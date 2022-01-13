@@ -121,26 +121,6 @@ namespace FileSystem {
      */
     bool OCSYNC_EXPORT openAndSeekFileSharedRead (QFile *file, QString *error, int64 seek);
 
-#ifdef Q_OS_WIN
-    /**
-     * Returns the file system used at the given path.
-     */
-    QString fileSystemForPath (QString &path);
-
-    /*
-     * This function takes a path and converts it to a UNC representation of the
-     * string. That means that it prepends a \\?\ (unless already UNC) and converts
-     * all slashes to backslashes.
-     *
-     * Note the following:
-     *  - The string must be absolute.
-     *  - it needs to contain a drive character to be a valid UNC
-     *  - A conversion is only done if the path len is larger than 245. Otherwise
-     *    the windows API functions work with the normal "unixoid" representation too.
-     */
-    QString OCSYNC_EXPORT pathtoUNC (QString &str);
-#endif
-
     /**
      * Returns true when a file is locked. (Windows only)
      */

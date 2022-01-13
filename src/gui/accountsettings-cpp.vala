@@ -123,11 +123,7 @@ AccountSettings.AccountSettings (AccountState *accountState, QWidget *parent)
     _ui._folderList.header ().hide ();
     _ui._folderList.setItemDelegate (delegate);
     _ui._folderList.setModel (_model);
-#if defined (Q_OS_MAC)
-    _ui._folderList.setMinimumWidth (400);
-#else
     _ui._folderList.setMinimumWidth (300);
-#endif
     new ToolTipUpdater (_ui._folderList);
 
     auto mouseCursorChanger = new MouseCursorChanger (this);

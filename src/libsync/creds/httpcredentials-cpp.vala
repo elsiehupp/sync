@@ -215,7 +215,6 @@ void HttpCredentials.deleteOldKeychainEntries () {
 }
 
 bool HttpCredentials.keychainUnavailableRetryLater (QKeychain.ReadPasswordJob *incoming) {
-#if defined (Q_OS_UNIX) && !defined (Q_OS_MAC)
     Q_ASSERT (!incoming.insecureFallback ()); // If insecureFallback is set, the next test would be pointless
     if (_retryOnKeyChainError && (incoming.error () == QKeychain.NoBackendAvailable
             || incoming.error () == QKeychain.OtherError)) {
@@ -227,9 +226,6 @@ bool HttpCredentials.keychainUnavailableRetryLater (QKeychain.ReadPasswordJob *i
         _retryOnKeyChainError = false;
         return true;
     }
-#else
-    Q_UNUSED (incoming);
-#endif
     _retryOnKeyChainError = false;
     return false;
 }

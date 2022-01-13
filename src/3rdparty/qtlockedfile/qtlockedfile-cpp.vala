@@ -70,10 +70,6 @@ namespace SharedTools {
 */
 QtLockedFile.QtLockedFile ()
     : QFile () {
-#ifdef Q_OS_WIN
-    m_semaphore_hnd = 0;
-    m_mutex_hnd = 0;
-#endif
     m_lock_mode = NoLock;
 }
 
@@ -85,10 +81,6 @@ QtLockedFile.QtLockedFile ()
 */
 QtLockedFile.QtLockedFile (QString &name)
     : QFile (name) {
-#ifdef Q_OS_WIN
-    m_semaphore_hnd = 0;
-    m_mutex_hnd = 0;
-#endif
     m_lock_mode = NoLock;
 }
 

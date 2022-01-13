@@ -82,7 +82,6 @@ Systray.Systray ()
 
     qmlRegisterType<WheelHandler> ("com.nextcloud.desktopclient", 1, 0, "WheelHandler");
 
-#ifndef Q_OS_MAC
     auto contextMenu = new QMenu ();
     if (AccountManager.instance ().accounts ().isEmpty ()) {
         contextMenu.addAction (tr ("Add account"), this, &Systray.openAccountWizard);
@@ -111,7 +110,6 @@ Systray.Systray ()
         resumeAction.setVisible (anyPaused);
         resumeAction.setEnabled (anyPaused);
     });
-#endif
 
     connect (UserModel.instance (), &UserModel.newUserSelected,
         this, &Systray.slotNewUserSelected);
@@ -264,14 +262,6 @@ void Systray.forceWindowInit (QQuickWindow *window) {
     // this shouldn't flicker
     window.show ();
     window.hide ();
-
-#ifdef Q_OS_MAC
-    // On macOS we need to designate the tray window as visible on all spaces and
-    // at the menu bar level, otherwise showing it can cause the current spaces to
-    // change, or the window could be obscured by another window that shouldn't
-    // normally cover a menu.
-    OCC.setTrayWindowLevelAndVisibleOnAllSpaces (window);
-#endif
 }
 
 QScreen *Systray.currentScreen () {
@@ -290,35 +280,6 @@ QScreen *Systray.currentScreen () {
 }
 
 Systray.TaskBarPosition Systray.taskbarOrientation () {
-// macOS: Always on top
-#if defined (Q_OS_MACOS)
-    return TaskBarPosition.Top;
-// Windows: Check registry for actual taskbar orientation
-#elif defined (Q_OS_WIN)
-    auto taskbarPositionSubkey = QStringLiteral ("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StuckRects3");
-    if (!Utility.registryKeyExists (HKEY_CURRENT_USER, taskbarPositionSubkey)) {
-        // Windows 7
-        taskbarPositionSubkey = QStringLiteral ("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StuckRects2");
-    }
-    if (!Utility.registryKeyExists (HKEY_CURRENT_USER, taskbarPositionSubkey)) {
-        return TaskBarPosition.Bottom;
-    }
-    auto taskbarPosition = Utility.registryGetKeyValue (HKEY_CURRENT_USER, taskbarPositionSubkey, "Settings");
-    switch (taskbarPosition.toInt ()) {
-    // Mapping windows binary value (0 = left, 1 = top, 2 = right, 3 = bottom) to qml logic (0 = bottom, 1 = left...)
-    case 0:
-        return TaskBarPosition.Left;
-    case 1:
-        return TaskBarPosition.Top;
-    case 2:
-        return TaskBarPosition.Right;
-    case 3:
-        return TaskBarPosition.Bottom;
-    default:
-        return TaskBarPosition.Bottom;
-    }
-// Probably Linux
-#else
     const auto screenRect = currentScreenRect ();
     const auto trayIconCenter = calcTrayIconCenter ();
 
@@ -338,25 +299,10 @@ Systray.TaskBarPosition Systray.taskbarOrientation () {
     } else {
         return TaskBarPosition.Right;
     }
-#endif
 }
 
 // TODO: Get real taskbar dimensions Linux as well
 QRect Systray.taskbarGeometry () {
-#if defined (Q_OS_WIN)
-    QRect tbRect = Utility.getTaskbarDimensions ();
-    //QML side expects effective pixels, convert taskbar dimensions if necessary
-    auto pixelRatio = currentScreen ().devicePixelRatio ();
-    if (pixelRatio != 1) {
-        tbRect.setHeight (tbRect.height () / pixelRatio);
-        tbRect.setWidth (tbRect.width () / pixelRatio);
-    }
-    return tbRect;
-#elif defined (Q_OS_MACOS)
-    // Finder bar is always 22px height on macOS (when treating as effective pixels)
-    auto screenWidth = currentScreenRect ().width ();
-    return {0, 0, screenWidth, 22};
-#else
     if (taskbarOrientation () == TaskBarPosition.Bottom || taskbarOrientation () == TaskBarPosition.Top) {
         auto screenWidth = currentScreenRect ().width ();
         return {0, 0, screenWidth, 32};
@@ -364,7 +310,6 @@ QRect Systray.taskbarGeometry () {
         auto screenHeight = currentScreenRect ().height ();
         return {0, 0, 32, screenHeight};
     }
-#endif
 }
 
 QRect Systray.currentScreenRect () {
@@ -458,15 +403,8 @@ QPoint Systray.computeWindowPosition (int width, int height) {
 }
 
 QPoint Systray.calcTrayIconCenter () {
-    // QSystemTrayIcon.geometry () is broken for ages on most Linux DEs (invalid geometry returned)
-    // thus we can use this only for Windows and macOS
-#if defined (Q_OS_WIN) || defined (Q_OS_MACOS)
-    auto trayIconCenter = geometry ().center ();
-    return trayIconCenter;
-#else
     // On Linux, fall back to mouse position (assuming tray icon is activated by mouse click)
     return QCursor.pos (currentScreen ());
-#endif
 }
 
 AccessManagerFactory.AccessManagerFactory ()

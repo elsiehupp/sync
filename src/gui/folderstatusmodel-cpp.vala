@@ -1011,23 +1011,13 @@ void FolderStatusModel.slotSetProgress (ProgressInfo &progress) {
             if (estimatedDownBw > 0) {
                 fileProgressString.append (tr (", "));
 // ifdefs: https://github.com/owncloud/client/issues/3095#issuecomment-128409294
-#ifdef Q_OS_WIN
-                //: Example text: "download 24Kb/s"   (%1 is replaced by 24Kb (translated))
-                fileProgressString.append (tr ("download %1/s").arg (Utility.octetsToString (estimatedDownBw)));
-#else
                 fileProgressString.append (tr ("\u2193 %1/s")
                                               .arg (Utility.octetsToString (estimatedDownBw)));
-#endif
             }
             if (estimatedUpBw > 0) {
                 fileProgressString.append (tr (", "));
-#ifdef Q_OS_WIN
-                //: Example text: "upload 24Kb/s"   (%1 is replaced by 24Kb (translated))
-                fileProgressString.append (tr ("upload %1/s").arg (Utility.octetsToString (estimatedUpBw)));
-#else
                 fileProgressString.append (tr ("\u2191 %1/s")
                                               .arg (Utility.octetsToString (estimatedUpBw)));
-#endif
             }
         } else {
             //: Example text: "uploading foobar.png (2MB of 2MB)"

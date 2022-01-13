@@ -24,56 +24,6 @@
 class TestLongWindowsPath : public QObject {
 
 private Q_SLOTS:
-#ifdef Q_OS_WIN
-    void check_long_win_path () { {
-            const auto path = QStringLiteral ("C://DATA/FILES/MUSIC/MY_MUSIC.mp3"); // check a short path
-            const auto exp_path = QStringLiteral ("\\\\?\\C:\\\\DATA\\FILES\\MUSIC\\MY_MUSIC.mp3");
-            QString new_short = OCC.FileSystem.pathtoUNC (path);
-            QCOMPARE (new_short, exp_path);
-        }
- {
-            const auto path = QStringLiteral ("\\\\foo\\bar/MY_MUSIC.mp3");
-            const auto exp_path = QStringLiteral ("\\\\foo\\bar\\MY_MUSIC.mp3");
-            QString new_short = OCC.FileSystem.pathtoUNC (path);
-            QCOMPARE (new_short, exp_path);
-        }
- {
-            const auto path = QStringLiteral ("//foo\\bar/MY_MUSIC.mp3");
-            const auto exp_path = QStringLiteral ("\\\\foo\\bar\\MY_MUSIC.mp3");
-            QString new_short = OCC.FileSystem.pathtoUNC (path);
-            QCOMPARE (new_short, exp_path);
-        }
- {
-            const auto path = QStringLiteral ("\\foo\\bar");
-            const auto exp_path = QStringLiteral ("\\\\?\\foo\\bar");
-            QString new_short = OCC.FileSystem.pathtoUNC (path);
-            QCOMPARE (new_short, exp_path);
-        }
- {
-            const auto path = QStringLiteral ("/foo/bar");
-            const auto exp_path = QStringLiteral ("\\\\?\\foo\\bar");
-            QString new_short = OCC.FileSystem.pathtoUNC (path);
-            QCOMPARE (new_short, exp_path);
-        }
-
-        const auto longPath = QStringLiteral ("D://alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
-                                             "elonglonglonglong/flonglonglonglong/glonglonglonglong/hlonglonglonglong/ilonglonglonglong/"
-                                             "jlonglonglonglong/klonglonglonglong/llonglonglonglong/mlonglonglonglong/nlonglonglonglong/"
-                                             "olonglonglonglong/file.txt");
-        const auto longPathConv = QStringLiteral ("\\\\?\\D:\\\\alonglonglonglong\\blonglonglonglong\\clonglonglonglong\\dlonglonglonglong\\"
-                                                 "elonglonglonglong\\flonglonglonglong\\glonglonglonglong\\hlonglonglonglong\\ilonglonglonglong\\"
-                                                 "jlonglonglonglong\\klonglonglonglong\\llonglonglonglong\\mlonglonglonglong\\nlonglonglonglong\\"
-                                                 "olonglonglonglong\\file.txt");
-
-        QString new_long = OCC.FileSystem.pathtoUNC (longPath);
-        // printf ( "XXXXXXXXXXXX %s %d\n", new_long, mem_reserved);
-
-        QCOMPARE (new_long, longPathConv);
-
-        // printf ( "YYYYYYYYYYYY %ld\n", strlen (new_long));
-        QCOMPARE (new_long.length (), 286);
-    }
-#endif
 
     void testLongPathStat_data () {
         QTest.addColumn<QString> ("name");

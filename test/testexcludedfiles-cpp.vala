@@ -200,7 +200,6 @@ private slots:
         QCOMPARE (check_file_full ("a b d"), CSYNC_FILE_EXCLUDE_LIST);
         QCOMPARE (check_file_full ("a c d"), CSYNC_FILE_EXCLUDE_LIST);
 
-#ifndef Q_OS_WIN   // Because of CSYNC_FILE_EXCLUDE_INVALID_CHAR on windows
         /* escapes */
         excludedFiles.addManualExclude ("a \\*");
         excludedFiles.addManualExclude ("b \\?");
@@ -215,7 +214,6 @@ private slots:
         QCOMPARE (check_file_full ("c \\[d]"), CSYNC_NOT_EXCLUDED);
         QCOMPARE (check_file_full ("c d"), CSYNC_NOT_EXCLUDED);
         QCOMPARE (check_file_full ("c [d]"), CSYNC_FILE_EXCLUDE_LIST);
-#endif
     }
 
     void check_csync_excluded_per_dir () {
@@ -392,7 +390,6 @@ private slots:
         QCOMPARE (check_file_traversal ("a b d"), CSYNC_FILE_EXCLUDE_LIST);
         QCOMPARE (check_file_traversal ("a c d"), CSYNC_FILE_EXCLUDE_LIST);
 
-#ifndef Q_OS_WIN   // Because of CSYNC_FILE_EXCLUDE_INVALID_CHAR on windows
         /* escapes */
         excludedFiles.addManualExclude ("a \\*");
         excludedFiles.addManualExclude ("b \\?");
@@ -407,7 +404,6 @@ private slots:
         QCOMPARE (check_file_traversal ("c \\[d]"), CSYNC_NOT_EXCLUDED);
         QCOMPARE (check_file_traversal ("c d"), CSYNC_NOT_EXCLUDED);
         QCOMPARE (check_file_traversal ("c [d]"), CSYNC_FILE_EXCLUDE_LIST);
-#endif
     }
 
     void check_csync_dir_only () {

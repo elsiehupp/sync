@@ -20,10 +20,6 @@
 #if defined (BUILD_UPDATER)
 #endif
 
-#if defined (Q_OS_WIN)
-// #include <windows.h>
-#endif
-
 #if defined (WITH_CRASHREPORTER)
 // #include <libcrashreporter-handler/Handler.h>
 #endif
@@ -65,11 +61,7 @@ namespace {
             qCWarning (lcApplication) << "Running from build location! Translations may be incomplete!";
             return devTrPath;
         }
-#if defined (Q_OS_WIN)
-        return QApplication.applicationDirPath () + QLatin1String ("/i18n/");
-#elif defined (Q_OS_MAC)
-        return QApplication.applicationDirPath () + QLatin1String ("/../Resources/Translations"); // path defaults to app dir.
-#elif defined (Q_OS_UNIX)
+#if defined (Q_OS_UNIX)
         return QString.fromLatin1 (SHAREDIR "/" APPLICATION_EXECUTABLE "/i18n/");
 #endif
     }
@@ -157,12 +149,6 @@ Application.Application (int &argc, char **argv)
 
     qsrand (std.random_device () ());
 
-#ifdef Q_OS_WIN
-    // Ensure OpenSSL config file is only loaded from app directory
-    QString opensslConf = QCoreApplication.applicationDirPath () + QString ("/openssl.cnf");
-    qputenv ("OPENSSL_CONF", opensslConf.toLocal8Bit ());
-#endif
-
     // TODO: Can't set this without breaking current config paths
     //    setOrganizationName (QLatin1String (APPLICATION_VENDOR));
     setOrganizationDomain (QLatin1String (APPLICATION_REV_DOMAIN));
@@ -210,11 +196,6 @@ Application.Application (int &argc, char **argv)
                         }
                     }
                 }
-            } else {
-#ifndef Q_OS_WIN
-                // Create a symbolic link so a downgrade of the client would still find the config.
-                QFile.link (confDir, oldDir);
-#endif
             }
         }
     }
@@ -235,11 +216,6 @@ Application.Application (int &argc, char **argv)
 #if defined (WITH_CRASHREPORTER)
     if (ConfigFile ().crashReporter ()) {
         auto reporter = QStringLiteral (CRASHREPORTER_EXECUTABLE);
-#ifdef Q_OS_WIN
-        if (!reporter.endsWith (QLatin1String (".exe"))) {
-            reporter.append (QLatin1String (".exe"));
-        }
-#endif
         _crashHandler.reset (new CrashReporter.Handler (QDir.tempPath (), true, reporter));
     }
 #endif
@@ -460,11 +436,6 @@ void Application.slotownCloudWizardDone (int res) {
 #else
         bool shouldSetAutoStart = false;
 #endif
-#ifdef Q_OS_MAC
-        // Don't auto start when not being 'installed'
-        shouldSetAutoStart = shouldSetAutoStart
-            && QCoreApplication.applicationDirPath ().startsWith ("/Applications/");
-#endif
         if (shouldSetAutoStart) {
             Utility.setLaunchOnStartup (_theme.appName (), _theme.appNameGUI (), true);
         }
@@ -596,27 +567,10 @@ void Application.parseOptions (QStringList &options) {
 }
 
 // Helpers for displaying messages. Note that there is no console on Windows.
-#ifdef Q_OS_WIN
-// Format as <pre> HTML
-static inline void toHtml (QString &t) {
-    t.replace (QLatin1Char ('&'), QLatin1String ("&amp;"));
-    t.replace (QLatin1Char ('<'), QLatin1String ("&lt;"));
-    t.replace (QLatin1Char ('>'), QLatin1String ("&gt;"));
-    t.insert (0, QLatin1String ("<html><pre>"));
-    t.append (QLatin1String ("</pre></html>"));
-}
-
-static void displayHelpText (QString t) // No console on Windows. {
-    toHtml (t);
-    QMessageBox.information (0, Theme.instance ().appNameGUI (), t);
-}
-
-#else
 
 static void displayHelpText (QString &t) {
     std.cout << qUtf8Printable (t);
 }
-#endif
 
 void Application.showHelp () {
     setHelp ();
@@ -677,13 +631,7 @@ QString substLang (QString &lang) {
 
 void Application.setupTranslations () {
     QStringList uiLanguages;
-// uiLanguages crashes on Windows with 4.8.0 release builds
-#if (QT_VERSION >= 0x040801) || (QT_VERSION >= 0x040800 && !defined (Q_OS_WIN))
     uiLanguages = QLocale.system ().uiLanguages ();
-#else
-    // older versions need to fall back to the systems locale
-    uiLanguages << QLocale.system ().name ();
-#endif
 
     QString enforcedLocale = Theme.instance ().enforcedLocale ();
     if (!enforcedLocale.isEmpty ())
@@ -779,15 +727,6 @@ void Application.tryTrayAgain () {
 }
 
 bool Application.event (QEvent *event) {
-#ifdef Q_OS_MAC
-    if (event.type () == QEvent.FileOpen) {
-        QFileOpenEvent *openEvent = static_cast<QFileOpenEvent *> (event);
-        qCDebug (lcApplication) << "QFileOpenEvent" << openEvent.file ();
-        // virtual file, open it after the Folder were created (if the app is not terminated)
-        QString fn = openEvent.file ();
-        QTimer.singleShot (0, this, [this, fn] { openVirtualFile (fn); });
-    }
-#endif
     return SharedTools.QtSingleApplication.event (event);
 }
 

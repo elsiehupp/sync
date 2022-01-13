@@ -42,14 +42,6 @@ QUrl Updater.updateUrl () {
 
     auto urlQuery = getQueryParams ();
 
-#if defined (Q_OS_MAC) && defined (HAVE_SPARKLE)
-    urlQuery.addQueryItem (QLatin1String ("sparkle"), QLatin1String ("true"));
-#endif
-
-#if defined (Q_OS_WIN)
-    urlQuery.addQueryItem (QLatin1String ("msi"), QLatin1String ("true"));
-#endif
-
     updateBaseUrl.setQuery (urlQuery);
 
     return updateBaseUrl;
@@ -122,16 +114,8 @@ Updater *Updater.create () {
         qCWarning (lcUpdater) << "Not a valid updater URL, will not do update check";
         return nullptr;
     }
-
-#if defined (Q_OS_MAC) && defined (HAVE_SPARKLE)
-    return new SparkleUpdater (url);
-#elif defined (Q_OS_WIN32)
-    // Also for MSI
-    return new NSISUpdater (url);
-#else
     // the best we can do is notify about updates
     return new PassiveUpdateNotifier (url);
-#endif
 }
 
 int64 Updater.Helper.versionToInt (int64 major, int64 minor, int64 patch, int64 build) {

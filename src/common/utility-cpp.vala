@@ -44,13 +44,7 @@
 // #include <cstdarg>
 // #include <cstring>
 
-#if defined (Q_OS_WIN)
-#include "utility_win.cpp"
-#elif defined (Q_OS_MAC)
-#include "utility_mac.cpp"
-#else
 #include "utility_unix.cpp"
-#endif
 
 namespace OCC {
 
@@ -147,25 +141,7 @@ QString Utility.octetsToString (int64 octets) {
 
 // Qtified version of get_platforms () in csync_owncloud.c
 static QLatin1String platform () {
-#if defined (Q_OS_WIN)
-    return QLatin1String ("Windows");
-#elif defined (Q_OS_MAC)
-    return QLatin1String ("Macintosh");
-#elif defined (Q_OS_LINUX)
-    return QLatin1String ("Linux");
-#elif defined (__DragonFly__) // Q_OS_FREEBSD also defined
-    return QLatin1String ("DragonFlyBSD");
-#elif defined (Q_OS_FREEBSD) || defined (Q_OS_FREEBSD_KERNEL)
-    return QLatin1String ("FreeBSD");
-#elif defined (Q_OS_NETBSD)
-    return QLatin1String ("NetBSD");
-#elif defined (Q_OS_OPENBSD)
-    return QLatin1String ("OpenBSD");
-#elif defined (Q_OS_SOLARIS)
-    return QLatin1String ("Solaris");
-#else
     return QSysInfo.productType ();
-#endif
 }
 
 QByteArray Utility.userAgentString () {
@@ -187,12 +163,8 @@ QByteArray Utility.friendlyUserAgentString () {
 }
 
 bool Utility.hasSystemLaunchOnStartup (QString &appName) {
-#if defined (Q_OS_WIN)
-    return hasSystemLaunchOnStartup_private (appName);
-#else
     Q_UNUSED (appName)
     return false;
-#endif
 }
 
 bool Utility.hasLaunchOnStartup (QString &appName) {
@@ -204,21 +176,10 @@ void Utility.setLaunchOnStartup (QString &appName, QString &guiName, bool enable
 }
 
 int64 Utility.freeDiskSpace (QString &path) {
-#if defined (Q_OS_MAC) || defined (Q_OS_FREEBSD) || defined (Q_OS_FREEBSD_KERNEL) || defined (Q_OS_NETBSD) || defined (Q_OS_OPENBSD)
-    struct statvfs stat;
-    if (statvfs (path.toLocal8Bit ().data (), &stat) == 0) {
-        return (int64)stat.f_bavail * stat.f_frsize;
-    }
-#elif defined (Q_OS_UNIX)
+#if defined (Q_OS_UNIX)
     struct statvfs64 stat;
     if (statvfs64 (path.toLocal8Bit ().data (), &stat) == 0) {
         return (int64)stat.f_bavail * stat.f_frsize;
-    }
-#elif defined (Q_OS_WIN)
-    ULARGE_INTEGER freeBytes;
-    freeBytes.QuadPart = 0L;
-    if (GetDiskFreeSpaceEx (reinterpret_cast<const wchar_t *> (FileSystem.longWinPath (path).utf16 ()), &freeBytes, nullptr, nullptr)) {
-        return freeBytes.QuadPart;
     }
 #endif
     return -1;
@@ -628,25 +589,11 @@ QByteArray Utility.conflictFileBaseNameFromPattern (QByteArray &conflictName) {
 
 bool Utility.isPathWindowsDrivePartitionRoot (QString &path) {
     Q_UNUSED (path)
-#ifdef Q_OS_WIN
-    // should be 2 or 3 characters length
-    if (! (path.size () >= 2 && path.size () <= 3)) {
-        return false;
-    }
-
-    // must mutch a pattern "[A-Za-z]:"
-    if (! (path.at (1) == QLatin1Char (':') && path.at (0).isLetter ())) {
-        return false;
-    }
-
-    // final check - last character should be either slash/backslash, or, it should be missing
-    return path.size () < 3 || path.at (2) == QLatin1Char ('/') || path.at (2) == QLatin1Char ('\\');
-#endif
     return false;
 }
 
 QString Utility.sanitizeForFileName (QString &name) {
-    const auto invalid = QStringLiteral (R" (/?<>\:*|")");
+    const auto invalid = QStringLiteral (R" (/?<>\:*|\")");
     QString result;
     result.reserve (name.size ());
     for (auto c : name) {

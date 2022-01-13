@@ -64,11 +64,8 @@ static int setup_testenv (void **state) {
 
     assert_non_null (_tgetcwd (wd_buffer, WD_BUFFER_SIZE));
 
-#ifdef Q_OS_WIN
-    rc  = _tchdir (dir.toStdWString ().data ());
-#else
     rc  = _tchdir (dir.toLocal8Bit ().constData ());
-#endif
+
     assert_int_equal (rc, 0);
 
     /* --- initialize csync */

@@ -239,14 +239,6 @@ void ownCloudGui.slotComputeOverallSyncStatus () {
         } else {
             setStatusText (tr ("Disconnected from some accounts"));
         }
-#ifdef Q_OS_WIN
-        // Windows has a 128-char tray tooltip length limit.
-        QStringList accountNames;
-        foreach (AccountStatePtr a, problemAccounts) {
-            accountNames.append (a.account ().displayName ());
-        }
-        _tray.setToolTip (tr ("Disconnected from %1").arg (accountNames.join (QLatin1String (", "))));
-#else
         QStringList messages;
         messages.append (tr ("Disconnected from accounts:"));
         foreach (AccountStatePtr a, problemAccounts) {
@@ -300,10 +292,6 @@ void ownCloudGui.slotComputeOverallSyncStatus () {
 
     // create the tray blob message, check if we have an defined state
     if (map.count () > 0) {
-#ifdef Q_OS_WIN
-        // Windows has a 128-char tray tooltip length limit.
-        trayMessage = folderMan.trayTooltipStatusString (overallStatus, hasUnresolvedConflicts, false);
-#else
         QStringList allStatusStrings;
         foreach (Folder *folder, map.values ()) {
             QString folderMessage = FolderMan.trayTooltipStatusString (
@@ -357,16 +345,6 @@ void ownCloudGui.slotFolderOpenAction (QString &alias) {
     if (f) {
         qCInfo (lcApplication) << "opening local url " << f.path ();
         QUrl url = QUrl.fromLocalFile (f.path ());
-
-#ifdef Q_OS_WIN
-        // work around a bug in QDesktopServices on Win32, see i-net
-        QString filePath = f.path ();
-
-        if (filePath.startsWith (QLatin1String ("\\\\")) || filePath.startsWith (QLatin1String ("//")))
-            url = QUrl.fromLocalFile (QDir.toNativeSeparators (filePath));
-        else
-            url = QUrl.fromLocalFile (filePath);
-#endif
         QDesktopServices.openUrl (url);
     }
 }
@@ -540,21 +518,6 @@ void ownCloudGui.raiseDialog (QWidget *raiseWidget) {
         raiseWidget.showNormal ();
         raiseWidget.raise ();
         raiseWidget.activateWindow ();
-#ifdef Q_OS_WIN
-        // Windows disallows raising a Window when you're not the active application.
-        // Use a common hack to attach to the active application
-        const auto activeProcessId = GetWindowThreadProcessId (GetForegroundWindow (), nullptr);
-        if (activeProcessId != qApp.applicationPid ()) {
-            const auto threadId = GetCurrentThreadId ();
-            // don't step here with a debugger...
-            if (AttachThreadInput (threadId, activeProcessId, true)) {
-                const auto hwnd = reinterpret_cast<HWND> (raiseWidget.winId ());
-                SetForegroundWindow (hwnd);
-                SetWindowPos (hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
-                AttachThreadInput (threadId, activeProcessId, false);
-            }
-        }
-#endif
     }
 }
 

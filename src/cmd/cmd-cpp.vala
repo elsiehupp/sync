@@ -33,12 +33,8 @@
 # include "creds/httpcredentials.h"
 #endif
 
-#ifdef Q_OS_WIN32
-// #include <windows.h>
-#else
 // #include <termios.h>
 // #include <unistd.h>
-#endif
 
 using namespace OCC;
 
@@ -72,33 +68,18 @@ CmdOptions *opts = nullptr;
 class EchoDisabler {
 public:
     EchoDisabler () {
-#ifdef Q_OS_WIN
-        hStdin = GetStdHandle (STD_INPUT_HANDLE);
-        GetConsoleMode (hStdin, &mode);
-        SetConsoleMode (hStdin, mode & (~ENABLE_ECHO_INPUT));
-#else
         tcgetattr (STDIN_FILENO, &tios);
         termios tios_new = tios;
         tios_new.c_lflag &= ~ECHO;
         tcsetattr (STDIN_FILENO, TCSANOW, &tios_new);
-#endif
     }
 
     ~EchoDisabler () {
-#ifdef Q_OS_WIN
-        SetConsoleMode (hStdin, mode);
-#else
         tcsetattr (STDIN_FILENO, TCSANOW, &tios);
-#endif
     }
 
 private:
-#ifdef Q_OS_WIN
-    DWORD mode = 0;
-    HANDLE hStdin;
-#else
     termios tios;
-#endif
 };
 
 QString queryPassword (QString &user) {
@@ -278,16 +259,7 @@ void selectiveSyncFixup (OCC.SyncJournalDb *journal, QStringList &newList) {
 }
 
 int main (int argc, char **argv) {
-#ifdef Q_OS_WIN
-    SetDllDirectory (L"");
-#endif
     QCoreApplication app (argc, argv);
-
-#ifdef Q_OS_WIN
-    // Ensure OpenSSL config file is only loaded from app directory
-    QString opensslConf = QCoreApplication.applicationDirPath () + QString ("/openssl.cnf");
-    qputenv ("OPENSSL_CONF", opensslConf.toLocal8Bit ());
-#endif
 
     CmdOptions options;
     options.silent = false;

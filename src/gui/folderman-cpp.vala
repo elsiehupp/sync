@@ -15,10 +15,6 @@
 // #include <pushnotifications.h>
 // #include <syncengine.h>
 
-#ifdef Q_OS_MAC
-// #include <CoreServices/CoreServices.h>
-#endif
-
 // #include <QMessageBox>
 // #include <QtCore>
 // #include <QMutableSetIterator>
@@ -1471,9 +1467,6 @@ static QString checkPathValidityRecursive (QString &path) {
         return FolderMan.tr ("No valid folder selected!");
     }
 
-#ifdef Q_OS_WIN
-    Utility.NtfsPermissionLookupRAII ntfs_perm;
-#endif
     const QFileInfo selFile (path);
 
     if (!selFile.exists ()) {

@@ -593,7 +593,6 @@ private slots:
     void testInvalidFilenameRegex () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
 
-#ifndef Q_OS_WIN  // We can't have local file with these character
         // For current servers, no characters are forbidden
         fakeFolder.syncEngine ().account ().setServerVersion ("10.0.0");
         fakeFolder.localModifier ().insert ("A/\\:?*\"<>|.txt");
@@ -605,7 +604,6 @@ private slots:
         fakeFolder.localModifier ().insert ("B/\\:?*\"<>|.txt");
         QVERIFY (fakeFolder.syncOnce ());
         QVERIFY (!fakeFolder.currentRemoteState ().find ("B/\\:?*\"<>|.txt"));
-#endif
 
         // We can override that by setting the capability
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "invalidFilenameRegex", "" } } } });
@@ -662,7 +660,6 @@ private slots:
         QVERIFY (fakeFolder.currentLocalState ().find ("A/tößt"));
         QVERIFY (fakeFolder.currentLocalState ().find ("A/t𠜎t"));
 
-#if !defined (Q_OS_MAC) && !defined (Q_OS_WIN)
         // Try again with a locale that can represent ö but not 𠜎 (4-byte utf8).
         QTextCodec.setCodecForLocale (QTextCodec.codecForName ("ISO-8859-15"));
         QVERIFY (QTextCodec.codecForLocale ().mibEnum () == 111);
@@ -693,7 +690,6 @@ private slots:
         QVERIFY (fakeFolder.currentRemoteState ().find ("C/tößt"));
 
         QTextCodec.setCodecForLocale (utf8Locale);
-#endif
     }
 
     // Aborting has had bugs when there are parallel upload jobs
@@ -722,7 +718,6 @@ private slots:
         QCOMPARE (nPUT, 3);
     }
 
-#ifndef Q_OS_WIN
     void testPropagatePermissions () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         auto perm = QFileDevice.Permission (0x7704); // user/owner: rwx, group: r, other: -
@@ -741,7 +736,6 @@ private slots:
         QVERIFY (conflictName.contains ("A/a2"));
         QCOMPARE (QFileInfo (fakeFolder.localPath () + conflictName).permissions (), perm);
     }
-#endif
 
     void testEmptyLocalButHasRemote () {
         FakeFolder fakeFolder{ FileInfo{} };

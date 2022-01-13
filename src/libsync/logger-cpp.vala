@@ -25,10 +25,6 @@
 // #include <zlib.h>
 #endif
 
-#ifdef Q_OS_WIN
-// #include <io.h> // for stdout
-#endif
-
 namespace {
 constexpr int CrashLogSize = 20;
 }
@@ -86,10 +82,6 @@ void Logger.doLog (QtMsgType type, QMessageLogContext &ctx, QString &message) { 
         }
         if (type == QtFatalMsg) {
             close ();
-#if defined (Q_OS_WIN)
-            // Make application terminate in a way that can be caught by the crash reporter
-            Utility.crash ();
-#endif
         }
     }
     emit logWindowLog (msg);

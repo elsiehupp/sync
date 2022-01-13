@@ -21,23 +21,11 @@ Q_LOGGING_CATEGORY (lcStatusTracker, "nextcloud.sync.statustracker", QtInfoMsg)
 
 static int pathCompare ( const QString& lhs, QString& rhs ) {
     // Should match Utility.fsCasePreserving, we want don't want to pay for the runtime check on every comparison.
-    return lhs.compare (rhs,
-#if defined (Q_OS_WIN) || defined (Q_OS_MAC)
-        Qt.CaseInsensitive
-#else
-        Qt.CaseSensitive
-#endif
-        );
+    return lhs.compare (rhs, Qt.CaseSensitive);
 }
 
 static bool pathStartsWith ( const QString& lhs, QString& rhs ) {
-    return lhs.startsWith (rhs,
-#if defined (Q_OS_WIN) || defined (Q_OS_MAC)
-        Qt.CaseInsensitive
-#else
-        Qt.CaseSensitive
-#endif
-        );
+    return lhs.startsWith (rhs, Qt.CaseSensitive);
 }
 
 bool SyncFileStatusTracker.PathComparator.operator () ( const QString& lhs, QString& rhs ) {

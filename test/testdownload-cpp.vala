@@ -137,9 +137,6 @@ private slots:
     }
 
     void testMoveFailsInAConflict () {
-#ifdef Q_OS_WIN
-        QSKIP ("Not run on windows because permission on directory does not do what is expected");
-#endif
         // Test for https://github.com/owncloud/client/issues/7015
         // We want to test the case in which the renaming of the original to the conflict file succeeds,
         // but renaming the temporary file fails.

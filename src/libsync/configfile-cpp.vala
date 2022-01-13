@@ -170,17 +170,7 @@ bool ConfigFile.optionalServerNotifications () {
 }
 
 bool ConfigFile.showInExplorerNavigationPane () {
-    const bool defaultValue =
-#ifdef Q_OS_WIN
-    #if QTLEGACY
-        (QSysInfo.windowsVersion () < QSysInfo.WV_WINDOWS10);
-    #else
-        QOperatingSystemVersion.current () >= QOperatingSystemVersion.Windows10;
-    #endif
-#else
-        false
-#endif
-        ;
+    const bool defaultValue = false;
     QSettings settings (configFile (), QSettings.IniFormat);
     return settings.value (QLatin1String (showInExplorerNavigationPaneC), defaultValue).toBool ();
 }
@@ -342,10 +332,6 @@ QString ConfigFile.excludeFile (Scope scope) {
 
 QString ConfigFile.excludeFileFromSystem () {
     QFileInfo fi;
-#ifdef Q_OS_WIN
-    fi.setFile (QCoreApplication.applicationDirPath (), exclFile);
-#endif
-#ifdef Q_OS_UNIX
     fi.setFile (QString (SYSCONFDIR "/" + Theme.instance ().appName ()), exclFile);
     if (!fi.exists ()) {
         // Prefer to return the preferred path! Only use the fallback location
@@ -368,12 +354,6 @@ QString ConfigFile.excludeFileFromSystem () {
             }
         }
     }
-#endif
-#ifdef Q_OS_MAC
-    // exec path is inside the bundle
-    fi.setFile (QCoreApplication.applicationDirPath (),
-        QLatin1String ("../Resources/") + exclFile);
-#endif
 
     return fi.absoluteFilePath ();
 }
@@ -826,10 +806,6 @@ void ConfigFile.setPromptDeleteFiles (bool promptDeleteFiles) {
 bool ConfigFile.monoIcons () {
     QSettings settings (configFile (), QSettings.IniFormat);
     bool monoDefault = false; // On Mac we want bw by default
-#ifdef Q_OS_MAC
-    // OEM themes are not obliged to ship mono icons
-    monoDefault = QByteArrayLiteral ("Nextcloud") == QByteArrayLiteral (APPLICATION_NAME);
-#endif
     return settings.value (QLatin1String (monoIconsC), monoDefault).toBool ();
 }
 

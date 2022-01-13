@@ -12,12 +12,6 @@
  * for more details.
  */
 
-#if defined (BUILD_UPDATER)
-#ifdef Q_OS_MAC
-// FIXME We should unify those, but Sparkle does everything behind the scene transparently
-#endif
-#endif
-
 // #include <QFileDialog>
 // #include <QMessageBox>
 // #include <QNetworkProxy>
@@ -123,11 +117,6 @@ GeneralSettings.GeneralSettings (QWidget *parent)
     connect (_ui.showInExplorerNavigationPaneCheckBox, &QAbstractButton.toggled, this, &GeneralSettings.slotShowInExplorerNavigationPane);
 
     // Rename 'Explorer' appropriately on non-Windows
-#ifdef Q_OS_MAC
-    QString txt = _ui.showInExplorerNavigationPaneCheckBox.text ();
-    txt.replace (QString.fromLatin1 ("Explorer"), QString.fromLatin1 ("Finder"));
-    _ui.showInExplorerNavigationPaneCheckBox.setText (txt);
-#endif
 
     if (Utility.hasSystemLaunchOnStartup (Theme.instance ().appName ())) {
         _ui.autostartCheckBox.setChecked (true);
@@ -165,19 +154,8 @@ GeneralSettings.GeneralSettings (QWidget *parent)
     _ui.crashreporterCheckBox.setVisible (false);
 #endif
 
-    // Hide on non-Windows, or WindowsVersion < 10.
-    // The condition should match the default value of ConfigFile.showInExplorerNavigationPane.
-#ifdef Q_OS_WIN
-    #if QTLEGACY
-        if (QSysInfo.windowsVersion () < QSysInfo.WV_WINDOWS10)
-    #else
-        if (QOperatingSystemVersion.current () < QOperatingSystemVersion.Windows10)
-    #endif
-            _ui.showInExplorerNavigationPaneCheckBox.setVisible (false);
-#else
     // Hide on non-Windows
     _ui.showInExplorerNavigationPaneCheckBox.setVisible (false);
-#endif
 
     /* Set the left contents margin of the layout to zero to make the checkboxes
      * align properly vertically , fixes bug #3758
@@ -261,12 +239,6 @@ void GeneralSettings.slotUpdateInfo () {
 
         _ui.autoCheckForUpdatesCheckBox.setChecked (ConfigFile ().autoUpdateCheck ());
     }
-#if defined (Q_OS_MAC) && defined (HAVE_SPARKLE)
-    else if (auto sparkleUpdater = qobject_cast<SparkleUpdater *> (Updater.instance ())) {
-        _ui.updateStateLabel.setText (sparkleUpdater.statusString ());
-        _ui.restartButton.setVisible (false);
-    }
-#endif
 
     // Channel selection
     _ui.updateChannel.setCurrentIndex (ConfigFile ().updateChannel () == "beta" ? 1 : 0);
@@ -304,12 +276,6 @@ void GeneralSettings.slotUpdateChannelChanged (QString &channel) {
                 updater.setUpdateUrl (Updater.updateUrl ());
                 updater.checkForUpdate ();
             }
-#if defined (Q_OS_MAC) && defined (HAVE_SPARKLE)
-            else if (auto updater = qobject_cast<SparkleUpdater *> (Updater.instance ())) {
-                updater.setUpdateUrl (Updater.updateUrl ());
-                updater.checkForUpdate ();
-            }
-#endif
         } else {
             _ui.updateChannel.setCurrentText (ConfigFile ().updateChannel ());
         }

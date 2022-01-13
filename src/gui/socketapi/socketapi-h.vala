@@ -14,11 +14,8 @@
 
 #include "sharedialog.h" // for the ShareDialogStartPage
 
-#if defined (Q_OS_MAC)
-#else
 // #include <QLocalServer>
 using SocketApiServer = QLocalServer;
-#endif
 
 class QUrl;
 class QLocalSocket;
@@ -113,13 +110,6 @@ private:
     Q_INVOKABLE void command_RESOLVE_CONFLICT (QString &localFile, SocketListener *listener);
     Q_INVOKABLE void command_DELETE_ITEM (QString &localFile, SocketListener *listener);
     Q_INVOKABLE void command_MOVE_ITEM (QString &localFile, SocketListener *listener);
-
-    // Windows Shell / Explorer pinning fallbacks, see issue: https://github.com/nextcloud/desktop/issues/1599
-#ifdef Q_OS_WIN
-    Q_INVOKABLE void command_COPYASPATH (QString &localFile, SocketListener *listener);
-    Q_INVOKABLE void command_OPENNEWWINDOW (QString &localFile, SocketListener *listener);
-    Q_INVOKABLE void command_OPEN (QString &localFile, SocketListener *listener);
-#endif
 
     // External sync
     Q_INVOKABLE void command_V2_LIST_ACCOUNTS (QSharedPointer<SocketApiJobV2> &job) const;

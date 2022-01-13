@@ -8,56 +8,34 @@
 // #include <QtTest>
 
 void touch (QString &file) {
-#ifdef Q_OS_WIN
-    OCC.Utility.writeRandomFile (file);
-#else
     QString cmd;
     cmd = QString ("touch %1").arg (file);
     qDebug () << "Command: " << cmd;
     system (cmd.toLocal8Bit ());
-#endif
 }
 
 void mkdir (QString &file) {
-#ifdef Q_OS_WIN
-    QDir dir;
-    dir.mkdir (file);
-#else
     QString cmd = QString ("mkdir %1").arg (file);
     qDebug () << "Command: " << cmd;
     system (cmd.toLocal8Bit ());
-#endif
 }
 
 void rmdir (QString &file) {
-#ifdef Q_OS_WIN
-    QDir dir;
-    dir.rmdir (file);
-#else
     QString cmd = QString ("rmdir %1").arg (file);
     qDebug () << "Command: " << cmd;
     system (cmd.toLocal8Bit ());
-#endif
 }
 
 void rm (QString &file) {
-#ifdef Q_OS_WIN
-    QFile.remove (file);
-#else
     QString cmd = QString ("rm %1").arg (file);
     qDebug () << "Command: " << cmd;
     system (cmd.toLocal8Bit ());
-#endif
 }
 
 void mv (QString &file1, QString &file2) {
-#ifdef Q_OS_WIN
-    QFile.rename (file1, file2);
-#else
     QString cmd = QString ("mv %1 %2").arg (file1, file2);
     qDebug () << "Command: " << cmd;
     system (cmd.toLocal8Bit ());
-#endif
 }
 
 using namespace OCC;
@@ -246,10 +224,6 @@ private slots:
     }
 };
 
-#ifdef Q_OS_MAC
-    QTEST_MAIN (TestFolderWatcher)
-#else
     QTEST_GUILESS_MAIN (TestFolderWatcher)
-#endif
 
 #include "testfolderwatcher.moc"

@@ -31,21 +31,6 @@ static void addSettingsToJob (Account *account, QKeychain.Job *job) {
 }
 #endif
 
-#ifdef Q_OS_WIN
-void jobKeyPrependAppName (QString &key) {
-    // NOTE: The following is normally done in AbstractCredentials.keychainKey
-    //       when an _account is specified by our other ctr overload (see 'kck' in this file).
-
-    // On Windows the credential keys aren't namespaced properly
-    // by qtkeychain. To work around that we manually add namespacing
-    // to the generated keys. See #6125.
-    // It's safe to do that since the key format is changing for 2.4
-    // anyway to include the account ids. That means old keys can be
-    // migrated to new namespaced keys on windows for 2.4.
-    key.prepend (QCoreApplication.applicationName () + "_");
-}
-#endif
-
 /*
 * Job
 */
@@ -109,9 +94,6 @@ WriteJob.WriteJob (Account *account, QString &key, QByteArray &data, QObject *pa
 
 WriteJob.WriteJob (QString &key, QByteArray &data, QObject *parent)
     : WriteJob (nullptr, key, data, parent) {
-#ifdef Q_OS_WIN
-    jobKeyPrependAppName (_key);
-#endif
 }
 
 void WriteJob.start () {
@@ -151,18 +133,11 @@ void WriteJob.slotWriteJobDone (QKeychain.Job *incomingJob) {
 
     // write a chunk if there is any in the buffer
     if (!_chunkBuffer.isEmpty ()) {
-#if defined (Q_OS_WIN)
-        // Windows workaround: Split the data into chunks of 2048 bytes,
-        // to allow 4k (4096 bit) keys to be saved (obey Windows's limits)
-        auto chunk = _chunkBuffer.left (KeychainChunk.ChunkSize);
-
-        _chunkBuffer = _chunkBuffer.right (_chunkBuffer.size () - chunk.size ());
-#else
         // write full data in one chunk on non-Windows, as usual
         auto chunk = _chunkBuffer;
 
         _chunkBuffer.clear ();
-#endif
+
         auto index = (_chunkCount++);
 
         // keep the limit
@@ -227,9 +202,6 @@ ReadJob.ReadJob (Account *account, QString &key, bool keychainMigration, QObject
 
 ReadJob.ReadJob (QString &key, QObject *parent)
     : ReadJob (nullptr, key, false, parent) {
-#ifdef Q_OS_WIN
-    jobKeyPrependAppName (_key);
-#endif
 }
 
 void ReadJob.start () {
@@ -280,34 +252,7 @@ void ReadJob.slotReadJobDone (QKeychain.Job *incomingJob) {
     if (readJob.error () == NoError && !readJob.binaryData ().isEmpty ()) {
         _chunkBuffer.append (readJob.binaryData ());
         _chunkCount++;
-
-#if defined (Q_OS_WIN)
-        // try to fetch next chunk
-        if (_chunkCount < KeychainChunk.MaxChunks) {
-            const QString keyWithIndex = _key + QString (".") + QString.number (_chunkCount);
-            const QString kck = _account ? AbstractCredentials.keychainKey (
-                    _account.url ().toString (),
-                    keyWithIndex,
-                    _keychainMigration ? QString () : _account.id ()
-                ) : keyWithIndex;
-
-            auto job = new QKeychain.ReadPasswordJob (_serviceName, this);
-#if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
-            addSettingsToJob (_account, job);
-#endif
-            job.setInsecureFallback (_insecureFallback);
-            job.setKey (kck);
-            connect (job, &QKeychain.Job.finished, this, &KeychainChunk.ReadJob.slotReadJobDone);
-            job.start ();
-
-            readJob.deleteLater ();
-            return;
-        } else {
-            qCWarning (lcKeychainChunk) << "Maximum chunk count for" << readJob.key () << "reached, ignoring after" << KeychainChunk.MaxChunks;
-        }
-#endif
     } else {
-#if defined (Q_OS_UNIX) && !defined (Q_OS_MAC)
         if (!readJob.insecureFallback ()) { // If insecureFallback is set, the next test would be pointless
             if (_retryOnKeyChainError && (readJob.error () == QKeychain.NoBackendAvailable
                     || readJob.error () == QKeychain.OtherError)) {
@@ -322,8 +267,6 @@ void ReadJob.slotReadJobDone (QKeychain.Job *incomingJob) {
             }
             _retryOnKeyChainError = false;
         }
-#endif
-
         if (readJob.error () != QKeychain.EntryNotFound ||
             ( (readJob.error () == QKeychain.EntryNotFound) && _chunkCount == 0)) {
             _error = readJob.error ();
@@ -354,9 +297,6 @@ DeleteJob.DeleteJob (Account *account, QString &key, bool keychainMigration, QOb
 
 DeleteJob.DeleteJob (QString &key, QObject *parent)
     : DeleteJob (nullptr, key, false, parent) {
-#ifdef Q_OS_WIN
-    jobKeyPrependAppName (_key);
-#endif
 }
 
 void DeleteJob.start () {
@@ -404,32 +344,6 @@ void DeleteJob.slotDeleteJobDone (QKeychain.Job *incomingJob) {
 
     if (deleteJob.error () == NoError) {
         _chunkCount++;
-
-#if defined (Q_OS_WIN)
-        // try to delete next chunk
-        if (_chunkCount < KeychainChunk.MaxChunks) {
-            const QString keyWithIndex = _key + QString (".") + QString.number (_chunkCount);
-            const QString kck = _account ? AbstractCredentials.keychainKey (
-                    _account.url ().toString (),
-                    keyWithIndex,
-                    _keychainMigration ? QString () : _account.id ()
-                ) : keyWithIndex;
-
-            auto job = new QKeychain.DeletePasswordJob (_serviceName, this);
-#if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
-            addSettingsToJob (_account, job);
-#endif
-            job.setInsecureFallback (_insecureFallback);
-            job.setKey (kck);
-            connect (job, &QKeychain.Job.finished, this, &KeychainChunk.DeleteJob.slotDeleteJobDone);
-            job.start ();
-
-            deleteJob.deleteLater ();
-            return;
-        } else {
-            qCWarning (lcKeychainChunk) << "Maximum chunk count for" << deleteJob.key () << "reached, ignoring after" << KeychainChunk.MaxChunks;
-        }
-#endif
     } else {
         if (deleteJob.error () != QKeychain.EntryNotFound ||
             ( (deleteJob.error () == QKeychain.EntryNotFound) && _chunkCount == 0)) {

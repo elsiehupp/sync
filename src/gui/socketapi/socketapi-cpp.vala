@@ -45,10 +45,6 @@
 // #include <QProcess>
 // #include <QStandardPaths>
 
-#ifdef Q_OS_MAC
-// #include <CoreFoundation/CoreFoundation.h>
-#endif
-
 // This is the version that is returned when the client asks for the VERSION.
 // The first number should be changed if there is an incompatible change that breaks old clients.
 // The second number should be changed when there are new features.
@@ -205,26 +201,6 @@ SocketApi.SocketApi (QObject *parent)
         // Example for developer builds (with ad-hoc signing identity): "" "com.owncloud.desktopclient" ".socketApi"
         // Example for official signed packages: "9B5WD74GWJ." "com.owncloud.desktopclient" ".socketApi"
         socketPath = SOCKETAPI_TEAM_IDENTIFIER_PREFIX APPLICATION_REV_DOMAIN ".socketApi";
-#ifdef Q_OS_MAC
-        CFURLRef url = (CFURLRef)CFAutorelease ( (CFURLRef)CFBundleCopyBundleURL (CFBundleGetMainBundle ()));
-        QString bundlePath = QUrl.fromCFURL (url).path ();
-
-        auto _system = [] (QString &cmd, QStringList &args) {
-            QProcess process;
-            process.setProcessChannelMode (QProcess.MergedChannels);
-            process.start (cmd, args);
-            if (!process.waitForFinished ()) {
-                qCWarning (lcSocketApi) << "Failed to load shell extension:" << cmd << args.join (" ") << process.errorString ();
-            } else {
-                qCInfo (lcSocketApi) << (process.exitCode () != 0 ? "Failed to load" : "Loaded") << "shell extension:" << cmd << args.join (" ") << process.readAll ();
-            }
-        };
-        // Add it again. This was needed for Mojave to trigger a load.
-        _system (QStringLiteral ("pluginkit"), { QStringLiteral ("-a"), QStringLiteral ("%1Contents/PlugIns/FinderSyncExt.appex/").arg (bundlePath) });
-        // Tell Finder to use the Extension (checking it from System Preferences . Extensions)
-        _system (QStringLiteral ("pluginkit"), { QStringLiteral ("-e"), QStringLiteral ("use"), QStringLiteral ("-i"), QStringLiteral (APPLICATION_REV_DOMAIN ".FinderSyncExt") });
-
-#endif
     } else if (Utility.isLinux () || Utility.isBSD ()) {
         QString runtimeDir;
         runtimeDir = QStandardPaths.writableLocation (QStandardPaths.RuntimeLocation);
@@ -716,21 +692,6 @@ void SocketApi.command_COPY_PUBLIC_LINK (QString &localFile, SocketListener *) {
         [=] () { emit shareCommandReceived (fileData.serverRelativePath, fileData.localPath, ShareDialogStartPage.PublicLinks); });
     job.run ();
 }
-
-// Windows Shell / Explorer pinning fallbacks, see issue: https://github.com/nextcloud/desktop/issues/1599
-#ifdef Q_OS_WIN
-void SocketApi.command_COPYASPATH (QString &localFile, SocketListener *) {
-    QApplication.clipboard ().setText (localFile);
-}
-
-void SocketApi.command_OPENNEWWINDOW (QString &localFile, SocketListener *) {
-    QDesktopServices.openUrl (QUrl.fromLocalFile (localFile));
-}
-
-void SocketApi.command_OPEN (QString &localFile, SocketListener *socketListener) {
-    command_OPENNEWWINDOW (localFile, socketListener);
-}
-#endif
 
 // Fetches the private link url asynchronously and then calls the target slot
 void SocketApi.fetchPrivateLinkUrlHelper (QString &localFile, std.function<void (QString &url)> &targetFun) {

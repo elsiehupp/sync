@@ -59,23 +59,7 @@ static void fillFileRecordFromGetQuery (SyncJournalFileRecord &rec, SqlQuery &qu
 }
 
 static QByteArray defaultJournalMode (QString &dbPath) {
-#if defined (Q_OS_WIN)
-    // See #2693: Some exFAT file systems seem unable to cope with the
-    // WAL journaling mode. They work fine with DELETE.
-    QString fileSystem = FileSystem.fileSystemForPath (dbPath);
-    qCInfo (lcDb) << "Detected filesystem" << fileSystem << "for" << dbPath;
-    if (fileSystem.contains (QLatin1String ("FAT"))) {
-        qCInfo (lcDb) << "Filesystem contains FAT - using DELETE journal mode";
-        return "DELETE";
-    }
-#elif defined (Q_OS_MAC)
-    if (dbPath.startsWith (QLatin1String ("/Volumes/"))) {
-        qCInfo (lcDb) << "Mounted sync dir, do not use WAL for" << dbPath;
-        return "DELETE";
-    }
-#else
     Q_UNUSED (dbPath)
-#endif
     return "WAL";
 }
 

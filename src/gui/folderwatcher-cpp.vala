@@ -23,11 +23,6 @@
 // #include <QStringList>
 // #include <QTimer>
 
-#if defined (Q_OS_WIN)
-#elif defined (Q_OS_MAC)
-#elif defined (Q_OS_UNIX)
-#endif
-
 namespace OCC {
 
 Q_LOGGING_CATEGORY (lcFolderWatcher, "nextcloud.gui.folderwatcher", QtInfoMsg)
@@ -77,14 +72,6 @@ void FolderWatcher.appendSubPaths (QDir dir, QStringList& subPaths) {
 }
 
 void FolderWatcher.startNotificatonTest (QString &path) {
-#ifdef Q_OS_MAC
-    // Testing the folder watcher on OSX is harder because the watcher
-    // automatically discards changes that were performed by our process.
-    // It would still be useful to test but the OSX implementation
-    // is deferred until later.
-    return;
-#endif
-
     Q_ASSERT (_testNotificationPath.isEmpty ());
     _testNotificationPath = path;
 

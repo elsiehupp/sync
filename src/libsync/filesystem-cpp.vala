@@ -95,26 +95,7 @@ bool FileSystem.verifyFileUnchanged (QString &fileName,
     return true;
 }
 
-#ifdef Q_OS_WIN
-static int64 getSizeWithCsync (QString &filename) {
-    int64 result = 0;
-    csync_file_stat_t stat;
-    if (csync_vio_local_stat (filename, &stat) != -1) {
-        result = stat.size;
-    } else {
-        qCWarning (lcFileSystem) << "Could not get size for" << filename << "with csync" << Utility.formatWinError (errno);
-    }
-    return result;
-}
-#endif
-
 int64 FileSystem.getSize (QString &filename) {
-#ifdef Q_OS_WIN
-    if (isLnkFile (filename)) {
-        // Qt handles .lnk as symlink... https://doc.qt.io/qt-5/qfileinfo.html#details
-        return getSizeWithCsync (filename);
-    }
-#endif
     return QFileInfo (filename).size ();
 }
 

@@ -17,9 +17,6 @@ class TestFolderMan: public QObject {
 
 private slots:
     void testCheckPathValidityForNewFolder () {
-#ifdef Q_OS_WIN
-        Utility.NtfsPermissionLookupRAII ntfs_perm;
-#endif
         QTemporaryDir dir;
         ConfigFile.setConfDir (dir.path ()); // we don't want to pollute the user's config file
         QVERIFY (dir.isValid ());
@@ -84,7 +81,6 @@ private slots:
         QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/sub/ownCloud1/folder").isNull ());
         QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/sub/ownCloud1/folder/f").isNull ());
 
-#ifndef Q_OS_WIN // no links on windows, no permissions
         // make a bunch of links
         QVERIFY (QFile.link (dirPath + "/sub/free", dirPath + "/link1"));
         QVERIFY (QFile.link (dirPath + "/sub", dirPath + "/link2"));
@@ -119,20 +115,6 @@ private slots:
         // Should not have the rights
         QVERIFY (!folderman.checkPathValidityForNewFolder ("/").isNull ());
         QVERIFY (!folderman.checkPathValidityForNewFolder ("/usr/bin/somefolder").isNull ());
-#endif
-
-#ifdef Q_OS_WIN // drive-letter tests
-        if (!QFileInfo ("v:/").exists ()) {
-            QVERIFY (!folderman.checkPathValidityForNewFolder ("v:").isNull ());
-            QVERIFY (!folderman.checkPathValidityForNewFolder ("v:/").isNull ());
-            QVERIFY (!folderman.checkPathValidityForNewFolder ("v:/foo").isNull ());
-        }
-        if (QFileInfo ("c:/").isWritable ()) {
-            QVERIFY (folderman.checkPathValidityForNewFolder ("c:").isNull ());
-            QVERIFY (folderman.checkPathValidityForNewFolder ("c:/").isNull ());
-            QVERIFY (folderman.checkPathValidityForNewFolder ("c:/foo").isNull ());
-        }
-#endif
 
         // Invalid paths
         QVERIFY (!folderman.checkPathValidityForNewFolder ("").isNull ());

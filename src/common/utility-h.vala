@@ -28,11 +28,6 @@
 // #include <functional>
 // #include <memory>
 
-#ifdef Q_OS_WIN
-// #include <QRect>
-// #include <windows.h>
-#endif
-
 class QSettings;
 
 namespace OCC {
@@ -68,10 +63,6 @@ namespace Utility {
     OCSYNC_EXPORT void setLaunchOnStartup (QString &appName, QString &guiName, bool launch);
     OCSYNC_EXPORT uint convertSizeToUint (size_t &convertVar);
     OCSYNC_EXPORT int convertSizeToInt (size_t &convertVar);
-
-#ifdef Q_OS_WIN
-    OCSYNC_EXPORT DWORD convertSizeToDWORD (size_t &convertVar);
-#endif
 
     /**
      * Return the amount of free space available.
@@ -240,55 +231,15 @@ namespace Utility {
      * @brief Retrieves current logged-in user name from the OS
      */
     OCSYNC_EXPORT QString getCurrentUserName ();
-
-#ifdef Q_OS_WIN
-    OCSYNC_EXPORT bool registryKeyExists (HKEY hRootKey, QString &subKey);
-    OCSYNC_EXPORT QVariant registryGetKeyValue (HKEY hRootKey, QString &subKey, QString &valueName);
-    OCSYNC_EXPORT bool registrySetKeyValue (HKEY hRootKey, QString &subKey, QString &valueName, DWORD type, QVariant &value);
-    OCSYNC_EXPORT bool registryDeleteKeyTree (HKEY hRootKey, QString &subKey);
-    OCSYNC_EXPORT bool registryDeleteKeyValue (HKEY hRootKey, QString &subKey, QString &valueName);
-    OCSYNC_EXPORT bool registryWalkSubKeys (HKEY hRootKey, QString &subKey, std.function<void (HKEY, QString &)> &callback);
-    OCSYNC_EXPORT QRect getTaskbarDimensions ();
-
-    // Possibly refactor to share code with UnixTimevalToFileTime in c_time.c
-    OCSYNC_EXPORT void UnixTimeToFiletime (time_t t, FILETIME *filetime);
-    OCSYNC_EXPORT void FiletimeToLargeIntegerFiletime (FILETIME *filetime, LARGE_INTEGER *hundredNSecs);
-    OCSYNC_EXPORT void UnixTimeToLargeIntegerFiletime (time_t t, LARGE_INTEGER *hundredNSecs);
-
-    OCSYNC_EXPORT QString formatWinError (long error);
-
-    class OCSYNC_EXPORT NtfsPermissionLookupRAII {
-    public:
-        /**
-         * NTFS permissions lookup is diabled by default for performance reasons
-         * Enable it and disable it again once we leave the scope
-         * https://doc.qt.io/Qt-5/qfileinfo.html#ntfs-permissions
-         */
-        NtfsPermissionLookupRAII ();
-        ~NtfsPermissionLookupRAII ();
-
-    private:
-        Q_DISABLE_COPY (NtfsPermissionLookupRAII);
-    };
-
-#endif
 }
 /** @} */ // \addtogroup
 
 inline bool Utility.isWindows () {
-#ifdef Q_OS_WIN
-    return true;
-#else
     return false;
-#endif
 }
 
 inline bool Utility.isMac () {
-#ifdef Q_OS_MAC
-    return true;
-#else
     return false;
-#endif
 }
 
 inline bool Utility.isUnix () {

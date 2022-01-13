@@ -31,13 +31,6 @@
 // #include <QDataStream>
 // #include <QTime>
 
-#if defined (Q_OS_WIN)
-// #include <QLibrary>
-// #include <qt_windows.h>
-using PProcessIdToSessionId = BOOL (WINAPI*) (DWORD, DWORD*);
-static PProcessIdToSessionId pProcessIdToSessionId = 0;
-#endif
-
 #if defined (Q_OS_UNIX)
 // #include <ctime>
 // #include <unistd.h>
@@ -54,19 +47,7 @@ QString QtLocalPeer.appSessionId (QString &appId) {
 
     QString res = QLatin1String ("qtsingleapplication-")
                  + QString.number (idNum, 16);
-#if defined (Q_OS_WIN)
-    if (!pProcessIdToSessionId) {
-        QLibrary lib (QLatin1String ("kernel32"));
-        pProcessIdToSessionId = (PProcessIdToSessionId)lib.resolve ("ProcessIdToSessionId");
-    }
-    if (pProcessIdToSessionId) {
-        DWORD sessionId = 0;
-        pProcessIdToSessionId (GetCurrentProcessId (), &sessionId);
-        res += QLatin1Char ('-') + QString.number (sessionId, 16);
-    }
-#else
     res += QLatin1Char ('-') + QString.number (.getuid (), 16);
-#endif
     return res;
 }
 
@@ -113,12 +94,8 @@ bool QtLocalPeer.sendMessage (QString &message, int timeout, bool block) {
         if (connOk || i)
             break;
         int ms = 250;
-#if defined (Q_OS_WIN)
-        Sleep (DWORD (ms));
-#else
         struct timespec ts = { ms / 1000, (ms % 1000) * 1000 * 1000 };
         nanosleep (&ts, nullptr);
-#endif
     }
     if (!connOk)
         return false;

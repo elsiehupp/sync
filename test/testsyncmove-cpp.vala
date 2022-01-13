@@ -858,14 +858,6 @@ private slots:
 
         QTest.newRow ("Vfs.Off") << Vfs.Off;
         QTest.newRow ("Vfs.WithSuffix") << Vfs.WithSuffix;
-#ifdef Q_OS_WIN32
-        if (isVfsPluginAvailable (Vfs.WindowsCfApi)) {
-            QTest.newRow ("Vfs.WindowsCfApi") << Vfs.WindowsCfApi;
-        } else {
-            QWARN ("Skipping Vfs.WindowsCfApi");
-        }
-
-#endif
     }
 
     void testMovedWithError () {

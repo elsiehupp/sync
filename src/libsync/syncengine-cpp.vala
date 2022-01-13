@@ -13,11 +13,7 @@
  * for more details.
  */
 
-#ifdef Q_OS_WIN
-// #include <windows.h>
-#else
 // #include <unistd.h>
-#endif
 
 // #include <climits>
 // #include <cassert>

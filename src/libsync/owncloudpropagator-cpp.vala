@@ -13,11 +13,6 @@
  * for more details.
  */
 
-#ifdef Q_OS_WIN
-// #include <windef.h>
-// #include <winbase.h>
-#endif
-
 // #include <QStack>
 // #include <QFileInfo>
 // #include <QDir>
@@ -574,35 +569,6 @@ bool OwncloudPropagator.localFileNameClash (QString &relFile) {
 
     if (!file.isEmpty () && Utility.fsCasePreserving ()) {
         qCDebug (lcPropagator) << "CaseClashCheck for " << file;
-#ifdef Q_OS_MAC
-        const QFileInfo fileInfo (file);
-        if (!fileInfo.exists ()) {
-            return false;
-        } else {
-            // Need to normalize to composited form because of QTBUG-39622/QTBUG-55896
-            const QString cName = fileInfo.canonicalFilePath ().normalized (QString.NormalizationForm_C);
-            if (file != cName && !cName.endsWith (relFile, Qt.CaseSensitive)) {
-                qCWarning (lcPropagator) << "Detected case clash between" << file << "and" << cName;
-                return true;
-            }
-        }
-#elif defined (Q_OS_WIN)
-        WIN32_FIND_DATA FindFileData;
-        HANDLE hFind;
-
-        hFind = FindFirstFileW (reinterpret_cast<const wchar_t *> (FileSystem.longWinPath (file).utf16 ()), &FindFileData);
-        if (hFind == INVALID_HANDLE_VALUE) {
-            // returns false.
-        } else {
-            const QString realFileName = QString.fromWCharArray (FindFileData.cFileName);
-            FindClose (hFind);
-
-            if (!file.endsWith (realFileName, Qt.CaseSensitive)) {
-                qCWarning (lcPropagator) << "Detected case clash between" << file << "and" << realFileName;
-                return true;
-            }
-        }
-#else
         // On Linux, the file system is case sensitive, but this code is useful for testing.
         // Just check that there is no other file with the same name and different casing.
         QFileInfo fileInfo (file);
@@ -611,38 +577,13 @@ bool OwncloudPropagator.localFileNameClash (QString &relFile) {
         if (list.count () > 1 || (list.count () == 1 && list[0] != fn)) {
             return true;
         }
-#endif
     }
     return false;
 }
 
 bool OwncloudPropagator.hasCaseClashAccessibilityProblem (QString &relfile) {
-#ifdef Q_OS_WIN
-    bool result = false;
-    const QString file (_localDir + relfile);
-    WIN32_FIND_DATA FindFileData;
-    HANDLE hFind;
-
-    hFind = FindFirstFileW (reinterpret_cast<const wchar_t *> (FileSystem.longWinPath (file).utf16 ()), &FindFileData);
-    if (hFind != INVALID_HANDLE_VALUE) {
-        QString firstFile = QString.fromWCharArray (FindFileData.cFileName);
-        if (FindNextFile (hFind, &FindFileData)) {
-            QString secondFile = QString.fromWCharArray (FindFileData.cFileName);
-            // This extra check shouldn't be necessary, but ensures that there
-            // are two different filenames that are identical when case is ignored.
-            if (firstFile != secondFile
-                && QString.compare (firstFile, secondFile, Qt.CaseInsensitive) == 0) {
-                result = true;
-                qCWarning (lcPropagator) << "Found two filepaths that only differ in case: " << firstFile << secondFile;
-            }
-        }
-        FindClose (hFind);
-    }
-    return result;
-#else
     Q_UNUSED (relfile);
     return false;
-#endif
 }
 
 QString OwncloudPropagator.fullLocalPath (QString &tmp_file_name) {
