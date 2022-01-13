@@ -22,59 +22,59 @@
 
 class FakeWebSocketServer : public QObject {
 public:
-    explicit FakeWebSocketServer(quint16 port = 12345, QObject *parent = nullptr);
+    explicit FakeWebSocketServer (quint16 port = 12345, QObject *parent = nullptr);
 
-    ~FakeWebSocketServer() override;
+    ~FakeWebSocketServer () override;
 
-    QWebSocket *authenticateAccount(
-        const OCC::AccountPtr account, std::function<void(OCC::PushNotifications *pushNotifications)> beforeAuthentication = [](OCC::PushNotifications *) {}, std::function<void(void)> afterAuthentication = [] {});
+    QWebSocket *authenticateAccount (
+        const OCC.AccountPtr account, std.function<void (OCC.PushNotifications *pushNotifications)> beforeAuthentication = [] (OCC.PushNotifications *) {}, std.function<void (void)> afterAuthentication = [] {});
 
-    void close();
+    void close ();
 
-    bool waitForTextMessages() const;
+    bool waitForTextMessages () const;
 
-    uint32_t textMessagesCount() const;
+    uint32_t textMessagesCount () const;
 
-    QString textMessage(int messageNumber) const;
+    QString textMessage (int messageNumber) const;
 
-    QWebSocket *socketForTextMessage(int messageNumber) const;
+    QWebSocket *socketForTextMessage (int messageNumber) const;
 
-    void clearTextMessages();
+    void clearTextMessages ();
 
-    static OCC::AccountPtr createAccount(QString &username = "user", QString &password = "password");
+    static OCC.AccountPtr createAccount (QString &username = "user", QString &password = "password");
 
 signals:
-    void closed();
-    void processTextMessage(QWebSocket *sender, QString &message);
+    void closed ();
+    void processTextMessage (QWebSocket *sender, QString &message);
 
 private slots:
-    void processTextMessageInternal(QString &message);
-    void onNewConnection();
-    void socketDisconnected();
+    void processTextMessageInternal (QString &message);
+    void onNewConnection ();
+    void socketDisconnected ();
 
 private:
     QWebSocketServer *_webSocketServer;
     QList<QWebSocket *> _clients;
 
-    std::unique_ptr<QSignalSpy> _processTextMessageSpy;
+    std.unique_ptr<QSignalSpy> _processTextMessageSpy;
 };
 
-class CredentialsStub : public OCC::AbstractCredentials {
+class CredentialsStub : public OCC.AbstractCredentials {
 
 public:
-    CredentialsStub(QString &user, QString &password);
-    QString authType() const override;
-    QString user() const override;
-    QString password() const override;
-    QNetworkAccessManager *createQNAM() const override;
-    bool ready() const override;
-    void fetchFromKeychain() override;
-    void askFromUser() override;
+    CredentialsStub (QString &user, QString &password);
+    QString authType () const override;
+    QString user () const override;
+    QString password () const override;
+    QNetworkAccessManager *createQNAM () const override;
+    bool ready () const override;
+    void fetchFromKeychain () override;
+    void askFromUser () override;
 
-    bool stillValid(QNetworkReply *reply) override;
-    void persist() override;
-    void invalidateToken() override;
-    void forgetSensitiveData() override;
+    bool stillValid (QNetworkReply *reply) override;
+    void persist () override;
+    void invalidateToken () override;
+    void forgetSensitiveData () override;
 
 private:
     QString _user;

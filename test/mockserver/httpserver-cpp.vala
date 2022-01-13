@@ -12,46 +12,46 @@
  * for more details.
  */
 
-HttpServer::HttpServer(quint16 port, QObject* parent)
-    : QTcpServer(parent) {
-    listen(QHostAddress::Any, port);
+HttpServer.HttpServer (quint16 port, QObject* parent)
+    : QTcpServer (parent) {
+    listen (QHostAddress.Any, port);
 }
 
-void HttpServer::readClient() {
-    QTcpSocket* socket = (QTcpSocket*)sender();
-    if (socket->canReadLine()) {
-        QStringList tokens = QString(socket->readLine()).split(QRegularExpression("[ \r\n][ \r\n]*"));
+void HttpServer.readClient () {
+    QTcpSocket* socket = (QTcpSocket*)sender ();
+    if (socket.canReadLine ()) {
+        QStringList tokens = QString (socket.readLine ()).split (QRegularExpression ("[ \r\n][ \r\n]*"));
         if (tokens[0] == "GET") {
-            QTextStream os(socket);
-            os.setAutoDetectUnicode(true);
+            QTextStream os (socket);
+            os.setAutoDetectUnicode (true);
             os << "HTTP/1.0 200 Ok\r\n"
                 "Content-Type: text/html; charset=\"utf-8\"\r\n"
                 "\r\n"
                 "<h1>Nothing to see here</h1>\n"
-                << QDateTime::currentDateTimeUtc().toString() << "\n";
-            socket->close();
+                << QDateTime.currentDateTimeUtc ().toString () << "\n";
+            socket.close ();
 
-            QtServiceBase::instance()->logMessage("Wrote to client");
+            QtServiceBase.instance ().logMessage ("Wrote to client");
 
-            if (socket->state() == QTcpSocket::UnconnectedState) {
+            if (socket.state () == QTcpSocket.UnconnectedState) {
                 delete socket;
-                QtServiceBase::instance()->logMessage("Connection closed");
+                QtServiceBase.instance ().logMessage ("Connection closed");
             }
         }
     }
 }
-void HttpServer::discardClient() {
-    QTcpSocket* socket = (QTcpSocket*)sender();
-    socket->deleteLater();
+void HttpServer.discardClient () {
+    QTcpSocket* socket = (QTcpSocket*)sender ();
+    socket.deleteLater ();
 
-    QtServiceBase::instance()->logMessage("Connection closed");
+    QtServiceBase.instance ().logMessage ("Connection closed");
 }
 
-void HttpServer::incomingConnection(int socket) {
+void HttpServer.incomingConnection (int socket) {
     if (disabled)
         return;
-    QTcpSocket* s = new QTcpSocket(this);
-    connect(s, SIGNAL(readyRead()), this, SLOT(readClient()));
-    connect(s, SIGNAL(disconnected()), this, SLOT(discardClient()));
-    s->setSocketDescriptor(socket);
+    QTcpSocket* s = new QTcpSocket (this);
+    connect (s, SIGNAL (readyRead ()), this, SLOT (readClient ()));
+    connect (s, SIGNAL (disconnected ()), this, SLOT (discardClient ()));
+    s.setSocketDescriptor (socket);
 }

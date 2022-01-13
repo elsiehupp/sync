@@ -35,7 +35,7 @@ public:
     UploadDevice (QString &fileName, qint64 start, qint64 size, BandwidthManager *bwm);
     ~UploadDevice () override;
 
-    bool open (QIODevice::OpenMode mode) override;
+    bool open (QIODevice.OpenMode mode) override;
     void close () override;
 
     qint64 writeData (char *, qint64) override;
@@ -91,22 +91,22 @@ private:
 
 public:
     // Takes ownership of the device
-    explicit PUTFileJob (AccountPtr account, QString &path, std::unique_ptr<QIODevice> device,
+    explicit PUTFileJob (AccountPtr account, QString &path, std.unique_ptr<QIODevice> device,
         const QMap<QByteArray, QByteArray> &headers, int chunk, QObject *parent = nullptr)
         : AbstractNetworkJob (account, path, parent)
         , _device (device.release ())
         , _headers (headers)
         , _chunk (chunk) {
-        _device->setParent (this);
+        _device.setParent (this);
     }
-    explicit PUTFileJob (AccountPtr account, QUrl &url, std::unique_ptr<QIODevice> device,
+    explicit PUTFileJob (AccountPtr account, QUrl &url, std.unique_ptr<QIODevice> device,
         const QMap<QByteArray, QByteArray> &headers, int chunk, QObject *parent = nullptr)
         : AbstractNetworkJob (account, QString (), parent)
         , _device (device.release ())
         , _headers (headers)
         , _url (url)
         , _chunk (chunk) {
-        _device->setParent (this);
+        _device.setParent (this);
     }
     ~PUTFileJob () override;
 
@@ -121,11 +121,11 @@ public:
     }
 
     QString errorString () const override {
-        return _errorString.isEmpty () ? AbstractNetworkJob::errorString () : _errorString;
+        return _errorString.isEmpty () ? AbstractNetworkJob.errorString () : _errorString;
     }
 
-    std::chrono::milliseconds msSinceStart () const {
-        return std::chrono::milliseconds (_requestTimer.elapsed ());
+    std.chrono.milliseconds msSinceStart () {
+        return std.chrono.milliseconds (_requestTimer.elapsed ());
     }
 
 signals:
@@ -171,15 +171,15 @@ class PropagateUploadEncrypted;
  *
  * State Machine:
  *
- *   +---> start ()  --> (delete job) -------+
+ *   +--. start ()  -. (delete job) -------+
  *   |                                      |
- *   +--> slotComputeContentChecksum ()  <---+
+ *   +-. slotComputeContentChecksum ()  <---+
  *                   |
  *                   v
  *    slotComputeTransmissionChecksum ()
  *         |
  *         v
- *    slotStartUpload ()  -> doStartUpload ()
+ *    slotStartUpload ()  . doStartUpload ()
  *                                  .
  *                                  .
  *                                  v
@@ -188,7 +188,7 @@ class PropagateUploadEncrypted;
 class PropagateUploadFileCommon : public PropagateItemJob {
 
     struct UploadStatus {
-        SyncFileItem::Status status = SyncFileItem::NoStatus;
+        SyncFileItem.Status status = SyncFileItem.NoStatus;
         QString message;
     };
 
@@ -236,7 +236,7 @@ public:
     void setupUnencryptedFile ();
     void startUploadFile ();
     void callUnlockFolder ();
-    bool isLikelyFinishedQuickly () override { return _item->_size < propagator ()->smallFileSize (); }
+    bool isLikelyFinishedQuickly () override { return _item._size < propagator ().smallFileSize (); }
 
 private slots:
     void slotComputeContentChecksum ();
@@ -247,14 +247,14 @@ private slots:
     // invoked when encrypted folder lock has been released
     void slotFolderUnlocked (QByteArray &folderId, int httpReturnCode);
     // invoked on internal error to unlock a folder and faile
-    void slotOnErrorStartFolderUnlock (SyncFileItem::Status status, QString &errorString);
+    void slotOnErrorStartFolderUnlock (SyncFileItem.Status status, QString &errorString);
 
 public:
     virtual void doStartUpload () = 0;
 
     void startPollJob (QString &path);
     void finalize ();
-    void abortWithError (SyncFileItem::Status status, QString &error);
+    void abortWithError (SyncFileItem.Status status, QString &error);
 
 public slots:
     void slotJobDestroyed (QObject *job);
@@ -263,7 +263,7 @@ private slots:
     void slotPollFinished ();
 
 protected:
-    void done (SyncFileItem::Status status, QString &errorString = QString ()) override;
+    void done (SyncFileItem.Status status, QString &errorString = QString ()) override;
 
     /**
      * Aborts all running network jobs, except for the ones that mayAbortJob
@@ -271,11 +271,11 @@ protected:
      */
     void abortNetworkJobs (
         AbortType abortType,
-        const std::function<bool (AbstractNetworkJob *job)> &mayAbortJob);
+        const std.function<bool (AbstractNetworkJob *job)> &mayAbortJob);
 
     /**
      * Checks whether the current error is one that should reset the whole
-     * transfer if it happens too often. If so: Bump UploadInfo::errorCount
+     * transfer if it happens too often. If so: Bump UploadInfo.errorCount
      * and maybe perform the reset.
      */
     void checkResettingErrors ();
@@ -328,10 +328,10 @@ private:
     int _chunkCount = 0; /// Total number of chunks for this file
     uint _transferId = 0; /// transfer id (part of the url)
 
-    qint64 chunkSize () const {
+    qint64 chunkSize () {
         // Old chunking does not use dynamic chunking algorithm, and does not adjusts the chunk size respectively,
         // thus this value should be used as the one classifing item to be chunked
-        return propagator ()->syncOptions ()._initialChunkSize;
+        return propagator ().syncOptions ()._initialChunkSize;
     }
 
 public:
@@ -341,7 +341,7 @@ public:
 
     void doStartUpload () override;
 public slots:
-    void abort (PropagatorJob::AbortType abortType) override;
+    void abort (PropagatorJob.AbortType abortType) override;
 private slots:
     void startNextChunk ();
     void slotPutFinished ();

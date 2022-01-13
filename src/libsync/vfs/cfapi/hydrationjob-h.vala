@@ -69,7 +69,7 @@ public:
 
     void start ();
     void cancel ();
-    void finalize (OCC::VfsCfApi *vfs);
+    void finalize (OCC.VfsCfApi *vfs);
 
 public slots:
     void slotCheckFolderId (QStringList &list);

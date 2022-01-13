@@ -37,13 +37,13 @@ Q_SIGNALS:
 class WebEnginePage : public QWebEnginePage {
 public:
     WebEnginePage (QWebEngineProfile *profile, QObject* parent = nullptr);
-    QWebEnginePage * createWindow (QWebEnginePage::WebWindowType type) override;
+    QWebEnginePage * createWindow (QWebEnginePage.WebWindowType type) override;
     void setUrl (QUrl &url);
 
 protected:
     bool certificateError (QWebEngineCertificateError &certificateError) override;
 
-    bool acceptNavigationRequest (QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame) override;
+    bool acceptNavigationRequest (QUrl &url, QWebEnginePage.NavigationType type, bool isMainFrame) override;
 
 private:
     bool _enforceHttps = false;
@@ -54,16 +54,16 @@ private:
 class ExternalWebEnginePage : public QWebEnginePage {
 public:
     ExternalWebEnginePage (QWebEngineProfile *profile, QObject* parent = nullptr);
-    bool acceptNavigationRequest (QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame) override;
+    bool acceptNavigationRequest (QUrl &url, QWebEnginePage.NavigationType type, bool isMainFrame) override;
 };
 
-WebView::WebView (QWidget *parent)
+WebView.WebView (QWidget *parent)
     : QWidget (parent),
       _ui () {
     _ui.setupUi (this);
 #if QT_VERSION >= 0x051200
     QWebEngineUrlScheme _ncsheme ("nc");
-    QWebEngineUrlScheme::registerScheme (_ncsheme);
+    QWebEngineUrlScheme.registerScheme (_ncsheme);
 #endif
     _webview = new QWebEngineView (this);
     _profile = new QWebEngineProfile (this);
@@ -71,40 +71,40 @@ WebView::WebView (QWidget *parent)
     _interceptor = new WebViewPageUrlRequestInterceptor (this);
     _schemeHandler = new WebViewPageUrlSchemeHandler (this);
 
-    const QString userAgent (Utility::userAgentString ());
-    _profile->setHttpUserAgent (userAgent);
-    QWebEngineProfile::defaultProfile ()->setHttpUserAgent (userAgent);
-    _profile->setRequestInterceptor (_interceptor);
-    _profile->installUrlSchemeHandler ("nc", _schemeHandler);
+    const QString userAgent (Utility.userAgentString ());
+    _profile.setHttpUserAgent (userAgent);
+    QWebEngineProfile.defaultProfile ().setHttpUserAgent (userAgent);
+    _profile.setRequestInterceptor (_interceptor);
+    _profile.installUrlSchemeHandler ("nc", _schemeHandler);
 
     /*
      * Set a proper accept langauge to the language of the client
      * code from: http://code.qt.io/cgit/qt/qtbase.git/tree/src/network/access/qhttpnetworkconnection.cpp
      */ {
-        QString systemLocale = QLocale::system ().name ().replace (QChar::fromLatin1 ('_'),QChar::fromLatin1 ('-'));
+        QString systemLocale = QLocale.system ().name ().replace (QChar.fromLatin1 ('_'),QChar.fromLatin1 ('-'));
         QString acceptLanguage;
         if (systemLocale == QLatin1String ("C")) {
-            acceptLanguage = QString::fromLatin1 ("en,*");
+            acceptLanguage = QString.fromLatin1 ("en,*");
         } else if (systemLocale.startsWith (QLatin1String ("en-"))) {
             acceptLanguage = systemLocale + QLatin1String (",*");
         } else {
             acceptLanguage = systemLocale + QLatin1String (",en,*");
         }
-        _profile->setHttpAcceptLanguage (acceptLanguage);
+        _profile.setHttpAcceptLanguage (acceptLanguage);
     }
 
-    _webview->setPage (_page);
-    _ui.verticalLayout->addWidget (_webview);
+    _webview.setPage (_page);
+    _ui.verticalLayout.addWidget (_webview);
 
-    connect (_webview, &QWebEngineView::loadProgress, _ui.progressBar, &QProgressBar::setValue);
-    connect (_schemeHandler, &WebViewPageUrlSchemeHandler::urlCatched, this, &WebView::urlCatched);
+    connect (_webview, &QWebEngineView.loadProgress, _ui.progressBar, &QProgressBar.setValue);
+    connect (_schemeHandler, &WebViewPageUrlSchemeHandler.urlCatched, this, &WebView.urlCatched);
 }
 
-void WebView::setUrl (QUrl &url) {
-    _page->setUrl (url);
+void WebView.setUrl (QUrl &url) {
+    _page.setUrl (url);
 }
 
-WebView::~WebView () {
+WebView.~WebView () {
     /*
      * The Qt implmentation deletes children in the order they are added to the
      * object tree, so in this case _page is deleted after _profile, which
@@ -117,22 +117,22 @@ WebView::~WebView () {
     delete _page;
 }
 
-WebViewPageUrlRequestInterceptor::WebViewPageUrlRequestInterceptor (QObject *parent)
+WebViewPageUrlRequestInterceptor.WebViewPageUrlRequestInterceptor (QObject *parent)
     : QWebEngineUrlRequestInterceptor (parent) {
 
 }
 
-void WebViewPageUrlRequestInterceptor::interceptRequest (QWebEngineUrlRequestInfo &info) {
+void WebViewPageUrlRequestInterceptor.interceptRequest (QWebEngineUrlRequestInfo &info) {
     info.setHttpHeader ("OCS-APIREQUEST", "true");
 }
 
-WebViewPageUrlSchemeHandler::WebViewPageUrlSchemeHandler (QObject *parent)
+WebViewPageUrlSchemeHandler.WebViewPageUrlSchemeHandler (QObject *parent)
     : QWebEngineUrlSchemeHandler (parent) {
 
 }
 
-void WebViewPageUrlSchemeHandler::requestStarted (QWebEngineUrlRequestJob *request) {
-    QUrl url = request->requestUrl ();
+void WebViewPageUrlSchemeHandler.requestStarted (QWebEngineUrlRequestJob *request) {
+    QUrl url = request.requestUrl ();
 
     QString path = url.path ().mid (1); // get undecoded path
     const QStringList parts = path.split ("&");
@@ -156,8 +156,8 @@ void WebViewPageUrlSchemeHandler::requestStarted (QWebEngineUrlRequestJob *reque
     user = user.replace (QChar ('+'), QChar (' '));
     password = password.replace (QChar ('+'), QChar (' '));
 
-    user = QUrl::fromPercentEncoding (user.toUtf8 ());
-    password = QUrl::fromPercentEncoding (password.toUtf8 ());
+    user = QUrl.fromPercentEncoding (user.toUtf8 ());
+    password = QUrl.fromPercentEncoding (password.toUtf8 ());
 
     if (!server.startsWith ("http://") && !server.startsWith ("https://")) {
         server = "https://" + server;
@@ -167,22 +167,22 @@ void WebViewPageUrlSchemeHandler::requestStarted (QWebEngineUrlRequestJob *reque
     emit urlCatched (user, password, server);
 }
 
-WebEnginePage::WebEnginePage (QWebEngineProfile *profile, QObject* parent) : QWebEnginePage (profile, parent) {
+WebEnginePage.WebEnginePage (QWebEngineProfile *profile, QObject* parent) : QWebEnginePage (profile, parent) {
 
 }
 
-QWebEnginePage * WebEnginePage::createWindow (QWebEnginePage::WebWindowType type) {
+QWebEnginePage * WebEnginePage.createWindow (QWebEnginePage.WebWindowType type) {
     Q_UNUSED (type);
-    auto *view = new ExternalWebEnginePage (this->profile ());
+    auto *view = new ExternalWebEnginePage (this.profile ());
     return view;
 }
 
-void WebEnginePage::setUrl (QUrl &url) {
-    QWebEnginePage::setUrl (url);
+void WebEnginePage.setUrl (QUrl &url) {
+    QWebEnginePage.setUrl (url);
     _enforceHttps = url.scheme () == QStringLiteral ("https");
 }
 
-bool WebEnginePage::certificateError (QWebEngineCertificateError &certificateError) {
+bool WebEnginePage.certificateError (QWebEngineCertificateError &certificateError) {
     /**
      * TODO properly improve this.
      * The certificate should be displayed.
@@ -193,34 +193,34 @@ bool WebEnginePage::certificateError (QWebEngineCertificateError &certificateErr
     QMessageBox messageBox;
     messageBox.setText (tr ("Invalid certificate detected"));
     messageBox.setInformativeText (tr ("The host \"%1\" provided an invalid certificate. Continue?").arg (certificateError.url ().host ()));
-    messageBox.setIcon (QMessageBox::Warning);
-    messageBox.setStandardButtons (QMessageBox::Yes|QMessageBox::No);
-    messageBox.setDefaultButton (QMessageBox::No);
+    messageBox.setIcon (QMessageBox.Warning);
+    messageBox.setStandardButtons (QMessageBox.Yes|QMessageBox.No);
+    messageBox.setDefaultButton (QMessageBox.No);
 
     int ret = messageBox.exec ();
 
-    return ret == QMessageBox::Yes;
+    return ret == QMessageBox.Yes;
 }
 
-bool WebEnginePage::acceptNavigationRequest (QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame) {
+bool WebEnginePage.acceptNavigationRequest (QUrl &url, QWebEnginePage.NavigationType type, bool isMainFrame) {
     Q_UNUSED (type);
     Q_UNUSED (isMainFrame);
 
     if (_enforceHttps && url.scheme () != QStringLiteral ("https") && url.scheme () != QStringLiteral ("nc")) {
-        QMessageBox::warning (nullptr, "Security warning", "Can not follow non https link on a https website. This might be a security issue. Please contact your administrator");
+        QMessageBox.warning (nullptr, "Security warning", "Can not follow non https link on a https website. This might be a security issue. Please contact your administrator");
         return false;
     }
     return true;
 }
 
-ExternalWebEnginePage::ExternalWebEnginePage (QWebEngineProfile *profile, QObject* parent) : QWebEnginePage (profile, parent) {
+ExternalWebEnginePage.ExternalWebEnginePage (QWebEngineProfile *profile, QObject* parent) : QWebEnginePage (profile, parent) {
 
 }
 
-bool ExternalWebEnginePage::acceptNavigationRequest (QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame) {
+bool ExternalWebEnginePage.acceptNavigationRequest (QUrl &url, QWebEnginePage.NavigationType type, bool isMainFrame) {
     Q_UNUSED (type);
     Q_UNUSED (isMainFrame);
-    Utility::openBrowser (url);
+    Utility.openBrowser (url);
     return false;
 }
 

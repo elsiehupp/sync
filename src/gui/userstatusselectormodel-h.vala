@@ -31,7 +31,7 @@ class UserStatusSelectorModel : public QObject {
 
     Q_PROPERTY (QString userStatusMessage READ userStatusMessage NOTIFY userStatusChanged)
     Q_PROPERTY (QString userStatusEmoji READ userStatusEmoji WRITE setUserStatusEmoji NOTIFY userStatusChanged)
-    Q_PROPERTY (OCC::UserStatus::OnlineStatus onlineStatus READ onlineStatus WRITE setOnlineStatus NOTIFY onlineStatusChanged)
+    Q_PROPERTY (OCC.UserStatus.OnlineStatus onlineStatus READ onlineStatus WRITE setOnlineStatus NOTIFY onlineStatusChanged)
     Q_PROPERTY (int predefinedStatusesCount READ predefinedStatusesCount NOTIFY predefinedStatusesChanged)
     Q_PROPERTY (QStringList clearAtValues READ clearAtValues CONSTANT)
     Q_PROPERTY (QString clearAt READ clearAt NOTIFY clearAtChanged)
@@ -44,15 +44,15 @@ class UserStatusSelectorModel : public QObject {
 public:
     explicit UserStatusSelectorModel (QObject *parent = nullptr);
 
-    explicit UserStatusSelectorModel (std::shared_ptr<UserStatusConnector> userStatusConnector,
+    explicit UserStatusSelectorModel (std.shared_ptr<UserStatusConnector> userStatusConnector,
         QObject *parent = nullptr);
 
-    explicit UserStatusSelectorModel (std::shared_ptr<UserStatusConnector> userStatusConnector,
-        std::unique_ptr<DateTimeProvider> dateTimeProvider,
+    explicit UserStatusSelectorModel (std.shared_ptr<UserStatusConnector> userStatusConnector,
+        std.unique_ptr<DateTimeProvider> dateTimeProvider,
         QObject *parent = nullptr);
 
     explicit UserStatusSelectorModel (UserStatus &userStatus,
-        std::unique_ptr<DateTimeProvider> dateTimeProvider,
+        std.unique_ptr<DateTimeProvider> dateTimeProvider,
         QObject *parent = nullptr);
 
     explicit UserStatusSelectorModel (UserStatus &userStatus,
@@ -60,8 +60,8 @@ public:
 
     Q_INVOKABLE void load (int id);
 
-    Q_REQUIRED_RESULT UserStatus::OnlineStatus onlineStatus () const;
-    Q_INVOKABLE void setOnlineStatus (OCC::UserStatus::OnlineStatus status);
+    Q_REQUIRED_RESULT UserStatus.OnlineStatus onlineStatus () const;
+    Q_INVOKABLE void setOnlineStatus (OCC.UserStatus.OnlineStatus status);
 
     Q_REQUIRED_RESULT QUrl onlineIcon () const;
     Q_REQUIRED_RESULT QUrl awayIcon () const;
@@ -108,10 +108,10 @@ private:
     void init ();
     void reset ();
     void onUserStatusFetched (UserStatus &userStatus);
-    void onPredefinedStatusesFetched (std::vector<UserStatus> &statuses);
+    void onPredefinedStatusesFetched (std.vector<UserStatus> &statuses);
     void onUserStatusSet ();
     void onMessageCleared ();
-    void onError (UserStatusConnector::Error error);
+    void onError (UserStatusConnector.Error error);
 
     Q_REQUIRED_RESULT QString clearAtStageToString (ClearStageType stage) const;
     Q_REQUIRED_RESULT QString clearAtReadable (Optional<ClearAt> &clearAt) const;
@@ -120,20 +120,20 @@ private:
     void setError (QString &reason);
     void clearError ();
 
-    std::shared_ptr<UserStatusConnector> _userStatusConnector {};
-    std::vector<UserStatus> _predefinedStatuses;
+    std.shared_ptr<UserStatusConnector> _userStatusConnector {};
+    std.vector<UserStatus> _predefinedStatuses;
     UserStatus _userStatus;
-    std::unique_ptr<DateTimeProvider> _dateTimeProvider;
+    std.unique_ptr<DateTimeProvider> _dateTimeProvider;
 
     QString _errorMessage;
 
-    std::vector<ClearStageType> _clearStages = {
-        ClearStageType::DontClear,
-        ClearStageType::HalfHour,
-        ClearStageType::OneHour,
-        ClearStageType::FourHour,
-        ClearStageType::Today,
-        ClearStageType::Week
+    std.vector<ClearStageType> _clearStages = {
+        ClearStageType.DontClear,
+        ClearStageType.HalfHour,
+        ClearStageType.OneHour,
+        ClearStageType.FourHour,
+        ClearStageType.Today,
+        ClearStageType.Week
     };
 };
 }

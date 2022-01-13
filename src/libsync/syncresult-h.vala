@@ -54,29 +54,29 @@ public:
     void setFolder (QString &folder);
     QString folder () const;
 
-    bool foundFilesNotSynced () const { return _foundFilesNotSynced; }
-    bool folderStructureWasChanged () const { return _folderStructureWasChanged; }
+    bool foundFilesNotSynced () { return _foundFilesNotSynced; }
+    bool folderStructureWasChanged () { return _folderStructureWasChanged; }
 
-    int numNewItems () const { return _numNewItems; }
-    int numRemovedItems () const { return _numRemovedItems; }
-    int numUpdatedItems () const { return _numUpdatedItems; }
-    int numRenamedItems () const { return _numRenamedItems; }
-    int numNewConflictItems () const { return _numNewConflictItems; }
-    int numOldConflictItems () const { return _numOldConflictItems; }
+    int numNewItems () { return _numNewItems; }
+    int numRemovedItems () { return _numRemovedItems; }
+    int numUpdatedItems () { return _numUpdatedItems; }
+    int numRenamedItems () { return _numRenamedItems; }
+    int numNewConflictItems () { return _numNewConflictItems; }
+    int numOldConflictItems () { return _numOldConflictItems; }
     void setNumOldConflictItems (int n) { _numOldConflictItems = n; }
-    int numErrorItems () const { return _numErrorItems; }
-    bool hasUnresolvedConflicts () const { return _numNewConflictItems + _numOldConflictItems > 0; }
+    int numErrorItems () { return _numErrorItems; }
+    bool hasUnresolvedConflicts () { return _numNewConflictItems + _numOldConflictItems > 0; }
 
-    int numLockedItems () const { return _numLockedItems; }
-    bool hasLockedFiles () const { return _numLockedItems > 0; }
+    int numLockedItems () { return _numLockedItems; }
+    bool hasLockedFiles () { return _numLockedItems > 0; }
 
-    const SyncFileItemPtr &firstItemNew () const { return _firstItemNew; }
-    const SyncFileItemPtr &firstItemDeleted () const { return _firstItemDeleted; }
-    const SyncFileItemPtr &firstItemUpdated () const { return _firstItemUpdated; }
-    const SyncFileItemPtr &firstItemRenamed () const { return _firstItemRenamed; }
-    const SyncFileItemPtr &firstNewConflictItem () const { return _firstNewConflictItem; }
-    const SyncFileItemPtr &firstItemError () const { return _firstItemError; }
-    const SyncFileItemPtr &firstItemLocked () const { return _firstItemLocked; }
+    const SyncFileItemPtr &firstItemNew () { return _firstItemNew; }
+    const SyncFileItemPtr &firstItemDeleted () { return _firstItemDeleted; }
+    const SyncFileItemPtr &firstItemUpdated () { return _firstItemUpdated; }
+    const SyncFileItemPtr &firstItemRenamed () { return _firstItemRenamed; }
+    const SyncFileItemPtr &firstNewConflictItem () { return _firstNewConflictItem; }
+    const SyncFileItemPtr &firstItemError () { return _firstItemError; }
+    const SyncFileItemPtr &firstItemLocked () { return _firstItemLocked; }
 
     void processCompletedItem (SyncFileItemPtr &item);
 

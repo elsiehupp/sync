@@ -20,11 +20,11 @@ namespace OCC {
 const int horizontalMargin (4);
 const int verticalMargin (4);
 
-PostfixLineEdit::PostfixLineEdit (QWidget *parent)
+PostfixLineEdit.PostfixLineEdit (QWidget *parent)
     : QLineEdit (parent) {
 }
 
-void PostfixLineEdit::setPostfix (QString &postfix) {
+void PostfixLineEdit.setPostfix (QString &postfix) {
     _postfix = postfix;
     QFontMetricsF fm (font ());
     QMargins tm = textMargins ();
@@ -32,15 +32,15 @@ void PostfixLineEdit::setPostfix (QString &postfix) {
     setTextMargins (tm);
 }
 
-QString PostfixLineEdit::postfix () const {
+QString PostfixLineEdit.postfix () {
     return _postfix;
 }
 
-QString PostfixLineEdit::fullText () const {
+QString PostfixLineEdit.fullText () {
     return text () + _postfix;
 }
 
-void PostfixLineEdit::setFullText (QString &text) {
+void PostfixLineEdit.setFullText (QString &text) {
     QString prefixString = text;
     if (prefixString.endsWith (postfix ())) {
         prefixString.chop (postfix ().length ());
@@ -48,17 +48,17 @@ void PostfixLineEdit::setFullText (QString &text) {
     setText (prefixString);
 }
 
-void PostfixLineEdit::paintEvent (QPaintEvent *pe) {
-    QLineEdit::paintEvent (pe);
+void PostfixLineEdit.paintEvent (QPaintEvent *pe) {
+    QLineEdit.paintEvent (pe);
     QPainter p (this);
 
     //
-    p.setPen (palette ().color (QPalette::Disabled, QPalette::Text));
+    p.setPen (palette ().color (QPalette.Disabled, QPalette.Text));
     QFontMetricsF fm (font ());
     int start = rect ().right () - qRound (fm.width (_postfix));
     QStyleOptionFrame panel;
     initStyleOption (&panel);
-    QRect r = style ()->subElementRect (QStyle::SE_LineEditContents, &panel, this);
+    QRect r = style ().subElementRect (QStyle.SE_LineEditContents, &panel, this);
     r.setTop (r.top () + horizontalMargin - 1);
     QRect postfixRect (r);
 

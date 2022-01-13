@@ -34,15 +34,15 @@ class LsColJob;
  */
 class FolderStatusModel : public QAbstractItemModel {
 public:
-    enum {FileIdRole = Qt::UserRole+1};
+    enum {FileIdRole = Qt.UserRole+1};
 
     FolderStatusModel (QObject *parent = nullptr);
     ~FolderStatusModel () override;
     void setAccountState (AccountState *accountState);
 
-    Qt::ItemFlags flags (QModelIndex &) const override;
+    Qt.ItemFlags flags (QModelIndex &) const override;
     QVariant data (QModelIndex &index, int role) const override;
-    bool setData (QModelIndex &index, QVariant &value, int role = Qt::EditRole) override;
+    bool setData (QModelIndex &index, QVariant &value, int role = Qt.EditRole) override;
     int columnCount (QModelIndex &parent = QModelIndex ()) const override;
     int rowCount (QModelIndex &parent = QModelIndex ()) const override;
     QModelIndex index (int row, int column = 0, QModelIndex &parent = QModelIndex ()) const override;
@@ -72,7 +72,7 @@ public:
         bool _isUndecided = false;
         QByteArray _fileId; // the file id for this folder on the server.
 
-        Qt::CheckState _checked = Qt::Checked;
+        Qt.CheckState _checked = Qt.Checked;
 
         // Whether this has a FetchLabel subrow
         bool hasLabel () const;
@@ -134,7 +134,7 @@ private slots:
     void slotShowFetchProgress ();
 
 private:
-    QStringList createBlackList (OCC::FolderStatusModel::SubFolderInfo &root,
+    QStringList createBlackList (OCC.FolderStatusModel.SubFolderInfo &root,
         const QStringList &oldBlackList) const;
     const AccountState *_accountState = nullptr;
     bool _dirty = false; // If the selective sync checkboxes were changed
@@ -156,6 +156,6 @@ signals:
 
 } // namespace OCC
 
-Q_DECLARE_METATYPE (OCC::FolderStatusModel::SubFolderInfo*)
+Q_DECLARE_METATYPE (OCC.FolderStatusModel.SubFolderInfo*)
 
 #endif // FOLDERSTATUSMODEL_H

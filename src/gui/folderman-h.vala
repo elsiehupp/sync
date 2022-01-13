@@ -37,7 +37,7 @@ class LockWatcher;
  *   (_timeScheduler and slotScheduleFolderByTime ())
  *
  * - A folder watcher receives a notification about a file change
- *   (_folderWatchers and Folder::slotWatchedPathChanged ())
+ *   (_folderWatchers and Folder.slotWatchedPathChanged ())
  *
  * - The folder etag on the server has changed
  *   (_etagPollTimer)
@@ -47,7 +47,7 @@ class LockWatcher;
  *
  * - There was a sync error or a follow-up sync is requested
  *   (_timeScheduler and slotScheduleFolderByTime ()
- *    and Folder::slotSyncFinished ())
+ *    and Folder.slotSyncFinished ())
  */
 class FolderMan : public QObject {
 public:
@@ -63,7 +63,7 @@ public:
      */
     static void backwardMigrationSettingsKeys (QStringList *deleteKeys, QStringList *ignoreKeys);
 
-    const Folder::Map &map () const;
+    const Folder.Map &map () const;
 
     /** Adds a folder for an account, ensures the journal is gone and saves it in the settings.
       */
@@ -102,11 +102,11 @@ public:
     bool startFromScratch (QString &);
 
     /// Produce text for use in the tray tooltip
-    static QString trayTooltipStatusString (SyncResult::Status syncStatus, bool hasUnresolvedConflicts, bool paused);
+    static QString trayTooltipStatusString (SyncResult.Status syncStatus, bool hasUnresolvedConflicts, bool paused);
 
     /// Compute status summarizing multiple folders
     static void trayOverallStatus (QList<Folder *> &folders,
-        SyncResult::Status *status, bool *unresolvedConflicts);
+        SyncResult.Status *status, bool *unresolvedConflicts);
 
     // Escaping of the alias which is used in QSettings AND the file
     // system, thus need to be escaped.
@@ -206,7 +206,7 @@ signals:
     /**
      * Emitted whenever the list of configured folders changes.
      */
-    void folderListChanged (Folder::Map &);
+    void folderListChanged (Folder.Map &);
 
     /**
      * Emitted once slotRemoveFoldersForAccount is done wiping
@@ -257,8 +257,8 @@ private slots:
 
     void slotRemoveFoldersForAccount (AccountState *accountState);
 
-    // Wraps the Folder::syncStateChange () signal into the
-    // FolderMan::folderSyncStateChange (Folder*) signal.
+    // Wraps the Folder.syncStateChange () signal into the
+    // FolderMan.folderSyncStateChange (Folder*) signal.
     void slotForwardFolderSyncStateChange ();
 
     void slotServerVersionChanged (Account *account);
@@ -279,7 +279,7 @@ private slots:
      */
     void slotScheduleFolderByTime ();
 
-    void slotSetupPushNotifications (Folder::Map &);
+    void slotSetupPushNotifications (Folder.Map &);
     void slotProcessFilesPushNotification (Account *account);
     void slotConnectToPushNotifications (Account *account);
 
@@ -288,7 +288,7 @@ private:
      *  does not set an account on the new folder.
       */
     Folder *addFolderInternal (FolderDefinition folderDefinition,
-        AccountState *accountState, std::unique_ptr<Vfs> vfs);
+        AccountState *accountState, std.unique_ptr<Vfs> vfs);
 
     /* unloads a folder object, does not delete it */
     void unloadFolder (Folder *);
@@ -316,7 +316,7 @@ private:
     bool isSwitchToVfsNeeded (FolderDefinition &folderDefinition) const;
 
     QSet<Folder *> _disabledFolders;
-    Folder::Map _folderMap;
+    Folder.Map _folderMap;
     QString _folderConfigPath;
     Folder *_currentSyncFolder = nullptr;
     QPointer<Folder> _lastSyncFolder;
@@ -349,8 +349,8 @@ private:
 
     static FolderMan *_instance;
     explicit FolderMan (QObject *parent = nullptr);
-    friend class OCC::Application;
-    friend class ::TestFolderMan;
+    friend class OCC.Application;
+    friend class .TestFolderMan;
 };
 
 } // namespace OCC

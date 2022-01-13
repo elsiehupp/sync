@@ -35,11 +35,11 @@ class SyncJournalDb;
  *
  * After being start ()'ed this job will perform work asynchronously and emit finished () when done.
  *
- * Internally, this job will call DiscoveryPhase::scheduleMoreJobs when one of its sub-jobs is
- * finished. DiscoveryPhase::scheduleMoreJobs will call processSubJobs () to continue work until
+ * Internally, this job will call DiscoveryPhase.scheduleMoreJobs when one of its sub-jobs is
+ * finished. DiscoveryPhase.scheduleMoreJobs will call processSubJobs () to continue work until
  * the job is finished.
  *
- * Results are fed outwards via the DiscoveryPhase::itemDiscovered () signal.
+ * Results are fed outwards via the DiscoveryPhase.itemDiscovered () signal.
  */
 class ProcessDirectoryJob : public QObject {
 
@@ -74,9 +74,9 @@ public:
         , _lastSyncTimestamp (lastSyncTimestamp)
         , _queryServer (queryServer)
         , _queryLocal (queryLocal)
-        , _discoveryData (parent->_discoveryData)
+        , _discoveryData (parent._discoveryData)
         , _currentFolder (path) {
-        computePinState (parent->_pinState);
+        computePinState (parent._pinState);
     }
 
     void start ();
@@ -87,7 +87,7 @@ public:
         _isInsideEncryptedTree = isInsideEncryptedTree;
     }
 
-    bool isInsideEncryptedTree () const {
+    bool isInsideEncryptedTree () {
         return _isInsideEncryptedTree;
     }
 
@@ -122,7 +122,7 @@ private:
         static QString pathAppend (QString &base, QString &name) {
             return base.isEmpty () ? name : base + QLatin1Char ('/') + name;
         }
-        PathTuple addName (QString &name) const {
+        PathTuple addName (QString &name) {
             PathTuple result;
             result._original = pathAppend (_original, name);
             auto buildString = [&] (QString &other) {
@@ -136,7 +136,7 @@ private:
         }
     };
 
-    bool checkForInvalidFileName (PathTuple &path, std::map<QString, Entries> &entries, Entries &entry);
+    bool checkForInvalidFileName (PathTuple &path, std.map<QString, Entries> &entries, Entries &entry);
 
     /** Iterate over entries inside the directory (non-recursively).
      *
@@ -239,8 +239,8 @@ private:
 
     qint64 _lastSyncTimestamp = 0;
 
-    QueryMode _queryServer = QueryMode::NormalQuery;
-    QueryMode _queryLocal = QueryMode::NormalQuery;
+    QueryMode _queryServer = QueryMode.NormalQuery;
+    QueryMode _queryLocal = QueryMode.NormalQuery;
 
     // Holds entries that resulted from a NormalQuery
     QVector<RemoteInfo> _serverNormalQueryEntries;
@@ -270,7 +270,7 @@ private:
      * The jobs are enqueued while processind directory entries and
      * then gradually run via calls to processSubJobs ().
      */
-    std::deque<ProcessDirectoryJob *> _queuedJobs;
+    std.deque<ProcessDirectoryJob *> _queuedJobs;
     QVector<ProcessDirectoryJob *> _runningJobs;
 
     DiscoveryPhase *_discoveryData;
@@ -278,7 +278,7 @@ private:
     PathTuple _currentFolder;
     bool _childModified = false; // the directory contains modified item what would prevent deletion
     bool _childIgnored = false; // The directory contains ignored item that would prevent deletion
-    PinState _pinState = PinState::Unspecified; // The directory's pin-state, see computePinState ()
+    PinState _pinState = PinState.Unspecified; // The directory's pin-state, see computePinState ()
     bool _isInsideEncryptedTree = false; // this directory is encrypted or is within the tree of directories with root directory encrypted
 
 signals:

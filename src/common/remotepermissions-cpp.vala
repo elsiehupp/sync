@@ -23,18 +23,18 @@ namespace OCC {
 static const char letters[] = " WDNVCKRSMm";
 
 template <typename Char>
-void RemotePermissions::fromArray (Char *p) {
+void RemotePermissions.fromArray (Char *p) {
     _value = notNullMask;
     if (!p)
         return;
     while (*p) {
-        if (auto res = std::strchr (letters, static_cast<char> (*p)))
+        if (auto res = std.strchr (letters, static_cast<char> (*p)))
             _value |= (1 << (res - letters));
         ++p;
     }
 }
 
-QByteArray RemotePermissions::toDbValue () const {
+QByteArray RemotePermissions.toDbValue () {
     QByteArray result;
     if (isNull ())
         return result;
@@ -50,11 +50,11 @@ QByteArray RemotePermissions::toDbValue () const {
     return result;
 }
 
-QString RemotePermissions::toString () const {
-    return QString::fromUtf8 (toDbValue ());
+QString RemotePermissions.toString () {
+    return QString.fromUtf8 (toDbValue ());
 }
 
-RemotePermissions RemotePermissions::fromDbValue (QByteArray &value) {
+RemotePermissions RemotePermissions.fromDbValue (QByteArray &value) {
     if (value.isEmpty ())
         return {};
     RemotePermissions perm;
@@ -62,7 +62,7 @@ RemotePermissions RemotePermissions::fromDbValue (QByteArray &value) {
     return perm;
 }
 
-RemotePermissions RemotePermissions::fromServerString (QString &value) {
+RemotePermissions RemotePermissions.fromServerString (QString &value) {
     RemotePermissions perm;
     perm.fromArray (value.utf16 ());
     return perm;

@@ -227,13 +227,13 @@ namespace Progress {
     OWNCLOUDSYNC_EXPORT QString asActionString (SyncFileItem &item);
     OWNCLOUDSYNC_EXPORT QString asResultString (SyncFileItem &item);
 
-    OWNCLOUDSYNC_EXPORT bool isWarningKind (SyncFileItem::Status);
-    OWNCLOUDSYNC_EXPORT bool isIgnoredKind (SyncFileItem::Status);
+    OWNCLOUDSYNC_EXPORT bool isWarningKind (SyncFileItem.Status);
+    OWNCLOUDSYNC_EXPORT bool isIgnoredKind (SyncFileItem.Status);
 }
 
 /** Type of error
  *
- * Used for ProgressDispatcher::syncError. May trigger error interactivity
+ * Used for ProgressDispatcher.syncError. May trigger error interactivity
  * in IssuesWidget.
  */
 enum class ErrorCategory {
@@ -283,7 +283,7 @@ signals:
      * @param[out] full error message
      * @param[out] subject (optional)
      */
-    void addErrorToGui (QString &folder, SyncFileItem::Status status, QString &errorMessage, QString &subject);
+    void addErrorToGui (QString &folder, SyncFileItem.Status status, QString &errorMessage, QString &subject);
 
     /**
      * @brief Emitted for a folder when a sync is done, listing all pending conflicts

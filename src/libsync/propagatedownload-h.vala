@@ -30,7 +30,7 @@ class OWNCLOUDSYNC_EXPORT GETFileJob : public AbstractNetworkJob {
     QByteArray _expectedEtagForResume;
     qint64 _expectedContentLength;
     qint64 _resumeStart;
-    SyncFileItem::Status _errorStatus;
+    SyncFileItem.Status _errorStatus;
     QUrl _directDownloadUrl;
     QByteArray _etag;
     bool _bandwidthLimited; // if _bandwidthQuota will be used
@@ -57,17 +57,17 @@ public:
         qint64 resumeStart, QObject *parent = nullptr);
     ~GETFileJob () override {
         if (_bandwidthManager) {
-            _bandwidthManager->unregisterDownloadJob (this);
+            _bandwidthManager.unregisterDownloadJob (this);
         }
     }
 
     void start () override;
     bool finished () override {
-        if (_saveBodyToFile && reply ()->bytesAvailable ()) {
+        if (_saveBodyToFile && reply ().bytesAvailable ()) {
             return false;
         } else {
             if (_bandwidthManager) {
-                _bandwidthManager->unregisterDownloadJob (this);
+                _bandwidthManager.unregisterDownloadJob (this);
             }
             if (!_hasEmittedFinishedSignal) {
                 emit finishedSignal ();
@@ -90,8 +90,8 @@ public:
     QString errorString () const override;
     void setErrorString (QString &s) { _errorString = s; }
 
-    SyncFileItem::Status errorStatus () { return _errorStatus; }
-    void setErrorStatus (SyncFileItem::Status &s) { _errorStatus = s; }
+    SyncFileItem.Status errorStatus () { return _errorStatus; }
+    void setErrorStatus (SyncFileItem.Status &s) { _errorStatus = s; }
 
     void onTimedOut () override;
 
@@ -99,8 +99,8 @@ public:
     qint64 resumeStart () { return _resumeStart; }
     time_t lastModified () { return _lastModified; }
 
-    qint64 contentLength () const { return _contentLength; }
-    qint64 expectedContentLength () const { return _expectedContentLength; }
+    qint64 contentLength () { return _contentLength; }
+    qint64 expectedContentLength () { return _expectedContentLength; }
     void setExpectedContentLength (qint64 size) { _expectedContentLength = size; }
 
 protected:
@@ -134,7 +134,7 @@ protected:
     qint64 writeToDevice (QByteArray &data) override;
 
 private:
-    QSharedPointer<EncryptionHelper::StreamingDecryptor> _decryptor;
+    QSharedPointer<EncryptionHelper.StreamingDecryptor> _decryptor;
     EncryptedFile _encryptedFileInfo = {};
     QByteArray _pendingBytes;
     qint64 _processedSoFar = 0;
@@ -151,30 +151,30 @@ private:
     |
     | deleteExistingFolder () if enabled
     |
-    +--> mtime and size identical?
+    +-. mtime and size identical?
     |    then compute the local checksum
-    |                               done?-> conflictChecksumComputed ()
+    |                               done?. conflictChecksumComputed ()
     |                                              |
     |                         checksum differs?    |
-    +-> startDownload () <--------------------------+
+    +. startDownload () <--------------------------+
           |                                        |
-          +-> run a GETFileJob                     | checksum identical?
+          +. run a GETFileJob                     | checksum identical?
                                                    |
-      done?-> slotGetFinished ()                    |
+      done?. slotGetFinished ()                    |
                 |                                  |
-                +-> validate checksum header       |
+                +. validate checksum header       |
                                                    |
-      done?-> transmissionChecksumValidated ()      |
+      done?. transmissionChecksumValidated ()      |
                 |                                  |
-                +-> compute the content checksum   |
+                +. compute the content checksum   |
                                                    |
-      done?-> contentChecksumComputed ()            |
+      done?. contentChecksumComputed ()            |
                 |                                  |
-                +-> downloadFinished ()             |
+                +. downloadFinished ()             |
                        |                           |
     +------------------+                           |
     |                                              |
-    +-> updateMetadata () <-------------------------+
+    +. updateMetadata () <-------------------------+
 
 \endcode
  */
@@ -190,7 +190,7 @@ public:
     qint64 committedDiskSpace () const override;
 
     // We think it might finish quickly because it is a small file.
-    bool isLikelyFinishedQuickly () override { return _item->_size < propagator ()->smallFileSize (); }
+    bool isLikelyFinishedQuickly () override { return _item._size < propagator ().smallFileSize (); }
 
     /**
      * Whether an existing folder with the same name may be deleted before
@@ -219,7 +219,7 @@ private slots:
     /// Called when it's time to update the db metadata
     void updateMetadata (bool isConflict);
 
-    void abort (PropagatorJob::AbortType abortType) override;
+    void abort (PropagatorJob.AbortType abortType) override;
     void slotDownloadProgress (qint64, qint64);
     void slotChecksumFail (QString &errMsg);
 

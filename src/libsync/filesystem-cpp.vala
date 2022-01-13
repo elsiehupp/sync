@@ -20,11 +20,11 @@
 
 namespace OCC {
 
-bool FileSystem::fileEquals (QString &fn1, QString &fn2) {
+bool FileSystem.fileEquals (QString &fn1, QString &fn2) {
     // compare two files with given filename and return true if they have the same content
     QFile f1 (fn1);
     QFile f2 (fn2);
-    if (!f1.open (QIODevice::ReadOnly) || !f2.open (QIODevice::ReadOnly)) {
+    if (!f1.open (QIODevice.ReadOnly) || !f2.open (QIODevice.ReadOnly)) {
         qCWarning (lcFileSystem) << "fileEquals: Failed to open " << fn1 << "or" << fn2;
         return false;
     }
@@ -47,21 +47,21 @@ bool FileSystem::fileEquals (QString &fn1, QString &fn2) {
     return true;
 }
 
-time_t FileSystem::getModTime (QString &filename) {
+time_t FileSystem.getModTime (QString &filename) {
     csync_file_stat_t stat;
     qint64 result = -1;
     if (csync_vio_local_stat (filename, &stat) != -1
         && (stat.modtime != 0)) {
         result = stat.modtime;
     } else {
-        result = Utility::qDateTimeToTime_t (QFileInfo (filename).lastModified ());
+        result = Utility.qDateTimeToTime_t (QFileInfo (filename).lastModified ());
         qCWarning (lcFileSystem) << "Could not get modification time for" << filename
                                 << "with csync, using QFileInfo:" << result;
     }
     return result;
 }
 
-bool FileSystem::setModTime (QString &filename, time_t modTime) {
+bool FileSystem.setModTime (QString &filename, time_t modTime) {
     struct timeval times[2];
     times[0].tv_sec = times[1].tv_sec = modTime;
     times[0].tv_usec = times[1].tv_usec = 0;
@@ -74,22 +74,22 @@ bool FileSystem::setModTime (QString &filename, time_t modTime) {
     return true;
 }
 
-bool FileSystem::fileChanged (QString &fileName,
+bool FileSystem.fileChanged (QString &fileName,
     qint64 previousSize,
     time_t previousMtime) {
     return getSize (fileName) != previousSize
         || getModTime (fileName) != previousMtime;
 }
 
-bool FileSystem::verifyFileUnchanged (QString &fileName,
+bool FileSystem.verifyFileUnchanged (QString &fileName,
     qint64 previousSize,
     time_t previousMtime) {
     const qint64 actualSize = getSize (fileName);
     const time_t actualMtime = getModTime (fileName);
     if ( (actualSize != previousSize && actualMtime > 0) || (actualMtime != previousMtime && previousMtime > 0 && actualMtime > 0)) {
         qCInfo (lcFileSystem) << "File" << fileName << "has changed:"
-                             << "size: " << previousSize << "<->" << actualSize
-                             << ", mtime: " << previousMtime << "<->" << actualMtime;
+                             << "size: " << previousSize << "<." << actualSize
+                             << ", mtime: " << previousMtime << "<." << actualMtime;
         return false;
     }
     return true;
@@ -102,13 +102,13 @@ static qint64 getSizeWithCsync (QString &filename) {
     if (csync_vio_local_stat (filename, &stat) != -1) {
         result = stat.size;
     } else {
-        qCWarning (lcFileSystem) << "Could not get size for" << filename << "with csync" << Utility::formatWinError (errno);
+        qCWarning (lcFileSystem) << "Could not get size for" << filename << "with csync" << Utility.formatWinError (errno);
     }
     return result;
 }
 #endif
 
-qint64 FileSystem::getSize (QString &filename) {
+qint64 FileSystem.getSize (QString &filename) {
 #ifdef Q_OS_WIN
     if (isLnkFile (filename)) {
         // Qt handles .lnk as symlink... https://doc.qt.io/qt-5/qfileinfo.html#details
@@ -118,10 +118,10 @@ qint64 FileSystem::getSize (QString &filename) {
     return QFileInfo (filename).size ();
 }
 
-// Code inspired from Qt5's QDir::removeRecursively
-bool FileSystem::removeRecursively (QString &path, std::function<void (QString &path, bool isDir)> &onDeleted, QStringList *errors) {
+// Code inspired from Qt5's QDir.removeRecursively
+bool FileSystem.removeRecursively (QString &path, std.function<void (QString &path, bool isDir)> &onDeleted, QStringList *errors) {
     bool allRemoved = true;
-    QDirIterator di (path, QDir::AllEntries | QDir::Hidden | QDir::System | QDir::NoDotAndDotDot);
+    QDirIterator di (path, QDir.AllEntries | QDir.Hidden | QDir.System | QDir.NoDotAndDotDot);
 
     while (di.hasNext ()) {
         di.next ();
@@ -129,19 +129,19 @@ bool FileSystem::removeRecursively (QString &path, std::function<void (QString &
         bool removeOk = false;
         // The use of isSymLink here is okay:
         // we never want to go into this branch for .lnk files
-        bool isDir = fi.isDir () && !fi.isSymLink () && !FileSystem::isJunction (fi.absoluteFilePath ());
+        bool isDir = fi.isDir () && !fi.isSymLink () && !FileSystem.isJunction (fi.absoluteFilePath ());
         if (isDir) {
             removeOk = removeRecursively (path + QLatin1Char ('/') + di.fileName (), onDeleted, errors); // recursive
         } else {
             QString removeError;
-            removeOk = FileSystem::remove (di.filePath (), &removeError);
+            removeOk = FileSystem.remove (di.filePath (), &removeError);
             if (removeOk) {
                 if (onDeleted)
                     onDeleted (di.filePath (), false);
             } else {
                 if (errors) {
-                    errors->append (QCoreApplication::translate ("FileSystem", "Error removing \"%1\": %2")
-                                       .arg (QDir::toNativeSeparators (di.filePath ()), removeError));
+                    errors.append (QCoreApplication.translate ("FileSystem", "Error removing \"%1\": %2")
+                                       .arg (QDir.toNativeSeparators (di.filePath ()), removeError));
                 }
                 qCWarning (lcFileSystem) << "Error removing " << di.filePath () << ':' << removeError;
             }
@@ -156,8 +156,8 @@ bool FileSystem::removeRecursively (QString &path, std::function<void (QString &
                 onDeleted (path, true);
         } else {
             if (errors) {
-                errors->append (QCoreApplication::translate ("FileSystem", "Could not remove folder \"%1\"")
-                                   .arg (QDir::toNativeSeparators (path)));
+                errors.append (QCoreApplication.translate ("FileSystem", "Could not remove folder \"%1\"")
+                                   .arg (QDir.toNativeSeparators (path)));
             }
             qCWarning (lcFileSystem) << "Error removing folder" << path;
         }
@@ -165,7 +165,7 @@ bool FileSystem::removeRecursively (QString &path, std::function<void (QString &
     return allRemoved;
 }
 
-bool FileSystem::getInode (QString &filename, quint64 *inode) {
+bool FileSystem.getInode (QString &filename, quint64 *inode) {
     csync_file_stat_t fs;
     if (csync_vio_local_stat (filename, &fs) == 0) {
         *inode = fs.inode;

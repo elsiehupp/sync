@@ -18,7 +18,7 @@
 
 namespace OCC {
 
-QByteArray SyncJournalFileRecord::numericFileId () const {
+QByteArray SyncJournalFileRecord.numericFileId () {
     // Use the id up until the first non-numeric character
     for (int i = 0; i < _fileId.size (); ++i) {
         if (_fileId[i] < '0' || _fileId[i] > '9') {
@@ -28,7 +28,7 @@ QByteArray SyncJournalFileRecord::numericFileId () const {
     return _fileId;
 }
 
-bool SyncJournalErrorBlacklistRecord::isValid () const {
+bool SyncJournalErrorBlacklistRecord.isValid () {
     return !_file.isEmpty ()
         && (!_lastTryEtag.isEmpty () || _lastTryModtime != 0)
         && _lastTryTime > 0;

@@ -14,7 +14,7 @@
 
 namespace OCC {
 
-bool SimpleSslErrorHandler::handleErrors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, OCC::AccountPtr account) {
+bool SimpleSslErrorHandler.handleErrors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, OCC.AccountPtr account) {
     (void)account;
     (void)conf;
 
@@ -24,7 +24,7 @@ bool SimpleSslErrorHandler::handleErrors (QList<QSslError> errors, QSslConfigura
     }
 
     for (auto &error : qAsConst (errors)) {
-        certs->append (error.certificate ());
+        certs.append (error.certificate ());
     }
     return true;
 }

@@ -30,7 +30,7 @@ public:
 
 signals:
     void jobFinished (QByteArray iconData);
-    void error (QNetworkReply::NetworkError errorType);
+    void error (QNetworkReply.NetworkError errorType);
 
 private slots:
     void finished ();

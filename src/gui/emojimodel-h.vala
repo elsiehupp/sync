@@ -26,8 +26,8 @@ namespace OCC {
 
 struct Emoji {
     Emoji (QString u, QString s, bool isCustom = false)
-        : unicode (std::move (std::move (u)))
-        , shortname (std::move (std::move (s)))
+        : unicode (std.move (std.move (u)))
+        , shortname (std.move (std.move (s)))
         , isCustom (isCustom) {
     }
     Emoji () = default;
@@ -72,7 +72,7 @@ private:
         QString label;
     };
 
-    static const std::vector<Category> categories;
+    static const std.vector<Category> categories;
 };
 
 class EmojiModel : public QObject {
@@ -125,4 +125,4 @@ private:
 
 }
 
-Q_DECLARE_METATYPE (OCC::Emoji)
+Q_DECLARE_METATYPE (OCC.Emoji)

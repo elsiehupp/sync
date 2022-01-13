@@ -39,14 +39,14 @@ class SslErrorDialog;
  * @brief The Application class
  * @ingroup gui
  */
-class Application : public SharedTools::QtSingleApplication {
+class Application : public SharedTools.QtSingleApplication {
 public:
     explicit Application (int &argc, char **argv);
     ~Application () override;
 
     bool giveHelp ();
     void showHelp ();
-    void showHint (std::string errorHint);
+    void showHint (std.string errorHint);
     bool debugMode ();
     bool backgroundMode () const;
     bool versionOnly (); // only display the version?
@@ -126,7 +126,7 @@ private:
     QTimer _checkConnectionTimer;
 
 #if defined (WITH_CRASHREPORTER)
-    QScopedPointer<CrashReporter::Handler> _crashHandler;
+    QScopedPointer<CrashReporter.Handler> _crashHandler;
 #endif
     QScopedPointer<FolderMan> _folderManager;
 };

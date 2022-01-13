@@ -45,7 +45,7 @@ namespace FileSystem {
     /**
      * @brief Get the mtime for a filepath
      *
-     * Use this over QFileInfo::lastModified () to avoid timezone related bugs. See
+     * Use this over QFileInfo.lastModified () to avoid timezone related bugs. See
      * owncloud/core#9781 for details.
      */
     time_t OWNCLOUDSYNC_EXPORT getModTime (QString &filename);
@@ -55,7 +55,7 @@ namespace FileSystem {
     /**
      * @brief Get the size for a file
      *
-     * Use this over QFileInfo::size () to avoid bugs with lnk files on Windows.
+     * Use this over QFileInfo.size () to avoid bugs with lnk files on Windows.
      * See https://bugreports.qt.io/browse/QTBUG-24831.
      */
     qint64 OWNCLOUDSYNC_EXPORT getSize (QString &filename);
@@ -91,7 +91,7 @@ namespace FileSystem {
      * errors are collected in errors.
      */
     bool OWNCLOUDSYNC_EXPORT removeRecursively (QString &path,
-        const std::function<void (QString &path, bool isDir)> &onDeleted = nullptr,
+        const std.function<void (QString &path, bool isDir)> &onDeleted = nullptr,
         QStringList *errors = nullptr);
 }
 

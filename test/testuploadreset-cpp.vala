@@ -16,56 +16,56 @@ class TestUploadReset : public QObject {
 private slots:
 
     // Verify that the chunked transfer eventually gets reset with the new chunking
-    void testFileUploadNg() {
-        FakeFolder fakeFolder{FileInfo::A12_B12_C12_S12()};
+    void testFileUploadNg () {
+        FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
 
-        fakeFolder.syncEngine().account()->setCapabilities({ { "dav", QVariantMap{ {"chunking", "1.0"}, {"httpErrorCodesThatResetFailingChunkedUploads", QVariantList{500} } } } });
+        fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"}, {"httpErrorCodesThatResetFailingChunkedUploads", QVariantList{500} } } } });
 
         const int size = 100 * 1000 * 1000; // 100 MB
-        fakeFolder.localModifier().insert("A/a0", size);
-        QDateTime modTime = QDateTime::currentDateTime();
-        fakeFolder.localModifier().setModTime("A/a0", modTime);
+        fakeFolder.localModifier ().insert ("A/a0", size);
+        QDateTime modTime = QDateTime.currentDateTime ();
+        fakeFolder.localModifier ().setModTime ("A/a0", modTime);
 
         // Create a transfer id, so we can make the final MOVE fail
-        SyncJournalDb::UploadInfo uploadInfo;
+        SyncJournalDb.UploadInfo uploadInfo;
         uploadInfo._transferid = 1;
         uploadInfo._valid = true;
-        uploadInfo._modtime = Utility::qDateTimeToTime_t(modTime);
+        uploadInfo._modtime = Utility.qDateTimeToTime_t (modTime);
         uploadInfo._size = size;
-        fakeFolder.syncEngine().journal()->setUploadInfo("A/a0", uploadInfo);
+        fakeFolder.syncEngine ().journal ().setUploadInfo ("A/a0", uploadInfo);
 
-        fakeFolder.uploadState().mkdir("1");
-        fakeFolder.serverErrorPaths().append("1/.file");
+        fakeFolder.uploadState ().mkdir ("1");
+        fakeFolder.serverErrorPaths ().append ("1/.file");
 
-        QVERIFY(!fakeFolder.syncOnce());
+        QVERIFY (!fakeFolder.syncOnce ());
 
-        uploadInfo = fakeFolder.syncEngine().journal()->getUploadInfo("A/a0");
-        QCOMPARE(uploadInfo._errorCount, 1);
-        QCOMPARE(uploadInfo._transferid, 1U);
+        uploadInfo = fakeFolder.syncEngine ().journal ().getUploadInfo ("A/a0");
+        QCOMPARE (uploadInfo._errorCount, 1);
+        QCOMPARE (uploadInfo._transferid, 1U);
 
-        fakeFolder.syncEngine().journal()->wipeErrorBlacklist();
-        QVERIFY(!fakeFolder.syncOnce());
+        fakeFolder.syncEngine ().journal ().wipeErrorBlacklist ();
+        QVERIFY (!fakeFolder.syncOnce ());
 
-        uploadInfo = fakeFolder.syncEngine().journal()->getUploadInfo("A/a0");
-        QCOMPARE(uploadInfo._errorCount, 2);
-        QCOMPARE(uploadInfo._transferid, 1U);
+        uploadInfo = fakeFolder.syncEngine ().journal ().getUploadInfo ("A/a0");
+        QCOMPARE (uploadInfo._errorCount, 2);
+        QCOMPARE (uploadInfo._transferid, 1U);
 
-        fakeFolder.syncEngine().journal()->wipeErrorBlacklist();
-        QVERIFY(!fakeFolder.syncOnce());
+        fakeFolder.syncEngine ().journal ().wipeErrorBlacklist ();
+        QVERIFY (!fakeFolder.syncOnce ());
 
-        uploadInfo = fakeFolder.syncEngine().journal()->getUploadInfo("A/a0");
-        QCOMPARE(uploadInfo._errorCount, 3);
-        QCOMPARE(uploadInfo._transferid, 1U);
+        uploadInfo = fakeFolder.syncEngine ().journal ().getUploadInfo ("A/a0");
+        QCOMPARE (uploadInfo._errorCount, 3);
+        QCOMPARE (uploadInfo._transferid, 1U);
 
-        fakeFolder.syncEngine().journal()->wipeErrorBlacklist();
-        QVERIFY(!fakeFolder.syncOnce());
+        fakeFolder.syncEngine ().journal ().wipeErrorBlacklist ();
+        QVERIFY (!fakeFolder.syncOnce ());
 
-        uploadInfo = fakeFolder.syncEngine().journal()->getUploadInfo("A/a0");
-        QCOMPARE(uploadInfo._errorCount, 0);
-        QCOMPARE(uploadInfo._transferid, 0U);
-        QVERIFY(!uploadInfo._valid);
+        uploadInfo = fakeFolder.syncEngine ().journal ().getUploadInfo ("A/a0");
+        QCOMPARE (uploadInfo._errorCount, 0);
+        QCOMPARE (uploadInfo._transferid, 0U);
+        QVERIFY (!uploadInfo._valid);
     }
 };
 
-QTEST_GUILESS_MAIN(TestUploadReset)
+QTEST_GUILESS_MAIN (TestUploadReset)
 #include "testuploadreset.moc"

@@ -32,7 +32,7 @@ private:
     void deleteNestedRemoteItem (QString &filename);
     void decryptAndRemoteDelete ();
 
-    QMap<QString, OCC::SyncJournalFileRecord> _nestedItems; // Nested files and folders
+    QMap<QString, OCC.SyncJournalFileRecord> _nestedItems; // Nested files and folders
 };
 
 }

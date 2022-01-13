@@ -34,14 +34,14 @@ struct argument_s {
   int verbose;
 };
 
-void torture_cmdline_parse(int argc, char **argv, struct argument_s *arguments);
+void torture_cmdline_parse (int argc, char **argv, struct argument_s *arguments);
 
-int torture_csync_verbosity(void);
+int torture_csync_verbosity (void);
 
 /*
  * This function must be defined in every unit test file.
  */
-int torture_run_tests(void);
+int torture_run_tests (void);
 
 #ifdef __cplusplus
 }

@@ -42,9 +42,9 @@ private:
     void setupCreateAccountButton ();
     void setupHostYourOwnServerLabel ();
 
-    QScopedPointer<Ui::WelcomePage> _ui;
+    QScopedPointer<Ui.WelcomePage> _ui;
 
     OwncloudWizard *_ocWizard;
-    WizardCommon::Pages _nextPage = WizardCommon::Page_ServerSetup;
+    WizardCommon.Pages _nextPage = WizardCommon.Page_ServerSetup;
 };
 }

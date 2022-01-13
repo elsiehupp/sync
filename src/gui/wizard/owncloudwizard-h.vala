@@ -70,7 +70,7 @@ public:
      * being experimental. Calles the callback with true if enabling was
      * chosen.
      */
-    static void askExperimentalVirtualFilesFeature (QWidget *receiver, std::function<void (bool enable)> &callback);
+    static void askExperimentalVirtualFilesFeature (QWidget *receiver, std.function<void (bool enable)> &callback);
 
     // FIXME: Can those be local variables?
     // Set from the OwncloudSetupPage, later used from OwncloudHttpCredsPage
@@ -81,7 +81,7 @@ public:
     QList<QSslCertificate> _clientSslCaCertificates;
 
 public slots:
-    void setAuthType (DetermineAuthTypeJob::AuthType type);
+    void setAuthType (DetermineAuthTypeJob.AuthType type);
     void setRemoteFolder (QString &);
     void appendToConfigurationLog (QString &msg, LogType type = LogParagraph);
     void slotCurrentPageChanged (int);

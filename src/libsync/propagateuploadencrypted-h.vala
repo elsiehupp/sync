@@ -35,9 +35,9 @@ public:
 
     void unlockFolder ();
 
-    bool isUnlockRunning () const { return _isUnlockRunning; }
-    bool isFolderLocked () const { return _isFolderLocked; }
-    const QByteArray folderToken () const { return _folderToken; }
+    bool isUnlockRunning () { return _isUnlockRunning; }
+    bool isFolderLocked () { return _isFolderLocked; }
+    const QByteArray folderToken () { return _folderToken; }
 
 private slots:
     void slotFolderEncryptedIdReceived (QStringList &list);

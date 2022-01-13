@@ -47,7 +47,7 @@ class QFile;
  * Manages file/directory exclusion.
  *
  * Most commonly exclude patterns are loaded from files. See
- * addExcludeFilePath() and reloadExcludeFiles().
+ * addExcludeFilePath () and reloadExcludeFiles ().
  *
  * Excluded files are primarily relevant for sync runs, and for
  * file watcher filtering.
@@ -58,24 +58,24 @@ class QFile;
  */
 class OCSYNC_EXPORT ExcludedFiles : public QObject {
 public:
-    using Version = std::tuple<int, int, int>;
+    using Version = std.tuple<int, int, int>;
 
-    explicit ExcludedFiles(QString &localPath = QStringLiteral("/"));
-    ~ExcludedFiles() override;
+    explicit ExcludedFiles (QString &localPath = QStringLiteral ("/"));
+    ~ExcludedFiles () override;
 
     /**
      * Adds a new path to a file containing exclude patterns.
      *
-     * Does not load the file. Use reloadExcludeFiles() afterwards.
+     * Does not load the file. Use reloadExcludeFiles () afterwards.
      */
-    void addExcludeFilePath(QString &path);
+    void addExcludeFilePath (QString &path);
 
     /**
      * Whether conflict files shall be excluded.
      *
      * Defaults to true.
      */
-    void setExcludeConflictFiles(bool onoff);
+    void setExcludeConflictFiles (bool onoff);
 
     /**
      * Checks whether a file or directory should be excluded.
@@ -83,7 +83,7 @@ public:
      * @param filePath     the absolute path to the file
      * @param basePath     folder path from which to apply exclude rules, ends with a /
      */
-    bool isExcluded(
+    bool isExcluded (
         const QString &filePath,
         const QString &basePath,
         bool excludeHidden) const;
@@ -92,33 +92,33 @@ public:
      * Adds an exclude pattern anchored to base path
      *
      * Primarily used in tests. Patterns added this way are preserved when
-     * reloadExcludeFiles() is called.
+     * reloadExcludeFiles () is called.
      */
-    void addManualExclude(QString &expr);
-    void addManualExclude(QString &expr, QString &basePath);
+    void addManualExclude (QString &expr);
+    void addManualExclude (QString &expr, QString &basePath);
 
     /**
      * Removes all manually added exclude patterns.
      *
      * Primarily used in tests.
      */
-    void clearManualExcludes();
+    void clearManualExcludes ();
 
     /**
      * Adjusts behavior of wildcards. Only used for testing.
      */
-    void setWildcardsMatchSlash(bool onoff);
+    void setWildcardsMatchSlash (bool onoff);
 
     /**
      * Sets the client version, only used for testing.
      */
-    void setClientVersion(Version version);
+    void setClientVersion (Version version);
 
     /**
      * @brief Check if the given path should be excluded in a traversal situation.
      *
-     * It does only part of the work that full() does because it's assumed
-     * that all leading directories have been run through traversal()
+     * It does only part of the work that full () does because it's assumed
+     * that all leading directories have been run through traversal ()
      * before. This can be significantly faster.
      *
      * That means for 'foo/bar/file' only ('foo/bar/file', 'file') is checked
@@ -129,17 +129,17 @@ public:
      * Note that this only matches patterns. It does not check whether the file
      * or directory pointed to is hidden (or whether it even exists).
      */
-    CSYNC_EXCLUDE_TYPE traversalPatternMatch(QString &path, ItemType filetype);
+    CSYNC_EXCLUDE_TYPE traversalPatternMatch (QString &path, ItemType filetype);
 
 public slots:
     /**
      * Reloads the exclude patterns from the registered paths.
      */
-    bool reloadExcludeFiles();
+    bool reloadExcludeFiles ();
     /**
      * Loads the exclude patterns from file the registered base paths.
      */
-    void loadExcludeFilePatterns(QString &basePath, QFile &file);
+    void loadExcludeFilePatterns (QString &basePath, QFile &file);
 
 private:
     /**
@@ -157,7 +157,7 @@ private:
      *
      * Would enable the "myexclude" pattern only for versions before 2.5.0.
      */
-    bool versionDirectiveKeepNextLine(QByteArray &directive) const;
+    bool versionDirectiveKeepNextLine (QByteArray &directive) const;
 
     /**
      * @brief Match the exclude pattern against the full path.
@@ -167,19 +167,19 @@ private:
      * Note that this only matches patterns. It does not check whether the file
      * or directory pointed to is hidden (or whether it even exists).
      */
-    CSYNC_EXCLUDE_TYPE fullPatternMatch(QString &path, ItemType filetype) const;
+    CSYNC_EXCLUDE_TYPE fullPatternMatch (QString &path, ItemType filetype) const;
 
     // Our BasePath need to end with '/'
     class BasePathString : public QString {
     public:
-        BasePathString(QString &&other)
-            : QString(std::move(other)) {
-            Q_ASSERT(endsWith(QLatin1Char('/')));
+        BasePathString (QString &&other)
+            : QString (std.move (other)) {
+            Q_ASSERT (endsWith (QLatin1Char ('/')));
         }
 
-        BasePathString(QString &other)
-            : QString(other) {
-            Q_ASSERT(endsWith(QLatin1Char('/')));
+        BasePathString (QString &other)
+            : QString (other) {
+            Q_ASSERT (endsWith (QLatin1Char ('/')));
         }
     };
 
@@ -201,7 +201,7 @@ private:
      *
      * The full matcher is equivalent to or-combining the traversal match results
      * of all parent paths:
-     *   full("a/b/c/d") == traversal("a") || traversal("a/b") || traversal("a/b/c")
+     *   full ("a/b/c/d") == traversal ("a") || traversal ("a/b") || traversal ("a/b/c")
      *
      * The traversal matcher can be extremely fast because it has a fast early-out
      * case: It checks the bname part of the path against _bnameTraversalRegex
@@ -209,28 +209,28 @@ private:
      * activation for it was triggered.
      *
      * Note: The traversal matcher will return not-excluded on some paths that the
-     * full matcher would exclude. Example: "b" is excluded. traversal("b/c")
+     * full matcher would exclude. Example: "b" is excluded. traversal ("b/c")
      * returns not-excluded because "c" isn't a bname activation pattern.
      */
-    void prepare(BasePathString &basePath);
+    void prepare (BasePathString &basePath);
 
-    void prepare();
+    void prepare ();
 
-    static QString extractBnameTrigger(QString &exclude, bool wildcardsMatchSlash);
-    static QString convertToRegexpSyntax(QString exclude, bool wildcardsMatchSlash);
+    static QString extractBnameTrigger (QString &exclude, bool wildcardsMatchSlash);
+    static QString convertToRegexpSyntax (QString exclude, bool wildcardsMatchSlash);
 
     QString _localPath;
 
     /// Files to load excludes from
     QMap<BasePathString, QStringList> _excludeFiles;
 
-    /// Exclude patterns added with addManualExclude()
+    /// Exclude patterns added with addManualExclude ()
     QMap<BasePathString, QStringList> _manualExcludes;
 
     /// List of all active exclude patterns
     QMap<BasePathString, QStringList> _allExcludes;
 
-    /// see prepare()
+    /// see prepare ()
     QMap<BasePathString, QRegularExpression> _bnameTraversalRegexFile;
     QMap<BasePathString, QRegularExpression> _bnameTraversalRegexDir;
     QMap<BasePathString, QRegularExpression> _fullTraversalRegexFile;
@@ -250,7 +250,7 @@ private:
 
     /**
      * The client version. Used to evaluate version-dependent excludes,
-     * see versionDirectiveKeepNextLine().
+     * see versionDirectiveKeepNextLine ().
      */
     Version _clientVersion;
 

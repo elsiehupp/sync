@@ -16,7 +16,7 @@
 
 namespace OCC {
 
-QString UnifiedSearchResult::typeAsString (UnifiedSearchResult::Type type) {
+QString UnifiedSearchResult.typeAsString (UnifiedSearchResult.Type type) {
     QString result;
 
     switch (type) {

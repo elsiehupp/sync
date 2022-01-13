@@ -21,42 +21,42 @@ namespace OCC {
 
 Q_LOGGING_CATEGORY (lcPushNotifications, "nextcloud.sync.pushnotifications", QtInfoMsg)
 
-PushNotifications::PushNotifications (Account *account, QObject *parent)
+PushNotifications.PushNotifications (Account *account, QObject *parent)
     : QObject (parent)
     , _account (account)
-    , _webSocket (new QWebSocket (QString (), QWebSocketProtocol::VersionLatest, this)) {
-    connect (_webSocket, QOverload<QAbstractSocket::SocketError>::of (&QWebSocket::error), this, &PushNotifications::onWebSocketError);
-    connect (_webSocket, &QWebSocket::sslErrors, this, &PushNotifications::onWebSocketSslErrors);
-    connect (_webSocket, &QWebSocket::connected, this, &PushNotifications::onWebSocketConnected);
-    connect (_webSocket, &QWebSocket::disconnected, this, &PushNotifications::onWebSocketDisconnected);
-    connect (_webSocket, &QWebSocket::pong, this, &PushNotifications::onWebSocketPongReceived);
+    , _webSocket (new QWebSocket (QString (), QWebSocketProtocol.VersionLatest, this)) {
+    connect (_webSocket, QOverload<QAbstractSocket.SocketError>.of (&QWebSocket.error), this, &PushNotifications.onWebSocketError);
+    connect (_webSocket, &QWebSocket.sslErrors, this, &PushNotifications.onWebSocketSslErrors);
+    connect (_webSocket, &QWebSocket.connected, this, &PushNotifications.onWebSocketConnected);
+    connect (_webSocket, &QWebSocket.disconnected, this, &PushNotifications.onWebSocketDisconnected);
+    connect (_webSocket, &QWebSocket.pong, this, &PushNotifications.onWebSocketPongReceived);
 
-    connect (&_pingTimer, &QTimer::timeout, this, &PushNotifications::pingWebSocketServer);
+    connect (&_pingTimer, &QTimer.timeout, this, &PushNotifications.pingWebSocketServer);
     _pingTimer.setSingleShot (true);
     _pingTimer.setInterval (PING_INTERVAL);
 
-    connect (&_pingTimedOutTimer, &QTimer::timeout, this, &PushNotifications::onPingTimedOut);
+    connect (&_pingTimedOutTimer, &QTimer.timeout, this, &PushNotifications.onPingTimedOut);
     _pingTimedOutTimer.setSingleShot (true);
     _pingTimedOutTimer.setInterval (PING_INTERVAL);
 }
 
-PushNotifications::~PushNotifications () {
+PushNotifications.~PushNotifications () {
     closeWebSocket ();
 }
 
-void PushNotifications::setup () {
+void PushNotifications.setup () {
     qCInfo (lcPushNotifications) << "Setup push notifications";
     _failedAuthenticationAttemptsCount = 0;
     reconnectToWebSocket ();
 }
 
-void PushNotifications::reconnectToWebSocket () {
+void PushNotifications.reconnectToWebSocket () {
     closeWebSocket ();
     openWebSocket ();
 }
 
-void PushNotifications::closeWebSocket () {
-    qCInfo (lcPushNotifications) << "Close websocket for account" << _account->url ();
+void PushNotifications.closeWebSocket () {
+    qCInfo (lcPushNotifications) << "Close websocket for account" << _account.url ();
 
     _pingTimer.stop ();
     _pingTimedOutTimer.stop ();
@@ -64,38 +64,38 @@ void PushNotifications::closeWebSocket () {
 
     // Maybe there run some reconnection attempts
     if (_reconnectTimer) {
-        _reconnectTimer->stop ();
+        _reconnectTimer.stop ();
     }
 
-    disconnect (_webSocket, QOverload<QAbstractSocket::SocketError>::of (&QWebSocket::error), this, &PushNotifications::onWebSocketError);
-    disconnect (_webSocket, &QWebSocket::sslErrors, this, &PushNotifications::onWebSocketSslErrors);
+    disconnect (_webSocket, QOverload<QAbstractSocket.SocketError>.of (&QWebSocket.error), this, &PushNotifications.onWebSocketError);
+    disconnect (_webSocket, &QWebSocket.sslErrors, this, &PushNotifications.onWebSocketSslErrors);
 
-    _webSocket->close ();
+    _webSocket.close ();
 }
 
-void PushNotifications::onWebSocketConnected () {
-    qCInfo (lcPushNotifications) << "Connected to websocket for account" << _account->url ();
+void PushNotifications.onWebSocketConnected () {
+    qCInfo (lcPushNotifications) << "Connected to websocket for account" << _account.url ();
 
-    connect (_webSocket, &QWebSocket::textMessageReceived, this, &PushNotifications::onWebSocketTextMessageReceived, Qt::UniqueConnection);
+    connect (_webSocket, &QWebSocket.textMessageReceived, this, &PushNotifications.onWebSocketTextMessageReceived, Qt.UniqueConnection);
 
     authenticateOnWebSocket ();
 }
 
-void PushNotifications::authenticateOnWebSocket () {
-    const auto credentials = _account->credentials ();
-    const auto username = credentials->user ();
-    const auto password = credentials->password ();
+void PushNotifications.authenticateOnWebSocket () {
+    const auto credentials = _account.credentials ();
+    const auto username = credentials.user ();
+    const auto password = credentials.password ();
 
     // Authenticate
-    _webSocket->sendTextMessage (username);
-    _webSocket->sendTextMessage (password);
+    _webSocket.sendTextMessage (username);
+    _webSocket.sendTextMessage (password);
 }
 
-void PushNotifications::onWebSocketDisconnected () {
-    qCInfo (lcPushNotifications) << "Disconnected from websocket for account" << _account->url ();
+void PushNotifications.onWebSocketDisconnected () {
+    qCInfo (lcPushNotifications) << "Disconnected from websocket for account" << _account.url ();
 }
 
-void PushNotifications::onWebSocketTextMessageReceived (QString &message) {
+void PushNotifications.onWebSocketTextMessageReceived (QString &message) {
     qCInfo (lcPushNotifications) << "Received push notification:" << message;
 
     if (message == "notify_file") {
@@ -111,20 +111,20 @@ void PushNotifications::onWebSocketTextMessageReceived (QString &message) {
     }
 }
 
-void PushNotifications::onWebSocketError (QAbstractSocket::SocketError error) {
+void PushNotifications.onWebSocketError (QAbstractSocket.SocketError error) {
     // This error gets thrown in testSetup_maxConnectionAttemptsReached_deletePushNotifications after
     // the second connection attempt. I have no idea why this happens. Maybe the socket gets not closed correctly?
     // I think it's fine to ignore this error.
-    if (error == QAbstractSocket::UnfinishedSocketOperationError) {
+    if (error == QAbstractSocket.UnfinishedSocketOperationError) {
         return;
     }
 
-    qCWarning (lcPushNotifications) << "Websocket error on with account" << _account->url () << error;
+    qCWarning (lcPushNotifications) << "Websocket error on with account" << _account.url () << error;
     closeWebSocket ();
     emit connectionLost ();
 }
 
-bool PushNotifications::tryReconnectToWebSocket () {
+bool PushNotifications.tryReconnectToWebSocket () {
     ++_failedAuthenticationAttemptsCount;
     if (_failedAuthenticationAttemptsCount >= MAX_ALLOWED_FAILED_AUTHENTICATION_ATTEMPTS) {
         qCInfo (lcPushNotifications) << "Max authentication attempts reached";
@@ -135,42 +135,42 @@ bool PushNotifications::tryReconnectToWebSocket () {
         _reconnectTimer = new QTimer (this);
     }
 
-    _reconnectTimer->setInterval (_reconnectTimerInterval);
-    _reconnectTimer->setSingleShot (true);
-    connect (_reconnectTimer, &QTimer::timeout, [this] () {
+    _reconnectTimer.setInterval (_reconnectTimerInterval);
+    _reconnectTimer.setSingleShot (true);
+    connect (_reconnectTimer, &QTimer.timeout, [this] () {
         reconnectToWebSocket ();
     });
-    _reconnectTimer->start ();
+    _reconnectTimer.start ();
 
     return true;
 }
 
-void PushNotifications::onWebSocketSslErrors (QList<QSslError> &errors) {
-    qCWarning (lcPushNotifications) << "Websocket ssl errors on with account" << _account->url () << errors;
+void PushNotifications.onWebSocketSslErrors (QList<QSslError> &errors) {
+    qCWarning (lcPushNotifications) << "Websocket ssl errors on with account" << _account.url () << errors;
     closeWebSocket ();
     emit authenticationFailed ();
 }
 
-void PushNotifications::openWebSocket () {
+void PushNotifications.openWebSocket () {
     // Open websocket
-    const auto capabilities = _account->capabilities ();
+    const auto capabilities = _account.capabilities ();
     const auto webSocketUrl = capabilities.pushNotificationsWebSocketUrl ();
 
-    qCInfo (lcPushNotifications) << "Open connection to websocket on" << webSocketUrl << "for account" << _account->url ();
-    connect (_webSocket, QOverload<QAbstractSocket::SocketError>::of (&QWebSocket::error), this, &PushNotifications::onWebSocketError);
-    connect (_webSocket, &QWebSocket::sslErrors, this, &PushNotifications::onWebSocketSslErrors);
-    _webSocket->open (webSocketUrl);
+    qCInfo (lcPushNotifications) << "Open connection to websocket on" << webSocketUrl << "for account" << _account.url ();
+    connect (_webSocket, QOverload<QAbstractSocket.SocketError>.of (&QWebSocket.error), this, &PushNotifications.onWebSocketError);
+    connect (_webSocket, &QWebSocket.sslErrors, this, &PushNotifications.onWebSocketSslErrors);
+    _webSocket.open (webSocketUrl);
 }
 
-void PushNotifications::setReconnectTimerInterval (uint32_t interval) {
+void PushNotifications.setReconnectTimerInterval (uint32_t interval) {
     _reconnectTimerInterval = interval;
 }
 
-bool PushNotifications::isReady () const {
+bool PushNotifications.isReady () {
     return _isReady;
 }
 
-void PushNotifications::handleAuthenticated () {
+void PushNotifications.handleAuthenticated () {
     qCInfo (lcPushNotifications) << "Authenticated successful on websocket";
     _failedAuthenticationAttemptsCount = 0;
     _isReady = true;
@@ -185,12 +185,12 @@ void PushNotifications::handleAuthenticated () {
     emitActivitiesChanged ();
 }
 
-void PushNotifications::handleNotifyFile () {
+void PushNotifications.handleNotifyFile () {
     qCInfo (lcPushNotifications) << "Files push notification arrived";
     emitFilesChanged ();
 }
 
-void PushNotifications::handleInvalidCredentials () {
+void PushNotifications.handleInvalidCredentials () {
     qCInfo (lcPushNotifications) << "Invalid credentials submitted to websocket";
     if (!tryReconnectToWebSocket ()) {
         closeWebSocket ();
@@ -198,17 +198,17 @@ void PushNotifications::handleInvalidCredentials () {
     }
 }
 
-void PushNotifications::handleNotifyNotification () {
+void PushNotifications.handleNotifyNotification () {
     qCInfo (lcPushNotifications) << "Push notification arrived";
     emitNotificationsChanged ();
 }
 
-void PushNotifications::handleNotifyActivity () {
+void PushNotifications.handleNotifyActivity () {
     qCInfo (lcPushNotifications) << "Push activity arrived";
     emitActivitiesChanged ();
 }
 
-void PushNotifications::onWebSocketPongReceived (quint64 /*elapsedTime*/, QByteArray & /*payload*/) {
+void PushNotifications.onWebSocketPongReceived (quint64 /*elapsedTime*/, QByteArray & /*payload*/) {
     qCDebug (lcPushNotifications) << "Pong received in time";
     // We are fine with every kind of pong and don't care about the
     // payload. As long as we receive pongs the server is still alive.
@@ -216,25 +216,25 @@ void PushNotifications::onWebSocketPongReceived (quint64 /*elapsedTime*/, QByteA
     startPingTimer ();
 }
 
-void PushNotifications::startPingTimer () {
+void PushNotifications.startPingTimer () {
     _pingTimedOutTimer.stop ();
     _pingTimer.start ();
 }
 
-void PushNotifications::startPingTimedOutTimer () {
+void PushNotifications.startPingTimedOutTimer () {
     _pingTimedOutTimer.start ();
 }
 
-void PushNotifications::pingWebSocketServer () {
+void PushNotifications.pingWebSocketServer () {
     qCDebug (lcPushNotifications, "Ping websocket server");
 
     _pongReceivedFromWebSocketServer = false;
 
-    _webSocket->ping ({});
+    _webSocket.ping ({});
     startPingTimedOutTimer ();
 }
 
-void PushNotifications::onPingTimedOut () {
+void PushNotifications.onPingTimedOut () {
     if (_pongReceivedFromWebSocketServer) {
         qCDebug (lcPushNotifications) << "Websocket respond with a pong in time.";
         return;
@@ -245,20 +245,20 @@ void PushNotifications::onPingTimedOut () {
     setup ();
 }
 
-void PushNotifications::setPingInterval (int timeoutInterval) {
+void PushNotifications.setPingInterval (int timeoutInterval) {
     _pingTimer.setInterval (timeoutInterval);
     _pingTimedOutTimer.setInterval (timeoutInterval);
 }
 
-void PushNotifications::emitFilesChanged () {
+void PushNotifications.emitFilesChanged () {
     emit filesChanged (_account);
 }
 
-void PushNotifications::emitNotificationsChanged () {
+void PushNotifications.emitNotificationsChanged () {
     emit notificationsChanged (_account);
 }
 
-void PushNotifications::emitActivitiesChanged () {
+void PushNotifications.emitActivitiesChanged () {
     emit activitiesChanged (_account);
 }
 }

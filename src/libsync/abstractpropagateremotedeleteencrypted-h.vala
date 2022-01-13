@@ -30,7 +30,7 @@ public:
     AbstractPropagateRemoteDeleteEncrypted (OwncloudPropagator *propagator, SyncFileItemPtr item, QObject *parent);
     ~AbstractPropagateRemoteDeleteEncrypted () override = default;
 
-    QNetworkReply::NetworkError networkError () const;
+    QNetworkReply.NetworkError networkError () const;
     QString errorString () const;
 
     virtual void start () = 0;
@@ -39,7 +39,7 @@ signals:
     void finished (bool success);
 
 protected:
-    void storeFirstError (QNetworkReply::NetworkError err);
+    void storeFirstError (QNetworkReply.NetworkError err);
     void storeFirstErrorString (QString &errString);
 
     void startLsColJob (QString &path);
@@ -61,7 +61,7 @@ protected:
     QByteArray _folderId;
     bool _folderLocked = false;
     bool _isTaskFailed = false;
-    QNetworkReply::NetworkError _networkError = QNetworkReply::NoError;
+    QNetworkReply.NetworkError _networkError = QNetworkReply.NoError;
     QString _errorString;
 };
 

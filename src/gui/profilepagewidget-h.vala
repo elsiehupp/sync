@@ -18,7 +18,7 @@ public:
 
 private:
     void onHovercardFetched ();
-    void onIconLoaded (std::size_t &hovercardActionIndex);
+    void onIconLoaded (std.size_t &hovercardActionIndex);
 
     OcsProfileConnector _profileConnector;
     QMenu _menu;

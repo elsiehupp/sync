@@ -53,7 +53,7 @@ public:
     void removeAccount () const;
     QString avatarUrl () const;
     bool isDesktopNotificationsAllowed () const;
-    UserStatus::OnlineStatus status () const;
+    UserStatus.OnlineStatus status () const;
     QString statusMessage () const;
     QUrl statusIcon () const;
     QString statusEmoji () const;
@@ -73,7 +73,7 @@ public slots:
     void slotItemCompleted (QString &folder, SyncFileItemPtr &item);
     void slotProgressInfo (QString &folder, ProgressInfo &progress);
     void slotAddError (QString &folderAlias, QString &message, ErrorCategory category);
-    void slotAddErrorToGui (QString &folderAlias, SyncFileItem::Status status, QString &errorMessage, QString &subject = {});
+    void slotAddErrorToGui (QString &folderAlias, SyncFileItem.Status status, QString &errorMessage, QString &subject = {});
     void slotNotificationRequestFinished (int statusCode);
     void slotNotifyNetworkError (QNetworkReply *reply);
     void slotEndNotificationRequest (int replyCode);
@@ -85,7 +85,7 @@ public slots:
     void slotRefresh ();
     void slotRefreshUserStatus ();
     void slotRefreshImmediately ();
-    void setNotificationRefreshInterval (std::chrono::milliseconds interval);
+    void setNotificationRefreshInterval (std.chrono.milliseconds interval);
     void slotRebuildNavigationAppList ();
 
 private:
@@ -134,7 +134,7 @@ public:
 
     int rowCount (QModelIndex &parent = QModelIndex ()) const override;
 
-    QVariant data (QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QVariant data (QModelIndex &index, int role = Qt.DisplayRole) const override;
 
     QImage avatarById (int &id);
 
@@ -155,12 +155,12 @@ public:
     Q_INVOKABLE void logout (int &id);
     Q_INVOKABLE void removeAccount (int &id);
 
-    Q_INVOKABLE std::shared_ptr<OCC::UserStatusConnector> userStatusConnector (int id);
+    Q_INVOKABLE std.shared_ptr<OCC.UserStatusConnector> userStatusConnector (int id);
 
     ActivityListModel *currentActivityModel ();
 
     enum UserRoles {
-        NameRole = Qt::UserRole + 1,
+        NameRole = Qt.UserRole + 1,
         ServerRole,
         ServerHasUserStatusRole,
         StatusIconRole,
@@ -205,10 +205,10 @@ public:
 
     int rowCount (QModelIndex &parent = QModelIndex ()) const override;
 
-    QVariant data (QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QVariant data (QModelIndex &index, int role = Qt.DisplayRole) const override;
 
     enum UserAppsRoles {
-        NameRole = Qt::UserRole + 1,
+        NameRole = Qt.UserRole + 1,
         UrlRole,
         IconUrlRole
     };

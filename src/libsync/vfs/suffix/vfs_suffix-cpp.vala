@@ -16,53 +16,53 @@
 
 namespace OCC {
 
-VfsSuffix::VfsSuffix (QObject *parent)
+VfsSuffix.VfsSuffix (QObject *parent)
     : Vfs (parent) {
 }
 
-VfsSuffix::~VfsSuffix () = default;
+VfsSuffix.~VfsSuffix () = default;
 
-Vfs::Mode VfsSuffix::mode () const {
+Vfs.Mode VfsSuffix.mode () {
     return WithSuffix;
 }
 
-QString VfsSuffix::fileSuffix () const {
+QString VfsSuffix.fileSuffix () {
     return QStringLiteral (APPLICATION_DOTVIRTUALFILE_SUFFIX);
 }
 
-void VfsSuffix::startImpl (VfsSetupParams &params) {
+void VfsSuffix.startImpl (VfsSetupParams &params) {
     // It is unsafe for the database to contain any ".owncloud" file entries
     // that are not marked as a virtual file. These could be real .owncloud
     // files that were synced before vfs was enabled.
     QByteArrayList toWipe;
-    params.journal->getFilesBelowPath ("", [&toWipe] (SyncJournalFileRecord &rec) {
+    params.journal.getFilesBelowPath ("", [&toWipe] (SyncJournalFileRecord &rec) {
         if (!rec.isVirtualFile () && rec._path.endsWith (APPLICATION_DOTVIRTUALFILE_SUFFIX))
             toWipe.append (rec._path);
     });
     for (auto &path : toWipe)
-        params.journal->deleteFileRecord (path);
+        params.journal.deleteFileRecord (path);
 }
 
-void VfsSuffix::stop () {
+void VfsSuffix.stop () {
 }
 
-void VfsSuffix::unregisterFolder () {
+void VfsSuffix.unregisterFolder () {
 }
 
-bool VfsSuffix::isHydrating () const {
+bool VfsSuffix.isHydrating () {
     return false;
 }
 
-Result<void, QString> VfsSuffix::updateMetadata (QString &filePath, time_t modtime, qint64, QByteArray &) {
+Result<void, QString> VfsSuffix.updateMetadata (QString &filePath, time_t modtime, qint64, QByteArray &) {
     if (modtime <= 0) {
         return {tr ("Error updating metadata due to invalid modified time")};
     }
 
-    FileSystem::setModTime (filePath, modtime);
+    FileSystem.setModTime (filePath, modtime);
     return {};
 }
 
-Result<void, QString> VfsSuffix::createPlaceholder (SyncFileItem &item) {
+Result<void, QString> VfsSuffix.createPlaceholder (SyncFileItem &item) {
     if (item._modtime <= 0) {
         return {tr ("Error updating metadata due to invalid modified time")};
     }
@@ -76,65 +76,65 @@ Result<void, QString> VfsSuffix::createPlaceholder (SyncFileItem &item) {
 
     QFile file (fn);
     if (file.exists () && file.size () > 1
-        && !FileSystem::verifyFileUnchanged (fn, item._size, item._modtime)) {
+        && !FileSystem.verifyFileUnchanged (fn, item._size, item._modtime)) {
         return QString ("Cannot create a placeholder because a file with the placeholder name already exist");
     }
 
-    if (!file.open (QFile::ReadWrite | QFile::Truncate))
+    if (!file.open (QFile.ReadWrite | QFile.Truncate))
         return file.errorString ();
 
     file.write (" ");
     file.close ();
-    FileSystem::setModTime (fn, item._modtime);
+    FileSystem.setModTime (fn, item._modtime);
     return {};
 }
 
-Result<void, QString> VfsSuffix::dehydratePlaceholder (SyncFileItem &item) {
+Result<void, QString> VfsSuffix.dehydratePlaceholder (SyncFileItem &item) {
     SyncFileItem virtualItem (item);
     virtualItem._file = item._renameTarget;
     auto r = createPlaceholder (virtualItem);
     if (!r)
         return r;
 
-    if (item._file != item._renameTarget) { // can be the same when renaming foo -> foo.owncloud to dehydrate
-        QFile::remove (_setupParams.filesystemPath + item._file);
+    if (item._file != item._renameTarget) { // can be the same when renaming foo . foo.owncloud to dehydrate
+        QFile.remove (_setupParams.filesystemPath + item._file);
     }
 
     // Move the item's pin state
-    auto pin = _setupParams.journal->internalPinStates ().rawForPath (item._file.toUtf8 ());
-    if (pin && *pin != PinState::Inherited) {
+    auto pin = _setupParams.journal.internalPinStates ().rawForPath (item._file.toUtf8 ());
+    if (pin && *pin != PinState.Inherited) {
         setPinState (item._renameTarget, *pin);
-        setPinState (item._file, PinState::Inherited);
+        setPinState (item._file, PinState.Inherited);
     }
 
     // Ensure the pin state isn't contradictory
     pin = pinState (item._renameTarget);
-    if (pin && *pin == PinState::AlwaysLocal)
-        setPinState (item._renameTarget, PinState::Unspecified);
+    if (pin && *pin == PinState.AlwaysLocal)
+        setPinState (item._renameTarget, PinState.Unspecified);
     return {};
 }
 
-Result<Vfs::ConvertToPlaceholderResult, QString> VfsSuffix::convertToPlaceholder (QString &, SyncFileItem &, QString &) {
+Result<Vfs.ConvertToPlaceholderResult, QString> VfsSuffix.convertToPlaceholder (QString &, SyncFileItem &, QString &) {
     // Nothing necessary
-    return Vfs::ConvertToPlaceholderResult::Ok;
+    return Vfs.ConvertToPlaceholderResult.Ok;
 }
 
-bool VfsSuffix::isDehydratedPlaceholder (QString &filePath) {
+bool VfsSuffix.isDehydratedPlaceholder (QString &filePath) {
     if (!filePath.endsWith (fileSuffix ()))
         return false;
     QFileInfo fi (filePath);
     return fi.exists () && fi.size () == 1;
 }
 
-bool VfsSuffix::statTypeVirtualFile (csync_file_stat_t *stat, void *) {
-    if (stat->path.endsWith (fileSuffix ().toUtf8 ())) {
-        stat->type = ItemTypeVirtualFile;
+bool VfsSuffix.statTypeVirtualFile (csync_file_stat_t *stat, void *) {
+    if (stat.path.endsWith (fileSuffix ().toUtf8 ())) {
+        stat.type = ItemTypeVirtualFile;
         return true;
     }
     return false;
 }
 
-Vfs::AvailabilityResult VfsSuffix::availability (QString &folderPath) {
+Vfs.AvailabilityResult VfsSuffix.availability (QString &folderPath) {
     return availabilityInDb (folderPath);
 }
 

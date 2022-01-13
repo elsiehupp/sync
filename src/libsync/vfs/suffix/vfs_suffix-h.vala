@@ -37,7 +37,7 @@ public:
 
     Result<void, QString> createPlaceholder (SyncFileItem &item) override;
     Result<void, QString> dehydratePlaceholder (SyncFileItem &item) override;
-    Result<Vfs::ConvertToPlaceholderResult, QString> convertToPlaceholder (QString &filename, SyncFileItem &item, QString &) override;
+    Result<Vfs.ConvertToPlaceholderResult, QString> convertToPlaceholder (QString &filename, SyncFileItem &item, QString &) override;
 
     bool needsMetadataUpdate (SyncFileItem &) override { return false; }
     bool isDehydratedPlaceholder (QString &filePath) override;
@@ -56,7 +56,7 @@ protected:
 
 class SuffixVfsPluginFactory : public QObject, public DefaultPluginFactory<VfsSuffix> {
     Q_PLUGIN_METADATA (IID "org.owncloud.PluginFactory" FILE "vfspluginmetadata.json")
-    Q_INTERFACES (OCC::PluginFactory)
+    Q_INTERFACES (OCC.PluginFactory)
 };
 
 } // namespace OCC

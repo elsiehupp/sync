@@ -20,14 +20,14 @@ namespace OCC {
 
 Q_LOGGING_CATEGORY (lcCredentials, "nextcloud.sync.credentials", QtInfoMsg)
 
-AbstractCredentials::AbstractCredentials () = default;
+AbstractCredentials.AbstractCredentials () = default;
 
-void AbstractCredentials::setAccount (Account *account) {
+void AbstractCredentials.setAccount (Account *account) {
     ENFORCE (!_account, "should only setAccount once");
     _account = account;
 }
 
-QString AbstractCredentials::keychainKey (QString &url, QString &user, QString &accountId) {
+QString AbstractCredentials.keychainKey (QString &url, QString &user, QString &accountId) {
     QString u (url);
     if (u.isEmpty ()) {
         qCWarning (lcCredentials) << "Empty url in keyChain, error!";
@@ -53,7 +53,7 @@ QString AbstractCredentials::keychainKey (QString &url, QString &user, QString &
         // It's safe to do that since the key format is changing for 2.4
         // anyway to include the account ids. That means old keys can be
         // migrated to new namespaced keys on windows for 2.4.
-        key.prepend (QCoreApplication::applicationName () + "_");
+        key.prepend (QCoreApplication.applicationName () + "_");
 #endif
     return key;
 }

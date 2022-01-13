@@ -30,7 +30,7 @@ public:
     PropagateRemoteMkdir (OwncloudPropagator *propagator, SyncFileItemPtr &item);
 
     void start () override;
-    void abort (PropagatorJob::AbortType abortType) override;
+    void abort (PropagatorJob.AbortType abortType) override;
 
     // Creating a directory should be fast.
     bool isLikelyFinishedQuickly () override { return true; }
@@ -52,6 +52,6 @@ private slots:
     void success ();
 
 private:
-    void finalizeMkColJob (QNetworkReply::NetworkError err, QString &jobHttpReasonPhraseString, QString &jobPath);
+    void finalizeMkColJob (QNetworkReply.NetworkError err, QString &jobHttpReasonPhraseString, QString &jobPath);
 };
 }

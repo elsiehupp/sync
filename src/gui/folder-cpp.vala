@@ -29,8 +29,8 @@ namespace OCC {
 
 Q_LOGGING_CATEGORY (lcFolder, "nextcloud.gui.folder", QtInfoMsg)
 
-Folder::Folder (FolderDefinition &definition,
-    AccountState *accountState, std::unique_ptr<Vfs> vfs,
+Folder.Folder (FolderDefinition &definition,
+    AccountState *accountState, std.unique_ptr<Vfs> vfs,
     QObject *parent)
     : QObject (parent)
     , _accountState (accountState)
@@ -44,9 +44,9 @@ Folder::Folder (FolderDefinition &definition,
     _timeSinceLastSyncStart.start ();
     _timeSinceLastSyncDone.start ();
 
-    SyncResult::Status status = SyncResult::NotYetStarted;
+    SyncResult.Status status = SyncResult.NotYetStarted;
     if (definition.paused) {
-        status = SyncResult::Paused;
+        status = SyncResult.Paused;
     }
     _syncResult.setStatus (status);
 
@@ -55,60 +55,60 @@ Folder::Folder (FolderDefinition &definition,
 
     _syncResult.setFolder (_definition.alias);
 
-    _engine.reset (new SyncEngine (_accountState->account (), path (), remotePath (), &_journal));
+    _engine.reset (new SyncEngine (_accountState.account (), path (), remotePath (), &_journal));
     // pass the setting if hidden files are to be ignored, will be read in csync_update
-    _engine->setIgnoreHiddenFiles (_definition.ignoreHiddenFiles);
+    _engine.setIgnoreHiddenFiles (_definition.ignoreHiddenFiles);
 
-    ConfigFile::setupDefaultExcludeFilePaths (_engine->excludedFiles ());
+    ConfigFile.setupDefaultExcludeFilePaths (_engine.excludedFiles ());
     if (!reloadExcludes ())
         qCWarning (lcFolder, "Could not read system exclude file");
 
-    connect (_accountState.data (), &AccountState::isConnectedChanged, this, &Folder::canSyncChanged);
-    connect (_engine.data (), &SyncEngine::rootEtag, this, &Folder::etagRetrievedFromSyncEngine);
+    connect (_accountState.data (), &AccountState.isConnectedChanged, this, &Folder.canSyncChanged);
+    connect (_engine.data (), &SyncEngine.rootEtag, this, &Folder.etagRetrievedFromSyncEngine);
 
-    connect (_engine.data (), &SyncEngine::started, this, &Folder::slotSyncStarted, Qt::QueuedConnection);
-    connect (_engine.data (), &SyncEngine::finished, this, &Folder::slotSyncFinished, Qt::QueuedConnection);
+    connect (_engine.data (), &SyncEngine.started, this, &Folder.slotSyncStarted, Qt.QueuedConnection);
+    connect (_engine.data (), &SyncEngine.finished, this, &Folder.slotSyncFinished, Qt.QueuedConnection);
 
-    connect (_engine.data (), &SyncEngine::aboutToRemoveAllFiles,
-        this, &Folder::slotAboutToRemoveAllFiles);
-    connect (_engine.data (), &SyncEngine::transmissionProgress, this, &Folder::slotTransmissionProgress);
-    connect (_engine.data (), &SyncEngine::itemCompleted,
-        this, &Folder::slotItemCompleted);
-    connect (_engine.data (), &SyncEngine::newBigFolder,
-        this, &Folder::slotNewBigFolderDiscovered);
-    connect (_engine.data (), &SyncEngine::seenLockedFile, FolderMan::instance (), &FolderMan::slotSyncOnceFileUnlocks);
-    connect (_engine.data (), &SyncEngine::aboutToPropagate,
-        this, &Folder::slotLogPropagationStart);
-    connect (_engine.data (), &SyncEngine::syncError, this, &Folder::slotSyncError);
+    connect (_engine.data (), &SyncEngine.aboutToRemoveAllFiles,
+        this, &Folder.slotAboutToRemoveAllFiles);
+    connect (_engine.data (), &SyncEngine.transmissionProgress, this, &Folder.slotTransmissionProgress);
+    connect (_engine.data (), &SyncEngine.itemCompleted,
+        this, &Folder.slotItemCompleted);
+    connect (_engine.data (), &SyncEngine.newBigFolder,
+        this, &Folder.slotNewBigFolderDiscovered);
+    connect (_engine.data (), &SyncEngine.seenLockedFile, FolderMan.instance (), &FolderMan.slotSyncOnceFileUnlocks);
+    connect (_engine.data (), &SyncEngine.aboutToPropagate,
+        this, &Folder.slotLogPropagationStart);
+    connect (_engine.data (), &SyncEngine.syncError, this, &Folder.slotSyncError);
 
-    connect (_engine.data (), &SyncEngine::addErrorToGui, this, &Folder::slotAddErrorToGui);
+    connect (_engine.data (), &SyncEngine.addErrorToGui, this, &Folder.slotAddErrorToGui);
 
     _scheduleSelfTimer.setSingleShot (true);
-    _scheduleSelfTimer.setInterval (SyncEngine::minimumFileAgeForUpload);
-    connect (&_scheduleSelfTimer, &QTimer::timeout,
-        this, &Folder::slotScheduleThisFolder);
+    _scheduleSelfTimer.setInterval (SyncEngine.minimumFileAgeForUpload);
+    connect (&_scheduleSelfTimer, &QTimer.timeout,
+        this, &Folder.slotScheduleThisFolder);
 
-    connect (ProgressDispatcher::instance (), &ProgressDispatcher::folderConflicts,
-        this, &Folder::slotFolderConflicts);
+    connect (ProgressDispatcher.instance (), &ProgressDispatcher.folderConflicts,
+        this, &Folder.slotFolderConflicts);
 
     _localDiscoveryTracker.reset (new LocalDiscoveryTracker);
-    connect (_engine.data (), &SyncEngine::finished,
-        _localDiscoveryTracker.data (), &LocalDiscoveryTracker::slotSyncFinished);
-    connect (_engine.data (), &SyncEngine::itemCompleted,
-        _localDiscoveryTracker.data (), &LocalDiscoveryTracker::slotItemCompleted);
+    connect (_engine.data (), &SyncEngine.finished,
+        _localDiscoveryTracker.data (), &LocalDiscoveryTracker.slotSyncFinished);
+    connect (_engine.data (), &SyncEngine.itemCompleted,
+        _localDiscoveryTracker.data (), &LocalDiscoveryTracker.slotItemCompleted);
 
     // Potentially upgrade suffix vfs to windows vfs
     ENFORCE (_vfs);
-    if (_definition.virtualFilesMode == Vfs::WithSuffix
+    if (_definition.virtualFilesMode == Vfs.WithSuffix
         && _definition.upgradeVfsMode) {
-        if (isVfsPluginAvailable (Vfs::WindowsCfApi)) {
-            if (auto winvfs = createVfsFromPlugin (Vfs::WindowsCfApi)) {
+        if (isVfsPluginAvailable (Vfs.WindowsCfApi)) {
+            if (auto winvfs = createVfsFromPlugin (Vfs.WindowsCfApi)) {
                 // Wipe the existing suffix files from fs and journal
-                SyncEngine::wipeVirtualFiles (path (), _journal, *_vfs);
+                SyncEngine.wipeVirtualFiles (path (), _journal, *_vfs);
 
                 // Then switch to winvfs mode
                 _vfs.reset (winvfs.release ());
-                _definition.virtualFilesMode = Vfs::WindowsCfApi;
+                _definition.virtualFilesMode = Vfs.WindowsCfApi;
             }
         }
         saveToSettings ();
@@ -118,21 +118,21 @@ Folder::Folder (FolderDefinition &definition,
     startVfs ();
 }
 
-Folder::~Folder () {
+Folder.~Folder () {
     // If wipeForRemoval () was called the vfs has already shut down.
     if (_vfs)
-        _vfs->stop ();
+        _vfs.stop ();
 
     // Reset then engine first as it will abort and try to access members of the Folder
     _engine.reset ();
 }
 
-void Folder::checkLocalPath () {
+void Folder.checkLocalPath () {
     const QFileInfo fi (_definition.localPath);
     _canonicalLocalPath = fi.canonicalFilePath ();
 #ifdef Q_OS_MAC
     // Workaround QTBUG-55896  (Should be fixed in Qt 5.8)
-    _canonicalLocalPath = _canonicalLocalPath.normalized (QString::NormalizationForm_C);
+    _canonicalLocalPath = _canonicalLocalPath.normalized (QString.NormalizationForm_C);
 #endif
     if (_canonicalLocalPath.isEmpty ()) {
         qCWarning (lcFolder) << "Broken symlink:" << _definition.localPath;
@@ -145,20 +145,20 @@ void Folder::checkLocalPath () {
         qCDebug (lcFolder) << "Checked local path ok";
     } else {
         // Check directory again
-        if (!FileSystem::fileExists (_definition.localPath, fi)) {
+        if (!FileSystem.fileExists (_definition.localPath, fi)) {
             _syncResult.appendErrorString (tr ("Local folder %1 does not exist.").arg (_definition.localPath));
-            _syncResult.setStatus (SyncResult::SetupError);
+            _syncResult.setStatus (SyncResult.SetupError);
         } else if (!fi.isDir ()) {
             _syncResult.appendErrorString (tr ("%1 should be a folder but is not.").arg (_definition.localPath));
-            _syncResult.setStatus (SyncResult::SetupError);
+            _syncResult.setStatus (SyncResult.SetupError);
         } else if (!fi.isReadable ()) {
             _syncResult.appendErrorString (tr ("%1 is not readable.").arg (_definition.localPath));
-            _syncResult.setStatus (SyncResult::SetupError);
+            _syncResult.setStatus (SyncResult.SetupError);
         }
     }
 }
 
-QString Folder::shortGuiRemotePathOrAppName () const {
+QString Folder.shortGuiRemotePathOrAppName () {
     if (remotePath ().length () > 0 && remotePath () != QLatin1String ("/")) {
         QString a = QFile (remotePath ()).fileName ();
         if (a.startsWith ('/')) {
@@ -166,21 +166,21 @@ QString Folder::shortGuiRemotePathOrAppName () const {
         }
         return a;
     } else {
-        return Theme::instance ()->appNameGUI ();
+        return Theme.instance ().appNameGUI ();
     }
 }
 
-QString Folder::alias () const {
+QString Folder.alias () {
     return _definition.alias;
 }
 
-QString Folder::path () const {
+QString Folder.path () {
     return _canonicalLocalPath;
 }
 
-QString Folder::shortGuiLocalPath () const {
+QString Folder.shortGuiLocalPath () {
     QString p = _definition.localPath;
-    QString home = QDir::homePath ();
+    QString home = QDir.homePath ();
     if (!home.endsWith ('/')) {
         home.append ('/');
     }
@@ -190,20 +190,20 @@ QString Folder::shortGuiLocalPath () const {
     if (p.length () > 1 && p.endsWith ('/')) {
         p.chop (1);
     }
-    return QDir::toNativeSeparators (p);
+    return QDir.toNativeSeparators (p);
 }
 
-bool Folder::ignoreHiddenFiles () {
+bool Folder.ignoreHiddenFiles () {
     bool re (_definition.ignoreHiddenFiles);
     return re;
 }
 
-void Folder::setIgnoreHiddenFiles (bool ignore) {
+void Folder.setIgnoreHiddenFiles (bool ignore) {
     _definition.ignoreHiddenFiles = ignore;
 }
 
-QString Folder::cleanPath () const {
-    QString cleanedPath = QDir::cleanPath (_canonicalLocalPath);
+QString Folder.cleanPath () {
+    QString cleanedPath = QDir.cleanPath (_canonicalLocalPath);
 
     if (cleanedPath.length () == 3 && cleanedPath.endsWith (":/"))
         cleanedPath.remove (2, 1);
@@ -211,38 +211,38 @@ QString Folder::cleanPath () const {
     return cleanedPath;
 }
 
-bool Folder::isBusy () const {
+bool Folder.isBusy () {
     return isSyncRunning ();
 }
 
-bool Folder::isSyncRunning () const {
-    return _engine->isSyncRunning () || (_vfs && _vfs->isHydrating ());
+bool Folder.isSyncRunning () {
+    return _engine.isSyncRunning () || (_vfs && _vfs.isHydrating ());
 }
 
-QString Folder::remotePath () const {
+QString Folder.remotePath () {
     return _definition.targetPath;
 }
 
-QString Folder::remotePathTrailingSlash () const {
+QString Folder.remotePathTrailingSlash () {
     QString result = remotePath ();
     if (!result.endsWith ('/'))
         result.append ('/');
     return result;
 }
 
-QUrl Folder::remoteUrl () const {
-    return Utility::concatUrlPath (_accountState->account ()->davUrl (), remotePath ());
+QUrl Folder.remoteUrl () {
+    return Utility.concatUrlPath (_accountState.account ().davUrl (), remotePath ());
 }
 
-bool Folder::syncPaused () const {
+bool Folder.syncPaused () {
     return _definition.paused;
 }
 
-bool Folder::canSync () const {
-    return !syncPaused () && accountState ()->isConnected ();
+bool Folder.canSync () {
+    return !syncPaused () && accountState ().isConnected ();
 }
 
-void Folder::setSyncPaused (bool paused) {
+void Folder.setSyncPaused (bool paused) {
     if (paused == _definition.paused) {
         return;
     }
@@ -251,39 +251,39 @@ void Folder::setSyncPaused (bool paused) {
     saveToSettings ();
 
     if (!paused) {
-        setSyncState (SyncResult::NotYetStarted);
+        setSyncState (SyncResult.NotYetStarted);
     } else {
-        setSyncState (SyncResult::Paused);
+        setSyncState (SyncResult.Paused);
     }
     emit syncPausedChanged (this, paused);
     emit syncStateChange ();
     emit canSyncChanged ();
 }
 
-void Folder::onAssociatedAccountRemoved () {
+void Folder.onAssociatedAccountRemoved () {
     if (_vfs) {
-        _vfs->stop ();
-        _vfs->unregisterFolder ();
+        _vfs.stop ();
+        _vfs.unregisterFolder ();
     }
 }
 
-void Folder::setSyncState (SyncResult::Status state) {
+void Folder.setSyncState (SyncResult.Status state) {
     _syncResult.setStatus (state);
 }
 
-SyncResult Folder::syncResult () const {
+SyncResult Folder.syncResult () {
     return _syncResult;
 }
 
-void Folder::prepareToSync () {
+void Folder.prepareToSync () {
     _syncResult.reset ();
-    _syncResult.setStatus (SyncResult::NotYetStarted);
+    _syncResult.setStatus (SyncResult.NotYetStarted);
 }
 
-void Folder::slotRunEtagJob () {
+void Folder.slotRunEtagJob () {
     qCInfo (lcFolder) << "Trying to check" << remoteUrl ().toString () << "for changes via ETag check. (time since last sync:" << (_timeSinceLastSyncDone.elapsed () / 1000) << "s)";
 
-    AccountPtr account = _accountState->account ();
+    AccountPtr account = _accountState.account ();
 
     if (_requestEtagJob) {
         qCInfo (lcFolder) << remoteUrl ().toString () << "has ETag job queued, not trying to sync";
@@ -291,7 +291,7 @@ void Folder::slotRunEtagJob () {
     }
 
     if (!canSync ()) {
-        qCInfo (lcFolder) << "Not syncing.  :" << remoteUrl ().toString () << _definition.paused << AccountState::stateString (_accountState->state ());
+        qCInfo (lcFolder) << "Not syncing.  :" << remoteUrl ().toString () << _definition.paused << AccountState.stateString (_accountState.state ());
         return;
     }
 
@@ -299,75 +299,75 @@ void Folder::slotRunEtagJob () {
     // sync if it's different.
 
     _requestEtagJob = new RequestEtagJob (account, remotePath (), this);
-    _requestEtagJob->setTimeout (60 * 1000);
+    _requestEtagJob.setTimeout (60 * 1000);
     // check if the etag is different when retrieved
-    QObject::connect (_requestEtagJob.data (), &RequestEtagJob::etagRetrieved, this, &Folder::etagRetrieved);
-    FolderMan::instance ()->slotScheduleETagJob (alias (), _requestEtagJob);
+    QObject.connect (_requestEtagJob.data (), &RequestEtagJob.etagRetrieved, this, &Folder.etagRetrieved);
+    FolderMan.instance ().slotScheduleETagJob (alias (), _requestEtagJob);
     // The _requestEtagJob is auto deleting itself on finish. Our guard pointer _requestEtagJob will then be null.
 }
 
-void Folder::etagRetrieved (QByteArray &etag, QDateTime &tp) {
+void Folder.etagRetrieved (QByteArray &etag, QDateTime &tp) {
     // re-enable sync if it was disabled because network was down
-    FolderMan::instance ()->setSyncEnabled (true);
+    FolderMan.instance ().setSyncEnabled (true);
 
     if (_lastEtag != etag) {
-        qCInfo (lcFolder) << "Compare etag with previous etag: last:" << _lastEtag << ", received:" << etag << "-> CHANGED";
+        qCInfo (lcFolder) << "Compare etag with previous etag: last:" << _lastEtag << ", received:" << etag << ". CHANGED";
         _lastEtag = etag;
         slotScheduleThisFolder ();
     }
 
-    _accountState->tagLastSuccessfullETagRequest (tp);
+    _accountState.tagLastSuccessfullETagRequest (tp);
 }
 
-void Folder::etagRetrievedFromSyncEngine (QByteArray &etag, QDateTime &time) {
+void Folder.etagRetrievedFromSyncEngine (QByteArray &etag, QDateTime &time) {
     qCInfo (lcFolder) << "Root etag from during sync:" << etag;
-    accountState ()->tagLastSuccessfullETagRequest (time);
+    accountState ().tagLastSuccessfullETagRequest (time);
     _lastEtag = etag;
 }
 
-void Folder::showSyncResultPopup () {
+void Folder.showSyncResultPopup () {
     if (_syncResult.firstItemNew ()) {
-        createGuiLog (_syncResult.firstItemNew ()->destination (), LogStatusNew, _syncResult.numNewItems ());
+        createGuiLog (_syncResult.firstItemNew ().destination (), LogStatusNew, _syncResult.numNewItems ());
     }
     if (_syncResult.firstItemDeleted ()) {
-        createGuiLog (_syncResult.firstItemDeleted ()->destination (), LogStatusRemove, _syncResult.numRemovedItems ());
+        createGuiLog (_syncResult.firstItemDeleted ().destination (), LogStatusRemove, _syncResult.numRemovedItems ());
     }
     if (_syncResult.firstItemUpdated ()) {
-        createGuiLog (_syncResult.firstItemUpdated ()->destination (), LogStatusUpdated, _syncResult.numUpdatedItems ());
+        createGuiLog (_syncResult.firstItemUpdated ().destination (), LogStatusUpdated, _syncResult.numUpdatedItems ());
     }
 
     if (_syncResult.firstItemRenamed ()) {
         LogStatus status (LogStatusRename);
         // if the path changes it's rather a move
-        QDir renTarget = QFileInfo (_syncResult.firstItemRenamed ()->_renameTarget).dir ();
-        QDir renSource = QFileInfo (_syncResult.firstItemRenamed ()->_file).dir ();
+        QDir renTarget = QFileInfo (_syncResult.firstItemRenamed ()._renameTarget).dir ();
+        QDir renSource = QFileInfo (_syncResult.firstItemRenamed ()._file).dir ();
         if (renTarget != renSource) {
             status = LogStatusMove;
         }
-        createGuiLog (_syncResult.firstItemRenamed ()->_file, status,
-            _syncResult.numRenamedItems (), _syncResult.firstItemRenamed ()->_renameTarget);
+        createGuiLog (_syncResult.firstItemRenamed ()._file, status,
+            _syncResult.numRenamedItems (), _syncResult.firstItemRenamed ()._renameTarget);
     }
 
     if (_syncResult.firstNewConflictItem ()) {
-        createGuiLog (_syncResult.firstNewConflictItem ()->destination (), LogStatusConflict, _syncResult.numNewConflictItems ());
+        createGuiLog (_syncResult.firstNewConflictItem ().destination (), LogStatusConflict, _syncResult.numNewConflictItems ());
     }
     if (int errorCount = _syncResult.numErrorItems ()) {
-        createGuiLog (_syncResult.firstItemError ()->_file, LogStatusError, errorCount);
+        createGuiLog (_syncResult.firstItemError ()._file, LogStatusError, errorCount);
     }
 
     if (int lockedCount = _syncResult.numLockedItems ()) {
-        createGuiLog (_syncResult.firstItemLocked ()->_file, LogStatusFileLocked, lockedCount);
+        createGuiLog (_syncResult.firstItemLocked ()._file, LogStatusFileLocked, lockedCount);
     }
 
     qCInfo (lcFolder) << "Folder" << _syncResult.folder () << "sync result: " << _syncResult.status ();
 }
 
-void Folder::createGuiLog (QString &filename, LogStatus status, int count,
+void Folder.createGuiLog (QString &filename, LogStatus status, int count,
     const QString &renameTarget) {
     if (count > 0) {
-        Logger *logger = Logger::instance ();
+        Logger *logger = Logger.instance ();
 
-        QString file = QDir::toNativeSeparators (filename);
+        QString file = QDir.toNativeSeparators (filename);
         QString text;
 
         switch (status) {
@@ -432,82 +432,82 @@ void Folder::createGuiLog (QString &filename, LogStatus status, int count,
         if (!text.isEmpty ()) {
             // Ignores the settings in case of an error or conflict
             if (status == LogStatusError || status == LogStatusConflict)
-                logger->postOptionalGuiLog (tr ("Sync Activity"), text);
+                logger.postOptionalGuiLog (tr ("Sync Activity"), text);
         }
     }
 }
 
-void Folder::startVfs () {
+void Folder.startVfs () {
     ENFORCE (_vfs);
-    ENFORCE (_vfs->mode () == _definition.virtualFilesMode);
+    ENFORCE (_vfs.mode () == _definition.virtualFilesMode);
 
     VfsSetupParams vfsParams;
     vfsParams.filesystemPath = path ();
     vfsParams.displayName = shortGuiRemotePathOrAppName ();
     vfsParams.alias = alias ();
     vfsParams.remotePath = remotePathTrailingSlash ();
-    vfsParams.account = _accountState->account ();
+    vfsParams.account = _accountState.account ();
     vfsParams.journal = &_journal;
-    vfsParams.providerName = Theme::instance ()->appNameGUI ();
-    vfsParams.providerVersion = Theme::instance ()->version ();
-    vfsParams.multipleAccountsRegistered = AccountManager::instance ()->accounts ().size () > 1;
+    vfsParams.providerName = Theme.instance ().appNameGUI ();
+    vfsParams.providerVersion = Theme.instance ().version ();
+    vfsParams.multipleAccountsRegistered = AccountManager.instance ().accounts ().size () > 1;
 
-    connect (_vfs.data (), &Vfs::beginHydrating, this, &Folder::slotHydrationStarts);
-    connect (_vfs.data (), &Vfs::doneHydrating, this, &Folder::slotHydrationDone);
+    connect (_vfs.data (), &Vfs.beginHydrating, this, &Folder.slotHydrationStarts);
+    connect (_vfs.data (), &Vfs.doneHydrating, this, &Folder.slotHydrationDone);
 
-    connect (&_engine->syncFileStatusTracker (), &SyncFileStatusTracker::fileStatusChanged,
-            _vfs.data (), &Vfs::fileStatusChanged);
+    connect (&_engine.syncFileStatusTracker (), &SyncFileStatusTracker.fileStatusChanged,
+            _vfs.data (), &Vfs.fileStatusChanged);
 
-    _vfs->start (vfsParams);
+    _vfs.start (vfsParams);
 
     // Immediately mark the sqlite temporaries as excluded. They get recreated
     // on db-open and need to get marked again every time.
     QString stateDbFile = _journal.databaseFilePath ();
     _journal.open ();
-    _vfs->fileStatusChanged (stateDbFile + "-wal", SyncFileStatus::StatusExcluded);
-    _vfs->fileStatusChanged (stateDbFile + "-shm", SyncFileStatus::StatusExcluded);
+    _vfs.fileStatusChanged (stateDbFile + "-wal", SyncFileStatus.StatusExcluded);
+    _vfs.fileStatusChanged (stateDbFile + "-shm", SyncFileStatus.StatusExcluded);
 }
 
-int Folder::slotDiscardDownloadProgress () {
+int Folder.slotDiscardDownloadProgress () {
     // Delete from journal and from filesystem.
     QDir folderpath (_definition.localPath);
     QSet<QString> keep_nothing;
-    const QVector<SyncJournalDb::DownloadInfo> deleted_infos =
+    const QVector<SyncJournalDb.DownloadInfo> deleted_infos =
         _journal.getAndDeleteStaleDownloadInfos (keep_nothing);
     for (auto &deleted_info : deleted_infos) {
         const QString tmppath = folderpath.filePath (deleted_info._tmpfile);
         qCInfo (lcFolder) << "Deleting temporary file: " << tmppath;
-        FileSystem::remove (tmppath);
+        FileSystem.remove (tmppath);
     }
     return deleted_infos.size ();
 }
 
-int Folder::downloadInfoCount () {
+int Folder.downloadInfoCount () {
     return _journal.downloadInfoCount ();
 }
 
-int Folder::errorBlackListEntryCount () {
+int Folder.errorBlackListEntryCount () {
     return _journal.errorBlackListEntryCount ();
 }
 
-int Folder::slotWipeErrorBlacklist () {
+int Folder.slotWipeErrorBlacklist () {
     return _journal.wipeErrorBlacklist ();
 }
 
-void Folder::slotWatchedPathChanged (QString &path, ChangeReason reason) {
-    if (!path.startsWith (this->path ())) {
+void Folder.slotWatchedPathChanged (QString &path, ChangeReason reason) {
+    if (!path.startsWith (this.path ())) {
         qCDebug (lcFolder) << "Changed path is not contained in folder, ignoring:" << path;
         return;
     }
 
-    auto relativePath = path.midRef (this->path ().size ());
+    auto relativePath = path.midRef (this.path ().size ());
 
     // Add to list of locally modified paths
     //
     // We do this before checking for our own sync-related changes to make
     // extra sure to not miss relevant changes.
     auto relativePathBytes = relativePath.toUtf8 ();
-    _localDiscoveryTracker->addTouchedPath (relativePathBytes);
+    _localDiscoveryTracker.addTouchedPath (relativePathBytes);
 
 // The folder watcher fires a lot of bogus notifications during
 // a sync operation, both for actual user files and the database
@@ -518,7 +518,7 @@ void Folder::slotWatchedPathChanged (QString &path, ChangeReason reason) {
 // own process. Therefore nothing needs to be done here!
 #else
     // Use the path to figure out whether it was our own change
-    if (_engine->wasFileTouched (path)) {
+    if (_engine.wasFileTouched (path)) {
         qCDebug (lcFolder) << "Changed path was touched by SyncEngine, ignoring:" << path;
         return;
     }
@@ -526,18 +526,18 @@ void Folder::slotWatchedPathChanged (QString &path, ChangeReason reason) {
 
     SyncJournalFileRecord record;
     _journal.getFileRecord (relativePathBytes, &record);
-    if (reason != ChangeReason::UnLock) {
+    if (reason != ChangeReason.UnLock) {
         // Check that the mtime/size actually changed or there was
         // an attribute change (pin state) that caused the notification
         bool spurious = false;
         if (record.isValid ()
-            && !FileSystem::fileChanged (path, record._fileSize, record._modtime)) {
+            && !FileSystem.fileChanged (path, record._fileSize, record._modtime)) {
             spurious = true;
 
-            if (auto pinState = _vfs->pinState (relativePath.toString ())) {
-                if (*pinState == PinState::AlwaysLocal && record.isVirtualFile ())
+            if (auto pinState = _vfs.pinState (relativePath.toString ())) {
+                if (*pinState == PinState.AlwaysLocal && record.isVirtualFile ())
                     spurious = false;
-                if (*pinState == PinState::OnlineOnly && record.isFile ())
+                if (*pinState == PinState.OnlineOnly && record.isFile ())
                     spurious = false;
             }
         }
@@ -555,7 +555,7 @@ void Folder::slotWatchedPathChanged (QString &path, ChangeReason reason) {
     scheduleThisFolderSoon ();
 }
 
-void Folder::implicitlyHydrateFile (QString &relativepath) {
+void Folder.implicitlyHydrateFile (QString &relativepath) {
     qCInfo (lcFolder) << "Implicitly hydrate virtual file:" << relativepath;
 
     // Set in the database that we should download the file
@@ -574,9 +574,9 @@ void Folder::implicitlyHydrateFile (QString &relativepath) {
 
     // Change the file's pin state if it's contradictory to being hydrated
     // (suffix-virtual file's pin state is stored at the hydrated path)
-    const auto pin = _vfs->pinState (relativepath);
-    if (pin && *pin == PinState::OnlineOnly) {
-        if (!_vfs->setPinState (relativepath, PinState::Unspecified)) {
+    const auto pin = _vfs.pinState (relativepath);
+    if (pin && *pin == PinState.OnlineOnly) {
+        if (!_vfs.setPinState (relativepath, PinState.Unspecified)) {
             qCWarning (lcFolder) << "Could not set pin state of" << relativepath << "to unspecified";
         }
     }
@@ -586,29 +586,29 @@ void Folder::implicitlyHydrateFile (QString &relativepath) {
     slotScheduleThisFolder ();
 }
 
-void Folder::setVirtualFilesEnabled (bool enabled) {
-    Vfs::Mode newMode = _definition.virtualFilesMode;
-    if (enabled && _definition.virtualFilesMode == Vfs::Off) {
+void Folder.setVirtualFilesEnabled (bool enabled) {
+    Vfs.Mode newMode = _definition.virtualFilesMode;
+    if (enabled && _definition.virtualFilesMode == Vfs.Off) {
         newMode = bestAvailableVfsMode ();
-    } else if (!enabled && _definition.virtualFilesMode != Vfs::Off) {
-        newMode = Vfs::Off;
+    } else if (!enabled && _definition.virtualFilesMode != Vfs.Off) {
+        newMode = Vfs.Off;
     }
 
     if (newMode != _definition.virtualFilesMode) {
         // TODO: Must wait for current sync to finish!
-        SyncEngine::wipeVirtualFiles (path (), _journal, *_vfs);
+        SyncEngine.wipeVirtualFiles (path (), _journal, *_vfs);
 
-        _vfs->stop ();
-        _vfs->unregisterFolder ();
+        _vfs.stop ();
+        _vfs.unregisterFolder ();
 
         disconnect (_vfs.data (), nullptr, this, nullptr);
-        disconnect (&_engine->syncFileStatusTracker (), nullptr, _vfs.data (), nullptr);
+        disconnect (&_engine.syncFileStatusTracker (), nullptr, _vfs.data (), nullptr);
 
         _vfs.reset (createVfsFromPlugin (newMode).release ());
 
         _definition.virtualFilesMode = newMode;
         startVfs ();
-        if (newMode != Vfs::Off) {
+        if (newMode != Vfs.Off) {
             _saveInFoldersWithPlaceholders = true;
             switchToVirtualFiles ();
         }
@@ -616,8 +616,8 @@ void Folder::setVirtualFilesEnabled (bool enabled) {
     }
 }
 
-void Folder::setRootPinState (PinState state) {
-    if (!_vfs->setPinState (QString (), state)) {
+void Folder.setRootPinState (PinState state) {
+    if (!_vfs.setPinState (QString (), state)) {
         qCWarning (lcFolder) << "Could not set root pin state of" << _definition.alias;
     }
 
@@ -626,33 +626,33 @@ void Folder::setRootPinState (PinState state) {
     slotNextSyncFullLocalDiscovery ();
 }
 
-void Folder::switchToVirtualFiles () {
-    SyncEngine::switchToVirtualFiles (path (), _journal, *_vfs);
+void Folder.switchToVirtualFiles () {
+    SyncEngine.switchToVirtualFiles (path (), _journal, *_vfs);
     _hasSwitchedToVfs = true;
 }
 
-void Folder::processSwitchedToVirtualFiles () {
+void Folder.processSwitchedToVirtualFiles () {
     if (_hasSwitchedToVfs) {
         _hasSwitchedToVfs = false;
         saveToSettings ();
     }
 }
 
-bool Folder::supportsSelectiveSync () const {
+bool Folder.supportsSelectiveSync () {
     return !virtualFilesEnabled () && !isVfsOnOffSwitchPending ();
 }
 
-void Folder::saveToSettings () const {
+void Folder.saveToSettings () {
     // Remove first to make sure we don't get duplicates
     removeFromSettings ();
 
-    auto settings = _accountState->settings ();
+    auto settings = _accountState.settings ();
     QString settingsGroup = QStringLiteral ("Multifolders");
 
     // True if the folder path appears in only one account
-    const auto folderMap = FolderMan::instance ()->map ();
-    const auto oneAccountOnly = std::none_of (folderMap.cbegin (), folderMap.cend (), [this] (auto *other) {
-        return other != this && other->cleanPath () == this->cleanPath ();
+    const auto folderMap = FolderMan.instance ().map ();
+    const auto oneAccountOnly = std.none_of (folderMap.cbegin (), folderMap.cend (), [this] (auto *other) {
+        return other != this && other.cleanPath () == this.cleanPath ();
     });
 
     if (virtualFilesEnabled () || _saveInFoldersWithPlaceholders) {
@@ -671,56 +671,56 @@ void Folder::saveToSettings () const {
         settingsGroup = QStringLiteral ("Folders");
     }
 
-    settings->beginGroup (settingsGroup);
+    settings.beginGroup (settingsGroup);
     // Note: Each of these groups might have a "version" tag, but that's
     //       currently unused.
-    settings->beginGroup (FolderMan::escapeAlias (_definition.alias));
-    FolderDefinition::save (*settings, _definition);
+    settings.beginGroup (FolderMan.escapeAlias (_definition.alias));
+    FolderDefinition.save (*settings, _definition);
 
-    settings->sync ();
-    qCInfo (lcFolder) << "Saved folder" << _definition.alias << "to settings, status" << settings->status ();
+    settings.sync ();
+    qCInfo (lcFolder) << "Saved folder" << _definition.alias << "to settings, status" << settings.status ();
 }
 
-void Folder::removeFromSettings () const {
-    auto settings = _accountState->settings ();
-    settings->beginGroup (QLatin1String ("Folders"));
-    settings->remove (FolderMan::escapeAlias (_definition.alias));
-    settings->endGroup ();
-    settings->beginGroup (QLatin1String ("Multifolders"));
-    settings->remove (FolderMan::escapeAlias (_definition.alias));
-    settings->endGroup ();
-    settings->beginGroup (QLatin1String ("FoldersWithPlaceholders"));
-    settings->remove (FolderMan::escapeAlias (_definition.alias));
+void Folder.removeFromSettings () {
+    auto settings = _accountState.settings ();
+    settings.beginGroup (QLatin1String ("Folders"));
+    settings.remove (FolderMan.escapeAlias (_definition.alias));
+    settings.endGroup ();
+    settings.beginGroup (QLatin1String ("Multifolders"));
+    settings.remove (FolderMan.escapeAlias (_definition.alias));
+    settings.endGroup ();
+    settings.beginGroup (QLatin1String ("FoldersWithPlaceholders"));
+    settings.remove (FolderMan.escapeAlias (_definition.alias));
 }
 
-bool Folder::isFileExcludedAbsolute (QString &fullPath) const {
-    return _engine->excludedFiles ().isExcluded (fullPath, path (), _definition.ignoreHiddenFiles);
+bool Folder.isFileExcludedAbsolute (QString &fullPath) {
+    return _engine.excludedFiles ().isExcluded (fullPath, path (), _definition.ignoreHiddenFiles);
 }
 
-bool Folder::isFileExcludedRelative (QString &relativePath) const {
-    return _engine->excludedFiles ().isExcluded (path () + relativePath, path (), _definition.ignoreHiddenFiles);
+bool Folder.isFileExcludedRelative (QString &relativePath) {
+    return _engine.excludedFiles ().isExcluded (path () + relativePath, path (), _definition.ignoreHiddenFiles);
 }
 
-void Folder::slotTerminateSync () {
+void Folder.slotTerminateSync () {
     qCInfo (lcFolder) << "folder " << alias () << " Terminating!";
 
-    if (_engine->isSyncRunning ()) {
-        _engine->abort ();
+    if (_engine.isSyncRunning ()) {
+        _engine.abort ();
 
-        setSyncState (SyncResult::SyncAbortRequested);
+        setSyncState (SyncResult.SyncAbortRequested);
     }
 }
 
-void Folder::wipeForRemoval () {
+void Folder.wipeForRemoval () {
     // Delete files that have been partially downloaded.
     slotDiscardDownloadProgress ();
 
     // Unregister the socket API so it does not keep the .sync_journal file open
-    FolderMan::instance ()->socketApi ()->slotUnregisterPath (alias ());
+    FolderMan.instance ().socketApi ().slotUnregisterPath (alias ());
     _journal.close (); // close the sync journal
 
     // Remove db and temporaries
-    QString stateDbFile = _engine->journal ()->databaseFilePath ();
+    QString stateDbFile = _engine.journal ().databaseFilePath ();
 
     QFile file (stateDbFile);
     if (file.exists ()) {
@@ -734,21 +734,21 @@ void Folder::wipeForRemoval () {
     }
 
     // Also remove other db related files
-    QFile::remove (stateDbFile + ".ctmp");
-    QFile::remove (stateDbFile + "-shm");
-    QFile::remove (stateDbFile + "-wal");
-    QFile::remove (stateDbFile + "-journal");
+    QFile.remove (stateDbFile + ".ctmp");
+    QFile.remove (stateDbFile + "-shm");
+    QFile.remove (stateDbFile + "-wal");
+    QFile.remove (stateDbFile + "-journal");
 
-    _vfs->stop ();
-    _vfs->unregisterFolder ();
+    _vfs.stop ();
+    _vfs.unregisterFolder ();
     _vfs.reset (nullptr); // warning: folder now in an invalid state
 }
 
-bool Folder::reloadExcludes () {
-    return _engine->excludedFiles ().reloadExcludeFiles ();
+bool Folder.reloadExcludes () {
+    return _engine.excludedFiles ().reloadExcludeFiles ();
 }
 
-void Folder::startSync (QStringList &pathList) {
+void Folder.startSync (QStringList &pathList) {
     Q_UNUSED (pathList)
 
     if (isBusy ()) {
@@ -757,28 +757,28 @@ void Folder::startSync (QStringList &pathList) {
     }
 
     _timeSinceLastSyncStart.start ();
-    _syncResult.setStatus (SyncResult::SyncPrepare);
+    _syncResult.setStatus (SyncResult.SyncPrepare);
     emit syncStateChange ();
 
     qCInfo (lcFolder) << "*** Start syncing " << remoteUrl ().toString () << " -" << APPLICATION_NAME << "client version"
-                     << qPrintable (Theme::instance ()->version ());
+                     << qPrintable (Theme.instance ().version ());
 
-    _fileLog->start (path ());
+    _fileLog.start (path ());
 
     if (!reloadExcludes ()) {
         slotSyncError (tr ("Could not read system exclude file"));
-        QMetaObject::invokeMethod (this, "slotSyncFinished", Qt::QueuedConnection, Q_ARG (bool, false));
+        QMetaObject.invokeMethod (this, "slotSyncFinished", Qt.QueuedConnection, Q_ARG (bool, false));
         return;
     }
 
     setDirtyNetworkLimits ();
     setSyncOptions ();
 
-    static std::chrono::milliseconds fullLocalDiscoveryInterval = [] () {
+    static std.chrono.milliseconds fullLocalDiscoveryInterval = [] () {
         auto interval = ConfigFile ().fullLocalDiscoveryInterval ();
         QByteArray env = qgetenv ("OWNCLOUD_FULL_LOCAL_DISCOVERY_INTERVAL");
         if (!env.isEmpty ()) {
-            interval = std::chrono::milliseconds (env.toLongLong ());
+            interval = std.chrono.milliseconds (env.toLongLong ());
         }
         return interval;
     } ();
@@ -786,31 +786,31 @@ void Folder::startSync (QStringList &pathList) {
     bool periodicFullLocalDiscoveryNow =
         fullLocalDiscoveryInterval.count () >= 0 // negative means we don't require periodic full runs
         && _timeSinceLastFullLocalDiscovery.hasExpired (fullLocalDiscoveryInterval.count ());
-    if (_folderWatcher && _folderWatcher->isReliable ()
+    if (_folderWatcher && _folderWatcher.isReliable ()
         && hasDoneFullLocalDiscovery
         && !periodicFullLocalDiscoveryNow) {
         qCInfo (lcFolder) << "Allowing local discovery to read from the database";
-        _engine->setLocalDiscoveryOptions (
-            LocalDiscoveryStyle::DatabaseAndFilesystem,
-            _localDiscoveryTracker->localDiscoveryPaths ());
-        _localDiscoveryTracker->startSyncPartialDiscovery ();
+        _engine.setLocalDiscoveryOptions (
+            LocalDiscoveryStyle.DatabaseAndFilesystem,
+            _localDiscoveryTracker.localDiscoveryPaths ());
+        _localDiscoveryTracker.startSyncPartialDiscovery ();
     } else {
         qCInfo (lcFolder) << "Forbidding local discovery to read from the database";
-        _engine->setLocalDiscoveryOptions (LocalDiscoveryStyle::FilesystemOnly);
-        _localDiscoveryTracker->startSyncFullDiscovery ();
+        _engine.setLocalDiscoveryOptions (LocalDiscoveryStyle.FilesystemOnly);
+        _localDiscoveryTracker.startSyncFullDiscovery ();
     }
 
-    _engine->setIgnoreHiddenFiles (_definition.ignoreHiddenFiles);
+    _engine.setIgnoreHiddenFiles (_definition.ignoreHiddenFiles);
 
     correctPlaceholderFiles ();
 
-    QMetaObject::invokeMethod (_engine.data (), "startSync", Qt::QueuedConnection);
+    QMetaObject.invokeMethod (_engine.data (), "startSync", Qt.QueuedConnection);
 
     emit syncStarted ();
 }
 
-void Folder::correctPlaceholderFiles () {
-    if (_definition.virtualFilesMode == Vfs::Off) {
+void Folder.correctPlaceholderFiles () {
+    if (_definition.virtualFilesMode == Vfs.Off) {
         return;
     }
     static const auto placeholdersCorrectedKey = QStringLiteral ("placeholders_corrected");
@@ -822,7 +822,7 @@ void Folder::correctPlaceholderFiles () {
     }
 }
 
-void Folder::setSyncOptions () {
+void Folder.setSyncOptions () {
     SyncOptions opt;
     ConfigFile cfgFile;
 
@@ -831,7 +831,7 @@ void Folder::setSyncOptions () {
     opt._confirmExternalStorage = cfgFile.confirmExternalStorage ();
     opt._moveFilesToTrash = cfgFile.moveToTrash ();
     opt._vfs = _vfs;
-    opt._parallelNetworkJobs = _accountState->account ()->isHttp2Supported () ? 20 : 6;
+    opt._parallelNetworkJobs = _accountState.account ().isHttp2Supported () ? 20 : 6;
 
     opt._initialChunkSize = cfgFile.chunkSize ();
     opt._minChunkSize = cfgFile.minChunkSize ();
@@ -841,10 +841,10 @@ void Folder::setSyncOptions () {
     opt.fillFromEnvironmentVariables ();
     opt.verifyChunkSizes ();
 
-    _engine->setSyncOptions (opt);
+    _engine.setSyncOptions (opt);
 }
 
-void Folder::setDirtyNetworkLimits () {
+void Folder.setDirtyNetworkLimits () {
     ConfigFile cfg;
     int downloadLimit = -75; // 75%
     int useDownLimit = cfg.useDownloadLimit ();
@@ -862,28 +862,28 @@ void Folder::setDirtyNetworkLimits () {
         uploadLimit = 0;
     }
 
-    _engine->setNetworkLimits (uploadLimit, downloadLimit);
+    _engine.setNetworkLimits (uploadLimit, downloadLimit);
 }
 
-void Folder::slotSyncError (QString &message, ErrorCategory category) {
+void Folder.slotSyncError (QString &message, ErrorCategory category) {
     _syncResult.appendErrorString (message);
-    emit ProgressDispatcher::instance ()->syncError (alias (), message, category);
+    emit ProgressDispatcher.instance ().syncError (alias (), message, category);
 }
 
-void Folder::slotAddErrorToGui (SyncFileItem::Status status, QString &errorMessage, QString &subject) {
-    emit ProgressDispatcher::instance ()->addErrorToGui (alias (), status, errorMessage, subject);
+void Folder.slotAddErrorToGui (SyncFileItem.Status status, QString &errorMessage, QString &subject) {
+    emit ProgressDispatcher.instance ().addErrorToGui (alias (), status, errorMessage, subject);
 }
 
-void Folder::slotSyncStarted () {
+void Folder.slotSyncStarted () {
     qCInfo (lcFolder) << "#### Propagation start ####################################################";
-    _syncResult.setStatus (SyncResult::SyncRunning);
+    _syncResult.setStatus (SyncResult.SyncRunning);
     emit syncStateChange ();
 }
 
-void Folder::slotSyncFinished (bool success) {
-    qCInfo (lcFolder) << "Client version" << qPrintable (Theme::instance ()->version ())
+void Folder.slotSyncFinished (bool success) {
+    qCInfo (lcFolder) << "Client version" << qPrintable (Theme.instance ().version ())
                      << " Qt" << qVersion ()
-                     << " SSL " << QSslSocket::sslLibraryVersionString ().toUtf8 ().data ()
+                     << " SSL " << QSslSocket.sslLibraryVersionString ().toUtf8 ().data ()
         ;
 
     bool syncError = !_syncResult.errorStrings ().isEmpty ();
@@ -892,40 +892,40 @@ void Folder::slotSyncFinished (bool success) {
     } else {
         qCInfo (lcFolder) << "SyncEngine finished without problem.";
     }
-    _fileLog->finish ();
+    _fileLog.finish ();
     showSyncResultPopup ();
 
-    auto anotherSyncNeeded = _engine->isAnotherSyncNeeded ();
+    auto anotherSyncNeeded = _engine.isAnotherSyncNeeded ();
 
     if (syncError) {
-        _syncResult.setStatus (SyncResult::Error);
+        _syncResult.setStatus (SyncResult.Error);
     } else if (_syncResult.foundFilesNotSynced ()) {
-        _syncResult.setStatus (SyncResult::Problem);
+        _syncResult.setStatus (SyncResult.Problem);
     } else if (_definition.paused) {
         // Maybe the sync was terminated because the user paused the folder
-        _syncResult.setStatus (SyncResult::Paused);
+        _syncResult.setStatus (SyncResult.Paused);
     } else {
-        _syncResult.setStatus (SyncResult::Success);
+        _syncResult.setStatus (SyncResult.Success);
     }
 
     // Count the number of syncs that have failed in a row.
-    if (_syncResult.status () == SyncResult::Success
-        || _syncResult.status () == SyncResult::Problem) {
+    if (_syncResult.status () == SyncResult.Success
+        || _syncResult.status () == SyncResult.Problem) {
         _consecutiveFailingSyncs = 0;
     } else {
         _consecutiveFailingSyncs++;
         qCInfo (lcFolder) << "the last" << _consecutiveFailingSyncs << "syncs failed";
     }
 
-    if (_syncResult.status () == SyncResult::Success && success) {
+    if (_syncResult.status () == SyncResult.Success && success) {
         // Clear the white list as all the folders that should be on that list are sync-ed
-        journalDb ()->setSelectiveSyncList (SyncJournalDb::SelectiveSyncWhiteList, QStringList ());
+        journalDb ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncWhiteList, QStringList ());
     }
 
-    if ( (_syncResult.status () == SyncResult::Success
-            || _syncResult.status () == SyncResult::Problem)
+    if ( (_syncResult.status () == SyncResult.Success
+            || _syncResult.status () == SyncResult.Problem)
         && success) {
-        if (_engine->lastLocalDiscoveryStyle () == LocalDiscoveryStyle::FilesystemOnly) {
+        if (_engine.lastLocalDiscoveryStyle () == LocalDiscoveryStyle.FilesystemOnly) {
             _timeSinceLastFullLocalDiscovery.start ();
         }
     }
@@ -938,9 +938,9 @@ void Folder::slotSyncFinished (bool success) {
     // file system change notifications are ignored for that folder. And it takes
     // some time under certain conditions to make the file system notifications
     // all come in.
-    QTimer::singleShot (200, this, &Folder::slotEmitFinishedDelayed);
+    QTimer.singleShot (200, this, &Folder.slotEmitFinishedDelayed);
 
-    _lastSyncDuration = std::chrono::milliseconds (_timeSinceLastSyncStart.elapsed ());
+    _lastSyncDuration = std.chrono.milliseconds (_timeSinceLastSyncStart.elapsed ());
     _timeSinceLastSyncDone.start ();
 
     // Increment the follow-up sync counter if necessary.
@@ -961,12 +961,12 @@ void Folder::slotSyncFinished (bool success) {
     }
 }
 
-void Folder::slotEmitFinishedDelayed () {
+void Folder.slotEmitFinishedDelayed () {
     emit syncFinished (_syncResult);
 
     // Immediately check the etag again if there was some sync activity.
-    if ( (_syncResult.status () == SyncResult::Success
-            || _syncResult.status () == SyncResult::Problem)
+    if ( (_syncResult.status () == SyncResult.Success
+            || _syncResult.status () == SyncResult.Problem)
         && (_syncResult.firstItemDeleted ()
                || _syncResult.firstItemNew ()
                || _syncResult.firstItemRenamed ()
@@ -978,25 +978,25 @@ void Folder::slotEmitFinishedDelayed () {
 
 // the progress comes without a folder and the valid path set. Add that here
 // and hand the result over to the progress dispatcher.
-void Folder::slotTransmissionProgress (ProgressInfo &pi) {
+void Folder.slotTransmissionProgress (ProgressInfo &pi) {
     emit progressInfo (pi);
-    ProgressDispatcher::instance ()->setProgressInfo (alias (), pi);
+    ProgressDispatcher.instance ().setProgressInfo (alias (), pi);
 }
 
 // a item is completed: count the errors and forward to the ProgressDispatcher
-void Folder::slotItemCompleted (SyncFileItemPtr &item) {
-    if (item->_instruction == CSYNC_INSTRUCTION_NONE || item->_instruction == CSYNC_INSTRUCTION_UPDATE_METADATA) {
+void Folder.slotItemCompleted (SyncFileItemPtr &item) {
+    if (item._instruction == CSYNC_INSTRUCTION_NONE || item._instruction == CSYNC_INSTRUCTION_UPDATE_METADATA) {
         // We only care about the updates that deserve to be shown in the UI
         return;
     }
 
     _syncResult.processCompletedItem (item);
 
-    _fileLog->logItem (*item);
-    emit ProgressDispatcher::instance ()->itemCompleted (alias (), item);
+    _fileLog.logItem (*item);
+    emit ProgressDispatcher.instance ().itemCompleted (alias (), item);
 }
 
-void Folder::slotNewBigFolderDiscovered (QString &newF, bool isExternal) {
+void Folder.slotNewBigFolderDiscovered (QString &newF, bool isExternal) {
     auto newFolder = newF;
     if (!newFolder.endsWith (QLatin1Char ('/'))) {
         newFolder += QLatin1Char ('/');
@@ -1006,19 +1006,19 @@ void Folder::slotNewBigFolderDiscovered (QString &newF, bool isExternal) {
     // Add the entry to the blacklist if it is neither in the blacklist or whitelist already
     bool ok1 = false;
     bool ok2 = false;
-    auto blacklist = journal->getSelectiveSyncList (SyncJournalDb::SelectiveSyncBlackList, &ok1);
-    auto whitelist = journal->getSelectiveSyncList (SyncJournalDb::SelectiveSyncWhiteList, &ok2);
+    auto blacklist = journal.getSelectiveSyncList (SyncJournalDb.SelectiveSyncBlackList, &ok1);
+    auto whitelist = journal.getSelectiveSyncList (SyncJournalDb.SelectiveSyncWhiteList, &ok2);
     if (ok1 && ok2 && !blacklist.contains (newFolder) && !whitelist.contains (newFolder)) {
         blacklist.append (newFolder);
-        journal->setSelectiveSyncList (SyncJournalDb::SelectiveSyncBlackList, blacklist);
+        journal.setSelectiveSyncList (SyncJournalDb.SelectiveSyncBlackList, blacklist);
     }
 
     // And add the entry to the undecided list and signal the UI
-    auto undecidedList = journal->getSelectiveSyncList (SyncJournalDb::SelectiveSyncUndecidedList, &ok1);
+    auto undecidedList = journal.getSelectiveSyncList (SyncJournalDb.SelectiveSyncUndecidedList, &ok1);
     if (ok1) {
         if (!undecidedList.contains (newFolder)) {
             undecidedList.append (newFolder);
-            journal->setSelectiveSyncList (SyncJournalDb::SelectiveSyncUndecidedList, undecidedList);
+            journal.setSelectiveSyncList (SyncJournalDb.SelectiveSyncUndecidedList, undecidedList);
             emit newBigFolderDiscovered (newFolder);
         }
         QString message = !isExternal ? (tr ("A new folder larger than %1 MB has been added: %2.\n")
@@ -1027,28 +1027,28 @@ void Folder::slotNewBigFolderDiscovered (QString &newF, bool isExternal) {
                                       : (tr ("A folder from an external storage has been added.\n"));
         message += tr ("Please go in the settings to select it if you wish to download it.");
 
-        auto logger = Logger::instance ();
-        logger->postOptionalGuiLog (Theme::instance ()->appNameGUI (), message);
+        auto logger = Logger.instance ();
+        logger.postOptionalGuiLog (Theme.instance ().appNameGUI (), message);
     }
 }
 
-void Folder::slotLogPropagationStart () {
-    _fileLog->logLap ("Propagation starts");
+void Folder.slotLogPropagationStart () {
+    _fileLog.logLap ("Propagation starts");
 }
 
-void Folder::slotScheduleThisFolder () {
-    FolderMan::instance ()->scheduleFolder (this);
+void Folder.slotScheduleThisFolder () {
+    FolderMan.instance ().scheduleFolder (this);
 }
 
-void Folder::slotNextSyncFullLocalDiscovery () {
+void Folder.slotNextSyncFullLocalDiscovery () {
     _timeSinceLastFullLocalDiscovery.invalidate ();
 }
 
-void Folder::schedulePathForLocalDiscovery (QString &relativePath) {
-    _localDiscoveryTracker->addTouchedPath (relativePath.toUtf8 ());
+void Folder.schedulePathForLocalDiscovery (QString &relativePath) {
+    _localDiscoveryTracker.addTouchedPath (relativePath.toUtf8 ());
 }
 
-void Folder::slotFolderConflicts (QString &folder, QStringList &conflictPaths) {
+void Folder.slotFolderConflicts (QString &folder, QStringList &conflictPaths) {
     if (folder != _definition.alias)
         return;
     auto &r = _syncResult;
@@ -1058,7 +1058,7 @@ void Folder::slotFolderConflicts (QString &folder, QStringList &conflictPaths) {
         r.setNumOldConflictItems (conflictPaths.size () - r.numNewConflictItems ());
 }
 
-void Folder::warnOnNewExcludedItem (SyncJournalFileRecord &record, QStringRef &path) {
+void Folder.warnOnNewExcludedItem (SyncJournalFileRecord &record, QStringRef &path) {
     // Never warn for items in the database
     if (record.isValid ())
         return;
@@ -1072,7 +1072,7 @@ void Folder::warnOnNewExcludedItem (SyncJournalFileRecord &record, QStringRef &p
         return;
 
     bool ok = false;
-    auto blacklist = _journal.getSelectiveSyncList (SyncJournalDb::SelectiveSyncBlackList, &ok);
+    auto blacklist = _journal.getSelectiveSyncList (SyncJournalDb.SelectiveSyncBlackList, &ok);
     if (!ok)
         return;
     if (!blacklist.contains (path + "/"))
@@ -1086,10 +1086,10 @@ void Folder::warnOnNewExcludedItem (SyncJournalFileRecord &record, QStringRef &p
              "It will not be synchronized.")
               .arg (fi.filePath ());
 
-    Logger::instance ()->postOptionalGuiLog (Theme::instance ()->appNameGUI (), message);
+    Logger.instance ().postOptionalGuiLog (Theme.instance ().appNameGUI (), message);
 }
 
-void Folder::slotWatcherUnreliable (QString &message) {
+void Folder.slotWatcherUnreliable (QString &message) {
     qCWarning (lcFolder) << "Folder watcher for" << path () << "became unreliable:" << message;
     auto fullMessage =
         tr ("Changes in synchronized folders could not be tracked reliably.\n"
@@ -1099,12 +1099,12 @@ void Folder::slotWatcherUnreliable (QString &message) {
            "occasionally (every two hours by default).\n"
            "\n"
            "%1").arg (message);
-    Logger::instance ()->postGuiLog (Theme::instance ()->appNameGUI (), fullMessage);
+    Logger.instance ().postGuiLog (Theme.instance ().appNameGUI (), fullMessage);
 }
 
-void Folder::slotHydrationStarts () {
+void Folder.slotHydrationStarts () {
     // Abort any running full sync run and reschedule
-    if (_engine->isSyncRunning ()) {
+    if (_engine.isSyncRunning ()) {
         slotTerminateSync ();
         scheduleThisFolderSoon ();
         // TODO: This sets the sync state to AbortRequested on done, we don't want that
@@ -1112,57 +1112,57 @@ void Folder::slotHydrationStarts () {
 
     // Let everyone know we're syncing
     _syncResult.reset ();
-    _syncResult.setStatus (SyncResult::SyncRunning);
+    _syncResult.setStatus (SyncResult.SyncRunning);
     emit syncStarted ();
     emit syncStateChange ();
 }
 
-void Folder::slotHydrationDone () {
+void Folder.slotHydrationDone () {
     // emit signal to update ui and reschedule normal syncs if necessary
-    _syncResult.setStatus (SyncResult::Success);
+    _syncResult.setStatus (SyncResult.Success);
     emit syncFinished (_syncResult);
     emit syncStateChange ();
 }
 
-void Folder::scheduleThisFolderSoon () {
+void Folder.scheduleThisFolderSoon () {
     if (!_scheduleSelfTimer.isActive ()) {
         _scheduleSelfTimer.start ();
     }
 }
 
-void Folder::setSaveBackwardsCompatible (bool save) {
+void Folder.setSaveBackwardsCompatible (bool save) {
     _saveBackwardsCompatible = save;
 }
 
-void Folder::registerFolderWatcher () {
+void Folder.registerFolderWatcher () {
     if (_folderWatcher)
         return;
     if (!QDir (path ()).exists ())
         return;
 
     _folderWatcher.reset (new FolderWatcher (this));
-    connect (_folderWatcher.data (), &FolderWatcher::pathChanged,
-        this, [this] (QString &path) { slotWatchedPathChanged (path, Folder::ChangeReason::Other); });
-    connect (_folderWatcher.data (), &FolderWatcher::lostChanges,
-        this, &Folder::slotNextSyncFullLocalDiscovery);
-    connect (_folderWatcher.data (), &FolderWatcher::becameUnreliable,
-        this, &Folder::slotWatcherUnreliable);
-    _folderWatcher->init (path ());
-    _folderWatcher->startNotificatonTest (path () + QLatin1String (".owncloudsync.log"));
+    connect (_folderWatcher.data (), &FolderWatcher.pathChanged,
+        this, [this] (QString &path) { slotWatchedPathChanged (path, Folder.ChangeReason.Other); });
+    connect (_folderWatcher.data (), &FolderWatcher.lostChanges,
+        this, &Folder.slotNextSyncFullLocalDiscovery);
+    connect (_folderWatcher.data (), &FolderWatcher.becameUnreliable,
+        this, &Folder.slotWatcherUnreliable);
+    _folderWatcher.init (path ());
+    _folderWatcher.startNotificatonTest (path () + QLatin1String (".owncloudsync.log"));
 }
 
-bool Folder::virtualFilesEnabled () const {
-    return _definition.virtualFilesMode != Vfs::Off && !isVfsOnOffSwitchPending ();
+bool Folder.virtualFilesEnabled () {
+    return _definition.virtualFilesMode != Vfs.Off && !isVfsOnOffSwitchPending ();
 }
 
-void Folder::slotAboutToRemoveAllFiles (SyncFileItem::Direction dir, std::function<void (bool)> callback) {
+void Folder.slotAboutToRemoveAllFiles (SyncFileItem.Direction dir, std.function<void (bool)> callback) {
     ConfigFile cfgFile;
     if (!cfgFile.promptDeleteFiles ()) {
         callback (false);
         return;
     }
 
-    const QString msg = dir == SyncFileItem::Down ? tr ("All files in the sync folder \"%1\" folder were deleted on the server.\n"
+    const QString msg = dir == SyncFileItem.Down ? tr ("All files in the sync folder \"%1\" folder were deleted on the server.\n"
                                                  "These deletes will be synchronized to your local sync folder, making such files "
                                                  "unavailable unless you have a right to restore. \n"
                                                  "If you decide to restore the files, they will be re-synced with the server if you have rights to do so.\n"
@@ -1171,44 +1171,44 @@ void Folder::slotAboutToRemoveAllFiles (SyncFileItem::Direction dir, std::functi
                                                  "synchronized with your server, making such files unavailable unless restored.\n"
                                                  "Are you sure you want to sync those actions with the server?\n"
                                                  "If this was an accident and you decide to keep your files, they will be re-synced from the server.");
-    auto msgBox = new QMessageBox (QMessageBox::Warning, tr ("Remove All Files?"),
-        msg.arg (shortGuiLocalPath ()), QMessageBox::NoButton);
-    msgBox->setAttribute (Qt::WA_DeleteOnClose);
-    msgBox->setWindowFlags (msgBox->windowFlags () | Qt::WindowStaysOnTopHint);
-    msgBox->addButton (tr ("Remove all files"), QMessageBox::DestructiveRole);
-    QPushButton *keepBtn = msgBox->addButton (tr ("Keep files"), QMessageBox::AcceptRole);
+    auto msgBox = new QMessageBox (QMessageBox.Warning, tr ("Remove All Files?"),
+        msg.arg (shortGuiLocalPath ()), QMessageBox.NoButton);
+    msgBox.setAttribute (Qt.WA_DeleteOnClose);
+    msgBox.setWindowFlags (msgBox.windowFlags () | Qt.WindowStaysOnTopHint);
+    msgBox.addButton (tr ("Remove all files"), QMessageBox.DestructiveRole);
+    QPushButton *keepBtn = msgBox.addButton (tr ("Keep files"), QMessageBox.AcceptRole);
     bool oldPaused = syncPaused ();
     setSyncPaused (true);
-    connect (msgBox, &QMessageBox::finished, this, [msgBox, keepBtn, callback, oldPaused, this] {
-        const bool cancel = msgBox->clickedButton () == keepBtn;
+    connect (msgBox, &QMessageBox.finished, this, [msgBox, keepBtn, callback, oldPaused, this] {
+        const bool cancel = msgBox.clickedButton () == keepBtn;
         callback (cancel);
         if (cancel) {
-            FileSystem::setFolderMinimumPermissions (path ());
-            journalDb ()->clearFileTable ();
+            FileSystem.setFolderMinimumPermissions (path ());
+            journalDb ().clearFileTable ();
             _lastEtag.clear ();
             slotScheduleThisFolder ();
         }
         setSyncPaused (oldPaused);
     });
-    connect (this, &Folder::destroyed, msgBox, &QMessageBox::deleteLater);
-    msgBox->open ();
+    connect (this, &Folder.destroyed, msgBox, &QMessageBox.deleteLater);
+    msgBox.open ();
 }
 
-QString Folder::fileFromLocalPath (QString &localPath) const {
+QString Folder.fileFromLocalPath (QString &localPath) {
     return localPath.mid (cleanPath ().length () + 1);
 }
 
-void FolderDefinition::save (QSettings &settings, FolderDefinition &folder) {
+void FolderDefinition.save (QSettings &settings, FolderDefinition &folder) {
     settings.setValue (QLatin1String ("localPath"), folder.localPath);
     settings.setValue (QLatin1String ("journalPath"), folder.journalPath);
     settings.setValue (QLatin1String ("targetPath"), folder.targetPath);
     settings.setValue (QLatin1String ("paused"), folder.paused);
     settings.setValue (QLatin1String ("ignoreHiddenFiles"), folder.ignoreHiddenFiles);
 
-    settings.setValue (QStringLiteral ("virtualFilesMode"), Vfs::modeToString (folder.virtualFilesMode));
+    settings.setValue (QStringLiteral ("virtualFilesMode"), Vfs.modeToString (folder.virtualFilesMode));
 
     // Ensure new vfs modes won't be attempted by older clients
-    if (folder.virtualFilesMode == Vfs::WindowsCfApi) {
+    if (folder.virtualFilesMode == Vfs.WindowsCfApi) {
         settings.setValue (QLatin1String (versionC), 3);
     } else {
         settings.setValue (QLatin1String (versionC), 2);
@@ -1221,50 +1221,50 @@ void FolderDefinition::save (QSettings &settings, FolderDefinition &folder) {
         settings.remove (QLatin1String ("navigationPaneClsid"));
 }
 
-bool FolderDefinition::load (QSettings &settings, QString &alias,
+bool FolderDefinition.load (QSettings &settings, QString &alias,
     FolderDefinition *folder) {
-    folder->alias = FolderMan::unescapeAlias (alias);
-    folder->localPath = settings.value (QLatin1String ("localPath")).toString ();
-    folder->journalPath = settings.value (QLatin1String ("journalPath")).toString ();
-    folder->targetPath = settings.value (QLatin1String ("targetPath")).toString ();
-    folder->paused = settings.value (QLatin1String ("paused")).toBool ();
-    folder->ignoreHiddenFiles = settings.value (QLatin1String ("ignoreHiddenFiles"), QVariant (true)).toBool ();
-    folder->navigationPaneClsid = settings.value (QLatin1String ("navigationPaneClsid")).toUuid ();
+    folder.alias = FolderMan.unescapeAlias (alias);
+    folder.localPath = settings.value (QLatin1String ("localPath")).toString ();
+    folder.journalPath = settings.value (QLatin1String ("journalPath")).toString ();
+    folder.targetPath = settings.value (QLatin1String ("targetPath")).toString ();
+    folder.paused = settings.value (QLatin1String ("paused")).toBool ();
+    folder.ignoreHiddenFiles = settings.value (QLatin1String ("ignoreHiddenFiles"), QVariant (true)).toBool ();
+    folder.navigationPaneClsid = settings.value (QLatin1String ("navigationPaneClsid")).toUuid ();
 
-    folder->virtualFilesMode = Vfs::Off;
+    folder.virtualFilesMode = Vfs.Off;
     QString vfsModeString = settings.value (QStringLiteral ("virtualFilesMode")).toString ();
     if (!vfsModeString.isEmpty ()) {
-        if (auto mode = Vfs::modeFromString (vfsModeString)) {
-            folder->virtualFilesMode = *mode;
+        if (auto mode = Vfs.modeFromString (vfsModeString)) {
+            folder.virtualFilesMode = *mode;
         } else {
             qCWarning (lcFolder) << "Unknown virtualFilesMode:" << vfsModeString << "assuming 'off'";
         }
     } else {
         if (settings.value (QLatin1String ("usePlaceholders")).toBool ()) {
-            folder->virtualFilesMode = Vfs::WithSuffix;
-            folder->upgradeVfsMode = true; // maybe winvfs is available?
+            folder.virtualFilesMode = Vfs.WithSuffix;
+            folder.upgradeVfsMode = true; // maybe winvfs is available?
         }
     }
 
     // Old settings can contain paths with native separators. In the rest of the
     // code we assume /, so clean it up now.
-    folder->localPath = prepareLocalPath (folder->localPath);
+    folder.localPath = prepareLocalPath (folder.localPath);
 
     // Target paths also have a convention
-    folder->targetPath = prepareTargetPath (folder->targetPath);
+    folder.targetPath = prepareTargetPath (folder.targetPath);
 
     return true;
 }
 
-QString FolderDefinition::prepareLocalPath (QString &path) {
-    QString p = QDir::fromNativeSeparators (path);
+QString FolderDefinition.prepareLocalPath (QString &path) {
+    QString p = QDir.fromNativeSeparators (path);
     if (!p.endsWith (QLatin1Char ('/'))) {
         p.append (QLatin1Char ('/'));
     }
     return p;
 }
 
-QString FolderDefinition::prepareTargetPath (QString &path) {
+QString FolderDefinition.prepareTargetPath (QString &path) {
     QString p = path;
     if (p.endsWith (QLatin1Char ('/'))) {
         p.chop (1);
@@ -1277,12 +1277,12 @@ QString FolderDefinition::prepareTargetPath (QString &path) {
     return p;
 }
 
-QString FolderDefinition::absoluteJournalPath () const {
+QString FolderDefinition.absoluteJournalPath () {
     return QDir (localPath).filePath (journalPath);
 }
 
-QString FolderDefinition::defaultJournalPath (AccountPtr account) {
-    return SyncJournalDb::makeDbName (localPath, account->url (), targetPath, account->credentials ()->user ());
+QString FolderDefinition.defaultJournalPath (AccountPtr account) {
+    return SyncJournalDb.makeDbName (localPath, account.url (), targetPath, account.credentials ().user ());
 }
 
 } // namespace OCC

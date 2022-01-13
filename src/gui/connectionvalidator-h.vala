@@ -31,31 +31,31 @@ namespace OCC {
  * Here follows the state machine
 
 \code{.unparsed}
-*---> checkServerAndAuth  (check status.php)
+*--. checkServerAndAuth  (check status.php)
         Will asynchronously check for system proxy (if using system proxy)
         And then invoke slotCheckServerAndAuth
         CheckServerJob
         |
-        +-> slotNoStatusFound --> X
+        +. slotNoStatusFound -. X
         |
-        +-> slotJobTimeout --> X
+        +. slotJobTimeout -. X
         |
-        +-> slotStatusFound --+--> X (if credentials are still missing)
+        +. slotStatusFound --+-. X (if credentials are still missing)
                               |
   +---------------------------+
   |
-*-+-> checkAuthentication (PROPFIND on root)
+*-+. checkAuthentication (PROPFIND on root)
         PropfindJob
         |
-        +-> slotAuthFailed --> X
+        +. slotAuthFailed -. X
         |
-        +-> slotAuthSuccess --+--> X (depending if coming from checkServerAndAuth or not)
+        +. slotAuthSuccess --+-. X (depending if coming from checkServerAndAuth or not)
                               |
   +---------------------------+
   |
-  +-> checkServerCapabilities --------------v (in parallel)
+  +. checkServerCapabilities --------------v (in parallel)
         JsonApiJob (cloud/capabilities)
-        +-> slotCapabilitiesRecieved -+
+        +. slotCapabilitiesRecieved -+
                                       |
     +---------------------------------+
     |
@@ -63,7 +63,7 @@ namespace OCC {
         Utilizes the UserInfo class to fetch the user and avatar image
   +-----------------------------------+
   |
-  +-> Client Side Encryption Checks --+ --reportResult ()
+  +. Client Side Encryption Checks --+ --reportResult ()
     \endcode
  */
 
@@ -100,7 +100,7 @@ public slots:
     void checkAuthentication ();
 
 signals:
-    void connectionResult (ConnectionValidator::Status status, QStringList &errors);
+    void connectionResult (ConnectionValidator.Status status, QStringList &errors);
 
 protected slots:
     void slotCheckServerAndAuth ();

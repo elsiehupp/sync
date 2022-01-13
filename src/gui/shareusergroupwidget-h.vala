@@ -78,7 +78,7 @@ private slots:
     void slotSharesFetched (QList<QSharedPointer<Share>> &shares);
 
     void on_shareeLineEdit_textChanged (QString &text);
-    void searchForSharees (ShareeModel::LookupMode lookupMode);
+    void searchForSharees (ShareeModel.LookupMode lookupMode);
     void slotLineEditTextEdited (QString &text);
 
     void slotLineEditReturn ();
@@ -98,7 +98,7 @@ private:
 
     void activateShareeLineEdit ();
 
-    Ui::ShareUserGroupWidget *_ui;
+    Ui.ShareUserGroupWidget *_ui;
     QScrollArea *_parentScrollArea;
     AccountPtr _account;
     QString _sharePath;
@@ -176,8 +176,8 @@ private:
     void setDefaultAvatar (int avatarSize);
     void customizeStyle ();
 
-    QPixmap pixmapForShareeType (Sharee::Type type, QColor &backgroundColor = QColor ()) const;
-    QColor backgroundColorForShareeType (Sharee::Type type) const;
+    QPixmap pixmapForShareeType (Sharee.Type type, QColor &backgroundColor = QColor ()) const;
+    QColor backgroundColorForShareeType (Sharee.Type type) const;
 
   void showNoteOptions (bool show);
   void toggleNoteOptions (bool enable);
@@ -193,10 +193,10 @@ private:
   void enableProgessIndicatorAnimation (bool enable);
   void disableProgessIndicatorAnimation ();
 
-  QDate maxExpirationDateForShare (Share::ShareType type, QDate &fallbackDate) const;
-  bool enforceExpirationDateForShare (Share::ShareType type) const;
+  QDate maxExpirationDateForShare (Share.ShareType type, QDate &fallbackDate) const;
+  bool enforceExpirationDateForShare (Share.ShareType type) const;
 
-  Ui::ShareUserLine *_ui;
+  Ui.ShareUserLine *_ui;
   AccountPtr _account;
   QSharedPointer<UserGroupShare> _share;
   bool _isFile;

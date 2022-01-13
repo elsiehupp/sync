@@ -47,7 +47,7 @@ QT_BEGIN_NAMESPACE
 
 template <class T, class const_iterator>
 struct QTokenizerPrivate {
-    using char_type = typename T::value_type;
+    using char_type = typename T.value_type;
 
     struct State {
         bool inQuote = false;
@@ -67,28 +67,28 @@ struct QTokenizerPrivate {
       , returnQuotes (false) {
     }
 
-    bool isDelimiter (char_type c) const {
+    bool isDelimiter (char_type c) {
         return delimiters.contains (c);
     }
 
-    bool isQuote (char_type c) const {
+    bool isQuote (char_type c) {
         return quotes.contains (c);
     }
 
     // Returns true if a delimiter was not hit
     bool nextChar (State* state, char_type c) {
-        if (state->inQuote) {
-            if (state->inEscape) {
-                state->inEscape = false;
+        if (state.inQuote) {
+            if (state.inEscape) {
+                state.inEscape = false;
             } else if (c == '\\') {
-                state->inEscape = true;
-            } else if (c == state->quoteChar) {
-                state->inQuote = false;
+                state.inEscape = true;
+            } else if (c == state.quoteChar) {
+                state.inQuote = false;
             }
         } else {
             if (isDelimiter (c))
                 return false;
-            state->inQuote = isQuote (state->quoteChar = c);
+            state.inQuote = isQuote (state.quoteChar = c);
         }
         return true;
     }
@@ -106,16 +106,16 @@ struct QTokenizerPrivate {
     bool returnQuotes;
 };
 
-template <class T, class const_iterator = typename T::const_iterator>
+template <class T, class const_iterator = typename T.const_iterator>
 class QTokenizer {
 public:
-    using char_type = typename T::value_type;
+    using char_type = typename T.value_type;
 
     /*!
        \class QTokenizer
        \inmodule QtNetwork
        \brief QTokenizer tokenizes Strings on QString, QByteArray,
-              std::string or std::wstring
+              std.string or std.wstring
 
        Example Usage:
 
@@ -143,7 +143,7 @@ public:
        Whether or not to return delimiters as tokens
        \see setQuoteCharacters
      */
-    void setReturnDelimiters (bool enable) { d->returnDelimiters = enable; }
+    void setReturnDelimiters (bool enable) { d.returnDelimiters = enable; }
 
     /*!
        Sets characters that are considered to start and end quotes.
@@ -156,13 +156,13 @@ public:
 
        \param quotes Characters that delimit quotes.
      */
-    void setQuoteCharacters (T& quotes) { d->quotes = quotes; }
+    void setQuoteCharacters (T& quotes) { d.quotes = quotes; }
 
     /*!
        Whether or not to return delimiters as tokens
        \see setQuoteCharacters
      */
-    void setReturnQuoteCharacters (bool enable) { d->returnQuotes = enable; }
+    void setReturnQuoteCharacters (bool enable) { d.returnQuotes = enable; }
 
     /*!
        Retrieve next token.
@@ -172,22 +172,22 @@ public:
        \sa next ()
      */
     bool hasNext () {
-        typename QTokenizerPrivate<T, const_iterator>::State state;
-        d->isDelim = false;
+        typename QTokenizerPrivate<T, const_iterator>.State state;
+        d.isDelim = false;
         for (;;) {
-            d->tokenBegin = d->tokenEnd;
-            if (d->tokenEnd == d->end)
+            d.tokenBegin = d.tokenEnd;
+            if (d.tokenEnd == d.end)
                 return false;
-            d->tokenEnd++;
-            if (d->nextChar (&state, *d->tokenBegin))
+            d.tokenEnd++;
+            if (d.nextChar (&state, *d.tokenBegin))
                 break;
-            if (d->returnDelimiters) {
-                d->isDelim = true;
+            if (d.returnDelimiters) {
+                d.isDelim = true;
                 return true;
             }
         }
-        while (d->tokenEnd != d->end && d->nextChar (&state, *d->tokenEnd)) {
-            d->tokenEnd++;
+        while (d.tokenEnd != d.end && d.nextChar (&state, *d.tokenEnd)) {
+            d.tokenEnd++;
         }
         return true;
     }
@@ -196,24 +196,24 @@ public:
        Resets the tokenizer to the starting position.
      */
     void reset () {
-        d->tokenEnd = d->begin;
+        d.tokenEnd = d.begin;
     }
 
     /*!
        Returns true if the current token is a delimiter,
        if one more more delimiting characters have been set.
      */
-    bool isDelimiter () const { return d->isDelim; }
+    bool isDelimiter () { return d.isDelim; }
 
     /*!
        Returns the current token.
 
        Use \c hasNext () to fetch the next token.
      */
-    T next () const {
-        int len = std::distance (d->tokenBegin, d->tokenEnd);
-        const_iterator tmpStart = d->tokenBegin;
-        if (!d->returnQuotes && len > 1 && d->isQuote (*d->tokenBegin)) {
+    T next () {
+        int len = std.distance (d.tokenBegin, d.tokenEnd);
+        const_iterator tmpStart = d.tokenBegin;
+        if (!d.returnQuotes && len > 1 && d.isQuote (*d.tokenBegin)) {
             tmpStart++;
             len -= 2;
         }
@@ -228,26 +228,26 @@ private:
 class QStringTokenizer : public QTokenizer<QString> {
 public:
     QStringTokenizer (QString &string, QString &delim) :
-        QTokenizer<QString, QString::const_iterator> (string, delim) {}
+        QTokenizer<QString, QString.const_iterator> (string, delim) {}
     /**
      * @brief Like \see next (), but returns a lightweight string reference
      * @return A reference to the token within the string
      */
     QStringRef stringRef () {
         // If those differences overflow an int we'd have a veeeeeery long string in memory
-        int begin = std::distance (d->begin, d->tokenBegin);
-        int end = std::distance (d->tokenBegin, d->tokenEnd);
-        if (!d->returnQuotes && d->isQuote (*d->tokenBegin)) {
+        int begin = std.distance (d.begin, d.tokenBegin);
+        int end = std.distance (d.tokenBegin, d.tokenEnd);
+        if (!d.returnQuotes && d.isQuote (*d.tokenBegin)) {
             begin++;
             end -= 2;
         }
-        return QStringRef (&d->string, begin, end);
+        return QStringRef (&d.string, begin, end);
     }
 };
 
 using QByteArrayTokenizer = QTokenizer<QByteArray>;
-using StringTokenizer = QTokenizer<std::string>;
-using WStringTokenizer = QTokenizer<std::wstring>;
+using StringTokenizer = QTokenizer<std.string>;
+using WStringTokenizer = QTokenizer<std.wstring>;
 
 QT_END_NAMESPACE
 

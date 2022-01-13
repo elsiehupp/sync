@@ -19,7 +19,7 @@ public:
 };
 
 struct OWNCLOUDSYNC_EXPORT Hovercard {
-    std::vector<HovercardAction> _actions;
+    std.vector<HovercardAction> _actions;
 };
 
 class OWNCLOUDSYNC_EXPORT OcsProfileConnector : public QObject {
@@ -32,20 +32,20 @@ public:
 signals:
     void error ();
     void hovercardFetched ();
-    void iconLoaded (std::size_t hovercardActionIndex);
+    void iconLoaded (std.size_t hovercardActionIndex);
 
 private:
     void onHovercardFetched (QJsonDocument &json, int statusCode);
 
     void fetchIcons ();
-    void startFetchIconJob (std::size_t hovercardActionIndex);
-    void setHovercardActionIcon (std::size_t index, QPixmap &pixmap);
-    void loadHovercardActionIcon (std::size_t hovercardActionIndex, QByteArray &iconData);
+    void startFetchIconJob (std.size_t hovercardActionIndex);
+    void setHovercardActionIcon (std.size_t index, QPixmap &pixmap);
+    void loadHovercardActionIcon (std.size_t hovercardActionIndex, QByteArray &iconData);
 
     AccountPtr _account;
     Hovercard _currentHovercard;
 };
 }
 
-Q_DECLARE_METATYPE (OCC::HovercardAction)
-Q_DECLARE_METATYPE (OCC::Hovercard)
+Q_DECLARE_METATYPE (OCC.HovercardAction)
+Q_DECLARE_METATYPE (OCC.Hovercard)

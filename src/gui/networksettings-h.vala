@@ -47,7 +47,7 @@ private:
     void loadProxySettings ();
     void loadBWLimitSettings ();
 
-    Ui::NetworkSettings *_ui;
+    Ui.NetworkSettings *_ui;
 };
 
 } // namespace OCC

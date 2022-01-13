@@ -14,8 +14,8 @@
 
 // #include <QCoreApplication>
 
-int main(int argc, char* argv[]) {
-  QCoreApplication app(argc, argv);
+int main (int argc, char* argv[]) {
+  QCoreApplication app (argc, argv);
   HttpServer server;
-  return app.exec();
+  return app.exec ();
 }

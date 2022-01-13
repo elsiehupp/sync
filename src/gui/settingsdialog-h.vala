@@ -71,7 +71,7 @@ private:
     QAction *createColorAwareAction (QString &iconName, QString &fileName);
     QAction *createActionWithIcon (QIcon &icon, QString &text, QString &iconPath = QString ());
 
-    Ui::SettingsDialog *const _ui;
+    Ui.SettingsDialog *const _ui;
 
     QActionGroup *_actionGroup;
     // Maps the actions from the action group to the corresponding widgets

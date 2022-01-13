@@ -18,17 +18,17 @@ namespace OCC {
 
 Q_LOGGING_CATEGORY (lcNotificationsJob, "nextcloud.gui.notifications", QtInfoMsg)
 
-NotificationConfirmJob::NotificationConfirmJob (AccountPtr account)
+NotificationConfirmJob.NotificationConfirmJob (AccountPtr account)
     : AbstractNetworkJob (account, "") {
     setIgnoreCredentialFailure (true);
 }
 
-void NotificationConfirmJob::setLinkAndVerb (QUrl &link, QByteArray &verb) {
+void NotificationConfirmJob.setLinkAndVerb (QUrl &link, QByteArray &verb) {
     _link = link;
     _verb = verb;
 }
 
-void NotificationConfirmJob::start () {
+void NotificationConfirmJob.start () {
     if (!_link.isValid ()) {
         qCWarning (lcNotificationsJob) << "Attempt to trigger invalid URL: " << _link.toString ();
         return;
@@ -39,13 +39,13 @@ void NotificationConfirmJob::start () {
 
     sendRequest (_verb, _link, req);
 
-    AbstractNetworkJob::start ();
+    AbstractNetworkJob.start ();
 }
 
-bool NotificationConfirmJob::finished () {
+bool NotificationConfirmJob.finished () {
     int replyCode = 0;
     // FIXME: check for the reply code!
-    const QString replyStr = reply ()->readAll ();
+    const QString replyStr = reply ().readAll ();
 
     if (replyStr.contains ("<?xml version=\"1.0\"?>")) {
         const QRegularExpression rex ("<statuscode> (\\d+)</statuscode>");

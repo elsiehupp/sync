@@ -38,7 +38,7 @@ protected:
 private:
     void customizeStyle ();
 
-    Ui::LegalNotice *_ui;
+    Ui.LegalNotice *_ui;
 };
 
 } // namespace OCC

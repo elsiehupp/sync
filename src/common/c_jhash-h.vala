@@ -74,7 +74,7 @@
  *
  * _c_mix64 () takes 48 machine instructions, but only 24 cycles on a superscalar
  * machine (like Intel's new MMX architecture).  It requires 4 64-bit
- * registers for 4::2 parallelism.
+ * registers for 4.2 parallelism.
  * All 1-bit deltas, all 2-bit deltas, all deltas composed of top bits of
  * (a,b,c), and all deltas of bottom bits were tested.  All deltas were
  * tested both on random keys and on keys that were nearly all zero.

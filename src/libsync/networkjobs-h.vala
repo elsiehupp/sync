@@ -404,7 +404,7 @@ private:
     QUrlQuery _additionalParams;
     QNetworkRequest _request;
 
-    Verb _verb = Verb::Get;
+    Verb _verb = Verb.Get;
 
     QByteArray verbToString () const;
 };
@@ -478,7 +478,7 @@ private slots:
 void OWNCLOUDSYNC_EXPORT fetchPrivateLinkUrl (
     AccountPtr account, QString &remotePath,
     const QByteArray &numericFileId, QObject *target,
-    std::function<void (QString &url)> targetFun);
+    std.function<void (QString &url)> targetFun);
 
 } // namespace OCC
 

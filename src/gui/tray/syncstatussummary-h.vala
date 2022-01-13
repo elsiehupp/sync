@@ -49,9 +49,9 @@ public slots:
     void load ();
 
 private:
-    void connectToFoldersProgress (Folder::Map &map);
+    void connectToFoldersProgress (Folder.Map &map);
 
-    void onFolderListChanged (OCC::Folder::Map &folderMap);
+    void onFolderListChanged (OCC.Folder.Map &folderMap);
     void onFolderProgressInfo (ProgressInfo &progress);
     void onFolderSyncStateChanged (Folder *folder);
     void onIsConnectedChanged ();
@@ -74,9 +74,9 @@ private:
     void setAccountState (AccountStatePtr accountState);
 
     AccountStatePtr _accountState;
-    std::set<QString> _foldersWithErrors;
+    std.set<QString> _foldersWithErrors;
 
-    QUrl _syncIcon = Theme::instance ()->syncStatusOk ();
+    QUrl _syncIcon = Theme.instance ().syncStatusOk ();
     double _progress = 1.0;
     bool _isSyncing = false;
     QString _syncStatusString = tr ("All synced!");

@@ -40,7 +40,7 @@ public:
 
     Result<void, QString> createPlaceholder (SyncFileItem &item) override;
     Result<void, QString> dehydratePlaceholder (SyncFileItem &item) override;
-    Result<Vfs::ConvertToPlaceholderResult, QString> convertToPlaceholder (QString &filename, SyncFileItem &item, QString &replacesFile) override;
+    Result<Vfs.ConvertToPlaceholderResult, QString> convertToPlaceholder (QString &filename, SyncFileItem &item, QString &replacesFile) override;
 
     bool needsMetadataUpdate (SyncFileItem &) override;
     bool isDehydratedPlaceholder (QString &filePath) override;
@@ -86,7 +86,7 @@ private:
 
 class CfApiVfsPluginFactory : public QObject, public DefaultPluginFactory<VfsCfApi> {
     Q_PLUGIN_METADATA (IID "org.owncloud.PluginFactory" FILE "vfspluginmetadata.json")
-    Q_INTERFACES (OCC::PluginFactory)
+    Q_INTERFACES (OCC.PluginFactory)
 };
 
 } // namespace OCC

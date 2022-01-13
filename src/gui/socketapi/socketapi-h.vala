@@ -126,7 +126,7 @@ private:
     Q_INVOKABLE void command_V2_UPLOAD_FILES_FROM (QSharedPointer<SocketApiJobV2> &job) const;
 
     // Fetch the private link and call targetFun
-    void fetchPrivateLinkUrlHelper (QString &localFile, std::function<void (QString &url)> &targetFun);
+    void fetchPrivateLinkUrlHelper (QString &localFile, std.function<void (QString &url)> &targetFun);
 
     /** Sends translated/branded strings that may be useful to the integration */
     Q_INVOKABLE void command_GET_STRINGS (QString &argument, SocketListener *listener);

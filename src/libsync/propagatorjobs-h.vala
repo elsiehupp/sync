@@ -80,6 +80,6 @@ public:
         : PropagateItemJob (propagator, item) {
     }
     void start () override;
-    JobParallelism parallelism () override { return _item->isDirectory () ? WaitForFinished : FullParallelism; }
+    JobParallelism parallelism () override { return _item.isDirectory () ? WaitForFinished : FullParallelism; }
 };
 }

@@ -24,7 +24,7 @@ bool operator== (Activity &rhs, Activity &lhs) {
     return (rhs._type == lhs._type && rhs._id == lhs._id && rhs._accName == lhs._accName);
 }
 
-Activity::Identifier Activity::ident () const {
+Activity.Identifier Activity.ident () {
     return Identifier (_id, _accName);
 }
 }

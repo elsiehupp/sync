@@ -41,4 +41,4 @@ QString pluginFileName (QString &type, QString &name);
 
 }
 
-Q_DECLARE_INTERFACE (OCC::PluginFactory, "org.owncloud.PluginFactory")
+Q_DECLARE_INTERFACE (OCC.PluginFactory, "org.owncloud.PluginFactory")

@@ -88,7 +88,7 @@ public:
      * @param permissions
      */
     void setPermissions (QString &shareId,
-        const Share::Permissions permissions);
+        const Share.Permissions permissions);
 
     /**
      * Set share link label
@@ -114,9 +114,9 @@ public:
      * @param password The password to protect the share with
      */
     void createShare (QString &path,
-        const Share::ShareType shareType,
+        const Share.ShareType shareType,
         const QString &shareWith = "",
-        const Share::Permissions permissions = SharePermissionRead,
+        const Share.Permissions permissions = SharePermissionRead,
         const QString &password = "");
 
     /**

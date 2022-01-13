@@ -43,7 +43,7 @@ public:
         \return The number of milliseconds between animation steps. By default, the animation delay is set to 40 milliseconds.
         \sa setAnimationDelay
      */
-    int animationDelay () const { return m_delay; }
+    int animationDelay () { return m_delay; }
 
     /*! Returns a Boolean value indicating whether the component is currently animated.
         \return Animation state.
@@ -60,7 +60,7 @@ public:
     /*! Returns the color of the component.
         \sa setColor
       */
-    const QColor & color () const { return m_color; }
+    const QColor & color () { return m_color; }
 
     QSize sizeHint () const override;
     int heightForWidth (int w) const override;
@@ -100,7 +100,7 @@ private:
     int m_timerId = -1;
     int m_delay = 40;
     bool m_displayedWhenStopped = false;
-    QColor m_color = Qt::black;
+    QColor m_color = Qt.black;
 };
 
 #endif // QPROGRESSINDICATOR_H

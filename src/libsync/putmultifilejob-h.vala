@@ -30,7 +30,7 @@ namespace OCC {
 Q_DECLARE_LOGGING_CATEGORY (lcPutMultiFileJob)
 
 struct SingleUploadFileData {
-    std::unique_ptr<UploadDevice> _device;
+    std.unique_ptr<UploadDevice> _device;
     QMap<QByteArray, QByteArray> _headers;
 };
 
@@ -42,15 +42,15 @@ class OWNCLOUDSYNC_EXPORT PutMultiFileJob : public AbstractNetworkJob {
 
 public:
     explicit PutMultiFileJob (AccountPtr account, QUrl &url,
-                             std::vector<SingleUploadFileData> devices, QObject *parent = nullptr)
+                             std.vector<SingleUploadFileData> devices, QObject *parent = nullptr)
         : AbstractNetworkJob (account, {}, parent)
-        , _devices (std::move (devices))
+        , _devices (std.move (devices))
         , _url (url) {
-        _body.setContentType (QHttpMultiPart::RelatedType);
+        _body.setContentType (QHttpMultiPart.RelatedType);
         for (auto &singleDevice : _devices) {
-            singleDevice._device->setParent (this);
-            connect (this, &PutMultiFileJob::uploadProgress,
-                    singleDevice._device.get (), &UploadDevice::slotJobUploadProgress);
+            singleDevice._device.setParent (this);
+            connect (this, &PutMultiFileJob.uploadProgress,
+                    singleDevice._device.get (), &UploadDevice.slotJobUploadProgress);
         }
     }
 
@@ -61,11 +61,11 @@ public:
     bool finished () override;
 
     QString errorString () const override {
-        return _errorString.isEmpty () ? AbstractNetworkJob::errorString () : _errorString;
+        return _errorString.isEmpty () ? AbstractNetworkJob.errorString () : _errorString;
     }
 
-    std::chrono::milliseconds msSinceStart () const {
-        return std::chrono::milliseconds (_requestTimer.elapsed ());
+    std.chrono.milliseconds msSinceStart () {
+        return std.chrono.milliseconds (_requestTimer.elapsed ());
     }
 
 signals:
@@ -74,7 +74,7 @@ signals:
 
 private:
     QHttpMultiPart _body;
-    std::vector<SingleUploadFileData> _devices;
+    std.vector<SingleUploadFileData> _devices;
     QString _errorString;
     QUrl _url;
     QElapsedTimer _requestTimer;

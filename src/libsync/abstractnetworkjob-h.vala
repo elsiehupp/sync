@@ -35,44 +35,44 @@ class AbstractSslErrorHandler;
  */
 class OWNCLOUDSYNC_EXPORT AbstractNetworkJob : public QObject {
 public:
-    explicit AbstractNetworkJob(AccountPtr account, QString &path, QObject *parent = nullptr);
-    ~AbstractNetworkJob() override;
+    explicit AbstractNetworkJob (AccountPtr account, QString &path, QObject *parent = nullptr);
+    ~AbstractNetworkJob () override;
 
-    virtual void start();
+    virtual void start ();
 
-    AccountPtr account() const { return _account; }
+    AccountPtr account () { return _account; }
 
-    void setPath(QString &path);
-    QString path() const { return _path; }
+    void setPath (QString &path);
+    QString path () { return _path; }
 
-    void setReply(QNetworkReply *reply);
-    QNetworkReply *reply() const { return _reply; }
+    void setReply (QNetworkReply *reply);
+    QNetworkReply *reply () { return _reply; }
 
-    void setIgnoreCredentialFailure(bool ignore);
-    bool ignoreCredentialFailure() const { return _ignoreCredentialFailure; }
+    void setIgnoreCredentialFailure (bool ignore);
+    bool ignoreCredentialFailure () { return _ignoreCredentialFailure; }
 
     /** Whether to handle redirects transparently.
      *
      * If true, a follow-up request is issued automatically when
-     * a redirect is encountered. The finished() function is only
+     * a redirect is encountered. The finished () function is only
      * called if there are no more redirects (or there are problems
      * with the redirect).
      *
      * The transparent redirect following may be disabled for some
      * requests where custom handling is necessary.
      */
-    void setFollowRedirects(bool follow);
-    bool followRedirects() const { return _followRedirects; }
+    void setFollowRedirects (bool follow);
+    bool followRedirects () { return _followRedirects; }
 
-    QByteArray responseTimestamp();
+    QByteArray responseTimestamp ();
     /* Content of the X-Request-ID header. (Only set after the request is sent) */
-    QByteArray requestId();
+    QByteArray requestId ();
 
-    qint64 timeoutMsec() const { return _timer.interval(); }
-    bool timedOut() const { return _timedout; }
+    qint64 timeoutMsec () { return _timer.interval (); }
+    bool timedOut () { return _timedout; }
 
     /** Returns an error message, if any. */
-    virtual QString errorString() const;
+    virtual QString errorString () const;
 
     /** Like errorString, but also checking the reply body for information.
      *
@@ -82,27 +82,27 @@ public:
      *
      * \a body is optinally filled with the reply body.
      *
-     * Warning: Needs to call reply()->readAll().
+     * Warning: Needs to call reply ().readAll ().
      */
-    QString errorStringParsingBody(QByteArray *body = nullptr);
+    QString errorStringParsingBody (QByteArray *body = nullptr);
 
     /** Make a new request */
-    void retry();
+    void retry ();
 
     /** static variable the HTTP timeout (in seconds). If set to 0, the default will be used
      */
     static int httpTimeout;
 
 public slots:
-    void setTimeout(qint64 msec);
-    void resetTimeout();
+    void setTimeout (qint64 msec);
+    void resetTimeout ();
 signals:
     /** Emitted on network error.
      *
      * \a reply is never null
      */
-    void networkError(QNetworkReply *reply);
-    void networkActivity();
+    void networkError (QNetworkReply *reply);
+    void networkActivity ();
 
     /** Emitted when a redirect is followed.
      *
@@ -110,30 +110,30 @@ signals:
      * \a targetUrl Where to redirect to
      * \a redirectCount Counts redirect hops, first is 0.
      */
-    void redirected(QNetworkReply *reply, QUrl &targetUrl, int redirectCount);
+    void redirected (QNetworkReply *reply, QUrl &targetUrl, int redirectCount);
 
 protected:
     /** Initiate a network request, returning a QNetworkReply.
      *
-     * Calls setReply() and setupConnections() on it.
+     * Calls setReply () and setupConnections () on it.
      *
      * Takes ownership of the requestBody (to allow redirects).
      */
-    QNetworkReply *sendRequest(QByteArray &verb, QUrl &url,
-        QNetworkRequest req = QNetworkRequest(),
+    QNetworkReply *sendRequest (QByteArray &verb, QUrl &url,
+        QNetworkRequest req = QNetworkRequest (),
         QIODevice *requestBody = nullptr);
 
-    QNetworkReply *sendRequest(QByteArray &verb, QUrl &url,
+    QNetworkReply *sendRequest (QByteArray &verb, QUrl &url,
         QNetworkRequest req, QByteArray &requestBody);
 
     // sendRequest does not take a relative path instead of an url,
     // but the old API allowed that. We have this undefined overload
     // to help catch usage errors
-    QNetworkReply *sendRequest(QByteArray &verb, QString &relativePath,
-        QNetworkRequest req = QNetworkRequest(),
+    QNetworkReply *sendRequest (QByteArray &verb, QString &relativePath,
+        QNetworkRequest req = QNetworkRequest (),
         QIODevice *requestBody = nullptr);
 
-    QNetworkReply *sendRequest(QByteArray &verb, QUrl &url,
+    QNetworkReply *sendRequest (QByteArray &verb, QUrl &url,
         QNetworkRequest req, QHttpMultiPart *requestBody);
 
     /** Makes this job drive a pre-made QNetworkReply
@@ -141,37 +141,37 @@ protected:
      * This reply cannot have a QIODevice request body because we can't get
      * at it and thus not resend it in case of redirects.
      */
-    void adoptRequest(QNetworkReply *reply);
+    void adoptRequest (QNetworkReply *reply);
 
-    void setupConnections(QNetworkReply *reply);
+    void setupConnections (QNetworkReply *reply);
 
     /** Can be used by derived classes to set up the network reply.
      *
-     * Particularly useful when the request is redirected and reply()
+     * Particularly useful when the request is redirected and reply ()
      * changes. For things like setting up additional signal connections
      * on the new reply.
      */
-    virtual void newReplyHook(QNetworkReply *) {}
+    virtual void newReplyHook (QNetworkReply *) {}
 
     /// Creates a url for the account from a relative path
-    QUrl makeAccountUrl(QString &relativePath) const;
+    QUrl makeAccountUrl (QString &relativePath) const;
 
-    /// Like makeAccountUrl() but uses the account's dav base path
-    QUrl makeDavUrl(QString &relativePath) const;
+    /// Like makeAccountUrl () but uses the account's dav base path
+    QUrl makeDavUrl (QString &relativePath) const;
 
-    int maxRedirects() const { return 10; }
+    int maxRedirects () { return 10; }
 
-    /** Called at the end of QNetworkReply::finished processing.
+    /** Called at the end of QNetworkReply.finished processing.
      *
-     * Returning true triggers a deleteLater() of this job.
+     * Returning true triggers a deleteLater () of this job.
      */
-    virtual bool finished() = 0;
+    virtual bool finished () = 0;
 
     /** Called on timeout.
      *
      * The default implementation aborts the reply.
      */
-    virtual void onTimedOut();
+    virtual void onTimedOut ();
 
     QByteArray _responseTimestamp;
     bool _timedout; // set to true when the timeout slot is received
@@ -180,17 +180,17 @@ protected:
     // GET requests that don't set up any HTTP body or other flags.
     bool _followRedirects;
 
-    QString replyStatusString();
+    QString replyStatusString ();
 
 private slots:
-    void slotFinished();
-    void slotTimeout();
+    void slotFinished ();
+    void slotTimeout ();
 
 protected:
     AccountPtr _account;
 
 private:
-    QNetworkReply *addTimer(QNetworkReply *reply);
+    QNetworkReply *addTimer (QNetworkReply *reply);
     bool _ignoreCredentialFailure;
     QPointer<QNetworkReply> _reply; // (QPointer because the NetworkManager may be destroyed before the jobs at exit)
     QString _path;
@@ -198,7 +198,7 @@ private:
     int _redirectCount = 0;
     int _http2ResendCount = 0;
 
-    // Set by the xyzRequest() functions and needed to be able to redirect
+    // Set by the xyzRequest () functions and needed to be able to redirect
     // requests, should it be required.
     //
     // Reparented to the currently running QNetworkReply.
@@ -210,8 +210,8 @@ private:
  */
 class NetworkJobTimeoutPauser {
 public:
-    NetworkJobTimeoutPauser(QNetworkReply *reply);
-    ~NetworkJobTimeoutPauser();
+    NetworkJobTimeoutPauser (QNetworkReply *reply);
+    ~NetworkJobTimeoutPauser ();
 
 private:
     QPointer<QTimer> _timer;
@@ -224,20 +224,20 @@ private:
  *
  * Returns a null string if no message was found.
  */
-QString OWNCLOUDSYNC_EXPORT extractErrorMessage(QByteArray &errorResponse);
+QString OWNCLOUDSYNC_EXPORT extractErrorMessage (QByteArray &errorResponse);
 
 /** Builds a error message based on the error and the reply body. */
-QString OWNCLOUDSYNC_EXPORT errorMessage(QString &baseError, QByteArray &body);
+QString OWNCLOUDSYNC_EXPORT errorMessage (QString &baseError, QByteArray &body);
 
-/** Nicer errorString() for QNetworkReply
+/** Nicer errorString () for QNetworkReply
  *
- * By default QNetworkReply::errorString() often produces messages like
+ * By default QNetworkReply.errorString () often produces messages like
  *   "Error downloading <url> - server replied: <reason>"
  * but the "downloading" part invariably confuses people since the
  * error might very well have been produced by a PUT request.
  *
  * This function produces clearer error messages for HTTP errors.
  */
-QString OWNCLOUDSYNC_EXPORT networkReplyErrorString(QNetworkReply &reply);
+QString OWNCLOUDSYNC_EXPORT networkReplyErrorString (QNetworkReply &reply);
 
 } // namespace OCC

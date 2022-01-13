@@ -42,7 +42,7 @@ public:
 
     ~Job () override;
 
-    QKeychain::Error error () const;
+    QKeychain.Error error () const;
     QString errorString () const;
 
     QByteArray binaryData () const;
@@ -75,7 +75,7 @@ protected:
     bool _autoDelete = true;
     bool _keychainMigration = false;
 
-    QKeychain::Error _error = QKeychain::NoError;
+    QKeychain.Error _error = QKeychain.NoError;
     QString _errorString;
 
     int _chunkCount = 0;
@@ -83,9 +83,9 @@ protected:
 }; // class Job
 
 /*
-* @brief: Simple wrapper class for QKeychain::WritePasswordJob, splits too large keychain entry's data into chunks on Windows
+* @brief: Simple wrapper class for QKeychain.WritePasswordJob, splits too large keychain entry's data into chunks on Windows
 */
-class OWNCLOUDSYNC_EXPORT WriteJob : public KeychainChunk::Job {
+class OWNCLOUDSYNC_EXPORT WriteJob : public KeychainChunk.Job {
 public:
     WriteJob (Account *account, QString &key, QByteArray &data, QObject *parent = nullptr);
     WriteJob (QString &key, QByteArray &data, QObject *parent = nullptr);
@@ -94,7 +94,7 @@ public:
      * Call this method to start the job (async).
      * You should connect some slot to the finished () signal first.
      *
-     * @see QKeychain::Job::start ()
+     * @see QKeychain.Job.start ()
      */
     void start ();
 
@@ -102,21 +102,21 @@ public:
      * Call this method to start the job synchronously.
      * Awaits completion with no need to connect some slot to the finished () signal first.
      *
-     * @return Returns true on succeess (QKeychain::NoError).
+     * @return Returns true on succeess (QKeychain.NoError).
     */
     bool exec ();
 
 signals:
-    void finished (KeychainChunk::WriteJob *incomingJob);
+    void finished (KeychainChunk.WriteJob *incomingJob);
 
 private slots:
-    void slotWriteJobDone (QKeychain::Job *incomingJob);
+    void slotWriteJobDone (QKeychain.Job *incomingJob);
 }; // class WriteJob
 
 /*
-* @brief: Simple wrapper class for QKeychain::ReadPasswordJob, splits too large keychain entry's data into chunks on Windows
+* @brief: Simple wrapper class for QKeychain.ReadPasswordJob, splits too large keychain entry's data into chunks on Windows
 */
-class OWNCLOUDSYNC_EXPORT ReadJob : public KeychainChunk::Job {
+class OWNCLOUDSYNC_EXPORT ReadJob : public KeychainChunk.Job {
 public:
     ReadJob (Account *account, QString &key, bool keychainMigration, QObject *parent = nullptr);
     ReadJob (QString &key, QObject *parent = nullptr);
@@ -125,7 +125,7 @@ public:
      * Call this method to start the job (async).
      * You should connect some slot to the finished () signal first.
      *
-     * @see QKeychain::Job::start ()
+     * @see QKeychain.Job.start ()
      */
     void start ();
 
@@ -133,15 +133,15 @@ public:
      * Call this method to start the job synchronously.
      * Awaits completion with no need to connect some slot to the finished () signal first.
      *
-     * @return Returns true on succeess (QKeychain::NoError).
+     * @return Returns true on succeess (QKeychain.NoError).
     */
     bool exec ();
 
 signals:
-    void finished (KeychainChunk::ReadJob *incomingJob);
+    void finished (KeychainChunk.ReadJob *incomingJob);
 
 private slots:
-    void slotReadJobDone (QKeychain::Job *incomingJob);
+    void slotReadJobDone (QKeychain.Job *incomingJob);
 
 #if defined (Q_OS_UNIX) && !defined (Q_OS_MAC)
 private:
@@ -150,9 +150,9 @@ private:
 }; // class ReadJob
 
 /*
-* @brief: Simple wrapper class for QKeychain::DeletePasswordJob
+* @brief: Simple wrapper class for QKeychain.DeletePasswordJob
 */
-class OWNCLOUDSYNC_EXPORT DeleteJob : public KeychainChunk::Job {
+class OWNCLOUDSYNC_EXPORT DeleteJob : public KeychainChunk.Job {
 public:
     DeleteJob (Account *account, QString &key, bool keychainMigration, QObject *parent = nullptr);
     DeleteJob (QString &key, QObject *parent = nullptr);
@@ -161,7 +161,7 @@ public:
      * Call this method to start the job (async).
      * You should connect some slot to the finished () signal first.
      *
-     * @see QKeychain::Job::start ()
+     * @see QKeychain.Job.start ()
      */
     void start ();
 
@@ -169,15 +169,15 @@ public:
      * Call this method to start the job synchronously.
      * Awaits completion with no need to connect some slot to the finished () signal first.
      *
-     * @return Returns true on succeess (QKeychain::NoError).
+     * @return Returns true on succeess (QKeychain.NoError).
     */
     bool exec ();
 
 signals:
-    void finished (KeychainChunk::DeleteJob *incomingJob);
+    void finished (KeychainChunk.DeleteJob *incomingJob);
 
 private slots:
-    void slotDeleteJobDone (QKeychain::Job *incomingJob);
+    void slotDeleteJobDone (QKeychain.Job *incomingJob);
 }; // class DeleteJob
 
 } // namespace KeychainChunk

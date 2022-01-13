@@ -31,7 +31,7 @@ public:
     /** The bound account for the credentials instance.
      *
      * Credentials are always used in conjunction with an account.
-     * Calling Account::setCredentials () will call this function.
+     * Calling Account.setCredentials () will call this function.
      * Credentials only live as long as the underlying account object.
      */
     virtual void setAccount (Account *account);
@@ -45,7 +45,7 @@ public:
     virtual bool ready () const = 0;
 
     /** Whether fetchFromKeychain () was called before. */
-    bool wasFetched () const { return _wasFetched; }
+    bool wasFetched () { return _wasFetched; }
 
     /** Trigger (async) fetching of credential information
      *

@@ -49,7 +49,7 @@ public:
     ~ProxyAuthHandler () override;
 
 public slots:
-    /// Intended for QNetworkAccessManager::proxyAuthenticationRequired ()
+    /// Intended for QNetworkAccessManager.proxyAuthenticationRequired ()
     void handleProxyAuthenticationRequired (QNetworkProxy &proxy,
         QAuthenticator *authenticator);
 
@@ -72,7 +72,7 @@ private:
     void execAwait (T *sender,
                    PointerToMemberFunction signal,
                    int &counter,
-                   const QEventLoop::ProcessEventsFlags flags = QEventLoop::AllEvents);
+                   const QEventLoop.ProcessEventsFlags flags = QEventLoop.AllEvents);
 
     QString keychainUsernameKey () const;
     QString keychainPasswordKey () const;
@@ -100,7 +100,7 @@ private:
     QScopedPointer<QSettings> _settings;
 
     /// Pointer to the most-recently-run ReadPasswordJob, needed due to reentrancy.
-    QScopedPointer<QKeychain::ReadPasswordJob> _readPasswordJob;
+    QScopedPointer<QKeychain.ReadPasswordJob> _readPasswordJob;
 
     /// For checking the proxy config settings.
     QScopedPointer<ConfigFile> _configFile;

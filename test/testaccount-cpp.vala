@@ -14,11 +14,11 @@ using namespace OCC;
 class TestAccount: public QObject {
 
 private slots:
-    void testAccountDavPath_unitialized_noCrash() {
-        AccountPtr account = Account::create();
-        account->davPath();
+    void testAccountDavPath_unitialized_noCrash () {
+        AccountPtr account = Account.create ();
+        account.davPath ();
     }
 };
 
-QTEST_APPLESS_MAIN(TestAccount)
+QTEST_APPLESS_MAIN (TestAccount)
 #include "testaccount.moc"

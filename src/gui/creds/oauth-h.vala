@@ -24,11 +24,11 @@ namespace OCC {
  *
  * Normal workflow:
  *
- *   --> start ()
+ *   -. start ()
  *       |
- *       +----> openBrowser () open the browser to the login page, redirects to http://localhost:xxx
+ *       +---. openBrowser () open the browser to the login page, redirects to http://localhost:xxx
  *       |
- *       +----> _server starts listening on a TCP port waiting for an HTTP request with a 'code'
+ *       +---. _server starts listening on a TCP port waiting for an HTTP request with a 'code'
  *                |
  *                v
  *             request the access_token and the refresh_token via 'apps/oauth2/api/v1/token'
@@ -58,7 +58,7 @@ signals:
      * The state has changed.
      * when logged in, token has the value of the token.
      */
-    void result (OAuth::Result result, QString &user = QString (), QString &token = QString (), QString &refreshToken = QString ());
+    void result (OAuth.Result result, QString &user = QString (), QString &token = QString (), QString &refreshToken = QString ());
 
 private:
     Account *_account;

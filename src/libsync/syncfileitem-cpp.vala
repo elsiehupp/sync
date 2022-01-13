@@ -18,7 +18,7 @@ namespace OCC {
 
 Q_LOGGING_CATEGORY (lcFileItem, "nextcloud.sync.fileitem", QtInfoMsg)
 
-SyncJournalFileRecord SyncFileItem::toSyncJournalFileRecordWithInode (QString &localFileName) const {
+SyncJournalFileRecord SyncFileItem.toSyncJournalFileRecordWithInode (QString &localFileName) {
     SyncJournalFileRecord rec;
     rec._path = destination ().toUtf8 ();
     rec._modtime = _modtime;
@@ -41,7 +41,7 @@ SyncJournalFileRecord SyncFileItem::toSyncJournalFileRecordWithInode (QString &l
 
     // Update the inode if possible
     rec._inode = _inode;
-    if (FileSystem::getInode (localFileName, &rec._inode)) {
+    if (FileSystem.getInode (localFileName, &rec._inode)) {
         qCDebug (lcFileItem) << localFileName << "Retrieved inode " << rec._inode << " (previous item inode: " << _inode << ")";
     } else {
         // use the "old" inode coming with the item for the case where the
@@ -53,20 +53,20 @@ SyncJournalFileRecord SyncFileItem::toSyncJournalFileRecordWithInode (QString &l
     return rec;
 }
 
-SyncFileItemPtr SyncFileItem::fromSyncJournalFileRecord (SyncJournalFileRecord &rec) {
-    auto item = SyncFileItemPtr::create ();
-    item->_file = rec.path ();
-    item->_inode = rec._inode;
-    item->_modtime = rec._modtime;
-    item->_type = rec._type;
-    item->_etag = rec._etag;
-    item->_fileId = rec._fileId;
-    item->_size = rec._fileSize;
-    item->_remotePerm = rec._remotePerm;
-    item->_serverHasIgnoredFiles = rec._serverHasIgnoredFiles;
-    item->_checksumHeader = rec._checksumHeader;
-    item->_encryptedFileName = rec.e2eMangledName ();
-    item->_isEncrypted = rec._isE2eEncrypted;
+SyncFileItemPtr SyncFileItem.fromSyncJournalFileRecord (SyncJournalFileRecord &rec) {
+    auto item = SyncFileItemPtr.create ();
+    item._file = rec.path ();
+    item._inode = rec._inode;
+    item._modtime = rec._modtime;
+    item._type = rec._type;
+    item._etag = rec._etag;
+    item._fileId = rec._fileId;
+    item._size = rec._fileSize;
+    item._remotePerm = rec._remotePerm;
+    item._serverHasIgnoredFiles = rec._serverHasIgnoredFiles;
+    item._checksumHeader = rec._checksumHeader;
+    item._encryptedFileName = rec.e2eMangledName ();
+    item._isEncrypted = rec._isE2eEncrypted;
     return item;
 }
 

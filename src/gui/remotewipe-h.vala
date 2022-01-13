@@ -52,7 +52,7 @@ private:
     QNetworkReply *_networkReplyCheck;
     QNetworkReply *_networkReplySuccess;
 
-    friend class ::TestRemoteWipe;
+    friend class .TestRemoteWipe;
 };
 }
 #endif // REMOTEWIPE_H

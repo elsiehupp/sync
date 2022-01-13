@@ -18,13 +18,13 @@
 
 namespace OCC {
 
-FolderWatcherPrivate::FolderWatcherPrivate (FolderWatcher *p, QString &path)
+FolderWatcherPrivate.FolderWatcherPrivate (FolderWatcher *p, QString &path)
     : _parent (p)
     , _folder (path) {
-    this->startWatching ();
+    this.startWatching ();
 }
 
-FolderWatcherPrivate::~FolderWatcherPrivate () {
+FolderWatcherPrivate.~FolderWatcherPrivate () {
     FSEventStreamStop (_stream);
     FSEventStreamInvalidate (_stream);
     FSEventStreamRelease (_stream);
@@ -48,7 +48,7 @@ static void callback (
         | kFSEventStreamEventFlagItemModified; // for content change
     //We ignore other flags, e.g. for owner change, xattr change, Finder label change etc
 
-    qCDebug (lcFolderWatcher) << "FolderWatcherPrivate::callback by OS X";
+    qCDebug (lcFolderWatcher) << "FolderWatcherPrivate.callback by OS X";
 
     QStringList paths;
     CFArrayRef eventPaths = (CFArrayRef)eventPathsVoid;
@@ -59,7 +59,7 @@ static void callback (
         CFIndex pathLength = CFStringGetLength (path);
         qstring.resize (pathLength);
         CFStringGetCharacters (path, CFRangeMake (0, pathLength), reinterpret_cast<UniChar *> (qstring.data ()));
-        QString fn = qstring.normalized (QString::NormalizationForm_C);
+        QString fn = qstring.normalized (QString.NormalizationForm_C);
 
         if (! (eventFlags[i] & c_interestingFlags)) {
             qCDebug (lcFolderWatcher) << "Ignoring non-content changes for" << fn << eventFlags[i];
@@ -69,11 +69,11 @@ static void callback (
         paths.append (fn);
     }
 
-    reinterpret_cast<FolderWatcherPrivate *> (clientCallBackInfo)->doNotifyParent (paths);
+    reinterpret_cast<FolderWatcherPrivate *> (clientCallBackInfo).doNotifyParent (paths);
 }
 
-void FolderWatcherPrivate::startWatching () {
-    qCDebug (lcFolderWatcher) << "FolderWatcherPrivate::startWatching ()" << _folder;
+void FolderWatcherPrivate.startWatching () {
+    qCDebug (lcFolderWatcher) << "FolderWatcherPrivate.startWatching ()" << _folder;
     CFStringRef folderCF = CFStringCreateWithCharacters (0, reinterpret_cast<const UniChar *> (_folder.unicode ()),
         _folder.length ());
     CFArrayRef pathsToWatch = CFStringCreateArrayBySeparatingStrings (nullptr, folderCF, CFSTR (":"));
@@ -94,11 +94,11 @@ void FolderWatcherPrivate::startWatching () {
     FSEventStreamStart (_stream);
 }
 
-QStringList FolderWatcherPrivate::addCoalescedPaths (QStringList &paths) const {
+QStringList FolderWatcherPrivate.addCoalescedPaths (QStringList &paths) {
     QStringList coalescedPaths;
     for (auto &eventPath : paths) {
         if (QDir (eventPath).exists ()) {
-            QDirIterator it (eventPath, QDir::AllDirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+            QDirIterator it (eventPath, QDir.AllDirs | QDir.NoDotAndDotDot, QDirIterator.Subdirectories);
             while (it.hasNext ()) {
                 auto subfolder = it.next ();
                 if (!paths.contains (subfolder)) {
@@ -110,9 +110,9 @@ QStringList FolderWatcherPrivate::addCoalescedPaths (QStringList &paths) const {
     return (paths + coalescedPaths);
 }
 
-void FolderWatcherPrivate::doNotifyParent (QStringList &paths) {
+void FolderWatcherPrivate.doNotifyParent (QStringList &paths) {
     const QStringList totalPaths = addCoalescedPaths (paths);
-    _parent->changeDetected (totalPaths);
+    _parent.changeDetected (totalPaths);
 }
 
 } // ns mirall

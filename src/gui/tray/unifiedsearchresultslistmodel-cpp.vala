@@ -19,18 +19,18 @@
 
 namespace {
 QString imagePlaceholderUrlForProviderId (QString &providerId) {
-    if (providerId.contains (QStringLiteral ("message"), Qt::CaseInsensitive)
-        || providerId.contains (QStringLiteral ("talk"), Qt::CaseInsensitive)) {
+    if (providerId.contains (QStringLiteral ("message"), Qt.CaseInsensitive)
+        || providerId.contains (QStringLiteral ("talk"), Qt.CaseInsensitive)) {
         return QStringLiteral ("qrc:///client/theme/black/wizard-talk.svg");
-    } else if (providerId.contains (QStringLiteral ("file"), Qt::CaseInsensitive)) {
+    } else if (providerId.contains (QStringLiteral ("file"), Qt.CaseInsensitive)) {
         return QStringLiteral ("qrc:///client/theme/black/edit.svg");
-    } else if (providerId.contains (QStringLiteral ("deck"), Qt::CaseInsensitive)) {
+    } else if (providerId.contains (QStringLiteral ("deck"), Qt.CaseInsensitive)) {
         return QStringLiteral ("qrc:///client/theme/black/deck.svg");
-    } else if (providerId.contains (QStringLiteral ("calendar"), Qt::CaseInsensitive)) {
+    } else if (providerId.contains (QStringLiteral ("calendar"), Qt.CaseInsensitive)) {
         return QStringLiteral ("qrc:///client/theme/black/calendar.svg");
-    } else if (providerId.contains (QStringLiteral ("mail"), Qt::CaseInsensitive)) {
+    } else if (providerId.contains (QStringLiteral ("mail"), Qt.CaseInsensitive)) {
         return QStringLiteral ("qrc:///client/theme/black/email.svg");
-    } else if (providerId.contains (QStringLiteral ("comment"), Qt::CaseInsensitive)) {
+    } else if (providerId.contains (QStringLiteral ("comment"), Qt.CaseInsensitive)) {
         return QStringLiteral ("qrc:///client/theme/black/comment.svg");
     }
 
@@ -38,18 +38,18 @@ QString imagePlaceholderUrlForProviderId (QString &providerId) {
 }
 
 QString localIconPathFromIconPrefix (QString &iconNameWithPrefix) {
-    if (iconNameWithPrefix.contains (QStringLiteral ("message"), Qt::CaseInsensitive)
-        || iconNameWithPrefix.contains (QStringLiteral ("talk"), Qt::CaseInsensitive)) {
+    if (iconNameWithPrefix.contains (QStringLiteral ("message"), Qt.CaseInsensitive)
+        || iconNameWithPrefix.contains (QStringLiteral ("talk"), Qt.CaseInsensitive)) {
         return QStringLiteral (":/client/theme/black/wizard-talk.svg");
-    } else if (iconNameWithPrefix.contains (QStringLiteral ("folder"), Qt::CaseInsensitive)) {
+    } else if (iconNameWithPrefix.contains (QStringLiteral ("folder"), Qt.CaseInsensitive)) {
         return QStringLiteral (":/client/theme/black/folder.svg");
-    } else if (iconNameWithPrefix.contains (QStringLiteral ("deck"), Qt::CaseInsensitive)) {
+    } else if (iconNameWithPrefix.contains (QStringLiteral ("deck"), Qt.CaseInsensitive)) {
         return QStringLiteral (":/client/theme/black/deck.svg");
-    } else if (iconNameWithPrefix.contains (QStringLiteral ("contacts"), Qt::CaseInsensitive)) {
+    } else if (iconNameWithPrefix.contains (QStringLiteral ("contacts"), Qt.CaseInsensitive)) {
         return QStringLiteral (":/client/theme/black/wizard-groupware.svg");
-    } else if (iconNameWithPrefix.contains (QStringLiteral ("calendar"), Qt::CaseInsensitive)) {
+    } else if (iconNameWithPrefix.contains (QStringLiteral ("calendar"), Qt.CaseInsensitive)) {
         return QStringLiteral (":/client/theme/black/calendar.svg");
-    } else if (iconNameWithPrefix.contains (QStringLiteral ("mail"), Qt::CaseInsensitive)) {
+    } else if (iconNameWithPrefix.contains (QStringLiteral ("mail"), Qt.CaseInsensitive)) {
         return QStringLiteral (":/client/theme/black/email.svg");
     }
 
@@ -69,13 +69,13 @@ QString iconUrlForDefaultIconName (QString &defaultIconName) {
         if (parts.size () > 1) {
             const QString iconFilePath = QStringLiteral (":/client/theme/") + parts[1] + QStringLiteral (".svg");
 
-            if (QFile::exists (iconFilePath)) {
+            if (QFile.exists (iconFilePath)) {
                 return iconFilePath;
             }
 
             const QString blackIconFilePath = QStringLiteral (":/client/theme/black/") + parts[1] + QStringLiteral (".svg");
 
-            if (QFile::exists (blackIconFilePath)) {
+            if (QFile.exists (blackIconFilePath)) {
                 return blackIconFilePath;
             }
         }
@@ -98,7 +98,7 @@ QString generateUrlForThumbnail (QString &thumbnailUrl, QUrl &serverUrl) {
         // relative image resource URL, just needs some concatenation with current server URL
         // some icons may contain parameters after (?)
         const QStringList thumbnailUrlCopySplitted = thumbnailUrlCopy.contains (QLatin1Char ('?'))
-            ? thumbnailUrlCopy.split (QLatin1Char ('?'), Qt::SkipEmptyParts)
+            ? thumbnailUrlCopy.split (QLatin1Char ('?'), Qt.SkipEmptyParts)
             : QStringList{thumbnailUrlCopy};
         Q_ASSERT (!thumbnailUrlCopySplitted.isEmpty ());
         serverUrlCopy.setPath (thumbnailUrlCopySplitted[0]);
@@ -171,13 +171,13 @@ constexpr int minimumEntresNumberToShowLoadMore = 5;
 namespace OCC {
 Q_LOGGING_CATEGORY (lcUnifiedSearch, "nextcloud.gui.unifiedsearch", QtInfoMsg)
 
-UnifiedSearchResultsListModel::UnifiedSearchResultsListModel (AccountState *accountState, QObject *parent)
+UnifiedSearchResultsListModel.UnifiedSearchResultsListModel (AccountState *accountState, QObject *parent)
     : QAbstractListModel (parent)
     , _accountState (accountState) {
 }
 
-QVariant UnifiedSearchResultsListModel::data (QModelIndex &index, int role) const {
-    Q_ASSERT (checkIndex (index, QAbstractItemModel::CheckIndexOption::IndexIsValid));
+QVariant UnifiedSearchResultsListModel.data (QModelIndex &index, int role) {
+    Q_ASSERT (checkIndex (index, QAbstractItemModel.CheckIndexOption.IndexIsValid));
 
     switch (role) {
     case ProviderNameRole:
@@ -199,13 +199,13 @@ QVariant UnifiedSearchResultsListModel::data (QModelIndex &index, int role) cons
     case TypeRole:
         return _results.at (index.row ())._type;
     case TypeAsStringRole:
-        return UnifiedSearchResult::typeAsString (_results.at (index.row ())._type);
+        return UnifiedSearchResult.typeAsString (_results.at (index.row ())._type);
     }
 
     return {};
 }
 
-int UnifiedSearchResultsListModel::rowCount (QModelIndex &parent) const {
+int UnifiedSearchResultsListModel.rowCount (QModelIndex &parent) {
     if (parent.isValid ()) {
         return 0;
     }
@@ -213,8 +213,8 @@ int UnifiedSearchResultsListModel::rowCount (QModelIndex &parent) const {
     return _results.size ();
 }
 
-QHash<int, QByteArray> UnifiedSearchResultsListModel::roleNames () const {
-    auto roles = QAbstractListModel::roleNames ();
+QHash<int, QByteArray> UnifiedSearchResultsListModel.roleNames () {
+    auto roles = QAbstractListModel.roleNames ();
     roles[ProviderNameRole] = "providerName";
     roles[ProviderIdRole] = "providerId";
     roles[IconsRole] = "icons";
@@ -228,19 +228,19 @@ QHash<int, QByteArray> UnifiedSearchResultsListModel::roleNames () const {
     return roles;
 }
 
-QString UnifiedSearchResultsListModel::searchTerm () const {
+QString UnifiedSearchResultsListModel.searchTerm () {
     return _searchTerm;
 }
 
-QString UnifiedSearchResultsListModel::errorString () const {
+QString UnifiedSearchResultsListModel.errorString () {
     return _errorString;
 }
 
-QString UnifiedSearchResultsListModel::currentFetchMoreInProgressProviderId () const {
+QString UnifiedSearchResultsListModel.currentFetchMoreInProgressProviderId () {
     return _currentFetchMoreInProgressProviderId;
 }
 
-void UnifiedSearchResultsListModel::setSearchTerm (QString &term) {
+void UnifiedSearchResultsListModel.setSearchTerm (QString &term) {
     if (term == _searchTerm) {
         return;
     }
@@ -257,8 +257,8 @@ void UnifiedSearchResultsListModel::setSearchTerm (QString &term) {
 
     clearCurrentFetchMoreInProgressProviderId ();
 
-    disconnect (&_unifiedSearchTextEditingFinishedTimer, &QTimer::timeout, this,
-        &UnifiedSearchResultsListModel::slotSearchTermEditingFinished);
+    disconnect (&_unifiedSearchTextEditingFinishedTimer, &QTimer.timeout, this,
+        &UnifiedSearchResultsListModel.slotSearchTermEditingFinished);
 
     if (_unifiedSearchTextEditingFinishedTimer.isActive ()) {
         _unifiedSearchTextEditingFinishedTimer.stop ();
@@ -266,8 +266,8 @@ void UnifiedSearchResultsListModel::setSearchTerm (QString &term) {
 
     if (!_searchTerm.isEmpty ()) {
         _unifiedSearchTextEditingFinishedTimer.setInterval (searchTermEditingFinishedSearchStartDelay);
-        connect (&_unifiedSearchTextEditingFinishedTimer, &QTimer::timeout, this,
-            &UnifiedSearchResultsListModel::slotSearchTermEditingFinished);
+        connect (&_unifiedSearchTextEditingFinishedTimer, &QTimer.timeout, this,
+            &UnifiedSearchResultsListModel.slotSearchTermEditingFinished);
         _unifiedSearchTextEditingFinishedTimer.start ();
     }
 
@@ -278,35 +278,35 @@ void UnifiedSearchResultsListModel::setSearchTerm (QString &term) {
     }
 }
 
-bool UnifiedSearchResultsListModel::isSearchInProgress () const {
+bool UnifiedSearchResultsListModel.isSearchInProgress () {
     return !_searchJobConnections.isEmpty ();
 }
 
-void UnifiedSearchResultsListModel::resultClicked (QString &providerId, QUrl &resourceUrl) const {
+void UnifiedSearchResultsListModel.resultClicked (QString &providerId, QUrl &resourceUrl) {
     const QUrlQuery urlQuery{resourceUrl};
-    const auto dir = urlQuery.queryItemValue (QStringLiteral ("dir"), QUrl::ComponentFormattingOption::FullyDecoded);
+    const auto dir = urlQuery.queryItemValue (QStringLiteral ("dir"), QUrl.ComponentFormattingOption.FullyDecoded);
     const auto fileName =
-        urlQuery.queryItemValue (QStringLiteral ("scrollto"), QUrl::ComponentFormattingOption::FullyDecoded);
+        urlQuery.queryItemValue (QStringLiteral ("scrollto"), QUrl.ComponentFormattingOption.FullyDecoded);
 
-    if (providerId.contains (QStringLiteral ("file"), Qt::CaseInsensitive) && !dir.isEmpty () && !fileName.isEmpty ()) {
-        if (!_accountState || !_accountState->account ()) {
+    if (providerId.contains (QStringLiteral ("file"), Qt.CaseInsensitive) && !dir.isEmpty () && !fileName.isEmpty ()) {
+        if (!_accountState || !_accountState.account ()) {
             return;
         }
 
         const QString relativePath = dir + QLatin1Char ('/') + fileName;
         const auto localFiles =
-            FolderMan::instance ()->findFileInLocalFolders (QFileInfo (relativePath).path (), _accountState->account ());
+            FolderMan.instance ().findFileInLocalFolders (QFileInfo (relativePath).path (), _accountState.account ());
 
         if (!localFiles.isEmpty ()) {
             qCInfo (lcUnifiedSearch) << "Opening file:" << localFiles.constFirst ();
-            QDesktopServices::openUrl (QUrl::fromLocalFile (localFiles.constFirst ()));
+            QDesktopServices.openUrl (QUrl.fromLocalFile (localFiles.constFirst ()));
             return;
         }
     }
-    Utility::openBrowser (resourceUrl);
+    Utility.openBrowser (resourceUrl);
 }
 
-void UnifiedSearchResultsListModel::fetchMoreTriggerClicked (QString &providerId) {
+void UnifiedSearchResultsListModel.fetchMoreTriggerClicked (QString &providerId) {
     if (isSearchInProgress () || !_currentFetchMoreInProgressProviderId.isEmpty ()) {
         return;
     }
@@ -321,25 +321,25 @@ void UnifiedSearchResultsListModel::fetchMoreTriggerClicked (QString &providerId
     }
 }
 
-void UnifiedSearchResultsListModel::slotSearchTermEditingFinished () {
-    disconnect (&_unifiedSearchTextEditingFinishedTimer, &QTimer::timeout, this,
-        &UnifiedSearchResultsListModel::slotSearchTermEditingFinished);
+void UnifiedSearchResultsListModel.slotSearchTermEditingFinished () {
+    disconnect (&_unifiedSearchTextEditingFinishedTimer, &QTimer.timeout, this,
+        &UnifiedSearchResultsListModel.slotSearchTermEditingFinished);
 
-    if (!_accountState || !_accountState->account ()) {
+    if (!_accountState || !_accountState.account ()) {
         qCCritical (lcUnifiedSearch) << QString ("Account state is invalid. Could not start search!");
         return;
     }
 
     if (_providers.isEmpty ()) {
-        auto job = new JsonApiJob (_accountState->account (), QLatin1String ("ocs/v2.php/search/providers"));
-        QObject::connect (job, &JsonApiJob::jsonReceived, this, &UnifiedSearchResultsListModel::slotFetchProvidersFinished);
-        job->start ();
+        auto job = new JsonApiJob (_accountState.account (), QLatin1String ("ocs/v2.php/search/providers"));
+        QObject.connect (job, &JsonApiJob.jsonReceived, this, &UnifiedSearchResultsListModel.slotFetchProvidersFinished);
+        job.start ();
     } else {
         startSearch ();
     }
 }
 
-void UnifiedSearchResultsListModel::slotFetchProvidersFinished (QJsonDocument &json, int statusCode) {
+void UnifiedSearchResultsListModel.slotFetchProvidersFinished (QJsonDocument &json, int statusCode) {
     const auto job = qobject_cast<JsonApiJob *> (sender ());
 
     if (!job) {
@@ -353,9 +353,9 @@ void UnifiedSearchResultsListModel::slotFetchProvidersFinished (QJsonDocument &j
         qCCritical (lcUnifiedSearch) << QString ("%1: Failed to fetch search providers for '%2'. Error: %3")
                                            .arg (statusCode)
                                            .arg (_searchTerm)
-                                           .arg (job->errorString ());
+                                           .arg (job.errorString ());
         _errorString +=
-            tr ("Failed to fetch search providers for '%1'. Error: %2").arg (_searchTerm).arg (job->errorString ())
+            tr ("Failed to fetch search providers for '%1'. Error: %2").arg (_searchTerm).arg (job.errorString ())
             + QLatin1Char ('\n');
         emit errorStringChanged ();
         return;
@@ -381,8 +381,8 @@ void UnifiedSearchResultsListModel::slotFetchProvidersFinished (QJsonDocument &j
     }
 }
 
-void UnifiedSearchResultsListModel::slotSearchForProviderFinished (QJsonDocument &json, int statusCode) {
-    Q_ASSERT (_accountState && _accountState->account ());
+void UnifiedSearchResultsListModel.slotSearchForProviderFinished (QJsonDocument &json, int statusCode) {
+    Q_ASSERT (_accountState && _accountState.account ());
 
     const auto job = qobject_cast<JsonApiJob *> (sender ());
 
@@ -393,7 +393,7 @@ void UnifiedSearchResultsListModel::slotSearchForProviderFinished (QJsonDocument
         return;
     }
 
-    const auto providerId = job->property ("providerId").toString ();
+    const auto providerId = job.property ("providerId").toString ();
 
     if (providerId.isEmpty ()) {
         return;
@@ -415,25 +415,25 @@ void UnifiedSearchResultsListModel::slotSearchForProviderFinished (QJsonDocument
         qCCritical (lcUnifiedSearch) << QString ("%1: Search has failed for '%2'. Error: %3")
                                            .arg (statusCode)
                                            .arg (_searchTerm)
-                                           .arg (job->errorString ());
+                                           .arg (job.errorString ());
         _errorString +=
-            tr ("Search has failed for '%1'. Error: %2").arg (_searchTerm).arg (job->errorString ()) + QLatin1Char ('\n');
+            tr ("Search has failed for '%1'. Error: %2").arg (_searchTerm).arg (job.errorString ()) + QLatin1Char ('\n');
         emit errorStringChanged ();
         return;
     }
 
     const auto data = json.object ().value (QStringLiteral ("ocs")).toObject ().value (QStringLiteral ("data")).toObject ();
     if (!data.isEmpty ()) {
-        parseResultsForProvider (data, providerId, job->property ("appendResults").toBool ());
+        parseResultsForProvider (data, providerId, job.property ("appendResults").toBool ());
     }
 }
 
-void UnifiedSearchResultsListModel::startSearch () {
-    Q_ASSERT (_accountState && _accountState->account ());
+void UnifiedSearchResultsListModel.startSearch () {
+    Q_ASSERT (_accountState && _accountState.account ());
 
     disconnectAndClearSearchJobs ();
 
-    if (!_accountState || !_accountState->account ()) {
+    if (!_accountState || !_accountState.account ()) {
         return;
     }
 
@@ -448,35 +448,35 @@ void UnifiedSearchResultsListModel::startSearch () {
     }
 }
 
-void UnifiedSearchResultsListModel::startSearchForProvider (QString &providerId, qint32 cursor) {
-    Q_ASSERT (_accountState && _accountState->account ());
+void UnifiedSearchResultsListModel.startSearchForProvider (QString &providerId, qint32 cursor) {
+    Q_ASSERT (_accountState && _accountState.account ());
 
-    if (!_accountState || !_accountState->account ()) {
+    if (!_accountState || !_accountState.account ()) {
         return;
     }
 
-    auto job = new JsonApiJob (_accountState->account (),
+    auto job = new JsonApiJob (_accountState.account (),
         QLatin1String ("ocs/v2.php/search/providers/%1/search").arg (providerId));
 
     QUrlQuery params;
     params.addQueryItem (QStringLiteral ("term"), _searchTerm);
     if (cursor > 0) {
-        params.addQueryItem (QStringLiteral ("cursor"), QString::number (cursor));
-        job->setProperty ("appendResults", true);
+        params.addQueryItem (QStringLiteral ("cursor"), QString.number (cursor));
+        job.setProperty ("appendResults", true);
     }
-    job->setProperty ("providerId", providerId);
-    job->addQueryParams (params);
+    job.setProperty ("providerId", providerId);
+    job.addQueryParams (params);
     const auto wasSearchInProgress = isSearchInProgress ();
     _searchJobConnections.insert (providerId,
-        QObject::connect (
-            job, &JsonApiJob::jsonReceived, this, &UnifiedSearchResultsListModel::slotSearchForProviderFinished));
+        QObject.connect (
+            job, &JsonApiJob.jsonReceived, this, &UnifiedSearchResultsListModel.slotSearchForProviderFinished));
     if (isSearchInProgress () && !wasSearchInProgress) {
         emit isSearchInProgressChanged ();
     }
-    job->start ();
+    job.start ();
 }
 
-void UnifiedSearchResultsListModel::parseResultsForProvider (QJsonObject &data, QString &providerId, bool fetchedMore) {
+void UnifiedSearchResultsListModel.parseResultsForProvider (QJsonObject &data, QString &providerId, bool fetchedMore) {
     const auto cursor = data.value (QStringLiteral ("cursor")).toInt ();
     const auto entries = data.value (QStringLiteral ("entries")).toVariant ().toList ();
 
@@ -539,7 +539,7 @@ void UnifiedSearchResultsListModel::parseResultsForProvider (QJsonObject &data, 
         result._subline = entryMap.value (QStringLiteral ("subline")).toString ();
 
         const auto resourceUrl = entryMap.value (QStringLiteral ("resourceUrl")).toString ();
-        const auto accountUrl = (_accountState && _accountState->account ()) ? _accountState->account ()->url () : QUrl ();
+        const auto accountUrl = (_accountState && _accountState.account ()) ? _accountState.account ().url () : QUrl ();
 
         result._resourceUrl = makeResourceUrl (resourceUrl, accountUrl);
         result._icons = iconsFromThumbnailAndFallbackIcon (entryMap.value (QStringLiteral ("thumbnailUrl")).toString (),
@@ -555,13 +555,13 @@ void UnifiedSearchResultsListModel::parseResultsForProvider (QJsonObject &data, 
     }
 }
 
-void UnifiedSearchResultsListModel::appendResults (QVector<UnifiedSearchResult> results, UnifiedSearchProvider &provider) {
+void UnifiedSearchResultsListModel.appendResults (QVector<UnifiedSearchResult> results, UnifiedSearchProvider &provider) {
     if (provider._cursor > 0 && provider._isPaginated) {
         UnifiedSearchResult fetchMoreTrigger;
         fetchMoreTrigger._providerId = provider._id;
         fetchMoreTrigger._providerName = provider._name;
         fetchMoreTrigger._order = provider._order;
-        fetchMoreTrigger._type = UnifiedSearchResult::Type::FetchMoreTrigger;
+        fetchMoreTrigger._type = UnifiedSearchResult.Type.FetchMoreTrigger;
         results.push_back (fetchMoreTrigger);
     }
 
@@ -572,8 +572,8 @@ void UnifiedSearchResultsListModel::appendResults (QVector<UnifiedSearchResult> 
         return;
     }
 
-    // insertion is done with sorting (first -> by order, then -> by name)
-    const auto itToInsertTo = std::find_if (std::begin (_results), std::end (_results),
+    // insertion is done with sorting (first . by order, then . by name)
+    const auto itToInsertTo = std.find_if (std.begin (_results), std.end (_results),
         [&provider] (UnifiedSearchResult &current) {
             // insert before other results of higher order when possible
             if (current._order > provider._order) {
@@ -588,15 +588,15 @@ void UnifiedSearchResultsListModel::appendResults (QVector<UnifiedSearchResult> 
             }
         });
 
-    const auto first = static_cast<int> (std::distance (std::begin (_results), itToInsertTo));
+    const auto first = static_cast<int> (std.distance (std.begin (_results), itToInsertTo));
     const auto last = first + results.size () - 1;
 
     beginInsertRows ({}, first, last);
-    std::copy (std::begin (results), std::end (results), std::inserter (_results, itToInsertTo));
+    std.copy (std.begin (results), std.end (results), std.inserter (_results, itToInsertTo));
     endInsertRows ();
 }
 
-void UnifiedSearchResultsListModel::appendResultsToProvider (QVector<UnifiedSearchResult> &results, UnifiedSearchProvider &provider) {
+void UnifiedSearchResultsListModel.appendResultsToProvider (QVector<UnifiedSearchResult> &results, UnifiedSearchProvider &provider) {
     if (results.isEmpty ()) {
         return;
     }
@@ -605,18 +605,18 @@ void UnifiedSearchResultsListModel::appendResultsToProvider (QVector<UnifiedSear
     /* we need to find the last result that is not a fetch-more-trigger or category-separator for the current
        provider */
     const auto itLastResultForProviderReverse =
-        std::find_if (std::rbegin (_results), std::rend (_results), [&providerId] (UnifiedSearchResult &result) {
-            return result._providerId == providerId && result._type == UnifiedSearchResult::Type::Default;
+        std.find_if (std.rbegin (_results), std.rend (_results), [&providerId] (UnifiedSearchResult &result) {
+            return result._providerId == providerId && result._type == UnifiedSearchResult.Type.Default;
         });
 
-    if (itLastResultForProviderReverse != std::rend (_results)) {
+    if (itLastResultForProviderReverse != std.rend (_results)) {
         // #1 Insert rows
         // convert reverse_iterator to iterator
         const auto itLastResultForProvider = (itLastResultForProviderReverse + 1).base ();
-        const auto first = static_cast<int> (std::distance (std::begin (_results), itLastResultForProvider + 1));
+        const auto first = static_cast<int> (std.distance (std.begin (_results), itLastResultForProvider + 1));
         const auto last = first + results.size () - 1;
         beginInsertRows ({}, first, last);
-        std::copy (std::begin (results), std::end (results), std::inserter (_results, itLastResultForProvider + 1));
+        std.copy (std.begin (results), std.end (results), std.inserter (_results, itLastResultForProvider + 1));
         endInsertRows ();
 
         // #2 Remove the FetchMoreTrigger item if there are no more results to load for this provider
@@ -626,21 +626,21 @@ void UnifiedSearchResultsListModel::appendResultsToProvider (QVector<UnifiedSear
     }
 }
 
-void UnifiedSearchResultsListModel::removeFetchMoreTrigger (QString &providerId) {
-    const auto itFetchMoreTriggerForProviderReverse = std::find_if (
-        std::rbegin (_results),
-        std::rend (_results),
+void UnifiedSearchResultsListModel.removeFetchMoreTrigger (QString &providerId) {
+    const auto itFetchMoreTriggerForProviderReverse = std.find_if (
+        std.rbegin (_results),
+        std.rend (_results),
         [providerId] (UnifiedSearchResult &result) {
-            return result._providerId == providerId && result._type == UnifiedSearchResult::Type::FetchMoreTrigger;
+            return result._providerId == providerId && result._type == UnifiedSearchResult.Type.FetchMoreTrigger;
         });
 
-    if (itFetchMoreTriggerForProviderReverse != std::rend (_results)) {
+    if (itFetchMoreTriggerForProviderReverse != std.rend (_results)) {
         // convert reverse_iterator to iterator
         const auto itFetchMoreTriggerForProvider = (itFetchMoreTriggerForProviderReverse + 1).base ();
 
-        if (itFetchMoreTriggerForProvider != std::end (_results)
-            && itFetchMoreTriggerForProvider != std::begin (_results)) {
-            const auto eraseIndex = static_cast<int> (std::distance (std::begin (_results), itFetchMoreTriggerForProvider));
+        if (itFetchMoreTriggerForProvider != std.end (_results)
+            && itFetchMoreTriggerForProvider != std.begin (_results)) {
+            const auto eraseIndex = static_cast<int> (std.distance (std.begin (_results), itFetchMoreTriggerForProvider));
             Q_ASSERT (eraseIndex >= 0 && eraseIndex < static_cast<int> (_results.size ()));
             beginRemoveRows ({}, eraseIndex, eraseIndex);
             _results.erase (itFetchMoreTriggerForProvider);
@@ -649,10 +649,10 @@ void UnifiedSearchResultsListModel::removeFetchMoreTrigger (QString &providerId)
     }
 }
 
-void UnifiedSearchResultsListModel::disconnectAndClearSearchJobs () {
+void UnifiedSearchResultsListModel.disconnectAndClearSearchJobs () {
     for (auto &connection : _searchJobConnections) {
         if (connection) {
-            QObject::disconnect (connection);
+            QObject.disconnect (connection);
         }
     }
 
@@ -662,7 +662,7 @@ void UnifiedSearchResultsListModel::disconnectAndClearSearchJobs () {
     }
 }
 
-void UnifiedSearchResultsListModel::clearCurrentFetchMoreInProgressProviderId () {
+void UnifiedSearchResultsListModel.clearCurrentFetchMoreInProgressProviderId () {
     if (!_currentFetchMoreInProgressProviderId.isEmpty ()) {
         _currentFetchMoreInProgressProviderId.clear ();
         emit currentFetchMoreInProgressProviderIdChanged ();

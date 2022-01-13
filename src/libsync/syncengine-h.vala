@@ -57,15 +57,15 @@ public:
     /* Abort the sync.  Called from the main thread */
     void abort ();
 
-    bool isSyncRunning () const { return _syncRunning; }
+    bool isSyncRunning () { return _syncRunning; }
 
-    SyncOptions syncOptions () const { return _syncOptions; }
+    SyncOptions syncOptions () { return _syncOptions; }
     void setSyncOptions (SyncOptions &options) { _syncOptions = options; }
-    bool ignoreHiddenFiles () const { return _ignore_hidden_files; }
+    bool ignoreHiddenFiles () { return _ignore_hidden_files; }
     void setIgnoreHiddenFiles (bool ignore) { _ignore_hidden_files = ignore; }
 
     ExcludedFiles &excludedFiles () { return *_excludedFiles; }
-    Utility::StopWatch &stopWatch () { return _stopWatch; }
+    Utility.StopWatch &stopWatch () { return _stopWatch; }
     SyncFileStatusTracker &syncFileStatusTracker () { return *_syncFileStatusTracker; }
 
     /* Returns whether another sync is needed to complete the sync */
@@ -74,8 +74,8 @@ public:
     bool wasFileTouched (QString &fn) const;
 
     AccountPtr account () const;
-    SyncJournalDb *journal () const { return _journal; }
-    QString localPath () const { return _localPath; }
+    SyncJournalDb *journal () { return _journal; }
+    QString localPath () { return _localPath; }
 
     /** Duration in ms that uploads should be delayed after a file change
      *
@@ -87,7 +87,7 @@ public:
      * To avoid that, uploads of files where the distance between the mtime and the
      * current time is less than this duration are skipped.
      */
-    static std::chrono::milliseconds minimumFileAgeForUpload;
+    static std.chrono.milliseconds minimumFileAgeForUpload;
 
     /**
      * Control whether local discovery should read from filesystem or db.
@@ -100,7 +100,7 @@ public:
      * revert afterwards. Use _lastLocalDiscoveryStyle to discover the last
      * sync's style.
      */
-    void setLocalDiscoveryOptions (LocalDiscoveryStyle style, std::set<QString> paths = {});
+    void setLocalDiscoveryOptions (LocalDiscoveryStyle style, std.set<QString> paths = {});
 
     /**
      * Returns whether the given folder-relative path should be locally discovered
@@ -112,7 +112,7 @@ public:
     bool shouldDiscoverLocally (QString &path) const;
 
     /** Access the last sync run's local discovery style */
-    LocalDiscoveryStyle lastLocalDiscoveryStyle () const { return _lastLocalDiscoveryStyle; }
+    LocalDiscoveryStyle lastLocalDiscoveryStyle () { return _lastLocalDiscoveryStyle; }
 
     /** Removes all virtual file db entries and dehydrated local placeholders.
      *
@@ -120,7 +120,7 @@ public:
      * different kind of vfs.
      *
      * Note that *hydrated* placeholder files might still be left. These will
-     * get cleaned up by Vfs::unregisterFolder ().
+     * get cleaned up by Vfs.unregisterFolder ().
      */
     static void wipeVirtualFiles (QString &localPath, SyncJournalDb &journal, Vfs &vfs);
 
@@ -141,9 +141,9 @@ signals:
     void transmissionProgress (ProgressInfo &progress);
 
     /// We've produced a new sync error of a type.
-    void syncError (QString &message, ErrorCategory category = ErrorCategory::Normal);
+    void syncError (QString &message, ErrorCategory category = ErrorCategory.Normal);
 
-    void addErrorToGui (SyncFileItem::Status status, QString &errorMessage, QString &subject);
+    void addErrorToGui (SyncFileItem.Status status, QString &errorMessage, QString &subject);
 
     void finished (bool success);
     void started ();
@@ -153,14 +153,14 @@ signals:
      * This usually happen when the server was reset or something.
      * Set *cancel to true in a slot connected from this signal to abort the sync.
      */
-    void aboutToRemoveAllFiles (SyncFileItem::Direction direction, std::function<void (bool)> f);
+    void aboutToRemoveAllFiles (SyncFileItem.Direction direction, std.function<void (bool)> f);
 
     // A new folder was discovered and was not synced because of the confirmation feature
     void newBigFolder (QString &folder, bool isExternal);
 
     /** Emitted when propagation has problems with a locked file.
      *
-     * Forwarded from OwncloudPropagator::seenLockedFile.
+     * Forwarded from OwncloudPropagator.seenLockedFile.
      */
     void seenLockedFile (QString &fileName);
 
@@ -240,7 +240,7 @@ private:
 
     QScopedPointer<ExcludedFiles> _excludedFiles;
     QScopedPointer<SyncFileStatusTracker> _syncFileStatusTracker;
-    Utility::StopWatch _stopWatch;
+    Utility.StopWatch _stopWatch;
 
     /**
      * check if we are allowed to propagate everything, and if we are not, adjust the instructions
@@ -281,9 +281,9 @@ private:
     QSet<QString> _uniqueErrors;
 
     /** The kind of local discovery the last sync run used */
-    LocalDiscoveryStyle _lastLocalDiscoveryStyle = LocalDiscoveryStyle::FilesystemOnly;
-    LocalDiscoveryStyle _localDiscoveryStyle = LocalDiscoveryStyle::FilesystemOnly;
-    std::set<QString> _localDiscoveryPaths;
+    LocalDiscoveryStyle _lastLocalDiscoveryStyle = LocalDiscoveryStyle.FilesystemOnly;
+    LocalDiscoveryStyle _localDiscoveryStyle = LocalDiscoveryStyle.FilesystemOnly;
+    std.set<QString> _localDiscoveryPaths;
 };
 }
 

@@ -52,7 +52,7 @@ public:
     /// whether the folder syncs hidden files
     bool ignoreHiddenFiles = false;
     /// Which virtual files setting the folder uses
-    Vfs::Mode virtualFilesMode = Vfs::Off;
+    Vfs.Mode virtualFilesMode = Vfs.Off;
     /// The CLSID where this folder appears in registry for the Explorer navigation pane entry.
     QUuid navigationPaneClsid;
 
@@ -103,7 +103,7 @@ public:
 
     /** Create a new Folder
      */
-    Folder (FolderDefinition &definition, AccountState *accountState, std::unique_ptr<Vfs> vfs, QObject *parent = nullptr);
+    Folder (FolderDefinition &definition, AccountState *accountState, std.unique_ptr<Vfs> vfs, QObject *parent = nullptr);
 
     ~Folder () override;
 
@@ -113,7 +113,7 @@ public:
     /**
      * The account the folder is configured on.
      */
-    AccountState *accountState () const { return _accountState.data (); }
+    AccountState *accountState () { return _accountState.data (); }
 
     /**
      * alias or nickname
@@ -134,7 +134,7 @@ public:
     /**
      * cleaned canonical folder path, like path () but never ends with a /
      *
-     * Wrapper for QDir::cleanPath (path ()) except for "Z:/",
+     * Wrapper for QDir.cleanPath (path ()) except for "Z:/",
      * where it returns "Z:" instead of "Z:/".
      */
     QString cleanPath () const;
@@ -150,7 +150,7 @@ public:
     QString remotePathTrailingSlash () const;
 
     void setNavigationPaneClsid (QUuid &clsid) { _definition.navigationPaneClsid = clsid; }
-    QUuid navigationPaneClsid () const { return _definition.navigationPaneClsid; }
+    QUuid navigationPaneClsid () { return _definition.navigationPaneClsid; }
 
     /**
      * remote folder path with server url
@@ -196,7 +196,7 @@ public:
 
     void onAssociatedAccountRemoved ();
 
-    void setSyncState (SyncResult::Status state);
+    void setSyncState (SyncResult.Status state);
 
     void setDirtyNetworkLimits ();
 
@@ -213,10 +213,10 @@ public:
     Vfs &vfs () { return *_vfs; }
 
     RequestEtagJob *etagJob () { return _requestEtagJob; }
-    std::chrono::milliseconds msecSinceLastSync () const { return std::chrono::milliseconds (_timeSinceLastSyncDone.elapsed ()); }
-    std::chrono::milliseconds msecLastSyncDuration () const { return _lastSyncDuration; }
-    int consecutiveFollowUpSyncs () const { return _consecutiveFollowUpSyncs; }
-    int consecutiveFailingSyncs () const { return _consecutiveFailingSyncs; }
+    std.chrono.milliseconds msecSinceLastSync () { return std.chrono.milliseconds (_timeSinceLastSyncDone.elapsed ()); }
+    std.chrono.milliseconds msecLastSyncDuration () { return _lastSyncDuration; }
+    int consecutiveFollowUpSyncs () { return _consecutiveFollowUpSyncs; }
+    int consecutiveFailingSyncs () { return _consecutiveFailingSyncs; }
 
     /// Saves the folder data in the account's settings.
     void saveToSettings () const;
@@ -272,7 +272,7 @@ public:
     void setRootPinState (PinState state);
 
     /** Whether user desires a switch that couldn't be executed yet, see member */
-    bool isVfsOnOffSwitchPending () const { return _vfsOnOffPending; }
+    bool isVfsOnOffSwitchPending () { return _vfsOnOffPending; }
     void setVfsOnOffSwitchPending (bool pending) { _vfsOnOffPending = pending; }
 
     void switchToVirtualFiles ();
@@ -307,7 +307,7 @@ public slots:
     void slotTerminateSync ();
 
     // connected to the corresponding signals in the SyncEngine
-    void slotAboutToRemoveAllFiles (SyncFileItem::Direction, std::function<void (bool)> callback);
+    void slotAboutToRemoveAllFiles (SyncFileItem.Direction, std.function<void (bool)> callback);
 
     /**
       * Starts a sync operation
@@ -362,9 +362,9 @@ private slots:
 
     /** Adds a error message that's not tied to a specific item.
      */
-    void slotSyncError (QString &message, ErrorCategory category = ErrorCategory::Normal);
+    void slotSyncError (QString &message, ErrorCategory category = ErrorCategory.Normal);
 
-    void slotAddErrorToGui (SyncFileItem::Status status, QString &errorMessage, QString &subject = {});
+    void slotAddErrorToGui (SyncFileItem.Status status, QString &errorMessage, QString &subject = {});
 
     void slotTransmissionProgress (ProgressInfo &pi);
     void slotItemCompleted (SyncFileItemPtr &);
@@ -447,7 +447,7 @@ private:
     QElapsedTimer _timeSinceLastSyncDone;
     QElapsedTimer _timeSinceLastSyncStart;
     QElapsedTimer _timeSinceLastFullLocalDiscovery;
-    std::chrono::milliseconds _lastSyncDuration;
+    std.chrono.milliseconds _lastSyncDuration;
 
     /// The number of syncs that failed in a row.
     /// Reset when a sync is successful.

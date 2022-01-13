@@ -40,7 +40,7 @@ public:
     void reset ();
 
 private:
-    Ui::ProxyAuthDialog *ui;
+    Ui.ProxyAuthDialog *ui;
 };
 
 } // namespace OCC

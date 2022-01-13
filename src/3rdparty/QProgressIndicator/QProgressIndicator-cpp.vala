@@ -24,34 +24,34 @@
 
 // #include <QPainter>
 
-QProgressIndicator::QProgressIndicator (QWidget* parent)
+QProgressIndicator.QProgressIndicator (QWidget* parent)
     : QWidget (parent) {
-    setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
-    setFocusPolicy (Qt::NoFocus);
+    setSizePolicy (QSizePolicy.Fixed, QSizePolicy.Fixed);
+    setFocusPolicy (Qt.NoFocus);
 }
 
-bool QProgressIndicator::isAnimated () const {
+bool QProgressIndicator.isAnimated () {
     return (m_timerId != -1);
 }
 
-void QProgressIndicator::setDisplayedWhenStopped (bool state) {
+void QProgressIndicator.setDisplayedWhenStopped (bool state) {
     m_displayedWhenStopped = state;
 
     update ();
 }
 
-bool QProgressIndicator::isDisplayedWhenStopped () const {
+bool QProgressIndicator.isDisplayedWhenStopped () {
     return m_displayedWhenStopped;
 }
 
-void QProgressIndicator::startAnimation () {
+void QProgressIndicator.startAnimation () {
     m_angle = 0;
 
     if (m_timerId == -1)
         m_timerId = startTimer (m_delay);
 }
 
-void QProgressIndicator::stopAnimation () {
+void QProgressIndicator.stopAnimation () {
     if (m_timerId != -1)
         killTimer (m_timerId);
 
@@ -60,7 +60,7 @@ void QProgressIndicator::stopAnimation () {
     update ();
 }
 
-void QProgressIndicator::setAnimationDelay (int delay) {
+void QProgressIndicator.setAnimationDelay (int delay) {
     if (m_timerId != -1)
         killTimer (m_timerId);
 
@@ -70,34 +70,34 @@ void QProgressIndicator::setAnimationDelay (int delay) {
         m_timerId = startTimer (m_delay);
 }
 
-void QProgressIndicator::setColor (QColor & color) {
+void QProgressIndicator.setColor (QColor & color) {
     m_color = color;
 
     update ();
 }
 
-QSize QProgressIndicator::sizeHint () const {
+QSize QProgressIndicator.sizeHint () {
     return {20, 20};
 }
 
-int QProgressIndicator::heightForWidth (int w) const {
+int QProgressIndicator.heightForWidth (int w) {
     return w;
 }
 
-void QProgressIndicator::timerEvent (QTimerEvent * /*event*/) {
+void QProgressIndicator.timerEvent (QTimerEvent * /*event*/) {
     m_angle = (m_angle+30)%360;
 
     update ();
 }
 
-void QProgressIndicator::paintEvent (QPaintEvent * /*event*/) {
+void QProgressIndicator.paintEvent (QPaintEvent * /*event*/) {
     if (!m_displayedWhenStopped && !isAnimated ())
         return;
 
-    int width = qMin (this->width (), this->height ());
+    int width = qMin (this.width (), this.height ());
 
     QPainter p (this);
-    p.setRenderHint (QPainter::Antialiasing);
+    p.setRenderHint (QPainter.Antialiasing);
 
     int outerRadius = qRound ( (width - 1) * 0.5);
     int innerRadius = qRound ( (width - 1) * 0.5 * 0.38);
@@ -109,7 +109,7 @@ void QProgressIndicator::paintEvent (QPaintEvent * /*event*/) {
     for (int i=0; i<12; i++) {
         QColor color = m_color;
         color.setAlphaF (1.0f - (static_cast<float> (i) / 12.0f));
-        p.setPen (Qt::NoPen);
+        p.setPen (Qt.NoPen);
         p.setBrush (color);
         p.save ();
         p.translate (rect ().center ());

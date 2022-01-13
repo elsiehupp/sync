@@ -45,7 +45,7 @@ public:
     ~SslErrorDialog () override;
     bool checkFailingCertsKnown (QList<QSslError> &errors);
     bool trustConnection ();
-    QList<QSslCertificate> unknownCerts () const { return _unknownCerts; }
+    QList<QSslCertificate> unknownCerts () { return _unknownCerts; }
 
 private:
     QString styleSheet () const;
@@ -55,7 +55,7 @@ private:
 
     QList<QSslCertificate> _unknownCerts;
     QString _customConfigHandle;
-    Ui::SslErrorDialog *_ui;
+    Ui.SslErrorDialog *_ui;
     AccountPtr _account;
 };
 } // end namespace

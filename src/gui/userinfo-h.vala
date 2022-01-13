@@ -49,24 +49,24 @@ class JsonApiJob;
  * Here follows the state machine
 
  \code{.unparsed}
- *---> slotFetchInfo
+ *--. slotFetchInfo
          JsonApiJob (ocs/v1.php/cloud/user)
          |
-         +-> slotUpdateLastInfo
+         +. slotUpdateLastInfo
                AvatarJob (if _fetchAvatarImage is true)
                |
-               +-> slotAvatarImage -->
+               +. slotAvatarImage -.
    +-----------------------------------+
    |
-   +-> Client Side Encryption Checks --+ --reportResult ()
+   +. Client Side Encryption Checks --+ --reportResult ()
      \endcode
   */
 class UserInfo : public QObject {
 public:
-    explicit UserInfo (OCC::AccountState *accountState, bool allowDisconnectedAccountState, bool fetchAvatarImage, QObject *parent = nullptr);
+    explicit UserInfo (OCC.AccountState *accountState, bool allowDisconnectedAccountState, bool fetchAvatarImage, QObject *parent = nullptr);
 
-    qint64 lastQuotaTotalBytes () const { return _lastQuotaTotalBytes; }
-    qint64 lastQuotaUsedBytes () const { return _lastQuotaUsedBytes; }
+    qint64 lastQuotaTotalBytes () { return _lastQuotaTotalBytes; }
+    qint64 lastQuotaUsedBytes () { return _lastQuotaUsedBytes; }
 
     /**
      * When the quotainfo is active, it requests the quota at regular interval.

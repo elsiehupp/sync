@@ -26,25 +26,25 @@ static const int Spacing = 6;
 static const int SlideDuration = 1000;
 static const int SlideDistance = 400;
 
-SlideShow::SlideShow (QWidget *parent) : QWidget (parent) {
-    setSizePolicy (QSizePolicy::Minimum, QSizePolicy::Minimum);
+SlideShow.SlideShow (QWidget *parent) : QWidget (parent) {
+    setSizePolicy (QSizePolicy.Minimum, QSizePolicy.Minimum);
 }
 
-void SlideShow::addSlide (QPixmap &pixmap, QString &label) {
+void SlideShow.addSlide (QPixmap &pixmap, QString &label) {
     _labels += label;
     _pixmaps += pixmap;
     updateGeometry ();
 }
 
-bool SlideShow::isActive () const {
+bool SlideShow.isActive () {
     return _timer.isActive ();
 }
 
-int SlideShow::interval () const {
+int SlideShow.interval () {
     return _interval;
 }
 
-void SlideShow::setInterval (int interval) {
+void SlideShow.setInterval (int interval) {
     if (_interval == interval)
         return;
 
@@ -52,23 +52,23 @@ void SlideShow::setInterval (int interval) {
     maybeRestartTimer ();
 }
 
-int SlideShow::currentSlide () const {
+int SlideShow.currentSlide () {
     return _currentIndex;
 }
 
-void SlideShow::setCurrentSlide (int index) {
+void SlideShow.setCurrentSlide (int index) {
     if (_currentIndex == index)
         return;
 
     if (!_animation) {
         _animation = new QVariantAnimation (this);
-        _animation->setDuration (SlideDuration);
-        _animation->setEasingCurve (QEasingCurve::OutCubic);
-        _animation->setStartValue (static_cast<qreal> (_currentIndex));
+        _animation.setDuration (SlideDuration);
+        _animation.setEasingCurve (QEasingCurve.OutCubic);
+        _animation.setStartValue (static_cast<qreal> (_currentIndex));
         connect (_animation.data (), SIGNAL (valueChanged (QVariant)), this, SLOT (update ()));
     }
-    _animation->setEndValue (static_cast<qreal> (index));
-    _animation->start (QAbstractAnimation::DeleteWhenStopped);
+    _animation.setEndValue (static_cast<qreal> (index));
+    _animation.start (QAbstractAnimation.DeleteWhenStopped);
 
     _reverse = index < _currentIndex;
     _currentIndex = index;
@@ -77,48 +77,48 @@ void SlideShow::setCurrentSlide (int index) {
     emit currentSlideChanged (index);
 }
 
-QSize SlideShow::sizeHint () const {
+QSize SlideShow.sizeHint () {
     QFontMetrics fm = fontMetrics ();
     QSize labelSize (0, fm.height ());
     for (QString &label : _labels) {
 #if (HASQT5_11)
-        labelSize.setWidth (std::max (fm.horizontalAdvance (label), labelSize.width ()));
+        labelSize.setWidth (std.max (fm.horizontalAdvance (label), labelSize.width ()));
 #else
-        labelSize.setWidth (std::max (fm.width (label), labelSize.width ()));
+        labelSize.setWidth (std.max (fm.width (label), labelSize.width ()));
 #endif
     }
     QSize pixmapSize;
     for (QPixmap &pixmap : _pixmaps) {
-        pixmapSize.setWidth (std::max (pixmap.width (), pixmapSize.width ()));
-        pixmapSize.setHeight (std::max (pixmap.height (), pixmapSize.height ()));
+        pixmapSize.setWidth (std.max (pixmap.width (), pixmapSize.width ()));
+        pixmapSize.setHeight (std.max (pixmap.height (), pixmapSize.height ()));
     }
     return {
-        std::max (labelSize.width (), pixmapSize.width ()),
+        std.max (labelSize.width (), pixmapSize.width ()),
         labelSize.height () + Spacing + pixmapSize.height ()
     };
 }
 
-void SlideShow::startShow (int interval) {
+void SlideShow.startShow (int interval) {
     if (interval > 0)
         _interval = interval;
     _timer.start (_interval, this);
 }
 
-void SlideShow::stopShow () {
+void SlideShow.stopShow () {
     _timer.stop ();
 }
 
-void SlideShow::nextSlide () {
+void SlideShow.nextSlide () {
     setCurrentSlide ( (_currentIndex + 1) % _labels.count ());
     _reverse = false;
 }
 
-void SlideShow::prevSlide () {
+void SlideShow.prevSlide () {
     setCurrentSlide ( (_currentIndex > 0 ? _currentIndex : _labels.count ()) - 1);
     _reverse = true;
 }
 
-void SlideShow::reset () {
+void SlideShow.reset () {
     stopShow ();
     _pixmaps.clear ();
     _labels.clear ();
@@ -126,22 +126,22 @@ void SlideShow::reset () {
     update ();
 }
 
-void SlideShow::mousePressEvent (QMouseEvent *event) {
-    _pressPoint = event->pos ();
+void SlideShow.mousePressEvent (QMouseEvent *event) {
+    _pressPoint = event.pos ();
 }
 
-void SlideShow::mouseReleaseEvent (QMouseEvent *event) {
-    if (!_animation && QLineF (_pressPoint, event->pos ()).length () < QGuiApplication::styleHints ()->startDragDistance ())
+void SlideShow.mouseReleaseEvent (QMouseEvent *event) {
+    if (!_animation && QLineF (_pressPoint, event.pos ()).length () < QGuiApplication.styleHints ().startDragDistance ())
         emit clicked ();
 }
 
-void SlideShow::paintEvent (QPaintEvent *) {
+void SlideShow.paintEvent (QPaintEvent *) {
     QPainter painter (this);
 
     if (_animation) {
-        int from = _animation->startValue ().toInt ();
-        int to = _animation->endValue ().toInt ();
-        qreal progress = _animation->easingCurve ().valueForProgress (_animation->currentTime () / static_cast<qreal> (_animation->duration ()));
+        int from = _animation.startValue ().toInt ();
+        int to = _animation.endValue ().toInt ();
+        qreal progress = _animation.easingCurve ().valueForProgress (_animation.currentTime () / static_cast<qreal> (_animation.duration ()));
 
         painter.save ();
         painter.setOpacity (1.0 - progress);
@@ -157,26 +157,26 @@ void SlideShow::paintEvent (QPaintEvent *) {
     }
 }
 
-void SlideShow::timerEvent (QTimerEvent *event) {
-    if (event->timerId () == _timer.timerId ())
+void SlideShow.timerEvent (QTimerEvent *event) {
+    if (event.timerId () == _timer.timerId ())
         nextSlide ();
 }
 
-void SlideShow::maybeRestartTimer () {
+void SlideShow.maybeRestartTimer () {
     if (!isActive ())
         return;
 
     startShow ();
 }
 
-void SlideShow::drawSlide (QPainter *painter, int index) {
+void SlideShow.drawSlide (QPainter *painter, int index) {
     QString label = _labels.value (index);
-    QRect labelRect = style ()->itemTextRect (fontMetrics (), rect (), Qt::AlignBottom | Qt::AlignHCenter, isEnabled (), label);
-    style ()->drawItemText (painter, labelRect, Qt::AlignCenter, palette (), isEnabled (), label, QPalette::WindowText);
+    QRect labelRect = style ().itemTextRect (fontMetrics (), rect (), Qt.AlignBottom | Qt.AlignHCenter, isEnabled (), label);
+    style ().drawItemText (painter, labelRect, Qt.AlignCenter, palette (), isEnabled (), label, QPalette.WindowText);
 
     QPixmap pixmap = _pixmaps.value (index);
-    QRect pixmapRect = style ()->itemPixmapRect (QRect (0, 0, width (), labelRect.top () - Spacing), Qt::AlignCenter, pixmap);
-    style ()->drawItemPixmap (painter, pixmapRect, Qt::AlignCenter, pixmap);
+    QRect pixmapRect = style ().itemPixmapRect (QRect (0, 0, width (), labelRect.top () - Spacing), Qt.AlignCenter, pixmap);
+    style ().drawItemPixmap (painter, pixmapRect, Qt.AlignCenter, pixmap);
 }
 
 } // namespace OCC

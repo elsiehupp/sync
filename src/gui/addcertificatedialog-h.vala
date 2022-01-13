@@ -40,7 +40,7 @@ private slots:
     void on_pushButtonBrowseCertificate_clicked ();
 
 private:
-    Ui::AddCertificateDialog *ui;
+    Ui.AddCertificateDialog *ui;
 };
 
 } //End namespace OCC

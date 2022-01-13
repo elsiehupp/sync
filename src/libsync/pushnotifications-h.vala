@@ -83,14 +83,14 @@ signals:
     /**
      * Will be emitted if push notifications are unable to authenticate
      *
-     * It's save to call #PushNotifications::setup () after this signal has been emitted.
+     * It's save to call #PushNotifications.setup () after this signal has been emitted.
      */
     void authenticationFailed ();
 
     /**
      * Will be emitted if push notifications are unable to connect or the connection timed out
      *
-     * It's save to call #PushNotifications::setup () after this signal has been emitted.
+     * It's save to call #PushNotifications.setup () after this signal has been emitted.
      */
     void connectionLost ();
 
@@ -98,7 +98,7 @@ private slots:
     void onWebSocketConnected ();
     void onWebSocketDisconnected ();
     void onWebSocketTextMessageReceived (QString &message);
-    void onWebSocketError (QAbstractSocket::SocketError error);
+    void onWebSocketError (QAbstractSocket.SocketError error);
     void onWebSocketSslErrors (QList<QSslError> &errors);
     void onWebSocketPongReceived (quint64 elapsedTime, QByteArray &payload);
     void onPingTimedOut ();

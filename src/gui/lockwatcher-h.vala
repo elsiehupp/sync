@@ -50,7 +50,7 @@ public:
     void addFile (QString &path);
 
     /** Adjusts the default interval for checking whether the lock is still present */
-    void setCheckInterval (std::chrono::milliseconds interval);
+    void setCheckInterval (std.chrono.milliseconds interval);
 
     /** Whether the path is being watched for lock-changes */
     bool contains (QString &path);

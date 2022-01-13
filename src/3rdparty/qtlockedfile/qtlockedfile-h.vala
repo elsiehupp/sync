@@ -62,8 +62,8 @@ public:
 
 private:
 #ifdef Q_OS_WIN
-    Qt::HANDLE m_semaphore_hnd;
-    Qt::HANDLE m_mutex_hnd;
+    Qt.HANDLE m_semaphore_hnd;
+    Qt.HANDLE m_mutex_hnd;
 #endif
     LockMode m_lock_mode;
 };

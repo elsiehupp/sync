@@ -45,7 +45,7 @@ class SyncJournalDb;
  * property retrieved from the server.
  *
  * Example: "ADLER32:1231 SHA1:ab124124 MD5:2131affa21"
- *       -> "SHA1:ab124124"
+ *       . "SHA1:ab124124"
  */
 OCSYNC_EXPORT QByteArray findBestChecksum (QByteArray &checksums);
 
@@ -99,7 +99,7 @@ public:
      * The device ownership transfers into the thread that
      * will compute the checksum. It must not have a parent.
      */
-    void start (std::unique_ptr<QIODevice> device);
+    void start (std.unique_ptr<QIODevice> device);
 
     /**
      * Computes the checksum synchronously.
@@ -118,7 +118,7 @@ private slots:
     void slotCalculationDone ();
 
 private:
-    void startImpl (std::unique_ptr<QIODevice> device);
+    void startImpl (std.unique_ptr<QIODevice> device);
 
     QByteArray _checksumType;
 
@@ -151,7 +151,7 @@ public:
      * The device ownership transfers into the thread that
      * will compute the checksum. It must not have a parent.
      */
-    void start (std::unique_ptr<QIODevice> device, QByteArray &checksumHeader);
+    void start (std.unique_ptr<QIODevice> device, QByteArray &checksumHeader);
 
 signals:
     void validated (QByteArray &checksumType, QByteArray &checksum);

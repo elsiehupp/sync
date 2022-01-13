@@ -157,7 +157,7 @@ Q_ENUM_NS (ItemType)
 }
 
 using namespace CSyncEnums;
-using CSYNC_STATUS = CSyncEnums::csync_status_codes_e;
+using CSYNC_STATUS = CSyncEnums.csync_status_codes_e;
 typedef struct csync_file_stat_s csync_file_stat_t;
 
 struct OCSYNC_EXPORT csync_file_stat_s {
@@ -165,7 +165,7 @@ struct OCSYNC_EXPORT csync_file_stat_s {
   int64_t size = 0;
   uint64_t inode = 0;
 
-  OCC::RemotePermissions remotePerm;
+  OCC.RemotePermissions remotePerm;
   ItemType type BITFIELD (4);
   bool child_modified BITFIELD (1);
   bool has_ignored_files BITFIELD (1); // Specify that a directory, or child directory contains ignored files.

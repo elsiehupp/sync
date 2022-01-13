@@ -177,14 +177,14 @@ public:
     /**
       * get an sync state icon
       */
-    virtual QIcon syncStateIcon (SyncResult::Status, bool sysTray = false) const;
+    virtual QIcon syncStateIcon (SyncResult.Status, bool sysTray = false) const;
 
     virtual QIcon folderDisabledIcon () const;
     virtual QIcon folderOfflineIcon (bool sysTray = false) const;
     virtual QIcon applicationIcon () const;
 #endif
 
-    virtual QString statusHeaderText (SyncResult::Status) const;
+    virtual QString statusHeaderText (SyncResult.Status) const;
     virtual QString version () const;
 
     /**
@@ -268,7 +268,7 @@ public:
     /**
      * Override to encforce a particular locale, i.e. "de" or "pt_BR"
      */
-    virtual QString enforcedLocale () const { return QString (); }
+    virtual QString enforcedLocale () { return QString (); }
 
     /** colored, white or black */
     QString systrayIconFlavor (bool mono) const;
@@ -389,7 +389,7 @@ public:
 
     /** @brief What to display as the userID (e.g. in the wizards)
      *
-     *  @return UserIDType::UserIDUserName, unless reimplemented
+     *  @return UserIDType.UserIDUserName, unless reimplemented
      */
     virtual UserIDType userIDType () const;
 

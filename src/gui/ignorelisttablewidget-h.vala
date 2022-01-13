@@ -31,6 +31,6 @@ private slots:
 private:
     void setupTableReadOnlyItems ();
     QString readOnlyTooltip;
-    Ui::IgnoreListTableWidget *ui;
+    Ui.IgnoreListTableWidget *ui;
 };
 } // namespace OCC

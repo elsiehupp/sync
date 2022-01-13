@@ -16,13 +16,13 @@
 
 using namespace OCC;
 
-SyncOptions::SyncOptions ()
+SyncOptions.SyncOptions ()
     : _vfs (new VfsOff) {
 }
 
-SyncOptions::~SyncOptions () = default;
+SyncOptions.~SyncOptions () = default;
 
-void SyncOptions::fillFromEnvironmentVariables () {
+void SyncOptions.fillFromEnvironmentVariables () {
     QByteArray chunkSizeEnv = qgetenv ("OWNCLOUD_CHUNK_SIZE");
     if (!chunkSizeEnv.isEmpty ())
         _initialChunkSize = chunkSizeEnv.toUInt ();
@@ -37,28 +37,28 @@ void SyncOptions::fillFromEnvironmentVariables () {
 
     QByteArray targetChunkUploadDurationEnv = qgetenv ("OWNCLOUD_TARGET_CHUNK_UPLOAD_DURATION");
     if (!targetChunkUploadDurationEnv.isEmpty ())
-        _targetChunkUploadDuration = std::chrono::milliseconds (targetChunkUploadDurationEnv.toUInt ());
+        _targetChunkUploadDuration = std.chrono.milliseconds (targetChunkUploadDurationEnv.toUInt ());
 
     int maxParallel = qgetenv ("OWNCLOUD_MAX_PARALLEL").toInt ();
     if (maxParallel > 0)
         _parallelNetworkJobs = maxParallel;
 }
 
-void SyncOptions::verifyChunkSizes () {
+void SyncOptions.verifyChunkSizes () {
     _minChunkSize = qMin (_minChunkSize, _initialChunkSize);
     _maxChunkSize = qMax (_maxChunkSize, _initialChunkSize);
 }
 
-QRegularExpression SyncOptions::fileRegex () const {
+QRegularExpression SyncOptions.fileRegex () {
     return _fileRegex;
 }
 
-void SyncOptions::setFilePattern (QString &pattern) {
+void SyncOptions.setFilePattern (QString &pattern) {
     // full match or a path ending with this pattern
     setPathPattern (QStringLiteral (" (^|/|\\\\)") + pattern + QLatin1Char ('$'));
 }
 
-void SyncOptions::setPathPattern (QString &pattern) {
-    _fileRegex.setPatternOptions (Utility::fsCasePreserving () ? QRegularExpression::CaseInsensitiveOption : QRegularExpression::NoPatternOption);
+void SyncOptions.setPathPattern (QString &pattern) {
+    _fileRegex.setPatternOptions (Utility.fsCasePreserving () ? QRegularExpression.CaseInsensitiveOption : QRegularExpression.NoPatternOption);
     _fileRegex.setPattern (pattern);
 }

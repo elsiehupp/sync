@@ -41,12 +41,12 @@ class UnifiedSearchResultsListModel : public QAbstractListModel {
         qint32 _cursor = -1; // current pagination value
         qint32 _pageSize = -1; // how many max items per step of pagination
         bool _isPaginated = false;
-        qint32 _order = std::numeric_limits<qint32>::max (); // sorting order (smaller number has bigger priority)
+        qint32 _order = std.numeric_limits<qint32>.max (); // sorting order (smaller number has bigger priority)
     };
 
 public:
     enum DataRole {
-        ProviderNameRole = Qt::UserRole + 1,
+        ProviderNameRole = Qt.UserRole + 1,
         ProviderIdRole,
         ImagePlaceholderRole,
         IconsRole,
@@ -115,7 +115,7 @@ private:
 
     QString _currentFetchMoreInProgressProviderId;
 
-    QMap<QString, QMetaObject::Connection> _searchJobConnections;
+    QMap<QString, QMetaObject.Connection> _searchJobConnections;
 
     QTimer _unifiedSearchTextEditingFinishedTimer;
 

@@ -41,9 +41,9 @@ static void setupFavLink_private (QString &folder) {
         qCWarning (lcUtility) << desktopIni.fileName () << "already exists, not overwriting it to set the folder icon.";
     } else {
         qCInfo (lcUtility) << "Creating" << desktopIni.fileName () << "to set a folder icon in Explorer.";
-        desktopIni.open (QFile::WriteOnly);
+        desktopIni.open (QFile.WriteOnly);
         desktopIni.write ("[.ShellClassInfo]\r\nIconResource=");
-        desktopIni.write (QDir::toNativeSeparators (qApp->applicationFilePath ()).toUtf8 ());
+        desktopIni.write (QDir.toNativeSeparators (qApp.applicationFilePath ()).toUtf8 ());
 #ifdef APPLICATION_FOLDER_ICON_INDEX
         const auto iconIndex = APPLICATION_FOLDER_ICON_INDEX;
 #else
@@ -63,18 +63,18 @@ static void setupFavLink_private (QString &folder) {
 
     // Windows Explorer: Place under "Favorites" (Links)
     QString linkName;
-    QDir folderDir (QDir::fromNativeSeparators (folder));
+    QDir folderDir (QDir.fromNativeSeparators (folder));
 
     /* Use new WINAPI functions */
     PWSTR path;
 
     if (SHGetKnownFolderPath (FOLDERID_Links, 0, nullptr, &path) == S_OK) {
-        QString links = QDir::fromNativeSeparators (QString::fromWCharArray (path));
+        QString links = QDir.fromNativeSeparators (QString.fromWCharArray (path));
         linkName = QDir (links).filePath (folderDir.dirName () + QLatin1String (".lnk"));
         CoTaskMemFree (path);
     }
     qCInfo (lcUtility) << "Creating favorite link from" << folder << "to" << linkName;
-    if (!QFile::link (folder, linkName))
+    if (!QFile.link (folder, linkName))
         qCWarning (lcUtility) << "linking" << folder << "to" << linkName << "failed!";
 }
 
@@ -82,7 +82,7 @@ static void removeFavLink_private (QString &folder) {
     const QDir folderDir (folder);
 
     // #1 Remove the Desktop.ini to reset the folder icon
-    if (!QFile::remove (folderDir.absoluteFilePath (QLatin1String ("Desktop.ini")))) {
+    if (!QFile.remove (folderDir.absoluteFilePath (QLatin1String ("Desktop.ini")))) {
         qCWarning (lcUtility) << "Remove Desktop.ini from" << folder
                              << " has failed. Make sure it exists and is not locked by another process.";
     }
@@ -100,35 +100,35 @@ static void removeFavLink_private (QString &folder) {
         return;
     }
 
-    const QDir links (QString::fromWCharArray (path));
+    const QDir links (QString.fromWCharArray (path));
     CoTaskMemFree (path);
 
     const auto linkName = QDir (links).absoluteFilePath (folderDir.dirName () + QLatin1String (".lnk"));
 
     qCInfo (lcUtility) << "Removing favorite link from" << folder << "to" << linkName;
-    if (!QFile::remove (linkName)) {
+    if (!QFile.remove (linkName)) {
         qCWarning (lcUtility) << "Removing a favorite link from" << folder << "to" << linkName << "failed.";
     }
 }
 
 bool hasSystemLaunchOnStartup_private (QString &appName) {
     QString runPath = QLatin1String (systemRunPathC);
-    QSettings settings (runPath, QSettings::NativeFormat);
+    QSettings settings (runPath, QSettings.NativeFormat);
     return settings.contains (appName);
 }
 
 bool hasLaunchOnStartup_private (QString &appName) {
     QString runPath = QLatin1String (runPathC);
-    QSettings settings (runPath, QSettings::NativeFormat);
+    QSettings settings (runPath, QSettings.NativeFormat);
     return settings.contains (appName);
 }
 
 void setLaunchOnStartup_private (QString &appName, QString &guiName, bool enable) {
     Q_UNUSED (guiName);
     QString runPath = QLatin1String (runPathC);
-    QSettings settings (runPath, QSettings::NativeFormat);
+    QSettings settings (runPath, QSettings.NativeFormat);
     if (enable) {
-        settings.setValue (appName, QDir::toNativeSeparators (QCoreApplication::applicationFilePath ()));
+        settings.setValue (appName, QDir.toNativeSeparators (QCoreApplication.applicationFilePath ()));
     } else {
         settings.remove (appName);
     }
@@ -136,7 +136,7 @@ void setLaunchOnStartup_private (QString &appName, QString &guiName, bool enable
 
 // TODO: Right now only detection on toggle/startup, not when windows theme is switched while nextcloud is running
 static inline bool hasDarkSystray_private () {
-    if (Utility::registryGetKeyValue (    HKEY_CURRENT_USER,
+    if (Utility.registryGetKeyValue (    HKEY_CURRENT_USER,
                                         QStringLiteral (R" (Software\Microsoft\Windows\CurrentVersion\Themes\Personalize)"),
                                         QStringLiteral ("SystemUsesLightTheme") ) == 1) {
         return false;
@@ -146,7 +146,7 @@ static inline bool hasDarkSystray_private () {
     }
 }
 
-QRect Utility::getTaskbarDimensions () {
+QRect Utility.getTaskbarDimensions () {
     APPBARDATA barData;
     barData.cbSize = sizeof (APPBARDATA);
 
@@ -159,7 +159,7 @@ QRect Utility::getTaskbarDimensions () {
     return QRect (barRect.left, barRect.top, (barRect.right - barRect.left), (barRect.bottom - barRect.top));
 }
 
-bool Utility::registryKeyExists (HKEY hRootKey, QString &subKey) {
+bool Utility.registryKeyExists (HKEY hRootKey, QString &subKey) {
     HKEY hKey;
 
     REGSAM sam = KEY_READ | KEY_WOW64_64KEY;
@@ -169,7 +169,7 @@ bool Utility::registryKeyExists (HKEY hRootKey, QString &subKey) {
     return result != ERROR_FILE_NOT_FOUND;
 }
 
-QVariant Utility::registryGetKeyValue (HKEY hRootKey, QString &subKey, QString &valueName) {
+QVariant Utility.registryGetKeyValue (HKEY hRootKey, QString &subKey, QString &valueName) {
     QVariant value;
 
     HKEY hKey;
@@ -229,7 +229,7 @@ QVariant Utility::registryGetKeyValue (HKEY hRootKey, QString &subKey, QString &
     return value;
 }
 
-bool Utility::registrySetKeyValue (HKEY hRootKey, QString &subKey, QString &valueName, DWORD type, QVariant &value) {
+bool Utility.registrySetKeyValue (HKEY hRootKey, QString &subKey, QString &valueName, DWORD type, QVariant &value) {
     HKEY hKey;
     // KEY_WOW64_64KEY is necessary because CLSIDs are "Redirected and reflected only for CLSIDs that do not specify InprocServer32 or InprocHandler32."
     // https://msdn.microsoft.com/en-us/library/windows/desktop/aa384253%28v=vs.85%29.aspx#redirected__shared__and_reflected_keys_under_wow64
@@ -263,7 +263,7 @@ bool Utility::registrySetKeyValue (HKEY hRootKey, QString &subKey, QString &valu
     return result == ERROR_SUCCESS;
 }
 
-bool Utility::registryDeleteKeyTree (HKEY hRootKey, QString &subKey) {
+bool Utility.registryDeleteKeyTree (HKEY hRootKey, QString &subKey) {
     HKEY hKey;
     REGSAM sam = DELETE | KEY_ENUMERATE_SUB_KEYS | KEY_QUERY_VALUE | KEY_SET_VALUE | KEY_WOW64_64KEY;
     LONG result = RegOpenKeyEx (hRootKey, reinterpret_cast<LPCWSTR> (subKey.utf16 ()), 0, sam, &hKey);
@@ -281,7 +281,7 @@ bool Utility::registryDeleteKeyTree (HKEY hRootKey, QString &subKey) {
     return result == ERROR_SUCCESS;
 }
 
-bool Utility::registryDeleteKeyValue (HKEY hRootKey, QString &subKey, QString &valueName) {
+bool Utility.registryDeleteKeyValue (HKEY hRootKey, QString &subKey, QString &valueName) {
     HKEY hKey;
     REGSAM sam = KEY_WRITE | KEY_WOW64_64KEY;
     LONG result = RegOpenKeyEx (hRootKey, reinterpret_cast<LPCWSTR> (subKey.utf16 ()), 0, sam, &hKey);
@@ -296,7 +296,7 @@ bool Utility::registryDeleteKeyValue (HKEY hRootKey, QString &subKey, QString &v
     return result == ERROR_SUCCESS;
 }
 
-bool Utility::registryWalkSubKeys (HKEY hRootKey, QString &subKey, std::function<void (HKEY, QString &)> &callback) {
+bool Utility.registryWalkSubKeys (HKEY hRootKey, QString &subKey, std.function<void (HKEY, QString &)> &callback) {
     HKEY hKey;
     REGSAM sam = KEY_READ | KEY_WOW64_64KEY;
     LONG result = RegOpenKeyEx (hRootKey, reinterpret_cast<LPCWSTR> (subKey.utf16 ()), 0, sam, &hKey);
@@ -337,36 +337,36 @@ bool Utility::registryWalkSubKeys (HKEY hRootKey, QString &subKey, std::function
     return retCode != ERROR_NO_MORE_ITEMS;
 }
 
-DWORD Utility::convertSizeToDWORD (size_t &convertVar) {
+DWORD Utility.convertSizeToDWORD (size_t &convertVar) {
     if ( convertVar > UINT_MAX ) {
-        //throw std::bad_cast ();
+        //throw std.bad_cast ();
         convertVar = UINT_MAX; // intentionally default to wrong value here to not crash: exception handling TBD
     }
     return static_cast<DWORD> (convertVar);
 }
 
-void Utility::UnixTimeToFiletime (time_t t, FILETIME *filetime) {
+void Utility.UnixTimeToFiletime (time_t t, FILETIME *filetime) {
     LONGLONG ll = Int32x32To64 (t, 10000000) + 116444736000000000;
-    filetime->dwLowDateTime = (DWORD) ll;
-    filetime->dwHighDateTime = ll >>32;
+    filetime.dwLowDateTime = (DWORD) ll;
+    filetime.dwHighDateTime = ll >>32;
 }
 
-void Utility::FiletimeToLargeIntegerFiletime (FILETIME *filetime, LARGE_INTEGER *hundredNSecs) {
-    hundredNSecs->LowPart = filetime->dwLowDateTime;
-    hundredNSecs->HighPart = filetime->dwHighDateTime;
+void Utility.FiletimeToLargeIntegerFiletime (FILETIME *filetime, LARGE_INTEGER *hundredNSecs) {
+    hundredNSecs.LowPart = filetime.dwLowDateTime;
+    hundredNSecs.HighPart = filetime.dwHighDateTime;
 }
 
-void Utility::UnixTimeToLargeIntegerFiletime (time_t t, LARGE_INTEGER *hundredNSecs) {
+void Utility.UnixTimeToLargeIntegerFiletime (time_t t, LARGE_INTEGER *hundredNSecs) {
     LONGLONG ll = Int32x32To64 (t, 10000000) + 116444736000000000;
-    hundredNSecs->LowPart = (DWORD) ll;
-    hundredNSecs->HighPart = ll >>32;
+    hundredNSecs.LowPart = (DWORD) ll;
+    hundredNSecs.HighPart = ll >>32;
 }
 
-QString Utility::formatWinError (long errorCode) {
-    return QStringLiteral ("WindowsError: %1: %2").arg (QString::number (errorCode, 16), QString::fromWCharArray (_com_error (errorCode).ErrorMessage ()));
+QString Utility.formatWinError (long errorCode) {
+    return QStringLiteral ("WindowsError: %1: %2").arg (QString.number (errorCode, 16), QString.fromWCharArray (_com_error (errorCode).ErrorMessage ()));
 }
 
-QString Utility::getCurrentUserName () {
+QString Utility.getCurrentUserName () {
     TCHAR username[UNLEN + 1] = {0};
     DWORD len = sizeof (username) / sizeof (TCHAR);
 
@@ -374,14 +374,14 @@ QString Utility::getCurrentUserName () {
         qCWarning (lcUtility) << "Could not retrieve Windows user name." << formatWinError (GetLastError ());
     }
 
-    return QString::fromWCharArray (username);
+    return QString.fromWCharArray (username);
 }
 
-Utility::NtfsPermissionLookupRAII::NtfsPermissionLookupRAII () {
+Utility.NtfsPermissionLookupRAII.NtfsPermissionLookupRAII () {
     qt_ntfs_permission_lookup++;
 }
 
-Utility::NtfsPermissionLookupRAII::~NtfsPermissionLookupRAII () {
+Utility.NtfsPermissionLookupRAII.~NtfsPermissionLookupRAII () {
     qt_ntfs_permission_lookup--;
 }
 

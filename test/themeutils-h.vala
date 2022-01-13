@@ -19,14 +19,14 @@
 
 class FakePaintDevice : public QPaintDevice {
 public:
-    FakePaintDevice();
+    FakePaintDevice ();
 
-    QPaintEngine *paintEngine() const override;
+    QPaintEngine *paintEngine () const override;
 
-    void setHidpi(bool value);
+    void setHidpi (bool value);
 
 protected:
-    int metric(QPaintDevice::PaintDeviceMetric metric) const override;
+    int metric (QPaintDevice.PaintDeviceMetric metric) const override;
 
 private:
     bool _hidpi = false;

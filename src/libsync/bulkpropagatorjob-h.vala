@@ -54,7 +54,7 @@ class BulkPropagatorJob : public PropagatorJob {
 
 public:
     explicit BulkPropagatorJob (OwncloudPropagator *propagator,
-                               const std::deque<SyncFileItemPtr> &items);
+                               const std.deque<SyncFileItemPtr> &items);
 
     bool scheduleSelfOrChild () override;
 
@@ -75,7 +75,7 @@ private slots:
 
     // invoked on internal error to unlock a folder and faile
     void slotOnErrorStartFolderUnlock (SyncFileItemPtr item,
-                                      SyncFileItem::Status status,
+                                      SyncFileItem.Status status,
                                       const QString &errorString);
 
     void slotPutFinished ();
@@ -97,23 +97,23 @@ private:
     void finalizeOneFile (BulkUploadItem &oneFile);
 
     void slotPutFinishedOneFile (BulkUploadItem &singleFile,
-                                OCC::PutMultiFileJob *job,
+                                OCC.PutMultiFileJob *job,
                                 const QJsonObject &fullReplyObject);
 
     void done (SyncFileItemPtr item,
-              SyncFileItem::Status status,
+              SyncFileItem.Status status,
               const QString &errorString);
 
     /** Bases headers that need to be sent on the PUT, or in the MOVE for chunking-ng */
     QMap<QByteArray, QByteArray> headers (SyncFileItemPtr item) const;
 
     void abortWithError (SyncFileItemPtr item,
-                        SyncFileItem::Status status,
+                        SyncFileItem.Status status,
                         const QString &error);
 
     /**
      * Checks whether the current error is one that should reset the whole
-     * transfer if it happens too often. If so: Bump UploadInfo::errorCount
+     * transfer if it happens too often. If so: Bump UploadInfo.errorCount
      * and maybe perform the reset.
      */
     void checkResettingErrors (SyncFileItemPtr item) const;
@@ -141,21 +141,21 @@ private:
     void handleBulkUploadBlackList (SyncFileItemPtr item) const;
 
     void handleJobDoneErrors (SyncFileItemPtr item,
-                             SyncFileItem::Status status);
+                             SyncFileItem.Status status);
 
     void triggerUpload ();
 
     void checkPropagationIsDone ();
 
-    std::deque<SyncFileItemPtr> _items;
+    std.deque<SyncFileItemPtr> _items;
 
     QVector<AbstractNetworkJob *> _jobs; /// network jobs that are currently in transit
 
     QSet<QString> _pendingChecksumFiles;
 
-    std::vector<BulkUploadItem> _filesToUpload;
+    std.vector<BulkUploadItem> _filesToUpload;
 
-    SyncFileItem::Status _finalStatus = SyncFileItem::Status::NoStatus;
+    SyncFileItem.Status _finalStatus = SyncFileItem.Status.NoStatus;
 };
 
 }

@@ -12,24 +12,24 @@
  * for more details.
  */
 
-FakePaintDevice::FakePaintDevice() = default;
+FakePaintDevice.FakePaintDevice () = default;
 
-QPaintEngine *FakePaintDevice::paintEngine() const {
+QPaintEngine *FakePaintDevice.paintEngine () {
     return nullptr;
 }
 
-void FakePaintDevice::setHidpi(bool value) {
+void FakePaintDevice.setHidpi (bool value) {
     _hidpi = value;
 }
 
-int FakePaintDevice::metric(QPaintDevice::PaintDeviceMetric metric) const {
+int FakePaintDevice.metric (QPaintDevice.PaintDeviceMetric metric) {
     switch (metric) {
-    case QPaintDevice::PdmDevicePixelRatio:
+    case QPaintDevice.PdmDevicePixelRatio:
         if (_hidpi) {
             return 2;
         }
         return 1;
     default:
-        return QPaintDevice::metric(metric);
+        return QPaintDevice.metric (metric);
     }
 }

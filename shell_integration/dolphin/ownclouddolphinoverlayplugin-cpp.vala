@@ -33,23 +33,23 @@ class OwncloudDolphinPlugin : public KOverlayIconPlugin {
 public:
 
     OwncloudDolphinPlugin () {
-        auto helper = OwncloudDolphinPluginHelper::instance ();
-        QObject::connect (helper, &OwncloudDolphinPluginHelper::commandRecieved,
-                         this, &OwncloudDolphinPlugin::slotCommandRecieved);
+        auto helper = OwncloudDolphinPluginHelper.instance ();
+        QObject.connect (helper, &OwncloudDolphinPluginHelper.commandRecieved,
+                         this, &OwncloudDolphinPlugin.slotCommandRecieved);
     }
 
     QStringList getOverlays (QUrl& url) override {
-        auto helper = OwncloudDolphinPluginHelper::instance ();
-        if (!helper->isConnected ())
+        auto helper = OwncloudDolphinPluginHelper.instance ();
+        if (!helper.isConnected ())
             return QStringList ();
         if (!url.isLocalFile ())
             return QStringList ();
         QDir localPath (url.toLocalFile ());
         const QByteArray localFile = localPath.canonicalPath ().toUtf8 ();
 
-        helper->sendCommand (QByteArray ("RETRIEVE_FILE_STATUS:" + localFile + "\n"));
+        helper.sendCommand (QByteArray ("RETRIEVE_FILE_STATUS:" + localFile + "\n"));
 
-        StatusMap::iterator it = m_status.find (localFile);
+        StatusMap.iterator it = m_status.find (localFile);
         if (it != m_status.constEnd ()) {
             return  overlaysForString (*it);
         }
@@ -95,7 +95,7 @@ private:
             return;
         status = tokens[1];
 
-        emit overlaysChanged (QUrl::fromLocalFile (QString::fromUtf8 (name)), overlaysForString (status));
+        emit overlaysChanged (QUrl.fromLocalFile (QString.fromUtf8 (name)), overlaysForString (status));
     }
 };
 

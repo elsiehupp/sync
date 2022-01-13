@@ -31,16 +31,16 @@ class Share : public QObject {
 public:
     /**
      * Possible share types
-     * Need to be in sync with Sharee::Type
+     * Need to be in sync with Sharee.Type
      */
     enum ShareType {
-        TypeUser = Sharee::User,
-        TypeGroup = Sharee::Group,
+        TypeUser = Sharee.User,
+        TypeGroup = Sharee.Group,
         TypeLink = 3,
-        TypeEmail = Sharee::Email,
-        TypeRemote = Sharee::Federated,
-        TypeCircle = Sharee::Circle,
-        TypeRoom = Sharee::Room
+        TypeEmail = Sharee.Email,
+        TypeRemote = Sharee.Federated,
+        TypeCircle = Sharee.Circle,
+        TypeRoom = Sharee.Room
     };
 
     using Permissions = SharePermissions;
@@ -343,9 +343,9 @@ public:
      * In case of a server error the serverError signal is emitted
      */
     void createShare (QString &path,
-        const Share::ShareType shareType,
+        const Share.ShareType shareType,
         const QString shareWith,
-        const Share::Permissions permissions,
+        const Share.Permissions permissions,
         const QString &password = "");
 
     /**

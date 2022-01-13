@@ -70,7 +70,7 @@ public:
     };
 
     /// The actual current connectivity status.
-    using ConnectionStatus = ConnectionValidator::Status;
+    using ConnectionStatus = ConnectionValidator.Status;
 
     /// Use the account as parent
     explicit AccountState (AccountPtr account);
@@ -121,7 +121,7 @@ public:
     bool isConnected () const;
 
     /** Returns a new settings object for this account, already in the right groups. */
-    std::unique_ptr<QSettings> settings ();
+    std.unique_ptr<QSettings> settings ();
 
     /** Mark the timestamp when the last successful ETag check happened for
      *  this account.
@@ -180,7 +180,7 @@ signals:
     void desktopNotificationsAllowedChanged ();
 
 protected Q_SLOTS:
-    void slotConnectionValidatorResult (ConnectionValidator::Status status, QStringList &errors);
+    void slotConnectionValidatorResult (ConnectionValidator.Status status, QStringList &errors);
 
     /// When client gets a 401 or 403 checks if server requested remote wipe
     /// before asking for user credentials again
@@ -218,7 +218,7 @@ private:
 
     /**
      * Connects remote wipe check with the account
-     * the log out triggers the check (loads app password -> create request)
+     * the log out triggers the check (loads app password . create request)
      */
     RemoteWipe *_remoteWipe;
 
@@ -251,7 +251,7 @@ private:
 
 }
 
-Q_DECLARE_METATYPE (OCC::AccountState *)
-Q_DECLARE_METATYPE (OCC::AccountStatePtr)
+Q_DECLARE_METATYPE (OCC.AccountState *)
+Q_DECLARE_METATYPE (OCC.AccountStatePtr)
 
 #endif //ACCOUNTINFO_H

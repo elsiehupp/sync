@@ -22,17 +22,17 @@ namespace OCC {
 
 Q_LOGGING_CATEGORY (lcUpdater, "nextcloud.gui.updater", QtInfoMsg)
 
-Updater *Updater::_instance = nullptr;
+Updater *Updater._instance = nullptr;
 
-Updater *Updater::instance () {
+Updater *Updater.instance () {
     if (!_instance) {
         _instance = create ();
     }
     return _instance;
 }
 
-QUrl Updater::updateUrl () {
-    QUrl updateBaseUrl (QString::fromLocal8Bit (qgetenv ("OCC_UPDATE_URL")));
+QUrl Updater.updateUrl () {
+    QUrl updateBaseUrl (QString.fromLocal8Bit (qgetenv ("OCC_UPDATE_URL")));
     if (updateBaseUrl.isEmpty ()) {
         updateBaseUrl = QUrl (QLatin1String (APPLICATION_UPDATE_URL));
     }
@@ -55,17 +55,17 @@ QUrl Updater::updateUrl () {
     return updateBaseUrl;
 }
 
-QUrlQuery Updater::getQueryParams () {
+QUrlQuery Updater.getQueryParams () {
     QUrlQuery query;
-    Theme *theme = Theme::instance ();
+    Theme *theme = Theme.instance ();
     QString platform = QStringLiteral ("stranger");
-    if (Utility::isLinux ()) {
+    if (Utility.isLinux ()) {
         platform = QStringLiteral ("linux");
-    } else if (Utility::isBSD ()) {
+    } else if (Utility.isBSD ()) {
         platform = QStringLiteral ("bsd");
-    } else if (Utility::isWindows ()) {
+    } else if (Utility.isWindows ()) {
         platform = QStringLiteral ("win32");
-    } else if (Utility::isMac ()) {
+    } else if (Utility.isMac ()) {
         platform = QStringLiteral ("macos");
     }
 
@@ -75,12 +75,12 @@ QUrlQuery Updater::getQueryParams () {
     }
     query.addQueryItem (QStringLiteral ("version"), clientVersion ());
     query.addQueryItem (QStringLiteral ("platform"), platform);
-    query.addQueryItem (QStringLiteral ("osRelease"), QSysInfo::productType ());
-    query.addQueryItem (QStringLiteral ("osVersion"), QSysInfo::productVersion ());
-    query.addQueryItem (QStringLiteral ("kernelVersion"), QSysInfo::kernelVersion ());
-    query.addQueryItem (QStringLiteral ("oem"), theme->appName ());
-    query.addQueryItem (QStringLiteral ("buildArch"), QSysInfo::buildCpuArchitecture ());
-    query.addQueryItem (QStringLiteral ("currentArch"), QSysInfo::currentCpuArchitecture ());
+    query.addQueryItem (QStringLiteral ("osRelease"), QSysInfo.productType ());
+    query.addQueryItem (QStringLiteral ("osVersion"), QSysInfo.productVersion ());
+    query.addQueryItem (QStringLiteral ("kernelVersion"), QSysInfo.kernelVersion ());
+    query.addQueryItem (QStringLiteral ("oem"), theme.appName ());
+    query.addQueryItem (QStringLiteral ("buildArch"), QSysInfo.buildCpuArchitecture ());
+    query.addQueryItem (QStringLiteral ("currentArch"), QSysInfo.currentCpuArchitecture ());
 
     QString suffix = QStringLiteral (MIRALL_STRINGIFY (MIRALL_VERSION_SUFFIX));
     query.addQueryItem (QStringLiteral ("versionsuffix"), suffix);
@@ -93,12 +93,12 @@ QUrlQuery Updater::getQueryParams () {
     // updateSegment (see configfile.h)
     ConfigFile cfg;
     auto updateSegment = cfg.updateSegment ();
-    query.addQueryItem (QLatin1String ("updatesegment"), QString::number (updateSegment));
+    query.addQueryItem (QLatin1String ("updatesegment"), QString.number (updateSegment));
 
     return query;
 }
 
-QString Updater::getSystemInfo () {
+QString Updater.getSystemInfo () {
 #ifdef Q_OS_LINUX
     QProcess process;
     process.start (QLatin1String ("lsb_release"), { QStringLiteral ("-a") });
@@ -108,14 +108,14 @@ QString Updater::getSystemInfo () {
     if (output.length () > 1024)
         output.clear (); // don't send too much.
 
-    return QString::fromLocal8Bit (output.toBase64 ());
+    return QString.fromLocal8Bit (output.toBase64 ());
 #else
     return QString ();
 #endif
 }
 
 // To test, cmake with -DAPPLICATION_UPDATE_URL="http://127.0.0.1:8080/test.rss"
-Updater *Updater::create () {
+Updater *Updater.create () {
     auto url = updateUrl ();
     qCDebug (lcUpdater) << url;
     if (url.isEmpty ()) {
@@ -134,16 +134,16 @@ Updater *Updater::create () {
 #endif
 }
 
-qint64 Updater::Helper::versionToInt (qint64 major, qint64 minor, qint64 patch, qint64 build) {
+qint64 Updater.Helper.versionToInt (qint64 major, qint64 minor, qint64 patch, qint64 build) {
     return major << 56 | minor << 48 | patch << 40 | build;
 }
 
-qint64 Updater::Helper::currentVersionToInt () {
+qint64 Updater.Helper.currentVersionToInt () {
     return versionToInt (MIRALL_VERSION_MAJOR, MIRALL_VERSION_MINOR,
         MIRALL_VERSION_PATCH, MIRALL_VERSION_BUILD);
 }
 
-qint64 Updater::Helper::stringVersionToInt (QString &version) {
+qint64 Updater.Helper.stringVersionToInt (QString &version) {
     if (version.isEmpty ())
         return 0;
     QByteArray baVersion = version.toLatin1 ();
@@ -152,8 +152,8 @@ qint64 Updater::Helper::stringVersionToInt (QString &version) {
     return versionToInt (major, minor, patch, build);
 }
 
-QString Updater::clientVersion () {
-    return QString::fromLatin1 (MIRALL_STRINGIFY (MIRALL_VERSION_FULL));
+QString Updater.clientVersion () {
+    return QString.fromLatin1 (MIRALL_STRINGIFY (MIRALL_VERSION_FULL));
 }
 
 } // namespace OCC

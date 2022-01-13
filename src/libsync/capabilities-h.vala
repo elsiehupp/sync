@@ -118,7 +118,7 @@ public:
      * List of HTTP error codes should be guaranteed to eventually reset
      * failing chunked uploads.
      *
-     * The resetting works by tracking UploadInfo::errorCount.
+     * The resetting works by tracking UploadInfo.errorCount.
      *
      * Note that other error codes than the ones listed here may reset the
      * upload as well.

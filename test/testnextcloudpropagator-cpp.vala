@@ -9,66 +9,66 @@
 
 using namespace OCC;
 namespace OCC {
-QString OWNCLOUDSYNC_EXPORT createDownloadTmpFileName(QString &previous);
+QString OWNCLOUDSYNC_EXPORT createDownloadTmpFileName (QString &previous);
 }
 
 class TestNextcloudPropagator : public QObject {
 
 private slots:
-    void testUpdateErrorFromSession() {
-        //OwncloudPropagator propagator(nullptr, QLatin1String("test1"), QLatin1String("test2"), new ProgressDatabase);
-        QVERIFY( true );
+    void testUpdateErrorFromSession () {
+        //OwncloudPropagator propagator (nullptr, QLatin1String ("test1"), QLatin1String ("test2"), new ProgressDatabase);
+        QVERIFY ( true );
     }
 
-    void testTmpDownloadFileNameGeneration() {
+    void testTmpDownloadFileNameGeneration () {
         QString fn;
         // without dir
         for (int i = 1; i <= 1000; i++) {
             fn+="F";
-            QString tmpFileName = createDownloadTmpFileName(fn);
-            if (tmpFileName.contains('/')) {
-                tmpFileName = tmpFileName.mid(tmpFileName.lastIndexOf('/')+1);
+            QString tmpFileName = createDownloadTmpFileName (fn);
+            if (tmpFileName.contains ('/')) {
+                tmpFileName = tmpFileName.mid (tmpFileName.lastIndexOf ('/')+1);
             }
-            QVERIFY( tmpFileName.length() > 0);
-            QVERIFY( tmpFileName.length() <= 254);
+            QVERIFY ( tmpFileName.length () > 0);
+            QVERIFY ( tmpFileName.length () <= 254);
         }
         // with absolute dir
         fn = "/Users/guruz/ownCloud/rocks/GPL";
         for (int i = 1; i < 1000; i++) {
             fn+="F";
-            QString tmpFileName = createDownloadTmpFileName(fn);
-            if (tmpFileName.contains('/')) {
-                tmpFileName = tmpFileName.mid(tmpFileName.lastIndexOf('/')+1);
+            QString tmpFileName = createDownloadTmpFileName (fn);
+            if (tmpFileName.contains ('/')) {
+                tmpFileName = tmpFileName.mid (tmpFileName.lastIndexOf ('/')+1);
             }
-            QVERIFY( tmpFileName.length() > 0);
-            QVERIFY( tmpFileName.length() <= 254);
+            QVERIFY ( tmpFileName.length () > 0);
+            QVERIFY ( tmpFileName.length () <= 254);
         }
         // with relative dir
         fn = "rocks/GPL";
         for (int i = 1; i < 1000; i++) {
             fn+="F";
-            QString tmpFileName = createDownloadTmpFileName(fn);
-            if (tmpFileName.contains('/')) {
-                tmpFileName = tmpFileName.mid(tmpFileName.lastIndexOf('/')+1);
+            QString tmpFileName = createDownloadTmpFileName (fn);
+            if (tmpFileName.contains ('/')) {
+                tmpFileName = tmpFileName.mid (tmpFileName.lastIndexOf ('/')+1);
             }
-            QVERIFY( tmpFileName.length() > 0);
-            QVERIFY( tmpFileName.length() <= 254);
+            QVERIFY ( tmpFileName.length () > 0);
+            QVERIFY ( tmpFileName.length () <= 254);
         }
     }
 
-    void testParseEtag() {
+    void testParseEtag () {
         using Test = QPair<const char*, char*>;
         QList<Test> tests;
-        tests.append(Test("\"abcd\"", "abcd"));
-        tests.append(Test("\"\"", ""));
-        tests.append(Test("\"fii\"-gzip", "fii"));
-        tests.append(Test("W/\"foo\"", "foo"));
+        tests.append (Test ("\"abcd\"", "abcd"));
+        tests.append (Test ("\"\"", ""));
+        tests.append (Test ("\"fii\"-gzip", "fii"));
+        tests.append (Test ("W/\"foo\"", "foo"));
 
         foreach (auto& test, tests) {
-            QCOMPARE(parseEtag(test.first), QByteArray(test.second));
+            QCOMPARE (parseEtag (test.first), QByteArray (test.second));
         }
     }
 };
 
-QTEST_APPLESS_MAIN(TestNextcloudPropagator)
+QTEST_APPLESS_MAIN (TestNextcloudPropagator)
 #include "testnextcloudpropagator.moc"

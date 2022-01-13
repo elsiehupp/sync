@@ -47,7 +47,7 @@ static void removeFavLink_private (QString &folder) {
 bool hasLaunchOnStartup_private (QString &) {
     // this is quite some duplicate code with setLaunchOnStartup, at some point we should fix this FIXME.
     bool returnValue = false;
-    QString filePath = QDir (QCoreApplication::applicationDirPath () + QLatin1String ("/../..")).absolutePath ();
+    QString filePath = QDir (QCoreApplication.applicationDirPath () + QLatin1String ("/../..")).absolutePath ();
     CFStringRef folderCFStr = CFStringCreateWithCString (0, filePath.toUtf8 ().data (), kCFStringEncodingUTF8);
     CFURLRef urlRef = CFURLCreateWithFileSystemPath (0, folderCFStr, kCFURLPOSIXPathStyle, true);
     LSSharedFileListRef loginItems = LSSharedFileListCreate (0, kLSSharedFileListSessionLoginItems, 0);
@@ -79,7 +79,7 @@ bool hasLaunchOnStartup_private (QString &) {
 void setLaunchOnStartup_private (QString &appName, QString &guiName, bool enable) {
     Q_UNUSED (appName)
     Q_UNUSED (guiName)
-    QString filePath = QDir (QCoreApplication::applicationDirPath () + QLatin1String ("/../..")).absolutePath ();
+    QString filePath = QDir (QCoreApplication.applicationDirPath () + QLatin1String ("/../..")).absolutePath ();
     CFStringRef folderCFStr = CFStringCreateWithCString (0, filePath.toUtf8 ().data (), kCFStringEncodingUTF8);
     CFURLRef urlRef = CFURLCreateWithFileSystemPath (0, folderCFStr, kCFURLPOSIXPathStyle, true);
     LSSharedFileListRef loginItems = LSSharedFileListCreate (0, kLSSharedFileListSessionLoginItems, 0);
@@ -131,7 +131,7 @@ static bool hasDarkSystray_private () {
     return returnValue;
 }
 
-QString Utility::getCurrentUserName () {
+QString Utility.getCurrentUserName () {
     return {};
 }
 

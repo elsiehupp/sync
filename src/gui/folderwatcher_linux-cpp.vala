@@ -21,25 +21,25 @@
 
 namespace OCC {
 
-FolderWatcherPrivate::FolderWatcherPrivate (FolderWatcher *p, QString &path)
+FolderWatcherPrivate.FolderWatcherPrivate (FolderWatcher *p, QString &path)
     : QObject ()
     , _parent (p)
     , _folder (path) {
     _fd = inotify_init ();
     if (_fd != -1) {
-        _socket.reset (new QSocketNotifier (_fd, QSocketNotifier::Read));
-        connect (_socket.data (), &QSocketNotifier::activated, this, &FolderWatcherPrivate::slotReceivedNotification);
+        _socket.reset (new QSocketNotifier (_fd, QSocketNotifier.Read));
+        connect (_socket.data (), &QSocketNotifier.activated, this, &FolderWatcherPrivate.slotReceivedNotification);
     } else {
         qCWarning (lcFolderWatcher) << "notify_init () failed: " << strerror (errno);
     }
 
-    QMetaObject::invokeMethod (this, "slotAddFolderRecursive", Q_ARG (QString, path));
+    QMetaObject.invokeMethod (this, "slotAddFolderRecursive", Q_ARG (QString, path));
 }
 
-FolderWatcherPrivate::~FolderWatcherPrivate () = default;
+FolderWatcherPrivate.~FolderWatcherPrivate () = default;
 
 // attention: result list passed by reference!
-bool FolderWatcherPrivate::findFoldersBelow (QDir &dir, QStringList &fullList) {
+bool FolderWatcherPrivate.findFoldersBelow (QDir &dir, QStringList &fullList) {
     bool ok = true;
     if (! (dir.exists () && dir.isReadable ())) {
         qCDebug (lcFolderWatcher) << "Non existing path coming in: " << dir.absolutePath ();
@@ -47,10 +47,10 @@ bool FolderWatcherPrivate::findFoldersBelow (QDir &dir, QStringList &fullList) {
     } else {
         QStringList nameFilter;
         nameFilter << QLatin1String ("*");
-        QDir::Filters filter = QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks | QDir::Hidden;
+        QDir.Filters filter = QDir.Dirs | QDir.NoDotAndDotDot | QDir.NoSymLinks | QDir.Hidden;
         const QStringList pathes = dir.entryList (nameFilter, filter);
 
-        QStringList::const_iterator constIterator;
+        QStringList.const_iterator constIterator;
         for (constIterator = pathes.constBegin (); constIterator != pathes.constEnd ();
              ++constIterator) {
             const QString fullPath (dir.path () + QLatin1String ("/") + (*constIterator));
@@ -62,7 +62,7 @@ bool FolderWatcherPrivate::findFoldersBelow (QDir &dir, QStringList &fullList) {
     return ok;
 }
 
-void FolderWatcherPrivate::inotifyRegisterPath (QString &path) {
+void FolderWatcherPrivate.inotifyRegisterPath (QString &path) {
     if (path.isEmpty ())
         return;
 
@@ -74,16 +74,16 @@ void FolderWatcherPrivate::inotifyRegisterPath (QString &path) {
     } else {
         // If we're running out of memory or inotify watches, become
         // unreliable.
-        if (_parent->_isReliable && (errno == ENOMEM || errno == ENOSPC)) {
-            _parent->_isReliable = false;
-            emit _parent->becameUnreliable (
+        if (_parent._isReliable && (errno == ENOMEM || errno == ENOSPC)) {
+            _parent._isReliable = false;
+            emit _parent.becameUnreliable (
                 tr ("This problem usually happens when the inotify watches are exhausted. "
                    "Check the FAQ for details."));
         }
     }
 }
 
-void FolderWatcherPrivate::slotAddFolderRecursive (QString &path) {
+void FolderWatcherPrivate.slotAddFolderRecursive (QString &path) {
     if (_pathToWatch.contains (path))
         return;
 
@@ -103,22 +103,22 @@ void FolderWatcherPrivate::slotAddFolderRecursive (QString &path) {
         QDir folder (subfolder);
         if (folder.exists () && !_pathToWatch.contains (folder.absolutePath ())) {
             subdirs++;
-            if (_parent->pathIsIgnored (subfolder)) {
+            if (_parent.pathIsIgnored (subfolder)) {
                 qCDebug (lcFolderWatcher) << "* Not adding" << folder.path ();
                 continue;
             }
             inotifyRegisterPath (folder.absolutePath ());
         } else {
-            qCDebug (lcFolderWatcher) << "    `-> discarded:" << folder.path ();
+            qCDebug (lcFolderWatcher) << "    `. discarded:" << folder.path ();
         }
     }
 
     if (subdirs > 0) {
-        qCDebug (lcFolderWatcher) << "    `-> and" << subdirs << "subdirectories";
+        qCDebug (lcFolderWatcher) << "    `. and" << subdirs << "subdirectories";
     }
 }
 
-void FolderWatcherPrivate::slotReceivedNotification (int fd) {
+void FolderWatcherPrivate.slotReceivedNotification (int fd) {
     int len = 0;
     struct inotify_event *event = nullptr;
     size_t i = 0;
@@ -147,7 +147,7 @@ void FolderWatcherPrivate::slotReceivedNotification (int fd) {
 
     // iterate events in buffer
     unsigned int ulen = len;
-    for (i = 0; i + sizeof (inotify_event) < ulen; i += sizeof (inotify_event) + (event ? event->len : 0)) {
+    for (i = 0; i + sizeof (inotify_event) < ulen; i += sizeof (inotify_event) + (event ? event.len : 0)) {
         // cast an inotify_event
         event = (struct inotify_event *)&buffer[i];
         if (!event) {
@@ -156,31 +156,31 @@ void FolderWatcherPrivate::slotReceivedNotification (int fd) {
         }
 
         // Fire event for the path that was changed.
-        if (event->len == 0 || event->wd <= -1)
+        if (event.len == 0 || event.wd <= -1)
             continue;
-        QByteArray fileName (event->name);
+        QByteArray fileName (event.name);
         // Filter out journal changes - redundant with filtering in
-        // FolderWatcher::pathIsIgnored.
+        // FolderWatcher.pathIsIgnored.
         if (fileName.startsWith ("._sync_")
             || fileName.startsWith (".csync_journal.db")
             || fileName.startsWith (".sync_")) {
             continue;
         }
-        const QString p = _watchToPath[event->wd] + '/' + fileName;
-        _parent->changeDetected (p);
+        const QString p = _watchToPath[event.wd] + '/' + fileName;
+        _parent.changeDetected (p);
 
-        if ( (event->mask & (IN_MOVED_TO | IN_CREATE))
+        if ( (event.mask & (IN_MOVED_TO | IN_CREATE))
             && QFileInfo (p).isDir ()
-            && !_parent->pathIsIgnored (p)) {
+            && !_parent.pathIsIgnored (p)) {
             slotAddFolderRecursive (p);
         }
-        if (event->mask & (IN_MOVED_FROM | IN_DELETE)) {
+        if (event.mask & (IN_MOVED_FROM | IN_DELETE)) {
             removeFoldersBelow (p);
         }
     }
 }
 
-void FolderWatcherPrivate::removeFoldersBelow (QString &path) {
+void FolderWatcherPrivate.removeFoldersBelow (QString &path) {
     auto it = _pathToWatch.find (path);
     if (it == _pathToWatch.end ())
         return;

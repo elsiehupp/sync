@@ -71,52 +71,52 @@ namespace OCC {
 const int GapBetweenLogoAndRightEdge = 5;
 const int ModernHeaderTopMargin = 2;
 
-HeaderBanner::HeaderBanner (QWidget *parent)
+HeaderBanner.HeaderBanner (QWidget *parent)
     : QWidget (parent) {
-    setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Fixed);
-    setBackgroundRole (QPalette::Base);
+    setSizePolicy (QSizePolicy.Expanding, QSizePolicy.Fixed);
+    setBackgroundRole (QPalette.Base);
     titleLabel = new QLabel (this);
-    titleLabel->setBackgroundRole (QPalette::Base);
+    titleLabel.setBackgroundRole (QPalette.Base);
     logoLabel = new QLabel (this);
-    QFont font = titleLabel->font ();
+    QFont font = titleLabel.font ();
     font.setBold (true);
-    titleLabel->setFont (font);
+    titleLabel.setFont (font);
     layout = new QGridLayout (this);
-    layout->setContentsMargins (QMargins ());
-    layout->setSpacing (0);
-    layout->setRowMinimumHeight (3, 1);
-    layout->setRowStretch (4, 1);
-    layout->setColumnStretch (2, 1);
-    layout->setColumnMinimumWidth (4, 2 * GapBetweenLogoAndRightEdge);
-    layout->setColumnMinimumWidth (6, GapBetweenLogoAndRightEdge);
-    layout->addWidget (titleLabel, 1, 1, 5, 1);
-    layout->addWidget (logoLabel, 1, 5, 5, 1);
+    layout.setContentsMargins (QMargins ());
+    layout.setSpacing (0);
+    layout.setRowMinimumHeight (3, 1);
+    layout.setRowStretch (4, 1);
+    layout.setColumnStretch (2, 1);
+    layout.setColumnMinimumWidth (4, 2 * GapBetweenLogoAndRightEdge);
+    layout.setColumnMinimumWidth (6, GapBetweenLogoAndRightEdge);
+    layout.addWidget (titleLabel, 1, 1, 5, 1);
+    layout.addWidget (logoLabel, 1, 5, 5, 1);
 }
 
-void HeaderBanner::setup (QString &title, QPixmap &logo, QPixmap &banner,
-                         const Qt::TextFormat titleFormat, QString &styleSheet) {
-    QStyle *style = parentWidget ()->style ();
-    //const int layoutHorizontalSpacing = style->pixelMetric (QStyle::PM_LayoutHorizontalSpacing);
-    int topLevelMarginLeft = style->pixelMetric (QStyle::PM_LayoutLeftMargin, nullptr, parentWidget ());
-    int topLevelMarginRight = style->pixelMetric (QStyle::PM_LayoutRightMargin, nullptr, parentWidget ());
-    int topLevelMarginTop = style->pixelMetric (QStyle::PM_LayoutTopMargin, nullptr, parentWidget ());
-    //int topLevelMarginBottom = style->pixelMetric (QStyle::PM_LayoutBottomMargin, 0, parentWidget ());
+void HeaderBanner.setup (QString &title, QPixmap &logo, QPixmap &banner,
+                         const Qt.TextFormat titleFormat, QString &styleSheet) {
+    QStyle *style = parentWidget ().style ();
+    //const int layoutHorizontalSpacing = style.pixelMetric (QStyle.PM_LayoutHorizontalSpacing);
+    int topLevelMarginLeft = style.pixelMetric (QStyle.PM_LayoutLeftMargin, nullptr, parentWidget ());
+    int topLevelMarginRight = style.pixelMetric (QStyle.PM_LayoutRightMargin, nullptr, parentWidget ());
+    int topLevelMarginTop = style.pixelMetric (QStyle.PM_LayoutTopMargin, nullptr, parentWidget ());
+    //int topLevelMarginBottom = style.pixelMetric (QStyle.PM_LayoutBottomMargin, 0, parentWidget ());
 
-    layout->setRowMinimumHeight (0, ModernHeaderTopMargin);
-    layout->setRowMinimumHeight (1, topLevelMarginTop - ModernHeaderTopMargin - 1);
-    layout->setRowMinimumHeight (6, 3);
+    layout.setRowMinimumHeight (0, ModernHeaderTopMargin);
+    layout.setRowMinimumHeight (1, topLevelMarginTop - ModernHeaderTopMargin - 1);
+    layout.setRowMinimumHeight (6, 3);
     int minColumnWidth0 = topLevelMarginLeft + topLevelMarginRight;
     int minColumnWidth1 = topLevelMarginLeft + topLevelMarginRight + 1;
-    layout->setColumnMinimumWidth (0, minColumnWidth0);
-    layout->setColumnMinimumWidth (1, minColumnWidth1);
-    titleLabel->setTextFormat (titleFormat);
-    titleLabel->setText (title);
+    layout.setColumnMinimumWidth (0, minColumnWidth0);
+    layout.setColumnMinimumWidth (1, minColumnWidth1);
+    titleLabel.setTextFormat (titleFormat);
+    titleLabel.setText (title);
     if (!styleSheet.isEmpty ())
-        titleLabel->setStyleSheet (styleSheet);
-    logoLabel->setPixmap (logo);
+        titleLabel.setStyleSheet (styleSheet);
+    logoLabel.setPixmap (logo);
     bannerPixmap = banner;
     if (bannerPixmap.isNull ()) {
-        QSize size = layout->totalMinimumSize ();
+        QSize size = layout.totalMinimumSize ();
         setMinimumSize (size);
         setMaximumSize (QWIDGETSIZE_MAX, size.height ());
     } else {
@@ -125,12 +125,12 @@ void HeaderBanner::setup (QString &title, QPixmap &logo, QPixmap &banner,
     updateGeometry ();
 }
 
-void HeaderBanner::paintEvent (QPaintEvent * /* event */) {
+void HeaderBanner.paintEvent (QPaintEvent * /* event */) {
     QPainter painter (this);
     painter.drawPixmap (0, 0, width (), bannerPixmap.height (), bannerPixmap);
     int x = width () - 2;
     int y = height () - 2;
-    const QPalette &pal = QGuiApplication::palette ();
+    const QPalette &pal = QGuiApplication.palette ();
     painter.setPen (pal.mid ().color ());
     painter.drawLine (0, y, x, y);
     painter.setPen (pal.base ().color ());

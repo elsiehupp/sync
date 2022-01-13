@@ -30,7 +30,7 @@ namespace OCC {
  * as it changes.
  *
  * To accomplish that, the eventFilter () stores the tooltip's position
- * and the dataChanged () slot updates the tooltip if Qt::ToolTipRole
+ * and the dataChanged () slot updates the tooltip if Qt.ToolTipRole
  * gets updated while a tooltip is shown.
  */
 class ToolTipUpdater : public QObject {

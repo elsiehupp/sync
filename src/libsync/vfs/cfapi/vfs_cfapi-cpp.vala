@@ -21,7 +21,7 @@
 Q_LOGGING_CATEGORY (lcCfApi, "nextcloud.sync.vfs.cfapi", QtInfoMsg)
 
 namespace cfapi {
-using namespace OCC::CfApiWrapper;
+using namespace OCC.CfApiWrapper;
 }
 
 namespace OCC {
@@ -29,70 +29,70 @@ namespace OCC {
 class VfsCfApiPrivate {
 public:
     QList<HydrationJob *> hydrationJobs;
-    cfapi::ConnectionKey connectionKey;
+    cfapi.ConnectionKey connectionKey;
 };
 
-VfsCfApi::VfsCfApi (QObject *parent)
+VfsCfApi.VfsCfApi (QObject *parent)
     : Vfs (parent)
     , d (new VfsCfApiPrivate) {
 }
 
-VfsCfApi::~VfsCfApi () = default;
+VfsCfApi.~VfsCfApi () = default;
 
-Vfs::Mode VfsCfApi::mode () const {
+Vfs.Mode VfsCfApi.mode () {
     return WindowsCfApi;
 }
 
-QString VfsCfApi::fileSuffix () const {
+QString VfsCfApi.fileSuffix () {
     return {};
 }
 
-void VfsCfApi::startImpl (VfsSetupParams &params) {
-    const auto localPath = QDir::toNativeSeparators (params.filesystemPath);
+void VfsCfApi.startImpl (VfsSetupParams &params) {
+    const auto localPath = QDir.toNativeSeparators (params.filesystemPath);
 
-    const auto registerResult = cfapi::registerSyncRoot (localPath, params.providerName, params.providerVersion, params.alias, params.displayName, params.account->displayName ());
+    const auto registerResult = cfapi.registerSyncRoot (localPath, params.providerName, params.providerVersion, params.alias, params.displayName, params.account.displayName ());
     if (!registerResult) {
         qCCritical (lcCfApi) << "Initialization failed, couldn't register sync root:" << registerResult.error ();
         return;
     }
 
-    auto connectResult = cfapi::connectSyncRoot (localPath, this);
+    auto connectResult = cfapi.connectSyncRoot (localPath, this);
     if (!connectResult) {
         qCCritical (lcCfApi) << "Initialization failed, couldn't connect sync root:" << connectResult.error ();
         return;
     }
 
-    d->connectionKey = *std::move (connectResult);
+    d.connectionKey = *std.move (connectResult);
 }
 
-void VfsCfApi::stop () {
-    const auto result = cfapi::disconnectSyncRoot (std::move (d->connectionKey));
+void VfsCfApi.stop () {
+    const auto result = cfapi.disconnectSyncRoot (std.move (d.connectionKey));
     if (!result) {
-        qCCritical (lcCfApi) << "Disconnect failed for" << QDir::toNativeSeparators (params ().filesystemPath) << ":" << result.error ();
+        qCCritical (lcCfApi) << "Disconnect failed for" << QDir.toNativeSeparators (params ().filesystemPath) << ":" << result.error ();
     }
 }
 
-void VfsCfApi::unregisterFolder () {
-    const auto localPath = QDir::toNativeSeparators (params ().filesystemPath);
-    const auto result = cfapi::unregisterSyncRoot (localPath, params ().providerName, params ().account->displayName ());
+void VfsCfApi.unregisterFolder () {
+    const auto localPath = QDir.toNativeSeparators (params ().filesystemPath);
+    const auto result = cfapi.unregisterSyncRoot (localPath, params ().providerName, params ().account.displayName ());
     if (!result) {
         qCCritical (lcCfApi) << "Unregistration failed for" << localPath << ":" << result.error ();
     }
 }
 
-bool VfsCfApi::socketApiPinStateActionsShown () const {
+bool VfsCfApi.socketApiPinStateActionsShown () {
     return true;
 }
 
-bool VfsCfApi::isHydrating () const {
-    return !d->hydrationJobs.isEmpty ();
+bool VfsCfApi.isHydrating () {
+    return !d.hydrationJobs.isEmpty ();
 }
 
-Result<void, QString> VfsCfApi::updateMetadata (QString &filePath, time_t modtime, qint64 size, QByteArray &fileId) {
-    const auto localPath = QDir::toNativeSeparators (filePath);
-    const auto handle = cfapi::handleForPath (localPath);
+Result<void, QString> VfsCfApi.updateMetadata (QString &filePath, time_t modtime, qint64 size, QByteArray &fileId) {
+    const auto localPath = QDir.toNativeSeparators (filePath);
+    const auto handle = cfapi.handleForPath (localPath);
     if (handle) {
-        auto result = cfapi::updatePlaceholderInfo (handle, modtime, size, fileId);
+        auto result = cfapi.updatePlaceholderInfo (handle, modtime, size, fileId);
         if (result) {
             return {};
         } else {
@@ -104,17 +104,17 @@ Result<void, QString> VfsCfApi::updateMetadata (QString &filePath, time_t modtim
     }
 }
 
-Result<void, QString> VfsCfApi::createPlaceholder (SyncFileItem &item) {
+Result<void, QString> VfsCfApi.createPlaceholder (SyncFileItem &item) {
     Q_ASSERT (params ().filesystemPath.endsWith ('/'));
-    const auto localPath = QDir::toNativeSeparators (params ().filesystemPath + item._file);
-    const auto result = cfapi::createPlaceholderInfo (localPath, item._modtime, item._size, item._fileId);
+    const auto localPath = QDir.toNativeSeparators (params ().filesystemPath + item._file);
+    const auto result = cfapi.createPlaceholderInfo (localPath, item._modtime, item._size, item._fileId);
     return result;
 }
 
-Result<void, QString> VfsCfApi::dehydratePlaceholder (SyncFileItem &item) {
+Result<void, QString> VfsCfApi.dehydratePlaceholder (SyncFileItem &item) {
     const auto previousPin = pinState (item._file);
 
-    if (!FileSystem::remove (_setupParams.filesystemPath + item._file)) {
+    if (!FileSystem.remove (_setupParams.filesystemPath + item._file)) {
         return QStringLiteral ("Couldn't remove %1 to fulfill dehydration").arg (item._file);
     }
 
@@ -124,8 +124,8 @@ Result<void, QString> VfsCfApi::dehydratePlaceholder (SyncFileItem &item) {
     }
 
     if (previousPin) {
-        if (*previousPin == PinState::AlwaysLocal) {
-            setPinState (item._file, PinState::Unspecified);
+        if (*previousPin == PinState.AlwaysLocal) {
+            setPinState (item._file, PinState.Unspecified);
         } else {
             setPinState (item._file, *previousPin);
         }
@@ -134,71 +134,71 @@ Result<void, QString> VfsCfApi::dehydratePlaceholder (SyncFileItem &item) {
     return {};
 }
 
-Result<Vfs::ConvertToPlaceholderResult, QString> VfsCfApi::convertToPlaceholder (QString &filename, SyncFileItem &item, QString &replacesFile) {
-    const auto localPath = QDir::toNativeSeparators (filename);
-    const auto replacesPath = QDir::toNativeSeparators (replacesFile);
+Result<Vfs.ConvertToPlaceholderResult, QString> VfsCfApi.convertToPlaceholder (QString &filename, SyncFileItem &item, QString &replacesFile) {
+    const auto localPath = QDir.toNativeSeparators (filename);
+    const auto replacesPath = QDir.toNativeSeparators (replacesFile);
 
-    const auto handle = cfapi::handleForPath (localPath);
+    const auto handle = cfapi.handleForPath (localPath);
     if (!handle) {
         return { "Invalid handle for path " + localPath };
     }
-    if (cfapi::findPlaceholderInfo (handle)) {
-        return cfapi::updatePlaceholderInfo (handle, item._modtime, item._size, item._fileId, replacesPath);
+    if (cfapi.findPlaceholderInfo (handle)) {
+        return cfapi.updatePlaceholderInfo (handle, item._modtime, item._size, item._fileId, replacesPath);
     } else {
-        return cfapi::convertToPlaceholder (handle, item._modtime, item._size, item._fileId, replacesPath);
+        return cfapi.convertToPlaceholder (handle, item._modtime, item._size, item._fileId, replacesPath);
     }
 }
 
-bool VfsCfApi::needsMetadataUpdate (SyncFileItem &item) {
+bool VfsCfApi.needsMetadataUpdate (SyncFileItem &item) {
     return false;
 }
 
-bool VfsCfApi::isDehydratedPlaceholder (QString &filePath) {
-    const auto path = QDir::toNativeSeparators (filePath);
-    return cfapi::isSparseFile (path);
+bool VfsCfApi.isDehydratedPlaceholder (QString &filePath) {
+    const auto path = QDir.toNativeSeparators (filePath);
+    return cfapi.isSparseFile (path);
 }
 
-bool VfsCfApi::statTypeVirtualFile (csync_file_stat_t *stat, void *statData) {
+bool VfsCfApi.statTypeVirtualFile (csync_file_stat_t *stat, void *statData) {
     const auto ffd = static_cast<WIN32_FIND_DATA *> (statData);
 
-    const auto isDirectory = (ffd->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
-    const auto isSparseFile = (ffd->dwFileAttributes & FILE_ATTRIBUTE_SPARSE_FILE) != 0;
-    const auto isPinned = (ffd->dwFileAttributes & FILE_ATTRIBUTE_PINNED) != 0;
-    const auto isUnpinned = (ffd->dwFileAttributes & FILE_ATTRIBUTE_UNPINNED) != 0;
-    const auto hasReparsePoint = (ffd->dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0;
-    const auto hasCloudTag = (ffd->dwReserved0 & IO_REPARSE_TAG_CLOUD) != 0;
+    const auto isDirectory = (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+    const auto isSparseFile = (ffd.dwFileAttributes & FILE_ATTRIBUTE_SPARSE_FILE) != 0;
+    const auto isPinned = (ffd.dwFileAttributes & FILE_ATTRIBUTE_PINNED) != 0;
+    const auto isUnpinned = (ffd.dwFileAttributes & FILE_ATTRIBUTE_UNPINNED) != 0;
+    const auto hasReparsePoint = (ffd.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0;
+    const auto hasCloudTag = (ffd.dwReserved0 & IO_REPARSE_TAG_CLOUD) != 0;
 
-    const auto isWindowsShortcut = !isDirectory && FileSystem::isLnkFile (stat->path);
+    const auto isWindowsShortcut = !isDirectory && FileSystem.isLnkFile (stat.path);
 
-    const auto isExcludeFile = !isDirectory && FileSystem::isExcludeFile (stat->path);
+    const auto isExcludeFile = !isDirectory && FileSystem.isExcludeFile (stat.path);
 
     // It's a dir with a reparse point due to the placeholder info (hence the cloud tag)
     // if we don't remove the reparse point flag the discovery will end up thinking
     // it is a file... let's prevent it
     if (isDirectory) {
         if (hasReparsePoint && hasCloudTag) {
-            ffd->dwFileAttributes &= ~FILE_ATTRIBUTE_REPARSE_POINT;
+            ffd.dwFileAttributes &= ~FILE_ATTRIBUTE_REPARSE_POINT;
         }
         return false;
     } else if (isSparseFile && isPinned) {
-        stat->type = ItemTypeVirtualFileDownload;
+        stat.type = ItemTypeVirtualFileDownload;
         return true;
     } else if (!isSparseFile && isUnpinned && !isWindowsShortcut && !isExcludeFile) {
-        stat->type = ItemTypeVirtualFileDehydration;
+        stat.type = ItemTypeVirtualFileDehydration;
         return true;
     } else if (isSparseFile) {
-        stat->type = ItemTypeVirtualFile;
+        stat.type = ItemTypeVirtualFile;
         return true;
     }
 
     return false;
 }
 
-bool VfsCfApi::setPinState (QString &folderPath, PinState state) {
-    const auto localPath = QDir::toNativeSeparators (params ().filesystemPath + folderPath);
-    const auto handle = cfapi::handleForPath (localPath);
+bool VfsCfApi.setPinState (QString &folderPath, PinState state) {
+    const auto localPath = QDir.toNativeSeparators (params ().filesystemPath + folderPath);
+    const auto handle = cfapi.handleForPath (localPath);
     if (handle) {
-        if (cfapi::setPinState (handle, state, cfapi::Recurse)) {
+        if (cfapi.setPinState (handle, state, cfapi.Recurse)) {
             return true;
         } else {
             return false;
@@ -209,15 +209,15 @@ bool VfsCfApi::setPinState (QString &folderPath, PinState state) {
     }
 }
 
-Optional<PinState> VfsCfApi::pinState (QString &folderPath) {
-    const auto localPath = QDir::toNativeSeparators (params ().filesystemPath + folderPath);
-    const auto handle = cfapi::handleForPath (localPath);
+Optional<PinState> VfsCfApi.pinState (QString &folderPath) {
+    const auto localPath = QDir.toNativeSeparators (params ().filesystemPath + folderPath);
+    const auto handle = cfapi.handleForPath (localPath);
     if (!handle) {
         qCWarning (lcCfApi) << "Couldn't find pin state for non existing file" << localPath;
         return {};
     }
 
-    const auto info = cfapi::findPlaceholderInfo (handle);
+    const auto info = cfapi.findPlaceholderInfo (handle);
     if (!info) {
         qCWarning (lcCfApi) << "Couldn't find pin state for regular non-placeholder file" << localPath;
         return {};
@@ -226,7 +226,7 @@ Optional<PinState> VfsCfApi::pinState (QString &folderPath) {
     return info.pinState ();
 }
 
-Vfs::AvailabilityResult VfsCfApi::availability (QString &folderPath) {
+Vfs.AvailabilityResult VfsCfApi.availability (QString &folderPath) {
     const auto basePinState = pinState (folderPath);
     const auto hydrationAndPinStates = computeRecursiveHydrationAndPinStates (folderPath, basePinState);
 
@@ -235,54 +235,54 @@ Vfs::AvailabilityResult VfsCfApi::availability (QString &folderPath) {
 
     if (hydrationStatus.hasDehydrated) {
         if (hydrationStatus.hasHydrated)
-            return VfsItemAvailability::Mixed;
-        if (pin && *pin == PinState::OnlineOnly)
-            return VfsItemAvailability::OnlineOnly;
+            return VfsItemAvailability.Mixed;
+        if (pin && *pin == PinState.OnlineOnly)
+            return VfsItemAvailability.OnlineOnly;
         else
-            return VfsItemAvailability::AllDehydrated;
+            return VfsItemAvailability.AllDehydrated;
     } else if (hydrationStatus.hasHydrated) {
-        if (pin && *pin == PinState::AlwaysLocal)
-            return VfsItemAvailability::AlwaysLocal;
+        if (pin && *pin == PinState.AlwaysLocal)
+            return VfsItemAvailability.AlwaysLocal;
         else
-            return VfsItemAvailability::AllHydrated;
+            return VfsItemAvailability.AllHydrated;
     }
-    return AvailabilityError::NoSuchItem;
+    return AvailabilityError.NoSuchItem;
 }
 
-HydrationJob *VfsCfApi::findHydrationJob (QString &requestId) const {
+HydrationJob *VfsCfApi.findHydrationJob (QString &requestId) {
     // Find matching hydration job for request id
-    const auto hydrationJobsIter = std::find_if (d->hydrationJobs.cbegin (), d->hydrationJobs.cend (), [&] (HydrationJob *job) {
-        return job->requestId () == requestId;
+    const auto hydrationJobsIter = std.find_if (d.hydrationJobs.cbegin (), d.hydrationJobs.cend (), [&] (HydrationJob *job) {
+        return job.requestId () == requestId;
     });
 
-    if (hydrationJobsIter != d->hydrationJobs.cend ()) {
+    if (hydrationJobsIter != d.hydrationJobs.cend ()) {
         return *hydrationJobsIter;
     }
 
     return nullptr;
 }
 
-void VfsCfApi::cancelHydration (QString &requestId, QString & /*path*/) {
+void VfsCfApi.cancelHydration (QString &requestId, QString & /*path*/) {
     // Find matching hydration job for request id
     const auto hydrationJob = findHydrationJob (requestId);
     // If found, cancel it
     if (hydrationJob) {
         qCInfo (lcCfApi) << "Cancel hydration";
-        hydrationJob->cancel ();
+        hydrationJob.cancel ();
     }
 }
 
-void VfsCfApi::requestHydration (QString &requestId, QString &path) {
+void VfsCfApi.requestHydration (QString &requestId, QString &path) {
     qCInfo (lcCfApi) << "Received request to hydrate" << path << requestId;
-    const auto root = QDir::toNativeSeparators (params ().filesystemPath);
+    const auto root = QDir.toNativeSeparators (params ().filesystemPath);
     Q_ASSERT (path.startsWith (root));
 
-    const auto relativePath = QDir::fromNativeSeparators (path.mid (root.length ()));
+    const auto relativePath = QDir.fromNativeSeparators (path.mid (root.length ()));
     const auto journal = params ().journal;
 
     // Set in the database that we should download the file
     SyncJournalFileRecord record;
-    journal->getFileRecord (relativePath, &record);
+    journal.getFileRecord (relativePath, &record);
     if (!record.isValid ()) {
         qCInfo (lcCfApi) << "Couldn't hydrate, did not find file in db";
         emit hydrationRequestFailed (requestId);
@@ -299,14 +299,14 @@ void VfsCfApi::requestHydration (QString &requestId, QString &path) {
     scheduleHydrationJob (requestId, relativePath, record);
 }
 
-void VfsCfApi::fileStatusChanged (QString &systemFileName, SyncFileStatus fileStatus) {
+void VfsCfApi.fileStatusChanged (QString &systemFileName, SyncFileStatus fileStatus) {
     Q_UNUSED (systemFileName);
     Q_UNUSED (fileStatus);
 }
 
-void VfsCfApi::scheduleHydrationJob (QString &requestId, QString &folderPath, SyncJournalFileRecord &record) {
-    const auto jobAlreadyScheduled = std::any_of (std::cbegin (d->hydrationJobs), std::cend (d->hydrationJobs), [=] (HydrationJob *job) {
-        return job->requestId () == requestId || job->folderPath () == folderPath;
+void VfsCfApi.scheduleHydrationJob (QString &requestId, QString &folderPath, SyncJournalFileRecord &record) {
+    const auto jobAlreadyScheduled = std.any_of (std.cbegin (d.hydrationJobs), std.cend (d.hydrationJobs), [=] (HydrationJob *job) {
+        return job.requestId () == requestId || job.folderPath () == folderPath;
     });
 
     if (jobAlreadyScheduled) {
@@ -315,51 +315,51 @@ void VfsCfApi::scheduleHydrationJob (QString &requestId, QString &folderPath, Sy
         return;
     }
 
-    if (d->hydrationJobs.isEmpty ()) {
+    if (d.hydrationJobs.isEmpty ()) {
         emit beginHydrating ();
     }
 
     auto job = new HydrationJob (this);
-    job->setAccount (params ().account);
-    job->setRemotePath (params ().remotePath);
-    job->setLocalPath (params ().filesystemPath);
-    job->setJournal (params ().journal);
-    job->setRequestId (requestId);
-    job->setFolderPath (folderPath);
-    job->setIsEncryptedFile (record._isE2eEncrypted);
-    job->setE2eMangledName (record._e2eMangledName);
-    connect (job, &HydrationJob::finished, this, &VfsCfApi::onHydrationJobFinished);
-    d->hydrationJobs << job;
-    job->start ();
+    job.setAccount (params ().account);
+    job.setRemotePath (params ().remotePath);
+    job.setLocalPath (params ().filesystemPath);
+    job.setJournal (params ().journal);
+    job.setRequestId (requestId);
+    job.setFolderPath (folderPath);
+    job.setIsEncryptedFile (record._isE2eEncrypted);
+    job.setE2eMangledName (record._e2eMangledName);
+    connect (job, &HydrationJob.finished, this, &VfsCfApi.onHydrationJobFinished);
+    d.hydrationJobs << job;
+    job.start ();
     emit hydrationRequestReady (requestId);
 }
 
-void VfsCfApi::onHydrationJobFinished (HydrationJob *job) {
-    Q_ASSERT (d->hydrationJobs.contains (job));
-    qCInfo (lcCfApi) << "Hydration job finished" << job->requestId () << job->folderPath () << job->status ();
-    emit hydrationRequestFinished (job->requestId ());
+void VfsCfApi.onHydrationJobFinished (HydrationJob *job) {
+    Q_ASSERT (d.hydrationJobs.contains (job));
+    qCInfo (lcCfApi) << "Hydration job finished" << job.requestId () << job.folderPath () << job.status ();
+    emit hydrationRequestFinished (job.requestId ());
 }
 
-int VfsCfApi::finalizeHydrationJob (QString &requestId) {
+int VfsCfApi.finalizeHydrationJob (QString &requestId) {
     qCDebug (lcCfApi) << "Finalize hydration job" << requestId;
     // Find matching hydration job for request id
     const auto hydrationJob = findHydrationJob (requestId);
 
     // If found, finalize it
     if (hydrationJob) {
-        hydrationJob->finalize (this);
-        d->hydrationJobs.removeAll (hydrationJob);
-        hydrationJob->deleteLater ();
-        if (d->hydrationJobs.isEmpty ()) {
+        hydrationJob.finalize (this);
+        d.hydrationJobs.removeAll (hydrationJob);
+        hydrationJob.deleteLater ();
+        if (d.hydrationJobs.isEmpty ()) {
             emit doneHydrating ();
         }
-        return hydrationJob->status ();
+        return hydrationJob.status ();
     }
 
-    return HydrationJob::Status::Error;
+    return HydrationJob.Status.Error;
 }
 
-VfsCfApi::HydratationAndPinStates VfsCfApi::computeRecursiveHydrationAndPinStates (QString &folderPath, Optional<PinState> &basePinState) {
+VfsCfApi.HydratationAndPinStates VfsCfApi.computeRecursiveHydrationAndPinStates (QString &folderPath, Optional<PinState> &basePinState) {
     Q_ASSERT (!folderPath.endsWith ('/'));
     QFileInfo info (params ().filesystemPath + folderPath);
 
@@ -368,9 +368,9 @@ VfsCfApi::HydratationAndPinStates VfsCfApi::computeRecursiveHydrationAndPinState
     }
     const auto effectivePin = pinState (folderPath);
     const auto pinResult = (!effectivePin && !basePinState) ? Optional<PinState> ()
-                         : (!effectivePin || !basePinState) ? PinState::Inherited
+                         : (!effectivePin || !basePinState) ? PinState.Inherited
                          : (*effectivePin == *basePinState) ? *effectivePin
-                         : PinState::Inherited;
+                         : PinState.Inherited;
 
     if (info.isDir ()) {
         const auto dirState = HydratationAndPinStates {
@@ -379,7 +379,7 @@ VfsCfApi::HydratationAndPinStates VfsCfApi::computeRecursiveHydrationAndPinState
         const auto dir = QDir (info.absoluteFilePath ());
         Q_ASSERT (dir.exists ());
         const auto children = dir.entryList ();
-        return std::accumulate (std::cbegin (children), std::cend (children), dirState, [=] (HydratationAndPinStates &currentState, QString &name) {
+        return std.accumulate (std.cbegin (children), std.cend (children), dirState, [=] (HydratationAndPinStates &currentState, QString &name) {
             if (name == QStringLiteral ("..") || name == QStringLiteral (".")) {
                 return currentState;
             }

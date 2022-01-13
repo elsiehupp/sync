@@ -77,7 +77,7 @@ namespace FileSystem {
     /**
      * @brief Checks whether a file exists.
      *
-     * Use this over QFileInfo::exists () and QFile::exists () to avoid bugs with lnk
+     * Use this over QFileInfo.exists () and QFile.exists () to avoid bugs with lnk
      * files, see above.
      */
     bool OCSYNC_EXPORT fileExists (QString &filename, QFileInfo & = QFileInfo ());
@@ -85,7 +85,7 @@ namespace FileSystem {
     /**
      * @brief Rename the file \a originFileName to \a destinationFileName.
      *
-     * It behaves as QFile::rename () but handles .lnk files correctly on Windows.
+     * It behaves as QFile.rename () but handles .lnk files correctly on Windows.
      */
     bool OCSYNC_EXPORT rename (QString &originFileName,
         const QString &destinationFileName,
@@ -102,7 +102,7 @@ namespace FileSystem {
     /**
      * Removes a file.
      *
-     * Equivalent to QFile::remove (), except on Windows, where it will also
+     * Equivalent to QFile.remove (), except on Windows, where it will also
      * successfully remove read-only files.
      */
     bool OCSYNC_EXPORT remove (QString &fileName, QString *errorString = nullptr);
@@ -113,7 +113,7 @@ namespace FileSystem {
     bool OCSYNC_EXPORT moveToTrash (QString &filename, QString *errorString);
 
     /**
-     * Replacement for QFile::open (ReadOnly) followed by a seek ().
+     * Replacement for QFile.open (ReadOnly) followed by a seek ().
      * This version sets a more permissive sharing mode on Windows.
      *
      * Warning: The resulting file may have an empty fileName and be unsuitable for use

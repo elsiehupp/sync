@@ -18,68 +18,68 @@
 
 namespace OCC {
 
-ProgressDispatcher *ProgressDispatcher::_instance = nullptr;
+ProgressDispatcher *ProgressDispatcher._instance = nullptr;
 
-QString Progress::asResultString (SyncFileItem &item) {
+QString Progress.asResultString (SyncFileItem &item) {
     switch (item._instruction) {
     case CSYNC_INSTRUCTION_SYNC:
     case CSYNC_INSTRUCTION_NEW:
     case CSYNC_INSTRUCTION_TYPE_CHANGE:
-        if (item._direction != SyncFileItem::Up) {
+        if (item._direction != SyncFileItem.Up) {
             if (item._type == ItemTypeVirtualFile) {
-                return QCoreApplication::translate ("progress", "Virtual file created");
+                return QCoreApplication.translate ("progress", "Virtual file created");
             } else if (item._type == ItemTypeVirtualFileDehydration) {
-                return QCoreApplication::translate ("progress", "Replaced by virtual file");
+                return QCoreApplication.translate ("progress", "Replaced by virtual file");
             } else {
-                return QCoreApplication::translate ("progress", "Downloaded");
+                return QCoreApplication.translate ("progress", "Downloaded");
             }
         } else {
-            return QCoreApplication::translate ("progress", "Uploaded");
+            return QCoreApplication.translate ("progress", "Uploaded");
         }
     case CSYNC_INSTRUCTION_CONFLICT:
-        return QCoreApplication::translate ("progress", "Server version downloaded, copied changed local file into conflict file");
+        return QCoreApplication.translate ("progress", "Server version downloaded, copied changed local file into conflict file");
     case CSYNC_INSTRUCTION_REMOVE:
-        return QCoreApplication::translate ("progress", "Deleted");
+        return QCoreApplication.translate ("progress", "Deleted");
     case CSYNC_INSTRUCTION_EVAL_RENAME:
     case CSYNC_INSTRUCTION_RENAME:
-        return QCoreApplication::translate ("progress", "Moved to %1").arg (item._renameTarget);
+        return QCoreApplication.translate ("progress", "Moved to %1").arg (item._renameTarget);
     case CSYNC_INSTRUCTION_IGNORE:
-        return QCoreApplication::translate ("progress", "Ignored");
+        return QCoreApplication.translate ("progress", "Ignored");
     case CSYNC_INSTRUCTION_STAT_ERROR:
-        return QCoreApplication::translate ("progress", "Filesystem access error");
+        return QCoreApplication.translate ("progress", "Filesystem access error");
     case CSYNC_INSTRUCTION_ERROR:
-        return QCoreApplication::translate ("progress", "Error");
+        return QCoreApplication.translate ("progress", "Error");
     case CSYNC_INSTRUCTION_UPDATE_METADATA:
-        return QCoreApplication::translate ("progress", "Updated local metadata");
+        return QCoreApplication.translate ("progress", "Updated local metadata");
     case CSYNC_INSTRUCTION_NONE:
     case CSYNC_INSTRUCTION_EVAL:
-        return QCoreApplication::translate ("progress", "Unknown");
+        return QCoreApplication.translate ("progress", "Unknown");
     }
-    return QCoreApplication::translate ("progress", "Unknown");
+    return QCoreApplication.translate ("progress", "Unknown");
 }
 
-QString Progress::asActionString (SyncFileItem &item) {
+QString Progress.asActionString (SyncFileItem &item) {
     switch (item._instruction) {
     case CSYNC_INSTRUCTION_CONFLICT:
     case CSYNC_INSTRUCTION_SYNC:
     case CSYNC_INSTRUCTION_NEW:
     case CSYNC_INSTRUCTION_TYPE_CHANGE:
-        if (item._direction != SyncFileItem::Up)
-            return QCoreApplication::translate ("progress", "downloading");
+        if (item._direction != SyncFileItem.Up)
+            return QCoreApplication.translate ("progress", "downloading");
         else
-            return QCoreApplication::translate ("progress", "uploading");
+            return QCoreApplication.translate ("progress", "uploading");
     case CSYNC_INSTRUCTION_REMOVE:
-        return QCoreApplication::translate ("progress", "deleting");
+        return QCoreApplication.translate ("progress", "deleting");
     case CSYNC_INSTRUCTION_EVAL_RENAME:
     case CSYNC_INSTRUCTION_RENAME:
-        return QCoreApplication::translate ("progress", "moving");
+        return QCoreApplication.translate ("progress", "moving");
     case CSYNC_INSTRUCTION_IGNORE:
-        return QCoreApplication::translate ("progress", "ignoring");
+        return QCoreApplication.translate ("progress", "ignoring");
     case CSYNC_INSTRUCTION_STAT_ERROR:
     case CSYNC_INSTRUCTION_ERROR:
-        return QCoreApplication::translate ("progress", "error");
+        return QCoreApplication.translate ("progress", "error");
     case CSYNC_INSTRUCTION_UPDATE_METADATA:
-        return QCoreApplication::translate ("progress", "updating local metadata");
+        return QCoreApplication.translate ("progress", "updating local metadata");
     case CSYNC_INSTRUCTION_NONE:
     case CSYNC_INSTRUCTION_EVAL:
         break;
@@ -87,32 +87,32 @@ QString Progress::asActionString (SyncFileItem &item) {
     return QString ();
 }
 
-bool Progress::isWarningKind (SyncFileItem::Status kind) {
-    return kind == SyncFileItem::SoftError || kind == SyncFileItem::NormalError
-        || kind == SyncFileItem::FatalError || kind == SyncFileItem::FileIgnored
-        || kind == SyncFileItem::Conflict || kind == SyncFileItem::Restoration
-        || kind == SyncFileItem::DetailError || kind == SyncFileItem::BlacklistedError
-        || kind == SyncFileItem::FileLocked;
+bool Progress.isWarningKind (SyncFileItem.Status kind) {
+    return kind == SyncFileItem.SoftError || kind == SyncFileItem.NormalError
+        || kind == SyncFileItem.FatalError || kind == SyncFileItem.FileIgnored
+        || kind == SyncFileItem.Conflict || kind == SyncFileItem.Restoration
+        || kind == SyncFileItem.DetailError || kind == SyncFileItem.BlacklistedError
+        || kind == SyncFileItem.FileLocked;
 }
 
-bool Progress::isIgnoredKind (SyncFileItem::Status kind) {
-    return kind == SyncFileItem::FileIgnored;
+bool Progress.isIgnoredKind (SyncFileItem.Status kind) {
+    return kind == SyncFileItem.FileIgnored;
 }
 
-ProgressDispatcher *ProgressDispatcher::instance () {
+ProgressDispatcher *ProgressDispatcher.instance () {
     if (!_instance) {
         _instance = new ProgressDispatcher ();
     }
     return _instance;
 }
 
-ProgressDispatcher::ProgressDispatcher (QObject *parent)
+ProgressDispatcher.ProgressDispatcher (QObject *parent)
     : QObject (parent) {
 }
 
-ProgressDispatcher::~ProgressDispatcher () = default;
+ProgressDispatcher.~ProgressDispatcher () = default;
 
-void ProgressDispatcher::setProgressInfo (QString &folder, ProgressInfo &progress) {
+void ProgressDispatcher.setProgressInfo (QString &folder, ProgressInfo &progress) {
     if (folder.isEmpty ())
     // The update phase now also has progress
     //            (progress._currentItems.size () == 0
@@ -122,12 +122,12 @@ void ProgressDispatcher::setProgressInfo (QString &folder, ProgressInfo &progres
     emit progressInfo (folder, progress);
 }
 
-ProgressInfo::ProgressInfo () {
-    connect (&_updateEstimatesTimer, &QTimer::timeout, this, &ProgressInfo::updateEstimates);
+ProgressInfo.ProgressInfo () {
+    connect (&_updateEstimatesTimer, &QTimer.timeout, this, &ProgressInfo.updateEstimates);
     reset ();
 }
 
-void ProgressInfo::reset () {
+void ProgressInfo.reset () {
     _status = Starting;
 
     _currentItems.clear ();
@@ -146,15 +146,15 @@ void ProgressInfo::reset () {
     _lastCompletedItem = SyncFileItem ();
 }
 
-ProgressInfo::Status ProgressInfo::status () const {
+ProgressInfo.Status ProgressInfo.status () {
     return _status;
 }
 
-void ProgressInfo::startEstimateUpdates () {
+void ProgressInfo.startEstimateUpdates () {
     _updateEstimatesTimer.start (1000);
 }
 
-bool ProgressInfo::isUpdatingEstimates () const {
+bool ProgressInfo.isUpdatingEstimates () {
     return _updateEstimatesTimer.isActive ();
 }
 
@@ -172,7 +172,7 @@ static bool shouldCountProgress (SyncFileItem &item) {
     return true;
 }
 
-void ProgressInfo::adjustTotalsForFile (SyncFileItem &item) {
+void ProgressInfo.adjustTotalsForFile (SyncFileItem &item) {
     if (!shouldCountProgress (item)) {
         return;
     }
@@ -183,41 +183,41 @@ void ProgressInfo::adjustTotalsForFile (SyncFileItem &item) {
     }
 }
 
-qint64 ProgressInfo::totalFiles () const {
+qint64 ProgressInfo.totalFiles () {
     return _fileProgress._total;
 }
 
-qint64 ProgressInfo::completedFiles () const {
+qint64 ProgressInfo.completedFiles () {
     return _fileProgress._completed;
 }
 
-qint64 ProgressInfo::currentFile () const {
+qint64 ProgressInfo.currentFile () {
     return completedFiles () + _currentItems.size ();
 }
 
-qint64 ProgressInfo::totalSize () const {
+qint64 ProgressInfo.totalSize () {
     return _sizeProgress._total;
 }
 
-qint64 ProgressInfo::completedSize () const {
+qint64 ProgressInfo.completedSize () {
     return _sizeProgress._completed;
 }
 
-void ProgressInfo::setProgressComplete (SyncFileItem &item) {
+void ProgressInfo.setProgressComplete (SyncFileItem &item) {
     if (!shouldCountProgress (item)) {
         return;
     }
 
     _currentItems.remove (item._file);
     _fileProgress.setCompleted (_fileProgress._completed + item._affectedItems);
-    if (ProgressInfo::isSizeDependent (item)) {
+    if (ProgressInfo.isSizeDependent (item)) {
         _totalSizeOfCompletedJobs += item._size;
     }
     recomputeCompletedSize ();
     _lastCompletedItem = item;
 }
 
-void ProgressInfo::setProgressItem (SyncFileItem &item, qint64 completed) {
+void ProgressInfo.setProgressItem (SyncFileItem &item, qint64 completed) {
     if (!shouldCountProgress (item)) {
         return;
     }
@@ -231,7 +231,7 @@ void ProgressInfo::setProgressItem (SyncFileItem &item, qint64 completed) {
     _lastCompletedItem = SyncFileItem ();
 }
 
-ProgressInfo::Estimates ProgressInfo::totalProgress () const {
+ProgressInfo.Estimates ProgressInfo.totalProgress () {
     Estimates file = _fileProgress.estimates ();
     if (_sizeProgress._total == 0) {
         return file;
@@ -290,7 +290,7 @@ ProgressInfo::Estimates ProgressInfo::totalProgress () const {
     return size;
 }
 
-quint64 ProgressInfo::optimisticEta () const {
+quint64 ProgressInfo.optimisticEta () {
     // This assumes files and transfers finish as quickly as possible
     // *but* note that maxPerSecond could be serious underestimate
     // (if we never got to fully excercise transfer or files/second)
@@ -299,15 +299,15 @@ quint64 ProgressInfo::optimisticEta () const {
         + _sizeProgress.remaining () / _maxBytesPerSecond * 1000;
 }
 
-bool ProgressInfo::trustEta () const {
+bool ProgressInfo.trustEta () {
     return totalProgress ().estimatedEta < 100 * optimisticEta ();
 }
 
-ProgressInfo::Estimates ProgressInfo::fileProgress (SyncFileItem &item) const {
+ProgressInfo.Estimates ProgressInfo.fileProgress (SyncFileItem &item) {
     return _currentItems[item._file]._progress.estimates ();
 }
 
-void ProgressInfo::updateEstimates () {
+void ProgressInfo.updateEstimates () {
     _sizeProgress.update ();
     _fileProgress.update ();
 
@@ -324,7 +324,7 @@ void ProgressInfo::updateEstimates () {
         _maxBytesPerSecond);
 }
 
-void ProgressInfo::recomputeCompletedSize () {
+void ProgressInfo.recomputeCompletedSize () {
     qint64 r = _totalSizeOfCompletedJobs;
     foreach (ProgressItem &i, _currentItems) {
         if (isSizeDependent (i._item))
@@ -333,7 +333,7 @@ void ProgressInfo::recomputeCompletedSize () {
     _sizeProgress.setCompleted (r);
 }
 
-ProgressInfo::Estimates ProgressInfo::Progress::estimates () const {
+ProgressInfo.Estimates ProgressInfo.Progress.estimates () {
     Estimates est;
     est.estimatedBandwidth = _progressPerSec;
     if (_progressPerSec != 0) {
@@ -344,15 +344,15 @@ ProgressInfo::Estimates ProgressInfo::Progress::estimates () const {
     return est;
 }
 
-qint64 ProgressInfo::Progress::completed () const {
+qint64 ProgressInfo.Progress.completed () {
     return _completed;
 }
 
-qint64 ProgressInfo::Progress::remaining () const {
+qint64 ProgressInfo.Progress.remaining () {
     return _total - _completed;
 }
 
-void ProgressInfo::Progress::update () {
+void ProgressInfo.Progress.update () {
     // A good way to think about the smoothing factor:
     // If we make progress P per sec and then stop making progress at all,
     // after N calls to this function (and thus seconds) the _progressPerSec
@@ -367,7 +367,7 @@ void ProgressInfo::Progress::update () {
     _prevCompleted = _completed;
 }
 
-void ProgressInfo::Progress::setCompleted (qint64 completed) {
+void ProgressInfo.Progress.setCompleted (qint64 completed) {
     _completed = qMin (completed, _total);
     _prevCompleted = qMin (_prevCompleted, _completed);
 }

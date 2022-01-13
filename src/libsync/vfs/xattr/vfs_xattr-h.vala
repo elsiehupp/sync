@@ -56,7 +56,7 @@ protected:
 
 class XattrVfsPluginFactory : public QObject, public DefaultPluginFactory<VfsXAttr> {
     Q_PLUGIN_METADATA (IID "org.owncloud.PluginFactory" FILE "vfspluginmetadata.json")
-    Q_INTERFACES (OCC::PluginFactory)
+    Q_INTERFACES (OCC.PluginFactory)
 };
 
 } // namespace OCC

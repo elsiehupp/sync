@@ -125,9 +125,9 @@ public slots:
     void slotRequestMnemonic ();
 
 private slots:
-    void publicKeyFetched (QKeychain::Job *incoming);
-    void privateKeyFetched (QKeychain::Job *incoming);
-    void mnemonicKeyFetched (QKeychain::Job *incoming);
+    void publicKeyFetched (QKeychain.Job *incoming);
+    void privateKeyFetched (QKeychain.Job *incoming);
+    void mnemonicKeyFetched (QKeychain.Job *incoming);
 
 signals:
     void initializationFinished ();
@@ -181,7 +181,7 @@ public:
     QVector<EncryptedFile> files () const;
 
 private:
-    /* Use std::string and std::vector internally on this class
+    /* Use std.string and std.vector internally on this class
      * to ease the port to Nlohmann Json API
      */
     void setupEmptyMetadata ();

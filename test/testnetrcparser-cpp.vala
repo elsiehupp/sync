@@ -19,54 +19,54 @@ const char testfileEmptyC[] = "netrctestEmpty";
 class TestNetrcParser : public QObject {
 
 private slots:
-    void initTestCase() {
-       QFile netrc(testfileC);
-       QVERIFY(netrc.open(QIODevice::WriteOnly));
-       netrc.write("machine foo login bar password baz\n");
-       netrc.write("machine broken login bar2 dontbelonghere password baz2 extratokens dontcare andanother\n");
-       netrc.write("machine\nfunnysplit\tlogin bar3 password baz3\n");
-       netrc.write("machine frob login \"user with spaces\" password 'space pwd'\n");
-       QFile netrcWithDefault(testfileWithDefaultC);
-       QVERIFY(netrcWithDefault.open(QIODevice::WriteOnly));
-       netrcWithDefault.write("machine foo login bar password baz\n");
-       netrcWithDefault.write("default login user password pass\n");
-       QFile netrcEmpty(testfileEmptyC);
-       QVERIFY(netrcEmpty.open(QIODevice::WriteOnly));
+    void initTestCase () {
+       QFile netrc (testfileC);
+       QVERIFY (netrc.open (QIODevice.WriteOnly));
+       netrc.write ("machine foo login bar password baz\n");
+       netrc.write ("machine broken login bar2 dontbelonghere password baz2 extratokens dontcare andanother\n");
+       netrc.write ("machine\nfunnysplit\tlogin bar3 password baz3\n");
+       netrc.write ("machine frob login \"user with spaces\" password 'space pwd'\n");
+       QFile netrcWithDefault (testfileWithDefaultC);
+       QVERIFY (netrcWithDefault.open (QIODevice.WriteOnly));
+       netrcWithDefault.write ("machine foo login bar password baz\n");
+       netrcWithDefault.write ("default login user password pass\n");
+       QFile netrcEmpty (testfileEmptyC);
+       QVERIFY (netrcEmpty.open (QIODevice.WriteOnly));
     }
 
-    void cleanupTestCase() {
-       QVERIFY(QFile::remove(testfileC));
-       QVERIFY(QFile::remove(testfileWithDefaultC));
-       QVERIFY(QFile::remove(testfileEmptyC));
+    void cleanupTestCase () {
+       QVERIFY (QFile.remove (testfileC));
+       QVERIFY (QFile.remove (testfileWithDefaultC));
+       QVERIFY (QFile.remove (testfileEmptyC));
     }
 
-    void testValidNetrc() {
-       NetrcParser parser(testfileC);
-       QVERIFY(parser.parse());
-       QCOMPARE(parser.find("foo"), qMakePair(QString("bar"), QString("baz")));
-       QCOMPARE(parser.find("broken"), qMakePair(QString("bar2"), QString()));
-       QCOMPARE(parser.find("funnysplit"), qMakePair(QString("bar3"), QString("baz3")));
-       QCOMPARE(parser.find("frob"), qMakePair(QString("user with spaces"), QString("space pwd")));
+    void testValidNetrc () {
+       NetrcParser parser (testfileC);
+       QVERIFY (parser.parse ());
+       QCOMPARE (parser.find ("foo"), qMakePair (QString ("bar"), QString ("baz")));
+       QCOMPARE (parser.find ("broken"), qMakePair (QString ("bar2"), QString ()));
+       QCOMPARE (parser.find ("funnysplit"), qMakePair (QString ("bar3"), QString ("baz3")));
+       QCOMPARE (parser.find ("frob"), qMakePair (QString ("user with spaces"), QString ("space pwd")));
     }
 
-    void testEmptyNetrc() {
-       NetrcParser parser(testfileEmptyC);
-       QVERIFY(!parser.parse());
-       QCOMPARE(parser.find("foo"), qMakePair(QString(), QString()));
+    void testEmptyNetrc () {
+       NetrcParser parser (testfileEmptyC);
+       QVERIFY (!parser.parse ());
+       QCOMPARE (parser.find ("foo"), qMakePair (QString (), QString ()));
     }
 
-    void testValidNetrcWithDefault() {
-       NetrcParser parser(testfileWithDefaultC);
-       QVERIFY(parser.parse());
-       QCOMPARE(parser.find("foo"), qMakePair(QString("bar"), QString("baz")));
-       QCOMPARE(parser.find("dontknow"), qMakePair(QString("user"), QString("pass")));
+    void testValidNetrcWithDefault () {
+       NetrcParser parser (testfileWithDefaultC);
+       QVERIFY (parser.parse ());
+       QCOMPARE (parser.find ("foo"), qMakePair (QString ("bar"), QString ("baz")));
+       QCOMPARE (parser.find ("dontknow"), qMakePair (QString ("user"), QString ("pass")));
     }
 
-    void testInvalidNetrc() {
-       NetrcParser parser("/invalid");
-       QVERIFY(!parser.parse());
+    void testInvalidNetrc () {
+       NetrcParser parser ("/invalid");
+       QVERIFY (!parser.parse ());
     }
 };
 
-QTEST_APPLESS_MAIN(TestNetrcParser)
+QTEST_APPLESS_MAIN (TestNetrcParser)
 #include "testnetrcparser.moc"

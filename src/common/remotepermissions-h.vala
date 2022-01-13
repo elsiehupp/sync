@@ -53,7 +53,7 @@ public:
         IsMountedSub = 10,        // m (internal: set if the parent dir has IsMounted)
 
         // Note: when adding support for more permissions, we need to invalid the cache in the database.
-        // (by setting forceRemoteDiscovery in SyncJournalDb::checkConnect)
+        // (by setting forceRemoteDiscovery in SyncJournalDb.checkConnect)
         PermissionsCount = IsMountedSub
     };
 
@@ -72,7 +72,7 @@ public:
     /// read a permissions string received from the server, never null
     static RemotePermissions fromServerString (QString &);
 
-    bool hasPermission (Permissions p) const {
+    bool hasPermission (Permissions p) {
         return _value & (1 << static_cast<int> (p));
     }
     void setPermission (Permissions p) {
@@ -82,7 +82,7 @@ public:
         _value &= ~ (1 << static_cast<int> (p));
     }
 
-    bool isNull () const { return ! (_value & notNullMask); }
+    bool isNull () { return ! (_value & notNullMask); }
     friend bool operator== (RemotePermissions a, RemotePermissions b) {
         return a._value == b._value;
     }
@@ -97,4 +97,4 @@ public:
 
 } // namespace OCC
 
-Q_DECLARE_METATYPE (OCC::RemotePermissions)
+Q_DECLARE_METATYPE (OCC.RemotePermissions)

@@ -23,17 +23,17 @@ public:
     explicit ElidedLabel (QString &text, QWidget *parent = nullptr);
 
     void setText (QString &text);
-    const QString &text () const { return _text; }
+    const QString &text () { return _text; }
 
-    void setElideMode (Qt::TextElideMode elideMode);
-    Qt::TextElideMode elideMode () const { return _elideMode; }
+    void setElideMode (Qt.TextElideMode elideMode);
+    Qt.TextElideMode elideMode () { return _elideMode; }
 
 protected:
     void resizeEvent (QResizeEvent *event) override;
 
 private:
     QString _text;
-    Qt::TextElideMode _elideMode = Qt::ElideNone;
+    Qt.TextElideMode _elideMode = Qt.ElideNone;
 };
 }
 

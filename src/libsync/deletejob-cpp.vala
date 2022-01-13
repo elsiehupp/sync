@@ -18,16 +18,16 @@ namespace OCC {
 
 Q_LOGGING_CATEGORY (lcDeleteJob, "nextcloud.sync.networkjob.delete", QtInfoMsg)
 
-DeleteJob::DeleteJob (AccountPtr account, QString &path, QObject *parent)
+DeleteJob.DeleteJob (AccountPtr account, QString &path, QObject *parent)
     : AbstractNetworkJob (account, path, parent) {
 }
 
-DeleteJob::DeleteJob (AccountPtr account, QUrl &url, QObject *parent)
+DeleteJob.DeleteJob (AccountPtr account, QUrl &url, QObject *parent)
     : AbstractNetworkJob (account, QString (), parent)
     , _url (url) {
 }
 
-void DeleteJob::start () {
+void DeleteJob.start () {
     QNetworkRequest req;
     if (!_folderToken.isEmpty ()) {
         req.setRawHeader ("e2e-token", _folderToken);
@@ -39,25 +39,25 @@ void DeleteJob::start () {
         sendRequest ("DELETE", makeDavUrl (path ()), req);
     }
 
-    if (reply ()->error () != QNetworkReply::NoError) {
-        qCWarning (lcDeleteJob) << " Network error: " << reply ()->errorString ();
+    if (reply ().error () != QNetworkReply.NoError) {
+        qCWarning (lcDeleteJob) << " Network error: " << reply ().errorString ();
     }
-    AbstractNetworkJob::start ();
+    AbstractNetworkJob.start ();
 }
 
-bool DeleteJob::finished () {
-    qCInfo (lcDeleteJob) << "DELETE of" << reply ()->request ().url () << "FINISHED WITH STATUS"
+bool DeleteJob.finished () {
+    qCInfo (lcDeleteJob) << "DELETE of" << reply ().request ().url () << "FINISHED WITH STATUS"
                        << replyStatusString ();
 
     emit finishedSignal ();
     return true;
 }
 
-QByteArray DeleteJob::folderToken () const {
+QByteArray DeleteJob.folderToken () {
     return _folderToken;
 }
 
-void DeleteJob::setFolderToken (QByteArray &folderToken) {
+void DeleteJob.setFolderToken (QByteArray &folderToken) {
     _folderToken = folderToken;
 }
 

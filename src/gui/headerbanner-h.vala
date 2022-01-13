@@ -71,7 +71,7 @@ public:
     HeaderBanner (QWidget *parent = nullptr);
 
     void setup (QString &title, QPixmap &logo, QPixmap &banner,
-               const Qt::TextFormat titleFormat, QString &styleSheet);
+               const Qt.TextFormat titleFormat, QString &styleSheet);
 
 protected:
     void paintEvent (QPaintEvent *event) override;

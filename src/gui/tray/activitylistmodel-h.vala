@@ -36,7 +36,7 @@ class ActivityListModel : public QAbstractListModel {
     Q_PROPERTY (AccountState *accountState READ accountState CONSTANT)
 public:
     enum DataRole {
-        ActionIconRole = Qt::UserRole + 1,
+        ActionIconRole = Qt.UserRole + 1,
         UserIconRole,
         AccountRole,
         ObjectTypeRole,

@@ -75,7 +75,7 @@ public slots:
     void slotShowSyncProtocol ();
     void slotShutdown ();
     void slotSyncStateChange (Folder *);
-    void slotTrayClicked (QSystemTrayIcon::ActivationReason reason);
+    void slotTrayClicked (QSystemTrayIcon.ActivationReason reason);
     void slotToggleLogBrowser ();
     void slotOpenOwnCloud ();
     void slotOpenSettingsDialog ();

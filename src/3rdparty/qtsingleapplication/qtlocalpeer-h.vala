@@ -41,7 +41,7 @@ public:
     explicit QtLocalPeer (QObject *parent = nullptr, QString &appId = QString ());
     bool isClient ();
     bool sendMessage (QString &message, int timeout, bool block);
-    QString applicationId () const { return id; }
+    QString applicationId () { return id; }
     static QString appSessionId (QString &appId);
 
 Q_SIGNALS:

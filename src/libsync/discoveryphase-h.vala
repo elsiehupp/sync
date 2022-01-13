@@ -47,7 +47,7 @@ struct RemoteInfo {
     QByteArray etag;
     QByteArray fileId;
     QByteArray checksumHeader;
-    OCC::RemotePermissions remotePerm;
+    OCC.RemotePermissions remotePerm;
     time_t modtime = 0;
     int64_t size = 0;
     int64_t sizeOfFolder = 0;
@@ -55,7 +55,7 @@ struct RemoteInfo {
     bool isE2eEncrypted = false;
     QString e2eMangledName;
 
-    bool isValid () const { return !name.isNull (); }
+    bool isValid () { return !name.isNull (); }
 
     QString directDownloadUrl;
     QString directDownloadCookies;
@@ -73,7 +73,7 @@ struct LocalInfo {
     bool isHidden = false;
     bool isVirtualFile = false;
     bool isSymLink = false;
-    bool isValid () const { return !name.isNull (); }
+    bool isValid () { return !name.isNull (); }
 };
 
 /**
@@ -83,7 +83,7 @@ struct LocalInfo {
  */
 class DiscoverySingleLocalDirectoryJob : public QObject, public QRunnable {
 public:
-    explicit DiscoverySingleLocalDirectoryJob (AccountPtr &account, QString &localPath, OCC::Vfs *vfs, QObject *parent = nullptr);
+    explicit DiscoverySingleLocalDirectoryJob (AccountPtr &account, QString &localPath, OCC.Vfs *vfs, QObject *parent = nullptr);
 
     void run () override;
 signals:
@@ -97,7 +97,7 @@ private slots:
 private:
     QString _localPath;
     AccountPtr _account;
-    OCC::Vfs* _vfs;
+    OCC.Vfs* _vfs;
 public:
 };
 
@@ -179,7 +179,7 @@ class DiscoveryPhase : public QObject {
      */
     QMap<QString, ProcessDirectoryJob *> _queuedDeletedDirectories;
 
-    // map source (original path) -> destinations (current server or local path)
+    // map source (original path) . destinations (current server or local path)
     QMap<QString, QString> _renamedItemsRemote;
     QMap<QString, QString> _renamedItemsLocal;
 
@@ -198,7 +198,7 @@ class DiscoveryPhase : public QObject {
      * Useful for avoiding processing of items that have already been claimed in
      * a rename (would otherwise be discovered as deletions).
      */
-    bool isRenamed (QString &p) const { return _renamedItemsLocal.contains (p) || _renamedItemsRemote.contains (p); }
+    bool isRenamed (QString &p) { return _renamedItemsLocal.contains (p) || _renamedItemsRemote.contains (p); }
 
     int _currentlyActiveJobs = 0;
 
@@ -213,14 +213,14 @@ class DiscoveryPhase : public QObject {
     // Check if the new folder should be deselected or not.
     // May be async. "Return" via the callback, true if the item is blacklisted
     void checkSelectiveSyncNewFolder (QString &path, RemotePermissions rp,
-        std::function<void (bool)> callback);
+        std.function<void (bool)> callback);
 
     /** Given an original path, return the target path obtained when renaming is done.
      *
      * Note that it only considers parent directory renames. So if A/B got renamed to C/D,
      * checking A/B/file would yield C/D/file, but checking A/B would yield A/B.
      */
-    QString adjustRenamedPath (QString &original, SyncFileItem::Direction) const;
+    QString adjustRenamedPath (QString &original, SyncFileItem.Direction) const;
 
     /** If the db-path is scheduled for deletion, abort it.
      *
@@ -246,7 +246,7 @@ public:
     QRegularExpression _invalidFilenameRx; // FIXME: maybe move in ExcludedFiles
     QStringList _serverBlacklistedFiles; // The blacklist from the capabilities
     bool _ignoreHiddenFiles = false;
-    std::function<bool (QString &)> _shouldDiscoverLocaly;
+    std.function<bool (QString &)> _shouldDiscoverLocaly;
 
     void startJob (ProcessDirectoryJob *);
 
@@ -267,13 +267,13 @@ signals:
 
     /** For excluded items that don't show up in itemDiscovered ()
       *
-      * The path is relative to the sync folder, similar to item->_file
+      * The path is relative to the sync folder, similar to item._file
       */
     void silentlyExcluded (QString &folderPath);
 
-    void addErrorToGui (SyncFileItem::Status status, QString &errorMessage, QString &subject);
+    void addErrorToGui (SyncFileItem.Status status, QString &errorMessage, QString &subject);
 };
 
-/// Implementation of DiscoveryPhase::adjustRenamedPath
+/// Implementation of DiscoveryPhase.adjustRenamedPath
 QString adjustRenamedPath (QMap<QString, QString> &renamedItems, QString &original);
 }

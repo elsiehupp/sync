@@ -72,7 +72,7 @@ private:
     ShareLinkWidget *addLinkShareWidget (QSharedPointer<LinkShare> &linkShare);
     void initLinkShareWidget ();
 
-    Ui::ShareDialog *_ui;
+    Ui.ShareDialog *_ui;
 
     QPointer<AccountState> _accountState;
     QString _sharePath;

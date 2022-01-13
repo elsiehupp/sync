@@ -61,22 +61,22 @@ public:
     bool passwordStorageAllowed (QString &connection = QString ());
 
     /* Server poll interval in milliseconds */
-    std::chrono::milliseconds remotePollInterval (QString &connection = QString ()) const;
+    std.chrono.milliseconds remotePollInterval (QString &connection = QString ()) const;
     /* Set poll interval. Value in milliseconds has to be larger than 5000 */
-    void setRemotePollInterval (std::chrono::milliseconds interval, QString &connection = QString ());
+    void setRemotePollInterval (std.chrono.milliseconds interval, QString &connection = QString ());
 
     /* Interval to check for new notifications */
-    std::chrono::milliseconds notificationRefreshInterval (QString &connection = QString ()) const;
+    std.chrono.milliseconds notificationRefreshInterval (QString &connection = QString ()) const;
 
     /* Force sync interval, in milliseconds */
-    std::chrono::milliseconds forceSyncInterval (QString &connection = QString ()) const;
+    std.chrono.milliseconds forceSyncInterval (QString &connection = QString ()) const;
 
     /**
      * Interval in milliseconds within which full local discovery is required
      *
      * Use -1 to disable regular full local discoveries.
      */
-    std::chrono::milliseconds fullLocalDiscoveryInterval () const;
+    std.chrono.milliseconds fullLocalDiscoveryInterval () const;
 
     bool monoIcons () const;
     void setMonoIcons (bool);
@@ -154,13 +154,13 @@ public:
     qint64 chunkSize () const;
     qint64 maxChunkSize () const;
     qint64 minChunkSize () const;
-    std::chrono::milliseconds targetChunkUploadDuration () const;
+    std.chrono.milliseconds targetChunkUploadDuration () const;
 
     void saveGeometry (QWidget *w);
     void restoreGeometry (QWidget *w);
 
     // how often the check about new versions runs
-    std::chrono::milliseconds updateCheckInterval (QString &connection = QString ()) const;
+    std.chrono.milliseconds updateCheckInterval (QString &connection = QString ()) const;
 
     // skipUpdateCheck completely disables the updater and hides its UI
     bool skipUpdateCheck (QString &connection = QString ()) const;
@@ -193,7 +193,7 @@ public:
 
     /**  Returns a new settings pre-set in a specific group.  The Settings will be created
          with the given parent. If no parent is specified, the caller must destroy the settings */
-    static std::unique_ptr<QSettings> settingsWithGroup (QString &group, QObject *parent = nullptr);
+    static std.unique_ptr<QSettings> settingsWithGroup (QString &group, QObject *parent = nullptr);
 
     /// Add the system and user exclude file path to the ExcludedFiles instance.
     static void setupDefaultExcludeFilePaths (ExcludedFiles &excludedFiles);

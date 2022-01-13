@@ -42,7 +42,7 @@ static QString errorCodeToString (DWORD errorCode) {
     FormatMessageA (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
                     0, errorCode, 0,
                     (char*)&data, 0, 0);
-    result = QString::fromLocal8Bit (data);
+    result = QString.fromLocal8Bit (data);
     if (data != 0)
         LocalFree (data);
 
@@ -52,9 +52,9 @@ static QString errorCodeToString (DWORD errorCode) {
     return result;
 }
 
-bool QtLockedFile::lock (LockMode mode, bool block) {
+bool QtLockedFile.lock (LockMode mode, bool block) {
     if (!isOpen ()) {
-        qWarning ("QtLockedFile::lock (): file is not opened");
+        qWarning ("QtLockedFile.lock (): file is not opened");
         return false;
     }
 
@@ -66,14 +66,14 @@ bool QtLockedFile::lock (LockMode mode, bool block) {
 
     if (m_semaphore_hnd == 0) {
         QFileInfo fi (*this);
-        QString sem_name = QString::fromLatin1 (SEMAPHORE_PREFIX)
+        QString sem_name = QString.fromLatin1 (SEMAPHORE_PREFIX)
                            + fi.absoluteFilePath ().toLower ();
 
         m_semaphore_hnd = CreateSemaphoreW (0, SEMAPHORE_MAX, SEMAPHORE_MAX,
                                            (TCHAR*)sem_name.utf16 ());
 
         if (m_semaphore_hnd == 0) {
-            qWarning ("QtLockedFile::lock (): CreateSemaphore: %s",
+            qWarning ("QtLockedFile.lock (): CreateSemaphore: %s",
                      errorCodeToString (GetLastError ()).toLatin1 ().constData ());
             return false;
         }
@@ -87,13 +87,13 @@ bool QtLockedFile::lock (LockMode mode, bool block) {
         decrement = SEMAPHORE_MAX;
         if (m_mutex_hnd == 0) {
             QFileInfo fi (*this);
-            QString mut_name = QString::fromLatin1 (MUTEX_PREFIX)
+            QString mut_name = QString.fromLatin1 (MUTEX_PREFIX)
                                + fi.absoluteFilePath ().toLower ();
 
             m_mutex_hnd = CreateMutexW (nullptr, FALSE, (TCHAR*)mut_name.utf16 ());
 
             if (m_mutex_hnd == 0) {
-                qWarning ("QtLockedFile::lock (): CreateMutex: %s",
+                qWarning ("QtLockedFile.lock (): CreateMutex: %s",
                          errorCodeToString (GetLastError ()).toLatin1 ().constData ());
                 return false;
             }
@@ -102,7 +102,7 @@ bool QtLockedFile::lock (LockMode mode, bool block) {
         if (res == WAIT_TIMEOUT)
             return false;
         if (res == WAIT_FAILED) {
-            qWarning ("QtLockedFile::lock (): WaitForSingleObject (mutex): %s",
+            qWarning ("QtLockedFile.lock (): WaitForSingleObject (mutex): %s",
                      errorCodeToString (GetLastError ()).toLatin1 ().constData ());
             return false;
         }
@@ -115,7 +115,7 @@ bool QtLockedFile::lock (LockMode mode, bool block) {
             if (i) {
                 // A failed nonblocking rw locking. Undo changes to semaphore.
                 if (ReleaseSemaphore (m_semaphore_hnd, i, nullptr) == 0) {
-                    qWarning ("QtLockedFile::unlock (): ReleaseSemaphore: %s",
+                    qWarning ("QtLockedFile.unlock (): ReleaseSemaphore: %s",
                              errorCodeToString (GetLastError ()).toLatin1 ().constData ());
                     // Fall through
                 }
@@ -127,7 +127,7 @@ bool QtLockedFile::lock (LockMode mode, bool block) {
         if (res != WAIT_OBJECT_0) {
             if (gotMutex)
                 ReleaseMutex (m_mutex_hnd);
-            qWarning ("QtLockedFile::lock (): WaitForSingleObject (semaphore): %s",
+            qWarning ("QtLockedFile.lock (): WaitForSingleObject (semaphore): %s",
                         errorCodeToString (GetLastError ()).toLatin1 ().constData ());
             return false;
         }
@@ -139,9 +139,9 @@ bool QtLockedFile::lock (LockMode mode, bool block) {
     return true;
 }
 
-bool QtLockedFile::unlock () {
+bool QtLockedFile.unlock () {
     if (!isOpen ()) {
-        qWarning ("QtLockedFile::unlock (): file is not opened");
+        qWarning ("QtLockedFile.unlock (): file is not opened");
         return false;
     }
 
@@ -156,23 +156,23 @@ bool QtLockedFile::unlock () {
 
     DWORD ret = ReleaseSemaphore (m_semaphore_hnd, increment, 0);
     if (ret == 0) {
-        qWarning ("QtLockedFile::unlock (): ReleaseSemaphore: %s",
+        qWarning ("QtLockedFile.unlock (): ReleaseSemaphore: %s",
                     errorCodeToString (GetLastError ()).toLatin1 ().constData ());
         return false;
     }
 
-    m_lock_mode = QtLockedFile::NoLock;
+    m_lock_mode = QtLockedFile.NoLock;
     remove ();
     return true;
 }
 
-QtLockedFile::~QtLockedFile () {
+QtLockedFile.~QtLockedFile () {
     if (isOpen ())
         unlock ();
     if (m_mutex_hnd != 0) {
         DWORD ret = CloseHandle (m_mutex_hnd);
         if (ret == 0) {
-            qWarning ("QtLockedFile::~QtLockedFile (): CloseHandle (mutex): %s",
+            qWarning ("QtLockedFile.~QtLockedFile (): CloseHandle (mutex): %s",
                         errorCodeToString (GetLastError ()).toLatin1 ().constData ());
         }
         m_mutex_hnd = 0;
@@ -180,7 +180,7 @@ QtLockedFile::~QtLockedFile () {
     if (m_semaphore_hnd != 0) {
         DWORD ret = CloseHandle (m_semaphore_hnd);
         if (ret == 0) {
-            qWarning ("QtLockedFile::~QtLockedFile (): CloseHandle (semaphore): %s",
+            qWarning ("QtLockedFile.~QtLockedFile (): CloseHandle (semaphore): %s",
                         errorCodeToString (GetLastError ()).toLatin1 ().constData ());
         }
         m_semaphore_hnd = 0;

@@ -17,66 +17,66 @@
 class TestIconUtils : public QObject {
 
 public:
-    TestIconUtils() {
-        Q_INIT_RESOURCE(resources);
-        Q_INIT_RESOURCE(theme);
+    TestIconUtils () {
+        Q_INIT_RESOURCE (resources);
+        Q_INIT_RESOURCE (theme);
     }
 
 private slots:
-    void testDrawSvgWithCustomFillColor() {
-        const QString blackSvgDirPath{QString{OCC::Theme::themePrefix} + QStringLiteral("black")};
-        const QDir blackSvgDir(blackSvgDirPath);
-        const QStringList blackImages = blackSvgDir.entryList(QStringList("*.svg"));
+    void testDrawSvgWithCustomFillColor () {
+        const QString blackSvgDirPath{QString{OCC.Theme.themePrefix} + QStringLiteral ("black")};
+        const QDir blackSvgDir (blackSvgDirPath);
+        const QStringList blackImages = blackSvgDir.entryList (QStringList ("*.svg"));
 
-        Q_ASSERT(!blackImages.isEmpty());
+        Q_ASSERT (!blackImages.isEmpty ());
 
-        QVERIFY(!OCC::Ui::IconUtils::drawSvgWithCustomFillColor(blackSvgDirPath + QStringLiteral("/") + blackImages.at(0), QColorConstants::Svg::red).isNull());
+        QVERIFY (!OCC.Ui.IconUtils.drawSvgWithCustomFillColor (blackSvgDirPath + QStringLiteral ("/") + blackImages.at (0), QColorConstants.Svg.red).isNull ());
 
-        QVERIFY(!OCC::Ui::IconUtils::drawSvgWithCustomFillColor(blackSvgDirPath + QStringLiteral("/") + blackImages.at(0), QColorConstants::Svg::green).isNull());
+        QVERIFY (!OCC.Ui.IconUtils.drawSvgWithCustomFillColor (blackSvgDirPath + QStringLiteral ("/") + blackImages.at (0), QColorConstants.Svg.green).isNull ());
 
-        const QString whiteSvgDirPath{QString{OCC::Theme::themePrefix} + QStringLiteral("white")};
-        const QDir whiteSvgDir(whiteSvgDirPath);
-        const QStringList whiteImages = whiteSvgDir.entryList(QStringList("*.svg"));
+        const QString whiteSvgDirPath{QString{OCC.Theme.themePrefix} + QStringLiteral ("white")};
+        const QDir whiteSvgDir (whiteSvgDirPath);
+        const QStringList whiteImages = whiteSvgDir.entryList (QStringList ("*.svg"));
 
-        Q_ASSERT(!whiteImages.isEmpty());
+        Q_ASSERT (!whiteImages.isEmpty ());
 
-        QVERIFY(!OCC::Ui::IconUtils::drawSvgWithCustomFillColor(whiteSvgDirPath + QStringLiteral("/") + whiteImages.at(0), QColorConstants::Svg::blue).isNull());
+        QVERIFY (!OCC.Ui.IconUtils.drawSvgWithCustomFillColor (whiteSvgDirPath + QStringLiteral ("/") + whiteImages.at (0), QColorConstants.Svg.blue).isNull ());
     }
 
-    void testCreateSvgPixmapWithCustomColor() {
-        const QDir blackSvgDir(QString(QString{OCC::Theme::themePrefix}) + QStringLiteral("black"));
-        const QStringList blackImages = blackSvgDir.entryList(QStringList("*.svg"));
+    void testCreateSvgPixmapWithCustomColor () {
+        const QDir blackSvgDir (QString (QString{OCC.Theme.themePrefix}) + QStringLiteral ("black"));
+        const QStringList blackImages = blackSvgDir.entryList (QStringList ("*.svg"));
 
-        QVERIFY(!blackImages.isEmpty());
+        QVERIFY (!blackImages.isEmpty ());
 
-        QVERIFY(!OCC::Ui::IconUtils::createSvgImageWithCustomColor(blackImages.at(0), QColorConstants::Svg::red).isNull());
+        QVERIFY (!OCC.Ui.IconUtils.createSvgImageWithCustomColor (blackImages.at (0), QColorConstants.Svg.red).isNull ());
 
-        QVERIFY(!OCC::Ui::IconUtils::createSvgImageWithCustomColor(blackImages.at(0), QColorConstants::Svg::green).isNull());
+        QVERIFY (!OCC.Ui.IconUtils.createSvgImageWithCustomColor (blackImages.at (0), QColorConstants.Svg.green).isNull ());
 
-        const QDir whiteSvgDir(QString(QString{OCC::Theme::themePrefix}) + QStringLiteral("white"));
-        const QStringList whiteImages = whiteSvgDir.entryList(QStringList("*.svg"));
+        const QDir whiteSvgDir (QString (QString{OCC.Theme.themePrefix}) + QStringLiteral ("white"));
+        const QStringList whiteImages = whiteSvgDir.entryList (QStringList ("*.svg"));
 
-        QVERIFY(!whiteImages.isEmpty());
+        QVERIFY (!whiteImages.isEmpty ());
 
-        QVERIFY(!OCC::Ui::IconUtils::createSvgImageWithCustomColor(whiteImages.at(0), QColorConstants::Svg::blue).isNull());
+        QVERIFY (!OCC.Ui.IconUtils.createSvgImageWithCustomColor (whiteImages.at (0), QColorConstants.Svg.blue).isNull ());
     }
 
-    void testPixmapForBackground() {
-        const QDir blackSvgDir(QString(QString{OCC::Theme::themePrefix}) + QStringLiteral("black"));
-        const QStringList blackImages = blackSvgDir.entryList(QStringList("*.svg"));
+    void testPixmapForBackground () {
+        const QDir blackSvgDir (QString (QString{OCC.Theme.themePrefix}) + QStringLiteral ("black"));
+        const QStringList blackImages = blackSvgDir.entryList (QStringList ("*.svg"));
 
-        const QDir whiteSvgDir(QString(QString{OCC::Theme::themePrefix}) + QStringLiteral("white"));
-        const QStringList whiteImages = whiteSvgDir.entryList(QStringList("*.svg"));
+        const QDir whiteSvgDir (QString (QString{OCC.Theme.themePrefix}) + QStringLiteral ("white"));
+        const QStringList whiteImages = whiteSvgDir.entryList (QStringList ("*.svg"));
 
-        QVERIFY(!blackImages.isEmpty());
+        QVERIFY (!blackImages.isEmpty ());
 
-        QVERIFY(!OCC::Ui::IconUtils::pixmapForBackground(whiteImages.at(0), QColor("blue")).isNull());
+        QVERIFY (!OCC.Ui.IconUtils.pixmapForBackground (whiteImages.at (0), QColor ("blue")).isNull ());
 
-        QVERIFY(!whiteImages.isEmpty());
+        QVERIFY (!whiteImages.isEmpty ());
 
-        QVERIFY(!OCC::Ui::IconUtils::pixmapForBackground(blackImages.at(0), QColor("yellow")).isNull());
+        QVERIFY (!OCC.Ui.IconUtils.pixmapForBackground (blackImages.at (0), QColor ("yellow")).isNull ());
     }
 };
 
-QTEST_MAIN(TestIconUtils)
+QTEST_MAIN (TestIconUtils)
 #include "testiconutils.moc"

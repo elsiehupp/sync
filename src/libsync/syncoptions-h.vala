@@ -62,7 +62,7 @@ public:
      *
      * Set to 0 it will disable dynamic chunk sizing.
      */
-    std::chrono::milliseconds _targetChunkUploadDuration = std::chrono::minutes (1);
+    std.chrono.milliseconds _targetChunkUploadDuration = std.chrono.minutes (1);
 
     /** The maximum number of active jobs in parallel  */
     int _parallelNetworkJobs = 6;

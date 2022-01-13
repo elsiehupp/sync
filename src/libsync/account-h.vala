@@ -83,7 +83,7 @@ public:
      * The user that can be used in dav url.
      *
      * This can very well be different frome the login user that's
-     * stored in credentials ()->user ().
+     * stored in credentials ().user ().
      */
     QString davUser () const;
     void setDavUser (QString &newDavUser);
@@ -104,7 +104,7 @@ public:
 
     /** Server url of the account */
     void setUrl (QUrl &url);
-    QUrl url () const { return _url; }
+    QUrl url () { return _url; }
 
     /// Adjusts _userVisibleUrl once the host to use is discovered.
     void setUserVisibleHost (QString &host);
@@ -158,7 +158,7 @@ public:
 
     /** The ssl configuration during the first connection */
     QSslConfiguration getOrCreateSslConfig ();
-    QSslConfiguration sslConfiguration () const { return _sslConfiguration; }
+    QSslConfiguration sslConfiguration () { return _sslConfiguration; }
     void setSslConfiguration (QSslConfiguration &config);
     // Because of bugs in Qt, we use this to store info needed for the SSL Button
     QSslCipher _sessionCipher;
@@ -166,7 +166,7 @@ public:
     QList<QSslCertificate> _peerCertificateChain;
 
     /** The certificates of the account */
-    QList<QSslCertificate> approvedCerts () const { return _approvedCerts; }
+    QList<QSslCertificate> approvedCerts () { return _approvedCerts; }
     void setApprovedCerts (QList<QSslCertificate> certs);
     void addApprovedCerts (QList<QSslCertificate> certs);
 
@@ -254,7 +254,7 @@ public:
     PushNotifications *pushNotifications () const;
     void setPushNotificationsReconnectInterval (int interval);
 
-    std::shared_ptr<UserStatusConnector> userStatusConnector () const;
+    std.shared_ptr<UserStatusConnector> userStatusConnector () const;
 
 public slots:
     /// Used when forgetting credentials
@@ -271,7 +271,7 @@ signals:
     void credentialsFetched (AbstractCredentials *credentials);
     void credentialsAsked (AbstractCredentials *credentials);
 
-    /// Forwards from QNetworkAccessManager::proxyAuthenticationRequired ().
+    /// Forwards from QNetworkAccessManager.proxyAuthenticationRequired ().
     void proxyAuthenticationRequired (QNetworkProxy &, QAuthenticator *);
 
     // e.g. when the approved SSL certificates changed
@@ -346,9 +346,9 @@ private:
 
     PushNotifications *_pushNotifications = nullptr;
 
-    std::shared_ptr<UserStatusConnector> _userStatusConnector;
+    std.shared_ptr<UserStatusConnector> _userStatusConnector;
 
-    /* IMPORTANT - remove later - FIXME MS@2019-12-07 -->
+    /* IMPORTANT - remove later - FIXME MS@2019-12-07 -.
      * TODO: For "Log out" & "Remove account": Remove client CA certs and KEY!
      *
      *       Disabled as long as selecting another cert is not supported by the UI.
@@ -366,7 +366,7 @@ private:
 };
 }
 
-Q_DECLARE_METATYPE (OCC::AccountPtr)
-Q_DECLARE_METATYPE (OCC::Account *)
+Q_DECLARE_METATYPE (OCC.AccountPtr)
+Q_DECLARE_METATYPE (OCC.Account *)
 
 #endif //SERVERCONNECTION_H

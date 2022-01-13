@@ -20,9 +20,9 @@
 // #include <QFileInfo>
 
 int main (int argc, char *argv[]) {
-    QCoreApplication::setAttribute (Qt::AA_UseHighDpiPixmaps, true);
+    QCoreApplication.setAttribute (Qt.AA_UseHighDpiPixmaps, true);
 #ifdef Q_OS_WIN
-    QCoreApplication::setAttribute (Qt::AA_EnableHighDpiScaling, true);
+    QCoreApplication.setAttribute (Qt.AA_EnableHighDpiScaling, true);
 #endif // !Q_OS_WIN
     QApplication app (argc, argv);
 
@@ -33,7 +33,7 @@ int main (int argc, char *argv[]) {
     // QApplication was constructed, but before any QWidget is
     // constructed.
     if (app.devicePixelRatio () > 1)
-        QApplication::setStyle (QStringLiteral ("fusion"));
+        QApplication.setStyle (QStringLiteral ("fusion"));
 #endif // Q_OS_WIN
 
     if (app.arguments ().size () != 2) {
@@ -50,10 +50,10 @@ int main (int argc, char *argv[]) {
     reporter.setWindowTitle (CRASHREPORTER_PRODUCT_NAME);
     reporter.setText ("<html><head/><body><p><span style=\" font-weight:600;\">Sorry!</span> " CRASHREPORTER_PRODUCT_NAME " crashed. Please tell us about it! " CRASHREPORTER_PRODUCT_NAME " has created an error report for you that can help improve the stability in the future. You can now send this report directly to the " CRASHREPORTER_PRODUCT_NAME " developers.</p></body></html>");
 
-    const QFileInfo crashLog (QDir::tempPath () + QStringLiteral ("/" CRASHREPORTER_PRODUCT_NAME "-crash.log"));
+    const QFileInfo crashLog (QDir.tempPath () + QStringLiteral ("/" CRASHREPORTER_PRODUCT_NAME "-crash.log"));
     if (crashLog.exists ()) {
         QFile inFile (crashLog.filePath ());
-        if (inFile.open (QFile::ReadOnly)) {
+        if (inFile.open (QFile.ReadOnly)) {
             reporter.setComment (inFile.readAll ());
         }
     }
@@ -63,7 +63,7 @@ int main (int argc, char *argv[]) {
     reporter.setReportData ("Version", CRASHREPORTER_VERSION_STRING);
     reporter.setReportData ("ReleaseChannel", CRASHREPORTER_RELEASE_CHANNEL);
 
-    //reporter.setReportData ( "timestamp", QByteArray::number ( QDateTime::currentDateTime ().toTime_t () ) );
+    //reporter.setReportData ( "timestamp", QByteArray.number ( QDateTime.currentDateTime ().toTime_t () ) );
 
     // add parameters
 
@@ -95,7 +95,7 @@ int main (int argc, char *argv[]) {
     // TODO:
     // send log
     //    QFile logFile ( INSERT_FILE_PATH_HERE );
-    //    logFile.open ( QFile::ReadOnly );
+    //    logFile.open ( QFile.ReadOnly );
     //    reporter.setReportData ( "upload_file_miralllog", qCompress ( logFile.readAll () ), "application/x-gzip", QFileInfo ( INSERT_FILE_PATH_HERE ).fileName ().toUtf8 ());
     //    logFile.close ();
 

@@ -129,7 +129,7 @@ public:
 
         // Find the length of the largest prefix
         int prefixL = 0;
-        auto minSize = std::min (d1.size (), d2.size ());
+        auto minSize = std.min (d1.size (), d2.size ());
         while (prefixL < minSize && data1[prefixL] == data2[prefixL]) {
             prefixL++;
         }
@@ -147,45 +147,45 @@ public:
         return data1[prefixL] < data2[prefixL];
     }
 
-    QString destination () const {
+    QString destination () {
         if (!_renameTarget.isEmpty ()) {
             return _renameTarget;
         }
         return _file;
     }
 
-    bool isEmpty () const {
+    bool isEmpty () {
         return _file.isEmpty ();
     }
 
-    bool isDirectory () const {
+    bool isDirectory () {
         return _type == ItemTypeDirectory;
     }
 
     /**
      * True if the item had any kind of error.
      */
-    bool hasErrorStatus () const {
-        return _status == SyncFileItem::SoftError
-            || _status == SyncFileItem::NormalError
-            || _status == SyncFileItem::FatalError
+    bool hasErrorStatus () {
+        return _status == SyncFileItem.SoftError
+            || _status == SyncFileItem.NormalError
+            || _status == SyncFileItem.FatalError
             || !_errorString.isEmpty ();
     }
 
     /**
      * Whether this item should appear on the issues tab.
      */
-    bool showInIssuesTab () const {
-        return hasErrorStatus () || _status == SyncFileItem::Conflict;
+    bool showInIssuesTab () {
+        return hasErrorStatus () || _status == SyncFileItem.Conflict;
     }
 
     /**
      * Whether this item should appear on the protocol tab.
      */
-    bool showInProtocolTab () const {
-        return (!showInIssuesTab () || _status == SyncFileItem::Restoration)
+    bool showInProtocolTab () {
+        return (!showInIssuesTab () || _status == SyncFileItem.Restoration)
             // Don't show conflicts that were resolved as "not a conflict after all"
-            && ! (_instruction == CSYNC_INSTRUCTION_CONFLICT && _status == SyncFileItem::Success);
+            && ! (_instruction == CSYNC_INSTRUCTION_CONFLICT && _status == SyncFileItem.Success);
     }
 
     // Variables useful for everybody
@@ -273,7 +273,7 @@ inline bool operator< (SyncFileItemPtr &item1, SyncFileItemPtr &item2) {
 using SyncFileItemVector = QVector<SyncFileItemPtr>;
 }
 
-Q_DECLARE_METATYPE (OCC::SyncFileItem)
-Q_DECLARE_METATYPE (OCC::SyncFileItemPtr)
+Q_DECLARE_METATYPE (OCC.SyncFileItem)
+Q_DECLARE_METATYPE (OCC.SyncFileItemPtr)
 
 #endif // SYNCFILEITEM_H

@@ -16,32 +16,32 @@ private:
   QStringList _items;
 
 public slots:
-  void slotDirectoryListingSubFolders(QStringList& list) {
-     qDebug() << "subfolders: " << list;
-     _subdirs.append(list);
+  void slotDirectoryListingSubFolders (QStringList& list) {
+     qDebug () << "subfolders: " << list;
+     _subdirs.append (list);
   }
 
-  void slotDirectoryListingIterated(QString& item, QMap<QString,QString>& ) {
-    qDebug() << "     item: " << item;
-    _items.append(item);
+  void slotDirectoryListingIterated (QString& item, QMap<QString,QString>& ) {
+    qDebug () << "     item: " << item;
+    _items.append (item);
   }
 
-  void slotFinishedSuccessfully() {
+  void slotFinishedSuccessfully () {
       _success = true;
   }
 
 private slots:
-    void init() {
-        qDebug() << Q_FUNC_INFO;
+    void init () {
+        qDebug () << Q_FUNC_INFO;
       _success = false;
-      _subdirs.clear();
-      _items.clear();
+      _subdirs.clear ();
+      _items.clear ();
     }
 
-    void cleanup() {
+    void cleanup () {
     }
 
-    void testParser1() {
+    void testParser1 () {
         const QByteArray testXml = "<?xml version='1.0' encoding='utf-8'?>"
               "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
               "<d:response>"
@@ -93,28 +93,28 @@ private slots:
 
         LsColXMLParser parser;
 
-        connect( &parser, SIGNAL(directoryListingSubfolders(QStringList&)),
-                 this, SLOT(slotDirectoryListingSubFolders(QStringList&)) );
-        connect( &parser, SIGNAL(directoryListingIterated(QString&, QMap<QString,QString>&)),
-                 this, SLOT(slotDirectoryListingIterated(QString&, QMap<QString,QString>&)) );
-        connect( &parser, SIGNAL(finishedWithoutError()),
-                 this, SLOT(slotFinishedSuccessfully()) );
+        connect ( &parser, SIGNAL (directoryListingSubfolders (QStringList&)),
+                 this, SLOT (slotDirectoryListingSubFolders (QStringList&)) );
+        connect ( &parser, SIGNAL (directoryListingIterated (QString&, QMap<QString,QString>&)),
+                 this, SLOT (slotDirectoryListingIterated (QString&, QMap<QString,QString>&)) );
+        connect ( &parser, SIGNAL (finishedWithoutError ()),
+                 this, SLOT (slotFinishedSuccessfully ()) );
 
         QHash <QString, ExtraFolderInfo> sizes;
-        QVERIFY(parser.parse( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
+        QVERIFY (parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
 
-        QVERIFY(_success);
-        QCOMPARE(sizes.size(), 1 ); // Quota info in the XML
+        QVERIFY (_success);
+        QCOMPARE (sizes.size (), 1 ); // Quota info in the XML
 
-        QVERIFY(_items.contains("/oc/remote.php/dav/sharefolder/quitte.pdf"));
-        QVERIFY(_items.contains("/oc/remote.php/dav/sharefolder"));
-        QVERIFY(_items.size() == 2 );
+        QVERIFY (_items.contains ("/oc/remote.php/dav/sharefolder/quitte.pdf"));
+        QVERIFY (_items.contains ("/oc/remote.php/dav/sharefolder"));
+        QVERIFY (_items.size () == 2 );
 
-        QVERIFY(_subdirs.contains("/oc/remote.php/dav/sharefolder/"));
-        QVERIFY(_subdirs.size() == 1);
+        QVERIFY (_subdirs.contains ("/oc/remote.php/dav/sharefolder/"));
+        QVERIFY (_subdirs.size () == 1);
     }
 
-    void testParserBrokenXml() {
+    void testParserBrokenXml () {
         const QByteArray testXml = "X<?xml version='1.0' encoding='utf-8'?>"
               "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
               "<d:response>"
@@ -166,69 +166,69 @@ private slots:
 
         LsColXMLParser parser;
 
-        connect( &parser, SIGNAL(directoryListingSubfolders(QStringList&)),
-                 this, SLOT(slotDirectoryListingSubFolders(QStringList&)) );
-        connect( &parser, SIGNAL(directoryListingIterated(QString&, QMap<QString,QString>&)),
-                 this, SLOT(slotDirectoryListingIterated(QString&, QMap<QString,QString>&)) );
-        connect( &parser, SIGNAL(finishedWithoutError()),
-                 this, SLOT(slotFinishedSuccessfully()) );
+        connect ( &parser, SIGNAL (directoryListingSubfolders (QStringList&)),
+                 this, SLOT (slotDirectoryListingSubFolders (QStringList&)) );
+        connect ( &parser, SIGNAL (directoryListingIterated (QString&, QMap<QString,QString>&)),
+                 this, SLOT (slotDirectoryListingIterated (QString&, QMap<QString,QString>&)) );
+        connect ( &parser, SIGNAL (finishedWithoutError ()),
+                 this, SLOT (slotFinishedSuccessfully ()) );
 
         QHash <QString, ExtraFolderInfo> sizes;
-        QVERIFY(false == parser.parse( testXml, &sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
+        QVERIFY (false == parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
 
-        QVERIFY(!_success);
-        QVERIFY(sizes.size() == 0 ); // No quota info in the XML
+        QVERIFY (!_success);
+        QVERIFY (sizes.size () == 0 ); // No quota info in the XML
 
-        QVERIFY(_items.size() == 0 ); // FIXME: We should change the parser to not emit during parsing but at the end
+        QVERIFY (_items.size () == 0 ); // FIXME: We should change the parser to not emit during parsing but at the end
 
-        QVERIFY(_subdirs.size() == 0);
+        QVERIFY (_subdirs.size () == 0);
     }
 
-    void testParserEmptyXmlNoDav() {
+    void testParserEmptyXmlNoDav () {
         const QByteArray testXml = "<html><body>I am under construction</body></html>";
 
         LsColXMLParser parser;
 
-        connect( &parser, SIGNAL(directoryListingSubfolders(QStringList&)),
-                 this, SLOT(slotDirectoryListingSubFolders(QStringList&)) );
-        connect( &parser, SIGNAL(directoryListingIterated(QString&, QMap<QString,QString>&)),
-                 this, SLOT(slotDirectoryListingIterated(QString&, QMap<QString,QString>&)) );
-        connect( &parser, SIGNAL(finishedWithoutError()),
-                 this, SLOT(slotFinishedSuccessfully()) );
+        connect ( &parser, SIGNAL (directoryListingSubfolders (QStringList&)),
+                 this, SLOT (slotDirectoryListingSubFolders (QStringList&)) );
+        connect ( &parser, SIGNAL (directoryListingIterated (QString&, QMap<QString,QString>&)),
+                 this, SLOT (slotDirectoryListingIterated (QString&, QMap<QString,QString>&)) );
+        connect ( &parser, SIGNAL (finishedWithoutError ()),
+                 this, SLOT (slotFinishedSuccessfully ()) );
 
         QHash <QString, ExtraFolderInfo> sizes;
-        QVERIFY(false == parser.parse( testXml, &sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
+        QVERIFY (false == parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
 
-        QVERIFY(!_success);
-        QVERIFY(sizes.size() == 0 ); // No quota info in the XML
+        QVERIFY (!_success);
+        QVERIFY (sizes.size () == 0 ); // No quota info in the XML
 
-        QVERIFY(_items.size() == 0 ); // FIXME: We should change the parser to not emit during parsing but at the end
-        QVERIFY(_subdirs.size() == 0);
+        QVERIFY (_items.size () == 0 ); // FIXME: We should change the parser to not emit during parsing but at the end
+        QVERIFY (_subdirs.size () == 0);
     }
 
-    void testParserEmptyXml() {
+    void testParserEmptyXml () {
         const QByteArray testXml = "";
 
         LsColXMLParser parser;
 
-        connect( &parser, SIGNAL(directoryListingSubfolders(QStringList&)),
-                 this, SLOT(slotDirectoryListingSubFolders(QStringList&)) );
-        connect( &parser, SIGNAL(directoryListingIterated(QString&, QMap<QString,QString>&)),
-                 this, SLOT(slotDirectoryListingIterated(QString&, QMap<QString,QString>&)) );
-        connect( &parser, SIGNAL(finishedWithoutError()),
-                 this, SLOT(slotFinishedSuccessfully()) );
+        connect ( &parser, SIGNAL (directoryListingSubfolders (QStringList&)),
+                 this, SLOT (slotDirectoryListingSubFolders (QStringList&)) );
+        connect ( &parser, SIGNAL (directoryListingIterated (QString&, QMap<QString,QString>&)),
+                 this, SLOT (slotDirectoryListingIterated (QString&, QMap<QString,QString>&)) );
+        connect ( &parser, SIGNAL (finishedWithoutError ()),
+                 this, SLOT (slotFinishedSuccessfully ()) );
 
         QHash <QString, ExtraFolderInfo> sizes;
-        QVERIFY(false == parser.parse( testXml, &sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
+        QVERIFY (false == parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
 
-        QVERIFY(!_success);
-        QVERIFY(sizes.size() == 0 ); // No quota info in the XML
+        QVERIFY (!_success);
+        QVERIFY (sizes.size () == 0 ); // No quota info in the XML
 
-        QVERIFY(_items.size() == 0 ); // FIXME: We should change the parser to not emit during parsing but at the end
-        QVERIFY(_subdirs.size() == 0);
+        QVERIFY (_items.size () == 0 ); // FIXME: We should change the parser to not emit during parsing but at the end
+        QVERIFY (_subdirs.size () == 0);
     }
 
-    void testParserTruncatedXml() {
+    void testParserTruncatedXml () {
         const QByteArray testXml = "<?xml version='1.0' encoding='utf-8'?>"
               "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
               "<d:response>"
@@ -249,19 +249,19 @@ private slots:
 
         LsColXMLParser parser;
 
-        connect( &parser, SIGNAL(directoryListingSubfolders(QStringList&)),
-                 this, SLOT(slotDirectoryListingSubFolders(QStringList&)) );
-        connect( &parser, SIGNAL(directoryListingIterated(QString&, QMap<QString,QString>&)),
-                 this, SLOT(slotDirectoryListingIterated(QString&, QMap<QString,QString>&)) );
-        connect( &parser, SIGNAL(finishedWithoutError()),
-                 this, SLOT(slotFinishedSuccessfully()) );
+        connect ( &parser, SIGNAL (directoryListingSubfolders (QStringList&)),
+                 this, SLOT (slotDirectoryListingSubFolders (QStringList&)) );
+        connect ( &parser, SIGNAL (directoryListingIterated (QString&, QMap<QString,QString>&)),
+                 this, SLOT (slotDirectoryListingIterated (QString&, QMap<QString,QString>&)) );
+        connect ( &parser, SIGNAL (finishedWithoutError ()),
+                 this, SLOT (slotFinishedSuccessfully ()) );
 
         QHash <QString, ExtraFolderInfo> sizes;
-        QVERIFY(!parser.parse( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
-        QVERIFY(!_success);
+        QVERIFY (!parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
+        QVERIFY (!_success);
     }
 
-    void testParserBogfusHref1() {
+    void testParserBogfusHref1 () {
         const QByteArray testXml = "<?xml version='1.0' encoding='utf-8'?>"
               "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
               "<d:response>"
@@ -313,19 +313,19 @@ private slots:
 
         LsColXMLParser parser;
 
-        connect( &parser, SIGNAL(directoryListingSubfolders(QStringList&)),
-                 this, SLOT(slotDirectoryListingSubFolders(QStringList&)) );
-        connect( &parser, SIGNAL(directoryListingIterated(QString&, QMap<QString,QString>&)),
-                 this, SLOT(slotDirectoryListingIterated(QString&, QMap<QString,QString>&)) );
-        connect( &parser, SIGNAL(finishedWithoutError()),
-                 this, SLOT(slotFinishedSuccessfully()) );
+        connect ( &parser, SIGNAL (directoryListingSubfolders (QStringList&)),
+                 this, SLOT (slotDirectoryListingSubFolders (QStringList&)) );
+        connect ( &parser, SIGNAL (directoryListingIterated (QString&, QMap<QString,QString>&)),
+                 this, SLOT (slotDirectoryListingIterated (QString&, QMap<QString,QString>&)) );
+        connect ( &parser, SIGNAL (finishedWithoutError ()),
+                 this, SLOT (slotFinishedSuccessfully ()) );
 
         QHash <QString, ExtraFolderInfo> sizes;
-        QVERIFY(false == parser.parse( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
-        QVERIFY(!_success);
+        QVERIFY (false == parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
+        QVERIFY (!_success);
     }
 
-    void testParserBogfusHref2() {
+    void testParserBogfusHref2 () {
         const QByteArray testXml = "<?xml version='1.0' encoding='utf-8'?>"
               "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
               "<d:response>"
@@ -377,19 +377,19 @@ private slots:
 
         LsColXMLParser parser;
 
-        connect( &parser, SIGNAL(directoryListingSubfolders(QStringList&)),
-                 this, SLOT(slotDirectoryListingSubFolders(QStringList&)) );
-        connect( &parser, SIGNAL(directoryListingIterated(QString&, QMap<QString,QString>&)),
-                 this, SLOT(slotDirectoryListingIterated(QString&, QMap<QString,QString>&)) );
-        connect( &parser, SIGNAL(finishedWithoutError()),
-                 this, SLOT(slotFinishedSuccessfully()) );
+        connect ( &parser, SIGNAL (directoryListingSubfolders (QStringList&)),
+                 this, SLOT (slotDirectoryListingSubFolders (QStringList&)) );
+        connect ( &parser, SIGNAL (directoryListingIterated (QString&, QMap<QString,QString>&)),
+                 this, SLOT (slotDirectoryListingIterated (QString&, QMap<QString,QString>&)) );
+        connect ( &parser, SIGNAL (finishedWithoutError ()),
+                 this, SLOT (slotFinishedSuccessfully ()) );
 
         QHash <QString, ExtraFolderInfo> sizes;
-        QVERIFY(false == parser.parse( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
-        QVERIFY(!_success);
+        QVERIFY (false == parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
+        QVERIFY (!_success);
     }
 
-    void testParserDenormalizedPath() {
+    void testParserDenormalizedPath () {
         const QByteArray testXml = "<?xml version='1.0' encoding='utf-8'?>"
               "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
               "<d:response>"
@@ -441,28 +441,28 @@ private slots:
 
         LsColXMLParser parser;
 
-        connect( &parser, SIGNAL(directoryListingSubfolders(QStringList&)),
-                 this, SLOT(slotDirectoryListingSubFolders(QStringList&)) );
-        connect( &parser, SIGNAL(directoryListingIterated(QString&, QMap<QString,QString>&)),
-                 this, SLOT(slotDirectoryListingIterated(QString&, QMap<QString,QString>&)) );
-        connect( &parser, SIGNAL(finishedWithoutError()),
-                 this, SLOT(slotFinishedSuccessfully()) );
+        connect ( &parser, SIGNAL (directoryListingSubfolders (QStringList&)),
+                 this, SLOT (slotDirectoryListingSubFolders (QStringList&)) );
+        connect ( &parser, SIGNAL (directoryListingIterated (QString&, QMap<QString,QString>&)),
+                 this, SLOT (slotDirectoryListingIterated (QString&, QMap<QString,QString>&)) );
+        connect ( &parser, SIGNAL (finishedWithoutError ()),
+                 this, SLOT (slotFinishedSuccessfully ()) );
 
         QHash <QString, ExtraFolderInfo> sizes;
-        QVERIFY(parser.parse( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
+        QVERIFY (parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
 
-        QVERIFY(_success);
-        QCOMPARE(sizes.size(), 1 ); // Quota info in the XML
+        QVERIFY (_success);
+        QCOMPARE (sizes.size (), 1 ); // Quota info in the XML
 
-        QVERIFY(_items.contains("/oc/remote.php/dav/sharefolder/quitte.pdf"));
-        QVERIFY(_items.contains("/oc/remote.php/dav/sharefolder"));
-        QVERIFY(_items.size() == 2 );
+        QVERIFY (_items.contains ("/oc/remote.php/dav/sharefolder/quitte.pdf"));
+        QVERIFY (_items.contains ("/oc/remote.php/dav/sharefolder"));
+        QVERIFY (_items.size () == 2 );
 
-        QVERIFY(_subdirs.contains("/oc/remote.php/dav/sharefolder/"));
-        QVERIFY(_subdirs.size() == 1);
+        QVERIFY (_subdirs.contains ("/oc/remote.php/dav/sharefolder/"));
+        QVERIFY (_subdirs.size () == 1);
     }
 
-    void testParserDenormalizedPathOutsideNamespace() {
+    void testParserDenormalizedPathOutsideNamespace () {
         const QByteArray testXml = "<?xml version='1.0' encoding='utf-8'?>"
               "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
               "<d:response>"
@@ -514,20 +514,20 @@ private slots:
 
         LsColXMLParser parser;
 
-        connect( &parser, SIGNAL(directoryListingSubfolders(QStringList&)),
-                 this, SLOT(slotDirectoryListingSubFolders(QStringList&)) );
-        connect( &parser, SIGNAL(directoryListingIterated(QString&, QMap<QString,QString>&)),
-                 this, SLOT(slotDirectoryListingIterated(QString&, QMap<QString,QString>&)) );
-        connect( &parser, SIGNAL(finishedWithoutError()),
-                 this, SLOT(slotFinishedSuccessfully()) );
+        connect ( &parser, SIGNAL (directoryListingSubfolders (QStringList&)),
+                 this, SLOT (slotDirectoryListingSubFolders (QStringList&)) );
+        connect ( &parser, SIGNAL (directoryListingIterated (QString&, QMap<QString,QString>&)),
+                 this, SLOT (slotDirectoryListingIterated (QString&, QMap<QString,QString>&)) );
+        connect ( &parser, SIGNAL (finishedWithoutError ()),
+                 this, SLOT (slotFinishedSuccessfully ()) );
 
         QHash <QString, ExtraFolderInfo> sizes;
-        QVERIFY(!parser.parse( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
+        QVERIFY (!parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
 
-        QVERIFY(!_success);
+        QVERIFY (!_success);
     }
 
-    void testHrefUrlEncoding() {
+    void testHrefUrlEncoding () {
         const QByteArray testXml = "<?xml version='1.0' encoding='utf-8'?>"
               "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
               "<d:response>"
@@ -579,27 +579,27 @@ private slots:
 
         LsColXMLParser parser;
 
-        connect( &parser, SIGNAL(directoryListingSubfolders(QStringList&)),
-                 this, SLOT(slotDirectoryListingSubFolders(QStringList&)) );
-        connect( &parser, SIGNAL(directoryListingIterated(QString&, QMap<QString,QString>&)),
-                 this, SLOT(slotDirectoryListingIterated(QString&, QMap<QString,QString>&)) );
-        connect( &parser, SIGNAL(finishedWithoutError()),
-                 this, SLOT(slotFinishedSuccessfully()) );
+        connect ( &parser, SIGNAL (directoryListingSubfolders (QStringList&)),
+                 this, SLOT (slotDirectoryListingSubFolders (QStringList&)) );
+        connect ( &parser, SIGNAL (directoryListingIterated (QString&, QMap<QString,QString>&)),
+                 this, SLOT (slotDirectoryListingIterated (QString&, QMap<QString,QString>&)) );
+        connect ( &parser, SIGNAL (finishedWithoutError ()),
+                 this, SLOT (slotFinishedSuccessfully ()) );
 
         QHash <QString, ExtraFolderInfo> sizes;
-        QVERIFY(parser.parse( testXml, &sizes, QString::fromUtf8("/ä") ));
-        QVERIFY(_success);
+        QVERIFY (parser.parse ( testXml, &sizes, QString.fromUtf8 ("/ä") ));
+        QVERIFY (_success);
 
-        QVERIFY(_items.contains(QString::fromUtf8("/ä/ä.pdf")));
-        QVERIFY(_items.contains(QString::fromUtf8("/ä")));
-        QVERIFY(_items.size() == 2 );
+        QVERIFY (_items.contains (QString.fromUtf8 ("/ä/ä.pdf")));
+        QVERIFY (_items.contains (QString.fromUtf8 ("/ä")));
+        QVERIFY (_items.size () == 2 );
 
-        QVERIFY(_subdirs.contains(QString::fromUtf8("/ä")));
-        QVERIFY(_subdirs.size() == 1);
+        QVERIFY (_subdirs.contains (QString.fromUtf8 ("/ä")));
+        QVERIFY (_subdirs.size () == 1);
     }
 
 };
 
-    QTEST_GUILESS_MAIN(TestXmlParse)
+    QTEST_GUILESS_MAIN (TestXmlParse)
 
 #include "testxmlparse.moc"

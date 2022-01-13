@@ -8,39 +8,39 @@
 
 namespace OCC {
 
-void UpdateInfo::setVersion (QString &v) {
+void UpdateInfo.setVersion (QString &v) {
     mVersion = v;
 }
 
-QString UpdateInfo::version () const {
+QString UpdateInfo.version () {
     return mVersion;
 }
 
-void UpdateInfo::setVersionString (QString &v) {
+void UpdateInfo.setVersionString (QString &v) {
     mVersionString = v;
 }
 
-QString UpdateInfo::versionString () const {
+QString UpdateInfo.versionString () {
     return mVersionString;
 }
 
-void UpdateInfo::setWeb (QString &v) {
+void UpdateInfo.setWeb (QString &v) {
     mWeb = v;
 }
 
-QString UpdateInfo::web () const {
+QString UpdateInfo.web () {
     return mWeb;
 }
 
-void UpdateInfo::setDownloadUrl (QString &v) {
+void UpdateInfo.setDownloadUrl (QString &v) {
     mDownloadUrl = v;
 }
 
-QString UpdateInfo::downloadUrl () const {
+QString UpdateInfo.downloadUrl () {
     return mDownloadUrl;
 }
 
-UpdateInfo UpdateInfo::parseElement (QDomElement &element, bool *ok) {
+UpdateInfo UpdateInfo.parseElement (QDomElement &element, bool *ok) {
     if (element.tagName () != QLatin1String ("owncloudclient")) {
         qCCritical (lcUpdater) << "Expected 'owncloudclient', got '" << element.tagName () << "'.";
         if (ok)
@@ -69,7 +69,7 @@ UpdateInfo UpdateInfo::parseElement (QDomElement &element, bool *ok) {
     return result;
 }
 
-UpdateInfo UpdateInfo::parseString (QString &xml, bool *ok) {
+UpdateInfo UpdateInfo.parseString (QString &xml, bool *ok) {
     QString errorMsg;
     int errorLine = 0, errorCol = 0;
     QDomDocument doc;
@@ -77,7 +77,7 @@ UpdateInfo UpdateInfo::parseString (QString &xml, bool *ok) {
         qCWarning (lcUpdater).noquote ().nospace () << errorMsg << " at " << errorLine << "," << errorCol
                                 << "\n" <<  xml.splitRef ("\n").value (errorLine-1) << "\n"
                                 << QString (" ").repeated (errorCol - 1) << "^\n"
-                                << "->" << xml << "<-";
+                                << "." << xml << "<-";
         if (ok)
             *ok = false;
         return UpdateInfo ();

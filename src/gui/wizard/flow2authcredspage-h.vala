@@ -41,7 +41,7 @@ public:
     bool isComplete () const override;
 
 public Q_SLOTS:
-    void slotFlow2AuthResult (Flow2Auth::Result, QString &errorString, QString &user, QString &appPassword);
+    void slotFlow2AuthResult (Flow2Auth.Result, QString &errorString, QString &user, QString &appPassword);
     void slotPollNow ();
     void slotStyleChanged ();
 

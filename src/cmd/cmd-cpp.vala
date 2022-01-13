@@ -103,10 +103,10 @@ private:
 
 QString queryPassword (QString &user) {
     EchoDisabler disabler;
-    std::cout << "Password for user " << qPrintable (user) << ": ";
-    std::string s;
-    std::getline (std::cin, s);
-    return QString::fromStdString (s);
+    std.cout << "Password for user " << qPrintable (user) << ": ";
+    std.string s;
+    std.getline (std.cin, s);
+    return QString.fromStdString (s);
 }
 
 #ifndef TOKEN_AUTH_ONLY
@@ -119,7 +119,7 @@ public:
     }
 
     void askFromUser () override {
-        _password = ::queryPassword (user ());
+        _password = .queryPassword (user ());
         _ready = true;
         persist ();
         emit asked ();
@@ -141,37 +141,37 @@ private:
 void help () {
     const char *binaryName = APPLICATION_EXECUTABLE "cmd";
 
-    std::cout << binaryName << " - command line " APPLICATION_NAME " client tool" << std::endl;
-    std::cout << "" << std::endl;
-    std::cout << "Usage: " << binaryName << " [OPTION] <source_dir> <server_url>" << std::endl;
-    std::cout << "" << std::endl;
-    std::cout << "A proxy can either be set manually using --httpproxy." << std::endl;
-    std::cout << "Otherwise, the setting from a configured sync client will be used." << std::endl;
-    std::cout << std::endl;
-    std::cout << "Options:" << std::endl;
-    std::cout << "  --silent, -s           Don't be so verbose" << std::endl;
-    std::cout << "  --httpproxy [proxy]    Specify a http proxy to use." << std::endl;
-    std::cout << "                         Proxy is http://server:port" << std::endl;
-    std::cout << "  --trust                Trust the SSL certification." << std::endl;
-    std::cout << "  --exclude [file]       Exclude list file" << std::endl;
-    std::cout << "  --unsyncedfolders [file]    File containing the list of unsynced remote folders (selective sync)" << std::endl;
-    std::cout << "  --user, -u [name]      Use [name] as the login name" << std::endl;
-    std::cout << "  --password, -p [pass]  Use [pass] as password" << std::endl;
-    std::cout << "  -n                     Use netrc (5) for login" << std::endl;
-    std::cout << "  --non-interactive      Do not block execution with interaction" << std::endl;
-    std::cout << "  --max-sync-retries [n] Retries maximum n times (default to 3)" << std::endl;
-    std::cout << "  --uplimit [n]          Limit the upload speed of files to n KB/s" << std::endl;
-    std::cout << "  --downlimit [n]        Limit the download speed of files to n KB/s" << std::endl;
-    std::cout << "  -h                     Sync hidden files, do not ignore them" << std::endl;
-    std::cout << "  --version, -v          Display version and exit" << std::endl;
-    std::cout << "  --logdebug             More verbose logging" << std::endl;
-    std::cout << "  --path                 Path to a folder on a remote server" << std::endl;
-    std::cout << "" << std::endl;
+    std.cout << binaryName << " - command line " APPLICATION_NAME " client tool" << std.endl;
+    std.cout << "" << std.endl;
+    std.cout << "Usage: " << binaryName << " [OPTION] <source_dir> <server_url>" << std.endl;
+    std.cout << "" << std.endl;
+    std.cout << "A proxy can either be set manually using --httpproxy." << std.endl;
+    std.cout << "Otherwise, the setting from a configured sync client will be used." << std.endl;
+    std.cout << std.endl;
+    std.cout << "Options:" << std.endl;
+    std.cout << "  --silent, -s           Don't be so verbose" << std.endl;
+    std.cout << "  --httpproxy [proxy]    Specify a http proxy to use." << std.endl;
+    std.cout << "                         Proxy is http://server:port" << std.endl;
+    std.cout << "  --trust                Trust the SSL certification." << std.endl;
+    std.cout << "  --exclude [file]       Exclude list file" << std.endl;
+    std.cout << "  --unsyncedfolders [file]    File containing the list of unsynced remote folders (selective sync)" << std.endl;
+    std.cout << "  --user, -u [name]      Use [name] as the login name" << std.endl;
+    std.cout << "  --password, -p [pass]  Use [pass] as password" << std.endl;
+    std.cout << "  -n                     Use netrc (5) for login" << std.endl;
+    std.cout << "  --non-interactive      Do not block execution with interaction" << std.endl;
+    std.cout << "  --max-sync-retries [n] Retries maximum n times (default to 3)" << std.endl;
+    std.cout << "  --uplimit [n]          Limit the upload speed of files to n KB/s" << std.endl;
+    std.cout << "  --downlimit [n]        Limit the download speed of files to n KB/s" << std.endl;
+    std.cout << "  -h                     Sync hidden files, do not ignore them" << std.endl;
+    std.cout << "  --version, -v          Display version and exit" << std.endl;
+    std.cout << "  --logdebug             More verbose logging" << std.endl;
+    std.cout << "  --path                 Path to a folder on a remote server" << std.endl;
+    std.cout << "" << std.endl;
     exit (0);
 }
 
 void showVersion () {
-    std::cout << qUtf8Printable (Theme::instance ()->versionSwitchOutput ());
+    std.cout << qUtf8Printable (Theme.instance ().versionSwitchOutput ());
     exit (0);
 }
 
@@ -190,18 +190,18 @@ void parseOptions (QStringList &app_args, CmdOptions *options) {
         help ();
     }
 
-    options->target_url = args.takeLast ();
+    options.target_url = args.takeLast ();
 
-    options->source_dir = args.takeLast ();
-    if (!options->source_dir.endsWith ('/')) {
-        options->source_dir.append ('/');
+    options.source_dir = args.takeLast ();
+    if (!options.source_dir.endsWith ('/')) {
+        options.source_dir.append ('/');
     }
-    QFileInfo fi (options->source_dir);
+    QFileInfo fi (options.source_dir);
     if (!fi.exists ()) {
-        std::cerr << "Source dir '" << qPrintable (options->source_dir) << "' does not exist." << std::endl;
+        std.cerr << "Source dir '" << qPrintable (options.source_dir) << "' does not exist." << std.endl;
         exit (1);
     }
-    options->source_dir = fi.absoluteFilePath ();
+    options.source_dir = fi.absoluteFilePath ();
 
     QStringListIterator it (args);
     // skip file name;
@@ -212,68 +212,68 @@ void parseOptions (QStringList &app_args, CmdOptions *options) {
         const QString option = it.next ();
 
         if (option == "--httpproxy" && !it.peekNext ().startsWith ("-")) {
-            options->proxy = it.next ();
+            options.proxy = it.next ();
         } else if (option == "-s" || option == "--silent") {
-            options->silent = true;
+            options.silent = true;
         } else if (option == "--trust") {
-            options->trustSSL = true;
+            options.trustSSL = true;
         } else if (option == "-n") {
-            options->useNetrc = true;
+            options.useNetrc = true;
         } else if (option == "-h") {
-            options->ignoreHiddenFiles = false;
+            options.ignoreHiddenFiles = false;
         } else if (option == "--non-interactive") {
-            options->interactive = false;
+            options.interactive = false;
         } else if ( (option == "-u" || option == "--user") && !it.peekNext ().startsWith ("-")) {
-            options->user = it.next ();
+            options.user = it.next ();
         } else if ( (option == "-p" || option == "--password") && !it.peekNext ().startsWith ("-")) {
-            options->password = it.next ();
+            options.password = it.next ();
         } else if (option == "--exclude" && !it.peekNext ().startsWith ("-")) {
-            options->exclude = it.next ();
+            options.exclude = it.next ();
         } else if (option == "--unsyncedfolders" && !it.peekNext ().startsWith ("-")) {
-            options->unsyncedfolders = it.next ();
+            options.unsyncedfolders = it.next ();
         } else if (option == "--max-sync-retries" && !it.peekNext ().startsWith ("-")) {
-            options->restartTimes = it.next ().toInt ();
+            options.restartTimes = it.next ().toInt ();
         } else if (option == "--uplimit" && !it.peekNext ().startsWith ("-")) {
-            options->uplimit = it.next ().toInt () * 1000;
+            options.uplimit = it.next ().toInt () * 1000;
         } else if (option == "--downlimit" && !it.peekNext ().startsWith ("-")) {
-            options->downlimit = it.next ().toInt () * 1000;
+            options.downlimit = it.next ().toInt () * 1000;
         } else if (option == "--logdebug") {
-            Logger::instance ()->setLogFile ("-");
-            Logger::instance ()->setLogDebug (true);
+            Logger.instance ().setLogFile ("-");
+            Logger.instance ().setLogDebug (true);
         } else if (option == "--path" && !it.peekNext ().startsWith ("-")) {
-            options->remotePath = it.next ();
+            options.remotePath = it.next ();
         }
         else {
             help ();
         }
     }
 
-    if (options->target_url.isEmpty () || options->source_dir.isEmpty ()) {
+    if (options.target_url.isEmpty () || options.source_dir.isEmpty ()) {
         help ();
     }
 }
 
 /* If the selective sync list is different from before, we need to disable the read from db
-  (The normal client does it in SelectiveSyncDialog::accept*)
+  (The normal client does it in SelectiveSyncDialog.accept*)
  */
-void selectiveSyncFixup (OCC::SyncJournalDb *journal, QStringList &newList) {
+void selectiveSyncFixup (OCC.SyncJournalDb *journal, QStringList &newList) {
     SqlDatabase db;
-    if (!db.openOrCreateReadWrite (journal->databaseFilePath ())) {
+    if (!db.openOrCreateReadWrite (journal.databaseFilePath ())) {
         return;
     }
 
     bool ok = false;
 
-    const auto selectiveSyncList = journal->getSelectiveSyncList (SyncJournalDb::SelectiveSyncBlackList, &ok);
+    const auto selectiveSyncList = journal.getSelectiveSyncList (SyncJournalDb.SelectiveSyncBlackList, &ok);
     const QSet<QString> oldBlackListSet (selectiveSyncList.begin (), selectiveSyncList.end ());
     if (ok) {
         const QSet<QString> blackListSet (newList.begin (), newList.end ());
         const auto changes = (oldBlackListSet - blackListSet) + (blackListSet - oldBlackListSet);
         for (auto &it : changes) {
-            journal->schedulePathForRemoteDiscovery (it);
+            journal.schedulePathForRemoteDiscovery (it);
         }
 
-        journal->setSelectiveSyncList (SyncJournalDb::SelectiveSyncBlackList, newList);
+        journal.setSelectiveSyncList (SyncJournalDb.SelectiveSyncBlackList, newList);
     }
 }
 
@@ -285,7 +285,7 @@ int main (int argc, char **argv) {
 
 #ifdef Q_OS_WIN
     // Ensure OpenSSL config file is only loaded from app directory
-    QString opensslConf = QCoreApplication::applicationDirPath () + QString ("/openssl.cnf");
+    QString opensslConf = QCoreApplication.applicationDirPath () + QString ("/openssl.cnf");
     qputenv ("OPENSSL_CONF", opensslConf.toLocal8Bit ());
 #endif
 
@@ -307,21 +307,21 @@ int main (int argc, char **argv) {
         qSetMessagePattern ("%{time MM-dd hh:mm:ss:zzz} [ %{type} %{category} ]%{if-debug}\t[ %{function} ]%{endif}:\t%{message}");
     }
 
-    AccountPtr account = Account::create ();
+    AccountPtr account = Account.create ();
 
     if (!account) {
         qFatal ("Could not initialize account!");
         return EXIT_FAILURE;
     }
 
-    if (options.target_url.contains ("/webdav", Qt::CaseInsensitive) || options.target_url.contains ("/dav", Qt::CaseInsensitive)) {
+    if (options.target_url.contains ("/webdav", Qt.CaseInsensitive) || options.target_url.contains ("/dav", Qt.CaseInsensitive)) {
         qWarning ("Dav or webdav in server URL.");
-        std::cerr << "Error! Please specify only the base URL of your host with username and password. Example:" << std::endl
-                  << "http (s)://username:password@cloud.example.com" << std::endl;
+        std.cerr << "Error! Please specify only the base URL of your host with username and password. Example:" << std.endl
+                  << "http (s)://username:password@cloud.example.com" << std.endl;
         return EXIT_FAILURE;
     }
 
-    QUrl hostUrl = QUrl::fromUserInput ( (options.target_url.endsWith (QLatin1Char ('/')) || options.target_url.endsWith (QLatin1Char ('\\'))) ? options.target_url.chopped (1) : options.target_url);
+    QUrl hostUrl = QUrl.fromUserInput ( (options.target_url.endsWith (QLatin1Char ('/')) || options.target_url.endsWith (QLatin1Char ('\\'))) ? options.target_url.chopped (1) : options.target_url);
 
     // Order of retrieval attempt (later attempts override earlier ones):
     // 1. From URL
@@ -343,7 +343,7 @@ int main (int argc, char **argv) {
     if (options.useNetrc) {
         NetrcParser parser;
         if (parser.parse ()) {
-            NetrcParser::LoginPair pair = parser.find (hostUrl.host ());
+            NetrcParser.LoginPair pair = parser.find (hostUrl.host ());
             user = pair.first;
             password = pair.second;
         }
@@ -351,10 +351,10 @@ int main (int argc, char **argv) {
 
     if (options.interactive) {
         if (user.isEmpty ()) {
-            std::cout << "Please enter user name: ";
-            std::string s;
-            std::getline (std::cin, s);
-            user = QString::fromStdString (s);
+            std.cout << "Please enter user name: ";
+            std.string s;
+            std.getline (std.cin, s);
+            user = QString.fromStdString (s);
         }
         if (password.isEmpty ()) {
             password = queryPassword (user);
@@ -386,8 +386,8 @@ int main (int argc, char **argv) {
 
             port = pList.at (2).toInt (&ok);
 
-            QNetworkProxyFactory::setUseSystemConfiguration (false);
-            QNetworkProxy::setApplicationProxy (QNetworkProxy (QNetworkProxy::HttpProxy, host, port));
+            QNetworkProxyFactory.setUseSystemConfiguration (false);
+            QNetworkProxy.setApplicationProxy (QNetworkProxy (QNetworkProxy.HttpProxy, host, port));
         } else {
             qFatal ("Could not read httpproxy. The proxy should have the format \"http://hostname:port\".");
         }
@@ -397,47 +397,47 @@ int main (int argc, char **argv) {
 
 #ifdef TOKEN_AUTH_ONLY
     auto *cred = new TokenCredentials (user, password, "");
-    account->setCredentials (cred);
+    account.setCredentials (cred);
 #else
     auto *cred = new HttpCredentialsText (user, password);
-    account->setCredentials (cred);
+    account.setCredentials (cred);
     if (options.trustSSL) {
-        cred->setSSLTrusted (true);
+        cred.setSSLTrusted (true);
     }
 #endif
 
-    account->setUrl (hostUrl);
-    account->setSslErrorHandler (sslErrorHandler);
+    account.setUrl (hostUrl);
+    account.setSslErrorHandler (sslErrorHandler);
 
     QEventLoop loop;
     auto *job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/capabilities"));
-    QObject::connect (job, &JsonApiJob::jsonReceived, [&] (QJsonDocument &json) {
+    QObject.connect (job, &JsonApiJob.jsonReceived, [&] (QJsonDocument &json) {
         auto caps = json.object ().value ("ocs").toObject ().value ("data").toObject ().value ("capabilities").toObject ();
         qDebug () << "Server capabilities" << caps;
-        account->setCapabilities (caps.toVariantMap ());
-        account->setServerVersion (caps["core"].toObject ()["status"].toObject ()["version"].toString ());
+        account.setCapabilities (caps.toVariantMap ());
+        account.setServerVersion (caps["core"].toObject ()["status"].toObject ()["version"].toString ());
         loop.quit ();
     });
-    job->start ();
+    job.start ();
     loop.exec ();
 
-    if (job->reply ()->error () != QNetworkReply::NoError){
-        std::cout<<"Error connecting to server\n";
+    if (job.reply ().error () != QNetworkReply.NoError){
+        std.cout<<"Error connecting to server\n";
         return EXIT_FAILURE;
     }
 
     job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/user"));
-    QObject::connect (job, &JsonApiJob::jsonReceived, [&] (QJsonDocument &json) {
+    QObject.connect (job, &JsonApiJob.jsonReceived, [&] (QJsonDocument &json) {
         const QJsonObject data = json.object ().value ("ocs").toObject ().value ("data").toObject ();
-        account->setDavUser (data.value ("id").toString ());
-        account->setDavDisplayName (data.value ("display-name").toString ());
+        account.setDavUser (data.value ("id").toString ());
+        account.setDavDisplayName (data.value ("display-name").toString ());
         loop.quit ();
     });
-    job->start ();
+    job.start ();
     loop.exec ();
 
     // much lower age than the default since this utility is usually made to be run right after a change in the tests
-    SyncEngine::minimumFileAgeForUpload = std::chrono::milliseconds (0);
+    SyncEngine.minimumFileAgeForUpload = std.chrono.milliseconds (0);
 
     int restartCount = 0;
 restart_sync:
@@ -447,11 +447,11 @@ restart_sync:
     QStringList selectiveSyncList;
     if (!options.unsyncedfolders.isEmpty ()) {
         QFile f (options.unsyncedfolders);
-        if (!f.open (QFile::ReadOnly)) {
+        if (!f.open (QFile.ReadOnly)) {
             qCritical () << "Could not open file containing the list of unsynced folders: " << options.unsyncedfolders;
         } else {
             // filter out empty lines and comments
-            selectiveSyncList = QString::fromUtf8 (f.readAll ()).split ('\n').filter (QRegularExpression ("\\S+")).filter (QRegularExpression ("^[^#]"));
+            selectiveSyncList = QString.fromUtf8 (f.readAll ()).split ('\n').filter (QRegularExpression ("\\S+")).filter (QRegularExpression ("^[^#]"));
 
             for (int i = 0; i < selectiveSyncList.count (); ++i) {
                 if (!selectiveSyncList.at (i).endsWith (QLatin1Char ('/'))) {
@@ -462,7 +462,7 @@ restart_sync:
     }
 
     Cmd cmd;
-    QString dbPath = options.source_dir + SyncJournalDb::makeDbName (options.source_dir, credentialFreeUrl, folder, user);
+    QString dbPath = options.source_dir + SyncJournalDb.makeDbName (options.source_dir, credentialFreeUrl, folder, user);
     SyncJournalDb db (dbPath);
 
     if (!selectiveSyncList.empty ()) {
@@ -475,23 +475,23 @@ restart_sync:
     SyncEngine engine (account, options.source_dir, folder, &db);
     engine.setIgnoreHiddenFiles (options.ignoreHiddenFiles);
     engine.setNetworkLimits (options.uplimit, options.downlimit);
-    QObject::connect (&engine, &SyncEngine::finished,
+    QObject.connect (&engine, &SyncEngine.finished,
         [&app] (bool result) { app.exit (result ? EXIT_SUCCESS : EXIT_FAILURE); });
-    QObject::connect (&engine, &SyncEngine::transmissionProgress, &cmd, &Cmd::transmissionProgressSlot);
-    QObject::connect (&engine, &SyncEngine::syncError,
+    QObject.connect (&engine, &SyncEngine.transmissionProgress, &cmd, &Cmd.transmissionProgressSlot);
+    QObject.connect (&engine, &SyncEngine.syncError,
         [] (QString &error) { qWarning () << "Sync error:" << error; });
 
     // Exclude lists
 
     bool hasUserExcludeFile = !options.exclude.isEmpty ();
-    QString systemExcludeFile = ConfigFile::excludeFileFromSystem ();
+    QString systemExcludeFile = ConfigFile.excludeFileFromSystem ();
 
     // Always try to load the user-provided exclude list if one is specified
     if (hasUserExcludeFile) {
         engine.excludedFiles ().addExcludeFilePath (options.exclude);
     }
     // Load the system list if available, or if there's no user-provided list
-    if (!hasUserExcludeFile || QFile::exists (systemExcludeFile)) {
+    if (!hasUserExcludeFile || QFile.exists (systemExcludeFile)) {
         engine.excludedFiles ().addExcludeFilePath (systemExcludeFile);
     }
 
@@ -501,7 +501,7 @@ restart_sync:
     }
 
     // Have to be done async, else, an error before exec () does not terminate the event loop.
-    QMetaObject::invokeMethod (&engine, "startSync", Qt::QueuedConnection);
+    QMetaObject.invokeMethod (&engine, "startSync", Qt.QueuedConnection);
 
     int resultCode = app.exec ();
 

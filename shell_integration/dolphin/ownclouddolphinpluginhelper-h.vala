@@ -29,20 +29,20 @@ public:
 
     bool isConnected () const;
     void sendCommand (char *data);
-    QVector<QString> paths () const { return _paths; }
+    QVector<QString> paths () { return _paths; }
 
-    QString contextMenuTitle () const {
+    QString contextMenuTitle () {
         return _strings.value ("CONTEXT_MENU_TITLE", APPLICATION_NAME);
     }
-    QString shareActionTitle () const {
+    QString shareActionTitle () {
         return _strings.value ("SHARE_MENU_TITLE", "Share …");
     }
-    QString contextMenuIconName () const {
+    QString contextMenuIconName () {
         return _strings.value ("CONTEXT_MENU_ICON", APPLICATION_ICON_NAME);
     }
 
-    QString copyPrivateLinkTitle () const { return _strings["COPY_PRIVATE_LINK_MENU_TITLE"]; }
-    QString emailPrivateLinkTitle () const { return _strings["EMAIL_PRIVATE_LINK_MENU_TITLE"]; }
+    QString copyPrivateLinkTitle () { return _strings["COPY_PRIVATE_LINK_MENU_TITLE"]; }
+    QString emailPrivateLinkTitle () { return _strings["EMAIL_PRIVATE_LINK_MENU_TITLE"]; }
 
     QByteArray version () { return _version; }
 

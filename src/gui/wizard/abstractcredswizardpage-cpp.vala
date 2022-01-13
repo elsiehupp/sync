@@ -16,14 +16,14 @@
 
 namespace OCC {
 
-void AbstractCredentialsWizardPage::cleanupPage () {
+void AbstractCredentialsWizardPage.cleanupPage () {
     // Reset the credentials when the 'Back' button is used.
 
-    AccountPtr account = static_cast<OwncloudWizard *> (wizard ())->account ();
-    AbstractCredentials *creds = account->credentials ();
+    AccountPtr account = static_cast<OwncloudWizard *> (wizard ()).account ();
+    AbstractCredentials *creds = account.credentials ();
     if (creds) {
-        if (!creds->inherits ("DummyCredentials")) {
-            account->setCredentials (CredentialsFactory::create ("dummy"));
+        if (!creds.inherits ("DummyCredentials")) {
+            account.setCredentials (CredentialsFactory.create ("dummy"));
         }
     }
 }

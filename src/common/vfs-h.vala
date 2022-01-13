@@ -54,7 +54,7 @@ struct OCSYNC_EXPORT VfsSetupParams {
 
     /** Access to the sync folder's database.
      *
-     * Note: The journal must live at least until the Vfs::stop () call.
+     * Note: The journal must live at least until the Vfs.stop () call.
      */
     SyncJournalDb *journal = nullptr;
 
@@ -124,7 +124,7 @@ public:
     virtual QString fileSuffix () const = 0;
 
     /// Access to the parameters the instance was start ()ed with.
-    const VfsSetupParams &params () const { return _setupParams; }
+    const VfsSetupParams &params () { return _setupParams; }
 
     /** Initializes interaction with the VFS provider.
      *
@@ -188,7 +188,7 @@ public:
      * new placeholder shall supersede, for rename-replace actions with new downloads,
      * for example.
      */
-    virtual Q_REQUIRED_RESULT Result<Vfs::ConvertToPlaceholderResult, QString> convertToPlaceholder (
+    virtual Q_REQUIRED_RESULT Result<Vfs.ConvertToPlaceholderResult, QString> convertToPlaceholder (
         const QString &filename,
         const SyncFileItem &item,
         const QString &replacesFile = QString ()) = 0;
@@ -198,8 +198,8 @@ public:
 
     /** Similar to isDehydratedPlaceholder () but used from sync discovery.
      *
-     * This function shall set stat->type if appropriate.
-     * It may rely on stat->path and stat_data (platform specific data).
+     * This function shall set stat.type if appropriate.
+     * It may rely on stat.path and stat_data (platform specific data).
      *
      * Returning true means that type was fully determined.
      */
@@ -272,14 +272,14 @@ protected:
     VfsSetupParams _setupParams;
 };
 
-/// Implementation of Vfs for Vfs::Off mode - does nothing
+/// Implementation of Vfs for Vfs.Off mode - does nothing
 class OCSYNC_EXPORT VfsOff : public Vfs {
 
 public:
     VfsOff (QObject* parent = nullptr);
     ~VfsOff () override;
 
-    Mode mode () const override { return Vfs::Off; }
+    Mode mode () const override { return Vfs.Off; }
 
     QString fileSuffix () const override { return QString (); }
 
@@ -292,15 +292,15 @@ public:
     Result<void, QString> updateMetadata (QString &, time_t, qint64, QByteArray &) override { return {}; }
     Result<void, QString> createPlaceholder (SyncFileItem &) override { return {}; }
     Result<void, QString> dehydratePlaceholder (SyncFileItem &) override { return {}; }
-    Result<ConvertToPlaceholderResult, QString> convertToPlaceholder (QString &, SyncFileItem &, QString &) override { return ConvertToPlaceholderResult::Ok; }
+    Result<ConvertToPlaceholderResult, QString> convertToPlaceholder (QString &, SyncFileItem &, QString &) override { return ConvertToPlaceholderResult.Ok; }
 
     bool needsMetadataUpdate (SyncFileItem &) override { return false; }
     bool isDehydratedPlaceholder (QString &) override { return false; }
     bool statTypeVirtualFile (csync_file_stat_t *, void *) override { return false; }
 
     bool setPinState (QString &, PinState) override { return true; }
-    Optional<PinState> pinState (QString &) override { return PinState::AlwaysLocal; }
-    AvailabilityResult availability (QString &) override { return VfsItemAvailability::AlwaysLocal; }
+    Optional<PinState> pinState (QString &) override { return PinState.AlwaysLocal; }
+    AvailabilityResult availability (QString &) override { return VfsItemAvailability.AlwaysLocal; }
 
 public slots:
     void fileStatusChanged (QString &, SyncFileStatus) override {}
@@ -310,21 +310,21 @@ protected:
 };
 
 /// Check whether the plugin for the mode is available.
-OCSYNC_EXPORT bool isVfsPluginAvailable (Vfs::Mode mode);
+OCSYNC_EXPORT bool isVfsPluginAvailable (Vfs.Mode mode);
 
 /// Return the best available VFS mode.
-OCSYNC_EXPORT Vfs::Mode bestAvailableVfsMode ();
+OCSYNC_EXPORT Vfs.Mode bestAvailableVfsMode ();
 
 /// Create a VFS instance for the mode, returns nullptr on failure.
-OCSYNC_EXPORT std::unique_ptr<Vfs> createVfsFromPlugin (Vfs::Mode mode);
+OCSYNC_EXPORT std.unique_ptr<Vfs> createVfsFromPlugin (Vfs.Mode mode);
 
 } // namespace OCC
 
 #define OCC_DEFINE_VFS_FACTORY (name, Type) \
-    static_assert (std::is_base_of<OCC::Vfs, Type>::value, "Please define VFS factories only for OCC::Vfs subclasses"); \
+    static_assert (std.is_base_of<OCC.Vfs, Type>.value, "Please define VFS factories only for OCC.Vfs subclasses"); \
     namespace { \
     void initPlugin () \ { \
-        OCC::Vfs::registerPlugin (QStringLiteral (name), [] () -> OCC::Vfs * { return new (Type); }); \
+        OCC.Vfs.registerPlugin (QStringLiteral (name), [] () . OCC.Vfs * { return new (Type); }); \
     } \
     Q_COREAPP_STARTUP_FUNCTION (initPlugin) \
     }

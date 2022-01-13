@@ -30,7 +30,7 @@ Q_DECLARE_LOGGING_CATEGORY (lcSharing)
 
 class Sharee {
 public:
-    // Keep in sync with Share::ShareType
+    // Keep in sync with Share.ShareType
     enum Type {
         User = 0,
         Group = 1,
@@ -71,7 +71,7 @@ public:
 
     QSharedPointer<Sharee> getSharee (int at);
 
-    QString currentSearch () const { return _search; }
+    QString currentSearch () { return _search; }
 
 signals:
     void shareesReady ();
@@ -93,6 +93,6 @@ private:
 };
 }
 
-Q_DECLARE_METATYPE (QSharedPointer<OCC::Sharee>)
+Q_DECLARE_METATYPE (QSharedPointer<OCC.Sharee>)
 
 #endif //SHAREE_H

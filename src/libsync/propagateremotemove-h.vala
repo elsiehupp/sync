@@ -48,8 +48,8 @@ public:
         : PropagateItemJob (propagator, item) {
     }
     void start () override;
-    void abort (PropagatorJob::AbortType abortType) override;
-    JobParallelism parallelism () override { return _item->isDirectory () ? WaitForFinished : FullParallelism; }
+    void abort (PropagatorJob.AbortType abortType) override;
+    JobParallelism parallelism () override { return _item.isDirectory () ? WaitForFinished : FullParallelism; }
 
     /**
      * Rename the directory in the selective sync list

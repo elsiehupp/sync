@@ -58,9 +58,9 @@
 #define uid_t int
 #define gid_t int
 #define nlink_t int
-#define getuid() 0
-#define geteuid() 0
-#elif defined(_WIN32)
+#define getuid () 0
+#define geteuid () 0
+#elif defined (_WIN32)
 #define mode_t int
 #else
 // #include <fcntl.h>
@@ -100,11 +100,11 @@ using mbchar_t = wchar_t;
 #define _tstat           _wstat64
 #define _tfstat          _fstat64
 #define _tunlink         _wunlink
-#define _tmkdir(X,Y)     _wmkdir(X)
+#define _tmkdir (X,Y)     _wmkdir (X)
 #define _trmdir	         _wrmdir
 #define _tchmod          _wchmod
 #define _trewinddir      _wrewinddir
-#define _tchown(X, Y, Z)  0 /* no chown on Win32 */
+#define _tchown (X, Y, Z)  0 /* no chown on Win32 */
 #define _tchdir          _wchdir
 #define _tgetcwd         _wgetcwd
 #else
@@ -121,20 +121,20 @@ using mbchar_t = char;
 #define _tstat         lstat
 #define _tfstat        fstat
 #define _tunlink       unlink
-#define _tmkdir(X,Y)   mkdir(X,Y)
+#define _tmkdir (X,Y)   mkdir (X,Y)
 #define _trmdir	       rmdir
 #define _tchmod        chmod
 #define _trewinddir    rewinddir
-#define _tchown(X,Y,Z) chown(X,Y,Z)
+#define _tchown (X,Y,Z) chown (X,Y,Z)
 #define _tchdir        chdir
 #define _tgetcwd       getcwd
 #endif
 
 /* FIXME: Implement TLS for OS X */
-#if defined(__GNUC__) && !defined(__APPLE__)
+#if defined (__GNUC__) && !defined (__APPLE__)
 # define CSYNC_THREAD __thread
-#elif defined(_MSC_VER)
-# define CSYNC_THREAD __declspec(thread)
+#elif defined (_MSC_VER)
+# define CSYNC_THREAD __declspec (thread)
 #else
 # define CSYNC_THREAD
 #endif

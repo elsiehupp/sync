@@ -23,7 +23,7 @@ using namespace OCC;
 
 Q_LOGGING_CATEGORY (lcUtility, "nextcloud.gui.utility", QtInfoMsg)
 
-bool Utility::openBrowser (QUrl &url, QWidget *errorWidgetParent) {
+bool Utility.openBrowser (QUrl &url, QWidget *errorWidgetParent) {
     const QStringList allowedUrlSchemes = {
         "http",
         "https",
@@ -35,63 +35,63 @@ bool Utility::openBrowser (QUrl &url, QWidget *errorWidgetParent) {
         return false;
     }
 
-    if (!QDesktopServices::openUrl (url)) {
+    if (!QDesktopServices.openUrl (url)) {
         if (errorWidgetParent) {
-            QMessageBox::warning (
+            QMessageBox.warning (
                 errorWidgetParent,
-                QCoreApplication::translate ("utility", "Could not open browser"),
-                QCoreApplication::translate ("utility",
+                QCoreApplication.translate ("utility", "Could not open browser"),
+                QCoreApplication.translate ("utility",
                     "There was an error when launching the browser to go to "
                     "URL %1. Maybe no default browser is configured?")
                     .arg (url.toString ()));
         }
-        qCWarning (lcUtility) << "QDesktopServices::openUrl failed for" << url;
+        qCWarning (lcUtility) << "QDesktopServices.openUrl failed for" << url;
         return false;
     }
     return true;
 }
 
-bool Utility::openEmailComposer (QString &subject, QString &body, QWidget *errorWidgetParent) {
+bool Utility.openEmailComposer (QString &subject, QString &body, QWidget *errorWidgetParent) {
     QUrl url (QLatin1String ("mailto:"));
     QUrlQuery query;
     query.setQueryItems ({ { QLatin1String ("subject"), subject }, { QLatin1String ("body"), body } });
     url.setQuery (query);
 
-    if (!QDesktopServices::openUrl (url)) {
+    if (!QDesktopServices.openUrl (url)) {
         if (errorWidgetParent) {
-            QMessageBox::warning (
+            QMessageBox.warning (
                 errorWidgetParent,
-                QCoreApplication::translate ("utility", "Could not open email client"),
-                QCoreApplication::translate ("utility",
+                QCoreApplication.translate ("utility", "Could not open email client"),
+                QCoreApplication.translate ("utility",
                     "There was an error when launching the email client to "
                     "create a new message. Maybe no default email client is "
                     "configured?"));
         }
-        qCWarning (lcUtility) << "QDesktopServices::openUrl failed for" << url;
+        qCWarning (lcUtility) << "QDesktopServices.openUrl failed for" << url;
         return false;
     }
     return true;
 }
 
-QString Utility::vfsCurrentAvailabilityText (VfsItemAvailability availability) {
+QString Utility.vfsCurrentAvailabilityText (VfsItemAvailability availability) {
     switch (availability) {
-    case VfsItemAvailability::AlwaysLocal:
-        return QCoreApplication::translate ("utility", "Always available locally");
-    case VfsItemAvailability::AllHydrated:
-        return QCoreApplication::translate ("utility", "Currently available locally");
-    case VfsItemAvailability::Mixed:
-        return QCoreApplication::translate ("utility", "Some available online only");
-    case VfsItemAvailability::AllDehydrated:
-    case VfsItemAvailability::OnlineOnly:
-        return QCoreApplication::translate ("utility", "Available online only");
+    case VfsItemAvailability.AlwaysLocal:
+        return QCoreApplication.translate ("utility", "Always available locally");
+    case VfsItemAvailability.AllHydrated:
+        return QCoreApplication.translate ("utility", "Currently available locally");
+    case VfsItemAvailability.Mixed:
+        return QCoreApplication.translate ("utility", "Some available online only");
+    case VfsItemAvailability.AllDehydrated:
+    case VfsItemAvailability.OnlineOnly:
+        return QCoreApplication.translate ("utility", "Available online only");
     }
     Q_UNREACHABLE ();
 }
 
-QString Utility::vfsPinActionText () {
-    return QCoreApplication::translate ("utility", "Make always available locally");
+QString Utility.vfsPinActionText () {
+    return QCoreApplication.translate ("utility", "Make always available locally");
 }
 
-QString Utility::vfsFreeSpaceActionText () {
-    return QCoreApplication::translate ("utility", "Free up local space");
+QString Utility.vfsFreeSpaceActionText () {
+    return QCoreApplication.translate ("utility", "Free up local space");
 }

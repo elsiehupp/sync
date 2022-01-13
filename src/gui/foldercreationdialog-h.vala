@@ -32,7 +32,7 @@ private slots:
     void slotNewFolderNameEditTextEdited ();
 
 private:
-    Ui::FolderCreationDialog *ui;
+    Ui.FolderCreationDialog *ui;
 
     QString _destination;
 };

@@ -46,13 +46,13 @@ public:
     void initializePage () override;
     void cleanupPage () override;
 
-    void setFolderMap (Folder::Map &fm) { _folderMap = fm; }
+    void setFolderMap (Folder.Map &fm) { _folderMap = fm; }
 protected slots:
     void slotChooseLocalFolder ();
 
 private:
     Ui_FolderWizardSourcePage _ui;
-    Folder::Map _folderMap;
+    Folder.Map _folderMap;
     AccountPtr _account;
 };
 

@@ -124,20 +124,20 @@ public:
     };
     NextResult next ();
 
-    template<class T, typename std::enable_if<std::is_enum<T>::value, int>::type = 0>
+    template<class T, typename std.enable_if<std.is_enum<T>.value, int>.type = 0>
     void bindValue (int pos, T &value) {
         qCDebug (lcSql) << "SQL bind" << pos << value;
         bindValueInternal (pos, static_cast<int> (value));
     }
 
-    template<class T, typename std::enable_if<!std::is_enum<T>::value, int>::type = 0>
+    template<class T, typename std.enable_if<!std.is_enum<T>.value, int>.type = 0>
     void bindValue (int pos, T &value) {
         qCDebug (lcSql) << "SQL bind" << pos << value;
         bindValueInternal (pos, value);
     }
 
     void bindValue (int pos, QByteArray &value) {
-        qCDebug (lcSql) << "SQL bind" << pos << QString::fromUtf8 (value);
+        qCDebug (lcSql) << "SQL bind" << pos << QString.fromUtf8 (value);
         bindValueInternal (pos, value);
     }
 

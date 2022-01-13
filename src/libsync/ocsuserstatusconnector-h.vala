@@ -45,7 +45,7 @@ private:
     void logResponse (QString &message, QJsonDocument &json, int statusCode);
     void startFetchUserStatusJob ();
     void startFetchPredefinedStatuses ();
-    void setUserStatusOnlineStatus (UserStatus::OnlineStatus onlineStatus);
+    void setUserStatusOnlineStatus (UserStatus.OnlineStatus onlineStatus);
     void setUserStatusMessage (UserStatus &userStatus);
     void setUserStatusMessagePredefined (UserStatus &userStatus);
     void setUserStatusMessageCustom (UserStatus &userStatus);

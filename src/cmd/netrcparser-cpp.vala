@@ -29,14 +29,14 @@ namespace {
     QString passwordKeyword = QLatin1String ("password");
 }
 
-NetrcParser::NetrcParser (QString &file) {
+NetrcParser.NetrcParser (QString &file) {
     _netrcLocation = file;
     if (_netrcLocation.isEmpty ()) {
-        _netrcLocation = QDir::homePath () + QLatin1String ("/.netrc");
+        _netrcLocation = QDir.homePath () + QLatin1String ("/.netrc");
     }
 }
 
-void NetrcParser::tryAddEntryAndClear (QString &machine, LoginPair &pair, bool &isDefault) {
+void NetrcParser.tryAddEntryAndClear (QString &machine, LoginPair &pair, bool &isDefault) {
     if (isDefault) {
         _default = pair;
     } else if (!machine.isEmpty () && !pair.first.isEmpty ()) {
@@ -47,9 +47,9 @@ void NetrcParser::tryAddEntryAndClear (QString &machine, LoginPair &pair, bool &
     isDefault = false;
 }
 
-bool NetrcParser::parse () {
+bool NetrcParser.parse () {
     QFile netrc (_netrcLocation);
-    if (!netrc.open (QIODevice::ReadOnly)) {
+    if (!netrc.open (QIODevice.ReadOnly)) {
         return false;
     }
     QString content = netrc.readAll ();
@@ -92,8 +92,8 @@ bool NetrcParser::parse () {
     }
 }
 
-NetrcParser::LoginPair NetrcParser::find (QString &machine) {
-    QHash<QString, LoginPair>::const_iterator it = _entries.find (machine);
+NetrcParser.LoginPair NetrcParser.find (QString &machine) {
+    QHash<QString, LoginPair>.const_iterator it = _entries.find (machine);
     if (it != _entries.end ()) {
         return *it;
     } else {

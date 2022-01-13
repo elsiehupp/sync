@@ -22,12 +22,12 @@
 
 namespace OCC {
 
-NextcloudTheme::NextcloudTheme()
-    : Theme() {
+NextcloudTheme.NextcloudTheme ()
+    : Theme () {
 }
 
-QString NextcloudTheme::wizardUrlHint() const {
-    return QString("https://try.nextcloud.com");
+QString NextcloudTheme.wizardUrlHint () {
+    return QString ("https://try.nextcloud.com");
 }
 
 }

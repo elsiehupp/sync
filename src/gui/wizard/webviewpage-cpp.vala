@@ -9,7 +9,7 @@ namespace OCC {
 
 Q_LOGGING_CATEGORY (lcWizardWebiewPage, "nextcloud.gui.wizard.webviewpage", QtInfoMsg)
 
-WebViewPage::WebViewPage (QWidget *parent)
+WebViewPage.WebViewPage (QWidget *parent)
     : AbstractCredentialsWizardPage () {
     _ocWizard = qobject_cast<OwncloudWizard *> (parent);
 
@@ -17,41 +17,41 @@ WebViewPage::WebViewPage (QWidget *parent)
     _webView = new WebView (this);
 
     auto *layout = new QVBoxLayout (this);
-    layout->setMargin (0);
-    layout->addWidget (_webView);
+    layout.setMargin (0);
+    layout.addWidget (_webView);
     setLayout (layout);
 
-    connect (_webView, &WebView::urlCatched, this, &WebViewPage::urlCatched);
+    connect (_webView, &WebView.urlCatched, this, &WebViewPage.urlCatched);
 
-    //_useSystemProxy = QNetworkProxyFactory::usesSystemConfiguration ();
+    //_useSystemProxy = QNetworkProxyFactory.usesSystemConfiguration ();
 }
 
-WebViewPage::~WebViewPage () = default;
+WebViewPage.~WebViewPage () = default;
 //{
-//    QNetworkProxyFactory::setUseSystemConfiguration (_useSystemProxy);
+//    QNetworkProxyFactory.setUseSystemConfiguration (_useSystemProxy);
 //}
 
-void WebViewPage::initializePage () {
-    //QNetworkProxy::setApplicationProxy (QNetworkProxy::applicationProxy ());
+void WebViewPage.initializePage () {
+    //QNetworkProxy.setApplicationProxy (QNetworkProxy.applicationProxy ());
 
     QString url;
-    if (_ocWizard->registration ()) {
+    if (_ocWizard.registration ()) {
         url = "https://nextcloud.com/register";
     } else {
-        url = _ocWizard->ocUrl ();
+        url = _ocWizard.ocUrl ();
         if (!url.endsWith ('/')) {
             url += "/";
         }
         url += "index.php/login/flow";
     }
     qCInfo (lcWizardWebiewPage ()) << "Url to auth at: " << url;
-    _webView->setUrl (QUrl (url));
+    _webView.setUrl (QUrl (url));
 
-    _originalWizardSize = _ocWizard->size ();
+    _originalWizardSize = _ocWizard.size ();
     resizeWizard ();
 }
 
-void WebViewPage::resizeWizard () {
+void WebViewPage.resizeWizard () {
     // The webview needs a little bit more space
     auto wizardSizeChanged = tryToSetWizardSize (_originalWizardSize.width () * 2, _originalWizardSize.height () * 2);
 
@@ -60,53 +60,53 @@ void WebViewPage::resizeWizard () {
     }
 
     if (wizardSizeChanged) {
-        _ocWizard->centerWindow ();
+        _ocWizard.centerWindow ();
     }
 }
 
-bool WebViewPage::tryToSetWizardSize (int width, int height) {
-    const auto window = _ocWizard->window ();
-    const auto screenGeometry = QGuiApplication::screenAt (window->pos ())->geometry ();
+bool WebViewPage.tryToSetWizardSize (int width, int height) {
+    const auto window = _ocWizard.window ();
+    const auto screenGeometry = QGuiApplication.screenAt (window.pos ()).geometry ();
     const auto windowWidth = screenGeometry.width ();
     const auto windowHeight = screenGeometry.height ();
 
     if (width < windowWidth && height < windowHeight) {
-        _ocWizard->resize (width, height);
+        _ocWizard.resize (width, height);
         return true;
     }
 
     return false;
 }
 
-void WebViewPage::cleanupPage () {
-    _ocWizard->resize (_originalWizardSize);
-    _ocWizard->centerWindow ();
+void WebViewPage.cleanupPage () {
+    _ocWizard.resize (_originalWizardSize);
+    _ocWizard.centerWindow ();
 }
 
-int WebViewPage::nextId () const {
-    return WizardCommon::Page_AdvancedSetup;
+int WebViewPage.nextId () {
+    return WizardCommon.Page_AdvancedSetup;
 }
 
-bool WebViewPage::isComplete () const {
+bool WebViewPage.isComplete () {
     return false;
 }
 
-AbstractCredentials* WebViewPage::getCredentials () const {
-    return new WebFlowCredentials (_user, _pass, _ocWizard->_clientSslCertificate, _ocWizard->_clientSslKey);
+AbstractCredentials* WebViewPage.getCredentials () {
+    return new WebFlowCredentials (_user, _pass, _ocWizard._clientSslCertificate, _ocWizard._clientSslKey);
 }
 
-void WebViewPage::setConnected () {
+void WebViewPage.setConnected () {
     qCInfo (lcWizardWebiewPage ()) << "YAY! we are connected!";
 }
 
-void WebViewPage::urlCatched (QString user, QString pass, QString host) {
+void WebViewPage.urlCatched (QString user, QString pass, QString host) {
     qCInfo (lcWizardWebiewPage ()) << "Got user: " << user << ", server: " << host;
 
     _user = user;
     _pass = pass;
 
-    AccountPtr account = _ocWizard->account ();
-    account->setUrl (host);
+    AccountPtr account = _ocWizard.account ();
+    account.setUrl (host);
 
     qCInfo (lcWizardWebiewPage ()) << "URL: " << field ("OCUrl").toString ();
     emit connectToOCUrl (host);

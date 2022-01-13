@@ -58,6 +58,6 @@ inline bool operator!= (SyncFileStatus &a, SyncFileStatus &b) {
 }
 }
 
-Q_DECLARE_METATYPE (OCC::SyncFileStatus)
+Q_DECLARE_METATYPE (OCC.SyncFileStatus)
 
 #endif // SYNCFILESTATUS_H

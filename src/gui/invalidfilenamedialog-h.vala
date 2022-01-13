@@ -39,7 +39,7 @@ public:
     void accept () override;
 
 private:
-    std::unique_ptr<Ui::InvalidFilenameDialog> _ui;
+    std.unique_ptr<Ui.InvalidFilenameDialog> _ui;
 
     AccountPtr _account;
     Folder *_folder;

@@ -32,13 +32,13 @@ public:
     void setError (QString &error);
 
 public Q_SLOTS:
-    void slotAuthResult (Flow2Auth::Result, QString &errorString, QString &user, QString &appPassword);
+    void slotAuthResult (Flow2Auth.Result, QString &errorString, QString &user, QString &appPassword);
     void slotPollNow ();
-    void slotStatusChanged (Flow2Auth::PollStatus status, int secondsLeft);
+    void slotStatusChanged (Flow2Auth.PollStatus status, int secondsLeft);
     void slotStyleChanged ();
 
 signals:
-    void authResult (Flow2Auth::Result, QString &errorString, QString &user, QString &appPassword);
+    void authResult (Flow2Auth.Result, QString &errorString, QString &user, QString &appPassword);
     void pollNow ();
 
 private:

@@ -21,11 +21,11 @@ namespace OCC {
 Q_LOGGING_CATEGORY (lcSslErrorDialog, "nextcloud.gui.sslerrordialog", QtInfoMsg)
 
 namespace Utility {
-    //  Used for QSSLCertificate::subjectInfo which returns a QStringList in Qt5, but a QString in Qt4
+    //  Used for QSSLCertificate.subjectInfo which returns a QStringList in Qt5, but a QString in Qt4
     QString escape (QStringList &l) { return escape (l.join (';')); }
 }
 
-bool SslDialogErrorHandler::handleErrors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, AccountPtr account) {
+bool SslDialogErrorHandler.handleErrors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, AccountPtr account) {
     (void)conf;
     if (!certs) {
         qCCritical (lcSslErrorDialog) << "Certs parameter required but is NULL!";
@@ -39,7 +39,7 @@ bool SslDialogErrorHandler::handleErrors (QList<QSslError> errors, QSslConfigura
         return true;
     }
     // whether the user accepted the certs
-    if (dlg.exec () == QDialog::Accepted) {
+    if (dlg.exec () == QDialog.Accepted) {
         if (dlg.trustConnection ()) {
             *certs = dlg.unknownCerts ();
             return true;
@@ -48,36 +48,36 @@ bool SslDialogErrorHandler::handleErrors (QList<QSslError> errors, QSslConfigura
     return false;
 }
 
-SslErrorDialog::SslErrorDialog (AccountPtr account, QWidget *parent)
+SslErrorDialog.SslErrorDialog (AccountPtr account, QWidget *parent)
     : QDialog (parent)
     , _allTrusted (false)
-    , _ui (new Ui::SslErrorDialog)
+    , _ui (new Ui.SslErrorDialog)
     , _account (account) {
-    setWindowFlags (windowFlags () & ~Qt::WindowContextHelpButtonHint);
-    _ui->setupUi (this);
+    setWindowFlags (windowFlags () & ~Qt.WindowContextHelpButtonHint);
+    _ui.setupUi (this);
     setWindowTitle (tr ("Untrusted Certificate"));
     QPushButton *okButton =
-        _ui->_dialogButtonBox->button (QDialogButtonBox::Ok);
+        _ui._dialogButtonBox.button (QDialogButtonBox.Ok);
     QPushButton *cancelButton =
-        _ui->_dialogButtonBox->button (QDialogButtonBox::Cancel);
-    okButton->setEnabled (false);
+        _ui._dialogButtonBox.button (QDialogButtonBox.Cancel);
+    okButton.setEnabled (false);
 
-    _ui->_cbTrustConnect->setEnabled (!Theme::instance ()->forbidBadSSL ());
-    connect (_ui->_cbTrustConnect, &QAbstractButton::clicked,
-        okButton, &QWidget::setEnabled);
+    _ui._cbTrustConnect.setEnabled (!Theme.instance ().forbidBadSSL ());
+    connect (_ui._cbTrustConnect, &QAbstractButton.clicked,
+        okButton, &QWidget.setEnabled);
 
     if (okButton) {
-        okButton->setDefault (true);
-        connect (okButton, &QAbstractButton::clicked, this, &QDialog::accept);
-        connect (cancelButton, &QAbstractButton::clicked, this, &QDialog::reject);
+        okButton.setDefault (true);
+        connect (okButton, &QAbstractButton.clicked, this, &QDialog.accept);
+        connect (cancelButton, &QAbstractButton.clicked, this, &QDialog.reject);
     }
 }
 
-SslErrorDialog::~SslErrorDialog () {
+SslErrorDialog.~SslErrorDialog () {
     delete _ui;
 }
 
-QString SslErrorDialog::styleSheet () const {
+QString SslErrorDialog.styleSheet () {
     const QString style = QLatin1String (
         "#cert {margin-left: 5px;} "
         "#ca_error { color:#a00011; margin-left:5px; margin-right:5px; }"
@@ -90,7 +90,7 @@ QString SslErrorDialog::styleSheet () const {
 }
 #define QL (x) QLatin1String (x)
 
-bool SslErrorDialog::checkFailingCertsKnown (QList<QSslError> &errors) {
+bool SslErrorDialog.checkFailingCertsKnown (QList<QSslError> &errors) {
     // check if unknown certs caused errors.
     _unknownCerts.clear ();
 
@@ -98,7 +98,7 @@ bool SslErrorDialog::checkFailingCertsKnown (QList<QSslError> &errors) {
 
     QStringList additionalErrorStrings;
 
-    QList<QSslCertificate> trustedCerts = _account->approvedCerts ();
+    QList<QSslCertificate> trustedCerts = _account.approvedCerts ();
 
     for (int i = 0; i < errors.count (); ++i) {
         QSslError error = errors.at (i);
@@ -123,7 +123,7 @@ bool SslErrorDialog::checkFailingCertsKnown (QList<QSslError> &errors) {
     msg += QL ("<link rel='stylesheet' type='text/css' href='format.css'>");
     msg += QL ("</head><body>");
 
-    auto host = _account->url ().host ();
+    auto host = _account.url ().host ();
     msg += QL ("<h3>") + tr ("Cannot connect securely to <i>%1</i>:").arg (host) + QL ("</h3>");
     // loop over the unknown certs and line up their errors.
     msg += QL ("<div id=\"ca_errors\">");
@@ -156,26 +156,26 @@ bool SslErrorDialog::checkFailingCertsKnown (QList<QSslError> &errors) {
 
     auto *doc = new QTextDocument (nullptr);
     QString style = styleSheet ();
-    doc->addResource (QTextDocument::StyleSheetResource, QUrl (QL ("format.css")), style);
-    doc->setHtml (msg);
+    doc.addResource (QTextDocument.StyleSheetResource, QUrl (QL ("format.css")), style);
+    doc.setHtml (msg);
 
-    _ui->_tbErrors->setDocument (doc);
-    _ui->_tbErrors->show ();
+    _ui._tbErrors.setDocument (doc);
+    _ui._tbErrors.show ();
 
     return false;
 }
 
-QString SslErrorDialog::certDiv (QSslCertificate cert) const {
+QString SslErrorDialog.certDiv (QSslCertificate cert) {
     QString msg;
     msg += QL ("<div id=\"cert\">");
-    msg += QL ("<h3>") + tr ("with Certificate %1").arg (Utility::escape (cert.subjectInfo (QSslCertificate::CommonName))) + QL ("</h3>");
+    msg += QL ("<h3>") + tr ("with Certificate %1").arg (Utility.escape (cert.subjectInfo (QSslCertificate.CommonName))) + QL ("</h3>");
 
     msg += QL ("<div id=\"ccert\">");
     QStringList li;
 
-    QString org = Utility::escape (cert.subjectInfo (QSslCertificate::Organization));
-    QString unit = Utility::escape (cert.subjectInfo (QSslCertificate::OrganizationalUnitName));
-    QString country = Utility::escape (cert.subjectInfo (QSslCertificate::CountryName));
+    QString org = Utility.escape (cert.subjectInfo (QSslCertificate.Organization));
+    QString unit = Utility.escape (cert.subjectInfo (QSslCertificate.OrganizationalUnitName));
+    QString country = Utility.escape (cert.subjectInfo (QSslCertificate.CountryName));
     if (unit.isEmpty ())
         unit = tr ("&lt;not specified&gt;");
     if (org.isEmpty ())
@@ -189,13 +189,13 @@ QString SslErrorDialog::certDiv (QSslCertificate cert) const {
 
     msg += QL ("<p>");
 
-    if (cert.effectiveDate () < QDateTime (QDate (2016, 1, 1), QTime (), Qt::UTC)) {
-	QString sha1sum = Utility::formatFingerprint (cert.digest (QCryptographicHash::Sha1).toHex ());
+    if (cert.effectiveDate () < QDateTime (QDate (2016, 1, 1), QTime (), Qt.UTC)) {
+	QString sha1sum = Utility.formatFingerprint (cert.digest (QCryptographicHash.Sha1).toHex ());
         msg += tr ("Fingerprint (SHA1): <tt>%1</tt>").arg (sha1sum) + QL ("<br/>");
     }
 
-    QString sha256sum = Utility::formatFingerprint (cert.digest (QCryptographicHash::Sha256).toHex ());
-    QString sha512sum = Utility::formatFingerprint (cert.digest (QCryptographicHash::Sha512).toHex ());
+    QString sha256sum = Utility.formatFingerprint (cert.digest (QCryptographicHash.Sha256).toHex ());
+    QString sha512sum = Utility.formatFingerprint (cert.digest (QCryptographicHash.Sha512).toHex ());
     msg += tr ("Fingerprint (SHA-256): <tt>%1</tt>").arg (sha256sum) + QL ("<br/>");
     msg += tr ("Fingerprint (SHA-512): <tt>%1</tt>").arg (sha512sum) + QL ("<br/>");
     msg += QL ("<br/>");
@@ -204,12 +204,12 @@ QString SslErrorDialog::certDiv (QSslCertificate cert) const {
 
     msg += QL ("</div>");
 
-    msg += QL ("<h3>") + tr ("Issuer: %1").arg (Utility::escape (cert.issuerInfo (QSslCertificate::CommonName))) + QL ("</h3>");
+    msg += QL ("<h3>") + tr ("Issuer: %1").arg (Utility.escape (cert.issuerInfo (QSslCertificate.CommonName))) + QL ("</h3>");
     msg += QL ("<div id=\"issuer\">");
     li.clear ();
-    li << tr ("Organization: %1").arg (Utility::escape (cert.issuerInfo (QSslCertificate::Organization)));
-    li << tr ("Unit: %1").arg (Utility::escape (cert.issuerInfo (QSslCertificate::OrganizationalUnitName)));
-    li << tr ("Country: %1").arg (Utility::escape (cert.issuerInfo (QSslCertificate::CountryName)));
+    li << tr ("Organization: %1").arg (Utility.escape (cert.issuerInfo (QSslCertificate.Organization)));
+    li << tr ("Unit: %1").arg (Utility.escape (cert.issuerInfo (QSslCertificate.OrganizationalUnitName)));
+    li << tr ("Country: %1").arg (Utility.escape (cert.issuerInfo (QSslCertificate.CountryName)));
     msg += QL ("<p>") + li.join (QL ("<br/>")) + QL ("</p>");
     msg += QL ("</div>");
     msg += QL ("</div>");
@@ -217,11 +217,11 @@ QString SslErrorDialog::certDiv (QSslCertificate cert) const {
     return msg;
 }
 
-bool SslErrorDialog::trustConnection () {
+bool SslErrorDialog.trustConnection () {
     if (_allTrusted)
         return true;
 
-    bool stat = (_ui->_cbTrustConnect->checkState () == Qt::Checked);
+    bool stat = (_ui._cbTrustConnect.checkState () == Qt.Checked);
     qCInfo (lcSslErrorDialog) << "SSL-Connection is trusted: " << stat;
 
     return stat;

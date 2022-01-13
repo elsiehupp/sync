@@ -24,9 +24,9 @@ namespace OCC {
 
 static void setupFavLink_private (QString &folder) {
     // Nautilus: add to ~/.gtk-bookmarks
-    QFile gtkBookmarks (QDir::homePath () + QLatin1String ("/.config/gtk-3.0/bookmarks"));
+    QFile gtkBookmarks (QDir.homePath () + QLatin1String ("/.config/gtk-3.0/bookmarks"));
     QByteArray folderUrl = "file://" + folder.toUtf8 ();
-    if (gtkBookmarks.open (QFile::ReadWrite)) {
+    if (gtkBookmarks.open (QFile.ReadWrite)) {
         QByteArray places = gtkBookmarks.readAll ();
         if (!places.contains (folderUrl)) {
             places += folderUrl;
@@ -43,7 +43,7 @@ static void removeFavLink_private (QString &folder) {
 // returns the autostart directory the linux way
 // and respects the XDG_CONFIG_HOME env variable
 QString getUserAutostartDir_private () {
-    QString config = QStandardPaths::writableLocation (QStandardPaths::ConfigLocation);
+    QString config = QStandardPaths.writableLocation (QStandardPaths.ConfigLocation);
     config += QLatin1String ("/autostart/");
     return config;
 }
@@ -53,7 +53,7 @@ bool hasLaunchOnStartup_private (QString &appName) {
     QString desktopFileLocation = getUserAutostartDir_private ()
                                     + QLatin1String (LINUX_APPLICATION_ID)
                                     + QLatin1String (".desktop");
-    return QFile::exists (desktopFileLocation);
+    return QFile.exists (desktopFileLocation);
 }
 
 void setLaunchOnStartup_private (QString &appName, QString &guiName, bool enable) {
@@ -68,15 +68,15 @@ void setLaunchOnStartup_private (QString &appName, QString &guiName, bool enable
             return;
         }
         QFile iniFile (desktopFileLocation);
-        if (!iniFile.open (QIODevice::WriteOnly)) {
+        if (!iniFile.open (QIODevice.WriteOnly)) {
             qCWarning (lcUtility) << "Could not write auto start entry" << desktopFileLocation;
             return;
         }
         // When running inside an AppImage, we need to set the path to the
         // AppImage instead of the path to the executable
         const QString appImagePath = qEnvironmentVariable ("APPIMAGE");
-        const bool runningInsideAppImage = !appImagePath.isNull () && QFile::exists (appImagePath);
-        const QString executablePath = runningInsideAppImage ? appImagePath : QCoreApplication::applicationFilePath ();
+        const bool runningInsideAppImage = !appImagePath.isNull () && QFile.exists (appImagePath);
+        const QString executablePath = runningInsideAppImage ? appImagePath : QCoreApplication.applicationFilePath ();
 
         QTextStream ts (&iniFile);
         ts.setCodec ("UTF-8");
@@ -90,9 +90,9 @@ void setLaunchOnStartup_private (QString &appName, QString &guiName, bool enable
            << QLatin1String ("Type=") << QLatin1String ("Application\n")
            << QLatin1String ("StartupNotify=") << "false\n"
            << QLatin1String ("X-GNOME-Autostart-enabled=") << "true\n"
-           << QLatin1String ("X-GNOME-Autostart-Delay=10") << Qt::endl;
+           << QLatin1String ("X-GNOME-Autostart-Delay=10") << Qt.endl;
     } else {
-        if (!QFile::remove (desktopFileLocation)) {
+        if (!QFile.remove (desktopFileLocation)) {
             qCWarning (lcUtility) << "Could not remove autostart desktop file";
         }
     }
@@ -102,7 +102,7 @@ static inline bool hasDarkSystray_private () {
     return true;
 }
 
-QString Utility::getCurrentUserName () {
+QString Utility.getCurrentUserName () {
     return {};
 }
 

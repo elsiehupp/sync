@@ -124,8 +124,8 @@ private:
     qreal m_y = 0;
     QPointF m_angleDelta;
     QPointF m_pixelDelta;
-    Qt::MouseButtons m_buttons = Qt::NoButton;
-    Qt::KeyboardModifiers m_modifiers = Qt::NoModifier;
+    Qt.MouseButtons m_buttons = Qt.NoButton;
+    Qt.KeyboardModifiers m_modifiers = Qt.NoModifier;
     bool m_inverted = false;
     bool m_accepted = false;
 };

@@ -26,7 +26,7 @@ class FolderStatusDelegate : public QStyledItemDelegate {
 public:
     FolderStatusDelegate ();
 
-    enum datarole { FolderAliasRole = Qt::UserRole + 100,
+    enum datarole { FolderAliasRole = Qt.UserRole + 100,
         HeaderRole,
         FolderPathRole, // for a SubFolder it's the complete path
         FolderSecondPathRole,
@@ -57,8 +57,8 @@ public:
     /**
      * return the position of the option button within the item
      */
-    static QRect optionsButtonRect (QRect within, Qt::LayoutDirection direction);
-    static QRect addButtonRect (QRect within, Qt::LayoutDirection direction);
+    static QRect optionsButtonRect (QRect within, Qt.LayoutDirection direction);
+    static QRect addButtonRect (QRect within, Qt.LayoutDirection direction);
     static QRect errorsListRect (QRect within);
     static int rootFolderHeightWithoutErrors (QFontMetrics &fm, QFontMetrics &aliasFm);
 

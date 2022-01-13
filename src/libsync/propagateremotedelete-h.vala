@@ -33,9 +33,9 @@ public:
     }
     void start () override;
     void createDeleteJob (QString &filename);
-    void abort (PropagatorJob::AbortType abortType) override;
+    void abort (PropagatorJob.AbortType abortType) override;
 
-    bool isLikelyFinishedQuickly () override { return !_item->isDirectory (); }
+    bool isLikelyFinishedQuickly () override { return !_item.isDirectory (); }
 
 private slots:
     void slotDeleteJobFinished ();

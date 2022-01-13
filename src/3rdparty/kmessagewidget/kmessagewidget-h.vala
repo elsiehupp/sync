@@ -156,9 +156,9 @@ public:
 
     /**
      * Get the type of this message.
-     * By default, the type is set to KMessageWidget::Information.
+     * By default, the type is set to KMessageWidget.Information.
      *
-     * @see KMessageWidget::MessageType, setMessageType ()
+     * @see KMessageWidget.MessageType, setMessageType ()
      */
     MessageType messageType () const;
 
@@ -168,7 +168,7 @@ public:
      * order the actions were added.
      *
      * @param action the action to add
-     * @see removeAction (), QWidget::actions ()
+     * @see removeAction (), QWidget.actions ()
      */
     void addAction (QAction *action);
 
@@ -176,7 +176,7 @@ public:
      * Remove @p action from the message widget.
      *
      * @param action the action to remove
-     * @see KMessageWidget::MessageType, addAction (), setMessageType ()
+     * @see KMessageWidget.MessageType, addAction (), setMessageType ()
      */
     void removeAction (QAction *action);
 
@@ -253,13 +253,13 @@ public Q_SLOTS:
 
     /**
      * Set the message type to @p type.
-     * By default, the message type is set to KMessageWidget::Information.
+     * By default, the message type is set to KMessageWidget.Information.
      * Appropriate colors are chosen to mimic the appearance of Kirigami's
      * InlineMessage.
      *
-     * @see messageType (), KMessageWidget::MessageType
+     * @see messageType (), KMessageWidget.MessageType
      */
-    void setMessageType (KMessageWidget::MessageType type);
+    void setMessageType (KMessageWidget.MessageType type);
 
     /**
      * Show the widget using an animation.
@@ -282,7 +282,7 @@ Q_SIGNALS:
      * This signal is emitted when the user clicks a link in the text label.
      * The URL referred to by the href anchor is passed in contents.
      * @param contents text of the href anchor
-     * @see QLabel::linkActivated ()
+     * @see QLabel.linkActivated ()
      * @since 4.10
      */
     void linkActivated (QString &contents);
@@ -291,7 +291,7 @@ Q_SIGNALS:
      * This signal is emitted when the user hovers over a link in the text label.
      * The URL referred to by the href anchor is passed in contents.
      * @param contents text of the href anchor
-     * @see QLabel::linkHovered ()
+     * @see QLabel.linkHovered ()
      * @since 4.11
      */
     void linkHovered (QString &contents);

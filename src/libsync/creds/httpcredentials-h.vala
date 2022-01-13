@@ -43,7 +43,7 @@ namespace OCC {
 
    1) First, AccountState will attempt to load the certificate from the keychain
 
-   ---->  fetchFromKeychain
+   ---.  fetchFromKeychain
                 |                           }
                 v                            }
           slotReadClientCertPEMJobDone       }     There are first 3 QtKeychain jobs to fetch
@@ -54,7 +54,7 @@ namespace OCC {
                 v
             slotReadJobDone
                 |        |
-                |        +-------> emit fetched ()   if OAuth is not used
+                |        +------. emit fetched ()   if OAuth is not used
                 |
                 v
             refreshAccessToken ()
@@ -71,7 +71,7 @@ class OWNCLOUDSYNC_EXPORT HttpCredentials : public AbstractCredentials {
 
 public:
     /// Don't add credentials if this is set on a QNetworkRequest
-    static constexpr QNetworkRequest::Attribute DontAddCredentialsAttribute = QNetworkRequest::User;
+    static constexpr QNetworkRequest.Attribute DontAddCredentialsAttribute = QNetworkRequest.User;
 
     HttpCredentials ();
     explicit HttpCredentials (QString &user, QString &password,
@@ -100,26 +100,26 @@ public:
     void setAccount (Account *account) override;
 
     // Whether we are using OAuth
-    bool isUsingOAuth () const { return !_refreshToken.isNull (); }
+    bool isUsingOAuth () { return !_refreshToken.isNull (); }
 
     bool retryIfNeeded (AbstractNetworkJob *) override;
 
 private Q_SLOTS:
     void slotAuthentication (QNetworkReply *, QAuthenticator *);
 
-    void slotReadClientCertPasswordJobDone (QKeychain::Job *);
-    void slotReadClientCertPEMJobDone (QKeychain::Job *);
-    void slotReadClientKeyPEMJobDone (QKeychain::Job *);
+    void slotReadClientCertPasswordJobDone (QKeychain.Job *);
+    void slotReadClientCertPEMJobDone (QKeychain.Job *);
+    void slotReadClientKeyPEMJobDone (QKeychain.Job *);
 
     void slotReadPasswordFromKeychain ();
-    void slotReadJobDone (QKeychain::Job *);
+    void slotReadJobDone (QKeychain.Job *);
 
-    void slotWriteClientCertPasswordJobDone (QKeychain::Job *);
-    void slotWriteClientCertPEMJobDone (QKeychain::Job *);
-    void slotWriteClientKeyPEMJobDone (QKeychain::Job *);
+    void slotWriteClientCertPasswordJobDone (QKeychain.Job *);
+    void slotWriteClientCertPEMJobDone (QKeychain.Job *);
+    void slotWriteClientKeyPEMJobDone (QKeychain.Job *);
 
     void slotWritePasswordToKeychain ();
-    void slotWriteJobDone (QKeychain::Job *);
+    void slotWriteJobDone (QKeychain.Job *);
 
 protected:
     /** Reads data from keychain locations
@@ -142,7 +142,7 @@ protected:
      * If that happens, this function will schedule another try and
      * return true.
      */
-    bool keychainUnavailableRetryLater (QKeychain::ReadPasswordJob *);
+    bool keychainUnavailableRetryLater (QKeychain.ReadPasswordJob *);
 
     /** Takes client cert pkcs12 and unwraps the key/cert.
      *

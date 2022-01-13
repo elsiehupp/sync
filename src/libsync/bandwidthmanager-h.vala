@@ -65,8 +65,8 @@ private:
     QTimer _absoluteLimitTimer;
 
     // FIXME merge these two lists
-    std::list<UploadDevice *> _absoluteUploadDeviceList;
-    std::list<UploadDevice *> _relativeUploadDeviceList;
+    std.list<UploadDevice *> _absoluteUploadDeviceList;
+    std.list<UploadDevice *> _relativeUploadDeviceList;
 
     QTimer _relativeUploadMeasuringTimer;
 
@@ -80,7 +80,7 @@ private:
     qint64 _relativeUploadLimitProgressAtMeasuringRestart;
     qint64 _currentUploadLimit;
 
-    std::list<GETFileJob *> _downloadJobList;
+    std.list<GETFileJob *> _downloadJobList;
     QTimer _relativeDownloadMeasuringTimer;
 
     // for relative bw limiting, we need to wait this amount before measuring again

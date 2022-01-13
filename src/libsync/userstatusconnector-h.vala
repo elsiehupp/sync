@@ -32,9 +32,9 @@ enum class OWNCLOUDSYNC_EXPORT ClearAtType {
     Timestamp
 };
 
-// TODO: If we can use C++17 make it a std::variant
+// TODO: If we can use C++17 make it a std.variant
 struct OWNCLOUDSYNC_EXPORT ClearAt {
-    ClearAtType _type = ClearAtType::Period;
+    ClearAtType _type = ClearAtType.Period;
 
     quint64 _timestamp;
     int _period;
@@ -85,7 +85,7 @@ private:
     QString _id;
     QString _message;
     QString _icon;
-    OnlineStatus _state = OnlineStatus::Online;
+    OnlineStatus _state = OnlineStatus.Online;
     bool _messagePredefined;
     Optional<ClearAt> _clearAt;
 };
@@ -119,12 +119,12 @@ public:
 
 signals:
     void userStatusFetched (UserStatus &userStatus);
-    void predefinedStatusesFetched (std::vector<UserStatus> &statuses);
+    void predefinedStatusesFetched (std.vector<UserStatus> &statuses);
     void userStatusSet ();
     void messageCleared ();
     void error (Error error);
 };
 }
 
-Q_DECLARE_METATYPE (OCC::UserStatusConnector *)
-Q_DECLARE_METATYPE (OCC::UserStatus)
+Q_DECLARE_METATYPE (OCC.UserStatusConnector *)
+Q_DECLARE_METATYPE (OCC.UserStatus)

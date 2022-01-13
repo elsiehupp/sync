@@ -45,8 +45,8 @@ class AccountSettings : public QWidget {
 public:
     explicit AccountSettings (AccountState *accountState, QWidget *parent = nullptr);
     ~AccountSettings () override;
-    QSize sizeHint () const override { return ownCloudGui::settingsDialogSize (); }
-    bool canEncryptOrDecrypt (FolderStatusModel::SubFolderInfo* folderInfo);
+    QSize sizeHint () const override { return ownCloudGui.settingsDialogSize (); }
+    bool canEncryptOrDecrypt (FolderStatusModel.SubFolderInfo* folderInfo);
 
 signals:
     void folderChanged ();
@@ -85,7 +85,7 @@ protected slots:
     void slotDeleteAccount ();
     void slotToggleSignInState ();
     void refreshSelectiveSyncStatus ();
-    void slotMarkSubfolderEncrypted (FolderStatusModel::SubFolderInfo *folderInfo);
+    void slotMarkSubfolderEncrypted (FolderStatusModel.SubFolderInfo *folderInfo);
     void slotSubfolderContextMenuRequested (QModelIndex& idx, QPoint& point);
     void slotCustomContextMenuRequested (QPoint &);
     void slotFolderListClicked (QModelIndex &indx);
@@ -111,7 +111,7 @@ private:
     /// Returns the alias of the selected folder, empty string if none
     QString selectedFolderAlias () const;
 
-    Ui::AccountSettings *_ui;
+    Ui.AccountSettings *_ui;
 
     FolderStatusModel *_model;
     QUrl _OCUrl;

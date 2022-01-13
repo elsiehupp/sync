@@ -42,7 +42,7 @@ public:
     QString localFolder () const;
     void setRemoteFolder (QString &remoteFolder);
     void setMultipleFoldersExist (bool exist);
-    void setAuthType (DetermineAuthTypeJob::AuthType type);
+    void setAuthType (DetermineAuthTypeJob.AuthType type);
 
 public slots:
     void setErrorString (QString &, bool retryHTTPonly);
@@ -71,7 +71,7 @@ private:
     QString _ocUser;
     bool _authTypeKnown = false;
     bool _checking = false;
-    DetermineAuthTypeJob::AuthType _authType = DetermineAuthTypeJob::Basic;
+    DetermineAuthTypeJob.AuthType _authType = DetermineAuthTypeJob.Basic;
 
     QProgressIndicator *_progressIndi;
     OwncloudWizard *_ocWizard;

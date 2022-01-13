@@ -17,37 +17,37 @@
 // #include <QLineEdit>
 
 namespace OCC {
-AddCertificateDialog::AddCertificateDialog (QWidget *parent)
+AddCertificateDialog.AddCertificateDialog (QWidget *parent)
     : QDialog (parent)
-    , ui (new Ui::AddCertificateDialog) {
-    ui->setupUi (this);
-    ui->labelErrorCertif->setText ("");
+    , ui (new Ui.AddCertificateDialog) {
+    ui.setupUi (this);
+    ui.labelErrorCertif.setText ("");
 }
 
-AddCertificateDialog::~AddCertificateDialog () {
+AddCertificateDialog.~AddCertificateDialog () {
     delete ui;
 }
 
-void AddCertificateDialog::on_pushButtonBrowseCertificate_clicked () {
-    QString fileName = QFileDialog::getOpenFileName (this, tr ("Select a certificate"), "", tr ("Certificate files (*.p12 *.pfx)"));
-    ui->lineEditCertificatePath->setText (fileName);
+void AddCertificateDialog.on_pushButtonBrowseCertificate_clicked () {
+    QString fileName = QFileDialog.getOpenFileName (this, tr ("Select a certificate"), "", tr ("Certificate files (*.p12 *.pfx)"));
+    ui.lineEditCertificatePath.setText (fileName);
 }
 
-QString AddCertificateDialog::getCertificatePath () {
-    return ui->lineEditCertificatePath->text ();
+QString AddCertificateDialog.getCertificatePath () {
+    return ui.lineEditCertificatePath.text ();
 }
 
-QString AddCertificateDialog::getCertificatePasswd () {
-    return ui->lineEditPWDCertificate->text ();
+QString AddCertificateDialog.getCertificatePasswd () {
+    return ui.lineEditPWDCertificate.text ();
 }
 
-void AddCertificateDialog::showErrorMessage (QString message) {
-    ui->labelErrorCertif->setText (message);
+void AddCertificateDialog.showErrorMessage (QString message) {
+    ui.labelErrorCertif.setText (message);
 }
 
-void AddCertificateDialog::reinit () {
-    ui->labelErrorCertif->clear ();
-    ui->lineEditCertificatePath->clear ();
-    ui->lineEditPWDCertificate->clear ();
+void AddCertificateDialog.reinit () {
+    ui.labelErrorCertif.clear ();
+    ui.lineEditCertificatePath.clear ();
+    ui.lineEditPWDCertificate.clear ();
 }
 }

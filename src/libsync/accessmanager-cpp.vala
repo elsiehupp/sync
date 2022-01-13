@@ -27,11 +27,11 @@ namespace OCC {
 
 Q_LOGGING_CATEGORY (lcAccessManager, "nextcloud.sync.accessmanager", QtInfoMsg)
 
-AccessManager::AccessManager (QObject *parent)
+AccessManager.AccessManager (QObject *parent)
     : QNetworkAccessManager (parent) {
 #if defined (Q_OS_MAC)
     // FIXME Workaround http://stackoverflow.com/a/15707366/2941 https://bugreports.qt-project.org/browse/QTBUG-30434
-    QNetworkProxy proxy = this->proxy ();
+    QNetworkProxy proxy = this.proxy ();
     proxy.setHostName (" ");
     setProxy (proxy);
 #endif
@@ -43,26 +43,26 @@ AccessManager::AccessManager (QObject *parent)
     setCookieJar (new CookieJar);
 }
 
-QByteArray AccessManager::generateRequestId () {
-    return QUuid::createUuid ().toByteArray (QUuid::WithoutBraces);
+QByteArray AccessManager.generateRequestId () {
+    return QUuid.createUuid ().toByteArray (QUuid.WithoutBraces);
 }
 
-QNetworkReply *AccessManager::createRequest (QNetworkAccessManager::Operation op, QNetworkRequest &request, QIODevice *outgoingData) {
+QNetworkReply *AccessManager.createRequest (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *outgoingData) {
     QNetworkRequest newRequest (request);
 
     // Respect request specific user agent if any
-    if (!newRequest.header (QNetworkRequest::UserAgentHeader).isValid ()) {
-        newRequest.setHeader (QNetworkRequest::UserAgentHeader, Utility::userAgentString ());
+    if (!newRequest.header (QNetworkRequest.UserAgentHeader).isValid ()) {
+        newRequest.setHeader (QNetworkRequest.UserAgentHeader, Utility.userAgentString ());
     }
 
     // Some firewalls reject requests that have a "User-Agent" but no "Accept" header
     newRequest.setRawHeader (QByteArray ("Accept"), "*/*");
 
-    QByteArray verb = newRequest.attribute (QNetworkRequest::CustomVerbAttribute).toByteArray ();
+    QByteArray verb = newRequest.attribute (QNetworkRequest.CustomVerbAttribute).toByteArray ();
     // For PROPFIND (assumed to be a WebDAV op), set xml/utf8 as content type/encoding
     // This needs extension
     if (verb == "PROPFIND") {
-        newRequest.setHeader (QNetworkRequest::ContentTypeHeader, QLatin1String ("text/xml; charset=utf-8"));
+        newRequest.setHeader (QNetworkRequest.ContentTypeHeader, QLatin1String ("text/xml; charset=utf-8"));
     }
 
     // Generate a new request id
@@ -76,12 +76,12 @@ QNetworkReply *AccessManager::createRequest (QNetworkAccessManager::Operation op
         // http2 seems to cause issues, as with our recommended server setup we don't support http2, disable it by default for now
         static const bool http2EnabledEnv = qEnvironmentVariableIntValue ("OWNCLOUD_HTTP2_ENABLED") == 1;
 
-        newRequest.setAttribute (QNetworkRequest::HTTP2AllowedAttribute, http2EnabledEnv);
+        newRequest.setAttribute (QNetworkRequest.HTTP2AllowedAttribute, http2EnabledEnv);
     }
 #endif
 
-    const auto reply = QNetworkAccessManager::createRequest (op, newRequest, outgoingData);
-    HttpLogger::logRequest (reply, op, outgoingData);
+    const auto reply = QNetworkAccessManager.createRequest (op, newRequest, outgoingData);
+    HttpLogger.logRequest (reply, op, outgoingData);
     return reply;
 }
 

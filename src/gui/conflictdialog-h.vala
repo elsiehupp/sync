@@ -43,7 +43,7 @@ private:
     void updateButtonStates ();
 
     QString _baseFilename;
-    QScopedPointer<Ui::ConflictDialog> _ui;
+    QScopedPointer<Ui.ConflictDialog> _ui;
     ConflictSolver *_solver;
 };
 

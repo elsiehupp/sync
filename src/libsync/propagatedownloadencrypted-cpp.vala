@@ -3,71 +3,71 @@ Q_LOGGING_CATEGORY (lcPropagateDownloadEncrypted, "nextcloud.sync.propagator.dow
 
 namespace OCC {
 
-PropagateDownloadEncrypted::PropagateDownloadEncrypted (OwncloudPropagator *propagator, QString &localParentPath, SyncFileItemPtr item, QObject *parent)
+PropagateDownloadEncrypted.PropagateDownloadEncrypted (OwncloudPropagator *propagator, QString &localParentPath, SyncFileItemPtr item, QObject *parent)
     : QObject (parent)
     , _propagator (propagator)
     , _localParentPath (localParentPath)
     , _item (item)
-    , _info (_item->_file) {
+    , _info (_item._file) {
 }
 
-void PropagateDownloadEncrypted::start () {
+void PropagateDownloadEncrypted.start () {
     const auto rootPath = [=] () {
-        const auto result = _propagator->remotePath ();
+        const auto result = _propagator.remotePath ();
         if (result.startsWith ('/')) {
             return result.mid (1);
         } else {
             return result;
         }
     } ();
-    const auto remoteFilename = _item->_encryptedFileName.isEmpty () ? _item->_file : _item->_encryptedFileName;
+    const auto remoteFilename = _item._encryptedFileName.isEmpty () ? _item._file : _item._encryptedFileName;
     const auto remotePath = QString (rootPath + remoteFilename);
     const auto remoteParentPath = remotePath.left (remotePath.lastIndexOf ('/'));
 
     // Is encrypted Now we need the folder-id
-    auto job = new LsColJob (_propagator->account (), remoteParentPath, this);
-    job->setProperties ({"resourcetype", "http://owncloud.org/ns:fileid"});
-    connect (job, &LsColJob::directoryListingSubfolders,
-            this, &PropagateDownloadEncrypted::checkFolderId);
-    connect (job, &LsColJob::finishedWithError,
-            this, &PropagateDownloadEncrypted::folderIdError);
-    job->start ();
+    auto job = new LsColJob (_propagator.account (), remoteParentPath, this);
+    job.setProperties ({"resourcetype", "http://owncloud.org/ns:fileid"});
+    connect (job, &LsColJob.directoryListingSubfolders,
+            this, &PropagateDownloadEncrypted.checkFolderId);
+    connect (job, &LsColJob.finishedWithError,
+            this, &PropagateDownloadEncrypted.folderIdError);
+    job.start ();
 }
 
-void PropagateDownloadEncrypted::folderIdError () {
+void PropagateDownloadEncrypted.folderIdError () {
   qCDebug (lcPropagateDownloadEncrypted) << "Failed to get encrypted metadata of folder";
 }
 
-void PropagateDownloadEncrypted::checkFolderId (QStringList &list) {
+void PropagateDownloadEncrypted.checkFolderId (QStringList &list) {
   auto job = qobject_cast<LsColJob*> (sender ());
   const QString folderId = list.first ();
   qCDebug (lcPropagateDownloadEncrypted) << "Received id of folder" << folderId;
 
-  const ExtraFolderInfo &folderInfo = job->_folderInfos.value (folderId);
+  const ExtraFolderInfo &folderInfo = job._folderInfos.value (folderId);
 
   // Now that we have the folder-id we need it's JSON metadata
-  auto metadataJob = new GetMetadataApiJob (_propagator->account (), folderInfo.fileId);
-  connect (metadataJob, &GetMetadataApiJob::jsonReceived,
-          this, &PropagateDownloadEncrypted::checkFolderEncryptedMetadata);
-  connect (metadataJob, &GetMetadataApiJob::error,
-          this, &PropagateDownloadEncrypted::folderEncryptedMetadataError);
+  auto metadataJob = new GetMetadataApiJob (_propagator.account (), folderInfo.fileId);
+  connect (metadataJob, &GetMetadataApiJob.jsonReceived,
+          this, &PropagateDownloadEncrypted.checkFolderEncryptedMetadata);
+  connect (metadataJob, &GetMetadataApiJob.error,
+          this, &PropagateDownloadEncrypted.folderEncryptedMetadataError);
 
-  metadataJob->start ();
+  metadataJob.start ();
 }
 
-void PropagateDownloadEncrypted::folderEncryptedMetadataError (QByteArray & /*fileId*/, int /*httpReturnCode*/) {
+void PropagateDownloadEncrypted.folderEncryptedMetadataError (QByteArray & /*fileId*/, int /*httpReturnCode*/) {
     qCCritical (lcPropagateDownloadEncrypted) << "Failed to find encrypted metadata information of remote file" << _info.fileName ();
     emit failed ();
 }
 
-void PropagateDownloadEncrypted::checkFolderEncryptedMetadata (QJsonDocument &json) {
+void PropagateDownloadEncrypted.checkFolderEncryptedMetadata (QJsonDocument &json) {
   qCDebug (lcPropagateDownloadEncrypted) << "Metadata Received reading"
-                                        << _item->_instruction << _item->_file << _item->_encryptedFileName;
+                                        << _item._instruction << _item._file << _item._encryptedFileName;
   const QString filename = _info.fileName ();
-  auto meta = new FolderMetadata (_propagator->account (), json.toJson (QJsonDocument::Compact));
-  const QVector<EncryptedFile> files = meta->files ();
+  auto meta = new FolderMetadata (_propagator.account (), json.toJson (QJsonDocument.Compact));
+  const QVector<EncryptedFile> files = meta.files ();
 
-  const QString encryptedFilename = _item->_encryptedFileName.section (QLatin1Char ('/'), -1);
+  const QString encryptedFilename = _item._encryptedFileName.section (QLatin1Char ('/'), -1);
   for (EncryptedFile &file : files) {
     if (encryptedFilename == file.encryptedFilename) {
       _encryptedInfo = file;
@@ -85,13 +85,13 @@ void PropagateDownloadEncrypted::checkFolderEncryptedMetadata (QJsonDocument &js
 // TODO: Fix this. Exported in the wrong place.
 QString createDownloadTmpFileName (QString &previous);
 
-bool PropagateDownloadEncrypted::decryptFile (QFile& tmpFile) {
-    const QString tmpFileName = createDownloadTmpFileName (_item->_file + QLatin1String ("_dec"));
+bool PropagateDownloadEncrypted.decryptFile (QFile& tmpFile) {
+    const QString tmpFileName = createDownloadTmpFileName (_item._file + QLatin1String ("_dec"));
     qCDebug (lcPropagateDownloadEncrypted) << "Content Checksum Computed starting decryption" << tmpFileName;
 
     tmpFile.close ();
-    QFile _tmpOutput (_propagator->fullLocalPath (tmpFileName), this);
-    EncryptionHelper::fileDecryption (_encryptedInfo.encryptionKey,
+    QFile _tmpOutput (_propagator.fullLocalPath (tmpFileName), this);
+    EncryptionHelper.fileDecryption (_encryptedInfo.encryptionKey,
                                      _encryptedInfo.initializationVector,
                                      &tmpFile,
                                      &_tmpOutput);
@@ -114,7 +114,7 @@ bool PropagateDownloadEncrypted::decryptFile (QFile& tmpFile) {
     return true;
 }
 
-QString PropagateDownloadEncrypted::errorString () const {
+QString PropagateDownloadEncrypted.errorString () {
   return _errorString;
 }
 

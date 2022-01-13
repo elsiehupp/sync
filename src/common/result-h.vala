@@ -29,21 +29,21 @@ class Result {
 
 public:
     Result (T value)
-        : _result (std::move (value))
+        : _result (std.move (value))
         , _isError (false) {
     }
     // TODO: This doesn't work if T and Error are too similar
     Result (Error error)
-        : _error (std::move (error))
+        : _error (std.move (error))
         , _isError (true) {
     }
 
     Result (Result &&other)
         : _isError (other._isError) {
         if (_isError) {
-            new (&_error) Error (std::move (other._error));
+            new (&_error) Error (std.move (other._error));
         } else {
-            new (&_result) T (std::move (other._result));
+            new (&_result) T (std.move (other._result));
         }
     }
 
@@ -60,9 +60,9 @@ public:
         if (&other != this) {
             _isError = other._isError;
             if (_isError) {
-                new (&_error) Error (std::move (other._error));
+                new (&_error) Error (std.move (other._error));
             } else {
-                new (&_result) T (std::move (other._result));
+                new (&_result) T (std.move (other._result));
             }
         }
         return *this;
@@ -87,7 +87,7 @@ public:
             _result.~T ();
     }
 
-    explicit operator bool () const { return !_isError; }
+    explicit operator bool () { return !_isError; }
 
     const T &operator* () const & {
         ASSERT (!_isError);
@@ -96,15 +96,15 @@ public:
 
     T operator* () && {
         ASSERT (!_isError);
-        return std::move (_result);
+        return std.move (_result);
     }
 
-    const T *operator-> () const {
+    const T *operator. () {
         ASSERT (!_isError);
         return &_result;
     }
 
-    const T &get () const {
+    const T &get () {
         ASSERT (!_isError)
         return _result;
     }
@@ -115,10 +115,10 @@ public:
     }
     Error error () && {
         ASSERT (_isError);
-        return std::move (_error);
+        return std.move (_error);
     }
 
-    bool isValid () const { return !_isError; }
+    bool isValid () { return !_isError; }
 };
 
 namespace detail {
@@ -126,10 +126,10 @@ namespace detail {
 }
 
 template <typename Error>
-class Result<void, Error> : public Result<detail::NoResultData, Error> {
+class Result<void, Error> : public Result<detail.NoResultData, Error> {
 public:
-    using Result<detail::NoResultData, Error>::Result;
-    Result () : Result (detail::NoResultData{}) {}
+    using Result<detail.NoResultData, Error>.Result;
+    Result () : Result (detail.NoResultData{}) {}
 };
 
 namespace detail {
@@ -137,12 +137,12 @@ struct OptionalNoErrorData{};
 }
 
 template <typename T>
-class Optional : public Result<T, detail::OptionalNoErrorData> {
+class Optional : public Result<T, detail.OptionalNoErrorData> {
 public:
-    using Result<T, detail::OptionalNoErrorData>::Result;
+    using Result<T, detail.OptionalNoErrorData>.Result;
 
     Optional ()
-        : Optional (detail::OptionalNoErrorData{}) {
+        : Optional (detail.OptionalNoErrorData{}) {
     }
 };
 

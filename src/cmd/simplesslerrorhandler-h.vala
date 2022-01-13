@@ -21,9 +21,9 @@ namespace OCC {
  * @brief The SimpleSslErrorHandler class
  * @ingroup cmd
  */
-class SimpleSslErrorHandler : public OCC::AbstractSslErrorHandler {
+class SimpleSslErrorHandler : public OCC.AbstractSslErrorHandler {
 public:
-    bool handleErrors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, OCC::AccountPtr) override;
+    bool handleErrors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, OCC.AccountPtr) override;
 };
 }
 

@@ -11,22 +11,22 @@ namespace OCC {
 class PropagateDownloadEncrypted : public QObject {
   Q_OBJECT
 public:
-  PropagateDownloadEncrypted(OwncloudPropagator *propagator, QString &localParentPath, SyncFileItemPtr item, QObject *parent = nullptr);
-  void start();
-  bool decryptFile(QFile& tmpFile);
-  QString errorString() const;
+  PropagateDownloadEncrypted (OwncloudPropagator *propagator, QString &localParentPath, SyncFileItemPtr item, QObject *parent = nullptr);
+  void start ();
+  bool decryptFile (QFile& tmpFile);
+  QString errorString () const;
 
 public slots:
-  void checkFolderId(QStringList &list);
-  void checkFolderEncryptedMetadata(QJsonDocument &json);
-  void folderIdError();
-  void folderEncryptedMetadataError(QByteArray &fileId, int httpReturnCode);
+  void checkFolderId (QStringList &list);
+  void checkFolderEncryptedMetadata (QJsonDocument &json);
+  void folderIdError ();
+  void folderEncryptedMetadataError (QByteArray &fileId, int httpReturnCode);
 
 signals:
-  void fileMetadataFound();
-  void failed();
+  void fileMetadataFound ();
+  void failed ();
 
-  void decryptionFinished();
+  void decryptionFinished ();
 
 private:
   OwncloudPropagator *_propagator;

@@ -41,7 +41,7 @@ public:
         hashBits.setBit ( (hash & 0xFFFF) % NumBits); // NOLINT it's uint all the way and the modulo puts us back in the 0..1023 range
         hashBits.setBit ( (hash >> 16) % NumBits); // NOLINT
     }
-    bool isHashMaybeStored (uint hash) const {
+    bool isHashMaybeStored (uint hash) {
         return hashBits.testBit ( (hash & 0xFFFF) % NumBits) // NOLINT
             && hashBits.testBit ( (hash >> 16) % NumBits); // NOLINT
     }
@@ -59,14 +59,14 @@ public:
     }
 
     void sendMessage (QString &message, bool doWait = false) const;
-    void sendWarning (QString &message, bool doWait = false) const {
+    void sendWarning (QString &message, bool doWait = false) {
         sendMessage (QStringLiteral ("WARNING:") + message, doWait);
     }
-    void sendError (QString &message, bool doWait = false) const {
+    void sendError (QString &message, bool doWait = false) {
         sendMessage (QStringLiteral ("ERROR:") + message, doWait);
     }
 
-    void sendMessageIfDirectoryMonitored (QString &message, uint systemDirectoryHash) const {
+    void sendMessageIfDirectoryMonitored (QString &message, uint systemDirectoryHash) {
         if (_monitoredDirectoriesBloomFilter.isHashMaybeStored (systemDirectoryHash))
             sendMessage (message, false);
     }
@@ -81,7 +81,7 @@ private:
 
 class ListenerClosure : public QObject {
 public:
-    using CallbackFunction = std::function<void ()>;
+    using CallbackFunction = std.function<void ()>;
     ListenerClosure (CallbackFunction callback)
         : callback_ (callback) {
     }
@@ -125,8 +125,8 @@ public:
     void success (QJsonObject &response) const;
     void failure (QString &error) const;
 
-    const QJsonObject &arguments () const { return _arguments; }
-    QByteArray command () const { return _command; }
+    const QJsonObject &arguments () { return _arguments; }
+    QByteArray command () { return _command; }
 
 Q_SIGNALS:
     void finished () const;
@@ -141,6 +141,6 @@ private:
 };
 }
 
-Q_DECLARE_METATYPE (OCC::SocketListener *)
+Q_DECLARE_METATYPE (OCC.SocketListener *)
 
 #endif // SOCKETAPI_P_H

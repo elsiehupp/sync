@@ -39,7 +39,7 @@ public:
     }
 
     /**
-     * This will query the server and either uses OAuth via _asyncAuth->start ()
+     * This will query the server and either uses OAuth via _asyncAuth.start ()
      * or call showDialog to ask the password
      */
     void askFromUser () override;
@@ -47,11 +47,11 @@ public:
      * In case of oauth, return an URL to the link to open the browser.
      * An invalid URL otherwise
      */
-    QUrl authorisationLink () const { return _asyncAuth ? _asyncAuth->authorisationLink () : QUrl (); }
+    QUrl authorisationLink () { return _asyncAuth ? _asyncAuth.authorisationLink () : QUrl (); }
 
     static QString requestAppPasswordText (Account *account);
 private slots:
-    void asyncAuthResult (OAuth::Result, QString &user, QString &accessToken, QString &refreshToken);
+    void asyncAuthResult (OAuth.Result, QString &user, QString &accessToken, QString &refreshToken);
     void showDialog ();
     void askFromUserAsync ();
 

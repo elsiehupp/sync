@@ -56,7 +56,7 @@ private slots:
 private:
     void customizeStyle ();
 
-    Ui::GeneralSettings *_ui;
+    Ui.GeneralSettings *_ui;
     QPointer<IgnoreListEditor> _ignoreEditor;
     bool _currentlyLoading = false;
 };

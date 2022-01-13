@@ -117,7 +117,7 @@ private:
 
     void displayShareLinkLabel ();
 
-    Ui::ShareLinkWidget *_ui;
+    Ui.ShareLinkWidget *_ui;
     AccountPtr _account;
     QString _sharePath;
     QString _localPath;

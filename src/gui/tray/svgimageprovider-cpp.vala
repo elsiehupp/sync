@@ -18,14 +18,14 @@ namespace OCC {
 namespace Ui {
     Q_LOGGING_CATEGORY (lcSvgImageProvider, "nextcloud.gui.svgimageprovider", QtInfoMsg)
 
-    SvgImageProvider::SvgImageProvider ()
-        : QQuickImageProvider (QQuickImageProvider::Image) {
+    SvgImageProvider.SvgImageProvider ()
+        : QQuickImageProvider (QQuickImageProvider.Image) {
     }
 
-    QImage SvgImageProvider::requestImage (QString &id, QSize *size, QSize &requestedSize) {
+    QImage SvgImageProvider.requestImage (QString &id, QSize *size, QSize &requestedSize) {
         Q_ASSERT (!id.isEmpty ());
 
-        const auto idSplit = id.split (QStringLiteral ("/"), Qt::SkipEmptyParts);
+        const auto idSplit = id.split (QStringLiteral ("/"), Qt.SkipEmptyParts);
 
         if (idSplit.isEmpty ()) {
             qCWarning (lcSvgImageProvider) << "Image id is incorrect!";
@@ -33,14 +33,14 @@ namespace Ui {
         }
 
         const auto pixmapName = idSplit.at (0);
-        const auto pixmapColor = idSplit.size () > 1 ? QColor (idSplit.at (1)) : QColorConstants::Svg::black;
+        const auto pixmapColor = idSplit.size () > 1 ? QColor (idSplit.at (1)) : QColorConstants.Svg.black;
 
         if (pixmapName.isEmpty () || !pixmapColor.isValid ()) {
             qCWarning (lcSvgImageProvider) << "Image id is incorrect!";
             return {};
         }
 
-        return IconUtils::createSvgImageWithCustomColor (pixmapName, pixmapColor, size, requestedSize);
+        return IconUtils.createSvgImageWithCustomColor (pixmapName, pixmapColor, size, requestedSize);
     }
 }
 }

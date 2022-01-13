@@ -11,18 +11,18 @@ using namespace OCC;
 class TestUpdater : public QObject {
 
 private slots:
-    void testVersionToInt() {
-        qint64 lowVersion = Updater::Helper::versionToInt(1,2,80,3000);
-        QCOMPARE(Updater::Helper::stringVersionToInt("1.2.80.3000"), lowVersion);
+    void testVersionToInt () {
+        qint64 lowVersion = Updater.Helper.versionToInt (1,2,80,3000);
+        QCOMPARE (Updater.Helper.stringVersionToInt ("1.2.80.3000"), lowVersion);
 
-        qint64 highVersion = Updater::Helper::versionToInt(99,2,80,3000);
-        qint64 currVersion = Updater::Helper::currentVersionToInt();
-        QVERIFY(currVersion > 0);
-        QVERIFY(currVersion > lowVersion);
-        QVERIFY(currVersion < highVersion);
+        qint64 highVersion = Updater.Helper.versionToInt (99,2,80,3000);
+        qint64 currVersion = Updater.Helper.currentVersionToInt ();
+        QVERIFY (currVersion > 0);
+        QVERIFY (currVersion > lowVersion);
+        QVERIFY (currVersion < highVersion);
     }
 
 };
 
-QTEST_APPLESS_MAIN(TestUpdater)
+QTEST_APPLESS_MAIN (TestUpdater)
 #include "testupdater.moc"

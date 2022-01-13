@@ -29,7 +29,7 @@ class WebFlowCredentials : public AbstractCredentials {
 
 public:
     /// Don't add credentials if this is set on a QNetworkRequest
-    static constexpr QNetworkRequest::Attribute DontAddCredentialsAttribute = QNetworkRequest::User;
+    static constexpr QNetworkRequest.Attribute DontAddCredentialsAttribute = QNetworkRequest.User;
 
     explicit WebFlowCredentials ();
     WebFlowCredentials (
@@ -64,15 +64,15 @@ private slots:
     void slotAskFromUserCredentialsProvided (QString &user, QString &pass, QString &host);
     void slotAskFromUserCancelled ();
 
-    void slotReadClientCertPEMJobDone (KeychainChunk::ReadJob *readJob);
-    void slotReadClientKeyPEMJobDone (KeychainChunk::ReadJob *readJob);
-    void slotReadClientCaCertsPEMJobDone (KeychainChunk::ReadJob *readJob);
-    void slotReadPasswordJobDone (QKeychain::Job *incomingJob);
+    void slotReadClientCertPEMJobDone (KeychainChunk.ReadJob *readJob);
+    void slotReadClientKeyPEMJobDone (KeychainChunk.ReadJob *readJob);
+    void slotReadClientCaCertsPEMJobDone (KeychainChunk.ReadJob *readJob);
+    void slotReadPasswordJobDone (QKeychain.Job *incomingJob);
 
-    void slotWriteClientCertPEMJobDone (KeychainChunk::WriteJob *writeJob);
-    void slotWriteClientKeyPEMJobDone (KeychainChunk::WriteJob *writeJob);
-    void slotWriteClientCaCertsPEMJobDone (KeychainChunk::WriteJob *writeJob);
-    void slotWriteJobDone (QKeychain::Job *);
+    void slotWriteClientCertPEMJobDone (KeychainChunk.WriteJob *writeJob);
+    void slotWriteClientKeyPEMJobDone (KeychainChunk.WriteJob *writeJob);
+    void slotWriteClientCaCertsPEMJobDone (KeychainChunk.WriteJob *writeJob);
+    void slotWriteJobDone (QKeychain.Job *);
 
 private:
     /*

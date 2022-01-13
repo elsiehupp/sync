@@ -20,7 +20,7 @@ namespace OCC {
 
 Q_LOGGING_CATEGORY (lcClientProxy, "nextcloud.sync.clientproxy", QtInfoMsg)
 
-ClientProxy::ClientProxy (QObject *parent)
+ClientProxy.ClientProxy (QObject *parent)
     : QObject (parent) {
 }
 
@@ -39,43 +39,43 @@ static QNetworkProxy proxyFromConfig (ConfigFile &cfg) {
     return proxy;
 }
 
-bool ClientProxy::isUsingSystemDefault () {
-    OCC::ConfigFile cfg;
+bool ClientProxy.isUsingSystemDefault () {
+    OCC.ConfigFile cfg;
 
     // if there is no config file, default to system proxy.
     if (cfg.exists ()) {
-        return cfg.proxyType () == QNetworkProxy::DefaultProxy;
+        return cfg.proxyType () == QNetworkProxy.DefaultProxy;
     }
 
     return true;
 }
 
-const char *ClientProxy::proxyTypeToCStr (QNetworkProxy::ProxyType type) {
+const char *ClientProxy.proxyTypeToCStr (QNetworkProxy.ProxyType type) {
     switch (type) {
-    case QNetworkProxy::NoProxy:
+    case QNetworkProxy.NoProxy:
         return "NoProxy";
-    case QNetworkProxy::DefaultProxy:
+    case QNetworkProxy.DefaultProxy:
         return "DefaultProxy";
-    case QNetworkProxy::Socks5Proxy:
+    case QNetworkProxy.Socks5Proxy:
         return "Socks5Proxy";
-    case QNetworkProxy::HttpProxy:
+    case QNetworkProxy.HttpProxy:
         return "HttpProxy";
-    case QNetworkProxy::HttpCachingProxy:
+    case QNetworkProxy.HttpCachingProxy:
         return "HttpCachingProxy";
-    case QNetworkProxy::FtpCachingProxy:
+    case QNetworkProxy.FtpCachingProxy:
         return "FtpCachingProxy";
     default:
         return "NoProxy";
     }
 }
 
-QString ClientProxy::printQNetworkProxy (QNetworkProxy &proxy) {
+QString ClientProxy.printQNetworkProxy (QNetworkProxy &proxy) {
     return QString ("%1://%2:%3").arg (proxyTypeToCStr (proxy.type ())).arg (proxy.hostName ()).arg (proxy.port ());
 }
 
-void ClientProxy::setupQtProxyFromConfig () {
-    OCC::ConfigFile cfg;
-    int proxyType = QNetworkProxy::DefaultProxy;
+void ClientProxy.setupQtProxyFromConfig () {
+    OCC.ConfigFile cfg;
+    int proxyType = QNetworkProxy.DefaultProxy;
     QNetworkProxy proxy;
 
     // if there is no config file, default to system proxy.
@@ -85,57 +85,57 @@ void ClientProxy::setupQtProxyFromConfig () {
     }
 
     switch (proxyType) {
-        case QNetworkProxy::NoProxy:
+        case QNetworkProxy.NoProxy:
             qCInfo (lcClientProxy) << "Set proxy configuration to use NO proxy";
-            QNetworkProxyFactory::setUseSystemConfiguration (false);
-            QNetworkProxy::setApplicationProxy (QNetworkProxy::NoProxy);
+            QNetworkProxyFactory.setUseSystemConfiguration (false);
+            QNetworkProxy.setApplicationProxy (QNetworkProxy.NoProxy);
             break;
-        case QNetworkProxy::DefaultProxy:
+        case QNetworkProxy.DefaultProxy:
             qCInfo (lcClientProxy) << "Set proxy configuration to use the preferred system proxy for http tcp connections"; {
                 QNetworkProxyQuery query;
                 query.setProtocolTag ("http");
-                query.setQueryType (QNetworkProxyQuery::TcpSocket);
-                auto proxies = QNetworkProxyFactory::proxyForQuery (query);
+                query.setQueryType (QNetworkProxyQuery.TcpSocket);
+                auto proxies = QNetworkProxyFactory.proxyForQuery (query);
                 proxy = proxies.first ();
             }
-            QNetworkProxyFactory::setUseSystemConfiguration (false);
-            QNetworkProxy::setApplicationProxy (proxy);
+            QNetworkProxyFactory.setUseSystemConfiguration (false);
+            QNetworkProxy.setApplicationProxy (proxy);
             break;
-        case QNetworkProxy::Socks5Proxy:
-            proxy.setType (QNetworkProxy::Socks5Proxy);
+        case QNetworkProxy.Socks5Proxy:
+            proxy.setType (QNetworkProxy.Socks5Proxy);
             qCInfo (lcClientProxy) << "Set proxy configuration to SOCKS5" << printQNetworkProxy (proxy);
-            QNetworkProxyFactory::setUseSystemConfiguration (false);
-            QNetworkProxy::setApplicationProxy (proxy);
+            QNetworkProxyFactory.setUseSystemConfiguration (false);
+            QNetworkProxy.setApplicationProxy (proxy);
             break;
-        case QNetworkProxy::HttpProxy:
-            proxy.setType (QNetworkProxy::HttpProxy);
+        case QNetworkProxy.HttpProxy:
+            proxy.setType (QNetworkProxy.HttpProxy);
             qCInfo (lcClientProxy) << "Set proxy configuration to HTTP" << printQNetworkProxy (proxy);
-            QNetworkProxyFactory::setUseSystemConfiguration (false);
-            QNetworkProxy::setApplicationProxy (proxy);
+            QNetworkProxyFactory.setUseSystemConfiguration (false);
+            QNetworkProxy.setApplicationProxy (proxy);
             break;
         default:
             break;
     }
 }
 
-void ClientProxy::lookupSystemProxyAsync (QUrl &url, QObject *dst, char *slot) {
+void ClientProxy.lookupSystemProxyAsync (QUrl &url, QObject *dst, char *slot) {
     auto *runnable = new SystemProxyRunnable (url);
-    QObject::connect (runnable, SIGNAL (systemProxyLookedUp (QNetworkProxy)), dst, slot);
-    QThreadPool::globalInstance ()->start (runnable); // takes ownership and deletes
+    QObject.connect (runnable, SIGNAL (systemProxyLookedUp (QNetworkProxy)), dst, slot);
+    QThreadPool.globalInstance ().start (runnable); // takes ownership and deletes
 }
 
-SystemProxyRunnable::SystemProxyRunnable (QUrl &url)
+SystemProxyRunnable.SystemProxyRunnable (QUrl &url)
     : QObject ()
     , QRunnable ()
     , _url (url) {
 }
 
-void SystemProxyRunnable::run () {
+void SystemProxyRunnable.run () {
     qRegisterMetaType<QNetworkProxy> ("QNetworkProxy");
-    QList<QNetworkProxy> proxies = QNetworkProxyFactory::systemProxyForQuery (QNetworkProxyQuery (_url));
+    QList<QNetworkProxy> proxies = QNetworkProxyFactory.systemProxyForQuery (QNetworkProxyQuery (_url));
 
     if (proxies.isEmpty ()) {
-        emit systemProxyLookedUp (QNetworkProxy (QNetworkProxy::NoProxy));
+        emit systemProxyLookedUp (QNetworkProxy (QNetworkProxy.NoProxy));
     } else {
         emit systemProxyLookedUp (proxies.first ());
         // FIXME Would we really ever return more?

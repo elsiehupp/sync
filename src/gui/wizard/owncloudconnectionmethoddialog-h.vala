@@ -46,7 +46,7 @@ public slots:
     void returnBack ();
 
 private:
-    Ui::OwncloudConnectionMethodDialog *ui;
+    Ui.OwncloudConnectionMethodDialog *ui;
 };
 }
 

@@ -4889,7 +4889,7 @@ SQLITE_API int sqlite3_data_count (sqlite3_stmt *pStmt);
 ** <tr><td>  NULL    <td>   BLOB    <td> Result is a NULL pointer
 ** <tr><td> INTEGER  <td>  FLOAT    <td> Convert from integer to float
 ** <tr><td> INTEGER  <td>   TEXT    <td> ASCII rendering of the integer
-** <tr><td> INTEGER  <td>   BLOB    <td> Same as INTEGER->TEXT
+** <tr><td> INTEGER  <td>   BLOB    <td> Same as INTEGER.TEXT
 ** <tr><td>  FLOAT   <td> INTEGER   <td> [CAST] to INTEGER
 ** <tr><td>  FLOAT   <td>   TEXT    <td> ASCII rendering of the float
 ** <tr><td>  FLOAT   <td>   BLOB    <td> [CAST] to BLOB
@@ -6032,8 +6032,8 @@ SQLITE_API int sqlite3_sleep (int);
 ** example of how to do this using C++ with the Windows Runtime:
 **
 ** <blockquote><pre>
-** LPCWSTR zPath = Windows::Storage::ApplicationData::Current->
-** &nbsp;     TemporaryFolder->Path->Data ();
+** LPCWSTR zPath = Windows.Storage.ApplicationData.Current.
+** &nbsp;     TemporaryFolder.Path.Data ();
 ** char zPathBuf&#91;MAX_PATH + 1&#93;;
 ** memset (zPathBuf, 0, sizeof (zPathBuf));
 ** WideCharToMultiByte (CP_UTF8, 0, zPath, -1, zPathBuf, sizeof (zPathBuf),
@@ -11873,9 +11873,9 @@ struct Fts5PhraseIter {
 **
 **       Fts5PhraseIter iter;
 **       int iCol, iOff;
-**       for (pApi->xPhraseFirst (pFts, iPhrase, &iter, &iCol, &iOff);
+**       for (pApi.xPhraseFirst (pFts, iPhrase, &iter, &iCol, &iOff);
 **           iCol>=0;
-**           pApi->xPhraseNext (pFts, &iter, &iCol, &iOff)
+**           pApi.xPhraseNext (pFts, &iter, &iCol, &iOff)
 **       ){
 **         // An instance of phrase iPhrase at offset iOff of column iCol
 **       }
@@ -11903,9 +11903,9 @@ struct Fts5PhraseIter {
 **
 **       Fts5PhraseIter iter;
 **       int iCol;
-**       for (pApi->xPhraseFirstColumn (pFts, iPhrase, &iter, &iCol);
+**       for (pApi.xPhraseFirstColumn (pFts, iPhrase, &iter, &iCol);
 **           iCol>=0;
-**           pApi->xPhraseNextColumn (pFts, &iter, &iCol)
+**           pApi.xPhraseNextColumn (pFts, &iter, &iCol)
 **       ){
 **         // Column iCol contains at least one instance of phrase iPhrase
 **       }

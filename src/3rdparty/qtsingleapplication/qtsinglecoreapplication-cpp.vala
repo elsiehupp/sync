@@ -29,32 +29,32 @@
 
 namespace SharedTools {
 
-QtSingleCoreApplication::QtSingleCoreApplication (int &argc, char **argv)
+QtSingleCoreApplication.QtSingleCoreApplication (int &argc, char **argv)
     : QCoreApplication (argc, argv) {
     peer = new QtLocalPeer (this);
     block = false;
-    connect (peer, &QtLocalPeer::messageReceived, this, &QtSingleCoreApplication::messageReceived);
+    connect (peer, &QtLocalPeer.messageReceived, this, &QtSingleCoreApplication.messageReceived);
 }
 
-QtSingleCoreApplication::QtSingleCoreApplication (QString &appId, int &argc, char **argv)
+QtSingleCoreApplication.QtSingleCoreApplication (QString &appId, int &argc, char **argv)
     : QCoreApplication (argc, argv) {
     peer = new QtLocalPeer (this, appId);
-    connect (peer, &QtLocalPeer::messageReceived, this, &QtSingleCoreApplication::messageReceived);
+    connect (peer, &QtLocalPeer.messageReceived, this, &QtSingleCoreApplication.messageReceived);
 }
 
-bool QtSingleCoreApplication::isRunning () {
-    return peer->isClient ();
+bool QtSingleCoreApplication.isRunning () {
+    return peer.isClient ();
 }
 
-bool QtSingleCoreApplication::sendMessage (QString &message, int timeout) {
-    return peer->sendMessage (message, timeout, block);
+bool QtSingleCoreApplication.sendMessage (QString &message, int timeout) {
+    return peer.sendMessage (message, timeout, block);
 }
 
-QString QtSingleCoreApplication::id () const {
-    return peer->applicationId ();
+QString QtSingleCoreApplication.id () {
+    return peer.applicationId ();
 }
 
-void QtSingleCoreApplication::setBlock (bool value) {
+void QtSingleCoreApplication.setBlock (bool value) {
     block = value;
 }
 

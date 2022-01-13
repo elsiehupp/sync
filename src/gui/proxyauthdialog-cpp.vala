@@ -14,32 +14,32 @@
 
 namespace OCC {
 
-ProxyAuthDialog::ProxyAuthDialog (QWidget *parent)
+ProxyAuthDialog.ProxyAuthDialog (QWidget *parent)
     : QDialog (parent)
-    , ui (new Ui::ProxyAuthDialog) {
-    ui->setupUi (this);
+    , ui (new Ui.ProxyAuthDialog) {
+    ui.setupUi (this);
 }
 
-ProxyAuthDialog::~ProxyAuthDialog () {
+ProxyAuthDialog.~ProxyAuthDialog () {
     delete ui;
 }
 
-void ProxyAuthDialog::setProxyAddress (QString &address) {
-    ui->proxyAddress->setText (address);
+void ProxyAuthDialog.setProxyAddress (QString &address) {
+    ui.proxyAddress.setText (address);
 }
 
-QString ProxyAuthDialog::username () const {
-    return ui->usernameEdit->text ();
+QString ProxyAuthDialog.username () {
+    return ui.usernameEdit.text ();
 }
 
-QString ProxyAuthDialog::password () const {
-    return ui->passwordEdit->text ();
+QString ProxyAuthDialog.password () {
+    return ui.passwordEdit.text ();
 }
 
-void ProxyAuthDialog::reset () {
-    ui->usernameEdit->setFocus ();
-    ui->usernameEdit->clear ();
-    ui->passwordEdit->clear ();
+void ProxyAuthDialog.reset () {
+    ui.usernameEdit.setFocus ();
+    ui.usernameEdit.clear ();
+    ui.passwordEdit.clear ();
 }
 
 } // namespace OCC

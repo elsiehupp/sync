@@ -35,7 +35,7 @@ public:
     static void lookupSystemProxyAsync (QUrl &url, QObject *dst, char *slot);
 
     static QString printQNetworkProxy (QNetworkProxy &proxy);
-    static const char *proxyTypeToCStr (QNetworkProxy::ProxyType type);
+    static const char *proxyTypeToCStr (QNetworkProxy.ProxyType type);
 
 public slots:
     void setupQtProxyFromConfig ();

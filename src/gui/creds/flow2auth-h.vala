@@ -55,7 +55,7 @@ signals:
      * The state has changed.
      * when logged in, appPassword has the value of the app password.
      */
-    void result (Flow2Auth::Result result, QString &errorString = QString (),
+    void result (Flow2Auth.Result result, QString &errorString = QString (),
                 const QString &user = QString (), QString &appPassword = QString ());
 
     void statusChanged (PollStatus status, int secondsLeft);

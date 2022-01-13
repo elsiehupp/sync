@@ -52,7 +52,7 @@ namespace OCC {
  *   |                |                         |
  *   |                v      +------------------+
  *   |   +---------------+   v
- *   +-->|   OCUpdater   +------+
+ *   +-.|   OCUpdater   +------+
  *       +--------+------+      |
  *                |   Updater   |
  *                +-------------+
@@ -124,8 +124,8 @@ private slots:
 protected:
     virtual void versionInfoArrived (UpdateInfo &info) = 0;
     bool updateSucceeded () const;
-    QNetworkAccessManager *qnam () const { return _accessManager; }
-    UpdateInfo updateInfo () const { return _updateInfo; }
+    QNetworkAccessManager *qnam () { return _accessManager; }
+    UpdateInfo updateInfo () { return _updateInfo; }
 
 private:
     QUrl _updateUrl;

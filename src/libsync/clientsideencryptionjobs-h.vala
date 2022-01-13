@@ -15,9 +15,9 @@ namespace OCC {
  * To be used like this:
  * \code
  * _job = new SignPublicKeyApiJob (account, QLatin1String ("ocs/v1.php/foo/bar"), this);
- * _job->setCsr ( csr );
+ * _job.setCsr ( csr );
  * connect (_job...);
- * _job->start ();
+ * _job.start ();
  * \encode
  *
  * @ingroup libsync
@@ -56,9 +56,9 @@ private:
  * To be used like this:
  * \code
  * _job = new StorePrivateKeyApiJob (account, QLatin1String ("ocs/v1.php/foo/bar"), this);
- * _job->setPrivateKey ( privKey );
+ * _job.setPrivateKey ( privKey );
  * connect (_job...);
- * _job->start ();
+ * _job.start ();
  * \encode
  *
  * @ingroup libsync
@@ -98,7 +98,7 @@ private:
  * \code
  * _job = new SetEncryptionFlagApiJob (account, 2, this);
   * connect (_job...);
- * _job->start ();
+ * _job.start ();
  * \encode
  *
  * @ingroup libsync

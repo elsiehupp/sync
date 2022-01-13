@@ -26,7 +26,7 @@ namespace {
     static const int failIntervalT = 5 * 1000;
 }
 
-UserInfo::UserInfo (AccountState *accountState, bool allowDisconnectedAccountState, bool fetchAvatarImage, QObject *parent)
+UserInfo.UserInfo (AccountState *accountState, bool allowDisconnectedAccountState, bool fetchAvatarImage, QObject *parent)
     : QObject (parent)
     , _accountState (accountState)
     , _allowDisconnectedAccountState (allowDisconnectedAccountState)
@@ -34,22 +34,22 @@ UserInfo::UserInfo (AccountState *accountState, bool allowDisconnectedAccountSta
     , _lastQuotaTotalBytes (0)
     , _lastQuotaUsedBytes (0)
     , _active (false) {
-    connect (accountState, &AccountState::stateChanged,
-        this, &UserInfo::slotAccountStateChanged);
-    connect (&_jobRestartTimer, &QTimer::timeout, this, &UserInfo::slotFetchInfo);
+    connect (accountState, &AccountState.stateChanged,
+        this, &UserInfo.slotAccountStateChanged);
+    connect (&_jobRestartTimer, &QTimer.timeout, this, &UserInfo.slotFetchInfo);
     _jobRestartTimer.setSingleShot (true);
 }
 
-void UserInfo::setActive (bool active) {
+void UserInfo.setActive (bool active) {
     _active = active;
     slotAccountStateChanged ();
 }
 
-void UserInfo::slotAccountStateChanged () {
+void UserInfo.slotAccountStateChanged () {
     if (canGetInfo ()) {
         // Obviously assumes there will never be more than thousand of hours between last info
         // received and now, hence why we static_cast
-        auto elapsed = static_cast<int> (_lastInfoReceived.msecsTo (QDateTime::currentDateTime ()));
+        auto elapsed = static_cast<int> (_lastInfoReceived.msecsTo (QDateTime.currentDateTime ()));
         if (_lastInfoReceived.isNull () || elapsed >= defaultIntervalT) {
             slotFetchInfo ();
         } else {
@@ -60,53 +60,53 @@ void UserInfo::slotAccountStateChanged () {
     }
 }
 
-void UserInfo::slotRequestFailed () {
+void UserInfo.slotRequestFailed () {
     _lastQuotaTotalBytes = 0;
     _lastQuotaUsedBytes = 0;
     _jobRestartTimer.start (failIntervalT);
 }
 
-bool UserInfo::canGetInfo () const {
+bool UserInfo.canGetInfo () {
     if (!_accountState || !_active) {
         return false;
     }
-    AccountPtr account = _accountState->account ();
-    return (_accountState->isConnected () || _allowDisconnectedAccountState)
-        && account->credentials ()
-        && account->credentials ()->ready ();
+    AccountPtr account = _accountState.account ();
+    return (_accountState.isConnected () || _allowDisconnectedAccountState)
+        && account.credentials ()
+        && account.credentials ().ready ();
 }
 
-void UserInfo::slotFetchInfo () {
+void UserInfo.slotFetchInfo () {
     if (!canGetInfo ()) {
         return;
     }
 
     if (_job) {
         // The previous job was not finished?  Then we cancel it!
-        _job->deleteLater ();
+        _job.deleteLater ();
     }
 
-    AccountPtr account = _accountState->account ();
+    AccountPtr account = _accountState.account ();
     _job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/user"), this);
-    _job->setTimeout (20 * 1000);
-    connect (_job.data (), &JsonApiJob::jsonReceived, this, &UserInfo::slotUpdateLastInfo);
-    connect (_job.data (), &AbstractNetworkJob::networkError, this, &UserInfo::slotRequestFailed);
-    _job->start ();
+    _job.setTimeout (20 * 1000);
+    connect (_job.data (), &JsonApiJob.jsonReceived, this, &UserInfo.slotUpdateLastInfo);
+    connect (_job.data (), &AbstractNetworkJob.networkError, this, &UserInfo.slotRequestFailed);
+    _job.start ();
 }
 
-void UserInfo::slotUpdateLastInfo (QJsonDocument &json) {
+void UserInfo.slotUpdateLastInfo (QJsonDocument &json) {
     auto objData = json.object ().value ("ocs").toObject ().value ("data").toObject ();
 
-    AccountPtr account = _accountState->account ();
+    AccountPtr account = _accountState.account ();
 
     // User Info
     QString user = objData.value ("id").toString ();
     if (!user.isEmpty ()) {
-        account->setDavUser (user);
+        account.setDavUser (user);
     }
     QString displayName = objData.value ("display-name").toString ();
     if (!displayName.isEmpty ()) {
-        account->setDavDisplayName (displayName);
+        account.setDavDisplayName (displayName);
     }
 
     // Quota
@@ -121,21 +121,21 @@ void UserInfo::slotUpdateLastInfo (QJsonDocument &json) {
     }
 
     _jobRestartTimer.start (defaultIntervalT);
-    _lastInfoReceived = QDateTime::currentDateTime ();
+    _lastInfoReceived = QDateTime.currentDateTime ();
 
     // Avatar Image
     if (_fetchAvatarImage) {
-        auto *job = new AvatarJob (account, account->davUser (), 128, this);
-        job->setTimeout (20 * 1000);
-        QObject::connect (job, &AvatarJob::avatarPixmap, this, &UserInfo::slotAvatarImage);
-        job->start ();
+        auto *job = new AvatarJob (account, account.davUser (), 128, this);
+        job.setTimeout (20 * 1000);
+        QObject.connect (job, &AvatarJob.avatarPixmap, this, &UserInfo.slotAvatarImage);
+        job.start ();
     }
     else
         emit fetchedLastInfo (this);
 }
 
-void UserInfo::slotAvatarImage (QImage &img) {
-    _accountState->account ()->setAvatar (img);
+void UserInfo.slotAvatarImage (QImage &img) {
+    _accountState.account ().setAvatar (img);
 
     emit fetchedLastInfo (this);
 }

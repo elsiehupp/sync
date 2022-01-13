@@ -93,7 +93,7 @@ namespace Utility {
     // porting methods
     OCSYNC_EXPORT QString escape (QString &);
 
-    // conversion function QDateTime <-> time_t   (because the ones builtin work on only unsigned 32bit)
+    // conversion function QDateTime <. time_t   (because the ones builtin work on only unsigned 32bit)
     OCSYNC_EXPORT QDateTime qDateTimeFromTime_t (qint64 t);
     OCSYNC_EXPORT qint64 qDateTimeToTime_t (QDateTime &t);
 
@@ -141,7 +141,7 @@ namespace Utility {
     OCSYNC_EXPORT bool fsCasePreserving ();
 
     // Check if two pathes that MUST exist are equal. This function
-    // uses QDir::canonicalPath () to judge and cares for the systems
+    // uses QDir.canonicalPath () to judge and cares for the systems
     // case sensitivity.
     OCSYNC_EXPORT bool fileNamesEqual (QString &fn1, QString &fn2);
 
@@ -196,7 +196,7 @@ namespace Utility {
 
     /**  Returns a new settings pre-set in a specific group.  The Settings will be created
          with the given parent. If no parent is specified, the caller must destroy the settings */
-    OCSYNC_EXPORT std::unique_ptr<QSettings> settingsWithGroup (QString &group, QObject *parent = nullptr);
+    OCSYNC_EXPORT std.unique_ptr<QSettings> settingsWithGroup (QString &group, QObject *parent = nullptr);
 
     /** Sanitizes a string that shall become part of a filename.
      *
@@ -227,7 +227,7 @@ namespace Utility {
      * Will return an empty string if it's not a conflict file.
      *
      * Prefer to use the data from the conflicts table in the journal to determine
-     * a conflict's base file, see SyncJournal::conflictFileBaseName ()
+     * a conflict's base file, see SyncJournal.conflictFileBaseName ()
      */
     OCSYNC_EXPORT QByteArray conflictFileBaseNameFromPattern (QByteArray &conflictName);
 
@@ -247,7 +247,7 @@ namespace Utility {
     OCSYNC_EXPORT bool registrySetKeyValue (HKEY hRootKey, QString &subKey, QString &valueName, DWORD type, QVariant &value);
     OCSYNC_EXPORT bool registryDeleteKeyTree (HKEY hRootKey, QString &subKey);
     OCSYNC_EXPORT bool registryDeleteKeyValue (HKEY hRootKey, QString &subKey, QString &valueName);
-    OCSYNC_EXPORT bool registryWalkSubKeys (HKEY hRootKey, QString &subKey, std::function<void (HKEY, QString &)> &callback);
+    OCSYNC_EXPORT bool registryWalkSubKeys (HKEY hRootKey, QString &subKey, std.function<void (HKEY, QString &)> &callback);
     OCSYNC_EXPORT QRect getTaskbarDimensions ();
 
     // Possibly refactor to share code with UnixTimevalToFileTime in c_time.c
@@ -275,7 +275,7 @@ namespace Utility {
 }
 /** @} */ // \addtogroup
 
-inline bool Utility::isWindows () {
+inline bool Utility.isWindows () {
 #ifdef Q_OS_WIN
     return true;
 #else
@@ -283,7 +283,7 @@ inline bool Utility::isWindows () {
 #endif
 }
 
-inline bool Utility::isMac () {
+inline bool Utility.isMac () {
 #ifdef Q_OS_MAC
     return true;
 #else
@@ -291,7 +291,7 @@ inline bool Utility::isMac () {
 #endif
 }
 
-inline bool Utility::isUnix () {
+inline bool Utility.isUnix () {
 #ifdef Q_OS_UNIX
     return true;
 #else
@@ -299,7 +299,7 @@ inline bool Utility::isUnix () {
 #endif
 }
 
-inline bool Utility::isLinux () {
+inline bool Utility.isLinux () {
 #if defined (Q_OS_LINUX)
     return true;
 #else
@@ -307,7 +307,7 @@ inline bool Utility::isLinux () {
 #endif
 }
 
-inline bool Utility::isBSD () {
+inline bool Utility.isBSD () {
 #if defined (Q_OS_FREEBSD) || defined (Q_OS_NETBSD) || defined (Q_OS_OPENBSD)
     return true;
 #else

@@ -21,31 +21,31 @@ Q_LOGGING_CATEGORY (lcLockWatcher, "nextcloud.gui.lockwatcher", QtInfoMsg)
 
 static const int check_frequency = 20 * 1000; // ms
 
-LockWatcher::LockWatcher (QObject *parent)
+LockWatcher.LockWatcher (QObject *parent)
     : QObject (parent) {
-    connect (&_timer, &QTimer::timeout,
-        this, &LockWatcher::checkFiles);
+    connect (&_timer, &QTimer.timeout,
+        this, &LockWatcher.checkFiles);
     _timer.start (check_frequency);
 }
 
-void LockWatcher::addFile (QString &path) {
+void LockWatcher.addFile (QString &path) {
     qCInfo (lcLockWatcher) << "Watching for lock of" << path << "being released";
     _watchedPaths.insert (path);
 }
 
-void LockWatcher::setCheckInterval (std::chrono::milliseconds interval) {
+void LockWatcher.setCheckInterval (std.chrono.milliseconds interval) {
     _timer.start (interval.count ());
 }
 
-bool LockWatcher::contains (QString &path) {
+bool LockWatcher.contains (QString &path) {
     return _watchedPaths.contains (path);
 }
 
-void LockWatcher::checkFiles () {
+void LockWatcher.checkFiles () {
     QSet<QString> unlocked;
 
     foreach (QString &path, _watchedPaths) {
-        if (!FileSystem::isFileLocked (path)) {
+        if (!FileSystem.isFileLocked (path)) {
             qCInfo (lcLockWatcher) << "Lock of" << path << "was released";
             emit fileUnlocked (path);
             unlocked.insert (path);

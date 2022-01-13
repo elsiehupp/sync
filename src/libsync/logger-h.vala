@@ -47,7 +47,7 @@ public:
 
     void setLogFlush (bool flush);
 
-    bool logDebug () const { return _logDebug; }
+    bool logDebug () { return _logDebug; }
     void setLogDebug (bool debug);
 
     /** Returns where the automatic logdir would be */
@@ -59,7 +59,7 @@ public:
      * logexpire: 4 hours
      * logdebug: true
      *
-     * Used in conjunction with ConfigFile::automaticLogDir
+     * Used in conjunction with ConfigFile.automaticLogDir
      */
     void setupTemporaryFolderLogDir ();
 

@@ -23,7 +23,7 @@ public:
     void setInfo (QString &msg);
     void setError (QString &error);
 
-    bool isUsingFlow2 () const {
+    bool isUsingFlow2 () {
         return _useFlow2;
     }
 
@@ -32,7 +32,7 @@ protected:
     void changeEvent (QEvent *) override;
 
 public slots:
-    void slotFlow2AuthResult (Flow2Auth::Result, QString &errorString, QString &user, QString &appPassword);
+    void slotFlow2AuthResult (Flow2Auth.Result, QString &errorString, QString &user, QString &appPassword);
     void slotShowSettingsDialog ();
 
 signals:

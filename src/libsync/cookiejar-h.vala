@@ -29,8 +29,8 @@ public:
 
     void clearSessionCookies ();
 
-    using QNetworkCookieJar::setAllCookies;
-    using QNetworkCookieJar::allCookies;
+    using QNetworkCookieJar.setAllCookies;
+    using QNetworkCookieJar.allCookies;
 
     bool save (QString &fileName);
     bool restore (QString &fileName);

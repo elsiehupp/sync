@@ -16,29 +16,29 @@
 
 namespace OCC {
 
-OcsShareeJob::OcsShareeJob (AccountPtr account)
+OcsShareeJob.OcsShareeJob (AccountPtr account)
     : OcsJob (account) {
     setPath ("ocs/v2.php/apps/files_sharing/api/v1/sharees");
-    connect (this, &OcsJob::jobFinished, this, &OcsShareeJob::jobDone);
+    connect (this, &OcsJob.jobFinished, this, &OcsShareeJob.jobDone);
 }
 
-void OcsShareeJob::getSharees (QString &search,
+void OcsShareeJob.getSharees (QString &search,
     const QString &itemType,
     int page,
     int perPage,
     bool lookup) {
     setVerb ("GET");
 
-    addParam (QString::fromLatin1 ("search"), search);
-    addParam (QString::fromLatin1 ("itemType"), itemType);
-    addParam (QString::fromLatin1 ("page"), QString::number (page));
-    addParam (QString::fromLatin1 ("perPage"), QString::number (perPage));
-    addParam (QString::fromLatin1 ("lookup"), QVariant (lookup).toString ());
+    addParam (QString.fromLatin1 ("search"), search);
+    addParam (QString.fromLatin1 ("itemType"), itemType);
+    addParam (QString.fromLatin1 ("page"), QString.number (page));
+    addParam (QString.fromLatin1 ("perPage"), QString.number (perPage));
+    addParam (QString.fromLatin1 ("lookup"), QVariant (lookup).toString ());
 
     start ();
 }
 
-void OcsShareeJob::jobDone (QJsonDocument &reply) {
+void OcsShareeJob.jobDone (QJsonDocument &reply) {
     emit shareeJobFinished (reply);
 }
 }

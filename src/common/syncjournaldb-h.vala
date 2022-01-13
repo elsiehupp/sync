@@ -46,14 +46,14 @@ public:
     /// Migrate a csync_journal to the new path, if necessary. Returns false on error
     static bool maybeMigrateDb (QString &localPath, QString &absoluteJournalPath);
 
-    // To verify that the record could be found check with SyncJournalFileRecord::isValid ()
+    // To verify that the record could be found check with SyncJournalFileRecord.isValid ()
     bool getFileRecord (QString &filename, SyncJournalFileRecord *rec) { return getFileRecord (filename.toUtf8 (), rec); }
     bool getFileRecord (QByteArray &filename, SyncJournalFileRecord *rec);
     bool getFileRecordByE2eMangledName (QString &mangledName, SyncJournalFileRecord *rec);
     bool getFileRecordByInode (quint64 inode, SyncJournalFileRecord *rec);
-    bool getFileRecordsByFileId (QByteArray &fileId, std::function<void (SyncJournalFileRecord &)> &rowCallback);
-    bool getFilesBelowPath (QByteArray &path, std::function<void (SyncJournalFileRecord&)> &rowCallback);
-    bool listFilesInPath (QByteArray &path, std::function<void (SyncJournalFileRecord&)> &rowCallback);
+    bool getFileRecordsByFileId (QByteArray &fileId, std.function<void (SyncJournalFileRecord &)> &rowCallback);
+    bool getFilesBelowPath (QByteArray &path, std.function<void (SyncJournalFileRecord&)> &rowCallback);
+    bool listFilesInPath (QByteArray &path, std.function<void (SyncJournalFileRecord&)> &rowCallback);
     Result<void, QString> setFileRecord (SyncJournalFileRecord &record);
 
     void keyValueStoreSet (QString &key, QVariant value);
@@ -85,7 +85,7 @@ public:
 
     void setErrorBlacklistEntry (SyncJournalErrorBlacklistRecord &item);
     void wipeErrorBlacklistEntry (QString &file);
-    void wipeErrorBlacklistCategory (SyncJournalErrorBlacklistRecord::Category category);
+    void wipeErrorBlacklistCategory (SyncJournalErrorBlacklistRecord.Category category);
     int wipeErrorBlacklist ();
     int errorBlackListEntryCount ();
 
@@ -108,7 +108,7 @@ public:
          * (As opposed to a small file transfer which is stored in the db so we can detect the case
          * when the upload succeeded, but the connection was dropped before we got the answer)
          */
-        bool isChunked () const { return _transferid != 0; }
+        bool isChunked () { return _transferid != 0; }
     };
 
     struct PollInfo {
@@ -287,7 +287,7 @@ public:
          * The path should not have a trailing slash.
          * It's valid to use the root path "".
          *
-         * Never returns PinState::Inherited. If the root is "Inherited"
+         * Never returns PinState.Inherited. If the root is "Inherited"
          * or there's an error, "AlwaysLocal" is returned.
          *
          * Returns none on db error.
@@ -301,7 +301,7 @@ public:
          * then that pin state will be returned.
          *
          * If some subitem's pin state is different from the path's state,
-         * PinState::Inherited will be returned. Inherited isn't returned in
+         * PinState.Inherited will be returned. Inherited isn't returned in
          * any other cases.
          *
          * It's valid to use the root path "".
@@ -341,7 +341,7 @@ public:
     /** Access to PinStates stored in the database.
      *
      * Important: Not all vfs plugins store the pin states in the database,
-     * prefer to use Vfs::pinState () etc.
+     * prefer to use Vfs.pinState () etc.
      */
     PinStateInterface internalPinStates ();
 
@@ -405,11 +405,11 @@ private:
 };
 
 bool OCSYNC_EXPORT
-operator== (SyncJournalDb::DownloadInfo &lhs,
-    const SyncJournalDb::DownloadInfo &rhs);
+operator== (SyncJournalDb.DownloadInfo &lhs,
+    const SyncJournalDb.DownloadInfo &rhs);
 bool OCSYNC_EXPORT
-operator== (SyncJournalDb::UploadInfo &lhs,
-    const SyncJournalDb::UploadInfo &rhs);
+operator== (SyncJournalDb.UploadInfo &lhs,
+    const SyncJournalDb.UploadInfo &rhs);
 
 } // namespace OCC
 #endif // SYNCJOURNALDB_H

@@ -24,9 +24,9 @@ class OCSYNC_EXPORT PreparedSqlQuery {
 public:
     ~PreparedSqlQuery ();
 
-    explicit operator bool () const { return _ok; }
+    explicit operator bool () { return _ok; }
 
-    SqlQuery *operator-> () const {
+    SqlQuery *operator. () {
         Q_ASSERT (_ok);
         return _query;
     }
