@@ -68,7 +68,7 @@ void PropagateRemoteMkdir.slotStartMkcolJob () {
     _job.start ();
 }
 
-void PropagateRemoteMkdir.slotStartEncryptedMkcolJob (QString &path, QString &filename, quint64 size) {
+void PropagateRemoteMkdir.slotStartEncryptedMkcolJob (QString &path, QString &filename, uint64 size) {
     Q_UNUSED (path)
     Q_UNUSED (size)
 

@@ -88,7 +88,7 @@ bool VfsCfApi.isHydrating () {
     return !d.hydrationJobs.isEmpty ();
 }
 
-Result<void, QString> VfsCfApi.updateMetadata (QString &filePath, time_t modtime, qint64 size, QByteArray &fileId) {
+Result<void, QString> VfsCfApi.updateMetadata (QString &filePath, time_t modtime, int64 size, QByteArray &fileId) {
     const auto localPath = QDir.toNativeSeparators (filePath);
     const auto handle = cfapi.handleForPath (localPath);
     if (handle) {

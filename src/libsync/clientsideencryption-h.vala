@@ -87,10 +87,10 @@ private:
 
 class OWNCLOUDSYNC_EXPORT StreamingDecryptor {
 public:
-    StreamingDecryptor (QByteArray &key, QByteArray &iv, quint64 totalSize);
+    StreamingDecryptor (QByteArray &key, QByteArray &iv, uint64 totalSize);
     ~StreamingDecryptor () = default;
 
-    QByteArray chunkDecryption (char *input, quint64 chunkSize);
+    QByteArray chunkDecryption (char *input, uint64 chunkSize);
 
     bool isInitialized () const;
     bool isFinished () const;
@@ -101,8 +101,8 @@ private:
     CipherCtx _ctx;
     bool _isInitialized = false;
     bool _isFinished = false;
-    quint64 _decryptedSoFar = 0;
-    quint64 _totalSize = 0;
+    uint64 _decryptedSoFar = 0;
+    uint64 _totalSize = 0;
 };
 }
 

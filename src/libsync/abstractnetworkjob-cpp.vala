@@ -73,12 +73,12 @@ void AbstractNetworkJob.setReply (QNetworkReply *reply) {
     delete old;
 }
 
-void AbstractNetworkJob.setTimeout (qint64 msec) {
+void AbstractNetworkJob.setTimeout (int64 msec) {
     _timer.start (msec);
 }
 
 void AbstractNetworkJob.resetTimeout () {
-    qint64 interval = _timer.interval ();
+    int64 interval = _timer.interval ();
     _timer.stop ();
     _timer.start (interval);
 }

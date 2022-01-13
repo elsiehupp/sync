@@ -65,8 +65,8 @@ private slots:
         QLocale.setDefault (QLocale ("C"));
         //NOTE: in order for the plural to work we would need to load the english translation
 
-        quint64 sec = 1000;
-        quint64 hour = 3600 * sec;
+        uint64 sec = 1000;
+        uint64 hour = 3600 * sec;
 
         QDateTime current = QDateTime.currentDateTimeUtc ();
 

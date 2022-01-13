@@ -63,7 +63,7 @@ class FileModifier {
 public:
     virtual ~FileModifier () = default;
     virtual void remove (QString &relativePath) = 0;
-    virtual void insert (QString &relativePath, qint64 size = 64, char contentChar = 'W') = 0;
+    virtual void insert (QString &relativePath, int64 size = 64, char contentChar = 'W') = 0;
     virtual void setContents (QString &relativePath, char contentChar) = 0;
     virtual void appendByte (QString &relativePath) = 0;
     virtual void mkdir (QString &relativePath) = 0;
@@ -76,7 +76,7 @@ class DiskFileModifier : public FileModifier {
 public:
     DiskFileModifier (QString &rootDirPath) : _rootDir (rootDirPath) { }
     void remove (QString &relativePath) override;
-    void insert (QString &relativePath, qint64 size = 64, char contentChar = 'W') override;
+    void insert (QString &relativePath, int64 size = 64, char contentChar = 'W') override;
     void setContents (QString &relativePath, char contentChar) override;
     void appendByte (QString &relativePath) override;
 
@@ -91,15 +91,15 @@ public:
 
     FileInfo () = default;
     FileInfo (QString &name) : name{name} { }
-    FileInfo (QString &name, qint64 size) : name{name}, isDir{false}, size{size} { }
-    FileInfo (QString &name, qint64 size, char contentChar) : name{name}, isDir{false}, size{size}, contentChar{contentChar} { }
+    FileInfo (QString &name, int64 size) : name{name}, isDir{false}, size{size} { }
+    FileInfo (QString &name, int64 size, char contentChar) : name{name}, isDir{false}, size{size}, contentChar{contentChar} { }
     FileInfo (QString &name, std.initializer_list<FileInfo> &children);
 
     void addChild (FileInfo &info);
 
     void remove (QString &relativePath) override;
 
-    void insert (QString &relativePath, qint64 size = 64, char contentChar = 'W') override;
+    void insert (QString &relativePath, int64 size = 64, char contentChar = 'W') override;
 
     void setContents (QString &relativePath, char contentChar) override;
 
@@ -115,7 +115,7 @@ public:
 
     FileInfo *createDir (QString &relativePath);
 
-    FileInfo *create (QString &relativePath, qint64 size, char contentChar);
+    FileInfo *create (QString &relativePath, int64 size, char contentChar);
 
     bool operator< (FileInfo &other) {
         return name < other.name;
@@ -142,7 +142,7 @@ public:
     QByteArray fileId = generateFileId ();
     QByteArray checksums;
     QByteArray extraDavProperties;
-    qint64 size = 0;
+    int64 size = 0;
     char contentChar = 'W';
 
     // Sorted by name to be able to compare trees
@@ -177,8 +177,8 @@ public:
 
     void abort () override { }
 
-    qint64 bytesAvailable () const override;
-    qint64 readData (char *data, qint64 maxlen) override;
+    int64 bytesAvailable () const override;
+    int64 readData (char *data, int64 maxlen) override;
 };
 
 class FakePutReply : public FakeReply {
@@ -191,7 +191,7 @@ public:
     Q_INVOKABLE virtual void respond ();
 
     void abort () override;
-    qint64 readData (char *, qint64) override { return 0; }
+    int64 readData (char *, int64) override { return 0; }
 };
 
 class FakePutMultiFileReply : public FakeReply {
@@ -204,8 +204,8 @@ public:
 
     void abort () override;
 
-    qint64 bytesAvailable () const override;
-    qint64 readData (char *data, qint64 maxlen) override;
+    int64 bytesAvailable () const override;
+    int64 readData (char *data, int64 maxlen) override;
 
 private:
     QVector<FileInfo *> _allFileInfo;
@@ -221,7 +221,7 @@ public:
     Q_INVOKABLE void respond ();
 
     void abort () override { }
-    qint64 readData (char *, qint64) override { return 0; }
+    int64 readData (char *, int64) override { return 0; }
 };
 
 class FakeDeleteReply : public FakeReply {
@@ -231,7 +231,7 @@ public:
     Q_INVOKABLE void respond ();
 
     void abort () override { }
-    qint64 readData (char *, qint64) override { return 0; }
+    int64 readData (char *, int64) override { return 0; }
 };
 
 class FakeMoveReply : public FakeReply {
@@ -241,7 +241,7 @@ public:
     Q_INVOKABLE void respond ();
 
     void abort () override { }
-    qint64 readData (char *, qint64) override { return 0; }
+    int64 readData (char *, int64) override { return 0; }
 };
 
 class FakeGetReply : public FakeReply {
@@ -256,16 +256,16 @@ public:
     Q_INVOKABLE void respond ();
 
     void abort () override;
-    qint64 bytesAvailable () const override;
+    int64 bytesAvailable () const override;
 
-    qint64 readData (char *data, qint64 maxlen) override;
+    int64 readData (char *data, int64 maxlen) override;
 };
 
 class FakeGetWithDataReply : public FakeReply {
 public:
     const FileInfo *fileInfo;
     QByteArray payload;
-    quint64 offset = 0;
+    uint64 offset = 0;
     bool aborted = false;
 
     FakeGetWithDataReply (FileInfo &remoteRootFileInfo, QByteArray &data, QNetworkAccessManager.Operation op, QNetworkRequest &request, QObject *parent);
@@ -273,9 +273,9 @@ public:
     Q_INVOKABLE void respond ();
 
     void abort () override;
-    qint64 bytesAvailable () const override;
+    int64 bytesAvailable () const override;
 
-    qint64 readData (char *data, qint64 maxlen) override;
+    int64 readData (char *data, int64 maxlen) override;
 };
 
 class FakeChunkMoveReply : public FakeReply {
@@ -293,7 +293,7 @@ public:
 
     void abort () override;
 
-    qint64 readData (char *, qint64) override { return 0; }
+    int64 readData (char *, int64) override { return 0; }
 };
 
 class FakePayloadReply : public FakeReply {
@@ -307,8 +307,8 @@ public:
     void respond ();
 
     void abort () override {}
-    qint64 readData (char *buf, qint64 max) override;
-    qint64 bytesAvailable () const override;
+    int64 readData (char *buf, int64 max) override;
+    int64 bytesAvailable () const override;
     QByteArray _body;
 
     static const int defaultDelay = 10;
@@ -330,8 +330,8 @@ public slots:
 
 public:
     void abort () override { }
-    qint64 readData (char *buf, qint64 max) override;
-    qint64 bytesAvailable () const override;
+    int64 readData (char *buf, int64 max) override;
+    int64 bytesAvailable () const override;
 
     QByteArray _body;
 };
@@ -351,7 +351,7 @@ public:
     FakeHangingReply (QNetworkAccessManager.Operation op, QNetworkRequest &request, QObject *parent);
 
     void abort () override;
-    qint64 readData (char *, qint64) override { return 0; }
+    int64 readData (char *, int64) override { return 0; }
 };
 
 // A delayed reply
@@ -359,11 +359,11 @@ template <class OriginalReply>
 class DelayedReply : public OriginalReply {
 public:
     template <typename... Args>
-    explicit DelayedReply (quint64 delayMS, Args &&... args)
+    explicit DelayedReply (uint64 delayMS, Args &&... args)
         : OriginalReply (std.forward<Args> (args)...)
         , _delayMs (delayMS) {
     }
-    quint64 _delayMs;
+    uint64 _delayMs;
 
     void respond () override {
         QTimer.singleShot (_delayMs, static_cast<OriginalReply *> (this), [this] {

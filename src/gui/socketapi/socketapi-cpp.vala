@@ -174,7 +174,7 @@ void SocketListener.sendMessage (QString &message, bool doWait) {
     }
 
     QByteArray bytesToSend = localMessage.toUtf8 ();
-    qint64 sent = socket.write (bytesToSend);
+    int64 sent = socket.write (bytesToSend);
     if (doWait) {
         socket.waitForBytesWritten (1000);
     }

@@ -50,14 +50,14 @@ public:
     bool getFileRecord (QString &filename, SyncJournalFileRecord *rec) { return getFileRecord (filename.toUtf8 (), rec); }
     bool getFileRecord (QByteArray &filename, SyncJournalFileRecord *rec);
     bool getFileRecordByE2eMangledName (QString &mangledName, SyncJournalFileRecord *rec);
-    bool getFileRecordByInode (quint64 inode, SyncJournalFileRecord *rec);
+    bool getFileRecordByInode (uint64 inode, SyncJournalFileRecord *rec);
     bool getFileRecordsByFileId (QByteArray &fileId, std.function<void (SyncJournalFileRecord &)> &rowCallback);
     bool getFilesBelowPath (QByteArray &path, std.function<void (SyncJournalFileRecord&)> &rowCallback);
     bool listFilesInPath (QByteArray &path, std.function<void (SyncJournalFileRecord&)> &rowCallback);
     Result<void, QString> setFileRecord (SyncJournalFileRecord &record);
 
     void keyValueStoreSet (QString &key, QVariant value);
-    qint64 keyValueStoreGetInt (QString &key, qint64 defaultValue);
+    int64 keyValueStoreGetInt (QString &key, int64 defaultValue);
     void keyValueStoreDelete (QString &key);
 
     bool deleteFileRecord (QString &filename, bool recursively = false);
@@ -65,7 +65,7 @@ public:
         const QByteArray &contentChecksum,
         const QByteArray &contentChecksumType);
     bool updateLocalMetadata (QString &filename,
-        qint64 modtime, qint64 size, quint64 inode);
+        int64 modtime, int64 size, uint64 inode);
 
     /// Return value for hasHydratedOrDehydratedFiles ()
     struct HasHydratedDehydrated {
@@ -81,7 +81,7 @@ public:
 
     QString databaseFilePath () const;
 
-    static qint64 getPHash (QByteArray &);
+    static int64 getPHash (QByteArray &);
 
     void setErrorBlacklistEntry (SyncJournalErrorBlacklistRecord &item);
     void wipeErrorBlacklistEntry (QString &file);
@@ -98,8 +98,8 @@ public:
     struct UploadInfo {
         int _chunk = 0;
         uint _transferid = 0;
-        qint64 _size = 0;
-        qint64 _modtime = 0;
+        int64 _size = 0;
+        int64 _modtime = 0;
         int _errorCount = 0;
         bool _valid = false;
         QByteArray _contentChecksum;
@@ -114,8 +114,8 @@ public:
     struct PollInfo {
         QString _file; // The relative path of a file
         QString _url; // the poll url. (This pollinfo is invalid if _url is empty)
-        qint64 _modtime; // The modtime of the file being uploaded
-        qint64 _fileSize;
+        int64 _modtime; // The modtime of the file being uploaded
+        int64 _fileSize;
     };
 
     DownloadInfo getDownloadInfo (QString &file);

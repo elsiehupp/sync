@@ -131,7 +131,7 @@ static QTreeWidgetItem *findFirstChild (QTreeWidgetItem *parent, QString &text) 
     return nullptr;
 }
 
-void SelectiveSyncWidget.recursiveInsert (QTreeWidgetItem *parent, QStringList pathTrail, QString path, qint64 size) {
+void SelectiveSyncWidget.recursiveInsert (QTreeWidgetItem *parent, QStringList pathTrail, QString path, int64 size) {
     QFileIconProvider prov;
     QIcon folderIcon = prov.icon (QFileIconProvider.Folder);
     if (pathTrail.size () == 0) {
@@ -224,7 +224,7 @@ void SelectiveSyncWidget.slotUpdateDirectories (QStringList list) {
         root.setIcon (0, Theme.instance ().applicationIcon ());
         root.setData (0, Qt.UserRole, QString ());
         root.setCheckState (0, Qt.Checked);
-        qint64 size = job ? job._folderInfos[pathToRemove].size : -1;
+        int64 size = job ? job._folderInfos[pathToRemove].size : -1;
         if (size >= 0) {
             root.setText (1, Utility.octetsToString (size));
             root.setData (1, Qt.UserRole, size);
@@ -397,7 +397,7 @@ QStringList SelectiveSyncWidget.oldBlackList () {
     return _oldBlackList;
 }
 
-qint64 SelectiveSyncWidget.estimatedSize (QTreeWidgetItem *root) {
+int64 SelectiveSyncWidget.estimatedSize (QTreeWidgetItem *root) {
     if (!root) {
         root = _folderTree.topLevelItem (0);
     }
@@ -413,7 +413,7 @@ qint64 SelectiveSyncWidget.estimatedSize (QTreeWidgetItem *root) {
         break;
     }
 
-    qint64 result = 0;
+    int64 result = 0;
     if (root.childCount ()) {
         for (int i = 0; i < root.childCount (); ++i) {
             auto r = estimatedSize (root.child (i));
@@ -503,7 +503,7 @@ QStringList SelectiveSyncDialog.oldBlackList () {
     return _selectiveSync.oldBlackList ();
 }
 
-qint64 SelectiveSyncDialog.estimatedSize () {
+int64 SelectiveSyncDialog.estimatedSize () {
     return _selectiveSync.estimatedSize ();
 }
 }

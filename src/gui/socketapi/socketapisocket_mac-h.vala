@@ -23,11 +23,11 @@ public:
     SocketApiSocket (QObject *parent, SocketApiSocketPrivate *p);
     ~SocketApiSocket ();
 
-    qint64 readData (char *data, qint64 maxlen) override;
-    qint64 writeData (char *data, qint64 len) override;
+    int64 readData (char *data, int64 maxlen) override;
+    int64 writeData (char *data, int64 len) override;
 
     bool isSequential () const override { return true; }
-    qint64 bytesAvailable () const override;
+    int64 bytesAvailable () const override;
     bool canReadLine () const override;
 
 signals:

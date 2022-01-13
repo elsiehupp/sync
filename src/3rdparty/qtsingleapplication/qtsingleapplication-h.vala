@@ -41,7 +41,7 @@ public:
     QtSingleApplication (QString &id, int &argc, char **argv);
     ~QtSingleApplication () override;
 
-    bool isRunning (qint64 pid = -1);
+    bool isRunning (int64 pid = -1);
 
     void setActivationWindow (QWidget* aw, bool activateOnMessage = true);
     QWidget* activationWindow () const;
@@ -51,7 +51,7 @@ public:
     void setBlock (bool value);
 
 public Q_SLOTS:
-    bool sendMessage (QString &message, int timeout = 5000, qint64 pid = -1);
+    bool sendMessage (QString &message, int timeout = 5000, int64 pid = -1);
     void activateWindow ();
 
 Q_SIGNALS:
@@ -61,7 +61,7 @@ Q_SIGNALS:
 private:
     QString instancesFileName (QString &appId);
 
-    qint64 firstPeer;
+    int64 firstPeer;
     QSharedMemory *instances;
     QtLocalPeer *pidPeer;
     QWidget *actWin;

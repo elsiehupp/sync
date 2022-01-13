@@ -39,7 +39,7 @@ class BulkPropagatorJob : public PropagatorJob {
     struct UploadFileInfo {
       QString _file; /// I'm still unsure if I should use a SyncFilePtr here.
       QString _path; /// the full path on disk.
-      qint64 _size;
+      int64 _size;
     };
 
     struct BulkUploadItem {
@@ -48,7 +48,7 @@ class BulkPropagatorJob : public PropagatorJob {
         UploadFileInfo _fileToUpload;
         QString _remotePath;
         QString _localPath;
-        qint64 _fileSize;
+        int64 _fileSize;
         QMap<QByteArray, QByteArray> _headers;
     };
 
@@ -80,7 +80,7 @@ private slots:
 
     void slotPutFinished ();
 
-    void slotUploadProgress (SyncFileItemPtr item, qint64 sent, qint64 total);
+    void slotUploadProgress (SyncFileItemPtr item, int64 sent, int64 total);
 
     void slotJobDestroyed (QObject *job);
 
@@ -90,7 +90,7 @@ private:
                        QByteArray transmissionChecksumHeader);
 
     void adjustLastJobTimeout (AbstractNetworkJob *job,
-                              qint64 fileSize) const;
+                              int64 fileSize) const;
 
     void finalize (QJsonObject &fullReply);
 

@@ -77,8 +77,8 @@ private:
     UploadDevice *_relativeLimitCurrentMeasuredDevice;
 
     // for measuring how much progress we made at start
-    qint64 _relativeUploadLimitProgressAtMeasuringRestart;
-    qint64 _currentUploadLimit;
+    int64 _relativeUploadLimitProgressAtMeasuringRestart;
+    int64 _currentUploadLimit;
 
     std.list<GETFileJob *> _downloadJobList;
     QTimer _relativeDownloadMeasuringTimer;
@@ -90,9 +90,9 @@ private:
     GETFileJob *_relativeLimitCurrentMeasuredJob;
 
     // for measuring how much progress we made at start
-    qint64 _relativeDownloadLimitProgressAtMeasuringRestart;
+    int64 _relativeDownloadLimitProgressAtMeasuringRestart;
 
-    qint64 _currentDownloadLimit;
+    int64 _currentDownloadLimit;
 };
 
 } // namespace OCC

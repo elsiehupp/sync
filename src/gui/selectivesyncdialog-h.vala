@@ -41,7 +41,7 @@ public:
     QStringList oldBlackList () const;
 
     // Estimates the total size of checked items (recursively)
-    qint64 estimatedSize (QTreeWidgetItem *root = nullptr);
+    int64 estimatedSize (QTreeWidgetItem *root = nullptr);
 
     // oldBlackList is a list of excluded paths, each including a trailing /
     void setFolderInfo (QString &folderPath, QString &rootName,
@@ -58,7 +58,7 @@ private slots:
 
 private:
     void refreshFolders ();
-    void recursiveInsert (QTreeWidgetItem *parent, QStringList pathTrail, QString path, qint64 size);
+    void recursiveInsert (QTreeWidgetItem *parent, QStringList pathTrail, QString path, int64 size);
 
     AccountPtr _account;
 
@@ -96,7 +96,7 @@ public:
     QStringList oldBlackList () const;
 
     // Estimate the size of the total of sync'ed files from the server
-    qint64 estimatedSize ();
+    int64 estimatedSize ();
 
 private:
     void init (AccountPtr &account);

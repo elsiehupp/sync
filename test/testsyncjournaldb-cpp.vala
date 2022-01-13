@@ -20,7 +20,7 @@ public:
         QVERIFY (_tempDir.isValid ());
     }
 
-    qint64 dropMsecs (QDateTime time) {
+    int64 dropMsecs (QDateTime time) {
         return Utility.qDateTimeToTime_t (time);
     }
 
@@ -42,7 +42,7 @@ private slots:
         record._path = "foo";
         // Use a value that exceeds uint32 and isn't representable by the
         // signed int being cast to uint64 either (like uint64.max would be)
-        record._inode = std.numeric_limits<quint32>.max () + 12ull;
+        record._inode = std.numeric_limits<uint32>.max () + 12ull;
         record._modtime = dropMsecs (QDateTime.currentDateTime ());
         record._type = ItemTypeDirectory;
         record._etag = "789789";
@@ -65,7 +65,7 @@ private slots:
         // Update metadata
         record._modtime = dropMsecs (QDateTime.currentDateTime ().addDays (1));
         // try a value that only fits uint64, not int64
-        record._inode = std.numeric_limits<quint64>.max () - std.numeric_limits<quint32>.max () - 1;
+        record._inode = std.numeric_limits<uint64>.max () - std.numeric_limits<uint32>.max () - 1;
         record._type = ItemTypeFile;
         record._etag = "789FFF";
         record._fileId = "efg";

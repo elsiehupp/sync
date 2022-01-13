@@ -196,17 +196,17 @@ int ConfigFile.timeout () {
     return settings.value (QLatin1String (timeoutC), 300).toInt (); // default to 5 min
 }
 
-qint64 ConfigFile.chunkSize () {
+int64 ConfigFile.chunkSize () {
     QSettings settings (configFile (), QSettings.IniFormat);
     return settings.value (QLatin1String (chunkSizeC), 10 * 1000 * 1000).toLongLong (); // default to 10 MB
 }
 
-qint64 ConfigFile.maxChunkSize () {
+int64 ConfigFile.maxChunkSize () {
     QSettings settings (configFile (), QSettings.IniFormat);
     return settings.value (QLatin1String (maxChunkSizeC), 1000 * 1000 * 1000).toLongLong (); // default to 1000 MB
 }
 
-qint64 ConfigFile.minChunkSize () {
+int64 ConfigFile.minChunkSize () {
     QSettings settings (configFile (), QSettings.IniFormat);
     return settings.value (QLatin1String (minChunkSizeC), 1000 * 1000).toLongLong (); // default to 1 MB
 }
@@ -774,15 +774,15 @@ void ConfigFile.setDownloadLimit (int kbytes) {
     setValue (downloadLimitC, kbytes);
 }
 
-QPair<bool, qint64> ConfigFile.newBigFolderSizeLimit () {
+QPair<bool, int64> ConfigFile.newBigFolderSizeLimit () {
     auto defaultValue = Theme.instance ().newBigFolderSizeLimit ();
     const auto fallback = getValue (newBigFolderSizeLimitC, QString (), defaultValue).toLongLong ();
     const auto value = getPolicySetting (QLatin1String (newBigFolderSizeLimitC), fallback).toLongLong ();
     const bool use = value >= 0 && useNewBigFolderSizeLimit ();
-    return qMakePair (use, qMax<qint64> (0, value));
+    return qMakePair (use, qMax<int64> (0, value));
 }
 
-void ConfigFile.setNewBigFolderSizeLimit (bool isChecked, qint64 mbytes) {
+void ConfigFile.setNewBigFolderSizeLimit (bool isChecked, int64 mbytes) {
     setValue (newBigFolderSizeLimitC, mbytes);
     setValue (useNewBigFolderSizeLimitC, isChecked);
 }

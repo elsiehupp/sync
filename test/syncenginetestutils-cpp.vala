@@ -40,7 +40,7 @@ void DiskFileModifier.remove (QString &relativePath) {
         QVERIFY (QDir { fi.filePath () }.removeRecursively ());
 }
 
-void DiskFileModifier.insert (QString &relativePath, qint64 size, char contentChar) {
+void DiskFileModifier.insert (QString &relativePath, int64 size, char contentChar) {
     QFile file { _rootDir.filePath (relativePath) };
     QVERIFY (!file.exists ());
     file.open (QFile.WriteOnly);
@@ -58,7 +58,7 @@ void DiskFileModifier.insert (QString &relativePath, qint64 size, char contentCh
 void DiskFileModifier.setContents (QString &relativePath, char contentChar) {
     QFile file { _rootDir.filePath (relativePath) };
     QVERIFY (file.exists ());
-    qint64 size = file.size ();
+    int64 size = file.size ();
     file.open (QFile.WriteOnly);
     file.write (QByteArray {}.fill (contentChar, size));
 }
@@ -116,7 +116,7 @@ void FileInfo.remove (QString &relativePath) {
         [&pathComponents] (FileInfo &fi) { return fi.name == pathComponents.fileName (); }));
 }
 
-void FileInfo.insert (QString &relativePath, qint64 size, char contentChar) {
+void FileInfo.insert (QString &relativePath, int64 size, char contentChar) {
     create (relativePath, size, contentChar);
 }
 
@@ -187,7 +187,7 @@ FileInfo *FileInfo.createDir (QString &relativePath) {
     return &child;
 }
 
-FileInfo *FileInfo.create (QString &relativePath, qint64 size, char contentChar) {
+FileInfo *FileInfo.create (QString &relativePath, int64 size, char contentChar) {
     const PathComponents pathComponents { relativePath };
     FileInfo *parent = findInvalidatingEtags (pathComponents.parentDirComponents ());
     Q_ASSERT (parent);
@@ -319,12 +319,12 @@ void FakePropfindReply.respond404 () {
     emit finished ();
 }
 
-qint64 FakePropfindReply.bytesAvailable () {
+int64 FakePropfindReply.bytesAvailable () {
     return payload.size () + QIODevice.bytesAvailable ();
 }
 
-qint64 FakePropfindReply.readData (char *data, qint64 maxlen) {
-    qint64 len = std.min (qint64 { payload.size () }, maxlen);
+int64 FakePropfindReply.readData (char *data, int64 maxlen) {
+    int64 len = std.min (int64 { payload.size () }, maxlen);
     std.copy (payload.cbegin (), payload.cbegin () + len, data);
     payload.remove (0, static_cast<int> (len));
     return len;
@@ -421,7 +421,7 @@ void FakePutMultiFileReply.respond () {
     QJsonDocument reply;
     QJsonObject allFileInfoReply;
 
-    qint64 totalSize = 0;
+    int64 totalSize = 0;
     std.for_each (_allFileInfo.begin (), _allFileInfo.end (), [&totalSize] (auto &fileInfo) {
         totalSize += fileInfo.size;
     });
@@ -458,12 +458,12 @@ void FakePutMultiFileReply.abort () {
     emit finished ();
 }
 
-qint64 FakePutMultiFileReply.bytesAvailable () {
+int64 FakePutMultiFileReply.bytesAvailable () {
     return _payload.size () + QIODevice.bytesAvailable ();
 }
 
-qint64 FakePutMultiFileReply.readData (char *data, qint64 maxlen) {
-    qint64 len = std.min (qint64 { _payload.size () }, maxlen);
+int64 FakePutMultiFileReply.readData (char *data, int64 maxlen) {
+    int64 len = std.min (int64 { _payload.size () }, maxlen);
     std.copy (_payload.cbegin (), _payload.cbegin () + len, data);
     _payload.remove (0, static_cast<int> (len));
     return len;
@@ -576,14 +576,14 @@ void FakeGetReply.abort () {
     aborted = true;
 }
 
-qint64 FakeGetReply.bytesAvailable () {
+int64 FakeGetReply.bytesAvailable () {
     if (aborted)
         return 0;
     return size + QIODevice.bytesAvailable ();
 }
 
-qint64 FakeGetReply.readData (char *data, qint64 maxlen) {
-    qint64 len = std.min (qint64 { size }, maxlen);
+int64 FakeGetReply.readData (char *data, int64 maxlen) {
+    int64 len = std.min (int64 { size }, maxlen);
     std.fill_n (data, len, payload);
     size -= len;
     return len;
@@ -638,14 +638,14 @@ void FakeGetWithDataReply.abort () {
     aborted = true;
 }
 
-qint64 FakeGetWithDataReply.bytesAvailable () {
+int64 FakeGetWithDataReply.bytesAvailable () {
     if (aborted)
         return 0;
     return payload.size () - offset + QIODevice.bytesAvailable ();
 }
 
-qint64 FakeGetWithDataReply.readData (char *data, qint64 maxlen) {
-    qint64 len = std.min (payload.size () - offset, quint64 (maxlen));
+int64 FakeGetWithDataReply.readData (char *data, int64 maxlen) {
+    int64 len = std.min (payload.size () - offset, uint64 (maxlen));
     std.memcpy (data, payload.constData () + offset, len);
     offset += len;
     return len;
@@ -764,14 +764,14 @@ void FakePayloadReply.respond () {
     emit finished ();
 }
 
-qint64 FakePayloadReply.readData (char *buf, qint64 max) {
-    max = qMin<qint64> (max, _body.size ());
+int64 FakePayloadReply.readData (char *buf, int64 max) {
+    max = qMin<int64> (max, _body.size ());
     memcpy (buf, _body.constData (), max);
     _body = _body.mid (max);
     return max;
 }
 
-qint64 FakePayloadReply.bytesAvailable () {
+int64 FakePayloadReply.bytesAvailable () {
     return _body.size ();
 }
 
@@ -799,14 +799,14 @@ void FakeErrorReply.slotSetFinished () {
     emit finished ();
 }
 
-qint64 FakeErrorReply.readData (char *buf, qint64 max) {
-    max = qMin<qint64> (max, _body.size ());
+int64 FakeErrorReply.readData (char *buf, int64 max) {
+    max = qMin<int64> (max, _body.size ());
     memcpy (buf, _body.constData (), max);
     _body = _body.mid (max);
     return max;
 }
 
-qint64 FakeErrorReply.bytesAvailable () {
+int64 FakeErrorReply.bytesAvailable () {
     return _body.size ();
 }
 

@@ -234,20 +234,20 @@ public:
     bool _isRestoration BITFIELD (1); // The original operation was forbidden, and this is a restoration
     bool _isSelectiveSync BITFIELD (1); // The file is removed or ignored because it is in the selective sync list
     bool _isEncrypted BITFIELD (1); // The file is E2EE or the content of the directory should be E2EE
-    quint16 _httpErrorCode = 0;
+    uint16 _httpErrorCode = 0;
     RemotePermissions _remotePerm;
     QString _errorString; // Contains a string only in case of error
     QByteArray _responseTimeStamp;
     QByteArray _requestId; // X-Request-Id of the failed request
-    quint32 _affectedItems = 1; // the number of affected items by the operation on this item.
+    uint32 _affectedItems = 1; // the number of affected items by the operation on this item.
     // usually this value is 1, but for removes on dirs, it might be much higher.
 
     // Variables used by the propagator
     SyncInstructions _instruction = CSYNC_INSTRUCTION_NONE;
     time_t _modtime = 0;
     QByteArray _etag;
-    qint64 _size = 0;
-    quint64 _inode = 0;
+    int64 _size = 0;
+    uint64 _inode = 0;
     QByteArray _fileId;
 
     // This is the value for the 'new' side, matching with _size and _modtime.
@@ -259,7 +259,7 @@ public:
     QByteArray _checksumHeader;
 
     // The size and modtime of the file getting overwritten (on the disk for downloads, on the server for uploads).
-    qint64 _previousSize = 0;
+    int64 _previousSize = 0;
     time_t _previousModtime = 0;
 
     QString _directDownloadUrl;

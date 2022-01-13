@@ -25,9 +25,9 @@ Q_DECLARE_LOGGING_CATEGORY (lcUpdater)
 class Updater : public QObject {
 public:
     struct Helper {
-        static qint64 stringVersionToInt (QString &version);
-        static qint64 currentVersionToInt ();
-        static qint64 versionToInt (qint64 major, qint64 minor, qint64 patch, qint64 build);
+        static int64 stringVersionToInt (QString &version);
+        static int64 currentVersionToInt ();
+        static int64 versionToInt (int64 major, int64 minor, int64 patch, int64 build);
     };
 
     static Updater *instance ();

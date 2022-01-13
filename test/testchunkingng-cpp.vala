@@ -12,13 +12,13 @@ using namespace OCC;
 
 /* Upload a 1/3 of a file of given size.
  * fakeFolder needs to be synchronized */
-static void partialUpload (FakeFolder &fakeFolder, QString &name, qint64 size) {
+static void partialUpload (FakeFolder &fakeFolder, QString &name, int64 size) {
     QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     QCOMPARE (fakeFolder.uploadState ().children.count (), 0); // The state should be clean
 
     fakeFolder.localModifier ().insert (name, size);
     // Abort when the upload is at 1/3
-    qint64 sizeWhenAbort = -1;
+    int64 sizeWhenAbort = -1;
     auto con = QObject.connect (&fakeFolder.syncEngine (),  &SyncEngine.transmissionProgress,
                                     [&] (ProgressInfo &progress) {
                 if (progress.completedSize () > (progress.totalSize () /3 )) {
@@ -39,7 +39,7 @@ static void partialUpload (FakeFolder &fakeFolder, QString &name, qint64 size) {
 }
 
 // Reduce max chunk size a bit so we get more chunks
-static void setChunkSize (SyncEngine &engine, qint64 size) {
+static void setChunkSize (SyncEngine &engine, int64 size) {
     SyncOptions options;
     options._maxChunkSize = size;
     options._initialChunkSize = size;
@@ -81,7 +81,7 @@ private slots:
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
         auto chunkingId = fakeFolder.uploadState ().children.first ().name;
         const auto &chunkMap = fakeFolder.uploadState ().children.first ().children;
-        qint64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (qint64 s, FileInfo &f) { return s + f.size; });
+        int64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (int64 s, FileInfo &f) { return s + f.size; });
         QVERIFY (uploadedSize > 2 * 1000 * 1000); // at least 2 MB
 
         // Add a fake chunk to make sure it gets deleted
@@ -116,7 +116,7 @@ private slots:
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
         auto chunkingId = fakeFolder.uploadState ().children.first ().name;
         const auto &chunkMap = fakeFolder.uploadState ().children.first ().children;
-        qint64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (qint64 s, FileInfo &f) { return s + f.size; });
+        int64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (int64 s, FileInfo &f) { return s + f.size; });
         QVERIFY (uploadedSize > 2 * 1000 * 1000); // at least 50 MB
         QVERIFY (chunkMap.size () >= 3); // at least three chunks
 
@@ -172,7 +172,7 @@ private slots:
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
         auto chunkingId = fakeFolder.uploadState ().children.first ().name;
         const auto &chunkMap = fakeFolder.uploadState ().children.first ().children;
-        qint64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (qint64 s, FileInfo &f) { return s + f.size; });
+        int64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (int64 s, FileInfo &f) { return s + f.size; });
         QVERIFY (uploadedSize > 5 * 1000 * 1000); // at least 5 MB
 
         // Add a chunk that makes the file completely uploaded
@@ -217,7 +217,7 @@ private slots:
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
         auto chunkingId = fakeFolder.uploadState ().children.first ().name;
         const auto &chunkMap = fakeFolder.uploadState ().children.first ().children;
-        qint64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (qint64 s, FileInfo &f) { return s + f.size; });
+        int64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (int64 s, FileInfo &f) { return s + f.size; });
         QVERIFY (uploadedSize > 5 * 1000 * 1000); // at least 5 MB
 
         // Add a chunk that makes the file more than completely uploaded
@@ -580,7 +580,7 @@ private slots:
     void testVeryBigFiles () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
-        const qint64 size = 2.5 * 1024 * 1024 * 1024; // 2.5 GiB
+        const int64 size = 2.5 * 1024 * 1024 * 1024; // 2.5 GiB
 
         // Partial upload of big files
         partialUpload (fakeFolder, "A/a0", size);

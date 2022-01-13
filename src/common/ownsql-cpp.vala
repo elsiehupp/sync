@@ -122,7 +122,7 @@ bool SqlDatabase.openOrCreateReadWrite (QString &filename) {
         if (checkResult == CheckDbResult.CantPrepare) {
             // When disk space is low, preparing may fail even though the db is fine.
             // Typically CANTOPEN or IOERR.
-            qint64 freeSpace = Utility.freeDiskSpace (QFileInfo (filename).dir ().absolutePath ());
+            int64 freeSpace = Utility.freeDiskSpace (QFileInfo (filename).dir ().absolutePath ());
             if (freeSpace != -1 && freeSpace < 1000000) {
                 qCWarning (lcSql) << "Can't prepare consistency check and disk space is low:" << freeSpace;
                 close ();
@@ -412,7 +412,7 @@ int SqlQuery.intValue (int index) {
     return sqlite3_column_int (_stmt, index);
 }
 
-quint64 SqlQuery.int64Value (int index) {
+uint64 SqlQuery.int64Value (int index) {
     return sqlite3_column_int64 (_stmt, index);
 }
 

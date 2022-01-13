@@ -41,8 +41,8 @@ class FakeProvider {
 public:
     QString _id;
     QString _name;
-    qint32 _order = std.numeric_limits<qint32>.max ();
-    quint32 _numItemsToInsert = 5; // how many fake resuls to insert
+    int32 _order = std.numeric_limits<int32>.max ();
+    uint32 _numItemsToInsert = 5; // how many fake resuls to insert
 };
 
 // this will be used when initializing fake search results data for each provider
@@ -77,8 +77,8 @@ class FakeSearchResultsStorage { {lass Provider
 
         QString _id;
         QString _name;
-        qint32 _order = std.numeric_limits<qint32>.max ();
-        qint32 _cursor = 0;
+        int32 _order = std.numeric_limits<int32>.max ();
+        int32 _cursor = 0;
         bool _isPaginated = false;
         QVector<SearchResult> _results;
     };
@@ -141,7 +141,7 @@ public:
             if (fakeProvider._numItemsToInsert > pageSize) {
                 providerData._isPaginated = true;
             }
-            for (quint32 i = 0; i < fakeProvider._numItemsToInsert; ++i) {
+            for (uint32 i = 0; i < fakeProvider._numItemsToInsert; ++i) {
                 providerData._results.push_back ( {"http://example.de/avatar/john/64", QString (QStringLiteral ("John Doe in ") + fakeProvider._name),
                         QString (QStringLiteral ("We a discussion about ") + fakeProvider._name
                             + QStringLiteral (" already. But, let's have a follow up tomorrow afternoon.")),

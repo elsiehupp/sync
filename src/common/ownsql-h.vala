@@ -112,7 +112,7 @@ public:
 
     QString stringValue (int index);
     int intValue (int index);
-    quint64 int64Value (int index);
+    uint64 int64Value (int index);
     QByteArray baValue (int index);
     bool isSelect ();
     bool isPragma ();

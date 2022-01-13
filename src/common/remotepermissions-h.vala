@@ -31,7 +31,7 @@ class OCSYNC_EXPORT RemotePermissions {
 private:
     // The first bit tells if the value is set or not
     // The remaining bits correspond to know if the value is set
-    quint16 _value = 0;
+    uint16 _value = 0;
     static constexpr int notNullMask = 0x1;
 
     template <typename Char> // can be 'char' or 'ushort' if conversion from QString

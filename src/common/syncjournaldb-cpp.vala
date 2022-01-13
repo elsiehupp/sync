@@ -861,8 +861,8 @@ QVector<QByteArray> SyncJournalDb.tableColumns (QByteArray &table) {
     return columns;
 }
 
-qint64 SyncJournalDb.getPHash (QByteArray &file) {
-    qint64 h = 0;
+int64 SyncJournalDb.getPHash (QByteArray &file) {
+    int64 h = 0;
     int len = file.length ();
 
     h = c_jhash64 ( (uint8_t *)file.data (), len, 0);
@@ -891,7 +891,7 @@ Result<void, QString> SyncJournalDb.setFileRecord (SyncJournalFileRecord &_recor
                  << "fileSize:" << record._fileSize << "checksum:" << record._checksumHeader
                  << "e2eMangledName:" << record.e2eMangledName () << "isE2eEncrypted:" << record._isE2eEncrypted;
 
-    const qint64 phash = getPHash (record._path);
+    const int64 phash = getPHash (record._path);
     if (checkConnect ()) {
         int plen = record._path.length ();
 
@@ -963,7 +963,7 @@ void SyncJournalDb.keyValueStoreSet (QString &key, QVariant value) {
     query.exec ();
 }
 
-qint64 SyncJournalDb.keyValueStoreGetInt (QString &key, qint64 defaultValue) {
+int64 SyncJournalDb.keyValueStoreGetInt (QString &key, int64 defaultValue) {
     QMutexLocker locker (&_mutex);
     if (!checkConnect ()) {
         return defaultValue;
@@ -1011,7 +1011,7 @@ bool SyncJournalDb.deleteFileRecord (QString &filename, bool recursively) {
                 return false;
             }
 
-            const qint64 phash = getPHash (filename.toUtf8 ());
+            const int64 phash = getPHash (filename.toUtf8 ());
             query.bindValue (1, phash);
 
             if (!query.exec ()) {
@@ -1119,7 +1119,7 @@ bool SyncJournalDb.getFileRecordByE2eMangledName (QString &mangledName, SyncJour
     return true;
 }
 
-bool SyncJournalDb.getFileRecordByInode (quint64 inode, SyncJournalFileRecord *rec) {
+bool SyncJournalDb.getFileRecordByInode (uint64 inode, SyncJournalFileRecord *rec) {
     QMutexLocker locker (&_mutex);
 
     // Reset the output var in case the caller is reusing it.
@@ -1306,7 +1306,7 @@ bool SyncJournalDb.updateFileRecordChecksum (QString &filename,
 
     qCInfo (lcDb) << "Updating file checksum" << filename << contentChecksum << contentChecksumType;
 
-    const qint64 phash = getPHash (filename.toUtf8 ());
+    const int64 phash = getPHash (filename.toUtf8 ());
     if (!checkConnect ()) {
         qCWarning (lcDb) << "Failed to connect database.";
         return false;
@@ -1328,13 +1328,13 @@ bool SyncJournalDb.updateFileRecordChecksum (QString &filename,
 }
 
 bool SyncJournalDb.updateLocalMetadata (QString &filename,
-    qint64 modtime, qint64 size, quint64 inode)
+    int64 modtime, int64 size, uint64 inode)
  {
     QMutexLocker locker (&_mutex);
 
     qCInfo (lcDb) << "Updating local metadata for:" << filename << modtime << size << inode;
 
-    const qint64 phash = getPHash (filename.toUtf8 ());
+    const int64 phash = getPHash (filename.toUtf8 ());
     if (!checkConnect ()) {
         qCWarning (lcDb) << "Failed to connect database.";
         return false;

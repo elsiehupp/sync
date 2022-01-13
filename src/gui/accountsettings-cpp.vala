@@ -987,7 +987,7 @@ void AccountSettings.slotOpenOC () {
     }
 }
 
-void AccountSettings.slotUpdateQuota (qint64 total, qint64 used) {
+void AccountSettings.slotUpdateQuota (int64 total, int64 used) {
     if (total > 0) {
         _ui.quotaProgressBar.setVisible (true);
         _ui.quotaProgressBar.setEnabled (true);

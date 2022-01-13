@@ -960,10 +960,10 @@ void FolderStatusModel.slotSetProgress (ProgressInfo &progress) {
     // find the single item to display:  This is going to be the bigger item, or the last completed
     // item if no items are in progress.
     SyncFileItem curItem = progress._lastCompletedItem;
-    qint64 curItemProgress = -1; // -1 means finished
-    qint64 biggerItemSize = 0;
-    quint64 estimatedUpBw = 0;
-    quint64 estimatedDownBw = 0;
+    int64 curItemProgress = -1; // -1 means finished
+    int64 biggerItemSize = 0;
+    uint64 estimatedUpBw = 0;
+    uint64 estimatedDownBw = 0;
     QString allFilenames;
     foreach (ProgressInfo.ProgressItem &citm, progress._currentItems) {
         if (curItemProgress == -1 || (ProgressInfo.isSizeDependent (citm._item)
@@ -997,7 +997,7 @@ void FolderStatusModel.slotSetProgress (ProgressInfo &progress) {
     if (ProgressInfo.isSizeDependent (curItem)) {
         QString s1 = Utility.octetsToString (curItemProgress);
         QString s2 = Utility.octetsToString (curItem._size);
-        //quint64 estimatedBw = progress.fileProgress (curItem).estimatedBandwidth;
+        //uint64 estimatedBw = progress.fileProgress (curItem).estimatedBandwidth;
         if (estimatedUpBw || estimatedDownBw) {
             /*
             //: Example text: "uploading foobar.png (1MB of 2MB) time left 2 minutes at a rate of 24Kb/s"
@@ -1040,11 +1040,11 @@ void FolderStatusModel.slotSetProgress (ProgressInfo &progress) {
     pi._progressString = fileProgressString;
 
     // overall progress
-    qint64 completedSize = progress.completedSize ();
-    qint64 completedFile = progress.completedFiles ();
-    qint64 currentFile = progress.currentFile ();
-    qint64 totalSize = qMax (completedSize, progress.totalSize ());
-    qint64 totalFileCount = qMax (currentFile, progress.totalFiles ());
+    int64 completedSize = progress.completedSize ();
+    int64 completedFile = progress.completedFiles ();
+    int64 currentFile = progress.currentFile ();
+    int64 totalSize = qMax (completedSize, progress.totalSize ());
+    int64 totalFileCount = qMax (currentFile, progress.totalFiles ());
     QString overallSyncString;
     if (totalSize > 0) {
         QString s1 = Utility.octetsToString (completedSize);

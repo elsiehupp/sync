@@ -208,7 +208,7 @@ void PushNotifications.handleNotifyActivity () {
     emitActivitiesChanged ();
 }
 
-void PushNotifications.onWebSocketPongReceived (quint64 /*elapsedTime*/, QByteArray & /*payload*/) {
+void PushNotifications.onWebSocketPongReceived (uint64 /*elapsedTime*/, QByteArray & /*payload*/) {
     qCDebug (lcPushNotifications) << "Pong received in time";
     // We are fine with every kind of pong and don't care about the
     // payload. As long as we receive pongs the server is still alive.

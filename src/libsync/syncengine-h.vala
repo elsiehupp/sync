@@ -182,7 +182,7 @@ private slots:
     void slotItemCompleted (SyncFileItemPtr &item);
     void slotDiscoveryFinished ();
     void slotPropagationFinished (bool success);
-    void slotProgress (SyncFileItem &item, qint64 curent);
+    void slotProgress (SyncFileItem &item, int64 curent);
     void slotCleanPollsJobAborted (QString &error);
 
     /** Records that a file was touched by a job. */

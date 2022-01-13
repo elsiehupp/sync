@@ -58,12 +58,12 @@ namespace FileSystem {
      * Use this over QFileInfo.size () to avoid bugs with lnk files on Windows.
      * See https://bugreports.qt.io/browse/QTBUG-24831.
      */
-    qint64 OWNCLOUDSYNC_EXPORT getSize (QString &filename);
+    int64 OWNCLOUDSYNC_EXPORT getSize (QString &filename);
 
     /**
      * @brief Retrieve a file inode with csync
      */
-    bool OWNCLOUDSYNC_EXPORT getInode (QString &filename, quint64 *inode);
+    bool OWNCLOUDSYNC_EXPORT getInode (QString &filename, uint64 *inode);
 
     /**
      * @brief Check if \a fileName has changed given previous size and mtime
@@ -73,14 +73,14 @@ namespace FileSystem {
      * @return true if the file's mtime or size are not what is expected.
      */
     bool OWNCLOUDSYNC_EXPORT fileChanged (QString &fileName,
-        qint64 previousSize,
+        int64 previousSize,
         time_t previousMtime);
 
     /**
      * @brief Like !fileChanged () but with verbose logging if the file *did* change.
      */
     bool OWNCLOUDSYNC_EXPORT verifyFileUnchanged (QString &fileName,
-        qint64 previousSize,
+        int64 previousSize,
         time_t previousMtime);
 
     /**

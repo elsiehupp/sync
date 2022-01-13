@@ -36,7 +36,7 @@ namespace {
 constexpr auto syncRootFlagsFull = 34;
 constexpr auto syncRootFlagsNoCfApiContextMenu = 2;
 
-void cfApiSendTransferInfo (CF_CONNECTION_KEY &connectionKey, CF_TRANSFER_KEY &transferKey, NTSTATUS status, void *buffer, qint64 offset, qint64 currentBlockLength, qint64 totalLength) {
+void cfApiSendTransferInfo (CF_CONNECTION_KEY &connectionKey, CF_TRANSFER_KEY &transferKey, NTSTATUS status, void *buffer, int64 offset, int64 currentBlockLength, int64 totalLength) {
 
     CF_OPERATION_INFO opInfo = { 0 };
     CF_OPERATION_PARAMETERS opParams = { 0 };
@@ -51,7 +51,7 @@ void cfApiSendTransferInfo (CF_CONNECTION_KEY &connectionKey, CF_TRANSFER_KEY &t
     opParams.TransferData.Offset.QuadPart = offset;
     opParams.TransferData.Length.QuadPart = currentBlockLength;
 
-    const qint64 cfExecuteresult = CfExecute (&opInfo, &opParams);
+    const int64 cfExecuteresult = CfExecute (&opInfo, &opParams);
     if (cfExecuteresult != S_OK) {
         qCCritical (lcCfApiWrapper) << "Couldn't send transfer info" << QString.number (transferKey.QuadPart, 16) << ":" << cfExecuteresult << QString.fromWCharArray (_com_error (cfExecuteresult).ErrorMessage ());
     }
@@ -68,7 +68,7 @@ void cfApiSendTransferInfo (CF_CONNECTION_KEY &connectionKey, CF_TRANSFER_KEY &t
     LARGE_INTEGER progressCompleted;
     progressCompleted.QuadPart = offset;
 
-    const qint64 cfReportProgressresult =  CfReportProviderProgress (connectionKey, transferKey, progressTotal, progressCompleted);
+    const int64 cfReportProgressresult =  CfReportProviderProgress (connectionKey, transferKey, progressTotal, progressCompleted);
 
     if (cfReportProgressresult != S_OK) {
         qCCritical (lcCfApiWrapper) << "Couldn't report provider progress" << QString.number (transferKey.QuadPart, 16) << ":" << cfReportProgressresult << QString.fromWCharArray (_com_error (cfReportProgressresult).ErrorMessage ());
@@ -87,7 +87,7 @@ void CALLBACK cfApiFetchDataCallback (CF_CALLBACK_INFO *callbackInfo, CF_CALLBAC
                               callbackInfo.FileSize.QuadPart);
     };
 
-    const auto sendTransferInfo = [=] (QByteArray &data, qint64 offset) {
+    const auto sendTransferInfo = [=] (QByteArray &data, int64 offset) {
         cfApiSendTransferInfo (callbackInfo.ConnectionKey,
                               callbackInfo.TransferKey,
                               STATUS_SUCCESS,
@@ -162,7 +162,7 @@ void CALLBACK cfApiFetchDataCallback (CF_CALLBACK_INFO *callbackInfo, CF_CALLBAC
     // Only the last sent block is allowed to be of a different size than
     // a multiple of a block size
     constexpr auto cfapiBlockSize = 4096;
-    qint64 dataOffset = 0;
+    int64 dataOffset = 0;
     QByteArray protrudingData;
 
     const auto alignAndSendData = [&] (QByteArray &receivedData) {
@@ -256,7 +256,7 @@ void deletePlaceholderInfo (CF_PLACEHOLDER_BASIC_INFO *info) {
 
 std.wstring pathForHandle (OCC.CfApiWrapper.FileHandle &handle) {
     wchar_t buffer[MAX_PATH];
-    const qint64 result = GetFinalPathNameByHandle (handle.get (), buffer, MAX_PATH, VOLUME_NAME_DOS);
+    const int64 result = GetFinalPathNameByHandle (handle.get (), buffer, MAX_PATH, VOLUME_NAME_DOS);
     Q_ASSERT (result < MAX_PATH);
     return std.wstring (buffer);
 }
@@ -488,7 +488,7 @@ OCC.Result<void, QString> OCC.CfApiWrapper.registerSyncRoot (QString &path, QStr
     policies.InSync = CF_INSYNC_POLICY_PRESERVE_INSYNC_FOR_SYNC_ENGINE;
     policies.HardLink = CF_HARDLINK_POLICY_NONE;
 
-    const qint64 result = CfRegisterSyncRoot (p.data (), &info, &policies, CF_REGISTER_FLAG_UPDATE);
+    const int64 result = CfRegisterSyncRoot (p.data (), &info, &policies, CF_REGISTER_FLAG_UPDATE);
     Q_ASSERT (result == S_OK);
     if (result != S_OK) {
         return QString.fromWCharArray (_com_error (result).ErrorMessage ());
@@ -506,7 +506,7 @@ OCC.Result<void, QString> OCC.CfApiWrapper.unregisterSyncRoot (QString &path, QS
     }
 
     const auto p = path.toStdWString ();
-    const qint64 result = CfUnregisterSyncRoot (p.data ());
+    const int64 result = CfUnregisterSyncRoot (p.data ());
     Q_ASSERT (result == S_OK);
     if (result != S_OK) {
         return QString.fromWCharArray (_com_error (result).ErrorMessage ());
@@ -518,7 +518,7 @@ OCC.Result<void, QString> OCC.CfApiWrapper.unregisterSyncRoot (QString &path, QS
 OCC.Result<OCC.CfApiWrapper.ConnectionKey, QString> OCC.CfApiWrapper.connectSyncRoot (QString &path, OCC.VfsCfApi *context) {
     auto key = ConnectionKey ();
     const auto p = path.toStdWString ();
-    const qint64 result = CfConnectSyncRoot (p.data (),
+    const int64 result = CfConnectSyncRoot (p.data (),
                                             cfApiCallbacks,
                                             context,
                                             CF_CONNECT_FLAG_REQUIRE_PROCESS_INFO | CF_CONNECT_FLAG_REQUIRE_FULL_FILE_PATH,
@@ -532,7 +532,7 @@ OCC.Result<OCC.CfApiWrapper.ConnectionKey, QString> OCC.CfApiWrapper.connectSync
 }
 
 OCC.Result<void, QString> OCC.CfApiWrapper.disconnectSyncRoot (ConnectionKey &&key) {
-    const qint64 result = CfDisconnectSyncRoot (*static_cast<CF_CONNECTION_KEY *> (key.get ()));
+    const int64 result = CfDisconnectSyncRoot (*static_cast<CF_CONNECTION_KEY *> (key.get ()));
     Q_ASSERT (result == S_OK);
     if (result != S_OK) {
         return QString.fromWCharArray (_com_error (result).ErrorMessage ());
@@ -559,7 +559,7 @@ OCC.CfApiWrapper.FileHandle OCC.CfApiWrapper.handleForPath (QString &path) {
 
     if (pathFileInfo.isDir ()) {
         HANDLE handle = nullptr;
-        const qint64 openResult = CfOpenFileWithOplock (path.toStdWString ().data (), CF_OPEN_FILE_FLAG_NONE, &handle);
+        const int64 openResult = CfOpenFileWithOplock (path.toStdWString ().data (), CF_OPEN_FILE_FLAG_NONE, &handle);
         if (openResult == S_OK) {
             return {handle, [] (HANDLE h) { CfCloseHandle (h); }};
         }
@@ -583,7 +583,7 @@ OCC.CfApiWrapper.PlaceHolderInfo OCC.CfApiWrapper.findPlaceholderInfo (FileHandl
     constexpr auto fileIdMaxLength = 128;
     const auto infoSize = sizeof (CF_PLACEHOLDER_BASIC_INFO) + fileIdMaxLength;
     auto info = PlaceHolderInfo (reinterpret_cast<CF_PLACEHOLDER_BASIC_INFO *> (new char[infoSize]), deletePlaceholderInfo);
-    const qint64 result = CfGetPlaceholderInfo (handle.get (), CF_PLACEHOLDER_INFO_BASIC, info.get (), sizeToDWORD (infoSize), nullptr);
+    const int64 result = CfGetPlaceholderInfo (handle.get (), CF_PLACEHOLDER_INFO_BASIC, info.get (), sizeToDWORD (infoSize), nullptr);
 
     if (result == S_OK) {
         return info;
@@ -596,7 +596,7 @@ OCC.Result<OCC.Vfs.ConvertToPlaceholderResult, QString> OCC.CfApiWrapper.setPinS
     const auto cfState = pinStateToCfPinState (state);
     const auto flags = pinRecurseModeToCfSetPinFlags (mode);
 
-    const qint64 result = CfSetPinState (handle.get (), cfState, flags, nullptr);
+    const int64 result = CfSetPinState (handle.get (), cfState, flags, nullptr);
     if (result == S_OK) {
         return OCC.Vfs.ConvertToPlaceholderResult.Ok;
     } else {
@@ -605,7 +605,7 @@ OCC.Result<OCC.Vfs.ConvertToPlaceholderResult, QString> OCC.CfApiWrapper.setPinS
     }
 }
 
-OCC.Result<void, QString> OCC.CfApiWrapper.createPlaceholderInfo (QString &path, time_t modtime, qint64 size, QByteArray &fileId) {
+OCC.Result<void, QString> OCC.CfApiWrapper.createPlaceholderInfo (QString &path, time_t modtime, int64 size, QByteArray &fileId) {
     if (modtime <= 0) {
         return {QString{"Could not update metadata due to invalid modified time for %1: %2"}.arg (path).arg (modtime)};
     }
@@ -636,7 +636,7 @@ OCC.Result<void, QString> OCC.CfApiWrapper.createPlaceholderInfo (QString &path,
         cloudEntry.FsMetadata.FileSize.QuadPart = 0;
     }
 
-    const qint64 result = CfCreatePlaceholders (localBasePath.data (), &cloudEntry, 1, CF_CREATE_FLAG_NONE, nullptr);
+    const int64 result = CfCreatePlaceholders (localBasePath.data (), &cloudEntry, 1, CF_CREATE_FLAG_NONE, nullptr);
     if (result != S_OK) {
         qCWarning (lcCfApiWrapper) << "Couldn't create placeholder info for" << path << ":" << QString.fromWCharArray (_com_error (result).ErrorMessage ());
         return { "Couldn't create placeholder info" };
@@ -654,7 +654,7 @@ OCC.Result<void, QString> OCC.CfApiWrapper.createPlaceholderInfo (QString &path,
     return {};
 }
 
-OCC.Result<OCC.Vfs.ConvertToPlaceholderResult, QString> OCC.CfApiWrapper.updatePlaceholderInfo (FileHandle &handle, time_t modtime, qint64 size, QByteArray &fileId, QString &replacesPath) {
+OCC.Result<OCC.Vfs.ConvertToPlaceholderResult, QString> OCC.CfApiWrapper.updatePlaceholderInfo (FileHandle &handle, time_t modtime, int64 size, QByteArray &fileId, QString &replacesPath) {
     Q_ASSERT (handle);
 
     if (modtime <= 0) {
@@ -679,7 +679,7 @@ OCC.Result<OCC.Vfs.ConvertToPlaceholderResult, QString> OCC.CfApiWrapper.updateP
     OCC.Utility.UnixTimeToLargeIntegerFiletime (modtime, &metadata.BasicInfo.ChangeTime);
     metadata.BasicInfo.FileAttributes = 0;
 
-    const qint64 result = CfUpdatePlaceholder (handle.get (), &metadata,
+    const int64 result = CfUpdatePlaceholder (handle.get (), &metadata,
                                               fileIdentity.data (), sizeToDWORD (fileIdentitySize),
                                               nullptr, 0, CF_UPDATE_FLAG_MARK_IN_SYNC, nullptr, nullptr);
 
@@ -696,7 +696,7 @@ OCC.Result<OCC.Vfs.ConvertToPlaceholderResult, QString> OCC.CfApiWrapper.updateP
     return OCC.Vfs.ConvertToPlaceholderResult.Ok;
 }
 
-OCC.Result<OCC.Vfs.ConvertToPlaceholderResult, QString> OCC.CfApiWrapper.convertToPlaceholder (FileHandle &handle, time_t modtime, qint64 size, QByteArray &fileId, QString &replacesPath) {
+OCC.Result<OCC.Vfs.ConvertToPlaceholderResult, QString> OCC.CfApiWrapper.convertToPlaceholder (FileHandle &handle, time_t modtime, int64 size, QByteArray &fileId, QString &replacesPath) {
     Q_UNUSED (modtime);
     Q_UNUSED (size);
 
@@ -704,7 +704,7 @@ OCC.Result<OCC.Vfs.ConvertToPlaceholderResult, QString> OCC.CfApiWrapper.convert
 
     const auto fileIdentity = QString.fromUtf8 (fileId).toStdWString ();
     const auto fileIdentitySize = (fileIdentity.length () + 1) * sizeof (wchar_t);
-    const qint64 result = CfConvertToPlaceholder (handle.get (), fileIdentity.data (), sizeToDWORD (fileIdentitySize), CF_CONVERT_FLAG_MARK_IN_SYNC, nullptr, nullptr);
+    const int64 result = CfConvertToPlaceholder (handle.get (), fileIdentity.data (), sizeToDWORD (fileIdentitySize), CF_CONVERT_FLAG_MARK_IN_SYNC, nullptr, nullptr);
     Q_ASSERT (result == S_OK);
     if (result != S_OK) {
         qCCritical (lcCfApiWrapper) << "Couldn't convert to placeholder" << pathForHandle (handle) << ":" << QString.fromWCharArray (_com_error (result).ErrorMessage ());

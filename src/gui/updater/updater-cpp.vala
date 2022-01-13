@@ -134,16 +134,16 @@ Updater *Updater.create () {
 #endif
 }
 
-qint64 Updater.Helper.versionToInt (qint64 major, qint64 minor, qint64 patch, qint64 build) {
+int64 Updater.Helper.versionToInt (int64 major, int64 minor, int64 patch, int64 build) {
     return major << 56 | minor << 48 | patch << 40 | build;
 }
 
-qint64 Updater.Helper.currentVersionToInt () {
+int64 Updater.Helper.currentVersionToInt () {
     return versionToInt (MIRALL_VERSION_MAJOR, MIRALL_VERSION_MINOR,
         MIRALL_VERSION_PATCH, MIRALL_VERSION_BUILD);
 }
 
-qint64 Updater.Helper.stringVersionToInt (QString &version) {
+int64 Updater.Helper.stringVersionToInt (QString &version) {
     if (version.isEmpty ())
         return 0;
     QByteArray baVersion = version.toLatin1 ();

@@ -32,25 +32,25 @@ class BandwidthManager;
  */
 class UploadDevice : public QIODevice {
 public:
-    UploadDevice (QString &fileName, qint64 start, qint64 size, BandwidthManager *bwm);
+    UploadDevice (QString &fileName, int64 start, int64 size, BandwidthManager *bwm);
     ~UploadDevice () override;
 
     bool open (QIODevice.OpenMode mode) override;
     void close () override;
 
-    qint64 writeData (char *, qint64) override;
-    qint64 readData (char *data, qint64 maxlen) override;
+    int64 writeData (char *, int64) override;
+    int64 readData (char *data, int64 maxlen) override;
     bool atEnd () const override;
-    qint64 size () const override;
-    qint64 bytesAvailable () const override;
+    int64 size () const override;
+    int64 bytesAvailable () const override;
     bool isSequential () const override;
-    bool seek (qint64 pos) override;
+    bool seek (int64 pos) override;
 
     void setBandwidthLimited (bool);
     bool isBandwidthLimited () { return _bandwidthLimited; }
     void setChoked (bool);
     bool isChoked () { return _choked; }
-    void giveBandwidthQuota (qint64 bwq);
+    void giveBandwidthQuota (int64 bwq);
 
 signals:
 
@@ -59,21 +59,21 @@ private:
     QFile _file;
 
     /// Start of the file data to use
-    qint64 _start = 0;
+    int64 _start = 0;
     /// Amount of file data after _start to use
-    qint64 _size = 0;
+    int64 _size = 0;
     /// Position between _start and _start+_size
-    qint64 _read = 0;
+    int64 _read = 0;
 
     // Bandwidth manager related
     QPointer<BandwidthManager> _bandwidthManager;
-    qint64 _bandwidthQuota = 0;
-    qint64 _readWithProgress = 0;
+    int64 _bandwidthQuota = 0;
+    int64 _readWithProgress = 0;
     bool _bandwidthLimited = false; // if _bandwidthQuota will be used
     bool _choked = false; // if upload is paused (readData () will return 0)
     friend class BandwidthManager;
 public slots:
-    void slotJobUploadProgress (qint64 sent, qint64 t);
+    void slotJobUploadProgress (int64 sent, int64 t);
 };
 
 /**
@@ -130,7 +130,7 @@ public:
 
 signals:
     void finishedSignal ();
-    void uploadProgress (qint64, qint64);
+    void uploadProgress (int64, int64);
 
 };
 
@@ -214,7 +214,7 @@ protected:
     struct UploadFileInfo {
       QString _file; /// I'm still unsure if I should use a SyncFilePtr here.
       QString _path; /// the full path on disk.
-      qint64 _size;
+      int64 _size;
     };
     UploadFileInfo _fileToUpload;
     QByteArray _transmissionChecksumHeader;
@@ -232,7 +232,7 @@ public:
 
     /* start should setup the file, path and size that will be send to the server */
     void start () override;
-    void setupEncryptedFile (QString& path, QString& filename, quint64 size);
+    void setupEncryptedFile (QString& path, QString& filename, uint64 size);
     void setupUnencryptedFile ();
     void startUploadFile ();
     void callUnlockFolder ();
@@ -294,7 +294,7 @@ protected:
      *
      * See #6527, enterprise#2480
      */
-    static void adjustLastJobTimeout (AbstractNetworkJob *job, qint64 fileSize);
+    static void adjustLastJobTimeout (AbstractNetworkJob *job, int64 fileSize);
 
     /** Bases headers that need to be sent on the PUT, or in the MOVE for chunking-ng */
     QMap<QByteArray, QByteArray> headers ();
@@ -328,7 +328,7 @@ private:
     int _chunkCount = 0; /// Total number of chunks for this file
     uint _transferId = 0; /// transfer id (part of the url)
 
-    qint64 chunkSize () {
+    int64 chunkSize () {
         // Old chunking does not use dynamic chunking algorithm, and does not adjusts the chunk size respectively,
         // thus this value should be used as the one classifing item to be chunked
         return propagator ().syncOptions ()._initialChunkSize;
@@ -345,7 +345,7 @@ public slots:
 private slots:
     void startNextChunk ();
     void slotPutFinished ();
-    void slotUploadProgress (qint64, qint64);
+    void slotUploadProgress (int64, int64);
 };
 
 /**
@@ -356,19 +356,19 @@ private slots:
  */
 class PropagateUploadFileNG : public PropagateUploadFileCommon {
 private:
-    qint64 _sent = 0; /// amount of data (bytes) that was already sent
+    int64 _sent = 0; /// amount of data (bytes) that was already sent
     uint _transferId = 0; /// transfer id (part of the url)
     int _currentChunk = 0; /// Id of the next chunk that will be sent
-    qint64 _currentChunkSize = 0; /// current chunk size
+    int64 _currentChunkSize = 0; /// current chunk size
     bool _removeJobError = false; /// If not null, there was an error removing the job
 
     // Map chunk number with its size  from the PROPFIND on resume.
     // (Only used from slotPropfindIterate/slotPropfindFinished because the LsColJob use signals to report data.)
     struct ServerChunkInfo {
-        qint64 size;
+        int64 size;
         QString originalName;
     };
-    QMap<qint64, ServerChunkInfo> _serverChunks;
+    QMap<int64, ServerChunkInfo> _serverChunks;
 
     /**
      * Return the URL of a chunk.
@@ -396,6 +396,6 @@ private slots:
     void slotMkColFinished ();
     void slotPutFinished ();
     void slotMoveJobFinished ();
-    void slotUploadProgress (qint64, qint64);
+    void slotUploadProgress (int64, int64);
 };
 }

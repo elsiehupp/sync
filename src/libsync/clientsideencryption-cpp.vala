@@ -54,7 +54,7 @@ namespace {
     const char e2e_private[] = "_e2e-private";
     const char e2e_mnemonic[] = "_e2e-mnemonic";
 
-    constexpr qint64 blockSize = 1024;
+    constexpr int64 blockSize = 1024;
 
     QList<QByteArray> oldCipherFormatSplit (QByteArray &cipher) {
         const auto separator = QByteArrayLiteral ("fA=="); // BASE64 encoded '|'
@@ -1645,7 +1645,7 @@ bool EncryptionHelper.fileDecryption (QByteArray &key, QByteArray& iv,
         return false;
     }
 
-    qint64 size = input.size () - OCC.Constants.e2EeTagSize;
+    int64 size = input.size () - OCC.Constants.e2EeTagSize;
 
     QByteArray out (blockSize + OCC.Constants.e2EeTagSize - 1, '\0');
     int len = 0;
@@ -1691,7 +1691,7 @@ bool EncryptionHelper.fileDecryption (QByteArray &key, QByteArray& iv,
     return true;
 }
 
-EncryptionHelper.StreamingDecryptor.StreamingDecryptor (QByteArray &key, QByteArray &iv, quint64 totalSize) : _totalSize (totalSize) {
+EncryptionHelper.StreamingDecryptor.StreamingDecryptor (QByteArray &key, QByteArray &iv, uint64 totalSize) : _totalSize (totalSize) {
     if (_ctx && !key.isEmpty () && !iv.isEmpty () && totalSize > 0) {
         _isInitialized = true;
 
@@ -1717,7 +1717,7 @@ EncryptionHelper.StreamingDecryptor.StreamingDecryptor (QByteArray &key, QByteAr
     }
 }
 
-QByteArray EncryptionHelper.StreamingDecryptor.chunkDecryption (char *input, quint64 chunkSize) {
+QByteArray EncryptionHelper.StreamingDecryptor.chunkDecryption (char *input, uint64 chunkSize) {
     QByteArray byteArray;
     QBuffer buffer (&byteArray);
     buffer.open (QIODevice.WriteOnly);
@@ -1765,7 +1765,7 @@ QByteArray EncryptionHelper.StreamingDecryptor.chunkDecryption (char *input, qui
     const bool isLastChunk = _decryptedSoFar + chunkSize == _totalSize;
 
     // last OCC.Constants.e2EeTagSize bytes is ALWAYS a e2EeTag!!!
-    const qint64 size = isLastChunk ? chunkSize - OCC.Constants.e2EeTagSize : chunkSize;
+    const int64 size = isLastChunk ? chunkSize - OCC.Constants.e2EeTagSize : chunkSize;
 
     // either the size is more than 0 and an e2EeTag is at the end of chunk, or, chunk is the e2EeTag itself
     Q_ASSERT (size > 0 || chunkSize == OCC.Constants.e2EeTagSize);
@@ -1774,8 +1774,8 @@ QByteArray EncryptionHelper.StreamingDecryptor.chunkDecryption (char *input, qui
         return QByteArray ();
     }
 
-    qint64 bytesWritten = 0;
-    qint64 inputPos = 0;
+    int64 bytesWritten = 0;
+    int64 inputPos = 0;
 
     QByteArray decryptedBlock (blockSize + OCC.Constants.e2EeTagSize - 1, '\0');
 

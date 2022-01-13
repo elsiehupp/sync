@@ -104,11 +104,11 @@ void Utility.removeFavLink (QString &folder) {
     removeFavLink_private (folder);
 }
 
-QString Utility.octetsToString (qint64 octets) {
+QString Utility.octetsToString (int64 octets) {
 #define THE_FACTOR 1024
-    static const qint64 kb = THE_FACTOR;
-    static const qint64 mb = THE_FACTOR * kb;
-    static const qint64 gb = THE_FACTOR * mb;
+    static const int64 kb = THE_FACTOR;
+    static const int64 mb = THE_FACTOR * kb;
+    static const int64 gb = THE_FACTOR * mb;
 
     QString s;
     qreal value = octets;
@@ -203,16 +203,16 @@ void Utility.setLaunchOnStartup (QString &appName, QString &guiName, bool enable
     setLaunchOnStartup_private (appName, guiName, enable);
 }
 
-qint64 Utility.freeDiskSpace (QString &path) {
+int64 Utility.freeDiskSpace (QString &path) {
 #if defined (Q_OS_MAC) || defined (Q_OS_FREEBSD) || defined (Q_OS_FREEBSD_KERNEL) || defined (Q_OS_NETBSD) || defined (Q_OS_OPENBSD)
     struct statvfs stat;
     if (statvfs (path.toLocal8Bit ().data (), &stat) == 0) {
-        return (qint64)stat.f_bavail * stat.f_frsize;
+        return (int64)stat.f_bavail * stat.f_frsize;
     }
 #elif defined (Q_OS_UNIX)
     struct statvfs64 stat;
     if (statvfs64 (path.toLocal8Bit ().data (), &stat) == 0) {
-        return (qint64)stat.f_bavail * stat.f_frsize;
+        return (int64)stat.f_bavail * stat.f_frsize;
     }
 #elif defined (Q_OS_WIN)
     ULARGE_INTEGER freeBytes;
@@ -280,20 +280,20 @@ bool Utility.fileNamesEqual (QString &fn1, QString &fn2) {
     return re;
 }
 
-QDateTime Utility.qDateTimeFromTime_t (qint64 t) {
+QDateTime Utility.qDateTimeFromTime_t (int64 t) {
     return QDateTime.fromMSecsSinceEpoch (t * 1000);
 }
 
-qint64 Utility.qDateTimeToTime_t (QDateTime &t) {
+int64 Utility.qDateTimeToTime_t (QDateTime &t) {
     return t.toMSecsSinceEpoch () / 1000;
 }
 
 namespace {
     struct Period {
         const char *name;
-        quint64 msec;
+        uint64 msec;
 
-        QString description (quint64 value) {
+        QString description (uint64 value) {
             return QCoreApplication.translate ("Utility", name, nullptr, value);
         }
     };
@@ -306,7 +306,7 @@ namespace {
     };
 } // anonymous namespace
 
-QString Utility.durationToDescriptiveString2 (quint64 msecs) {
+QString Utility.durationToDescriptiveString2 (uint64 msecs) {
     int p = 0;
     while (periods[p + 1].name && msecs < periods[p].msec) {
         p++;
@@ -318,7 +318,7 @@ QString Utility.durationToDescriptiveString2 (quint64 msecs) {
         return firstPart;
     }
 
-    quint64 secondPartNum = qRound (double (msecs % periods[p].msec) / periods[p + 1].msec);
+    uint64 secondPartNum = qRound (double (msecs % periods[p].msec) / periods[p + 1].msec);
 
     if (secondPartNum == 0) {
         return firstPart;
@@ -327,13 +327,13 @@ QString Utility.durationToDescriptiveString2 (quint64 msecs) {
     return QCoreApplication.translate ("Utility", "%1 %2").arg (firstPart, periods[p + 1].description (secondPartNum));
 }
 
-QString Utility.durationToDescriptiveString1 (quint64 msecs) {
+QString Utility.durationToDescriptiveString1 (uint64 msecs) {
     int p = 0;
     while (periods[p + 1].name && msecs < periods[p].msec) {
         p++;
     }
 
-    quint64 amount = qRound (double (msecs) / periods[p].msec);
+    uint64 amount = qRound (double (msecs) / periods[p].msec);
     return periods[p].description (amount);
 }
 
@@ -435,7 +435,7 @@ QString Utility.timeAgoInWords (QDateTime &dt, QDateTime &from) {
     } else if (dt.daysTo (now) > 1) {
         return QObject.tr ("%n days ago", "", dt.daysTo (now));
     } else {
-        qint64 secs = dt.secsTo (now);
+        int64 secs = dt.secsTo (now);
         if (secs < 0) {
             return QObject.tr ("in the future");
         }
@@ -476,9 +476,9 @@ void Utility.StopWatch.start () {
     _timer.start ();
 }
 
-quint64 Utility.StopWatch.stop () {
+uint64 Utility.StopWatch.stop () {
     addLapTime (QLatin1String (STOPWATCH_END_TAG));
-    quint64 duration = _timer.elapsed ();
+    uint64 duration = _timer.elapsed ();
     _timer.invalidate ();
     return duration;
 }
@@ -489,11 +489,11 @@ void Utility.StopWatch.reset () {
     _lapTimes.clear ();
 }
 
-quint64 Utility.StopWatch.addLapTime (QString &lapName) {
+uint64 Utility.StopWatch.addLapTime (QString &lapName) {
     if (!_timer.isValid ()) {
         start ();
     }
-    quint64 re = _timer.elapsed ();
+    uint64 re = _timer.elapsed ();
     _lapTimes[lapName] = re;
     return re;
 }
@@ -503,7 +503,7 @@ QDateTime Utility.StopWatch.startTime () {
 }
 
 QDateTime Utility.StopWatch.timeOfLap (QString &lapName) {
-    quint64 t = durationOfLap (lapName);
+    uint64 t = durationOfLap (lapName);
     if (t) {
         QDateTime re (_startTime);
         return re.addMSecs (t);
@@ -512,7 +512,7 @@ QDateTime Utility.StopWatch.timeOfLap (QString &lapName) {
     return QDateTime ();
 }
 
-quint64 Utility.StopWatch.durationOfLap (QString &lapName) {
+uint64 Utility.StopWatch.durationOfLap (QString &lapName) {
     return _lapTimes.value (lapName, 0);
 }
 

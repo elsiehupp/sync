@@ -199,7 +199,7 @@ bool FileSystem.uncheckedRenameReplace (QString &originFileName,
     return true;
 }
 
-bool FileSystem.openAndSeekFileSharedRead (QFile *file, QString *errorOrNull, qint64 seek) {
+bool FileSystem.openAndSeekFileSharedRead (QFile *file, QString *errorOrNull, int64 seek) {
     QString errorDummy;
     // avoid many if (errorOrNull) later.
     QString &error = errorOrNull ? *errorOrNull : errorDummy;

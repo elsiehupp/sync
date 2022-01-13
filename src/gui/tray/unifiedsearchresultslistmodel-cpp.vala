@@ -448,7 +448,7 @@ void UnifiedSearchResultsListModel.startSearch () {
     }
 }
 
-void UnifiedSearchResultsListModel.startSearchForProvider (QString &providerId, qint32 cursor) {
+void UnifiedSearchResultsListModel.startSearchForProvider (QString &providerId, int32 cursor) {
     Q_ASSERT (_accountState && _accountState.account ());
 
     if (!_accountState || !_accountState.account ()) {

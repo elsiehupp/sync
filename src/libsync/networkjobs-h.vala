@@ -71,7 +71,7 @@ private slots:
 
 struct ExtraFolderInfo {
     QByteArray fileId;
-    qint64 size = -1;
+    int64 size = -1;
 };
 
 /**

@@ -156,7 +156,7 @@ public:
      * If the remote metadata changes, the local placeholder's metadata should possibly
      * change as well.
      */
-    virtual Q_REQUIRED_RESULT Result<void, QString> updateMetadata (QString &filePath, time_t modtime, qint64 size, QByteArray &fileId) = 0;
+    virtual Q_REQUIRED_RESULT Result<void, QString> updateMetadata (QString &filePath, time_t modtime, int64 size, QByteArray &fileId) = 0;
 
     /// Create a new dehydrated placeholder. Called from PropagateDownload.
     virtual Q_REQUIRED_RESULT Result<void, QString> createPlaceholder (SyncFileItem &item) = 0;
@@ -289,7 +289,7 @@ public:
     bool socketApiPinStateActionsShown () const override { return false; }
     bool isHydrating () const override { return false; }
 
-    Result<void, QString> updateMetadata (QString &, time_t, qint64, QByteArray &) override { return {}; }
+    Result<void, QString> updateMetadata (QString &, time_t, int64, QByteArray &) override { return {}; }
     Result<void, QString> createPlaceholder (SyncFileItem &) override { return {}; }
     Result<void, QString> dehydratePlaceholder (SyncFileItem &) override { return {}; }
     Result<ConvertToPlaceholderResult, QString> convertToPlaceholder (QString &, SyncFileItem &, QString &) override { return ConvertToPlaceholderResult.Ok; }

@@ -38,10 +38,10 @@ class UnifiedSearchResultsListModel : public QAbstractListModel {
     struct UnifiedSearchProvider {
         QString _id;
         QString _name;
-        qint32 _cursor = -1; // current pagination value
-        qint32 _pageSize = -1; // how many max items per step of pagination
+        int32 _cursor = -1; // current pagination value
+        int32 _pageSize = -1; // how many max items per step of pagination
         bool _isPaginated = false;
-        qint32 _order = std.numeric_limits<qint32>.max (); // sorting order (smaller number has bigger priority)
+        int32 _order = std.numeric_limits<int32>.max (); // sorting order (smaller number has bigger priority)
     };
 
 public:
@@ -76,7 +76,7 @@ public:
 
 private:
     void startSearch ();
-    void startSearchForProvider (QString &providerId, qint32 cursor = -1);
+    void startSearchForProvider (QString &providerId, int32 cursor = -1);
 
     void parseResultsForProvider (QJsonObject &data, QString &providerId, bool fetchedMore = false);
 

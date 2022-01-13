@@ -723,8 +723,8 @@ void FolderMan.startScheduledSyncSoon () {
         return;
     }
 
-    qint64 msDelay = 100; // 100ms minimum delay
-    qint64 msSinceLastSync = 0;
+    int64 msDelay = 100; // 100ms minimum delay
+    int64 msSinceLastSync = 0;
 
     // Require a pause based on the duration of the last sync run.
     if (Folder *lastFolder = _lastSyncFolder) {
@@ -734,7 +734,7 @@ void FolderMan.startScheduledSyncSoon () {
         // 10s   . 5s pause
         //  1min . 12s pause
         //  1h   . 90s pause
-        qint64 pause = qSqrt (lastFolder.msecLastSyncDuration ().count ()) / 20.0 * 1000.0;
+        int64 pause = qSqrt (lastFolder.msecLastSyncDuration ().count ()) / 20.0 * 1000.0;
         msDelay = qMax (msDelay, pause);
     }
 

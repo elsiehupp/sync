@@ -155,7 +155,7 @@ bool SyncEngine.checkErrorBlacklisting (SyncFileItem &item) {
         }
     }
 
-    qint64 waitSeconds = entry._lastTryTime + entry._ignoreDuration - now;
+    int64 waitSeconds = entry._lastTryTime + entry._ignoreDuration - now;
     qCInfo (lcEngine) << "Item is on blacklist: " << entry._file
                      << "retries:" << entry._retryCount
                      << "for another" << waitSeconds << "s";
@@ -431,8 +431,8 @@ void SyncEngine.startSync () {
     }
 
     // Check free size on disk first.
-    const qint64 minFree = criticalFreeSpaceLimit ();
-    const qint64 freeBytes = Utility.freeDiskSpace (_localPath);
+    const int64 minFree = criticalFreeSpaceLimit ();
+    const int64 freeBytes = Utility.freeDiskSpace (_localPath);
     if (freeBytes >= 0) {
         if (freeBytes < minFree) {
             qCWarning (lcEngine ()) << "Too little space available at" << _localPath << ". Have"
@@ -812,7 +812,7 @@ void SyncEngine.finalize (bool success) {
     _clearTouchedFilesTimer.start ();
 }
 
-void SyncEngine.slotProgress (SyncFileItem &item, qint64 current) {
+void SyncEngine.slotProgress (SyncFileItem &item, int64 current) {
     _progressInfo.setProgressItem (item, current);
     emit transmissionProgress (*_progressInfo);
 }

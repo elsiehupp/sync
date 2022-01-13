@@ -83,14 +83,14 @@ public:
      */
     void adjustTotalsForFile (SyncFileItem &item);
 
-    qint64 totalFiles () const;
-    qint64 completedFiles () const;
+    int64 totalFiles () const;
+    int64 completedFiles () const;
 
-    qint64 totalSize () const;
-    qint64 completedSize () const;
+    int64 totalSize () const;
+    int64 completedSize () const;
 
     /** Number of a file that is currently in progress. */
-    qint64 currentFile () const;
+    int64 currentFile () const;
 
     /** Return true if the size needs to be taken in account in the total amount of time */
     static inline bool isSizeDependent (SyncFileItem &item) {
@@ -108,10 +108,10 @@ public:
      */
     struct Estimates {
         /// Estimated completion amount per second. (of bytes or files)
-        qint64 estimatedBandwidth;
+        int64 estimatedBandwidth;
 
         /// Estimated time remaining in milliseconds.
-        quint64 estimatedEta;
+        uint64 estimatedEta;
     };
 
     /**
@@ -122,8 +122,8 @@ public:
         /** Returns the estimates about progress per second and eta. */
         Estimates estimates () const;
 
-        qint64 completed () const;
-        qint64 remaining () const;
+        int64 completed () const;
+        int64 remaining () const;
 
     private:
         /**
@@ -135,19 +135,19 @@ public:
          * Changes the _completed value and does sanity checks on
          * _prevCompleted and _total.
          */
-        void setCompleted (qint64 completed);
+        void setCompleted (int64 completed);
 
         // Updated by update ()
         double _progressPerSec = 0;
-        qint64 _prevCompleted = 0;
+        int64 _prevCompleted = 0;
 
         // Used to get to a good value faster when
         // progress measurement stats. See update ().
         double _initialSmoothing = 1.0;
 
         // Set and updated by ProgressInfo
-        qint64 _completed = 0;
-        qint64 _total = 0;
+        int64 _completed = 0;
+        int64 _total = 0;
 
         friend class ProgressInfo;
     };
@@ -168,7 +168,7 @@ public:
 
     void setProgressComplete (SyncFileItem &item);
 
-    void setProgressItem (SyncFileItem &item, qint64 completed);
+    void setProgressItem (SyncFileItem &item, int64 completed);
 
     /**
      * Get the total completion estimate
@@ -181,7 +181,7 @@ public:
      * This value is based on the highest observed transfer bandwidth
      * and files-per-second speed.
      */
-    quint64 optimisticEta () const;
+    uint64 optimisticEta () const;
 
     /**
      * Whether the remaining-time estimate is trusted.
@@ -215,7 +215,7 @@ private:
     Progress _fileProgress;
 
     // All size from completed jobs only.
-    qint64 _totalSizeOfCompletedJobs;
+    int64 _totalSizeOfCompletedJobs;
 
     // The fastest observed rate of files per second in this sync.
     double _maxFilesPerSecond;

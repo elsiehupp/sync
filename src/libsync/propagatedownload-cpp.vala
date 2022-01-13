@@ -58,7 +58,7 @@ QString OWNCLOUDSYNC_EXPORT createDownloadTmpFileName (QString &previous) {
 // DOES NOT take ownership of the device.
 GETFileJob.GETFileJob (AccountPtr account, QString &path, QIODevice *device,
     const QMap<QByteArray, QByteArray> &headers, QByteArray &expectedEtagForResume,
-    qint64 resumeStart, QObject *parent)
+    int64 resumeStart, QObject *parent)
     : AbstractNetworkJob (account, path, parent)
     , _device (device)
     , _headers (headers)
@@ -77,7 +77,7 @@ GETFileJob.GETFileJob (AccountPtr account, QString &path, QIODevice *device,
 
 GETFileJob.GETFileJob (AccountPtr account, QUrl &url, QIODevice *device,
     const QMap<QByteArray, QByteArray> &headers, QByteArray &expectedEtagForResume,
-    qint64 resumeStart, QObject *parent)
+    int64 resumeStart, QObject *parent)
     : AbstractNetworkJob (account, url.toEncoded (), parent)
     , _device (device)
     , _headers (headers)
@@ -197,7 +197,7 @@ void GETFileJob.slotMetaDataChanged () {
         return;
     }
 
-    qint64 start = 0;
+    int64 start = 0;
     QByteArray ranges = reply ().rawHeader ("Content-Range");
     if (!ranges.isEmpty ()) {
         const QRegularExpression rx ("bytes (\\d+)-");
@@ -248,20 +248,20 @@ void GETFileJob.setBandwidthLimited (bool b) {
     QMetaObject.invokeMethod (this, "slotReadyRead", Qt.QueuedConnection);
 }
 
-void GETFileJob.giveBandwidthQuota (qint64 q) {
+void GETFileJob.giveBandwidthQuota (int64 q) {
     _bandwidthQuota = q;
     qCDebug (lcGetJob) << "Got" << q << "bytes";
     QMetaObject.invokeMethod (this, "slotReadyRead", Qt.QueuedConnection);
 }
 
-qint64 GETFileJob.currentDownloadPosition () {
-    if (_device && _device.pos () > 0 && _device.pos () > qint64 (_resumeStart)) {
+int64 GETFileJob.currentDownloadPosition () {
+    if (_device && _device.pos () > 0 && _device.pos () > int64 (_resumeStart)) {
         return _device.pos ();
     }
     return _resumeStart;
 }
 
-qint64 GETFileJob.writeToDevice (QByteArray &data) {
+int64 GETFileJob.writeToDevice (QByteArray &data) {
     return _device.write (data);
 }
 
@@ -276,9 +276,9 @@ void GETFileJob.slotReadyRead () {
             qCWarning (lcGetJob) << "Download choked";
             break;
         }
-        qint64 toRead = bufferSize;
+        int64 toRead = bufferSize;
         if (_bandwidthLimited) {
-            toRead = qMin (qint64 (bufferSize), _bandwidthQuota);
+            toRead = qMin (int64 (bufferSize), _bandwidthQuota);
             if (toRead == 0) {
                 qCWarning (lcGetJob) << "Out of quota";
                 break;
@@ -286,7 +286,7 @@ void GETFileJob.slotReadyRead () {
             _bandwidthQuota -= toRead;
         }
 
-        const qint64 readBytes = reply ().read (buffer.data (), toRead);
+        const int64 readBytes = reply ().read (buffer.data (), toRead);
         if (readBytes < 0) {
             _errorString = networkReplyErrorString (*reply ());
             _errorStatus = SyncFileItem.NormalError;
@@ -295,7 +295,7 @@ void GETFileJob.slotReadyRead () {
             return;
         }
 
-        const qint64 writtenBytes = writeToDevice (QByteArray.fromRawData (buffer.constData (), readBytes));
+        const int64 writtenBytes = writeToDevice (QByteArray.fromRawData (buffer.constData (), readBytes));
         if (writtenBytes != readBytes) {
             _errorString = _device.errorString ();
             _errorStatus = SyncFileItem.NormalError;
@@ -350,19 +350,19 @@ QString GETFileJob.errorString () {
 
 GETEncryptedFileJob.GETEncryptedFileJob (AccountPtr account, QString &path, QIODevice *device,
     const QMap<QByteArray, QByteArray> &headers, QByteArray &expectedEtagForResume,
-    qint64 resumeStart, EncryptedFile encryptedInfo, QObject *parent)
+    int64 resumeStart, EncryptedFile encryptedInfo, QObject *parent)
     : GETFileJob (account, path, device, headers, expectedEtagForResume, resumeStart, parent)
     , _encryptedFileInfo (encryptedInfo) {
 }
 
 GETEncryptedFileJob.GETEncryptedFileJob (AccountPtr account, QUrl &url, QIODevice *device,
     const QMap<QByteArray, QByteArray> &headers, QByteArray &expectedEtagForResume,
-    qint64 resumeStart, EncryptedFile encryptedInfo, QObject *parent)
+    int64 resumeStart, EncryptedFile encryptedInfo, QObject *parent)
     : GETFileJob (account, url, device, headers, expectedEtagForResume, resumeStart, parent)
     , _encryptedFileInfo (encryptedInfo) {
 }
 
-qint64 GETEncryptedFileJob.writeToDevice (QByteArray &data) {
+int64 GETEncryptedFileJob.writeToDevice (QByteArray &data) {
     if (!_decryptor) {
         // only initialize the decryptor once, because, according to Qt documentation, metadata might get changed during the processing of the data sometimes
         // https://doc.qt.io/qt-5/qnetworkreply.html#metaDataChanged
@@ -689,7 +689,7 @@ void PropagateDownloadFile.startDownload () {
     _job.start ();
 }
 
-qint64 PropagateDownloadFile.committedDiskSpace () {
+int64 PropagateDownloadFile.committedDiskSpace () {
     if (_state == Running) {
         return qBound (0LL, _item._size - _resumeStart - _downloadProgress, _item._size);
     }
@@ -807,7 +807,7 @@ void PropagateDownloadFile.slotGetFinished () {
      * truncated, as described here: https://github.com/owncloud/mirall/issues/2528
      */
     const QByteArray sizeHeader ("Content-Length");
-    qint64 bodySize = job.reply ().rawHeader (sizeHeader).toLongLong ();
+    int64 bodySize = job.reply ().rawHeader (sizeHeader).toLongLong ();
     bool hasSizeHeader = !job.reply ().rawHeader (sizeHeader).isEmpty ();
 
     // Qt removes the content-length header for transparently decompressed HTTP1 replies
@@ -1092,7 +1092,7 @@ void PropagateDownloadFile.downloadFinished () {
         // phase by comparing size and mtime to the previous values. This
         // is necessary to avoid overwriting user changes that happened between
         // the discovery phase and now.
-        const qint64 expectedSize = _item._previousSize;
+        const int64 expectedSize = _item._previousSize;
         const time_t expectedMtime = _item._previousModtime;
         if (!FileSystem.verifyFileUnchanged (fn, expectedSize, expectedMtime)) {
             propagator ()._anotherSyncNeeded = true;
@@ -1190,13 +1190,13 @@ void PropagateDownloadFile.updateMetadata (bool isConflict) {
         handleRecallFile (fn, propagator ().localPath (), *propagator ()._journal);
     }
 
-    qint64 duration = _stopwatch.elapsed ();
+    int64 duration = _stopwatch.elapsed ();
     if (isLikelyFinishedQuickly () && duration > 5 * 1000) {
         qCWarning (lcPropagateDownload) << "WARNING: Unexpectedly slow connection, took" << duration << "msec for" << _item._size - _resumeStart << "bytes for" << _item._file;
     }
 }
 
-void PropagateDownloadFile.slotDownloadProgress (qint64 received, qint64) {
+void PropagateDownloadFile.slotDownloadProgress (int64 received, int64) {
     if (!_job)
         return;
     _downloadProgress = received;

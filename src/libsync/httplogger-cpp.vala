@@ -19,7 +19,7 @@
 namespace {
 Q_LOGGING_CATEGORY (lcNetworkHttp, "sync.httplogger", QtWarningMsg)
 
-const qint64 PeekSize = 1024 * 1024;
+const int64 PeekSize = 1024 * 1024;
 
 const QByteArray XRequestId (){
     return QByteArrayLiteral ("X-Request-ID");

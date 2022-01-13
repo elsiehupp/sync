@@ -45,7 +45,7 @@ void WatcherThread.watchChanges (size_t fileNotifyBufferSize,
     OVERLAPPED overlapped;
     overlapped.hEvent = _resultEvent;
 
-    // QVarLengthArray ensures the stack-buffer is aligned like double and qint64.
+    // QVarLengthArray ensures the stack-buffer is aligned like double and int64.
     QVarLengthArray<char, 4096 * 10> fileNotifyBuffer;
     fileNotifyBuffer.resize (static_cast<int> (fileNotifyBufferSize));
 

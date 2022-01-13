@@ -59,7 +59,7 @@ public:
         QString _e2eMangledName; // Mangled name that needs to be used when making fetch requests and should not be used for displaying in the UI
         QVector<int> _pathIdx;
         QVector<SubFolderInfo> _subs;
-        qint64 _size = 0;
+        int64 _size = 0;
         bool _isExternal = false;
         bool _isEncrypted = false;
 

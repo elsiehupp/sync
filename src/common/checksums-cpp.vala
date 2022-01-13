@@ -84,7 +84,7 @@ namespace OCC {
 
 Q_LOGGING_CATEGORY (lcChecksums, "nextcloud.sync.checksums", QtInfoMsg)
 
-#define BUFSIZE qint64 (500 * 1024) // 500 KiB
+#define BUFSIZE int64 (500 * 1024) // 500 KiB
 
 static QByteArray calcCryptoHash (QIODevice *device, QCryptographicHash.Algorithm algo) {
      QByteArray arr;
@@ -112,7 +112,7 @@ QByteArray calcAdler32 (QIODevice *device) { {f (device.size () == 0)
     QByteArray buf (BUFSIZE, Qt.Uninitialized);
 
     unsigned int adler = adler32 (0L, Z_NULL, 0);
-    qint64 size = 0;
+    int64 size = 0;
     while (!device.atEnd ()) {
         size = device.read (buf.data (), BUFSIZE);
         if (size > 0)

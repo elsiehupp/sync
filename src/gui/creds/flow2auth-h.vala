@@ -74,8 +74,8 @@ private:
     QString _pollToken;
     QString _pollEndpoint;
     QTimer _pollTimer;
-    qint64 _secondsLeft;
-    qint64 _secondsInterval;
+    int64 _secondsLeft;
+    int64 _secondsInterval;
     bool _isBusy;
     bool _hasToken;
     bool _enforceHttps = false;

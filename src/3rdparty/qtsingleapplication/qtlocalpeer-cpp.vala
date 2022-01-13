@@ -49,7 +49,7 @@ static const char ack[] = "ack";
 
 QString QtLocalPeer.appSessionId (QString &appId) {
     QByteArray idc = appId.toUtf8 ();
-    quint16 idNum = qChecksum (idc.constData (), idc.size ());
+    uint16 idNum = qChecksum (idc.constData (), idc.size ());
     //### could do: two 16bit checksums over separate halves of id, for a 32bit result - improved uniqeness probability. Every-other-char split would be best.
 
     QString res = QLatin1String ("qtsingleapplication-")
@@ -140,14 +140,14 @@ void QtLocalPeer.receiveConnection () {
         return;
 
     // Why doesn't Qt have a blocking stream that takes care of this shait???
-    while (socket.bytesAvailable () < static_cast<int> (sizeof (quint32))) {
+    while (socket.bytesAvailable () < static_cast<int> (sizeof (uint32))) {
         if (!socket.isValid ()) // stale request
             return;
         socket.waitForReadyRead (1000);
     }
     QDataStream ds (socket);
     QByteArray uMsg;
-    quint32 remaining = 0;
+    uint32 remaining = 0;
     ds >> remaining;
     uMsg.resize (remaining);
     int got = 0;

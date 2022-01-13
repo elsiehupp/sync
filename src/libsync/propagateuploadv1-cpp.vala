@@ -78,15 +78,15 @@ void PropagateUploadFileV1.startNextChunk () {
         // is sent last.
         return;
     }
-    qint64 fileSize = _fileToUpload._size;
+    int64 fileSize = _fileToUpload._size;
     auto headers = PropagateUploadFileCommon.headers ();
     headers[QByteArrayLiteral ("OC-Total-Length")] = QByteArray.number (fileSize);
     headers[QByteArrayLiteral ("OC-Chunk-Size")] = QByteArray.number (chunkSize ());
 
     QString path = _fileToUpload._file;
 
-    qint64 chunkStart = 0;
-    qint64 currentChunkSize = fileSize;
+    int64 chunkStart = 0;
+    int64 currentChunkSize = fileSize;
     bool isFinalChunk = false;
     if (_chunkCount > 1) {
         int sendingChunk = (_currentChunk + _startChunk) % _chunkCount;
@@ -317,7 +317,7 @@ void PropagateUploadFileV1.slotPutFinished () {
     finalize ();
 }
 
-void PropagateUploadFileV1.slotUploadProgress (qint64 sent, qint64 total) {
+void PropagateUploadFileV1.slotUploadProgress (int64 sent, int64 total) {
     // Completion is signaled with sent=0, total=0; avoid accidentally
     // resetting progress due to the sent being zero by ignoring it.
     // finishedSignal () is bound to be emitted soon anyway.
@@ -334,7 +334,7 @@ void PropagateUploadFileV1.slotUploadProgress (qint64 sent, qint64 total) {
     // not including this one.
     // FIXME: this assumes all chunks have the same size, which is true only if the last chunk
     // has not been finished (which should not happen because the last chunk is sent sequentially)
-    qint64 amount = progressChunk * chunkSize ();
+    int64 amount = progressChunk * chunkSize ();
 
     sender ().setProperty ("byteWritten", sent);
     if (_jobs.count () > 1) {

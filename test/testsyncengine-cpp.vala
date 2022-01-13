@@ -388,7 +388,7 @@ private slots:
         QString a1path = fakeFolder.localPath () + "A/a1";
         SyncJournalFileRecord a1record;
         fakeFolder.syncJournal ().getFileRecord (QByteArray ("A/a1"), &a1record);
-        QCOMPARE (a1record._modtime, (qint64)FileSystem.getModTime (a1path));
+        QCOMPARE (a1record._modtime, (int64)FileSystem.getModTime (a1path));
 
         // Extra sync reads from db, no difference
         QVERIFY (fakeFolder.syncOnce ());
@@ -445,28 +445,28 @@ private slots:
             QVERIFY (a1);
             QCOMPARE (a1._instruction, CSYNC_INSTRUCTION_SYNC);
             QCOMPARE (a1._direction, SyncFileItem.Up);
-            QCOMPARE (a1._size, qint64 (5));
+            QCOMPARE (a1._size, int64 (5));
 
             QCOMPARE (Utility.qDateTimeFromTime_t (a1._modtime), changedMtime);
-            QCOMPARE (a1._previousSize, qint64 (4));
+            QCOMPARE (a1._previousSize, int64 (4));
             QCOMPARE (Utility.qDateTimeFromTime_t (a1._previousModtime), initialMtime);
 
             // b2: should have remote size and modtime
             QVERIFY (b1);
             QCOMPARE (b1._instruction, CSYNC_INSTRUCTION_SYNC);
             QCOMPARE (b1._direction, SyncFileItem.Down);
-            QCOMPARE (b1._size, qint64 (17));
+            QCOMPARE (b1._size, int64 (17));
             QCOMPARE (Utility.qDateTimeFromTime_t (b1._modtime), changedMtime);
-            QCOMPARE (b1._previousSize, qint64 (16));
+            QCOMPARE (b1._previousSize, int64 (16));
             QCOMPARE (Utility.qDateTimeFromTime_t (b1._previousModtime), initialMtime);
 
             // c1: conflicts are downloads, so remote size and modtime
             QVERIFY (c1);
             QCOMPARE (c1._instruction, CSYNC_INSTRUCTION_CONFLICT);
             QCOMPARE (c1._direction, SyncFileItem.None);
-            QCOMPARE (c1._size, qint64 (25));
+            QCOMPARE (c1._size, int64 (25));
             QCOMPARE (Utility.qDateTimeFromTime_t (c1._modtime), changedMtime2);
-            QCOMPARE (c1._previousSize, qint64 (26));
+            QCOMPARE (c1._previousSize, int64 (26));
             QCOMPARE (Utility.qDateTimeFromTime_t (c1._previousModtime), changedMtime);
         });
 

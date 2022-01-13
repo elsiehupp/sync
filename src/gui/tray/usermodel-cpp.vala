@@ -13,8 +13,8 @@
 #define NOTIFICATION_REQUEST_FREE_PERIOD 15000
 
 namespace {
-constexpr qint64 expiredActivitiesCheckIntervalMsecs = 1000 * 60;
-constexpr qint64 activityDefaultExpirationTimeMsecs = 1000 * 60 * 10;
+constexpr int64 expiredActivitiesCheckIntervalMsecs = 1000 * 60;
+constexpr int64 activityDefaultExpirationTimeMsecs = 1000 * 60 * 10;
 }
 
 namespace OCC {
@@ -66,7 +66,7 @@ void User.showDesktopNotification (QString &title, QString &message) {
     }
 
     // after one hour, clear the gui log notification store
-    constexpr qint64 clearGuiLogInterval = 60 * 60 * 1000;
+    constexpr int64 clearGuiLogInterval = 60 * 60 * 1000;
     if (_guiLogTimer.elapsed () > clearGuiLogInterval) {
         _notificationCache.clear ();
     }

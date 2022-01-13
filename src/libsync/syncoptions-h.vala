@@ -32,7 +32,7 @@ public:
 
     /** Maximum size (in Bytes) a folder can have without asking for confirmation.
      * -1 means infinite */
-    qint64 _newBigFolderSizeLimit = -1;
+    int64 _newBigFolderSizeLimit = -1;
 
     /** If a confirmation should be asked for external storages */
     bool _confirmExternalStorage = false;
@@ -50,13 +50,13 @@ public:
      * starting value and is then gradually adjusted within the
      * minChunkSize / maxChunkSize bounds.
      */
-    qint64 _initialChunkSize = 10 * 1000 * 1000; // 10MB
+    int64 _initialChunkSize = 10 * 1000 * 1000; // 10MB
 
     /** The minimum chunk size in bytes for chunked uploads */
-    qint64 _minChunkSize = 1 * 1000 * 1000; // 1MB
+    int64 _minChunkSize = 1 * 1000 * 1000; // 1MB
 
     /** The maximum chunk size in bytes for chunked uploads */
-    qint64 _maxChunkSize = 1000 * 1000 * 1000; // 1000MB
+    int64 _maxChunkSize = 1000 * 1000 * 1000; // 1000MB
 
     /** The target duration of chunk uploads for dynamic chunk sizing.
      *

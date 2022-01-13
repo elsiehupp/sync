@@ -165,7 +165,7 @@ void SyncStatusSummary.onFolderSyncStateChanged (Folder *folder) {
 }
 
 constexpr double calculateOverallPercent (
-    qint64 totalFileCount, qint64 completedFile, qint64 totalSize, qint64 completedSize) {
+    int64 totalFileCount, int64 completedFile, int64 totalSize, int64 completedSize) {
     int overallPercent = 0;
     if (totalFileCount > 0) {
         // Add one 'byte' for each file so the percentage is moving when deleting or renaming files
@@ -176,11 +176,11 @@ constexpr double calculateOverallPercent (
 }
 
 void SyncStatusSummary.onFolderProgressInfo (ProgressInfo &progress) {
-    const qint64 completedSize = progress.completedSize ();
-    const qint64 currentFile = progress.currentFile ();
-    const qint64 completedFile = progress.completedFiles ();
-    const qint64 totalSize = qMax (completedSize, progress.totalSize ());
-    const qint64 totalFileCount = qMax (currentFile, progress.totalFiles ());
+    const int64 completedSize = progress.completedSize ();
+    const int64 currentFile = progress.currentFile ();
+    const int64 completedFile = progress.completedFiles ();
+    const int64 totalSize = qMax (completedSize, progress.totalSize ());
+    const int64 totalFileCount = qMax (currentFile, progress.totalFiles ());
 
     setSyncProgress (calculateOverallPercent (totalFileCount, completedFile, totalSize, completedSize));
 

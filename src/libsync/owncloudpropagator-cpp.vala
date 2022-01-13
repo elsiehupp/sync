@@ -35,11 +35,11 @@ Q_LOGGING_CATEGORY (lcDirectory, "nextcloud.sync.propagator.directory", QtInfoMs
 Q_LOGGING_CATEGORY (lcRootDirectory, "nextcloud.sync.propagator.root.directory", QtInfoMsg)
 Q_LOGGING_CATEGORY (lcCleanupPolls, "nextcloud.sync.propagator.cleanuppolls", QtInfoMsg)
 
-qint64 criticalFreeSpaceLimit () {
-    qint64 value = 50 * 1000 * 1000LL;
+int64 criticalFreeSpaceLimit () {
+    int64 value = 50 * 1000 * 1000LL;
 
     static bool hasEnv = false;
-    static qint64 env = qgetenv ("OWNCLOUD_CRITICAL_FREE_SPACE_BYTES").toLongLong (&hasEnv);
+    static int64 env = qgetenv ("OWNCLOUD_CRITICAL_FREE_SPACE_BYTES").toLongLong (&hasEnv);
     if (hasEnv) {
         value = env;
     }
@@ -47,11 +47,11 @@ qint64 criticalFreeSpaceLimit () {
     return qBound (0LL, value, freeSpaceLimit ());
 }
 
-qint64 freeSpaceLimit () {
-    qint64 value = 250 * 1000 * 1000LL;
+int64 freeSpaceLimit () {
+    int64 value = 250 * 1000 * 1000LL;
 
     static bool hasEnv = false;
-    static qint64 env = qgetenv ("OWNCLOUD_FREE_SPACE_BYTES").toLongLong (&hasEnv);
+    static int64 env = qgetenv ("OWNCLOUD_FREE_SPACE_BYTES").toLongLong (&hasEnv);
     if (hasEnv) {
         value = env;
     }
@@ -87,12 +87,12 @@ PropagateItemJob.~PropagateItemJob () {
     }
 }
 
-static qint64 getMinBlacklistTime () {
+static int64 getMinBlacklistTime () {
     return qMax (qEnvironmentVariableIntValue ("OWNCLOUD_BLACKLIST_TIME_MIN"),
         25); // 25 seconds
 }
 
-static qint64 getMaxBlacklistTime () {
+static int64 getMaxBlacklistTime () {
     int v = qEnvironmentVariableIntValue ("OWNCLOUD_BLACKLIST_TIME_MAX");
     if (v > 0)
         return v;
@@ -115,15 +115,15 @@ static SyncJournalErrorBlacklistRecord createBlacklistEntry (
     entry._retryCount = old._retryCount + 1;
     entry._requestId = item._requestId;
 
-    static qint64 minBlacklistTime (getMinBlacklistTime ());
-    static qint64 maxBlacklistTime (qMax (getMaxBlacklistTime (), minBlacklistTime));
+    static int64 minBlacklistTime (getMinBlacklistTime ());
+    static int64 maxBlacklistTime (qMax (getMaxBlacklistTime (), minBlacklistTime));
 
     // The factor of 5 feels natural: 25s, 2 min, 10 min, ~1h, ~5h, ~24h
     entry._ignoreDuration = old._ignoreDuration * 5;
 
     if (item._httpErrorCode == 403) {
         qCWarning (lcPropagator) << "Probably firewall error: " << item._httpErrorCode << ", blacklisting up to 1h only";
-        entry._ignoreDuration = qMin (entry._ignoreDuration, qint64 (60 * 60));
+        entry._ignoreDuration = qMin (entry._ignoreDuration, int64 (60 * 60));
 
     } else if (item._httpErrorCode == 413 || item._httpErrorCode == 415) {
         qCWarning (lcPropagator) << "Fatal Error condition" << item._httpErrorCode << ", maximum blacklist ignore time!";
@@ -379,8 +379,8 @@ void OwncloudPropagator.resetDelayedUploadTasks () {
     _delayedTasks.clear ();
 }
 
-qint64 OwncloudPropagator.smallFileSize () {
-    const qint64 smallFileSize = 100 * 1024; //default to 1 MB. Not dynamic right now.
+int64 OwncloudPropagator.smallFileSize () {
+    const int64 smallFileSize = 100 * 1024; //default to 1 MB. Not dynamic right now.
     return smallFileSize;
 }
 
@@ -691,7 +691,7 @@ void OwncloudPropagator.scheduleNextJobImpl () {
     }
 }
 
-void OwncloudPropagator.reportProgress (SyncFileItem &item, qint64 bytes) {
+void OwncloudPropagator.reportProgress (SyncFileItem &item, int64 bytes) {
     emit progress (item, bytes);
 }
 
@@ -700,7 +700,7 @@ AccountPtr OwncloudPropagator.account () {
 }
 
 OwncloudPropagator.DiskSpaceResult OwncloudPropagator.diskSpaceCheck () {
-    const qint64 freeBytes = Utility.freeDiskSpace (_localDir);
+    const int64 freeBytes = Utility.freeDiskSpace (_localDir);
     if (freeBytes < 0) {
         return DiskSpaceOk;
     }
@@ -971,8 +971,8 @@ void PropagatorCompositeJob.finalize () {
     emit finished (_hasError == SyncFileItem.NoStatus ? SyncFileItem.Success : _hasError);
 }
 
-qint64 PropagatorCompositeJob.committedDiskSpace () {
-    qint64 needed = 0;
+int64 PropagatorCompositeJob.committedDiskSpace () {
+    int64 needed = 0;
     foreach (PropagatorJob *job, _runningJobs) {
         needed += job.committedDiskSpace ();
     }
@@ -1127,7 +1127,7 @@ void PropagateRootDirectory.abort (PropagatorJob.AbortType abortType) {
     _dirDeletionJobs.abort (abortType);
 }
 
-qint64 PropagateRootDirectory.committedDiskSpace () {
+int64 PropagateRootDirectory.committedDiskSpace () {
     return _subJobs.committedDiskSpace () + _dirDeletionJobs.committedDiskSpace ();
 }
 

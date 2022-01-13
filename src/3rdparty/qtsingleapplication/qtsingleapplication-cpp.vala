@@ -76,7 +76,7 @@ QtSingleApplication.QtSingleApplication (QString &appId, int &argc, char **argv)
 
     lockfile.open (QtLockedFile.ReadWrite);
     lockfile.lock (QtLockedFile.WriteLock);
-    auto *pids = static_cast<qint64 *> (instances.data ());
+    auto *pids = static_cast<int64 *> (instances.data ());
     if (!created) {
         // Find the first instance that it still running
         // The whole list needs to be iterated in order to append to it
@@ -98,13 +98,13 @@ QtSingleApplication.QtSingleApplication (QString &appId, int &argc, char **argv)
 QtSingleApplication.~QtSingleApplication () {
     if (!instances)
         return;
-    const qint64 appPid = QCoreApplication.applicationPid ();
+    const int64 appPid = QCoreApplication.applicationPid ();
     QtLockedFile lockfile (instancesLockFilename (QtLocalPeer.appSessionId (appId)));
     lockfile.open (QtLockedFile.ReadWrite);
     lockfile.lock (QtLockedFile.WriteLock);
     // Rewrite array, removing current pid and previously crashed ones
-    auto *pids = static_cast<qint64 *> (instances.data ());
-    qint64 *newpids = pids;
+    auto *pids = static_cast<int64 *> (instances.data ());
+    int64 *newpids = pids;
     for (; *pids; ++pids) {
         if (*pids != appPid && isRunning (*pids))
             *newpids++ = *pids;
@@ -122,7 +122,7 @@ bool QtSingleApplication.event (QEvent *event) {
     return QApplication.event (event);
 }
 
-bool QtSingleApplication.isRunning (qint64 pid) {
+bool QtSingleApplication.isRunning (int64 pid) {
     if (pid == -1) {
         pid = firstPeer;
         if (pid == -1)
@@ -133,7 +133,7 @@ bool QtSingleApplication.isRunning (qint64 pid) {
     return peer.isClient ();
 }
 
-bool QtSingleApplication.sendMessage (QString &message, int timeout, qint64 pid) {
+bool QtSingleApplication.sendMessage (QString &message, int timeout, int64 pid) {
     if (pid == -1) {
         pid = firstPeer;
         if (pid == -1)

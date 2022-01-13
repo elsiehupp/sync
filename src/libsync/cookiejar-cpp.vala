@@ -29,7 +29,7 @@ namespace {
 
 QDataStream &operator<< (QDataStream &stream, QList<QNetworkCookie> &list) {
     stream << JAR_VERSION;
-    stream << quint32 (list.size ());
+    stream << uint32 (list.size ());
     for (auto &cookie : list)
         stream << cookie.toRawForm ();
     return stream;
@@ -38,15 +38,15 @@ QDataStream &operator<< (QDataStream &stream, QList<QNetworkCookie> &list) {
 QDataStream &operator>> (QDataStream &stream, QList<QNetworkCookie> &list) {
     list.clear ();
 
-    quint32 version = 0;
+    uint32 version = 0;
     stream >> version;
 
     if (version != JAR_VERSION)
         return stream;
 
-    quint32 count = 0;
+    uint32 count = 0;
     stream >> count;
-    for (quint32 i = 0; i < count; ++i) {
+    for (uint32 i = 0; i < count; ++i) {
         QByteArray value;
         stream >> value;
         QList<QNetworkCookie> newCookies = QNetworkCookie.parseCookies (value);

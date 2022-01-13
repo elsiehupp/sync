@@ -68,7 +68,7 @@ public:
     /* Content of the X-Request-ID header. (Only set after the request is sent) */
     QByteArray requestId ();
 
-    qint64 timeoutMsec () { return _timer.interval (); }
+    int64 timeoutMsec () { return _timer.interval (); }
     bool timedOut () { return _timedout; }
 
     /** Returns an error message, if any. */
@@ -94,7 +94,7 @@ public:
     static int httpTimeout;
 
 public slots:
-    void setTimeout (qint64 msec);
+    void setTimeout (int64 msec);
     void resetTimeout ();
 signals:
     /** Emitted on network error.

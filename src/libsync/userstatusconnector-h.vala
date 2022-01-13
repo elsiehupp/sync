@@ -36,7 +36,7 @@ enum class OWNCLOUDSYNC_EXPORT ClearAtType {
 struct OWNCLOUDSYNC_EXPORT ClearAt {
     ClearAtType _type = ClearAtType.Period;
 
-    quint64 _timestamp;
+    uint64 _timestamp;
     int _period;
     QString _endof;
 };
@@ -50,7 +50,7 @@ class OWNCLOUDSYNC_EXPORT UserStatus {
     Q_PROPERTY (OnlineStatus state MEMBER _state)
 
 public:
-    enum class OnlineStatus : quint8 {
+    enum class OnlineStatus : uint8 {
         Online,
         DoNotDisturb,
         Away,

@@ -49,12 +49,12 @@ public:
     QString e2eMangledName () { return QString.fromUtf8 (_e2eMangledName); }
 
     QByteArray _path;
-    quint64 _inode = 0;
-    qint64 _modtime = 0;
+    uint64 _inode = 0;
+    int64 _modtime = 0;
     ItemType _type = ItemTypeSkip;
     QByteArray _etag;
     QByteArray _fileId;
-    qint64 _fileSize = 0;
+    int64 _fileSize = 0;
     RemotePermissions _remotePerm;
     bool _serverHasIgnoredFiles = false;
     QByteArray _checksumHeader;
@@ -83,14 +83,14 @@ public:
     /// The error category. Sometimes used for special actions.
     Category _errorCategory = Category.Normal;
 
-    qint64 _lastTryModtime = 0;
+    int64 _lastTryModtime = 0;
     QByteArray _lastTryEtag;
 
     /// The last time the operation was attempted (in s since epoch).
-    qint64 _lastTryTime = 0;
+    int64 _lastTryTime = 0;
 
     /// The number of seconds the file shall be ignored.
-    qint64 _ignoreDuration = 0;
+    int64 _ignoreDuration = 0;
 
     QString _file;
     QString _renameTarget;
@@ -123,7 +123,7 @@ public:
      *
      * may not be available and be -1
      */
-    qint64 baseModtime = -1;
+    int64 baseModtime = -1;
 
     /** Etag of the base file
      *

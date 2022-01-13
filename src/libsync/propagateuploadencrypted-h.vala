@@ -52,7 +52,7 @@ private slots:
 
 signals:
     // Emmited after the file is encrypted and everythign is setup.
-    void finalized (QString& path, QString& filename, quint64 size);
+    void finalized (QString& path, QString& filename, uint64 size);
     void error ();
     void folderUnlocked (QByteArray &folderId, int httpStatus);
 

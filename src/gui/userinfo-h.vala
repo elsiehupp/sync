@@ -65,8 +65,8 @@ class UserInfo : public QObject {
 public:
     explicit UserInfo (OCC.AccountState *accountState, bool allowDisconnectedAccountState, bool fetchAvatarImage, QObject *parent = nullptr);
 
-    qint64 lastQuotaTotalBytes () { return _lastQuotaTotalBytes; }
-    qint64 lastQuotaUsedBytes () { return _lastQuotaUsedBytes; }
+    int64 lastQuotaTotalBytes () { return _lastQuotaTotalBytes; }
+    int64 lastQuotaUsedBytes () { return _lastQuotaUsedBytes; }
 
     /**
      * When the quotainfo is active, it requests the quota at regular interval.
@@ -85,7 +85,7 @@ private Q_SLOTS:
     void slotAvatarImage (QImage &img);
 
 Q_SIGNALS:
-    void quotaUpdated (qint64 total, qint64 used);
+    void quotaUpdated (int64 total, int64 used);
     void fetchedLastInfo (UserInfo *userInfo);
 
 private:
@@ -95,8 +95,8 @@ private:
     bool _allowDisconnectedAccountState;
     bool _fetchAvatarImage;
 
-    qint64 _lastQuotaTotalBytes;
-    qint64 _lastQuotaUsedBytes;
+    int64 _lastQuotaTotalBytes;
+    int64 _lastQuotaUsedBytes;
     QTimer _jobRestartTimer;
     QDateTime _lastInfoReceived; // the time at which the user info and quota was received last
     bool _active; // if we should check at regular interval (when the UI is visible)

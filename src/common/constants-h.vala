@@ -18,6 +18,6 @@
 
 namespace OCC {
 namespace Constants {
-    constexpr qint32 e2EeTagSize = 16;
+    constexpr int32 e2EeTagSize = 16;
 }
 }

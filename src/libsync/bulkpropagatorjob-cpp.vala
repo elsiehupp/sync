@@ -202,7 +202,7 @@ void BulkPropagatorJob.triggerUpload () {
 
     for (auto &singleFile : _filesToUpload) {
         connect (job.get (), &PutMultiFileJob.uploadProgress,
-                this, [this, singleFile] (qint64 sent, qint64 total) {
+                this, [this, singleFile] (int64 sent, int64 total) {
             slotUploadProgress (singleFile._item, sent, total);
         });
     }
@@ -322,9 +322,9 @@ void BulkPropagatorJob.slotPutFinishedOneFile (BulkUploadItem &singleFile,
     qCInfo (lcBulkPropagatorJob ()) << singleFile._item._file << "file headers" << fileReply;
 
     if (fileReply.contains ("error") && !fileReply[QStringLiteral ("error")].toBool ()) {
-        singleFile._item._httpErrorCode = static_cast<quint16> (200);
+        singleFile._item._httpErrorCode = static_cast<uint16> (200);
     } else {
-        singleFile._item._httpErrorCode = static_cast<quint16> (412);
+        singleFile._item._httpErrorCode = static_cast<uint16> (412);
     }
 
     singleFile._item._responseTimeStamp = job.responseTimestamp ();
@@ -394,7 +394,7 @@ void BulkPropagatorJob.slotPutFinished () {
     finalize (fullReplyObject);
 }
 
-void BulkPropagatorJob.slotUploadProgress (SyncFileItemPtr item, qint64 sent, qint64 total) {
+void BulkPropagatorJob.slotUploadProgress (SyncFileItemPtr item, int64 sent, int64 total) {
     // Completion is signaled with sent=0, total=0; avoid accidentally
     // resetting progress due to the sent being zero by ignoring it.
     // finishedSignal () is bound to be emitted soon anyway.
@@ -409,7 +409,7 @@ void BulkPropagatorJob.slotJobDestroyed (QObject *job) {
     _jobs.erase (std.remove (_jobs.begin (), _jobs.end (), job), _jobs.end ());
 }
 
-void BulkPropagatorJob.adjustLastJobTimeout (AbstractNetworkJob *job, qint64 fileSize) {
+void BulkPropagatorJob.adjustLastJobTimeout (AbstractNetworkJob *job, int64 fileSize) {
     constexpr double threeMinutes = 3.0 * 60 * 1000;
 
     job.setTimeout (qBound (
@@ -417,7 +417,7 @@ void BulkPropagatorJob.adjustLastJobTimeout (AbstractNetworkJob *job, qint64 fil
         // Calculate 3 minutes for each gigabyte of data
         qRound64 (threeMinutes * static_cast<double> (fileSize) / 1e9),
         // Maximum of 30 minutes
-                        static_cast<qint64> (30 * 60 * 1000)));
+                        static_cast<int64> (30 * 60 * 1000)));
 }
 
 void BulkPropagatorJob.finalizeOneFile (BulkUploadItem &oneFile) {
@@ -497,7 +497,7 @@ void BulkPropagatorJob.done (SyncFileItemPtr item,
 QMap<QByteArray, QByteArray> BulkPropagatorJob.headers (SyncFileItemPtr item) {
     QMap<QByteArray, QByteArray> headers;
     headers[QByteArrayLiteral ("Content-Type")] = QByteArrayLiteral ("application/octet-stream");
-    headers[QByteArrayLiteral ("X-File-Mtime")] = QByteArray.number (qint64 (item._modtime));
+    headers[QByteArrayLiteral ("X-File-Mtime")] = QByteArray.number (int64 (item._modtime));
     if (qEnvironmentVariableIntValue ("OWNCLOUD_LAZYOPS")) {
         headers[QByteArrayLiteral ("OC-LazyOps")] = QByteArrayLiteral ("true");
     }

@@ -49,7 +49,7 @@ bool FileSystem.fileEquals (QString &fn1, QString &fn2) {
 
 time_t FileSystem.getModTime (QString &filename) {
     csync_file_stat_t stat;
-    qint64 result = -1;
+    int64 result = -1;
     if (csync_vio_local_stat (filename, &stat) != -1
         && (stat.modtime != 0)) {
         result = stat.modtime;
@@ -75,16 +75,16 @@ bool FileSystem.setModTime (QString &filename, time_t modTime) {
 }
 
 bool FileSystem.fileChanged (QString &fileName,
-    qint64 previousSize,
+    int64 previousSize,
     time_t previousMtime) {
     return getSize (fileName) != previousSize
         || getModTime (fileName) != previousMtime;
 }
 
 bool FileSystem.verifyFileUnchanged (QString &fileName,
-    qint64 previousSize,
+    int64 previousSize,
     time_t previousMtime) {
-    const qint64 actualSize = getSize (fileName);
+    const int64 actualSize = getSize (fileName);
     const time_t actualMtime = getModTime (fileName);
     if ( (actualSize != previousSize && actualMtime > 0) || (actualMtime != previousMtime && previousMtime > 0 && actualMtime > 0)) {
         qCInfo (lcFileSystem) << "File" << fileName << "has changed:"
@@ -96,8 +96,8 @@ bool FileSystem.verifyFileUnchanged (QString &fileName,
 }
 
 #ifdef Q_OS_WIN
-static qint64 getSizeWithCsync (QString &filename) {
-    qint64 result = 0;
+static int64 getSizeWithCsync (QString &filename) {
+    int64 result = 0;
     csync_file_stat_t stat;
     if (csync_vio_local_stat (filename, &stat) != -1) {
         result = stat.size;
@@ -108,7 +108,7 @@ static qint64 getSizeWithCsync (QString &filename) {
 }
 #endif
 
-qint64 FileSystem.getSize (QString &filename) {
+int64 FileSystem.getSize (QString &filename) {
 #ifdef Q_OS_WIN
     if (isLnkFile (filename)) {
         // Qt handles .lnk as symlink... https://doc.qt.io/qt-5/qfileinfo.html#details
@@ -165,7 +165,7 @@ bool FileSystem.removeRecursively (QString &path, std.function<void (QString &pa
     return allRemoved;
 }
 
-bool FileSystem.getInode (QString &filename, quint64 *inode) {
+bool FileSystem.getInode (QString &filename, uint64 *inode) {
     csync_file_stat_t fs;
     if (csync_vio_local_stat (filename, &fs) == 0) {
         *inode = fs.inode;

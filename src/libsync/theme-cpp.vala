@@ -404,7 +404,7 @@ QString Theme.updateCheckUrl () {
     return APPLICATION_UPDATE_URL;
 }
 
-qint64 Theme.newBigFolderSizeLimit () {
+int64 Theme.newBigFolderSizeLimit () {
     // Default to 500MB
     return 500;
 }

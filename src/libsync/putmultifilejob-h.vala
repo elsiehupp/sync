@@ -70,7 +70,7 @@ public:
 
 signals:
     void finishedSignal ();
-    void uploadProgress (qint64, qint64);
+    void uploadProgress (int64, int64);
 
 private:
     QHttpMultiPart _body;

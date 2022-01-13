@@ -46,7 +46,7 @@ public:
 private slots:
     void slotMkdir ();
     void slotStartMkcolJob ();
-    void slotStartEncryptedMkcolJob (QString &path, QString &filename, quint64 size);
+    void slotStartEncryptedMkcolJob (QString &path, QString &filename, uint64 size);
     void slotMkcolJobFinished ();
     void slotEncryptFolderFinished ();
     void success ();

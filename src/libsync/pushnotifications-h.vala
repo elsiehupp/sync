@@ -100,7 +100,7 @@ private slots:
     void onWebSocketTextMessageReceived (QString &message);
     void onWebSocketError (QAbstractSocket.SocketError error);
     void onWebSocketSslErrors (QList<QSslError> &errors);
-    void onWebSocketPongReceived (quint64 elapsedTime, QByteArray &payload);
+    void onWebSocketPongReceived (uint64 elapsedTime, QByteArray &payload);
     void onPingTimedOut ();
 
 private:

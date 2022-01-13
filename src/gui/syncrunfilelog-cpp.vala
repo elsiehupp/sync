@@ -25,7 +25,7 @@ QString SyncRunFileLog.dateTimeStr (QDateTime &dt) {
 }
 
 void SyncRunFileLog.start (QString &folderPath) {
-    const qint64 logfileMaxSize = 10 * 1024 * 1024; // 10MiB
+    const int64 logfileMaxSize = 10 * 1024 * 1024; // 10MiB
 
     const QString logpath = QStandardPaths.writableLocation (QStandardPaths.AppDataLocation);
     if (!QDir (logpath).exists ()) {

@@ -494,7 +494,7 @@ void ProcessDirectoryJob.processFileAnalyzeRemoteInfo (
         const bool isDbEntryAnE2EePlaceholder = dbEntry.isVirtualFile () && !dbEntry.e2eMangledName ().isEmpty ();
         Q_ASSERT (!isDbEntryAnE2EePlaceholder || serverEntry.size >= Constants.e2EeTagSize);
         const bool isVirtualE2EePlaceholder = isDbEntryAnE2EePlaceholder && serverEntry.size >= Constants.e2EeTagSize;
-        const qint64 sizeOnServer = isVirtualE2EePlaceholder ? serverEntry.size - Constants.e2EeTagSize : serverEntry.size;
+        const int64 sizeOnServer = isVirtualE2EePlaceholder ? serverEntry.size - Constants.e2EeTagSize : serverEntry.size;
         const bool metaDataSizeNeedsUpdateForE2EeFilePlaceholder = isVirtualE2EePlaceholder && dbEntry._fileSize == serverEntry.size;
 
         if (serverEntry.isDirectory != dbEntry.isDirectory ()) {
@@ -552,7 +552,7 @@ void ProcessDirectoryJob.processFileAnalyzeRemoteInfo (
             const QueryMode serverQueryMode = [this, &dbEntry, &serverEntry] () {
                 const bool isVfsModeOn = _discoveryData && _discoveryData._syncOptions._vfs && _discoveryData._syncOptions._vfs.mode () != Vfs.Off;
                 if (isVfsModeOn && dbEntry.isDirectory () && dbEntry._isE2eEncrypted) {
-                    qint64 localFolderSize = 0;
+                    int64 localFolderSize = 0;
                     const auto listFilesCallback = [&localFolderSize] (OCC.SyncJournalFileRecord &record) {
                         if (record.isFile ()) {
                             // add Constants.e2EeTagSize so we will know the size of E2EE file on the server

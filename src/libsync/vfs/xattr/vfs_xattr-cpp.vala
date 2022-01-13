@@ -51,7 +51,7 @@ bool VfsXAttr.isHydrating () {
     return false;
 }
 
-Result<void, QString> VfsXAttr.updateMetadata (QString &filePath, time_t modtime, qint64, QByteArray &) {
+Result<void, QString> VfsXAttr.updateMetadata (QString &filePath, time_t modtime, int64, QByteArray &) {
     if (modtime <= 0) {
         return {tr ("Error updating metadata due to invalid modified time")};
     }

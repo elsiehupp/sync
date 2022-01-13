@@ -52,7 +52,7 @@ namespace Utility {
     OCSYNC_EXPORT void setupFavLink (QString &folder);
     OCSYNC_EXPORT void removeFavLink (QString &folder);
     OCSYNC_EXPORT bool writeRandomFile (QString &fname, int size = -1);
-    OCSYNC_EXPORT QString octetsToString (qint64 octets);
+    OCSYNC_EXPORT QString octetsToString (int64 octets);
     OCSYNC_EXPORT QByteArray userAgentString ();
     OCSYNC_EXPORT QByteArray friendlyUserAgentString ();
     /**
@@ -78,7 +78,7 @@ namespace Utility {
      *
      * \a path must point to a directory
      */
-    OCSYNC_EXPORT qint64 freeDiskSpace (QString &path);
+    OCSYNC_EXPORT int64 freeDiskSpace (QString &path);
 
     /**
      * @brief compactFormatDouble - formats a double value human readable.
@@ -94,12 +94,12 @@ namespace Utility {
     OCSYNC_EXPORT QString escape (QString &);
 
     // conversion function QDateTime <. time_t   (because the ones builtin work on only unsigned 32bit)
-    OCSYNC_EXPORT QDateTime qDateTimeFromTime_t (qint64 t);
-    OCSYNC_EXPORT qint64 qDateTimeToTime_t (QDateTime &t);
+    OCSYNC_EXPORT QDateTime qDateTimeFromTime_t (int64 t);
+    OCSYNC_EXPORT int64 qDateTimeToTime_t (QDateTime &t);
 
     /**
      * @brief Convert milliseconds duration to human readable string.
-     * @param quint64 msecs the milliseconds to convert to string.
+     * @param uint64 msecs the milliseconds to convert to string.
      * @return an HMS representation of the milliseconds value.
      *
      * durationToDescriptiveString1 describes the duration in a single
@@ -108,8 +108,8 @@ namespace Utility {
      * durationToDescriptiveString2 uses two units where possible, so
      * "5 minutes 43 seconds" or "1 month 3 days".
      */
-    OCSYNC_EXPORT QString durationToDescriptiveString1 (quint64 msecs);
-    OCSYNC_EXPORT QString durationToDescriptiveString2 (quint64 msecs);
+    OCSYNC_EXPORT QString durationToDescriptiveString1 (uint64 msecs);
+    OCSYNC_EXPORT QString durationToDescriptiveString2 (uint64 msecs);
 
     /**
      * @brief hasDarkSystray - determines whether the systray is dark or light.
@@ -168,20 +168,20 @@ namespace Utility {
 
     class OCSYNC_EXPORT StopWatch {
     private:
-        QMap<QString, quint64> _lapTimes;
+        QMap<QString, uint64> _lapTimes;
         QDateTime _startTime;
         QElapsedTimer _timer;
 
     public:
         void start ();
-        quint64 stop ();
-        quint64 addLapTime (QString &lapName);
+        uint64 stop ();
+        uint64 addLapTime (QString &lapName);
         void reset ();
 
         // out helpers, return the measured times.
         QDateTime startTime () const;
         QDateTime timeOfLap (QString &lapName) const;
-        quint64 durationOfLap (QString &lapName) const;
+        uint64 durationOfLap (QString &lapName) const;
     };
 
     /**

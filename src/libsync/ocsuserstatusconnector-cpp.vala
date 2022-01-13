@@ -86,7 +86,7 @@ OCC.UserStatus jsonToUserStatus (QJsonDocument &json) { { QJsonObject d { "icon"
     return jsonExtractUserStatus (retrievedData);
 }
 
-quint64 clearAtEndOfToTimestamp (OCC.ClearAt &clearAt) {
+uint64 clearAtEndOfToTimestamp (OCC.ClearAt &clearAt) {
     Q_ASSERT (clearAt._type == OCC.ClearAtType.EndOf);
 
     if (clearAt._endof == "day") {
@@ -99,11 +99,11 @@ quint64 clearAtEndOfToTimestamp (OCC.ClearAt &clearAt) {
     return QDateTime.currentDateTime ().toTime_t ();
 }
 
-quint64 clearAtPeriodToTimestamp (OCC.ClearAt &clearAt) {
+uint64 clearAtPeriodToTimestamp (OCC.ClearAt &clearAt) {
     return QDateTime.currentDateTime ().addSecs (clearAt._period).toTime_t ();
 }
 
-quint64 clearAtToTimestamp (OCC.ClearAt &clearAt) {
+uint64 clearAtToTimestamp (OCC.ClearAt &clearAt) {
     switch (clearAt._type) {
     case OCC.ClearAtType.Period: {
         return clearAtPeriodToTimestamp (clearAt);
@@ -121,7 +121,7 @@ quint64 clearAtToTimestamp (OCC.ClearAt &clearAt) {
     return 0;
 }
 
-quint64 clearAtToTimestamp (OCC.Optional<OCC.ClearAt> &clearAt) {
+uint64 clearAtToTimestamp (OCC.Optional<OCC.ClearAt> &clearAt) {
     if (clearAt) {
         return clearAtToTimestamp (*clearAt);
     }

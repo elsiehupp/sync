@@ -22,7 +22,7 @@
 
 class FakeWebSocketServer : public QObject {
 public:
-    explicit FakeWebSocketServer (quint16 port = 12345, QObject *parent = nullptr);
+    explicit FakeWebSocketServer (uint16 port = 12345, QObject *parent = nullptr);
 
     ~FakeWebSocketServer () override;
 

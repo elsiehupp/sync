@@ -348,7 +348,7 @@ public:
      * Size in MB of the maximum size of folder before we ask the confirmation.
      * Set -1 to never ask confirmation.  0 to ask confirmation for every folder.
      **/
-    virtual qint64 newBigFolderSizeLimit () const;
+    virtual int64 newBigFolderSizeLimit () const;
 
     /**
      * Hide the checkbox that says "Ask for confirmation before synchronizing folders larger than X MB"

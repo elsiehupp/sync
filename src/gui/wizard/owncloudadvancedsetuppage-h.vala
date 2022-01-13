@@ -64,8 +64,8 @@ private:
     void startSpinner ();
     void stopSpinner ();
     QUrl serverUrl () const;
-    qint64 availableLocalSpace () const;
-    QString checkLocalSpace (qint64 remoteSize) const;
+    int64 availableLocalSpace () const;
+    QString checkLocalSpace (int64 remoteSize) const;
     void customizeStyle ();
     void setServerAddressLabelUrl (QUrl &url);
     void setLocalFolderPushButtonPath (QString &path);
@@ -86,8 +86,8 @@ private:
     QProgressIndicator *_progressIndi;
     QString _remoteFolder;
     QStringList _selectiveSyncBlacklist;
-    qint64 _rSize = -1;
-    qint64 _rSelectedSize = -1;
+    int64 _rSize = -1;
+    int64 _rSelectedSize = -1;
     OwncloudWizard *_ocWizard;
 };
 

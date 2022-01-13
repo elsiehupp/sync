@@ -119,7 +119,7 @@ namespace FileSystem {
      * Warning: The resulting file may have an empty fileName and be unsuitable for use
      * with QFileInfo! Calling seek () on the QFile with >32bit signed values will fail!
      */
-    bool OCSYNC_EXPORT openAndSeekFileSharedRead (QFile *file, QString *error, qint64 seek);
+    bool OCSYNC_EXPORT openAndSeekFileSharedRead (QFile *file, QString *error, int64 seek);
 
 #ifdef Q_OS_WIN
     /**

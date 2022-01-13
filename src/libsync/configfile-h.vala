@@ -130,8 +130,8 @@ public:
     void setUploadLimit (int kbytes);
     void setDownloadLimit (int kbytes);
     /** [checked, size in MB] **/
-    QPair<bool, qint64> newBigFolderSizeLimit () const;
-    void setNewBigFolderSizeLimit (bool isChecked, qint64 mbytes);
+    QPair<bool, int64> newBigFolderSizeLimit () const;
+    void setNewBigFolderSizeLimit (bool isChecked, int64 mbytes);
     bool useNewBigFolderSizeLimit () const;
     bool confirmExternalStorage () const;
     void setConfirmExternalStorage (bool);
@@ -151,9 +151,9 @@ public:
     void setShowInExplorerNavigationPane (bool show);
 
     int timeout () const;
-    qint64 chunkSize () const;
-    qint64 maxChunkSize () const;
-    qint64 minChunkSize () const;
+    int64 chunkSize () const;
+    int64 maxChunkSize () const;
+    int64 minChunkSize () const;
     std.chrono.milliseconds targetChunkUploadDuration () const;
 
     void saveGeometry (QWidget *w);

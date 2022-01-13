@@ -29,14 +29,14 @@ Q_DECLARE_LOGGING_CATEGORY (lcPropagator)
 
 /** Free disk space threshold below which syncs will abort and not even start.
  */
-qint64 criticalFreeSpaceLimit ();
+int64 criticalFreeSpaceLimit ();
 
 /** The client will not intentionally reduce the available free disk space below
  *  this limit.
  *
  * Uploads will still run and downloads that are small enough will continue too.
  */
-qint64 freeSpaceLimit ();
+int64 freeSpaceLimit ();
 
 void blacklistUpdate (SyncJournalDb *journal, SyncFileItem &item);
 
@@ -98,7 +98,7 @@ public:
      * Note that this does *not* include the disk space that's already
      * in use by running jobs for things like a download-in-progress.
      */
-    virtual qint64 committedDiskSpace () { return 0; }
+    virtual int64 committedDiskSpace () { return 0; }
 
     /** Set the associated composite job
      *
@@ -216,7 +216,7 @@ public:
     SyncFileItemVector _tasksToDo;
     QVector<PropagatorJob *> _runningJobs;
     SyncFileItem.Status _hasError; // NoStatus,  or NormalError / SoftError if there was an error
-    quint64 _abortsCount;
+    uint64 _abortsCount;
 
     explicit PropagatorCompositeJob (OwncloudPropagator *propagator)
         : PropagatorJob (propagator)
@@ -256,7 +256,7 @@ public:
         }
     }
 
-    qint64 committedDiskSpace () const override;
+    int64 committedDiskSpace () const override;
 
 private slots:
     void slotSubJobAbortFinished ();
@@ -311,7 +311,7 @@ public:
         _firstJob._item._affectedItems++;
     }
 
-    qint64 committedDiskSpace () const override {
+    int64 committedDiskSpace () const override {
         return _subJobs.committedDiskSpace ();
     }
 
@@ -339,7 +339,7 @@ public:
     JobParallelism parallelism () override;
     void abort (PropagatorJob.AbortType abortType) override;
 
-    qint64 committedDiskSpace () const override;
+    int64 committedDiskSpace () const override;
 
 private slots:
     void slotSubJobsFinished (SyncFileItem.Status status) override;
@@ -443,7 +443,7 @@ public:
      *
      * This allows skipping of uploads that have a very high likelihood of failure.
      */
-    QHash<QString, qint64> _folderQuota;
+    QHash<QString, int64> _folderQuota;
 
     /* the maximum number of jobs using bandwidth (uploads or downloads, in parallel) */
     int maximumActiveTransferJob ();
@@ -454,8 +454,8 @@ public:
      * if Capabilities.desiredChunkUploadDuration has a target
      * chunk-upload duration set.
      */
-    qint64 _chunkSize;
-    qint64 smallFileSize ();
+    int64 _chunkSize;
+    int64 smallFileSize ();
 
     /* The maximum number of active jobs in parallel  */
     int hardMaximumActiveJob ();
@@ -491,7 +491,7 @@ public:
     PropagateItemJob *createJob (SyncFileItemPtr &item);
 
     void scheduleNextJob ();
-    void reportProgress (SyncFileItem &, qint64 bytes);
+    void reportProgress (SyncFileItem &, int64 bytes);
 
     void abort () {
         if (_abortRequested)
@@ -596,7 +596,7 @@ private slots:
 signals:
     void newItem (SyncFileItemPtr &);
     void itemCompleted (SyncFileItemPtr &);
-    void progress (SyncFileItem &, qint64 bytes);
+    void progress (SyncFileItem &, int64 bytes);
     void finished (bool success);
 
     /** Emitted when propagation has problems with a locked file. */

@@ -266,7 +266,7 @@ void PropagateUploadFileNG.startNextChunk () {
     if (propagator ()._abortRequested)
         return;
 
-    qint64 fileSize = _fileToUpload._size;
+    int64 fileSize = _fileToUpload._size;
     ENFORCE (fileSize >= _sent, "Sent data exceeds file size");
 
     // prevent situation that chunk size is bigger then required one to send
@@ -372,7 +372,7 @@ void PropagateUploadFileNG.slotPutFinished () {
     auto targetDuration = propagator ().syncOptions ()._targetChunkUploadDuration;
     if (targetDuration.count () > 0) {
         auto uploadTime = ++job.msSinceStart (); // add one to avoid div-by-zero
-        qint64 predictedGoodSize = (_currentChunkSize * targetDuration) / uploadTime;
+        int64 predictedGoodSize = (_currentChunkSize * targetDuration) / uploadTime;
 
         // The whole targeting is heuristic. The predictedGoodSize will fluctuate
         // quite a bit because of external factors (like available bandwidth)
@@ -380,7 +380,7 @@ void PropagateUploadFileNG.slotPutFinished () {
         //
         // We use an exponential moving average here as a cheap way of smoothing
         // the chunk sizes a bit.
-        qint64 targetSize = propagator ()._chunkSize / 2 + predictedGoodSize / 2;
+        int64 targetSize = propagator ()._chunkSize / 2 + predictedGoodSize / 2;
 
         // Adjust the dynamic chunk size _chunkSize used for sizing of the item's chunks to be send
         propagator ()._chunkSize = qBound (
@@ -489,7 +489,7 @@ void PropagateUploadFileNG.slotMoveJobFinished () {
     finalize ();
 }
 
-void PropagateUploadFileNG.slotUploadProgress (qint64 sent, qint64 total) {
+void PropagateUploadFileNG.slotUploadProgress (int64 sent, int64 total) {
     // Completion is signaled with sent=0, total=0; avoid accidentally
     // resetting progress due to the sent being zero by ignoring it.
     // finishedSignal () is bound to be emitted soon anyway.

@@ -217,7 +217,7 @@ void PropagateUploadFileCommon.start () {
     _uploadEncryptedHelper.start ();
 }
 
-void PropagateUploadFileCommon.setupEncryptedFile (QString& path, QString& filename, quint64 size) {
+void PropagateUploadFileCommon.setupEncryptedFile (QString& path, QString& filename, uint64 size) {
     qCDebug (lcPropagateUpload) << "Starting to upload encrypted file" << path << filename << size;
     _uploadingEncrypted = true;
     _fileToUpload._path = path;
@@ -246,8 +246,8 @@ void PropagateUploadFileCommon.startUploadFile () {
     }
 
     // Check if we believe that the upload will fail due to remote quota limits
-    const qint64 quotaGuess = propagator ()._folderQuota.value (
-        QFileInfo (_fileToUpload._file).path (), std.numeric_limits<qint64>.max ());
+    const int64 quotaGuess = propagator ()._folderQuota.value (
+        QFileInfo (_fileToUpload._file).path (), std.numeric_limits<int64>.max ());
     if (_fileToUpload._size > quotaGuess) {
         // Necessary for blacklisting logic
         _item._httpErrorCode = 507;
@@ -420,7 +420,7 @@ void PropagateUploadFileCommon.slotOnErrorStartFolderUnlock (SyncFileItem.Status
     }
 }
 
-UploadDevice.UploadDevice (QString &fileName, qint64 start, qint64 size, BandwidthManager *bwm)
+UploadDevice.UploadDevice (QString &fileName, int64 start, int64 size, BandwidthManager *bwm)
     : _file (fileName)
     , _start (start)
     , _size (size)
@@ -459,12 +459,12 @@ void UploadDevice.close () {
     QIODevice.close ();
 }
 
-qint64 UploadDevice.writeData (char *, qint64) {
+int64 UploadDevice.writeData (char *, int64) {
     ASSERT (false, "write to read only device");
     return 0;
 }
 
-qint64 UploadDevice.readData (char *data, qint64 maxlen) {
+int64 UploadDevice.readData (char *data, int64 maxlen) {
     if (_size - _read <= 0) {
         // at end
         if (_bandwidthManager) {
@@ -496,7 +496,7 @@ qint64 UploadDevice.readData (char *data, qint64 maxlen) {
     return c;
 }
 
-void UploadDevice.slotJobUploadProgress (qint64 sent, qint64 t) {
+void UploadDevice.slotJobUploadProgress (int64 sent, int64 t) {
     if (sent == 0 || t == 0) {
         return;
     }
@@ -507,11 +507,11 @@ bool UploadDevice.atEnd () {
     return _read >= _size;
 }
 
-qint64 UploadDevice.size () {
+int64 UploadDevice.size () {
     return _size;
 }
 
-qint64 UploadDevice.bytesAvailable () {
+int64 UploadDevice.bytesAvailable () {
     return _size - _read + QIODevice.bytesAvailable ();
 }
 
@@ -520,7 +520,7 @@ bool UploadDevice.isSequential () {
     return false;
 }
 
-bool UploadDevice.seek (qint64 pos) {
+bool UploadDevice.seek (int64 pos) {
     if (!QIODevice.seek (pos)) {
         return false;
     }
@@ -532,7 +532,7 @@ bool UploadDevice.seek (qint64 pos) {
     return true;
 }
 
-void UploadDevice.giveBandwidthQuota (qint64 bwq) {
+void UploadDevice.giveBandwidthQuota (int64 bwq) {
     if (!atEnd ()) {
         _bandwidthQuota = bwq;
         QMetaObject.invokeMethod (this, "readyRead", Qt.QueuedConnection); // tell QNAM that we have quota
@@ -651,7 +651,7 @@ void PropagateUploadFileCommon.commonErrorHandling (AbstractNetworkJob *job) {
     abortWithError (status, errorString);
 }
 
-void PropagateUploadFileCommon.adjustLastJobTimeout (AbstractNetworkJob *job, qint64 fileSize) {
+void PropagateUploadFileCommon.adjustLastJobTimeout (AbstractNetworkJob *job, int64 fileSize) {
     constexpr double threeMinutes = 3.0 * 60 * 1000;
 
     job.setTimeout (qBound (
@@ -659,7 +659,7 @@ void PropagateUploadFileCommon.adjustLastJobTimeout (AbstractNetworkJob *job, qi
         // Calculate 3 minutes for each gigabyte of data
         qRound64 (threeMinutes * fileSize / 1e9),
         // Maximum of 30 minutes
-        static_cast<qint64> (30 * 60 * 1000)));
+        static_cast<int64> (30 * 60 * 1000)));
 }
 
 void PropagateUploadFileCommon.slotJobDestroyed (QObject *job) {
@@ -681,7 +681,7 @@ QMap<QByteArray, QByteArray> PropagateUploadFileCommon.headers () {
     if (_item._modtime <= 0) {
         qCWarning (lcPropagateUpload ()) << "invalid modified time" << _item._file << _item._modtime;
     }
-    headers[QByteArrayLiteral ("X-OC-Mtime")] = QByteArray.number (qint64 (_item._modtime));
+    headers[QByteArrayLiteral ("X-OC-Mtime")] = QByteArray.number (int64 (_item._modtime));
     if (qEnvironmentVariableIntValue ("OWNCLOUD_LAZYOPS"))
         headers[QByteArrayLiteral ("OC-LazyOps")] = QByteArrayLiteral ("true");
 

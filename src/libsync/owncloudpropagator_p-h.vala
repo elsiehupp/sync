@@ -31,7 +31,7 @@ namespace {
  */
 inline bool fileIsStillChanging (OCC.SyncFileItem &item) {
     const auto modtime = OCC.Utility.qDateTimeFromTime_t (item._modtime);
-    const qint64 msSinceMod = modtime.msecsTo (QDateTime.currentDateTimeUtc ());
+    const int64 msSinceMod = modtime.msecsTo (QDateTime.currentDateTimeUtc ());
 
     return std.chrono.milliseconds (msSinceMod) < OCC.SyncEngine.minimumFileAgeForUpload
         // if the mtime is too much in the future we *do* upload the file

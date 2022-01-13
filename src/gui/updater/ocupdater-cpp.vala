@@ -230,8 +230,8 @@ bool OCUpdater.updateSucceeded () {
     ConfigFile cfg;
     QSettings settings (cfg.configFile (), QSettings.IniFormat);
 
-    qint64 targetVersionInt = Helper.stringVersionToInt (settings.value (updateTargetVersionC).toString ());
-    qint64 currentVersion = Helper.currentVersionToInt ();
+    int64 targetVersionInt = Helper.stringVersionToInt (settings.value (updateTargetVersionC).toString ());
+    int64 currentVersion = Helper.currentVersionToInt ();
     return currentVersion >= targetVersionInt;
 }
 
@@ -317,10 +317,10 @@ void NSISUpdater.slotDownloadFinished () {
 void NSISUpdater.versionInfoArrived (UpdateInfo &info) {
     ConfigFile cfg;
     QSettings settings (cfg.configFile (), QSettings.IniFormat);
-    qint64 infoVersion = Helper.stringVersionToInt (info.version ());
+    int64 infoVersion = Helper.stringVersionToInt (info.version ());
     auto seenString = settings.value (seenVersionC).toString ();
-    qint64 seenVersion = Helper.stringVersionToInt (seenString);
-    qint64 currVersion = Helper.currentVersionToInt ();
+    int64 seenVersion = Helper.stringVersionToInt (seenString);
+    int64 currVersion = Helper.currentVersionToInt ();
     qCInfo (lcUpdater) << "Version info arrived:"
             << "Your version:" << currVersion
             << "Skipped version:" << seenVersion << seenString
@@ -529,8 +529,8 @@ void PassiveUpdateNotifier.backgroundCheckForUpdate () {
 }
 
 void PassiveUpdateNotifier.versionInfoArrived (UpdateInfo &info) {
-    qint64 currentVer = Helper.currentVersionToInt ();
-    qint64 remoteVer = Helper.stringVersionToInt (info.version ());
+    int64 currentVer = Helper.currentVersionToInt ();
+    int64 remoteVer = Helper.stringVersionToInt (info.version ());
 
     if (info.version ().isEmpty () || currentVer >= remoteVer) {
         qCInfo (lcUpdater) << "Client is on latest version!";

@@ -27,7 +27,7 @@ namespace OCC {
  */
 
 struct UnifiedSearchResult {
-    enum Type : quint8 {
+    enum Type : uint8 {
         Default,
         FetchMoreTrigger,
     };
@@ -39,7 +39,7 @@ struct UnifiedSearchResult {
     QString _providerId;
     QString _providerName;
     bool _isRounded = false;
-    qint32 _order = std.numeric_limits<qint32>.max ();
+    int32 _order = std.numeric_limits<int32>.max ();
     QUrl _resourceUrl;
     QString _icons;
     Type _type = Type.Default;

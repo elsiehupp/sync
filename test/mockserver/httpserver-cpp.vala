@@ -12,7 +12,7 @@
  * for more details.
  */
 
-HttpServer.HttpServer (quint16 port, QObject* parent)
+HttpServer.HttpServer (uint16 port, QObject* parent)
     : QTcpServer (parent) {
     listen (QHostAddress.Any, port);
 }

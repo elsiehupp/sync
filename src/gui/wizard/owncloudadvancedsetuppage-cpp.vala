@@ -261,7 +261,7 @@ void OwncloudAdvancedSetupPage.updateStatus () {
     _ui.syncModeLabel.setText (t);
     _ui.syncModeLabel.setFixedHeight (_ui.syncModeLabel.sizeHint ().height ());
 
-    qint64 rSpace = _ui.rSyncEverything.isChecked () ? _rSize : _rSelectedSize;
+    int64 rSpace = _ui.rSyncEverything.isChecked () ? _rSize : _rSelectedSize;
 
     QString spaceError = checkLocalSpace (rSpace);
     if (!spaceError.isEmpty ()) {
@@ -396,7 +396,7 @@ void OwncloudAdvancedSetupPage.slotSelectFolder () {
         updateStatus ();
     }
 
-    qint64 rSpace = _ui.rSyncEverything.isChecked () ? _rSize : _rSelectedSize;
+    int64 rSpace = _ui.rSyncEverything.isChecked () ? _rSize : _rSelectedSize;
     QString errorStr = checkLocalSpace (rSpace);
     setErrorString (errorStr);
 }
@@ -486,7 +486,7 @@ void OwncloudAdvancedSetupPage.slotQuotaRetrieved (QVariantMap &result) {
     updateStatus ();
 }
 
-qint64 OwncloudAdvancedSetupPage.availableLocalSpace () {
+int64 OwncloudAdvancedSetupPage.availableLocalSpace () {
     QString localDir = localFolder ();
     QString path = !QDir (localDir).exists () && localDir.contains (QDir.homePath ()) ?
                 QDir.homePath () : localDir;
@@ -495,7 +495,7 @@ qint64 OwncloudAdvancedSetupPage.availableLocalSpace () {
     return storage.bytesAvailable ();
 }
 
-QString OwncloudAdvancedSetupPage.checkLocalSpace (qint64 remoteSize) {
+QString OwncloudAdvancedSetupPage.checkLocalSpace (int64 remoteSize) {
     return (availableLocalSpace ()>remoteSize) ? QString () : tr ("There isn't enough free space in the local folder!");
 }
 

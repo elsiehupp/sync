@@ -183,23 +183,23 @@ void ProgressInfo.adjustTotalsForFile (SyncFileItem &item) {
     }
 }
 
-qint64 ProgressInfo.totalFiles () {
+int64 ProgressInfo.totalFiles () {
     return _fileProgress._total;
 }
 
-qint64 ProgressInfo.completedFiles () {
+int64 ProgressInfo.completedFiles () {
     return _fileProgress._completed;
 }
 
-qint64 ProgressInfo.currentFile () {
+int64 ProgressInfo.currentFile () {
     return completedFiles () + _currentItems.size ();
 }
 
-qint64 ProgressInfo.totalSize () {
+int64 ProgressInfo.totalSize () {
     return _sizeProgress._total;
 }
 
-qint64 ProgressInfo.completedSize () {
+int64 ProgressInfo.completedSize () {
     return _sizeProgress._completed;
 }
 
@@ -217,7 +217,7 @@ void ProgressInfo.setProgressComplete (SyncFileItem &item) {
     _lastCompletedItem = item;
 }
 
-void ProgressInfo.setProgressItem (SyncFileItem &item, qint64 completed) {
+void ProgressInfo.setProgressItem (SyncFileItem &item, int64 completed) {
     if (!shouldCountProgress (item)) {
         return;
     }
@@ -284,13 +284,13 @@ ProgressInfo.Estimates ProgressInfo.totalProgress () {
                                     1.0);
 
     double beOptimistic = nearMaxFps * slowTransfer;
-    size.estimatedEta = quint64 ( (1.0 - beOptimistic) * size.estimatedEta
+    size.estimatedEta = uint64 ( (1.0 - beOptimistic) * size.estimatedEta
         + beOptimistic * optimisticEta ());
 
     return size;
 }
 
-quint64 ProgressInfo.optimisticEta () {
+uint64 ProgressInfo.optimisticEta () {
     // This assumes files and transfers finish as quickly as possible
     // *but* note that maxPerSecond could be serious underestimate
     // (if we never got to fully excercise transfer or files/second)
@@ -325,7 +325,7 @@ void ProgressInfo.updateEstimates () {
 }
 
 void ProgressInfo.recomputeCompletedSize () {
-    qint64 r = _totalSizeOfCompletedJobs;
+    int64 r = _totalSizeOfCompletedJobs;
     foreach (ProgressItem &i, _currentItems) {
         if (isSizeDependent (i._item))
             r += i._progress._completed;
@@ -339,16 +339,16 @@ ProgressInfo.Estimates ProgressInfo.Progress.estimates () {
     if (_progressPerSec != 0) {
         est.estimatedEta = qRound64 (static_cast<double> (_total - _completed) / _progressPerSec) * 1000;
     } else {
-        est.estimatedEta = 0; // looks better than qint64 max
+        est.estimatedEta = 0; // looks better than int64 max
     }
     return est;
 }
 
-qint64 ProgressInfo.Progress.completed () {
+int64 ProgressInfo.Progress.completed () {
     return _completed;
 }
 
-qint64 ProgressInfo.Progress.remaining () {
+int64 ProgressInfo.Progress.remaining () {
     return _total - _completed;
 }
 
@@ -367,7 +367,7 @@ void ProgressInfo.Progress.update () {
     _prevCompleted = _completed;
 }
 
-void ProgressInfo.Progress.setCompleted (qint64 completed) {
+void ProgressInfo.Progress.setCompleted (int64 completed) {
     _completed = qMin (completed, _total);
     _prevCompleted = qMin (_prevCompleted, _completed);
 }

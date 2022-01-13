@@ -6,7 +6,7 @@
 
 Q_LOGGING_CATEGORY (lcFakeWebSocketServer, "nextcloud.test.fakewebserver", QtInfoMsg)
 
-FakeWebSocketServer.FakeWebSocketServer (quint16 port, QObject *parent)
+FakeWebSocketServer.FakeWebSocketServer (uint16 port, QObject *parent)
     : QObject (parent)
     , _webSocketServer (new QWebSocketServer (QStringLiteral ("Fake Server"), QWebSocketServer.NonSecureMode, this)) {
     if (!_webSocketServer.listen (QHostAddress.Any, port)) {

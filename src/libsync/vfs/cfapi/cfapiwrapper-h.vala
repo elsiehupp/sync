@@ -82,9 +82,9 @@ enum SetPinRecurseMode {
 };
 
 NEXTCLOUD_CFAPI_EXPORT Result<OCC.Vfs.ConvertToPlaceholderResult, QString> setPinState (FileHandle &handle, PinState state, SetPinRecurseMode mode);
-NEXTCLOUD_CFAPI_EXPORT Result<void, QString> createPlaceholderInfo (QString &path, time_t modtime, qint64 size, QByteArray &fileId);
-NEXTCLOUD_CFAPI_EXPORT Result<OCC.Vfs.ConvertToPlaceholderResult, QString> updatePlaceholderInfo (FileHandle &handle, time_t modtime, qint64 size, QByteArray &fileId, QString &replacesPath = QString ());
-NEXTCLOUD_CFAPI_EXPORT Result<OCC.Vfs.ConvertToPlaceholderResult, QString> convertToPlaceholder (FileHandle &handle, time_t modtime, qint64 size, QByteArray &fileId, QString &replacesPath);
+NEXTCLOUD_CFAPI_EXPORT Result<void, QString> createPlaceholderInfo (QString &path, time_t modtime, int64 size, QByteArray &fileId);
+NEXTCLOUD_CFAPI_EXPORT Result<OCC.Vfs.ConvertToPlaceholderResult, QString> updatePlaceholderInfo (FileHandle &handle, time_t modtime, int64 size, QByteArray &fileId, QString &replacesPath = QString ());
+NEXTCLOUD_CFAPI_EXPORT Result<OCC.Vfs.ConvertToPlaceholderResult, QString> convertToPlaceholder (FileHandle &handle, time_t modtime, int64 size, QByteArray &fileId, QString &replacesPath);
 
 }
 

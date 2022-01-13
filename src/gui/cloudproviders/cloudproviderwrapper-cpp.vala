@@ -110,8 +110,8 @@ void CloudProviderWrapper.slotUpdateProgress (QString &folder, ProgressInfo &pro
     if (!progress._currentDiscoveredRemoteFolder.isEmpty ()) {
         msg =  tr ("Checking for changes in \"%1\"").arg (progress._currentDiscoveredRemoteFolder);
     } else if (progress.totalSize () == 0) {
-        qint64 currentFile = progress.currentFile ();
-        qint64 totalFileCount = qMax (progress.totalFiles (), currentFile);
+        int64 currentFile = progress.currentFile ();
+        int64 totalFileCount = qMax (progress.totalFiles (), currentFile);
         if (progress.trustEta ()) {
             msg = tr ("Syncing %1 of %2  (%3 left)")
                     .arg (currentFile)

@@ -58,7 +58,7 @@ signals:
 
 public slots:
     void slotOpenOC ();
-    void slotUpdateQuota (qint64 total, qint64 used);
+    void slotUpdateQuota (int64 total, int64 used);
     void slotAccountStateChanged ();
     void slotStyleChanged ();
     AccountState *accountsState () { return _accountState; }

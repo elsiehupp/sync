@@ -33,7 +33,7 @@ public:
     }
 
     void abort () override {}
-    qint64 readData (char *, qint64) override { return 0; }
+    int64 readData (char *, int64) override { return 0; }
 };
 
 class TestAsyncOp : public QObject {
@@ -128,7 +128,7 @@ private slots:
         };
 
         // Create a testcase by creating a file of a given size locally and assigning it a callback
-        auto insertFile = [&] (QString &file, qint64 size, TestCase.PollRequest_t cb) {
+        auto insertFile = [&] (QString &file, int64 size, TestCase.PollRequest_t cb) {
             fakeFolder.localModifier ().insert (file, size);
             testCases[file] = { std.move (cb) };
         };

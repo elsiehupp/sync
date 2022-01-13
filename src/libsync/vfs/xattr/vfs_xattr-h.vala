@@ -33,7 +33,7 @@ public:
     bool socketApiPinStateActionsShown () const override;
     bool isHydrating () const override;
 
-    Result<void, QString> updateMetadata (QString &filePath, time_t modtime, qint64 size, QByteArray &fileId) override;
+    Result<void, QString> updateMetadata (QString &filePath, time_t modtime, int64 size, QByteArray &fileId) override;
 
     Result<void, QString> createPlaceholder (SyncFileItem &item) override;
     Result<void, QString> dehydratePlaceholder (SyncFileItem &item) override;

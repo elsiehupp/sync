@@ -62,8 +62,8 @@ public:
     QString e2eMangledName () const;
     void setE2eMangledName (QString &e2eMangledName);
 
-    qint64 fileTotalSize () const;
-    void setFileTotalSize (qint64 totalSize);
+    int64 fileTotalSize () const;
+    void setFileTotalSize (int64 totalSize);
 
     Status status () const;
 

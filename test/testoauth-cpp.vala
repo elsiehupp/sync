@@ -73,13 +73,13 @@ public:
     void abort () override {
         aborted = true;
     }
-    qint64 bytesAvailable () const override {
+    int64 bytesAvailable () const override {
         if (aborted)
             return 0;
         return payload.bytesAvailable ();
     }
 
-    qint64 readData (char *data, qint64 maxlen) override {
+    int64 readData (char *data, int64 maxlen) override {
         return payload.read (data, maxlen);
     }
 };
