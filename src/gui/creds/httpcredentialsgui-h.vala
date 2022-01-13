@@ -14,8 +14,6 @@
  */
 
 // #pragma once
-#include "creds/httpcredentials.h"
-#include "creds/oauth.h"
 // #include <QPointer>
 // #include <QTcpServer>
 
@@ -30,12 +28,12 @@ public:
     explicit HttpCredentialsGui()
         : HttpCredentials() {
     }
-    HttpCredentialsGui(const QString &user, const QString &password,
-            const QByteArray &clientCertBundle, const QByteArray &clientCertPassword)
+    HttpCredentialsGui(QString &user, QString &password,
+            const QByteArray &clientCertBundle, QByteArray &clientCertPassword)
         : HttpCredentials(user, password, clientCertBundle, clientCertPassword) {
     }
-    HttpCredentialsGui(const QString &user, const QString &password, const QString &refreshToken,
-            const QByteArray &clientCertBundle, const QByteArray &clientCertPassword)
+    HttpCredentialsGui(QString &user, QString &password, QString &refreshToken,
+            const QByteArray &clientCertBundle, QByteArray &clientCertPassword)
         : HttpCredentials(user, password, clientCertBundle, clientCertPassword) {
         _refreshToken = refreshToken;
     }
@@ -51,10 +49,9 @@ public:
      */
     QUrl authorisationLink() const { return _asyncAuth ? _asyncAuth->authorisationLink() : QUrl(); }
 
-
-    static QString requestAppPasswordText(const Account *account);
+    static QString requestAppPasswordText(Account *account);
 private slots:
-    void asyncAuthResult(OAuth::Result, const QString &user, const QString &accessToken, const QString &refreshToken);
+    void asyncAuthResult(OAuth::Result, QString &user, QString &accessToken, QString &refreshToken);
     void showDialog();
     void askFromUserAsync();
 

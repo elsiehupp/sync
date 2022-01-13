@@ -14,7 +14,6 @@
 
 // #pragma once
 
-#include "owncloudgui.h"
 // #include <QObject>
 // #include <QString>
 // #include <QNetworkProxy>
@@ -51,7 +50,7 @@ public:
 
 public slots:
     /// Intended for QNetworkAccessManager::proxyAuthenticationRequired()
-    void handleProxyAuthenticationRequired(const QNetworkProxy &proxy,
+    void handleProxyAuthenticationRequired(QNetworkProxy &proxy,
         QAuthenticator *authenticator);
 
 private slots:
@@ -70,7 +69,7 @@ private:
     void storeCredsInKeychain();
 
     template<class T, typename PointerToMemberFunction>
-    void execAwait(const T *sender,
+    void execAwait(T *sender,
                    PointerToMemberFunction signal,
                    int &counter,
                    const QEventLoop::ProcessEventsFlags flags = QEventLoop::AllEvents);

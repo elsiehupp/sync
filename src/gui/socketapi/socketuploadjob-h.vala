@@ -16,9 +16,6 @@
 // #include <QObject>
 // #include <QTemporaryFile>
 
-#include "socketapi.h"
-#include "account.h"
-
 namespace OCC {
 
 class SyncJournalDb;
@@ -26,7 +23,7 @@ class SyncEngine;
 
 class SocketUploadJob : public QObject {
 public:
-    SocketUploadJob(const QSharedPointer<SocketApiJobV2> &job);
+    SocketUploadJob(QSharedPointer<SocketApiJobV2> &job);
     void start();
 
 private:

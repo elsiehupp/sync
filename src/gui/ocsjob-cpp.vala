@@ -12,10 +12,6 @@
  * for more details.
  */
 
-#include "ocsjob.h"
-#include "networkjobs.h"
-#include "account.h"
-
 // #include <QBuffer>
 // #include <QJsonDocument>
 // #include <QJsonObject>
@@ -32,11 +28,11 @@ OcsJob::OcsJob(AccountPtr account)
     setIgnoreCredentialFailure(true);
 }
 
-void OcsJob::setVerb(const QByteArray &verb) {
+void OcsJob::setVerb(QByteArray &verb) {
     _verb = verb;
 }
 
-void OcsJob::addParam(const QString &name, const QString &value) {
+void OcsJob::addParam(QString &name, QString &value) {
     _params.append(qMakePair(name, value));
 }
 
@@ -44,11 +40,11 @@ void OcsJob::addPassStatusCode(int code) {
     _passStatusCodes.append(code);
 }
 
-void OcsJob::appendPath(const QString &id) {
+void OcsJob::appendPath(QString &id) {
     setPath(path() + QLatin1Char('/') + id);
 }
 
-void OcsJob::addRawHeader(const QByteArray &headerName, const QByteArray &value) {
+void OcsJob::addRawHeader(QByteArray &headerName, QByteArray &value) {
     _request.setRawHeader(headerName, value);
 }
 
@@ -57,7 +53,7 @@ static QUrlQuery percentEncodeQueryItems(
     QUrlQuery result;
     // Note: QUrlQuery::setQueryItems() does not fully percent encode
     // the query items, see #5042
-    foreach (const auto &item, items) {
+    foreach (auto &item, items) {
         result.addQueryItem(
             QUrl::toPercentEncoding(item.first),
             QUrl::toPercentEncoding(item.second));
@@ -133,7 +129,7 @@ bool OcsJob::finished() {
     return true;
 }
 
-int OcsJob::getJsonReturnCode(const QJsonDocument &json, QString &message) {
+int OcsJob::getJsonReturnCode(QJsonDocument &json, QString &message) {
     //TODO proper checking
     auto meta = json.object().value("ocs").toObject().value("meta").toObject();
     int code = meta.value("statuscode").toInt();

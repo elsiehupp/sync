@@ -1,5 +1,4 @@
 
-#include "wordlist.h"
 // #include <openssl/rand.h>
 
 namespace OCC {
@@ -2083,9 +2082,9 @@ QStringList getRandomWords(int nr) {
     return randomWords;
 }
 
-QString getUnifiedString(const QStringList& wList) {
+QString getUnifiedString(QStringList& wList) {
     QString ret;
-    for(const auto& str : wList) {
+    for(auto& str : wList) {
         ret += str;
     }
     return ret;

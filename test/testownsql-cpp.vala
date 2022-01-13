@@ -8,8 +8,6 @@
 
 // #include <sqlite3.h>
 
-#include "common/ownsql.h"
-
 using namespace OCC;
 
 class TestOwnSql : public QObject {

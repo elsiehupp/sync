@@ -12,9 +12,7 @@
  * for more details.
  */
 
-
 // #include <QObject>
-#include "folder.h"
 
 using namespace OCC;
 
@@ -28,7 +26,7 @@ public:
 signals:
 
 public slots:
-    void slotFolderListChanged(const Folder::Map &folderMap);
+    void slotFolderListChanged(Folder::Map &folderMap);
 
 private:
     QMap<QString, CloudProviderWrapper*> _map;

@@ -7,12 +7,9 @@
 // #include <QtTest>
 // #include <QDebug>
 
-#include "propagatedownload.h"
-#include "owncloudpropagator_p.h"
-
 using namespace OCC;
 namespace OCC {
-QString OWNCLOUDSYNC_EXPORT createDownloadTmpFileName(const QString &previous);
+QString OWNCLOUDSYNC_EXPORT createDownloadTmpFileName(QString &previous);
 }
 
 class TestNextcloudPropagator : public QObject {
@@ -60,14 +57,14 @@ private slots:
     }
 
     void testParseEtag() {
-        using Test = QPair<const char*, const char*>;
+        using Test = QPair<const char*, char*>;
         QList<Test> tests;
         tests.append(Test("\"abcd\"", "abcd"));
         tests.append(Test("\"\"", ""));
         tests.append(Test("\"fii\"-gzip", "fii"));
         tests.append(Test("W/\"foo\"", "foo"));
 
-        foreach (const auto& test, tests) {
+        foreach (auto& test, tests) {
             QCOMPARE(parseEtag(test.first), QByteArray(test.second));
         }
     }

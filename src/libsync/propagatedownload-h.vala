@@ -13,11 +13,6 @@
  */
 // #pragma once
 
-#include "owncloudlib.h"
-#include "owncloudpropagator.h"
-#include "networkjobs.h"
-#include "clientsideencryption.h"
-
 // #include <QBuffer>
 // #include <QFile>
 
@@ -53,12 +48,12 @@ protected:
 
 public:
     // DOES NOT take ownership of the device.
-    explicit GETFileJob(AccountPtr account, const QString &path, QIODevice *device,
-        const QMap<QByteArray, QByteArray> &headers, const QByteArray &expectedEtagForResume,
+    explicit GETFileJob(AccountPtr account, QString &path, QIODevice *device,
+        const QMap<QByteArray, QByteArray> &headers, QByteArray &expectedEtagForResume,
         qint64 resumeStart, QObject *parent = nullptr);
     // For directDownloadUrl:
-    explicit GETFileJob(AccountPtr account, const QUrl &url, QIODevice *device,
-        const QMap<QByteArray, QByteArray> &headers, const QByteArray &expectedEtagForResume,
+    explicit GETFileJob(AccountPtr account, QUrl &url, QIODevice *device,
+        const QMap<QByteArray, QByteArray> &headers, QByteArray &expectedEtagForResume,
         qint64 resumeStart, QObject *parent = nullptr);
     ~GETFileJob() override {
         if (_bandwidthManager) {
@@ -93,10 +88,10 @@ public:
     qint64 currentDownloadPosition();
 
     QString errorString() const override;
-    void setErrorString(const QString &s) { _errorString = s; }
+    void setErrorString(QString &s) { _errorString = s; }
 
     SyncFileItem::Status errorStatus() { return _errorStatus; }
-    void setErrorStatus(const SyncFileItem::Status &s) { _errorStatus = s; }
+    void setErrorStatus(SyncFileItem::Status &s) { _errorStatus = s; }
 
     void onTimedOut() override;
 
@@ -109,7 +104,7 @@ public:
     void setExpectedContentLength(qint64 size) { _expectedContentLength = size; }
 
 protected:
-    virtual qint64 writeToDevice(const QByteArray &data);
+    virtual qint64 writeToDevice(QByteArray &data);
 
 signals:
     void finishedSignal();
@@ -127,16 +122,16 @@ class OWNCLOUDSYNC_EXPORT GETEncryptedFileJob : public GETFileJob {
 
 public:
     // DOES NOT take ownership of the device.
-    explicit GETEncryptedFileJob(AccountPtr account, const QString &path, QIODevice *device,
-        const QMap<QByteArray, QByteArray> &headers, const QByteArray &expectedEtagForResume,
+    explicit GETEncryptedFileJob(AccountPtr account, QString &path, QIODevice *device,
+        const QMap<QByteArray, QByteArray> &headers, QByteArray &expectedEtagForResume,
         qint64 resumeStart, EncryptedFile encryptedInfo, QObject *parent = nullptr);
-    explicit GETEncryptedFileJob(AccountPtr account, const QUrl &url, QIODevice *device,
-        const QMap<QByteArray, QByteArray> &headers, const QByteArray &expectedEtagForResume,
+    explicit GETEncryptedFileJob(AccountPtr account, QUrl &url, QIODevice *device,
+        const QMap<QByteArray, QByteArray> &headers, QByteArray &expectedEtagForResume,
         qint64 resumeStart, EncryptedFile encryptedInfo, QObject *parent = nullptr);
     ~GETEncryptedFileJob() override = default;
 
 protected:
-    qint64 writeToDevice(const QByteArray &data) override;
+    qint64 writeToDevice(QByteArray &data) override;
 
 private:
     QSharedPointer<EncryptionHelper::StreamingDecryptor> _decryptor;
@@ -185,7 +180,7 @@ private:
  */
 class PropagateDownloadFile : public PropagateItemJob {
 public:
-    PropagateDownloadFile(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
+    PropagateDownloadFile(OwncloudPropagator *propagator, SyncFileItemPtr &item)
         : PropagateItemJob(propagator, item)
         , _resumeStart(0)
         , _downloadProgress(0)
@@ -211,22 +206,22 @@ public:
 private slots:
     /// Called when ComputeChecksum on the local file finishes,
     /// maybe the local and remote checksums are identical?
-    void conflictChecksumComputed(const QByteArray &checksumType, const QByteArray &checksum);
+    void conflictChecksumComputed(QByteArray &checksumType, QByteArray &checksum);
     /// Called to start downloading the remote file
     void startDownload();
     /// Called when the GETFileJob finishes
     void slotGetFinished();
     /// Called when the download's checksum header was validated
-    void transmissionChecksumValidated(const QByteArray &checksumType, const QByteArray &checksum);
+    void transmissionChecksumValidated(QByteArray &checksumType, QByteArray &checksum);
     /// Called when the download's checksum computation is done
-    void contentChecksumComputed(const QByteArray &checksumType, const QByteArray &checksum);
+    void contentChecksumComputed(QByteArray &checksumType, QByteArray &checksum);
     void downloadFinished();
     /// Called when it's time to update the db metadata
     void updateMetadata(bool isConflict);
 
     void abort(PropagatorJob::AbortType abortType) override;
     void slotDownloadProgress(qint64, qint64);
-    void slotChecksumFail(const QString &errMsg);
+    void slotChecksumFail(QString &errMsg);
 
 private:
     void startAfterIsEncryptedIsChecked();

@@ -12,9 +12,6 @@
 
 // #include <openssl/evp.h>
 
-#include "accountfwd.h"
-#include "networkjobs.h"
-
 namespace QKeychain {
 class Job;
 class WritePasswordJob;
@@ -28,7 +25,7 @@ QString e2eeBaseUrl();
 namespace EncryptionHelper {
     QByteArray generateRandomFilename();
     OWNCLOUDSYNC_EXPORT QByteArray generateRandom(int size);
-    QByteArray generatePassword(const QString &wordlist, const QByteArray& salt);
+    QByteArray generatePassword(QString &wordlist, QByteArray& salt);
     OWNCLOUDSYNC_EXPORT QByteArray encryptPrivateKey(
             const QByteArray& key,
             const QByteArray& privateKey,
@@ -38,7 +35,7 @@ namespace EncryptionHelper {
             const QByteArray& key,
             const QByteArray& data
     );
-    OWNCLOUDSYNC_EXPORT QByteArray extractPrivateKeySalt(const QByteArray &data);
+    OWNCLOUDSYNC_EXPORT QByteArray extractPrivateKeySalt(QByteArray &data);
     OWNCLOUDSYNC_EXPORT QByteArray encryptStringSymmetric(
             const QByteArray& key,
             const QByteArray& data
@@ -48,7 +45,7 @@ namespace EncryptionHelper {
             const QByteArray& data
     );
 
-    QByteArray privateKeyToPem(const QByteArray key);
+    QByteArray privateKeyToPem(QByteArray key);
 
     //TODO: change those two EVP_PKEY into QSslKey.
     QByteArray encryptStringAsymmetric(
@@ -60,10 +57,10 @@ namespace EncryptionHelper {
             const QByteArray& data
     );
 
-    OWNCLOUDSYNC_EXPORT bool fileEncryption(const QByteArray &key, const QByteArray &iv,
+    OWNCLOUDSYNC_EXPORT bool fileEncryption(QByteArray &key, QByteArray &iv,
                       QFile *input, QFile *output, QByteArray& returnTag);
 
-    OWNCLOUDSYNC_EXPORT bool fileDecryption(const QByteArray &key, const QByteArray &iv,
+    OWNCLOUDSYNC_EXPORT bool fileDecryption(QByteArray &key, QByteArray &iv,
                                QFile *input, QFile *output);
 
 //
@@ -90,10 +87,10 @@ private:
 
 class OWNCLOUDSYNC_EXPORT StreamingDecryptor {
 public:
-    StreamingDecryptor(const QByteArray &key, const QByteArray &iv, quint64 totalSize);
+    StreamingDecryptor(QByteArray &key, QByteArray &iv, quint64 totalSize);
     ~StreamingDecryptor() = default;
 
-    QByteArray chunkDecryption(const char *input, quint64 chunkSize);
+    QByteArray chunkDecryption(char *input, quint64 chunkSize);
 
     bool isInitialized() const;
     bool isFinished() const;
@@ -112,15 +109,15 @@ private:
 class OWNCLOUDSYNC_EXPORT ClientSideEncryption : public QObject {
 public:
     ClientSideEncryption();
-    void initialize(const AccountPtr &account);
+    void initialize(AccountPtr &account);
 
 private:
-    void generateKeyPair(const AccountPtr &account);
-    void generateCSR(const AccountPtr &account, EVP_PKEY *keyPair);
-    void encryptPrivateKey(const AccountPtr &account);
+    void generateKeyPair(AccountPtr &account);
+    void generateCSR(AccountPtr &account, EVP_PKEY *keyPair);
+    void encryptPrivateKey(AccountPtr &account);
 
 public:
-    void forgetSensitiveData(const AccountPtr &account);
+    void forgetSensitiveData(AccountPtr &account);
 
     bool newMnemonicGenerated() const;
 
@@ -134,22 +131,22 @@ private slots:
 
 signals:
     void initializationFinished();
-    void mnemonicGenerated(const QString& mnemonic);
-    void showMnemonic(const QString& mnemonic);
+    void mnemonicGenerated(QString& mnemonic);
+    void showMnemonic(QString& mnemonic);
 
 private:
-    void getPrivateKeyFromServer(const AccountPtr &account);
-    void getPublicKeyFromServer(const AccountPtr &account);
-    void fetchAndValidatePublicKeyFromServer(const AccountPtr &account);
-    void decryptPrivateKey(const AccountPtr &account, const QByteArray &key);
+    void getPrivateKeyFromServer(AccountPtr &account);
+    void getPublicKeyFromServer(AccountPtr &account);
+    void fetchAndValidatePublicKeyFromServer(AccountPtr &account);
+    void decryptPrivateKey(AccountPtr &account, QByteArray &key);
 
-    void fetchFromKeyChain(const AccountPtr &account);
+    void fetchFromKeyChain(AccountPtr &account);
 
-    bool checkPublicKeyValidity(const AccountPtr &account) const;
-    bool checkServerPublicKeyValidity(const QByteArray &serverPublicKeyString) const;
-    void writePrivateKey(const AccountPtr &account);
-    void writeCertificate(const AccountPtr &account);
-    void writeMnemonic(const AccountPtr &account);
+    bool checkPublicKeyValidity(AccountPtr &account) const;
+    bool checkServerPublicKeyValidity(QByteArray &serverPublicKeyString) const;
+    void writePrivateKey(AccountPtr &account);
+    void writeCertificate(AccountPtr &account);
+    void writeMnemonic(AccountPtr &account);
 
     bool isInitialized = false;
 
@@ -176,26 +173,25 @@ struct EncryptedFile {
 
 class OWNCLOUDSYNC_EXPORT FolderMetadata {
 public:
-    FolderMetadata(AccountPtr account, const QByteArray& metadata = QByteArray(), int statusCode = -1);
+    FolderMetadata(AccountPtr account, QByteArray& metadata = QByteArray(), int statusCode = -1);
     QByteArray encryptedMetadata();
-    void addEncryptedFile(const EncryptedFile& f);
-    void removeEncryptedFile(const EncryptedFile& f);
+    void addEncryptedFile(EncryptedFile& f);
+    void removeEncryptedFile(EncryptedFile& f);
     void removeAllEncryptedFiles();
     QVector<EncryptedFile> files() const;
-
 
 private:
     /* Use std::string and std::vector internally on this class
      * to ease the port to Nlohmann Json API
      */
     void setupEmptyMetadata();
-    void setupExistingMetadata(const QByteArray& metadata);
+    void setupExistingMetadata(QByteArray& metadata);
 
-    QByteArray encryptMetadataKey(const QByteArray& metadataKey) const;
-    QByteArray decryptMetadataKey(const QByteArray& encryptedKey) const;
+    QByteArray encryptMetadataKey(QByteArray& metadataKey) const;
+    QByteArray decryptMetadataKey(QByteArray& encryptedKey) const;
 
-    QByteArray encryptJsonObject(const QByteArray& obj, const QByteArray pass) const;
-    QByteArray decryptJsonObject(const QByteArray& encryptedJsonBlob, const QByteArray& pass) const;
+    QByteArray encryptJsonObject(QByteArray& obj, QByteArray pass) const;
+    QByteArray decryptJsonObject(QByteArray& encryptedJsonBlob, QByteArray& pass) const;
 
     QVector<EncryptedFile> _files;
     QMap<int, QByteArray> _metadataKeys;

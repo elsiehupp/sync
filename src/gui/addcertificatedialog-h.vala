@@ -13,7 +13,6 @@
  * for more details.
  */
 
-
 // #include <QDialog>
 // #include <QString>
 
@@ -34,7 +33,7 @@ public:
     ~AddCertificateDialog() override;
     QString getCertificatePath();
     QString getCertificatePasswd();
-    void showErrorMessage(const QString message);
+    void showErrorMessage(QString message);
     void reinit();
 
 private slots:

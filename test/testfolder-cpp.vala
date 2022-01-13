@@ -7,9 +7,6 @@
 
 // #include <QtTest>
 
-#include "common/utility.h"
-#include "folder.h"
-
 using namespace OCC;
 
 class TestFolder: public QObject {

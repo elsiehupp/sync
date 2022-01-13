@@ -20,7 +20,6 @@
 
 // #include <QString>
 // #include <QMetaType>
-#include "ocsynclib.h"
 // #include <QDebug>
 
 namespace OCC {
@@ -36,7 +35,7 @@ private:
     static constexpr int notNullMask = 0x1;
 
     template <typename Char> // can be 'char' or 'ushort' if conversion from QString
-    void fromArray(const Char *p);
+    void fromArray(Char *p);
 
 public:
     enum Permissions {
@@ -68,10 +67,10 @@ public:
     QString toString() const;
 
     /// read value that was written with toDbValue()
-    static RemotePermissions fromDbValue(const QByteArray &);
+    static RemotePermissions fromDbValue(QByteArray &);
 
     /// read a permissions string received from the server, never null
-    static RemotePermissions fromServerString(const QString &);
+    static RemotePermissions fromServerString(QString &);
 
     bool hasPermission(Permissions p) const {
         return _value & (1 << static_cast<int>(p));
@@ -95,7 +94,6 @@ public:
         return dbg << p.toString();
     }
 };
-
 
 } // namespace OCC
 

@@ -1,7 +1,4 @@
-#include "webflowcredentials.h"
 
-#include "creds/httpcredentials.h"
-#include "creds/keychainchunk.h"
 
 // #include <QAuthenticator>
 // #include <QNetworkAccessManager>
@@ -12,14 +9,8 @@
 // #include <QVBoxLayout>
 // #include <QLabel>
 
-#include "accessmanager.h"
-#include "account.h"
-#include "configfile.h"
-#include "theme.h"
 #ifdef WITH_WEBENGINE
-#include "wizard/webview.h"
 #endif // WITH_WEBENGINE
-#include "webflowcredentialsdialog.h"
 
 using namespace QKeychain;
 
@@ -36,13 +27,13 @@ namespace {
 
 class WebFlowCredentialsAccessManager : public AccessManager {
 public:
-    WebFlowCredentialsAccessManager(const WebFlowCredentials *cred, QObject *parent = nullptr)
+    WebFlowCredentialsAccessManager(WebFlowCredentials *cred, QObject *parent = nullptr)
         : AccessManager(parent)
         , _cred(cred) {
     }
 
 protected:
-    QNetworkReply *createRequest(Operation op, const QNetworkRequest &request, QIODevice *outgoingData) override {
+    QNetworkReply *createRequest(Operation op, QNetworkRequest &request, QIODevice *outgoingData) override {
         QNetworkRequest req(request);
         if (!req.attribute(WebFlowCredentials::DontAddCredentialsAttribute).toBool()) {
             if (_cred && !_cred->password().isEmpty()) {
@@ -85,7 +76,7 @@ static void addSettingsToJob(Account *account, QKeychain::Job *job) {
 
 WebFlowCredentials::WebFlowCredentials() = default;
 
-WebFlowCredentials::WebFlowCredentials(const QString &user, const QString &password, const QSslCertificate &certificate, const QSslKey &key, const QList<QSslCertificate> &caCertificates)
+WebFlowCredentials::WebFlowCredentials(QString &user, QString &password, QSslCertificate &certificate, QSslKey &key, QList<QSslCertificate> &caCertificates)
     : _user(user)
     , _password(password)
     , _clientSslKey(key)
@@ -171,7 +162,7 @@ void WebFlowCredentials::askFromUser() {
     qCDebug(lcWebFlowCredentials()) << "User needs to reauth!";
 }
 
-void WebFlowCredentials::slotAskFromUserCredentialsProvided(const QString &user, const QString &pass, const QString &host) {
+void WebFlowCredentials::slotAskFromUserCredentialsProvided(QString &user, QString &pass, QString &host) {
     Q_UNUSED(host)
 
     // Compare the re-entered username case-insensitive and save the new value (avoid breaking the account)

@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#include "ocsshareejob.h"
-
 // #include <QJsonDocument>
 
 namespace OCC {
@@ -24,7 +22,7 @@ OcsShareeJob::OcsShareeJob(AccountPtr account)
     connect(this, &OcsJob::jobFinished, this, &OcsShareeJob::jobDone);
 }
 
-void OcsShareeJob::getSharees(const QString &search,
+void OcsShareeJob::getSharees(QString &search,
     const QString &itemType,
     int page,
     int perPage,
@@ -40,7 +38,7 @@ void OcsShareeJob::getSharees(const QString &search,
     start();
 }
 
-void OcsShareeJob::jobDone(const QJsonDocument &reply) {
+void OcsShareeJob::jobDone(QJsonDocument &reply) {
     emit shareeJobFinished(reply);
 }
 }

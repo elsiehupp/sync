@@ -12,7 +12,6 @@
  * for more details.
  */
 
-
 // #include <QLabel>
 
 namespace OCC {
@@ -21,9 +20,9 @@ namespace OCC {
 class ElidedLabel : public QLabel {
 public:
     explicit ElidedLabel(QWidget *parent = nullptr);
-    explicit ElidedLabel(const QString &text, QWidget *parent = nullptr);
+    explicit ElidedLabel(QString &text, QWidget *parent = nullptr);
 
-    void setText(const QString &text);
+    void setText(QString &text);
     const QString &text() const { return _text; }
 
     void setElideMode(Qt::TextElideMode elideMode);

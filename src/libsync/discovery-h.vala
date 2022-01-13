@@ -15,10 +15,6 @@
 // #pragma once
 
 // #include <QObject>
-#include "discoveryphase.h"
-#include "syncfileitem.h"
-#include "common/asserts.h"
-#include "common/syncjournaldb.h"
 
 class ExcludedFiles;
 
@@ -70,7 +66,7 @@ public:
     }
 
     /// For creating subjobs
-    explicit ProcessDirectoryJob(const PathTuple &path, const SyncFileItemPtr &dirItem,
+    explicit ProcessDirectoryJob(PathTuple &path, SyncFileItemPtr &dirItem,
         QueryMode queryLocal, QueryMode queryServer, qint64 lastSyncTimestamp,
         ProcessDirectoryJob *parent)
         : QObject(parent)
@@ -123,13 +119,13 @@ private:
         QString _target; // Path that will be the result after the sync (and will be in the DB)
         QString _server; // Path on the server (before the sync)
         QString _local; // Path locally (before the sync)
-        static QString pathAppend(const QString &base, const QString &name) {
+        static QString pathAppend(QString &base, QString &name) {
             return base.isEmpty() ? name : base + QLatin1Char('/') + name;
         }
-        PathTuple addName(const QString &name) const {
+        PathTuple addName(QString &name) const {
             PathTuple result;
             result._original = pathAppend(_original, name);
-            auto buildString = [&](const QString &other) {
+            auto buildString = [&](QString &other) {
                 // Optimize by trying to keep all string implicitly shared if they are the same (common case)
                 return other == _original ? result._original : pathAppend(other, name);
             };
@@ -140,7 +136,7 @@ private:
         }
     };
 
-    bool checkForInvalidFileName(const PathTuple &path, const std::map<QString, Entries> &entries, Entries &entry);
+    bool checkForInvalidFileName(PathTuple &path, std::map<QString, Entries> &entries, Entries &entry);
 
     /** Iterate over entries inside the directory (non-recursively).
      *
@@ -152,7 +148,7 @@ private:
 
     // return true if the file is excluded.
     // path is the full relative path of the file. localName is the base name of the local entry.
-    bool handleExcluded(const QString &path, const QString &localName, bool isDirectory,
+    bool handleExcluded(QString &path, QString &localName, bool isDirectory,
         bool isHidden, bool isSymlink);
 
     /** Reconcile local/remote/db information for a single item.
@@ -162,26 +158,25 @@ private:
      *
      * This main function delegates some work to the processFile* functions.
      */
-    void processFile(PathTuple, const LocalInfo &, const RemoteInfo &, const SyncJournalFileRecord &);
+    void processFile(PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &);
 
     /// processFile helper for when remote information is available, typically flows into AnalyzeLocalInfo when done
-    void processFileAnalyzeRemoteInfo(const SyncFileItemPtr &item, PathTuple, const LocalInfo &, const RemoteInfo &, const SyncJournalFileRecord &);
+    void processFileAnalyzeRemoteInfo(SyncFileItemPtr &item, PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &);
 
     /// processFile helper for reconciling local changes
-    void processFileAnalyzeLocalInfo(const SyncFileItemPtr &item, PathTuple, const LocalInfo &, const RemoteInfo &, const SyncJournalFileRecord &, QueryMode recurseQueryServer);
+    void processFileAnalyzeLocalInfo(SyncFileItemPtr &item, PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &, QueryMode recurseQueryServer);
 
     /// processFile helper for local/remote conflicts
-    void processFileConflict(const SyncFileItemPtr &item, PathTuple, const LocalInfo &, const RemoteInfo &, const SyncJournalFileRecord &);
+    void processFileConflict(SyncFileItemPtr &item, PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &);
 
     /// processFile helper for common final processing
-    void processFileFinalize(const SyncFileItemPtr &item, PathTuple, bool recurse, QueryMode recurseQueryLocal, QueryMode recurseQueryServer);
-
+    void processFileFinalize(SyncFileItemPtr &item, PathTuple, bool recurse, QueryMode recurseQueryLocal, QueryMode recurseQueryServer);
 
     /** Checks the permission for this item, if needed, change the item to a restoration item.
      * @return false indicate that this is an error and if it is a directory, one should not recurse
      * inside it.
      */
-    bool checkPermissions(const SyncFileItemPtr &item);
+    bool checkPermissions(SyncFileItemPtr &item);
 
     struct MovePermissionResult {
         // whether moving/renaming the source is ok
@@ -196,16 +191,16 @@ private:
      * Check if the move is of a specified file within this directory is allowed.
      * Return true if it is allowed, false otherwise
      */
-    MovePermissionResult checkMovePermissions(RemotePermissions srcPerm, const QString &srcPath, bool isDirectory);
+    MovePermissionResult checkMovePermissions(RemotePermissions srcPerm, QString &srcPath, bool isDirectory);
 
-    void processBlacklisted(const PathTuple &, const LocalInfo &, const SyncJournalFileRecord &dbEntry);
+    void processBlacklisted(PathTuple &, LocalInfo &, SyncJournalFileRecord &dbEntry);
     void subJobFinished();
 
     /** An DB operation failed */
     void dbError();
 
     void addVirtualFileSuffix(QString &str) const;
-    bool hasVirtualFileSuffix(const QString &str) const;
+    bool hasVirtualFileSuffix(QString &str) const;
     void chopVirtualFileSuffix(QString &str) const;
 
     /** Convenience to detect suffix-vfs modes */
@@ -222,7 +217,6 @@ private:
       * Fills _localNormalQueryEntries.
       */
     void startAsyncLocalQuery();
-
 
     /** Sets _pinState, the directory's pin state
      *
@@ -260,7 +254,6 @@ private:
     RemotePermissions _rootPermissions;
     QPointer<DiscoverySingleDirectoryJob> _serverJob;
 
-
     /** Number of currently running async jobs.
      *
      * These "async jobs" have nothing to do with the jobs for subdirectories
@@ -291,6 +284,6 @@ private:
 signals:
     void finished();
     // The root etag of this directory was fetched
-    void etag(const QByteArray &, const QDateTime &time);
+    void etag(QByteArray &, QDateTime &time);
 };
 }

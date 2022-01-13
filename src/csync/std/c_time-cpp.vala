@@ -18,14 +18,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "config_csync.h"
-#include "c_private.h"
-#include "c_time.h"
-
 // #include <QFile>
 
 #ifdef HAVE_UTIMES
-int c_utimes(const QString &uri, const struct timeval *times) {
+int c_utimes(QString &uri, struct timeval *times) {
     int ret = utimes(QFile::encodeName(uri).constData(), times);
     return ret;
 }
@@ -46,7 +42,7 @@ static void UnixTimevalToFileTime(struct timeval t, LPFILETIME pft) {
     pft->dwHighDateTime = ll >> 32;
 }
 
-int c_utimes(const QString &uri, const struct timeval *times) {
+int c_utimes(QString &uri, struct timeval *times) {
     FILETIME LastAccessTime;
     FILETIME LastModificationTime;
     HANDLE hFile;

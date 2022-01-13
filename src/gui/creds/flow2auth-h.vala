@@ -17,7 +17,6 @@
 // #include <QPointer>
 // #include <QUrl>
 // #include <QTimer>
-#include "accountfwd.h"
 
 namespace OCC {
 
@@ -56,10 +55,10 @@ signals:
      * The state has changed.
      * when logged in, appPassword has the value of the app password.
      */
-    void result(Flow2Auth::Result result, const QString &errorString = QString(),
-                const QString &user = QString(), const QString &appPassword = QString());
+    void result(Flow2Auth::Result result, QString &errorString = QString(),
+                const QString &user = QString(), QString &appPassword = QString());
 
-    void statusChanged(const PollStatus status, int secondsLeft);
+    void statusChanged(PollStatus status, int secondsLeft);
 
 public slots:
     void slotPollNow();
@@ -68,7 +67,7 @@ private slots:
     void slotPollTimerTimeout();
 
 private:
-    void fetchNewToken(const TokenAction action);
+    void fetchNewToken(TokenAction action);
 
     Account *_account;
     QUrl _loginUrl;

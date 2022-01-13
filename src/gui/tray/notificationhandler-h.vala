@@ -3,8 +3,6 @@
 
 // #include <QtCore>
 
-#include "usermodel.h"
-
 class QJsonDocument;
 
 namespace OCC {
@@ -20,8 +18,8 @@ public slots:
     void slotFetchNotifications();
 
 private slots:
-    void slotNotificationsReceived(const QJsonDocument &json, int statusCode);
-    void slotEtagResponseHeaderReceived(const QByteArray &value, int statusCode);
+    void slotNotificationsReceived(QJsonDocument &json, int statusCode);
+    void slotEtagResponseHeaderReceived(QByteArray &value, int statusCode);
     void slotAllowDesktopNotificationsChanged(bool isAllowed);
 
 private:

@@ -15,12 +15,6 @@
 // #include <QFileInfo>
 // #include <QLoggingCategory>
 
-#include "abstractpropagateremotedeleteencrypted.h"
-#include "account.h"
-#include "clientsideencryptionjobs.h"
-#include "deletejob.h"
-#include "owncloudpropagator.h"
-
 Q_LOGGING_CATEGORY(ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED, "nextcloud.sync.propagator.remove.encrypted")
 
 namespace OCC {
@@ -44,13 +38,13 @@ void AbstractPropagateRemoteDeleteEncrypted::storeFirstError(QNetworkReply::Netw
     }
 }
 
-void AbstractPropagateRemoteDeleteEncrypted::storeFirstErrorString(const QString &errString) {
+void AbstractPropagateRemoteDeleteEncrypted::storeFirstErrorString(QString &errString) {
     if (_errorString.isEmpty()) {
         _errorString = errString;
     }
 }
 
-void AbstractPropagateRemoteDeleteEncrypted::startLsColJob(const QString &path) {
+void AbstractPropagateRemoteDeleteEncrypted::startLsColJob(QString &path) {
     qCDebug(ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Folder is encrypted, let's get the Id from it.";
     auto job = new LsColJob(_propagator->account(), _propagator->fullRemotePath(path), this);
     job->setProperties({"resourcetype", "http://owncloud.org/ns:fileid"});
@@ -59,21 +53,21 @@ void AbstractPropagateRemoteDeleteEncrypted::startLsColJob(const QString &path) 
     job->start();
 }
 
-void AbstractPropagateRemoteDeleteEncrypted::slotFolderEncryptedIdReceived(const QStringList &list) {
+void AbstractPropagateRemoteDeleteEncrypted::slotFolderEncryptedIdReceived(QStringList &list) {
     qCDebug(ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Received id of folder, trying to lock it so we can prepare the metadata";
     auto job = qobject_cast<LsColJob *>(sender());
     const ExtraFolderInfo folderInfo = job->_folderInfos.value(list.first());
     slotTryLock(folderInfo.fileId);
 }
 
-void AbstractPropagateRemoteDeleteEncrypted::slotTryLock(const QByteArray &folderId) {
+void AbstractPropagateRemoteDeleteEncrypted::slotTryLock(QByteArray &folderId) {
     auto lockJob = new LockEncryptFolderApiJob(_propagator->account(), folderId, this);
     connect(lockJob, &LockEncryptFolderApiJob::success, this, &AbstractPropagateRemoteDeleteEncrypted::slotFolderLockedSuccessfully);
     connect(lockJob, &LockEncryptFolderApiJob::error, this, &AbstractPropagateRemoteDeleteEncrypted::taskFailed);
     lockJob->start();
 }
 
-void AbstractPropagateRemoteDeleteEncrypted::slotFolderLockedSuccessfully(const QByteArray &folderId, const QByteArray &token) {
+void AbstractPropagateRemoteDeleteEncrypted::slotFolderLockedSuccessfully(QByteArray &folderId, QByteArray &token) {
     qCDebug(ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Folder id" << folderId << "Locked Successfully for Upload, Fetching Metadata";
     _folderLocked = true;
     _folderToken = token;
@@ -85,7 +79,7 @@ void AbstractPropagateRemoteDeleteEncrypted::slotFolderLockedSuccessfully(const 
     job->start();
 }
 
-void AbstractPropagateRemoteDeleteEncrypted::slotFolderUnLockedSuccessfully(const QByteArray &folderId) {
+void AbstractPropagateRemoteDeleteEncrypted::slotFolderUnLockedSuccessfully(QByteArray &folderId) {
     Q_UNUSED(folderId);
     qCDebug(ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Folder id" << folderId << "successfully unlocked";
     _folderLocked = false;
@@ -139,7 +133,7 @@ void AbstractPropagateRemoteDeleteEncrypted::slotDeleteRemoteItemFinished() {
     unlockFolder();
 }
 
-void AbstractPropagateRemoteDeleteEncrypted::deleteRemoteItem(const QString &filename) {
+void AbstractPropagateRemoteDeleteEncrypted::deleteRemoteItem(QString &filename) {
     qCInfo(ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Deleting nested encrypted item" << filename;
 
     auto deleteJob = new DeleteJob(_propagator->account(), _propagator->fullRemotePath(filename), this);
@@ -160,7 +154,7 @@ void AbstractPropagateRemoteDeleteEncrypted::unlockFolder() {
     auto unlockJob = new UnlockEncryptFolderApiJob(_propagator->account(), _folderId, _folderToken, this);
 
     connect(unlockJob, &UnlockEncryptFolderApiJob::success, this, &AbstractPropagateRemoteDeleteEncrypted::slotFolderUnLockedSuccessfully);
-    connect(unlockJob, &UnlockEncryptFolderApiJob::error, this, [this] (const QByteArray& fileId, int httpReturnCode) {
+    connect(unlockJob, &UnlockEncryptFolderApiJob::error, this, [this] (QByteArray& fileId, int httpReturnCode) {
         Q_UNUSED(fileId);
         _folderLocked = false;
         _folderToken = "";

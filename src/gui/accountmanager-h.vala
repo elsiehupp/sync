@@ -14,9 +14,6 @@
 
 // #pragma once
 
-#include "account.h"
-#include "accountstate.h"
-
 namespace OCC {
 
 /**
@@ -45,7 +42,7 @@ public:
      * Add this account in the list of saved accounts.
      * Typically called from the wizard
      */
-    AccountState *addAccount(const AccountPtr &newAccount);
+    AccountState *addAccount(AccountPtr &newAccount);
 
     /**
      * remove all accounts
@@ -61,7 +58,7 @@ public:
     /**
      * Return the account state pointer for an account identified by its display name
      */
-    AccountStatePtr account(const QString &name);
+    AccountStatePtr account(QString &name);
 
     /**
      * Delete the AccountState
@@ -87,7 +84,7 @@ private:
 
     bool restoreFromLegacySettings();
 
-    bool isAccountIdAvailable(const QString &id) const;
+    bool isAccountIdAvailable(QString &id) const;
     QString generateFreeAccountId() const;
 
     // Adds an account to the tracked list, emitting accountAdded()
@@ -106,8 +103,7 @@ public slots:
     void saveAccountState(AccountState *a);
 
     /// Display a Box with the mnemonic so the user can copy it to a safe place.
-    static void displayMnemonic(const QString& mnemonic);
-
+    static void displayMnemonic(QString& mnemonic);
 
 Q_SIGNALS:
     void accountAdded(AccountState *account);

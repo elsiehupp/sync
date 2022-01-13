@@ -21,14 +21,11 @@
 // #include <QCheckBox>
 // #include <QSpinBox>
 
-#include "wizard/owncloudwizardcommon.h"
-#include "theme.h"
-
 namespace OCC {
 
 namespace WizardCommon {
 
-    void setupCustomMedia(const QVariant &variant, QLabel *label) {
+    void setupCustomMedia(QVariant &variant, QLabel *label) {
         if (!label)
             return;
 

@@ -12,10 +12,6 @@
  * for more details.
  */
 
-
-#include "accountfwd.h"
-#include "abstractnetworkjob.h"
-
 // #include <QVector>
 // #include <QList>
 // #include <QPair>
@@ -41,7 +37,7 @@ public:
      *
      * @param verb currently supported GET PUT POST DELETE
      */
-    void setLinkAndVerb(const QUrl &link, const QByteArray &verb);
+    void setLinkAndVerb(QUrl &link, QByteArray &verb);
 
     /**
      * @brief Start the OCS request

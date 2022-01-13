@@ -6,8 +6,6 @@
  */
 
 // #include <QtTest>
-#include "syncenginetestutils.h"
-#include "lockwatcher.h"
 // #include <syncengine.h>
 // #include <localdiscoverytracker.h>
 
@@ -15,7 +13,7 @@ using namespace OCC;
 
 #ifdef Q_OS_WIN
 // pass combination of FILE_SHARE_READ, FILE_SHARE_WRITE, FILE_SHARE_DELETE
-HANDLE makeHandle(const QString &file, int shareMode) {
+HANDLE makeHandle(QString &file, int shareMode) {
     const auto fName = FileSystem::longWinPath(file);
     const wchar_t *wuri = reinterpret_cast<const wchar_t *>(fName.utf16());
     auto handle = CreateFileW(
@@ -42,7 +40,7 @@ private slots:
 
         LockWatcher watcher;
         watcher.setCheckInterval(std::chrono::milliseconds(50));
-        connect(&watcher, &LockWatcher::fileUnlocked, &watcher, [&](const QString &f) { ++count; file = f; });
+        connect(&watcher, &LockWatcher::fileUnlocked, &watcher, [&](QString &f) { ++count; file = f; });
 
         const QString tmpFile = tmp.path() + QString::fromUtf8("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
                                                                "elonglonglonglong/flonglonglonglong/glonglonglonglong/hlonglonglonglong/ilonglonglonglong/"
@@ -101,12 +99,12 @@ private slots:
 
         QStringList seenLockedFiles;
         connect(&fakeFolder.syncEngine(), &SyncEngine::seenLockedFile, &fakeFolder.syncEngine(),
-                [&](const QString &file) { seenLockedFiles.append(file); });
+                [&](QString &file) { seenLockedFiles.append(file); });
 
         LocalDiscoveryTracker tracker;
         connect(&fakeFolder.syncEngine(), &SyncEngine::itemCompleted, &tracker, &LocalDiscoveryTracker::slotItemCompleted);
         connect(&fakeFolder.syncEngine(), &SyncEngine::finished, &tracker, &LocalDiscoveryTracker::slotSyncFinished);
-        auto hasLocalDiscoveryPath = [&](const QString &path) {
+        auto hasLocalDiscoveryPath = [&](QString &path) {
             auto &paths = tracker.localDiscoveryPaths();
             return paths.find(path.toUtf8()) != paths.end();
         };

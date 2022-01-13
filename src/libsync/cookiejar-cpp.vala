@@ -12,10 +12,6 @@
  * for more details.
  */
 
-#include "cookiejar.h"
-
-#include "configfile.h"
-
 // #include <QFile>
 // #include <QDateTime>
 // #include <QLoggingCategory>
@@ -31,10 +27,10 @@ namespace {
     const unsigned int JAR_VERSION = 23;
 }
 
-QDataStream &operator<<(QDataStream &stream, const QList<QNetworkCookie> &list) {
+QDataStream &operator<<(QDataStream &stream, QList<QNetworkCookie> &list) {
     stream << JAR_VERSION;
     stream << quint32(list.size());
-    for (const auto &cookie : list)
+    for (auto &cookie : list)
         stream << cookie.toRawForm();
     return stream;
 }
@@ -71,7 +67,7 @@ CookieJar::CookieJar(QObject *parent)
 
 CookieJar::~CookieJar() = default;
 
-bool CookieJar::setCookiesFromUrl(const QList<QNetworkCookie> &cookieList, const QUrl &url) {
+bool CookieJar::setCookiesFromUrl(QList<QNetworkCookie> &cookieList, QUrl &url) {
     if (QNetworkCookieJar::setCookiesFromUrl(cookieList, url)) {
         Q_EMIT newCookiesForUrl(cookieList, url);
         return true;
@@ -80,7 +76,7 @@ bool CookieJar::setCookiesFromUrl(const QList<QNetworkCookie> &cookieList, const
     return false;
 }
 
-QList<QNetworkCookie> CookieJar::cookiesForUrl(const QUrl &url) const {
+QList<QNetworkCookie> CookieJar::cookiesForUrl(QUrl &url) const {
     QList<QNetworkCookie> cookies = QNetworkCookieJar::cookiesForUrl(url);
     qCDebug(lcCookieJar) << url << "requests:" << cookies;
     return cookies;
@@ -90,7 +86,7 @@ void CookieJar::clearSessionCookies() {
     setAllCookies(removeExpired(allCookies()));
 }
 
-bool CookieJar::save(const QString &fileName) {
+bool CookieJar::save(QString &fileName) {
     const QFileInfo info(fileName);
     if (!info.dir().exists()) {
         info.dir().mkpath(".");
@@ -107,7 +103,7 @@ bool CookieJar::save(const QString &fileName) {
     return true;
 }
 
-bool CookieJar::restore(const QString &fileName) {
+bool CookieJar::restore(QString &fileName) {
     const QFileInfo info(fileName);
     if (!info.exists()) {
         return false;
@@ -125,9 +121,9 @@ bool CookieJar::restore(const QString &fileName) {
     return true;
 }
 
-QList<QNetworkCookie> CookieJar::removeExpired(const QList<QNetworkCookie> &cookies) {
+QList<QNetworkCookie> CookieJar::removeExpired(QList<QNetworkCookie> &cookies) {
     QList<QNetworkCookie> updatedList;
-    foreach (const QNetworkCookie &cookie, cookies) {
+    foreach (QNetworkCookie &cookie, cookies) {
         if (cookie.expirationDate() > QDateTime::currentDateTimeUtc() && !cookie.isSessionCookie()) {
             updatedList << cookie;
         }

@@ -16,9 +16,6 @@
 // #include <QString>
 // #include <QCoreApplication>
 
-#include "common/asserts.h"
-#include "creds/abstractcredentials.h"
-
 namespace OCC {
 
 Q_LOGGING_CATEGORY(lcCredentials, "nextcloud.sync.credentials", QtInfoMsg)
@@ -30,7 +27,7 @@ void AbstractCredentials::setAccount(Account *account) {
     _account = account;
 }
 
-QString AbstractCredentials::keychainKey(const QString &url, const QString &user, const QString &accountId) {
+QString AbstractCredentials::keychainKey(QString &url, QString &user, QString &accountId) {
     QString u(url);
     if (u.isEmpty()) {
         qCWarning(lcCredentials) << "Empty url in keyChain, error!";

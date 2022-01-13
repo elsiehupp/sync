@@ -6,12 +6,11 @@
  */
 
 // #include <QtTest>
-#include "syncenginetestutils.h"
 // #include <syncengine.h>
 
 using namespace OCC;
 
-SyncJournalFileRecord journalRecord(FakeFolder &folder, const QByteArray &path) {
+SyncJournalFileRecord journalRecord(FakeFolder &folder, QByteArray &path) {
     SyncJournalFileRecord rec;
     folder.syncJournal().getFileRecord(path, &rec);
     return rec;
@@ -38,7 +37,7 @@ private slots:
         int counter = 0;
         const QByteArray testFileName = QByteArrayLiteral("A/new");
         QByteArray reqId;
-        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, const QNetworkRequest &req, QIODevice *) -> QNetworkReply * {
+        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, QNetworkRequest &req, QIODevice *) -> QNetworkReply * {
             if (req.url().path().endsWith(testFileName)) {
                 reqId = req.rawHeader("X-Request-ID");
             }

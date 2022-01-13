@@ -12,8 +12,6 @@
  * for more details.
  */
 
-
-
 // #include <QObject>
 // #include <QTimer>
 

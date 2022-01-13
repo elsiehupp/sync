@@ -20,5 +20,5 @@ namespace OCC {
  * @brief Open the file manager with the specified file pre-selected
  * @ingroup gui
  */
-void showInFileManager(const QString &localPath);
+void showInFileManager(QString &localPath);
 }

@@ -18,8 +18,6 @@
 // #include <QString>
 // #include <QNetworkReply>
 
-#include "syncfileitem.h"
-
 namespace OCC {
 
 class OwncloudPropagator;
@@ -42,17 +40,17 @@ signals:
 
 protected:
     void storeFirstError(QNetworkReply::NetworkError err);
-    void storeFirstErrorString(const QString &errString);
+    void storeFirstErrorString(QString &errString);
 
-    void startLsColJob(const QString &path);
-    void slotFolderEncryptedIdReceived(const QStringList &list);
-    void slotTryLock(const QByteArray &folderId);
-    void slotFolderLockedSuccessfully(const QByteArray &folderId, const QByteArray &token);
-    virtual void slotFolderUnLockedSuccessfully(const QByteArray &folderId);
-    virtual void slotFolderEncryptedMetadataReceived(const QJsonDocument &json, int statusCode) = 0;
+    void startLsColJob(QString &path);
+    void slotFolderEncryptedIdReceived(QStringList &list);
+    void slotTryLock(QByteArray &folderId);
+    void slotFolderLockedSuccessfully(QByteArray &folderId, QByteArray &token);
+    virtual void slotFolderUnLockedSuccessfully(QByteArray &folderId);
+    virtual void slotFolderEncryptedMetadataReceived(QJsonDocument &json, int statusCode) = 0;
     void slotDeleteRemoteItemFinished();
 
-    void deleteRemoteItem(const QString &filename);
+    void deleteRemoteItem(QString &filename);
     void unlockFolder();
     void taskFailed();
 

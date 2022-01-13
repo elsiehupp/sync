@@ -27,8 +27,6 @@
 **
 ****************************************************************************/
 
-#include "qtlockedfile.h"
-
 // #include <cstring>
 // #include <cerrno>
 // #include <unistd.h>
@@ -65,11 +63,9 @@ bool QtLockedFile::lock(LockMode mode, bool block) {
         return false;
     }
 
-
     m_lock_mode = mode;
     return true;
 }
-
 
 bool QtLockedFile::unlock() {
     if (!isOpen()) {

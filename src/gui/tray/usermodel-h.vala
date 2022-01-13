@@ -8,13 +8,6 @@
 // #include <QQuickImageProvider>
 // #include <QHash>
 
-#include "activitylistmodel.h"
-#include "accountfwd.h"
-#include "accountmanager.h"
-#include "folderman.h"
-#include "notificationcache.h"
-#include "userstatusselectormodel.h"
-#include "userstatusconnector.h"
 // #include <chrono>
 
 namespace OCC {
@@ -34,14 +27,14 @@ class User : public QObject {
     Q_PROPERTY(bool isConnected READ isConnected NOTIFY accountStateChanged)
     Q_PROPERTY(UnifiedSearchResultsListModel* unifiedSearchResultsListModel READ getUnifiedSearchResultsListModel CONSTANT)
 public:
-    User(AccountStatePtr &account, const bool &isCurrent = false, QObject *parent = nullptr);
+    User(AccountStatePtr &account, bool &isCurrent = false, QObject *parent = nullptr);
 
     AccountPtr account() const;
     AccountStatePtr accountState() const;
 
     bool isConnected() const;
     bool isCurrentUser() const;
-    void setCurrentUser(const bool &isCurrent);
+    void setCurrentUser(bool &isCurrent);
     Folder *getFolder() const;
     ActivityListModel *getActivityModel();
     UnifiedSearchResultsListModel *getUnifiedSearchResultsListModel() const;
@@ -64,10 +57,10 @@ public:
     QString statusMessage() const;
     QUrl statusIcon() const;
     QString statusEmoji() const;
-    void processCompletedSyncItem(const Folder *folder, const SyncFileItemPtr &item);
+    void processCompletedSyncItem(Folder *folder, SyncFileItemPtr &item);
 
 signals:
-    void guiLog(const QString &, const QString &);
+    void guiLog(QString &, QString &);
     void nameChanged();
     void hasLocalFolderChanged();
     void serverHasTalkChanged();
@@ -77,16 +70,16 @@ signals:
     void desktopNotificationsAllowedChanged();
 
 public slots:
-    void slotItemCompleted(const QString &folder, const SyncFileItemPtr &item);
-    void slotProgressInfo(const QString &folder, const ProgressInfo &progress);
-    void slotAddError(const QString &folderAlias, const QString &message, ErrorCategory category);
-    void slotAddErrorToGui(const QString &folderAlias, SyncFileItem::Status status, const QString &errorMessage, const QString &subject = {});
+    void slotItemCompleted(QString &folder, SyncFileItemPtr &item);
+    void slotProgressInfo(QString &folder, ProgressInfo &progress);
+    void slotAddError(QString &folderAlias, QString &message, ErrorCategory category);
+    void slotAddErrorToGui(QString &folderAlias, SyncFileItem::Status status, QString &errorMessage, QString &subject = {});
     void slotNotificationRequestFinished(int statusCode);
     void slotNotifyNetworkError(QNetworkReply *reply);
     void slotEndNotificationRequest(int replyCode);
-    void slotNotifyServerFinished(const QString &reply, int replyCode);
-    void slotSendNotificationRequest(const QString &accountName, const QString &link, const QByteArray &verb, int row);
-    void slotBuildNotificationDisplay(const ActivityList &list);
+    void slotNotifyServerFinished(QString &reply, int replyCode);
+    void slotSendNotificationRequest(QString &accountName, QString &link, QByteArray &verb, int row);
+    void slotBuildNotificationDisplay(ActivityList &list);
     void slotRefreshNotifications();
     void slotRefreshActivities();
     void slotRefresh();
@@ -105,10 +98,10 @@ private:
     void connectPushNotifications() const;
     bool checkPushNotificationsAreReady() const;
 
-    bool isActivityOfCurrentAccount(const Folder *folder) const;
-    bool isUnsolvableConflict(const SyncFileItemPtr &item) const;
+    bool isActivityOfCurrentAccount(Folder *folder) const;
+    bool isUnsolvableConflict(SyncFileItemPtr &item) const;
 
-    void showDesktopNotification(const QString &title, const QString &message);
+    void showDesktopNotification(QString &title, QString &message);
 
 private:
     AccountStatePtr _account;
@@ -136,14 +129,14 @@ public:
     static UserModel *instance();
     ~UserModel() override = default;
 
-    void addUser(AccountStatePtr &user, const bool &isCurrent = false);
+    void addUser(AccountStatePtr &user, bool &isCurrent = false);
     int currentUserIndex();
 
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    int rowCount(QModelIndex &parent = QModelIndex()) const override;
 
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QVariant data(QModelIndex &index, int role = Qt::DisplayRole) const override;
 
-    QImage avatarById(const int &id);
+    QImage avatarById(int &id);
 
     User *currentUser() const;
 
@@ -156,11 +149,11 @@ public:
     Q_INVOKABLE int numUsers();
     Q_INVOKABLE QString currentUserServer();
     int currentUserId() const;
-    Q_INVOKABLE bool isUserConnected(const int &id);
-    Q_INVOKABLE void switchCurrentUser(const int &id);
-    Q_INVOKABLE void login(const int &id);
-    Q_INVOKABLE void logout(const int &id);
-    Q_INVOKABLE void removeAccount(const int &id);
+    Q_INVOKABLE bool isUserConnected(int &id);
+    Q_INVOKABLE void switchCurrentUser(int &id);
+    Q_INVOKABLE void login(int &id);
+    Q_INVOKABLE void logout(int &id);
+    Q_INVOKABLE void removeAccount(int &id);
 
     Q_INVOKABLE std::shared_ptr<OCC::UserStatusConnector> userStatusConnector(int id);
 
@@ -202,7 +195,7 @@ private:
 class ImageProvider : public QQuickImageProvider {
 public:
     ImageProvider();
-    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize) override;
+    QImage requestImage(QString &id, QSize *size, QSize &requestedSize) override;
 };
 
 class UserAppsModel : public QAbstractListModel {
@@ -210,9 +203,9 @@ public:
     static UserAppsModel *instance();
     ~UserAppsModel() override = default;
 
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    int rowCount(QModelIndex &parent = QModelIndex()) const override;
 
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QVariant data(QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     enum UserAppsRoles {
         NameRole = Qt::UserRole + 1,
@@ -223,7 +216,7 @@ public:
     void buildAppList();
 
 public slots:
-    void openAppUrl(const QUrl &url);
+    void openAppUrl(QUrl &url);
 
 protected:
     QHash<int, QByteArray> roleNames() const override;

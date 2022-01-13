@@ -27,8 +27,6 @@
 **
 ****************************************************************************/
 
-#include "qtlockedfile.h"
-
 namespace SharedTools {
 
 /*!
@@ -81,11 +79,11 @@ QtLockedFile::QtLockedFile()
 
 /*!
     Constructs an unlocked QtLockedFile object with file \a name. This constructor behaves in
-    the same way as \e QFile::QFile(const QString&).
+    the same way as \e QFile::QFile(QString&).
 
     \sa QFile::QFile()
 */
-QtLockedFile::QtLockedFile(const QString &name)
+QtLockedFile::QtLockedFile(QString &name)
     : QFile(name) {
 #ifdef Q_OS_WIN
     m_semaphore_hnd = 0;

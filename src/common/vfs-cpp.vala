@@ -16,14 +16,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "config.h"
-#include "vfs.h"
-#include "plugin.h"
-#include "version.h"
-#include "syncjournaldb.h"
-
-#include "common/filesystembase.h"
-
 // #include <QPluginLoader>
 // #include <QLoggingCategory>
 
@@ -50,7 +42,7 @@ QString Vfs::modeToString(Mode mode) {
     return QStringLiteral("off");
 }
 
-Optional<Vfs::Mode> Vfs::modeFromString(const QString &str) {
+Optional<Vfs::Mode> Vfs::modeFromString(QString &str) {
     // Note: Strings are used for config and must be stable
     if (str == QLatin1String("off")) {
         return Off;
@@ -62,7 +54,7 @@ Optional<Vfs::Mode> Vfs::modeFromString(const QString &str) {
     return {};
 }
 
-Result<bool, QString> Vfs::checkAvailability(const QString &path) {
+Result<bool, QString> Vfs::checkAvailability(QString &path) {
     const auto mode = bestAvailableVfsMode();
 #ifdef Q_OS_WIN
     if (mode == Mode::WindowsCfApi) {
@@ -78,12 +70,12 @@ Result<bool, QString> Vfs::checkAvailability(const QString &path) {
     return true;
 }
 
-void Vfs::start(const VfsSetupParams &params) {
+void Vfs::start(VfsSetupParams &params) {
     _setupParams = params;
     startImpl(params);
 }
 
-bool Vfs::setPinStateInDb(const QString &folderPath, PinState state) {
+bool Vfs::setPinStateInDb(QString &folderPath, PinState state) {
     auto path = folderPath.toUtf8();
     _setupParams.journal->internalPinStates().wipeForPathAndBelow(path);
     if (state != PinState::Inherited)
@@ -91,12 +83,12 @@ bool Vfs::setPinStateInDb(const QString &folderPath, PinState state) {
     return true;
 }
 
-Optional<PinState> Vfs::pinStateInDb(const QString &folderPath) {
+Optional<PinState> Vfs::pinStateInDb(QString &folderPath) {
     auto pin = _setupParams.journal->internalPinStates().effectiveForPath(folderPath.toUtf8());
     return pin;
 }
 
-Vfs::AvailabilityResult Vfs::availabilityInDb(const QString &folderPath) {
+Vfs::AvailabilityResult Vfs::availabilityInDb(QString &folderPath) {
     auto path = folderPath.toUtf8();
     auto pin = _setupParams.journal->internalPinStates().effectiveForPathRecursive(path);
     // not being able to retrieve the pin state isn't too bad

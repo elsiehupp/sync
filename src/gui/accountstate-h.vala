@@ -12,13 +12,9 @@
  * for more details.
  */
 
-
-
 // #include <QByteArray>
 // #include <QElapsedTimer>
 // #include <QPointer>
-#include "connectionvalidator.h"
-#include "creds/abstractcredentials.h"
 
 // #include <memory>
 
@@ -103,7 +99,7 @@ public:
     bool isSignedOut() const;
 
     AccountAppList appList() const;
-    AccountApp* findApp(const QString &appId) const;
+    AccountApp* findApp(QString &appId) const;
 
     /** A user-triggered sign out which disconnects, stops syncs
      * for the account and forgets the password. */
@@ -133,7 +129,7 @@ public:
      *  the server to validate the connection if the last successful etag job
      *  was not so long ago.
      */
-    void tagLastSuccessfullETagRequest(const QDateTime &tp);
+    void tagLastSuccessfullETagRequest(QDateTime &tp);
 
     /** Saves the ETag Response header from the last Notifications api
      * request with statusCode 200.
@@ -143,7 +139,7 @@ public:
     /** Returns the ETag Response header from the last Notifications api
      * request with statusCode 200.
     */
-    void setNotificationsEtagResponseHeader(const QByteArray &value);
+    void setNotificationsEtagResponseHeader(QByteArray &value);
 
     /** Saves the ETag Response header from the last Navigation Apps api
      * request with statusCode 200.
@@ -153,7 +149,7 @@ public:
     /** Returns the ETag Response header from the last Navigation Apps api
      * request with statusCode 200.
     */
-    void setNavigationAppsEtagResponseHeader(const QByteArray &value);
+    void setNavigationAppsEtagResponseHeader(QByteArray &value);
 
     ///Asks for user credentials
     void handleInvalidCredentials();
@@ -184,7 +180,7 @@ signals:
     void desktopNotificationsAllowedChanged();
 
 protected Q_SLOTS:
-    void slotConnectionValidatorResult(ConnectionValidator::Status status, const QStringList &errors);
+    void slotConnectionValidatorResult(ConnectionValidator::Status status, QStringList &errors);
 
     /// When client gets a 401 or 403 checks if server requested remote wipe
     /// before asking for user credentials again
@@ -193,9 +189,9 @@ protected Q_SLOTS:
     void slotCredentialsFetched(AbstractCredentials *creds);
     void slotCredentialsAsked(AbstractCredentials *creds);
 
-    void slotNavigationAppsFetched(const QJsonDocument &reply, int statusCode);
-    void slotEtagResponseHeaderReceived(const QByteArray &value, int statusCode);
-    void slotOcsError(int statusCode, const QString &message);
+    void slotNavigationAppsFetched(QJsonDocument &reply, int statusCode);
+    void slotEtagResponseHeaderReceived(QByteArray &value, int statusCode);
+    void slotOcsError(int statusCode, QString &message);
 
 private:
     AccountPtr _account;
@@ -236,8 +232,8 @@ private:
 
 class AccountApp : public QObject {
 public:
-    AccountApp(const QString &name, const QUrl &url,
-        const QString &id, const QUrl &iconUrl,
+    AccountApp(QString &name, QUrl &url,
+        const QString &id, QUrl &iconUrl,
         QObject* parent = nullptr);
 
     QString name() const;

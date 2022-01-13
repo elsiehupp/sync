@@ -12,14 +12,6 @@
  * for more details.
  */
 
-#include "cfapiwrapper.h"
-
-#include "common/utility.h"
-#include "common/filesystembase.h"
-#include "hydrationjob.h"
-#include "theme.h"
-#include "vfs_cfapi.h"
-
 // #include <QCoreApplication>
 // #include <QEventLoop>
 // #include <QDir>
@@ -44,7 +36,7 @@ namespace {
 constexpr auto syncRootFlagsFull = 34;
 constexpr auto syncRootFlagsNoCfApiContextMenu = 2;
 
-void cfApiSendTransferInfo(const CF_CONNECTION_KEY &connectionKey, const CF_TRANSFER_KEY &transferKey, NTSTATUS status, void *buffer, qint64 offset, qint64 currentBlockLength, qint64 totalLength) {
+void cfApiSendTransferInfo(CF_CONNECTION_KEY &connectionKey, CF_TRANSFER_KEY &transferKey, NTSTATUS status, void *buffer, qint64 offset, qint64 currentBlockLength, qint64 totalLength) {
 
     CF_OPERATION_INFO opInfo = { 0 };
     CF_OPERATION_PARAMETERS opParams = { 0 };
@@ -83,7 +75,7 @@ void cfApiSendTransferInfo(const CF_CONNECTION_KEY &connectionKey, const CF_TRAN
     }
 }
 
-void CALLBACK cfApiFetchDataCallback(const CF_CALLBACK_INFO *callbackInfo, const CF_CALLBACK_PARAMETERS *callbackParameters) {
+void CALLBACK cfApiFetchDataCallback(CF_CALLBACK_INFO *callbackInfo, CF_CALLBACK_PARAMETERS *callbackParameters) {
     qDebug(lcCfApiWrapper) << "Fetch data callback called. File size:" << callbackInfo->FileSize.QuadPart;
     const auto sendTransferError = [=] {
         cfApiSendTransferInfo(callbackInfo->ConnectionKey,
@@ -120,13 +112,13 @@ void CALLBACK cfApiFetchDataCallback(const CF_CALLBACK_INFO *callbackInfo, const
     // Block and wait for vfs to signal back the hydration is ready
     bool hydrationRequestResult = false;
     QEventLoop loop;
-    QObject::connect(vfs, &OCC::VfsCfApi::hydrationRequestReady, &loop, [&](const QString &id) {
+    QObject::connect(vfs, &OCC::VfsCfApi::hydrationRequestReady, &loop, [&](QString &id) {
         if (requestId == id) {
             hydrationRequestResult = true;
             loop.quit();
         }
     });
-    QObject::connect(vfs, &OCC::VfsCfApi::hydrationRequestFailed, &loop, [&](const QString &id) {
+    QObject::connect(vfs, &OCC::VfsCfApi::hydrationRequestFailed, &loop, [&](QString &id) {
         if (requestId == id) {
             hydrationRequestResult = false;
             loop.quit();
@@ -173,7 +165,7 @@ void CALLBACK cfApiFetchDataCallback(const CF_CALLBACK_INFO *callbackInfo, const
     qint64 dataOffset = 0;
     QByteArray protrudingData;
 
-    const auto alignAndSendData = [&](const QByteArray &receivedData) {
+    const auto alignAndSendData = [&](QByteArray &receivedData) {
         QByteArray data = protrudingData + receivedData;
         protrudingData.clear();
         if (data.size() < cfapiBlockSize) {
@@ -205,7 +197,7 @@ void CALLBACK cfApiFetchDataCallback(const CF_CALLBACK_INFO *callbackInfo, const
         alignAndSendData(receivedData);
     });
 
-    QObject::connect(vfs, &OCC::VfsCfApi::hydrationRequestFinished, &loop, [&](const QString &id) {
+    QObject::connect(vfs, &OCC::VfsCfApi::hydrationRequestFinished, &loop, [&](QString &id) {
         qDebug(lcCfApiWrapper) << "Hydration finished for request" << id;
         if (requestId == id) {
             loop.quit();
@@ -233,7 +225,7 @@ void CALLBACK cfApiFetchDataCallback(const CF_CALLBACK_INFO *callbackInfo, const
 }
 }
 
-void CALLBACK cfApiCancelFetchData(const CF_CALLBACK_INFO *callbackInfo, const CF_CALLBACK_PARAMETERS * /*callbackParameters*/) {
+void CALLBACK cfApiCancelFetchData(CF_CALLBACK_INFO *callbackInfo, CF_CALLBACK_PARAMETERS * /*callbackParameters*/) {
     const auto path = QString(QString::fromWCharArray(callbackInfo->VolumeDosName) + QString::fromWCharArray(callbackInfo->NormalizedPath));
 
     qInfo(lcCfApiWrapper) << "Cancel fetch data of" << path;
@@ -262,7 +254,7 @@ void deletePlaceholderInfo(CF_PLACEHOLDER_BASIC_INFO *info) {
     delete[] byte;
 }
 
-std::wstring pathForHandle(const OCC::CfApiWrapper::FileHandle &handle) {
+std::wstring pathForHandle(OCC::CfApiWrapper::FileHandle &handle) {
     wchar_t buffer[MAX_PATH];
     const qint64 result = GetFinalPathNameByHandle(handle.get(), buffer, MAX_PATH, VOLUME_NAME_DOS);
     Q_ASSERT(result < MAX_PATH);
@@ -380,14 +372,14 @@ std::unique_ptr<TOKEN_USER> getCurrentTokenInformation() {
 }
 
 QString retrieveWindowsSid() {
-    if (const auto tokenInfo = getCurrentTokenInformation()) {
+    if (auto tokenInfo = getCurrentTokenInformation()) {
         return convertSidToStringSid(tokenInfo->User.Sid);
     }
 
     return {};
 }
 
-bool createSyncRootRegistryKeys(const QString &providerName, const QString &folderAlias, const QString &displayName, const QString &accountDisplayName, const QString &syncRootPath) {
+bool createSyncRootRegistryKeys(QString &providerName, QString &folderAlias, QString &displayName, QString &accountDisplayName, QString &syncRootPath) {
     // We must set specific Registry keys to make the progress bar refresh correctly and also add status icons into Windows Explorer
     // More about this here: https://docs.microsoft.com/en-us/windows/win32/shell/integrate-cloud-storage
     const auto windowsSid = retrieveWindowsSid();
@@ -416,7 +408,7 @@ bool createSyncRootRegistryKeys(const QString &providerName, const QString &fold
     const QVector<RegistryKeyInfo> registryKeysToSet = { { providerSyncRootIdRegistryKey, QStringLiteral("Flags"), REG_DWORD, flags }, { providerSyncRootIdRegistryKey, QStringLiteral("DisplayNameResource"), REG_EXPAND_SZ, displayName }, { providerSyncRootIdRegistryKey, QStringLiteral("IconResource"), REG_EXPAND_SZ, QString(QDir::toNativeSeparators(qApp->applicationFilePath()) + QStringLiteral(",0")) }, { providerSyncRootIdUserSyncRootsRegistryKey, windowsSid, REG_SZ, syncRootPath }
     };
 
-    for (const auto &registryKeyToSet : qAsConst(registryKeysToSet)) {
+    for (auto &registryKeyToSet : qAsConst(registryKeysToSet)) {
         if (!OCC::Utility::registrySetKeyValue(HKEY_LOCAL_MACHINE, registryKeyToSet.subKey, registryKeyToSet.valueName, registryKeyToSet.type, registryKeyToSet.value)) {
             qCWarning(lcCfApiWrapper) << "Failed to set Registry keys for shell integration. Progress bar will not work.";
             const auto deleteKeyResult = OCC::Utility::registryDeleteKeyTree(HKEY_LOCAL_MACHINE, providerSyncRootIdRegistryKey);
@@ -430,7 +422,7 @@ bool createSyncRootRegistryKeys(const QString &providerName, const QString &fold
     return true;
 }
 
-bool deleteSyncRootRegistryKey(const QString &syncRootPath, const QString &providerName, const QString &accountDisplayName) {
+bool deleteSyncRootRegistryKey(QString &syncRootPath, QString &providerName, QString &accountDisplayName) {
     const auto syncRootManagerRegistryKey = QStringLiteral(R"(SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\SyncRootManager\)");
 
     if (OCC::Utility::registryKeyExists(HKEY_LOCAL_MACHINE, syncRootManagerRegistryKey)) {
@@ -446,7 +438,7 @@ bool deleteSyncRootRegistryKey(const QString &syncRootPath, const QString &provi
         bool result = true;
 
         // walk through each registered syncRootId
-        OCC::Utility::registryWalkSubKeys(HKEY_LOCAL_MACHINE, syncRootManagerRegistryKey, [&](HKEY, const QString &syncRootId) {
+        OCC::Utility::registryWalkSubKeys(HKEY_LOCAL_MACHINE, syncRootManagerRegistryKey, [&](HKEY, QString &syncRootId) {
             // make sure we have matching syncRootId(providerName!windowsSid!accountDisplayName)
             if (syncRootId.startsWith(currentUserSyncRootIdPattern)) {
                 const QString syncRootIdUserSyncRootsRegistryKey = syncRootManagerRegistryKey + syncRootId + QStringLiteral(R"(\UserSyncRoots\)");
@@ -462,7 +454,7 @@ bool deleteSyncRootRegistryKey(const QString &syncRootPath, const QString &provi
     return true;
 }
 
-OCC::Result<void, QString> OCC::CfApiWrapper::registerSyncRoot(const QString &path, const QString &providerName, const QString &providerVersion, const QString &folderAlias, const QString &displayName, const QString &accountDisplayName) {
+OCC::Result<void, QString> OCC::CfApiWrapper::registerSyncRoot(QString &path, QString &providerName, QString &providerVersion, QString &folderAlias, QString &displayName, QString &accountDisplayName) {
     // even if we fail to register our sync root with shell, we can still proceed with using the VFS
     const auto createRegistryKeyResult = createSyncRootRegistryKeys(providerName, folderAlias, displayName, accountDisplayName, path);
     Q_ASSERT(createRegistryKeyResult);
@@ -505,7 +497,7 @@ OCC::Result<void, QString> OCC::CfApiWrapper::registerSyncRoot(const QString &pa
     }
 }
 
-OCC::Result<void, QString> OCC::CfApiWrapper::unregisterSyncRoot(const QString &path, const QString &providerName, const QString &accountDisplayName) {
+OCC::Result<void, QString> OCC::CfApiWrapper::unregisterSyncRoot(QString &path, QString &providerName, QString &accountDisplayName) {
     const auto deleteRegistryKeyResult = deleteSyncRootRegistryKey(path, providerName, accountDisplayName);
     Q_ASSERT(deleteRegistryKeyResult);
 
@@ -523,7 +515,7 @@ OCC::Result<void, QString> OCC::CfApiWrapper::unregisterSyncRoot(const QString &
     }
 }
 
-OCC::Result<OCC::CfApiWrapper::ConnectionKey, QString> OCC::CfApiWrapper::connectSyncRoot(const QString &path, OCC::VfsCfApi *context) {
+OCC::Result<OCC::CfApiWrapper::ConnectionKey, QString> OCC::CfApiWrapper::connectSyncRoot(QString &path, OCC::VfsCfApi *context) {
     auto key = ConnectionKey();
     const auto p = path.toStdWString();
     const qint64 result = CfConnectSyncRoot(p.data(),
@@ -549,13 +541,13 @@ OCC::Result<void, QString> OCC::CfApiWrapper::disconnectSyncRoot(ConnectionKey &
     }
 }
 
-bool OCC::CfApiWrapper::isSparseFile(const QString &path) {
+bool OCC::CfApiWrapper::isSparseFile(QString &path) {
     const auto p = path.toStdWString();
     const auto attributes = GetFileAttributes(p.data());
     return (attributes & FILE_ATTRIBUTE_SPARSE_FILE) != 0;
 }
 
-OCC::CfApiWrapper::FileHandle OCC::CfApiWrapper::handleForPath(const QString &path) {
+OCC::CfApiWrapper::FileHandle OCC::CfApiWrapper::handleForPath(QString &path) {
     if (path.isEmpty()) {
         return {};
     }
@@ -585,7 +577,7 @@ OCC::CfApiWrapper::FileHandle OCC::CfApiWrapper::handleForPath(const QString &pa
     return {};
 }
 
-OCC::CfApiWrapper::PlaceHolderInfo OCC::CfApiWrapper::findPlaceholderInfo(const FileHandle &handle) {
+OCC::CfApiWrapper::PlaceHolderInfo OCC::CfApiWrapper::findPlaceholderInfo(FileHandle &handle) {
     Q_ASSERT(handle);
 
     constexpr auto fileIdMaxLength = 128;
@@ -600,7 +592,7 @@ OCC::CfApiWrapper::PlaceHolderInfo OCC::CfApiWrapper::findPlaceholderInfo(const 
     }
 }
 
-OCC::Result<OCC::Vfs::ConvertToPlaceholderResult, QString> OCC::CfApiWrapper::setPinState(const FileHandle &handle, OCC::PinStateEnums::PinState state, SetPinRecurseMode mode) {
+OCC::Result<OCC::Vfs::ConvertToPlaceholderResult, QString> OCC::CfApiWrapper::setPinState(FileHandle &handle, OCC::PinStateEnums::PinState state, SetPinRecurseMode mode) {
     const auto cfState = pinStateToCfPinState(state);
     const auto flags = pinRecurseModeToCfSetPinFlags(mode);
 
@@ -613,7 +605,7 @@ OCC::Result<OCC::Vfs::ConvertToPlaceholderResult, QString> OCC::CfApiWrapper::se
     }
 }
 
-OCC::Result<void, QString> OCC::CfApiWrapper::createPlaceholderInfo(const QString &path, time_t modtime, qint64 size, const QByteArray &fileId) {
+OCC::Result<void, QString> OCC::CfApiWrapper::createPlaceholderInfo(QString &path, time_t modtime, qint64 size, QByteArray &fileId) {
     if (modtime <= 0) {
         return {QString{"Could not update metadata due to invalid modified time for %1: %2"}.arg(path).arg(modtime)};
     }
@@ -662,7 +654,7 @@ OCC::Result<void, QString> OCC::CfApiWrapper::createPlaceholderInfo(const QStrin
     return {};
 }
 
-OCC::Result<OCC::Vfs::ConvertToPlaceholderResult, QString> OCC::CfApiWrapper::updatePlaceholderInfo(const FileHandle &handle, time_t modtime, qint64 size, const QByteArray &fileId, const QString &replacesPath) {
+OCC::Result<OCC::Vfs::ConvertToPlaceholderResult, QString> OCC::CfApiWrapper::updatePlaceholderInfo(FileHandle &handle, time_t modtime, qint64 size, QByteArray &fileId, QString &replacesPath) {
     Q_ASSERT(handle);
 
     if (modtime <= 0) {
@@ -704,7 +696,7 @@ OCC::Result<OCC::Vfs::ConvertToPlaceholderResult, QString> OCC::CfApiWrapper::up
     return OCC::Vfs::ConvertToPlaceholderResult::Ok;
 }
 
-OCC::Result<OCC::Vfs::ConvertToPlaceholderResult, QString> OCC::CfApiWrapper::convertToPlaceholder(const FileHandle &handle, time_t modtime, qint64 size, const QByteArray &fileId, const QString &replacesPath) {
+OCC::Result<OCC::Vfs::ConvertToPlaceholderResult, QString> OCC::CfApiWrapper::convertToPlaceholder(FileHandle &handle, time_t modtime, qint64 size, QByteArray &fileId, QString &replacesPath) {
     Q_UNUSED(modtime);
     Q_UNUSED(size);
 

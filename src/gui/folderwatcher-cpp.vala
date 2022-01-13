@@ -13,7 +13,6 @@
  */
 
 // event masks
-#include "folderwatcher.h"
 
 // #include <cstdint>
 
@@ -25,15 +24,9 @@
 // #include <QTimer>
 
 #if defined(Q_OS_WIN)
-#include "folderwatcher_win.h"
 #elif defined(Q_OS_MAC)
-#include "folderwatcher_mac.h"
 #elif defined(Q_OS_UNIX)
-#include "folderwatcher_linux.h"
 #endif
-
-#include "folder.h"
-#include "filesystem.h"
 
 namespace OCC {
 
@@ -46,12 +39,12 @@ FolderWatcher::FolderWatcher(Folder *folder)
 
 FolderWatcher::~FolderWatcher() = default;
 
-void FolderWatcher::init(const QString &root) {
+void FolderWatcher::init(QString &root) {
     _d.reset(new FolderWatcherPrivate(this, root));
     _timer.start();
 }
 
-bool FolderWatcher::pathIsIgnored(const QString &path) {
+bool FolderWatcher::pathIsIgnored(QString &path) {
     if (path.isEmpty())
         return true;
     if (!_folder)
@@ -83,7 +76,7 @@ void FolderWatcher::appendSubPaths(QDir dir, QStringList& subPaths) {
     }
 }
 
-void FolderWatcher::startNotificatonTest(const QString &path) {
+void FolderWatcher::startNotificatonTest(QString &path) {
 #ifdef Q_OS_MAC
     // Testing the folder watcher on OSX is harder because the watcher
     // automatically discards changes that were performed by our process.
@@ -122,7 +115,6 @@ void FolderWatcher::startNotificationTestWhenReady() {
     });
 }
 
-
 int FolderWatcher::testLinuxWatchCount() const {
 #ifdef Q_OS_LINUX
     return _d->testWatchCount();
@@ -131,7 +123,7 @@ int FolderWatcher::testLinuxWatchCount() const {
 #endif
 }
 
-void FolderWatcher::changeDetected(const QString &path) {
+void FolderWatcher::changeDetected(QString &path) {
     QFileInfo fileInfo(path);
     QStringList paths(path);
     if (fileInfo.isDir()) {
@@ -141,7 +133,7 @@ void FolderWatcher::changeDetected(const QString &path) {
     changeDetected(paths);
 }
 
-void FolderWatcher::changeDetected(const QStringList &paths) {
+void FolderWatcher::changeDetected(QStringList &paths) {
     // TODO: this shortcut doesn't look very reliable:
     //   - why is the timeout only 1 second?
     //   - what if there is more than one file being updated frequently?
@@ -176,7 +168,7 @@ void FolderWatcher::changeDetected(const QStringList &paths) {
     }
 
     qCInfo(lcFolderWatcher) << "Detected changes in paths:" << changedPaths;
-    foreach (const QString &path, changedPaths) {
+    foreach (QString &path, changedPaths) {
         emit pathChanged(path);
     }
 }

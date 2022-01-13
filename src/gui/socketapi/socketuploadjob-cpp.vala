@@ -12,20 +12,13 @@
  * for more details.
  */
 
-#include "socketuploadjob.h"
-#include "socketapi_p.h"
-
-#include "accountmanager.h"
-#include "common/syncjournaldb.h"
-#include "syncengine.h"
-
 // #include <QFileInfo>
 // #include <QJsonArray>
 // #include <QRegularExpression>
 
 using namespace OCC;
 
-SocketUploadJob::SocketUploadJob(const QSharedPointer<SocketApiJobV2> &job)
+SocketUploadJob::SocketUploadJob(QSharedPointer<SocketApiJobV2> &job)
     : _apiJob(job) {
     connect(job.data(), &SocketApiJobV2::finished, this, &SocketUploadJob::deleteLater);
 
@@ -53,7 +46,7 @@ SocketUploadJob::SocketUploadJob(const QSharedPointer<SocketApiJobV2> &job)
     _engine = new SyncEngine(account->account(), _localPath.endsWith(QLatin1Char('/')) ? _localPath : _localPath + QLatin1Char('/'), _remotePath, _db);
     _engine->setParent(_db);
 
-    connect(_engine, &OCC::SyncEngine::itemCompleted, this, [this](const OCC::SyncFileItemPtr item) {
+    connect(_engine, &OCC::SyncEngine::itemCompleted, this, [this](OCC::SyncFileItemPtr item) {
         _syncedFiles.append(item->_file);
     });
 
@@ -62,7 +55,7 @@ SocketUploadJob::SocketUploadJob(const QSharedPointer<SocketApiJobV2> &job)
             _apiJob->success({ { "localPath", _localPath }, { "syncedFiles", QJsonArray::fromStringList(_syncedFiles) } });
         }
     });
-    connect(_engine, &OCC::SyncEngine::syncError, this, [this](const QString &error, ErrorCategory) {
+    connect(_engine, &OCC::SyncEngine::syncError, this, [this](QString &error, ErrorCategory) {
         _apiJob->failure(error);
     });
 }

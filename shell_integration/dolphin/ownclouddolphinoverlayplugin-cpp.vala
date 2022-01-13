@@ -23,7 +23,6 @@
 // #include <KIOCore/kfileitem.h>
 // #include <QDir>
 // #include <QTimer>
-#include "ownclouddolphinpluginhelper.h"
 
 class OwncloudDolphinPlugin : public KOverlayIconPlugin {
     Q_PLUGIN_METADATA(IID "com.owncloud.ovarlayiconplugin" FILE "ownclouddolphinoverlayplugin.json")
@@ -39,7 +38,7 @@ public:
                          this, &OwncloudDolphinPlugin::slotCommandRecieved);
     }
 
-    QStringList getOverlays(const QUrl& url) override {
+    QStringList getOverlays(QUrl& url) override {
         auto helper = OwncloudDolphinPluginHelper::instance();
         if (!helper->isConnected())
             return QStringList();
@@ -58,7 +57,7 @@ public:
     }
 
 private:
-    QStringList overlaysForString(const QByteArray &status) {
+    QStringList overlaysForString(QByteArray &status) {
         QStringList r;
         if (status.startsWith("NOP"))
             return r;
@@ -78,7 +77,7 @@ private:
         return r;
     }
 
-    void slotCommandRecieved(const QByteArray &line) {
+    void slotCommandRecieved(QByteArray &line) {
 
         QList<QByteArray> tokens = line.split(':');
         if (tokens.count() < 3)

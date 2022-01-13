@@ -23,18 +23,7 @@
 // #include <sys/resource.h>
 #endif
 
-#include "application.h"
-#include "fileactivitylistmodel.h"
-#include "theme.h"
-#include "common/utility.h"
-#include "cocoainitializer.h"
-#include "userstatusselectormodel.h"
-#include "emojimodel.h"
-#include "tray/syncstatussummary.h"
-#include "tray/unifiedsearchresultslistmodel.h"
-
 #if defined(BUILD_UPDATER)
-#include "updater/updater.h"
 #endif
 
 // #include <QTimer>
@@ -75,7 +64,6 @@ int main(int argc, char **argv) {
 
     qRegisterMetaTypeStreamOperators<Emoji>();
     qRegisterMetaType<OCC::UserStatus>("UserStatus");
-
 
     // Work around a bug in KDE's qqc2-desktop-style which breaks
     // buttons with icons not based on a name, by forcing a style name

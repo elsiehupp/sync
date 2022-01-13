@@ -12,12 +12,6 @@
  * for more details.
  */
 
-#include "invalidfilenamedialog.h"
-#include "accountfwd.h"
-#include "common/syncjournalfilerecord.h"
-#include "propagateremotemove.h"
-#include "ui_invalidfilenamedialog.h"
-
 // #include <folder.h>
 
 // #include <QPushButton>
@@ -32,9 +26,9 @@
 namespace {
 constexpr std::array<QChar, 9> illegalCharacters({ '\\', '/', ':', '?', '*', '\"', '<', '>', '|' });
 
-QVector<QChar> getIllegalCharsFromString(const QString &string) {
+QVector<QChar> getIllegalCharsFromString(QString &string) {
     QVector<QChar> result;
-    for (const auto &character : string) {
+    for (auto &character : string) {
         if (std::find(illegalCharacters.begin(), illegalCharacters.end(), character)
             != illegalCharacters.end()) {
             result.push_back(character);
@@ -43,7 +37,7 @@ QVector<QChar> getIllegalCharsFromString(const QString &string) {
     return result;
 }
 
-QString illegalCharacterListToString(const QVector<QChar> &illegalCharacters) {
+QString illegalCharacterListToString(QVector<QChar> &illegalCharacters) {
     QString illegalCharactersString;
     if (illegalCharacters.size() > 0) {
         illegalCharactersString += illegalCharacters[0];
@@ -103,7 +97,7 @@ void InvalidFilenameDialog::checkIfAllowedToRename() {
     propfindJob->start();
 }
 
-void InvalidFilenameDialog::onPropfindPermissionSuccess(const QVariantMap &values) {
+void InvalidFilenameDialog::onPropfindPermissionSuccess(QVariantMap &values) {
     if (!values.contains("permissions")) {
         return;
     }
@@ -125,7 +119,7 @@ void InvalidFilenameDialog::accept() {
     propfindJob->start();
 }
 
-void InvalidFilenameDialog::onFilenameLineEditTextChanged(const QString &text) {
+void InvalidFilenameDialog::onFilenameLineEditTextChanged(QString &text) {
     const auto isNewFileNameDifferent = text != _originalFileName;
     const auto illegalContainedCharacters = getIllegalCharsFromString(text);
     const auto containsIllegalChars = !illegalContainedCharacters.empty() || text.endsWith(QLatin1Char('.'));
@@ -154,7 +148,7 @@ void InvalidFilenameDialog::onMoveJobFinished() {
     QDialog::accept();
 }
 
-void InvalidFilenameDialog::onRemoteFileAlreadyExists(const QVariantMap &values) {
+void InvalidFilenameDialog::onRemoteFileAlreadyExists(QVariantMap &values) {
     Q_UNUSED(values);
 
     _ui->errorLabel->setText(tr("Cannot rename file because a file with the same name does already exist on the server. Please pick another name."));

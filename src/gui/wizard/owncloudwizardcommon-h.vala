@@ -13,7 +13,6 @@
  * for more details.
  */
 
-
 // #include <QString>
 
 class QVariant;
@@ -27,7 +26,7 @@ namespace OCC {
 
 namespace WizardCommon {
 
-    void setupCustomMedia(const QVariant &variant, QLabel *label);
+    void setupCustomMedia(QVariant &variant, QLabel *label);
     QString titleTemplate();
     QString subTitleTemplate();
     void initErrorLabel(QLabel *errorLabel);

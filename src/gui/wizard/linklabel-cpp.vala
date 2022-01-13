@@ -12,16 +12,13 @@
  * for more details.
  */
 
-#include "linklabel.h"
-#include "guiutility.h"
-
 namespace OCC {
 
 LinkLabel::LinkLabel(QWidget *parent) : QLabel(parent) {
 
 }
 
-void LinkLabel::setUrl(const QUrl &url) {
+void LinkLabel::setUrl(QUrl &url) {
     this->url = url;
 }
 

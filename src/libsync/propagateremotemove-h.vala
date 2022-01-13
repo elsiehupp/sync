@@ -13,9 +13,6 @@
  */
 // #pragma once
 
-#include "owncloudpropagator.h"
-#include "networkjobs.h"
-
 namespace OCC {
 
 /**
@@ -28,8 +25,8 @@ class OWNCLOUDSYNC_EXPORT MoveJob : public AbstractNetworkJob {
     QMap<QByteArray, QByteArray> _extraHeaders;
 
 public:
-    explicit MoveJob(AccountPtr account, const QString &path, const QString &destination, QObject *parent = nullptr);
-    explicit MoveJob(AccountPtr account, const QUrl &url, const QString &destination,
+    explicit MoveJob(AccountPtr account, QString &path, QString &destination, QObject *parent = nullptr);
+    explicit MoveJob(AccountPtr account, QUrl &url, QString &destination,
         QMap<QByteArray, QByteArray> _extraHeaders, QObject *parent = nullptr);
 
     void start() override;
@@ -47,7 +44,7 @@ class PropagateRemoteMove : public PropagateItemJob {
     QPointer<MoveJob> _job;
 
 public:
-    PropagateRemoteMove(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
+    PropagateRemoteMove(OwncloudPropagator *propagator, SyncFileItemPtr &item)
         : PropagateItemJob(propagator, item) {
     }
     void start() override;
@@ -57,7 +54,7 @@ public:
     /**
      * Rename the directory in the selective sync list
      */
-    static bool adjustSelectiveSync(SyncJournalDb *journal, const QString &from, const QString &to);
+    static bool adjustSelectiveSync(SyncJournalDb *journal, QString &from, QString &to);
 
 private slots:
     void slotMoveJobFinished();

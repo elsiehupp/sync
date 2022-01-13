@@ -12,12 +12,9 @@
  * for more details.
  */
 
-
 // #include <QString>
 // #include <QUrl>
 // #include <QWidget>
-
-#include "common/pinstate.h"
 
 namespace OCC {
 namespace Utility {
@@ -26,13 +23,13 @@ namespace Utility {
      *
      * If launching the browser fails, display a message.
      */
-    bool openBrowser(const QUrl &url, QWidget *errorWidgetParent = nullptr);
+    bool openBrowser(QUrl &url, QWidget *errorWidgetParent = nullptr);
 
     /** Start composing a new email message.
      *
      * If launching the email program fails, display a message.
      */
-    bool openEmailComposer(const QString &subject, const QString &body,
+    bool openEmailComposer(QString &subject, QString &body,
         QWidget *errorWidgetParent);
 
     /** Returns a translated string indicating the current availability.

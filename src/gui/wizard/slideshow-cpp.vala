@@ -12,7 +12,6 @@
  * for more details.
  */
 
-#include "slideshow.h"
 // #include <QGuiApplication>
 // #include <QMouseEvent>
 // #include <QPainter>
@@ -31,7 +30,7 @@ SlideShow::SlideShow(QWidget *parent) : QWidget(parent) {
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 }
 
-void SlideShow::addSlide(const QPixmap &pixmap, const QString &label) {
+void SlideShow::addSlide(QPixmap &pixmap, QString &label) {
     _labels += label;
     _pixmaps += pixmap;
     updateGeometry();
@@ -81,7 +80,7 @@ void SlideShow::setCurrentSlide(int index) {
 QSize SlideShow::sizeHint() const {
     QFontMetrics fm = fontMetrics();
     QSize labelSize(0, fm.height());
-    for (const QString &label : _labels) {
+    for (QString &label : _labels) {
 #if (HASQT5_11)
         labelSize.setWidth(std::max(fm.horizontalAdvance(label), labelSize.width()));
 #else
@@ -89,7 +88,7 @@ QSize SlideShow::sizeHint() const {
 #endif
     }
     QSize pixmapSize;
-    for (const QPixmap &pixmap : _pixmaps) {
+    for (QPixmap &pixmap : _pixmaps) {
         pixmapSize.setWidth(std::max(pixmap.width(), pixmapSize.width()));
         pixmapSize.setHeight(std::max(pixmap.height(), pixmapSize.height()));
     }

@@ -12,11 +12,6 @@
  * for more details.
  */
 
-#include "accountmanager.h"
-#include "configfile.h"
-#include "sslerrordialog.h"
-#include "proxyauthhandler.h"
-#include "common/asserts.h"
 // #include <theme.h>
 // #include <creds/credentialsfactory.h>
 // #include <creds/abstractcredentials.h>
@@ -25,8 +20,6 @@
 // #include <QDir>
 // #include <QNetworkAccessManager>
 // #include <QMessageBox>
-#include "clientsideencryption.h"
-#include "ui_mnemonicdialog.h"
 
 namespace {
 static const char urlC[] = "url";
@@ -43,7 +36,6 @@ static const char serverVersionC[] = "serverVersion";
 static const int maxAccountsVersion = 2;
 static const int maxAccountVersion = 1;
 }
-
 
 namespace OCC {
 
@@ -78,7 +70,7 @@ bool AccountManager::restore() {
         return true;
     }
 
-    for (const auto &accountId : settings->childGroups()) {
+    for (auto &accountId : settings->childGroups()) {
         settings->beginGroup(accountId);
         if (!skipSettingsKeys.contains(settings->group())) {
             if (auto acc = loadAccountHelper(*settings)) {
@@ -105,7 +97,7 @@ void AccountManager::backwardMigrationSettingsKeys(QStringList *deleteKeys, QStr
     auto settings = ConfigFile::settingsWithGroup(QLatin1String(accountsC));
     const int accountsVersion = settings->value(QLatin1String(versionC)).toInt();
     if (accountsVersion <= maxAccountsVersion) {
-        foreach (const auto &accountId, settings->childGroups()) {
+        foreach (auto &accountId, settings->childGroups()) {
             settings->beginGroup(accountId);
             const int accountVersion = settings->value(QLatin1String(versionC), 1).toInt();
             if (accountVersion > maxAccountVersion) {
@@ -177,7 +169,7 @@ bool AccountManager::restoreFromLegacySettings() {
 void AccountManager::save(bool saveCredentials) {
     auto settings = ConfigFile::settingsWithGroup(QLatin1String(accountsC));
     settings->setValue(QLatin1String(versionC), maxAccountsVersion);
-    for (const auto &acc : qAsConst(_accounts)) {
+    for (auto &acc : qAsConst(_accounts)) {
         settings->beginGroup(acc->account()->id());
         saveAccountHelper(acc->account().data(), *settings, saveCredentials);
         acc->writeToSettings(*settings);
@@ -223,7 +215,7 @@ void AccountManager::saveAccountHelper(Account *acc, QSettings &settings, bool s
             // re-persisting them)
             acc->_credentials->persist();
         }
-        for (const auto &key : acc->_settingsMap.keys()) {
+        for (auto &key : acc->_settingsMap.keys()) {
             settings.setValue(key, acc->_settingsMap.value(key));
         }
         settings.setValue(QLatin1String(authTypeC), acc->_credentials->authType());
@@ -237,7 +229,7 @@ void AccountManager::saveAccountHelper(Account *acc, QSettings &settings, bool s
     settings.beginGroup(QLatin1String("General"));
     qCInfo(lcAccountManager) << "Saving " << acc->approvedCerts().count() << " unknown certs.";
     QByteArray certs;
-    for (const auto &cert : acc->approvedCerts()) {
+    for (auto &cert : acc->approvedCerts()) {
         certs += cert.toPem() + '\n';
     }
     if (!certs.isEmpty()) {
@@ -295,7 +287,7 @@ AccountPtr AccountManager::loadAccountHelper(QSettings &settings) {
         authType = "webflow";
         settings.setValue(QLatin1String(authTypeC), authType);
 
-        for (const QString &key : settings.childKeys()) {
+        for (QString &key : settings.childKeys()) {
             if (!key.startsWith("http_"))
                 continue;
             auto newkey = QString::fromLatin1("webflow_").append(key.mid(5));
@@ -312,7 +304,7 @@ AccountPtr AccountManager::loadAccountHelper(QSettings &settings) {
     // We want to only restore settings for that auth type and the user value
     acc->_settingsMap.insert(QLatin1String(userC), settings.value(userC));
     QString authTypePrefix = authType + "_";
-    for (const auto &key : settings.childKeys()) {
+    for (auto &key : settings.childKeys()) {
         if (!key.startsWith(authTypePrefix))
             continue;
         acc->_settingsMap.insert(key, settings.value(key));
@@ -330,14 +322,14 @@ AccountPtr AccountManager::loadAccountHelper(QSettings &settings) {
     return acc;
 }
 
-AccountStatePtr AccountManager::account(const QString &name) {
-    const auto it = std::find_if(_accounts.cbegin(), _accounts.cend(), [name](const auto &acc) {
+AccountStatePtr AccountManager::account(QString &name) {
+    const auto it = std::find_if(_accounts.cbegin(), _accounts.cend(), [name](auto &acc) {
         return acc->account()->displayName() == name;
     });
     return it != _accounts.cend() ? *it : AccountStatePtr();
 }
 
-AccountState *AccountManager::addAccount(const AccountPtr &newAccount) {
+AccountState *AccountManager::addAccount(AccountPtr &newAccount) {
     auto id = newAccount->id();
     if (id.isEmpty() || !isAccountIdAvailable(id)) {
         id = generateFreeAccountId();
@@ -382,7 +374,7 @@ AccountPtr AccountManager::createAccount() {
     return acc;
 }
 
-void AccountManager::displayMnemonic(const QString& mnemonic) {
+void AccountManager::displayMnemonic(QString& mnemonic) {
     auto *widget = new QDialog;
     Ui_Dialog ui;
     ui.setupUi(widget);
@@ -401,7 +393,7 @@ void AccountManager::displayMnemonic(const QString& mnemonic) {
 void AccountManager::shutdown() {
     const auto accountsCopy = _accounts;
     _accounts.clear();
-    for (const auto &acc : accountsCopy) {
+    for (auto &acc : accountsCopy) {
         emit accountRemoved(acc.data());
         emit removeAccountFolders(acc.data());
     }
@@ -411,11 +403,11 @@ QList<AccountStatePtr> AccountManager::accounts() const {
      return _accounts;
 }
 
-bool AccountManager::isAccountIdAvailable(const QString &id) const {
+bool AccountManager::isAccountIdAvailable(QString &id) const {
     if (_additionalBlockedAccountIds.contains(id))
         return false;
 
-    return std::none_of(_accounts.cbegin(), _accounts.cend(), [id](const auto &acc) {
+    return std::none_of(_accounts.cbegin(), _accounts.cend(), [id](auto &acc) {
         return acc->account()->id() == id;
     });
 }

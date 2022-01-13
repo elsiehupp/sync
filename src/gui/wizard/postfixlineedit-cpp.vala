@@ -15,8 +15,6 @@
 // #include <QStyle>
 // #include <QStyleOptionFrame>
 
-#include "postfixlineedit.h"
-
 namespace OCC {
 
 const int horizontalMargin(4);
@@ -26,7 +24,7 @@ PostfixLineEdit::PostfixLineEdit(QWidget *parent)
     : QLineEdit(parent) {
 }
 
-void PostfixLineEdit::setPostfix(const QString &postfix) {
+void PostfixLineEdit::setPostfix(QString &postfix) {
     _postfix = postfix;
     QFontMetricsF fm(font());
     QMargins tm = textMargins();
@@ -42,7 +40,7 @@ QString PostfixLineEdit::fullText() const {
     return text() + _postfix;
 }
 
-void PostfixLineEdit::setFullText(const QString &text) {
+void PostfixLineEdit::setFullText(QString &text) {
     QString prefixString = text;
     if (prefixString.endsWith(postfix())) {
         prefixString.chop(postfix().length());

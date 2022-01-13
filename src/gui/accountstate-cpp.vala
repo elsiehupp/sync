@@ -12,16 +12,6 @@
  * for more details.
  */
 
-#include "accountstate.h"
-#include "accountmanager.h"
-#include "remotewipe.h"
-#include "account.h"
-#include "creds/abstractcredentials.h"
-#include "creds/httpcredentials.h"
-#include "logger.h"
-#include "configfile.h"
-#include "ocsnavigationappsjob.h"
-
 // #include <QSettings>
 // #include <QTimer>
 // #include <qfontmetrics.h>
@@ -167,7 +157,7 @@ bool AccountState::isConnected() const {
     return _state == Connected;
 }
 
-void AccountState::tagLastSuccessfullETagRequest(const QDateTime &tp) {
+void AccountState::tagLastSuccessfullETagRequest(QDateTime &tp) {
     _timeOfLastETagCheck = tp;
 }
 
@@ -175,7 +165,7 @@ QByteArray AccountState::notificationsEtagResponseHeader() const {
     return _notificationsEtagResponseHeader;
 }
 
-void AccountState::setNotificationsEtagResponseHeader(const QByteArray &value) {
+void AccountState::setNotificationsEtagResponseHeader(QByteArray &value) {
     _notificationsEtagResponseHeader = value;
 }
 
@@ -183,7 +173,7 @@ QByteArray AccountState::navigationAppsEtagResponseHeader() const {
     return _navigationAppsEtagResponseHeader;
 }
 
-void AccountState::setNavigationAppsEtagResponseHeader(const QByteArray &value) {
+void AccountState::setNavigationAppsEtagResponseHeader(QByteArray &value) {
     _navigationAppsEtagResponseHeader = value;
 }
 
@@ -256,7 +246,7 @@ void AccountState::checkConnectivity() {
     }
 }
 
-void AccountState::slotConnectionValidatorResult(ConnectionValidator::Status status, const QStringList &errors) {
+void AccountState::slotConnectionValidatorResult(ConnectionValidator::Status status, QStringList &errors) {
     if (isSignedOut()) {
         qCWarning(lcAccountState) << "Signed out, ignoring" << status << _account->url().toString();
         return;
@@ -344,7 +334,6 @@ void AccountState::slotHandleRemoteWipeCheck() {
     setState(SignedOut);
 }
 
-
 void AccountState::handleInvalidCredentials() {
     if (isSignedOut() || _waitingForNewCredentials)
         return;
@@ -364,7 +353,6 @@ void AccountState::handleInvalidCredentials() {
     }
     account()->credentials()->askFromUser();
 }
-
 
 void AccountState::slotCredentialsFetched(AbstractCredentials *) {
     // Make a connection attempt, no matter whether the credentials are
@@ -413,18 +401,18 @@ void AccountState::fetchNavigationApps(){
     job->getNavigationApps();
 }
 
-void AccountState::slotEtagResponseHeaderReceived(const QByteArray &value, int statusCode){
+void AccountState::slotEtagResponseHeaderReceived(QByteArray &value, int statusCode){
     if(statusCode == 200){
         qCDebug(lcAccountState) << "New navigation apps ETag Response Header received " << value;
         setNavigationAppsEtagResponseHeader(value);
     }
 }
 
-void AccountState::slotOcsError(int statusCode, const QString &message) {
+void AccountState::slotOcsError(int statusCode, QString &message) {
     qCDebug(lcAccountState) << "Error " << statusCode << " while fetching new navigation apps: " << message;
 }
 
-void AccountState::slotNavigationAppsFetched(const QJsonDocument &reply, int statusCode) {
+void AccountState::slotNavigationAppsFetched(QJsonDocument &reply, int statusCode) {
     if(_account){
         if (statusCode == 304) {
             qCWarning(lcAccountState) << "Status code " << statusCode << " Not Modified - No new navigation apps.";
@@ -436,7 +424,7 @@ void AccountState::slotNavigationAppsFetched(const QJsonDocument &reply, int sta
                 const auto navLinks = element.toArray();
 
                 if(navLinks.size() > 0){
-                    for (const QJsonValue &value : navLinks) {
+                    for (QJsonValue &value : navLinks) {
                         auto navLink = value.toObject();
 
                         auto *app = new AccountApp(navLink.value("name").toString(), QUrl(navLink.value("href").toString()),
@@ -456,10 +444,10 @@ AccountAppList AccountState::appList() const {
     return _apps;
 }
 
-AccountApp* AccountState::findApp(const QString &appId) const {
+AccountApp* AccountState::findApp(QString &appId) const {
     if(!appId.isEmpty()) {
         const auto apps = appList();
-        const auto it = std::find_if(apps.cbegin(), apps.cend(), [appId](const auto &app) {
+        const auto it = std::find_if(apps.cbegin(), apps.cend(), [appId](auto &app) {
             return app->id() == appId;
         });
         if (it != apps.cend()) {
@@ -472,8 +460,8 @@ AccountApp* AccountState::findApp(const QString &appId) const {
 
 /*-------------------------------------------------------------------------------------*/
 
-AccountApp::AccountApp(const QString &name, const QUrl &url,
-    const QString &id, const QUrl &iconUrl,
+AccountApp::AccountApp(QString &name, QUrl &url,
+    const QString &id, QUrl &iconUrl,
     QObject *parent)
     : QObject(parent)
     , _name(name)

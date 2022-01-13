@@ -12,17 +12,7 @@
  * for more details.
  */
 
-#include "discoveryphase.h"
-#include "discovery.h"
-
-#include "account.h"
-#include "clientsideencryptionjobs.h"
-
-#include "common/asserts.h"
-#include "common/checksums.h"
-
 // #include <csync_exclude.h>
-#include "vio/csync_vio_local.h"
 
 // #include <QLoggingCategory>
 // #include <QUrl>
@@ -32,13 +22,12 @@
 // #include <cstring>
 // #include <QDateTime>
 
-
 namespace OCC {
 
 Q_LOGGING_CATEGORY(lcDiscovery, "nextcloud.sync.discovery", QtInfoMsg)
 
 /* Given a sorted list of paths ending with '/', return whether or not the given path is within one of the paths of the list*/
-static bool findPathInList(const QStringList &list, const QString &path) {
+static bool findPathInList(QStringList &list, QString &path) {
     Q_ASSERT(std::is_sorted(list.begin(), list.end()));
 
     if (list.size() == 1 && list.first() == QLatin1String("/")) {
@@ -64,7 +53,7 @@ static bool findPathInList(const QStringList &list, const QString &path) {
     return pathSlash.startsWith(*it);
 }
 
-bool DiscoveryPhase::isInSelectiveSyncBlackList(const QString &path) const {
+bool DiscoveryPhase::isInSelectiveSyncBlackList(QString &path) const {
     if (_selectiveSyncBlackList.isEmpty()) {
         // If there is no black list, everything is allowed
         return false;
@@ -78,7 +67,7 @@ bool DiscoveryPhase::isInSelectiveSyncBlackList(const QString &path) const {
     return false;
 }
 
-void DiscoveryPhase::checkSelectiveSyncNewFolder(const QString &path, RemotePermissions remotePerm,
+void DiscoveryPhase::checkSelectiveSyncNewFolder(QString &path, RemotePermissions remotePerm,
     std::function<void(bool)> callback) {
     if (_syncOptions._confirmExternalStorage && _syncOptions._vfs->mode() == Vfs::Off
         && remotePerm.hasPermission(RemotePermissions::IsMounted)) {
@@ -114,7 +103,7 @@ void DiscoveryPhase::checkSelectiveSyncNewFolder(const QString &path, RemotePerm
                                                    << "http://owncloud.org/ns:size");
     QObject::connect(propfindJob, &PropfindJob::finishedWithError,
         this, [=] { return callback(false); });
-    QObject::connect(propfindJob, &PropfindJob::result, this, [=](const QVariantMap &values) {
+    QObject::connect(propfindJob, &PropfindJob::result, this, [=](QVariantMap &values) {
         auto result = values.value(QLatin1String("size")).toLongLong();
         if (result >= limit) {
             // we tell the UI there is a new folder
@@ -136,11 +125,11 @@ void DiscoveryPhase::checkSelectiveSyncNewFolder(const QString &path, RemotePerm
 }
 
 /* Given a path on the remote, give the path as it is when the rename is done */
-QString DiscoveryPhase::adjustRenamedPath(const QString &original, SyncFileItem::Direction d) const {
+QString DiscoveryPhase::adjustRenamedPath(QString &original, SyncFileItem::Direction d) const {
     return OCC::adjustRenamedPath(d == SyncFileItem::Down ? _renamedItemsRemote : _renamedItemsLocal, original);
 }
 
-QString adjustRenamedPath(const QMap<QString, QString> &renamedItems, const QString &original) {
+QString adjustRenamedPath(QMap<QString, QString> &renamedItems, QString &original) {
     int slashPos = original.size();
     while ((slashPos = original.lastIndexOf('/', slashPos - 1)) > 0) {
         auto it = renamedItems.constFind(original.left(slashPos));
@@ -151,7 +140,7 @@ QString adjustRenamedPath(const QMap<QString, QString> &renamedItems, const QStr
     return original;
 }
 
-QPair<bool, QByteArray> DiscoveryPhase::findAndCancelDeletedJob(const QString &originalPath) {
+QPair<bool, QByteArray> DiscoveryPhase::findAndCancelDeletedJob(QString &originalPath) {
     bool result = false;
     QByteArray oldEtag;
     auto it = _deletedItem.find(originalPath);
@@ -218,12 +207,12 @@ void DiscoveryPhase::startJob(ProcessDirectoryJob *job) {
     job->start();
 }
 
-void DiscoveryPhase::setSelectiveSyncBlackList(const QStringList &list) {
+void DiscoveryPhase::setSelectiveSyncBlackList(QStringList &list) {
     _selectiveSyncBlackList = list;
     std::sort(_selectiveSyncBlackList.begin(), _selectiveSyncBlackList.end());
 }
 
-void DiscoveryPhase::setSelectiveSyncWhiteList(const QStringList &list) {
+void DiscoveryPhase::setSelectiveSyncWhiteList(QStringList &list) {
     _selectiveSyncWhiteList = list;
     std::sort(_selectiveSyncWhiteList.begin(), _selectiveSyncWhiteList.end());
 }
@@ -235,7 +224,7 @@ void DiscoveryPhase::scheduleMoreJobs() {
     }
 }
 
-DiscoverySingleLocalDirectoryJob::DiscoverySingleLocalDirectoryJob(const AccountPtr &account, const QString &localPath, OCC::Vfs *vfs, QObject *parent)
+DiscoverySingleLocalDirectoryJob::DiscoverySingleLocalDirectoryJob(AccountPtr &account, QString &localPath, OCC::Vfs *vfs, QObject *parent)
  : QObject(parent), QRunnable(), _localPath(localPath), _account(account), _vfs(vfs) {
     qRegisterMetaType<QVector<LocalInfo> >("QVector<LocalInfo>");
 }
@@ -318,7 +307,7 @@ void DiscoverySingleLocalDirectoryJob::run() {
     emit finished(results);
 }
 
-DiscoverySingleDirectoryJob::DiscoverySingleDirectoryJob(const AccountPtr &account, const QString &path, QObject *parent)
+DiscoverySingleDirectoryJob::DiscoverySingleDirectoryJob(AccountPtr &account, QString &path, QObject *parent)
     : QObject(parent)
     , _subPath(path)
     , _account(account)
@@ -371,7 +360,7 @@ void DiscoverySingleDirectoryJob::abort() {
     }
 }
 
-static void propertyMapToRemoteInfo(const QMap<QString, QString> &map, RemoteInfo &result) {
+static void propertyMapToRemoteInfo(QMap<QString, QString> &map, RemoteInfo &result) {
     for (auto it = map.constBegin(); it != map.constEnd(); ++it) {
         QString property = it.key();
         QString value = it.value();
@@ -423,7 +412,7 @@ static void propertyMapToRemoteInfo(const QMap<QString, QString> &map, RemoteInf
     }
 }
 
-void DiscoverySingleDirectoryJob::directoryListingIteratedSlot(const QString &file, const QMap<QString, QString> &map) {
+void DiscoverySingleDirectoryJob::directoryListingIteratedSlot(QString &file, QMap<QString, QString> &map) {
     if (!_ignoredFirst) {
         // The first entry is for the folder itself, we should process it differently.
         _ignoredFirst = true;
@@ -523,15 +512,15 @@ void DiscoverySingleDirectoryJob::fetchE2eMetadata() {
     job->start();
 }
 
-void DiscoverySingleDirectoryJob::metadataReceived(const QJsonDocument &json, int statusCode) {
+void DiscoverySingleDirectoryJob::metadataReceived(QJsonDocument &json, int statusCode) {
     qCDebug(lcDiscovery) << "Metadata received, applying it to the result list";
     Q_ASSERT(_subPath.startsWith('/'));
 
     const auto metadata = FolderMetadata(_account, json.toJson(QJsonDocument::Compact), statusCode);
     const auto encryptedFiles = metadata.files();
 
-    const auto findEncryptedFile = [=](const QString &name) {
-        const auto it = std::find_if(std::cbegin(encryptedFiles), std::cend(encryptedFiles), [=](const EncryptedFile &file) {
+    const auto findEncryptedFile = [=](QString &name) {
+        const auto it = std::find_if(std::cbegin(encryptedFiles), std::cend(encryptedFiles), [=](EncryptedFile &file) {
             return file.encryptedFilename == name;
         });
         if (it == std::cend(encryptedFiles)) {
@@ -541,7 +530,7 @@ void DiscoverySingleDirectoryJob::metadataReceived(const QJsonDocument &json, in
         }
     };
 
-    std::transform(std::cbegin(_results), std::cend(_results), std::begin(_results), [=](const RemoteInfo &info) {
+    std::transform(std::cbegin(_results), std::cend(_results), std::begin(_results), [=](RemoteInfo &info) {
         auto result = info;
         const auto encryptedFileInfo = findEncryptedFile(result.name);
         if (encryptedFileInfo) {
@@ -556,7 +545,7 @@ void DiscoverySingleDirectoryJob::metadataReceived(const QJsonDocument &json, in
     deleteLater();
 }
 
-void DiscoverySingleDirectoryJob::metadataError(const QByteArray &fileId, int httpReturnCode) {
+void DiscoverySingleDirectoryJob::metadataError(QByteArray &fileId, int httpReturnCode) {
     qCWarning(lcDiscovery) << "E2EE Metadata job error. Trying to proceed without it." << fileId << httpReturnCode;
     emit finished(_results);
     deleteLater();

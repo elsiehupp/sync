@@ -14,11 +14,6 @@
 
 // #pragma once
 
-#include "account.h"
-#include "accountfwd.h"
-#include "accountstate.h"
-#include "folderman.h"
-
 // #include <theme.h>
 // #include <folder.h>
 
@@ -54,18 +49,18 @@ public slots:
     void load();
 
 private:
-    void connectToFoldersProgress(const Folder::Map &map);
+    void connectToFoldersProgress(Folder::Map &map);
 
-    void onFolderListChanged(const OCC::Folder::Map &folderMap);
-    void onFolderProgressInfo(const ProgressInfo &progress);
-    void onFolderSyncStateChanged(const Folder *folder);
+    void onFolderListChanged(OCC::Folder::Map &folderMap);
+    void onFolderProgressInfo(ProgressInfo &progress);
+    void onFolderSyncStateChanged(Folder *folder);
     void onIsConnectedChanged();
 
-    void setSyncStateForFolder(const Folder *folder);
-    void markFolderAsError(const Folder *folder);
-    void markFolderAsSuccess(const Folder *folder);
+    void setSyncStateForFolder(Folder *folder);
+    void markFolderAsError(Folder *folder);
+    void markFolderAsSuccess(Folder *folder);
     bool folderErrors() const;
-    bool folderError(const Folder *folder) const;
+    bool folderError(Folder *folder) const;
     void clearFolderErrors();
     void setSyncStateToConnectedState();
     bool reloadNeeded(AccountState *accountState) const;
@@ -73,9 +68,9 @@ private:
 
     void setSyncProgress(double value);
     void setSyncing(bool value);
-    void setSyncStatusString(const QString &value);
-    void setSyncStatusDetailString(const QString &value);
-    void setSyncIcon(const QUrl &value);
+    void setSyncStatusString(QString &value);
+    void setSyncStatusDetailString(QString &value);
+    void setSyncIcon(QUrl &value);
     void setAccountState(AccountStatePtr accountState);
 
     AccountStatePtr _accountState;

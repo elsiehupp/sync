@@ -9,13 +9,6 @@
 // #include <QTemporaryDir>
 // #include <QtTest>
 
-#include "common/utility.h"
-#include "folderman.h"
-#include "account.h"
-#include "accountstate.h"
-#include "configfile.h"
-#include "testhelper.h"
-
 using namespace OCC;
 
 class TestFolderMan: public QObject {
@@ -55,13 +48,12 @@ private slots:
 
         const auto folderList = folderman->map();
 
-        for (const auto &folder : folderList) {
+        for (auto &folder : folderList) {
             QVERIFY(!folder->isSyncRunning());
         }
 
-
         // those should be allowed
-        // QString FolderMan::checkPathValidityForNewFolder(const QString& path, const QUrl &serverUrl, bool forNewDirectory)
+        // QString FolderMan::checkPathValidityForNewFolder(QString& path, QUrl &serverUrl, bool forNewDirectory)
 
         QCOMPARE(folderman->checkPathValidityForNewFolder(dirPath + "/sub/free"), QString());
         QCOMPARE(folderman->checkPathValidityForNewFolder(dirPath + "/free2/"), QString());
@@ -144,7 +136,6 @@ private slots:
 
         // Invalid paths
         QVERIFY(!folderman->checkPathValidityForNewFolder("").isNull());
-
 
         // REMOVE ownCloud2 from the filesystem, but keep a folder sync'ed to it.
         QDir(dirPath + "/ownCloud2/").removeRecursively();

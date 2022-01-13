@@ -1,8 +1,6 @@
 #ifndef CLIENTSIDEENCRYPTIONJOBS_H
 #define CLIENTSIDEENCRYPTIONJOBS_H
 
-#include "networkjobs.h"
-#include "accountfwd.h"
 // #include <QString>
 // #include <QJsonDocument>
 
@@ -26,13 +24,13 @@ namespace OCC {
  */
 class OWNCLOUDSYNC_EXPORT SignPublicKeyApiJob : public AbstractNetworkJob {
 public:
-    explicit SignPublicKeyApiJob(const AccountPtr &account, const QString &path, QObject *parent = nullptr);
+    explicit SignPublicKeyApiJob(AccountPtr &account, QString &path, QObject *parent = nullptr);
 
     /**
      * @brief setCsr - the CSR with the public key.
      * This function needs to be called before start() obviously.
      */
-    void setCsr(const QByteArray& csr);
+    void setCsr(QByteArray& csr);
 
 public slots:
     void start() override;
@@ -46,7 +44,7 @@ signals:
      * @param json - the parsed json document
      * @param statusCode - the OCS status code: 100 (!) for success
      */
-    void jsonReceived(const QJsonDocument &json, int statusCode);
+    void jsonReceived(QJsonDocument &json, int statusCode);
 
 private:
     QBuffer _csr;
@@ -67,13 +65,13 @@ private:
  */
 class OWNCLOUDSYNC_EXPORT StorePrivateKeyApiJob : public AbstractNetworkJob {
 public:
-    explicit StorePrivateKeyApiJob(const AccountPtr &account, const QString &path, QObject *parent = nullptr);
+    explicit StorePrivateKeyApiJob(AccountPtr &account, QString &path, QObject *parent = nullptr);
 
     /**
      * @brief setCsr - the CSR with the public key.
      * This function needs to be called before start() obviously.
      */
-    void setPrivateKey(const QByteArray& privateKey);
+    void setPrivateKey(QByteArray& privateKey);
 
 public slots:
     void start() override;
@@ -87,12 +85,11 @@ signals:
      * @param json - the parsed json document
      * @param statusCode - the OCS status code: 100 (!) for success
      */
-    void jsonReceived(const QJsonDocument &json, int statusCode);
+    void jsonReceived(QJsonDocument &json, int statusCode);
 
 private:
     QBuffer _privKey;
 };
-
 
 /*
  * @brief Job to mark a folder as encrypted JSON
@@ -113,7 +110,7 @@ public:
         Set = 1
     };
 
-    explicit SetEncryptionFlagApiJob(const AccountPtr &account, const QByteArray &fileId, FlagAction flagAction = Set, QObject *parent = nullptr);
+    explicit SetEncryptionFlagApiJob(AccountPtr &account, QByteArray &fileId, FlagAction flagAction = Set, QObject *parent = nullptr);
 
 public slots:
     void start() override;
@@ -122,8 +119,8 @@ protected:
     bool finished() override;
 
 signals:
-    void success(const QByteArray &fileId);
-    void error(const QByteArray &fileId, int httpReturnCode);
+    void success(QByteArray &fileId);
+    void error(QByteArray &fileId, int httpReturnCode);
 
 private:
     QByteArray _fileId;
@@ -132,7 +129,7 @@ private:
 
 class OWNCLOUDSYNC_EXPORT LockEncryptFolderApiJob : public AbstractNetworkJob {
 public:
-    explicit LockEncryptFolderApiJob(const AccountPtr &account, const QByteArray& fileId, QObject *parent = nullptr);
+    explicit LockEncryptFolderApiJob(AccountPtr &account, QByteArray& fileId, QObject *parent = nullptr);
 
 public slots:
     void start() override;
@@ -141,13 +138,12 @@ protected:
     bool finished() override;
 
 signals:
-    void success(const QByteArray& fileId, const QByteArray& token);
-    void error(const QByteArray& fileId, int httpdErrorCode);
+    void success(QByteArray& fileId, QByteArray& token);
+    void error(QByteArray& fileId, int httpdErrorCode);
 
 private:
     QByteArray _fileId;
 };
-
 
 class OWNCLOUDSYNC_EXPORT UnlockEncryptFolderApiJob : public AbstractNetworkJob {
 public:
@@ -164,15 +160,14 @@ protected:
     bool finished() override;
 
 signals:
-    void success(const QByteArray& fileId);
-    void error(const QByteArray& fileId, int httpReturnCode);
+    void success(QByteArray& fileId);
+    void error(QByteArray& fileId, int httpReturnCode);
 
 private:
     QByteArray _fileId;
     QByteArray _token;
     QBuffer *_tokenBuf;
 };
-
 
 class OWNCLOUDSYNC_EXPORT StoreMetaDataApiJob : public AbstractNetworkJob {
 public:
@@ -189,8 +184,8 @@ protected:
     bool finished() override;
 
 signals:
-    void success(const QByteArray& fileId);
-    void error(const QByteArray& fileId, int httpReturnCode);
+    void success(QByteArray& fileId);
+    void error(QByteArray& fileId, int httpReturnCode);
 
 private:
     QByteArray _fileId;
@@ -213,15 +208,14 @@ protected:
     bool finished() override;
 
 signals:
-    void success(const QByteArray& fileId);
-    void error(const QByteArray& fileId, int httpReturnCode);
+    void success(QByteArray& fileId);
+    void error(QByteArray& fileId, int httpReturnCode);
 
 private:
     QByteArray _fileId;
     QByteArray _b64Metadata;
     QByteArray _token;
 };
-
 
 class OWNCLOUDSYNC_EXPORT GetMetadataApiJob : public AbstractNetworkJob {
 public:
@@ -237,8 +231,8 @@ protected:
     bool finished() override;
 
 signals:
-    void jsonReceived(const QJsonDocument &json, int statusCode);
-    void error(const QByteArray& fileId, int httpReturnCode);
+    void jsonReceived(QJsonDocument &json, int statusCode);
+    void error(QByteArray& fileId, int httpReturnCode);
 
 private:
     QByteArray _fileId;
@@ -258,8 +252,8 @@ protected:
     bool finished() override;
 
 signals:
-    void success(const QByteArray& fileId);
-    void error(const QByteArray& fileId, int httpErrorCode);
+    void success(QByteArray& fileId);
+    void error(QByteArray& fileId, int httpErrorCode);
 
 private:
     QByteArray _fileId;

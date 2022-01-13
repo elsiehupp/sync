@@ -15,9 +15,6 @@
 // #pragma once
 // #include <QDialog>
 // #include <QTreeWidget>
-#include "accountfwd.h"
-
-#include "csync_exclude.h"
 
 class QTreeWidgetItem;
 class QTreeWidget;
@@ -47,7 +44,7 @@ public:
     qint64 estimatedSize(QTreeWidgetItem *root = nullptr);
 
     // oldBlackList is a list of excluded paths, each including a trailing /
-    void setFolderInfo(const QString &folderPath, const QString &rootName,
+    void setFolderInfo(QString &folderPath, QString &rootName,
         const QStringList &oldBlackList = QStringList());
 
     QSize sizeHint() const override;
@@ -57,7 +54,7 @@ private slots:
     void slotItemExpanded(QTreeWidgetItem *);
     void slotItemChanged(QTreeWidgetItem *, int);
     void slotLscolFinishedWithError(QNetworkReply *);
-    void slotGatherEncryptedPaths(const QString &, const QMap<QString, QString> &);
+    void slotGatherEncryptedPaths(QString &, QMap<QString, QString> &);
 
 private:
     void refreshFolders();
@@ -91,7 +88,7 @@ public:
     explicit SelectiveSyncDialog(AccountPtr account, Folder *folder, QWidget *parent = nullptr, Qt::WindowFlags f = {});
 
     // Dialog for the whole account (Used from the wizard)
-    explicit SelectiveSyncDialog(AccountPtr account, const QString &folder, const QStringList &blacklist, QWidget *parent = nullptr, Qt::WindowFlags f = {});
+    explicit SelectiveSyncDialog(AccountPtr account, QString &folder, QStringList &blacklist, QWidget *parent = nullptr, Qt::WindowFlags f = {});
 
     void accept() override;
 
@@ -102,7 +99,7 @@ public:
     qint64 estimatedSize();
 
 private:
-    void init(const AccountPtr &account);
+    void init(AccountPtr &account);
 
     SelectiveSyncWidget *_selectiveSync;
 

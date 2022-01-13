@@ -6,7 +6,6 @@
  */
 
 // #include <QtTest>
-#include "syncenginetestutils.h"
 // #include <syncengine.h>
 // #include <localdiscoverytracker.h>
 
@@ -113,7 +112,7 @@ private slots:
         LocalDiscoveryTracker tracker;
         connect(&fakeFolder.syncEngine(), &SyncEngine::itemCompleted, &tracker, &LocalDiscoveryTracker::slotItemCompleted);
         connect(&fakeFolder.syncEngine(), &SyncEngine::finished, &tracker, &LocalDiscoveryTracker::slotSyncFinished);
-        auto trackerContains = [&](const char *path) {
+        auto trackerContains = [&](char *path) {
             return tracker.localDiscoveryPaths().find(path) != tracker.localDiscoveryPaths().end();
         };
 

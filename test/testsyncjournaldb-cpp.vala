@@ -8,9 +8,6 @@
 
 // #include <sqlite3.h>
 
-#include "common/syncjournaldb.h"
-#include "common/syncjournalfilerecord.h"
-
 using namespace OCC;
 
 class TestSyncJournalDB : public QObject {
@@ -194,7 +191,7 @@ private slots:
     void testAvoidReadFromDbOnNextSync() {
         auto invalidEtag = QByteArray("_invalid_");
         auto initialEtag = QByteArray("etag");
-        auto makeEntry = [&](const QByteArray &path, ItemType type) {
+        auto makeEntry = [&](QByteArray &path, ItemType type) {
             SyncJournalFileRecord record;
             record._path = path;
             record._type = type;
@@ -202,7 +199,7 @@ private slots:
             record._remotePerm = RemotePermissions::fromDbValue("RW");
             _db.setFileRecord(record);
         };
-        auto getEtag = [&](const QByteArray &path) {
+        auto getEtag = [&](QByteArray &path) {
             SyncJournalFileRecord record;
             _db.getFileRecord(path, &record);
             return record._etag;
@@ -257,7 +254,7 @@ private slots:
     }
 
     void testRecursiveDelete() {
-        auto makeEntry = [&](const QByteArray &path) {
+        auto makeEntry = [&](QByteArray &path) {
             SyncJournalFileRecord record;
             record._path = path;
             record._remotePerm = RemotePermissions::fromDbValue("RW");
@@ -275,12 +272,12 @@ private slots:
             << "foo bla bar/file"
             << "fo_"
             << "fo_/file";
-        for (const auto& elem : elements)
+        for (auto& elem : elements)
             makeEntry(elem);
 
         auto checkElements = [&]() {
             bool ok = true;
-            for (const auto& elem : elements) {
+            for (auto& elem : elements) {
                 SyncJournalFileRecord record;
                 _db.getFileRecord(elem, &record);
                 if (!record.isValid()) {
@@ -307,13 +304,13 @@ private slots:
     }
 
     void testPinState() {
-        auto make = [&](const QByteArray &path, PinState state) {
+        auto make = [&](QByteArray &path, PinState state) {
             _db.internalPinStates().setForPath(path, state);
             auto pinState = _db.internalPinStates().rawForPath(path);
             QVERIFY(pinState);
             QCOMPARE(*pinState, state);
         };
-        auto get = [&](const QByteArray &path) -> PinState {
+        auto get = [&](QByteArray &path) -> PinState {
             auto state = _db.internalPinStates().effectiveForPath(path);
             if (!state) {
                 QTest::qFail("couldn't read pin state", __FILE__, __LINE__);
@@ -321,7 +318,7 @@ private slots:
             }
             return *state;
         };
-        auto getRecursive = [&](const QByteArray &path) -> PinState {
+        auto getRecursive = [&](QByteArray &path) -> PinState {
             auto state = _db.internalPinStates().effectiveForPathRecursive(path);
             if (!state) {
                 QTest::qFail("couldn't read pin state", __FILE__, __LINE__);
@@ -329,7 +326,7 @@ private slots:
             }
             return *state;
         };
-        auto getRaw = [&](const QByteArray &path) -> PinState {
+        auto getRaw = [&](QByteArray &path) -> PinState {
             auto state = _db.internalPinStates().rawForPath(path);
             if (!state) {
                 QTest::qFail("couldn't read pin state", __FILE__, __LINE__);

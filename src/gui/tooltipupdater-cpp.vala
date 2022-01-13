@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#include "tooltipupdater.h"
-
 // #include <QTreeView>
 // #include <QHelpEvent>
 // #include <QToolTip>
@@ -36,7 +34,7 @@ bool ToolTipUpdater::eventFilter(QObject * /*obj*/, QEvent *ev) {
     return false;
 }
 
-void ToolTipUpdater::dataChanged(const QModelIndex &topLeft,
+void ToolTipUpdater::dataChanged(QModelIndex &topLeft,
     const QModelIndex &bottomRight,
     const QVector<int> &roles) {
     if (!QToolTip::isVisible() || !roles.contains(Qt::ToolTipRole) || _toolTipPos.isNull()) {

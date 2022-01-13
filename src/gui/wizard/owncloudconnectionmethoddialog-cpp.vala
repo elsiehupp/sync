@@ -13,7 +13,6 @@
  * for more details.
  */
 
-#include "wizard/owncloudconnectionmethoddialog.h"
 // #include <QUrl>
 
 namespace OCC {
@@ -28,10 +27,9 @@ OwncloudConnectionMethodDialog::OwncloudConnectionMethodDialog(QWidget *parent)
     connect(ui->btnBack, &QAbstractButton::clicked, this, &OwncloudConnectionMethodDialog::returnBack);
 }
 
-void OwncloudConnectionMethodDialog::setUrl(const QUrl &url) {
+void OwncloudConnectionMethodDialog::setUrl(QUrl &url) {
     ui->label->setText(tr("<html><head/><body><p>Failed to connect to the secure server address <em>%1</em>. How do you wish to proceed?</p></body></html>").arg(url.toDisplayString().toHtmlEscaped()));
 }
-
 
 void OwncloudConnectionMethodDialog::returnNoTLS() {
     done(No_TLS);

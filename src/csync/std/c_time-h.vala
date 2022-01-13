@@ -18,10 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-
 // #include <QString>
-
-#include "ocsynclib.h"
 
 #ifdef _WIN32
 // #include <time.h>
@@ -29,7 +26,6 @@
 // #include <sys/time.h>
 #endif
 
-OCSYNC_EXPORT int c_utimes(const QString &uri, const struct timeval *times);
-
+OCSYNC_EXPORT int c_utimes(QString &uri, struct timeval *times);
 
 #endif /* _C_TIME_H */

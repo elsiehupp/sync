@@ -14,9 +14,6 @@
 
 // #pragma once
 
-#include "accountfwd.h"
-#include "networkjobs.h"
-
 namespace OCC {
 
 /**
@@ -25,14 +22,14 @@ namespace OCC {
  */
 class DeleteJob : public AbstractNetworkJob {
 public:
-    explicit DeleteJob(AccountPtr account, const QString &path, QObject *parent = nullptr);
-    explicit DeleteJob(AccountPtr account, const QUrl &url, QObject *parent = nullptr);
+    explicit DeleteJob(AccountPtr account, QString &path, QObject *parent = nullptr);
+    explicit DeleteJob(AccountPtr account, QUrl &url, QObject *parent = nullptr);
 
     void start() override;
     bool finished() override;
 
     QByteArray folderToken() const;
-    void setFolderToken(const QByteArray &folderToken);
+    void setFolderToken(QByteArray &folderToken);
 
 signals:
     void finishedSignal();

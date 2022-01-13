@@ -1,6 +1,5 @@
-#include "testhelper.h"
 
-OCC::FolderDefinition folderDefinition(const QString &path) {
+OCC::FolderDefinition folderDefinition(QString &path) {
     OCC::FolderDefinition d;
     d.localPath = path;
     d.targetPath = path;

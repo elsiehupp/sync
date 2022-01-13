@@ -14,9 +14,6 @@
 
 // #pragma once
 
-#include "common/result.h"
-#include "owncloudlib.h"
-
 // #include <QObject>
 // #include <QString>
 // #include <QMetaType>
@@ -26,7 +23,6 @@
 // #include <QVariant>
 
 // #include <vector>
-
 
 namespace OCC {
 
@@ -65,8 +61,8 @@ public:
 
     UserStatus();
 
-    UserStatus(const QString &id, const QString &message, const QString &icon,
-        OnlineStatus state, bool messagePredefined, const Optional<ClearAt> &clearAt = {});
+    UserStatus(QString &id, QString &message, QString &icon,
+        OnlineStatus state, bool messagePredefined, Optional<ClearAt> &clearAt = {});
 
     Q_REQUIRED_RESULT QString id() const;
     Q_REQUIRED_RESULT QString message() const;
@@ -74,12 +70,12 @@ public:
     Q_REQUIRED_RESULT OnlineStatus state() const;
     Q_REQUIRED_RESULT Optional<ClearAt> clearAt() const;
 
-    void setId(const QString &id);
-    void setMessage(const QString &message);
+    void setId(QString &id);
+    void setMessage(QString &message);
     void setState(OnlineStatus state);
-    void setIcon(const QString &icon);
+    void setIcon(QString &icon);
     void setMessagePredefined(bool value);
-    void setClearAt(const Optional<ClearAt> &dateTime);
+    void setClearAt(Optional<ClearAt> &dateTime);
 
     Q_REQUIRED_RESULT bool messagePredefined() const;
 
@@ -115,15 +111,15 @@ public:
 
     virtual void fetchPredefinedStatuses() = 0;
 
-    virtual void setUserStatus(const UserStatus &userStatus) = 0;
+    virtual void setUserStatus(UserStatus &userStatus) = 0;
 
     virtual void clearMessage() = 0;
 
     virtual UserStatus userStatus() const = 0;
 
 signals:
-    void userStatusFetched(const UserStatus &userStatus);
-    void predefinedStatusesFetched(const std::vector<UserStatus> &statuses);
+    void userStatusFetched(UserStatus &userStatus);
+    void predefinedStatusesFetched(std::vector<UserStatus> &statuses);
     void userStatusSet();
     void messageCleared();
     void error(Error error);

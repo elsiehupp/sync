@@ -27,8 +27,6 @@
 **
 ****************************************************************************/
 
-#include "qtlockedfile.h"
-
 // #include <qt_windows.h>
 // #include <QFileInfo>
 

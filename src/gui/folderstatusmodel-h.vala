@@ -12,7 +12,6 @@
  * for more details.
  */
 
-
 // #include <accountfwd.h>
 // #include <QAbstractItemModel>
 // #include <QLoggingCategory>
@@ -39,19 +38,19 @@ public:
 
     FolderStatusModel(QObject *parent = nullptr);
     ~FolderStatusModel() override;
-    void setAccountState(const AccountState *accountState);
+    void setAccountState(AccountState *accountState);
 
-    Qt::ItemFlags flags(const QModelIndex &) const override;
-    QVariant data(const QModelIndex &index, int role) const override;
-    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    QModelIndex index(int row, int column = 0, const QModelIndex &parent = QModelIndex()) const override;
-    QModelIndex parent(const QModelIndex &child) const override;
-    bool canFetchMore(const QModelIndex &parent) const override;
-    void fetchMore(const QModelIndex &parent) override;
-    void resetAndFetch(const QModelIndex &parent);
-    bool hasChildren(const QModelIndex &parent = QModelIndex()) const override;
+    Qt::ItemFlags flags(QModelIndex &) const override;
+    QVariant data(QModelIndex &index, int role) const override;
+    bool setData(QModelIndex &index, QVariant &value, int role = Qt::EditRole) override;
+    int columnCount(QModelIndex &parent = QModelIndex()) const override;
+    int rowCount(QModelIndex &parent = QModelIndex()) const override;
+    QModelIndex index(int row, int column = 0, QModelIndex &parent = QModelIndex()) const override;
+    QModelIndex parent(QModelIndex &child) const override;
+    bool canFetchMore(QModelIndex &parent) const override;
+    void fetchMore(QModelIndex &parent) override;
+    void resetAndFetch(QModelIndex &parent);
+    bool hasChildren(QModelIndex &parent = QModelIndex()) const override;
 
     struct SubFolderInfo {
         Folder *_folder = nullptr;
@@ -99,9 +98,9 @@ public:
         SubFolder,
         AddButton,
         FetchLabel };
-    ItemType classify(const QModelIndex &index) const;
-    SubFolderInfo *infoForIndex(const QModelIndex &index) const;
-    bool isAnyAncestorEncrypted(const QModelIndex &index) const;
+    ItemType classify(QModelIndex &index) const;
+    SubFolderInfo *infoForIndex(QModelIndex &index) const;
+    bool isAnyAncestorEncrypted(QModelIndex &index) const;
     // If the selective sync check boxes were changed
     bool isDirty() { return _dirty; }
 
@@ -109,7 +108,7 @@ public:
      * return a QModelIndex for the given path within the given folder.
      * Note: this method returns an invalid index if the path was not fetched from the server before
      */
-    QModelIndex indexForPath(Folder *f, const QString &path) const;
+    QModelIndex indexForPath(Folder *f, QString &path) const;
 
 public slots:
     void slotUpdateFolderState(Folder *);
@@ -117,12 +116,12 @@ public slots:
     void resetFolders();
     void slotSyncAllPendingBigFolders();
     void slotSyncNoPendingBigFolders();
-    void slotSetProgress(const ProgressInfo &progress);
+    void slotSetProgress(ProgressInfo &progress);
 
 private slots:
-    void slotUpdateDirectories(const QStringList &);
-    void slotGatherPermissions(const QString &name, const QMap<QString, QString> &properties);
-    void slotGatherEncryptionStatus(const QString &href, const QMap<QString, QString> &properties);
+    void slotUpdateDirectories(QStringList &);
+    void slotGatherPermissions(QString &name, QMap<QString, QString> &properties);
+    void slotGatherEncryptionStatus(QString &href, QMap<QString, QString> &properties);
     void slotLscolFinishedWithError(QNetworkReply *r);
     void slotFolderSyncStateChange(Folder *f);
     void slotFolderScheduleQueueChanged();
@@ -135,7 +134,7 @@ private slots:
     void slotShowFetchProgress();
 
 private:
-    QStringList createBlackList(const OCC::FolderStatusModel::SubFolderInfo &root,
+    QStringList createBlackList(OCC::FolderStatusModel::SubFolderInfo &root,
         const QStringList &oldBlackList) const;
     const AccountState *_accountState = nullptr;
     bool _dirty = false; // If the selective sync checkboxes were changed
@@ -151,7 +150,7 @@ signals:
     void dirtyChanged();
 
     // Tell the view that this item should be expanded because it has an undecided item
-    void suggestExpand(const QModelIndex &);
+    void suggestExpand(QModelIndex &);
     friend struct SubFolderInfo;
 };
 

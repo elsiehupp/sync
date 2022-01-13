@@ -29,10 +29,6 @@
  * @{
  */
 
-
-#include "std/c_private.h"
-#include "ocsynclib.h"
-
 // #include <sys/stat.h>
 
 // #include <cstdint>
@@ -41,7 +37,6 @@
 // #include <functional>
 // #include <memory>
 // #include <QByteArray>
-#include "common/remotepermissions.h"
 
 namespace OCC {
 class SyncJournalFileRecord;

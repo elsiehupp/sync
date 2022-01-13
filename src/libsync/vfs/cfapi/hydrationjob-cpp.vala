@@ -12,14 +12,7 @@
  * for more details.
  */
 
-#include "hydrationjob.h"
-
-#include "common/syncjournaldb.h"
-#include "propagatedownload.h"
-#include "vfs/cfapi/vfs_cfapi.h"
 // #include <clientsideencryptionjobs.h>
-
-#include "filesystem.h"
 
 // #include <QLocalServer>
 // #include <QLocalSocket>
@@ -34,7 +27,7 @@ OCC::AccountPtr OCC::HydrationJob::account() const {
     return _account;
 }
 
-void OCC::HydrationJob::setAccount(const AccountPtr &account) {
+void OCC::HydrationJob::setAccount(AccountPtr &account) {
     _account = account;
 }
 
@@ -42,7 +35,7 @@ QString OCC::HydrationJob::remotePath() const {
     return _remotePath;
 }
 
-void OCC::HydrationJob::setRemotePath(const QString &remotePath) {
+void OCC::HydrationJob::setRemotePath(QString &remotePath) {
     _remotePath = remotePath;
 }
 
@@ -50,7 +43,7 @@ QString OCC::HydrationJob::localPath() const {
     return _localPath;
 }
 
-void OCC::HydrationJob::setLocalPath(const QString &localPath) {
+void OCC::HydrationJob::setLocalPath(QString &localPath) {
     _localPath = localPath;
 }
 
@@ -66,7 +59,7 @@ QString OCC::HydrationJob::requestId() const {
     return _requestId;
 }
 
-void OCC::HydrationJob::setRequestId(const QString &requestId) {
+void OCC::HydrationJob::setRequestId(QString &requestId) {
     _requestId = requestId;
 }
 
@@ -74,7 +67,7 @@ QString OCC::HydrationJob::folderPath() const {
     return _folderPath;
 }
 
-void OCC::HydrationJob::setFolderPath(const QString &folderPath) {
+void OCC::HydrationJob::setFolderPath(QString &folderPath) {
     _folderPath = folderPath;
 }
 
@@ -90,7 +83,7 @@ QString OCC::HydrationJob::e2eMangledName() const {
     return _e2eMangledName;
 }
 
-void OCC::HydrationJob::setE2eMangledName(const QString &e2eMangledName) {
+void OCC::HydrationJob::setE2eMangledName(QString &e2eMangledName) {
     _e2eMangledName = e2eMangledName;
 }
 
@@ -108,7 +101,7 @@ void OCC::HydrationJob::start() {
     Q_ASSERT(_localPath.endsWith('/'));
     Q_ASSERT(!_folderPath.startsWith('/'));
 
-    const auto startServer = [this](const QString &serverName) -> QLocalServer * {
+    const auto startServer = [this](QString &serverName) -> QLocalServer * {
         const auto server = new QLocalServer(this);
         const auto listenResult = server->listen(serverName);
         if (!listenResult) {
@@ -147,7 +140,7 @@ void OCC::HydrationJob::slotFolderIdError() {
     emitFinished(Error);
 }
 
-void OCC::HydrationJob::slotCheckFolderId(const QStringList &list) {
+void OCC::HydrationJob::slotCheckFolderId(QStringList &list) {
     // TODO: the following code is borrowed from PropagateDownloadEncrypted (see HydrationJob::onNewConnection() for explanation of next steps)
     auto job = qobject_cast<LsColJob *>(sender());
     const QString folderId = list.first();
@@ -165,14 +158,14 @@ void OCC::HydrationJob::slotCheckFolderId(const QStringList &list) {
     metadataJob->start();
 }
 
-void OCC::HydrationJob::slotFolderEncryptedMetadataError(const QByteArray & /*fileId*/, int /*httpReturnCode*/) {
+void OCC::HydrationJob::slotFolderEncryptedMetadataError(QByteArray & /*fileId*/, int /*httpReturnCode*/) {
     // TODO: the following code is borrowed from PropagateDownloadEncrypted (see HydrationJob::onNewConnection() for explanation of next steps)
     qCCritical(lcHydration) << "Failed to find encrypted metadata information of remote file" << e2eMangledName();
     emitFinished(Error);
     return;
 }
 
-void OCC::HydrationJob::slotCheckFolderEncryptedMetadata(const QJsonDocument &json) {
+void OCC::HydrationJob::slotCheckFolderEncryptedMetadata(QJsonDocument &json) {
     // TODO: the following code is borrowed from PropagateDownloadEncrypted (see HydrationJob::onNewConnection() for explanation of next steps)
     qCDebug(lcHydration) << "Metadata Received reading" << e2eMangledName();
     const QString filename = e2eMangledName();
@@ -182,7 +175,7 @@ void OCC::HydrationJob::slotCheckFolderEncryptedMetadata(const QJsonDocument &js
     EncryptedFile encryptedInfo = {};
 
     const QString encryptedFileExactName = e2eMangledName().section(QLatin1Char('/'), -1);
-    for (const EncryptedFile &file : files) {
+    for (EncryptedFile &file : files) {
         if (encryptedFileExactName == file.encryptedFilename) {
             EncryptedFile encryptedInfo = file;
             encryptedInfo = file;

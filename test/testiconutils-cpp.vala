@@ -14,9 +14,6 @@
 
 // #include <QTest>
 
-#include "theme.h"
-#include "iconutils.h"
-
 class TestIconUtils : public QObject {
 
 public:

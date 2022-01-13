@@ -12,11 +12,6 @@
  * for more details.
  */
 
-
-#include "account.h"
-#include "accountfwd.h"
-#include "owncloudlib.h"
-
 // #include <QObject>
 // #include <QByteArray>
 // #include <QNetworkAccessManager>
@@ -31,7 +26,7 @@ namespace OCC {
  */
 class OWNCLOUDSYNC_EXPORT IconJob : public QObject {
 public:
-    explicit IconJob(AccountPtr account, const QUrl &url, QObject *parent = nullptr);
+    explicit IconJob(AccountPtr account, QUrl &url, QObject *parent = nullptr);
 
 signals:
     void jobFinished(QByteArray iconData);

@@ -26,16 +26,6 @@
 // #include <QGraphicsPixmapItem>
 // #include <QBuffer>
 
-#include "QProgressIndicator.h"
-
-#include "wizard/owncloudwizardcommon.h"
-#include "wizard/owncloudsetuppage.h"
-#include "wizard/owncloudconnectionmethoddialog.h"
-#include "wizard/slideshow.h"
-#include "theme.h"
-#include "account.h"
-#include "config.h"
-
 namespace OCC {
 
 OwncloudSetupPage::OwncloudSetupPage(QWidget *parent)
@@ -53,7 +43,6 @@ OwncloudSetupPage::OwncloudSetupPage(QWidget *parent)
     } else if (Theme::instance()->forceOverrideServerUrl()) {
         _ui.leUrl->setEnabled(false);
     }
-
 
     registerField(QLatin1String("OCUrl*"), _ui.leUrl);
 
@@ -83,7 +72,7 @@ void OwncloudSetupPage::setupServerAddressDescriptionLabel() {
     _ui.serverAddressDescriptionLabel->setText(tr("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").arg(appName));
 }
 
-void OwncloudSetupPage::setServerUrl(const QString &newUrl) {
+void OwncloudSetupPage::setServerUrl(QString &newUrl) {
     _ocWizard->setRegistration(false);
     _oCUrl = newUrl;
     if (_oCUrl.isEmpty()) {
@@ -115,7 +104,7 @@ void OwncloudSetupPage::setupCustomization() {
 }
 
 // slot hit from textChanged of the url entry field.
-void OwncloudSetupPage::slotUrlChanged(const QString &url) {
+void OwncloudSetupPage::slotUrlChanged(QString &url) {
     // Need to set next button as default button here because
     // otherwise the on OSX the next button does not stay the default
     // button
@@ -250,7 +239,7 @@ void OwncloudSetupPage::setAuthType(DetermineAuthTypeJob::AuthType type) {
     stopSpinner();
 }
 
-void OwncloudSetupPage::setErrorString(const QString &err, bool retryHTTPonly) {
+void OwncloudSetupPage::setErrorString(QString &err, bool retryHTTPonly) {
     if (err.isEmpty()) {
         _ui.errorLabel->setVisible(false);
     } else {
@@ -305,7 +294,7 @@ void OwncloudSetupPage::stopSpinner() {
     _progressIndi->stopAnimation();
 }
 
-QString subjectInfoHelper(const QSslCertificate &cert, const QByteArray &qa) {
+QString subjectInfoHelper(QSslCertificate &cert, QByteArray &qa) {
     return cert.subjectInfo(qa).join(QLatin1Char('/'));
 }
 
@@ -351,7 +340,6 @@ void OwncloudSetupPage::customizeStyle() {
             _progressIndi->setColor(Qt::black);
         }
     }
-
 
     WizardCommon::customizeHintLabel(_ui.serverAddressDescriptionLabel);
 }

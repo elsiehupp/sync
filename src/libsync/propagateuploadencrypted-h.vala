@@ -10,9 +10,6 @@
 // #include <QFile>
 // #include <QTemporaryFile>
 
-#include "owncloudpropagator.h"
-#include "clientsideencryption.h"
-
 namespace OCC {
 class FolderMetadata;
 
@@ -31,7 +28,7 @@ class FolderMetadata;
 class PropagateUploadEncrypted : public QObject {
   Q_OBJECT
 public:
-    PropagateUploadEncrypted(OwncloudPropagator *propagator, const QString &remoteParentPath, SyncFileItemPtr item, QObject *parent = nullptr);
+    PropagateUploadEncrypted(OwncloudPropagator *propagator, QString &remoteParentPath, SyncFileItemPtr item, QObject *parent = nullptr);
     ~PropagateUploadEncrypted() override = default;
 
     void start();
@@ -43,21 +40,21 @@ public:
     const QByteArray folderToken() const { return _folderToken; }
 
 private slots:
-    void slotFolderEncryptedIdReceived(const QStringList &list);
+    void slotFolderEncryptedIdReceived(QStringList &list);
     void slotFolderEncryptedIdError(QNetworkReply *r);
-    void slotFolderLockedSuccessfully(const QByteArray& fileId, const QByteArray& token);
-    void slotFolderLockedError(const QByteArray& fileId, int httpErrorCode);
-    void slotTryLock(const QByteArray& fileId);
-    void slotFolderEncryptedMetadataReceived(const QJsonDocument &json, int statusCode);
-    void slotFolderEncryptedMetadataError(const QByteArray& fileId, int httpReturnCode);
-    void slotUpdateMetadataSuccess(const QByteArray& fileId);
-    void slotUpdateMetadataError(const QByteArray& fileId, int httpReturnCode);
+    void slotFolderLockedSuccessfully(QByteArray& fileId, QByteArray& token);
+    void slotFolderLockedError(QByteArray& fileId, int httpErrorCode);
+    void slotTryLock(QByteArray& fileId);
+    void slotFolderEncryptedMetadataReceived(QJsonDocument &json, int statusCode);
+    void slotFolderEncryptedMetadataError(QByteArray& fileId, int httpReturnCode);
+    void slotUpdateMetadataSuccess(QByteArray& fileId);
+    void slotUpdateMetadataError(QByteArray& fileId, int httpReturnCode);
 
 signals:
     // Emmited after the file is encrypted and everythign is setup.
-    void finalized(const QString& path, const QString& filename, quint64 size);
+    void finalized(QString& path, QString& filename, quint64 size);
     void error();
-    void folderUnlocked(const QByteArray &folderId, int httpStatus);
+    void folderUnlocked(QByteArray &folderId, int httpStatus);
 
 private:
   OwncloudPropagator *_propagator;
@@ -79,7 +76,6 @@ private:
   EncryptedFile _encryptedFile;
   QString _completeFileName;
 };
-
 
 }
 #endif

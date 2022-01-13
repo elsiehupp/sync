@@ -12,12 +12,9 @@
  * for more details.
  */
 
-
 // #include <QObject>
 
 // #include <csync.h>
-#include "owncloudlib.h"
-#include "accountfwd.h"
 
 class QNetworkAccessManager;
 class QNetworkReply;
@@ -84,7 +81,7 @@ public:
      */
     virtual void forgetSensitiveData() = 0;
 
-    static QString keychainKey(const QString &url, const QString &user, const QString &accountId);
+    static QString keychainKey(QString &url, QString &user, QString &accountId);
 
     /** If the job need to be restarted or queue, this does it and returns true. */
     virtual bool retryIfNeeded(AbstractNetworkJob *) { return false; }

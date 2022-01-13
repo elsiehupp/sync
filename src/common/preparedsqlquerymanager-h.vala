@@ -18,10 +18,6 @@
 
 // #pragma once
 
-#include "ocsynclib.h"
-#include "ownsql.h"
-#include "common/asserts.h"
-
 namespace OCC {
 
 class OCSYNC_EXPORT PreparedSqlQuery {
@@ -105,7 +101,7 @@ public:
     /**
      * Prepare the SqlQuery if it was not prepared yet.
      */
-    const PreparedSqlQuery get(Key key, const QByteArray &sql, SqlDatabase &db);
+    const PreparedSqlQuery get(Key key, QByteArray &sql, SqlDatabase &db);
 
 private:
     SqlQuery _queries[PreparedQueryCount];

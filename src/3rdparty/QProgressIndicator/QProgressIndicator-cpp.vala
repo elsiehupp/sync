@@ -22,8 +22,6 @@
  * SOFTWARE.
  */
 
-#include "QProgressIndicator.h"
-
 // #include <QPainter>
 
 QProgressIndicator::QProgressIndicator(QWidget* parent)
@@ -72,7 +70,7 @@ void QProgressIndicator::setAnimationDelay(int delay) {
         m_timerId = startTimer(m_delay);
 }
 
-void QProgressIndicator::setColor(const QColor & color) {
+void QProgressIndicator::setColor(QColor & color) {
     m_color = color;
 
     update();

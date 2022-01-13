@@ -12,9 +12,6 @@
  * for more details.
  */
 
-
-#include "ocsjob.h"
-
 class QJsonDocument;
 
 namespace OCC {
@@ -34,17 +31,17 @@ public:
      *
      * @param path Path to request shares for (default all shares)
      */
-    void getSharees(const QString &search, const QString &itemType, int page = 1, int perPage = 50, bool lookup = false);
+    void getSharees(QString &search, QString &itemType, int page = 1, int perPage = 50, bool lookup = false);
 signals:
     /**
      * Result of the OCS request
      *
      * @param reply The reply
      */
-    void shareeJobFinished(const QJsonDocument &reply);
+    void shareeJobFinished(QJsonDocument &reply);
 
 private slots:
-    void jobDone(const QJsonDocument &reply);
+    void jobDone(QJsonDocument &reply);
 };
 }
 

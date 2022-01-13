@@ -1,10 +1,4 @@
-#include "notificationhandler.h"
 
-#include "accountstate.h"
-#include "capabilities.h"
-#include "networkjobs.h"
-
-#include "iconjob.h"
 
 // #include <QJsonDocument>
 // #include <QJsonObject>
@@ -52,7 +46,7 @@ void ServerNotificationHandler::slotFetchNotifications() {
     _notificationJob->start();
 }
 
-void ServerNotificationHandler::slotEtagResponseHeaderReceived(const QByteArray &value, int statusCode) {
+void ServerNotificationHandler::slotEtagResponseHeaderReceived(QByteArray &value, int statusCode) {
     if (statusCode == successStatusCode) {
         qCWarning(lcServerNotification) << "New Notification ETag Response Header received " << value;
         auto *account = qvariant_cast<AccountState *>(sender()->property(propertyAccountStateC));
@@ -67,7 +61,7 @@ void ServerNotificationHandler::slotAllowDesktopNotificationsChanged(bool isAllo
     }
 }
 
-void ServerNotificationHandler::slotNotificationsReceived(const QJsonDocument &json, int statusCode) {
+void ServerNotificationHandler::slotNotificationsReceived(QJsonDocument &json, int statusCode) {
     if (statusCode != successStatusCode && statusCode != notModifiedStatusCode) {
         qCWarning(lcServerNotification) << "Notifications failed with status code " << statusCode;
         deleteLater();

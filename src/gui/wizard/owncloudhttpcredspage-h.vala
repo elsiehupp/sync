@@ -13,12 +13,6 @@
  * for more details.
  */
 
-
-#include "wizard/abstractcredswizardpage.h"
-#include "wizard/owncloudwizard.h"
-
-#include "ui_owncloudhttpcredspage.h"
-
 class QProgressIndicator;
 
 namespace OCC {
@@ -37,10 +31,10 @@ public:
     bool validatePage() override;
     int nextId() const override;
     void setConnected();
-    void setErrorString(const QString &err);
+    void setErrorString(QString &err);
 
 Q_SIGNALS:
-    void connectToOCUrl(const QString &);
+    void connectToOCUrl(QString &);
 
 public slots:
     void slotStyleChanged();

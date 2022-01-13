@@ -12,7 +12,6 @@
  * for more details.
  */
 
-
 // #include <QDialog>
 
 namespace OCC {
@@ -24,7 +23,7 @@ class FolderCreationDialog;
 class FolderCreationDialog : public QDialog {
 
 public:
-    explicit FolderCreationDialog(const QString &destination, QWidget *parent = nullptr);
+    explicit FolderCreationDialog(QString &destination, QWidget *parent = nullptr);
     ~FolderCreationDialog() override;
 
 private slots:

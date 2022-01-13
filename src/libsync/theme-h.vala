@@ -12,10 +12,8 @@
  * for more details.
  */
 
-
 // #include <QIcon>
 // #include <QObject>
-#include "syncresult.h"
 
 class QString;
 class QObject;
@@ -170,9 +168,9 @@ public:
     virtual QString configFileName() const;
 
 #ifndef TOKEN_AUTH_ONLY
-    static QString hidpiFileName(const QString &fileName, QPaintDevice *dev = nullptr);
+    static QString hidpiFileName(QString &fileName, QPaintDevice *dev = nullptr);
 
-    static QString hidpiFileName(const QString &iconName, const QColor &backgroundColor, QPaintDevice *dev = nullptr);
+    static QString hidpiFileName(QString &iconName, QColor &backgroundColor, QPaintDevice *dev = nullptr);
 
     static bool isHidpi(QPaintDevice *dev = nullptr);
 
@@ -460,7 +458,7 @@ public:
     * This should be replaced (TODO) by a real theming implementation for the client UI
     * (actually 2019/09/13 only systray theming).
     */
-	virtual QIcon uiThemeIcon(const QString &iconName, bool uiHasDarkBg) const;
+	virtual QIcon uiThemeIcon(QString &iconName, bool uiHasDarkBg) const;
 
     /**
      * @brief Perform a calculation to check if a colour is dark or light and accounts for different sensitivity of the human eye.
@@ -469,7 +467,7 @@ public:
      *
      * 2019/12/08: Moved here from SettingsDialog.
      */
-    static bool isDarkColor(const QColor &color);
+    static bool isDarkColor(QColor &color);
 
     /**
      * @brief Return the colour to be used for HTML links (e.g. used in QLabel), based on the current app palette or given colour (Dark-/Light-Mode switching).
@@ -478,7 +476,7 @@ public:
      *
      * 2019/12/08: Implemented for the Dark Mode on macOS, because the app palette can not account for that (Qt 5.12.5).
      */
-    static QColor getBackgroundAwareLinkColor(const QColor &backgroundColor);
+    static QColor getBackgroundAwareLinkColor(QColor &backgroundColor);
 
     /**
      * @brief Return the colour to be used for HTML links (e.g. used in QLabel), based on the current app palette (Dark-/Light-Mode switching).
@@ -496,7 +494,7 @@ public:
      *
      * This way we also avoid having certain strings re-translated on Transifex.
      */
-    static void replaceLinkColorStringBackgroundAware(QString &linkString, const QColor &backgroundColor);
+    static void replaceLinkColorStringBackgroundAware(QString &linkString, QColor &backgroundColor);
 
     /**
      * @brief Appends a CSS-style colour value to all HTML link tags in a given string, based on the current app palette (Dark-/Light-Mode switching).
@@ -514,7 +512,7 @@ public:
      *
      * This way we also avoid having certain strings re-translated on Transifex.
      */
-    static void replaceLinkColorString(QString &linkString, const QColor &newColor);
+    static void replaceLinkColorString(QString &linkString, QColor &newColor);
 
     /**
      * @brief Creates a colour-aware icon based on the specified palette's base colour.
@@ -523,7 +521,7 @@ public:
      *
      * 2019/12/09: Moved here from SettingsDialog.
      */
-    static QIcon createColorAwareIcon(const QString &name, const QPalette &palette);
+    static QIcon createColorAwareIcon(QString &name, QPalette &palette);
 
     /**
      * @brief Creates a colour-aware icon based on the app palette's base colour (Dark-/Light-Mode switching).
@@ -532,7 +530,7 @@ public:
      *
      * 2019/12/09: Moved here from SettingsDialog.
      */
-    static QIcon createColorAwareIcon(const QString &name);
+    static QIcon createColorAwareIcon(QString &name);
 
     /**
      * @brief Creates a colour-aware pixmap based on the specified palette's base colour.
@@ -541,7 +539,7 @@ public:
      *
      * 2019/12/09: Adapted from createColorAwareIcon.
      */
-    static QPixmap createColorAwarePixmap(const QString &name, const QPalette &palette);
+    static QPixmap createColorAwarePixmap(QString &name, QPalette &palette);
 
     /**
      * @brief Creates a colour-aware pixmap based on the app palette's base colour (Dark-/Light-Mode switching).
@@ -550,8 +548,7 @@ public:
      *
      * 2019/12/09: Adapted from createColorAwareIcon.
      */
-    static QPixmap createColorAwarePixmap(const QString &name);
-
+    static QPixmap createColorAwarePixmap(QString &name);
 
     /**
      * @brief Whether to show the option to create folders using "virtual files".
@@ -576,7 +573,7 @@ public:
 
 protected:
 #ifndef TOKEN_AUTH_ONLY
-    QIcon themeIcon(const QString &name, bool sysTray = false) const;
+    QIcon themeIcon(QString &name, bool sysTray = false) const;
 #endif
     /**
      * @brief Generates image path in the resources
@@ -585,7 +582,7 @@ protected:
      * @param sysTray Whether the image requested is for Systray or not
      * @return QString image path in the resources
      **/
-    QString themeImagePath(const QString &name, int size = -1, bool sysTray = false) const;
+    QString themeImagePath(QString &name, int size = -1, bool sysTray = false) const;
     Theme();
 
 signals:

@@ -14,8 +14,6 @@
 
 // #pragma once
 
-#include "abstractpropagateremotedeleteencrypted.h"
-
 namespace OCC {
 
 class PropagateRemoteDeleteEncrypted : public AbstractPropagateRemoteDeleteEncrypted {
@@ -25,8 +23,8 @@ public:
     void start() override;
 
 private:
-    void slotFolderUnLockedSuccessfully(const QByteArray &folderId) override;
-    void slotFolderEncryptedMetadataReceived(const QJsonDocument &json, int statusCode) override;
+    void slotFolderUnLockedSuccessfully(QByteArray &folderId) override;
+    void slotFolderEncryptedMetadataReceived(QJsonDocument &json, int statusCode) override;
 };
 
 }

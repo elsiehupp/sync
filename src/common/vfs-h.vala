@@ -19,11 +19,6 @@
 
 // #include <memory>
 
-#include "ocsynclib.h"
-#include "result.h"
-#include "syncfilestatus.h"
-#include "pinstate.h"
-
 using csync_file_stat_t = struct csync_file_stat_s;
 
 namespace OCC {
@@ -107,9 +102,9 @@ public:
     Q_ENUM(ConvertToPlaceholderResult)
 
     static QString modeToString(Mode mode);
-    static Optional<Mode> modeFromString(const QString &str);
+    static Optional<Mode> modeFromString(QString &str);
 
-    static Result<bool, QString> checkAvailability(const QString &path);
+    static Result<bool, QString> checkAvailability(QString &path);
 
     enum class AvailabilityError {
         // Availability can't be retrieved due to db error
@@ -131,19 +126,17 @@ public:
     /// Access to the parameters the instance was start()ed with.
     const VfsSetupParams &params() const { return _setupParams; }
 
-
     /** Initializes interaction with the VFS provider.
      *
      * The plugin-specific work is done in startImpl().
      */
-    void start(const VfsSetupParams &params);
+    void start(VfsSetupParams &params);
 
     /// Stop interaction with VFS provider. Like when the client application quits.
     virtual void stop() = 0;
 
     /// Deregister the folder with the sync provider, like when a folder is removed.
     virtual void unregisterFolder() = 0;
-
 
     /** Whether the socket api should show pin state options
      *
@@ -163,24 +156,24 @@ public:
      * If the remote metadata changes, the local placeholder's metadata should possibly
      * change as well.
      */
-    virtual Q_REQUIRED_RESULT Result<void, QString> updateMetadata(const QString &filePath, time_t modtime, qint64 size, const QByteArray &fileId) = 0;
+    virtual Q_REQUIRED_RESULT Result<void, QString> updateMetadata(QString &filePath, time_t modtime, qint64 size, QByteArray &fileId) = 0;
 
     /// Create a new dehydrated placeholder. Called from PropagateDownload.
-    virtual Q_REQUIRED_RESULT Result<void, QString> createPlaceholder(const SyncFileItem &item) = 0;
+    virtual Q_REQUIRED_RESULT Result<void, QString> createPlaceholder(SyncFileItem &item) = 0;
 
     /** Convert a hydrated placeholder to a dehydrated one. Called from PropagateDownlaod.
      *
      * This is different from delete+create because preserving some file metadata
      * (like pin states) may be essential for some vfs plugins.
      */
-    virtual Q_REQUIRED_RESULT Result<void, QString> dehydratePlaceholder(const SyncFileItem &item) = 0;
+    virtual Q_REQUIRED_RESULT Result<void, QString> dehydratePlaceholder(SyncFileItem &item) = 0;
 
     /** Discovery hook: even unchanged files may need UPDATE_METADATA.
      *
      * For instance cfapi vfs wants local hydrated non-placeholder files to
      * become hydrated placeholder files.
      */
-    virtual Q_REQUIRED_RESULT bool needsMetadataUpdate(const SyncFileItem &item) = 0;
+    virtual Q_REQUIRED_RESULT bool needsMetadataUpdate(SyncFileItem &item) = 0;
 
     /** Convert a new file to a hydrated placeholder.
      *
@@ -201,7 +194,7 @@ public:
         const QString &replacesFile = QString()) = 0;
 
     /// Determine whether the file at the given absolute path is a dehydrated placeholder.
-    virtual Q_REQUIRED_RESULT bool isDehydratedPlaceholder(const QString &filePath) = 0;
+    virtual Q_REQUIRED_RESULT bool isDehydratedPlaceholder(QString &filePath) = 0;
 
     /** Similar to isDehydratedPlaceholder() but used from sync discovery.
      *
@@ -221,7 +214,7 @@ public:
      *
      * folderPath is relative to the sync folder. Can be "" for root folder.
      */
-    virtual Q_REQUIRED_RESULT bool setPinState(const QString &folderPath, PinState state) = 0;
+    virtual Q_REQUIRED_RESULT bool setPinState(QString &folderPath, PinState state) = 0;
 
     /** Returns the pin state of an item at a path.
      *
@@ -232,7 +225,7 @@ public:
      *
      * Returns none on retrieval error.
      */
-    virtual Q_REQUIRED_RESULT Optional<PinState> pinState(const QString &folderPath) = 0;
+    virtual Q_REQUIRED_RESULT Optional<PinState> pinState(QString &folderPath) = 0;
 
     /** Returns availability status of an item at a path.
      *
@@ -241,7 +234,7 @@ public:
      *
      * folderPath is relative to the sync folder. Can be "" for root folder.
      */
-    virtual Q_REQUIRED_RESULT AvailabilityResult availability(const QString &folderPath) = 0;
+    virtual Q_REQUIRED_RESULT AvailabilityResult availability(QString &folderPath) = 0;
 
 public slots:
     /** Update in-sync state based on SyncFileStatusTracker signal.
@@ -250,7 +243,7 @@ public slots:
      * via the vfs plugin. The connection to SyncFileStatusTracker allows both to be based
      * on the same data.
      */
-    virtual void fileStatusChanged(const QString &systemFileName, SyncFileStatus fileStatus) = 0;
+    virtual void fileStatusChanged(QString &systemFileName, SyncFileStatus fileStatus) = 0;
 
 signals:
     /// Emitted when a user-initiated hydration starts
@@ -268,12 +261,12 @@ protected:
      * Usually some registration needs to be done with the backend. This function
      * should take care of it if necessary.
      */
-    virtual void startImpl(const VfsSetupParams &params) = 0;
+    virtual void startImpl(VfsSetupParams &params) = 0;
 
     // Db-backed pin state handling. Derived classes may use it to implement pin states.
-    bool setPinStateInDb(const QString &folderPath, PinState state);
-    Optional<PinState> pinStateInDb(const QString &folderPath);
-    AvailabilityResult availabilityInDb(const QString &folderPath);
+    bool setPinStateInDb(QString &folderPath, PinState state);
+    Optional<PinState> pinStateInDb(QString &folderPath);
+    AvailabilityResult availabilityInDb(QString &folderPath);
 
     // the parameters passed to start()
     VfsSetupParams _setupParams;
@@ -296,24 +289,24 @@ public:
     bool socketApiPinStateActionsShown() const override { return false; }
     bool isHydrating() const override { return false; }
 
-    Result<void, QString> updateMetadata(const QString &, time_t, qint64, const QByteArray &) override { return {}; }
-    Result<void, QString> createPlaceholder(const SyncFileItem &) override { return {}; }
-    Result<void, QString> dehydratePlaceholder(const SyncFileItem &) override { return {}; }
-    Result<ConvertToPlaceholderResult, QString> convertToPlaceholder(const QString &, const SyncFileItem &, const QString &) override { return ConvertToPlaceholderResult::Ok; }
+    Result<void, QString> updateMetadata(QString &, time_t, qint64, QByteArray &) override { return {}; }
+    Result<void, QString> createPlaceholder(SyncFileItem &) override { return {}; }
+    Result<void, QString> dehydratePlaceholder(SyncFileItem &) override { return {}; }
+    Result<ConvertToPlaceholderResult, QString> convertToPlaceholder(QString &, SyncFileItem &, QString &) override { return ConvertToPlaceholderResult::Ok; }
 
-    bool needsMetadataUpdate(const SyncFileItem &) override { return false; }
-    bool isDehydratedPlaceholder(const QString &) override { return false; }
+    bool needsMetadataUpdate(SyncFileItem &) override { return false; }
+    bool isDehydratedPlaceholder(QString &) override { return false; }
     bool statTypeVirtualFile(csync_file_stat_t *, void *) override { return false; }
 
-    bool setPinState(const QString &, PinState) override { return true; }
-    Optional<PinState> pinState(const QString &) override { return PinState::AlwaysLocal; }
-    AvailabilityResult availability(const QString &) override { return VfsItemAvailability::AlwaysLocal; }
+    bool setPinState(QString &, PinState) override { return true; }
+    Optional<PinState> pinState(QString &) override { return PinState::AlwaysLocal; }
+    AvailabilityResult availability(QString &) override { return VfsItemAvailability::AlwaysLocal; }
 
 public slots:
-    void fileStatusChanged(const QString &, SyncFileStatus) override {}
+    void fileStatusChanged(QString &, SyncFileStatus) override {}
 
 protected:
-    void startImpl(const VfsSetupParams &) override {}
+    void startImpl(VfsSetupParams &) override {}
 };
 
 /// Check whether the plugin for the mode is available.

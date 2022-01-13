@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#include "syncfilestatus.h"
-
 namespace OCC {
 SyncFileStatus::SyncFileStatus() = default;
 

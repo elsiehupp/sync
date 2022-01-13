@@ -12,16 +12,9 @@
  * for more details.
  */
 
-
-
 // #include <QObject>
 // #include <QQueue>
 // #include <QList>
-
-#include "folder.h"
-#include "folderwatcher.h"
-#include "navigationpanehelper.h"
-#include "syncfileitem.h"
 
 class TestFolderMan;
 
@@ -74,51 +67,51 @@ public:
 
     /** Adds a folder for an account, ensures the journal is gone and saves it in the settings.
       */
-    Folder *addFolder(AccountState *accountState, const FolderDefinition &folderDefinition);
+    Folder *addFolder(AccountState *accountState, FolderDefinition &folderDefinition);
 
     /** Removes a folder */
     void removeFolder(Folder *);
 
     /** Returns the folder which the file or directory stored in path is in */
-    Folder *folderForPath(const QString &path);
+    Folder *folderForPath(QString &path);
 
     /**
       * returns a list of local files that exist on the local harddisk for an
       * incoming relative server path. The method checks with all existing sync
       * folders.
       */
-    QStringList findFileInLocalFolders(const QString &relPath, const AccountPtr acc);
+    QStringList findFileInLocalFolders(QString &relPath, AccountPtr acc);
 
     /** Returns the folder by alias or \c nullptr if no folder with the alias exists. */
-    Folder *folder(const QString &);
+    Folder *folder(QString &);
 
     /**
      * Migrate accounts from owncloud < 2.0
      * Creates a folder for a specific configuration, identified by alias.
      */
-    Folder *setupFolderFromOldConfigFile(const QString &, AccountState *account);
+    Folder *setupFolderFromOldConfigFile(QString &, AccountState *account);
 
     /**
      * Ensures that a given directory does not contain a sync journal file.
      *
      * @returns false if the journal could not be removed, true otherwise.
      */
-    static bool ensureJournalGone(const QString &journalDbFile);
+    static bool ensureJournalGone(QString &journalDbFile);
 
     /** Creates a new and empty local directory. */
-    bool startFromScratch(const QString &);
+    bool startFromScratch(QString &);
 
     /// Produce text for use in the tray tooltip
     static QString trayTooltipStatusString(SyncResult::Status syncStatus, bool hasUnresolvedConflicts, bool paused);
 
     /// Compute status summarizing multiple folders
-    static void trayOverallStatus(const QList<Folder *> &folders,
+    static void trayOverallStatus(QList<Folder *> &folders,
         SyncResult::Status *status, bool *unresolvedConflicts);
 
     // Escaping of the alias which is used in QSettings AND the file
     // system, thus need to be escaped.
-    static QString escapeAlias(const QString &);
-    static QString unescapeAlias(const QString &);
+    static QString escapeAlias(QString &);
+    static QString unescapeAlias(QString &);
 
     SocketApi *socketApi();
     NavigationPaneHelper &navigationPaneHelper() { return _navigationPaneHelper; }
@@ -131,7 +124,7 @@ public:
      *
      * @returns an empty string if it is allowed, or an error if it is not allowed
      */
-    QString checkPathValidityForNewFolder(const QString &path, const QUrl &serverUrl = QUrl()) const;
+    QString checkPathValidityForNewFolder(QString &path, QUrl &serverUrl = QUrl()) const;
 
     /**
      * Attempts to find a non-existing, acceptable path for creating a new sync folder.
@@ -142,7 +135,7 @@ public:
      * subfolder of ~ would be a good candidate. When that happens \a basePath
      * is returned.
      */
-    QString findGoodPathForNewSyncFolder(const QString &basePath, const QUrl &serverUrl) const;
+    QString findGoodPathForNewSyncFolder(QString &basePath, QUrl &serverUrl) const;
 
     /**
      * While ignoring hidden files can theoretically be switched per folder,
@@ -213,7 +206,7 @@ signals:
     /**
      * Emitted whenever the list of configured folders changes.
      */
-    void folderListChanged(const Folder::Map &);
+    void folderListChanged(Folder::Map &);
 
     /**
      * Emitted once slotRemoveFoldersForAccount is done wiping
@@ -239,10 +232,10 @@ public slots:
      * Automatically detemines the folder that's responsible for the file.
      * See slotWatchedFileUnlocked().
      */
-    void slotSyncOnceFileUnlocks(const QString &path);
+    void slotSyncOnceFileUnlocks(QString &path);
 
     // slot to schedule an ETag job (from Folder only)
-    void slotScheduleETagJob(const QString &alias, RequestEtagJob *job);
+    void slotScheduleETagJob(QString &alias, RequestEtagJob *job);
 
     /** Wipe folder */
     void slotWipeFolderForAccount(AccountState *accountState);
@@ -251,7 +244,7 @@ private slots:
     void slotFolderSyncPaused(Folder *, bool paused);
     void slotFolderCanSyncChanged();
     void slotFolderSyncStarted();
-    void slotFolderSyncFinished(const SyncResult &);
+    void slotFolderSyncFinished(SyncResult &);
 
     void slotRunOneEtagJob();
     void slotEtagJobDestroyed(QObject *);
@@ -276,7 +269,7 @@ private slots:
      * This schedules the folder for synchronization that contains
      * the file with the given path.
      */
-    void slotWatchedFileUnlocked(const QString &path);
+    void slotWatchedFileUnlocked(QString &path);
 
     /**
      * Schedules folders whose time to sync has come.
@@ -286,7 +279,7 @@ private slots:
      */
     void slotScheduleFolderByTime();
 
-    void slotSetupPushNotifications(const Folder::Map &);
+    void slotSetupPushNotifications(Folder::Map &);
     void slotProcessFilesPushNotification(Account *account);
     void slotConnectToPushNotifications(Account *account);
 
@@ -313,14 +306,14 @@ private:
     // restarts the application (Linux only)
     void restartApplication();
 
-    void setupFoldersHelper(QSettings &settings, AccountStatePtr account, const QStringList &ignoreKeys, bool backwardsCompatible, bool foldersWithPlaceholders);
+    void setupFoldersHelper(QSettings &settings, AccountStatePtr account, QStringList &ignoreKeys, bool backwardsCompatible, bool foldersWithPlaceholders);
 
-    void runEtagJobsIfPossible(const QList<Folder *> &folderMap);
+    void runEtagJobsIfPossible(QList<Folder *> &folderMap);
     void runEtagJobIfPossible(Folder *folder);
 
     bool pushNotificationsFilesReady(Account *account);
 
-    bool isSwitchToVfsNeeded(const FolderDefinition &folderDefinition) const;
+    bool isSwitchToVfsNeeded(FolderDefinition &folderDefinition) const;
 
     QSet<Folder *> _disabledFolders;
     Folder::Map _folderMap;

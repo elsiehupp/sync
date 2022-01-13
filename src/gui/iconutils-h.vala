@@ -12,17 +12,16 @@
  * for more details.
  */
 
-
 // #include <QColor>
 // #include <QPixmap>
 
 namespace OCC {
 namespace Ui {
 namespace IconUtils {
-QPixmap pixmapForBackground(const QString &fileName, const QColor &backgroundColor);
-QImage createSvgImageWithCustomColor(const QString &fileName, const QColor &customColor, QSize *originalSize = nullptr, const QSize &requestedSize = {});
-QPixmap createSvgPixmapWithCustomColorCached(const QString &fileName, const QColor &customColor, QSize *originalSize = nullptr, const QSize &requestedSize = {});
-QImage drawSvgWithCustomFillColor(const QString &sourceSvgPath, const QColor &fillColor, QSize *originalSize = nullptr, const QSize &requestedSize = {});
+QPixmap pixmapForBackground(QString &fileName, QColor &backgroundColor);
+QImage createSvgImageWithCustomColor(QString &fileName, QColor &customColor, QSize *originalSize = nullptr, QSize &requestedSize = {});
+QPixmap createSvgPixmapWithCustomColorCached(QString &fileName, QColor &customColor, QSize *originalSize = nullptr, QSize &requestedSize = {});
+QImage drawSvgWithCustomFillColor(QString &sourceSvgPath, QColor &fillColor, QSize *originalSize = nullptr, QSize &requestedSize = {});
 }
 }
 }

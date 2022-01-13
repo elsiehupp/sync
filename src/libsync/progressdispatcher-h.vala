@@ -12,16 +12,12 @@
  * for more details.
  */
 
-
-#include "owncloudlib.h"
 // #include <QObject>
 // #include <QHash>
 // #include <QTime>
 // #include <QQueue>
 // #include <QElapsedTimer>
 // #include <QTimer>
-
-#include "syncfileitem.h"
 
 namespace OCC {
 
@@ -85,7 +81,7 @@ public:
     /**
      * Increase the file and size totals by the amount indicated in item.
      */
-    void adjustTotalsForFile(const SyncFileItem &item);
+    void adjustTotalsForFile(SyncFileItem &item);
 
     qint64 totalFiles() const;
     qint64 completedFiles() const;
@@ -97,7 +93,7 @@ public:
     qint64 currentFile() const;
 
     /** Return true if the size needs to be taken in account in the total amount of time */
-    static inline bool isSizeDependent(const SyncFileItem &item) {
+    static inline bool isSizeDependent(SyncFileItem &item) {
         return !item.isDirectory()
             && (item._instruction == CSYNC_INSTRUCTION_CONFLICT
                 || item._instruction == CSYNC_INSTRUCTION_SYNC
@@ -170,9 +166,9 @@ public:
     QString _currentDiscoveredRemoteFolder;
     QString _currentDiscoveredLocalFolder;
 
-    void setProgressComplete(const SyncFileItem &item);
+    void setProgressComplete(SyncFileItem &item);
 
-    void setProgressItem(const SyncFileItem &item, qint64 completed);
+    void setProgressItem(SyncFileItem &item, qint64 completed);
 
     /**
      * Get the total completion estimate
@@ -198,7 +194,7 @@ public:
     /**
      * Get the current file completion estimate structure
      */
-    Estimates fileProgress(const SyncFileItem &item) const;
+    Estimates fileProgress(SyncFileItem &item) const;
 
 private slots:
     /**
@@ -228,8 +224,8 @@ private:
 
 namespace Progress {
 
-    OWNCLOUDSYNC_EXPORT QString asActionString(const SyncFileItem &item);
-    OWNCLOUDSYNC_EXPORT QString asResultString(const SyncFileItem &item);
+    OWNCLOUDSYNC_EXPORT QString asActionString(SyncFileItem &item);
+    OWNCLOUDSYNC_EXPORT QString asResultString(SyncFileItem &item);
 
     OWNCLOUDSYNC_EXPORT bool isWarningKind(SyncFileItem::Status);
     OWNCLOUDSYNC_EXPORT bool isIgnoredKind(SyncFileItem::Status);
@@ -269,16 +265,16 @@ signals:
       @param[out]  progress   A struct with all progress info.
 
      */
-    void progressInfo(const QString &folder, const ProgressInfo &progress);
+    void progressInfo(QString &folder, ProgressInfo &progress);
     /**
      * @brief: the item was completed by a job
      */
-    void itemCompleted(const QString &folder, const SyncFileItemPtr &item);
+    void itemCompleted(QString &folder, SyncFileItemPtr &item);
 
     /**
      * @brief A new folder-wide sync error was seen.
      */
-    void syncError(const QString &folder, const QString &message, ErrorCategory category);
+    void syncError(QString &folder, QString &message, ErrorCategory category);
 
     /**
      * @brief Emitted when an error needs to be added into GUI
@@ -287,15 +283,15 @@ signals:
      * @param[out] full error message
      * @param[out] subject (optional)
      */
-    void addErrorToGui(const QString &folder, SyncFileItem::Status status, const QString &errorMessage, const QString &subject);
+    void addErrorToGui(QString &folder, SyncFileItem::Status status, QString &errorMessage, QString &subject);
 
     /**
      * @brief Emitted for a folder when a sync is done, listing all pending conflicts
      */
-    void folderConflicts(const QString &folder, const QStringList &conflictPaths);
+    void folderConflicts(QString &folder, QStringList &conflictPaths);
 
 protected:
-    void setProgressInfo(const QString &folder, const ProgressInfo &progress);
+    void setProgressInfo(QString &folder, ProgressInfo &progress);
 
 private:
     ProgressDispatcher(QObject *parent = nullptr);

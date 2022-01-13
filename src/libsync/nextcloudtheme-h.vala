@@ -12,9 +12,6 @@
  * for more details.
  */
 
-
-#include "theme.h"
-
 namespace OCC {
 
 /**

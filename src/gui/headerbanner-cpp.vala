@@ -58,8 +58,6 @@
 **
 ****************************************************************************/
 
-#include "headerbanner.h"
-
 // #include <QVBoxLayout>
 // #include <QLabel>
 
@@ -95,8 +93,8 @@ HeaderBanner::HeaderBanner(QWidget *parent)
     layout->addWidget(logoLabel, 1, 5, 5, 1);
 }
 
-void HeaderBanner::setup(const QString &title, const QPixmap &logo, const QPixmap &banner,
-                         const Qt::TextFormat titleFormat, const QString &styleSheet) {
+void HeaderBanner::setup(QString &title, QPixmap &logo, QPixmap &banner,
+                         const Qt::TextFormat titleFormat, QString &styleSheet) {
     QStyle *style = parentWidget()->style();
     //const int layoutHorizontalSpacing = style->pixelMetric(QStyle::PM_LayoutHorizontalSpacing);
     int topLevelMarginLeft = style->pixelMetric(QStyle::PM_LayoutLeftMargin, nullptr, parentWidget());

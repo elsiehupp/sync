@@ -12,7 +12,6 @@
  * for more details.
  */
 
-
 // #include <QDialog>
 
 namespace OCC {
@@ -32,7 +31,7 @@ public:
     explicit ProxyAuthDialog(QWidget *parent = nullptr);
     ~ProxyAuthDialog() override;
 
-    void setProxyAddress(const QString &address);
+    void setProxyAddress(QString &address);
 
     QString username() const;
     QString password() const;
@@ -43,7 +42,6 @@ public:
 private:
     Ui::ProxyAuthDialog *ui;
 };
-
 
 } // namespace OCC
 #endif // OCC_PROXYAUTHDIALOG_H

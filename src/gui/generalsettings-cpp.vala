@@ -12,33 +12,11 @@
  * for more details.
  */
 
-#include "generalsettings.h"
-#include "ui_generalsettings.h"
-
-#include "theme.h"
-#include "configfile.h"
-#include "application.h"
-#include "configfile.h"
-#include "owncloudsetupwizard.h"
-#include "accountmanager.h"
-#include "guiutility.h"
-
 #if defined(BUILD_UPDATER)
-#include "updater/updater.h"
-#include "updater/ocupdater.h"
 #ifdef Q_OS_MAC
 // FIXME We should unify those, but Sparkle does everything behind the scene transparently
-#include "updater/sparkleupdater.h"
 #endif
 #endif
-
-#include "ignorelisteditor.h"
-#include "common/utility.h"
-#include "logger.h"
-
-#include "config.h"
-
-#include "legalnotice.h"
 
 // #include <QFileDialog>
 // #include <QMessageBox>
@@ -61,14 +39,14 @@ struct ZipEntry {
     QString zipFilename;
 };
 
-ZipEntry fileInfoToZipEntry(const QFileInfo &info) {
+ZipEntry fileInfoToZipEntry(QFileInfo &info) {
     return {
         info.absoluteFilePath(),
         info.fileName()
     };
 }
 
-ZipEntry fileInfoToLogZipEntry(const QFileInfo &info) {
+ZipEntry fileInfoToLogZipEntry(QFileInfo &info) {
     auto entry = fileInfoToZipEntry(info);
     entry.zipFilename.prepend(QStringLiteral("logs/"));
     return entry;
@@ -108,11 +86,11 @@ QVector<ZipEntry> createFileList() {
     return list;
 }
 
-void createDebugArchive(const QString &filename) {
+void createDebugArchive(QString &filename) {
     const auto entries = createFileList();
 
     QZipWriter zip(filename);
-    for (const auto &entry : entries) {
+    for (auto &entry : entries) {
         if (entry.localFilename.isEmpty()) {
             zip.addDirectory(entry.zipFilename);
         } else {
@@ -270,7 +248,7 @@ void GeneralSettings::slotUpdateInfo() {
         Theme::replaceLinkColorStringBackgroundAware(status);
 
         _ui->updateStateLabel->setOpenExternalLinks(false);
-        connect(_ui->updateStateLabel, &QLabel::linkActivated, this, [](const QString &link) {
+        connect(_ui->updateStateLabel, &QLabel::linkActivated, this, [](QString &link) {
             Utility::openBrowser(QUrl(link));
         });
         _ui->updateStateLabel->setText(status);
@@ -296,7 +274,7 @@ void GeneralSettings::slotUpdateInfo() {
         this, &GeneralSettings::slotUpdateChannelChanged, Qt::UniqueConnection);
 }
 
-void GeneralSettings::slotUpdateChannelChanged(const QString &channel) {
+void GeneralSettings::slotUpdateChannelChanged(QString &channel) {
     if (channel == ConfigFile().updateChannel())
         return;
 

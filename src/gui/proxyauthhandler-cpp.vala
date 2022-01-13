@@ -12,13 +12,6 @@
  * for more details.
  */
 
-#include "proxyauthhandler.h"
-
-#include "proxyauthdialog.h"
-#include "theme.h"
-#include "configfile.h"
-#include "account.h"
-
 // #include <QApplication>
 
 // #include <qt5keychain/keychain.h>
@@ -86,7 +79,6 @@ void ProxyAuthHandler::handleProxyAuthenticationRequired(
     if (!sending_qnam) {
         qCWarning(lcProxy) << "Could not get the sending QNAM for" << sender();
     }
-
 
     qCInfo(lcProxy) << "Proxy auth required for" << key << proxy.type();
 
@@ -158,7 +150,7 @@ bool ProxyAuthHandler::getCredsFromDialog() {
 }
 
 template<class T, typename PointerToMemberFunction>
-void ProxyAuthHandler::execAwait(const T *sender,
+void ProxyAuthHandler::execAwait(T *sender,
                                  PointerToMemberFunction signal,
                                  int &counter,
                                  const QEventLoop::ProcessEventsFlags flags) {

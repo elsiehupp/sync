@@ -14,11 +14,6 @@
  * for more details.
  */
 
-#include "folderstatusdelegate.h"
-#include "folderstatusmodel.h"
-#include "folderstatusview.h"
-#include "folderman.h"
-#include "accountstate.h"
 // #include <theme.h>
 // #include <account.h>
 
@@ -27,7 +22,7 @@
 // #include <QApplication>
 // #include <QMouseEvent>
 
-inline static QFont makeAliasFont(const QFont &normalFont) {
+inline static QFont makeAliasFont(QFont &normalFont) {
     QFont aliasFont = normalFont;
     aliasFont.setBold(true);
     aliasFont.setPointSize(normalFont.pointSize() + 2);
@@ -46,7 +41,7 @@ QString FolderStatusDelegate::addFolderText() {
 }
 
 // allocate each item size in listview.
-QSize FolderStatusDelegate::sizeHint(const QStyleOptionViewItem &option,
+QSize FolderStatusDelegate::sizeHint(QStyleOptionViewItem &option,
     const QModelIndex &index) const {
     QFont aliasFont = makeAliasFont(option.font);
     QFont font = option.font;
@@ -87,7 +82,7 @@ QSize FolderStatusDelegate::sizeHint(const QStyleOptionViewItem &option,
     return {0, h};
 }
 
-int FolderStatusDelegate::rootFolderHeightWithoutErrors(const QFontMetrics &fm, const QFontMetrics &aliasFm) {
+int FolderStatusDelegate::rootFolderHeightWithoutErrors(QFontMetrics &fm, QFontMetrics &aliasFm) {
     const int aliasMargin = aliasFm.height() / 2;
     const int margin = fm.height() / 4;
 
@@ -101,7 +96,7 @@ int FolderStatusDelegate::rootFolderHeightWithoutErrors(const QFontMetrics &fm, 
     return h;
 }
 
-void FolderStatusDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
+void FolderStatusDelegate::paint(QPainter *painter, QStyleOptionViewItem &option,
     const QModelIndex &index) const {
     if (index.data(AddButton).toBool()) {
         const_cast<QStyleOptionViewItem &>(option).showDecorationSelected = false;
@@ -225,7 +220,6 @@ void FolderStatusDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
         palette.setColor(QPalette::All, QPalette::Highlight, palette.base().color().darker(108));
     }
 
-
     QPalette::ColorGroup cg = option.state & QStyle::State_Enabled
         ? QPalette::Normal
         : QPalette::Disabled;
@@ -258,7 +252,7 @@ void FolderStatusDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     int h = iconRect.bottom() + margin;
 
     // paint an error overlay if there is an error string or conflict string
-    auto drawTextBox = [&](const QStringList &texts, QColor color) {
+    auto drawTextBox = [&](QStringList &texts, QColor color) {
         QRect rect = localPathRect;
         rect.setLeft(iconRect.left());
         rect.setTop(h);
@@ -321,7 +315,6 @@ void FolderStatusDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
         pBarOpt.rect = QStyle::visualRect(option.direction, option.rect, pBRect);
         QApplication::style()->drawControl(QStyle::CE_ProgressBar, &pBarOpt, painter, option.widget);
 
-
         // Overall Progress Text
         QRect overallProgressRect;
         overallProgressRect.setTop(pBRect.bottom() + margin);
@@ -354,11 +347,11 @@ void FolderStatusDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
 }
 
 bool FolderStatusDelegate::editorEvent(QEvent *event, QAbstractItemModel *model,
-    const QStyleOptionViewItem &option, const QModelIndex &index) {
+    const QStyleOptionViewItem &option, QModelIndex &index) {
     switch (event->type()) {
     case QEvent::MouseButtonPress:
     case QEvent::MouseMove:
-        if (const auto *view = qobject_cast<const QAbstractItemView *>(option.widget)) {
+        if (auto *view = qobject_cast<const QAbstractItemView *>(option.widget)) {
             auto *me = static_cast<QMouseEvent *>(event);
             QModelIndex index;
             if (me->buttons()) {

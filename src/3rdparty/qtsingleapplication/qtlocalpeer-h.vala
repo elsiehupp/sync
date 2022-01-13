@@ -38,14 +38,14 @@ namespace SharedTools {
 class QtLocalPeer : public QObject {
 
 public:
-    explicit QtLocalPeer(QObject *parent = nullptr, const QString &appId = QString());
+    explicit QtLocalPeer(QObject *parent = nullptr, QString &appId = QString());
     bool isClient();
-    bool sendMessage(const QString &message, int timeout, bool block);
+    bool sendMessage(QString &message, int timeout, bool block);
     QString applicationId() const { return id; }
-    static QString appSessionId(const QString &appId);
+    static QString appSessionId(QString &appId);
 
 Q_SIGNALS:
-    void messageReceived(const QString &message, QObject *socket);
+    void messageReceived(QString &message, QObject *socket);
 
 protected Q_SLOTS:
     void receiveConnection();

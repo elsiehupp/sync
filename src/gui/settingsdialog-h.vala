@@ -12,12 +12,8 @@
  * for more details.
  */
 
-
 // #include <QDialog>
 // #include <QStyledItemDelegate>
-
-#include "progressdispatcher.h"
-#include "owncloudgui.h"
 
 class QAction;
 class QActionGroup;
@@ -72,8 +68,8 @@ private slots:
 private:
     void customizeStyle();
 
-    QAction *createColorAwareAction(const QString &iconName, const QString &fileName);
-    QAction *createActionWithIcon(const QIcon &icon, const QString &text, const QString &iconPath = QString());
+    QAction *createColorAwareAction(QString &iconName, QString &fileName);
+    QAction *createActionWithIcon(QIcon &icon, QString &text, QString &iconPath = QString());
 
     Ui::SettingsDialog *const _ui;
 

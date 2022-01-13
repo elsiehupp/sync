@@ -12,7 +12,6 @@
  * for more details.
  */
 
-
 // #include <QVector>
 // #include <QString>
 // #include <QDateTime>
@@ -90,15 +89,14 @@ public:
     };
     Q_ENUM(Status)
 
-    SyncJournalFileRecord toSyncJournalFileRecordWithInode(const QString &localFileName) const;
+    SyncJournalFileRecord toSyncJournalFileRecordWithInode(QString &localFileName) const;
 
     /** Creates a basic SyncFileItem from a DB record
      *
      * This is intended in particular for read-update-write cycles that need
      * to go through a a SyncFileItem, like PollJob.
      */
-    static SyncFileItemPtr fromSyncJournalFileRecord(const SyncJournalFileRecord &rec);
-
+    static SyncFileItemPtr fromSyncJournalFileRecord(SyncJournalFileRecord &rec);
 
     SyncFileItem()
         : _type(ItemTypeSkip)
@@ -112,11 +110,11 @@ public:
         , _isEncrypted(false) {
     }
 
-    friend bool operator==(const SyncFileItem &item1, const SyncFileItem &item2) {
+    friend bool operator==(SyncFileItem &item1, SyncFileItem &item2) {
         return item1._originalFile == item2._originalFile;
     }
 
-    friend bool operator<(const SyncFileItem &item1, const SyncFileItem &item2) {
+    friend bool operator<(SyncFileItem &item1, SyncFileItem &item2) {
         // Sort by destination
         auto d1 = item1.destination();
         auto d2 = item2.destination();
@@ -268,7 +266,7 @@ public:
     QString _directDownloadCookies;
 };
 
-inline bool operator<(const SyncFileItemPtr &item1, const SyncFileItemPtr &item2) {
+inline bool operator<(SyncFileItemPtr &item1, SyncFileItemPtr &item2) {
     return *item1 < *item2;
 }
 

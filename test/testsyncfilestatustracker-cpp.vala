@@ -6,8 +6,6 @@
  */
 
 // #include <QtTest>
-#include "syncenginetestutils.h"
-#include "csync_exclude.h"
 
 using namespace OCC;
 
@@ -15,10 +13,10 @@ class StatusPushSpy : public QSignalSpy {
     SyncEngine &_syncEngine;
 public:
     StatusPushSpy(SyncEngine &syncEngine)
-        : QSignalSpy(&syncEngine.syncFileStatusTracker(), SIGNAL(fileStatusChanged(const QString&, SyncFileStatus)))
+        : QSignalSpy(&syncEngine.syncFileStatusTracker(), SIGNAL(fileStatusChanged(QString&, SyncFileStatus)))
         , _syncEngine(syncEngine) { }
 
-    SyncFileStatus statusOf(const QString &relativePath) const {
+    SyncFileStatus statusOf(QString &relativePath) const {
         QFileInfo file(_syncEngine.localPath(), relativePath);
         // Start from the end to get the latest status
         for (int i = size() - 1; i >= 0; --i) {
@@ -28,7 +26,7 @@ public:
         return {};
     }
 
-    bool statusEmittedBefore(const QString &firstPath, const QString &secondPath) const {
+    bool statusEmittedBefore(QString &firstPath, QString &secondPath) const {
         QFileInfo firstFile(_syncEngine.localPath(), firstPath);
         QFileInfo secondFile(_syncEngine.localPath(), secondPath);
         // Start from the end to get the latest status
@@ -49,7 +47,7 @@ public:
 
 class TestSyncFileStatusTracker : public QObject {
 
-    void verifyThatPushMatchesPull(const FakeFolder &fakeFolder, const StatusPushSpy &statusSpy) {
+    void verifyThatPushMatchesPull(FakeFolder &fakeFolder, StatusPushSpy &statusSpy) {
         QString root = fakeFolder.localPath();
         QDirIterator it(root, QDir::AllEntries | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
         while (it.hasNext()) {

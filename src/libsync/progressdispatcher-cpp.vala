@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#include "progressdispatcher.h"
-
 // #include <QObject>
 // #include <QMetaType>
 // #include <QCoreApplication>
@@ -22,7 +20,7 @@ namespace OCC {
 
 ProgressDispatcher *ProgressDispatcher::_instance = nullptr;
 
-QString Progress::asResultString(const SyncFileItem &item) {
+QString Progress::asResultString(SyncFileItem &item) {
     switch (item._instruction) {
     case CSYNC_INSTRUCTION_SYNC:
     case CSYNC_INSTRUCTION_NEW:
@@ -60,7 +58,7 @@ QString Progress::asResultString(const SyncFileItem &item) {
     return QCoreApplication::translate("progress", "Unknown");
 }
 
-QString Progress::asActionString(const SyncFileItem &item) {
+QString Progress::asActionString(SyncFileItem &item) {
     switch (item._instruction) {
     case CSYNC_INSTRUCTION_CONFLICT:
     case CSYNC_INSTRUCTION_SYNC:
@@ -114,7 +112,7 @@ ProgressDispatcher::ProgressDispatcher(QObject *parent)
 
 ProgressDispatcher::~ProgressDispatcher() = default;
 
-void ProgressDispatcher::setProgressInfo(const QString &folder, const ProgressInfo &progress) {
+void ProgressDispatcher::setProgressInfo(QString &folder, ProgressInfo &progress) {
     if (folder.isEmpty())
     // The update phase now also has progress
     //            (progress._currentItems.size() == 0
@@ -160,7 +158,7 @@ bool ProgressInfo::isUpdatingEstimates() const {
     return _updateEstimatesTimer.isActive();
 }
 
-static bool shouldCountProgress(const SyncFileItem &item) {
+static bool shouldCountProgress(SyncFileItem &item) {
     const auto instruction = item._instruction;
 
     // Skip any ignored, error or non-propagated files and directories.
@@ -174,7 +172,7 @@ static bool shouldCountProgress(const SyncFileItem &item) {
     return true;
 }
 
-void ProgressInfo::adjustTotalsForFile(const SyncFileItem &item) {
+void ProgressInfo::adjustTotalsForFile(SyncFileItem &item) {
     if (!shouldCountProgress(item)) {
         return;
     }
@@ -205,7 +203,7 @@ qint64 ProgressInfo::completedSize() const {
     return _sizeProgress._completed;
 }
 
-void ProgressInfo::setProgressComplete(const SyncFileItem &item) {
+void ProgressInfo::setProgressComplete(SyncFileItem &item) {
     if (!shouldCountProgress(item)) {
         return;
     }
@@ -219,7 +217,7 @@ void ProgressInfo::setProgressComplete(const SyncFileItem &item) {
     _lastCompletedItem = item;
 }
 
-void ProgressInfo::setProgressItem(const SyncFileItem &item, qint64 completed) {
+void ProgressInfo::setProgressItem(SyncFileItem &item, qint64 completed) {
     if (!shouldCountProgress(item)) {
         return;
     }
@@ -305,7 +303,7 @@ bool ProgressInfo::trustEta() const {
     return totalProgress().estimatedEta < 100 * optimisticEta();
 }
 
-ProgressInfo::Estimates ProgressInfo::fileProgress(const SyncFileItem &item) const {
+ProgressInfo::Estimates ProgressInfo::fileProgress(SyncFileItem &item) const {
     return _currentItems[item._file]._progress.estimates();
 }
 
@@ -328,7 +326,7 @@ void ProgressInfo::updateEstimates() {
 
 void ProgressInfo::recomputeCompletedSize() {
     qint64 r = _totalSizeOfCompletedJobs;
-    foreach (const ProgressItem &i, _currentItems) {
+    foreach (ProgressItem &i, _currentItems) {
         if (isSizeDependent(i._item))
             r += i._progress._completed;
     }

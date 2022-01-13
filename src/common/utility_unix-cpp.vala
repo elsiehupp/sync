@@ -22,7 +22,7 @@
 
 namespace OCC {
 
-static void setupFavLink_private(const QString &folder) {
+static void setupFavLink_private(QString &folder) {
     // Nautilus: add to ~/.gtk-bookmarks
     QFile gtkBookmarks(QDir::homePath() + QLatin1String("/.config/gtk-3.0/bookmarks"));
     QByteArray folderUrl = "file://" + folder.toUtf8();
@@ -36,7 +36,7 @@ static void setupFavLink_private(const QString &folder) {
     }
 }
 
-static void removeFavLink_private(const QString &folder) {
+static void removeFavLink_private(QString &folder) {
     Q_UNUSED(folder)
 }
 
@@ -48,7 +48,7 @@ QString getUserAutostartDir_private() {
     return config;
 }
 
-bool hasLaunchOnStartup_private(const QString &appName) {
+bool hasLaunchOnStartup_private(QString &appName) {
     Q_UNUSED(appName)
     QString desktopFileLocation = getUserAutostartDir_private()
                                     + QLatin1String(LINUX_APPLICATION_ID)
@@ -56,7 +56,7 @@ bool hasLaunchOnStartup_private(const QString &appName) {
     return QFile::exists(desktopFileLocation);
 }
 
-void setLaunchOnStartup_private(const QString &appName, const QString &guiName, bool enable) {
+void setLaunchOnStartup_private(QString &appName, QString &guiName, bool enable) {
     Q_UNUSED(appName)
     QString userAutoStartPath = getUserAutostartDir_private();
     QString desktopFileLocation = userAutoStartPath

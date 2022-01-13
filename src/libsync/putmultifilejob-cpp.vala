@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#include "putmultifilejob.h"
-
 // #include <QHttpPart>
 
 namespace OCC {
@@ -52,7 +50,7 @@ void PutMultiFileJob::start() {
 }
 
 bool PutMultiFileJob::finished() {
-    for(const auto &oneDevice : _devices) {
+    for(auto &oneDevice : _devices) {
         oneDevice._device->close();
     }
 

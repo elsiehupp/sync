@@ -6,8 +6,6 @@
 
 // #include <QtTest>
 
-#include "libsync/cookiejar.h"
-
 using namespace OCC;
 
 class TestCookies : public QObject {

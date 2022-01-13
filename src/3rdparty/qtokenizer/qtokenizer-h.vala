@@ -39,7 +39,6 @@
 **
 ****************************************************************************/
 
-
 // #include <QString>
 // #include <QByteArray>
 // #include <QSharedPointer>
@@ -56,7 +55,7 @@ struct QTokenizerPrivate {
         char_type quoteChar = '\0';
     };
 
-    QTokenizerPrivate(const T& _string, const T& _delims) :
+    QTokenizerPrivate(T& _string, T& _delims) :
         string(_string)
       , begin(string.begin())
       , end(string.end())
@@ -137,7 +136,7 @@ public:
 
        \sa QStringTokenizer, QByteArrayTokenizer, StringTokenizer, WStringTokenizer
      */
-    QTokenizer(const T& string, const T& delimiters)
+    QTokenizer(T& string, T& delimiters)
         : d(new QTokenizerPrivate<T, const_iterator>(string, delimiters)) { }
 
     /*!
@@ -145,7 +144,6 @@ public:
        \see setQuoteCharacters
      */
     void setReturnDelimiters(bool enable) { d->returnDelimiters = enable; }
-
 
     /*!
        Sets characters that are considered to start and end quotes.
@@ -158,15 +156,13 @@ public:
 
        \param quotes Characters that delimit quotes.
      */
-    void setQuoteCharacters(const T& quotes) { d->quotes = quotes; }
-
+    void setQuoteCharacters(T& quotes) { d->quotes = quotes; }
 
     /*!
        Whether or not to return delimiters as tokens
        \see setQuoteCharacters
      */
     void setReturnQuoteCharacters(bool enable) { d->returnQuotes = enable; }
-
 
     /*!
        Retrieve next token.
@@ -231,7 +227,7 @@ private:
 
 class QStringTokenizer : public QTokenizer<QString> {
 public:
-    QStringTokenizer(const QString &string, const QString &delim) :
+    QStringTokenizer(QString &string, QString &delim) :
         QTokenizer<QString, QString::const_iterator>(string, delim) {}
     /**
      * @brief Like \see next(), but returns a lightweight string reference

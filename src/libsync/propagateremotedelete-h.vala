@@ -13,9 +13,6 @@
  */
 // #pragma once
 
-#include "owncloudpropagator.h"
-#include "networkjobs.h"
-
 namespace OCC {
 
 class DeleteJob;
@@ -31,11 +28,11 @@ class PropagateRemoteDelete : public PropagateItemJob {
     AbstractPropagateRemoteDeleteEncrypted *_deleteEncryptedHelper = nullptr;
 
 public:
-    PropagateRemoteDelete(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
+    PropagateRemoteDelete(OwncloudPropagator *propagator, SyncFileItemPtr &item)
         : PropagateItemJob(propagator, item) {
     }
     void start() override;
-    void createDeleteJob(const QString &filename);
+    void createDeleteJob(QString &filename);
     void abort(PropagatorJob::AbortType abortType) override;
 
     bool isLikelyFinishedQuickly() override { return !_item->isDirectory(); }

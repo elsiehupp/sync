@@ -12,14 +12,10 @@
  * for more details.
  */
 
-
-#include "owncloudlib.h"
 // #include <QObject>
 // #include <QStringList>
 // #include <QVariantMap>
 // #include <QNetworkReply>
-#include "accountfwd.h"
-#include "clientsideencryption.h"
 
 namespace OCC {
 
@@ -98,25 +94,25 @@ public:
 public slots:
     /// Checks the server and the authentication.
     void checkServerAndAuth();
-    void systemProxyLookupDone(const QNetworkProxy &proxy);
+    void systemProxyLookupDone(QNetworkProxy &proxy);
 
     /// Checks authentication only.
     void checkAuthentication();
 
 signals:
-    void connectionResult(ConnectionValidator::Status status, const QStringList &errors);
+    void connectionResult(ConnectionValidator::Status status, QStringList &errors);
 
 protected slots:
     void slotCheckServerAndAuth();
 
-    void slotStatusFound(const QUrl &url, const QJsonObject &info);
+    void slotStatusFound(QUrl &url, QJsonObject &info);
     void slotNoStatusFound(QNetworkReply *reply);
-    void slotJobTimeout(const QUrl &url);
+    void slotJobTimeout(QUrl &url);
 
     void slotAuthFailed(QNetworkReply *reply);
     void slotAuthSuccess();
 
-    void slotCapabilitiesRecieved(const QJsonDocument &);
+    void slotCapabilitiesRecieved(QJsonDocument &);
     void slotUserFetched(UserInfo *userInfo);
 
 private:
@@ -131,7 +127,7 @@ private:
      *
      * Returns false and reports ServerVersionMismatch for very old servers.
      */
-    bool setAndCheckServerVersion(const QString &version);
+    bool setAndCheckServerVersion(QString &version);
 
     QStringList _errors;
     AccountStatePtr _accountState;

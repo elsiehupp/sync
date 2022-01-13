@@ -13,11 +13,7 @@
  * for more details.
  */
 
-
-// #include "ownsql.h"
-#include "syncfileitem.h"
-#include "common/syncfilestatus.h"
-// #include <map>
+// // #include <map>
 // #include <QSet>
 
 namespace OCC {
@@ -32,40 +28,40 @@ class SyncEngine;
 class OWNCLOUDSYNC_EXPORT SyncFileStatusTracker : public QObject {
 public:
     explicit SyncFileStatusTracker(SyncEngine *syncEngine);
-    SyncFileStatus fileStatus(const QString &relativePath);
+    SyncFileStatus fileStatus(QString &relativePath);
 
 public slots:
-    void slotPathTouched(const QString &fileName);
+    void slotPathTouched(QString &fileName);
     // path relative to folder
-    void slotAddSilentlyExcluded(const QString &folderPath);
+    void slotAddSilentlyExcluded(QString &folderPath);
 
 signals:
-    void fileStatusChanged(const QString &systemFileName, SyncFileStatus fileStatus);
+    void fileStatusChanged(QString &systemFileName, SyncFileStatus fileStatus);
 
 private slots:
     void slotAboutToPropagate(SyncFileItemVector &items);
-    void slotItemCompleted(const SyncFileItemPtr &item);
+    void slotItemCompleted(SyncFileItemPtr &item);
     void slotSyncFinished();
     void slotSyncEngineRunningChanged();
 
 private:
     struct PathComparator {
-        bool operator()( const QString& lhs, const QString& rhs ) const;
+        bool operator()( const QString& lhs, QString& rhs ) const;
     };
     using ProblemsMap = std::map<QString, SyncFileStatus::SyncFileStatusTag, PathComparator>;
-    SyncFileStatus::SyncFileStatusTag lookupProblem(const QString &pathToMatch, const ProblemsMap &problemMap);
+    SyncFileStatus::SyncFileStatusTag lookupProblem(QString &pathToMatch, ProblemsMap &problemMap);
 
     enum SharedFlag { UnknownShared,
         NotShared,
         Shared };
     enum PathKnownFlag { PathUnknown = 0,
         PathKnown };
-    SyncFileStatus resolveSyncAndErrorStatus(const QString &relativePath, SharedFlag sharedState, PathKnownFlag isPathKnown = PathKnown);
+    SyncFileStatus resolveSyncAndErrorStatus(QString &relativePath, SharedFlag sharedState, PathKnownFlag isPathKnown = PathKnown);
 
-    void invalidateParentPaths(const QString &path);
-    QString getSystemDestination(const QString &relativePath);
-    void incSyncCountAndEmitStatusChanged(const QString &relativePath, SharedFlag sharedState);
-    void decSyncCountAndEmitStatusChanged(const QString &relativePath, SharedFlag sharedState);
+    void invalidateParentPaths(QString &path);
+    QString getSystemDestination(QString &relativePath);
+    void incSyncCountAndEmitStatusChanged(QString &relativePath, SharedFlag sharedState);
+    void decSyncCountAndEmitStatusChanged(QString &relativePath, SharedFlag sharedState);
 
     SyncEngine *_syncEngine;
 

@@ -13,9 +13,6 @@
  * for more details.
  */
 
-
-#include "owncloudlib.h"
-
 namespace OCC {
 
 } // namespace OCC

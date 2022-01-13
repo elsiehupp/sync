@@ -12,7 +12,6 @@
  * for more details.
  */
 
-
 // #include <QWidget>
 // #include <QBasicTimer>
 // #include <QPointer>
@@ -31,7 +30,7 @@ class SlideShow : public QWidget {
 public:
     explicit SlideShow(QWidget* parent = nullptr);
 
-    void addSlide(const QPixmap &pixmap, const QString &label);
+    void addSlide(QPixmap &pixmap, QString &label);
 
     bool isActive() const;
 

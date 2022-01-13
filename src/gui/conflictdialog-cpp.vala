@@ -12,11 +12,6 @@
  * for more details.
  */
 
-#include "conflictdialog.h"
-#include "ui_conflictdialog.h"
-
-#include "conflictsolver.h"
-
 // #include <QDateTime>
 // #include <QDebug>
 // #include <QDesktopServices>
@@ -78,7 +73,7 @@ QString ConflictDialog::remoteVersionFilename() const {
     return _solver->remoteVersionFilename();
 }
 
-void ConflictDialog::setBaseFilename(const QString &baseFilename) {
+void ConflictDialog::setBaseFilename(QString &baseFilename) {
     if (_baseFilename == baseFilename) {
         return;
     }
@@ -87,11 +82,11 @@ void ConflictDialog::setBaseFilename(const QString &baseFilename) {
     _ui->conflictMessage->setText(tr("Conflicting versions of %1.").arg(_baseFilename));
 }
 
-void ConflictDialog::setLocalVersionFilename(const QString &localVersionFilename) {
+void ConflictDialog::setLocalVersionFilename(QString &localVersionFilename) {
     _solver->setLocalVersionFilename(localVersionFilename);
 }
 
-void ConflictDialog::setRemoteVersionFilename(const QString &remoteVersionFilename) {
+void ConflictDialog::setRemoteVersionFilename(QString &remoteVersionFilename) {
     _solver->setRemoteVersionFilename(remoteVersionFilename);
 }
 
@@ -115,7 +110,7 @@ void ConflictDialog::accept() {
 void ConflictDialog::updateWidgets() {
     QMimeDatabase mimeDb;
 
-    const auto updateGroup = [this, &mimeDb](const QString &filename, QLabel *linkLabel, const QString &linkText, QLabel *mtimeLabel, QLabel *sizeLabel, QToolButton *button) {
+    const auto updateGroup = [this, &mimeDb](QString &filename, QLabel *linkLabel, QString &linkText, QLabel *mtimeLabel, QLabel *sizeLabel, QToolButton *button) {
         const auto fileUrl = QUrl::fromLocalFile(filename).toString();
         linkLabel->setText(QStringLiteral("<a href='%1'>%2</a>").arg(fileUrl).arg(linkText));
 

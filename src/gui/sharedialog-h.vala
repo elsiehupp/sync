@@ -12,11 +12,6 @@
  * for more details.
  */
 
-
-#include "accountstate.h"
-#include "sharepermissions.h"
-#include "owncloudgui.h"
-
 // #include <QSharedPointer>
 // #include <QPointer>
 // #include <QString>
@@ -51,16 +46,16 @@ public:
 
 private slots:
     void done(int r) override;
-    void slotPropfindReceived(const QVariantMap &result);
+    void slotPropfindReceived(QVariantMap &result);
     void slotPropfindError();
-    void slotThumbnailFetched(const int &statusCode, const QByteArray &reply);
+    void slotThumbnailFetched(int &statusCode, QByteArray &reply);
     void slotAccountStateChanged(int state);
 
-    void slotSharesFetched(const QList<QSharedPointer<Share>> &shares);
-    void slotAddLinkShareWidget(const QSharedPointer<LinkShare> &linkShare);
+    void slotSharesFetched(QList<QSharedPointer<Share>> &shares);
+    void slotAddLinkShareWidget(QSharedPointer<LinkShare> &linkShare);
     void slotDeleteShare();
     void slotCreateLinkShare();
-    void slotCreatePasswordForLinkShare(const QString &password);
+    void slotCreatePasswordForLinkShare(QString &password);
     void slotCreatePasswordForLinkShareProcessed();
     void slotLinkShareRequiresPassword();
     void slotAdjustScrollWidgetSize();
@@ -74,7 +69,7 @@ protected:
 
 private:
     void showSharingUi();
-    ShareLinkWidget *addLinkShareWidget(const QSharedPointer<LinkShare> &linkShare);
+    ShareLinkWidget *addLinkShareWidget(QSharedPointer<LinkShare> &linkShare);
     void initLinkShareWidget();
 
     Ui::ShareDialog *_ui;

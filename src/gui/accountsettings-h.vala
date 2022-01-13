@@ -12,18 +12,11 @@
  * for more details.
  */
 
-
 // #include <QWidget>
 // #include <QUrl>
 // #include <QPointer>
 // #include <QHash>
 // #include <QTimer>
-
-#include "folder.h"
-#include "userinfo.h"
-#include "progressdispatcher.h"
-#include "owncloudgui.h"
-#include "folderstatusmodel.h"
 
 class QModelIndex;
 class QNetworkReply;
@@ -53,11 +46,11 @@ public:
     explicit AccountSettings(AccountState *accountState, QWidget *parent = nullptr);
     ~AccountSettings() override;
     QSize sizeHint() const override { return ownCloudGui::settingsDialogSize(); }
-    bool canEncryptOrDecrypt(const FolderStatusModel::SubFolderInfo* folderInfo);
+    bool canEncryptOrDecrypt(FolderStatusModel::SubFolderInfo* folderInfo);
 
 signals:
     void folderChanged();
-    void openFolderAlias(const QString &);
+    void openFolderAlias(QString &);
     void showIssuesList(AccountState *account);
     void requestMnemonic();
     void removeAccountFolders(AccountState *account);
@@ -86,33 +79,33 @@ protected slots:
     void slotEnableVfsCurrentFolder();
     void slotDisableVfsCurrentFolder();
     void slotSetCurrentFolderAvailability(PinState state);
-    void slotSetSubFolderAvailability(Folder *folder, const QString &path, PinState state);
+    void slotSetSubFolderAvailability(Folder *folder, QString &path, PinState state);
     void slotFolderWizardAccepted();
     void slotFolderWizardRejected();
     void slotDeleteAccount();
     void slotToggleSignInState();
     void refreshSelectiveSyncStatus();
     void slotMarkSubfolderEncrypted(FolderStatusModel::SubFolderInfo *folderInfo);
-    void slotSubfolderContextMenuRequested(const QModelIndex& idx, const QPoint& point);
-    void slotCustomContextMenuRequested(const QPoint &);
-    void slotFolderListClicked(const QModelIndex &indx);
+    void slotSubfolderContextMenuRequested(QModelIndex& idx, QPoint& point);
+    void slotCustomContextMenuRequested(QPoint &);
+    void slotFolderListClicked(QModelIndex &indx);
     void doExpand();
-    void slotLinkActivated(const QString &link);
+    void slotLinkActivated(QString &link);
 
     // Encryption Related Stuff.
-    void slotShowMnemonic(const QString &mnemonic);
+    void slotShowMnemonic(QString &mnemonic);
     void slotNewMnemonicGenerated();
     void slotEncryptFolderFinished(int status);
 
-    void slotSelectiveSyncChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight,
+    void slotSelectiveSyncChanged(QModelIndex &topLeft, QModelIndex &bottomRight,
                                   const QVector<int> &roles);
 
 private:
-    void showConnectionLabel(const QString &message,
+    void showConnectionLabel(QString &message,
         QStringList errors = QStringList());
     bool event(QEvent *) override;
     void createAccountToolbox();
-    void openIgnoredFilesDialog(const QString & absFolderPath);
+    void openIgnoredFilesDialog(QString & absFolderPath);
     void customizeStyle();
 
     /// Returns the alias of the selected folder, empty string if none

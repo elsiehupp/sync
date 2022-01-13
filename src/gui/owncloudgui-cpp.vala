@@ -12,25 +12,7 @@
  * for more details.
  */
 
-#include "application.h"
-#include "owncloudgui.h"
-#include "theme.h"
-#include "folderman.h"
-#include "progressdispatcher.h"
-#include "owncloudsetupwizard.h"
-#include "sharedialog.h"
-#include "settingsdialog.h"
-#include "logger.h"
-#include "logbrowser.h"
-#include "account.h"
-#include "accountstate.h"
-#include "openfilemanager.h"
-#include "accountmanager.h"
-#include "common/syncjournalfilerecord.h"
-#include "creds/abstractcredentials.h"
-#include "guiutility.h"
 #ifdef WITH_LIBCLOUDPROVIDERS
-#include "cloudproviders/cloudprovidermanager.h"
 #endif
 
 // #include <QQmlApplicationEngine>
@@ -42,7 +24,6 @@
 // #include <QtDBus/QDBusConnection>
 // #include <QtDBus/QDBusInterface>
 #endif
-
 
 // #include <QQmlEngine>
 // #include <QQmlComponent>
@@ -89,7 +70,7 @@ ownCloudGui::ownCloudGui(Application *parent)
         this, &ownCloudGui::slotShutdown);
 
     connect(_tray.data(), &Systray::openShareDialog,
-        this, [=](const QString &sharePath, const QString &localPath) {
+        this, [=](QString &sharePath, QString &localPath) {
                 slotShowShareDialog(sharePath, localPath, ShareDialogStartPage::UsersAndGroups);
             });
 
@@ -160,7 +141,7 @@ void ownCloudGui::slotTrayClicked(QSystemTrayIcon::ActivationReason reason) {
             // brought wizard to front
         } else if (_shareDialogs.size() > 0) {
             // Share dialog(s) be hidden by other apps, bring them back
-            Q_FOREACH (const QPointer<ShareDialog> &shareDialog, _shareDialogs) {
+            Q_FOREACH (QPointer<ShareDialog> &shareDialog, _shareDialogs) {
                 Q_ASSERT(shareDialog.data());
                 raiseDialog(shareDialog);
             }
@@ -202,7 +183,7 @@ void ownCloudGui::slotFoldersChanged() {
     slotComputeOverallSyncStatus();
 }
 
-void ownCloudGui::slotOpenPath(const QString &path) {
+void ownCloudGui::slotOpenPath(QString &path) {
     showInFileManager(path);
 }
 
@@ -226,7 +207,7 @@ void ownCloudGui::slotComputeOverallSyncStatus() {
     bool allPaused = true;
     bool allDisconnected = true;
     QVector<AccountStatePtr> problemAccounts;
-    auto setStatusText = [&](const QString &text) {
+    auto setStatusText = [&](QString &text) {
         // FIXME: So this doesn't do anything? Needs to be revisited
         Q_UNUSED(text)
         // Don't overwrite the status if we're currently syncing
@@ -357,21 +338,21 @@ void ownCloudGui::hideAndShowTray() {
     _tray->show();
 }
 
-void ownCloudGui::slotShowTrayMessage(const QString &title, const QString &msg) {
+void ownCloudGui::slotShowTrayMessage(QString &title, QString &msg) {
     if (_tray)
         _tray->showMessage(title, msg);
     else
         qCWarning(lcApplication) << "Tray not ready: " << msg;
 }
 
-void ownCloudGui::slotShowOptionalTrayMessage(const QString &title, const QString &msg) {
+void ownCloudGui::slotShowOptionalTrayMessage(QString &title, QString &msg) {
     slotShowTrayMessage(title, msg);
 }
 
 /*
  * open the folder with the given Alias
  */
-void ownCloudGui::slotFolderOpenAction(const QString &alias) {
+void ownCloudGui::slotFolderOpenAction(QString &alias) {
     Folder *f = FolderMan::instance()->folder(alias);
     if (f) {
         qCInfo(lcApplication) << "opening local url " << f->path();
@@ -390,7 +371,7 @@ void ownCloudGui::slotFolderOpenAction(const QString &alias) {
     }
 }
 
-void ownCloudGui::slotUpdateProgress(const QString &folder, const ProgressInfo &progress) {
+void ownCloudGui::slotUpdateProgress(QString &folder, ProgressInfo &progress) {
     Q_UNUSED(folder);
 
     // FIXME: Lots of messages computed for nothing in this method, needs revisiting
@@ -467,7 +448,7 @@ void ownCloudGui::slotLogin() {
         account->signIn();
     } else {
         auto list = AccountManager::instance()->accounts();
-        foreach (const auto &a, list) {
+        foreach (auto &a, list) {
             a->signIn();
         }
     }
@@ -480,7 +461,7 @@ void ownCloudGui::slotLogout() {
         list.append(account);
     }
 
-    foreach (const auto &ai, list) {
+    foreach (auto &ai, list) {
         ai->signOutByUi();
     }
 }
@@ -489,7 +470,7 @@ void ownCloudGui::slotNewAccountWizard() {
     OwncloudSetupWizard::runWizard(qApp, SLOT(slotownCloudWizardDone(int)));
 }
 
-void ownCloudGui::slotShowGuiMessage(const QString &title, const QString &message) {
+void ownCloudGui::slotShowGuiMessage(QString &title, QString &message) {
     auto *msgBox = new QMessageBox;
     msgBox->setWindowFlags(msgBox->windowFlags() | Qt::WindowStaysOnTopHint);
     msgBox->setAttribute(Qt::WA_DeleteOnClose);
@@ -516,7 +497,6 @@ void ownCloudGui::slotShowSyncProtocol() {
     slotShowSettings();
     //_settingsDialog->showActivityPage();
 }
-
 
 void ownCloudGui::slotShutdown() {
     // explicitly close windows. This is somewhat of a hack to ensure
@@ -578,8 +558,7 @@ void ownCloudGui::raiseDialog(QWidget *raiseWidget) {
     }
 }
 
-
-void ownCloudGui::slotShowShareDialog(const QString &sharePath, const QString &localPath, ShareDialogStartPage startPage) {
+void ownCloudGui::slotShowShareDialog(QString &sharePath, QString &localPath, ShareDialogStartPage startPage) {
     const auto folder = FolderMan::instance()->folderForPath(localPath);
     if (!folder) {
         qCWarning(lcApplication) << "Could not open share dialog for" << localPath << "no responsible folder found";
@@ -625,6 +604,5 @@ void ownCloudGui::slotRemoveDestroyedShareDialogs() {
         }
     }
 }
-
 
 } // end namespace

@@ -12,8 +12,6 @@
  * for more details.
  */
 
-
-
 // #include <QByteArray>
 // #include <QUrl>
 // #include <QNetworkCookie>
@@ -29,10 +27,7 @@
 // #include <QPixmap>
 #endif
 
-#include "common/utility.h"
 // #include <memory>
-#include "capabilities.h"
-#include "clientsideencryption.h"
 
 class QSettings;
 class QNetworkReply;
@@ -62,7 +57,7 @@ class UserStatusConnector;
 class AbstractSslErrorHandler {
 public:
     virtual ~AbstractSslErrorHandler() = default;
-    virtual bool handleErrors(QList<QSslError>, const QSslConfiguration &conf, QList<QSslCertificate> *, AccountPtr) = 0;
+    virtual bool handleErrors(QList<QSslError>, QSslConfiguration &conf, QList<QSslCertificate> *, AccountPtr) = 0;
 };
 
 /**
@@ -91,14 +86,14 @@ public:
      * stored in credentials()->user().
      */
     QString davUser() const;
-    void setDavUser(const QString &newDavUser);
+    void setDavUser(QString &newDavUser);
 
     QString davDisplayName() const;
-    void setDavDisplayName(const QString &newDisplayName);
+    void setDavDisplayName(QString &newDisplayName);
 
 #ifndef TOKEN_AUTH_ONLY
     QImage avatar() const;
-    void setAvatar(const QImage &img);
+    void setAvatar(QImage &img);
 #endif
 
     /// The name of the account as shown in the toolbar
@@ -108,11 +103,11 @@ public:
     QString id() const;
 
     /** Server url of the account */
-    void setUrl(const QUrl &url);
+    void setUrl(QUrl &url);
     QUrl url() const { return _url; }
 
     /// Adjusts _userVisibleUrl once the host to use is discovered.
-    void setUserVisibleHost(const QString &host);
+    void setUserVisibleHost(QString &host);
 
     /**
      * @brief The possibly themed dav path for the account. It has
@@ -129,7 +124,7 @@ public:
      * This uses the old way of manually building the url. New code should
      * use the "privatelink" property accessible via PROPFIND.
      */
-    QUrl deprecatedPrivateLinkUrl(const QByteArray &numericFileId) const;
+    QUrl deprecatedPrivateLinkUrl(QByteArray &numericFileId) const;
 
     /** Holds the accounts credentials */
     AbstractCredentials *credentials() const;
@@ -141,22 +136,22 @@ public:
      * this function. Other places should prefer to use jobs or
      * sendRequest().
      */
-    QNetworkReply *sendRawRequest(const QByteArray &verb,
+    QNetworkReply *sendRawRequest(QByteArray &verb,
         const QUrl &url,
         QNetworkRequest req = QNetworkRequest(),
         QIODevice *data = nullptr);
 
-    QNetworkReply *sendRawRequest(const QByteArray &verb,
-        const QUrl &url, QNetworkRequest req, const QByteArray &data);
+    QNetworkReply *sendRawRequest(QByteArray &verb,
+        const QUrl &url, QNetworkRequest req, QByteArray &data);
 
-    QNetworkReply *sendRawRequest(const QByteArray &verb,
+    QNetworkReply *sendRawRequest(QByteArray &verb,
         const QUrl &url, QNetworkRequest req, QHttpMultiPart *data);
 
     /** Create and start network job for a simple one-off request.
      *
      * More complicated requests typically create their own job types.
      */
-    SimpleNetworkJob *sendRequest(const QByteArray &verb,
+    SimpleNetworkJob *sendRequest(QByteArray &verb,
         const QUrl &url,
         QNetworkRequest req = QNetworkRequest(),
         QIODevice *data = nullptr);
@@ -164,17 +159,16 @@ public:
     /** The ssl configuration during the first connection */
     QSslConfiguration getOrCreateSslConfig();
     QSslConfiguration sslConfiguration() const { return _sslConfiguration; }
-    void setSslConfiguration(const QSslConfiguration &config);
+    void setSslConfiguration(QSslConfiguration &config);
     // Because of bugs in Qt, we use this to store info needed for the SSL Button
     QSslCipher _sessionCipher;
     QByteArray _sessionTicket;
     QList<QSslCertificate> _peerCertificateChain;
 
-
     /** The certificates of the account */
     QList<QSslCertificate> approvedCerts() const { return _approvedCerts; }
-    void setApprovedCerts(const QList<QSslCertificate> certs);
-    void addApprovedCerts(const QList<QSslCertificate> certs);
+    void setApprovedCerts(QList<QSslCertificate> certs);
+    void addApprovedCerts(QList<QSslCertificate> certs);
 
     // Usually when a user explicitly rejects a certificate we don't
     // ask again. After this call, a dialog will again be shown when
@@ -185,15 +179,15 @@ public:
     void setSslErrorHandler(AbstractSslErrorHandler *handler);
 
     // To be called by credentials only, for storing username and the like
-    QVariant credentialSetting(const QString &key) const;
-    void setCredentialSetting(const QString &key, const QVariant &value);
+    QVariant credentialSetting(QString &key) const;
+    void setCredentialSetting(QString &key, QVariant &value);
 
     /** Assign a client certificate */
-    void setCertificate(const QByteArray certficate = QByteArray(), const QString privateKey = QString());
+    void setCertificate(QByteArray certficate = QByteArray(), QString privateKey = QString());
 
     /** Access the server capabilities */
     const Capabilities &capabilities() const;
-    void setCapabilities(const QVariantMap &caps);
+    void setCapabilities(QVariantMap &caps);
 
     /** Access the server version
      *
@@ -211,7 +205,7 @@ public:
     int serverVersionInt() const;
 
     static int makeServerVersion(int majorVersion, int minorVersion, int patchVersion);
-    void setServerVersion(const QString &version);
+    void setServerVersion(QString &version);
 
     /** Whether the server is too old.
      *
@@ -253,7 +247,7 @@ public:
 
     /// Direct Editing
     // Check for the directEditing capability
-    void fetchDirectEditors(const QUrl &directEditingURL, const QString &directEditingETag);
+    void fetchDirectEditors(QUrl &directEditingURL, QString &directEditingETag);
 
     void setupUserStatusConnector();
     void trySetupPushNotifications();
@@ -278,12 +272,12 @@ signals:
     void credentialsAsked(AbstractCredentials *credentials);
 
     /// Forwards from QNetworkAccessManager::proxyAuthenticationRequired().
-    void proxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *);
+    void proxyAuthenticationRequired(QNetworkProxy &, QAuthenticator *);
 
     // e.g. when the approved SSL certificates changed
     void wantsAccountSaved(Account *acc);
 
-    void serverVersionChanged(Account *account, const QString &newVersion, const QString &oldVersion);
+    void serverVersionChanged(Account *account, QString &newVersion, QString &oldVersion);
 
     void accountChangedAvatar();
     void accountChangedDisplayName();
@@ -299,7 +293,7 @@ signals:
 protected Q_SLOTS:
     void slotCredentialsFetched();
     void slotCredentialsAsked();
-    void slotDirectEditingRecieved(const QJsonDocument &json);
+    void slotDirectEditingRecieved(QJsonDocument &json);
 
 private:
     Account(QObject *parent = nullptr);

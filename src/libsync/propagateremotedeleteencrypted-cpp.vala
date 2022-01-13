@@ -12,10 +12,6 @@
  * for more details.
  */
 
-#include "propagateremotedeleteencrypted.h"
-#include "clientsideencryptionjobs.h"
-#include "owncloudpropagator.h"
-#include "encryptfolderjob.h"
 // #include <QLoggingCategory>
 // #include <QFileInfo>
 
@@ -35,12 +31,12 @@ void PropagateRemoteDeleteEncrypted::start() {
     startLsColJob(info.path());
 }
 
-void PropagateRemoteDeleteEncrypted::slotFolderUnLockedSuccessfully(const QByteArray &folderId) {
+void PropagateRemoteDeleteEncrypted::slotFolderUnLockedSuccessfully(QByteArray &folderId) {
     AbstractPropagateRemoteDeleteEncrypted::slotFolderUnLockedSuccessfully(folderId);
     emit finished(!_isTaskFailed);
 }
 
-void PropagateRemoteDeleteEncrypted::slotFolderEncryptedMetadataReceived(const QJsonDocument &json, int statusCode) {
+void PropagateRemoteDeleteEncrypted::slotFolderEncryptedMetadataReceived(QJsonDocument &json, int statusCode) {
     if (statusCode == 404) {
         qCDebug(PROPAGATE_REMOVE_ENCRYPTED) << "Metadata not found, but let's proceed with removing the file anyway.";
         deleteRemoteItem(_item->_encryptedFileName);
@@ -57,7 +53,7 @@ void PropagateRemoteDeleteEncrypted::slotFolderEncryptedMetadataReceived(const Q
     // Find existing metadata for this file
     bool found = false;
     const QVector<EncryptedFile> files = metadata.files();
-    for (const EncryptedFile &file : files) {
+    for (EncryptedFile &file : files) {
         if (file.originalFilename == fileName) {
             metadata.removeEncryptedFile(file);
             found = true;
@@ -74,7 +70,7 @@ void PropagateRemoteDeleteEncrypted::slotFolderEncryptedMetadataReceived(const Q
     qCDebug(PROPAGATE_REMOVE_ENCRYPTED) << "Metadata updated, sending to the server.";
 
     auto job = new UpdateMetadataApiJob(_propagator->account(), _folderId, metadata.encryptedMetadata(), _folderToken);
-    connect(job, &UpdateMetadataApiJob::success, this, [this](const QByteArray& fileId) {
+    connect(job, &UpdateMetadataApiJob::success, this, [this](QByteArray& fileId) {
         Q_UNUSED(fileId);
         deleteRemoteItem(_item->_encryptedFileName);
     });

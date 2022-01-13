@@ -6,27 +6,24 @@
  */
 
 // #include <QtTest>
-#include "syncenginetestutils.h"
-#include "common/vfs.h"
-#include "config.h"
 // #include <syncengine.h>
 
 using namespace OCC;
 
 #define DVSUFFIX APPLICATION_DOTVIRTUALFILE_SUFFIX
 
-bool itemInstruction(const ItemCompletedSpy &spy, const QString &path, const SyncInstructions instr) {
+bool itemInstruction(ItemCompletedSpy &spy, QString &path, SyncInstructions instr) {
     auto item = spy.findItem(path);
     return item->_instruction == instr;
 }
 
-SyncJournalFileRecord dbRecord(FakeFolder &folder, const QString &path) {
+SyncJournalFileRecord dbRecord(FakeFolder &folder, QString &path) {
     SyncJournalFileRecord record;
     folder.syncJournal().getFileRecord(path, &record);
     return record;
 }
 
-void triggerDownload(FakeFolder &folder, const QByteArray &path) {
+void triggerDownload(FakeFolder &folder, QByteArray &path) {
     auto &journal = folder.syncJournal();
     SyncJournalFileRecord record;
     journal.getFileRecord(path + DVSUFFIX, &record);
@@ -37,7 +34,7 @@ void triggerDownload(FakeFolder &folder, const QByteArray &path) {
     journal.schedulePathForRemoteDiscovery(record._path);
 }
 
-void markForDehydration(FakeFolder &folder, const QByteArray &path) {
+void markForDehydration(FakeFolder &folder, QByteArray &path) {
     auto &journal = folder.syncJournal();
     SyncJournalFileRecord record;
     journal.getFileRecord(path, &record);
@@ -507,7 +504,6 @@ private slots:
         QVERIFY(!fakeFolder.currentLocalState().find("B/b1"));
         QVERIFY(!fakeFolder.currentLocalState().find("B/Sub/b2"));
 
-
         // Download All file in the directory A/Sub
         // (as in Folder::downloadVirtualFile)
         fakeFolder.syncJournal().markVirtualFileForDownloadRecursively("A/Sub");
@@ -789,12 +785,12 @@ private slots:
 
         QVERIFY(fakeFolder.syncOnce());
 
-        auto isDehydrated = [&](const QString &path) {
+        auto isDehydrated = [&](QString &path) {
             QString placeholder = path + DVSUFFIX;
             return !fakeFolder.currentLocalState().find(path)
                 && fakeFolder.currentLocalState().find(placeholder);
         };
-        auto hasDehydratedDbEntries = [&](const QString &path) {
+        auto hasDehydratedDbEntries = [&](QString &path) {
             SyncJournalFileRecord normal, suffix;
             fakeFolder.syncJournal().getFileRecord(path, &normal);
             fakeFolder.syncJournal().getFileRecord(path + DVSUFFIX, &suffix);
@@ -886,7 +882,7 @@ private slots:
         setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
 
-        auto setPin = [&] (const QByteArray &path, PinState state) {
+        auto setPin = [&] (QByteArray &path, PinState state) {
             fakeFolder.syncJournal().internalPinStates().setForPath(path, state);
         };
 
@@ -1139,7 +1135,7 @@ private slots:
         auto vfs = setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
 
-        auto setPin = [&] (const QByteArray &path, PinState state) {
+        auto setPin = [&] (QByteArray &path, PinState state) {
             fakeFolder.syncJournal().internalPinStates().setForPath(path, state);
         };
 
@@ -1204,7 +1200,7 @@ private slots:
         auto vfs = setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
 
-        auto setPin = [&] (const QByteArray &path, PinState state) {
+        auto setPin = [&] (QByteArray &path, PinState state) {
             fakeFolder.syncJournal().internalPinStates().setForPath(path, state);
         };
 
@@ -1285,7 +1281,7 @@ private slots:
         auto vfs = setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
 
-        auto setPin = [&] (const QByteArray &path, PinState state) {
+        auto setPin = [&] (QByteArray &path, PinState state) {
             fakeFolder.syncJournal().internalPinStates().setForPath(path, state);
         };
 

@@ -12,9 +12,6 @@
  * for more details.
  */
 
-#include "svgimageprovider.h"
-#include "iconutils.h"
-
 // #include <QLoggingCategory>
 
 namespace OCC {
@@ -25,7 +22,7 @@ namespace Ui {
         : QQuickImageProvider(QQuickImageProvider::Image) {
     }
 
-    QImage SvgImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize) {
+    QImage SvgImageProvider::requestImage(QString &id, QSize *size, QSize &requestedSize) {
         Q_ASSERT(!id.isEmpty());
 
         const auto idSplit = id.split(QStringLiteral("/"), Qt::SkipEmptyParts);

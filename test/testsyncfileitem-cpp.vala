@@ -6,8 +6,6 @@
 
 // #include <QtTest>
 
-#include "syncfileitem.h"
-
 using namespace OCC;
 
 class TestSyncFileItem : public QObject {

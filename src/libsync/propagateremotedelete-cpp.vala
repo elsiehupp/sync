@@ -12,14 +12,6 @@
  * for more details.
  */
 
-#include "propagateremotedelete.h"
-#include "propagateremotedeleteencrypted.h"
-#include "propagateremotedeleteencryptedrootfolder.h"
-#include "owncloudpropagator_p.h"
-#include "account.h"
-#include "deletejob.h"
-#include "common/asserts.h"
-
 // #include <QLoggingCategory>
 
 namespace OCC {
@@ -55,7 +47,7 @@ void PropagateRemoteDelete::start() {
     }
 }
 
-void PropagateRemoteDelete::createDeleteJob(const QString &filename) {
+void PropagateRemoteDelete::createDeleteJob(QString &filename) {
     qCInfo(lcPropagateRemoteDelete) << "Deleting file, local" << _item->_file << "remote" << filename;
 
     _job = new DeleteJob(propagator()->account(),

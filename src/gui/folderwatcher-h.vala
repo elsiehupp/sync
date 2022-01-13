@@ -12,9 +12,6 @@
  * for more details.
  */
 
-
-#include "config.h"
-
 // #include <QList>
 // #include <QLoggingCategory>
 // #include <QObject>
@@ -54,10 +51,10 @@ public:
     /**
      * @param root Path of the root of the folder
      */
-    void init(const QString &root);
+    void init(QString &root);
 
     /* Check if the path is ignored. */
-    bool pathIsIgnored(const QString &path);
+    bool pathIsIgnored(QString &path);
 
     /**
      * Returns false if the folder watcher can't be trusted to capture all
@@ -74,7 +71,7 @@ public:
      * If no notification is seen, the folderwatcher marks itself as unreliable.
      * The path must be ignored by the watcher.
      */
-    void startNotificatonTest(const QString &path);
+    void startNotificatonTest(QString &path);
 
     /// For testing linux behavior only
     int testLinuxWatchCount() const;
@@ -82,7 +79,7 @@ public:
 signals:
     /** Emitted when one of the watched directories or one
      *  of the contained files is changed. */
-    void pathChanged(const QString &path);
+    void pathChanged(QString &path);
 
     /**
      * Emitted if some notifications were lost.
@@ -98,12 +95,12 @@ signals:
      * Signals when the watcher became unreliable. The string is a translated
      * message that can be shown to users.
      */
-    void becameUnreliable(const QString &message);
+    void becameUnreliable(QString &message);
 
 protected slots:
     // called from the implementations to indicate a change in path
-    void changeDetected(const QString &path);
-    void changeDetected(const QStringList &paths);
+    void changeDetected(QString &path);
+    void changeDetected(QStringList &paths);
 
 private slots:
     void startNotificationTestWhenReady();

@@ -13,7 +13,6 @@
  * for more details.
  */
 
-
 // #include <QObject>
 
 /**

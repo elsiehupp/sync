@@ -13,24 +13,6 @@
  * for more details.
  */
 
-#include "syncengine.h"
-#include "account.h"
-#include "common/filesystembase.h"
-#include "owncloudpropagator.h"
-#include "common/syncjournaldb.h"
-#include "common/syncjournalfilerecord.h"
-#include "discoveryphase.h"
-#include "creds/abstractcredentials.h"
-#include "common/syncfilestatus.h"
-#include "csync_exclude.h"
-#include "filesystem.h"
-#include "deletejob.h"
-#include "propagatedownload.h"
-#include "common/asserts.h"
-#include "configfile.h"
-#include "discovery.h"
-#include "common/vfs.h"
-
 #ifdef Q_OS_WIN
 // #include <windows.h>
 #else
@@ -81,7 +63,7 @@ static const std::chrono::milliseconds s_touchedFilesMaxAgeMs(3 * 1000);
 // doc in header
 std::chrono::milliseconds SyncEngine::minimumFileAgeForUpload(2000);
 
-SyncEngine::SyncEngine(AccountPtr account, const QString &localPath,
+SyncEngine::SyncEngine(AccountPtr account, QString &localPath,
     const QString &remotePath, OCC::SyncJournalDb *journal)
     : _account(account)
     , _needsUpdate(false)
@@ -202,10 +184,10 @@ static bool isFileTransferInstruction(SyncInstructions instruction) {
         || instruction == CSYNC_INSTRUCTION_TYPE_CHANGE;
 }
 
-void SyncEngine::deleteStaleDownloadInfos(const SyncFileItemVector &syncItems) {
+void SyncEngine::deleteStaleDownloadInfos(SyncFileItemVector &syncItems) {
     // Find all downloadinfo paths that we want to preserve.
     QSet<QString> download_file_paths;
-    foreach (const SyncFileItemPtr &it, syncItems) {
+    foreach (SyncFileItemPtr &it, syncItems) {
         if (it->_direction == SyncFileItem::Down
             && it->_type == ItemTypeFile
             && isFileTransferInstruction(it->_instruction)) {
@@ -216,17 +198,17 @@ void SyncEngine::deleteStaleDownloadInfos(const SyncFileItemVector &syncItems) {
     // Delete from journal and from filesystem.
     const QVector<SyncJournalDb::DownloadInfo> deleted_infos =
         _journal->getAndDeleteStaleDownloadInfos(download_file_paths);
-    foreach (const SyncJournalDb::DownloadInfo &deleted_info, deleted_infos) {
+    foreach (SyncJournalDb::DownloadInfo &deleted_info, deleted_infos) {
         const QString tmppath = _propagator->fullLocalPath(deleted_info._tmpfile);
         qCInfo(lcEngine) << "Deleting stale temporary file: " << tmppath;
         FileSystem::remove(tmppath);
     }
 }
 
-void SyncEngine::deleteStaleUploadInfos(const SyncFileItemVector &syncItems) {
+void SyncEngine::deleteStaleUploadInfos(SyncFileItemVector &syncItems) {
     // Find all blacklisted paths that we want to preserve.
     QSet<QString> upload_file_paths;
-    foreach (const SyncFileItemPtr &it, syncItems) {
+    foreach (SyncFileItemPtr &it, syncItems) {
         if (it->_direction == SyncFileItem::Up
             && it->_type == ItemTypeFile
             && isFileTransferInstruction(it->_instruction)) {
@@ -248,10 +230,10 @@ void SyncEngine::deleteStaleUploadInfos(const SyncFileItemVector &syncItems) {
     }
 }
 
-void SyncEngine::deleteStaleErrorBlacklistEntries(const SyncFileItemVector &syncItems) {
+void SyncEngine::deleteStaleErrorBlacklistEntries(SyncFileItemVector &syncItems) {
     // Find all blacklisted paths that we want to preserve.
     QSet<QString> blacklist_file_paths;
-    foreach (const SyncFileItemPtr &it, syncItems) {
+    foreach (SyncFileItemPtr &it, syncItems) {
         if (it->_hasBlacklistEntry)
             blacklist_file_paths.insert(it->_file);
     }
@@ -270,7 +252,7 @@ void SyncEngine::conflictRecordMaintenance() {
     // by checking which files still exist and removing the
     // missing ones.
     const auto conflictRecordPaths = _journal->conflictRecordPaths();
-    for (const auto &path : conflictRecordPaths) {
+    for (auto &path : conflictRecordPaths) {
         auto fsPath = _propagator->fullLocalPath(QString::fromUtf8(path));
         if (!QFileInfo(fsPath).exists()) {
             _journal->deleteConflictRecord(path);
@@ -282,7 +264,7 @@ void SyncEngine::conflictRecordMaintenance() {
     //
     // This happens when the conflicts table is new or when conflict files
     // are downlaoded but the server doesn't send conflict headers.
-    for (const auto &path : qAsConst(_seenConflictFiles)) {
+    for (auto &path : qAsConst(_seenConflictFiles)) {
         ASSERT(Utility::isConflictFile(path));
 
         auto bapath = path.toUtf8();
@@ -303,8 +285,7 @@ void SyncEngine::conflictRecordMaintenance() {
     }
 }
 
-
-void OCC::SyncEngine::slotItemDiscovered(const OCC::SyncFileItemPtr &item) {
+void OCC::SyncEngine::slotItemDiscovered(OCC::SyncFileItemPtr &item) {
     if (Utility::isConflictFile(item->_file))
         _seenConflictFiles.insert(item->_file);
     if (item->_instruction == CSYNC_INSTRUCTION_UPDATE_METADATA && !item->isDirectory()) {
@@ -549,7 +530,7 @@ void SyncEngine::startSync() {
     if (!_discoveryPhase->_remoteFolder.endsWith('/'))
         _discoveryPhase->_remoteFolder+='/';
     _discoveryPhase->_syncOptions = _syncOptions;
-    _discoveryPhase->_shouldDiscoverLocaly = [this](const QString &s) { return shouldDiscoverLocally(s); };
+    _discoveryPhase->_shouldDiscoverLocaly = [this](QString &s) { return shouldDiscoverLocally(s); };
     _discoveryPhase->setSelectiveSyncBlackList(selectiveSyncBlackList);
     _discoveryPhase->setSelectiveSyncWhiteList(_journal->getSelectiveSyncList(SyncJournalDb::SelectiveSyncWhiteList, &ok));
     if (!ok) {
@@ -577,7 +558,7 @@ void SyncEngine::startSync() {
 
     connect(_discoveryPhase.data(), &DiscoveryPhase::itemDiscovered, this, &SyncEngine::slotItemDiscovered);
     connect(_discoveryPhase.data(), &DiscoveryPhase::newBigFolder, this, &SyncEngine::newBigFolder);
-    connect(_discoveryPhase.data(), &DiscoveryPhase::fatalError, this, [this](const QString &errorString) {
+    connect(_discoveryPhase.data(), &DiscoveryPhase::fatalError, this, [this](QString &errorString) {
         Q_EMIT syncError(errorString);
         finalize(false);
     });
@@ -592,7 +573,7 @@ void SyncEngine::startSync() {
     connect(_discoveryPhase.data(), &DiscoveryPhase::addErrorToGui, this, &SyncEngine::addErrorToGui);
 }
 
-void SyncEngine::slotFolderDiscovered(bool local, const QString &folder) {
+void SyncEngine::slotFolderDiscovered(bool local, QString &folder) {
     // Don't wanna overload the UI
     if (!_lastUpdateProgressCallbackCall.isValid() || _lastUpdateProgressCallbackCall.elapsed() >= 200) {
         _lastUpdateProgressCallbackCall.start(); // first call or enough elapsed time
@@ -610,7 +591,7 @@ void SyncEngine::slotFolderDiscovered(bool local, const QString &folder) {
     emit transmissionProgress(*_progressInfo);
 }
 
-void SyncEngine::slotRootEtagReceived(const QByteArray &e, const QDateTime &time) {
+void SyncEngine::slotRootEtagReceived(QByteArray &e, QDateTime &time) {
     if (_remoteRootEtag.isEmpty()) {
         qCDebug(lcEngine) << "Root etag:" << e;
         _remoteRootEtag = e;
@@ -618,7 +599,7 @@ void SyncEngine::slotRootEtagReceived(const QByteArray &e, const QDateTime &time
     }
 }
 
-void SyncEngine::slotNewItem(const SyncFileItemPtr &item) {
+void SyncEngine::slotNewItem(SyncFileItemPtr &item) {
     _progressInfo->adjustTotalsForFile(*item);
 }
 
@@ -730,7 +711,7 @@ void SyncEngine::slotDiscoveryFinished() {
     if (!_hasNoneFiles && _hasRemoveFile) {
         qCInfo(lcEngine) << "All the files are going to be changed, asking the user";
         int side = 0; // > 0 means more deleted on the server.  < 0 means more deleted on the client
-        foreach (const auto &it, _syncItems) {
+        foreach (auto &it, _syncItems) {
             if (it->_instruction == CSYNC_INSTRUCTION_REMOVE) {
                 side += it->_direction == SyncFileItem::Down ? 1 : -1;
             }
@@ -759,7 +740,7 @@ void SyncEngine::slotDiscoveryFinished() {
     finish();
 }
 
-void SyncEngine::slotCleanPollsJobAborted(const QString &error) {
+void SyncEngine::slotCleanPollsJobAborted(QString &error) {
     syncError(error);
     finalize(false);
 }
@@ -779,7 +760,7 @@ void SyncEngine::setNetworkLimits(int upload, int download) {
     }
 }
 
-void SyncEngine::slotItemCompleted(const SyncFileItemPtr &item) {
+void SyncEngine::slotItemCompleted(SyncFileItemPtr &item) {
     _progressInfo->setProgressComplete(*item);
 
     emit transmissionProgress(*_progressInfo);
@@ -831,11 +812,10 @@ void SyncEngine::finalize(bool success) {
     _clearTouchedFilesTimer.start();
 }
 
-void SyncEngine::slotProgress(const SyncFileItem &item, qint64 current) {
+void SyncEngine::slotProgress(SyncFileItem &item, qint64 current) {
     _progressInfo->setProgressItem(item, current);
     emit transmissionProgress(*_progressInfo);
 }
-
 
 void SyncEngine::restoreOldFiles(SyncFileItemVector &syncItems) {
     /* When the server is trying to send us lots of file in the past, this means that a backup
@@ -844,7 +824,7 @@ void SyncEngine::restoreOldFiles(SyncFileItemVector &syncItems) {
        upload the client file. But we still downloaded the old file in a conflict file just in case
     */
 
-    for (const auto &syncItem : qAsConst(syncItems)) {
+    for (auto &syncItem : qAsConst(syncItems)) {
         if (syncItem->_direction != SyncFileItem::Down)
             continue;
 
@@ -868,7 +848,7 @@ void SyncEngine::restoreOldFiles(SyncFileItemVector &syncItems) {
     }
 }
 
-void SyncEngine::slotAddTouchedFile(const QString &fn) {
+void SyncEngine::slotAddTouchedFile(QString &fn) {
     QElapsedTimer now;
     now.start();
     QString file = QDir::cleanPath(fn);
@@ -897,7 +877,7 @@ void SyncEngine::slotClearTouchedFiles() {
     _touchedFiles.clear();
 }
 
-bool SyncEngine::wasFileTouched(const QString &fn) const {
+bool SyncEngine::wasFileTouched(QString &fn) const {
     // Start from the end (most recent) and look for our path. Check the time just in case.
     auto begin = _touchedFiles.constBegin();
     for (auto it = _touchedFiles.constEnd(); it != begin; --it) {
@@ -932,7 +912,7 @@ void SyncEngine::setLocalDiscoveryOptions(LocalDiscoveryStyle style, std::set<QS
     }
 }
 
-bool SyncEngine::shouldDiscoverLocally(const QString &path) const {
+bool SyncEngine::shouldDiscoverLocally(QString &path) const {
     if (_localDiscoveryStyle == LocalDiscoveryStyle::FilesystemOnly)
         return true;
 
@@ -969,9 +949,9 @@ bool SyncEngine::shouldDiscoverLocally(const QString &path) const {
     return false;
 }
 
-void SyncEngine::wipeVirtualFiles(const QString &localPath, SyncJournalDb &journal, Vfs &vfs) {
+void SyncEngine::wipeVirtualFiles(QString &localPath, SyncJournalDb &journal, Vfs &vfs) {
     qCInfo(lcEngine) << "Wiping virtual files inside" << localPath;
-    journal.getFilesBelowPath(QByteArray(), [&](const SyncJournalFileRecord &rec) {
+    journal.getFilesBelowPath(QByteArray(), [&](SyncJournalFileRecord &rec) {
         if (rec._type != ItemTypeVirtualFile && rec._type != ItemTypeVirtualFileDownload)
             return;
 
@@ -993,9 +973,9 @@ void SyncEngine::wipeVirtualFiles(const QString &localPath, SyncJournalDb &journ
     // But hydrated placeholders may still be around.
 }
 
-void SyncEngine::switchToVirtualFiles(const QString &localPath, SyncJournalDb &journal, Vfs &vfs) {
+void SyncEngine::switchToVirtualFiles(QString &localPath, SyncJournalDb &journal, Vfs &vfs) {
     qCInfo(lcEngine) << "Convert to virtual files inside" << localPath;
-    journal.getFilesBelowPath({}, [&](const SyncJournalFileRecord &rec) {
+    journal.getFilesBelowPath({}, [&](SyncJournalFileRecord &rec) {
         const auto path = rec.path();
         const auto fileName = QFileInfo(path).fileName();
         if (FileSystem::isExcludeFile(fileName)) {
@@ -1028,7 +1008,7 @@ void SyncEngine::abort() {
     }
 }
 
-void SyncEngine::slotSummaryError(const QString &message) {
+void SyncEngine::slotSummaryError(QString &message) {
     if (_uniqueErrors.contains(message))
         return;
 

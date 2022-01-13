@@ -1,8 +1,5 @@
 #pragma once
 
-#include "accountfwd.h"
-#include "owncloudlib.h"
-
 // #include <QObject>
 // #include <QPixmap>
 // #include <QUrl>
@@ -29,21 +26,21 @@ class OWNCLOUDSYNC_EXPORT OcsProfileConnector : public QObject {
 public:
     explicit OcsProfileConnector(AccountPtr account, QObject *parent = nullptr);
 
-    void fetchHovercard(const QString &userId);
+    void fetchHovercard(QString &userId);
     const Hovercard &hovercard() const;
 
 signals:
     void error();
     void hovercardFetched();
-    void iconLoaded(const std::size_t hovercardActionIndex);
+    void iconLoaded(std::size_t hovercardActionIndex);
 
 private:
-    void onHovercardFetched(const QJsonDocument &json, int statusCode);
+    void onHovercardFetched(QJsonDocument &json, int statusCode);
 
     void fetchIcons();
-    void startFetchIconJob(const std::size_t hovercardActionIndex);
-    void setHovercardActionIcon(const std::size_t index, const QPixmap &pixmap);
-    void loadHovercardActionIcon(const std::size_t hovercardActionIndex, const QByteArray &iconData);
+    void startFetchIconJob(std::size_t hovercardActionIndex);
+    void setHovercardActionIcon(std::size_t index, QPixmap &pixmap);
+    void loadHovercardActionIcon(std::size_t hovercardActionIndex, QByteArray &iconData);
 
     AccountPtr _account;
     Hovercard _currentHovercard;

@@ -13,10 +13,7 @@
  * for more details.
  */
 
-
 // #include <QMap>
-
-#include "creds/abstractcredentials.h"
 
 class QNetworkReply;
 class QAuthenticator;
@@ -33,7 +30,7 @@ class OWNCLOUDSYNC_EXPORT TokenCredentials : public AbstractCredentials {
 public:
     friend class TokenCredentialsAccessManager;
     TokenCredentials();
-    TokenCredentials(const QString &user, const QString &password, const QString &token);
+    TokenCredentials(QString &user, QString &password, QString &token);
 
     QString authType() const override;
     QNetworkAccessManager *createQNAM() const override;

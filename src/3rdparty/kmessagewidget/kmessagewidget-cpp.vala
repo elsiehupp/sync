@@ -18,7 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301  USA
  */
-#include "kmessagewidget.h"
 
 // #include <QAction>
 // #include <QApplication>
@@ -271,7 +270,7 @@ KMessageWidget::KMessageWidget(QWidget *parent)
     d->init(this);
 }
 
-KMessageWidget::KMessageWidget(const QString &text, QWidget *parent)
+KMessageWidget::KMessageWidget(QString &text, QWidget *parent)
     : QFrame(parent)
     , d(new KMessageWidgetPrivate) {
     d->init(this);
@@ -286,7 +285,7 @@ QString KMessageWidget::text() const {
     return d->textLabel->text();
 }
 
-void KMessageWidget::setText(const QString &text) {
+void KMessageWidget::setText(QString &text) {
     d->textLabel->setText(text);
     updateGeometry();
 }
@@ -463,7 +462,7 @@ QIcon KMessageWidget::icon() const {
     return d->icon;
 }
 
-void KMessageWidget::setIcon(const QIcon &icon) {
+void KMessageWidget::setIcon(QIcon &icon) {
     d->icon = icon;
     if (d->icon.isNull()) {
         d->iconLabel->hide();

@@ -24,17 +24,12 @@
 // #include <cerrno>
 // #include <cstdio>
 
-#include "csync.h"
-#include "vio/csync_vio_local.h"
-
 // #include <QDir>
 
 static const auto CSYNC_TEST_DIR = []{ return QStringLiteral("%1/csync_test").arg(QDir::tempPath());}();
 
-#include "torture.h"
-
 namespace {
-int oc_mkdir(const QString &path) {
+int oc_mkdir(QString &path) {
     return QDir(path).mkpath(path) ? 0 : -1;
 }
 
@@ -141,7 +136,7 @@ static void create_dirs( const char *path ) {
  * whole tree.
  *
  */
-static void traverse_dir(void **state, const QString &dir, int *cnt) {
+static void traverse_dir(void **state, QString &dir, int *cnt) {
     csync_vio_handle_t *dh = nullptr;
     std::unique_ptr<csync_file_stat_t> dirent;
     auto sv = (statevar*) *state;
@@ -192,7 +187,7 @@ static void traverse_dir(void **state, const QString &dir, int *cnt) {
 
 }
 
-static void create_file( const char *path, const char *name, const char *content) {
+static void create_file( const char *path, char *name, char *content) {
     QFile file(QStringLiteral("%1/%2%3").arg(CSYNC_TEST_DIR, QString::fromUtf8(path), QString::fromUtf8(name)));
     assert_int_equal(1, file.open(QIODevice::WriteOnly | QIODevice::NewOnly));
     file.write(content);
@@ -228,7 +223,6 @@ static void check_readdir_with_content(void **state) {
 
     create_file( t1, "Räuber Max.txt", "Der Max ist ein schlimmer finger");
     create_file( t1, "пя́тница.txt", "Am Freitag tanzt der Ürk");
-
 
     traverse_dir(state, CSYNC_TEST_DIR, &files_cnt);
 
@@ -271,7 +265,6 @@ static void check_readdir_longtree(void **state) {
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll"
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum").arg(CSYNC_TEST_DIR);
 
-
     const auto r2 = QString::fromUtf8(
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und"
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so"
@@ -285,7 +278,6 @@ static void check_readdir_longtree(void **state) {
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS"
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE"
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH").arg(CSYNC_TEST_DIR);
-
 
     const auto r3 = QString::fromUtf8(
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND"

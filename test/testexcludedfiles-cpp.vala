@@ -8,8 +8,6 @@
 // #include <QtTest>
 // #include <QTemporaryDir>
 
-#include "csync_exclude.h"
-
 using namespace OCC;
 
 #define EXCLUDE_LIST_FILE SOURCEDIR "/../../sync-exclude.lst"
@@ -40,22 +38,21 @@ static void setup_init() {
 
 class TestExcludedFiles: public QObject {
 
-static auto check_file_full(const char *path) {
+static auto check_file_full(char *path) {
     return excludedFiles->fullPatternMatch(path, ItemTypeFile);
 }
 
-static auto check_dir_full(const char *path) {
+static auto check_dir_full(char *path) {
     return excludedFiles->fullPatternMatch(path, ItemTypeDirectory);
 }
 
-static auto check_file_traversal(const char *path) {
+static auto check_file_traversal(char *path) {
     return excludedFiles->traversalPatternMatch(path, ItemTypeFile);
 }
 
-static auto check_dir_traversal(const char *path) {
+static auto check_dir_traversal(char *path) {
     return excludedFiles->traversalPatternMatch(path, ItemTypeDirectory);
 }
-
 
 private slots:
     void testFun() {
@@ -156,7 +153,6 @@ private slots:
         QCOMPARE(check_file_full(".sync_5bdd60bdfcfa.db.ctmp"), CSYNC_FILE_SILENTLY_EXCLUDED);
         QCOMPARE(check_file_full(".sync_5bdd60bdfcfa.db-shm"), CSYNC_FILE_SILENTLY_EXCLUDED);
         QCOMPARE(check_file_full("subdir/.sync_5bdd60bdfcfa.db"), CSYNC_FILE_SILENTLY_EXCLUDED);
-
 
         /* pattern ]*.directory - ignore and remove */
         QCOMPARE(check_file_full("my.~directory"), CSYNC_FILE_EXCLUDE_AND_REMOVE);
@@ -339,7 +335,6 @@ private slots:
         QCOMPARE(check_file_traversal("file_invalid_char<"), CSYNC_FILE_EXCLUDE_INVALID_CHAR);
     #endif
 
-
         /* From here the actual traversal tests */
 
         excludedFiles->addManualExclude("/exclude");
@@ -520,7 +515,7 @@ private slots:
     void check_csync_regex_translation() {
         setup();
         QByteArray storage;
-        auto translate = [&storage](const char *pattern) {
+        auto translate = [&storage](char *pattern) {
             storage = ExcludedFiles::convertToRegexpSyntax(pattern, false).toUtf8();
             return storage.constData();
         };
@@ -541,7 +536,7 @@ private slots:
         setup();
         bool wildcardsMatchSlash = false;
         QByteArray storage;
-        auto translate = [&storage, &wildcardsMatchSlash](const char *pattern) {
+        auto translate = [&storage, &wildcardsMatchSlash](char *pattern) {
             storage = ExcludedFiles::extractBnameTrigger(pattern, wildcardsMatchSlash).toUtf8();
             return storage.constData();
         };
@@ -569,9 +564,9 @@ private slots:
     }
 
     void check_csync_is_windows_reserved_word() {
-        auto csync_is_windows_reserved_word = [](const char *fn) {
+        auto csync_is_windows_reserved_word = [](char *fn) {
             QString s = QString::fromLatin1(fn);
-            extern bool csync_is_windows_reserved_word(const QStringRef &filename);
+            extern bool csync_is_windows_reserved_word(QStringRef &filename);
             return csync_is_windows_reserved_word(&s);
         };
 

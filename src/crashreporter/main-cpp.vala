@@ -12,9 +12,6 @@
  * for more details.
  */
 
-
-#include "CrashReporterConfig.h"
-
 // #include <libcrashreporter-gui/CrashReporter.h>
 
 // #include <QApplication>
@@ -67,7 +64,6 @@ int main(int argc, char *argv[]) {
     reporter.setReportData("ReleaseChannel", CRASHREPORTER_RELEASE_CHANNEL);
 
     //reporter.setReportData( "timestamp", QByteArray::number( QDateTime::currentDateTime().toTime_t() ) );
-
 
     // add parameters
 

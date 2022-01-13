@@ -12,7 +12,6 @@
  * for more details.
  */
 
-
 // #include <QThread>
 // #include <QAtomicInt>
 // #include <windows.h>
@@ -27,7 +26,7 @@ class FolderWatcher;
  */
 class WatcherThread : public QThread {
 public:
-    WatcherThread(const QString &path)
+    WatcherThread(QString &path)
         : QThread()
         , _path(path + (path.endsWith(QLatin1Char('/')) ? QString() : QStringLiteral("/")))
         , _directory(0)
@@ -47,7 +46,7 @@ protected:
     void closeHandle();
 
 signals:
-    void changed(const QString &path);
+    void changed(QString &path);
     void lostChanges();
     void ready();
 
@@ -65,7 +64,7 @@ private:
  */
 class FolderWatcherPrivate : public QObject {
 public:
-    FolderWatcherPrivate(FolderWatcher *p, const QString &path);
+    FolderWatcherPrivate(FolderWatcher *p, QString &path);
     ~FolderWatcherPrivate();
 
     /// Set to non-zero once the WatcherThread is capturing events.

@@ -14,11 +14,6 @@
 
 // #pragma once
 
-#include "abstractnetworkjob.h"
-
-#include "propagateupload.h"
-#include "account.h"
-
 // #include <QLoggingCategory>
 // #include <QMap>
 // #include <QByteArray>
@@ -46,7 +41,7 @@ struct SingleUploadFileData {
 class OWNCLOUDSYNC_EXPORT PutMultiFileJob : public AbstractNetworkJob {
 
 public:
-    explicit PutMultiFileJob(AccountPtr account, const QUrl &url,
+    explicit PutMultiFileJob(AccountPtr account, QUrl &url,
                              std::vector<SingleUploadFileData> devices, QObject *parent = nullptr)
         : AbstractNetworkJob(account, {}, parent)
         , _devices(std::move(devices))

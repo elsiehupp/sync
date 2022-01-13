@@ -12,9 +12,7 @@
  * for more details.
  */
 
-
 // #include <QObject>
-#include "folderman.h"
 
 /* Forward declaration required since gio header files interfere with QObject headers */
 struct _CloudProvidersProviderExporter;
@@ -45,8 +43,8 @@ public:
 
 public slots:
     void slotSyncStarted();
-    void slotSyncFinished(const SyncResult &);
-    void slotUpdateProgress(const QString &folder, const ProgressInfo &progress);
+    void slotSyncFinished(SyncResult &);
+    void slotUpdateProgress(QString &folder, ProgressInfo &progress);
     void slotSyncPausedChanged(Folder*, bool);
 
 private:

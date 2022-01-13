@@ -12,9 +12,6 @@
  * for more details.
  */
 
-#include "creds/dummycredentials.h"
-#include "accessmanager.h"
-
 namespace OCC {
 
 QString DummyCredentials::authType() const {

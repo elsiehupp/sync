@@ -12,10 +12,6 @@
  * for more details.
  */
 
-#include "notificationconfirmjob.h"
-#include "networkjobs.h"
-#include "account.h"
-
 // #include <QBuffer>
 
 namespace OCC {
@@ -27,7 +23,7 @@ NotificationConfirmJob::NotificationConfirmJob(AccountPtr account)
     setIgnoreCredentialFailure(true);
 }
 
-void NotificationConfirmJob::setLinkAndVerb(const QUrl &link, const QByteArray &verb) {
+void NotificationConfirmJob::setLinkAndVerb(QUrl &link, QByteArray &verb) {
     _link = link;
     _verb = verb;
 }

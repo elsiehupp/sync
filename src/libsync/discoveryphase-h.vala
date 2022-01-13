@@ -20,13 +20,10 @@
 // #include <csync.h>
 // #include <QMap>
 // #include <QSet>
-#include "networkjobs.h"
 // #include <QMutex>
 // #include <QWaitCondition>
 // #include <QRunnable>
 // #include <deque>
-#include "syncoptions.h"
-#include "syncfileitem.h"
 
 class ExcludedFiles;
 
@@ -36,7 +33,6 @@ enum class LocalDiscoveryStyle {
     FilesystemOnly, //< read all local data from the filesystem
     DatabaseAndFilesystem, //< read from the db, except for listed paths
 };
-
 
 class Account;
 class SyncJournalDb;
@@ -87,7 +83,7 @@ struct LocalInfo {
  */
 class DiscoverySingleLocalDirectoryJob : public QObject, public QRunnable {
 public:
-    explicit DiscoverySingleLocalDirectoryJob(const AccountPtr &account, const QString &localPath, OCC::Vfs *vfs, QObject *parent = nullptr);
+    explicit DiscoverySingleLocalDirectoryJob(AccountPtr &account, QString &localPath, OCC::Vfs *vfs, QObject *parent = nullptr);
 
     void run() override;
 signals:
@@ -105,7 +101,6 @@ private:
 public:
 };
 
-
 /**
  * @brief Run a PROPFIND on a directory and process the results for Discovery
  *
@@ -113,7 +108,7 @@ public:
  */
 class DiscoverySingleDirectoryJob : public QObject {
 public:
-    explicit DiscoverySingleDirectoryJob(const AccountPtr &account, const QString &path, QObject *parent = nullptr);
+    explicit DiscoverySingleDirectoryJob(AccountPtr &account, QString &path, QObject *parent = nullptr);
     // Specify that this is the root and we need to check the data-fingerprint
     void setIsRootPath() { _isRootPath = true; }
     void start();
@@ -122,16 +117,16 @@ public:
     // This is not actually a network job, it is just a job
 signals:
     void firstDirectoryPermissions(RemotePermissions);
-    void etag(const QByteArray &, const QDateTime &time);
-    void finished(const HttpResult<QVector<RemoteInfo>> &result);
+    void etag(QByteArray &, QDateTime &time);
+    void finished(HttpResult<QVector<RemoteInfo>> &result);
 
 private slots:
-    void directoryListingIteratedSlot(const QString &, const QMap<QString, QString> &);
+    void directoryListingIteratedSlot(QString &, QMap<QString, QString> &);
     void lsJobFinishedWithoutErrorSlot();
     void lsJobFinishedWithErrorSlot(QNetworkReply *);
     void fetchE2eMetadata();
-    void metadataReceived(const QJsonDocument &json, int statusCode);
-    void metadataError(const QByteArray& fileId, int httpReturnCode);
+    void metadataReceived(QJsonDocument &json, int statusCode);
+    void metadataError(QByteArray& fileId, int httpReturnCode);
 
 private:
     QVector<RemoteInfo> _results;
@@ -203,7 +198,7 @@ class DiscoveryPhase : public QObject {
      * Useful for avoiding processing of items that have already been claimed in
      * a rename (would otherwise be discovered as deletions).
      */
-    bool isRenamed(const QString &p) const { return _renamedItemsLocal.contains(p) || _renamedItemsRemote.contains(p); }
+    bool isRenamed(QString &p) const { return _renamedItemsLocal.contains(p) || _renamedItemsRemote.contains(p); }
 
     int _currentlyActiveJobs = 0;
 
@@ -213,11 +208,11 @@ class DiscoveryPhase : public QObject {
 
     void scheduleMoreJobs();
 
-    bool isInSelectiveSyncBlackList(const QString &path) const;
+    bool isInSelectiveSyncBlackList(QString &path) const;
 
     // Check if the new folder should be deselected or not.
     // May be async. "Return" via the callback, true if the item is blacklisted
-    void checkSelectiveSyncNewFolder(const QString &path, RemotePermissions rp,
+    void checkSelectiveSyncNewFolder(QString &path, RemotePermissions rp,
         std::function<void(bool)> callback);
 
     /** Given an original path, return the target path obtained when renaming is done.
@@ -225,7 +220,7 @@ class DiscoveryPhase : public QObject {
      * Note that it only considers parent directory renames. So if A/B got renamed to C/D,
      * checking A/B/file would yield C/D/file, but checking A/B would yield A/B.
      */
-    QString adjustRenamedPath(const QString &original, SyncFileItem::Direction) const;
+    QString adjustRenamedPath(QString &original, SyncFileItem::Direction) const;
 
     /** If the db-path is scheduled for deletion, abort it.
      *
@@ -238,7 +233,7 @@ class DiscoveryPhase : public QObject {
      *
      * See _deletedItem and _queuedDeletedDirectories.
      */
-    QPair<bool, QByteArray> findAndCancelDeletedJob(const QString &originalPath);
+    QPair<bool, QByteArray> findAndCancelDeletedJob(QString &originalPath);
 
 public:
     // input
@@ -251,34 +246,34 @@ public:
     QRegularExpression _invalidFilenameRx; // FIXME: maybe move in ExcludedFiles
     QStringList _serverBlacklistedFiles; // The blacklist from the capabilities
     bool _ignoreHiddenFiles = false;
-    std::function<bool(const QString &)> _shouldDiscoverLocaly;
+    std::function<bool(QString &)> _shouldDiscoverLocaly;
 
     void startJob(ProcessDirectoryJob *);
 
-    void setSelectiveSyncBlackList(const QStringList &list);
-    void setSelectiveSyncWhiteList(const QStringList &list);
+    void setSelectiveSyncBlackList(QStringList &list);
+    void setSelectiveSyncWhiteList(QStringList &list);
 
     // output
     QByteArray _dataFingerprint;
     bool _anotherSyncNeeded = false;
 
 signals:
-    void fatalError(const QString &errorString);
-    void itemDiscovered(const SyncFileItemPtr &item);
+    void fatalError(QString &errorString);
+    void itemDiscovered(SyncFileItemPtr &item);
     void finished();
 
     // A new folder was discovered and was not synced because of the confirmation feature
-    void newBigFolder(const QString &folder, bool isExternal);
+    void newBigFolder(QString &folder, bool isExternal);
 
     /** For excluded items that don't show up in itemDiscovered()
       *
       * The path is relative to the sync folder, similar to item->_file
       */
-    void silentlyExcluded(const QString &folderPath);
+    void silentlyExcluded(QString &folderPath);
 
-    void addErrorToGui(SyncFileItem::Status status, const QString &errorMessage, const QString &subject);
+    void addErrorToGui(SyncFileItem::Status status, QString &errorMessage, QString &subject);
 };
 
 /// Implementation of DiscoveryPhase::adjustRenamedPath
-QString adjustRenamedPath(const QMap<QString, QString> &renamedItems, const QString &original);
+QString adjustRenamedPath(QMap<QString, QString> &renamedItems, QString &original);
 }

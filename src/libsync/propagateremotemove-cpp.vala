@@ -12,13 +12,6 @@
  * for more details.
  */
 
-#include "propagateremotemove.h"
-#include "propagatorjobs.h"
-#include "owncloudpropagator_p.h"
-#include "account.h"
-#include "common/syncjournalfilerecord.h"
-#include "filesystem.h"
-#include "common/asserts.h"
 // #include <QFile>
 // #include <QStringList>
 // #include <QDir>
@@ -28,13 +21,13 @@ namespace OCC {
 Q_LOGGING_CATEGORY(lcMoveJob, "nextcloud.sync.networkjob.move", QtInfoMsg)
 Q_LOGGING_CATEGORY(lcPropagateRemoteMove, "nextcloud.sync.propagator.remotemove", QtInfoMsg)
 
-MoveJob::MoveJob(AccountPtr account, const QString &path,
+MoveJob::MoveJob(AccountPtr account, QString &path,
     const QString &destination, QObject *parent)
     : AbstractNetworkJob(account, path, parent)
     , _destination(destination) {
 }
 
-MoveJob::MoveJob(AccountPtr account, const QUrl &url, const QString &destination,
+MoveJob::MoveJob(AccountPtr account, QUrl &url, QString &destination,
     QMap<QByteArray, QByteArray> extraHeaders, QObject *parent)
     : AbstractNetworkJob(account, QString(), parent)
     , _destination(destination)
@@ -59,7 +52,6 @@ void MoveJob::start() {
     }
     AbstractNetworkJob::start();
 }
-
 
 bool MoveJob::finished() {
     qCInfo(lcMoveJob) << "MOVE of" << reply()->request().url() << "FINISHED WITH STATUS"
@@ -272,7 +264,7 @@ void PropagateRemoteMove::finalize() {
     done(SyncFileItem::Success);
 }
 
-bool PropagateRemoteMove::adjustSelectiveSync(SyncJournalDb *journal, const QString &from_, const QString &to_) {
+bool PropagateRemoteMove::adjustSelectiveSync(SyncJournalDb *journal, QString &from_, QString &to_) {
     bool ok = false;
     // We only care about preserving the blacklist.   The white list should anyway be empty.
     // And the undecided list will be repopulated on the next sync, if there is anything too big.

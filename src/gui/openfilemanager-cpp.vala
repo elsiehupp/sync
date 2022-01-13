@@ -13,8 +13,6 @@
  * for more details.
  */
 
-#include "openfilemanager.h"
-#include "common/utility.h"
 // #include <QProcess>
 // #include <QSettings>
 // #include <QDir>
@@ -86,9 +84,8 @@ static bool checkDolphinCanSelect() {
     return p.readAll().contains("--select");
 }
 
-
 // inspired by Qt Creator's showInGraphicalShell();
-void showInFileManager(const QString &localPath) {
+void showInFileManager(QString &localPath) {
     if (Utility::isWindows()) {
 #ifdef Q_OS_WIN
         #if QTLEGACY
@@ -189,7 +186,6 @@ void showInFileManager(const QString &localPath) {
             (*it) = desktopFile.value("Desktop Entry/Icon").toString();
             args.insert(it, QString::fromLatin1("--icon")); // before
         }
-
 
         if (args.count() == 0)
             args << fileToOpen;

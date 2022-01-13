@@ -13,7 +13,6 @@
  * for more details.
  */
 
-
 // #include <QObject>
 // #include <QPointer>
 // #include <QVariant>
@@ -80,10 +79,10 @@ public Q_SLOTS:
     void slotFetchInfo();
 
 private Q_SLOTS:
-    void slotUpdateLastInfo(const QJsonDocument &json);
+    void slotUpdateLastInfo(QJsonDocument &json);
     void slotAccountStateChanged();
     void slotRequestFailed();
-    void slotAvatarImage(const QImage &img);
+    void slotAvatarImage(QImage &img);
 
 Q_SIGNALS:
     void quotaUpdated(qint64 total, qint64 used);
@@ -103,7 +102,6 @@ private:
     bool _active; // if we should check at regular interval (when the UI is visible)
     QPointer<JsonApiJob> _job; // the currently running job
 };
-
 
 } // namespace OCC
 

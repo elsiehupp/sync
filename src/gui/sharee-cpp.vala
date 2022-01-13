@@ -12,9 +12,6 @@
  * for more details.
  */
 
-#include "sharee.h"
-#include "ocsshareejob.h"
-
 // #include <QJsonObject>
 // #include <QJsonDocument>
 // #include <QJsonArray>
@@ -23,7 +20,7 @@ namespace OCC {
 
 Q_LOGGING_CATEGORY(lcSharing, "nextcloud.gui.sharing", QtInfoMsg)
 
-Sharee::Sharee(const QString shareWith,
+Sharee::Sharee(QString shareWith,
     const QString displayName,
     const Type type)
     : _shareWith(shareWith)
@@ -61,13 +58,13 @@ Sharee::Type Sharee::type() const {
     return _type;
 }
 
-ShareeModel::ShareeModel(const AccountPtr &account, const QString &type, QObject *parent)
+ShareeModel::ShareeModel(AccountPtr &account, QString &type, QObject *parent)
     : QAbstractListModel(parent)
     , _account(account)
     , _type(type) {
 }
 
-void ShareeModel::fetch(const QString &search, const ShareeSet &blacklist, LookupMode lookupMode) {
+void ShareeModel::fetch(QString &search, ShareeSet &blacklist, LookupMode lookupMode) {
     _search = search;
     _shareeBlacklist = blacklist;
     auto *job = new OcsShareeJob(_account);
@@ -76,15 +73,15 @@ void ShareeModel::fetch(const QString &search, const ShareeSet &blacklist, Looku
     job->getSharees(_search, _type, 1, 50, lookupMode == GlobalSearch ? true : false);
 }
 
-void ShareeModel::shareesFetched(const QJsonDocument &reply) {
+void ShareeModel::shareesFetched(QJsonDocument &reply) {
     QVector<QSharedPointer<Sharee>> newSharees;
  {
         const QStringList shareeTypes {"users", "groups", "emails", "remotes", "circles", "rooms"};
 
-        const auto appendSharees = [this, &shareeTypes](const QJsonObject &data, QVector<QSharedPointer<Sharee>>& out) {
-            for (const auto &shareeType : shareeTypes) {
+        const auto appendSharees = [this, &shareeTypes](QJsonObject &data, QVector<QSharedPointer<Sharee>>& out) {
+            for (auto &shareeType : shareeTypes) {
                 const auto category = data.value(shareeType).toArray();
-                for (const auto &sharee : category) {
+                for (auto &sharee : category) {
                     out.append(parseSharee(sharee.toObject()));
                 }
             }
@@ -96,9 +93,9 @@ void ShareeModel::shareesFetched(const QJsonDocument &reply) {
 
     // Filter sharees that we have already shared with
     QVector<QSharedPointer<Sharee>> filteredSharees;
-    foreach (const auto &sharee, newSharees) {
+    foreach (auto &sharee, newSharees) {
         bool found = false;
-        foreach (const auto &blacklistSharee, _shareeBlacklist) {
+        foreach (auto &blacklistSharee, _shareeBlacklist) {
             if (sharee->type() == blacklistSharee->type() && sharee->shareWith() == blacklistSharee->shareWith()) {
                 found = true;
                 break;
@@ -114,7 +111,7 @@ void ShareeModel::shareesFetched(const QJsonDocument &reply) {
     shareesReady();
 }
 
-QSharedPointer<Sharee> ShareeModel::parseSharee(const QJsonObject &data) {
+QSharedPointer<Sharee> ShareeModel::parseSharee(QJsonObject &data) {
     QString displayName = data.value("label").toString();
     const QString shareWith = data.value("value").toObject().value("shareWith").toString();
     Sharee::Type type = (Sharee::Type)data.value("value").toObject().value("shareType").toInt();
@@ -126,15 +123,14 @@ QSharedPointer<Sharee> ShareeModel::parseSharee(const QJsonObject &data) {
     return QSharedPointer<Sharee>(new Sharee(shareWith, displayName, type));
 }
 
-
 // Helper function for setNewSharees   (could be a lambda when we can use them)
-static QSharedPointer<Sharee> shareeFromModelIndex(const QModelIndex &idx) {
+static QSharedPointer<Sharee> shareeFromModelIndex(QModelIndex &idx) {
     return idx.data(Qt::UserRole).value<QSharedPointer<Sharee>>();
 }
 
 struct FindShareeHelper {
     const QSharedPointer<Sharee> &sharee;
-    bool operator()(const QSharedPointer<Sharee> &s2) const {
+    bool operator()(QSharedPointer<Sharee> &s2) const {
         return s2->format() == sharee->format() && s2->displayName() == sharee->format();
     }
 };
@@ -143,7 +139,7 @@ struct FindShareeHelper {
 
     Do that while preserving the model index so the selection stays
 */
-void ShareeModel::setNewSharees(const QVector<QSharedPointer<Sharee>> &newSharees) {
+void ShareeModel::setNewSharees(QVector<QSharedPointer<Sharee>> &newSharees) {
     layoutAboutToBeChanged();
     const auto persistent = persistentIndexList();
     QVector<QSharedPointer<Sharee>> oldPersistantSharee;
@@ -156,7 +152,7 @@ void ShareeModel::setNewSharees(const QVector<QSharedPointer<Sharee>> &newSharee
 
     QModelIndexList newPersistant;
     newPersistant.reserve(persistent.size());
-    foreach (const QSharedPointer<Sharee> &sharee, oldPersistantSharee) {
+    foreach (QSharedPointer<Sharee> &sharee, oldPersistantSharee) {
         FindShareeHelper helper = { sharee };
         auto it = std::find_if(_sharees.constBegin(), _sharees.constEnd(), helper);
         if (it == _sharees.constEnd()) {
@@ -170,12 +166,11 @@ void ShareeModel::setNewSharees(const QVector<QSharedPointer<Sharee>> &newSharee
     layoutChanged();
 }
 
-
-int ShareeModel::rowCount(const QModelIndex &) const {
+int ShareeModel::rowCount(QModelIndex &) const {
     return _sharees.size();
 }
 
-QVariant ShareeModel::data(const QModelIndex &index, int role) const {
+QVariant ShareeModel::data(QModelIndex &index, int role) const {
     if (index.row() < 0 || index.row() > _sharees.size()) {
         return QVariant();
     }

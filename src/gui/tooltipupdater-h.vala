@@ -41,7 +41,7 @@ protected:
     bool eventFilter(QObject *obj, QEvent *ev) override;
 
 private slots:
-    void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
+    void dataChanged(QModelIndex &topLeft, QModelIndex &bottomRight, QVector<int> &roles);
 
 private:
     QTreeView *_treeView;

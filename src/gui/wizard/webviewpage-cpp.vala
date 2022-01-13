@@ -1,4 +1,3 @@
-#include "webviewpage.h"
 
 // #include <QWebEngineUrlRequestJob>
 // #include <QProgressBar>
@@ -6,15 +5,9 @@
 // #include <QNetworkProxyFactory>
 // #include <QScreen>
 
-#include "owncloudwizard.h"
-#include "creds/webflowcredentials.h"
-#include "webview.h"
-#include "account.h"
-
 namespace OCC {
 
 Q_LOGGING_CATEGORY(lcWizardWebiewPage, "nextcloud.gui.wizard.webviewpage", QtInfoMsg)
-
 
 WebViewPage::WebViewPage(QWidget *parent)
     : AbstractCredentialsWizardPage() {

@@ -13,16 +13,6 @@
  * for more details.
  */
 
-#include "QProgressIndicator.h"
-
-#include "creds/httpcredentialsgui.h"
-#include "theme.h"
-#include "account.h"
-#include "configfile.h"
-#include "wizard/owncloudhttpcredspage.h"
-#include "wizard/owncloudwizardcommon.h"
-#include "wizard/owncloudwizard.h"
-
 namespace OCC {
 
 OwncloudHttpCredsPage::OwncloudHttpCredsPage(QWidget *parent)
@@ -168,7 +158,7 @@ void OwncloudHttpCredsPage::stopSpinner() {
     _progressIndi->stopAnimation();
 }
 
-void OwncloudHttpCredsPage::setErrorString(const QString &err) {
+void OwncloudHttpCredsPage::setErrorString(QString &err) {
     if (err.isEmpty()) {
         _ui.errorLabel->setVisible(false);
     } else {

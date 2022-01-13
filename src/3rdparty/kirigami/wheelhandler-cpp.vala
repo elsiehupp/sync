@@ -4,7 +4,6 @@
  *  SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
-#include "wheelhandler.h"
 // #include <QWheelEvent>
 // #include <QQuickItem>
 // #include <QDebug>
@@ -172,7 +171,6 @@ void GlobalWheelFilter::manageWheel(QQuickItem *target, QWheelEvent *event) {
     target->metaObject()->invokeMethod(target, "cancelFlick");
 }
 
-
 ////////////////////////////
 KirigamiWheelEvent::KirigamiWheelEvent(QObject *parent)
     : QObject(parent) {}
@@ -226,7 +224,6 @@ void KirigamiWheelEvent::setAccepted(bool accepted) {
     m_accepted = accepted;
 }
 
-
 ///////////////////////////////
 
 WheelHandler::WheelHandler(QObject *parent)
@@ -254,6 +251,5 @@ void WheelHandler::setTarget(QQuickItem *target) {
 
     emit targetChanged();
 }
-
 
 #include "moc_wheelhandler.cpp"

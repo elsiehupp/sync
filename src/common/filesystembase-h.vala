@@ -18,8 +18,6 @@
 
 // #pragma once
 
-#include "config.h"
-
 // #include <QString>
 // #include <ctime>
 // #include <QFileInfo>
@@ -46,7 +44,7 @@ namespace FileSystem {
     /**
      * @brief Mark the file as hidden  (only has effects on windows)
      */
-    void OCSYNC_EXPORT setFileHidden(const QString &filename, bool hidden);
+    void OCSYNC_EXPORT setFileHidden(QString &filename, bool hidden);
 
     /**
      * @brief Marks the file as read-only.
@@ -54,7 +52,7 @@ namespace FileSystem {
      * On linux this either revokes all 'w' permissions or restores permissions
      * according to the umask.
      */
-    void OCSYNC_EXPORT setFileReadOnly(const QString &filename, bool readonly);
+    void OCSYNC_EXPORT setFileReadOnly(QString &filename, bool readonly);
 
     /**
      * @brief Marks the file as read-only.
@@ -65,16 +63,16 @@ namespace FileSystem {
      * This means that it will preserve explicitly set rw-r--r-- permissions even
      * when the umask is 0002. (setFileReadOnly() would adjust to rw-rw-r--)
      */
-    void OCSYNC_EXPORT setFileReadOnlyWeak(const QString &filename, bool readonly);
+    void OCSYNC_EXPORT setFileReadOnlyWeak(QString &filename, bool readonly);
 
     /**
      * @brief Try to set permissions so that other users on the local machine can not
      * go into the folder.
      */
-    void OCSYNC_EXPORT setFolderMinimumPermissions(const QString &filename);
+    void OCSYNC_EXPORT setFolderMinimumPermissions(QString &filename);
 
     /** convert a "normal" windows path into a path that can be 32k chars long. */
-    QString OCSYNC_EXPORT longWinPath(const QString &inpath);
+    QString OCSYNC_EXPORT longWinPath(QString &inpath);
 
     /**
      * @brief Checks whether a file exists.
@@ -82,14 +80,14 @@ namespace FileSystem {
      * Use this over QFileInfo::exists() and QFile::exists() to avoid bugs with lnk
      * files, see above.
      */
-    bool OCSYNC_EXPORT fileExists(const QString &filename, const QFileInfo & = QFileInfo());
+    bool OCSYNC_EXPORT fileExists(QString &filename, QFileInfo & = QFileInfo());
 
     /**
      * @brief Rename the file \a originFileName to \a destinationFileName.
      *
      * It behaves as QFile::rename() but handles .lnk files correctly on Windows.
      */
-    bool OCSYNC_EXPORT rename(const QString &originFileName,
+    bool OCSYNC_EXPORT rename(QString &originFileName,
         const QString &destinationFileName,
         QString *errorString = nullptr);
 
@@ -97,7 +95,7 @@ namespace FileSystem {
      * Rename the file \a originFileName to \a destinationFileName, and
      * overwrite the destination if it already exists - without extra checks.
      */
-    bool OCSYNC_EXPORT uncheckedRenameReplace(const QString &originFileName,
+    bool OCSYNC_EXPORT uncheckedRenameReplace(QString &originFileName,
         const QString &destinationFileName,
         QString *errorString);
 
@@ -107,12 +105,12 @@ namespace FileSystem {
      * Equivalent to QFile::remove(), except on Windows, where it will also
      * successfully remove read-only files.
      */
-    bool OCSYNC_EXPORT remove(const QString &fileName, QString *errorString = nullptr);
+    bool OCSYNC_EXPORT remove(QString &fileName, QString *errorString = nullptr);
 
     /**
      * Move the specified file or folder to the trash. (Only implemented on linux)
      */
-    bool OCSYNC_EXPORT moveToTrash(const QString &filename, QString *errorString);
+    bool OCSYNC_EXPORT moveToTrash(QString &filename, QString *errorString);
 
     /**
      * Replacement for QFile::open(ReadOnly) followed by a seek().
@@ -127,7 +125,7 @@ namespace FileSystem {
     /**
      * Returns the file system used at the given path.
      */
-    QString fileSystemForPath(const QString &path);
+    QString fileSystemForPath(QString &path);
 
     /*
      * This function takes a path and converts it to a UNC representation of the
@@ -140,28 +138,28 @@ namespace FileSystem {
      *  - A conversion is only done if the path len is larger than 245. Otherwise
      *    the windows API functions work with the normal "unixoid" representation too.
      */
-    QString OCSYNC_EXPORT pathtoUNC(const QString &str);
+    QString OCSYNC_EXPORT pathtoUNC(QString &str);
 #endif
 
     /**
      * Returns true when a file is locked. (Windows only)
      */
-    bool OCSYNC_EXPORT isFileLocked(const QString &fileName);
+    bool OCSYNC_EXPORT isFileLocked(QString &fileName);
 
     /**
      * Returns whether the file is a shortcut file (ends with .lnk)
      */
-    bool OCSYNC_EXPORT isLnkFile(const QString &filename);
+    bool OCSYNC_EXPORT isLnkFile(QString &filename);
 
     /**
      * Returns whether the file is an exclude file (contains patterns to exclude from sync)
      */
-    bool OCSYNC_EXPORT isExcludeFile(const QString &filename);
+    bool OCSYNC_EXPORT isExcludeFile(QString &filename);
 
     /**
      * Returns whether the file is a junction (windows only)
      */
-    bool OCSYNC_EXPORT isJunction(const QString &filename);
+    bool OCSYNC_EXPORT isJunction(QString &filename);
 }
 
 /** @} */

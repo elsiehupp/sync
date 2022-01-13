@@ -12,7 +12,6 @@
  * for more details.
  */
 
-
 // #include <QDialog>
 
 class QLineEdit;
@@ -25,7 +24,7 @@ namespace OCC {
  */
 class AuthenticationDialog : public QDialog {
 public:
-    AuthenticationDialog(const QString &realm, const QString &domain, QWidget *parent = nullptr);
+    AuthenticationDialog(QString &realm, QString &domain, QWidget *parent = nullptr);
 
     QString user() const;
     QString password() const;
@@ -34,7 +33,6 @@ private:
     QLineEdit *_user;
     QLineEdit *_password;
 };
-
 
 } // namespace OCC
 

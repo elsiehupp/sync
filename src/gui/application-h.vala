@@ -12,23 +12,12 @@
  * for more details.
  */
 
-
 // #include <QApplication>
 // #include <QPointer>
 // #include <QQueue>
 // #include <QTimer>
 // #include <QElapsedTimer>
 // #include <QNetworkConfigurationManager>
-
-#include "qtsingleapplication.h"
-
-#include "syncresult.h"
-#include "logbrowser.h"
-#include "owncloudgui.h"
-#include "connectionvalidator.h"
-#include "progressdispatcher.h"
-#include "clientproxy.h"
-#include "folderman.h"
 
 class QMessageBox;
 class QSystemTrayIcon;
@@ -75,13 +64,13 @@ public slots:
      * Will download a virtual file, and open the result.
      * The argument is the filename of the virtual file (including the extension)
      */
-    void openVirtualFile(const QString &filename);
+    void openVirtualFile(QString &filename);
 
     /// Attempt to show() the tray icon again. Used if no systray was available initially.
     void tryTrayAgain();
 
 protected:
-    void parseOptions(const QStringList &);
+    void parseOptions(QStringList &);
     void setupTranslations();
     void setupLogging();
     bool event(QEvent *event) override;
@@ -92,7 +81,7 @@ signals:
     void isShowingSettingsDialog();
 
 protected slots:
-    void slotParseMessage(const QString &, QObject *);
+    void slotParseMessage(QString &, QObject *);
     void slotCheckConnection();
     void slotUseMonoIconsChanged(bool);
     void slotCleanup();

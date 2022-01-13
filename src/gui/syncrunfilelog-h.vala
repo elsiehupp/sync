@@ -12,15 +12,12 @@
  * for more details.
  */
 
-
 // #include <QFile>
 // #include <QTextStream>
 // #include <QScopedPointer>
 // #include <QElapsedTimer>
 // #include <QStandardPaths>
 // #include <QDir>
-
-#include "syncfileitem.h"
 
 namespace OCC {
 class SyncFileItem;
@@ -32,14 +29,14 @@ class SyncFileItem;
 class SyncRunFileLog {
 public:
     SyncRunFileLog();
-    void start(const QString &folderPath);
-    void logItem(const SyncFileItem &item);
-    void logLap(const QString &name);
+    void start(QString &folderPath);
+    void logItem(SyncFileItem &item);
+    void logLap(QString &name);
     void finish();
 
 protected:
 private:
-    QString dateTimeStr(const QDateTime &dt);
+    QString dateTimeStr(QDateTime &dt);
 
     QScopedPointer<QFile> _file;
     QTextStream _out;

@@ -12,14 +12,10 @@
  * for more details.
  */
 
-
-#include "owncloudlib.h"
-
 class QString;
 
 namespace OCC {
 class AbstractCredentials;
-
 
 /**
  * @brief The HttpCredentialsGui namespace
@@ -27,7 +23,7 @@ class AbstractCredentials;
  */
 namespace CredentialsFactory {
 
-    AbstractCredentials *create(const QString &type);
+    AbstractCredentials *create(QString &type);
 
 } // ns CredentialsFactory
 

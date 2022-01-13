@@ -21,10 +21,6 @@
 // #include <QUrl>
 // #include <QPointer>
 
-#include "wizard/abstractcredswizardpage.h"
-#include "accountfwd.h"
-#include "creds/flow2auth.h"
-
 class QVBoxLayout;
 class QProgressIndicator;
 
@@ -45,12 +41,12 @@ public:
     bool isComplete() const override;
 
 public Q_SLOTS:
-    void slotFlow2AuthResult(Flow2Auth::Result, const QString &errorString, const QString &user, const QString &appPassword);
+    void slotFlow2AuthResult(Flow2Auth::Result, QString &errorString, QString &user, QString &appPassword);
     void slotPollNow();
     void slotStyleChanged();
 
 signals:
-    void connectToOCUrl(const QString &);
+    void connectToOCUrl(QString &);
     void pollNow();
     void styleChanged();
 

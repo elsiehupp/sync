@@ -27,7 +27,6 @@
 **
 ****************************************************************************/
 
-
 // #include <QFile>
 
 #if defined(Q_OS_WIN)
@@ -53,7 +52,7 @@ public:
     enum LockMode { NoLock = 0, ReadLock, WriteLock };
 
     QtLockedFile();
-    QtLockedFile(const QString &name);
+    QtLockedFile(QString &name);
     ~QtLockedFile() override;
 
     bool lock(LockMode mode, bool block = true);

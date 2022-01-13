@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#include "themeutils.h"
-
 FakePaintDevice::FakePaintDevice() = default;
 
 QPaintEngine *FakePaintDevice::paintEngine() const {

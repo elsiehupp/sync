@@ -13,16 +13,6 @@
  * for more details.
  */
 
-#include "account.h"
-#include "propagatedownloadencrypted.h"
-#include "propagatorjobs.h"
-#include "owncloudpropagator.h"
-#include "owncloudpropagator_p.h"
-#include "propagateremotemove.h"
-#include "common/utility.h"
-#include "common/syncjournaldb.h"
-#include "common/syncjournalfilerecord.h"
-#include "filesystem.h"
 // #include <qfile.h>
 // #include <qdir.h>
 // #include <qdiriterator.h>
@@ -34,14 +24,13 @@
 
 // #include <ctime>
 
-
 namespace OCC {
 
 Q_LOGGING_CATEGORY(lcPropagateLocalRemove, "nextcloud.sync.propagator.localremove", QtInfoMsg)
 Q_LOGGING_CATEGORY(lcPropagateLocalMkdir, "nextcloud.sync.propagator.localmkdir", QtInfoMsg)
 Q_LOGGING_CATEGORY(lcPropagateLocalRename, "nextcloud.sync.propagator.localrename", QtInfoMsg)
 
-QByteArray localFileIdFromFullId(const QByteArray &id) {
+QByteArray localFileIdFromFullId(QByteArray &id) {
     return id.left(8);
 }
 
@@ -53,13 +42,13 @@ QByteArray localFileIdFromFullId(const QByteArray &id) {
  *
  * \a path is relative to propagator()->_localDir + _item->_file and should start with a slash
  */
-bool PropagateLocalRemove::removeRecursively(const QString &path) {
+bool PropagateLocalRemove::removeRecursively(QString &path) {
     QString absolute = propagator()->fullLocalPath(_item->_file + path);
     QStringList errors;
     QList<QPair<QString, bool>> deleted;
     bool success = FileSystem::removeRecursively(
         absolute,
-        [&deleted](const QString &path, bool isDir) {
+        [&deleted](QString &path, bool isDir) {
             // by prepending, a folder deletion may be followed by content deletions
             deleted.prepend(qMakePair(path, isDir));
         },
@@ -69,7 +58,7 @@ bool PropagateLocalRemove::removeRecursively(const QString &path) {
         // We need to delete the entries from the database now from the deleted vector.
         // Do it while avoiding redundant delete calls to the journal.
         QString deletedDir;
-        foreach (const auto &it, deleted) {
+        foreach (auto &it, deleted) {
             if (!it.first.startsWith(propagator()->localPath()))
                 continue;
             if (!deletedDir.isEmpty() && it.first.startsWith(deletedDir))

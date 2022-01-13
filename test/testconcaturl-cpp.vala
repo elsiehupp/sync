@@ -10,8 +10,6 @@
 // #include <QUrl>
 // #include <QString>
 
-#include "account.h"
-
 using namespace OCC;
 
 using QueryItems = QList<QPair<QString, QString>>;

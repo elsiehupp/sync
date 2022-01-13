@@ -6,16 +6,13 @@
  */
 
 // #include <QtTest>
-#include "syncenginetestutils.h"
 // #include <syncengine.h>
 
 using namespace OCC;
 
-
 class TestSelectiveSync : public QObject {
 
 private slots:
-
 
     void testSelectiveSyncBigFolders() {
         FakeFolder fakeFolder { FileInfo::A12_B12_C12_S12() };
@@ -24,7 +21,7 @@ private slots:
         fakeFolder.syncEngine().setSyncOptions(options);
 
         QStringList sizeRequests;
-        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation, const QNetworkRequest &req, QIODevice *device)
+        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation, QNetworkRequest &req, QIODevice *device)
                                          -> QNetworkReply * {
             // Record what path we are querying for the size
             if (req.attribute(QNetworkRequest::CustomVerbAttribute) == "PROPFIND") {

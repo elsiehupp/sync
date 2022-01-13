@@ -12,13 +12,6 @@
  * for more details.
  */
 
-#include "account.h"
-#include "keychainchunk.h"
-#include "theme.h"
-#include "networkjobs.h"
-#include "configfile.h"
-#include "creds/abstractcredentials.h"
-
 // #include <QApplication>
 
 using namespace QKeychain;
@@ -103,7 +96,7 @@ void Job::setAutoDelete(bool autoDelete) {
 /*
 * WriteJob
 */
-WriteJob::WriteJob(Account *account, const QString &key, const QByteArray &data, QObject *parent)
+WriteJob::WriteJob(Account *account, QString &key, QByteArray &data, QObject *parent)
     : Job(parent) {
     _account = account;
     _key = key;
@@ -114,7 +107,7 @@ WriteJob::WriteJob(Account *account, const QString &key, const QByteArray &data,
     _chunkCount = 0;
 }
 
-WriteJob::WriteJob(const QString &key, const QByteArray &data, QObject *parent)
+WriteJob::WriteJob(QString &key, QByteArray &data, QObject *parent)
     : WriteJob(nullptr, key, data, parent) {
 #ifdef Q_OS_WIN
     jobKeyPrependAppName(_key);
@@ -221,7 +214,7 @@ void WriteJob::slotWriteJobDone(QKeychain::Job *incomingJob) {
 /*
 * ReadJob
 */
-ReadJob::ReadJob(Account *account, const QString &key, bool keychainMigration, QObject *parent)
+ReadJob::ReadJob(Account *account, QString &key, bool keychainMigration, QObject *parent)
     : Job(parent) {
     _account = account;
     _key = key;
@@ -232,7 +225,7 @@ ReadJob::ReadJob(Account *account, const QString &key, bool keychainMigration, Q
     _chunkBuffer.clear();
 }
 
-ReadJob::ReadJob(const QString &key, QObject *parent)
+ReadJob::ReadJob(QString &key, QObject *parent)
     : ReadJob(nullptr, key, false, parent) {
 #ifdef Q_OS_WIN
     jobKeyPrependAppName(_key);
@@ -351,7 +344,7 @@ void ReadJob::slotReadJobDone(QKeychain::Job *incomingJob) {
 /*
 * DeleteJob
 */
-DeleteJob::DeleteJob(Account *account, const QString &key, bool keychainMigration, QObject *parent)
+DeleteJob::DeleteJob(Account *account, QString &key, bool keychainMigration, QObject *parent)
     : Job(parent) {
     _account = account;
     _key = key;
@@ -359,7 +352,7 @@ DeleteJob::DeleteJob(Account *account, const QString &key, bool keychainMigratio
     _keychainMigration = keychainMigration;
 }
 
-DeleteJob::DeleteJob(const QString &key, QObject *parent)
+DeleteJob::DeleteJob(QString &key, QObject *parent)
     : DeleteJob(nullptr, key, false, parent) {
 #ifdef Q_OS_WIN
     jobKeyPrependAppName(_key);

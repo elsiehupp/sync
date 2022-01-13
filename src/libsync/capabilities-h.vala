@@ -12,10 +12,6 @@
  * for more details.
  */
 
-
-
-#include "owncloudlib.h"
-
 // #include <QVariantMap>
 // #include <QStringList>
 // #include <QMimeDatabase>
@@ -40,7 +36,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(PushNotificationTypes)
  */
 class OWNCLOUDSYNC_EXPORT Capabilities {
 public:
-    Capabilities(const QVariantMap &capabilities);
+    Capabilities(QVariantMap &capabilities);
 
     bool shareAPI() const;
     bool shareEmailPasswordEnabled() const;
@@ -160,8 +156,8 @@ public:
 
     // Direct Editing
     void addDirectEditor(DirectEditor* directEditor);
-    DirectEditor* getDirectEditorForMimetype(const QMimeType &mimeType);
-    DirectEditor* getDirectEditorForOptionalMimetype(const QMimeType &mimeType);
+    DirectEditor* getDirectEditorForMimetype(QMimeType &mimeType);
+    DirectEditor* getDirectEditorForOptionalMimetype(QMimeType &mimeType);
 
 private:
     QVariantMap _capabilities;
@@ -173,13 +169,13 @@ private:
 
 class OWNCLOUDSYNC_EXPORT DirectEditor : public QObject {
 public:
-    DirectEditor(const QString &id, const QString &name, QObject* parent = nullptr);
+    DirectEditor(QString &id, QString &name, QObject* parent = nullptr);
 
-    void addMimetype(const QByteArray &mimeType);
-    void addOptionalMimetype(const QByteArray &mimeType);
+    void addMimetype(QByteArray &mimeType);
+    void addOptionalMimetype(QByteArray &mimeType);
 
-    bool hasMimetype(const QMimeType &mimeType);
-    bool hasOptionalMimetype(const QMimeType &mimeType);
+    bool hasMimetype(QMimeType &mimeType);
+    bool hasOptionalMimetype(QMimeType &mimeType);
 
     QString id() const;
     QString name() const;

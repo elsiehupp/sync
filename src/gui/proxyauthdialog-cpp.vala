@@ -12,9 +12,6 @@
  * for more details.
  */
 
-#include "proxyauthdialog.h"
-#include "ui_proxyauthdialog.h"
-
 namespace OCC {
 
 ProxyAuthDialog::ProxyAuthDialog(QWidget *parent)
@@ -27,7 +24,7 @@ ProxyAuthDialog::~ProxyAuthDialog() {
     delete ui;
 }
 
-void ProxyAuthDialog::setProxyAddress(const QString &address) {
+void ProxyAuthDialog::setProxyAddress(QString &address) {
     ui->proxyAddress->setText(address);
 }
 

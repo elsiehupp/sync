@@ -12,11 +12,9 @@
  * for more details.
  */
 
-#include "iconjob.h"
-
 namespace OCC {
 
-IconJob::IconJob(AccountPtr account, const QUrl &url, QObject *parent)
+IconJob::IconJob(AccountPtr account, QUrl &url, QObject *parent)
     : QObject(parent) {
     QNetworkRequest request(url);
 #if (QT_VERSION >= 0x050600)

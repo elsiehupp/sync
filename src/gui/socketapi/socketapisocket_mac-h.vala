@@ -12,7 +12,6 @@
  * for more details.
  */
 
-
 // #include <QAbstractSocket>
 // #include <QIODevice>
 
@@ -25,7 +24,7 @@ public:
     ~SocketApiSocket();
 
     qint64 readData(char *data, qint64 maxlen) override;
-    qint64 writeData(const char *data, qint64 len) override;
+    qint64 writeData(char *data, qint64 len) override;
 
     bool isSequential() const override { return true; }
     qint64 bytesAvailable() const override;
@@ -47,10 +46,10 @@ public:
     ~SocketApiServer();
 
     void close();
-    bool listen(const QString &name);
+    bool listen(QString &name);
     SocketApiSocket *nextPendingConnection();
 
-    static bool removeServer(const QString &) { return false; }
+    static bool removeServer(QString &) { return false; }
 
 signals:
     void newConnection();

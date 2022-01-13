@@ -18,14 +18,10 @@
 // #include <cloudprovidersaccountexporter.h>
 // #include <cloudprovidersproviderexporter.h>
 
-#include "cloudproviderwrapper.h"
 // #include <account.h>
 // #include <folder.h>
 // #include <accountstate.h>
 // #include <QDesktopServices>
-#include "openfilemanager.h"
-#include "owncloudgui.h"
-#include "application.h"
 
 using namespace OCC;
 
@@ -51,7 +47,7 @@ CloudProviderWrapper::CloudProviderWrapper(QObject *parent, Folder *folder, int 
 
     connect(ProgressDispatcher::instance(), SIGNAL(progressInfo(QString, ProgressInfo)), this, SLOT(slotUpdateProgress(QString, ProgressInfo)));
     connect(_folder, SIGNAL(syncStarted()), this, SLOT(slotSyncStarted()));
-    connect(_folder, SIGNAL(syncFinished(SyncResult)), this, SLOT(slotSyncFinished(const SyncResult)));
+    connect(_folder, SIGNAL(syncFinished(SyncResult)), this, SLOT(slotSyncFinished(SyncResult)));
     connect(_folder, SIGNAL(syncPausedChanged(Folder*,bool)), this, SLOT(slotSyncPausedChanged(Folder*, bool)));
 
     _paused = _folder->syncPaused();
@@ -71,21 +67,21 @@ CloudProvidersAccountExporter* CloudProviderWrapper::accountExporter() {
     return _cloudProviderAccount;
 }
 
-static bool shouldShowInRecentsMenu(const SyncFileItem &item) {
+static bool shouldShowInRecentsMenu(SyncFileItem &item) {
     return !Progress::isIgnoredKind(item._status)
             && item._instruction != CSYNC_INSTRUCTION_EVAL
             && item._instruction != CSYNC_INSTRUCTION_NONE;
 }
 
-static GMenuItem *menu_item_new(const QString &label, const gchar *detailed_action) {
+static GMenuItem *menu_item_new(QString &label, gchar *detailed_action) {
     return g_menu_item_new(label.toUtf8 ().data(), detailed_action);
 }
 
-static GMenuItem *menu_item_new_submenu(const QString &label, GMenuModel *submenu) {
+static GMenuItem *menu_item_new_submenu(QString &label, GMenuModel *submenu) {
     return g_menu_item_new_submenu(label.toUtf8 ().data(), submenu);
 }
 
-void CloudProviderWrapper::slotUpdateProgress(const QString &folder, const ProgressInfo &progress) {
+void CloudProviderWrapper::slotUpdateProgress(QString &folder, ProgressInfo &progress) {
     // Only update progress for the current folder
     Folder *f = FolderMan::instance()->folder(folder);
     if (f != _folder)
@@ -183,7 +179,7 @@ void CloudProviderWrapper::slotSyncStarted() {
     cloud_providers_account_exporter_set_status(_cloudProviderAccount, CLOUD_PROVIDERS_ACCOUNT_STATUS_SYNCING);
 }
 
-void CloudProviderWrapper::slotSyncFinished(const SyncResult &result) { {f (result.status() == result.Success || result.status() == result.Problem)
+void CloudProviderWrapper::slotSyncFinished(SyncResult &result) { {f (result.status() == result.Success || result.status() == result.Problem)
     {
         cloud_providers_account_exporter_set_status(_cloudProviderAccount, CLOUD_PROVIDERS_ACCOUNT_STATUS_IDLE);
         updateStatusText(result.statusString());

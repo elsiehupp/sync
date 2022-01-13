@@ -18,19 +18,12 @@
 // #include <QClipboard>
 // #include <QTimer>
 // #include <QBuffer>
-#include "account.h"
-#include "flow2auth.h"
 // #include <QJsonObject>
 // #include <QJsonDocument>
-#include "theme.h"
-#include "networkjobs.h"
-#include "configfile.h"
-#include "guiutility.h"
 
 namespace OCC {
 
 Q_LOGGING_CATEGORY(lcFlow2auth, "nextcloud.sync.credentials.flow2auth", QtInfoMsg)
-
 
 Flow2Auth::Flow2Auth(Account *account, QObject *parent)
     : QObject(parent)
@@ -62,7 +55,7 @@ void Flow2Auth::copyLinkToClipboard() {
     fetchNewToken(TokenAction::actionCopyLinkToClipboard);
 }
 
-void Flow2Auth::fetchNewToken(const TokenAction action) {
+void Flow2Auth::fetchNewToken(TokenAction action) {
     if(_isBusy)
         return;
 
@@ -124,7 +117,6 @@ void Flow2Auth::fetchNewToken(const TokenAction action) {
             return;
         }
 
-
         _loginUrl = loginUrl;
 
         if (_account->isUsernamePrefillSupported()) {
@@ -139,7 +131,6 @@ void Flow2Auth::fetchNewToken(const TokenAction action) {
         _pollToken = pollToken;
         _pollEndpoint = pollEndpoint;
 
-
         // Start polling
         ConfigFile cfg;
         std::chrono::milliseconds polltime = cfg.remotePollInterval();
@@ -151,7 +142,6 @@ void Flow2Auth::fetchNewToken(const TokenAction action) {
         if(!_pollTimer.isActive()) {
             _pollTimer.start();
         }
-
 
         switch(action) {
         case actionOpenBrowser:

@@ -21,7 +21,7 @@
 
 namespace OCC {
 
-static void setupFavLink_private(const QString &folder) {
+static void setupFavLink_private(QString &folder) {
     // Finder: Place under "Places"/"Favorites" on the left sidebar
     CFStringRef folderCFStr = CFStringCreateWithCString(0, folder.toUtf8().data(), kCFStringEncodingUTF8);
     CFURLRef urlRef = CFURLCreateWithFileSystemPath(0, folderCFStr, kCFURLPOSIXPathStyle, true);
@@ -40,11 +40,11 @@ static void setupFavLink_private(const QString &folder) {
     CFRelease(urlRef);
 }
 
-static void removeFavLink_private(const QString &folder) {
+static void removeFavLink_private(QString &folder) {
     Q_UNUSED(folder)
 }
 
-bool hasLaunchOnStartup_private(const QString &) {
+bool hasLaunchOnStartup_private(QString &) {
     // this is quite some duplicate code with setLaunchOnStartup, at some point we should fix this FIXME.
     bool returnValue = false;
     QString filePath = QDir(QCoreApplication::applicationDirPath() + QLatin1String("/../..")).absolutePath();
@@ -76,7 +76,7 @@ bool hasLaunchOnStartup_private(const QString &) {
     return returnValue;
 }
 
-void setLaunchOnStartup_private(const QString &appName, const QString &guiName, bool enable) {
+void setLaunchOnStartup_private(QString &appName, QString &guiName, bool enable) {
     Q_UNUSED(appName)
     Q_UNUSED(guiName)
     QString filePath = QDir(QCoreApplication::applicationDirPath() + QLatin1String("/../..")).absolutePath();

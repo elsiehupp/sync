@@ -12,10 +12,6 @@
  * for more details.
  */
 
-#include "unifiedsearchresultimageprovider.h"
-
-#include "usermodel.h"
-
 // #include <QImage>
 // #include <QPainter>
 // #include <QSvgRenderer>
@@ -23,7 +19,7 @@
 namespace {
 class AsyncImageResponse : public QQuickImageResponse {
 public:
-    AsyncImageResponse(const QString &id, const QSize &requestedSize) {
+    AsyncImageResponse(QString &id, QSize &requestedSize) {
         if (id.isEmpty()) {
             setImageAndEmitFinished();
             return;
@@ -39,7 +35,7 @@ public:
         }
     }
 
-    void setImageAndEmitFinished(const QImage &image = {}) {
+    void setImageAndEmitFinished(QImage &image = {}) {
         _image = image;
         emit finished();
     }
@@ -117,7 +113,7 @@ private slots:
 
 namespace OCC {
 
-QQuickImageResponse *UnifiedSearchResultImageProvider::requestImageResponse(const QString &id, const QSize &requestedSize) {
+QQuickImageResponse *UnifiedSearchResultImageProvider::requestImageResponse(QString &id, QSize &requestedSize) {
     return new AsyncImageResponse(id, requestedSize);
 }
 

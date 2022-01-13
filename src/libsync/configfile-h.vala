@@ -12,8 +12,6 @@
  * for more details.
  */
 
-
-#include "owncloudlib.h"
 // #include <memory>
 // #include <QSharedPointer>
 // #include <QSettings>
@@ -58,20 +56,20 @@ public:
 
     // the certs do not depend on a connection.
     QByteArray caCerts();
-    void setCaCerts(const QByteArray &);
+    void setCaCerts(QByteArray &);
 
-    bool passwordStorageAllowed(const QString &connection = QString());
+    bool passwordStorageAllowed(QString &connection = QString());
 
     /* Server poll interval in milliseconds */
-    std::chrono::milliseconds remotePollInterval(const QString &connection = QString()) const;
+    std::chrono::milliseconds remotePollInterval(QString &connection = QString()) const;
     /* Set poll interval. Value in milliseconds has to be larger than 5000 */
-    void setRemotePollInterval(std::chrono::milliseconds interval, const QString &connection = QString());
+    void setRemotePollInterval(std::chrono::milliseconds interval, QString &connection = QString());
 
     /* Interval to check for new notifications */
-    std::chrono::milliseconds notificationRefreshInterval(const QString &connection = QString()) const;
+    std::chrono::milliseconds notificationRefreshInterval(QString &connection = QString()) const;
 
     /* Force sync interval, in milliseconds */
-    std::chrono::milliseconds forceSyncInterval(const QString &connection = QString()) const;
+    std::chrono::milliseconds forceSyncInterval(QString &connection = QString()) const;
 
     /**
      * Interval in milliseconds within which full local discovery is required
@@ -93,7 +91,7 @@ public:
     void setAutomaticLogDir(bool enabled);
 
     QString logDir() const;
-    void setLogDir(const QString &dir);
+    void setLogDir(QString &dir);
 
     bool logDebug() const;
     void setLogDebug(bool enabled);
@@ -144,7 +142,7 @@ public:
 
     bool showMainDialogAsNormalWindow() const;
 
-    static bool setConfDir(const QString &value);
+    static bool setConfDir(QString &value);
 
     bool optionalServerNotifications() const;
     void setOptionalServerNotifications(bool show);
@@ -162,15 +160,15 @@ public:
     void restoreGeometry(QWidget *w);
 
     // how often the check about new versions runs
-    std::chrono::milliseconds updateCheckInterval(const QString &connection = QString()) const;
+    std::chrono::milliseconds updateCheckInterval(QString &connection = QString()) const;
 
     // skipUpdateCheck completely disables the updater and hides its UI
-    bool skipUpdateCheck(const QString &connection = QString()) const;
-    void setSkipUpdateCheck(bool, const QString &);
+    bool skipUpdateCheck(QString &connection = QString()) const;
+    void setSkipUpdateCheck(bool, QString &);
 
     // autoUpdateCheck allows the user to make the choice in the UI
-    bool autoUpdateCheck(const QString &connection = QString()) const;
-    void setAutoUpdateCheck(bool, const QString &);
+    bool autoUpdateCheck(QString &connection = QString()) const;
+    void setAutoUpdateCheck(bool, QString &);
 
     /** Query-parameter 'updatesegment' for the update check, value between 0 and 99.
         Used to throttle down desktop release rollout in order to keep the update servers alive at peak times.
@@ -178,39 +176,39 @@ public:
     int updateSegment() const;
 
     QString updateChannel() const;
-    void setUpdateChannel(const QString &channel);
+    void setUpdateChannel(QString &channel);
 
     void saveGeometryHeader(QHeaderView *header);
     void restoreGeometryHeader(QHeaderView *header);
 
     QString certificatePath() const;
-    void setCertificatePath(const QString &cPath);
+    void setCertificatePath(QString &cPath);
     QString certificatePasswd() const;
-    void setCertificatePasswd(const QString &cPasswd);
+    void setCertificatePasswd(QString &cPasswd);
 
     /** The client version that last used this settings file.
         Updated by configVersionMigration() at client startup. */
     QString clientVersionString() const;
-    void setClientVersionString(const QString &version);
+    void setClientVersionString(QString &version);
 
     /**  Returns a new settings pre-set in a specific group.  The Settings will be created
          with the given parent. If no parent is specified, the caller must destroy the settings */
-    static std::unique_ptr<QSettings> settingsWithGroup(const QString &group, QObject *parent = nullptr);
+    static std::unique_ptr<QSettings> settingsWithGroup(QString &group, QObject *parent = nullptr);
 
     /// Add the system and user exclude file path to the ExcludedFiles instance.
     static void setupDefaultExcludeFilePaths(ExcludedFiles &excludedFiles);
 
 protected:
-    QVariant getPolicySetting(const QString &policy, const QVariant &defaultValue = QVariant()) const;
-    void storeData(const QString &group, const QString &key, const QVariant &value);
-    QVariant retrieveData(const QString &group, const QString &key) const;
-    void removeData(const QString &group, const QString &key);
-    bool dataExists(const QString &group, const QString &key) const;
+    QVariant getPolicySetting(QString &policy, QVariant &defaultValue = QVariant()) const;
+    void storeData(QString &group, QString &key, QVariant &value);
+    QVariant retrieveData(QString &group, QString &key) const;
+    void removeData(QString &group, QString &key);
+    bool dataExists(QString &group, QString &key) const;
 
 private:
-    QVariant getValue(const QString &param, const QString &group = QString(),
+    QVariant getValue(QString &param, QString &group = QString(),
         const QVariant &defaultValue = QVariant()) const;
-    void setValue(const QString &key, const QVariant &value);
+    void setValue(QString &key, QVariant &value);
 
     QString keychainProxyPasswordKey() const;
 

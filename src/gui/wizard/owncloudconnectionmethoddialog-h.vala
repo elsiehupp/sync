@@ -13,10 +13,7 @@
  * for more details.
  */
 
-
 // #include <QDialog>
-
-#include "ui_owncloudconnectionmethoddialog.h"
 
 namespace OCC {
 
@@ -41,7 +38,7 @@ public:
     };
 
     // The URL that was tried
-    void setUrl(const QUrl &);
+    void setUrl(QUrl &);
 
 public slots:
     void returnNoTLS();

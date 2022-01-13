@@ -4,9 +4,6 @@
  *
  * See http://burtleburtle.net/bob/hash/evahash.html
  */
-#include "torture.h"
-
-#include "common/c_jhash.h"
 
 #define HASHSTATE 1
 #define HASHLEN   1

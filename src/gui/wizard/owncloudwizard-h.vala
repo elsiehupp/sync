@@ -13,15 +13,10 @@
  * for more details.
  */
 
-
 // #include <QWizard>
 // #include <QLoggingCategory>
 // #include <QSslKey>
 // #include <QSslCertificate>
-
-#include "networkjobs.h"
-#include "wizard/owncloudwizardcommon.h"
-#include "accountfwd.h"
 
 namespace OCC {
 
@@ -53,7 +48,7 @@ public:
 
     void setAccount(AccountPtr account);
     AccountPtr account() const;
-    void setOCUrl(const QString &);
+    void setOCUrl(QString &);
     bool registration();
     void setRegistration(bool registration);
 
@@ -64,7 +59,7 @@ public:
     bool useVirtualFileSync() const;
     bool isConfirmBigFolderChecked() const;
 
-    void displayError(const QString &, bool retryHTTPonly);
+    void displayError(QString &, bool retryHTTPonly);
     AbstractCredentials *getCredentials() const;
 
     void bringToTop();
@@ -75,7 +70,7 @@ public:
      * being experimental. Calles the callback with true if enabling was
      * chosen.
      */
-    static void askExperimentalVirtualFilesFeature(QWidget *receiver, const std::function<void(bool enable)> &callback);
+    static void askExperimentalVirtualFilesFeature(QWidget *receiver, std::function<void(bool enable)> &callback);
 
     // FIXME: Can those be local variables?
     // Set from the OwncloudSetupPage, later used from OwncloudHttpCredsPage
@@ -87,16 +82,16 @@ public:
 
 public slots:
     void setAuthType(DetermineAuthTypeJob::AuthType type);
-    void setRemoteFolder(const QString &);
-    void appendToConfigurationLog(const QString &msg, LogType type = LogParagraph);
+    void setRemoteFolder(QString &);
+    void appendToConfigurationLog(QString &msg, LogType type = LogParagraph);
     void slotCurrentPageChanged(int);
     void successfulStep();
 
 signals:
     void clearPendingRequests();
-    void determineAuthType(const QString &);
-    void connectToOCUrl(const QString &);
-    void createLocalAndRemoteFolders(const QString &, const QString &);
+    void determineAuthType(QString &);
+    void connectToOCUrl(QString &);
+    void createLocalAndRemoteFolders(QString &, QString &);
     // make sure to connect to this, rather than finished(int)!!
     void basicSetupFinished(int);
     void skipFolderConfiguration();
@@ -110,7 +105,7 @@ protected:
 private:
     void customizeStyle();
     void adjustWizardSize();
-    int calculateLongestSideOfWizardPages(const QList<QSize> &pageSizes) const;
+    int calculateLongestSideOfWizardPages(QList<QSize> &pageSizes) const;
     QList<QSize> calculateWizardPageSizes() const;
 
     AccountPtr _account;

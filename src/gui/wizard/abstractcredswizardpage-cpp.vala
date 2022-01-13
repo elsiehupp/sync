@@ -12,12 +12,6 @@
  * for more details.
  */
 
-#include "creds/abstractcredentials.h"
-#include "creds/credentialsfactory.h"
-#include "account.h"
-#include "wizard/owncloudwizard.h"
-
-#include "wizard/abstractcredswizardpage.h"
 // #include <accountmanager.h>
 
 namespace OCC {

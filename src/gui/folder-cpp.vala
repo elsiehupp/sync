@@ -13,29 +13,6 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
  */
-#include "config.h"
-
-#include "account.h"
-#include "accountmanager.h"
-#include "accountstate.h"
-#include "folder.h"
-#include "folderman.h"
-#include "logger.h"
-#include "configfile.h"
-#include "networkjobs.h"
-#include "common/syncjournalfilerecord.h"
-#include "syncresult.h"
-#include "clientproxy.h"
-#include "syncengine.h"
-#include "syncrunfilelog.h"
-#include "socketapi/socketapi.h"
-#include "theme.h"
-#include "filesystem.h"
-#include "localdiscoverytracker.h"
-#include "csync_exclude.h"
-#include "common/vfs.h"
-#include "creds/abstractcredentials.h"
-#include "settingsdialog.h"
 
 // #include <QTimer>
 // #include <QUrl>
@@ -52,7 +29,7 @@ namespace OCC {
 
 Q_LOGGING_CATEGORY(lcFolder, "nextcloud.gui.folder", QtInfoMsg)
 
-Folder::Folder(const FolderDefinition &definition,
+Folder::Folder(FolderDefinition &definition,
     AccountState *accountState, std::unique_ptr<Vfs> vfs,
     QObject *parent)
     : QObject(parent)
@@ -216,7 +193,6 @@ QString Folder::shortGuiLocalPath() const {
     return QDir::toNativeSeparators(p);
 }
 
-
 bool Folder::ignoreHiddenFiles() {
     bool re(_definition.ignoreHiddenFiles);
     return re;
@@ -330,7 +306,7 @@ void Folder::slotRunEtagJob() {
     // The _requestEtagJob is auto deleting itself on finish. Our guard pointer _requestEtagJob will then be null.
 }
 
-void Folder::etagRetrieved(const QByteArray &etag, const QDateTime &tp) {
+void Folder::etagRetrieved(QByteArray &etag, QDateTime &tp) {
     // re-enable sync if it was disabled because network was down
     FolderMan::instance()->setSyncEnabled(true);
 
@@ -343,12 +319,11 @@ void Folder::etagRetrieved(const QByteArray &etag, const QDateTime &tp) {
     _accountState->tagLastSuccessfullETagRequest(tp);
 }
 
-void Folder::etagRetrievedFromSyncEngine(const QByteArray &etag, const QDateTime &time) {
+void Folder::etagRetrievedFromSyncEngine(QByteArray &etag, QDateTime &time) {
     qCInfo(lcFolder) << "Root etag from during sync:" << etag;
     accountState()->tagLastSuccessfullETagRequest(time);
     _lastEtag = etag;
 }
-
 
 void Folder::showSyncResultPopup() {
     if (_syncResult.firstItemNew()) {
@@ -387,7 +362,7 @@ void Folder::showSyncResultPopup() {
     qCInfo(lcFolder) << "Folder" << _syncResult.folder() << "sync result: " << _syncResult.status();
 }
 
-void Folder::createGuiLog(const QString &filename, LogStatus status, int count,
+void Folder::createGuiLog(QString &filename, LogStatus status, int count,
     const QString &renameTarget) {
     if (count > 0) {
         Logger *logger = Logger::instance();
@@ -499,7 +474,7 @@ int Folder::slotDiscardDownloadProgress() {
     QSet<QString> keep_nothing;
     const QVector<SyncJournalDb::DownloadInfo> deleted_infos =
         _journal.getAndDeleteStaleDownloadInfos(keep_nothing);
-    for (const auto &deleted_info : deleted_infos) {
+    for (auto &deleted_info : deleted_infos) {
         const QString tmppath = folderpath.filePath(deleted_info._tmpfile);
         qCInfo(lcFolder) << "Deleting temporary file: " << tmppath;
         FileSystem::remove(tmppath);
@@ -519,7 +494,7 @@ int Folder::slotWipeErrorBlacklist() {
     return _journal.wipeErrorBlacklist();
 }
 
-void Folder::slotWatchedPathChanged(const QString &path, ChangeReason reason) {
+void Folder::slotWatchedPathChanged(QString &path, ChangeReason reason) {
     if (!path.startsWith(this->path())) {
         qCDebug(lcFolder) << "Changed path is not contained in folder, ignoring:" << path;
         return;
@@ -548,7 +523,6 @@ void Folder::slotWatchedPathChanged(const QString &path, ChangeReason reason) {
         return;
     }
 #endif
-
 
     SyncJournalFileRecord record;
     _journal.getFileRecord(relativePathBytes, &record);
@@ -581,7 +555,7 @@ void Folder::slotWatchedPathChanged(const QString &path, ChangeReason reason) {
     scheduleThisFolderSoon();
 }
 
-void Folder::implicitlyHydrateFile(const QString &relativepath) {
+void Folder::implicitlyHydrateFile(QString &relativepath) {
     qCInfo(lcFolder) << "Implicitly hydrate virtual file:" << relativepath;
 
     // Set in the database that we should download the file
@@ -677,7 +651,7 @@ void Folder::saveToSettings() const {
 
     // True if the folder path appears in only one account
     const auto folderMap = FolderMan::instance()->map();
-    const auto oneAccountOnly = std::none_of(folderMap.cbegin(), folderMap.cend(), [this](const auto *other) {
+    const auto oneAccountOnly = std::none_of(folderMap.cbegin(), folderMap.cend(), [this](auto *other) {
         return other != this && other->cleanPath() == this->cleanPath();
     });
 
@@ -719,11 +693,11 @@ void Folder::removeFromSettings() const {
     settings->remove(FolderMan::escapeAlias(_definition.alias));
 }
 
-bool Folder::isFileExcludedAbsolute(const QString &fullPath) const {
+bool Folder::isFileExcludedAbsolute(QString &fullPath) const {
     return _engine->excludedFiles().isExcluded(fullPath, path(), _definition.ignoreHiddenFiles);
 }
 
-bool Folder::isFileExcludedRelative(const QString &relativePath) const {
+bool Folder::isFileExcludedRelative(QString &relativePath) const {
     return _engine->excludedFiles().isExcluded(path() + relativePath, path(), _definition.ignoreHiddenFiles);
 }
 
@@ -774,7 +748,7 @@ bool Folder::reloadExcludes() {
     return _engine->excludedFiles().reloadExcludeFiles();
 }
 
-void Folder::startSync(const QStringList &pathList) {
+void Folder::startSync(QStringList &pathList) {
     Q_UNUSED(pathList)
 
     if (isBusy()) {
@@ -891,12 +865,12 @@ void Folder::setDirtyNetworkLimits() {
     _engine->setNetworkLimits(uploadLimit, downloadLimit);
 }
 
-void Folder::slotSyncError(const QString &message, ErrorCategory category) {
+void Folder::slotSyncError(QString &message, ErrorCategory category) {
     _syncResult.appendErrorString(message);
     emit ProgressDispatcher::instance()->syncError(alias(), message, category);
 }
 
-void Folder::slotAddErrorToGui(SyncFileItem::Status status, const QString &errorMessage, const QString &subject) {
+void Folder::slotAddErrorToGui(SyncFileItem::Status status, QString &errorMessage, QString &subject) {
     emit ProgressDispatcher::instance()->addErrorToGui(alias(), status, errorMessage, subject);
 }
 
@@ -956,7 +930,6 @@ void Folder::slotSyncFinished(bool success) {
         }
     }
 
-
     emit syncStateChange();
 
     // The syncFinished result that is to be triggered here makes the folderman
@@ -1005,13 +978,13 @@ void Folder::slotEmitFinishedDelayed() {
 
 // the progress comes without a folder and the valid path set. Add that here
 // and hand the result over to the progress dispatcher.
-void Folder::slotTransmissionProgress(const ProgressInfo &pi) {
+void Folder::slotTransmissionProgress(ProgressInfo &pi) {
     emit progressInfo(pi);
     ProgressDispatcher::instance()->setProgressInfo(alias(), pi);
 }
 
 // a item is completed: count the errors and forward to the ProgressDispatcher
-void Folder::slotItemCompleted(const SyncFileItemPtr &item) {
+void Folder::slotItemCompleted(SyncFileItemPtr &item) {
     if (item->_instruction == CSYNC_INSTRUCTION_NONE || item->_instruction == CSYNC_INSTRUCTION_UPDATE_METADATA) {
         // We only care about the updates that deserve to be shown in the UI
         return;
@@ -1023,7 +996,7 @@ void Folder::slotItemCompleted(const SyncFileItemPtr &item) {
     emit ProgressDispatcher::instance()->itemCompleted(alias(), item);
 }
 
-void Folder::slotNewBigFolderDiscovered(const QString &newF, bool isExternal) {
+void Folder::slotNewBigFolderDiscovered(QString &newF, bool isExternal) {
     auto newFolder = newF;
     if (!newFolder.endsWith(QLatin1Char('/'))) {
         newFolder += QLatin1Char('/');
@@ -1071,11 +1044,11 @@ void Folder::slotNextSyncFullLocalDiscovery() {
     _timeSinceLastFullLocalDiscovery.invalidate();
 }
 
-void Folder::schedulePathForLocalDiscovery(const QString &relativePath) {
+void Folder::schedulePathForLocalDiscovery(QString &relativePath) {
     _localDiscoveryTracker->addTouchedPath(relativePath.toUtf8());
 }
 
-void Folder::slotFolderConflicts(const QString &folder, const QStringList &conflictPaths) {
+void Folder::slotFolderConflicts(QString &folder, QStringList &conflictPaths) {
     if (folder != _definition.alias)
         return;
     auto &r = _syncResult;
@@ -1085,7 +1058,7 @@ void Folder::slotFolderConflicts(const QString &folder, const QStringList &confl
         r.setNumOldConflictItems(conflictPaths.size() - r.numNewConflictItems());
 }
 
-void Folder::warnOnNewExcludedItem(const SyncJournalFileRecord &record, const QStringRef &path) {
+void Folder::warnOnNewExcludedItem(SyncJournalFileRecord &record, QStringRef &path) {
     // Never warn for items in the database
     if (record.isValid())
         return;
@@ -1116,7 +1089,7 @@ void Folder::warnOnNewExcludedItem(const SyncJournalFileRecord &record, const QS
     Logger::instance()->postOptionalGuiLog(Theme::instance()->appNameGUI(), message);
 }
 
-void Folder::slotWatcherUnreliable(const QString &message) {
+void Folder::slotWatcherUnreliable(QString &message) {
     qCWarning(lcFolder) << "Folder watcher for" << path() << "became unreliable:" << message;
     auto fullMessage =
         tr("Changes in synchronized folders could not be tracked reliably.\n"
@@ -1169,7 +1142,7 @@ void Folder::registerFolderWatcher() {
 
     _folderWatcher.reset(new FolderWatcher(this));
     connect(_folderWatcher.data(), &FolderWatcher::pathChanged,
-        this, [this](const QString &path) { slotWatchedPathChanged(path, Folder::ChangeReason::Other); });
+        this, [this](QString &path) { slotWatchedPathChanged(path, Folder::ChangeReason::Other); });
     connect(_folderWatcher.data(), &FolderWatcher::lostChanges,
         this, &Folder::slotNextSyncFullLocalDiscovery);
     connect(_folderWatcher.data(), &FolderWatcher::becameUnreliable,
@@ -1221,11 +1194,11 @@ void Folder::slotAboutToRemoveAllFiles(SyncFileItem::Direction dir, std::functio
     msgBox->open();
 }
 
-QString Folder::fileFromLocalPath(const QString &localPath) const {
+QString Folder::fileFromLocalPath(QString &localPath) const {
     return localPath.mid(cleanPath().length() + 1);
 }
 
-void FolderDefinition::save(QSettings &settings, const FolderDefinition &folder) {
+void FolderDefinition::save(QSettings &settings, FolderDefinition &folder) {
     settings.setValue(QLatin1String("localPath"), folder.localPath);
     settings.setValue(QLatin1String("journalPath"), folder.journalPath);
     settings.setValue(QLatin1String("targetPath"), folder.targetPath);
@@ -1248,7 +1221,7 @@ void FolderDefinition::save(QSettings &settings, const FolderDefinition &folder)
         settings.remove(QLatin1String("navigationPaneClsid"));
 }
 
-bool FolderDefinition::load(QSettings &settings, const QString &alias,
+bool FolderDefinition::load(QSettings &settings, QString &alias,
     FolderDefinition *folder) {
     folder->alias = FolderMan::unescapeAlias(alias);
     folder->localPath = settings.value(QLatin1String("localPath")).toString();
@@ -1283,7 +1256,7 @@ bool FolderDefinition::load(QSettings &settings, const QString &alias,
     return true;
 }
 
-QString FolderDefinition::prepareLocalPath(const QString &path) {
+QString FolderDefinition::prepareLocalPath(QString &path) {
     QString p = QDir::fromNativeSeparators(path);
     if (!p.endsWith(QLatin1Char('/'))) {
         p.append(QLatin1Char('/'));
@@ -1291,7 +1264,7 @@ QString FolderDefinition::prepareLocalPath(const QString &path) {
     return p;
 }
 
-QString FolderDefinition::prepareTargetPath(const QString &path) {
+QString FolderDefinition::prepareTargetPath(QString &path) {
     QString p = path;
     if (p.endsWith(QLatin1Char('/'))) {
         p.chop(1);
@@ -1311,6 +1284,5 @@ QString FolderDefinition::absoluteJournalPath() const {
 QString FolderDefinition::defaultJournalPath(AccountPtr account) {
     return SyncJournalDb::makeDbName(localPath, account->url(), targetPath, account->credentials()->user());
 }
-
 
 } // namespace OCC

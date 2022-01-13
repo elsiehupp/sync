@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#include "httplogger.h"
-
 // #include <QRegularExpression>
 // #include <QLoggingCategory>
 // #include <QBuffer>
@@ -27,12 +25,12 @@ const QByteArray XRequestId(){
     return QByteArrayLiteral("X-Request-ID");
 }
 
-bool isTextBody(const QString &s) {
+bool isTextBody(QString &s) {
     static const QRegularExpression regexp(QStringLiteral("^(text/.*|(application/(xml|json|x-www-form-urlencoded)(;|$)))"));
     return regexp.match(s).hasMatch();
 }
 
-void logHttp(const QByteArray &verb, const QString &url, const QByteArray &id, const QString &contentType, const QList<QNetworkReply::RawHeaderPair> &header, QIODevice *device) {
+void logHttp(QByteArray &verb, QString &url, QByteArray &id, QString &contentType, QList<QNetworkReply::RawHeaderPair> &header, QIODevice *device) {
     const auto reply = qobject_cast<QNetworkReply *>(device);
     const auto contentLength = device ? device->size() : 0;
     QString msg;
@@ -48,7 +46,7 @@ void logHttp(const QByteArray &verb, const QString &url, const QByteArray &id, c
         stream << " " << reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     }
     stream << " " << url << " Header: { ";
-    for (const auto &it : header) {
+    for (auto &it : header) {
         stream << it.first << ": ";
         if (it.first == "Authorization") {
             stream << (it.second.startsWith("Bearer ") ? "Bearer" : "Basic");
@@ -80,7 +78,6 @@ void logHttp(const QByteArray &verb, const QString &url, const QByteArray &id, c
 }
 }
 
-
 namespace OCC {
 
 void HttpLogger::logRequest(QNetworkReply *reply, QNetworkAccessManager::Operation operation, QIODevice *device) {
@@ -91,7 +88,7 @@ void HttpLogger::logRequest(QNetworkReply *reply, QNetworkAccessManager::Operati
     const auto keys = request.rawHeaderList();
     QList<QNetworkReply::RawHeaderPair> header;
     header.reserve(keys.size());
-    for (const auto &key : keys) {
+    for (auto &key : keys) {
         header << qMakePair(key, request.rawHeader(key));
     }
     logHttp(requestVerb(operation, request),
@@ -111,7 +108,7 @@ void HttpLogger::logRequest(QNetworkReply *reply, QNetworkAccessManager::Operati
     });
 }
 
-QByteArray HttpLogger::requestVerb(QNetworkAccessManager::Operation operation, const QNetworkRequest &request) {
+QByteArray HttpLogger::requestVerb(QNetworkAccessManager::Operation operation, QNetworkRequest &request) {
     switch (operation) {
     case QNetworkAccessManager::HeadOperation:
         return QByteArrayLiteral("HEAD");

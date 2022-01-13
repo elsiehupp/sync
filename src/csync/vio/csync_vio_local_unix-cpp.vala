@@ -28,13 +28,6 @@
 
 // #include <memory>
 
-#include "c_private.h"
-#include "c_lib.h"
-#include "csync.h"
-
-#include "vio/csync_vio_local.h"
-#include "common/vfs.h"
-
 // #include <QtCore/QLoggingCategory>
 // #include <QtCore/QFile>
 
@@ -49,9 +42,9 @@ struct csync_vio_handle_t {
   QByteArray path;
 };
 
-static int _csync_vio_local_stat_mb(const mbchar_t *wuri, csync_file_stat_t *buf);
+static int _csync_vio_local_stat_mb(mbchar_t *wuri, csync_file_stat_t *buf);
 
-csync_vio_handle_t *csync_vio_local_opendir(const QString &name) {
+csync_vio_handle_t *csync_vio_local_opendir(QString &name) {
     QScopedPointer<csync_vio_handle_t> handle(new csync_vio_handle_t{});
 
     auto dirname = QFile::encodeName(name);
@@ -131,12 +124,11 @@ std::unique_ptr<csync_file_stat_t> csync_vio_local_readdir(csync_vio_handle_t *h
   return file_stat;
 }
 
-
-int csync_vio_local_stat(const QString &uri, csync_file_stat_t *buf) {
+int csync_vio_local_stat(QString &uri, csync_file_stat_t *buf) {
     return _csync_vio_local_stat_mb(QFile::encodeName(uri).constData(), buf);
 }
 
-static int _csync_vio_local_stat_mb(const mbchar_t *wuri, csync_file_stat_t *buf) {
+static int _csync_vio_local_stat_mb(mbchar_t *wuri, csync_file_stat_t *buf) {
     csync_stat_t sb;
 
     if (_tstat(wuri, &sb) < 0) {

@@ -4,9 +4,6 @@
 // #include <cstdint>
 // #include <functional>
 
-#include "pushnotificationstestutils.h"
-#include "pushnotifications.h"
-
 Q_LOGGING_CATEGORY(lcFakeWebSocketServer, "nextcloud.test.fakewebserver", QtInfoMsg)
 
 FakeWebSocketServer::FakeWebSocketServer(quint16 port, QObject *parent)
@@ -25,7 +22,7 @@ FakeWebSocketServer::~FakeWebSocketServer() {
     close();
 }
 
-QWebSocket *FakeWebSocketServer::authenticateAccount(const OCC::AccountPtr account, std::function<void(OCC::PushNotifications *pushNotifications)> beforeAuthentication, std::function<void(void)> afterAuthentication) {
+QWebSocket *FakeWebSocketServer::authenticateAccount(OCC::AccountPtr account, std::function<void(OCC::PushNotifications *pushNotifications)> beforeAuthentication, std::function<void(void)> afterAuthentication) {
     const auto pushNotifications = account->pushNotifications();
     Q_ASSERT(pushNotifications);
     QSignalSpy readySpy(pushNotifications, &OCC::PushNotifications::ready);
@@ -73,7 +70,7 @@ void FakeWebSocketServer::close() {
     }
 }
 
-void FakeWebSocketServer::processTextMessageInternal(const QString &message) {
+void FakeWebSocketServer::processTextMessageInternal(QString &message) {
     auto client = qobject_cast<QWebSocket *>(sender());
     emit processTextMessage(client, message);
 }
@@ -122,7 +119,7 @@ void FakeWebSocketServer::clearTextMessages() {
     _processTextMessageSpy->clear();
 }
 
-OCC::AccountPtr FakeWebSocketServer::createAccount(const QString &username, const QString &password) {
+OCC::AccountPtr FakeWebSocketServer::createAccount(QString &username, QString &password) {
     auto account = OCC::Account::create();
 
     QStringList typeList;
@@ -150,7 +147,7 @@ OCC::AccountPtr FakeWebSocketServer::createAccount(const QString &username, cons
     return account;
 }
 
-CredentialsStub::CredentialsStub(const QString &user, const QString &password)
+CredentialsStub::CredentialsStub(QString &user, QString &password)
     : _user(user)
     , _password(password) {
 }

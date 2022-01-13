@@ -12,7 +12,6 @@
  * for more details.
  */
 
-
 // #include <QObject>
 // #include <QFlags>
 // #include <QAbstractListModel>
@@ -21,8 +20,6 @@
 // #include <QVariant>
 // #include <QSharedPointer>
 // #include <QVector>
-
-#include "accountfwd.h"
 
 class QJsonDocument;
 class QJsonObject;
@@ -43,7 +40,7 @@ public:
         Room = 10
     };
 
-    explicit Sharee(const QString shareWith,
+    explicit Sharee(QString shareWith,
         const QString displayName,
         const Type type);
 
@@ -58,7 +55,6 @@ private:
     Type _type;
 };
 
-
 class ShareeModel : public QAbstractListModel {
 public:
     enum LookupMode {
@@ -66,12 +62,12 @@ public:
         GlobalSearch = 1
     };
 
-    explicit ShareeModel(const AccountPtr &account, const QString &type, QObject *parent = nullptr);
+    explicit ShareeModel(AccountPtr &account, QString &type, QObject *parent = nullptr);
 
     using ShareeSet = QVector<QSharedPointer<Sharee>>; // FIXME: make it a QSet<Sharee> when Sharee can be compared
-    void fetch(const QString &search, const ShareeSet &blacklist, LookupMode lookupMode);
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    QVariant data(const QModelIndex &index, int role) const override;
+    void fetch(QString &search, ShareeSet &blacklist, LookupMode lookupMode);
+    int rowCount(QModelIndex &parent = QModelIndex()) const override;
+    QVariant data(QModelIndex &index, int role) const override;
 
     QSharedPointer<Sharee> getSharee(int at);
 
@@ -79,14 +75,14 @@ public:
 
 signals:
     void shareesReady();
-    void displayErrorMessage(int code, const QString &);
+    void displayErrorMessage(int code, QString &);
 
 private slots:
-    void shareesFetched(const QJsonDocument &reply);
+    void shareesFetched(QJsonDocument &reply);
 
 private:
-    QSharedPointer<Sharee> parseSharee(const QJsonObject &data);
-    void setNewSharees(const QVector<QSharedPointer<Sharee>> &newSharees);
+    QSharedPointer<Sharee> parseSharee(QJsonObject &data);
+    void setNewSharees(QVector<QSharedPointer<Sharee>> &newSharees);
 
     AccountPtr _account;
     QString _search;

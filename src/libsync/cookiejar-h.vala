@@ -12,10 +12,7 @@
  * for more details.
  */
 
-
 // #include <QNetworkCookieJar>
-
-#include "owncloudlib.h"
 
 namespace OCC {
 
@@ -27,22 +24,22 @@ class OWNCLOUDSYNC_EXPORT CookieJar : public QNetworkCookieJar {
 public:
     explicit CookieJar(QObject *parent = nullptr);
     ~CookieJar() override;
-    bool setCookiesFromUrl(const QList<QNetworkCookie> &cookieList, const QUrl &url) override;
-    QList<QNetworkCookie> cookiesForUrl(const QUrl &url) const override;
+    bool setCookiesFromUrl(QList<QNetworkCookie> &cookieList, QUrl &url) override;
+    QList<QNetworkCookie> cookiesForUrl(QUrl &url) const override;
 
     void clearSessionCookies();
 
     using QNetworkCookieJar::setAllCookies;
     using QNetworkCookieJar::allCookies;
 
-    bool save(const QString &fileName);
-    bool restore(const QString &fileName);
+    bool save(QString &fileName);
+    bool restore(QString &fileName);
 
 signals:
-    void newCookiesForUrl(const QList<QNetworkCookie> &cookieList, const QUrl &url);
+    void newCookiesForUrl(QList<QNetworkCookie> &cookieList, QUrl &url);
 
 private:
-    QList<QNetworkCookie> removeExpired(const QList<QNetworkCookie> &cookies);
+    QList<QNetworkCookie> removeExpired(QList<QNetworkCookie> &cookies);
 };
 
 } // namespace OCC

@@ -6,8 +6,6 @@
 
 // #include <QtTest>
 
-#include "networkjobs.h"
-
 using namespace OCC;
 
 class TestXmlParse : public QObject {
@@ -18,12 +16,12 @@ private:
   QStringList _items;
 
 public slots:
-  void slotDirectoryListingSubFolders(const QStringList& list) {
+  void slotDirectoryListingSubFolders(QStringList& list) {
      qDebug() << "subfolders: " << list;
      _subdirs.append(list);
   }
 
-  void slotDirectoryListingIterated(const QString& item, const QMap<QString,QString>& ) {
+  void slotDirectoryListingIterated(QString& item, QMap<QString,QString>& ) {
     qDebug() << "     item: " << item;
     _items.append(item);
   }
@@ -42,7 +40,6 @@ private slots:
 
     void cleanup() {
     }
-
 
     void testParser1() {
         const QByteArray testXml = "<?xml version='1.0' encoding='utf-8'?>"
@@ -94,13 +91,12 @@ private slots:
               "</d:response>"
               "</d:multistatus>";
 
-
         LsColXMLParser parser;
 
-        connect( &parser, SIGNAL(directoryListingSubfolders(const QStringList&)),
-                 this, SLOT(slotDirectoryListingSubFolders(const QStringList&)) );
-        connect( &parser, SIGNAL(directoryListingIterated(const QString&, const QMap<QString,QString>&)),
-                 this, SLOT(slotDirectoryListingIterated(const QString&, const QMap<QString,QString>&)) );
+        connect( &parser, SIGNAL(directoryListingSubfolders(QStringList&)),
+                 this, SLOT(slotDirectoryListingSubFolders(QStringList&)) );
+        connect( &parser, SIGNAL(directoryListingIterated(QString&, QMap<QString,QString>&)),
+                 this, SLOT(slotDirectoryListingIterated(QString&, QMap<QString,QString>&)) );
         connect( &parser, SIGNAL(finishedWithoutError()),
                  this, SLOT(slotFinishedSuccessfully()) );
 
@@ -168,13 +164,12 @@ private slots:
               "</d:response>"
               "</d:multistatus>";
 
-
         LsColXMLParser parser;
 
-        connect( &parser, SIGNAL(directoryListingSubfolders(const QStringList&)),
-                 this, SLOT(slotDirectoryListingSubFolders(const QStringList&)) );
-        connect( &parser, SIGNAL(directoryListingIterated(const QString&, const QMap<QString,QString>&)),
-                 this, SLOT(slotDirectoryListingIterated(const QString&, const QMap<QString,QString>&)) );
+        connect( &parser, SIGNAL(directoryListingSubfolders(QStringList&)),
+                 this, SLOT(slotDirectoryListingSubFolders(QStringList&)) );
+        connect( &parser, SIGNAL(directoryListingIterated(QString&, QMap<QString,QString>&)),
+                 this, SLOT(slotDirectoryListingIterated(QString&, QMap<QString,QString>&)) );
         connect( &parser, SIGNAL(finishedWithoutError()),
                  this, SLOT(slotFinishedSuccessfully()) );
 
@@ -194,10 +189,10 @@ private slots:
 
         LsColXMLParser parser;
 
-        connect( &parser, SIGNAL(directoryListingSubfolders(const QStringList&)),
-                 this, SLOT(slotDirectoryListingSubFolders(const QStringList&)) );
-        connect( &parser, SIGNAL(directoryListingIterated(const QString&, const QMap<QString,QString>&)),
-                 this, SLOT(slotDirectoryListingIterated(const QString&, const QMap<QString,QString>&)) );
+        connect( &parser, SIGNAL(directoryListingSubfolders(QStringList&)),
+                 this, SLOT(slotDirectoryListingSubFolders(QStringList&)) );
+        connect( &parser, SIGNAL(directoryListingIterated(QString&, QMap<QString,QString>&)),
+                 this, SLOT(slotDirectoryListingIterated(QString&, QMap<QString,QString>&)) );
         connect( &parser, SIGNAL(finishedWithoutError()),
                  this, SLOT(slotFinishedSuccessfully()) );
 
@@ -216,10 +211,10 @@ private slots:
 
         LsColXMLParser parser;
 
-        connect( &parser, SIGNAL(directoryListingSubfolders(const QStringList&)),
-                 this, SLOT(slotDirectoryListingSubFolders(const QStringList&)) );
-        connect( &parser, SIGNAL(directoryListingIterated(const QString&, const QMap<QString,QString>&)),
-                 this, SLOT(slotDirectoryListingIterated(const QString&, const QMap<QString,QString>&)) );
+        connect( &parser, SIGNAL(directoryListingSubfolders(QStringList&)),
+                 this, SLOT(slotDirectoryListingSubFolders(QStringList&)) );
+        connect( &parser, SIGNAL(directoryListingIterated(QString&, QMap<QString,QString>&)),
+                 this, SLOT(slotDirectoryListingIterated(QString&, QMap<QString,QString>&)) );
         connect( &parser, SIGNAL(finishedWithoutError()),
                  this, SLOT(slotFinishedSuccessfully()) );
 
@@ -252,13 +247,12 @@ private slots:
               "<d:status>HTTP/1.1 200 OK</d:status>"
               "</d:propstat>"; // no proper end here
 
-
         LsColXMLParser parser;
 
-        connect( &parser, SIGNAL(directoryListingSubfolders(const QStringList&)),
-                 this, SLOT(slotDirectoryListingSubFolders(const QStringList&)) );
-        connect( &parser, SIGNAL(directoryListingIterated(const QString&, const QMap<QString,QString>&)),
-                 this, SLOT(slotDirectoryListingIterated(const QString&, const QMap<QString,QString>&)) );
+        connect( &parser, SIGNAL(directoryListingSubfolders(QStringList&)),
+                 this, SLOT(slotDirectoryListingSubFolders(QStringList&)) );
+        connect( &parser, SIGNAL(directoryListingIterated(QString&, QMap<QString,QString>&)),
+                 this, SLOT(slotDirectoryListingIterated(QString&, QMap<QString,QString>&)) );
         connect( &parser, SIGNAL(finishedWithoutError()),
                  this, SLOT(slotFinishedSuccessfully()) );
 
@@ -317,13 +311,12 @@ private slots:
               "</d:response>"
               "</d:multistatus>";
 
-
         LsColXMLParser parser;
 
-        connect( &parser, SIGNAL(directoryListingSubfolders(const QStringList&)),
-                 this, SLOT(slotDirectoryListingSubFolders(const QStringList&)) );
-        connect( &parser, SIGNAL(directoryListingIterated(const QString&, const QMap<QString,QString>&)),
-                 this, SLOT(slotDirectoryListingIterated(const QString&, const QMap<QString,QString>&)) );
+        connect( &parser, SIGNAL(directoryListingSubfolders(QStringList&)),
+                 this, SLOT(slotDirectoryListingSubFolders(QStringList&)) );
+        connect( &parser, SIGNAL(directoryListingIterated(QString&, QMap<QString,QString>&)),
+                 this, SLOT(slotDirectoryListingIterated(QString&, QMap<QString,QString>&)) );
         connect( &parser, SIGNAL(finishedWithoutError()),
                  this, SLOT(slotFinishedSuccessfully()) );
 
@@ -382,13 +375,12 @@ private slots:
               "</d:response>"
               "</d:multistatus>";
 
-
         LsColXMLParser parser;
 
-        connect( &parser, SIGNAL(directoryListingSubfolders(const QStringList&)),
-                 this, SLOT(slotDirectoryListingSubFolders(const QStringList&)) );
-        connect( &parser, SIGNAL(directoryListingIterated(const QString&, const QMap<QString,QString>&)),
-                 this, SLOT(slotDirectoryListingIterated(const QString&, const QMap<QString,QString>&)) );
+        connect( &parser, SIGNAL(directoryListingSubfolders(QStringList&)),
+                 this, SLOT(slotDirectoryListingSubFolders(QStringList&)) );
+        connect( &parser, SIGNAL(directoryListingIterated(QString&, QMap<QString,QString>&)),
+                 this, SLOT(slotDirectoryListingIterated(QString&, QMap<QString,QString>&)) );
         connect( &parser, SIGNAL(finishedWithoutError()),
                  this, SLOT(slotFinishedSuccessfully()) );
 
@@ -447,13 +439,12 @@ private slots:
               "</d:response>"
               "</d:multistatus>";
 
-
         LsColXMLParser parser;
 
-        connect( &parser, SIGNAL(directoryListingSubfolders(const QStringList&)),
-                 this, SLOT(slotDirectoryListingSubFolders(const QStringList&)) );
-        connect( &parser, SIGNAL(directoryListingIterated(const QString&, const QMap<QString,QString>&)),
-                 this, SLOT(slotDirectoryListingIterated(const QString&, const QMap<QString,QString>&)) );
+        connect( &parser, SIGNAL(directoryListingSubfolders(QStringList&)),
+                 this, SLOT(slotDirectoryListingSubFolders(QStringList&)) );
+        connect( &parser, SIGNAL(directoryListingIterated(QString&, QMap<QString,QString>&)),
+                 this, SLOT(slotDirectoryListingIterated(QString&, QMap<QString,QString>&)) );
         connect( &parser, SIGNAL(finishedWithoutError()),
                  this, SLOT(slotFinishedSuccessfully()) );
 
@@ -521,13 +512,12 @@ private slots:
               "</d:response>"
               "</d:multistatus>";
 
-
         LsColXMLParser parser;
 
-        connect( &parser, SIGNAL(directoryListingSubfolders(const QStringList&)),
-                 this, SLOT(slotDirectoryListingSubFolders(const QStringList&)) );
-        connect( &parser, SIGNAL(directoryListingIterated(const QString&, const QMap<QString,QString>&)),
-                 this, SLOT(slotDirectoryListingIterated(const QString&, const QMap<QString,QString>&)) );
+        connect( &parser, SIGNAL(directoryListingSubfolders(QStringList&)),
+                 this, SLOT(slotDirectoryListingSubFolders(QStringList&)) );
+        connect( &parser, SIGNAL(directoryListingIterated(QString&, QMap<QString,QString>&)),
+                 this, SLOT(slotDirectoryListingIterated(QString&, QMap<QString,QString>&)) );
         connect( &parser, SIGNAL(finishedWithoutError()),
                  this, SLOT(slotFinishedSuccessfully()) );
 
@@ -589,10 +579,10 @@ private slots:
 
         LsColXMLParser parser;
 
-        connect( &parser, SIGNAL(directoryListingSubfolders(const QStringList&)),
-                 this, SLOT(slotDirectoryListingSubFolders(const QStringList&)) );
-        connect( &parser, SIGNAL(directoryListingIterated(const QString&, const QMap<QString,QString>&)),
-                 this, SLOT(slotDirectoryListingIterated(const QString&, const QMap<QString,QString>&)) );
+        connect( &parser, SIGNAL(directoryListingSubfolders(QStringList&)),
+                 this, SLOT(slotDirectoryListingSubFolders(QStringList&)) );
+        connect( &parser, SIGNAL(directoryListingIterated(QString&, QMap<QString,QString>&)),
+                 this, SLOT(slotDirectoryListingIterated(QString&, QMap<QString,QString>&)) );
         connect( &parser, SIGNAL(finishedWithoutError()),
                  this, SLOT(slotFinishedSuccessfully()) );
 

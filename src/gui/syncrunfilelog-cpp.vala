@@ -14,20 +14,17 @@
 
 // #include <QRegularExpression>
 
-#include "syncrunfilelog.h"
-#include "common/utility.h"
-#include "filesystem.h"
 // #include <qfileinfo.h>
 
 namespace OCC {
 
 SyncRunFileLog::SyncRunFileLog() = default;
 
-QString SyncRunFileLog::dateTimeStr(const QDateTime &dt) {
+QString SyncRunFileLog::dateTimeStr(QDateTime &dt) {
     return dt.toString(Qt::ISODate);
 }
 
-void SyncRunFileLog::start(const QString &folderPath) {
+void SyncRunFileLog::start(QString &folderPath) {
     const qint64 logfileMaxSize = 10 * 1024 * 1024; // 10MiB
 
     const QString logpath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
@@ -76,7 +73,6 @@ void SyncRunFileLog::start(const QString &folderPath) {
     _file->open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
     _out.setDevice(_file.data());
 
-
     if (!exists) {
         _out << folderPath << endl;
         // We are creating a new file, add the note.
@@ -88,12 +84,11 @@ void SyncRunFileLog::start(const QString &folderPath) {
         FileSystem::setFileHidden(filename, true);
     }
 
-
     _totalDuration.start();
     _lapDuration.start();
     _out << "#=#=#=# Syncrun started " << dateTimeStr(QDateTime::currentDateTimeUtc()) << endl;
 }
-void SyncRunFileLog::logItem(const SyncFileItem &item) {
+void SyncRunFileLog::logItem(SyncFileItem &item) {
     // don't log the directory items that are in the list
     if (item._direction == SyncFileItem::None
         || item._instruction == CSYNC_INSTRUCTION_IGNORE) {
@@ -132,7 +127,7 @@ void SyncRunFileLog::logItem(const SyncFileItem &item) {
     _out << endl;
 }
 
-void SyncRunFileLog::logLap(const QString &name) {
+void SyncRunFileLog::logLap(QString &name) {
     _out << "#=#=#=#=# " << name << " " << dateTimeStr(QDateTime::currentDateTimeUtc())
          << " (last step: " << _lapDuration.restart() << " msec"
          << ", total: " << _totalDuration.elapsed() << " msec)" << endl;

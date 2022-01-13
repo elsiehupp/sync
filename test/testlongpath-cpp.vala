@@ -17,13 +17,9 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-#include "common/filesystembase.h"
-#include "csync/csync.h"
-#include "csync/vio/csync_vio_local.h"
 
 // #include <QTemporaryFile>
 // #include <QTest>
-
 
 class TestLongWindowsPath : public QObject {
 
@@ -78,7 +74,6 @@ private Q_SLOTS:
         QCOMPARE(new_long.length(), 286);
     }
 #endif
-
 
     void testLongPathStat_data() {
         QTest::addColumn<QString>("name");

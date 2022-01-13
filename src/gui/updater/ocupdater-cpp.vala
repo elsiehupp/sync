@@ -12,13 +12,6 @@
  * for more details.
  */
 
-#include "theme.h"
-#include "configfile.h"
-#include "common/utility.h"
-#include "accessmanager.h"
-
-#include "updater/ocupdater.h"
-
 // #include <QObject>
 // #include <QtCore>
 // #include <QtNetwork>
@@ -34,7 +27,6 @@ static const char updateTargetVersionC[] = "Updater/updateTargetVersion";
 static const char updateTargetVersionStringC[] = "Updater/updateTargetVersionString";
 static const char seenVersionC[] = "Updater/seenVersion";
 static const char autoUpdateAttemptedC[] = "Updater/autoUpdateAttempted";
-
 
 UpdaterScheduler::UpdaterScheduler(QObject *parent)
     : QObject(parent) {
@@ -78,10 +70,9 @@ void UpdaterScheduler::slotTimerFired() {
     }
 }
 
-
 /* ----------------------------------------------------------------- */
 
-OCUpdater::OCUpdater(const QUrl &url)
+OCUpdater::OCUpdater(QUrl &url)
     : Updater()
     , _updateUrl(url)
     , _state(Unknown)
@@ -89,7 +80,7 @@ OCUpdater::OCUpdater(const QUrl &url)
     , _timeoutWatchdog(new QTimer(this)) {
 }
 
-void OCUpdater::setUpdateUrl(const QUrl &url) {
+void OCUpdater::setUpdateUrl(QUrl &url) {
     _updateUrl = url;
 }
 
@@ -272,7 +263,7 @@ void OCUpdater::slotTimedOut() {
 
 ////////////////////////////////////////////////////////////////////////
 
-NSISUpdater::NSISUpdater(const QUrl &url)
+NSISUpdater::NSISUpdater(QUrl &url)
     : OCUpdater(url) {
 }
 
@@ -323,7 +314,7 @@ void NSISUpdater::slotDownloadFinished() {
     settings.setValue(updateAvailableC, _targetFile);
 }
 
-void NSISUpdater::versionInfoArrived(const UpdateInfo &info) {
+void NSISUpdater::versionInfoArrived(UpdateInfo &info) {
     ConfigFile cfg;
     QSettings settings(cfg.configFile(), QSettings::IniFormat);
     qint64 infoVersion = Helper::stringVersionToInt(info.version());
@@ -367,7 +358,7 @@ void NSISUpdater::versionInfoArrived(const UpdateInfo &info) {
     }
 }
 
-void NSISUpdater::showNoUrlDialog(const UpdateInfo &info) {
+void NSISUpdater::showNoUrlDialog(UpdateInfo &info) {
     // if the version tag is set, there is a newer version.
     auto *msgBox = new QDialog;
     msgBox->setAttribute(Qt::WA_DeleteOnClose);
@@ -417,7 +408,7 @@ void NSISUpdater::showNoUrlDialog(const UpdateInfo &info) {
     msgBox->open();
 }
 
-void NSISUpdater::showUpdateErrorDialog(const QString &targetVersion) {
+void NSISUpdater::showUpdateErrorDialog(QString &targetVersion) {
     auto msgBox = new QDialog;
     msgBox->setAttribute(Qt::WA_DeleteOnClose);
     msgBox->setWindowFlags(msgBox->windowFlags() & ~Qt::WindowContextHelpButtonHint);
@@ -515,7 +506,7 @@ void NSISUpdater::slotSetSeenVersion() {
 
 ////////////////////////////////////////////////////////////////////////
 
-PassiveUpdateNotifier::PassiveUpdateNotifier(const QUrl &url)
+PassiveUpdateNotifier::PassiveUpdateNotifier(QUrl &url)
     : OCUpdater(url) {
     // remember the version of the currently running binary. On Linux it might happen that the
     // package management updates the package while the app is running. This is detected in the
@@ -537,7 +528,7 @@ void PassiveUpdateNotifier::backgroundCheckForUpdate() {
     OCUpdater::backgroundCheckForUpdate();
 }
 
-void PassiveUpdateNotifier::versionInfoArrived(const UpdateInfo &info) {
+void PassiveUpdateNotifier::versionInfoArrived(UpdateInfo &info) {
     qint64 currentVer = Helper::currentVersionToInt();
     qint64 remoteVer = Helper::stringVersionToInt(info.version());
 

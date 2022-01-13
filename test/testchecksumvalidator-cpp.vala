@@ -9,12 +9,6 @@
 // #include <QDir>
 // #include <QString>
 
-#include "common/checksums.h"
-#include "networkjobs.h"
-#include "common/utility.h"
-#include "filesystem.h"
-#include "propagatorjobs.h"
-
 using namespace OCC;
 using namespace OCC::Utility;
 
@@ -31,7 +25,7 @@ using namespace OCC::Utility;
 
     public slots:
 
-    void slotUpValidated(const QByteArray& type, const QByteArray& checksum) {
+    void slotUpValidated(QByteArray& type, QByteArray& checksum) {
          qDebug() << "Checksum: " << checksum;
          QVERIFY(_expected == checksum );
          QVERIFY(_expectedType == type );
@@ -41,12 +35,12 @@ using namespace OCC::Utility;
          _successDown = true;
     }
 
-    void slotDownError(const QString &errMsg) {
+    void slotDownError(QString &errMsg) {
          QCOMPARE(_expectedError, errMsg);
          _errorSeen = true;
     }
 
-    static QByteArray shellSum( const QByteArray& cmd, const QString& file ) {
+    static QByteArray shellSum( const QByteArray& cmd, QString& file ) {
         QProcess md5;
         QStringList args;
         args.append(file);
@@ -207,7 +201,6 @@ using namespace OCC::Utility;
         delete vali;
 #endif
     }
-
 
     void cleanupTestCase() {
     }

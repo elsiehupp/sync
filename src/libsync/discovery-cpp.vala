@@ -12,33 +12,23 @@
  * for more details.
  */
 
-#include "discovery.h"
-#include "common/filesystembase.h"
-#include "common/syncjournaldb.h"
-#include "filesystem.h"
-#include "syncfileitem.h"
 // #include <QDebug>
 // #include <algorithm>
 // #include <QEventLoop>
 // #include <QDir>
 // #include <set>
 // #include <QTextCodec>
-#include "vio/csync_vio_local.h"
 // #include <QFileInfo>
 // #include <QFile>
 // #include <QThreadPool>
 // #include <common/checksums.h>
 // #include <common/constants.h>
-#include "csync_exclude.h"
-#include "csync.h"
-
 
 namespace OCC {
 
 Q_LOGGING_CATEGORY(lcDisco, "sync.discovery", QtInfoMsg)
 
-
-bool ProcessDirectoryJob::checkForInvalidFileName(const PathTuple &path,
+bool ProcessDirectoryJob::checkForInvalidFileName(PathTuple &path,
     const std::map<QString, Entries> &entries, Entries &entry) {
     const auto originalFileName = entry.localEntry.name;
     const auto newFileName = originalFileName.trimmed();
@@ -125,7 +115,7 @@ void ProcessDirectoryJob::process() {
 
     // fetch all the name from the DB
     auto pathU8 = _currentFolder._original.toUtf8();
-    if (!_discoveryData->_statedb->listFilesInPath(pathU8, [&](const SyncJournalFileRecord &rec) {
+    if (!_discoveryData->_statedb->listFilesInPath(pathU8, [&](SyncJournalFileRecord &rec) {
             auto name = pathU8.isEmpty() ? rec._path : QString::fromUtf8(rec._path.constData() + (pathU8.size() + 1));
             if (rec.isVirtualFile() && isVfsWithSuffix())
                 chopVirtualFileSuffix(name);
@@ -238,7 +228,7 @@ void ProcessDirectoryJob::process() {
     QTimer::singleShot(0, _discoveryData, &DiscoveryPhase::scheduleMoreJobs);
 }
 
-bool ProcessDirectoryJob::handleExcluded(const QString &path, const QString &localName, bool isDirectory, bool isHidden, bool isSymlink) {
+bool ProcessDirectoryJob::handleExcluded(QString &path, QString &localName, bool isDirectory, bool isHidden, bool isSymlink) {
     auto excluded = _discoveryData->_excludes->traversalPatternMatch(path, isDirectory ? ItemTypeDirectory : ItemTypeFile);
 
     // FIXME: move to ExcludedFiles 's regexp ?
@@ -350,7 +340,7 @@ bool ProcessDirectoryJob::handleExcluded(const QString &path, const QString &loc
 }
 
 void ProcessDirectoryJob::processFile(PathTuple path,
-    const LocalInfo &localEntry, const RemoteInfo &serverEntry,
+    const LocalInfo &localEntry, RemoteInfo &serverEntry,
     const SyncJournalFileRecord &dbEntry) {
     const char *hasServer = serverEntry.isValid() ? "true" : _queryServer == ParentNotChanged ? "db" : "false";
     const char *hasLocal = localEntry.isValid() ? "true" : _queryLocal == ParentNotChanged ? "db" : "false";
@@ -443,7 +433,7 @@ void ProcessDirectoryJob::processFile(PathTuple path,
 
 // Compute the checksum of the given file and assign the result in item->_checksumHeader
 // Returns true if the checksum was successfully computed
-static bool computeLocalChecksum(const QByteArray &header, const QString &path, const SyncFileItemPtr &item) {
+static bool computeLocalChecksum(QByteArray &header, QString &path, SyncFileItemPtr &item) {
     auto type = parseChecksumHeaderType(header);
     if (!type.isEmpty()) {
         // TODO: compute async?
@@ -457,8 +447,8 @@ static bool computeLocalChecksum(const QByteArray &header, const QString &path, 
 }
 
 void ProcessDirectoryJob::processFileAnalyzeRemoteInfo(
-    const SyncFileItemPtr &item, PathTuple path, const LocalInfo &localEntry,
-    const RemoteInfo &serverEntry, const SyncJournalFileRecord &dbEntry) {
+    const SyncFileItemPtr &item, PathTuple path, LocalInfo &localEntry,
+    const RemoteInfo &serverEntry, SyncJournalFileRecord &dbEntry) {
     item->_checksumHeader = serverEntry.checksumHeader;
     item->_fileId = serverEntry.fileId;
     item->_remotePerm = serverEntry.remotePerm;
@@ -563,7 +553,7 @@ void ProcessDirectoryJob::processFileAnalyzeRemoteInfo(
                 const bool isVfsModeOn = _discoveryData && _discoveryData->_syncOptions._vfs && _discoveryData->_syncOptions._vfs->mode() != Vfs::Off;
                 if (isVfsModeOn && dbEntry.isDirectory() && dbEntry._isE2eEncrypted) {
                     qint64 localFolderSize = 0;
-                    const auto listFilesCallback = [&localFolderSize](const OCC::SyncJournalFileRecord &record) {
+                    const auto listFilesCallback = [&localFolderSize](OCC::SyncJournalFileRecord &record) {
                         if (record.isFile()) {
                             // add Constants::e2EeTagSize so we will know the size of E2EE file on the server
                             localFolderSize += record._fileSize + Constants::e2EeTagSize;
@@ -648,7 +638,7 @@ void ProcessDirectoryJob::processFileAnalyzeRemoteInfo(
     bool done = false;
     bool async = false;
     // This function will be executed for every candidate
-    auto renameCandidateProcessing = [&](const OCC::SyncJournalFileRecord &base) {
+    auto renameCandidateProcessing = [&](OCC::SyncJournalFileRecord &base) {
         if (done)
             return;
         if (!base.isValid())
@@ -751,7 +741,7 @@ void ProcessDirectoryJob::processFileAnalyzeRemoteInfo(
             // we need to make a request to the server to know that the original file is deleted on the server
             _pendingAsyncJobs++;
             auto job = new RequestEtagJob(_discoveryData->_account, _discoveryData->_remoteFolder + originalPath, this);
-            connect(job, &RequestEtagJob::finishedWithResult, this, [=](const HttpResult<QByteArray> &etag) mutable {
+            connect(job, &RequestEtagJob::finishedWithResult, this, [=](HttpResult<QByteArray> &etag) mutable {
                 _pendingAsyncJobs--;
                 QTimer::singleShot(0, _discoveryData, &DiscoveryPhase::scheduleMoreJobs);
                 if (etag || etag.error().code != 404 ||
@@ -791,8 +781,8 @@ void ProcessDirectoryJob::processFileAnalyzeRemoteInfo(
 }
 
 void ProcessDirectoryJob::processFileAnalyzeLocalInfo(
-    const SyncFileItemPtr &item, PathTuple path, const LocalInfo &localEntry,
-    const RemoteInfo &serverEntry, const SyncJournalFileRecord &dbEntry, QueryMode recurseQueryServer) {
+    const SyncFileItemPtr &item, PathTuple path, LocalInfo &localEntry,
+    const RemoteInfo &serverEntry, SyncJournalFileRecord &dbEntry, QueryMode recurseQueryServer) {
     bool noServerEntry = (_queryServer != ParentNotChanged && !serverEntry.isValid())
         || (_queryServer == ParentNotChanged && !dbEntry.isValid());
 
@@ -1232,7 +1222,7 @@ void ProcessDirectoryJob::processFileAnalyzeLocalInfo(
         if (base.isVirtualFile() && isVfsWithSuffix())
             chopVirtualFileSuffix(serverOriginalPath);
         auto job = new RequestEtagJob(_discoveryData->_account, serverOriginalPath, this);
-        connect(job, &RequestEtagJob::finishedWithResult, this, [=](const HttpResult<QByteArray> &etag) mutable {
+        connect(job, &RequestEtagJob::finishedWithResult, this, [=](HttpResult<QByteArray> &etag) mutable {
             if (!etag || (etag.get() != base._etag && !item->isDirectory()) || _discoveryData->isRenamed(originalPath)) {
                 qCInfo(lcDisco) << "Can't rename because the etag has changed or the directory is gone" << originalPath;
                 // Can't be a rename, leave it as a new.
@@ -1254,7 +1244,7 @@ void ProcessDirectoryJob::processFileAnalyzeLocalInfo(
     finalize();
 }
 
-void ProcessDirectoryJob::processFileConflict(const SyncFileItemPtr &item, ProcessDirectoryJob::PathTuple path, const LocalInfo &localEntry, const RemoteInfo &serverEntry, const SyncJournalFileRecord &dbEntry) {
+void ProcessDirectoryJob::processFileConflict(SyncFileItemPtr &item, ProcessDirectoryJob::PathTuple path, LocalInfo &localEntry, RemoteInfo &serverEntry, SyncJournalFileRecord &dbEntry) {
     item->_previousSize = localEntry.size;
     item->_previousModtime = localEntry.modtime;
 
@@ -1386,7 +1376,7 @@ void ProcessDirectoryJob::processFileFinalize(
     }
 }
 
-void ProcessDirectoryJob::processBlacklisted(const PathTuple &path, const OCC::LocalInfo &localEntry,
+void ProcessDirectoryJob::processBlacklisted(PathTuple &path, OCC::LocalInfo &localEntry,
     const SyncJournalFileRecord &dbEntry) {
     if (!localEntry.isValid())
         return;
@@ -1417,7 +1407,7 @@ void ProcessDirectoryJob::processBlacklisted(const PathTuple &path, const OCC::L
     }
 }
 
-bool ProcessDirectoryJob::checkPermissions(const OCC::SyncFileItemPtr &item) {
+bool ProcessDirectoryJob::checkPermissions(OCC::SyncFileItemPtr &item) {
     if (item->_direction != SyncFileItem::Up) {
         // Currently we only check server-side permissions
         return true;
@@ -1499,8 +1489,7 @@ bool ProcessDirectoryJob::checkPermissions(const OCC::SyncFileItemPtr &item) {
     return true;
 }
 
-
-auto ProcessDirectoryJob::checkMovePermissions(RemotePermissions srcPerm, const QString &srcPath,
+auto ProcessDirectoryJob::checkMovePermissions(RemotePermissions srcPerm, QString &srcPath,
                                                bool isDirectory)
     -> MovePermissionResult {
     auto destPerms = !_rootPermissions.isNull() ? _rootPermissions
@@ -1599,7 +1588,7 @@ void ProcessDirectoryJob::addVirtualFileSuffix(QString &str) const {
     str.append(_discoveryData->_syncOptions._vfs->fileSuffix());
 }
 
-bool ProcessDirectoryJob::hasVirtualFileSuffix(const QString &str) const {
+bool ProcessDirectoryJob::hasVirtualFileSuffix(QString &str) const {
     if (!isVfsWithSuffix())
         return false;
     return str.endsWith(_discoveryData->_syncOptions._vfs->fileSuffix());
@@ -1622,7 +1611,7 @@ DiscoverySingleDirectoryJob *ProcessDirectoryJob::startAsyncServerQuery() {
     connect(serverJob, &DiscoverySingleDirectoryJob::etag, this, &ProcessDirectoryJob::etag);
     _discoveryData->_currentlyActiveJobs++;
     _pendingAsyncJobs++;
-    connect(serverJob, &DiscoverySingleDirectoryJob::finished, this, [this, serverJob](const auto &results) {
+    connect(serverJob, &DiscoverySingleDirectoryJob::finished, this, [this, serverJob](auto &results) {
         _discoveryData->_currentlyActiveJobs--;
         _pendingAsyncJobs--;
         if (results) {
@@ -1655,7 +1644,7 @@ DiscoverySingleDirectoryJob *ProcessDirectoryJob::startAsyncServerQuery() {
         }
     });
     connect(serverJob, &DiscoverySingleDirectoryJob::firstDirectoryPermissions, this,
-        [this](const RemotePermissions &perms) { _rootPermissions = perms; });
+        [this](RemotePermissions &perms) { _rootPermissions = perms; });
     serverJob->start();
     return serverJob;
 }
@@ -1673,7 +1662,7 @@ void ProcessDirectoryJob::startAsyncLocalQuery() {
         _childIgnored = b;
     });
 
-    connect(localJob, &DiscoverySingleLocalDirectoryJob::finishedFatalError, this, [this](const QString &msg) {
+    connect(localJob, &DiscoverySingleLocalDirectoryJob::finishedFatalError, this, [this](QString &msg) {
         _discoveryData->_currentlyActiveJobs--;
         _pendingAsyncJobs--;
         if (_serverJob)
@@ -1682,7 +1671,7 @@ void ProcessDirectoryJob::startAsyncLocalQuery() {
         emit _discoveryData->fatalError(msg);
     });
 
-    connect(localJob, &DiscoverySingleLocalDirectoryJob::finishedNonFatalError, this, [this](const QString &msg) {
+    connect(localJob, &DiscoverySingleLocalDirectoryJob::finishedNonFatalError, this, [this](QString &msg) {
         _discoveryData->_currentlyActiveJobs--;
         _pendingAsyncJobs--;
 
@@ -1696,7 +1685,7 @@ void ProcessDirectoryJob::startAsyncLocalQuery() {
         }
     });
 
-    connect(localJob, &DiscoverySingleLocalDirectoryJob::finished, this, [this](const auto &results) {
+    connect(localJob, &DiscoverySingleLocalDirectoryJob::finished, this, [this](auto &results) {
         _discoveryData->_currentlyActiveJobs--;
         _pendingAsyncJobs--;
 
@@ -1710,7 +1699,6 @@ void ProcessDirectoryJob::startAsyncLocalQuery() {
     QThreadPool *pool = QThreadPool::globalInstance();
     pool->start(localJob); // QThreadPool takes ownership
 }
-
 
 bool ProcessDirectoryJob::isVfsWithSuffix() const {
     return _discoveryData->_syncOptions._vfs->mode() == Vfs::WithSuffix;

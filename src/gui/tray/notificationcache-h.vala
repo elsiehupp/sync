@@ -11,15 +11,14 @@ public:
         QString message;
     };
 
-    bool contains(const Notification &notification) const;
+    bool contains(Notification &notification) const;
 
-    void insert(const Notification &notification);
+    void insert(Notification &notification);
 
     void clear();
 
 private:
-    uint calculateKey(const Notification &notification) const;
-
+    uint calculateKey(Notification &notification) const;
 
     QSet<uint> _notifications;
 };

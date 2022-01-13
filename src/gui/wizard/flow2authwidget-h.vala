@@ -18,10 +18,6 @@
 // #include <QUrl>
 // #include <QWidget>
 
-#include "creds/flow2auth.h"
-
-#include "ui_flow2authwidget.h"
-
 class QProgressIndicator;
 
 namespace OCC {
@@ -33,16 +29,16 @@ public:
 
     void startAuth(Account *account);
     void resetAuth(Account *account = nullptr);
-    void setError(const QString &error);
+    void setError(QString &error);
 
 public Q_SLOTS:
-    void slotAuthResult(Flow2Auth::Result, const QString &errorString, const QString &user, const QString &appPassword);
+    void slotAuthResult(Flow2Auth::Result, QString &errorString, QString &user, QString &appPassword);
     void slotPollNow();
     void slotStatusChanged(Flow2Auth::PollStatus status, int secondsLeft);
     void slotStyleChanged();
 
 signals:
-    void authResult(Flow2Auth::Result, const QString &errorString, const QString &user, const QString &appPassword);
+    void authResult(Flow2Auth::Result, QString &errorString, QString &user, QString &appPassword);
     void pollNow();
 
 private:

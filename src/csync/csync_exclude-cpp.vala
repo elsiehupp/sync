@@ -18,19 +18,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "config_csync.h"
 // #include <qglobal.h>
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
 
-#include "c_lib.h"
-#include "c_private.h"
-
-#include "csync_exclude.h"
-
-#include "common/utility.h"
 #include "../version.h"
 
 // #include <QString>
@@ -89,7 +82,7 @@ static const char *win_reserved_words_n[] = { "CLOCK$", "$Recycle.Bin" };
  * @param file_name filename
  * @return true if file is reserved, false otherwise
  */
-OCSYNC_EXPORT bool csync_is_windows_reserved_word(const QStringRef &filename) {
+OCSYNC_EXPORT bool csync_is_windows_reserved_word(QStringRef &filename) {
     size_t len_filename = filename.size();
 
     // Drive letters
@@ -103,7 +96,7 @@ OCSYNC_EXPORT bool csync_is_windows_reserved_word(const QStringRef &filename) {
     }
 
     if (len_filename == 3 || (len_filename > 3 && filename.at(3) == QLatin1Char('.'))) {
-        for (const char *word : win_reserved_words_3) {
+        for (char *word : win_reserved_words_3) {
             if (filename.left(3).compare(QLatin1String(word), Qt::CaseInsensitive) == 0) {
                 return true;
             }
@@ -111,14 +104,14 @@ OCSYNC_EXPORT bool csync_is_windows_reserved_word(const QStringRef &filename) {
     }
 
     if (len_filename == 4 || (len_filename > 4 && filename.at(4) == QLatin1Char('.'))) {
-        for (const char *word : win_reserved_words_4) {
+        for (char *word : win_reserved_words_4) {
             if (filename.left(4).compare(QLatin1String(word), Qt::CaseInsensitive) == 0) {
                 return true;
             }
         }
     }
 
-    for (const char *word : win_reserved_words_n) {
+    for (char *word : win_reserved_words_n) {
         if (filename.compare(QLatin1String(word), Qt::CaseInsensitive) == 0) {
             return true;
         }
@@ -127,7 +120,7 @@ OCSYNC_EXPORT bool csync_is_windows_reserved_word(const QStringRef &filename) {
     return false;
 }
 
-static CSYNC_EXCLUDE_TYPE _csync_excluded_common(const QString &path, bool excludeConflictFiles) {
+static CSYNC_EXCLUDE_TYPE _csync_excluded_common(QString &path, bool excludeConflictFiles) {
     /* split up the path */
     QStringRef bname(&path);
     int lastSlash = path.lastIndexOf(QLatin1Char('/'));
@@ -201,21 +194,20 @@ static CSYNC_EXCLUDE_TYPE _csync_excluded_common(const QString &path, bool exclu
         return CSYNC_FILE_SILENTLY_EXCLUDED;
     }
 
-
     if (excludeConflictFiles && OCC::Utility::isConflictFile(path)) {
         return CSYNC_FILE_EXCLUDE_CONFLICT;
     }
     return CSYNC_NOT_EXCLUDED;
 }
 
-static QString leftIncludeLast(const QString &arr, const QChar &c) {
+static QString leftIncludeLast(QString &arr, QChar &c) {
     // left up to and including `c`
     return arr.left(arr.lastIndexOf(c, arr.size() - 2) + 1);
 }
 
 using namespace OCC;
 
-ExcludedFiles::ExcludedFiles(const QString &localPath)
+ExcludedFiles::ExcludedFiles(QString &localPath)
     : _localPath(localPath)
     , _clientVersion(MIRALL_VERSION_MAJOR, MIRALL_VERSION_MINOR, MIRALL_VERSION_PATCH) {
     Q_ASSERT(_localPath.endsWith(QStringLiteral("/")));
@@ -229,7 +221,7 @@ ExcludedFiles::ExcludedFiles(const QString &localPath)
 
 ExcludedFiles::~ExcludedFiles() = default;
 
-void ExcludedFiles::addExcludeFilePath(const QString &path) {
+void ExcludedFiles::addExcludeFilePath(QString &path) {
     const QFileInfo excludeFileInfo(path);
     const auto fileName = excludeFileInfo.fileName();
     const auto basePath = fileName.compare(QStringLiteral("sync-exclude.lst"), Qt::CaseInsensitive) == 0
@@ -245,11 +237,11 @@ void ExcludedFiles::setExcludeConflictFiles(bool onoff) {
     _excludeConflictFiles = onoff;
 }
 
-void ExcludedFiles::addManualExclude(const QString &expr) {
+void ExcludedFiles::addManualExclude(QString &expr) {
     addManualExclude(expr, _localPath);
 }
 
-void ExcludedFiles::addManualExclude(const QString &expr, const QString &basePath) {
+void ExcludedFiles::addManualExclude(QString &expr, QString &basePath) {
     Q_ASSERT(basePath.endsWith(QLatin1Char('/')));
 
     auto key = basePath;
@@ -272,7 +264,7 @@ void ExcludedFiles::setClientVersion(ExcludedFiles::Version version) {
     _clientVersion = version;
 }
 
-void ExcludedFiles::loadExcludeFilePatterns(const QString &basePath, QFile &file) {
+void ExcludedFiles::loadExcludeFilePatterns(QString &basePath, QFile &file) {
     QStringList patterns;
     while (!file.atEnd()) {
         QByteArray line = file.readLine().trimmed();
@@ -305,8 +297,8 @@ bool ExcludedFiles::reloadExcludeFiles() {
 
     bool success = true;
     const auto keys = _excludeFiles.keys();
-    for (const auto& basePath : keys) {
-        for (const auto &excludeFile : _excludeFiles.value(basePath)) {
+    for (auto& basePath : keys) {
+        for (auto &excludeFile : _excludeFiles.value(basePath)) {
             QFile file(excludeFile);
             if (file.exists() && file.open(QIODevice::ReadOnly)) {
                 loadExcludeFilePatterns(basePath, file);
@@ -326,7 +318,7 @@ bool ExcludedFiles::reloadExcludeFiles() {
     return success;
 }
 
-bool ExcludedFiles::versionDirectiveKeepNextLine(const QByteArray &directive) const {
+bool ExcludedFiles::versionDirectiveKeepNextLine(QByteArray &directive) const {
     if (!directive.startsWith("#!version"))
         return true;
     QByteArrayList args = directive.split(' ');
@@ -391,7 +383,7 @@ bool ExcludedFiles::isExcluded(
     return fullPatternMatch(relativePath, type) != CSYNC_NOT_EXCLUDED;
 }
 
-CSYNC_EXCLUDE_TYPE ExcludedFiles::traversalPatternMatch(const QString &path, ItemType filetype) {
+CSYNC_EXCLUDE_TYPE ExcludedFiles::traversalPatternMatch(QString &path, ItemType filetype) {
     auto match = _csync_excluded_common(path, _excludeConflictFiles);
     if (match != CSYNC_NOT_EXCLUDED)
         return match;
@@ -469,7 +461,7 @@ CSYNC_EXCLUDE_TYPE ExcludedFiles::traversalPatternMatch(const QString &path, Ite
     return CSYNC_NOT_EXCLUDED;
 }
 
-CSYNC_EXCLUDE_TYPE ExcludedFiles::fullPatternMatch(const QString &p, ItemType filetype) const {
+CSYNC_EXCLUDE_TYPE ExcludedFiles::fullPatternMatch(QString &p, ItemType filetype) const {
     auto match = _csync_excluded_common(p, _excludeConflictFiles);
     if (match != CSYNC_NOT_EXCLUDED)
         return match;
@@ -602,7 +594,7 @@ QString ExcludedFiles::convertToRegexpSyntax(QString exclude, bool wildcardsMatc
     return regex;
 }
 
-QString ExcludedFiles::extractBnameTrigger(const QString &exclude, bool wildcardsMatchSlash) {
+QString ExcludedFiles::extractBnameTrigger(QString &exclude, bool wildcardsMatchSlash) {
     // We can definitely drop everything to the left of a / - that will never match
     // any bname.
     QString pattern = exclude.mid(exclude.lastIndexOf(QLatin1Char('/')) + 1);
@@ -651,7 +643,7 @@ void ExcludedFiles::prepare() {
         prepare(basePath);
 }
 
-void ExcludedFiles::prepare(const BasePathString & basePath) {
+void ExcludedFiles::prepare(BasePathString & basePath) {
     Q_ASSERT(_allExcludes.contains(basePath));
 
     // Build regular expressions for the different cases.
@@ -688,7 +680,7 @@ void ExcludedFiles::prepare(const BasePathString & basePath) {
     QString bnameTriggerFileDir;
     QString bnameTriggerDir;
 
-    auto regexAppend = [](QString &fileDirPattern, QString &dirPattern, const QString &appendMe, bool dirOnly) {
+    auto regexAppend = [](QString &fileDirPattern, QString &dirPattern, QString &appendMe, bool dirOnly) {
         QString &pattern = dirOnly ? dirPattern : fileDirPattern;
         if (!pattern.isEmpty())
             pattern.append(QLatin1Char('|'));

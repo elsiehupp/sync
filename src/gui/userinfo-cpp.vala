@@ -13,12 +13,6 @@
  * for more details.
  */
 
-#include "userinfo.h"
-#include "account.h"
-#include "accountstate.h"
-#include "networkjobs.h"
-#include "folderman.h"
-#include "creds/abstractcredentials.h"
 // #include <theme.h>
 
 // #include <QTimer>
@@ -50,7 +44,6 @@ void UserInfo::setActive(bool active) {
     _active = active;
     slotAccountStateChanged();
 }
-
 
 void UserInfo::slotAccountStateChanged() {
     if (canGetInfo()) {
@@ -101,7 +94,7 @@ void UserInfo::slotFetchInfo() {
     _job->start();
 }
 
-void UserInfo::slotUpdateLastInfo(const QJsonDocument &json) {
+void UserInfo::slotUpdateLastInfo(QJsonDocument &json) {
     auto objData = json.object().value("ocs").toObject().value("data").toObject();
 
     AccountPtr account = _accountState->account();
@@ -141,7 +134,7 @@ void UserInfo::slotUpdateLastInfo(const QJsonDocument &json) {
         emit fetchedLastInfo(this);
 }
 
-void UserInfo::slotAvatarImage(const QImage &img) {
+void UserInfo::slotAvatarImage(QImage &img) {
     _accountState->account()->setAvatar(img);
 
     emit fetchedLastInfo(this);

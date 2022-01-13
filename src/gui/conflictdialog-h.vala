@@ -12,7 +12,6 @@
  * for more details.
  */
 
-
 // #include <QDialog>
 
 namespace OCC {
@@ -33,9 +32,9 @@ public:
     QString remoteVersionFilename() const;
 
 public slots:
-    void setBaseFilename(const QString &baseFilename);
-    void setLocalVersionFilename(const QString &localVersionFilename);
-    void setRemoteVersionFilename(const QString &remoteVersionFilename);
+    void setBaseFilename(QString &baseFilename);
+    void setLocalVersionFilename(QString &localVersionFilename);
+    void setRemoteVersionFilename(QString &remoteVersionFilename);
 
     void accept() override;
 

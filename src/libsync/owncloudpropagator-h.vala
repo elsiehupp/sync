@@ -12,7 +12,6 @@
  * for more details.
  */
 
-
 // #include <QHash>
 // #include <QObject>
 // #include <QMap>
@@ -21,13 +20,6 @@
 // #include <QPointer>
 // #include <QIODevice>
 // #include <QMutex>
-
-#include "csync.h"
-#include "syncfileitem.h"
-#include "common/syncjournaldb.h"
-#include "bandwidthmanager.h"
-#include "accountfwd.h"
-#include "syncoptions.h"
 
 // #include <deque>
 
@@ -159,7 +151,7 @@ protected:
  */
 class PropagateItemJob : public PropagatorJob {
 protected:
-    virtual void done(SyncFileItem::Status status, const QString &errorString = QString());
+    virtual void done(SyncFileItem::Status status, QString &errorString = QString());
 
     /*
      * set a custom restore job message that is used if the restore job succeeded.
@@ -168,7 +160,7 @@ protected:
     QString restoreJobMsg() const {
         return _item->_isRestoration ? _item->_errorString : QString();
     }
-    void setRestoreJobMsg(const QString &msg = QString()) {
+    void setRestoreJobMsg(QString &msg = QString()) {
         _item->_isRestoration = true;
         _item->_errorString = msg;
     }
@@ -183,7 +175,7 @@ private:
     JobParallelism _parallelism;
 
 public:
-    PropagateItemJob(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
+    PropagateItemJob(OwncloudPropagator *propagator, SyncFileItemPtr &item)
         : PropagatorJob(propagator)
         , _parallelism(FullParallelism)
         , _item(item) {
@@ -237,7 +229,7 @@ public:
     ~PropagatorCompositeJob() override = default;
 
     void appendJob(PropagatorJob *job);
-    void appendTask(const SyncFileItemPtr &item) {
+    void appendTask(SyncFileItemPtr &item) {
         _tasksToDo.append(item);
     }
 
@@ -291,13 +283,13 @@ public:
 
     PropagatorCompositeJob _subJobs;
 
-    explicit PropagateDirectory(OwncloudPropagator *propagator, const SyncFileItemPtr &item);
+    explicit PropagateDirectory(OwncloudPropagator *propagator, SyncFileItemPtr &item);
 
     void appendJob(PropagatorJob *job) {
         _subJobs.appendJob(job);
     }
 
-    void appendTask(const SyncFileItemPtr &item) {
+    void appendTask(SyncFileItemPtr &item) {
         _subJobs.appendTask(item);
     }
 
@@ -318,7 +310,6 @@ public:
     void increaseAffectedCount() {
         _firstJob->_item->_affectedItems++;
     }
-
 
     qint64 committedDiskSpace() const override {
         return _subJobs.committedDiskSpace();
@@ -365,7 +356,7 @@ private:
  */
 class PropagateIgnoreJob : public PropagateItemJob {
 public:
-    PropagateIgnoreJob(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
+    PropagateIgnoreJob(OwncloudPropagator *propagator, SyncFileItemPtr &item)
         : PropagateItemJob(propagator, item) {
     }
     void start() override {
@@ -390,7 +381,7 @@ public:
     bool _finishedEmited; // used to ensure that finished is only emitted once
 
 public:
-    OwncloudPropagator(AccountPtr account, const QString &localDir,
+    OwncloudPropagator(AccountPtr account, QString &localDir,
                        const QString &remoteFolder, SyncJournalDb *progressDb,
                        QSet<QString> &bulkUploadBlackList)
         : _journal(progressDb)
@@ -409,20 +400,20 @@ public:
 
     void start(SyncFileItemVector &&_syncedItems);
 
-    void startDirectoryPropagation(const SyncFileItemPtr &item,
+    void startDirectoryPropagation(SyncFileItemPtr &item,
                                    QStack<QPair<QString, PropagateDirectory*>> &directories,
                                    QVector<PropagatorJob *> &directoriesToRemove,
                                    QString &removedDirectory,
                                    const SyncFileItemVector &items);
 
-    void startFilePropagation(const SyncFileItemPtr &item,
+    void startFilePropagation(SyncFileItemPtr &item,
                               QStack<QPair<QString, PropagateDirectory*>> &directories,
                               QVector<PropagatorJob *> &directoriesToRemove,
                               QString &removedDirectory,
                               QString &maybeConflictDirectory);
 
     const SyncOptions &syncOptions() const;
-    void setSyncOptions(const SyncOptions &syncOptions);
+    void setSyncOptions(SyncOptions &syncOptions);
 
     int _downloadLimit = 0;
     int _uploadLimit = 0;
@@ -472,7 +463,7 @@ public:
     /** Check whether a download would clash with an existing file
      * in filesystems that are only case-preserving.
      */
-    bool localFileNameClash(const QString &relfile);
+    bool localFileNameClash(QString &relfile);
 
     /** Check whether a file is properly accessible for upload.
      *
@@ -483,24 +474,24 @@ public:
      * When that happens, we want to avoid uploading incorrect data
      * and give up on the file.
      */
-    bool hasCaseClashAccessibilityProblem(const QString &relfile);
+    bool hasCaseClashAccessibilityProblem(QString &relfile);
 
-    Q_REQUIRED_RESULT QString fullLocalPath(const QString &tmp_file_name) const;
+    Q_REQUIRED_RESULT QString fullLocalPath(QString &tmp_file_name) const;
     QString localPath() const;
 
     /**
      * Returns the full remote path including the folder root of a
      * folder sync path.
      */
-    Q_REQUIRED_RESULT QString fullRemotePath(const QString &tmp_file_name) const;
+    Q_REQUIRED_RESULT QString fullRemotePath(QString &tmp_file_name) const;
     QString remotePath() const;
 
     /** Creates the job for an item.
      */
-    PropagateItemJob *createJob(const SyncFileItemPtr &item);
+    PropagateItemJob *createJob(SyncFileItemPtr &item);
 
     void scheduleNextJob();
-    void reportProgress(const SyncFileItem &, qint64 bytes);
+    void reportProgress(SyncFileItem &, qint64 bytes);
 
     void abort() {
         if (_abortRequested)
@@ -543,12 +534,12 @@ public:
      *
      * Returns true on success, false and error on error.
      */
-    bool createConflict(const SyncFileItemPtr &item,
+    bool createConflict(SyncFileItemPtr &item,
         PropagatorCompositeJob *composite, QString *error);
 
     // Map original path (as in the DB) to target final path
     QMap<QString, QString> _renamedDirectories;
-    QString adjustRenamedPath(const QString &original) const;
+    QString adjustRenamedPath(QString &original) const;
 
     /** Update the database for an item.
      *
@@ -557,7 +548,7 @@ public:
      *
      * Will also trigger a Vfs::convertToPlaceholder.
      */
-    Result<Vfs::ConvertToPlaceholderResult, QString> updateMetadata(const SyncFileItem &item);
+    Result<Vfs::ConvertToPlaceholderResult, QString> updateMetadata(SyncFileItem &item);
 
     /** Update the database for an item.
      *
@@ -566,10 +557,10 @@ public:
      *
      * Will also trigger a Vfs::convertToPlaceholder.
      */
-    static Result<Vfs::ConvertToPlaceholderResult, QString> staticUpdateMetadata(const SyncFileItem &item, const QString localDir,
+    static Result<Vfs::ConvertToPlaceholderResult, QString> staticUpdateMetadata(SyncFileItem &item, QString localDir,
                                                                                  Vfs *vfs, SyncJournalDb * const journal);
 
-    Q_REQUIRED_RESULT bool isDelayedUploadItem(const SyncFileItemPtr &item) const;
+    Q_REQUIRED_RESULT bool isDelayedUploadItem(SyncFileItemPtr &item) const;
 
     Q_REQUIRED_RESULT const std::deque<SyncFileItemPtr>& delayedTasks() const {
         return _delayedTasks;
@@ -579,11 +570,11 @@ public:
 
     void clearDelayedTasks();
 
-    void addToBulkUploadBlackList(const QString &file);
+    void addToBulkUploadBlackList(QString &file);
 
-    void removeFromBulkUploadBlackList(const QString &file);
+    void removeFromBulkUploadBlackList(QString &file);
 
-    bool isInBulkUploadBlackList(const QString &file) const;
+    bool isInBulkUploadBlackList(QString &file) const;
 
 private slots:
 
@@ -603,20 +594,20 @@ private slots:
     void scheduleNextJobImpl();
 
 signals:
-    void newItem(const SyncFileItemPtr &);
-    void itemCompleted(const SyncFileItemPtr &);
-    void progress(const SyncFileItem &, qint64 bytes);
+    void newItem(SyncFileItemPtr &);
+    void itemCompleted(SyncFileItemPtr &);
+    void progress(SyncFileItem &, qint64 bytes);
     void finished(bool success);
 
     /** Emitted when propagation has problems with a locked file. */
-    void seenLockedFile(const QString &fileName);
+    void seenLockedFile(QString &fileName);
 
     /** Emitted when propagation touches a file.
      *
      * Used to track our own file modifications such that notifications
      * from the file watcher about these can be ignored.
      */
-    void touchedFile(const QString &fileName);
+    void touchedFile(QString &fileName);
 
     void insufficientLocalStorage();
     void insufficientRemoteStorage();
@@ -645,7 +636,6 @@ private:
     static bool _allowDelayedUpload;
 };
 
-
 /**
  * @brief Job that wait for all the poll jobs to be completed
  * @ingroup libsync
@@ -658,7 +648,7 @@ class CleanupPollsJob : public QObject {
     QSharedPointer<Vfs> _vfs;
 
 public:
-    explicit CleanupPollsJob(const QVector<SyncJournalDb::PollInfo> &pollInfos, AccountPtr account, SyncJournalDb *journal, const QString &localPath,
+    explicit CleanupPollsJob(QVector<SyncJournalDb::PollInfo> &pollInfos, AccountPtr account, SyncJournalDb *journal, QString &localPath,
                              const QSharedPointer<Vfs> &vfs, QObject *parent = nullptr)
         : QObject(parent)
         , _pollInfos(pollInfos)
@@ -677,7 +667,7 @@ public:
     void start();
 signals:
     void finished();
-    void aborted(const QString &error);
+    void aborted(QString &error);
 private slots:
     void slotPollFinished();
 };

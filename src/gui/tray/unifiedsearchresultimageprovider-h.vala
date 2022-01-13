@@ -27,6 +27,6 @@ namespace OCC {
 
 class UnifiedSearchResultImageProvider : public QQuickAsyncImageProvider {
 public:
-    QQuickImageResponse *requestImageResponse(const QString &id, const QSize &requestedSize) override;
+    QQuickImageResponse *requestImageResponse(QString &id, QSize &requestedSize) override;
 };
 }

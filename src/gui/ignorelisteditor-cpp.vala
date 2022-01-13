@@ -12,13 +12,6 @@
  * for more details.
  */
 
-#include "configfile.h"
-
-#include "folderman.h"
-#include "generalsettings.h"
-#include "ignorelisteditor.h"
-#include "ui_ignorelisteditor.h"
-
 // #include <QFile>
 // #include <QDir>
 // #include <QListWidget>

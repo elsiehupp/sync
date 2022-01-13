@@ -12,11 +12,6 @@
  * for more details.
  */
 
-#include "sslbutton.h"
-#include "account.h"
-#include "accountstate.h"
-#include "theme.h"
-
 // #include <QMenu>
 // #include <QUrl>
 // #include <QtNetwork>
@@ -39,7 +34,7 @@ SslButton::SslButton(QWidget *parent)
     setMenu(_menu);
 }
 
-static QString addCertDetailsField(const QString &key, const QString &value) {
+static QString addCertDetailsField(QString &key, QString &value) {
     if (value.isEmpty())
         return QString();
 
@@ -48,15 +43,14 @@ static QString addCertDetailsField(const QString &key, const QString &value) {
         + QLatin1String("</td></tr>");
 }
 
-
 // necessary indication only, not sufficient for primary validation!
-static bool isSelfSigned(const QSslCertificate &certificate) {
+static bool isSelfSigned(QSslCertificate &certificate) {
     return certificate.issuerInfo(QSslCertificate::CommonName) == certificate.subjectInfo(QSslCertificate::CommonName)
         && certificate.issuerInfo(QSslCertificate::OrganizationalUnitName) == certificate.subjectInfo(QSslCertificate::OrganizationalUnitName);
 }
 
-QMenu *SslButton::buildCertMenu(QMenu *parent, const QSslCertificate &cert,
-    const QList<QSslCertificate> &userApproved, int pos, const QList<QSslCertificate> &systemCaCertificates) {
+QMenu *SslButton::buildCertMenu(QMenu *parent, QSslCertificate &cert,
+    const QList<QSslCertificate> &userApproved, int pos, QList<QSslCertificate> &systemCaCertificates) {
     QString cn = QStringList(cert.subjectInfo(QSslCertificate::CommonName)).join(QChar(';'));
     QString ou = QStringList(cert.subjectInfo(QSslCertificate::OrganizationalUnitName)).join(QChar(';'));
     QString org = QStringList(cert.subjectInfo(QSslCertificate::Organization)).join(QChar(';'));
@@ -219,7 +213,7 @@ void SslButton::slotUpdateMenu() {
         chain = tmpChain;
 
         // find trust anchor (informational only, verification is done by QSslSocket!)
-        for (const QSslCertificate &rootCA : systemCerts) {
+        for (QSslCertificate &rootCA : systemCerts) {
             if (rootCA.issuerInfo(QSslCertificate::CommonName) == chain.last().issuerInfo(QSslCertificate::CommonName)
                 && rootCA.issuerInfo(QSslCertificate::Organization) == chain.last().issuerInfo(QSslCertificate::Organization)) {
                 chain.append(rootCA);

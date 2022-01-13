@@ -12,13 +12,6 @@
  * for more details.
  */
 
-#include "theme.h"
-#include "config.h"
-#include "common/utility.h"
-#include "version.h"
-#include "configfile.h"
-#include "common/vfs.h"
-
 // #include <QtCore>
 #ifndef TOKEN_AUTH_ONLY
 // #include <QtGui>
@@ -27,8 +20,6 @@
 #endif
 // #include <QSslSocket>
 // #include <QSvgRenderer>
-
-#include "nextcloudtheme.h"
 
 #ifdef THEME_INCLUDE
 #define Mirall OCC // namespace hack to make old themes work
@@ -40,7 +31,7 @@
 
 namespace {
 
-QUrl imagePathToUrl(const QString &imagePath) {
+QUrl imagePathToUrl(QString &imagePath) {
     if (imagePath.startsWith(':')) {
         auto url = QUrl();
         url.setScheme(QStringLiteral("qrc"));
@@ -188,7 +179,7 @@ QIcon Theme::applicationIcon() const {
  * helper to load a icon from either the icon theme the desktop provides or from
  * the apps Qt resources.
  */
-QIcon Theme::themeIcon(const QString &name, bool sysTray) const {
+QIcon Theme::themeIcon(QString &name, bool sysTray) const {
     QString flavor;
     if (sysTray) {
         flavor = systrayIconFlavor(_mono);
@@ -249,7 +240,7 @@ QIcon Theme::themeIcon(const QString &name, bool sysTray) const {
     return cached;
 }
 
-QString Theme::themeImagePath(const QString &name, int size, bool sysTray) const {
+QString Theme::themeImagePath(QString &name, int size, bool sysTray) const {
     const auto flavor = (!isBranded() && sysTray) ? systrayIconFlavor(_mono) : QLatin1String("colored");
     const auto useSvg = shouldPreferSvg();
 
@@ -277,18 +268,17 @@ bool Theme::isHidpi(QPaintDevice *dev) {
     return devicePixelRatio > 1;
 }
 
-QIcon Theme::uiThemeIcon(const QString &iconName, bool uiHasDarkBg) const {
+QIcon Theme::uiThemeIcon(QString &iconName, bool uiHasDarkBg) const {
     QString iconPath = QString(Theme::themePrefix) + (uiHasDarkBg ? "white/" : "black/") + iconName;
     std::string icnPath = iconPath.toUtf8().constData();
     return QIcon(QPixmap(iconPath));
 }
 
-QString Theme::hidpiFileName(const QString &fileName, QPaintDevice *dev) {
+QString Theme::hidpiFileName(QString &fileName, QPaintDevice *dev) {
     if (!Theme::isHidpi(dev)) {
         return fileName;
     }
     // try to find a 2x version
-
 
     const int dotIndex = fileName.lastIndexOf(QLatin1Char('.'));
     if (dotIndex != -1) {
@@ -301,14 +291,13 @@ QString Theme::hidpiFileName(const QString &fileName, QPaintDevice *dev) {
     return fileName;
 }
 
-QString Theme::hidpiFileName(const QString &iconName, const QColor &backgroundColor, QPaintDevice *dev) {
+QString Theme::hidpiFileName(QString &iconName, QColor &backgroundColor, QPaintDevice *dev) {
     const auto isDarkBackground = Theme::isDarkColor(backgroundColor);
 
     const QString iconPath = QString(Theme::themePrefix) + (isDarkBackground ? "white/" : "black/") + iconName;
 
     return Theme::hidpiFileName(iconPath, dev);
 }
-
 
 #endif
 
@@ -382,7 +371,6 @@ bool Theme::forbidBadSSL() const {
 QString Theme::forceConfigAuthType() const {
     return QString();
 }
-
 
 QString Theme::defaultClientFolder() const {
     return appName();
@@ -654,7 +642,6 @@ QString Theme::userIDHint() const {
     return QString();
 }
 
-
 QString Theme::wizardUrlPostfix() const {
     return QString();
 }
@@ -694,13 +681,13 @@ QString Theme::versionSwitchOutput() const {
     return helpText;
 }
 
-bool Theme::isDarkColor(const QColor &color) {
+bool Theme::isDarkColor(QColor &color) {
     // account for different sensitivity of the human eye to certain colors
     double treshold = 1.0 - (0.299 * color.red() + 0.587 * color.green() + 0.114 * color.blue()) / 255.0;
     return treshold > 0.5;
 }
 
-QColor Theme::getBackgroundAwareLinkColor(const QColor &backgroundColor) {
+QColor Theme::getBackgroundAwareLinkColor(QColor &backgroundColor) {
     return {(isDarkColor(backgroundColor) ? QColor("#6193dc") : QGuiApplication::palette().color(QPalette::Link))};
 }
 
@@ -708,7 +695,7 @@ QColor Theme::getBackgroundAwareLinkColor() {
     return getBackgroundAwareLinkColor(QGuiApplication::palette().base().color());
 }
 
-void Theme::replaceLinkColorStringBackgroundAware(QString &linkString, const QColor &backgroundColor) {
+void Theme::replaceLinkColorStringBackgroundAware(QString &linkString, QColor &backgroundColor) {
     replaceLinkColorString(linkString, getBackgroundAwareLinkColor(backgroundColor));
 }
 
@@ -716,11 +703,11 @@ void Theme::replaceLinkColorStringBackgroundAware(QString &linkString) {
     replaceLinkColorStringBackgroundAware(linkString, QGuiApplication::palette().color(QPalette::Base));
 }
 
-void Theme::replaceLinkColorString(QString &linkString, const QColor &newColor) {
+void Theme::replaceLinkColorString(QString &linkString, QColor &newColor) {
     linkString.replace(QRegularExpression("(<a href|<a style='color:#([a-zA-Z0-9]{6});' href)"), QString::fromLatin1("<a style='color:%1;' href").arg(newColor.name()));
 }
 
-QIcon Theme::createColorAwareIcon(const QString &name, const QPalette &palette) {
+QIcon Theme::createColorAwareIcon(QString &name, QPalette &palette) {
     QSvgRenderer renderer(name);
     QImage img(64, 64, QImage::Format_ARGB32);
     img.fill(Qt::GlobalColor::transparent);
@@ -748,11 +735,11 @@ QIcon Theme::createColorAwareIcon(const QString &name, const QPalette &palette) 
     return icon;
 }
 
-QIcon Theme::createColorAwareIcon(const QString &name) {
+QIcon Theme::createColorAwareIcon(QString &name) {
     return createColorAwareIcon(name, QGuiApplication::palette());
 }
 
-QPixmap Theme::createColorAwarePixmap(const QString &name, const QPalette &palette) {
+QPixmap Theme::createColorAwarePixmap(QString &name, QPalette &palette) {
     QImage img(name);
     QImage inverted(img);
     inverted.invertPixels(QImage::InvertRgb);
@@ -766,7 +753,7 @@ QPixmap Theme::createColorAwarePixmap(const QString &name, const QPalette &palet
     return pixmap;
 }
 
-QPixmap Theme::createColorAwarePixmap(const QString &name) {
+QPixmap Theme::createColorAwarePixmap(QString &name) {
     return createColorAwarePixmap(name, QGuiApplication::palette());
 }
 

@@ -6,38 +6,37 @@
  */
 
 // #include <QtTest>
-#include "syncenginetestutils.h"
 // #include <syncengine.h>
 
 using namespace OCC;
 
-bool itemDidComplete(const ItemCompletedSpy &spy, const QString &path) {
+bool itemDidComplete(ItemCompletedSpy &spy, QString &path) {
     if (auto item = spy.findItem(path)) {
         return item->_instruction != CSYNC_INSTRUCTION_NONE && item->_instruction != CSYNC_INSTRUCTION_UPDATE_METADATA;
     }
     return false;
 }
 
-bool itemInstruction(const ItemCompletedSpy &spy, const QString &path, const SyncInstructions instr) {
+bool itemInstruction(ItemCompletedSpy &spy, QString &path, SyncInstructions instr) {
     auto item = spy.findItem(path);
     return item->_instruction == instr;
 }
 
-bool itemDidCompleteSuccessfully(const ItemCompletedSpy &spy, const QString &path) {
+bool itemDidCompleteSuccessfully(ItemCompletedSpy &spy, QString &path) {
     if (auto item = spy.findItem(path)) {
         return item->_status == SyncFileItem::Success;
     }
     return false;
 }
 
-bool itemDidCompleteSuccessfullyWithExpectedRank(const ItemCompletedSpy &spy, const QString &path, int rank) {
+bool itemDidCompleteSuccessfullyWithExpectedRank(ItemCompletedSpy &spy, QString &path, int rank) {
     if (auto item = spy.findItemWithExpectedRank(path, rank)) {
         return item->_status == SyncFileItem::Success;
     }
     return false;
 }
 
-int itemSuccessfullyCompletedGetRank(const ItemCompletedSpy &spy, const QString &path) {
+int itemSuccessfullyCompletedGetRank(ItemCompletedSpy &spy, QString &path) {
     auto itItem = std::find_if(spy.begin(), spy.end(), [&path] (auto currentItem) {
         auto item = currentItem[0].template value<OCC::SyncFileItemPtr>();
         return item->destination() == path;
@@ -211,7 +210,7 @@ private slots:
         // Remove subFolderA with selectiveSync:
         fakeFolder.syncEngine().journal()->setSelectiveSyncList(SyncJournalDb::SelectiveSyncBlackList, {"parentFolder/subFolderA/"});
         fakeFolder.syncEngine().journal()->schedulePathForRemoteDiscovery(QByteArrayLiteral("parentFolder/subFolderA/"));
-        auto getEtag = [&](const QByteArray &file) {
+        auto getEtag = [&](QByteArray &file) {
             SyncJournalFileRecord rec;
             fakeFolder.syncJournal().getFileRecord(file, &rec);
             return rec._etag;
@@ -300,7 +299,7 @@ private slots:
         QCoreApplication::processEvents(); // should not crash
 
         QSet<QString> seen;
-        for(const QList<QVariant> &args : completeSpy) {
+        for(QList<QVariant> &args : completeSpy) {
             auto item = args[0].value<SyncFileItemPtr>();
             qDebug() << item->_file << item->isDirectory() << item->_status;
             QVERIFY(!seen.contains(item->_file)); // signal only sent once per item
@@ -341,7 +340,6 @@ private slots:
             << true << QByteArray("SHA1:56900fb1d337cf7237ff766276b9c1e8ce507427")
             << 0;
 
-
         QTest::newRow("mtime changed, but no server checksum -> download")
             << false << QByteArray()
             << 1;
@@ -363,7 +361,7 @@ private slots:
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
 
         int nGET = 0;
-        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, const QNetworkRequest &, QIODevice *) {
+        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, QNetworkRequest &, QIODevice *) {
             if (op == QNetworkAccessManager::GetOperation)
                 ++nGET;
             return nullptr;
@@ -418,7 +416,6 @@ private slots:
         initialFileInfo.setModTime("C/c1", initialMtime);
 
         FakeFolder fakeFolder{ initialFileInfo };
-
 
         // upload a
         fakeFolder.localModifier().appendByte("A/a1");
@@ -491,7 +488,7 @@ private slots:
         int remoteQuota = 1000;
         int n507 = 0, nPUT = 0;
         QObject parent;
-        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, const QNetworkRequest &request, QIODevice *outgoingData) -> QNetworkReply * {
+        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, QNetworkRequest &request, QIODevice *outgoingData) -> QNetworkReply * {
             Q_UNUSED(outgoingData)
 
             if (op == QNetworkAccessManager::PutOperation) {
@@ -533,7 +530,7 @@ private slots:
         QByteArray checksumValue;
         QByteArray contentMd5Value;
 
-        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, const QNetworkRequest &request, QIODevice *) -> QNetworkReply * {
+        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, QNetworkRequest &request, QIODevice *) -> QNetworkReply * {
             if (op == QNetworkAccessManager::GetOperation) {
                 auto reply = new FakeGetReply(fakeFolder.remoteModifier(), op, request, &parent);
                 if (!checksumValue.isNull())
@@ -710,7 +707,7 @@ private slots:
 
         QObject parent;
         int nPUT = 0;
-        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, const QNetworkRequest &request, QIODevice *) -> QNetworkReply * {
+        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, QNetworkRequest &request, QIODevice *) -> QNetworkReply * {
             if (op == QNetworkAccessManager::PutOperation) {
                 ++nPUT;
                 return new FakeHangingReply(op, request, &parent);
@@ -786,12 +783,12 @@ private slots:
 
         int nPUT = 0;
         int nPOST = 0;
-        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, const QNetworkRequest &request, QIODevice *outgoingData) -> QNetworkReply * {
+        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, QNetworkRequest &request, QIODevice *outgoingData) -> QNetworkReply * {
             auto contentType = request.header(QNetworkRequest::ContentTypeHeader).toString();
             if (op == QNetworkAccessManager::PostOperation) {
                 ++nPOST;
                 if (contentType.startsWith(QStringLiteral("multipart/related; boundary="))) {
-                    auto jsonReplyObject = fakeFolder.forEachReplyPart(outgoingData, contentType, [] (const QMap<QString, QByteArray> &allHeaders) -> QJsonObject {
+                    auto jsonReplyObject = fakeFolder.forEachReplyPart(outgoingData, contentType, [] (QMap<QString, QByteArray> &allHeaders) -> QJsonObject {
                         auto reply = QJsonObject{};
                         const auto fileName = allHeaders[QStringLiteral("X-File-Path")];
                         if (fileName.endsWith("A/big2") ||

@@ -11,13 +11,6 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
  */
-#include "selectivesyncdialog.h"
-#include "folder.h"
-#include "account.h"
-#include "networkjobs.h"
-#include "theme.h"
-#include "folderman.h"
-#include "configfile.h"
 // #include <QDialogButtonBox>
 // #include <QVBoxLayout>
 // #include <QTreeWidget>
@@ -32,13 +25,12 @@
 
 namespace OCC {
 
-
 class SelectiveSyncTreeViewItem : public QTreeWidgetItem {
 public:
     SelectiveSyncTreeViewItem(int type = QTreeWidgetItem::Type)
         : QTreeWidgetItem(type) {
     }
-    SelectiveSyncTreeViewItem(const QStringList &strings, int type = QTreeWidgetItem::Type)
+    SelectiveSyncTreeViewItem(QStringList &strings, int type = QTreeWidgetItem::Type)
         : QTreeWidgetItem(strings, type) {
     }
     SelectiveSyncTreeViewItem(QTreeWidget *view, int type = QTreeWidgetItem::Type)
@@ -49,7 +41,7 @@ public:
     }
 
 private:
-    bool operator<(const QTreeWidgetItem &other) const override {
+    bool operator<(QTreeWidgetItem &other) const override {
         int column = treeWidget()->sortColumn();
         if (column == 1) {
             return data(1, Qt::UserRole).toLongLong() < other.data(1, Qt::UserRole).toLongLong();
@@ -118,7 +110,7 @@ void SelectiveSyncWidget::refreshFolders() {
     _loading->move(10, _folderTree->header()->height() + 10);
 }
 
-void SelectiveSyncWidget::setFolderInfo(const QString &folderPath, const QString &rootName, const QStringList &oldBlackList) {
+void SelectiveSyncWidget::setFolderInfo(QString &folderPath, QString &rootName, QStringList &oldBlackList) {
     _folderPath = folderPath;
     if (_folderPath.startsWith(QLatin1Char('/'))) {
         // remove leading '/'
@@ -129,7 +121,7 @@ void SelectiveSyncWidget::setFolderInfo(const QString &folderPath, const QString
     refreshFolders();
 }
 
-static QTreeWidgetItem *findFirstChild(QTreeWidgetItem *parent, const QString &text) {
+static QTreeWidgetItem *findFirstChild(QTreeWidgetItem *parent, QString &text) {
     for (int i = 0; i < parent->childCount(); ++i) {
         QTreeWidgetItem *child = parent->child(i);
         if (child->text(0) == text) {
@@ -155,7 +147,7 @@ void SelectiveSyncWidget::recursiveInsert(QTreeWidgetItem *parent, QStringList p
             if (parent->checkState(0) == Qt::Checked
                 || parent->checkState(0) == Qt::PartiallyChecked) {
                 item->setCheckState(0, Qt::Checked);
-                foreach (const QString &str, _oldBlackList) {
+                foreach (QString &str, _oldBlackList) {
                     if (str == path || str == QLatin1String("/")) {
                         item->setCheckState(0, Qt::Unchecked);
                         break;
@@ -245,7 +237,7 @@ void SelectiveSyncWidget::slotUpdateDirectories(QStringList list) {
         path.remove(pathToRemove);
 
         // Don't allow to select subfolders of encrypted subfolders
-        const auto isAnyAncestorEncrypted = std::any_of(std::cbegin(_encryptedPaths), std::cend(_encryptedPaths), [=](const QString &encryptedPath) {
+        const auto isAnyAncestorEncrypted = std::any_of(std::cbegin(_encryptedPaths), std::cend(_encryptedPaths), [=](QString &encryptedPath) {
             return path.size() > encryptedPath.size() && path.startsWith(encryptedPath);
         });
         if (isAnyAncestorEncrypted) {
@@ -284,7 +276,7 @@ void SelectiveSyncWidget::slotLscolFinishedWithError(QNetworkReply *r) {
     _loading->resize(_loading->sizeHint()); // because it's not in a layout
 }
 
-void SelectiveSyncWidget::slotGatherEncryptedPaths(const QString &path, const QMap<QString, QString> &properties) {
+void SelectiveSyncWidget::slotGatherEncryptedPaths(QString &path, QMap<QString, QString> &properties) {
     const auto it = properties.find("is-encrypted");
     if (it == properties.cend() || *it != QStringLiteral("1")) {
         return;
@@ -393,7 +385,7 @@ QStringList SelectiveSyncWidget::createBlackList(QTreeWidgetItem *root) const {
     } else {
         // We did not load from the server so we re-use the one from the old black list
         QString path = root->data(0, Qt::UserRole).toString();
-        foreach (const QString &it, _oldBlackList) {
+        foreach (QString &it, _oldBlackList) {
             if (it.startsWith(path))
                 result += it;
         }
@@ -411,7 +403,6 @@ qint64 SelectiveSyncWidget::estimatedSize(QTreeWidgetItem *root) {
     }
     if (!root)
         return -1;
-
 
     switch (root->checkState(0)) {
     case Qt::Unchecked:
@@ -437,7 +428,6 @@ qint64 SelectiveSyncWidget::estimatedSize(QTreeWidgetItem *root) {
     return result;
 }
 
-
 SelectiveSyncDialog::SelectiveSyncDialog(AccountPtr account, Folder *folder, QWidget *parent, Qt::WindowFlags f)
     : QDialog(parent, f)
     , _folder(folder)
@@ -454,7 +444,7 @@ SelectiveSyncDialog::SelectiveSyncDialog(AccountPtr account, Folder *folder, QWi
     connect(_folder, &QObject::destroyed, this, &QObject::deleteLater);
 }
 
-SelectiveSyncDialog::SelectiveSyncDialog(AccountPtr account, const QString &folder,
+SelectiveSyncDialog::SelectiveSyncDialog(AccountPtr account, QString &folder,
     const QStringList &blacklist, QWidget *parent, Qt::WindowFlags f)
     : QDialog(parent, f)
     , _folder(nullptr) {
@@ -462,7 +452,7 @@ SelectiveSyncDialog::SelectiveSyncDialog(AccountPtr account, const QString &fold
     _selectiveSync->setFolderInfo(folder, folder, blacklist);
 }
 
-void SelectiveSyncDialog::init(const AccountPtr &account) {
+void SelectiveSyncDialog::init(AccountPtr &account) {
     setWindowTitle(tr("Choose What to Sync"));
     auto *layout = new QVBoxLayout(this);
     _selectiveSync = new SelectiveSyncWidget(account, this);
@@ -495,7 +485,7 @@ void SelectiveSyncDialog::accept() {
         // (the ones that are no longer in the blacklist)
         auto blackListSet = blackList.toSet();
         auto changes = (oldBlackListSet - blackListSet) + (blackListSet - oldBlackListSet);
-        foreach (const auto &it, changes) {
+        foreach (auto &it, changes) {
             _folder->journalDb()->schedulePathForRemoteDiscovery(it);
             _folder->schedulePathForLocalDiscovery(it);
         }

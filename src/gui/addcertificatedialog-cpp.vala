@@ -13,11 +13,8 @@
  * for more details.
  */
 
-#include "ui_addcertificatedialog.h"
-#include "addcertificatedialog.h"
 // #include <QFileDialog>
 // #include <QLineEdit>
-
 
 namespace OCC {
 AddCertificateDialog::AddCertificateDialog(QWidget *parent)
@@ -44,7 +41,7 @@ QString AddCertificateDialog::getCertificatePasswd() {
     return ui->lineEditPWDCertificate->text();
 }
 
-void AddCertificateDialog::showErrorMessage(const QString message) {
+void AddCertificateDialog::showErrorMessage(QString message) {
     ui->labelErrorCertif->setText(message);
 }
 

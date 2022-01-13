@@ -12,19 +12,6 @@
  * for more details.
  */
 
-#include "settingsdialog.h"
-#include "ui_settingsdialog.h"
-
-#include "folderman.h"
-#include "theme.h"
-#include "generalsettings.h"
-#include "networksettings.h"
-#include "accountsettings.h"
-#include "configfile.h"
-#include "progressdispatcher.h"
-#include "owncloudgui.h"
-#include "accountmanager.h"
-
 // #include <QLabel>
 // #include <QStandardItemModel>
 // #include <QStackedWidget>
@@ -50,7 +37,6 @@ const QString TOOLBAR_CSS() {
 
 const float buttonSizeRatio = 1.618f; // golden ratio
 
-
 /** display name with two lines that is displayed in the settings
  * If width is bigger than 0, the string will be ellided so it does not exceed that width
  */
@@ -74,7 +60,6 @@ QString shortDisplayNameForSettings(OCC::Account *account, int width) {
     return QStringLiteral("%1\n%2").arg(user, host);
 }
 }
-
 
 namespace OCC {
 
@@ -105,7 +90,6 @@ SettingsDialog::SettingsDialog(ownCloudGui *gui, QWidget *parent)
         this, &SettingsDialog::accountAdded);
     connect(AccountManager::instance(), &AccountManager::accountRemoved,
         this, &SettingsDialog::accountRemoved);
-
 
     _actionGroup = new QActionGroup(this);
     _actionGroup->setExclusive(true);
@@ -338,12 +322,11 @@ void SettingsDialog::customizeStyle() {
 
 class ToolButtonAction : public QWidgetAction {
 public:
-    explicit ToolButtonAction(const QIcon &icon, const QString &text, QObject *parent)
+    explicit ToolButtonAction(QIcon &icon, QString &text, QObject *parent)
         : QWidgetAction(parent) {
         setText(text);
         setIcon(icon);
     }
-
 
     QWidget *createWidget(QWidget *parent) override {
         auto toolbar = qobject_cast<QToolBar *>(parent);
@@ -364,7 +347,7 @@ public:
     }
 };
 
-QAction *SettingsDialog::createActionWithIcon(const QIcon &icon, const QString &text, const QString &iconPath) {
+QAction *SettingsDialog::createActionWithIcon(QIcon &icon, QString &text, QString &iconPath) {
     QAction *action = new ToolButtonAction(icon, text, this);
     action->setCheckable(true);
     if (!iconPath.isEmpty()) {
@@ -373,7 +356,7 @@ QAction *SettingsDialog::createActionWithIcon(const QIcon &icon, const QString &
     return action;
 }
 
-QAction *SettingsDialog::createColorAwareAction(const QString &iconPath, const QString &text) {
+QAction *SettingsDialog::createColorAwareAction(QString &iconPath, QString &text) {
     // all buttons must have the same size in order to keep a good layout
     QIcon coloredIcon = Theme::createColorAwareIcon(iconPath, palette());
     return createActionWithIcon(coloredIcon, text, iconPath);

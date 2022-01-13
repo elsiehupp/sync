@@ -1,7 +1,5 @@
 // #include <QTest>
 
-#include "capabilities.h"
-
 class TestCapabilities : public QObject {
 
 private slots:

@@ -22,15 +22,13 @@
 // #include <QBasicTimer>
 // #include <QLocalSocket>
 // #include <QRegularExpression>
-#include "ownclouddolphinpluginhelper_export.h"
-#include "config.h"
 
 class OWNCLOUDDOLPHINPLUGINHELPER_EXPORT OwncloudDolphinPluginHelper : public QObject {
 public:
     static OwncloudDolphinPluginHelper *instance();
 
     bool isConnected() const;
-    void sendCommand(const char *data);
+    void sendCommand(char *data);
     QVector<QString> paths() const { return _paths; }
 
     QString contextMenuTitle() const {
@@ -49,7 +47,7 @@ public:
     QByteArray version() { return _version; }
 
 signals:
-    void commandRecieved(const QByteArray &cmd);
+    void commandRecieved(QByteArray &cmd);
 
 protected:
     void timerEvent(QTimerEvent*) override;

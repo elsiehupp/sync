@@ -6,11 +6,9 @@
  */
 
 // #include <QtTest>
-#include "syncenginetestutils.h"
 // #include <syncengine.h>
 
 using namespace OCC;
-
 
 class TestDatabaseError : public QObject {
 

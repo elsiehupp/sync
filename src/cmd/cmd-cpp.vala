@@ -26,27 +26,12 @@
 // #include <QNetworkProxy>
 // #include <qdebug.h>
 
-#include "account.h"
 #include "configfile.h" // ONLY ACCESS THE STATIC FUNCTIONS!
 #ifdef TOKEN_AUTH_ONLY
 # include "creds/tokencredentials.h"
 #else
 # include "creds/httpcredentials.h"
 #endif
-#include "simplesslerrorhandler.h"
-#include "syncengine.h"
-#include "common/syncjournaldb.h"
-#include "config.h"
-#include "csync_exclude.h"
-
-
-#include "cmd.h"
-
-#include "theme.h"
-#include "netrcparser.h"
-#include "libsync/logger.h"
-
-#include "config.h"
 
 #ifdef Q_OS_WIN32
 // #include <windows.h>
@@ -57,8 +42,7 @@
 
 using namespace OCC;
 
-
-static void nullMessageHandler(QtMsgType, const QMessageLogContext &, const QString &) {
+static void nullMessageHandler(QtMsgType, QMessageLogContext &, QString &) {
 }
 
 struct CmdOptions {
@@ -117,7 +101,7 @@ private:
 #endif
 };
 
-QString queryPassword(const QString &user) {
+QString queryPassword(QString &user) {
     EchoDisabler disabler;
     std::cout << "Password for user " << qPrintable(user) << ": ";
     std::string s;
@@ -128,7 +112,7 @@ QString queryPassword(const QString &user) {
 #ifndef TOKEN_AUTH_ONLY
 class HttpCredentialsText : public HttpCredentials {
 public:
-    HttpCredentialsText(const QString &user, const QString &password)
+    HttpCredentialsText(QString &user, QString &password)
         : HttpCredentials(user, password)
         , // FIXME: not working with client certs yet (qknight)
         _sslTrusted(false) {
@@ -191,7 +175,7 @@ void showVersion() {
     exit(0);
 }
 
-void parseOptions(const QStringList &app_args, CmdOptions *options) {
+void parseOptions(QStringList &app_args, CmdOptions *options) {
     QStringList args(app_args);
 
     int argCount = args.count();
@@ -272,7 +256,7 @@ void parseOptions(const QStringList &app_args, CmdOptions *options) {
 /* If the selective sync list is different from before, we need to disable the read from db
   (The normal client does it in SelectiveSyncDialog::accept*)
  */
-void selectiveSyncFixup(OCC::SyncJournalDb *journal, const QStringList &newList) {
+void selectiveSyncFixup(OCC::SyncJournalDb *journal, QStringList &newList) {
     SqlDatabase db;
     if (!db.openOrCreateReadWrite(journal->databaseFilePath())) {
         return;
@@ -285,7 +269,7 @@ void selectiveSyncFixup(OCC::SyncJournalDb *journal, const QStringList &newList)
     if (ok) {
         const QSet<QString> blackListSet(newList.begin(), newList.end());
         const auto changes = (oldBlackListSet - blackListSet) + (blackListSet - oldBlackListSet);
-        for (const auto &it : changes) {
+        for (auto &it : changes) {
             journal->schedulePathForRemoteDiscovery(it);
         }
 
@@ -427,7 +411,7 @@ int main(int argc, char **argv) {
 
     QEventLoop loop;
     auto *job = new JsonApiJob(account, QLatin1String("ocs/v1.php/cloud/capabilities"));
-    QObject::connect(job, &JsonApiJob::jsonReceived, [&](const QJsonDocument &json) {
+    QObject::connect(job, &JsonApiJob::jsonReceived, [&](QJsonDocument &json) {
         auto caps = json.object().value("ocs").toObject().value("data").toObject().value("capabilities").toObject();
         qDebug() << "Server capabilities" << caps;
         account->setCapabilities(caps.toVariantMap());
@@ -443,7 +427,7 @@ int main(int argc, char **argv) {
     }
 
     job = new JsonApiJob(account, QLatin1String("ocs/v1.php/cloud/user"));
-    QObject::connect(job, &JsonApiJob::jsonReceived, [&](const QJsonDocument &json) {
+    QObject::connect(job, &JsonApiJob::jsonReceived, [&](QJsonDocument &json) {
         const QJsonObject data = json.object().value("ocs").toObject().value("data").toObject();
         account->setDavUser(data.value("id").toString());
         account->setDavDisplayName(data.value("display-name").toString());
@@ -495,8 +479,7 @@ restart_sync:
         [&app](bool result) { app.exit(result ? EXIT_SUCCESS : EXIT_FAILURE); });
     QObject::connect(&engine, &SyncEngine::transmissionProgress, &cmd, &Cmd::transmissionProgressSlot);
     QObject::connect(&engine, &SyncEngine::syncError,
-        [](const QString &error) { qWarning() << "Sync error:" << error; });
-
+        [](QString &error) { qWarning() << "Sync error:" << error; });
 
     // Exclude lists
 
@@ -516,7 +499,6 @@ restart_sync:
         qFatal("Cannot load system exclude list or list supplied via --exclude");
         return EXIT_FAILURE;
     }
-
 
     // Have to be done async, else, an error before exec() does not terminate the event loop.
     QMetaObject::invokeMethod(&engine, "startSync", Qt::QueuedConnection);

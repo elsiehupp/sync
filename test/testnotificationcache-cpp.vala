@@ -1,7 +1,5 @@
 // #include <QTest>
 
-#include "tray/notificationcache.h"
-
 class TestNotificationCache : public QObject {
 
 private slots:

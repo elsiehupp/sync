@@ -16,12 +16,12 @@ public:
     IgnoreListTableWidget(QWidget *parent = nullptr);
     ~IgnoreListTableWidget() override;
 
-    void readIgnoreFile(const QString &file, bool readOnly = false);
-    int addPattern(const QString &pattern, bool deletable, bool readOnly);
+    void readIgnoreFile(QString &file, bool readOnly = false);
+    int addPattern(QString &pattern, bool deletable, bool readOnly);
 
 public slots:
     void slotRemoveAllItems();
-    void slotWriteIgnoreFile(const QString & file);
+    void slotWriteIgnoreFile(QString & file);
 
 private slots:
     void slotItemSelectionChanged();

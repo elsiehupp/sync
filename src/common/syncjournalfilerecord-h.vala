@@ -16,14 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-
 // #include <QString>
 // #include <QDateTime>
-
-#include "csync.h"
-#include "ocsynclib.h"
-#include "remotepermissions.h"
-#include "common/utility.h"
 
 namespace OCC {
 
@@ -69,7 +63,7 @@ public:
 };
 
 bool OCSYNC_EXPORT
-operator==(const SyncJournalFileRecord &lhs,
+operator==(SyncJournalFileRecord &lhs,
     const SyncJournalFileRecord &rhs);
 
 class OCSYNC_EXPORT SyncJournalErrorBlacklistRecord {
@@ -146,7 +140,6 @@ public:
      * maybe be empty if not available
      */
     QByteArray initialBasePath;
-
 
     bool isValid() const { return !path.isEmpty(); }
 };

@@ -26,15 +26,6 @@
 // #include <sqlite3.h>
 // #include <cstring>
 
-#include "common/syncjournaldb.h"
-#include "version.h"
-#include "filesystembase.h"
-#include "common/asserts.h"
-#include "common/checksums.h"
-#include "common/preparedsqlquerymanager.h"
-
-#include "common/c_jhash.h"
-
 // SQL expression to check whether path.startswith(prefix + '/')
 // Note: '/' + 1 == '0'
 #define IS_PREFIX_PATH_OF(prefix, path) \
@@ -67,7 +58,7 @@ static void fillFileRecordFromGetQuery(SyncJournalFileRecord &rec, SqlQuery &que
     rec._isE2eEncrypted = query.intValue(11) > 0;
 }
 
-static QByteArray defaultJournalMode(const QString &dbPath) {
+static QByteArray defaultJournalMode(QString &dbPath) {
 #if defined(Q_OS_WIN)
     // See #2693: Some exFAT file systems seem unable to cope with the
     // WAL journaling mode. They work fine with DELETE.
@@ -88,7 +79,7 @@ static QByteArray defaultJournalMode(const QString &dbPath) {
     return "WAL";
 }
 
-SyncJournalDb::SyncJournalDb(const QString &dbFilePath, QObject *parent)
+SyncJournalDb::SyncJournalDb(QString &dbFilePath, QObject *parent)
     : QObject(parent)
     , _dbFile(dbFilePath)
     , _transaction(0)
@@ -101,7 +92,7 @@ SyncJournalDb::SyncJournalDb(const QString &dbFilePath, QObject *parent)
     }
 }
 
-QString SyncJournalDb::makeDbName(const QString &localPath,
+QString SyncJournalDb::makeDbName(QString &localPath,
     const QUrl &remoteUrl,
     const QString &remotePath,
     const QString &user) {
@@ -131,7 +122,7 @@ QString SyncJournalDb::makeDbName(const QString &localPath,
     return journalPath;
 }
 
-bool SyncJournalDb::maybeMigrateDb(const QString &localPath, const QString &absoluteJournalPath) {
+bool SyncJournalDb::maybeMigrateDb(QString &localPath, QString &absoluteJournalPath) {
     const QString oldDbName = localPath + QLatin1String(".csync_journal.db");
     if (!FileSystem::fileExists(oldDbName)) {
         return true;
@@ -237,7 +228,7 @@ void SyncJournalDb::commitTransaction() {
     }
 }
 
-bool SyncJournalDb::sqlFail(const QString &log, const SqlQuery &query) {
+bool SyncJournalDb::sqlFail(QString &log, SqlQuery &query) {
     commitTransaction();
     qCWarning(lcDb) << "SQL Error" << log << query.error();
     _db.close();
@@ -579,7 +570,6 @@ bool SyncJournalDb::checkConnect() {
         return sqlFail(QStringLiteral("prepare _deleteDownloadInfoQuery"), *deleteDownloadInfo);
     }
 
-
     const auto deleteUploadInfoQuery = _queryManager.get(PreparedSqlQueryManager::DeleteUploadInfoQuery, QByteArrayLiteral("DELETE FROM uploadinfo WHERE path=?1"), _db);
     if (!deleteUploadInfoQuery) {
         return sqlFail(QStringLiteral("prepare _deleteUploadInfoQuery"), *deleteUploadInfoQuery);
@@ -623,7 +613,6 @@ void SyncJournalDb::close() {
     clearEtagStorageFilter();
     _metadataTableIsEmpty = false;
 }
-
 
 bool SyncJournalDb::updateDatabaseStructure() {
     if (!updateMetadataTableStructure())
@@ -856,7 +845,7 @@ bool SyncJournalDb::updateErrorBlacklistTableStructure() {
     return re;
 }
 
-QVector<QByteArray> SyncJournalDb::tableColumns(const QByteArray &table) {
+QVector<QByteArray> SyncJournalDb::tableColumns(QByteArray &table) {
     QVector<QByteArray> columns;
     if (!checkConnect()) {
         return columns;
@@ -872,7 +861,7 @@ QVector<QByteArray> SyncJournalDb::tableColumns(const QByteArray &table) {
     return columns;
 }
 
-qint64 SyncJournalDb::getPHash(const QByteArray &file) {
+qint64 SyncJournalDb::getPHash(QByteArray &file) {
     qint64 h = 0;
     int len = file.length();
 
@@ -880,14 +869,14 @@ qint64 SyncJournalDb::getPHash(const QByteArray &file) {
     return h;
 }
 
-Result<void, QString> SyncJournalDb::setFileRecord(const SyncJournalFileRecord &_record) {
+Result<void, QString> SyncJournalDb::setFileRecord(SyncJournalFileRecord &_record) {
     SyncJournalFileRecord record = _record;
     QMutexLocker locker(&_mutex);
 
     if (!_etagStorageFilter.isEmpty()) {
         // If we are a directory that should not be read from db next time, don't write the etag
         QByteArray prefix = record._path + "/";
-        foreach (const QByteArray &it, _etagStorageFilter) {
+        foreach (QByteArray &it, _etagStorageFilter) {
             if (it.startsWith(prefix)) {
                 qCInfo(lcDb) << "Filtered writing the etag of" << prefix << "because it is a prefix of" << it;
                 record._etag = "_invalid_";
@@ -958,7 +947,7 @@ Result<void, QString> SyncJournalDb::setFileRecord(const SyncJournalFileRecord &
     }
 }
 
-void SyncJournalDb::keyValueStoreSet(const QString &key, QVariant value) {
+void SyncJournalDb::keyValueStoreSet(QString &key, QVariant value) {
     QMutexLocker locker(&_mutex);
     if (!checkConnect()) {
         return;
@@ -974,7 +963,7 @@ void SyncJournalDb::keyValueStoreSet(const QString &key, QVariant value) {
     query->exec();
 }
 
-qint64 SyncJournalDb::keyValueStoreGetInt(const QString &key, qint64 defaultValue) {
+qint64 SyncJournalDb::keyValueStoreGetInt(QString &key, qint64 defaultValue) {
     QMutexLocker locker(&_mutex);
     if (!checkConnect()) {
         return defaultValue;
@@ -996,7 +985,7 @@ qint64 SyncJournalDb::keyValueStoreGetInt(const QString &key, qint64 defaultValu
     return query->int64Value(0);
 }
 
-void SyncJournalDb::keyValueStoreDelete(const QString &key) {
+void SyncJournalDb::keyValueStoreDelete(QString &key) {
     const auto query = _queryManager.get(PreparedSqlQueryManager::DeleteKeyValueStoreQuery, QByteArrayLiteral("DELETE FROM key_value_store WHERE key=?1;"), _db);
     if (!query) {
         qCWarning(lcDb) << "Failed to initOrReset _deleteKeyValueStoreQuery";
@@ -1010,7 +999,7 @@ void SyncJournalDb::keyValueStoreDelete(const QString &key) {
 }
 
 // TODO: filename -> QBytearray?
-bool SyncJournalDb::deleteFileRecord(const QString &filename, bool recursively) {
+bool SyncJournalDb::deleteFileRecord(QString &filename, bool recursively) {
     QMutexLocker locker(&_mutex);
 
     if (checkConnect()) {
@@ -1046,8 +1035,7 @@ bool SyncJournalDb::deleteFileRecord(const QString &filename, bool recursively) 
     }
 }
 
-
-bool SyncJournalDb::getFileRecord(const QByteArray &filename, SyncJournalFileRecord *rec) {
+bool SyncJournalDb::getFileRecord(QByteArray &filename, SyncJournalFileRecord *rec) {
     QMutexLocker locker(&_mutex);
 
     // Reset the output var in case the caller is reusing it.
@@ -1088,7 +1076,7 @@ bool SyncJournalDb::getFileRecord(const QByteArray &filename, SyncJournalFileRec
     return true;
 }
 
-bool SyncJournalDb::getFileRecordByE2eMangledName(const QString &mangledName, SyncJournalFileRecord *rec) {
+bool SyncJournalDb::getFileRecordByE2eMangledName(QString &mangledName, SyncJournalFileRecord *rec) {
     QMutexLocker locker(&_mutex);
 
     // Reset the output var in case the caller is reusing it.
@@ -1162,7 +1150,7 @@ bool SyncJournalDb::getFileRecordByInode(quint64 inode, SyncJournalFileRecord *r
     return true;
 }
 
-bool SyncJournalDb::getFileRecordsByFileId(const QByteArray &fileId, const std::function<void(const SyncJournalFileRecord &)> &rowCallback) {
+bool SyncJournalDb::getFileRecordsByFileId(QByteArray &fileId, std::function<void(SyncJournalFileRecord &)> &rowCallback) {
     QMutexLocker locker(&_mutex);
 
     if (fileId.isEmpty() || _metadataTableIsEmpty)
@@ -1196,7 +1184,7 @@ bool SyncJournalDb::getFileRecordsByFileId(const QByteArray &fileId, const std::
     return true;
 }
 
-bool SyncJournalDb::getFilesBelowPath(const QByteArray &path, const std::function<void(const SyncJournalFileRecord&)> &rowCallback) {
+bool SyncJournalDb::getFilesBelowPath(QByteArray &path, std::function<void(SyncJournalFileRecord&)> &rowCallback) {
     QMutexLocker locker(&_mutex);
 
     if (_metadataTableIsEmpty)
@@ -1255,8 +1243,8 @@ bool SyncJournalDb::getFilesBelowPath(const QByteArray &path, const std::functio
     }
 }
 
-bool SyncJournalDb::listFilesInPath(const QByteArray& path,
-                                    const std::function<void (const SyncJournalFileRecord &)>& rowCallback) {
+bool SyncJournalDb::listFilesInPath(QByteArray& path,
+                                    const std::function<void (SyncJournalFileRecord &)>& rowCallback) {
     QMutexLocker locker(&_mutex);
 
     if (_metadataTableIsEmpty)
@@ -1311,7 +1299,7 @@ int SyncJournalDb::getFileRecordCount() {
     return -1;
 }
 
-bool SyncJournalDb::updateFileRecordChecksum(const QString &filename,
+bool SyncJournalDb::updateFileRecordChecksum(QString &filename,
     const QByteArray &contentChecksum,
     const QByteArray &contentChecksumType) {
     QMutexLocker locker(&_mutex);
@@ -1339,7 +1327,7 @@ bool SyncJournalDb::updateFileRecordChecksum(const QString &filename,
     return query->exec();
 }
 
-bool SyncJournalDb::updateLocalMetadata(const QString &filename,
+bool SyncJournalDb::updateLocalMetadata(QString &filename,
     qint64 modtime, qint64 size, quint64 inode)
  {
     QMutexLocker locker(&_mutex);
@@ -1367,7 +1355,7 @@ bool SyncJournalDb::updateLocalMetadata(const QString &filename,
     return query->exec();
 }
 
-Optional<SyncJournalDb::HasHydratedDehydrated> SyncJournalDb::hasHydratedOrDehydratedFiles(const QByteArray &filename) {
+Optional<SyncJournalDb::HasHydratedDehydrated> SyncJournalDb::hasHydratedOrDehydratedFiles(QByteArray &filename) {
     QMutexLocker locker(&_mutex);
     if (!checkConnect())
         return {};
@@ -1408,13 +1396,13 @@ static void toDownloadInfo(SqlQuery &query, SyncJournalDb::DownloadInfo *res) {
     res->_valid = ok;
 }
 
-static bool deleteBatch(SqlQuery &query, const QStringList &entries, const QString &name) {
+static bool deleteBatch(SqlQuery &query, QStringList &entries, QString &name) {
     if (entries.isEmpty())
         return true;
 
     qCDebug(lcDb) << "Removing stale" << name << "entries:" << entries.join(QStringLiteral(", "));
     // FIXME: Was ported from execBatch, check if correct!
-    foreach (const QString &entry, entries) {
+    foreach (QString &entry, entries) {
         query.reset_and_clear_bindings();
         query.bindValue(1, entry);
         if (!query.exec()) {
@@ -1425,7 +1413,7 @@ static bool deleteBatch(SqlQuery &query, const QStringList &entries, const QStri
     return true;
 }
 
-SyncJournalDb::DownloadInfo SyncJournalDb::getDownloadInfo(const QString &file) {
+SyncJournalDb::DownloadInfo SyncJournalDb::getDownloadInfo(QString &file) {
     QMutexLocker locker(&_mutex);
 
     DownloadInfo res;
@@ -1449,13 +1437,12 @@ SyncJournalDb::DownloadInfo SyncJournalDb::getDownloadInfo(const QString &file) 
     return res;
 }
 
-void SyncJournalDb::setDownloadInfo(const QString &file, const SyncJournalDb::DownloadInfo &i) {
+void SyncJournalDb::setDownloadInfo(QString &file, SyncJournalDb::DownloadInfo &i) {
     QMutexLocker locker(&_mutex);
 
     if (!checkConnect()) {
         return;
     }
-
 
     if (i._valid) {
         const auto query = _queryManager.get(PreparedSqlQueryManager::SetDownloadInfoQuery, QByteArrayLiteral("INSERT OR REPLACE INTO downloadinfo "
@@ -1477,7 +1464,7 @@ void SyncJournalDb::setDownloadInfo(const QString &file, const SyncJournalDb::Do
     }
 }
 
-QVector<SyncJournalDb::DownloadInfo> SyncJournalDb::getAndDeleteStaleDownloadInfos(const QSet<QString> &keep) {
+QVector<SyncJournalDb::DownloadInfo> SyncJournalDb::getAndDeleteStaleDownloadInfos(QSet<QString> &keep) {
     QVector<SyncJournalDb::DownloadInfo> empty_result;
     QMutexLocker locker(&_mutex);
 
@@ -1532,7 +1519,7 @@ int SyncJournalDb::downloadInfoCount() {
     return re;
 }
 
-SyncJournalDb::UploadInfo SyncJournalDb::getUploadInfo(const QString &file) {
+SyncJournalDb::UploadInfo SyncJournalDb::getUploadInfo(QString &file) {
     QMutexLocker locker(&_mutex);
 
     UploadInfo res;
@@ -1564,7 +1551,7 @@ SyncJournalDb::UploadInfo SyncJournalDb::getUploadInfo(const QString &file) {
     return res;
 }
 
-void SyncJournalDb::setUploadInfo(const QString &file, const SyncJournalDb::UploadInfo &i) {
+void SyncJournalDb::setUploadInfo(QString &file, SyncJournalDb::UploadInfo &i) {
     QMutexLocker locker(&_mutex);
 
     if (!checkConnect()) {
@@ -1601,7 +1588,7 @@ void SyncJournalDb::setUploadInfo(const QString &file, const SyncJournalDb::Uplo
     }
 }
 
-QVector<uint> SyncJournalDb::deleteStaleUploadInfos(const QSet<QString> &keep) {
+QVector<uint> SyncJournalDb::deleteStaleUploadInfos(QSet<QString> &keep) {
     QMutexLocker locker(&_mutex);
     QVector<uint> ids;
 
@@ -1631,7 +1618,7 @@ QVector<uint> SyncJournalDb::deleteStaleUploadInfos(const QSet<QString> &keep) {
     return ids;
 }
 
-SyncJournalErrorBlacklistRecord SyncJournalDb::errorBlacklistEntry(const QString &file) {
+SyncJournalErrorBlacklistRecord SyncJournalDb::errorBlacklistEntry(QString &file) {
     QMutexLocker locker(&_mutex);
     SyncJournalErrorBlacklistRecord entry;
 
@@ -1661,7 +1648,7 @@ SyncJournalErrorBlacklistRecord SyncJournalDb::errorBlacklistEntry(const QString
     return entry;
 }
 
-bool SyncJournalDb::deleteStaleErrorBlacklistEntries(const QSet<QString> &keep) {
+bool SyncJournalDb::deleteStaleErrorBlacklistEntries(QSet<QString> &keep) {
     QMutexLocker locker(&_mutex);
 
     if (!checkConnect()) {
@@ -1731,7 +1718,7 @@ int SyncJournalDb::wipeErrorBlacklist() {
     return -1;
 }
 
-void SyncJournalDb::wipeErrorBlacklistEntry(const QString &file) {
+void SyncJournalDb::wipeErrorBlacklistEntry(QString &file) {
     if (file.isEmpty()) {
         return;
     }
@@ -1761,7 +1748,7 @@ void SyncJournalDb::wipeErrorBlacklistCategory(SyncJournalErrorBlacklistRecord::
     }
 }
 
-void SyncJournalDb::setErrorBlacklistEntry(const SyncJournalErrorBlacklistRecord &item) {
+void SyncJournalDb::setErrorBlacklistEntry(SyncJournalErrorBlacklistRecord &item) {
     QMutexLocker locker(&_mutex);
 
     qCInfo(lcDb) << "Setting blacklist entry for" << item._file << item._retryCount
@@ -1819,7 +1806,7 @@ QVector<SyncJournalDb::PollInfo> SyncJournalDb::getPollInfos() {
     return res;
 }
 
-void SyncJournalDb::setPollInfo(const SyncJournalDb::PollInfo &info) {
+void SyncJournalDb::setPollInfo(SyncJournalDb::PollInfo &info) {
     QMutexLocker locker(&_mutex);
     if (!checkConnect()) {
         return;
@@ -1881,7 +1868,7 @@ QStringList SyncJournalDb::getSelectiveSyncList(SyncJournalDb::SelectiveSyncList
     return result;
 }
 
-void SyncJournalDb::setSelectiveSyncList(SyncJournalDb::SelectiveSyncListType type, const QStringList &list) {
+void SyncJournalDb::setSelectiveSyncList(SyncJournalDb::SelectiveSyncListType type, QStringList &list) {
     QMutexLocker locker(&_mutex);
     if (!checkConnect()) {
         return;
@@ -1897,7 +1884,7 @@ void SyncJournalDb::setSelectiveSyncList(SyncJournalDb::SelectiveSyncListType ty
     }
 
     SqlQuery insQuery("INSERT INTO selectivesync VALUES (?1, ?2)", _db);
-    foreach (const auto &path, list) {
+    foreach (auto &path, list) {
         insQuery.reset_and_clear_bindings();
         insQuery.bindValue(1, path);
         insQuery.bindValue(2, int(type));
@@ -1909,7 +1896,7 @@ void SyncJournalDb::setSelectiveSyncList(SyncJournalDb::SelectiveSyncListType ty
     commitInternal(QStringLiteral("setSelectiveSyncList"));
 }
 
-void SyncJournalDb::avoidRenamesOnNextSync(const QByteArray &path) {
+void SyncJournalDb::avoidRenamesOnNextSync(QByteArray &path) {
     QMutexLocker locker(&_mutex);
 
     if (!checkConnect()) {
@@ -1926,7 +1913,7 @@ void SyncJournalDb::avoidRenamesOnNextSync(const QByteArray &path) {
     schedulePathForRemoteDiscovery(path);
 }
 
-void SyncJournalDb::schedulePathForRemoteDiscovery(const QByteArray &fileName) {
+void SyncJournalDb::schedulePathForRemoteDiscovery(QByteArray &fileName) {
     QMutexLocker locker(&_mutex);
 
     if (!checkConnect()) {
@@ -1972,7 +1959,6 @@ void SyncJournalDb::forceRemoteDiscoveryNextSyncLocked() {
     deleteRemoteFolderEtagsQuery.exec();
 }
 
-
 QByteArray SyncJournalDb::getChecksumType(int checksumTypeId) {
     QMutexLocker locker(&_mutex);
     if (!checkConnect()) {
@@ -1996,7 +1982,7 @@ QByteArray SyncJournalDb::getChecksumType(int checksumTypeId) {
     return query->baValue(0);
 }
 
-int SyncJournalDb::mapChecksumType(const QByteArray &checksumType) {
+int SyncJournalDb::mapChecksumType(QByteArray &checksumType) {
     if (checksumType.isEmpty()) {
         return 0;
     }
@@ -2057,7 +2043,7 @@ QByteArray SyncJournalDb::dataFingerprint() {
     return query->baValue(0);
 }
 
-void SyncJournalDb::setDataFingerprint(const QByteArray &dataFingerprint) {
+void SyncJournalDb::setDataFingerprint(QByteArray &dataFingerprint) {
     QMutexLocker locker(&_mutex);
     if (!checkConnect()) {
         return;
@@ -2075,7 +2061,7 @@ void SyncJournalDb::setDataFingerprint(const QByteArray &dataFingerprint) {
     setDataFingerprintQuery2->exec();
 }
 
-void SyncJournalDb::setConflictRecord(const ConflictRecord &record) {
+void SyncJournalDb::setConflictRecord(ConflictRecord &record) {
     QMutexLocker locker(&_mutex);
     if (!checkConnect())
         return;
@@ -2093,7 +2079,7 @@ void SyncJournalDb::setConflictRecord(const ConflictRecord &record) {
     ASSERT(query->exec())
 }
 
-ConflictRecord SyncJournalDb::conflictRecord(const QByteArray &path) {
+ConflictRecord SyncJournalDb::conflictRecord(QByteArray &path) {
     ConflictRecord entry;
 
     QMutexLocker locker(&_mutex);
@@ -2115,7 +2101,7 @@ ConflictRecord SyncJournalDb::conflictRecord(const QByteArray &path) {
     return entry;
 }
 
-void SyncJournalDb::deleteConflictRecord(const QByteArray &path) {
+void SyncJournalDb::deleteConflictRecord(QByteArray &path) {
     QMutexLocker locker(&_mutex);
     if (!checkConnect())
         return;
@@ -2142,11 +2128,11 @@ QByteArrayList SyncJournalDb::conflictRecordPaths() {
     return paths;
 }
 
-QByteArray SyncJournalDb::conflictFileBaseName(const QByteArray &conflictName) {
+QByteArray SyncJournalDb::conflictFileBaseName(QByteArray &conflictName) {
     auto conflict = conflictRecord(conflictName);
     QByteArray result;
     if (conflict.isValid()) {
-        getFileRecordsByFileId(conflict.baseFileId, [&result](const SyncJournalFileRecord &record) {
+        getFileRecordsByFileId(conflict.baseFileId, [&result](SyncJournalFileRecord &record) {
             if (!record._path.isEmpty())
                 result = record._path;
         });
@@ -2165,7 +2151,7 @@ void SyncJournalDb::clearFileTable() {
     query.exec();
 }
 
-void SyncJournalDb::markVirtualFileForDownloadRecursively(const QByteArray &path) {
+void SyncJournalDb::markVirtualFileForDownloadRecursively(QByteArray &path) {
     QMutexLocker lock(&_mutex);
     if (!checkConnect())
         return;
@@ -2186,7 +2172,7 @@ void SyncJournalDb::markVirtualFileForDownloadRecursively(const QByteArray &path
     query.exec();
 }
 
-Optional<PinState> SyncJournalDb::PinStateInterface::rawForPath(const QByteArray &path) {
+Optional<PinState> SyncJournalDb::PinStateInterface::rawForPath(QByteArray &path) {
     QMutexLocker lock(&_db->_mutex);
     if (!_db->checkConnect())
         return {};
@@ -2206,7 +2192,7 @@ Optional<PinState> SyncJournalDb::PinStateInterface::rawForPath(const QByteArray
     return static_cast<PinState>(query->intValue(0));
 }
 
-Optional<PinState> SyncJournalDb::PinStateInterface::effectiveForPath(const QByteArray &path) {
+Optional<PinState> SyncJournalDb::PinStateInterface::effectiveForPath(QByteArray &path) {
     QMutexLocker lock(&_db->_mutex);
     if (!_db->checkConnect())
         return {};
@@ -2232,7 +2218,7 @@ Optional<PinState> SyncJournalDb::PinStateInterface::effectiveForPath(const QByt
     return static_cast<PinState>(query->intValue(0));
 }
 
-Optional<PinState> SyncJournalDb::PinStateInterface::effectiveForPathRecursive(const QByteArray &path) {
+Optional<PinState> SyncJournalDb::PinStateInterface::effectiveForPathRecursive(QByteArray &path) {
     // Get the item's effective pin state. We'll compare subitem's pin states
     // against this.
     const auto basePin = effectiveForPath(path);
@@ -2267,7 +2253,7 @@ Optional<PinState> SyncJournalDb::PinStateInterface::effectiveForPathRecursive(c
     return *basePin;
 }
 
-void SyncJournalDb::PinStateInterface::setForPath(const QByteArray &path, PinState state) {
+void SyncJournalDb::PinStateInterface::setForPath(QByteArray &path, PinState state) {
     QMutexLocker lock(&_db->_mutex);
     if (!_db->checkConnect())
         return;
@@ -2286,7 +2272,7 @@ void SyncJournalDb::PinStateInterface::setForPath(const QByteArray &path, PinSta
     query->exec();
 }
 
-void SyncJournalDb::PinStateInterface::wipeForPathAndBelow(const QByteArray &path) {
+void SyncJournalDb::PinStateInterface::wipeForPathAndBelow(QByteArray &path) {
     QMutexLocker lock(&_db->_mutex);
     if (!_db->checkConnect())
         return;
@@ -2325,12 +2311,12 @@ SyncJournalDb::PinStateInterface SyncJournalDb::internalPinStates() {
     return {this};
 }
 
-void SyncJournalDb::commit(const QString &context, bool startTrans) {
+void SyncJournalDb::commit(QString &context, bool startTrans) {
     QMutexLocker lock(&_mutex);
     commitInternal(context, startTrans);
 }
 
-void SyncJournalDb::commitIfNeededAndStartNewTransaction(const QString &context) {
+void SyncJournalDb::commitIfNeededAndStartNewTransaction(QString &context) {
     QMutexLocker lock(&_mutex);
     if (_transaction == 1) {
         commitInternal(context, true);
@@ -2349,7 +2335,7 @@ bool SyncJournalDb::isOpen() {
     return _db.isOpen();
 }
 
-void SyncJournalDb::commitInternal(const QString &context, bool startTrans) {
+void SyncJournalDb::commitInternal(QString &context, bool startTrans) {
     qCDebug(lcDb) << "Transaction commit" << context << (startTrans ? "and starting new transaction" : "");
     commitTransaction();
 
@@ -2362,8 +2348,7 @@ SyncJournalDb::~SyncJournalDb() {
     close();
 }
 
-
-bool operator==(const SyncJournalDb::DownloadInfo &lhs,
+bool operator==(SyncJournalDb::DownloadInfo &lhs,
     const SyncJournalDb::DownloadInfo &rhs) {
     return lhs._errorCount == rhs._errorCount
         && lhs._etag == rhs._etag
@@ -2371,7 +2356,7 @@ bool operator==(const SyncJournalDb::DownloadInfo &lhs,
         && lhs._valid == rhs._valid;
 }
 
-bool operator==(const SyncJournalDb::UploadInfo &lhs,
+bool operator==(SyncJournalDb::UploadInfo &lhs,
     const SyncJournalDb::UploadInfo &rhs) {
     return lhs._errorCount == rhs._errorCount
         && lhs._chunk == rhs._chunk

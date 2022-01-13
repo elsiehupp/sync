@@ -15,7 +15,6 @@
 
 // #pragma once
 
-#include "owncloudlib.h"
 // #include <QObject>
 // #include <QNetworkRequest>
 // #include <QNetworkReply>
@@ -23,8 +22,6 @@
 // #include <QElapsedTimer>
 // #include <QDateTime>
 // #include <QTimer>
-#include "accountfwd.h"
-#include "common/asserts.h"
 
 class QUrl;
 
@@ -38,14 +35,14 @@ class AbstractSslErrorHandler;
  */
 class OWNCLOUDSYNC_EXPORT AbstractNetworkJob : public QObject {
 public:
-    explicit AbstractNetworkJob(AccountPtr account, const QString &path, QObject *parent = nullptr);
+    explicit AbstractNetworkJob(AccountPtr account, QString &path, QObject *parent = nullptr);
     ~AbstractNetworkJob() override;
 
     virtual void start();
 
     AccountPtr account() const { return _account; }
 
-    void setPath(const QString &path);
+    void setPath(QString &path);
     QString path() const { return _path; }
 
     void setReply(QNetworkReply *reply);
@@ -113,7 +110,7 @@ signals:
      * \a targetUrl Where to redirect to
      * \a redirectCount Counts redirect hops, first is 0.
      */
-    void redirected(QNetworkReply *reply, const QUrl &targetUrl, int redirectCount);
+    void redirected(QNetworkReply *reply, QUrl &targetUrl, int redirectCount);
 
 protected:
     /** Initiate a network request, returning a QNetworkReply.
@@ -122,21 +119,21 @@ protected:
      *
      * Takes ownership of the requestBody (to allow redirects).
      */
-    QNetworkReply *sendRequest(const QByteArray &verb, const QUrl &url,
+    QNetworkReply *sendRequest(QByteArray &verb, QUrl &url,
         QNetworkRequest req = QNetworkRequest(),
         QIODevice *requestBody = nullptr);
 
-    QNetworkReply *sendRequest(const QByteArray &verb, const QUrl &url,
-        QNetworkRequest req, const QByteArray &requestBody);
+    QNetworkReply *sendRequest(QByteArray &verb, QUrl &url,
+        QNetworkRequest req, QByteArray &requestBody);
 
     // sendRequest does not take a relative path instead of an url,
     // but the old API allowed that. We have this undefined overload
     // to help catch usage errors
-    QNetworkReply *sendRequest(const QByteArray &verb, const QString &relativePath,
+    QNetworkReply *sendRequest(QByteArray &verb, QString &relativePath,
         QNetworkRequest req = QNetworkRequest(),
         QIODevice *requestBody = nullptr);
 
-    QNetworkReply *sendRequest(const QByteArray &verb, const QUrl &url,
+    QNetworkReply *sendRequest(QByteArray &verb, QUrl &url,
         QNetworkRequest req, QHttpMultiPart *requestBody);
 
     /** Makes this job drive a pre-made QNetworkReply
@@ -157,10 +154,10 @@ protected:
     virtual void newReplyHook(QNetworkReply *) {}
 
     /// Creates a url for the account from a relative path
-    QUrl makeAccountUrl(const QString &relativePath) const;
+    QUrl makeAccountUrl(QString &relativePath) const;
 
     /// Like makeAccountUrl() but uses the account's dav base path
-    QUrl makeDavUrl(const QString &relativePath) const;
+    QUrl makeDavUrl(QString &relativePath) const;
 
     int maxRedirects() const { return 10; }
 
@@ -220,7 +217,6 @@ private:
     QPointer<QTimer> _timer;
 };
 
-
 /** Gets the SabreDAV-style error message from an error response.
  *
  * This assumes the response is XML with a 'error' tag that has a
@@ -228,10 +224,10 @@ private:
  *
  * Returns a null string if no message was found.
  */
-QString OWNCLOUDSYNC_EXPORT extractErrorMessage(const QByteArray &errorResponse);
+QString OWNCLOUDSYNC_EXPORT extractErrorMessage(QByteArray &errorResponse);
 
 /** Builds a error message based on the error and the reply body. */
-QString OWNCLOUDSYNC_EXPORT errorMessage(const QString &baseError, const QByteArray &body);
+QString OWNCLOUDSYNC_EXPORT errorMessage(QString &baseError, QByteArray &body);
 
 /** Nicer errorString() for QNetworkReply
  *
@@ -242,6 +238,6 @@ QString OWNCLOUDSYNC_EXPORT errorMessage(const QString &baseError, const QByteAr
  *
  * This function produces clearer error messages for HTTP errors.
  */
-QString OWNCLOUDSYNC_EXPORT networkReplyErrorString(const QNetworkReply &reply);
+QString OWNCLOUDSYNC_EXPORT networkReplyErrorString(QNetworkReply &reply);
 
 } // namespace OCC

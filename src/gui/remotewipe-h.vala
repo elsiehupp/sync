@@ -1,7 +1,6 @@
 #ifndef REMOTEWIPE_H
 #define REMOTEWIPE_H
 
-#include "accountmanager.h"
 // #include <QNetworkAccessManager>
 
 class QJsonDocument;

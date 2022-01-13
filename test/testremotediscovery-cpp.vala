@@ -6,7 +6,6 @@
  */
 
 // #include <QtTest>
-#include "syncenginetestutils.h"
 // #include <syncengine.h>
 // #include <localdiscoverytracker.h>
 
@@ -33,7 +32,6 @@ struct MissingPermissionsPropfindReply : FakePropfindReply {
         payload.remove(pos, sizeof(toRemove) - 1);
     }
 };
-
 
 enum ErrorKind : int {
     // Lower code are corresponding to HTML error code
@@ -67,7 +65,6 @@ private slots:
         QTest::newRow("Timeout") << +Timeout << "Operation canceled" << false;
     }
 
-
     // Check what happens when there is an error.
     void testRemoteDiscoveryError() {
         QFETCH(int, errorKind);
@@ -89,7 +86,7 @@ private slots:
 
         QString errorFolder = "dav/files/admin/B";
         QString fatalErrorPrefix = "Server replied with an error while reading directory \"B\" : ";
-        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, const QNetworkRequest &req, QIODevice *)
+        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, QNetworkRequest &req, QIODevice *)
                 -> QNetworkReply *{
             if (req.attribute(QNetworkRequest::CustomVerbAttribute) == "PROPFIND" && req.url().path().endsWith(errorFolder)) {
                 if (errorKind == InvalidXML) {
@@ -147,7 +144,7 @@ private slots:
         fakeFolder.remoteModifier().mkdir("nopermissions");
         fakeFolder.remoteModifier().insert("nopermissions/A");
 
-        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, const QNetworkRequest &req, QIODevice *)
+        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, QNetworkRequest &req, QIODevice *)
                 -> QNetworkReply *{
             if (req.attribute(QNetworkRequest::CustomVerbAttribute) == "PROPFIND" && req.url().path().endsWith("nopermissions"))
                 return new MissingPermissionsPropfindReply(fakeFolder.remoteModifier(), op, req, this);

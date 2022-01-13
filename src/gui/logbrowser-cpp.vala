@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#include "logbrowser.h"
-
 // #include <cstdio>
 // #include <iostream>
 
@@ -28,9 +26,6 @@
 // #include <QSettings>
 // #include <QAction>
 // #include <QDesktopServices>
-
-#include "configfile.h"
-#include "logger.h"
 
 namespace OCC {
 

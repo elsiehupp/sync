@@ -15,18 +15,13 @@
 // #include <QLoggingCategory>
 // #include <QString>
 
-#include "creds/credentialsfactory.h"
-#include "creds/httpcredentialsgui.h"
-#include "creds/dummycredentials.h"
-#include "creds/webflowcredentials.h"
-
 namespace OCC {
 
 Q_LOGGING_CATEGORY(lcGuiCredentials, "nextcloud.gui.credentials", QtInfoMsg)
 
 namespace CredentialsFactory {
 
-    AbstractCredentials *create(const QString &type) {
+    AbstractCredentials *create(QString &type) {
         // empty string might happen for old version of configuration
         if (type == "http" || type == "") {
             return new HttpCredentialsGui;

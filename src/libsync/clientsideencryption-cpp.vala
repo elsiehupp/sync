@@ -5,15 +5,6 @@
 // #include <openssl/engine.h>
 // #include <openssl/rand.h>
 
-
-#include "clientsideencryption.h"
-#include "account.h"
-#include "capabilities.h"
-#include "networkjobs.h"
-#include "clientsideencryptionjobs.h"
-#include "theme.h"
-#include "creds/abstractcredentials.h"
-
 // #include <map>
 // #include <string>
 // #include <algorithm>
@@ -39,9 +30,7 @@
 // #include <common/utility.h>
 // #include <common/constants.h>
 
-#include "wordlist.h"
-
-QDebug operator<<(QDebug out, const std::string& str) {
+QDebug operator<<(QDebug out, std::string& str) {
     out << QString::fromStdString(str);
     return out;
 }
@@ -67,7 +56,7 @@ namespace {
 
     constexpr qint64 blockSize = 1024;
 
-    QList<QByteArray> oldCipherFormatSplit(const QByteArray &cipher) {
+    QList<QByteArray> oldCipherFormatSplit(QByteArray &cipher) {
         const auto separator = QByteArrayLiteral("fA=="); // BASE64 encoded '|'
         auto result = QList<QByteArray>();
 
@@ -83,7 +72,7 @@ namespace {
         return result;
     }
 
-    QList<QByteArray> splitCipherParts(const QByteArray &data) {
+    QList<QByteArray> splitCipherParts(QByteArray &data) {
         const auto isOldFormat = !data.contains('|');
         const auto parts = isOldFormat ? oldCipherFormatSplit(data) : data.split('|');
         qCInfo(lcCse()) << "found parts:" << parts << "old format?" << isOldFormat;
@@ -283,11 +272,7 @@ namespace {
     }
 }
 
-
 namespace EncryptionHelper {
-
-
-
 
 QByteArray generateRandomFilename() {
     return QUuid::createUuid().toRfc4122().toHex();
@@ -305,7 +290,7 @@ QByteArray generateRandom(int size) {
     return result;
 }
 
-QByteArray generatePassword(const QString& wordlist, const QByteArray& salt) {
+QByteArray generatePassword(QString& wordlist, QByteArray& salt) {
     qCInfo(lcCse()) << "Start encryption key generation!";
 
     const int iterationCount = 1024;
@@ -317,7 +302,7 @@ QByteArray generatePassword(const QString& wordlist, const QByteArray& salt) {
     int ret = PKCS5_PBKDF2_HMAC_SHA1(
         wordlist.toLocal8Bit().constData(),     // const char *password,
         wordlist.size(),                        // int password length,
-        (const unsigned char *)salt.constData(),// const unsigned char *salt,
+        (unsigned char *)salt.constData(),// const unsigned char *salt,
         salt.size(),                            // int saltlen,
         iterationCount,                         // int iterations,
         keyLength,                              // int keylen,
@@ -416,7 +401,7 @@ QByteArray encryptPrivateKey(
     return result;
 }
 
-QByteArray decryptPrivateKey(const QByteArray& key, const QByteArray& data) {
+QByteArray decryptPrivateKey(QByteArray& key, QByteArray& data) {
     qCInfo(lcCse()) << "decryptStringSymmetric key: " << key;
     qCInfo(lcCse()) << "decryptStringSymmetric data: " << data;
 
@@ -495,7 +480,7 @@ QByteArray decryptPrivateKey(const QByteArray& key, const QByteArray& data) {
     return QByteArray::fromBase64(result);
 }
 
-QByteArray extractPrivateKeySalt(const QByteArray &data) {
+QByteArray extractPrivateKeySalt(QByteArray &data) {
     const auto parts = splitCipherParts(data);
     if (parts.size() < 3) {
         qCInfo(lcCse()) << "Not enough parts found";
@@ -505,7 +490,7 @@ QByteArray extractPrivateKeySalt(const QByteArray &data) {
     return QByteArray::fromBase64(parts.at(2));
 }
 
-QByteArray decryptStringSymmetric(const QByteArray& key, const QByteArray& data) {
+QByteArray decryptStringSymmetric(QByteArray& key, QByteArray& data) {
     qCInfo(lcCse()) << "decryptStringSymmetric key: " << key;
     qCInfo(lcCse()) << "decryptStringSymmetric data: " << data;
 
@@ -583,7 +568,7 @@ QByteArray decryptStringSymmetric(const QByteArray& key, const QByteArray& data)
     return QByteArray::fromBase64(QByteArray(ptext, plen));
 }
 
-QByteArray privateKeyToPem(const QByteArray key) {
+QByteArray privateKeyToPem(QByteArray key) {
     Bio privateKeyBio;
     BIO_write(privateKeyBio, key.constData(), key.size());
     auto pkey = PKey::readPrivateKey(privateKeyBio);
@@ -595,7 +580,7 @@ QByteArray privateKeyToPem(const QByteArray key) {
     return pem;
 }
 
-QByteArray encryptStringSymmetric(const QByteArray& key, const QByteArray& data) {
+QByteArray encryptStringSymmetric(QByteArray& key, QByteArray& data) {
     QByteArray iv = generateRandom(16);
 
     CipherCtx ctx;
@@ -677,7 +662,7 @@ QByteArray encryptStringSymmetric(const QByteArray& key, const QByteArray& data)
     return result;
 }
 
-QByteArray decryptStringAsymmetric(EVP_PKEY *privateKey, const QByteArray& data) {
+QByteArray decryptStringAsymmetric(EVP_PKEY *privateKey, QByteArray& data) {
     int err = -1;
 
     qCInfo(lcCseDecryption()) << "Start to work the decryption.";
@@ -738,7 +723,7 @@ QByteArray decryptStringAsymmetric(EVP_PKEY *privateKey, const QByteArray& data)
     return out;
 }
 
-QByteArray encryptStringAsymmetric(EVP_PKEY *publicKey, const QByteArray& data) {
+QByteArray encryptStringAsymmetric(EVP_PKEY *publicKey, QByteArray& data) {
     int err = -1;
 
     auto ctx = PKeyCtx::forKey(publicKey, ENGINE_get_default_RSA());
@@ -788,10 +773,9 @@ QByteArray encryptStringAsymmetric(EVP_PKEY *publicKey, const QByteArray& data) 
 
 }
 
-
 ClientSideEncryption::ClientSideEncryption() = default;
 
-void ClientSideEncryption::initialize(const AccountPtr &account) {
+void ClientSideEncryption::initialize(AccountPtr &account) {
     Q_ASSERT(account);
 
     qCInfo(lcCse()) << "Initializing";
@@ -804,7 +788,7 @@ void ClientSideEncryption::initialize(const AccountPtr &account) {
     fetchFromKeyChain(account);
 }
 
-void ClientSideEncryption::fetchFromKeyChain(const AccountPtr &account) {
+void ClientSideEncryption::fetchFromKeyChain(AccountPtr &account) {
     const QString kck = AbstractCredentials::keychainKey(
                 account->url().toString(),
                 account->credentials()->user() + e2e_cert,
@@ -819,7 +803,7 @@ void ClientSideEncryption::fetchFromKeyChain(const AccountPtr &account) {
     job->start();
 }
 
-bool ClientSideEncryption::checkPublicKeyValidity(const AccountPtr &account) const {
+bool ClientSideEncryption::checkPublicKeyValidity(AccountPtr &account) const {
     QByteArray data = EncryptionHelper::generateRandom(64);
 
     Bio publicKeyBio;
@@ -844,7 +828,7 @@ bool ClientSideEncryption::checkPublicKeyValidity(const AccountPtr &account) con
     return true;
 }
 
-bool ClientSideEncryption::checkServerPublicKeyValidity(const QByteArray &serverPublicKeyString) const {
+bool ClientSideEncryption::checkServerPublicKeyValidity(QByteArray &serverPublicKeyString) const {
     Bio serverPublicKeyBio;
     BIO_write(serverPublicKeyBio, serverPublicKeyString.constData(), serverPublicKeyString.size());
     const auto serverPublicKey = PKey::readPrivateKey(serverPublicKeyBio);
@@ -961,7 +945,7 @@ void ClientSideEncryption::mnemonicKeyFetched(QKeychain::Job *incoming) {
     emit initializationFinished();
 }
 
-void ClientSideEncryption::writePrivateKey(const AccountPtr &account) {
+void ClientSideEncryption::writePrivateKey(AccountPtr &account) {
     const QString kck = AbstractCredentials::keychainKey(
                 account->url().toString(),
                 account->credentials()->user() + e2e_private,
@@ -979,7 +963,7 @@ void ClientSideEncryption::writePrivateKey(const AccountPtr &account) {
     job->start();
 }
 
-void ClientSideEncryption::writeCertificate(const AccountPtr &account) {
+void ClientSideEncryption::writeCertificate(AccountPtr &account) {
     const QString kck = AbstractCredentials::keychainKey(
                 account->url().toString(),
                 account->credentials()->user() + e2e_cert,
@@ -997,7 +981,7 @@ void ClientSideEncryption::writeCertificate(const AccountPtr &account) {
     job->start();
 }
 
-void ClientSideEncryption::writeMnemonic(const AccountPtr &account) {
+void ClientSideEncryption::writeMnemonic(AccountPtr &account) {
     const QString kck = AbstractCredentials::keychainKey(
                 account->url().toString(),
                 account->credentials()->user() + e2e_mnemonic,
@@ -1015,7 +999,7 @@ void ClientSideEncryption::writeMnemonic(const AccountPtr &account) {
     job->start();
 }
 
-void ClientSideEncryption::forgetSensitiveData(const AccountPtr &account) {
+void ClientSideEncryption::forgetSensitiveData(AccountPtr &account) {
     _privateKey = QByteArray();
     _certificate = QSslCertificate();
     _publicKey = QSslKey();
@@ -1038,12 +1022,11 @@ void ClientSideEncryption::slotRequestMnemonic() {
     emit showMnemonic(_mnemonic);
 }
 
-void ClientSideEncryption::generateKeyPair(const AccountPtr &account) {
+void ClientSideEncryption::generateKeyPair(AccountPtr &account) {
     // AES/GCM/NoPadding,
     // metadataKeys with RSA/ECB/OAEPWithSHA-256AndMGF1Padding
     qCInfo(lcCse()) << "No public key, generating a pair.";
     const int rsaKeyLen = 2048;
-
 
     // Init RSA
     PKeyCtx ctx(EVP_PKEY_RSA);
@@ -1080,12 +1063,12 @@ void ClientSideEncryption::generateKeyPair(const AccountPtr &account) {
     generateCSR(account, localKeyPair);
 }
 
-void ClientSideEncryption::generateCSR(const AccountPtr &account, EVP_PKEY *keyPair) {
+void ClientSideEncryption::generateCSR(AccountPtr &account, EVP_PKEY *keyPair) {
     // OpenSSL expects const char.
     auto cnArray = account->davUser().toLocal8Bit();
     qCInfo(lcCse()) << "Getting the following array for the account Id" << cnArray;
 
-    auto certParams = std::map<const char *, const char*>{ {"C", "DE"}, {"ST", "Baden-Wuerttemberg"}, {"L", "Stuttgart"}, {"O","Nextcloud"}, {"CN", cnArray.constData()}
+    auto certParams = std::map<const char *, char*>{ {"C", "DE"}, {"ST", "Baden-Wuerttemberg"}, {"L", "Stuttgart"}, {"O","Nextcloud"}, {"CN", cnArray.constData()}
     };
 
     int ret = 0;
@@ -1102,8 +1085,8 @@ void ClientSideEncryption::generateCSR(const AccountPtr &account, EVP_PKEY *keyP
     // 3. set subject of x509 req
     auto x509_name = X509_REQ_get_subject_name(x509_req);
 
-    for(const auto& v : certParams) {
-        ret = X509_NAME_add_entry_by_txt(x509_name, v.first,  MBSTRING_ASC, (const unsigned char*) v.second, -1, -1, 0);
+    for(auto& v : certParams) {
+        ret = X509_NAME_add_entry_by_txt(x509_name, v.first,  MBSTRING_ASC, (unsigned char*) v.second, -1, -1, 0);
         if (ret != 1) {
             qCInfo(lcCse()) << "Error Generating the Certificate while adding" << v.first << v.second;
             return;
@@ -1132,7 +1115,7 @@ void ClientSideEncryption::generateCSR(const AccountPtr &account, EVP_PKEY *keyP
     auto job = new SignPublicKeyApiJob(account, e2eeBaseUrl() + "public-key", this);
     job->setCsr(output);
 
-    connect(job, &SignPublicKeyApiJob::jsonReceived, [this, account](const QJsonDocument& json, int retCode) {
+    connect(job, &SignPublicKeyApiJob::jsonReceived, [this, account](QJsonDocument& json, int retCode) {
         if (retCode == 200) {
             QString cert = json.object().value("ocs").toObject().value("data").toObject().value("public-key").toString();
             _certificate = QSslCertificate(cert.toLocal8Bit(), QSsl::Pem);
@@ -1144,7 +1127,7 @@ void ClientSideEncryption::generateCSR(const AccountPtr &account, EVP_PKEY *keyP
     job->start();
 }
 
-void ClientSideEncryption::encryptPrivateKey(const AccountPtr &account) {
+void ClientSideEncryption::encryptPrivateKey(AccountPtr &account) {
     QStringList list = WordList::getRandomWords(12);
     _mnemonic = list.join(' ');
     _newMnemonicGenerated = true;
@@ -1162,7 +1145,7 @@ void ClientSideEncryption::encryptPrivateKey(const AccountPtr &account) {
     // Send private key to the server
     auto job = new StorePrivateKeyApiJob(account, e2eeBaseUrl() + "private-key", this);
     job->setPrivateKey(cryptedText);
-    connect(job, &StorePrivateKeyApiJob::jsonReceived, [this, account](const QJsonDocument& doc, int retCode) {
+    connect(job, &StorePrivateKeyApiJob::jsonReceived, [this, account](QJsonDocument& doc, int retCode) {
         Q_UNUSED(doc);
         switch(retCode) {
             case 200:
@@ -1183,7 +1166,7 @@ bool ClientSideEncryption::newMnemonicGenerated() const {
     return _newMnemonicGenerated;
 }
 
-void ClientSideEncryption::decryptPrivateKey(const AccountPtr &account, const QByteArray &key) {
+void ClientSideEncryption::decryptPrivateKey(AccountPtr &account, QByteArray &key) {
     QString msg = tr("Please enter your end to end encryption passphrase:<br>"
                      "<br>"
                      "User: %2<br>"
@@ -1240,10 +1223,10 @@ void ClientSideEncryption::decryptPrivateKey(const AccountPtr &account, const QB
     emit initializationFinished();
 }
 
-void ClientSideEncryption::getPrivateKeyFromServer(const AccountPtr &account) {
+void ClientSideEncryption::getPrivateKeyFromServer(AccountPtr &account) {
     qCInfo(lcCse()) << "Retrieving private key from server";
     auto job = new JsonApiJob(account, e2eeBaseUrl() + "private-key", this);
-    connect(job, &JsonApiJob::jsonReceived, [this, account](const QJsonDocument& doc, int retCode) {
+    connect(job, &JsonApiJob::jsonReceived, [this, account](QJsonDocument& doc, int retCode) {
             if (retCode == 200) {
                 QString key = doc.object()["ocs"].toObject()["data"].toObject()["private-key"].toString();
                 qCInfo(lcCse()) << key;
@@ -1258,10 +1241,10 @@ void ClientSideEncryption::getPrivateKeyFromServer(const AccountPtr &account) {
     job->start();
 }
 
-void ClientSideEncryption::getPublicKeyFromServer(const AccountPtr &account) {
+void ClientSideEncryption::getPublicKeyFromServer(AccountPtr &account) {
     qCInfo(lcCse()) << "Retrieving public key from server";
     auto job = new JsonApiJob(account, e2eeBaseUrl() + "public-key", this);
-    connect(job, &JsonApiJob::jsonReceived, [this, account](const QJsonDocument& doc, int retCode) {
+    connect(job, &JsonApiJob::jsonReceived, [this, account](QJsonDocument& doc, int retCode) {
             if (retCode == 200) {
                 QString publicKey = doc.object()["ocs"].toObject()["data"].toObject()["public-keys"].toObject()[account->davUser()].toString();
                 _certificate = QSslCertificate(publicKey.toLocal8Bit(), QSsl::Pem);
@@ -1278,10 +1261,10 @@ void ClientSideEncryption::getPublicKeyFromServer(const AccountPtr &account) {
     job->start();
 }
 
-void ClientSideEncryption::fetchAndValidatePublicKeyFromServer(const AccountPtr &account) {
+void ClientSideEncryption::fetchAndValidatePublicKeyFromServer(AccountPtr &account) {
     qCInfo(lcCse()) << "Retrieving public key from server";
     auto job = new JsonApiJob(account, e2eeBaseUrl() + "server-key", this);
-    connect(job, &JsonApiJob::jsonReceived, [this, account](const QJsonDocument& doc, int retCode) {
+    connect(job, &JsonApiJob::jsonReceived, [this, account](QJsonDocument& doc, int retCode) {
         if (retCode == 200) {
             const auto serverPublicKey = doc.object()["ocs"].toObject()["data"].toObject()["public-key"].toString().toLatin1();
             qCInfo(lcCse()) << "Found Server Public key, checking it. Server public key:" << serverPublicKey;
@@ -1308,7 +1291,7 @@ void ClientSideEncryption::fetchAndValidatePublicKeyFromServer(const AccountPtr 
     job->start();
 }
 
-FolderMetadata::FolderMetadata(AccountPtr account, const QByteArray& metadata, int statusCode) : _account(account) {
+FolderMetadata::FolderMetadata(AccountPtr account, QByteArray& metadata, int statusCode) : _account(account) {
     if (metadata.isEmpty() || statusCode == 404) {
         qCInfo(lcCseMetadata()) << "Setupping Empty Metadata";
         setupEmptyMetadata();
@@ -1318,7 +1301,7 @@ FolderMetadata::FolderMetadata(AccountPtr account, const QByteArray& metadata, i
     }
 }
 
-void FolderMetadata::setupExistingMetadata(const QByteArray& metadata) {
+void FolderMetadata::setupExistingMetadata(QByteArray& metadata) {
   /* This is the json response from the server, it contains two extra objects that we are *not* interested.
   * ocs and data.
   */
@@ -1411,7 +1394,7 @@ void FolderMetadata::setupExistingMetadata(const QByteArray& metadata) {
 }
 
 // RSA/ECB/OAEPWithSHA-256AndMGF1Padding using private / public key.
-QByteArray FolderMetadata::encryptMetadataKey(const QByteArray& data) const {
+QByteArray FolderMetadata::encryptMetadataKey(QByteArray& data) const {
     Bio publicKeyBio;
     QByteArray publicKeyPem = _account->e2e()->_publicKey.toPem();
     BIO_write(publicKeyBio, publicKeyPem.constData(), publicKeyPem.size());
@@ -1421,7 +1404,7 @@ QByteArray FolderMetadata::encryptMetadataKey(const QByteArray& data) const {
     return EncryptionHelper::encryptStringAsymmetric(publicKey, data.toBase64());
 }
 
-QByteArray FolderMetadata::decryptMetadataKey(const QByteArray& encryptedMetadata) const {
+QByteArray FolderMetadata::decryptMetadataKey(QByteArray& encryptedMetadata) const {
     Bio privateKeyBio;
     QByteArray privateKeyPem = _account->e2e()->_privateKey;
     BIO_write(privateKeyBio, privateKeyPem.constData(), privateKeyPem.size());
@@ -1439,11 +1422,11 @@ QByteArray FolderMetadata::decryptMetadataKey(const QByteArray& encryptedMetadat
 }
 
 // AES/GCM/NoPadding (128 bit key size)
-QByteArray FolderMetadata::encryptJsonObject(const QByteArray& obj, const QByteArray pass) const {
+QByteArray FolderMetadata::encryptJsonObject(QByteArray& obj, QByteArray pass) const {
     return EncryptionHelper::encryptStringSymmetric(pass, obj);
 }
 
-QByteArray FolderMetadata::decryptJsonObject(const QByteArray& encryptedMetadata, const QByteArray& pass) const {
+QByteArray FolderMetadata::decryptJsonObject(QByteArray& encryptedMetadata, QByteArray& pass) const {
     return EncryptionHelper::decryptStringSymmetric(pass, encryptedMetadata);
 }
 
@@ -1517,7 +1500,7 @@ QByteArray FolderMetadata::encryptedMetadata() {
     return internalMetadata.toJson();
 }
 
-void FolderMetadata::addEncryptedFile(const EncryptedFile &f) {
+void FolderMetadata::addEncryptedFile(EncryptedFile &f) {
 
     for (int i = 0; i < _files.size(); i++) {
         if (_files.at(i).originalFilename == f.originalFilename) {
@@ -1529,7 +1512,7 @@ void FolderMetadata::addEncryptedFile(const EncryptedFile &f) {
     _files.append(f);
 }
 
-void FolderMetadata::removeEncryptedFile(const EncryptedFile &f) {
+void FolderMetadata::removeEncryptedFile(EncryptedFile &f) {
     for (int i = 0; i < _files.size(); i++) {
         if (_files.at(i).originalFilename == f.originalFilename) {
             _files.removeAt(i);
@@ -1546,7 +1529,7 @@ QVector<EncryptedFile> FolderMetadata::files() const {
     return _files;
 }
 
-bool EncryptionHelper::fileEncryption(const QByteArray &key, const QByteArray &iv, QFile *input, QFile *output, QByteArray& returnTag) {
+bool EncryptionHelper::fileEncryption(QByteArray &key, QByteArray &iv, QFile *input, QFile *output, QByteArray& returnTag) {
     if (!input->open(QIODevice::ReadOnly)) {
       qCDebug(lcCse) << "Could not open input file for reading" << input->errorString();
     }
@@ -1578,7 +1561,7 @@ bool EncryptionHelper::fileEncryption(const QByteArray &key, const QByteArray &i
     }
 
     /* Initialise key and IV */
-    if(!EVP_EncryptInit_ex(ctx, nullptr, nullptr, (const unsigned char *)key.constData(), (const unsigned char *)iv.constData())) {
+    if(!EVP_EncryptInit_ex(ctx, nullptr, nullptr, (unsigned char *)key.constData(), (unsigned char *)iv.constData())) {
         qCInfo(lcCse()) << "Could not set key and iv";
         return false;
     }
@@ -1628,7 +1611,7 @@ bool EncryptionHelper::fileEncryption(const QByteArray &key, const QByteArray &i
     return true;
 }
 
-bool EncryptionHelper::fileDecryption(const QByteArray &key, const QByteArray& iv,
+bool EncryptionHelper::fileDecryption(QByteArray &key, QByteArray& iv,
                                QFile *input, QFile *output) {
     input->open(QIODevice::ReadOnly);
     output->open(QIODevice::WriteOnly);
@@ -1657,7 +1640,7 @@ bool EncryptionHelper::fileDecryption(const QByteArray &key, const QByteArray& i
     }
 
     /* Initialise key and IV */
-    if(!EVP_DecryptInit_ex(ctx, nullptr, nullptr, (const unsigned char *) key.constData(), (const unsigned char *) iv.constData())) {
+    if(!EVP_DecryptInit_ex(ctx, nullptr, nullptr, (unsigned char *) key.constData(), (unsigned char *) iv.constData())) {
         qCInfo(lcCse()) << "Could not set key and iv";
         return false;
     }
@@ -1708,7 +1691,7 @@ bool EncryptionHelper::fileDecryption(const QByteArray &key, const QByteArray& i
     return true;
 }
 
-EncryptionHelper::StreamingDecryptor::StreamingDecryptor(const QByteArray &key, const QByteArray &iv, quint64 totalSize) : _totalSize(totalSize) {
+EncryptionHelper::StreamingDecryptor::StreamingDecryptor(QByteArray &key, QByteArray &iv, quint64 totalSize) : _totalSize(totalSize) {
     if (_ctx && !key.isEmpty() && !iv.isEmpty() && totalSize > 0) {
         _isInitialized = true;
 
@@ -1734,7 +1717,7 @@ EncryptionHelper::StreamingDecryptor::StreamingDecryptor(const QByteArray &key, 
     }
 }
 
-QByteArray EncryptionHelper::StreamingDecryptor::chunkDecryption(const char *input, quint64 chunkSize) {
+QByteArray EncryptionHelper::StreamingDecryptor::chunkDecryption(char *input, quint64 chunkSize) {
     QByteArray byteArray;
     QBuffer buffer(&byteArray);
     buffer.open(QIODevice::WriteOnly);

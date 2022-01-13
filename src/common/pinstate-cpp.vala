@@ -12,5 +12,4 @@
  * for more details.
  */
 
-#include "pinstate.h"
 #include "moc_pinstate.cpp"

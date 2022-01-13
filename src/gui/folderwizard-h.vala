@@ -12,16 +12,9 @@
  * for more details.
  */
 
-
 // #include <QWizard>
 // #include <QNetworkReply>
 // #include <QTimer>
-
-#include "folder.h"
-#include "accountfwd.h"
-
-#include "ui_folderwizardsourcepage.h"
-#include "ui_folderwizardtargetpage.h"
 
 class QCheckBox;
 
@@ -37,7 +30,7 @@ class ownCloudInfo;
  */
 class FormatWarningsWizardPage : public QWizardPage {
 protected:
-    QString formatWarnings(const QStringList &warnings) const;
+    QString formatWarnings(QStringList &warnings) const;
 };
 
 /**
@@ -46,14 +39,14 @@ protected:
  */
 class FolderWizardLocalPath : public FormatWarningsWizardPage {
 public:
-    explicit FolderWizardLocalPath(const AccountPtr &account);
+    explicit FolderWizardLocalPath(AccountPtr &account);
     ~FolderWizardLocalPath() override;
 
     bool isComplete() const override;
     void initializePage() override;
     void cleanupPage() override;
 
-    void setFolderMap(const Folder::Map &fm) { _folderMap = fm; }
+    void setFolderMap(Folder::Map &fm) { _folderMap = fm; }
 protected slots:
     void slotChooseLocalFolder();
 
@@ -63,7 +56,6 @@ private:
     AccountPtr _account;
 };
 
-
 /**
  * @brief page to ask for the target folder
  * @ingroup gui
@@ -71,7 +63,7 @@ private:
 
 class FolderWizardRemotePath : public FormatWarningsWizardPage {
 public:
-    explicit FolderWizardRemotePath(const AccountPtr &account);
+    explicit FolderWizardRemotePath(AccountPtr &account);
     ~FolderWizardRemotePath() override;
 
     bool isComplete() const override;
@@ -81,23 +73,23 @@ public:
 
 protected slots:
 
-    void showWarn(const QString & = QString()) const;
+    void showWarn(QString & = QString()) const;
     void slotAddRemoteFolder();
-    void slotCreateRemoteFolder(const QString &);
+    void slotCreateRemoteFolder(QString &);
     void slotCreateRemoteFolderFinished();
     void slotHandleMkdirNetworkError(QNetworkReply *);
     void slotHandleLsColNetworkError(QNetworkReply *);
-    void slotUpdateDirectories(const QStringList &);
-    void slotGatherEncryptedPaths(const QString &, const QMap<QString, QString> &);
+    void slotUpdateDirectories(QStringList &);
+    void slotGatherEncryptedPaths(QString &, QMap<QString, QString> &);
     void slotRefreshFolders();
     void slotItemExpanded(QTreeWidgetItem *);
     void slotCurrentItemChanged(QTreeWidgetItem *);
-    void slotFolderEntryEdited(const QString &text);
+    void slotFolderEntryEdited(QString &text);
     void slotLsColFolderEntry();
-    void slotTypedPathFound(const QStringList &subpaths);
+    void slotTypedPathFound(QStringList &subpaths);
 
 private:
-    LsColJob *runLsColJob(const QString &path);
+    LsColJob *runLsColJob(QString &path);
     void recursiveInsert(QTreeWidgetItem *parent, QStringList pathTrail, QString path);
     bool selectByPath(QString path);
     Ui_FolderWizardTargetPage _ui;
@@ -113,7 +105,7 @@ private:
  */
 class FolderWizardSelectiveSync : public QWizardPage {
 public:
-    explicit FolderWizardSelectiveSync(const AccountPtr &account);
+    explicit FolderWizardSelectiveSync(AccountPtr &account);
     ~FolderWizardSelectiveSync() override;
 
     bool validatePage() override;
@@ -152,7 +144,6 @@ private:
     FolderWizardRemotePath *_folderWizardTargetPage;
     FolderWizardSelectiveSync *_folderWizardSelectiveSyncPage;
 };
-
 
 } // namespace OCC
 

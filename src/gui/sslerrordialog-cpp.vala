@@ -11,16 +11,10 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
  */
-#include "configfile.h"
-#include "sslerrordialog.h"
-#include "theme.h"
 
 // #include <QtGui>
 // #include <QtNetwork>
 // #include <QtWidgets>
-
-
-#include "ui_sslerrordialog.h"
 
 namespace OCC {
 
@@ -28,10 +22,10 @@ Q_LOGGING_CATEGORY(lcSslErrorDialog, "nextcloud.gui.sslerrordialog", QtInfoMsg)
 
 namespace Utility {
     //  Used for QSSLCertificate::subjectInfo which returns a QStringList in Qt5, but a QString in Qt4
-    QString escape(const QStringList &l) { return escape(l.join(';')); }
+    QString escape(QStringList &l) { return escape(l.join(';')); }
 }
 
-bool SslDialogErrorHandler::handleErrors(QList<QSslError> errors, const QSslConfiguration &conf, QList<QSslCertificate> *certs, AccountPtr account) {
+bool SslDialogErrorHandler::handleErrors(QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, AccountPtr account) {
     (void)conf;
     if (!certs) {
         qCCritical(lcSslErrorDialog) << "Certs parameter required but is NULL!";
@@ -83,7 +77,6 @@ SslErrorDialog::~SslErrorDialog() {
     delete _ui;
 }
 
-
 QString SslErrorDialog::styleSheet() const {
     const QString style = QLatin1String(
         "#cert {margin-left: 5px;} "
@@ -97,7 +90,7 @@ QString SslErrorDialog::styleSheet() const {
 }
 #define QL(x) QLatin1String(x)
 
-bool SslErrorDialog::checkFailingCertsKnown(const QList<QSslError> &errors) {
+bool SslErrorDialog::checkFailingCertsKnown(QList<QSslError> &errors) {
     // check if unknown certs caused errors.
     _unknownCerts.clear();
 
@@ -134,7 +127,7 @@ bool SslErrorDialog::checkFailingCertsKnown(const QList<QSslError> &errors) {
     msg += QL("<h3>") + tr("Cannot connect securely to <i>%1</i>:").arg(host) + QL("</h3>");
     // loop over the unknown certs and line up their errors.
     msg += QL("<div id=\"ca_errors\">");
-    foreach (const QSslCertificate &cert, _unknownCerts) {
+    foreach (QSslCertificate &cert, _unknownCerts) {
         msg += QL("<div id=\"ca_error\">");
         // add the errors for this cert
         foreach (QSslError err, errors) {
@@ -152,7 +145,7 @@ bool SslErrorDialog::checkFailingCertsKnown(const QList<QSslError> &errors) {
     if (!additionalErrorStrings.isEmpty()) {
         msg += QL("<h4>") + tr("Additional errors:") + QL("</h4>");
 
-        for (const auto &errorString : additionalErrorStrings) {
+        for (auto &errorString : additionalErrorStrings) {
             msg += QL("<div id=\"ca_error\">");
             msg += QL("<p>") + errorString + QL("</p>");
             msg += QL("</div>");

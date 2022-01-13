@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#include "accountfwd.h"
-
 class QSslError;
 class QSslCertificate;
 
@@ -25,7 +23,7 @@ namespace OCC {
  */
 class SimpleSslErrorHandler : public OCC::AbstractSslErrorHandler {
 public:
-    bool handleErrors(QList<QSslError> errors, const QSslConfiguration &conf, QList<QSslCertificate> *certs, OCC::AccountPtr) override;
+    bool handleErrors(QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, OCC::AccountPtr) override;
 };
 }
 

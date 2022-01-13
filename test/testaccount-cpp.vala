@@ -9,13 +9,6 @@
 // #include <QTemporaryDir>
 // #include <QtTest>
 
-#include "common/utility.h"
-#include "folderman.h"
-#include "account.h"
-#include "accountstate.h"
-#include "configfile.h"
-#include "testhelper.h"
-
 using namespace OCC;
 
 class TestAccount: public QObject {

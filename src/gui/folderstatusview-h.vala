@@ -12,7 +12,6 @@
  * for more details.
  */
 
-
 // #include <QTreeView>
 
 namespace OCC {
@@ -26,8 +25,8 @@ class FolderStatusView : public QTreeView {
 public:
     explicit FolderStatusView(QWidget *parent = nullptr);
 
-    QModelIndex indexAt(const QPoint &point) const override;
-    QRect visualRect(const QModelIndex &index) const override;
+    QModelIndex indexAt(QPoint &point) const override;
+    QRect visualRect(QModelIndex &index) const override;
 };
 
 } // namespace OCC

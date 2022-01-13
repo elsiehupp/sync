@@ -12,8 +12,6 @@
  * for more details.
  */
 
-
-#include "owncloudlib.h"
 // #include <set>
 // #include <QObject>
 // #include <QByteArray>
@@ -53,7 +51,7 @@ public:
      * This should be a full relative file path, example:
      *   foo/bar/file.txt
      */
-    void addTouchedPath(const QString &relativePath);
+    void addTouchedPath(QString &relativePath);
 
     /** Call when a sync run starts that rediscovers all local files */
     void startSyncFullDiscovery();
@@ -69,7 +67,7 @@ public slots:
      * Success and failure of sync items adjust what the next sync is
      * supposed to do.
      */
-    void slotItemCompleted(const SyncFileItemPtr &item);
+    void slotItemCompleted(SyncFileItemPtr &item);
 
     /**
      * When a sync finishes, the lists must be updated

@@ -1,21 +1,5 @@
-#include "notificationhandler.h"
-#include "usermodel.h"
 
-#include "accountmanager.h"
-#include "owncloudgui.h"
 // #include <pushnotifications.h>
-#include "userstatusselectormodel.h"
-#include "syncengine.h"
-#include "ocsjob.h"
-#include "configfile.h"
-#include "notificationconfirmjob.h"
-#include "logger.h"
-#include "guiutility.h"
-#include "syncfileitem.h"
-#include "tray/activitylistmodel.h"
-#include "tray/notificationcache.h"
-#include "tray/unifiedsearchresultslistmodel.h"
-#include "userstatusconnector.h"
 
 // #include <QDesktopServices>
 // #include <QIcon>
@@ -35,7 +19,7 @@ constexpr qint64 activityDefaultExpirationTimeMsecs = 1000 * 60 * 10;
 
 namespace OCC {
 
-User::User(AccountStatePtr &account, const bool &isCurrent, QObject *parent)
+User::User(AccountStatePtr &account, bool &isCurrent, QObject *parent)
     : QObject(parent)
     , _account(account)
     , _isCurrentUser(isCurrent)
@@ -75,7 +59,7 @@ User::User(AccountStatePtr &account, const bool &isCurrent, QObject *parent)
     connect(_activityModel, &ActivityListModel::sendNotificationRequest, this, &User::slotSendNotificationRequest);
 }
 
-void User::showDesktopNotification(const QString &title, const QString &message) {
+void User::showDesktopNotification(QString &title, QString &message) {
     ConfigFile cfg;
     if (!cfg.optionalServerNotifications() || !isDesktopNotificationsAllowed()) {
         return;
@@ -98,7 +82,7 @@ void User::showDesktopNotification(const QString &title, const QString &message)
     _guiLogTimer.start();
 }
 
-void User::slotBuildNotificationDisplay(const ActivityList &list) {
+void User::slotBuildNotificationDisplay(ActivityList &list) {
     _activityModel->clearNotifications();
 
     foreach (auto activity, list) {
@@ -153,7 +137,7 @@ void User::slotReceivedPushActivity(Account *account) {
 }
 
 void User::slotCheckExpiredActivities() {
-    for (const Activity &activity : _activityModel->errorsList()) {
+    for (Activity &activity : _activityModel->errorsList()) {
         if (activity._expireAtMsecs > 0 && QDateTime::currentDateTime().toMSecsSinceEpoch() >= activity._expireAtMsecs) {
             _activityModel->removeActivityFromActivityList(activity);
         }
@@ -272,7 +256,7 @@ void User::slotEndNotificationRequest(int replyCode) {
     slotNotificationRequestFinished(replyCode);
 }
 
-void User::slotSendNotificationRequest(const QString &accountName, const QString &link, const QByteArray &verb, int row) {
+void User::slotSendNotificationRequest(QString &accountName, QString &link, QByteArray &verb, int row) {
     qCInfo(lcActivity) << "Server Notification Request " << verb << link << "on account" << accountName;
 
     const QStringList validVerbs = QStringList() << "GET"
@@ -314,7 +298,7 @@ void User::slotNotifyNetworkError(QNetworkReply *reply) {
     qCWarning(lcActivity) << "Server notify job failed with code " << resultCode;
 }
 
-void User::slotNotifyServerFinished(const QString &reply, int replyCode) {
+void User::slotNotifyServerFinished(QString &reply, int replyCode) {
     auto *job = qobject_cast<NotificationConfirmJob *>(sender());
     if (!job) {
         return;
@@ -324,7 +308,7 @@ void User::slotNotifyServerFinished(const QString &reply, int replyCode) {
     qCInfo(lcActivity) << "Server Notification reply code" << replyCode << reply;
 }
 
-void User::slotProgressInfo(const QString &folder, const ProgressInfo &progress) {
+void User::slotProgressInfo(QString &folder, ProgressInfo &progress) {
     if (progress.status() == ProgressInfo::Reconcile) {
         // Wipe all non-persistent entries - as well as the persistent ones
         // in cases where a local discovery was done.
@@ -357,12 +341,10 @@ void User::slotProgressInfo(const QString &folder, const ProgressInfo &progress)
                 continue;
             }
 
-
             if (activity._status == SyncFileItem::FileIgnored && !QFileInfo(f->path() + activity._file).exists()) {
                 _activityModel->removeActivityFromActivityList(activity);
                 continue;
             }
-
 
             if (!QFileInfo(f->path() + activity._file).exists()) {
                 _activityModel->removeActivityFromActivityList(activity);
@@ -393,7 +375,7 @@ void User::slotProgressInfo(const QString &folder, const ProgressInfo &progress)
     }
 }
 
-void User::slotAddError(const QString &folderAlias, const QString &message, ErrorCategory category) {
+void User::slotAddError(QString &folderAlias, QString &message, ErrorCategory category) {
     auto folderInstance = FolderMan::instance()->folder(folderAlias);
     if (!folderInstance)
         return;
@@ -411,7 +393,6 @@ void User::slotAddError(const QString &folderAlias, const QString &message, Erro
         activity._accName = folderInstance->accountState()->account()->displayName();
         activity._folder = folderAlias;
 
-
         if (category == ErrorCategory::InsufficientRemoteStorage) {
             ActivityLink link;
             link._label = tr("Retry all uploads");
@@ -426,7 +407,7 @@ void User::slotAddError(const QString &folderAlias, const QString &message, Erro
     }
 }
 
-void User::slotAddErrorToGui(const QString &folderAlias, SyncFileItem::Status status, const QString &errorMessage, const QString &subject) {
+void User::slotAddErrorToGui(QString &folderAlias, SyncFileItem::Status status, QString &errorMessage, QString &subject) {
     const auto folderInstance = FolderMan::instance()->folder(folderAlias);
     if (!folderInstance) {
         return;
@@ -458,16 +439,16 @@ void User::slotAddErrorToGui(const QString &folderAlias, SyncFileItem::Status st
     }
 }
 
-bool User::isActivityOfCurrentAccount(const Folder *folder) const {
+bool User::isActivityOfCurrentAccount(Folder *folder) const {
     return folder->accountState() == _account.data();
 }
 
-bool User::isUnsolvableConflict(const SyncFileItemPtr &item) const {
+bool User::isUnsolvableConflict(SyncFileItemPtr &item) const {
     // We just care about conflict issues that we are able to resolve
     return item->_status == SyncFileItem::Conflict && !Utility::isConflictFile(item->_file);
 }
 
-void User::processCompletedSyncItem(const Folder *folder, const SyncFileItemPtr &item) {
+void User::processCompletedSyncItem(Folder *folder, SyncFileItemPtr &item) {
     Activity activity;
     activity._type = Activity::SyncFileItemType; //client activity
     activity._status = item->_status;
@@ -521,7 +502,7 @@ void User::processCompletedSyncItem(const Folder *folder, const SyncFileItemPtr 
     }
 }
 
-void User::slotItemCompleted(const QString &folder, const SyncFileItemPtr &item) {
+void User::slotItemCompleted(QString &folder, SyncFileItemPtr &item) {
     auto folderInstance = FolderMan::instance()->folder(folder);
 
     if (!folderInstance || !isActivityOfCurrentAccount(folderInstance) || isUnsolvableConflict(item)) {
@@ -540,7 +521,7 @@ AccountStatePtr User::accountState() const {
     return _account;
 }
 
-void User::setCurrentUser(const bool &isCurrent) {
+void User::setCurrentUser(bool &isCurrent) {
     _isCurrentUser = isCurrent;
 }
 
@@ -657,7 +638,6 @@ bool User::isConnected() const {
     return (_account->connectionStatus() == AccountState::ConnectionStatus::Connected);
 }
 
-
 bool User::isDesktopNotificationsAllowed() const {
     return _account.data()->isDesktopNotificationsAllowed();
 }
@@ -708,14 +688,14 @@ Q_INVOKABLE int UserModel::currentUserId() const {
     return _currentUserId;
 }
 
-Q_INVOKABLE bool UserModel::isUserConnected(const int &id) {
+Q_INVOKABLE bool UserModel::isUserConnected(int &id) {
     if (id < 0 || id >= _users.size())
         return false;
 
     return _users[id]->isConnected();
 }
 
-QImage UserModel::avatarById(const int &id) {
+QImage UserModel::avatarById(int &id) {
     if (id < 0 || id >= _users.size())
         return {};
 
@@ -729,9 +709,9 @@ Q_INVOKABLE QString UserModel::currentUserServer() {
     return _users[_currentUserId]->server();
 }
 
-void UserModel::addUser(AccountStatePtr &user, const bool &isCurrent) {
+void UserModel::addUser(AccountStatePtr &user, bool &isCurrent) {
     bool containsUser = false;
-    for (const auto &u : qAsConst(_users)) {
+    for (auto &u : qAsConst(_users)) {
         if (u->account() == user->account()) {
             containsUser = true;
             continue;
@@ -809,7 +789,7 @@ Q_INVOKABLE void UserModel::openCurrentAccountServer() {
     QDesktopServices::openUrl(url);
 }
 
-Q_INVOKABLE void UserModel::switchCurrentUser(const int &id) {
+Q_INVOKABLE void UserModel::switchCurrentUser(int &id) {
     if (_currentUserId < 0 || _currentUserId >= _users.size())
         return;
 
@@ -819,21 +799,21 @@ Q_INVOKABLE void UserModel::switchCurrentUser(const int &id) {
     emit newUserSelected();
 }
 
-Q_INVOKABLE void UserModel::login(const int &id) {
+Q_INVOKABLE void UserModel::login(int &id) {
     if (id < 0 || id >= _users.size())
         return;
 
     _users[id]->login();
 }
 
-Q_INVOKABLE void UserModel::logout(const int &id) {
+Q_INVOKABLE void UserModel::logout(int &id) {
     if (id < 0 || id >= _users.size())
         return;
 
     _users[id]->logout();
 }
 
-Q_INVOKABLE void UserModel::removeAccount(const int &id) {
+Q_INVOKABLE void UserModel::removeAccount(int &id) {
     if (id < 0 || id >= _users.size())
         return;
 
@@ -872,12 +852,12 @@ std::shared_ptr<OCC::UserStatusConnector> UserModel::userStatusConnector(int id)
     return _users[id]->account()->userStatusConnector();
 }
 
-int UserModel::rowCount(const QModelIndex &parent) const {
+int UserModel::rowCount(QModelIndex &parent) const {
     Q_UNUSED(parent);
     return _users.count();
 }
 
-QVariant UserModel::data(const QModelIndex &index, int role) const {
+QVariant UserModel::data(QModelIndex &index, int role) const {
     if (index.row() < 0 || index.row() >= _users.count()) {
         return QVariant();
     }
@@ -953,7 +933,7 @@ User *UserModel::currentUser() const {
 }
 
 int UserModel::findUserIdForAccount(AccountState *account) const {
-    const auto it = std::find_if(std::cbegin(_users), std::cend(_users), [=](const User *user) {
+    const auto it = std::find_if(std::cbegin(_users), std::cend(_users), [=](User *user) {
         return user->account()->id() == account->account()->id();
     });
 
@@ -971,11 +951,11 @@ ImageProvider::ImageProvider()
     : QQuickImageProvider(QQuickImageProvider::Image) {
 }
 
-QImage ImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize) {
+QImage ImageProvider::requestImage(QString &id, QSize *size, QSize &requestedSize) {
     Q_UNUSED(size)
     Q_UNUSED(requestedSize)
 
-    const auto makeIcon = [](const QString &path) {
+    const auto makeIcon = [](QString &path) {
         QImage image(128, 128, QImage::Format_ARGB32);
         image.fill(Qt::GlobalColor::transparent);
         QPainter painter(&image);
@@ -1032,16 +1012,16 @@ void UserAppsModel::buildAppList() {
     }
 }
 
-void UserAppsModel::openAppUrl(const QUrl &url) {
+void UserAppsModel::openAppUrl(QUrl &url) {
     Utility::openBrowser(url);
 }
 
-int UserAppsModel::rowCount(const QModelIndex &parent) const {
+int UserAppsModel::rowCount(QModelIndex &parent) const {
     Q_UNUSED(parent);
     return _apps.count();
 }
 
-QVariant UserAppsModel::data(const QModelIndex &index, int role) const {
+QVariant UserAppsModel::data(QModelIndex &index, int role) const {
     if (index.row() < 0 || index.row() >= _apps.count()) {
         return QVariant();
     }

@@ -12,24 +12,7 @@
  * for more details.
  */
 
-#include "account.h"
-#include "accountfwd.h"
-#include "clientsideencryptionjobs.h"
-#include "cookiejar.h"
-#include "networkjobs.h"
-#include "configfile.h"
-#include "accessmanager.h"
-#include "creds/abstractcredentials.h"
-#include "capabilities.h"
-#include "theme.h"
-#include "pushnotifications.h"
-#include "version.h"
-
 // #include <deletejob.h>
-
-#include "common/asserts.h"
-#include "clientsideencryption.h"
-#include "ocsuserstatusconnector.h"
 
 // #include <QLoggingCategory>
 // #include <QNetworkReply>
@@ -51,7 +34,6 @@
 
 // #include <qsslconfiguration.h>
 // #include <qt5keychain/keychain.h>
-#include "creds/abstractcredentials.h"
 
 using namespace QKeychain;
 
@@ -109,7 +91,7 @@ QString Account::davUser() const {
     return _davUser.isEmpty() && _credentials ? _credentials->user() : _davUser;
 }
 
-void Account::setDavUser(const QString &newDavUser) {
+void Account::setDavUser(QString &newDavUser) {
     if (_davUser == newDavUser)
         return;
     _davUser = newDavUser;
@@ -120,7 +102,7 @@ void Account::setDavUser(const QString &newDavUser) {
 QImage Account::avatar() const {
     return _avatarImg;
 }
-void Account::setAvatar(const QImage &img) {
+void Account::setAvatar(QImage &img) {
     _avatarImg = img;
     emit accountChangedAvatar();
 }
@@ -140,7 +122,7 @@ QString Account::davDisplayName() const {
     return _displayName;
 }
 
-void Account::setDavDisplayName(const QString &newDisplayName) {
+void Account::setDavDisplayName(QString &newDisplayName) {
     _displayName = newDisplayName;
     emit accountChangedDisplayName();
 }
@@ -240,7 +222,7 @@ QUrl Account::davUrl() const {
     return Utility::concatUrlPath(url(), davPath());
 }
 
-QUrl Account::deprecatedPrivateLinkUrl(const QByteArray &numericFileId) const {
+QUrl Account::deprecatedPrivateLinkUrl(QByteArray &numericFileId) const {
     return Utility::concatUrlPath(_userVisibleUrl,
         QLatin1String("/index.php/f/") + QUrl::toPercentEncoding(QString::fromLatin1(numericFileId)));
 }
@@ -299,7 +281,7 @@ QSharedPointer<QNetworkAccessManager> Account::sharedNetworkAccessManager() {
     return _am;
 }
 
-QNetworkReply *Account::sendRawRequest(const QByteArray &verb, const QUrl &url, QNetworkRequest req, QIODevice *data) {
+QNetworkReply *Account::sendRawRequest(QByteArray &verb, QUrl &url, QNetworkRequest req, QIODevice *data) {
     req.setUrl(url);
     req.setSslConfiguration(this->getOrCreateSslConfig());
     if (verb == "HEAD" && !data) {
@@ -316,7 +298,7 @@ QNetworkReply *Account::sendRawRequest(const QByteArray &verb, const QUrl &url, 
     return _am->sendCustomRequest(req, verb, data);
 }
 
-QNetworkReply *Account::sendRawRequest(const QByteArray &verb, const QUrl &url, QNetworkRequest req, const QByteArray &data) {
+QNetworkReply *Account::sendRawRequest(QByteArray &verb, QUrl &url, QNetworkRequest req, QByteArray &data) {
     req.setUrl(url);
     req.setSslConfiguration(this->getOrCreateSslConfig());
     if (verb == "HEAD" && data.isEmpty()) {
@@ -333,7 +315,7 @@ QNetworkReply *Account::sendRawRequest(const QByteArray &verb, const QUrl &url, 
     return _am->sendCustomRequest(req, verb, data);
 }
 
-QNetworkReply *Account::sendRawRequest(const QByteArray &verb, const QUrl &url, QNetworkRequest req, QHttpMultiPart *data) {
+QNetworkReply *Account::sendRawRequest(QByteArray &verb, QUrl &url, QNetworkRequest req, QHttpMultiPart *data) {
     req.setUrl(url);
     req.setSslConfiguration(this->getOrCreateSslConfig());
     if (verb == "PUT") {
@@ -344,13 +326,13 @@ QNetworkReply *Account::sendRawRequest(const QByteArray &verb, const QUrl &url, 
     return _am->sendCustomRequest(req, verb, data);
 }
 
-SimpleNetworkJob *Account::sendRequest(const QByteArray &verb, const QUrl &url, QNetworkRequest req, QIODevice *data) {
+SimpleNetworkJob *Account::sendRequest(QByteArray &verb, QUrl &url, QNetworkRequest req, QIODevice *data) {
     auto job = new SimpleNetworkJob(sharedFromThis());
     job->startRequest(verb, url, req, data);
     return job;
 }
 
-void Account::setSslConfiguration(const QSslConfiguration &config) {
+void Account::setSslConfiguration(QSslConfiguration &config) {
     _sslConfiguration = config;
 }
 
@@ -375,12 +357,12 @@ QSslConfiguration Account::getOrCreateSslConfig() {
     return sslConfig;
 }
 
-void Account::setApprovedCerts(const QList<QSslCertificate> certs) {
+void Account::setApprovedCerts(QList<QSslCertificate> certs) {
     _approvedCerts = certs;
     QSslConfiguration::defaultConfiguration().addCaCertificates(certs);
 }
 
-void Account::addApprovedCerts(const QList<QSslCertificate> certs) {
+void Account::addApprovedCerts(QList<QSslCertificate> certs) {
     _approvedCerts += certs;
 }
 
@@ -392,16 +374,16 @@ void Account::setSslErrorHandler(AbstractSslErrorHandler *handler) {
     _sslErrorHandler.reset(handler);
 }
 
-void Account::setUrl(const QUrl &url) {
+void Account::setUrl(QUrl &url) {
     _url = url;
     _userVisibleUrl = url;
 }
 
-void Account::setUserVisibleHost(const QString &host) {
+void Account::setUserVisibleHost(QString &host) {
     _userVisibleUrl.setHost(host);
 }
 
-QVariant Account::credentialSetting(const QString &key) const {
+QVariant Account::credentialSetting(QString &key) const {
     if (_credentials) {
         QString prefix = _credentials->authType();
         QVariant value = _settingsMap.value(prefix + "_" + key);
@@ -413,7 +395,7 @@ QVariant Account::credentialSetting(const QString &key) const {
     return QVariant();
 }
 
-void Account::setCredentialSetting(const QString &key, const QVariant &value) {
+void Account::setCredentialSetting(QString &key, QVariant &value) {
     if (_credentials) {
         QString prefix = _credentials->authType();
         _settingsMap.insert(prefix + "_" + key, value);
@@ -424,7 +406,7 @@ void Account::slotHandleSslErrors(QNetworkReply *reply, QList<QSslError> errors)
     NetworkJobTimeoutPauser pauser(reply);
     QString out;
     QDebug(&out) << "SSL-Errors happened for url " << reply->url().toString();
-    foreach (const QSslError &error, errors) {
+    foreach (QSslError &error, errors) {
         QDebug(&out) << "\tError in " << error.certificate() << ":"
                      << error.errorString() << "(" << error.error() << ")"
                      << "\n";
@@ -434,7 +416,7 @@ void Account::slotHandleSslErrors(QNetworkReply *reply, QList<QSslError> errors)
     qCInfo(lcAccount()) << reply->sslConfiguration().peerCertificateChain();
 
     bool allPreviouslyRejected = true;
-    foreach (const QSslError &error, errors) {
+    foreach (QSslError &error, errors) {
         if (!_rejectedCertificates.contains(error.certificate())) {
             allPreviouslyRejected = false;
         }
@@ -481,7 +463,7 @@ void Account::slotHandleSslErrors(QNetworkReply *reply, QList<QSslError> errors)
             return;
 
         // Mark all involved certificates as rejected, so we don't ask the user again.
-        foreach (const QSslError &error, errors) {
+        foreach (QSslError &error, errors) {
             if (!_rejectedCertificates.contains(error.certificate())) {
                 _rejectedCertificates.append(error.certificate());
             }
@@ -496,7 +478,7 @@ void Account::slotCredentialsFetched() {
     if (_davUser.isEmpty()) {
         qCDebug(lcAccount) << "User id not set. Fetch it.";
         const auto fetchUserNameJob = new JsonApiJob(sharedFromThis(), QStringLiteral("/ocs/v1.php/cloud/user"));
-        connect(fetchUserNameJob, &JsonApiJob::jsonReceived, this, [this, fetchUserNameJob](const QJsonDocument &json, int statusCode) {
+        connect(fetchUserNameJob, &JsonApiJob::jsonReceived, this, [this, fetchUserNameJob](QJsonDocument &json, int statusCode) {
             fetchUserNameJob->deleteLater();
             if (statusCode != 100) {
                 qCWarning(lcAccount) << "Could not fetch user id. Login will probably not work.";
@@ -535,7 +517,7 @@ const Capabilities &Account::capabilities() const {
     return _capabilities;
 }
 
-void Account::setCapabilities(const QVariantMap &caps) {
+void Account::setCapabilities(QVariantMap &caps) {
     _capabilities = Capabilities(caps);
 
     setupUserStatusConnector();
@@ -544,7 +526,7 @@ void Account::setCapabilities(const QVariantMap &caps) {
 
 void Account::setupUserStatusConnector() {
     _userStatusConnector = std::make_shared<OcsUserStatusConnector>(sharedFromThis());
-    connect(_userStatusConnector.get(), &UserStatusConnector::userStatusFetched, this, [this](const UserStatus &) {
+    connect(_userStatusConnector.get(), &UserStatusConnector::userStatusFetched, this, [this](UserStatus &) {
         emit userStatusChanged();
     });
     connect(_userStatusConnector.get(), &UserStatusConnector::messageCleared, this, [this] {
@@ -581,7 +563,7 @@ bool Account::isUsernamePrefillSupported() const {
     return serverVersionInt() >= makeServerVersion(usernamePrefillServerVersinMinSupportedMajor, 0, 0);
 }
 
-void Account::setServerVersion(const QString &version) {
+void Account::setServerVersion(QString &version) {
     if (version == _serverVersion) {
         return;
     }
@@ -681,7 +663,7 @@ void Account::deleteAppPassword() {
 void Account::deleteAppToken() {
     const auto deleteAppTokenJob = new DeleteJob(sharedFromThis(), QStringLiteral("/ocs/v2.php/core/apppassword"));
     connect(deleteAppTokenJob, &DeleteJob::finishedSignal, this, [this]() {
-        if (const auto deleteJob = qobject_cast<DeleteJob *>(QObject::sender())) {
+        if (auto deleteJob = qobject_cast<DeleteJob *>(QObject::sender())) {
             const auto httpCode = deleteJob->reply()->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
             if (httpCode != 200) {
                 qCWarning(lcAccount) << "AppToken remove failed for user: " << displayName() << " with code: " << httpCode;
@@ -696,7 +678,7 @@ void Account::deleteAppToken() {
     deleteAppTokenJob->start();
 }
 
-void Account::fetchDirectEditors(const QUrl &directEditingURL, const QString &directEditingETag) {
+void Account::fetchDirectEditors(QUrl &directEditingURL, QString &directEditingETag) {
     if(directEditingURL.isEmpty() || directEditingETag.isEmpty())
         return;
 
@@ -710,7 +692,7 @@ void Account::fetchDirectEditors(const QUrl &directEditingURL, const QString &di
     }
 }
 
-void Account::slotDirectEditingRecieved(const QJsonDocument &json) {
+void Account::slotDirectEditingRecieved(QJsonDocument &json) {
     auto data = json.object().value("ocs").toObject().value("data").toObject();
     auto editors = data.value("editors").toObject();
 

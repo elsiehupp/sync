@@ -12,7 +12,6 @@
  * for more details.
  */
 
-
 // #include <QObject>
 // #include <QTimer>
 // #include <QIODevice>
@@ -37,7 +36,6 @@ public:
     bool usingRelativeUploadLimit() { return _currentUploadLimit < 0; }
     bool usingAbsoluteDownloadLimit() { return _currentDownloadLimit > 0; }
     bool usingRelativeDownloadLimit() { return _currentDownloadLimit < 0; }
-
 
 public slots:
     void registerUploadDevice(UploadDevice *);

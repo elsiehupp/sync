@@ -6,28 +6,27 @@
  */
 
 // #include <QtTest>
-#include "syncenginetestutils.h"
 // #include <syncengine.h>
 
 using namespace OCC;
 
-bool itemSuccessful(const ItemCompletedSpy &spy, const QString &path, const SyncInstructions instr) {
+bool itemSuccessful(ItemCompletedSpy &spy, QString &path, SyncInstructions instr) {
     auto item = spy.findItem(path);
     return item->_status == SyncFileItem::Success && item->_instruction == instr;
 }
 
-bool itemConflict(const ItemCompletedSpy &spy, const QString &path) {
+bool itemConflict(ItemCompletedSpy &spy, QString &path) {
     auto item = spy.findItem(path);
     return item->_status == SyncFileItem::Conflict && item->_instruction == CSYNC_INSTRUCTION_CONFLICT;
 }
 
-bool itemSuccessfulMove(const ItemCompletedSpy &spy, const QString &path) {
+bool itemSuccessfulMove(ItemCompletedSpy &spy, QString &path) {
     return itemSuccessful(spy, path, CSYNC_INSTRUCTION_RENAME);
 }
 
-QStringList findConflicts(const FileInfo &dir) {
+QStringList findConflicts(FileInfo &dir) {
     QStringList conflicts;
-    for (const auto &item : dir.children) {
+    for (auto &item : dir.children) {
         if (item.name.contains("(conflicted copy")) {
             conflicts.append(item.path());
         }
@@ -35,12 +34,12 @@ QStringList findConflicts(const FileInfo &dir) {
     return conflicts;
 }
 
-bool expectAndWipeConflict(FileModifier &local, FileInfo state, const QString path) {
+bool expectAndWipeConflict(FileModifier &local, FileInfo state, QString path) {
     PathComponents pathComponents(path);
     auto base = state.find(pathComponents.parentDirComponents());
     if (!base)
         return false;
-    for (const auto &item : base->children) {
+    for (auto &item : base->children) {
         if (item.name.startsWith(pathComponents.fileName()) && item.name.contains("(conflicted copy")) {
             local.remove(item.path());
             return true;
@@ -49,7 +48,7 @@ bool expectAndWipeConflict(FileModifier &local, FileInfo state, const QString pa
     return false;
 }
 
-SyncJournalFileRecord dbRecord(FakeFolder &folder, const QString &path) {
+SyncJournalFileRecord dbRecord(FakeFolder &folder, QString &path) {
     SyncJournalFileRecord record;
     folder.syncJournal().getFileRecord(path, &record);
     return record;
@@ -70,7 +69,7 @@ private slots:
         QVERIFY(fakeFolder.syncOnce());
 
         // Verify that the conflict names don't have the user name
-        for (const auto &name : findConflicts(fakeFolder.currentLocalState().children["A"])) {
+        for (auto &name : findConflicts(fakeFolder.currentLocalState().children["A"])) {
             QVERIFY(!name.contains(fakeFolder.syncEngine().account()->davDisplayName()));
         }
 
@@ -85,7 +84,7 @@ private slots:
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
 
         QMap<QByteArray, QString> conflictMap;
-        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, const QNetworkRequest &request, QIODevice *) -> QNetworkReply * {
+        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, QNetworkRequest &request, QIODevice *) -> QNetworkReply * {
             if (op == QNetworkAccessManager::PutOperation) {
                 if (request.rawHeader("OC-Conflict") == "1") {
                     auto baseFileId = request.rawHeader("OC-ConflictBaseFileId");
@@ -134,7 +133,7 @@ private slots:
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
 
         QMap<QByteArray, QString> conflictMap;
-        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, const QNetworkRequest &request, QIODevice *) -> QNetworkReply * {
+        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, QNetworkRequest &request, QIODevice *) -> QNetworkReply * {
             if (op == QNetworkAccessManager::PutOperation) {
                 if (request.rawHeader("OC-Conflict") == "1") {
                     auto baseFileId = request.rawHeader("OC-ConflictBaseFileId");
@@ -215,7 +214,7 @@ private slots:
         // Now with server headers
         QObject parent;
         auto a2FileId = fakeFolder.remoteModifier().find("A/a2")->fileId;
-        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, const QNetworkRequest &request, QIODevice *) -> QNetworkReply * {
+        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, QNetworkRequest &request, QIODevice *) -> QNetworkReply * {
             if (op == QNetworkAccessManager::GetOperation) {
                 auto reply = new FakeGetReply(fakeFolder.remoteModifier(), op, request, &parent);
                 reply->setRawHeader("OC-Conflict", "1");
@@ -283,7 +282,7 @@ private slots:
         auto conflicts = findConflicts(fakeFolder.currentLocalState().children["A"]);
         QByteArray a1conflict;
         QByteArray a2conflict;
-        for (const auto & conflict : conflicts) {
+        for (auto & conflict : conflicts) {
             if (conflict.contains("a1"))
                 a1conflict = conflict.toUtf8();
             if (conflict.contains("a2"))
@@ -533,7 +532,7 @@ private slots:
         QVERIFY(conflicts.size() == 2);
         QVERIFY(conflicts[0].contains("A (conflicted copy"));
         QVERIFY(conflicts[1].contains("B (conflicted copy"));
-        for (const auto& conflict : conflicts)
+        for (auto& conflict : conflicts)
             QDir(fakeFolder.localPath() + conflict).removeRecursively();
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
 
@@ -570,7 +569,7 @@ private slots:
         auto conflicts = findConflicts(fakeFolder.currentLocalState());
         QVERIFY(conflicts.size() == 1);
         QVERIFY(conflicts[0].contains("A (conflicted copy"));
-        for (const auto& conflict : conflicts)
+        for (auto& conflict : conflicts)
             QDir(fakeFolder.localPath() + conflict).removeRecursively();
 
         QVERIFY(fakeFolder.syncEngine().isAnotherSyncNeeded() == ImmediateFollowUp);

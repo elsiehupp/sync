@@ -13,11 +13,7 @@
  * for more details.
  */
 
-
 // #include <QWizard>
-
-#include "wizard/owncloudwizardcommon.h"
-#include "ui_owncloudadvancedsetuppage.h"
 
 class QProgressIndicator;
 
@@ -41,15 +37,15 @@ public:
     QStringList selectiveSyncBlacklist() const;
     bool useVirtualFileSync() const;
     bool isConfirmBigFolderChecked() const;
-    void setRemoteFolder(const QString &remoteFolder);
+    void setRemoteFolder(QString &remoteFolder);
     void setMultipleFoldersExist(bool exist);
     void directoriesCreated();
 
 signals:
-    void createLocalAndRemoteFolders(const QString &, const QString &);
+    void createLocalAndRemoteFolders(QString &, QString &);
 
 public slots:
-    void setErrorString(const QString &);
+    void setErrorString(QString &);
     void slotStyleChanged();
 
 private slots:
@@ -57,7 +53,7 @@ private slots:
     void slotSyncEverythingClicked();
     void slotSelectiveSyncClicked();
     void slotVirtualFileSyncClicked();
-    void slotQuotaRetrieved(const QVariantMap &result);
+    void slotQuotaRetrieved(QVariantMap &result);
 
 private:
     void setRadioChecked(QRadioButton *radio);
@@ -71,8 +67,8 @@ private:
     qint64 availableLocalSpace() const;
     QString checkLocalSpace(qint64 remoteSize) const;
     void customizeStyle();
-    void setServerAddressLabelUrl(const QUrl &url);
-    void setLocalFolderPushButtonPath(const QString &path);
+    void setServerAddressLabelUrl(QUrl &url);
+    void setLocalFolderPushButtonPath(QString &path);
     void styleSyncLogo();
     void styleLocalFolderLabel();
     void setResolutionGuiVisible(bool value);
@@ -81,7 +77,7 @@ private:
     void setUserInformation();
 
     // TODO: remove when UX decision is made
-    void refreshVirtualFilesAvailibility(const QString &path);
+    void refreshVirtualFilesAvailibility(QString &path);
 
     Ui_OwncloudAdvancedSetupPage _ui;
     bool _checking = false;

@@ -12,10 +12,7 @@
  * for more details.
  */
 
-
 // #include <QtCore>
-
-#include "activitydata.h"
 
 class QJsonDocument;
 
@@ -65,11 +62,11 @@ public:
     explicit ActivityListModel(AccountState *accountState,
         QObject *parent = nullptr);
 
-    QVariant data(const QModelIndex &index, int role) const override;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    QVariant data(QModelIndex &index, int role) const override;
+    int rowCount(QModelIndex &parent = QModelIndex()) const override;
 
-    bool canFetchMore(const QModelIndex &) const override;
-    void fetchMore(const QModelIndex &) override;
+    bool canFetchMore(QModelIndex &) const override;
+    void fetchMore(QModelIndex &) override;
 
     ActivityList activityList() { return _finalList; }
     ActivityList errorsList() { return _notificationErrorsLists; }
@@ -92,10 +89,10 @@ public slots:
 
 signals:
     void activityJobStatusCode(int statusCode);
-    void sendNotificationRequest(const QString &accountName, const QString &link, const QByteArray &verb, int row);
+    void sendNotificationRequest(QString &accountName, QString &link, QByteArray &verb, int row);
 
 protected:
-    void activitiesReceived(const QJsonDocument &json, int statusCode);
+    void activitiesReceived(QJsonDocument &json, int statusCode);
     QHash<int, QByteArray> roleNames() const override;
 
     void setAccountState(AccountState *state);

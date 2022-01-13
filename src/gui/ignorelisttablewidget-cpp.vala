@@ -1,7 +1,4 @@
-#include "ignorelisttablewidget.h"
-#include "ui_ignorelisttablewidget.h"
 
-#include "folderman.h"
 
 // #include <QFile>
 // #include <QInputDialog>
@@ -65,7 +62,7 @@ void IgnoreListTableWidget::slotRemoveAllItems() {
     ui->tableWidget->setRowCount(0);
 }
 
-void IgnoreListTableWidget::slotWriteIgnoreFile(const QString & file) {
+void IgnoreListTableWidget::slotWriteIgnoreFile(QString & file) {
     QFile ignores(file);
     if (ignores.open(QIODevice::WriteOnly)) {
         // rewrites the whole file since now the user can also remove system patterns
@@ -113,7 +110,7 @@ void IgnoreListTableWidget::slotAddPattern() {
     ui->tableWidget->scrollToBottom();
 }
 
-void IgnoreListTableWidget::readIgnoreFile(const QString &file, bool readOnly) {
+void IgnoreListTableWidget::readIgnoreFile(QString &file, bool readOnly) {
     QFile ignores(file);
     if (ignores.open(QIODevice::ReadOnly)) {
         while (!ignores.atEnd()) {
@@ -131,7 +128,7 @@ void IgnoreListTableWidget::readIgnoreFile(const QString &file, bool readOnly) {
     }
 }
 
-int IgnoreListTableWidget::addPattern(const QString &pattern, bool deletable, bool readOnly) {
+int IgnoreListTableWidget::addPattern(QString &pattern, bool deletable, bool readOnly) {
     int newRow = ui->tableWidget->rowCount();
     ui->tableWidget->setRowCount(newRow + 1);
 

@@ -19,14 +19,6 @@
 // #include <QSettings>
 // #include <QNetworkCookieJar>
 
-#include "account.h"
-#include "accessmanager.h"
-#include "common/utility.h"
-#include "theme.h"
-#include "creds/credentialscommon.h"
-#include "creds/tokencredentials.h"
-
-
 namespace OCC {
 
 Q_LOGGING_CATEGORY(lcTokenCredentials, "nextcloud.sync.credentials.token", QtInfoMsg)
@@ -40,13 +32,13 @@ namespace {
 class TokenCredentialsAccessManager : public AccessManager {
 public:
     friend class TokenCredentials;
-    TokenCredentialsAccessManager(const TokenCredentials *cred, QObject *parent = nullptr)
+    TokenCredentialsAccessManager(TokenCredentials *cred, QObject *parent = nullptr)
         : AccessManager(parent)
         , _cred(cred) {
     }
 
 protected:
-    QNetworkReply *createRequest(Operation op, const QNetworkRequest &request, QIODevice *outgoingData) {
+    QNetworkReply *createRequest(Operation op, QNetworkRequest &request, QIODevice *outgoingData) {
         if (_cred->user().isEmpty() || _cred->password().isEmpty()) {
             qCWarning(lcTokenCredentials) << "Empty user/password provided!";
         }
@@ -75,7 +67,7 @@ TokenCredentials::TokenCredentials()
     , _ready(false) {
 }
 
-TokenCredentials::TokenCredentials(const QString &user, const QString &password, const QString &token)
+TokenCredentials::TokenCredentials(QString &user, QString &password, QString &token)
     : _user(user)
     , _password(password)
     , _token(token)
@@ -116,7 +108,6 @@ void TokenCredentials::askFromUser() {
     emit asked();
 }
 
-
 bool TokenCredentials::stillValid(QNetworkReply *reply) {
     return ((reply->error() != QNetworkReply::AuthenticationRequiredError)
         // returned if user/password or token are incorrect
@@ -139,7 +130,6 @@ void TokenCredentials::forgetSensitiveData() {
 
 void TokenCredentials::persist() {
 }
-
 
 void TokenCredentials::slotAuthentication(QNetworkReply *reply, QAuthenticator *authenticator) {
     Q_UNUSED(authenticator)

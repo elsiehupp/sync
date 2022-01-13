@@ -20,24 +20,6 @@
 // #include <QDesktopServices>
 // #include <QApplication>
 
-#include "wizard/owncloudwizardcommon.h"
-#include "wizard/owncloudwizard.h"
-#include "owncloudsetupwizard.h"
-#include "configfile.h"
-#include "folderman.h"
-#include "accessmanager.h"
-#include "account.h"
-#include "networkjobs.h"
-#include "sslerrordialog.h"
-#include "accountmanager.h"
-#include "clientproxy.h"
-#include "filesystem.h"
-#include "owncloudgui.h"
-
-#include "creds/credentialsfactory.h"
-#include "creds/abstractcredentials.h"
-#include "creds/dummycredentials.h"
-
 namespace OCC {
 
 OwncloudSetupWizard::OwncloudSetupWizard(QObject *parent)
@@ -65,7 +47,7 @@ OwncloudSetupWizard::~OwncloudSetupWizard() {
 
 static QPointer<OwncloudSetupWizard> wiz = nullptr;
 
-void OwncloudSetupWizard::runWizard(QObject *obj, const char *amember, QWidget *parent) {
+void OwncloudSetupWizard::runWizard(QObject *obj, char *amember, QWidget *parent) {
     if (!wiz.isNull()) {
         bringWizardToFrontIfVisible();
         return;
@@ -129,7 +111,7 @@ void OwncloudSetupWizard::startWizard() {
 }
 
 // also checks if an installation is valid and determines auth type in a second step
-void OwncloudSetupWizard::slotCheckServer(const QString &urlString) {
+void OwncloudSetupWizard::slotCheckServer(QString &urlString) {
     QString fixedUrl = urlString;
     QUrl url = QUrl::fromUserInput(fixedUrl);
     // fromUserInput defaults to http, not http if no scheme is specified
@@ -173,7 +155,7 @@ void OwncloudSetupWizard::slotCheckServer(const QString &urlString) {
     }
 }
 
-void OwncloudSetupWizard::slotSystemProxyLookupDone(const QNetworkProxy &proxy) {
+void OwncloudSetupWizard::slotSystemProxyLookupDone(QNetworkProxy &proxy) {
     if (proxy.type() != QNetworkProxy::NoProxy) {
         qCInfo(lcWizard) << "Setting QNAM proxy to be system proxy" << ClientProxy::printQNetworkProxy(proxy);
     } else {
@@ -224,7 +206,7 @@ void OwncloudSetupWizard::slotFindServerBehindRedirect() {
     // accordingly
     auto permanentRedirects = std::make_shared<int>(0);
     connect(redirectCheckJob, &AbstractNetworkJob::redirected, this,
-        [permanentRedirects, account](QNetworkReply *reply, const QUrl &targetUrl, int count) {
+        [permanentRedirects, account](QNetworkReply *reply, QUrl &targetUrl, int count) {
             int httpCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
             if (count == *permanentRedirects && (httpCode == 301 || httpCode == 308)) {
                 qCInfo(lcWizard) << account->url() << " was redirected to" << targetUrl;
@@ -246,7 +228,7 @@ void OwncloudSetupWizard::slotFindServerBehindRedirect() {
     });
 }
 
-void OwncloudSetupWizard::slotFoundServer(const QUrl &url, const QJsonObject &info) {
+void OwncloudSetupWizard::slotFoundServer(QUrl &url, QJsonObject &info) {
     auto serverVersion = CheckServerJob::version(info);
 
     _ocWizard->appendToConfigurationLog(tr("<font color=\"green\">Successfully connected to %1: %2 version %3 (%4)</font><br/><br/>")
@@ -291,7 +273,7 @@ void OwncloudSetupWizard::slotNoServerFound(QNetworkReply *reply) {
     _ocWizard->account()->resetRejectedCertificates();
 }
 
-void OwncloudSetupWizard::slotNoServerFoundTimeout(const QUrl &url) {
+void OwncloudSetupWizard::slotNoServerFoundTimeout(QUrl &url) {
     _ocWizard->displayError(
         tr("Timeout while trying to connect to %1 at %2.")
             .arg(Utility::escape(Theme::instance()->appNameGUI()), Utility::escape(url.toString())),
@@ -305,13 +287,13 @@ void OwncloudSetupWizard::slotDetermineAuthType() {
     job->start();
 }
 
-void OwncloudSetupWizard::slotConnectToOCUrl(const QString &url) {
+void OwncloudSetupWizard::slotConnectToOCUrl(QString &url) {
     qCInfo(lcWizard) << "Connect to url: " << url;
     AbstractCredentials *creds = _ocWizard->getCredentials();
     _ocWizard->account()->setCredentials(creds);
 
     const auto fetchUserNameJob = new JsonApiJob(_ocWizard->account()->sharedFromThis(), QStringLiteral("/ocs/v1.php/cloud/user"));
-    connect(fetchUserNameJob, &JsonApiJob::jsonReceived, this, [this, url](const QJsonDocument &json, int statusCode) {
+    connect(fetchUserNameJob, &JsonApiJob::jsonReceived, this, [this, url](QJsonDocument &json, int statusCode) {
         if (statusCode != 100) {
             qCWarning(lcWizard) << "Could not fetch username.";
         }
@@ -431,7 +413,7 @@ bool OwncloudSetupWizard::checkDowngradeAdvised(QNetworkReply *reply) {
     return true;
 }
 
-void OwncloudSetupWizard::slotCreateLocalAndRemoteFolders(const QString &localFolder, const QString &remoteFolder) {
+void OwncloudSetupWizard::slotCreateLocalAndRemoteFolders(QString &localFolder, QString &remoteFolder) {
     qCInfo(lcWizard) << "Setup local sync folder for new oC connection " << localFolder;
     const QDir fi(localFolder);
 
@@ -596,7 +578,7 @@ void OwncloudSetupWizard::finalizeSetup(bool success) {
     }
 }
 
-bool OwncloudSetupWizard::ensureStartFromScratch(const QString &localFolder) {
+bool OwncloudSetupWizard::ensureStartFromScratch(QString &localFolder) {
     // first try to rename (backup) the current local dir.
     bool renameOk = false;
     while (!renameOk) {

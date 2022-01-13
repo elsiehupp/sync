@@ -12,11 +12,6 @@
  * for more details.
  */
 
-#include "navigationpanehelper.h"
-#include "accountmanager.h"
-#include "configfile.h"
-#include "folderman.h"
-
 // #include <QDir>
 // #include <QCoreApplication>
 
@@ -65,7 +60,7 @@ void NavigationPaneHelper::updateCloudStorageRegistry() {
     QString nameSpaceKey = QStringLiteral(R"(Software\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace)");
     if (Utility::registryKeyExists(HKEY_CURRENT_USER, nameSpaceKey)) {
         Utility::registryWalkSubKeys(HKEY_CURRENT_USER, nameSpaceKey,
-            [&entriesToRemove](HKEY key, const QString &subKey) {
+            [&entriesToRemove](HKEY key, QString &subKey) {
                 QVariant appName = Utility::registryGetKeyValue(key, subKey, QStringLiteral("ApplicationName"));
                 if (appName.toString() == QLatin1String(APPLICATION_NAME)) {
                     QUuid clsid{ subKey };

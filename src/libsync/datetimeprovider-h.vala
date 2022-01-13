@@ -1,7 +1,5 @@
 #pragma once
 
-#include "owncloudlib.h"
-
 // #include <QDateTime>
 
 namespace OCC {

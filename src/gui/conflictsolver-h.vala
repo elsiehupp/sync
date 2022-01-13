@@ -12,7 +12,6 @@
  * for more details.
  */
 
-
 // #include <QObject>
 
 class QWidget;
@@ -37,8 +36,8 @@ public:
     bool exec(Solution solution);
 
 public slots:
-    void setLocalVersionFilename(const QString &localVersionFilename);
-    void setRemoteVersionFilename(const QString &remoteVersionFilename);
+    void setLocalVersionFilename(QString &localVersionFilename);
+    void setRemoteVersionFilename(QString &remoteVersionFilename);
 
 signals:
     void localVersionFilenameChanged();

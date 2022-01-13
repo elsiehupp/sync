@@ -14,8 +14,6 @@
 
 // #pragma once
 
-#include "common/result.h"
-
 // #include <userstatusconnector.h>
 // #include <datetimeprovider.h>
 
@@ -53,11 +51,11 @@ public:
         std::unique_ptr<DateTimeProvider> dateTimeProvider,
         QObject *parent = nullptr);
 
-    explicit UserStatusSelectorModel(const UserStatus &userStatus,
+    explicit UserStatusSelectorModel(UserStatus &userStatus,
         std::unique_ptr<DateTimeProvider> dateTimeProvider,
         QObject *parent = nullptr);
 
-    explicit UserStatusSelectorModel(const UserStatus &userStatus,
+    explicit UserStatusSelectorModel(UserStatus &userStatus,
         QObject *parent = nullptr);
 
     Q_INVOKABLE void load(int id);
@@ -71,8 +69,8 @@ public:
     Q_REQUIRED_RESULT QUrl invisibleIcon() const;
 
     Q_REQUIRED_RESULT QString userStatusMessage() const;
-    Q_INVOKABLE void setUserStatusMessage(const QString &message);
-    void setUserStatusEmoji(const QString &emoji);
+    Q_INVOKABLE void setUserStatusMessage(QString &message);
+    void setUserStatusEmoji(QString &emoji);
     Q_REQUIRED_RESULT QString userStatusEmoji() const;
 
     Q_INVOKABLE void setUserStatus();
@@ -109,17 +107,17 @@ private:
 
     void init();
     void reset();
-    void onUserStatusFetched(const UserStatus &userStatus);
-    void onPredefinedStatusesFetched(const std::vector<UserStatus> &statuses);
+    void onUserStatusFetched(UserStatus &userStatus);
+    void onPredefinedStatusesFetched(std::vector<UserStatus> &statuses);
     void onUserStatusSet();
     void onMessageCleared();
     void onError(UserStatusConnector::Error error);
 
     Q_REQUIRED_RESULT QString clearAtStageToString(ClearStageType stage) const;
-    Q_REQUIRED_RESULT QString clearAtReadable(const Optional<ClearAt> &clearAt) const;
+    Q_REQUIRED_RESULT QString clearAtReadable(Optional<ClearAt> &clearAt) const;
     Q_REQUIRED_RESULT QString timeDifferenceToString(int differenceSecs) const;
     Q_REQUIRED_RESULT Optional<ClearAt> clearStageTypeToDateTime(ClearStageType type) const;
-    void setError(const QString &reason);
+    void setError(QString &reason);
     void clearError();
 
     std::shared_ptr<UserStatusConnector> _userStatusConnector {};

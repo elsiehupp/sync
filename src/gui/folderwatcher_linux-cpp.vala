@@ -12,12 +12,7 @@
  * for more details.
  */
 
-#include "config.h"
-
 // #include <sys/inotify.h>
-
-#include "folder.h"
-#include "folderwatcher_linux.h"
 
 // #include <cerrno>
 // #include <QStringList>
@@ -26,7 +21,7 @@
 
 namespace OCC {
 
-FolderWatcherPrivate::FolderWatcherPrivate(FolderWatcher *p, const QString &path)
+FolderWatcherPrivate::FolderWatcherPrivate(FolderWatcher *p, QString &path)
     : QObject()
     , _parent(p)
     , _folder(path) {
@@ -44,7 +39,7 @@ FolderWatcherPrivate::FolderWatcherPrivate(FolderWatcher *p, const QString &path
 FolderWatcherPrivate::~FolderWatcherPrivate() = default;
 
 // attention: result list passed by reference!
-bool FolderWatcherPrivate::findFoldersBelow(const QDir &dir, QStringList &fullList) {
+bool FolderWatcherPrivate::findFoldersBelow(QDir &dir, QStringList &fullList) {
     bool ok = true;
     if (!(dir.exists() && dir.isReadable())) {
         qCDebug(lcFolderWatcher) << "Non existing path coming in: " << dir.absolutePath();
@@ -67,7 +62,7 @@ bool FolderWatcherPrivate::findFoldersBelow(const QDir &dir, QStringList &fullLi
     return ok;
 }
 
-void FolderWatcherPrivate::inotifyRegisterPath(const QString &path) {
+void FolderWatcherPrivate::inotifyRegisterPath(QString &path) {
     if (path.isEmpty())
         return;
 
@@ -88,7 +83,7 @@ void FolderWatcherPrivate::inotifyRegisterPath(const QString &path) {
     }
 }
 
-void FolderWatcherPrivate::slotAddFolderRecursive(const QString &path) {
+void FolderWatcherPrivate::slotAddFolderRecursive(QString &path) {
     if (_pathToWatch.contains(path))
         return;
 
@@ -185,7 +180,7 @@ void FolderWatcherPrivate::slotReceivedNotification(int fd) {
     }
 }
 
-void FolderWatcherPrivate::removeFoldersBelow(const QString &path) {
+void FolderWatcherPrivate::removeFoldersBelow(QString &path) {
     auto it = _pathToWatch.find(path);
     if (it == _pathToWatch.end())
         return;

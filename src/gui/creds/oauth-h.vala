@@ -16,7 +16,6 @@
 // #include <QPointer>
 // #include <QTcpServer>
 // #include <QUrl>
-#include "accountfwd.h"
 
 namespace OCC {
 
@@ -59,7 +58,7 @@ signals:
      * The state has changed.
      * when logged in, token has the value of the token.
      */
-    void result(OAuth::Result result, const QString &user = QString(), const QString &token = QString(), const QString &refreshToken = QString());
+    void result(OAuth::Result result, QString &user = QString(), QString &token = QString(), QString &refreshToken = QString());
 
 private:
     Account *_account;
@@ -68,6 +67,5 @@ private:
 public:
     QString _expectedUser;
 };
-
 
 } // namespace OCC

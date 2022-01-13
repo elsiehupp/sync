@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#include "ocsnavigationappsjob.h"
-
 namespace OCC {
 
 OcsNavigationAppsJob::OcsNavigationAppsJob(AccountPtr account)
@@ -28,7 +26,7 @@ void OcsNavigationAppsJob::getNavigationApps() {
     start();
 }
 
-void OcsNavigationAppsJob::jobDone(const QJsonDocument &reply, int statusCode) {
+void OcsNavigationAppsJob::jobDone(QJsonDocument &reply, int statusCode) {
     emit appsJobFinished(reply, statusCode);
 }
 }

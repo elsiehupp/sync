@@ -13,12 +13,10 @@
  * for more details.
  */
 
-
 // #include <QMap>
 // #include <QSslCertificate>
 // #include <QSslKey>
 // #include <QNetworkRequest>
-#include "creds/abstractcredentials.h"
 
 class QNetworkReply;
 class QAuthenticator;
@@ -76,8 +74,8 @@ public:
     static constexpr QNetworkRequest::Attribute DontAddCredentialsAttribute = QNetworkRequest::User;
 
     HttpCredentials();
-    explicit HttpCredentials(const QString &user, const QString &password,
-            const QByteArray &clientCertBundle = QByteArray(), const QByteArray &clientCertPassword = QByteArray());
+    explicit HttpCredentials(QString &user, QString &password,
+            const QByteArray &clientCertBundle = QByteArray(), QByteArray &clientCertPassword = QByteArray());
 
     QString authType() const override;
     QNetworkAccessManager *createQNAM() const override;
@@ -169,7 +167,6 @@ protected:
 
     QVector<QPointer<AbstractNetworkJob>> _retryQueue; // Jobs we need to retry once the auth token is fetched
 };
-
 
 } // namespace OCC
 

@@ -1,8 +1,6 @@
 #ifndef WEBVIEWPAGE_H
 #define WEBVIEWPAGE_H
 
-#include "wizard/abstractcredswizardpage.h"
-
 namespace OCC {
 
 class AbstractCredentials;
@@ -23,7 +21,7 @@ public:
     void setConnected();
 
 signals:
-    void connectToOCUrl(const QString&);
+    void connectToOCUrl(QString&);
 
 private slots:
     void urlCatched(QString user, QString pass, QString host);

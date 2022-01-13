@@ -4,8 +4,6 @@
 // #include <QUrl>
 // #include <QWidget>
 
-#include "ui_webview.h"
-
 class QWebEngineView;
 class QWebEngineProfile;
 class QWebEnginePage;
@@ -20,10 +18,10 @@ class WebView : public QWidget {
 public:
     WebView(QWidget *parent = nullptr);
     ~WebView() override;
-    void setUrl(const QUrl &url);
+    void setUrl(QUrl &url);
 
 signals:
-    void urlCatched(const QString user, const QString pass, const QString host);
+    void urlCatched(QString user, QString pass, QString host);
 
 private:
     Ui_WebView _ui;

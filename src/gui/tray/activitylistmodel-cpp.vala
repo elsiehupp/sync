@@ -20,22 +20,6 @@
 // #include <QJsonDocument>
 // #include <qloggingcategory.h>
 
-#include "account.h"
-#include "accountstate.h"
-#include "accountmanager.h"
-#include "conflictdialog.h"
-#include "folderman.h"
-#include "iconjob.h"
-#include "accessmanager.h"
-#include "owncloudgui.h"
-#include "guiutility.h"
-#include "invalidfilenamedialog.h"
-
-#include "activitydata.h"
-#include "activitylistmodel.h"
-
-#include "theme.h"
-
 namespace OCC {
 
 Q_LOGGING_CATEGORY(lcActivity, "nextcloud.gui.activity", QtInfoMsg)
@@ -93,7 +77,7 @@ void ActivityListModel::setDisplayActions(bool value) {
     _displayActions = value;
 }
 
-QVariant ActivityListModel::data(const QModelIndex &index, int role) const {
+QVariant ActivityListModel::data(QModelIndex &index, int role) const {
     Activity a;
 
     if (!index.isValid())
@@ -261,11 +245,11 @@ QVariant ActivityListModel::data(const QModelIndex &index, int role) const {
     return QVariant();
 }
 
-int ActivityListModel::rowCount(const QModelIndex &) const {
+int ActivityListModel::rowCount(QModelIndex &) const {
     return _finalList.count();
 }
 
-bool ActivityListModel::canFetchMore(const QModelIndex &) const {
+bool ActivityListModel::canFetchMore(QModelIndex &) const {
     // We need to be connected to be able to fetch more
     if (_accountState && _accountState->isConnected()) {
         // If the fetching is reported to be done or we are currently fetching we can't fetch more
@@ -295,7 +279,7 @@ void ActivityListModel::startFetchJob() {
     job->start();
 }
 
-void ActivityListModel::activitiesReceived(const QJsonDocument &json, int statusCode) {
+void ActivityListModel::activitiesReceived(QJsonDocument &json, int statusCode) {
     auto activities = json.object().value("ocs").toObject().value("data").toArray();
 
     ActivityList list;
@@ -575,7 +559,7 @@ bool ActivityListModel::canFetchActivities() const {
     return _accountState->isConnected() && _accountState->account()->capabilities().hasActivities();
 }
 
-void ActivityListModel::fetchMore(const QModelIndex &) {
+void ActivityListModel::fetchMore(QModelIndex &) {
     if (canFetchActivities()) {
         startFetchJob();
     } else {

@@ -12,18 +12,6 @@
  * for more details.
  */
 
-#include "flow2authwidget.h"
-
-#include "common/utility.h"
-#include "account.h"
-#include "creds/webflowcredentials.h"
-#include "networkjobs.h"
-#include "wizard/owncloudwizardcommon.h"
-#include "theme.h"
-#include "linklabel.h"
-
-#include "QProgressIndicator.h"
-
 // #include <QJsonDocument>
 // #include <QStringLiteral>
 // #include <QJsonObject>
@@ -31,7 +19,6 @@
 namespace OCC {
 
 Q_LOGGING_CATEGORY(lcFlow2AuthWidget, "nextcloud.gui.wizard.flow2authwidget", QtInfoMsg)
-
 
 Flow2AuthWidget::Flow2AuthWidget(QWidget *parent)
     : QWidget(parent)
@@ -83,7 +70,7 @@ void Flow2AuthWidget::resetAuth(Account *account) {
     startAuth(account);
 }
 
-void Flow2AuthWidget::slotAuthResult(Flow2Auth::Result r, const QString &errorString, const QString &user, const QString &appPassword) {
+void Flow2AuthWidget::slotAuthResult(Flow2Auth::Result r, QString &errorString, QString &user, QString &appPassword) {
     stopSpinner(false);
 
     switch (r) {
@@ -106,7 +93,7 @@ void Flow2AuthWidget::slotAuthResult(Flow2Auth::Result r, const QString &errorSt
     emit authResult(r, errorString, user, appPassword);
 }
 
-void Flow2AuthWidget::setError(const QString &error) {
+void Flow2AuthWidget::setError(QString &error) {
     if (error.isEmpty()) {
         _ui.errorLabel->hide();
     } else {

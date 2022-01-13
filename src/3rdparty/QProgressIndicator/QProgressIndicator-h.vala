@@ -22,7 +22,6 @@
  * SOFTWARE.
  */
 
-
 // #include <QWidget>
 // #include <QColor>
 
@@ -92,7 +91,7 @@ public slots:
     /*! Sets the color of the components to the given color.
         \sa color
      */
-    void setColor(const QColor & color);
+    void setColor(QColor & color);
 protected:
     void timerEvent(QTimerEvent * event) override;
     void paintEvent(QPaintEvent * event) override;

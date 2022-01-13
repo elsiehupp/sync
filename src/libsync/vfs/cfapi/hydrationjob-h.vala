@@ -15,8 +15,6 @@
 
 // #include <QObject>
 
-#include "account.h"
-
 class QLocalServer;
 class QLocalSocket;
 
@@ -41,28 +39,28 @@ public:
     explicit HydrationJob(QObject *parent = nullptr);
 
     AccountPtr account() const;
-    void setAccount(const AccountPtr &account);
+    void setAccount(AccountPtr &account);
 
     QString remotePath() const;
-    void setRemotePath(const QString &remotePath);
+    void setRemotePath(QString &remotePath);
 
     QString localPath() const;
-    void setLocalPath(const QString &localPath);
+    void setLocalPath(QString &localPath);
 
     SyncJournalDb *journal() const;
     void setJournal(SyncJournalDb *journal);
 
     QString requestId() const;
-    void setRequestId(const QString &requestId);
+    void setRequestId(QString &requestId);
 
     QString folderPath() const;
-    void setFolderPath(const QString &folderPath);
+    void setFolderPath(QString &folderPath);
 
     bool isEncryptedFile() const;
     void setIsEncryptedFile(bool isEncrypted);
 
     QString e2eMangledName() const;
-    void setE2eMangledName(const QString &e2eMangledName);
+    void setE2eMangledName(QString &e2eMangledName);
 
     qint64 fileTotalSize() const;
     void setFileTotalSize(qint64 totalSize);
@@ -74,10 +72,10 @@ public:
     void finalize(OCC::VfsCfApi *vfs);
 
 public slots:
-    void slotCheckFolderId(const QStringList &list);
+    void slotCheckFolderId(QStringList &list);
     void slotFolderIdError();
-    void slotCheckFolderEncryptedMetadata(const QJsonDocument &json);
-    void slotFolderEncryptedMetadataError(const QByteArray &fileId, int httpReturnCode);
+    void slotCheckFolderEncryptedMetadata(QJsonDocument &json);
+    void slotFolderEncryptedMetadataError(QByteArray &fileId, int httpReturnCode);
 
 signals:
     void finished(HydrationJob *job);

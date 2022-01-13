@@ -12,8 +12,6 @@
  * for more details.
  */
 
-
-#include "ocsjob.h"
 class QJsonDocument;
 
 namespace OCC {
@@ -41,10 +39,10 @@ signals:
      * @param reply The reply
      * @param statusCode the status code of the response
      */
-    void appsJobFinished(const QJsonDocument &reply, int statusCode);
+    void appsJobFinished(QJsonDocument &reply, int statusCode);
 
 private slots:
-    void jobDone(const QJsonDocument &reply, int statusCode);
+    void jobDone(QJsonDocument &reply, int statusCode);
 };
 }
 

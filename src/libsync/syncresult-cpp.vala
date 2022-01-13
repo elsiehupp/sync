@@ -12,9 +12,6 @@
  * for more details.
  */
 
-#include "syncresult.h"
-#include "progressdispatcher.h"
-
 namespace OCC {
 
 SyncResult::SyncResult() = default;
@@ -79,7 +76,7 @@ QStringList SyncResult::errorStrings() const {
     return _errors;
 }
 
-void SyncResult::appendErrorString(const QString &err) {
+void SyncResult::appendErrorString(QString &err) {
     _errors.append(err);
 }
 
@@ -93,7 +90,7 @@ void SyncResult::clearErrors() {
     _errors.clear();
 }
 
-void SyncResult::setFolder(const QString &folder) {
+void SyncResult::setFolder(QString &folder) {
     _folder = folder;
 }
 
@@ -101,7 +98,7 @@ QString SyncResult::folder() const {
     return _folder;
 }
 
-void SyncResult::processCompletedItem(const SyncFileItemPtr &item) {
+void SyncResult::processCompletedItem(SyncFileItemPtr &item) {
     if (Progress::isWarningKind(item->_status)) {
         // Count any error conditions, error strings will have priority anyway.
         _foundFilesNotSynced = true;

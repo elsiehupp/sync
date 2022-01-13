@@ -12,25 +12,6 @@
  * for more details.
  */
 
-#include "config.h"
-#include "propagateupload.h"
-#include "propagateuploadencrypted.h"
-#include "owncloudpropagator_p.h"
-#include "networkjobs.h"
-#include "account.h"
-#include "common/syncjournaldb.h"
-#include "common/syncjournalfilerecord.h"
-#include "common/utility.h"
-#include "filesystem.h"
-#include "propagatorjobs.h"
-#include "common/checksums.h"
-#include "syncengine.h"
-#include "deletejob.h"
-#include "common/asserts.h"
-#include "networkjobs.h"
-#include "clientsideencryption.h"
-#include "clientsideencryptionjobs.h"
-
 // #include <QNetworkAccessManager>
 // #include <QFileInfo>
 // #include <QDir>
@@ -163,7 +144,7 @@ bool PollJob::finished() {
     return true;
 }
 
-PropagateUploadFileCommon::PropagateUploadFileCommon(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
+PropagateUploadFileCommon::PropagateUploadFileCommon(OwncloudPropagator *propagator, SyncFileItemPtr &item)
     : PropagateItemJob(propagator, item)
     , _finished(false)
     , _deleteExisting(false)
@@ -189,7 +170,6 @@ void PropagateUploadFileCommon::start() {
     const auto path = _item->_file;
     const auto slashPosition = path.lastIndexOf('/');
     const auto parentPath = slashPosition >= 0 ? path.left(slashPosition) : QString();
-
 
     if (!_item->_renameTarget.isEmpty() && _item->_file != _item->_renameTarget) {
         // Try to rename the file
@@ -237,7 +217,7 @@ void PropagateUploadFileCommon::start() {
     _uploadEncryptedHelper->start();
 }
 
-void PropagateUploadFileCommon::setupEncryptedFile(const QString& path, const QString& filename, quint64 size) {
+void PropagateUploadFileCommon::setupEncryptedFile(QString& path, QString& filename, quint64 size) {
     qCDebug(lcPropagateUpload) << "Starting to upload encrypted file" << path << filename << size;
     _uploadingEncrypted = true;
     _fileToUpload._path = path;
@@ -336,7 +316,7 @@ void PropagateUploadFileCommon::slotComputeContentChecksum() {
     computeChecksum->start(_fileToUpload._path);
 }
 
-void PropagateUploadFileCommon::slotComputeTransmissionChecksum(const QByteArray &contentChecksumType, const QByteArray &contentChecksum) {
+void PropagateUploadFileCommon::slotComputeTransmissionChecksum(QByteArray &contentChecksumType, QByteArray &contentChecksum) {
     _item->_checksumHeader = makeChecksumHeader(contentChecksumType, contentChecksum);
 
     // Reuse the content checksum as the transmission checksum if possible
@@ -362,7 +342,7 @@ void PropagateUploadFileCommon::slotComputeTransmissionChecksum(const QByteArray
     computeChecksum->start(_fileToUpload._path);
 }
 
-void PropagateUploadFileCommon::slotStartUpload(const QByteArray &transmissionChecksumType, const QByteArray &transmissionChecksum) {
+void PropagateUploadFileCommon::slotStartUpload(QByteArray &transmissionChecksumType, QByteArray &transmissionChecksum) {
     // Remove ourselfs from the list of active job, before any posible call to done()
     // When we start chunks, we will add it again, once for every chunks.
     propagator()->_activeJobList.removeOne(this);
@@ -421,7 +401,7 @@ void PropagateUploadFileCommon::slotStartUpload(const QByteArray &transmissionCh
     doStartUpload();
 }
 
-void PropagateUploadFileCommon::slotFolderUnlocked(const QByteArray &folderId, int httpReturnCode) {
+void PropagateUploadFileCommon::slotFolderUnlocked(QByteArray &folderId, int httpReturnCode) {
     qDebug() << "Failed to unlock encrypted folder" << folderId;
     if (_uploadStatus.status == SyncFileItem::NoStatus && httpReturnCode != 200) {
         done(SyncFileItem::FatalError, tr("Failed to unlock encrypted folder."));
@@ -430,7 +410,7 @@ void PropagateUploadFileCommon::slotFolderUnlocked(const QByteArray &folderId, i
     }
 }
 
-void PropagateUploadFileCommon::slotOnErrorStartFolderUnlock(SyncFileItem::Status status, const QString &errorString) {
+void PropagateUploadFileCommon::slotOnErrorStartFolderUnlock(SyncFileItem::Status status, QString &errorString) {
     if (_uploadingEncrypted) {
         _uploadStatus = { status, errorString };
         connect(_uploadEncryptedHelper, &PropagateUploadEncrypted::folderUnlocked, this, &PropagateUploadFileCommon::slotFolderUnlocked);
@@ -440,14 +420,13 @@ void PropagateUploadFileCommon::slotOnErrorStartFolderUnlock(SyncFileItem::Statu
     }
 }
 
-UploadDevice::UploadDevice(const QString &fileName, qint64 start, qint64 size, BandwidthManager *bwm)
+UploadDevice::UploadDevice(QString &fileName, qint64 start, qint64 size, BandwidthManager *bwm)
     : _file(fileName)
     , _start(start)
     , _size(size)
     , _bandwidthManager(bwm) {
     _bandwidthManager->registerUploadDevice(this);
 }
-
 
 UploadDevice::~UploadDevice() {
     if (_bandwidthManager) {
@@ -480,7 +459,7 @@ void UploadDevice::close() {
     QIODevice::close();
 }
 
-qint64 UploadDevice::writeData(const char *, qint64) {
+qint64 UploadDevice::writeData(char *, qint64) {
     ASSERT(false, "write to read only device");
     return 0;
 }
@@ -572,7 +551,7 @@ void UploadDevice::setChoked(bool b) {
     }
 }
 
-void PropagateUploadFileCommon::startPollJob(const QString &path) {
+void PropagateUploadFileCommon::startPollJob(QString &path) {
     auto *job = new PollJob(propagator()->account(), path, _item,
         propagator()->_journal, propagator()->localPath(), this);
     connect(job, &PollJob::finishedSignal, this, &PropagateUploadFileCommon::slotPollFinished);
@@ -605,7 +584,7 @@ void PropagateUploadFileCommon::slotPollFinished() {
     finalize();
 }
 
-void PropagateUploadFileCommon::done(SyncFileItem::Status status, const QString &errorString) {
+void PropagateUploadFileCommon::done(SyncFileItem::Status status, QString &errorString) {
     _finished = true;
     PropagateItemJob::done(status, errorString);
 }
@@ -688,7 +667,7 @@ void PropagateUploadFileCommon::slotJobDestroyed(QObject *job) {
 }
 
 // This function is used whenever there is an error occuring and jobs might be in progress
-void PropagateUploadFileCommon::abortWithError(SyncFileItem::Status status, const QString &error) {
+void PropagateUploadFileCommon::abortWithError(SyncFileItem::Status status, QString &error) {
     if (_aborting)
         return;
     abort(AbortType::Synchronous);

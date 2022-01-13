@@ -18,11 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-
-#include "ocsynclib.h"
-
-#include "csync.h"
-
 // #include <QObject>
 // #include <QSet>
 // #include <QString>
@@ -65,7 +60,7 @@ class OCSYNC_EXPORT ExcludedFiles : public QObject {
 public:
     using Version = std::tuple<int, int, int>;
 
-    explicit ExcludedFiles(const QString &localPath = QStringLiteral("/"));
+    explicit ExcludedFiles(QString &localPath = QStringLiteral("/"));
     ~ExcludedFiles() override;
 
     /**
@@ -73,7 +68,7 @@ public:
      *
      * Does not load the file. Use reloadExcludeFiles() afterwards.
      */
-    void addExcludeFilePath(const QString &path);
+    void addExcludeFilePath(QString &path);
 
     /**
      * Whether conflict files shall be excluded.
@@ -99,8 +94,8 @@ public:
      * Primarily used in tests. Patterns added this way are preserved when
      * reloadExcludeFiles() is called.
      */
-    void addManualExclude(const QString &expr);
-    void addManualExclude(const QString &expr, const QString &basePath);
+    void addManualExclude(QString &expr);
+    void addManualExclude(QString &expr, QString &basePath);
 
     /**
      * Removes all manually added exclude patterns.
@@ -134,7 +129,7 @@ public:
      * Note that this only matches patterns. It does not check whether the file
      * or directory pointed to is hidden (or whether it even exists).
      */
-    CSYNC_EXCLUDE_TYPE traversalPatternMatch(const QString &path, ItemType filetype);
+    CSYNC_EXCLUDE_TYPE traversalPatternMatch(QString &path, ItemType filetype);
 
 public slots:
     /**
@@ -144,7 +139,7 @@ public slots:
     /**
      * Loads the exclude patterns from file the registered base paths.
      */
-    void loadExcludeFilePatterns(const QString &basePath, QFile &file);
+    void loadExcludeFilePatterns(QString &basePath, QFile &file);
 
 private:
     /**
@@ -162,7 +157,7 @@ private:
      *
      * Would enable the "myexclude" pattern only for versions before 2.5.0.
      */
-    bool versionDirectiveKeepNextLine(const QByteArray &directive) const;
+    bool versionDirectiveKeepNextLine(QByteArray &directive) const;
 
     /**
      * @brief Match the exclude pattern against the full path.
@@ -172,7 +167,7 @@ private:
      * Note that this only matches patterns. It does not check whether the file
      * or directory pointed to is hidden (or whether it even exists).
      */
-    CSYNC_EXCLUDE_TYPE fullPatternMatch(const QString &path, ItemType filetype) const;
+    CSYNC_EXCLUDE_TYPE fullPatternMatch(QString &path, ItemType filetype) const;
 
     // Our BasePath need to end with '/'
     class BasePathString : public QString {
@@ -182,7 +177,7 @@ private:
             Q_ASSERT(endsWith(QLatin1Char('/')));
         }
 
-        BasePathString(const QString &other)
+        BasePathString(QString &other)
             : QString(other) {
             Q_ASSERT(endsWith(QLatin1Char('/')));
         }
@@ -217,11 +212,11 @@ private:
      * full matcher would exclude. Example: "b" is excluded. traversal("b/c")
      * returns not-excluded because "c" isn't a bname activation pattern.
      */
-    void prepare(const BasePathString &basePath);
+    void prepare(BasePathString &basePath);
 
     void prepare();
 
-    static QString extractBnameTrigger(const QString &exclude, bool wildcardsMatchSlash);
+    static QString extractBnameTrigger(QString &exclude, bool wildcardsMatchSlash);
     static QString convertToRegexpSyntax(QString exclude, bool wildcardsMatchSlash);
 
     QString _localPath;

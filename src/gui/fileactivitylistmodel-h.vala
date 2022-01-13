@@ -14,9 +14,6 @@
 
 // #pragma once
 
-#include "accountstate.h"
-#include "tray/activitylistmodel.h"
-
 namespace OCC {
 
 class FileActivityListModel : public ActivityListModel {
@@ -25,7 +22,7 @@ public:
     explicit FileActivityListModel(QObject *parent = nullptr);
 
 public slots:
-    void load(AccountState *accountState, const QString &fileId);
+    void load(AccountState *accountState, QString &fileId);
 
 protected:
     void startFetchJob() override;

@@ -12,9 +12,6 @@
  * for more details.
  */
 
-#include "syncoptions.h"
-#include "common/utility.h"
-
 // #include <QRegularExpression>
 
 using namespace OCC;
@@ -56,12 +53,12 @@ QRegularExpression SyncOptions::fileRegex() const {
     return _fileRegex;
 }
 
-void SyncOptions::setFilePattern(const QString &pattern) {
+void SyncOptions::setFilePattern(QString &pattern) {
     // full match or a path ending with this pattern
     setPathPattern(QStringLiteral("(^|/|\\\\)") + pattern + QLatin1Char('$'));
 }
 
-void SyncOptions::setPathPattern(const QString &pattern) {
+void SyncOptions::setPathPattern(QString &pattern) {
     _fileRegex.setPatternOptions(Utility::fsCasePreserving() ? QRegularExpression::CaseInsensitiveOption : QRegularExpression::NoPatternOption);
     _fileRegex.setPattern(pattern);
 }

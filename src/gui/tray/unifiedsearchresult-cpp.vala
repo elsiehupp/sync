@@ -14,8 +14,6 @@
 
 // #include <QtCore>
 
-#include "unifiedsearchresult.h"
-
 namespace OCC {
 
 QString UnifiedSearchResult::typeAsString(UnifiedSearchResult::Type type) {

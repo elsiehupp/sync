@@ -12,9 +12,6 @@
  * for more details.
  */
 
-#include "clientproxy.h"
-
-#include "configfile.h"
 // #include <QLoggingCategory>
 // #include <QUrl>
 // #include <QThreadPool>
@@ -27,7 +24,7 @@ ClientProxy::ClientProxy(QObject *parent)
     : QObject(parent) {
 }
 
-static QNetworkProxy proxyFromConfig(const ConfigFile &cfg) {
+static QNetworkProxy proxyFromConfig(ConfigFile &cfg) {
     QNetworkProxy proxy;
 
     if (cfg.proxyHostName().isEmpty())
@@ -72,7 +69,7 @@ const char *ClientProxy::proxyTypeToCStr(QNetworkProxy::ProxyType type) {
     }
 }
 
-QString ClientProxy::printQNetworkProxy(const QNetworkProxy &proxy) {
+QString ClientProxy::printQNetworkProxy(QNetworkProxy &proxy) {
     return QString("%1://%2:%3").arg(proxyTypeToCStr(proxy.type())).arg(proxy.hostName()).arg(proxy.port());
 }
 
@@ -121,13 +118,13 @@ void ClientProxy::setupQtProxyFromConfig() {
     }
 }
 
-void ClientProxy::lookupSystemProxyAsync(const QUrl &url, QObject *dst, const char *slot) {
+void ClientProxy::lookupSystemProxyAsync(QUrl &url, QObject *dst, char *slot) {
     auto *runnable = new SystemProxyRunnable(url);
     QObject::connect(runnable, SIGNAL(systemProxyLookedUp(QNetworkProxy)), dst, slot);
     QThreadPool::globalInstance()->start(runnable); // takes ownership and deletes
 }
 
-SystemProxyRunnable::SystemProxyRunnable(const QUrl &url)
+SystemProxyRunnable::SystemProxyRunnable(QUrl &url)
     : QObject()
     , QRunnable()
     , _url(url) {

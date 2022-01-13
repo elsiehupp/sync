@@ -11,13 +11,10 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
  */
-#include "common/utility.h"
-#include "account.h"
-#include "simplesslerrorhandler.h"
 
 namespace OCC {
 
-bool SimpleSslErrorHandler::handleErrors(QList<QSslError> errors, const QSslConfiguration &conf, QList<QSslCertificate> *certs, OCC::AccountPtr account) {
+bool SimpleSslErrorHandler::handleErrors(QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, OCC::AccountPtr account) {
     (void)account;
     (void)conf;
 
@@ -26,7 +23,7 @@ bool SimpleSslErrorHandler::handleErrors(QList<QSslError> errors, const QSslConf
         return false;
     }
 
-    for (const auto &error : qAsConst(errors)) {
+    for (auto &error : qAsConst(errors)) {
         certs->append(error.certificate());
     }
     return true;

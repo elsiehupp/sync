@@ -12,16 +12,6 @@
  * for more details.
  */
 
-#include "networksettings.h"
-#include "ui_networksettings.h"
-
-#include "theme.h"
-#include "configfile.h"
-#include "application.h"
-#include "configfile.h"
-#include "folderman.h"
-#include "accountmanager.h"
-
 // #include <QNetworkProxy>
 // #include <QString>
 // #include <QList>
@@ -232,13 +222,12 @@ void NetworkSettings::showEvent(QShowEvent *event) {
     QWidget::showEvent(event);
 }
 
-
 void NetworkSettings::checkAccountLocalhost() {
     bool visible = false;
     if (_ui->manualProxyRadioButton->isChecked()) {
         // Check if at least one account is using localhost, because Qt proxy settings have no
         // effect for localhost (#7169)
-        for (const auto &account : AccountManager::instance()->accounts()) {
+        for (auto &account : AccountManager::instance()->accounts()) {
             const auto host = account->account()->url().host();
             // Some typical url for localhost
             if (host == "localhost" || host.startsWith("127.") || host == "[::1]")
@@ -247,6 +236,5 @@ void NetworkSettings::checkAccountLocalhost() {
     }
     _ui->labelLocalhost->setVisible(visible);
 }
-
 
 } // namespace OCC

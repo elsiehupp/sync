@@ -12,14 +12,11 @@
  * for more details.
  */
 
-
 // #include <QObject>
 // #include <QString>
 // #include <QSocketNotifier>
 // #include <QHash>
 // #include <QDir>
-
-#include "folderwatcher.h"
 
 class QTimer;
 
@@ -32,7 +29,7 @@ namespace OCC {
 class FolderWatcherPrivate : public QObject {
 public:
     FolderWatcherPrivate() = default;
-    FolderWatcherPrivate(FolderWatcher *p, const QString &path);
+    FolderWatcherPrivate(FolderWatcher *p, QString &path);
     ~FolderWatcherPrivate() override;
 
     int testWatchCount() const { return _pathToWatch.size(); }
@@ -42,12 +39,12 @@ public:
 
 protected slots:
     void slotReceivedNotification(int fd);
-    void slotAddFolderRecursive(const QString &path);
+    void slotAddFolderRecursive(QString &path);
 
 protected:
-    bool findFoldersBelow(const QDir &dir, QStringList &fullList);
-    void inotifyRegisterPath(const QString &path);
-    void removeFoldersBelow(const QString &path);
+    bool findFoldersBelow(QDir &dir, QStringList &fullList);
+    void inotifyRegisterPath(QString &path);
+    void removeFoldersBelow(QString &path);
 
 private:
     FolderWatcher *_parent;

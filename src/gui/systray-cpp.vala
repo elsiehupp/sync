@@ -12,18 +12,6 @@
  * for more details.
  */
 
-#include "accountmanager.h"
-#include "systray.h"
-#include "theme.h"
-#include "config.h"
-#include "common/utility.h"
-#include "tray/svgimageprovider.h"
-#include "tray/usermodel.h"
-#include "wheelhandler.h"
-#include "tray/unifiedsearchresultimageprovider.h"
-#include "configfile.h"
-#include "accessmanager.h"
-
 // #include <QCursor>
 // #include <QGuiApplication>
 // #include <QQmlApplicationEngine>
@@ -145,7 +133,7 @@ void Systray::create() {
     emit activated(QSystemTrayIcon::ActivationReason::Unknown);
 
     const auto folderMap = FolderMan::instance()->map();
-    for (const auto *folder : folderMap) {
+    for (auto *folder : folderMap) {
         if (!folder->syncPaused()) {
             _syncIsPaused = false;
             break;
@@ -179,7 +167,7 @@ void Systray::setPauseOnAllFoldersHelper(bool pause) {
         const auto ptrList = AccountManager::instance()->accounts();
         auto result = QList<AccountState *>();
         result.reserve(ptrList.size());
-        std::transform(std::cbegin(ptrList), std::cend(ptrList), std::back_inserter(result), [](const AccountStatePtr &account) {
+        std::transform(std::cbegin(ptrList), std::cend(ptrList), std::back_inserter(result), [](AccountStatePtr &account) {
             return account.data();
         });
         return result;
@@ -220,7 +208,7 @@ Q_INVOKABLE void Systray::setClosed() {
     _isOpen = false;
 }
 
-void Systray::showMessage(const QString &title, const QString &message, MessageIcon icon) {
+void Systray::showMessage(QString &title, QString &message, MessageIcon icon) {
 #ifdef USE_FDO_NOTIFICATIONS
     if (QDBusInterface(NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE).isValid()) {
         const QVariantMap hints = {{QStringLiteral("desktop-entry"), LINUX_APPLICATION_ID}};
@@ -240,7 +228,7 @@ void Systray::showMessage(const QString &title, const QString &message, MessageI
     }
 }
 
-void Systray::setToolTip(const QString &tip) {
+void Systray::setToolTip(QString &tip) {
     QSystemTrayIcon::setToolTip(tr("%1: %2").arg(Theme::instance()->appNameGUI(), tip));
 }
 
@@ -290,7 +278,7 @@ QScreen *Systray::currentScreen() const {
     const auto screens = QGuiApplication::screens();
     const auto cursorPos = QCursor::pos();
 
-    for (const auto screen : screens) {
+    for (auto screen : screens) {
         if (screen->geometry().contains(cursorPos)) {
             return screen;
         }

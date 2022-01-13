@@ -12,12 +12,6 @@
  * for more details.
  */
 
-#include "gui/tray/unifiedsearchresultslistmodel.h"
-
-#include "account.h"
-#include "accountstate.h"
-#include "syncenginetestutils.h"
-
 // #include <QAbstractItemModelTester>
 // #include <QDesktopServices>
 // #include <QSignalSpy>
@@ -36,7 +30,7 @@ public:
 
 public:
 signals:
-    void resultClicked(const QUrl &url);
+    void resultClicked(QUrl &url);
 };
 
 /**
@@ -125,7 +119,7 @@ public:
     void initProvidersResponse() {
         QList<QVariant> providersList;
 
-        for (const auto &fakeProviderInitInfo : fakeProvidersInitInfo) {
+        for (auto &fakeProviderInitInfo : fakeProvidersInitInfo) {
             providersList.push_back(QVariantMap{ {QStringLiteral("id"), fakeProviderInitInfo._id}, {QStringLiteral("name"), fakeProviderInitInfo._name}, {QStringLiteral("order"), fakeProviderInitInfo._order},
             });
         }
@@ -139,7 +133,7 @@ public:
 
     // init the map of fake search results for each provider
     void initSearchResultsData() {
-        for (const auto &fakeProvider : fakeProvidersInitInfo) {
+        for (auto &fakeProvider : fakeProvidersInitInfo) {
             auto &providerData = _searchResultsData[fakeProvider._id];
             providerData._id = fakeProvider._id;
             providerData._name = fakeProvider._name;
@@ -156,7 +150,7 @@ public:
         }
     }
 
-    const QList<QVariant> resultsForProvider(const QString &providerId, int cursor) {
+    const QList<QVariant> resultsForProvider(QString &providerId, int cursor) {
         QList<QVariant> list;
 
         const auto results = resultsForProviderAsVector(providerId, cursor);
@@ -165,7 +159,7 @@ public:
             return list;
         }
 
-        for (const auto &result : results) {
+        for (auto &result : results) {
             list.push_back(QVariantMap{ {"thumbnailUrl", result._thumbnailUrl}, {"title", result._title}, {"subline", result._subline}, {"resourceUrl", result._resourceUrl}, {"icon", result._icon}, {"rounded", result._rounded}
             });
         }
@@ -173,7 +167,7 @@ public:
         return list;
     }
 
-    const QVector<Provider::SearchResult> resultsForProviderAsVector(const QString &providerId, int cursor) {
+    const QVector<Provider::SearchResult> resultsForProviderAsVector(QString &providerId, int cursor) {
         QVector<Provider::SearchResult> results;
 
         const auto provider = _searchResultsData.value(providerId, Provider());
@@ -193,7 +187,7 @@ public:
         return results;
     }
 
-    const QByteArray queryProvider(const QString &providerId, const QString &searchTerm, int cursor) {
+    const QByteArray queryProvider(QString &providerId, QString &searchTerm, int cursor) {
         if (!_searchResultsData.contains(providerId)) {
             return fake404Response;
         }
@@ -264,7 +258,7 @@ private slots:
 
         accountState.reset(new OCC::AccountState(account));
 
-        fakeQnam->setOverride([this](QNetworkAccessManager::Operation op, const QNetworkRequest &req, QIODevice *device) {
+        fakeQnam->setOverride([this](QNetworkAccessManager::Operation op, QNetworkRequest &req, QIODevice *device) {
             Q_UNUSED(device);
             QNetworkReply *reply = nullptr;
 
@@ -329,7 +323,6 @@ private slots:
 
         // #3 test that model has not started search yet
         QVERIFY(!model->isSearchInProgress());
-
 
         // #4 test that model has started the search after specific delay
         QSignalSpy searchInProgressChanged(model.data(), &OCC::UnifiedSearchResultsListModel::isSearchInProgressChanged);

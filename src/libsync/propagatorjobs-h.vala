@@ -15,7 +15,6 @@
 
 // #pragma once
 
-#include "owncloudpropagator.h"
 // #include <QFile>
 
 namespace OCC {
@@ -33,13 +32,13 @@ static const char contentMd5HeaderC[] = "Content-MD5";
  */
 class PropagateLocalRemove : public PropagateItemJob {
 public:
-    PropagateLocalRemove(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
+    PropagateLocalRemove(OwncloudPropagator *propagator, SyncFileItemPtr &item)
         : PropagateItemJob(propagator, item) {
     }
     void start() override;
 
 private:
-    bool removeRecursively(const QString &path);
+    bool removeRecursively(QString &path);
     QString _error;
     bool _moveToTrash;
 };
@@ -50,7 +49,7 @@ private:
  */
 class PropagateLocalMkdir : public PropagateItemJob {
 public:
-    PropagateLocalMkdir(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
+    PropagateLocalMkdir(OwncloudPropagator *propagator, SyncFileItemPtr &item)
         : PropagateItemJob(propagator, item)
         , _deleteExistingFile(false) {
     }
@@ -66,7 +65,7 @@ public:
 
 private:
     void startLocalMkdir();
-    void startDemanglingName(const QString &parentPath);
+    void startDemanglingName(QString &parentPath);
 
     bool _deleteExistingFile;
 };
@@ -77,7 +76,7 @@ private:
  */
 class PropagateLocalRename : public PropagateItemJob {
 public:
-    PropagateLocalRename(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
+    PropagateLocalRename(OwncloudPropagator *propagator, SyncFileItemPtr &item)
         : PropagateItemJob(propagator, item) {
     }
     void start() override;

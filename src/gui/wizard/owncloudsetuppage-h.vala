@@ -13,18 +13,9 @@
  * for more details.
  */
 
-
 // #include <QWizard>
 
-#include "wizard/owncloudwizardcommon.h"
-#include "wizard/owncloudwizard.h"
-
 #include "../addcertificatedialog.h"
-#include "wizard/owncloudconnectionmethoddialog.h"
-
-#include "ui_owncloudsetupnocredspage.h"
-
-#include "config.h"
 
 class QLabel;
 class QVariant;
@@ -44,30 +35,30 @@ public:
     bool isComplete() const override;
     void initializePage() override;
     int nextId() const override;
-    void setServerUrl(const QString &);
+    void setServerUrl(QString &);
     void setAllowPasswordStorage(bool);
     bool validatePage() override;
     QString url() const;
     QString localFolder() const;
-    void setRemoteFolder(const QString &remoteFolder);
+    void setRemoteFolder(QString &remoteFolder);
     void setMultipleFoldersExist(bool exist);
     void setAuthType(DetermineAuthTypeJob::AuthType type);
 
 public slots:
-    void setErrorString(const QString &, bool retryHTTPonly);
+    void setErrorString(QString &, bool retryHTTPonly);
     void startSpinner();
     void stopSpinner();
     void slotCertificateAccepted();
     void slotStyleChanged();
 
 protected slots:
-    void slotUrlChanged(const QString &);
+    void slotUrlChanged(QString &);
     void slotUrlEditFinished();
 
     void setupCustomization();
 
 signals:
-    void determineAuthType(const QString &);
+    void determineAuthType(QString &);
 
 private:
     void setLogo();

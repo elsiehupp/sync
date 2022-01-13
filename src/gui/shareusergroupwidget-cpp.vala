@@ -12,26 +12,6 @@
  * for more details.
  */
 
-#include "ocsprofileconnector.h"
-#include "sharee.h"
-#include "tray/usermodel.h"
-#include "ui_shareusergroupwidget.h"
-#include "ui_shareuserline.h"
-#include "shareusergroupwidget.h"
-#include "account.h"
-#include "folderman.h"
-#include "folder.h"
-#include "accountmanager.h"
-#include "theme.h"
-#include "configfile.h"
-#include "capabilities.h"
-#include "guiutility.h"
-#include "thumbnailjob.h"
-#include "sharemanager.h"
-#include "theme.h"
-#include "iconutils.h"
-
-#include "QProgressIndicator.h"
 // #include <QBuffer>
 // #include <QFileIconProvider>
 // #include <QClipboard>
@@ -67,7 +47,6 @@ namespace OCC {
 AvatarEventFilter::AvatarEventFilter(QObject *parent)
     : QObject(parent) {
 }
-
 
 bool AvatarEventFilter::eventFilter(QObject *obj, QEvent *event) {
     if (event->type() == QEvent::ContextMenu) {
@@ -165,12 +144,12 @@ ShareUserGroupWidget::~ShareUserGroupWidget() {
     delete _ui;
 }
 
-void ShareUserGroupWidget::on_shareeLineEdit_textChanged(const QString &) {
+void ShareUserGroupWidget::on_shareeLineEdit_textChanged(QString &) {
     _completionTimer.stop();
     emit togglePublicLinkShare(false);
 }
 
-void ShareUserGroupWidget::slotLineEditTextEdited(const QString &text) {
+void ShareUserGroupWidget::slotLineEditTextEdited(QString &text) {
     _disableCompleterActivated = false;
     // First textChanged is called first and we stopped the timer when the text is changed, programatically or not
     // Then we restart the timer here if the user touched a key
@@ -226,7 +205,7 @@ void ShareUserGroupWidget::getShares() {
     _manager->fetchShares(_sharePath);
 }
 
-void ShareUserGroupWidget::slotShareCreated(const QSharedPointer<Share> &share) {
+void ShareUserGroupWidget::slotShareCreated(QSharedPointer<Share> &share) {
     if (share && _account->capabilities().shareEmailPasswordEnabled() && !_account->capabilities().shareEmailPasswordEnforced()) {
         // remember this share Id so we can set it's password Line Edit to focus later
         _lastCreatedShareId = share->getId();
@@ -235,7 +214,7 @@ void ShareUserGroupWidget::slotShareCreated(const QSharedPointer<Share> &share) 
     getShares();
 }
 
-void ShareUserGroupWidget::slotSharesFetched(const QList<QSharedPointer<Share>> &shares) {
+void ShareUserGroupWidget::slotSharesFetched(QList<QSharedPointer<Share>> &shares) {
     QScrollArea *scrollArea = _parentScrollArea;
 
     auto newViewPort = new QWidget(scrollArea);
@@ -247,7 +226,7 @@ void ShareUserGroupWidget::slotSharesFetched(const QList<QSharedPointer<Share>> 
 
     ShareUserLine *justCreatedShareThatNeedsPassword = nullptr;
 
-    foreach (const auto &share, shares) {
+    foreach (auto &share, shares) {
         // We don't handle link shares, only TypeUser or TypeGroup
         if (share->getShareType() == Share::TypeLink) {
             if(!share->getUidOwner().isEmpty() &&
@@ -262,7 +241,6 @@ void ShareUserGroupWidget::slotSharesFetched(const QList<QSharedPointer<Share>> 
         if(x == 0 && !share->getUidOwner().isEmpty() && !(share->getUidOwner() == _account->credentials()->user())) {
             _ui->mainOwnerLabel->setText(QString("Shared with you by ").append(share->getOwnerDisplayName()));
         }
-
 
         Q_ASSERT(Share::isShareTypeUserGroupEmailRoomOrRemote(share->getShareType()));
         auto userGroupShare = qSharedPointerDynamicCast<UserGroupShare>(share);
@@ -289,7 +267,7 @@ void ShareUserGroupWidget::slotSharesFetched(const QList<QSharedPointer<Share>> 
         }
     }
 
-    foreach (const QString &owner, linkOwners) {
+    foreach (QString &owner, linkOwners) {
         auto ownerLabel = new QLabel(QString(owner + " shared via link"));
         layout->addWidget(ownerLabel);
         ownerLabel->setVisible(true);
@@ -319,7 +297,7 @@ void ShareUserGroupWidget::slotAdjustScrollWidgetSize() {
     const auto shareUserLineChilds = scrollArea->findChildren<ShareUserLine *>();
 
     // Ask the child widgets to calculate their size
-    for (const auto shareUserLineChild : shareUserLineChilds) {
+    for (auto shareUserLineChild : shareUserLineChilds) {
         shareUserLineChild->adjustSize();
     }
 
@@ -355,7 +333,7 @@ void ShareUserGroupWidget::slotShareesReady() {
     _completer->complete();
 }
 
-void ShareUserGroupWidget::slotCompleterActivated(const QModelIndex &index) {
+void ShareUserGroupWidget::slotCompleterActivated(QModelIndex &index) {
     if (_disableCompleterActivated)
         return;
     // The index is an index from the QCompletion model which is itelf a proxy
@@ -411,13 +389,13 @@ void ShareUserGroupWidget::slotCompleterActivated(const QModelIndex &index) {
     _ui->shareeLineEdit->clear();
 }
 
-void ShareUserGroupWidget::slotCompleterHighlighted(const QModelIndex &index) {
+void ShareUserGroupWidget::slotCompleterHighlighted(QModelIndex &index) {
     // By default the completer would set the text to EditRole,
     // override that here.
     _ui->shareeLineEdit->setText(index.data(Qt::DisplayRole).toString());
 }
 
-void ShareUserGroupWidget::displayError(int code, const QString &message) {
+void ShareUserGroupWidget::displayError(int code, QString &message) {
     _pi_sharee.stopAnimation();
 
     // Also remove the spinner in the widget list, if any
@@ -627,7 +605,7 @@ ShareUserLine::ShareUserLine(AccountPtr account, QSharedPointer<UserGroupShare> 
     customizeStyle();
 }
 
-void ShareUserLine::onAvatarContextMenu(const QPoint &globalPosition) {
+void ShareUserLine::onAvatarContextMenu(QPoint &globalPosition) {
     if (_share->getShareType() == Share::TypeUser) {
         _profilePageMenu.exec(globalPosition);
     }
@@ -833,7 +811,7 @@ void ShareUserLine::slotPasswordSet() {
     refreshPasswordOptions();
 }
 
-void ShareUserLine::slotPasswordSetError(int statusCode, const QString &message) {
+void ShareUserLine::slotPasswordSetError(int statusCode, QString &message) {
     qCWarning(lcSharing) << "Error from server" << statusCode << message;
 
     togglePasswordSetProgressAnimation(false);
@@ -921,7 +899,7 @@ void ShareUserLine::customizeStyle() {
     _ui->errorLabel->setBackgroundRole(QPalette::WindowText);
 }
 
-QPixmap ShareUserLine::pixmapForShareeType(Sharee::Type type, const QColor &backgroundColor) const {
+QPixmap ShareUserLine::pixmapForShareeType(Sharee::Type type, QColor &backgroundColor) const {
     switch (type) {
     case Sharee::Room:
         return Ui::IconUtils::pixmapForBackground(QStringLiteral("talk-app.svg"), backgroundColor);
@@ -978,7 +956,6 @@ void ShareUserLine::showNoteOptions(bool show) {
     emit resizeRequested();
 }
 
-
 void ShareUserLine::toggleNoteOptions(bool enable) {
     showNoteOptions(enable);
 
@@ -992,7 +969,7 @@ void ShareUserLine::onNoteConfirmButtonClicked() {
     setNote(_ui->noteTextEdit->toPlainText());
 }
 
-void ShareUserLine::setNote(const QString &note) {
+void ShareUserLine::setNote(QString &note) {
     enableProgessIndicatorAnimation(true);
     _share->setNote(note);
 }
@@ -1005,7 +982,7 @@ void ShareUserLine::toggleExpireDateOptions(bool enable) {
     }
 }
 
-void ShareUserLine::showExpireDateOptions(bool show, const QDate &initialDate) {
+void ShareUserLine::showExpireDateOptions(bool show, QDate &initialDate) {
     _ui->expirationLabel->setVisible(show);
     _ui->calendar->setVisible(show);
 
@@ -1056,7 +1033,7 @@ void ShareUserLine::disableProgessIndicatorAnimation() {
     enableProgessIndicatorAnimation(false);
 }
 
-QDate ShareUserLine::maxExpirationDateForShare(const Share::ShareType type, const QDate &fallbackDate) const {
+QDate ShareUserLine::maxExpirationDateForShare(Share::ShareType type, QDate &fallbackDate) const {
     auto daysToExpire = 0;
     if (type == Share::ShareType::TypeRemote) {
         daysToExpire = _account->capabilities().shareRemoteExpireDateDays();
@@ -1073,7 +1050,7 @@ QDate ShareUserLine::maxExpirationDateForShare(const Share::ShareType type, cons
     return fallbackDate;
 }
 
-bool ShareUserLine::enforceExpirationDateForShare(const Share::ShareType type) const {
+bool ShareUserLine::enforceExpirationDateForShare(Share::ShareType type) const {
     if (type == Share::ShareType::TypeRemote) {
         return _account->capabilities().shareRemoteEnforceExpireDate();
     } else if (type == Share::ShareType::TypeEmail) {

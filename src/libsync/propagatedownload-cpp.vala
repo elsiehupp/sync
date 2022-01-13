@@ -12,22 +12,9 @@
  * for more details.
  */
 
-#include "config.h"
-#include "owncloudpropagator_p.h"
-#include "propagatedownload.h"
-#include "networkjobs.h"
-#include "account.h"
-#include "common/syncjournaldb.h"
-#include "common/syncjournalfilerecord.h"
-#include "common/utility.h"
-#include "filesystem.h"
-#include "propagatorjobs.h"
 // #include <common/checksums.h>
 // #include <common/asserts.h>
 // #include <common/constants.h>
-#include "clientsideencryptionjobs.h"
-#include "propagatedownloadencrypted.h"
-#include "common/vfs.h"
 
 // #include <QLoggingCategory>
 // #include <QNetworkAccessManager>
@@ -47,7 +34,7 @@ Q_LOGGING_CATEGORY(lcPropagateDownload, "nextcloud.sync.propagator.download", Qt
 // Always coming in with forward slashes.
 // In csync_excluded_no_ctx we ignore all files with longer than 254 chars
 // This function also adds a dot at the beginning of the filename to hide the file on OS X and Linux
-QString OWNCLOUDSYNC_EXPORT createDownloadTmpFileName(const QString &previous) {
+QString OWNCLOUDSYNC_EXPORT createDownloadTmpFileName(QString &previous) {
     QString tmpFileName;
     QString tmpPath;
     int slashPos = previous.lastIndexOf('/');
@@ -69,8 +56,8 @@ QString OWNCLOUDSYNC_EXPORT createDownloadTmpFileName(const QString &previous) {
 }
 
 // DOES NOT take ownership of the device.
-GETFileJob::GETFileJob(AccountPtr account, const QString &path, QIODevice *device,
-    const QMap<QByteArray, QByteArray> &headers, const QByteArray &expectedEtagForResume,
+GETFileJob::GETFileJob(AccountPtr account, QString &path, QIODevice *device,
+    const QMap<QByteArray, QByteArray> &headers, QByteArray &expectedEtagForResume,
     qint64 resumeStart, QObject *parent)
     : AbstractNetworkJob(account, path, parent)
     , _device(device)
@@ -88,8 +75,8 @@ GETFileJob::GETFileJob(AccountPtr account, const QString &path, QIODevice *devic
     , _contentLength(-1) {
 }
 
-GETFileJob::GETFileJob(AccountPtr account, const QUrl &url, QIODevice *device,
-    const QMap<QByteArray, QByteArray> &headers, const QByteArray &expectedEtagForResume,
+GETFileJob::GETFileJob(AccountPtr account, QUrl &url, QIODevice *device,
+    const QMap<QByteArray, QByteArray> &headers, QByteArray &expectedEtagForResume,
     qint64 resumeStart, QObject *parent)
     : AbstractNetworkJob(account, url.toEncoded(), parent)
     , _device(device)
@@ -107,7 +94,6 @@ GETFileJob::GETFileJob(AccountPtr account, const QUrl &url, QIODevice *device,
     , _lastModified()
     , _contentLength(-1) {
 }
-
 
 void GETFileJob::start() {
     if (_resumeStart > 0) {
@@ -275,7 +261,7 @@ qint64 GETFileJob::currentDownloadPosition() {
     return _resumeStart;
 }
 
-qint64 GETFileJob::writeToDevice(const QByteArray &data) {
+qint64 GETFileJob::writeToDevice(QByteArray &data) {
     return _device->write(data);
 }
 
@@ -362,21 +348,21 @@ QString GETFileJob::errorString() const {
     return AbstractNetworkJob::errorString();
 }
 
-GETEncryptedFileJob::GETEncryptedFileJob(AccountPtr account, const QString &path, QIODevice *device,
-    const QMap<QByteArray, QByteArray> &headers, const QByteArray &expectedEtagForResume,
+GETEncryptedFileJob::GETEncryptedFileJob(AccountPtr account, QString &path, QIODevice *device,
+    const QMap<QByteArray, QByteArray> &headers, QByteArray &expectedEtagForResume,
     qint64 resumeStart, EncryptedFile encryptedInfo, QObject *parent)
     : GETFileJob(account, path, device, headers, expectedEtagForResume, resumeStart, parent)
     , _encryptedFileInfo(encryptedInfo) {
 }
 
-GETEncryptedFileJob::GETEncryptedFileJob(AccountPtr account, const QUrl &url, QIODevice *device,
-    const QMap<QByteArray, QByteArray> &headers, const QByteArray &expectedEtagForResume,
+GETEncryptedFileJob::GETEncryptedFileJob(AccountPtr account, QUrl &url, QIODevice *device,
+    const QMap<QByteArray, QByteArray> &headers, QByteArray &expectedEtagForResume,
     qint64 resumeStart, EncryptedFile encryptedInfo, QObject *parent)
     : GETFileJob(account, url, device, headers, expectedEtagForResume, resumeStart, parent)
     , _encryptedFileInfo(encryptedInfo) {
 }
 
-qint64 GETEncryptedFileJob::writeToDevice(const QByteArray &data) {
+qint64 GETEncryptedFileJob::writeToDevice(QByteArray &data) {
     if (!_decryptor) {
         // only initialize the decryptor once, because, according to Qt documentation, metadata might get changed during the processing of the data sometimes
         // https://doc.qt.io/qt-5/qnetworkreply.html#metaDataChanged
@@ -538,7 +524,7 @@ void PropagateDownloadFile::startAfterIsEncryptedIsChecked() {
     // If the hashes are collision safe and identical, we assume the content is too.
     // For weak checksums, we only do that if the mtimes are also identical.
 
-    const auto csync_is_collision_safe_hash = [](const QByteArray &checksum_header) {
+    const auto csync_is_collision_safe_hash = [](QByteArray &checksum_header) {
         return checksum_header.startsWith("SHA")
             || checksum_header.startsWith("MD5:");
     };
@@ -564,7 +550,7 @@ void PropagateDownloadFile::startAfterIsEncryptedIsChecked() {
     startDownload();
 }
 
-void PropagateDownloadFile::conflictChecksumComputed(const QByteArray &checksumType, const QByteArray &checksum) {
+void PropagateDownloadFile::conflictChecksumComputed(QByteArray &checksumType, QByteArray &checksum) {
     propagator()->_activeJobList.removeOne(this);
     if (makeChecksumHeader(checksumType, checksum) == _item->_checksumHeader) {
         // No download necessary, just update fs and journal metadata
@@ -895,7 +881,7 @@ void PropagateDownloadFile::slotGetFinished() {
     validator->start(_tmpFile.fileName(), checksumHeader);
 }
 
-void PropagateDownloadFile::slotChecksumFail(const QString &errMsg) {
+void PropagateDownloadFile::slotChecksumFail(QString &errMsg) {
     FileSystem::remove(_tmpFile.fileName());
     propagator()->_anotherSyncNeeded = true;
     done(SyncFileItem::SoftError, errMsg); // tr("The file downloaded with a broken checksum, will be redownloaded."));
@@ -923,7 +909,7 @@ void PropagateDownloadFile::deleteExistingFolder() {
 }
 
 namespace { // Anonymous namespace for the recall feature
-    static QString makeRecallFileName(const QString &fn) {
+    static QString makeRecallFileName(QString &fn) {
         QString recallFileName(fn);
         // Add _recall-XXXX  before the extension.
         int dotLocation = recallFileName.lastIndexOf('.');
@@ -938,7 +924,7 @@ namespace { // Anonymous namespace for the recall feature
         return recallFileName;
     }
 
-    void handleRecallFile(const QString &filePath, const QString &folderPath, SyncJournalDb &journal) {
+    void handleRecallFile(QString &filePath, QString &folderPath, SyncJournalDb &journal) {
         qCDebug(lcPropagateDownload) << "handleRecallFile: " << filePath;
 
         FileSystem::setFileHidden(filePath, true);
@@ -981,7 +967,7 @@ namespace { // Anonymous namespace for the recall feature
         }
     }
 
-    static void preserveGroupOwnership(const QString &fileName, const QFileInfo &fi) {
+    static void preserveGroupOwnership(QString &fileName, QFileInfo &fi) {
 #ifdef Q_OS_UNIX
         int chownErr = chown(fileName.toLocal8Bit().constData(), -1, fi.groupId());
         if (chownErr) {
@@ -995,7 +981,7 @@ namespace { // Anonymous namespace for the recall feature
     }
 } // end namespace
 
-void PropagateDownloadFile::transmissionChecksumValidated(const QByteArray &checksumType, const QByteArray &checksum) {
+void PropagateDownloadFile::transmissionChecksumValidated(QByteArray &checksumType, QByteArray &checksum) {
     const QByteArray theContentChecksumType = propagator()->account()->capabilities().preferredUploadChecksumType();
 
     // Reuse transmission checksum as content checksum.
@@ -1015,7 +1001,7 @@ void PropagateDownloadFile::transmissionChecksumValidated(const QByteArray &chec
     computeChecksum->start(_tmpFile.fileName());
 }
 
-void PropagateDownloadFile::contentChecksumComputed(const QByteArray &checksumType, const QByteArray &checksum) {
+void PropagateDownloadFile::contentChecksumComputed(QByteArray &checksumType, QByteArray &checksum) {
     _item->_checksumHeader = makeChecksumHeader(checksumType, checksum);
 
     if (_isEncrypted) {
@@ -1216,7 +1202,6 @@ void PropagateDownloadFile::slotDownloadProgress(qint64 received, qint64) {
     _downloadProgress = received;
     propagator()->reportProgress(*_item, _resumeStart + received);
 }
-
 
 void PropagateDownloadFile::abort(PropagatorJob::AbortType abortType) {
     if (_job && _job->reply())

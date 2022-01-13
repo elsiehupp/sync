@@ -12,13 +12,8 @@
  * for more details.
  */
 
-#include "conflictsolver.h"
-
 // #include <QFileDialog>
 // #include <QMessageBox>
-
-#include "common/utility.h"
-#include "filesystem.h"
 
 namespace OCC {
 
@@ -50,7 +45,7 @@ bool ConflictSolver::exec(ConflictSolver::Solution solution) {
     return false;
 }
 
-void ConflictSolver::setLocalVersionFilename(const QString &localVersionFilename) {
+void ConflictSolver::setLocalVersionFilename(QString &localVersionFilename) {
     if (_localVersionFilename == localVersionFilename) {
         return;
     }
@@ -59,7 +54,7 @@ void ConflictSolver::setLocalVersionFilename(const QString &localVersionFilename
     emit localVersionFilenameChanged();
 }
 
-void ConflictSolver::setRemoteVersionFilename(const QString &remoteVersionFilename) {
+void ConflictSolver::setRemoteVersionFilename(QString &remoteVersionFilename) {
     if (_remoteVersionFilename == remoteVersionFilename) {
         return;
     }

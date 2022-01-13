@@ -12,11 +12,7 @@
  * for more details.
  */
 
-
 // #include <QSystemTrayIcon>
-
-#include "accountmanager.h"
-#include "tray/usermodel.h"
 
 // #include <QQmlNetworkAccessManagerFactory>
 
@@ -37,7 +33,7 @@ public:
 
 #ifdef Q_OS_OSX
 bool canOsXSendUserNotification();
-void sendOsXUserNotification(const QString &title, const QString &message);
+void sendOsXUserNotification(QString &title, QString &message);
 void setTrayWindowLevelAndVisibleOnAllSpaces(QWindow *window);
 #endif
 
@@ -60,8 +56,8 @@ public:
 
     void setTrayEngine(QQmlApplicationEngine *trayEngine);
     void create();
-    void showMessage(const QString &title, const QString &message, MessageIcon icon = Information);
-    void setToolTip(const QString &tip);
+    void showMessage(QString &title, QString &message, MessageIcon icon = Information);
+    void setToolTip(QString &tip);
     bool isOpen();
     QString windowTitle() const;
     bool useNormalWindow() const;
@@ -83,8 +79,8 @@ signals:
 
     void hideWindow();
     void showWindow();
-    void openShareDialog(const QString &sharePath, const QString &localPath);
-    void showFileActivityDialog(const QString &sharePath, const QString &localPath);
+    void openShareDialog(QString &sharePath, QString &localPath);
+    void showFileActivityDialog(QString &sharePath, QString &localPath);
 
 public slots:
     void slotNewUserSelected();

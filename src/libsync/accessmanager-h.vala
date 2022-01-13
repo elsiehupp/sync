@@ -12,8 +12,6 @@
  * for more details.
  */
 
-
-#include "owncloudlib.h"
 // #include <QNetworkAccessManager>
 
 class QByteArray;
@@ -33,7 +31,7 @@ public:
     AccessManager(QObject *parent = nullptr);
 
 protected:
-    QNetworkReply *createRequest(QNetworkAccessManager::Operation op, const QNetworkRequest &request, QIODevice *outgoingData = nullptr) override;
+    QNetworkReply *createRequest(QNetworkAccessManager::Operation op, QNetworkRequest &request, QIODevice *outgoingData = nullptr) override;
 };
 
 } // namespace OCC

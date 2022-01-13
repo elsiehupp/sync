@@ -17,8 +17,6 @@
 // #include <QWebSocket>
 // #include <QTimer>
 
-#include "capabilities.h"
-
 namespace OCC {
 
 class Account;
@@ -99,10 +97,10 @@ signals:
 private slots:
     void onWebSocketConnected();
     void onWebSocketDisconnected();
-    void onWebSocketTextMessageReceived(const QString &message);
+    void onWebSocketTextMessageReceived(QString &message);
     void onWebSocketError(QAbstractSocket::SocketError error);
-    void onWebSocketSslErrors(const QList<QSslError> &errors);
-    void onWebSocketPongReceived(quint64 elapsedTime, const QByteArray &payload);
+    void onWebSocketSslErrors(QList<QSslError> &errors);
+    void onWebSocketPongReceived(quint64 elapsedTime, QByteArray &payload);
     void onPingTimedOut();
 
 private:

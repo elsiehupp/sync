@@ -14,8 +14,6 @@
 
 // #pragma once
 
-#include "asserts.h"
-
 namespace OCC {
 
 /**
@@ -49,7 +47,7 @@ public:
         }
     }
 
-    Result(const Result &other)
+    Result(Result &other)
         : _isError(other._isError) {
         if (_isError) {
             new (&_error) Error(other._error);
@@ -70,7 +68,7 @@ public:
         return *this;
     }
 
-    Result &operator=(const Result &other) {
+    Result &operator=(Result &other) {
         if (&other != this) {
             _isError = other._isError;
             if (_isError) {

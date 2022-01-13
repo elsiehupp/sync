@@ -15,17 +15,12 @@
 
 // #include <QString>
 
-#include "owncloudlib.h"
-#include "common/result.h"
-
-#include "xattrexport.h"
-
 namespace OCC {
 
 namespace XAttrWrapper {
 
-OWNCLOUDSYNC_EXPORT bool hasNextcloudPlaceholderAttributes(const QString &path);
-OWNCLOUDSYNC_EXPORT Result<void, QString> addNextcloudPlaceholderAttributes(const QString &path);
+OWNCLOUDSYNC_EXPORT bool hasNextcloudPlaceholderAttributes(QString &path);
+OWNCLOUDSYNC_EXPORT Result<void, QString> addNextcloudPlaceholderAttributes(QString &path);
 
 }
 

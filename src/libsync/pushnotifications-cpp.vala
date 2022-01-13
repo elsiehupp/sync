@@ -12,10 +12,6 @@
  * for more details.
  */
 
-#include "pushnotifications.h"
-#include "creds/abstractcredentials.h"
-#include "account.h"
-
 namespace {
 static constexpr int MAX_ALLOWED_FAILED_AUTHENTICATION_ATTEMPTS = 3;
 static constexpr int PING_INTERVAL = 30 * 1000;
@@ -99,7 +95,7 @@ void PushNotifications::onWebSocketDisconnected() {
     qCInfo(lcPushNotifications) << "Disconnected from websocket for account" << _account->url();
 }
 
-void PushNotifications::onWebSocketTextMessageReceived(const QString &message) {
+void PushNotifications::onWebSocketTextMessageReceived(QString &message) {
     qCInfo(lcPushNotifications) << "Received push notification:" << message;
 
     if (message == "notify_file") {
@@ -149,7 +145,7 @@ bool PushNotifications::tryReconnectToWebSocket() {
     return true;
 }
 
-void PushNotifications::onWebSocketSslErrors(const QList<QSslError> &errors) {
+void PushNotifications::onWebSocketSslErrors(QList<QSslError> &errors) {
     qCWarning(lcPushNotifications) << "Websocket ssl errors on with account" << _account->url() << errors;
     closeWebSocket();
     emit authenticationFailed();
@@ -212,7 +208,7 @@ void PushNotifications::handleNotifyActivity() {
     emitActivitiesChanged();
 }
 
-void PushNotifications::onWebSocketPongReceived(quint64 /*elapsedTime*/, const QByteArray & /*payload*/) {
+void PushNotifications::onWebSocketPongReceived(quint64 /*elapsedTime*/, QByteArray & /*payload*/) {
     qCDebug(lcPushNotifications) << "Pong received in time";
     // We are fine with every kind of pong and don't care about the
     // payload. As long as we receive pongs the server is still alive.

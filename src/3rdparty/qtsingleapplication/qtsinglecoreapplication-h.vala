@@ -37,19 +37,17 @@ class QtSingleCoreApplication : public QCoreApplication {
 
 public:
     QtSingleCoreApplication(int &argc, char **argv);
-    QtSingleCoreApplication(const QString &id, int &argc, char **argv);
+    QtSingleCoreApplication(QString &id, int &argc, char **argv);
 
     bool isRunning();
     QString id() const;
     void setBlock(bool value);
 
 public Q_SLOTS:
-    bool sendMessage(const QString &message, int timeout = 5000);
-
+    bool sendMessage(QString &message, int timeout = 5000);
 
 Q_SIGNALS:
-    void messageReceived(const QString &message);
-
+    void messageReceived(QString &message);
 
 private:
     QtLocalPeer* peer;

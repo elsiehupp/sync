@@ -12,9 +12,6 @@
  * for more details.
  */
 
-#include "lockwatcher.h"
-#include "filesystem.h"
-
 // #include <QLoggingCategory>
 // #include <QTimer>
 
@@ -31,7 +28,7 @@ LockWatcher::LockWatcher(QObject *parent)
     _timer.start(check_frequency);
 }
 
-void LockWatcher::addFile(const QString &path) {
+void LockWatcher::addFile(QString &path) {
     qCInfo(lcLockWatcher) << "Watching for lock of" << path << "being released";
     _watchedPaths.insert(path);
 }
@@ -40,14 +37,14 @@ void LockWatcher::setCheckInterval(std::chrono::milliseconds interval) {
     _timer.start(interval.count());
 }
 
-bool LockWatcher::contains(const QString &path) {
+bool LockWatcher::contains(QString &path) {
     return _watchedPaths.contains(path);
 }
 
 void LockWatcher::checkFiles() {
     QSet<QString> unlocked;
 
-    foreach (const QString &path, _watchedPaths) {
+    foreach (QString &path, _watchedPaths) {
         if (!FileSystem::isFileLocked(path)) {
             qCInfo(lcLockWatcher) << "Lock of" << path << "was released";
             emit fileUnlocked(path);

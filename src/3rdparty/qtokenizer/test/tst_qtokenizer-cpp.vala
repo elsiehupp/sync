@@ -1,7 +1,5 @@
 // #include <QtTest>
 
-#include "qtokenizer.h"
-
 namespace {
   const QString simple     = QLatin1String("A simple tokenizer test");
   const QString quoted     = QLatin1String("\"Wait for me!\" he shouted");
@@ -70,7 +68,6 @@ private slots:
 
     QCOMPARE(tokenizer.hasNext(), false);
   }
-
 
   void tokenizeQStringWithDelims() {
     const QString delims(QLatin1String("I;Insist,On/a-Delimiter"));

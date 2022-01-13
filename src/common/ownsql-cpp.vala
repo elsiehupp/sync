@@ -23,9 +23,6 @@
 // #include <QFileInfo>
 // #include <QDir>
 
-#include "ownsql.h"
-#include "common/utility.h"
-#include "common/asserts.h"
 // #include <sqlite3.h>
 
 #define SQLITE_SLEEP_TIME_USEC 100000
@@ -49,12 +46,11 @@ SqlDatabase::~SqlDatabase() {
     close();
 }
 
-
 bool SqlDatabase::isOpen() {
     return _db != nullptr;
 }
 
-bool SqlDatabase::openHelper(const QString &filename, int sqliteFlags) {
+bool SqlDatabase::openHelper(QString &filename, int sqliteFlags) {
     if (isOpen()) {
         return true;
     }
@@ -112,7 +108,7 @@ SqlDatabase::CheckDbResult SqlDatabase::checkDb() {
     return CheckDbResult::Ok;
 }
 
-bool SqlDatabase::openOrCreateReadWrite(const QString &filename) {
+bool SqlDatabase::openOrCreateReadWrite(QString &filename) {
     if (isOpen()) {
         return true;
     }
@@ -152,7 +148,7 @@ bool SqlDatabase::openOrCreateReadWrite(const QString &filename) {
     return true;
 }
 
-bool SqlDatabase::openReadOnly(const QString &filename) {
+bool SqlDatabase::openReadOnly(QString &filename) {
     if (isOpen()) {
         return true;
     }
@@ -221,13 +217,13 @@ SqlQuery::~SqlQuery() {
     }
 }
 
-SqlQuery::SqlQuery(const QByteArray &sql, SqlDatabase &db)
+SqlQuery::SqlQuery(QByteArray &sql, SqlDatabase &db)
     : _sqldb(&db)
     , _db(db.sqliteDb()) {
     prepare(sql);
 }
 
-int SqlQuery::prepare(const QByteArray &sql, bool allow_failure) {
+int SqlQuery::prepare(QByteArray &sql, bool allow_failure) {
     _sql = sql.trimmed();
     if (_stmt) {
         finish();
@@ -260,7 +256,7 @@ int SqlQuery::prepare(const QByteArray &sql, bool allow_failure) {
  * There is no overloads to QByteArray::startWith that takes Qt::CaseInsensitive.
  * Returns true if 'a' starts with 'b' in a case insensitive way
  */
-static bool startsWithInsensitive(const QByteArray &a, const QByteArray &b) {
+static bool startsWithInsensitive(QByteArray &a, QByteArray &b) {
     return a.size() >= b.size() && qstrnicmp(a.constData(), b.constData(), static_cast<uint>(b.size())) == 0;
 }
 
@@ -340,7 +336,7 @@ auto SqlQuery::next() -> NextResult {
     return result;
 }
 
-void SqlQuery::bindValueInternal(int pos, const QVariant &value) {
+void SqlQuery::bindValueInternal(int pos, QVariant &value) {
     int res = -1;
     if (!_stmt) {
         ASSERT(false);

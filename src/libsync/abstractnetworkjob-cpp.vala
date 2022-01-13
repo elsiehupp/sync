@@ -30,14 +30,6 @@
 // #include <QMetaEnum>
 // #include <QRegularExpression>
 
-#include "common/asserts.h"
-#include "networkjobs.h"
-#include "account.h"
-#include "owncloudpropagator.h"
-#include "httplogger.h"
-
-#include "creds/abstractcredentials.h"
-
 Q_DECLARE_METATYPE(QTimer *)
 
 namespace OCC {
@@ -47,7 +39,7 @@ Q_LOGGING_CATEGORY(lcNetworkJob, "nextcloud.sync.networkjob", QtInfoMsg)
 // If not set, it is overwritten by the Application constructor with the value from the config
 int AbstractNetworkJob::httpTimeout = qEnvironmentVariableIntValue("OWNCLOUD_TIMEOUT");
 
-AbstractNetworkJob::AbstractNetworkJob(AccountPtr account, const QString &path, QObject *parent)
+AbstractNetworkJob::AbstractNetworkJob(AccountPtr account, QString &path, QObject *parent)
     : QObject(parent)
     , _timedout(false)
     , _followRedirects(true)
@@ -99,7 +91,7 @@ void AbstractNetworkJob::setFollowRedirects(bool follow) {
     _followRedirects = follow;
 }
 
-void AbstractNetworkJob::setPath(const QString &path) {
+void AbstractNetworkJob::setPath(QString &path) {
     _path = path;
 }
 
@@ -118,7 +110,7 @@ QNetworkReply *AbstractNetworkJob::addTimer(QNetworkReply *reply) {
     return reply;
 }
 
-QNetworkReply *AbstractNetworkJob::sendRequest(const QByteArray &verb, const QUrl &url,
+QNetworkReply *AbstractNetworkJob::sendRequest(QByteArray &verb, QUrl &url,
     QNetworkRequest req, QIODevice *requestBody) {
     auto reply = _account->sendRawRequest(verb, url, req, requestBody);
     _requestBody = requestBody;
@@ -129,15 +121,15 @@ QNetworkReply *AbstractNetworkJob::sendRequest(const QByteArray &verb, const QUr
     return reply;
 }
 
-QNetworkReply *AbstractNetworkJob::sendRequest(const QByteArray &verb, const QUrl &url,
-    QNetworkRequest req, const QByteArray &requestBody) {
+QNetworkReply *AbstractNetworkJob::sendRequest(QByteArray &verb, QUrl &url,
+    QNetworkRequest req, QByteArray &requestBody) {
     auto reply = _account->sendRawRequest(verb, url, req, requestBody);
     _requestBody = nullptr;
     adoptRequest(reply);
     return reply;
 }
 
-QNetworkReply *AbstractNetworkJob::sendRequest(const QByteArray &verb,
+QNetworkReply *AbstractNetworkJob::sendRequest(QByteArray &verb,
                                                const QUrl &url,
                                                QNetworkRequest req,
                                                QHttpMultiPart *requestBody) {
@@ -154,11 +146,11 @@ void AbstractNetworkJob::adoptRequest(QNetworkReply *reply) {
     newReplyHook(reply);
 }
 
-QUrl AbstractNetworkJob::makeAccountUrl(const QString &relativePath) const {
+QUrl AbstractNetworkJob::makeAccountUrl(QString &relativePath) const {
     return Utility::concatUrlPath(_account->url(), relativePath);
 }
 
-QUrl AbstractNetworkJob::makeDavUrl(const QString &relativePath) const {
+QUrl AbstractNetworkJob::makeDavUrl(QString &relativePath) const {
     return Utility::concatUrlPath(_account->davUrl(), relativePath);
 }
 
@@ -376,7 +368,7 @@ NetworkJobTimeoutPauser::~NetworkJobTimeoutPauser() {
     }
 }
 
-QString extractErrorMessage(const QByteArray &errorResponse) {
+QString extractErrorMessage(QByteArray &errorResponse) {
     QXmlStreamReader reader(errorResponse);
     reader.readNextStartElement();
     if (reader.name() != "error") {
@@ -399,7 +391,7 @@ QString extractErrorMessage(const QByteArray &errorResponse) {
     return exception;
 }
 
-QString errorMessage(const QString &baseError, const QByteArray &body) {
+QString errorMessage(QString &baseError, QByteArray &body) {
     QString msg = baseError;
     QString extra = extractErrorMessage(body);
     if (!extra.isEmpty()) {
@@ -408,7 +400,7 @@ QString errorMessage(const QString &baseError, const QByteArray &body) {
     return msg;
 }
 
-QString networkReplyErrorString(const QNetworkReply &reply) {
+QString networkReplyErrorString(QNetworkReply &reply) {
     QString base = reply.errorString();
     int httpStatus = reply.attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     QString httpReason = reply.attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString();

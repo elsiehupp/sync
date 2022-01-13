@@ -6,12 +6,9 @@
  */
 
 // #include <QtTest>
-#include "common/result.h"
-#include "syncenginetestutils.h"
 // #include <syncengine.h>
 
 using namespace OCC;
-
 
 struct OperationCounter {
     int nGET = 0;
@@ -22,7 +19,7 @@ struct OperationCounter {
     void reset() { *this = {}; }
 
     auto functor() {
-        return [&](QNetworkAccessManager::Operation op, const QNetworkRequest &req, QIODevice *) {
+        return [&](QNetworkAccessManager::Operation op, QNetworkRequest &req, QIODevice *) {
             if (op == QNetworkAccessManager::GetOperation)
                 ++nGET;
             if (op == QNetworkAccessManager::PutOperation)
@@ -36,23 +33,23 @@ struct OperationCounter {
     }
 };
 
-bool itemSuccessful(const ItemCompletedSpy &spy, const QString &path, const SyncInstructions instr) {
+bool itemSuccessful(ItemCompletedSpy &spy, QString &path, SyncInstructions instr) {
     auto item = spy.findItem(path);
     return item->_status == SyncFileItem::Success && item->_instruction == instr;
 }
 
-bool itemConflict(const ItemCompletedSpy &spy, const QString &path) {
+bool itemConflict(ItemCompletedSpy &spy, QString &path) {
     auto item = spy.findItem(path);
     return item->_status == SyncFileItem::Conflict && item->_instruction == CSYNC_INSTRUCTION_CONFLICT;
 }
 
-bool itemSuccessfulMove(const ItemCompletedSpy &spy, const QString &path) {
+bool itemSuccessfulMove(ItemCompletedSpy &spy, QString &path) {
     return itemSuccessful(spy, path, CSYNC_INSTRUCTION_RENAME);
 }
 
-QStringList findConflicts(const FileInfo &dir) {
+QStringList findConflicts(FileInfo &dir) {
     QStringList conflicts;
-    for (const auto &item : dir.children) {
+    for (auto &item : dir.children) {
         if (item.name.contains("(conflicted copy")) {
             conflicts.append(item.path());
         }
@@ -60,12 +57,12 @@ QStringList findConflicts(const FileInfo &dir) {
     return conflicts;
 }
 
-bool expectAndWipeConflict(FileModifier &local, FileInfo state, const QString path) {
+bool expectAndWipeConflict(FileModifier &local, FileInfo state, QString path) {
     PathComponents pathComponents(path);
     auto base = state.find(pathComponents.parentDirComponents());
     if (!base)
         return false;
-    for (const auto &item : base->children) {
+    for (auto &item : base->children) {
         if (item.name.startsWith(pathComponents.fileName()) && item.name.contains("(conflicted copy")) {
             local.remove(item.path());
             return true;
@@ -188,7 +185,7 @@ private slots:
 
         int nPUT = 0;
         int nDELETE = 0;
-        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, const QNetworkRequest &, QIODevice *) {
+        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, QNetworkRequest &, QIODevice *) {
             if (op == QNetworkAccessManager::PutOperation)
                 ++nPUT;
             if (op == QNetworkAccessManager::DeleteOperation)
@@ -563,13 +560,13 @@ private slots:
         auto currentLocal = fakeFolder.currentLocalState();
         auto conflicts = findConflicts(currentLocal.children["A4"]);
         QCOMPARE(conflicts.size(), 1);
-        for (const auto& c : conflicts) {
+        for (auto& c : conflicts) {
             QCOMPARE(currentLocal.find(c)->contentChar, 'L');
             local.remove(c);
         }
         conflicts = findConflicts(currentLocal.children["B4"]);
         QCOMPARE(conflicts.size(), 1);
-        for (const auto& c : conflicts) {
+        for (auto& c : conflicts) {
             QCOMPARE(currentLocal.find(c)->contentChar, 'L');
             local.remove(c);
         }
@@ -873,7 +870,7 @@ private slots:
 
     void testMovedWithError() {
         QFETCH(Vfs::Mode, vfsMode);
-        const auto getName = [vfsMode] (const QString &s) { {f (vfsMode == Vfs::WithSuffix)
+        const auto getName = [vfsMode] (QString &s) { {f (vfsMode == Vfs::WithSuffix)
             {
                 return QStringLiteral("%1" APPLICATION_DOTVIRTUALFILE_SUFFIX).arg(s);
             }
@@ -897,7 +894,6 @@ private slots:
             // make files virtual
             fakeFolder.syncOnce();
         }
-
 
         fakeFolder.serverErrorPaths().append(src, 403);
         fakeFolder.localModifier().rename(getName(src), getName(dest));

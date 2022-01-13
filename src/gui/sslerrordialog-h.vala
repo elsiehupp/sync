@@ -17,8 +17,6 @@
 // #include <QSslCertificate>
 // #include <QList>
 
-#include "account.h"
-
 class QSslError;
 class QSslCertificate;
 
@@ -34,7 +32,7 @@ namespace Ui {
  */
 class SslDialogErrorHandler : public AbstractSslErrorHandler {
 public:
-    bool handleErrors(QList<QSslError> errors, const QSslConfiguration &conf, QList<QSslCertificate> *certs, AccountPtr) override;
+    bool handleErrors(QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, AccountPtr) override;
 };
 
 /**
@@ -45,7 +43,7 @@ class SslErrorDialog : public QDialog {
 public:
     explicit SslErrorDialog(AccountPtr account, QWidget *parent = nullptr);
     ~SslErrorDialog() override;
-    bool checkFailingCertsKnown(const QList<QSslError> &errors);
+    bool checkFailingCertsKnown(QList<QSslError> &errors);
     bool trustConnection();
     QList<QSslCertificate> unknownCerts() const { return _unknownCerts; }
 

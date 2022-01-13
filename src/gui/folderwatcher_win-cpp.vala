@@ -15,14 +15,6 @@
 // #include <QThread>
 // #include <QDir>
 
-#include "common/asserts.h"
-#include "common/utility.h"
-#include "filesystem.h"
-#include "folderwatcher.h"
-#include "folderwatcher_win.h"
-
-#include "common/utility.h"
-
 // #include <stdlib.h>
 // #include <stdio.h>
 // #include <tchar.h>
@@ -59,7 +51,6 @@ void WatcherThread::watchChanges(size_t fileNotifyBufferSize,
 
     const size_t fileNameBufferSize = 4096;
     TCHAR fileNameBuffer[fileNameBufferSize];
-
 
     while (!_done) {
         ResetEvent(_resultEvent);
@@ -210,11 +201,11 @@ void WatcherThread::stop() {
     SetEvent(_stopEvent);
 }
 
-FolderWatcherPrivate::FolderWatcherPrivate(FolderWatcher *p, const QString &path)
+FolderWatcherPrivate::FolderWatcherPrivate(FolderWatcher *p, QString &path)
     : _parent(p) {
     _thread = new WatcherThread(path);
-    connect(_thread, SIGNAL(changed(const QString &)),
-        _parent, SLOT(changeDetected(const QString &)));
+    connect(_thread, SIGNAL(changed(QString &)),
+        _parent, SLOT(changeDetected(QString &)));
     connect(_thread, SIGNAL(lostChanges()),
         _parent, SIGNAL(lostChanges()));
     connect(_thread, &WatcherThread::ready,

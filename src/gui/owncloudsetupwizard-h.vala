@@ -12,18 +12,11 @@
  * for more details.
  */
 
-
 // #include <QObject>
 // #include <QWidget>
 // #include <QProcess>
 // #include <QNetworkReply>
 // #include <QPointer>
-
-#include "accountfwd.h"
-#include "theme.h"
-#include "networkjobs.h"
-
-#include "wizard/owncloudwizardcommon.h"
 
 namespace OCC {
 
@@ -38,28 +31,28 @@ class OwncloudWizard;
 class OwncloudSetupWizard : public QObject {
 public:
     /** Run the wizard */
-    static void runWizard(QObject *obj, const char *amember, QWidget *parent = nullptr);
+    static void runWizard(QObject *obj, char *amember, QWidget *parent = nullptr);
     static bool bringWizardToFrontIfVisible();
 signals:
     // overall dialog close signal.
     void ownCloudWizardDone(int);
 
 private slots:
-    void slotCheckServer(const QString &);
-    void slotSystemProxyLookupDone(const QNetworkProxy &proxy);
+    void slotCheckServer(QString &);
+    void slotSystemProxyLookupDone(QNetworkProxy &proxy);
 
     void slotFindServer();
     void slotFindServerBehindRedirect();
-    void slotFoundServer(const QUrl &, const QJsonObject &);
+    void slotFoundServer(QUrl &, QJsonObject &);
     void slotNoServerFound(QNetworkReply *reply);
-    void slotNoServerFoundTimeout(const QUrl &url);
+    void slotNoServerFoundTimeout(QUrl &url);
 
     void slotDetermineAuthType();
 
-    void slotConnectToOCUrl(const QString &);
+    void slotConnectToOCUrl(QString &);
     void slotAuthError();
 
-    void slotCreateLocalAndRemoteFolders(const QString &, const QString &);
+    void slotCreateLocalAndRemoteFolders(QString &, QString &);
     void slotRemoteFolderExists(QNetworkReply *);
     void slotCreateRemoteFolderFinished(QNetworkReply *reply);
     void slotAssistantFinished(int);
@@ -72,7 +65,7 @@ private:
     void testOwnCloudConnect();
     void createRemoteFolder();
     void finalizeSetup(bool);
-    bool ensureStartFromScratch(const QString &localFolder);
+    bool ensureStartFromScratch(QString &localFolder);
     AccountState *applyAccountChanges();
     bool checkDowngradeAdvised(QNetworkReply *reply);
 

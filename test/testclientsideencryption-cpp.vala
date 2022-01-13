@@ -11,13 +11,11 @@
 
 // #include <common/constants.h>
 
-#include "clientsideencryption.h"
-
 using namespace OCC;
 
 class TestClientSideEncryption : public QObject {
 
-    QByteArray convertToOldStorageFormat(const QByteArray &data) {
+    QByteArray convertToOldStorageFormat(QByteArray &data) {
         return data.split('|').join("fA==");
     }
 
@@ -150,7 +148,7 @@ private slots:
 
         QCOMPARE(dummyInputFile.write(dummyFileRandomContents), dummyFileRandomContents.size());
 
-        const auto generateHash = [](const QByteArray &data) {
+        const auto generateHash = [](QByteArray &data) {
             QCryptographicHash hash(QCryptographicHash::Sha1);
             hash.addData(data);
             return hash.result();

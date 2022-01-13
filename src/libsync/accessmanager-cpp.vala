@@ -23,11 +23,6 @@
 // #include <QNetworkConfiguration>
 // #include <QUuid>
 
-#include "cookiejar.h"
-#include "accessmanager.h"
-#include "common/utility.h"
-#include "httplogger.h"
-
 namespace OCC {
 
 Q_LOGGING_CATEGORY(lcAccessManager, "nextcloud.sync.accessmanager", QtInfoMsg)
@@ -52,7 +47,7 @@ QByteArray AccessManager::generateRequestId() {
     return QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 }
 
-QNetworkReply *AccessManager::createRequest(QNetworkAccessManager::Operation op, const QNetworkRequest &request, QIODevice *outgoingData) {
+QNetworkReply *AccessManager::createRequest(QNetworkAccessManager::Operation op, QNetworkRequest &request, QIODevice *outgoingData) {
     QNetworkRequest newRequest(request);
 
     // Respect request specific user agent if any

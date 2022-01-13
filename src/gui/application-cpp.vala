@@ -14,38 +14,11 @@
  * for more details.
  */
 
-#include "application.h"
-
 // #include <iostream>
 // #include <random>
 
-#include "config.h"
-#include "account.h"
-#include "accountstate.h"
-#include "connectionvalidator.h"
-#include "folder.h"
-#include "folderman.h"
-#include "logger.h"
-#include "configfile.h"
-#include "socketapi/socketapi.h"
-#include "sslerrordialog.h"
-#include "theme.h"
-#include "clientproxy.h"
-#include "sharedialog.h"
-#include "accountmanager.h"
-#include "creds/abstractcredentials.h"
-#include "pushnotifications.h"
-
 #if defined(BUILD_UPDATER)
-#include "updater/ocupdater.h"
 #endif
-
-#include "owncloudsetupwizard.h"
-#include "version.h"
-#include "csync_exclude.h"
-#include "common/vfs.h"
-
-#include "config.h"
 
 #if defined(Q_OS_WIN)
 // #include <windows.h>
@@ -155,7 +128,7 @@ bool Application::configVersionMigration() {
         settings->endGroup();
 
         // Wipe confusing keys from the future, ignore the others
-        for (const auto &badKey : deleteKeys)
+        for (auto &badKey : deleteKeys)
             settings->remove(badKey);
     }
 
@@ -231,7 +204,7 @@ Application::Application(int &argc, char **argv)
                 if (QFileInfo(confDir).isDir() || QDir().mkdir(confDir)) {
                     const QStringList filesList = QDir(oldDir).entryList(QDir::Files);
                     qCInfo(lcApplication) << "Will move the individual files" << filesList;
-                    for (const auto &name : filesList) {
+                    for (auto &name : filesList) {
                         if (!QFile::rename(oldDir + "/" + name,  confDir + "/" + name)) {
                             qCWarning(lcApplication) << "Fallback move of " << name << "also failed";
                         }
@@ -339,7 +312,7 @@ Application::Application(int &argc, char **argv)
         this, &Application::slotAccountStateAdded);
     connect(AccountManager::instance(), &AccountManager::accountRemoved,
         this, &Application::slotAccountStateRemoved);
-    for (const auto &ai : AccountManager::instance()->accounts()) {
+    for (auto &ai : AccountManager::instance()->accounts()) {
         slotAccountStateAdded(ai.data());
     }
 
@@ -445,7 +418,7 @@ void Application::slotSystemOnlineConfigurationChanged(QNetworkConfiguration cnf
 
 void Application::slotCheckConnection() {
     const auto list = AccountManager::instance()->accounts();
-    for (const auto &accountState : list) {
+    for (auto &accountState : list) {
         AccountState::State state = accountState->state();
 
         // Don't check if we're manually signed out or
@@ -528,7 +501,7 @@ void Application::slotUseMonoIconsChanged(bool) {
     _gui->slotComputeOverallSyncStatus();
 }
 
-void Application::slotParseMessage(const QString &msg, QObject *) {
+void Application::slotParseMessage(QString &msg, QObject *) {
     if (msg.startsWith(QLatin1String("MSG_PARSEOPTIONS:"))) {
         const int lengthOfMsgPrefix = 17;
         QStringList options = msg.mid(lengthOfMsgPrefix).split(QLatin1Char('|'));
@@ -559,7 +532,7 @@ void Application::slotParseMessage(const QString &msg, QObject *) {
     }
 }
 
-void Application::parseOptions(const QStringList &options) {
+void Application::parseOptions(QStringList &options) {
     QStringListIterator it(options);
     // skip file name;
     if (it.hasNext())
@@ -640,7 +613,7 @@ static void displayHelpText(QString t) // No console on Windows. {
 
 #else
 
-static void displayHelpText(const QString &t) {
+static void displayHelpText(QString &t) {
     std::cout << qUtf8Printable(t);
 }
 #endif
@@ -688,7 +661,7 @@ void Application::setHelp() {
     _helpOnly = true;
 }
 
-QString substLang(const QString &lang) {
+QString substLang(QString &lang) {
     // Map the more appropriate script codes
     // to country codes as used by Qt and
     // transifex translation conventions.
@@ -776,7 +749,7 @@ void Application::slotGuiIsShowingSettings() {
     emit isShowingSettingsDialog();
 }
 
-void Application::openVirtualFile(const QString &filename) {
+void Application::openVirtualFile(QString &filename) {
     QString virtualFileExt = QStringLiteral(APPLICATION_DOTVIRTUALFILE_SUFFIX);
     if (!filename.endsWith(virtualFileExt)) {
         qWarning(lcApplication) << "Can only handle file ending in .owncloud. Unable to open" << filename;

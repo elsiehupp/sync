@@ -1,10 +1,7 @@
-#include "profilepagewidget.h"
-#include "guiutility.h"
-#include "ocsprofileconnector.h"
 
 namespace OCC {
 
-ProfilePageMenu::ProfilePageMenu(AccountPtr account, const QString &shareWithUserId, QWidget *parent)
+ProfilePageMenu::ProfilePageMenu(AccountPtr account, QString &shareWithUserId, QWidget *parent)
     : QWidget(parent)
     , _profileConnector(account) {
     connect(&_profileConnector, &OcsProfileConnector::hovercardFetched, this, &ProfilePageMenu::onHovercardFetched);
@@ -14,7 +11,7 @@ ProfilePageMenu::ProfilePageMenu(AccountPtr account, const QString &shareWithUse
 
 ProfilePageMenu::~ProfilePageMenu() = default;
 
-void ProfilePageMenu::exec(const QPoint &globalPosition) {
+void ProfilePageMenu::exec(QPoint &globalPosition) {
     _menu.exec(globalPosition);
 }
 
@@ -22,14 +19,14 @@ void ProfilePageMenu::onHovercardFetched() {
     _menu.clear();
 
     const auto hovercardActions = _profileConnector.hovercard()._actions;
-    for (const auto &hovercardAction : hovercardActions) {
+    for (auto &hovercardAction : hovercardActions) {
         const auto action = _menu.addAction(hovercardAction._icon, hovercardAction._title);
         const auto link = hovercardAction._link;
         connect(action, &QAction::triggered, action, [link](bool) { Utility::openBrowser(link); });
     }
 }
 
-void ProfilePageMenu::onIconLoaded(const std::size_t &hovercardActionIndex) {
+void ProfilePageMenu::onIconLoaded(std::size_t &hovercardActionIndex) {
     const auto hovercardActions = _profileConnector.hovercard()._actions;
     const auto menuActions = _menu.actions();
     if (hovercardActionIndex >= hovercardActions.size()

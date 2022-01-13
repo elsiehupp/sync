@@ -11,21 +11,14 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
  */
-#include "config.h"
-
-#include "folder.h"
-#include "folderwatcher.h"
-#include "folderwatcher_mac.h"
-
 
 // #include <cerrno>
 // #include <QDirIterator>
 // #include <QStringList>
 
-
 namespace OCC {
 
-FolderWatcherPrivate::FolderWatcherPrivate(FolderWatcher *p, const QString &path)
+FolderWatcherPrivate::FolderWatcherPrivate(FolderWatcher *p, QString &path)
     : _parent(p)
     , _folder(path) {
     this->startWatching();
@@ -101,9 +94,9 @@ void FolderWatcherPrivate::startWatching() {
     FSEventStreamStart(_stream);
 }
 
-QStringList FolderWatcherPrivate::addCoalescedPaths(const QStringList &paths) const {
+QStringList FolderWatcherPrivate::addCoalescedPaths(QStringList &paths) const {
     QStringList coalescedPaths;
-    for (const auto &eventPath : paths) {
+    for (auto &eventPath : paths) {
         if (QDir(eventPath).exists()) {
             QDirIterator it(eventPath, QDir::AllDirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
             while (it.hasNext()) {
@@ -117,10 +110,9 @@ QStringList FolderWatcherPrivate::addCoalescedPaths(const QStringList &paths) co
     return (paths + coalescedPaths);
 }
 
-void FolderWatcherPrivate::doNotifyParent(const QStringList &paths) {
+void FolderWatcherPrivate::doNotifyParent(QStringList &paths) {
     const QStringList totalPaths = addCoalescedPaths(paths);
     _parent->changeDetected(totalPaths);
 }
-
 
 } // ns mirall

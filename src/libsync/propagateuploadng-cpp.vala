@@ -12,21 +12,6 @@
  * for more details.
  */
 
-#include "config.h"
-#include "propagateupload.h"
-#include "owncloudpropagator_p.h"
-#include "networkjobs.h"
-#include "account.h"
-#include "common/syncjournaldb.h"
-#include "common/syncjournalfilerecord.h"
-#include "common/utility.h"
-#include "filesystem.h"
-#include "propagatorjobs.h"
-#include "syncengine.h"
-#include "propagateremotemove.h"
-#include "deletejob.h"
-#include "common/asserts.h"
-
 // #include <QNetworkAccessManager>
 // #include <QFileInfo>
 // #include <QDir>
@@ -74,7 +59,6 @@ QUrl PropagateUploadFileNG::chunkUrl(int chunk) {
     |
     +-> MOVE ------> moveJobFinished() ---> finalize()
 
-
  */
 
 void PropagateUploadFileNG::doStartUpload() {
@@ -112,7 +96,7 @@ void PropagateUploadFileNG::doStartUpload() {
     startNewUpload();
 }
 
-void PropagateUploadFileNG::slotPropfindIterate(const QString &name, const QMap<QString, QString> &properties) {
+void PropagateUploadFileNG::slotPropfindIterate(QString &name, QMap<QString, QString> &properties) {
     if (name == chunkUrl().path()) {
         return; // skip the info about the path itself
     }
@@ -164,7 +148,7 @@ void PropagateUploadFileNG::slotPropfindFinished() {
         // Make sure that if there is a "hole" and then a few more chunks, on the server
         // we should remove the later chunks. Otherwise when we do dynamic chunk sizing, we may end up
         // with corruptions if there are too many chunks, or if we abort and there are still stale chunks.
-        for (const auto &serverChunk : qAsConst(_serverChunks)) {
+        for (auto &serverChunk : qAsConst(_serverChunks)) {
             auto job = new DeleteJob(propagator()->account(), Utility::concatUrlPath(chunkUrl(), serverChunk.originalName), this);
             QObject::connect(job, &DeleteJob::finishedSignal, this, &PropagateUploadFileNG::slotDeleteJobFinished);
             _jobs.append(job);
@@ -222,7 +206,6 @@ void PropagateUploadFileNG::slotDeleteJobFinished() {
         }
     }
 }
-
 
 void PropagateUploadFileNG::startNewUpload() {
     ASSERT(propagator()->_activeJobList.count(this) == 1);

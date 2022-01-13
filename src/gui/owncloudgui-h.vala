@@ -12,11 +12,6 @@
  * for more details.
  */
 
-
-#include "systray.h"
-#include "connectionvalidator.h"
-#include "progressdispatcher.h"
-
 // #include <QObject>
 // #include <QPointer>
 // #include <QAction>
@@ -65,16 +60,16 @@ public:
 
 signals:
     void setupProxy();
-    void serverError(int code, const QString &message);
+    void serverError(int code, QString &message);
     void isShowingSettingsDialog();
 
 public slots:
     void slotComputeOverallSyncStatus();
-    void slotShowTrayMessage(const QString &title, const QString &msg);
-    void slotShowOptionalTrayMessage(const QString &title, const QString &msg);
-    void slotFolderOpenAction(const QString &alias);
-    void slotUpdateProgress(const QString &folder, const ProgressInfo &progress);
-    void slotShowGuiMessage(const QString &title, const QString &message);
+    void slotShowTrayMessage(QString &title, QString &msg);
+    void slotShowOptionalTrayMessage(QString &title, QString &msg);
+    void slotFolderOpenAction(QString &alias);
+    void slotUpdateProgress(QString &folder, ProgressInfo &progress);
+    void slotShowGuiMessage(QString &title, QString &message);
     void slotFoldersChanged();
     void slotShowSettings();
     void slotShowSyncProtocol();
@@ -87,10 +82,9 @@ public slots:
     void slotOpenMainDialog();
     void slotSettingsDialogActivated();
     void slotHelp();
-    void slotOpenPath(const QString &path);
+    void slotOpenPath(QString &path);
     void slotAccountStateChanged();
     void slotTrayMessageIfServerUnsupported(Account *account);
-
 
     /**
      * Open a share dialog for a file or folder.
@@ -99,7 +93,7 @@ public slots:
      * localPath is the absolute local path to it (so not relative
      * to the folder).
      */
-    void slotShowShareDialog(const QString &sharePath, const QString &localPath, ShareDialogStartPage startPage);
+    void slotShowShareDialog(QString &sharePath, QString &localPath, ShareDialogStartPage startPage);
 
     void slotRemoveDestroyedShareDialogs();
 
@@ -123,7 +117,6 @@ private:
     QAction *_actionNewAccountWizard;
     QAction *_actionSettings;
     QAction *_actionEstimate;
-
 
     QList<QAction *> _recentItemsActions;
     Application *_app;

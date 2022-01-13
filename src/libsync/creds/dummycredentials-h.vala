@@ -12,9 +12,6 @@
  * for more details.
  */
 
-
-#include "creds/abstractcredentials.h"
-
 namespace OCC {
 
 class OWNCLOUDSYNC_EXPORT DummyCredentials : public AbstractCredentials {

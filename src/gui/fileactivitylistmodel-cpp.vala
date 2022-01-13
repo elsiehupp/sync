@@ -12,10 +12,6 @@
  * for more details.
  */
 
-#include "fileactivitylistmodel.h"
-#include "folderman.h"
-#include "tray/activitylistmodel.h"
-
 namespace OCC {
 
 Q_LOGGING_CATEGORY(lcFileActivityListModel, "nextcloud.gui.fileactivitylistmodel", QtInfoMsg)
@@ -25,7 +21,7 @@ FileActivityListModel::FileActivityListModel(QObject *parent)
     setDisplayActions(false);
 }
 
-void FileActivityListModel::load(AccountState *accountState, const QString &localPath) {
+void FileActivityListModel::load(AccountState *accountState, QString &localPath) {
     Q_ASSERT(accountState);
     if (!accountState || currentlyFetching()) {
         return;

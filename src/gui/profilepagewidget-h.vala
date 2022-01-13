@@ -1,7 +1,5 @@
 #pragma once
 
-#include "ocsprofileconnector.h"
-
 // #include <QBoxLayout>
 // #include <QLabel>
 // #include <account.h>
@@ -13,14 +11,14 @@ namespace OCC {
 
 class ProfilePageMenu : public QWidget {
 public:
-    explicit ProfilePageMenu(AccountPtr account, const QString &shareWithUserId, QWidget *parent = nullptr);
+    explicit ProfilePageMenu(AccountPtr account, QString &shareWithUserId, QWidget *parent = nullptr);
     ~ProfilePageMenu() override;
 
-    void exec(const QPoint &globalPosition);
+    void exec(QPoint &globalPosition);
 
 private:
     void onHovercardFetched();
-    void onIconLoaded(const std::size_t &hovercardActionIndex);
+    void onIconLoaded(std::size_t &hovercardActionIndex);
 
     OcsProfileConnector _profileConnector;
     QMenu _menu;

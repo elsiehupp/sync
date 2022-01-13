@@ -12,20 +12,6 @@
  * for more details.
  */
 
-#include "bulkpropagatorjob.h"
-
-#include "putmultifilejob.h"
-#include "owncloudpropagator_p.h"
-#include "syncfileitem.h"
-#include "syncengine.h"
-#include "propagateupload.h"
-#include "propagatorjobs.h"
-#include "filesystem.h"
-#include "account.h"
-#include "common/utility.h"
-#include "common/checksums.h"
-#include "networkjobs.h"
-
 // #include <QFileInfo>
 // #include <QDir>
 // #include <QJsonDocument>
@@ -41,7 +27,7 @@ Q_LOGGING_CATEGORY(lcBulkPropagatorJob, "nextcloud.sync.propagator.bulkupload", 
 
 namespace {
 
-QByteArray getEtagFromJsonReply(const QJsonObject &reply) {
+QByteArray getEtagFromJsonReply(QJsonObject &reply) {
     const auto ocEtag = OCC::parseEtag(reply.value("OC-ETag").toString().toLatin1());
     const auto ETag = OCC::parseEtag(reply.value("ETag").toString().toLatin1());
     const auto  etag = OCC::parseEtag(reply.value("etag").toString().toLatin1());
@@ -58,7 +44,7 @@ QByteArray getEtagFromJsonReply(const QJsonObject &reply) {
     return ret;
 }
 
-QByteArray getHeaderFromJsonReply(const QJsonObject &reply, const QByteArray &headerName) {
+QByteArray getHeaderFromJsonReply(QJsonObject &reply, QByteArray &headerName) {
     return reply.value(headerName).toString().toLatin1();
 }
 
@@ -259,7 +245,7 @@ void BulkPropagatorJob::slotComputeTransmissionChecksum(SyncFileItemPtr item,
     }
 
     connect(computeChecksum.get(), &ComputeChecksum::done,
-            this, [this, item, fileToUpload] (const QByteArray &contentChecksumType, const QByteArray &contentChecksum) {
+            this, [this, item, fileToUpload] (QByteArray &contentChecksumType, QByteArray &contentChecksum) {
         slotStartUpload(item, fileToUpload, contentChecksumType, contentChecksum);
     });
     connect(computeChecksum.get(), &ComputeChecksum::done,
@@ -328,7 +314,7 @@ void BulkPropagatorJob::slotOnErrorStartFolderUnlock(SyncFileItemPtr item,
     done(item, status, errorString);
 }
 
-void BulkPropagatorJob::slotPutFinishedOneFile(const BulkUploadItem &singleFile,
+void BulkPropagatorJob::slotPutFinishedOneFile(BulkUploadItem &singleFile,
                                                PutMultiFileJob *job,
                                                const QJsonObject &fileReply) {
     bool finished = false;
@@ -397,7 +383,7 @@ void BulkPropagatorJob::slotPutFinished() {
     const auto replyJson = QJsonDocument::fromJson(replyData);
     const auto fullReplyObject = replyJson.object();
 
-    for (const auto &singleFile : _filesToUpload) {
+    for (auto &singleFile : _filesToUpload) {
         if (!fullReplyObject.contains(singleFile._remotePath)) {
             continue;
         }
@@ -434,7 +420,7 @@ void BulkPropagatorJob::adjustLastJobTimeout(AbstractNetworkJob *job, qint64 fil
                         static_cast<qint64>(30 * 60 * 1000)));
 }
 
-void BulkPropagatorJob::finalizeOneFile(const BulkUploadItem &oneFile) {
+void BulkPropagatorJob::finalizeOneFile(BulkUploadItem &oneFile) {
     // Update the database entry
     const auto result = propagator()->updateMetadata(*oneFile._item);
     if (!result) {
@@ -461,7 +447,7 @@ void BulkPropagatorJob::finalizeOneFile(const BulkUploadItem &oneFile) {
     propagator()->_journal->commit("upload file start");
 }
 
-void BulkPropagatorJob::finalize(const QJsonObject &fullReply) {
+void BulkPropagatorJob::finalize(QJsonObject &fullReply) {
     for(auto singleFileIt = std::begin(_filesToUpload); singleFileIt != std::end(_filesToUpload); ) {
         const auto &singleFile = *singleFileIt;
 

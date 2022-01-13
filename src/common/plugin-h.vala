@@ -18,7 +18,6 @@
 
 // #pragma once
 
-#include "ocsynclib.h"
 // #include <QObject>
 
 namespace OCC {
@@ -38,7 +37,7 @@ public:
 };
 
 /// Return the expected name of a plugin, for use with QPluginLoader
-QString pluginFileName(const QString &type, const QString &name);
+QString pluginFileName(QString &type, QString &name);
 
 }
 

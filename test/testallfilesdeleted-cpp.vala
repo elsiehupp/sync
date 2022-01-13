@@ -6,12 +6,10 @@
  */
 
 // #include <QtTest>
-#include "syncenginetestutils.h"
 // #include <syncengine.h>
 // #include <configfile.h>
 
 using namespace OCC;
-
 
 static void changeAllFileId(FileInfo &info) {
     info.fileId = generateFileId();
@@ -66,7 +64,7 @@ private slots:
             });
 
         auto &modifier = deleteOnRemote ? fakeFolder.remoteModifier() : fakeFolder.localModifier();
-        for (const auto &s : fakeFolder.currentRemoteState().children.keys())
+        for (auto &s : fakeFolder.currentRemoteState().children.keys())
             modifier.remove(s);
 
         QVERIFY(!fakeFolder.syncOnce()); // Should fail because we cancel the sync
@@ -104,7 +102,7 @@ private slots:
             });
 
         auto &modifier = deleteOnRemote ? fakeFolder.remoteModifier() : fakeFolder.localModifier();
-        for (const auto &s : fakeFolder.currentRemoteState().children.keys())
+        for (auto &s : fakeFolder.currentRemoteState().children.keys())
             modifier.remove(s);
 
         QVERIFY(fakeFolder.syncOnce()); // Should succeed, and all files must then be deleted
@@ -133,7 +131,7 @@ private slots:
             [&] { QVERIFY(false); });
         QVERIFY(fakeFolder.syncOnce());
 
-        for (const auto &s : fakeFolder.currentRemoteState().children.keys())
+        for (auto &s : fakeFolder.currentRemoteState().children.keys())
             fakeFolder.syncJournal().avoidRenamesOnNextSync(s); // clears all the fileid and inodes.
         fakeFolder.localModifier().remove("A/a1");
         auto expectedState = fakeFolder.currentLocalState();
@@ -200,7 +198,7 @@ private slots:
         }
 
         int fingerprintRequests = 0;
-        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation, const QNetworkRequest &request, QIODevice *stream) -> QNetworkReply * {
+        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation, QNetworkRequest &request, QIODevice *stream) -> QNetworkReply * {
             auto verb = request.attribute(QNetworkRequest::CustomVerbAttribute);
             if (verb == "PROPFIND") {
                 auto data = stream->readAll();
@@ -314,7 +312,6 @@ private slots:
         QCOMPARE(fakeFolder.currentRemoteState(), FileInfo::A12_B12_C12_S12()); // Server not changed
         QCOMPARE(aboutToRemoveAllFilesCalled, 0); // But we did not show the popup
     }
-
 
 };
 

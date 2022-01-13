@@ -4,9 +4,6 @@
 // #include <QDialog>
 // #include <QUrl>
 
-#include "accountfwd.h"
-#include "creds/flow2auth.h"
-
 class QLabel;
 class QVBoxLayout;
 
@@ -22,9 +19,9 @@ class WebFlowCredentialsDialog : public QDialog {
 public:
     WebFlowCredentialsDialog(Account *account, bool useFlow2, QWidget *parent = nullptr);
 
-    void setUrl(const QUrl &url);
-    void setInfo(const QString &msg);
-    void setError(const QString &error);
+    void setUrl(QUrl &url);
+    void setInfo(QString &msg);
+    void setError(QString &error);
 
     bool isUsingFlow2() const {
         return _useFlow2;
@@ -35,11 +32,11 @@ protected:
     void changeEvent(QEvent *) override;
 
 public slots:
-    void slotFlow2AuthResult(Flow2Auth::Result, const QString &errorString, const QString &user, const QString &appPassword);
+    void slotFlow2AuthResult(Flow2Auth::Result, QString &errorString, QString &user, QString &appPassword);
     void slotShowSettingsDialog();
 
 signals:
-    void urlCatched(const QString user, const QString pass, const QString host);
+    void urlCatched(QString user, QString pass, QString host);
     void styleChanged();
     void onActivate();
     void onClose();

@@ -23,7 +23,7 @@ class LinkLabel : public QLabel {
 public:
     explicit LinkLabel(QWidget *parent = nullptr);
 
-    void setUrl(const QUrl &url);
+    void setUrl(QUrl &url);
 
 signals:
     void clicked();

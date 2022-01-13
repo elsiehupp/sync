@@ -12,9 +12,6 @@
  * for more details.
  */
 
-#include "userstatusselectormodel.h"
-#include "tray/usermodel.h"
-
 // #include <ocsuserstatusconnector.h>
 // #include <qnamespace.h>
 // #include <userstatusconnector.h>
@@ -56,7 +53,7 @@ UserStatusSelectorModel::UserStatusSelectorModel(std::shared_ptr<UserStatusConne
     init();
 }
 
-UserStatusSelectorModel::UserStatusSelectorModel(const UserStatus &userStatus,
+UserStatusSelectorModel::UserStatusSelectorModel(UserStatus &userStatus,
     std::unique_ptr<DateTimeProvider> dateTimeProvider, QObject *parent)
     : QObject(parent)
     , _userStatus(userStatus)
@@ -64,7 +61,7 @@ UserStatusSelectorModel::UserStatusSelectorModel(const UserStatus &userStatus,
     _userStatus.setIcon("😀");
 }
 
-UserStatusSelectorModel::UserStatusSelectorModel(const UserStatus &userStatus,
+UserStatusSelectorModel::UserStatusSelectorModel(UserStatus &userStatus,
     QObject *parent)
     : QObject(parent)
     , _userStatus(userStatus) {
@@ -153,7 +150,7 @@ void UserStatusSelectorModel::onError(UserStatusConnector::Error error) {
     Q_UNREACHABLE();
 }
 
-void UserStatusSelectorModel::setError(const QString &reason) {
+void UserStatusSelectorModel::setError(QString &reason) {
     _errorMessage = reason;
     emit errorMessageChanged();
 }
@@ -193,13 +190,13 @@ QString UserStatusSelectorModel::userStatusMessage() const {
     return _userStatus.message();
 }
 
-void UserStatusSelectorModel::setUserStatusMessage(const QString &message) {
+void UserStatusSelectorModel::setUserStatusMessage(QString &message) {
     _userStatus.setMessage(message);
     _userStatus.setMessagePredefined(false);
     emit userStatusChanged();
 }
 
-void UserStatusSelectorModel::setUserStatusEmoji(const QString &emoji) {
+void UserStatusSelectorModel::setUserStatusEmoji(QString &emoji) {
     _userStatus.setIcon(emoji);
     _userStatus.setMessagePredefined(false);
     emit userStatusChanged();
@@ -209,7 +206,7 @@ QString UserStatusSelectorModel::userStatusEmoji() const {
     return _userStatus.icon();
 }
 
-void UserStatusSelectorModel::onUserStatusFetched(const UserStatus &userStatus) {
+void UserStatusSelectorModel::onUserStatusFetched(UserStatus &userStatus) {
     if (userStatus.state() != UserStatus::OnlineStatus::Offline) {
         _userStatus.setState(userStatus.state());
     }
@@ -292,7 +289,7 @@ void UserStatusSelectorModel::clearUserStatus() {
     _userStatusConnector->clearMessage();
 }
 
-void UserStatusSelectorModel::onPredefinedStatusesFetched(const std::vector<UserStatus> &statuses) {
+void UserStatusSelectorModel::onPredefinedStatusesFetched(std::vector<UserStatus> &statuses) {
     _predefinedStatuses = statuses;
     emit predefinedStatusesChanged();
 }
@@ -349,7 +346,7 @@ QStringList UserStatusSelectorModel::clearAtValues() const {
     QStringList clearAtStages;
     std::transform(_clearStages.begin(), _clearStages.end(),
         std::back_inserter(clearAtStages),
-        [this](const ClearStageType &stage) { return clearAtStageToString(stage); });
+        [this](ClearStageType &stage) { return clearAtStageToString(stage); });
 
     return clearAtStages;
 }
@@ -391,7 +388,7 @@ QString UserStatusSelectorModel::timeDifferenceToString(int differenceSecs) cons
     }
 }
 
-QString UserStatusSelectorModel::clearAtReadable(const Optional<ClearAt> &clearAt) const {
+QString UserStatusSelectorModel::clearAtReadable(Optional<ClearAt> &clearAt) const {
     if (clearAt) {
         switch (clearAt->_type) {
         case ClearAtType::Period: {

@@ -12,7 +12,6 @@
  * for more details.
  */
 
-
 // #include <QHash>
 // #include <QPair>
 
@@ -26,9 +25,9 @@ class NetrcParser {
 public:
     using LoginPair = QPair<QString, QString>;
 
-    NetrcParser(const QString &file = QString());
+    NetrcParser(QString &file = QString());
     bool parse();
-    LoginPair find(const QString &machine);
+    LoginPair find(QString &machine);
 
 private:
     void tryAddEntryAndClear(QString &machine, LoginPair &pair, bool &isDefault);

@@ -13,13 +13,9 @@
  */
 // #pragma once
 
-#include "owncloudpropagator.h"
-#include "networkjobs.h"
-
 // #include <QBuffer>
 // #include <QFile>
 // #include <QElapsedTimer>
-
 
 namespace OCC {
 
@@ -36,13 +32,13 @@ class BandwidthManager;
  */
 class UploadDevice : public QIODevice {
 public:
-    UploadDevice(const QString &fileName, qint64 start, qint64 size, BandwidthManager *bwm);
+    UploadDevice(QString &fileName, qint64 start, qint64 size, BandwidthManager *bwm);
     ~UploadDevice() override;
 
     bool open(QIODevice::OpenMode mode) override;
     void close() override;
 
-    qint64 writeData(const char *, qint64) override;
+    qint64 writeData(char *, qint64) override;
     qint64 readData(char *data, qint64 maxlen) override;
     bool atEnd() const override;
     qint64 size() const override;
@@ -95,7 +91,7 @@ private:
 
 public:
     // Takes ownership of the device
-    explicit PUTFileJob(AccountPtr account, const QString &path, std::unique_ptr<QIODevice> device,
+    explicit PUTFileJob(AccountPtr account, QString &path, std::unique_ptr<QIODevice> device,
         const QMap<QByteArray, QByteArray> &headers, int chunk, QObject *parent = nullptr)
         : AbstractNetworkJob(account, path, parent)
         , _device(device.release())
@@ -103,7 +99,7 @@ public:
         , _chunk(chunk) {
         _device->setParent(this);
     }
-    explicit PUTFileJob(AccountPtr account, const QUrl &url, std::unique_ptr<QIODevice> device,
+    explicit PUTFileJob(AccountPtr account, QUrl &url, std::unique_ptr<QIODevice> device,
         const QMap<QByteArray, QByteArray> &headers, int chunk, QObject *parent = nullptr)
         : AbstractNetworkJob(account, QString(), parent)
         , _device(device.release())
@@ -152,8 +148,8 @@ class PollJob : public AbstractNetworkJob {
 public:
     SyncFileItemPtr _item;
     // Takes ownership of the device
-    explicit PollJob(AccountPtr account, const QString &path, const SyncFileItemPtr &item,
-        SyncJournalDb *journal, const QString &localPath, QObject *parent)
+    explicit PollJob(AccountPtr account, QString &path, SyncFileItemPtr &item,
+        SyncJournalDb *journal, QString &localPath, QObject *parent)
         : AbstractNetworkJob(account, path, parent)
         , _journal(journal)
         , _localPath(localPath)
@@ -224,7 +220,7 @@ protected:
     QByteArray _transmissionChecksumHeader;
 
 public:
-    PropagateUploadFileCommon(OwncloudPropagator *propagator, const SyncFileItemPtr &item);
+    PropagateUploadFileCommon(OwncloudPropagator *propagator, SyncFileItemPtr &item);
 
     /**
      * Whether an existing entity with the same name may be deleted before
@@ -236,7 +232,7 @@ public:
 
     /* start should setup the file, path and size that will be send to the server */
     void start() override;
-    void setupEncryptedFile(const QString& path, const QString& filename, quint64 size);
+    void setupEncryptedFile(QString& path, QString& filename, quint64 size);
     void setupUnencryptedFile();
     void startUploadFile();
     void callUnlockFolder();
@@ -245,20 +241,20 @@ public:
 private slots:
     void slotComputeContentChecksum();
     // Content checksum computed, compute the transmission checksum
-    void slotComputeTransmissionChecksum(const QByteArray &contentChecksumType, const QByteArray &contentChecksum);
+    void slotComputeTransmissionChecksum(QByteArray &contentChecksumType, QByteArray &contentChecksum);
     // transmission checksum computed, prepare the upload
-    void slotStartUpload(const QByteArray &transmissionChecksumType, const QByteArray &transmissionChecksum);
+    void slotStartUpload(QByteArray &transmissionChecksumType, QByteArray &transmissionChecksum);
     // invoked when encrypted folder lock has been released
-    void slotFolderUnlocked(const QByteArray &folderId, int httpReturnCode);
+    void slotFolderUnlocked(QByteArray &folderId, int httpReturnCode);
     // invoked on internal error to unlock a folder and faile
-    void slotOnErrorStartFolderUnlock(SyncFileItem::Status status, const QString &errorString);
+    void slotOnErrorStartFolderUnlock(SyncFileItem::Status status, QString &errorString);
 
 public:
     virtual void doStartUpload() = 0;
 
-    void startPollJob(const QString &path);
+    void startPollJob(QString &path);
     void finalize();
-    void abortWithError(SyncFileItem::Status status, const QString &error);
+    void abortWithError(SyncFileItem::Status status, QString &error);
 
 public slots:
     void slotJobDestroyed(QObject *job);
@@ -267,7 +263,7 @@ private slots:
     void slotPollFinished();
 
 protected:
-    void done(SyncFileItem::Status status, const QString &errorString = QString()) override;
+    void done(SyncFileItem::Status status, QString &errorString = QString()) override;
 
     /**
      * Aborts all running network jobs, except for the ones that mayAbortJob
@@ -339,7 +335,7 @@ private:
     }
 
 public:
-    PropagateUploadFileV1(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
+    PropagateUploadFileV1(OwncloudPropagator *propagator, SyncFileItemPtr &item)
         : PropagateUploadFileCommon(propagator, item) {
     }
 
@@ -381,7 +377,7 @@ private:
     QUrl chunkUrl(int chunk = -1);
 
 public:
-    PropagateUploadFileNG(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
+    PropagateUploadFileNG(OwncloudPropagator *propagator, SyncFileItemPtr &item)
         : PropagateUploadFileCommon(propagator, item) {
     }
 
@@ -395,7 +391,7 @@ public slots:
 private slots:
     void slotPropfindFinished();
     void slotPropfindFinishedWithError();
-    void slotPropfindIterate(const QString &name, const QMap<QString, QString> &properties);
+    void slotPropfindIterate(QString &name, QMap<QString, QString> &properties);
     void slotDeleteJobFinished();
     void slotMkColFinished();
     void slotPutFinished();

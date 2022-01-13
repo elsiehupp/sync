@@ -16,9 +16,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "common/syncjournalfilerecord.h"
-#include "common/utility.h"
-
 namespace OCC {
 
 QByteArray SyncJournalFileRecord::numericFileId() const {
@@ -37,7 +34,7 @@ bool SyncJournalErrorBlacklistRecord::isValid() const {
         && _lastTryTime > 0;
 }
 
-bool operator==(const SyncJournalFileRecord &lhs,
+bool operator==(SyncJournalFileRecord &lhs,
     const SyncJournalFileRecord &rhs) {
     return lhs._path == rhs._path
         && lhs._inode == rhs._inode

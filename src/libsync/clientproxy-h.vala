@@ -12,15 +12,12 @@
  * for more details.
  */
 
-
 // #include <QObject>
 // #include <QNetworkProxy>
 // #include <QRunnable>
 // #include <QUrl>
 
 // #include <csync.h>
-#include "common/utility.h"
-#include "owncloudlib.h"
 
 namespace OCC {
 
@@ -35,9 +32,9 @@ public:
     explicit ClientProxy(QObject *parent = nullptr);
 
     static bool isUsingSystemDefault();
-    static void lookupSystemProxyAsync(const QUrl &url, QObject *dst, const char *slot);
+    static void lookupSystemProxyAsync(QUrl &url, QObject *dst, char *slot);
 
-    static QString printQNetworkProxy(const QNetworkProxy &proxy);
+    static QString printQNetworkProxy(QNetworkProxy &proxy);
     static const char *proxyTypeToCStr(QNetworkProxy::ProxyType type);
 
 public slots:
@@ -46,10 +43,10 @@ public slots:
 
 class OWNCLOUDSYNC_EXPORT SystemProxyRunnable : public QObject, public QRunnable {
 public:
-    SystemProxyRunnable(const QUrl &url);
+    SystemProxyRunnable(QUrl &url);
     void run() override;
 signals:
-    void systemProxyLookedUp(const QNetworkProxy &url);
+    void systemProxyLookedUp(QNetworkProxy &url);
 
 private:
     QUrl _url;

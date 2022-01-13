@@ -15,11 +15,9 @@
 // #include <QtGlobal>
 // #include <memory>
 
-#include "emojimodel.h"
-
 namespace OCC {
 
-QVariant EmojiCategoriesModel::data(const QModelIndex &index, int role) const {
+QVariant EmojiCategoriesModel::data(QModelIndex &index, int role) const {
     if (!index.isValid()) {
         return {};
     }
@@ -35,7 +33,7 @@ QVariant EmojiCategoriesModel::data(const QModelIndex &index, int role) const {
     return {};
 }
 
-int EmojiCategoriesModel::rowCount(const QModelIndex &parent) const {
+int EmojiCategoriesModel::rowCount(QModelIndex &parent) const {
     Q_UNUSED(parent);
     return static_cast<int>(categories.size());
 }
@@ -54,7 +52,7 @@ QVariantList EmojiModel::history() const {
     return _settings.value("Editor/emojis", QVariantList()).toList();
 }
 
-void EmojiModel::setCategory(const QString &category) {
+void EmojiModel::setCategory(QString &category) {
     if (_category == category) {
         return;
     }
@@ -89,7 +87,7 @@ QVariantList EmojiModel::model() const {
     return history();
 }
 
-void EmojiModel::emojiUsed(const QVariant &modelData) {
+void EmojiModel::emojiUsed(QVariant &modelData) {
     auto historyEmojis = history();
 
     auto historyEmojisIter = historyEmojis.begin();

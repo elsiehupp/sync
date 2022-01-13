@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#include "capabilities.h"
-
 // #include <QVariantMap>
 // #include <QLoggingCategory>
 // #include <QUrl>
@@ -24,8 +22,7 @@ namespace OCC {
 
 Q_LOGGING_CATEGORY(lcServerCapabilities, "nextcloud.sync.server.capabilities", QtInfoMsg)
 
-
-Capabilities::Capabilities(const QVariantMap &capabilities)
+Capabilities::Capabilities(QVariantMap &capabilities)
     : _capabilities(capabilities) {
 }
 
@@ -159,7 +156,7 @@ bool Capabilities::hasActivities() const {
 
 QList<QByteArray> Capabilities::supportedChecksumTypes() const {
     QList<QByteArray> list;
-    foreach (const auto &t, _capabilities["checksums"].toMap()["supportedTypes"].toList()) {
+    foreach (auto &t, _capabilities["checksums"].toMap()["supportedTypes"].toList()) {
         list.push_back(t.toByteArray());
     }
     return list;
@@ -248,7 +245,7 @@ bool Capabilities::privateLinkPropertyAvailable() const {
 
 QList<int> Capabilities::httpErrorCodesThatResetFailingChunkedUploads() const {
     QList<int> list;
-    foreach (const auto &t, _capabilities["dav"].toMap()["httpErrorCodesThatResetFailingChunkedUploads"].toList()) {
+    foreach (auto &t, _capabilities["dav"].toMap()["httpErrorCodesThatResetFailingChunkedUploads"].toList()) {
         list.push_back(t.toInt());
     }
     return list;
@@ -279,7 +276,7 @@ void Capabilities::addDirectEditor(DirectEditor* directEditor) {
         _directEditors.append(directEditor);
 }
 
-DirectEditor* Capabilities::getDirectEditorForMimetype(const QMimeType &mimeType) {
+DirectEditor* Capabilities::getDirectEditorForMimetype(QMimeType &mimeType) {
     foreach(DirectEditor* editor, _directEditors) {
         if(editor->hasMimetype(mimeType))
             return editor;
@@ -288,7 +285,7 @@ DirectEditor* Capabilities::getDirectEditorForMimetype(const QMimeType &mimeType
     return nullptr;
 }
 
-DirectEditor* Capabilities::getDirectEditorForOptionalMimetype(const QMimeType &mimeType) {
+DirectEditor* Capabilities::getDirectEditorForOptionalMimetype(QMimeType &mimeType) {
     foreach(DirectEditor* editor, _directEditors) {
         if(editor->hasOptionalMimetype(mimeType))
             return editor;
@@ -299,7 +296,7 @@ DirectEditor* Capabilities::getDirectEditorForOptionalMimetype(const QMimeType &
 
 /*-------------------------------------------------------------------------------------*/
 
-DirectEditor::DirectEditor(const QString &id, const QString &name, QObject* parent)
+DirectEditor::DirectEditor(QString &id, QString &name, QObject* parent)
     : QObject(parent)
     , _id(id)
     , _name(name) {
@@ -313,11 +310,11 @@ QString DirectEditor::name() const {
     return _name;
 }
 
-void DirectEditor::addMimetype(const QByteArray &mimeType) {
+void DirectEditor::addMimetype(QByteArray &mimeType) {
     _mimeTypes.append(mimeType);
 }
 
-void DirectEditor::addOptionalMimetype(const QByteArray &mimeType) {
+void DirectEditor::addOptionalMimetype(QByteArray &mimeType) {
     _optionalMimeTypes.append(mimeType);
 }
 
@@ -329,11 +326,11 @@ QList<QByteArray> DirectEditor::optionalMimeTypes() const {
     return _optionalMimeTypes;
 }
 
-bool DirectEditor::hasMimetype(const QMimeType &mimeType) {
+bool DirectEditor::hasMimetype(QMimeType &mimeType) {
     return _mimeTypes.contains(mimeType.name().toLatin1());
 }
 
-bool DirectEditor::hasOptionalMimetype(const QMimeType &mimeType) {
+bool DirectEditor::hasOptionalMimetype(QMimeType &mimeType) {
     return _optionalMimeTypes.contains(mimeType.name().toLatin1());
 }
 

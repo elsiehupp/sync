@@ -16,16 +16,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "remotepermissions.h"
 // #include <cstring>
 
 namespace OCC {
 
 static const char letters[] = " WDNVCKRSMm";
 
-
 template <typename Char>
-void RemotePermissions::fromArray(const Char *p) {
+void RemotePermissions::fromArray(Char *p) {
     _value = notNullMask;
     if (!p)
         return;
@@ -56,7 +54,7 @@ QString RemotePermissions::toString() const {
     return QString::fromUtf8(toDbValue());
 }
 
-RemotePermissions RemotePermissions::fromDbValue(const QByteArray &value) {
+RemotePermissions RemotePermissions::fromDbValue(QByteArray &value) {
     if (value.isEmpty())
         return {};
     RemotePermissions perm;
@@ -64,7 +62,7 @@ RemotePermissions RemotePermissions::fromDbValue(const QByteArray &value) {
     return perm;
 }
 
-RemotePermissions RemotePermissions::fromServerString(const QString &value) {
+RemotePermissions RemotePermissions::fromServerString(QString &value) {
     RemotePermissions perm;
     perm.fromArray(value.utf16());
     return perm;

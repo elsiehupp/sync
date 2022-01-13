@@ -12,19 +12,11 @@
  * for more details.
  */
 
-#include "syncstatussummary.h"
-#include "accountfwd.h"
-#include "folderman.h"
-#include "navigationpanehelper.h"
-#include "networkjobs.h"
-#include "syncresult.h"
-#include "tray/usermodel.h"
-
 // #include <theme.h>
 
 namespace {
 
-OCC::SyncResult::Status determineSyncStatus(const OCC::SyncResult &syncResult) {
+OCC::SyncResult::Status determineSyncStatus(OCC::SyncResult &syncResult) {
     const auto status = syncResult.status();
 
     if (status == OCC::SyncResult::Success || status == OCC::SyncResult::Problem) {
@@ -80,15 +72,15 @@ bool SyncStatusSummary::syncing() const {
     return _isSyncing;
 }
 
-void SyncStatusSummary::onFolderListChanged(const OCC::Folder::Map &folderMap) {
+void SyncStatusSummary::onFolderListChanged(OCC::Folder::Map &folderMap) {
     connectToFoldersProgress(folderMap);
 }
 
-void SyncStatusSummary::markFolderAsError(const Folder *folder) {
+void SyncStatusSummary::markFolderAsError(Folder *folder) {
     _foldersWithErrors.insert(folder->alias());
 }
 
-void SyncStatusSummary::markFolderAsSuccess(const Folder *folder) {
+void SyncStatusSummary::markFolderAsSuccess(Folder *folder) {
     _foldersWithErrors.erase(folder->alias());
 }
 
@@ -96,7 +88,7 @@ bool SyncStatusSummary::folderErrors() const {
     return _foldersWithErrors.size() != 0;
 }
 
-bool SyncStatusSummary::folderError(const Folder *folder) const {
+bool SyncStatusSummary::folderError(Folder *folder) const {
     return _foldersWithErrors.find(folder->alias()) != _foldersWithErrors.end();
 }
 
@@ -104,7 +96,7 @@ void SyncStatusSummary::clearFolderErrors() {
     _foldersWithErrors.clear();
 }
 
-void SyncStatusSummary::setSyncStateForFolder(const Folder *folder) {
+void SyncStatusSummary::setSyncStateForFolder(Folder *folder) {
     if (_accountState && !_accountState->isConnected()) {
         setSyncing(false);
         setSyncStatusString(tr("Offline"));
@@ -160,7 +152,7 @@ void SyncStatusSummary::setSyncStateForFolder(const Folder *folder) {
     }
 }
 
-void SyncStatusSummary::onFolderSyncStateChanged(const Folder *folder) {
+void SyncStatusSummary::onFolderSyncStateChanged(Folder *folder) {
     if (!folder) {
         return;
     }
@@ -183,7 +175,7 @@ constexpr double calculateOverallPercent(
     return overallPercent / 100.0;
 }
 
-void SyncStatusSummary::onFolderProgressInfo(const ProgressInfo &progress) {
+void SyncStatusSummary::onFolderProgressInfo(ProgressInfo &progress) {
     const qint64 completedSize = progress.completedSize();
     const qint64 currentFile = progress.currentFile();
     const qint64 completedFile = progress.completedFiles();
@@ -229,7 +221,7 @@ void SyncStatusSummary::setSyncProgress(double value) {
     emit syncProgressChanged();
 }
 
-void SyncStatusSummary::setSyncStatusString(const QString &value) {
+void SyncStatusSummary::setSyncStatusString(QString &value) {
     if (_syncStatusString == value) {
         return;
     }
@@ -246,7 +238,7 @@ QString SyncStatusSummary::syncStatusDetailString() const {
     return _syncStatusDetailString;
 }
 
-void SyncStatusSummary::setSyncIcon(const QUrl &value) {
+void SyncStatusSummary::setSyncIcon(QUrl &value) {
     if (_syncIcon == value) {
         return;
     }
@@ -255,7 +247,7 @@ void SyncStatusSummary::setSyncIcon(const QUrl &value) {
     emit syncIconChanged();
 }
 
-void SyncStatusSummary::setSyncStatusDetailString(const QString &value) {
+void SyncStatusSummary::setSyncStatusDetailString(QString &value) {
     if (_syncStatusDetailString == value) {
         return;
     }
@@ -264,8 +256,8 @@ void SyncStatusSummary::setSyncStatusDetailString(const QString &value) {
     emit syncStatusDetailStringChanged();
 }
 
-void SyncStatusSummary::connectToFoldersProgress(const Folder::Map &folderMap) {
-    for (const auto &folder : folderMap) {
+void SyncStatusSummary::connectToFoldersProgress(Folder::Map &folderMap) {
+    for (auto &folder : folderMap) {
         if (folder->accountState() == _accountState.data()) {
             connect(
                 folder, &Folder::progressInfo, this, &SyncStatusSummary::onFolderProgressInfo, Qt::UniqueConnection);
@@ -305,7 +297,7 @@ void SyncStatusSummary::setAccountState(AccountStatePtr accountState) {
 
 void SyncStatusSummary::initSyncState() {
     auto syncStateFallbackNeeded = true;
-    for (const auto &folder : FolderMan::instance()->map()) {
+    for (auto &folder : FolderMan::instance()->map()) {
         onFolderSyncStateChanged(folder);
         syncStateFallbackNeeded = false;
     }

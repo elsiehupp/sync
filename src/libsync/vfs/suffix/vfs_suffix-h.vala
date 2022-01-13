@@ -16,9 +16,6 @@
 // #include <QObject>
 // #include <QScopedPointer>
 
-#include "common/vfs.h"
-#include "common/plugin.h"
-
 namespace OCC {
 
 class VfsSuffix : public Vfs {
@@ -36,25 +33,25 @@ public:
     bool socketApiPinStateActionsShown() const override { return true; }
     bool isHydrating() const override;
 
-    Result<void, QString> updateMetadata(const QString &filePath, time_t modtime, qint64 size, const QByteArray &fileId) override;
+    Result<void, QString> updateMetadata(QString &filePath, time_t modtime, qint64 size, QByteArray &fileId) override;
 
-    Result<void, QString> createPlaceholder(const SyncFileItem &item) override;
-    Result<void, QString> dehydratePlaceholder(const SyncFileItem &item) override;
-    Result<Vfs::ConvertToPlaceholderResult, QString> convertToPlaceholder(const QString &filename, const SyncFileItem &item, const QString &) override;
+    Result<void, QString> createPlaceholder(SyncFileItem &item) override;
+    Result<void, QString> dehydratePlaceholder(SyncFileItem &item) override;
+    Result<Vfs::ConvertToPlaceholderResult, QString> convertToPlaceholder(QString &filename, SyncFileItem &item, QString &) override;
 
-    bool needsMetadataUpdate(const SyncFileItem &) override { return false; }
-    bool isDehydratedPlaceholder(const QString &filePath) override;
+    bool needsMetadataUpdate(SyncFileItem &) override { return false; }
+    bool isDehydratedPlaceholder(QString &filePath) override;
     bool statTypeVirtualFile(csync_file_stat_t *stat, void *stat_data) override;
 
-    bool setPinState(const QString &folderPath, PinState state) override { return setPinStateInDb(folderPath, state); } {ptional<PinState> pinState(const QString &folderPath) override
+    bool setPinState(QString &folderPath, PinState state) override { return setPinStateInDb(folderPath, state); } {ptional<PinState> pinState(QString &folderPath) override
     { return pinStateInDb(folderPath); }
-    AvailabilityResult availability(const QString &folderPath) override;
+    AvailabilityResult availability(QString &folderPath) override;
 
 public slots:
-    void fileStatusChanged(const QString &, SyncFileStatus) override {}
+    void fileStatusChanged(QString &, SyncFileStatus) override {}
 
 protected:
-    void startImpl(const VfsSetupParams &params) override;
+    void startImpl(VfsSetupParams &params) override;
 };
 
 class SuffixVfsPluginFactory : public QObject, public DefaultPluginFactory<VfsSuffix> {

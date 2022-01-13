@@ -12,20 +12,6 @@
  * for more details.
  */
 
-#include "config.h"
-
-#include "configfile.h"
-#include "theme.h"
-#include "version.h"
-#include "common/utility.h"
-#include "common/asserts.h"
-#include "version.h"
-
-#include "creds/abstractcredentials.h"
-#include "creds/keychainchunk.h"
-
-#include "csync_exclude.h"
-
 #ifndef TOKEN_AUTH_ONLY
 // #include <QWidget>
 // #include <QHeaderView>
@@ -110,7 +96,7 @@ const char certPasswd[] = "http_certificatePasswd";
 QString ConfigFile::_confDir = QString();
 bool ConfigFile::_askedUser = false;
 
-static chrono::milliseconds millisecondsValue(const QSettings &setting, const char *key,
+static chrono::milliseconds millisecondsValue(QSettings &setting, char *key,
     chrono::milliseconds defaultValue) {
     return chrono::milliseconds(setting.value(QLatin1String(key), qlonglong(defaultValue.count())).toLongLong());
 }
@@ -155,12 +141,11 @@ ConfigFile::ConfigFile() {
 
     const QString config = configFile();
 
-
     QSettings settings(config, QSettings::IniFormat);
     settings.beginGroup(defaultConnection());
 }
 
-bool ConfigFile::setConfDir(const QString &value) {
+bool ConfigFile::setConfDir(QString &value) {
     QString dirPath = value;
     if (dirPath.isEmpty())
         return false;
@@ -278,7 +263,7 @@ void ConfigFile::restoreGeometryHeader(QHeaderView *header) {
 #endif
 }
 
-QVariant ConfigFile::getPolicySetting(const QString &setting, const QVariant &defaultValue) const {
+QVariant ConfigFile::getPolicySetting(QString &setting, QVariant &defaultValue) const {
     if (Utility::isWindows()) {
         // check for policies first and return immediately if a value is found.
         QSettings userPolicy(QString::fromLatin1(R"(HKEY_CURRENT_USER\Software\Policies\%1\%2)")
@@ -427,7 +412,7 @@ QString ConfigFile::defaultConnection() const {
     return Theme::instance()->appName();
 }
 
-void ConfigFile::storeData(const QString &group, const QString &key, const QVariant &value) {
+void ConfigFile::storeData(QString &group, QString &key, QVariant &value) {
     const QString con(group.isEmpty() ? defaultConnection() : group);
     QSettings settings(configFile(), QSettings::IniFormat);
 
@@ -436,7 +421,7 @@ void ConfigFile::storeData(const QString &group, const QString &key, const QVari
     settings.sync();
 }
 
-QVariant ConfigFile::retrieveData(const QString &group, const QString &key) const {
+QVariant ConfigFile::retrieveData(QString &group, QString &key) const {
     const QString con(group.isEmpty() ? defaultConnection() : group);
     QSettings settings(configFile(), QSettings::IniFormat);
 
@@ -444,7 +429,7 @@ QVariant ConfigFile::retrieveData(const QString &group, const QString &key) cons
     return settings.value(key);
 }
 
-void ConfigFile::removeData(const QString &group, const QString &key) {
+void ConfigFile::removeData(QString &group, QString &key) {
     const QString con(group.isEmpty() ? defaultConnection() : group);
     QSettings settings(configFile(), QSettings::IniFormat);
 
@@ -452,7 +437,7 @@ void ConfigFile::removeData(const QString &group, const QString &key) {
     settings.remove(key);
 }
 
-bool ConfigFile::dataExists(const QString &group, const QString &key) const {
+bool ConfigFile::dataExists(QString &group, QString &key) const {
     const QString con(group.isEmpty() ? defaultConnection() : group);
     QSettings settings(configFile(), QSettings::IniFormat);
 
@@ -460,7 +445,7 @@ bool ConfigFile::dataExists(const QString &group, const QString &key) const {
     return settings.contains(key);
 }
 
-chrono::milliseconds ConfigFile::remotePollInterval(const QString &connection) const {
+chrono::milliseconds ConfigFile::remotePollInterval(QString &connection) const {
     QString con(connection);
     if (connection.isEmpty())
         con = defaultConnection();
@@ -477,7 +462,7 @@ chrono::milliseconds ConfigFile::remotePollInterval(const QString &connection) c
     return remoteInterval;
 }
 
-void ConfigFile::setRemotePollInterval(chrono::milliseconds interval, const QString &connection) {
+void ConfigFile::setRemotePollInterval(chrono::milliseconds interval, QString &connection) {
     QString con(connection);
     if (connection.isEmpty())
         con = defaultConnection();
@@ -492,7 +477,7 @@ void ConfigFile::setRemotePollInterval(chrono::milliseconds interval, const QStr
     settings.sync();
 }
 
-chrono::milliseconds ConfigFile::forceSyncInterval(const QString &connection) const {
+chrono::milliseconds ConfigFile::forceSyncInterval(QString &connection) const {
     auto pollInterval = remotePollInterval(connection);
 
     QString con(connection);
@@ -516,7 +501,7 @@ chrono::milliseconds OCC::ConfigFile::fullLocalDiscoveryInterval() const {
     return millisecondsValue(settings, fullLocalDiscoveryIntervalC, chrono::hours(1));
 }
 
-chrono::milliseconds ConfigFile::notificationRefreshInterval(const QString &connection) const {
+chrono::milliseconds ConfigFile::notificationRefreshInterval(QString &connection) const {
     QString con(connection);
     if (connection.isEmpty())
         con = defaultConnection();
@@ -532,7 +517,7 @@ chrono::milliseconds ConfigFile::notificationRefreshInterval(const QString &conn
     return interval;
 }
 
-chrono::milliseconds ConfigFile::updateCheckInterval(const QString &connection) const {
+chrono::milliseconds ConfigFile::updateCheckInterval(QString &connection) const {
     QString con(connection);
     if (connection.isEmpty())
         con = defaultConnection();
@@ -550,7 +535,7 @@ chrono::milliseconds ConfigFile::updateCheckInterval(const QString &connection) 
     return interval;
 }
 
-bool ConfigFile::skipUpdateCheck(const QString &connection) const {
+bool ConfigFile::skipUpdateCheck(QString &connection) const {
     QString con(connection);
     if (connection.isEmpty())
         con = defaultConnection();
@@ -562,7 +547,7 @@ bool ConfigFile::skipUpdateCheck(const QString &connection) const {
     return value.toBool();
 }
 
-void ConfigFile::setSkipUpdateCheck(bool skip, const QString &connection) {
+void ConfigFile::setSkipUpdateCheck(bool skip, QString &connection) {
     QString con(connection);
     if (connection.isEmpty())
         con = defaultConnection();
@@ -574,7 +559,7 @@ void ConfigFile::setSkipUpdateCheck(bool skip, const QString &connection) {
     settings.sync();
 }
 
-bool ConfigFile::autoUpdateCheck(const QString &connection) const {
+bool ConfigFile::autoUpdateCheck(QString &connection) const {
     QString con(connection);
     if (connection.isEmpty())
         con = defaultConnection();
@@ -586,7 +571,7 @@ bool ConfigFile::autoUpdateCheck(const QString &connection) const {
     return value.toBool();
 }
 
-void ConfigFile::setAutoUpdateCheck(bool autoCheck, const QString &connection) {
+void ConfigFile::setAutoUpdateCheck(bool autoCheck, QString &connection) {
     QString con(connection);
     if (connection.isEmpty())
         con = defaultConnection();
@@ -627,7 +612,7 @@ QString ConfigFile::updateChannel() const {
     return settings.value(QLatin1String(updateChannelC), defaultUpdateChannel).toString();
 }
 
-void ConfigFile::setUpdateChannel(const QString &channel) {
+void ConfigFile::setUpdateChannel(QString &channel) {
     QSettings settings(configFile(), QSettings::IniFormat);
     settings.setValue(QLatin1String(updateChannelC), channel);
 }
@@ -666,7 +651,7 @@ void ConfigFile::setProxyType(int proxyType,
     settings.sync();
 }
 
-QVariant ConfigFile::getValue(const QString &param, const QString &group,
+QVariant ConfigFile::getValue(QString &param, QString &group,
     const QVariant &defaultValue) const {
     QVariant systemSetting;
     if (Utility::isMac()) {
@@ -698,7 +683,7 @@ QVariant ConfigFile::getValue(const QString &param, const QString &group,
     return settings.value(param, systemSetting);
 }
 
-void ConfigFile::setValue(const QString &key, const QVariant &value) {
+void ConfigFile::setValue(QString &key, QVariant &value) {
     QSettings settings(configFile(), QSettings::IniFormat);
 
     settings.setValue(key, value);
@@ -880,7 +865,7 @@ QString ConfigFile::logDir() const {
     return settings.value(QLatin1String(logDirC), defaultLogDir).toString();
 }
 
-void ConfigFile::setLogDir(const QString &dir) {
+void ConfigFile::setLogDir(QString &dir) {
     QSettings settings(configFile(), QSettings::IniFormat);
     settings.setValue(QLatin1String(logDirC), dir);
 }
@@ -924,7 +909,7 @@ QString ConfigFile::certificatePath() const {
     return retrieveData(QString(), QLatin1String(certPath)).toString();
 }
 
-void ConfigFile::setCertificatePath(const QString &cPath) {
+void ConfigFile::setCertificatePath(QString &cPath) {
     QSettings settings(configFile(), QSettings::IniFormat);
     settings.setValue(QLatin1String(certPath), cPath);
     settings.sync();
@@ -934,7 +919,7 @@ QString ConfigFile::certificatePasswd() const {
     return retrieveData(QString(), QLatin1String(certPasswd)).toString();
 }
 
-void ConfigFile::setCertificatePasswd(const QString &cPasswd) {
+void ConfigFile::setCertificatePasswd(QString &cPasswd) {
     QSettings settings(configFile(), QSettings::IniFormat);
     settings.setValue(QLatin1String(certPasswd), cPasswd);
     settings.sync();
@@ -945,14 +930,14 @@ QString ConfigFile::clientVersionString() const {
     return settings.value(QLatin1String(clientVersionC), QString()).toString();
 }
 
-void ConfigFile::setClientVersionString(const QString &version) {
+void ConfigFile::setClientVersionString(QString &version) {
     QSettings settings(configFile(), QSettings::IniFormat);
     settings.setValue(QLatin1String(clientVersionC), version);
 }
 
 Q_GLOBAL_STATIC(QString, g_configFileName)
 
-std::unique_ptr<QSettings> ConfigFile::settingsWithGroup(const QString &group, QObject *parent) {
+std::unique_ptr<QSettings> ConfigFile::settingsWithGroup(QString &group, QObject *parent) {
     if (g_configFileName()->isEmpty()) {
         // cache file name
         ConfigFile cfg;

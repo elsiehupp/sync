@@ -12,7 +12,6 @@
  * for more details.
  */
 
-
 // #include <QWidget>
 // #include <QPointer>
 
@@ -49,7 +48,7 @@ private slots:
     void slotShowLegalNotice();
 #if defined(BUILD_UPDATER)
     void slotUpdateInfo();
-    void slotUpdateChannelChanged(const QString &channel);
+    void slotUpdateChannelChanged(QString &channel);
     void slotUpdateCheckNow();
     void slotToggleAutoUpdateCheck();
 #endif
@@ -61,7 +60,6 @@ private:
     QPointer<IgnoreListEditor> _ignoreEditor;
     bool _currentlyLoading = false;
 };
-
 
 } // namespace OCC
 #endif // MIRALL_GENERALSETTINGS_H

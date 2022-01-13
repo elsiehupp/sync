@@ -6,7 +6,6 @@
  */
 
 // #include <QtTest>
-#include "syncenginetestutils.h"
 // #include <syncengine.h>
 
 using namespace OCC;
@@ -15,7 +14,7 @@ class FakeAsyncReply : public FakeReply {
     QByteArray _pollLocation;
 
 public:
-    FakeAsyncReply(const QByteArray &pollLocation, QNetworkAccessManager::Operation op, const QNetworkRequest &request, QObject *parent)
+    FakeAsyncReply(QByteArray &pollLocation, QNetworkAccessManager::Operation op, QNetworkRequest &request, QObject *parent)
         : FakeReply { parent }
         , _pollLocation(pollLocation) {
         setRequest(request);
@@ -37,7 +36,6 @@ public:
     qint64 readData(char *, qint64) override { return 0; }
 };
 
-
 class TestAsyncOp : public QObject {
 
 private slots:
@@ -58,13 +56,13 @@ private slots:
         // The testcase consist of the `pollRequest` which will be called when the sync engine
         // calls the poll url.
         struct TestCase {
-            using PollRequest_t = std::function<QNetworkReply *(TestCase *, const QNetworkRequest &request)>;
+            using PollRequest_t = std::function<QNetworkReply *(TestCase *, QNetworkRequest &request)>;
             PollRequest_t pollRequest;
             std::function<FileInfo *()> perform = nullptr;
         };
         QHash<QString, TestCase> testCases;
 
-        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, const QNetworkRequest &request, QIODevice *outgoingData) -> QNetworkReply * {
+        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, QNetworkRequest &request, QIODevice *outgoingData) -> QNetworkReply * {
             auto path = request.url().path();
 
             if (op == QNetworkAccessManager::GetOperation && path.startsWith("/async-poll/")) {
@@ -100,30 +98,29 @@ private slots:
             return nullptr;
         });
 
-
         // Callback to be used to finalize the transaction and return the success
-        auto successCallback = [](TestCase *tc, const QNetworkRequest &request) {
-            tc->pollRequest = [](TestCase *, const QNetworkRequest &) -> QNetworkReply * { std::abort(); }; // shall no longer be called
+        auto successCallback = [](TestCase *tc, QNetworkRequest &request) {
+            tc->pollRequest = [](TestCase *, QNetworkRequest &) -> QNetworkReply * { std::abort(); }; // shall no longer be called
             FileInfo *info = tc->perform();
             QByteArray body = R"({ "status":"finished", "ETag":"\")" + info->etag + R"(\"", "fileId":")" + info->fileId + "\"}\n";
             return new FakePayloadReply(QNetworkAccessManager::GetOperation, request, body, nullptr);
         };
         // Callback that never finishes
-        auto waitForeverCallback = [](TestCase *, const QNetworkRequest &request) {
+        auto waitForeverCallback = [](TestCase *, QNetworkRequest &request) {
             QByteArray body = "{\"status\":\"started\"}\n";
             return new FakePayloadReply(QNetworkAccessManager::GetOperation, request, body, nullptr);
         };
         // Callback that simulate an error.
-        auto errorCallback = [](TestCase *tc, const QNetworkRequest &request) {
-            tc->pollRequest = [](TestCase *, const QNetworkRequest &) -> QNetworkReply * { std::abort(); }; // shall no longer be called;
+        auto errorCallback = [](TestCase *tc, QNetworkRequest &request) {
+            tc->pollRequest = [](TestCase *, QNetworkRequest &) -> QNetworkReply * { std::abort(); }; // shall no longer be called;
             QByteArray body = "{\"status\":\"error\",\"errorCode\":500,\"errorMessage\":\"TestingErrors\"}\n";
             return new FakePayloadReply(QNetworkAccessManager::GetOperation, request, body, nullptr);
         };
         // This lambda takes another functor as a parameter, and returns a callback that will
         // tell the client needs to poll again, and further call to the poll url will call the
         // given callback
-        auto waitAndChain = [](const TestCase::PollRequest_t &chain) {
-            return [chain](TestCase *tc, const QNetworkRequest &request) {
+        auto waitAndChain = [](TestCase::PollRequest_t &chain) {
+            return [chain](TestCase *tc, QNetworkRequest &request) {
                 tc->pollRequest = chain;
                 QByteArray body = "{\"status\":\"started\"}\n";
                 return new FakePayloadReply(QNetworkAccessManager::GetOperation, request, body, nullptr);
@@ -131,7 +128,7 @@ private slots:
         };
 
         // Create a testcase by creating a file of a given size locally and assigning it a callback
-        auto insertFile = [&](const QString &file, qint64 size, TestCase::PollRequest_t cb) {
+        auto insertFile = [&](QString &file, qint64 size, TestCase::PollRequest_t cb) {
             fakeFolder.localModifier().insert(file, size);
             testCases[file] = { std::move(cb) };
         };
@@ -164,7 +161,7 @@ private slots:
         insertFile("waiting/small", 300, waitForeverCallback);
         insertFile("waiting/willNotConflict", 300, waitForeverCallback);
         insertFile("waiting/big", options._maxChunkSize * 3,
-            waitAndChain(waitAndChain([&](TestCase *tc, const QNetworkRequest &request) {
+            waitAndChain(waitAndChain([&](TestCase *tc, QNetworkRequest &request) {
                 QTimer::singleShot(0, &fakeFolder.syncEngine(), &SyncEngine::abort);
                 return waitAndChain(waitForeverCallback)(tc, request);
             })));
@@ -181,7 +178,7 @@ private slots:
         testCases["waiting/small"].pollRequest = waitAndChain(waitAndChain(successCallback));
         testCases["waiting/big"].pollRequest = waitAndChain(successCallback);
         testCases["waiting/willNotConflict"].pollRequest =
-            [&fakeFolder, &successCallback](TestCase *tc, const QNetworkRequest &request) {
+            [&fakeFolder, &successCallback](TestCase *tc, QNetworkRequest &request) {
                 auto &remoteModifier = fakeFolder.remoteModifier(); // successCallback destroys the capture
                 auto reply = successCallback(tc, request);
                 // This is going to succeed, and after we just change the file.
@@ -191,11 +188,10 @@ private slots:
                 return reply;
             };
 
-
         int nPUT = 0;
         int nMOVE = 0;
         int nDELETE = 0;
-        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, const QNetworkRequest &request, QIODevice *) -> QNetworkReply * {
+        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, QNetworkRequest &request, QIODevice *) -> QNetworkReply * {
             auto path = request.url().path();
             if (op == QNetworkAccessManager::GetOperation && path.startsWith("/async-poll/")) {
                 auto file = path.mid(sizeof("/async-poll/") - 1);

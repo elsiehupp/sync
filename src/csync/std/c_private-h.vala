@@ -20,11 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-
-#include "config_csync.h"
-
 /* cross platform defines */
-#include "config_csync.h"
 // #include <sys/types.h>
 // #include <sys/stat.h>
 
@@ -69,7 +65,6 @@
 #else
 // #include <fcntl.h>
 #endif
-
 
 #ifdef _WIN32
 using csync_stat_t = struct stat64;

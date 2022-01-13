@@ -13,23 +13,6 @@
  * for more details.
  */
 
-#include "owncloudpropagator.h"
-#include "common/syncjournaldb.h"
-#include "common/syncjournalfilerecord.h"
-#include "propagatedownload.h"
-#include "propagateupload.h"
-#include "propagateremotedelete.h"
-#include "propagateremotemove.h"
-#include "propagateremotemkdir.h"
-#include "bulkpropagatorjob.h"
-#include "propagatorjobs.h"
-#include "filesystem.h"
-#include "common/utility.h"
-#include "account.h"
-#include "common/asserts.h"
-#include "discoveryphase.h"
-#include "syncfileitem.h"
-
 #ifdef Q_OS_WIN
 // #include <windef.h>
 // #include <winbase.h>
@@ -78,7 +61,6 @@ qint64 freeSpaceLimit() {
 
 OwncloudPropagator::~OwncloudPropagator() = default;
 
-
 int OwncloudPropagator::maximumActiveTransferJob() {
     if (_downloadLimit != 0
         || _uploadLimit != 0
@@ -122,7 +104,7 @@ static qint64 getMaxBlacklistTime() {
  * The old entry may be invalid, then a fresh entry is created.
  */
 static SyncJournalErrorBlacklistRecord createBlacklistEntry(
-    const SyncJournalErrorBlacklistRecord &old, const SyncFileItem &item) {
+    const SyncJournalErrorBlacklistRecord &old, SyncFileItem &item) {
     SyncJournalErrorBlacklistRecord entry;
     entry._file = item._file;
     entry._errorString = item._errorString;
@@ -211,7 +193,7 @@ void blacklistUpdate(SyncJournalDb *journal, SyncFileItem &item) {
     }
 }
 
-void PropagateItemJob::done(SyncFileItem::Status statusArg, const QString &errorString) {
+void PropagateItemJob::done(SyncFileItem::Status statusArg, QString &errorString) {
     // Duplicate calls to done() are a logic error
     ENFORCE(_state != Finished);
     _state = Finished;
@@ -319,7 +301,7 @@ bool PropagateItemJob::hasEncryptedAncestor() const {
 
 // ================================================================================
 
-PropagateItemJob *OwncloudPropagator::createJob(const SyncFileItemPtr &item) {
+PropagateItemJob *OwncloudPropagator::createJob(SyncFileItemPtr &item) {
     bool deleteExisting = item->_instruction == CSYNC_INSTRUCTION_TYPE_CHANGE;
     switch (item->_instruction) {
     case CSYNC_INSTRUCTION_REMOVE:
@@ -437,7 +419,7 @@ void OwncloudPropagator::start(SyncFileItemVector &&items) {
     QVector<PropagatorJob *> directoriesToRemove;
     QString removedDirectory;
     QString maybeConflictDirectory;
-    foreach (const SyncFileItemPtr &item, items) {
+    foreach (SyncFileItemPtr &item, items) {
         if (!removedDirectory.isEmpty() && item->_file.startsWith(removedDirectory)) {
             // this is an item in a directory which is going to be removed.
             auto *delDirJob = qobject_cast<PropagateDirectory *>(directoriesToRemove.first());
@@ -510,7 +492,7 @@ void OwncloudPropagator::start(SyncFileItemVector &&items) {
     scheduleNextJob();
 }
 
-void OwncloudPropagator::startDirectoryPropagation(const SyncFileItemPtr &item,
+void OwncloudPropagator::startDirectoryPropagation(SyncFileItemPtr &item,
                                                    QStack<QPair<QString, PropagateDirectory *>> &directories,
                                                    QVector<PropagatorJob *> &directoriesToRemove,
                                                    QString &removedDirectory,
@@ -524,7 +506,7 @@ void OwncloudPropagator::startDirectoryPropagation(const SyncFileItemPtr &item,
         // checkForPermissions() has already run and used the permissions
         // of the file we're about to delete to decide whether uploading
         // to the new dir is ok...
-        foreach (const SyncFileItemPtr &dirItem, items) {
+        foreach (SyncFileItemPtr &dirItem, items) {
             if (dirItem->destination().startsWith(item->destination() + "/")) {
                 dirItem->_instruction = CSYNC_INSTRUCTION_NONE;
                 _anotherSyncNeeded = true;
@@ -554,7 +536,7 @@ void OwncloudPropagator::startDirectoryPropagation(const SyncFileItemPtr &item,
     directories.push(qMakePair(item->destination() + "/", directoryPropagationJob.release()));
 }
 
-void OwncloudPropagator::startFilePropagation(const SyncFileItemPtr &item,
+void OwncloudPropagator::startFilePropagation(SyncFileItemPtr &item,
                                               QStack<QPair<QString, PropagateDirectory *> > &directories,
                                               QVector<PropagatorJob *> &directoriesToRemove,
                                               QString &removedDirectory,
@@ -581,12 +563,12 @@ const SyncOptions &OwncloudPropagator::syncOptions() const {
     return _syncOptions;
 }
 
-void OwncloudPropagator::setSyncOptions(const SyncOptions &syncOptions) {
+void OwncloudPropagator::setSyncOptions(SyncOptions &syncOptions) {
     _syncOptions = syncOptions;
     _chunkSize = syncOptions._initialChunkSize;
 }
 
-bool OwncloudPropagator::localFileNameClash(const QString &relFile) {
+bool OwncloudPropagator::localFileNameClash(QString &relFile) {
     const QString file(_localDir + relFile);
     Q_ASSERT(!file.isEmpty());
 
@@ -634,7 +616,7 @@ bool OwncloudPropagator::localFileNameClash(const QString &relFile) {
     return false;
 }
 
-bool OwncloudPropagator::hasCaseClashAccessibilityProblem(const QString &relfile) {
+bool OwncloudPropagator::hasCaseClashAccessibilityProblem(QString &relfile) {
 #ifdef Q_OS_WIN
     bool result = false;
     const QString file(_localDir + relfile);
@@ -663,7 +645,7 @@ bool OwncloudPropagator::hasCaseClashAccessibilityProblem(const QString &relfile
 #endif
 }
 
-QString OwncloudPropagator::fullLocalPath(const QString &tmp_file_name) const {
+QString OwncloudPropagator::fullLocalPath(QString &tmp_file_name) const {
     return _localDir + tmp_file_name;
 }
 
@@ -709,7 +691,7 @@ void OwncloudPropagator::scheduleNextJobImpl() {
     }
 }
 
-void OwncloudPropagator::reportProgress(const SyncFileItem &item, qint64 bytes) {
+void OwncloudPropagator::reportProgress(SyncFileItem &item, qint64 bytes) {
     emit progress(item, bytes);
 }
 
@@ -734,7 +716,7 @@ OwncloudPropagator::DiskSpaceResult OwncloudPropagator::diskSpaceCheck() const {
     return DiskSpaceOk;
 }
 
-bool OwncloudPropagator::createConflict(const SyncFileItemPtr &item,
+bool OwncloudPropagator::createConflict(SyncFileItemPtr &item,
     PropagatorCompositeJob *composite, QString *error) {
     QString fn = fullLocalPath(item->_file);
 
@@ -806,15 +788,15 @@ bool OwncloudPropagator::createConflict(const SyncFileItemPtr &item,
     return true;
 }
 
-QString OwncloudPropagator::adjustRenamedPath(const QString &original) const {
+QString OwncloudPropagator::adjustRenamedPath(QString &original) const {
     return OCC::adjustRenamedPath(_renamedDirectories, original);
 }
 
-Result<Vfs::ConvertToPlaceholderResult, QString> OwncloudPropagator::updateMetadata(const SyncFileItem &item) {
+Result<Vfs::ConvertToPlaceholderResult, QString> OwncloudPropagator::updateMetadata(SyncFileItem &item) {
     return OwncloudPropagator::staticUpdateMetadata(item, _localDir, syncOptions()._vfs.data(), _journal);
 }
 
-Result<Vfs::ConvertToPlaceholderResult, QString> OwncloudPropagator::staticUpdateMetadata(const SyncFileItem &item, const QString localDir,
+Result<Vfs::ConvertToPlaceholderResult, QString> OwncloudPropagator::staticUpdateMetadata(SyncFileItem &item, QString localDir,
                                                                                           Vfs *vfs, SyncJournalDb *const journal) {
     const QString fsPath = localDir + item.destination();
     const auto result = vfs->convertToPlaceholder(fsPath, item);
@@ -831,7 +813,7 @@ Result<Vfs::ConvertToPlaceholderResult, QString> OwncloudPropagator::staticUpdat
     return Vfs::ConvertToPlaceholderResult::Ok;
 }
 
-bool OwncloudPropagator::isDelayedUploadItem(const SyncFileItemPtr &item) const {
+bool OwncloudPropagator::isDelayedUploadItem(SyncFileItemPtr &item) const {
     return account()->capabilities().bulkUpload() && !_scheduleDelayedTasks && !item->_isEncrypted && _syncOptions._minChunkSize > item->_size && !isInBulkUploadBlackList(item->_file);
 }
 
@@ -843,17 +825,17 @@ void OwncloudPropagator::clearDelayedTasks() {
     _delayedTasks.clear();
 }
 
-void OwncloudPropagator::addToBulkUploadBlackList(const QString &file) {
+void OwncloudPropagator::addToBulkUploadBlackList(QString &file) {
     qCDebug(lcPropagator) << "black list for bulk upload" << file;
     _bulkUploadBlackList.insert(file);
 }
 
-void OwncloudPropagator::removeFromBulkUploadBlackList(const QString &file) {
+void OwncloudPropagator::removeFromBulkUploadBlackList(QString &file) {
     qCDebug(lcPropagator) << "black list for bulk upload" << file;
     _bulkUploadBlackList.remove(file);
 }
 
-bool OwncloudPropagator::isInBulkUploadBlackList(const QString &file) const {
+bool OwncloudPropagator::isInBulkUploadBlackList(QString &file) const {
     return _bulkUploadBlackList.contains(file);
 }
 
@@ -999,7 +981,7 @@ qint64 PropagatorCompositeJob::committedDiskSpace() const {
 
 // ================================================================================
 
-PropagateDirectory::PropagateDirectory(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
+PropagateDirectory::PropagateDirectory(OwncloudPropagator *propagator, SyncFileItemPtr &item)
     : PropagatorJob(propagator)
     , _item(item)
     , _firstJob(propagator->createJob(item))
@@ -1021,7 +1003,6 @@ PropagatorJob::JobParallelism PropagateDirectory::parallelism() {
     }
     return FullParallelism;
 }
-
 
 bool PropagateDirectory::scheduleSelfOrChild() {
     if (_state == Finished) {
@@ -1259,7 +1240,7 @@ void CleanupPollsJob::slotPollFinished() {
     start();
 }
 
-QString OwncloudPropagator::fullRemotePath(const QString &tmp_file_name) const {
+QString OwncloudPropagator::fullRemotePath(QString &tmp_file_name) const {
     // TODO: should this be part of the _item (SyncFileItemPtr)?
     return _remoteFolder + tmp_file_name;
 }

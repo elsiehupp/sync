@@ -20,12 +20,6 @@
 // #include <QNetworkProxyFactory>
 // #include <QXmlStreamReader>
 
-#include "connectionvalidator.h"
-#include "account.h"
-#include "accountstate.h"
-#include "userinfo.h"
-#include "networkjobs.h"
-#include "clientproxy.h"
 // #include <creds/abstractcredentials.h>
 
 namespace OCC {
@@ -66,7 +60,7 @@ void ConnectionValidator::checkServerAndAuth() {
     }
 }
 
-void ConnectionValidator::systemProxyLookupDone(const QNetworkProxy &proxy) {
+void ConnectionValidator::systemProxyLookupDone(QNetworkProxy &proxy) {
     if (!_account) {
         qCWarning(lcConnectionValidator) << "Bailing out, Account had been deleted";
         return;
@@ -93,7 +87,7 @@ void ConnectionValidator::slotCheckServerAndAuth() {
     checkJob->start();
 }
 
-void ConnectionValidator::slotStatusFound(const QUrl &url, const QJsonObject &info) {
+void ConnectionValidator::slotStatusFound(QUrl &url, QJsonObject &info) {
     // Newer servers don't disclose any version in status.php anymore
     // https://github.com/owncloud/core/pull/27473/files
     // so this string can be empty.
@@ -146,13 +140,12 @@ void ConnectionValidator::slotNoStatusFound(QNetworkReply *reply) {
     reportResult(StatusNotFound);
 }
 
-void ConnectionValidator::slotJobTimeout(const QUrl &url) {
+void ConnectionValidator::slotJobTimeout(QUrl &url) {
     Q_UNUSED(url);
     //_errors.append(tr("Unable to connect to %1").arg(url.toString()));
     _errors.append(tr("Timeout"));
     reportResult(Timeout);
 }
-
 
 void ConnectionValidator::checkAuthentication() {
     AbstractCredentials *creds = _account->credentials();
@@ -218,7 +211,7 @@ void ConnectionValidator::checkServerCapabilities() {
     job->start();
 }
 
-void ConnectionValidator::slotCapabilitiesRecieved(const QJsonDocument &json) {
+void ConnectionValidator::slotCapabilitiesRecieved(QJsonDocument &json) {
     auto caps = json.object().value("ocs").toObject().value("data").toObject().value("capabilities").toObject();
     qCInfo(lcConnectionValidator) << "Server capabilities" << caps;
     _account->setCapabilities(caps.toVariantMap());
@@ -243,7 +236,7 @@ void ConnectionValidator::fetchUser() {
     userInfo->setActive(true);
 }
 
-bool ConnectionValidator::setAndCheckServerVersion(const QString &version) {
+bool ConnectionValidator::setAndCheckServerVersion(QString &version) {
     qCInfo(lcConnectionValidator) << _account->url() << "has server version" << version;
     _account->setServerVersion(version);
 

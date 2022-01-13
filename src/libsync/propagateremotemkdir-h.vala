@@ -13,9 +13,6 @@
  */
 // #pragma once
 
-#include "owncloudpropagator.h"
-#include "networkjobs.h"
-
 namespace OCC {
 
 class PropagateUploadEncrypted;
@@ -30,7 +27,7 @@ class PropagateRemoteMkdir : public PropagateItemJob {
     PropagateUploadEncrypted *_uploadEncryptedHelper;
     friend class PropagateDirectory; // So it can access the _item;
 public:
-    PropagateRemoteMkdir(OwncloudPropagator *propagator, const SyncFileItemPtr &item);
+    PropagateRemoteMkdir(OwncloudPropagator *propagator, SyncFileItemPtr &item);
 
     void start() override;
     void abort(PropagatorJob::AbortType abortType) override;
@@ -49,12 +46,12 @@ public:
 private slots:
     void slotMkdir();
     void slotStartMkcolJob();
-    void slotStartEncryptedMkcolJob(const QString &path, const QString &filename, quint64 size);
+    void slotStartEncryptedMkcolJob(QString &path, QString &filename, quint64 size);
     void slotMkcolJobFinished();
     void slotEncryptFolderFinished();
     void success();
 
 private:
-    void finalizeMkColJob(QNetworkReply::NetworkError err, const QString &jobHttpReasonPhraseString, const QString &jobPath);
+    void finalizeMkColJob(QNetworkReply::NetworkError err, QString &jobHttpReasonPhraseString, QString &jobPath);
 };
 }

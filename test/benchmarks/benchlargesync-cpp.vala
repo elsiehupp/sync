@@ -5,7 +5,6 @@
  *
  */
 
-#include "syncenginetestutils.h"
 // #include <syncengine.h>
 
 using namespace OCC;
@@ -14,7 +13,7 @@ int numDirs = 0;
 int numFiles = 0;
 
 template<int filesPerDir, int dirPerDir, int maxDepth>
-void addBunchOfFiles(int depth, const QString &path, FileModifier &fi) {
+void addBunchOfFiles(int depth, QString &path, FileModifier &fi) {
     for (int fileNum = 1; fileNum <= filesPerDir; ++fileNum) {
         QString name = QStringLiteral("file") + QString::number(fileNum);
         fi.insert(path.isEmpty() ? name : path + "/" + name);

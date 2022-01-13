@@ -16,14 +16,8 @@
 // #include <QNetworkReply>
 // #include <QTimer>
 // #include <QBuffer>
-#include "account.h"
-#include "creds/oauth.h"
 // #include <QJsonObject>
 // #include <QJsonDocument>
-#include "theme.h"
-#include "networkjobs.h"
-#include "creds/httpcredentials.h"
-#include "guiutility.h"
 
 namespace OCC {
 
@@ -31,7 +25,7 @@ Q_LOGGING_CATEGORY(lcOauth, "nextcloud.sync.credentials.oauth", QtInfoMsg)
 
 OAuth::~OAuth() = default;
 
-static void httpReplyAndClose(QTcpSocket *socket, const char *code, const char *html,
+static void httpReplyAndClose(QTcpSocket *socket, char *code, char *html,
     const char *moreHeaders = nullptr) {
     if (!socket)
         return; // socket can have been deleted if the browser was closed

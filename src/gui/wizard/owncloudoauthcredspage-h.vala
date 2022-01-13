@@ -20,15 +20,7 @@
 // #include <QUrl>
 // #include <QPointer>
 
-#include "wizard/abstractcredswizardpage.h"
-#include "accountfwd.h"
-#include "creds/oauth.h"
-
-#include "ui_owncloudoauthcredspage.h"
-
-
 namespace OCC {
-
 
 class OwncloudOAuthCredsPage : public AbstractCredentialsWizardPage {
 public:
@@ -43,11 +35,11 @@ public:
     bool isComplete() const override;
 
 public Q_SLOTS:
-    void asyncAuthResult(OAuth::Result, const QString &user, const QString &token,
+    void asyncAuthResult(OAuth::Result, QString &user, QString &token,
         const QString &reniewToken);
 
 signals:
-    void connectToOCUrl(const QString &);
+    void connectToOCUrl(QString &);
 
 public:
     QString _user;

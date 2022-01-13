@@ -1,4 +1,3 @@
-#include "webview.h"
 
 // #include <QWebEnginePage>
 // #include <QWebEngineProfile>
@@ -16,13 +15,9 @@
 // #include <QWebEngineCertificateError>
 // #include <QMessageBox>
 
-#include "guiutility.h"
-#include "common/utility.h"
-
 namespace OCC {
 
 Q_LOGGING_CATEGORY(lcWizardWebiew, "nextcloud.gui.wizard.webview", QtInfoMsg)
-
 
 class WebViewPageUrlRequestInterceptor : public QWebEngineUrlRequestInterceptor {
 public:
@@ -43,12 +38,12 @@ class WebEnginePage : public QWebEnginePage {
 public:
     WebEnginePage(QWebEngineProfile *profile, QObject* parent = nullptr);
     QWebEnginePage * createWindow(QWebEnginePage::WebWindowType type) override;
-    void setUrl(const QUrl &url);
+    void setUrl(QUrl &url);
 
 protected:
-    bool certificateError(const QWebEngineCertificateError &certificateError) override;
+    bool certificateError(QWebEngineCertificateError &certificateError) override;
 
-    bool acceptNavigationRequest(const QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame) override;
+    bool acceptNavigationRequest(QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame) override;
 
 private:
     bool _enforceHttps = false;
@@ -59,7 +54,7 @@ private:
 class ExternalWebEnginePage : public QWebEnginePage {
 public:
     ExternalWebEnginePage(QWebEngineProfile *profile, QObject* parent = nullptr);
-    bool acceptNavigationRequest(const QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame) override;
+    bool acceptNavigationRequest(QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame) override;
 };
 
 WebView::WebView(QWidget *parent)
@@ -105,7 +100,7 @@ WebView::WebView(QWidget *parent)
     connect(_schemeHandler, &WebViewPageUrlSchemeHandler::urlCatched, this, &WebView::urlCatched);
 }
 
-void WebView::setUrl(const QUrl &url) {
+void WebView::setUrl(QUrl &url) {
     _page->setUrl(url);
 }
 
@@ -172,7 +167,6 @@ void WebViewPageUrlSchemeHandler::requestStarted(QWebEngineUrlRequestJob *reques
     emit urlCatched(user, password, server);
 }
 
-
 WebEnginePage::WebEnginePage(QWebEngineProfile *profile, QObject* parent) : QWebEnginePage(profile, parent) {
 
 }
@@ -183,12 +177,12 @@ QWebEnginePage * WebEnginePage::createWindow(QWebEnginePage::WebWindowType type)
     return view;
 }
 
-void WebEnginePage::setUrl(const QUrl &url) {
+void WebEnginePage::setUrl(QUrl &url) {
     QWebEnginePage::setUrl(url);
     _enforceHttps = url.scheme() == QStringLiteral("https");
 }
 
-bool WebEnginePage::certificateError(const QWebEngineCertificateError &certificateError) {
+bool WebEnginePage::certificateError(QWebEngineCertificateError &certificateError) {
     /**
      * TODO properly improve this.
      * The certificate should be displayed.
@@ -208,7 +202,7 @@ bool WebEnginePage::certificateError(const QWebEngineCertificateError &certifica
     return ret == QMessageBox::Yes;
 }
 
-bool WebEnginePage::acceptNavigationRequest(const QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame) {
+bool WebEnginePage::acceptNavigationRequest(QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame) {
     Q_UNUSED(type);
     Q_UNUSED(isMainFrame);
 
@@ -223,8 +217,7 @@ ExternalWebEnginePage::ExternalWebEnginePage(QWebEngineProfile *profile, QObject
 
 }
 
-
-bool ExternalWebEnginePage::acceptNavigationRequest(const QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame) {
+bool ExternalWebEnginePage::acceptNavigationRequest(QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame) {
     Q_UNUSED(type);
     Q_UNUSED(isMainFrame);
     Utility::openBrowser(url);

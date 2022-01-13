@@ -19,12 +19,7 @@
 // #include <QNetworkReply>
 // #include <QTimer>
 // #include <QBuffer>
-#include "creds/httpcredentialsgui.h"
-#include "theme.h"
-#include "account.h"
-#include "networkjobs.h"
 // #include <QMessageBox>
-#include "common/asserts.h"
 
 using namespace QKeychain;
 
@@ -64,8 +59,8 @@ void HttpCredentialsGui::askFromUserAsync() {
     job->start();
 }
 
-void HttpCredentialsGui::asyncAuthResult(OAuth::Result r, const QString &user,
-    const QString &token, const QString &refreshToken) {
+void HttpCredentialsGui::asyncAuthResult(OAuth::Result r, QString &user,
+    const QString &token, QString &refreshToken) {
     switch (r) {
     case OAuth::NotSupported:
         showDialog();
@@ -132,7 +127,7 @@ void HttpCredentialsGui::showDialog() {
     });
 }
 
-QString HttpCredentialsGui::requestAppPasswordText(const Account *account) {
+QString HttpCredentialsGui::requestAppPasswordText(Account *account) {
     int version = account->serverVersionInt();
     auto url = account->url().toString();
     if (url.endsWith('/'))

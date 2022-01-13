@@ -12,12 +12,6 @@
  * for more details.
  */
 
-#include "owncloudpropagator.h"
-#include "propagatedownload.h"
-#include "propagateupload.h"
-#include "propagatorjobs.h"
-#include "common/utility.h"
-
 #ifdef Q_OS_WIN
 // #include <windef.h>
 // #include <winbase.h>

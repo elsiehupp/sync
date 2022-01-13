@@ -12,16 +12,13 @@
  * for more details.
  */
 
-#include "userstatusconnector.h"
-#include "theme.h"
-
 namespace OCC {
 
 UserStatus::UserStatus() = default;
 
 UserStatus::UserStatus(
-    const QString &id, const QString &message, const QString &icon,
-    OnlineStatus state, bool messagePredefined, const Optional<ClearAt> &clearAt)
+    const QString &id, QString &message, QString &icon,
+    OnlineStatus state, bool messagePredefined, Optional<ClearAt> &clearAt)
     : _id(id)
     , _message(message)
     , _icon(icon)
@@ -73,11 +70,11 @@ Optional<ClearAt> UserStatus::clearAt() const {
     return _clearAt;
 }
 
-void UserStatus::setId(const QString &id) {
+void UserStatus::setId(QString &id) {
     _id = id;
 }
 
-void UserStatus::setMessage(const QString &message) {
+void UserStatus::setMessage(QString &message) {
     _message = message;
 }
 
@@ -85,7 +82,7 @@ void UserStatus::setState(OnlineStatus state) {
     _state = state;
 }
 
-void UserStatus::setIcon(const QString &icon) {
+void UserStatus::setIcon(QString &icon) {
     _icon = icon;
 }
 
@@ -93,10 +90,9 @@ void UserStatus::setMessagePredefined(bool value) {
     _messagePredefined = value;
 }
 
-void UserStatus::setClearAt(const Optional<ClearAt> &dateTime) {
+void UserStatus::setClearAt(Optional<ClearAt> &dateTime) {
     _clearAt = dateTime;
 }
-
 
 UserStatusConnector::UserStatusConnector(QObject *parent)
     : QObject(parent) {

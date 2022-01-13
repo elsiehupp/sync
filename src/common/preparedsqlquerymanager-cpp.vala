@@ -16,9 +16,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-
-#include "preparedsqlquerymanager.h"
-
 // #include <sqlite3.h>
 
 using namespace OCC;
@@ -39,7 +36,7 @@ const PreparedSqlQuery PreparedSqlQueryManager::get(PreparedSqlQueryManager::Key
     return { &query };
 }
 
-const PreparedSqlQuery PreparedSqlQueryManager::get(PreparedSqlQueryManager::Key key, const QByteArray &sql, SqlDatabase &db) {
+const PreparedSqlQuery PreparedSqlQueryManager::get(PreparedSqlQueryManager::Key key, QByteArray &sql, SqlDatabase &db) {
     auto &query = _queries[key];
     Q_ASSERT(!sqlite3_stmt_busy(query._stmt));
     ENFORCE(!query._sqldb || &db == query._sqldb)

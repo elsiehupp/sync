@@ -20,9 +20,6 @@
 // #include <QWebSocket>
 // #include <QSignalSpy>
 
-#include "creds/abstractcredentials.h"
-#include "account.h"
-
 class FakeWebSocketServer : public QObject {
 public:
     explicit FakeWebSocketServer(quint16 port = 12345, QObject *parent = nullptr);
@@ -44,14 +41,14 @@ public:
 
     void clearTextMessages();
 
-    static OCC::AccountPtr createAccount(const QString &username = "user", const QString &password = "password");
+    static OCC::AccountPtr createAccount(QString &username = "user", QString &password = "password");
 
 signals:
     void closed();
-    void processTextMessage(QWebSocket *sender, const QString &message);
+    void processTextMessage(QWebSocket *sender, QString &message);
 
 private slots:
-    void processTextMessageInternal(const QString &message);
+    void processTextMessageInternal(QString &message);
     void onNewConnection();
     void socketDisconnected();
 
@@ -65,7 +62,7 @@ private:
 class CredentialsStub : public OCC::AbstractCredentials {
 
 public:
-    CredentialsStub(const QString &user, const QString &password);
+    CredentialsStub(QString &user, QString &password);
     QString authType() const override;
     QString user() const override;
     QString password() const override;

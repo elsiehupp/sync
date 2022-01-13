@@ -13,25 +13,6 @@
  * for more details.
  */
 
-#include "account.h"
-#include "config.h"
-#include "configfile.h"
-#include "theme.h"
-#include "owncloudgui.h"
-
-#include "wizard/owncloudwizard.h"
-#include "wizard/welcomepage.h"
-#include "wizard/owncloudsetuppage.h"
-#include "wizard/owncloudhttpcredspage.h"
-#include "wizard/owncloudoauthcredspage.h"
-#include "wizard/owncloudadvancedsetuppage.h"
-#include "wizard/webviewpage.h"
-#include "wizard/flow2authcredspage.h"
-
-#include "common/vfs.h"
-
-#include "QProgressIndicator.h"
-
 // #include <QtCore>
 // #include <QtGui>
 // #include <QMessageBox>
@@ -87,7 +68,6 @@ OwncloudWizard::OwncloudWizard(QWidget *parent)
         this, &OwncloudWizard::createLocalAndRemoteFolders);
     connect(this, &QWizard::customButtonClicked, this, &OwncloudWizard::skipFolderConfiguration);
 
-
     Theme *theme = Theme::instance();
     setWindowTitle(tr("Add %1 account").arg(theme->appNameGUI()));
     setWizardStyle(QWizard::ModernStyle);
@@ -128,7 +108,6 @@ void OwncloudWizard::centerWindow() {
     wizardWindow->move(newWindowPosition);
 }
 
-
 void OwncloudWizard::adjustWizardSize() {
     const auto pageSizes = calculateWizardPageSizes();
     const auto longestSide = calculateLongestSideOfWizardPages(pageSizes);
@@ -149,8 +128,8 @@ QList<QSize> OwncloudWizard::calculateWizardPageSizes() const {
     return pageSizes;
 }
 
-int OwncloudWizard::calculateLongestSideOfWizardPages(const QList<QSize> &pageSizes) const {
-    return std::accumulate(std::cbegin(pageSizes), std::cend(pageSizes), 0, [](int current, const QSize &size) {
+int OwncloudWizard::calculateLongestSideOfWizardPages(QList<QSize> &pageSizes) const {
+    return std::accumulate(std::cbegin(pageSizes), std::cend(pageSizes), 0, [](int current, QSize &size) {
         return std::max({ current, size.width(), size.height() });
     });
 }
@@ -192,7 +171,7 @@ void OwncloudWizard::setRegistration(bool registration) {
     _registration = registration;
 }
 
-void OwncloudWizard::setRemoteFolder(const QString &remoteFolder) {
+void OwncloudWizard::setRemoteFolder(QString &remoteFolder) {
     _advancedSetupPage->setRemoteFolder(remoteFolder);
 }
 
@@ -294,7 +273,7 @@ void OwncloudWizard::slotCurrentPageChanged(int id) {
     }
 }
 
-void OwncloudWizard::displayError(const QString &msg, bool retryHTTPonly) {
+void OwncloudWizard::displayError(QString &msg, bool retryHTTPonly) {
     switch (currentId()) {
     case WizardCommon::Page_ServerSetup:
         _setupPage->setErrorString(msg, retryHTTPonly);
@@ -310,12 +289,12 @@ void OwncloudWizard::displayError(const QString &msg, bool retryHTTPonly) {
     }
 }
 
-void OwncloudWizard::appendToConfigurationLog(const QString &msg, LogType /*type*/) {
+void OwncloudWizard::appendToConfigurationLog(QString &msg, LogType /*type*/) {
     _setupLog << msg;
     qCDebug(lcWizard) << "Setup-Log: " << msg;
 }
 
-void OwncloudWizard::setOCUrl(const QString &url) {
+void OwncloudWizard::setOCUrl(QString &url) {
     _setupPage->setServerUrl(url);
 }
 
@@ -366,7 +345,7 @@ void OwncloudWizard::bringToTop() {
     ownCloudGui::raiseDialog(this);
 }
 
-void OwncloudWizard::askExperimentalVirtualFilesFeature(QWidget *receiver, const std::function<void(bool enable)> &callback) {
+void OwncloudWizard::askExperimentalVirtualFilesFeature(QWidget *receiver, std::function<void(bool enable)> &callback) {
     const auto bestVfsMode = bestAvailableVfsMode();
     QMessageBox *msgBox = nullptr;
     QPushButton *acceptButton = nullptr;

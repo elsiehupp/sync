@@ -12,10 +12,6 @@
  * for more details.
  */
 
-#include "ocsuserstatusconnector.h"
-#include "account.h"
-#include "userstatusconnector.h"
-
 // #include <networkjobs.h>
 
 // #include <QDateTime>
@@ -35,7 +31,7 @@ namespace {
 
 Q_LOGGING_CATEGORY(lcOcsUserStatusConnector, "nextcloud.gui.ocsuserstatusconnector", QtInfoMsg)
 
-OCC::UserStatus::OnlineStatus stringToUserOnlineStatus(const QString &status) {
+OCC::UserStatus::OnlineStatus stringToUserOnlineStatus(QString &status) {
     // it needs to match the Status enum
     const QHash<QString, OCC::UserStatus::OnlineStatus> preDefinedStatus { { "online", OCC::UserStatus::OnlineStatus::Online }, { "dnd", OCC::UserStatus::OnlineStatus::DoNotDisturb }, { "away", OCC::UserStatus::OnlineStatus::Away }, { "offline", OCC::UserStatus::OnlineStatus::Offline }, { "invisible", OCC::UserStatus::OnlineStatus::Invisible }
     };
@@ -83,14 +79,14 @@ OCC::UserStatus jsonExtractUserStatus(QJsonObject json) {
     return userStatus;
 }
 
-OCC::UserStatus jsonToUserStatus(const QJsonDocument &json) { { QJsonObject d { "icon", "" }, { "message", "" }, { "status", "online" }, { "messageIsPredefined", "false" },
+OCC::UserStatus jsonToUserStatus(QJsonDocument &json) { { QJsonObject d { "icon", "" }, { "message", "" }, { "status", "online" }, { "messageIsPredefined", "false" },
         { "statusIsUserDefined", "false" }
     };
     const auto retrievedData = json.object().value("ocs").toObject().value("data").toObject(defaultValues);
     return jsonExtractUserStatus(retrievedData);
 }
 
-quint64 clearAtEndOfToTimestamp(const OCC::ClearAt &clearAt) {
+quint64 clearAtEndOfToTimestamp(OCC::ClearAt &clearAt) {
     Q_ASSERT(clearAt._type == OCC::ClearAtType::EndOf);
 
     if (clearAt._endof == "day") {
@@ -103,11 +99,11 @@ quint64 clearAtEndOfToTimestamp(const OCC::ClearAt &clearAt) {
     return QDateTime::currentDateTime().toTime_t();
 }
 
-quint64 clearAtPeriodToTimestamp(const OCC::ClearAt &clearAt) {
+quint64 clearAtPeriodToTimestamp(OCC::ClearAt &clearAt) {
     return QDateTime::currentDateTime().addSecs(clearAt._period).toTime_t();
 }
 
-quint64 clearAtToTimestamp(const OCC::ClearAt &clearAt) {
+quint64 clearAtToTimestamp(OCC::ClearAt &clearAt) {
     switch (clearAt._type) {
     case OCC::ClearAtType::Period: {
         return clearAtPeriodToTimestamp(clearAt);
@@ -125,7 +121,7 @@ quint64 clearAtToTimestamp(const OCC::ClearAt &clearAt) {
     return 0;
 }
 
-quint64 clearAtToTimestamp(const OCC::Optional<OCC::ClearAt> &clearAt) {
+quint64 clearAtToTimestamp(OCC::Optional<OCC::ClearAt> &clearAt) {
     if (clearAt) {
         return clearAtToTimestamp(*clearAt);
     }
@@ -172,7 +168,7 @@ OCC::UserStatus jsonToUserStatus(QJsonObject jsonObject) {
 
 std::vector<OCC::UserStatus> jsonToPredefinedStatuses(QJsonArray jsonDataArray) {
     std::vector<OCC::UserStatus> statuses;
-    for (const auto &jsonEntry : jsonDataArray) {
+    for (auto &jsonEntry : jsonDataArray) {
         Q_ASSERT(jsonEntry.isObject());
         if (!jsonEntry.isObject()) {
             continue;
@@ -182,7 +178,6 @@ std::vector<OCC::UserStatus> jsonToPredefinedStatuses(QJsonArray jsonDataArray) 
 
     return statuses;
 }
-
 
 const QString baseUrl("/ocs/v2.php/apps/user_status/api/v1");
 const QString userStatusBaseUrl = baseUrl + QStringLiteral("/user_status");
@@ -221,7 +216,7 @@ void OcsUserStatusConnector::startFetchUserStatusJob() {
     _getUserStatusJob->start();
 }
 
-void OcsUserStatusConnector::onUserStatusFetched(const QJsonDocument &json, int statusCode) {
+void OcsUserStatusConnector::onUserStatusFetched(QJsonDocument &json, int statusCode) {
     logResponse("user status fetched", json, statusCode);
 
     if (statusCode != 200) {
@@ -255,7 +250,7 @@ void OcsUserStatusConnector::fetchPredefinedStatuses() {
     startFetchPredefinedStatuses();
 }
 
-void OcsUserStatusConnector::onPredefinedStatusesFetched(const QJsonDocument &json, int statusCode) {
+void OcsUserStatusConnector::onPredefinedStatusesFetched(QJsonDocument &json, int statusCode) {
     logResponse("predefined statuses", json, statusCode);
 
     if (statusCode != 200) {
@@ -272,7 +267,7 @@ void OcsUserStatusConnector::onPredefinedStatusesFetched(const QJsonDocument &js
     emit predefinedStatusesFetched(statuses);
 }
 
-void OcsUserStatusConnector::logResponse(const QString &message, const QJsonDocument &json, int statusCode) {
+void OcsUserStatusConnector::logResponse(QString &message, QJsonDocument &json, int statusCode) {
     qCDebug(lcOcsUserStatusConnector) << "Response from:" << message << "Status:" << statusCode << "Json:" << json;
 }
 
@@ -290,7 +285,7 @@ void OcsUserStatusConnector::setUserStatusOnlineStatus(UserStatus::OnlineStatus 
     _setOnlineStatusJob->start();
 }
 
-void OcsUserStatusConnector::setUserStatusMessagePredefined(const UserStatus &userStatus) {
+void OcsUserStatusConnector::setUserStatusMessagePredefined(UserStatus &userStatus) {
     Q_ASSERT(userStatus.messagePredefined());
     if (!userStatus.messagePredefined()) {
         return;
@@ -313,7 +308,7 @@ void OcsUserStatusConnector::setUserStatusMessagePredefined(const UserStatus &us
     _setMessageJob->start();
 }
 
-void OcsUserStatusConnector::setUserStatusMessageCustom(const UserStatus &userStatus) {
+void OcsUserStatusConnector::setUserStatusMessageCustom(UserStatus &userStatus) {
     Q_ASSERT(!userStatus.messagePredefined());
     if (userStatus.messagePredefined()) {
         return;
@@ -342,7 +337,7 @@ void OcsUserStatusConnector::setUserStatusMessageCustom(const UserStatus &userSt
     _setMessageJob->start();
 }
 
-void OcsUserStatusConnector::setUserStatusMessage(const UserStatus &userStatus) {
+void OcsUserStatusConnector::setUserStatusMessage(UserStatus &userStatus) {
     if (userStatus.messagePredefined()) {
         setUserStatusMessagePredefined(userStatus);
         return;
@@ -350,7 +345,7 @@ void OcsUserStatusConnector::setUserStatusMessage(const UserStatus &userStatus) 
     setUserStatusMessageCustom(userStatus);
 }
 
-void OcsUserStatusConnector::setUserStatus(const UserStatus &userStatus) {
+void OcsUserStatusConnector::setUserStatus(UserStatus &userStatus) {
     if (!_userStatusSupported) {
         emit error(Error::UserStatusNotSupported);
         return;
@@ -365,7 +360,7 @@ void OcsUserStatusConnector::setUserStatus(const UserStatus &userStatus) {
     setUserStatusMessage(userStatus);
 }
 
-void OcsUserStatusConnector::onUserStatusOnlineStatusSet(const QJsonDocument &json, int statusCode) {
+void OcsUserStatusConnector::onUserStatusOnlineStatusSet(QJsonDocument &json, int statusCode) {
     logResponse("Online status set", json, statusCode);
 
     if (statusCode != 200) {
@@ -374,7 +369,7 @@ void OcsUserStatusConnector::onUserStatusOnlineStatusSet(const QJsonDocument &js
     }
 }
 
-void OcsUserStatusConnector::onUserStatusMessageSet(const QJsonDocument &json, int statusCode) {
+void OcsUserStatusConnector::onUserStatusMessageSet(QJsonDocument &json, int statusCode) {
     logResponse("Message set", json, statusCode);
 
     if (statusCode != 200) {
@@ -401,7 +396,7 @@ UserStatus OcsUserStatusConnector::userStatus() const {
     return _userStatus;
 }
 
-void OcsUserStatusConnector::onMessageCleared(const QJsonDocument &json, int statusCode) {
+void OcsUserStatusConnector::onMessageCleared(QJsonDocument &json, int statusCode) {
     logResponse("Message cleared", json, statusCode);
 
     if (statusCode != 200) {

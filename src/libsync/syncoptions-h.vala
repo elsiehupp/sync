@@ -14,15 +14,11 @@
 
 // #pragma once
 
-#include "owncloudlib.h"
-#include "common/vfs.h"
-
 // #include <QRegularExpression>
 // #include <QSharedPointer>
 // #include <QString>
 
 // #include <chrono>
-
 
 namespace OCC {
 
@@ -87,7 +83,6 @@ public:
      */
     void verifyChunkSizes();
 
-
     /** A regular expression to match file names
      * If no pattern is provided the default is an invalid regular expression.
      */
@@ -96,12 +91,12 @@ public:
     /**
      * A pattern like *.txt, matching only file names
      */
-    void setFilePattern(const QString &pattern);
+    void setFilePattern(QString &pattern);
 
     /**
      * A pattern like /own.*\/.*txt matching the full path
      */
-    void setPathPattern(const QString &pattern);
+    void setPathPattern(QString &pattern);
 
 private:
     /**

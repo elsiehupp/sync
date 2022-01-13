@@ -12,12 +12,9 @@
  * for more details.
  */
 
-
 // #include <QMetaType>
 // #include <QObject>
 // #include <QString>
-
-#include "ocsynclib.h"
 
 namespace OCC {
 
@@ -52,11 +49,11 @@ private:
     bool _shared = false;
 };
 
-inline bool operator==(const SyncFileStatus &a, const SyncFileStatus &b) {
+inline bool operator==(SyncFileStatus &a, SyncFileStatus &b) {
     return a.tag() == b.tag() && a.shared() == b.shared();
 }
 
-inline bool operator!=(const SyncFileStatus &a, const SyncFileStatus &b) {
+inline bool operator!=(SyncFileStatus &a, SyncFileStatus &b) {
     return !(a == b);
 }
 }

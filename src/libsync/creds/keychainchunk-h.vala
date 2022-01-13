@@ -16,7 +16,6 @@
 
 // #include <QObject>
 // #include <qt5keychain/keychain.h>
-#include "accountfwd.h"
 
 // We don't support insecure fallback
 // #define KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK
@@ -88,8 +87,8 @@ protected:
 */
 class OWNCLOUDSYNC_EXPORT WriteJob : public KeychainChunk::Job {
 public:
-    WriteJob(Account *account, const QString &key, const QByteArray &data, QObject *parent = nullptr);
-    WriteJob(const QString &key, const QByteArray &data, QObject *parent = nullptr);
+    WriteJob(Account *account, QString &key, QByteArray &data, QObject *parent = nullptr);
+    WriteJob(QString &key, QByteArray &data, QObject *parent = nullptr);
 
     /**
      * Call this method to start the job (async).
@@ -119,8 +118,8 @@ private slots:
 */
 class OWNCLOUDSYNC_EXPORT ReadJob : public KeychainChunk::Job {
 public:
-    ReadJob(Account *account, const QString &key, bool keychainMigration, QObject *parent = nullptr);
-    ReadJob(const QString &key, QObject *parent = nullptr);
+    ReadJob(Account *account, QString &key, bool keychainMigration, QObject *parent = nullptr);
+    ReadJob(QString &key, QObject *parent = nullptr);
 
     /**
      * Call this method to start the job (async).
@@ -155,8 +154,8 @@ private:
 */
 class OWNCLOUDSYNC_EXPORT DeleteJob : public KeychainChunk::Job {
 public:
-    DeleteJob(Account *account, const QString &key, bool keychainMigration, QObject *parent = nullptr);
-    DeleteJob(const QString &key, QObject *parent = nullptr);
+    DeleteJob(Account *account, QString &key, bool keychainMigration, QObject *parent = nullptr);
+    DeleteJob(QString &key, QObject *parent = nullptr);
 
     /**
      * Call this method to start the job (async).

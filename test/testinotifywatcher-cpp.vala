@@ -6,9 +6,6 @@
 
 // #include <QtTest>
 
-#include "folderwatcher_linux.h"
-#include "common/utility.h"
-
 using namespace OCC;
 
 class TestInotifyWatcher: public FolderWatcherPrivate {

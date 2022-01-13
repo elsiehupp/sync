@@ -21,7 +21,6 @@
 // #include <qcoreevent.h>
 // #include <QStandardPaths>
 // #include <QFile>
-#include "ownclouddolphinpluginhelper.h"
 
 OwncloudDolphinPluginHelper* OwncloudDolphinPluginHelper::instance() {
     static OwncloudDolphinPluginHelper self;
@@ -47,7 +46,7 @@ bool OwncloudDolphinPluginHelper::isConnected() const {
     return _socket.state() == QLocalSocket::ConnectedState;
 }
 
-void OwncloudDolphinPluginHelper::sendCommand(const char* data) {
+void OwncloudDolphinPluginHelper::sendCommand(char* data) {
     _socket.write(data);
     _socket.flush();
 }

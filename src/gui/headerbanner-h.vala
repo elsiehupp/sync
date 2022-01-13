@@ -58,7 +58,6 @@
 **
 ****************************************************************************/
 
-
 // #include <QWidget>
 
 class QLabel;
@@ -71,8 +70,8 @@ class HeaderBanner : public QWidget {
 public:
     HeaderBanner(QWidget *parent = nullptr);
 
-    void setup(const QString &title, const QPixmap &logo, const QPixmap &banner,
-               const Qt::TextFormat titleFormat, const QString &styleSheet);
+    void setup(QString &title, QPixmap &logo, QPixmap &banner,
+               const Qt::TextFormat titleFormat, QString &styleSheet);
 
 protected:
     void paintEvent(QPaintEvent *event) override;

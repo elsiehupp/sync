@@ -20,8 +20,6 @@
 
 // #include <QDebug>
 
-#include "netrcparser.h"
-
 namespace OCC {
 
 namespace {
@@ -31,7 +29,7 @@ namespace {
     QString passwordKeyword = QLatin1String("password");
 }
 
-NetrcParser::NetrcParser(const QString &file) {
+NetrcParser::NetrcParser(QString &file) {
     _netrcLocation = file;
     if (_netrcLocation.isEmpty()) {
         _netrcLocation = QDir::homePath() + QLatin1String("/.netrc");
@@ -94,7 +92,7 @@ bool NetrcParser::parse() {
     }
 }
 
-NetrcParser::LoginPair NetrcParser::find(const QString &machine) {
+NetrcParser::LoginPair NetrcParser::find(QString &machine) {
     QHash<QString, LoginPair>::const_iterator it = _entries.find(machine);
     if (it != _entries.end()) {
         return *it;

@@ -12,7 +12,6 @@
  * for more details.
  */
 
-
 // #include <QtCore>
 // #include <QIcon>
 
@@ -81,12 +80,11 @@ public:
      * @return
      */
 
-
     Identifier ident() const;
 };
 
-bool operator==(const Activity &rhs, const Activity &lhs);
-bool operator<(const Activity &rhs, const Activity &lhs);
+bool operator==(Activity &rhs, Activity &lhs);
+bool operator<(Activity &rhs, Activity &lhs);
 
 /* ==================================================================== */
 /**

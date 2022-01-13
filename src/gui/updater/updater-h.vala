@@ -12,7 +12,6 @@
  * for more details.
  */
 
-
 // #include <QLoggingCategory>
 // #include <QObject>
 
@@ -26,7 +25,7 @@ Q_DECLARE_LOGGING_CATEGORY(lcUpdater)
 class Updater : public QObject {
 public:
     struct Helper {
-        static qint64 stringVersionToInt(const QString &version);
+        static qint64 stringVersionToInt(QString &version);
         static qint64 currentVersionToInt();
         static qint64 versionToInt(qint64 major, qint64 minor, qint64 patch, qint64 build);
     };

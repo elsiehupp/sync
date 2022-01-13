@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#include "nextcloudtheme.h"
-
 // #include <QString>
 // #include <QVariant>
 #ifndef TOKEN_AUTH_ONLY
@@ -21,10 +19,6 @@
 // #include <QIcon>
 #endif
 // #include <QCoreApplication>
-
-#include "config.h"
-#include "common/utility.h"
-#include "version.h"
 
 namespace OCC {
 

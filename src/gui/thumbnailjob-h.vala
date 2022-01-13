@@ -12,10 +12,6 @@
  * for more details.
  */
 
-
-#include "networkjobs.h"
-#include "accountfwd.h"
-
 namespace OCC {
 
 /**
@@ -27,7 +23,7 @@ namespace OCC {
  */
 class ThumbnailJob : public AbstractNetworkJob {
 public:
-    explicit ThumbnailJob(const QString &path, AccountPtr account, QObject *parent = nullptr);
+    explicit ThumbnailJob(QString &path, AccountPtr account, QObject *parent = nullptr);
 public slots:
     void start() override;
 signals:

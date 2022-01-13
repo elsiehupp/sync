@@ -12,16 +12,12 @@
  * for more details.
  */
 
-
 // #include <QObject>
 // #include <QList>
 // #include <QDateTime>
 // #include <QFile>
 // #include <QTextStream>
 // #include <qmutex.h>
-
-#include "common/utility.h"
-#include "owncloudlib.h"
 
 namespace OCC {
 
@@ -33,21 +29,21 @@ class OWNCLOUDSYNC_EXPORT Logger : public QObject {
 public:
     bool isLoggingToFile() const;
 
-    void doLog(QtMsgType type, const QMessageLogContext &ctx, const QString &message);
+    void doLog(QtMsgType type, QMessageLogContext &ctx, QString &message);
 
     static Logger *instance();
 
-    void postGuiLog(const QString &title, const QString &message);
-    void postOptionalGuiLog(const QString &title, const QString &message);
-    void postGuiMessage(const QString &title, const QString &message);
+    void postGuiLog(QString &title, QString &message);
+    void postOptionalGuiLog(QString &title, QString &message);
+    void postGuiMessage(QString &title, QString &message);
 
     QString logFile() const;
-    void setLogFile(const QString &name);
+    void setLogFile(QString &name);
 
     void setLogExpire(int expire);
 
     QString logDir() const;
-    void setLogDir(const QString &dir);
+    void setLogDir(QString &dir);
 
     void setLogFlush(bool flush);
 
@@ -70,20 +66,20 @@ public:
     /** For switching off via logwindow */
     void disableTemporaryFolderLogDir();
 
-    void addLogRule(const QSet<QString> &rules) {
+    void addLogRule(QSet<QString> &rules) {
         setLogRules(_logRules + rules);
     }
-    void removeLogRule(const QSet<QString> &rules) {
+    void removeLogRule(QSet<QString> &rules) {
         setLogRules(_logRules - rules);
     }
-    void setLogRules(const QSet<QString> &rules);
+    void setLogRules(QSet<QString> &rules);
 
 signals:
-    void logWindowLog(const QString &);
+    void logWindowLog(QString &);
 
-    void guiLog(const QString &, const QString &);
-    void guiMessage(const QString &, const QString &);
-    void optionalGuiLog(const QString &, const QString &);
+    void guiLog(QString &, QString &);
+    void guiMessage(QString &, QString &);
+    void optionalGuiLog(QString &, QString &);
 
 public slots:
     void enterNextLogFile();

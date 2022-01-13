@@ -16,15 +16,6 @@
 // #include <QMenu>
 // #include <QClipboard>
 
-#include "wizard/owncloudoauthcredspage.h"
-#include "theme.h"
-#include "account.h"
-#include "cookiejar.h"
-#include "wizard/owncloudwizardcommon.h"
-#include "wizard/owncloudwizard.h"
-#include "creds/httpcredentialsgui.h"
-#include "creds/credentialsfactory.h"
-
 namespace OCC {
 
 OwncloudOAuthCredsPage::OwncloudOAuthCredsPage()
@@ -66,8 +57,8 @@ void OCC::OwncloudOAuthCredsPage::cleanupPage() {
     _asyncAuth.reset();
 }
 
-void OwncloudOAuthCredsPage::asyncAuthResult(OAuth::Result r, const QString &user,
-    const QString &token, const QString &refreshToken) {
+void OwncloudOAuthCredsPage::asyncAuthResult(OAuth::Result r, QString &user,
+    const QString &token, QString &refreshToken) {
     switch (r) {
     case OAuth::NotSupported: {
         /* OAuth not supported (can't open browser), fallback to HTTP credentials */

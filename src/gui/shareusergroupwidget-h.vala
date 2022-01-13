@@ -12,13 +12,6 @@
  * for more details.
  */
 
-
-#include "accountfwd.h"
-#include "sharemanager.h"
-#include "sharepermissions.h"
-#include "sharee.h"
-#include "profilepagewidget.h"
-#include "QProgressIndicator.h"
 // #include <QDialog>
 // #include <QWidget>
 // #include <QSharedPointer>
@@ -51,7 +44,7 @@ public:
 
 signals:
     void clicked();
-    void contextMenu(const QPoint &globalPosition);
+    void contextMenu(QPoint &globalPosition);
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
@@ -78,23 +71,23 @@ signals:
 
 public slots:
     void getShares();
-    void slotShareCreated(const QSharedPointer<Share> &share);
+    void slotShareCreated(QSharedPointer<Share> &share);
     void slotStyleChanged();
 
 private slots:
-    void slotSharesFetched(const QList<QSharedPointer<Share>> &shares);
+    void slotSharesFetched(QList<QSharedPointer<Share>> &shares);
 
-    void on_shareeLineEdit_textChanged(const QString &text);
+    void on_shareeLineEdit_textChanged(QString &text);
     void searchForSharees(ShareeModel::LookupMode lookupMode);
-    void slotLineEditTextEdited(const QString &text);
+    void slotLineEditTextEdited(QString &text);
 
     void slotLineEditReturn();
-    void slotCompleterActivated(const QModelIndex &index);
-    void slotCompleterHighlighted(const QModelIndex &index);
+    void slotCompleterActivated(QModelIndex &index);
+    void slotCompleterHighlighted(QModelIndex &index);
     void slotShareesReady();
     void slotAdjustScrollWidgetSize();
     void slotPrivateLinkShare();
-    void displayError(int code, const QString &message);
+    void displayError(int code, QString &message);
 
     void slotPrivateLinkOpenBrowser();
     void slotPrivateLinkCopy();
@@ -162,7 +155,7 @@ private slots:
     void refreshPasswordLineEditPlaceholder();
 
     void slotPasswordSet();
-    void slotPasswordSetError(int statusCode, const QString &message);
+    void slotPasswordSetError(int statusCode, QString &message);
 
     void slotShareDeleted();
     void slotPermissionsSet();
@@ -175,7 +168,7 @@ private slots:
 
     void slotConfirmPasswordClicked();
 
-    void onAvatarContextMenu(const QPoint &globalPosition);
+    void onAvatarContextMenu(QPoint &globalPosition);
 
 private:
     void displayPermissions();
@@ -183,16 +176,16 @@ private:
     void setDefaultAvatar(int avatarSize);
     void customizeStyle();
 
-    QPixmap pixmapForShareeType(Sharee::Type type, const QColor &backgroundColor = QColor()) const;
+    QPixmap pixmapForShareeType(Sharee::Type type, QColor &backgroundColor = QColor()) const;
     QColor backgroundColorForShareeType(Sharee::Type type) const;
 
   void showNoteOptions(bool show);
   void toggleNoteOptions(bool enable);
   void onNoteConfirmButtonClicked();
-  void setNote(const QString &note);
+  void setNote(QString &note);
 
   void toggleExpireDateOptions(bool enable);
-  void showExpireDateOptions(bool show, const QDate &initialDate = QDate());
+  void showExpireDateOptions(bool show, QDate &initialDate = QDate());
   void setExpireDate();
 
   void togglePasswordSetProgressAnimation(bool show);
@@ -200,8 +193,8 @@ private:
   void enableProgessIndicatorAnimation(bool enable);
   void disableProgessIndicatorAnimation();
 
-  QDate maxExpirationDateForShare(const Share::ShareType type, const QDate &fallbackDate) const;
-  bool enforceExpirationDateForShare(const Share::ShareType type) const;
+  QDate maxExpirationDateForShare(Share::ShareType type, QDate &fallbackDate) const;
+  bool enforceExpirationDateForShare(Share::ShareType type) const;
 
   Ui::ShareUserLine *_ui;
   AccountPtr _account;

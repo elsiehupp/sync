@@ -7,9 +7,6 @@
 // #include <QtTest>
 // #include <QTemporaryDir>
 
-#include "common/utility.h"
-#include "config.h"
-
 using namespace OCC::Utility;
 
 namespace OCC {

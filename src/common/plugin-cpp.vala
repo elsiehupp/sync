@@ -16,15 +16,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "plugin.h"
-
-#include "config.h"
-
 namespace OCC {
 
 PluginFactory::~PluginFactory() = default;
 
-QString pluginFileName(const QString &type, const QString &name) {
+QString pluginFileName(QString &type, QString &name) {
     return QStringLiteral("%1sync_%2_%3")
         .arg(QStringLiteral(APPLICATION_EXECUTABLE), type, name);
 }

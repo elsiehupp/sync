@@ -6,8 +6,6 @@
 // #include <QNetworkRequest>
 // #include <QQueue>
 
-#include "creds/abstractcredentials.h"
-
 class QDialog;
 class QLabel;
 class QNetworkReply;
@@ -63,7 +61,7 @@ private slots:
     void slotAuthentication(QNetworkReply *reply, QAuthenticator *authenticator);
     void slotFinished(QNetworkReply *reply);
 
-    void slotAskFromUserCredentialsProvided(const QString &user, const QString &pass, const QString &host);
+    void slotAskFromUserCredentialsProvided(QString &user, QString &pass, QString &host);
     void slotAskFromUserCancelled();
 
     void slotReadClientCertPEMJobDone(KeychainChunk::ReadJob *readJob);

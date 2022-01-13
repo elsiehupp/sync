@@ -12,10 +12,6 @@
  * for more details.
  */
 
-#include "localdiscoverytracker.h"
-
-#include "syncfileitem.h"
-
 // #include <QLoggingCategory>
 
 using namespace OCC;
@@ -24,7 +20,7 @@ Q_LOGGING_CATEGORY(lcLocalDiscoveryTracker, "sync.localdiscoverytracker", QtInfo
 
 LocalDiscoveryTracker::LocalDiscoveryTracker() = default;
 
-void LocalDiscoveryTracker::addTouchedPath(const QString &relativePath) {
+void LocalDiscoveryTracker::addTouchedPath(QString &relativePath) {
     qCDebug(lcLocalDiscoveryTracker) << "inserted touched" << relativePath;
     _localDiscoveryPaths.insert(relativePath);
 }
@@ -51,7 +47,7 @@ const std::set<QString> &LocalDiscoveryTracker::localDiscoveryPaths() const {
     return _localDiscoveryPaths;
 }
 
-void LocalDiscoveryTracker::slotItemCompleted(const SyncFileItemPtr &item) {
+void LocalDiscoveryTracker::slotItemCompleted(SyncFileItemPtr &item) {
     // For successes, we want to wipe the file from the list to ensure we don't
     // rediscover it even if this overall sync fails.
     //

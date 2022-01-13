@@ -24,13 +24,6 @@
 
 // #include <qt5keychain/keychain.h>
 
-#include "account.h"
-#include "accessmanager.h"
-#include "configfile.h"
-#include "theme.h"
-#include "syncengine.h"
-#include "creds/credentialscommon.h"
-#include "creds/httpcredentials.h"
 // #include <QAuthenticator>
 
 namespace OCC {
@@ -50,13 +43,13 @@ namespace {
 
 class HttpCredentialsAccessManager : public AccessManager {
 public:
-    HttpCredentialsAccessManager(const HttpCredentials *cred, QObject *parent = nullptr)
+    HttpCredentialsAccessManager(HttpCredentials *cred, QObject *parent = nullptr)
         : AccessManager(parent)
         , _cred(cred) {
     }
 
 protected:
-    QNetworkReply *createRequest(Operation op, const QNetworkRequest &request, QIODevice *outgoingData) override {
+    QNetworkReply *createRequest(Operation op, QNetworkRequest &request, QIODevice *outgoingData) override {
         QNetworkRequest req(request);
         if (!req.attribute(HttpCredentials::DontAddCredentialsAttribute).toBool()) {
             if (_cred && !_cred->password().isEmpty()) {
@@ -99,7 +92,6 @@ private:
     QPointer<const HttpCredentials> _cred;
 };
 
-
 static void addSettingsToJob(Account *account, QKeychain::Job *job) {
     Q_UNUSED(account);
     auto settings = ConfigFile::settingsWithGroup(Theme::instance()->appName());
@@ -110,7 +102,7 @@ static void addSettingsToJob(Account *account, QKeychain::Job *job) {
 HttpCredentials::HttpCredentials() = default;
 
 // From wizard
-HttpCredentials::HttpCredentials(const QString &user, const QString &password, const QByteArray &clientCertBundle, const QByteArray &clientCertPassword)
+HttpCredentials::HttpCredentials(QString &user, QString &password, QByteArray &clientCertBundle, QByteArray &clientCertPassword)
     : _user(user)
     , _password(password)
     , _ready(true)
@@ -326,7 +318,6 @@ void HttpCredentials::slotReadPasswordFromKeychain() {
     job->start();
 }
 
-
 bool HttpCredentials::stillValid(QNetworkReply *reply) {
     return ((reply->error() != QNetworkReply::AuthenticationRequiredError)
         // returned if user or password is incorrect
@@ -425,7 +416,7 @@ bool HttpCredentials::refreshAccessToken() {
             persist();
         }
         _isRenewingOAuthToken = false;
-        for (const auto &job : _retryQueue) {
+        for (auto &job : _retryQueue) {
             if (job)
                 job->retry();
         }
@@ -435,7 +426,6 @@ bool HttpCredentials::refreshAccessToken() {
     _isRenewingOAuthToken = true;
     return true;
 }
-
 
 void HttpCredentials::invalidateToken() {
     if (!_password.isEmpty()) {

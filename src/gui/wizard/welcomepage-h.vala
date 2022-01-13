@@ -16,8 +16,6 @@
 
 // #include <QWizardPage>
 
-#include "wizard/owncloudwizardcommon.h"
-
 namespace OCC {
 
 class OwncloudWizard;

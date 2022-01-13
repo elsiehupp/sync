@@ -12,14 +12,10 @@
  * for more details.
  */
 
-
 // #include <QObject>
 // #include <QUrl>
 // #include <QTemporaryFile>
 // #include <QTimer>
-
-#include "updater/updateinfo.h"
-#include "updater/updater.h"
 
 class QNetworkAccessManager;
 class QNetworkReply;
@@ -67,7 +63,7 @@ public:
     UpdaterScheduler(QObject *parent);
 
 signals:
-    void updaterAnnouncement(const QString &title, const QString &msg);
+    void updaterAnnouncement(QString &title, QString &msg);
     void requestRestart();
 
 private slots:
@@ -96,9 +92,9 @@ public:
         PlainText,
         Html,
     };
-    explicit OCUpdater(const QUrl &url);
+    explicit OCUpdater(QUrl &url);
 
-    void setUpdateUrl(const QUrl &url);
+    void setUpdateUrl(QUrl &url);
 
     bool performUpdate();
 
@@ -110,7 +106,7 @@ public:
 
 signals:
     void downloadStateChanged();
-    void newUpdateAvailable(const QString &header, const QString &message);
+    void newUpdateAvailable(QString &header, QString &message);
     void requestRestart();
 
 public slots:
@@ -126,7 +122,7 @@ private slots:
     void slotTimedOut();
 
 protected:
-    virtual void versionInfoArrived(const UpdateInfo &info) = 0;
+    virtual void versionInfoArrived(UpdateInfo &info) = 0;
     bool updateSucceeded() const;
     QNetworkAccessManager *qnam() const { return _accessManager; }
     UpdateInfo updateInfo() const { return _updateInfo; }
@@ -145,7 +141,7 @@ private:
  */
 class NSISUpdater : public OCUpdater {
 public:
-    explicit NSISUpdater(const QUrl &url);
+    explicit NSISUpdater(QUrl &url);
     bool handleStartup() override;
 private slots:
     void slotSetSeenVersion();
@@ -154,9 +150,9 @@ private slots:
 
 private:
     void wipeUpdateData();
-    void showNoUrlDialog(const UpdateInfo &info);
-    void showUpdateErrorDialog(const QString &targetVersion);
-    void versionInfoArrived(const UpdateInfo &info) override;
+    void showNoUrlDialog(UpdateInfo &info);
+    void showUpdateErrorDialog(QString &targetVersion);
+    void versionInfoArrived(UpdateInfo &info) override;
     QScopedPointer<QTemporaryFile> _file;
     QString _targetFile;
 };
@@ -170,12 +166,12 @@ private:
  */
 class PassiveUpdateNotifier : public OCUpdater {
 public:
-    explicit PassiveUpdateNotifier(const QUrl &url);
+    explicit PassiveUpdateNotifier(QUrl &url);
     bool handleStartup() override { return false; }
     void backgroundCheckForUpdate() override;
 
 private:
-    void versionInfoArrived(const UpdateInfo &info) override;
+    void versionInfoArrived(UpdateInfo &info) override;
     QByteArray _runningAppVersion;
 };
 }

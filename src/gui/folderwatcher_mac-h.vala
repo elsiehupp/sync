@@ -12,12 +12,10 @@
  * for more details.
  */
 
-
 // #include <QObject>
 // #include <QString>
 
 // #include <CoreServices/CoreServices.h>
-
 
 namespace OCC {
 
@@ -27,12 +25,12 @@ namespace OCC {
  */
 class FolderWatcherPrivate {
 public:
-    FolderWatcherPrivate(FolderWatcher *p, const QString &path);
+    FolderWatcherPrivate(FolderWatcher *p, QString &path);
     ~FolderWatcherPrivate();
 
     void startWatching();
-    QStringList addCoalescedPaths(const QStringList &) const;
-    void doNotifyParent(const QStringList &);
+    QStringList addCoalescedPaths(QStringList &) const;
+    void doNotifyParent(QStringList &);
 
     /// On OSX the watcher is ready when the ctor finished.
     bool _ready = true;

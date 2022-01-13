@@ -12,9 +12,6 @@
  * for more details.
  */
 
-
-#include "ocsynclib.h"
-
 // #include <QObject>
 
 namespace OCC {

@@ -12,12 +12,7 @@
  * for more details.
  */
 
-#include "legalnotice.h"
-#include "ui_legalnotice.h"
-#include "theme.h"
-
 namespace OCC {
-
 
 LegalNotice::LegalNotice(QDialog *parent)
     : QDialog(parent)

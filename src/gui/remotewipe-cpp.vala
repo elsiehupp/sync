@@ -12,9 +12,6 @@
  * for more details.
  */
 
-#include "remotewipe.h"
-#include "folderman.h"
-
 // #include <QJsonDocument>
 // #include <QJsonObject>
 // #include <QNetworkRequest>

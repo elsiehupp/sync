@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#include "authenticationdialog.h"
-
 // #include <QLabel>
 // #include <QLineEdit>
 // #include <QVBoxLayout>
@@ -22,7 +20,7 @@
 
 namespace OCC {
 
-AuthenticationDialog::AuthenticationDialog(const QString &realm, const QString &domain, QWidget *parent)
+AuthenticationDialog::AuthenticationDialog(QString &realm, QString &domain, QWidget *parent)
     : QDialog(parent)
     , _user(new QLineEdit)
     , _password(new QLineEdit) {

@@ -6,7 +6,6 @@
  */
 
 // #include <QtTest>
-#include "syncenginetestutils.h"
 // #include <syncengine.h>
 // #include <owncloudpropagator.h>
 
@@ -35,16 +34,14 @@ public:
     }
 };
 
-
-SyncFileItemPtr getItem(const QSignalSpy &spy, const QString &path) {
-    for (const QList<QVariant> &args : spy) {
+SyncFileItemPtr getItem(QSignalSpy &spy, QString &path) {
+    for (QList<QVariant> &args : spy) {
         auto item = args[0].value<SyncFileItemPtr>();
         if (item->destination() == path)
             return item;
     }
     return {};
 }
-
 
 class TestDownload : public QObject {
 
@@ -53,12 +50,12 @@ private slots:
     void testResume() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         fakeFolder.syncEngine().setIgnoreHiddenFiles(true);
-        QSignalSpy completeSpy(&fakeFolder.syncEngine(), SIGNAL(itemCompleted(const SyncFileItemPtr &)));
+        QSignalSpy completeSpy(&fakeFolder.syncEngine(), SIGNAL(itemCompleted(SyncFileItemPtr &)));
         auto size = 30 * 1000 * 1000;
         fakeFolder.remoteModifier().insert("A/a0", size);
 
         // First, download only the first 3 MB of the file
-        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, const QNetworkRequest &request, QIODevice *) -> QNetworkReply * {
+        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, QNetworkRequest &request, QIODevice *) -> QNetworkReply * {
             if (op == QNetworkAccessManager::GetOperation && request.url().path().endsWith("A/a0")) {
                 return new BrokenFakeGetReply(fakeFolder.remoteModifier(), op, request, this);
             }
@@ -72,7 +69,7 @@ private slots:
 
         // Now, we need to restart, this time, it should resume.
         QByteArray ranges;
-        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, const QNetworkRequest &request, QIODevice *) -> QNetworkReply * {
+        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, QNetworkRequest &request, QIODevice *) -> QNetworkReply * {
             if (op == QNetworkAccessManager::GetOperation && request.url().path().endsWith("A/a0")) {
                 ranges = request.rawHeader("Range");
             }
@@ -88,14 +85,14 @@ private slots:
 
         FakeFolder fakeFolder{FileInfo::A12_B12_C12_S12()};
         fakeFolder.syncEngine().setIgnoreHiddenFiles(true);
-        QSignalSpy completeSpy(&fakeFolder.syncEngine(), SIGNAL(itemCompleted(const SyncFileItemPtr &)));
+        QSignalSpy completeSpy(&fakeFolder.syncEngine(), SIGNAL(itemCompleted(SyncFileItemPtr &)));
         auto size = 3'500'000;
         fakeFolder.remoteModifier().insert("A/broken", size);
 
         QByteArray serverMessage = "The file was not downloaded because the tests wants so!";
 
         // First, download only the first 3 MB of the file
-        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, const QNetworkRequest &request, QIODevice *) -> QNetworkReply * {
+        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, QNetworkRequest &request, QIODevice *) -> QNetworkReply * {
             if (op == QNetworkAccessManager::GetOperation && request.url().path().endsWith("A/broken")) {
                 return new FakeErrorReply(op, request, this, 400,
                     "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
@@ -120,7 +117,7 @@ private slots:
 
         FakeFolder fakeFolder{FileInfo::A12_B12_C12_S12()};
         fakeFolder.remoteModifier().insert("A/broken");
-        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, const QNetworkRequest &request, QIODevice *) -> QNetworkReply * {
+        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, QNetworkRequest &request, QIODevice *) -> QNetworkReply * {
             if (op == QNetworkAccessManager::GetOperation) {
                 return new FakeErrorReply(op, request, this, 503,
                     "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
@@ -157,12 +154,12 @@ private slots:
         bool propConnected = false;
         QString conflictFile;
         auto transProgress = connect(&fakeFolder.syncEngine(), &SyncEngine::transmissionProgress,
-                                     [&](const ProgressInfo &pi) {
+                                     [&](ProgressInfo &pi) {
             auto propagator = fakeFolder.syncEngine().getPropagator();
             if (pi.status() != ProgressInfo::Propagation || propConnected || !propagator)
                 return;
             propConnected = true;
-            connect(propagator.data(), &OwncloudPropagator::touchedFile, [&](const QString &s) {
+            connect(propagator.data(), &OwncloudPropagator::touchedFile, [&](QString &s) {
                 if (s.contains("conflicted copy")) {
                     QCOMPARE(conflictFile, QString());
                     conflictFile = s;
@@ -184,7 +181,7 @@ private slots:
         QFile(fakeFolder.localPath() + "A/").setPermissions(QFile::Permissions(0x7777));
 
         QObject::disconnect(transProgress);
-        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, const QNetworkRequest &, QIODevice *) -> QNetworkReply * {
+        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, QNetworkRequest &, QIODevice *) -> QNetworkReply * {
             if (op == QNetworkAccessManager::GetOperation)
                 QTest::qFail("There shouldn't be any download", __FILE__, __LINE__);
             return nullptr;
@@ -208,7 +205,7 @@ private slots:
         int resendExpected = 2;
 
         // First, download only the first 3 MB of the file
-        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, const QNetworkRequest &request, QIODevice *) -> QNetworkReply * {
+        fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, QNetworkRequest &request, QIODevice *) -> QNetworkReply * {
             if (op == QNetworkAccessManager::GetOperation && request.url().path().endsWith("A/resendme") && resendActual < resendExpected) {
                 auto errorReply = new FakeErrorReply(op, request, this, 400, "ignore this body");
                 errorReply->setError(QNetworkReply::ContentReSendError, serverMessage);
@@ -228,7 +225,7 @@ private slots:
         resendActual = 0;
         resendExpected = 10;
 
-        QSignalSpy completeSpy(&fakeFolder.syncEngine(), SIGNAL(itemCompleted(const SyncFileItemPtr &)));
+        QSignalSpy completeSpy(&fakeFolder.syncEngine(), SIGNAL(itemCompleted(SyncFileItemPtr &)));
         QVERIFY(!fakeFolder.syncOnce());
         QCOMPARE(resendActual, 4); // the 4th fails because it only resends 3 times
         QCOMPARE(getItem(completeSpy, "A/resendme")->_status, SyncFileItem::NormalError);

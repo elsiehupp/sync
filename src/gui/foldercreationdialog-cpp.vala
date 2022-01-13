@@ -12,9 +12,6 @@
  * for more details.
  */
 
-#include "foldercreationdialog.h"
-#include "ui_foldercreationdialog.h"
-
 // #include <limits>
 
 // #include <QDir>
@@ -25,7 +22,7 @@ namespace OCC {
 
 Q_LOGGING_CATEGORY(lcFolderCreationDialog, "nextcloud.gui.foldercreationdialog", QtInfoMsg)
 
-FolderCreationDialog::FolderCreationDialog(const QString &destination, QWidget *parent)
+FolderCreationDialog::FolderCreationDialog(QString &destination, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::FolderCreationDialog)
     , _destination(destination) {

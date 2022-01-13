@@ -7,10 +7,7 @@
 
 // #include <QtTest>
 
-#include "folderwatcher.h"
-#include "common/utility.h"
-
-void touch(const QString &file) {
+void touch(QString &file) {
 #ifdef Q_OS_WIN
     OCC::Utility::writeRandomFile(file);
 #else
@@ -21,7 +18,7 @@ void touch(const QString &file) {
 #endif
 }
 
-void mkdir(const QString &file) {
+void mkdir(QString &file) {
 #ifdef Q_OS_WIN
     QDir dir;
     dir.mkdir(file);
@@ -32,7 +29,7 @@ void mkdir(const QString &file) {
 #endif
 }
 
-void rmdir(const QString &file) {
+void rmdir(QString &file) {
 #ifdef Q_OS_WIN
     QDir dir;
     dir.rmdir(file);
@@ -43,7 +40,7 @@ void rmdir(const QString &file) {
 #endif
 }
 
-void rm(const QString &file) {
+void rm(QString &file) {
 #ifdef Q_OS_WIN
     QFile::remove(file);
 #else
@@ -53,7 +50,7 @@ void rm(const QString &file) {
 #endif
 }
 
-void mv(const QString &file1, const QString &file2) {
+void mv(QString &file1, QString &file2) {
 #ifdef Q_OS_WIN
     QFile::rename(file1, file2);
 #else
@@ -72,7 +69,7 @@ class TestFolderWatcher : public QObject {
     QScopedPointer<FolderWatcher> _watcher;
     QScopedPointer<QSignalSpy> _pathChangedSpy;
 
-    bool waitForPathChanged(const QString &path) {
+    bool waitForPathChanged(QString &path) {
         QElapsedTimer t;
         t.start();
         while (t.elapsed() < 5000) {
@@ -115,9 +112,9 @@ public:
         _pathChangedSpy.reset(new QSignalSpy(_watcher.data(), SIGNAL(pathChanged(QString))));
     }
 
-    int countFolders(const QString &path) {
+    int countFolders(QString &path) {
         int n = 0;
-        for (const auto &sub : QDir(path).entryList(QDir::Dirs | QDir::NoDotAndDotDot))
+        for (auto &sub : QDir(path).entryList(QDir::Dirs | QDir::NoDotAndDotDot))
             n += 1 + countFolders(path + '/' + sub);
         return n;
     }
@@ -157,7 +154,6 @@ private slots:
         mv(_rootPath + "/a0", _rootPath + "/a");
         QVERIFY(waitForPathChanged(_rootPath + "/a/b/c/empty.txt"));
     }
-
 
     void testCreateADir() {
         QString file(_rootPath+"/a1/b1/new_dir");

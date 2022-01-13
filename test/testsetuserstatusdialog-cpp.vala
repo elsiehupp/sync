@@ -12,9 +12,6 @@
  * for more details.
  */
 
-#include "userstatusconnector.h"
-#include "userstatusselectormodel.h"
-
 // #include <QTest>
 // #include <QSignalSpy>
 // #include <QDateTime>
@@ -46,7 +43,7 @@ public:
         emit predefinedStatusesFetched(_predefinedStatuses);
     }
 
-    void setUserStatus(const OCC::UserStatus &userStatus) override {
+    void setUserStatus(OCC::UserStatus &userStatus) override {
         if (_couldNotSetUserStatusMessage) {
             emit error(Error::CouldNotSetUserStatus);
             return;
@@ -68,7 +65,7 @@ public:
         return {}; // Not implemented
     }
 
-    void setFakeUserStatus(const OCC::UserStatus &userStatus) {
+    void setFakeUserStatus(OCC::UserStatus &userStatus) {
         _userStatus = userStatus;
     }
 
@@ -120,7 +117,7 @@ private:
 
 class FakeDateTimeProvider : public OCC::DateTimeProvider {
 public:
-    void setCurrentDateTime(const QDateTime &dateTime) { _dateTime = dateTime; }
+    void setCurrentDateTime(QDateTime &dateTime) { _dateTime = dateTime; }
 
     QDateTime currentDateTime() const override { return _dateTime; }
 
@@ -131,7 +128,7 @@ private:
 };
 
 static std::vector<OCC::UserStatus>
-createFakePredefinedStatuses(const QDateTime &currentTime) {
+createFakePredefinedStatuses(QDateTime &currentTime) {
     std::vector<OCC::UserStatus> statuses;
 
     const QString userStatusId("fake-id");

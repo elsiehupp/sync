@@ -16,18 +16,6 @@
 // #include <QUrlQuery>
 // #include <QProcess>
 
-#include "updater/updater.h"
-#include "updater/sparkleupdater.h"
-#include "updater/ocupdater.h"
-
-#include "theme.h"
-#include "common/utility.h"
-#include "version.h"
-#include "configfile.h"
-
-#include "config.h"
-#include "configfile.h"
-
 // #include <QSysInfo>
 
 namespace OCC {
@@ -110,7 +98,6 @@ QUrlQuery Updater::getQueryParams() {
     return query;
 }
 
-
 QString Updater::getSystemInfo() {
 #ifdef Q_OS_LINUX
     QProcess process;
@@ -147,7 +134,6 @@ Updater *Updater::create() {
 #endif
 }
 
-
 qint64 Updater::Helper::versionToInt(qint64 major, qint64 minor, qint64 patch, qint64 build) {
     return major << 56 | minor << 48 | patch << 40 | build;
 }
@@ -157,7 +143,7 @@ qint64 Updater::Helper::currentVersionToInt() {
         MIRALL_VERSION_PATCH, MIRALL_VERSION_BUILD);
 }
 
-qint64 Updater::Helper::stringVersionToInt(const QString &version) {
+qint64 Updater::Helper::stringVersionToInt(QString &version) {
     if (version.isEmpty())
         return 0;
     QByteArray baVersion = version.toLatin1();

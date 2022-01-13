@@ -12,9 +12,7 @@
  * for more details.
  */
 
-
 // #include <QWidget>
-
 
 namespace OCC {
 
@@ -51,7 +49,6 @@ private:
 
     Ui::NetworkSettings *_ui;
 };
-
 
 } // namespace OCC
 #endif // MIRALL_NETWORKSETTINGS_H

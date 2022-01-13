@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#include "iconutils.h"
-
 // #include <theme.h>
 
 // #include <QFile>
@@ -23,13 +21,13 @@
 // #include <QSvgRenderer>
 
 namespace {
-QString findSvgFilePath(const QString &fileName, const QStringList &possibleColors) {
+QString findSvgFilePath(QString &fileName, QStringList &possibleColors) {
     QString result;
     result = QString{OCC::Theme::themePrefix} + fileName;
     if (QFile::exists(result)) {
         return result;
     } else {
-        for (const auto &color : possibleColors) {
+        for (auto &color : possibleColors) {
             result = QString{OCC::Theme::themePrefix} + color + QStringLiteral("/") + fileName;
 
             if (QFile::exists(result)) {
@@ -47,7 +45,7 @@ namespace OCC {
 namespace Ui {
 namespace IconUtils {
 Q_LOGGING_CATEGORY(lcIconUtils, "nextcloud.gui.iconutils", QtInfoMsg)
-QPixmap pixmapForBackground(const QString &fileName, const QColor &backgroundColor) {
+QPixmap pixmapForBackground(QString &fileName, QColor &backgroundColor) {
     Q_ASSERT(!fileName.isEmpty());
 
     const auto pixmapColor = backgroundColor.isValid() && !Theme::isDarkColor(backgroundColor)
@@ -57,7 +55,7 @@ QPixmap pixmapForBackground(const QString &fileName, const QColor &backgroundCol
     return createSvgPixmapWithCustomColorCached(fileName, pixmapColor);
 }
 
-QImage createSvgImageWithCustomColor(const QString &fileName, const QColor &customColor, QSize *originalSize, const QSize &requestedSize) {
+QImage createSvgImageWithCustomColor(QString &fileName, QColor &customColor, QSize *originalSize, QSize &requestedSize) {
     Q_ASSERT(!fileName.isEmpty());
     Q_ASSERT(customColor.isValid());
 
@@ -112,7 +110,7 @@ QImage createSvgImageWithCustomColor(const QString &fileName, const QColor &cust
     return result;
 }
 
-QPixmap createSvgPixmapWithCustomColorCached(const QString &fileName, const QColor &customColor, QSize *originalSize, const QSize &requestedSize) {
+QPixmap createSvgPixmapWithCustomColorCached(QString &fileName, QColor &customColor, QSize *originalSize, QSize &requestedSize) {
     QPixmap cachedPixmap;
 
     const auto customColorName = customColor.name();
@@ -137,7 +135,7 @@ QPixmap createSvgPixmapWithCustomColorCached(const QString &fileName, const QCol
 }
 
 QImage drawSvgWithCustomFillColor(
-    const QString &sourceSvgPath, const QColor &fillColor, QSize *originalSize, const QSize &requestedSize) {
+    const QString &sourceSvgPath, QColor &fillColor, QSize *originalSize, QSize &requestedSize) {
     QSvgRenderer svgRenderer;
 
     if (!svgRenderer.load(sourceSvgPath)) {

@@ -29,7 +29,6 @@ namespace Ui {
     class InvalidFilenameDialog;
 }
 
-
 class InvalidFilenameDialog : public QDialog {
 
 public:
@@ -49,11 +48,11 @@ private:
     QString _originalFileName;
     QString _newFilename;
 
-    void onFilenameLineEditTextChanged(const QString &text);
+    void onFilenameLineEditTextChanged(QString &text);
     void onMoveJobFinished();
-    void onRemoteFileAlreadyExists(const QVariantMap &values);
+    void onRemoteFileAlreadyExists(QVariantMap &values);
     void onRemoteFileDoesNotExist(QNetworkReply *reply);
     void checkIfAllowedToRename();
-    void onPropfindPermissionSuccess(const QVariantMap &values);
+    void onPropfindPermissionSuccess(QVariantMap &values);
 };
 }

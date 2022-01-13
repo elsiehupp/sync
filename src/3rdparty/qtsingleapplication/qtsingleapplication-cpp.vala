@@ -27,9 +27,6 @@
 **
 ****************************************************************************/
 
-#include "qtsingleapplication.h"
-#include "qtlocalpeer.h"
-
 // #include <qtlockedfile.h>
 
 // #include <QDir>
@@ -41,7 +38,7 @@ namespace SharedTools {
 
 static const int instancesSize = 1024;
 
-static QString instancesLockFilename(const QString &appSessionId) {
+static QString instancesLockFilename(QString &appSessionId) {
     const QChar slash(QLatin1Char('/'));
     QString res = QDir::tempPath();
     if (!res.endsWith(slash))
@@ -49,7 +46,7 @@ static QString instancesLockFilename(const QString &appSessionId) {
     return res + appSessionId + QLatin1String("-instances");
 }
 
-QtSingleApplication::QtSingleApplication(const QString &appId, int &argc, char **argv)
+QtSingleApplication::QtSingleApplication(QString &appId, int &argc, char **argv)
     : QApplication(argc, argv),
       firstPeer(-1),
       pidPeer(nullptr) {
@@ -136,7 +133,7 @@ bool QtSingleApplication::isRunning(qint64 pid) {
     return peer.isClient();
 }
 
-bool QtSingleApplication::sendMessage(const QString &message, int timeout, qint64 pid) {
+bool QtSingleApplication::sendMessage(QString &message, int timeout, qint64 pid) {
     if (pid == -1) {
         pid = firstPeer;
         if (pid == -1)
@@ -165,11 +162,9 @@ void QtSingleApplication::setActivationWindow(QWidget *aw, bool activateOnMessag
         disconnect(pidPeer, &QtLocalPeer::messageReceived, this, &QtSingleApplication::activateWindow);
 }
 
-
 QWidget* QtSingleApplication::activationWindow() const {
     return actWin;
 }
-
 
 void QtSingleApplication::activateWindow() {
     if (actWin) {

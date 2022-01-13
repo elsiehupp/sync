@@ -18,13 +18,6 @@
 // #include <QSslCertificate>
 // #include <QSslConfiguration>
 
-#include "creds/credentialscommon.h"
-
-#include "common/utility.h"
-#include "account.h"
-#include "syncengine.h"
-
 namespace OCC {
-
 
 } // namespace OCC

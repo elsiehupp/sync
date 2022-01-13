@@ -12,13 +12,6 @@
  * for more details.
  */
 
-#include "welcomepage.h"
-#include "guiutility.h"
-#include "theme.h"
-#include "wizard/owncloudwizard.h"
-#include "wizard/slideshow.h"
-#include "ui_welcomepage.h"
-
 namespace OCC {
 
 WelcomePage::WelcomePage(OwncloudWizard *ocWizard)

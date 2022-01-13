@@ -16,16 +16,6 @@
 // #include <QVariant>
 // #include <QVBoxLayout>
 
-#include "flow2authcredspage.h"
-#include "theme.h"
-#include "account.h"
-#include "cookiejar.h"
-#include "wizard/owncloudwizardcommon.h"
-#include "wizard/owncloudwizard.h"
-#include "wizard/flow2authwidget.h"
-#include "creds/credentialsfactory.h"
-#include "creds/webflowcredentials.h"
-
 namespace OCC {
 
 Flow2AuthCredsPage::Flow2AuthCredsPage()
@@ -69,7 +59,7 @@ void OCC::Flow2AuthCredsPage::cleanupPage() {
     _user.clear();
 }
 
-void Flow2AuthCredsPage::slotFlow2AuthResult(Flow2Auth::Result r, const QString &errorString, const QString &user, const QString &appPassword) {
+void Flow2AuthCredsPage::slotFlow2AuthResult(Flow2Auth::Result r, QString &errorString, QString &user, QString &appPassword) {
     Q_UNUSED(errorString)
     switch (r) {
     case Flow2Auth::NotSupported: {

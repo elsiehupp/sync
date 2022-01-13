@@ -28,14 +28,13 @@
 // #include <QtCore/QDir>
 // #include <QtCore/QTimer>
 // #include <QtCore/QEventLoop>
-#include "ownclouddolphinpluginhelper.h"
 
 class OwncloudDolphinPluginAction : public KAbstractFileItemActionPlugin {
 public:
-    explicit OwncloudDolphinPluginAction(QObject* parent, const QList<QVariant>&)
+    explicit OwncloudDolphinPluginAction(QObject* parent, QList<QVariant>&)
         : KAbstractFileItemActionPlugin(parent) { }
 
-    QList<QAction*> actions(const KFileItemListProperties& fileItemInfos, QWidget* parentWidget) override {
+    QList<QAction*> actions(KFileItemListProperties& fileItemInfos, QWidget* parentWidget) override {
         auto helper = OwncloudDolphinPluginHelper::instance();
         if (!helper->isConnected() || !fileItemInfos.isLocal())
             return {};
@@ -44,10 +43,10 @@ public:
         const QList<QUrl> urls = fileItemInfos.urlList();
         const auto paths = helper->paths();
         QByteArray files;
-        for (const auto &url : urls) {
+        for (auto &url : urls) {
             QDir localPath(url.toLocalFile());
             auto localFile = localPath.canonicalPath();
-            if (!std::any_of(paths.begin(), paths.end(), [&](const QString &s) {
+            if (!std::any_of(paths.begin(), paths.end(), [&](QString &s) {
                     return localFile.startsWith(s);
                 }))
                 return {};
@@ -63,7 +62,7 @@ public:
 
         auto menu = new QMenu(parentWidget);
         QEventLoop loop;
-        auto con = connect(helper, &OwncloudDolphinPluginHelper::commandRecieved, this, [&](const QByteArray &cmd) {
+        auto con = connect(helper, &OwncloudDolphinPluginHelper::commandRecieved, this, [&](QByteArray &cmd) {
             if (cmd.startsWith("GET_MENU_ITEMS:END")) {
                 loop.quit();
             } else if (cmd.startsWith("MENU_ITEM:")) {
@@ -93,8 +92,7 @@ public:
         return { menu->menuAction() };
     }
 
-
-    QList<QAction *> legacyActions(const KFileItemListProperties &fileItemInfos, QWidget *parentWidget) {
+    QList<QAction *> legacyActions(KFileItemListProperties &fileItemInfos, QWidget *parentWidget) {
         QList<QUrl> urls = fileItemInfos.urlList();
         if (urls.count() != 1)
             return {};

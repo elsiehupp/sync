@@ -6,9 +6,7 @@
  */
 
 // #include <QtTest>
-#include "syncenginetestutils.h"
 // #include <syncengine.h>
-#include "common/ownsql.h"
 
 using namespace OCC;
 
@@ -40,20 +38,20 @@ static void assertCsyncJournalOk(SyncJournalDb &journal) {
 #endif
 }
 
-SyncFileItemPtr findDiscoveryItem(const SyncFileItemVector &spy, const QString &path) {
-    for (const auto &item : spy) {
+SyncFileItemPtr findDiscoveryItem(SyncFileItemVector &spy, QString &path) {
+    for (auto &item : spy) {
         if (item->destination() == path)
             return item;
     }
     return SyncFileItemPtr(new SyncFileItem);
 }
 
-bool itemInstruction(const ItemCompletedSpy &spy, const QString &path, const SyncInstructions instr) {
+bool itemInstruction(ItemCompletedSpy &spy, QString &path, SyncInstructions instr) {
     auto item = spy.findItem(path);
     return item->_instruction == instr;
 }
 
-bool discoveryInstruction(const SyncFileItemVector &spy, const QString &path, const SyncInstructions instr) {
+bool discoveryInstruction(SyncFileItemVector &spy, QString &path, SyncInstructions instr) {
     auto item = findDiscoveryItem(spy, path);
     return item->_instruction == instr;
 }
@@ -77,7 +75,7 @@ private slots:
         const int canBeModifiedSize = 144;
 
         //create some files
-        auto insertIn = [&](const QString &dir) {
+        auto insertIn = [&](QString &dir) {
             fakeFolder.remoteModifier().insert(dir + "normalFile_PERM_WVND_.data", 100 );
             fakeFolder.remoteModifier().insert(dir + "cannotBeRemoved_PERM_WVN_.data", 101 );
             fakeFolder.remoteModifier().insert(dir + "canBeRemoved_PERM_D_.data", 102 );
@@ -107,7 +105,7 @@ private slots:
 
         //2. remove the file that can be removed
         //  (they should properly be gone)
-        auto removeReadOnly = [&] (const QString &file)  {
+        auto removeReadOnly = [&] (QString &file)  {
             QVERIFY(!QFileInfo(fakeFolder.localPath() + file).permission(QFile::WriteOwner));
             QFile(fakeFolder.localPath() + file).setPermissions(QFile::WriteOwner | QFile::ReadOwner);
             fakeFolder.localModifier().remove(file);
@@ -117,7 +115,7 @@ private slots:
 
         //3. Edit the files that cannot be modified
         //  (they should be recovered, and a conflict shall be created)
-        auto editReadOnly = [&] (const QString &file)  {
+        auto editReadOnly = [&] (QString &file)  {
             QVERIFY(!QFileInfo(fakeFolder.localPath() + file).permission(QFile::WriteOwner));
             QFile(fakeFolder.localPath() + file).setPermissions(QFile::WriteOwner | QFile::ReadOwner);
             fakeFolder.localModifier().appendByte(file);
@@ -198,7 +196,6 @@ private slots:
         // Both side should still be the same
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
 
-
         //######################################################################
         qInfo( "remove the read only directory" );
         // -> It must be recovered
@@ -219,7 +216,6 @@ private slots:
         applyPermissionsFromName(fakeFolder.remoteModifier());
         QVERIFY(fakeFolder.syncOnce());
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
-
 
         //######################################################################
         qInfo( "move a directory in a outside read only folder" );
@@ -248,7 +244,6 @@ private slots:
         applyPermissionsFromName(fakeFolder.remoteModifier());
         QVERIFY(fakeFolder.syncOnce());
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
-
 
         //######################################################################
         qInfo( "rename a directory in a read only folder and move a directory to a read-only" );
@@ -294,7 +289,6 @@ private slots:
         fakeFolder.remoteModifier().remove("normalDirectory_PERM_CKDNV_/subdir_PERM_CKDNV_");
 
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
-
 
         //######################################################################
         qInfo( "multiple restores of a file create different conflict files" );
@@ -492,7 +486,6 @@ private slots:
 
         lm.rename("changeonly/sub1", "changeonly/aaa");
         lm.rename("changeonly/sub2", "changeonly/zzz");
-
 
         auto expectedState = fakeFolder.currentLocalState();
 

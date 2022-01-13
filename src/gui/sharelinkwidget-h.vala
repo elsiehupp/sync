@@ -13,10 +13,6 @@
  * for more details.
  */
 
-
-#include "accountfwd.h"
-#include "sharepermissions.h"
-#include "QProgressIndicator.h"
 // #include <QDialog>
 // #include <QSharedPointer>
 // #include <QList>
@@ -65,18 +61,18 @@ public:
 
 public slots:
     void slotDeleteShareFetched();
-    void slotToggleShareLinkAnimation(const bool start);
-    void slotServerError(const int code, const QString &message);
-    void slotCreateShareRequiresPassword(const QString &message);
+    void slotToggleShareLinkAnimation(bool start);
+    void slotServerError(int code, QString &message);
+    void slotCreateShareRequiresPassword(QString &message);
     void slotStyleChanged();
 
 private slots:
-    void slotCreateShareLink(const bool clicked);
-    void slotCopyLinkShare(const bool clicked) const;
+    void slotCreateShareLink(bool clicked);
+    void slotCopyLinkShare(bool clicked) const;
 
     void slotCreatePassword();
     void slotPasswordSet();
-    void slotPasswordSetError(const int code, const QString &message);
+    void slotPasswordSetError(int code, QString &message);
 
     void slotCreateNote();
     void slotNoteSet();
@@ -98,16 +94,16 @@ signals:
     void deleteLinkShare();
     void resizeRequested();
     void visualDeletionDone();
-    void createPassword(const QString &password);
+    void createPassword(QString &password);
     void createPasswordProcessed();
 
 private:
-    void displayError(const QString &errMsg);
+    void displayError(QString &errMsg);
 
-    void togglePasswordOptions(const bool enable = true);
-    void toggleNoteOptions(const bool enable = true);
-    void toggleExpireDateOptions(const bool enable = true);
-    void toggleButtonAnimation(QToolButton *button, QProgressIndicator *progressIndicator, const QAction *checkedAction) const;
+    void togglePasswordOptions(bool enable = true);
+    void toggleNoteOptions(bool enable = true);
+    void toggleExpireDateOptions(bool enable = true);
+    void toggleButtonAnimation(QToolButton *button, QProgressIndicator *progressIndicator, QAction *checkedAction) const;
 
     /** Confirm with the user and then delete the share */
     void confirmAndDeleteShare();
@@ -115,7 +111,7 @@ private:
     /** Retrieve a share's name, accounting for _namesSupported */
     QString shareName() const;
 
-    void startAnimation(const int start, const int end);
+    void startAnimation(int start, int end);
 
     void customizeStyle();
 

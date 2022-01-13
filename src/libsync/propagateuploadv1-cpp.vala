@@ -12,21 +12,6 @@
  * for more details.
  */
 
-#include "config.h"
-#include "propagateupload.h"
-#include "owncloudpropagator_p.h"
-#include "networkjobs.h"
-#include "account.h"
-#include "common/syncjournaldb.h"
-#include "common/syncjournalfilerecord.h"
-#include "common/utility.h"
-#include "filesystem.h"
-#include "propagatorjobs.h"
-#include "common/checksums.h"
-#include "syncengine.h"
-#include "propagateremotedelete.h"
-#include "common/asserts.h"
-
 // #include <QNetworkAccessManager>
 // #include <QFileInfo>
 // #include <QDir>
@@ -331,7 +316,6 @@ void PropagateUploadFileV1::slotPutFinished() {
 
     finalize();
 }
-
 
 void PropagateUploadFileV1::slotUploadProgress(qint64 sent, qint64 total) {
     // Completion is signaled with sent=0, total=0; avoid accidentally

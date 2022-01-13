@@ -12,21 +12,6 @@
  * for more details.
  */
 
-#include "ui_sharedialog.h"
-#include "sharedialog.h"
-#include "sharee.h"
-#include "sharelinkwidget.h"
-#include "shareusergroupwidget.h"
-
-#include "sharemanager.h"
-
-#include "account.h"
-#include "accountstate.h"
-#include "configfile.h"
-#include "theme.h"
-#include "thumbnailjob.h"
-#include "wordlist.h"
-
 // #include <QFileInfo>
 // #include <QFileIconProvider>
 // #include <QInputDialog>
@@ -38,14 +23,13 @@ namespace {
 QString createRandomPassword() {
     const auto words = OCC::WordList::getRandomWords(10);
 
-    const auto addFirstLetter = [](const QString &current, const QString &next) -> QString {
+    const auto addFirstLetter = [](QString &current, QString &next) -> QString {
         return current + next.at(0);
     };
 
     return std::accumulate(std::cbegin(words), std::cend(words), QString(), addFirstLetter);
 }
 }
-
 
 namespace OCC {
 
@@ -150,7 +134,7 @@ ShareDialog::ShareDialog(QPointer<AccountState> accountState,
     }
 }
 
-ShareLinkWidget *ShareDialog::addLinkShareWidget(const QSharedPointer<LinkShare> &linkShare) {
+ShareLinkWidget *ShareDialog::addLinkShareWidget(QSharedPointer<LinkShare> &linkShare) {
     _linkWidgetList.append(new ShareLinkWidget(_accountState->account(), _sharePath, _localPath, _maxSharingPermissions, this));
 
     const auto linkShareWidget = _linkWidgetList.at(_linkWidgetList.size() - 1);
@@ -201,7 +185,7 @@ void ShareDialog::initLinkShareWidget() {
     }
 }
 
-void ShareDialog::slotAddLinkShareWidget(const QSharedPointer<LinkShare> &linkShare) {
+void ShareDialog::slotAddLinkShareWidget(QSharedPointer<LinkShare> &linkShare) {
     emit toggleShareLinkAnimation(true);
     const auto addedLinkShareWidget = addLinkShareWidget(linkShare);
     initLinkShareWidget();
@@ -211,7 +195,7 @@ void ShareDialog::slotAddLinkShareWidget(const QSharedPointer<LinkShare> &linkSh
     emit toggleShareLinkAnimation(false);
 }
 
-void ShareDialog::slotSharesFetched(const QList<QSharedPointer<Share>> &shares) {
+void ShareDialog::slotSharesFetched(QList<QSharedPointer<Share>> &shares) {
     emit toggleShareLinkAnimation(true);
 
     const QString versionString = _accountState->account()->serverVersion();
@@ -249,7 +233,7 @@ void ShareDialog::done(int r) {
     QDialog::done(r);
 }
 
-void ShareDialog::slotPropfindReceived(const QVariantMap &result) {
+void ShareDialog::slotPropfindReceived(QVariantMap &result) {
     const QVariant receivedPermissions = result["share-permissions"];
     if (!receivedPermissions.toString().isEmpty()) {
         _maxSharingPermissions = static_cast<SharePermissions>(receivedPermissions.toInt());
@@ -321,7 +305,7 @@ void ShareDialog::slotCreateLinkShare() {
     }
 }
 
-void ShareDialog::slotCreatePasswordForLinkShare(const QString &password) {
+void ShareDialog::slotCreatePasswordForLinkShare(QString &password) {
     const auto shareLinkWidget = qobject_cast<ShareLinkWidget*>(sender());
     Q_ASSERT(shareLinkWidget);
     if (shareLinkWidget) {
@@ -373,7 +357,7 @@ void ShareDialog::slotDeleteShare() {
     initLinkShareWidget();
 }
 
-void ShareDialog::slotThumbnailFetched(const int &statusCode, const QByteArray &reply) {
+void ShareDialog::slotThumbnailFetched(int &statusCode, QByteArray &reply) {
     if (statusCode != 200) {
         qCWarning(lcSharing) << "Thumbnail status code: " << statusCode;
         return;

@@ -12,13 +12,9 @@
  * for more details.
  */
 
-
 // #include <QStringList>
 // #include <QHash>
 // #include <QDateTime>
-
-#include "owncloudlib.h"
-#include "syncfileitem.h"
 
 namespace OCC {
 
@@ -46,7 +42,7 @@ public:
     SyncResult();
     void reset();
 
-    void appendErrorString(const QString &);
+    void appendErrorString(QString &);
     QString errorString() const;
     QStringList errorStrings() const;
     void clearErrors();
@@ -55,7 +51,7 @@ public:
     Status status() const;
     QString statusString() const;
     QDateTime syncTime() const;
-    void setFolder(const QString &folder);
+    void setFolder(QString &folder);
     QString folder() const;
 
     bool foundFilesNotSynced() const { return _foundFilesNotSynced; }
@@ -82,7 +78,7 @@ public:
     const SyncFileItemPtr &firstItemError() const { return _firstItemError; }
     const SyncFileItemPtr &firstItemLocked() const { return _firstItemLocked; }
 
-    void processCompletedItem(const SyncFileItemPtr &item);
+    void processCompletedItem(SyncFileItemPtr &item);
 
 private:
     Status _status = Undefined;

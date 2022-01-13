@@ -16,10 +16,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "asserts.h"
-#include "utility.h"
-#include "gui/configgui.h"
-
 // #include <comdef.h>
 // #include <Lmcons.h>
 // #include <shlguid.h>
@@ -38,7 +34,7 @@ static const char runPathC[] = R"(HKEY_CURRENT_USER\Software\Microsoft\Windows\C
 
 namespace OCC {
 
-static void setupFavLink_private(const QString &folder) {
+static void setupFavLink_private(QString &folder) {
     // First create a Desktop.ini so that the folder and favorite link show our application's icon.
     QFile desktopIni(folder + QLatin1String("/Desktop.ini"));
     if (desktopIni.exists()) {
@@ -82,7 +78,7 @@ static void setupFavLink_private(const QString &folder) {
         qCWarning(lcUtility) << "linking" << folder << "to" << linkName << "failed!";
 }
 
-static void removeFavLink_private(const QString &folder) {
+static void removeFavLink_private(QString &folder) {
     const QDir folderDir(folder);
 
     // #1 Remove the Desktop.ini to reset the folder icon
@@ -115,19 +111,19 @@ static void removeFavLink_private(const QString &folder) {
     }
 }
 
-bool hasSystemLaunchOnStartup_private(const QString &appName) {
+bool hasSystemLaunchOnStartup_private(QString &appName) {
     QString runPath = QLatin1String(systemRunPathC);
     QSettings settings(runPath, QSettings::NativeFormat);
     return settings.contains(appName);
 }
 
-bool hasLaunchOnStartup_private(const QString &appName) {
+bool hasLaunchOnStartup_private(QString &appName) {
     QString runPath = QLatin1String(runPathC);
     QSettings settings(runPath, QSettings::NativeFormat);
     return settings.contains(appName);
 }
 
-void setLaunchOnStartup_private(const QString &appName, const QString &guiName, bool enable) {
+void setLaunchOnStartup_private(QString &appName, QString &guiName, bool enable) {
     Q_UNUSED(guiName);
     QString runPath = QLatin1String(runPathC);
     QSettings settings(runPath, QSettings::NativeFormat);
@@ -163,7 +159,7 @@ QRect Utility::getTaskbarDimensions() {
     return QRect(barRect.left, barRect.top, (barRect.right - barRect.left), (barRect.bottom - barRect.top));
 }
 
-bool Utility::registryKeyExists(HKEY hRootKey, const QString &subKey) {
+bool Utility::registryKeyExists(HKEY hRootKey, QString &subKey) {
     HKEY hKey;
 
     REGSAM sam = KEY_READ | KEY_WOW64_64KEY;
@@ -173,7 +169,7 @@ bool Utility::registryKeyExists(HKEY hRootKey, const QString &subKey) {
     return result != ERROR_FILE_NOT_FOUND;
 }
 
-QVariant Utility::registryGetKeyValue(HKEY hRootKey, const QString &subKey, const QString &valueName) {
+QVariant Utility::registryGetKeyValue(HKEY hRootKey, QString &subKey, QString &valueName) {
     QVariant value;
 
     HKEY hKey;
@@ -233,7 +229,7 @@ QVariant Utility::registryGetKeyValue(HKEY hRootKey, const QString &subKey, cons
     return value;
 }
 
-bool Utility::registrySetKeyValue(HKEY hRootKey, const QString &subKey, const QString &valueName, DWORD type, const QVariant &value) {
+bool Utility::registrySetKeyValue(HKEY hRootKey, QString &subKey, QString &valueName, DWORD type, QVariant &value) {
     HKEY hKey;
     // KEY_WOW64_64KEY is necessary because CLSIDs are "Redirected and reflected only for CLSIDs that do not specify InprocServer32 or InprocHandler32."
     // https://msdn.microsoft.com/en-us/library/windows/desktop/aa384253%28v=vs.85%29.aspx#redirected__shared__and_reflected_keys_under_wow64
@@ -267,7 +263,7 @@ bool Utility::registrySetKeyValue(HKEY hRootKey, const QString &subKey, const QS
     return result == ERROR_SUCCESS;
 }
 
-bool Utility::registryDeleteKeyTree(HKEY hRootKey, const QString &subKey) {
+bool Utility::registryDeleteKeyTree(HKEY hRootKey, QString &subKey) {
     HKEY hKey;
     REGSAM sam = DELETE | KEY_ENUMERATE_SUB_KEYS | KEY_QUERY_VALUE | KEY_SET_VALUE | KEY_WOW64_64KEY;
     LONG result = RegOpenKeyEx(hRootKey, reinterpret_cast<LPCWSTR>(subKey.utf16()), 0, sam, &hKey);
@@ -285,7 +281,7 @@ bool Utility::registryDeleteKeyTree(HKEY hRootKey, const QString &subKey) {
     return result == ERROR_SUCCESS;
 }
 
-bool Utility::registryDeleteKeyValue(HKEY hRootKey, const QString &subKey, const QString &valueName) {
+bool Utility::registryDeleteKeyValue(HKEY hRootKey, QString &subKey, QString &valueName) {
     HKEY hKey;
     REGSAM sam = KEY_WRITE | KEY_WOW64_64KEY;
     LONG result = RegOpenKeyEx(hRootKey, reinterpret_cast<LPCWSTR>(subKey.utf16()), 0, sam, &hKey);
@@ -300,7 +296,7 @@ bool Utility::registryDeleteKeyValue(HKEY hRootKey, const QString &subKey, const
     return result == ERROR_SUCCESS;
 }
 
-bool Utility::registryWalkSubKeys(HKEY hRootKey, const QString &subKey, const std::function<void(HKEY, const QString &)> &callback) {
+bool Utility::registryWalkSubKeys(HKEY hRootKey, QString &subKey, std::function<void(HKEY, QString &)> &callback) {
     HKEY hKey;
     REGSAM sam = KEY_READ | KEY_WOW64_64KEY;
     LONG result = RegOpenKeyEx(hRootKey, reinterpret_cast<LPCWSTR>(subKey.utf16()), 0, sam, &hKey);
@@ -365,7 +361,6 @@ void Utility::UnixTimeToLargeIntegerFiletime(time_t t, LARGE_INTEGER *hundredNSe
     hundredNSecs->LowPart = (DWORD) ll;
     hundredNSecs->HighPart = ll >>32;
 }
-
 
 QString Utility::formatWinError(long errorCode) {
     return QStringLiteral("WindowsError: %1: %2").arg(QString::number(errorCode, 16), QString::fromWCharArray(_com_error(errorCode).ErrorMessage()));

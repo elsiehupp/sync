@@ -14,9 +14,6 @@
 
 // #pragma once
 
-#include "owncloudpropagator.h"
-#include "abstractnetworkjob.h"
-
 // #include <QLoggingCategory>
 // #include <QVector>
 // #include <QMap>
@@ -95,11 +92,11 @@ private:
     void adjustLastJobTimeout(AbstractNetworkJob *job,
                               qint64 fileSize) const;
 
-    void finalize(const QJsonObject &fullReply);
+    void finalize(QJsonObject &fullReply);
 
-    void finalizeOneFile(const BulkUploadItem &oneFile);
+    void finalizeOneFile(BulkUploadItem &oneFile);
 
-    void slotPutFinishedOneFile(const BulkUploadItem &singleFile,
+    void slotPutFinishedOneFile(BulkUploadItem &singleFile,
                                 OCC::PutMultiFileJob *job,
                                 const QJsonObject &fullReplyObject);
 

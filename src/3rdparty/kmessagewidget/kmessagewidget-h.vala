@@ -123,7 +123,7 @@ public:
      * Constructs a KMessageWidget with the specified @p parent and
      * contents @p text.
      */
-    explicit KMessageWidget(const QString &text, QWidget *parent = nullptr);
+    explicit KMessageWidget(QString &text, QWidget *parent = nullptr);
 
     /**
      * Destructor.
@@ -230,7 +230,7 @@ public Q_SLOTS:
      * @param text the text to display, rich text is allowed
      * @see text()
      */
-    void setText(const QString &text);
+    void setText(QString &text);
 
     /**
      * Set word wrap to @p wordWrap. If word wrap is enabled, the text()
@@ -275,7 +275,7 @@ public Q_SLOTS:
      * Define an icon to be shown on the left of the text
      * @since 4.11
      */
-    void setIcon(const QIcon &icon);
+    void setIcon(QIcon &icon);
 
 Q_SIGNALS:
     /**
@@ -285,7 +285,7 @@ Q_SIGNALS:
      * @see QLabel::linkActivated()
      * @since 4.10
      */
-    void linkActivated(const QString &contents);
+    void linkActivated(QString &contents);
 
     /**
      * This signal is emitted when the user hovers over a link in the text label.
@@ -294,7 +294,7 @@ Q_SIGNALS:
      * @see QLabel::linkHovered()
      * @since 4.11
      */
-    void linkHovered(const QString &contents);
+    void linkHovered(QString &contents);
 
     /**
      * This signal is emitted when the hide animation is finished, started by

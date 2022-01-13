@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#include "guiutility.h"
-
 // #include <QClipboard>
 // #include <QApplication>
 // #include <QDesktopServices>
@@ -21,12 +19,11 @@
 // #include <QMessageBox>
 // #include <QUrlQuery>
 
-#include "common/asserts.h"
 using namespace OCC;
 
 Q_LOGGING_CATEGORY(lcUtility, "nextcloud.gui.utility", QtInfoMsg)
 
-bool Utility::openBrowser(const QUrl &url, QWidget *errorWidgetParent) {
+bool Utility::openBrowser(QUrl &url, QWidget *errorWidgetParent) {
     const QStringList allowedUrlSchemes = {
         "http",
         "https",
@@ -54,7 +51,7 @@ bool Utility::openBrowser(const QUrl &url, QWidget *errorWidgetParent) {
     return true;
 }
 
-bool Utility::openEmailComposer(const QString &subject, const QString &body, QWidget *errorWidgetParent) {
+bool Utility::openEmailComposer(QString &subject, QString &body, QWidget *errorWidgetParent) {
     QUrl url(QLatin1String("mailto:"));
     QUrlQuery query;
     query.setQueryItems({ { QLatin1String("subject"), subject }, { QLatin1String("body"), body } });

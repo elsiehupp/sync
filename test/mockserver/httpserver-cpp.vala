@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#include "httpserver.h"
-
 HttpServer::HttpServer(quint16 port, QObject* parent)
     : QTcpServer(parent) {
     listen(QHostAddress::Any, port);
@@ -48,7 +46,6 @@ void HttpServer::discardClient() {
 
     QtServiceBase::instance()->logMessage("Connection closed");
 }
-
 
 void HttpServer::incomingConnection(int socket) {
     if (disabled)

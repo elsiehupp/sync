@@ -14,8 +14,6 @@
 
 // #pragma once
 
-#include "unifiedsearchresult.h"
-
 // #include <limits>
 
 // #include <QtCore>
@@ -62,8 +60,8 @@ public:
 
     explicit UnifiedSearchResultsListModel(AccountState *accountState, QObject *parent = nullptr);
 
-    QVariant data(const QModelIndex &index, int role) const override;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    QVariant data(QModelIndex &index, int role) const override;
+    int rowCount(QModelIndex &parent = QModelIndex()) const override;
 
     bool isSearchInProgress() const;
 
@@ -71,24 +69,24 @@ public:
     QString searchTerm() const;
     QString errorString() const;
 
-    Q_INVOKABLE void resultClicked(const QString &providerId, const QUrl &resourceUrl) const;
-    Q_INVOKABLE void fetchMoreTriggerClicked(const QString &providerId);
+    Q_INVOKABLE void resultClicked(QString &providerId, QUrl &resourceUrl) const;
+    Q_INVOKABLE void fetchMoreTriggerClicked(QString &providerId);
 
     QHash<int, QByteArray> roleNames() const override;
 
 private:
     void startSearch();
-    void startSearchForProvider(const QString &providerId, qint32 cursor = -1);
+    void startSearchForProvider(QString &providerId, qint32 cursor = -1);
 
-    void parseResultsForProvider(const QJsonObject &data, const QString &providerId, bool fetchedMore = false);
+    void parseResultsForProvider(QJsonObject &data, QString &providerId, bool fetchedMore = false);
 
     // append initial search results to the list
-    void appendResults(QVector<UnifiedSearchResult> results, const UnifiedSearchProvider &provider);
+    void appendResults(QVector<UnifiedSearchResult> results, UnifiedSearchProvider &provider);
 
     // append pagination results to existing results from the initial search
-    void appendResultsToProvider(const QVector<UnifiedSearchResult> &results, const UnifiedSearchProvider &provider);
+    void appendResultsToProvider(QVector<UnifiedSearchResult> &results, UnifiedSearchProvider &provider);
 
-    void removeFetchMoreTrigger(const QString &providerId);
+    void removeFetchMoreTrigger(QString &providerId);
 
     void disconnectAndClearSearchJobs();
 
@@ -101,12 +99,12 @@ signals:
     void searchTermChanged();
 
 public slots:
-    void setSearchTerm(const QString &term);
+    void setSearchTerm(QString &term);
 
 private slots:
     void slotSearchTermEditingFinished();
-    void slotFetchProvidersFinished(const QJsonDocument &json, int statusCode);
-    void slotSearchForProviderFinished(const QJsonDocument &json, int statusCode);
+    void slotFetchProvidersFinished(QJsonDocument &json, int statusCode);
+    void slotSearchForProviderFinished(QJsonDocument &json, int statusCode);
 
 private:
     QMap<QString, UnifiedSearchProvider> _providers;

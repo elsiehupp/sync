@@ -12,19 +12,17 @@
  * for more details.
  */
 
-#include "deletejob.h"
-#include "account.h"
 // #include <QLoggingCategory>
 
 namespace OCC {
 
 Q_LOGGING_CATEGORY(lcDeleteJob, "nextcloud.sync.networkjob.delete", QtInfoMsg)
 
-DeleteJob::DeleteJob(AccountPtr account, const QString &path, QObject *parent)
+DeleteJob::DeleteJob(AccountPtr account, QString &path, QObject *parent)
     : AbstractNetworkJob(account, path, parent) {
 }
 
-DeleteJob::DeleteJob(AccountPtr account, const QUrl &url, QObject *parent)
+DeleteJob::DeleteJob(AccountPtr account, QUrl &url, QObject *parent)
     : AbstractNetworkJob(account, QString(), parent)
     , _url(url) {
 }
@@ -59,7 +57,7 @@ QByteArray DeleteJob::folderToken() const {
     return _folderToken;
 }
 
-void DeleteJob::setFolderToken(const QByteArray &folderToken) {
+void DeleteJob::setFolderToken(QByteArray &folderToken) {
     _folderToken = folderToken;
 }
 

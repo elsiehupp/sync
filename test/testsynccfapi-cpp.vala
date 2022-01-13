@@ -6,12 +6,7 @@
  */
 
 // #include <QtTest>
-#include "syncenginetestutils.h"
-#include "common/vfs.h"
-#include "config.h"
 // #include <syncengine.h>
-
-#include "vfs/cfapi/cfapiwrapper.h"
 
 namespace cfapi {
 using namespace OCC::CfApiWrapper;
@@ -41,7 +36,7 @@ enum ErrorKind : int {
     Timeout = 1000,
 };
 
-void setPinState(const QString &path, PinState state, cfapi::SetPinRecurseMode mode) {
+void setPinState(QString &path, PinState state, cfapi::SetPinRecurseMode mode) {
     Q_ASSERT(mode == cfapi::Recurse || mode == cfapi::NoRecurse);
 
     const auto p = QDir::toNativeSeparators(path);
@@ -57,18 +52,18 @@ void setPinState(const QString &path, PinState state, cfapi::SetPinRecurseMode m
     }
 }
 
-bool itemInstruction(const ItemCompletedSpy &spy, const QString &path, const SyncInstructions instr) {
+bool itemInstruction(ItemCompletedSpy &spy, QString &path, SyncInstructions instr) {
     auto item = spy.findItem(path);
     return item->_instruction == instr;
 }
 
-SyncJournalFileRecord dbRecord(FakeFolder &folder, const QString &path) {
+SyncJournalFileRecord dbRecord(FakeFolder &folder, QString &path) {
     SyncJournalFileRecord record;
     folder.syncJournal().getFileRecord(path, &record);
     return record;
 }
 
-void triggerDownload(FakeFolder &folder, const QByteArray &path) {
+void triggerDownload(FakeFolder &folder, QByteArray &path) {
     auto &journal = folder.syncJournal();
     SyncJournalFileRecord record;
     journal.getFileRecord(path, &record);
@@ -79,7 +74,7 @@ void triggerDownload(FakeFolder &folder, const QByteArray &path) {
     journal.schedulePathForRemoteDiscovery(record._path);
 }
 
-void markForDehydration(FakeFolder &folder, const QByteArray &path) {
+void markForDehydration(FakeFolder &folder, QByteArray &path) {
     auto &journal = folder.syncJournal();
     SyncJournalFileRecord record;
     journal.getFileRecord(path, &record);
@@ -703,11 +698,11 @@ private slots:
 
         QVERIFY(fakeFolder.syncOnce());
 
-        auto isDehydrated = [&](const QString &path) {
+        auto isDehydrated = [&](QString &path) {
             return cfapi::isSparseFile(fakeFolder.localPath() + path)
                 && QFileInfo(fakeFolder.localPath() + path).exists();
         };
-        auto hasDehydratedDbEntries = [&](const QString &path) {
+        auto hasDehydratedDbEntries = [&](QString &path) {
             SyncJournalFileRecord rec;
             fakeFolder.syncJournal().getFileRecord(path, &rec);
             return rec.isValid() && rec._type == ItemTypeVirtualFile;
@@ -1139,7 +1134,7 @@ private slots:
 
         // Setup error case if needed
         if (errorKind == Timeout) {
-            fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, const QNetworkRequest &req, QIODevice *) -> QNetworkReply * {
+            fakeFolder.setServerOverride([&](QNetworkAccessManager::Operation op, QNetworkRequest &req, QIODevice *) -> QNetworkReply * {
                 if (req.url().path().endsWith("online/sub/file1")) {
                     return new FakeHangingReply(op, req, this);
                 }

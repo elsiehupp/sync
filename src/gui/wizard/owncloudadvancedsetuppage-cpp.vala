@@ -21,19 +21,7 @@
 // #include <QMessageBox>
 // #include <QJsonObject>
 
-#include "QProgressIndicator.h"
-
-#include "wizard/owncloudwizard.h"
-#include "wizard/owncloudwizardcommon.h"
-#include "wizard/owncloudadvancedsetuppage.h"
-#include "account.h"
-#include "theme.h"
-#include "configfile.h"
-#include "selectivesyncdialog.h"
 // #include <folderman.h>
-#include "creds/abstractcredentials.h"
-#include "networkjobs.h"
-#include "wizard/owncloudwizard.h"
 
 namespace OCC {
 
@@ -156,7 +144,6 @@ void OwncloudAdvancedSetupPage::initializePage() {
     connect(quotaJob, &PropfindJob::result, this, &OwncloudAdvancedSetupPage::slotQuotaRetrieved);
     quotaJob->start();
 
-
     if (Theme::instance()->wizardSelectiveSyncDefaultNothing()) {
         _selectiveSyncBlacklist = QStringList("/");
         setRadioChecked(_ui.rSelectiveSync);
@@ -192,7 +179,7 @@ void OwncloudAdvancedSetupPage::fetchUserAvatar() {
     }
     const auto avatarJob = new AvatarJob(account, account->davUser(), avatarSize, this);
     avatarJob->setTimeout(20 * 1000);
-    QObject::connect(avatarJob, &AvatarJob::avatarPixmap, this, [this](const QImage &avatarImage) {
+    QObject::connect(avatarJob, &AvatarJob::avatarPixmap, this, [this](QImage &avatarImage) {
         if (avatarImage.isNull()) {
             return;
         }
@@ -210,7 +197,7 @@ void OwncloudAdvancedSetupPage::setUserInformation() {
     _ui.userNameLabel->setText(userName);
 }
 
-void OwncloudAdvancedSetupPage::refreshVirtualFilesAvailibility(const QString &path) {
+void OwncloudAdvancedSetupPage::refreshVirtualFilesAvailibility(QString &path) {
     // TODO: remove when UX decision is made
     if (!_ui.rVirtualFileSync->isVisible()) {
         return;
@@ -227,7 +214,7 @@ void OwncloudAdvancedSetupPage::refreshVirtualFilesAvailibility(const QString &p
     //
 }
 
-void OwncloudAdvancedSetupPage::setServerAddressLabelUrl(const QUrl &url) {
+void OwncloudAdvancedSetupPage::setServerAddressLabelUrl(QUrl &url) {
     if (!url.isValid()) {
         return;
     }
@@ -374,7 +361,7 @@ bool OwncloudAdvancedSetupPage::validatePage() {
     }
 }
 
-void OwncloudAdvancedSetupPage::setErrorString(const QString &err) {
+void OwncloudAdvancedSetupPage::setErrorString(QString &err) {
     if (err.isEmpty()) {
         _ui.errorLabel->setVisible(false);
     } else {
@@ -392,7 +379,7 @@ void OwncloudAdvancedSetupPage::directoriesCreated() {
     emit completeChanged();
 }
 
-void OwncloudAdvancedSetupPage::setRemoteFolder(const QString &remoteFolder) {
+void OwncloudAdvancedSetupPage::setRemoteFolder(QString &remoteFolder) {
     if (!remoteFolder.isEmpty()) {
         _remoteFolder = remoteFolder;
     }
@@ -414,8 +401,7 @@ void OwncloudAdvancedSetupPage::slotSelectFolder() {
     setErrorString(errorStr);
 }
 
-
-void OwncloudAdvancedSetupPage::setLocalFolderPushButtonPath(const QString &path) {
+void OwncloudAdvancedSetupPage::setLocalFolderPushButtonPath(QString &path) {
     const auto homeDir = QDir::homePath().endsWith('/') ? QDir::homePath() : QDir::homePath() + QLatin1Char('/');
 
     if (!path.startsWith(homeDir)) {
@@ -493,7 +479,7 @@ void OwncloudAdvancedSetupPage::slotSyncEverythingClicked() {
     setErrorString(errorStr);
 }
 
-void OwncloudAdvancedSetupPage::slotQuotaRetrieved(const QVariantMap &result) {
+void OwncloudAdvancedSetupPage::slotQuotaRetrieved(QVariantMap &result) {
     _rSize = result["size"].toDouble();
     _ui.lSyncEverythingSizeLabel->setText(tr("(%1)").arg(Utility::octetsToString(_rSize)));
 

@@ -12,7 +12,6 @@
  * for more details.
  */
 
-
 // #include <QWizardPage>
 
 namespace OCC {

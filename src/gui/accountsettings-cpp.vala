@@ -12,36 +12,6 @@
  * for more details.
  */
 
-
-#include "accountsettings.h"
-#include "common/syncjournalfilerecord.h"
-#include "qmessagebox.h"
-#include "ui_accountsettings.h"
-
-#include "theme.h"
-#include "foldercreationdialog.h"
-#include "folderman.h"
-#include "folderwizard.h"
-#include "folderstatusmodel.h"
-#include "folderstatusdelegate.h"
-#include "common/utility.h"
-#include "guiutility.h"
-#include "application.h"
-#include "configfile.h"
-#include "account.h"
-#include "accountstate.h"
-#include "userinfo.h"
-#include "accountmanager.h"
-#include "owncloudsetupwizard.h"
-#include "creds/abstractcredentials.h"
-#include "creds/httpcredentialsgui.h"
-#include "tooltipupdater.h"
-#include "filesystem.h"
-#include "encryptfolderjob.h"
-#include "syncresult.h"
-#include "ignorelisttablewidget.h"
-#include "wizard/owncloudwizard.h"
-
 // #include <cmath>
 
 // #include <QDesktopServices>
@@ -57,8 +27,6 @@
 // #include <QVariant>
 // #include <QJsonDocument>
 // #include <QToolTip>
-
-#include "account.h"
 
 namespace {
 constexpr auto propertyFolder = "folder";
@@ -195,7 +163,6 @@ AccountSettings::AccountSettings(AccountState *accountState, QWidget *parent)
     connect(syncNowWithRemoteDiscovery, &QAction::triggered, this, &AccountSettings::slotScheduleCurrentFolderForceRemoteDiscovery);
     addAction(syncNowWithRemoteDiscovery);
 
-
     slotHideSelectiveSyncWidget();
     _ui->bigFolderUi->setVisible(false);
     connect(_model, &QAbstractItemModel::dataChanged, this, &AccountSettings::slotSelectiveSyncChanged);
@@ -210,7 +177,6 @@ AccountSettings::AccountSettings(AccountState *accountState, QWidget *parent)
 
     connect(FolderMan::instance(), &FolderMan::folderListChanged, _model, &FolderStatusModel::resetFolders);
     connect(this, &AccountSettings::folderChanged, _model, &FolderStatusModel::resetFolders);
-
 
     // quotaProgressBar style now set in customizeStyle()
     /*QColor color = palette().highlight().color();
@@ -297,11 +263,11 @@ void AccountSettings::doExpand() {
     }
 }
 
-void AccountSettings::slotShowMnemonic(const QString &mnemonic) {
+void AccountSettings::slotShowMnemonic(QString &mnemonic) {
     AccountManager::instance()->displayMnemonic(mnemonic);
 }
 
-bool AccountSettings::canEncryptOrDecrypt (const FolderStatusModel::SubFolderInfo* info) {
+bool AccountSettings::canEncryptOrDecrypt (FolderStatusModel::SubFolderInfo* info) {
     if (info->_folder->syncResult().status() != SyncResult::Status::Success) {
         QMessageBox msgBox;
         msgBox.setText("Please wait for the folder to sync before trying to encrypt it.");
@@ -386,7 +352,7 @@ void AccountSettings::slotOpenMakeFolderDialog() {
         QString result;
         if (classification == FolderStatusModel::RootFolder) {
             const auto alias = _model->data(selected, FolderStatusDelegate::FolderAliasRole).toString();
-            if (const auto folder = FolderMan::instance()->folder(alias)) {
+            if (auto folder = FolderMan::instance()->folder(alias)) {
                 result = folder->path();
             }
         } else {
@@ -415,7 +381,7 @@ void AccountSettings::slotEditCurrentLocalIgnoredFiles() {
     openIgnoredFilesDialog(fileName);
 }
 
-void AccountSettings::openIgnoredFilesDialog(const QString & absFolderPath) {
+void AccountSettings::openIgnoredFilesDialog(QString & absFolderPath) {
     Q_ASSERT(QFileInfo(absFolderPath).isAbsolute());
 
     const QString ignoreFile = absFolderPath + ".sync-exclude.lst";
@@ -441,7 +407,7 @@ void AccountSettings::openIgnoredFilesDialog(const QString & absFolderPath) {
     dialog->open();
 }
 
-void AccountSettings::slotSubfolderContextMenuRequested(const QModelIndex& index, const QPoint& pos) {
+void AccountSettings::slotSubfolderContextMenuRequested(QModelIndex& index, QPoint& pos) {
     Q_UNUSED(pos);
 
     QMenu menu;
@@ -503,7 +469,7 @@ void AccountSettings::slotSubfolderContextMenuRequested(const QModelIndex& index
     menu.exec(QCursor::pos());
 }
 
-void AccountSettings::slotCustomContextMenuRequested(const QPoint &pos) {
+void AccountSettings::slotCustomContextMenuRequested(QPoint &pos) {
     QTreeView *tv = _ui->_folderList;
     QModelIndex index = tv->indexAt(pos);
     if (!index.isValid()) {
@@ -590,11 +556,10 @@ void AccountSettings::slotCustomContextMenuRequested(const QPoint &pos) {
         }
     }
 
-
     menu->popup(tv->mapToGlobal(pos));
 }
 
-void AccountSettings::slotFolderListClicked(const QModelIndex &indx) {
+void AccountSettings::slotFolderListClicked(QModelIndex &indx) {
     if (indx.data(FolderStatusDelegate::AddButton).toBool()) {
         // "Add Folder Sync Connection"
         QTreeView *tv = _ui->_folderList;
@@ -649,7 +614,6 @@ void AccountSettings::slotAddFolder() {
     connect(folderWizard, &QDialog::rejected, this, &AccountSettings::slotFolderWizardRejected);
     folderWizard->open();
 }
-
 
 void AccountSettings::slotFolderWizardAccepted() {
     auto *folderWizard = qobject_cast<FolderWizard *>(sender());
@@ -799,7 +763,7 @@ void AccountSettings::slotEnableVfsCurrentFolder() {
             // Setting to Unspecified retains existing data.
             // Selective sync excluded folders become OnlineOnly.
             folder->setRootPinState(PinState::Unspecified);
-            for (const auto &entry : oldBlacklist) {
+            for (auto &entry : oldBlacklist) {
                 folder->journalDb()->schedulePathForRemoteDiscovery(entry);
                 if (!folder->vfs().setPinState(entry, PinState::OnlineOnly)) {
                     qCWarning(lcAccountSettings) << "Could not set pin state of" << entry << "to online only";
@@ -901,7 +865,7 @@ void AccountSettings::slotSetCurrentFolderAvailability(PinState state) {
     folder->scheduleThisFolderSoon();
 }
 
-void AccountSettings::slotSetSubFolderAvailability(Folder *folder, const QString &path, PinState state) {
+void AccountSettings::slotSetSubFolderAvailability(Folder *folder, QString &path, PinState state) {
     Q_ASSERT(folder && folder->virtualFilesEnabled());
     Q_ASSERT(!path.endsWith('/'));
 
@@ -915,7 +879,7 @@ void AccountSettings::slotSetSubFolderAvailability(Folder *folder, const QString
     folder->scheduleThisFolderSoon();
 }
 
-void AccountSettings::showConnectionLabel(const QString &message, QStringList errors) {
+void AccountSettings::showConnectionLabel(QString &message, QStringList errors) {
     const QString errStyle = QLatin1String("color:#ffffff; background-color:#bb4d4d;padding:5px;"
                                            "border-width: 1px; border-style: solid; border-color: #aaaaaa;"
                                            "border-radius:5px;");
@@ -1164,7 +1128,7 @@ void AccountSettings::slotAccountStateChanged() {
     }
 }
 
-void AccountSettings::slotLinkActivated(const QString &link) {
+void AccountSettings::slotLinkActivated(QString &link) {
     // Parse folder alias and filename from the link, calculate the index
     // and select it if it exists.
     const QStringList li = link.split(QLatin1String("?folder="));
@@ -1209,7 +1173,7 @@ void AccountSettings::slotHideSelectiveSyncWidget() {
     _ui->selectiveSyncLabel->hide();
 }
 
-void AccountSettings::slotSelectiveSyncChanged(const QModelIndex &topLeft,
+void AccountSettings::slotSelectiveSyncChanged(QModelIndex &topLeft,
                                                const QModelIndex &bottomRight,
                                                const QVector<int> &roles) {
     Q_UNUSED(bottomRight);
@@ -1271,7 +1235,7 @@ void AccountSettings::refreshSelectiveSyncStatus() {
 
         bool ok = false;
         const auto undecidedList = folder->journalDb()->getSelectiveSyncList(SyncJournalDb::SelectiveSyncUndecidedList, &ok);
-        for (const auto &it : undecidedList) {
+        for (auto &it : undecidedList) {
             // FIXME: add the folder alias in a hoover hint.
             // folder->alias() + QLatin1String("/")
             if (cnt++) {

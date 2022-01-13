@@ -12,15 +12,6 @@
  * for more details.
  */
 
-#include "propagateremotemkdir.h"
-#include "owncloudpropagator_p.h"
-#include "account.h"
-#include "common/syncjournalfilerecord.h"
-#include "propagateuploadencrypted.h"
-#include "deletejob.h"
-#include "common/asserts.h"
-#include "encryptfolderjob.h"
-
 // #include <QFile>
 // #include <QLoggingCategory>
 
@@ -28,7 +19,7 @@ namespace OCC {
 
 Q_LOGGING_CATEGORY(lcPropagateRemoteMkdir, "nextcloud.sync.propagator.remotemkdir", QtInfoMsg)
 
-PropagateRemoteMkdir::PropagateRemoteMkdir(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
+PropagateRemoteMkdir::PropagateRemoteMkdir(OwncloudPropagator *propagator, SyncFileItemPtr &item)
     : PropagateItemJob(propagator, item)
     , _deleteExisting(false)
     , _uploadEncryptedHelper(nullptr) {
@@ -77,7 +68,7 @@ void PropagateRemoteMkdir::slotStartMkcolJob() {
     _job->start();
 }
 
-void PropagateRemoteMkdir::slotStartEncryptedMkcolJob(const QString &path, const QString &filename, quint64 size) {
+void PropagateRemoteMkdir::slotStartEncryptedMkcolJob(QString &path, QString &filename, quint64 size) {
     Q_UNUSED(path)
     Q_UNUSED(size)
 
@@ -109,7 +100,7 @@ void PropagateRemoteMkdir::setDeleteExisting(bool enabled) {
     _deleteExisting = enabled;
 }
 
-void PropagateRemoteMkdir::finalizeMkColJob(QNetworkReply::NetworkError err, const QString &jobHttpReasonPhraseString, const QString &jobPath) {
+void PropagateRemoteMkdir::finalizeMkColJob(QNetworkReply::NetworkError err, QString &jobHttpReasonPhraseString, QString &jobPath) {
     if (_item->_httpErrorCode == 405) {
         // This happens when the directory already exists. Nothing to do.
         qDebug(lcPropagateRemoteMkdir) << "Folder" << jobPath << "already exists.";
@@ -132,7 +123,7 @@ void PropagateRemoteMkdir::finalizeMkColJob(QNetworkReply::NetworkError err, con
     propagator()->_activeJobList.append(this);
     auto propfindJob = new PropfindJob(propagator()->account(), jobPath, this);
     propfindJob->setProperties({"http://owncloud.org/ns:permissions"});
-    connect(propfindJob, &PropfindJob::result, this, [this, jobPath](const QVariantMap &result){
+    connect(propfindJob, &PropfindJob::result, this, [this, jobPath](QVariantMap &result){
         propagator()->_activeJobList.removeOne(this);
         _item->_remotePerm = RemotePermissions::fromServerString(result.value(QStringLiteral("permissions")).toString());
 

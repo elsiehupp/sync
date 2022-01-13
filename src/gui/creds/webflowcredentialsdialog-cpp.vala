@@ -1,17 +1,9 @@
-#include "webflowcredentialsdialog.h"
 
 // #include <QVBoxLayout>
 // #include <QLabel>
 
-#include "theme.h"
-#include "application.h"
-#include "owncloudgui.h"
-#include "headerbanner.h"
-#include "wizard/owncloudwizardcommon.h"
 #ifdef WITH_WEBENGINE
-#include "wizard/webview.h"
 #endif // WITH_WEBENGINE
-#include "wizard/flow2authwidget.h"
 
 namespace OCC {
 
@@ -96,7 +88,7 @@ void WebFlowCredentialsDialog::closeEvent(QCloseEvent* e) {
     emit onClose();
 }
 
-void WebFlowCredentialsDialog::setUrl(const QUrl &url) {
+void WebFlowCredentialsDialog::setUrl(QUrl &url) {
 #ifdef WITH_WEBENGINE
     if (_webView)
         _webView->setUrl(url);
@@ -105,11 +97,11 @@ void WebFlowCredentialsDialog::setUrl(const QUrl &url) {
 #endif // WITH_WEBENGINE
 }
 
-void WebFlowCredentialsDialog::setInfo(const QString &msg) {
+void WebFlowCredentialsDialog::setInfo(QString &msg) {
     _infoLabel->setText(msg);
 }
 
-void WebFlowCredentialsDialog::setError(const QString &error) {
+void WebFlowCredentialsDialog::setError(QString &error) {
     // bring window to top
     slotShowSettingsDialog();
 
@@ -158,7 +150,7 @@ void WebFlowCredentialsDialog::slotShowSettingsDialog() {
     });
 }
 
-void WebFlowCredentialsDialog::slotFlow2AuthResult(Flow2Auth::Result r, const QString &errorString, const QString &user, const QString &appPassword) {
+void WebFlowCredentialsDialog::slotFlow2AuthResult(Flow2Auth::Result r, QString &errorString, QString &user, QString &appPassword) {
     Q_UNUSED(errorString)
     if(r == Flow2Auth::LoggedIn) {
         emit urlCatched(user, appPassword, QString());

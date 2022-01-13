@@ -1,4 +1,3 @@
-#include "clientsideencryptionjobs.h"
 // #include <QDebug>
 // #include <QLoggingCategory>
 // #include <QFileInfo>
@@ -10,21 +9,13 @@
 // #include <QInputDialog>
 // #include <QLineEdit>
 
-#include "clientsideencryption.h"
-#include "account.h"
-#include "capabilities.h"
-#include "networkjobs.h"
-#include "clientsideencryptionjobs.h"
-#include "theme.h"
-#include "creds/abstractcredentials.h"
-
 Q_LOGGING_CATEGORY(lcSignPublicKeyApiJob, "nextcloud.sync.networkjob.sendcsr", QtInfoMsg)
 Q_LOGGING_CATEGORY(lcStorePrivateKeyApiJob, "nextcloud.sync.networkjob.storeprivatekey", QtInfoMsg)
 Q_LOGGING_CATEGORY(lcCseJob, "nextcloud.sync.networkjob.clientsideencrypt", QtInfoMsg)
 
 namespace OCC {
 
-GetMetadataApiJob::GetMetadataApiJob(const AccountPtr& account,
+GetMetadataApiJob::GetMetadataApiJob(AccountPtr& account,
                                     const QByteArray& fileId,
                                     QObject* parent)
 : AbstractNetworkJob(account, e2eeBaseUrl() + QStringLiteral("meta-data/") + fileId, parent), _fileId(fileId) {
@@ -56,7 +47,7 @@ bool GetMetadataApiJob::finished() {
     return true;
 }
 
-StoreMetaDataApiJob::StoreMetaDataApiJob(const AccountPtr& account,
+StoreMetaDataApiJob::StoreMetaDataApiJob(AccountPtr& account,
                                                  const QByteArray& fileId,
                                                  const QByteArray& b64Metadata,
                                                  QObject* parent)
@@ -93,7 +84,7 @@ bool StoreMetaDataApiJob::finished() {
     return true;
 }
 
-UpdateMetadataApiJob::UpdateMetadataApiJob(const AccountPtr& account,
+UpdateMetadataApiJob::UpdateMetadataApiJob(AccountPtr& account,
                                                  const QByteArray& fileId,
                                                  const QByteArray& b64Metadata,
                                                  const QByteArray& token,
@@ -141,7 +132,7 @@ bool UpdateMetadataApiJob::finished() {
     return true;
 }
 
-UnlockEncryptFolderApiJob::UnlockEncryptFolderApiJob(const AccountPtr& account,
+UnlockEncryptFolderApiJob::UnlockEncryptFolderApiJob(AccountPtr& account,
                                                  const QByteArray& fileId,
                                                  const QByteArray& token,
                                                  QObject* parent)
@@ -172,8 +163,7 @@ bool UnlockEncryptFolderApiJob::finished() {
     return true;
 }
 
-
-DeleteMetadataApiJob::DeleteMetadataApiJob(const AccountPtr& account,
+DeleteMetadataApiJob::DeleteMetadataApiJob(AccountPtr& account,
                                                   const QByteArray& fileId,
                                                  QObject* parent)
 : AbstractNetworkJob(account, e2eeBaseUrl() + QStringLiteral("meta-data/") + fileId, parent), _fileId(fileId) {
@@ -202,7 +192,7 @@ bool DeleteMetadataApiJob::finished() {
     return true;
 }
 
-LockEncryptFolderApiJob::LockEncryptFolderApiJob(const AccountPtr& account, const QByteArray& fileId, QObject* parent)
+LockEncryptFolderApiJob::LockEncryptFolderApiJob(AccountPtr& account, QByteArray& fileId, QObject* parent)
 : AbstractNetworkJob(account, e2eeBaseUrl() + QStringLiteral("lock/") + fileId, parent), _fileId(fileId) {
 }
 
@@ -238,7 +228,7 @@ bool LockEncryptFolderApiJob::finished() {
     return true;
 }
 
-SetEncryptionFlagApiJob::SetEncryptionFlagApiJob(const AccountPtr& account, const QByteArray& fileId, FlagAction flagAction, QObject* parent)
+SetEncryptionFlagApiJob::SetEncryptionFlagApiJob(AccountPtr& account, QByteArray& fileId, FlagAction flagAction, QObject* parent)
 : AbstractNetworkJob(account, e2eeBaseUrl() + QStringLiteral("encrypted/") + fileId, parent), _fileId(fileId), _flagAction(flagAction) {
 }
 
@@ -266,11 +256,11 @@ bool SetEncryptionFlagApiJob::finished() {
     return true;
 }
 
-StorePrivateKeyApiJob::StorePrivateKeyApiJob(const AccountPtr& account, const QString& path, QObject* parent)
+StorePrivateKeyApiJob::StorePrivateKeyApiJob(AccountPtr& account, QString& path, QObject* parent)
 : AbstractNetworkJob(account, path, parent) {
 }
 
-void StorePrivateKeyApiJob::setPrivateKey(const QByteArray& privKey) {
+void StorePrivateKeyApiJob::setPrivateKey(QByteArray& privKey) {
     QByteArray data = "privateKey=";
     data += QUrl::toPercentEncoding(privKey);
     _privKey.setData(data);
@@ -300,11 +290,11 @@ bool StorePrivateKeyApiJob::finished() {
     return true;
 }
 
-SignPublicKeyApiJob::SignPublicKeyApiJob(const AccountPtr& account, const QString& path, QObject* parent)
+SignPublicKeyApiJob::SignPublicKeyApiJob(AccountPtr& account, QString& path, QObject* parent)
 : AbstractNetworkJob(account, path, parent) {
 }
 
-void SignPublicKeyApiJob::setCsr(const QByteArray& csr) {
+void SignPublicKeyApiJob::setCsr(QByteArray& csr) {
     QByteArray data = "csr=";
     data += QUrl::toPercentEncoding(csr);
     _csr.setData(data);

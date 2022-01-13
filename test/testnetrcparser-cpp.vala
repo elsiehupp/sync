@@ -6,8 +6,6 @@
 
 // #include <QtTest>
 
-#include "cmd/netrcparser.h"
-
 using namespace OCC;
 
 namespace {

@@ -17,10 +17,6 @@
 // #include <QWebSocketServer>
 // #include <QSignalSpy>
 
-#include "accountfwd.h"
-#include "pushnotifications.h"
-#include "pushnotificationstestutils.h"
-
 #define RETURN_FALSE_ON_FAIL(expr) \
     if (!(expr)) {                 \
         return false;              \
