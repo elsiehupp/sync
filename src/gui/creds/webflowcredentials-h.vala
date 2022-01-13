@@ -1,37 +1,34 @@
 #ifndef WEBFLOWCREDENTIALS_H
-#define WEBFLOWCREDENTIALS_H
+const int WEBFLOWCREDENTIALS_H
 
 // #include <QSslCertificate>
 // #include <QSslKey>
 // #include <QNetworkRequest>
 // #include <QQueue>
 
-class QDialog;
 class QLabel;
-class QNetworkReply;
 class QAuthenticator;
 
 namespace QKeychain {
     class Job;
 }
 
-namespace OCC {
+namespace Occ {
 
 namespace KeychainChunk {
     class ReadJob;
     class WriteJob;
 }
 
-class WebFlowCredentialsDialog;
 
-class WebFlowCredentials : public AbstractCredentials {
+class WebFlowCredentials : AbstractCredentials {
     friend class WebFlowCredentialsAccessManager;
 
 public:
     /// Don't add credentials if this is set on a QNetworkRequest
     static constexpr QNetworkRequest.Attribute DontAddCredentialsAttribute = QNetworkRequest.User;
 
-    explicit WebFlowCredentials ();
+    WebFlowCredentials ();
     WebFlowCredentials (
             const QString &user,
             const QString &password,
@@ -76,10 +73,10 @@ private slots:
 
 private:
     /*
-     * Windows: Workaround for CredWriteW used by QtKeychain
+     * Windows : Workaround for CredWriteW used by QtKeychain
      *
      *          Saving all client CA's within one credential may result in:
-     *          Error: "Credential size exceeds maximum size of 2560"
+     *          Error : "Credential size exceeds maximum size of 2560"
      */
     void readSingleClientCaCertPEM ();
     void writeSingleClientCaCertPEM ();
@@ -122,6 +119,4 @@ protected:
     WebFlowCredentialsDialog *_askDialog = nullptr;
 };
 
-} // namespace OCC
-
-#endif // WEBFLOWCREDENTIALS_H
+} // namespace Occ

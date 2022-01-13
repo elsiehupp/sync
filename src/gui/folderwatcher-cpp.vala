@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // event masks
 
@@ -23,12 +23,12 @@
 // #include <QStringList>
 // #include <QTimer>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcFolderWatcher, "nextcloud.gui.folderwatcher", QtInfoMsg)
 
 FolderWatcher.FolderWatcher (Folder *folder)
-    : QObject (folder)
+    : GLib.Object (folder)
     , _folder (folder) {
 }
 
@@ -121,7 +121,7 @@ void FolderWatcher.changeDetected (QString &path) {
 }
 
 void FolderWatcher.changeDetected (QStringList &paths) {
-    // TODO: this shortcut doesn't look very reliable:
+    // TODO : this shortcut doesn't look very reliable:
     //   - why is the timeout only 1 second?
     //   - what if there is more than one file being updated frequently?
     //   - why do we skip the file altogether instead of e.g. reducing the upload frequency?
@@ -160,4 +160,4 @@ void FolderWatcher.changeDetected (QStringList &paths) {
     }
 }
 
-} // namespace OCC
+} // namespace Occ

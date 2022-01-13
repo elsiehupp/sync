@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Julius Härtl <jus@bitgrid.net>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Julius Härtl <jus@bitgrid.net>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <glib.h>
 // #include <gio/gio.h>
@@ -21,7 +21,7 @@ CloudProvidersProviderExporter *_providerExporter;
 void on_name_acquired (GDBusConnection *connection, gchar *name, gpointer user_data) {
     Q_UNUSED (name);
     CloudProviderManager *self;
-    self = static_cast<CloudProviderManager*> (user_data);
+    self = static_cast<CloudProviderManager> (user_data);
     _providerExporter = cloud_providers_provider_exporter_new (connection, LIBCLOUDPROVIDERS_DBUS_BUS_NAME, LIBCLOUDPROVIDERS_DBUS_OBJECT_PATH);
     cloud_providers_provider_exporter_set_name (_providerExporter, APPLICATION_NAME);
     self.registerSignals ();
@@ -35,18 +35,18 @@ void on_name_lost (GDBusConnection *connection, gchar *name, gpointer user_data)
 }
 
 void CloudProviderManager.registerSignals () {
-    OCC.FolderMan *folderManager = OCC.FolderMan.instance ();
+    Occ.FolderMan *folderManager = Occ.FolderMan.instance ();
     connect (folderManager, SIGNAL (folderListChanged (Folder.Map &)), SLOT (slotFolderListChanged (Folder.Map &)));
     slotFolderListChanged (folderManager.map ());
 }
 
-CloudProviderManager.CloudProviderManager (QObject *parent) : QObject (parent) {
+CloudProviderManager.CloudProviderManager (GLib.Object *parent) : GLib.Object (parent) {
     _folder_index = 0;
     g_bus_own_name (G_BUS_TYPE_SESSION, LIBCLOUDPROVIDERS_DBUS_BUS_NAME, G_BUS_NAME_OWNER_FLAGS_NONE, nullptr, on_name_acquired, nullptr, this, nullptr);
 }
 
 void CloudProviderManager.slotFolderListChanged (Folder.Map &folderMap) {
-    QMapIterator<QString, CloudProviderWrapper*> i (_map);
+    QMapIterator<QString, CloudProviderWrapper> i (_map);
     while (i.hasNext ()) {
         i.next ();
         if (!folderMap.contains (i.key ())) {

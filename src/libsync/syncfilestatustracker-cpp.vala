@@ -1,21 +1,21 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- * Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QLoggingCategory>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcStatusTracker, "nextcloud.sync.statustracker", QtInfoMsg)
 
@@ -47,7 +47,7 @@ SyncFileStatus.SyncFileStatusTag SyncFileStatusTracker.lookupProblem (QString &p
             return SyncFileStatus.StatusWarning;
         } else if (!pathStartsWith (problemPath, pathToMatch)) {
             // Starting at lower_bound we get the first path that is not smaller,
-            // since: "a/" < "a/aa" < "a/aa/aaa" < "a/ab/aba"
+            // since : "a/" < "a/aa" < "a/aa/aaa" < "a/ab/aba"
             // If problemMap keys are ["a/aa/aaa", "a/ab/aba"] and pathToMatch == "a/aa",
             // lower_bound (pathToMatch) will point to "a/aa/aaa", and the moment that
             // problemPath.startsWith (pathToMatch) == false, we know that we've looked
@@ -59,13 +59,13 @@ SyncFileStatus.SyncFileStatusTag SyncFileStatusTracker.lookupProblem (QString &p
 }
 
 /**
- * Whether this item should get an ERROR icon through the Socket API.
- *
- * The Socket API should only present serious, permanent errors to the user.
- * In particular SoftErrors should just retain their 'needs to be synced'
- * icon as the problem is most likely going to resolve itself quickly and
- * automatically.
- */
+Whether this item should get an ERROR icon through the Socket API.
+
+The Socket API should only present serious, permanent errors to the us
+In particular SoftErrors should just retain their 'needs to be synced'
+icon as the problem is most likely going to resolve itself quickly and
+automatically.
+*/
 static inline bool hasErrorStatus (SyncFileItem &item) {
     const auto status = item._status;
     return item._instruction == CSYNC_INSTRUCTION_ERROR
@@ -110,7 +110,7 @@ SyncFileStatus SyncFileStatusTracker.fileStatus (QString &relativePath) {
     // update the exclude list at runtime and doing it statically here removes
     // our ability to notify changes through the fileStatusChanged signal,
     // it's an acceptable compromize to treat all exclude types the same.
-    // Update: This extra check shouldn't hurt even though silently excluded files
+    // Update : This extra check shouldn't hurt even though silently excluded files
     // are now available via slotAddSilentlyExcluded ().
     if (_syncEngine.excludedFiles ().isExcluded (_syncEngine.localPath () + relativePath,
             _syncEngine.localPath (),

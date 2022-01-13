@@ -1,20 +1,20 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
+Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
+
+This library is free software; you can redistribute it and
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later versi
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GN
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+*/
 
 // #pragma once
 
@@ -22,12 +22,12 @@
 // #include <QMetaType>
 // #include <QDebug>
 
-namespace OCC {
+namespace Occ {
 
 /**
- * Class that store in a memory efficient way the remote permission
- */
-class OCSYNC_EXPORT RemotePermissions {
+Class that store in a memory efficient way the remote permission
+*/
+class RemotePermissions {
 private:
     // The first bit tells if the value is set or not
     // The remaining bits correspond to know if the value is set
@@ -46,13 +46,13 @@ public:
         CanAddFile = 5,           // C
         CanAddSubDirectories = 6, // K
         CanReshare = 7,           // R
-        // Note: on the server, this means SharedWithMe, but in discoveryphase.cpp we also set
+        // Note : on the server, this means SharedWithMe, but in discoveryphase.cpp we also set
         // this permission when the server reports the any "share-types"
         IsShared = 8,             // S
         IsMounted = 9,            // M
-        IsMountedSub = 10,        // m (internal: set if the parent dir has IsMounted)
+        IsMountedSub = 10,        // m (internal : set if the parent dir has IsMounted)
 
-        // Note: when adding support for more permissions, we need to invalid the cache in the database.
+        // Note : when adding support for more permissions, we need to invalid the cache in the database.
         // (by setting forceRemoteDiscovery in SyncJournalDb.checkConnect)
         PermissionsCount = IsMountedSub
     };
@@ -61,10 +61,10 @@ public:
     RemotePermissions () = default;
 
     /// array with one character per permission, "" is null, " " is non-null but empty
-    QByteArray toDbValue () const;
+    QByteArray toDbValue ();
 
     /// output for display purposes, no defined format (same as toDbValue in practice)
-    QString toString () const;
+    QString toString ();
 
     /// read value that was written with toDbValue ()
     static RemotePermissions fromDbValue (QByteArray &);
@@ -95,6 +95,6 @@ public:
     }
 };
 
-} // namespace OCC
+} // namespace Occ
 
-Q_DECLARE_METATYPE (OCC.RemotePermissions)
+Q_DECLARE_METATYPE (Occ.RemotePermissions)

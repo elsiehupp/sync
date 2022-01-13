@@ -1,22 +1,22 @@
 /*
- * Copyright (C) by Michael Schuster <michael@schuster.ms>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Michael Schuster <michael@schuster.ms>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QApplication>
 
 using namespace QKeychain;
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcKeychainChunk, "nextcloud.sync.credentials.keychainchunk", QtInfoMsg)
 
@@ -34,8 +34,8 @@ static void addSettingsToJob (Account *account, QKeychain.Job *job) {
 /*
 * Job
 */
-Job.Job (QObject *parent)
-    : QObject (parent) {
+Job.Job (GLib.Object *parent)
+    : GLib.Object (parent) {
     _serviceName = Theme.instance ().appName ();
 }
 
@@ -81,18 +81,18 @@ void Job.setAutoDelete (bool autoDelete) {
 /*
 * WriteJob
 */
-WriteJob.WriteJob (Account *account, QString &key, QByteArray &data, QObject *parent)
+WriteJob.WriteJob (Account *account, QString &key, QByteArray &data, GLib.Object *parent)
     : Job (parent) {
     _account = account;
     _key = key;
 
-    // Windows workaround: Split the private key into chunks of 2048 bytes,
+    // Windows workaround : Split the private key into chunks of 2048 bytes,
     // to allow 4k (4096 bit) keys to be saved (obey Windows's limits)
     _chunkBuffer = data;
     _chunkCount = 0;
 }
 
-WriteJob.WriteJob (QString &key, QByteArray &data, QObject *parent)
+WriteJob.WriteJob (QString &key, QByteArray &data, GLib.Object *parent)
     : WriteJob (nullptr, key, data, parent) {
 }
 
@@ -118,9 +118,9 @@ bool WriteJob.exec () {
 }
 
 void WriteJob.slotWriteJobDone (QKeychain.Job *incomingJob) {
-    auto writeJob = qobject_cast<QKeychain.WritePasswordJob *> (incomingJob);
+    auto writeJob = qobject_cast<QKeychain.WritePasswordJob> (incomingJob);
 
-    // Errors? (writeJob can be nullptr here, see: WriteJob.start)
+    // Errors? (writeJob can be nullptr here, see : WriteJob.start)
     if (writeJob) {
         _error = writeJob.error ();
         _errorString = writeJob.errorString ();
@@ -189,7 +189,7 @@ void WriteJob.slotWriteJobDone (QKeychain.Job *incomingJob) {
 /*
 * ReadJob
 */
-ReadJob.ReadJob (Account *account, QString &key, bool keychainMigration, QObject *parent)
+ReadJob.ReadJob (Account *account, QString &key, bool keychainMigration, GLib.Object *parent)
     : Job (parent) {
     _account = account;
     _key = key;
@@ -200,7 +200,7 @@ ReadJob.ReadJob (Account *account, QString &key, bool keychainMigration, QObject
     _chunkBuffer.clear ();
 }
 
-ReadJob.ReadJob (QString &key, QObject *parent)
+ReadJob.ReadJob (QString &key, GLib.Object *parent)
     : ReadJob (nullptr, key, false, parent) {
 }
 
@@ -246,7 +246,7 @@ bool ReadJob.exec () {
 
 void ReadJob.slotReadJobDone (QKeychain.Job *incomingJob) {
     // Errors or next chunk?
-    auto readJob = qobject_cast<QKeychain.ReadPasswordJob *> (incomingJob);
+    auto readJob = qobject_cast<QKeychain.ReadPasswordJob> (incomingJob);
     Q_ASSERT (readJob);
 
     if (readJob.error () == NoError && !readJob.binaryData ().isEmpty ()) {
@@ -287,7 +287,7 @@ void ReadJob.slotReadJobDone (QKeychain.Job *incomingJob) {
 /*
 * DeleteJob
 */
-DeleteJob.DeleteJob (Account *account, QString &key, bool keychainMigration, QObject *parent)
+DeleteJob.DeleteJob (Account *account, QString &key, bool keychainMigration, GLib.Object *parent)
     : Job (parent) {
     _account = account;
     _key = key;
@@ -295,7 +295,7 @@ DeleteJob.DeleteJob (Account *account, QString &key, bool keychainMigration, QOb
     _keychainMigration = keychainMigration;
 }
 
-DeleteJob.DeleteJob (QString &key, QObject *parent)
+DeleteJob.DeleteJob (QString &key, GLib.Object *parent)
     : DeleteJob (nullptr, key, false, parent) {
 }
 
@@ -339,7 +339,7 @@ bool DeleteJob.exec () {
 
 void DeleteJob.slotDeleteJobDone (QKeychain.Job *incomingJob) {
     // Errors or next chunk?
-    auto deleteJob = qobject_cast<QKeychain.DeletePasswordJob *> (incomingJob);
+    auto deleteJob = qobject_cast<QKeychain.DeletePasswordJob> (incomingJob);
     Q_ASSERT (deleteJob);
 
     if (deleteJob.error () == NoError) {
@@ -364,4 +364,4 @@ void DeleteJob.slotDeleteJobDone (QKeychain.Job *incomingJob) {
 
 } // namespace KeychainChunk
 
-} // namespace OCC
+} // namespace Occ

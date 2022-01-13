@@ -1,22 +1,22 @@
 /*
- * Copyright (C) 2015 by Christian Kamm <kamm@incasoftware.de>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) 2015 by Christian Kamm <kamm@incasoftware.de>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QApplication>
 
 // #include <qt5keychain/keychain.h>
 
-using namespace OCC;
+using namespace Occ;
 using namespace QKeychain;
 
 Q_LOGGING_CATEGORY (lcProxy, "nextcloud.gui.credentials.proxy", QtInfoMsg)
@@ -70,7 +70,7 @@ void ProxyAuthHandler.handleProxyAuthenticationRequired (
 
     // Find the responsible QNAM if possible.
     QPointer<QNetworkAccessManager> sending_qnam = nullptr;
-    if (auto account = qobject_cast<Account *> (sender ())) {
+    if (auto account = qobject_cast<Account> (sender ())) {
         // Since we go into an event loop, it's possible for the account's qnam
         // to be destroyed before we get back. We can use this to check for its
         // liveness.
@@ -113,12 +113,12 @@ void ProxyAuthHandler.handleProxyAuthenticationRequired (
     authenticator.setPassword (_password);
     if (sending_qnam) {
         _gaveCredentialsTo.insert (sending_qnam);
-        connect (sending_qnam, &QObject.destroyed,
+        connect (sending_qnam, &GLib.Object.destroyed,
             this, &ProxyAuthHandler.slotSenderDestroyed);
     }
 }
 
-void ProxyAuthHandler.slotSenderDestroyed (QObject *obj) {
+void ProxyAuthHandler.slotSenderDestroyed (GLib.Object *obj) {
     _gaveCredentialsTo.remove (obj);
 }
 

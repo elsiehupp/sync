@@ -1,17 +1,17 @@
 /*
- *
- * Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+
+Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 // #include <QtGlobal>
 
 // #include <cmath>
@@ -33,7 +33,7 @@
 // #include <QQuickWindow>
 // #include <QSurfaceFormat>
 
-using namespace OCC;
+using namespace Occ;
 
 void warnSystray () {
     QMessageBox.critical (nullptr, qApp.translate ("main.cpp", "System Tray not available"),
@@ -51,16 +51,16 @@ int main (int argc, char **argv) {
     qmlRegisterType<SyncStatusSummary> ("com.nextcloud.desktopclient", 1, 0, "SyncStatusSummary");
     qmlRegisterType<EmojiModel> ("com.nextcloud.desktopclient", 1, 0, "EmojiModel");
     qmlRegisterType<UserStatusSelectorModel> ("com.nextcloud.desktopclient", 1, 0, "UserStatusSelectorModel");
-    qmlRegisterType<OCC.ActivityListModel> ("com.nextcloud.desktopclient", 1, 0, "ActivityListModel");
-    qmlRegisterType<OCC.FileActivityListModel> ("com.nextcloud.desktopclient", 1, 0, "FileActivityListModel");
-    qmlRegisterUncreatableType<OCC.UnifiedSearchResultsListModel> (
+    qmlRegisterType<Occ.ActivityListModel> ("com.nextcloud.desktopclient", 1, 0, "ActivityListModel");
+    qmlRegisterType<Occ.FileActivityListModel> ("com.nextcloud.desktopclient", 1, 0, "FileActivityListModel");
+    qmlRegisterUncreatableType<Occ.UnifiedSearchResultsListModel> (
         "com.nextcloud.desktopclient", 1, 0, "UnifiedSearchResultsListModel", "UnifiedSearchResultsListModel");
-    qRegisterMetaType<UnifiedSearchResultsListModel *> ("UnifiedSearchResultsListModel*");
+    qRegisterMetaType<UnifiedSearchResultsListModel> ("UnifiedSearchResultsListModel*");
 
-    qmlRegisterUncreatableType<OCC.UserStatus> ("com.nextcloud.desktopclient", 1, 0, "UserStatus", "Access to Status enum");
+    qmlRegisterUncreatableType<Occ.UserStatus> ("com.nextcloud.desktopclient", 1, 0, "UserStatus", "Access to Status enum");
 
     qRegisterMetaTypeStreamOperators<Emoji> ();
-    qRegisterMetaType<OCC.UserStatus> ("UserStatus");
+    qRegisterMetaType<Occ.UserStatus> ("UserStatus");
 
     // Work around a bug in KDE's qqc2-desktop-style which breaks
     // buttons with icons not based on a name, by forcing a style name
@@ -69,11 +69,11 @@ int main (int argc, char **argv) {
     // Can be removed once the bug in qqc2-desktop-style is gone.
     QQuickStyle.setStyle ("Default");
 
-    // OpenSSL 1.1.0: No explicit initialisation or de-initialisation is necessary.
+    // OpenSSL 1.1.0 : No explicit initialisation or de-initialisation is necessary.
 
     QCoreApplication.setAttribute (Qt.AA_UseHighDpiPixmaps, true);
     QCoreApplication.setAttribute (Qt.AA_EnableHighDpiScaling, true);
-    OCC.Application app (argc, argv);
+    Occ.Application app (argc, argv);
 
     if (app.giveHelp ()) {
         app.showHelp ();

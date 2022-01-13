@@ -1,17 +1,17 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *    support, and with no warranty, express or implied, as to its usefulness for
- *    any purpose.
- *
- */
+   This software is in the public domain, furnished "as is", without technical
+   support, and with no warranty, express or implied, as to its usefulness for
+   any purpose.
+
+*/
 
 // #include <QtTest>
 // #include <syncengine.h>
 
-using namespace OCC;
+using namespace Occ;
 
 /* Upload a 1/3 of a file of given size.
- * fakeFolder needs to be synchronized */
+fakeFolder needs to be synchronized */
 static void partialUpload (FakeFolder &fakeFolder, QString &name, int64 size) {
     QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     QCOMPARE (fakeFolder.uploadState ().children.count (), 0); // The state should be clean
@@ -19,7 +19,7 @@ static void partialUpload (FakeFolder &fakeFolder, QString &name, int64 size) {
     fakeFolder.localModifier ().insert (name, size);
     // Abort when the upload is at 1/3
     int64 sizeWhenAbort = -1;
-    auto con = QObject.connect (&fakeFolder.syncEngine (),  &SyncEngine.transmissionProgress,
+    auto con = GLib.Object.connect (&fakeFolder.syncEngine (),  &SyncEngine.transmissionProgress,
                                     [&] (ProgressInfo &progress) {
                 if (progress.completedSize () > (progress.totalSize () /3 )) {
                     sizeWhenAbort = progress.completedSize ();
@@ -28,7 +28,7 @@ static void partialUpload (FakeFolder &fakeFolder, QString &name, int64 size) {
     });
 
     QVERIFY (!fakeFolder.syncOnce ()); // there should have been an error
-    QObject.disconnect (con);
+    GLib.Object.disconnect (con);
     QVERIFY (sizeWhenAbort > 0);
     QVERIFY (sizeWhenAbort < size);
 
@@ -47,7 +47,7 @@ static void setChunkSize (SyncEngine &engine, int64 size) {
     engine.setSyncOptions (options);
 }
 
-class TestChunkingNG : public QObject {
+class TestChunkingNG : GLib.Object {
 
 private slots:
 
@@ -242,7 +242,7 @@ private slots:
         setChunkSize (fakeFolder.syncEngine (), 1 * 1000 * 1000);
 
         // Make the MOVE never reply, but trigger a client-abort and apply the change remotely
-        QObject parent;
+        GLib.Object parent;
         QByteArray moveChecksumHeader;
         int nGET = 0;
         int responseDelay = 100000; // bigger than abort-wait timeout
@@ -257,9 +257,9 @@ private slots:
             return nullptr;
         });
 
-        // Test 1: NEW file aborted
+        // Test 1 : NEW file aborted
         fakeFolder.localModifier ().insert ("A/a0", size);
-        QVERIFY (!fakeFolder.syncOnce ()); // error: abort!
+        QVERIFY (!fakeFolder.syncOnce ()); // error : abort!
 
         // Now the next sync gets a NEW/NEW conflict and since there's no checksum
         // it just becomes a UPDATE_METADATA
@@ -276,9 +276,9 @@ private slots:
         QCOMPARE (nGET, 0);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        // Test 2: modified file upload aborted
+        // Test 2 : modified file upload aborted
         fakeFolder.localModifier ().appendByte ("A/a0");
-        QVERIFY (!fakeFolder.syncOnce ()); // error: abort!
+        QVERIFY (!fakeFolder.syncOnce ()); // error : abort!
 
         // An EVAL/EVAL conflict is also UPDATE_METADATA when there's no checksums
         connection = connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToPropagate, checkEtagUpdated);
@@ -287,9 +287,9 @@ private slots:
         QCOMPARE (nGET, 0);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        // Test 3: modified file upload aborted, with good checksums
+        // Test 3 : modified file upload aborted, with good checksums
         fakeFolder.localModifier ().appendByte ("A/a0");
-        QVERIFY (!fakeFolder.syncOnce ()); // error: abort!
+        QVERIFY (!fakeFolder.syncOnce ()); // error : abort!
 
         // Set the remote checksum -- the test setup doesn't do it automatically
         QVERIFY (!moveChecksumHeader.isEmpty ());
@@ -300,12 +300,12 @@ private slots:
         QCOMPARE (nGET, 0); // no new download, just a metadata update!
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        // Test 4: New file, that gets deleted locally before the next sync
+        // Test 4 : New file, that gets deleted locally before the next sync
         fakeFolder.localModifier ().insert ("A/a3", size);
-        QVERIFY (!fakeFolder.syncOnce ()); // error: abort!
+        QVERIFY (!fakeFolder.syncOnce ()); // error : abort!
         fakeFolder.localModifier ().remove ("A/a3");
 
-        // bug: in this case we must expect a re-download of A/A3
+        // bug : in this case we must expect a re-download of A/A3
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (nGET, 1);
         QVERIFY (fakeFolder.currentLocalState ().find ("A/a3"));
@@ -321,7 +321,7 @@ private slots:
         setChunkSize (fakeFolder.syncEngine (), 1 * 1000 * 1000);
 
         // Make the MOVE never reply, but trigger a client-abort and apply the change remotely
-        QObject parent;
+        GLib.Object parent;
         int responseDelay = 200; // smaller than abort-wait timeout
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
             if (request.attribute (QNetworkRequest.CustomVerbAttribute) == "MOVE") {
@@ -331,12 +331,12 @@ private slots:
             return nullptr;
         });
 
-        // Test 1: NEW file aborted
+        // Test 1 : NEW file aborted
         fakeFolder.localModifier ().insert ("A/a0", size);
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        // Test 2: modified file upload aborted
+        // Test 2 : modified file upload aborted
         fakeFolder.localModifier ().appendByte ("A/a0");
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
@@ -399,11 +399,11 @@ private slots:
         fakeFolder.localModifier ().appendByte ("A/a0");
 
         // But in the middle of the sync, modify the file on the server
-        QMetaObject.Connection con = QObject.connect (&fakeFolder.syncEngine (), &SyncEngine.transmissionProgress,
+        QMetaObject.Connection con = GLib.Object.connect (&fakeFolder.syncEngine (), &SyncEngine.transmissionProgress,
                                     [&] (ProgressInfo &progress) {
                 if (progress.completedSize () > (progress.totalSize () / 2 )) {
                     fakeFolder.remoteModifier ().setContents ("A/a0", 'C');
-                    QObject.disconnect (con);
+                    GLib.Object.disconnect (con);
                 }
         });
 
@@ -448,12 +448,12 @@ private slots:
         fakeFolder.localModifier ().insert ("A/a0", size);
 
         // middle of the sync, modify the file
-        QMetaObject.Connection con = QObject.connect (&fakeFolder.syncEngine (), &SyncEngine.transmissionProgress,
+        QMetaObject.Connection con = GLib.Object.connect (&fakeFolder.syncEngine (), &SyncEngine.transmissionProgress,
                                     [&] (ProgressInfo &progress) {
                 if (progress.completedSize () > (progress.totalSize () / 2 )) {
                     fakeFolder.localModifier ().setContents ("A/a0", 'B');
                     fakeFolder.localModifier ().appendByte ("A/a0");
-                    QObject.disconnect (con);
+                    GLib.Object.disconnect (con);
                 }
         });
 
@@ -535,7 +535,7 @@ private slots:
             return nullptr;
         });
 
-        // Test 1: a NEW file
+        // Test 1 : a NEW file
         fakeFolder.localModifier ().insert ("A/a0", size);
         QVERIFY (!fakeFolder.syncOnce ()); // timeout!
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ()); // but the upload succeeded
@@ -546,7 +546,7 @@ private slots:
         QCOMPARE (nGET, 0);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        // Test 2: Modify the file further
+        // Test 2 : Modify the file further
         fakeFolder.localModifier ().appendByte ("A/a0");
         QVERIFY (!fakeFolder.syncOnce ()); // timeout!
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ()); // but the upload succeeded

@@ -1,18 +1,18 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- * Copyright (C) by Daniel Heule <daniel.heule@gmail.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Daniel Heule <daniel.heule@gmail.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <iostream>
 // #include <random>
@@ -36,7 +36,7 @@
 // #include <termios.h>
 // #include <unistd.h>
 
-using namespace OCC;
+using namespace Occ;
 
 static void nullMessageHandler (QtMsgType, QMessageLogContext &, QString &) {
 }
@@ -84,18 +84,18 @@ private:
 
 QString queryPassword (QString &user) {
     EchoDisabler disabler;
-    std.cout << "Password for user " << qPrintable (user) << ": ";
+    std.cout << "Password for user " << qPrintable (user) << " : ";
     std.string s;
     std.getline (std.cin, s);
     return QString.fromStdString (s);
 }
 
 #ifndef TOKEN_AUTH_ONLY
-class HttpCredentialsText : public HttpCredentials {
+class HttpCredentialsText : HttpCredentials {
 public:
     HttpCredentialsText (QString &user, QString &password)
         : HttpCredentials (user, password)
-        , // FIXME: not working with client certs yet (qknight)
+        , // FIXME : not working with client certs yet (qknight)
         _sslTrusted (false) {
     }
 
@@ -124,7 +124,7 @@ void help () {
 
     std.cout << binaryName << " - command line " APPLICATION_NAME " client tool" << std.endl;
     std.cout << "" << std.endl;
-    std.cout << "Usage: " << binaryName << " [OPTION] <source_dir> <server_url>" << std.endl;
+    std.cout << "Usage : " << binaryName << " [OPTION] <source_dir> <server_url>" << std.endl;
     std.cout << "" << std.endl;
     std.cout << "A proxy can either be set manually using --httpproxy." << std.endl;
     std.cout << "Otherwise, the setting from a configured sync client will be used." << std.endl;
@@ -236,8 +236,8 @@ void parseOptions (QStringList &app_args, CmdOptions *options) {
 
 /* If the selective sync list is different from before, we need to disable the read from db
   (The normal client does it in SelectiveSyncDialog.accept*)
- */
-void selectiveSyncFixup (OCC.SyncJournalDb *journal, QStringList &newList) {
+*/
+void selectiveSyncFixup (Occ.SyncJournalDb *journal, QStringList &newList) {
     SqlDatabase db;
     if (!db.openOrCreateReadWrite (journal.databaseFilePath ())) {
         return;
@@ -323,7 +323,7 @@ int main (int argc, char **argv) {
 
     if (options.interactive) {
         if (user.isEmpty ()) {
-            std.cout << "Please enter user name: ";
+            std.cout << "Please enter user name : ";
             std.string s;
             std.getline (std.cin, s);
             user = QString.fromStdString (s);
@@ -350,7 +350,7 @@ int main (int argc, char **argv) {
 
         QStringList pList = options.proxy.split (':');
         if (pList.count () == 3) {
-            // http: //192.168.178.23 : 8080
+            // http : //192.168.178.23 : 8080
             //  0            1            2
             host = pList.at (1);
             if (host.startsWith ("//"))
@@ -383,7 +383,7 @@ int main (int argc, char **argv) {
 
     QEventLoop loop;
     auto *job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/capabilities"));
-    QObject.connect (job, &JsonApiJob.jsonReceived, [&] (QJsonDocument &json) {
+    GLib.Object.connect (job, &JsonApiJob.jsonReceived, [&] (QJsonDocument &json) {
         auto caps = json.object ().value ("ocs").toObject ().value ("data").toObject ().value ("capabilities").toObject ();
         qDebug () << "Server capabilities" << caps;
         account.setCapabilities (caps.toVariantMap ());
@@ -399,7 +399,7 @@ int main (int argc, char **argv) {
     }
 
     job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/user"));
-    QObject.connect (job, &JsonApiJob.jsonReceived, [&] (QJsonDocument &json) {
+    GLib.Object.connect (job, &JsonApiJob.jsonReceived, [&] (QJsonDocument &json) {
         const QJsonObject data = json.object ().value ("ocs").toObject ().value ("data").toObject ();
         account.setDavUser (data.value ("id").toString ());
         account.setDavDisplayName (data.value ("display-name").toString ());
@@ -420,7 +420,7 @@ restart_sync:
     if (!options.unsyncedfolders.isEmpty ()) {
         QFile f (options.unsyncedfolders);
         if (!f.open (QFile.ReadOnly)) {
-            qCritical () << "Could not open file containing the list of unsynced folders: " << options.unsyncedfolders;
+            qCritical () << "Could not open file containing the list of unsynced folders : " << options.unsyncedfolders;
         } else {
             // filter out empty lines and comments
             selectiveSyncList = QString.fromUtf8 (f.readAll ()).split ('\n').filter (QRegularExpression ("\\S+")).filter (QRegularExpression ("^[^#]"));
@@ -447,10 +447,10 @@ restart_sync:
     SyncEngine engine (account, options.source_dir, folder, &db);
     engine.setIgnoreHiddenFiles (options.ignoreHiddenFiles);
     engine.setNetworkLimits (options.uplimit, options.downlimit);
-    QObject.connect (&engine, &SyncEngine.finished,
+    GLib.Object.connect (&engine, &SyncEngine.finished,
         [&app] (bool result) { app.exit (result ? EXIT_SUCCESS : EXIT_FAILURE); });
-    QObject.connect (&engine, &SyncEngine.transmissionProgress, &cmd, &Cmd.transmissionProgressSlot);
-    QObject.connect (&engine, &SyncEngine.syncError,
+    GLib.Object.connect (&engine, &SyncEngine.transmissionProgress, &cmd, &Cmd.transmissionProgressSlot);
+    GLib.Object.connect (&engine, &SyncEngine.syncError,
         [] (QString &error) { qWarning () << "Sync error:" << error; });
 
     // Exclude lists

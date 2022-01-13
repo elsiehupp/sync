@@ -1,23 +1,23 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
-// Note:  This file must compile without QtGui
+This library is free software; you can redistribute it and
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later versi
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GN
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+*/
+
+// Note :  This file must compile without QtGui
 // #include <QCoreApplication>
 // #include <QSettings>
 // #include <QTextStream>
@@ -25,7 +25,7 @@
 // #include <QFile>
 // #include <QUrl>
 // #include <QProcess>
-// #include <QObject>
+// #include <GLib.Object>
 // #include <QThread>
 // #include <QDateTime>
 // #include <QSysInfo>
@@ -46,7 +46,7 @@
 
 #include "utility_unix.cpp"
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcUtility, "nextcloud.sync.utility", QtInfoMsg)
 
@@ -99,7 +99,7 @@ void Utility.removeFavLink (QString &folder) {
 }
 
 QString Utility.octetsToString (int64 octets) {
-#define THE_FACTOR 1024
+const int THE_FACTOR 1024
     static const int64 kb = THE_FACTOR;
     static const int64 mb = THE_FACTOR * kb;
     static const int64 gb = THE_FACTOR * mb;
@@ -107,7 +107,7 @@ QString Utility.octetsToString (int64 octets) {
     QString s;
     qreal value = octets;
 
-    // Whether we care about decimals: only for GB/MB and only
+    // Whether we care about decimals : only for GB/MB and only
     // if it's less than 10 units.
     bool round = true;
 
@@ -145,7 +145,7 @@ static QLatin1String platform () {
 }
 
 QByteArray Utility.userAgentString () {
-    return QStringLiteral ("Mozilla/5.0 (%1) mirall/%2 (%3, %4-%5 ClientArchitecture: %6 OsArchitecture: %7)")
+    return QStringLiteral ("Mozilla/5.0 (%1) mirall/%2 (%3, %4-%5 ClientArchitecture : %6 OsArchitecture : %7)")
         .arg (platform (),
             QStringLiteral (MIRALL_VERSION_STRING),
             qApp.applicationName (),
@@ -233,7 +233,7 @@ bool Utility.fileNamesEqual (QString &fn1, QString &fn2) {
     const QDir fd1 (fn1);
     const QDir fd2 (fn2);
 
-    // Attention: If the path does not exist, canonicalPath returns ""
+    // Attention : If the path does not exist, canonicalPath returns ""
     // ONLY use this function with existing pathes.
     const QString a = fd1.canonicalPath ();
     const QString b = fd2.canonicalPath ();
@@ -258,11 +258,11 @@ namespace {
             return QCoreApplication.translate ("Utility", name, nullptr, value);
         }
     };
-// QTBUG-3945 and issue #4855: QT_TRANSLATE_NOOP does not work with plural form because lupdate
+// QTBUG-3945 and issue #4855 : QT_TRANSLATE_NOOP does not work with plural form because lupdate
 // limitation unless we fake more arguments
 // (it must be in the form ("context", "source", "comment", n)
 #undef QT_TRANSLATE_NOOP
-#define QT_TRANSLATE_NOOP (ctx, str, ...) str
+const int QT_TRANSLATE_NOOP (ctx, str, ...) str
     Q_DECL_CONSTEXPR Period periods[] = { { QT_TRANSLATE_NOOP ("Utility", "%n year (s)", 0, _), 365 * 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n month (s)", 0, _), 30 * 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n day (s)", 0, _), 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n hour (s)", 0, _), 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n minute (s)", 0, _), 60 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n second (s)", 0, _), 1000LL }, { nullptr, 0 }
     };
 } // anonymous namespace
@@ -343,7 +343,7 @@ void Utility.crash () {
 uint Utility.convertSizeToUint (size_t &convertVar) {
     if (convertVar > UINT_MAX) {
         //throw std.bad_cast ();
-        convertVar = UINT_MAX; // intentionally default to wrong value here to not crash: exception handling TBD
+        convertVar = UINT_MAX; // intentionally default to wrong value here to not crash : exception handling TBD
     }
     return static_cast<uint> (convertVar);
 }
@@ -351,7 +351,7 @@ uint Utility.convertSizeToUint (size_t &convertVar) {
 int Utility.convertSizeToInt (size_t &convertVar) {
     if (convertVar > INT_MAX) {
         //throw std.bad_cast ();
-        convertVar = INT_MAX; // intentionally default to wrong value here to not crash: exception handling TBD
+        convertVar = INT_MAX; // intentionally default to wrong value here to not crash : exception handling TBD
     }
     return static_cast<int> (convertVar);
 }
@@ -392,40 +392,40 @@ QString Utility.timeAgoInWords (QDateTime &dt, QDateTime &from) {
     }
 
     if (dt.daysTo (now) == 1) {
-        return QObject.tr ("%n day ago", "", dt.daysTo (now));
+        return GLib.Object.tr ("%n day ago", "", dt.daysTo (now));
     } else if (dt.daysTo (now) > 1) {
-        return QObject.tr ("%n days ago", "", dt.daysTo (now));
+        return GLib.Object.tr ("%n days ago", "", dt.daysTo (now));
     } else {
         int64 secs = dt.secsTo (now);
         if (secs < 0) {
-            return QObject.tr ("in the future");
+            return GLib.Object.tr ("in the future");
         }
 
         if (floor (secs / 3600.0) > 0) {
             int hours = floor (secs / 3600.0);
             if (hours == 1) {
-                return (QObject.tr ("%n hour ago", "", hours));
+                return (GLib.Object.tr ("%n hour ago", "", hours));
             } else {
-                return (QObject.tr ("%n hours ago", "", hours));
+                return (GLib.Object.tr ("%n hours ago", "", hours));
             }
         } else {
             int minutes = qRound (secs / 60.0);
 
             if (minutes == 0) {
                 if (secs < 5) {
-                    return QObject.tr ("now");
+                    return GLib.Object.tr ("now");
                 } else {
-                    return QObject.tr ("Less than a minute ago");
+                    return GLib.Object.tr ("Less than a minute ago");
                 }
 
             } else if (minutes == 1) {
-                return (QObject.tr ("%n minute ago", "", minutes));
+                return (GLib.Object.tr ("%n minute ago", "", minutes));
             } else {
-                return (QObject.tr ("%n minutes ago", "", minutes));
+                return (GLib.Object.tr ("%n minutes ago", "", minutes));
             }
         }
     }
-    return QObject.tr ("Some time ago");
+    return GLib.Object.tr ("Some time ago");
 }
 
 /* --------------------------------------------------------------------------- */
@@ -606,4 +606,4 @@ QString Utility.sanitizeForFileName (QString &name) {
     return result;
 }
 
-} // namespace OCC
+} // namespace Occ

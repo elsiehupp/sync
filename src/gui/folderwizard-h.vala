@@ -1,45 +1,42 @@
 /*
- * Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QWizard>
 // #include <QNetworkReply>
 // #include <QTimer>
 
-class QCheckBox;
 
-namespace OCC {
+namespace Occ {
 
-class SelectiveSyncWidget;
 
-class ownCloudInfo;
 
 /**
- * @brief The FormatWarningsWizardPage class
- * @ingroup gui
- */
-class FormatWarningsWizardPage : public QWizardPage {
+@brief The FormatWarningsWizardPage class
+@ingroup gui
+*/
+class FormatWarningsWizardPage : QWizardPage {
 protected:
     QString formatWarnings (QStringList &warnings) const;
 };
 
 /**
- * @brief Page to ask for the local source folder
- * @ingroup gui
- */
-class FolderWizardLocalPath : public FormatWarningsWizardPage {
+@brief Page to ask for the local source folder
+@ingroup gui
+*/
+class FolderWizardLocalPath : FormatWarningsWizardPage {
 public:
-    explicit FolderWizardLocalPath (AccountPtr &account);
+    FolderWizardLocalPath (AccountPtr &account);
     ~FolderWizardLocalPath () override;
 
     bool isComplete () const override;
@@ -57,13 +54,13 @@ private:
 };
 
 /**
- * @brief page to ask for the target folder
- * @ingroup gui
- */
+@brief page to ask for the target folder
+@ingroup gui
+*/
 
-class FolderWizardRemotePath : public FormatWarningsWizardPage {
+class FolderWizardRemotePath : FormatWarningsWizardPage {
 public:
-    explicit FolderWizardRemotePath (AccountPtr &account);
+    FolderWizardRemotePath (AccountPtr &account);
     ~FolderWizardRemotePath () override;
 
     bool isComplete () const override;
@@ -100,12 +97,12 @@ private:
 };
 
 /**
- * @brief The FolderWizardSelectiveSync class
- * @ingroup gui
- */
-class FolderWizardSelectiveSync : public QWizardPage {
+@brief The FolderWizardSelectiveSync class
+@ingroup gui
+*/
+class FolderWizardSelectiveSync : QWizardPage {
 public:
-    explicit FolderWizardSelectiveSync (AccountPtr &account);
+    FolderWizardSelectiveSync (AccountPtr &account);
     ~FolderWizardSelectiveSync () override;
 
     bool validatePage () override;
@@ -122,10 +119,10 @@ private:
 };
 
 /**
- * @brief The FolderWizard class
- * @ingroup gui
- */
-class FolderWizard : public QWizard {
+@brief The FolderWizard class
+@ingroup gui
+*/
+class FolderWizard : QWizard {
 public:
     enum {
         Page_Source,
@@ -133,10 +130,10 @@ public:
         Page_SelectiveSync
     };
 
-    explicit FolderWizard (AccountPtr account, QWidget *parent = nullptr);
+    FolderWizard (AccountPtr account, QWidget *parent = nullptr);
     ~FolderWizard () override;
 
-    bool eventFilter (QObject *watched, QEvent *event) override;
+    bool eventFilter (GLib.Object *watched, QEvent *event) override;
     void resizeEvent (QResizeEvent *event) override;
 
 private:
@@ -145,6 +142,6 @@ private:
     FolderWizardSelectiveSync *_folderWizardSelectiveSyncPage;
 };
 
-} // namespace OCC
+} // namespace Occ
 
 #endif

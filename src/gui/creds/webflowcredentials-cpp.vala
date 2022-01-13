@@ -14,7 +14,7 @@
 
 using namespace QKeychain;
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcWebFlowCredentials, "nextcloud.sync.credentials.webflow", QtInfoMsg)
 
@@ -25,9 +25,9 @@ namespace {
     const char clientCaCertificatePEMC[] = "_clientCaCertificatePEM";
 } // ns
 
-class WebFlowCredentialsAccessManager : public AccessManager {
+class WebFlowCredentialsAccessManager : AccessManager {
 public:
-    WebFlowCredentialsAccessManager (WebFlowCredentials *cred, QObject *parent = nullptr)
+    WebFlowCredentialsAccessManager (WebFlowCredentials *cred, GLib.Object *parent = nullptr)
         : AccessManager (parent)
         , _cred (cred) {
     }
@@ -166,13 +166,13 @@ void WebFlowCredentials.slotAskFromUserCredentialsProvided (QString &user, QStri
     Q_UNUSED (host)
 
     // Compare the re-entered username case-insensitive and save the new value (avoid breaking the account)
-    // See issue: https://github.com/nextcloud/desktop/issues/1741
+    // See issue : https://github.com/nextcloud/desktop/issues/1741
     if (QString.compare (_user, user, Qt.CaseInsensitive) == 0) {
         _user = user;
     } else {
         qCInfo (lcWebFlowCredentials ()) << "Authed with the wrong user!";
 
-        QString msg = tr ("Please login with the user: %1")
+        QString msg = tr ("Please login with the user : %1")
                 .arg (_user);
         _askDialog.setError (msg);
 
@@ -358,7 +358,7 @@ void WebFlowCredentials.forgetSensitiveData () {
 
     const QString kck = keychainKey (_account.url ().toString (), _user, _account.id ());
     if (kck.isEmpty ()) {
-        qCDebug (lcWebFlowCredentials ()) << "InvalidateToken: User is empty, bailing out!";
+        qCDebug (lcWebFlowCredentials ()) << "InvalidateToken : User is empty, bailing out!";
         return;
     }
 
@@ -521,7 +521,7 @@ void WebFlowCredentials.slotReadClientCaCertsPEMJobDone (KeychainChunk.ReadJob *
 }
 
 void WebFlowCredentials.slotReadPasswordJobDone (Job *incomingJob) {
-    auto job = qobject_cast<ReadPasswordJob *> (incomingJob);
+    auto job = qobject_cast<ReadPasswordJob> (incomingJob);
     QKeychain.Error error = job.error ();
 
     // If we could not find the entry try the old entries
@@ -532,7 +532,7 @@ void WebFlowCredentials.slotReadPasswordJobDone (Job *incomingJob) {
     }
 
     if (_user.isEmpty ()) {
-        qCWarning (lcWebFlowCredentials) << "Strange: User is empty!";
+        qCWarning (lcWebFlowCredentials) << "Strange : User is empty!";
     }
 
     if (error == QKeychain.NoError) {
@@ -548,7 +548,7 @@ void WebFlowCredentials.slotReadPasswordJobDone (Job *incomingJob) {
     if (_keychainMigration && _ready) {
         _keychainMigration = false;
         persist ();
-        deleteKeychainEntries (true); // true: delete old entries
+        deleteKeychainEntries (true); // true : delete old entries
         qCInfo (lcWebFlowCredentials) << "Migrated old keychain entries";
     }
 }
@@ -562,11 +562,11 @@ void WebFlowCredentials.deleteKeychainEntries (bool oldKeychainEntries) {
     startDeleteJob (_user);
 
     /* IMPORTANT - remove later - FIXME MS@2019-12-07 -.
-      * TODO: For "Log out" & "Remove account": Remove client CA certs and KEY!
+      * TODO : For "Log out" & "Remove account" : Remove client CA certs and KEY!
       *
       *       Disabled as long as selecting another cert is not supported by the UI.
       *
-      *       Being able to specify a new certificate is important anyway: expiry etc.
+      *       Being able to specify a new certificate is important anyway : expiry etc.
       *
       *       We introduce this dirty hack here, to allow deleting them upon Remote Wipe.
      */
@@ -588,4 +588,4 @@ void WebFlowCredentials.deleteKeychainEntries (bool oldKeychainEntries) {
     // <-- FIXME MS@2019-12-07
 }
 
-} // namespace OCC
+} // namespace Occ

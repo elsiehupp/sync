@@ -1,26 +1,26 @@
 /*
- * Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QFileDialog>
 // #include <QMessageBox>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcConflict, "nextcloud.gui.conflictsolver", QtInfoMsg)
 
 ConflictSolver.ConflictSolver (QWidget *parent)
-    : QObject (parent)
+    : GLib.Object (parent)
     , _parentWidget (parent) {
 }
 
@@ -97,7 +97,7 @@ bool ConflictSolver.renameLocalVersion () {
     }
 
     const auto renamePattern = [=] {
-        auto result = QString.fromUtf8 (OCC.Utility.conflictFileBaseNameFromPattern (_localVersionFilename.toUtf8 ()));
+        auto result = QString.fromUtf8 (Occ.Utility.conflictFileBaseNameFromPattern (_localVersionFilename.toUtf8 ()));
         const auto dotIndex = result.lastIndexOf ('.');
         return QString (result.left (dotIndex) + "_%1" + result.mid (dotIndex));
     } ();
@@ -147,4 +147,4 @@ bool ConflictSolver.overwriteRemoteVersion () {
     }
 }
 
-} // namespace OCC
+} // namespace Occ

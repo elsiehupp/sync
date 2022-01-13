@@ -1,43 +1,43 @@
 /*
- * Copyright (C) by Camila Ayres <hello@camila.codes>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Camila Ayres <hello@camila.codes>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QJsonDocument>
 // #include <QJsonObject>
 // #include <QNetworkRequest>
 // #include <QBuffer>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcRemoteWipe, "nextcloud.gui.remotewipe", QtInfoMsg)
 
-RemoteWipe.RemoteWipe (AccountPtr account, QObject *parent)
-    : QObject (parent),
+RemoteWipe.RemoteWipe (AccountPtr account, GLib.Object *parent)
+    : GLib.Object (parent),
       _account (account),
       _appPassword (QString ()),
       _accountRemoved (false),
       _networkManager (nullptr),
       _networkReplyCheck (nullptr),
       _networkReplySuccess (nullptr) {
-    QObject.connect (AccountManager.instance (), &AccountManager.accountRemoved,
+    GLib.Object.connect (AccountManager.instance (), &AccountManager.accountRemoved,
                      this, [=] (AccountState *) {
         _accountRemoved = true;
     });
-    QObject.connect (this, &RemoteWipe.authorized, FolderMan.instance (),
+    GLib.Object.connect (this, &RemoteWipe.authorized, FolderMan.instance (),
                      &FolderMan.slotWipeFolderForAccount);
-    QObject.connect (FolderMan.instance (), &FolderMan.wipeDone, this,
+    GLib.Object.connect (FolderMan.instance (), &FolderMan.wipeDone, this,
                      &RemoteWipe.notifyServerSuccessJob);
-    QObject.connect (_account.data (), &Account.appPasswordRetrieved, this,
+    GLib.Object.connect (_account.data (), &Account.appPasswordRetrieved, this,
                      &RemoteWipe.startCheckJobWithAppPassword);
 }
 
@@ -57,9 +57,9 @@ void RemoteWipe.startCheckJobWithAppPassword (QString pwd){
     QUrlQuery arguments (QString ("token=%1").arg (_appPassword));
     requestBody.setData (arguments.query (QUrl.FullyEncoded).toLatin1 ());
     _networkReplyCheck = _networkManager.post (request, requestBody);
-    QObject.connect (&_networkManager, SIGNAL (sslErrors (QNetworkReply *, QList<QSslError>)),
+    GLib.Object.connect (&_networkManager, SIGNAL (sslErrors (QNetworkReply *, QList<QSslError>)),
 		_account.data (), SLOT (slotHandleSslErrors (QNetworkReply *, QList<QSslError>)));
-    QObject.connect (_networkReplyCheck, &QNetworkReply.finished, this,
+    GLib.Object.connect (_networkReplyCheck, &QNetworkReply.finished, this,
                      &RemoteWipe.checkJobSlot);
 }
 
@@ -75,13 +75,13 @@ void RemoteWipe.checkJobSlot () {
         QString errorReason;
         QString errorFromJson = json["error"].toString ();
         if (!errorFromJson.isEmpty ()) {
-            qCWarning (lcRemoteWipe) << QString ("Error returned from the server: <em>%1<em>")
+            qCWarning (lcRemoteWipe) << QString ("Error returned from the server : <em>%1<em>")
                                        .arg (errorFromJson.toHtmlEscaped ());
         } else if (_networkReplyCheck.error () != QNetworkReply.NoError) {
-            qCWarning (lcRemoteWipe) << QString ("There was an error accessing the 'token' endpoint: <br><em>%1</em>")
+            qCWarning (lcRemoteWipe) << QString ("There was an error accessing the 'token' endpoint : <br><em>%1</em>")
                               .arg (_networkReplyCheck.errorString ().toHtmlEscaped ());
         } else if (jsonParseError.error != QJsonParseError.NoError) {
-            qCWarning (lcRemoteWipe) << QString ("Could not parse the JSON returned from the server: <br><em>%1</em>")
+            qCWarning (lcRemoteWipe) << QString ("Could not parse the JSON returned from the server : <br><em>%1</em>")
                               .arg (jsonParseError.errorString ());
         } else {
             qCWarning (lcRemoteWipe) <<  QString ("The reply from the server did not contain all expected fields");
@@ -97,11 +97,11 @@ void RemoteWipe.checkJobSlot () {
 
     if (wipe){
         /* IMPORTANT - remove later - FIXME MS@2019-12-07 -.
-         * TODO: For "Log out" & "Remove account": Remove client CA certs and KEY!
+         * TODO : For "Log out" & "Remove account" : Remove client CA certs and KEY!
          *
          *       Disabled as long as selecting another cert is not supported by the UI.
          *
-         *       Being able to specify a new certificate is important anyway: expiry etc.
+         *       Being able to specify a new certificate is important anyway : expiry etc.
          *
          *       We introduce this dirty hack here, to allow deleting them upon Remote Wipe.
          */
@@ -136,7 +136,7 @@ void RemoteWipe.notifyServerSuccessJob (AccountState *accountState, bool dataWip
         QUrlQuery arguments (QString ("token=%1").arg (_appPassword));
         requestBody.setData (arguments.query (QUrl.FullyEncoded).toLatin1 ());
         _networkReplySuccess = _networkManager.post (request, requestBody);
-        QObject.connect (_networkReplySuccess, &QNetworkReply.finished, this,
+        GLib.Object.connect (_networkReplySuccess, &QNetworkReply.finished, this,
                          &RemoteWipe.notifyServerSuccessJobSlot);
     }
 }
@@ -150,13 +150,13 @@ void RemoteWipe.notifyServerSuccessJobSlot () {
         QString errorReason;
         QString errorFromJson = json["error"].toString ();
         if (!errorFromJson.isEmpty ()) {
-            qCWarning (lcRemoteWipe) << QString ("Error returned from the server: <em>%1</em>")
+            qCWarning (lcRemoteWipe) << QString ("Error returned from the server : <em>%1</em>")
                               .arg (errorFromJson.toHtmlEscaped ());
         } else if (_networkReplySuccess.error () != QNetworkReply.NoError) {
-            qCWarning (lcRemoteWipe) << QString ("There was an error accessing the 'success' endpoint: <br><em>%1</em>")
+            qCWarning (lcRemoteWipe) << QString ("There was an error accessing the 'success' endpoint : <br><em>%1</em>")
                               .arg (_networkReplySuccess.errorString ().toHtmlEscaped ());
         } else if (jsonParseError.error != QJsonParseError.NoError) {
-            qCWarning (lcRemoteWipe) << QString ("Could not parse the JSON returned from the server: <br><em>%1</em>")
+            qCWarning (lcRemoteWipe) << QString ("Could not parse the JSON returned from the server : <br><em>%1</em>")
                               .arg (jsonParseError.errorString ());
         } else {
             qCWarning (lcRemoteWipe) << QString ("The reply from the server did not contain all expected fields.");

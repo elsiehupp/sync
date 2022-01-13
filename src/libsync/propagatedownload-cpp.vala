@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <common/checksums.h>
 // #include <common/asserts.h>
@@ -26,7 +26,7 @@
 // #include <unistd.h>
 #endif
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcGetJob, "nextcloud.sync.networkjob.get", QtInfoMsg)
 Q_LOGGING_CATEGORY (lcPropagateDownload, "nextcloud.sync.propagator.download", QtInfoMsg)
@@ -58,7 +58,7 @@ QString OWNCLOUDSYNC_EXPORT createDownloadTmpFileName (QString &previous) {
 // DOES NOT take ownership of the device.
 GETFileJob.GETFileJob (AccountPtr account, QString &path, QIODevice *device,
     const QMap<QByteArray, QByteArray> &headers, QByteArray &expectedEtagForResume,
-    int64 resumeStart, QObject *parent)
+    int64 resumeStart, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent)
     , _device (device)
     , _headers (headers)
@@ -77,7 +77,7 @@ GETFileJob.GETFileJob (AccountPtr account, QString &path, QIODevice *device,
 
 GETFileJob.GETFileJob (AccountPtr account, QUrl &url, QIODevice *device,
     const QMap<QByteArray, QByteArray> &headers, QByteArray &expectedEtagForResume,
-    int64 resumeStart, QObject *parent)
+    int64 resumeStart, GLib.Object *parent)
     : AbstractNetworkJob (account, url.toEncoded (), parent)
     , _device (device)
     , _headers (headers)
@@ -154,7 +154,7 @@ void GETFileJob.slotMetaDataChanged () {
     }
 
     // If the status code isn't 2xx, don't write the reply body to the file.
-    // For any error: handle it when the job is finished, not here.
+    // For any error : handle it when the job is finished, not here.
     if (httpStatus / 100 != 2) {
         // Disable the buffer limit, as we don't limit the bandwidth for error messages.
         // (We are only going to do a readAll () at the end.)
@@ -207,7 +207,7 @@ void GETFileJob.slotMetaDataChanged () {
         }
     }
     if (start != _resumeStart) {
-        qCWarning (lcGetJob) << "Wrong content-range: " << ranges << " while expecting start was" << _resumeStart;
+        qCWarning (lcGetJob) << "Wrong content-range : " << ranges << " while expecting start was" << _resumeStart;
         if (ranges.isEmpty ()) {
             // device doesn't support range, just try again from scratch
             _device.close ();
@@ -290,7 +290,7 @@ void GETFileJob.slotReadyRead () {
         if (readBytes < 0) {
             _errorString = networkReplyErrorString (*reply ());
             _errorStatus = SyncFileItem.NormalError;
-            qCWarning (lcGetJob) << "Error while reading from device: " << _errorString;
+            qCWarning (lcGetJob) << "Error while reading from device : " << _errorString;
             reply ().abort ();
             return;
         }
@@ -350,14 +350,14 @@ QString GETFileJob.errorString () {
 
 GETEncryptedFileJob.GETEncryptedFileJob (AccountPtr account, QString &path, QIODevice *device,
     const QMap<QByteArray, QByteArray> &headers, QByteArray &expectedEtagForResume,
-    int64 resumeStart, EncryptedFile encryptedInfo, QObject *parent)
+    int64 resumeStart, EncryptedFile encryptedInfo, GLib.Object *parent)
     : GETFileJob (account, path, device, headers, expectedEtagForResume, resumeStart, parent)
     , _encryptedFileInfo (encryptedInfo) {
 }
 
 GETEncryptedFileJob.GETEncryptedFileJob (AccountPtr account, QUrl &url, QIODevice *device,
     const QMap<QByteArray, QByteArray> &headers, QByteArray &expectedEtagForResume,
-    int64 resumeStart, EncryptedFile encryptedInfo, QObject *parent)
+    int64 resumeStart, EncryptedFile encryptedInfo, GLib.Object *parent)
     : GETFileJob (account, url, device, headers, expectedEtagForResume, resumeStart, parent)
     , _encryptedFileInfo (encryptedInfo) {
 }
@@ -375,11 +375,11 @@ int64 GETEncryptedFileJob.writeToDevice (QByteArray &data) {
 
     const auto bytesRemaining = _contentLength - _processedSoFar - data.length ();
 
-    if (bytesRemaining != 0 && bytesRemaining < OCC.Constants.e2EeTagSize) {
-        // decryption is going to fail if last chunk does not include or does not equal to OCC.Constants.e2EeTagSize bytes tag
-        // we may end up receiving packets beyond OCC.Constants.e2EeTagSize bytes tag at the end
-        // in that case, we don't want to try and decrypt less than OCC.Constants.e2EeTagSize ending bytes of tag, we will accumulate all the incoming data till the end
-        // and then, we are going to decrypt the entire chunk containing OCC.Constants.e2EeTagSize bytes at the end
+    if (bytesRemaining != 0 && bytesRemaining < Occ.Constants.e2EeTagSize) {
+        // decryption is going to fail if last chunk does not include or does not equal to Occ.Constants.e2EeTagSize bytes tag
+        // we may end up receiving packets beyond Occ.Constants.e2EeTagSize bytes tag at the end
+        // in that case, we don't want to try and decrypt less than Occ.Constants.e2EeTagSize ending bytes of tag, we will accumulate all the incoming data till the end
+        // and then, we are going to decrypt the entire chunk containing Occ.Constants.e2EeTagSize bytes at the end
         _pendingBytes += QByteArray (data.constData (), data.length ());
         _processedSoFar += data.length ();
         if (_processedSoFar != _contentLength) {
@@ -636,7 +636,7 @@ void PropagateDownloadFile.startDownload () {
     if (diskSpaceResult != OwncloudPropagator.DiskSpaceOk) {
         if (diskSpaceResult == OwncloudPropagator.DiskSpaceFailure) {
             // Using DetailError here will make the error not pop up in the account
-            // tab: instead we'll generate a general "disk space low" message and show
+            // tab : instead we'll generate a general "disk space low" message and show
             // these detail errors only in the error view.
             done (SyncFileItem.DetailError,
                 tr ("The download would reduce free local disk space below the limit"));
@@ -804,7 +804,7 @@ void PropagateDownloadFile.slotGetFinished () {
 
     /* Check that the size of the GET reply matches the file size. There have been cases
      * reported that if a server breaks behind a proxy, the GET is still a 200 but is
-     * truncated, as described here: https://github.com/owncloud/mirall/issues/2528
+     * truncated, as described here : https://github.com/owncloud/mirall/issues/2528
      */
     const QByteArray sizeHeader ("Content-Length");
     int64 bodySize = job.reply ().rawHeader (sizeHeader).toLongLong ();
@@ -925,7 +925,7 @@ namespace { // Anonymous namespace for the recall feature
     }
 
     void handleRecallFile (QString &filePath, QString &folderPath, SyncJournalDb &journal) {
-        qCDebug (lcPropagateDownload) << "handleRecallFile: " << filePath;
+        qCDebug (lcPropagateDownload) << "handleRecallFile : " << filePath;
 
         FileSystem.setFileHidden (filePath, true);
 
@@ -960,7 +960,7 @@ namespace { // Anonymous namespace for the recall feature
 
             QString targetPath = makeRecallFileName (recalledFile);
 
-            qCDebug (lcPropagateDownload) << "Copy recall file: " << recalledFile << " . " << targetPath;
+            qCDebug (lcPropagateDownload) << "Copy recall file : " << recalledFile << " . " << targetPath;
             // Remove the target first, QFile.copy will not overwrite it.
             FileSystem.remove (targetPath);
             QFile.copy (recalledFile, targetPath);
@@ -971,8 +971,8 @@ namespace { // Anonymous namespace for the recall feature
 #ifdef Q_OS_UNIX
         int chownErr = chown (fileName.toLocal8Bit ().constData (), -1, fi.groupId ());
         if (chownErr) {
-            // TODO: Consider further error handling!
-            qCWarning (lcPropagateDownload) << QString ("preserveGroupOwnership: chown error %1: setting group %2 failed on file %3").arg (chownErr).arg (fi.groupId ()).arg (fileName);
+            // TODO : Consider further error handling!
+            qCWarning (lcPropagateDownload) << QString ("preserveGroupOwnership : chown error %1 : setting group %2 failed on file %3").arg (chownErr).arg (fi.groupId ()).arg (fileName);
         }
 #else
         Q_UNUSED (fileName);
@@ -1105,7 +1105,7 @@ void PropagateDownloadFile.downloadFinished () {
     emit propagator ().touchedFile (fn);
     // The fileChanged () check is done above to generate better error messages.
     if (!FileSystem.uncheckedRenameReplace (_tmpFile.fileName (), fn, &error)) {
-        qCWarning (lcPropagateDownload) << QString ("Rename failed: %1 => %2").arg (_tmpFile.fileName ()).arg (fn);
+        qCWarning (lcPropagateDownload) << QString ("Rename failed : %1 => %2").arg (_tmpFile.fileName ()).arg (fn);
         // If the file is locked, we want to retry this sync when it
         // becomes available again, otherwise try again directly
         if (FileSystem.isFileLocked (fn)) {
@@ -1166,7 +1166,7 @@ void PropagateDownloadFile.updateMetadata (bool isConflict) {
     const QString fn = propagator ().fullLocalPath (_item._file);
     const auto result = propagator ().updateMetadata (*_item);
     if (!result) {
-        done (SyncFileItem.FatalError, tr ("Error updating metadata: %1").arg (result.error ()));
+        done (SyncFileItem.FatalError, tr ("Error updating metadata : %1").arg (result.error ()));
         return;
     } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
         done (SyncFileItem.SoftError, tr ("The file %1 is currently in use").arg (_item._file));
@@ -1192,7 +1192,7 @@ void PropagateDownloadFile.updateMetadata (bool isConflict) {
 
     int64 duration = _stopwatch.elapsed ();
     if (isLikelyFinishedQuickly () && duration > 5 * 1000) {
-        qCWarning (lcPropagateDownload) << "WARNING: Unexpectedly slow connection, took" << duration << "msec for" << _item._size - _resumeStart << "bytes for" << _item._file;
+        qCWarning (lcPropagateDownload) << "WARNING : Unexpectedly slow connection, took" << duration << "msec for" << _item._size - _resumeStart << "bytes for" << _item._file;
     }
 }
 

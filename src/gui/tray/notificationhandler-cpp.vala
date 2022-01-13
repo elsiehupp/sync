@@ -3,7 +3,7 @@
 // #include <QJsonDocument>
 // #include <QJsonObject>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcServerNotification, "nextcloud.gui.servernotification", QtInfoMsg)
 
@@ -12,8 +12,8 @@ const char propertyAccountStateC[] = "oc_account_state";
 const int successStatusCode = 200;
 const int notModifiedStatusCode = 304;
 
-ServerNotificationHandler.ServerNotificationHandler (AccountState *accountState, QObject *parent)
-    : QObject (parent)
+ServerNotificationHandler.ServerNotificationHandler (AccountState *accountState, GLib.Object *parent)
+    : GLib.Object (parent)
     , _accountState (accountState) {
 }
 
@@ -35,13 +35,13 @@ void ServerNotificationHandler.slotFetchNotifications () {
 
     // if the previous notification job has finished, start next.
     _notificationJob = new JsonApiJob (_accountState.account (), notificationsPath, this);
-    QObject.connect (_notificationJob.data (), &JsonApiJob.jsonReceived,
+    GLib.Object.connect (_notificationJob.data (), &JsonApiJob.jsonReceived,
         this, &ServerNotificationHandler.slotNotificationsReceived);
-    QObject.connect (_notificationJob.data (), &JsonApiJob.etagResponseHeaderReceived,
+    GLib.Object.connect (_notificationJob.data (), &JsonApiJob.etagResponseHeaderReceived,
         this, &ServerNotificationHandler.slotEtagResponseHeaderReceived);
-    QObject.connect (_notificationJob.data (), &JsonApiJob.allowDesktopNotificationsChanged,
+    GLib.Object.connect (_notificationJob.data (), &JsonApiJob.allowDesktopNotificationsChanged,
             this, &ServerNotificationHandler.slotAllowDesktopNotificationsChanged);
-    _notificationJob.setProperty (propertyAccountStateC, QVariant.fromValue<AccountState *> (_accountState));
+    _notificationJob.setProperty (propertyAccountStateC, QVariant.fromValue<AccountState> (_accountState));
     _notificationJob.addRawHeader ("If-None-Match", _accountState.notificationsEtagResponseHeader ());
     _notificationJob.start ();
 }
@@ -49,13 +49,13 @@ void ServerNotificationHandler.slotFetchNotifications () {
 void ServerNotificationHandler.slotEtagResponseHeaderReceived (QByteArray &value, int statusCode) {
     if (statusCode == successStatusCode) {
         qCWarning (lcServerNotification) << "New Notification ETag Response Header received " << value;
-        auto *account = qvariant_cast<AccountState *> (sender ().property (propertyAccountStateC));
+        auto *account = qvariant_cast<AccountState> (sender ().property (propertyAccountStateC));
         account.setNotificationsEtagResponseHeader (value);
     }
 }
 
 void ServerNotificationHandler.slotAllowDesktopNotificationsChanged (bool isAllowed) {
-    auto *account = qvariant_cast<AccountState *> (sender ().property (propertyAccountStateC));
+    auto *account = qvariant_cast<AccountState> (sender ().property (propertyAccountStateC));
     if (account != nullptr) {
        account.setDesktopNotificationsAllowed (isAllowed);
     }
@@ -76,7 +76,7 @@ void ServerNotificationHandler.slotNotificationsReceived (QJsonDocument &json, i
 
     auto notifies = json.object ().value ("ocs").toObject ().value ("data").toArray ();
 
-    auto *ai = qvariant_cast<AccountState *> (sender ().property (propertyAccountStateC));
+    auto *ai = qvariant_cast<AccountState> (sender ().property (propertyAccountStateC));
 
     ActivityList list;
 

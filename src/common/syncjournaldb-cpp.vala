@@ -1,20 +1,20 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This library is free software; you can redistribute it and
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later versi
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GN
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+*/
 
 // #include <QCryptographicHash>
 // #include <QFile>
@@ -27,20 +27,20 @@
 // #include <cstring>
 
 // SQL expression to check whether path.startswith (prefix + '/')
-// Note: '/' + 1 == '0'
-#define IS_PREFIX_PATH_OF (prefix, path) \
+// Note : '/' + 1 == '0'
+const int IS_PREFIX_PATH_OF (prefix, path)
     " (" path " > (" prefix "||'/') AND " path " < (" prefix "||'0'))"
-#define IS_PREFIX_PATH_OR_EQUAL (prefix, path) \
+const int IS_PREFIX_PATH_OR_EQUAL (prefix, path)
     " (" path " == " prefix " OR " IS_PREFIX_PATH_OF (prefix, path) ")"
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcDb, "nextcloud.sync.database", QtInfoMsg)
 
-#define GET_FILE_RECORD_QUERY \
-        "SELECT path, inode, modtime, type, md5, fileid, remotePerm, filesize," \
-        "  ignoredChildrenRemote, contentchecksumtype.name || ':' || contentChecksum, e2eMangledName, isE2eEncrypted " \
-        " FROM metadata" \
+const int GET_FILE_RECORD_QUERY
+        "SELECT path, inode, modtime, type, md5, fileid, remotePerm, filesize,"
+        "  ignoredChildrenRemote, contentchecksumtype.name || ':' || contentChecksum, e2eMangledName, isE2eEncrypted "
+        " FROM metadata"
         "  LEFT JOIN checksumtype as contentchecksumtype ON metadata.contentChecksumTypeId == contentchecksumtype.id"
 
 static void fillFileRecordFromGetQuery (SyncJournalFileRecord &rec, SqlQuery &query) {
@@ -63,8 +63,8 @@ static QByteArray defaultJournalMode (QString &dbPath) {
     return "WAL";
 }
 
-SyncJournalDb.SyncJournalDb (QString &dbFilePath, QObject *parent)
-    : QObject (parent)
+SyncJournalDb.SyncJournalDb (QString &dbFilePath, GLib.Object *parent)
+    : GLib.Object (parent)
     , _dbFile (dbFilePath)
     , _transaction (0)
     , _metadataTableIsEmpty (false) {
@@ -126,38 +126,38 @@ bool SyncJournalDb.maybeMigrateDb (QString &localPath, QString &absoluteJournalP
 
     if (FileSystem.fileExists (newDbName)) {
         if (!FileSystem.remove (newDbName, &error)) {
-            qCWarning (lcDb) << "Database migration: Could not remove db file" << newDbName
+            qCWarning (lcDb) << "Database migration : Could not remove db file" << newDbName
                             << "due to" << error;
             return false;
         }
     }
     if (FileSystem.fileExists (newDbNameWal)) {
         if (!FileSystem.remove (newDbNameWal, &error)) {
-            qCWarning (lcDb) << "Database migration: Could not remove db WAL file" << newDbNameWal
+            qCWarning (lcDb) << "Database migration : Could not remove db WAL file" << newDbNameWal
                             << "due to" << error;
             return false;
         }
     }
     if (FileSystem.fileExists (newDbNameShm)) {
         if (!FileSystem.remove (newDbNameShm, &error)) {
-            qCWarning (lcDb) << "Database migration: Could not remove db SHM file" << newDbNameShm
+            qCWarning (lcDb) << "Database migration : Could not remove db SHM file" << newDbNameShm
                             << "due to" << error;
             return false;
         }
     }
 
     if (!FileSystem.rename (oldDbName, newDbName, &error)) {
-        qCWarning (lcDb) << "Database migration: could not rename" << oldDbName
+        qCWarning (lcDb) << "Database migration : could not rename" << oldDbName
                         << "to" << newDbName << ":" << error;
         return false;
     }
     if (!FileSystem.rename (oldDbNameWal, newDbNameWal, &error)) {
-        qCWarning (lcDb) << "Database migration: could not rename" << oldDbNameWal
+        qCWarning (lcDb) << "Database migration : could not rename" << oldDbNameWal
                         << "to" << newDbNameWal << ":" << error;
         return false;
     }
     if (!FileSystem.rename (oldDbNameShm, newDbNameShm, &error)) {
-        qCWarning (lcDb) << "Database migration: could not rename" << oldDbNameShm
+        qCWarning (lcDb) << "Database migration : could not rename" << oldDbNameShm
                         << "to" << newDbNameShm << ":" << error;
         return false;
     }
@@ -314,10 +314,10 @@ bool SyncJournalDb.checkConnect () {
 
     sqlite3_create_function (_db.sqliteDb (), "parent_hash", 1, SQLITE_UTF8 | SQLITE_DETERMINISTIC, nullptr,
                                 [] (sqlite3_context *ctx,int, sqlite3_value **argv) {
-                                    auto text = reinterpret_cast<const char*> (sqlite3_value_text (argv[0]));
+                                    auto text = reinterpret_cast<const char> (sqlite3_value_text (argv[0]));
                                     const char *end = std.strrchr (text, '/');
                                     if (!end) end = text;
-                                    sqlite3_result_int64 (ctx, c_jhash64 (reinterpret_cast<const uint8_t*> (text),
+                                    sqlite3_result_int64 (ctx, c_jhash64 (reinterpret_cast<const uint8_t> (text),
                                                                         end - text, 0));
                                 }, nullptr, nullptr);
 
@@ -349,7 +349,7 @@ bool SyncJournalDb.checkConnect () {
 #ifndef SQLITE_IOERR_SHMMAP
 // Requires sqlite >= 3.7.7 but old CentOS6 has sqlite-3.6.20
 // Definition taken from https://sqlite.org/c3ref/c_abort_rollback.html
-#define SQLITE_IOERR_SHMMAP            (SQLITE_IOERR | (21<<8))
+const int SQLITE_IOERR_SHMMAP            (SQLITE_IOERR | (21<<8))
 #endif
 
     if (!createQuery.exec ()) {
@@ -620,22 +620,22 @@ bool SyncJournalDb.updateMetadataTableStructure () {
         SqlQuery query (_db);
         query.prepare ("ALTER TABLE metadata ADD COLUMN fileid VARCHAR (128);");
         if (!query.exec ()) {
-            sqlFail (QStringLiteral ("updateMetadataTableStructure: Add column fileid"), query);
+            sqlFail (QStringLiteral ("updateMetadataTableStructure : Add column fileid"), query);
             re = false;
         }
 
         query.prepare ("CREATE INDEX metadata_file_id ON metadata (fileid);");
         if (!query.exec ()) {
-            sqlFail (QStringLiteral ("updateMetadataTableStructure: create index fileid"), query);
+            sqlFail (QStringLiteral ("updateMetadataTableStructure : create index fileid"), query);
             re = false;
         }
-        commitInternal (QStringLiteral ("update database structure: add fileid col"));
+        commitInternal (QStringLiteral ("update database structure : add fileid col"));
     }
     if (columns.indexOf ("remotePerm") == -1) {
         SqlQuery query (_db);
         query.prepare ("ALTER TABLE metadata ADD COLUMN remotePerm VARCHAR (128);");
         if (!query.exec ()) {
-            sqlFail (QStringLiteral ("updateMetadataTableStructure: add column remotePerm"), query);
+            sqlFail (QStringLiteral ("updateMetadataTableStructure : add column remotePerm"), query);
             re = false;
         }
         commitInternal (QStringLiteral ("update database structure (remotePerm)"));
@@ -644,89 +644,89 @@ bool SyncJournalDb.updateMetadataTableStructure () {
         SqlQuery query (_db);
         query.prepare ("ALTER TABLE metadata ADD COLUMN filesize BIGINT;");
         if (!query.exec ()) {
-            sqlFail (QStringLiteral ("updateDatabaseStructure: add column filesize"), query);
+            sqlFail (QStringLiteral ("updateDatabaseStructure : add column filesize"), query);
             re = false;
         }
-        commitInternal (QStringLiteral ("update database structure: add filesize col"));
+        commitInternal (QStringLiteral ("update database structure : add filesize col"));
     }
 
     if (true) {
         SqlQuery query (_db);
         query.prepare ("CREATE INDEX IF NOT EXISTS metadata_inode ON metadata (inode);");
         if (!query.exec ()) {
-            sqlFail (QStringLiteral ("updateMetadataTableStructure: create index inode"), query);
+            sqlFail (QStringLiteral ("updateMetadataTableStructure : create index inode"), query);
             re = false;
         }
-        commitInternal (QStringLiteral ("update database structure: add inode index"));
+        commitInternal (QStringLiteral ("update database structure : add inode index"));
     }
 
     if (true) {
         SqlQuery query (_db);
         query.prepare ("CREATE INDEX IF NOT EXISTS metadata_path ON metadata (path);");
         if (!query.exec ()) {
-            sqlFail (QStringLiteral ("updateMetadataTableStructure: create index path"), query);
+            sqlFail (QStringLiteral ("updateMetadataTableStructure : create index path"), query);
             re = false;
         }
-        commitInternal (QStringLiteral ("update database structure: add path index"));
+        commitInternal (QStringLiteral ("update database structure : add path index"));
     }
 
     if (true) {
         SqlQuery query (_db);
         query.prepare ("CREATE INDEX IF NOT EXISTS metadata_parent ON metadata (parent_hash (path));");
         if (!query.exec ()) {
-            sqlFail (QStringLiteral ("updateMetadataTableStructure: create index parent"), query);
+            sqlFail (QStringLiteral ("updateMetadataTableStructure : create index parent"), query);
             re = false;
         }
-        commitInternal (QStringLiteral ("update database structure: add parent index"));
+        commitInternal (QStringLiteral ("update database structure : add parent index"));
     }
 
     if (columns.indexOf ("ignoredChildrenRemote") == -1) {
         SqlQuery query (_db);
         query.prepare ("ALTER TABLE metadata ADD COLUMN ignoredChildrenRemote INT;");
         if (!query.exec ()) {
-            sqlFail (QStringLiteral ("updateMetadataTableStructure: add ignoredChildrenRemote column"), query);
+            sqlFail (QStringLiteral ("updateMetadataTableStructure : add ignoredChildrenRemote column"), query);
             re = false;
         }
-        commitInternal (QStringLiteral ("update database structure: add ignoredChildrenRemote col"));
+        commitInternal (QStringLiteral ("update database structure : add ignoredChildrenRemote col"));
     }
 
     if (columns.indexOf ("contentChecksum") == -1) {
         SqlQuery query (_db);
         query.prepare ("ALTER TABLE metadata ADD COLUMN contentChecksum TEXT;");
         if (!query.exec ()) {
-            sqlFail (QStringLiteral ("updateMetadataTableStructure: add contentChecksum column"), query);
+            sqlFail (QStringLiteral ("updateMetadataTableStructure : add contentChecksum column"), query);
             re = false;
         }
-        commitInternal (QStringLiteral ("update database structure: add contentChecksum col"));
+        commitInternal (QStringLiteral ("update database structure : add contentChecksum col"));
     }
     if (columns.indexOf ("contentChecksumTypeId") == -1) {
         SqlQuery query (_db);
         query.prepare ("ALTER TABLE metadata ADD COLUMN contentChecksumTypeId INTEGER;");
         if (!query.exec ()) {
-            sqlFail (QStringLiteral ("updateMetadataTableStructure: add contentChecksumTypeId column"), query);
+            sqlFail (QStringLiteral ("updateMetadataTableStructure : add contentChecksumTypeId column"), query);
             re = false;
         }
-        commitInternal (QStringLiteral ("update database structure: add contentChecksumTypeId col"));
+        commitInternal (QStringLiteral ("update database structure : add contentChecksumTypeId col"));
     }
 
     if (!columns.contains ("e2eMangledName")) {
         SqlQuery query (_db);
         query.prepare ("ALTER TABLE metadata ADD COLUMN e2eMangledName TEXT;");
         if (!query.exec ()) {
-            sqlFail (QStringLiteral ("updateMetadataTableStructure: add e2eMangledName column"), query);
+            sqlFail (QStringLiteral ("updateMetadataTableStructure : add e2eMangledName column"), query);
             re = false;
         }
-        commitInternal (QStringLiteral ("update database structure: add e2eMangledName col"));
+        commitInternal (QStringLiteral ("update database structure : add e2eMangledName col"));
     }
 
     if (!columns.contains ("isE2eEncrypted")) {
         SqlQuery query (_db);
         query.prepare ("ALTER TABLE metadata ADD COLUMN isE2eEncrypted INTEGER;");
         if (!query.exec ()) {
-            sqlFail (QStringLiteral ("updateMetadataTableStructure: add isE2eEncrypted column"), query);
+            sqlFail (QStringLiteral ("updateMetadataTableStructure : add isE2eEncrypted column"), query);
             re = false;
         }
-        commitInternal (QStringLiteral ("update database structure: add isE2eEncrypted col"));
+        commitInternal (QStringLiteral ("update database structure : add isE2eEncrypted col"));
     }
 
     auto uploadInfoColumns = tableColumns ("uploadinfo");
@@ -736,10 +736,10 @@ bool SyncJournalDb.updateMetadataTableStructure () {
         SqlQuery query (_db);
         query.prepare ("ALTER TABLE uploadinfo ADD COLUMN contentChecksum TEXT;");
         if (!query.exec ()) {
-            sqlFail (QStringLiteral ("updateMetadataTableStructure: add contentChecksum column"), query);
+            sqlFail (QStringLiteral ("updateMetadataTableStructure : add contentChecksum column"), query);
             re = false;
         }
-        commitInternal (QStringLiteral ("update database structure: add contentChecksum col for uploadinfo"));
+        commitInternal (QStringLiteral ("update database structure : add contentChecksum col for uploadinfo"));
     }
 
     auto conflictsColumns = tableColumns ("conflicts");
@@ -749,7 +749,7 @@ bool SyncJournalDb.updateMetadataTableStructure () {
         SqlQuery query (_db);
         query.prepare ("ALTER TABLE conflicts ADD COLUMN basePath TEXT;");
         if (!query.exec ()) {
-            sqlFail (QStringLiteral ("updateMetadataTableStructure: add basePath column"), query);
+            sqlFail (QStringLiteral ("updateMetadataTableStructure : add basePath column"), query);
             re = false;
         }
     }
@@ -758,10 +758,10 @@ bool SyncJournalDb.updateMetadataTableStructure () {
         SqlQuery query (_db);
         query.prepare ("CREATE INDEX IF NOT EXISTS metadata_e2e_id ON metadata (e2eMangledName);");
         if (!query.exec ()) {
-            sqlFail (QStringLiteral ("updateMetadataTableStructure: create index e2eMangledName"), query);
+            sqlFail (QStringLiteral ("updateMetadataTableStructure : create index e2eMangledName"), query);
             re = false;
         }
-        commitInternal (QStringLiteral ("update database structure: add e2eMangledName index"));
+        commitInternal (QStringLiteral ("update database structure : add e2eMangledName index"));
     }
 
     return re;
@@ -779,50 +779,50 @@ bool SyncJournalDb.updateErrorBlacklistTableStructure () {
         SqlQuery query (_db);
         query.prepare ("ALTER TABLE blacklist ADD COLUMN lastTryTime INTEGER (8);");
         if (!query.exec ()) {
-            sqlFail (QStringLiteral ("updateBlacklistTableStructure: Add lastTryTime fileid"), query);
+            sqlFail (QStringLiteral ("updateBlacklistTableStructure : Add lastTryTime fileid"), query);
             re = false;
         }
         query.prepare ("ALTER TABLE blacklist ADD COLUMN ignoreDuration INTEGER (8);");
         if (!query.exec ()) {
-            sqlFail (QStringLiteral ("updateBlacklistTableStructure: Add ignoreDuration fileid"), query);
+            sqlFail (QStringLiteral ("updateBlacklistTableStructure : Add ignoreDuration fileid"), query);
             re = false;
         }
-        commitInternal (QStringLiteral ("update database structure: add lastTryTime, ignoreDuration cols"));
+        commitInternal (QStringLiteral ("update database structure : add lastTryTime, ignoreDuration cols"));
     }
     if (columns.indexOf ("renameTarget") == -1) {
         SqlQuery query (_db);
         query.prepare ("ALTER TABLE blacklist ADD COLUMN renameTarget VARCHAR (4096);");
         if (!query.exec ()) {
-            sqlFail (QStringLiteral ("updateBlacklistTableStructure: Add renameTarget"), query);
+            sqlFail (QStringLiteral ("updateBlacklistTableStructure : Add renameTarget"), query);
             re = false;
         }
-        commitInternal (QStringLiteral ("update database structure: add renameTarget col"));
+        commitInternal (QStringLiteral ("update database structure : add renameTarget col"));
     }
 
     if (columns.indexOf ("errorCategory") == -1) {
         SqlQuery query (_db);
         query.prepare ("ALTER TABLE blacklist ADD COLUMN errorCategory INTEGER (8);");
         if (!query.exec ()) {
-            sqlFail (QStringLiteral ("updateBlacklistTableStructure: Add errorCategory"), query);
+            sqlFail (QStringLiteral ("updateBlacklistTableStructure : Add errorCategory"), query);
             re = false;
         }
-        commitInternal (QStringLiteral ("update database structure: add errorCategory col"));
+        commitInternal (QStringLiteral ("update database structure : add errorCategory col"));
     }
 
     if (columns.indexOf ("requestId") == -1) {
         SqlQuery query (_db);
         query.prepare ("ALTER TABLE blacklist ADD COLUMN requestId VARCHAR (36);");
         if (!query.exec ()) {
-            sqlFail (QStringLiteral ("updateBlacklistTableStructure: Add requestId"), query);
+            sqlFail (QStringLiteral ("updateBlacklistTableStructure : Add requestId"), query);
             re = false;
         }
-        commitInternal (QStringLiteral ("update database structure: add errorCategory col"));
+        commitInternal (QStringLiteral ("update database structure : add errorCategory col"));
     }
 
     SqlQuery query (_db);
     query.prepare ("CREATE INDEX IF NOT EXISTS blacklist_index ON blacklist (path collate nocase);");
     if (!query.exec ()) {
-        sqlFail (QStringLiteral ("updateErrorBlacklistTableStructure: create index blacklit"), query);
+        sqlFail (QStringLiteral ("updateErrorBlacklistTableStructure : create index blacklit"), query);
         re = false;
     }
 
@@ -982,7 +982,7 @@ void SyncJournalDb.keyValueStoreDelete (QString &key) {
     }
 }
 
-// TODO: filename . QBytearray?
+// TODO : filename . QBytearray?
 bool SyncJournalDb.deleteFileRecord (QString &filename, bool recursively) {
     QMutexLocker locker (&_mutex);
 
@@ -1092,7 +1092,7 @@ bool SyncJournalDb.getFileRecordByE2eMangledName (QString &mangledName, SyncJour
         auto next = query.next ();
         if (!next.ok) {
             QString err = query.error ();
-            qCWarning (lcDb) << "No journal entry found for mangled name" << mangledName << "Error: " << err;
+            qCWarning (lcDb) << "No journal entry found for mangled name" << mangledName << "Error : " << err;
             close ();
             return false;
         }
@@ -1385,7 +1385,7 @@ static bool deleteBatch (SqlQuery &query, QStringList &entries, QString &name) {
         return true;
 
     qCDebug (lcDb) << "Removing stale" << name << "entries:" << entries.join (QStringLiteral (", "));
-    // FIXME: Was ported from execBatch, check if correct!
+    // FIXME : Was ported from execBatch, check if correct!
     foreach (QString &entry, entries) {
         query.reset_and_clear_bindings ();
         query.bindValue (1, entry);
@@ -1911,7 +1911,7 @@ void SyncJournalDb.schedulePathForRemoteDiscovery (QByteArray &fileName) {
 
     SqlQuery query (_db);
     // This query will match entries for which the path is a prefix of fileName
-    // Note: CSYNC_FTW_TYPE_DIR == 2
+    // Note : CSYNC_FTW_TYPE_DIR == 2
     query.prepare ("UPDATE metadata SET md5='_invalid_' WHERE " IS_PREFIX_PATH_OR_EQUAL ("path", "?1") " AND type == 2;");
     query.bindValue (1, argument);
     query.exec ();
@@ -2351,4 +2351,4 @@ bool operator== (SyncJournalDb.UploadInfo &lhs,
         && lhs._contentChecksum == rhs._contentChecksum;
 }
 
-} // namespace OCC
+} // namespace Occ

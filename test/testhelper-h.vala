@@ -1,7 +1,5 @@
-#ifndef TESTHELPER_H
-#define TESTHELPER_H
 
-class HttpCredentialsTest : public OCC.HttpCredentials {
+class HttpCredentialsTest : Occ.HttpCredentials {
 public:
     HttpCredentialsTest (QString& user, QString& password)
     : HttpCredentials (user, password) {}
@@ -11,6 +9,4 @@ public:
     }
 };
 
-OCC.FolderDefinition folderDefinition (QString &path);
-
-#endif // TESTHELPER_H
+Occ.FolderDefinition folderDefinition (QString &path);

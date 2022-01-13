@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Dominik Schmidt <domme@tomahawk-player.org>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Dominik Schmidt <domme@tomahawk-player.org>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <libcrashreporter-gui/CrashReporter.h>
 
@@ -28,7 +28,7 @@ int main (int argc, char *argv[]) {
         return 1;
     }
 
-    // TODO: install socorro ....
+    // TODO : install socorro ....
     CrashReporter reporter (QUrl (CRASHREPORTER_SUBMIT_URL), app.arguments ());
 
 #ifdef CRASHREPORTER_ICON
@@ -67,7 +67,7 @@ int main (int argc, char *argv[]) {
     //            << Pair ("submitted_timestamp", "2013-01-09T22:21:18.646733+00:00")
     //            << Pair ("buildid", "20130107030932")
     //            << Pair ("timestamp", "1357770078.646789")
-    //            << Pair ("Notes", "OpenGL: NVIDIA Corporation -- GeForce 8600M GT/PCIe/SSE2 -- 3.3.0 NVIDIA 313.09 -- texture_from_pixmap\r\n")
+    //            << Pair ("Notes", "OpenGL : NVIDIA Corporation -- GeForce 8600M GT/PCIe/SSE2 -- 3.3.0 NVIDIA 313.09 -- texture_from_pixmap\r\n")
     //            << Pair ("StartupTime", "1357769913")
     //            << Pair ("FramePoisonSize", "4096")
     //            << Pair ("FramePoisonBase", "7ffffffff0dea000")

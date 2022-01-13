@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <algorithm>
 
@@ -168,10 +168,10 @@ constexpr int searchTermEditingFinishedSearchStartDelay = 800;
 // server-side bug of returning the cursor > 0 and isPaginated == 'true', using '5' as it is done on Android client's end now
 constexpr int minimumEntresNumberToShowLoadMore = 5;
 }
-namespace OCC {
+namespace Occ {
 Q_LOGGING_CATEGORY (lcUnifiedSearch, "nextcloud.gui.unifiedsearch", QtInfoMsg)
 
-UnifiedSearchResultsListModel.UnifiedSearchResultsListModel (AccountState *accountState, QObject *parent)
+UnifiedSearchResultsListModel.UnifiedSearchResultsListModel (AccountState *accountState, GLib.Object *parent)
     : QAbstractListModel (parent)
     , _accountState (accountState) {
 }
@@ -332,7 +332,7 @@ void UnifiedSearchResultsListModel.slotSearchTermEditingFinished () {
 
     if (_providers.isEmpty ()) {
         auto job = new JsonApiJob (_accountState.account (), QLatin1String ("ocs/v2.php/search/providers"));
-        QObject.connect (job, &JsonApiJob.jsonReceived, this, &UnifiedSearchResultsListModel.slotFetchProvidersFinished);
+        GLib.Object.connect (job, &JsonApiJob.jsonReceived, this, &UnifiedSearchResultsListModel.slotFetchProvidersFinished);
         job.start ();
     } else {
         startSearch ();
@@ -340,7 +340,7 @@ void UnifiedSearchResultsListModel.slotSearchTermEditingFinished () {
 }
 
 void UnifiedSearchResultsListModel.slotFetchProvidersFinished (QJsonDocument &json, int statusCode) {
-    const auto job = qobject_cast<JsonApiJob *> (sender ());
+    const auto job = qobject_cast<JsonApiJob> (sender ());
 
     if (!job) {
         qCCritical (lcUnifiedSearch) << QString ("Failed to fetch providers.").arg (_searchTerm);
@@ -350,12 +350,12 @@ void UnifiedSearchResultsListModel.slotFetchProvidersFinished (QJsonDocument &js
     }
 
     if (statusCode != 200) {
-        qCCritical (lcUnifiedSearch) << QString ("%1: Failed to fetch search providers for '%2'. Error: %3")
+        qCCritical (lcUnifiedSearch) << QString ("%1 : Failed to fetch search providers for '%2'. Error : %3")
                                            .arg (statusCode)
                                            .arg (_searchTerm)
                                            .arg (job.errorString ());
         _errorString +=
-            tr ("Failed to fetch search providers for '%1'. Error: %2").arg (_searchTerm).arg (job.errorString ())
+            tr ("Failed to fetch search providers for '%1'. Error : %2").arg (_searchTerm).arg (job.errorString ())
             + QLatin1Char ('\n');
         emit errorStringChanged ();
         return;
@@ -384,7 +384,7 @@ void UnifiedSearchResultsListModel.slotFetchProvidersFinished (QJsonDocument &js
 void UnifiedSearchResultsListModel.slotSearchForProviderFinished (QJsonDocument &json, int statusCode) {
     Q_ASSERT (_accountState && _accountState.account ());
 
-    const auto job = qobject_cast<JsonApiJob *> (sender ());
+    const auto job = qobject_cast<JsonApiJob> (sender ());
 
     if (!job) {
         qCCritical (lcUnifiedSearch) << QString ("Search has failed for '%2'.").arg (_searchTerm);
@@ -412,12 +412,12 @@ void UnifiedSearchResultsListModel.slotSearchForProviderFinished (QJsonDocument 
     }
 
     if (statusCode != 200) {
-        qCCritical (lcUnifiedSearch) << QString ("%1: Search has failed for '%2'. Error: %3")
+        qCCritical (lcUnifiedSearch) << QString ("%1 : Search has failed for '%2'. Error : %3")
                                            .arg (statusCode)
                                            .arg (_searchTerm)
                                            .arg (job.errorString ());
         _errorString +=
-            tr ("Search has failed for '%1'. Error: %2").arg (_searchTerm).arg (job.errorString ()) + QLatin1Char ('\n');
+            tr ("Search has failed for '%1'. Error : %2").arg (_searchTerm).arg (job.errorString ()) + QLatin1Char ('\n');
         emit errorStringChanged ();
         return;
     }
@@ -468,7 +468,7 @@ void UnifiedSearchResultsListModel.startSearchForProvider (QString &providerId, 
     job.addQueryParams (params);
     const auto wasSearchInProgress = isSearchInProgress ();
     _searchJobConnections.insert (providerId,
-        QObject.connect (
+        GLib.Object.connect (
             job, &JsonApiJob.jsonReceived, this, &UnifiedSearchResultsListModel.slotSearchForProviderFinished));
     if (isSearchInProgress () && !wasSearchInProgress) {
         emit isSearchInProgressChanged ();
@@ -652,7 +652,7 @@ void UnifiedSearchResultsListModel.removeFetchMoreTrigger (QString &providerId) 
 void UnifiedSearchResultsListModel.disconnectAndClearSearchJobs () {
     for (auto &connection : _searchJobConnections) {
         if (connection) {
-            QObject.disconnect (connection);
+            GLib.Object.disconnect (connection);
         }
     }
 

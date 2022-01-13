@@ -1,26 +1,25 @@
 /*
- * Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QAbstractSocket>
 // #include <QIODevice>
 
-class SocketApiServerPrivate;
 class SocketApiSocketPrivate;
 
-class SocketApiSocket : public QIODevice {
+class SocketApiSocket : QIODevice {
 public:
-    SocketApiSocket (QObject *parent, SocketApiSocketPrivate *p);
+    SocketApiSocket (GLib.Object *parent, SocketApiSocketPrivate *p);
     ~SocketApiSocket ();
 
     int64 readData (char *data, int64 maxlen) override;
@@ -40,7 +39,7 @@ private:
     friend class SocketApiServerPrivate;
 };
 
-class SocketApiServer : public QObject {
+class SocketApiServer : GLib.Object {
 public:
     SocketApiServer ();
     ~SocketApiServer ();
@@ -58,5 +57,3 @@ private:
     Q_DECLARE_PRIVATE (SocketApiServer)
     QScopedPointer<SocketApiServerPrivate> d_ptr;
 };
-
-#endif // SOCKETAPISOCKET_OSX_H

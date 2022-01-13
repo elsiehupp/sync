@@ -1,46 +1,46 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *    support, and with no warranty, express or implied, as to its usefulness for
- *    any purpose.
- *
- */
+   This software is in the public domain, furnished "as is", without technical
+   support, and with no warranty, express or implied, as to its usefulness for
+   any purpose.
+
+*/
 
 // #include <QtTest>
 
 void touch (QString &file) {
     QString cmd;
     cmd = QString ("touch %1").arg (file);
-    qDebug () << "Command: " << cmd;
+    qDebug () << "Command : " << cmd;
     system (cmd.toLocal8Bit ());
 }
 
 void mkdir (QString &file) {
     QString cmd = QString ("mkdir %1").arg (file);
-    qDebug () << "Command: " << cmd;
+    qDebug () << "Command : " << cmd;
     system (cmd.toLocal8Bit ());
 }
 
 void rmdir (QString &file) {
     QString cmd = QString ("rmdir %1").arg (file);
-    qDebug () << "Command: " << cmd;
+    qDebug () << "Command : " << cmd;
     system (cmd.toLocal8Bit ());
 }
 
 void rm (QString &file) {
     QString cmd = QString ("rm %1").arg (file);
-    qDebug () << "Command: " << cmd;
+    qDebug () << "Command : " << cmd;
     system (cmd.toLocal8Bit ());
 }
 
 void mv (QString &file1, QString &file2) {
     QString cmd = QString ("mv %1 %2").arg (file1, file2);
-    qDebug () << "Command: " << cmd;
+    qDebug () << "Command : " << cmd;
     system (cmd.toLocal8Bit ());
 }
 
-using namespace OCC;
+using namespace Occ;
 
-class TestFolderWatcher : public QObject {
+class TestFolderWatcher : GLib.Object {
 
     QTemporaryDir _root;
     QString _rootPath;
@@ -64,9 +64,9 @@ class TestFolderWatcher : public QObject {
     }
 
 #ifdef Q_OS_LINUX
-#define CHECK_WATCH_COUNT (n) QCOMPARE (_watcher.testLinuxWatchCount (), (n))
+const int CHECK_WATCH_COUNT (n) QCOMPARE (_watcher.testLinuxWatchCount (), (n))
 #else
-#define CHECK_WATCH_COUNT (n) do {} while (false)
+const int CHECK_WATCH_COUNT (n) do {} while (false)
 #endif
 
 public:
@@ -111,7 +111,7 @@ private slots:
         QString file (_rootPath + "/foo.txt");
         QString cmd;
         cmd = QString ("echo \"xyz\" > %1").arg (file);
-        qDebug () << "Command: " << cmd;
+        qDebug () << "Command : " << cmd;
         system (cmd.toLocal8Bit ());
 
         QVERIFY (waitForPathChanged (file));

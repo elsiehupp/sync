@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QMenu>
 // #include <QUrl>
@@ -19,7 +19,7 @@
 // #include <QWidgetAction>
 // #include <QLabel>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcSsl, "nextcloud.gui.ssl", QtInfoMsg)
 
@@ -29,7 +29,7 @@ SslButton.SslButton (QWidget *parent)
     setAutoRaise (true);
 
     _menu = new QMenu (this);
-    QObject.connect (_menu, &QMenu.aboutToShow,
+    GLib.Object.connect (_menu, &QMenu.aboutToShow,
         this, &SslButton.slotUpdateMenu);
     setMenu (_menu);
 }
@@ -38,8 +38,8 @@ static QString addCertDetailsField (QString &key, QString &value) {
     if (value.isEmpty ())
         return QString ();
 
-    return QLatin1String ("<tr><td style=\"vertical-align: top;\"><b>") + key
-        + QLatin1String ("</b></td><td style=\"vertical-align: bottom;\">") + value
+    return QLatin1String ("<tr><td style=\"vertical-align : top;\"><b>") + key
+        + QLatin1String ("</b></td><td style=\"vertical-align : bottom;\">") + value
         + QLatin1String ("</td></tr>");
 }
 
@@ -132,7 +132,7 @@ QMenu *SslButton.buildCertMenu (QMenu *parent, QSslCertificate &cert,
 
     // create label first
     auto *label = new QLabel (parent);
-    label.setStyleSheet (QLatin1String ("QLabel { padding: 8px; }"));
+    label.setStyleSheet (QLatin1String ("QLabel { padding : 8px; }"));
     label.setTextFormat (Qt.RichText);
     label.setText (details);
 
@@ -176,7 +176,7 @@ void SslButton.slotUpdateMenu () {
 
     AccountPtr account = _accountState.account ();
 
-    _menu.addAction (tr ("Server version: %1").arg (account.serverVersion ())).setEnabled (false);
+    _menu.addAction (tr ("Server version : %1").arg (account.serverVersion ())).setEnabled (false);
 
     if (account.isHttp2Supported ()) {
         _menu.addAction ("HTTP/2").setEnabled (false);
@@ -233,4 +233,4 @@ void SslButton.slotUpdateMenu () {
     }
 }
 
-} // namespace OCC
+} // namespace Occ

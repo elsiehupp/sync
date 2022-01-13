@@ -1,34 +1,34 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QFile>
 // #include <QStringList>
 // #include <QDir>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcMoveJob, "nextcloud.sync.networkjob.move", QtInfoMsg)
 Q_LOGGING_CATEGORY (lcPropagateRemoteMove, "nextcloud.sync.propagator.remotemove", QtInfoMsg)
 
 MoveJob.MoveJob (AccountPtr account, QString &path,
-    const QString &destination, QObject *parent)
+    const QString &destination, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent)
     , _destination (destination) {
 }
 
 MoveJob.MoveJob (AccountPtr account, QUrl &url, QString &destination,
-    QMap<QByteArray, QByteArray> extraHeaders, QObject *parent)
+    QMap<QByteArray, QByteArray> extraHeaders, GLib.Object *parent)
     : AbstractNetworkJob (account, QString (), parent)
     , _destination (destination)
     , _url (url)
@@ -48,7 +48,7 @@ void MoveJob.start () {
     }
 
     if (reply ().error () != QNetworkReply.NoError) {
-        qCWarning (lcPropagateRemoteMove) << " Network error: " << reply ().errorString ();
+        qCWarning (lcPropagateRemoteMove) << " Network error : " << reply ().errorString ();
     }
     AbstractNetworkJob.start ();
 }
@@ -154,7 +154,7 @@ void PropagateRemoteMove.start () {
         if (!FileSystem.fileExists (localTarget) && FileSystem.fileExists (localTargetAlt)) {
             QString error;
             if (!FileSystem.uncheckedRenameReplace (localTargetAlt, localTarget, &error)) {
-                done (SyncFileItem.NormalError, tr ("Could not rename %1 to %2, error: %3")
+                done (SyncFileItem.NormalError, tr ("Could not rename %1 to %2, error : %3")
                      .arg (folderTargetAlt, folderTarget, error));
                 return;
             }
@@ -232,7 +232,7 @@ void PropagateRemoteMove.finalize () {
     if (oldRecord.isValid ()) {
         newItem._checksumHeader = oldRecord._checksumHeader;
         if (newItem._size != oldRecord._fileSize) {
-            qCWarning (lcPropagateRemoteMove) << "File sizes differ on server vs sync journal: " << newItem._size << oldRecord._fileSize;
+            qCWarning (lcPropagateRemoteMove) << "File sizes differ on server vs sync journal : " << newItem._size << oldRecord._fileSize;
 
             // the server might have claimed a different size, we take the old one from the DB
             newItem._size = oldRecord._fileSize;
@@ -240,7 +240,7 @@ void PropagateRemoteMove.finalize () {
     }
     const auto result = propagator ().updateMetadata (newItem);
     if (!result) {
-        done (SyncFileItem.FatalError, tr ("Error updating metadata: %1").arg (result.error ()));
+        done (SyncFileItem.FatalError, tr ("Error updating metadata : %1").arg (result.error ()));
         return;
     } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
         done (SyncFileItem.SoftError, tr ("The file %1 is currently in use").arg (newItem._file));

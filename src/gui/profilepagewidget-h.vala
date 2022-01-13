@@ -7,11 +7,11 @@
 
 // #include <cstddef>
 
-namespace OCC {
+namespace Occ {
 
-class ProfilePageMenu : public QWidget {
+class ProfilePageMenu : QWidget {
 public:
-    explicit ProfilePageMenu (AccountPtr account, QString &shareWithUserId, QWidget *parent = nullptr);
+    ProfilePageMenu (AccountPtr account, QString &shareWithUserId, QWidget *parent = nullptr);
     ~ProfilePageMenu () override;
 
     void exec (QPoint &globalPosition);

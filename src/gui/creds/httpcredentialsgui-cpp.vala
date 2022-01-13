@@ -1,17 +1,17 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@kde.org>
- * Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@kde.org>
+Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QInputDialog>
 // #include <QLabel>
@@ -23,7 +23,7 @@
 
 using namespace QKeychain;
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcHttpCredentialsGui, "nextcloud.sync.credentials.http.gui", QtInfoMsg)
 
@@ -38,7 +38,7 @@ void HttpCredentialsGui.askFromUser () {
 void HttpCredentialsGui.askFromUserAsync () {
     // First, we will check what kind of auth we need.
     auto job = new DetermineAuthTypeJob (_account.sharedFromThis (), this);
-    QObject.connect (job, &DetermineAuthTypeJob.authType, this, [this] (DetermineAuthTypeJob.AuthType type) {
+    GLib.Object.connect (job, &DetermineAuthTypeJob.authType, this, [this] (DetermineAuthTypeJob.AuthType type) {
         if (type == DetermineAuthTypeJob.OAuth) {
             _asyncAuth.reset (new OAuth (_account, this));
             _asyncAuth._expectedUser = _account.davUser ();
@@ -87,8 +87,8 @@ void HttpCredentialsGui.asyncAuthResult (OAuth.Result r, QString &user,
 void HttpCredentialsGui.showDialog () {
     QString msg = tr ("Please enter %1 password:<br>"
                      "<br>"
-                     "User: %2<br>"
-                     "Account: %3<br>")
+                     "User : %2<br>"
+                     "Account : %3<br>")
                       .arg (Utility.escape (Theme.instance ().appNameGUI ()),
                           Utility.escape (_user),
                           Utility.escape (_account.displayName ()));
@@ -99,7 +99,7 @@ void HttpCredentialsGui.showDialog () {
     }
     if (!_fetchErrorString.isEmpty ()) {
         msg += QLatin1String ("<br>")
-            + tr ("Reading from keychain failed with error: \"%1\"")
+            + tr ("Reading from keychain failed with error : \"%1\"")
                   .arg (Utility.escape (_fetchErrorString))
             + QLatin1String ("<br>");
     }
@@ -110,7 +110,7 @@ void HttpCredentialsGui.showDialog () {
     dialog.setLabelText (msg);
     dialog.setTextValue (_previousPassword);
     dialog.setTextEchoMode (QLineEdit.Password);
-    if (auto *dialogLabel = dialog.findChild<QLabel *> ()) {
+    if (auto *dialogLabel = dialog.findChild<QLabel> ()) {
         dialogLabel.setOpenExternalLinks (true);
         dialogLabel.setTextFormat (Qt.RichText);
     }
@@ -146,4 +146,4 @@ QString HttpCredentialsGui.requestAppPasswordText (Account *account) {
     return tr ("<a href=\"%1\">Click here</a> to request an app password from the web interface.")
         .arg (url);
 }
-} // namespace OCC
+} // namespace Occ

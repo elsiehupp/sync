@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QRegularExpression>
 // #include <QLoggingCategory>
@@ -31,23 +31,23 @@ bool isTextBody (QString &s) {
 }
 
 void logHttp (QByteArray &verb, QString &url, QByteArray &id, QString &contentType, QList<QNetworkReply.RawHeaderPair> &header, QIODevice *device) {
-    const auto reply = qobject_cast<QNetworkReply *> (device);
+    const auto reply = qobject_cast<QNetworkReply> (device);
     const auto contentLength = device ? device.size () : 0;
     QString msg;
     QTextStream stream (&msg);
-    stream << id << ": ";
+    stream << id << " : ";
     if (!reply) {
-        stream << "Request: ";
+        stream << "Request : ";
     } else {
-        stream << "Response: ";
+        stream << "Response : ";
     }
     stream << verb;
     if (reply) {
         stream << " " << reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).toInt ();
     }
-    stream << " " << url << " Header: { ";
+    stream << " " << url << " Header : { ";
     for (auto &it : header) {
-        stream << it.first << ": ";
+        stream << it.first << " : ";
         if (it.first == "Authorization") {
             stream << (it.second.startsWith ("Bearer ") ? "Bearer" : "Basic");
             stream << " [redacted]";
@@ -56,11 +56,11 @@ void logHttp (QByteArray &verb, QString &url, QByteArray &id, QString &contentTy
         }
         stream << ", ";
     }
-    stream << "} Data: [";
+    stream << "} Data : [";
     if (contentLength > 0) {
         if (isTextBody (contentType)) {
             if (!device.isOpen ()) {
-                Q_ASSERT (dynamic_cast<QBuffer *> (device));
+                Q_ASSERT (dynamic_cast<QBuffer> (device));
                 // should we close it again?
                 device.open (QIODevice.ReadOnly);
             }
@@ -78,7 +78,7 @@ void logHttp (QByteArray &verb, QString &url, QByteArray &id, QString &contentTy
 }
 }
 
-namespace OCC {
+namespace Occ {
 
 void HttpLogger.logRequest (QNetworkReply *reply, QNetworkAccessManager.Operation operation, QIODevice *device) {
     const auto request = reply.request ();
@@ -98,7 +98,7 @@ void HttpLogger.logRequest (QNetworkReply *reply, QNetworkAccessManager.Operatio
         header,
         device);
 
-    QObject.connect (reply, &QNetworkReply.finished, reply, [reply] {
+    GLib.Object.connect (reply, &QNetworkReply.finished, reply, [reply] {
         logHttp (requestVerb (*reply),
             reply.url ().toString (),
             reply.request ().rawHeader (XRequestId ()),

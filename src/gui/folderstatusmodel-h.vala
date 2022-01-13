@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@kde.org>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@kde.org>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <accountfwd.h>
 // #include <QAbstractItemModel>
@@ -19,24 +19,21 @@
 // #include <QElapsedTimer>
 // #include <QPointer>
 
-class QNetworkReply;
-namespace OCC {
+namespace Occ {
 
 Q_DECLARE_LOGGING_CATEGORY (lcFolderStatus)
 
-class Folder;
 class ProgressInfo;
-class LsColJob;
 
 /**
- * @brief The FolderStatusModel class
- * @ingroup gui
- */
-class FolderStatusModel : public QAbstractItemModel {
+@brief The FolderStatusModel class
+@ingroup gui
+*/
+class FolderStatusModel : QAbstractItemModel {
 public:
     enum {FileIdRole = Qt.UserRole+1};
 
-    FolderStatusModel (QObject *parent = nullptr);
+    FolderStatusModel (GLib.Object *parent = nullptr);
     ~FolderStatusModel () override;
     void setAccountState (AccountState *accountState);
 
@@ -75,7 +72,7 @@ public:
         Qt.CheckState _checked = Qt.Checked;
 
         // Whether this has a FetchLabel subrow
-        bool hasLabel () const;
+        bool hasLabel ();
 
         // Reset all subfolders and fetch status
         void resetSubs (FolderStatusModel *model, QModelIndex index);
@@ -106,7 +103,7 @@ public:
 
     /**
      * return a QModelIndex for the given path within the given folder.
-     * Note: this method returns an invalid index if the path was not fetched from the server before
+     * Note : this method returns an invalid index if the path was not fetched from the server before
      */
     QModelIndex indexForPath (Folder *f, QString &path) const;
 
@@ -134,7 +131,7 @@ private slots:
     void slotShowFetchProgress ();
 
 private:
-    QStringList createBlackList (OCC.FolderStatusModel.SubFolderInfo &root,
+    QStringList createBlackList (Occ.FolderStatusModel.SubFolderInfo &root,
         const QStringList &oldBlackList) const;
     const AccountState *_accountState = nullptr;
     bool _dirty = false; // If the selective sync checkboxes were changed
@@ -154,8 +151,6 @@ signals:
     friend struct SubFolderInfo;
 };
 
-} // namespace OCC
+} // namespace Occ
 
-Q_DECLARE_METATYPE (OCC.FolderStatusModel.SubFolderInfo*)
-
-#endif // FOLDERSTATUSMODEL_H
+Q_DECLARE_METATYPE (Occ.FolderStatusModel.SubFolderInfo*)

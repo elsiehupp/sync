@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #pragma once
 
@@ -18,16 +18,15 @@
 
 // #include <QtCore>
 
-namespace OCC {
-class AccountState;
+namespace Occ {
 
 /**
- * @brief The UnifiedSearchResultsListModel
- * @ingroup gui
- * Simple list model to provide the list view with data for the Unified Search results.
- */
+@brief The UnifiedSearchResultsListModel
+@ingroup gui
+Simple list model to provide the list view with data for the Unified Search results.
+*/
 
-class UnifiedSearchResultsListModel : public QAbstractListModel {
+class UnifiedSearchResultsListModel : QAbstractListModel {
 
     Q_PROPERTY (bool isSearchInProgress READ isSearchInProgress NOTIFY isSearchInProgressChanged)
     Q_PROPERTY (QString currentFetchMoreInProgressProviderId READ currentFetchMoreInProgressProviderId NOTIFY
@@ -58,16 +57,16 @@ public:
         TypeAsStringRole,
     };
 
-    explicit UnifiedSearchResultsListModel (AccountState *accountState, QObject *parent = nullptr);
+    UnifiedSearchResultsListModel (AccountState *accountState, GLib.Object *parent = nullptr);
 
     QVariant data (QModelIndex &index, int role) const override;
     int rowCount (QModelIndex &parent = QModelIndex ()) const override;
 
-    bool isSearchInProgress () const;
+    bool isSearchInProgress ();
 
-    QString currentFetchMoreInProgressProviderId () const;
-    QString searchTerm () const;
-    QString errorString () const;
+    QString currentFetchMoreInProgressProviderId ();
+    QString searchTerm ();
+    QString errorString ();
 
     Q_INVOKABLE void resultClicked (QString &providerId, QUrl &resourceUrl) const;
     Q_INVOKABLE void fetchMoreTriggerClicked (QString &providerId);

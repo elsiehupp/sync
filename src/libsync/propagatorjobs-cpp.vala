@@ -1,17 +1,17 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <qfile.h>
 // #include <qdir.h>
@@ -24,7 +24,7 @@
 
 // #include <ctime>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcPropagateLocalRemove, "nextcloud.sync.propagator.localremove", QtInfoMsg)
 Q_LOGGING_CATEGORY (lcPropagateLocalMkdir, "nextcloud.sync.propagator.localmkdir", QtInfoMsg)
@@ -35,13 +35,13 @@ QByteArray localFileIdFromFullId (QByteArray &id) {
 }
 
 /**
- * The code will update the database in case of error.
- * If everything goes well (no error, returns true), the caller is responsible for removing the entries
- * in the database.  But in case of error, we need to remove the entries from the database of the files
- * that were deleted.
- *
- * \a path is relative to propagator ()._localDir + _item._file and should start with a slash
- */
+The code will update the database in case of error.
+If everything goes well (no error, returns true), the caller is responsible for removing the entries
+in the database.  But in case of error, we need to remove the entries from the database of the files
+that were deleted.
+
+\a path is relative to propagator ()._localDir + _item._file and should start with a slash
+*/
 bool PropagateLocalRemove.removeRecursively (QString &path) {
     QString absolute = propagator ().fullLocalPath (_item._file + path);
     QStringList errors;
@@ -140,7 +140,7 @@ void PropagateLocalMkdir.startLocalMkdir () {
             QString removeError;
             if (!FileSystem.remove (newDirStr, &removeError)) {
                 done (SyncFileItem.NormalError,
-                    tr ("could not delete file %1, error: %2")
+                    tr ("could not delete file %1, error : %2")
                         .arg (newDirStr, removeError));
                 return;
             }
@@ -174,7 +174,7 @@ void PropagateLocalMkdir.startLocalMkdir () {
     newItem._etag = "_invalid_";
     const auto result = propagator ().updateMetadata (newItem);
     if (!result) {
-        done (SyncFileItem.FatalError, tr ("Error updating metadata: %1").arg (result.error ()));
+        done (SyncFileItem.FatalError, tr ("Error updating metadata : %1").arg (result.error ()));
         return;
     } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
         done (SyncFileItem.SoftError, tr ("The file %1 is currently in use").arg (newItem._file));
@@ -206,7 +206,7 @@ void PropagateLocalRename.start () {
             // Only use localFileNameClash for the destination if we know that the source was not
             // the one conflicting  (renaming  A.txt . a.txt is OK)
 
-            // Fixme: the file that is the reason for the clash could be named here,
+            // Fixme : the file that is the reason for the clash could be named here,
             // it would have to come out the localFileNameClash function
             done (SyncFileItem.NormalError,
                 tr ("File %1 cannot be renamed to %2 because of a local file name clash")
@@ -243,7 +243,7 @@ void PropagateLocalRename.start () {
         }
         const auto result = propagator ().updateMetadata (newItem);
         if (!result) {
-            done (SyncFileItem.FatalError, tr ("Error updating metadata: %1").arg (result.error ()));
+            done (SyncFileItem.FatalError, tr ("Error updating metadata : %1").arg (result.error ()));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
             done (SyncFileItem.SoftError, tr ("The file %1 is currently in use").arg (newItem._file));

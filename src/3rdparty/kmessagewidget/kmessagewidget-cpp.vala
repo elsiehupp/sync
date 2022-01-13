@@ -1,23 +1,23 @@
 /* This file is part of the KDE libraries
- *
- * Copyright (c) 2011 Aurélien Gâteau <agateau@kde.org>
- * Copyright (c) 2014 Dominik Haumann <dhaumann@kde.org>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
- * 02110-1301  USA
- */
+
+Copyright (c) 2011 Aurélien Gâteau <agateau@kde.org>
+Copyright (c) 2014 Dominik Haumann <dhaumann@kde.org>
+
+This library is free software; you can redistribute it and
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later versi
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GN
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301  USA
+*/
 
 // #include <QAction>
 // #include <QApplication>
@@ -49,7 +49,7 @@ public:
 
     KMessageWidget.MessageType messageType;
     bool wordWrap;
-    QList<QToolButton *> buttons;
+    QList<QToolButton> buttons;
     QPixmap contentSnapShot;
 
     void createLayout ();
@@ -59,7 +59,7 @@ public:
     void slotTimeLineChanged (qreal);
     void slotTimeLineFinished ();
 
-    int bestContentHeight () const;
+    int bestContentHeight ();
 };
 
 void KMessageWidgetPrivate.init (KMessageWidget *q_ptr) {
@@ -67,10 +67,10 @@ void KMessageWidgetPrivate.init (KMessageWidget *q_ptr) {
 
     q.setSizePolicy (QSizePolicy.Minimum, QSizePolicy.Fixed);
 
-    // Note: when changing the value 500, also update KMessageWidgetTest
+    // Note : when changing the value 500, also update KMessageWidgetTest
     timeLine = new QTimeLine (500, q);
-    QObject.connect (timeLine, SIGNAL (valueChanged (qreal)), q, SLOT (slotTimeLineChanged (qreal)));
-    QObject.connect (timeLine, SIGNAL (finished ()), q, SLOT (slotTimeLineFinished ()));
+    GLib.Object.connect (timeLine, SIGNAL (valueChanged (qreal)), q, SLOT (slotTimeLineChanged (qreal)));
+    GLib.Object.connect (timeLine, SIGNAL (finished ()), q, SLOT (slotTimeLineFinished ()));
 
     content = new QFrame (q);
     content.setObjectName (QStringLiteral ("contentWidget"));
@@ -85,15 +85,15 @@ void KMessageWidgetPrivate.init (KMessageWidget *q_ptr) {
     textLabel = new QLabel (content);
     textLabel.setSizePolicy (QSizePolicy.Expanding, QSizePolicy.Fixed);
     textLabel.setTextInteractionFlags (Qt.TextBrowserInteraction);
-    QObject.connect (textLabel, &QLabel.linkActivated, q, &KMessageWidget.linkActivated);
-    QObject.connect (textLabel, &QLabel.linkHovered, q, &KMessageWidget.linkHovered);
+    GLib.Object.connect (textLabel, &QLabel.linkActivated, q, &KMessageWidget.linkActivated);
+    GLib.Object.connect (textLabel, &QLabel.linkHovered, q, &KMessageWidget.linkHovered);
 
     auto *closeAction = new QAction (q);
     closeAction.setText (KMessageWidget.tr ("&Close"));
     closeAction.setToolTip (KMessageWidget.tr ("Close message"));
-    closeAction.setIcon (QIcon (":/client/theme/close.svg")); // ivan: NC customization
+    closeAction.setIcon (QIcon (":/client/theme/close.svg")); // ivan : NC customization
 
-    QObject.connect (closeAction, &QAction.triggered, q, &KMessageWidget.animatedHide);
+    GLib.Object.connect (closeAction, &QAction.triggered, q, &KMessageWidget.animatedHide);
 
     closeButton = new QToolButton (content);
     closeButton.setAutoRaise (true);
@@ -171,16 +171,16 @@ void KMessageWidgetPrivate.applyStyleSheet () {
     // The following RGB color values come from the "default" scheme in kcolorscheme.cpp
     switch (messageType) {
     case KMessageWidget.Positive:
-        bgBaseColor.setRgb (39, 174,  96); // Window: ForegroundPositive
+        bgBaseColor.setRgb (39, 174,  96); // Window : ForegroundPositive
         break;
     case KMessageWidget.Information:
-        bgBaseColor.setRgb (61, 174, 233); // Window: ForegroundActive
+        bgBaseColor.setRgb (61, 174, 233); // Window : ForegroundActive
         break;
     case KMessageWidget.Warning:
-        bgBaseColor.setRgb (246, 116, 0); // Window: ForegroundNeutral
+        bgBaseColor.setRgb (246, 116, 0); // Window : ForegroundNeutral
         break;
     case KMessageWidget.Error:
-        bgBaseColor.setRgb (218, 68, 83); // Window: ForegroundNegative
+        bgBaseColor.setRgb (218, 68, 83); // Window : ForegroundNegative
         break;
     }
     const qreal bgBaseColorAlpha = 0.2;
@@ -200,12 +200,12 @@ void KMessageWidgetPrivate.applyStyleSheet () {
 
     content.setStyleSheet (
         QString.fromLatin1 (".QFrame {"
-                              "background-color: %1;"
-                              "border-radius: 4px;"
-                              "border: 2px solid %2;"
-                              "margin: %3px;"
+                              "background-color : %1;"
+                              "border-radius : 4px;"
+                              "border : 2px solid %2;"
+                              "margin : %3px;"
                               "}"
-                              ".QLabel { color: %4; }"
+                              ".QLabel { color : %4; }"
                              )
         .arg (bgFinalColor.name ())
         .arg (border.name ())
@@ -222,7 +222,7 @@ void KMessageWidgetPrivate.updateLayout () {
 }
 
 void KMessageWidgetPrivate.updateSnapShot () {
-    // Attention: updateSnapShot calls QWidget.render (), which causes the whole
+    // Attention : updateSnapShot calls QWidget.render (), which causes the whole
     // window layouts to be activated. Calling this method from resizeEvent ()
     // can lead to infinite recursion, see:
     // https://bugs.kde.org/show_bug.cgi?id=311336

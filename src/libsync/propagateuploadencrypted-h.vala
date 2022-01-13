@@ -1,7 +1,7 @@
 #ifndef PROPAGATEUPLOADENCRYPTED_H
-#define PROPAGATEUPLOADENCRYPTED_H
+const int PROPAGATEUPLOADENCRYPTED_H
 
-// #include <QObject>
+// #include <GLib.Object>
 // #include <QString>
 // #include <QMap>
 // #include <QByteArray>
@@ -10,25 +10,24 @@
 // #include <QFile>
 // #include <QTemporaryFile>
 
-namespace OCC {
-class FolderMetadata;
+namespace Occ {
 
   /* This class is used if the server supports end to end encryption.
- * It will fire for *any* folder, encrypted or not, because when the
- * client starts the upload request we don't know if the folder is
- * encrypted on the server.
- *
- * emits:
- * finalized () if the encrypted file is ready to be uploaded
- * error () if there was an error with the encryption
- * folderNotEncrypted () if the file is within a folder that's not encrypted.
- *
- */
+It will fire for *any* folder, encrypted or not, because when the
+client starts the upload request we don't know if the folder is
+encrypted on the server.
 
-class PropagateUploadEncrypted : public QObject {
+emits:
+finalized () if the encrypted file is ready to be
+error () if there was an error with the encryption
+folderNotEncrypted () if the file is within a folder that's not encrypted.
+
+*/
+
+class PropagateUploadEncrypted : GLib.Object {
   Q_OBJECT
 public:
-    PropagateUploadEncrypted (OwncloudPropagator *propagator, QString &remoteParentPath, SyncFileItemPtr item, QObject *parent = nullptr);
+    PropagateUploadEncrypted (OwncloudPropagator *propagator, QString &remoteParentPath, SyncFileItemPtr item, GLib.Object *parent = nullptr);
     ~PropagateUploadEncrypted () override = default;
 
     void start ();

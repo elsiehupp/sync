@@ -1,32 +1,30 @@
 /*
- * Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
-// #include <QObject>
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
+
+// #include <GLib.Object>
 
 // #include <csync.h>
 
-class QNetworkAccessManager;
 class QNetworkReply;
-namespace OCC {
+namespace Occ {
 
-class AbstractNetworkJob;
 
-class OWNCLOUDSYNC_EXPORT AbstractCredentials : public QObject {
+class OWNCLOUDSYNC_EXPORT AbstractCredentials : GLib.Object {
 
 public:
     AbstractCredentials ();
-    // No need for virtual destructor - QObject already has one.
+    // No need for virtual destructor - GLib.Object already has one.
 
     /** The bound account for the credentials instance.
      *
@@ -86,7 +84,7 @@ public:
     /** If the job need to be restarted or queue, this does it and returns true. */
     virtual bool retryIfNeeded (AbstractNetworkJob *) { return false; }
 
-Q_SIGNALS:
+signals:
     /** Emitted when fetchFromKeychain () is done.
      *
      * Note that ready () can be true or false, depending on whether there was useful
@@ -106,6 +104,6 @@ protected:
     bool _wasFetched = false;
 };
 
-} // namespace OCC
+} // namespace Occ
 
 #endif

@@ -1,21 +1,18 @@
 #ifndef WEBFLOWCREDENTIALSDIALOG_H
-#define WEBFLOWCREDENTIALSDIALOG_H
+const int WEBFLOWCREDENTIALSDIALOG_H
 
 // #include <QDialog>
 // #include <QUrl>
 
-class QLabel;
 class QVBoxLayout;
 
-namespace OCC {
+namespace Occ {
 
-class HeaderBanner;
 #ifdef WITH_WEBENGINE
-class WebView;
 #endif // WITH_WEBENGINE
 class Flow2AuthWidget;
 
-class WebFlowCredentialsDialog : public QDialog {
+class WebFlowCredentialsDialog : QDialog {
 public:
     WebFlowCredentialsDialog (Account *account, bool useFlow2, QWidget *parent = nullptr);
 
@@ -58,6 +55,4 @@ private:
     HeaderBanner *_headerBanner;
 };
 
-} // namespace OCC
-
-#endif // WEBFLOWCREDENTIALSDIALOG_H
+} // namespace Occ

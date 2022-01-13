@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QApplication>
 // #include <QPointer>
@@ -19,45 +19,40 @@
 // #include <QElapsedTimer>
 // #include <QNetworkConfigurationManager>
 
-class QMessageBox;
 class QSystemTrayIcon;
-class QSocket;
 
 namespace CrashReporter {
-class Handler;
 }
 
-namespace OCC {
+namespace Occ {
 
 Q_DECLARE_LOGGING_CATEGORY (lcApplication)
 
-class Theme;
 class Folder;
-class SslErrorDialog;
 
 /**
- * @brief The Application class
- * @ingroup gui
- */
-class Application : public SharedTools.QtSingleApplication {
+@brief The Application class
+@ingroup gui
+*/
+class Application : SharedTools.QtSingleApplication {
 public:
-    explicit Application (int &argc, char **argv);
+    Application (int &argc, char **argv);
     ~Application () override;
 
     bool giveHelp ();
     void showHelp ();
     void showHint (std.string errorHint);
     bool debugMode ();
-    bool backgroundMode () const;
+    bool backgroundMode ();
     bool versionOnly (); // only display the version?
     void showVersion ();
 
     void showMainDialog ();
 
-    ownCloudGui *gui () const;
+    ownCloudGui *gui ();
 
 public slots:
-    // TODO: this should not be public
+    // TODO : this should not be public
     void slotownCloudWizardDone (int);
     void slotCrash ();
     /**
@@ -81,7 +76,7 @@ signals:
     void isShowingSettingsDialog ();
 
 protected slots:
-    void slotParseMessage (QString &, QObject *);
+    void slotParseMessage (QString &, GLib.Object *);
     void slotCheckConnection ();
     void slotUseMonoIconsChanged (bool);
     void slotCleanup ();
@@ -131,6 +126,4 @@ private:
     QScopedPointer<FolderMan> _folderManager;
 };
 
-} // namespace OCC
-
-#endif // APPLICATION_H
+} // namespace Occ

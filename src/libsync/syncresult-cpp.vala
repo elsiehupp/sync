@@ -1,18 +1,18 @@
 /*
- * Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 
-namespace OCC {
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
+
+namespace Occ {
 
 SyncResult.SyncResult () = default;
 
@@ -120,8 +120,8 @@ void SyncResult.processCompletedItem (SyncFileItemPtr &item) {
 
     // Process the item to the gui
     if (item._status == SyncFileItem.FatalError || item._status == SyncFileItem.NormalError) {
-        //: this displays an error string (%2) for a file %1
-        appendErrorString (QObject.tr ("%1: %2").arg (item._file, item._errorString));
+        // : this displays an error string (%2) for a file %1
+        appendErrorString (GLib.Object.tr ("%1 : %2").arg (item._file, item._errorString));
         _numErrorItems++;
         if (!_firstItemError) {
             _firstItemError = item;

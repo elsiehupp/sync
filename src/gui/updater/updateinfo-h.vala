@@ -4,18 +4,18 @@
 // #include <QDomElement>
 // #include <QXmlStreamWriter>
 
-namespace OCC {
+namespace Occ {
 
 class UpdateInfo {
 public:
     void setVersion (QString &v);
-    QString version () const;
+    QString version ();
     void setVersionString (QString &v);
-    QString versionString () const;
+    QString versionString ();
     void setWeb (QString &v);
-    QString web () const;
+    QString web ();
     void setDownloadUrl (QString &v);
-    QString downloadUrl () const;
+    QString downloadUrl ();
     /**
       Parse XML object from DOM element.
      */
@@ -29,6 +29,4 @@ private:
     QString mDownloadUrl;
 };
 
-} // namespace OCC
-
-#endif // UPDATEINFO_H
+} // namespace Occ

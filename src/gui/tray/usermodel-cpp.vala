@@ -10,17 +10,17 @@
 
 // time span in milliseconds which has to be between two
 // refreshes of the notifications
-#define NOTIFICATION_REQUEST_FREE_PERIOD 15000
+const int NOTIFICATION_REQUEST_FREE_PERIOD 15000
 
 namespace {
 constexpr int64 expiredActivitiesCheckIntervalMsecs = 1000 * 60;
 constexpr int64 activityDefaultExpirationTimeMsecs = 1000 * 60 * 10;
 }
 
-namespace OCC {
+namespace Occ {
 
-User.User (AccountStatePtr &account, bool &isCurrent, QObject *parent)
-    : QObject (parent)
+User.User (AccountStatePtr &account, bool &isCurrent, GLib.Object *parent)
+    : GLib.Object (parent)
     , _account (account)
     , _isCurrentUser (isCurrent)
     , _activityModel (new ActivityListModel (_account.data (), this))
@@ -196,7 +196,7 @@ void User.slotRefresh () {
 
     // Fetch Activities only if visible and if last check is longer than 15 secs ago
     if (timer.isValid () && timer.elapsed () < NOTIFICATION_REQUEST_FREE_PERIOD) {
-        qCDebug (lcActivity) << "Do not check as last check is only secs ago: " << timer.elapsed () / 1000;
+        qCDebug (lcActivity) << "Do not check as last check is only secs ago : " << timer.elapsed () / 1000;
         return;
     }
     if (_account.data () && _account.data ().isConnected ()) {
@@ -282,12 +282,12 @@ void User.slotSendNotificationRequest (QString &accountName, QString &link, QByt
             _notificationRequestsRunning++;
         }
     } else {
-        qCWarning (lcActivity) << "Notification Links: Invalid verb:" << verb;
+        qCWarning (lcActivity) << "Notification Links : Invalid verb:" << verb;
     }
 }
 
 void User.slotNotifyNetworkError (QNetworkReply *reply) {
-    auto *job = qobject_cast<NotificationConfirmJob *> (sender ());
+    auto *job = qobject_cast<NotificationConfirmJob> (sender ());
     if (!job) {
         return;
     }
@@ -299,7 +299,7 @@ void User.slotNotifyNetworkError (QNetworkReply *reply) {
 }
 
 void User.slotNotifyServerFinished (QString &reply, int replyCode) {
-    auto *job = qobject_cast<NotificationConfirmJob *> (sender ());
+    auto *job = qobject_cast<NotificationConfirmJob> (sender ());
     if (!job) {
         return;
     }
@@ -658,9 +658,9 @@ UserModel *UserModel.instance () {
     return _instance;
 }
 
-UserModel.UserModel (QObject *parent)
+UserModel.UserModel (GLib.Object *parent)
     : QAbstractListModel (parent) {
-    // TODO: Remember selected user from last quit via settings file
+    // TODO : Remember selected user from last quit via settings file
     if (AccountManager.instance ().accounts ().size () > 0) {
         buildUserList ();
     }
@@ -844,7 +844,7 @@ Q_INVOKABLE void UserModel.removeAccount (int &id) {
     endRemoveRows ();
 }
 
-std.shared_ptr<OCC.UserStatusConnector> UserModel.userStatusConnector (int id) {
+std.shared_ptr<Occ.UserStatusConnector> UserModel.userStatusConnector (int id) {
     if (id < 0 || id >= _users.size ()) {
         return nullptr;
     }
@@ -987,7 +987,7 @@ UserAppsModel *UserAppsModel.instance () {
     return _instance;
 }
 
-UserAppsModel.UserAppsModel (QObject *parent)
+UserAppsModel.UserAppsModel (GLib.Object *parent)
     : QAbstractListModel (parent) {
 }
 

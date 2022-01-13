@@ -1,17 +1,17 @@
 // #include <QTest>
 
-class TestNotificationCache : public QObject {
+class TestNotificationCache : GLib.Object {
 
 private slots:
     void testContains_doesNotContainNotification_returnsFalse () {
-        OCC.NotificationCache notificationCache;
+        Occ.NotificationCache notificationCache;
 
         QVERIFY (!notificationCache.contains ({ "Title", { "Message" } }));
     }
 
     void testContains_doesContainNotification_returnTrue () {
-        OCC.NotificationCache notificationCache;
-        const OCC.NotificationCache.Notification notification { "Title", "message" };
+        Occ.NotificationCache notificationCache;
+        const Occ.NotificationCache.Notification notification { "Title", "message" };
 
         notificationCache.insert (notification);
 
@@ -19,8 +19,8 @@ private slots:
     }
 
     void testClear_doesContainNotification_clearNotifications () {
-        OCC.NotificationCache notificationCache;
-        const OCC.NotificationCache.Notification notification { "Title", "message" };
+        Occ.NotificationCache notificationCache;
+        const Occ.NotificationCache.Notification notification { "Title", "message" };
 
         notificationCache.insert (notification);
         notificationCache.clear ();

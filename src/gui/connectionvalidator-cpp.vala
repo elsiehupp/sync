@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QJsonDocument>
 // #include <QJsonObject>
@@ -22,7 +22,7 @@
 
 // #include <creds/abstractcredentials.h>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcConnectionValidator, "nextcloud.sync.connectionvalidator", QtInfoMsg)
 
@@ -30,8 +30,8 @@ Q_LOGGING_CATEGORY (lcConnectionValidator, "nextcloud.sync.connectionvalidator",
 // This makes sure we get tried often enough without "ConnectionValidator already running"
 static int64 timeoutToUseMsec = qMax (1000, ConnectionValidator.DefaultCallingIntervalMsec - 5 * 1000);
 
-ConnectionValidator.ConnectionValidator (AccountStatePtr accountState, QObject *parent)
-    : QObject (parent)
+ConnectionValidator.ConnectionValidator (AccountStatePtr accountState, GLib.Object *parent)
+    : GLib.Object (parent)
     , _accountState (accountState)
     , _account (accountState.account ())
     , _isCheckingServerAndAuth (false) {
@@ -94,7 +94,7 @@ void ConnectionValidator.slotStatusFound (QUrl &url, QJsonObject &info) {
     QString serverVersion = CheckServerJob.version (info);
 
     // status.php was found.
-    qCInfo (lcConnectionValidator) << "** Application: ownCloud found: "
+    qCInfo (lcConnectionValidator) << "** Application : ownCloud found : "
                                   << url << " with version "
                                   << CheckServerJob.versionString (info)
                                   << " (" << serverVersion << ")";
@@ -110,7 +110,7 @@ void ConnectionValidator.slotStatusFound (QUrl &url, QJsonObject &info) {
         return;
     }
 
-    // Check for maintenance mode: Servers send "true", so go through QVariant
+    // Check for maintenance mode : Servers send "true", so go through QVariant
     // to parse it correctly.
     if (info["maintenance"].toVariant ().toBool ()) {
         reportResult (MaintenanceMode);
@@ -123,7 +123,7 @@ void ConnectionValidator.slotStatusFound (QUrl &url, QJsonObject &info) {
 
 // status.php could not be loaded (network or server issue!).
 void ConnectionValidator.slotNoStatusFound (QNetworkReply *reply) {
-    auto job = qobject_cast<CheckServerJob *> (sender ());
+    auto job = qobject_cast<CheckServerJob> (sender ());
     qCWarning (lcConnectionValidator) << reply.error () << job.errorString () << reply.peek (1024);
     if (reply.error () == QNetworkReply.SslHandshakeFailedError) {
         reportResult (SslError);
@@ -131,8 +131,8 @@ void ConnectionValidator.slotNoStatusFound (QNetworkReply *reply) {
     }
 
     if (!_account.credentials ().stillValid (reply)) {
-        // Note: Why would this happen on a status.php request?
-        _errors.append (tr ("Authentication error: Either username or password are wrong."));
+        // Note : Why would this happen on a status.php request?
+        _errors.append (tr ("Authentication error : Either username or password are wrong."));
     } else {
         //_errors.append (tr ("Unable to connect to %1").arg (_account.url ().toString ()));
         _errors.append (job.errorString ());
@@ -167,7 +167,7 @@ void ConnectionValidator.checkAuthentication () {
 }
 
 void ConnectionValidator.slotAuthFailed (QNetworkReply *reply) {
-    auto job = qobject_cast<PropfindJob *> (sender ());
+    auto job = qobject_cast<PropfindJob> (sender ());
     Status stat = Timeout;
 
     if (reply.error () == QNetworkReply.SslHandshakeFailedError) {
@@ -207,7 +207,7 @@ void ConnectionValidator.checkServerCapabilities () {
     // The main flow now needs the capabilities
     auto *job = new JsonApiJob (_account, QLatin1String ("ocs/v1.php/cloud/capabilities"), this);
     job.setTimeout (timeoutToUseMsec);
-    QObject.connect (job, &JsonApiJob.jsonReceived, this, &ConnectionValidator.slotCapabilitiesRecieved);
+    GLib.Object.connect (job, &JsonApiJob.jsonReceived, this, &ConnectionValidator.slotCapabilitiesRecieved);
     job.start ();
 }
 
@@ -232,7 +232,7 @@ void ConnectionValidator.slotCapabilitiesRecieved (QJsonDocument &json) {
 
 void ConnectionValidator.fetchUser () {
     auto *userInfo = new UserInfo (_accountState.data (), true, true, this);
-    QObject.connect (userInfo, &UserInfo.fetchedLastInfo, this, &ConnectionValidator.slotUserFetched);
+    GLib.Object.connect (userInfo, &UserInfo.fetchedLastInfo, this, &ConnectionValidator.slotUserFetched);
     userInfo.setActive (true);
 }
 
@@ -254,7 +254,7 @@ bool ConnectionValidator.setAndCheckServerVersion (QString &version) {
 #if QT_VERSION >= QT_VERSION_CHECK (5, 9, 0)
     // Record that the server supports HTTP/2
     // Actual decision if we should use HTTP/2 is done in AccessManager.createRequest
-    if (auto job = qobject_cast<AbstractNetworkJob *> (sender ())) {
+    if (auto job = qobject_cast<AbstractNetworkJob> (sender ())) {
         if (auto reply = job.reply ()) {
             _account.setHttp2Supported (
                 reply.attribute (QNetworkRequest.HTTP2WasUsedAttribute).toBool ());
@@ -289,4 +289,4 @@ void ConnectionValidator.reportResult (Status status) {
     deleteLater ();
 }
 
-} // namespace OCC
+} // namespace Occ

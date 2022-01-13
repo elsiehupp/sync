@@ -1,8 +1,8 @@
 #ifndef CLIENTSIDEENCRYPTION_H
-#define CLIENTSIDEENCRYPTION_H
+const int CLIENTSIDEENCRYPTION_H
 
 // #include <QString>
-// #include <QObject>
+// #include <GLib.Object>
 // #include <QJsonDocument>
 // #include <QSslCertificate>
 // #include <QSslKey>
@@ -13,12 +13,10 @@
 // #include <openssl/evp.h>
 
 namespace QKeychain {
-class Job;
 class WritePasswordJob;
-class ReadPasswordJob;
 }
 
-namespace OCC {
+namespace Occ {
 
 QString e2eeBaseUrl ();
 
@@ -47,7 +45,7 @@ namespace EncryptionHelper {
 
     QByteArray privateKeyToPem (QByteArray key);
 
-    //TODO: change those two EVP_PKEY into QSslKey.
+    //TODO : change those two EVP_PKEY into QSslKey.
     QByteArray encryptStringAsymmetric (
             EVP_PKEY *publicKey,
             const QByteArray& data
@@ -92,8 +90,8 @@ public:
 
     QByteArray chunkDecryption (char *input, uint64 chunkSize);
 
-    bool isInitialized () const;
-    bool isFinished () const;
+    bool isInitialized ();
+    bool isFinished ();
 
 private:
     Q_DISABLE_COPY (StreamingDecryptor)
@@ -106,7 +104,7 @@ private:
 };
 }
 
-class OWNCLOUDSYNC_EXPORT ClientSideEncryption : public QObject {
+class OWNCLOUDSYNC_EXPORT ClientSideEncryption : GLib.Object {
 public:
     ClientSideEncryption ();
     void initialize (AccountPtr &account);
@@ -119,7 +117,7 @@ private:
 public:
     void forgetSensitiveData (AccountPtr &account);
 
-    bool newMnemonicGenerated () const;
+    bool newMnemonicGenerated ();
 
 public slots:
     void slotRequestMnemonic ();
@@ -178,7 +176,7 @@ public:
     void addEncryptedFile (EncryptedFile& f);
     void removeEncryptedFile (EncryptedFile& f);
     void removeAllEncryptedFiles ();
-    QVector<EncryptedFile> files () const;
+    QVector<EncryptedFile> files ();
 
 private:
     /* Use std.string and std.vector internally on this class
@@ -199,5 +197,5 @@ private:
     QVector<QPair<QString, QString>> _sharing;
 };
 
-} // namespace OCC
+} // namespace Occ
 #endif

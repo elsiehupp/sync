@@ -13,12 +13,12 @@ Q_LOGGING_CATEGORY (lcSignPublicKeyApiJob, "nextcloud.sync.networkjob.sendcsr", 
 Q_LOGGING_CATEGORY (lcStorePrivateKeyApiJob, "nextcloud.sync.networkjob.storeprivatekey", QtInfoMsg)
 Q_LOGGING_CATEGORY (lcCseJob, "nextcloud.sync.networkjob.clientsideencrypt", QtInfoMsg)
 
-namespace OCC {
+namespace Occ {
 
 GetMetadataApiJob.GetMetadataApiJob (AccountPtr& account,
                                     const QByteArray& fileId,
-                                    QObject* parent)
-: AbstractNetworkJob (account, e2eeBaseUrl () + QStringLiteral ("meta-data/") + fileId, parent), _fileId (fileId) {
+                                    GLib.Object* parent)
+ : AbstractNetworkJob (account, e2eeBaseUrl () + QStringLiteral ("meta-data/") + fileId, parent), _fileId (fileId) {
 }
 
 void GetMetadataApiJob.start () {
@@ -50,8 +50,8 @@ bool GetMetadataApiJob.finished () {
 StoreMetaDataApiJob.StoreMetaDataApiJob (AccountPtr& account,
                                                  const QByteArray& fileId,
                                                  const QByteArray& b64Metadata,
-                                                 QObject* parent)
-: AbstractNetworkJob (account, e2eeBaseUrl () + QStringLiteral ("meta-data/") + fileId, parent), _fileId (fileId), _b64Metadata (b64Metadata) {
+                                                 GLib.Object* parent)
+ : AbstractNetworkJob (account, e2eeBaseUrl () + QStringLiteral ("meta-data/") + fileId, parent), _fileId (fileId), _b64Metadata (b64Metadata) {
 }
 
 void StoreMetaDataApiJob.start () {
@@ -88,8 +88,8 @@ UpdateMetadataApiJob.UpdateMetadataApiJob (AccountPtr& account,
                                                  const QByteArray& fileId,
                                                  const QByteArray& b64Metadata,
                                                  const QByteArray& token,
-                                                 QObject* parent)
-: AbstractNetworkJob (account, e2eeBaseUrl () + QStringLiteral ("meta-data/") + fileId, parent)
+                                                 GLib.Object* parent)
+ : AbstractNetworkJob (account, e2eeBaseUrl () + QStringLiteral ("meta-data/") + fileId, parent)
 , _fileId (fileId),
 _b64Metadata (b64Metadata),
 _token (token) {
@@ -135,8 +135,8 @@ bool UpdateMetadataApiJob.finished () {
 UnlockEncryptFolderApiJob.UnlockEncryptFolderApiJob (AccountPtr& account,
                                                  const QByteArray& fileId,
                                                  const QByteArray& token,
-                                                 QObject* parent)
-: AbstractNetworkJob (account, e2eeBaseUrl () + QStringLiteral ("lock/") + fileId, parent), _fileId (fileId), _token (token) {
+                                                 GLib.Object* parent)
+ : AbstractNetworkJob (account, e2eeBaseUrl () + QStringLiteral ("lock/") + fileId, parent), _fileId (fileId), _token (token) {
 }
 
 void UnlockEncryptFolderApiJob.start () {
@@ -165,8 +165,8 @@ bool UnlockEncryptFolderApiJob.finished () {
 
 DeleteMetadataApiJob.DeleteMetadataApiJob (AccountPtr& account,
                                                   const QByteArray& fileId,
-                                                 QObject* parent)
-: AbstractNetworkJob (account, e2eeBaseUrl () + QStringLiteral ("meta-data/") + fileId, parent), _fileId (fileId) {
+                                                 GLib.Object* parent)
+ : AbstractNetworkJob (account, e2eeBaseUrl () + QStringLiteral ("meta-data/") + fileId, parent), _fileId (fileId) {
 }
 
 void DeleteMetadataApiJob.start () {
@@ -192,8 +192,8 @@ bool DeleteMetadataApiJob.finished () {
     return true;
 }
 
-LockEncryptFolderApiJob.LockEncryptFolderApiJob (AccountPtr& account, QByteArray& fileId, QObject* parent)
-: AbstractNetworkJob (account, e2eeBaseUrl () + QStringLiteral ("lock/") + fileId, parent), _fileId (fileId) {
+LockEncryptFolderApiJob.LockEncryptFolderApiJob (AccountPtr& account, QByteArray& fileId, GLib.Object* parent)
+ : AbstractNetworkJob (account, e2eeBaseUrl () + QStringLiteral ("lock/") + fileId, parent), _fileId (fileId) {
 }
 
 void LockEncryptFolderApiJob.start () {
@@ -223,13 +223,13 @@ bool LockEncryptFolderApiJob.finished () {
     auto token = obj["ocs"].toMap ()["data"].toMap ()["e2e-token"].toByteArray ();
     qCInfo (lcCseJob ()) << "got json:" << token;
 
-    //TODO: Parse the token and submit.
+    //TODO : Parse the token and submit.
     emit success (_fileId, token);
     return true;
 }
 
-SetEncryptionFlagApiJob.SetEncryptionFlagApiJob (AccountPtr& account, QByteArray& fileId, FlagAction flagAction, QObject* parent)
-: AbstractNetworkJob (account, e2eeBaseUrl () + QStringLiteral ("encrypted/") + fileId, parent), _fileId (fileId), _flagAction (flagAction) {
+SetEncryptionFlagApiJob.SetEncryptionFlagApiJob (AccountPtr& account, QByteArray& fileId, FlagAction flagAction, GLib.Object* parent)
+ : AbstractNetworkJob (account, e2eeBaseUrl () + QStringLiteral ("encrypted/") + fileId, parent), _fileId (fileId), _flagAction (flagAction) {
 }
 
 void SetEncryptionFlagApiJob.start () {
@@ -256,8 +256,8 @@ bool SetEncryptionFlagApiJob.finished () {
     return true;
 }
 
-StorePrivateKeyApiJob.StorePrivateKeyApiJob (AccountPtr& account, QString& path, QObject* parent)
-: AbstractNetworkJob (account, path, parent) {
+StorePrivateKeyApiJob.StorePrivateKeyApiJob (AccountPtr& account, QString& path, GLib.Object* parent)
+ : AbstractNetworkJob (account, path, parent) {
 }
 
 void StorePrivateKeyApiJob.setPrivateKey (QByteArray& privKey) {
@@ -290,8 +290,8 @@ bool StorePrivateKeyApiJob.finished () {
     return true;
 }
 
-SignPublicKeyApiJob.SignPublicKeyApiJob (AccountPtr& account, QString& path, QObject* parent)
-: AbstractNetworkJob (account, path, parent) {
+SignPublicKeyApiJob.SignPublicKeyApiJob (AccountPtr& account, QString& path, GLib.Object* parent)
+ : AbstractNetworkJob (account, path, parent) {
 }
 
 void SignPublicKeyApiJob.setCsr (QByteArray& csr) {

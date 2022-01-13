@@ -1,14 +1,14 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *       support, and with no warranty, express or implied, as to its usefulness for
- *          any purpose.
- *          */
+   This software is in the public domain, furnished "as is", without technical
+      support, and with no warranty, express or implied, as to its usefulness for
+         any purpose.
+         */
 
 // #include <QtTest>
 
-using namespace OCC;
+using namespace Occ;
 
-class TestXmlParse : public QObject {
+class TestXmlParse : GLib.Object {
 
 private:
   bool _success;
@@ -17,12 +17,12 @@ private:
 
 public slots:
   void slotDirectoryListingSubFolders (QStringList& list) {
-     qDebug () << "subfolders: " << list;
+     qDebug () << "subfolders : " << list;
      _subdirs.append (list);
   }
 
   void slotDirectoryListingIterated (QString& item, QMap<QString,QString>& ) {
-    qDebug () << "     item: " << item;
+    qDebug () << "     item : " << item;
     _items.append (item);
   }
 
@@ -179,7 +179,7 @@ private slots:
         QVERIFY (!_success);
         QVERIFY (sizes.size () == 0 ); // No quota info in the XML
 
-        QVERIFY (_items.size () == 0 ); // FIXME: We should change the parser to not emit during parsing but at the end
+        QVERIFY (_items.size () == 0 ); // FIXME : We should change the parser to not emit during parsing but at the end
 
         QVERIFY (_subdirs.size () == 0);
     }
@@ -202,7 +202,7 @@ private slots:
         QVERIFY (!_success);
         QVERIFY (sizes.size () == 0 ); // No quota info in the XML
 
-        QVERIFY (_items.size () == 0 ); // FIXME: We should change the parser to not emit during parsing but at the end
+        QVERIFY (_items.size () == 0 ); // FIXME : We should change the parser to not emit during parsing but at the end
         QVERIFY (_subdirs.size () == 0);
     }
 
@@ -224,7 +224,7 @@ private slots:
         QVERIFY (!_success);
         QVERIFY (sizes.size () == 0 ); // No quota info in the XML
 
-        QVERIFY (_items.size () == 0 ); // FIXME: We should change the parser to not emit during parsing but at the end
+        QVERIFY (_items.size () == 0 ); // FIXME : We should change the parser to not emit during parsing but at the end
         QVERIFY (_subdirs.size () == 0);
     }
 

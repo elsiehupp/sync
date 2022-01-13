@@ -1,43 +1,43 @@
 /*
- * Copyright (C) 2018 by J-P Nurmi <jpnurmi@gmail.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) 2018 by J-P Nurmi <jpnurmi@gmail.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QWidget>
 // #include <QBasicTimer>
 // #include <QPointer>
 // #include <QVariantAnimation>
 
-namespace OCC {
+namespace Occ {
 
 /**
- * @brief The SlideShow class
- * @ingroup gui
- */
-class SlideShow : public QWidget {
+@brief The SlideShow class
+@ingroup gui
+*/
+class SlideShow : QWidget {
     Q_PROPERTY (int interval READ interval WRITE setInterval)
     Q_PROPERTY (int currentSlide READ currentSlide WRITE setCurrentSlide NOTIFY currentSlideChanged)
 
 public:
-    explicit SlideShow (QWidget* parent = nullptr);
+    SlideShow (QWidget* parent = nullptr);
 
     void addSlide (QPixmap &pixmap, QString &label);
 
-    bool isActive () const;
+    bool isActive ();
 
-    int interval () const;
+    int interval ();
     void setInterval (int interval);
 
-    int currentSlide () const;
+    int currentSlide ();
     void setCurrentSlide (int index);
 
     QSize sizeHint () const override;
@@ -73,6 +73,4 @@ private:
     QPointer<QVariantAnimation> _animation = nullptr;
 };
 
-} // namespace OCC
-
-#endif // OCC_SLIDESHOW_H
+} // namespace Occ

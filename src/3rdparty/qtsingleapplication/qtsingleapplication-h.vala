@@ -1,7 +1,7 @@
 /****************************************************************************
 **
 ** Copyright (C) 2014 Digia Plc and/or its subsidiary (-ies).
-** Contact: http://www.qt-project.org/legal
+** Contact : http://www.qt-project.org/legal
 **
 ** This file is part of Qt Creator.
 **
@@ -19,7 +19,7 @@
 ** Foundation and appearing in the file LICENSE.LGPL included in the
 ** packaging of this file.  Please review the following information to
 ** ensure the GNU Lesser General Public License version 2.1 requirements
-** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** will be met : http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 **
 ** In addition, as a special exception, Digia gives you certain additional
 ** rights.  These rights are described in the Digia Qt LGPL Exception
@@ -33,9 +33,8 @@ QT_FORWARD_DECLARE_CLASS (QSharedMemory)
 
 namespace SharedTools {
 
-class QtLocalPeer;
 
-class QtSingleApplication : public QApplication {
+class QtSingleApplication : QApplication {
 
 public:
     QtSingleApplication (QString &id, int &argc, char **argv);
@@ -44,18 +43,18 @@ public:
     bool isRunning (int64 pid = -1);
 
     void setActivationWindow (QWidget* aw, bool activateOnMessage = true);
-    QWidget* activationWindow () const;
+    QWidget* activationWindow ();
     bool event (QEvent *event) override;
 
-    QString applicationId () const;
+    QString applicationId ();
     void setBlock (bool value);
 
-public Q_SLOTS:
+public slots:
     bool sendMessage (QString &message, int timeout = 5000, int64 pid = -1);
     void activateWindow ();
 
-Q_SIGNALS:
-    void messageReceived (QString &message, QObject *socket);
+signals:
+    void messageReceived (QString &message, GLib.Object *socket);
     void fileOpenRequest (QString &file);
 
 private:
@@ -70,5 +69,3 @@ private:
 };
 
 } // namespace SharedTools
-
-#endif // QTSINGLEAPPLICATION_H

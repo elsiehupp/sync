@@ -1,14 +1,14 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *    support, and with no warranty, express or implied, as to its usefulness for
- *    any purpose.
- *
- */
+   This software is in the public domain, furnished "as is", without technical
+   support, and with no warranty, express or implied, as to its usefulness for
+   any purpose.
+
+*/
 
 // #include <QtTest>
 // #include <syncengine.h>
 
-using namespace OCC;
+using namespace Occ;
 
 bool itemSuccessful (ItemCompletedSpy &spy, QString &path, SyncInstructions instr) {
     auto item = spy.findItem (path);
@@ -54,7 +54,7 @@ SyncJournalFileRecord dbRecord (FakeFolder &folder, QString &path) {
     return record;
 }
 
-class TestSyncConflict : public QObject {
+class TestSyncConflict : GLib.Object {
 
 private slots:
     void testNoUpload () {
@@ -212,7 +212,7 @@ private slots:
         QCOMPARE (conflictRecord.initialBasePath, QByteArray ("A/a1"));
 
         // Now with server headers
-        QObject parent;
+        GLib.Object parent;
         auto a2FileId = fakeFolder.remoteModifier ().find ("A/a2").fileId;
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.GetOperation) {
@@ -467,7 +467,7 @@ private slots:
         fakeFolder.remoteModifier ().insert ("Z/foo");
         fakeFolder.localModifier ().insert ("Z");
 
-        // 2) local dir becomes file: remote dir adds file
+        // 2) local dir becomes file : remote dir adds file
         fakeFolder.localModifier ().remove ("A");
         fakeFolder.localModifier ().insert ("A", 63);
         fakeFolder.remoteModifier ().insert ("A/bar");

@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QtCore>
 #ifndef TOKEN_AUTH_ONLY
@@ -22,9 +22,9 @@
 // #include <QSvgRenderer>
 
 #ifdef THEME_INCLUDE
-#define Mirall OCC // namespace hack to make old themes work
-#define QUOTEME (M) #M
-#define INCLUDE_FILE (M) QUOTEME (M)
+const int Mirall Occ // namespace hack to make old themes work
+const int QUOTEME (M) #M
+const int INCLUDE_FILE (M) QUOTEME (M)
 #include INCLUDE_FILE (THEME_INCLUDE)
 #undef Mirall
 #endif
@@ -48,7 +48,7 @@ bool shouldPreferSvg () {
 
 }
 
-namespace OCC {
+namespace Occ {
 
 Theme *Theme._instance = nullptr;
 
@@ -176,9 +176,9 @@ QIcon Theme.applicationIcon () {
 }
 
 /*
- * helper to load a icon from either the icon theme the desktop provides or from
- * the apps Qt resources.
- */
+helper to load a icon from either the icon theme the desktop provides or from
+the apps Qt resources.
+*/
 QIcon Theme.themeIcon (QString &name, bool sysTray) {
     QString flavor;
     if (sysTray) {
@@ -294,7 +294,7 @@ QString Theme.hidpiFileName (QString &iconName, QColor &backgroundColor, QPaintD
 #endif
 
 Theme.Theme ()
-    : QObject (nullptr) {
+    : GLib.Object (nullptr) {
 }
 
 // If this option returns true, the client only supports one folder to sync.
@@ -429,12 +429,12 @@ QString Theme.gitSHA1 () {
 }
 
 QString Theme.about () {
-    // Shorten Qt's OS name: "macOS Mojave (10.14)" . "macOS"
+    // Shorten Qt's OS name : "macOS Mojave (10.14)" . "macOS"
     QStringList osStringList = Utility.platformName ().split (QLatin1Char (' '));
     QString osName = osStringList.at (0);
 
     QString devString;
-    //: Example text: "<p>Nextcloud Desktop Client</p>"   (%1 is the application name)
+    // : Example text : "<p>Nextcloud Desktop Client</p>"   (%1 is the application name)
     devString = tr ("<p>%1 Desktop Client</p>")
               .arg (APPLICATION_NAME);
 
@@ -442,7 +442,7 @@ QString Theme.about () {
               .arg (QString.fromLatin1 (MIRALL_STRINGIFY (MIRALL_VERSION)) + QString (" (%1)").arg (osName))
               .arg (helpUrl ());
 
-    devString += tr ("<p><small>Using virtual files plugin: %1</small></p>")
+    devString += tr ("<p><small>Using virtual files plugin : %1</small></p>")
                      .arg (Vfs.modeToString (bestAvailableVfsMode ()));
     devString += QStringLiteral ("<br>%1")
               .arg (QSysInfo.productType () % QLatin1Char ('-') % QSysInfo.kernelVersion ());
@@ -498,7 +498,7 @@ QVariant Theme.customMedia (CustomMediaType type) {
 }
 
 QIcon Theme.syncStateIcon (SyncResult.Status status, bool sysTray) {
-    // FIXME: Mind the size!
+    // FIXME : Mind the size!
     QString statusIcon;
 
     switch (status) {
@@ -523,7 +523,7 @@ QIcon Theme.syncStateIcon (SyncResult.Status status, bool sysTray) {
         break;
     case SyncResult.Error:
     case SyncResult.SetupError:
-    // FIXME: Use state-problem once we have an icon.
+    // FIXME : Use state-problem once we have an icon.
     default:
         statusIcon = QLatin1String ("state-error");
     }
@@ -564,7 +564,7 @@ QPixmap Theme.wizardApplicationLogo () {
         return QPixmap (hidpiFileName (logoBasePath + ".png"));
     }
 #else
-    const auto size = Theme.isHidpi () ?: 200 : 100;
+    const auto size = Theme.isHidpi () ? : 200 : 100;
     return applicationIcon ().pixmap (size);
 #endif
 }
@@ -756,7 +756,7 @@ bool Theme.showVirtualFilesOption () {
 
 bool Theme.enforceVirtualFilesSyncFolder () {
     const auto vfsMode = bestAvailableVfsMode ();
-    return ENFORCE_VIRTUAL_FILES_SYNC_FOLDER && vfsMode != OCC.Vfs.Off;
+    return ENFORCE_VIRTUAL_FILES_SYNC_FOLDER && vfsMode != Occ.Vfs.Off;
 }
 
 QColor Theme.errorBoxTextColor () {

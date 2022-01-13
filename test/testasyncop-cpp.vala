@@ -1,20 +1,20 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *    support, and with no warranty, express or implied, as to its usefulness for
- *    any purpose.
- *
- */
+   This software is in the public domain, furnished "as is", without technical
+   support, and with no warranty, express or implied, as to its usefulness for
+   any purpose.
+
+*/
 
 // #include <QtTest>
 // #include <syncengine.h>
 
-using namespace OCC;
+using namespace Occ;
 
-class FakeAsyncReply : public FakeReply {
+class FakeAsyncReply : FakeReply {
     QByteArray _pollLocation;
 
 public:
-    FakeAsyncReply (QByteArray &pollLocation, QNetworkAccessManager.Operation op, QNetworkRequest &request, QObject *parent)
+    FakeAsyncReply (QByteArray &pollLocation, QNetworkAccessManager.Operation op, QNetworkRequest &request, GLib.Object *parent)
         : FakeReply { parent }
         , _pollLocation (pollLocation) {
         setRequest (request);
@@ -36,7 +36,7 @@ public:
     int64 readData (char *, int64) override { return 0; }
 };
 
-class TestAsyncOp : public QObject {
+class TestAsyncOp : GLib.Object {
 
 private slots:
 

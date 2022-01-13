@@ -1,17 +1,17 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QLoggingCategory>
 // #include <QNetworkRequest>
@@ -32,15 +32,15 @@
 
 Q_DECLARE_METATYPE (QTimer *)
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcNetworkJob, "nextcloud.sync.networkjob", QtInfoMsg)
 
 // If not set, it is overwritten by the Application constructor with the value from the config
 int AbstractNetworkJob.httpTimeout = qEnvironmentVariableIntValue ("OWNCLOUD_TIMEOUT");
 
-AbstractNetworkJob.AbstractNetworkJob (AccountPtr account, QString &path, QObject *parent)
-    : QObject (parent)
+AbstractNetworkJob.AbstractNetworkJob (AccountPtr account, QString &path, GLib.Object *parent)
+    : GLib.Object (parent)
     , _timedout (false)
     , _followRedirects (true)
     , _account (account)
@@ -158,7 +158,7 @@ void AbstractNetworkJob.slotFinished () {
     _timer.stop ();
 
     if (_reply.error () == QNetworkReply.SslHandshakeFailedError) {
-        qCWarning (lcNetworkJob) << "SslHandshakeFailedError: " << errorString () << " : can be caused by a webserver wanting SSL client certificates";
+        qCWarning (lcNetworkJob) << "SslHandshakeFailedError : " << errorString () << " : can be caused by a webserver wanting SSL client certificates";
     }
     // Qt doesn't yet transparently resend HTTP2 requests, do so here
     const auto maxHttp2Resends = 3;
@@ -236,7 +236,7 @@ void AbstractNetworkJob.slotFinished () {
         } else if (_requestBody && _requestBody.isSequential ()) {
             qCWarning (lcNetworkJob) << this << "cannot redirect request with sequential body";
         } else if (verb.isEmpty ()) {
-            qCWarning (lcNetworkJob) << this << "cannot redirect request: could not detect original verb";
+            qCWarning (lcNetworkJob) << this << "cannot redirect request : could not detect original verb";
         } else {
             emit redirected (_reply, redirectUrl, _redirectCount);
 
@@ -249,7 +249,7 @@ void AbstractNetworkJob.slotFinished () {
                 resetTimeout ();
                 if (_requestBody) {
                     if (!_requestBody.isOpen ()) {
-                        // Avoid the QIODevice.seek (QBuffer): The device is not open warning message
+                        // Avoid the QIODevice.seek (QBuffer) : The device is not open warning message
                        _requestBody.open (QIODevice.ReadOnly);
                     }
                     _requestBody.seek (0);
@@ -289,7 +289,7 @@ QString AbstractNetworkJob.errorString () {
     if (_timedout) {
         return tr ("Connection timed out");
     } else if (!reply ()) {
-        return tr ("Unknown error: network reply was deleted");
+        return tr ("Unknown error : network reply was deleted");
     } else if (reply ().hasRawHeader ("OC-ErrorString")) {
         return reply ().rawHeader ("OC-ErrorString");
     } else {
@@ -356,7 +356,7 @@ QString AbstractNetworkJob.replyStatusString () {
 }
 
 NetworkJobTimeoutPauser.NetworkJobTimeoutPauser (QNetworkReply *reply) {
-    _timer = reply.property ("timer").value<QTimer *> ();
+    _timer = reply.property ("timer").value<QTimer> ();
     if (!_timer.isNull ()) {
         _timer.stop ();
     }
@@ -428,4 +428,4 @@ void AbstractNetworkJob.retry () {
     sendRequest (verb, requestedUrl, req, _requestBody);
 }
 
-} // namespace OCC
+} // namespace Occ

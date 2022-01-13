@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QBuffer>
 // #include <QFileIconProvider>
@@ -42,22 +42,22 @@ const char *passwordIsSetPlaceholder = "●●●●●●●●";
 
 }
 
-namespace OCC {
+namespace Occ {
 
-AvatarEventFilter.AvatarEventFilter (QObject *parent)
-    : QObject (parent) {
+AvatarEventFilter.AvatarEventFilter (GLib.Object *parent)
+    : GLib.Object (parent) {
 }
 
-bool AvatarEventFilter.eventFilter (QObject *obj, QEvent *event) {
+bool AvatarEventFilter.eventFilter (GLib.Object *obj, QEvent *event) {
     if (event.type () == QEvent.ContextMenu) {
-        const auto contextMenuEvent = dynamic_cast<QContextMenuEvent *> (event);
+        const auto contextMenuEvent = dynamic_cast<QContextMenuEvent> (event);
         if (!contextMenuEvent) {
             return false;
         }
         emit contextMenu (contextMenuEvent.globalPos ());
         return true;
     }
-    return QObject.eventFilter (obj, event);
+    return GLib.Object.eventFilter (obj, event);
 }
 
 ShareUserGroupWidget.ShareUserGroupWidget (AccountPtr account,
@@ -135,7 +135,7 @@ ShareUserGroupWidget.ShareUserGroupWidget (AccountPtr account,
     // Setup the sharee search progress indicator
     //_ui.shareeHorizontalLayout.addWidget (&_pi_sharee);
 
-    _parentScrollArea = parentWidget ().findChild<QScrollArea*> ("scrollArea");
+    _parentScrollArea = parentWidget ().findChild<QScrollArea> ("scrollArea");
 
     customizeStyle ();
 }
@@ -194,7 +194,7 @@ void ShareUserGroupWidget.searchForSharees (ShareeModel.LookupMode lookupMode) {
     QSharedPointer<Sharee> currentUser (new Sharee (_account.credentials ().user (), "", Sharee.Type.User));
     blacklist << currentUser;
 
-    foreach (auto sw, _parentScrollArea.findChildren<ShareUserLine *> ()) {
+    foreach (auto sw, _parentScrollArea.findChildren<ShareUserLine> ()) {
         blacklist << sw.share ().getShareWith ();
     }
     _ui.errorLabel.hide ();
@@ -294,7 +294,7 @@ void ShareUserGroupWidget.slotSharesFetched (QList<QSharedPointer<Share>> &share
 
 void ShareUserGroupWidget.slotAdjustScrollWidgetSize () {
     QScrollArea *scrollArea = _parentScrollArea;
-    const auto shareUserLineChilds = scrollArea.findChildren<ShareUserLine *> ();
+    const auto shareUserLineChilds = scrollArea.findChildren<ShareUserLine> ();
 
     // Ask the child widgets to calculate their size
     for (auto shareUserLineChild : shareUserLineChilds) {
@@ -399,7 +399,7 @@ void ShareUserGroupWidget.displayError (int code, QString &message) {
     _pi_sharee.stopAnimation ();
 
     // Also remove the spinner in the widget list, if any
-    foreach (auto pi, _parentScrollArea.findChildren<QProgressIndicator *> ()) {
+    foreach (auto pi, _parentScrollArea.findChildren<QProgressIndicator> ()) {
         delete pi;
     }
 
@@ -436,7 +436,7 @@ void ShareUserGroupWidget.customizeStyle () {
 
     _pi_sharee.setColor (QGuiApplication.palette ().color (QPalette.Text));
 
-    foreach (auto pi, _parentScrollArea.findChildren<QProgressIndicator *> ()) {
+    foreach (auto pi, _parentScrollArea.findChildren<QProgressIndicator> ()) {
         pi.setColor (QGuiApplication.palette ().color (QPalette.Text));;
     }
 }
@@ -643,12 +643,12 @@ void ShareUserLine.setDefaultAvatar (int avatarSize) {
     // See core/js/placeholder.js for details on colors and styling
     const auto backgroundColor = backgroundColorForShareeType (_share.getShareWith ().type ());
     const QString style = QString (R" (* {
-        color: #fff;
-        background-color: %1;
-        border-radius: %2px;
-        text-align: center;
-        line-height: %2px;
-        font-size: %2px;
+        color : #fff;
+        background-color : %1;
+        border-radius : %2px;
+        text-align : center;
+        line-height : %2px;
+        font-size : %2px;
     })").arg (backgroundColor.name (), QString.number (avatarSize / 2));
     _ui.avatar.setStyleSheet (style);
 
@@ -657,7 +657,7 @@ void ShareUserLine.setDefaultAvatar (int avatarSize) {
     if (!pixmap.isNull ()) {
         _ui.avatar.setPixmap (pixmap);
     } else {
-        qCDebug (lcSharing) << "pixmap is null for share type: " << _share.getShareWith ().type ();
+        qCDebug (lcSharing) << "pixmap is null for share type : " << _share.getShareWith ().type ();
 
         // The avatar label is the first character of the user name.
         const auto text = _share.getShareWith ().displayName ();
@@ -775,7 +775,7 @@ void ShareUserLine.slotDeleteAnimationFinished () {
     // There is a painting bug where a small line of this widget isn't
     // properly cleared. This explicit repaint () call makes sure any trace of
     // the share widget is removed once it's destroyed. #4189
-    connect (this, SIGNAL (destroyed (QObject *)), parentWidget (), SLOT (repaint ()));
+    connect (this, SIGNAL (destroyed (GLib.Object *)), parentWidget (), SLOT (repaint ()));
 }
 
 void ShareUserLine.refreshPasswordOptions () {

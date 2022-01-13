@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QDir>
 // #include <QFile>
@@ -21,18 +21,18 @@
 Q_LOGGING_CATEGORY (lcCfApi, "nextcloud.sync.vfs.cfapi", QtInfoMsg)
 
 namespace cfapi {
-using namespace OCC.CfApiWrapper;
+using namespace Occ.CfApiWrapper;
 }
 
-namespace OCC {
+namespace Occ {
 
 class VfsCfApiPrivate {
 public:
-    QList<HydrationJob *> hydrationJobs;
+    QList<HydrationJob> hydrationJobs;
     cfapi.ConnectionKey connectionKey;
 };
 
-VfsCfApi.VfsCfApi (QObject *parent)
+VfsCfApi.VfsCfApi (GLib.Object *parent)
     : Vfs (parent)
     , d (new VfsCfApiPrivate) {
 }
@@ -159,7 +159,7 @@ bool VfsCfApi.isDehydratedPlaceholder (QString &filePath) {
 }
 
 bool VfsCfApi.statTypeVirtualFile (csync_file_stat_t *stat, void *statData) {
-    const auto ffd = static_cast<WIN32_FIND_DATA *> (statData);
+    const auto ffd = static_cast<WIN32_FIND_DATA> (statData);
 
     const auto isDirectory = (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
     const auto isSparseFile = (ffd.dwFileAttributes & FILE_ATTRIBUTE_SPARSE_FILE) != 0;
@@ -405,4 +405,4 @@ VfsCfApi.HydratationAndPinStates VfsCfApi.computeRecursiveHydrationAndPinStates 
     }
 }
 
-} // namespace OCC
+} // namespace Occ

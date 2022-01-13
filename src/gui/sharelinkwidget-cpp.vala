@@ -1,17 +1,17 @@
 /*
- * Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
- * Copyright (C) 2015 by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
+Copyright (C) 2015 by Klaas Freitag <freitag@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QBuffer>
 // #include <QClipboard>
@@ -27,7 +27,7 @@ namespace {
     const char *passwordIsSetPlaceholder = "●●●●●●●●";
 }
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcShareLink, "nextcloud.gui.sharelink", QtInfoMsg)
 
@@ -188,7 +188,7 @@ void ShareLinkWidget.setupUiOptions () {
         _allowUploadLinkAction.setChecked (checked);
     }
 
-    _shareLinkElidedLabel = new OCC.ElidedLabel (this);
+    _shareLinkElidedLabel = new Occ.ElidedLabel (this);
     _shareLinkElidedLabel.setElideMode (Qt.ElideRight);
     displayShareLinkLabel ();
     _ui.horizontalLayout.insertWidget (2, _shareLinkElidedLabel);
@@ -444,7 +444,7 @@ void ShareLinkWidget.slotDeleteAnimationFinished () {
     // There is a painting bug where a small line of this widget isn't
     // properly cleared. This explicit repaint () call makes sure any trace of
     // the share widget is removed once it's destroyed. #4189
-    connect (this, SIGNAL (destroyed (QObject *)), parentWidget (), SLOT (repaint ()));
+    connect (this, SIGNAL (destroyed (GLib.Object *)), parentWidget (), SLOT (repaint ()));
 }
 
 void ShareLinkWidget.slotCreateShareRequiresPassword (QString &message) {
@@ -493,7 +493,7 @@ void ShareLinkWidget.confirmAndDeleteShare () {
         QMessageBox.Question,
         tr ("Confirm Link Share Deletion"),
         tr ("<p>Do you really want to delete the public link share <i>%1</i>?</p>"
-           "<p>Note: This action cannot be undone.</p>")
+           "<p>Note : This action cannot be undone.</p>")
             .arg (shareName ()),
         QMessageBox.NoButton,
         this);

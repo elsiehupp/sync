@@ -1,16 +1,16 @@
 /*
- * Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QFileInfo>
 // #include <QDir>
@@ -19,7 +19,7 @@
 // #include <QJsonObject>
 // #include <QJsonValue>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcBulkPropagatorJob, "nextcloud.sync.propagator.bulkupload", QtInfoMsg)
 
@@ -28,9 +28,9 @@ Q_LOGGING_CATEGORY (lcBulkPropagatorJob, "nextcloud.sync.propagator.bulkupload",
 namespace {
 
 QByteArray getEtagFromJsonReply (QJsonObject &reply) {
-    const auto ocEtag = OCC.parseEtag (reply.value ("OC-ETag").toString ().toLatin1 ());
-    const auto ETag = OCC.parseEtag (reply.value ("ETag").toString ().toLatin1 ());
-    const auto  etag = OCC.parseEtag (reply.value ("etag").toString ().toLatin1 ());
+    const auto ocEtag = Occ.parseEtag (reply.value ("OC-ETag").toString ().toLatin1 ());
+    const auto ETag = Occ.parseEtag (reply.value ("ETag").toString ().toLatin1 ());
+    const auto  etag = Occ.parseEtag (reply.value ("etag").toString ().toLatin1 ());
     QByteArray ret = ocEtag;
     if (ret.isEmpty ()) {
         ret = ETag;
@@ -39,7 +39,7 @@ QByteArray getEtagFromJsonReply (QJsonObject &reply) {
         ret = etag;
     }
     if (ocEtag.length () > 0 && ocEtag != etag && ocEtag != ETag) {
-        qCDebug (OCC.lcBulkPropagatorJob) << "Quite peculiar, we have an etag != OC-Etag [no problem!]" << etag << ETag << ocEtag;
+        qCDebug (Occ.lcBulkPropagatorJob) << "Quite peculiar, we have an etag != OC-Etag [no problem!]" << etag << ETag << ocEtag;
     }
     return ret;
 }
@@ -53,7 +53,7 @@ constexpr auto batchSize = 100;
 constexpr auto parallelJobsMaximumCount = 1;
 }
 
-namespace OCC {
+namespace Occ {
 
 BulkPropagatorJob.BulkPropagatorJob (OwncloudPropagator *propagator,
                                      const std.deque<SyncFileItemPtr> &items)
@@ -178,7 +178,7 @@ void BulkPropagatorJob.triggerUpload () {
         auto device = std.make_unique<UploadDevice> (
                 singleFile._localPath, 0, singleFile._fileSize, &propagator ()._bandwidthManager);
         if (!device.open (QIODevice.ReadOnly)) {
-            qCWarning (lcBulkPropagatorJob) << "Could not prepare upload device: " << device.errorString ();
+            qCWarning (lcBulkPropagatorJob) << "Could not prepare upload device : " << device.errorString ();
 
             // If the file is currently locked, we want to retry the sync
             // when it becomes available again.
@@ -249,7 +249,7 @@ void BulkPropagatorJob.slotComputeTransmissionChecksum (SyncFileItemPtr item,
         slotStartUpload (item, fileToUpload, contentChecksumType, contentChecksum);
     });
     connect (computeChecksum.get (), &ComputeChecksum.done,
-            computeChecksum.get (), &QObject.deleteLater);
+            computeChecksum.get (), &GLib.Object.deleteLater);
     computeChecksum.release ().start (fileToUpload._path);
 }
 
@@ -337,7 +337,7 @@ void BulkPropagatorJob.slotPutFinishedOneFile (BulkUploadItem &singleFile,
     singleFile._item._status = SyncFileItem.Success;
 
     // Check the file again post upload.
-    // Two cases must be considered separately: If the upload is finished,
+    // Two cases must be considered separately : If the upload is finished,
     // the file is on the server and has a changed ETag. In that case,
     // the etag has to be properly updated in the client journal, and because
     // of that we can bail out here with an error. But we can reschedule a
@@ -374,7 +374,7 @@ void BulkPropagatorJob.slotPutFinishedOneFile (BulkUploadItem &singleFile,
 }
 
 void BulkPropagatorJob.slotPutFinished () {
-    auto *job = qobject_cast<PutMultiFileJob *> (sender ());
+    auto *job = qobject_cast<PutMultiFileJob> (sender ());
     Q_ASSERT (job);
 
     slotJobDestroyed (job); // remove it from the _jobs list
@@ -405,7 +405,7 @@ void BulkPropagatorJob.slotUploadProgress (SyncFileItemPtr item, int64 sent, int
     propagator ().reportProgress (*item, sent - total);
 }
 
-void BulkPropagatorJob.slotJobDestroyed (QObject *job) {
+void BulkPropagatorJob.slotJobDestroyed (GLib.Object *job) {
     _jobs.erase (std.remove (_jobs.begin (), _jobs.end (), job), _jobs.end ());
 }
 
@@ -424,7 +424,7 @@ void BulkPropagatorJob.finalizeOneFile (BulkUploadItem &oneFile) {
     // Update the database entry
     const auto result = propagator ().updateMetadata (*oneFile._item);
     if (!result) {
-        done (oneFile._item, SyncFileItem.FatalError, tr ("Error updating metadata: %1").arg (result.error ()));
+        done (oneFile._item, SyncFileItem.FatalError, tr ("Error updating metadata : %1").arg (result.error ()));
         return;
     } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
         done (oneFile._item, SyncFileItem.SoftError, tr ("The file %1 is currently in use").arg (oneFile._item._file));
@@ -503,7 +503,7 @@ QMap<QByteArray, QByteArray> BulkPropagatorJob.headers (SyncFileItemPtr item) {
     }
 
     if (item._file.contains (QLatin1String (".sys.admin#recall#"))) {
-        // This is a file recall triggered by the admin.  Note: the
+        // This is a file recall triggered by the admin.  Note : the
         // recall list file created by the admin and downloaded by the
         // client (.sys.admin#recall#) also falls into this category
         // (albeit users are not supposed to mess up with it)
@@ -598,7 +598,7 @@ bool BulkPropagatorJob.checkFileChanged (SyncFileItemPtr item,
         propagator ()._anotherSyncNeeded = true;
         if (!finished) {
             abortWithError (item, SyncFileItem.SoftError, tr ("Local file changed during sync."));
-            // FIXME:  the legacy code was retrying for a few seconds.
+            // FIXME :  the legacy code was retrying for a few seconds.
             //         and also checking that after the last chunk, and removed the file in case of INSTRUCTION_NEW
             return false;
         }
@@ -625,7 +625,7 @@ void BulkPropagatorJob.handleFileRestoration (SyncFileItemPtr item,
             || item._status == SyncFileItem.Conflict) {
             item._status = SyncFileItem.Restoration;
         } else {
-            item._errorString += tr ("; Restoration Failed: %1").arg (errorString);
+            item._errorString += tr ("; Restoration Failed : %1").arg (errorString);
         }
     } else {
         if (item._errorString.isEmpty ()) {

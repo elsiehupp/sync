@@ -1,26 +1,26 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QtCore>
 // #include <QIcon>
 
-namespace OCC {
+namespace Occ {
 /**
- * @brief The ActivityLink class describes actions of an activity
- *
- * These are part of notifications which are mapped into activities.
- */
+@brief The ActivityLink class describes actions of an activity
+
+These are part of notifications which are mapped into activities.
+*/
 
 class ActivityLink {
     Q_GADGET
@@ -39,11 +39,11 @@ public:
 
 /* ==================================================================== */
 /**
- * @brief Activity Structure
- * @ingroup gui
- *
- * contains all the information describing a single activity.
- */
+@brief Activity Structure
+@ingroup gui
+
+contains all the information describing a single activity.
+*/
 
 class Activity {
 public:
@@ -80,7 +80,7 @@ public:
      * @return
      */
 
-    Identifier ident () const;
+    Identifier ident ();
 };
 
 bool operator== (Activity &rhs, Activity &lhs);
@@ -88,15 +88,13 @@ bool operator< (Activity &rhs, Activity &lhs);
 
 /* ==================================================================== */
 /**
- * @brief The ActivityList
- * @ingroup gui
- *
- * A QList based list of Activities
- */
+@brief The ActivityList
+@ingroup gui
+
+A QList based list of Activities
+*/
 using ActivityList = QList<Activity>;
 }
 
-Q_DECLARE_METATYPE (OCC.Activity.Type)
-Q_DECLARE_METATYPE (OCC.ActivityLink)
-
-#endif // ACTIVITYDATA_H
+Q_DECLARE_METATYPE (Occ.Activity.Type)
+Q_DECLARE_METATYPE (Occ.ActivityLink)

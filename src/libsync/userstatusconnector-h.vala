@@ -1,20 +1,20 @@
 /*
- * Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #pragma once
 
-// #include <QObject>
+// #include <GLib.Object>
 // #include <QString>
 // #include <QMetaType>
 // #include <QUrl>
@@ -24,7 +24,7 @@
 
 // #include <vector>
 
-namespace OCC {
+namespace Occ {
 
 enum class OWNCLOUDSYNC_EXPORT ClearAtType {
     Period,
@@ -32,7 +32,7 @@ enum class OWNCLOUDSYNC_EXPORT ClearAtType {
     Timestamp
 };
 
-// TODO: If we can use C++17 make it a std.variant
+// TODO : If we can use C++17 make it a std.variant
 struct OWNCLOUDSYNC_EXPORT ClearAt {
     ClearAtType _type = ClearAtType.Period;
 
@@ -64,11 +64,11 @@ public:
     UserStatus (QString &id, QString &message, QString &icon,
         OnlineStatus state, bool messagePredefined, Optional<ClearAt> &clearAt = {});
 
-    Q_REQUIRED_RESULT QString id () const;
-    Q_REQUIRED_RESULT QString message () const;
-    Q_REQUIRED_RESULT QString icon () const;
-    Q_REQUIRED_RESULT OnlineStatus state () const;
-    Q_REQUIRED_RESULT Optional<ClearAt> clearAt () const;
+    Q_REQUIRED_RESULT QString id ();
+    Q_REQUIRED_RESULT QString message ();
+    Q_REQUIRED_RESULT QString icon ();
+    Q_REQUIRED_RESULT OnlineStatus state ();
+    Q_REQUIRED_RESULT Optional<ClearAt> clearAt ();
 
     void setId (QString &id);
     void setMessage (QString &message);
@@ -77,9 +77,9 @@ public:
     void setMessagePredefined (bool value);
     void setClearAt (Optional<ClearAt> &dateTime);
 
-    Q_REQUIRED_RESULT bool messagePredefined () const;
+    Q_REQUIRED_RESULT bool messagePredefined ();
 
-    Q_REQUIRED_RESULT QUrl stateIcon () const;
+    Q_REQUIRED_RESULT QUrl stateIcon ();
 
 private:
     QString _id;
@@ -90,7 +90,7 @@ private:
     Optional<ClearAt> _clearAt;
 };
 
-class OWNCLOUDSYNC_EXPORT UserStatusConnector : public QObject {
+class OWNCLOUDSYNC_EXPORT UserStatusConnector : GLib.Object {
 
 public:
     enum class Error {
@@ -103,7 +103,7 @@ public:
     };
     Q_ENUM (Error)
 
-    explicit UserStatusConnector (QObject *parent = nullptr);
+    UserStatusConnector (GLib.Object *parent = nullptr);
 
     ~UserStatusConnector () override;
 
@@ -126,5 +126,5 @@ signals:
 };
 }
 
-Q_DECLARE_METATYPE (OCC.UserStatusConnector *)
-Q_DECLARE_METATYPE (OCC.UserStatus)
+Q_DECLARE_METATYPE (Occ.UserStatusConnector *)
+Q_DECLARE_METATYPE (Occ.UserStatus)

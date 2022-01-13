@@ -1,17 +1,17 @@
 /*
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- * Copyright (C) by Michael Schuster <michael@schuster.ms>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+Copyright (C) by Michael Schuster <michael@schuster.ms>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <theme.h>
 
@@ -19,15 +19,15 @@
 // #include <QJsonDocument>
 // #include <QJsonObject>
 
-namespace OCC {
+namespace Occ {
 
 namespace {
     static const int defaultIntervalT = 30 * 1000;
     static const int failIntervalT = 5 * 1000;
 }
 
-UserInfo.UserInfo (AccountState *accountState, bool allowDisconnectedAccountState, bool fetchAvatarImage, QObject *parent)
-    : QObject (parent)
+UserInfo.UserInfo (AccountState *accountState, bool allowDisconnectedAccountState, bool fetchAvatarImage, GLib.Object *parent)
+    : GLib.Object (parent)
     , _accountState (accountState)
     , _allowDisconnectedAccountState (allowDisconnectedAccountState)
     , _fetchAvatarImage (fetchAvatarImage)
@@ -127,7 +127,7 @@ void UserInfo.slotUpdateLastInfo (QJsonDocument &json) {
     if (_fetchAvatarImage) {
         auto *job = new AvatarJob (account, account.davUser (), 128, this);
         job.setTimeout (20 * 1000);
-        QObject.connect (job, &AvatarJob.avatarPixmap, this, &UserInfo.slotAvatarImage);
+        GLib.Object.connect (job, &AvatarJob.avatarPixmap, this, &UserInfo.slotAvatarImage);
         job.start ();
     }
     else
@@ -140,4 +140,4 @@ void UserInfo.slotAvatarImage (QImage &img) {
     emit fetchedLastInfo (this);
 }
 
-} // namespace OCC
+} // namespace Occ

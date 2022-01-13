@@ -2,15 +2,14 @@
 
 // #include <QWidget>
 
-class QAbstractButton;
 
-namespace OCC {
+namespace Occ {
 
 namespace Ui {
     class IgnoreListTableWidget;
 }
 
-class IgnoreListTableWidget : public QWidget {
+class IgnoreListTableWidget : QWidget {
 
 public:
     IgnoreListTableWidget (QWidget *parent = nullptr);
@@ -33,4 +32,4 @@ private:
     QString readOnlyTooltip;
     Ui.IgnoreListTableWidget *ui;
 };
-} // namespace OCC
+} // namespace Occ

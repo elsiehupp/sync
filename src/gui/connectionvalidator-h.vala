@@ -1,34 +1,34 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-// #include <QObject>
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
+
+// #include <GLib.Object>
 // #include <QStringList>
 // #include <QVariantMap>
 // #include <QNetworkReply>
 
-namespace OCC {
+namespace Occ {
 
 /**
- * This is a job-like class to check that the server is up and that we are connected.
- * There are two entry points: checkServerAndAuth and checkAuthentication
- * checkAuthentication is the quick version that only does the propfind
- * while checkServerAndAuth is doing the 4 calls.
- *
- * We cannot use the capabilites call to test the login and the password because of
- * https://github.com/owncloud/core/issues/12930
- *
- * Here follows the state machine
+This is a job-like class to check that the server is up and that we are connected.
+There are two entry points : checkServerAndAuth and checkAuthentication
+checkAuthentication is the quick version that only does the propfind
+while checkServerAndAuth is doing the 4 calls.
+
+We cannot use the capabilites call to test the l
+https://github.com/owncloud/core/issues/12930
+
+Here follows the state machine
 
 \code{.unparsed}
 *--. checkServerAndAuth  (check status.php)
@@ -65,13 +65,12 @@ namespace OCC {
   |
   +. Client Side Encryption Checks --+ --reportResult ()
     \endcode
- */
+*/
 
-class UserInfo;
 
-class ConnectionValidator : public QObject {
+class ConnectionValidator : GLib.Object {
 public:
-    explicit ConnectionValidator (AccountStatePtr accountState, QObject *parent = nullptr);
+    ConnectionValidator (AccountStatePtr accountState, GLib.Object *parent = nullptr);
 
     enum Status {
         Undefined,
@@ -135,5 +134,3 @@ private:
     bool _isCheckingServerAndAuth;
 };
 }
-
-#endif // CONNECTIONVALIDATOR_H

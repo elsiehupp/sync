@@ -1,33 +1,32 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- * Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // // #include <map>
 // #include <QSet>
 
-namespace OCC {
+namespace Occ {
 
-class SyncEngine;
 
 /**
- * @brief Takes care of tracking the status of individual files as they
- *        go through the SyncEngine, to be reported as overlay icons in the shell.
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT SyncFileStatusTracker : public QObject {
+@brief Takes care of tracking the status of individual files as they
+       go through the SyncEngine, to be reported as overlay icons in the shell.
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT SyncFileStatusTracker : GLib.Object {
 public:
-    explicit SyncFileStatusTracker (SyncEngine *syncEngine);
+    SyncFileStatusTracker (SyncEngine *syncEngine);
     SyncFileStatus fileStatus (QString &relativePath);
 
 public slots:

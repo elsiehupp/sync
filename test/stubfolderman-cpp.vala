@@ -1,13 +1,13 @@
 // stub to prevent linker error
 
-Q_GLOBAL_STATIC (QObject, dummy)
+Q_GLOBAL_STATIC (GLib.Object, dummy)
 
-OCC.AccountManager *OCC.AccountManager.instance () { return static_cast<AccountManager *> (dummy ()); }
-void OCC.AccountManager.save (bool) { }
-void OCC.AccountManager.saveAccountState (AccountState *) { }
-void OCC.AccountManager.deleteAccount (AccountState *) { }
-void OCC.AccountManager.accountRemoved (OCC.AccountState*) { }
-QList<OCC.AccountStatePtr> OCC.AccountManager.accounts () { return QList<OCC.AccountStatePtr> (); }
-OCC.AccountStatePtr OCC.AccountManager.account (QString &){ return AccountStatePtr (); }
-void OCC.AccountManager.removeAccountFolders (OCC.AccountState*) { }
-const QMetaObject OCC.AccountManager.staticMetaObject = QObject.staticMetaObject;
+Occ.AccountManager *Occ.AccountManager.instance () { return static_cast<AccountManager> (dummy ()); }
+void Occ.AccountManager.save (bool) { }
+void Occ.AccountManager.saveAccountState (AccountState *) { }
+void Occ.AccountManager.deleteAccount (AccountState *) { }
+void Occ.AccountManager.accountRemoved (Occ.AccountState*) { }
+QList<Occ.AccountStatePtr> Occ.AccountManager.accounts () { return QList<Occ.AccountStatePtr> (); }
+Occ.AccountStatePtr Occ.AccountManager.account (QString &){ return AccountStatePtr (); }
+void Occ.AccountManager.removeAccountFolders (Occ.AccountState*) { }
+const QMetaObject Occ.AccountManager.staticMetaObject = GLib.Object.staticMetaObject;

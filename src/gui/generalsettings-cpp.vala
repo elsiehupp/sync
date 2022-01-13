@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QFileDialog>
 // #include <QMessageBox>
@@ -21,7 +21,7 @@
 
 // #include <private/qzipwriter_p.h>
 
-#define QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
+const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
 
 #if ! (QTLEGACY)
 // #include <QOperatingSystemVersion>
@@ -46,7 +46,7 @@ ZipEntry fileInfoToLogZipEntry (QFileInfo &info) {
     return entry;
 }
 
-ZipEntry syncFolderToZipEntry (OCC.Folder *f) {
+ZipEntry syncFolderToZipEntry (Occ.Folder *f) {
     const auto journalPath = f.journalDb ().databaseFilePath ();
     const auto journalInfo = QFileInfo (journalPath);
     return fileInfoToZipEntry (journalInfo);
@@ -54,11 +54,11 @@ ZipEntry syncFolderToZipEntry (OCC.Folder *f) {
 
 QVector<ZipEntry> createFileList () {
     auto list = QVector<ZipEntry> ();
-    OCC.ConfigFile cfg;
+    Occ.ConfigFile cfg;
 
     list.append (fileInfoToZipEntry (QFileInfo (cfg.configFile ())));
 
-    const auto logger = OCC.Logger.instance ();
+    const auto logger = Occ.Logger.instance ();
 
     if (!logger.logDir ().isEmpty ()) {
         list.append ({QString (), QStringLiteral ("logs")});
@@ -72,7 +72,7 @@ QVector<ZipEntry> createFileList () {
         list.append (fileInfoToZipEntry (QFileInfo (logger.logFile ())));
     }
 
-    const auto folders = OCC.FolderMan.instance ().map ().values ();
+    const auto folders = Occ.FolderMan.instance ().map ().values ();
     std.transform (std.cbegin (folders), std.cend (folders),
                    std.back_inserter (list),
                    syncFolderToZipEntry);
@@ -98,12 +98,12 @@ void createDebugArchive (QString &filename) {
 
     zip.addFile ("__nextcloud_client_parameters.txt", QCoreApplication.arguments ().join (' ').toUtf8 ());
 
-    const auto buildInfo = QString (OCC.Theme.instance ().about () + "\n\n" + OCC.Theme.instance ().aboutDetails ());
+    const auto buildInfo = QString (Occ.Theme.instance ().about () + "\n\n" + Occ.Theme.instance ().aboutDetails ());
     zip.addFile ("__nextcloud_client_buildinfo.txt", buildInfo.toUtf8 ());
 }
 }
 
-namespace OCC {
+namespace Occ {
 
 GeneralSettings.GeneralSettings (QWidget *parent)
     : QWidget (parent)
@@ -140,7 +140,7 @@ GeneralSettings.GeneralSettings (QWidget *parent)
     connect (_ui.legalNoticeButton, &QPushButton.clicked, this, &GeneralSettings.slotShowLegalNotice);
 
     loadMiscSettings ();
-    // updater info now set in: customizeStyle
+    // updater info now set in : customizeStyle
     //slotUpdateInfo ();
 
     // misc
@@ -213,8 +213,8 @@ void GeneralSettings.slotUpdateInfo () {
         return;
     }
 
-    // Note: the sparkle-updater is not an OCUpdater
-    auto *ocupdater = qobject_cast<OCUpdater *> (Updater.instance ());
+    // Note : the sparkle-updater is not an OCUpdater
+    auto *ocupdater = qobject_cast<OCUpdater> (Updater.instance ());
     if (ocupdater) {
         connect (ocupdater, &OCUpdater.downloadStateChanged, this, &GeneralSettings.slotUpdateInfo, Qt.UniqueConnection);
         connect (_ui.restartButton, &QAbstractButton.clicked, ocupdater, &OCUpdater.slotStartInstaller, Qt.UniqueConnection);
@@ -260,7 +260,7 @@ void GeneralSettings.slotUpdateChannelChanged (QString &channel) {
            "thoroughly."
            "\n\n"
            "Note that this selects only what pool upgrades are taken from, and that "
-           "there are no downgrades: So going back from the beta channel to "
+           "there are no downgrades : So going back from the beta channel to "
            "the stable channel usually cannot be done immediately and means waiting "
            "for a stable version that is newer than the currently installed beta "
            "version."),
@@ -272,7 +272,7 @@ void GeneralSettings.slotUpdateChannelChanged (QString &channel) {
         msgBox.deleteLater ();
         if (msgBox.clickedButton () == acceptButton) {
             ConfigFile ().setUpdateChannel (channel);
-            if (auto updater = qobject_cast<OCUpdater *> (Updater.instance ())) {
+            if (auto updater = qobject_cast<OCUpdater> (Updater.instance ())) {
                 updater.setUpdateUrl (Updater.updateUrl ());
                 updater.checkForUpdate ();
             }
@@ -284,7 +284,7 @@ void GeneralSettings.slotUpdateChannelChanged (QString &channel) {
 }
 
 void GeneralSettings.slotUpdateCheckNow () {
-    auto *updater = qobject_cast<OCUpdater *> (Updater.instance ());
+    auto *updater = qobject_cast<OCUpdater> (Updater.instance ());
     if (ConfigFile ().skipUpdateCheck ()) {
         updater = nullptr; // don't show update info if updates are disabled
     }
@@ -379,4 +379,4 @@ void GeneralSettings.customizeStyle () {
 #endif
 }
 
-} // namespace OCC
+} // namespace Occ

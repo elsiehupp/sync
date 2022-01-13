@@ -1,19 +1,19 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *    support, and with no warranty, express or implied, as to its usefulness for
- *    any purpose.
- *
- */
+   This software is in the public domain, furnished "as is", without technical
+   support, and with no warranty, express or implied, as to its usefulness for
+   any purpose.
+
+*/
 
 // #include <QtTest>
 // #include <syncengine.h>
 // #include <localdiscoverytracker.h>
 
-using namespace OCC;
+using namespace Occ;
 
 struct FakeBrokenXmlPropfindReply : FakePropfindReply {
     FakeBrokenXmlPropfindReply (FileInfo &remoteRootFileInfo, QNetworkAccessManager.Operation op,
-                               const QNetworkRequest &request, QObject *parent)
+                               const QNetworkRequest &request, GLib.Object *parent)
         : FakePropfindReply (remoteRootFileInfo, op, request, parent) {
         QVERIFY (payload.size () > 50);
         // turncate the XML
@@ -23,7 +23,7 @@ struct FakeBrokenXmlPropfindReply : FakePropfindReply {
 
 struct MissingPermissionsPropfindReply : FakePropfindReply {
     MissingPermissionsPropfindReply (FileInfo &remoteRootFileInfo, QNetworkAccessManager.Operation op,
-                               const QNetworkRequest &request, QObject *parent)
+                               const QNetworkRequest &request, GLib.Object *parent)
         : FakePropfindReply (remoteRootFileInfo, op, request, parent) {
         // If the propfind contains a single file without permissions, this is a server error
         const char toRemove[] = "<oc:permissions>RDNVCKW</oc:permissions>";
@@ -41,7 +41,7 @@ enum ErrorKind : int {
 
 Q_DECLARE_METATYPE (ErrorCategory)
 
-class TestRemoteDiscovery : public QObject {
+class TestRemoteDiscovery : GLib.Object {
 
 private slots:
 

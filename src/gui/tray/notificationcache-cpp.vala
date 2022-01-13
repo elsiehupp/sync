@@ -1,5 +1,5 @@
 
-namespace OCC {
+namespace Occ {
 
 bool NotificationCache.contains (Notification &notification) {
     return _notifications.find (calculateKey (notification)) != _notifications.end ();

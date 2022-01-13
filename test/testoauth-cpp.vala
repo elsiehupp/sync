@@ -1,16 +1,16 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *    support, and with no warranty, express or implied, as to its usefulness for
- *    any purpose.
- *
- */
+   This software is in the public domain, furnished "as is", without technical
+   support, and with no warranty, express or implied, as to its usefulness for
+   any purpose.
+
+*/
 
 // #include <QtTest/QtTest>
 // #include <QDesktopServices>
 
-using namespace OCC;
+using namespace Occ;
 
-class DesktopServiceHook : public QObject {
+class DesktopServiceHook : GLib.Object {
 signals:
     void hooked (QUrl &);
 public:
@@ -19,7 +19,7 @@ public:
 
 static const QUrl sOAuthTestServer ("oauthtest://someserver/owncloud");
 
-class FakePostReply : public QNetworkReply {
+class FakePostReply : QNetworkReply {
 public:
     std.unique_ptr<QIODevice> payload;
     bool aborted = false;
@@ -27,7 +27,7 @@ public:
     bool redirectToToken = false;
 
     FakePostReply (QNetworkAccessManager.Operation op, QNetworkRequest &request,
-                  std.unique_ptr<QIODevice> payload_, QObject *parent)
+                  std.unique_ptr<QIODevice> payload_, GLib.Object *parent)
         : QNetworkReply{parent}, payload{std.move (payload_)} {
         setRequest (request);
         setUrl (request.url ());
@@ -85,7 +85,7 @@ public:
 };
 
 // Reply with a small delay
-class SlowFakePostReply : public FakePostReply {
+class SlowFakePostReply : FakePostReply {
 public:
     using FakePostReply.FakePostReply;
     void respond () override {
@@ -94,7 +94,7 @@ public:
     }
 };
 
-class OAuthTestCase : public QObject {
+class OAuthTestCase : GLib.Object {
     DesktopServiceHook desktopServiceHook;
 public:
     enum State { StartState, BrowserOpened, TokenAsked, CustomState } state = StartState;
@@ -107,13 +107,13 @@ public:
     QNetworkAccessManager realQNAM;
     QPointer<QNetworkReply> browserReply = nullptr;
     QString code = generateEtag ();
-    OCC.AccountPtr account;
+    Occ.AccountPtr account;
 
     QScopedPointer<OAuth> oauth;
 
     virtual void test () {
         fakeQnam = new FakeQNAM ({});
-        account = OCC.Account.create ();
+        account = Occ.Account.create ();
         account.setUrl (sOAuthTestServer);
         account.setCredentials (new FakeCredentials{fakeQnam});
         fakeQnam.setParent (this);
@@ -123,11 +123,11 @@ public:
             return this.tokenReply (op, req);
         });
 
-        QObject.connect (&desktopServiceHook, &DesktopServiceHook.hooked,
+        GLib.Object.connect (&desktopServiceHook, &DesktopServiceHook.hooked,
                          this, &OAuthTestCase.openBrowserHook);
 
         oauth.reset (new OAuth (account.data (), nullptr));
-        QObject.connect (oauth.data (), &OAuth.result, this, &OAuthTestCase.oauthResult);
+        GLib.Object.connect (oauth.data (), &OAuth.result, this, &OAuthTestCase.oauthResult);
         oauth.start ();
         QTRY_VERIFY (done ());
     }
@@ -148,7 +148,7 @@ public:
 
     virtual QNetworkReply *createBrowserReply (QNetworkRequest &request) {
         browserReply = realQNAM.get (request);
-        QObject.connect (browserReply, &QNetworkReply.finished, this, &OAuthTestCase.browserReplyFinished);
+        GLib.Object.connect (browserReply, &QNetworkReply.finished, this, &OAuthTestCase.browserReplyFinished);
         return browserReply;
     }
 
@@ -187,7 +187,7 @@ public:
     }
 };
 
-class TestOAuth: public QObject {
+class TestOAuth : public GLib.Object {
 
 private slots:
     void testBasic () {

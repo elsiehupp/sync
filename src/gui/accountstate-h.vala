@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QByteArray>
 // #include <QElapsedTimer>
@@ -18,23 +18,20 @@
 
 // #include <memory>
 
-class QSettings;
 
-namespace OCC {
+namespace Occ {
 
-class AccountState;
 class Account;
-class AccountApp;
 class RemoteWipe;
 
 using AccountStatePtr = QExplicitlySharedDataPointer<AccountState>;
-using AccountAppList = QList<AccountApp *>;
+using AccountAppList = QList<AccountApp>;
 
 /**
- * @brief Extra info about an ownCloud server account.
- * @ingroup gui
- */
-class AccountState : public QObject, public QSharedData {
+@brief Extra info about an ownCloud server account.
+@ingroup gui
+*/
+class AccountState : GLib.Object, public QSharedData {
     Q_PROPERTY (AccountPtr account MEMBER _account)
 
 public:
@@ -62,7 +59,7 @@ public:
         /// again automatically.
         NetworkError,
 
-        /// Server configuration error. (For example: unsupported version)
+        /// Server configuration error. (For example : unsupported version)
         ConfigurationError,
 
         /// We are currently asking the user for credentials
@@ -73,7 +70,7 @@ public:
     using ConnectionStatus = ConnectionValidator.Status;
 
     /// Use the account as parent
-    explicit AccountState (AccountPtr account);
+    AccountState (AccountPtr account);
     ~AccountState () override;
 
     /** Creates an account state from settings and an Account object.
@@ -88,17 +85,17 @@ public:
      */
     void writeToSettings (QSettings &settings);
 
-    AccountPtr account () const;
+    AccountPtr account ();
 
-    ConnectionStatus connectionStatus () const;
-    QStringList connectionErrors () const;
+    ConnectionStatus connectionStatus ();
+    QStringList connectionErrors ();
 
-    State state () const;
+    State state ();
     static QString stateString (State state);
 
-    bool isSignedOut () const;
+    bool isSignedOut ();
 
-    AccountAppList appList () const;
+    AccountAppList appList ();
     AccountApp* findApp (QString &appId) const;
 
     /** A user-triggered sign out which disconnects, stops syncs
@@ -118,7 +115,7 @@ public:
     /// Move from SignedOut state to Disconnected (attempting to connect)
     void signIn ();
 
-    bool isConnected () const;
+    bool isConnected ();
 
     /** Returns a new settings object for this account, already in the right groups. */
     std.unique_ptr<QSettings> settings ();
@@ -134,7 +131,7 @@ public:
     /** Saves the ETag Response header from the last Notifications api
      * request with statusCode 200.
     */
-    QByteArray notificationsEtagResponseHeader () const;
+    QByteArray notificationsEtagResponseHeader ();
 
     /** Returns the ETag Response header from the last Notifications api
      * request with statusCode 200.
@@ -144,7 +141,7 @@ public:
     /** Saves the ETag Response header from the last Navigation Apps api
      * request with statusCode 200.
     */
-    QByteArray navigationAppsEtagResponseHeader () const;
+    QByteArray navigationAppsEtagResponseHeader ();
 
     /** Returns the ETag Response header from the last Navigation Apps api
      * request with statusCode 200.
@@ -157,7 +154,7 @@ public:
     /** Returns the notifications status retrieved by the notificatons endpoint
      *  https://github.com/nextcloud/desktop/issues/2318#issuecomment-680698429
     */
-    bool isDesktopNotificationsAllowed () const;
+    bool isDesktopNotificationsAllowed ();
 
     /** Set desktop notifications status retrieved by the notificatons endpoint
     */
@@ -179,7 +176,7 @@ signals:
     void statusChanged ();
     void desktopNotificationsAllowedChanged ();
 
-protected Q_SLOTS:
+protected slots:
     void slotConnectionValidatorResult (ConnectionValidator.Status status, QStringList &errors);
 
     /// When client gets a 401 or 403 checks if server requested remote wipe
@@ -230,16 +227,16 @@ private:
     bool _isDesktopNotificationsAllowed;
 };
 
-class AccountApp : public QObject {
+class AccountApp : GLib.Object {
 public:
     AccountApp (QString &name, QUrl &url,
         const QString &id, QUrl &iconUrl,
-        QObject* parent = nullptr);
+        GLib.Object* parent = nullptr);
 
-    QString name () const;
-    QUrl url () const;
-    QString id () const;
-    QUrl iconUrl () const;
+    QString name ();
+    QUrl url ();
+    QString id ();
+    QUrl iconUrl ();
 
 private:
     QString _name;
@@ -251,7 +248,7 @@ private:
 
 }
 
-Q_DECLARE_METATYPE (OCC.AccountState *)
-Q_DECLARE_METATYPE (OCC.AccountStatePtr)
+Q_DECLARE_METATYPE (Occ.AccountState *)
+Q_DECLARE_METATYPE (Occ.AccountStatePtr)
 
 #endif //ACCOUNTINFO_H

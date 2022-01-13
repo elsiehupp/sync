@@ -1,27 +1,26 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QBuffer>
 // #include <QUrlQuery>
 // #include <QJsonDocument>
 // #include <functional>
 
-class QUrl;
 class QJsonObject;
 
-namespace OCC {
+namespace Occ {
 
 /** Strips quotes and gzip annotations */
 OWNCLOUDSYNC_EXPORT QByteArray parseEtag (char *header);
@@ -35,12 +34,12 @@ template <typename T>
 using HttpResult = Result<T, HttpError>;
 
 /**
- * @brief The EntityExistsJob class
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT EntityExistsJob : public AbstractNetworkJob {
+@brief The EntityExistsJob class
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT EntityExistsJob : AbstractNetworkJob {
 public:
-    explicit EntityExistsJob (AccountPtr account, QString &path, QObject *parent = nullptr);
+    EntityExistsJob (AccountPtr account, QString &path, GLib.Object *parent = nullptr);
     void start () override;
 
 signals:
@@ -51,15 +50,15 @@ private slots:
 };
 
 /**
- * @brief sends a DELETE http request to a url.
- *
- * See Nextcloud API usage for the possible DELETE requests.
- *
- * This does *not* delete files, it does a http request.
- */
-class OWNCLOUDSYNC_EXPORT DeleteApiJob : public AbstractNetworkJob {
+@brief sends a DELETE http request to a url.
+
+See Nextcloud API usage for the possible DELETE requests.
+
+This does *not* delete files, it does a http request.
+*/
+class OWNCLOUDSYNC_EXPORT DeleteApiJob : AbstractNetworkJob {
 public:
-    explicit DeleteApiJob (AccountPtr account, QString &path, QObject *parent = nullptr);
+    DeleteApiJob (AccountPtr account, QString &path, GLib.Object *parent = nullptr);
     void start () override;
 
 signals:
@@ -75,12 +74,12 @@ struct ExtraFolderInfo {
 };
 
 /**
- * @brief The LsColJob class
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT LsColXMLParser : public QObject {
+@brief The LsColJob class
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT LsColXMLParser : GLib.Object {
 public:
-    explicit LsColXMLParser ();
+    LsColXMLParser ();
 
     bool parse (QByteArray &xml,
                QHash<QString, ExtraFolderInfo> *sizes,
@@ -93,10 +92,10 @@ signals:
     void finishedWithoutError ();
 };
 
-class OWNCLOUDSYNC_EXPORT LsColJob : public AbstractNetworkJob {
+class OWNCLOUDSYNC_EXPORT LsColJob : AbstractNetworkJob {
 public:
-    explicit LsColJob (AccountPtr account, QString &path, QObject *parent = nullptr);
-    explicit LsColJob (AccountPtr account, QUrl &url, QObject *parent = nullptr);
+    LsColJob (AccountPtr account, QString &path, GLib.Object *parent = nullptr);
+    LsColJob (AccountPtr account, QUrl &url, GLib.Object *parent = nullptr);
     void start () override;
     QHash<QString, ExtraFolderInfo> _folderInfos;
 
@@ -104,12 +103,12 @@ public:
      * Used to specify which properties shall be retrieved.
      *
      * The properties can
-     *  - contain no colon: they refer to a property in the DAV: namespace
-     *  - contain a colon: and thus specify an explicit namespace,
+     *  - contain no colon : they refer to a property in the DAV : namespace
+     *  - contain a colon : and thus specify an explicit namespace,
      *    e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
      */
     void setProperties (QList<QByteArray> properties);
-    QList<QByteArray> properties () const;
+    QList<QByteArray> properties ();
 
 signals:
     void directoryListingSubfolders (QStringList &items);
@@ -126,30 +125,30 @@ private:
 };
 
 /**
- * @brief The PropfindJob class
- *
- * Setting the desired properties with setProperties () is mandatory.
- *
- * Note that this job is only for querying one item.
- * There is also the LsColJob which can be used to list collections
- *
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT PropfindJob : public AbstractNetworkJob {
+@brief The PropfindJob class
+
+Setting the desired properties with setProperties
+
+Note that this job is only for querying one item.
+There is also the LsColJob which can be used to list collections
+
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT PropfindJob : AbstractNetworkJob {
 public:
-    explicit PropfindJob (AccountPtr account, QString &path, QObject *parent = nullptr);
+    PropfindJob (AccountPtr account, QString &path, GLib.Object *parent = nullptr);
     void start () override;
 
     /**
      * Used to specify which properties shall be retrieved.
      *
      * The properties can
-     *  - contain no colon: they refer to a property in the DAV: namespace
-     *  - contain a colon: and thus specify an explicit namespace,
+     *  - contain no colon : they refer to a property in the DAV : namespace
+     *  - contain a colon : and thus specify an explicit namespace,
      *    e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
      */
     void setProperties (QList<QByteArray> properties);
-    QList<QByteArray> properties () const;
+    QList<QByteArray> properties ();
 
 signals:
     void result (QVariantMap &values);
@@ -164,19 +163,19 @@ private:
 
 #ifndef TOKEN_AUTH_ONLY
 /**
- * @brief Retrieves the account users avatar from the server using a GET request.
- *
- * If the server does not have the avatar, the result Pixmap is empty.
- *
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT AvatarJob : public AbstractNetworkJob {
+@brief Retrieves the account users avatar from the server using a GET request.
+
+If the server does not have the avatar, the result Pixmap is empty.
+
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT AvatarJob : AbstractNetworkJob {
 public:
     /**
      * @param userId The user for which to obtain the avatar
      * @param size The size of the avatar (square so size*size)
      */
-    explicit AvatarJob (AccountPtr account, QString &userId, int size, QObject *parent = nullptr);
+    AvatarJob (AccountPtr account, QString &userId, int size, GLib.Object *parent = nullptr);
 
     void start () override;
 
@@ -199,29 +198,29 @@ private:
 #endif
 
 /**
- * @brief Send a Proppatch request
- *
- * Setting the desired properties with setProperties () is mandatory.
- *
- * WARNING: Untested!
- *
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT ProppatchJob : public AbstractNetworkJob {
+@brief Send a Proppatch request
+
+Setting the desired p
+
+WARNING : Untested!
+
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT ProppatchJob : AbstractNetworkJob {
 public:
-    explicit ProppatchJob (AccountPtr account, QString &path, QObject *parent = nullptr);
+    ProppatchJob (AccountPtr account, QString &path, GLib.Object *parent = nullptr);
     void start () override;
 
     /**
      * Used to specify which properties shall be set.
      *
      * The property keys can
-     *  - contain no colon: they refer to a property in the DAV: namespace
-     *  - contain a colon: and thus specify an explicit namespace,
+     *  - contain no colon : they refer to a property in the DAV : namespace
+     *  - contain a colon : and thus specify an explicit namespace,
      *    e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
      */
     void setProperties (QMap<QByteArray, QByteArray> properties);
-    QMap<QByteArray, QByteArray> properties () const;
+    QMap<QByteArray, QByteArray> properties ();
 
 signals:
     void success ();
@@ -235,18 +234,18 @@ private:
 };
 
 /**
- * @brief The MkColJob class
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT MkColJob : public AbstractNetworkJob {
+@brief The MkColJob class
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT MkColJob : AbstractNetworkJob {
     QUrl _url; // Only used if the constructor taking a url is taken.
     QMap<QByteArray, QByteArray> _extraHeaders;
 
 public:
-    explicit MkColJob (AccountPtr account, QString &path, QObject *parent = nullptr);
-    explicit MkColJob (AccountPtr account, QString &path, QMap<QByteArray, QByteArray> &extraHeaders, QObject *parent = nullptr);
-    explicit MkColJob (AccountPtr account, QUrl &url,
-        const QMap<QByteArray, QByteArray> &extraHeaders, QObject *parent = nullptr);
+    MkColJob (AccountPtr account, QString &path, GLib.Object *parent = nullptr);
+    MkColJob (AccountPtr account, QString &path, QMap<QByteArray, QByteArray> &extraHeaders, GLib.Object *parent = nullptr);
+    MkColJob (AccountPtr account, QUrl &url,
+        const QMap<QByteArray, QByteArray> &extraHeaders, GLib.Object *parent = nullptr);
     void start () override;
 
 signals:
@@ -258,12 +257,12 @@ private:
 };
 
 /**
- * @brief The CheckServerJob class
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT CheckServerJob : public AbstractNetworkJob {
+@brief The CheckServerJob class
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT CheckServerJob : AbstractNetworkJob {
 public:
-    explicit CheckServerJob (AccountPtr account, QObject *parent = nullptr);
+    CheckServerJob (AccountPtr account, GLib.Object *parent = nullptr);
     void start () override;
 
     static QString version (QJsonObject &info);
@@ -313,11 +312,11 @@ private:
 };
 
 /**
- * @brief The RequestEtagJob class
- */
-class OWNCLOUDSYNC_EXPORT RequestEtagJob : public AbstractNetworkJob {
+@brief The RequestEtagJob class
+*/
+class OWNCLOUDSYNC_EXPORT RequestEtagJob : AbstractNetworkJob {
 public:
-    explicit RequestEtagJob (AccountPtr account, QString &path, QObject *parent = nullptr);
+    RequestEtagJob (AccountPtr account, QString &path, GLib.Object *parent = nullptr);
     void start () override;
 
 signals:
@@ -329,21 +328,21 @@ private slots:
 };
 
 /**
- * @brief Job to check an API that return JSON
- *
- * Note! you need to be in the connected state before calling this because of a server bug:
- * https://github.com/owncloud/core/issues/12930
- *
- * To be used like this:
- * \code
- * _job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/foo/bar"), this);
- * connect (job, SIGNAL (jsonReceived (QJsonDocument)), ...)
- * The received QVariantMap is null in case of error
- * \encode
- *
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT JsonApiJob : public AbstractNetworkJob {
+@brief Job to check an API that return JSON
+
+Note! you need to be in the connected state befo
+https://github.com/ow
+
+To be used like this:
+\code
+_job = new JsonApiJob (account, QLatin1String ("o
+connect (j
+The received QVariantMap is null in case of error
+\encode
+
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT JsonApiJob : AbstractNetworkJob {
 public:
     enum class Verb {
         Get,
@@ -352,11 +351,11 @@ public:
         Delete,
     };
 
-    explicit JsonApiJob (AccountPtr &account, QString &path, QObject *parent = nullptr);
+    JsonApiJob (AccountPtr &account, QString &path, GLib.Object *parent = nullptr);
 
     /**
      * @brief addQueryParams - add more parameters to the ocs call
-     * @param params: list pairs of strings containing the parameter name and the value.
+     * @param params : list pairs of strings containing the parameter name and the value.
      *
      * All parameters from the passed list are appended to the query. Note
      * that the format=json parameter is added automatically and does not
@@ -381,7 +380,7 @@ signals:
     /**
      * @brief jsonReceived - signal to report the json answer from ocs
      * @param json - the parsed json document
-     * @param statusCode - the OCS status code: 100 (!) for success
+     * @param statusCode - the OCS status code : 100 (!) for success
      */
     void jsonReceived (QJsonDocument &json, int statusCode);
 
@@ -389,7 +388,7 @@ signals:
      * @brief etagResponseHeaderReceived - signal to report the ETag response header value
      * from ocs api v2
      * @param value - the ETag response header value
-     * @param statusCode - the OCS status code: 100 (!) for success
+     * @param statusCode - the OCS status code : 100 (!) for success
      */
     void etagResponseHeaderReceived (QByteArray &value, int statusCode);
 
@@ -406,14 +405,14 @@ private:
 
     Verb _verb = Verb.Get;
 
-    QByteArray verbToString () const;
+    QByteArray verbToString ();
 };
 
 /**
- * @brief Checks with auth type to use for a server
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT DetermineAuthTypeJob : public QObject {
+@brief Checks with auth type to use for a server
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT DetermineAuthTypeJob : GLib.Object {
 public:
     enum AuthType {
         NoAuthType, // used only before we got a chance to probe the server
@@ -426,7 +425,7 @@ public:
     };
     Q_ENUM (AuthType)
 
-    explicit DetermineAuthTypeJob (AccountPtr account, QObject *parent = nullptr);
+    DetermineAuthTypeJob (AccountPtr account, GLib.Object *parent = nullptr);
     void start ();
 signals:
     void authType (AuthType);
@@ -444,14 +443,14 @@ private:
 };
 
 /**
- * @brief A basic job around a network request without extra funtionality
- * @ingroup libsync
- *
- * Primarily adds timeout and redirection handling.
- */
-class OWNCLOUDSYNC_EXPORT SimpleNetworkJob : public AbstractNetworkJob {
+@brief A basic job around a network request without extra funtionality
+@ingroup libsync
+
+Primarily adds timeout and redirection handling.
+*/
+class OWNCLOUDSYNC_EXPORT SimpleNetworkJob : AbstractNetworkJob {
 public:
-    explicit SimpleNetworkJob (AccountPtr account, QObject *parent = nullptr);
+    SimpleNetworkJob (AccountPtr account, GLib.Object *parent = nullptr);
 
     QNetworkReply *startRequest (QByteArray &verb, QUrl &url,
         QNetworkRequest req = QNetworkRequest (),
@@ -464,22 +463,20 @@ private slots:
 };
 
 /**
- * @brief Runs a PROPFIND to figure out the private link url
- *
- * The numericFileId is used only to build the deprecatedPrivateLinkUrl
- * locally as a fallback. If it's empty and the PROPFIND fails, targetFun
- * will be called with an empty string.
- *
- * The job and signal connections are parented to the target QObject.
- *
- * Note: targetFun is guaranteed to be called only through the event
- * loop and never directly.
- */
+@brief Runs a PROPFIND to figure out the private link url
+
+The numericFileId is used only to build the deprecatedPrivateLinkUrl
+locally as a fallback. If it's empty an
+will be called with an empty string.
+
+The job and signal connections are parented to the target GLib.Object.
+
+Note : targetFun is guaranteed to be called only through the event
+loop and never directly.
+*/
 void OWNCLOUDSYNC_EXPORT fetchPrivateLinkUrl (
     AccountPtr account, QString &remotePath,
-    const QByteArray &numericFileId, QObject *target,
+    const QByteArray &numericFileId, GLib.Object *target,
     std.function<void (QString &url)> targetFun);
 
-} // namespace OCC
-
-#endif // NETWORKJOBS_H
+} // namespace Occ

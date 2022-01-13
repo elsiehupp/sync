@@ -1,7 +1,7 @@
 /****************************************************************************
 **
 ** Copyright (C) 2014 Digia Plc and/or its subsidiary (-ies).
-** Contact: http://www.qt-project.org/legal
+** Contact : http://www.qt-project.org/legal
 **
 ** This file is part of Qt Creator.
 **
@@ -19,7 +19,7 @@
 ** Foundation and appearing in the file LICENSE.LGPL included in the
 ** packaging of this file.  Please review the following information to
 ** ensure the GNU Lesser General Public License version 2.1 requirements
-** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** will be met : http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 **
 ** In addition, as a special exception, Digia gives you certain additional
 ** rights.  These rights are described in the Digia Qt LGPL Exception
@@ -34,7 +34,7 @@ define QT_QTLOCKEDFILE_EXPORT
 
 namespace SharedTools {
 
-class QT_QTLOCKEDFILE_EXPORT QtLockedFile : public QFile {
+class QT_QTLOCKEDFILE_EXPORT QtLockedFile : QFile {
 public:
     enum LockMode { NoLock = 0, ReadLock, WriteLock };
 
@@ -44,13 +44,11 @@ public:
 
     bool lock (LockMode mode, bool block = true);
     bool unlock ();
-    bool isLocked () const;
-    LockMode lockMode () const;
+    bool isLocked ();
+    LockMode lockMode ();
 
 private:
     LockMode m_lock_mode;
 };
 
 } // namespace SharedTools
-
-#endif // QTLOCKEDFILE_H

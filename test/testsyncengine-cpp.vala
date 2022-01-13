@@ -1,14 +1,14 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *    support, and with no warranty, express or implied, as to its usefulness for
- *    any purpose.
- *
- */
+   This software is in the public domain, furnished "as is", without technical
+   support, and with no warranty, express or implied, as to its usefulness for
+   any purpose.
+
+*/
 
 // #include <QtTest>
 // #include <syncengine.h>
 
-using namespace OCC;
+using namespace Occ;
 
 bool itemDidComplete (ItemCompletedSpy &spy, QString &path) {
     if (auto item = spy.findItem (path)) {
@@ -38,7 +38,7 @@ bool itemDidCompleteSuccessfullyWithExpectedRank (ItemCompletedSpy &spy, QString
 
 int itemSuccessfullyCompletedGetRank (ItemCompletedSpy &spy, QString &path) {
     auto itItem = std.find_if (spy.begin (), spy.end (), [&path] (auto currentItem) {
-        auto item = currentItem[0].template value<OCC.SyncFileItemPtr> ();
+        auto item = currentItem[0].template value<Occ.SyncFileItemPtr> ();
         return item.destination () == path;
     });
     if (itItem != spy.end ()) {
@@ -47,7 +47,7 @@ int itemSuccessfullyCompletedGetRank (ItemCompletedSpy &spy, QString &path) {
     return -1;
 }
 
-class TestSyncEngine : public QObject {
+class TestSyncEngine : GLib.Object {
 
 private slots:
     void testFileDownload () {
@@ -187,7 +187,7 @@ private slots:
     }
 
     void testSelectiveSyncBug () {
-        // issue owncloud/enterprise#1965: files from selective-sync ignored
+        // issue owncloud/enterprise#1965 : files from selective-sync ignored
         // folders are uploaded anyway is some circumstances.
         FakeFolder fakeFolder{FileInfo{ QString (), {
             FileInfo { QStringLiteral ("parentFolder"), {
@@ -441,7 +441,7 @@ private slots:
                     c1 = item;
             }
 
-            // a1: should have local size and modtime
+            // a1 : should have local size and modtime
             QVERIFY (a1);
             QCOMPARE (a1._instruction, CSYNC_INSTRUCTION_SYNC);
             QCOMPARE (a1._direction, SyncFileItem.Up);
@@ -451,7 +451,7 @@ private slots:
             QCOMPARE (a1._previousSize, int64 (4));
             QCOMPARE (Utility.qDateTimeFromTime_t (a1._previousModtime), initialMtime);
 
-            // b2: should have remote size and modtime
+            // b2 : should have remote size and modtime
             QVERIFY (b1);
             QCOMPARE (b1._instruction, CSYNC_INSTRUCTION_SYNC);
             QCOMPARE (b1._direction, SyncFileItem.Down);
@@ -460,7 +460,7 @@ private slots:
             QCOMPARE (b1._previousSize, int64 (16));
             QCOMPARE (Utility.qDateTimeFromTime_t (b1._previousModtime), initialMtime);
 
-            // c1: conflicts are downloads, so remote size and modtime
+            // c1 : conflicts are downloads, so remote size and modtime
             QVERIFY (c1);
             QCOMPARE (c1._instruction, CSYNC_INSTRUCTION_CONFLICT);
             QCOMPARE (c1._direction, SyncFileItem.None);
@@ -487,7 +487,7 @@ private slots:
         // Produce an error based on upload size
         int remoteQuota = 1000;
         int n507 = 0, nPUT = 0;
-        QObject parent;
+        GLib.Object parent;
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *outgoingData) . QNetworkReply * {
             Q_UNUSED (outgoingData)
 
@@ -525,7 +525,7 @@ private slots:
     // Checks whether downloads with bad checksums are accepted
     void testChecksumValidation () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
-        QObject parent;
+        GLib.Object parent;
 
         QByteArray checksumValue;
         QByteArray contentMd5Value;
@@ -701,7 +701,7 @@ private slots:
         options._minChunkSize = 10;
         fakeFolder.syncEngine ().setSyncOptions (options);
 
-        QObject parent;
+        GLib.Object parent;
         int nPUT = 0;
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.PutOperation) {
@@ -720,7 +720,7 @@ private slots:
 
     void testPropagatePermissions () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
-        auto perm = QFileDevice.Permission (0x7704); // user/owner: rwx, group: r, other: -
+        auto perm = QFileDevice.Permission (0x7704); // user/owner : rwx, group : r, other : -
         QFile.setPermissions (fakeFolder.localPath () + "A/a1", perm);
         QFile.setPermissions (fakeFolder.localPath () + "A/a2", perm);
         fakeFolder.syncOnce (); // get the metadata-only change out of the way

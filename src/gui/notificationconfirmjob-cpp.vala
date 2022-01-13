@@ -1,20 +1,20 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QBuffer>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcNotificationsJob, "nextcloud.gui.notifications", QtInfoMsg)
 
@@ -30,7 +30,7 @@ void NotificationConfirmJob.setLinkAndVerb (QUrl &link, QByteArray &verb) {
 
 void NotificationConfirmJob.start () {
     if (!_link.isValid ()) {
-        qCWarning (lcNotificationsJob) << "Attempt to trigger invalid URL: " << _link.toString ();
+        qCWarning (lcNotificationsJob) << "Attempt to trigger invalid URL : " << _link.toString ();
         return;
     }
     QNetworkRequest req;
@@ -44,7 +44,7 @@ void NotificationConfirmJob.start () {
 
 bool NotificationConfirmJob.finished () {
     int replyCode = 0;
-    // FIXME: check for the reply code!
+    // FIXME : check for the reply code!
     const QString replyStr = reply ().readAll ();
 
     if (replyStr.contains ("<?xml version=\"1.0\"?>")) {

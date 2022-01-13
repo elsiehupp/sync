@@ -1,18 +1,18 @@
 /*
- * Copyright (C) by Dominik Schmidt <dev@dominik-schmidt.de>
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- * Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Dominik Schmidt <dev@dominik-schmidt.de>
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 #ifndef OWNCLOUD_TEST
 #endif
@@ -48,7 +48,7 @@
 // This is the version that is returned when the client asks for the VERSION.
 // The first number should be changed if there is an incompatible change that breaks old clients.
 // The second number should be changed when there are new features.
-#define MIRALL_SOCKET_API_VERSION "1.1"
+const int MIRALL_SOCKET_API_VERSION "1.1"
 
 namespace {
 
@@ -57,16 +57,16 @@ const QLatin1Char RecordSeparator () {
 }
 
 QStringList split (QString &data) {
-    // TODO: string ref?
+    // TODO : string ref?
     return data.split (RecordSeparator ());
 }
 
 #if GUI_TESTING
 
-using namespace OCC;
+using namespace Occ;
 
-QList<QObject *> allObjects (QList<QWidget *> &widgets) {
-    QList<QObject *> objects;
+QList<GLib.Object> allObjects (QList<QWidget> &widgets) {
+    QList<GLib.Object> objects;
     std.copy (widgets.constBegin (), widgets.constEnd (), std.back_inserter (objects));
 
     objects << qApp;
@@ -74,10 +74,10 @@ QList<QObject *> allObjects (QList<QWidget *> &widgets) {
     return objects;
 }
 
-QObject *findWidget (QString &queryString, QList<QWidget *> &widgets = QApplication.allWidgets ()) {
+GLib.Object *findWidget (QString &queryString, QList<QWidget> &widgets = QApplication.allWidgets ()) {
     auto objects = allObjects (widgets);
 
-    QList<QObject *>.const_iterator foundWidget;
+    QList<GLib.Object>.const_iterator foundWidget;
 
     if (queryString.contains ('>')) {
         qCDebug (lcSocketApi) << "queryString contains >";
@@ -86,7 +86,7 @@ QObject *findWidget (QString &queryString, QList<QWidget *> &widgets = QApplicat
         Q_ASSERT (subQueries.count () == 2);
 
         auto parentQueryString = subQueries[0].trimmed ();
-        qCDebug (lcSocketApi) << "Find parent: " << parentQueryString;
+        qCDebug (lcSocketApi) << "Find parent : " << parentQueryString;
         auto parent = findWidget (parentQueryString);
 
         if (!parent) {
@@ -94,26 +94,26 @@ QObject *findWidget (QString &queryString, QList<QWidget *> &widgets = QApplicat
         }
 
         auto childQueryString = subQueries[1].trimmed ();
-        auto child = findWidget (childQueryString, parent.findChildren<QWidget *> ());
-        qCDebug (lcSocketApi) << "found child: " << !!child;
+        auto child = findWidget (childQueryString, parent.findChildren<QWidget> ());
+        qCDebug (lcSocketApi) << "found child : " << !!child;
         return child;
 
     } else if (queryString.startsWith ('#')) {
         auto objectName = queryString.mid (1);
-        qCDebug (lcSocketApi) << "find objectName: " << objectName;
-        foundWidget = std.find_if (objects.constBegin (), objects.constEnd (), [&] (QObject *widget) {
+        qCDebug (lcSocketApi) << "find objectName : " << objectName;
+        foundWidget = std.find_if (objects.constBegin (), objects.constEnd (), [&] (GLib.Object *widget) {
             return widget.objectName () == objectName;
         });
     } else {
-        QList<QObject *> matches;
-        std.copy_if (objects.constBegin (), objects.constEnd (), std.back_inserter (matches), [&] (QObject *widget) {
+        QList<GLib.Object> matches;
+        std.copy_if (objects.constBegin (), objects.constEnd (), std.back_inserter (matches), [&] (GLib.Object *widget) {
             return widget.inherits (queryString.toLatin1 ());
         });
 
-        std.for_each (matches.constBegin (), matches.constEnd (), [] (QObject *w) {
+        std.for_each (matches.constBegin (), matches.constEnd (), [] (GLib.Object *w) {
             if (!w)
                 return;
-            qCDebug (lcSocketApi) << "WIDGET: " << w.objectName () << w.metaObject ().className ();
+            qCDebug (lcSocketApi) << "WIDGET : " << w.objectName () << w.metaObject ().className ();
         });
 
         if (matches.empty ()) {
@@ -152,7 +152,7 @@ static QString buildMessage (QString &verb, QString &path, QString &status = QSt
 }
 }
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcSocketApi, "nextcloud.gui.socketapi", QtInfoMsg)
 Q_LOGGING_CATEGORY (lcPublicLink, "nextcloud.gui.socketapi.publiclink", QtInfoMsg)
@@ -179,11 +179,11 @@ void SocketListener.sendMessage (QString &message, bool doWait) {
     }
 }
 
-SocketApi.SocketApi (QObject *parent)
-    : QObject (parent) {
+SocketApi.SocketApi (GLib.Object *parent)
+    : GLib.Object (parent) {
     QString socketPath;
 
-    qRegisterMetaType<SocketListener *> ("SocketListener*");
+    qRegisterMetaType<SocketListener> ("SocketListener*");
     qRegisterMetaType<QSharedPointer<SocketApiJob>> ("QSharedPointer<SocketApiJob>");
     qRegisterMetaType<QSharedPointer<SocketApiJobV2>> ("QSharedPointer<SocketApiJobV2>");
 
@@ -192,14 +192,14 @@ SocketApi.SocketApi (QObject *parent)
             + QLatin1String (APPLICATION_EXECUTABLE)
             + QLatin1String ("-")
             + QString.fromLocal8Bit (qgetenv ("USERNAME"));
-        // TODO: once the windows extension supports multiple
+        // TODO : once the windows extension supports multiple
         // client connections, switch back to the theme name
         // See issue #2388
         // + Theme.instance ().appName ();
     } else if (Utility.isMac ()) {
         // This must match the code signing Team setting of the extension
-        // Example for developer builds (with ad-hoc signing identity): "" "com.owncloud.desktopclient" ".socketApi"
-        // Example for official signed packages: "9B5WD74GWJ." "com.owncloud.desktopclient" ".socketApi"
+        // Example for developer builds (with ad-hoc signing identity) : "" "com.owncloud.desktopclient" ".socketApi"
+        // Example for official signed packages : "9B5WD74GWJ." "com.owncloud.desktopclient" ".socketApi"
         socketPath = SOCKETAPI_TEAM_IDENTIFIER_PREFIX APPLICATION_REV_DOMAIN ".socketApi";
     } else if (Utility.isLinux () || Utility.isBSD ()) {
         QString runtimeDir;
@@ -250,7 +250,7 @@ void SocketApi.slotNewConnection () {
     qCInfo (lcSocketApi) << "New connection" << socket;
     connect (socket, &QIODevice.readyRead, this, &SocketApi.slotReadSocket);
     connect (socket, SIGNAL (disconnected ()), this, SLOT (onLostConnection ()));
-    connect (socket, &QObject.destroyed, this, &SocketApi.slotSocketDestroyed);
+    connect (socket, &GLib.Object.destroyed, this, &SocketApi.slotSocketDestroyed);
     ASSERT (socket.readAll ().isEmpty ());
 
     auto listener = QSharedPointer<SocketListener>.create (socket);
@@ -268,18 +268,18 @@ void SocketApi.onLostConnection () {
     qCInfo (lcSocketApi) << "Lost connection " << sender ();
     sender ().deleteLater ();
 
-    auto socket = qobject_cast<QIODevice *> (sender ());
+    auto socket = qobject_cast<QIODevice> (sender ());
     ASSERT (socket);
     _listeners.remove (socket);
 }
 
-void SocketApi.slotSocketDestroyed (QObject *obj) {
-    auto *socket = static_cast<QIODevice *> (obj);
+void SocketApi.slotSocketDestroyed (GLib.Object *obj) {
+    auto *socket = static_cast<QIODevice> (obj);
     _listeners.remove (socket);
 }
 
 void SocketApi.slotReadSocket () {
-    auto *socket = qobject_cast<QIODevice *> (sender ());
+    auto *socket = qobject_cast<QIODevice> (sender ());
     ASSERT (socket);
 
     // Find the SocketListener
@@ -328,7 +328,7 @@ void SocketApi.slotReadSocket () {
             auto jobId = arguments[0];
 
             auto socketApiJob = QSharedPointer<SocketApiJob> (
-                new SocketApiJob (jobId.toString (), listener, json), &QObject.deleteLater);
+                new SocketApiJob (jobId.toString (), listener, json), &GLib.Object.deleteLater);
             if (indexOfMethod != -1) {
                 staticMetaObject.method (indexOfMethod)
                     .invoke (this, Qt.QueuedConnection,
@@ -489,7 +489,7 @@ void SocketApi.command_RETRIEVE_FILE_STATUS (QString &argument, SocketListener *
 
     auto fileData = FileData.get (argument);
     if (!fileData.folder) {
-        // this can happen in offline mode e.g.: nothing to worry about
+        // this can happen in offline mode e.g. : nothing to worry about
         statusString = QLatin1String ("NOP");
     } else {
         // The user probably visited this directory in the file shell.
@@ -552,7 +552,7 @@ void SocketApi.command_EDIT (QString &localFile, SocketListener *listener) {
     job.addQueryParams (params);
     job.setVerb (JsonApiJob.Verb.Post);
 
-    QObject.connect (job, &JsonApiJob.jsonReceived, [] (QJsonDocument &json){
+    GLib.Object.connect (job, &JsonApiJob.jsonReceived, [] (QJsonDocument &json){
         auto data = json.object ().value ("ocs").toObject ().value ("data").toObject ();
         auto url = QUrl (data.value ("url").toString ());
 
@@ -565,11 +565,11 @@ void SocketApi.command_EDIT (QString &localFile, SocketListener *listener) {
 // don't pull the share manager into socketapi unittests
 #ifndef OWNCLOUD_TEST
 
-class GetOrCreatePublicLinkShare : public QObject {
+class GetOrCreatePublicLinkShare : GLib.Object {
 public:
     GetOrCreatePublicLinkShare (AccountPtr &account, QString &localFile,
-        QObject *parent)
-        : QObject (parent)
+        GLib.Object *parent)
+        : GLib.Object (parent)
         , _account (account)
         , _shareManager (account)
         , _localFile (localFile) {
@@ -667,10 +667,10 @@ private:
 
 #else
 
-class GetOrCreatePublicLinkShare : public QObject {
+class GetOrCreatePublicLinkShare : GLib.Object {
 public:
     GetOrCreatePublicLinkShare (AccountPtr &, QString &,
-        std.function<void (QString &link)>, QObject *) {
+        std.function<void (QString &link)>, GLib.Object *) {
     }
 
     void run () {
@@ -839,7 +839,7 @@ void SocketApi.command_MOVE_ITEM (QString &localFile, SocketListener *) {
 void SocketApi.command_V2_LIST_ACCOUNTS (QSharedPointer<SocketApiJobV2> &job) {
     QJsonArray out;
     for (auto acc : AccountManager.instance ().accounts ()) {
-        // TODO: Use uuid once https://github.com/owncloud/client/pull/8397 is merged
+        // TODO : Use uuid once https://github.com/owncloud/client/pull/8397 is merged
         out << QJsonObject ({ { "name", acc.account ().displayName () }, { "id", acc.account ().id () } });
     }
     job.success ({ { "accounts", out } });
@@ -857,7 +857,7 @@ void SocketApi.emailPrivateLink (QString &link) {
         nullptr);
 }
 
-void OCC.SocketApi.openPrivateLink (QString &link) {
+void Occ.SocketApi.openPrivateLink (QString &link) {
     Utility.openBrowser (link);
 }
 
@@ -908,7 +908,7 @@ void SocketApi.sendSharingContextMenuOptions (FileData &fileData, SocketListener
 
     listener.sendMessage (QLatin1String ("MENU_ITEM:COPY_PRIVATE_LINK") + flagString + tr ("Copy internal link"));
 
-    // Disabled: only providing email option for private links would look odd,
+    // Disabled : only providing email option for private links would look odd,
     // and the copy option is more general.
     //listener.sendMessage (QLatin1String ("MENU_ITEM:EMAIL_PRIVATE_LINK") + flagString + tr ("Send private link by email …"));
 }
@@ -960,7 +960,7 @@ SocketApi.FileData SocketApi.FileData.parentFolder () {
     return FileData.get (QFileInfo (localPath).dir ().path ().toUtf8 ());
 }
 
-void SocketApi.command_GET_MENU_ITEMS (QString &argument, OCC.SocketListener *listener) {
+void SocketApi.command_GET_MENU_ITEMS (QString &argument, Occ.SocketListener *listener) {
     listener.sendMessage (QString ("GET_MENU_ITEMS:BEGIN"));
     const QStringList files = split (argument);
 
@@ -1081,7 +1081,7 @@ void SocketApi.command_GET_MENU_ITEMS (QString &argument, OCC.SocketListener *li
             }
         }
 
-        // TODO: Should be a submenu, should use icons
+        // TODO : Should be a submenu, should use icons
         auto makePinContextMenu = [&] (bool makeAvailableLocally, bool freeSpace) {
             listener.sendMessage (QLatin1String ("MENU_ITEM:CURRENT_PIN:d:")
                 + Utility.vfsCurrentAvailabilityText (*combined));
@@ -1165,7 +1165,7 @@ void SocketApi.command_ASYNC_GET_WIDGET_PROPERTY (QSharedPointer<SocketApiJob> &
     QString widgetName = job.arguments ()[QLatin1String ("objectName")].toString ();
     auto widget = findWidget (widgetName);
     if (!widget) {
-        QString message = QString (QLatin1String ("Widget not found: 2: %1")).arg (widgetName);
+        QString message = QString (QLatin1String ("Widget not found : 2 : %1")).arg (widgetName);
         job.reject (message);
         return;
     }
@@ -1174,7 +1174,7 @@ void SocketApi.command_ASYNC_GET_WIDGET_PROPERTY (QSharedPointer<SocketApiJob> &
 
     auto segments = propertyName.split ('.');
 
-    QObject *currentObject = widget;
+    GLib.Object *currentObject = widget;
     QString value;
     for (int i = 0; i < segments.count (); i++) {
         auto segment = segments.at (i);
@@ -1186,11 +1186,11 @@ void SocketApi.command_ASYNC_GET_WIDGET_PROPERTY (QSharedPointer<SocketApiJob> &
             break;
         }
 
-        auto tmpObject = var.value<QObject *> ();
+        auto tmpObject = var.value<GLib.Object> ();
         if (tmpObject) {
             currentObject = tmpObject;
         } else {
-            QString message = QString (QLatin1String ("Widget not found: 3: %1")).arg (widgetName);
+            QString message = QString (QLatin1String ("Widget not found : 3 : %1")).arg (widgetName);
             job.reject (message);
             return;
         }
@@ -1204,7 +1204,7 @@ void SocketApi.command_ASYNC_SET_WIDGET_PROPERTY (QSharedPointer<SocketApiJob> &
     QString widgetName = arguments["objectName"].toString ();
     auto widget = findWidget (widgetName);
     if (!widget) {
-        QString message = QString (QLatin1String ("Widget not found: 4: %1")).arg (widgetName);
+        QString message = QString (QLatin1String ("Widget not found : 4 : %1")).arg (widgetName);
         job.reject (message);
         return;
     }
@@ -1219,7 +1219,7 @@ void SocketApi.command_ASYNC_WAIT_FOR_WIDGET_SIGNAL (QSharedPointer<SocketApiJob
     QString widgetName = arguments["objectName"].toString ();
     auto widget = findWidget (arguments["objectName"].toString ());
     if (!widget) {
-        QString message = QString (QLatin1String ("Widget not found: 5: %1")).arg (widgetName);
+        QString message = QString (QLatin1String ("Widget not found : 5 : %1")).arg (widgetName);
         job.reject (message);
         return;
     }
@@ -1239,12 +1239,12 @@ void SocketApi.command_ASYNC_TRIGGER_MENU_ACTION (QSharedPointer<SocketApiJob> &
     auto objectName = arguments["objectName"].toString ();
     auto widget = findWidget (objectName);
     if (!widget) {
-        QString message = QString (QLatin1String ("Object not found: 1: %1")).arg (objectName);
+        QString message = QString (QLatin1String ("Object not found : 1 : %1")).arg (objectName);
         job.reject (message);
         return;
     }
 
-    auto children = widget.findChildren<QWidget *> ();
+    auto children = widget.findChildren<QWidget> ();
     for (auto childWidget : children) {
         // foo is the popupwidget!
         auto actions = childWidget.actions ();
@@ -1258,14 +1258,14 @@ void SocketApi.command_ASYNC_TRIGGER_MENU_ACTION (QSharedPointer<SocketApiJob> &
         }
     }
 
-    QString message = QString (QLatin1String ("Action not found: 1: %1")).arg (arguments["actionName"].toString ());
+    QString message = QString (QLatin1String ("Action not found : 1 : %1")).arg (arguments["actionName"].toString ());
     job.reject (message);
 }
 
 void SocketApi.command_ASYNC_ASSERT_ICON_IS_EQUAL (QSharedPointer<SocketApiJob> &job) {
     auto widget = findWidget (job.arguments ()[QLatin1String ("queryString")].toString ());
     if (!widget) {
-        QString message = QString (QLatin1String ("Object not found: 6: %1")).arg (job.arguments ()["queryString"].toString ());
+        QString message = QString (QLatin1String ("Object not found : 6 : %1")).arg (job.arguments ()["queryString"].toString ());
         job.reject (message);
         return;
     }
@@ -1274,7 +1274,7 @@ void SocketApi.command_ASYNC_ASSERT_ICON_IS_EQUAL (QSharedPointer<SocketApiJob> 
 
     auto segments = propertyName.split ('.');
 
-    QObject *currentObject = widget;
+    GLib.Object *currentObject = widget;
     QIcon value;
     for (int i = 0; i < segments.count (); i++) {
         auto segment = segments.at (i);
@@ -1286,11 +1286,11 @@ void SocketApi.command_ASYNC_ASSERT_ICON_IS_EQUAL (QSharedPointer<SocketApiJob> 
             break;
         }
 
-        auto tmpObject = var.value<QObject *> ();
+        auto tmpObject = var.value<GLib.Object> ();
         if (tmpObject) {
             currentObject = tmpObject;
         } else {
-            job.reject (QString (QLatin1String ("Icon not found: %1")).arg (propertyName));
+            job.reject (QString (QLatin1String ("Icon not found : %1")).arg (propertyName));
         }
     }
 
@@ -1298,7 +1298,7 @@ void SocketApi.command_ASYNC_ASSERT_ICON_IS_EQUAL (QSharedPointer<SocketApiJob> 
     if (value.name () == iconName) {
         job.resolve ();
     } else {
-        job.reject ("iconName " + iconName + " does not match: " + value.name ());
+        job.reject ("iconName " + iconName + " does not match : " + value.name ());
     }
 }
 #endif
@@ -1343,6 +1343,6 @@ void SocketApiJobV2.doFinish (QJsonObject &obj) {
     Q_EMIT finished ();
 }
 
-} // namespace OCC
+} // namespace Occ
 
 #include "socketapi.moc"

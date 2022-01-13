@@ -1,6 +1,6 @@
 // #include <QTest>
 
-class TestCapabilities : public QObject {
+class TestCapabilities : GLib.Object {
 
 private slots:
     void testPushNotificationsAvailable_pushNotificationsForActivitiesAvailable_returnTrue () {
@@ -13,8 +13,8 @@ private slots:
         QVariantMap capabilitiesMap;
         capabilitiesMap["notify_push"] = notifyPushMap;
 
-        const auto &capabilities = OCC.Capabilities (capabilitiesMap);
-        const auto activitiesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (OCC.PushNotificationType.Activities);
+        const auto &capabilities = Occ.Capabilities (capabilitiesMap);
+        const auto activitiesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Activities);
 
         QCOMPARE (activitiesPushNotificationsAvailable, true);
     }
@@ -29,8 +29,8 @@ private slots:
         QVariantMap capabilitiesMap;
         capabilitiesMap["notify_push"] = notifyPushMap;
 
-        const auto &capabilities = OCC.Capabilities (capabilitiesMap);
-        const auto activitiesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (OCC.PushNotificationType.Activities);
+        const auto &capabilities = Occ.Capabilities (capabilitiesMap);
+        const auto activitiesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Activities);
 
         QCOMPARE (activitiesPushNotificationsAvailable, false);
     }
@@ -45,8 +45,8 @@ private slots:
         QVariantMap capabilitiesMap;
         capabilitiesMap["notify_push"] = notifyPushMap;
 
-        const auto &capabilities = OCC.Capabilities (capabilitiesMap);
-        const auto filesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (OCC.PushNotificationType.Files);
+        const auto &capabilities = Occ.Capabilities (capabilitiesMap);
+        const auto filesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Files);
 
         QCOMPARE (filesPushNotificationsAvailable, true);
     }
@@ -61,8 +61,8 @@ private slots:
         QVariantMap capabilitiesMap;
         capabilitiesMap["notify_push"] = notifyPushMap;
 
-        const auto &capabilities = OCC.Capabilities (capabilitiesMap);
-        const auto filesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (OCC.PushNotificationType.Files);
+        const auto &capabilities = Occ.Capabilities (capabilitiesMap);
+        const auto filesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Files);
 
         QCOMPARE (filesPushNotificationsAvailable, false);
     }
@@ -77,8 +77,8 @@ private slots:
         QVariantMap capabilitiesMap;
         capabilitiesMap["notify_push"] = notifyPushMap;
 
-        const auto &capabilities = OCC.Capabilities (capabilitiesMap);
-        const auto notificationsPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (OCC.PushNotificationType.Notifications);
+        const auto &capabilities = Occ.Capabilities (capabilitiesMap);
+        const auto notificationsPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Notifications);
 
         QCOMPARE (notificationsPushNotificationsAvailable, true);
     }
@@ -93,17 +93,17 @@ private slots:
         QVariantMap capabilitiesMap;
         capabilitiesMap["notify_push"] = notifyPushMap;
 
-        const auto &capabilities = OCC.Capabilities (capabilitiesMap);
-        const auto notificationsPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (OCC.PushNotificationType.Notifications);
+        const auto &capabilities = Occ.Capabilities (capabilitiesMap);
+        const auto notificationsPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Notifications);
 
         QCOMPARE (notificationsPushNotificationsAvailable, false);
     }
 
     void testPushNotificationsAvailable_pushNotificationsNotAvailable_returnFalse () {
-        const auto &capabilities = OCC.Capabilities (QVariantMap ());
-        const auto activitiesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (OCC.PushNotificationType.Activities);
-        const auto filesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (OCC.PushNotificationType.Files);
-        const auto notificationsPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (OCC.PushNotificationType.Notifications);
+        const auto &capabilities = Occ.Capabilities (QVariantMap ());
+        const auto activitiesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Activities);
+        const auto filesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Files);
+        const auto notificationsPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Notifications);
 
         QCOMPARE (activitiesPushNotificationsAvailable, false);
         QCOMPARE (filesPushNotificationsAvailable, false);
@@ -122,7 +122,7 @@ private slots:
         QVariantMap capabilitiesMap;
         capabilitiesMap["notify_push"] = notifyPushMap;
 
-        const auto &capabilities = OCC.Capabilities (capabilitiesMap);
+        const auto &capabilities = Occ.Capabilities (capabilitiesMap);
 
         QCOMPARE (capabilities.pushNotificationsWebSocketUrl (), websocketUrl);
     }
@@ -134,7 +134,7 @@ private slots:
         QVariantMap capabilitiesMap;
         capabilitiesMap["user_status"] = userStatusMap;
 
-        const OCC.Capabilities capabilities (capabilitiesMap);
+        const Occ.Capabilities capabilities (capabilitiesMap);
 
         QVERIFY (capabilities.userStatus ());
     }
@@ -146,7 +146,7 @@ private slots:
         QVariantMap capabilitiesMap;
         capabilitiesMap["user_status"] = userStatusMap;
 
-        const OCC.Capabilities capabilities (capabilitiesMap);
+        const Occ.Capabilities capabilities (capabilitiesMap);
 
         QVERIFY (!capabilities.userStatus ());
     }
@@ -154,7 +154,7 @@ private slots:
     void testUserStatus_userStatusNotInCapabilites_returnFalse () {
         QVariantMap capabilitiesMap;
 
-        const OCC.Capabilities capabilities (capabilitiesMap);
+        const Occ.Capabilities capabilities (capabilitiesMap);
 
         QVERIFY (!capabilities.userStatus ());
     }
@@ -167,7 +167,7 @@ private slots:
         QVariantMap capabilitiesMap;
         capabilitiesMap["user_status"] = userStatusMap;
 
-        const OCC.Capabilities capabilities (capabilitiesMap);
+        const Occ.Capabilities capabilities (capabilitiesMap);
 
         QVERIFY (capabilities.userStatus ());
     }
@@ -180,7 +180,7 @@ private slots:
         QVariantMap capabilitiesMap;
         capabilitiesMap["user_status"] = userStatusMap;
 
-        const OCC.Capabilities capabilities (capabilitiesMap);
+        const Occ.Capabilities capabilities (capabilitiesMap);
 
         QVERIFY (!capabilities.userStatusSupportsEmoji ());
     }
@@ -192,7 +192,7 @@ private slots:
         QVariantMap capabilitiesMap;
         capabilitiesMap["user_status"] = userStatusMap;
 
-        const OCC.Capabilities capabilities (capabilitiesMap);
+        const Occ.Capabilities capabilities (capabilitiesMap);
 
         QVERIFY (!capabilities.userStatusSupportsEmoji ());
     }
@@ -204,7 +204,7 @@ private slots:
         QVariantMap capabilitiesMap;
         capabilitiesMap["files_sharing"] = filesSharingMap;
 
-        const OCC.Capabilities capabilities (capabilitiesMap);
+        const Occ.Capabilities capabilities (capabilitiesMap);
         const auto defaultSharePermissionsNotInCapabilities = capabilities.shareDefaultPermissions ();
 
         QCOMPARE (defaultSharePermissionsNotInCapabilities, {});
@@ -218,7 +218,7 @@ private slots:
         QVariantMap capabilitiesMap;
         capabilitiesMap["files_sharing"] = filesSharingMap;
 
-        const OCC.Capabilities capabilities (capabilitiesMap);
+        const Occ.Capabilities capabilities (capabilitiesMap);
         const auto defaultSharePermissionsAvailable = capabilities.shareDefaultPermissions ();
 
         QCOMPARE (defaultSharePermissionsAvailable, 31);
@@ -231,7 +231,7 @@ private slots:
         QVariantMap capabilitiesMap;
         capabilitiesMap["dav"] = bulkuploadMap;
 
-        const auto &capabilities = OCC.Capabilities (capabilitiesMap);
+        const auto &capabilities = Occ.Capabilities (capabilitiesMap);
         const auto bulkuploadAvailable = capabilities.bulkUpload ();
 
         QCOMPARE (bulkuploadAvailable, true);

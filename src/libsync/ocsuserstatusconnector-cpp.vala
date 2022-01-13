@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <networkjobs.h>
 
@@ -31,47 +31,47 @@ namespace {
 
 Q_LOGGING_CATEGORY (lcOcsUserStatusConnector, "nextcloud.gui.ocsuserstatusconnector", QtInfoMsg)
 
-OCC.UserStatus.OnlineStatus stringToUserOnlineStatus (QString &status) {
+Occ.UserStatus.OnlineStatus stringToUserOnlineStatus (QString &status) {
     // it needs to match the Status enum
-    const QHash<QString, OCC.UserStatus.OnlineStatus> preDefinedStatus { { "online", OCC.UserStatus.OnlineStatus.Online }, { "dnd", OCC.UserStatus.OnlineStatus.DoNotDisturb }, { "away", OCC.UserStatus.OnlineStatus.Away }, { "offline", OCC.UserStatus.OnlineStatus.Offline }, { "invisible", OCC.UserStatus.OnlineStatus.Invisible }
+    const QHash<QString, Occ.UserStatus.OnlineStatus> preDefinedStatus { { "online", Occ.UserStatus.OnlineStatus.Online }, { "dnd", Occ.UserStatus.OnlineStatus.DoNotDisturb }, { "away", Occ.UserStatus.OnlineStatus.Away }, { "offline", Occ.UserStatus.OnlineStatus.Offline }, { "invisible", Occ.UserStatus.OnlineStatus.Invisible }
     };
 
     // api should return invisible, dnd,... toLower () it is to make sure
     // it matches _preDefinedStatus, otherwise the default is online (0)
-    return preDefinedStatus.value (status.toLower (), OCC.UserStatus.OnlineStatus.Online);
+    return preDefinedStatus.value (status.toLower (), Occ.UserStatus.OnlineStatus.Online);
 }
 
-QString onlineStatusToString (OCC.UserStatus.OnlineStatus status) {
+QString onlineStatusToString (Occ.UserStatus.OnlineStatus status) {
     switch (status) {
-    case OCC.UserStatus.OnlineStatus.Online:
+    case Occ.UserStatus.OnlineStatus.Online:
         return QStringLiteral ("online");
-    case OCC.UserStatus.OnlineStatus.DoNotDisturb:
+    case Occ.UserStatus.OnlineStatus.DoNotDisturb:
         return QStringLiteral ("dnd");
-    case OCC.UserStatus.OnlineStatus.Away:
+    case Occ.UserStatus.OnlineStatus.Away:
         return QStringLiteral ("offline");
-    case OCC.UserStatus.OnlineStatus.Offline:
+    case Occ.UserStatus.OnlineStatus.Offline:
         return QStringLiteral ("offline");
-    case OCC.UserStatus.OnlineStatus.Invisible:
+    case Occ.UserStatus.OnlineStatus.Invisible:
         return QStringLiteral ("invisible");
     }
     return QStringLiteral ("online");
 }
 
-OCC.Optional<OCC.ClearAt> jsonExtractClearAt (QJsonObject jsonObject) {
-    OCC.Optional<OCC.ClearAt> clearAt {};
+Occ.Optional<Occ.ClearAt> jsonExtractClearAt (QJsonObject jsonObject) {
+    Occ.Optional<Occ.ClearAt> clearAt {};
     if (jsonObject.contains ("clearAt") && !jsonObject.value ("clearAt").isNull ()) {
-        OCC.ClearAt clearAtValue;
-        clearAtValue._type = OCC.ClearAtType.Timestamp;
+        Occ.ClearAt clearAtValue;
+        clearAtValue._type = Occ.ClearAtType.Timestamp;
         clearAtValue._timestamp = jsonObject.value ("clearAt").toInt ();
         clearAt = clearAtValue;
     }
     return clearAt;
 }
 
-OCC.UserStatus jsonExtractUserStatus (QJsonObject json) {
+Occ.UserStatus jsonExtractUserStatus (QJsonObject json) {
     const auto clearAt = jsonExtractClearAt (json);
 
-    const OCC.UserStatus userStatus (json.value ("messageId").toString (),
+    const Occ.UserStatus userStatus (json.value ("messageId").toString (),
         json.value ("message").toString ().trimmed (),
         json.value ("icon").toString ().trimmed (), stringToUserOnlineStatus (json.value ("status").toString ()),
         json.value ("messageIsPredefined").toBool (false), clearAt);
@@ -79,15 +79,15 @@ OCC.UserStatus jsonExtractUserStatus (QJsonObject json) {
     return userStatus;
 }
 
-OCC.UserStatus jsonToUserStatus (QJsonDocument &json) { { QJsonObject d { "icon", "" }, { "message", "" }, { "status", "online" }, { "messageIsPredefined", "false" },
+Occ.UserStatus jsonToUserStatus (QJsonDocument &json) { { QJsonObject d { "icon", "" }, { "message", "" }, { "status", "online" }, { "messageIsPredefined", "false" },
         { "statusIsUserDefined", "false" }
     };
     const auto retrievedData = json.object ().value ("ocs").toObject ().value ("data").toObject (defaultValues);
     return jsonExtractUserStatus (retrievedData);
 }
 
-uint64 clearAtEndOfToTimestamp (OCC.ClearAt &clearAt) {
-    Q_ASSERT (clearAt._type == OCC.ClearAtType.EndOf);
+uint64 clearAtEndOfToTimestamp (Occ.ClearAt &clearAt) {
+    Q_ASSERT (clearAt._type == Occ.ClearAtType.EndOf);
 
     if (clearAt._endof == "day") {
         return QDate.currentDate ().addDays (1).startOfDay ().toTime_t ();
@@ -99,21 +99,21 @@ uint64 clearAtEndOfToTimestamp (OCC.ClearAt &clearAt) {
     return QDateTime.currentDateTime ().toTime_t ();
 }
 
-uint64 clearAtPeriodToTimestamp (OCC.ClearAt &clearAt) {
+uint64 clearAtPeriodToTimestamp (Occ.ClearAt &clearAt) {
     return QDateTime.currentDateTime ().addSecs (clearAt._period).toTime_t ();
 }
 
-uint64 clearAtToTimestamp (OCC.ClearAt &clearAt) {
+uint64 clearAtToTimestamp (Occ.ClearAt &clearAt) {
     switch (clearAt._type) {
-    case OCC.ClearAtType.Period: {
+    case Occ.ClearAtType.Period : {
         return clearAtPeriodToTimestamp (clearAt);
     }
 
-    case OCC.ClearAtType.EndOf: {
+    case Occ.ClearAtType.EndOf : {
         return clearAtEndOfToTimestamp (clearAt);
     }
 
-    case OCC.ClearAtType.Timestamp: {
+    case Occ.ClearAtType.Timestamp : {
         return clearAt._timestamp;
     }
     }
@@ -121,27 +121,27 @@ uint64 clearAtToTimestamp (OCC.ClearAt &clearAt) {
     return 0;
 }
 
-uint64 clearAtToTimestamp (OCC.Optional<OCC.ClearAt> &clearAt) {
+uint64 clearAtToTimestamp (Occ.Optional<Occ.ClearAt> &clearAt) {
     if (clearAt) {
         return clearAtToTimestamp (*clearAt);
     }
     return 0;
 }
 
-OCC.Optional<OCC.ClearAt> jsonToClearAt (QJsonObject jsonObject) {
-    OCC.Optional<OCC.ClearAt> clearAt;
+Occ.Optional<Occ.ClearAt> jsonToClearAt (QJsonObject jsonObject) {
+    Occ.Optional<Occ.ClearAt> clearAt;
 
     if (jsonObject.value ("clearAt").isObject () && !jsonObject.value ("clearAt").isNull ()) {
-        OCC.ClearAt clearAtValue;
+        Occ.ClearAt clearAtValue;
         const auto clearAtObject = jsonObject.value ("clearAt").toObject ();
         const auto typeValue = clearAtObject.value ("type").toString ("period");
         if (typeValue == "period") {
             const auto timeValue = clearAtObject.value ("time").toInt (0);
-            clearAtValue._type = OCC.ClearAtType.Period;
+            clearAtValue._type = Occ.ClearAtType.Period;
             clearAtValue._period = timeValue;
         } else if (typeValue == "end-of") {
             const auto timeValue = clearAtObject.value ("time").toString ("day");
-            clearAtValue._type = OCC.ClearAtType.EndOf;
+            clearAtValue._type = Occ.ClearAtType.EndOf;
             clearAtValue._endof = timeValue;
         } else {
             qCWarning (lcOcsUserStatusConnector) << "Can not handle clear type value" << typeValue;
@@ -152,22 +152,22 @@ OCC.Optional<OCC.ClearAt> jsonToClearAt (QJsonObject jsonObject) {
     return clearAt;
 }
 
-OCC.UserStatus jsonToUserStatus (QJsonObject jsonObject) {
+Occ.UserStatus jsonToUserStatus (QJsonObject jsonObject) {
     const auto clearAt = jsonToClearAt (jsonObject);
 
-    OCC.UserStatus userStatus (
+    Occ.UserStatus userStatus (
         jsonObject.value ("id").toString ("no-id"),
         jsonObject.value ("message").toString ("No message"),
         jsonObject.value ("icon").toString ("no-icon"),
-        OCC.UserStatus.OnlineStatus.Online,
+        Occ.UserStatus.OnlineStatus.Online,
         true,
         clearAt);
 
     return userStatus;
 }
 
-std.vector<OCC.UserStatus> jsonToPredefinedStatuses (QJsonArray jsonDataArray) {
-    std.vector<OCC.UserStatus> statuses;
+std.vector<Occ.UserStatus> jsonToPredefinedStatuses (QJsonArray jsonDataArray) {
+    std.vector<Occ.UserStatus> statuses;
     for (auto &jsonEntry : jsonDataArray) {
         Q_ASSERT (jsonEntry.isObject ());
         if (!jsonEntry.isObject ()) {
@@ -183,9 +183,9 @@ const QString baseUrl ("/ocs/v2.php/apps/user_status/api/v1");
 const QString userStatusBaseUrl = baseUrl + QStringLiteral ("/user_status");
 }
 
-namespace OCC {
+namespace Occ {
 
-OcsUserStatusConnector.OcsUserStatusConnector (AccountPtr account, QObject *parent)
+OcsUserStatusConnector.OcsUserStatusConnector (AccountPtr account, GLib.Object *parent)
     : UserStatusConnector (parent)
     , _account (account) {
     Q_ASSERT (_account);

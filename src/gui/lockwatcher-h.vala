@@ -1,46 +1,46 @@
 /*
- * Copyright (C) by Christian Kamm <mail@ckamm.de>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Christian Kamm <mail@ckamm.de>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #pragma once
 
 // #include <QList>
-// #include <QObject>
+// #include <GLib.Object>
 // #include <QString>
 // #include <QSet>
 // #include <QTimer>
 
 // #include <chrono>
 
-namespace OCC {
+namespace Occ {
 
 /**
- * @brief Monitors files that are locked, signaling when they become unlocked
- *
- * Only relevant on Windows. Some high-profile applications like Microsoft
- * Word lock the document that is currently being edited. The synchronization
- * client will be unable to update them while they are locked.
- *
- * In this situation we do want to start a sync run as soon as the file
- * becomes available again. To do that, we need to regularly check whether
- * the file is still being locked.
- *
- * @ingroup gui
- */
+@brief Monitors files that are locked, signaling when they become unlocked
 
-class LockWatcher : public QObject {
+Only relevant on Windows. Some high-profile applications like Microsoft
+Word lock the document that is currently being edited. The syn
+client will be unable to update them while they are locked.
+
+In this situation we do want to st
+becomes available again. To do that, we need to regularly check whether
+the file is still being locked.
+
+@ingroup gui
+*/
+
+class LockWatcher : GLib.Object {
 public:
-    explicit LockWatcher (QObject *parent = nullptr);
+    LockWatcher (GLib.Object *parent = nullptr);
 
     /** Start watching a file.
      *

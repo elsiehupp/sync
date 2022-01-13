@@ -1,45 +1,44 @@
 /*
- * Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QVector>
 // #include <QList>
 // #include <QPair>
 // #include <QUrl>
 
-#define OCS_SUCCESS_STATUS_CODE 100
+const int OCS_SUCCESS_STATUS_CODE 100
 // Apparantly the v2.php URLs can return that
-#define OCS_SUCCESS_STATUS_CODE_V2 200
+const int OCS_SUCCESS_STATUS_CODE_V2 200
 // not modified when using  ETag
-#define OCS_NOT_MODIFIED_STATUS_CODE_V2 304
+const int OCS_NOT_MODIFIED_STATUS_CODE_V2 304
 
-class QJsonDocument;
 
-namespace OCC {
+namespace Occ {
 
 /**
- * @brief The OcsShareJob class
- * @ingroup gui
- *
- * Base class for jobs that talk to the OCS endpoints on the server.
- * All the communication logic is handled in this class.
- *
- * All OCS jobs (e.g. sharing) should extend this class.
- */
-class OcsJob : public AbstractNetworkJob {
+@brief The OcsShareJob class
+@ingroup gui
+
+Base class for jobs that talk to the OCS endpoints on th
+All the communication logic is handled in this class.
+
+All OCS jobs (e.g. sharing) should extend this class.
+*/
+class OcsJob : AbstractNetworkJob {
 
 protected:
-    explicit OcsJob (AccountPtr account);
+    OcsJob (AccountPtr account);
 
     /**
      * Set the verb for the job
@@ -129,7 +128,7 @@ signals:
      * @brief etagResponseHeaderReceived - signal to report the ETag response header value
      * from ocs api v2
      * @param value - the ETag response header value
-     * @param statusCode - the OCS status code: 100 (!) for success
+     * @param statusCode - the OCS status code : 100 (!) for success
      */
     void etagResponseHeaderReceived (QByteArray &value, int statusCode);
 
@@ -143,5 +142,3 @@ private:
     QNetworkRequest _request;
 };
 }
-
-#endif // OCSJOB_H

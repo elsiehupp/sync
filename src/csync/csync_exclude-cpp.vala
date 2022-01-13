@@ -1,27 +1,27 @@
 /*
- * libcsync -- a library to sync a directory with another
- *
- * Copyright (c) 2008-2013 by Andreas Schneider <asn@cryptomilk.org>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
+libcsync -- a library to sync a directory with another
+
+Copyright (c) 2008-2013 by Andreas Schneider <asn@cryptomilk.
+
+This library is free software; you can redistribute it and/o
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later vers
+
+This library is distributed in the hope that it wi
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+*/
 
 // #include <qglobal.h>
 
 #ifndef _GNU_SOURCE
-#define _GNU_SOURCE
+const int _GNU_SOURCE
 #endif
 
 #include "../version.h"
@@ -31,7 +31,7 @@
 // #include <QDir>
 
 /** Expands C-like escape sequences (in place)
- */
+*/
 OCSYNC_EXPORT void csync_exclude_expand_escapes (QByteArray &input) {
     size_t o = 0;
     char *line = input.data ();
@@ -40,17 +40,17 @@ OCSYNC_EXPORT void csync_exclude_expand_escapes (QByteArray &input) {
         if (line[i] == '\\') {
             // at worst input[i+1] is \0
             switch (line[i+1]) {
-            case '\'': line[o++] = '\''; break;
-            case '"': line[o++] = '"'; break;
-            case '?': line[o++] = '?'; break;
-            case '#': line[o++] = '#'; break;
-            case 'a': line[o++] = '\a'; break;
-            case 'b': line[o++] = '\b'; break;
-            case 'f': line[o++] = '\f'; break;
-            case 'n': line[o++] = '\n'; break;
-            case 'r': line[o++] = '\r'; break;
-            case 't': line[o++] = '\t'; break;
-            case 'v': line[o++] = '\v'; break;
+            case '\'' : line[o++] = '\''; break;
+            case '"' : line[o++] = '"'; break;
+            case '?' : line[o++] = '?'; break;
+            case '#' : line[o++] = '#'; break;
+            case 'a' : line[o++] = '\a'; break;
+            case 'b' : line[o++] = '\b'; break;
+            case 'f' : line[o++] = '\f'; break;
+            case 'n' : line[o++] = '\n'; break;
+            case 'r' : line[o++] = '\r'; break;
+            case 't' : line[o++] = '\t'; break;
+            case 'v' : line[o++] = '\v'; break;
             default:
                 // '\*' '\?' '\[' '\\' will be processed during regex translation
                 // '\\' is intentionally not expanded here (to avoid '\\*' and '\*'
@@ -64,7 +64,7 @@ OCSYNC_EXPORT void csync_exclude_expand_escapes (QByteArray &input) {
             line[o++] = line[i];
         }
     }
-    input.resize (OCC.Utility.convertSizeToInt (o));
+    input.resize (Occ.Utility.convertSizeToInt (o));
 }
 
 // See http://support.microsoft.com/kb/74496 and
@@ -78,10 +78,10 @@ static const char *win_reserved_words_4[] = {
 static const char *win_reserved_words_n[] = { "CLOCK$", "$Recycle.Bin" };
 
 /**
- * @brief Checks if filename is considered reserved by Windows
- * @param file_name filename
- * @return true if file is reserved, false otherwise
- */
+@brief Checks if filename is considered reserved by Windows
+@param file_name filename
+@return true if file is reserved, false otherwise
+*/
 OCSYNC_EXPORT bool csync_is_windows_reserved_word (QStringRef &filename) {
     size_t len_filename = filename.size ();
 
@@ -194,7 +194,7 @@ static CSYNC_EXCLUDE_TYPE _csync_excluded_common (QString &path, bool excludeCon
         return CSYNC_FILE_SILENTLY_EXCLUDED;
     }
 
-    if (excludeConflictFiles && OCC.Utility.isConflictFile (path)) {
+    if (excludeConflictFiles && Occ.Utility.isConflictFile (path)) {
         return CSYNC_FILE_EXCLUDE_CONFLICT;
     }
     return CSYNC_NOT_EXCLUDED;
@@ -205,7 +205,7 @@ static QString leftIncludeLast (QString &arr, QChar &c) {
     return arr.left (arr.lastIndexOf (c, arr.size () - 2) + 1);
 }
 
-using namespace OCC;
+using namespace Occ;
 
 ExcludedFiles.ExcludedFiles (QString &localPath)
     : _localPath (localPath)
@@ -435,7 +435,7 @@ CSYNC_EXCLUDE_TYPE ExcludedFiles.traversalPatternMatch (QString &path, ItemType 
         }
     }
 
-    // third capture: full path matching is triggered
+    // third capture : full path matching is triggered
     basePath = _localPath + path;
     while (basePath.size () > _localPath.size ()) {
         basePath = leftIncludeLast (basePath, QLatin1Char ('/'));
@@ -501,10 +501,10 @@ CSYNC_EXCLUDE_TYPE ExcludedFiles.fullPatternMatch (QString &p, ItemType filetype
 }
 
 /**
- * On linux we used to use fnmatch with FNM_PATHNAME, but the windows function we used
- * didn't have that behavior. wildcardsMatchSlash can be used to control which behavior
- * the resulting regex shall use.
- */
+On linux we used to use fnmatch with FNM_PATHNAME, but the windows function we used
+didn't have that behavior. wildcardsMatchSlash can be used to control which behavior
+the resulting regex shall use.
+*/
 QString ExcludedFiles.convertToRegexpSyntax (QString exclude, bool wildcardsMatchSlash) {
     // Translate *, ?, [...] to their regex variants.
     // The escape sequences \*, \?, \[. \\ have a special meaning,
@@ -514,7 +514,7 @@ QString ExcludedFiles.convertToRegexpSyntax (QString exclude, bool wildcardsMatc
     // QString being UTF-16 makes unicode-correct escaping tricky.
     // If we escaped each UTF-16 code unit we'd end up splitting 4-byte
     // code points. To avoid problems we delegate as much work as possible to
-    // QRegularExpression.escape (): It always receives as long a sequence
+    // QRegularExpression.escape () : It always receives as long a sequence
     // as code units as possible.
     QString regex;
     int i = 0;
@@ -542,7 +542,7 @@ QString ExcludedFiles.convertToRegexpSyntax (QString exclude, bool wildcardsMatc
                 regex.append (QStringLiteral ("[^/]"));
             }
             break;
-        case '[': {
+        case '[' : {
             flush ();
             // Find the end of the bracket expression
             auto j = i + 1;
@@ -809,7 +809,7 @@ void ExcludedFiles.prepare (BasePathString & basePath) {
             .arg (fullFileDirKeep, fullDirKeep, bnameFileDirKeep, bnameDirKeep, fullFileDirRemove, fullDirRemove, bnameFileDirRemove, bnameDirRemove));
 
     QRegularExpression.PatternOptions patternOptions = QRegularExpression.NoPatternOption;
-    if (OCC.Utility.fsCasePreserving ())
+    if (Occ.Utility.fsCasePreserving ())
         patternOptions |= QRegularExpression.CaseInsensitiveOption;
     _bnameTraversalRegexFile[basePath].setPatternOptions (patternOptions);
     _bnameTraversalRegexFile[basePath].optimize ();

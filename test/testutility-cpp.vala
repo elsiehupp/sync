@@ -7,13 +7,13 @@
 // #include <QtTest>
 // #include <QTemporaryDir>
 
-using namespace OCC.Utility;
+using namespace Occ.Utility;
 
-namespace OCC {
+namespace Occ {
 OCSYNC_EXPORT extern bool fsCasePreserving_override;
 }
 
-class TestUtility : public QObject {
+class TestUtility : GLib.Object {
 
 private slots:
     void initTestCase () {
@@ -49,7 +49,7 @@ private slots:
     }
 
     void testLaunchOnStartup () {
-        QString postfix = QString.number (OCC.Utility.rand ());
+        QString postfix = QString.number (Occ.Utility.rand ());
 
         const QString appName = QString.fromLatin1 ("testLaunchOnStartup.%1").arg (postfix);
         const QString guiName = "LaunchOnStartup GUI Name";
@@ -63,7 +63,7 @@ private slots:
 
     void testDurationToDescriptiveString () {
         QLocale.setDefault (QLocale ("C"));
-        //NOTE: in order for the plural to work we would need to load the english translation
+        //NOTE : in order for the plural to work we would need to load the english translation
 
         uint64 sec = 1000;
         uint64 hour = 3600 * sec;
@@ -109,7 +109,7 @@ private slots:
             // but cmd and gui have the same --version handler by now
             // and cmd works without X in CI
             QString ver = versionOfInstalledBinary (QStringLiteral (OWNCLOUD_BIN_PATH  "/" APPLICATION_EXECUTABLE "cmd"));
-            qDebug () << "Version of installed Nextcloud: " << ver;
+            qDebug () << "Version of installed Nextcloud : " << ver;
             QVERIFY (!ver.isEmpty ());
 
             const QRegularExpression rx (QRegularExpression.anchoredPattern (APPLICATION_SHORTNAME R" ( version \d+\.\d+\.\d+.*)"));
@@ -145,10 +145,10 @@ private slots:
 
     void testFsCasePreserving () {
         QVERIFY (isMac () || isWindows () ? fsCasePreserving () : ! fsCasePreserving ());
-        QScopedValueRollback<bool> scope (OCC.fsCasePreserving_override);
-        OCC.fsCasePreserving_override = true;
+        QScopedValueRollback<bool> scope (Occ.fsCasePreserving_override);
+        Occ.fsCasePreserving_override = true;
         QVERIFY (fsCasePreserving ());
-        OCC.fsCasePreserving_override = false;
+        Occ.fsCasePreserving_override = false;
         QVERIFY (! fsCasePreserving ());
     }
 
@@ -171,7 +171,7 @@ private slots:
         QVERIFY (fileNamesEqual (a+"/test", b+"/test")); // both exist
         QVERIFY (fileNamesEqual (a+"/test/TESTI", b+"/test/../test/TESTI")); // both exist
 
-        QScopedValueRollback<bool> scope (OCC.fsCasePreserving_override, true);
+        QScopedValueRollback<bool> scope (Occ.fsCasePreserving_override, true);
         QVERIFY (fileNamesEqual (a+"/test", b+"/TEST")); // both exist
 
         QVERIFY (!fileNamesEqual (a+"/test", b+"/test/TESTI")); // both are different
@@ -203,9 +203,9 @@ private slots:
     void testNormalizeEtag () {
         QByteArray str;
 
-#define CHECK_NORMALIZE_ETAG (TEST, EXPECT) \
-    str = OCC.Utility.normalizeEtag (TEST); \
-    QCOMPARE (str.constData (), EXPECT); \
+const int CHECK_NORMALIZE_ETAG (TEST, EXPECT)
+    str = Occ.Utility.normalizeEtag (TEST);
+    QCOMPARE (str.constData (), EXPECT);
 
         CHECK_NORMALIZE_ETAG ("foo", "foo");
         CHECK_NORMALIZE_ETAG ("\"foo\"", "foo");

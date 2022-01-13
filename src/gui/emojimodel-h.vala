@@ -1,28 +1,28 @@
 /*
- * Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #pragma once
 
-// #include <QObject>
+// #include <GLib.Object>
 // #include <QSettings>
-// #include <QObject>
+// #include <GLib.Object>
 // #include <QQmlEngine>
 // #include <QVariant>
 // #include <QVector>
 // #include <QAbstractItemModel>
 
-namespace OCC {
+namespace Occ {
 
 struct Emoji {
     Emoji (QString u, QString s, bool isCustom = false)
@@ -55,7 +55,7 @@ struct Emoji {
     Q_PROPERTY (bool isCustom MEMBER isCustom)
 };
 
-class EmojiCategoriesModel : public QAbstractListModel {
+class EmojiCategoriesModel : QAbstractListModel {
 public:
     QVariant data (QModelIndex &index, int role) const override;
     int rowCount (QModelIndex &parent = QModelIndex ()) const override;
@@ -75,7 +75,7 @@ private:
     static const std.vector<Category> categories;
 };
 
-class EmojiModel : public QObject {
+class EmojiModel : GLib.Object {
 
     Q_PROPERTY (QVariantList model READ model NOTIFY modelChanged)
     Q_PROPERTY (QAbstractListModel *emojiCategoriesModel READ emojiCategoriesModel CONSTANT)
@@ -92,15 +92,15 @@ class EmojiModel : public QObject {
     Q_PROPERTY (QVariantList flags MEMBER flags CONSTANT)
 
 public:
-    explicit EmojiModel (QObject *parent = nullptr)
-        : QObject (parent) {
+    EmojiModel (GLib.Object *parent = nullptr)
+        : GLib.Object (parent) {
     }
 
-    Q_INVOKABLE QVariantList history () const;
+    Q_INVOKABLE QVariantList history ();
     Q_INVOKABLE void setCategory (QString &category);
     Q_INVOKABLE void emojiUsed (QVariant &modelData);
 
-    QVariantList model () const;
+    QVariantList model ();
     QAbstractListModel *emojiCategoriesModel ();
 
 signals:
@@ -125,4 +125,4 @@ private:
 
 }
 
-Q_DECLARE_METATYPE (OCC.Emoji)
+Q_DECLARE_METATYPE (Occ.Emoji)

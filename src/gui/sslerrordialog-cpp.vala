@@ -1,22 +1,22 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@kde.org>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@kde.org>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QtGui>
 // #include <QtNetwork>
 // #include <QtWidgets>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcSslErrorDialog, "nextcloud.gui.sslerrordialog", QtInfoMsg)
 
@@ -79,16 +79,16 @@ SslErrorDialog.~SslErrorDialog () {
 
 QString SslErrorDialog.styleSheet () {
     const QString style = QLatin1String (
-        "#cert {margin-left: 5px;} "
+        "#cert {margin-left : 5px;} "
         "#ca_error { color:#a00011; margin-left:5px; margin-right:5px; }"
-        "#ca_error p { margin-top: 2px; margin-bottom:2px; }"
-        "#ccert { margin-left: 5px; }"
-        "#issuer { margin-left: 5px; }"
-        "tt { font-size: small; }");
+        "#ca_error p { margin-top : 2px; margin-bottom:2px; }"
+        "#ccert { margin-left : 5px; }"
+        "#issuer { margin-left : 5px; }"
+        "tt { font-size : small; }");
 
     return style;
 }
-#define QL (x) QLatin1String (x)
+const int QL (x) QLatin1String (x)
 
 bool SslErrorDialog.checkFailingCertsKnown (QList<QSslError> &errors) {
     // check if unknown certs caused errors.
@@ -182,34 +182,34 @@ QString SslErrorDialog.certDiv (QSslCertificate cert) {
         org = tr ("&lt;not specified&gt;");
     if (country.isEmpty ())
         country = tr ("&lt;not specified&gt;");
-    li << tr ("Organization: %1").arg (org);
-    li << tr ("Unit: %1").arg (unit);
-    li << tr ("Country: %1").arg (country);
+    li << tr ("Organization : %1").arg (org);
+    li << tr ("Unit : %1").arg (unit);
+    li << tr ("Country : %1").arg (country);
     msg += QL ("<p>") + li.join (QL ("<br/>")) + QL ("</p>");
 
     msg += QL ("<p>");
 
     if (cert.effectiveDate () < QDateTime (QDate (2016, 1, 1), QTime (), Qt.UTC)) {
 	QString sha1sum = Utility.formatFingerprint (cert.digest (QCryptographicHash.Sha1).toHex ());
-        msg += tr ("Fingerprint (SHA1): <tt>%1</tt>").arg (sha1sum) + QL ("<br/>");
+        msg += tr ("Fingerprint (SHA1) : <tt>%1</tt>").arg (sha1sum) + QL ("<br/>");
     }
 
     QString sha256sum = Utility.formatFingerprint (cert.digest (QCryptographicHash.Sha256).toHex ());
     QString sha512sum = Utility.formatFingerprint (cert.digest (QCryptographicHash.Sha512).toHex ());
-    msg += tr ("Fingerprint (SHA-256): <tt>%1</tt>").arg (sha256sum) + QL ("<br/>");
-    msg += tr ("Fingerprint (SHA-512): <tt>%1</tt>").arg (sha512sum) + QL ("<br/>");
+    msg += tr ("Fingerprint (SHA-256) : <tt>%1</tt>").arg (sha256sum) + QL ("<br/>");
+    msg += tr ("Fingerprint (SHA-512) : <tt>%1</tt>").arg (sha512sum) + QL ("<br/>");
     msg += QL ("<br/>");
-    msg += tr ("Effective Date: %1").arg (cert.effectiveDate ().toString ()) + QL ("<br/>");
-    msg += tr ("Expiration Date: %1").arg (cert.expiryDate ().toString ()) + QL ("</p>");
+    msg += tr ("Effective Date : %1").arg (cert.effectiveDate ().toString ()) + QL ("<br/>");
+    msg += tr ("Expiration Date : %1").arg (cert.expiryDate ().toString ()) + QL ("</p>");
 
     msg += QL ("</div>");
 
-    msg += QL ("<h3>") + tr ("Issuer: %1").arg (Utility.escape (cert.issuerInfo (QSslCertificate.CommonName))) + QL ("</h3>");
+    msg += QL ("<h3>") + tr ("Issuer : %1").arg (Utility.escape (cert.issuerInfo (QSslCertificate.CommonName))) + QL ("</h3>");
     msg += QL ("<div id=\"issuer\">");
     li.clear ();
-    li << tr ("Organization: %1").arg (Utility.escape (cert.issuerInfo (QSslCertificate.Organization)));
-    li << tr ("Unit: %1").arg (Utility.escape (cert.issuerInfo (QSslCertificate.OrganizationalUnitName)));
-    li << tr ("Country: %1").arg (Utility.escape (cert.issuerInfo (QSslCertificate.CountryName)));
+    li << tr ("Organization : %1").arg (Utility.escape (cert.issuerInfo (QSslCertificate.Organization)));
+    li << tr ("Unit : %1").arg (Utility.escape (cert.issuerInfo (QSslCertificate.OrganizationalUnitName)));
+    li << tr ("Country : %1").arg (Utility.escape (cert.issuerInfo (QSslCertificate.CountryName)));
     msg += QL ("<p>") + li.join (QL ("<br/>")) + QL ("</p>");
     msg += QL ("</div>");
     msg += QL ("</div>");
@@ -222,7 +222,7 @@ bool SslErrorDialog.trustConnection () {
         return true;
 
     bool stat = (_ui._cbTrustConnect.checkState () == Qt.Checked);
-    qCInfo (lcSslErrorDialog) << "SSL-Connection is trusted: " << stat;
+    qCInfo (lcSslErrorDialog) << "SSL-Connection is trusted : " << stat;
 
     return stat;
 }

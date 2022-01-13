@@ -1,27 +1,27 @@
 /*
- * Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 /*
- * Removing the root encrypted folder is consisted of multiple steps:
- * - 1st step is to obtain the folderID via LsColJob so it then can be used for the next step
- * - 2nd step is to lock the root folder useing the folderID from the previous step. !!! NOTE: If there are no nested items in the folder, this, and subsequent steps are skipped until step 7.
- * - 3rd step is to obtain the root folder's metadata (it contains list of nested files and folders)
- * - 4th step is to remove the nested files and folders from the metadata and send it to the server via UpdateMetadataApiJob
- * - 5th step is to trigger DeleteJob for every nested file and folder of the root folder
- * - 6th step is to unlock the root folder using the previously obtained token from locking
- * - 7th step is to decrypt and delete the root folder, because it is now possible as it has become empty
- */
+Removing the root encrypted folder is consisted of multiple steps:
+- 1st step is to obtain the folderID via LsColJob so it then can be used for the next step
+- 2nd step is to lock the root folder useing the folderID from the previous step. !!! NOTE : If there are no nested items in the folder, this, and subsequent steps are skipped until step 7.
+- 3rd step is to obtain the root folder's metadata (it contains list of nested files and folders)
+- 4th step is to remove the nested files and folders from the metadata and send it to the server via UpdateMetadataApiJob
+- 5th step is to trigger DeleteJob for every nested file and folder of the root folder
+- 6th step is to unlock the root folder using the previously obtained token from locking
+- 7th step is to decrypt and delete the root folder, because it is now possible as it has become empty
+*/
 
 // #include <QFileInfo>
 // #include <QLoggingCategory>
@@ -30,11 +30,11 @@ namespace {
   const char* encryptedFileNamePropertyKey = "encryptedFileName";
 }
 
-using namespace OCC;
+using namespace Occ;
 
 Q_LOGGING_CATEGORY (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER, "nextcloud.sync.propagator.remove.encrypted.rootfolder")
 
-PropagateRemoteDeleteEncryptedRootFolder.PropagateRemoteDeleteEncryptedRootFolder (OwncloudPropagator *propagator, SyncFileItemPtr item, QObject *parent)
+PropagateRemoteDeleteEncryptedRootFolder.PropagateRemoteDeleteEncryptedRootFolder (OwncloudPropagator *propagator, SyncFileItemPtr item, GLib.Object *parent)
     : AbstractPropagateRemoteDeleteEncrypted (propagator, item, parent) {
 
 }
@@ -42,7 +42,7 @@ PropagateRemoteDeleteEncryptedRootFolder.PropagateRemoteDeleteEncryptedRootFolde
 void PropagateRemoteDeleteEncryptedRootFolder.start () {
     Q_ASSERT (_item._isEncrypted);
 
-    const bool listFilesResult = _propagator._journal.listFilesInPath (_item._file.toUtf8 (), [this] (OCC.SyncJournalFileRecord &record) {
+    const bool listFilesResult = _propagator._journal.listFilesInPath (_item._file.toUtf8 (), [this] (Occ.SyncJournalFileRecord &record) {
         _nestedItems[record._e2eMangledName] = record;
     });
 
@@ -90,7 +90,7 @@ void PropagateRemoteDeleteEncryptedRootFolder.slotFolderEncryptedMetadataReceive
 }
 
 void PropagateRemoteDeleteEncryptedRootFolder.slotDeleteNestedRemoteItemFinished () {
-    auto *deleteJob = qobject_cast<DeleteJob *> (QObject.sender ());
+    auto *deleteJob = qobject_cast<DeleteJob> (GLib.Object.sender ());
 
     Q_ASSERT (deleteJob);
 
@@ -120,7 +120,7 @@ void PropagateRemoteDeleteEncryptedRootFolder.slotDeleteNestedRemoteItemFinished
         storeFirstErrorString (deleteJob.errorString ());
         qCWarning (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "Delete nested item finished with error" << err << ".";
     } else if (httpErrorCode != 204 && httpErrorCode != 404) {
-        // A 404 reply is also considered a success here: We want to make sure
+        // A 404 reply is also considered a success here : We want to make sure
         // a file is gone from the server. It not being there in the first place
         // is ok. This will happen for files that are in the DB but not on
         // the server or the local file system.
@@ -163,12 +163,12 @@ void PropagateRemoteDeleteEncryptedRootFolder.deleteNestedRemoteItem (QString &f
 }
 
 void PropagateRemoteDeleteEncryptedRootFolder.decryptAndRemoteDelete () {
-    auto job = new OCC.SetEncryptionFlagApiJob (_propagator.account (), _item._fileId, OCC.SetEncryptionFlagApiJob.Clear, this);
-    connect (job, &OCC.SetEncryptionFlagApiJob.success, this, [this] (QByteArray &fileId) {
+    auto job = new Occ.SetEncryptionFlagApiJob (_propagator.account (), _item._fileId, Occ.SetEncryptionFlagApiJob.Clear, this);
+    connect (job, &Occ.SetEncryptionFlagApiJob.success, this, [this] (QByteArray &fileId) {
         Q_UNUSED (fileId);
         deleteRemoteItem (_item._file);
     });
-    connect (job, &OCC.SetEncryptionFlagApiJob.error, this, [this] (QByteArray &fileId, int httpReturnCode) {
+    connect (job, &Occ.SetEncryptionFlagApiJob.error, this, [this] (QByteArray &fileId, int httpReturnCode) {
         Q_UNUSED (fileId);
         _item._httpErrorCode = httpReturnCode;
         taskFailed ();

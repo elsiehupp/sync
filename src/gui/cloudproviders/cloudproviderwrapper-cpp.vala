@@ -1,17 +1,17 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- * Copyright (C) by Julius Härtl <jus@bitgrid.net>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Julius Härtl <jus@bitgrid.net>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <glib.h>
 // #include <gio/gio.h>
@@ -23,11 +23,11 @@
 // #include <accountstate.h>
 // #include <QDesktopServices>
 
-using namespace OCC;
+using namespace Occ;
 
 GSimpleActionGroup *actionGroup = nullptr;
 
-CloudProviderWrapper.CloudProviderWrapper (QObject *parent, Folder *folder, int folderId, CloudProvidersProviderExporter* cloudprovider) : QObject (parent)
+CloudProviderWrapper.CloudProviderWrapper (GLib.Object *parent, Folder *folder, int folderId, CloudProvidersProviderExporter* cloudprovider) : GLib.Object (parent)
   , _folder (folder) {
     GMenuModel *model;
     GActionGroup *action_group;
@@ -246,8 +246,8 @@ static void
 activate_action_open (GSimpleAction *action, GVariant *parameter, gpointer user_data) {
     Q_UNUSED (parameter);
     const gchar *name = g_action_get_name (G_ACTION (action));
-    auto *self = static_cast<CloudProviderWrapper*> (user_data);
-    auto *gui = dynamic_cast<ownCloudGui*> (self.parent ().parent ());
+    auto *self = static_cast<CloudProviderWrapper> (user_data);
+    auto *gui = dynamic_cast<ownCloudGui> (self.parent ().parent ());
 
     if (g_str_equal (name, "openhelp")) {
         gui.slotHelp ();
@@ -284,7 +284,7 @@ static void
 activate_action_openrecentfile (GSimpleAction *action, GVariant *parameter, gpointer user_data) {
     Q_UNUSED (action);
     Q_UNUSED (parameter);
-    auto *self = static_cast<CloudProviderWrapper*> (user_data);
+    auto *self = static_cast<CloudProviderWrapper> (user_data);
     QDesktopServices.openUrl (self.folder ().accountState ().account ().url ());
 }
 
@@ -293,7 +293,7 @@ activate_action_pause (GSimpleAction *action,
                        GVariant      *parameter,
                        gpointer       user_data) {
     Q_UNUSED (parameter);
-    auto *self = static_cast<CloudProviderWrapper*> (user_data);
+    auto *self = static_cast<CloudProviderWrapper> (user_data);
     GVariant *old_state, *new_state;
 
     old_state = g_action_get_state (G_ACTION (action));

@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QVariantMap>
 // #include <QLoggingCategory>
@@ -18,7 +18,7 @@
 
 // #include <QDebug>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcServerCapabilities, "nextcloud.sync.server.capabilities", QtInfoMsg)
 
@@ -296,8 +296,8 @@ DirectEditor* Capabilities.getDirectEditorForOptionalMimetype (QMimeType &mimeTy
 
 /*-------------------------------------------------------------------------------------*/
 
-DirectEditor.DirectEditor (QString &id, QString &name, QObject* parent)
-    : QObject (parent)
+DirectEditor.DirectEditor (QString &id, QString &name, GLib.Object* parent)
+    : GLib.Object (parent)
     , _id (id)
     , _name (name) {
 }

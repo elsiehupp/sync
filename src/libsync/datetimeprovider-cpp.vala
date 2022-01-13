@@ -1,5 +1,5 @@
 
-namespace OCC {
+namespace Occ {
 
 DateTimeProvider.~DateTimeProvider () = default;
 

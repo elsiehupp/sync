@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@kde.org>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@kde.org>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <theme.h>
 // #include <account.h>
@@ -21,7 +21,7 @@
 
 Q_DECLARE_METATYPE (QPersistentModelIndex)
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcFolderStatus, "nextcloud.gui.folder.model", QtInfoMsg)
 
@@ -36,7 +36,7 @@ static QString removeTrailingSlash (QString &s) {
     return s;
 }
 
-FolderStatusModel.FolderStatusModel (QObject *parent)
+FolderStatusModel.FolderStatusModel (GLib.Object *parent)
     : QAbstractItemModel (parent) {
 
 }
@@ -99,7 +99,7 @@ Qt.ItemFlags FolderStatusModel.flags (QModelIndex &index) {
     const auto supportsSelectiveSync = info && info._folder && info._folder.supportsSelectiveSync ();
 
     switch (classify (index)) {
-    case AddButton: {
+    case AddButton : {
         Qt.ItemFlags ret;
         ret = Qt.ItemNeverHasChildren;
         if (!_accountState.isConnected ()) {
@@ -129,7 +129,7 @@ QVariant FolderStatusModel.data (QModelIndex &index, int role) {
         return QVariant ();
 
     switch (classify (index)) {
-    case AddButton: {
+    case AddButton : {
         if (role == FolderStatusDelegate.AddButton) {
             return QVariant (true);
         } else if (role == Qt.ToolTipRole) {
@@ -140,13 +140,13 @@ QVariant FolderStatusModel.data (QModelIndex &index, int role) {
         }
         return QVariant ();
     }
-    case SubFolder: {
-        const auto &x = static_cast<SubFolderInfo *> (index.internalPointer ())._subs.at (index.row ());
+    case SubFolder : {
+        const auto &x = static_cast<SubFolderInfo> (index.internalPointer ())._subs.at (index.row ());
         const auto supportsSelectiveSync = x._folder && x._folder.supportsSelectiveSync ();
 
         switch (role) {
         case Qt.DisplayRole:
-            //: Example text: "File.txt (23KB)"
+            // : Example text : "File.txt (23KB)"
             return x._size < 0 ? x._name : tr ("%1 (%2)").arg (x._name, Utility.octetsToString (x._size));
         case Qt.ToolTipRole:
             return QString (QLatin1String ("<qt>") + Utility.escape (x._size < 0 ? x._name : tr ("%1 (%2)").arg (x._name, Utility.octetsToString (x._size))) + QLatin1String ("</qt>"));
@@ -156,7 +156,7 @@ QVariant FolderStatusModel.data (QModelIndex &index, int role) {
             } else {
                 return QVariant ();
             }
-        case Qt.DecorationRole: {
+        case Qt.DecorationRole : {
             if (x._isEncrypted) {
                 return QIcon (QLatin1String (":/client/theme/lock-https.svg"));
             } else if (x._size > 0 && isAnyAncestorEncrypted (index)) {
@@ -171,7 +171,7 @@ QVariant FolderStatusModel.data (QModelIndex &index, int role) {
             break;
         case FileIdRole:
             return x._fileId;
-        case FolderStatusDelegate.FolderPathRole: {
+        case FolderStatusDelegate.FolderPathRole : {
             auto f = x._folder;
             if (!f)
                 return QVariant ();
@@ -180,8 +180,8 @@ QVariant FolderStatusModel.data (QModelIndex &index, int role) {
         }
     }
         return QVariant ();
-    case FetchLabel: {
-        const auto x = static_cast<SubFolderInfo *> (index.internalPointer ());
+    case FetchLabel : {
+        const auto x = static_cast<SubFolderInfo> (index.internalPointer ());
         switch (role) {
         case Qt.DisplayRole:
             if (x._hasError) {
@@ -234,7 +234,7 @@ QVariant FolderStatusModel.data (QModelIndex &index, int role) {
         return f.syncPaused ();
     case FolderStatusDelegate.FolderAccountConnected:
         return accountConnected;
-    case Qt.ToolTipRole: {
+    case Qt.ToolTipRole : {
         QString toolTip;
         if (!progress.isNull ()) {
             return progress._progressString;
@@ -379,7 +379,7 @@ int FolderStatusModel.rowCount (QModelIndex &parent) {
 }
 
 FolderStatusModel.ItemType FolderStatusModel.classify (QModelIndex &index) {
-    if (auto sub = static_cast<SubFolderInfo *> (index.internalPointer ())) {
+    if (auto sub = static_cast<SubFolderInfo> (index.internalPointer ())) {
         if (sub.hasLabel ()) {
             return FetchLabel;
         } else {
@@ -395,7 +395,7 @@ FolderStatusModel.ItemType FolderStatusModel.classify (QModelIndex &index) {
 FolderStatusModel.SubFolderInfo *FolderStatusModel.infoForIndex (QModelIndex &index) {
     if (!index.isValid ())
         return nullptr;
-    if (auto parentInfo = static_cast<SubFolderInfo *> (index.internalPointer ())) {
+    if (auto parentInfo = static_cast<SubFolderInfo> (index.internalPointer ())) {
         if (parentInfo.hasLabel ()) {
             return nullptr;
         }
@@ -408,7 +408,7 @@ FolderStatusModel.SubFolderInfo *FolderStatusModel.infoForIndex (QModelIndex &in
             // AddButton
             return nullptr;
         }
-        return const_cast<SubFolderInfo *> (&_folders[index.row ()]);
+        return const_cast<SubFolderInfo> (&_folders[index.row ()]);
     }
 }
 
@@ -484,9 +484,9 @@ QModelIndex FolderStatusModel.index (int row, int column, QModelIndex &parent) {
     case RootFolder:
         if (_folders.count () <= parent.row ())
             return {}; // should not happen
-        return createIndex (row, column, const_cast<SubFolderInfo *> (&_folders[parent.row ()]));
-    case SubFolder: {
-        auto pinfo = static_cast<SubFolderInfo *> (parent.internalPointer ());
+        return createIndex (row, column, const_cast<SubFolderInfo> (&_folders[parent.row ()]));
+    case SubFolder : {
+        auto pinfo = static_cast<SubFolderInfo> (parent.internalPointer ());
         if (pinfo._subs.count () <= parent.row ())
             return {}; // should not happen
         auto &info = pinfo._subs[parent.row ()];
@@ -511,7 +511,7 @@ QModelIndex FolderStatusModel.parent (QModelIndex &child) {
     case FetchLabel:
         break;
     }
-    auto pathIdx = static_cast<SubFolderInfo *> (child.internalPointer ())._pathIdx;
+    auto pathIdx = static_cast<SubFolderInfo> (child.internalPointer ())._pathIdx;
     int i = 1;
     ASSERT (pathIdx.at (0) < _folders.count ());
     if (pathIdx.count () == 1) {
@@ -524,7 +524,7 @@ QModelIndex FolderStatusModel.parent (QModelIndex &child) {
         info = &info._subs.at (pathIdx.at (i));
         ++i;
     }
-    return createIndex (pathIdx.at (i), 0, const_cast<SubFolderInfo *> (info));
+    return createIndex (pathIdx.at (i), 0, const_cast<SubFolderInfo> (info));
 }
 
 bool FolderStatusModel.hasChildren (QModelIndex &parent) {
@@ -640,7 +640,7 @@ void FolderStatusModel.slotGatherEncryptionStatus (QString &href, QMap<QString, 
 }
 
 void FolderStatusModel.slotUpdateDirectories (QStringList &list) {
-    auto job = qobject_cast<LsColJob *> (sender ());
+    auto job = qobject_cast<LsColJob> (sender ());
     ASSERT (job);
     QModelIndex idx = qvariant_cast<QPersistentModelIndex> (job.property (propertyParentIndexC));
     auto parentInfo = infoForIndex (idx);
@@ -788,7 +788,7 @@ void FolderStatusModel.slotUpdateDirectories (QStringList &list) {
 }
 
 void FolderStatusModel.slotLscolFinishedWithError (QNetworkReply *r) {
-    auto job = qobject_cast<LsColJob *> (sender ());
+    auto job = qobject_cast<LsColJob> (sender ());
     ASSERT (job);
     QModelIndex idx = qvariant_cast<QPersistentModelIndex> (job.property (propertyParentIndexC));
     if (!idx.isValid ()) {
@@ -904,12 +904,12 @@ void FolderStatusModel.slotApplySelectiveSync () {
 }
 
 void FolderStatusModel.slotSetProgress (ProgressInfo &progress) {
-    auto par = qobject_cast<QWidget *> (QObject.parent ());
+    auto par = qobject_cast<QWidget> (GLib.Object.parent ());
     if (!par.isVisible ()) {
         return; // for https://github.com/owncloud/client/issues/2648#issuecomment-71377909
     }
 
-    auto *f = qobject_cast<Folder *> (sender ());
+    auto *f = qobject_cast<Folder> (sender ());
     if (!f) {
         return;
     }
@@ -957,7 +957,7 @@ void FolderStatusModel.slotSetProgress (ProgressInfo &progress) {
         pi._warningCount++;
     }
 
-    // find the single item to display:  This is going to be the bigger item, or the last completed
+    // find the single item to display :  This is going to be the bigger item, or the last completed
     // item if no items are in progress.
     SyncFileItem curItem = progress._lastCompletedItem;
     int64 curItemProgress = -1; // -1 means finished
@@ -979,10 +979,10 @@ void FolderStatusModel.slotSetProgress (ProgressInfo &progress) {
         }
         auto fileName = QFileInfo (citm._item._file).fileName ();
         if (allFilenames.length () > 0) {
-            //: Build a list of file names
+            // : Build a list of file names
             allFilenames.append (QStringLiteral (", \"%1\"").arg (fileName));
         } else {
-            //: Argument is a file name
+            // : Argument is a file name
             allFilenames.append (QStringLiteral ("\"%1\"").arg (fileName));
         }
     }
@@ -1000,17 +1000,17 @@ void FolderStatusModel.slotSetProgress (ProgressInfo &progress) {
         //uint64 estimatedBw = progress.fileProgress (curItem).estimatedBandwidth;
         if (estimatedUpBw || estimatedDownBw) {
             /*
-            //: Example text: "uploading foobar.png (1MB of 2MB) time left 2 minutes at a rate of 24Kb/s"
+            // : Example text : "uploading foobar.png (1MB of 2MB) time left 2 minutes at a rate of 24Kb/s"
             fileProgressString = tr ("%1 %2 (%3 of %4) %5 left at a rate of %6/s")
                 .arg (kindString, itemFileName, s1, s2,
                     Utility.durationToDescriptiveString (progress.fileProgress (curItem).estimatedEta),
                     Utility.octetsToString (estimatedBw) );
             */
-            //: Example text: "Syncing 'foo.txt', 'bar.txt'"
+            // : Example text : "Syncing 'foo.txt', 'bar.txt'"
             fileProgressString = tr ("Syncing %1").arg (allFilenames);
             if (estimatedDownBw > 0) {
                 fileProgressString.append (tr (", "));
-// ifdefs: https://github.com/owncloud/client/issues/3095#issuecomment-128409294
+// ifdefs : https://github.com/owncloud/client/issues/3095#issuecomment-128409294
                 fileProgressString.append (tr ("\u2193 %1/s")
                                               .arg (Utility.octetsToString (estimatedDownBw)));
             }
@@ -1020,11 +1020,11 @@ void FolderStatusModel.slotSetProgress (ProgressInfo &progress) {
                                               .arg (Utility.octetsToString (estimatedUpBw)));
             }
         } else {
-            //: Example text: "uploading foobar.png (2MB of 2MB)"
+            // : Example text : "uploading foobar.png (2MB of 2MB)"
             fileProgressString = tr ("%1 %2 (%3 of %4)").arg (kindString, itemFileName, s1, s2);
         }
     } else if (!kindString.isEmpty ()) {
-        //: Example text: "uploading foobar.png"
+        // : Example text : "uploading foobar.png"
         fileProgressString = tr ("%1 %2").arg (kindString, itemFileName);
     }
     pi._progressString = fileProgressString;
@@ -1041,7 +1041,7 @@ void FolderStatusModel.slotSetProgress (ProgressInfo &progress) {
         QString s2 = Utility.octetsToString (totalSize);
 
         if (progress.trustEta ()) {
-            //: Example text: "5 minutes left, 12 MB of 345 MB, file 6 of 7"
+            // : Example text : "5 minutes left, 12 MB of 345 MB, file 6 of 7"
             overallSyncString = tr ("%5 left, %1 of %2, file %3 of %4")
                                     .arg (s1, s2)
                                     .arg (currentFile)
@@ -1049,7 +1049,7 @@ void FolderStatusModel.slotSetProgress (ProgressInfo &progress) {
                                     .arg (Utility.durationToDescriptiveString1 (progress.totalProgress ().estimatedEta));
 
         } else {
-            //: Example text: "12 MB of 345 MB, file 6 of 7"
+            // : Example text : "12 MB of 345 MB, file 6 of 7"
             overallSyncString = tr ("%1 of %2, file %3 of %4")
                                     .arg (s1, s2)
                                     .arg (currentFile)
@@ -1205,7 +1205,7 @@ void FolderStatusModel.slotSyncNoPendingBigFolders () {
 }
 
 void FolderStatusModel.slotNewBigFolder () {
-    auto f = qobject_cast<Folder *> (sender ());
+    auto f = qobject_cast<Folder> (sender ());
     ASSERT (f);
 
     int folderIndex = -1;
@@ -1270,4 +1270,4 @@ void FolderStatusModel.SubFolderInfo.resetSubs (FolderStatusModel *model, QModel
     }
 }
 
-} // namespace OCC
+} // namespace Occ

@@ -1,5 +1,5 @@
 
-namespace OCC {
+namespace Occ {
 
 ProfilePageMenu.ProfilePageMenu (AccountPtr account, QString &shareWithUserId, QWidget *parent)
     : QWidget (parent)

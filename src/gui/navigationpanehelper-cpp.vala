@@ -1,21 +1,21 @@
 /*
- * Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QDir>
 // #include <QCoreApplication>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcNavPane, "nextcloud.gui.folder.navigationpane", QtInfoMsg)
 
@@ -79,7 +79,7 @@ void NavigationPaneHelper.updateCloudStorageRegistry () {
                 QString iconPath = QDir.toNativeSeparators (qApp.applicationFilePath ());
                 QString targetFolderPath = QDir.toNativeSeparators (folder.cleanPath ());
 
-                qCInfo (lcNavPane) << "Explorer Cloud storage provider: saving path" << targetFolderPath << "to CLSID" << clsidStr;
+                qCInfo (lcNavPane) << "Explorer Cloud storage provider : saving path" << targetFolderPath << "to CLSID" << clsidStr;
 
                 // This code path should only occur on Windows (the config will be false, and the checkbox invisible on other platforms).
                 // Add runtime checks rather than #ifdefing out the whole code to help catch breakages when developing on other platforms.
@@ -97,8 +97,8 @@ void NavigationPaneHelper.updateCloudStorageRegistry () {
         QString clsidPathWow64 = QString () % R" (Software\Classes\Wow6432Node\CLSID\)" % clsidStr;
         QString namespacePath = QString () % R" (Software\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\)" % clsidStr;
 
-        qCInfo (lcNavPane) << "Explorer Cloud storage provider: now unused, removing own CLSID" << clsidStr;
+        qCInfo (lcNavPane) << "Explorer Cloud storage provider : now unused, removing own CLSID" << clsidStr;
     }
 }
 
-} // namespace OCC
+} // namespace Occ

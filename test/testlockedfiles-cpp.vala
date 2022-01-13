@@ -1,17 +1,17 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *    support, and with no warranty, express or implied, as to its usefulness for
- *    any purpose.
- *
- */
+   This software is in the public domain, furnished "as is", without technical
+   support, and with no warranty, express or implied, as to its usefulness for
+   any purpose.
+
+*/
 
 // #include <QtTest>
 // #include <syncengine.h>
 // #include <localdiscoverytracker.h>
 
-using namespace OCC;
+using namespace Occ;
 
-class TestLockedFiles : public QObject {
+class TestLockedFiles : GLib.Object {
 
 private slots:
     void testBasicLockFileWatcher () {

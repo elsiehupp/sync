@@ -1,7 +1,7 @@
 
 // #include <openssl/rand.h>
 
-namespace OCC {
+namespace Occ {
 namespace WordList {
 
 // #include <initializer_list>

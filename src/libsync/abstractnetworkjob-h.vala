@@ -1,21 +1,21 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #pragma once
 
-// #include <QObject>
+// #include <GLib.Object>
 // #include <QNetworkRequest>
 // #include <QNetworkReply>
 // #include <QPointer>
@@ -23,19 +23,17 @@
 // #include <QDateTime>
 // #include <QTimer>
 
-class QUrl;
 
-namespace OCC {
+namespace Occ {
 
-class AbstractSslErrorHandler;
 
 /**
- * @brief The AbstractNetworkJob class
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT AbstractNetworkJob : public QObject {
+@brief The AbstractNetworkJob class
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT AbstractNetworkJob : GLib.Object {
 public:
-    explicit AbstractNetworkJob (AccountPtr account, QString &path, QObject *parent = nullptr);
+    AbstractNetworkJob (AccountPtr account, QString &path, GLib.Object *parent = nullptr);
     ~AbstractNetworkJob () override;
 
     virtual void start ();
@@ -72,7 +70,7 @@ public:
     bool timedOut () { return _timedout; }
 
     /** Returns an error message, if any. */
-    virtual QString errorString () const;
+    virtual QString errorString ();
 
     /** Like errorString, but also checking the reply body for information.
      *
@@ -82,7 +80,7 @@ public:
      *
      * \a body is optinally filled with the reply body.
      *
-     * Warning: Needs to call reply ().readAll ().
+     * Warning : Needs to call reply ().readAll ().
      */
     QString errorStringParsingBody (QByteArray *body = nullptr);
 
@@ -206,8 +204,8 @@ private:
 };
 
 /**
- * @brief Internal Helper class
- */
+@brief Internal Helper class
+*/
 class NetworkJobTimeoutPauser {
 public:
     NetworkJobTimeoutPauser (QNetworkReply *reply);
@@ -218,26 +216,26 @@ private:
 };
 
 /** Gets the SabreDAV-style error message from an error response.
- *
- * This assumes the response is XML with a 'error' tag that has a
- * 'message' tag that contains the data to extract.
- *
- * Returns a null string if no message was found.
- */
+
+This assumes the response is XML with a 'error' tag that has a
+'message' tag that contains the data to extract.
+
+Returns a null string if no message was found.
+*/
 QString OWNCLOUDSYNC_EXPORT extractErrorMessage (QByteArray &errorResponse);
 
 /** Builds a error message based on the error and the reply body. */
 QString OWNCLOUDSYNC_EXPORT errorMessage (QString &baseError, QByteArray &body);
 
 /** Nicer errorString () for QNetworkReply
- *
- * By default QNetworkReply.errorString () often produces messages like
- *   "Error downloading <url> - server replied: <reason>"
- * but the "downloading" part invariably confuses people since the
- * error might very well have been produced by a PUT request.
- *
- * This function produces clearer error messages for HTTP errors.
- */
+
+By default QNetworkReply.errorString () often produces messages like
+  "Error downloading <url> - server replied : <reason>"
+but the "downloading" part invariably confuses people since the
+error might very well have been produced by a PUT request.
+
+This function produces clearer error messages for HTTP errors.
+*/
 QString OWNCLOUDSYNC_EXPORT networkReplyErrorString (QNetworkReply &reply);
 
-} // namespace OCC
+} // namespace Occ

@@ -1,40 +1,40 @@
 /*
- * Copyright (C) by Christian Kamm <mail@ckamm.de>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Christian Kamm <mail@ckamm.de>
 
-// #include <QObject>
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
 
-namespace OCC {
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
+
+// #include <GLib.Object>
+
+namespace Occ {
 
 namespace PinStateEnums {
 OCSYNC_EXPORT Q_NAMESPACE
 
 /** Determines whether items should be available locally permanently or not
- *
- * The idea is that files and folders can be marked with the user intent
- * on availability.
- *
- * The Inherited state is used for resetting a pin state to what its
- * parent path would do.
- *
- * The pin state of a directory usually only matters for the initial pin and
- * hydration state of new remote files. It's perfectly possible for a
- * AlwaysLocal directory to have only OnlineOnly items. (though setting pin
- * states is usually done recursively, so one'd need to set the folder to
- * pinned and then each contained item to unpinned)
- *
- * Note: This enum intentionally mimics CF_PIN_STATE of Windows cfapi.
- */
+
+The idea is that files and folders can be marked with the user intent
+on availability.
+
+The Inherited state is u
+parent path would do.
+
+The pin state of a directory usually only matters for the initial pin an
+hydration state of new remote files. It's perfectly possible for a
+AlwaysLocal directory to have only OnlineOnly items
+states is usually done recursively, so one'd need to set the folder to
+pinned and then each contained item to unpinned)
+
+Note : This enum intentionally mimics CF_PIN_STATE of Windows cfapi.
+*/
 enum class PinState {
     /** The pin state is derived from the state of the parent folder.
      *
@@ -75,18 +75,18 @@ enum class PinState {
 Q_ENUM_NS (PinState)
 
 /** A user-facing version of PinState.
- *
- * PinStates communicate availability intent for an item, but particular
- * situations can get complex: An AlwaysLocal folder can have OnlineOnly
- * files or directories.
- *
- * For users this is condensed to a few useful cases.
- *
- * Note that this is only about *intent*. The file could still be out of date,
- * or not have been synced for other reasons, like errors.
- *
- * NOTE: The numerical values and ordering of this enum are relevant.
- */
+
+PinStates communicate availability intent for an item, but particular
+situations can get complex : An AlwaysLocal folder can have OnlineOnly
+files or directories.
+
+For users this is condensed to a few useful cases.
+
+Note that this is only about *intent*. The file could still be out of date,
+or not have been synced for other reasons, like errors.
+
+NOTE : The numerical values and ordering of this enum are relevant.
+*/
 enum class VfsItemAvailability {
     /** The item and all its subitems are hydrated and pinned AlwaysLocal.
      *

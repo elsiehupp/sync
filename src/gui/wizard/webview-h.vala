@@ -1,20 +1,16 @@
 #ifndef WEBVIEW_H
-#define WEBVIEW_H
+const int WEBVIEW_H
 
 // #include <QUrl>
 // #include <QWidget>
 
-class QWebEngineView;
 class QWebEngineProfile;
-class QWebEnginePage;
 
-namespace OCC {
+namespace Occ {
 
-class WebViewPageUrlRequestInterceptor;
 class WebViewPageUrlSchemeHandler;
-class WebEnginePage;
 
-class WebView : public QWidget {
+class WebView : QWidget {
 public:
     WebView (QWidget *parent = nullptr);
     ~WebView () override;
@@ -35,5 +31,3 @@ private:
 };
 
 }
-
-#endif // WEBVIEW_H

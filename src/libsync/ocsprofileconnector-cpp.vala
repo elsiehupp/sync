@@ -14,10 +14,10 @@
 namespace {
 Q_LOGGING_CATEGORY (lcOcsProfileConnector, "nextcloud.gui.ocsprofileconnector", QtInfoMsg)
 
-OCC.HovercardAction jsonToAction (QJsonObject &jsonActionObject) {
+Occ.HovercardAction jsonToAction (QJsonObject &jsonActionObject) {
     const auto iconUrl = jsonActionObject.value (QStringLiteral ("icon")).toString (QStringLiteral ("no-icon"));
     QPixmap iconPixmap;
-    OCC.HovercardAction hovercardAction{
+    Occ.HovercardAction hovercardAction{
         jsonActionObject.value (QStringLiteral ("title")).toString (QStringLiteral ("No title")), iconUrl,
         jsonActionObject.value (QStringLiteral ("hyperlink")).toString (QStringLiteral ("no-link"))};
     if (QPixmapCache.find (iconUrl, &iconPixmap)) {
@@ -26,8 +26,8 @@ OCC.HovercardAction jsonToAction (QJsonObject &jsonActionObject) {
     return hovercardAction;
 }
 
-OCC.Hovercard jsonToHovercard (QJsonArray &jsonDataArray) {
-    OCC.Hovercard hovercard;
+Occ.Hovercard jsonToHovercard (QJsonArray &jsonDataArray) {
+    Occ.Hovercard hovercard;
     hovercard._actions.reserve (jsonDataArray.size ());
     for (auto &jsonEntry : jsonDataArray) {
         Q_ASSERT (jsonEntry.isObject ());
@@ -39,13 +39,13 @@ OCC.Hovercard jsonToHovercard (QJsonArray &jsonDataArray) {
     return hovercard;
 }
 
-OCC.Optional<QPixmap> createPixmapFromSvgData (QByteArray &iconData) {
+Occ.Optional<QPixmap> createPixmapFromSvgData (QByteArray &iconData) {
     QSvgRenderer svgRenderer;
     if (!svgRenderer.load (iconData)) {
         return {};
     }
     QSize imageSize{16, 16};
-    if (OCC.Theme.isHidpi ()) {
+    if (Occ.Theme.isHidpi ()) {
         imageSize = QSize{32, 32};
     }
     QImage scaledSvg (imageSize, QImage.Format_ARGB32);
@@ -55,7 +55,7 @@ OCC.Optional<QPixmap> createPixmapFromSvgData (QByteArray &iconData) {
     return QPixmap.fromImage (scaledSvg);
 }
 
-OCC.Optional<QPixmap> iconDataToPixmap (QByteArray iconData) {
+Occ.Optional<QPixmap> iconDataToPixmap (QByteArray iconData) {
     if (!iconData.startsWith ("<svg")) {
         return {};
     }
@@ -63,7 +63,7 @@ OCC.Optional<QPixmap> iconDataToPixmap (QByteArray iconData) {
 }
 }
 
-namespace OCC {
+namespace Occ {
 
 HovercardAction.HovercardAction () = default;
 
@@ -73,8 +73,8 @@ HovercardAction.HovercardAction (QString title, QUrl iconUrl, QUrl link)
     , _link (std.move (link)) {
 }
 
-OcsProfileConnector.OcsProfileConnector (AccountPtr account, QObject *parent)
-    : QObject (parent)
+OcsProfileConnector.OcsProfileConnector (AccountPtr account, GLib.Object *parent)
+    : GLib.Object (parent)
     , _account (account) {
 }
 
@@ -114,7 +114,7 @@ void OcsProfileConnector.setHovercardActionIcon (std.size_t index, QPixmap &pixm
 
 void OcsProfileConnector.loadHovercardActionIcon (std.size_t hovercardActionIndex, QByteArray &iconData) {
     if (hovercardActionIndex >= _currentHovercard._actions.size ()) {
-        // Note: Probably could do more checking, like checking if the url is still the same.
+        // Note : Probably could do more checking, like checking if the url is still the same.
         return;
     }
     const auto icon = iconDataToPixmap (iconData);

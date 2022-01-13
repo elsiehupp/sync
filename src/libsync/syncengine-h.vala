@@ -1,17 +1,17 @@
 /*
- * Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #pragma once
 
@@ -26,13 +26,10 @@
 // #include <QSharedPointer>
 // #include <set>
 
-class QProcess;
 
-namespace OCC {
+namespace Occ {
 
-class SyncJournalFileRecord;
 class SyncJournalDb;
-class OwncloudPropagator;
 class ProcessDirectoryJob;
 
 enum AnotherSyncNeeded {
@@ -42,10 +39,10 @@ enum AnotherSyncNeeded {
 };
 
 /**
- * @brief The SyncEngine class
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT SyncEngine : public QObject {
+@brief The SyncEngine class
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT SyncEngine : GLib.Object {
 public:
     SyncEngine (AccountPtr account, QString &localPath,
         const QString &remotePath, SyncJournalDb *journal);
@@ -73,7 +70,7 @@ public:
 
     bool wasFileTouched (QString &fn) const;
 
-    AccountPtr account () const;
+    AccountPtr account ();
     SyncJournalDb *journal () { return _journal; }
     QString localPath () { return _localPath; }
 
@@ -106,7 +103,7 @@ public:
      * Returns whether the given folder-relative path should be locally discovered
      * given the local discovery options.
      *
-     * Example: If path is 'foo/bar' and style is DatabaseAndFilesystem and dirs contains
+     * Example : If path is 'foo/bar' and style is DatabaseAndFilesystem and dirs contains
      *     'foo/bar/touched_file', then the result will be true.
      */
     bool shouldDiscoverLocally (QString &path) const;

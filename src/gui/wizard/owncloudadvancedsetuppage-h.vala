@@ -1,31 +1,29 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- * Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QWizard>
 
-class QProgressIndicator;
 
-namespace OCC {
+namespace Occ {
 
-class OwncloudWizard;
 
 /**
- * @brief The OwncloudAdvancedSetupPage class
- * @ingroup gui
- */
-class OwncloudAdvancedSetupPage : public QWizardPage {
+@brief The OwncloudAdvancedSetupPage class
+@ingroup gui
+*/
+class OwncloudAdvancedSetupPage : QWizardPage {
 public:
     OwncloudAdvancedSetupPage (OwncloudWizard *wizard);
 
@@ -33,10 +31,10 @@ public:
     void initializePage () override;
     int nextId () const override;
     bool validatePage () override;
-    QString localFolder () const;
-    QStringList selectiveSyncBlacklist () const;
-    bool useVirtualFileSync () const;
-    bool isConfirmBigFolderChecked () const;
+    QString localFolder ();
+    QStringList selectiveSyncBlacklist ();
+    bool useVirtualFileSync ();
+    bool isConfirmBigFolderChecked ();
     void setRemoteFolder (QString &remoteFolder);
     void setMultipleFoldersExist (bool exist);
     void directoriesCreated ();
@@ -63,8 +61,8 @@ private:
     bool dataChanged ();
     void startSpinner ();
     void stopSpinner ();
-    QUrl serverUrl () const;
-    int64 availableLocalSpace () const;
+    QUrl serverUrl ();
+    int64 availableLocalSpace ();
     QString checkLocalSpace (int64 remoteSize) const;
     void customizeStyle ();
     void setServerAddressLabelUrl (QUrl &url);
@@ -76,7 +74,7 @@ private:
     void fetchUserAvatar ();
     void setUserInformation ();
 
-    // TODO: remove when UX decision is made
+    // TODO : remove when UX decision is made
     void refreshVirtualFilesAvailibility (QString &path);
 
     Ui_OwncloudAdvancedSetupPage _ui;
@@ -91,6 +89,6 @@ private:
     OwncloudWizard *_ocWizard;
 };
 
-} // namespace OCC
+} // namespace Occ
 
 #endif

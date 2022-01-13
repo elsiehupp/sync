@@ -1,35 +1,35 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *    support, and with no warranty, express or implied, as to its usefulness for
- *    any purpose.
- *
- */
+   This software is in the public domain, furnished "as is", without technical
+   support, and with no warranty, express or implied, as to its usefulness for
+   any purpose.
+
+*/
 
 // #include <QtTest>
 // #include <syncengine.h>
 
 namespace xattr {
-using namespace OCC.XAttrWrapper;
+using namespace Occ.XAttrWrapper;
 }
 
-#define XAVERIFY_VIRTUAL (folder, path) \
-    QVERIFY (QFileInfo ( (folder).localPath () + (path)).exists ()); \
-    QCOMPARE (QFileInfo ( (folder).localPath () + (path)).size (), 1); \
-    QVERIFY (xattr.hasNextcloudPlaceholderAttributes ( (folder).localPath () + (path))); \
-    QVERIFY (dbRecord ( (folder), (path)).isValid ()); \
+const int XAVERIFY_VIRTUAL (folder, path)
+    QVERIFY (QFileInfo ( (folder).localPath () + (path)).exists ());
+    QCOMPARE (QFileInfo ( (folder).localPath () + (path)).size (), 1);
+    QVERIFY (xattr.hasNextcloudPlaceholderAttributes ( (folder).localPath () + (path)));
+    QVERIFY (dbRecord ( (folder), (path)).isValid ());
     QCOMPARE (dbRecord ( (folder), (path))._type, ItemTypeVirtualFile);
 
-#define XAVERIFY_NONVIRTUAL (folder, path) \
-    QVERIFY (QFileInfo ( (folder).localPath () + (path)).exists ()); \
-    QVERIFY (!xattr.hasNextcloudPlaceholderAttributes ( (folder).localPath () + (path))); \
-    QVERIFY (dbRecord ( (folder), (path)).isValid ()); \
+const int XAVERIFY_NONVIRTUAL (folder, path)
+    QVERIFY (QFileInfo ( (folder).localPath () + (path)).exists ());
+    QVERIFY (!xattr.hasNextcloudPlaceholderAttributes ( (folder).localPath () + (path)));
+    QVERIFY (dbRecord ( (folder), (path)).isValid ());
     QCOMPARE (dbRecord ( (folder), (path))._type, ItemTypeFile);
 
-#define CFVERIFY_GONE (folder, path) \
-    QVERIFY (!QFileInfo ( (folder).localPath () + (path)).exists ()); \
+const int CFVERIFY_GONE (folder, path)
+    QVERIFY (!QFileInfo ( (folder).localPath () + (path)).exists ());
     QVERIFY (!dbRecord ( (folder), (path)).isValid ());
 
-using namespace OCC;
+using namespace Occ;
 
 bool itemInstruction (ItemCompletedSpy &spy, QString &path, SyncInstructions instr) {
     auto item = spy.findItem (path);
@@ -66,7 +66,7 @@ void markForDehydration (FakeFolder &folder, QByteArray &path) {
 
 QSharedPointer<Vfs> setupVfs (FakeFolder &folder) {
     auto xattrVfs = QSharedPointer<Vfs> (createVfsFromPlugin (Vfs.XAttr).release ());
-    QObject.connect (&folder.syncEngine ().syncFileStatusTracker (), &SyncFileStatusTracker.fileStatusChanged,
+    GLib.Object.connect (&folder.syncEngine ().syncFileStatusTracker (), &SyncFileStatusTracker.fileStatusChanged,
                      xattrVfs.data (), &Vfs.fileStatusChanged);
     folder.switchToVfs (xattrVfs);
 
@@ -77,7 +77,7 @@ QSharedPointer<Vfs> setupVfs (FakeFolder &folder) {
     return xattrVfs;
 }
 
-class TestSyncXAttr : public QObject {
+class TestSyncXAttr : GLib.Object {
 
 private slots:
     void testVirtualFileLifecycle_data () {
@@ -193,7 +193,7 @@ private slots:
         QVERIFY (!dbRecord (fakeFolder, "A/a1m").isValid ());
         cleanup ();
 
-        // Edge case: Local virtual file but no db entry for some reason
+        // Edge case : Local virtual file but no db entry for some reason
         fakeFolder.remoteModifier ().insert ("A/a2", 32);
         fakeFolder.remoteModifier ().insert ("A/a3", 33);
         QVERIFY (fakeFolder.syncOnce ());
@@ -248,8 +248,8 @@ private slots:
         fakeFolder.remoteModifier ().appendByte ("A/a2");
         fakeFolder.remoteModifier ().appendByte ("B/b1");
 
-        // A: the correct file and a conflicting file are added
-        // B: user adds a *directory* locally
+        // A : the correct file and a conflicting file are added
+        // B : user adds a *directory* locally
         fakeFolder.localModifier ().remove ("A/a1");
         fakeFolder.localModifier ().insert ("A/a1", 12);
         fakeFolder.localModifier ().remove ("A/a2");
@@ -607,27 +607,27 @@ private slots:
 
         cleanup ();
 
-        // Case 1: non-virtual, foo . bar (tested elsewhere)
-        // Case 2: virtual, foo . bar (tested elsewhere)
+        // Case 1 : non-virtual, foo . bar (tested elsewhere)
+        // Case 2 : virtual, foo . bar (tested elsewhere)
 
-        // Case 3: virtual, foo.oc . bar.oc (db hydrate)
+        // Case 3 : virtual, foo.oc . bar.oc (db hydrate)
         fakeFolder.localModifier ().rename ("case3", "case3-rename");
         triggerDownload (fakeFolder, "case3");
 
-        // Case 4: non-virtual foo . bar (db dehydrate)
+        // Case 4 : non-virtual foo . bar (db dehydrate)
         fakeFolder.localModifier ().rename ("case4", "case4-rename");
         markForDehydration (fakeFolder, "case4");
 
         QVERIFY (fakeFolder.syncOnce ());
 
-        // Case 3: the rename went though, hydration is forgotten
+        // Case 3 : the rename went though, hydration is forgotten
         CFVERIFY_GONE (fakeFolder, "case3");
         XAVERIFY_VIRTUAL (fakeFolder, "case3-rename");
         QVERIFY (!fakeFolder.currentRemoteState ().find ("case3"));
         QVERIFY (fakeFolder.currentRemoteState ().find ("case3-rename"));
         QVERIFY (itemInstruction (completeSpy, "case3-rename", CSYNC_INSTRUCTION_RENAME));
 
-        // Case 4: the rename went though, dehydration is forgotten
+        // Case 4 : the rename went though, dehydration is forgotten
         CFVERIFY_GONE (fakeFolder, "case4");
         XAVERIFY_NONVIRTUAL (fakeFolder, "case4-rename");
         QVERIFY (!fakeFolder.currentRemoteState ().find ("case4"));
@@ -657,25 +657,25 @@ private slots:
 
         markForDehydration (fakeFolder, "A/a2");
         fakeFolder.remoteModifier ().appendByte ("A/a2");
-        // expect: normal dehydration
+        // expect : normal dehydration
 
         markForDehydration (fakeFolder, "B/b1");
         fakeFolder.remoteModifier ().remove ("B/b1");
-        // expect: local removal
+        // expect : local removal
 
         markForDehydration (fakeFolder, "B/b2");
         fakeFolder.remoteModifier ().rename ("B/b2", "B/b3");
-        // expect: B/b2 is gone, B/b3 is NEW placeholder
+        // expect : B/b2 is gone, B/b3 is NEW placeholder
 
         markForDehydration (fakeFolder, "C/c1");
         fakeFolder.localModifier ().appendByte ("C/c1");
-        // expect: no dehydration, upload of c1
+        // expect : no dehydration, upload of c1
 
         markForDehydration (fakeFolder, "C/c2");
         fakeFolder.localModifier ().appendByte ("C/c2");
         fakeFolder.remoteModifier ().appendByte ("C/c2");
         fakeFolder.remoteModifier ().appendByte ("C/c2");
-        // expect: no dehydration, conflict
+        // expect : no dehydration, conflict
 
         QVERIFY (fakeFolder.syncOnce ());
 
@@ -820,7 +820,7 @@ private slots:
         setPin ("online", PinState.OnlineOnly);
         setPin ("unspec", PinState.Unspecified);
 
-        // Test 1: root is Unspecified
+        // Test 1 : root is Unspecified
         fakeFolder.remoteModifier ().insert ("file1");
         fakeFolder.remoteModifier ().insert ("online/file1");
         fakeFolder.remoteModifier ().insert ("local/file1");
@@ -832,7 +832,7 @@ private slots:
         XAVERIFY_NONVIRTUAL (fakeFolder, "local/file1");
         XAVERIFY_VIRTUAL (fakeFolder, "unspec/file1");
 
-        // Test 2: change root to AlwaysLocal
+        // Test 2 : change root to AlwaysLocal
         setPin (QByteArray (), PinState.AlwaysLocal);
 
         fakeFolder.remoteModifier ().insert ("file2");
@@ -854,7 +854,7 @@ private slots:
         XAVERIFY_NONVIRTUAL (fakeFolder, "local/file1");
         XAVERIFY_VIRTUAL (fakeFolder, "unspec/file1");
 
-        // Test 3: change root to OnlineOnly
+        // Test 3 : change root to OnlineOnly
         setPin (QByteArray (), PinState.OnlineOnly);
 
         fakeFolder.remoteModifier ().insert ("file3");
@@ -975,7 +975,7 @@ private slots:
         QCOMPARE (*vfs.pinState ("online/file1"), PinState.Unspecified);
         QCOMPARE (*vfs.pinState ("unspec/file1"), PinState.Unspecified);
 
-        // Sync again: bad pin states of new local files usually take effect on second sync
+        // Sync again : bad pin states of new local files usually take effect on second sync
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 

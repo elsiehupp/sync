@@ -1,22 +1,22 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-// #include <QObject>
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
+
+// #include <GLib.Object>
 // #include <QMetaType>
 // #include <QCoreApplication>
 
-namespace OCC {
+namespace Occ {
 
 ProgressDispatcher *ProgressDispatcher._instance = nullptr;
 
@@ -106,8 +106,8 @@ ProgressDispatcher *ProgressDispatcher.instance () {
     return _instance;
 }
 
-ProgressDispatcher.ProgressDispatcher (QObject *parent)
-    : QObject (parent) {
+ProgressDispatcher.ProgressDispatcher (GLib.Object *parent)
+    : GLib.Object (parent) {
 }
 
 ProgressDispatcher.~ProgressDispatcher () = default;

@@ -1,20 +1,20 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
+Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
+
+This library is free software; you can redistribute it and
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later versi
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GN
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+*/
 
 // #pragma once
 
@@ -25,20 +25,19 @@
 
 // #include <ocsynclib.h>
 
-class QFile;
 
-namespace OCC {
+namespace Occ {
 
 OCSYNC_EXPORT Q_DECLARE_LOGGING_CATEGORY (lcFileSystem)
 
 /**
- *  \addtogroup libsync
- *  @{
- */
+ \addtogroup libsync
+ @{
+*/
 
 /**
- * @brief This file contains file system helper
- */
+@brief This file contains file system helper
+*/
 namespace FileSystem {
 
     /**
@@ -57,7 +56,7 @@ namespace FileSystem {
     /**
      * @brief Marks the file as read-only.
      *
-     * It's like setFileReadOnly (), but weaker: if readonly is false and the user
+     * It's like setFileReadOnly (), but weaker : if readonly is false and the user
      * already has write permissions, no change to the permissions is made.
      *
      * This means that it will preserve explicitly set rw-r--r-- permissions even
@@ -116,7 +115,7 @@ namespace FileSystem {
      * Replacement for QFile.open (ReadOnly) followed by a seek ().
      * This version sets a more permissive sharing mode on Windows.
      *
-     * Warning: The resulting file may have an empty fileName and be unsuitable for use
+     * Warning : The resulting file may have an empty fileName and be unsuitable for use
      * with QFileInfo! Calling seek () on the QFile with >32bit signed values will fail!
      */
     bool OCSYNC_EXPORT openAndSeekFileSharedRead (QFile *file, QString *error, int64 seek);

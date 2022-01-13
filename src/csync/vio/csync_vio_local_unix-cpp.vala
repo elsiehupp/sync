@@ -1,23 +1,23 @@
 /*
- * libcsync -- a library to sync a directory with another
- *
- * Copyright (c) 2008-2013 by Andreas Schneider <asn@cryptomilk.org>
- * Copyright (c) 2013- by Klaas Freitag <freitag@owncloud.com>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
+libcsync -- a library to sync a directory with another
+
+Copyright (c) 2008-2013 by Andreas Schneider <asn@cryptomilk.o
+Copyright (c) 2013- by Klaas Freitag <freitag@owncloud.com>
+
+This library is free software; you can redistribute it and/o
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later vers
+
+This library is distributed in the hope that it wi
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+*/
 
 // #include <cerrno>
 // #include <sys/types.h>
@@ -34,8 +34,8 @@
 Q_LOGGING_CATEGORY (lcCSyncVIOLocal, "nextcloud.sync.csync.vio_local", QtInfoMsg)
 
 /*
- * directory functions
- */
+directory functions
+*/
 
 struct csync_vio_handle_t {
   DIR *dh;
@@ -65,7 +65,7 @@ int csync_vio_local_closedir (csync_vio_handle_t *dhandle) {
     return rc;
 }
 
-std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t *handle, OCC.Vfs *vfs) {
+std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t *handle, Occ.Vfs *vfs) {
 
   struct _tdirent *dirent = nullptr;
   std.unique_ptr<csync_file_stat_t> file_stat;
@@ -78,7 +78,7 @@ std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t *h
 
   file_stat = std.make_unique<csync_file_stat_t> ();
   file_stat.path = QFile.decodeName (dirent.d_name).toUtf8 ();
-  QByteArray fullPath = handle.path % '/' % QByteArray () % const_cast<const char *> (dirent.d_name);
+  QByteArray fullPath = handle.path % '/' % QByteArray () % const_cast<const char> (dirent.d_name);
   if (file_stat.path.isNull ()) {
       file_stat.original_path = fullPath;
       qCWarning (lcCSyncVIOLocal) << "Invalid characters in file/directory name, please rename:" << dirent.d_name << handle.path;

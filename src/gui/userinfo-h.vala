@@ -1,52 +1,51 @@
 /*
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- * Copyright (C) by Michael Schuster <michael@schuster.ms>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+Copyright (C) by Michael Schuster <michael@schuster.ms>
 
-// #include <QObject>
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
+
+// #include <GLib.Object>
 // #include <QPointer>
 // #include <QVariant>
 // #include <QTimer>
 // #include <QDateTime>
 
-namespace OCC {
-class AccountState;
+namespace Occ {
 class JsonApiJob;
 
 /**
- * @brief handles getting the user info and quota to display in the UI
- *
- * It is typically owned by the AccountSetting page.
- *
- * The user info and quota is requested if these 3 conditions are met:
- *  - This object is active via setActive () (typically if the settings page is visible.)
- *  - The account is connected.
- *  - Every 30 seconds (defaultIntervalT) or 5 seconds in case of failure (failIntervalT)
- *
- * We only request the info when the UI is visible otherwise this might slow down the server with
- * too many requests. But we still need to do it every 30 seconds otherwise user complains that the
- * quota is not updated fast enough when changed on the server.
- *
- * If the fetch job is not finished within 30 seconds, it is cancelled and another one is started
- *
- * Constructor notes:
- *  - allowDisconnectedAccountState: set to true if you want to ignore AccountState's isConnected () state,
- *    this is used by ConnectionValidator (prior having a valid AccountState).
- *  - fetchAvatarImage: set to false if you don't want to fetch the avatar image
- *
- * @ingroup gui
- *
- * Here follows the state machine
+@brief handles getting the user info and quota to display in the UI
+
+It is typically owned by the AccountSetting page.
+
+The user info and quota is r
+ - This object is active via setActive () (typically if the settings page is visible.)
+ - The account is connected.
+ - Every 30 seconds (defaultIntervalT) or 5 seconds in case of failure (failIntervalT)
+
+We only request the info when the UI is visible otherwise this might slow down the server with
+too many requests.
+quota is not updated fast enough when changed on the server.
+
+If the fetch job is not finished within 30 seconds, it is cancelled and another
+
+Constructor notes:
+ - allowDisconnectedAccountState : set to true if you want to ignore AccountState's isConnected () state,
+   this is used by ConnectionValidator (prior having a valid AccountState).
+ - fetchAvatarImage : set to false if you don't want to fetch the avatar image
+
+@ingroup gui
+
+Here follows the state machine
 
  \code{.unparsed}
  *--. slotFetchInfo
@@ -61,9 +60,9 @@ class JsonApiJob;
    +. Client Side Encryption Checks --+ --reportResult ()
      \endcode
   */
-class UserInfo : public QObject {
+class UserInfo : GLib.Object {
 public:
-    explicit UserInfo (OCC.AccountState *accountState, bool allowDisconnectedAccountState, bool fetchAvatarImage, QObject *parent = nullptr);
+    UserInfo (Occ.AccountState *accountState, bool allowDisconnectedAccountState, bool fetchAvatarImage, GLib.Object *parent = nullptr);
 
     int64 lastQuotaTotalBytes () { return _lastQuotaTotalBytes; }
     int64 lastQuotaUsedBytes () { return _lastQuotaUsedBytes; }
@@ -75,21 +74,21 @@ public:
      */
     void setActive (bool active);
 
-public Q_SLOTS:
+public slots:
     void slotFetchInfo ();
 
-private Q_SLOTS:
+private slots:
     void slotUpdateLastInfo (QJsonDocument &json);
     void slotAccountStateChanged ();
     void slotRequestFailed ();
     void slotAvatarImage (QImage &img);
 
-Q_SIGNALS:
+signals:
     void quotaUpdated (int64 total, int64 used);
     void fetchedLastInfo (UserInfo *userInfo);
 
 private:
-    bool canGetInfo () const;
+    bool canGetInfo ();
 
     QPointer<AccountState> _accountState;
     bool _allowDisconnectedAccountState;
@@ -103,6 +102,6 @@ private:
     QPointer<JsonApiJob> _job; // the currently running job
 };
 
-} // namespace OCC
+} // namespace Occ
 
 #endif //USERINFO_H

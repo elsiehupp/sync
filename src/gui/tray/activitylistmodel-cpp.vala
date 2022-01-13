@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QtCore>
 // #include <QAbstractListModel>
@@ -20,16 +20,16 @@
 // #include <QJsonDocument>
 // #include <qloggingcategory.h>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcActivity, "nextcloud.gui.activity", QtInfoMsg)
 
-ActivityListModel.ActivityListModel (QObject *parent)
+ActivityListModel.ActivityListModel (GLib.Object *parent)
     : QAbstractListModel (parent) {
 }
 
 ActivityListModel.ActivityListModel (AccountState *accountState,
-    QObject *parent)
+    GLib.Object *parent)
     : QAbstractListModel (parent)
     , _accountState (accountState) {
 }
@@ -135,7 +135,7 @@ QVariant ActivityListModel.data (QModelIndex &index, int role) {
             return QUrl.fromLocalFile (localFiles.constFirst ());
         }
         return QString ();
-    case AbsolutePathRole: {
+    case AbsolutePathRole : {
         const auto folder = FolderMan.instance ().folder (a._folder);
         QString relPath (a._file);
         if (!a._file.isEmpty ()) {
@@ -154,14 +154,14 @@ QVariant ActivityListModel.data (QModelIndex &index, int role) {
             return QString ();
         }
     }
-    case ActionsLinksRole: {
+    case ActionsLinksRole : {
         QList<QVariant> customList;
         foreach (ActivityLink activityLink, a._links) {
             customList << QVariant.fromValue (activityLink);
         }
         return customList;
     }
-    case ActionIconRole: {
+    case ActionIconRole : {
         if (a._type == Activity.NotificationType) {
             return "qrc:///client/theme/black/bell.svg";
         } else if (a._type == Activity.SyncResultType) {
@@ -201,7 +201,7 @@ QVariant ActivityListModel.data (QModelIndex &index, int role) {
     }
     case ObjectTypeRole:
         return a._objectType;
-    case ActionRole: {
+    case ActionRole : {
         switch (a._type) {
         case Activity.ActivityType:
             return "Activity";
@@ -218,10 +218,10 @@ QVariant ActivityListModel.data (QModelIndex &index, int role) {
     case ActionTextRole:
         return a._subject;
     case ActionTextColorRole:
-        return a._id == -1 ? QLatin1String ("#808080") : QLatin1String ("#222");   // FIXME: This is a temporary workaround for _showMoreActivitiesAvailableEntry
+        return a._id == -1 ? QLatin1String ("#808080") : QLatin1String ("#222");   // FIXME : This is a temporary workaround for _showMoreActivitiesAvailableEntry
     case MessageRole:
         return a._message;
-    case LinkRole: {
+    case LinkRole : {
         if (a._link.isEmpty ()) {
             return "";
         } else {
@@ -266,7 +266,7 @@ void ActivityListModel.startFetchJob () {
         return;
     }
     auto *job = new JsonApiJob (_accountState.account (), QLatin1String ("ocs/v2.php/apps/activity/api/v2/activity"), this);
-    QObject.connect (job, &JsonApiJob.jsonReceived,
+    GLib.Object.connect (job, &JsonApiJob.jsonReceived,
         this, &ActivityListModel.activitiesReceived);
 
     QUrlQuery params;
@@ -333,13 +333,13 @@ void ActivityListModel.activitiesReceived (QJsonDocument &json, int statusCode) 
 }
 
 void ActivityListModel.addErrorToActivityList (Activity activity) {
-    qCInfo (lcActivity) << "Error successfully added to the notification list: " << activity._subject;
+    qCInfo (lcActivity) << "Error successfully added to the notification list : " << activity._subject;
     _notificationErrorsLists.prepend (activity);
     combineActivityLists ();
 }
 
 void ActivityListModel.addIgnoredFileToList (Activity newActivity) {
-    qCInfo (lcActivity) << "First checking for duplicates then add file to the notification list of ignored files: " << newActivity._file;
+    qCInfo (lcActivity) << "First checking for duplicates then add file to the notification list of ignored files : " << newActivity._file;
 
     bool duplicate = false;
     if (_listOfIgnoredFiles.size () == 0) {
@@ -362,7 +362,7 @@ void ActivityListModel.addIgnoredFileToList (Activity newActivity) {
 }
 
 void ActivityListModel.addNotificationToActivityList (Activity activity) {
-    qCInfo (lcActivity) << "Notification successfully added to the notification list: " << activity._subject;
+    qCInfo (lcActivity) << "Notification successfully added to the notification list : " << activity._subject;
     _notificationLists.prepend (activity);
     combineActivityLists ();
 }
@@ -380,13 +380,13 @@ void ActivityListModel.removeActivityFromActivityList (int row) {
 }
 
 void ActivityListModel.addSyncFileItemToActivityList (Activity activity) {
-    qCInfo (lcActivity) << "Successfully added to the activity list: " << activity._subject;
+    qCInfo (lcActivity) << "Successfully added to the activity list : " << activity._subject;
     _syncFileItemLists.prepend (activity);
     combineActivityLists ();
 }
 
 void ActivityListModel.removeActivityFromActivityList (Activity activity) {
-    qCInfo (lcActivity) << "Activity/Notification/Error successfully dismissed: " << activity._subject;
+    qCInfo (lcActivity) << "Activity/Notification/Error successfully dismissed : " << activity._subject;
     qCInfo (lcActivity) << "Trying to remove Activity/Notification/Error from view... ";
 
     int index = -1;

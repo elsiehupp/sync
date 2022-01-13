@@ -1,20 +1,20 @@
 /******************************************************************************
- *   Copyright (C) 2014 by Olivier Goffart <ogoffart@woboq.com                *
- *                                                                            *
- *   This program is free software; you can redistribute it and/or modify     *
- *   it under the terms of the GNU General Public License as published by     *
- *   the Free Software Foundation; either version 2 of the License, or        *
- *   (at your option) any later version.                                      *
- *                                                                            *
- *   This program is distributed in the hope that it will be useful,          *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of           *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
- *   GNU General Public License for more details.                             *
- *                                                                            *
- *   You should have received a copy of the GNU General Public License        *
- *   along with this program; if not, write to the                            *
- *   Free Software Foundation, Inc.,                                          *
- *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA               *
+  Copyright (C) 2014 by Olivier Goffart <ogoffart@woboq.com                *
+                                                                           *
+  This program is free software; you can redistribute it and/or modify     *
+  it under the terms of the GNU General Public License as published by     *
+  the Free Software Foundation; either version 2 of the License, or        *
+  (at your option) any later version.                                      *
+                                                                           *
+  This program is distributed in the hope that it will be useful,          *
+  but WITHOUT ANY WARRANTY; without even the implied warranty of           *
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
+  GNU General Public License for more details.                             *
+                                                                           *
+  You should have received a copy of the GNU General Public License        *
+  along with this program; if not, write to the                            *
+  Free Software Foundation, Inc.,                                          *
+  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA               *
  ******************************************************************************/
 
 // #include <KCoreAddons/KPluginFactory>
@@ -29,12 +29,12 @@
 // #include <QtCore/QTimer>
 // #include <QtCore/QEventLoop>
 
-class OwncloudDolphinPluginAction : public KAbstractFileItemActionPlugin {
+class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
 public:
-    explicit OwncloudDolphinPluginAction (QObject* parent, QList<QVariant>&)
+    OwncloudDolphinPluginAction (GLib.Object* parent, QList<QVariant>&)
         : KAbstractFileItemActionPlugin (parent) { }
 
-    QList<QAction*> actions (KFileItemListProperties& fileItemInfos, QWidget* parentWidget) override {
+    QList<QAction> actions (KFileItemListProperties& fileItemInfos, QWidget* parentWidget) override {
         auto helper = OwncloudDolphinPluginHelper.instance ();
         if (!helper.isConnected () || !fileItemInfos.isLocal ())
             return {};
@@ -92,7 +92,7 @@ public:
         return { menu.menuAction () };
     }
 
-    QList<QAction *> legacyActions (KFileItemListProperties &fileItemInfos, QWidget *parentWidget) {
+    QList<QAction> legacyActions (KFileItemListProperties &fileItemInfos, QWidget *parentWidget) {
         QList<QUrl> urls = fileItemInfos.urlList ();
         if (urls.count () != 1)
             return {};

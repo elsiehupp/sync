@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #pragma once
 
@@ -20,20 +20,20 @@
 // #include <QWebSocket>
 // #include <QSignalSpy>
 
-class FakeWebSocketServer : public QObject {
+class FakeWebSocketServer : GLib.Object {
 public:
-    explicit FakeWebSocketServer (uint16 port = 12345, QObject *parent = nullptr);
+    FakeWebSocketServer (uint16 port = 12345, GLib.Object *parent = nullptr);
 
     ~FakeWebSocketServer () override;
 
     QWebSocket *authenticateAccount (
-        const OCC.AccountPtr account, std.function<void (OCC.PushNotifications *pushNotifications)> beforeAuthentication = [] (OCC.PushNotifications *) {}, std.function<void (void)> afterAuthentication = [] {});
+        const Occ.AccountPtr account, std.function<void (Occ.PushNotifications *pushNotifications)> beforeAuthentication = [] (Occ.PushNotifications *) {}, std.function<void (void)> afterAuthentication = [] {});
 
     void close ();
 
-    bool waitForTextMessages () const;
+    bool waitForTextMessages ();
 
-    uint32_t textMessagesCount () const;
+    uint32_t textMessagesCount ();
 
     QString textMessage (int messageNumber) const;
 
@@ -41,7 +41,7 @@ public:
 
     void clearTextMessages ();
 
-    static OCC.AccountPtr createAccount (QString &username = "user", QString &password = "password");
+    static Occ.AccountPtr createAccount (QString &username = "user", QString &password = "password");
 
 signals:
     void closed ();
@@ -54,12 +54,12 @@ private slots:
 
 private:
     QWebSocketServer *_webSocketServer;
-    QList<QWebSocket *> _clients;
+    QList<QWebSocket> _clients;
 
     std.unique_ptr<QSignalSpy> _processTextMessageSpy;
 };
 
-class CredentialsStub : public OCC.AbstractCredentials {
+class CredentialsStub : Occ.AbstractCredentials {
 
 public:
     CredentialsStub (QString &user, QString &password);

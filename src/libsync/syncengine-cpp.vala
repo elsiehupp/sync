@@ -1,17 +1,17 @@
 /*
- * Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <unistd.h>
 
@@ -35,32 +35,32 @@
 // #include <QFileInfo>
 // #include <qtextcodec.h>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcEngine, "nextcloud.sync.engine", QtInfoMsg)
 
 bool SyncEngine.s_anySyncRunning = false;
 
 /** When the client touches a file, block change notifications for this duration (ms)
- *
- * On Linux and Windows the file watcher can't distinguish a change that originates
- * from the client (like a download during a sync operation) and an external change.
- * To work around that, all files the client touches are recorded and file change
- * notifications for these are blocked for some time. This value controls for how
- * long.
- *
- * Reasons this delay can't be very small:
- * - it takes time for the change notification to arrive and to be processed by the client
- * - some time could pass between the client recording that a file will be touched
- *   and its filesystem operation finishing, triggering the notification
- */
+
+On Linux and Windows the file watcher can't distinguish a change that originates
+from the client (like a download during a sync operation) and an external change.
+To work around that, all files the client touches are recorded and file change
+notifications for these are blocked for some time. This value controls for how
+long.
+
+Reasons this delay can't be very small:
+- it takes time for the change notification to arrive and to be processed by th
+- some time could pass between the client recording that a file will be touched
+  and its filesystem operation finishing, triggering the notification
+*/
 static const std.chrono.milliseconds s_touchedFilesMaxAgeMs (3 * 1000);
 
 // doc in header
 std.chrono.milliseconds SyncEngine.minimumFileAgeForUpload (2000);
 
 SyncEngine.SyncEngine (AccountPtr account, QString &localPath,
-    const QString &remotePath, OCC.SyncJournalDb *journal)
+    const QString &remotePath, Occ.SyncJournalDb *journal)
     : _account (account)
     , _needsUpdate (false)
     , _syncRunning (false)
@@ -101,11 +101,11 @@ SyncEngine.~SyncEngine () {
 }
 
 /**
- * Check if the item is in the blacklist.
- * If it should not be sync'ed because of the blacklist, update the item with the error instruction
- * and proper error message, and return true.
- * If the item is not in the blacklist, or the blacklist is stale, return false.
- */
+Check if the item is in the blacklist.
+If it should not be sync'ed because of the blacklist, update the item with the error instruction
+and proper error message, and return true.
+If the item is not in the blacklist, or the blacklist is stale, return false.
+*/
 bool SyncEngine.checkErrorBlacklisting (SyncFileItem &item) {
     if (!_journal) {
         qCCritical (lcEngine) << "Journal is undefined!";
@@ -152,7 +152,7 @@ bool SyncEngine.checkErrorBlacklisting (SyncFileItem &item) {
     }
 
     int64 waitSeconds = entry._lastTryTime + entry._ignoreDuration - now;
-    qCInfo (lcEngine) << "Item is on blacklist: " << entry._file
+    qCInfo (lcEngine) << "Item is on blacklist : " << entry._file
                      << "retries:" << entry._retryCount
                      << "for another" << waitSeconds << "s";
 
@@ -196,7 +196,7 @@ void SyncEngine.deleteStaleDownloadInfos (SyncFileItemVector &syncItems) {
         _journal.getAndDeleteStaleDownloadInfos (download_file_paths);
     foreach (SyncJournalDb.DownloadInfo &deleted_info, deleted_infos) {
         const QString tmppath = _propagator.fullLocalPath (deleted_info._tmpfile);
-        qCInfo (lcEngine) << "Deleting stale temporary file: " << tmppath;
+        qCInfo (lcEngine) << "Deleting stale temporary file : " << tmppath;
         FileSystem.remove (tmppath);
     }
 }
@@ -281,17 +281,17 @@ void SyncEngine.conflictRecordMaintenance () {
     }
 }
 
-void OCC.SyncEngine.slotItemDiscovered (OCC.SyncFileItemPtr &item) {
+void Occ.SyncEngine.slotItemDiscovered (Occ.SyncFileItemPtr &item) {
     if (Utility.isConflictFile (item._file))
         _seenConflictFiles.insert (item._file);
     if (item._instruction == CSYNC_INSTRUCTION_UPDATE_METADATA && !item.isDirectory ()) {
         // For directories, metadata-only updates will be done after all their files are propagated.
 
-        // Update the database now already:  New remote fileid or Etag or RemotePerm
+        // Update the database now already :  New remote fileid or Etag or RemotePerm
         // Or for files that were detected as "resolved conflict".
         // Or a local inode/mtime change
 
-        // In case of "resolved conflict": there should have been a conflict because they
+        // In case of "resolved conflict" : there should have been a conflict because they
         // both were new, or both had their local mtime or remote etag modified, but the
         // size and mtime is the same on the server.  This typically happens when the
         // database is removed. Nothing will be done for those files, but we still need
@@ -322,7 +322,7 @@ void OCC.SyncEngine.slotItemDiscovered (OCC.SyncFileItemPtr &item) {
                 const auto result = _syncOptions._vfs.convertToPlaceholder (filePath, *item);
                 if (!result) {
                     item._instruction = CSYNC_INSTRUCTION_ERROR;
-                    item._errorString = tr ("Could not update file: %1").arg (result.error ());
+                    item._errorString = tr ("Could not update file : %1").arg (result.error ());
                     return;
                 }
             }
@@ -332,7 +332,7 @@ void OCC.SyncEngine.slotItemDiscovered (OCC.SyncFileItemPtr &item) {
                 auto r = _syncOptions._vfs.updateMetadata (filePath, item._modtime, item._size, item._fileId);
                 if (!r) {
                     item._instruction = CSYNC_INSTRUCTION_ERROR;
-                    item._errorString = tr ("Could not update virtual file metadata: %1").arg (r.error ());
+                    item._errorString = tr ("Could not update virtual file metadata : %1").arg (r.error ());
                     return;
                 }
             }
@@ -352,7 +352,7 @@ void OCC.SyncEngine.slotItemDiscovered (OCC.SyncFileItemPtr &item) {
         _hasNoneFiles = true;
         if (_account.capabilities ().uploadConflictFiles () && Utility.isConflictFile (item._file)) {
             // For uploaded conflict files, files with no action performed on them should
-            // be displayed: but we mustn't overwrite the instruction if something happens
+            // be displayed : but we mustn't overwrite the instruction if something happens
             // to the file!
             item._errorString = tr ("Unresolved conflict.");
             item._instruction = CSYNC_INSTRUCTION_IGNORE;
@@ -623,7 +623,7 @@ void SyncEngine.slotDiscoveryFinished () {
     _progressInfo._status = ProgressInfo.Reconcile;
     emit transmissionProgress (*_progressInfo);
 
-    //    qCInfo (lcEngine) << "Permissions of the root folder: " << _csync_ctx.remote.root_perms.toString ();
+    //    qCInfo (lcEngine) << "Permissions of the root folder : " << _csync_ctx.remote.root_perms.toString ();
     auto finish = [this]{
         auto databaseFingerprint = _journal.dataFingerprint ();
         // If databaseFingerprint is empty, this means that there was no information in the database
@@ -654,19 +654,19 @@ void SyncEngine.slotDiscoveryFinished () {
         emit transmissionProgress (*_progressInfo);
         _progressInfo.startEstimateUpdates ();
 
-        // post update phase script: allow to tweak stuff by a custom script in debug mode.
+        // post update phase script : allow to tweak stuff by a custom script in debug mode.
         if (!qEnvironmentVariableIsEmpty ("OWNCLOUD_POST_UPDATE_SCRIPT")) {
     #ifndef NDEBUG
             const QString script = qEnvironmentVariable ("OWNCLOUD_POST_UPDATE_SCRIPT");
 
-            qCDebug (lcEngine) << "Post Update Script: " << script;
+            qCDebug (lcEngine) << "Post Update Script : " << script;
             auto scriptArgs = script.split (QRegularExpression ("\\s+"), Qt.SkipEmptyParts);
             if (scriptArgs.size () > 0) {
                 const auto scriptExecutable = scriptArgs.takeFirst ();
                 QProcess.execute (scriptExecutable, scriptArgs);
             }
 #else
-            qCWarning (lcEngine) << "**** Attention: POST_UPDATE_SCRIPT installed, but not executed because compiled with NDEBUG";
+            qCWarning (lcEngine) << "**** Attention : POST_UPDATE_SCRIPT installed, but not executed because compiled with NDEBUG";
     #endif
         }
 
@@ -713,8 +713,8 @@ void SyncEngine.slotDiscoveryFinished () {
             }
         }
 
-        QPointer<QObject> guard = new QObject ();
-        QPointer<QObject> self = this;
+        QPointer<GLib.Object> guard = new GLib.Object ();
+        QPointer<GLib.Object> self = this;
         auto callback = [this, self, finish, guard] (bool cancel) . void {
             // use a guard to ensure its only called once...
             // qpointer to self to ensure we still exist
@@ -826,11 +826,11 @@ void SyncEngine.restoreOldFiles (SyncFileItemVector &syncItems) {
 
         switch (syncItem._instruction) {
         case CSYNC_INSTRUCTION_SYNC:
-            qCWarning (lcEngine) << "restoreOldFiles: RESTORING" << syncItem._file;
+            qCWarning (lcEngine) << "restoreOldFiles : RESTORING" << syncItem._file;
             syncItem._instruction = CSYNC_INSTRUCTION_CONFLICT;
             break;
         case CSYNC_INSTRUCTION_REMOVE:
-            qCWarning (lcEngine) << "restoreOldFiles: RESTORING" << syncItem._file;
+            qCWarning (lcEngine) << "restoreOldFiles : RESTORING" << syncItem._file;
             syncItem._instruction = CSYNC_INSTRUCTION_NEW;
             syncItem._direction = SyncFileItem.Up;
             break;
@@ -892,7 +892,7 @@ void SyncEngine.setLocalDiscoveryOptions (LocalDiscoveryStyle style, std.set<QSt
     _localDiscoveryPaths = std.move (paths);
 
     // Normalize to make sure that no path is a contained in another.
-    // Note: for simplicity, this code consider anything less than '/' as a path separator, so for
+    // Note : for simplicity, this code consider anything less than '/' as a path separator, so for
     // example, this will remove "foo.bar" if "foo" is in the list. This will mean we might have
     // some false positive, but that's Ok.
     // This invariant is used in SyncEngine.shouldDiscoverLocally
@@ -965,7 +965,7 @@ void SyncEngine.wipeVirtualFiles (QString &localPath, SyncJournalDb &journal, Vf
 
     journal.forceRemoteDiscoveryNextSync ();
 
-    // Postcondition: No ItemTypeVirtualFile / ItemTypeVirtualFileDownload left in the db.
+    // Postcondition : No ItemTypeVirtualFile / ItemTypeVirtualFileDownload left in the db.
     // But hydrated placeholders may still be around.
 }
 
@@ -1014,7 +1014,7 @@ void SyncEngine.slotSummaryError (QString &message) {
 
 void SyncEngine.slotInsufficientLocalStorage () {
     slotSummaryError (
-        tr ("Disk space is low: Downloads that would reduce free space "
+        tr ("Disk space is low : Downloads that would reduce free space "
            "below %1 were skipped.")
             .arg (Utility.octetsToString (freeSpaceLimit ())));
 }
@@ -1028,4 +1028,4 @@ void SyncEngine.slotInsufficientRemoteStorage () {
     emit syncError (msg, ErrorCategory.InsufficientRemoteStorage);
 }
 
-} // namespace OCC
+} // namespace Occ

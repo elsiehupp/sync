@@ -1,47 +1,45 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #pragma once
 
-// #include <QObject>
+// #include <GLib.Object>
 
-class ExcludedFiles;
 
-namespace OCC {
-class SyncJournalDb;
+namespace Occ {
 
 /**
- * Job that handles discovery of a directory.
- *
- * This includes:
- *  - Do a DiscoverySingleDirectoryJob network job which will do a PROPFIND of this directory
- *  - Stat all the entries in the local file system for this directory
- *  - Merge all information (and the information from the database) in order to know what needs
- *    to be done for every file within this directory.
- *  - For every sub-directory within this directory, "recursively" create a new ProcessDirectoryJob.
- *
- * This job is tightly coupled with the DiscoveryPhase class.
- *
- * After being start ()'ed this job will perform work asynchronously and emit finished () when done.
- *
- * Internally, this job will call DiscoveryPhase.scheduleMoreJobs when one of its sub-jobs is
- * finished. DiscoveryPhase.scheduleMoreJobs will call processSubJobs () to continue work until
- * the job is finished.
- *
- * Results are fed outwards via the DiscoveryPhase.itemDiscovered () signal.
- */
-class ProcessDirectoryJob : public QObject {
+Job that handles discovery of a directory.
+
+This includes:
+ - Do a DiscoverySingleDirectoryJob network job which will do a PRO
+ - Stat all the entries in the local file system for this directory
+ - Merge all information (and the information from
+   to be done for every file within this directory.
+ - For every sub-directory within this directory, "recursivel
+
+This job is tightly coupled with the DiscoveryPhase class.
+
+After being start ()'ed
+
+Internally, this job will call DiscoveryPhase.scheduleMoreJobs when one of its sub-jobs is
+finished. DiscoveryPhase.scheduleMoreJobs will call processSubJobs () to continue work until
+the job is finished.
+
+Results are fed outwards via the DiscoveryPhase.itemDiscovered () signal.
+*/
+class ProcessDirectoryJob : GLib.Object {
 
     struct PathTuple;
 public:
@@ -57,19 +55,19 @@ public:
      *
      * The base pin state is used if the root dir's pin state can't be retrieved.
      */
-    explicit ProcessDirectoryJob (DiscoveryPhase *data, PinState basePinState,
-        int64 lastSyncTimestamp, QObject *parent)
-        : QObject (parent)
+    ProcessDirectoryJob (DiscoveryPhase *data, PinState basePinState,
+        int64 lastSyncTimestamp, GLib.Object *parent)
+        : GLib.Object (parent)
         , _lastSyncTimestamp (lastSyncTimestamp)
         , _discoveryData (data) {
         computePinState (basePinState);
     }
 
     /// For creating subjobs
-    explicit ProcessDirectoryJob (PathTuple &path, SyncFileItemPtr &dirItem,
+    ProcessDirectoryJob (PathTuple &path, SyncFileItemPtr &dirItem,
         QueryMode queryLocal, QueryMode queryServer, int64 lastSyncTimestamp,
         ProcessDirectoryJob *parent)
-        : QObject (parent)
+        : GLib.Object (parent)
         , _dirItem (dirItem)
         , _lastSyncTimestamp (lastSyncTimestamp)
         , _queryServer (queryServer)
@@ -109,10 +107,10 @@ private:
      *
      * _server and _local paths will differ if there are renames, example:
      *   remote renamed A/ to B/ and local renamed A/X to A/Y then
-     *     target:   B/Y/file
-     *     original: A/X/file
-     *     local:    A/Y/file
-     *     server:   B/X/file
+     *     target :   B/Y/file
+     *     original : A/X/file
+     *     local :    A/Y/file
+     *     server :   B/X/file
      */
     struct PathTuple {
         QString _original; // Path as in the DB (before the sync)
@@ -204,7 +202,7 @@ private:
     void chopVirtualFileSuffix (QString &str) const;
 
     /** Convenience to detect suffix-vfs modes */
-    bool isVfsWithSuffix () const;
+    bool isVfsWithSuffix ();
 
     /** Start a remote discovery network job
      *
@@ -270,8 +268,8 @@ private:
      * The jobs are enqueued while processind directory entries and
      * then gradually run via calls to processSubJobs ().
      */
-    std.deque<ProcessDirectoryJob *> _queuedJobs;
-    QVector<ProcessDirectoryJob *> _runningJobs;
+    std.deque<ProcessDirectoryJob> _queuedJobs;
+    QVector<ProcessDirectoryJob> _runningJobs;
 
     DiscoveryPhase *_discoveryData;
 

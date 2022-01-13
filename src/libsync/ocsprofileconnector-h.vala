@@ -1,11 +1,11 @@
 #pragma once
 
-// #include <QObject>
+// #include <GLib.Object>
 // #include <QPixmap>
 // #include <QUrl>
 // #include <QString>
 
-namespace OCC {
+namespace Occ {
 
 struct OWNCLOUDSYNC_EXPORT HovercardAction {
 public:
@@ -22,12 +22,12 @@ struct OWNCLOUDSYNC_EXPORT Hovercard {
     std.vector<HovercardAction> _actions;
 };
 
-class OWNCLOUDSYNC_EXPORT OcsProfileConnector : public QObject {
+class OWNCLOUDSYNC_EXPORT OcsProfileConnector : GLib.Object {
 public:
-    explicit OcsProfileConnector (AccountPtr account, QObject *parent = nullptr);
+    OcsProfileConnector (AccountPtr account, GLib.Object *parent = nullptr);
 
     void fetchHovercard (QString &userId);
-    const Hovercard &hovercard () const;
+    const Hovercard &hovercard ();
 
 signals:
     void error ();
@@ -47,5 +47,5 @@ private:
 };
 }
 
-Q_DECLARE_METATYPE (OCC.HovercardAction)
-Q_DECLARE_METATYPE (OCC.Hovercard)
+Q_DECLARE_METATYPE (Occ.HovercardAction)
+Q_DECLARE_METATYPE (Occ.Hovercard)

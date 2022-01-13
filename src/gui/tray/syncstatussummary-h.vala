@@ -1,27 +1,27 @@
 /*
- * Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #pragma once
 
 // #include <theme.h>
 // #include <folder.h>
 
-// #include <QObject>
+// #include <GLib.Object>
 
-namespace OCC {
+namespace Occ {
 
-class SyncStatusSummary : public QObject {
+class SyncStatusSummary : GLib.Object {
 
     Q_PROPERTY (double syncProgress READ syncProgress NOTIFY syncProgressChanged)
     Q_PROPERTY (QUrl syncIcon READ syncIcon NOTIFY syncIconChanged)
@@ -30,13 +30,13 @@ class SyncStatusSummary : public QObject {
     Q_PROPERTY (QString syncStatusDetailString READ syncStatusDetailString NOTIFY syncStatusDetailStringChanged)
 
 public:
-    explicit SyncStatusSummary (QObject *parent = nullptr);
+    SyncStatusSummary (GLib.Object *parent = nullptr);
 
-    double syncProgress () const;
-    QUrl syncIcon () const;
-    bool syncing () const;
-    QString syncStatusString () const;
-    QString syncStatusDetailString () const;
+    double syncProgress ();
+    QUrl syncIcon ();
+    bool syncing ();
+    QString syncStatusString ();
+    QString syncStatusDetailString ();
 
 signals:
     void syncProgressChanged ();
@@ -51,7 +51,7 @@ public slots:
 private:
     void connectToFoldersProgress (Folder.Map &map);
 
-    void onFolderListChanged (OCC.Folder.Map &folderMap);
+    void onFolderListChanged (Occ.Folder.Map &folderMap);
     void onFolderProgressInfo (ProgressInfo &progress);
     void onFolderSyncStateChanged (Folder *folder);
     void onIsConnectedChanged ();
@@ -59,7 +59,7 @@ private:
     void setSyncStateForFolder (Folder *folder);
     void markFolderAsError (Folder *folder);
     void markFolderAsSuccess (Folder *folder);
-    bool folderErrors () const;
+    bool folderErrors ();
     bool folderError (Folder *folder) const;
     void clearFolderErrors ();
     void setSyncStateToConnectedState ();

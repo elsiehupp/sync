@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <theme.h>
 // #include <creds/credentialsfactory.h>
@@ -37,7 +37,7 @@ static const int maxAccountsVersion = 2;
 static const int maxAccountVersion = 1;
 }
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcAccountManager, "nextcloud.gui.account.manager", QtInfoMsg)
 
@@ -58,7 +58,7 @@ bool AccountManager.restore () {
     }
 
     if (skipSettingsKeys.contains (settings.group ())) {
-        // Should not happen: bad container keys should have been deleted
+        // Should not happen : bad container keys should have been deleted
         qCWarning (lcAccountManager) << "Accounts structure is too new, ignoring";
         return true;
     }
@@ -76,7 +76,7 @@ bool AccountManager.restore () {
             if (auto acc = loadAccountHelper (*settings)) {
                 acc._id = accountId;
                 if (auto accState = AccountState.loadFromSettings (acc, *settings)) {
-                    auto jar = qobject_cast<CookieJar*> (acc._am.cookieJar ());
+                    auto jar = qobject_cast<CookieJar> (acc._am.cookieJar ());
                     ASSERT (jar);
                     if (jar)
                         jar.restore (acc.cookieJarPath ());
@@ -111,7 +111,7 @@ void AccountManager.backwardMigrationSettingsKeys (QStringList *deleteKeys, QStr
 }
 
 bool AccountManager.restoreFromLegacySettings () {
-    qCInfo (lcAccountManager) << "Migrate: restoreFromLegacySettings, checking settings group"
+    qCInfo (lcAccountManager) << "Migrate : restoreFromLegacySettings, checking settings group"
                              << Theme.instance ().appName ();
 
     // try to open the correctly themed settings
@@ -127,7 +127,7 @@ bool AccountManager.restoreFromLegacySettings () {
         oCCfgFile = oCCfgFile.left (oCCfgFile.lastIndexOf ('/'));
         oCCfgFile += QLatin1String ("/ownCloud/owncloud.cfg");
 
-        qCInfo (lcAccountManager) << "Migrate: checking old config " << oCCfgFile;
+        qCInfo (lcAccountManager) << "Migrate : checking old config " << oCCfgFile;
 
         QFileInfo fi (oCCfgFile);
         if (fi.isReadable ()) {
@@ -220,7 +220,7 @@ void AccountManager.saveAccountHelper (Account *acc, QSettings &settings, bool s
         }
         settings.setValue (QLatin1String (authTypeC), acc._credentials.authType ());
 
-        // HACK: Save http_user also as user
+        // HACK : Save http_user also as user
         if (acc._settingsMap.contains (httpUserC))
             settings.setValue (userC, acc._settingsMap.value (httpUserC));
     }
@@ -239,7 +239,7 @@ void AccountManager.saveAccountHelper (Account *acc, QSettings &settings, bool s
 
     // Save cookies.
     if (acc._am) {
-        auto *jar = qobject_cast<CookieJar *> (acc._am.cookieJar ());
+        auto *jar = qobject_cast<CookieJar> (acc._am.cookieJar ());
         if (jar) {
             qCInfo (lcAccountManager) << "Saving cookies." << acc.cookieJarPath ();
             if (!jar.save (acc.cookieJarPath ())) {
@@ -315,7 +315,7 @@ AccountPtr AccountManager.loadAccountHelper (QSettings &settings) {
     // now the server cert, it is in the general group
     settings.beginGroup (QLatin1String ("General"));
     const auto certs = QSslCertificate.fromData (settings.value (caCertsKeyC).toByteArray ());
-    qCInfo (lcAccountManager) << "Restored: " << certs.count () << " unknown certs.";
+    qCInfo (lcAccountManager) << "Restored : " << certs.count () << " unknown certs.";
     acc.setApprovedCerts (certs);
     settings.endGroup ();
 
@@ -424,7 +424,7 @@ QString AccountManager.generateFreeAccountId () {
 }
 
 void AccountManager.addAccountState (AccountState *accountState) {
-    QObject.connect (accountState.account ().data (),
+    GLib.Object.connect (accountState.account ().data (),
         &Account.wantsAccountSaved,
         this, &AccountManager.saveAccount);
 

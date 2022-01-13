@@ -1,20 +1,20 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QList>
 // #include <QLoggingCategory>
-// #include <QObject>
+// #include <GLib.Object>
 // #include <QString>
 // #include <QStringList>
 // #include <QElapsedTimer>
@@ -23,29 +23,27 @@
 // #include <QSet>
 // #include <QDir>
 
-class QTimer;
 
-namespace OCC {
+namespace Occ {
 
 Q_DECLARE_LOGGING_CATEGORY (lcFolderWatcher)
 
-class FolderWatcherPrivate;
 class Folder;
 
 /**
- * @brief Monitors a directory recursively for changes
- *
- * Folder Watcher monitors a directory and its sub directories
- * for changes in the local file system. Changes are signalled
- * through the pathChanged () signal.
- *
- * @ingroup gui
- */
+@brief Monitors a directory recursively for changes
 
-class FolderWatcher : public QObject {
+Folder Watcher monitors a directory and its sub directories
+for changes in the local file system.
+through the pathChanged () signal.
+
+@ingroup gui
+*/
+
+class FolderWatcher : GLib.Object {
 public:
     // Construct, connect signals, call init ()
-    explicit FolderWatcher (Folder *folder = nullptr);
+    FolderWatcher (Folder *folder = nullptr);
     ~FolderWatcher () override;
 
     /**
@@ -63,7 +61,7 @@ public:
      * For example, this can happen on linux if the inotify user limit from
      * /proc/sys/fs/inotify/max_user_watches is exceeded.
      */
-    bool isReliable () const;
+    bool isReliable ();
 
     /**
      * Triggers a change in the path and verifies a notification arrives.
@@ -74,7 +72,7 @@ public:
     void startNotificatonTest (QString &path);
 
     /// For testing linux behavior only
-    int testLinuxWatchCount () const;
+    int testLinuxWatchCount ();
 
 signals:
     /** Emitted when one of the watched directories or one

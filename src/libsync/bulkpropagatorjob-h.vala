@@ -1,16 +1,16 @@
 /*
- * Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #pragma once
 
@@ -20,14 +20,13 @@
 // #include <QByteArray>
 // #include <deque>
 
-namespace OCC {
+namespace Occ {
 
 Q_DECLARE_LOGGING_CATEGORY (lcBulkPropagatorJob)
 
-class ComputeChecksum;
 class PutMultiFileJob;
 
-class BulkPropagatorJob : public PropagatorJob {
+class BulkPropagatorJob : PropagatorJob {
 
     /* This is a minified version of the SyncFileItem,
      * that holds only the specifics about the file that's
@@ -53,7 +52,7 @@ class BulkPropagatorJob : public PropagatorJob {
     };
 
 public:
-    explicit BulkPropagatorJob (OwncloudPropagator *propagator,
+    BulkPropagatorJob (OwncloudPropagator *propagator,
                                const std.deque<SyncFileItemPtr> &items);
 
     bool scheduleSelfOrChild () override;
@@ -82,7 +81,7 @@ private slots:
 
     void slotUploadProgress (SyncFileItemPtr item, int64 sent, int64 total);
 
-    void slotJobDestroyed (QObject *job);
+    void slotJobDestroyed (GLib.Object *job);
 
 private:
     void doStartUpload (SyncFileItemPtr item,
@@ -97,7 +96,7 @@ private:
     void finalizeOneFile (BulkUploadItem &oneFile);
 
     void slotPutFinishedOneFile (BulkUploadItem &singleFile,
-                                OCC.PutMultiFileJob *job,
+                                Occ.PutMultiFileJob *job,
                                 const QJsonObject &fullReplyObject);
 
     void done (SyncFileItemPtr item,
@@ -113,7 +112,7 @@ private:
 
     /**
      * Checks whether the current error is one that should reset the whole
-     * transfer if it happens too often. If so: Bump UploadInfo.errorCount
+     * transfer if it happens too often. If so : Bump UploadInfo.errorCount
      * and maybe perform the reset.
      */
     void checkResettingErrors (SyncFileItemPtr item) const;
@@ -149,7 +148,7 @@ private:
 
     std.deque<SyncFileItemPtr> _items;
 
-    QVector<AbstractNetworkJob *> _jobs; /// network jobs that are currently in transit
+    QVector<AbstractNetworkJob> _jobs; /// network jobs that are currently in transit
 
     QSet<QString> _pendingChecksumFiles;
 

@@ -1,30 +1,29 @@
 /*
- * Copyright (C) by Camila Ayres <camila@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Camila Ayres <camila@nextcloud.com>
 
-class QJsonDocument;
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
 
-namespace OCC {
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
+
+
+namespace Occ {
 
 /**
- * @brief The OcsAppsJob class
- * @ingroup gui
- *
- * Fetching enabled apps from the OCS Apps API
- */
-class OcsNavigationAppsJob : public OcsJob {
+@brief The OcsAppsJob class
+@ingroup gui
+
+Fetching enabled apps from the OCS Apps API
+*/
+class OcsNavigationAppsJob : OcsJob {
 public:
-    explicit OcsNavigationAppsJob (AccountPtr account);
+    OcsNavigationAppsJob (AccountPtr account);
 
     /**
      * Get a list of enabled apps and external sites
@@ -45,5 +44,3 @@ private slots:
     void jobDone (QJsonDocument &reply, int statusCode);
 };
 }
-
-#endif // OCSNAVIGATIONAPPSJOB_H

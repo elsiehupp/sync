@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 // #include <QDialogButtonBox>
 // #include <QVBoxLayout>
 // #include <QTreeWidget>
@@ -23,9 +23,9 @@
 // #include <QLabel>
 // #include <QVBoxLayout>
 
-namespace OCC {
+namespace Occ {
 
-class SelectiveSyncTreeViewItem : public QTreeWidgetItem {
+class SelectiveSyncTreeViewItem : QTreeWidgetItem {
 public:
     SelectiveSyncTreeViewItem (int type = QTreeWidgetItem.Type)
         : QTreeWidgetItem (type) {
@@ -141,7 +141,7 @@ void SelectiveSyncWidget.recursiveInsert (QTreeWidgetItem *parent, QStringList p
         parent.setToolTip (0, path);
         parent.setData (0, Qt.UserRole, path);
     } else {
-        auto *item = static_cast<SelectiveSyncTreeViewItem *> (findFirstChild (parent, pathTrail.first ()));
+        auto *item = static_cast<SelectiveSyncTreeViewItem> (findFirstChild (parent, pathTrail.first ()));
         if (!item) {
             item = new SelectiveSyncTreeViewItem (parent);
             if (parent.checkState (0) == Qt.Checked
@@ -174,11 +174,11 @@ void SelectiveSyncWidget.recursiveInsert (QTreeWidgetItem *parent, QStringList p
 }
 
 void SelectiveSyncWidget.slotUpdateDirectories (QStringList list) {
-    auto job = qobject_cast<LsColJob *> (sender ());
+    auto job = qobject_cast<LsColJob> (sender ());
     QScopedValueRollback<bool> isInserting (_inserting);
     _inserting = true;
 
-    auto *root = static_cast<SelectiveSyncTreeViewItem *> (_folderTree.topLevelItem (0));
+    auto *root = static_cast<SelectiveSyncTreeViewItem> (_folderTree.topLevelItem (0));
 
     QUrl url = _account.davUrl ();
     QString pathToRemove = url.path ();
@@ -441,7 +441,7 @@ SelectiveSyncDialog.SelectiveSyncDialog (AccountPtr account, Folder *folder, QWi
         _okButton.setEnabled (false);
     }
     // Make sure we don't get crashes if the folder is destroyed while we are still open
-    connect (_folder, &QObject.destroyed, this, &QObject.deleteLater);
+    connect (_folder, &GLib.Object.destroyed, this, &GLib.Object.deleteLater);
 }
 
 SelectiveSyncDialog.SelectiveSyncDialog (AccountPtr account, QString &folder,

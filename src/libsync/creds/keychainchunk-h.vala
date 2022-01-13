@@ -1,26 +1,26 @@
 /*
- * Copyright (C) by Michael Schuster <michael@schuster.ms>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Michael Schuster <michael@schuster.ms>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #pragma once
 
-// #include <QObject>
+// #include <GLib.Object>
 // #include <qt5keychain/keychain.h>
 
 // We don't support insecure fallback
-// #define KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK
+// const int KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK
 
-namespace OCC {
+namespace Occ {
 
 namespace KeychainChunk {
 
@@ -34,21 +34,21 @@ static constexpr int ChunkSize = 2048;
 static constexpr int MaxChunks = 10;
 
 /*
- * @brief: Abstract base class for KeychainChunk jobs.
- */
-class OWNCLOUDSYNC_EXPORT Job : public QObject {
+@brief : Abstract base class for KeychainChunk jobs.
+*/
+class OWNCLOUDSYNC_EXPORT Job : GLib.Object {
 public:
-    Job (QObject *parent = nullptr);
+    Job (GLib.Object *parent = nullptr);
 
     ~Job () override;
 
-    QKeychain.Error error () const;
-    QString errorString () const;
+    QKeychain.Error error ();
+    QString errorString ();
 
-    QByteArray binaryData () const;
-    QString textData () const;
+    QByteArray binaryData ();
+    QString textData ();
 
-    bool insecureFallback () const;
+    bool insecureFallback ();
 
 // If we use it but don't support insecure fallback, give us nice compilation errors ;p
 #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
@@ -59,7 +59,7 @@ public:
      * @return Whether this job autodeletes itself once finished () has been emitted. Default is true.
      * @see setAutoDelete ()
      */
-    bool autoDelete () const;
+    bool autoDelete ();
 
     /**
      * Set whether this job should autodelete itself once finished () has been emitted.
@@ -83,12 +83,12 @@ protected:
 }; // class Job
 
 /*
-* @brief: Simple wrapper class for QKeychain.WritePasswordJob, splits too large keychain entry's data into chunks on Windows
+* @brief : Simple wrapper class for QKeychain.WritePasswordJob, splits too large keychain entry's data into chunks on Windows
 */
-class OWNCLOUDSYNC_EXPORT WriteJob : public KeychainChunk.Job {
+class OWNCLOUDSYNC_EXPORT WriteJob : KeychainChunk.Job {
 public:
-    WriteJob (Account *account, QString &key, QByteArray &data, QObject *parent = nullptr);
-    WriteJob (QString &key, QByteArray &data, QObject *parent = nullptr);
+    WriteJob (Account *account, QString &key, QByteArray &data, GLib.Object *parent = nullptr);
+    WriteJob (QString &key, QByteArray &data, GLib.Object *parent = nullptr);
 
     /**
      * Call this method to start the job (async).
@@ -114,12 +114,12 @@ private slots:
 }; // class WriteJob
 
 /*
-* @brief: Simple wrapper class for QKeychain.ReadPasswordJob, splits too large keychain entry's data into chunks on Windows
+* @brief : Simple wrapper class for QKeychain.ReadPasswordJob, splits too large keychain entry's data into chunks on Windows
 */
-class OWNCLOUDSYNC_EXPORT ReadJob : public KeychainChunk.Job {
+class OWNCLOUDSYNC_EXPORT ReadJob : KeychainChunk.Job {
 public:
-    ReadJob (Account *account, QString &key, bool keychainMigration, QObject *parent = nullptr);
-    ReadJob (QString &key, QObject *parent = nullptr);
+    ReadJob (Account *account, QString &key, bool keychainMigration, GLib.Object *parent = nullptr);
+    ReadJob (QString &key, GLib.Object *parent = nullptr);
 
     /**
      * Call this method to start the job (async).
@@ -148,12 +148,12 @@ private:
 }; // class ReadJob
 
 /*
-* @brief: Simple wrapper class for QKeychain.DeletePasswordJob
+* @brief : Simple wrapper class for QKeychain.DeletePasswordJob
 */
-class OWNCLOUDSYNC_EXPORT DeleteJob : public KeychainChunk.Job {
+class OWNCLOUDSYNC_EXPORT DeleteJob : KeychainChunk.Job {
 public:
-    DeleteJob (Account *account, QString &key, bool keychainMigration, QObject *parent = nullptr);
-    DeleteJob (QString &key, QObject *parent = nullptr);
+    DeleteJob (Account *account, QString &key, bool keychainMigration, GLib.Object *parent = nullptr);
+    DeleteJob (QString &key, GLib.Object *parent = nullptr);
 
     /**
      * Call this method to start the job (async).
@@ -180,6 +180,4 @@ private slots:
 
 } // namespace KeychainChunk
 
-} // namespace OCC
-
-#endif // KEYCHAINCHUNK_H
+} // namespace Occ

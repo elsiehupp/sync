@@ -7,12 +7,12 @@
 // #include <QtTest>
 // #include <QDebug>
 
-using namespace OCC;
-namespace OCC {
+using namespace Occ;
+namespace Occ {
 QString OWNCLOUDSYNC_EXPORT createDownloadTmpFileName (QString &previous);
 }
 
-class TestNextcloudPropagator : public QObject {
+class TestNextcloudPropagator : GLib.Object {
 
 private slots:
     void testUpdateErrorFromSession () {
@@ -57,7 +57,7 @@ private slots:
     }
 
     void testParseEtag () {
-        using Test = QPair<const char*, char*>;
+        using Test = QPair<const char*, char>;
         QList<Test> tests;
         tests.append (Test ("\"abcd\"", "abcd"));
         tests.append (Test ("\"\"", ""));

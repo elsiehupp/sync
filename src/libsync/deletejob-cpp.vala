@@ -1,28 +1,28 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QLoggingCategory>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcDeleteJob, "nextcloud.sync.networkjob.delete", QtInfoMsg)
 
-DeleteJob.DeleteJob (AccountPtr account, QString &path, QObject *parent)
+DeleteJob.DeleteJob (AccountPtr account, QString &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 }
 
-DeleteJob.DeleteJob (AccountPtr account, QUrl &url, QObject *parent)
+DeleteJob.DeleteJob (AccountPtr account, QUrl &url, GLib.Object *parent)
     : AbstractNetworkJob (account, QString (), parent)
     , _url (url) {
 }
@@ -40,7 +40,7 @@ void DeleteJob.start () {
     }
 
     if (reply ().error () != QNetworkReply.NoError) {
-        qCWarning (lcDeleteJob) << " Network error: " << reply ().errorString ();
+        qCWarning (lcDeleteJob) << " Network error : " << reply ().errorString ();
     }
     AbstractNetworkJob.start ();
 }
@@ -61,4 +61,4 @@ void DeleteJob.setFolderToken (QByteArray &folderToken) {
     _folderToken = folderToken;
 }
 
-} // namespace OCC
+} // namespace Occ

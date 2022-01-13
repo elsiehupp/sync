@@ -1,43 +1,38 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- * Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QWizard>
 // #include <QLoggingCategory>
 // #include <QSslKey>
 // #include <QSslCertificate>
 
-namespace OCC {
+namespace Occ {
 
 Q_DECLARE_LOGGING_CATEGORY (lcWizard)
 
-class WelcomePage;
 class OwncloudSetupPage;
-class OwncloudHttpCredsPage;
 class OwncloudOAuthCredsPage;
-class OwncloudAdvancedSetupPage;
 class OwncloudWizardResultPage;
-class AbstractCredentials;
 class AbstractCredentialsWizardPage;
-class WebViewPage;
 class Flow2AuthCredsPage;
 
 /**
- * @brief The OwncloudWizard class
- * @ingroup gui
- */
-class OwncloudWizard : public QWizard {
+@brief The OwncloudWizard class
+@ingroup gui
+*/
+class OwncloudWizard : QWizard {
 public:
     enum LogType {
         LogPlain,
@@ -47,20 +42,20 @@ public:
     OwncloudWizard (QWidget *parent = nullptr);
 
     void setAccount (AccountPtr account);
-    AccountPtr account () const;
+    AccountPtr account ();
     void setOCUrl (QString &);
     bool registration ();
     void setRegistration (bool registration);
 
     void setupCustomMedia (QVariant, QLabel *);
-    QString ocUrl () const;
-    QString localFolder () const;
-    QStringList selectiveSyncBlacklist () const;
-    bool useVirtualFileSync () const;
-    bool isConfirmBigFolderChecked () const;
+    QString ocUrl ();
+    QString localFolder ();
+    QStringList selectiveSyncBlacklist ();
+    bool useVirtualFileSync ();
+    bool isConfirmBigFolderChecked ();
 
     void displayError (QString &, bool retryHTTPonly);
-    AbstractCredentials *getCredentials () const;
+    AbstractCredentials *getCredentials ();
 
     void bringToTop ();
     void centerWindow ();
@@ -72,7 +67,7 @@ public:
      */
     static void askExperimentalVirtualFilesFeature (QWidget *receiver, std.function<void (bool enable)> &callback);
 
-    // FIXME: Can those be local variables?
+    // FIXME : Can those be local variables?
     // Set from the OwncloudSetupPage, later used from OwncloudHttpCredsPage
     QByteArray _clientCertBundle; // raw, potentially encrypted pkcs12 bundle provided by the user
     QByteArray _clientCertPassword; // password for the pkcs12
@@ -106,7 +101,7 @@ private:
     void customizeStyle ();
     void adjustWizardSize ();
     int calculateLongestSideOfWizardPages (QList<QSize> &pageSizes) const;
-    QList<QSize> calculateWizardPageSizes () const;
+    QList<QSize> calculateWizardPageSizes ();
 
     AccountPtr _account;
     WelcomePage *_welcomePage;
@@ -126,6 +121,6 @@ private:
     friend class OwncloudSetupWizard;
 };
 
-} // namespace OCC
+} // namespace Occ
 
 #endif

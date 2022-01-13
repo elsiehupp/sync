@@ -1,9 +1,9 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *    support, and with no warranty, express or implied, as to its usefulness for
- *    any purpose.
- *
- */
+   This software is in the public domain, furnished "as is", without technical
+   support, and with no warranty, express or implied, as to its usefulness for
+   any purpose.
+
+*/
 
 // #include <QJsonDocument>
 // #include <QJsonArray>
@@ -51,7 +51,7 @@ void DiskFileModifier.insert (QString &relativePath, int64 size, char contentCha
     file.write (buf.data (), size % buf.size ());
     file.close ();
     // Set the mtime 30 seconds in the past, for some tests that need to make sure that the mtime differs.
-    OCC.FileSystem.setModTime (file.fileName (), OCC.Utility.qDateTimeToTime_t (QDateTime.currentDateTimeUtc ().addSecs (-30)));
+    Occ.FileSystem.setModTime (file.fileName (), Occ.Utility.qDateTimeToTime_t (QDateTime.currentDateTimeUtc ().addSecs (-30)));
     QCOMPARE (file.size (), size);
 }
 
@@ -82,7 +82,7 @@ void DiskFileModifier.rename (QString &from, QString &to) {
 }
 
 void DiskFileModifier.setModTime (QString &relativePath, QDateTime &modTime) {
-    OCC.FileSystem.setModTime (_rootDir.filePath (relativePath), OCC.Utility.qDateTimeToTime_t (modTime));
+    Occ.FileSystem.setModTime (_rootDir.filePath (relativePath), Occ.Utility.qDateTimeToTime_t (modTime));
 }
 
 FileInfo FileInfo.A12_B12_C12_S12 () { { { QStringLiteral ("A"), { { QStringLiteral ("a1"), 4 }, { QStringLiteral ("a2"), 4 } } }, { QStringLiteral ("B"), { { QStringLiteral ("b1"), 16 }, { QStringLiteral ("b2"), 16 } } },
@@ -232,7 +232,7 @@ FileInfo *FileInfo.findInvalidatingEtags (PathComponents pathComponents) {
     return find (std.move (pathComponents), true);
 }
 
-FakePropfindReply.FakePropfindReply (FileInfo &remoteRootFileInfo, QNetworkAccessManager.Operation op, QNetworkRequest &request, QObject *parent)
+FakePropfindReply.FakePropfindReply (FileInfo &remoteRootFileInfo, QNetworkAccessManager.Operation op, QNetworkRequest &request, GLib.Object *parent)
     : FakeReply { parent } {
     setRequest (request);
     setUrl (request.url ());
@@ -265,7 +265,7 @@ FakePropfindReply.FakePropfindReply (FileInfo &remoteRootFileInfo, QNetworkAcces
         if (!url.endsWith (QChar ('/'))) {
             url.append (QChar ('/'));
         }
-        const auto href = OCC.Utility.concatUrlPath (prefix, url).path ();
+        const auto href = Occ.Utility.concatUrlPath (prefix, url).path ();
         xml.writeTextElement (davUri, QStringLiteral ("href"), href);
         xml.writeStartElement (davUri, QStringLiteral ("propstat"));
         xml.writeStartElement (davUri, QStringLiteral ("prop"));
@@ -330,7 +330,7 @@ int64 FakePropfindReply.readData (char *data, int64 maxlen) {
     return len;
 }
 
-FakePutReply.FakePutReply (FileInfo &remoteRootFileInfo, QNetworkAccessManager.Operation op, QNetworkRequest &request, QByteArray &putPayload, QObject *parent)
+FakePutReply.FakePutReply (FileInfo &remoteRootFileInfo, QNetworkAccessManager.Operation op, QNetworkRequest &request, QByteArray &putPayload, GLib.Object *parent)
     : FakeReply { parent } {
     setRequest (request);
     setUrl (request.url ());
@@ -351,7 +351,7 @@ FileInfo *FakePutReply.perform (FileInfo &remoteRootFileInfo, QNetworkRequest &r
         // Assume that the file is filled with the same character
         fileInfo = remoteRootFileInfo.create (fileName, putPayload.size (), putPayload.at (0));
     }
-    fileInfo.lastModified = OCC.Utility.qDateTimeFromTime_t (request.rawHeader ("X-OC-Mtime").toLongLong ());
+    fileInfo.lastModified = Occ.Utility.qDateTimeFromTime_t (request.rawHeader ("X-OC-Mtime").toLongLong ());
     remoteRootFileInfo.find (fileName, /*invalidateEtags=*/true);
     return fileInfo;
 }
@@ -372,7 +372,7 @@ void FakePutReply.abort () {
     emit finished ();
 }
 
-FakePutMultiFileReply.FakePutMultiFileReply (FileInfo &remoteRootFileInfo, QNetworkAccessManager.Operation op, QNetworkRequest &request, QString &contentType, QByteArray &putPayload, QObject *parent)
+FakePutMultiFileReply.FakePutMultiFileReply (FileInfo &remoteRootFileInfo, QNetworkAccessManager.Operation op, QNetworkRequest &request, QString &contentType, QByteArray &putPayload, GLib.Object *parent)
     : FakeReply { parent } {
     setRequest (request);
     setUrl (request.url ());
@@ -382,8 +382,8 @@ FakePutMultiFileReply.FakePutMultiFileReply (FileInfo &remoteRootFileInfo, QNetw
     QMetaObject.invokeMethod (this, "respond", Qt.QueuedConnection);
 }
 
-QVector<FileInfo *> FakePutMultiFileReply.performMultiPart (FileInfo &remoteRootFileInfo, QNetworkRequest &request, QByteArray &putPayload, QString &contentType) {
-    QVector<FileInfo *> result;
+QVector<FileInfo> FakePutMultiFileReply.performMultiPart (FileInfo &remoteRootFileInfo, QNetworkRequest &request, QByteArray &putPayload, QString &contentType) {
+    QVector<FileInfo> result;
 
     auto stringPutPayload = QString.fromUtf8 (putPayload);
     constexpr int boundaryPosition = sizeof ("multipart/related; boundary=");
@@ -397,7 +397,7 @@ QVector<FileInfo *> FakePutMultiFileReply.performMultiPart (FileInfo &remoteRoot
         auto onePartHeaders = onePartHeaderPart.split (QStringLiteral ("\r\n"));
         QMap<QString, QString> allHeaders;
         for (auto oneHeader : onePartHeaders) {
-            auto headerParts = oneHeader.split (QStringLiteral (": "));
+            auto headerParts = oneHeader.split (QStringLiteral (" : "));
             allHeaders[headerParts.at (0)] = headerParts.at (1);
         }
         auto fileName = allHeaders[QStringLiteral ("X-File-Path")];
@@ -410,7 +410,7 @@ QVector<FileInfo *> FakePutMultiFileReply.performMultiPart (FileInfo &remoteRoot
             // Assume that the file is filled with the same character
             fileInfo = remoteRootFileInfo.create (fileName, onePartBody.size (), onePartBody.at (0).toLatin1 ());
         }
-        fileInfo.lastModified = OCC.Utility.qDateTimeFromTime_t (request.rawHeader ("X-OC-Mtime").toLongLong ());
+        fileInfo.lastModified = Occ.Utility.qDateTimeFromTime_t (request.rawHeader ("X-OC-Mtime").toLongLong ());
         remoteRootFileInfo.find (fileName, /*invalidateEtags=*/true);
         result.push_back (fileInfo);
     }
@@ -469,7 +469,7 @@ int64 FakePutMultiFileReply.readData (char *data, int64 maxlen) {
     return len;
 }
 
-FakeMkcolReply.FakeMkcolReply (FileInfo &remoteRootFileInfo, QNetworkAccessManager.Operation op, QNetworkRequest &request, QObject *parent)
+FakeMkcolReply.FakeMkcolReply (FileInfo &remoteRootFileInfo, QNetworkAccessManager.Operation op, QNetworkRequest &request, GLib.Object *parent)
     : FakeReply { parent } {
     setRequest (request);
     setUrl (request.url ());
@@ -494,7 +494,7 @@ void FakeMkcolReply.respond () {
     emit finished ();
 }
 
-FakeDeleteReply.FakeDeleteReply (FileInfo &remoteRootFileInfo, QNetworkAccessManager.Operation op, QNetworkRequest &request, QObject *parent)
+FakeDeleteReply.FakeDeleteReply (FileInfo &remoteRootFileInfo, QNetworkAccessManager.Operation op, QNetworkRequest &request, GLib.Object *parent)
     : FakeReply { parent } {
     setRequest (request);
     setUrl (request.url ());
@@ -513,7 +513,7 @@ void FakeDeleteReply.respond () {
     emit finished ();
 }
 
-FakeMoveReply.FakeMoveReply (FileInfo &remoteRootFileInfo, QNetworkAccessManager.Operation op, QNetworkRequest &request, QObject *parent)
+FakeMoveReply.FakeMoveReply (FileInfo &remoteRootFileInfo, QNetworkAccessManager.Operation op, QNetworkRequest &request, GLib.Object *parent)
     : FakeReply { parent } {
     setRequest (request);
     setUrl (request.url ());
@@ -534,7 +534,7 @@ void FakeMoveReply.respond () {
     emit finished ();
 }
 
-FakeGetReply.FakeGetReply (FileInfo &remoteRootFileInfo, QNetworkAccessManager.Operation op, QNetworkRequest &request, QObject *parent)
+FakeGetReply.FakeGetReply (FileInfo &remoteRootFileInfo, QNetworkAccessManager.Operation op, QNetworkRequest &request, GLib.Object *parent)
     : FakeReply { parent } {
     setRequest (request);
     setUrl (request.url ());
@@ -589,7 +589,7 @@ int64 FakeGetReply.readData (char *data, int64 maxlen) {
     return len;
 }
 
-FakeGetWithDataReply.FakeGetWithDataReply (FileInfo &remoteRootFileInfo, QByteArray &data, QNetworkAccessManager.Operation op, QNetworkRequest &request, QObject *parent)
+FakeGetWithDataReply.FakeGetWithDataReply (FileInfo &remoteRootFileInfo, QByteArray &data, QNetworkAccessManager.Operation op, QNetworkRequest &request, GLib.Object *parent)
     : FakeReply { parent } {
     setRequest (request);
     setUrl (request.url ());
@@ -651,7 +651,7 @@ int64 FakeGetWithDataReply.readData (char *data, int64 maxlen) {
     return len;
 }
 
-FakeChunkMoveReply.FakeChunkMoveReply (FileInfo &uploadsFileInfo, FileInfo &remoteRootFileInfo, QNetworkAccessManager.Operation op, QNetworkRequest &request, QObject *parent)
+FakeChunkMoveReply.FakeChunkMoveReply (FileInfo &uploadsFileInfo, FileInfo &remoteRootFileInfo, QNetworkAccessManager.Operation op, QNetworkRequest &request, GLib.Object *parent)
     : FakeReply { parent } {
     setRequest (request);
     setUrl (request.url ());
@@ -693,7 +693,7 @@ FileInfo *FakeChunkMoveReply.perform (FileInfo &uploadsFileInfo, FileInfo &remot
     }
     Q_ASSERT (sourceFolder.children.count () == count); // There should not be holes or extra files
 
-    // NOTE: This does not actually assemble the file data from the chunks!
+    // NOTE : This does not actually assemble the file data from the chunks!
     FileInfo *fileInfo = remoteRootFileInfo.find (fileName);
     if (fileInfo) {
         // The client should put this header
@@ -713,7 +713,7 @@ FileInfo *FakeChunkMoveReply.perform (FileInfo &uploadsFileInfo, FileInfo &remot
         // Assume that the file is filled with the same character
         fileInfo = remoteRootFileInfo.create (fileName, size, payload);
     }
-    fileInfo.lastModified = OCC.Utility.qDateTimeFromTime_t (request.rawHeader ("X-OC-Mtime").toLongLong ());
+    fileInfo.lastModified = Occ.Utility.qDateTimeFromTime_t (request.rawHeader ("X-OC-Mtime").toLongLong ());
     remoteRootFileInfo.find (fileName, /*invalidateEtags=*/true);
 
     return fileInfo;
@@ -740,12 +740,12 @@ void FakeChunkMoveReply.abort () {
     emit finished ();
 }
 
-FakePayloadReply.FakePayloadReply (QNetworkAccessManager.Operation op, QNetworkRequest &request, QByteArray &body, QObject *parent)
+FakePayloadReply.FakePayloadReply (QNetworkAccessManager.Operation op, QNetworkRequest &request, QByteArray &body, GLib.Object *parent)
     : FakePayloadReply (op, request, body, FakePayloadReply.defaultDelay, parent) {
 }
 
 FakePayloadReply.FakePayloadReply (
-    QNetworkAccessManager.Operation op, QNetworkRequest &request, QByteArray &body, int delay, QObject *parent)
+    QNetworkAccessManager.Operation op, QNetworkRequest &request, QByteArray &body, int delay, GLib.Object *parent)
     : FakeReply{parent}
     , _body (body) {
     setRequest (request);
@@ -775,7 +775,7 @@ int64 FakePayloadReply.bytesAvailable () {
     return _body.size ();
 }
 
-FakeErrorReply.FakeErrorReply (QNetworkAccessManager.Operation op, QNetworkRequest &request, QObject *parent, int httpErrorCode, QByteArray &body)
+FakeErrorReply.FakeErrorReply (QNetworkAccessManager.Operation op, QNetworkRequest &request, GLib.Object *parent, int httpErrorCode, QByteArray &body)
     : FakeReply { parent }
     , _body (body) {
     setRequest (request);
@@ -810,7 +810,7 @@ int64 FakeErrorReply.bytesAvailable () {
     return _body.size ();
 }
 
-FakeHangingReply.FakeHangingReply (QNetworkAccessManager.Operation op, QNetworkRequest &request, QObject *parent)
+FakeHangingReply.FakeHangingReply (QNetworkAccessManager.Operation op, QNetworkRequest &request, GLib.Object *parent)
     : FakeReply (parent) {
     setRequest (request);
     setUrl (request.url ());
@@ -829,7 +829,7 @@ void FakeHangingReply.abort () {
 
 FakeQNAM.FakeQNAM (FileInfo initialRoot)
     : _remoteRootFileInfo { std.move (initialRoot) } {
-    setCookieJar (new OCC.CookieJar);
+    setCookieJar (new Occ.CookieJar);
 }
 
 QJsonObject FakeQNAM.forEachReplyPart (QIODevice *outgoingData,
@@ -849,7 +849,7 @@ QJsonObject FakeQNAM.forEachReplyPart (QIODevice *outgoingData,
         auto onePartHeaders = onePartHeaderPart.split (QStringLiteral ("\r\n"));
         QMap<QString, QByteArray> allHeaders;
         for (auto &oneHeader : qAsConst (onePartHeaders)) {
-            auto headerParts = oneHeader.split (QStringLiteral (": "));
+            auto headerParts = oneHeader.split (QStringLiteral (" : "));
             allHeaders[headerParts.at (0)] = headerParts.at (1).toLatin1 ();
         }
 
@@ -866,7 +866,7 @@ QJsonObject FakeQNAM.forEachReplyPart (QIODevice *outgoingData,
 QNetworkReply *FakeQNAM.createRequest (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *outgoingData) {
     QNetworkReply *reply = nullptr;
     auto newRequest = request;
-    newRequest.setRawHeader ("X-Request-ID", OCC.AccessManager.generateRequestId ());
+    newRequest.setRawHeader ("X-Request-ID", Occ.AccessManager.generateRequestId ());
     auto contentType = request.header (QNetworkRequest.ContentTypeHeader).toString ();
     if (_override) {
         if (auto _reply = _override (op, newRequest, outgoingData)) {
@@ -905,7 +905,7 @@ QNetworkReply *FakeQNAM.createRequest (QNetworkAccessManager.Operation op, QNetw
             Q_UNREACHABLE ();
         }
     }
-    OCC.HttpLogger.logRequest (reply, op, outgoingData);
+    Occ.HttpLogger.logRequest (reply, op, outgoingData);
     return reply;
 }
 
@@ -920,12 +920,12 @@ QNetworkReply * FakeQNAM.overrideReplyWithError (QString fileName, QNetworkAcces
     return reply;
 }
 
-FakeFolder.FakeFolder (FileInfo &fileTemplate, OCC.Optional<FileInfo> &localFileInfo, QString &remotePath)
+FakeFolder.FakeFolder (FileInfo &fileTemplate, Occ.Optional<FileInfo> &localFileInfo, QString &remotePath)
     : _localModifier (_tempDir.path ()) {
     // Needs to be done once
-    OCC.SyncEngine.minimumFileAgeForUpload = std.chrono.milliseconds (0);
-    OCC.Logger.instance ().setLogFile (QStringLiteral ("-"));
-    OCC.Logger.instance ().addLogRule ({ QStringLiteral ("sync.httplogger=true") });
+    Occ.SyncEngine.minimumFileAgeForUpload = std.chrono.milliseconds (0);
+    Occ.Logger.instance ().setLogFile (QStringLiteral ("-"));
+    Occ.Logger.instance ().addLogRule ({ QStringLiteral ("sync.httplogger=true") });
 
     QDir rootDir { _tempDir.path () };
     qDebug () << "FakeFolder operating on" << rootDir;
@@ -936,19 +936,19 @@ FakeFolder.FakeFolder (FileInfo &fileTemplate, OCC.Optional<FileInfo> &localFile
     }
 
     _fakeQnam = new FakeQNAM (fileTemplate);
-    _account = OCC.Account.create ();
+    _account = Occ.Account.create ();
     _account.setUrl (QUrl (QStringLiteral ("http://admin:admin@localhost/owncloud")));
     _account.setCredentials (new FakeCredentials { _fakeQnam });
     _account.setDavDisplayName (QStringLiteral ("fakename"));
     _account.setServerVersion (QStringLiteral ("10.0.0"));
 
-    _journalDb = std.make_unique<OCC.SyncJournalDb> (localPath () + QStringLiteral (".sync_test.db"));
-    _syncEngine = std.make_unique<OCC.SyncEngine> (_account, localPath (), remotePath, _journalDb.get ());
+    _journalDb = std.make_unique<Occ.SyncJournalDb> (localPath () + QStringLiteral (".sync_test.db"));
+    _syncEngine = std.make_unique<Occ.SyncEngine> (_account, localPath (), remotePath, _journalDb.get ());
     // Ignore temporary files from the download. (This is in the default exclude list, but we don't load it)
     _syncEngine.excludedFiles ().addManualExclude (QStringLiteral ("]*.~*"));
 
     // handle aboutToRemoveAllFiles with a timeout in case our test does not handle it
-    QObject.connect (_syncEngine.get (), &OCC.SyncEngine.aboutToRemoveAllFiles, _syncEngine.get (), [this] (OCC.SyncFileItem.Direction, std.function<void (bool)> callback) {
+    GLib.Object.connect (_syncEngine.get (), &Occ.SyncEngine.aboutToRemoveAllFiles, _syncEngine.get (), [this] (Occ.SyncFileItem.Direction, std.function<void (bool)> callback) {
         QTimer.singleShot (1 * 1000, _syncEngine.get (), [callback] {
             callback (false);
         });
@@ -963,23 +963,23 @@ FakeFolder.FakeFolder (FileInfo &fileTemplate, OCC.Optional<FileInfo> &localFile
     ENFORCE (syncOnce ());
 }
 
-void FakeFolder.switchToVfs (QSharedPointer<OCC.Vfs> vfs) {
+void FakeFolder.switchToVfs (QSharedPointer<Occ.Vfs> vfs) {
     auto opts = _syncEngine.syncOptions ();
 
     opts._vfs.stop ();
-    QObject.disconnect (_syncEngine.get (), nullptr, opts._vfs.data (), nullptr);
+    GLib.Object.disconnect (_syncEngine.get (), nullptr, opts._vfs.data (), nullptr);
 
     opts._vfs = vfs;
     _syncEngine.setSyncOptions (opts);
 
-    OCC.VfsSetupParams vfsParams;
+    Occ.VfsSetupParams vfsParams;
     vfsParams.filesystemPath = localPath ();
     vfsParams.remotePath = QLatin1Char ('/');
     vfsParams.account = _account;
     vfsParams.journal = _journalDb.get ();
     vfsParams.providerName = QStringLiteral ("OC-TEST");
     vfsParams.providerVersion = QStringLiteral ("0.1");
-    QObject.connect (_syncEngine.get (), &QObject.destroyed, vfs.data (), [vfs] () {
+    GLib.Object.connect (_syncEngine.get (), &GLib.Object.destroyed, vfs.data (), [vfs] () {
         vfs.stop ();
         vfs.unregisterFolder ();
     });
@@ -1020,7 +1020,7 @@ void FakeFolder.execUntilItemCompleted (QString &relativePath) {
         spy.clear ();
         QVERIFY (spy.wait ());
         for (QList<QVariant> &args : spy) {
-            auto item = args[0].value<OCC.SyncFileItemPtr> ();
+            auto item = args[0].value<Occ.SyncFileItemPtr> ();
             if (item.destination () == relativePath)
                 return;
         }
@@ -1040,7 +1040,7 @@ void FakeFolder.toDisk (QDir &dir, FileInfo &templateFi) {
             file.open (QFile.WriteOnly);
             file.write (QByteArray {}.fill (child.contentChar, child.size));
             file.close ();
-            OCC.FileSystem.setModTime (file.fileName (), OCC.Utility.qDateTimeToTime_t (child.lastModified));
+            Occ.FileSystem.setModTime (file.fileName (), Occ.Utility.qDateTimeToTime_t (child.lastModified));
         }
     }
 }
@@ -1081,7 +1081,7 @@ static FileInfo &findOrCreateDirs (FileInfo &base, PathComponents components) {
 
 FileInfo FakeFolder.dbState () {
     FileInfo result;
-    _journalDb.getFilesBelowPath ("", [&] (OCC.SyncJournalFileRecord &record) {
+    _journalDb.getFilesBelowPath ("", [&] (Occ.SyncJournalFileRecord &record) {
         auto components = PathComponents (record.path ());
         auto &parentDir = findOrCreateDirs (result, components.parentDirComponents ());
         auto name = components.fileName ();
@@ -1092,7 +1092,7 @@ FileInfo FakeFolder.dbState () {
         item.isDir = record._type == ItemTypeDirectory;
         item.permissions = record._remotePerm;
         item.etag = record._etag;
-        item.lastModified = OCC.Utility.qDateTimeFromTime_t (record._modtime);
+        item.lastModified = Occ.Utility.qDateTimeFromTime_t (record._modtime);
         item.fileId = record._fileId;
         item.checksums = record._checksumHeader;
         // item.contentChar can't be set from the db
@@ -1100,28 +1100,28 @@ FileInfo FakeFolder.dbState () {
     return result;
 }
 
-OCC.SyncFileItemPtr ItemCompletedSpy.findItem (QString &path) {
+Occ.SyncFileItemPtr ItemCompletedSpy.findItem (QString &path) {
     for (QList<QVariant> &args : *this) {
-        auto item = args[0].value<OCC.SyncFileItemPtr> ();
+        auto item = args[0].value<Occ.SyncFileItemPtr> ();
         if (item.destination () == path)
             return item;
     }
-    return OCC.SyncFileItemPtr.create ();
+    return Occ.SyncFileItemPtr.create ();
 }
 
-OCC.SyncFileItemPtr ItemCompletedSpy.findItemWithExpectedRank (QString &path, int rank) {
+Occ.SyncFileItemPtr ItemCompletedSpy.findItemWithExpectedRank (QString &path, int rank) {
     Q_ASSERT (size () > rank);
     Q_ASSERT (! (*this)[rank].isEmpty ());
 
-    auto item = (*this)[rank][0].value<OCC.SyncFileItemPtr> ();
+    auto item = (*this)[rank][0].value<Occ.SyncFileItemPtr> ();
     if (item.destination () == path) {
         return item;
     } else {
-        return OCC.SyncFileItemPtr.create ();
+        return Occ.SyncFileItemPtr.create ();
     }
 }
 
-FakeReply.FakeReply (QObject *parent)
+FakeReply.FakeReply (GLib.Object *parent)
     : QNetworkReply (parent) {
     setRawHeader (QByteArrayLiteral ("Date"), QDateTime.currentDateTimeUtc ().toString (Qt.RFC2822Date).toUtf8 ());
 }
@@ -1130,7 +1130,7 @@ FakeReply.~FakeReply () = default;
 
 FakeJsonErrorReply.FakeJsonErrorReply (QNetworkAccessManager.Operation op,
                                        const QNetworkRequest &request,
-                                       QObject *parent,
+                                       GLib.Object *parent,
                                        int httpErrorCode,
                                        const QJsonDocument &reply)
     : FakeErrorReply{ op, request, parent, httpErrorCode, reply.toJson () } {

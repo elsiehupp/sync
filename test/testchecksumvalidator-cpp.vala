@@ -1,18 +1,18 @@
 /*
- * This software is in the public domain, furnished "as is", without technical
- * support, and with no warranty, express or implied, as to its usefulness for
- * any purpose.
- *
- */
+This software is in the public domain, furnished "as is", without technical
+support, and with no warranty, express or implied, as to its usefulness for
+any purpose.
+
+*/
 
 // #include <QtTest>
 // #include <QDir>
 // #include <QString>
 
-using namespace OCC;
-using namespace OCC.Utility;
+using namespace Occ;
+using namespace Occ.Utility;
 
-    class TestChecksumValidator : public QObject {
+    class TestChecksumValidator : GLib.Object {
         Q_OBJECT
     private:
         QTemporaryDir _root;
@@ -26,7 +26,7 @@ using namespace OCC.Utility;
     public slots:
 
     void slotUpValidated (QByteArray& type, QByteArray& checksum) {
-         qDebug () << "Checksum: " << checksum;
+         qDebug () << "Checksum : " << checksum;
          QVERIFY (_expected == checksum );
          QVERIFY (_expectedType == type );
     }
@@ -46,7 +46,7 @@ using namespace OCC.Utility;
         args.append (file);
         md5.start (cmd, args);
         QByteArray sumShell;
-        qDebug () << "File: "<< file;
+        qDebug () << "File : "<< file;
 
         if ( md5.waitForFinished ()  ) {
 
@@ -114,7 +114,7 @@ using namespace OCC.Utility;
         auto file = new QFile (_testfile, vali);
         file.open (QIODevice.ReadOnly);
         _expected = calcAdler32 (file);
-        qDebug () << "XX Expected Checksum: " << _expected;
+        qDebug () << "XX Expected Checksum : " << _expected;
         vali.start (_testfile);
 
         QEventLoop loop;
@@ -128,7 +128,7 @@ using namespace OCC.Utility;
     void testUploadChecksummingMd5 () {
 
         auto *vali = new ComputeChecksum (this);
-        _expectedType = OCC.checkSumMD5C;
+        _expectedType = Occ.checkSumMD5C;
         vali.setChecksumType (_expectedType);
         connect (vali, SIGNAL (done (QByteArray,QByteArray)), this, SLOT (slotUpValidated (QByteArray,QByteArray)));
 
@@ -147,7 +147,7 @@ using namespace OCC.Utility;
     void testUploadChecksummingSha1 () {
 
         auto *vali = new ComputeChecksum (this);
-        _expectedType = OCC.checkSumSHA1C;
+        _expectedType = Occ.checkSumSHA1C;
         vali.setChecksumType (_expectedType);
         connect (vali, SIGNAL (done (QByteArray,QByteArray)), this, SLOT (slotUpValidated (QByteArray,QByteArray)));
 

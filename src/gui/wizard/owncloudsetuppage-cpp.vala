@@ -1,17 +1,17 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- * Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QDir>
 // #include <QFileDialog>
@@ -26,12 +26,12 @@
 // #include <QGraphicsPixmapItem>
 // #include <QBuffer>
 
-namespace OCC {
+namespace Occ {
 
 OwncloudSetupPage.OwncloudSetupPage (QWidget *parent)
     : QWizardPage ()
     , _progressIndi (new QProgressIndicator (this))
-    , _ocWizard (qobject_cast<OwncloudWizard *> (parent)) {
+    , _ocWizard (qobject_cast<OwncloudWizard> (parent)) {
     _ui.setupUi (this);
 
     setupServerAddressDescriptionLabel ();
@@ -108,7 +108,7 @@ void OwncloudSetupPage.slotUrlChanged (QString &url) {
     // Need to set next button as default button here because
     // otherwise the on OSX the next button does not stay the default
     // button
-    auto nextButton = qobject_cast<QPushButton *> (_ocWizard.button (QWizard.NextButton));
+    auto nextButton = qobject_cast<QPushButton> (_ocWizard.button (QWizard.NextButton));
     if (nextButton) {
         nextButton.setDefault (true);
     }
@@ -158,7 +158,7 @@ void OwncloudSetupPage.initializePage () {
     _checking = false;
 
     QAbstractButton *nextButton = wizard ().button (QWizard.NextButton);
-    auto *pushButton = qobject_cast<QPushButton *> (nextButton);
+    auto *pushButton = qobject_cast<QPushButton> (nextButton);
     if (pushButton) {
         pushButton.setDefault (true);
     }
@@ -177,7 +177,7 @@ void OwncloudSetupPage.initializePage () {
         // we just check the server type and switch to next page
         // immediately.
         setCommitPage (true);
-        // Hack: setCommitPage () changes caption, but after an error this page could still be visible
+        // Hack : setCommitPage () changes caption, but after an error this page could still be visible
         setButtonText (QWizard.CommitButton, tr ("&Next >"));
         validatePage ();
         setVisible (false);
@@ -252,11 +252,11 @@ void OwncloudSetupPage.setErrorString (QString &err, bool retryHTTPonly) {
 
                 OwncloudConnectionMethodDialog dialog;
                 dialog.setUrl (url);
-                // FIXME: Synchronous dialogs are not so nice because of event loop recursion
+                // FIXME : Synchronous dialogs are not so nice because of event loop recursion
                 int retVal = dialog.exec ();
 
                 switch (retVal) {
-                case OwncloudConnectionMethodDialog.No_TLS: {
+                case OwncloudConnectionMethodDialog.No_TLS : {
                     url.setScheme ("http");
                     _ui.leUrl.setFullText (url.toString ());
                     // skip ahead to next page, since the user would expect us to retry automatically
@@ -313,7 +313,7 @@ void OwncloudSetupPage.slotCertificateAccepted () {
         _ocWizard._clientCertBundle = certData;
         _ocWizard._clientCertPassword = certPassword;
 
-        addCertDial.reinit (); // FIXME: Why not just have this only created on use?
+        addCertDial.reinit (); // FIXME : Why not just have this only created on use?
 
         // The extracted SSL key and cert gets added to the QSslConfiguration in checkServer ()
         validatePage ();
@@ -344,4 +344,4 @@ void OwncloudSetupPage.customizeStyle () {
     WizardCommon.customizeHintLabel (_ui.serverAddressDescriptionLabel);
 }
 
-} // namespace OCC
+} // namespace Occ

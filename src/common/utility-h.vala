@@ -1,21 +1,21 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This library is free software; you can redistribute it and
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later versi
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GN
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+*/
 
 // #include <QString>
 // #include <QByteArray>
@@ -28,17 +28,15 @@
 // #include <functional>
 // #include <memory>
 
-class QSettings;
 
-namespace OCC {
+namespace Occ {
 
-class SyncJournal;
 
 Q_DECLARE_LOGGING_CATEGORY (lcUtility)
 
 /** \addtogroup libsync
- *  @{
- */
+ @{
+*/
 namespace Utility {
     OCSYNC_EXPORT int rand ();
     OCSYNC_EXPORT void sleep (int sec);
@@ -157,7 +155,7 @@ namespace Utility {
      */
     OCSYNC_EXPORT QString timeAgoInWords (QDateTime &dt, QDateTime &from = QDateTime ());
 
-    class OCSYNC_EXPORT StopWatch {
+    class StopWatch {
     private:
         QMap<QString, uint64> _lapTimes;
         QDateTime _startTime;
@@ -170,7 +168,7 @@ namespace Utility {
         void reset ();
 
         // out helpers, return the measured times.
-        QDateTime startTime () const;
+        QDateTime startTime ();
         QDateTime timeOfLap (QString &lapName) const;
         uint64 durationOfLap (QString &lapName) const;
     };
@@ -187,15 +185,15 @@ namespace Utility {
 
     /**  Returns a new settings pre-set in a specific group.  The Settings will be created
          with the given parent. If no parent is specified, the caller must destroy the settings */
-    OCSYNC_EXPORT std.unique_ptr<QSettings> settingsWithGroup (QString &group, QObject *parent = nullptr);
+    OCSYNC_EXPORT std.unique_ptr<QSettings> settingsWithGroup (QString &group, GLib.Object *parent = nullptr);
 
     /** Sanitizes a string that shall become part of a filename.
      *
      * Filters out reserved characters like
      * - unicode control and format characters
-     * - reserved characters: /, ?, <, >, \, :, *, |, and "
+     * - reserved characters : /, ?, <, >, \, :, *, |, and "
      *
-     * Warning: This does not sanitize the whole resulting string, so
+     * Warning : This does not sanitize the whole resulting string, so
      * - unix reserved filenames ('.', '..')
      * - trailing periods and spaces
      * - windows reserved filenames ('CON' etc)
@@ -267,4 +265,3 @@ inline bool Utility.isBSD () {
 }
 
 }
-#endif // UTILITY_H

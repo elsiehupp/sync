@@ -1,13 +1,11 @@
 #ifndef WEBVIEWPAGE_H
-#define WEBVIEWPAGE_H
+const int WEBVIEWPAGE_H
 
-namespace OCC {
+namespace Occ {
 
-class AbstractCredentials;
 class OwncloudWizard;
-class WebView;
 
-class WebViewPage : public AbstractCredentialsWizardPage {
+class WebViewPage : AbstractCredentialsWizardPage {
 public:
     WebViewPage (QWidget *parent = nullptr);
     ~WebViewPage () override;
@@ -42,5 +40,3 @@ private:
 };
 
 }
-
-#endif // WEBVIEWPAGE_H

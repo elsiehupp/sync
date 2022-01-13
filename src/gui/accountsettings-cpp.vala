@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <cmath>
 
@@ -33,20 +33,19 @@ constexpr auto propertyFolder = "folder";
 constexpr auto propertyPath = "path";
 }
 
-namespace OCC {
+namespace Occ {
 
-class AccountSettings;
 
 Q_LOGGING_CATEGORY (lcAccountSettings, "nextcloud.gui.account.settings", QtInfoMsg)
 
 static const char progressBarStyleC[] =
     "QProgressBar {"
-    "border: 1px solid grey;"
-    "border-radius: 5px;"
-    "text-align: center;"
+    "border : 1px solid grey;"
+    "border-radius : 5px;"
+    "text-align : center;"
     "}"
     "QProgressBar.chunk {"
-    "background-color: %1; width: 1px;"
+    "background-color : %1; width : 1px;"
     "}";
 
 void showEnableE2eeWithVirtualFilesWarningDialog (std.function<void (void)> onAccept) {
@@ -65,28 +64,28 @@ void showEnableE2eeWithVirtualFilesWarningDialog (std.function<void (void)> onAc
     const auto encryptButton = messageBox.addButton (QMessageBox.StandardButton.Ok);
     Q_ASSERT (encryptButton);
     encryptButton.setText (AccountSettings.tr ("Encrypt folder"));
-    QObject.connect (messageBox, &QMessageBox.accepted, onAccept);
+    GLib.Object.connect (messageBox, &QMessageBox.accepted, onAccept);
 
     messageBox.open ();
 }
 
 /**
- * Adjusts the mouse cursor based on the region it is on over the folder tree view.
- *
- * Used to show that one can click the red error list box by changing the cursor
- * to the pointing hand.
- */
-class MouseCursorChanger : public QObject {
+Adjusts the mouse cursor based on the region it is on over the folder tree view.
+
+Used to show that one can click the red error list box by changing the cursor
+to the pointing hand.
+*/
+class MouseCursorChanger : GLib.Object {
 public:
-    MouseCursorChanger (QObject *parent)
-        : QObject (parent) {
+    MouseCursorChanger (GLib.Object *parent)
+        : GLib.Object (parent) {
     }
 
     QTreeView *folderList;
     FolderStatusModel *model;
 
 protected:
-    bool eventFilter (QObject *watched, QEvent *event) override {
+    bool eventFilter (GLib.Object *watched, QEvent *event) override {
         if (event.type () == QEvent.HoverMove) {
             Qt.CursorShape shape = Qt.ArrowCursor;
             auto pos = folderList.mapFromGlobal (QCursor.pos ());
@@ -98,7 +97,7 @@ protected:
             }
             folderList.setCursor (shape);
         }
-        return QObject.eventFilter (watched, event);
+        return GLib.Object.eventFilter (watched, event);
     }
 };
 
@@ -218,13 +217,13 @@ void AccountSettings.slotNewMnemonicGenerated () {
 
 void AccountSettings.slotEncryptFolderFinished (int status) {
     qCInfo (lcAccountSettings) << "Current folder encryption status code:" << status;
-    auto job = qobject_cast<EncryptFolderJob*> (sender ());
+    auto job = qobject_cast<EncryptFolderJob> (sender ());
     Q_ASSERT (job);
     if (!job.errorString ().isEmpty ()) {
         QMessageBox.warning (nullptr, tr ("Warning"), job.errorString ());
     }
 
-    const auto folder = job.property (propertyFolder).value<Folder *> ();
+    const auto folder = job.property (propertyFolder).value<Folder> ();
     Q_ASSERT (folder);
     const auto path = job.property (propertyPath).value<QString> ();
     const auto index = _model.indexForPath (folder, path);
@@ -308,10 +307,10 @@ void AccountSettings.slotMarkSubfolderEncrypted (FolderStatusModel.SubFolderInfo
         Q_ASSERT (!path.startsWith ('/') && path.endsWith ('/'));
         // But EncryptFolderJob expects directory path Foo/Bar convention
         const auto choppedPath = path.chopped (1);
-        auto job = new OCC.EncryptFolderJob (accountsState ().account (), folder.journalDb (), choppedPath, fileId, this);
+        auto job = new Occ.EncryptFolderJob (accountsState ().account (), folder.journalDb (), choppedPath, fileId, this);
         job.setProperty (propertyFolder, QVariant.fromValue (folder));
         job.setProperty (propertyPath, QVariant.fromValue (path));
-        connect (job, &OCC.EncryptFolderJob.finished, this, &AccountSettings.slotEncryptFolderFinished);
+        connect (job, &Occ.EncryptFolderJob.finished, this, &AccountSettings.slotEncryptFolderFinished);
         job.start ();
     };
 
@@ -545,7 +544,7 @@ void AccountSettings.slotCustomContextMenuRequested (QPoint &pos) {
         const auto mode = bestAvailableVfsMode ();
         if (mode == Vfs.WindowsCfApi || ConfigFile ().showExperimentalOptions ()) {
             ac = menu.addAction (tr ("Enable virtual file support %1 …").arg (mode == Vfs.WindowsCfApi ? QString () : tr (" (experimental)")));
-            // TODO: remove when UX decision is made
+            // TODO : remove when UX decision is made
             ac.setEnabled (!Utility.isPathWindowsDrivePartitionRoot (folder.path ()));
             //
             connect (ac, &QAction.triggered, this, &AccountSettings.slotEnableVfsCurrentFolder);
@@ -612,7 +611,7 @@ void AccountSettings.slotAddFolder () {
 }
 
 void AccountSettings.slotFolderWizardAccepted () {
-    auto *folderWizard = qobject_cast<FolderWizard *> (sender ());
+    auto *folderWizard = qobject_cast<FolderWizard> (sender ());
     FolderMan *folderMan = FolderMan.instance ();
 
     qCInfo (lcAccountSettings) << "Folder wizard completed";
@@ -743,7 +742,7 @@ void AccountSettings.slotEnableVfsCurrentFolder () {
         auto connection = std.make_shared<QMetaObject.Connection> ();
         auto switchVfsOn = [folder, connection, this] () {
             if (*connection)
-                QObject.disconnect (*connection);
+                GLib.Object.disconnect (*connection);
 
             qCInfo (lcAccountSettings) << "Enabling vfs support for folder" << folder.path ();
 
@@ -815,7 +814,7 @@ void AccountSettings.slotDisableVfsCurrentFolder () {
         auto connection = std.make_shared<QMetaObject.Connection> ();
         auto switchVfsOff = [folder, connection, this] () {
             if (*connection)
-                QObject.disconnect (*connection);
+                GLib.Object.disconnect (*connection);
 
             qCInfo (lcAccountSettings) << "Disabling vfs support for folder" << folder.path ();
 
@@ -856,7 +855,7 @@ void AccountSettings.slotSetCurrentFolderAvailability (PinState state) {
     if (!selected.isValid () || !folder)
         return;
 
-    // similar to socket api: sets pin state recursively and sync
+    // similar to socket api : sets pin state recursively and sync
     folder.setRootPinState (state);
     folder.scheduleThisFolderSoon ();
 }
@@ -877,7 +876,7 @@ void AccountSettings.slotSetSubFolderAvailability (Folder *folder, QString &path
 
 void AccountSettings.showConnectionLabel (QString &message, QStringList errors) {
     const QString errStyle = QLatin1String ("color:#ffffff; background-color:#bb4d4d;padding:5px;"
-                                           "border-width: 1px; border-style: solid; border-color: #aaaaaa;"
+                                           "border-width : 1px; border-style : solid; border-color : #aaaaaa;"
                                            "border-radius:5px;");
     if (errors.isEmpty ()) {
         QString msg = message;
@@ -903,7 +902,7 @@ void AccountSettings.slotEnableCurrentFolder (bool terminate) {
     if (!alias.isEmpty ()) {
         FolderMan *folderMan = FolderMan.instance ();
 
-        qCInfo (lcAccountSettings) << "Application: enable folder with alias " << alias;
+        qCInfo (lcAccountSettings) << "Application : enable folder with alias " << alias;
         bool currentlyPaused = false;
 
         // this sets the folder status to disabled but does not interrupt it.
@@ -1037,7 +1036,7 @@ void AccountSettings.slotAccountStateChanged () {
         }
 
         switch (state) {
-        case AccountState.Connected: {
+        case AccountState.Connected : {
             QStringList errors;
             if (account.serverVersionUnsupported ()) {
                 errors << tr ("The server version %1 is unsupported! Proceed at your own risk.").arg (account.serverVersion ());
@@ -1054,9 +1053,9 @@ void AccountSettings.slotAccountStateChanged () {
         case AccountState.SignedOut:
             showConnectionLabel (tr ("Signed out from %1.").arg (serverWithUser));
             break;
-        case AccountState.AskingCredentials: {
+        case AccountState.AskingCredentials : {
             QUrl url;
-            if (auto cred = qobject_cast<HttpCredentialsGui *> (account.credentials ())) {
+            if (auto cred = qobject_cast<HttpCredentialsGui> (account.credentials ())) {
                 connect (cred, &HttpCredentialsGui.authorisationLinkChanged,
                     this, &AccountSettings.slotAccountStateChanged, Qt.UniqueConnection);
                 url = cred.authorisationLink ();
@@ -1076,7 +1075,7 @@ void AccountSettings.slotAccountStateChanged () {
                 _accountState.connectionErrors ());
             break;
         case AccountState.ConfigurationError:
-            showConnectionLabel (tr ("Server configuration error: %1 at %2.")
+            showConnectionLabel (tr ("Server configuration error : %1 at %2.")
                                     .arg (Utility.escape (Theme.instance ().appNameGUI ()), server),
                 _accountState.connectionErrors ());
             break;
@@ -1111,7 +1110,7 @@ void AccountSettings.slotAccountStateChanged () {
     refreshSelectiveSyncStatus ();
 
     if (state == AccountState.State.Connected) {
-        /* TODO: We should probably do something better here.
+        /* TODO : We should probably do something better here.
          * Verify if the user has a private key already uploaded to the server,
          * if it has, do not offer to create one.
          */
@@ -1184,7 +1183,7 @@ void AccountSettings.slotSelectiveSyncChanged (QModelIndex &topLeft,
 
     const bool showWarning = _model.isDirty () && _accountState.isConnected () && info._checked == Qt.Unchecked;
 
-    // FIXME: the model is not precise enough to handle extra cases
+    // FIXME : the model is not precise enough to handle extra cases
     // e.g. the user clicked on the same checkbox 2x without applying the change in between.
     // We don't know which checkbox changed to be able to toggle the selectiveSyncLabel display.
     if (showWarning) {
@@ -1232,7 +1231,7 @@ void AccountSettings.refreshSelectiveSyncStatus () {
         bool ok = false;
         const auto undecidedList = folder.journalDb ().getSelectiveSyncList (SyncJournalDb.SelectiveSyncUndecidedList, &ok);
         for (auto &it : undecidedList) {
-            // FIXME: add the folder alias in a hoover hint.
+            // FIXME : add the folder alias in a hoover hint.
             // folder.alias () + QLatin1String ("/")
             if (cnt++) {
                 msg += QLatin1String (", ");
@@ -1254,10 +1253,10 @@ void AccountSettings.refreshSelectiveSyncStatus () {
     if (!msg.isEmpty ()) {
         ConfigFile cfg;
         QString info = !cfg.confirmExternalStorage ()
-                ? tr ("There are folders that were not synchronized because they are too big: ")
+                ? tr ("There are folders that were not synchronized because they are too big : ")
                 : !cfg.newBigFolderSizeLimit ().first
-                  ? tr ("There are folders that were not synchronized because they are external storages: ")
-                  : tr ("There are folders that were not synchronized because they are too big or external storages: ");
+                  ? tr ("There are folders that were not synchronized because they are external storages : ")
+                  : tr ("There are folders that were not synchronized because they are too big or external storages : ");
 
         _ui.selectiveSyncNotification.setText (info + msg);
         _ui.bigFolderUi.setVisible (true);
@@ -1320,6 +1319,6 @@ void AccountSettings.customizeStyle () {
     _ui.quotaProgressBar.setStyleSheet (QString.fromLatin1 (progressBarStyleC).arg (color.name ()));
 }
 
-} // namespace OCC
+} // namespace Occ
 
 #include "accountsettings.moc"

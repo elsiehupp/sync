@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QVector>
 // #include <QString>
@@ -22,16 +22,15 @@
 
 // #include <owncloudlib.h>
 
-namespace OCC {
+namespace Occ {
 
-class SyncFileItem;
 class SyncJournalFileRecord;
 using SyncFileItemPtr = QSharedPointer<SyncFileItem>;
 
 /**
- * @brief The SyncFileItem class
- * @ingroup libsync
- */
+@brief The SyncFileItem class
+@ingroup libsync
+*/
 class OWNCLOUDSYNC_EXPORT SyncFileItem {
     Q_GADGET
 public:
@@ -53,8 +52,8 @@ public:
 
         /** Marks a conflict, old or new.
          *
-         * With instruction:IGNORE: detected an old unresolved old conflict
-         * With instruction:CONFLICT: a new conflict this sync run
+         * With instruction:IGNORE : detected an old unresolved old conflict
+         * With instruction:CONFLICT : a new conflict this sync run
          */
         Conflict,
 
@@ -196,8 +195,8 @@ public:
      */
     QString _file;
 
-    /** for renames: the name _file should be renamed to
-     * for dehydrations: the name _file should become after dehydration (like adding a suffix)
+    /** for renames : the name _file should be renamed to
+     * for dehydrations : the name _file should become after dehydration (like adding a suffix)
      * otherwise empty. Use destination () to find the sync target.
      */
     QString _renameTarget;
@@ -218,7 +217,7 @@ public:
     bool _serverHasIgnoredFiles BITFIELD (1);
 
     /// Whether there's an entry in the blacklist table.
-    /// Note: that entry may have retries left, so this can be true
+    /// Note : that entry may have retries left, so this can be true
     /// without the status being FileIgnored.
     bool _hasBlacklistEntry BITFIELD (1);
 
@@ -273,7 +272,5 @@ inline bool operator< (SyncFileItemPtr &item1, SyncFileItemPtr &item2) {
 using SyncFileItemVector = QVector<SyncFileItemPtr>;
 }
 
-Q_DECLARE_METATYPE (OCC.SyncFileItem)
-Q_DECLARE_METATYPE (OCC.SyncFileItemPtr)
-
-#endif // SYNCFILEITEM_H
+Q_DECLARE_METATYPE (Occ.SyncFileItem)
+Q_DECLARE_METATYPE (Occ.SyncFileItemPtr)

@@ -1,17 +1,17 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- * Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QAbstractButton>
 // #include <QtCore>
@@ -20,10 +20,10 @@
 // #include <QDesktopServices>
 // #include <QApplication>
 
-namespace OCC {
+namespace Occ {
 
-OwncloudSetupWizard.OwncloudSetupWizard (QObject *parent)
-    : QObject (parent)
+OwncloudSetupWizard.OwncloudSetupWizard (GLib.Object *parent)
+    : GLib.Object (parent)
     , _ocWizard (new OwncloudWizard)
     , _remoteFolder () {
     connect (_ocWizard, &OwncloudWizard.determineAuthType,
@@ -37,7 +37,7 @@ OwncloudSetupWizard.OwncloudSetupWizard (QObject *parent)
        Therefore Qt.QueuedConnection is required */
     connect (_ocWizard, &OwncloudWizard.basicSetupFinished,
         this, &OwncloudSetupWizard.slotAssistantFinished, Qt.QueuedConnection);
-    connect (_ocWizard, &QDialog.finished, this, &QObject.deleteLater);
+    connect (_ocWizard, &QDialog.finished, this, &GLib.Object.deleteLater);
     connect (_ocWizard, &OwncloudWizard.skipFolderConfiguration, this, &OwncloudSetupWizard.slotSkipFolderConfiguration);
 }
 
@@ -47,7 +47,7 @@ OwncloudSetupWizard.~OwncloudSetupWizard () {
 
 static QPointer<OwncloudSetupWizard> wiz = nullptr;
 
-void OwncloudSetupWizard.runWizard (QObject *obj, char *amember, QWidget *parent) {
+void OwncloudSetupWizard.runWizard (GLib.Object *obj, char *amember, QWidget *parent) {
     if (!wiz.isNull ()) {
         bringWizardToFrontIfVisible ();
         return;
@@ -180,7 +180,7 @@ void OwncloudSetupWizard.slotFindServer () {
     // 2. Check the url for permanent redirects (like url shorteners)
     // 3. Check redirected-url/status.php with CheckServerJob
 
-    // Step 1: Check url/status.php
+    // Step 1 : Check url/status.php
     auto *job = new CheckServerJob (account, this);
     job.setIgnoreCredentialFailure (true);
     connect (job, &CheckServerJob.instanceFound, this, &OwncloudSetupWizard.slotFoundServer);
@@ -195,7 +195,7 @@ void OwncloudSetupWizard.slotFindServer () {
 void OwncloudSetupWizard.slotFindServerBehindRedirect () {
     AccountPtr account = _ocWizard.account ();
 
-    // Step 2: Resolve any permanent redirect chains on the base url
+    // Step 2 : Resolve any permanent redirect chains on the base url
     auto redirectCheckJob = account.sendRequest ("GET", account.url ());
 
     // Use a significantly reduced timeout for this redirect check:
@@ -215,7 +215,7 @@ void OwncloudSetupWizard.slotFindServerBehindRedirect () {
             }
         });
 
-    // Step 3: When done, start checking status.php.
+    // Step 3 : When done, start checking status.php.
     connect (redirectCheckJob, &SimpleNetworkJob.finishedSignal, this,
         [this, account] () {
             auto *job = new CheckServerJob (account, this);
@@ -231,7 +231,7 @@ void OwncloudSetupWizard.slotFindServerBehindRedirect () {
 void OwncloudSetupWizard.slotFoundServer (QUrl &url, QJsonObject &info) {
     auto serverVersion = CheckServerJob.version (info);
 
-    _ocWizard.appendToConfigurationLog (tr ("<font color=\"green\">Successfully connected to %1: %2 version %3 (%4)</font><br/><br/>")
+    _ocWizard.appendToConfigurationLog (tr ("<font color=\"green\">Successfully connected to %1 : %2 version %3 (%4)</font><br/><br/>")
                                             .arg (Utility.escape (url.toString ()),
                                                 Utility.escape (Theme.instance ().appNameGUI ()),
                                                 Utility.escape (CheckServerJob.versionString (info)),
@@ -251,7 +251,7 @@ void OwncloudSetupWizard.slotFoundServer (QUrl &url, QJsonObject &info) {
 }
 
 void OwncloudSetupWizard.slotNoServerFound (QNetworkReply *reply) {
-    auto job = qobject_cast<CheckServerJob *> (sender ());
+    auto job = qobject_cast<CheckServerJob> (sender ());
 
     // Do this early because reply might be deleted in message box event loop
     QString msg;
@@ -288,7 +288,7 @@ void OwncloudSetupWizard.slotDetermineAuthType () {
 }
 
 void OwncloudSetupWizard.slotConnectToOCUrl (QString &url) {
-    qCInfo (lcWizard) << "Connect to url: " << url;
+    qCInfo (lcWizard) << "Connect to url : " << url;
     AbstractCredentials *creds = _ocWizard.getCredentials ();
     _ocWizard.account ().setCredentials (creds);
 
@@ -333,7 +333,7 @@ void OwncloudSetupWizard.testOwnCloudConnect () {
 void OwncloudSetupWizard.slotAuthError () {
     QString errorMsg;
 
-    auto *job = qobject_cast<PropfindJob *> (sender ());
+    auto *job = qobject_cast<PropfindJob> (sender ());
     if (!job) {
         qCWarning (lcWizard) << "Cannot check for authed redirects. This slot should be invoked from PropfindJob!";
         return;
@@ -362,7 +362,7 @@ void OwncloudSetupWizard.slotAuthError () {
                       "\"%1\". The URL is bad, the server is misconfigured.")
                        .arg (Utility.escape (redirectUrl.toString ()));
 
-        // A 404 is actually a success: we were authorized to know that the folder does
+        // A 404 is actually a success : we were authorized to know that the folder does
         // not exist. It will be created later...
     } else if (reply.error () == QNetworkReply.ContentNotFoundError) {
         _ocWizard.successfulStep ();
@@ -444,9 +444,9 @@ void OwncloudSetupWizard.slotCreateLocalAndRemoteFolders (QString &localFolder, 
         /*
          * BEGIN - Sanitize URL paths to eliminate double-slashes
          *
-         *         Purpose: Don't rely on unsafe paths, be extra careful.
+         *         Purpose : Don't rely on unsafe paths, be extra careful.
          *
-         *         Example: https://cloud.example.com/remote.php/dav//
+         *         Example : https://cloud.example.com/remote.php/dav//
          *
         */
         qCInfo (lcWizard) << "Sanitize got URL path:" << QString (_ocWizard.account ().url ().toString () + '/' + _ocWizard.account ().davPath () + remoteFolder);
@@ -485,7 +485,7 @@ void OwncloudSetupWizard.slotCreateLocalAndRemoteFolders (QString &localFolder, 
 
 // ### TODO move into EntityExistsJob once we decide if/how to return gui strings from jobs
 void OwncloudSetupWizard.slotRemoteFolderExists (QNetworkReply *reply) {
-    auto job = qobject_cast<EntityExistsJob *> (sender ());
+    auto job = qobject_cast<EntityExistsJob> (sender ());
     bool ok = true;
     QString error;
     QNetworkReply.NetworkError errId = reply.error ();
@@ -500,7 +500,7 @@ void OwncloudSetupWizard.slotRemoteFolderExists (QNetworkReply *reply) {
             createRemoteFolder ();
         }
     } else {
-        error = tr ("Error: %1").arg (job.errorString ());
+        error = tr ("Error : %1").arg (job.errorString ());
         ok = false;
     }
 
@@ -512,7 +512,7 @@ void OwncloudSetupWizard.slotRemoteFolderExists (QNetworkReply *reply) {
 }
 
 void OwncloudSetupWizard.createRemoteFolder () {
-    _ocWizard.appendToConfigurationLog (tr ("creating folder on Nextcloud: %1").arg (_remoteFolder));
+    _ocWizard.appendToConfigurationLog (tr ("creating folder on Nextcloud : %1").arg (_remoteFolder));
 
     auto *job = new MkColJob (_ocWizard.account (), _remoteFolder, this);
     connect (job, &MkColJob.finishedWithError, this, &OwncloudSetupWizard.slotCreateRemoteFolderFinished);
@@ -671,4 +671,4 @@ AccountState *OwncloudSetupWizard.applyAccountChanges () {
     return newState;
 }
 
-} // namespace OCC
+} // namespace Occ

@@ -1,25 +1,24 @@
 /*
- * Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 // #pragma once
 
 // #include <memory>
 
 struct CF_PLACEHOLDER_BASIC_INFO;
 
-namespace OCC {
+namespace Occ {
 
-class VfsCfApi;
 
 namespace CfApiWrapper {
 
@@ -57,7 +56,7 @@ public:
     inline CF_PLACEHOLDER_BASIC_INFO *operator. () const noexcept { return _data.get (); }
     inline explicit operator bool () const noexcept { return static_cast<bool> (_data); }
 
-    Optional<PinState> pinState () const;
+    Optional<PinState> pinState ();
 
 private:
     std.unique_ptr<CF_PLACEHOLDER_BASIC_INFO, Deleter> _data;
@@ -81,11 +80,11 @@ enum SetPinRecurseMode {
     ChildrenOnly
 };
 
-NEXTCLOUD_CFAPI_EXPORT Result<OCC.Vfs.ConvertToPlaceholderResult, QString> setPinState (FileHandle &handle, PinState state, SetPinRecurseMode mode);
+NEXTCLOUD_CFAPI_EXPORT Result<Occ.Vfs.ConvertToPlaceholderResult, QString> setPinState (FileHandle &handle, PinState state, SetPinRecurseMode mode);
 NEXTCLOUD_CFAPI_EXPORT Result<void, QString> createPlaceholderInfo (QString &path, time_t modtime, int64 size, QByteArray &fileId);
-NEXTCLOUD_CFAPI_EXPORT Result<OCC.Vfs.ConvertToPlaceholderResult, QString> updatePlaceholderInfo (FileHandle &handle, time_t modtime, int64 size, QByteArray &fileId, QString &replacesPath = QString ());
-NEXTCLOUD_CFAPI_EXPORT Result<OCC.Vfs.ConvertToPlaceholderResult, QString> convertToPlaceholder (FileHandle &handle, time_t modtime, int64 size, QByteArray &fileId, QString &replacesPath);
+NEXTCLOUD_CFAPI_EXPORT Result<Occ.Vfs.ConvertToPlaceholderResult, QString> updatePlaceholderInfo (FileHandle &handle, time_t modtime, int64 size, QByteArray &fileId, QString &replacesPath = QString ());
+NEXTCLOUD_CFAPI_EXPORT Result<Occ.Vfs.ConvertToPlaceholderResult, QString> convertToPlaceholder (FileHandle &handle, time_t modtime, int64 size, QByteArray &fileId, QString &replacesPath);
 
 }
 
-} // namespace OCC
+} // namespace Occ

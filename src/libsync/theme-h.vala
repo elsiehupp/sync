@@ -1,36 +1,32 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QIcon>
-// #include <QObject>
+// #include <GLib.Object>
 
-class QString;
-class QObject;
-class QPixmap;
+class GLib.Object;
 class QColor;
-class QPaintDevice;
 class QPalette;
 
-namespace OCC {
+namespace Occ {
 
-class SyncResult;
 
 /**
- * @brief The Theme class
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT Theme : public QObject {
+@brief The Theme class
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT Theme : GLib.Object {
     Q_PROPERTY (bool branded READ isBranded CONSTANT)
     Q_PROPERTY (QString appNameGUI READ appNameGUI CONSTANT)
     Q_PROPERTY (QString appName READ appName CONSTANT)
@@ -80,7 +76,7 @@ public:
      *
      * @return true if branded, false otherwise
      */
-    virtual bool isBranded () const;
+    virtual bool isBranded ();
 
     /**
      * @brief appNameGUI - Human readable application name.
@@ -93,7 +89,7 @@ public:
      *
      * @return QString with human readable app name.
      */
-    virtual QString appNameGUI () const;
+    virtual QString appNameGUI ();
 
     /**
      * @brief appName - Application name (short)
@@ -106,66 +102,66 @@ public:
      * cmake variable, and should be the same. This method is only
      * reimplementable for legacy reasons.
      *
-     * Warning: Do not modify this value, as many things, e.g. settings
+     * Warning : Do not modify this value, as many things, e.g. settings
      * depend on it! You most likely want to modify \ref appNameGUI ().
      *
      * @return QString with app name.
      */
-    virtual QString appName () const;
+    virtual QString appName ();
 
     /**
      * @brief Returns full path to an online state icon
      * @return QUrl full path to an icon
      */
-    QUrl stateOnlineImageSource () const;
+    QUrl stateOnlineImageSource ();
 
     /**
      * @brief Returns full path to an offline state icon
      * @return QUrl full path to an icon
      */
-    QUrl stateOfflineImageSource () const;
+    QUrl stateOfflineImageSource ();
 
     /**
      * @brief Returns full path to an online user status icon
      * @return QUrl full path to an icon
      */
-    QUrl statusOnlineImageSource () const;
+    QUrl statusOnlineImageSource ();
 
     /**
      * @brief Returns full path to an do not disturb user status icon
      * @return QUrl full path to an icon
      */
-    QUrl statusDoNotDisturbImageSource () const;
+    QUrl statusDoNotDisturbImageSource ();
 
     /**
      * @brief Returns full path to an away user status icon
      * @return QUrl full path to an icon
      */
-    QUrl statusAwayImageSource () const;
+    QUrl statusAwayImageSource ();
 
     /**
      * @brief Returns full path to an invisible user status icon
      * @return QUrl full path to an icon
      */
-    QUrl statusInvisibleImageSource () const;
+    QUrl statusInvisibleImageSource ();
 
-    QUrl syncStatusOk () const;
+    QUrl syncStatusOk ();
 
-    QUrl syncStatusError () const;
+    QUrl syncStatusError ();
 
-    QUrl syncStatusRunning () const;
+    QUrl syncStatusRunning ();
 
-    QUrl syncStatusPause () const;
+    QUrl syncStatusPause ();
 
-    QUrl syncStatusWarning () const;
+    QUrl syncStatusWarning ();
 
-    QUrl folderOffline () const;
+    QUrl folderOffline ();
 
     /**
      * @brief configFileName
      * @return the name of the config file.
      */
-    virtual QString configFileName () const;
+    virtual QString configFileName ();
 
 #ifndef TOKEN_AUTH_ONLY
     static QString hidpiFileName (QString &fileName, QPaintDevice *dev = nullptr);
@@ -179,23 +175,23 @@ public:
       */
     virtual QIcon syncStateIcon (SyncResult.Status, bool sysTray = false) const;
 
-    virtual QIcon folderDisabledIcon () const;
+    virtual QIcon folderDisabledIcon ();
     virtual QIcon folderOfflineIcon (bool sysTray = false) const;
-    virtual QIcon applicationIcon () const;
+    virtual QIcon applicationIcon ();
 #endif
 
     virtual QString statusHeaderText (SyncResult.Status) const;
-    virtual QString version () const;
+    virtual QString version ();
 
     /**
-     * Characteristics: bool if more than one sync folder is allowed
+     * Characteristics : bool if more than one sync folder is allowed
      */
-    virtual bool singleSyncFolder () const;
+    virtual bool singleSyncFolder ();
 
     /**
      * When true, client works with multiple accounts.
      */
-    virtual bool multiAccount () const;
+    virtual bool multiAccount ();
 
     /**
     * URL to documentation.
@@ -207,7 +203,7 @@ public:
     *
     * Defaults to Nextclouds client documentation website.
     */
-    virtual QString helpUrl () const;
+    virtual QString helpUrl ();
 
     /**
      * The url to use for showing help on conflicts.
@@ -218,52 +214,52 @@ public:
      * documentation website. If helpUrl () is empty, this function will also return the
      * empty string.
      */
-    virtual QString conflictHelpUrl () const;
+    virtual QString conflictHelpUrl ();
 
     /**
      * Setting a value here will pre-define the server url.
      *
      * The respective UI controls will be disabled only if forceOverrideServerUrl () is true
      */
-    virtual QString overrideServerUrl () const;
+    virtual QString overrideServerUrl ();
 
     /**
      * Enforce a pre-defined server url.
      *
      * When true, the respective UI controls will be disabled
      */
-    virtual bool forceOverrideServerUrl () const;
+    virtual bool forceOverrideServerUrl ();
 
     /**
      * Enable OCSP stapling for SSL handshakes
      *
      * When true, peer will be requested for Online Certificate Status Protocol response
      */
-    virtual bool enableStaplingOCSP () const;
+    virtual bool enableStaplingOCSP ();
 
     /**
      * Enforce SSL validity
      *
      * When true, trusting the untrusted certificate is not allowed
      */
-    virtual bool forbidBadSSL () const;
+    virtual bool forbidBadSSL ();
 
     /**
      * This is only usefull when previous version had a different overrideServerUrl
      * with a different auth type in that case You should then specify "http" or "shibboleth".
      * Normaly this should be left empty.
      */
-    virtual QString forceConfigAuthType () const;
+    virtual QString forceConfigAuthType ();
 
     /**
      * The default folder name without path on the server at setup time.
      */
-    virtual QString defaultServerFolder () const;
+    virtual QString defaultServerFolder ();
 
     /**
      * The default folder name without path on the client side at setup time.
      */
-    virtual QString defaultClientFolder () const;
+    virtual QString defaultClientFolder ();
 
     /**
      * Override to encforce a particular locale, i.e. "de" or "pt_BR"
@@ -282,15 +278,15 @@ public:
     virtual QVariant customMedia (CustomMediaType type);
 
     /** @return color for the setup wizard */
-    virtual QColor wizardHeaderTitleColor () const;
+    virtual QColor wizardHeaderTitleColor ();
 
     /** @return color for the setup wizard. */
-    virtual QColor wizardHeaderBackgroundColor () const;
+    virtual QColor wizardHeaderBackgroundColor ();
 
-    virtual QPixmap wizardApplicationLogo () const;
+    virtual QPixmap wizardApplicationLogo ();
 
     /** @return logo for the setup wizard. */
-    virtual QPixmap wizardHeaderLogo () const;
+    virtual QPixmap wizardHeaderLogo ();
 
     /**
      * The default implementation creates a
@@ -299,23 +295,23 @@ public:
      *
      * @return banner for the setup wizard.
      */
-    virtual QPixmap wizardHeaderBanner () const;
+    virtual QPixmap wizardHeaderBanner ();
 #endif
 
     /**
      * The SHA sum of the released git commit
      */
-    QString gitSHA1 () const;
+    QString gitSHA1 ();
 
     /**
      * About dialog contents
      */
-    virtual QString about () const;
+    virtual QString about ();
 
     /**
      * Legal notice dialog version detail contents
      */
-    virtual QString aboutDetails () const;
+    virtual QString aboutDetails ();
 
     /**
      * Define if the systray icons should be using mono design
@@ -325,56 +321,56 @@ public:
     /**
      * Retrieve wether to use mono icons for systray
      */
-    bool systrayUseMonoIcons () const;
+    bool systrayUseMonoIcons ();
 
     /**
      * Check if mono icons are available
      */
-    bool monoIconsAvailable () const;
+    bool monoIconsAvailable ();
 
     /**
      * @brief Where to check for new Updates.
      */
-    virtual QString updateCheckUrl () const;
+    virtual QString updateCheckUrl ();
 
     /**
      * When true, the setup wizard will show the selective sync dialog by default and default
      * to nothing selected
      */
-    virtual bool wizardSelectiveSyncDefaultNothing () const;
+    virtual bool wizardSelectiveSyncDefaultNothing ();
 
     /**
      * Default option for the newBigFolderSizeLimit.
      * Size in MB of the maximum size of folder before we ask the confirmation.
      * Set -1 to never ask confirmation.  0 to ask confirmation for every folder.
      **/
-    virtual int64 newBigFolderSizeLimit () const;
+    virtual int64 newBigFolderSizeLimit ();
 
     /**
      * Hide the checkbox that says "Ask for confirmation before synchronizing folders larger than X MB"
      * in the account wizard
      */
-    virtual bool wizardHideFolderSizeLimitCheckbox () const;
+    virtual bool wizardHideFolderSizeLimitCheckbox ();
     /**
      * Hide the checkbox that says "Ask for confirmation before synchronizing external storages"
      * in the account wizard
      */
-    virtual bool wizardHideExternalStorageConfirmationCheckbox () const;
+    virtual bool wizardHideExternalStorageConfirmationCheckbox ();
 
     /**
      * @brief Sharing options
      *
      * Allow link sharing and or user/group sharing
      */
-    virtual bool linkSharing () const;
-    virtual bool userGroupSharing () const;
+    virtual bool linkSharing ();
+    virtual bool userGroupSharing ();
 
     /**
      * If this returns true, the user cannot configure the proxy in the network settings.
      * The proxy settings will be disabled in the configuration dialog.
      * Default returns false.
      */
-    virtual bool forceSystemNetworkProxy () const;
+    virtual bool forceSystemNetworkProxy ();
 
     /**
      * @brief How to handle the userID
@@ -391,7 +387,7 @@ public:
      *
      *  @return UserIDType.UserIDUserName, unless reimplemented
      */
-    virtual UserIDType userIDType () const;
+    virtual UserIDType userIDType ();
 
     /**
      * @brief Allows to customize the type of user ID (e.g. user name, email)
@@ -401,7 +397,7 @@ public:
      *
      * @return An empty string, unless reimplemented
      */
-    virtual QString customUserID () const;
+    virtual QString customUserID ();
 
     /**
      * @brief Demo string to be displayed when no text has been
@@ -409,7 +405,7 @@ public:
      *
      * @return An empty string, unless reimplemented
      */
-    virtual QString userIDHint () const;
+    virtual QString userIDHint ();
 
     /**
      * @brief Postfix that will be enforced in a URL. e.g.
@@ -417,14 +413,14 @@ public:
      *
      * @return An empty string, unless reimplemented
      */
-    virtual QString wizardUrlPostfix () const;
+    virtual QString wizardUrlPostfix ();
 
     /**
      * @brief String that will be shown as long as no text has been entered by the user.
      *
      * @return An empty string, unless reimplemented
      */
-    virtual QString wizardUrlHint () const;
+    virtual QString wizardUrlHint ();
 
     /**
      * @brief the server folder that should be queried for the quota information
@@ -433,16 +429,16 @@ public:
      * folder than the root. This is the folder on which the client will do
      * PROPFIND calls to get "quota-available-bytes" and "quota-used-bytes"
      *
-     * Defaults: "/"
+     * Defaults : "/"
      */
-    virtual QString quotaBaseFolder () const;
+    virtual QString quotaBaseFolder ();
 
     /**
      * The OAuth client_id, secret pair.
      * Note that client that change these value cannot connect to un-branded owncloud servers.
      */
-    virtual QString oauthClientId () const;
-    virtual QString oauthClientSecret () const;
+    virtual QString oauthClientId ();
+    virtual QString oauthClientSecret ();
 
     /**
      * @brief What should be output for the --version command line switch.
@@ -450,7 +446,7 @@ public:
      * By default, it's a combination of appName (), version (), the GIT SHA1 and some
      * important dependency versions.
      */
-    virtual QString versionSwitchOutput () const;
+    virtual QString versionSwitchOutput ();
 	
 	/**
     * @brief Request suitable QIcon resource depending on the background colour of the parent widget.
@@ -465,7 +461,7 @@ public:
      *
      * @return True if the specified colour is dark.
      *
-     * 2019/12/08: Moved here from SettingsDialog.
+     * 2019/12/08 : Moved here from SettingsDialog.
      */
     static bool isDarkColor (QColor &color);
 
@@ -474,7 +470,7 @@ public:
      *
      * @return Background-aware colour for HTML links, based on the current app palette or given colour.
      *
-     * 2019/12/08: Implemented for the Dark Mode on macOS, because the app palette can not account for that (Qt 5.12.5).
+     * 2019/12/08 : Implemented for the Dark Mode on macOS, because the app palette can not account for that (Qt 5.12.5).
      */
     static QColor getBackgroundAwareLinkColor (QColor &backgroundColor);
 
@@ -483,14 +479,14 @@ public:
      *
      * @return Background-aware colour for HTML links, based on the current app palette.
      *
-     * 2019/12/08: Implemented for the Dark Mode on macOS, because the app palette can not account for that (Qt 5.12.5).
+     * 2019/12/08 : Implemented for the Dark Mode on macOS, because the app palette can not account for that (Qt 5.12.5).
      */
     static QColor getBackgroundAwareLinkColor ();
 
     /**
      * @brief Appends a CSS-style colour value to all HTML link tags in a given string, based on the current app palette or given colour (Dark-/Light-Mode switching).
      *
-     * 2019/12/08: Implemented for the Dark Mode on macOS, because the app palette can not account for that (Qt 5.12.5).
+     * 2019/12/08 : Implemented for the Dark Mode on macOS, because the app palette can not account for that (Qt 5.12.5).
      *
      * This way we also avoid having certain strings re-translated on Transifex.
      */
@@ -499,7 +495,7 @@ public:
     /**
      * @brief Appends a CSS-style colour value to all HTML link tags in a given string, based on the current app palette (Dark-/Light-Mode switching).
      *
-     * 2019/12/08: Implemented for the Dark Mode on macOS, because the app palette can not account for that (Qt 5.12.5).
+     * 2019/12/08 : Implemented for the Dark Mode on macOS, because the app palette can not account for that (Qt 5.12.5).
      *
      * This way we also avoid having certain strings re-translated on Transifex.
      */
@@ -508,7 +504,7 @@ public:
     /**
      * @brief Appends a CSS-style colour value to all HTML link tags in a given string, as specified by newColor.
      *
-     * 2019/12/19: Implemented for the Dark Mode on macOS, because the app palette can not account for that (Qt 5.12.5).
+     * 2019/12/19 : Implemented for the Dark Mode on macOS, because the app palette can not account for that (Qt 5.12.5).
      *
      * This way we also avoid having certain strings re-translated on Transifex.
      */
@@ -519,7 +515,7 @@ public:
      *
      * @return QIcon, colour-aware (inverted on dark backgrounds).
      *
-     * 2019/12/09: Moved here from SettingsDialog.
+     * 2019/12/09 : Moved here from SettingsDialog.
      */
     static QIcon createColorAwareIcon (QString &name, QPalette &palette);
 
@@ -528,7 +524,7 @@ public:
      *
      * @return QIcon, colour-aware (inverted on dark backgrounds).
      *
-     * 2019/12/09: Moved here from SettingsDialog.
+     * 2019/12/09 : Moved here from SettingsDialog.
      */
     static QIcon createColorAwareIcon (QString &name);
 
@@ -537,7 +533,7 @@ public:
      *
      * @return QPixmap, colour-aware (inverted on dark backgrounds).
      *
-     * 2019/12/09: Adapted from createColorAwareIcon.
+     * 2019/12/09 : Adapted from createColorAwareIcon.
      */
     static QPixmap createColorAwarePixmap (QString &name, QPalette &palette);
 
@@ -546,7 +542,7 @@ public:
      *
      * @return QPixmap, colour-aware (inverted on dark backgrounds).
      *
-     * 2019/12/09: Adapted from createColorAwareIcon.
+     * 2019/12/09 : Adapted from createColorAwareIcon.
      */
     static QPixmap createColorAwarePixmap (QString &name);
 
@@ -556,18 +552,18 @@ public:
      * By default, the options are not shown unless experimental options are
      * manually enabled in the configuration file.
      */
-    virtual bool showVirtualFilesOption () const;
+    virtual bool showVirtualFilesOption ();
 
-    virtual bool enforceVirtualFilesSyncFolder () const;
+    virtual bool enforceVirtualFilesSyncFolder ();
 
     /** @return color for the ErrorBox text. */
-    virtual QColor errorBoxTextColor () const;
+    virtual QColor errorBoxTextColor ();
 
     /** @return color for the ErrorBox background. */
-    virtual QColor errorBoxBackgroundColor () const;
+    virtual QColor errorBoxBackgroundColor ();
 
     /** @return color for the ErrorBox border. */
-    virtual QColor errorBoxBorderColor () const;
+    virtual QColor errorBoxBorderColor ();
 
     static constexpr const char *themePrefix = ":/client/theme/";
 
@@ -599,4 +595,3 @@ private:
 #endif
 };
 }
-#endif // _THEME_H

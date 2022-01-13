@@ -1,20 +1,20 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This library is free software; you can redistribute it and
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later versi
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GN
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+*/
 
 // #include <QLoggingCategory>
 // #include <qtconcurrentrun.h>
@@ -25,66 +25,66 @@
 #endif
 
 /** \file checksums.cpp
- *
- * \brief Computing and validating file checksums
- *
- * Overview
- * --------
- *
- * Checksums are used in two distinct ways during synchronization:
- *
- * - to guard uploads and downloads against data corruption
- *   (transmission checksum)
- * - to quickly check whether the content of a file has changed
- *   to avoid redundant uploads (content checksum)
- *
- * In principle both are independent and different checksumming
- * algorithms can be used. To avoid redundant computations, it can
- * make sense to use the same checksum algorithm though.
- *
- * Transmission Checksums
- * ----------------------
- *
- * The usage of transmission checksums is currently optional and needs
- * to be explicitly enabled by adding 'transmissionChecksum=TYPE' to
- * the '[General]' section of the config file.
- *
- * When enabled, the checksum will be calculated on upload and sent to
- * the server in the OC-Checksum header with the format 'TYPE:CHECKSUM'.
- *
- * On download, the header with the same name is read and if the
- * received data does not have the expected checksum, the download is
- * rejected.
- *
- * Transmission checksums guard a specific sync action and are not stored
- * in the database.
- *
- * Content Checksums
- * -----------------
- *
- * Sometimes the metadata of a local file changes while the content stays
- * unchanged. Content checksums allow the sync client to avoid uploading
- * the same data again by comparing the file's actual checksum to the
- * checksum stored in the database.
- *
- * Content checksums are not sent to the server.
- *
- * Checksum Algorithms
- * -------------------
- *
- * - Adler32 (requires zlib)
- * - MD5
- * - SHA1
- * - SHA256
- * - SHA3-256 (requires Qt 5.9)
- *
- */
 
-namespace OCC {
+\brief Computing and validating file checksums
+
+Overview
+--------
+
+Checksums are used in two
+
+- to guard uploads and downloads against data corr
+  (transmission checksum)
+- to quickly check whether the content of a file has changed
+  to avoid redundant uploads (content checksum)
+
+In principle both are ind
+algorithms can be used. To avoid redundant computations, it can
+make sense to use the same checksum algorithm though.
+
+Transmission Checksums
+----------------------
+
+The usage of transmission checksums is currently optional and need
+to be explic
+the '[General]' section of the config file.
+
+When enabled, the
+the server in the OC
+
+On download, the header with the same name is read and if the
+received data does not have the expected checksum, the download is
+rejected.
+
+Transmission checks
+in the database.
+
+Conte
+------
+
+Sometimes the metadata of a local file changes while the content stays
+unchanged. Content checksums allow the sync client to avoid uploading
+the same data again by comparing the file's actual checksum to the
+checksum stored in the database.
+
+Content checksums a
+
+Checksum Algorithms
+-----
+
+- Adler3
+- MD5
+- SHA1
+- SHA256
+- SHA3-256 (requires Qt 5.9)
+
+*/
+
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcChecksums, "nextcloud.sync.checksums", QtInfoMsg)
 
-#define BUFSIZE int64 (500 * 1024) // 500 KiB
+const int BUFSIZE int64 (500 * 1024) // 500 KiB
 
 static QByteArray calcCryptoHash (QIODevice *device, QCryptographicHash.Algorithm algo) {
      QByteArray arr;
@@ -192,8 +192,8 @@ static bool checksumComputationEnabled () {
     return enabled;
 }
 
-ComputeChecksum.ComputeChecksum (QObject *parent)
-    : QObject (parent) {
+ComputeChecksum.ComputeChecksum (GLib.Object *parent)
+    : GLib.Object (parent) {
 }
 
 ComputeChecksum.~ComputeChecksum () = default;
@@ -228,11 +228,11 @@ void ComputeChecksum.startImpl (std.unique_ptr<QIODevice> device) {
     // awkward with the C++ standard we're on
     auto sharedDevice = QSharedPointer<QIODevice> (device.release ());
 
-    // Bug: The thread will keep running even if ComputeChecksum is deleted.
+    // Bug : The thread will keep running even if ComputeChecksum is deleted.
     auto type = checksumType ();
     _watcher.setFuture (QtConcurrent.run ([sharedDevice, type] () {
         if (!sharedDevice.open (QIODevice.ReadOnly)) {
-            if (auto file = qobject_cast<QFile *> (sharedDevice.data ())) {
+            if (auto file = qobject_cast<QFile> (sharedDevice.data ())) {
                 qCWarning (lcChecksums) << "Could not open file" << file.fileName ()
                         << "for reading to compute a checksum" << file.errorString ();
             } else {
@@ -296,8 +296,8 @@ void ComputeChecksum.slotCalculationDone () {
     }
 }
 
-ValidateChecksumHeader.ValidateChecksumHeader (QObject *parent)
-    : QObject (parent) {
+ValidateChecksumHeader.ValidateChecksumHeader (GLib.Object *parent)
+    : GLib.Object (parent) {
 }
 
 ComputeChecksum *ValidateChecksumHeader.prepareStart (QByteArray &checksumHeader) {

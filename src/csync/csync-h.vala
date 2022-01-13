@@ -1,33 +1,33 @@
 /*
- * libcsync -- a library to sync a directory with another
- *
- * Copyright (c) 2008-2013 by Andreas Schneider <asn@cryptomilk.org>
- * Copyright (c) 2012-2013 by Klaas Freitag <freitag@owncloud.com>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
+libcsync -- a library to sync a directory with another
+
+Copyright (c) 2008-2013 by Andreas Schneider <asn@cryptomilk.org>
+Copyright (c) 2012-2013 by Klaas Freitag <freitag@owncloud.co
+
+This library is free software; you can redistribute it and/o
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later vers
+
+This library is distributed in the hope that it wi
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+*/
 
 /**
- * @file csync.h
- *
- * @brief Application developer interface for csync.
- *
- * @defgroup csyncPublicAPI csync public API
- *
- * @{
- */
+@file csync.h
+
+@brief Application developer interface for c
+
+@defgroup csyncPublicAPI csync public API
+
+@{
+*/
 
 // #include <sys/stat.h>
 
@@ -38,18 +38,17 @@
 // #include <memory>
 // #include <QByteArray>
 
-namespace OCC {
-class SyncJournalFileRecord;
+namespace Occ {
 }
 
 #if defined (Q_CC_GNU) && !defined (Q_CC_INTEL) && !defined (Q_CC_CLANG) && (__GNUC__ * 100 + __GNUC_MINOR__ < 408)
 // openSuse 12.3 didn't like enum bitfields.
-#define BITFIELD (size)
+const int BITFIELD (size)
 #elif defined (Q_CC_MSVC)
 // MSVC stores enum and bool as signed, so we need to add a bit for the sign
-#define BITFIELD (size) : (size+1)
+const int BITFIELD (size) : (size+1)
 #else
-#define BITFIELD (size) :size
+const int BITFIELD (size) :size
 #endif
 
 namespace CSyncEnums {
@@ -76,7 +75,7 @@ enum csync_status_codes_e {
   CSYNC_STATUS_READDIR_ERROR,
   CSYNC_STATUS_OPEN_ERROR,
   CSYNC_STATUS_ABORTED,
-    /* Codes for file individual status: */
+    /* Codes for file individual status : */
     CSYNC_STATUS_INDIVIDUAL_IS_SYMLINK,
     CSYNC_STATUS_INDIVIDUAL_IGNORE_LIST,
     CSYNC_STATUS_INDIVIDUAL_IS_INVALID_CHARS,
@@ -165,7 +164,7 @@ struct OCSYNC_EXPORT csync_file_stat_s {
   int64_t size = 0;
   uint64_t inode = 0;
 
-  OCC.RemotePermissions remotePerm;
+  Occ.RemotePermissions remotePerm;
   ItemType type BITFIELD (4);
   bool child_modified BITFIELD (1);
   bool has_ignored_files BITFIELD (1); // Specify that a directory, or child directory contains ignored files.
@@ -200,7 +199,7 @@ struct OCSYNC_EXPORT csync_file_stat_s {
 };
 
 /**
- * }@
- */
+}@
+*/
 #endif /* _CSYNC_H */
-/* vim: set ft=c.doxygen ts=8 sw=2 et cindent: */
+/* vim : set ft=c.doxygen ts=8 sw=2 et cindent : */

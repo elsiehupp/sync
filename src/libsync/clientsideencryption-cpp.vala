@@ -37,7 +37,7 @@ QDebug operator<< (QDebug out, std.string& str) {
 
 using namespace QKeychain;
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcCse, "nextcloud.sync.clientsideencryption", QtInfoMsg)
 Q_LOGGING_CATEGORY (lcCseDecryption, "nextcloud.e2e", QtInfoMsg)
@@ -132,7 +132,7 @@ namespace {
 
     class PKeyCtx {
     public:
-        explicit PKeyCtx (int id, ENGINE *e = nullptr)
+        PKeyCtx (int id, ENGINE *e = nullptr)
             : _ctx (EVP_PKEY_CTX_new_id (id, e)) {
         }
 
@@ -381,14 +381,14 @@ QByteArray encryptPrivateKey (
     clen += len;
 
     /* Get the e2EeTag */
-    QByteArray e2EeTag (OCC.Constants.e2EeTagSize, '\0');
-    if (1 != EVP_CIPHER_CTX_ctrl (ctx, EVP_CTRL_GCM_GET_TAG, OCC.Constants.e2EeTagSize, unsignedData (e2EeTag))) {
+    QByteArray e2EeTag (Occ.Constants.e2EeTagSize, '\0');
+    if (1 != EVP_CIPHER_CTX_ctrl (ctx, EVP_CTRL_GCM_GET_TAG, Occ.Constants.e2EeTagSize, unsignedData (e2EeTag))) {
         qCInfo (lcCse ()) << "Error getting the e2EeTag";
         handleErrors ();
     }
 
     QByteArray cipherTXT;
-    cipherTXT.reserve (clen + OCC.Constants.e2EeTagSize);
+    cipherTXT.reserve (clen + Occ.Constants.e2EeTagSize);
     cipherTXT.append (ctext, clen);
     cipherTXT.append (e2EeTag);
 
@@ -402,8 +402,8 @@ QByteArray encryptPrivateKey (
 }
 
 QByteArray decryptPrivateKey (QByteArray& key, QByteArray& data) {
-    qCInfo (lcCse ()) << "decryptStringSymmetric key: " << key;
-    qCInfo (lcCse ()) << "decryptStringSymmetric data: " << data;
+    qCInfo (lcCse ()) << "decryptStringSymmetric key : " << key;
+    qCInfo (lcCse ()) << "decryptStringSymmetric data : " << data;
 
     const auto parts = splitCipherParts (data);
     if (parts.size () < 2) {
@@ -414,14 +414,14 @@ QByteArray decryptPrivateKey (QByteArray& key, QByteArray& data) {
     QByteArray cipherTXT64 = parts.at (0);
     QByteArray ivB64 = parts.at (1);
 
-    qCInfo (lcCse ()) << "decryptStringSymmetric cipherTXT: " << cipherTXT64;
-    qCInfo (lcCse ()) << "decryptStringSymmetric IV: " << ivB64;
+    qCInfo (lcCse ()) << "decryptStringSymmetric cipherTXT : " << cipherTXT64;
+    qCInfo (lcCse ()) << "decryptStringSymmetric IV : " << ivB64;
 
     QByteArray cipherTXT = QByteArray.fromBase64 (cipherTXT64);
     QByteArray iv = QByteArray.fromBase64 (ivB64);
 
-    const QByteArray e2EeTag = cipherTXT.right (OCC.Constants.e2EeTagSize);
-    cipherTXT.chop (OCC.Constants.e2EeTagSize);
+    const QByteArray e2EeTag = cipherTXT.right (Occ.Constants.e2EeTagSize);
+    cipherTXT.chop (Occ.Constants.e2EeTagSize);
 
     // Init
     CipherCtx ctx;
@@ -450,7 +450,7 @@ QByteArray decryptPrivateKey (QByteArray& key, QByteArray& data) {
         return QByteArray ();
     }
 
-    QByteArray ptext (cipherTXT.size () + OCC.Constants.e2EeTagSize, '\0');
+    QByteArray ptext (cipherTXT.size () + Occ.Constants.e2EeTagSize, '\0');
     int plen = 0;
 
     /* Provide the message to be decrypted, and obtain the plaintext output.
@@ -491,8 +491,8 @@ QByteArray extractPrivateKeySalt (QByteArray &data) {
 }
 
 QByteArray decryptStringSymmetric (QByteArray& key, QByteArray& data) {
-    qCInfo (lcCse ()) << "decryptStringSymmetric key: " << key;
-    qCInfo (lcCse ()) << "decryptStringSymmetric data: " << data;
+    qCInfo (lcCse ()) << "decryptStringSymmetric key : " << key;
+    qCInfo (lcCse ()) << "decryptStringSymmetric data : " << data;
 
     const auto parts = splitCipherParts (data);
     if (parts.size () < 2) {
@@ -503,14 +503,14 @@ QByteArray decryptStringSymmetric (QByteArray& key, QByteArray& data) {
     QByteArray cipherTXT64 = parts.at (0);
     QByteArray ivB64 = parts.at (1);
 
-    qCInfo (lcCse ()) << "decryptStringSymmetric cipherTXT: " << cipherTXT64;
-    qCInfo (lcCse ()) << "decryptStringSymmetric IV: " << ivB64;
+    qCInfo (lcCse ()) << "decryptStringSymmetric cipherTXT : " << cipherTXT64;
+    qCInfo (lcCse ()) << "decryptStringSymmetric IV : " << ivB64;
 
     QByteArray cipherTXT = QByteArray.fromBase64 (cipherTXT64);
     QByteArray iv = QByteArray.fromBase64 (ivB64);
 
-    const QByteArray e2EeTag = cipherTXT.right (OCC.Constants.e2EeTagSize);
-    cipherTXT.chop (OCC.Constants.e2EeTagSize);
+    const QByteArray e2EeTag = cipherTXT.right (Occ.Constants.e2EeTagSize);
+    cipherTXT.chop (Occ.Constants.e2EeTagSize);
 
     // Init
     CipherCtx ctx;
@@ -539,7 +539,7 @@ QByteArray decryptStringSymmetric (QByteArray& key, QByteArray& data) {
         return QByteArray ();
     }
 
-    QByteArray ptext (cipherTXT.size () + OCC.Constants.e2EeTagSize, '\0');
+    QByteArray ptext (cipherTXT.size () + Occ.Constants.e2EeTagSize, '\0');
     int plen = 0;
 
     /* Provide the message to be decrypted, and obtain the plaintext output.
@@ -643,15 +643,15 @@ QByteArray encryptStringSymmetric (QByteArray& key, QByteArray& data) {
     clen += len;
 
     /* Get the e2EeTag */
-    QByteArray e2EeTag (OCC.Constants.e2EeTagSize, '\0');
-    if (1 != EVP_CIPHER_CTX_ctrl (ctx, EVP_CTRL_GCM_GET_TAG, OCC.Constants.e2EeTagSize, unsignedData (e2EeTag))) {
+    QByteArray e2EeTag (Occ.Constants.e2EeTagSize, '\0');
+    if (1 != EVP_CIPHER_CTX_ctrl (ctx, EVP_CTRL_GCM_GET_TAG, Occ.Constants.e2EeTagSize, unsignedData (e2EeTag))) {
         qCInfo (lcCse ()) << "Error getting the e2EeTag";
         handleErrors ();
         return {};
     }
 
     QByteArray cipherTXT;
-    cipherTXT.reserve (clen + OCC.Constants.e2EeTagSize);
+    cipherTXT.reserve (clen + Occ.Constants.e2EeTagSize);
     cipherTXT.append (ctext, clen);
     cipherTXT.append (e2EeTag);
 
@@ -705,8 +705,8 @@ QByteArray decryptStringAsymmetric (EVP_PKEY *privateKey, QByteArray& data) {
         handleErrors ();
         return {};
     } else {
-        qCInfo (lcCseDecryption ()) << "Size of output is: " << outlen;
-        qCInfo (lcCseDecryption ()) << "Size of data is: " << data.size ();
+        qCInfo (lcCseDecryption ()) << "Size of output is : " << outlen;
+        qCInfo (lcCseDecryption ()) << "Size of data is : " << data.size ();
     }
 
     QByteArray out (static_cast<int> (outlen), '\0');
@@ -852,7 +852,7 @@ bool ClientSideEncryption.checkServerPublicKeyValidity (QByteArray &serverPublic
 }
 
 void ClientSideEncryption.publicKeyFetched (Job *incoming) {
-    auto *readJob = static_cast<ReadPasswordJob *> (incoming);
+    auto *readJob = static_cast<ReadPasswordJob> (incoming);
     auto account = readJob.property (accountProperty).value<AccountPtr> ();
     Q_ASSERT (account);
 
@@ -888,7 +888,7 @@ void ClientSideEncryption.publicKeyFetched (Job *incoming) {
 }
 
 void ClientSideEncryption.privateKeyFetched (Job *incoming) {
-    auto *readJob = static_cast<ReadPasswordJob *> (incoming);
+    auto *readJob = static_cast<ReadPasswordJob> (incoming);
     auto account = readJob.property (accountProperty).value<AccountPtr> ();
     Q_ASSERT (account);
 
@@ -925,7 +925,7 @@ void ClientSideEncryption.privateKeyFetched (Job *incoming) {
 }
 
 void ClientSideEncryption.mnemonicKeyFetched (QKeychain.Job *incoming) {
-    auto *readJob = static_cast<ReadPasswordJob *> (incoming);
+    auto *readJob = static_cast<ReadPasswordJob> (incoming);
     auto account = readJob.property (accountProperty).value<AccountPtr> ();
     Q_ASSERT (account);
 
@@ -940,7 +940,7 @@ void ClientSideEncryption.mnemonicKeyFetched (QKeychain.Job *incoming) {
 
     _mnemonic = readJob.textData ();
 
-    qCInfo (lcCse ()) << "Mnemonic key fetched from keychain: " << _mnemonic;
+    qCInfo (lcCse ()) << "Mnemonic key fetched from keychain : " << _mnemonic;
 
     emit initializationFinished ();
 }
@@ -1068,7 +1068,7 @@ void ClientSideEncryption.generateCSR (AccountPtr &account, EVP_PKEY *keyPair) {
     auto cnArray = account.davUser ().toLocal8Bit ();
     qCInfo (lcCse ()) << "Getting the following array for the account Id" << cnArray;
 
-    auto certParams = std.map<const char *, char*>{ {"C", "DE"}, {"ST", "Baden-Wuerttemberg"}, {"L", "Stuttgart"}, {"O","Nextcloud"}, {"CN", cnArray.constData ()}
+    auto certParams = std.map<const char *, char>{ {"C", "DE"}, {"ST", "Baden-Wuerttemberg"}, {"L", "Stuttgart"}, {"O","Nextcloud"}, {"CN", cnArray.constData ()}
     };
 
     int ret = 0;
@@ -1169,8 +1169,8 @@ bool ClientSideEncryption.newMnemonicGenerated () {
 void ClientSideEncryption.decryptPrivateKey (AccountPtr &account, QByteArray &key) {
     QString msg = tr ("Please enter your end to end encryption passphrase:<br>"
                      "<br>"
-                     "User: %2<br>"
-                     "Account: %3<br>")
+                     "User : %2<br>"
+                     "Account : %3<br>")
                       .arg (Utility.escape (account.credentials ().user ()),
                            Utility.escape (account.displayName ()));
 
@@ -1204,7 +1204,7 @@ void ClientSideEncryption.decryptPrivateKey (AccountPtr &account, QByteArray &ke
             //_privateKey = QSslKey (privateKey, QSsl.Rsa, QSsl.Pem, QSsl.PrivateKey);
             _privateKey = privateKey;
 
-            qCInfo (lcCse ()) << "Private key: " << _privateKey;
+            qCInfo (lcCse ()) << "Private key : " << _privateKey;
 
             if (!_privateKey.isNull () && checkPublicKeyValidity (account)) {
                 writePrivateKey (account);
@@ -1233,9 +1233,9 @@ void ClientSideEncryption.getPrivateKeyFromServer (AccountPtr &account) {
                 qCInfo (lcCse ()) << "Found private key, lets decrypt it!";
                 decryptPrivateKey (account, key.toLocal8Bit ());
             } else if (retCode == 404) {
-                qCInfo (lcCse ()) << "No private key on the server: setup is incomplete.";
+                qCInfo (lcCse ()) << "No private key on the server : setup is incomplete.";
             } else {
-                qCInfo (lcCse ()) << "Error while requesting public key: " << retCode;
+                qCInfo (lcCse ()) << "Error while requesting public key : " << retCode;
             }
     });
     job.start ();
@@ -1255,7 +1255,7 @@ void ClientSideEncryption.getPublicKeyFromServer (AccountPtr &account) {
                 qCInfo (lcCse ()) << "No public key on the server";
                 generateKeyPair (account);
             } else {
-                qCInfo (lcCse ()) << "Error while requesting public key: " << retCode;
+                qCInfo (lcCse ()) << "Error while requesting public key : " << retCode;
             }
     });
     job.start ();
@@ -1285,7 +1285,7 @@ void ClientSideEncryption.fetchAndValidatePublicKeyFromServer (AccountPtr &accou
                 return;
             }
         } else {
-            qCInfo (lcCse ()) << "Error while requesting server public key: " << retCode;
+            qCInfo (lcCse ()) << "Error while requesting server public key : " << retCode;
         }
     });
     job.start ();
@@ -1327,7 +1327,7 @@ void FolderMetadata.setupExistingMetadata (QByteArray& metadata) {
 
   QJsonDocument debugHelper;
   debugHelper.setObject (metadataKeys);
-  qCDebug (lcCse) << "Keys: " << debugHelper.toJson (QJsonDocument.Compact);
+  qCDebug (lcCse) << "Keys : " << debugHelper.toJson (QJsonDocument.Compact);
 
   // Iterate over the document to store the keys. I'm unsure that the keys are in order,
   // perhaps it's better to store a map instead of a vector, perhaps this just doesn't matter.
@@ -1348,7 +1348,7 @@ void FolderMetadata.setupExistingMetadata (QByteArray& metadata) {
   }
 
   // Cool, We actually have the key, we can decrypt the rest of the metadata.
-  qCDebug (lcCse) << "Sharing: " << sharing;
+  qCDebug (lcCse) << "Sharing : " << sharing;
   if (sharing.size ()) {
       auto sharingDecrypted = decryptJsonObject (sharing, _metadataKeys.last ());
       qCDebug (lcCse) << "Sharing Decrypted" << sharingDecrypted;
@@ -1566,7 +1566,7 @@ bool EncryptionHelper.fileEncryption (QByteArray &key, QByteArray &iv, QFile *in
         return false;
     }
 
-    QByteArray out (blockSize + OCC.Constants.e2EeTagSize - 1, '\0');
+    QByteArray out (blockSize + Occ.Constants.e2EeTagSize - 1, '\0');
     int len = 0;
     int total_len = 0;
 
@@ -1596,14 +1596,14 @@ bool EncryptionHelper.fileEncryption (QByteArray &key, QByteArray &iv, QFile *in
     total_len += len;
 
     /* Get the e2EeTag */
-    QByteArray e2EeTag (OCC.Constants.e2EeTagSize, '\0');
-    if (1 != EVP_CIPHER_CTX_ctrl (ctx, EVP_CTRL_GCM_GET_TAG, OCC.Constants.e2EeTagSize, unsignedData (e2EeTag))) {
+    QByteArray e2EeTag (Occ.Constants.e2EeTagSize, '\0');
+    if (1 != EVP_CIPHER_CTX_ctrl (ctx, EVP_CTRL_GCM_GET_TAG, Occ.Constants.e2EeTagSize, unsignedData (e2EeTag))) {
         qCInfo (lcCse ()) << "Could not get e2EeTag";
         return false;
     }
 
     returnTag = e2EeTag;
-    output.write (e2EeTag, OCC.Constants.e2EeTagSize);
+    output.write (e2EeTag, Occ.Constants.e2EeTagSize);
 
     input.close ();
     output.close ();
@@ -1645,9 +1645,9 @@ bool EncryptionHelper.fileDecryption (QByteArray &key, QByteArray& iv,
         return false;
     }
 
-    int64 size = input.size () - OCC.Constants.e2EeTagSize;
+    int64 size = input.size () - Occ.Constants.e2EeTagSize;
 
-    QByteArray out (blockSize + OCC.Constants.e2EeTagSize - 1, '\0');
+    QByteArray out (blockSize + Occ.Constants.e2EeTagSize - 1, '\0');
     int len = 0;
 
     while (input.pos () < size) {
@@ -1672,7 +1672,7 @@ bool EncryptionHelper.fileDecryption (QByteArray &key, QByteArray& iv,
         output.write (out, len);
     }
 
-    const QByteArray e2EeTag = input.read (OCC.Constants.e2EeTagSize);
+    const QByteArray e2EeTag = input.read (Occ.Constants.e2EeTagSize);
 
     /* Set expected e2EeTag value. Works in OpenSSL 1.0.1d and later */
     if (!EVP_CIPHER_CTX_ctrl (ctx, EVP_CTRL_GCM_SET_TAG, e2EeTag.size (), (unsigned char *)e2EeTag.constData ())) {
@@ -1710,7 +1710,7 @@ EncryptionHelper.StreamingDecryptor.StreamingDecryptor (QByteArray &key, QByteAr
         }
 
         /* Initialize key and IV */
-        if (!EVP_DecryptInit_ex (_ctx, nullptr, nullptr, reinterpret_cast<const unsigned char*> (key.constData ()), reinterpret_cast<const unsigned char*> (iv.constData ()))) {
+        if (!EVP_DecryptInit_ex (_ctx, nullptr, nullptr, reinterpret_cast<const unsigned char> (key.constData ()), reinterpret_cast<const unsigned char> (iv.constData ()))) {
             qCritical (lcCse ()) << "Could not set key and iv";
             _isInitialized = false;
         }
@@ -1756,28 +1756,28 @@ QByteArray EncryptionHelper.StreamingDecryptor.chunkDecryption (char *input, uin
         return QByteArray ();
     }
 
-    Q_ASSERT (_decryptedSoFar + chunkSize < OCC.Constants.e2EeTagSize || _totalSize - OCC.Constants.e2EeTagSize >= _decryptedSoFar + chunkSize - OCC.Constants.e2EeTagSize);
-    if (_decryptedSoFar + chunkSize > OCC.Constants.e2EeTagSize && _totalSize - OCC.Constants.e2EeTagSize < _decryptedSoFar + chunkSize - OCC.Constants.e2EeTagSize) {
+    Q_ASSERT (_decryptedSoFar + chunkSize < Occ.Constants.e2EeTagSize || _totalSize - Occ.Constants.e2EeTagSize >= _decryptedSoFar + chunkSize - Occ.Constants.e2EeTagSize);
+    if (_decryptedSoFar + chunkSize > Occ.Constants.e2EeTagSize && _totalSize - Occ.Constants.e2EeTagSize < _decryptedSoFar + chunkSize - Occ.Constants.e2EeTagSize) {
         qCritical (lcCse ()) << "Decryption failed. Incorrect chunk!";
         return QByteArray ();
     }
 
     const bool isLastChunk = _decryptedSoFar + chunkSize == _totalSize;
 
-    // last OCC.Constants.e2EeTagSize bytes is ALWAYS a e2EeTag!!!
-    const int64 size = isLastChunk ? chunkSize - OCC.Constants.e2EeTagSize : chunkSize;
+    // last Occ.Constants.e2EeTagSize bytes is ALWAYS a e2EeTag!!!
+    const int64 size = isLastChunk ? chunkSize - Occ.Constants.e2EeTagSize : chunkSize;
 
     // either the size is more than 0 and an e2EeTag is at the end of chunk, or, chunk is the e2EeTag itself
-    Q_ASSERT (size > 0 || chunkSize == OCC.Constants.e2EeTagSize);
-    if (size <= 0 && chunkSize != OCC.Constants.e2EeTagSize) {
-        qCritical (lcCse ()) << "Decryption failed. Invalid input size: " << size << " !";
+    Q_ASSERT (size > 0 || chunkSize == Occ.Constants.e2EeTagSize);
+    if (size <= 0 && chunkSize != Occ.Constants.e2EeTagSize) {
+        qCritical (lcCse ()) << "Decryption failed. Invalid input size : " << size << " !";
         return QByteArray ();
     }
 
     int64 bytesWritten = 0;
     int64 inputPos = 0;
 
-    QByteArray decryptedBlock (blockSize + OCC.Constants.e2EeTagSize - 1, '\0');
+    QByteArray decryptedBlock (blockSize + Occ.Constants.e2EeTagSize - 1, '\0');
 
     while (inputPos < size) {
         // read blockSize or less bytes
@@ -1790,7 +1790,7 @@ QByteArray EncryptionHelper.StreamingDecryptor.chunkDecryption (char *input, uin
 
         int outLen = 0;
 
-        if (!EVP_DecryptUpdate (_ctx, unsignedData (decryptedBlock), &outLen, reinterpret_cast<const unsigned char*> (encryptedBlock.data ()), encryptedBlock.size ())) {
+        if (!EVP_DecryptUpdate (_ctx, unsignedData (decryptedBlock), &outLen, reinterpret_cast<const unsigned char> (encryptedBlock.data ()), encryptedBlock.size ())) {
             qCritical (lcCse ()) << "Could not decrypt";
             return QByteArray ();
         }
@@ -1814,18 +1814,18 @@ QByteArray EncryptionHelper.StreamingDecryptor.chunkDecryption (char *input, uin
     if (isLastChunk) {
         // if it's a last chunk, we'd need to read a e2EeTag at the end and finalize the decryption
 
-        Q_ASSERT (chunkSize - inputPos == OCC.Constants.e2EeTagSize);
-        if (chunkSize - inputPos != OCC.Constants.e2EeTagSize) {
+        Q_ASSERT (chunkSize - inputPos == Occ.Constants.e2EeTagSize);
+        if (chunkSize - inputPos != Occ.Constants.e2EeTagSize) {
             qCritical (lcCse ()) << "Decryption failed. e2EeTag is missing!";
             return QByteArray ();
         }
 
         int outLen = 0;
 
-        QByteArray e2EeTag = QByteArray (input + inputPos, OCC.Constants.e2EeTagSize);
+        QByteArray e2EeTag = QByteArray (input + inputPos, Occ.Constants.e2EeTagSize);
 
         /* Set expected e2EeTag value. Works in OpenSSL 1.0.1d and later */
-        if (!EVP_CIPHER_CTX_ctrl (_ctx, EVP_CTRL_GCM_SET_TAG, e2EeTag.size (), reinterpret_cast<unsigned char*> (e2EeTag.data ()))) {
+        if (!EVP_CIPHER_CTX_ctrl (_ctx, EVP_CTRL_GCM_SET_TAG, e2EeTag.size (), reinterpret_cast<unsigned char> (e2EeTag.data ()))) {
             qCritical (lcCse ()) << "Could not set expected e2EeTag";
             return QByteArray ();
         }
@@ -1845,7 +1845,7 @@ QByteArray EncryptionHelper.StreamingDecryptor.chunkDecryption (char *input, uin
 
         bytesWritten += writtenToOutput;
 
-        _decryptedSoFar += OCC.Constants.e2EeTagSize;
+        _decryptedSoFar += Occ.Constants.e2EeTagSize;
 
         _isFinished = true;
     }

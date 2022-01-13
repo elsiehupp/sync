@@ -1,45 +1,40 @@
 /*
- * Copyright (C) by Dominik Schmidt <dev@dominik-schmidt.de>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Dominik Schmidt <dev@dominik-schmidt.de>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 #include "sharedialog.h" // for the ShareDialogStartPage
 
 // #include <QLocalServer>
 using SocketApiServer = QLocalServer;
 
-class QUrl;
 class QLocalSocket;
-class QStringList;
 
-namespace OCC {
+namespace Occ {
 
-class SyncFileStatus;
 class Folder;
-class SocketListener;
 class DirectEditor;
-class SocketApiJob;
 class SocketApiJobV2;
 
 Q_DECLARE_LOGGING_CATEGORY (lcSocketApi)
 
 /**
- * @brief The SocketApi class
- * @ingroup gui
- */
-class SocketApi : public QObject {
+@brief The SocketApi class
+@ingroup gui
+*/
+class SocketApi : GLib.Object {
 
 public:
-    explicit SocketApi (QObject *parent = nullptr);
+    SocketApi (GLib.Object *parent = nullptr);
     ~SocketApi () override;
 
 public slots:
@@ -55,7 +50,7 @@ signals:
 private slots:
     void slotNewConnection ();
     void onLostConnection ();
-    void slotSocketDestroyed (QObject *obj);
+    void slotSocketDestroyed (GLib.Object *obj);
     void slotReadSocket ();
 
     static void copyUrlToClipboard (QString &link);
@@ -68,12 +63,12 @@ private:
     // actions.
     struct FileData {
         static FileData get (QString &localFile);
-        SyncFileStatus syncFileStatus () const;
-        SyncJournalFileRecord journalRecord () const;
-        FileData parentFolder () const;
+        SyncFileStatus syncFileStatus ();
+        SyncJournalFileRecord journalRecord ();
+        FileData parentFolder ();
 
         // Relative path of the file locally, without any vfs suffix
-        QString folderRelativePathNoVfsSuffix () const;
+        QString folderRelativePathNoVfsSuffix ();
 
         Folder *folder;
         // Absolute path of the file locally. (May be a virtual file)
@@ -154,5 +149,3 @@ private:
     SocketApiServer _localServer;
 };
 }
-
-#endif // SOCKETAPI_H

@@ -11,9 +11,9 @@
 
 // #include <common/constants.h>
 
-using namespace OCC;
+using namespace Occ;
 
-class TestClientSideEncryption : public QObject {
+class TestClientSideEncryption : GLib.Object {
 
     QByteArray convertToOldStorageFormat (QByteArray &data) {
         return data.split ('|').join ("fA==");
@@ -204,11 +204,11 @@ private slots:
                 toRead = dummyEncryptionOutputFile.size () - dummyEncryptionOutputFile.pos ();
             }
 
-            if (bytesRemaining - toRead != 0 && bytesRemaining - toRead < OCC.Constants.e2EeTagSize) {
-                // decryption is going to fail if last chunk does not include or does not equal to OCC.Constants.e2EeTagSize bytes tag
-                // since we are emulating random size of network packets, we may end up reading beyond OCC.Constants.e2EeTagSize bytes tag at the end
-                // in that case, we don't want to try and decrypt less than OCC.Constants.e2EeTagSize ending bytes of tag, we will accumulate all the incoming data till the end
-                // and then, we are going to decrypt the entire chunk containing OCC.Constants.e2EeTagSize bytes at the end
+            if (bytesRemaining - toRead != 0 && bytesRemaining - toRead < Occ.Constants.e2EeTagSize) {
+                // decryption is going to fail if last chunk does not include or does not equal to Occ.Constants.e2EeTagSize bytes tag
+                // since we are emulating random size of network packets, we may end up reading beyond Occ.Constants.e2EeTagSize bytes tag at the end
+                // in that case, we don't want to try and decrypt less than Occ.Constants.e2EeTagSize ending bytes of tag, we will accumulate all the incoming data till the end
+                // and then, we are going to decrypt the entire chunk containing Occ.Constants.e2EeTagSize bytes at the end
                 pendingBytes += dummyEncryptionOutputFile.read (bytesRemaining);
                 continue;
             }

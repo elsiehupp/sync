@@ -1,41 +1,40 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+*/
 
 // #include <QLoggingCategory>
-// #include <QObject>
+// #include <GLib.Object>
 // #include <QVariant>
 
 struct sqlite3;
 struct sqlite3_stmt;
 
-namespace OCC {
+namespace Occ {
 OCSYNC_EXPORT Q_DECLARE_LOGGING_CATEGORY (lcSql)
 
-class SqlQuery;
 
 /**
- * @brief The SqlDatabase class
- * @ingroup libsync
- */
-class OCSYNC_EXPORT SqlDatabase {
+@brief The SqlDatabase class
+@ingroup libsync
+*/
+class SqlDatabase {
     Q_DISABLE_COPY (SqlDatabase)
 public:
-    explicit SqlDatabase ();
+    SqlDatabase ();
     ~SqlDatabase ();
 
     bool isOpen ();
@@ -44,7 +43,7 @@ public:
     bool transaction ();
     bool commit ();
     void close ();
-    QString error () const;
+    QString error ();
     sqlite3 *sqliteDb ();
 
 private:
@@ -63,39 +62,39 @@ private:
     int _errId = 0;
 
     friend class SqlQuery;
-    QSet<SqlQuery *> _queries;
+    QSet<SqlQuery> _queries;
 };
 
 /**
- * @brief The SqlQuery class
- * @ingroup libsync
- *
- * There is basically 3 ways to initialize and use a query:
- *
+@brief The SqlQuery class
+@ingroup libsync
+
+There is basically 3 ways to initialize and use a query:
+
     SqlQuery q1;
     [...]
     q1.initOrReset (...);
     q1.bindValue (...);
     q1.exec (...)
- *
+
     SqlQuery q2 (db);
     q2.prepare (...);
     [...]
     q2.reset_and_clear_bindings ();
     q2.bindValue (...);
     q2.exec (...)
- *
+
     SqlQuery q3 ("...", db);
     q3.bindValue (...);
     q3.exec (...)
- *
- */
-class OCSYNC_EXPORT SqlQuery {
+
+*/
+class SqlQuery {
     Q_DISABLE_COPY (SqlQuery)
 public:
-    explicit SqlQuery () = default;
-    explicit SqlQuery (SqlDatabase &db);
-    explicit SqlQuery (QByteArray &sql, SqlDatabase &db);
+    SqlQuery () = default;
+    SqlQuery (SqlDatabase &db);
+    SqlQuery (QByteArray &sql, SqlDatabase &db);
     /**
      * Prepare the SqlQuery.
      * If the query was already prepared, this will first call finish (), and re-prepare it.
@@ -104,8 +103,8 @@ public:
     int prepare (QByteArray &sql, bool allow_failure = false);
 
     ~SqlQuery ();
-    QString error () const;
-    int errorId () const;
+    QString error ();
+    int errorId ();
 
     /// Checks whether the value at the given column index is NULL
     bool nullValue (int index);
@@ -141,7 +140,7 @@ public:
         bindValueInternal (pos, value);
     }
 
-    const QByteArray &lastQuery () const;
+    const QByteArray &lastQuery ();
     int numRowsAffected ();
     void reset_and_clear_bindings ();
 
@@ -160,6 +159,4 @@ private:
     friend class PreparedSqlQueryManager;
 };
 
-} // namespace OCC
-
-#endif // OWNSQL_H
+} // namespace Occ

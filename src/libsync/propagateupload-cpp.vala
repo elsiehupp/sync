@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QNetworkAccessManager>
 // #include <QFileInfo>
@@ -22,7 +22,7 @@
 // #include <cmath>
 // #include <cstring>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcPutJob, "nextcloud.sync.networkjob.put", QtInfoMsg)
 Q_LOGGING_CATEGORY (lcPollJob, "nextcloud.sync.networkjob.poll", QtInfoMsg)
@@ -50,7 +50,7 @@ void PUTFileJob.start () {
     }
 
     if (reply ().error () != QNetworkReply.NoError) {
-        qCWarning (lcPutJob) << " Network error: " << reply ().errorString ();
+        qCWarning (lcPutJob) << " Network error : " << reply ().errorString ();
     }
 
     connect (reply (), &QNetworkReply.uploadProgress, this, &PUTFileJob.uploadProgress);
@@ -269,7 +269,7 @@ void PropagateUploadFileCommon.startUploadFile () {
         this);
     _jobs.append (job);
     connect (job, &DeleteJob.finishedSignal, this, &PropagateUploadFileCommon.slotComputeContentChecksum);
-    connect (job, &QObject.destroyed, this, &PropagateUploadFileCommon.slotJobDestroyed);
+    connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.slotJobDestroyed);
     job.start ();
 }
 
@@ -312,7 +312,7 @@ void PropagateUploadFileCommon.slotComputeContentChecksum () {
     connect (computeChecksum, &ComputeChecksum.done,
         this, &PropagateUploadFileCommon.slotComputeTransmissionChecksum);
     connect (computeChecksum, &ComputeChecksum.done,
-        computeChecksum, &QObject.deleteLater);
+        computeChecksum, &GLib.Object.deleteLater);
     computeChecksum.start (_fileToUpload._path);
 }
 
@@ -338,7 +338,7 @@ void PropagateUploadFileCommon.slotComputeTransmissionChecksum (QByteArray &cont
     connect (computeChecksum, &ComputeChecksum.done,
         this, &PropagateUploadFileCommon.slotStartUpload);
     connect (computeChecksum, &ComputeChecksum.done,
-        computeChecksum, &QObject.deleteLater);
+        computeChecksum, &GLib.Object.deleteLater);
     computeChecksum.start (_fileToUpload._path);
 }
 
@@ -438,7 +438,7 @@ bool UploadDevice.open (QIODevice.OpenMode mode) {
     if (mode & QIODevice.WriteOnly)
         return false;
 
-    // Get the file size now: _file.fileName () is no longer reliable
+    // Get the file size now : _file.fileName () is no longer reliable
     // on all platforms after openAndSeekFileSharedRead ().
     auto fileDiskSize = FileSystem.getSize (_file.fileName ());
 
@@ -571,7 +571,7 @@ void PropagateUploadFileCommon.startPollJob (QString &path) {
 }
 
 void PropagateUploadFileCommon.slotPollFinished () {
-    auto *job = qobject_cast<PollJob *> (sender ());
+    auto *job = qobject_cast<PollJob> (sender ());
     ASSERT (job);
 
     propagator ()._activeJobList.removeOne (this);
@@ -614,7 +614,7 @@ void PropagateUploadFileCommon.commonErrorHandling (AbstractNetworkJob *job) {
     qCDebug (lcPropagateUpload) << replyContent; // display the XML error in the debug
 
     if (_item._httpErrorCode == 412) {
-        // Precondition Failed: Either an etag or a checksum mismatch.
+        // Precondition Failed : Either an etag or a checksum mismatch.
 
         // Maybe the bad etag is in the database, we need to clear the
         // parent folder etag so we won't read from DB next sync.
@@ -662,7 +662,7 @@ void PropagateUploadFileCommon.adjustLastJobTimeout (AbstractNetworkJob *job, in
         static_cast<int64> (30 * 60 * 1000)));
 }
 
-void PropagateUploadFileCommon.slotJobDestroyed (QObject *job) {
+void PropagateUploadFileCommon.slotJobDestroyed (GLib.Object *job) {
     _jobs.erase (std.remove (_jobs.begin (), _jobs.end (), job), _jobs.end ());
 }
 
@@ -686,7 +686,7 @@ QMap<QByteArray, QByteArray> PropagateUploadFileCommon.headers () {
         headers[QByteArrayLiteral ("OC-LazyOps")] = QByteArrayLiteral ("true");
 
     if (_item._file.contains (QLatin1String (".sys.admin#recall#"))) {
-        // This is a file recall triggered by the admin.  Note: the
+        // This is a file recall triggered by the admin.  Note : the
         // recall list file created by the admin and downloaded by the
         // client (.sys.admin#recall#) also falls into this category
         // (albeit users are not supposed to mess up with it)
@@ -735,7 +735,7 @@ void PropagateUploadFileCommon.finalize () {
     // Update the database entry
     const auto result = propagator ().updateMetadata (*_item);
     if (!result) {
-        done (SyncFileItem.FatalError, tr ("Error updating metadata: %1").arg (result.error ()));
+        done (SyncFileItem.FatalError, tr ("Error updating metadata : %1").arg (result.error ()));
         return;
     } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
         done (SyncFileItem.SoftError, tr ("The file %1 is currently in use").arg (_item._file));

@@ -1,20 +1,20 @@
 /*
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This library is free software; you can redistribute it and
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later versi
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GN
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+*/
 
 // #include <comdef.h>
 // #include <Lmcons.h>
@@ -32,7 +32,7 @@ extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 static const char systemRunPathC[] = R" (HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run)";
 static const char runPathC[] = R" (HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run)";
 
-namespace OCC {
+namespace Occ {
 
 static void setupFavLink_private (QString &folder) {
     // First create a Desktop.ini so that the folder and favorite link show our application's icon.
@@ -61,7 +61,7 @@ static void setupFavLink_private (QString &folder) {
         SetFileAttributesW ( (wchar_t *)desktopIni.fileName ().utf16 (), FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM);
     }
 
-    // Windows Explorer: Place under "Favorites" (Links)
+    // Windows Explorer : Place under "Favorites" (Links)
     QString linkName;
     QDir folderDir (QDir.fromNativeSeparators (folder));
 
@@ -134,7 +134,7 @@ void setLaunchOnStartup_private (QString &appName, QString &guiName, bool enable
     }
 }
 
-// TODO: Right now only detection on toggle/startup, not when windows theme is switched while nextcloud is running
+// TODO : Right now only detection on toggle/startup, not when windows theme is switched while nextcloud is running
 static inline bool hasDarkSystray_private () {
     if (Utility.registryGetKeyValue (    HKEY_CURRENT_USER,
                                         QStringLiteral (R" (Software\Microsoft\Windows\CurrentVersion\Themes\Personalize)"),
@@ -193,7 +193,7 @@ QVariant Utility.registryGetKeyValue (HKEY hRootKey, QString &subKey, QString &v
             }
             break;
         case REG_EXPAND_SZ:
-        case REG_SZ: {
+        case REG_SZ : {
             QString string;
             string.resize (sizeInBytes / sizeof (QChar));
             result = RegQueryValueEx (hKey, reinterpret_cast<LPCWSTR> (valueName.utf16 ()), 0, &type, reinterpret_cast<LPBYTE> (string.data ()), &sizeInBytes);
@@ -210,7 +210,7 @@ QVariant Utility.registryGetKeyValue (HKEY hRootKey, QString &subKey, QString &v
             }
             break;
         }
-        case REG_BINARY: {
+        case REG_BINARY : {
             QByteArray buffer;
             buffer.resize (sizeInBytes);
             result = RegQueryValueEx (hKey, reinterpret_cast<LPCWSTR> (valueName.utf16 ()), 0, &type, reinterpret_cast<LPBYTE> (buffer.data ()), &sizeInBytes);
@@ -234,7 +234,7 @@ bool Utility.registrySetKeyValue (HKEY hRootKey, QString &subKey, QString &value
     // KEY_WOW64_64KEY is necessary because CLSIDs are "Redirected and reflected only for CLSIDs that do not specify InprocServer32 or InprocHandler32."
     // https://msdn.microsoft.com/en-us/library/windows/desktop/aa384253%28v=vs.85%29.aspx#redirected__shared__and_reflected_keys_under_wow64
     // This shouldn't be an issue in our case since we use shell32.dll as InprocServer32, so we could write those registry keys for both 32 and 64bit.
-    // FIXME: Not doing so at the moment means that explorer will show the cloud provider, but 32bit processes' open dialogs (like the ownCloud client itself) won't show it.
+    // FIXME : Not doing so at the moment means that explorer will show the cloud provider, but 32bit processes' open dialogs (like the ownCloud client itself) won't show it.
     REGSAM sam = KEY_WRITE | KEY_WOW64_64KEY;
     LONG result = RegCreateKeyEx (hRootKey, reinterpret_cast<LPCWSTR> (subKey.utf16 ()), 0, nullptr, 0, sam, nullptr, &hKey, nullptr);
     ASSERT (result == ERROR_SUCCESS);
@@ -243,15 +243,15 @@ bool Utility.registrySetKeyValue (HKEY hRootKey, QString &subKey, QString &value
 
     result = -1;
     switch (type) {
-    case REG_DWORD: {
+    case REG_DWORD : {
         DWORD dword = value.toInt ();
-        result = RegSetValueEx (hKey, reinterpret_cast<LPCWSTR> (valueName.utf16 ()), 0, type, reinterpret_cast<const BYTE *> (&dword), sizeof (dword));
+        result = RegSetValueEx (hKey, reinterpret_cast<LPCWSTR> (valueName.utf16 ()), 0, type, reinterpret_cast<const BYTE> (&dword), sizeof (dword));
         break;
     }
     case REG_EXPAND_SZ:
-    case REG_SZ: {
+    case REG_SZ : {
         QString string = value.toString ();
-        result = RegSetValueEx (hKey, reinterpret_cast<LPCWSTR> (valueName.utf16 ()), 0, type, reinterpret_cast<const BYTE *> (string.constData ()), (string.size () + 1) * sizeof (QChar));
+        result = RegSetValueEx (hKey, reinterpret_cast<LPCWSTR> (valueName.utf16 ()), 0, type, reinterpret_cast<const BYTE> (string.constData ()), (string.size () + 1) * sizeof (QChar));
         break;
     }
     default:
@@ -340,7 +340,7 @@ bool Utility.registryWalkSubKeys (HKEY hRootKey, QString &subKey, std.function<v
 DWORD Utility.convertSizeToDWORD (size_t &convertVar) {
     if ( convertVar > UINT_MAX ) {
         //throw std.bad_cast ();
-        convertVar = UINT_MAX; // intentionally default to wrong value here to not crash: exception handling TBD
+        convertVar = UINT_MAX; // intentionally default to wrong value here to not crash : exception handling TBD
     }
     return static_cast<DWORD> (convertVar);
 }
@@ -363,7 +363,7 @@ void Utility.UnixTimeToLargeIntegerFiletime (time_t t, LARGE_INTEGER *hundredNSe
 }
 
 QString Utility.formatWinError (long errorCode) {
-    return QStringLiteral ("WindowsError: %1: %2").arg (QString.number (errorCode, 16), QString.fromWCharArray (_com_error (errorCode).ErrorMessage ()));
+    return QStringLiteral ("WindowsError : %1 : %2").arg (QString.number (errorCode, 16), QString.fromWCharArray (_com_error (errorCode).ErrorMessage ()));
 }
 
 QString Utility.getCurrentUserName () {
@@ -385,4 +385,4 @@ Utility.NtfsPermissionLookupRAII.~NtfsPermissionLookupRAII () {
     qt_ntfs_permission_lookup--;
 }
 
-} // namespace OCC
+} // namespace Occ

@@ -1,18 +1,18 @@
 /*
- * Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QTimer>
 // #include <QUrl>
@@ -25,14 +25,14 @@
 
 static const char versionC[] = "version";
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcFolder, "nextcloud.gui.folder", QtInfoMsg)
 
 Folder.Folder (FolderDefinition &definition,
     AccountState *accountState, std.unique_ptr<Vfs> vfs,
-    QObject *parent)
-    : QObject (parent)
+    GLib.Object *parent)
+    : GLib.Object (parent)
     , _accountState (accountState)
     , _definition (definition)
     , _lastSyncDuration (0)
@@ -297,7 +297,7 @@ void Folder.slotRunEtagJob () {
     _requestEtagJob = new RequestEtagJob (account, remotePath (), this);
     _requestEtagJob.setTimeout (60 * 1000);
     // check if the etag is different when retrieved
-    QObject.connect (_requestEtagJob.data (), &RequestEtagJob.etagRetrieved, this, &Folder.etagRetrieved);
+    GLib.Object.connect (_requestEtagJob.data (), &RequestEtagJob.etagRetrieved, this, &Folder.etagRetrieved);
     FolderMan.instance ().slotScheduleETagJob (alias (), _requestEtagJob);
     // The _requestEtagJob is auto deleting itself on finish. Our guard pointer _requestEtagJob will then be null.
 }
@@ -307,7 +307,7 @@ void Folder.etagRetrieved (QByteArray &etag, QDateTime &tp) {
     FolderMan.instance ().setSyncEnabled (true);
 
     if (_lastEtag != etag) {
-        qCInfo (lcFolder) << "Compare etag with previous etag: last:" << _lastEtag << ", received:" << etag << ". CHANGED";
+        qCInfo (lcFolder) << "Compare etag with previous etag : last:" << _lastEtag << ", received:" << etag << ". CHANGED";
         _lastEtag = etag;
         slotScheduleThisFolder ();
     }
@@ -355,7 +355,7 @@ void Folder.showSyncResultPopup () {
         createGuiLog (_syncResult.firstItemLocked ()._file, LogStatusFileLocked, lockedCount);
     }
 
-    qCInfo (lcFolder) << "Folder" << _syncResult.folder () << "sync result: " << _syncResult.status ();
+    qCInfo (lcFolder) << "Folder" << _syncResult.folder () << "sync result : " << _syncResult.status ();
 }
 
 void Folder.createGuiLog (QString &filename, LogStatus status, int count,
@@ -472,7 +472,7 @@ int Folder.slotDiscardDownloadProgress () {
         _journal.getAndDeleteStaleDownloadInfos (keep_nothing);
     for (auto &deleted_info : deleted_infos) {
         const QString tmppath = folderpath.filePath (deleted_info._tmpfile);
-        qCInfo (lcFolder) << "Deleting temporary file: " << tmppath;
+        qCInfo (lcFolder) << "Deleting temporary file : " << tmppath;
         FileSystem.remove (tmppath);
     }
     return deleted_infos.size ();
@@ -588,7 +588,7 @@ void Folder.setVirtualFilesEnabled (bool enabled) {
     }
 
     if (newMode != _definition.virtualFilesMode) {
-        // TODO: Must wait for current sync to finish!
+        // TODO : Must wait for current sync to finish!
         SyncEngine.wipeVirtualFiles (path (), _journal, *_vfs);
 
         _vfs.stop ();
@@ -665,7 +665,7 @@ void Folder.saveToSettings () {
     }
 
     settings.beginGroup (settingsGroup);
-    // Note: Each of these groups might have a "version" tag, but that's
+    // Note : Each of these groups might have a "version" tag, but that's
     //       currently unused.
     settings.beginGroup (FolderMan.escapeAlias (_definition.alias));
     FolderDefinition.save (*settings, _definition);
@@ -720,7 +720,7 @@ void Folder.wipeForRemoval () {
         if (!file.remove ()) {
             qCWarning (lcFolder) << "Failed to remove existing csync StateDB " << stateDbFile;
         } else {
-            qCInfo (lcFolder) << "wipe: Removed csync StateDB " << stateDbFile;
+            qCInfo (lcFolder) << "wipe : Removed csync StateDB " << stateDbFile;
         }
     } else {
         qCWarning (lcFolder) << "statedb is empty, can not remove.";
@@ -734,7 +734,7 @@ void Folder.wipeForRemoval () {
 
     _vfs.stop ();
     _vfs.unregisterFolder ();
-    _vfs.reset (nullptr); // warning: folder now in an invalid state
+    _vfs.reset (nullptr); // warning : folder now in an invalid state
 }
 
 bool Folder.reloadExcludes () {
@@ -976,7 +976,7 @@ void Folder.slotTransmissionProgress (ProgressInfo &pi) {
     ProgressDispatcher.instance ().setProgressInfo (alias (), pi);
 }
 
-// a item is completed: count the errors and forward to the ProgressDispatcher
+// a item is completed : count the errors and forward to the ProgressDispatcher
 void Folder.slotItemCompleted (SyncFileItemPtr &item) {
     if (item._instruction == CSYNC_INSTRUCTION_NONE || item._instruction == CSYNC_INSTRUCTION_UPDATE_METADATA) {
         // We only care about the updates that deserve to be shown in the UI
@@ -1014,7 +1014,7 @@ void Folder.slotNewBigFolderDiscovered (QString &newF, bool isExternal) {
             journal.setSelectiveSyncList (SyncJournalDb.SelectiveSyncUndecidedList, undecidedList);
             emit newBigFolderDiscovered (newFolder);
         }
-        QString message = !isExternal ? (tr ("A new folder larger than %1 MB has been added: %2.\n")
+        QString message = !isExternal ? (tr ("A new folder larger than %1 MB has been added : %2.\n")
                                                 .arg (ConfigFile ().newBigFolderSizeLimit ().second)
                                                 .arg (newF))
                                       : (tr ("A folder from an external storage has been added.\n"));
@@ -1057,7 +1057,7 @@ void Folder.warnOnNewExcludedItem (SyncJournalFileRecord &record, QStringRef &pa
         return;
 
     // Don't warn for items that no longer exist.
-    // Note: This assumes we're getting file watcher notifications
+    // Note : This assumes we're getting file watcher notifications
     // for folders only on creation and deletion - if we got a notification
     // on content change that would create spurious warnings.
     QFileInfo fi (_canonicalLocalPath + path);
@@ -1100,7 +1100,7 @@ void Folder.slotHydrationStarts () {
     if (_engine.isSyncRunning ()) {
         slotTerminateSync ();
         scheduleThisFolderSoon ();
-        // TODO: This sets the sync state to AbortRequested on done, we don't want that
+        // TODO : This sets the sync state to AbortRequested on done, we don't want that
     }
 
     // Let everyone know we're syncing
@@ -1278,4 +1278,4 @@ QString FolderDefinition.defaultJournalPath (AccountPtr account) {
     return SyncJournalDb.makeDbName (localPath, account.url (), targetPath, account.credentials ().user ());
 }
 
-} // namespace OCC
+} // namespace Occ

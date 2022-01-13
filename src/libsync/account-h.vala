@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QByteArray>
 // #include <QUrl>
@@ -29,31 +29,24 @@
 
 // #include <memory>
 
-class QSettings;
 class QNetworkReply;
-class QUrl;
 class QNetworkAccessManager;
 
 namespace QKeychain {
-class Job;
 class WritePasswordJob;
-class ReadPasswordJob;
 }
 
-namespace OCC {
+namespace Occ {
 
-class AbstractCredentials;
 class Account;
 using AccountPtr = QSharedPointer<Account>;
-class AccessManager;
 class SimpleNetworkJob;
-class PushNotifications;
 class UserStatusConnector;
 
 /**
- * @brief Reimplement this to handle SSL errors from libsync
- * @ingroup libsync
- */
+@brief Reimplement this to handle SSL errors from libsync
+@ingroup libsync
+*/
 class AbstractSslErrorHandler {
 public:
     virtual ~AbstractSslErrorHandler () = default;
@@ -61,13 +54,13 @@ public:
 };
 
 /**
- * @brief The Account class represents an account on an ownCloud Server
- * @ingroup libsync
- *
- * The Account has a name and url. It also has information about credentials,
- * SSL errors and certificates.
- */
-class OWNCLOUDSYNC_EXPORT Account : public QObject {
+@brief The Account class represents an account on an ownCloud Server
+@ingroup libsync
+
+The Account has a name and url. It also has information about credentials,
+SSL errors and certificates.
+*/
+class OWNCLOUDSYNC_EXPORT Account : GLib.Object {
     Q_PROPERTY (QString id MEMBER _id)
     Q_PROPERTY (QString davUser MEMBER _davUser)
     Q_PROPERTY (QString displayName MEMBER _displayName)
@@ -85,22 +78,22 @@ public:
      * This can very well be different frome the login user that's
      * stored in credentials ().user ().
      */
-    QString davUser () const;
+    QString davUser ();
     void setDavUser (QString &newDavUser);
 
-    QString davDisplayName () const;
+    QString davDisplayName ();
     void setDavDisplayName (QString &newDisplayName);
 
 #ifndef TOKEN_AUTH_ONLY
-    QImage avatar () const;
+    QImage avatar ();
     void setAvatar (QImage &img);
 #endif
 
     /// The name of the account as shown in the toolbar
-    QString displayName () const;
+    QString displayName ();
 
     /// The internal id of the account.
-    QString id () const;
+    QString id ();
 
     /** Server url of the account */
     void setUrl (QUrl &url);
@@ -114,10 +107,10 @@ public:
      *        a trailing slash.
      * @returns the (themeable) dav path for the account.
      */
-    QString davPath () const;
+    QString davPath ();
 
     /** Returns webdav entry URL, based on url () */
-    QUrl davUrl () const;
+    QUrl davUrl ();
 
     /** Returns the legacy permalink url for a file.
      *
@@ -127,7 +120,7 @@ public:
     QUrl deprecatedPrivateLinkUrl (QByteArray &numericFileId) const;
 
     /** Holds the accounts credentials */
-    AbstractCredentials *credentials () const;
+    AbstractCredentials *credentials ();
     void setCredentials (AbstractCredentials *cred);
 
     /** Create a network request on the account's QNAM.
@@ -186,7 +179,7 @@ public:
     void setCertificate (QByteArray certficate = QByteArray (), QString privateKey = QString ());
 
     /** Access the server capabilities */
-    const Capabilities &capabilities () const;
+    const Capabilities &capabilities ();
     void setCapabilities (QVariantMap &caps);
 
     /** Access the server version
@@ -194,15 +187,15 @@ public:
      * For servers >= 10.0.0, this can be the empty string until capabilities
      * have been received.
      */
-    QString serverVersion () const;
+    QString serverVersion ();
 
     /** Server version for easy comparison.
      *
-     * Example: serverVersionInt () >= makeServerVersion (11, 2, 3)
+     * Example : serverVersionInt () >= makeServerVersion (11, 2, 3)
      *
      * Will be 0 if the version is not available yet.
      */
-    int serverVersionInt () const;
+    int serverVersionInt ();
 
     static int makeServerVersion (int majorVersion, int minorVersion, int patchVersion);
     void setServerVersion (QString &version);
@@ -217,9 +210,9 @@ public:
      *
      * This function returns true if the server is beyond the weak limit.
      */
-    bool serverVersionUnsupported () const;
+    bool serverVersionUnsupported ();
 
-    bool isUsernamePrefillSupported () const;
+    bool isUsernamePrefillSupported ();
 
     /** True when the server connection is using HTTP2  */
     bool isHttp2Supported () { return _http2Supported; }
@@ -251,10 +244,10 @@ public:
 
     void setupUserStatusConnector ();
     void trySetupPushNotifications ();
-    PushNotifications *pushNotifications () const;
+    PushNotifications *pushNotifications ();
     void setPushNotificationsReconnectInterval (int interval);
 
-    std.shared_ptr<UserStatusConnector> userStatusConnector () const;
+    std.shared_ptr<UserStatusConnector> userStatusConnector ();
 
 public slots:
     /// Used when forgetting credentials
@@ -290,13 +283,13 @@ signals:
 
     void userStatusChanged ();
 
-protected Q_SLOTS:
+protected slots:
     void slotCredentialsFetched ();
     void slotCredentialsAsked ();
     void slotDirectEditingRecieved (QJsonDocument &json);
 
 private:
-    Account (QObject *parent = nullptr);
+    Account (GLib.Object *parent = nullptr);
     void setSharedThis (AccountPtr sharedThis);
 
     static QString davPathBase ();
@@ -349,11 +342,11 @@ private:
     std.shared_ptr<UserStatusConnector> _userStatusConnector;
 
     /* IMPORTANT - remove later - FIXME MS@2019-12-07 -.
-     * TODO: For "Log out" & "Remove account": Remove client CA certs and KEY!
+     * TODO : For "Log out" & "Remove account" : Remove client CA certs and KEY!
      *
      *       Disabled as long as selecting another cert is not supported by the UI.
      *
-     *       Being able to specify a new certificate is important anyway: expiry etc.
+     *       Being able to specify a new certificate is important anyway : expiry etc.
      *
      *       We introduce this dirty hack here, to allow deleting them upon Remote Wipe.
     */
@@ -366,7 +359,7 @@ private:
 };
 }
 
-Q_DECLARE_METATYPE (OCC.AccountPtr)
-Q_DECLARE_METATYPE (OCC.Account *)
+Q_DECLARE_METATYPE (Occ.AccountPtr)
+Q_DECLARE_METATYPE (Occ.Account *)
 
 #endif //SERVERCONNECTION_H

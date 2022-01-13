@@ -1,33 +1,31 @@
 /*
- * Copyright (C) by Markus Goetz <markus@woboq.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Markus Goetz <markus@woboq.com>
 
-// #include <QObject>
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
+
+// #include <GLib.Object>
 // #include <QTimer>
 // #include <QIODevice>
 // #include <list>
 
-namespace OCC {
+namespace Occ {
 
-class UploadDevice;
 class GETFileJob;
-class OwncloudPropagator;
 
 /**
- * @brief The BandwidthManager class
- * @ingroup libsync
- */
-class BandwidthManager : public QObject {
+@brief The BandwidthManager class
+@ingroup libsync
+*/
+class BandwidthManager : GLib.Object {
 public:
     BandwidthManager (OwncloudPropagator *p);
     ~BandwidthManager () override;
@@ -39,10 +37,10 @@ public:
 
 public slots:
     void registerUploadDevice (UploadDevice *);
-    void unregisterUploadDevice (QObject *);
+    void unregisterUploadDevice (GLib.Object *);
 
     void registerDownloadJob (GETFileJob *);
-    void unregisterDownloadJob (QObject *);
+    void unregisterDownloadJob (GLib.Object *);
 
     void absoluteLimitTimerExpired ();
     void switchingTimerExpired ();
@@ -65,8 +63,8 @@ private:
     QTimer _absoluteLimitTimer;
 
     // FIXME merge these two lists
-    std.list<UploadDevice *> _absoluteUploadDeviceList;
-    std.list<UploadDevice *> _relativeUploadDeviceList;
+    std.list<UploadDevice> _absoluteUploadDeviceList;
+    std.list<UploadDevice> _relativeUploadDeviceList;
 
     QTimer _relativeUploadMeasuringTimer;
 
@@ -80,7 +78,7 @@ private:
     int64 _relativeUploadLimitProgressAtMeasuringRestart;
     int64 _currentUploadLimit;
 
-    std.list<GETFileJob *> _downloadJobList;
+    std.list<GETFileJob> _downloadJobList;
     QTimer _relativeDownloadMeasuringTimer;
 
     // for relative bw limiting, we need to wait this amount before measuring again
@@ -95,6 +93,6 @@ private:
     int64 _currentDownloadLimit;
 };
 
-} // namespace OCC
+} // namespace Occ
 
 #endif

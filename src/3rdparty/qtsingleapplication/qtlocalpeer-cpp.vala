@@ -1,7 +1,7 @@
 /****************************************************************************
 **
 ** Copyright (C) 2014 Digia Plc and/or its subsidiary (-ies).
-** Contact: http://www.qt-project.org/legal
+** Contact : http://www.qt-project.org/legal
 **
 ** This file is part of Qt Creator.
 **
@@ -19,7 +19,7 @@
 ** Foundation and appearing in the file LICENSE.LGPL included in the
 ** packaging of this file.  Please review the following information to
 ** ensure the GNU Lesser General Public License version 2.1 requirements
-** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** will be met : http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 **
 ** In addition, as a special exception, Digia gives you certain additional
 ** rights.  These rights are described in the Digia Qt LGPL Exception
@@ -43,7 +43,7 @@ static const char ack[] = "ack";
 QString QtLocalPeer.appSessionId (QString &appId) {
     QByteArray idc = appId.toUtf8 ();
     uint16 idNum = qChecksum (idc.constData (), idc.size ());
-    //### could do: two 16bit checksums over separate halves of id, for a 32bit result - improved uniqeness probability. Every-other-char split would be best.
+    //### could do : two 16bit checksums over separate halves of id, for a 32bit result - improved uniqeness probability. Every-other-char split would be best.
 
     QString res = QLatin1String ("qtsingleapplication-")
                  + QString.number (idNum, 16);
@@ -51,8 +51,8 @@ QString QtLocalPeer.appSessionId (QString &appId) {
     return res;
 }
 
-QtLocalPeer.QtLocalPeer (QObject *parent, QString &appId)
-    : QObject (parent), id (appId) {
+QtLocalPeer.QtLocalPeer (GLib.Object *parent, QString &appId)
+    : GLib.Object (parent), id (appId) {
     if (id.isEmpty ())
         id = QCoreApplication.applicationFilePath ();  //### On win, check if this returns .../argv[0] without casefolding; .\MYAPP == .\myapp on Win
 
@@ -73,11 +73,11 @@ bool QtLocalPeer.isClient () {
         return true;
 
     if (!QLocalServer.removeServer (socketName))
-        qWarning ("QtSingleCoreApplication: could not cleanup socket");
+        qWarning ("QtSingleCoreApplication : could not cleanup socket");
     bool res = server.listen (socketName);
     if (!res)
-        qWarning ("QtSingleCoreApplication: listen on local socket failed, %s", qPrintable (server.errorString ()));
-    QObject.connect (server, &QLocalServer.newConnection, this, &QtLocalPeer.receiveConnection);
+        qWarning ("QtSingleCoreApplication : listen on local socket failed, %s", qPrintable (server.errorString ()));
+    GLib.Object.connect (server, &QLocalServer.newConnection, this, &QtLocalPeer.receiveConnection);
     return false;
 }
 
@@ -129,16 +129,16 @@ void QtLocalPeer.receiveConnection () {
     uMsg.resize (remaining);
     int got = 0;
     char* uMsgBuf = uMsg.data ();
-    //qDebug () << "RCV: remaining" << remaining;
+    //qDebug () << "RCV : remaining" << remaining;
     do {
         got = ds.readRawData (uMsgBuf, remaining);
         remaining -= got;
         uMsgBuf += got;
-        //qDebug () << "RCV: got" << got << "remaining" << remaining;
+        //qDebug () << "RCV : got" << got << "remaining" << remaining;
     } while (remaining && got >= 0 && socket.waitForReadyRead (2000));
-    //### error check: got<0
+    //### error check : got<0
     if (got < 0) {
-        qWarning () << "QtLocalPeer: Message reception failed" << socket.errorString ();
+        qWarning () << "QtLocalPeer : Message reception failed" << socket.errorString ();
         delete socket;
         return;
     }

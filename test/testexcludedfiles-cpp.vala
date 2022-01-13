@@ -1,16 +1,16 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *    support, and with no warranty, express or implied, as to its usefulness for
- *    any purpose.
- *
- */
+   This software is in the public domain, furnished "as is", without technical
+   support, and with no warranty, express or implied, as to its usefulness for
+   any purpose.
+
+*/
 
 // #include <QtTest>
 // #include <QTemporaryDir>
 
-using namespace OCC;
+using namespace Occ;
 
-#define EXCLUDE_LIST_FILE SOURCEDIR "/../../sync-exclude.lst"
+const int EXCLUDE_LIST_FILE SOURCEDIR "/../../sync-exclude.lst"
 
 // The tests were converted from the old CMocka framework, that's why there is a global
 static QScopedPointer<ExcludedFiles> excludedFiles;
@@ -36,7 +36,7 @@ static void setup_init () {
     QVERIFY (excludedFiles.reloadExcludeFiles ());
 }
 
-class TestExcludedFiles: public QObject {
+class TestExcludedFiles : public GLib.Object {
 
 static auto check_file_full (char *path) {
     return excludedFiles.fullPatternMatch (path, ItemTypeFile);
@@ -346,7 +346,7 @@ private slots:
         QCOMPARE (check_file_traversal ("/exclude"), CSYNC_FILE_EXCLUDE_LIST);
         QCOMPARE (check_file_traversal ("/foo/exclude"), CSYNC_NOT_EXCLUDED);
 
-        /* Add an exclude for directories only: excl/ */
+        /* Add an exclude for directories only : excl/ */
         excludedFiles.addManualExclude ("excl/");
         excludedFiles.reloadExcludeFiles ();
         QCOMPARE (check_dir_traversal ("/excl"), CSYNC_FILE_EXCLUDE_LIST);
@@ -446,7 +446,7 @@ private slots:
 
         QCOMPARE (check_file_full ("/foo/exclude"), CSYNC_NOT_EXCLUDED);
 
-        /* Add an exclude for directories only: excl/ */
+        /* Add an exclude for directories only : excl/ */
         excludedFiles.addManualExclude ("excl/");
         excludedFiles.reloadExcludeFiles ();
         QCOMPARE (check_dir_full ("/excl"), CSYNC_FILE_EXCLUDE_LIST);

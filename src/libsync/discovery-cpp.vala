@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QDebug>
 // #include <algorithm>
@@ -24,7 +24,7 @@
 // #include <common/checksums.h>
 // #include <common/constants.h>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcDisco, "sync.discovery", QtInfoMsg)
 
@@ -226,7 +226,7 @@ void ProcessDirectoryJob.process () {
 bool ProcessDirectoryJob.handleExcluded (QString &path, QString &localName, bool isDirectory, bool isHidden, bool isSymlink) {
     auto excluded = _discoveryData._excludes.traversalPatternMatch (path, isDirectory ? ItemTypeDirectory : ItemTypeFile);
 
-    // FIXME: move to ExcludedFiles 's regexp ?
+    // FIXME : move to ExcludedFiles 's regexp ?
     bool isInvalidPattern = false;
     if (excluded == CSYNC_NOT_EXCLUDED && !_discoveryData._invalidFilenameRx.pattern ().isEmpty ()) {
         if (path.contains (_discoveryData._invalidFilenameRx)) {
@@ -317,7 +317,7 @@ bool ProcessDirectoryJob.handleExcluded (QString &path, QString &localName, bool
             item._errorString = tr ("Stat failed.");
             break;
         case CSYNC_FILE_EXCLUDE_CONFLICT:
-            item._errorString = tr ("Conflict: Server version downloaded, local copy renamed and not uploaded.");
+            item._errorString = tr ("Conflict : Server version downloaded, local copy renamed and not uploaded.");
             item._status = SyncFileItem.Conflict;
         break;
         case CSYNC_FILE_EXCLUDE_CANNOT_ENCODE:
@@ -340,17 +340,17 @@ void ProcessDirectoryJob.processFile (PathTuple path,
     const char *hasServer = serverEntry.isValid () ? "true" : _queryServer == ParentNotChanged ? "db" : "false";
     const char *hasLocal = localEntry.isValid () ? "true" : _queryLocal == ParentNotChanged ? "db" : "false";
     qCInfo (lcDisco).nospace () << "Processing " << path._original
-                              << " | valid: " << dbEntry.isValid () << "/" << hasLocal << "/" << hasServer
-                              << " | mtime: " << dbEntry._modtime << "/" << localEntry.modtime << "/" << serverEntry.modtime
-                              << " | size: " << dbEntry._fileSize << "/" << localEntry.size << "/" << serverEntry.size
-                              << " | etag: " << dbEntry._etag << "//" << serverEntry.etag
-                              << " | checksum: " << dbEntry._checksumHeader << "//" << serverEntry.checksumHeader
-                              << " | perm: " << dbEntry._remotePerm << "//" << serverEntry.remotePerm
-                              << " | fileid: " << dbEntry._fileId << "//" << serverEntry.fileId
-                              << " | inode: " << dbEntry._inode << "/" << localEntry.inode << "/"
-                              << " | type: " << dbEntry._type << "/" << localEntry.type << "/" << (serverEntry.isDirectory ? ItemTypeDirectory : ItemTypeFile)
-                              << " | e2ee: " << dbEntry._isE2eEncrypted << "/" << serverEntry.isE2eEncrypted
-                              << " | e2eeMangledName: " << dbEntry.e2eMangledName () << "/" << serverEntry.e2eMangledName;
+                              << " | valid : " << dbEntry.isValid () << "/" << hasLocal << "/" << hasServer
+                              << " | mtime : " << dbEntry._modtime << "/" << localEntry.modtime << "/" << serverEntry.modtime
+                              << " | size : " << dbEntry._fileSize << "/" << localEntry.size << "/" << serverEntry.size
+                              << " | etag : " << dbEntry._etag << "//" << serverEntry.etag
+                              << " | checksum : " << dbEntry._checksumHeader << "//" << serverEntry.checksumHeader
+                              << " | perm : " << dbEntry._remotePerm << "//" << serverEntry.remotePerm
+                              << " | fileid : " << dbEntry._fileId << "//" << serverEntry.fileId
+                              << " | inode : " << dbEntry._inode << "/" << localEntry.inode << "/"
+                              << " | type : " << dbEntry._type << "/" << localEntry.type << "/" << (serverEntry.isDirectory ? ItemTypeDirectory : ItemTypeFile)
+                              << " | e2ee : " << dbEntry._isE2eEncrypted << "/" << serverEntry.isE2eEncrypted
+                              << " | e2eeMangledName : " << dbEntry.e2eMangledName () << "/" << serverEntry.e2eMangledName;
 
     if (localEntry.isValid ()
         && !serverEntry.isValid ()
@@ -382,7 +382,7 @@ void ProcessDirectoryJob.processFile (PathTuple path,
     }
 
     // The item shall only have this type if the db request for the virtual download
-    // was successful (like: no conflicting remote remove etc). This decision is done
+    // was successful (like : no conflicting remote remove etc). This decision is done
     // either in processFileAnalyzeRemoteInfo () or further down here.
     if (item._type == ItemTypeVirtualFileDownload)
         item._type = ItemTypeVirtualFile;
@@ -410,7 +410,7 @@ void ProcessDirectoryJob.processFile (PathTuple path,
 
     // Downloading a virtual file is like a server action and can happen even if
     // server-side nothing has changed
-    // NOTE: Normally setting the VirtualFileDownload flag means that local and
+    // NOTE : Normally setting the VirtualFileDownload flag means that local and
     // remote will be rediscovered. This is just a fallback for a similar check
     // in processFileAnalyzeRemoteInfo ().
     if (_queryServer == ParentNotChanged
@@ -431,7 +431,7 @@ void ProcessDirectoryJob.processFile (PathTuple path,
 static bool computeLocalChecksum (QByteArray &header, QString &path, SyncFileItemPtr &item) {
     auto type = parseChecksumHeaderType (header);
     if (!type.isEmpty ()) {
-        // TODO: compute async?
+        // TODO : compute async?
         QByteArray checksum = ComputeChecksum.computeNowOnFile (path, type);
         if (!checksum.isEmpty ()) {
             item._checksumHeader = makeChecksumHeader (type, checksum);
@@ -548,7 +548,7 @@ void ProcessDirectoryJob.processFileAnalyzeRemoteInfo (
                 const bool isVfsModeOn = _discoveryData && _discoveryData._syncOptions._vfs && _discoveryData._syncOptions._vfs.mode () != Vfs.Off;
                 if (isVfsModeOn && dbEntry.isDirectory () && dbEntry._isE2eEncrypted) {
                     int64 localFolderSize = 0;
-                    const auto listFilesCallback = [&localFolderSize] (OCC.SyncJournalFileRecord &record) {
+                    const auto listFilesCallback = [&localFolderSize] (Occ.SyncJournalFileRecord &record) {
                         if (record.isFile ()) {
                             // add Constants.e2EeTagSize so we will know the size of E2EE file on the server
                             localFolderSize += record._fileSize + Constants.e2EeTagSize;
@@ -576,7 +576,7 @@ void ProcessDirectoryJob.processFileAnalyzeRemoteInfo (
         return;
     }
 
-    // Unknown in db: new file on the server
+    // Unknown in db : new file on the server
     Q_ASSERT (!dbEntry.isValid ());
 
     item._instruction = CSYNC_INSTRUCTION_NEW;
@@ -626,14 +626,14 @@ void ProcessDirectoryJob.processFileAnalyzeRemoteInfo (
         return;
     }
 
-    // Not in db or locally: either new or a rename
+    // Not in db or locally : either new or a rename
     Q_ASSERT (!dbEntry.isValid () && !localEntry.isValid ());
 
     // Check for renames (if there is a file with the same file id)
     bool done = false;
     bool async = false;
     // This function will be executed for every candidate
-    auto renameCandidateProcessing = [&] (OCC.SyncJournalFileRecord &base) {
+    auto renameCandidateProcessing = [&] (Occ.SyncJournalFileRecord &base) {
         if (done)
             return;
         if (!base.isValid ())
@@ -694,7 +694,7 @@ void ProcessDirectoryJob.processFileAnalyzeRemoteInfo (
                 qCInfo (lcDisco) << "Local file does not exist anymore." << originalPathAdjusted;
                 return;
             }
-            // NOTE: This prohibits some VFS renames from being detected since
+            // NOTE : This prohibits some VFS renames from being detected since
             // suffix-file size is different from the db size. That's ok, they'll DELETE+NEW.
             if (buf.modtime != base._modtime || buf.size != base._fileSize || buf.type == ItemTypeDirectory) {
                 qCInfo (lcDisco) << "File has changed locally, not a rename." << originalPath;
@@ -804,8 +804,8 @@ void ProcessDirectoryJob.processFileAnalyzeLocalInfo (
 
     auto finalize = [&] {
         bool recurse = item.isDirectory () || localEntry.isDirectory || serverEntry.isDirectory;
-        // Even if we have a local directory: If the remote is a file that's propagated as a
-        // conflict we don't need to recurse into it. (local c1.owncloud, c1/ ; remote: c1)
+        // Even if we have a local directory : If the remote is a file that's propagated as a
+        // conflict we don't need to recurse into it. (local c1.owncloud, c1/ ; remote : c1)
         if (item._instruction == CSYNC_INSTRUCTION_CONFLICT && !item.isDirectory ())
             recurse = false;
         if (_queryLocal != NormalQuery && _queryServer != NormalQuery)
@@ -819,7 +819,7 @@ void ProcessDirectoryJob.processFileAnalyzeLocalInfo (
         if (_queryLocal == ParentNotChanged && dbEntry.isValid ()) {
             // Not modified locally (ParentNotChanged)
             if (noServerEntry) {
-                // not on the server: Removed on the server, delete locally
+                // not on the server : Removed on the server, delete locally
                 qCInfo (lcDisco) << "File" << item._file << "is not anymore on server. Going to delete it locally.";
                 item._instruction = CSYNC_INSTRUCTION_REMOVE;
                 item._direction = SyncFileItem.Down;
@@ -843,7 +843,7 @@ void ProcessDirectoryJob.processFileAnalyzeLocalInfo (
             item._direction = SyncFileItem.Down;
             item._type = ItemTypeVirtualFile;
         } else if (!serverModified) {
-            // Removed locally: also remove on the server.
+            // Removed locally : also remove on the server.
             if (!dbEntry._serverHasIgnoredFiles) {
                 qCInfo (lcDisco) << "File" << item._file << "was deleted locally. Going to delete it on the server.";
                 item._instruction = CSYNC_INSTRUCTION_REMOVE;
@@ -915,10 +915,10 @@ void ProcessDirectoryJob.processFileAnalyzeLocalInfo (
             }
         } else if (serverModified
             || (isVfsWithSuffix () && dbEntry.isVirtualFile ())) {
-            // There's a local change and a server change: Conflict!
+            // There's a local change and a server change : Conflict!
             // Alternatively, this might be a suffix-file that's virtual in the db but
             // not locally. These also become conflicts. For in-place placeholders that's
-            // not necessary: they could be replaced by real files and should then trigger
+            // not necessary : they could be replaced by real files and should then trigger
             // a regular SYNC upwards when there's no server change.
             processFileConflict (item, path, localEntry, serverEntry, dbEntry);
         } else if (typeChange) {
@@ -956,7 +956,7 @@ void ProcessDirectoryJob.processFileAnalyzeLocalInfo (
             if (isEmlFile && dbEntry._fileSize == localEntry.size && !dbEntry._checksumHeader.isEmpty ()) {
                 if (computeLocalChecksum (dbEntry._checksumHeader, _discoveryData._localDir + path._local, item)
                         && item._checksumHeader == dbEntry._checksumHeader) {
-                    qCInfo (lcDisco) << "NOTE: Checksums are identical, file did not actually change: " << path._local;
+                    qCInfo (lcDisco) << "NOTE : Checksums are identical, file did not actually change : " << path._local;
                     item._instruction = CSYNC_INSTRUCTION_UPDATE_METADATA;
                 }
             }
@@ -991,7 +991,7 @@ void ProcessDirectoryJob.processFileAnalyzeLocalInfo (
     _childModified = true;
 
     auto postProcessLocalNew = [item, localEntry, path, this] () {
-        // TODO: We may want to execute the same logic for non-VFS mode, as, moving/renaming the same folder by 2 or more clients at the same time is not possible in Web UI.
+        // TODO : We may want to execute the same logic for non-VFS mode, as, moving/renaming the same folder by 2 or more clients at the same time is not possible in Web UI.
         // Keeping it like this (for VFS files and folders only) just to fix a user issue.
 
         if (! (_discoveryData && _discoveryData._syncOptions._vfs && _discoveryData._syncOptions._vfs.mode () != Vfs.Off)) {
@@ -1031,7 +1031,7 @@ void ProcessDirectoryJob.processFileAnalyzeLocalInfo (
 
         const auto isfolderPlaceHolderAvailabilityOnlineOnly = (folderPlaceHolderAvailability.isValid () && *folderPlaceHolderAvailability == VfsItemAvailability.OnlineOnly);
 
-        // a folder is considered online-only if: no files are hydrated, or, if it's an empty folder
+        // a folder is considered online-only if : no files are hydrated, or, if it's an empty folder
         const auto isOnlineOnlyFolder = isfolderPlaceHolderAvailabilityOnlineOnly || (!folderPlaceHolderAvailability && isFolderPinStateOnlineOnly);
 
         if (!isFilePlaceHolder && !isOnlineOnlyFolder) {
@@ -1069,7 +1069,7 @@ void ProcessDirectoryJob.processFileAnalyzeLocalInfo (
     };
 
     // Check if it is a move
-    OCC.SyncJournalFileRecord base;
+    Occ.SyncJournalFileRecord base;
     if (!_discoveryData._statedb.getFileRecordByInode (localEntry.inode, &base)) {
         dbError ();
         return;
@@ -1102,7 +1102,7 @@ void ProcessDirectoryJob.processFileAnalyzeLocalInfo (
 
         // The old file must have been deleted.
         if (QFile.exists (_discoveryData._localDir + originalPath)
-            // Exception: If the rename changes case only (like "foo" . "Foo") the
+            // Exception : If the rename changes case only (like "foo" . "Foo") the
             // old filename might still point to the same file.
             && ! (Utility.fsCasePreserving ()
                  && originalPath.compare (path._local, Qt.CaseInsensitive) == 0
@@ -1161,8 +1161,8 @@ void ProcessDirectoryJob.processFileAnalyzeLocalInfo (
         if (movePerms.destinationNewOk)
             return;
 
-        // Here we know the new location can't be uploaded: must prevent the source delete.
-        // Two cases: either the source item was already processed or not.
+        // Here we know the new location can't be uploaded : must prevent the source delete.
+        // Two cases : either the source item was already processed or not.
         auto wasDeletedOnClient = _discoveryData.findAndCancelDeletedJob (originalPath);
         if (wasDeletedOnClient.first) {
             // More complicated. The REMOVE is canceled. Restore will happen next sync.
@@ -1263,7 +1263,7 @@ void ProcessDirectoryJob.processFileConflict (SyncFileItemPtr &item, ProcessDire
         // In older client versions we always treated these cases as a
         // non-conflict. This behavior is preserved in case the server
         // doesn't provide a content checksum.
-        // SO: If there is no checksum, we can have !isConflict here
+        // SO : If there is no checksum, we can have !isConflict here
         // even though the files might have different content! This is an
         // intentional tradeoff. Downloading and comparing files would
         // be technically correct in this situation but leads to too
@@ -1289,7 +1289,7 @@ void ProcessDirectoryJob.processFileConflict (SyncFileItemPtr &item, ProcessDire
         // Update the etag and other server metadata in the journal already
         // (We can't use a typical CSYNC_INSTRUCTION_UPDATE_METADATA because
         // we must not store the size/modtime from the file system)
-        OCC.SyncJournalFileRecord rec;
+        Occ.SyncJournalFileRecord rec;
         if (_discoveryData._statedb.getFileRecord (path._original, &rec)) {
             rec._path = path._original.toUtf8 ();
             rec._etag = serverEntry.etag;
@@ -1371,7 +1371,7 @@ void ProcessDirectoryJob.processFileFinalize (
     }
 }
 
-void ProcessDirectoryJob.processBlacklisted (PathTuple &path, OCC.LocalInfo &localEntry,
+void ProcessDirectoryJob.processBlacklisted (PathTuple &path, Occ.LocalInfo &localEntry,
     const SyncJournalFileRecord &dbEntry) {
     if (!localEntry.isValid ())
         return;
@@ -1402,7 +1402,7 @@ void ProcessDirectoryJob.processBlacklisted (PathTuple &path, OCC.LocalInfo &loc
     }
 }
 
-bool ProcessDirectoryJob.checkPermissions (OCC.SyncFileItemPtr &item) {
+bool ProcessDirectoryJob.checkPermissions (Occ.SyncFileItemPtr &item) {
     if (item._direction != SyncFileItem.Up) {
         // Currently we only check server-side permissions
         return true;
@@ -1410,26 +1410,26 @@ bool ProcessDirectoryJob.checkPermissions (OCC.SyncFileItemPtr &item) {
 
     switch (item._instruction) {
     case CSYNC_INSTRUCTION_TYPE_CHANGE:
-    case CSYNC_INSTRUCTION_NEW: {
+    case CSYNC_INSTRUCTION_NEW : {
         const auto perms = !_rootPermissions.isNull () ? _rootPermissions
                                                       : _dirItem ? _dirItem._remotePerm : _rootPermissions;
         if (perms.isNull ()) {
             // No permissions set
             return true;
         } else if (item.isDirectory () && !perms.hasPermission (RemotePermissions.CanAddSubDirectories)) {
-            qCWarning (lcDisco) << "checkForPermission: ERROR" << item._file;
+            qCWarning (lcDisco) << "checkForPermission : ERROR" << item._file;
             item._instruction = CSYNC_INSTRUCTION_ERROR;
             item._errorString = tr ("Not allowed because you don't have permission to add subfolders to that folder");
             return false;
         } else if (!item.isDirectory () && !perms.hasPermission (RemotePermissions.CanAddFile)) {
-            qCWarning (lcDisco) << "checkForPermission: ERROR" << item._file;
+            qCWarning (lcDisco) << "checkForPermission : ERROR" << item._file;
             item._instruction = CSYNC_INSTRUCTION_ERROR;
             item._errorString = tr ("Not allowed because you don't have permission to add files in that folder");
             return false;
         }
         break;
     }
-    case CSYNC_INSTRUCTION_SYNC: {
+    case CSYNC_INSTRUCTION_SYNC : {
         const auto perms = item._remotePerm;
         if (perms.isNull ()) {
             // No permissions set
@@ -1440,8 +1440,8 @@ bool ProcessDirectoryJob.checkPermissions (OCC.SyncFileItemPtr &item) {
             item._errorString = tr ("Not allowed to upload this file because it is read-only on the server, restoring");
             item._direction = SyncFileItem.Down;
             item._isRestoration = true;
-            qCWarning (lcDisco) << "checkForPermission: RESTORING" << item._file << item._errorString;
-            // Take the things to write to the db from the "other" node (i.e: info from server).
+            qCWarning (lcDisco) << "checkForPermission : RESTORING" << item._file << item._errorString;
+            // Take the things to write to the db from the "other" node (i.e : info from server).
             // Do a lookup into the csync remote tree to get the metadata we need to restore.
             qSwap (item._size, item._previousSize);
             qSwap (item._modtime, item._previousModtime);
@@ -1449,7 +1449,7 @@ bool ProcessDirectoryJob.checkPermissions (OCC.SyncFileItemPtr &item) {
         }
         break;
     }
-    case CSYNC_INSTRUCTION_REMOVE: {
+    case CSYNC_INSTRUCTION_REMOVE : {
         QString fileSlash = item._file + '/';
         auto forbiddenIt = _discoveryData._forbiddenDeletes.upperBound (fileSlash);
         if (forbiddenIt != _discoveryData._forbiddenDeletes.begin ())
@@ -1460,7 +1460,7 @@ bool ProcessDirectoryJob.checkPermissions (OCC.SyncFileItemPtr &item) {
             item._direction = SyncFileItem.Down;
             item._isRestoration = true;
             item._errorString = tr ("Moved to invalid target, restoring");
-            qCWarning (lcDisco) << "checkForPermission: RESTORING" << item._file << item._errorString;
+            qCWarning (lcDisco) << "checkForPermission : RESTORING" << item._file << item._errorString;
             return true; // restore sub items
         }
         const auto perms = item._remotePerm;
@@ -1473,7 +1473,7 @@ bool ProcessDirectoryJob.checkPermissions (OCC.SyncFileItemPtr &item) {
             item._direction = SyncFileItem.Down;
             item._isRestoration = true;
             item._errorString = tr ("Not allowed to remove, restoring");
-            qCWarning (lcDisco) << "checkForPermission: RESTORING" << item._file << item._errorString;
+            qCWarning (lcDisco) << "checkForPermission : RESTORING" << item._file << item._errorString;
             return true; // (we need to recurse to restore sub items)
         }
         break;
@@ -1518,7 +1518,7 @@ auto ProcessDirectoryJob.checkMovePermissions (RemotePermissions srcPerm, QStrin
 }
 
 void ProcessDirectoryJob.subJobFinished () {
-    auto job = qobject_cast<ProcessDirectoryJob *> (sender ());
+    auto job = qobject_cast<ProcessDirectoryJob> (sender ());
     ASSERT (job);
 
     _childIgnored |= job._childIgnored;

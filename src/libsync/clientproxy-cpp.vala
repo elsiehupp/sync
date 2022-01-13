@@ -1,27 +1,27 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QLoggingCategory>
 // #include <QUrl>
 // #include <QThreadPool>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcClientProxy, "nextcloud.sync.clientproxy", QtInfoMsg)
 
-ClientProxy.ClientProxy (QObject *parent)
-    : QObject (parent) {
+ClientProxy.ClientProxy (GLib.Object *parent)
+    : GLib.Object (parent) {
 }
 
 static QNetworkProxy proxyFromConfig (ConfigFile &cfg) {
@@ -40,7 +40,7 @@ static QNetworkProxy proxyFromConfig (ConfigFile &cfg) {
 }
 
 bool ClientProxy.isUsingSystemDefault () {
-    OCC.ConfigFile cfg;
+    Occ.ConfigFile cfg;
 
     // if there is no config file, default to system proxy.
     if (cfg.exists ()) {
@@ -74,7 +74,7 @@ QString ClientProxy.printQNetworkProxy (QNetworkProxy &proxy) {
 }
 
 void ClientProxy.setupQtProxyFromConfig () {
-    OCC.ConfigFile cfg;
+    Occ.ConfigFile cfg;
     int proxyType = QNetworkProxy.DefaultProxy;
     QNetworkProxy proxy;
 
@@ -118,14 +118,14 @@ void ClientProxy.setupQtProxyFromConfig () {
     }
 }
 
-void ClientProxy.lookupSystemProxyAsync (QUrl &url, QObject *dst, char *slot) {
+void ClientProxy.lookupSystemProxyAsync (QUrl &url, GLib.Object *dst, char *slot) {
     auto *runnable = new SystemProxyRunnable (url);
-    QObject.connect (runnable, SIGNAL (systemProxyLookedUp (QNetworkProxy)), dst, slot);
+    GLib.Object.connect (runnable, SIGNAL (systemProxyLookedUp (QNetworkProxy)), dst, slot);
     QThreadPool.globalInstance ().start (runnable); // takes ownership and deletes
 }
 
 SystemProxyRunnable.SystemProxyRunnable (QUrl &url)
-    : QObject ()
+    : GLib.Object ()
     , QRunnable ()
     , _url (url) {
 }

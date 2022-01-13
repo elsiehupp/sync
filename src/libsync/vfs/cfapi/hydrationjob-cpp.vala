@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <clientsideencryptionjobs.h>
 
@@ -19,79 +19,79 @@
 
 Q_LOGGING_CATEGORY (lcHydration, "nextcloud.sync.vfs.hydrationjob", QtInfoMsg)
 
-OCC.HydrationJob.HydrationJob (QObject *parent)
-    : QObject (parent) {
+Occ.HydrationJob.HydrationJob (GLib.Object *parent)
+    : GLib.Object (parent) {
 }
 
-OCC.AccountPtr OCC.HydrationJob.account () {
+Occ.AccountPtr Occ.HydrationJob.account () {
     return _account;
 }
 
-void OCC.HydrationJob.setAccount (AccountPtr &account) {
+void Occ.HydrationJob.setAccount (AccountPtr &account) {
     _account = account;
 }
 
-QString OCC.HydrationJob.remotePath () {
+QString Occ.HydrationJob.remotePath () {
     return _remotePath;
 }
 
-void OCC.HydrationJob.setRemotePath (QString &remotePath) {
+void Occ.HydrationJob.setRemotePath (QString &remotePath) {
     _remotePath = remotePath;
 }
 
-QString OCC.HydrationJob.localPath () {
+QString Occ.HydrationJob.localPath () {
     return _localPath;
 }
 
-void OCC.HydrationJob.setLocalPath (QString &localPath) {
+void Occ.HydrationJob.setLocalPath (QString &localPath) {
     _localPath = localPath;
 }
 
-OCC.SyncJournalDb *OCC.HydrationJob.journal () {
+Occ.SyncJournalDb *Occ.HydrationJob.journal () {
     return _journal;
 }
 
-void OCC.HydrationJob.setJournal (SyncJournalDb *journal) {
+void Occ.HydrationJob.setJournal (SyncJournalDb *journal) {
     _journal = journal;
 }
 
-QString OCC.HydrationJob.requestId () {
+QString Occ.HydrationJob.requestId () {
     return _requestId;
 }
 
-void OCC.HydrationJob.setRequestId (QString &requestId) {
+void Occ.HydrationJob.setRequestId (QString &requestId) {
     _requestId = requestId;
 }
 
-QString OCC.HydrationJob.folderPath () {
+QString Occ.HydrationJob.folderPath () {
     return _folderPath;
 }
 
-void OCC.HydrationJob.setFolderPath (QString &folderPath) {
+void Occ.HydrationJob.setFolderPath (QString &folderPath) {
     _folderPath = folderPath;
 }
 
-bool OCC.HydrationJob.isEncryptedFile () {
+bool Occ.HydrationJob.isEncryptedFile () {
     return _isEncryptedFile;
 }
 
-void OCC.HydrationJob.setIsEncryptedFile (bool isEncrypted) {
+void Occ.HydrationJob.setIsEncryptedFile (bool isEncrypted) {
     _isEncryptedFile = isEncrypted;
 }
 
-QString OCC.HydrationJob.e2eMangledName () {
+QString Occ.HydrationJob.e2eMangledName () {
     return _e2eMangledName;
 }
 
-void OCC.HydrationJob.setE2eMangledName (QString &e2eMangledName) {
+void Occ.HydrationJob.setE2eMangledName (QString &e2eMangledName) {
     _e2eMangledName = e2eMangledName;
 }
 
-OCC.HydrationJob.Status OCC.HydrationJob.status () {
+Occ.HydrationJob.Status Occ.HydrationJob.status () {
     return _status;
 }
 
-void OCC.HydrationJob.start () {
+void Occ.HydrationJob.start () {
     Q_ASSERT (_account);
     Q_ASSERT (_journal);
     Q_ASSERT (!_remotePath.isEmpty () && !_localPath.isEmpty ());
@@ -134,15 +134,15 @@ void OCC.HydrationJob.start () {
     connect (_transferDataServer, &QLocalServer.newConnection, this, &HydrationJob.onNewConnection);
 }
 
-void OCC.HydrationJob.slotFolderIdError () {
-    // TODO: the following code is borrowed from PropagateDownloadEncrypted (see HydrationJob.onNewConnection () for explanation of next steps)
+void Occ.HydrationJob.slotFolderIdError () {
+    // TODO : the following code is borrowed from PropagateDownloadEncrypted (see HydrationJob.onNewConnection () for explanation of next steps)
     qCCritical (lcHydration) << "Failed to get encrypted metadata of folder" << _requestId << _localPath << _folderPath;
     emitFinished (Error);
 }
 
-void OCC.HydrationJob.slotCheckFolderId (QStringList &list) {
-    // TODO: the following code is borrowed from PropagateDownloadEncrypted (see HydrationJob.onNewConnection () for explanation of next steps)
-    auto job = qobject_cast<LsColJob *> (sender ());
+void Occ.HydrationJob.slotCheckFolderId (QStringList &list) {
+    // TODO : the following code is borrowed from PropagateDownloadEncrypted (see HydrationJob.onNewConnection () for explanation of next steps)
+    auto job = qobject_cast<LsColJob> (sender ());
     const QString folderId = list.first ();
     qCDebug (lcHydration) << "Received id of folder" << folderId;
 
@@ -158,15 +158,15 @@ void OCC.HydrationJob.slotCheckFolderId (QStringList &list) {
     metadataJob.start ();
 }
 
-void OCC.HydrationJob.slotFolderEncryptedMetadataError (QByteArray & /*fileId*/, int /*httpReturnCode*/) {
-    // TODO: the following code is borrowed from PropagateDownloadEncrypted (see HydrationJob.onNewConnection () for explanation of next steps)
+void Occ.HydrationJob.slotFolderEncryptedMetadataError (QByteArray & /*fileId*/, int /*httpReturnCode*/) {
+    // TODO : the following code is borrowed from PropagateDownloadEncrypted (see HydrationJob.onNewConnection () for explanation of next steps)
     qCCritical (lcHydration) << "Failed to find encrypted metadata information of remote file" << e2eMangledName ();
     emitFinished (Error);
     return;
 }
 
-void OCC.HydrationJob.slotCheckFolderEncryptedMetadata (QJsonDocument &json) {
-    // TODO: the following code is borrowed from PropagateDownloadEncrypted (see HydrationJob.onNewConnection () for explanation of next steps)
+void Occ.HydrationJob.slotCheckFolderEncryptedMetadata (QJsonDocument &json) {
+    // TODO : the following code is borrowed from PropagateDownloadEncrypted (see HydrationJob.onNewConnection () for explanation of next steps)
     qCDebug (lcHydration) << "Metadata Received reading" << e2eMangledName ();
     const QString filename = e2eMangledName ();
     auto meta = new FolderMetadata (_account, json.toJson (QJsonDocument.Compact));
@@ -184,7 +184,7 @@ void OCC.HydrationJob.slotCheckFolderEncryptedMetadata (QJsonDocument &json) {
             _transferDataSocket = _transferDataServer.nextPendingConnection ();
             _job = new GETEncryptedFileJob (_account, _remotePath + e2eMangledName (), _transferDataSocket, {}, {}, 0, encryptedInfo, this);
 
-            connect (qobject_cast<GETEncryptedFileJob *> (_job), &GETEncryptedFileJob.finishedSignal, this, &HydrationJob.onGetFinished);
+            connect (qobject_cast<GETEncryptedFileJob> (_job), &GETEncryptedFileJob.finishedSignal, this, &HydrationJob.onGetFinished);
             _job.start ();
             return;
         }
@@ -194,7 +194,7 @@ void OCC.HydrationJob.slotCheckFolderEncryptedMetadata (QJsonDocument &json) {
     emitFinished (Error);
 }
 
-void OCC.HydrationJob.cancel () {
+void Occ.HydrationJob.cancel () {
     Q_ASSERT (_signalSocket);
 
     _isCancelled = true;
@@ -209,7 +209,7 @@ void OCC.HydrationJob.cancel () {
     emitFinished (Cancelled);
 }
 
-void OCC.HydrationJob.emitFinished (Status status) {
+void Occ.HydrationJob.emitFinished (Status status) {
     _status = status;
     _signalSocket.close ();
 
@@ -226,14 +226,14 @@ void OCC.HydrationJob.emitFinished (Status status) {
     emit finished (this);
 }
 
-void OCC.HydrationJob.onCancellationServerNewConnection () {
+void Occ.HydrationJob.onCancellationServerNewConnection () {
     Q_ASSERT (!_signalSocket);
 
     qCInfo (lcHydration) << "Got new connection on cancellation server" << _requestId << _folderPath;
     _signalSocket = _signalServer.nextPendingConnection ();
 }
 
-void OCC.HydrationJob.onNewConnection () {
+void Occ.HydrationJob.onNewConnection () {
     Q_ASSERT (!_transferDataSocket);
     Q_ASSERT (!_job);
 
@@ -244,7 +244,7 @@ void OCC.HydrationJob.onNewConnection () {
     }
 }
 
-void OCC.HydrationJob.finalize (OCC.VfsCfApi *vfs) {
+void Occ.HydrationJob.finalize (Occ.VfsCfApi *vfs) {
     // Mark the file as hydrated in the sync journal
     SyncJournalFileRecord record;
     _journal.getFileRecord (_folderPath, &record);
@@ -272,7 +272,7 @@ void OCC.HydrationJob.finalize (OCC.VfsCfApi *vfs) {
     _journal.setFileRecord (record);
 }
 
-void OCC.HydrationJob.onGetFinished () {
+void Occ.HydrationJob.onGetFinished () {
     qCInfo (lcHydration) << "GETFileJob finished" << _requestId << _folderPath << _job.reply ().error ();
 
     const auto isGetJobResultError = _job.reply ().error ();
@@ -289,7 +289,7 @@ void OCC.HydrationJob.onGetFinished () {
     emitFinished (Success);
 }
 
-void OCC.HydrationJob.handleNewConnection () {
+void Occ.HydrationJob.handleNewConnection () {
     qCInfo (lcHydration) << "Got new connection starting GETFileJob" << _requestId << _folderPath;
     _transferDataSocket = _transferDataServer.nextPendingConnection ();
     _job = new GETFileJob (_account, _remotePath + _folderPath, _transferDataSocket, {}, {}, 0, this);
@@ -297,8 +297,8 @@ void OCC.HydrationJob.handleNewConnection () {
     _job.start ();
 }
 
-void OCC.HydrationJob.handleNewConnectionForEncryptedFile () {
-    // TODO: the following code is borrowed from PropagateDownloadEncrypted (should we factor it out and reuse? YES! Should we do it now? Probably not, as, this would imply modifying PropagateDownloadEncrypted, so we need a separate PR)
+void Occ.HydrationJob.handleNewConnectionForEncryptedFile () {
+    // TODO : the following code is borrowed from PropagateDownloadEncrypted (should we factor it out and reuse? YES! Should we do it now? Probably not, as, this would imply modifying PropagateDownloadEncrypted, so we need a separate PR)
     qCInfo (lcHydration) << "Got new connection for encrypted file. Getting required info for decryption...";
     const auto rootPath = [=] () {
         const auto result = _remotePath;

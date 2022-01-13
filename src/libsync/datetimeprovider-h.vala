@@ -2,14 +2,14 @@
 
 // #include <QDateTime>
 
-namespace OCC {
+namespace Occ {
 
 class OWNCLOUDSYNC_EXPORT DateTimeProvider {
 public:
     virtual ~DateTimeProvider ();
 
-    virtual QDateTime currentDateTime () const;
+    virtual QDateTime currentDateTime ();
 
-    virtual QDate currentDate () const;
+    virtual QDate currentDate ();
 };
 }

@@ -1,16 +1,16 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *    support, and with no warranty, express or implied, as to its usefulness for
- *    any purpose.
- *
- */
+   This software is in the public domain, furnished "as is", without technical
+   support, and with no warranty, express or implied, as to its usefulness for
+   any purpose.
+
+*/
 
 // #include <QtTest>
 // #include <syncengine.h>
 
-using namespace OCC;
+using namespace Occ;
 
-#define DVSUFFIX APPLICATION_DOTVIRTUALFILE_SUFFIX
+const int DVSUFFIX APPLICATION_DOTVIRTUALFILE_SUFFIX
 
 bool itemInstruction (ItemCompletedSpy &spy, QString &path, SyncInstructions instr) {
     auto item = spy.findItem (path);
@@ -56,7 +56,7 @@ QSharedPointer<Vfs> setupVfs (FakeFolder &folder) {
     return suffixVfs;
 }
 
-class TestSyncVirtualFiles : public QObject {
+class TestSyncVirtualFiles : GLib.Object {
 
 private slots:
     void testVirtualFileLifecycle_data () {
@@ -166,7 +166,7 @@ private slots:
         QVERIFY (!dbRecord (fakeFolder, "A/a1m" DVSUFFIX).isValid ());
         cleanup ();
 
-        // Edge case: Local virtual file but no db entry for some reason
+        // Edge case : Local virtual file but no db entry for some reason
         fakeFolder.remoteModifier ().insert ("A/a2", 64);
         fakeFolder.remoteModifier ().insert ("A/a3", 64);
         QVERIFY (fakeFolder.syncOnce ());
@@ -213,9 +213,9 @@ private slots:
         QVERIFY (fakeFolder.currentLocalState ().find ("B/b2" DVSUFFIX));
         cleanup ();
 
-        // A: the correct file and a conflicting file are added, virtual files stay
-        // B: same setup, but the virtual files are deleted by the user
-        // C: user adds a *directory* locally
+        // A : the correct file and a conflicting file are added, virtual files stay
+        // B : same setup, but the virtual files are deleted by the user
+        // C : user adds a *directory* locally
         fakeFolder.localModifier ().insert ("A/a1", 64);
         fakeFolder.localModifier ().insert ("A/a2", 30);
         fakeFolder.localModifier ().insert ("B/b1", 64);
@@ -681,26 +681,26 @@ private slots:
         QVERIFY (fakeFolder.currentLocalState ().find ("case6"));
         cleanup ();
 
-        // Case 1: foo . bar (tested elsewhere)
-        // Case 2: foo.oc . bar.oc (tested elsewhere)
+        // Case 1 : foo . bar (tested elsewhere)
+        // Case 2 : foo.oc . bar.oc (tested elsewhere)
 
-        // Case 3: foo.oc . bar (db unchanged)
+        // Case 3 : foo.oc . bar (db unchanged)
         fakeFolder.localModifier ().rename ("case3" DVSUFFIX, "case3-rename");
 
-        // Case 4: foo . bar.oc (db unchanged)
+        // Case 4 : foo . bar.oc (db unchanged)
         fakeFolder.localModifier ().rename ("case4", "case4-rename" DVSUFFIX);
 
-        // Case 5: foo.oc . bar.oc (db hydrate)
+        // Case 5 : foo.oc . bar.oc (db hydrate)
         fakeFolder.localModifier ().rename ("case5" DVSUFFIX, "case5-rename" DVSUFFIX);
         triggerDownload (fakeFolder, "case5");
 
-        // Case 6: foo . bar (db dehydrate)
+        // Case 6 : foo . bar (db dehydrate)
         fakeFolder.localModifier ().rename ("case6", "case6-rename");
         markForDehydration (fakeFolder, "case6");
 
         QVERIFY (fakeFolder.syncOnce ());
 
-        // Case 3: the rename went though, hydration is forgotten
+        // Case 3 : the rename went though, hydration is forgotten
         QVERIFY (!fakeFolder.currentLocalState ().find ("case3"));
         QVERIFY (!fakeFolder.currentLocalState ().find ("case3" DVSUFFIX));
         QVERIFY (!fakeFolder.currentLocalState ().find ("case3-rename"));
@@ -710,7 +710,7 @@ private slots:
         QVERIFY (itemInstruction (completeSpy, "case3-rename" DVSUFFIX, CSYNC_INSTRUCTION_RENAME));
         QVERIFY (dbRecord (fakeFolder, "case3-rename" DVSUFFIX)._type == ItemTypeVirtualFile);
 
-        // Case 4: the rename went though, dehydration is forgotten
+        // Case 4 : the rename went though, dehydration is forgotten
         QVERIFY (!fakeFolder.currentLocalState ().find ("case4"));
         QVERIFY (!fakeFolder.currentLocalState ().find ("case4" DVSUFFIX));
         QVERIFY (fakeFolder.currentLocalState ().find ("case4-rename"));
@@ -720,7 +720,7 @@ private slots:
         QVERIFY (itemInstruction (completeSpy, "case4-rename", CSYNC_INSTRUCTION_RENAME));
         QVERIFY (dbRecord (fakeFolder, "case4-rename")._type == ItemTypeFile);
 
-        // Case 5: the rename went though, hydration is forgotten
+        // Case 5 : the rename went though, hydration is forgotten
         QVERIFY (!fakeFolder.currentLocalState ().find ("case5"));
         QVERIFY (!fakeFolder.currentLocalState ().find ("case5" DVSUFFIX));
         QVERIFY (!fakeFolder.currentLocalState ().find ("case5-rename"));
@@ -730,7 +730,7 @@ private slots:
         QVERIFY (itemInstruction (completeSpy, "case5-rename" DVSUFFIX, CSYNC_INSTRUCTION_RENAME));
         QVERIFY (dbRecord (fakeFolder, "case5-rename" DVSUFFIX)._type == ItemTypeVirtualFile);
 
-        // Case 6: the rename went though, dehydration is forgotten
+        // Case 6 : the rename went though, dehydration is forgotten
         QVERIFY (!fakeFolder.currentLocalState ().find ("case6"));
         QVERIFY (!fakeFolder.currentLocalState ().find ("case6" DVSUFFIX));
         QVERIFY (fakeFolder.currentLocalState ().find ("case6-rename"));
@@ -763,25 +763,25 @@ private slots:
 
         markForDehydration (fakeFolder, "A/a2");
         fakeFolder.remoteModifier ().appendByte ("A/a2");
-        // expect: normal dehydration
+        // expect : normal dehydration
 
         markForDehydration (fakeFolder, "B/b1");
         fakeFolder.remoteModifier ().remove ("B/b1");
-        // expect: local removal
+        // expect : local removal
 
         markForDehydration (fakeFolder, "B/b2");
         fakeFolder.remoteModifier ().rename ("B/b2", "B/b3");
-        // expect: B/b2 is gone, B/b3 is NEW placeholder
+        // expect : B/b2 is gone, B/b3 is NEW placeholder
 
         markForDehydration (fakeFolder, "C/c1");
         fakeFolder.localModifier ().appendByte ("C/c1");
-        // expect: no dehydration, upload of c1
+        // expect : no dehydration, upload of c1
 
         markForDehydration (fakeFolder, "C/c2");
         fakeFolder.localModifier ().appendByte ("C/c2");
         fakeFolder.remoteModifier ().appendByte ("C/c2");
         fakeFolder.remoteModifier ().appendByte ("C/c2");
-        // expect: no dehydration, conflict
+        // expect : no dehydration, conflict
 
         QVERIFY (fakeFolder.syncOnce ());
 
@@ -896,7 +896,7 @@ private slots:
         setPin ("online", PinState.OnlineOnly);
         setPin ("unspec", PinState.Unspecified);
 
-        // Test 1: root is Unspecified
+        // Test 1 : root is Unspecified
         fakeFolder.remoteModifier ().insert ("file1");
         fakeFolder.remoteModifier ().insert ("online/file1");
         fakeFolder.remoteModifier ().insert ("local/file1");
@@ -908,7 +908,7 @@ private slots:
         QVERIFY (fakeFolder.currentLocalState ().find ("local/file1"));
         QVERIFY (fakeFolder.currentLocalState ().find ("unspec/file1" DVSUFFIX));
 
-        // Test 2: change root to AlwaysLocal
+        // Test 2 : change root to AlwaysLocal
         setPin ("", PinState.AlwaysLocal);
 
         fakeFolder.remoteModifier ().insert ("file2");
@@ -930,7 +930,7 @@ private slots:
         QVERIFY (fakeFolder.currentLocalState ().find ("local/file1"));
         QVERIFY (fakeFolder.currentLocalState ().find ("unspec/file1" DVSUFFIX));
 
-        // Test 3: change root to OnlineOnly
+        // Test 3 : change root to OnlineOnly
         setPin ("", PinState.OnlineOnly);
 
         fakeFolder.remoteModifier ().insert ("file3");
@@ -1030,7 +1030,7 @@ private slots:
         QVERIFY (itemInstruction (completeSpy, "A/file3" DVSUFFIX DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
         cleanup ();
 
-        // Local removal: when not querying server
+        // Local removal : when not querying server
         fakeFolder.localModifier ().remove ("A/file1" DVSUFFIX);
         fakeFolder.localModifier ().remove ("A/file2" DVSUFFIX);
         fakeFolder.localModifier ().remove ("A/file3" DVSUFFIX);
@@ -1042,7 +1042,7 @@ private slots:
         QVERIFY (completeSpy.findItem ("A/file3" DVSUFFIX DVSUFFIX).isEmpty ());
         cleanup ();
 
-        // Local removal: when querying server
+        // Local removal : when querying server
         fakeFolder.remoteModifier ().setContents ("A/file1" DVSUFFIX, 'D');
         QVERIFY (fakeFolder.syncOnce ());
         QVERIFY (itemInstruction (completeSpy, "A/file1" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
@@ -1228,7 +1228,7 @@ private slots:
         QCOMPARE (*vfs.pinState ("online/file1"), PinState.Unspecified);
         QCOMPARE (*vfs.pinState ("unspec/file1"), PinState.Unspecified);
 
-        // Sync again: bad pin states of new local files usually take effect on second sync
+        // Sync again : bad pin states of new local files usually take effect on second sync
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 

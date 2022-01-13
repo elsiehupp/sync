@@ -1,8 +1,8 @@
 /*
- *  SPDX-FileCopyrightText: 2019 Marco Martin <mart@kde.org>
- *
- *  SPDX-License-Identifier: LGPL-2.0-or-later
- */
+ SPDX-FileCopyrightText : 2019 Marco Martin <mart@kde.org>
+
+ SPDX-License-Identifier : LGPL-2.0-or-later
+*/
 
 // #include <QWheelEvent>
 // #include <QQuickItem>
@@ -15,8 +15,8 @@ public:
 
 Q_GLOBAL_STATIC (GlobalWheelFilterSingleton, privateGlobalWheelFilterSelf)
 
-GlobalWheelFilter.GlobalWheelFilter (QObject *parent)
-    : QObject (parent) {
+GlobalWheelFilter.GlobalWheelFilter (GLib.Object *parent)
+    : GLib.Object (parent) {
 }
 
 GlobalWheelFilter.~GlobalWheelFilter () = default;
@@ -31,13 +31,13 @@ void GlobalWheelFilter.setItemHandlerAssociation (QQuickItem *item, WheelHandler
     }
     m_handlersForItem.insert (item, handler);
 
-    connect (item, &QObject.destroyed, this, [this] (QObject *obj) {
-        auto item = static_cast<QQuickItem *> (obj);
+    connect (item, &GLib.Object.destroyed, this, [this] (GLib.Object *obj) {
+        auto item = static_cast<QQuickItem> (obj);
         m_handlersForItem.remove (item);
     });
 
-    connect (handler, &QObject.destroyed, this, [this] (QObject *obj) {
-        auto handler = static_cast<WheelHandler *> (obj);
+    connect (handler, &GLib.Object.destroyed, this, [this] (GLib.Object *obj) {
+        auto handler = static_cast<WheelHandler> (obj);
         removeItemHandlerAssociation (handler.target (), handler);
     });
 }
@@ -52,13 +52,13 @@ void GlobalWheelFilter.removeItemHandlerAssociation (QQuickItem *item, WheelHand
     }
 }
 
-bool GlobalWheelFilter.eventFilter (QObject *watched, QEvent *event) {
+bool GlobalWheelFilter.eventFilter (GLib.Object *watched, QEvent *event) {
     if (event.type () == QEvent.Wheel) {
-        auto item = qobject_cast<QQuickItem *> (watched);
+        auto item = qobject_cast<QQuickItem> (watched);
         if (!item || !item.isEnabled ()) {
-            return QObject.eventFilter (watched, event);
+            return GLib.Object.eventFilter (watched, event);
         }
-        auto we = static_cast<QWheelEvent *> (event);
+        auto we = static_cast<QWheelEvent> (event);
         m_wheelEvent.initializeFromEvent (we);
 
         bool shouldBlock = false;
@@ -82,11 +82,11 @@ bool GlobalWheelFilter.eventFilter (QObject *watched, QEvent *event) {
             return true;
         }
     }
-    return QObject.eventFilter (watched, event);
+    return GLib.Object.eventFilter (watched, event);
 }
 
 void GlobalWheelFilter.manageWheel (QQuickItem *target, QWheelEvent *event) {
-    // Duck typing: accept everyhint that has all the properties we need
+    // Duck typing : accept everyhint that has all the properties we need
     if (target.metaObject ().indexOfProperty ("contentX") == -1
         || target.metaObject ().indexOfProperty ("contentY") == -1
         || target.metaObject ().indexOfProperty ("contentWidth") == -1
@@ -141,7 +141,7 @@ void GlobalWheelFilter.manageWheel (QQuickItem *target, QWheelEvent *event) {
 
         int x = event.pixelDelta ().x () != 0 ? event.pixelDelta ().x () : event.angleDelta ().x () / 8;
 
-        // Special case: when can't scroll vertically, scroll horizontally with vertical wheel as well
+        // Special case : when can't scroll vertically, scroll horizontally with vertical wheel as well
         if (x == 0 && contentHeight <= target.height ()) {
             x = event.pixelDelta ().y () != 0 ? event.pixelDelta ().y () : event.angleDelta ().y () / 8;
         }
@@ -172,8 +172,8 @@ void GlobalWheelFilter.manageWheel (QQuickItem *target, QWheelEvent *event) {
 }
 
 ////////////////////////////
-KirigamiWheelEvent.KirigamiWheelEvent (QObject *parent)
-    : QObject (parent) {}
+KirigamiWheelEvent.KirigamiWheelEvent (GLib.Object *parent)
+    : GLib.Object (parent) {}
 
 KirigamiWheelEvent.~KirigamiWheelEvent () = default;
 
@@ -226,8 +226,8 @@ void KirigamiWheelEvent.setAccepted (bool accepted) {
 
 ///////////////////////////////
 
-WheelHandler.WheelHandler (QObject *parent)
-    : QObject (parent) {
+WheelHandler.WheelHandler (GLib.Object *parent)
+    : GLib.Object (parent) {
 }
 
 WheelHandler.~WheelHandler () = default;

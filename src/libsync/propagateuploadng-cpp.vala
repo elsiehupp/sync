@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QNetworkAccessManager>
 // #include <QFileInfo>
@@ -18,7 +18,7 @@
 // #include <cmath>
 // #include <cstring>
 
-namespace OCC {
+namespace Occ {
 
 QUrl PropagateUploadFileNG.chunkUrl (int chunk) {
     QString path = QLatin1String ("remote.php/dav/uploads/")
@@ -35,13 +35,13 @@ QUrl PropagateUploadFileNG.chunkUrl (int chunk) {
   State machine:
 
      *---. doStartUpload ()
-            Check the db: is there an entry?
-              /               \
+            Check the db : is there an entry?
+              /
              no                yes
-            /                   \
+            /
            /                  PROPFIND
-       startNewUpload () <-+        +----------------------------\
-          |               |        |                             \
+       startNewUpload () <-+        +----------------------------
+          |               |        |
          MKCOL            + slotPropfindFinishedWithError ()     slotPropfindFinished ()
           |                                                       Is there stale files to remove?
       slotMkColFinished ()                                         |                      |
@@ -59,7 +59,7 @@ QUrl PropagateUploadFileNG.chunkUrl (int chunk) {
     |
     +. MOVE -----. moveJobFinished () --. finalize ()
 
- */
+*/
 
 void PropagateUploadFileNG.doStartUpload () {
     propagator ()._activeJobList.append (this);
@@ -80,7 +80,7 @@ void PropagateUploadFileNG.doStartUpload () {
         connect (job, &LsColJob.finishedWithoutError, this, &PropagateUploadFileNG.slotPropfindFinished);
         connect (job, &LsColJob.finishedWithError,
             this, &PropagateUploadFileNG.slotPropfindFinishedWithError);
-        connect (job, &QObject.destroyed, this, &PropagateUploadFileCommon.slotJobDestroyed);
+        connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.slotJobDestroyed);
         connect (job, &LsColJob.directoryListingIterated,
             this, &PropagateUploadFileNG.slotPropfindIterate);
         job.start ();
@@ -110,7 +110,7 @@ void PropagateUploadFileNG.slotPropfindIterate (QString &name, QMap<QString, QSt
 }
 
 void PropagateUploadFileNG.slotPropfindFinished () {
-    auto job = qobject_cast<LsColJob *> (sender ());
+    auto job = qobject_cast<LsColJob> (sender ());
     slotJobDestroyed (job); // remove it from the _jobs list
     propagator ()._activeJobList.removeOne (this);
 
@@ -126,7 +126,7 @@ void PropagateUploadFileNG.slotPropfindFinished () {
         // Normally this can't happen because the size is xor'ed with the transfer id, and it is
         // therefore impossible that there is more data on the server than on the file.
         qCCritical (lcPropagateUploadNG) << "Inconsistency while resuming " << _item._file
-                                      << ": the size on the server (" << _sent << ") is bigger than the size of the file ("
+                                      << " : the size on the server (" << _sent << ") is bigger than the size of the file ("
                                       << _fileToUpload._size << ")";
 
         // Wipe the old chunking data.
@@ -150,7 +150,7 @@ void PropagateUploadFileNG.slotPropfindFinished () {
         // with corruptions if there are too many chunks, or if we abort and there are still stale chunks.
         for (auto &serverChunk : qAsConst (_serverChunks)) {
             auto job = new DeleteJob (propagator ().account (), Utility.concatUrlPath (chunkUrl (), serverChunk.originalName), this);
-            QObject.connect (job, &DeleteJob.finishedSignal, this, &PropagateUploadFileNG.slotDeleteJobFinished);
+            GLib.Object.connect (job, &DeleteJob.finishedSignal, this, &PropagateUploadFileNG.slotDeleteJobFinished);
             _jobs.append (job);
             job.start ();
         }
@@ -162,7 +162,7 @@ void PropagateUploadFileNG.slotPropfindFinished () {
 }
 
 void PropagateUploadFileNG.slotPropfindFinishedWithError () {
-    auto job = qobject_cast<LsColJob *> (sender ());
+    auto job = qobject_cast<LsColJob> (sender ());
     slotJobDestroyed (job); // remove it from the _jobs list
     QNetworkReply.NetworkError err = job.reply ().error ();
     auto httpErrorCode = job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).toInt ();
@@ -177,7 +177,7 @@ void PropagateUploadFileNG.slotPropfindFinishedWithError () {
 }
 
 void PropagateUploadFileNG.slotDeleteJobFinished () {
-    auto job = qobject_cast<DeleteJob *> (sender ());
+    auto job = qobject_cast<DeleteJob> (sender ());
     ASSERT (job);
     _jobs.remove (_jobs.indexOf (job));
 
@@ -241,13 +241,13 @@ void PropagateUploadFileNG.startNewUpload () {
         this, &PropagateUploadFileNG.slotMkColFinished);
     connect (job, &MkColJob.finishedWithoutError,
         this, &PropagateUploadFileNG.slotMkColFinished);
-    connect (job, &QObject.destroyed, this, &PropagateUploadFileCommon.slotJobDestroyed);
+    connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.slotJobDestroyed);
     job.start ();
 }
 
 void PropagateUploadFileNG.slotMkColFinished () {
     propagator ()._activeJobList.removeOne (this);
-    auto job = qobject_cast<MkColJob *> (sender ());
+    auto job = qobject_cast<MkColJob> (sender ());
     slotJobDestroyed (job); // remove it from the _jobs list
     QNetworkReply.NetworkError err = job.reply ().error ();
     _item._httpErrorCode = job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).toInt ();
@@ -297,7 +297,7 @@ void PropagateUploadFileNG.startNextChunk () {
             destination, headers, this);
         _jobs.append (job);
         connect (job, &MoveJob.finishedSignal, this, &PropagateUploadFileNG.slotMoveJobFinished);
-        connect (job, &QObject.destroyed, this, &PropagateUploadFileCommon.slotJobDestroyed);
+        connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.slotJobDestroyed);
         propagator ()._activeJobList.append (this);
         adjustLastJobTimeout (job, fileSize);
         job.start ();
@@ -308,7 +308,7 @@ void PropagateUploadFileNG.startNextChunk () {
     auto device = std.make_unique<UploadDevice> (
             fileName, _sent, _currentChunkSize, &propagator ()._bandwidthManager);
     if (!device.open (QIODevice.ReadOnly)) {
-        qCWarning (lcPropagateUploadNG) << "Could not prepare upload device: " << device.errorString ();
+        qCWarning (lcPropagateUploadNG) << "Could not prepare upload device : " << device.errorString ();
 
         // If the file is currently locked, we want to retry the sync
         // when it becomes available again.
@@ -335,14 +335,14 @@ void PropagateUploadFileNG.startNextChunk () {
         this, &PropagateUploadFileNG.slotUploadProgress);
     connect (job, &PUTFileJob.uploadProgress,
         devicePtr, &UploadDevice.slotJobUploadProgress);
-    connect (job, &QObject.destroyed, this, &PropagateUploadFileCommon.slotJobDestroyed);
+    connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.slotJobDestroyed);
     job.start ();
     propagator ()._activeJobList.append (this);
     _currentChunk++;
 }
 
 void PropagateUploadFileNG.slotPutFinished () {
-    auto *job = qobject_cast<PUTFileJob *> (sender ());
+    auto *job = qobject_cast<PUTFileJob> (sender ());
     ASSERT (job);
 
     slotJobDestroyed (job); // remove it from the _jobs list
@@ -438,7 +438,7 @@ void PropagateUploadFileNG.slotPutFinished () {
 
 void PropagateUploadFileNG.slotMoveJobFinished () {
     propagator ()._activeJobList.removeOne (this);
-    auto job = qobject_cast<MoveJob *> (sender ());
+    auto job = qobject_cast<MoveJob> (sender ());
     slotJobDestroyed (job); // remove it from the _jobs list
     QNetworkReply.NetworkError err = job.reply ().error ();
     _item._httpErrorCode = job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).toInt ();
@@ -504,7 +504,7 @@ void PropagateUploadFileNG.abort (PropagatorJob.AbortType abortType) {
     abortNetworkJobs (
         abortType,
         [abortType] (AbstractNetworkJob *job) {
-            return abortType != AbortType.Asynchronous || !qobject_cast<MoveJob *> (job);
+            return abortType != AbortType.Asynchronous || !qobject_cast<MoveJob> (job);
         });
 }
 

@@ -1,7 +1,7 @@
 /****************************************************************************
 **
 ** Copyright (C) 2014 Daniel Molkentin <daniel@molkentin.de>
-** Contact: http://www.qt-project.org/legal
+** Contact : http://www.qt-project.org/legal
 **
 ** This file is part of the QtNetwork module of the Qt Toolkit.
 **
@@ -20,7 +20,7 @@
 ** Foundation and appearing in the file LICENSE.LGPL included in the
 ** packaging of this file.  Please review the following information to
 ** ensure the GNU Lesser General Public License version 2.1 requirements
-** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** will be met : http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 **
 ** In addition, as a special exception, Digia gives you certain additional
 ** rights.  These rights are described in the Digia Qt LGPL Exception
@@ -32,7 +32,7 @@
 ** Foundation and appearing in the file LICENSE.GPL included in the
 ** packaging of this file.  Please review the following information to
 ** ensure the GNU General Public License version 3.0 requirements will be
-** met: http://www.gnu.org/copyleft/gpl.html.
+** met : http://www.gnu.org/copyleft/gpl.html.
 **
 **
 ** $QT_END_LICENSE$
@@ -225,7 +225,7 @@ private:
     QSharedPointer<QTokenizerPrivate<T, const_iterator> > d;
 };
 
-class QStringTokenizer : public QTokenizer<QString> {
+class QStringTokenizer : QTokenizer<QString> {
 public:
     QStringTokenizer (QString &string, QString &delim) :
         QTokenizer<QString, QString.const_iterator> (string, delim) {}
@@ -250,6 +250,4 @@ using StringTokenizer = QTokenizer<std.string>;
 using WStringTokenizer = QTokenizer<std.wstring>;
 
 QT_END_NAMESPACE
-
-#endif // TOKENIZER_H
 

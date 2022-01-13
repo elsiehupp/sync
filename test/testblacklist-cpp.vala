@@ -1,14 +1,14 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *    support, and with no warranty, express or implied, as to its usefulness for
- *    any purpose.
- *
- */
+   This software is in the public domain, furnished "as is", without technical
+   support, and with no warranty, express or implied, as to its usefulness for
+   any purpose.
+
+*/
 
 // #include <QtTest>
 // #include <syncengine.h>
 
-using namespace OCC;
+using namespace Occ;
 
 SyncJournalFileRecord journalRecord (FakeFolder &folder, QByteArray &path) {
     SyncJournalFileRecord rec;
@@ -16,7 +16,7 @@ SyncJournalFileRecord journalRecord (FakeFolder &folder, QByteArray &path) {
     return rec;
 }
 
-class TestBlacklist : public QObject {
+class TestBlacklist : GLib.Object {
 
 private slots:
     void testBlacklistBasic_data () {

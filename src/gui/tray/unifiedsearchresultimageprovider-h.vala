@@ -1,31 +1,31 @@
 /*
- * Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #pragma once
 
 // #include <QtCore>
 // #include <QQuickImageProvider>
 
-namespace OCC {
+namespace Occ {
 
 /**
- * @brief The UnifiedSearchResultImageProvider
- * @ingroup gui
- * Allows to fetch Unified Search result icon from the server or used a local resource
- */
+@brief The UnifiedSearchResultImageProvider
+@ingroup gui
+Allows to fetch Unified Search result icon from the server or used a local resource
+*/
 
-class UnifiedSearchResultImageProvider : public QQuickAsyncImageProvider {
+class UnifiedSearchResultImageProvider : QQuickAsyncImageProvider {
 public:
     QQuickImageResponse *requestImageResponse (QString &id, QSize &requestedSize) override;
 };

@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QSettings>
 // #include <QTimer>
@@ -22,12 +22,12 @@
 // #include <QNetworkRequest>
 // #include <QBuffer>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcAccountState, "nextcloud.gui.account.state", QtInfoMsg)
 
 AccountState.AccountState (AccountPtr account)
-    : QObject ()
+    : GLib.Object ()
     , _account (account)
     , _state (AccountState.Disconnected)
     , _connectionStatus (ConnectionValidator.Undefined)
@@ -35,7 +35,7 @@ AccountState.AccountState (AccountPtr account)
     , _maintenanceToConnectedDelay (60000 + (qrand () % (4 * 60000))) // 1-5min delay
     , _remoteWipe (new RemoteWipe (_account))
     , _isDesktopNotificationsAllowed (true) {
-    qRegisterMetaType<AccountState *> ("AccountState*");
+    qRegisterMetaType<AccountState> ("AccountState*");
 
     connect (account.data (), &Account.invalidCredentials,
         this, &AccountState.slotHandleRemoteWipeCheck);
@@ -80,7 +80,7 @@ AccountState.State AccountState.state () {
 
 void AccountState.setState (State state) {
     if (_state != state) {
-        qCInfo (lcAccountState) << "AccountState state change: "
+        qCInfo (lcAccountState) << "AccountState state change : "
                                << stateString (_state) << "." << stateString (state);
         State oldState = _state;
         _state = state;
@@ -257,20 +257,20 @@ void AccountState.slotConnectionValidatorResult (ConnectionValidator.Status stat
         && (_connectionStatus == ConnectionValidator.ServiceUnavailable
             || _connectionStatus == ConnectionValidator.MaintenanceMode)) {
         if (!_timeSinceMaintenanceOver.isValid ()) {
-            qCInfo (lcAccountState) << "AccountState reconnection: delaying for"
+            qCInfo (lcAccountState) << "AccountState reconnection : delaying for"
                                    << _maintenanceToConnectedDelay << "ms";
             _timeSinceMaintenanceOver.start ();
             QTimer.singleShot (_maintenanceToConnectedDelay + 100, this, &AccountState.checkConnectivity);
             return;
         } else if (_timeSinceMaintenanceOver.elapsed () < _maintenanceToConnectedDelay) {
-            qCInfo (lcAccountState) << "AccountState reconnection: only"
+            qCInfo (lcAccountState) << "AccountState reconnection : only"
                                    << _timeSinceMaintenanceOver.elapsed () << "ms have passed";
             return;
         }
     }
 
     if (_connectionStatus != status) {
-        qCInfo (lcAccountState) << "AccountState connection status change: "
+        qCInfo (lcAccountState) << "AccountState connection status change : "
                                << _connectionStatus << "."
                                << status;
         _connectionStatus = status;
@@ -347,7 +347,7 @@ void AccountState.handleInvalidCredentials () {
     if (account ().credentials ().ready ()) {
         account ().credentials ().invalidateToken ();
     }
-    if (auto creds = qobject_cast<HttpCredentials *> (account ().credentials ())) {
+    if (auto creds = qobject_cast<HttpCredentials> (account ().credentials ())) {
         if (creds.refreshAccessToken ())
             return;
     }
@@ -409,7 +409,7 @@ void AccountState.slotEtagResponseHeaderReceived (QByteArray &value, int statusC
 }
 
 void AccountState.slotOcsError (int statusCode, QString &message) {
-    qCDebug (lcAccountState) << "Error " << statusCode << " while fetching new navigation apps: " << message;
+    qCDebug (lcAccountState) << "Error " << statusCode << " while fetching new navigation apps : " << message;
 }
 
 void AccountState.slotNavigationAppsFetched (QJsonDocument &reply, int statusCode) {
@@ -462,8 +462,8 @@ AccountApp* AccountState.findApp (QString &appId) {
 
 AccountApp.AccountApp (QString &name, QUrl &url,
     const QString &id, QUrl &iconUrl,
-    QObject *parent)
-    : QObject (parent)
+    GLib.Object *parent)
+    : GLib.Object (parent)
     , _name (name)
     , _url (url)
     , _id (id)
@@ -488,4 +488,4 @@ QUrl AccountApp.iconUrl () {
 
 /*-------------------------------------------------------------------------------------*/
 
-} // namespace OCC
+} // namespace Occ

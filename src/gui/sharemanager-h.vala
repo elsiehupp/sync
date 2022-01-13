@@ -1,32 +1,30 @@
 /*
- * Copyright (C) by Roeland Jago Douma <rullzer@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Roeland Jago Douma <rullzer@owncloud.com>
 
-// #include <QObject>
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
+
+// #include <GLib.Object>
 // #include <QDate>
 // #include <QString>
 // #include <QList>
 // #include <QSharedPointer>
 // #include <QUrl>
 
-class QJsonDocument;
 class QJsonObject;
 
-namespace OCC {
+namespace Occ {
 
-class OcsShareJob;
 
-class Share : public QObject {
+class Share : GLib.Object {
 
 public:
     /**
@@ -48,7 +46,7 @@ public:
     /*
      * Constructor for shares
      */
-    explicit Share (AccountPtr account,
+    Share (AccountPtr account,
         const QString &id,
         const QString &owner,
         const QString &ownerDisplayName,
@@ -61,39 +59,39 @@ public:
     /**
      * The account the share is defined on.
      */
-    AccountPtr account () const;
+    AccountPtr account ();
 
-    QString path () const;
+    QString path ();
 
     /*
      * Get the id
      */
-    QString getId () const;
+    QString getId ();
 
     /*
      * Get the uid_owner
      */
-    QString getUidOwner () const;
+    QString getUidOwner ();
 
     /*
      * Get the owner display name
      */
-    QString getOwnerDisplayName () const;
+    QString getOwnerDisplayName ();
 
     /*
      * Get the shareType
      */
-    ShareType getShareType () const;
+    ShareType getShareType ();
 
     /*
      * Get the shareWith
      */
-    QSharedPointer<Sharee> getShareWith () const;
+    QSharedPointer<Sharee> getShareWith ();
 
     /*
      * Get permissions
      */
-    Permissions getPermissions () const;
+    Permissions getPermissions ();
 
     /*
      * Set the permissions of a share
@@ -111,7 +109,7 @@ public:
      */
     void setPassword (QString &password);
 
-    bool isPasswordSet () const;
+    bool isPasswordSet ();
 
     /*
      * Deletes a share
@@ -155,13 +153,13 @@ private slots:
 };
 
 /**
- * A Link share is just like a regular share but then slightly different.
- * There are several methods in the API that either work differently for
- * link shares or are only available to link shares.
- */
-class LinkShare : public Share {
+A Link share is just like a regular share but then slightly different.
+There are several methods in the API that either work differently for
+link shares or are only available to link shares.
+*/
+class LinkShare : Share {
 public:
-    explicit LinkShare (AccountPtr account,
+    LinkShare (AccountPtr account,
         const QString &id,
         const QString &uidowner,
         const QString &ownerDisplayName,
@@ -178,37 +176,37 @@ public:
     /*
      * Get the share link
      */
-    QUrl getLink () const;
+    QUrl getLink ();
 
     /*
      * The share's link for direct downloading.
      */
-    QUrl getDirectDownloadLink () const;
+    QUrl getDirectDownloadLink ();
 
     /*
      * Get the publicUpload status of this share
      */
-    bool getPublicUpload () const;
+    bool getPublicUpload ();
 
     /*
      * Whether directory listings are available (READ permission)
      */
-    bool getShowFileListing () const;
+    bool getShowFileListing ();
 
     /*
      * Returns the name of the link share. Can be empty.
      */
-    QString getName () const;
+    QString getName ();
 
     /*
      * Returns the note of the link share.
      */
-    QString getNote () const;
+    QString getNote ();
 
     /*
      * Returns the label of the link share.
      */
-    QString getLabel () const;
+    QString getLabel ();
 
     /*
      * Set the name of the link share.
@@ -225,12 +223,12 @@ public:
     /*
      * Returns the token of the link share.
      */
-    QString getToken () const;
+    QString getToken ();
 
     /*
      * Get the expiration date
      */
-    QDate getExpireDate () const;
+    QDate getExpireDate ();
 
     /*
      * Set the expiration date
@@ -272,7 +270,7 @@ private:
     QString _label;
 };
 
-class UserGroupShare : public Share {
+class UserGroupShare : Share {
 public:
     UserGroupShare (AccountPtr account,
         const QString &id,
@@ -288,13 +286,13 @@ public:
 
     void setNote (QString &note);
 
-    QString getNote () const;
+    QString getNote ();
 
     void slotNoteSet (QJsonDocument &, QVariant &note);
 
     void setExpireDate (QDate &date);
 
-    QDate getExpireDate () const;
+    QDate getExpireDate ();
 
     void slotExpireDateSet (QJsonDocument &reply, QVariant &value);
 
@@ -309,13 +307,13 @@ private:
 };
 
 /**
- * The share manager allows for creating, retrieving and deletion
- * of shares. It abstracts away from the OCS Share API, all the usages
- * shares should talk to this manager and not use OCS Share Job directly
- */
-class ShareManager : public QObject {
+The share manager allows for creating, retrieving and deletion
+of shares. It abstracts away from the OCS Share API, all the usages
+shares should talk to this manager and not use OCS Share Job directly
+*/
+class ShareManager : GLib.Object {
 public:
-    explicit ShareManager (AccountPtr _account, QObject *parent = nullptr);
+    ShareManager (AccountPtr _account, GLib.Object *parent = nullptr);
 
     /**
      * Tell the manager to create a link share
@@ -385,5 +383,3 @@ private:
     AccountPtr _account;
 };
 }
-
-#endif // SHAREMANAGER_H

@@ -1,15 +1,15 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *    support, and with no warranty, express or implied, as to its usefulness for
- *    any purpose.
- *
- */
+   This software is in the public domain, furnished "as is", without technical
+   support, and with no warranty, express or implied, as to its usefulness for
+   any purpose.
+
+*/
 
 // #include <QtTest>
 // #include <syncengine.h>
 // #include <configfile.h>
 
-using namespace OCC;
+using namespace Occ;
 
 static void changeAllFileId (FileInfo &info) {
     info.fileId = generateFileId ();
@@ -22,10 +22,10 @@ static void changeAllFileId (FileInfo &info) {
 }
 
 /*
- * This test ensure that the SyncEngine.aboutToRemoveAllFiles is correctly called and that when
- * we the user choose to remove all files SyncJournalDb.clearFileTable makes works as expected
- */
-class TestAllFilesDeleted : public QObject {
+This test ensure that the SyncEngine.aboutToRemoveAllFiles is correctly called and that when
+we the user choose to remove all files SyncJournalDb.clearFileTable makes works as expected
+*/
+class TestAllFilesDeleted : GLib.Object {
 
 private slots:
 
@@ -54,7 +54,7 @@ private slots:
 
         auto initialState = fakeFolder.currentLocalState ();
         int aboutToRemoveAllFilesCalled = 0;
-        QObject.connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToRemoveAllFiles,
+        GLib.Object.connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToRemoveAllFiles,
             [&] (SyncFileItem.Direction dir, std.function<void (bool)> callback) {
                 QCOMPARE (aboutToRemoveAllFilesCalled, 0);
                 aboutToRemoveAllFilesCalled++;
@@ -93,7 +93,7 @@ private slots:
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
 
         int aboutToRemoveAllFilesCalled = 0;
-        QObject.connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToRemoveAllFiles,
+        GLib.Object.connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToRemoveAllFiles,
             [&] (SyncFileItem.Direction dir, std.function<void (bool)> callback) {
                 QCOMPARE (aboutToRemoveAllFilesCalled, 0);
                 aboutToRemoveAllFilesCalled++;
@@ -127,7 +127,7 @@ private slots:
 
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         // We never remove all files.
-        QObject.connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToRemoveAllFiles,
+        GLib.Object.connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToRemoveAllFiles,
             [&] { QVERIFY (false); });
         QVERIFY (fakeFolder.syncOnce ());
 
@@ -151,7 +151,7 @@ private slots:
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
 
         int aboutToRemoveAllFilesCalled = 0;
-        QObject.connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToRemoveAllFiles,
+        GLib.Object.connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToRemoveAllFiles,
             [&] (SyncFileItem.Direction dir, std.function<void (bool)> callback) {
                 QCOMPARE (aboutToRemoveAllFilesCalled, 0);
                 aboutToRemoveAllFilesCalled++;
@@ -269,7 +269,7 @@ private slots:
         FakeFolder fakeFolder{FileInfo{}};
 
         int aboutToRemoveAllFilesCalled = 0;
-        QObject.connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToRemoveAllFiles,
+        GLib.Object.connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToRemoveAllFiles,
             [&] (SyncFileItem.Direction , std.function<void (bool)> ) {
                 aboutToRemoveAllFilesCalled++;
                 QFAIL ("should not be called");
@@ -294,7 +294,7 @@ private slots:
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
 
         int aboutToRemoveAllFilesCalled = 0;
-        QObject.connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToRemoveAllFiles,
+        GLib.Object.connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToRemoveAllFiles,
             [&] (SyncFileItem.Direction , std.function<void (bool)>) {
                 aboutToRemoveAllFilesCalled++;
                 QFAIL ("should not be called");

@@ -1,20 +1,20 @@
 /*
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This library is free software; you can redistribute it and
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later versi
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GN
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+*/
 
 // #include <QDateTime>
 // #include <QDir>
@@ -25,7 +25,7 @@
 // #include <sys/stat.h>
 // #include <sys/types.h>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcFileSystem, "nextcloud.sync.filesystem", QtInfoMsg)
 
@@ -111,7 +111,7 @@ bool FileSystem.rename (QString &originFileName,
     if (!success) {
         qCWarning (lcFileSystem) << "Error renaming file" << originFileName
                                 << "to" << destinationFileName
-                                << "failed: " << error;
+                                << "failed : " << error;
         if (errorString) {
             *errorString = error;
         }
@@ -140,7 +140,7 @@ bool FileSystem.uncheckedRenameReplace (QString &originFileName,
     }
     if (!success) {
         *errorString = orig.errorString ();
-        qCWarning (lcFileSystem) << "Renaming temp file to final failed: " << *errorString;
+        qCWarning (lcFileSystem) << "Renaming temp file to final failed : " << *errorString;
         return false;
     }
 
@@ -188,7 +188,7 @@ bool FileSystem.remove (QString &fileName, QString *errorString) {
 }
 
 bool FileSystem.moveToTrash (QString &fileName, QString *errorString) {
-    // TODO: Qt 5.15 bool QFile.moveToTrash ()
+    // TODO : Qt 5.15 bool QFile.moveToTrash ()
     QString trashPath, trashFilePath, trashInfoPath;
     QString xdgDataHome = QFile.decodeName (qgetenv ("XDG_DATA_HOME"));
     if (xdgDataHome.isEmpty ()) {
@@ -276,4 +276,4 @@ bool FileSystem.isJunction (QString &filename) {
     return false;
 }
 
-} // namespace OCC
+} // namespace Occ

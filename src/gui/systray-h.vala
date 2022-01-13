@@ -1,34 +1,31 @@
 /*
- * Copyright (C) by Cédric Bellegarde <gnumdk@gmail.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Cédric Bellegarde <gnumdk@gmail.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QSystemTrayIcon>
 
 // #include <QQmlNetworkAccessManagerFactory>
 
-class QScreen;
 class QQmlApplicationEngine;
-class QQuickWindow;
 class QWindow;
-class QQuickWindow;
 
-namespace OCC {
+namespace Occ {
 
-class AccessManagerFactory : public QQmlNetworkAccessManagerFactory {
+class AccessManagerFactory : QQmlNetworkAccessManagerFactory {
 public:
     AccessManagerFactory ();
 
-    QNetworkAccessManager* create (QObject *parent) override;
+    QNetworkAccessManager* create (GLib.Object *parent) override;
 };
 
 #ifdef Q_OS_OSX
@@ -38,11 +35,11 @@ void setTrayWindowLevelAndVisibleOnAllSpaces (QWindow *window);
 #endif
 
 /**
- * @brief The Systray class
- * @ingroup gui
- */
+@brief The Systray class
+@ingroup gui
+*/
 class Systray
-    : public QSystemTrayIcon {
+   : QSystemTrayIcon {
 
     Q_PROPERTY (QString windowTitle READ windowTitle CONSTANT)
     Q_PROPERTY (bool useNormalWindow READ useNormalWindow CONSTANT)
@@ -59,8 +56,8 @@ public:
     void showMessage (QString &title, QString &message, MessageIcon icon = Information);
     void setToolTip (QString &tip);
     bool isOpen ();
-    QString windowTitle () const;
-    bool useNormalWindow () const;
+    QString windowTitle ();
+    bool useNormalWindow ();
 
     Q_INVOKABLE void pauseResumeSync ();
     Q_INVOKABLE bool syncIsPaused ();
@@ -95,12 +92,12 @@ private:
     static Systray *_instance;
     Systray ();
 
-    QScreen *currentScreen () const;
-    QRect currentScreenRect () const;
-    QPoint computeWindowReferencePoint () const;
-    QPoint calcTrayIconCenter () const;
-    TaskBarPosition taskbarOrientation () const;
-    QRect taskbarGeometry () const;
+    QScreen *currentScreen ();
+    QRect currentScreenRect ();
+    QPoint computeWindowReferencePoint ();
+    QPoint calcTrayIconCenter ();
+    TaskBarPosition taskbarOrientation ();
+    QRect taskbarGeometry ();
     QPoint computeWindowPosition (int width, int height) const;
 
     bool _isOpen = false;
@@ -110,6 +107,6 @@ private:
     AccessManagerFactory _accessManagerFactory;
 };
 
-} // namespace OCC
+} // namespace Occ
 
 #endif //SYSTRAY_H

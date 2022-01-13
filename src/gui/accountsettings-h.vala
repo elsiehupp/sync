@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QWidget>
 // #include <QUrl>
@@ -18,32 +18,27 @@
 // #include <QHash>
 // #include <QTimer>
 
-class QModelIndex;
 class QNetworkReply;
-class QListWidgetItem;
 class QLabel;
 
-namespace OCC {
+namespace Occ {
 
 namespace Ui {
     class AccountSettings;
 }
 
-class FolderMan;
 
-class Account;
 class AccountState;
-class FolderStatusModel;
 
 /**
- * @brief The AccountSettings class
- * @ingroup gui
- */
-class AccountSettings : public QWidget {
+@brief The AccountSettings class
+@ingroup gui
+*/
+class AccountSettings : QWidget {
     Q_PROPERTY (AccountState* accountState MEMBER _accountState)
 
 public:
-    explicit AccountSettings (AccountState *accountState, QWidget *parent = nullptr);
+    AccountSettings (AccountState *accountState, QWidget *parent = nullptr);
     ~AccountSettings () override;
     QSize sizeHint () const override { return ownCloudGui.settingsDialogSize (); }
     bool canEncryptOrDecrypt (FolderStatusModel.SubFolderInfo* folderInfo);
@@ -109,7 +104,7 @@ private:
     void customizeStyle ();
 
     /// Returns the alias of the selected folder, empty string if none
-    QString selectedFolderAlias () const;
+    QString selectedFolderAlias ();
 
     Ui.AccountSettings *_ui;
 
@@ -124,6 +119,4 @@ private:
     bool _menuShown;
 };
 
-} // namespace OCC
-
-#endif // ACCOUNTSETTINGS_H
+} // namespace Occ

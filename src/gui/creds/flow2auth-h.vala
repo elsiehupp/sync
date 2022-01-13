@@ -1,31 +1,31 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
- * Copyright (C) by Michael Schuster <michael@schuster.ms>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
+Copyright (C) by Michael Schuster <michael@schuster.ms>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #pragma once
 // #include <QPointer>
 // #include <QUrl>
 // #include <QTimer>
 
-namespace OCC {
+namespace Occ {
 
 /**
- * Job that does the authorization, grants and fetches the access token via Login Flow v2
- *
- * See: https://docs.nextcloud.com/server/latest/developer_manual/client_apis/LoginFlow/index.html#login-flow-v2
- */
-class Flow2Auth : public QObject {
+Job that does the authorization, grants and fetches the access token via Login Flow v2
+
+See : https://docs.nextcloud.com/server/latest/developer_manual/client_apis/LoginFlow/index.html#login-flow-v2
+*/
+class Flow2Auth : GLib.Object {
 public:
     enum TokenAction {
         actionOpenBrowser = 1,
@@ -38,7 +38,7 @@ public:
         statusCopyLinkToClipboard
     };
 
-    Flow2Auth (Account *account, QObject *parent);
+    Flow2Auth (Account *account, GLib.Object *parent);
     ~Flow2Auth () override;
 
     enum Result { NotSupported,
@@ -48,7 +48,7 @@ public:
     void start ();
     void openBrowser ();
     void copyLinkToClipboard ();
-    QUrl authorisationLink () const;
+    QUrl authorisationLink ();
 
 signals:
     /**
@@ -81,4 +81,4 @@ private:
     bool _enforceHttps = false;
 };
 
-} // namespace OCC
+} // namespace Occ

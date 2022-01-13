@@ -1,40 +1,39 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-// #include <QObject>
+This library is free software; you can redistribute it and
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later versi
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GN
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+*/
+
+// #include <GLib.Object>
 // #include <QDateTime>
 // #include <QHash>
 // #include <QMutex>
 // #include <QVariant>
 // #include <functional>
 
-namespace OCC {
-class SyncJournalFileRecord;
+namespace Occ {
 
 /**
- * @brief Class that handles the sync database
- *
- * This class is thread safe. All public functions lock the mutex.
- * @ingroup libsync
- */
-class OCSYNC_EXPORT SyncJournalDb : public QObject {
+@brief Class that handles the sync database
+
+This class is thread safe. All public functions lock the mutex.
+@ingroup libsync
+*/
+class SyncJournalDb : GLib.Object {
 public:
-    explicit SyncJournalDb (QString &dbFilePath, QObject *parent = nullptr);
+    SyncJournalDb (QString &dbFilePath, GLib.Object *parent = nullptr);
     ~SyncJournalDb () override;
 
     /// Create a journal path for a specific configuration
@@ -79,7 +78,7 @@ public:
     bool exists ();
     void walCheckpoint ();
 
-    QString databaseFilePath () const;
+    QString databaseFilePath ();
 
     static int64 getPHash (QByteArray &);
 
@@ -340,7 +339,7 @@ public:
 
     /** Access to PinStates stored in the database.
      *
-     * Important: Not all vfs plugins store the pin states in the database,
+     * Important : Not all vfs plugins store the pin states in the database,
      * prefer to use Vfs.pinState () etc.
      */
     PinStateInterface internalPinStates ();
@@ -411,5 +410,4 @@ bool OCSYNC_EXPORT
 operator== (SyncJournalDb.UploadInfo &lhs,
     const SyncJournalDb.UploadInfo &rhs);
 
-} // namespace OCC
-#endif // SYNCJOURNALDB_H
+} // namespace Occ

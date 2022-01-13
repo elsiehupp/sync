@@ -5,7 +5,7 @@
 // #include <QLineEdit>
 // #include <QMessageBox>
 
-namespace OCC {
+namespace Occ {
 
 static constexpr int patternCol = 0;
 static constexpr int deletableCol = 1;
@@ -152,4 +152,4 @@ int IgnoreListTableWidget.addPattern (QString &pattern, bool deletable, bool rea
     return newRow;
 }
 
-} // namespace OCC
+} // namespace Occ

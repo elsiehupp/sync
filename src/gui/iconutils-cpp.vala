@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <theme.h>
 
@@ -23,12 +23,12 @@
 namespace {
 QString findSvgFilePath (QString &fileName, QStringList &possibleColors) {
     QString result;
-    result = QString{OCC.Theme.themePrefix} + fileName;
+    result = QString{Occ.Theme.themePrefix} + fileName;
     if (QFile.exists (result)) {
         return result;
     } else {
         for (auto &color : possibleColors) {
-            result = QString{OCC.Theme.themePrefix} + color + QStringLiteral ("/") + fileName;
+            result = QString{Occ.Theme.themePrefix} + color + QStringLiteral ("/") + fileName;
 
             if (QFile.exists (result)) {
                 return result;
@@ -41,7 +41,7 @@ QString findSvgFilePath (QString &fileName, QStringList &possibleColors) {
 }
 }
 
-namespace OCC {
+namespace Occ {
 namespace Ui {
 namespace IconUtils {
 Q_LOGGING_CATEGORY (lcIconUtils, "nextcloud.gui.iconutils", QtInfoMsg)
@@ -84,7 +84,7 @@ QImage createSvgImageWithCustomColor (QString &fileName, QColor &customColor, QS
         } ();
 
         if (iconBaseColors.contains (customColorName)) {
-            result = QImage{QString{OCC.Theme.themePrefix} + customColorName + QStringLiteral ("/") + fileName};
+            result = QImage{QString{Occ.Theme.themePrefix} + customColorName + QStringLiteral ("/") + fileName};
             if (!result.isNull ()) {
                 return result;
             }

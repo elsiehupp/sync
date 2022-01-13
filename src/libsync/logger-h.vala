@@ -1,33 +1,33 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-// #include <QObject>
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
+
+// #include <GLib.Object>
 // #include <QList>
 // #include <QDateTime>
 // #include <QFile>
 // #include <QTextStream>
 // #include <qmutex.h>
 
-namespace OCC {
+namespace Occ {
 
 /**
- * @brief The Logger class
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT Logger : public QObject {
+@brief The Logger class
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT Logger : GLib.Object {
 public:
-    bool isLoggingToFile () const;
+    bool isLoggingToFile ();
 
     void doLog (QtMsgType type, QMessageLogContext &ctx, QString &message);
 
@@ -37,12 +37,12 @@ public:
     void postOptionalGuiLog (QString &title, QString &message);
     void postGuiMessage (QString &title, QString &message);
 
-    QString logFile () const;
+    QString logFile ();
     void setLogFile (QString &name);
 
     void setLogExpire (int expire);
 
-    QString logDir () const;
+    QString logDir ();
     void setLogDir (QString &dir);
 
     void setLogFlush (bool flush);
@@ -51,13 +51,13 @@ public:
     void setLogDebug (bool debug);
 
     /** Returns where the automatic logdir would be */
-    QString temporaryFolderLogDirPath () const;
+    QString temporaryFolderLogDirPath ();
 
     /** Sets up default dir log setup.
      *
-     * logdir: a temporary folder
-     * logexpire: 4 hours
-     * logdebug: true
+     * logdir : a temporary folder
+     * logexpire : 4 hours
+     * logdebug : true
      *
      * Used in conjunction with ConfigFile.automaticLogDir
      */
@@ -85,7 +85,7 @@ public slots:
     void enterNextLogFile ();
 
 private:
-    Logger (QObject *parent = nullptr);
+    Logger (GLib.Object *parent = nullptr);
     ~Logger () override;
 
     void close ();
@@ -104,6 +104,4 @@ private:
     int _crashLogIndex = 0;
 };
 
-} // namespace OCC
-
-#endif // LOGGER_H
+} // namespace Occ

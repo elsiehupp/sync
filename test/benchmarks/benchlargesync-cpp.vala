@@ -1,13 +1,13 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *    support, and with no warranty, express or implied, as to its usefulness for
- *    any purpose.
- *
- */
+   This software is in the public domain, furnished "as is", without technical
+   support, and with no warranty, express or implied, as to its usefulness for
+   any purpose.
+
+*/
 
 // #include <syncengine.h>
 
-using namespace OCC;
+using namespace Occ;
 
 int numDirs = 0;
 int numFiles = 0;
@@ -40,8 +40,8 @@ int main (int argc, char *argv[]) {
     QElapsedTimer timer;
     timer.start ();
     bool result1 = fakeFolder.syncOnce ();
-    qDebug () << "FIRST SYNC: " << result1 << timer.restart ();
+    qDebug () << "FIRST SYNC : " << result1 << timer.restart ();
     bool result2 = fakeFolder.syncOnce ();
-    qDebug () << "SECOND SYNC: " << result2 << timer.restart ();
+    qDebug () << "SECOND SYNC : " << result2 << timer.restart ();
     return (result1 && result2) ? 0 : -1;
 }

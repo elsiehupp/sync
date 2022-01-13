@@ -1,33 +1,32 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This library is free software; you can redistribute it and
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later versi
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GN
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+*/
 
 // #include <QString>
 // #include <QDateTime>
 
-namespace OCC {
+namespace Occ {
 
-class SyncFileItem;
 
 /**
- * @brief The SyncJournalFileRecord class
- * @ingroup libsync
- */
-class OCSYNC_EXPORT SyncJournalFileRecord {
+@brief The SyncJournalFileRecord class
+@ingroup libsync
+*/
+class SyncJournalFileRecord {
 public:
     bool isValid () {
         return !_path.isEmpty ();
@@ -39,7 +38,7 @@ public:
      *
      * It is used in the construction of private links.
      */
-    QByteArray numericFileId () const;
+    QByteArray numericFileId ();
     QDateTime modDateTime () { return Utility.qDateTimeFromTime_t (_modtime); }
 
     bool isDirectory () { return _type == ItemTypeDirectory; }
@@ -66,7 +65,7 @@ bool OCSYNC_EXPORT
 operator== (SyncJournalFileRecord &lhs,
     const SyncJournalFileRecord &rhs);
 
-class OCSYNC_EXPORT SyncJournalErrorBlacklistRecord {
+class SyncJournalErrorBlacklistRecord {
 public:
     enum Category {
         /// Normal errors have no special behavior
@@ -98,17 +97,17 @@ public:
     /// The last X-Request-ID of the request that failled
     QByteArray _requestId;
 
-    bool isValid () const;
+    bool isValid ();
 };
 
 /** Represents a conflict in the conflicts table.
- *
- * In the following the "conflict file" is the file that has the conflict
- * tag in the filename, and the base file is the file that it's a conflict for.
- * So if "a/foo.txt" is the base file, its conflict file could be
- * "a/foo (conflicted copy 1234).txt".
- */
-class OCSYNC_EXPORT ConflictRecord {
+
+In the following the "conflict file" is the file that has the conflict
+tag in the filename, and the base file is the file that it's a conflict for.
+So if "a/foo.txt" is the base file, its conflict file could be
+"a/foo (conflicted copy 1234).txt".
+*/
+class ConflictRecord {
 public:
     /** Path to the file with the conflict tag in the name
      *
@@ -144,5 +143,3 @@ public:
     bool isValid () { return !path.isEmpty (); }
 };
 }
-
-#endif // SYNCJOURNALFILERECORD_H

@@ -2,7 +2,7 @@
 
 // #include <QSet>
 
-namespace OCC {
+namespace Occ {
 
 class NotificationCache {
 public:

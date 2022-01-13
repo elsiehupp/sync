@@ -1,16 +1,16 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *       support, and with no warranty, express or implied, as to its usefulness for
- *          any purpose.
- *          */
+   This software is in the public domain, furnished "as is", without technical
+      support, and with no warranty, express or implied, as to its usefulness for
+         any purpose.
+         */
 
 // #include <QtTest>
 
 // #include <sqlite3.h>
 
-using namespace OCC;
+using namespace Occ;
 
-class TestSyncJournalDB : public QObject {
+class TestSyncJournalDB : GLib.Object {
 
     QTemporaryDir _tempDir;
 
@@ -97,7 +97,7 @@ private slots:
 
             // qDebug ()<< "OOOOO " << storedRecord._modtime.toTime_t () << record._modtime.toTime_t ();
 
-            // Attention: compare time_t types here, as QDateTime seem to maintain
+            // Attention : compare time_t types here, as QDateTime seem to maintain
             // milliseconds internally, which disappear in sqlite. Go for full seconds here.
             QVERIFY (storedRecord._modtime == record._modtime);
             QVERIFY (storedRecord == record);
@@ -238,7 +238,7 @@ private slots:
         QCOMPARE (getEtag ("foodir/sub"), initialEtag);
         QCOMPARE (getEtag ("foodir/subdir/otherdir"), initialEtag);
 
-        // Indirect effects: setFileRecord () calls filter etags
+        // Indirect effects : setFileRecord () calls filter etags
         initialEtag = "etag2";
 
         makeEntry ("foodir", ItemTypeDirectory);
@@ -281,7 +281,7 @@ private slots:
                 SyncJournalFileRecord record;
                 _db.getFileRecord (elem, &record);
                 if (!record.isValid ()) {
-                    qWarning () << "Missing record: " << elem;
+                    qWarning () << "Missing record : " << elem;
                     ok = false;
                 }
             }

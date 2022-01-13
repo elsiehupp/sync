@@ -1,7 +1,7 @@
 /****************************************************************************
 **
 ** Copyright (C) 2014 Digia Plc and/or its subsidiary (-ies).
-** Contact: http://www.qt-project.org/legal
+** Contact : http://www.qt-project.org/legal
 **
 ** This file is part of Qt Creator.
 **
@@ -19,7 +19,7 @@
 ** Foundation and appearing in the file LICENSE.LGPL included in the
 ** packaging of this file.  Please review the following information to
 ** ensure the GNU Lesser General Public License version 2.1 requirements
-** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** will be met : http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 **
 ** In addition, as a special exception, Digia gives you certain additional
 ** rights.  These rights are described in the Digia Qt LGPL Exception
@@ -35,19 +35,19 @@
 
 namespace SharedTools {
 
-class QtLocalPeer : public QObject {
+class QtLocalPeer : GLib.Object {
 
 public:
-    explicit QtLocalPeer (QObject *parent = nullptr, QString &appId = QString ());
+    QtLocalPeer (GLib.Object *parent = nullptr, QString &appId = QString ());
     bool isClient ();
     bool sendMessage (QString &message, int timeout, bool block);
     QString applicationId () { return id; }
     static QString appSessionId (QString &appId);
 
-Q_SIGNALS:
-    void messageReceived (QString &message, QObject *socket);
+signals:
+    void messageReceived (QString &message, GLib.Object *socket);
 
-protected Q_SLOTS:
+protected slots:
     void receiveConnection ();
 
 protected:

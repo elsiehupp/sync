@@ -1,20 +1,20 @@
 /*
- * Copyright (C) 2015 by Christian Kamm <kamm@incasoftware.de>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) 2015 by Christian Kamm <kamm@incasoftware.de>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #pragma once
 
-// #include <QObject>
+// #include <GLib.Object>
 // #include <QString>
 // #include <QNetworkProxy>
 // #include <QAuthenticator>
@@ -24,24 +24,22 @@
 // #include <QSet>
 
 namespace QKeychain {
-class Job;
 class ReadPasswordJob;
 }
 
-namespace OCC {
+namespace Occ {
 
-class ConfigFile;
 class ProxyAuthDialog;
 
 /**
- * @brief Handle proxyAuthenticationRequired signals from our QNetworkAccessManagers.
- *
- * The main complication here is that the slot needs to return credential information
- * synchronously - but running a dialog or getting password data from synchronous
- * storage are asynchronous operations. This leads to reentrant calls that are
- * fairly complicated to handle.
- */
-class ProxyAuthHandler : public QObject {
+@brief Handle proxyAuthenticationRequired signals from our QNetworkAccessManagers.
+
+The main complication here is that the slot needs to return credential informa
+synchronously - but running a dialog or getting password data from synchron
+storage are asynchronous operations. This leads to reentrant calls that are
+fairly complicated to handle.
+*/
+class ProxyAuthHandler : GLib.Object {
 
 public:
     static ProxyAuthHandler *instance ();
@@ -54,7 +52,7 @@ public slots:
         QAuthenticator *authenticator);
 
 private slots:
-    void slotSenderDestroyed (QObject *);
+    void slotSenderDestroyed (GLib.Object *);
 
 private:
     ProxyAuthHandler ();
@@ -74,8 +72,8 @@ private:
                    int &counter,
                    const QEventLoop.ProcessEventsFlags flags = QEventLoop.AllEvents);
 
-    QString keychainUsernameKey () const;
-    QString keychainPasswordKey () const;
+    QString keychainUsernameKey ();
+    QString keychainPasswordKey ();
 
     /// The hostname:port of the current proxy, used for detecting switches
     /// to a different proxy.
@@ -108,7 +106,7 @@ private:
     /// To distinguish between a new QNAM asking for credentials and credentials
     /// failing for an existing QNAM, we keep track of the senders of the
     /// proxyAuthRequired signal here.
-    QSet<QObject *> _gaveCredentialsTo;
+    QSet<GLib.Object> _gaveCredentialsTo;
 };
 
-} // namespace OCC
+} // namespace Occ

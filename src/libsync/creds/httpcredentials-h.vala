@@ -1,37 +1,34 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@kde.org>
- * Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@kde.org>
+Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QMap>
 // #include <QSslCertificate>
 // #include <QSslKey>
 // #include <QNetworkRequest>
 
-class QNetworkReply;
 class QAuthenticator;
 
 namespace QKeychain {
-class Job;
 class WritePasswordJob;
-class ReadPasswordJob;
 }
 
-namespace OCC {
+namespace Occ {
 
 /*
    The authentication system is this way because of Shibboleth.
-   There used to be two different ways to authenticate: Shibboleth and HTTP Basic Auth.
+   There used to be two different ways to authenticate : Shibboleth and HTTP Basic Auth.
    AbstractCredentials can be inherited from both ShibbolethCrendentials and HttpCredentials.
 
    HttpCredentials is then split in HttpCredentials and HttpCredentialsGui.
@@ -65,8 +62,8 @@ namespace OCC {
    2) If the credentials is still not valid when fetched () is emitted, the ui, will call askFromUser ()
       which is implemented in HttpCredentialsGui
 
- */
-class OWNCLOUDSYNC_EXPORT HttpCredentials : public AbstractCredentials {
+*/
+class OWNCLOUDSYNC_EXPORT HttpCredentials : AbstractCredentials {
     friend class HttpCredentialsAccessManager;
 
 public:
@@ -74,7 +71,7 @@ public:
     static constexpr QNetworkRequest.Attribute DontAddCredentialsAttribute = QNetworkRequest.User;
 
     HttpCredentials ();
-    explicit HttpCredentials (QString &user, QString &password,
+    HttpCredentials (QString &user, QString &password,
             const QByteArray &clientCertBundle = QByteArray (), QByteArray &clientCertPassword = QByteArray ());
 
     QString authType () const override;
@@ -104,7 +101,7 @@ public:
 
     bool retryIfNeeded (AbstractNetworkJob *) override;
 
-private Q_SLOTS:
+private slots:
     void slotAuthentication (QNetworkReply *, QAuthenticator *);
 
     void slotReadClientCertPasswordJobDone (QKeychain.Job *);
@@ -168,6 +165,6 @@ protected:
     QVector<QPointer<AbstractNetworkJob>> _retryQueue; // Jobs we need to retry once the auth token is fetched
 };
 
-} // namespace OCC
+} // namespace Occ
 
 #endif

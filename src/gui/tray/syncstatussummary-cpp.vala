@@ -1,42 +1,42 @@
 /*
- * Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <theme.h>
 
 namespace {
 
-OCC.SyncResult.Status determineSyncStatus (OCC.SyncResult &syncResult) {
+Occ.SyncResult.Status determineSyncStatus (Occ.SyncResult &syncResult) {
     const auto status = syncResult.status ();
 
-    if (status == OCC.SyncResult.Success || status == OCC.SyncResult.Problem) {
+    if (status == Occ.SyncResult.Success || status == Occ.SyncResult.Problem) {
         if (syncResult.hasUnresolvedConflicts ()) {
-            return OCC.SyncResult.Problem;
+            return Occ.SyncResult.Problem;
         }
-        return OCC.SyncResult.Success;
-    } else if (status == OCC.SyncResult.SyncPrepare || status == OCC.SyncResult.Undefined) {
-        return OCC.SyncResult.SyncRunning;
+        return Occ.SyncResult.Success;
+    } else if (status == Occ.SyncResult.SyncPrepare || status == Occ.SyncResult.Undefined) {
+        return Occ.SyncResult.SyncRunning;
     }
     return status;
 }
 }
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcSyncStatusModel, "nextcloud.gui.syncstatusmodel", QtInfoMsg)
 
-SyncStatusSummary.SyncStatusSummary (QObject *parent)
-    : QObject (parent) {
+SyncStatusSummary.SyncStatusSummary (GLib.Object *parent)
+    : GLib.Object (parent) {
     const auto folderMan = FolderMan.instance ();
     connect (folderMan, &FolderMan.folderListChanged, this, &SyncStatusSummary.onFolderListChanged);
     connect (folderMan, &FolderMan.folderSyncStateChange, this, &SyncStatusSummary.onFolderSyncStateChanged);
@@ -72,7 +72,7 @@ bool SyncStatusSummary.syncing () {
     return _isSyncing;
 }
 
-void SyncStatusSummary.onFolderListChanged (OCC.Folder.Map &folderMap) {
+void SyncStatusSummary.onFolderListChanged (Occ.Folder.Map &folderMap) {
     connectToFoldersProgress (folderMap);
 }
 

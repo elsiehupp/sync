@@ -1,19 +1,19 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QHash>
-// #include <QObject>
+// #include <GLib.Object>
 // #include <QMap>
 // #include <QElapsedTimer>
 // #include <QTimer>
@@ -23,39 +23,37 @@
 
 // #include <deque>
 
-namespace OCC {
+namespace Occ {
 
 Q_DECLARE_LOGGING_CATEGORY (lcPropagator)
 
 /** Free disk space threshold below which syncs will abort and not even start.
- */
+*/
 int64 criticalFreeSpaceLimit ();
 
 /** The client will not intentionally reduce the available free disk space below
- *  this limit.
- *
- * Uploads will still run and downloads that are small enough will continue too.
- */
+ this limit.
+
+Uploads will still run and downloads that are small enough will continue too.
+*/
 int64 freeSpaceLimit ();
 
 void blacklistUpdate (SyncJournalDb *journal, SyncFileItem &item);
 
-class SyncJournalDb;
 class OwncloudPropagator;
-class PropagatorCompositeJob;
 
 /**
- * @brief the base class of propagator jobs
- *
- * This can either be a job, or a container for jobs.
- * If it is a composite job, it then inherits from PropagateDirectory
- *
- * @ingroup libsync
- */
-class PropagatorJob : public QObject {
+@brief the base class of propagator jobs
+
+This can either be a job, or a container for jobs.
+If it is a composite job, it then inherits from PropagateDirectory
+
+@ingroup libsync
+*/
+class PropagatorJob : GLib.Object {
 
 public:
-    explicit PropagatorJob (OwncloudPropagator *propagator);
+    PropagatorJob (OwncloudPropagator *propagator);
 
     enum AbortType {
         Synchronous,
@@ -133,7 +131,7 @@ signals:
      */
     void abortFinished (SyncFileItem.Status status = SyncFileItem.NormalError);
 protected:
-    OwncloudPropagator *propagator () const;
+    OwncloudPropagator *propagator ();
 
     /** If this job gets added to a composite job, this will point to the parent.
      *
@@ -147,9 +145,9 @@ protected:
 };
 
 /*
- * Abstract class to propagate a single item
- */
-class PropagateItemJob : public PropagatorJob {
+Abstract class to propagate a single item
+*/
+class PropagateItemJob : PropagatorJob {
 protected:
     virtual void done (SyncFileItem.Status status, QString &errorString = QString ());
 
@@ -165,7 +163,7 @@ protected:
         _item._errorString = msg;
     }
 
-    bool hasEncryptedAncestor () const;
+    bool hasEncryptedAncestor ();
 
 protected slots:
     void slotRestoreJobFinished (SyncFileItem.Status status);
@@ -180,7 +178,7 @@ public:
         , _parallelism (FullParallelism)
         , _item (item) {
         // we should always execute jobs that process the E2EE API calls as sequential jobs
-        // TODO: In fact, we must make sure Lock/Unlock are not colliding and always wait for each other to complete. So, we could refactor this "_parallelism" later
+        // TODO : In fact, we must make sure Lock/Unlock are not colliding and always wait for each other to complete. So, we could refactor this "_parallelism" later
         // so every "PropagateItemJob" that will potentially execute Lock job on E2EE folder will get executed sequentially.
         // As an alternative, we could optimize Lock/Unlock calls, so we do a batch-write on one folder and only lock and unlock a folder once per batch.
         _parallelism = (_item._isEncrypted || hasEncryptedAncestor ()) ? WaitForFinished : FullParallelism;
@@ -207,23 +205,23 @@ public slots:
 };
 
 /**
- * @brief Job that runs subjobs. It becomes finished only when all subjobs are finished.
- * @ingroup libsync
- */
-class PropagatorCompositeJob : public PropagatorJob {
+@brief Job that runs subjobs. It becomes finished only when all subjobs are finished.
+@ingroup libsync
+*/
+class PropagatorCompositeJob : PropagatorJob {
 public:
-    QVector<PropagatorJob *> _jobsToDo;
+    QVector<PropagatorJob> _jobsToDo;
     SyncFileItemVector _tasksToDo;
-    QVector<PropagatorJob *> _runningJobs;
+    QVector<PropagatorJob> _runningJobs;
     SyncFileItem.Status _hasError; // NoStatus,  or NormalError / SoftError if there was an error
     uint64 _abortsCount;
 
-    explicit PropagatorCompositeJob (OwncloudPropagator *propagator)
+    PropagatorCompositeJob (OwncloudPropagator *propagator)
         : PropagatorJob (propagator)
         , _hasError (SyncFileItem.NoStatus), _abortsCount (0) {
     }
 
-    // Don't delete jobs in _jobsToDo and _runningJobs: they have parents
+    // Don't delete jobs in _jobsToDo and _runningJobs : they have parents
     // that will be responsible for cleanup. Deleting them here would risk
     // deleting something that has already been deleted by a shared parent.
     ~PropagatorCompositeJob () override = default;
@@ -272,18 +270,18 @@ private slots:
 };
 
 /**
- * @brief Propagate a directory, and all its sub entries.
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT PropagateDirectory : public PropagatorJob {
+@brief Propagate a directory, and all its sub entries.
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT PropagateDirectory : PropagatorJob {
 public:
     SyncFileItemPtr _item;
-    // e.g: create the directory
+    // e.g : create the directory
     QScopedPointer<PropagateItemJob> _firstJob;
 
     PropagatorCompositeJob _subJobs;
 
-    explicit PropagateDirectory (OwncloudPropagator *propagator, SyncFileItemPtr &item);
+    PropagateDirectory (OwncloudPropagator *propagator, SyncFileItemPtr &item);
 
     void appendJob (PropagatorJob *job) {
         _subJobs.appendJob (job);
@@ -323,17 +321,17 @@ private slots:
 };
 
 /**
- * @brief Propagate the root directory, and all its sub entries.
- * @ingroup libsync
- *
- * Primary difference to PropagateDirectory is that it keeps track of directory
- * deletions that must happen at the very end.
- */
-class OWNCLOUDSYNC_EXPORT PropagateRootDirectory : public PropagateDirectory {
+@brief Propagate the root directory, and all its sub entries.
+@ingroup libsync
+
+Primary difference to PropagateDirectory is that it keeps track of directory
+deletions that must happen at the very end.
+*/
+class OWNCLOUDSYNC_EXPORT PropagateRootDirectory : PropagateDirectory {
 public:
     PropagatorCompositeJob _dirDeletionJobs;
 
-    explicit PropagateRootDirectory (OwncloudPropagator *propagator);
+    PropagateRootDirectory (OwncloudPropagator *propagator);
 
     bool scheduleSelfOrChild () override;
     JobParallelism parallelism () override;
@@ -351,10 +349,10 @@ private:
 };
 
 /**
- * @brief Dummy job that just mark it as completed and ignored
- * @ingroup libsync
- */
-class PropagateIgnoreJob : public PropagateItemJob {
+@brief Dummy job that just mark it as completed and ignored
+@ingroup libsync
+*/
+class PropagateIgnoreJob : PropagateItemJob {
 public:
     PropagateIgnoreJob (OwncloudPropagator *propagator, SyncFileItemPtr &item)
         : PropagateItemJob (propagator, item) {
@@ -373,9 +371,8 @@ public:
     }
 };
 
-class PropagateUploadFileCommon;
 
-class OWNCLOUDSYNC_EXPORT OwncloudPropagator : public QObject {
+class OWNCLOUDSYNC_EXPORT OwncloudPropagator : GLib.Object {
 public:
     SyncJournalDb *const _journal;
     bool _finishedEmited; // used to ensure that finished is only emitted once
@@ -401,18 +398,18 @@ public:
     void start (SyncFileItemVector &&_syncedItems);
 
     void startDirectoryPropagation (SyncFileItemPtr &item,
-                                   QStack<QPair<QString, PropagateDirectory*>> &directories,
-                                   QVector<PropagatorJob *> &directoriesToRemove,
+                                   QStack<QPair<QString, PropagateDirectory>> &directories,
+                                   QVector<PropagatorJob> &directoriesToRemove,
                                    QString &removedDirectory,
                                    const SyncFileItemVector &items);
 
     void startFilePropagation (SyncFileItemPtr &item,
-                              QStack<QPair<QString, PropagateDirectory*>> &directories,
-                              QVector<PropagatorJob *> &directoriesToRemove,
+                              QStack<QPair<QString, PropagateDirectory>> &directories,
+                              QVector<PropagatorJob> &directoriesToRemove,
                               QString &removedDirectory,
                               QString &maybeConflictDirectory);
 
-    const SyncOptions &syncOptions () const;
+    const SyncOptions &syncOptions ();
     void setSyncOptions (SyncOptions &syncOptions);
 
     int _downloadLimit = 0;
@@ -427,7 +424,7 @@ public:
         Jobs add themself to the list when they do an assynchronous operation.
         Jobs can be several time on the list (example, when several chunks are uploaded in parallel)
      */
-    QList<PropagateItemJob *> _activeJobList;
+    QList<PropagateItemJob> _activeJobList;
 
     /** We detected that another sync is required after this one */
     bool _anotherSyncNeeded;
@@ -477,14 +474,14 @@ public:
     bool hasCaseClashAccessibilityProblem (QString &relfile);
 
     Q_REQUIRED_RESULT QString fullLocalPath (QString &tmp_file_name) const;
-    QString localPath () const;
+    QString localPath ();
 
     /**
      * Returns the full remote path including the folder root of a
      * folder sync path.
      */
     Q_REQUIRED_RESULT QString fullRemotePath (QString &tmp_file_name) const;
-    QString remotePath () const;
+    QString remotePath ();
 
     /** Creates the job for an item.
      */
@@ -512,7 +509,7 @@ public:
         }
     }
 
-    AccountPtr account () const;
+    AccountPtr account ();
 
     enum DiskSpaceResult {
         DiskSpaceOk,
@@ -523,7 +520,7 @@ public:
     /** Checks whether there's enough disk space available to complete
      *  all jobs that are currently running.
      */
-    DiskSpaceResult diskSpaceCheck () const;
+    DiskSpaceResult diskSpaceCheck ();
 
     /** Handles a conflict by renaming the file 'item'.
      *
@@ -637,10 +634,10 @@ private:
 };
 
 /**
- * @brief Job that wait for all the poll jobs to be completed
- * @ingroup libsync
- */
-class CleanupPollsJob : public QObject {
+@brief Job that wait for all the poll jobs to be completed
+@ingroup libsync
+*/
+class CleanupPollsJob : GLib.Object {
     QVector<SyncJournalDb.PollInfo> _pollInfos;
     AccountPtr _account;
     SyncJournalDb *_journal;
@@ -648,9 +645,9 @@ class CleanupPollsJob : public QObject {
     QSharedPointer<Vfs> _vfs;
 
 public:
-    explicit CleanupPollsJob (QVector<SyncJournalDb.PollInfo> &pollInfos, AccountPtr account, SyncJournalDb *journal, QString &localPath,
-                             const QSharedPointer<Vfs> &vfs, QObject *parent = nullptr)
-        : QObject (parent)
+    CleanupPollsJob (QVector<SyncJournalDb.PollInfo> &pollInfos, AccountPtr account, SyncJournalDb *journal, QString &localPath,
+                             const QSharedPointer<Vfs> &vfs, GLib.Object *parent = nullptr)
+        : GLib.Object (parent)
         , _pollInfos (pollInfos)
         , _account (account)
         , _journal (journal)

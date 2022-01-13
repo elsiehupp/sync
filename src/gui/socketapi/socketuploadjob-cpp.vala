@@ -1,22 +1,22 @@
 /*
- * Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QFileInfo>
 // #include <QJsonArray>
 // #include <QRegularExpression>
 
-using namespace OCC;
+using namespace Occ;
 
 SocketUploadJob.SocketUploadJob (QSharedPointer<SocketApiJobV2> &job)
     : _apiJob (job) {
@@ -29,7 +29,7 @@ SocketUploadJob.SocketUploadJob (QSharedPointer<SocketApiJobV2> &job)
     }
 
     _pattern = job.arguments ()[QLatin1String ("pattern")].toString ();
-    // TODO: use uuid
+    // TODO : use uuid
     const auto accname = job.arguments ()[QLatin1String ("account")][QLatin1String ("name")].toString ();
     auto account = AccountManager.instance ().account (accname);
 
@@ -46,16 +46,16 @@ SocketUploadJob.SocketUploadJob (QSharedPointer<SocketApiJobV2> &job)
     _engine = new SyncEngine (account.account (), _localPath.endsWith (QLatin1Char ('/')) ? _localPath : _localPath + QLatin1Char ('/'), _remotePath, _db);
     _engine.setParent (_db);
 
-    connect (_engine, &OCC.SyncEngine.itemCompleted, this, [this] (OCC.SyncFileItemPtr item) {
+    connect (_engine, &Occ.SyncEngine.itemCompleted, this, [this] (Occ.SyncFileItemPtr item) {
         _syncedFiles.append (item._file);
     });
 
-    connect (_engine, &OCC.SyncEngine.finished, this, [this] (bool ok) {
+    connect (_engine, &Occ.SyncEngine.finished, this, [this] (bool ok) {
         if (ok) {
             _apiJob.success ({ { "localPath", _localPath }, { "syncedFiles", QJsonArray.fromStringList (_syncedFiles) } });
         }
     });
-    connect (_engine, &OCC.SyncEngine.syncError, this, [this] (QString &error, ErrorCategory) {
+    connect (_engine, &Occ.SyncEngine.syncError, this, [this] (QString &error, ErrorCategory) {
         _apiJob.failure (error);
     });
 }
@@ -70,9 +70,9 @@ void SocketUploadJob.start () {
     _engine.setSyncOptions (opt);
 
     // create the dir, fail if it already exists
-    auto mkdir = new OCC.MkColJob (_engine.account (), _remotePath);
-    connect (mkdir, &OCC.MkColJob.finishedWithoutError, _engine, &OCC.SyncEngine.startSync);
-    connect (mkdir, &OCC.MkColJob.finishedWithError, this, [this] (QNetworkReply *reply) {
+    auto mkdir = new Occ.MkColJob (_engine.account (), _remotePath);
+    connect (mkdir, &Occ.MkColJob.finishedWithoutError, _engine, &Occ.SyncEngine.startSync);
+    connect (mkdir, &Occ.MkColJob.finishedWithError, this, [this] (QNetworkReply *reply) {
         if (reply.error () == 202) {
             _apiJob.failure (QStringLiteral ("Destination %1 already exists").arg (_remotePath));
         } else {

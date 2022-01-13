@@ -1,18 +1,18 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@kde.org>
- * Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
+Copyright (C) by Klaas Freitag <freitag@kde.org>
+Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
+
  *
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <theme.h>
 // #include <account.h>
@@ -29,7 +29,7 @@ inline static QFont makeAliasFont (QFont &normalFont) {
     return aliasFont;
 }
 
-namespace OCC {
+namespace Occ {
 
 FolderStatusDelegate.FolderStatusDelegate ()
     : QStyledItemDelegate () {
@@ -49,7 +49,7 @@ QSize FolderStatusDelegate.sizeHint (QStyleOptionViewItem &option,
     QFontMetrics fm (font);
     QFontMetrics aliasFm (aliasFont);
 
-    auto classif = static_cast<const FolderStatusModel *> (index.model ()).classify (index);
+    auto classif = static_cast<const FolderStatusModel> (index.model ()).classify (index);
     if (classif == FolderStatusModel.AddButton) {
         const int margins = aliasFm.height (); // same as 2*aliasMargin of paint
         QFontMetrics fm (qApp.font ("QPushButton"));
@@ -137,7 +137,7 @@ void FolderStatusDelegate.paint (QPainter *painter, QStyleOptionViewItem &option
         return;
     }
 
-    if (static_cast<const FolderStatusModel *> (index.model ()).classify (index) != FolderStatusModel.RootFolder) {
+    if (static_cast<const FolderStatusModel> (index.model ()).classify (index) != FolderStatusModel.RootFolder) {
         return;
     }
     painter.save ();
@@ -213,7 +213,7 @@ void FolderStatusDelegate.paint (QPainter *painter, QStyleOptionViewItem &option
     auto palette = option.palette;
 
     if (qApp.style ().inherits ("QWindowsVistaStyle")) {
-        // Hack: Windows Vista's light blue is not contrasting enough for white
+        // Hack : Windows Vista's light blue is not contrasting enough for white
 
         // (code from QWindowsVistaStyle.drawControl for CE_ItemViewItem)
         palette.setColor (QPalette.All, QPalette.HighlightedText, palette.color (QPalette.Active, QPalette.Text));
@@ -259,7 +259,7 @@ void FolderStatusDelegate.paint (QPainter *painter, QStyleOptionViewItem &option
         rect.setHeight (texts.count () * subFm.height () + 2 * margin);
         rect.setRight (option.rect.right () - margin);
 
-        // save previous state to not mess up colours with the background (fixes issue: https://github.com/nextcloud/desktop/issues/1237)
+        // save previous state to not mess up colours with the background (fixes issue : https://github.com/nextcloud/desktop/issues/1237)
         painter.save ();
         painter.setBrush (color);
         painter.setPen (QColor (0xaa, 0xaa, 0xaa));
@@ -290,7 +290,7 @@ void FolderStatusDelegate.paint (QPainter *painter, QStyleOptionViewItem &option
     if (!infoTexts.isEmpty ())
         drawTextBox (infoTexts, QColor (0x4d, 0x4d, 0xba));
 
-    // Sync File Progress Bar: Show it if syncFile is not empty.
+    // Sync File Progress Bar : Show it if syncFile is not empty.
     if (showProgess) {
         int fileNameTextHeight = subFm.boundingRect (tr ("File")).height ();
         int barHeight = 7; // same height as quota bar
@@ -351,8 +351,8 @@ bool FolderStatusDelegate.editorEvent (QEvent *event, QAbstractItemModel *model,
     switch (event.type ()) {
     case QEvent.MouseButtonPress:
     case QEvent.MouseMove:
-        if (auto *view = qobject_cast<const QAbstractItemView *> (option.widget)) {
-            auto *me = static_cast<QMouseEvent *> (event);
+        if (auto *view = qobject_cast<const QAbstractItemView> (option.widget)) {
+            auto *me = static_cast<QMouseEvent> (event);
             QModelIndex index;
             if (me.buttons ()) {
                 index = view.indexAt (me.pos ());
@@ -417,4 +417,4 @@ void FolderStatusDelegate.customizeStyle () {
     _iconMore = Theme.createColorAwareIcon (QLatin1String (":/client/theme/more.svg"));
 }
 
-} // namespace OCC
+} // namespace Occ

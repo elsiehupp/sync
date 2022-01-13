@@ -1,22 +1,22 @@
 /*
- * libcsync -- a library to sync a directory with another
- *
- * Copyright (c) 2015-2013 by Klaas Freitag <freitag@owncloud.com>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
+libcsync -- a library to sync a directory with another
+
+Copyright (c) 2015-2013 by Klaas Freitag <freitag@owncloud.co
+
+This library is free software; you can redistribute it and/o
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later vers
+
+This library is distributed in the hope that it wi
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+*/
 // #include <sys/types.h>
 // #include <sys/stat.h>
 // #include <fcntl.h>
@@ -26,7 +26,9 @@
 
 // #include <QDir>
 
-static const auto CSYNC_TEST_DIR = []{ return QStringLiteral ("%1/csync_test").arg (QDir.tempPath ());} ();
+static const auto CSYNC_TEST_DIR = []{
+    return QStringLiteral ("%1/csync_test").arg (QDir.tempPath ());
+} ();
 
 namespace {
 int oc_mkdir (QString &path) {
@@ -34,7 +36,7 @@ int oc_mkdir (QString &path) {
 }
 
 }
-#define WD_BUFFER_SIZE 255
+const int WD_BUFFER_SIZE = 255
 
 static mbchar_t wd_buffer[WD_BUFFER_SIZE];
 
@@ -45,11 +47,11 @@ typedef struct {
 
 /* remove the complete test dir */
 static int wipe_testdir () {
-  QDir tmp (CSYNC_TEST_DIR);
-  if (tmp.exists ()) {
-      return tmp.removeRecursively () ? 0 : 1;
-  }
-  return 0;
+    QDir tmp (CSYNC_TEST_DIR);
+    if (tmp.exists ()) {
+        return tmp.removeRecursively () ? 0 : 1;
+    }
+    return 0;
 }
 
 static int setup_testenv (void **state) {
@@ -64,7 +66,7 @@ static int setup_testenv (void **state) {
 
     assert_non_null (_tgetcwd (wd_buffer, WD_BUFFER_SIZE));
 
-    rc  = _tchdir (dir.toLocal8Bit ().constData ());
+    rc = _tchdir (dir.toLocal8Bit ().constData ());
 
     assert_int_equal (rc, 0);
 
@@ -89,13 +91,13 @@ static int teardown (void **state) {
     rc = wipe_testdir ();
     assert_int_equal (rc, 0);
 
-    delete reinterpret_cast<statevar*> (*state);
+    delete reinterpret_cast<statevar> (*state);
     return 0;
 }
 
 /* This function takes a relative path, prepends it with the CSYNC_TEST_DIR
- * and creates each sub directory.
- */
+and creates each sub directory.
+*/
 static void create_dirs ( const char *path ) {
   int rc = -1;
   auto _mypath = QStringLiteral ("%1/%2").arg (CSYNC_TEST_DIR, QString.fromUtf8 (path)).toUtf8 ();
@@ -123,16 +125,16 @@ static void create_dirs ( const char *path ) {
 }
 
 /*
- * This function uses the vio_opendir, vio_readdir and vio_closedir functions
- * to traverse a file tree that was created before by the create_dir function.
- *
- * It appends a listing to the result member of the incoming struct in *state
- * that can be compared later to what was expected in the calling functions.
- *
- * The int parameter cnt contains the number of seen files (not dirs) in the
- * whole tree.
- *
- */
+This function uses the vio_opendir, vio_readdir and vio_closedir functions
+to traverse a file tree that was created before by the create_dir function.
+
+It appends a listing to the result member of the incoming struct in *state
+that can be compared later to what was expected in the calling functions.
+
+The int parameter cnt contains the number of seen files (not dirs) in the
+whole tree.
+
+*/
 static void traverse_dir (void **state, QString &dir, int *cnt) {
     csync_vio_handle_t *dh = nullptr;
     std.unique_ptr<csync_file_stat_t> dirent;
@@ -145,7 +147,7 @@ static void traverse_dir (void **state, QString &dir, int *cnt) {
     dh = csync_vio_local_opendir (dir);
     assert_non_null (dh);
 
-    OCC.Vfs *vfs = nullptr;
+    Occ.Vfs *vfs = nullptr;
     while ( (dirent = csync_vio_local_readdir (dh, vfs)) ) {
         assert_non_null (dirent.get ());
         if (!dirent.original_path.isEmpty ()) {
@@ -239,7 +241,7 @@ static void check_readdir_with_content (void **state) {
 static void check_readdir_longtree (void **state) {
     auto sv = (statevar*) *state;
 
-    /* Strange things here: Compilers only support strings with length of 4k max.
+    /* Strange things here : Compilers only support strings with length of 4k max.
      * The expected result string is longer, so it needs to be split up in r1, r2 and r3
      */
 
@@ -305,10 +307,10 @@ static void check_readdir_longtree (void **state) {
 // https://github.com/owncloud/client/issues/3128 https://github.com/owncloud/client/issues/2777
 static void check_readdir_bigunicode (void **state) {
     auto sv = (statevar*) *state;
-//    1: ? ASCII: 239 - EF
-//    2: ? ASCII: 187 - BB
-//    3: ? ASCII: 191 - BF
-//    4: ASCII: 32    - 20
+//    1 : ? ASCII : 239 - EF
+//    2 : ? ASCII : 187 - BB
+//    3 : ? ASCII : 191 - BF
+//    4 : ASCII : 32    - 20
 
     QString p = QStringLiteral ("%1/%2").arg (CSYNC_TEST_DIR, QStringLiteral ("goodone/"));
     int rc = oc_mkdir (p);

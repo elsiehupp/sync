@@ -1,5 +1,5 @@
 #ifndef USERMODEL_H
-#define USERMODEL_H
+const int USERMODEL_H
 
 // #include <QAbstractListModel>
 // #include <QImage>
@@ -10,10 +10,9 @@
 
 // #include <chrono>
 
-namespace OCC {
-class UnifiedSearchResultsListModel;
+namespace Occ {
 
-class User : public QObject {
+class User : GLib.Object {
     Q_PROPERTY (QString name READ name NOTIFY nameChanged)
     Q_PROPERTY (QString server READ server CONSTANT)
     Q_PROPERTY (bool serverHasUserStatus READ serverHasUserStatus CONSTANT)
@@ -27,36 +26,36 @@ class User : public QObject {
     Q_PROPERTY (bool isConnected READ isConnected NOTIFY accountStateChanged)
     Q_PROPERTY (UnifiedSearchResultsListModel* unifiedSearchResultsListModel READ getUnifiedSearchResultsListModel CONSTANT)
 public:
-    User (AccountStatePtr &account, bool &isCurrent = false, QObject *parent = nullptr);
+    User (AccountStatePtr &account, bool &isCurrent = false, GLib.Object *parent = nullptr);
 
-    AccountPtr account () const;
-    AccountStatePtr accountState () const;
+    AccountPtr account ();
+    AccountStatePtr accountState ();
 
-    bool isConnected () const;
-    bool isCurrentUser () const;
+    bool isConnected ();
+    bool isCurrentUser ();
     void setCurrentUser (bool &isCurrent);
-    Folder *getFolder () const;
+    Folder *getFolder ();
     ActivityListModel *getActivityModel ();
-    UnifiedSearchResultsListModel *getUnifiedSearchResultsListModel () const;
+    UnifiedSearchResultsListModel *getUnifiedSearchResultsListModel ();
     void openLocalFolder ();
-    QString name () const;
+    QString name ();
     QString server (bool shortened = true) const;
-    bool hasLocalFolder () const;
-    bool serverHasTalk () const;
-    bool serverHasUserStatus () const;
-    AccountApp *talkApp () const;
-    bool hasActivities () const;
-    AccountAppList appList () const;
-    QImage avatar () const;
-    void login () const;
-    void logout () const;
-    void removeAccount () const;
-    QString avatarUrl () const;
-    bool isDesktopNotificationsAllowed () const;
-    UserStatus.OnlineStatus status () const;
-    QString statusMessage () const;
-    QUrl statusIcon () const;
-    QString statusEmoji () const;
+    bool hasLocalFolder ();
+    bool serverHasTalk ();
+    bool serverHasUserStatus ();
+    AccountApp *talkApp ();
+    bool hasActivities ();
+    AccountAppList appList ();
+    QImage avatar ();
+    void login ();
+    void logout ();
+    void removeAccount ();
+    QString avatarUrl ();
+    bool isDesktopNotificationsAllowed ();
+    UserStatus.OnlineStatus status ();
+    QString statusMessage ();
+    QUrl statusIcon ();
+    QString statusEmoji ();
     void processCompletedSyncItem (Folder *folder, SyncFileItemPtr &item);
 
 signals:
@@ -95,8 +94,8 @@ private:
     void slotReceivedPushActivity (Account *account);
     void slotCheckExpiredActivities ();
 
-    void connectPushNotifications () const;
-    bool checkPushNotificationsAreReady () const;
+    void connectPushNotifications ();
+    bool checkPushNotificationsAreReady ();
 
     bool isActivityOfCurrentAccount (Folder *folder) const;
     bool isUnsolvableConflict (SyncFileItemPtr &item) const;
@@ -122,7 +121,7 @@ private:
     int _notificationRequestsRunning;
 };
 
-class UserModel : public QAbstractListModel {
+class UserModel : QAbstractListModel {
     Q_PROPERTY (User* currentUser READ currentUser NOTIFY newUserSelected)
     Q_PROPERTY (int currentUserId READ currentUserId NOTIFY newUserSelected)
 public:
@@ -138,7 +137,7 @@ public:
 
     QImage avatarById (int &id);
 
-    User *currentUser () const;
+    User *currentUser ();
 
     int findUserIdForAccount (AccountState *account) const;
 
@@ -148,14 +147,14 @@ public:
     Q_INVOKABLE void openCurrentAccountServer ();
     Q_INVOKABLE int numUsers ();
     Q_INVOKABLE QString currentUserServer ();
-    int currentUserId () const;
+    int currentUserId ();
     Q_INVOKABLE bool isUserConnected (int &id);
     Q_INVOKABLE void switchCurrentUser (int &id);
     Q_INVOKABLE void login (int &id);
     Q_INVOKABLE void logout (int &id);
     Q_INVOKABLE void removeAccount (int &id);
 
-    Q_INVOKABLE std.shared_ptr<OCC.UserStatusConnector> userStatusConnector (int id);
+    Q_INVOKABLE std.shared_ptr<Occ.UserStatusConnector> userStatusConnector (int id);
 
     ActivityListModel *currentActivityModel ();
 
@@ -173,7 +172,7 @@ public:
         IdRole
     };
 
-    AccountAppList appList () const;
+    AccountAppList appList ();
 
 signals:
     Q_INVOKABLE void addAccount ();
@@ -184,21 +183,21 @@ protected:
 
 private:
     static UserModel *_instance;
-    UserModel (QObject *parent = nullptr);
-    QList<User*> _users;
+    UserModel (GLib.Object *parent = nullptr);
+    QList<User> _users;
     int _currentUserId = 0;
     bool _init = true;
 
     void buildUserList ();
 };
 
-class ImageProvider : public QQuickImageProvider {
+class ImageProvider : QQuickImageProvider {
 public:
     ImageProvider ();
     QImage requestImage (QString &id, QSize *size, QSize &requestedSize) override;
 };
 
-class UserAppsModel : public QAbstractListModel {
+class UserAppsModel : QAbstractListModel {
 public:
     static UserAppsModel *instance ();
     ~UserAppsModel () override = default;
@@ -223,10 +222,9 @@ protected:
 
 private:
     static UserAppsModel *_instance;
-    UserAppsModel (QObject *parent = nullptr);
+    UserAppsModel (GLib.Object *parent = nullptr);
 
     AccountAppList _apps;
 };
 
 }
-#endif // USERMODEL_H

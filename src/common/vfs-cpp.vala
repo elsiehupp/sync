@@ -1,34 +1,34 @@
 /*
- * Copyright (C) by Dominik Schmidt <dschmidt@owncloud.com>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
+Copyright (C) by Dominik Schmidt <dschmidt@owncloud.com>
+
+This library is free software; you can redistribute it and
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later versi
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GN
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+*/
 
 // #include <QPluginLoader>
 // #include <QLoggingCategory>
 
-using namespace OCC;
+using namespace Occ;
 
-Vfs.Vfs (QObject* parent)
-    : QObject (parent) {
+Vfs.Vfs (GLib.Object* parent)
+    : GLib.Object (parent) {
 }
 
 Vfs.~Vfs () = default;
 
 QString Vfs.modeToString (Mode mode) {
-    // Note: Strings are used for config and must be stable
+    // Note : Strings are used for config and must be stable
     switch (mode) {
     case Off:
         return QStringLiteral ("off");
@@ -43,7 +43,7 @@ QString Vfs.modeToString (Mode mode) {
 }
 
 Optional<Vfs.Mode> Vfs.modeFromString (QString &str) {
-    // Note: Strings are used for config and must be stable
+    // Note : Strings are used for config and must be stable
     if (str == QLatin1String ("off")) {
         return Off;
     } else if (str == QLatin1String ("suffix")) {
@@ -103,7 +103,7 @@ Vfs.AvailabilityResult Vfs.availabilityInDb (QString &folderPath) {
     return AvailabilityError.NoSuchItem;
 }
 
-VfsOff.VfsOff (QObject *parent)
+VfsOff.VfsOff (GLib.Object *parent)
     : Vfs (parent) {
 }
 
@@ -121,8 +121,8 @@ static QString modeToPluginName (Vfs.Mode mode) {
 
 Q_LOGGING_CATEGORY (lcPlugin, "plugins", QtInfoMsg)
 
-bool OCC.isVfsPluginAvailable (Vfs.Mode mode) {
-    // TODO: cache plugins available?
+bool Occ.isVfsPluginAvailable (Vfs.Mode mode) {
+    // TODO : cache plugins available?
     if (mode == Vfs.Off) {
         return true;
     }
@@ -164,7 +164,7 @@ bool OCC.isVfsPluginAvailable (Vfs.Mode mode) {
     return true;
 }
 
-Vfs.Mode OCC.bestAvailableVfsMode () {
+Vfs.Mode Occ.bestAvailableVfsMode () {
     if (isVfsPluginAvailable (Vfs.WindowsCfApi)) {
         return Vfs.WindowsCfApi;
     }
@@ -196,7 +196,7 @@ Vfs.Mode OCC.bestAvailableVfsMode () {
     return Vfs.Off;
 }
 
-std.unique_ptr<Vfs> OCC.createVfsFromPlugin (Vfs.Mode mode) {
+std.unique_ptr<Vfs> Occ.createVfsFromPlugin (Vfs.Mode mode) {
     if (mode == Vfs.Off)
         return std.unique_ptr<Vfs> (new VfsOff);
 
@@ -208,7 +208,7 @@ std.unique_ptr<Vfs> OCC.createVfsFromPlugin (Vfs.Mode mode) {
     const auto pluginPath = pluginFileName (QStringLiteral ("vfs"), name);
 
     if (!isVfsPluginAvailable (mode)) {
-        qCCritical (lcPlugin) << "Could not load plugin: not existant or bad metadata" << pluginPath;
+        qCCritical (lcPlugin) << "Could not load plugin : not existant or bad metadata" << pluginPath;
         return nullptr;
     }
 
@@ -219,13 +219,13 @@ std.unique_ptr<Vfs> OCC.createVfsFromPlugin (Vfs.Mode mode) {
         return nullptr;
     }
 
-    auto factory = qobject_cast<PluginFactory *> (plugin);
+    auto factory = qobject_cast<PluginFactory> (plugin);
     if (!factory) {
         qCCritical (lcPlugin) << "Plugin" << loader.fileName () << "does not implement PluginFactory";
         return nullptr;
     }
 
-    auto vfs = std.unique_ptr<Vfs> (qobject_cast<Vfs *> (factory.create (nullptr)));
+    auto vfs = std.unique_ptr<Vfs> (qobject_cast<Vfs> (factory.create (nullptr)));
     if (!vfs) {
         qCCritical (lcPlugin) << "Plugin" << loader.fileName () << "does not create a Vfs instance";
         return nullptr;

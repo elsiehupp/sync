@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QLoggingCategory>
 // #include <QNetworkRequest>
@@ -23,11 +23,11 @@
 // #include <QNetworkConfiguration>
 // #include <QUuid>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcAccessManager, "nextcloud.sync.accessmanager", QtInfoMsg)
 
-AccessManager.AccessManager (QObject *parent)
+AccessManager.AccessManager (GLib.Object *parent)
     : QNetworkAccessManager (parent) {
 
 #ifndef Q_OS_LINUX
@@ -66,7 +66,7 @@ QNetworkReply *AccessManager.createRequest (QNetworkAccessManager.Operation op, 
 
 #if QT_VERSION >= QT_VERSION_CHECK (5, 9, 4)
     // only enable HTTP2 with Qt 5.9.4 because old Qt have too many bugs (e.g. QTBUG-64359 is fixed in >= Qt 5.9.4)
-    if (newRequest.url ().scheme () == "https") { // Not for "http": QTBUG-61397
+    if (newRequest.url ().scheme () == "https") { // Not for "http" : QTBUG-61397
         // http2 seems to cause issues, as with our recommended server setup we don't support http2, disable it by default for now
         static const bool http2EnabledEnv = qEnvironmentVariableIntValue ("OWNCLOUD_HTTP2_ENABLED") == 1;
 
@@ -79,4 +79,4 @@ QNetworkReply *AccessManager.createRequest (QNetworkAccessManager.Operation op, 
     return reply;
 }
 
-} // namespace OCC
+} // namespace Occ

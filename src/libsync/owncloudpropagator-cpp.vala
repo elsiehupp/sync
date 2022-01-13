@@ -1,29 +1,29 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QStack>
 // #include <QFileInfo>
 // #include <QDir>
 // #include <QLoggingCategory>
 // #include <QTimer>
-// #include <QObject>
+// #include <GLib.Object>
 // #include <QTimerEvent>
 // #include <QRegularExpression>
 // #include <qmath.h>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcPropagator, "nextcloud.sync.propagator", QtInfoMsg)
 Q_LOGGING_CATEGORY (lcDirectory, "nextcloud.sync.propagator.directory", QtInfoMsg)
@@ -95,9 +95,9 @@ static int64 getMaxBlacklistTime () {
 }
 
 /** Creates a blacklist entry, possibly taking into account an old one.
- *
- * The old entry may be invalid, then a fresh entry is created.
- */
+
+The old entry may be invalid, then a fresh entry is created.
+*/
 static SyncJournalErrorBlacklistRecord createBlacklistEntry (
     const SyncJournalErrorBlacklistRecord &old, SyncFileItem &item) {
     SyncJournalErrorBlacklistRecord entry;
@@ -113,11 +113,11 @@ static SyncJournalErrorBlacklistRecord createBlacklistEntry (
     static int64 minBlacklistTime (getMinBlacklistTime ());
     static int64 maxBlacklistTime (qMax (getMaxBlacklistTime (), minBlacklistTime));
 
-    // The factor of 5 feels natural: 25s, 2 min, 10 min, ~1h, ~5h, ~24h
+    // The factor of 5 feels natural : 25s, 2 min, 10 min, ~1h, ~5h, ~24h
     entry._ignoreDuration = old._ignoreDuration * 5;
 
     if (item._httpErrorCode == 403) {
-        qCWarning (lcPropagator) << "Probably firewall error: " << item._httpErrorCode << ", blacklisting up to 1h only";
+        qCWarning (lcPropagator) << "Probably firewall error : " << item._httpErrorCode << ", blacklisting up to 1h only";
         entry._ignoreDuration = qMin (entry._ignoreDuration, int64 (60 * 60));
 
     } else if (item._httpErrorCode == 413 || item._httpErrorCode == 415) {
@@ -140,9 +140,9 @@ static SyncJournalErrorBlacklistRecord createBlacklistEntry (
 }
 
 /** Updates, creates or removes a blacklist entry for the given item.
- *
- * May adjust the status or item._errorString.
- */
+
+May adjust the status or item._errorString.
+*/
 void blacklistUpdate (SyncJournalDb *journal, SyncFileItem &item) {
     SyncJournalErrorBlacklistRecord oldEntry = journal.errorBlacklistEntry (item._file);
 
@@ -200,7 +200,7 @@ void PropagateItemJob.done (SyncFileItem.Status statusArg, QString &errorString)
             || _item._status == SyncFileItem.Conflict) {
             _item._status = SyncFileItem.Restoration;
         } else {
-            _item._errorString += tr ("; Restoration Failed: %1").arg (errorString);
+            _item._errorString += tr ("; Restoration Failed : %1").arg (errorString);
         }
     } else {
         if (_item._errorString.isEmpty ()) {
@@ -268,7 +268,7 @@ void PropagateItemJob.slotRestoreJobFinished (SyncFileItem.Status status) {
         || status == SyncFileItem.Restoration) {
         done (SyncFileItem.SoftError, msg);
     } else {
-        done (status, tr ("A file or folder was removed from a read only share, but restoring failed: %1").arg (msg));
+        done (status, tr ("A file or folder was removed from a read only share, but restoring failed : %1").arg (msg));
     }
 }
 
@@ -411,13 +411,13 @@ void OwncloudPropagator.start (SyncFileItemVector &&items) {
     _rootJob.reset (new PropagateRootDirectory (this));
     QStack<QPair<QString /* directory name */, PropagateDirectory * /* job */>> directories;
     directories.push (qMakePair (QString (), _rootJob.data ()));
-    QVector<PropagatorJob *> directoriesToRemove;
+    QVector<PropagatorJob> directoriesToRemove;
     QString removedDirectory;
     QString maybeConflictDirectory;
     foreach (SyncFileItemPtr &item, items) {
         if (!removedDirectory.isEmpty () && item._file.startsWith (removedDirectory)) {
             // this is an item in a directory which is going to be removed.
-            auto *delDirJob = qobject_cast<PropagateDirectory *> (directoriesToRemove.first ());
+            auto *delDirJob = qobject_cast<PropagateDirectory> (directoriesToRemove.first ());
 
             const auto isNewDirectory = item.isDirectory () &&
                     (item._instruction == CSYNC_INSTRUCTION_NEW || item._instruction == CSYNC_INSTRUCTION_TYPE_CHANGE);
@@ -439,7 +439,7 @@ void OwncloudPropagator.start (SyncFileItemVector &&items) {
             } else if (item._instruction == CSYNC_INSTRUCTION_RENAME) {
                 // all is good, the rename will be executed before the directory deletion
             } else {
-                qCWarning (lcPropagator) << "WARNING:  Job within a removed directory?  This should not happen!"
+                qCWarning (lcPropagator) << "WARNING :  Job within a removed directory?  This should not happen!"
                                         << item._file << item._instruction;
             }
         }
@@ -488,8 +488,8 @@ void OwncloudPropagator.start (SyncFileItemVector &&items) {
 }
 
 void OwncloudPropagator.startDirectoryPropagation (SyncFileItemPtr &item,
-                                                   QStack<QPair<QString, PropagateDirectory *>> &directories,
-                                                   QVector<PropagatorJob *> &directoriesToRemove,
+                                                   QStack<QPair<QString, PropagateDirectory>> &directories,
+                                                   QVector<PropagatorJob> &directoriesToRemove,
                                                    QString &removedDirectory,
                                                    const SyncFileItemVector &items) {
     auto directoryPropagationJob = std.make_unique<PropagateDirectory> (this, item);
@@ -517,7 +517,7 @@ void OwncloudPropagator.startDirectoryPropagation (SyncFileItemPtr &item,
 
         // We should not update the etag of parent directories of the removed directory
         // since it would be done before the actual remove (issue #1845)
-        // NOTE: Currently this means that we don't update those etag at all in this sync,
+        // NOTE : Currently this means that we don't update those etag at all in this sync,
         //       but it should not be a problem, they will be updated in the next sync.
         for (int i = 0; i < directories.size (); ++i) {
             if (directories[i].second._item._instruction == CSYNC_INSTRUCTION_UPDATE_METADATA) {
@@ -532,8 +532,8 @@ void OwncloudPropagator.startDirectoryPropagation (SyncFileItemPtr &item,
 }
 
 void OwncloudPropagator.startFilePropagation (SyncFileItemPtr &item,
-                                              QStack<QPair<QString, PropagateDirectory *> > &directories,
-                                              QVector<PropagatorJob *> &directoriesToRemove,
+                                              QStack<QPair<QString, PropagateDirectory> > &directories,
+                                              QVector<PropagatorJob> &directoriesToRemove,
                                               QString &removedDirectory,
                                               QString &maybeConflictDirectory) {
     if (item._instruction == CSYNC_INSTRUCTION_TYPE_CHANGE) {
@@ -601,7 +601,7 @@ void OwncloudPropagator.scheduleNextJob () {
 }
 
 void OwncloudPropagator.scheduleNextJobImpl () {
-    // TODO: If we see that the automatic up-scaling has a bad impact we
+    // TODO : If we see that the automatic up-scaling has a bad impact we
     // need to check how to avoid this.
     // Down-scaling on slow networks? https://github.com/owncloud/client/issues/3382
     // Making sure we do up/down at same time? https://github.com/owncloud/client/issues/1633
@@ -614,7 +614,7 @@ void OwncloudPropagator.scheduleNextJobImpl () {
         }
     } else if (_activeJobList.count () < hardMaximumActiveJob ()) {
         int likelyFinishedQuicklyCount = 0;
-        // NOTE: Only counts the first 3 jobs! Then for each
+        // NOTE : Only counts the first 3 jobs! Then for each
         // one that is likely finished quickly, we can launch another one.
         // When a job finishes another one will "move up" to be one of the first 3 and then
         // be counted too.
@@ -730,7 +730,7 @@ bool OwncloudPropagator.createConflict (SyncFileItemPtr &item,
 }
 
 QString OwncloudPropagator.adjustRenamedPath (QString &original) {
-    return OCC.adjustRenamedPath (_renamedDirectories, original);
+    return Occ.adjustRenamedPath (_renamedDirectories, original);
 }
 
 Result<Vfs.ConvertToPlaceholderResult, QString> OwncloudPropagator.updateMetadata (SyncFileItem &item) {
@@ -783,12 +783,12 @@ bool OwncloudPropagator.isInBulkUploadBlackList (QString &file) {
 // ================================================================================
 
 PropagatorJob.PropagatorJob (OwncloudPropagator *propagator)
-    : QObject (propagator)
+    : GLib.Object (propagator)
     , _state (NotYetStarted) {
 }
 
 OwncloudPropagator *PropagatorJob.propagator () {
-    return qobject_cast<OwncloudPropagator *> (parent ());
+    return qobject_cast<OwncloudPropagator> (parent ());
 }
 
 // ================================================================================
@@ -876,7 +876,7 @@ bool PropagatorCompositeJob.scheduleSelfOrChild () {
 }
 
 void PropagatorCompositeJob.slotSubJobFinished (SyncFileItem.Status status) {
-    auto *subJob = static_cast<PropagatorJob *> (sender ());
+    auto *subJob = static_cast<PropagatorJob> (sender ());
     ASSERT (subJob);
 
     // Delete the job and remove it from our list of jobs.
@@ -1016,7 +1016,7 @@ void PropagateDirectory.slotSubJobsFinished (SyncFileItem.Status status) {
             const auto result = propagator ().updateMetadata (*_item);
             if (!result) {
                 status = _item._status = SyncFileItem.FatalError;
-                _item._errorString = tr ("Error updating metadata: %1").arg (result.error ());
+                _item._errorString = tr ("Error updating metadata : %1").arg (result.error ());
                 qCWarning (lcDirectory) << "Error writing to the database for file" << _item._file << "with" << result.error ();
             } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
                 _item._status = SyncFileItem.SoftError;
@@ -1083,7 +1083,7 @@ bool PropagateRootDirectory.scheduleSelfOrChild () {
         return true;
     }
 
-    // Important: Finish _subJobs before scheduling any deletes.
+    // Important : Finish _subJobs before scheduling any deletes.
     if (_subJobs._state != Finished) {
         return false;
     }
@@ -1158,7 +1158,7 @@ void CleanupPollsJob.start () {
 }
 
 void CleanupPollsJob.slotPollFinished () {
-    auto *job = qobject_cast<PollJob *> (sender ());
+    auto *job = qobject_cast<PollJob> (sender ());
     ASSERT (job);
     if (job._item._status == SyncFileItem.FatalError) {
         emit aborted (job._item._errorString);
@@ -1182,7 +1182,7 @@ void CleanupPollsJob.slotPollFinished () {
 }
 
 QString OwncloudPropagator.fullRemotePath (QString &tmp_file_name) {
-    // TODO: should this be part of the _item (SyncFileItemPtr)?
+    // TODO : should this be part of the _item (SyncFileItemPtr)?
     return _remoteFolder + tmp_file_name;
 }
 

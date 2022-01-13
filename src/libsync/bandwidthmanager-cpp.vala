@@ -1,22 +1,22 @@
 /*
- * Copyright (C) by Markus Goetz <markus@woboq.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Markus Goetz <markus@woboq.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QLoggingCategory>
 // #include <QTimer>
-// #include <QObject>
+// #include <GLib.Object>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcBandwidthManager, "nextcloud.sync.bandwidthmanager", QtInfoMsg)
 
@@ -34,7 +34,7 @@ static int64 relativeLimitMeasuringTimerIntervalMsec = 1000 * 2;
 //  * For relative limiting, smoothen measurements
 
 BandwidthManager.BandwidthManager (OwncloudPropagator *p)
-    : QObject ()
+    : GLib.Object ()
     , _propagator (p)
     , _relativeLimitCurrentMeasuredDevice (nullptr)
     , _relativeUploadLimitProgressAtMeasuringRestart (0)
@@ -44,33 +44,33 @@ BandwidthManager.BandwidthManager (OwncloudPropagator *p)
     _currentUploadLimit = _propagator._uploadLimit;
     _currentDownloadLimit = _propagator._downloadLimit;
 
-    QObject.connect (&_switchingTimer, &QTimer.timeout, this, &BandwidthManager.switchingTimerExpired);
+    GLib.Object.connect (&_switchingTimer, &QTimer.timeout, this, &BandwidthManager.switchingTimerExpired);
     _switchingTimer.setInterval (10 * 1000);
     _switchingTimer.start ();
     QMetaObject.invokeMethod (this, "switchingTimerExpired", Qt.QueuedConnection);
 
     // absolute uploads/downloads
-    QObject.connect (&_absoluteLimitTimer, &QTimer.timeout, this, &BandwidthManager.absoluteLimitTimerExpired);
+    GLib.Object.connect (&_absoluteLimitTimer, &QTimer.timeout, this, &BandwidthManager.absoluteLimitTimerExpired);
     _absoluteLimitTimer.setInterval (1000);
     _absoluteLimitTimer.start ();
 
     // Relative uploads
-    QObject.connect (&_relativeUploadMeasuringTimer, &QTimer.timeout,
+    GLib.Object.connect (&_relativeUploadMeasuringTimer, &QTimer.timeout,
         this, &BandwidthManager.relativeUploadMeasuringTimerExpired);
     _relativeUploadMeasuringTimer.setInterval (relativeLimitMeasuringTimerIntervalMsec);
     _relativeUploadMeasuringTimer.start ();
     _relativeUploadMeasuringTimer.setSingleShot (true); // will be restarted from the delay timer
-    QObject.connect (&_relativeUploadDelayTimer, &QTimer.timeout,
+    GLib.Object.connect (&_relativeUploadDelayTimer, &QTimer.timeout,
         this, &BandwidthManager.relativeUploadDelayTimerExpired);
     _relativeUploadDelayTimer.setSingleShot (true); // will be restarted from the measuring timer
 
     // Relative downloads
-    QObject.connect (&_relativeDownloadMeasuringTimer, &QTimer.timeout,
+    GLib.Object.connect (&_relativeDownloadMeasuringTimer, &QTimer.timeout,
         this, &BandwidthManager.relativeDownloadMeasuringTimerExpired);
     _relativeDownloadMeasuringTimer.setInterval (relativeLimitMeasuringTimerIntervalMsec);
     _relativeDownloadMeasuringTimer.start ();
     _relativeDownloadMeasuringTimer.setSingleShot (true); // will be restarted from the delay timer
-    QObject.connect (&_relativeDownloadDelayTimer, &QTimer.timeout,
+    GLib.Object.connect (&_relativeDownloadDelayTimer, &QTimer.timeout,
         this, &BandwidthManager.relativeDownloadDelayTimerExpired);
     _relativeDownloadDelayTimer.setSingleShot (true); // will be restarted from the measuring timer
 }
@@ -80,7 +80,7 @@ BandwidthManager.~BandwidthManager () = default;
 void BandwidthManager.registerUploadDevice (UploadDevice *p) {
     _absoluteUploadDeviceList.push_back (p);
     _relativeUploadDeviceList.push_back (p);
-    QObject.connect (p, &QObject.destroyed, this, &BandwidthManager.unregisterUploadDevice);
+    GLib.Object.connect (p, &GLib.Object.destroyed, this, &BandwidthManager.unregisterUploadDevice);
 
     if (usingAbsoluteUploadLimit ()) {
         p.setBandwidthLimited (true);
@@ -94,8 +94,8 @@ void BandwidthManager.registerUploadDevice (UploadDevice *p) {
     }
 }
 
-void BandwidthManager.unregisterUploadDevice (QObject *o) {
-    auto p = reinterpret_cast<UploadDevice *> (o); // note, we might already be in the ~QObject
+void BandwidthManager.unregisterUploadDevice (GLib.Object *o) {
+    auto p = reinterpret_cast<UploadDevice> (o); // note, we might already be in the ~GLib.Object
     _absoluteUploadDeviceList.remove (p);
     _relativeUploadDeviceList.remove (p);
     if (p == _relativeLimitCurrentMeasuredDevice) {
@@ -106,7 +106,7 @@ void BandwidthManager.unregisterUploadDevice (QObject *o) {
 
 void BandwidthManager.registerDownloadJob (GETFileJob *j) {
     _downloadJobList.push_back (j);
-    QObject.connect (j, &QObject.destroyed, this, &BandwidthManager.unregisterDownloadJob);
+    GLib.Object.connect (j, &GLib.Object.destroyed, this, &BandwidthManager.unregisterDownloadJob);
 
     if (usingAbsoluteDownloadLimit ()) {
         j.setBandwidthLimited (true);
@@ -120,8 +120,8 @@ void BandwidthManager.registerDownloadJob (GETFileJob *j) {
     }
 }
 
-void BandwidthManager.unregisterDownloadJob (QObject *o) {
-    auto *j = reinterpret_cast<GETFileJob *> (o); // note, we might already be in the ~QObject
+void BandwidthManager.unregisterDownloadJob (GLib.Object *o) {
+    auto *j = reinterpret_cast<GETFileJob> (o); // note, we might already be in the ~GLib.Object
     _downloadJobList.remove (j);
     if (_relativeLimitCurrentMeasuredJob == j) {
         _relativeLimitCurrentMeasuredJob = nullptr;
@@ -354,7 +354,7 @@ void BandwidthManager.switchingTimerExpired () {
 
 void BandwidthManager.absoluteLimitTimerExpired () {
     if (usingAbsoluteUploadLimit () && !_absoluteUploadDeviceList.empty ()) {
-        int64 quotaPerDevice = _currentUploadLimit / qMax ( (std.list<UploadDevice *>.size_type)1, _absoluteUploadDeviceList.size ());
+        int64 quotaPerDevice = _currentUploadLimit / qMax ( (std.list<UploadDevice>.size_type)1, _absoluteUploadDeviceList.size ());
         qCDebug (lcBandwidthManager) << quotaPerDevice << _absoluteUploadDeviceList.size () << _currentUploadLimit;
         Q_FOREACH (UploadDevice *device, _absoluteUploadDeviceList) {
             device.giveBandwidthQuota (quotaPerDevice);
@@ -362,7 +362,7 @@ void BandwidthManager.absoluteLimitTimerExpired () {
         }
     }
     if (usingAbsoluteDownloadLimit () && !_downloadJobList.empty ()) {
-        int64 quotaPerJob = _currentDownloadLimit / qMax ( (std.list<GETFileJob *>.size_type)1, _downloadJobList.size ());
+        int64 quotaPerJob = _currentDownloadLimit / qMax ( (std.list<GETFileJob>.size_type)1, _downloadJobList.size ());
         qCDebug (lcBandwidthManager) << quotaPerJob << _downloadJobList.size () << _currentDownloadLimit;
         Q_FOREACH (GETFileJob *j, _downloadJobList) {
             j.giveBandwidthQuota (quotaPerJob);
@@ -371,4 +371,4 @@ void BandwidthManager.absoluteLimitTimerExpired () {
     }
 }
 
-} // namespace OCC
+} // namespace Occ

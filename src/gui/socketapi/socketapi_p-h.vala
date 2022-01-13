@@ -1,18 +1,18 @@
 /*
- * Copyright (C) by Dominik Schmidt <dev@dominik-schmidt.de>
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- * Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Dominik Schmidt <dev@dominik-schmidt.de>
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <functional>
 // #include <QBitArray>
@@ -24,7 +24,7 @@
 // #include <memory>
 // #include <QTimer>
 
-namespace OCC {
+namespace Occ {
 
 class BloomFilter {
     // Initialize with m=1024 bits and k=2 (high and low 16 bits of a qHash).
@@ -54,7 +54,7 @@ class SocketListener {
 public:
     QPointer<QIODevice> socket;
 
-    explicit SocketListener (QIODevice *_socket)
+    SocketListener (QIODevice *_socket)
         : socket (_socket) {
     }
 
@@ -79,7 +79,7 @@ private:
     BloomFilter _monitoredDirectoriesBloomFilter;
 };
 
-class ListenerClosure : public QObject {
+class ListenerClosure : GLib.Object {
 public:
     using CallbackFunction = std.function<void ()>;
     ListenerClosure (CallbackFunction callback)
@@ -96,9 +96,9 @@ private:
     CallbackFunction callback_;
 };
 
-class SocketApiJob : public QObject {
+class SocketApiJob : GLib.Object {
 public:
-    explicit SocketApiJob (QString &jobId, QSharedPointer<SocketListener> &socketListener, QJsonObject &arguments)
+    SocketApiJob (QString &jobId, QSharedPointer<SocketListener> &socketListener, QJsonObject &arguments)
         : _jobId (jobId)
         , _socketListener (socketListener)
         , _arguments (arguments) {
@@ -118,9 +118,9 @@ protected:
     QJsonObject _arguments;
 };
 
-class SocketApiJobV2 : public QObject {
+class SocketApiJobV2 : GLib.Object {
 public:
-    explicit SocketApiJobV2 (QSharedPointer<SocketListener> &socketListener, QByteArray &command, QJsonObject &arguments);
+    SocketApiJobV2 (QSharedPointer<SocketListener> &socketListener, QByteArray &command, QJsonObject &arguments);
 
     void success (QJsonObject &response) const;
     void failure (QString &error) const;
@@ -128,8 +128,8 @@ public:
     const QJsonObject &arguments () { return _arguments; }
     QByteArray command () { return _command; }
 
-Q_SIGNALS:
-    void finished () const;
+signals:
+    void finished ();
 
 private:
     void doFinish (QJsonObject &obj) const;
@@ -141,6 +141,4 @@ private:
 };
 }
 
-Q_DECLARE_METATYPE (OCC.SocketListener *)
-
-#endif // SOCKETAPI_P_H
+Q_DECLARE_METATYPE (Occ.SocketListener *)

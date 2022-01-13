@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QDialog>
 // #include <QWidget>
@@ -21,43 +21,39 @@
 // #include <qpushbutton.h>
 // #include <qscrollarea.h>
 
-class QAction;
 class QCompleter;
-class QModelIndex;
 
-namespace OCC {
+namespace Occ {
 
 namespace Ui {
     class ShareUserGroupWidget;
     class ShareUserLine;
 }
 
-class AbstractCredentials;
 class SyncResult;
-class Share;
 class ShareManager;
 
-class AvatarEventFilter : public QObject {
+class AvatarEventFilter : GLib.Object {
 
 public:
-    explicit AvatarEventFilter (QObject *parent = nullptr);
+    AvatarEventFilter (GLib.Object *parent = nullptr);
 
 signals:
     void clicked ();
     void contextMenu (QPoint &globalPosition);
 
 protected:
-    bool eventFilter (QObject *obj, QEvent *event) override;
+    bool eventFilter (GLib.Object *obj, QEvent *event) override;
 };
 
 /**
- * @brief The ShareDialog (user/group) class
- * @ingroup gui
- */
-class ShareUserGroupWidget : public QWidget {
+@brief The ShareDialog (user/group) class
+@ingroup gui
+*/
+class ShareUserGroupWidget : QWidget {
 
 public:
-    explicit ShareUserGroupWidget (AccountPtr account,
+    ShareUserGroupWidget (AccountPtr account,
         const QString &sharePath,
         const QString &localPath,
         SharePermissions maxSharingPermissions,
@@ -120,19 +116,19 @@ private:
 };
 
 /**
- * The widget displayed for each user/group share
- */
-class ShareUserLine : public QWidget {
+The widget displayed for each user/group share
+*/
+class ShareUserLine : QWidget {
 
 public:
-    explicit ShareUserLine (AccountPtr account,
+    ShareUserLine (AccountPtr account,
         QSharedPointer<UserGroupShare> Share,
         SharePermissions maxSharingPermissions,
         bool isFile,
         QWidget *parent = nullptr);
     ~ShareUserLine () override;
 
-    QSharedPointer<Share> share () const;
+    QSharedPointer<Share> share ();
 
 signals:
     void visualDeletionDone ();
@@ -214,5 +210,3 @@ private:
   QAction *_passwordProtectLinkAction;
 };
 }
-
-#endif // SHAREUSERGROUPWIDGET_H

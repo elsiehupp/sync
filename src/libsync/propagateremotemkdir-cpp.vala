@@ -1,21 +1,21 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QFile>
 // #include <QLoggingCategory>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcPropagateRemoteMkdir, "nextcloud.sync.propagator.remotemkdir", QtInfoMsg)
 
@@ -50,7 +50,7 @@ void PropagateRemoteMkdir.start () {
     _job = new DeleteJob (propagator ().account (),
         propagator ().fullRemotePath (_item._file),
         this);
-    connect (qobject_cast<DeleteJob *> (_job), &DeleteJob.finishedSignal, this, &PropagateRemoteMkdir.slotMkdir);
+    connect (qobject_cast<DeleteJob> (_job), &DeleteJob.finishedSignal, this, &PropagateRemoteMkdir.slotMkdir);
     _job.start ();
 }
 
@@ -63,8 +63,8 @@ void PropagateRemoteMkdir.slotStartMkcolJob () {
     _job = new MkColJob (propagator ().account (),
         propagator ().fullRemotePath (_item._file),
         this);
-    connect (qobject_cast<MkColJob *> (_job), &MkColJob.finishedWithError, this, &PropagateRemoteMkdir.slotMkcolJobFinished);
-    connect (qobject_cast<MkColJob *> (_job), &MkColJob.finishedWithoutError, this, &PropagateRemoteMkdir.slotMkcolJobFinished);
+    connect (qobject_cast<MkColJob> (_job), &MkColJob.finishedWithError, this, &PropagateRemoteMkdir.slotMkcolJobFinished);
+    connect (qobject_cast<MkColJob> (_job), &MkColJob.finishedWithoutError, this, &PropagateRemoteMkdir.slotMkcolJobFinished);
     _job.start ();
 }
 
@@ -137,8 +137,8 @@ void PropagateRemoteMkdir.finalizeMkColJob (QNetworkReply.NetworkError err, QStr
             // We're expecting directory path in /Foo/Bar convention...
             Q_ASSERT (jobPath.startsWith ('/') && !jobPath.endsWith ('/'));
             // But encryption job expect it in Foo/Bar/ convention
-            auto job = new OCC.EncryptFolderJob (propagator ().account (), propagator ()._journal, jobPath.mid (1), _item._fileId, this);
-            connect (job, &OCC.EncryptFolderJob.finished, this, &PropagateRemoteMkdir.slotEncryptFolderFinished);
+            auto job = new Occ.EncryptFolderJob (propagator ().account (), propagator ()._journal, jobPath.mid (1), _item._fileId, this);
+            connect (job, &Occ.EncryptFolderJob.finished, this, &PropagateRemoteMkdir.slotEncryptFolderFinished);
             job.start ();
         }
     });
@@ -222,7 +222,7 @@ void PropagateRemoteMkdir.success () {
     // save the file id already so we can detect rename or remove
     const auto result = propagator ().updateMetadata (itemCopy);
     if (!result) {
-        done (SyncFileItem.FatalError, tr ("Error writing metadata to the database: %1").arg (result.error ()));
+        done (SyncFileItem.FatalError, tr ("Error writing metadata to the database : %1").arg (result.error ()));
         return;
     } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
         done (SyncFileItem.FatalError, tr ("The file %1 is currently in use").arg (_item._file));

@@ -1,12 +1,12 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *       support, and with no warranty, express or implied, as to its usefulness for
- *          any purpose.
- *          */
+   This software is in the public domain, furnished "as is", without technical
+      support, and with no warranty, express or implied, as to its usefulness for
+         any purpose.
+         */
 
 // #include <QtTest>
 
-using namespace OCC;
+using namespace Occ;
 
 namespace {
 
@@ -16,7 +16,7 @@ const char testfileEmptyC[] = "netrctestEmpty";
 
 }
 
-class TestNetrcParser : public QObject {
+class TestNetrcParser : GLib.Object {
 
 private slots:
     void initTestCase () {

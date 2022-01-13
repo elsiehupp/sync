@@ -1,20 +1,20 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #pragma once
 
-// #include <QObject>
+// #include <GLib.Object>
 // #include <QElapsedTimer>
 // #include <QStringList>
 // #include <csync.h>
@@ -25,29 +25,26 @@
 // #include <QRunnable>
 // #include <deque>
 
-class ExcludedFiles;
 
-namespace OCC {
+namespace Occ {
 
 enum class LocalDiscoveryStyle {
     FilesystemOnly, //< read all local data from the filesystem
     DatabaseAndFilesystem, //< read from the db, except for listed paths
 };
 
-class Account;
 class SyncJournalDb;
-class ProcessDirectoryJob;
 
 /**
- * Represent all the meta-data about a file in the server
- */
+Represent all the meta-data about a file in the server
+*/
 struct RemoteInfo {
     /** FileName of the entry (this does not contains any directory or path, just the plain name */
     QString name;
     QByteArray etag;
     QByteArray fileId;
     QByteArray checksumHeader;
-    OCC.RemotePermissions remotePerm;
+    Occ.RemotePermissions remotePerm;
     time_t modtime = 0;
     int64_t size = 0;
     int64_t sizeOfFolder = 0;
@@ -77,13 +74,13 @@ struct LocalInfo {
 };
 
 /**
- * @brief Run list on a local directory and process the results for Discovery
- *
- * @ingroup libsync
- */
-class DiscoverySingleLocalDirectoryJob : public QObject, public QRunnable {
+@brief Run list on a local directory and process the results for Discovery
+
+@ingroup libsync
+*/
+class DiscoverySingleLocalDirectoryJob : GLib.Object, public QRunnable {
 public:
-    explicit DiscoverySingleLocalDirectoryJob (AccountPtr &account, QString &localPath, OCC.Vfs *vfs, QObject *parent = nullptr);
+    DiscoverySingleLocalDirectoryJob (AccountPtr &account, QString &localPath, Occ.Vfs *vfs, GLib.Object *parent = nullptr);
 
     void run () override;
 signals:
@@ -97,18 +94,18 @@ private slots:
 private:
     QString _localPath;
     AccountPtr _account;
-    OCC.Vfs* _vfs;
+    Occ.Vfs* _vfs;
 public:
 };
 
 /**
- * @brief Run a PROPFIND on a directory and process the results for Discovery
- *
- * @ingroup libsync
- */
-class DiscoverySingleDirectoryJob : public QObject {
+@brief Run a PROPFIND on a directory and process the results for Discovery
+
+@ingroup libsync
+*/
+class DiscoverySingleDirectoryJob : GLib.Object {
 public:
-    explicit DiscoverySingleDirectoryJob (AccountPtr &account, QString &path, QObject *parent = nullptr);
+    DiscoverySingleDirectoryJob (AccountPtr &account, QString &path, GLib.Object *parent = nullptr);
     // Specify that this is the root and we need to check the data-fingerprint
     void setIsRootPath () { _isRootPath = true; }
     void start ();
@@ -153,7 +150,7 @@ public:
     QByteArray _dataFingerprint;
 };
 
-class DiscoveryPhase : public QObject {
+class DiscoveryPhase : GLib.Object {
 
     friend class ProcessDirectoryJob;
 
@@ -177,7 +174,7 @@ class DiscoveryPhase : public QObject {
      *
      * See findAndCancelDeletedJob ().
      */
-    QMap<QString, ProcessDirectoryJob *> _queuedDeletedDirectories;
+    QMap<QString, ProcessDirectoryJob> _queuedDeletedDirectories;
 
     // map source (original path) . destinations (current server or local path)
     QMap<QString, QString> _renamedItemsRemote;
@@ -228,7 +225,7 @@ class DiscoveryPhase : public QObject {
      * If that's not the case, return { false, QByteArray () }.
      * If there is such a job, cancel that job and return true and the old etag.
      *
-     * Used when having detected a rename: The rename source may have been
+     * Used when having detected a rename : The rename source may have been
      * discovered before and would have looked like a delete.
      *
      * See _deletedItem and _queuedDeletedDirectories.
@@ -243,7 +240,7 @@ public:
     AccountPtr _account;
     SyncOptions _syncOptions;
     ExcludedFiles *_excludes;
-    QRegularExpression _invalidFilenameRx; // FIXME: maybe move in ExcludedFiles
+    QRegularExpression _invalidFilenameRx; // FIXME : maybe move in ExcludedFiles
     QStringList _serverBlacklistedFiles; // The blacklist from the capabilities
     bool _ignoreHiddenFiles = false;
     std.function<bool (QString &)> _shouldDiscoverLocaly;

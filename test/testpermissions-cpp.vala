@@ -1,14 +1,14 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *    support, and with no warranty, express or implied, as to its usefulness for
- *    any purpose.
- *
- */
+   This software is in the public domain, furnished "as is", without technical
+   support, and with no warranty, express or implied, as to its usefulness for
+   any purpose.
+
+*/
 
 // #include <QtTest>
 // #include <syncengine.h>
 
-using namespace OCC;
+using namespace Occ;
 
 static void applyPermissionsFromName (FileInfo &info) {
     static QRegularExpression rx ("_PERM_ ([^_]*)_[^/]*$");
@@ -24,7 +24,7 @@ static void applyPermissionsFromName (FileInfo &info) {
 // Check if the expected rows in the DB are non-empty. Note that in some cases they might be, then we cannot use this function
 // https://github.com/owncloud/client/issues/2038
 static void assertCsyncJournalOk (SyncJournalDb &journal) {
-    // The DB is openend in locked mode: close to allow us to access.
+    // The DB is openend in locked mode : close to allow us to access.
     journal.close ();
 
     SqlDatabase db;
@@ -53,7 +53,7 @@ bool discoveryInstruction (SyncFileItemVector &spy, QString &path, SyncInstructi
     return item._instruction == instr;
 }
 
-class TestPermissions : public QObject {
+class TestPermissions : GLib.Object {
 
 private slots:
 
@@ -178,7 +178,7 @@ private slots:
         fakeFolder.localModifier ().insert ("readonlyDirectory_PERM_M_/newFile_PERM_WDNV_.data", 105 );
 
         applyPermissionsFromName (fakeFolder.remoteModifier ());
-        // error: can't upload to readonly
+        // error : can't upload to readonly
         QVERIFY (!fakeFolder.syncOnce ());
 
         assertCsyncJournalOk (fakeFolder.syncJournal ());
@@ -260,7 +260,7 @@ private slots:
         //2. move a directory from read to read only  (move the directory from previous step)
         fakeFolder.localModifier ().rename ("normalDirectory_PERM_CKDNV_/subdir_PERM_CKDNV_", "readonlyDirectory_PERM_M_/moved_PERM_CK_" );
 
-        // error: can't upload to readonly!
+        // error : can't upload to readonly!
         QVERIFY (!fakeFolder.syncOnce ());
         currentLocalState = fakeFolder.currentLocalState ();
 
@@ -271,13 +271,13 @@ private slots:
         QVERIFY (currentLocalState.find ("readonlyDirectory_PERM_M_/subdir_PERM_CK_/subsubdir_PERM_CKDNV_/normalFile_PERM_WVND_.data" ));
         // new still exist
         QVERIFY (currentLocalState.find ("readonlyDirectory_PERM_M_/newname_PERM_CK_/subsubdir_PERM_CKDNV_/normalFile_PERM_WVND_.data" ));
-        // but is not on server: so remove it localy for the future comarison
+        // but is not on server : so remove it localy for the future comarison
         fakeFolder.localModifier ().remove ("readonlyDirectory_PERM_M_/newname_PERM_CK_");
 
         //2.
         // old removed
         QVERIFY (!currentLocalState.find ("normalDirectory_PERM_CKDNV_/subdir_PERM_CKDNV_"));
-        // but still on the server: the rename causing an error meant the deletes didn't execute
+        // but still on the server : the rename causing an error meant the deletes didn't execute
         QVERIFY (fakeFolder.currentRemoteState ().find ("normalDirectory_PERM_CKDNV_/subdir_PERM_CKDNV_"));
         // new still there
         QVERIFY (currentLocalState.find ("readonlyDirectory_PERM_M_/moved_PERM_CK_/subsubdir_PERM_CKDNV_/normalFile_PERM_WVND_.data" ));
@@ -382,7 +382,7 @@ private slots:
         // Createfile errors
         lm.rename ("allowed/file", "nocreatefile/file");
         lm.rename ("zallowed/file", "nocreatefile/zfile");
-        lm.rename ("allowed/sub", "nocreatefile/sub"); // TODO: probably forbidden because it contains file children?
+        lm.rename ("allowed/sub", "nocreatefile/sub"); // TODO : probably forbidden because it contains file children?
         // Createdir errors
         lm.rename ("allowed/sub2", "nocreatedir/sub2");
         lm.rename ("zallowed/sub2", "nocreatedir/zsub2");
@@ -414,7 +414,7 @@ private slots:
         // when moving to an invalid target, the targets should be an error
         QVERIFY (itemInstruction (completeSpy, "nocreatefile/file", CSYNC_INSTRUCTION_ERROR));
         QVERIFY (itemInstruction (completeSpy, "nocreatefile/zfile", CSYNC_INSTRUCTION_ERROR));
-        QVERIFY (itemInstruction (completeSpy, "nocreatefile/sub", CSYNC_INSTRUCTION_RENAME)); // TODO: What does a real server say?
+        QVERIFY (itemInstruction (completeSpy, "nocreatefile/sub", CSYNC_INSTRUCTION_RENAME)); // TODO : What does a real server say?
         QVERIFY (itemInstruction (completeSpy, "nocreatedir/sub2", CSYNC_INSTRUCTION_ERROR));
         QVERIFY (itemInstruction (completeSpy, "nocreatedir/zsub2", CSYNC_INSTRUCTION_ERROR));
 

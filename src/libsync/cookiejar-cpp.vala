@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QFile>
 // #include <QDateTime>
@@ -19,7 +19,7 @@
 // #include <QDataStream>
 // #include <QDir>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcCookieJar, "nextcloud.sync.cookiejar", QtInfoMsg)
 
@@ -51,7 +51,7 @@ QDataStream &operator>> (QDataStream &stream, QList<QNetworkCookie> &list) {
         stream >> value;
         QList<QNetworkCookie> newCookies = QNetworkCookie.parseCookies (value);
         if (newCookies.count () == 0 && value.length () != 0) {
-            qCWarning (lcCookieJar) << "CookieJar: Unable to parse saved cookie:" << value;
+            qCWarning (lcCookieJar) << "CookieJar : Unable to parse saved cookie:" << value;
         }
         for (int j = 0; j < newCookies.count (); ++j)
             list.append (newCookies.at (j));
@@ -61,7 +61,7 @@ QDataStream &operator>> (QDataStream &stream, QList<QNetworkCookie> &list) {
     return stream;
 }
 
-CookieJar.CookieJar (QObject *parent)
+CookieJar.CookieJar (GLib.Object *parent)
     : QNetworkCookieJar (parent) {
 }
 
@@ -131,4 +131,4 @@ QList<QNetworkCookie> CookieJar.removeExpired (QList<QNetworkCookie> &cookies) {
     return updatedList;
 }
 
-} // namespace OCC
+} // namespace Occ

@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QNetworkAccessManager>
 // #include <QFileInfo>
@@ -18,7 +18,7 @@
 // #include <cmath>
 // #include <cstring>
 
-namespace OCC {
+namespace Occ {
 
 void PropagateUploadFileV1.doStartUpload () {
     _chunkCount = int (std.ceil (_fileToUpload._size / double (chunkSize ())));
@@ -39,7 +39,7 @@ void PropagateUploadFileV1.doStartUpload () {
         && (progressInfo._contentChecksum == _item._checksumHeader || progressInfo._contentChecksum.isEmpty () || _item._checksumHeader.isEmpty ())) {
         _startChunk = progressInfo._chunk;
         _transferId = progressInfo._transferid;
-        qCInfo (lcPropagateUploadV1) << _item._file << ": Resuming from chunk " << _startChunk;
+        qCInfo (lcPropagateUploadV1) << _item._file << " : Resuming from chunk " << _startChunk;
     } else if (_chunkCount <= 1 && !_item._checksumHeader.isEmpty ()) {
         // If there is only one chunk, write the checksum in the database, so if the PUT is sent
         // to the server, but the connection drops before we get the etag, we can check the checksum
@@ -74,7 +74,7 @@ void PropagateUploadFileV1.startNextChunk () {
         // Don't do parallel upload of chunk if this might be the last chunk because the server cannot handle that
         // https://github.com/owncloud/core/issues/11106
         // We return now and when the _jobs are finished we will proceed with the last chunk
-        // NOTE: Some other parts of the code such as slotUploadProgress also assume that the last chunk
+        // NOTE : Some other parts of the code such as slotUploadProgress also assume that the last chunk
         // is sent last.
         return;
     }
@@ -121,7 +121,7 @@ void PropagateUploadFileV1.startNextChunk () {
     auto device = std.make_unique<UploadDevice> (
             fileName, chunkStart, currentChunkSize, &propagator ()._bandwidthManager);
     if (!device.open (QIODevice.ReadOnly)) {
-        qCWarning (lcPropagateUploadV1) << "Could not prepare upload device: " << device.errorString ();
+        qCWarning (lcPropagateUploadV1) << "Could not prepare upload device : " << device.errorString ();
 
         // If the file is currently locked, we want to retry the sync
         // when it becomes available again.
@@ -140,7 +140,7 @@ void PropagateUploadFileV1.startNextChunk () {
     connect (job, &PUTFileJob.finishedSignal, this, &PropagateUploadFileV1.slotPutFinished);
     connect (job, &PUTFileJob.uploadProgress, this, &PropagateUploadFileV1.slotUploadProgress);
     connect (job, &PUTFileJob.uploadProgress, devicePtr, &UploadDevice.slotJobUploadProgress);
-    connect (job, &QObject.destroyed, this, &PropagateUploadFileCommon.slotJobDestroyed);
+    connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.slotJobDestroyed);
     if (isFinalChunk)
         adjustLastJobTimeout (job, fileSize);
     job.start ();
@@ -182,7 +182,7 @@ void PropagateUploadFileV1.startNextChunk () {
 }
 
 void PropagateUploadFileV1.slotPutFinished () {
-    auto *job = qobject_cast<PUTFileJob *> (sender ());
+    auto *job = qobject_cast<PUTFileJob> (sender ());
     ASSERT (job);
 
     slotJobDestroyed (job); // remove it from the _jobs list
@@ -216,7 +216,7 @@ void PropagateUploadFileV1.slotPutFinished () {
     }
 
     // Check the file again post upload.
-    // Two cases must be considered separately: If the upload is finished,
+    // Two cases must be considered separately : If the upload is finished,
     // the file is on the server and has a changed ETag. In that case,
     // the etag has to be properly updated in the client journal, and because
     // of that we can bail out here with an error. But we can reschedule a
@@ -247,7 +247,7 @@ void PropagateUploadFileV1.slotPutFinished () {
         propagator ()._anotherSyncNeeded = true;
         if (!_finished) {
             abortWithError (SyncFileItem.SoftError, tr ("Local file changed during sync."));
-            // FIXME:  the legacy code was retrying for a few seconds.
+            // FIXME :  the legacy code was retrying for a few seconds.
             //         and also checking that after the last chunk, and removed the file in case of INSTRUCTION_NEW
             return;
         }
@@ -275,7 +275,7 @@ void PropagateUploadFileV1.slotPutFinished () {
         auto currentChunk = job._chunk;
         foreach (auto *job, _jobs) {
             // Take the minimum finished one
-            if (auto putJob = qobject_cast<PUTFileJob *> (job)) {
+            if (auto putJob = qobject_cast<PUTFileJob> (job)) {
                 currentChunk = qMin (currentChunk, putJob._chunk - 1);
             }
         }
@@ -332,14 +332,14 @@ void PropagateUploadFileV1.slotUploadProgress (int64 sent, int64 total) {
 
     // amount is the number of bytes already sent by all the other chunks that were sent
     // not including this one.
-    // FIXME: this assumes all chunks have the same size, which is true only if the last chunk
+    // FIXME : this assumes all chunks have the same size, which is true only if the last chunk
     // has not been finished (which should not happen because the last chunk is sent sequentially)
     int64 amount = progressChunk * chunkSize ();
 
     sender ().setProperty ("byteWritten", sent);
     if (_jobs.count () > 1) {
         amount -= (_jobs.count () - 1) * chunkSize ();
-        foreach (QObject *j, _jobs) {
+        foreach (GLib.Object *j, _jobs) {
             amount += j.property ("byteWritten").toULongLong ();
         }
     } else {
@@ -353,7 +353,7 @@ void PropagateUploadFileV1.abort (PropagatorJob.AbortType abortType) {
     abortNetworkJobs (
         abortType,
         [this, abortType] (AbstractNetworkJob *job) {
-            if (auto *putJob = qobject_cast<PUTFileJob *> (job)){
+            if (auto *putJob = qobject_cast<PUTFileJob> (job)){
                 if (abortType == AbortType.Asynchronous
                     && _chunkCount > 0
                     && ( ( (_currentChunk + _startChunk) % _chunkCount) == 0)

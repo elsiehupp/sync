@@ -1,20 +1,19 @@
 #ifndef PROPAGATEDOWNLOADENCRYPTED_H
-#define PROPAGATEDOWNLOADENCRYPTED_H
+const int PROPAGATEDOWNLOADENCRYPTED_H
 
-// #include <QObject>
+// #include <GLib.Object>
 // #include <QFileInfo>
 
-class QJsonDocument;
 
-namespace OCC {
+namespace Occ {
 
-class PropagateDownloadEncrypted : public QObject {
+class PropagateDownloadEncrypted : GLib.Object {
   Q_OBJECT
 public:
-  PropagateDownloadEncrypted (OwncloudPropagator *propagator, QString &localParentPath, SyncFileItemPtr item, QObject *parent = nullptr);
+  PropagateDownloadEncrypted (OwncloudPropagator *propagator, QString &localParentPath, SyncFileItemPtr item, GLib.Object *parent = nullptr);
   void start ();
   bool decryptFile (QFile& tmpFile);
-  QString errorString () const;
+  QString errorString ();
 
 public slots:
   void checkFolderId (QStringList &list);

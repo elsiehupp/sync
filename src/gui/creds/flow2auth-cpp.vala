@@ -1,17 +1,17 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
- * Copyright (C) by Michael Schuster <michael@schuster.ms>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
+Copyright (C) by Michael Schuster <michael@schuster.ms>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QDesktopServices>
 // #include <QApplication>
@@ -21,23 +21,23 @@
 // #include <QJsonObject>
 // #include <QJsonDocument>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcFlow2auth, "nextcloud.sync.credentials.flow2auth", QtInfoMsg)
 
-Flow2Auth.Flow2Auth (Account *account, QObject *parent)
-    : QObject (parent)
+Flow2Auth.Flow2Auth (Account *account, GLib.Object *parent)
+    : GLib.Object (parent)
     , _account (account)
     , _isBusy (false)
     , _hasToken (false) {
     _pollTimer.setInterval (1000);
-    QObject.connect (&_pollTimer, &QTimer.timeout, this, &Flow2Auth.slotPollTimerTimeout);
+    GLib.Object.connect (&_pollTimer, &QTimer.timeout, this, &Flow2Auth.slotPollTimerTimeout);
 }
 
 Flow2Auth.~Flow2Auth () = default;
 
 void Flow2Auth.start () {
-    // Note: All startup code is in openBrowser () to allow reinitiate a new request with
+    // Note : All startup code is in openBrowser () to allow reinitiate a new request with
     //       fresh tokens. Opening the same pollEndpoint link twice triggers an expiration
     //       message by the server (security, intended design).
     openBrowser ();
@@ -64,11 +64,11 @@ void Flow2Auth.fetchNewToken (TokenAction action) {
 
     emit statusChanged (PollStatus.statusFetchToken, 0);
 
-    // Step 1: Initiate a login, do an anonymous POST request
+    // Step 1 : Initiate a login, do an anonymous POST request
     QUrl url = Utility.concatUrlPath (_account.url ().toString (), QLatin1String ("/index.php/login/v2"));
     _enforceHttps = url.scheme () == QStringLiteral ("https");
 
-    // add 'Content-Length: 0' header (see https://github.com/nextcloud/desktop/issues/1473)
+    // add 'Content-Length : 0' header (see https://github.com/nextcloud/desktop/issues/1473)
     QNetworkRequest req;
     req.setHeader (QNetworkRequest.ContentLengthHeader, "0");
     req.setHeader (QNetworkRequest.UserAgentHeader, Utility.friendlyUserAgentString ());
@@ -76,7 +76,7 @@ void Flow2Auth.fetchNewToken (TokenAction action) {
     auto job = _account.sendRequest ("POST", url, req);
     job.setTimeout (qMin (30 * 1000ll, job.timeoutMsec ()));
 
-    QObject.connect (job, &SimpleNetworkJob.finishedSignal, this, [this, action] (QNetworkReply *reply) {
+    GLib.Object.connect (job, &SimpleNetworkJob.finishedSignal, this, [this, action] (QNetworkReply *reply) {
         auto jsonData = reply.readAll ();
         QJsonParseError jsonParseError;
         QJsonObject json = QJsonDocument.fromJson (jsonData, &jsonParseError).object ();
@@ -99,13 +99,13 @@ void Flow2Auth.fetchNewToken (TokenAction action) {
             QString errorReason;
             QString errorFromJson = json["error"].toString ();
             if (!errorFromJson.isEmpty ()) {
-                errorReason = tr ("Error returned from the server: <em>%1</em>")
+                errorReason = tr ("Error returned from the server : <em>%1</em>")
                                   .arg (errorFromJson.toHtmlEscaped ());
             } else if (reply.error () != QNetworkReply.NoError) {
-                errorReason = tr ("There was an error accessing the \"token\" endpoint: <br><em>%1</em>")
+                errorReason = tr ("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
                                   .arg (reply.errorString ().toHtmlEscaped ());
             } else if (jsonParseError.error != QJsonParseError.NoError) {
-                errorReason = tr ("Could not parse the JSON returned from the server: <br><em>%1</em>")
+                errorReason = tr ("Could not parse the JSON returned from the server : <br><em>%1</em>")
                                   .arg (jsonParseError.errorString ());
             } else {
                 errorReason = tr ("The reply from the server did not contain all expected fields");
@@ -177,7 +177,7 @@ void Flow2Auth.slotPollTimerTimeout () {
     }
     emit statusChanged (PollStatus.statusPollNow, 0);
 
-    // Step 2: Poll
+    // Step 2 : Poll
     QNetworkRequest req;
     req.setHeader (QNetworkRequest.ContentTypeHeader, "application/x-www-form-urlencoded");
 
@@ -188,7 +188,7 @@ void Flow2Auth.slotPollTimerTimeout () {
     auto job = _account.sendRequest ("POST", _pollEndpoint, req, requestBody);
     job.setTimeout (qMin (30 * 1000ll, job.timeoutMsec ()));
 
-    QObject.connect (job, &SimpleNetworkJob.finishedSignal, this, [this] (QNetworkReply *reply) {
+    GLib.Object.connect (job, &SimpleNetworkJob.finishedSignal, this, [this] (QNetworkReply *reply) {
         auto jsonData = reply.readAll ();
         QJsonParseError jsonParseError;
         QJsonObject json = QJsonDocument.fromJson (jsonData, &jsonParseError).object ();
@@ -212,13 +212,13 @@ void Flow2Auth.slotPollTimerTimeout () {
             QString errorReason;
             QString errorFromJson = json["error"].toString ();
             if (!errorFromJson.isEmpty ()) {
-                errorReason = tr ("Error returned from the server: <em>%1</em>")
+                errorReason = tr ("Error returned from the server : <em>%1</em>")
                                   .arg (errorFromJson.toHtmlEscaped ());
             } else if (reply.error () != QNetworkReply.NoError) {
-                errorReason = tr ("There was an error accessing the \"token\" endpoint: <br><em>%1</em>")
+                errorReason = tr ("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
                                   .arg (reply.errorString ().toHtmlEscaped ());
             } else if (jsonParseError.error != QJsonParseError.NoError) {
-                errorReason = tr ("Could not parse the JSON returned from the server: <br><em>%1</em>")
+                errorReason = tr ("Could not parse the JSON returned from the server : <br><em>%1</em>")
                                   .arg (jsonParseError.errorString ());
             } else {
                 errorReason = tr ("The reply from the server did not contain all expected fields");
@@ -233,7 +233,7 @@ void Flow2Auth.slotPollTimerTimeout () {
             appPassword.clear ();
             loginName.clear ();
 
-            // Failed: poll again
+            // Failed : poll again
             _secondsLeft = _secondsInterval;
             _isBusy = false;
             return;
@@ -242,7 +242,7 @@ void Flow2Auth.slotPollTimerTimeout () {
         _pollTimer.stop ();
 
         // Success
-        qCInfo (lcFlow2auth) << "Success getting the appPassword for user: " << loginName << ", server: " << serverUrl.toString ();
+        qCInfo (lcFlow2auth) << "Success getting the appPassword for user : " << loginName << ", server : " << serverUrl.toString ();
 
         _account.setUrl (serverUrl);
 
@@ -270,4 +270,4 @@ void Flow2Auth.slotPollNow () {
     slotPollTimerTimeout ();
 }
 
-} // namespace OCC
+} // namespace Occ

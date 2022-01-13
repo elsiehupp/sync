@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Roeland Jago Douma <rullzer@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Roeland Jago Douma <rullzer@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QUrl>
 // #include <QJsonDocument>
@@ -19,11 +19,11 @@
 
 Q_LOGGING_CATEGORY (lcUserGroupShare, "nextcloud.gui.usergroupshare", QtInfoMsg)
 
-namespace OCC {
+namespace Occ {
 
 /**
- * When a share is modified, we need to tell the folders so they can adjust overlay icons
- */
+When a share is modified, we need to tell the folders so they can adjust overlay icons
+*/
 static void updateFolder (AccountPtr &account, QString &path) {
     foreach (Folder *f, FolderMan.instance ().map ()) {
         if (f.accountState ().account () != account)
@@ -328,8 +328,8 @@ void UserGroupShare.slotExpireDateSet (QJsonDocument &reply, QVariant &value) {
     emit expireDateSet ();
 }
 
-ShareManager.ShareManager (AccountPtr account, QObject *parent)
-    : QObject (parent)
+ShareManager.ShareManager (AccountPtr account, GLib.Object *parent)
+    : GLib.Object (parent)
     , _account (account) {
 }
 

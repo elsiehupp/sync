@@ -1,24 +1,23 @@
 /*
- * Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 
-// #include <QObject>
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
 
-class QWidget;
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
-namespace OCC {
+// #include <GLib.Object>
 
-class ConflictSolver : public QObject {
+
+namespace Occ {
+
+class ConflictSolver : GLib.Object {
     Q_PROPERTY (QString localVersionFilename READ localVersionFilename WRITE setLocalVersionFilename NOTIFY localVersionFilenameChanged)
     Q_PROPERTY (QString remoteVersionFilename READ remoteVersionFilename WRITE setRemoteVersionFilename NOTIFY remoteVersionFilenameChanged)
 public:
@@ -28,10 +27,10 @@ public:
         KeepBothVersions
     };
 
-    explicit ConflictSolver (QWidget *parent = nullptr);
+    ConflictSolver (QWidget *parent = nullptr);
 
-    QString localVersionFilename () const;
-    QString remoteVersionFilename () const;
+    QString localVersionFilename ();
+    QString remoteVersionFilename ();
 
     bool exec (Solution solution);
 
@@ -53,6 +52,4 @@ private:
     QString _remoteVersionFilename;
 };
 
-} // namespace OCC
-
-#endif // CONFLICTSOLVER_H
+} // namespace Occ

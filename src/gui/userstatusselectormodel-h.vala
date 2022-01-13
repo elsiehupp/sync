@@ -1,23 +1,23 @@
 /*
- * Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #pragma once
 
 // #include <userstatusconnector.h>
 // #include <datetimeprovider.h>
 
-// #include <QObject>
+// #include <GLib.Object>
 // #include <QMetaType>
 // #include <QtNumeric>
 
@@ -25,13 +25,13 @@
 // #include <memory>
 // #include <vector>
 
-namespace OCC {
+namespace Occ {
 
-class UserStatusSelectorModel : public QObject {
+class UserStatusSelectorModel : GLib.Object {
 
     Q_PROPERTY (QString userStatusMessage READ userStatusMessage NOTIFY userStatusChanged)
     Q_PROPERTY (QString userStatusEmoji READ userStatusEmoji WRITE setUserStatusEmoji NOTIFY userStatusChanged)
-    Q_PROPERTY (OCC.UserStatus.OnlineStatus onlineStatus READ onlineStatus WRITE setOnlineStatus NOTIFY onlineStatusChanged)
+    Q_PROPERTY (Occ.UserStatus.OnlineStatus onlineStatus READ onlineStatus WRITE setOnlineStatus NOTIFY onlineStatusChanged)
     Q_PROPERTY (int predefinedStatusesCount READ predefinedStatusesCount NOTIFY predefinedStatusesChanged)
     Q_PROPERTY (QStringList clearAtValues READ clearAtValues CONSTANT)
     Q_PROPERTY (QString clearAt READ clearAt NOTIFY clearAtChanged)
@@ -42,50 +42,50 @@ class UserStatusSelectorModel : public QObject {
     Q_PROPERTY (QUrl invisibleIcon READ invisibleIcon CONSTANT)
 
 public:
-    explicit UserStatusSelectorModel (QObject *parent = nullptr);
+    UserStatusSelectorModel (GLib.Object *parent = nullptr);
 
-    explicit UserStatusSelectorModel (std.shared_ptr<UserStatusConnector> userStatusConnector,
-        QObject *parent = nullptr);
+    UserStatusSelectorModel (std.shared_ptr<UserStatusConnector> userStatusConnector,
+        GLib.Object *parent = nullptr);
 
-    explicit UserStatusSelectorModel (std.shared_ptr<UserStatusConnector> userStatusConnector,
+    UserStatusSelectorModel (std.shared_ptr<UserStatusConnector> userStatusConnector,
         std.unique_ptr<DateTimeProvider> dateTimeProvider,
-        QObject *parent = nullptr);
+        GLib.Object *parent = nullptr);
 
-    explicit UserStatusSelectorModel (UserStatus &userStatus,
+    UserStatusSelectorModel (UserStatus &userStatus,
         std.unique_ptr<DateTimeProvider> dateTimeProvider,
-        QObject *parent = nullptr);
+        GLib.Object *parent = nullptr);
 
-    explicit UserStatusSelectorModel (UserStatus &userStatus,
-        QObject *parent = nullptr);
+    UserStatusSelectorModel (UserStatus &userStatus,
+        GLib.Object *parent = nullptr);
 
     Q_INVOKABLE void load (int id);
 
-    Q_REQUIRED_RESULT UserStatus.OnlineStatus onlineStatus () const;
-    Q_INVOKABLE void setOnlineStatus (OCC.UserStatus.OnlineStatus status);
+    Q_REQUIRED_RESULT UserStatus.OnlineStatus onlineStatus ();
+    Q_INVOKABLE void setOnlineStatus (Occ.UserStatus.OnlineStatus status);
 
-    Q_REQUIRED_RESULT QUrl onlineIcon () const;
-    Q_REQUIRED_RESULT QUrl awayIcon () const;
-    Q_REQUIRED_RESULT QUrl dndIcon () const;
-    Q_REQUIRED_RESULT QUrl invisibleIcon () const;
+    Q_REQUIRED_RESULT QUrl onlineIcon ();
+    Q_REQUIRED_RESULT QUrl awayIcon ();
+    Q_REQUIRED_RESULT QUrl dndIcon ();
+    Q_REQUIRED_RESULT QUrl invisibleIcon ();
 
-    Q_REQUIRED_RESULT QString userStatusMessage () const;
+    Q_REQUIRED_RESULT QString userStatusMessage ();
     Q_INVOKABLE void setUserStatusMessage (QString &message);
     void setUserStatusEmoji (QString &emoji);
-    Q_REQUIRED_RESULT QString userStatusEmoji () const;
+    Q_REQUIRED_RESULT QString userStatusEmoji ();
 
     Q_INVOKABLE void setUserStatus ();
     Q_INVOKABLE void clearUserStatus ();
 
-    Q_REQUIRED_RESULT int predefinedStatusesCount () const;
+    Q_REQUIRED_RESULT int predefinedStatusesCount ();
     Q_INVOKABLE UserStatus predefinedStatus (int index) const;
     Q_INVOKABLE QString predefinedStatusClearAt (int index) const;
     Q_INVOKABLE void setPredefinedStatus (int index);
 
-    Q_REQUIRED_RESULT QStringList clearAtValues () const;
-    Q_REQUIRED_RESULT QString clearAt () const;
+    Q_REQUIRED_RESULT QStringList clearAtValues ();
+    Q_REQUIRED_RESULT QString clearAt ();
     Q_INVOKABLE void setClearAt (int index);
 
-    Q_REQUIRED_RESULT QString errorMessage () const;
+    Q_REQUIRED_RESULT QString errorMessage ();
 
 signals:
     void errorMessageChanged ();

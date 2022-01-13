@@ -1,33 +1,30 @@
 /*
- * Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 // #pragma once
 
-// #include <QObject>
+// #include <GLib.Object>
 
-class QLocalServer;
 class QLocalSocket;
 
-namespace OCC {
-class GETFileJob;
+namespace Occ {
 class SyncJournalDb;
-class VfsCfApi;
 
 namespace EncryptionHelper {
     class StreamingDecryptor;
 };
 
-class HydrationJob : public QObject {
+class HydrationJob : GLib.Object {
 public:
     enum Status {
         Success = 0,
@@ -36,40 +33,40 @@ public:
     };
     Q_ENUM (Status)
 
-    explicit HydrationJob (QObject *parent = nullptr);
+    HydrationJob (GLib.Object *parent = nullptr);
 
-    AccountPtr account () const;
+    AccountPtr account ();
     void setAccount (AccountPtr &account);
 
-    QString remotePath () const;
+    QString remotePath ();
     void setRemotePath (QString &remotePath);
 
-    QString localPath () const;
+    QString localPath ();
     void setLocalPath (QString &localPath);
 
-    SyncJournalDb *journal () const;
+    SyncJournalDb *journal ();
     void setJournal (SyncJournalDb *journal);
 
-    QString requestId () const;
+    QString requestId ();
     void setRequestId (QString &requestId);
 
-    QString folderPath () const;
+    QString folderPath ();
     void setFolderPath (QString &folderPath);
 
-    bool isEncryptedFile () const;
+    bool isEncryptedFile ();
     void setIsEncryptedFile (bool isEncrypted);
 
-    QString e2eMangledName () const;
+    QString e2eMangledName ();
     void setE2eMangledName (QString &e2eMangledName);
 
-    int64 fileTotalSize () const;
+    int64 fileTotalSize ();
     void setFileTotalSize (int64 totalSize);
 
-    Status status () const;
+    Status status ();
 
     void start ();
     void cancel ();
-    void finalize (OCC.VfsCfApi *vfs);
+    void finalize (Occ.VfsCfApi *vfs);
 
 public slots:
     void slotCheckFolderId (QStringList &list);
@@ -112,4 +109,4 @@ private:
     Status _status = Success;
 };
 
-} // namespace OCC
+} // namespace Occ

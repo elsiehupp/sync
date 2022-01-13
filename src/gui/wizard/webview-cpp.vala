@@ -15,28 +15,28 @@
 // #include <QWebEngineCertificateError>
 // #include <QMessageBox>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcWizardWebiew, "nextcloud.gui.wizard.webview", QtInfoMsg)
 
-class WebViewPageUrlRequestInterceptor : public QWebEngineUrlRequestInterceptor {
+class WebViewPageUrlRequestInterceptor : QWebEngineUrlRequestInterceptor {
 public:
-    WebViewPageUrlRequestInterceptor (QObject *parent = nullptr);
+    WebViewPageUrlRequestInterceptor (GLib.Object *parent = nullptr);
     void interceptRequest (QWebEngineUrlRequestInfo &info) override;
 };
 
-class WebViewPageUrlSchemeHandler : public QWebEngineUrlSchemeHandler {
+class WebViewPageUrlSchemeHandler : QWebEngineUrlSchemeHandler {
 public:
-    WebViewPageUrlSchemeHandler (QObject *parent = nullptr);
+    WebViewPageUrlSchemeHandler (GLib.Object *parent = nullptr);
     void requestStarted (QWebEngineUrlRequestJob *request) override;
 
-Q_SIGNALS:
+signals:
     void urlCatched (QString user, QString pass, QString host);
 };
 
-class WebEnginePage : public QWebEnginePage {
+class WebEnginePage : QWebEnginePage {
 public:
-    WebEnginePage (QWebEngineProfile *profile, QObject* parent = nullptr);
+    WebEnginePage (QWebEngineProfile *profile, GLib.Object* parent = nullptr);
     QWebEnginePage * createWindow (QWebEnginePage.WebWindowType type) override;
     void setUrl (QUrl &url);
 
@@ -51,9 +51,9 @@ private:
 
 // We need a separate class here, since we cannot simply return the same WebEnginePage object
 // this leads to a strage segfault somewhere deep inside of the QWebEngine code
-class ExternalWebEnginePage : public QWebEnginePage {
+class ExternalWebEnginePage : QWebEnginePage {
 public:
-    ExternalWebEnginePage (QWebEngineProfile *profile, QObject* parent = nullptr);
+    ExternalWebEnginePage (QWebEngineProfile *profile, GLib.Object* parent = nullptr);
     bool acceptNavigationRequest (QUrl &url, QWebEnginePage.NavigationType type, bool isMainFrame) override;
 };
 
@@ -79,7 +79,7 @@ WebView.WebView (QWidget *parent)
 
     /*
      * Set a proper accept langauge to the language of the client
-     * code from: http://code.qt.io/cgit/qt/qtbase.git/tree/src/network/access/qhttpnetworkconnection.cpp
+     * code from : http://code.qt.io/cgit/qt/qtbase.git/tree/src/network/access/qhttpnetworkconnection.cpp
      */ {
         QString systemLocale = QLocale.system ().name ().replace (QChar.fromLatin1 ('_'),QChar.fromLatin1 ('-'));
         QString acceptLanguage;
@@ -117,7 +117,7 @@ WebView.~WebView () {
     delete _page;
 }
 
-WebViewPageUrlRequestInterceptor.WebViewPageUrlRequestInterceptor (QObject *parent)
+WebViewPageUrlRequestInterceptor.WebViewPageUrlRequestInterceptor (GLib.Object *parent)
     : QWebEngineUrlRequestInterceptor (parent) {
 
 }
@@ -126,7 +126,7 @@ void WebViewPageUrlRequestInterceptor.interceptRequest (QWebEngineUrlRequestInfo
     info.setHttpHeader ("OCS-APIREQUEST", "true");
 }
 
-WebViewPageUrlSchemeHandler.WebViewPageUrlSchemeHandler (QObject *parent)
+WebViewPageUrlSchemeHandler.WebViewPageUrlSchemeHandler (GLib.Object *parent)
     : QWebEngineUrlSchemeHandler (parent) {
 
 }
@@ -151,7 +151,7 @@ void WebViewPageUrlSchemeHandler.requestStarted (QWebEngineUrlRequestJob *reques
         }
     }
 
-    qCDebug (lcWizardWebiew ()) << "Got raw user from request path: " << user;
+    qCDebug (lcWizardWebiew ()) << "Got raw user from request path : " << user;
 
     user = user.replace (QChar ('+'), QChar (' '));
     password = password.replace (QChar ('+'), QChar (' '));
@@ -162,12 +162,12 @@ void WebViewPageUrlSchemeHandler.requestStarted (QWebEngineUrlRequestJob *reques
     if (!server.startsWith ("http://") && !server.startsWith ("https://")) {
         server = "https://" + server;
     }
-    qCInfo (lcWizardWebiew ()) << "Got user: " << user << ", server: " << server;
+    qCInfo (lcWizardWebiew ()) << "Got user : " << user << ", server : " << server;
 
     emit urlCatched (user, password, server);
 }
 
-WebEnginePage.WebEnginePage (QWebEngineProfile *profile, QObject* parent) : QWebEnginePage (profile, parent) {
+WebEnginePage.WebEnginePage (QWebEngineProfile *profile, GLib.Object* parent) : QWebEnginePage (profile, parent) {
 
 }
 
@@ -213,7 +213,7 @@ bool WebEnginePage.acceptNavigationRequest (QUrl &url, QWebEnginePage.Navigation
     return true;
 }
 
-ExternalWebEnginePage.ExternalWebEnginePage (QWebEngineProfile *profile, QObject* parent) : QWebEnginePage (profile, parent) {
+ExternalWebEnginePage.ExternalWebEnginePage (QWebEngineProfile *profile, GLib.Object* parent) : QWebEnginePage (profile, parent) {
 
 }
 

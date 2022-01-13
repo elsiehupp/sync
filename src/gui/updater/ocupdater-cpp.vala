@@ -1,18 +1,18 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-// #include <QObject>
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
+
+// #include <GLib.Object>
 // #include <QtCore>
 // #include <QtNetwork>
 // #include <QtGui>
@@ -20,7 +20,7 @@
 
 // #include <cstdio>
 
-namespace OCC {
+namespace Occ {
 
 static const char updateAvailableC[] = "Updater/updateAvailable";
 static const char updateTargetVersionC[] = "Updater/updateTargetVersion";
@@ -28,13 +28,13 @@ static const char updateTargetVersionStringC[] = "Updater/updateTargetVersionStr
 static const char seenVersionC[] = "Updater/seenVersion";
 static const char autoUpdateAttemptedC[] = "Updater/autoUpdateAttempted";
 
-UpdaterScheduler.UpdaterScheduler (QObject *parent)
-    : QObject (parent) {
+UpdaterScheduler.UpdaterScheduler (GLib.Object *parent)
+    : GLib.Object (parent) {
     connect (&_updateCheckTimer, &QTimer.timeout,
         this, &UpdaterScheduler.slotTimerFired);
 
-    // Note: the sparkle-updater is not an OCUpdater
-    if (auto *updater = qobject_cast<OCUpdater *> (Updater.instance ())) {
+    // Note : the sparkle-updater is not an OCUpdater
+    if (auto *updater = qobject_cast<OCUpdater> (Updater.instance ())) {
         connect (updater, &OCUpdater.newUpdateAvailable,
             this, &UpdaterScheduler.updaterAnnouncement);
         connect (updater, &OCUpdater.requestRestart, this, &UpdaterScheduler.requestRestart);
@@ -137,7 +137,7 @@ QString OCUpdater.statusString (UpdateStatusStringFormat format) {
         return tr ("Downloading %1. Please wait …").arg (updateVersion);
     case DownloadComplete:
         return tr ("%1 available. Restart application to start the update.").arg (updateVersion);
-    case DownloadFailed: {
+    case DownloadFailed : {
         if (format == UpdateStatusStringFormat.Html) {
             return tr ("Could not download update. Please open <a href='%1'>%1</a> to download the update manually.").arg (_updateInfo.web ());
         }
@@ -145,7 +145,7 @@ QString OCUpdater.statusString (UpdateStatusStringFormat format) {
     }
     case DownloadTimedOut:
         return tr ("Could not check for new updates.");
-    case UpdateOnlyAvailableThroughSystem: {
+    case UpdateOnlyAvailableThroughSystem : {
         if (format == UpdateStatusStringFormat.Html) {
             return tr ("New %1 is available. Please open <a href='%2'>%2</a> to download the update.").arg (updateVersion, _updateInfo.web ());
         }
@@ -154,7 +154,7 @@ QString OCUpdater.statusString (UpdateStatusStringFormat format) {
     case CheckingServer:
         return tr ("Checking update server …");
     case Unknown:
-        return tr ("Update status is unknown: Did not check for new updates.");
+        return tr ("Update status is unknown : Did not check for new updates.");
     case UpToDate:
     // fall through
     default:
@@ -237,10 +237,10 @@ bool OCUpdater.updateSucceeded () {
 
 void OCUpdater.slotVersionInfoArrived () {
     _timeoutWatchdog.stop ();
-    auto *reply = qobject_cast<QNetworkReply *> (sender ());
+    auto *reply = qobject_cast<QNetworkReply> (sender ());
     reply.deleteLater ();
     if (reply.error () != QNetworkReply.NoError) {
-        qCWarning (lcUpdater) << "Failed to reach version check url: " << reply.errorString ();
+        qCWarning (lcUpdater) << "Failed to reach version check url : " << reply.errorString ();
         setDownloadState (DownloadTimedOut);
         return;
     }
@@ -268,7 +268,7 @@ NSISUpdater.NSISUpdater (QUrl &url)
 }
 
 void NSISUpdater.slotWriteFile () {
-    auto *reply = qobject_cast<QNetworkReply *> (sender ());
+    auto *reply = qobject_cast<QNetworkReply> (sender ());
     if (_file.isOpen ()) {
         _file.write (reply.readAll ());
     }
@@ -287,7 +287,7 @@ void NSISUpdater.wipeUpdateData () {
 }
 
 void NSISUpdater.slotDownloadFinished () {
-    auto *reply = qobject_cast<QNetworkReply *> (sender ());
+    auto *reply = qobject_cast<QNetworkReply> (sender ());
     reply.deleteLater ();
     if (reply.error () != QNetworkReply.NoError) {
         setDownloadState (DownloadFailed);
@@ -455,7 +455,7 @@ void NSISUpdater.showUpdateErrorDialog (QString &targetVersion) {
         wipeUpdateData ();
         slotSetSeenVersion ();
     });
-    // askagain: do nothing
+    // askagain : do nothing
     connect (retry, &QAbstractButton.clicked, this, [this] () {
         slotStartInstaller ();
     });
@@ -478,7 +478,7 @@ bool NSISUpdater.handleStartup () {
         // did it try to execute the update?
         if (settings.value (autoUpdateAttemptedC, false).toBool ()) {
             if (updateSucceeded ()) {
-                // success: clean up
+                // success : clean up
                 qCInfo (lcUpdater) << "The requested update attempt has succeeded"
                         << Helper.currentVersionToInt ();
                 wipeUpdateData ();
@@ -510,7 +510,7 @@ PassiveUpdateNotifier.PassiveUpdateNotifier (QUrl &url)
     : OCUpdater (url) {
     // remember the version of the currently running binary. On Linux it might happen that the
     // package management updates the package while the app is running. This is detected in the
-    // updater slot: If the installed binary on the hd has a different version than the one
+    // updater slot : If the installed binary on the hd has a different version than the one
     // running, the running app is restarted. That happens in folderman.
     _runningAppVersion = Utility.versionOfInstalledBinary ();
 }

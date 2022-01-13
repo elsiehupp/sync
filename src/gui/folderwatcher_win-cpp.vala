@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QThread>
 // #include <QDir>
@@ -19,7 +19,7 @@
 // #include <stdio.h>
 // #include <tchar.h>
 
-namespace OCC {
+namespace Occ {
 
 void WatcherThread.watchChanges (size_t fileNotifyBufferSize,
     bool *increaseBufferSize) {
@@ -56,7 +56,7 @@ void WatcherThread.watchChanges (size_t fileNotifyBufferSize,
         ResetEvent (_resultEvent);
 
         FILE_NOTIFY_INFORMATION *pFileNotifyBuffer =
-                reinterpret_cast<FILE_NOTIFY_INFORMATION *> (fileNotifyBuffer.data ());
+                reinterpret_cast<FILE_NOTIFY_INFORMATION> (fileNotifyBuffer.data ());
         DWORD dwBytesReturned = 0;
         if (!ReadDirectoryChangesW (_directory, pFileNotifyBuffer,
                 static_cast<DWORD> (fileNotifyBufferSize), true,
@@ -115,7 +115,7 @@ void WatcherThread.watchChanges (size_t fileNotifyBufferSize,
             QString longfile = longPath + QString.fromWCharArray (curEntry.FileName, len);
 
             // Unless the file was removed or renamed, get its full long name
-            // TODO: We could still try expanding the path in the tricky cases...
+            // TODO : We could still try expanding the path in the tricky cases...
             if (curEntry.Action != FILE_ACTION_REMOVED
                 && curEntry.Action != FILE_ACTION_RENAMED_OLD_NAME) {
                 const auto wfile = longfile.toStdWString ();
@@ -137,7 +137,7 @@ void WatcherThread.watchChanges (size_t fileNotifyBufferSize,
 #endif
             longfile = QDir.cleanPath (longfile);
 
-            // Skip modifications of folders: One of these is triggered for changes
+            // Skip modifications of folders : One of these is triggered for changes
             // and new files in a folder, probably because of the folder's mtime
             // changing. We don't need them.
             const bool skip = curEntry.Action == FILE_ACTION_MODIFIED
@@ -153,7 +153,7 @@ void WatcherThread.watchChanges (size_t fileNotifyBufferSize,
                 break;
             }
             // FILE_NOTIFY_INFORMATION has no fixed size and the offset is in bytes therefor we first need to cast to char
-            curEntry = reinterpret_cast<FILE_NOTIFY_INFORMATION *> (reinterpret_cast<char*> (curEntry) + curEntry.NextEntryOffset);
+            curEntry = reinterpret_cast<FILE_NOTIFY_INFORMATION> (reinterpret_cast<char> (curEntry) + curEntry.NextEntryOffset);
         }
     }
 
@@ -219,4 +219,4 @@ FolderWatcherPrivate.~FolderWatcherPrivate () {
     delete _thread;
 }
 
-} // namespace OCC
+} // namespace Occ

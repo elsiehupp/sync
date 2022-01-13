@@ -1,15 +1,15 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *    support, and with no warranty, express or implied, as to its usefulness for
- *    any purpose.
- *
- */
+   This software is in the public domain, furnished "as is", without technical
+   support, and with no warranty, express or implied, as to its usefulness for
+   any purpose.
+
+*/
 
 // #include <QtTest>
 
-using namespace OCC;
+using namespace Occ;
 
-class StatusPushSpy : public QSignalSpy {
+class StatusPushSpy : QSignalSpy {
     SyncEngine &_syncEngine;
 public:
     StatusPushSpy (SyncEngine &syncEngine)
@@ -45,7 +45,7 @@ public:
     }
 };
 
-class TestSyncFileStatusTracker : public QObject {
+class TestSyncFileStatusTracker : GLib.Object {
 
     void verifyThatPushMatchesPull (FakeFolder &fakeFolder, StatusPushSpy &statusSpy) {
         QString root = fakeFolder.localPath ();

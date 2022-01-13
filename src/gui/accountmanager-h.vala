@@ -1,26 +1,26 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #pragma once
 
-namespace OCC {
+namespace Occ {
 
 /**
    @brief The AccountManager class
    @ingroup gui
 */
-class AccountManager : public QObject {
+class AccountManager : GLib.Object {
 public:
     static AccountManager *instance ();
     ~AccountManager () override = default;
@@ -53,7 +53,7 @@ public:
      * Return a list of all accounts.
      * (this is a list of QSharedPointer for internal reasons, one should normally not keep a copy of them)
      */
-    QList<AccountStatePtr> accounts () const;
+    QList<AccountStatePtr> accounts ();
 
     /**
      * Return the account state pointer for an account identified by its display name
@@ -85,7 +85,7 @@ private:
     bool restoreFromLegacySettings ();
 
     bool isAccountIdAvailable (QString &id) const;
-    QString generateFreeAccountId () const;
+    QString generateFreeAccountId ();
 
     // Adds an account to the tracked list, emitting accountAdded ()
     void addAccountState (AccountState *accountState);
@@ -105,7 +105,7 @@ public slots:
     /// Display a Box with the mnemonic so the user can copy it to a safe place.
     static void displayMnemonic (QString& mnemonic);
 
-Q_SIGNALS:
+signals:
     void accountAdded (AccountState *account);
     void accountRemoved (AccountState *account);
     void accountSyncConnectionRemoved (AccountState *account);

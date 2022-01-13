@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QLabel>
 // #include <QStandardItemModel>
@@ -29,18 +29,18 @@
 
 namespace {
 const QString TOOLBAR_CSS () {
-    return QStringLiteral ("QToolBar { background: %1; margin: 0; padding: 0; border: none; border-bottom: 1px solid %2; spacing: 0; } "
-                          "QToolBar QToolButton { background: %1; border: none; border-bottom: 1px solid %2; margin: 0; padding: 5px; } "
+    return QStringLiteral ("QToolBar { background : %1; margin : 0; padding : 0; border : none; border-bottom : 1px solid %2; spacing : 0; } "
+                          "QToolBar QToolButton { background : %1; border : none; border-bottom : 1px solid %2; margin : 0; padding : 5px; } "
                           "QToolBar QToolBarExtension { padding:0; } "
-                          "QToolBar QToolButton:checked { background: %3; color: %4; }");
+                          "QToolBar QToolButton:checked { background : %3; color : %4; }");
 }
 
 const float buttonSizeRatio = 1.618f; // golden ratio
 
 /** display name with two lines that is displayed in the settings
- * If width is bigger than 0, the string will be ellided so it does not exceed that width
- */
-QString shortDisplayNameForSettings (OCC.Account *account, int width) {
+If width is bigger than 0, the string will be ellided so it does not exceed that width
+*/
+QString shortDisplayNameForSettings (Occ.Account *account, int width) {
     QString user = account.davDisplayName ();
     if (user.isEmpty ()) {
         user = account.credentials ().user ();
@@ -61,7 +61,7 @@ QString shortDisplayNameForSettings (OCC.Account *account, int width) {
 }
 }
 
-namespace OCC {
+namespace Occ {
 
 SettingsDialog.SettingsDialog (ownCloudGui *gui, QWidget *parent)
     : QDialog (parent)
@@ -83,7 +83,7 @@ SettingsDialog.SettingsDialog (ownCloudGui *gui, QWidget *parent)
 
     setObjectName ("Settings"); // required as group for saveGeometry call
 
-    //: This name refers to the application name e.g Nextcloud
+    // : This name refers to the application name e.g Nextcloud
     setWindowTitle (tr ("%1 Settings").arg (Theme.instance ().appNameGUI ()));
 
     connect (AccountManager.instance (), &AccountManager.accountAdded,
@@ -190,7 +190,7 @@ void SettingsDialog.slotSwitchPage (QAction *action) {
 }
 
 void SettingsDialog.showFirstPage () {
-    QList<QAction *> actions = _toolBar.actions ();
+    QList<QAction> actions = _toolBar.actions ();
     if (!actions.empty ()) {
         actions.first ().trigger ();
     }
@@ -247,7 +247,7 @@ void SettingsDialog.accountAdded (AccountState *s) {
 }
 
 void SettingsDialog.slotAccountAvatarChanged () {
-    auto *account = static_cast<Account *> (sender ());
+    auto *account = static_cast<Account> (sender ());
     if (account && _actionForAccount.contains (account)) {
         QAction *action = _actionForAccount[account];
         if (action) {
@@ -260,7 +260,7 @@ void SettingsDialog.slotAccountAvatarChanged () {
 }
 
 void SettingsDialog.slotAccountDisplayNameChanged () {
-    auto *account = static_cast<Account *> (sender ());
+    auto *account = static_cast<Account> (sender ());
     if (account && _actionForAccount.contains (account)) {
         QAction *action = _actionForAccount[account];
         if (action) {
@@ -274,7 +274,7 @@ void SettingsDialog.slotAccountDisplayNameChanged () {
 
 void SettingsDialog.accountRemoved (AccountState *s) {
     for (auto it = _actionGroupWidgets.begin (); it != _actionGroupWidgets.end (); ++it) {
-        auto as = qobject_cast<AccountSettings *> (*it);
+        auto as = qobject_cast<AccountSettings> (*it);
         if (!as) {
             continue;
         }
@@ -314,22 +314,22 @@ void SettingsDialog.customizeStyle () {
     Q_FOREACH (QAction *a, _actionGroup.actions ()) {
         QIcon icon = Theme.createColorAwareIcon (a.property ("iconPath").toString (), palette ());
         a.setIcon (icon);
-        auto *btn = qobject_cast<QToolButton *> (_toolBar.widgetForAction (a));
+        auto *btn = qobject_cast<QToolButton> (_toolBar.widgetForAction (a));
         if (btn)
             btn.setIcon (icon);
     }
 }
 
-class ToolButtonAction : public QWidgetAction {
+class ToolButtonAction : QWidgetAction {
 public:
-    explicit ToolButtonAction (QIcon &icon, QString &text, QObject *parent)
+    ToolButtonAction (QIcon &icon, QString &text, GLib.Object *parent)
         : QWidgetAction (parent) {
         setText (text);
         setIcon (icon);
     }
 
     QWidget *createWidget (QWidget *parent) override {
-        auto toolbar = qobject_cast<QToolBar *> (parent);
+        auto toolbar = qobject_cast<QToolBar> (parent);
         if (!toolbar) {
             // this means we are in the extention menu, no special action here
             return nullptr;
@@ -362,4 +362,4 @@ QAction *SettingsDialog.createColorAwareAction (QString &iconPath, QString &text
     return createActionWithIcon (coloredIcon, text, iconPath);
 }
 
-} // namespace OCC
+} // namespace Occ

@@ -1,17 +1,17 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@kde.org>
- * Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@kde.org>
+Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QLoggingCategory>
 // #include <QMutex>
@@ -26,7 +26,7 @@
 
 // #include <QAuthenticator>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcHttpCredentials, "nextcloud.sync.credentials.http", QtInfoMsg)
 
@@ -41,9 +41,9 @@ namespace {
     const char needRetryC[] = "owncloud-need-retry";
 } // ns
 
-class HttpCredentialsAccessManager : public AccessManager {
+class HttpCredentialsAccessManager : AccessManager {
 public:
-    HttpCredentialsAccessManager (HttpCredentials *cred, QObject *parent = nullptr)
+    HttpCredentialsAccessManager (HttpCredentials *cred, GLib.Object *parent = nullptr)
         : AccessManager (parent)
         , _cred (cred) {
     }
@@ -175,7 +175,7 @@ void HttpCredentials.fetchFromKeychain () {
 void HttpCredentials.fetchFromKeychainHelper () {
     _clientCertBundle = _account.credentialSetting (QLatin1String (clientCertBundleC)).toByteArray ();
     if (!_clientCertBundle.isEmpty ()) {
-        // New case (>=2.6): We have a bundle in the settings and read the password from
+        // New case (>=2.6) : We have a bundle in the settings and read the password from
         // the keychain
         auto job = new QKeychain.ReadPasswordJob (Theme.instance ().appName ());
         addSettingsToJob (_account, job);
@@ -186,7 +186,7 @@ void HttpCredentials.fetchFromKeychainHelper () {
         return;
     }
 
-    // Old case (pre 2.6): Read client cert and then key from keychain
+    // Old case (pre 2.6) : Read client cert and then key from keychain
     const QString kck = keychainKey (
         _account.url ().toString (),
         _user + clientCertificatePEMC,
@@ -231,7 +231,7 @@ bool HttpCredentials.keychainUnavailableRetryLater (QKeychain.ReadPasswordJob *i
 }
 
 void HttpCredentials.slotReadClientCertPasswordJobDone (QKeychain.Job *job) {
-    auto readJob = qobject_cast<QKeychain.ReadPasswordJob*> (job);
+    auto readJob = qobject_cast<QKeychain.ReadPasswordJob> (job);
     if (keychainUnavailableRetryLater (readJob))
         return;
 
@@ -251,7 +251,7 @@ void HttpCredentials.slotReadClientCertPasswordJobDone (QKeychain.Job *job) {
 }
 
 void HttpCredentials.slotReadClientCertPEMJobDone (QKeychain.Job *incoming) {
-    auto readJob = qobject_cast<QKeychain.ReadPasswordJob*> (incoming);
+    auto readJob = qobject_cast<QKeychain.ReadPasswordJob> (incoming);
     if (keychainUnavailableRetryLater (readJob))
         return;
 
@@ -278,7 +278,7 @@ void HttpCredentials.slotReadClientCertPEMJobDone (QKeychain.Job *incoming) {
 }
 
 void HttpCredentials.slotReadClientKeyPEMJobDone (QKeychain.Job *incoming) {
-    auto readJob = qobject_cast<QKeychain.ReadPasswordJob*> (incoming);
+    auto readJob = qobject_cast<QKeychain.ReadPasswordJob> (incoming);
     // Store key in memory
 
     if (readJob.error () == QKeychain.NoError && readJob.binaryData ().length () > 0) {
@@ -322,7 +322,7 @@ bool HttpCredentials.stillValid (QNetworkReply *reply) {
 }
 
 void HttpCredentials.slotReadJobDone (QKeychain.Job *incoming) {
-    auto *job = static_cast<QKeychain.ReadPasswordJob *> (incoming);
+    auto *job = static_cast<QKeychain.ReadPasswordJob> (incoming);
     QKeychain.Error error = job.error ();
 
     // If we can't find the credentials at the keys that include the account id,
@@ -343,7 +343,7 @@ void HttpCredentials.slotReadJobDone (QKeychain.Job *incoming) {
     }
 
     if (_user.isEmpty ()) {
-        qCWarning (lcHttpCredentials) << "Strange: User is empty!";
+        qCWarning (lcHttpCredentials) << "Strange : User is empty!";
     }
 
     if (!_refreshToken.isEmpty () && error == QKeychain.NoError) {
@@ -392,13 +392,13 @@ bool HttpCredentials.refreshAccessToken () {
 
     auto job = _account.sendRequest ("POST", requestToken, req, requestBody);
     job.setTimeout (qMin (30 * 1000ll, job.timeoutMsec ()));
-    QObject.connect (job, &SimpleNetworkJob.finishedSignal, this, [this] (QNetworkReply *reply) {
+    GLib.Object.connect (job, &SimpleNetworkJob.finishedSignal, this, [this] (QNetworkReply *reply) {
         auto jsonData = reply.readAll ();
         QJsonParseError jsonParseError;
         QJsonObject json = QJsonDocument.fromJson (jsonData, &jsonParseError).object ();
         QString accessToken = json["access_token"].toString ();
         if (jsonParseError.error != QJsonParseError.NoError || json.isEmpty ()) {
-            // Invalid or empty JSON: Network error maybe?
+            // Invalid or empty JSON : Network error maybe?
             qCWarning (lcHttpCredentials) << "Error while refreshing the token" << reply.errorString () << jsonData << jsonParseError.errorString ();
         } else if (accessToken.isEmpty ()) {
             // If the json was valid, but the reply did not contain an access token, the token
@@ -435,7 +435,7 @@ void HttpCredentials.invalidateToken () {
 
     const QString kck = keychainKey (_account.url ().toString (), _user, _account.id ());
     if (kck.isEmpty ()) {
-        qCWarning (lcHttpCredentials) << "InvalidateToken: User is empty, bailing out!";
+        qCWarning (lcHttpCredentials) << "InvalidateToken : User is empty, bailing out!";
         return;
     }
 
@@ -487,7 +487,7 @@ void HttpCredentials.persist () {
 
     // write secrets to the keychain
     if (!_clientCertBundle.isEmpty ()) {
-        // Option 1: If we have a pkcs12 bundle, that'll be written to the config file
+        // Option 1 : If we have a pkcs12 bundle, that'll be written to the config file
         // and we'll just store the bundle password in the keychain. That's prefered
         // since the keychain on older Windows platforms can only store a limited number
         // of bytes per entry and key/cert may exceed that.
@@ -501,7 +501,7 @@ void HttpCredentials.persist () {
         _clientCertBundle.clear ();
         _clientCertPassword.clear ();
     } else if (_account.credentialSetting (QLatin1String (clientCertBundleC)).isNull () && !_clientSslCertificate.isNull ()) {
-        // Option 2, pre 2.6 configs: We used to store the raw cert/key in the keychain and
+        // Option 2, pre 2.6 configs : We used to store the raw cert/key in the keychain and
         // still do so if no bundle is available. We can't currently migrate to Option 1
         // because we have no functions for creating an encrypted pkcs12 bundle.
         auto *job = new QKeychain.WritePasswordJob (Theme.instance ().appName ());
@@ -512,7 +512,7 @@ void HttpCredentials.persist () {
         job.setBinaryData (_clientSslCertificate.toPem ());
         job.start ();
     } else {
-        // Option 3: no client certificate at all (or doesn't need to be written)
+        // Option 3 : no client certificate at all (or doesn't need to be written)
         slotWritePasswordToKeychain ();
     }
 }
@@ -578,7 +578,7 @@ void HttpCredentials.slotAuthentication (QNetworkReply *reply, QAuthenticator *a
     Q_UNUSED (authenticator)
     // Because of issue #4326, we need to set the login and password manually at every requests
     // Thus, if we reach this signal, those credentials were invalid and we terminate.
-    qCWarning (lcHttpCredentials) << "Stop request: Authentication failed for " << reply.url ().toString ();
+    qCWarning (lcHttpCredentials) << "Stop request : Authentication failed for " << reply.url ().toString ();
     reply.setProperty (authenticationFailedC, true);
 
     if (_isRenewingOAuthToken) {
@@ -613,4 +613,4 @@ bool HttpCredentials.unpackClientCertBundle () {
             &certBuffer, &_clientSslKey, &_clientSslCertificate, &clientCaCertificates, _clientCertPassword);
 }
 
-} // namespace OCC
+} // namespace Occ

@@ -1,10 +1,10 @@
 
 Q_LOGGING_CATEGORY (lcPropagateDownloadEncrypted, "nextcloud.sync.propagator.download.encrypted", QtInfoMsg)
 
-namespace OCC {
+namespace Occ {
 
-PropagateDownloadEncrypted.PropagateDownloadEncrypted (OwncloudPropagator *propagator, QString &localParentPath, SyncFileItemPtr item, QObject *parent)
-    : QObject (parent)
+PropagateDownloadEncrypted.PropagateDownloadEncrypted (OwncloudPropagator *propagator, QString &localParentPath, SyncFileItemPtr item, GLib.Object *parent)
+    : GLib.Object (parent)
     , _propagator (propagator)
     , _localParentPath (localParentPath)
     , _item (item)
@@ -39,7 +39,7 @@ void PropagateDownloadEncrypted.folderIdError () {
 }
 
 void PropagateDownloadEncrypted.checkFolderId (QStringList &list) {
-  auto job = qobject_cast<LsColJob*> (sender ());
+  auto job = qobject_cast<LsColJob> (sender ());
   const QString folderId = list.first ();
   qCDebug (lcPropagateDownloadEncrypted) << "Received id of folder" << folderId;
 
@@ -82,7 +82,7 @@ void PropagateDownloadEncrypted.checkFolderEncryptedMetadata (QJsonDocument &jso
   qCCritical (lcPropagateDownloadEncrypted) << "Failed to find encrypted metadata information of remote file" << filename;
 }
 
-// TODO: Fix this. Exported in the wrong place.
+// TODO : Fix this. Exported in the wrong place.
 QString createDownloadTmpFileName (QString &previous);
 
 bool PropagateDownloadEncrypted.decryptFile (QFile& tmpFile) {

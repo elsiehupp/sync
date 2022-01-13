@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QDir>
 // #include <QRegularExpression>
@@ -28,15 +28,15 @@
 namespace {
 constexpr int CrashLogSize = 20;
 }
-namespace OCC {
+namespace Occ {
 
 Logger *Logger.instance () {
     static Logger log;
     return &log;
 }
 
-Logger.Logger (QObject *parent)
-    : QObject (parent) {
+Logger.Logger (GLib.Object *parent)
+    : GLib.Object (parent) {
     qSetMessagePattern (QStringLiteral ("%{time yyyy-MM-dd hh:mm:ss:zzz} [ %{type} %{category} %{file}:%{line} "
                                       "]%{if-debug}\t[ %{function} ]%{endif}:\t%{message}"));
     _crashLog.resize (CrashLogSize);
@@ -279,4 +279,4 @@ void Logger.enterNextLogFile () {
     }
 }
 
-} // namespace OCC
+} // namespace Occ

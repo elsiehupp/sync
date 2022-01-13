@@ -1,30 +1,29 @@
 /*
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QThread>
 // #include <QAtomicInt>
 // #include <windows.h>
 
-namespace OCC {
+namespace Occ {
 
-class FolderWatcher;
 
 /**
- * @brief The WatcherThread class
- * @ingroup gui
- */
-class WatcherThread : public QThread {
+@brief The WatcherThread class
+@ingroup gui
+*/
+class WatcherThread : QThread {
 public:
     WatcherThread (QString &path)
         : QThread ()
@@ -59,10 +58,10 @@ private:
 };
 
 /**
- * @brief Windows implementation of FolderWatcher
- * @ingroup gui
- */
-class FolderWatcherPrivate : public QObject {
+@brief Windows implementation of FolderWatcher
+@ingroup gui
+*/
+class FolderWatcherPrivate : GLib.Object {
 public:
     FolderWatcherPrivate (FolderWatcher *p, QString &path);
     ~FolderWatcherPrivate ();
@@ -75,5 +74,3 @@ private:
     WatcherThread *_thread;
 };
 }
-
-#endif // MIRALL_FOLDERWATCHER_WIN_H

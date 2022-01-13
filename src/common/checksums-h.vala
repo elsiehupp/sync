@@ -1,52 +1,50 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This library is free software; you can redistribute it and
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later versi
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GN
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+*/
 
 // #pragma once
 
-// #include <QObject>
+// #include <GLib.Object>
 // #include <QByteArray>
 // #include <QFutureWatcher>
 
 // #include <memory>
 
-class QFile;
 
-namespace OCC {
+namespace Occ {
 
 /**
- * Tags for checksum headers values.
- * They are here for being shared between Upload- and Download Job
- */
+Tags for checksum headers values.
+They are here for being shared between Upload- and Download Job
+*/
 static const char checkSumMD5C[] = "MD5";
 static const char checkSumSHA1C[] = "SHA1";
 static const char checkSumSHA2C[] = "SHA256";
 static const char checkSumSHA3C[] = "SHA3-256";
 static const char checkSumAdlerC[] = "Adler32";
 
-class SyncJournalDb;
 
 /**
- * Returns the highest-quality checksum in a 'checksums'
- * property retrieved from the server.
- *
- * Example: "ADLER32:1231 SHA1:ab124124 MD5:2131affa21"
- *       . "SHA1:ab124124"
- */
+Returns the highest-quality checksum in a 'checksums'
+property retrieved from the server.
+
+Example : "ADLER32:1231 SHA1:ab124124 MD5:2131affa21"
+      . "SHA1:ab124124"
+*/
 OCSYNC_EXPORT QByteArray findBestChecksum (QByteArray &checksums);
 
 /// Creates a checksum header from type and value.
@@ -69,12 +67,12 @@ QByteArray OCSYNC_EXPORT calcAdler32 (QIODevice *device);
 #endif
 
 /**
- * Computes the checksum of a file.
- * \ingroup libsync
- */
-class OCSYNC_EXPORT ComputeChecksum : public QObject {
+Computes the checksum of a file.
+\ingroup libsync
+*/
+class ComputeChecksum : GLib.Object {
 public:
-    explicit ComputeChecksum (QObject *parent = nullptr);
+    ComputeChecksum (GLib.Object *parent = nullptr);
     ~ComputeChecksum () override;
 
     /**
@@ -82,7 +80,7 @@ public:
      */
     void setChecksumType (QByteArray &type);
 
-    QByteArray checksumType () const;
+    QByteArray checksumType ();
 
     /**
      * Computes the checksum for the given file path.
@@ -127,12 +125,12 @@ private:
 };
 
 /**
- * Checks whether a file's checksum matches the expected value.
- * @ingroup libsync
- */
-class OCSYNC_EXPORT ValidateChecksumHeader : public QObject {
+Checks whether a file's checksum matches the expected value.
+@ingroup libsync
+*/
+class ValidateChecksumHeader : GLib.Object {
 public:
-    explicit ValidateChecksumHeader (QObject *parent = nullptr);
+    ValidateChecksumHeader (GLib.Object *parent = nullptr);
 
     /**
      * Check a file's actual checksum against the provided checksumHeader
@@ -168,12 +166,12 @@ private:
 };
 
 /**
- * Hooks checksum computations into csync.
- * @ingroup libsync
- */
-class OCSYNC_EXPORT CSyncChecksumHook : public QObject {
+Hooks checksum computations into csync.
+@ingroup libsync
+*/
+class CSyncChecksumHook : GLib.Object {
 public:
-    explicit CSyncChecksumHook ();
+    CSyncChecksumHook ();
 
     /**
      * Returns the checksum value for \a path that is comparable to \a otherChecksum.

@@ -1,33 +1,31 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- * Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QWizard>
 
 #include "../addcertificatedialog.h"
 
-class QLabel;
 class QVariant;
-class QProgressIndicator;
 
-namespace OCC {
+namespace Occ {
 
 /**
- * @brief The OwncloudSetupPage class
- * @ingroup gui
- */
-class OwncloudSetupPage : public QWizardPage {
+@brief The OwncloudSetupPage class
+@ingroup gui
+*/
+class OwncloudSetupPage : QWizardPage {
 public:
     OwncloudSetupPage (QWidget *parent = nullptr);
     ~OwncloudSetupPage () override;
@@ -38,8 +36,8 @@ public:
     void setServerUrl (QString &);
     void setAllowPasswordStorage (bool);
     bool validatePage () override;
-    QString url () const;
-    QString localFolder () const;
+    QString url ();
+    QString localFolder ();
     void setRemoteFolder (QString &remoteFolder);
     void setMultipleFoldersExist (bool exist);
     void setAuthType (DetermineAuthTypeJob.AuthType type);
@@ -78,6 +76,6 @@ private:
     AddCertificateDialog *addCertDial = nullptr;
 };
 
-} // namespace OCC
+} // namespace Occ
 
 #endif

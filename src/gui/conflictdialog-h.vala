@@ -1,35 +1,34 @@
 /*
- * Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QDialog>
 
-namespace OCC {
+namespace Occ {
 
-class ConflictSolver;
 
 namespace Ui {
     class ConflictDialog;
 }
 
-class ConflictDialog : public QDialog {
+class ConflictDialog : QDialog {
 public:
-    explicit ConflictDialog (QWidget *parent = nullptr);
+    ConflictDialog (QWidget *parent = nullptr);
     ~ConflictDialog () override;
 
-    QString baseFilename () const;
-    QString localVersionFilename () const;
-    QString remoteVersionFilename () const;
+    QString baseFilename ();
+    QString localVersionFilename ();
+    QString remoteVersionFilename ();
 
 public slots:
     void setBaseFilename (QString &baseFilename);
@@ -47,6 +46,4 @@ private:
     ConflictSolver *_solver;
 };
 
-} // namespace OCC
-
-#endif // CONFLICTDIALOG_H
+} // namespace Occ

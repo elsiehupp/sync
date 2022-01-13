@@ -1,26 +1,25 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- * Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
-class QProgressIndicator;
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
 
-namespace OCC {
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
+
+
+namespace Occ {
 
 /**
- * @brief The OwncloudHttpCredsPage class
- */
-class OwncloudHttpCredsPage : public AbstractCredentialsWizardPage {
+@brief The OwncloudHttpCredsPage class
+*/
+class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
 public:
     OwncloudHttpCredsPage (QWidget *parent);
 
@@ -33,7 +32,7 @@ public:
     void setConnected ();
     void setErrorString (QString &err);
 
-Q_SIGNALS:
+signals:
     void connectToOCUrl (QString &);
 
 public slots:
@@ -51,6 +50,6 @@ private:
     OwncloudWizard *_ocWizard;
 };
 
-} // namespace OCC
+} // namespace Occ
 
 #endif

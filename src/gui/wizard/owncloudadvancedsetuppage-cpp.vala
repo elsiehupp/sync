@@ -1,17 +1,17 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- * Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QDir>
 // #include <QFileDialog>
@@ -23,7 +23,7 @@
 
 // #include <folderman.h>
 
-namespace OCC {
+namespace Occ {
 
 OwncloudAdvancedSetupPage.OwncloudAdvancedSetupPage (OwncloudWizard *wizard)
     : QWizardPage ()
@@ -130,7 +130,7 @@ void OwncloudAdvancedSetupPage.initializePage () {
     // ensure "next" gets the focus, not obSelectLocalFolder
     QTimer.singleShot (0, wizard ().button (QWizard.FinishButton), qOverload<> (&QWidget.setFocus));
 
-    auto acc = static_cast<OwncloudWizard *> (wizard ()).account ();
+    auto acc = static_cast<OwncloudWizard> (wizard ()).account ();
     auto quotaJob = new PropfindJob (acc, _remoteFolder, this);
     quotaJob.setProperties (QList<QByteArray> () << "http://owncloud.org/ns:size");
 
@@ -154,7 +154,7 @@ void OwncloudAdvancedSetupPage.initializePage () {
 
     customizeStyle ();
 
-    auto nextButton = qobject_cast<QPushButton *> (_ocWizard.button (QWizard.NextButton));
+    auto nextButton = qobject_cast<QPushButton> (_ocWizard.button (QWizard.NextButton));
     if (nextButton) {
         nextButton.setDefault (true);
     }
@@ -172,7 +172,7 @@ void OwncloudAdvancedSetupPage.fetchUserAvatar () {
     }
     const auto avatarJob = new AvatarJob (account, account.davUser (), avatarSize, this);
     avatarJob.setTimeout (20 * 1000);
-    QObject.connect (avatarJob, &AvatarJob.avatarPixmap, this, [this] (QImage &avatarImage) {
+    GLib.Object.connect (avatarJob, &AvatarJob.avatarPixmap, this, [this] (QImage &avatarImage) {
         if (avatarImage.isNull ()) {
             return;
         }
@@ -191,7 +191,7 @@ void OwncloudAdvancedSetupPage.setUserInformation () {
 }
 
 void OwncloudAdvancedSetupPage.refreshVirtualFilesAvailibility (QString &path) {
-    // TODO: remove when UX decision is made
+    // TODO : remove when UX decision is made
     if (!_ui.rVirtualFileSync.isVisible ()) {
         return;
     }
@@ -241,7 +241,7 @@ void OwncloudAdvancedSetupPage.updateStatus () {
 
         const bool dirNotEmpty (QDir (locFolder).entryList (QDir.AllEntries | QDir.NoDotAndDotDot).count () > 0);
         if (dirNotEmpty) {
-            t += tr ("Warning: The local folder is not empty. Pick a resolution!");
+            t += tr ("Warning : The local folder is not empty. Pick a resolution!");
         }
         setResolutionGuiVisible (dirNotEmpty);
     } else {
@@ -249,7 +249,7 @@ void OwncloudAdvancedSetupPage.updateStatus () {
     }
 
     QString lfreeSpaceStr = Utility.octetsToString (availableLocalSpace ());
-    _ui.lFreeSpace.setText (QString (tr ("%1 free space", "%1 gets replaced with the size and a matching unit. Example: 3 MB or 5 GB")).arg (lfreeSpaceStr));
+    _ui.lFreeSpace.setText (QString (tr ("%1 free space", "%1 gets replaced with the size and a matching unit. Example : 3 MB or 5 GB")).arg (lfreeSpaceStr));
 
     _ui.syncModeLabel.setText (t);
     _ui.syncModeLabel.setFixedHeight (_ui.syncModeLabel.sizeHint ().height ());
@@ -289,8 +289,8 @@ void OwncloudAdvancedSetupPage.stopSpinner () {
 }
 
 QUrl OwncloudAdvancedSetupPage.serverUrl () {
-    const QString urlString = static_cast<OwncloudWizard *> (wizard ()).ocUrl ();
-    const QString user = static_cast<OwncloudWizard *> (wizard ()).getCredentials ().user ();
+    const QString urlString = static_cast<OwncloudWizard> (wizard ()).ocUrl ();
+    const QString user = static_cast<OwncloudWizard> (wizard ()).getCredentials ().user ();
 
     QUrl url (urlString);
     url.setUserName (user);
@@ -381,7 +381,7 @@ void OwncloudAdvancedSetupPage.setRemoteFolder (QString &remoteFolder) {
 void OwncloudAdvancedSetupPage.slotSelectFolder () {
     QString dir = QFileDialog.getExistingDirectory (nullptr, tr ("Local Sync Folder"), QDir.homePath ());
     if (!dir.isEmpty ()) {
-        // TODO: remove when UX decision is made
+        // TODO : remove when UX decision is made
         refreshVirtualFilesAvailibility (dir);
 
         setLocalFolderPushButtonPath (dir);
@@ -409,7 +409,7 @@ void OwncloudAdvancedSetupPage.setLocalFolderPushButtonPath (QString &path) {
 }
 
 void OwncloudAdvancedSetupPage.slotSelectiveSyncClicked () {
-    AccountPtr acc = static_cast<OwncloudWizard *> (wizard ()).account ();
+    AccountPtr acc = static_cast<OwncloudWizard> (wizard ()).account ();
     auto *dlg = new SelectiveSyncDialog (acc, _remoteFolder, _selectiveSyncBlacklist, this);
     dlg.setAttribute (Qt.WA_DeleteOnClose);
 
@@ -548,4 +548,4 @@ void OwncloudAdvancedSetupPage.setupResoultionWidget () {
     }
 }
 
-} // namespace OCC
+} // namespace Occ

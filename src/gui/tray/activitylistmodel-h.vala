@@ -1,37 +1,34 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QtCore>
 
-class QJsonDocument;
 
-namespace OCC {
+namespace Occ {
 
 Q_DECLARE_LOGGING_CATEGORY (lcActivity)
 
-class AccountState;
 class ConflictDialog;
-class InvalidFilenameDialog;
 
 /**
- * @brief The ActivityListModel
- * @ingroup gui
- *
- * Simple list model to provide the list view with data.
- */
+@brief The ActivityListModel
+@ingroup gui
 
-class ActivityListModel : public QAbstractListModel {
+Simple list model to provide the list view with data.
+*/
+
+class ActivityListModel : QAbstractListModel {
 
     Q_PROPERTY (AccountState *accountState READ accountState CONSTANT)
 public:
@@ -57,10 +54,10 @@ public:
     };
     Q_ENUM (DataRole)
 
-    explicit ActivityListModel (QObject *parent = nullptr);
+    ActivityListModel (GLib.Object *parent = nullptr);
 
-    explicit ActivityListModel (AccountState *accountState,
-        QObject *parent = nullptr);
+    ActivityListModel (AccountState *accountState,
+        GLib.Object *parent = nullptr);
 
     QVariant data (QModelIndex &index, int role) const override;
     int rowCount (QModelIndex &parent = QModelIndex ()) const override;
@@ -81,7 +78,7 @@ public:
     Q_INVOKABLE void triggerDefaultAction (int activityIndex);
     Q_INVOKABLE void triggerAction (int activityIndex, int actionIndex);
 
-    AccountState *accountState () const;
+    AccountState *accountState ();
 
 public slots:
     void slotRefreshActivity ();
@@ -97,7 +94,7 @@ protected:
 
     void setAccountState (AccountState *state);
     void setCurrentlyFetching (bool value);
-    bool currentlyFetching () const;
+    bool currentlyFetching ();
     void setDoneFetching (bool value);
     void setHideOldActivities (bool value);
     void setDisplayActions (bool value);
@@ -106,7 +103,7 @@ protected:
 
 private:
     void combineActivityLists ();
-    bool canFetchActivities () const;
+    bool canFetchActivities ();
 
     ActivityList _activityLists;
     ActivityList _syncFileItemLists;
@@ -133,5 +130,3 @@ private:
     bool _hideOldActivities = true;
 };
 }
-
-#endif // ACTIVITYLISTMODEL_H

@@ -1,17 +1,17 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QProcess>
 // #include <QSettings>
@@ -20,13 +20,13 @@
 // #include <QDesktopServices>
 // #include <QApplication>
 
-#define QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
+const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
 
 #if ! (QTLEGACY)
 // #include <QOperatingSystemVersion>
 #endif
 
-namespace OCC {
+namespace Occ {
 
 // according to the QStandardDir impl from Qt5
 static QStringList xdgDataDirs () {
@@ -136,7 +136,7 @@ void showInFileManager (QString &localPath) {
     std.replace (args.begin (), args.end (), QString.fromLatin1 ("%f"), fileToOpen);
     std.replace (args.begin (), args.end (), QString.fromLatin1 ("%F"), fileToOpen);
 
-    // fixme: needs to append --icon, according to http://standards.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html#exec-variables
+    // fixme : needs to append --icon, according to http://standards.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html#exec-variables
     QStringList.iterator it = std.find (args.begin (), args.end (), QString.fromLatin1 ("%i"));
     if (it != args.end ()) {
         (*it) = desktopFile.value ("Desktop Entry/Icon").toString ();
@@ -147,7 +147,7 @@ void showInFileManager (QString &localPath) {
         args << fileToOpen;
 
     if (app.isEmpty () || args.isEmpty () || !canHandleFile) {
-        // fall back: open the default file manager, without ever selecting the file
+        // fall back : open the default file manager, without ever selecting the file
         QDesktopServices.openUrl (QUrl.fromLocalFile (pathToOpen));
     } else {
         QProcess.startDetached (app, args);

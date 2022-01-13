@@ -1,27 +1,27 @@
 /*
- * Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QStringList>
 // #include <QHash>
 // #include <QDateTime>
 
-namespace OCC {
+namespace Occ {
 
 /**
- * @brief The SyncResult class
- * @ingroup libsync
- */
+@brief The SyncResult class
+@ingroup libsync
+*/
 class OWNCLOUDSYNC_EXPORT SyncResult {
     Q_GADGET
 public:
@@ -43,16 +43,16 @@ public:
     void reset ();
 
     void appendErrorString (QString &);
-    QString errorString () const;
-    QStringList errorStrings () const;
+    QString errorString ();
+    QStringList errorStrings ();
     void clearErrors ();
 
     void setStatus (Status);
-    Status status () const;
-    QString statusString () const;
-    QDateTime syncTime () const;
+    Status status ();
+    QString statusString ();
+    QDateTime syncTime ();
     void setFolder (QString &folder);
-    QString folder () const;
+    QString folder ();
 
     bool foundFilesNotSynced () { return _foundFilesNotSynced; }
     bool folderStructureWasChanged () { return _folderStructureWasChanged; }

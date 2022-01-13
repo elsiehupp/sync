@@ -1,18 +1,18 @@
 /*
- * Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <iostream>
 // #include <random>
@@ -30,9 +30,8 @@
 // #include <QDesktopServices>
 // #include <QGuiApplication>
 
-class QSocket;
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcApplication, "nextcloud.gui.application", QtInfoMsg)
 
@@ -149,11 +148,11 @@ Application.Application (int &argc, char **argv)
 
     qsrand (std.random_device () ());
 
-    // TODO: Can't set this without breaking current config paths
+    // TODO : Can't set this without breaking current config paths
     //    setOrganizationName (QLatin1String (APPLICATION_VENDOR));
     setOrganizationDomain (QLatin1String (APPLICATION_REV_DOMAIN));
 
-    // setDesktopFilename to provide wayland compatibility (in general: conformance with naming standards)
+    // setDesktopFilename to provide wayland compatibility (in general : conformance with naming standards)
     // but only on Qt >= 5.7, where setDesktopFilename was introduced
 #if (QT_VERSION >= 0x050700)
     QString desktopFileName = QString (QLatin1String (LINUX_APPLICATION_ID)
@@ -168,7 +167,7 @@ Application.Application (int &argc, char **argv)
         // Migrate from version <= 2.4
         setApplicationName (_theme.appNameGUI ());
 #ifndef QT_WARNING_DISABLE_DEPRECATED // Was added in Qt 5.9
-#define QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-declarations")
+const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-declarations")
 #endif
         QT_WARNING_PUSH
         QT_WARNING_DISABLE_DEPRECATED
@@ -383,7 +382,7 @@ void Application.slotCleanup () {
     _gui.deleteLater ();
 }
 
-// FIXME: This is not ideal yet since a ConnectionValidator might already be running and is in
+// FIXME : This is not ideal yet since a ConnectionValidator might already be running and is in
 // progress of timing out in some seconds.
 // Maybe we need 2 validators, one triggered by timer, one by network configuration changes?
 void Application.slotSystemOnlineConfigurationChanged (QNetworkConfiguration cnf) {
@@ -430,7 +429,7 @@ void Application.slotownCloudWizardDone (int res) {
         _checkConnectionTimer.start ();
         slotCheckConnection ();
 
-        // If one account is configured: enable autostart
+        // If one account is configured : enable autostart
 #ifndef QT_DEBUG
         bool shouldSetAutoStart = AccountManager.instance ().accounts ().size () == 1;
 #else
@@ -472,7 +471,7 @@ void Application.slotUseMonoIconsChanged (bool) {
     _gui.slotComputeOverallSyncStatus ();
 }
 
-void Application.slotParseMessage (QString &msg, QObject *) {
+void Application.slotParseMessage (QString &msg, GLib.Object *) {
     if (msg.startsWith (QLatin1String ("MSG_PARSEOPTIONS:"))) {
         const int lengthOfMsgPrefix = 17;
         QStringList options = msg.mid (lengthOfMsgPrefix).split (QLatin1Char ('|'));
@@ -647,7 +646,7 @@ void Application.setupTranslations () {
         const QString trPath = applicationTrPath ();
         const QString trFile = QLatin1String ("client_") + lang;
         if (translator.load (trFile, trPath) || lang.startsWith (QLatin1String ("en"))) {
-            // Permissive approach: Qt and keychain translations
+            // Permissive approach : Qt and keychain translations
             // may be missing, but Qt translations must be there in order
             // for us to accept the language. Otherwise, we try with the next.
             // "en" is an exception as it is the default language and may not
@@ -706,7 +705,7 @@ void Application.openVirtualFile (QString &filename) {
     auto folder = FolderMan.instance ().folderForPath (filename);
     if (!folder) {
         qWarning (lcApplication) << "Can't find sync folder for" << filename;
-        // TODO: show a QMessageBox for errors
+        // TODO : show a QMessageBox for errors
         return;
     }
     QString relativePath = QDir.cleanPath (filename).mid (folder.cleanPath ().length () + 1);
@@ -730,4 +729,4 @@ bool Application.event (QEvent *event) {
     return SharedTools.QtSingleApplication.event (event);
 }
 
-} // namespace OCC
+} // namespace Occ

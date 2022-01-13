@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QAbstractItemModelTester>
 // #include <QDesktopServices>
@@ -19,14 +19,14 @@
 
 namespace {
 /**
- * @brief The FakeDesktopServicesUrlHandler
- * overrides QDesktopServices.openUrl
+@brief The FakeDesktopServicesUrlHandler
+overrides QDesktopServices.openUrl
  **/
-class FakeDesktopServicesUrlHandler : public QObject {
+class FakeDesktopServicesUrlHandler : GLib.Object {
 
 public:
-    FakeDesktopServicesUrlHandler (QObject *parent = nullptr)
-        : QObject (parent) {}
+    FakeDesktopServicesUrlHandler (GLib.Object *parent = nullptr)
+        : GLib.Object (parent) {}
 
 public:
 signals:
@@ -34,8 +34,8 @@ signals:
 };
 
 /**
- * @brief The FakeProvider
- * is a simple structure that represents initial list of providers and their properties
+@brief The FakeProvider
+is a simple structure that represents initial list of providers and their properties
  **/
 class FakeProvider {
 public:
@@ -49,7 +49,7 @@ public:
 static const QVector<FakeProvider> fakeProvidersInitInfo = { {QStringLiteral ("settings_apps"), QStringLiteral ("Apps"), -50, 10}, {QStringLiteral ("talk-message"), QStringLiteral ("Messages"), -2, 17}, {QStringLiteral ("files"), QStringLiteral ("Files"), 5, 3}, {QStringLiteral ("deck"), QStringLiteral ("Deck"), 10, 5}, {QStringLiteral ("comments"), QStringLiteral ("Comments"), 10, 2}, {QStringLiteral ("mail"), QStringLiteral ("Mails"), 10, 15}, {QStringLiteral ("calendar"), QStringLiteral ("Events"), 30, 11}
 };
 
-static QByteArray fake404Response = R" ( {"ocs":{"meta":{"status":"failure","statuscode":404,"message":"Invalid query, please check the syntax. API specifications are here: http:\/\/www.freedesktop.org\/wiki\/Specifications\/open-collaboration-services.\n"},"data":[]}}
+static QByteArray fake404Response = R" ( {"ocs":{"meta":{"status":"failure","statuscode":404,"message":"Invalid query, please check the syntax. API specifications are here : http:\/\/www.freedesktop.org\/wiki\/Specifications\/open-collaboration-services.\n"},"data":[]}}
 )";
 
 static QByteArray fake400Response = R" ( {"ocs":{"meta":{"status":"failure","statuscode":400,"message":"Parameter is incorrect.\n"},"data":[]}}
@@ -59,8 +59,8 @@ static QByteArray fake500Response = R" ( {"ocs":{"meta":{"status":"failure","sta
 )";
 
 /**
- * @brief The FakeSearchResultsStorage
- * emulates the real server storage that contains all the results that UnifiedSearchListmodel will search for
+@brief The FakeSearchResultsStorage
+emulates the real server storage that contains all the results that UnifiedSearchListmodel will search for
  **/
 class FakeSearchResultsStorage { {lass Provider
     {
@@ -234,15 +234,15 @@ FakeSearchResultsStorage *FakeSearchResultsStorage._instance = nullptr;
 
 }
 
-class TestUnifiedSearchListmodel : public QObject {
+class TestUnifiedSearchListmodel : GLib.Object {
 
 public:
     TestUnifiedSearchListmodel () = default;
 
     QScopedPointer<FakeQNAM> fakeQnam;
-    OCC.AccountPtr account;
-    QScopedPointer<OCC.AccountState> accountState;
-    QScopedPointer<OCC.UnifiedSearchResultsListModel> model;
+    Occ.AccountPtr account;
+    QScopedPointer<Occ.AccountState> accountState;
+    QScopedPointer<Occ.UnifiedSearchResultsListModel> model;
     QScopedPointer<QAbstractItemModelTester> modelTester;
 
     QScopedPointer<FakeDesktopServicesUrlHandler> fakeDesktopServicesUrlHandler;
@@ -252,11 +252,11 @@ public:
 private slots:
     void initTestCase () {
         fakeQnam.reset (new FakeQNAM ({}));
-        account = OCC.Account.create ();
+        account = Occ.Account.create ();
         account.setCredentials (new FakeCredentials{fakeQnam.data ()});
         account.setUrl (QUrl ( ("http://example.de")));
 
-        accountState.reset (new OCC.AccountState (account));
+        accountState.reset (new Occ.AccountState (account));
 
         fakeQnam.setOverride ([this] (QNetworkAccessManager.Operation op, QNetworkRequest &req, QIODevice *device) {
             Q_UNUSED (device);
@@ -292,13 +292,13 @@ private slots:
             }
 
             if (!reply) {
-                return qobject_cast<QNetworkReply*> (new FakeErrorReply (op, req, this, 404, QByteArrayLiteral ("{error: \"Not found!\"}")));
+                return qobject_cast<QNetworkReply> (new FakeErrorReply (op, req, this, 404, QByteArrayLiteral ("{error : \"Not found!\"}")));
             }
 
             return reply;
         });
 
-        model.reset (new OCC.UnifiedSearchResultsListModel (accountState.data ()));
+        model.reset (new Occ.UnifiedSearchResultsListModel (accountState.data ()));
 
         modelTester.reset (new QAbstractItemModelTester (model.data ()));
 
@@ -310,7 +310,7 @@ private slots:
         QVERIFY (model.rowCount () == 0);
 
         // #1 test setSearchTerm actually sets the search term and the signal is emitted
-        QSignalSpy searhTermChanged (model.data (), &OCC.UnifiedSearchResultsListModel.searchTermChanged);
+        QSignalSpy searhTermChanged (model.data (), &Occ.UnifiedSearchResultsListModel.searchTermChanged);
         model.setSearchTerm (QStringLiteral ("dis"));
         QCOMPARE (searhTermChanged.count (), 1);
         QCOMPARE (model.searchTerm (), QStringLiteral ("dis"));
@@ -325,7 +325,7 @@ private slots:
         QVERIFY (!model.isSearchInProgress ());
 
         // #4 test that model has started the search after specific delay
-        QSignalSpy searchInProgressChanged (model.data (), &OCC.UnifiedSearchResultsListModel.isSearchInProgressChanged);
+        QSignalSpy searchInProgressChanged (model.data (), &Occ.UnifiedSearchResultsListModel.isSearchInProgressChanged);
         // allow search jobs to get created within the model
         QVERIFY (searchInProgressChanged.wait ());
         QCOMPARE (searchInProgressChanged.count (), 1);
@@ -345,7 +345,7 @@ private slots:
         model.setSearchTerm (model.searchTerm () + QStringLiteral ("discuss"));
 
         QSignalSpy searchInProgressChanged (
-            model.data (), &OCC.UnifiedSearchResultsListModel.isSearchInProgressChanged);
+            model.data (), &Occ.UnifiedSearchResultsListModel.isSearchInProgressChanged);
 
         QVERIFY (searchInProgressChanged.wait ());
 
@@ -370,7 +370,7 @@ private slots:
         model.setSearchTerm (model.searchTerm () + QStringLiteral ("[empty]"));
 
         QSignalSpy searchInProgressChanged (
-            model.data (), &OCC.UnifiedSearchResultsListModel.isSearchInProgressChanged);
+            model.data (), &Occ.UnifiedSearchResultsListModel.isSearchInProgressChanged);
 
         QVERIFY (searchInProgressChanged.wait ());
 
@@ -392,7 +392,7 @@ private slots:
         QVERIFY (model.rowCount () == 0);
 
         QSignalSpy searchInProgressChanged (
-            model.data (), &OCC.UnifiedSearchResultsListModel.isSearchInProgressChanged);
+            model.data (), &Occ.UnifiedSearchResultsListModel.isSearchInProgressChanged);
 
         // test that search term gets set, search gets started and enough results get returned
         model.setSearchTerm (model.searchTerm () + QStringLiteral ("whatever"));
@@ -411,14 +411,14 @@ private slots:
 
         // test fetch more results
         QSignalSpy currentFetchMoreInProgressProviderIdChanged (
-            model.data (), &OCC.UnifiedSearchResultsListModel.currentFetchMoreInProgressProviderIdChanged);
-        QSignalSpy rowsInserted (model.data (), &OCC.UnifiedSearchResultsListModel.rowsInserted);
+            model.data (), &Occ.UnifiedSearchResultsListModel.currentFetchMoreInProgressProviderIdChanged);
+        QSignalSpy rowsInserted (model.data (), &Occ.UnifiedSearchResultsListModel.rowsInserted);
         for (int i = 0; i < model.rowCount (); ++i) {
-            const auto type = model.data (model.index (i), OCC.UnifiedSearchResultsListModel.DataRole.TypeRole);
+            const auto type = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.TypeRole);
 
-            if (type == OCC.UnifiedSearchResult.Type.FetchMoreTrigger) {
+            if (type == Occ.UnifiedSearchResult.Type.FetchMoreTrigger) {
                 const auto providerId =
-                    model.data (model.index (i), OCC.UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
+                    model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
                         .toString ();
                 model.fetchMoreTriggerClicked (providerId);
                 break;
@@ -454,7 +454,7 @@ private slots:
             currentFetchMoreInProgressProviderIdChanged.clear ();
             rowsInserted.clear ();
 
-            QSignalSpy rowsRemoved (model.data (), &OCC.UnifiedSearchResultsListModel.rowsRemoved);
+            QSignalSpy rowsRemoved (model.data (), &Occ.UnifiedSearchResultsListModel.rowsRemoved);
 
             for (int i = 0; i < 10; ++i) {
                 model.fetchMoreTriggerClicked (providerIdFetchMoreTriggered);
@@ -471,10 +471,10 @@ private slots:
             bool isFetchMoreTriggerFound = false;
 
             for (int i = 0; i < model.rowCount (); ++i) {
-                const auto type = model.data (model.index (i), OCC.UnifiedSearchResultsListModel.DataRole.TypeRole);
-                const auto providerId =  model.data (model.index (i), OCC.UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
+                const auto type = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.TypeRole);
+                const auto providerId =  model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
                             .toString ();
-                if (type == OCC.UnifiedSearchResult.Type.FetchMoreTrigger
+                if (type == Occ.UnifiedSearchResult.Type.FetchMoreTrigger
                     && providerId == providerIdFetchMoreTriggered) {
                     isFetchMoreTriggerFound = true;
                     break;
@@ -494,7 +494,7 @@ private slots:
         model.setSearchTerm (model.searchTerm () + QStringLiteral ("discuss"));
 
         QSignalSpy searchInProgressChanged (
-            model.data (), &OCC.UnifiedSearchResultsListModel.isSearchInProgressChanged);
+            model.data (), &Occ.UnifiedSearchResultsListModel.isSearchInProgressChanged);
 
         QVERIFY (searchInProgressChanged.wait ());
 
@@ -518,13 +518,13 @@ private slots:
         QString urlForClickedResult;
 
         for (int i = 0; i < model.rowCount (); ++i) {
-            const auto type = model.data (model.index (i), OCC.UnifiedSearchResultsListModel.DataRole.TypeRole);
+            const auto type = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.TypeRole);
 
-            if (type == OCC.UnifiedSearchResult.Type.Default) {
+            if (type == Occ.UnifiedSearchResult.Type.Default) {
                 const auto providerId =
-                    model.data (model.index (i), OCC.UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
+                    model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
                         .toString ();
-                urlForClickedResult = model.data (model.index (i), OCC.UnifiedSearchResultsListModel.DataRole.ResourceUrlRole).toString ();
+                urlForClickedResult = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ResourceUrlRole).toString ();
 
                 if (!providerId.isEmpty () && !urlForClickedResult.isEmpty ()) {
                     model.resultClicked (providerId, QUrl (urlForClickedResult));
@@ -547,9 +547,9 @@ private slots:
         model.setSearchTerm (QStringLiteral (""));
         QVERIFY (model.rowCount () == 0);
 
-        QSignalSpy errorStringChanged (model.data (), &OCC.UnifiedSearchResultsListModel.errorStringChanged);
+        QSignalSpy errorStringChanged (model.data (), &Occ.UnifiedSearchResultsListModel.errorStringChanged);
         QSignalSpy searchInProgressChanged (
-            model.data (), &OCC.UnifiedSearchResultsListModel.isSearchInProgressChanged);
+            model.data (), &Occ.UnifiedSearchResultsListModel.isSearchInProgressChanged);
 
         model.setSearchTerm (model.searchTerm () + QStringLiteral ("[HTTP500]"));
 

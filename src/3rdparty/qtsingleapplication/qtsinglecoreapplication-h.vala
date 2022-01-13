@@ -1,7 +1,7 @@
 /****************************************************************************
 **
 ** Copyright (C) 2014 Digia Plc and/or its subsidiary (-ies).
-** Contact: http://www.qt-project.org/legal
+** Contact : http://www.qt-project.org/legal
 **
 ** This file is part of Qt Creator.
 **
@@ -19,7 +19,7 @@
 ** Foundation and appearing in the file LICENSE.LGPL included in the
 ** packaging of this file.  Please review the following information to
 ** ensure the GNU Lesser General Public License version 2.1 requirements
-** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** will be met : http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 **
 ** In addition, as a special exception, Digia gives you certain additional
 ** rights.  These rights are described in the Digia Qt LGPL Exception
@@ -31,22 +31,21 @@
 
 namespace SharedTools {
 
-class QtLocalPeer;
 
-class QtSingleCoreApplication : public QCoreApplication {
+class QtSingleCoreApplication : QCoreApplication {
 
 public:
     QtSingleCoreApplication (int &argc, char **argv);
     QtSingleCoreApplication (QString &id, int &argc, char **argv);
 
     bool isRunning ();
-    QString id () const;
+    QString id ();
     void setBlock (bool value);
 
-public Q_SLOTS:
+public slots:
     bool sendMessage (QString &message, int timeout = 5000);
 
-Q_SIGNALS:
+signals:
     void messageReceived (QString &message);
 
 private:

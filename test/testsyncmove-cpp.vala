@@ -1,14 +1,14 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *    support, and with no warranty, express or implied, as to its usefulness for
- *    any purpose.
- *
- */
+   This software is in the public domain, furnished "as is", without technical
+   support, and with no warranty, express or implied, as to its usefulness for
+   any purpose.
+
+*/
 
 // #include <QtTest>
 // #include <syncengine.h>
 
-using namespace OCC;
+using namespace Occ;
 
 struct OperationCounter {
     int nGET = 0;
@@ -71,7 +71,7 @@ bool expectAndWipeConflict (FileModifier &local, FileInfo state, QString path) {
     return false;
 }
 
-class TestSyncMove : public QObject {
+class TestSyncMove : GLib.Object {
 
 private slots:
     void testMoveCustomRemoteRoot () {
@@ -233,7 +233,7 @@ private slots:
         QCOMPARE (nDELETE, 3);
 
         // Move-and-change, content only -- c1 has no checksum, so we fail to detect this!
-        // NOTE: This is an expected failure.
+        // NOTE : This is an expected failure.
         mtime = fakeFolder.remoteModifier ().find ("C/c1").lastModified;
         fakeFolder.localModifier ().rename ("C/c1", "C/c1m");
         fakeFolder.localModifier ().setContents ("C/c1m", 'C');
@@ -630,7 +630,7 @@ private slots:
             local.mkdir ("B/b1");
             ItemCompletedSpy completeSpy (fakeFolder);
             QVERIFY (fakeFolder.syncOnce ());
-            // BUG: This doesn't behave right
+            // BUG : This doesn't behave right
             //QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         }
     }

@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QFile>
 // #include <QFileInfo>
@@ -18,14 +18,14 @@
 // #include <QDirIterator>
 // #include <QCoreApplication>
 
-namespace OCC {
+namespace Occ {
 
 bool FileSystem.fileEquals (QString &fn1, QString &fn2) {
     // compare two files with given filename and return true if they have the same content
     QFile f1 (fn1);
     QFile f2 (fn2);
     if (!f1.open (QIODevice.ReadOnly) || !f2.open (QIODevice.ReadOnly)) {
-        qCWarning (lcFileSystem) << "fileEquals: Failed to open " << fn1 << "or" << fn2;
+        qCWarning (lcFileSystem) << "fileEquals : Failed to open " << fn1 << "or" << fn2;
         return false;
     }
 
@@ -68,7 +68,7 @@ bool FileSystem.setModTime (QString &filename, time_t modTime) {
     int rc = c_utimes (filename, times);
     if (rc != 0) {
         qCWarning (lcFileSystem) << "Error setting mtime for" << filename
-                                << "failed: rc" << rc << ", errno:" << errno;
+                                << "failed : rc" << rc << ", errno:" << errno;
         return false;
     }
     return true;
@@ -88,8 +88,8 @@ bool FileSystem.verifyFileUnchanged (QString &fileName,
     const time_t actualMtime = getModTime (fileName);
     if ( (actualSize != previousSize && actualMtime > 0) || (actualMtime != previousMtime && previousMtime > 0 && actualMtime > 0)) {
         qCInfo (lcFileSystem) << "File" << fileName << "has changed:"
-                             << "size: " << previousSize << "<." << actualSize
-                             << ", mtime: " << previousMtime << "<." << actualMtime;
+                             << "size : " << previousSize << "<." << actualSize
+                             << ", mtime : " << previousMtime << "<." << actualMtime;
         return false;
     }
     return true;
@@ -121,7 +121,7 @@ bool FileSystem.removeRecursively (QString &path, std.function<void (QString &pa
                     onDeleted (di.filePath (), false);
             } else {
                 if (errors) {
-                    errors.append (QCoreApplication.translate ("FileSystem", "Error removing \"%1\": %2")
+                    errors.append (QCoreApplication.translate ("FileSystem", "Error removing \"%1\" : %2")
                                        .arg (QDir.toNativeSeparators (di.filePath ()), removeError));
                 }
                 qCWarning (lcFileSystem) << "Error removing " << di.filePath () << ':' << removeError;
@@ -155,4 +155,4 @@ bool FileSystem.getInode (QString &filename, uint64 *inode) {
     return false;
 }
 
-} // namespace OCC
+} // namespace Occ

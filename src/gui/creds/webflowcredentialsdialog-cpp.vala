@@ -5,7 +5,7 @@
 #ifdef WITH_WEBENGINE
 #endif // WITH_WEBENGINE
 
-namespace OCC {
+namespace Occ {
 
 WebFlowCredentialsDialog.WebFlowCredentialsDialog (Account *account, bool useFlow2, QWidget *parent)
     : QDialog (parent)
@@ -52,7 +52,7 @@ WebFlowCredentialsDialog.WebFlowCredentialsDialog (Account *account, bool useFlo
 #endif // WITH_WEBENGINE
     }
 
-    auto app = static_cast<Application *> (qApp);
+    auto app = static_cast<Application> (qApp);
     connect (app, &Application.isShowingSettingsDialog, this, &WebFlowCredentialsDialog.slotShowSettingsDialog);
 
     _errorLabel = new QLabel ();
@@ -140,7 +140,7 @@ void WebFlowCredentialsDialog.changeEvent (QEvent *e) {
 }
 
 void WebFlowCredentialsDialog.customizeStyle () {
-    // HINT: Customize dialog's own style here, if necessary in the future (Dark-/Light-Mode switching)
+    // HINT : Customize dialog's own style here, if necessary in the future (Dark-/Light-Mode switching)
 }
 
 void WebFlowCredentialsDialog.slotShowSettingsDialog () {
@@ -160,4 +160,4 @@ void WebFlowCredentialsDialog.slotFlow2AuthResult (Flow2Auth.Result r, QString &
     }
 }
 
-} // namespace OCC
+} // namespace Occ

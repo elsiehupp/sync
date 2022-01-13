@@ -1,30 +1,30 @@
 #ifndef CLIENTSIDEENCRYPTIONJOBS_H
-#define CLIENTSIDEENCRYPTIONJOBS_H
+const int CLIENTSIDEENCRYPTIONJOBS_H
 
 // #include <QString>
 // #include <QJsonDocument>
 
-namespace OCC {
+namespace Occ {
 /* Here are all of the network jobs for the client side encryption.
- * anything that goes thru the server and expects a response, is here.
- */
+anything that goes thru the server and expects a response, is here.
+*/
 
 /*
- * @brief Job to sigh the CSR that return JSON
- *
- * To be used like this:
- * \code
- * _job = new SignPublicKeyApiJob (account, QLatin1String ("ocs/v1.php/foo/bar"), this);
- * _job.setCsr ( csr );
- * connect (_job...);
- * _job.start ();
- * \encode
- *
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT SignPublicKeyApiJob : public AbstractNetworkJob {
+@brief Job to sigh the CSR that return JSON
+
+To be
+\code
+_job = new SignPubli
+_job.setCsr ( csr
+connect (_job.
+_job.start
+\encode
+
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT SignPublicKeyApiJob : AbstractNetworkJob {
 public:
-    explicit SignPublicKeyApiJob (AccountPtr &account, QString &path, QObject *parent = nullptr);
+    SignPublicKeyApiJob (AccountPtr &account, QString &path, GLib.Object *parent = nullptr);
 
     /**
      * @brief setCsr - the CSR with the public key.
@@ -42,7 +42,7 @@ signals:
     /**
      * @brief jsonReceived - signal to report the json answer from ocs
      * @param json - the parsed json document
-     * @param statusCode - the OCS status code: 100 (!) for success
+     * @param statusCode - the OCS status code : 100 (!) for success
      */
     void jsonReceived (QJsonDocument &json, int statusCode);
 
@@ -51,21 +51,21 @@ private:
 };
 
 /*
- * @brief Job to upload the PrivateKey that return JSON
- *
- * To be used like this:
- * \code
- * _job = new StorePrivateKeyApiJob (account, QLatin1String ("ocs/v1.php/foo/bar"), this);
- * _job.setPrivateKey ( privKey );
- * connect (_job...);
- * _job.start ();
- * \encode
- *
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT StorePrivateKeyApiJob : public AbstractNetworkJob {
+@brief Job to upload the PrivateKey that return JSON
+
+To be
+\code
+_job = new StorePrivateKeyApiJo
+_job.setPrivateKey
+connect (_job.
+_job.start
+\encode
+
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT StorePrivateKeyApiJob : AbstractNetworkJob {
 public:
-    explicit StorePrivateKeyApiJob (AccountPtr &account, QString &path, QObject *parent = nullptr);
+    StorePrivateKeyApiJob (AccountPtr &account, QString &path, GLib.Object *parent = nullptr);
 
     /**
      * @brief setCsr - the CSR with the public key.
@@ -83,7 +83,7 @@ signals:
     /**
      * @brief jsonReceived - signal to report the json answer from ocs
      * @param json - the parsed json document
-     * @param statusCode - the OCS status code: 100 (!) for success
+     * @param statusCode - the OCS status code : 100 (!) for success
      */
     void jsonReceived (QJsonDocument &json, int statusCode);
 
@@ -92,25 +92,25 @@ private:
 };
 
 /*
- * @brief Job to mark a folder as encrypted JSON
- *
- * To be used like this:
- * \code
- * _job = new SetEncryptionFlagApiJob (account, 2, this);
-  * connect (_job...);
- * _job.start ();
- * \encode
- *
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT SetEncryptionFlagApiJob : public AbstractNetworkJob {
+@brief Job to mark a folder as encrypted JSON
+
+To be
+\code
+_job = new Set
+ connect (
+_job.start ();
+\encode
+
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT SetEncryptionFlagApiJob : AbstractNetworkJob {
 public:
     enum FlagAction {
         Clear = 0,
         Set = 1
     };
 
-    explicit SetEncryptionFlagApiJob (AccountPtr &account, QByteArray &fileId, FlagAction flagAction = Set, QObject *parent = nullptr);
+    SetEncryptionFlagApiJob (AccountPtr &account, QByteArray &fileId, FlagAction flagAction = Set, GLib.Object *parent = nullptr);
 
 public slots:
     void start () override;
@@ -127,9 +127,9 @@ private:
     FlagAction _flagAction = Set;
 };
 
-class OWNCLOUDSYNC_EXPORT LockEncryptFolderApiJob : public AbstractNetworkJob {
+class OWNCLOUDSYNC_EXPORT LockEncryptFolderApiJob : AbstractNetworkJob {
 public:
-    explicit LockEncryptFolderApiJob (AccountPtr &account, QByteArray& fileId, QObject *parent = nullptr);
+    LockEncryptFolderApiJob (AccountPtr &account, QByteArray& fileId, GLib.Object *parent = nullptr);
 
 public slots:
     void start () override;
@@ -145,13 +145,13 @@ private:
     QByteArray _fileId;
 };
 
-class OWNCLOUDSYNC_EXPORT UnlockEncryptFolderApiJob : public AbstractNetworkJob {
+class OWNCLOUDSYNC_EXPORT UnlockEncryptFolderApiJob : AbstractNetworkJob {
 public:
-    explicit UnlockEncryptFolderApiJob (
+    UnlockEncryptFolderApiJob (
         const AccountPtr &account,
         const QByteArray& fileId,
         const QByteArray& token,
-        QObject *parent = nullptr);
+        GLib.Object *parent = nullptr);
 
 public slots:
     void start () override;
@@ -169,13 +169,13 @@ private:
     QBuffer *_tokenBuf;
 };
 
-class OWNCLOUDSYNC_EXPORT StoreMetaDataApiJob : public AbstractNetworkJob {
+class OWNCLOUDSYNC_EXPORT StoreMetaDataApiJob : AbstractNetworkJob {
 public:
-    explicit StoreMetaDataApiJob (
+    StoreMetaDataApiJob (
         const AccountPtr &account,
         const QByteArray& fileId,
         const QByteArray& b64Metadata,
-        QObject *parent = nullptr);
+        GLib.Object *parent = nullptr);
 
 public slots:
     void start () override;
@@ -192,14 +192,14 @@ private:
     QByteArray _b64Metadata;
 };
 
-class OWNCLOUDSYNC_EXPORT UpdateMetadataApiJob : public AbstractNetworkJob {
+class OWNCLOUDSYNC_EXPORT UpdateMetadataApiJob : AbstractNetworkJob {
 public:
-    explicit UpdateMetadataApiJob (
+    UpdateMetadataApiJob (
         const AccountPtr &account,
         const QByteArray& fileId,
         const QByteArray& b64Metadata,
         const QByteArray& lockedToken,
-        QObject *parent = nullptr);
+        GLib.Object *parent = nullptr);
 
 public slots:
     void start () override;
@@ -217,12 +217,12 @@ private:
     QByteArray _token;
 };
 
-class OWNCLOUDSYNC_EXPORT GetMetadataApiJob : public AbstractNetworkJob {
+class OWNCLOUDSYNC_EXPORT GetMetadataApiJob : AbstractNetworkJob {
 public:
-    explicit GetMetadataApiJob (
+    GetMetadataApiJob (
         const AccountPtr &account,
         const QByteArray& fileId,
-        QObject *parent = nullptr);
+        GLib.Object *parent = nullptr);
 
 public slots:
     void start () override;
@@ -238,12 +238,12 @@ private:
     QByteArray _fileId;
 };
 
-class OWNCLOUDSYNC_EXPORT DeleteMetadataApiJob : public AbstractNetworkJob {
+class OWNCLOUDSYNC_EXPORT DeleteMetadataApiJob : AbstractNetworkJob {
 public:
-    explicit DeleteMetadataApiJob (
+    DeleteMetadataApiJob (
         const AccountPtr &account,
         const QByteArray& fileId,
-        QObject *parent = nullptr);
+        GLib.Object *parent = nullptr);
 
 public slots:
     void start () override;

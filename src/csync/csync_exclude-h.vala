@@ -1,24 +1,24 @@
 /*
- * libcsync -- a library to sync a directory with another
- *
- * Copyright (c) 2008-2013 by Andreas Schneider <asn@cryptomilk.org>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
+libcsync -- a library to sync a directory with another
 
-// #include <QObject>
+Copyright (c) 2008-2013 by Andreas Schneider <asn@cryptomilk.
+
+This library is free software; you can redistribute it and/o
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later vers
+
+This library is distributed in the hope that it wi
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+*/
+
+// #include <GLib.Object>
 // #include <QSet>
 // #include <QString>
 // #include <QRegularExpression>
@@ -40,27 +40,26 @@ enum CSYNC_EXCLUDE_TYPE {
   CSYNC_FILE_EXCLUDE_SERVER_BLACKLISTED,
 };
 
-class ExcludedFilesTest;
 class QFile;
 
 /**
- * Manages file/directory exclusion.
- *
- * Most commonly exclude patterns are loaded from files. See
- * addExcludeFilePath () and reloadExcludeFiles ().
- *
- * Excluded files are primarily relevant for sync runs, and for
- * file watcher filtering.
- *
- * Excluded files and ignored files are the same thing. But the
- * selective sync blacklist functionality is a different thing
- * entirely.
- */
-class OCSYNC_EXPORT ExcludedFiles : public QObject {
+Manages file/directory exclusion.
+
+Most commonly exclude patterns are loaded from file
+addExcludeFilePath () and reloadExcludeFiles ().
+
+Excluded files are primarily relevant for sync runs, and for
+file watcher filtering.
+
+Excluded files and ignored files are the same thing. But the
+selective sync blacklist functionality is a different thing
+entirely.
+*/
+class ExcludedFiles : GLib.Object {
 public:
     using Version = std.tuple<int, int, int>;
 
-    explicit ExcludedFiles (QString &localPath = QStringLiteral ("/"));
+    ExcludedFiles (QString &localPath = QStringLiteral ("/"));
     ~ExcludedFiles () override;
 
     /**
@@ -170,7 +169,7 @@ private:
     CSYNC_EXCLUDE_TYPE fullPatternMatch (QString &path, ItemType filetype) const;
 
     // Our BasePath need to end with '/'
-    class BasePathString : public QString {
+    class BasePathString : QString {
     public:
         BasePathString (QString &&other)
             : QString (std.move (other)) {
@@ -186,16 +185,16 @@ private:
     /**
      * Generate optimized regular expressions for the exclude patterns anchored to basePath.
      *
-     * The optimization works in two steps: First, all supported patterns are put
+     * The optimization works in two steps : First, all supported patterns are put
      * into _fullRegexFile/_fullRegexDir. These regexes can be applied to the full
      * path to determine whether it is excluded or not.
      *
      * The second is a performance optimization. The particularly common use
-     * case for excludes during a sync run is "traversal": Instead of checking
+     * case for excludes during a sync run is "traversal" : Instead of checking
      * the full path every time, we check each parent path with the traversal
      * function incrementally.
      *
-     * Example: When the sync run eventually arrives at "a/b/c it can assume
+     * Example : When the sync run eventually arrives at "a/b/c it can assume
      * that the traversal matching has already been run on "a", "a/b"
      * and just needs to run the traversal matcher on "a/b/c".
      *
@@ -204,12 +203,12 @@ private:
      *   full ("a/b/c/d") == traversal ("a") || traversal ("a/b") || traversal ("a/b/c")
      *
      * The traversal matcher can be extremely fast because it has a fast early-out
-     * case: It checks the bname part of the path against _bnameTraversalRegex
+     * case : It checks the bname part of the path against _bnameTraversalRegex
      * and only runs a simplified _fullTraversalRegex on the whole path if bname
      * activation for it was triggered.
      *
-     * Note: The traversal matcher will return not-excluded on some paths that the
-     * full matcher would exclude. Example: "b" is excluded. traversal ("b/c")
+     * Note : The traversal matcher will return not-excluded on some paths that the
+     * full matcher would exclude. Example : "b" is excluded. traversal ("b/c")
      * returns not-excluded because "c" isn't a bname activation pattern.
      */
     void prepare (BasePathString &basePath);

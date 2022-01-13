@@ -1,18 +1,18 @@
 /*
- * Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 
-// #include <QObject>
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
+
+// #include <GLib.Object>
 // #include <QFlags>
 // #include <QAbstractListModel>
 // #include <QLoggingCategory>
@@ -21,10 +21,9 @@
 // #include <QSharedPointer>
 // #include <QVector>
 
-class QJsonDocument;
 class QJsonObject;
 
-namespace OCC {
+namespace Occ {
 
 Q_DECLARE_LOGGING_CATEGORY (lcSharing)
 
@@ -40,14 +39,14 @@ public:
         Room = 10
     };
 
-    explicit Sharee (QString shareWith,
+    Sharee (QString shareWith,
         const QString displayName,
         const Type type);
 
-    QString format () const;
-    QString shareWith () const;
-    QString displayName () const;
-    Type type () const;
+    QString format ();
+    QString shareWith ();
+    QString displayName ();
+    Type type ();
 
 private:
     QString _shareWith;
@@ -55,16 +54,16 @@ private:
     Type _type;
 };
 
-class ShareeModel : public QAbstractListModel {
+class ShareeModel : QAbstractListModel {
 public:
     enum LookupMode {
         LocalSearch = 0,
         GlobalSearch = 1
     };
 
-    explicit ShareeModel (AccountPtr &account, QString &type, QObject *parent = nullptr);
+    ShareeModel (AccountPtr &account, QString &type, GLib.Object *parent = nullptr);
 
-    using ShareeSet = QVector<QSharedPointer<Sharee>>; // FIXME: make it a QSet<Sharee> when Sharee can be compared
+    using ShareeSet = QVector<QSharedPointer<Sharee>>; // FIXME : make it a QSet<Sharee> when Sharee can be compared
     void fetch (QString &search, ShareeSet &blacklist, LookupMode lookupMode);
     int rowCount (QModelIndex &parent = QModelIndex ()) const override;
     QVariant data (QModelIndex &index, int role) const override;
@@ -93,6 +92,6 @@ private:
 };
 }
 
-Q_DECLARE_METATYPE (QSharedPointer<OCC.Sharee>)
+Q_DECLARE_METATYPE (QSharedPointer<Occ.Sharee>)
 
 #endif //SHAREE_H

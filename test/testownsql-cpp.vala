@@ -1,16 +1,16 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *       support, and with no warranty, express or implied, as to its usefulness for
- *          any purpose.
- *          */
+   This software is in the public domain, furnished "as is", without technical
+      support, and with no warranty, express or implied, as to its usefulness for
+         any purpose.
+         */
 
 // #include <QtTest>
 
 // #include <sqlite3.h>
 
-using namespace OCC;
+using namespace Occ;
 
-class TestOwnSql : public QObject {
+class TestOwnSql : GLib.Object {
     QTemporaryDir _tempDir;
 
 private slots:
@@ -68,8 +68,8 @@ private slots:
 
         q.exec ();
         while ( q.next ().hasData ) {
-            qDebug () << "Name: " << q.stringValue (1);
-            qDebug () << "Address: " << q.stringValue (2);
+            qDebug () << "Name : " << q.stringValue (1);
+            qDebug () << "Address : " << q.stringValue (2);
         }
     }
 

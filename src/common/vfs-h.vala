@@ -1,19 +1,19 @@
 /*
- * Copyright (C) by Christian Kamm <mail@ckamm.de>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Christian Kamm <mail@ckamm.de>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 // #pragma once
 
-// #include <QObject>
+// #include <GLib.Object>
 // #include <QScopedPointer>
 // #include <QSharedPointer>
 
@@ -21,13 +21,10 @@
 
 using csync_file_stat_t = struct csync_file_stat_s;
 
-namespace OCC {
+namespace Occ {
 
-class Account;
 using AccountPtr = QSharedPointer<Account>;
-class SyncJournalDb;
 class VfsPrivate;
-class SyncFileItem;
 
 /** Collection of parameters for initializing a Vfs instance. */
 struct OCSYNC_EXPORT VfsSetupParams {
@@ -54,7 +51,7 @@ struct OCSYNC_EXPORT VfsSetupParams {
 
     /** Access to the sync folder's database.
      *
-     * Note: The journal must live at least until the Vfs.stop () call.
+     * Note : The journal must live at least until the Vfs.stop () call.
      */
     SyncJournalDb *journal = nullptr;
 
@@ -69,18 +66,18 @@ struct OCSYNC_EXPORT VfsSetupParams {
 };
 
 /** Interface describing how to deal with virtual/placeholder files.
- *
- * There are different ways of representing files locally that will only
- * be filled with data (hydrated) on demand. One such way would be suffixed
- * files, others could be FUSE based or use Windows CfAPI.
- *
- * This interface intends to decouple the sync algorithm and Folder from
- * the details of how a particular VFS solution works.
- *
- * An instance is usually created through a plugin via the createVfsFromPlugin ()
- * function.
- */
-class OCSYNC_EXPORT Vfs : public QObject {
+
+There are different ways of representing files locally that will only
+be filled with data (hydrated) on demand. One such way would be suffixed
+files, others could be FUSE based or use Windows CfAPI.
+
+This interface intends to decouple the sync algorithm
+the details of how a particular VFS solution works.
+
+An instance is usually created through a plugin via the createVfsFromPlugin ()
+function.
+*/
+class Vfs : GLib.Object {
 
 public:
     /** The kind of VFS in use (or no-VFS)
@@ -115,12 +112,12 @@ public:
     using AvailabilityResult = Result<VfsItemAvailability, AvailabilityError>;
 
 public:
-    explicit Vfs (QObject* parent = nullptr);
+    Vfs (GLib.Object* parent = nullptr);
     ~Vfs () override;
 
     virtual Mode mode () const = 0;
 
-    /// For WithSuffix modes: the suffix (including the dot)
+    /// For WithSuffix modes : the suffix (including the dot)
     virtual QString fileSuffix () const = 0;
 
     /// Access to the parameters the instance was start ()ed with.
@@ -168,7 +165,7 @@ public:
      */
     virtual Q_REQUIRED_RESULT Result<void, QString> dehydratePlaceholder (SyncFileItem &item) = 0;
 
-    /** Discovery hook: even unchanged files may need UPDATE_METADATA.
+    /** Discovery hook : even unchanged files may need UPDATE_METADATA.
      *
      * For instance cfapi vfs wants local hydrated non-placeholder files to
      * become hydrated placeholder files.
@@ -273,10 +270,10 @@ protected:
 };
 
 /// Implementation of Vfs for Vfs.Off mode - does nothing
-class OCSYNC_EXPORT VfsOff : public Vfs {
+class VfsOff : Vfs {
 
 public:
-    VfsOff (QObject* parent = nullptr);
+    VfsOff (GLib.Object* parent = nullptr);
     ~VfsOff () override;
 
     Mode mode () const override { return Vfs.Off; }
@@ -318,13 +315,13 @@ OCSYNC_EXPORT Vfs.Mode bestAvailableVfsMode ();
 /// Create a VFS instance for the mode, returns nullptr on failure.
 OCSYNC_EXPORT std.unique_ptr<Vfs> createVfsFromPlugin (Vfs.Mode mode);
 
-} // namespace OCC
+} // namespace Occ
 
-#define OCC_DEFINE_VFS_FACTORY (name, Type) \
-    static_assert (std.is_base_of<OCC.Vfs, Type>.value, "Please define VFS factories only for OCC.Vfs subclasses"); \
-    namespace { \
-    void initPlugin () \ { \
-        OCC.Vfs.registerPlugin (QStringLiteral (name), [] () . OCC.Vfs * { return new (Type); }); \
-    } \
-    Q_COREAPP_STARTUP_FUNCTION (initPlugin) \
+const int OCC_DEFINE_VFS_FACTORY (name, Type)
+    static_assert (std.is_base_of<Occ.Vfs, Type>.value, "Please define VFS factories only for Occ.Vfs subclasses");
+    namespace {
+    void initPlugin () \ {
+        Occ.Vfs.registerPlugin (QStringLiteral (name), [] () . Occ.Vfs * { return new (Type); });
+    }
+    Q_COREAPP_STARTUP_FUNCTION (initPlugin)
     }

@@ -1,17 +1,17 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QJsonDocument>
 // #include <QLoggingCategory>
@@ -36,7 +36,7 @@
 // #include <QPainterPath>
 #endif
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcEtagJob, "nextcloud.sync.networkjob.etag", QtInfoMsg)
 Q_LOGGING_CATEGORY (lcLsColJob, "nextcloud.sync.networkjob.lscol", QtInfoMsg)
@@ -67,7 +67,7 @@ QByteArray parseEtag (char *header) {
     return arr;
 }
 
-RequestEtagJob.RequestEtagJob (AccountPtr account, QString &path, QObject *parent)
+RequestEtagJob.RequestEtagJob (AccountPtr account, QString &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 }
 
@@ -88,7 +88,7 @@ void RequestEtagJob.start () {
     sendRequest ("PROPFIND", makeDavUrl (path ()), req, buf);
 
     if (reply ().error () != QNetworkReply.NoError) {
-        qCWarning (lcEtagJob) << "request network error: " << reply ().errorString ();
+        qCWarning (lcEtagJob) << "request network error : " << reply ().errorString ();
     }
     AbstractNetworkJob.start ();
 }
@@ -128,24 +128,24 @@ bool RequestEtagJob.finished () {
 
 /*********************************************************************************************/
 
-MkColJob.MkColJob (AccountPtr account, QString &path, QObject *parent)
+MkColJob.MkColJob (AccountPtr account, QString &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 }
 
-MkColJob.MkColJob (AccountPtr account, QString &path, QMap<QByteArray, QByteArray> &extraHeaders, QObject *parent)
+MkColJob.MkColJob (AccountPtr account, QString &path, QMap<QByteArray, QByteArray> &extraHeaders, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent)
     , _extraHeaders (extraHeaders) {
 }
 
 MkColJob.MkColJob (AccountPtr account, QUrl &url,
-    const QMap<QByteArray, QByteArray> &extraHeaders, QObject *parent)
+    const QMap<QByteArray, QByteArray> &extraHeaders, GLib.Object *parent)
     : AbstractNetworkJob (account, QString (), parent)
     , _url (url)
     , _extraHeaders (extraHeaders) {
 }
 
 void MkColJob.start () {
-    // add 'Content-Length: 0' header (see https://github.com/owncloud/client/issues/3256)
+    // add 'Content-Length : 0' header (see https://github.com/owncloud/client/issues/3256)
     QNetworkRequest req;
     req.setRawHeader ("Content-Length", "0");
     for (auto it = _extraHeaders.constBegin (); it != _extraHeaders.constEnd (); ++it) {
@@ -305,11 +305,11 @@ bool LsColXMLParser.parse (QByteArray &xml, QHash<QString, ExtraFolderInfo> *fil
 
 /*********************************************************************************************/
 
-LsColJob.LsColJob (AccountPtr account, QString &path, QObject *parent)
+LsColJob.LsColJob (AccountPtr account, QString &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 }
 
-LsColJob.LsColJob (AccountPtr account, QUrl &url, QObject *parent)
+LsColJob.LsColJob (AccountPtr account, QUrl &url, GLib.Object *parent)
     : AbstractNetworkJob (account, QString (), parent)
     , _url (url) {
 }
@@ -361,7 +361,7 @@ void LsColJob.start () {
     AbstractNetworkJob.start ();
 }
 
-// TODO: Instead of doing all in this slot, we should iteratively parse in readyRead (). This
+// TODO : Instead of doing all in this slot, we should iteratively parse in readyRead (). This
 // would allow us to be more asynchronous in processing while data is coming from the network,
 // not all in one big blob at the end.
 bool LsColJob.finished () {
@@ -401,7 +401,7 @@ namespace {
     const char nextcloudDirC[] = "nextcloud/";
 }
 
-CheckServerJob.CheckServerJob (AccountPtr account, QObject *parent)
+CheckServerJob.CheckServerJob (AccountPtr account, GLib.Object *parent)
     : AbstractNetworkJob (account, QLatin1String (statusphpC), parent)
     , _subdirFallback (false)
     , _permanentRedirects (0) {
@@ -500,7 +500,7 @@ bool CheckServerJob.finished () {
     QByteArray body = reply ().peek (4 * 1024);
     int httpStatus = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).toInt ();
     if (body.isEmpty () || httpStatus != 200) {
-        qCWarning (lcCheckServerJob) << "error: status.php replied " << httpStatus << body;
+        qCWarning (lcCheckServerJob) << "error : status.php replied " << httpStatus << body;
         emit instanceNotFound (reply ());
     } else {
         QJsonParseError error;
@@ -510,7 +510,7 @@ bool CheckServerJob.finished () {
             qCWarning (lcCheckServerJob) << "status.php from server is not valid JSON!" << body << reply ().request ().url () << error.errorString ();
         }
 
-        qCInfo (lcCheckServerJob) << "status.php returns: " << status << " " << reply ().error () << " Reply: " << reply ();
+        qCInfo (lcCheckServerJob) << "status.php returns : " << status << " " << reply ().error () << " Reply : " << reply ();
         if (status.object ().contains ("installed")) {
             emit instanceFound (_serverUrl, status.object ());
         } else {
@@ -523,7 +523,7 @@ bool CheckServerJob.finished () {
 
 /*********************************************************************************************/
 
-PropfindJob.PropfindJob (AccountPtr account, QString &path, QObject *parent)
+PropfindJob.PropfindJob (AccountPtr account, QString &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 }
 
@@ -601,7 +601,7 @@ bool PropfindJob.finished () {
             }
         }
         if (reader.hasError ()) {
-            qCWarning (lcPropfindJob) << "XML parser error: " << reader.errorString ();
+            qCWarning (lcPropfindJob) << "XML parser error : " << reader.errorString ();
             emit finishedWithError (reply ());
         } else {
             emit result (items);
@@ -617,7 +617,7 @@ bool PropfindJob.finished () {
 /*********************************************************************************************/
 
 #ifndef TOKEN_AUTH_ONLY
-AvatarJob.AvatarJob (AccountPtr account, QString &userId, int size, QObject *parent)
+AvatarJob.AvatarJob (AccountPtr account, QString &userId, int size, GLib.Object *parent)
     : AbstractNetworkJob (account, QString (), parent) {
     if (account.serverVersionInt () >= Account.makeServerVersion (10, 0, 0)) {
         _avatarUrl = Utility.concatUrlPath (account.url (), QString ("remote.php/dav/avatars/%1/%2.png").arg (userId, QString.number (size)));
@@ -675,7 +675,7 @@ bool AvatarJob.finished () {
 
 /*********************************************************************************************/
 
-ProppatchJob.ProppatchJob (AccountPtr account, QString &path, QObject *parent)
+ProppatchJob.ProppatchJob (AccountPtr account, QString &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 }
 
@@ -744,7 +744,7 @@ bool ProppatchJob.finished () {
 
 /*********************************************************************************************/
 
-EntityExistsJob.EntityExistsJob (AccountPtr account, QString &path, QObject *parent)
+EntityExistsJob.EntityExistsJob (AccountPtr account, QString &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 }
 
@@ -760,7 +760,7 @@ bool EntityExistsJob.finished () {
 
 /*********************************************************************************************/
 
-JsonApiJob.JsonApiJob (AccountPtr &account, QString &path, QObject *parent)
+JsonApiJob.JsonApiJob (AccountPtr &account, QString &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 }
 
@@ -819,7 +819,7 @@ bool JsonApiJob.finished () {
     int statusCode = 0;
     int httpStatusCode = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).toInt ();
     if (reply ().error () != QNetworkReply.NoError) {
-        qCWarning (lcJsonApiJob) << "Network error: " << path () << errorString () << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute);
+        qCWarning (lcJsonApiJob) << "Network error : " << path () << errorString () << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute);
         statusCode = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).toInt ();
         emit jsonReceived (QJsonDocument (), statusCode);
         return true;
@@ -834,11 +834,11 @@ bool JsonApiJob.finished () {
             statusCode = rexMatch.captured (1).toInt ();
         }
     } else if (jsonStr.isEmpty () && httpStatusCode == notModifiedStatusCode){
-        qCWarning (lcJsonApiJob) << "Nothing changed so nothing to retrieve - status code: " << httpStatusCode;
+        qCWarning (lcJsonApiJob) << "Nothing changed so nothing to retrieve - status code : " << httpStatusCode;
         statusCode = httpStatusCode;
     } else {
-        const QRegularExpression rex (R" ("statuscode": (\d+))");
-        // example: "{"ocs":{"meta":{"status":"ok","statuscode":100,"message":null},"data":{"version":{"major":8,"minor":"... (504)
+        const QRegularExpression rex (R" ("statuscode" : (\d+))");
+        // example : "{"ocs":{"meta":{"status":"ok","statuscode":100,"message":null},"data":{"version":{"major":8,"minor":"... (504)
         const auto rxMatch = rex.match (jsonStr);
         if (rxMatch.hasMatch ()) {
             statusCode = rxMatch.captured (1).toInt ();
@@ -867,8 +867,8 @@ bool JsonApiJob.finished () {
     return true;
 }
 
-DetermineAuthTypeJob.DetermineAuthTypeJob (AccountPtr account, QObject *parent)
-    : QObject (parent)
+DetermineAuthTypeJob.DetermineAuthTypeJob (AccountPtr account, GLib.Object *parent)
+    : GLib.Object (parent)
     , _account (account) {
 }
 
@@ -996,7 +996,7 @@ void DetermineAuthTypeJob.checkAllDone () {
     deleteLater ();
 }
 
-SimpleNetworkJob.SimpleNetworkJob (AccountPtr account, QObject *parent)
+SimpleNetworkJob.SimpleNetworkJob (AccountPtr account, GLib.Object *parent)
     : AbstractNetworkJob (account, QString (), parent) {
 }
 
@@ -1012,7 +1012,7 @@ bool SimpleNetworkJob.finished () {
     return true;
 }
 
-DeleteApiJob.DeleteApiJob (AccountPtr account, QString &path, QObject *parent)
+DeleteApiJob.DeleteApiJob (AccountPtr account, QString &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 
 }
@@ -1033,7 +1033,7 @@ bool DeleteApiJob.finished () {
     int httpStatus = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).toInt ();
 
     if (reply ().error () != QNetworkReply.NoError) {
-        qCWarning (lcJsonApiJob) << "Network error: " << path () << errorString () << httpStatus;
+        qCWarning (lcJsonApiJob) << "Network error : " << path () << errorString () << httpStatus;
         emit result (httpStatus);
         return true;
     }
@@ -1045,7 +1045,7 @@ bool DeleteApiJob.finished () {
 }
 
 void fetchPrivateLinkUrl (AccountPtr account, QString &remotePath,
-    const QByteArray &numericFileId, QObject *target,
+    const QByteArray &numericFileId, GLib.Object *target,
     std.function<void (QString &url)> targetFun) {
     QString oldUrl;
     if (!numericFileId.isEmpty ())
@@ -1058,7 +1058,7 @@ void fetchPrivateLinkUrl (AccountPtr account, QString &remotePath,
         << "http://owncloud.org/ns:fileid" // numeric file id for fallback private link generation
         << "http://owncloud.org/ns:privatelink");
     job.setTimeout (10 * 1000);
-    QObject.connect (job, &PropfindJob.result, target, [=] (QVariantMap &result) {
+    GLib.Object.connect (job, &PropfindJob.result, target, [=] (QVariantMap &result) {
         auto privateLinkUrl = result["privatelink"].toString ();
         auto numericFileId = result["fileid"].toByteArray ();
         if (!privateLinkUrl.isEmpty ()) {
@@ -1069,10 +1069,10 @@ void fetchPrivateLinkUrl (AccountPtr account, QString &remotePath,
             targetFun (oldUrl);
         }
     });
-    QObject.connect (job, &PropfindJob.finishedWithError, target, [=] (QNetworkReply *) {
+    GLib.Object.connect (job, &PropfindJob.finishedWithError, target, [=] (QNetworkReply *) {
         targetFun (oldUrl);
     });
     job.start ();
 }
 
-} // namespace OCC
+} // namespace Occ

@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <folder.h>
 
@@ -53,7 +53,7 @@ QString illegalCharacterListToString (QVector<QChar> &illegalCharacters) {
 }
 }
 
-namespace OCC {
+namespace Occ {
 
 InvalidFilenameDialog.InvalidFilenameDialog (AccountPtr account, Folder *folder, QString filePath, QWidget *parent)
     : QDialog (parent)
@@ -76,7 +76,7 @@ InvalidFilenameDialog.InvalidFilenameDialog (AccountPtr account, Folder *folder,
     _ui.buttonBox.button (QDialogButtonBox.Ok).setText (tr ("Rename file"));
 
     _ui.descriptionLabel.setText (tr ("The file %1 could not be synced because the name contains characters which are not allowed on this system.").arg (_originalFileName));
-    _ui.explanationLabel.setText (tr ("The following characters are not allowed on the system: * \" | & ? , ; : \\ / ~ < >"));
+    _ui.explanationLabel.setText (tr ("The following characters are not allowed on the system : * \" | & ? , ; : \\ / ~ < >"));
     _ui.filenameLineEdit.setText (filePathFileInfo.fileName ());
 
     connect (_ui.buttonBox, &QDialogButtonBox.accepted, this, &QDialog.accept);
@@ -128,7 +128,7 @@ void InvalidFilenameDialog.onFilenameLineEditTextChanged (QString &text) {
     if (isTextValid) {
         _ui.errorLabel.setText ("");
     } else {
-        _ui.errorLabel.setText (tr ("Filename contains illegal characters: %1")
+        _ui.errorLabel.setText (tr ("Filename contains illegal characters : %1")
                                      .arg (illegalCharacterListToString (illegalContainedCharacters)));
     }
 
@@ -137,7 +137,7 @@ void InvalidFilenameDialog.onFilenameLineEditTextChanged (QString &text) {
 }
 
 void InvalidFilenameDialog.onMoveJobFinished () {
-    const auto job = qobject_cast<MoveJob *> (sender ());
+    const auto job = qobject_cast<MoveJob> (sender ());
     const auto error = job.reply ().error ();
 
     if (error != QNetworkReply.NoError) {

@@ -1,26 +1,26 @@
 /*
- * Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QFileInfo>
 // #include <QLoggingCategory>
 
 Q_LOGGING_CATEGORY (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED, "nextcloud.sync.propagator.remove.encrypted")
 
-namespace OCC {
+namespace Occ {
 
-AbstractPropagateRemoteDeleteEncrypted.AbstractPropagateRemoteDeleteEncrypted (OwncloudPropagator *propagator, SyncFileItemPtr item, QObject *parent)
-    : QObject (parent)
+AbstractPropagateRemoteDeleteEncrypted.AbstractPropagateRemoteDeleteEncrypted (OwncloudPropagator *propagator, SyncFileItemPtr item, GLib.Object *parent)
+    : GLib.Object (parent)
     , _propagator (propagator)
     , _item (item) {}
 
@@ -55,7 +55,7 @@ void AbstractPropagateRemoteDeleteEncrypted.startLsColJob (QString &path) {
 
 void AbstractPropagateRemoteDeleteEncrypted.slotFolderEncryptedIdReceived (QStringList &list) {
     qCDebug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Received id of folder, trying to lock it so we can prepare the metadata";
-    auto job = qobject_cast<LsColJob *> (sender ());
+    auto job = qobject_cast<LsColJob> (sender ());
     const ExtraFolderInfo folderInfo = job._folderInfos.value (list.first ());
     slotTryLock (folderInfo.fileId);
 }
@@ -87,7 +87,7 @@ void AbstractPropagateRemoteDeleteEncrypted.slotFolderUnLockedSuccessfully (QByt
 }
 
 void AbstractPropagateRemoteDeleteEncrypted.slotDeleteRemoteItemFinished () {
-    auto *deleteJob = qobject_cast<DeleteJob *> (QObject.sender ());
+    auto *deleteJob = qobject_cast<DeleteJob> (GLib.Object.sender ());
 
     Q_ASSERT (deleteJob);
 
@@ -111,7 +111,7 @@ void AbstractPropagateRemoteDeleteEncrypted.slotDeleteRemoteItemFinished () {
         return;
     }
 
-    // A 404 reply is also considered a success here: We want to make sure
+    // A 404 reply is also considered a success here : We want to make sure
     // a file is gone from the server. It not being there in the first place
     // is ok. This will happen for files that are in the DB but not on
     // the server or the local file system.
@@ -178,4 +178,4 @@ void AbstractPropagateRemoteDeleteEncrypted.taskFailed () {
     }
 }
 
-} // namespace OCC
+} // namespace Occ

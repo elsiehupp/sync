@@ -1,20 +1,20 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This library is free software; you can redistribute it and
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later versi
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GN
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+*/
 
 // #include <QDateTime>
 // #include <QLoggingCategory>
@@ -25,18 +25,18 @@
 
 // #include <sqlite3.h>
 
-#define SQLITE_SLEEP_TIME_USEC 100000
-#define SQLITE_REPEAT_COUNT 20
+const int SQLITE_SLEEP_TIME_USEC 100000
+const int SQLITE_REPEAT_COUNT 20
 
-#define SQLITE_DO (A)                                         \
-    if (1) {                                                 \
-        _errId = (A);                                        \
-        if (_errId != SQLITE_OK && _errId != SQLITE_DONE && _errId != SQLITE_ROW) {  \
-            _error = QString.fromUtf8 (sqlite3_errmsg (_db)); \
-        }                                                    \
+const int SQLITE_DO (A)
+    if (1) {
+        _errId = (A);
+        if (_errId != SQLITE_OK && _errId != SQLITE_DONE && _errId != SQLITE_ROW) {
+            _error = QString.fromUtf8 (sqlite3_errmsg (_db));
+        }
     }
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcSql, "nextcloud.sync.database.sql", QtInfoMsg)
 
@@ -62,9 +62,9 @@ bool SqlDatabase.openHelper (QString &filename, int sqliteFlags) {
     if (_errId != SQLITE_OK) {
         qCWarning (lcSql) << "Error:" << _error << "for" << filename;
         if (_errId == SQLITE_CANTOPEN) {
-            qCWarning (lcSql) << "CANTOPEN extended errcode: " << sqlite3_extended_errcode (_db);
+            qCWarning (lcSql) << "CANTOPEN extended errcode : " << sqlite3_extended_errcode (_db);
 #if SQLITE_VERSION_NUMBER >= 3012000
-            qCWarning (lcSql) << "CANTOPEN system errno: " << sqlite3_system_errno (_db);
+            qCWarning (lcSql) << "CANTOPEN system errno : " << sqlite3_system_errno (_db);
 #endif
         }
         close ();
@@ -72,7 +72,7 @@ bool SqlDatabase.openHelper (QString &filename, int sqliteFlags) {
     }
 
     if (!_db) {
-        qCWarning (lcSql) << "Error: no database for" << filename;
+        qCWarning (lcSql) << "Error : no database for" << filename;
         return false;
     }
 
@@ -235,7 +235,7 @@ int SqlQuery.prepare (QByteArray &sql, bool allow_failure) {
             rc = sqlite3_prepare_v2 (_db, _sql.constData (), -1, &_stmt, nullptr);
             if ( (rc == SQLITE_BUSY) || (rc == SQLITE_LOCKED)) {
                 n++;
-                OCC.Utility.usleep (SQLITE_SLEEP_TIME_USEC);
+                Occ.Utility.usleep (SQLITE_SLEEP_TIME_USEC);
             }
         } while ( (n < SQLITE_REPEAT_COUNT) && ( (rc == SQLITE_BUSY) || (rc == SQLITE_LOCKED)));
         _errId = rc;
@@ -253,9 +253,9 @@ int SqlQuery.prepare (QByteArray &sql, bool allow_failure) {
 }
 
 /**
- * There is no overloads to QByteArray.startWith that takes Qt.CaseInsensitive.
- * Returns true if 'a' starts with 'b' in a case insensitive way
- */
+There is no overloads to QByteArray.startWith that takes Qt.CaseInsensitive.
+Returns true if 'a' starts with 'b' in a case insensitive way
+*/
 static bool startsWithInsensitive (QByteArray &a, QByteArray &b) {
     return a.size () >= b.size () && qstrnicmp (a.constData (), b.constData (), static_cast<uint> (b.size ())) == 0;
 }
@@ -284,9 +284,9 @@ bool SqlQuery.exec () {
             if (rc == SQLITE_LOCKED) {
                 rc = sqlite3_reset (_stmt); /* This will also return SQLITE_LOCKED */
                 n++;
-                OCC.Utility.usleep (SQLITE_SLEEP_TIME_USEC);
+                Occ.Utility.usleep (SQLITE_SLEEP_TIME_USEC);
             } else if (rc == SQLITE_BUSY) {
-                OCC.Utility.usleep (SQLITE_SLEEP_TIME_USEC);
+                Occ.Utility.usleep (SQLITE_SLEEP_TIME_USEC);
                 n++;
             }
         } while ( (n < SQLITE_REPEAT_COUNT) && ( (rc == SQLITE_BUSY) || (rc == SQLITE_LOCKED)));
@@ -296,9 +296,9 @@ bool SqlQuery.exec () {
             _error = QString.fromUtf8 (sqlite3_errmsg (_db));
             qCWarning (lcSql) << "Sqlite exec statement error:" << _errId << _error << "in" << _sql;
             if (_errId == SQLITE_IOERR) {
-                qCWarning (lcSql) << "IOERR extended errcode: " << sqlite3_extended_errcode (_db);
+                qCWarning (lcSql) << "IOERR extended errcode : " << sqlite3_extended_errcode (_db);
 #if SQLITE_VERSION_NUMBER >= 3012000
-                qCWarning (lcSql) << "IOERR system errno: " << sqlite3_system_errno (_db);
+                qCWarning (lcSql) << "IOERR system errno : " << sqlite3_system_errno (_db);
 #endif
             }
         } else {
@@ -319,7 +319,7 @@ auto SqlQuery.next () . NextResult {
         if (n < SQLITE_REPEAT_COUNT && firstStep && (_errId == SQLITE_LOCKED || _errId == SQLITE_BUSY)) {
             sqlite3_reset (_stmt); // not necessary after sqlite version 3.6.23.1
             n++;
-            OCC.Utility.usleep (SQLITE_SLEEP_TIME_USEC);
+            Occ.Utility.usleep (SQLITE_SLEEP_TIME_USEC);
         } else {
             break;
         }
@@ -356,24 +356,24 @@ void SqlQuery.bindValueInternal (int pos, QVariant &value) {
     case QVariant.ULongLong:
         res = sqlite3_bind_int64 (_stmt, pos, value.toLongLong ());
         break;
-    case QVariant.DateTime: {
+    case QVariant.DateTime : {
         const QDateTime dateTime = value.toDateTime ();
         const QString str = dateTime.toString (QStringLiteral ("yyyy-MM-ddThh:mm:ss.zzz"));
         res = sqlite3_bind_text16 (_stmt, pos, str.utf16 (),
             str.size () * static_cast<int> (sizeof (ushort)), SQLITE_TRANSIENT);
         break;
     }
-    case QVariant.Time: {
+    case QVariant.Time : {
         const QTime time = value.toTime ();
         const QString str = time.toString (QStringLiteral ("hh:mm:ss.zzz"));
         res = sqlite3_bind_text16 (_stmt, pos, str.utf16 (),
             str.size () * static_cast<int> (sizeof (ushort)), SQLITE_TRANSIENT);
         break;
     }
-    case QVariant.String: {
+    case QVariant.String : {
         if (!value.toString ().isNull ()) {
             // lifetime of string == lifetime of its qvariant
-            const auto *str = static_cast<const QString *> (value.constData ());
+            const auto *str = static_cast<const QString> (value.constData ());
             res = sqlite3_bind_text16 (_stmt, pos, str.utf16 (),
                 (str.size ()) * static_cast<int> (sizeof (QChar)), SQLITE_TRANSIENT);
         } else {
@@ -381,12 +381,12 @@ void SqlQuery.bindValueInternal (int pos, QVariant &value) {
         }
         break;
     }
-    case QVariant.ByteArray: {
+    case QVariant.ByteArray : {
         auto ba = value.toByteArray ();
         res = sqlite3_bind_text (_stmt, pos, ba.constData (), ba.size (), SQLITE_TRANSIENT);
         break;
     }
-    default: {
+    default : {
         QString str = value.toString ();
         // SQLITE_TRANSIENT makes sure that sqlite buffers the data
         res = sqlite3_bind_text16 (_stmt, pos, str.utf16 (),
@@ -405,7 +405,7 @@ bool SqlQuery.nullValue (int index) {
 }
 
 QString SqlQuery.stringValue (int index) {
-    return QString.fromUtf16 (static_cast<const ushort *> (sqlite3_column_text16 (_stmt, index)));
+    return QString.fromUtf16 (static_cast<const ushort> (sqlite3_column_text16 (_stmt, index)));
 }
 
 int SqlQuery.intValue (int index) {
@@ -417,7 +417,7 @@ uint64 SqlQuery.int64Value (int index) {
 }
 
 QByteArray SqlQuery.baValue (int index) {
-    return QByteArray (static_cast<const char *> (sqlite3_column_blob (_stmt, index)),
+    return QByteArray (static_cast<const char> (sqlite3_column_blob (_stmt, index)),
         sqlite3_column_bytes (_stmt, index));
 }
 
@@ -454,4 +454,4 @@ void SqlQuery.reset_and_clear_bindings () {
     }
 }
 
-} // namespace OCC
+} // namespace Occ

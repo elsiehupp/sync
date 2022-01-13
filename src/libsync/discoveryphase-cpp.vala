@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <csync_exclude.h>
 
@@ -22,7 +22,7 @@
 // #include <cstring>
 // #include <QDateTime>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcDiscovery, "nextcloud.sync.discovery", QtInfoMsg)
 
@@ -73,7 +73,7 @@ void DiscoveryPhase.checkSelectiveSyncNewFolder (QString &path, RemotePermission
         && remotePerm.hasPermission (RemotePermissions.IsMounted)) {
         // external storage.
 
-        /* Note: DiscoverySingleDirectoryJob.directoryListingIteratedSlot make sure that only the
+        /* Note : DiscoverySingleDirectoryJob.directoryListingIteratedSlot make sure that only the
          * root of a mounted storage has 'M', all sub entries have 'm' */
 
         // Only allow it if the white list contains exactly this path (not parents)
@@ -101,9 +101,9 @@ void DiscoveryPhase.checkSelectiveSyncNewFolder (QString &path, RemotePermission
     auto propfindJob = new PropfindJob (_account, _remoteFolder + path, this);
     propfindJob.setProperties (QList<QByteArray> () << "resourcetype"
                                                    << "http://owncloud.org/ns:size");
-    QObject.connect (propfindJob, &PropfindJob.finishedWithError,
+    GLib.Object.connect (propfindJob, &PropfindJob.finishedWithError,
         this, [=] { return callback (false); });
-    QObject.connect (propfindJob, &PropfindJob.result, this, [=] (QVariantMap &values) {
+    GLib.Object.connect (propfindJob, &PropfindJob.result, this, [=] (QVariantMap &values) {
         auto result = values.value (QLatin1String ("size")).toLongLong ();
         if (result >= limit) {
             // we tell the UI there is a new folder
@@ -126,7 +126,7 @@ void DiscoveryPhase.checkSelectiveSyncNewFolder (QString &path, RemotePermission
 
 /* Given a path on the remote, give the path as it is when the rename is done */
 QString DiscoveryPhase.adjustRenamedPath (QString &original, SyncFileItem.Direction d) {
-    return OCC.adjustRenamedPath (d == SyncFileItem.Down ? _renamedItemsRemote : _renamedItemsLocal, original);
+    return Occ.adjustRenamedPath (d == SyncFileItem.Down ? _renamedItemsRemote : _renamedItemsLocal, original);
 }
 
 QString adjustRenamedPath (QMap<QString, QString> &renamedItems, QString &original) {
@@ -224,8 +224,8 @@ void DiscoveryPhase.scheduleMoreJobs () {
     }
 }
 
-DiscoverySingleLocalDirectoryJob.DiscoverySingleLocalDirectoryJob (AccountPtr &account, QString &localPath, OCC.Vfs *vfs, QObject *parent)
- : QObject (parent), QRunnable (), _localPath (localPath), _account (account), _vfs (vfs) {
+DiscoverySingleLocalDirectoryJob.DiscoverySingleLocalDirectoryJob (AccountPtr &account, QString &localPath, Occ.Vfs *vfs, GLib.Object *parent)
+ : GLib.Object (parent), QRunnable (), _localPath (localPath), _account (account), _vfs (vfs) {
     qRegisterMetaType<QVector<LocalInfo> > ("QVector<LocalInfo>");
 }
 
@@ -244,7 +244,7 @@ void DiscoverySingleLocalDirectoryJob.run () {
             emit finishedNonFatalError (errorString);
             return;
         } else if (errno == ENOENT) {
-            errorString = tr ("Directory not found: %1").arg (localPath);
+            errorString = tr ("Directory not found : %1").arg (localPath);
         } else if (errno == ENOTDIR) {
             // Not a directory..
             // Just consider it is empty
@@ -292,8 +292,8 @@ void DiscoverySingleLocalDirectoryJob.run () {
     if (errno != 0) {
         csync_vio_local_closedir (dh);
 
-        // Note: Windows vio converts any error into EACCES
-        qCWarning (lcDiscovery) << "readdir failed for file in " << localPath << " - errno: " << errno;
+        // Note : Windows vio converts any error into EACCES
+        qCWarning (lcDiscovery) << "readdir failed for file in " << localPath << " - errno : " << errno;
         emit finishedFatalError (tr ("Error while reading directory %1").arg (localPath));
         return;
     }
@@ -301,14 +301,14 @@ void DiscoverySingleLocalDirectoryJob.run () {
     errno = 0;
     csync_vio_local_closedir (dh);
     if (errno != 0) {
-        qCWarning (lcDiscovery) << "closedir failed for file in " << localPath << " - errno: " << errno;
+        qCWarning (lcDiscovery) << "closedir failed for file in " << localPath << " - errno : " << errno;
     }
 
     emit finished (results);
 }
 
-DiscoverySingleDirectoryJob.DiscoverySingleDirectoryJob (AccountPtr &account, QString &path, QObject *parent)
-    : QObject (parent)
+DiscoverySingleDirectoryJob.DiscoverySingleDirectoryJob (AccountPtr &account, QString &path, GLib.Object *parent)
+    : GLib.Object (parent)
     , _subPath (path)
     , _account (account)
     , _ignoredFirst (false)
@@ -345,10 +345,10 @@ void DiscoverySingleDirectoryJob.start () {
 
     lsColJob.setProperties (props);
 
-    QObject.connect (lsColJob, &LsColJob.directoryListingIterated,
+    GLib.Object.connect (lsColJob, &LsColJob.directoryListingIterated,
         this, &DiscoverySingleDirectoryJob.directoryListingIteratedSlot);
-    QObject.connect (lsColJob, &LsColJob.finishedWithError, this, &DiscoverySingleDirectoryJob.lsJobFinishedWithErrorSlot);
-    QObject.connect (lsColJob, &LsColJob.finishedWithoutError, this, &DiscoverySingleDirectoryJob.lsJobFinishedWithoutErrorSlot);
+    GLib.Object.connect (lsColJob, &LsColJob.finishedWithError, this, &DiscoverySingleDirectoryJob.lsJobFinishedWithErrorSlot);
+    GLib.Object.connect (lsColJob, &LsColJob.finishedWithoutError, this, &DiscoverySingleDirectoryJob.lsJobFinishedWithoutErrorSlot);
     lsColJob.start ();
 
     _lsColJob = lsColJob;
@@ -473,7 +473,7 @@ void DiscoverySingleDirectoryJob.lsJobFinishedWithoutErrorSlot () {
     if (!_ignoredFirst) {
         // This is a sanity check, if we haven't _ignoredFirst then it means we never received any directoryListingIteratedSlot
         // which means somehow the server XML was bogus
-        emit finished (HttpError{ 0, tr ("Server error: PROPFIND reply is not XML formatted!") });
+        emit finished (HttpError{ 0, tr ("Server error : PROPFIND reply is not XML formatted!") });
         deleteLater ();
         return;
     } else if (!_error.isEmpty ()) {
@@ -497,7 +497,7 @@ void DiscoverySingleDirectoryJob.lsJobFinishedWithErrorSlot (QNetworkReply *r) {
     qCWarning (lcDiscovery) << "LSCOL job error" << r.errorString () << httpCode << r.error ();
     if (r.error () == QNetworkReply.NoError
         && !contentType.contains ("application/xml; charset=utf-8")) {
-        msg = tr ("Server error: PROPFIND reply is not XML formatted!");
+        msg = tr ("Server error : PROPFIND reply is not XML formatted!");
     }
     emit finished (HttpError{ httpCode, msg });
     deleteLater ();

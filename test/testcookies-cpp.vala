@@ -6,9 +6,9 @@
 
 // #include <QtTest>
 
-using namespace OCC;
+using namespace Occ;
 
-class TestCookies : public QObject {
+class TestCookies : GLib.Object {
 
 private slots:
     void testCookies () {

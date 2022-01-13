@@ -5,13 +5,13 @@
 // #include <QNetworkProxyFactory>
 // #include <QScreen>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcWizardWebiewPage, "nextcloud.gui.wizard.webviewpage", QtInfoMsg)
 
 WebViewPage.WebViewPage (QWidget *parent)
     : AbstractCredentialsWizardPage () {
-    _ocWizard = qobject_cast<OwncloudWizard *> (parent);
+    _ocWizard = qobject_cast<OwncloudWizard> (parent);
 
     qCInfo (lcWizardWebiewPage ()) << "Time for a webview!";
     _webView = new WebView (this);
@@ -44,7 +44,7 @@ void WebViewPage.initializePage () {
         }
         url += "index.php/login/flow";
     }
-    qCInfo (lcWizardWebiewPage ()) << "Url to auth at: " << url;
+    qCInfo (lcWizardWebiewPage ()) << "Url to auth at : " << url;
     _webView.setUrl (QUrl (url));
 
     _originalWizardSize = _ocWizard.size ();
@@ -100,7 +100,7 @@ void WebViewPage.setConnected () {
 }
 
 void WebViewPage.urlCatched (QString user, QString pass, QString host) {
-    qCInfo (lcWizardWebiewPage ()) << "Got user: " << user << ", server: " << host;
+    qCInfo (lcWizardWebiewPage ()) << "Got user : " << user << ", server : " << host;
 
     _user = user;
     _pass = pass;
@@ -108,7 +108,7 @@ void WebViewPage.urlCatched (QString user, QString pass, QString host) {
     AccountPtr account = _ocWizard.account ();
     account.setUrl (host);
 
-    qCInfo (lcWizardWebiewPage ()) << "URL: " << field ("OCUrl").toString ();
+    qCInfo (lcWizardWebiewPage ()) << "URL : " << field ("OCUrl").toString ();
     emit connectToOCUrl (host);
 }
 

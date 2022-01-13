@@ -1,28 +1,27 @@
 /*
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QLoggingCategory>
-// #include <QObject>
+// #include <GLib.Object>
 
-class QUrl;
 class QUrlQuery;
 
-namespace OCC {
+namespace Occ {
 
 Q_DECLARE_LOGGING_CATEGORY (lcUpdater)
 
-class Updater : public QObject {
+class Updater : GLib.Object {
 public:
     struct Helper {
         static int64 stringVersionToInt (QString &version);
@@ -40,7 +39,7 @@ public:
 protected:
     static QString clientVersion ();
     Updater ()
-        : QObject (nullptr) {
+        : GLib.Object (nullptr) {
     }
 
 private:
@@ -50,6 +49,4 @@ private:
     static Updater *_instance;
 };
 
-} // namespace OCC
-
-#endif // UPDATER_H
+} // namespace Occ

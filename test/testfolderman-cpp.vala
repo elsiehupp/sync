@@ -1,17 +1,17 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *    support, and with no warranty, express or implied, as to its usefulness for
- *    any purpose.
- *
- */
+   This software is in the public domain, furnished "as is", without technical
+   support, and with no warranty, express or implied, as to its usefulness for
+   any purpose.
+
+*/
 
 // #include <qglobal.h>
 // #include <QTemporaryDir>
 // #include <QtTest>
 
-using namespace OCC;
+using namespace Occ;
 
-class TestFolderMan: public QObject {
+class TestFolderMan : public GLib.Object {
 
     FolderMan _fm;
 
@@ -62,7 +62,7 @@ private slots:
         // A file . Error
         QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/sub/file.txt").isNull ());
 
-        // There are folders configured in those folders, url needs to be taken into account: . ERROR
+        // There are folders configured in those folders, url needs to be taken into account : . ERROR
         QUrl url2 (url);
         const QString user = account.credentials ().user ();
         url2.setUserName (user);

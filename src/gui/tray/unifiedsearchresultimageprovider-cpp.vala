@@ -1,23 +1,23 @@
 /*
- * Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QImage>
 // #include <QPainter>
 // #include <QSvgRenderer>
 
 namespace {
-class AsyncImageResponse : public QQuickImageResponse {
+class AsyncImageResponse : QQuickImageResponse {
 public:
     AsyncImageResponse (QString &id, QSize &requestedSize) {
         if (id.isEmpty ()) {
@@ -56,7 +56,7 @@ private:
             return;
         }
 
-        const auto currentUser = OCC.UserModel.instance ().currentUser ();
+        const auto currentUser = Occ.UserModel.instance ().currentUser ();
         if (currentUser && currentUser.account ()) {
             const QUrl iconUrl (_imagePaths.at (_index));
             if (iconUrl.isValid () && !iconUrl.scheme ().isEmpty ()) {
@@ -73,7 +73,7 @@ private:
 
 private slots:
     void slotProcessNetworkReply () {
-        const auto reply = qobject_cast<QNetworkReply *> (sender ());
+        const auto reply = qobject_cast<QNetworkReply> (sender ());
         if (!reply) {
             setImageAndEmitFinished ();
             return;
@@ -111,7 +111,7 @@ private slots:
 };
 }
 
-namespace OCC {
+namespace Occ {
 
 QQuickImageResponse *UnifiedSearchResultImageProvider.requestImageResponse (QString &id, QSize &requestedSize) {
     return new AsyncImageResponse (id, requestedSize);

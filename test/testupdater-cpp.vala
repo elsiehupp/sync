@@ -6,9 +6,9 @@
 
 // #include <QtTest>
 
-using namespace OCC;
+using namespace Occ;
 
-class TestUpdater : public QObject {
+class TestUpdater : GLib.Object {
 
 private slots:
     void testVersionToInt () {

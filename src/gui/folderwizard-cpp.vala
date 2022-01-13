@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QDesktopServices>
 // #include <QDir>
@@ -29,7 +29,7 @@
 
 // #include <cstdlib>
 
-namespace OCC {
+namespace Occ {
 
 QString FormatWarningsWizardPage.formatWarnings (QStringList &warnings) {
     QString ret;
@@ -189,7 +189,7 @@ void FolderWizardRemotePath.slotCreateRemoteFolderFinished () {
     qCDebug (lcWizard) << "webdav mkdir request finished";
     showWarn (tr ("Folder was successfully created on %1.").arg (Theme.instance ().appNameGUI ()));
     slotRefreshFolders ();
-    _ui.folderEntry.setText (static_cast<MkColJob *> (sender ()).path ());
+    _ui.folderEntry.setText (static_cast<MkColJob> (sender ()).path ());
     slotLsColFolderEntry ();
 }
 
@@ -213,9 +213,9 @@ void FolderWizardRemotePath.slotHandleLsColNetworkError (QNetworkReply *reply) {
         showWarn (QString ()); // hides the warning pane
         return;
     }
-    auto job = qobject_cast<LsColJob *> (sender ());
+    auto job = qobject_cast<LsColJob> (sender ());
     ASSERT (job);
-    showWarn (tr ("Failed to list a folder. Error: %1")
+    showWarn (tr ("Failed to list a folder. Error : %1")
                  .arg (job.errorStringParsingBody ()));
 }
 
@@ -420,7 +420,7 @@ bool FolderWizardRemotePath.isComplete () {
     Folder.Map map = FolderMan.instance ().map ();
     Folder.Map.const_iterator i = map.constBegin ();
     for (i = map.constBegin (); i != map.constEnd (); i++) {
-        auto *f = static_cast<Folder *> (i.value ());
+        auto *f = static_cast<Folder> (i.value ());
         if (f.accountState ().account () != _account) {
             continue;
         }
@@ -492,7 +492,7 @@ void FolderWizardSelectiveSync.initializePage () {
     _selectiveSync.setFolderInfo (targetPath, alias, initialBlacklist);
 
     if (_virtualFilesCheckBox) {
-        // TODO: remove when UX decision is made
+        // TODO : remove when UX decision is made
         if (Utility.isPathWindowsDrivePartitionRoot (wizard ().field (QStringLiteral ("sourceFolder")).toString ())) {
             _virtualFilesCheckBox.setChecked (false);
             _virtualFilesCheckBox.setEnabled (false);
@@ -552,8 +552,8 @@ void FolderWizardSelectiveSync.virtualFilesCheckboxClicked () {
 // ====================================================================================
 
 /**
- * Folder wizard itself
- */
+Folder wizard itself
+*/
 
 FolderWizard.FolderWizard (AccountPtr account, QWidget *parent)
     : QWizard (parent)
@@ -577,9 +577,9 @@ FolderWizard.FolderWizard (AccountPtr account, QWidget *parent)
 
 FolderWizard.~FolderWizard () = default;
 
-bool FolderWizard.eventFilter (QObject *watched, QEvent *event) {
+bool FolderWizard.eventFilter (GLib.Object *watched, QEvent *event) {
     if (event.type () == QEvent.LayoutRequest) {
-        // Workaround QTBUG-3396:  forces QWizardPrivate.updateLayout ()
+        // Workaround QTBUG-3396 :  forces QWizardPrivate.updateLayout ()
         QTimer.singleShot (0, this, [this] { setTitleFormat (titleFormat ()); });
     }
     return QWizard.eventFilter (watched, event);
@@ -588,7 +588,7 @@ bool FolderWizard.eventFilter (QObject *watched, QEvent *event) {
 void FolderWizard.resizeEvent (QResizeEvent *event) {
     QWizard.resizeEvent (event);
 
-    // workaround for QTBUG-22819: when the error label word wrap, the minimum height is not adjusted
+    // workaround for QTBUG-22819 : when the error label word wrap, the minimum height is not adjusted
     if (auto page = currentPage ()) {
         int hfw = page.heightForWidth (page.width ());
         if (page.height () < hfw) {

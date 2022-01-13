@@ -1,25 +1,25 @@
 /*
- * Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QLoggingCategory>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcEncryptFolderJob, "nextcloud.sync.propagator.encryptfolder", QtInfoMsg)
 
-EncryptFolderJob.EncryptFolderJob (AccountPtr &account, SyncJournalDb *journal, QString &path, QByteArray &fileId, QObject *parent)
-    : QObject (parent)
+EncryptFolderJob.EncryptFolderJob (AccountPtr &account, SyncJournalDb *journal, QString &path, QByteArray &fileId, GLib.Object *parent)
+    : GLib.Object (parent)
     , _account (account)
     , _journal (journal)
     , _path (path)
@@ -27,9 +27,9 @@ EncryptFolderJob.EncryptFolderJob (AccountPtr &account, SyncJournalDb *journal, 
 }
 
 void EncryptFolderJob.start () {
-    auto job = new OCC.SetEncryptionFlagApiJob (_account, _fileId, OCC.SetEncryptionFlagApiJob.Set, this);
-    connect (job, &OCC.SetEncryptionFlagApiJob.success, this, &EncryptFolderJob.slotEncryptionFlagSuccess);
-    connect (job, &OCC.SetEncryptionFlagApiJob.error, this, &EncryptFolderJob.slotEncryptionFlagError);
+    auto job = new Occ.SetEncryptionFlagApiJob (_account, _fileId, Occ.SetEncryptionFlagApiJob.Set, this);
+    connect (job, &Occ.SetEncryptionFlagApiJob.success, this, &EncryptFolderJob.slotEncryptionFlagSuccess);
+    connect (job, &Occ.SetEncryptionFlagApiJob.error, this, &EncryptFolderJob.slotEncryptionFlagError);
     job.start ();
 }
 
@@ -64,7 +64,7 @@ void EncryptFolderJob.slotLockForEncryptionSuccess (QByteArray &fileId, QByteArr
     FolderMetadata emptyMetadata (_account);
     auto encryptedMetadata = emptyMetadata.encryptedMetadata ();
     if (encryptedMetadata.isEmpty ()) {
-        //TODO: Mark the folder as unencrypted as the metadata generation failed.
+        //TODO : Mark the folder as unencrypted as the metadata generation failed.
         _errorString = tr ("Could not generate the metadata for encryption, Unlocking the folder.\n"
                           "This can be an issue with your OpenSSL libraries.");
         emit finished (Error);

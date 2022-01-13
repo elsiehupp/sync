@@ -6,8 +6,8 @@
 
 Q_LOGGING_CATEGORY (lcFakeWebSocketServer, "nextcloud.test.fakewebserver", QtInfoMsg)
 
-FakeWebSocketServer.FakeWebSocketServer (uint16 port, QObject *parent)
-    : QObject (parent)
+FakeWebSocketServer.FakeWebSocketServer (uint16 port, GLib.Object *parent)
+    : GLib.Object (parent)
     , _webSocketServer (new QWebSocketServer (QStringLiteral ("Fake Server"), QWebSocketServer.NonSecureMode, this)) {
     if (!_webSocketServer.listen (QHostAddress.Any, port)) {
         Q_UNREACHABLE ();
@@ -22,10 +22,10 @@ FakeWebSocketServer.~FakeWebSocketServer () {
     close ();
 }
 
-QWebSocket *FakeWebSocketServer.authenticateAccount (OCC.AccountPtr account, std.function<void (OCC.PushNotifications *pushNotifications)> beforeAuthentication, std.function<void (void)> afterAuthentication) {
+QWebSocket *FakeWebSocketServer.authenticateAccount (Occ.AccountPtr account, std.function<void (Occ.PushNotifications *pushNotifications)> beforeAuthentication, std.function<void (void)> afterAuthentication) {
     const auto pushNotifications = account.pushNotifications ();
     Q_ASSERT (pushNotifications);
-    QSignalSpy readySpy (pushNotifications, &OCC.PushNotifications.ready);
+    QSignalSpy readySpy (pushNotifications, &Occ.PushNotifications.ready);
 
     beforeAuthentication (pushNotifications);
 
@@ -71,7 +71,7 @@ void FakeWebSocketServer.close () {
 }
 
 void FakeWebSocketServer.processTextMessageInternal (QString &message) {
-    auto client = qobject_cast<QWebSocket *> (sender ());
+    auto client = qobject_cast<QWebSocket> (sender ());
     emit processTextMessage (client, message);
 }
 
@@ -89,7 +89,7 @@ void FakeWebSocketServer.onNewConnection () {
 void FakeWebSocketServer.socketDisconnected () {
     qCInfo (lcFakeWebSocketServer) << "Socket disconnected";
 
-    auto client = qobject_cast<QWebSocket *> (sender ());
+    auto client = qobject_cast<QWebSocket> (sender ());
 
     if (client) {
         _clients.removeAll (client);
@@ -112,15 +112,15 @@ QString FakeWebSocketServer.textMessage (int messageNumber) {
 
 QWebSocket *FakeWebSocketServer.socketForTextMessage (int messageNumber) {
     Q_ASSERT (0 <= messageNumber && messageNumber < _processTextMessageSpy.count ());
-    return _processTextMessageSpy.at (messageNumber).at (0).value<QWebSocket *> ();
+    return _processTextMessageSpy.at (messageNumber).at (0).value<QWebSocket> ();
 }
 
 void FakeWebSocketServer.clearTextMessages () {
     _processTextMessageSpy.clear ();
 }
 
-OCC.AccountPtr FakeWebSocketServer.createAccount (QString &username, QString &password) {
-    auto account = OCC.Account.create ();
+Occ.AccountPtr FakeWebSocketServer.createAccount (QString &username, QString &password) {
+    auto account = Occ.Account.create ();
 
     QStringList typeList;
     typeList.append ("files");

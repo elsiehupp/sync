@@ -1,42 +1,38 @@
 /*
- * Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-// #include <QObject>
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
+
+// #include <GLib.Object>
 // #include <QStringList>
 // #include <QUuid>
 // #include <set>
 // #include <chrono>
 // #include <memory>
 
-class QThread;
 class QSettings;
 
-namespace OCC {
+namespace Occ {
 
-class Vfs;
 class SyncEngine;
-class AccountState;
 class SyncRunFileLog;
-class FolderWatcher;
 class LocalDiscoveryTracker;
 
 /**
- * @brief The FolderDefinition class
- * @ingroup gui
- */
+@brief The FolderDefinition class
+@ingroup gui
+*/
 class FolderDefinition {
 public:
     /// The name of the folder in the ui and internally
@@ -68,31 +64,31 @@ public:
 
     /** The highest version in the settings that load () can read
      *
-     * Version 1: initial version (default if value absent in settings)
-     * Version 2: introduction of metadata_parent hash in 2.6.0
+     * Version 1 : initial version (default if value absent in settings)
+     * Version 2 : introduction of metadata_parent hash in 2.6.0
      *            (version remains readable by 2.5.1)
-     * Version 3: introduction of new windows vfs mode in 2.6.0
+     * Version 3 : introduction of new windows vfs mode in 2.6.0
      */
     static int maxSettingsVersion () { return 3; }
 
     /// Ensure / as separator and trailing /.
     static QString prepareLocalPath (QString &path);
 
-    /// Remove ending /, then ensure starting '/': so "/foo/bar" and "/".
+    /// Remove ending /, then ensure starting '/' : so "/foo/bar" and "/".
     static QString prepareTargetPath (QString &path);
 
     /// journalPath relative to localPath.
-    QString absoluteJournalPath () const;
+    QString absoluteJournalPath ();
 
     /// Returns the relative journal path that's appropriate for this folder and account.
     QString defaultJournalPath (AccountPtr account);
 };
 
 /**
- * @brief The Folder class
- * @ingroup gui
- */
-class Folder : public QObject {
+@brief The Folder class
+@ingroup gui
+*/
+class Folder : GLib.Object {
 
 public:
     enum class ChangeReason {
@@ -103,12 +99,12 @@ public:
 
     /** Create a new Folder
      */
-    Folder (FolderDefinition &definition, AccountState *accountState, std.unique_ptr<Vfs> vfs, QObject *parent = nullptr);
+    Folder (FolderDefinition &definition, AccountState *accountState, std.unique_ptr<Vfs> vfs, GLib.Object *parent = nullptr);
 
     ~Folder () override;
 
-    using Map = QMap<QString, Folder *>;
-    using MapIterator = QMapIterator<QString, Folder *>;
+    using Map = QMap<QString, Folder>;
+    using MapIterator = QMapIterator<QString, Folder>;
 
     /**
      * The account the folder is configured on.
@@ -118,18 +114,18 @@ public:
     /**
      * alias or nickname
      */
-    QString alias () const;
-    QString shortGuiRemotePathOrAppName () const; // since 2.0 we don't want to show aliases anymore, show the path instead
+    QString alias ();
+    QString shortGuiRemotePathOrAppName (); // since 2.0 we don't want to show aliases anymore, show the path instead
 
     /**
      * short local path to display on the GUI  (native separators)
      */
-    QString shortGuiLocalPath () const;
+    QString shortGuiLocalPath ();
 
     /**
      * canonical local folder path, always ends with /
      */
-    QString path () const;
+    QString path ();
 
     /**
      * cleaned canonical folder path, like path () but never ends with a /
@@ -137,17 +133,17 @@ public:
      * Wrapper for QDir.cleanPath (path ()) except for "Z:/",
      * where it returns "Z:" instead of "Z:/".
      */
-    QString cleanPath () const;
+    QString cleanPath ();
 
     /**
      * remote folder path, usually without trailing /, exception "/"
      */
-    QString remotePath () const;
+    QString remotePath ();
 
     /**
      * remote folder path, always with a trailing /
      */
-    QString remotePathTrailingSlash () const;
+    QString remotePathTrailingSlash ();
 
     void setNavigationPaneClsid (QUuid &clsid) { _definition.navigationPaneClsid = clsid; }
     QUuid navigationPaneClsid () { return _definition.navigationPaneClsid; }
@@ -155,19 +151,19 @@ public:
     /**
      * remote folder path with server url
      */
-    QUrl remoteUrl () const;
+    QUrl remoteUrl ();
 
     /**
      * switch sync on or off
      */
     void setSyncPaused (bool);
 
-    bool syncPaused () const;
+    bool syncPaused ();
 
     /**
      * Returns true when the folder may sync.
      */
-    bool canSync () const;
+    bool canSync ();
 
     void prepareToSync ();
 
@@ -175,15 +171,15 @@ public:
      * True if the folder is busy and can't initiate
      * a synchronization
      */
-    virtual bool isBusy () const;
+    virtual bool isBusy ();
 
     /** True if the folder is currently synchronizing */
-    bool isSyncRunning () const;
+    bool isSyncRunning ();
 
     /**
      * return the last sync result with error message and status
      */
-    SyncResult syncResult () const;
+    SyncResult syncResult ();
 
     /**
       * This is called when the sync folder definition is removed. Do cleanups here.
@@ -219,9 +215,9 @@ public:
     int consecutiveFailingSyncs () { return _consecutiveFailingSyncs; }
 
     /// Saves the folder data in the account's settings.
-    void saveToSettings () const;
+    void saveToSettings ();
     /// Removes the folder from the account's settings.
-    void removeFromSettings () const;
+    void removeFromSettings ();
 
     /**
       * Returns whether a file inside this folder should be excluded.
@@ -245,12 +241,12 @@ public:
     void scheduleThisFolderSoon ();
 
     /**
-      * Migration: When this flag is true, this folder will save to
+      * Migration : When this flag is true, this folder will save to
       * the backwards-compatible 'Folders' section in the config file.
       */
     void setSaveBackwardsCompatible (bool save);
 
-    /** Used to have placeholders: save in placeholder config section */
+    /** Used to have placeholders : save in placeholder config section */
     void setSaveInFoldersWithPlaceholders () { _saveInFoldersWithPlaceholders = true; }
 
     /**
@@ -266,7 +262,7 @@ public:
      * and never have an automatic virtual file. But when it's on, the shell context menu will allow
      * users to make existing files virtual.
      */
-    bool virtualFilesEnabled () const;
+    bool virtualFilesEnabled ();
     void setVirtualFilesEnabled (bool enabled);
 
     void setRootPinState (PinState state);
@@ -280,7 +276,7 @@ public:
     void processSwitchedToVirtualFiles ();
 
     /** Whether this folder should show selective sync ui */
-    bool supportsSelectiveSync () const;
+    bool supportsSelectiveSync ();
 
     QString fileFromLocalPath (QString &localPath) const;
 

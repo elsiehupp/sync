@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 #ifdef WITH_LIBCLOUDPROVIDERS
 #endif
@@ -31,12 +31,12 @@
 // #include <QQuickItem>
 // #include <QQmlContext>
 
-namespace OCC {
+namespace Occ {
 
 const char propertyAccountC[] = "oc_account";
 
 ownCloudGui.ownCloudGui (Application *parent)
-    : QObject (parent)
+    : GLib.Object (parent)
     , _tray (nullptr)
     , _settingsDialog (nullptr)
     , _logBrowser (nullptr)
@@ -156,7 +156,7 @@ void ownCloudGui.slotTrayClicked (QSystemTrayIcon.ActivationReason reason) {
 
         }
     }
-    // FIXME: Also make sure that any auto updater dialogue https://github.com/owncloud/client/issues/5613
+    // FIXME : Also make sure that any auto updater dialogue https://github.com/owncloud/client/issues/5613
     // or SSL error dialog also comes to front.
 }
 
@@ -169,7 +169,7 @@ void ownCloudGui.slotSyncStateChange (Folder *folder) {
 
     auto result = folder.syncResult ();
 
-    qCInfo (lcApplication) << "Sync state changed for folder " << folder.remoteUrl ().toString () << ": " << result.statusString ();
+    qCInfo (lcApplication) << "Sync state changed for folder " << folder.remoteUrl ().toString () << " : " << result.statusString ();
 
     if (result.status () == SyncResult.Success
         || result.status () == SyncResult.Problem
@@ -208,7 +208,7 @@ void ownCloudGui.slotComputeOverallSyncStatus () {
     bool allDisconnected = true;
     QVector<AccountStatePtr> problemAccounts;
     auto setStatusText = [&] (QString &text) {
-        // FIXME: So this doesn't do anything? Needs to be revisited
+        // FIXME : So this doesn't do anything? Needs to be revisited
         Q_UNUSED (text)
         // Don't overwrite the status if we're currently syncing
         if (FolderMan.instance ().isAnySyncRunning ())
@@ -242,7 +242,7 @@ void ownCloudGui.slotComputeOverallSyncStatus () {
         QStringList messages;
         messages.append (tr ("Disconnected from accounts:"));
         foreach (AccountStatePtr a, problemAccounts) {
-            QString message = tr ("Account %1: %2").arg (a.account ().displayName (), a.stateString (a.state ()));
+            QString message = tr ("Account %1 : %2").arg (a.account ().displayName (), a.stateString (a.state ()));
             if (!a.connectionErrors ().empty ()) {
                 message += QLatin1String ("\n");
                 message += a.connectionErrors ().join (QLatin1String ("\n"));
@@ -298,7 +298,7 @@ void ownCloudGui.slotComputeOverallSyncStatus () {
                 folder.syncResult ().status (),
                 folder.syncResult ().hasUnresolvedConflicts (),
                 folder.syncPaused ());
-            allStatusStrings += tr ("Folder %1: %2").arg (folder.shortGuiLocalPath (), folderMessage);
+            allStatusStrings += tr ("Folder %1 : %2").arg (folder.shortGuiLocalPath (), folderMessage);
         }
         trayMessage = allStatusStrings.join (QLatin1String ("\n"));
 #endif
@@ -330,7 +330,7 @@ void ownCloudGui.slotShowTrayMessage (QString &title, QString &msg) {
     if (_tray)
         _tray.showMessage (title, msg);
     else
-        qCWarning (lcApplication) << "Tray not ready: " << msg;
+        qCWarning (lcApplication) << "Tray not ready : " << msg;
 }
 
 void ownCloudGui.slotShowOptionalTrayMessage (QString &title, QString &msg) {
@@ -338,8 +338,8 @@ void ownCloudGui.slotShowOptionalTrayMessage (QString &title, QString &msg) {
 }
 
 /*
- * open the folder with the given Alias
- */
+open the folder with the given Alias
+*/
 void ownCloudGui.slotFolderOpenAction (QString &alias) {
     Folder *f = FolderMan.instance ().folder (alias);
     if (f) {
@@ -352,7 +352,7 @@ void ownCloudGui.slotFolderOpenAction (QString &alias) {
 void ownCloudGui.slotUpdateProgress (QString &folder, ProgressInfo &progress) {
     Q_UNUSED (folder);
 
-    // FIXME: Lots of messages computed for nothing in this method, needs revisiting
+    // FIXME : Lots of messages computed for nothing in this method, needs revisiting
     if (progress.status () == ProgressInfo.Discovery) {
 #if 0
         if (!progress._currentDiscoveredRemoteFolder.isEmpty ()) {
@@ -492,7 +492,7 @@ void ownCloudGui.slotToggleLogBrowser () {
     if (_logBrowser.isNull ()) {
         // init the log browser.
         _logBrowser = new LogBrowser;
-        // ## TODO: allow new log name maybe?
+        // ## TODO : allow new log name maybe?
     }
 
     if (_logBrowser.isVisible ()) {
@@ -535,7 +535,7 @@ void ownCloudGui.slotShowShareDialog (QString &sharePath, QString &localPath, Sh
 
     bool resharingAllowed = true; // lets assume the good
     if (folder.journalDb ().getFileRecord (file, &fileRecord) && fileRecord.isValid ()) {
-        // check the permission: Is resharing allowed?
+        // check the permission : Is resharing allowed?
         if (!fileRecord._remotePerm.isNull () && !fileRecord._remotePerm.hasPermission (RemotePermissions.CanReshare)) {
             resharingAllowed = false;
         }
@@ -553,7 +553,7 @@ void ownCloudGui.slotShowShareDialog (QString &sharePath, QString &localPath, Sh
         w.setAttribute (Qt.WA_DeleteOnClose, true);
 
         _shareDialogs[localPath] = w;
-        connect (w, &QObject.destroyed, this, &ownCloudGui.slotRemoveDestroyedShareDialogs);
+        connect (w, &GLib.Object.destroyed, this, &ownCloudGui.slotRemoveDestroyedShareDialogs);
     }
     raiseDialog (w);
 }

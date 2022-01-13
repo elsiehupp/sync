@@ -1,48 +1,47 @@
 /*
- * Copyright (C) by Christian Kamm <mail@ckamm.de>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Christian Kamm <mail@ckamm.de>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <set>
-// #include <QObject>
+// #include <GLib.Object>
 // #include <QByteArray>
 // #include <QSharedPointer>
 
-namespace OCC {
+namespace Occ {
 
-class SyncFileItem;
 using SyncFileItemPtr = QSharedPointer<SyncFileItem>;
 
 /**
- * @brief Tracks files that must be rediscovered locally
- *
- * It does this by being notified about
- * - modified files (addTouchedPath (), from file watcher)
- * - starting syncs (startSync* ())
- * - finished items (slotItemCompleted (), by SyncEngine signal)
- * - finished syncs (slotSyncFinished (), by SyncEngine signal)
- *
- * Then localDiscoveryPaths () can be used to determine paths to rediscover
- * and send to SyncEngine.setLocalDiscoveryOptions ().
- *
- * This class is primarily used from Folder and separate primarily for
- * readability and testing purposes.
- *
- * All paths used in this class are expected to be utf8 encoded byte arrays,
- * relative to the folder that is being synced, without a starting slash.
- *
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT LocalDiscoveryTracker : public QObject {
+@brief Tracks files that must be rediscovered locally
+
+It does this by being notified about
+- modified files (addTouchedPath
+- starting syncs (startSync* ())
+- finished items (slotItemCompleted (), by SyncEngine signal)
+- finished syncs (slotSyncFinished (), by SyncEngine signal)
+
+Then localDiscoveryPaths () can be used to determine paths to redis
+and send to SyncEngine.setLocalDisco
+
+This class is primarily used from Folder and separate primarily for
+readability and testing purposes.
+
+All paths used in this class are expected to be utf8 encoded byte arrays,
+relative to the folder that is being synced, without a starting slash.
+
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT LocalDiscoveryTracker : GLib.Object {
 public:
     LocalDiscoveryTracker ();
 
@@ -60,7 +59,7 @@ public:
     void startSyncPartialDiscovery ();
 
     /** Access list of files that shall be locally rediscovered. */
-    const std.set<QString> &localDiscoveryPaths () const;
+    const std.set<QString> &localDiscoveryPaths ();
 
 public slots:
     /**
@@ -92,6 +91,6 @@ private:
     std.set<QString> _previousLocalDiscoveryPaths;
 };
 
-} // namespace OCC
+} // namespace Occ
 
 #endif

@@ -1,28 +1,28 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <sys/inotify.h>
 
 // #include <cerrno>
 // #include <QStringList>
-// #include <QObject>
+// #include <GLib.Object>
 // #include <QVarLengthArray>
 
-namespace OCC {
+namespace Occ {
 
 FolderWatcherPrivate.FolderWatcherPrivate (FolderWatcher *p, QString &path)
-    : QObject ()
+    : GLib.Object ()
     , _parent (p)
     , _folder (path) {
     _fd = inotify_init ();
@@ -30,7 +30,7 @@ FolderWatcherPrivate.FolderWatcherPrivate (FolderWatcher *p, QString &path)
         _socket.reset (new QSocketNotifier (_fd, QSocketNotifier.Read));
         connect (_socket.data (), &QSocketNotifier.activated, this, &FolderWatcherPrivate.slotReceivedNotification);
     } else {
-        qCWarning (lcFolderWatcher) << "notify_init () failed: " << strerror (errno);
+        qCWarning (lcFolderWatcher) << "notify_init () failed : " << strerror (errno);
     }
 
     QMetaObject.invokeMethod (this, "slotAddFolderRecursive", Q_ARG (QString, path));
@@ -38,11 +38,11 @@ FolderWatcherPrivate.FolderWatcherPrivate (FolderWatcher *p, QString &path)
 
 FolderWatcherPrivate.~FolderWatcherPrivate () = default;
 
-// attention: result list passed by reference!
+// attention : result list passed by reference!
 bool FolderWatcherPrivate.findFoldersBelow (QDir &dir, QStringList &fullList) {
     bool ok = true;
     if (! (dir.exists () && dir.isReadable ())) {
-        qCDebug (lcFolderWatcher) << "Non existing path coming in: " << dir.absolutePath ();
+        qCDebug (lcFolderWatcher) << "Non existing path coming in : " << dir.absolutePath ();
         ok = false;
     } else {
         QStringList nameFilter;
@@ -132,7 +132,7 @@ void FolderWatcherPrivate.slotReceivedNotification (int fd) {
       *
       * The behavior when the buffer given to read (2) is too
       * small to return information about the next event
-      * depends on the kernel version: in kernels  before 2.6.21,
+      * depends on the kernel version : in kernels  before 2.6.21,
       * read (2) returns 0; since kernel 2.6.21, read (2) fails with
       * the error EINVAL.
       */

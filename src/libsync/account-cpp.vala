@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <deletejob.h>
 
@@ -42,16 +42,16 @@ constexpr int pushNotificationsReconnectInterval = 1000 * 60 * 2;
 constexpr int usernamePrefillServerVersinMinSupportedMajor = 24;
 }
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcAccount, "nextcloud.sync.account", QtInfoMsg)
 const char app_password[] = "_app-password";
 
-Account.Account (QObject *parent)
-    : QObject (parent)
+Account.Account (GLib.Object *parent)
+    : GLib.Object (parent)
     , _capabilities (QVariantMap ()) {
     qRegisterMetaType<AccountPtr> ("AccountPtr");
-    qRegisterMetaType<Account *> ("Account*");
+    qRegisterMetaType<Account> ("Account*");
 
     _pushNotificationsReconnectTimer.setInterval (pushNotificationsReconnectInterval);
     connect (&_pushNotificationsReconnectTimer, &QTimer.timeout, this, &Account.trySetupPushNotifications);
@@ -155,10 +155,10 @@ void Account.setCredentials (AbstractCredentials *cred) {
     _credentials.reset (cred);
     cred.setAccount (this);
 
-    // Note: This way the QNAM can outlive the Account and Credentials.
+    // Note : This way the QNAM can outlive the Account and Credentials.
     // This is necessary to avoid issues with the QNAM being deleted while
     // processing slotHandleSslErrors ().
-    _am = QSharedPointer<QNetworkAccessManager> (_credentials.createQNAM (), &QObject.deleteLater);
+    _am = QSharedPointer<QNetworkAccessManager> (_credentials.createQNAM (), &GLib.Object.deleteLater);
 
     if (jar) {
         _am.setCookieJar (jar);
@@ -228,10 +228,10 @@ QUrl Account.deprecatedPrivateLinkUrl (QByteArray &numericFileId) {
 }
 
 /**
- * clear all cookies. (Session cookies or not)
- */
+clear all cookies. (Session cookies or not)
+*/
 void Account.clearCookieJar () {
-    auto jar = qobject_cast<CookieJar *> (_am.cookieJar ());
+    auto jar = qobject_cast<CookieJar> (_am.cookieJar ());
     ASSERT (jar);
     jar.setAllCookies (QList<QNetworkCookie> ());
     emit wantsAccountSaved (this);
@@ -262,7 +262,7 @@ void Account.resetNetworkAccessManager () {
 
     // Use a QSharedPointer to allow locking the life of the QNAM on the stack.
     // Make it call deleteLater to make sure that we can return to any QNAM stack frames safely.
-    _am = QSharedPointer<QNetworkAccessManager> (_credentials.createQNAM (), &QObject.deleteLater);
+    _am = QSharedPointer<QNetworkAccessManager> (_credentials.createQNAM (), &GLib.Object.deleteLater);
 
     _am.setCookieJar (jar); // takes ownership of the old cookie jar
     _am.setProxy (proxy);   // Remember proxy (issue #2108)
@@ -344,7 +344,7 @@ QSslConfiguration Account.getOrCreateSslConfig () {
     }
 
     // if setting the client certificate fails, you will probably get an error similar to this:
-    //  "An internal error number 1060 happened. SSL handshake failed, client certificate was requested: SSL error: sslv3 alert handshake failure"
+    //  "An internal error number 1060 happened. SSL handshake failed, client certificate was requested : SSL error : sslv3 alert handshake failure"
     QSslConfiguration sslConfig = QSslConfiguration.defaultConfiguration ();
 
     // Try hard to re-use session for different requests
@@ -439,7 +439,7 @@ void Account.slotHandleSslErrors (QNetworkReply *reply, QList<QSslError> errors)
     // Keep a ref here on our stackframe to make sure that it doesn't get deleted before
     // handleErrors returns.
     QSharedPointer<QNetworkAccessManager> qnamLock = _am;
-    QPointer<QObject> guard = reply;
+    QPointer<GLib.Object> guard = reply;
 
     if (_sslErrorHandler.handleErrors (errors, reply.sslConfiguration (), &approvedCerts, sharedFromThis ())) {
         if (!guard)
@@ -454,7 +454,7 @@ void Account.slotHandleSslErrors (QNetworkReply *reply, QList<QSslError> errors)
             qCInfo (lcAccount) << out << "Certs are known and trusted! This is not an actual error.";
         }
 
-        // Warning: Do *not* use ignoreSslErrors () (without args) here:
+        // Warning : Do *not* use ignoreSslErrors () (without args) here:
         // it permanently ignores all SSL errors for this host, even
         // certificate changes.
         reply.ignoreSslErrors (errors);
@@ -539,7 +539,7 @@ QString Account.serverVersion () {
 }
 
 int Account.serverVersionInt () {
-    // FIXME: Use Qt 5.5 QVersionNumber
+    // FIXME : Use Qt 5.5 QVersionNumber
     auto components = serverVersion ().split ('.');
     return makeServerVersion (components.value (0).toInt (),
         components.value (1).toInt (),
@@ -577,7 +577,7 @@ void Account.writeAppPasswordOnce (QString appPassword){
     if (_wroteAppPassword)
         return;
 
-    // Fix: Password got written from Account Wizard, before finish.
+    // Fix : Password got written from Account Wizard, before finish.
     // Only write the app password for a connected account, else
     // there'll be a zombie keychain slot forever, never used again ;p
     //
@@ -596,7 +596,7 @@ void Account.writeAppPasswordOnce (QString appPassword){
     job.setKey (kck);
     job.setBinaryData (appPassword.toLatin1 ());
     connect (job, &WritePasswordJob.finished, [this] (Job *incoming) {
-        auto *writeJob = static_cast<WritePasswordJob *> (incoming);
+        auto *writeJob = static_cast<WritePasswordJob> (incoming);
         if (writeJob.error () == NoError)
             qCInfo (lcAccount) << "appPassword stored in keychain";
         else
@@ -619,7 +619,7 @@ void Account.retrieveAppPassword (){
     job.setInsecureFallback (false);
     job.setKey (kck);
     connect (job, &ReadPasswordJob.finished, [this] (Job *incoming) {
-        auto *readJob = static_cast<ReadPasswordJob *> (incoming);
+        auto *readJob = static_cast<ReadPasswordJob> (incoming);
         QString pwd ("");
         // Error or no valid public key error out
         if (readJob.error () == NoError &&
@@ -648,7 +648,7 @@ void Account.deleteAppPassword () {
     job.setInsecureFallback (false);
     job.setKey (kck);
     connect (job, &DeletePasswordJob.finished, [this] (Job *incoming) {
-        auto *deleteJob = static_cast<DeletePasswordJob *> (incoming);
+        auto *deleteJob = static_cast<DeletePasswordJob> (incoming);
         if (deleteJob.error () == NoError)
             qCInfo (lcAccount) << "appPassword deleted from keychain";
         else
@@ -663,12 +663,12 @@ void Account.deleteAppPassword () {
 void Account.deleteAppToken () {
     const auto deleteAppTokenJob = new DeleteJob (sharedFromThis (), QStringLiteral ("/ocs/v2.php/core/apppassword"));
     connect (deleteAppTokenJob, &DeleteJob.finishedSignal, this, [this] () {
-        if (auto deleteJob = qobject_cast<DeleteJob *> (QObject.sender ())) {
+        if (auto deleteJob = qobject_cast<DeleteJob> (GLib.Object.sender ())) {
             const auto httpCode = deleteJob.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).toInt ();
             if (httpCode != 200) {
-                qCWarning (lcAccount) << "AppToken remove failed for user: " << displayName () << " with code: " << httpCode;
+                qCWarning (lcAccount) << "AppToken remove failed for user : " << displayName () << " with code : " << httpCode;
             } else {
-                qCInfo (lcAccount) << "AppToken for user: " << displayName () << " has been removed.";
+                qCInfo (lcAccount) << "AppToken for user : " << displayName () << " has been removed.";
             }
         } else {
             Q_ASSERT (false);
@@ -687,7 +687,7 @@ void Account.fetchDirectEditors (QUrl &directEditingURL, QString &directEditingE
         (directEditingETag.isEmpty () || directEditingETag != _lastDirectEditingETag)) {
             // Fetch the available editors and their mime types
             auto *job = new JsonApiJob (sharedFromThis (), QLatin1String ("ocs/v2.php/apps/files/api/v1/directEditing"));
-            QObject.connect (job, &JsonApiJob.jsonReceived, this, &Account.slotDirectEditingRecieved);
+            GLib.Object.connect (job, &JsonApiJob.jsonReceived, this, &Account.slotDirectEditingRecieved);
             job.start ();
     }
 }
@@ -729,4 +729,4 @@ std.shared_ptr<UserStatusConnector> Account.userStatusConnector () {
     return _userStatusConnector;
 }
 
-} // namespace OCC
+} // namespace Occ

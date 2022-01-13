@@ -1,55 +1,52 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-// #include <QObject>
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
+
+// #include <GLib.Object>
 // #include <QQueue>
 // #include <QList>
 
-class TestFolderMan;
 
-namespace OCC {
+namespace Occ {
 
-class Application;
 class SyncResult;
-class SocketApi;
 class LockWatcher;
 
 /**
- * @brief The FolderMan class
- * @ingroup gui
- *
- * The FolderMan knows about all loaded folders and is responsible for
- * scheduling them when necessary.
- *
- * A folder is scheduled if:
- * - The configured force-sync-interval has expired
- *   (_timeScheduler and slotScheduleFolderByTime ())
- *
- * - A folder watcher receives a notification about a file change
- *   (_folderWatchers and Folder.slotWatchedPathChanged ())
- *
- * - The folder etag on the server has changed
- *   (_etagPollTimer)
- *
- * - The locks of a monitored file are released
- *   (_lockWatcher and slotWatchedFileUnlocked ())
- *
- * - There was a sync error or a follow-up sync is requested
- *   (_timeScheduler and slotScheduleFolderByTime ()
- *    and Folder.slotSyncFinished ())
- */
-class FolderMan : public QObject {
+@brief The FolderMan class
+@ingroup gui
+
+The FolderMan knows about all load
+scheduling them when nece
+
+A folder is scheduled if:
+- The configured force-sync-interval has expired
+  (_timeScheduler and slotScheduleFolderByTime ())
+
+- A folder watcher re
+  (_folderWatchers and Folder.slotWatchedPat
+
+- The folder etag on the server has changed
+  (_etagPollTimer)
+
+- The locks of a monitored file are released
+  (_lockWatcher and slotWatchedFileUnlocked ())
+
+- There was a sync error or a follow-up sync is r
+  (_timeScheduler and slotScheduleFolderByTime ()
+   and Folder.slotSyncFinished ())
+*/
+class FolderMan : GLib.Object {
 public:
     ~FolderMan () override;
     static FolderMan *instance ();
@@ -63,7 +60,7 @@ public:
      */
     static void backwardMigrationSettingsKeys (QStringList *deleteKeys, QStringList *ignoreKeys);
 
-    const Folder.Map &map () const;
+    const Folder.Map &map ();
 
     /** Adds a folder for an account, ensures the journal is gone and saves it in the settings.
       */
@@ -105,7 +102,7 @@ public:
     static QString trayTooltipStatusString (SyncResult.Status syncStatus, bool hasUnresolvedConflicts, bool paused);
 
     /// Compute status summarizing multiple folders
-    static void trayOverallStatus (QList<Folder *> &folders,
+    static void trayOverallStatus (QList<Folder> &folders,
         SyncResult.Status *status, bool *unresolvedConflicts);
 
     // Escaping of the alias which is used in QSettings AND the file
@@ -143,23 +140,23 @@ public:
      * at once.
      * These helper functions can be removed once it's properly per-folder.
      */
-    bool ignoreHiddenFiles () const;
+    bool ignoreHiddenFiles ();
     void setIgnoreHiddenFiles (bool ignore);
 
     /**
      * Access to the current queue of scheduled folders.
      */
-    QQueue<Folder *> scheduleQueue () const;
+    QQueue<Folder> scheduleQueue ();
 
     /**
      * Access to the currently syncing folder.
      *
-     * Note: This is only the folder that's currently syncing *as-scheduled*. There
+     * Note : This is only the folder that's currently syncing *as-scheduled*. There
      * may be externally-managed syncs such as from placeholder hydrations.
      *
      * See also isAnySyncRunning ()
      */
-    Folder *currentSyncFolder () const;
+    Folder *currentSyncFolder ();
 
     /**
      * Returns true if any folder is currently syncing.
@@ -167,7 +164,7 @@ public:
      * This might be a FolderMan-scheduled sync, or a externally
      * managed sync like a placeholder hydration.
      */
-    bool isAnySyncRunning () const;
+    bool isAnySyncRunning ();
 
     /** Removes all folders */
     int unloadAndDeleteAllFolders ();
@@ -194,7 +191,7 @@ signals:
     /**
       * signal to indicate a folder has changed its sync state.
       *
-      * Attention: The folder may be zero. Do a general update of the state then.
+      * Attention : The folder may be zero. Do a general update of the state then.
       */
     void folderSyncStateChange (Folder *);
 
@@ -247,7 +244,7 @@ private slots:
     void slotFolderSyncFinished (SyncResult &);
 
     void slotRunOneEtagJob ();
-    void slotEtagJobDestroyed (QObject *);
+    void slotEtagJobDestroyed (GLib.Object *);
 
     // slot to take the next folder from queue and start syncing.
     void slotStartScheduledFolderSync ();
@@ -308,14 +305,14 @@ private:
 
     void setupFoldersHelper (QSettings &settings, AccountStatePtr account, QStringList &ignoreKeys, bool backwardsCompatible, bool foldersWithPlaceholders);
 
-    void runEtagJobsIfPossible (QList<Folder *> &folderMap);
+    void runEtagJobsIfPossible (QList<Folder> &folderMap);
     void runEtagJobIfPossible (Folder *folder);
 
     bool pushNotificationsFilesReady (Account *account);
 
     bool isSwitchToVfsNeeded (FolderDefinition &folderDefinition) const;
 
-    QSet<Folder *> _disabledFolders;
+    QSet<Folder> _disabledFolders;
     Folder.Map _folderMap;
     QString _folderConfigPath;
     Folder *_currentSyncFolder = nullptr;
@@ -337,7 +334,7 @@ private:
     QTimer _timeScheduler;
 
     /// Scheduled folders that should be synced as soon as possible
-    QQueue<Folder *> _scheduledFolders;
+    QQueue<Folder> _scheduledFolders;
 
     /// Picks the next scheduled folder and starts the sync
     QTimer _startScheduledSyncTimer;
@@ -348,10 +345,9 @@ private:
     bool _appRestartRequired = false;
 
     static FolderMan *_instance;
-    explicit FolderMan (QObject *parent = nullptr);
-    friend class OCC.Application;
+    FolderMan (GLib.Object *parent = nullptr);
+    friend class Occ.Application;
     friend class .TestFolderMan;
 };
 
-} // namespace OCC
-#endif // FOLDERMAN_H
+} // namespace Occ

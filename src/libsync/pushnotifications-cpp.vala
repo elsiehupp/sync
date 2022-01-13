@@ -1,28 +1,28 @@
 /*
- * Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 namespace {
 static constexpr int MAX_ALLOWED_FAILED_AUTHENTICATION_ATTEMPTS = 3;
 static constexpr int PING_INTERVAL = 30 * 1000;
 }
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcPushNotifications, "nextcloud.sync.pushnotifications", QtInfoMsg)
 
-PushNotifications.PushNotifications (Account *account, QObject *parent)
-    : QObject (parent)
+PushNotifications.PushNotifications (Account *account, GLib.Object *parent)
+    : GLib.Object (parent)
     , _account (account)
     , _webSocket (new QWebSocket (QString (), QWebSocketProtocol.VersionLatest, this)) {
     connect (_webSocket, QOverload<QAbstractSocket.SocketError>.of (&QWebSocket.error), this, &PushNotifications.onWebSocketError);
@@ -106,7 +106,7 @@ void PushNotifications.onWebSocketTextMessageReceived (QString &message) {
         handleNotifyNotification ();
     } else if (message == "authenticated") {
         handleAuthenticated ();
-    } else if (message == "err: Invalid credentials") {
+    } else if (message == "err : Invalid credentials") {
         handleInvalidCredentials ();
     }
 }

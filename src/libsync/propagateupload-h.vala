@@ -1,36 +1,35 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 // #pragma once
 
 // #include <QBuffer>
 // #include <QFile>
 // #include <QElapsedTimer>
 
-namespace OCC {
+namespace Occ {
 
 Q_DECLARE_LOGGING_CATEGORY (lcPutJob)
 Q_DECLARE_LOGGING_CATEGORY (lcPropagateUpload)
 Q_DECLARE_LOGGING_CATEGORY (lcPropagateUploadV1)
 Q_DECLARE_LOGGING_CATEGORY (lcPropagateUploadNG)
 
-class BandwidthManager;
 
 /**
- * @brief The UploadDevice class
- * @ingroup libsync
- */
-class UploadDevice : public QIODevice {
+@brief The UploadDevice class
+@ingroup libsync
+*/
+class UploadDevice : QIODevice {
 public:
     UploadDevice (QString &fileName, int64 start, int64 size, BandwidthManager *bwm);
     ~UploadDevice () override;
@@ -77,10 +76,10 @@ public slots:
 };
 
 /**
- * @brief The PUTFileJob class
- * @ingroup libsync
- */
-class PUTFileJob : public AbstractNetworkJob {
+@brief The PUTFileJob class
+@ingroup libsync
+*/
+class PUTFileJob : AbstractNetworkJob {
 
 private:
     QIODevice *_device;
@@ -91,16 +90,16 @@ private:
 
 public:
     // Takes ownership of the device
-    explicit PUTFileJob (AccountPtr account, QString &path, std.unique_ptr<QIODevice> device,
-        const QMap<QByteArray, QByteArray> &headers, int chunk, QObject *parent = nullptr)
+    PUTFileJob (AccountPtr account, QString &path, std.unique_ptr<QIODevice> device,
+        const QMap<QByteArray, QByteArray> &headers, int chunk, GLib.Object *parent = nullptr)
         : AbstractNetworkJob (account, path, parent)
         , _device (device.release ())
         , _headers (headers)
         , _chunk (chunk) {
         _device.setParent (this);
     }
-    explicit PUTFileJob (AccountPtr account, QUrl &url, std.unique_ptr<QIODevice> device,
-        const QMap<QByteArray, QByteArray> &headers, int chunk, QObject *parent = nullptr)
+    PUTFileJob (AccountPtr account, QUrl &url, std.unique_ptr<QIODevice> device,
+        const QMap<QByteArray, QByteArray> &headers, int chunk, GLib.Object *parent = nullptr)
         : AbstractNetworkJob (account, QString (), parent)
         , _device (device.release ())
         , _headers (headers)
@@ -135,21 +134,21 @@ signals:
 };
 
 /**
- * @brief This job implements the asynchronous PUT
- *
- * If the server replies to a PUT with a OC-JobStatus-Location path, we will query this url until the server
- * replies with an etag.
- * @ingroup libsync
- */
-class PollJob : public AbstractNetworkJob {
+@brief This job implements the asynchronous PUT
+
+If the server replies
+replies with an etag.
+@ingroup libsync
+*/
+class PollJob : AbstractNetworkJob {
     SyncJournalDb *_journal;
     QString _localPath;
 
 public:
     SyncFileItemPtr _item;
     // Takes ownership of the device
-    explicit PollJob (AccountPtr account, QString &path, SyncFileItemPtr &item,
-        SyncJournalDb *journal, QString &localPath, QObject *parent)
+    PollJob (AccountPtr account, QString &path, SyncFileItemPtr &item,
+        SyncJournalDb *journal, QString &localPath, GLib.Object *parent)
         : AbstractNetworkJob (account, path, parent)
         , _journal (journal)
         , _localPath (localPath)
@@ -163,29 +162,28 @@ signals:
     void finishedSignal ();
 };
 
-class PropagateUploadEncrypted;
 
 /**
- * @brief The PropagateUploadFileCommon class is the code common between all chunking algorithms
- * @ingroup libsync
- *
- * State Machine:
- *
- *   +--. start ()  -. (delete job) -------+
- *   |                                      |
- *   +-. slotComputeContentChecksum ()  <---+
- *                   |
- *                   v
- *    slotComputeTransmissionChecksum ()
- *         |
- *         v
- *    slotStartUpload ()  . doStartUpload ()
- *                                  .
- *                                  .
- *                                  v
- *        finalize () or abortWithError ()  or startPollJob ()
- */
-class PropagateUploadFileCommon : public PropagateItemJob {
+@brief The PropagateUploadFileCommon class is the code common between all chunking algorithms
+@ingroup libsync
+
+State Machine:
+
+  +--. start ()  -. (delete job) -------+
+  |
+  +-. slotComputeCo
+                  |
+
+   slotCo
+        |
+        v
+   slotStartUpload ()  . doStartUp
+                                 .
+                                 .
+                                 v
+       finalize () or abortWithError ()  or startPollJob ()
+*/
+class PropagateUploadFileCommon : PropagateItemJob {
 
     struct UploadStatus {
         SyncFileItem.Status status = SyncFileItem.NoStatus;
@@ -193,7 +191,7 @@ class PropagateUploadFileCommon : public PropagateItemJob {
     };
 
 protected:
-    QVector<AbstractNetworkJob *> _jobs; /// network jobs that are currently in transit
+    QVector<AbstractNetworkJob> _jobs; /// network jobs that are currently in transit
     bool _finished BITFIELD (1); /// Tells that all the jobs have been finished
     bool _deleteExisting BITFIELD (1);
 
@@ -226,7 +224,7 @@ public:
      * Whether an existing entity with the same name may be deleted before
      * the upload.
      *
-     * Default: false.
+     * Default : false.
      */
     void setDeleteExisting (bool enabled);
 
@@ -257,7 +255,7 @@ public:
     void abortWithError (SyncFileItem.Status status, QString &error);
 
 public slots:
-    void slotJobDestroyed (QObject *job);
+    void slotJobDestroyed (GLib.Object *job);
 
 private slots:
     void slotPollFinished ();
@@ -275,7 +273,7 @@ protected:
 
     /**
      * Checks whether the current error is one that should reset the whole
-     * transfer if it happens too often. If so: Bump UploadInfo.errorCount
+     * transfer if it happens too often. If so : Bump UploadInfo.errorCount
      * and maybe perform the reset.
      */
     void checkResettingErrors ();
@@ -305,12 +303,12 @@ private:
 };
 
 /**
- * @ingroup libsync
- *
- * Propagation job, impementing the old chunking agorithm
- *
- */
-class PropagateUploadFileV1 : public PropagateUploadFileCommon {
+@ingroup libsync
+
+Propagation job, impementing the old chunking agorithm
+
+*/
+class PropagateUploadFileV1 : PropagateUploadFileCommon {
 
 private:
     /**
@@ -349,12 +347,12 @@ private slots:
 };
 
 /**
- * @ingroup libsync
- *
- * Propagation job, impementing the new chunking agorithm
- *
- */
-class PropagateUploadFileNG : public PropagateUploadFileCommon {
+@ingroup libsync
+
+Propagation job, impementing the new chunking agorithm
+
+*/
+class PropagateUploadFileNG : PropagateUploadFileCommon {
 private:
     int64 _sent = 0; /// amount of data (bytes) that was already sent
     uint _transferId = 0; /// transfer id (part of the url)

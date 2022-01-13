@@ -1,15 +1,14 @@
 #ifndef NOTIFICATIONHANDLER_H
-#define NOTIFICATIONHANDLER_H
+const int NOTIFICATIONHANDLER_H
 
 // #include <QtCore>
 
-class QJsonDocument;
 
-namespace OCC {
+namespace Occ {
 
-class ServerNotificationHandler : public QObject {
+class ServerNotificationHandler : GLib.Object {
 public:
-    explicit ServerNotificationHandler (AccountState *accountState, QObject *parent = nullptr);
+    ServerNotificationHandler (AccountState *accountState, GLib.Object *parent = nullptr);
 
 signals:
     void newNotificationList (ActivityList);
@@ -27,5 +26,3 @@ private:
     AccountState *_accountState;
 };
 }
-
-#endif // NOTIFICATIONHANDLER_H

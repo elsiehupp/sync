@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <memory>
 // #include <QSharedPointer>
@@ -19,18 +19,15 @@
 // #include <QVariant>
 // #include <chrono>
 
-class QWidget;
 class QHeaderView;
-class ExcludedFiles;
 
-namespace OCC {
+namespace Occ {
 
-class AbstractCredentials;
 
 /**
- * @brief The ConfigFile class
- * @ingroup libsync
- */
+@brief The ConfigFile class
+@ingroup libsync
+*/
 class OWNCLOUDSYNC_EXPORT ConfigFile {
 public:
     ConfigFile ();
@@ -38,8 +35,8 @@ public:
     enum Scope { UserScope,
         SystemScope };
 
-    QString configPath () const;
-    QString configFile () const;
+    QString configPath ();
+    QString configFile ();
     QString excludeFile (Scope scope) const;
     static QString excludeFileFromSystem (); // doesn't access config dir
 
@@ -48,11 +45,11 @@ public:
      *
      * Returns the path of the new backup.
      */
-    QString backup () const;
+    QString backup ();
 
     bool exists ();
 
-    QString defaultConnection () const;
+    QString defaultConnection ();
 
     // the certs do not depend on a connection.
     QByteArray caCerts ();
@@ -76,34 +73,34 @@ public:
      *
      * Use -1 to disable regular full local discoveries.
      */
-    std.chrono.milliseconds fullLocalDiscoveryInterval () const;
+    std.chrono.milliseconds fullLocalDiscoveryInterval ();
 
-    bool monoIcons () const;
+    bool monoIcons ();
     void setMonoIcons (bool);
 
-    bool promptDeleteFiles () const;
+    bool promptDeleteFiles ();
     void setPromptDeleteFiles (bool promptDeleteFiles);
 
-    bool crashReporter () const;
+    bool crashReporter ();
     void setCrashReporter (bool enabled);
 
-    bool automaticLogDir () const;
+    bool automaticLogDir ();
     void setAutomaticLogDir (bool enabled);
 
-    QString logDir () const;
+    QString logDir ();
     void setLogDir (QString &dir);
 
-    bool logDebug () const;
+    bool logDebug ();
     void setLogDebug (bool enabled);
 
-    int logExpire () const;
+    int logExpire ();
     void setLogExpire (int hours);
 
-    bool logFlush () const;
+    bool logFlush ();
     void setLogFlush (bool enabled);
 
     // Whether experimental UI options should be shown
-    bool showExperimentalOptions () const;
+    bool showExperimentalOptions ();
 
     // proxy settings
     void setProxyType (int proxyType,
@@ -112,49 +109,49 @@ public:
         const QString &user = QString (),
         const QString &pass = QString ());
 
-    int proxyType () const;
-    QString proxyHostName () const;
-    int proxyPort () const;
-    bool proxyNeedsAuth () const;
-    QString proxyUser () const;
-    QString proxyPassword () const;
+    int proxyType ();
+    QString proxyHostName ();
+    int proxyPort ();
+    bool proxyNeedsAuth ();
+    QString proxyUser ();
+    QString proxyPassword ();
 
-    /** 0: no limit, 1: manual, >0: automatic */
-    int useUploadLimit () const;
-    int useDownloadLimit () const;
+    /** 0 : no limit, 1 : manual, >0 : automatic */
+    int useUploadLimit ();
+    int useDownloadLimit ();
     void setUseUploadLimit (int);
     void setUseDownloadLimit (int);
     /** in kbyte/s */
-    int uploadLimit () const;
-    int downloadLimit () const;
+    int uploadLimit ();
+    int downloadLimit ();
     void setUploadLimit (int kbytes);
     void setDownloadLimit (int kbytes);
     /** [checked, size in MB] **/
-    QPair<bool, int64> newBigFolderSizeLimit () const;
+    QPair<bool, int64> newBigFolderSizeLimit ();
     void setNewBigFolderSizeLimit (bool isChecked, int64 mbytes);
-    bool useNewBigFolderSizeLimit () const;
-    bool confirmExternalStorage () const;
+    bool useNewBigFolderSizeLimit ();
+    bool confirmExternalStorage ();
     void setConfirmExternalStorage (bool);
 
     /** If we should move the files deleted on the server in the trash  */
-    bool moveToTrash () const;
+    bool moveToTrash ();
     void setMoveToTrash (bool);
 
-    bool showMainDialogAsNormalWindow () const;
+    bool showMainDialogAsNormalWindow ();
 
     static bool setConfDir (QString &value);
 
-    bool optionalServerNotifications () const;
+    bool optionalServerNotifications ();
     void setOptionalServerNotifications (bool show);
 
-    bool showInExplorerNavigationPane () const;
+    bool showInExplorerNavigationPane ();
     void setShowInExplorerNavigationPane (bool show);
 
-    int timeout () const;
-    int64 chunkSize () const;
-    int64 maxChunkSize () const;
-    int64 minChunkSize () const;
-    std.chrono.milliseconds targetChunkUploadDuration () const;
+    int timeout ();
+    int64 chunkSize ();
+    int64 maxChunkSize ();
+    int64 minChunkSize ();
+    std.chrono.milliseconds targetChunkUploadDuration ();
 
     void saveGeometry (QWidget *w);
     void restoreGeometry (QWidget *w);
@@ -172,28 +169,28 @@ public:
 
     /** Query-parameter 'updatesegment' for the update check, value between 0 and 99.
         Used to throttle down desktop release rollout in order to keep the update servers alive at peak times.
-        See: https://github.com/nextcloud/client_updater_server/pull/36 */
-    int updateSegment () const;
+        See : https://github.com/nextcloud/client_updater_server/pull/36 */
+    int updateSegment ();
 
-    QString updateChannel () const;
+    QString updateChannel ();
     void setUpdateChannel (QString &channel);
 
     void saveGeometryHeader (QHeaderView *header);
     void restoreGeometryHeader (QHeaderView *header);
 
-    QString certificatePath () const;
+    QString certificatePath ();
     void setCertificatePath (QString &cPath);
-    QString certificatePasswd () const;
+    QString certificatePasswd ();
     void setCertificatePasswd (QString &cPasswd);
 
     /** The client version that last used this settings file.
         Updated by configVersionMigration () at client startup. */
-    QString clientVersionString () const;
+    QString clientVersionString ();
     void setClientVersionString (QString &version);
 
     /**  Returns a new settings pre-set in a specific group.  The Settings will be created
          with the given parent. If no parent is specified, the caller must destroy the settings */
-    static std.unique_ptr<QSettings> settingsWithGroup (QString &group, QObject *parent = nullptr);
+    static std.unique_ptr<QSettings> settingsWithGroup (QString &group, GLib.Object *parent = nullptr);
 
     /// Add the system and user exclude file path to the ExcludedFiles instance.
     static void setupDefaultExcludeFilePaths (ExcludedFiles &excludedFiles);
@@ -210,7 +207,7 @@ private:
         const QVariant &defaultValue = QVariant ()) const;
     void setValue (QString &key, QVariant &value);
 
-    QString keychainProxyPasswordKey () const;
+    QString keychainProxyPasswordKey ();
 
 private:
     using SharedCreds = QSharedPointer<AbstractCredentials>;
@@ -220,4 +217,3 @@ private:
     static QString _confDir;
 };
 }
-#endif // CONFIGFILE_H

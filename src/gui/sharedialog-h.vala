@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QSharedPointer>
 // #include <QPointer>
@@ -18,24 +18,20 @@
 // #include <QDialog>
 // #include <QWidget>
 
-class QProgressIndicator;
 
-namespace OCC {
+namespace Occ {
 
 namespace Ui {
     class ShareDialog;
 }
 
-class ShareLinkWidget;
 class ShareUserGroupWidget;
-class ShareManager;
 class LinkShare;
-class Share;
 
-class ShareDialog : public QDialog {
+class ShareDialog : QDialog {
 
 public:
-    explicit ShareDialog (QPointer<AccountState> accountState,
+    ShareDialog (QPointer<AccountState> accountState,
         const QString &sharePath,
         const QString &localPath,
         SharePermissions maxSharingPermissions,
@@ -83,12 +79,10 @@ private:
     ShareDialogStartPage _startPage;
     ShareManager *_manager = nullptr;
 
-    QList<ShareLinkWidget*> _linkWidgetList;
+    QList<ShareLinkWidget> _linkWidgetList;
     ShareLinkWidget* _emptyShareLinkWidget = nullptr;
     ShareUserGroupWidget *_userGroupWidget = nullptr;
     QProgressIndicator *_progressIndicator = nullptr;
 };
 
-} // namespace OCC
-
-#endif // SHAREDIALOG_H
+} // namespace Occ

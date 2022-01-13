@@ -1,24 +1,23 @@
 /*
- * Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QVariantMap>
 // #include <QStringList>
 // #include <QMimeDatabase>
 
-namespace OCC {
+namespace Occ {
 
-class DirectEditor;
 
 enum PushNotificationType {
     None = 0,
@@ -30,59 +29,59 @@ Q_DECLARE_FLAGS (PushNotificationTypes, PushNotificationType)
 Q_DECLARE_OPERATORS_FOR_FLAGS (PushNotificationTypes)
 
 /**
- * @brief The Capabilities class represents the capabilities of an ownCloud
- * server
- * @ingroup libsync
- */
+@brief The Capabilities class represents the capabilities of an ownCloud
+server
+@ingroup libsync
+*/
 class OWNCLOUDSYNC_EXPORT Capabilities {
 public:
     Capabilities (QVariantMap &capabilities);
 
-    bool shareAPI () const;
-    bool shareEmailPasswordEnabled () const;
-    bool shareEmailPasswordEnforced () const;
-    bool sharePublicLink () const;
-    bool sharePublicLinkAllowUpload () const;
-    bool sharePublicLinkSupportsUploadOnly () const;
-    bool sharePublicLinkAskOptionalPassword () const;
-    bool sharePublicLinkEnforcePassword () const;
-    bool sharePublicLinkEnforceExpireDate () const;
-    int sharePublicLinkExpireDateDays () const;
-    bool shareInternalEnforceExpireDate () const;
-    int shareInternalExpireDateDays () const;
-    bool shareRemoteEnforceExpireDate () const;
-    int shareRemoteExpireDateDays () const;
-    bool sharePublicLinkMultiple () const;
-    bool shareResharing () const;
-    int shareDefaultPermissions () const;
-    bool chunkingNg () const;
-    bool bulkUpload () const;
-    bool userStatus () const;
-    bool userStatusSupportsEmoji () const;
+    bool shareAPI ();
+    bool shareEmailPasswordEnabled ();
+    bool shareEmailPasswordEnforced ();
+    bool sharePublicLink ();
+    bool sharePublicLinkAllowUpload ();
+    bool sharePublicLinkSupportsUploadOnly ();
+    bool sharePublicLinkAskOptionalPassword ();
+    bool sharePublicLinkEnforcePassword ();
+    bool sharePublicLinkEnforceExpireDate ();
+    int sharePublicLinkExpireDateDays ();
+    bool shareInternalEnforceExpireDate ();
+    int shareInternalExpireDateDays ();
+    bool shareRemoteEnforceExpireDate ();
+    int shareRemoteExpireDateDays ();
+    bool sharePublicLinkMultiple ();
+    bool shareResharing ();
+    int shareDefaultPermissions ();
+    bool chunkingNg ();
+    bool bulkUpload ();
+    bool userStatus ();
+    bool userStatusSupportsEmoji ();
 
     /// Returns which kind of push notfications are available
-    PushNotificationTypes availablePushNotifications () const;
+    PushNotificationTypes availablePushNotifications ();
 
     /// Websocket url for files push notifications if available
-    QUrl pushNotificationsWebSocketUrl () const;
+    QUrl pushNotificationsWebSocketUrl ();
 
     /// disable parallel upload in chunking
-    bool chunkingParallelUploadDisabled () const;
+    bool chunkingParallelUploadDisabled ();
 
     /// Whether the "privatelink" DAV property is available
-    bool privateLinkPropertyAvailable () const;
+    bool privateLinkPropertyAvailable ();
 
     /// returns true if the capabilities report notifications
-    bool notificationsAvailable () const;
+    bool notificationsAvailable ();
 
     /// returns true if the server supports client side encryption
-    bool clientSideEncryptionAvailable () const;
+    bool clientSideEncryptionAvailable ();
 
     /// returns true if the capabilities are loaded already.
-    bool isValid () const;
+    bool isValid ();
 
     /// return true if the activity app is enabled
-    bool hasActivities () const;
+    bool hasActivities ();
 
     /**
      * Returns the checksum types the server understands.
@@ -91,28 +90,28 @@ public:
      * the OC-Checksum header of a file upload, the server will use
      * it to validate that data was transmitted correctly.
      *
-     * Path: checksums/supportedTypes
-     * Default: []
-     * Possible entries: "Adler32", "MD5", "SHA1"
+     * Path : checksums/supportedTypes
+     * Default : []
+     * Possible entries : "Adler32", "MD5", "SHA1"
      */
-    QList<QByteArray> supportedChecksumTypes () const;
+    QList<QByteArray> supportedChecksumTypes ();
 
     /**
      * The checksum algorithm that the server recommends for file uploads.
      * This is just a preference, any algorithm listed in supportedTypes may be used.
      *
-     * Path: checksums/preferredUploadType
-     * Default: empty, meaning "no preference"
-     * Possible values: empty or any of the supportedTypes
+     * Path : checksums/preferredUploadType
+     * Default : empty, meaning "no preference"
+     * Possible values : empty or any of the supportedTypes
      */
-    QByteArray preferredUploadChecksumType () const;
+    QByteArray preferredUploadChecksumType ();
 
     /**
      * Helper that returns the preferredUploadChecksumType () if set, or one
      * of the supportedChecksumTypes () if it isn't. May return an empty
      * QByteArray if no checksum types are supported.
      */
-    QByteArray uploadChecksumType () const;
+    QByteArray uploadChecksumType ();
 
     /**
      * List of HTTP error codes should be guaranteed to eventually reset
@@ -123,15 +122,15 @@ public:
      * Note that other error codes than the ones listed here may reset the
      * upload as well.
      *
-     * Motivation: See #5344. They should always be reset on 412 (possibly
+     * Motivation : See #5344. They should always be reset on 412 (possibly
      * checksum error), but broken servers may also require resets on
      * unusual error codes such as 503.
      *
-     * Path: dav/httpErrorCodesThatResetFailingChunkedUploads
-     * Default: []
-     * Example: [503, 500]
+     * Path : dav/httpErrorCodesThatResetFailingChunkedUploads
+     * Default : []
+     * Example : [503, 500]
      */
-    QList<int> httpErrorCodesThatResetFailingChunkedUploads () const;
+    QList<int> httpErrorCodesThatResetFailingChunkedUploads ();
 
     /**
      * Regex that, if contained in a filename, will result in it not being uploaded.
@@ -142,17 +141,17 @@ public:
      *
      * Note that it just needs to be contained. The regex [ab] is contained in "car".
      */
-    QString invalidFilenameRegex () const;
+    QString invalidFilenameRegex ();
 
     /**
      * return the list of filename that should not be uploaded
      */
-    QStringList blacklistedFiles () const;
+    QStringList blacklistedFiles ();
 
     /**
      * Whether conflict files should remain local (default) or should be uploaded.
      */
-    bool uploadConflictFiles () const;
+    bool uploadConflictFiles ();
 
     // Direct Editing
     void addDirectEditor (DirectEditor* directEditor);
@@ -162,14 +161,14 @@ public:
 private:
     QVariantMap _capabilities;
 
-    QList<DirectEditor*> _directEditors;
+    QList<DirectEditor> _directEditors;
 };
 
 /*-------------------------------------------------------------------------------------*/
 
-class OWNCLOUDSYNC_EXPORT DirectEditor : public QObject {
+class OWNCLOUDSYNC_EXPORT DirectEditor : GLib.Object {
 public:
-    DirectEditor (QString &id, QString &name, QObject* parent = nullptr);
+    DirectEditor (QString &id, QString &name, GLib.Object* parent = nullptr);
 
     void addMimetype (QByteArray &mimeType);
     void addOptionalMimetype (QByteArray &mimeType);
@@ -177,11 +176,11 @@ public:
     bool hasMimetype (QMimeType &mimeType);
     bool hasOptionalMimetype (QMimeType &mimeType);
 
-    QString id () const;
-    QString name () const;
+    QString id ();
+    QString name ();
 
-    QList<QByteArray> mimeTypes () const;
-    QList<QByteArray> optionalMimeTypes () const;
+    QList<QByteArray> mimeTypes ();
+    QList<QByteArray> optionalMimeTypes ();
 
 private:
     QString _id;

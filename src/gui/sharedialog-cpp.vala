@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QFileInfo>
 // #include <QFileIconProvider>
@@ -21,7 +21,7 @@
 
 namespace {
 QString createRandomPassword () {
-    const auto words = OCC.WordList.getRandomWords (10);
+    const auto words = Occ.WordList.getRandomWords (10);
 
     const auto addFirstLetter = [] (QString &current, QString &next) . QString {
         return current + next.at (0);
@@ -31,7 +31,7 @@ QString createRandomPassword () {
 }
 }
 
-namespace OCC {
+namespace Occ {
 
 static const int thumbnailSize = 40;
 
@@ -91,7 +91,7 @@ ShareDialog.ShareDialog (QPointer<AccountState> accountState,
     } else {
         _ui.gridLayout.addWidget (_ui.label_name, 0, 1, 1, 1);
         _ui.gridLayout.addWidget (_ui.label_sharePath, 1, 1, 1, 1);
-        _ui.label_sharePath.setText (tr ("Folder: %2").arg (ocDir));
+        _ui.label_sharePath.setText (tr ("Folder : %2").arg (ocDir));
     }
 
     this.setWindowTitle (tr ("%1 Sharing").arg (Theme.instance ().appNameGUI ()));
@@ -214,7 +214,7 @@ void ShareDialog.slotSharesFetched (QList<QSharedPointer<Share>> &shares) {
 }
 
 void ShareDialog.slotAdjustScrollWidgetSize () {
-    int count = this.findChildren<ShareLinkWidget *> ().count ();
+    int count = this.findChildren<ShareLinkWidget> ().count ();
     _ui.scrollArea.setVisible (count > 0);
     if (count > 0 && count <= 3) {
         _ui.scrollArea.setFixedHeight (_ui.scrollArea.widget ().sizeHint ().height ());
@@ -306,7 +306,7 @@ void ShareDialog.slotCreateLinkShare () {
 }
 
 void ShareDialog.slotCreatePasswordForLinkShare (QString &password) {
-    const auto shareLinkWidget = qobject_cast<ShareLinkWidget*> (sender ());
+    const auto shareLinkWidget = qobject_cast<ShareLinkWidget> (sender ());
     Q_ASSERT (shareLinkWidget);
     if (shareLinkWidget) {
         connect (_manager, &ShareManager.linkShareRequiresPassword, shareLinkWidget, &ShareLinkWidget.slotCreateShareRequiresPassword);
@@ -318,7 +318,7 @@ void ShareDialog.slotCreatePasswordForLinkShare (QString &password) {
 }
 
 void ShareDialog.slotCreatePasswordForLinkShareProcessed () {
-    const auto shareLinkWidget = qobject_cast<ShareLinkWidget*> (sender ());
+    const auto shareLinkWidget = qobject_cast<ShareLinkWidget> (sender ());
     Q_ASSERT (shareLinkWidget);
     if (shareLinkWidget) {
         disconnect (_manager, &ShareManager.linkShareRequiresPassword, shareLinkWidget, &ShareLinkWidget.slotCreateShareRequiresPassword);
@@ -350,7 +350,7 @@ void ShareDialog.slotLinkShareRequiresPassword () {
 }
 
 void ShareDialog.slotDeleteShare () {
-    auto sharelinkWidget = dynamic_cast<ShareLinkWidget*> (sender ());
+    auto sharelinkWidget = dynamic_cast<ShareLinkWidget> (sender ());
     sharelinkWidget.hide ();
     _ui.verticalLayout.removeWidget (sharelinkWidget);
     _linkWidgetList.removeAll (sharelinkWidget);
@@ -359,7 +359,7 @@ void ShareDialog.slotDeleteShare () {
 
 void ShareDialog.slotThumbnailFetched (int &statusCode, QByteArray &reply) {
     if (statusCode != 200) {
-        qCWarning (lcSharing) << "Thumbnail status code: " << statusCode;
+        qCWarning (lcSharing) << "Thumbnail status code : " << statusCode;
         return;
     }
 
@@ -400,4 +400,4 @@ void ShareDialog.changeEvent (QEvent *e) {
     QDialog.changeEvent (e);
 }
 
-} // namespace OCC
+} // namespace Occ

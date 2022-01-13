@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Cédric Bellegarde <gnumdk@gmail.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Cédric Bellegarde <gnumdk@gmail.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QCursor>
 // #include <QGuiApplication>
@@ -25,12 +25,12 @@
 // #include <QDBusInterface>
 // #include <QDBusMessage>
 // #include <QDBusPendingCall>
-#define NOTIFICATIONS_SERVICE "org.freedesktop.Notifications"
-#define NOTIFICATIONS_PATH "/org/freedesktop/Notifications"
-#define NOTIFICATIONS_IFACE "org.freedesktop.Notifications"
+const int NOTIFICATIONS_SERVICE "org.freedesktop.Notifications"
+const int NOTIFICATIONS_PATH "/org/freedesktop/Notifications"
+const int NOTIFICATIONS_IFACE "org.freedesktop.Notifications"
 #endif
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcSystray, "nextcloud.gui.systray")
 
@@ -50,32 +50,32 @@ void Systray.setTrayEngine (QQmlApplicationEngine *trayEngine) {
 
     _trayEngine.addImportPath ("qrc:/qml/theme");
     _trayEngine.addImageProvider ("avatars", new ImageProvider);
-    _trayEngine.addImageProvider (QLatin1String ("svgimage-custom-color"), new OCC.Ui.SvgImageProvider);
+    _trayEngine.addImageProvider (QLatin1String ("svgimage-custom-color"), new Occ.Ui.SvgImageProvider);
     _trayEngine.addImageProvider (QLatin1String ("unified-search-result-icon"), new UnifiedSearchResultImageProvider);
 }
 
 Systray.Systray ()
     : QSystemTrayIcon (nullptr) {
     qmlRegisterSingletonType<UserModel> ("com.nextcloud.desktopclient", 1, 0, "UserModel",
-        [] (QQmlEngine *, QJSEngine *) . QObject * {
+        [] (QQmlEngine *, QJSEngine *) . GLib.Object * {
             return UserModel.instance ();
         }
     );
 
     qmlRegisterSingletonType<UserAppsModel> ("com.nextcloud.desktopclient", 1, 0, "UserAppsModel",
-        [] (QQmlEngine *, QJSEngine *) . QObject * {
+        [] (QQmlEngine *, QJSEngine *) . GLib.Object * {
             return UserAppsModel.instance ();
         }
     );
 
     qmlRegisterSingletonType<Systray> ("com.nextcloud.desktopclient", 1, 0, "Theme",
-        [] (QQmlEngine *, QJSEngine *) . QObject * {
+        [] (QQmlEngine *, QJSEngine *) . GLib.Object * {
             return Theme.instance ();
         }
     );
 
     qmlRegisterSingletonType<Systray> ("com.nextcloud.desktopclient", 1, 0, "Systray",
-        [] (QQmlEngine *, QJSEngine *) . QObject * {
+        [] (QQmlEngine *, QJSEngine *) . GLib.Object * {
             return Systray.instance ();
         }
     );
@@ -163,7 +163,7 @@ void Systray.setPauseOnAllFoldersHelper (bool pause) {
     // later on...
     const auto accounts = [=] {
         const auto ptrList = AccountManager.instance ().accounts ();
-        auto result = QList<AccountState *> ();
+        auto result = QList<AccountState> ();
         result.reserve (ptrList.size ());
         std.transform (std.cbegin (ptrList), std.cend (ptrList), std.back_inserter (result), [] (AccountStatePtr &account) {
             return account.data ();
@@ -227,7 +227,7 @@ void Systray.showMessage (QString &title, QString &message, MessageIcon icon) {
 }
 
 void Systray.setToolTip (QString &tip) {
-    QSystemTrayIcon.setToolTip (tr ("%1: %2").arg (Theme.instance ().appNameGUI (), tip));
+    QSystemTrayIcon.setToolTip (tr ("%1 : %2").arg (Theme.instance ().appNameGUI (), tip));
 }
 
 bool Systray.syncIsPaused () {
@@ -257,7 +257,7 @@ void Systray.positionWindow (QQuickWindow *window) {
 }
 
 void Systray.forceWindowInit (QQuickWindow *window) {
-    // HACK: At least on Windows, if the systray window is not shown at least once
+    // HACK : At least on Windows, if the systray window is not shown at least once
     // it can prevent session handling to carry on properly, so we show/hide it here
     // this shouldn't flicker
     window.show ();
@@ -301,7 +301,7 @@ Systray.TaskBarPosition Systray.taskbarOrientation () {
     }
 }
 
-// TODO: Get real taskbar dimensions Linux as well
+// TODO : Get real taskbar dimensions Linux as well
 QRect Systray.taskbarGeometry () {
     if (taskbarOrientation () == TaskBarPosition.Bottom || taskbarOrientation () == TaskBarPosition.Top) {
         auto screenWidth = currentScreenRect ().width ();
@@ -411,8 +411,8 @@ AccessManagerFactory.AccessManagerFactory ()
     : QQmlNetworkAccessManagerFactory () {
 }
 
-QNetworkAccessManager* AccessManagerFactory.create (QObject *parent) {
+QNetworkAccessManager* AccessManagerFactory.create (GLib.Object *parent) {
     return new AccessManager (parent);
 }
 
-} // namespace OCC
+} // namespace Occ

@@ -7,12 +7,12 @@
 // #include <QLoggingCategory>
 // #include <QMimeDatabase>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcPropagateUploadEncrypted, "nextcloud.sync.propagator.upload.encrypted", QtInfoMsg)
 
-PropagateUploadEncrypted.PropagateUploadEncrypted (OwncloudPropagator *propagator, QString &remoteParentPath, SyncFileItemPtr item, QObject *parent)
-    : QObject (parent)
+PropagateUploadEncrypted.PropagateUploadEncrypted (OwncloudPropagator *propagator, QString &remoteParentPath, SyncFileItemPtr item, GLib.Object *parent)
+    : GLib.Object (parent)
     , _propagator (propagator)
     , _remoteParentPath (remoteParentPath)
     , _item (item)
@@ -55,17 +55,17 @@ void PropagateUploadEncrypted.start () {
 }
 
 /* We try to lock a folder, if it's locked we try again in one second.
- * if it's still locked we try again in one second. looping untill one minute.
- *                                                                      . fail.
- * the 'loop':                                                         /
- *    slotFolderEncryptedIdReceived . slotTryLock . lockError . stillTime? . slotTryLock
- *                                        \
- *                                         . success.
- */
+if it's still locked we try again in one second. looping untill one minute.
+                                                                     . fail.
+the 'loop' :                                                         /
+   slotFolderEncryptedIdReceived . slotTryLock . lockError . stillTime? . slotTryLock
+
+                                        . success.
+*/
 
 void PropagateUploadEncrypted.slotFolderEncryptedIdReceived (QStringList &list) {
   qCDebug (lcPropagateUploadEncrypted) << "Received id of folder, trying to lock it so we can prepare the metadata";
-  auto job = qobject_cast<LsColJob *> (sender ());
+  auto job = qobject_cast<LsColJob> (sender ());
   const auto& folderInfo = job._folderInfos.value (list.first ());
   _folderLockFirstTry.start ();
   slotTryLock (folderInfo.fileId);
@@ -278,4 +278,4 @@ void PropagateUploadEncrypted.unlockFolder () {
     unlockJob.start ();
 }
 
-} // namespace OCC
+} // namespace Occ

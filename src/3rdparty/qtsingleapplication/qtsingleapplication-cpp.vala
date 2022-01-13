@@ -1,7 +1,7 @@
 /****************************************************************************
 **
 ** Copyright (C) 2014 Digia Plc and/or its subsidiary (-ies).
-** Contact: http://www.qt-project.org/legal
+** Contact : http://www.qt-project.org/legal
 **
 ** This file is part of Qt Creator.
 **
@@ -19,7 +19,7 @@
 ** Foundation and appearing in the file LICENSE.LGPL included in the
 ** packaging of this file.  Please review the following information to
 ** ensure the GNU Lesser General Public License version 2.1 requirements
-** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** will be met : http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 **
 ** In addition, as a special exception, Digia gives you certain additional
 ** rights.  These rights are described in the Digia Qt LGPL Exception
@@ -63,7 +63,7 @@ QtSingleApplication.QtSingleApplication (QString &appId, int &argc, char **argv)
     const bool created = instances.create (instancesSize);
     if (!created) {
         if (!instances.attach ()) {
-            qWarning () << "Failed to initialize instances shared memory: "
+            qWarning () << "Failed to initialize instances shared memory : "
                        << instances.errorString ();
             delete instances;
             instances = nullptr;
@@ -76,7 +76,7 @@ QtSingleApplication.QtSingleApplication (QString &appId, int &argc, char **argv)
 
     lockfile.open (QtLockedFile.ReadWrite);
     lockfile.lock (QtLockedFile.WriteLock);
-    auto *pids = static_cast<int64 *> (instances.data ());
+    auto *pids = static_cast<int64> (instances.data ());
     if (!created) {
         // Find the first instance that it still running
         // The whole list needs to be iterated in order to append to it
@@ -103,7 +103,7 @@ QtSingleApplication.~QtSingleApplication () {
     lockfile.open (QtLockedFile.ReadWrite);
     lockfile.lock (QtLockedFile.WriteLock);
     // Rewrite array, removing current pid and previously crashed ones
-    auto *pids = static_cast<int64 *> (instances.data ());
+    auto *pids = static_cast<int64> (instances.data ());
     int64 *newpids = pids;
     for (; *pids; ++pids) {
         if (*pids != appPid && isRunning (*pids))
@@ -115,7 +115,7 @@ QtSingleApplication.~QtSingleApplication () {
 
 bool QtSingleApplication.event (QEvent *event) {
     if (event.type () == QEvent.FileOpen) {
-        auto *foe = static_cast<QFileOpenEvent*> (event);
+        auto *foe = static_cast<QFileOpenEvent> (event);
         emit fileOpenRequest (foe.file ());
         return true;
     }

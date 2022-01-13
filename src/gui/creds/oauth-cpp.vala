@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QDesktopServices>
 // #include <QNetworkReply>
@@ -19,7 +19,7 @@
 // #include <QJsonObject>
 // #include <QJsonDocument>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcOauth, "nextcloud.sync.credentials.oauth", QtInfoMsg)
 
@@ -31,7 +31,7 @@ static void httpReplyAndClose (QTcpSocket *socket, char *code, char *html,
         return; // socket can have been deleted if the browser was closed
     socket.write ("HTTP/1.1 ");
     socket.write (code);
-    socket.write ("\r\nContent-Type: text/html\r\nConnection: close\r\nContent-Length: ");
+    socket.write ("\r\nContent-Type : text/html\r\nConnection : close\r\nContent-Length : ");
     socket.write (QByteArray.number (qstrlen (html)));
     if (moreHeaders) {
         socket.write ("\r\n");
@@ -55,10 +55,10 @@ void OAuth.start () {
     if (!openBrowser ())
         return;
 
-    QObject.connect (&_server, &QTcpServer.newConnection, this, [this] {
+    GLib.Object.connect (&_server, &QTcpServer.newConnection, this, [this] {
         while (QPointer<QTcpSocket> socket = _server.nextPendingConnection ()) {
-            QObject.connect (socket.data (), &QTcpSocket.disconnected, socket.data (), &QTcpSocket.deleteLater);
-            QObject.connect (socket.data (), &QIODevice.readyRead, this, [this, socket] {
+            GLib.Object.connect (socket.data (), &QTcpSocket.disconnected, socket.data (), &QTcpSocket.deleteLater);
+            GLib.Object.connect (socket.data (), &QIODevice.readyRead, this, [this, socket] {
                 QByteArray peek = socket.peek (qMin (socket.bytesAvailable (), 4000LL)); //The code should always be within the first 4K
                 if (peek.indexOf ('\n') < 0)
                     return; // wait until we find a \n
@@ -89,7 +89,7 @@ void OAuth.start () {
 
                 auto job = _account.sendRequest ("POST", requestToken, req, requestBody);
                 job.setTimeout (qMin (30 * 1000ll, job.timeoutMsec ()));
-                QObject.connect (job, &SimpleNetworkJob.finishedSignal, this, [this, socket] (QNetworkReply *reply) {
+                GLib.Object.connect (job, &SimpleNetworkJob.finishedSignal, this, [this, socket] (QNetworkReply *reply) {
                     auto jsonData = reply.readAll ();
                     QJsonParseError jsonParseError;
                     QJsonObject json = QJsonDocument.fromJson (jsonData, &jsonParseError).object ();
@@ -104,10 +104,10 @@ void OAuth.start () {
                         QString errorReason;
                         QString errorFromJson = json["error"].toString ();
                         if (!errorFromJson.isEmpty ()) {
-                            errorReason = tr ("Error returned from the server: <em>%1</em>")
+                            errorReason = tr ("Error returned from the server : <em>%1</em>")
                                               .arg (errorFromJson.toHtmlEscaped ());
                         } else if (reply.error () != QNetworkReply.NoError) {
-                            errorReason = tr ("There was an error accessing the \"token\" endpoint: <br><em>%1</em>")
+                            errorReason = tr ("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
                                               .arg (reply.errorString ().toHtmlEscaped ());
                         } else if (jsonData.isEmpty ()) {
                             // Can happen if a funky load balancer strips away POST data, e.g. BigIP APM my.policy
@@ -116,7 +116,7 @@ void OAuth.start () {
                             // it will show a fake json will null values that actually never was received like this as
                             // soon as you access json["whatever"] the debug output json will claim to have "whatever":null
                         } else if (jsonParseError.error != QJsonParseError.NoError) {
-                            errorReason = tr ("Could not parse the JSON returned from the server: <br><em>%1</em>")
+                            errorReason = tr ("Could not parse the JSON returned from the server : <br><em>%1</em>")
                                               .arg (jsonParseError.errorString ());
                         } else {
                             errorReason = tr ("The reply from the server did not contain all expected fields");
@@ -142,7 +142,7 @@ void OAuth.start () {
                     const char *loginSuccessfullHtml = "<h1>Login Successful</h1><p>You can close this window.</p>";
                     if (messageUrl.isValid ()) {
                         httpReplyAndClose (socket, "303 See Other", loginSuccessfullHtml,
-                            QByteArray ("Location: " + messageUrl.toEncoded ()).constData ());
+                            QByteArray ("Location : " + messageUrl.toEncoded ()).constData ());
                     } else {
                         httpReplyAndClose (socket, "200 OK", loginSuccessfullHtml);
                     }
@@ -172,4 +172,4 @@ bool OAuth.openBrowser () {
     return true;
 }
 
-} // namespace OCC
+} // namespace Occ

@@ -1,22 +1,22 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
- * Copyright (C) by Michael Schuster <michael@schuster.ms>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
+Copyright (C) by Michael Schuster <michael@schuster.ms>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <QVariant>
 // #include <QVBoxLayout>
 
-namespace OCC {
+namespace Occ {
 
 Flow2AuthCredsPage.Flow2AuthCredsPage ()
     : AbstractCredentialsWizardPage () {
@@ -35,7 +35,7 @@ Flow2AuthCredsPage.Flow2AuthCredsPage ()
 }
 
 void Flow2AuthCredsPage.initializePage () {
-    auto *ocWizard = qobject_cast<OwncloudWizard *> (wizard ());
+    auto *ocWizard = qobject_cast<OwncloudWizard> (wizard ());
     Q_ASSERT (ocWizard);
     ocWizard.account ().setCredentials (CredentialsFactory.create ("http"));
 
@@ -48,7 +48,7 @@ void Flow2AuthCredsPage.initializePage () {
     _flow2AuthWidget.slotStyleChanged ();
 }
 
-void OCC.Flow2AuthCredsPage.cleanupPage () {
+void Occ.Flow2AuthCredsPage.cleanupPage () {
     // The next or back button was activated, show the wizard again
     wizard ().show ();
     if (_flow2AuthWidget)
@@ -62,12 +62,12 @@ void OCC.Flow2AuthCredsPage.cleanupPage () {
 void Flow2AuthCredsPage.slotFlow2AuthResult (Flow2Auth.Result r, QString &errorString, QString &user, QString &appPassword) {
     Q_UNUSED (errorString)
     switch (r) {
-    case Flow2Auth.NotSupported: {
+    case Flow2Auth.NotSupported : {
         /* Flow2Auth not supported (can't open browser) */
         wizard ().show ();
 
         /* Don't fallback to HTTP credentials */
-        /*OwncloudWizard *ocWizard = qobject_cast<OwncloudWizard *> (wizard ());
+        /*OwncloudWizard *ocWizard = qobject_cast<OwncloudWizard> (wizard ());
         ocWizard.back ();
         ocWizard.setAuthType (DetermineAuthTypeJob.Basic);*/
         break;
@@ -76,10 +76,10 @@ void Flow2AuthCredsPage.slotFlow2AuthResult (Flow2Auth.Result r, QString &errorS
         /* Error while getting the access token.  (Timeout, or the server did not accept our client credentials */
         wizard ().show ();
         break;
-    case Flow2Auth.LoggedIn: {
+    case Flow2Auth.LoggedIn : {
         _user = user;
         _appPassword = appPassword;
-        auto *ocWizard = qobject_cast<OwncloudWizard *> (wizard ());
+        auto *ocWizard = qobject_cast<OwncloudWizard> (wizard ());
         Q_ASSERT (ocWizard);
 
         emit connectToOCUrl (ocWizard.account ().url ().toString ());
@@ -93,7 +93,7 @@ int Flow2AuthCredsPage.nextId () {
 }
 
 void Flow2AuthCredsPage.setConnected () {
-    auto *ocWizard = qobject_cast<OwncloudWizard *> (wizard ());
+    auto *ocWizard = qobject_cast<OwncloudWizard> (wizard ());
     Q_ASSERT (ocWizard);
 
     // bring wizard to top
@@ -101,7 +101,7 @@ void Flow2AuthCredsPage.setConnected () {
 }
 
 AbstractCredentials *Flow2AuthCredsPage.getCredentials () {
-    auto *ocWizard = qobject_cast<OwncloudWizard *> (wizard ());
+    auto *ocWizard = qobject_cast<OwncloudWizard> (wizard ());
     Q_ASSERT (ocWizard);
     return new WebFlowCredentials (
                 _user,
@@ -124,4 +124,4 @@ void Flow2AuthCredsPage.slotStyleChanged () {
     emit styleChanged ();
 }
 
-} // namespace OCC
+} // namespace Occ

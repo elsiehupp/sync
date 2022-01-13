@@ -1,16 +1,15 @@
 #ifndef REMOTEWIPE_H
-#define REMOTEWIPE_H
+const int REMOTEWIPE_H
 
 // #include <QNetworkAccessManager>
 
-class QJsonDocument;
 class TestRemoteWipe;
 
-namespace OCC {
+namespace Occ {
 
-class RemoteWipe : public QObject {
+class RemoteWipe : GLib.Object {
 public:
-    explicit RemoteWipe (AccountPtr account, QObject *parent = nullptr);
+    RemoteWipe (AccountPtr account, GLib.Object *parent = nullptr);
 
 signals:
     /**

@@ -1,31 +1,31 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-// #include <QObject>
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
+
+// #include <GLib.Object>
 // #include <QHash>
 // #include <QTime>
 // #include <QQueue>
 // #include <QElapsedTimer>
 // #include <QTimer>
 
-namespace OCC {
+namespace Occ {
 
 /**
- * @brief The ProgressInfo class
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT ProgressInfo : public QObject {
+@brief The ProgressInfo class
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT ProgressInfo : GLib.Object {
 public:
     ProgressInfo ();
 
@@ -60,7 +60,7 @@ public:
         Done
     };
 
-    Status status () const;
+    Status status ();
 
     /**
      * Called when propagation starts.
@@ -76,21 +76,21 @@ public:
      * is about to start via the transmissionProgress () signal. The
      * first ProgressInfo will have isUpdatingEstimates () == false.
      */
-    bool isUpdatingEstimates () const;
+    bool isUpdatingEstimates ();
 
     /**
      * Increase the file and size totals by the amount indicated in item.
      */
     void adjustTotalsForFile (SyncFileItem &item);
 
-    int64 totalFiles () const;
-    int64 completedFiles () const;
+    int64 totalFiles ();
+    int64 completedFiles ();
 
-    int64 totalSize () const;
-    int64 completedSize () const;
+    int64 totalSize ();
+    int64 completedSize ();
 
     /** Number of a file that is currently in progress. */
-    int64 currentFile () const;
+    int64 currentFile ();
 
     /** Return true if the size needs to be taken in account in the total amount of time */
     static inline bool isSizeDependent (SyncFileItem &item) {
@@ -120,10 +120,10 @@ public:
      */
     struct OWNCLOUDSYNC_EXPORT Progress {
         /** Returns the estimates about progress per second and eta. */
-        Estimates estimates () const;
+        Estimates estimates ();
 
-        int64 completed () const;
-        int64 remaining () const;
+        int64 completed ();
+        int64 remaining ();
 
     private:
         /**
@@ -173,7 +173,7 @@ public:
     /**
      * Get the total completion estimate
      */
-    Estimates totalProgress () const;
+    Estimates totalProgress ();
 
     /**
      * Get the optimistic eta.
@@ -181,7 +181,7 @@ public:
      * This value is based on the highest observed transfer bandwidth
      * and files-per-second speed.
      */
-    uint64 optimisticEta () const;
+    uint64 optimisticEta ();
 
     /**
      * Whether the remaining-time estimate is trusted.
@@ -189,7 +189,7 @@ public:
      * We don't trust it if it is hugely above the optimistic estimate.
      * See #5046.
      */
-    bool trustEta () const;
+    bool trustEta ();
 
     /**
      * Get the current file completion estimate structure
@@ -232,25 +232,25 @@ namespace Progress {
 }
 
 /** Type of error
- *
- * Used for ProgressDispatcher.syncError. May trigger error interactivity
- * in IssuesWidget.
- */
+
+Used for ProgressDispatcher.syncError. May trigger error interactivity
+in IssuesWidget.
+*/
 enum class ErrorCategory {
     Normal,
     InsufficientRemoteStorage,
 };
 
 /**
- * @file progressdispatcher.h
- * @brief A singleton class to provide sync progress information to other gui classes.
- *
- * How to use the ProgressDispatcher:
- * Just connect to the two signals either to progress for every individual file
- * or the overall sync progress.
- *
- */
-class OWNCLOUDSYNC_EXPORT ProgressDispatcher : public QObject {
+@file progressdispatcher.h
+@brief A singleton class to provide sync progress information to other gui classes.
+
+How to use the ProgressDispatcher:
+Just connect to the two signals either to progress for every individual file
+or the overall sync progress.
+
+*/
+class OWNCLOUDSYNC_EXPORT ProgressDispatcher : GLib.Object {
 
     friend class Folder; // only allow Folder class to access the setting slots.
 public:
@@ -267,7 +267,7 @@ signals:
      */
     void progressInfo (QString &folder, ProgressInfo &progress);
     /**
-     * @brief: the item was completed by a job
+     * @brief : the item was completed by a job
      */
     void itemCompleted (QString &folder, SyncFileItemPtr &item);
 
@@ -294,10 +294,9 @@ protected:
     void setProgressInfo (QString &folder, ProgressInfo &progress);
 
 private:
-    ProgressDispatcher (QObject *parent = nullptr);
+    ProgressDispatcher (GLib.Object *parent = nullptr);
 
     QElapsedTimer _timer;
     static ProgressDispatcher *_instance;
 };
 }
-#endif // PROGRESSDISPATCHER_H

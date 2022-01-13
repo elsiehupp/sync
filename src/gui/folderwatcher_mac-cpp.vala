@@ -1,22 +1,22 @@
 /*
- * Copyright (C) by Markus Goetz <markus@woboq.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Markus Goetz <markus@woboq.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <cerrno>
 // #include <QDirIterator>
 // #include <QStringList>
 
-namespace OCC {
+namespace Occ {
 
 FolderWatcherPrivate.FolderWatcherPrivate (FolderWatcher *p, QString &path)
     : _parent (p)
@@ -58,7 +58,7 @@ static void callback (
         QString qstring;
         CFIndex pathLength = CFStringGetLength (path);
         qstring.resize (pathLength);
-        CFStringGetCharacters (path, CFRangeMake (0, pathLength), reinterpret_cast<UniChar *> (qstring.data ()));
+        CFStringGetCharacters (path, CFRangeMake (0, pathLength), reinterpret_cast<UniChar> (qstring.data ()));
         QString fn = qstring.normalized (QString.NormalizationForm_C);
 
         if (! (eventFlags[i] & c_interestingFlags)) {
@@ -69,12 +69,12 @@ static void callback (
         paths.append (fn);
     }
 
-    reinterpret_cast<FolderWatcherPrivate *> (clientCallBackInfo).doNotifyParent (paths);
+    reinterpret_cast<FolderWatcherPrivate> (clientCallBackInfo).doNotifyParent (paths);
 }
 
 void FolderWatcherPrivate.startWatching () {
     qCDebug (lcFolderWatcher) << "FolderWatcherPrivate.startWatching ()" << _folder;
-    CFStringRef folderCF = CFStringCreateWithCharacters (0, reinterpret_cast<const UniChar *> (_folder.unicode ()),
+    CFStringRef folderCF = CFStringCreateWithCharacters (0, reinterpret_cast<const UniChar> (_folder.unicode ()),
         _folder.length ());
     CFArrayRef pathsToWatch = CFStringCreateArrayBySeparatingStrings (nullptr, folderCF, CFSTR (":"));
 

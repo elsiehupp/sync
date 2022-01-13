@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #include <ocsuserstatusconnector.h>
 // #include <qnamespace.h>
@@ -24,18 +24,18 @@
 // #include <cmath>
 // #include <cstddef>
 
-namespace OCC {
+namespace Occ {
 
 Q_LOGGING_CATEGORY (lcUserStatusDialogModel, "nextcloud.gui.userstatusdialogmodel", QtInfoMsg)
 
-UserStatusSelectorModel.UserStatusSelectorModel (QObject *parent)
-    : QObject (parent)
+UserStatusSelectorModel.UserStatusSelectorModel (GLib.Object *parent)
+    : GLib.Object (parent)
     , _dateTimeProvider (new DateTimeProvider) {
     _userStatus.setIcon ("😀");
 }
 
-UserStatusSelectorModel.UserStatusSelectorModel (std.shared_ptr<UserStatusConnector> userStatusConnector, QObject *parent)
-    : QObject (parent)
+UserStatusSelectorModel.UserStatusSelectorModel (std.shared_ptr<UserStatusConnector> userStatusConnector, GLib.Object *parent)
+    : GLib.Object (parent)
     , _userStatusConnector (userStatusConnector)
     , _userStatus ("no-id", "", "😀", UserStatus.OnlineStatus.Online, false, {})
     , _dateTimeProvider (new DateTimeProvider) {
@@ -45,8 +45,8 @@ UserStatusSelectorModel.UserStatusSelectorModel (std.shared_ptr<UserStatusConnec
 
 UserStatusSelectorModel.UserStatusSelectorModel (std.shared_ptr<UserStatusConnector> userStatusConnector,
     std.unique_ptr<DateTimeProvider> dateTimeProvider,
-    QObject *parent)
-    : QObject (parent)
+    GLib.Object *parent)
+    : GLib.Object (parent)
     , _userStatusConnector (userStatusConnector)
     , _dateTimeProvider (std.move (dateTimeProvider)) {
     _userStatus.setIcon ("😀");
@@ -54,16 +54,16 @@ UserStatusSelectorModel.UserStatusSelectorModel (std.shared_ptr<UserStatusConnec
 }
 
 UserStatusSelectorModel.UserStatusSelectorModel (UserStatus &userStatus,
-    std.unique_ptr<DateTimeProvider> dateTimeProvider, QObject *parent)
-    : QObject (parent)
+    std.unique_ptr<DateTimeProvider> dateTimeProvider, GLib.Object *parent)
+    : GLib.Object (parent)
     , _userStatus (userStatus)
     , _dateTimeProvider (std.move (dateTimeProvider)) {
     _userStatus.setIcon ("😀");
 }
 
 UserStatusSelectorModel.UserStatusSelectorModel (UserStatus &userStatus,
-    QObject *parent)
-    : QObject (parent)
+    GLib.Object *parent)
+    : GLib.Object (parent)
     , _userStatus (userStatus) {
     _userStatus.setIcon ("😀");
 }
@@ -229,35 +229,35 @@ Optional<ClearAt> UserStatusSelectorModel.clearStageTypeToDateTime (ClearStageTy
     case ClearStageType.DontClear:
         return {};
 
-    case ClearStageType.HalfHour: {
+    case ClearStageType.HalfHour : {
         ClearAt clearAt;
         clearAt._type = ClearAtType.Period;
         clearAt._period = 60 * 30;
         return clearAt;
     }
 
-    case ClearStageType.OneHour: {
+    case ClearStageType.OneHour : {
         ClearAt clearAt;
         clearAt._type = ClearAtType.Period;
         clearAt._period = 60 * 60;
         return clearAt;
     }
 
-    case ClearStageType.FourHour: {
+    case ClearStageType.FourHour : {
         ClearAt clearAt;
         clearAt._type = ClearAtType.Period;
         clearAt._period = 60 * 60 * 4;
         return clearAt;
     }
 
-    case ClearStageType.Today: {
+    case ClearStageType.Today : {
         ClearAt clearAt;
         clearAt._type = ClearAtType.EndOf;
         clearAt._endof = "day";
         return clearAt;
     }
 
-    case ClearStageType.Week: {
+    case ClearStageType.Week : {
         ClearAt clearAt;
         clearAt._type = ClearAtType.EndOf;
         clearAt._endof = "week";
@@ -391,16 +391,16 @@ QString UserStatusSelectorModel.timeDifferenceToString (int differenceSecs) {
 QString UserStatusSelectorModel.clearAtReadable (Optional<ClearAt> &clearAt) {
     if (clearAt) {
         switch (clearAt._type) {
-        case ClearAtType.Period: {
+        case ClearAtType.Period : {
             return timeDifferenceToString (clearAt._period);
         }
 
-        case ClearAtType.Timestamp: {
+        case ClearAtType.Timestamp : {
             const int difference = static_cast<int> (clearAt._timestamp - _dateTimeProvider.currentDateTime ().toTime_t ());
             return timeDifferenceToString (difference);
         }
 
-        case ClearAtType.EndOf: {
+        case ClearAtType.EndOf : {
             if (clearAt._endof == "day") {
                 return tr ("Today");
             } else if (clearAt._endof == "week") {

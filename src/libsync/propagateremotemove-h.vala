@@ -1,33 +1,33 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 // #pragma once
 
-namespace OCC {
+namespace Occ {
 
 /**
- * @brief The MoveJob class
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT MoveJob : public AbstractNetworkJob {
+@brief The MoveJob class
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT MoveJob : AbstractNetworkJob {
     const QString _destination;
     const QUrl _url; // Only used (instead of path) when the constructor taking an URL is used
     QMap<QByteArray, QByteArray> _extraHeaders;
 
 public:
-    explicit MoveJob (AccountPtr account, QString &path, QString &destination, QObject *parent = nullptr);
-    explicit MoveJob (AccountPtr account, QUrl &url, QString &destination,
-        QMap<QByteArray, QByteArray> _extraHeaders, QObject *parent = nullptr);
+    MoveJob (AccountPtr account, QString &path, QString &destination, GLib.Object *parent = nullptr);
+    MoveJob (AccountPtr account, QUrl &url, QString &destination,
+        QMap<QByteArray, QByteArray> _extraHeaders, GLib.Object *parent = nullptr);
 
     void start () override;
     bool finished () override;
@@ -37,10 +37,10 @@ signals:
 };
 
 /**
- * @brief The PropagateRemoteMove class
- * @ingroup libsync
- */
-class PropagateRemoteMove : public PropagateItemJob {
+@brief The PropagateRemoteMove class
+@ingroup libsync
+*/
+class PropagateRemoteMove : PropagateItemJob {
     QPointer<MoveJob> _job;
 
 public:

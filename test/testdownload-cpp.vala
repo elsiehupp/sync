@@ -1,20 +1,20 @@
 /*
- *    This software is in the public domain, furnished "as is", without technical
- *    support, and with no warranty, express or implied, as to its usefulness for
- *    any purpose.
- *
- */
+   This software is in the public domain, furnished "as is", without technical
+   support, and with no warranty, express or implied, as to its usefulness for
+   any purpose.
+
+*/
 
 // #include <QtTest>
 // #include <syncengine.h>
 // #include <owncloudpropagator.h>
 
-using namespace OCC;
+using namespace Occ;
 
 static constexpr int64 stopAfter = 3'123'668;
 
 /* A FakeGetReply that sends max 'fakeSize' bytes, but whose ContentLength has the corect size */
-class BrokenFakeGetReply : public FakeGetReply {
+class BrokenFakeGetReply : FakeGetReply {
 public:
     using FakeGetReply.FakeGetReply;
     int fakeSize = stopAfter;
@@ -22,7 +22,7 @@ public:
     int64 bytesAvailable () const override {
         if (aborted)
             return 0;
-        return std.min (size, fakeSize) + QIODevice.bytesAvailable (); // NOLINT: This is intended to simulare the brokeness
+        return std.min (size, fakeSize) + QIODevice.bytesAvailable (); // NOLINT : This is intended to simulare the brokeness
     }
 
     int64 readData (char *data, int64 maxlen) override {
@@ -43,7 +43,7 @@ SyncFileItemPtr getItem (QSignalSpy &spy, QString &path) {
     return {};
 }
 
-class TestDownload : public QObject {
+class TestDownload : GLib.Object {
 
 private slots:
 
@@ -177,7 +177,7 @@ private slots:
         // restore permissions
         QFile (fakeFolder.localPath () + "A/").setPermissions (QFile.Permissions (0x7777));
 
-        QObject.disconnect (transProgress);
+        GLib.Object.disconnect (transProgress);
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.GetOperation)
                 QTest.qFail ("There shouldn't be any download", __FILE__, __LINE__);

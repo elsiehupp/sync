@@ -1,29 +1,28 @@
 /*
- * Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 // #pragma once
 
 // #include <QBuffer>
 // #include <QFile>
 
-namespace OCC {
-class PropagateDownloadEncrypted;
+namespace Occ {
 
 /**
- * @brief The GETFileJob class
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT GETFileJob : public AbstractNetworkJob {
+@brief The GETFileJob class
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT GETFileJob : AbstractNetworkJob {
     QIODevice *_device;
     QMap<QByteArray, QByteArray> _headers;
     QString _errorString;
@@ -48,13 +47,13 @@ protected:
 
 public:
     // DOES NOT take ownership of the device.
-    explicit GETFileJob (AccountPtr account, QString &path, QIODevice *device,
+    GETFileJob (AccountPtr account, QString &path, QIODevice *device,
         const QMap<QByteArray, QByteArray> &headers, QByteArray &expectedEtagForResume,
-        int64 resumeStart, QObject *parent = nullptr);
+        int64 resumeStart, GLib.Object *parent = nullptr);
     // For directDownloadUrl:
-    explicit GETFileJob (AccountPtr account, QUrl &url, QIODevice *device,
+    GETFileJob (AccountPtr account, QUrl &url, QIODevice *device,
         const QMap<QByteArray, QByteArray> &headers, QByteArray &expectedEtagForResume,
-        int64 resumeStart, QObject *parent = nullptr);
+        int64 resumeStart, GLib.Object *parent = nullptr);
     ~GETFileJob () override {
         if (_bandwidthManager) {
             _bandwidthManager.unregisterDownloadJob (this);
@@ -115,19 +114,19 @@ private slots:
 };
 
 /**
- * @brief The GETEncryptedFileJob class that provides file decryption on the fly while the download is running
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT GETEncryptedFileJob : public GETFileJob {
+@brief The GETEncryptedFileJob class that provides file decryption on the fly while the download is running
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT GETEncryptedFileJob : GETFileJob {
 
 public:
     // DOES NOT take ownership of the device.
-    explicit GETEncryptedFileJob (AccountPtr account, QString &path, QIODevice *device,
+    GETEncryptedFileJob (AccountPtr account, QString &path, QIODevice *device,
         const QMap<QByteArray, QByteArray> &headers, QByteArray &expectedEtagForResume,
-        int64 resumeStart, EncryptedFile encryptedInfo, QObject *parent = nullptr);
-    explicit GETEncryptedFileJob (AccountPtr account, QUrl &url, QIODevice *device,
+        int64 resumeStart, EncryptedFile encryptedInfo, GLib.Object *parent = nullptr);
+    GETEncryptedFileJob (AccountPtr account, QUrl &url, QIODevice *device,
         const QMap<QByteArray, QByteArray> &headers, QByteArray &expectedEtagForResume,
-        int64 resumeStart, EncryptedFile encryptedInfo, QObject *parent = nullptr);
+        int64 resumeStart, EncryptedFile encryptedInfo, GLib.Object *parent = nullptr);
     ~GETEncryptedFileJob () override = default;
 
 protected:
@@ -141,10 +140,10 @@ private:
 };
 
 /**
- * @brief The PropagateDownloadFile class
- * @ingroup libsync
- *
- * This is the flow:
+@brief The PropagateDownloadFile class
+@ingroup libsync
+
+This is the flow:
 
 \code{.unparsed}
   start ()
@@ -177,8 +176,8 @@ private:
     +. updateMetadata () <-------------------------+
 
 \endcode
- */
-class PropagateDownloadFile : public PropagateItemJob {
+*/
+class PropagateDownloadFile : PropagateItemJob {
 public:
     PropagateDownloadFile (OwncloudPropagator *propagator, SyncFileItemPtr &item)
         : PropagateItemJob (propagator, item)
@@ -199,7 +198,7 @@ public:
      * If it's a non-empty folder, it'll be renamed to a conflict-style name
      * to preserve any non-synced content that may be inside.
      *
-     * Default: false.
+     * Default : false.
      */
     void setDeleteExistingFolder (bool enabled);
 

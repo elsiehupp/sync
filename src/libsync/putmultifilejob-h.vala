@@ -1,16 +1,16 @@
 /*
- * Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 // #pragma once
 
@@ -23,9 +23,8 @@
 // #include <QHttpMultiPart>
 // #include <memory>
 
-class QIODevice;
 
-namespace OCC {
+namespace Occ {
 
 Q_DECLARE_LOGGING_CATEGORY (lcPutMultiFileJob)
 
@@ -35,14 +34,14 @@ struct SingleUploadFileData {
 };
 
 /**
- * @brief The PutMultiFileJob class
- * @ingroup libsync
- */
-class OWNCLOUDSYNC_EXPORT PutMultiFileJob : public AbstractNetworkJob {
+@brief The PutMultiFileJob class
+@ingroup libsync
+*/
+class OWNCLOUDSYNC_EXPORT PutMultiFileJob : AbstractNetworkJob {
 
 public:
-    explicit PutMultiFileJob (AccountPtr account, QUrl &url,
-                             std.vector<SingleUploadFileData> devices, QObject *parent = nullptr)
+    PutMultiFileJob (AccountPtr account, QUrl &url,
+                             std.vector<SingleUploadFileData> devices, GLib.Object *parent = nullptr)
         : AbstractNetworkJob (account, {}, parent)
         , _devices (std.move (devices))
         , _url (url) {

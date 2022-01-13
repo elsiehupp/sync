@@ -6,7 +6,7 @@
 // #include <QtCore/QtDebug>
 // #include <QtCore/QFile>
 
-namespace OCC {
+namespace Occ {
 
 void UpdateInfo.setVersion (QString &v) {
     mVersion = v;
@@ -91,4 +91,4 @@ UpdateInfo UpdateInfo.parseString (QString &xml, bool *ok) {
     return c;
 }
 
-} // namespace OCC
+} // namespace Occ

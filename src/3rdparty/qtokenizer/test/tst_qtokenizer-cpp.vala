@@ -5,7 +5,7 @@ namespace {
   const QString quoted     = QLatin1String ("\"Wait for me!\" he shouted");
 }
 
-class TestTokenizer : public QObject {
+class TestTokenizer : GLib.Object {
   Q_OBJECT
 private slots:
   void tokenizeQStringSimple () {

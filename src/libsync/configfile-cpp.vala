@@ -1,16 +1,16 @@
 /*
- * Copyright (C) by Klaas Freitag <freitag@owncloud.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- * for more details.
- */
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+the Free Software Foundation; either v
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+*/
 
 #ifndef TOKEN_AUTH_ONLY
 // #include <QWidget>
@@ -26,20 +26,20 @@
 // #include <QNetworkProxy>
 // #include <QStandardPaths>
 
-#define QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
+const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
 
 #if ! (QTLEGACY)
 // #include <QOperatingSystemVersion>
 #endif
 
-#define DEFAULT_REMOTE_POLL_INTERVAL 30000 // default remote poll time in milliseconds
-#define DEFAULT_MAX_LOG_LINES 20000
+const int DEFAULT_REMOTE_POLL_INTERVAL 30000 // default remote poll time in milliseconds
+const int DEFAULT_MAX_LOG_LINES 20000
 
 namespace {
 static constexpr char showMainDialogAsNormalWindowC[] = "showMainDialogAsNormalWindow";
 }
 
-namespace OCC {
+namespace Occ {
 
 namespace chrono = std.chrono;
 
@@ -475,7 +475,7 @@ chrono.milliseconds ConfigFile.forceSyncInterval (QString &connection) {
     return interval;
 }
 
-chrono.milliseconds OCC.ConfigFile.fullLocalDiscoveryInterval () {
+chrono.milliseconds Occ.ConfigFile.fullLocalDiscoveryInterval () {
     QSettings settings (configFile (), QSettings.IniFormat);
     settings.beginGroup (defaultConnection ());
     return millisecondsValue (settings, fullLocalDiscoveryIntervalC, chrono.hours (1));
@@ -613,7 +613,7 @@ void ConfigFile.setProxyType (int proxyType,
         settings.setValue (QLatin1String (proxyUserC), user);
 
         if (pass.isEmpty ()) {
-            // Security: Don't keep password in config file
+            // Security : Don't keep password in config file
             settings.remove (QLatin1String (proxyPassC));
 
             // Delete password from keychain
@@ -623,7 +623,7 @@ void ConfigFile.setProxyType (int proxyType,
             // Write password to keychain
             auto job = new KeychainChunk.WriteJob (keychainProxyPasswordKey (), pass.toUtf8 ());
             if (job.exec ()) {
-                // Security: Don't keep password in config file
+                // Security : Don't keep password in config file
                 settings.remove (QLatin1String (proxyPassC));
             }
         }
@@ -700,7 +700,7 @@ QString ConfigFile.proxyPassword () {
     const auto key = keychainProxyPasswordKey ();
 
     if (!pass.isEmpty ()) {
-        // Security: Migrate password from config file to keychain
+        // Security : Migrate password from config file to keychain
         auto job = new KeychainChunk.WriteJob (key, pass.toUtf8 ());
         if (job.exec ()) {
             QSettings settings (configFile (), QSettings.IniFormat);
@@ -913,7 +913,7 @@ void ConfigFile.setClientVersionString (QString &version) {
 
 Q_GLOBAL_STATIC (QString, g_configFileName)
 
-std.unique_ptr<QSettings> ConfigFile.settingsWithGroup (QString &group, QObject *parent) {
+std.unique_ptr<QSettings> ConfigFile.settingsWithGroup (QString &group, GLib.Object *parent) {
     if (g_configFileName ().isEmpty ()) {
         // cache file name
         ConfigFile cfg;
