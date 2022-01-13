@@ -2,8 +2,16 @@
 Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 Copyright (C) by Michael Schuster <michael@schuster.ms>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QDesktopServices>
+// #include <QApplication>
+// #include <QClipboard>
+// #include <QTimer>
+// #include <QBuffer>
+// #include <QJsonObject>
+// #include <QJsonDocument>
 
 // #pragma once
 // #include <QPointer>
@@ -44,9 +52,9 @@ public:
 
 signals:
     /***********************************************************
-     * The state has changed.
-     * when logged in, appPassword has the value of the app password.
-     */
+    The state has changed.
+    when logged in, appPassword has the value of the app password.
+    ***********************************************************/
     void result (Flow2Auth.Result result, string &errorString = string (),
                 const string &user = string (), string &appPassword = string ());
 
@@ -73,35 +81,8 @@ private:
     bool _enforceHttps = false;
 };
 
-} // namespace Occ
 
 
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
-Copyright (C) by Michael Schuster <michael@schuster.ms>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QDesktopServices>
-// #include <QApplication>
-// #include <QClipboard>
-// #include <QTimer>
-// #include <QBuffer>
-// #include <QJsonObject>
-// #include <QJsonDocument>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcFlow2auth, "nextcloud.sync.credentials.flow2auth", QtInfoMsg)
-    
     Flow2Auth.Flow2Auth (Account *account, GLib.Object *parent)
         : GLib.Object (parent)
         , _account (account)

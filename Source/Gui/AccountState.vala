@@ -1,8 +1,18 @@
 /***********************************************************
 Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QSettings>
+// #include <QTimer>
+// #include <qfontmetrics.h>
+
+// #include <QJsonDocument>
+// #include <QJsonObject>
+// #include <QJsonArray>
+// #include <QNetworkRequest>
+// #include <QBuffer>
 
 // #include <QByteArray>
 // #include <QElapsedTimer>
@@ -12,6 +22,9 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 
 namespace Occ {
+
+Q_DECLARE_METATYPE (Occ.AccountState *)
+Q_DECLARE_METATYPE (Occ.AccountStatePtr)
 
 class RemoteWipe;
 
@@ -64,16 +77,18 @@ public:
     AccountState (AccountPtr account);
     ~AccountState () override;
 
-    /** Creates an account state from settings and an Account object.
-     *
-     * Use from AccountManager with a prepared QSettings object only.
-     */
+    /***********************************************************
+    Creates an account state from settings and an Account object.
+
+    Use from AccountManager with a prepared QSettings object only.
+    ***********************************************************/
     static AccountState *loadFromSettings (AccountPtr account, QSettings &settings);
 
-    /** Writes account state information to settings.
-     *
-     * It does not write the Account data.
-     */
+    /***********************************************************
+    Writes account state information to settings.
+
+    It does not write the Account data.
+    ***********************************************************/
     void writeToSettings (QSettings &settings);
 
     AccountPtr account ();
@@ -89,18 +104,20 @@ public:
     AccountAppList appList ();
     AccountApp* findApp (string &appId) const;
 
-    /** A user-triggered sign out which disconnects, stops syncs
-     * for the account and forgets the password. */
+    /***********************************************************
+    A user-triggered sign out which disconnects, stops syncs
+    for the account and forgets the password. */
     void signOutByUi ();
 
-    /** Tries to connect from scratch.
-     *
-     * Does nothing for signed out accounts.
-     * Connected accounts will be disconnected and try anew.
-     * Disconnected accounts will go to checkConnectivity ().
-     *
+    /***********************************************************
+    Tries to connect from scratch.
+
+    Does nothing for signed out accounts.
+    Connected accounts will be disconnected and try anew.
+    Disconnected accounts will go to checkConnectivity ().
+    
      * Useful for when network settings (proxy) change.
-     */
+    ***********************************************************/
     void freshConnectionAttempt ();
 
     /// Move from SignedOut state to Disconnected (attempting to connect)
@@ -108,46 +125,54 @@ public:
 
     bool isConnected ();
 
-    /** Returns a new settings object for this account, already in the right groups. */
+    /***********************************************************
+    Returns a new settings object for this account, already in the right groups. */
     std.unique_ptr<QSettings> settings ();
 
-    /** Mark the timestamp when the last successful ETag check happened for
-     *  this account.
-     *  The checkConnectivity () method uses the timestamp to save a call to
-     *  the server to validate the connection if the last successful etag job
-     *  was not so long ago.
-     */
+    /***********************************************************
+    Mark the timestamp when the last successful ETag check happened for
+     this account.
+     The checkConnectivity () method uses the timestamp to save a call to
+     the server to validate the connection if the last successful etag job
+     was not so long ago.
+    ***********************************************************/
     void tagLastSuccessfullETagRequest (QDateTime &tp);
 
-    /** Saves the ETag Response header from the last Notifications api
-     * request with statusCode 200.
+    /***********************************************************
+    Saves the ETag Response header from the last Notifications api
+    request with statusCode 200.
     */
     QByteArray notificationsEtagResponseHeader ();
 
-    /** Returns the ETag Response header from the last Notifications api
-     * request with statusCode 200.
+    /***********************************************************
+    Returns the ETag Response header from the last Notifications api
+    request with statusCode 200.
     */
     void setNotificationsEtagResponseHeader (QByteArray &value);
 
-    /** Saves the ETag Response header from the last Navigation Apps api
-     * request with statusCode 200.
+    /***********************************************************
+    Saves the ETag Response header from the last Navigation Apps api
+    request with statusCode 200.
     */
     QByteArray navigationAppsEtagResponseHeader ();
 
-    /** Returns the ETag Response header from the last Navigation Apps api
-     * request with statusCode 200.
+    /***********************************************************
+    Returns the ETag Response header from the last Navigation Apps api
+    request with statusCode 200.
     */
     void setNavigationAppsEtagResponseHeader (QByteArray &value);
 
     ///Asks for user credentials
     void handleInvalidCredentials ();
 
-    /** Returns the notifications status retrieved by the notificatons endpoint
-     *  https://github.com/nextcloud/desktop/issues/2318#issuecomment-680698429
+    /***********************************************************
+    Returns the notifications status retrieved by the notificatons endpoint
+     https://github.com/nextcloud/desktop/issues/2318#issuecomment-680698429
     */
     bool isDesktopNotificationsAllowed ();
 
-    /** Set desktop notifications status retrieved by the notificatons endpoint
+    /***********************************************************
+    Set desktop notifications status retrieved by the notificatons endpoint
     */
     void setDesktopNotificationsAllowed (bool isAllowed);
 
@@ -193,26 +218,26 @@ private:
     QByteArray _navigationAppsEtagResponseHeader;
 
     /***********************************************************
-     * Starts counting when the server starts being back up after 503 or
-     * maintenance mode. The account will only become connected once this
-     * timer exceeds the _maintenanceToConnectedDelay value.
-     */
+    Starts counting when the server starts being back up after 503 or
+    maintenance mode. The account will only become connected once this
+    timer exceeds the _maintenanceToConnectedDelay value.
+    ***********************************************************/
     QElapsedTimer _timeSinceMaintenanceOver;
 
     /***********************************************************
-     * Milliseconds for which to delay reconnection after 503/maintenance.
-     */
+    Milliseconds for which to delay reconnection after 503/maintenance.
+    ***********************************************************/
     int _maintenanceToConnectedDelay;
 
     /***********************************************************
-     * Connects remote wipe check with the account
-     * the log out triggers the check (loads app password . create request)
-     */
+    Connects remote wipe check with the account
+    the log out triggers the check (loads app password . create request)
+    ***********************************************************/
     RemoteWipe *_remoteWipe;
 
     /***********************************************************
-     * Holds the App names and URLs available on the server
-     */
+    Holds the App names and URLs available on the server
+    ***********************************************************/
     AccountAppList _apps;
 
     bool _isDesktopNotificationsAllowed;
@@ -237,39 +262,7 @@ private:
     QUrl _iconUrl;
 };
 
-}
 
-Q_DECLARE_METATYPE (Occ.AccountState *)
-Q_DECLARE_METATYPE (Occ.AccountStatePtr)
-
-#endif //ACCOUNTINFO_H
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QSettings>
-// #include <QTimer>
-// #include <qfontmetrics.h>
-
-// #include <QJsonDocument>
-// #include <QJsonObject>
-// #include <QJsonArray>
-// #include <QNetworkRequest>
-// #include <QBuffer>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcAccountState, "nextcloud.gui.account.state", QtInfoMsg)
-    
     AccountState.AccountState (AccountPtr account)
         : GLib.Object ()
         , _account (account)

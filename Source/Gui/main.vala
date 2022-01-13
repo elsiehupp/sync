@@ -2,7 +2,7 @@
 
 Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 // #include <QtGlobal>
 

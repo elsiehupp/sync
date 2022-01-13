@@ -2,8 +2,14 @@
 Copyright (C) by Klaas Freitag <freitag@kde.org>
 Copyright (c) by Markus Goetz <guruz@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QLoggingCategory>
+// #include <QMutex>
+// #include <QNetworkReply>
+// #include <QSettings>
+// #include <QNetworkCookieJar>
 
 // #include <QMap>
 
@@ -42,34 +48,7 @@ private:
     bool _ready;
 };
 
-} // namespace Occ
 
-#endif
-
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@kde.org>
-Copyright (c) by Markus Goetz <guruz@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QLoggingCategory>
-// #include <QMutex>
-// #include <QNetworkReply>
-// #include <QSettings>
-// #include <QNetworkCookieJar>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcTokenCredentials, "nextcloud.sync.credentials.token", QtInfoMsg)
-    
     namespace {
     
         const char authenticationFailedC[] = "owncloud-authentication-failed";

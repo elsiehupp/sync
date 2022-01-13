@@ -2,8 +2,19 @@
 Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <qfile.h>
+// #include <qdir.h>
+// #include <qdiriterator.h>
+// #include <qtemporaryfile.h>
+// #include <qsavefile.h>
+// #include <QDateTime>
+// #include <qstack.h>
+// #include <QCoreApplication>
+
+// #include <ctime>
 
 // #pragma once
 
@@ -48,11 +59,11 @@ public:
     void start () override;
 
     /***********************************************************
-     * Whether an existing file with the same name may be deleted before
-     * creating the directory.
-     *
+    Whether an existing file with the same name may be deleted before
+    creating the directory.
+    
      * Default : false.
-     */
+    ***********************************************************/
     void setDeleteExistingFile (bool enabled);
 
 private:
@@ -74,40 +85,7 @@ public:
     void start () override;
     JobParallelism parallelism () override { return _item.isDirectory () ? WaitForFinished : FullParallelism; }
 };
-}
 
-
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <qfile.h>
-// #include <qdir.h>
-// #include <qdiriterator.h>
-// #include <qtemporaryfile.h>
-// #include <qsavefile.h>
-// #include <QDateTime>
-// #include <qstack.h>
-// #include <QCoreApplication>
-
-// #include <ctime>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcPropagateLocalRemove, "nextcloud.sync.propagator.localremove", QtInfoMsg)
-    Q_LOGGING_CATEGORY (lcPropagateLocalMkdir, "nextcloud.sync.propagator.localmkdir", QtInfoMsg)
-    Q_LOGGING_CATEGORY (lcPropagateLocalRename, "nextcloud.sync.propagator.localrename", QtInfoMsg)
-    
     QByteArray localFileIdFromFullId (QByteArray &id) {
         return id.left (8);
     }

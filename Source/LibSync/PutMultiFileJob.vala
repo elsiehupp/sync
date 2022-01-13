@@ -1,8 +1,10 @@
 /***********************************************************
 Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QHttpPart>
 
 // #pragma once
 
@@ -71,26 +73,7 @@ private:
     QElapsedTimer _requestTimer;
 };
 
-}
 
-
-
-
-
-
-
-/***********************************************************
-Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QHttpPart>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcPutMultiFileJob, "nextcloud.sync.networkjob.put.multi", QtInfoMsg)
-    
     PutMultiFileJob.~PutMultiFileJob () = default;
     
     void PutMultiFileJob.start () {

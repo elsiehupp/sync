@@ -1,12 +1,37 @@
 /***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <theme.h>
+// #include <creds/credentialsfactory.h>
+// #include <creds/abstractcredentials.h>
+// #include <cookiejar.h>
+// #include <QSettings>
+// #include <QDir>
+// #include <QNetworkAccessManager>
+// #include <QMessageBox>
 
 // #pragma once
 
 namespace Occ {
+    
+namespace {
+    static const char urlC[] = "url";
+    static const char authTypeC[] = "authType";
+    static const char userC[] = "user";
+    static const char httpUserC[] = "http_user";
+    static const char davUserC[] = "dav_user";
+    static const char caCertsKeyC[] = "CaCertificates";
+    static const char accountsC[] = "Accounts";
+    static const char versionC[] = "version";
+    static const char serverVersionC[] = "serverVersion";
+    
+    // The maximum versions that this client can read
+    static const int maxAccountsVersion = 2;
+    static const int maxAccountVersion = 1;
+    }
 
 /***********************************************************
    @brief The AccountManager class
@@ -18,55 +43,55 @@ public:
     ~AccountManager () override = default;
 
     /***********************************************************
-     * Saves the accounts to a given settings file
-     */
+    Saves the accounts to a given settings file
+    ***********************************************************/
     void save (bool saveCredentials = true);
 
     /***********************************************************
-     * Creates account objects from a given settings file.
-     *
-     * Returns false if there was an error reading the settings,
+    Creates account objects from a given settings file.
+    
+    Returns false if there was an error reading the settings,
      * but note that settings not existing is not an error.
-     */
+    ***********************************************************/
     bool restore ();
 
     /***********************************************************
-     * Add this account in the list of saved accounts.
-     * Typically called from the wizard
-     */
+    Add this account in the list of saved accounts.
+    Typically called from the wizard
+    ***********************************************************/
     AccountState *addAccount (AccountPtr &newAccount);
 
     /***********************************************************
-     * remove all accounts
-     */
+    remove all accounts
+    ***********************************************************/
     void shutdown ();
 
     /***********************************************************
-     * Return a list of all accounts.
-     * (this is a list of QSharedPointer for internal reasons, one should normally not keep a copy of them)
-     */
+    Return a list of all accounts.
+    (this is a list of QSharedPointer for internal reasons, one should normally not keep a copy of them)
+    ***********************************************************/
     QList<AccountStatePtr> accounts ();
 
     /***********************************************************
-     * Return the account state pointer for an account identified by its display name
-     */
+    Return the account state pointer for an account identified by its display name
+    ***********************************************************/
     AccountStatePtr account (string &name);
 
     /***********************************************************
-     * Delete the AccountState
-     */
+    Delete the AccountState
+    ***********************************************************/
     void deleteAccount (AccountState *account);
 
     /***********************************************************
-     * Creates an account and sets up some basic handlers.
-     * Does *not* add the account to the account manager just yet.
-     */
+    Creates an account and sets up some basic handlers.
+    Does *not* add the account to the account manager just yet.
+    ***********************************************************/
     static AccountPtr createAccount ();
 
     /***********************************************************
-     * Returns the list of settings keys that can't be read because
-     * they are from the future.
-     */
+    Returns the list of settings keys that can't be read because
+    they are from the future.
+    ***********************************************************/
     static void backwardMigrationSettingsKeys (QStringList *deleteKeys, QStringList *ignoreKeys);
 
 private:
@@ -103,49 +128,9 @@ signals:
     void accountSyncConnectionRemoved (AccountState *account);
     void removeAccountFolders (AccountState *account);
 };
-}
 
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <theme.h>
-// #include <creds/credentialsfactory.h>
-// #include <creds/abstractcredentials.h>
-// #include <cookiejar.h>
-// #include <QSettings>
-// #include <QDir>
-// #include <QNetworkAccessManager>
-// #include <QMessageBox>
-
-namespace {
-    static const char urlC[] = "url";
-    static const char authTypeC[] = "authType";
-    static const char userC[] = "user";
-    static const char httpUserC[] = "http_user";
-    static const char davUserC[] = "dav_user";
-    static const char caCertsKeyC[] = "CaCertificates";
-    static const char accountsC[] = "Accounts";
-    static const char versionC[] = "version";
-    static const char serverVersionC[] = "serverVersion";
     
-    // The maximum versions that this client can read
-    static const int maxAccountsVersion = 2;
-    static const int maxAccountVersion = 1;
-    }
-    
-    namespace Occ {
-    
-    Q_LOGGING_CATEGORY (lcAccountManager, "nextcloud.gui.account.manager", QtInfoMsg)
-    
+  
     AccountManager *AccountManager.instance () {
         static AccountManager instance;
         return &instance;

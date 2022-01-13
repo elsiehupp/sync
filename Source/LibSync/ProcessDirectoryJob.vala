@@ -1,8 +1,20 @@
 /***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QDebug>
+// #include <algorithm>
+// #include <QEventLoop>
+// #include <QDir>
+// #include <set>
+// #include <QTextCodec>
+// #include <QFileInfo>
+// #include <QFile>
+// #include <QThreadPool>
+// #include <common/checksums.h>
+// #include <common/constants.h>
 
 // #pragma once
 
@@ -43,10 +55,11 @@ public:
     };
     Q_ENUM (QueryMode)
 
-    /** For creating the root job
-     *
-     * The base pin state is used if the root dir's pin state can't be retrieved.
-     */
+    /***********************************************************
+    For creating the root job
+
+    The base pin state is used if the root dir's pin state can't be retrieved.
+    ***********************************************************/
     ProcessDirectoryJob (DiscoveryPhase *data, PinState basePinState,
         int64 lastSyncTimestamp, GLib.Object *parent)
         : GLib.Object (parent)
@@ -70,7 +83,8 @@ public:
     }
 
     void start ();
-    /** Start up to nbJobs, return the number of job started; emit finished () when done */
+    /***********************************************************
+    Start up to nbJobs, return the number of job started; emit finished () when done */
     int processSubJobs (int nbJobs);
 
     void setInsideEncryptedTree (bool isInsideEncryptedTree) {
@@ -91,19 +105,20 @@ private:
         LocalInfo localEntry;
     };
 
-    /** Structure representing a path during discovery. A same path may have different value locally
-     * or on the server in case of renames.
-     *
-     * These strings never start or ends with slashes. They are all relative to the folder's root.
-     * Usually they are all the same and are even shared instance of the same string.
-     *
-     * _server and _local paths will differ if there are renames, example:
-     *   remote renamed A/ to B/ and local renamed A/X to A/Y then
-     *     target :   B/Y/file
-     *     original : A/X/file
+    /***********************************************************
+    Structure representing a path during discovery. A same path may have different value locally
+    or on the server in case of renames.
+    
+    These strings never start or ends with slashes. They are all relative to the fo
+    Usually they are all the same and are even shared instance of the s
+    
+    _server and _local path
+      remote renamed A/ to 
+        target :   B/Y/file
+        original : A/X/file
      *     local :    A/Y/file
      *     server :   B/X/file
-     */
+    ***********************************************************/
     struct PathTuple {
         string _original; // Path as in the DB (before the sync)
         string _target; // Path that will be the result after the sync (and will be in the DB)
@@ -128,12 +143,13 @@ private:
 
     bool checkForInvalidFileName (PathTuple &path, std.map<string, Entries> &entries, Entries &entry);
 
-    /** Iterate over entries inside the directory (non-recursively).
-     *
-     * Called once _serverEntries and _localEntries are filled
-     * Calls processFile () for each non-excluded one.
-     * Will start scheduling subdir jobs when done.
-     */
+    /***********************************************************
+    Iterate over entries inside the directory (non-recursively).
+
+    Called once _serverEntries and _localEntries are filled
+    Calls processFile () for each non-excluded one.
+    Will start scheduling subdir jobs when done.
+    ***********************************************************/
     void process ();
 
     // return true if the file is excluded.
@@ -141,13 +157,14 @@ private:
     bool handleExcluded (string &path, string &localName, bool isDirectory,
         bool isHidden, bool isSymlink);
 
-    /** Reconcile local/remote/db information for a single item.
-     *
-     * Can be a file or a directory.
-     * Usually ends up emitting itemDiscovered () or creating a subdirectory job.
-     *
+    /***********************************************************
+    Reconcile local/remote/db information for a single item.
+
+    Can be a file or a directory.
+    Usually ends up emitting itemDiscovered () or creating a subdirectory job.
+    
      * This main function delegates some work to the processFile* functions.
-     */
+    ***********************************************************/
     void processFile (PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &);
 
     /// processFile helper for when remote information is available, typically flows into AnalyzeLocalInfo when done
@@ -162,10 +179,11 @@ private:
     /// processFile helper for common final processing
     void processFileFinalize (SyncFileItemPtr &item, PathTuple, bool recurse, QueryMode recurseQueryLocal, QueryMode recurseQueryServer);
 
-    /** Checks the permission for this item, if needed, change the item to a restoration item.
-     * @return false indicate that this is an error and if it is a directory, one should not recurse
-     * inside it.
-     */
+    /***********************************************************
+    Checks the permission for this item, if needed, change the item to a restoration item.
+    @return false indicate that this is an error and if it is a directory, one should not recurse
+    inside it.
+    ***********************************************************/
     bool checkPermissions (SyncFileItemPtr &item);
 
     struct MovePermissionResult {
@@ -178,53 +196,59 @@ private:
     };
 
     /***********************************************************
-     * Check if the move is of a specified file within this directory is allowed.
-     * Return true if it is allowed, false otherwise
-     */
+    Check if the move is of a specified file within this directory is allowed.
+    Return true if it is allowed, false otherwise
+    ***********************************************************/
     MovePermissionResult checkMovePermissions (RemotePermissions srcPerm, string &srcPath, bool isDirectory);
 
     void processBlacklisted (PathTuple &, LocalInfo &, SyncJournalFileRecord &dbEntry);
     void subJobFinished ();
 
-    /** An DB operation failed */
+    /***********************************************************
+    An DB operation failed */
     void dbError ();
 
     void addVirtualFileSuffix (string &str) const;
     bool hasVirtualFileSuffix (string &str) const;
     void chopVirtualFileSuffix (string &str) const;
 
-    /** Convenience to detect suffix-vfs modes */
+    /***********************************************************
+    Convenience to detect suffix-vfs modes */
     bool isVfsWithSuffix ();
 
-    /** Start a remote discovery network job
-     *
-     * It fills _serverNormalQueryEntries and sets _serverQueryDone when done.
-     */
+    /***********************************************************
+    Start a remote discovery network job
+
+    It fills _serverNormalQueryEntries and sets _serverQueryDone when done.
+    ***********************************************************/
     DiscoverySingleDirectoryJob *startAsyncServerQuery ();
 
-    /** Discover the local directory
+    /***********************************************************
+    Discover the local directory
       *
       * Fills _localNormalQueryEntries.
       */
     void startAsyncLocalQuery ();
 
-    /** Sets _pinState, the directory's pin state
-     *
-     * If the folder exists locally its state is retrieved, otherwise the
-     * parent's pin state is inherited.
-     */
+    /***********************************************************
+    Sets _pinState, the directory's pin state
+
+    If the folder exists locally its state is retrieved, otherwise the
+    parent's pin state is inherited.
+    ***********************************************************/
     void computePinState (PinState parentState);
 
-    /** Adjust record._type if the db pin state suggests it.
-     *
-     * If the pin state is stored in the database (suffix vfs only right now)
-     * its effects won't be seen in localEntry._type. Instead the effects
-     * should materialize in dbEntry._type.
-     *
-     * This function checks whether the combination of file type and pin
-     * state suggests a hydration or dehydration action and changes the
+    /***********************************************************
+    Adjust record._type if the db pin state suggests it.
+
+    If the pin state is stored in the database (suffix vfs only right now)
+    its effects won't be seen in localEntry._type. Instead the effects
+    should materialize in dbEntry._type.
+    
+    This function checks whether the combination of file type and pi
+    state suggests a hydration or dehydration action and changes the
      * _type field accordingly.
-     */
+    ***********************************************************/
     void setupDbPinStateActions (SyncJournalFileRecord &record);
 
     int64 _lastSyncTimestamp = 0;
@@ -244,22 +268,24 @@ private:
     RemotePermissions _rootPermissions;
     QPointer<DiscoverySingleDirectoryJob> _serverJob;
 
-    /** Number of currently running async jobs.
-     *
-     * These "async jobs" have nothing to do with the jobs for subdirectories
-     * which are being tracked by _queuedJobs and _runningJobs.
-     *
-     * They are jobs that need to be completed to finish processing of directory
-     * entries. This variable is used to ensure this job doesn't finish while
+    /***********************************************************
+    Number of currently running async jobs.
+
+    These "async jobs" have nothing to do with the jobs for subdirectories
+    which are being tracked by _queuedJobs and _runningJobs.
+    
+    They are jobs that need to be completed to finish processing of direct
+    entries. This variable is used to ensure this job doesn't finish while
      * these jobs are still in flight.
-     */
+    ***********************************************************/
     int _pendingAsyncJobs = 0;
 
-    /** The queued and running jobs for subdirectories.
-     *
-     * The jobs are enqueued while processind directory entries and
-     * then gradually run via calls to processSubJobs ().
-     */
+    /***********************************************************
+    The queued and running jobs for subdirectories.
+
+    The jobs are enqueued while processind directory entries and
+    then gradually run via calls to processSubJobs ().
+    ***********************************************************/
     std.deque<ProcessDirectoryJob> _queuedJobs;
     QVector<ProcessDirectoryJob> _runningJobs;
 
@@ -276,35 +302,7 @@ signals:
     // The root etag of this directory was fetched
     void etag (QByteArray &, QDateTime &time);
 };
-}
 
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QDebug>
-// #include <algorithm>
-// #include <QEventLoop>
-// #include <QDir>
-// #include <set>
-// #include <QTextCodec>
-// #include <QFileInfo>
-// #include <QFile>
-// #include <QThreadPool>
-// #include <common/checksums.h>
-// #include <common/constants.h>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcDisco, "sync.discovery", QtInfoMsg)
-    
     bool ProcessDirectoryJob.checkForInvalidFileName (PathTuple &path,
         const std.map<string, Entries> &entries, Entries &entry) {
         const auto originalFileName = entry.localEntry.name;

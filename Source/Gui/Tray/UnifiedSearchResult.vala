@@ -1,8 +1,10 @@
 /***********************************************************
 Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QtCore>
 
 // #pragma once
 
@@ -46,13 +48,6 @@ struct UnifiedSearchResult {
 
 
 
-/***********************************************************
-Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QtCore>
 
 namespace Occ {
 

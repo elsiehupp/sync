@@ -1,8 +1,16 @@
 /***********************************************************
 Copyright (C) 2018 by J-P Nurmi <jpnurmi@gmail.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QGuiApplication>
+// #include <QMouseEvent>
+// #include <QPainter>
+// #include <QStyle>
+// #include <QStyleHints>
+
+const int HASQT5_11 (QT_VERSION >= QT_VERSION_CHECK (5,11,0))
 
 // #include <Gtk.Widget>
 // #include <QBasicTimer>
@@ -74,19 +82,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) 2018 by J-P Nurmi <jpnurmi@gmail.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QGuiApplication>
-// #include <QMouseEvent>
-// #include <QPainter>
-// #include <QStyle>
-// #include <QStyleHints>
-
-const int HASQT5_11 (QT_VERSION >= QT_VERSION_CHECK (5,11,0))
 
 namespace Occ {
 

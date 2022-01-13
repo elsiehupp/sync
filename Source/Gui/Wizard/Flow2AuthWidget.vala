@@ -1,7 +1,7 @@
 /***********************************************************
 Copyright (C) by Michael Schuster <michael@schuster.ms>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 #ifndef FLOW2AUTHWIDGET_H

@@ -1,32 +1,12 @@
 /***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Daniel Heule <daniel.heule@gmail.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 // #include <GLib.Object>
-
-/***********************************************************
-@brief Helper class for command line client
-@ingroup cmd
-***********************************************************/
-class Cmd : GLib.Object {
-public:
-    Cmd () : GLib.Object () {
-    }
-public slots:
-    void transmissionProgressSlot () {
-    }
-};
-/***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Daniel Heule <daniel.heule@gmail.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
 // #include <iostream>
 // #include <random>
 // #include <qcoreapplication.h>
@@ -50,6 +30,20 @@ Copyright (C) by Daniel Heule <daniel.heule@gmail.com>
 // #include <unistd.h>
 
 using namespace Occ;
+
+/***********************************************************
+@brief Helper class for command line client
+@ingroup cmd
+***********************************************************/
+class Cmd : GLib.Object {
+public:
+    Cmd () : GLib.Object () {
+    }
+public slots:
+    void transmissionProgressSlot () {
+    }
+};
+
 
 static void nullMessageHandler (QtMsgType, QMessageLogContext &, string &) {
 }

@@ -1,7 +1,7 @@
 /***********************************************************
 Copyright (C) 2018 by J-P Nurmi <jpnurmi@gmail.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 // #include <QTreeView>
@@ -28,11 +28,6 @@ public:
 
 
 
-/***********************************************************
-Copyright (C) 2018 by J-P Nurmi <jpnurmi@gmail.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
 
 namespace Occ {
 

@@ -1,8 +1,23 @@
 /***********************************************************
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 Copyright (C) by Julius Härtl <jus@bitgrid.net>
 
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
+<GPLv3-or-later-Boilerplate>
+***********************************************************/\
+
+// #include <glib.h>
+// #include <gio/gio.h>
+// #include <cloudprovidersaccountexporter.h>
+// #include <cloudprovidersproviderexporter.h>
+
+// #include <account.h>
+// #include <folder.h>
+// #include <accountstate.h>
+// #include <QDesktopServices>
+
+using namespace Occ;
+
+GSimpleActionGroup *actionGroup = nullptr;
 
 // #include <GLib.Object>
 
@@ -53,26 +68,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Julius Härtl <jus@bitgrid.net>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <glib.h>
-// #include <gio/gio.h>
-// #include <cloudprovidersaccountexporter.h>
-// #include <cloudprovidersproviderexporter.h>
-
-// #include <account.h>
-// #include <folder.h>
-// #include <accountstate.h>
-// #include <QDesktopServices>
-
-using namespace Occ;
-
-GSimpleActionGroup *actionGroup = nullptr;
 
 CloudProviderWrapper.CloudProviderWrapper (GLib.Object *parent, Folder *folder, int folderId, CloudProvidersProviderExporter* cloudprovider) : GLib.Object (parent)
   , _folder (folder) {

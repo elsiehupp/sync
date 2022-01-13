@@ -1,8 +1,15 @@
 /***********************************************************
 Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QFile>
+// #include <QDir>
+// #include <QListWidget>
+// #include <QListWidgetItem>
+// #include <QMessageBox>
+// #include <QInputDialog>
 
 // #include <Gtk.Dialog>
 
@@ -40,18 +47,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QFile>
-// #include <QDir>
-// #include <QListWidget>
-// #include <QListWidgetItem>
-// #include <QMessageBox>
-// #include <QInputDialog>
 
 namespace Occ {
 

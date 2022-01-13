@@ -1,8 +1,23 @@
 /***********************************************************
 Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QLabel>
+// #include <QStandardItemModel>
+// #include <QStackedWidget>
+// #include <QPushButton>
+// #include <QSettings>
+// #include <QToolBar>
+// #include <QToolButton>
+// #include <QLayout>
+// #include <QVBoxLayout>
+// #include <QPixmap>
+// #include <QImage>
+// #include <QWidgetAction>
+// #include <QPainter>
+// #include <QPainterPath>
 
 // #include <Gtk.Dialog>
 // #include <QStyledItemDelegate>
@@ -78,26 +93,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QLabel>
-// #include <QStandardItemModel>
-// #include <QStackedWidget>
-// #include <QPushButton>
-// #include <QSettings>
-// #include <QToolBar>
-// #include <QToolButton>
-// #include <QLayout>
-// #include <QVBoxLayout>
-// #include <QPixmap>
-// #include <QImage>
-// #include <QWidgetAction>
-// #include <QPainter>
-// #include <QPainterPath>
 
 namespace {
     const string TOOLBAR_CSS () {
@@ -109,7 +104,8 @@ namespace {
     
     const float buttonSizeRatio = 1.618f; // golden ratio
     
-    /** display name with two lines that is displayed in the settings
+    /***********************************************************
+    display name with two lines that is displayed in the settings
     If width is bigger than 0, the string will be ellided so it does not exceed that width
     ***********************************************************/
     string shortDisplayNameForSettings (Occ.Account *account, int width) {

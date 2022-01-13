@@ -1,8 +1,15 @@
 /***********************************************************
 Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QMenu>
+// #include <QUrl>
+// #include <QtNetwork>
+// #include <QSslConfiguration>
+// #include <QWidgetAction>
+// #include <QLabel>
 
 // #include <QToolButton>
 // #include <QPointer>
@@ -31,33 +38,7 @@ private:
     QMenu *_menu;
 };
 
-} // namespace Occ
 
-
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QMenu>
-// #include <QUrl>
-// #include <QtNetwork>
-// #include <QSslConfiguration>
-// #include <QWidgetAction>
-// #include <QLabel>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcSsl, "nextcloud.gui.ssl", QtInfoMsg)
-    
     SslButton.SslButton (Gtk.Widget *parent)
         : QToolButton (parent) {
         setPopupMode (QToolButton.InstantPopup);

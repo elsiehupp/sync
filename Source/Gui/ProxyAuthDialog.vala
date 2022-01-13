@@ -1,7 +1,7 @@
 /***********************************************************
 Copyright (C) 2015 by Christian Kamm <kamm@incasoftware.de>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 // #include <Gtk.Dialog>
@@ -44,11 +44,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) 2015 by Christian Kamm <kamm@incasoftware.de>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
 
 namespace Occ {
 

@@ -1,8 +1,18 @@
 /***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <csync_exclude.h>
+
+// #include <QLoggingCategory>
+// #include <QUrl>
+// #include <QFile>
+// #include <QFileInfo>
+// #include <QTextCodec>
+// #include <cstring>
+// #include <QDateTime>
 
 // #pragma once
 
@@ -30,7 +40,8 @@ enum class LocalDiscoveryStyle {
 Represent all the meta-data about a file in the server
 ***********************************************************/
 struct RemoteInfo {
-    /** FileName of the entry (this does not contains any directory or path, just the plain name */
+    /***********************************************************
+    FileName of the entry (this does not contains any directory or path, just the plain name */
     string name;
     QByteArray etag;
     QByteArray fileId;
@@ -50,7 +61,8 @@ struct RemoteInfo {
 };
 
 struct LocalInfo {
-    /** FileName of the entry (this does not contains any directory or path, just the plain name */
+    /***********************************************************
+    FileName of the entry (this does not contains any directory or path, just the plain name */
     string name;
     string renameName;
     time_t modtime = 0;
@@ -147,24 +159,26 @@ class DiscoveryPhase : GLib.Object {
 
     QPointer<ProcessDirectoryJob> _currentRootJob;
 
-    /** Maps the db-path of a deleted item to its SyncFileItem.
-     *
-     * If it turns out the item was renamed after all, the instruction
-     * can be changed. See findAndCancelDeletedJob (). Note that
-     * itemDiscovered () will already have been emitted for the item.
-     */
+    /***********************************************************
+    Maps the db-path of a deleted item to its SyncFileItem.
+
+    If it turns out the item was renamed after all, the instruction
+    can be changed. See findAndCancelDeletedJob (). Note that
+    itemDiscovered () will already have been emitted for the item.
+    ***********************************************************/
     QMap<string, SyncFileItemPtr> _deletedItem;
 
-    /** Maps the db-path of a deleted folder to its queued job.
-     *
-     * If a folder is deleted and must be recursed into, its job isn't
-     * executed immediately. Instead it's queued here and only run
-     * once the rest of the discovery has finished and we are certain
-     * that the folder wasn't just renamed. This avoids running the
-     * discovery on contents in the old location of renamed folders.
-     *
+    /***********************************************************
+    Maps the db-path of a deleted folder to its queued job.
+
+    If a folder is deleted and must be recursed into, its job isn't
+    executed immediately. Instead it's queued here and only run
+    once the rest of the discovery has finished and we are certain
+    that the folder wasn't just renamed. This avoids running the
+    discovery on contents in the old location of renamed folders.
+    
      * See findAndCancelDeletedJob ().
-     */
+    ***********************************************************/
     QMap<string, ProcessDirectoryJob> _queuedDeletedDirectories;
 
     // map source (original path) . destinations (current server or local path)
@@ -181,11 +195,12 @@ class DiscoveryPhase : GLib.Object {
     // The value of this map doesn't matter.
     QMap<string, bool> _forbiddenDeletes;
 
-    /** Returns whether the db-path has been renamed locally or on the remote.
-     *
-     * Useful for avoiding processing of items that have already been claimed in
-     * a rename (would otherwise be discovered as deletions).
-     */
+    /***********************************************************
+    Returns whether the db-path has been renamed locally or on the remote.
+
+    Useful for avoiding processing of items that have already been claimed in
+    a rename (would otherwise be discovered as deletions).
+    ***********************************************************/
     bool isRenamed (string &p) { return _renamedItemsLocal.contains (p) || _renamedItemsRemote.contains (p); }
 
     int _currentlyActiveJobs = 0;
@@ -203,24 +218,26 @@ class DiscoveryPhase : GLib.Object {
     void checkSelectiveSyncNewFolder (string &path, RemotePermissions rp,
         std.function<void (bool)> callback);
 
-    /** Given an original path, return the target path obtained when renaming is done.
-     *
-     * Note that it only considers parent directory renames. So if A/B got renamed to C/D,
-     * checking A/B/file would yield C/D/file, but checking A/B would yield A/B.
-     */
+    /***********************************************************
+    Given an original path, return the target path obtained when renaming is done.
+
+    Note that it only considers parent directory renames. So if A/B got renamed to C/D,
+    checking A/B/file would yield C/D/file, but checking A/B would yield A/B.
+    ***********************************************************/
     string adjustRenamedPath (string &original, SyncFileItem.Direction) const;
 
-    /** If the db-path is scheduled for deletion, abort it.
-     *
-     * Check if there is already a job to delete that item:
-     * If that's not the case, return { false, QByteArray () }.
-     * If there is such a job, cancel that job and return true and the old etag.
-     *
-     * Used when having detected a rename : The rename source may have been
-     * discovered before and would have looked like a delete.
-     *
+    /***********************************************************
+    If the db-path is scheduled for deletion, abort it.
+
+    Check if there is already a job to delete that item:
+    If that's not the case, return { false, QByteArray () }.
+    If there is such a job, cancel that job and return true and the old etag.
+    
+    Used when having detected a rename : The rename source 
+    discovered before and would have looked like a delete.
+
      * See _deletedItem and _queuedDeletedDirectories.
-     */
+    ***********************************************************/
     QPair<bool, QByteArray> findAndCancelDeletedJob (string &originalPath);
 
 public:
@@ -253,7 +270,8 @@ signals:
     // A new folder was discovered and was not synced because of the confirmation feature
     void newBigFolder (string &folder, bool isExternal);
 
-    /** For excluded items that don't show up in itemDiscovered ()
+    /***********************************************************
+    For excluded items that don't show up in itemDiscovered ()
       *
       * The path is relative to the sync folder, similar to item._file
       */
@@ -264,35 +282,7 @@ signals:
 
 /// Implementation of DiscoveryPhase.adjustRenamedPath
 string adjustRenamedPath (QMap<string, string> &renamedItems, string &original);
-}
 
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <csync_exclude.h>
-
-// #include <QLoggingCategory>
-// #include <QUrl>
-// #include <QFile>
-// #include <QFileInfo>
-// #include <QTextCodec>
-// #include <cstring>
-// #include <QDateTime>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcDiscovery, "nextcloud.sync.discovery", QtInfoMsg)
-    
     /* Given a sorted list of paths ending with '/', return whether or not the given path is within one of the paths of the list*/
     static bool findPathInList (QStringList &list, string &path) {
         Q_ASSERT (std.is_sorted (list.begin (), list.end ()));

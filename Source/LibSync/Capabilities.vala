@@ -1,8 +1,14 @@
 /***********************************************************
 Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QVariantMap>
+// #include <QLoggingCategory>
+// #include <QUrl>
+
+// #include <QDebug>
 
 // #include <QVariantMap>
 // #include <QStringList>
@@ -76,73 +82,73 @@ public:
     bool hasActivities ();
 
     /***********************************************************
-     * Returns the checksum types the server understands.
-     *
-     * When the client uses one of these checksumming algorithms in
-     * the OC-Checksum header of a file upload, the server will use
-     * it to validate that data was transmitted correctly.
-     *
-     * Path : checksums/supportedTypes
+    Returns the checksum types the server understands.
+    
+    When the client uses one of these checksumming algorithms in
+    the OC-Checksum header of a file upload, the server 
+    it to validate that data was tr
+    
+    Path : checksums/supportedTypes
      * Default : []
      * Possible entries : "Adler32", "MD5", "SHA1"
-     */
+    ***********************************************************/
     QList<QByteArray> supportedChecksumTypes ();
 
     /***********************************************************
-     * The checksum algorithm that the server recommends for file uploads.
-     * This is just a preference, any algorithm listed in supportedTypes may be used.
-     *
-     * Path : checksums/preferredUploadType
-     * Default : empty, meaning "no preference"
+    The checksum algorithm that the server recommends for file uploads.
+    This is just a preference, any algorithm listed in supportedTypes may be used.
+    
+    Path : checksums/preferredUploadType
+    Default : empty, meaning "no preference"
      * Possible values : empty or any of the supportedTypes
-     */
+    ***********************************************************/
     QByteArray preferredUploadChecksumType ();
 
     /***********************************************************
-     * Helper that returns the preferredUploadChecksumType () if set, or one
-     * of the supportedChecksumTypes () if it isn't. May return an empty
-     * QByteArray if no checksum types are supported.
-     */
+    Helper that returns the preferredUploadChecksumType () if set, or one
+    of the supportedChecksumTypes () if it isn't. May return an empty
+    QByteArray if no checksum types are supported.
+    ***********************************************************/
     QByteArray uploadChecksumType ();
 
     /***********************************************************
-     * List of HTTP error codes should be guaranteed to eventually reset
-     * failing chunked uploads.
-     *
-     * The resetting works by tracking UploadInfo.errorCount.
-     *
-     * Note that other error codes than the ones listed here may reset the
-     * upload as well.
-     *
-     * Motivation : See #5344. They should always be reset on 412 (possibly
-     * checksum error), but broken servers may also require resets on
-     * unusual error codes such as 503.
-     *
+    List of HTTP error codes should be guaranteed to eventually reset
+    failing chunked uploads.
+    
+    The resetting works by tracking UploadInfo.errorCount.
+    
+    Note that other error codes than the ones listed here may reset the
+    upload as well.
+    
+    Motivation : See #5344. They should always be reset on 
+    checksum err
+    unusual error codes such as 503.
+
      * Path : dav/httpErrorCodesThatResetFailingChunkedUploads
      * Default : []
      * Example : [503, 500]
-     */
+    ***********************************************************/
     QList<int> httpErrorCodesThatResetFailingChunkedUploads ();
 
     /***********************************************************
-     * Regex that, if contained in a filename, will result in it not being uploaded.
-     *
-     * For servers older than 8.1.0 it defaults to [\\:?*"<>|]
-     * For servers >= that version, it defaults to the empty regex (the server
-     * will indicate invalid characters through an upload error)
-     *
+    Regex that, if contained in a filename, will result in it not being uploaded.
+    
+    For servers older than 8.1.0 it defaults to [\\:?*"<>|]
+    For servers >= that version, it defaults to the empty rege
+    will indicate invalid characters through an upload error)
+
      * Note that it just needs to be contained. The regex [ab] is contained in "car".
-     */
+    ***********************************************************/
     string invalidFilenameRegex ();
 
     /***********************************************************
-     * return the list of filename that should not be uploaded
-     */
+    return the list of filename that should not be uploaded
+    ***********************************************************/
     QStringList blacklistedFiles ();
 
     /***********************************************************
-     * Whether conflict files should remain local (default) or should be uploaded.
-     */
+    Whether conflict files should remain local (default) or should be uploaded.
+    ***********************************************************/
     bool uploadConflictFiles ();
 
     // Direct Editing
@@ -182,38 +188,6 @@ private:
     QList<QByteArray> _optionalMimeTypes;
 };
 
-/*-------------------------------------------------------------------------------------*/
-
-}
-
-#endif //CAPABILITIES_H
-
-
-
-
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QVariantMap>
-// #include <QLoggingCategory>
-// #include <QUrl>
-
-// #include <QDebug>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcServerCapabilities, "nextcloud.sync.server.capabilities", QtInfoMsg)
-    
     Capabilities.Capabilities (QVariantMap &capabilities)
         : _capabilities (capabilities) {
     }

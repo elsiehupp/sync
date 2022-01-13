@@ -1,8 +1,12 @@
 /***********************************************************
 Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QImage>
+// #include <QPainter>
+// #include <QSvgRenderer>
 
 // #pragma once
 
@@ -29,15 +33,6 @@ public:
 
 
 
-/***********************************************************
-Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QImage>
-// #include <QPainter>
-// #include <QSvgRenderer>
 
 namespace {
     class AsyncImageResponse : QQuickImageResponse {

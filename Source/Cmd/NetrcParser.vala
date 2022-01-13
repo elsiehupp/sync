@@ -1,11 +1,18 @@
 /***********************************************************
 Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 // #include <QHash>
 // #include <QPair>
+// #include <QDir>
+// #include <QFile>
+// #include <QTextStream>
+
+// #include <qtokenizer.h>
+
+// #include <QDebug>
 
 namespace Occ {
 
@@ -28,24 +35,7 @@ private:
     string _netrcLocation;
 };
 
-} // namespace Occ
 
-
-/***********************************************************
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QDir>
-// #include <QFile>
-// #include <QTextStream>
-
-// #include <qtokenizer.h>
-
-// #include <QDebug>
-
-namespace Occ {
 
     namespace {
         string defaultKeyword = QLatin1String ("default");

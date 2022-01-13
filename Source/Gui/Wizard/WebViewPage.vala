@@ -1,5 +1,9 @@
-#ifndef WEBVIEWPAGE_H
-const int WEBVIEWPAGE_H
+
+// #include <QWebEngineUrlRequestJob>
+// #include <QProgressBar>
+// #include <QVBoxLayout>
+// #include <QNetworkProxyFactory>
+// #include <QScreen>
 
 namespace Occ {
 
@@ -38,28 +42,7 @@ private:
     QSize _originalWizardSize;
 };
 
-}
 
-
-
-
-
-
-
-
-
-
-
-// #include <QWebEngineUrlRequestJob>
-// #include <QProgressBar>
-// #include <QVBoxLayout>
-// #include <QNetworkProxyFactory>
-// #include <QScreen>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcWizardWebiewPage, "nextcloud.gui.wizard.webviewpage", QtInfoMsg)
-    
     WebViewPage.WebViewPage (Gtk.Widget *parent)
         : AbstractCredentialsWizardPage () {
         _ocWizard = qobject_cast<OwncloudWizard> (parent);

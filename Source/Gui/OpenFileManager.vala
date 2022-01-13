@@ -1,8 +1,23 @@
 /***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QProcess>
+// #include <QSettings>
+// #include <QDir>
+// #include <QUrl>
+// #include <QDesktopServices>
+// #include <QApplication>
+
+const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
+
+#if ! (QTLEGACY)
+// #include <QOperatingSystemVersion>
+#endif
 // #pragma once
 
 // #include <string>
@@ -20,25 +35,6 @@ void showInFileManager (string &localPath);
 
 
 
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QProcess>
-// #include <QSettings>
-// #include <QDir>
-// #include <QUrl>
-// #include <QDesktopServices>
-// #include <QApplication>
-
-const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
-
-#if ! (QTLEGACY)
-// #include <QOperatingSystemVersion>
-#endif
 
 namespace Occ {
 

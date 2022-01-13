@@ -1,8 +1,23 @@
 /***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <cstdio>
+// #include <iostream>
+
+// #include <QDialogButtonBox>
+// #include <QLayout>
+// #include <QPushButton>
+// #include <QLabel>
+// #include <QDir>
+// #include <QTextStream>
+// #include <QMessageBox>
+// #include <QCoreApplication>
+// #include <QSettings>
+// #include <QAction>
+// #include <QDesktopServices>
 
 // #include <QCheckBox>
 // #include <QPlainTextEdit>
@@ -42,26 +57,6 @@ protected slots:
 
 
 
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <cstdio>
-// #include <iostream>
-
-// #include <QDialogButtonBox>
-// #include <QLayout>
-// #include <QPushButton>
-// #include <QLabel>
-// #include <QDir>
-// #include <QTextStream>
-// #include <QMessageBox>
-// #include <QCoreApplication>
-// #include <QSettings>
-// #include <QAction>
-// #include <QDesktopServices>
 
 namespace Occ {
 

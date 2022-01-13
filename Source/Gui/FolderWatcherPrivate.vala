@@ -1,8 +1,15 @@
 /***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <sys/inotify.h>
+
+// #include <cerrno>
+// #include <QStringList>
+// #include <GLib.Object>
+// #include <QVarLengthArray>
 
 // #include <GLib.Object>
 // #include <string>
@@ -55,18 +62,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <sys/inotify.h>
-
-// #include <cerrno>
-// #include <QStringList>
-// #include <GLib.Object>
-// #include <QVarLengthArray>
 
 namespace Occ {
 

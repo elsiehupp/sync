@@ -1,8 +1,12 @@
 /***********************************************************
 Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QJsonObject>
+// #include <QJsonDocument>
+// #include <QJsonArray>
 
 // #include <GLib.Object>
 // #include <QFlags>
@@ -13,6 +17,7 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 // #include <QSharedPointer>
 // #include <QVector>
 
+Q_DECLARE_METATYPE (QSharedPointer<Occ.Sharee>)
 
 namespace Occ {
 
@@ -81,33 +86,7 @@ private:
     QVector<QSharedPointer<Sharee>> _sharees;
     QVector<QSharedPointer<Sharee>> _shareeBlacklist;
 };
-}
 
-Q_DECLARE_METATYPE (QSharedPointer<Occ.Sharee>)
-
-#endif //SHAREE_H
-
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QJsonObject>
-// #include <QJsonDocument>
-// #include <QJsonArray>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcSharing, "nextcloud.gui.sharing", QtInfoMsg)
-    
     Sharee.Sharee (string shareWith,
         const string displayName,
         const Type type)

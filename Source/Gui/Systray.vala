@@ -1,8 +1,26 @@
 /***********************************************************
 Copyright (C) by Cédric Bellegarde <gnumdk@gmail.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QCursor>
+// #include <QGuiApplication>
+// #include <QQmlApplicationEngine>
+// #include <QQmlContext>
+// #include <QQuickWindow>
+// #include <QScreen>
+// #include <QMenu>
+
+#ifdef USE_FDO_NOTIFICATIONS
+// #include <QDBusConnection>
+// #include <QDBusInterface>
+// #include <QDBusMessage>
+// #include <QDBusPendingCall>
+const int NOTIFICATIONS_SERVICE "org.freedesktop.Notifications"
+const int NOTIFICATIONS_PATH "/org/freedesktop/Notifications"
+const int NOTIFICATIONS_IFACE "org.freedesktop.Notifications"
+#endif
 
 // #include <QSystemTrayIcon>
 
@@ -98,49 +116,6 @@ private:
     AccessManagerFactory _accessManagerFactory;
 };
 
-} // namespace Occ
-
-#endif //SYSTRAY_H
-
-
-
-
-
-
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Cédric Bellegarde <gnumdk@gmail.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QCursor>
-// #include <QGuiApplication>
-// #include <QQmlApplicationEngine>
-// #include <QQmlContext>
-// #include <QQuickWindow>
-// #include <QScreen>
-// #include <QMenu>
-
-#ifdef USE_FDO_NOTIFICATIONS
-// #include <QDBusConnection>
-// #include <QDBusInterface>
-// #include <QDBusMessage>
-// #include <QDBusPendingCall>
-const int NOTIFICATIONS_SERVICE "org.freedesktop.Notifications"
-const int NOTIFICATIONS_PATH "/org/freedesktop/Notifications"
-const int NOTIFICATIONS_IFACE "org.freedesktop.Notifications"
-#endif
-
-namespace Occ {
-
-Q_LOGGING_CATEGORY (lcSystray, "nextcloud.gui.systray")
 
 Systray *Systray._instance = nullptr;
 

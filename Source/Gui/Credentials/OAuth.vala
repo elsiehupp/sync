@@ -1,8 +1,15 @@
 /***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QDesktopServices>
+// #include <QNetworkReply>
+// #include <QTimer>
+// #include <QBuffer>
+// #include <QJsonObject>
+// #include <QJsonDocument>
 
 // #pragma once
 // #include <QPointer>
@@ -47,9 +54,9 @@ public:
 
 signals:
     /***********************************************************
-     * The state has changed.
-     * when logged in, token has the value of the token.
-     */
+    The state has changed.
+    when logged in, token has the value of the token.
+    ***********************************************************/
     void result (OAuth.Result result, string &user = string (), string &token = string (), string &refreshToken = string ());
 
 private:
@@ -60,30 +67,7 @@ public:
     string _expectedUser;
 };
 
-} // namespace Occ
 
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QDesktopServices>
-// #include <QNetworkReply>
-// #include <QTimer>
-// #include <QBuffer>
-// #include <QJsonObject>
-// #include <QJsonDocument>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcOauth, "nextcloud.sync.credentials.oauth", QtInfoMsg)
-    
     OAuth.~OAuth () = default;
     
     static void httpReplyAndClose (QTcpSocket *socket, char *code, char *html,

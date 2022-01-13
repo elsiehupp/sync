@@ -1,8 +1,25 @@
 /***********************************************************
 Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QDesktopServices>
+// #include <QDir>
+// #include <QFileDialog>
+// #include <QFileInfo>
+// #include <QFileIconProvider>
+// #include <QInputDialog>
+// #include <QUrl>
+// #include <QValidator>
+// #include <QWizardPage>
+// #include <QTreeWidget>
+// #include <QVBoxLayout>
+// #include <QEvent>
+// #include <QCheckBox>
+// #include <QMessageBox>
+
+// #include <cstdlib>
 
 // #include <QWizard>
 // #include <QNetworkReply>
@@ -145,28 +162,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QDesktopServices>
-// #include <QDir>
-// #include <QFileDialog>
-// #include <QFileInfo>
-// #include <QFileIconProvider>
-// #include <QInputDialog>
-// #include <QUrl>
-// #include <QValidator>
-// #include <QWizardPage>
-// #include <QTreeWidget>
-// #include <QVBoxLayout>
-// #include <QEvent>
-// #include <QCheckBox>
-// #include <QMessageBox>
-
-// #include <cstdlib>
 
 namespace Occ {
 

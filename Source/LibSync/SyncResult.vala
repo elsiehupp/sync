@@ -1,7 +1,7 @@
 /***********************************************************
 Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 // #include <QStringList>
@@ -78,8 +78,8 @@ private:
     QDateTime _syncTime;
     string _folder;
     /***********************************************************
-     * when the sync tool support this...
-     */
+    when the sync tool support this...
+    ***********************************************************/
     QStringList _errors;
     bool _foundFilesNotSynced = false;
     bool _folderStructureWasChanged = false;
@@ -104,7 +104,6 @@ private:
 };
 }
 
-#endif
 
 
 
@@ -112,11 +111,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
 
 namespace Occ {
 

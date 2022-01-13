@@ -1,8 +1,12 @@
 /***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QFile>
+// #include <QStringList>
+// #include <QDir>
 // #pragma once
 
 namespace Occ {
@@ -44,37 +48,15 @@ public:
     JobParallelism parallelism () override { return _item.isDirectory () ? WaitForFinished : FullParallelism; }
 
     /***********************************************************
-     * Rename the directory in the selective sync list
-     */
+    Rename the directory in the selective sync list
+    ***********************************************************/
     static bool adjustSelectiveSync (SyncJournalDb *journal, string &from, string &to);
 
 private slots:
     void slotMoveJobFinished ();
     void finalize ();
 };
-}
 
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QFile>
-// #include <QStringList>
-// #include <QDir>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcMoveJob, "nextcloud.sync.networkjob.move", QtInfoMsg)
-    Q_LOGGING_CATEGORY (lcPropagateRemoteMove, "nextcloud.sync.propagator.remotemove", QtInfoMsg)
-    
     MoveJob.MoveJob (AccountPtr account, string &path,
         const string &destination, GLib.Object *parent)
         : AbstractNetworkJob (account, path, parent)

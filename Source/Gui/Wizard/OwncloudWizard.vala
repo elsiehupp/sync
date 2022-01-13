@@ -2,8 +2,15 @@
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QtCore>
+// #include <QtGui>
+// #include <QMessageBox>
+// #include <owncloudgui.h>
+
+// #include <cstdlib>
 
 // #include <QWizard>
 // #include <QLoggingCategory>
@@ -50,10 +57,10 @@ public:
     void centerWindow ();
 
     /***********************************************************
-     * Shows a dialog explaining the virtual files mode and warning about it
-     * being experimental. Calles the callback with true if enabling was
-     * chosen.
-     */
+    Shows a dialog explaining the virtual files mode and warning about it
+    being experimental. Calles the callback with true if enabling was
+    chosen.
+    ***********************************************************/
     static void askExperimentalVirtualFilesFeature (Gtk.Widget *receiver, std.function<void (bool enable)> &callback);
 
     // FIXME : Can those be local variables?
@@ -110,37 +117,7 @@ private:
     friend class OwncloudSetupWizard;
 };
 
-} // namespace Occ
 
-#endif
-
-
-
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QtCore>
-// #include <QtGui>
-// #include <QMessageBox>
-// #include <owncloudgui.h>
-
-// #include <cstdlib>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcWizard, "nextcloud.gui.wizard", QtInfoMsg)
-    
     OwncloudWizard.OwncloudWizard (Gtk.Widget *parent)
         : QWizard (parent)
         , _account (nullptr)

@@ -2,8 +2,31 @@
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QJsonDocument>
+// #include <QLoggingCategory>
+// #include <QNetworkRequest>
+// #include <QNetworkAccessManager>
+// #include <QNetworkReply>
+// #include <QNetworkRequest>
+// #include <QSslConfiguration>
+// #include <QSslCipher>
+// #include <QBuffer>
+// #include <QXmlStreamReader>
+// #include <QStringList>
+// #include <QStack>
+// #include <QTimer>
+// #include <QMutex>
+// #include <QCoreApplication>
+// #include <QJsonDocument>
+// #include <QJsonObject>
+// #include <qloggingcategory.h>
+#ifndef TOKEN_AUTH_ONLY
+// #include <QPainter>
+// #include <QPainterPath>
+#endif
 
 // #include <QBuffer>
 // #include <QUrlQuery>
@@ -13,8 +36,9 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 namespace Occ {
 
-/** Strips quotes and gzip annotations */
-OWNCLOUDSYNC_EXPORT QByteArray parseEtag (char *header);
+/***********************************************************
+Strips quotes and gzip annotations */
+QByteArray parseEtag (char *header);
 
 struct HttpError {
     int code; // HTTP error code
@@ -91,13 +115,13 @@ public:
     QHash<string, ExtraFolderInfo> _folderInfos;
 
     /***********************************************************
-     * Used to specify which properties shall be retrieved.
-     *
-     * The properties can
-     *  - contain no colon : they refer to a property in the DAV : namespace
-     *  - contain a colon : and thus specify an explicit namespace,
+    Used to specify which properties shall be retrieved.
+    
+    The properties can
+     - contain no colon : they refer to a property in the DAV : 
+     - contain a colon : and thus specify an explicit namespace,
      *    e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
-     */
+    ***********************************************************/
     void setProperties (QList<QByteArray> properties);
     QList<QByteArray> properties ();
 
@@ -131,13 +155,13 @@ public:
     void start () override;
 
     /***********************************************************
-     * Used to specify which properties shall be retrieved.
-     *
-     * The properties can
-     *  - contain no colon : they refer to a property in the DAV : namespace
-     *  - contain a colon : and thus specify an explicit namespace,
+    Used to specify which properties shall be retrieved.
+    
+    The properties can
+     - contain no colon : they refer to a property in the DAV : 
+     - contain a colon : and thus specify an explicit namespace,
      *    e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
-     */
+    ***********************************************************/
     void setProperties (QList<QByteArray> properties);
     QList<QByteArray> properties ();
 
@@ -163,20 +187,21 @@ If the server does not have the avatar, the result Pixmap is empty.
 class AvatarJob : AbstractNetworkJob {
 public:
     /***********************************************************
-     * @param userId The user for which to obtain the avatar
-     * @param size The size of the avatar (square so size*size)
-     */
+    @param userId The user for which to obtain the avatar
+    @param size The size of the avatar (square so size*size)
+    ***********************************************************/
     AvatarJob (AccountPtr account, string &userId, int size, GLib.Object *parent = nullptr);
 
     void start () override;
 
-    /** The retrieved avatar images don't have the circle shape by default */
+    /***********************************************************
+    The retrieved avatar images don't have the circle shape by default */
     static QImage makeCircularAvatar (QImage &baseAvatar);
 
 signals:
     /***********************************************************
-     * @brief avatarPixmap - returns either a valid pixmap or not.
-     */
+    @brief avatarPixmap - returns either a valid pixmap or not.
+    ***********************************************************/
 
     void avatarPixmap (QImage &);
 
@@ -203,13 +228,13 @@ public:
     void start () override;
 
     /***********************************************************
-     * Used to specify which properties shall be set.
-     *
-     * The property keys can
-     *  - contain no colon : they refer to a property in the DAV : namespace
-     *  - contain a colon : and thus specify an explicit namespace,
+    Used to specify which properties shall be set.
+    
+    The property keys can
+     - contain no colon : they refer to a property in the DAV : 
+     - contain a colon : and thus specify an explicit namespace,
      *    e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
-     */
+    ***********************************************************/
     void setProperties (QMap<QByteArray, QByteArray> properties);
     QMap<QByteArray, QByteArray> properties ();
 
@@ -261,23 +286,26 @@ public:
     static bool installed (QJsonObject &info);
 
 signals:
-    /** Emitted when a status.php was successfully read.
-     *
-     * \a url see _serverStatusUrl (does not include "/status.php")
-     * \a info The status.php reply information
-     */
+    /***********************************************************
+    Emitted when a status.php was successfully read.
+
+    \a url see _serverStatusUrl (does not include "/status.php")
+    \a info The status.php reply information
+    ***********************************************************/
     void instanceFound (QUrl &url, QJsonObject &info);
 
-    /** Emitted on invalid status.php reply.
-     *
-     * \a reply is never null
-     */
+    /***********************************************************
+    Emitted on invalid status.php reply.
+
+    \a reply is never null
+    ***********************************************************/
     void instanceNotFound (QNetworkReply *reply);
 
-    /** A timeout occurred.
-     *
-     * \a url The specific url where the timeout happened.
-     */
+    /***********************************************************
+    A timeout occurred.
+
+    \a url The specific url where the timeout happened.
+    ***********************************************************/
     void timeout (QUrl &url);
 
 private:
@@ -291,14 +319,16 @@ private slots:
 private:
     bool _subdirFallback;
 
-    /** The permanent-redirect adjusted account url.
-     *
-     * Note that temporary redirects or a permanent redirect behind a temporary
-     * one do not affect this url.
-     */
+    /***********************************************************
+    The permanent-redirect adjusted account url.
+
+    Note that temporary redirects or a permanent redirect behind a temporary
+    one do not affect this url.
+    ***********************************************************/
     QUrl _serverUrl;
 
-    /** Keep track of how many permanent redirect were applied. */
+    /***********************************************************
+    Keep track of how many permanent redirect were applied. */
     int _permanentRedirects;
 };
 
@@ -345,15 +375,15 @@ public:
     JsonApiJob (AccountPtr &account, string &path, GLib.Object *parent = nullptr);
 
     /***********************************************************
-     * @brief addQueryParams - add more parameters to the ocs call
-     * @param params : list pairs of strings containing the parameter name and the value.
-     *
-     * All parameters from the passed list are appended to the query. Note
-     * that the format=json parameter is added automatically and does not
-     * need to be set this way.
-     *
+    @brief addQueryParams - add more parameters to the ocs call
+    @param params : list pairs of strings containing the parameter name and the value.
+    
+    All parameters from the passed list are appended to the query. Not
+    that the format=json para
+    need to be set this way.
+
      * This function needs to be called before start () obviously.
-     */
+    ***********************************************************/
     void addQueryParams (QUrlQuery &params);
     void addRawHeader (QByteArray &headerName, QByteArray &value);
 
@@ -369,24 +399,24 @@ protected:
 signals:
 
     /***********************************************************
-     * @brief jsonReceived - signal to report the json answer from ocs
-     * @param json - the parsed json document
-     * @param statusCode - the OCS status code : 100 (!) for success
-     */
+    @brief jsonReceived - signal to report the json answer from ocs
+    @param json - the parsed json document
+    @param statusCode - the OCS status code : 100 (!) for success
+    ***********************************************************/
     void jsonReceived (QJsonDocument &json, int statusCode);
 
     /***********************************************************
-     * @brief etagResponseHeaderReceived - signal to report the ETag response header value
-     * from ocs api v2
-     * @param value - the ETag response header value
-     * @param statusCode - the OCS status code : 100 (!) for success
-     */
+    @brief etagResponseHeaderReceived - signal to report the ETag response header value
+    from ocs api v2
+    @param value - the ETag response header value
+    @param statusCode - the OCS status code : 100 (!) for success
+    ***********************************************************/
     void etagResponseHeaderReceived (QByteArray &value, int statusCode);
 
     /***********************************************************
-     * @brief desktopNotificationStatusReceived - signal to report if notifications are allowed
-     * @param status - set desktop notifications allowed status
-     */
+    @brief desktopNotificationStatusReceived - signal to report if notifications are allowed
+    @param status - set desktop notifications allowed status
+    ***********************************************************/
     void allowDesktopNotificationsChanged (bool isAllowed);
 
 private:
@@ -470,62 +500,8 @@ void fetchPrivateLinkUrl (
     const QByteArray &numericFileId, GLib.Object *target,
     std.function<void (string &url)> targetFun);
 
-} // namespace Occ
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QJsonDocument>
-// #include <QLoggingCategory>
-// #include <QNetworkRequest>
-// #include <QNetworkAccessManager>
-// #include <QNetworkReply>
-// #include <QNetworkRequest>
-// #include <QSslConfiguration>
-// #include <QSslCipher>
-// #include <QBuffer>
-// #include <QXmlStreamReader>
-// #include <QStringList>
-// #include <QStack>
-// #include <QTimer>
-// #include <QMutex>
-// #include <QCoreApplication>
-// #include <QJsonDocument>
-// #include <QJsonObject>
-// #include <qloggingcategory.h>
-#ifndef TOKEN_AUTH_ONLY
-// #include <QPainter>
-// #include <QPainterPath>
-#endif
-
-namespace Occ {
-
-Q_LOGGING_CATEGORY (lcEtagJob, "nextcloud.sync.networkjob.etag", QtInfoMsg)
-Q_LOGGING_CATEGORY (lcLsColJob, "nextcloud.sync.networkjob.lscol", QtInfoMsg)
-Q_LOGGING_CATEGORY (lcCheckServerJob, "nextcloud.sync.networkjob.checkserver", QtInfoMsg)
-Q_LOGGING_CATEGORY (lcPropfindJob, "nextcloud.sync.networkjob.propfind", QtInfoMsg)
-Q_LOGGING_CATEGORY (lcAvatarJob, "nextcloud.sync.networkjob.avatar", QtInfoMsg)
-Q_LOGGING_CATEGORY (lcMkColJob, "nextcloud.sync.networkjob.mkcol", QtInfoMsg)
-Q_LOGGING_CATEGORY (lcProppatchJob, "nextcloud.sync.networkjob.proppatch", QtInfoMsg)
-Q_LOGGING_CATEGORY (lcJsonApiJob, "nextcloud.sync.networkjob.jsonapi", QtInfoMsg)
-Q_LOGGING_CATEGORY (lcDetermineAuthTypeJob, "nextcloud.sync.networkjob.determineauthtype", QtInfoMsg)
 const int notModifiedStatusCode = 304;
 
 QByteArray parseEtag (char *header) {

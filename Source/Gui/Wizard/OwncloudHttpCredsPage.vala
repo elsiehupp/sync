@@ -2,7 +2,7 @@
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 
@@ -44,7 +44,6 @@ private:
 
 } // namespace Occ
 
-#endif
 
 
 
@@ -52,12 +51,7 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
 
 namespace Occ {
 

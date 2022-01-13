@@ -2,9 +2,10 @@
 Copyright (C) 2015 by Jeroen Hoek
 Copyright (C) 2015 by Olivier Goffart <ogoffart@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
+// #include <QUrl>
 // #include <Gtk.Dialog>
 
 namespace Occ {
@@ -52,14 +53,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) 2015 by Jeroen Hoek
-Copyright (C) 2015 by Olivier Goffart <ogoffart@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QUrl>
 
 namespace Occ {
 

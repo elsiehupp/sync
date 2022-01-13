@@ -1,8 +1,11 @@
 /***********************************************************
 Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QDir>
+// #include <QCoreApplication>
 
 // #include <GLib.Object>
 // #include <QTimer>
@@ -27,29 +30,6 @@ private:
     QTimer _updateCloudStorageRegistryTimer;
 };
 
-} // namespace Occ
-
-
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QDir>
-// #include <QCoreApplication>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcNavPane, "nextcloud.gui.folder.navigationpane", QtInfoMsg)
-    
     NavigationPaneHelper.NavigationPaneHelper (FolderMan *folderMan)
         : _folderMan (folderMan) {
         ConfigFile cfg;

@@ -1,8 +1,56 @@
 /***********************************************************
 Copyright (C) by Dominik Schmidt <dev@dominik-schmidt.de>
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <functional>
+// #include <QBitArray>
+// #include <QPointer>
+
+// #include <QJsonDocument>
+// #include <QJsonObject>
+
+// #include <memory>
+// #include <QTimer>
+
+#ifndef OWNCLOUD_TEST
+#endif
+
+// #include <array>
+// #include <QBitArray>
+// #include <QUrl>
+// #include <QMetaMethod>
+// #include <QMetaObject>
+// #include <QStringList>
+// #include <QScopedPointer>
+// #include <QFile>
+// #include <QDir>
+// #include <QApplication>
+// #include <QLocalSocket>
+// #include <QStringBuilder>
+// #include <QMessageBox>
+// #include <QInputDialog>
+// #include <QFileDialog>
+
+// #include <QAction>
+// #include <QJsonArray>
+// #include <QJsonDocument>
+// #include <QJsonObject>
+// #include <Gtk.Widget>
+
+// #include <QClipboard>
+// #include <QDesktopServices>
+
+// #include <QProcess>
+// #include <QStandardPaths>
+
+// This is the version that is returned when the client asks for the VERSION.
+// The first number should be changed if there is an incompatible change that breaks old clients.
+// The second number should be changed when there are new features.
+const int MIRALL_SOCKET_API_VERSION "1.1"
 
 #include "sharedialog.h" // for the ShareDialogStartPage
 
@@ -102,19 +150,21 @@ private:
     // Fetch the private link and call targetFun
     void fetchPrivateLinkUrlHelper (string &localFile, std.function<void (string &url)> &targetFun);
 
-    /** Sends translated/branded strings that may be useful to the integration */
+    /***********************************************************
+    Sends translated/branded strings that may be useful to the integration */
     Q_INVOKABLE void command_GET_STRINGS (string &argument, SocketListener *listener);
 
     // Sends the context menu options relating to sharing to listener
     void sendSharingContextMenuOptions (FileData &fileData, SocketListener *listener, bool enabled);
 
-    /** Send the list of menu item. (added in version 1.1)
-     * argument is a list of files for which the menu should be shown, separated by '\x1e'
-     * Reply with  GET_MENU_ITEMS:BEGIN
-     * followed by several MENU_ITEM:[Action]:[flag]:[Text]
-     * If flag contains 'd', the menu should be disabled
-     * and ends with GET_MENU_ITEMS:END
-     */
+    /***********************************************************
+    Send the list of menu item. (added in version 1.1)
+    argument is a list of files for which the menu should be shown, separated by '\x1e'
+    Reply with  GET_MENU_ITEMS:BEGIN
+    followed by several MENU_ITEM:[Action]:[flag]:[Text]
+    If flag contains 'd', the menu should be disabled
+    and ends with GET_MENU_ITEMS:END
+    ***********************************************************/
     Q_INVOKABLE void command_GET_MENU_ITEMS (string &argument, SocketListener *listener);
 
     /// Direct Editing
@@ -150,49 +200,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Dominik Schmidt <dev@dominik-schmidt.de>
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-#ifndef OWNCLOUD_TEST
-#endif
-
-// #include <array>
-// #include <QBitArray>
-// #include <QUrl>
-// #include <QMetaMethod>
-// #include <QMetaObject>
-// #include <QStringList>
-// #include <QScopedPointer>
-// #include <QFile>
-// #include <QDir>
-// #include <QApplication>
-// #include <QLocalSocket>
-// #include <QStringBuilder>
-// #include <QMessageBox>
-// #include <QInputDialog>
-// #include <QFileDialog>
-
-// #include <QAction>
-// #include <QJsonArray>
-// #include <QJsonDocument>
-// #include <QJsonObject>
-// #include <Gtk.Widget>
-
-// #include <QClipboard>
-// #include <QDesktopServices>
-
-// #include <QProcess>
-// #include <QStandardPaths>
-
-// This is the version that is returned when the client asks for the VERSION.
-// The first number should be changed if there is an incompatible change that breaks old clients.
-// The second number should be changed when there are new features.
-const int MIRALL_SOCKET_API_VERSION "1.1"
 
 namespace {
 
@@ -294,12 +301,6 @@ static string buildMessage (string &verb, string &path, string &status = string 
     }
     return msg;
 }
-}
-
-namespace Occ {
-
-Q_LOGGING_CATEGORY (lcSocketApi, "nextcloud.gui.socketapi", QtInfoMsg)
-Q_LOGGING_CATEGORY (lcPublicLink, "nextcloud.gui.socketapi.publiclink", QtInfoMsg)
 
 void SocketListener.sendMessage (string &message, bool doWait) {
     if (!socket) {
@@ -1503,23 +1504,6 @@ void SocketApiJobV2.doFinish (QJsonObject &obj) {
 
 
 
-/***********************************************************
-Copyright (C) by Dominik Schmidt <dev@dominik-schmidt.de>
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <functional>
-// #include <QBitArray>
-// #include <QPointer>
-
-// #include <QJsonDocument>
-// #include <QJsonObject>
-
-// #include <memory>
-// #include <QTimer>
 
 namespace Occ {
 

@@ -10,6 +10,8 @@ Copyright (C) by Dominik Schmidt <dschmidt@owncloud.com>
 
 namespace Occ {
 
+Q_DECLARE_INTERFACE (Occ.PluginFactory, "org.owncloud.PluginFactory")
+
 class PluginFactory {
 public:
     virtual ~PluginFactory ();
@@ -27,26 +29,14 @@ public:
 /// Return the expected name of a plugin, for use with QPluginLoader
 string pluginFileName (string &type, string &name);
 
+
+
+PluginFactory.~PluginFactory () = default;
+
+string pluginFileName (string &type, string &name) {
+    return QStringLiteral ("%1sync_%2_%3")
+        .arg (QStringLiteral (APPLICATION_EXECUTABLE), type, name);
 }
-
-Q_DECLARE_INTERFACE (Occ.PluginFactory, "org.owncloud.PluginFactory")
-
-
-
-/***********************************************************
-Copyright (C) by Dominik Schmidt <dschmidt@owncloud.com>
-
-<LGPLv2.1-or-later-Boilerplate>
-***********************************************************/
-
-namespace Occ {
-
-    PluginFactory.~PluginFactory () = default;
     
-    string pluginFileName (string &type, string &name) {
-        return QStringLiteral ("%1sync_%2_%3")
-            .arg (QStringLiteral (APPLICATION_EXECUTABLE), type, name);
-    }
-    
-    }
+}
     

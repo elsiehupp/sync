@@ -2,8 +2,18 @@
 Copyright (C) by Klaas Freitag <freitag@kde.org>
 Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QInputDialog>
+// #include <QLabel>
+// #include <QDesktopServices>
+// #include <QNetworkReply>
+// #include <QTimer>
+// #include <QBuffer>
+// #include <QMessageBox>
+
+using namespace QKeychain;
 
 // #pragma once
 // #include <QPointer>
@@ -31,14 +41,14 @@ public:
     }
 
     /***********************************************************
-     * This will query the server and either uses OAuth via _asyncAuth.start ()
-     * or call showDialog to ask the password
-     */
+    This will query the server and either uses OAuth via _asyncAuth.start ()
+    or call showDialog to ask the password
+    ***********************************************************/
     void askFromUser () override;
     /***********************************************************
-     * In case of oauth, return an URL to the link to open the browser.
-     * An invalid URL otherwise
-     */
+    In case of oauth, return an URL to the link to open the browser.
+    An invalid URL otherwise
+    ***********************************************************/
     QUrl authorisationLink () { return _asyncAuth ? _asyncAuth.authorisationLink () : QUrl (); }
 
     static string requestAppPasswordText (Account *account);
@@ -55,34 +65,6 @@ private:
     QScopedPointer<OAuth, QScopedPointerObjectDeleteLater<OAuth>> _asyncAuth;
 };
 
-} // namespace Occ
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@kde.org>
-Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QInputDialog>
-// #include <QLabel>
-// #include <QDesktopServices>
-// #include <QNetworkReply>
-// #include <QTimer>
-// #include <QBuffer>
-// #include <QMessageBox>
-
-using namespace QKeychain;
-
-namespace Occ {
-
-Q_LOGGING_CATEGORY (lcHttpCredentialsGui, "nextcloud.sync.credentials.http.gui", QtInfoMsg)
 
 void HttpCredentialsGui.askFromUser () {
     // This function can be called from AccountState.slotInvalidCredentials,

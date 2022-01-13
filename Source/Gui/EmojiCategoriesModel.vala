@@ -1,8 +1,11 @@
 /***********************************************************
 Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QtGlobal>
+// #include <memory>
 
 // #pragma once
 
@@ -127,14 +130,6 @@ Q_DECLARE_METATYPE (Occ.Emoji)
 
 
 
-/***********************************************************
-Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QtGlobal>
-// #include <memory>
 
 namespace Occ {
 

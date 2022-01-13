@@ -1,9 +1,8 @@
 /***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
-
 
 namespace Occ {
 
@@ -15,14 +14,7 @@ class SimpleSslErrorHandler : Occ.AbstractSslErrorHandler {
 public:
     bool handleErrors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, Occ.AccountPtr) override;
 };
-}
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-namespace Occ {
 
     bool SimpleSslErrorHandler.handleErrors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, Occ.AccountPtr account) {
         (void)account;

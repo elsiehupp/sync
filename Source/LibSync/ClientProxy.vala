@@ -1,8 +1,12 @@
 /***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QLoggingCategory>
+// #include <QUrl>
+// #include <QThreadPool>
 
 // #include <GLib.Object>
 // #include <QNetworkProxy>
@@ -43,28 +47,7 @@ private:
     QUrl _url;
 };
 
-}
 
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QLoggingCategory>
-// #include <QUrl>
-// #include <QThreadPool>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcClientProxy, "nextcloud.sync.clientproxy", QtInfoMsg)
-    
     ClientProxy.ClientProxy (GLib.Object *parent)
         : GLib.Object (parent) {
     }

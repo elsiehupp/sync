@@ -1,8 +1,10 @@
 /***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QLoggingCategory>
 
 // #include <QVector>
 // #include <string>
@@ -13,6 +15,11 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <csync.h>
 
 // #include <owncloudlib.h>
+
+
+Q_DECLARE_METATYPE (Occ.SyncFileItem)
+Q_DECLARE_METATYPE (Occ.SyncFileItemPtr)
+
 
 namespace Occ {
 
@@ -81,11 +88,12 @@ public:
 
     SyncJournalFileRecord toSyncJournalFileRecordWithInode (string &localFileName) const;
 
-    /** Creates a basic SyncFileItem from a DB record
-     *
-     * This is intended in particular for read-update-write cycles that need
-     * to go through a a SyncFileItem, like PollJob.
-     */
+    /***********************************************************
+    Creates a basic SyncFileItem from a DB record
+
+    This is intended in particular for read-update-write cycles that need
+    to go through a a SyncFileItem, like PollJob.
+    ***********************************************************/
     static SyncFileItemPtr fromSyncJournalFileRecord (SyncJournalFileRecord &rec);
 
     SyncFileItem ()
@@ -153,8 +161,8 @@ public:
     }
 
     /***********************************************************
-     * True if the item had any kind of error.
-     */
+    True if the item had any kind of error.
+    ***********************************************************/
     bool hasErrorStatus () {
         return _status == SyncFileItem.SoftError
             || _status == SyncFileItem.NormalError
@@ -163,15 +171,15 @@ public:
     }
 
     /***********************************************************
-     * Whether this item should appear on the issues tab.
-     */
+    Whether this item should appear on the issues tab.
+    ***********************************************************/
     bool showInIssuesTab () {
         return hasErrorStatus () || _status == SyncFileItem.Conflict;
     }
 
     /***********************************************************
-     * Whether this item should appear on the protocol tab.
-     */
+    Whether this item should appear on the protocol tab.
+    ***********************************************************/
     bool showInProtocolTab () {
         return (!showInIssuesTab () || _status == SyncFileItem.Restoration)
             // Don't show conflicts that were resolved as "not a conflict after all"
@@ -180,22 +188,25 @@ public:
 
     // Variables useful for everybody
 
-    /** The syncfolder-relative filesystem path that the operation is about
-     *
-     * For rename operation this is the rename source and the target is in _renameTarget.
-     */
+    /***********************************************************
+    The syncfolder-relative filesystem path that the operation is about
+
+    For rename operation this is the rename source and the target is in _renameTarget.
+    ***********************************************************/
     string _file;
 
-    /** for renames : the name _file should be renamed to
-     * for dehydrations : the name _file should become after dehydration (like adding a suffix)
-     * otherwise empty. Use destination () to find the sync target.
-     */
+    /***********************************************************
+    for renames : the name _file should be renamed to
+    for dehydrations : the name _file should become after dehydration (like adding a suffix)
+    otherwise empty. Use destination () to find the sync target.
+    ***********************************************************/
     string _renameTarget;
 
-    /** The db-path of this item.
-     *
-     * This can easily differ from _file and _renameTarget if parts of the path were renamed.
-     */
+    /***********************************************************
+    The db-path of this item.
+
+    This can easily differ from _file and _renameTarget if parts of the path were renamed.
+    ***********************************************************/
     string _originalFile;
 
     /// Whether there's end to end encryption on this file.
@@ -212,11 +223,12 @@ public:
     /// without the status being FileIgnored.
     bool _hasBlacklistEntry BITFIELD (1);
 
-    /** If true and NormalError, this error may be blacklisted
-     *
-     * Note that non-local errors (httpErrorCode!=0) may also be
-     * blacklisted independently of this flag.
-     */
+    /***********************************************************
+    If true and NormalError, this error may be blacklisted
+
+    Note that non-local errors (httpErrorCode!=0) may also be
+    blacklisted independently of this flag.
+    ***********************************************************/
     bool _errorMayBeBlacklisted BITFIELD (1);
 
     // Variables useful to report to the user
@@ -261,30 +273,8 @@ inline bool operator< (SyncFileItemPtr &item1, SyncFileItemPtr &item2) {
 }
 
 using SyncFileItemVector = QVector<SyncFileItemPtr>;
-}
-
-Q_DECLARE_METATYPE (Occ.SyncFileItem)
-Q_DECLARE_METATYPE (Occ.SyncFileItemPtr)
 
 
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QLoggingCategory>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcFileItem, "nextcloud.sync.fileitem", QtInfoMsg)
-    
     SyncJournalFileRecord SyncFileItem.toSyncJournalFileRecordWithInode (string &localFileName) {
         SyncJournalFileRecord rec;
         rec._path = destination ().toUtf8 ();

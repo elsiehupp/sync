@@ -2,8 +2,30 @@
 Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <unistd.h>
+
+// #include <climits>
+// #include <cassert>
+// #include <chrono>
+
+// #include <QCoreApplication>
+// #include <QSslSocket>
+// #include <QDir>
+// #include <QLoggingCategory>
+// #include <QMutexLocker>
+// #include <QThread>
+// #include <QStringList>
+// #include <QTextStream>
+// #include <QTime>
+// #include <QUrl>
+// #include <QSslCertificate>
+// #include <QProcess>
+// #include <QElapsedTimer>
+// #include <QFileInfo>
+// #include <qtextcodec.h>
 
 // #pragma once
 
@@ -65,51 +87,54 @@ public:
     SyncJournalDb *journal () { return _journal; }
     string localPath () { return _localPath; }
 
-    /** Duration in ms that uploads should be delayed after a file change
-     *
-     * In certain situations a file can be written to very regularly over a large
-     * amount of time. Copying a large file could take a while. A logfile could be
-     * updated every second.
-     *
-     * In these cases it isn't desirable to attempt to upload the "unfinished" file.
-     * To avoid that, uploads of files where the distance between the mtime and the
+    /***********************************************************
+    Duration in ms that uploads should be delayed after a file change
+
+    In certain situations a file can be written to very regularly over a large
+    amount of time. Copying a large file could take a while. A logfile could be
+    updated every second.
+    
+    In these cases it isn't desirable to attempt to upload the "unfinished" file
+    To avoid that, uploads of files where the distance between the mtime and the
      * current time is less than this duration are skipped.
-     */
+    ***********************************************************/
     static std.chrono.milliseconds minimumFileAgeForUpload;
 
     /***********************************************************
-     * Control whether local discovery should read from filesystem or db.
-     *
-     * If style is DatabaseAndFilesystem, paths a set of file paths relative to
-     * the synced folder. All the parent directories of these paths will not
-     * be read from the db and scanned on the filesystem.
-     *
-     * Note, the style and paths are only retained for the next sync and
+    Control whether local discovery should read from filesystem or db.
+    
+    If style is DatabaseAndFilesystem, paths a set of file paths relative
+    the synced folder. All the parent directories of th
+    be read from the db and scanned on the filesystem.
+    
+    Note, the style and paths are only retained for the next sync and
      * revert afterwards. Use _lastLocalDiscoveryStyle to discover the last
      * sync's style.
-     */
+    ***********************************************************/
     void setLocalDiscoveryOptions (LocalDiscoveryStyle style, std.set<string> paths = {});
 
     /***********************************************************
-     * Returns whether the given folder-relative path should be locally discovered
-     * given the local discovery options.
-     *
-     * Example : If path is 'foo/bar' and style is DatabaseAndFilesystem and dirs contains
+    Returns whether the given folder-relative path should be locally discovered
+    given the local discovery options.
+    
+    Example : If path is 'foo/bar' and style is DatabaseAndFilesystem and dirs contains
      *     'foo/bar/touched_file', then the result will be true.
-     */
+    ***********************************************************/
     bool shouldDiscoverLocally (string &path) const;
 
-    /** Access the last sync run's local discovery style */
+    /***********************************************************
+    Access the last sync run's local discovery style */
     LocalDiscoveryStyle lastLocalDiscoveryStyle () { return _lastLocalDiscoveryStyle; }
 
-    /** Removes all virtual file db entries and dehydrated local placeholders.
-     *
-     * Particularly useful when switching off vfs mode or switching to a
-     * different kind of vfs.
-     *
-     * Note that *hydrated* placeholder files might still be left. These will
+    /***********************************************************
+    Removes all virtual file db entries and dehydrated local placeholders.
+
+    Particularly useful when switching off vfs mode or switching to a
+    different kind of vfs.
+    
+    Note that *hydrated* placeholder files might still be left. These will
      * get cleaned up by Vfs.unregisterFolder ().
-     */
+    ***********************************************************/
     static void wipeVirtualFiles (string &localPath, SyncJournalDb &journal, Vfs &vfs);
 
     static void switchToVirtualFiles (string &localPath, SyncJournalDb &journal, Vfs &vfs);
@@ -137,34 +162,37 @@ signals:
     void started ();
 
     /***********************************************************
-     * Emited when the sync engine detects that all the files have been removed or change.
-     * This usually happen when the server was reset or something.
-     * Set *cancel to true in a slot connected from this signal to abort the sync.
-     */
+    Emited when the sync engine detects that all the files have been removed or change.
+    This usually happen when the server was reset or something.
+    Set *cancel to true in a slot connected from this signal to abort the sync.
+    ***********************************************************/
     void aboutToRemoveAllFiles (SyncFileItem.Direction direction, std.function<void (bool)> f);
 
     // A new folder was discovered and was not synced because of the confirmation feature
     void newBigFolder (string &folder, bool isExternal);
 
-    /** Emitted when propagation has problems with a locked file.
-     *
-     * Forwarded from OwncloudPropagator.seenLockedFile.
-     */
+    /***********************************************************
+    Emitted when propagation has problems with a locked file.
+
+    Forwarded from OwncloudPropagator.seenLockedFile.
+    ***********************************************************/
     void seenLockedFile (string &fileName);
 
 private slots:
     void slotFolderDiscovered (bool local, string &folder);
     void slotRootEtagReceived (QByteArray &, QDateTime &time);
 
-    /** When the discovery phase discovers an item */
+    /***********************************************************
+    When the discovery phase discovers an item */
     void slotItemDiscovered (SyncFileItemPtr &item);
 
-    /** Called when a SyncFileItem gets accepted for a sync.
-     *
-     * Mostly done in initial creation inside treewalkFile but
-     * can also be called via the propagator for items that are
-     * created during propagation.
-     */
+    /***********************************************************
+    Called when a SyncFileItem gets accepted for a sync.
+
+    Mostly done in initial creation inside treewalkFile but
+    can also be called via the propagator for items that are
+    created during propagation.
+    ***********************************************************/
     void slotNewItem (SyncFileItemPtr &item);
 
     void slotItemCompleted (SyncFileItemPtr &item);
@@ -173,13 +201,16 @@ private slots:
     void slotProgress (SyncFileItem &item, int64 curent);
     void slotCleanPollsJobAborted (string &error);
 
-    /** Records that a file was touched by a job. */
+    /***********************************************************
+    Records that a file was touched by a job. */
     void slotAddTouchedFile (string &fn);
 
-    /** Wipes the _touchedFiles hash */
+    /***********************************************************
+    Wipes the _touchedFiles hash */
     void slotClearTouchedFiles ();
 
-    /** Emit a summary error, unless it was seen before */
+    /***********************************************************
+    Emit a summary error, unless it was seen before */
     void slotSummaryError (string &message);
 
     void slotInsufficientLocalStorage ();
@@ -231,15 +262,15 @@ private:
     Utility.StopWatch _stopWatch;
 
     /***********************************************************
-     * check if we are allowed to propagate everything, and if we are not, adjust the instructions
-     * to recover
-     */
+    check if we are allowed to propagate everything, and if we are not, adjust the instructions
+    to recover
+    ***********************************************************/
     void checkForPermission (SyncFileItemVector &syncItems);
     RemotePermissions getPermissions (string &file) const;
 
     /***********************************************************
-     * Instead of downloading files from the server, upload the files to the server
-     */
+    Instead of downloading files from the server, upload the files to the server
+    ***********************************************************/
     void restoreOldFiles (SyncFileItemVector &syncItems);
 
     // true if there is at least one file which was not changed on the server
@@ -257,67 +288,31 @@ private:
 
     AnotherSyncNeeded _anotherSyncNeeded;
 
-    /** Stores the time since a job touched a file. */
+    /***********************************************************
+    Stores the time since a job touched a file. */
     QMultiMap<QElapsedTimer, string> _touchedFiles;
 
     QElapsedTimer _lastUpdateProgressCallbackCall;
 
-    /** For clearing the _touchedFiles variable after sync finished */
+    /***********************************************************
+    For clearing the _touchedFiles variable after sync finished */
     QTimer _clearTouchedFilesTimer;
 
-    /** List of unique errors that occurred in a sync run. */
+    /***********************************************************
+    List of unique errors that occurred in a sync run. */
     QSet<string> _uniqueErrors;
 
-    /** The kind of local discovery the last sync run used */
+    /***********************************************************
+    The kind of local discovery the last sync run used */
     LocalDiscoveryStyle _lastLocalDiscoveryStyle = LocalDiscoveryStyle.FilesystemOnly;
     LocalDiscoveryStyle _localDiscoveryStyle = LocalDiscoveryStyle.FilesystemOnly;
     std.set<string> _localDiscoveryPaths;
 };
-}
 
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <unistd.h>
-
-// #include <climits>
-// #include <cassert>
-// #include <chrono>
-
-// #include <QCoreApplication>
-// #include <QSslSocket>
-// #include <QDir>
-// #include <QLoggingCategory>
-// #include <QMutexLocker>
-// #include <QThread>
-// #include <QStringList>
-// #include <QTextStream>
-// #include <QTime>
-// #include <QUrl>
-// #include <QSslCertificate>
-// #include <QProcess>
-// #include <QElapsedTimer>
-// #include <QFileInfo>
-// #include <qtextcodec.h>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcEngine, "nextcloud.sync.engine", QtInfoMsg)
-    
     bool SyncEngine.s_anySyncRunning = false;
     
-    /** When the client touches a file, block change notifications for this duration (ms)
+    /***********************************************************
+    When the client touches a file, block change notifications for this duration (ms)
     
     On Linux and Windows the file watcher can't distinguish a change that originates
     from the client (like a download during a sync operation) and an external change.

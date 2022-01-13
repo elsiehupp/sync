@@ -1,224 +1,7 @@
 /***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <memory>
-// #include <QSharedPointer>
-// #include <QSettings>
-// #include <string>
-// #include <QVariant>
-// #include <chrono>
-
-
-namespace Occ {
-
-
-/***********************************************************
-@brief The ConfigFile class
-@ingroup libsync
-***********************************************************/
-class ConfigFile {
-public:
-    ConfigFile ();
-
-    enum Scope { UserScope,
-        SystemScope };
-
-    string configPath ();
-    string configFile ();
-    string excludeFile (Scope scope) const;
-    static string excludeFileFromSystem (); // doesn't access config dir
-
-    /***********************************************************
-     * Creates a backup of the file
-     *
-     * Returns the path of the new backup.
-     */
-    string backup ();
-
-    bool exists ();
-
-    string defaultConnection ();
-
-    // the certs do not depend on a connection.
-    QByteArray caCerts ();
-    void setCaCerts (QByteArray &);
-
-    bool passwordStorageAllowed (string &connection = string ());
-
-    /* Server poll interval in milliseconds */
-    std.chrono.milliseconds remotePollInterval (string &connection = string ()) const;
-    /* Set poll interval. Value in milliseconds has to be larger than 5000 */
-    void setRemotePollInterval (std.chrono.milliseconds interval, string &connection = string ());
-
-    /* Interval to check for new notifications */
-    std.chrono.milliseconds notificationRefreshInterval (string &connection = string ()) const;
-
-    /* Force sync interval, in milliseconds */
-    std.chrono.milliseconds forceSyncInterval (string &connection = string ()) const;
-
-    /***********************************************************
-     * Interval in milliseconds within which full local discovery is required
-     *
-     * Use -1 to disable regular full local discoveries.
-     */
-    std.chrono.milliseconds fullLocalDiscoveryInterval ();
-
-    bool monoIcons ();
-    void setMonoIcons (bool);
-
-    bool promptDeleteFiles ();
-    void setPromptDeleteFiles (bool promptDeleteFiles);
-
-    bool crashReporter ();
-    void setCrashReporter (bool enabled);
-
-    bool automaticLogDir ();
-    void setAutomaticLogDir (bool enabled);
-
-    string logDir ();
-    void setLogDir (string &dir);
-
-    bool logDebug ();
-    void setLogDebug (bool enabled);
-
-    int logExpire ();
-    void setLogExpire (int hours);
-
-    bool logFlush ();
-    void setLogFlush (bool enabled);
-
-    // Whether experimental UI options should be shown
-    bool showExperimentalOptions ();
-
-    // proxy settings
-    void setProxyType (int proxyType,
-        const string &host = string (),
-        int port = 0, bool needsAuth = false,
-        const string &user = string (),
-        const string &pass = string ());
-
-    int proxyType ();
-    string proxyHostName ();
-    int proxyPort ();
-    bool proxyNeedsAuth ();
-    string proxyUser ();
-    string proxyPassword ();
-
-    /** 0 : no limit, 1 : manual, >0 : automatic */
-    int useUploadLimit ();
-    int useDownloadLimit ();
-    void setUseUploadLimit (int);
-    void setUseDownloadLimit (int);
-    /** in kbyte/s */
-    int uploadLimit ();
-    int downloadLimit ();
-    void setUploadLimit (int kbytes);
-    void setDownloadLimit (int kbytes);
-    /** [checked, size in MB] **/
-    QPair<bool, int64> newBigFolderSizeLimit ();
-    void setNewBigFolderSizeLimit (bool isChecked, int64 mbytes);
-    bool useNewBigFolderSizeLimit ();
-    bool confirmExternalStorage ();
-    void setConfirmExternalStorage (bool);
-
-    /** If we should move the files deleted on the server in the trash  */
-    bool moveToTrash ();
-    void setMoveToTrash (bool);
-
-    bool showMainDialogAsNormalWindow ();
-
-    static bool setConfDir (string &value);
-
-    bool optionalServerNotifications ();
-    void setOptionalServerNotifications (bool show);
-
-    bool showInExplorerNavigationPane ();
-    void setShowInExplorerNavigationPane (bool show);
-
-    int timeout ();
-    int64 chunkSize ();
-    int64 maxChunkSize ();
-    int64 minChunkSize ();
-    std.chrono.milliseconds targetChunkUploadDuration ();
-
-    void saveGeometry (Gtk.Widget *w);
-    void restoreGeometry (Gtk.Widget *w);
-
-    // how often the check about new versions runs
-    std.chrono.milliseconds updateCheckInterval (string &connection = string ()) const;
-
-    // skipUpdateCheck completely disables the updater and hides its UI
-    bool skipUpdateCheck (string &connection = string ()) const;
-    void setSkipUpdateCheck (bool, string &);
-
-    // autoUpdateCheck allows the user to make the choice in the UI
-    bool autoUpdateCheck (string &connection = string ()) const;
-    void setAutoUpdateCheck (bool, string &);
-
-    /** Query-parameter 'updatesegment' for the update check, value between 0 and 99.
-        Used to throttle down desktop release rollout in order to keep the update servers alive at peak times.
-        See : https://github.com/nextcloud/client_updater_server/pull/36 */
-    int updateSegment ();
-
-    string updateChannel ();
-    void setUpdateChannel (string &channel);
-
-    void saveGeometryHeader (QHeaderView *header);
-    void restoreGeometryHeader (QHeaderView *header);
-
-    string certificatePath ();
-    void setCertificatePath (string &cPath);
-    string certificatePasswd ();
-    void setCertificatePasswd (string &cPasswd);
-
-    /** The client version that last used this settings file.
-        Updated by configVersionMigration () at client startup. */
-    string clientVersionString ();
-    void setClientVersionString (string &version);
-
-    /**  Returns a new settings pre-set in a specific group.  The Settings will be created
-         with the given parent. If no parent is specified, the caller must destroy the settings */
-    static std.unique_ptr<QSettings> settingsWithGroup (string &group, GLib.Object *parent = nullptr);
-
-    /// Add the system and user exclude file path to the ExcludedFiles instance.
-    static void setupDefaultExcludeFilePaths (ExcludedFiles &excludedFiles);
-
-protected:
-    QVariant getPolicySetting (string &policy, QVariant &defaultValue = QVariant ()) const;
-    void storeData (string &group, string &key, QVariant &value);
-    QVariant retrieveData (string &group, string &key) const;
-    void removeData (string &group, string &key);
-    bool dataExists (string &group, string &key) const;
-
-private:
-    QVariant getValue (string &param, string &group = string (),
-        const QVariant &defaultValue = QVariant ()) const;
-    void setValue (string &key, QVariant &value);
-
-    string keychainProxyPasswordKey ();
-
-private:
-    using SharedCreds = QSharedPointer<AbstractCredentials>;
-
-    static bool _askedUser;
-    static string _oCVersion;
-    static string _confDir;
-};
-}
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 #ifndef TOKEN_AUTH_ONLY
@@ -244,15 +27,9 @@ const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
 const int DEFAULT_REMOTE_POLL_INTERVAL 30000 // default remote poll time in milliseconds
 const int DEFAULT_MAX_LOG_LINES 20000
 
-namespace {
-static constexpr char showMainDialogAsNormalWindowC[] = "showMainDialogAsNormalWindow";
-}
-
-namespace Occ {
 
 namespace chrono = std.chrono;
 
-Q_LOGGING_CATEGORY (lcConfigFile, "nextcloud.sync.configfile", QtInfoMsg)
 
 //static const char caCertsKeyC[] = "CaCertificates"; only used from account.cpp
 static const char remotePollIntervalC[] = "remotePollInterval";
@@ -304,6 +81,221 @@ const char certPath[] = "http_certificatePath";
 const char certPasswd[] = "http_certificatePasswd";
 string ConfigFile._confDir = string ();
 bool ConfigFile._askedUser = false;
+
+namespace {
+static constexpr char showMainDialogAsNormalWindowC[] = "showMainDialogAsNormalWindow";
+}
+
+// #include <memory>
+// #include <QSharedPointer>
+// #include <QSettings>
+// #include <string>
+// #include <QVariant>
+// #include <chrono>
+
+
+namespace Occ {
+
+
+/***********************************************************
+@brief The ConfigFile class
+@ingroup libsync
+***********************************************************/
+class ConfigFile {
+public:
+    ConfigFile ();
+
+    enum Scope { UserScope,
+        SystemScope };
+
+    string configPath ();
+    string configFile ();
+    string excludeFile (Scope scope) const;
+    static string excludeFileFromSystem (); // doesn't access config dir
+
+    /***********************************************************
+    Creates a backup of the file
+    
+     * Returns the path of the new backup.
+    ***********************************************************/
+    string backup ();
+
+    bool exists ();
+
+    string defaultConnection ();
+
+    // the certs do not depend on a connection.
+    QByteArray caCerts ();
+    void setCaCerts (QByteArray &);
+
+    bool passwordStorageAllowed (string &connection = string ());
+
+    /* Server poll interval in milliseconds */
+    std.chrono.milliseconds remotePollInterval (string &connection = string ()) const;
+    /* Set poll interval. Value in milliseconds has to be larger than 5000 */
+    void setRemotePollInterval (std.chrono.milliseconds interval, string &connection = string ());
+
+    /* Interval to check for new notifications */
+    std.chrono.milliseconds notificationRefreshInterval (string &connection = string ()) const;
+
+    /* Force sync interval, in milliseconds */
+    std.chrono.milliseconds forceSyncInterval (string &connection = string ()) const;
+
+    /***********************************************************
+    Interval in milliseconds within which full local discovery is required
+    
+     * Use -1 to disable regular full local discoveries.
+    ***********************************************************/
+    std.chrono.milliseconds fullLocalDiscoveryInterval ();
+
+    bool monoIcons ();
+    void setMonoIcons (bool);
+
+    bool promptDeleteFiles ();
+    void setPromptDeleteFiles (bool promptDeleteFiles);
+
+    bool crashReporter ();
+    void setCrashReporter (bool enabled);
+
+    bool automaticLogDir ();
+    void setAutomaticLogDir (bool enabled);
+
+    string logDir ();
+    void setLogDir (string &dir);
+
+    bool logDebug ();
+    void setLogDebug (bool enabled);
+
+    int logExpire ();
+    void setLogExpire (int hours);
+
+    bool logFlush ();
+    void setLogFlush (bool enabled);
+
+    // Whether experimental UI options should be shown
+    bool showExperimentalOptions ();
+
+    // proxy settings
+    void setProxyType (int proxyType,
+        const string &host = string (),
+        int port = 0, bool needsAuth = false,
+        const string &user = string (),
+        const string &pass = string ());
+
+    int proxyType ();
+    string proxyHostName ();
+    int proxyPort ();
+    bool proxyNeedsAuth ();
+    string proxyUser ();
+    string proxyPassword ();
+
+    /***********************************************************
+    0 : no limit, 1 : manual, >0 : automatic */
+    int useUploadLimit ();
+    int useDownloadLimit ();
+    void setUseUploadLimit (int);
+    void setUseDownloadLimit (int);
+    /***********************************************************
+    in kbyte/s */
+    int uploadLimit ();
+    int downloadLimit ();
+    void setUploadLimit (int kbytes);
+    void setDownloadLimit (int kbytes);
+    /***********************************************************
+    [checked, size in MB] **/
+    QPair<bool, int64> newBigFolderSizeLimit ();
+    void setNewBigFolderSizeLimit (bool isChecked, int64 mbytes);
+    bool useNewBigFolderSizeLimit ();
+    bool confirmExternalStorage ();
+    void setConfirmExternalStorage (bool);
+
+    /***********************************************************
+    If we should move the files deleted on the server in the trash  */
+    bool moveToTrash ();
+    void setMoveToTrash (bool);
+
+    bool showMainDialogAsNormalWindow ();
+
+    static bool setConfDir (string &value);
+
+    bool optionalServerNotifications ();
+    void setOptionalServerNotifications (bool show);
+
+    bool showInExplorerNavigationPane ();
+    void setShowInExplorerNavigationPane (bool show);
+
+    int timeout ();
+    int64 chunkSize ();
+    int64 maxChunkSize ();
+    int64 minChunkSize ();
+    std.chrono.milliseconds targetChunkUploadDuration ();
+
+    void saveGeometry (Gtk.Widget *w);
+    void restoreGeometry (Gtk.Widget *w);
+
+    // how often the check about new versions runs
+    std.chrono.milliseconds updateCheckInterval (string &connection = string ()) const;
+
+    // skipUpdateCheck completely disables the updater and hides its UI
+    bool skipUpdateCheck (string &connection = string ()) const;
+    void setSkipUpdateCheck (bool, string &);
+
+    // autoUpdateCheck allows the user to make the choice in the UI
+    bool autoUpdateCheck (string &connection = string ()) const;
+    void setAutoUpdateCheck (bool, string &);
+
+    /***********************************************************
+    Query-parameter 'updatesegment' for the update check, value between 0 and 99.
+        Used to throttle down desktop release rollout in order to keep the update servers alive at peak times.
+        See : https://github.com/nextcloud/client_updater_server/pull/36 */
+    int updateSegment ();
+
+    string updateChannel ();
+    void setUpdateChannel (string &channel);
+
+    void saveGeometryHeader (QHeaderView *header);
+    void restoreGeometryHeader (QHeaderView *header);
+
+    string certificatePath ();
+    void setCertificatePath (string &cPath);
+    string certificatePasswd ();
+    void setCertificatePasswd (string &cPasswd);
+
+    /***********************************************************
+    The client version that last used this settings file.
+        Updated by configVersionMigration () at client startup. */
+    string clientVersionString ();
+    void setClientVersionString (string &version);
+
+    /***********************************************************
+     Returns a new settings pre-set in a specific group.  The Settings will be created
+         with the given parent. If no parent is specified, the caller must destroy the settings */
+    static std.unique_ptr<QSettings> settingsWithGroup (string &group, GLib.Object *parent = nullptr);
+
+    /// Add the system and user exclude file path to the ExcludedFiles instance.
+    static void setupDefaultExcludeFilePaths (ExcludedFiles &excludedFiles);
+
+protected:
+    QVariant getPolicySetting (string &policy, QVariant &defaultValue = QVariant ()) const;
+    void storeData (string &group, string &key, QVariant &value);
+    QVariant retrieveData (string &group, string &key) const;
+    void removeData (string &group, string &key);
+    bool dataExists (string &group, string &key) const;
+
+private:
+    QVariant getValue (string &param, string &group = string (),
+        const QVariant &defaultValue = QVariant ()) const;
+    void setValue (string &key, QVariant &value);
+
+    string keychainProxyPasswordKey ();
+
+private:
+    using SharedCreds = QSharedPointer<AbstractCredentials>;
+
+    static bool _askedUser;
+    static string _oCVersion;
+    static string _confDir;
+};
 
 static chrono.milliseconds millisecondsValue (QSettings &setting, char *key,
     chrono.milliseconds defaultValue) {

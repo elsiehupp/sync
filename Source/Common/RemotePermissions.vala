@@ -3,6 +3,13 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
+/***********************************************************
+Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
+
+<LGPLv2.1-or-later-Boilerplate>
+***********************************************************/
+
+// #include <cstring>
 
 // #pragma once
 
@@ -11,6 +18,8 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 // #include <QDebug>
 
 namespace Occ {
+
+Q_DECLARE_METATYPE (Occ.RemotePermissions)
 
 /***********************************************************
 Class that store in a memory efficient way the remote permission
@@ -83,22 +92,7 @@ public:
     }
 };
 
-} // namespace Occ
 
-Q_DECLARE_METATYPE (Occ.RemotePermissions)
-
-
-
-
-/***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
-
-<LGPLv2.1-or-later-Boilerplate>
-***********************************************************/
-
-// #include <cstring>
-
-namespace Occ {
 
     static const char letters[] = " WDNVCKRSMm";
     

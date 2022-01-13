@@ -4,6 +4,71 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
 
+// #include <QLoggingCategory>
+// #include <qtconcurrentrun.h>
+// #include <QCryptographicHash>
+
+#ifdef ZLIB_FOUND
+// #include <zlib.h>
+#endif
+
+/***********************************************************
+\file checksums.cpp
+
+\brief Computing and validating file checksums
+
+Overview
+--------
+
+Checksums are used in two
+
+- to guard uploads and downloads against data corr
+  (transmission checksum)
+- to quickly check whether the content of a file has changed
+  to avoid redundant uploads (content checksum)
+
+In principle both are ind
+algorithms can be used. To avoid redundant computations, it can
+make sense to use the same checksum algorithm though.
+
+Transmission Checksums
+----------------------
+
+The usage of transmission checksums is currently optional and need
+to be explic
+the '[General]' section of the config file.
+
+When enabled, the
+the server in the OC
+
+On download, the header with the same name is read and if the
+received data does not have the expected checksum, the download is
+rejected.
+
+Transmission checks
+in the database.
+
+Conte
+------
+
+Sometimes the metadata of a local file changes while the content stays
+unchanged. Content checksums allow the sync client to avoid uploading
+the same data again by comparing the file's actual checksum to the
+checksum stored in the database.
+
+Content checksums a
+
+Checksum Algorithms
+-----
+
+- Adler3
+- MD5
+- SHA1
+- SHA256
+- SHA3-256 (requires Qt 5.9)
+
+***********************************************************/
+
 // #pragma once
 
 // #include <GLib.Object>
@@ -64,37 +129,37 @@ public:
     ~ComputeChecksum () override;
 
     /***********************************************************
-     * Sets the checksum type to be used. The default is empty.
-     */
+    Sets the checksum type to be used. The default is empty.
+    ***********************************************************/
     void setChecksumType (QByteArray &type);
 
     QByteArray checksumType ();
 
     /***********************************************************
-     * Computes the checksum for the given file path.
-     *
+    Computes the checksum for the given file path.
+    
      * done () is emitted when the calculation finishes.
-     */
+    ***********************************************************/
     void start (string &filePath);
 
     /***********************************************************
-     * Computes the checksum for the given device.
-     *
-     * done () is emitted when the calculation finishes.
-     *
+    Computes the checksum for the given device.
+    
+    done () is emitted when the calculation finishes.
+    
      * The device ownership transfers into the thread that
      * will compute the checksum. It must not have a parent.
-     */
+    ***********************************************************/
     void start (std.unique_ptr<QIODevice> device);
 
     /***********************************************************
-     * Computes the checksum synchronously.
-     */
+    Computes the checksum synchronously.
+    ***********************************************************/
     static QByteArray computeNow (QIODevice *device, QByteArray &checksumType);
 
     /***********************************************************
-     * Computes the checksum synchronously on file. Convenience wrapper for computeNow ().
-     */
+    Computes the checksum synchronously on file. Convenience wrapper for computeNow ().
+    ***********************************************************/
     static QByteArray computeNowOnFile (string &filePath, QByteArray &checksumType);
 
 signals:
@@ -121,22 +186,22 @@ public:
     ValidateChecksumHeader (GLib.Object *parent = nullptr);
 
     /***********************************************************
-     * Check a file's actual checksum against the provided checksumHeader
-     *
-     * If no checksum is there, or if a correct checksum is there, the signal validated ()
-     * will be emitted. In case of any kind of error, the signal validationFailed () will
+    Check a file's actual checksum against the provided checksumHeader
+    
+    If no checksum is there, or if a correct checksum is there, the signal validated (
+    will be emitted. In case of any kind of error, the signal validationFailed () will
      * be emitted.
-     */
+    ***********************************************************/
     void start (string &filePath, QByteArray &checksumHeader);
 
     /***********************************************************
-     * Check a device's actual checksum against the provided checksumHeader
-     *
-     * Like the other start () but works on an device.
-     *
+    Check a device's actual checksum against the provided checksumHeader
+    
+    Like the other start () but works on an device.
+    
      * The device ownership transfers into the thread that
      * will compute the checksum. It must not have a parent.
-     */
+    ***********************************************************/
     void start (std.unique_ptr<QIODevice> device, QByteArray &checksumHeader);
 
 signals:
@@ -162,92 +227,16 @@ public:
     CSyncChecksumHook ();
 
     /***********************************************************
-     * Returns the checksum value for \a path that is comparable to \a otherChecksum.
-     *
-     * Called from csync, where a instance of CSyncChecksumHook has
-     * to be set as userdata.
+    Returns the checksum value for \a path that is comparable to \a otherChecksum.
+    
+    Called from csync, whe
+    to be set as userdata.
      * The return value will be owned by csync.
-     */
+    ***********************************************************/
     static QByteArray hook (QByteArray &path, QByteArray &otherChecksumHeader, void *this_obj);
 };
-}
 
 
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<LGPLv2.1-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QLoggingCategory>
-// #include <qtconcurrentrun.h>
-// #include <QCryptographicHash>
-
-#ifdef ZLIB_FOUND
-// #include <zlib.h>
-#endif
-
-/** \file checksums.cpp
-
-\brief Computing and validating file checksums
-
-Overview
---------
-
-Checksums are used in two
-
-- to guard uploads and downloads against data corr
-  (transmission checksum)
-- to quickly check whether the content of a file has changed
-  to avoid redundant uploads (content checksum)
-
-In principle both are ind
-algorithms can be used. To avoid redundant computations, it can
-make sense to use the same checksum algorithm though.
-
-Transmission Checksums
-----------------------
-
-The usage of transmission checksums is currently optional and need
-to be explic
-the '[General]' section of the config file.
-
-When enabled, the
-the server in the OC
-
-On download, the header with the same name is read and if the
-received data does not have the expected checksum, the download is
-rejected.
-
-Transmission checks
-in the database.
-
-Conte
-------
-
-Sometimes the metadata of a local file changes while the content stays
-unchanged. Content checksums allow the sync client to avoid uploading
-the same data again by comparing the file's actual checksum to the
-checksum stored in the database.
-
-Content checksums a
-
-Checksum Algorithms
------
-
-- Adler3
-- MD5
-- SHA1
-- SHA256
-- SHA3-256 (requires Qt 5.9)
-
-***********************************************************/
-
-namespace Occ {
-
-Q_LOGGING_CATEGORY (lcChecksums, "nextcloud.sync.checksums", QtInfoMsg)
 
 const int BUFSIZE int64 (500 * 1024) // 500 KiB
 

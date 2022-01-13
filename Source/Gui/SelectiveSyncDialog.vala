@@ -1,8 +1,20 @@
 /***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QDialogButtonBox>
+// #include <QVBoxLayout>
+// #include <QTreeWidget>
+// #include <qpushbutton.h>
+// #include <QFileIconProvider>
+// #include <QHeaderView>
+// #include <QSettings>
+// #include <QScopedValueRollback>
+// #include <QTreeWidgetItem>
+// #include <QLabel>
+// #include <QVBoxLayout>
 
 // #pragma once
 // #include <Gtk.Dialog>
@@ -23,9 +35,10 @@ public:
     /// Returns a list of blacklisted paths, each including the trailing /
     QStringList createBlackList (QTreeWidgetItem *root = nullptr) const;
 
-    /** Returns the oldBlackList passed into setFolderInfo (), except that
-     *  a "/" entry is expanded to all top-level folder names.
-     */
+    /***********************************************************
+    Returns the oldBlackList passed into setFolderInfo (), except that
+     a "/" entry is expanded to all top-level folder names.
+    ***********************************************************/
     QStringList oldBlackList ();
 
     // Estimates the total size of checked items (recursively)
@@ -102,22 +115,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-// #include <QDialogButtonBox>
-// #include <QVBoxLayout>
-// #include <QTreeWidget>
-// #include <qpushbutton.h>
-// #include <QFileIconProvider>
-// #include <QHeaderView>
-// #include <QSettings>
-// #include <QScopedValueRollback>
-// #include <QTreeWidgetItem>
-// #include <QLabel>
-// #include <QVBoxLayout>
 
 namespace Occ {
 

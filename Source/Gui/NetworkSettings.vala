@@ -1,8 +1,12 @@
 /***********************************************************
 Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QNetworkProxy>
+// #include <string>
+// #include <QList>
 
 // #include <Gtk.Widget>
 
@@ -51,15 +55,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QNetworkProxy>
-// #include <string>
-// #include <QList>
 
 namespace Occ {
 

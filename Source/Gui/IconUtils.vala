@@ -1,8 +1,16 @@
 /***********************************************************
 Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <theme.h>
+
+// #include <QFile>
+// #include <QLoggingCategory>
+// #include <QPainter>
+// #include <QPixmapCache>
+// #include <QSvgRenderer>
 
 // #include <QColor>
 // #include <QPixmap>
@@ -23,19 +31,6 @@ QImage drawSvgWithCustomFillColor (string &sourceSvgPath, QColor &fillColor, QSi
 
 
 
-/***********************************************************
-Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <theme.h>
-
-// #include <QFile>
-// #include <QLoggingCategory>
-// #include <QPainter>
-// #include <QPixmapCache>
-// #include <QSvgRenderer>
 
 namespace {
     string findSvgFilePath (string &fileName, QStringList &possibleColors) {
@@ -61,7 +56,6 @@ namespace {
     namespace Occ {
     namespace Ui {
     namespace IconUtils {
-    Q_LOGGING_CATEGORY (lcIconUtils, "nextcloud.gui.iconutils", QtInfoMsg)
     QPixmap pixmapForBackground (string &fileName, QColor &backgroundColor) {
         Q_ASSERT (!fileName.isEmpty ());
     

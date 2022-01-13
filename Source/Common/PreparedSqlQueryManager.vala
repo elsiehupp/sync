@@ -83,12 +83,12 @@ public:
     };
     PreparedSqlQueryManager () = default;
     /***********************************************************
-     * The queries are reset in the destructor to prevent wal locks
-     */
+    The queries are reset in the destructor to prevent wal locks
+    ***********************************************************/
     const PreparedSqlQuery get (Key key);
     /***********************************************************
-     * Prepare the SqlQuery if it was not prepared yet.
-     */
+    Prepare the SqlQuery if it was not prepared yet.
+    ***********************************************************/
     const PreparedSqlQuery get (Key key, QByteArray &sql, SqlDatabase &db);
 
 private:

@@ -62,109 +62,109 @@ public:
     ~ExcludedFiles () override;
 
     /***********************************************************
-     * Adds a new path to a file containing exclude patterns.
-     *
+    Adds a new path to a file containing exclude patterns.
+    
      * Does not load the file. Use reloadExcludeFiles () afterwards.
-     */
+    ***********************************************************/
     void addExcludeFilePath (string &path);
 
     /***********************************************************
-     * Whether conflict files shall be excluded.
-     *
+    Whether conflict files shall be excluded.
+    
      * Defaults to true.
-     */
+    ***********************************************************/
     void setExcludeConflictFiles (bool onoff);
 
     /***********************************************************
-     * Checks whether a file or directory should be excluded.
-     *
-     * @param filePath     the absolute path to the file
+    Checks whether a file or directory should be excluded.
+    
+    @param filePath     the absolute path to the file
      * @param basePath     folder path from which to apply exclude rules, ends with a /
-     */
+    ***********************************************************/
     bool isExcluded (
         const string &filePath,
         const string &basePath,
         bool excludeHidden) const;
 
     /***********************************************************
-     * Adds an exclude pattern anchored to base path
-     *
-     * Primarily used in tests. Patterns added this way are preserved when
+    Adds an exclude pattern anchored to base path
+    
+    Primarily used in tests. Patterns added this way are preserved when
      * reloadExcludeFiles () is called.
-     */
+    ***********************************************************/
     void addManualExclude (string &expr);
     void addManualExclude (string &expr, string &basePath);
 
     /***********************************************************
-     * Removes all manually added exclude patterns.
-     *
+    Removes all manually added exclude patterns.
+    
      * Primarily used in tests.
-     */
+    ***********************************************************/
     void clearManualExcludes ();
 
     /***********************************************************
-     * Adjusts behavior of wildcards. Only used for testing.
-     */
+    Adjusts behavior of wildcards. Only used for testing.
+    ***********************************************************/
     void setWildcardsMatchSlash (bool onoff);
 
     /***********************************************************
-     * Sets the client version, only used for testing.
-     */
+    Sets the client version, only used for testing.
+    ***********************************************************/
     void setClientVersion (Version version);
 
     /***********************************************************
-     * @brief Check if the given path should be excluded in a traversal situation.
-     *
-     * It does only part of the work that full () does because it's assumed
-     * that all leading directories have been run through traversal ()
-     * before. This can be significantly faster.
-     *
-     * That means for 'foo/bar/file' only ('foo/bar/file', 'file') is checked
-     * against the exclude patterns.
-     *
+    @brief Check if the given path should be excluded in a traversal situation.
+    
+    It does only part of the work that full () does because it's as
+    that all leading directories have been run
+    before. This can be significantly faster.
+    
+    That means for 'foo/bar/file' only ('foo/bar/file', 'file')
+    against the exclude patterns.
+    
      * @param Path is folder-relative, should not start with a /.
-     *
+
      * Note that this only matches patterns. It does not check whether the file
      * or directory pointed to is hidden (or whether it even exists).
-     */
+    ***********************************************************/
     CSYNC_EXCLUDE_TYPE traversalPatternMatch (string &path, ItemType filetype);
 
 public slots:
     /***********************************************************
-     * Reloads the exclude patterns from the registered paths.
-     */
+    Reloads the exclude patterns from the registered paths.
+    ***********************************************************/
     bool reloadExcludeFiles ();
     /***********************************************************
-     * Loads the exclude patterns from file the registered base paths.
-     */
+    Loads the exclude patterns from file the registered base paths.
+    ***********************************************************/
     void loadExcludeFilePatterns (string &basePath, QFile &file);
 
 private:
     /***********************************************************
-     * Returns true if the version directive indicates the next line
-     * should be skipped.
-     *
-     * A version directive has the form "#!version <op> <version>"
-     * where <op> can be <, <=, ==, >, >= and <version> can be any version
-     * like 2.5.0.
-     *
-     * Example:
-     *
+    Returns true if the version directive indicates the next line
+    should be skipped.
+    
+    A version directive has the form "#!version <op> <version>"
+    where <op> c
+    like 2.5.
+    
+    Example:
+    
      * #!version < 2.5.0
      * myexclude
-     *
+
      * Would enable the "myexclude" pattern only for versions before 2.5.0.
-     */
+    ***********************************************************/
     bool versionDirectiveKeepNextLine (QByteArray &directive) const;
 
     /***********************************************************
-     * @brief Match the exclude pattern against the full path.
-     *
-     * @param Path is folder-relative, should not start with a /.
-     *
+    @brief Match the exclude pattern against the full path.
+    
+    @param Path is folder-relative, should not start with a /.
+    
      * Note that this only matches patterns. It does not check whether the file
      * or directory pointed to is hidden (or whether it even exists).
-     */
+    ***********************************************************/
     CSYNC_EXCLUDE_TYPE fullPatternMatch (string &path, ItemType filetype) const;
 
     // Our BasePath need to end with '/'
@@ -182,34 +182,34 @@ private:
     };
 
     /***********************************************************
-     * Generate optimized regular expressions for the exclude patterns anchored to basePath.
-     *
-     * The optimization works in two steps : First, all supported patterns are put
-     * into _fullRegexFile/_fullRegexDir. These regexes can be applied to the full
-     * path to determine whether it is excluded or not.
-     *
-     * The second is a performance optimization. The particularly common use
-     * case for excludes during a sync run is "traversal" : Instead of checking
-     * the full path every time, we check each parent path with the traversal
-     * function incrementally.
-     *
-     * Example : When the sync run eventually arrives at "a/b/c it can assume
-     * that the traversal matching has already been run on "a", "a/b"
-     * and just needs to run the traversal matcher on "a/b/c".
-     *
-     * The full matcher is equivalent to or-combining the traversal match results
-     * of all parent paths:
-     *   full ("a/b/c/d") == traversal ("a") || traversal ("a/b") || traversal ("a/b/c")
-     *
-     * The traversal matcher can be extremely fast because it has a fast early-out
-     * case : It checks the bname part of the path against _bnameTraversalRegex
+    Generate optimized regular expressions for the exclude patterns anchored to basePath.
+    
+    The optimization works in two steps : First, all supported patterns are put
+    into _fullRegexFile/_fullRegexDir. These regexes 
+    path to determine whether it is excluded or not.
+    
+    The second is a performance optimization. The particularly common use
+    case for excludes during
+    the full path every time, we check each parent path with the traversal
+    function incrementally.
+    
+    Example : When the sync run eventually arrives at "a/b/c it can assume
+    that the traversal m
+    and just needs to run the traversal matcher on "a/b/c".
+    
+    The full matcher is equivalent to or-combining the traversal match resul
+    of all parent paths:
+      full ("a/b/c/d") == traversal (
+    
+    The traversal matcher can be extremely fast because it has a fast early-
+    case : It checks the bname part of the path against _bnameTraversalRegex
      * and only runs a simplified _fullTraversalRegex on the whole path if bname
      * activation for it was triggered.
-     *
+
      * Note : The traversal matcher will return not-excluded on some paths that the
      * full matcher would exclude. Example : "b" is excluded. traversal ("b/c")
      * returns not-excluded because "c" isn't a bname activation pattern.
-     */
+    ***********************************************************/
     void prepare (BasePathString &basePath);
 
     void prepare ();
@@ -239,23 +239,22 @@ private:
     bool _excludeConflictFiles = true;
 
     /***********************************************************
-     * Whether * and ? in patterns can match a /
-     *
-     * Unfortunately this was how matching was done on Windows so
+    Whether * and ? in patterns can match a /
+    
+    Unfortunately this was how matching was done on Windows so
      * it continues to be enabled there.
-     */
+    ***********************************************************/
     bool _wildcardsMatchSlash = false;
 
     /***********************************************************
-     * The client version. Used to evaluate version-dependent excludes,
-     * see versionDirectiveKeepNextLine ().
-     */
+    The client version. Used to evaluate version-dependent excludes,
+    see versionDirectiveKeepNextLine ().
+    ***********************************************************/
     Version _clientVersion;
 
     friend class TestExcludedFiles;
 };
 
-#endif /* _CSYNC_EXCLUDE_H */
 
 
 
@@ -298,7 +297,8 @@ const int _GNU_SOURCE
 // #include <QFileInfo>
 // #include <QDir>
 
-/** Expands C-like escape sequences (in place)
+/***********************************************************
+Expands C-like escape sequences (in place)
 ***********************************************************/
 OCSYNC_EXPORT void csync_exclude_expand_escapes (QByteArray &input) {
     size_t o = 0;

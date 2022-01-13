@@ -2,8 +2,11 @@
 Copyright (C) 2015 by nocteau
 Copyright (C) 2015 by Daniel Molkentin <danimo@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QFileDialog>
+// #include <QLineEdit>
 
 // #include <Gtk.Dialog>
 // #include <string>
@@ -48,15 +51,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) 2015 by nocteau
-Copyright (C) 2015 by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QFileDialog>
-// #include <QLineEdit>
 
 namespace Occ {
     AddCertificateDialog.AddCertificateDialog (Gtk.Widget *parent)

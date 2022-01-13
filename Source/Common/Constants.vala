@@ -1,7 +1,7 @@
 /***********************************************************
 Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 // #pragma once

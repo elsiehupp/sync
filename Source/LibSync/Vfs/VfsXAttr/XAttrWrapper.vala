@@ -1,8 +1,13 @@
 /***********************************************************
 Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QLoggingCategory>
+
+// #include <sys/xattr.h>
+
 // #pragma once
 
 // #include <string>
@@ -11,31 +16,15 @@ namespace Occ {
 
 namespace XAttrWrapper {
 
-OWNCLOUDSYNC_EXPORT bool hasNextcloudPlaceholderAttributes (string &path);
-OWNCLOUDSYNC_EXPORT Result<void, string> addNextcloudPlaceholderAttributes (string &path);
+bool hasNextcloudPlaceholderAttributes (string &path);
+Result<void, string> addNextcloudPlaceholderAttributes (string &path);
 
 }
 
 } // namespace Occ
 
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QLoggingCategory>
-
-// #include <sys/xattr.h>
-
-Q_LOGGING_CATEGORY (lcXAttrWrapper, "nextcloud.sync.vfs.xattr.wrapper", QtInfoMsg)
-
 namespace {
+
 constexpr auto hydrateExecAttributeName = "user.nextcloud.hydrate_exec";
 
 Occ.Optional<QByteArray> xattrGet (QByteArray &path, QByteArray &name) {

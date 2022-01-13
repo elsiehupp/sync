@@ -1,8 +1,15 @@
 /***********************************************************
 Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QFileInfo>
+// #include <QDir>
+// #include <QJsonDocument>
+// #include <QJsonArray>
+// #include <QJsonObject>
+// #include <QJsonValue>
 
 // #pragma once
 
@@ -20,12 +27,12 @@ Q_DECLARE_LOGGING_CATEGORY (lcBulkPropagatorJob)
 class BulkPropagatorJob : PropagatorJob {
 
     /* This is a minified version of the SyncFileItem,
-     * that holds only the specifics about the file that's
-     * being uploaded.
-     *
-     * This is needed if we wanna apply changes on the file
+    that holds only the specifics about the file that's
+    being uploaded.
+    
+    This is needed if we wanna apply changes on the file
      * that's being uploaded while keeping the original on disk.
-     */
+    ***********************************************************/
     struct UploadFileInfo {
       string _file; /// I'm still unsure if I should use a SyncFilePtr here.
       string _path; /// the full path on disk.
@@ -94,7 +101,8 @@ private:
               SyncFileItem.Status status,
               const string &errorString);
 
-    /** Bases headers that need to be sent on the PUT, or in the MOVE for chunking-ng */
+    /***********************************************************
+    Bases headers that need to be sent on the PUT, or in the MOVE for chunking-ng */
     QMap<QByteArray, QByteArray> headers (SyncFileItemPtr item) const;
 
     void abortWithError (SyncFileItemPtr item,
@@ -102,15 +110,15 @@ private:
                         const string &error);
 
     /***********************************************************
-     * Checks whether the current error is one that should reset the whole
-     * transfer if it happens too often. If so : Bump UploadInfo.errorCount
-     * and maybe perform the reset.
-     */
+    Checks whether the current error is one that should reset the whole
+    transfer if it happens too often. If so : Bump UploadInfo.errorCount
+    and maybe perform the reset.
+    ***********************************************************/
     void checkResettingErrors (SyncFileItemPtr item) const;
 
     /***********************************************************
-     * Error handling functionality that is shared between jobs.
-     */
+    Error handling functionality that is shared between jobs.
+    ***********************************************************/
     void commonErrorHandling (SyncFileItemPtr item,
                              const string &errorMessage);
 
@@ -148,34 +156,7 @@ private:
     SyncFileItem.Status _finalStatus = SyncFileItem.Status.NoStatus;
 };
 
-}
 
-
-
-
-
-
-
-/***********************************************************
-Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QFileInfo>
-// #include <QDir>
-// #include <QJsonDocument>
-// #include <QJsonArray>
-// #include <QJsonObject>
-// #include <QJsonValue>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcBulkPropagatorJob, "nextcloud.sync.propagator.bulkupload", QtInfoMsg)
-    
-    }
-    
-    namespace {
     
     QByteArray getEtagFromJsonReply (QJsonObject &reply) {
         const auto ocEtag = Occ.parseEtag (reply.value ("OC-ETag").toString ().toLatin1 ());

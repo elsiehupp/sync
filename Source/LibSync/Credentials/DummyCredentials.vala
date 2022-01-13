@@ -1,7 +1,7 @@
 /***********************************************************
 Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 namespace Occ {
@@ -34,11 +34,6 @@ public:
 
 
 
-/***********************************************************
-Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
 
 namespace Occ {
 

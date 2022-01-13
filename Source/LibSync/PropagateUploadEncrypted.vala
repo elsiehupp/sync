@@ -1,5 +1,4 @@
-#ifndef PROPAGATEUPLOADENCRYPTED_H
-const int PROPAGATEUPLOADENCRYPTED_H
+
 
 // #include <GLib.Object>
 // #include <string>
@@ -9,6 +8,13 @@ const int PROPAGATEUPLOADENCRYPTED_H
 // #include <QNetworkReply>
 // #include <QFile>
 // #include <QTemporaryFile>
+// #include <QFileInfo>
+// #include <QDir>
+// #include <QUrl>
+// #include <QFile>
+// #include <QTemporaryFile>
+// #include <QLoggingCategory>
+// #include <QMimeDatabase>
 
 namespace Occ {
 
@@ -76,30 +82,7 @@ private:
   string _completeFileName;
 };
 
-}
-#endif
 
-
-
-
-
-
-
-
-
-
-// #include <QFileInfo>
-// #include <QDir>
-// #include <QUrl>
-// #include <QFile>
-// #include <QTemporaryFile>
-// #include <QLoggingCategory>
-// #include <QMimeDatabase>
-
-namespace Occ {
-
-  Q_LOGGING_CATEGORY (lcPropagateUploadEncrypted, "nextcloud.sync.propagator.upload.encrypted", QtInfoMsg)
-  
   PropagateUploadEncrypted.PropagateUploadEncrypted (OwncloudPropagator *propagator, string &remoteParentPath, SyncFileItemPtr item, GLib.Object *parent)
       : GLib.Object (parent)
       , _propagator (propagator)

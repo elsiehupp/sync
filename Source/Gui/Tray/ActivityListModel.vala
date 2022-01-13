@@ -1,8 +1,16 @@
 /***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QtCore>
+// #include <QAbstractListModel>
+// #include <QDesktopServices>
+// #include <Gtk.Widget>
+// #include <QJsonObject>
+// #include <QJsonDocument>
+// #include <qloggingcategory.h>
 
 // #include <QtCore>
 
@@ -120,36 +128,7 @@ private:
     bool _doneFetching = false;
     bool _hideOldActivities = true;
 };
-}
 
-
-
-
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QtCore>
-// #include <QAbstractListModel>
-// #include <QDesktopServices>
-// #include <Gtk.Widget>
-// #include <QJsonObject>
-// #include <QJsonDocument>
-// #include <qloggingcategory.h>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcActivity, "nextcloud.gui.activity", QtInfoMsg)
-    
     ActivityListModel.ActivityListModel (GLib.Object *parent)
         : QAbstractListModel (parent) {
     }

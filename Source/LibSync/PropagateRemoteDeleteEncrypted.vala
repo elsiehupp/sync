@@ -1,8 +1,14 @@
 /***********************************************************
 Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QLoggingCategory>
+// #include <QFileInfo>
+
+using namespace Occ;
+
 
 // #pragma once
 
@@ -26,19 +32,6 @@ private:
 
 
 
-
-/***********************************************************
-Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QLoggingCategory>
-// #include <QFileInfo>
-
-using namespace Occ;
-
-Q_LOGGING_CATEGORY (PROPAGATE_REMOVE_ENCRYPTED, "nextcloud.sync.propagator.remove.encrypted")
 
 PropagateRemoteDeleteEncrypted.PropagateRemoteDeleteEncrypted (OwncloudPropagator *propagator, SyncFileItemPtr item, GLib.Object *parent)
     : AbstractPropagateRemoteDeleteEncrypted (propagator, item, parent) {

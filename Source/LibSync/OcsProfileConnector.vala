@@ -4,8 +4,23 @@
 // #include <QPixmap>
 // #include <QUrl>
 // #include <string>
+// #include <QJsonObject>
+// #include <QJsonDocument>
+// #include <QJsonArray>
+// #include <QLoggingCategory>
+// #include <QIcon>
+// #include <QPainter>
+// #include <QImage>
+// #include <QSvgRenderer>
+// #include <QNetworkReply>
+// #include <QPixmap>
+// #include <QPixmapCache>
 
 namespace Occ {
+
+Q_DECLARE_METATYPE (Occ.HovercardAction)
+Q_DECLARE_METATYPE (Occ.Hovercard)
+
 
 struct HovercardAction {
 public:
@@ -45,35 +60,10 @@ private:
     AccountPtr _account;
     Hovercard _currentHovercard;
 };
-}
-
-Q_DECLARE_METATYPE (Occ.HovercardAction)
-Q_DECLARE_METATYPE (Occ.Hovercard)
 
 
 
 
-
-
-
-
-
-
-// #include <QJsonObject>
-// #include <QJsonDocument>
-// #include <QJsonArray>
-// #include <QLoggingCategory>
-// #include <QIcon>
-// #include <QPainter>
-// #include <QImage>
-// #include <QSvgRenderer>
-// #include <QNetworkReply>
-// #include <QPixmap>
-// #include <QPixmapCache>
-
-namespace {
-    Q_LOGGING_CATEGORY (lcOcsProfileConnector, "nextcloud.gui.ocsprofileconnector", QtInfoMsg)
-    
     Occ.HovercardAction jsonToAction (QJsonObject &jsonActionObject) {
         const auto iconUrl = jsonActionObject.value (QStringLiteral ("icon")).toString (QStringLiteral ("no-icon"));
         QPixmap iconPixmap;

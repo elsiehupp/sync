@@ -2,8 +2,16 @@
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QLabel>
+// #include <QPixmap>
+// #include <QVariant>
+// #include <QRadioButton>
+// #include <QAbstractButton>
+// #include <QCheckBox>
+// #include <QSpinBox>
 
 // #include <string>
 
@@ -50,20 +58,6 @@ namespace WizardCommon {
 
 
 
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QLabel>
-// #include <QPixmap>
-// #include <QVariant>
-// #include <QRadioButton>
-// #include <QAbstractButton>
-// #include <QCheckBox>
-// #include <QSpinBox>
 
 namespace Occ {
 

@@ -28,7 +28,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 OCSYNC_EXPORT int c_utimes (string &uri, struct timeval *times);
 
-#endif /* _C_TIME_H */
 
 
 

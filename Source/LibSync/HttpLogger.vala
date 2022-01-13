@@ -1,8 +1,12 @@
 /***********************************************************
 Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QRegularExpression>
+// #include <QLoggingCategory>
+// #include <QBuffer>
 // #pragma once
 
 // #include <QNetworkReply>
@@ -20,26 +24,7 @@ namespace HttpLogger {
         return requestVerb (reply.operation (), reply.request ());
     }
 }
-}
 
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QRegularExpression>
-// #include <QLoggingCategory>
-// #include <QBuffer>
-
-namespace {
-    Q_LOGGING_CATEGORY (lcNetworkHttp, "sync.httplogger", QtWarningMsg)
-    
     const int64 PeekSize = 1024 * 1024;
     
     const QByteArray XRequestId (){

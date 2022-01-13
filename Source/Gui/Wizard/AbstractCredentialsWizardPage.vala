@@ -1,8 +1,11 @@
 /***********************************************************
 Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <accountmanager.h>
 
 // #include <QWizardPage>
 
@@ -21,7 +24,6 @@ public:
 
 } // namespace Occ
 
-#endif
 
 
 
@@ -31,13 +33,7 @@ public:
 
 
 
-/***********************************************************
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <accountmanager.h>
 
 namespace Occ {
 

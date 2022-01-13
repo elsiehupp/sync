@@ -1,8 +1,22 @@
-#ifndef WEBVIEW_H
-const int WEBVIEW_H
+
 
 // #include <QUrl>
 // #include <Gtk.Widget>
+// #include <QWebEnginePage>
+// #include <QWebEngineProfile>
+// #include <QWebEngineUrlRequestInterceptor>
+// #include <QWebEngineUrlRequestJob>
+#if QT_VERSION >= 0x051200
+// #include <QWebEngineUrlScheme>
+#endif
+// #include <QWebEngineUrlSchemeHandler>
+// #include <QWebEngineView>
+// #include <QDesktopServices>
+// #include <QProgressBar>
+// #include <QLoggingCategory>
+// #include <QLocale>
+// #include <QWebEngineCertificateError>
+// #include <QMessageBox>
 
 
 namespace Occ {
@@ -28,37 +42,6 @@ private:
     WebViewPageUrlSchemeHandler *_schemeHandler;
 };
 
-}
-
-
-
-
-
-
-
-
-
-
-
-// #include <QWebEnginePage>
-// #include <QWebEngineProfile>
-// #include <QWebEngineUrlRequestInterceptor>
-// #include <QWebEngineUrlRequestJob>
-#if QT_VERSION >= 0x051200
-// #include <QWebEngineUrlScheme>
-#endif
-// #include <QWebEngineUrlSchemeHandler>
-// #include <QWebEngineView>
-// #include <QDesktopServices>
-// #include <QProgressBar>
-// #include <QLoggingCategory>
-// #include <QLocale>
-// #include <QWebEngineCertificateError>
-// #include <QMessageBox>
-
-namespace Occ {
-
-Q_LOGGING_CATEGORY (lcWizardWebiew, "nextcloud.gui.wizard.webview", QtInfoMsg)
 
 class WebViewPageUrlRequestInterceptor : QWebEngineUrlRequestInterceptor {
 public:
@@ -119,9 +102,9 @@ WebView.WebView (Gtk.Widget *parent)
     _profile.installUrlSchemeHandler ("nc", _schemeHandler);
 
     /***********************************************************
-     * Set a proper accept langauge to the language of the client
-     * code from : http://code.qt.io/cgit/qt/qtbase.git/tree/src/network/access/qhttpnetworkconnection.cpp
-     */ {
+    Set a proper accept langauge to the language of the client
+    code from : http://code.qt.io/cgit/qt/qtbase.git/tree/src/network/access/qhttpnetworkconnection.cpp
+    ***********************************************************/ {
         string systemLocale = QLocale.system ().name ().replace (QChar.fromLatin1 ('_'),QChar.fromLatin1 ('-'));
         string acceptLanguage;
         if (systemLocale == QLatin1String ("C")) {
@@ -147,14 +130,14 @@ void WebView.setUrl (QUrl &url) {
 
 WebView.~WebView () {
     /***********************************************************
-     * The Qt implmentation deletes children in the order they are added to the
-     * object tree, so in this case _page is deleted after _profile, which
-     * violates the assumption that _profile should exist longer than
-     * _page [1]. Here I delete _page manually so that _profile can be safely
-     * deleted later.
-     *
+    The Qt implmentation deletes children in the order they are added to the
+    object tree, so in this case _page is deleted after _profile, which
+    violates the assumption that _profile should exist longer than
+    _page [1]. Here I delete _page manually so that _profile can be safely
+    deleted later.
+    
      * [1] https://doc.qt.io/qt-5/qwebenginepage.html#QWebEnginePage-1
-     */
+    ***********************************************************/
     delete _page;
 }
 
@@ -225,12 +208,12 @@ void WebEnginePage.setUrl (QUrl &url) {
 
 bool WebEnginePage.certificateError (QWebEngineCertificateError &certificateError) {
     /***********************************************************
-     * TODO properly improve this.
-     * The certificate should be displayed.
-     *
-     * Or rather we should do a request with the QNAM and see if it works (then it is in the store).
+    TODO properly improve this.
+    The certificate should be displayed.
+    
+    Or rather we should do a request with the QNAM and see if it works (then it is in the store).
      * This is just a quick fix for now.
-     */
+    ***********************************************************/
     QMessageBox messageBox;
     messageBox.setText (tr ("Invalid certificate detected"));
     messageBox.setInformativeText (tr ("The host \"%1\" provided an invalid certificate. Continue?").arg (certificateError.url ().host ()));

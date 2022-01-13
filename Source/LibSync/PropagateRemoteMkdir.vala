@@ -1,8 +1,11 @@
 /***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QFile>
+// #include <QLoggingCategory>
 // #pragma once
 
 namespace Occ {
@@ -27,11 +30,11 @@ public:
     bool isLikelyFinishedQuickly () override { return true; }
 
     /***********************************************************
-     * Whether an existing entity with the same name may be deleted before
-     * creating the directory.
-     *
+    Whether an existing entity with the same name may be deleted before
+    creating the directory.
+    
      * Default : false.
-     */
+    ***********************************************************/
     void setDeleteExisting (bool enabled);
 
 private slots:
@@ -45,27 +48,7 @@ private slots:
 private:
     void finalizeMkColJob (QNetworkReply.NetworkError err, string &jobHttpReasonPhraseString, string &jobPath);
 };
-}
 
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QFile>
-// #include <QLoggingCategory>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcPropagateRemoteMkdir, "nextcloud.sync.propagator.remotemkdir", QtInfoMsg)
-    
     PropagateRemoteMkdir.PropagateRemoteMkdir (OwncloudPropagator *propagator, SyncFileItemPtr &item)
         : PropagateItemJob (propagator, item)
         , _deleteExisting (false)

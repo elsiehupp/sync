@@ -2,8 +2,18 @@
 Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 Copyright (C) 2015 by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QBuffer>
+// #include <QClipboard>
+// #include <QFileInfo>
+// #include <QDesktopServices>
+// #include <QMessageBox>
+// #include <QMenu>
+// #include <QTextEdit>
+// #include <QToolButton>
+// #include <QPropertyAnimation>
 
 // #include <Gtk.Dialog>
 // #include <QSharedPointer>
@@ -16,6 +26,10 @@ Copyright (C) 2015 by Klaas Freitag <freitag@owncloud.com>
 
 
 namespace Occ {
+
+namespace {
+    const char *passwordIsSetPlaceholder = "●●●●●●●●";
+}
 
 namespace Ui {
     class ShareLinkWidget;
@@ -91,10 +105,12 @@ private:
     void toggleExpireDateOptions (bool enable = true);
     void toggleButtonAnimation (QToolButton *button, QProgressIndicator *progressIndicator, QAction *checkedAction) const;
 
-    /** Confirm with the user and then delete the share */
+    /***********************************************************
+    Confirm with the user and then delete the share */
     void confirmAndDeleteShare ();
 
-    /** Retrieve a share's name, accounting for _namesSupported */
+    /***********************************************************
+    Retrieve a share's name, accounting for _namesSupported */
     string shareName ();
 
     void startAnimation (int start, int end);
@@ -136,38 +152,7 @@ private:
     Gtk.Widget *_shareLinkDefaultWidget{};
     QWidgetAction *_shareLinkWidgetAction{};
 };
-}
 
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
-Copyright (C) 2015 by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QBuffer>
-// #include <QClipboard>
-// #include <QFileInfo>
-// #include <QDesktopServices>
-// #include <QMessageBox>
-// #include <QMenu>
-// #include <QTextEdit>
-// #include <QToolButton>
-// #include <QPropertyAnimation>
-
-namespace {
-    const char *passwordIsSetPlaceholder = "●●●●●●●●";
-}
-
-namespace Occ {
-
-Q_LOGGING_CATEGORY (lcShareLink, "nextcloud.gui.sharelink", QtInfoMsg)
 
 ShareLinkWidget.ShareLinkWidget (AccountPtr account,
     const string &sharePath,

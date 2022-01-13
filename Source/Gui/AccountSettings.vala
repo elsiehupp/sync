@@ -1,8 +1,24 @@
 /***********************************************************
 Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <cmath>
+
+// #include <QDesktopServices>
+// #include <QDialogButtonBox>
+// #include <QDir>
+// #include <QListWidgetItem>
+// #include <QMessageBox>
+// #include <QAction>
+// #include <QVBoxLayout>
+// #include <QTreeView>
+// #include <QKeySequence>
+// #include <QIcon>
+// #include <QVariant>
+// #include <QJsonDocument>
+// #include <QToolTip>
 
 // #include <Gtk.Widget>
 // #include <QUrl>
@@ -13,6 +29,11 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 class QLabel;
 
 namespace Occ {
+
+namespace {
+    constexpr auto propertyFolder = "folder";
+    constexpr auto propertyPath = "path";
+    }
 
 namespace Ui {
     class AccountSettings;
@@ -109,49 +130,10 @@ private:
     bool _menuShown;
 };
 
-} // namespace Occ
 
-
-
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <cmath>
-
-// #include <QDesktopServices>
-// #include <QDialogButtonBox>
-// #include <QDir>
-// #include <QListWidgetItem>
-// #include <QMessageBox>
-// #include <QAction>
-// #include <QVBoxLayout>
-// #include <QTreeView>
-// #include <QKeySequence>
-// #include <QIcon>
-// #include <QVariant>
-// #include <QJsonDocument>
-// #include <QToolTip>
-
-namespace {
-    constexpr auto propertyFolder = "folder";
-    constexpr auto propertyPath = "path";
-    }
-    
-    namespace Occ {
     
     
-    Q_LOGGING_CATEGORY (lcAccountSettings, "nextcloud.gui.account.settings", QtInfoMsg)
-    
+ 
     static const char progressBarStyleC[] =
         "QProgressBar {"
         "border : 1px solid grey;"

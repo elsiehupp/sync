@@ -1,8 +1,18 @@
 /***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QJsonDocument>
+// #include <QJsonObject>
+// #include <QJsonArray>
+// #include <QLoggingCategory>
+// #include <QNetworkReply>
+// #include <QNetworkProxyFactory>
+// #include <QXmlStreamReader>
+
+// #include <creds/abstractcredentials.h>
 
 // #include <GLib.Object>
 // #include <QStringList>
@@ -114,10 +124,11 @@ private:
     void checkServerCapabilities ();
     void fetchUser ();
 
-    /** Sets the account's server version
-     *
-     * Returns false and reports ServerVersionMismatch for very old servers.
-     */
+    /***********************************************************
+    Sets the account's server version
+
+    Returns false and reports ServerVersionMismatch for very old servers.
+    ***********************************************************/
     bool setAndCheckServerVersion (string &version);
 
     QStringList _errors;
@@ -125,33 +136,7 @@ private:
     AccountPtr _account;
     bool _isCheckingServerAndAuth;
 };
-}
 
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QJsonDocument>
-// #include <QJsonObject>
-// #include <QJsonArray>
-// #include <QLoggingCategory>
-// #include <QNetworkReply>
-// #include <QNetworkProxyFactory>
-// #include <QXmlStreamReader>
-
-// #include <creds/abstractcredentials.h>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcConnectionValidator, "nextcloud.sync.connectionvalidator", QtInfoMsg)
-    
     // Make sure the timeout for this job is less than how often we get called
     // This makes sure we get tried often enough without "ConnectionValidator already running"
     static int64 timeoutToUseMsec = qMax (1000, ConnectionValidator.DefaultCallingIntervalMsec - 5 * 1000);

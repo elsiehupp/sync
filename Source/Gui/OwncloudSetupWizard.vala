@@ -1,8 +1,17 @@
 /***********************************************************
 Copyright (C) by Klaas Freitag <freitag@kde.org>
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QAbstractButton>
+// #include <QtCore>
+// #include <QProcess>
+// #include <QMessageBox>
+// #include <QDesktopServices>
+// #include <QApplication>
 
 // #include <GLib.Object>
 // #include <Gtk.Widget>
@@ -20,7 +29,8 @@ namespace Occ {
 ***********************************************************/
 class OwncloudSetupWizard : GLib.Object {
 public:
-    /** Run the wizard */
+    /***********************************************************
+    Run the wizard */
     static void runWizard (GLib.Object *obj, char *amember, Gtk.Widget *parent = nullptr);
     static bool bringWizardToFrontIfVisible ();
 signals:
@@ -69,19 +79,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QAbstractButton>
-// #include <QtCore>
-// #include <QProcess>
-// #include <QMessageBox>
-// #include <QDesktopServices>
-// #include <QApplication>
 
 namespace Occ {
 

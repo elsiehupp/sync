@@ -1,7 +1,7 @@
 /***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 // #include <QMetaType>
@@ -9,6 +9,8 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <string>
 
 namespace Occ {
+
+Q_DECLARE_METATYPE (Occ.SyncFileStatus)
 
 /***********************************************************
 @brief The SyncFileStatus class
@@ -48,20 +50,7 @@ inline bool operator== (SyncFileStatus &a, SyncFileStatus &b) {
 inline bool operator!= (SyncFileStatus &a, SyncFileStatus &b) {
     return ! (a == b);
 }
-}
 
-Q_DECLARE_METATYPE (Occ.SyncFileStatus)
-
-
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-namespace Occ {
     SyncFileStatus.SyncFileStatus () = default;
     
     SyncFileStatus.SyncFileStatus (SyncFileStatusTag tag)

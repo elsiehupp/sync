@@ -1,8 +1,12 @@
 /***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QRegularExpression>
+
+// #include <qfileinfo.h>
 
 // #include <QFile>
 // #include <QTextStream>
@@ -43,15 +47,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QRegularExpression>
-
-// #include <qfileinfo.h>
 
 namespace Occ {
 

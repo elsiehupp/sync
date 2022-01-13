@@ -1,8 +1,15 @@
 /***********************************************************
 Copyright (C) 2015 by Christian Kamm <kamm@incasoftware.de>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QApplication>
+
+// #include <qt5keychain/keychain.h>
+
+using namespace Occ;
+using namespace QKeychain;
 
 // #pragma once
 
@@ -106,20 +113,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) 2015 by Christian Kamm <kamm@incasoftware.de>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QApplication>
-
-// #include <qt5keychain/keychain.h>
-
-using namespace Occ;
-using namespace QKeychain;
-
-Q_LOGGING_CATEGORY (lcProxy, "nextcloud.gui.credentials.proxy", QtInfoMsg)
 
 ProxyAuthHandler *ProxyAuthHandler.instance () {
     static ProxyAuthHandler inst;

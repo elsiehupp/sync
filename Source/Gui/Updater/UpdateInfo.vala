@@ -18,7 +18,7 @@ public:
     string downloadUrl ();
     /***********************************************************
       Parse XML object from DOM element.
-     */
+    ***********************************************************/
     static UpdateInfo parseElement (QDomElement &element, bool *ok);
     static UpdateInfo parseString (string &xml, bool *ok);
 

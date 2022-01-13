@@ -1,8 +1,10 @@
 /***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QtCore>
 
 // #include <QtCore>
 // #include <QIcon>
@@ -67,10 +69,10 @@ public:
 
     QVector<ActivityLink> _links;
     /***********************************************************
-     * @brief Sort operator to sort the list youngest first.
-     * @param val
-     * @return
-     */
+    @brief Sort operator to sort the list youngest first.
+    @param val
+    @return
+    ***********************************************************/
 
     Identifier ident ();
 };
@@ -97,13 +99,6 @@ Q_DECLARE_METATYPE (Occ.ActivityLink)
 
 
 
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QtCore>
 
 namespace Occ {
 

@@ -1,8 +1,14 @@
 /***********************************************************
 Copyright (C) 2014 by Daniel Molkentin <danimo@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QLabel>
+// #include <QLineEdit>
+// #include <QVBoxLayout>
+// #include <QFormLayout>
+// #include <QDialogButtonBox>
 
 // #include <Gtk.Dialog>
 
@@ -28,21 +34,6 @@ private:
 } // namespace Occ
 
 
-
-
-
-
-/***********************************************************
-Copyright (C) 2014 by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QLabel>
-// #include <QLineEdit>
-// #include <QVBoxLayout>
-// #include <QFormLayout>
-// #include <QDialogButtonBox>
 
 namespace Occ {
 

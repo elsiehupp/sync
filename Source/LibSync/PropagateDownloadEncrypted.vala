@@ -36,22 +36,7 @@ private:
   string _errorString;
 };
 
-}
-#endif
 
-
-
-
-
-
-
-
-
-
-
-Q_LOGGING_CATEGORY (lcPropagateDownloadEncrypted, "nextcloud.sync.propagator.download.encrypted", QtInfoMsg)
-
-namespace Occ {
 
 PropagateDownloadEncrypted.PropagateDownloadEncrypted (OwncloudPropagator *propagator, string &localParentPath, SyncFileItemPtr item, GLib.Object *parent)
     : GLib.Object (parent)

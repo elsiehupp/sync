@@ -30,7 +30,6 @@ std.unique_ptr<csync_file_stat_t> OCSYNC_EXPORT csync_vio_local_readdir (csync_v
 
 int OCSYNC_EXPORT csync_vio_local_stat (string &uri, csync_file_stat_t *buf);
 
-#endif /* _CSYNC_VIO_LOCAL_H */
 
 
 
@@ -79,7 +78,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 // #include <QtCore/QLoggingCategory>
 // #include <QtCore/QFile>
 
-Q_LOGGING_CATEGORY (lcCSyncVIOLocal, "nextcloud.sync.csync.vio_local", QtInfoMsg)
 
 /***********************************************************
 directory functions

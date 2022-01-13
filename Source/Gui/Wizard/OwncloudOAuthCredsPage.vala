@@ -1,8 +1,12 @@
 /***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QVariant>
+// #include <QMenu>
+// #include <QClipboard>
 
 // #pragma once
 
@@ -56,15 +60,6 @@ protected slots:
 
 
 
-/***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QVariant>
-// #include <QMenu>
-// #include <QClipboard>
 
 namespace Occ {
 

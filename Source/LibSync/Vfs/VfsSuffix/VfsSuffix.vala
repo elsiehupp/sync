@@ -1,8 +1,10 @@
 /***********************************************************
 Copyright (C) by Christian Kamm <mail@ckamm.de>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QFile>
 // #pragma once
 
 // #include <GLib.Object>
@@ -59,13 +61,6 @@ class SuffixVfsPluginFactory : GLib.Object, public DefaultPluginFactory<VfsSuffi
 
 
 
-/***********************************************************
-Copyright (C) by Christian Kamm <mail@ckamm.de>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QFile>
 
 namespace Occ {
 

@@ -5,6 +5,19 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 
+// #include <QDir>
+// #include <QFileDialog>
+// #include <QUrl>
+// #include <QTimer>
+// #include <QPushButton>
+// #include <QMessageBox>
+// #include <QSsl>
+// #include <QSslCertificate>
+// #include <QNetworkAccessManager>
+// #include <QPropertyAnimation>
+// #include <QGraphicsPixmapItem>
+// #include <QBuffer>
+
 // #include <QWizard>
 
 #include "../addcertificatedialog.h"
@@ -69,32 +82,13 @@ private:
 
 } // namespace Occ
 
-#endif
 
 
 
 
 
 
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QDir>
-// #include <QFileDialog>
-// #include <QUrl>
-// #include <QTimer>
-// #include <QPushButton>
-// #include <QMessageBox>
-// #include <QSsl>
-// #include <QSslCertificate>
-// #include <QNetworkAccessManager>
-// #include <QPropertyAnimation>
-// #include <QGraphicsPixmapItem>
-// #include <QBuffer>
 
 namespace Occ {
 

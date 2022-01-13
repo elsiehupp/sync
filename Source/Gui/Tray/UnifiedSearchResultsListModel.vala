@@ -1,8 +1,13 @@
 /***********************************************************
 Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <algorithm>
+
+// #include <QAbstractListModel>
+// #include <QDesktopServices>
 
 // #pragma once
 
@@ -120,16 +125,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <algorithm>
-
-// #include <QAbstractListModel>
-// #include <QDesktopServices>
 
 namespace {
     string imagePlaceholderUrlForProviderId (string &providerId) {
@@ -281,10 +276,7 @@ namespace {
     
     // server-side bug of returning the cursor > 0 and isPaginated == 'true', using '5' as it is done on Android client's end now
     constexpr int minimumEntresNumberToShowLoadMore = 5;
-    }
-    namespace Occ {
-    Q_LOGGING_CATEGORY (lcUnifiedSearch, "nextcloud.gui.unifiedsearch", QtInfoMsg)
-    
+
     UnifiedSearchResultsListModel.UnifiedSearchResultsListModel (AccountState *accountState, GLib.Object *parent)
         : QAbstractListModel (parent)
         , _accountState (accountState) {

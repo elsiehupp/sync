@@ -1,7 +1,7 @@
 /***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 // #include <QNetworkAccessManager>

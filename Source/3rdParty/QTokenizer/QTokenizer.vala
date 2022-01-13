@@ -133,14 +133,14 @@ public:
        \param delimiters A string containing delimiters
 
        \sa QStringTokenizer, QByteArrayTokenizer, StringTokenizer, WStringTokenizer
-     */
+    ***********************************************************/
     QTokenizer (T& string, T& delimiters)
         : d (new QTokenizerPrivate<T, const_iterator> (string, delimiters)) { }
 
     /***********************************************************
        Whether or not to return delimiters as tokens
        \see setQuoteCharacters
-     */
+    ***********************************************************/
     void setReturnDelimiters (bool enable) { d.returnDelimiters = enable; }
 
     /***********************************************************
@@ -153,13 +153,13 @@ public:
        to skip the next character.
 
        \param quotes Characters that delimit quotes.
-     */
+    ***********************************************************/
     void setQuoteCharacters (T& quotes) { d.quotes = quotes; }
 
     /***********************************************************
        Whether or not to return delimiters as tokens
        \see setQuoteCharacters
-     */
+    ***********************************************************/
     void setReturnQuoteCharacters (bool enable) { d.returnQuotes = enable; }
 
     /***********************************************************
@@ -168,7 +168,7 @@ public:
        Returns true if there are more tokens, false otherwise.
 
        \sa next ()
-     */
+    ***********************************************************/
     bool hasNext () {
         typename QTokenizerPrivate<T, const_iterator>.State state;
         d.isDelim = false;
@@ -192,7 +192,7 @@ public:
 
     /***********************************************************
        Resets the tokenizer to the starting position.
-     */
+    ***********************************************************/
     void reset () {
         d.tokenEnd = d.begin;
     }
@@ -200,14 +200,14 @@ public:
     /***********************************************************
        Returns true if the current token is a delimiter,
        if one more more delimiting characters have been set.
-     */
+    ***********************************************************/
     bool isDelimiter () { return d.isDelim; }
 
     /***********************************************************
        Returns the current token.
 
        Use \c hasNext () to fetch the next token.
-     */
+    ***********************************************************/
     T next () {
         int len = std.distance (d.tokenBegin, d.tokenEnd);
         const_iterator tmpStart = d.tokenBegin;
@@ -228,9 +228,9 @@ public:
     QStringTokenizer (string &string, string &delim) :
         QTokenizer<string, string.const_iterator> (string, delim) {}
     /***********************************************************
-     * @brief Like \see next (), but returns a lightweight string reference
-     * @return A reference to the token within the string
-     */
+    @brief Like \see next (), but returns a lightweight string reference
+    @return A reference to the token within the string
+    ***********************************************************/
     QStringRef stringRef () {
         // If those differences overflow an int we'd have a veeeeeery long string in memory
         int begin = std.distance (d.begin, d.tokenBegin);

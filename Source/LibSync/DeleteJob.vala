@@ -1,8 +1,10 @@
 /***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QLoggingCategory>
 
 // #pragma once
 
@@ -30,27 +32,7 @@ private:
     QUrl _url; // Only used if the constructor taking a url is taken.
     QByteArray _folderToken;
 };
-}
 
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QLoggingCategory>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcDeleteJob, "nextcloud.sync.networkjob.delete", QtInfoMsg)
-    
     DeleteJob.DeleteJob (AccountPtr account, string &path, GLib.Object *parent)
         : AbstractNetworkJob (account, path, parent) {
     }

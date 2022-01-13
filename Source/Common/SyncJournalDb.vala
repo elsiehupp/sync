@@ -4,6 +4,23 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
 
+// #include <QCryptographicHash>
+// #include <QFile>
+// #include <QLoggingCategory>
+// #include <QStringList>
+// #include <QElapsedTimer>
+// #include <QUrl>
+// #include <QDir>
+// #include <sqlite3.h>
+// #include <cstring>
+
+// SQL expression to check whether path.startswith (prefix + '/')
+// Note : '/' + 1 == '0'
+const int IS_PREFIX_PATH_OF (prefix, path)
+" (" path " > (" prefix "||'/') AND " path " < (" prefix "||'0'))"
+const int IS_PREFIX_PATH_OR_EQUAL (prefix, path)
+" (" path " == " prefix " OR " IS_PREFIX_PATH_OF (prefix, path) ")"
+
 // #include <GLib.Object>
 // #include <QDateTime>
 // #include <QHash>
@@ -60,7 +77,8 @@ public:
         bool hasDehydrated = false;
     };
 
-    /** Returns whether the item or any subitems are dehydrated */
+    /***********************************************************
+    Returns whether the item or any subitems are dehydrated */
     Optional<HasHydratedDehydrated> hasHydratedOrDehydratedFiles (QByteArray &filename);
 
     bool exists ();
@@ -146,65 +164,68 @@ public:
     void setSelectiveSyncList (SelectiveSyncListType type, QStringList &list);
 
     /***********************************************************
-     * Make sure that on the next sync fileName and its parents are discovered from the server.
-     *
-     * That means its metadata and, if it's a directory, its direct contents.
-     *
-     * Specifically, etag (md5 field) of fileName and all its parents are set to _invalid_.
-     * That causes a metadata difference and a resulting discovery from the remote for the
-     * affected folders.
-     *
-     * Since folders in the selective sync list will not be rediscovered (csync_ftw,
-     * _csync_detect_update skip them), the _invalid_ marker will stay. And any
+    Make sure that on the next sync fileName and its parents are discovered from the server.
+    
+    That means its metadata and, if it's a directory, its direct contents.
+    
+    Specifically, etag
+    That causes a metadata difference and a resulting discovery from the remote f
+    affected folders.
+    
+    Since folders in the selective sync list will not be rediscovered (csync_ftw,
+    _csync_detect_update skip them), the _invalid_ marker will stay. And any
      * child items in the db will be ignored when reading a remote tree from the database.
-     *
+
      * Any setFileRecord () call to affected directories before the next sync run will be
      * adjusted to retain the invalid etag via _etagStorageFilter.
-     */
+    ***********************************************************/
     void schedulePathForRemoteDiscovery (string &fileName) { schedulePathForRemoteDiscovery (fileName.toUtf8 ()); }
     void schedulePathForRemoteDiscovery (QByteArray &fileName);
 
     /***********************************************************
-     * Wipe _etagStorageFilter. Also done implicitly on close ().
-     */
+    Wipe _etagStorageFilter. Also done implicitly on close ().
+    ***********************************************************/
     void clearEtagStorageFilter ();
 
     /***********************************************************
-     * Ensures full remote discovery happens on the next sync.
-     *
+    Ensures full remote discovery happens on the next sync.
+    
      * Equivalent to calling schedulePathForRemoteDiscovery () for all files.
-     */
+    ***********************************************************/
     void forceRemoteDiscoveryNextSync ();
 
     /* Because sqlite transactions are really slow, we encapsulate everything in big transactions
-     * Commit will actually commit the transaction and create a new one.
-     */
+    Commit will actually commit the transaction and create a new one.
+    ***********************************************************/
     void commit (string &context, bool startTrans = true);
     void commitIfNeededAndStartNewTransaction (string &context);
 
-    /** Open the db if it isn't already.
-     *
-     * This usually creates some temporary files next to the db file, like
-     * $dbfile-shm or $dbfile-wal.
-     *
+    /***********************************************************
+    Open the db if it isn't already.
+
+    This usually creates some temporary files next to the db file, like
+    $dbfile-shm or $dbfile-wal.
+    
      * returns true if it could be openend or is currently opened.
-     */
+    ***********************************************************/
     bool open ();
 
-    /** Returns whether the db is currently openend. */
+    /***********************************************************
+    Returns whether the db is currently openend. */
     bool isOpen ();
 
-    /** Close the database */
+    /***********************************************************
+    Close the database */
     void close ();
 
     /***********************************************************
-     * Returns the checksum type for an id.
-     */
+    Returns the checksum type for an id.
+    ***********************************************************/
     QByteArray getChecksumType (int checksumTypeId);
 
     /***********************************************************
-     * The data-fingerprint used to detect backup
-     */
+    The data-fingerprint used to detect backup
+    ***********************************************************/
     void setDataFingerprint (QByteArray &dataFingerprint);
     QByteArray dataFingerprint ();
 
@@ -222,33 +243,35 @@ public:
     /// Return all paths of files with a conflict tag in the name and records in the db
     QByteArrayList conflictRecordPaths ();
 
-    /** Find the base name for a conflict file name, using journal or name pattern
-     *
-     * The path must be sync-folder relative.
-     *
+    /***********************************************************
+    Find the base name for a conflict file name, using journal or name pattern
+
+    The path must be sync-folder relative.
+    
      * Will return an empty string if it's not even a conflict file by pattern.
-     */
+    ***********************************************************/
     QByteArray conflictFileBaseName (QByteArray &conflictName);
 
     /***********************************************************
-     * Delete any file entry. This will force the next sync to re-sync everything as if it was new,
-     * restoring everyfile on every remote. If a file is there both on the client and server side,
-     * it will be a conflict that will be automatically resolved if the file is the same.
-     */
+    Delete any file entry. This will force the next sync to re-sync everything as if it was new,
+    restoring everyfile on every remote. If a file is there both on the client and server side,
+    it will be a conflict that will be automatically resolved if the file is the same.
+    ***********************************************************/
     void clearFileTable ();
 
     /***********************************************************
-     * Set the 'ItemTypeVirtualFileDownload' to all the files that have the ItemTypeVirtualFile flag
-     * within the directory specified path path
-     *
+    Set the 'ItemTypeVirtualFileDownload' to all the files that have the ItemTypeVirtualFile flag
+    within the directory specified path path
+    
      * The path "" marks everything.
-     */
+    ***********************************************************/
     void markVirtualFileForDownloadRecursively (QByteArray &path);
 
-    /** Grouping for all functions relating to pin states,
-     *
-     * Use internalPinStates () to get at them.
-     */
+    /***********************************************************
+    Grouping for all functions relating to pin states,
+
+    Use internalPinStates () to get at them.
+    ***********************************************************/
     struct OCSYNC_EXPORT PinStateInterface {
         PinStateInterface (PinStateInterface &) = delete;
         PinStateInterface (PinStateInterface &&) = delete;
@@ -325,18 +348,19 @@ public:
     };
     friend struct PinStateInterface;
 
-    /** Access to PinStates stored in the database.
-     *
-     * Important : Not all vfs plugins store the pin states in the database,
-     * prefer to use Vfs.pinState () etc.
-     */
+    /***********************************************************
+    Access to PinStates stored in the database.
+
+    Important : Not all vfs plugins store the pin states in the database,
+    prefer to use Vfs.pinState () etc.
+    ***********************************************************/
     PinStateInterface internalPinStates ();
 
     /***********************************************************
-     * Only used for auto-test:
-     * when positive, will decrease the counter for every database operation.
-     * reaching 0 makes the operation fails
-     */
+    Only used for auto-test:
+    when positive, will decrease the counter for every database operation.
+    reaching 0 makes the operation fails
+    ***********************************************************/
     int autotestFailCounter = -1;
 
 private:
@@ -367,25 +391,26 @@ private:
     bool _metadataTableIsEmpty;
 
     /* Storing etags to these folders, or their parent folders, is filtered out.
-     *
-     * When schedulePathForRemoteDiscovery () is called some etags to _invalid_ in the
-     * database. If this is done during a sync run, a later propagation job might
-     * undo that by writing the correct etag to the database instead. This filter
-     * will prevent this write and instead guarantee the _invalid_ etag stays in
-     * place.
-     *
-     * The list is cleared on close () (end of sync run) and explicitly with
-     * clearEtagStorageFilter () (start of sync run).
-     *
+
+    When schedulePathForRemoteDiscovery () is called some etags to _invalid_ in the
+    database. If this is done during a sync run, a later propagation job might
+    undo that by writing the correct etag to the database instead. This filter
+    will prevent this write and instead guarantee the _invalid_ etag stays in
+    place.
+    
+    The list is cleared on close () (end of sync ru
+    clearEtagStorageFilter () (start of sync run).
+
      * The contained paths have a trailing /.
-     */
+    ***********************************************************/
     QList<QByteArray> _etagStorageFilter;
 
-    /** The journal mode to use for the db.
-     *
-     * Typically WAL initially, but may be set to other modes via environment
-     * variable, for specific filesystems, or when WAL fails in a particular way.
-     */
+    /***********************************************************
+    The journal mode to use for the db.
+
+    Typically WAL initially, but may be set to other modes via environment
+    variable, for specific filesystems, or when WAL fails in a particular way.
+    ***********************************************************/
     QByteArray _journalMode;
 
     PreparedSqlQueryManager _queryManager;
@@ -398,38 +423,8 @@ bool OCSYNC_EXPORT
 operator== (SyncJournalDb.UploadInfo &lhs,
     const SyncJournalDb.UploadInfo &rhs);
 
-} // namespace Occ
 
 
-
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<LGPLv2.1-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QCryptographicHash>
-// #include <QFile>
-// #include <QLoggingCategory>
-// #include <QStringList>
-// #include <QElapsedTimer>
-// #include <QUrl>
-// #include <QDir>
-// #include <sqlite3.h>
-// #include <cstring>
-
-// SQL expression to check whether path.startswith (prefix + '/')
-// Note : '/' + 1 == '0'
-const int IS_PREFIX_PATH_OF (prefix, path)
-    " (" path " > (" prefix "||'/') AND " path " < (" prefix "||'0'))"
-const int IS_PREFIX_PATH_OR_EQUAL (prefix, path)
-    " (" path " == " prefix " OR " IS_PREFIX_PATH_OF (prefix, path) ")"
-
-namespace Occ {
-
-Q_LOGGING_CATEGORY (lcDb, "nextcloud.sync.database", QtInfoMsg)
 
 const int GET_FILE_RECORD_QUERY
         "SELECT path, inode, modtime, type, md5, fileid, remotePerm, filesize,"
@@ -933,13 +928,13 @@ const int SQLITE_IOERR_SHMMAP            (SQLITE_IOERR | (21<<8))
     }
 
     /***********************************************************
-     * If we are upgrading from a client version older than 1.5,
-     * we cannot read from the database because we need to fetch the files id and etags.
-     *
-     *  If 1.8.0 caused missing data in the local tree, so we also don't read from DB
-     *  to get back the files that were gone.
+    If we are upgrading from a client version older than 1.5,
+    we cannot read from the database because we need to fetch the files id and etags.
+    
+     If 1.8.0 caused missing data in the l
+     to get back the files that were gone.
      *  In 1.8.1 we had a fix to re-get the data, but this one here is better
-     */
+    ***********************************************************/
     if (forceRemoteDiscovery) {
         forceRemoteDiscoveryNextSyncLocked ();
     }

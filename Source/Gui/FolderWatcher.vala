@@ -1,8 +1,19 @@
 /***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// event masks
+
+// #include <cstdint>
+
+// #include <QFileInfo>
+// #include <QFlags>
+// #include <QDir>
+// #include <QMutexLocker>
+// #include <QStringList>
+// #include <QTimer>
 
 // #include <QList>
 // #include <QLoggingCategory>
@@ -38,52 +49,53 @@ public:
     ~FolderWatcher () override;
 
     /***********************************************************
-     * @param root Path of the root of the folder
-     */
+    @param root Path of the root of the folder
+    ***********************************************************/
     void init (string &root);
 
     /* Check if the path is ignored. */
     bool pathIsIgnored (string &path);
 
     /***********************************************************
-     * Returns false if the folder watcher can't be trusted to capture all
-     * notifications.
-     *
-     * For example, this can happen on linux if the inotify user limit from
+    Returns false if the folder watcher can't be trusted to capture all
+    notifications.
+    
+    For example, this can happen on linux if the inotify user limit from
      * /proc/sys/fs/inotify/max_user_watches is exceeded.
-     */
+    ***********************************************************/
     bool isReliable ();
 
     /***********************************************************
-     * Triggers a change in the path and verifies a notification arrives.
-     *
-     * If no notification is seen, the folderwatcher marks itself as unreliable.
+    Triggers a change in the path and verifies a notification arrives.
+    
+    If no notification is seen, the folderwatcher marks itself as unreliable.
      * The path must be ignored by the watcher.
-     */
+    ***********************************************************/
     void startNotificatonTest (string &path);
 
     /// For testing linux behavior only
     int testLinuxWatchCount ();
 
 signals:
-    /** Emitted when one of the watched directories or one
-     *  of the contained files is changed. */
+    /***********************************************************
+    Emitted when one of the watched directories or one
+     of the contained files is changed. */
     void pathChanged (string &path);
 
     /***********************************************************
-     * Emitted if some notifications were lost.
-     *
-     * Would happen, for example, if the number of pending notifications
-     * exceeded the allocated buffer size on Windows. Note that the folder
-     * watcher could still be able to capture all future notifications -
+    Emitted if some notifications were lost.
+    
+    Would happen, for example, if the number of pending notifications
+    exceeded the allocated buffer size on Windows. Note that the fold
+    watcher could still be able to capture all future notifications -
      * i.e. isReliable () is orthogonal to losing changes occasionally.
-     */
+    ***********************************************************/
     void lostChanges ();
 
     /***********************************************************
-     * Signals when the watcher became unreliable. The string is a translated
-     * message that can be shown to users.
-     */
+    Signals when the watcher became unreliable. The string is a translated
+    message that can be shown to users.
+    ***********************************************************/
     void becameUnreliable (string &message);
 
 protected slots:
@@ -106,42 +118,13 @@ private:
 
     void appendSubPaths (QDir dir, QStringList& subPaths);
 
-    /** Path of the expected test notification */
+    /***********************************************************
+    Path of the expected test notification */
     string _testNotificationPath;
 
     friend class FolderWatcherPrivate;
 };
-}
 
-#endif
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// event masks
-
-// #include <cstdint>
-
-// #include <QFileInfo>
-// #include <QFlags>
-// #include <QDir>
-// #include <QMutexLocker>
-// #include <QStringList>
-// #include <QTimer>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcFolderWatcher, "nextcloud.gui.folderwatcher", QtInfoMsg)
-    
     FolderWatcher.FolderWatcher (Folder *folder)
         : GLib.Object (folder)
         , _folder (folder) {

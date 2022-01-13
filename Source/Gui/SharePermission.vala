@@ -1,7 +1,7 @@
 /***********************************************************
 Copyright (C) by Roeland Jago Douma <rullzer@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 // #include <qglobal.h>

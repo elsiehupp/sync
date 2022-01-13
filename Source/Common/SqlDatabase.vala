@@ -1,20 +1,33 @@
 /***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+<LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
+/***********************************************************
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+
+<LGPLv2.1-or-later-Boilerplate>
+***********************************************************/
+
+// #include <QDateTime>
+// #include <QLoggingCategory>
+// #include <string>
+// #include <QFile>
+// #include <QFileInfo>
+// #include <QDir>
+
+// #include <sqlite3.h>
+
+const int SQLITE_SLEEP_TIME_USEC 100000
+const int SQLITE_REPEAT_COUNT 20
+
+const int SQLITE_DO (A)
+    if (1) {
+        _errId = (A);
+        if (_errId != SQLITE_OK && _errId != SQLITE_DONE && _errId != SQLITE_ROW) {
+            _error = string.fromUtf8 (sqlite3_errmsg (_db));
+        }
+    }
 
 // #include <QLoggingCategory>
 // #include <GLib.Object>
@@ -96,10 +109,10 @@ public:
     SqlQuery (SqlDatabase &db);
     SqlQuery (QByteArray &sql, SqlDatabase &db);
     /***********************************************************
-     * Prepare the SqlQuery.
-     * If the query was already prepared, this will first call finish (), and re-prepare it.
-     * This function must only be used if the constructor was setting a SqlDatabase
-     */
+    Prepare the SqlQuery.
+    If the query was already prepared, this will first call finish (), and re-prepare it.
+    This function must only be used if the constructor was setting a SqlDatabase
+    ***********************************************************/
     int prepare (QByteArray &sql, bool allow_failure = false);
 
     ~SqlQuery ();
@@ -159,39 +172,8 @@ private:
     friend class PreparedSqlQueryManager;
 };
 
-} // namespace Occ
 
 
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<LGPLv2.1-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QDateTime>
-// #include <QLoggingCategory>
-// #include <string>
-// #include <QFile>
-// #include <QFileInfo>
-// #include <QDir>
-
-// #include <sqlite3.h>
-
-const int SQLITE_SLEEP_TIME_USEC 100000
-const int SQLITE_REPEAT_COUNT 20
-
-const int SQLITE_DO (A)
-    if (1) {
-        _errId = (A);
-        if (_errId != SQLITE_OK && _errId != SQLITE_DONE && _errId != SQLITE_ROW) {
-            _error = string.fromUtf8 (sqlite3_errmsg (_db));
-        }
-    }
-
-namespace Occ {
-
-Q_LOGGING_CATEGORY (lcSql, "nextcloud.sync.database.sql", QtInfoMsg)
 
 SqlDatabase.SqlDatabase () = default;
 

@@ -1,8 +1,17 @@
-#ifndef CLIENTSIDEENCRYPTIONJOBS_H
-const int CLIENTSIDEENCRYPTIONJOBS_H
+
 
 // #include <string>
 // #include <QJsonDocument>
+// #include <QDebug>
+// #include <QLoggingCategory>
+// #include <QFileInfo>
+// #include <QDir>
+// #include <QJsonObject>
+// #include <QXmlStreamReader>
+// #include <QXmlStreamNamespaceDeclaration>
+// #include <QStack>
+// #include <QInputDialog>
+// #include <QLineEdit>
 
 namespace Occ {
 /* Here are all of the network jobs for the client side encryption.
@@ -27,9 +36,9 @@ public:
     SignPublicKeyApiJob (AccountPtr &account, string &path, GLib.Object *parent = nullptr);
 
     /***********************************************************
-     * @brief setCsr - the CSR with the public key.
-     * This function needs to be called before start () obviously.
-     */
+    @brief setCsr - the CSR with the public key.
+    This function needs to be called before start () obviously.
+    ***********************************************************/
     void setCsr (QByteArray& csr);
 
 public slots:
@@ -40,10 +49,10 @@ protected:
 signals:
 
     /***********************************************************
-     * @brief jsonReceived - signal to report the json answer from ocs
-     * @param json - the parsed json document
-     * @param statusCode - the OCS status code : 100 (!) for success
-     */
+    @brief jsonReceived - signal to report the json answer from ocs
+    @param json - the parsed json document
+    @param statusCode - the OCS status code : 100 (!) for success
+    ***********************************************************/
     void jsonReceived (QJsonDocument &json, int statusCode);
 
 private:
@@ -68,9 +77,9 @@ public:
     StorePrivateKeyApiJob (AccountPtr &account, string &path, GLib.Object *parent = nullptr);
 
     /***********************************************************
-     * @brief setCsr - the CSR with the public key.
-     * This function needs to be called before start () obviously.
-     */
+    @brief setCsr - the CSR with the public key.
+    This function needs to be called before start () obviously.
+    ***********************************************************/
     void setPrivateKey (QByteArray& privateKey);
 
 public slots:
@@ -81,10 +90,10 @@ protected:
 signals:
 
     /***********************************************************
-     * @brief jsonReceived - signal to report the json answer from ocs
-     * @param json - the parsed json document
-     * @param statusCode - the OCS status code : 100 (!) for success
-     */
+    @brief jsonReceived - signal to report the json answer from ocs
+    @param json - the parsed json document
+    @param statusCode - the OCS status code : 100 (!) for success
+    ***********************************************************/
     void jsonReceived (QJsonDocument &json, int statusCode);
 
 private:
@@ -259,31 +268,7 @@ private:
     QByteArray _fileId;
 };
 
-}
-#endif
 
-
-
-
-
-
-
-// #include <QDebug>
-// #include <QLoggingCategory>
-// #include <QFileInfo>
-// #include <QDir>
-// #include <QJsonObject>
-// #include <QXmlStreamReader>
-// #include <QXmlStreamNamespaceDeclaration>
-// #include <QStack>
-// #include <QInputDialog>
-// #include <QLineEdit>
-
-Q_LOGGING_CATEGORY (lcSignPublicKeyApiJob, "nextcloud.sync.networkjob.sendcsr", QtInfoMsg)
-Q_LOGGING_CATEGORY (lcStorePrivateKeyApiJob, "nextcloud.sync.networkjob.storeprivatekey", QtInfoMsg)
-Q_LOGGING_CATEGORY (lcCseJob, "nextcloud.sync.networkjob.clientsideencrypt", QtInfoMsg)
-
-namespace Occ {
 
 GetMetadataApiJob.GetMetadataApiJob (AccountPtr& account,
                                     const QByteArray& fileId,

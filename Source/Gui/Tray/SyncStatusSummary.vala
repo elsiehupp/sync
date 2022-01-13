@@ -1,8 +1,10 @@
 /***********************************************************
 Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <theme.h>
 
 // #pragma once
 
@@ -84,13 +86,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <theme.h>
 
 namespace {
 
@@ -107,12 +102,7 @@ namespace {
         }
         return status;
     }
-    }
-    
-    namespace Occ {
-    
-    Q_LOGGING_CATEGORY (lcSyncStatusModel, "nextcloud.gui.syncstatusmodel", QtInfoMsg)
-    
+
     SyncStatusSummary.SyncStatusSummary (GLib.Object *parent)
         : GLib.Object (parent) {
         const auto folderMan = FolderMan.instance ();

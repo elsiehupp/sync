@@ -72,32 +72,33 @@ private slots:
 
 private:
     /***********************************************************
-     * Windows : Workaround for CredWriteW used by QtKeychain
-     *
-     *          Saving all client CA's within one credential may result in:
+    Windows : Workaround for CredWriteW used by QtKeychain
+    
+             Saving all client CA's within one credential may result in:
      *          Error : "Credential size exceeds maximum size of 2560"
-     */
+    ***********************************************************/
     void readSingleClientCaCertPEM ();
     void writeSingleClientCaCertPEM ();
 
     /***********************************************************
-     * Since we're limited by Windows limits, we just create our own
-     * limit to avoid evil things happening by endless recursion
-     *
+    Since we're limited by Windows limits, we just create our own
+    limit to avoid evil things happening by endless recursion
+    
      * Better than storing the count and relying on maybe-hacked values
-     */
+    ***********************************************************/
     static constexpr int _clientSslCaCertificatesMaxCount = 10;
     QQueue<QSslCertificate> _clientSslCaCertificatesWriteQueue;
 
 protected:
-    /** Reads data from keychain locations
-     *
-     * Goes through
-     *   slotReadClientCertPEMJobDone to
-     *   slotReadClientKeyPEMJobDone to
-     *   slotReadClientCaCertsPEMJobDone to
-     *   slotReadJobDone
-     */
+    /***********************************************************
+    Reads data from keychain locations
+
+    Goes through
+      slotReadClientCertPEMJobDone to
+      slotReadClientKeyPEMJobDone to
+      slotReadClientCaCertsPEMJobDone to
+      slotReadJobDone
+    ***********************************************************/
     void fetchFromKeychainHelper ();
 
     /// Wipes legacy keychain locations
@@ -146,7 +147,6 @@ using namespace QKeychain;
 
 namespace Occ {
 
-Q_LOGGING_CATEGORY (lcWebFlowCredentials, "nextcloud.sync.credentials.webflow", QtInfoMsg)
 
 namespace {
     const char userC[] = "user";
@@ -699,7 +699,7 @@ void WebFlowCredentials.deleteKeychainEntries (bool oldKeychainEntries) {
       *       Being able to specify a new certificate is important anyway : expiry etc.
       *
       *       We introduce this dirty hack here, to allow deleting them upon Remote Wipe.
-     */
+    ***********************************************************/
     if (_account.isRemoteWipeRequested_HACK ()) {
     // <-- FIXME MS@2019-12-07
 

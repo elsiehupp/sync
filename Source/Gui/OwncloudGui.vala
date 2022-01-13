@@ -1,8 +1,27 @@
 /***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+#ifdef WITH_LIBCLOUDPROVIDERS
+#endif
+
+// #include <QQmlApplicationEngine>
+// #include <QDesktopServices>
+// #include <QDir>
+// #include <QMessageBox>
+// #include <QSignalMapper>
+#ifdef WITH_LIBCLOUDPROVIDERS
+// #include <QtDBus/QDBusConnection>
+// #include <QtDBus/QDBusInterface>
+#endif
+
+// #include <QQmlEngine>
+// #include <QQmlComponent>
+// #include <QQmlApplicationEngine>
+// #include <QQuickItem>
+// #include <QQmlContext>
 
 // #include <GLib.Object>
 // #include <QPointer>
@@ -74,12 +93,12 @@ public slots:
     void slotTrayMessageIfServerUnsupported (Account *account);
 
     /***********************************************************
-     * Open a share dialog for a file or folder.
-     *
-     * sharePath is the full remote path to the item,
-     * localPath is the absolute local path to it (so not relative
+    Open a share dialog for a file or folder.
+    
+    sharePath is the full remote path to the item,
+    localPath is the absolute local path to it (so not relative
      * to the folder).
-     */
+    ***********************************************************/
     void slotShowShareDialog (string &sharePath, string &localPath, ShareDialogStartPage startPage);
 
     void slotRemoveDestroyedShareDialogs ();
@@ -116,30 +135,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-#ifdef WITH_LIBCLOUDPROVIDERS
-#endif
-
-// #include <QQmlApplicationEngine>
-// #include <QDesktopServices>
-// #include <QDir>
-// #include <QMessageBox>
-// #include <QSignalMapper>
-#ifdef WITH_LIBCLOUDPROVIDERS
-// #include <QtDBus/QDBusConnection>
-// #include <QtDBus/QDBusInterface>
-#endif
-
-// #include <QQmlEngine>
-// #include <QQmlComponent>
-// #include <QQmlApplicationEngine>
-// #include <QQuickItem>
-// #include <QQmlContext>
 
 namespace Occ {
 

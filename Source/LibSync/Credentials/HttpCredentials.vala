@@ -2,8 +2,21 @@
 Copyright (C) by Klaas Freitag <freitag@kde.org>
 Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QLoggingCategory>
+// #include <QMutex>
+// #include <QNetworkReply>
+// #include <QSettings>
+// #include <QSslKey>
+// #include <QJsonObject>
+// #include <QJsonDocument>
+// #include <QBuffer>
+
+// #include <qt5keychain/keychain.h>
+
+// #include <QAuthenticator>
 
 // #include <QMap>
 // #include <QSslCertificate>
@@ -15,6 +28,18 @@ namespace QKeychain {
 }
 
 namespace Occ {
+
+
+namespace {
+    const char userC[] = "user";
+    const char isOAuthC[] = "oauth";
+    const char clientCertBundleC[] = "clientCertPkcs12";
+    const char clientCertPasswordC[] = "_clientCertPassword";
+    const char clientCertificatePEMC[] = "_clientCertificatePEM";
+    const char clientKeyPEMC[] = "_clientKeyPEM";
+    const char authenticationFailedC[] = "owncloud-authentication-failed";
+    const char needRetryC[] = "owncloud-need-retry";
+} // ns
 
 /***********************************************************
    The authentication system is this way because of Shibboleth.
@@ -79,8 +104,8 @@ public:
     virtual bool sslIsTrusted () { return false; }
 
     /* If we still have a valid refresh token, try to refresh it assynchronously and emit fetched ()
-     * otherwise return false
-     */
+    otherwise return false
+    ***********************************************************/
     bool refreshAccessToken ();
 
     // To fetch the user name as early as possible
@@ -109,32 +134,35 @@ private slots:
     void slotWriteJobDone (QKeychain.Job *);
 
 protected:
-    /** Reads data from keychain locations
-     *
-     * Goes through
-     *   slotReadClientCertPEMJobDone to
-     *   slotReadClientCertPEMJobDone to
-     *   slotReadJobDone
-     */
+    /***********************************************************
+    Reads data from keychain locations
+
+    Goes through
+      slotReadClientCertPEMJobDone to
+      slotReadClientCertPEMJobDone to
+      slotReadJobDone
+    ***********************************************************/
     void fetchFromKeychainHelper ();
 
     /// Wipes legacy keychain locations
     void deleteOldKeychainEntries ();
 
-    /** Whether to bow out now because a retry will happen later
-     *
-     * Sometimes the keychain needs a while to become available.
-     * This function should be called on first keychain-read to check
-     * whether it errored because the keychain wasn't available yet.
-     * If that happens, this function will schedule another try and
-     * return true.
-     */
+    /***********************************************************
+    Whether to bow out now because a retry will happen later
+
+    Sometimes the keychain needs a while to become available.
+    This function should be called on first keychain-read to check
+    whether it errored because the keychain wasn't available yet.
+    If that happens, this function will schedule another try and
+    return true.
+    ***********************************************************/
     bool keychainUnavailableRetryLater (QKeychain.ReadPasswordJob *);
 
-    /** Takes client cert pkcs12 and unwraps the key/cert.
-     *
-     * Returns false on failure.
-     */
+    /***********************************************************
+    Takes client cert pkcs12 and unwraps the key/cert.
+
+    Returns false on failure.
+    ***********************************************************/
     bool unpackClientCertBundle ();
 
     string _user;
@@ -155,49 +183,7 @@ protected:
     QVector<QPointer<AbstractNetworkJob>> _retryQueue; // Jobs we need to retry once the auth token is fetched
 };
 
-} // namespace Occ
 
-#endif
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@kde.org>
-Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QLoggingCategory>
-// #include <QMutex>
-// #include <QNetworkReply>
-// #include <QSettings>
-// #include <QSslKey>
-// #include <QJsonObject>
-// #include <QJsonDocument>
-// #include <QBuffer>
-
-// #include <qt5keychain/keychain.h>
-
-// #include <QAuthenticator>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcHttpCredentials, "nextcloud.sync.credentials.http", QtInfoMsg)
-    
-    namespace {
-        const char userC[] = "user";
-        const char isOAuthC[] = "oauth";
-        const char clientCertBundleC[] = "clientCertPkcs12";
-        const char clientCertPasswordC[] = "_clientCertPassword";
-        const char clientCertificatePEMC[] = "_clientCertificatePEM";
-        const char clientKeyPEMC[] = "_clientKeyPEM";
-        const char authenticationFailedC[] = "owncloud-authentication-failed";
-        const char needRetryC[] = "owncloud-need-retry";
-    } // ns
     
     class HttpCredentialsAccessManager : AccessManager {
     public:

@@ -1,8 +1,12 @@
 /***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <GLib.Object>
+// #include <QMetaType>
+// #include <QCoreApplication>
 
 // #include <GLib.Object>
 // #include <QHash>
@@ -21,12 +25,14 @@ class ProgressInfo : GLib.Object {
 public:
     ProgressInfo ();
 
-    /** Resets for a new sync run.
-     */
+    /***********************************************************
+    Resets for a new sync run.
+    ***********************************************************/
     void reset ();
 
-    /** Records the status of the sync run
-     */
+    /***********************************************************
+    Records the status of the sync run
+    ***********************************************************/
     enum Status {
         /// Emitted once at start
         Starting,
@@ -55,24 +61,24 @@ public:
     Status status ();
 
     /***********************************************************
-     * Called when propagation starts.
-     *
+    Called when propagation starts.
+    
      * isUpdatingEstimates () will return true afterwards.
-     */
+    ***********************************************************/
     void startEstimateUpdates ();
 
     /***********************************************************
-     * Returns true when startEstimateUpdates () was called.
-     *
-     * This is used when the SyncEngine wants to indicate a new sync
-     * is about to start via the transmissionProgress () signal. The
+    Returns true when startEstimateUpdates () was called.
+    
+    This is used when the SyncEngine wants to indicate a new sync
+    is about to start via the transmissionProgress () signal. The
      * first ProgressInfo will have isUpdatingEstimates () == false.
-     */
+    ***********************************************************/
     bool isUpdatingEstimates ();
 
     /***********************************************************
-     * Increase the file and size totals by the amount indicated in item.
-     */
+    Increase the file and size totals by the amount indicated in item.
+    ***********************************************************/
     void adjustTotalsForFile (SyncFileItem &item);
 
     int64 totalFiles ();
@@ -81,10 +87,12 @@ public:
     int64 totalSize ();
     int64 completedSize ();
 
-    /** Number of a file that is currently in progress. */
+    /***********************************************************
+    Number of a file that is currently in progress. */
     int64 currentFile ();
 
-    /** Return true if the size needs to be taken in account in the total amount of time */
+    /***********************************************************
+    Return true if the size needs to be taken in account in the total amount of time */
     static inline bool isSizeDependent (SyncFileItem &item) {
         return !item.isDirectory ()
             && (item._instruction == CSYNC_INSTRUCTION_CONFLICT
@@ -96,8 +104,8 @@ public:
     }
 
     /***********************************************************
-     * Holds estimates about progress, returned to the user.
-     */
+    Holds estimates about progress, returned to the user.
+    ***********************************************************/
     struct Estimates {
         /// Estimated completion amount per second. (of bytes or files)
         int64 estimatedBandwidth;
@@ -107,9 +115,9 @@ public:
     };
 
     /***********************************************************
-     * Holds the current state of something making progress and maintains an
-     * estimate of the current progress per second.
-     */
+    Holds the current state of something making progress and maintains an
+    estimate of the current progress per second.
+    ***********************************************************/
     struct Progress {
         /** Returns the estimates about progress per second and eta. */
         Estimates estimates ();
@@ -163,36 +171,36 @@ public:
     void setProgressItem (SyncFileItem &item, int64 completed);
 
     /***********************************************************
-     * Get the total completion estimate
-     */
+    Get the total completion estimate
+    ***********************************************************/
     Estimates totalProgress ();
 
     /***********************************************************
-     * Get the optimistic eta.
-     *
-     * This value is based on the highest observed transfer bandwidth
+    Get the optimistic eta.
+    
+    This value is based on the highest observed transfer bandwidth
      * and files-per-second speed.
-     */
+    ***********************************************************/
     uint64 optimisticEta ();
 
     /***********************************************************
-     * Whether the remaining-time estimate is trusted.
-     *
-     * We don't trust it if it is hugely above the optimistic estimate.
+    Whether the remaining-time estimate is trusted.
+    
+    We don't trust it if it is hugely above the optimistic estimate.
      * See #5046.
-     */
+    ***********************************************************/
     bool trustEta ();
 
     /***********************************************************
-     * Get the current file completion estimate structure
-     */
+    Get the current file completion estimate structure
+    ***********************************************************/
     Estimates fileProgress (SyncFileItem &item) const;
 
 private slots:
     /***********************************************************
-     * Called every second once started, this function updates the
-     * estimates.
-     */
+    Called every second once started, this function updates the
+    estimates.
+    ***********************************************************/
     void updateEstimates ();
 
 private:
@@ -223,7 +231,8 @@ namespace Progress {
     bool isIgnoredKind (SyncFileItem.Status);
 }
 
-/** Type of error
+/***********************************************************
+Type of error
 
 Used for ProgressDispatcher.syncError. May trigger error interactivity
 in IssuesWidget.
@@ -256,30 +265,30 @@ signals:
       @param[out]  folder The folder which is being processed
       @param[out]  progress   A struct with all progress info.
 
-     */
+    ***********************************************************/
     void progressInfo (string &folder, ProgressInfo &progress);
     /***********************************************************
-     * @brief : the item was completed by a job
-     */
+    @brief : the item was completed by a job
+    ***********************************************************/
     void itemCompleted (string &folder, SyncFileItemPtr &item);
 
     /***********************************************************
-     * @brief A new folder-wide sync error was seen.
-     */
+    @brief A new folder-wide sync error was seen.
+    ***********************************************************/
     void syncError (string &folder, string &message, ErrorCategory category);
 
     /***********************************************************
-     * @brief Emitted when an error needs to be added into GUI
-     * @param[out] folder The folder which is being processed
-     * @param[out] status of the error
-     * @param[out] full error message
-     * @param[out] subject (optional)
-     */
+    @brief Emitted when an error needs to be added into GUI
+    @param[out] folder The folder which is being processed
+    @param[out] status of the error
+    @param[out] full error message
+    @param[out] subject (optional)
+    ***********************************************************/
     void addErrorToGui (string &folder, SyncFileItem.Status status, string &errorMessage, string &subject);
 
     /***********************************************************
-     * @brief Emitted for a folder when a sync is done, listing all pending conflicts
-     */
+    @brief Emitted for a folder when a sync is done, listing all pending conflicts
+    ***********************************************************/
     void folderConflicts (string &folder, QStringList &conflictPaths);
 
 protected:
@@ -304,15 +313,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <GLib.Object>
-// #include <QMetaType>
-// #include <QCoreApplication>
 
 namespace Occ {
 

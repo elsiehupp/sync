@@ -1,8 +1,26 @@
 /***********************************************************
 Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <iostream>
+// #include <random>
+
+#if defined (BUILD_UPDATER)
+#endif
+
+#if defined (WITH_CRASHREPORTER)
+// #include <libcrashreporter-handler/Handler.h>
+#endif
+
+// #include <QTranslator>
+// #include <QMenu>
+// #include <QMessageBox>
+// #include <QDesktopServices>
+// #include <QGuiApplication>
 
 // #include <QApplication>
 // #include <QPointer>
@@ -46,9 +64,9 @@ public slots:
     void slotownCloudWizardDone (int);
     void slotCrash ();
     /***********************************************************
-     * Will download a virtual file, and open the result.
-     * The argument is the filename of the virtual file (including the extension)
-     */
+    Will download a virtual file, and open the result.
+    The argument is the filename of the virtual file (including the extension)
+    ***********************************************************/
     void openVirtualFile (string &filename);
 
     /// Attempt to show () the tray icon again. Used if no systray was available initially.
@@ -79,9 +97,9 @@ private:
     void setHelp ();
 
     /***********************************************************
-     * Maybe a newer version of the client was used with this config file:
-     * if so, backup, confirm with user and remove the config that can't be read.
-     */
+    Maybe a newer version of the client was used with this config file:
+    if so, backup, confirm with user and remove the config that can't be read.
+    ***********************************************************/
     bool configVersionMigration ();
 
     QPointer<OwncloudGui> _gui;
@@ -116,44 +134,7 @@ private:
     QScopedPointer<FolderMan> _folderManager;
 };
 
-} // namespace Occ
 
-
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <iostream>
-// #include <random>
-
-#if defined (BUILD_UPDATER)
-#endif
-
-#if defined (WITH_CRASHREPORTER)
-// #include <libcrashreporter-handler/Handler.h>
-#endif
-
-// #include <QTranslator>
-// #include <QMenu>
-// #include <QMessageBox>
-// #include <QDesktopServices>
-// #include <QGuiApplication>
-
-
-namespace Occ {
-
-Q_LOGGING_CATEGORY (lcApplication, "nextcloud.gui.application", QtInfoMsg)
 
 namespace {
 

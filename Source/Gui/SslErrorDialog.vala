@@ -1,8 +1,12 @@
 /***********************************************************
 Copyright (C) by Klaas Freitag <freitag@kde.org>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QtGui>
+// #include <QtNetwork>
+// #include <QtWidgets>
 
 // #include <QtCore>
 // #include <Gtk.Dialog>
@@ -48,33 +52,7 @@ private:
     Ui.SslErrorDialog *_ui;
     AccountPtr _account;
 };
-} // end namespace
 
-
-
-
-
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@kde.org>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QtGui>
-// #include <QtNetwork>
-// #include <QtWidgets>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcSslErrorDialog, "nextcloud.gui.sslerrordialog", QtInfoMsg)
-    
     namespace Utility {
         //  Used for QSSLCertificate.subjectInfo which returns a QStringList in Qt5, but a string in Qt4
         string escape (QStringList &l) { return escape (l.join (';')); }

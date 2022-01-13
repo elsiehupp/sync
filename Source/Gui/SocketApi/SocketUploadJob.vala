@@ -1,8 +1,14 @@
 /***********************************************************
 Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QFileInfo>
+// #include <QJsonArray>
+// #include <QRegularExpression>
+
+using namespace Occ;
 
 // #pragma once
 // #include <GLib.Object>
@@ -35,17 +41,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QFileInfo>
-// #include <QJsonArray>
-// #include <QRegularExpression>
-
-using namespace Occ;
 
 SocketUploadJob.SocketUploadJob (QSharedPointer<SocketApiJobV2> &job)
     : _apiJob (job) {

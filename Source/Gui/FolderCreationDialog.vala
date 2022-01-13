@@ -1,8 +1,14 @@
 /***********************************************************
 Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <limits>
+
+// #include <QDir>
+// #include <QMessageBox>
+// #include <QLoggingCategory>
 
 // #include <Gtk.Dialog>
 
@@ -28,30 +34,7 @@ private:
     string _destination;
 };
 
-}
 
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <limits>
-
-// #include <QDir>
-// #include <QMessageBox>
-// #include <QLoggingCategory>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcFolderCreationDialog, "nextcloud.gui.foldercreationdialog", QtInfoMsg)
-    
     FolderCreationDialog.FolderCreationDialog (string &destination, Gtk.Widget *parent)
         : Gtk.Dialog (parent)
         , ui (new Ui.FolderCreationDialog)

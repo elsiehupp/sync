@@ -1,8 +1,10 @@
 /***********************************************************
 Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QJsonDocument>
 
 
 namespace Occ {
@@ -18,17 +20,17 @@ public:
     OcsShareeJob (AccountPtr account);
 
     /***********************************************************
-     * Get a list of sharees
-     *
+    Get a list of sharees
+    
      * @param path Path to request shares for (default all shares)
-     */
+    ***********************************************************/
     void getSharees (string &search, string &itemType, int page = 1, int perPage = 50, bool lookup = false);
 signals:
     /***********************************************************
-     * Result of the OCS request
-     *
+    Result of the OCS request
+    
      * @param reply The reply
-     */
+    ***********************************************************/
     void shareeJobFinished (QJsonDocument &reply);
 
 private slots:
@@ -42,13 +44,6 @@ private slots:
 
 
 
-/***********************************************************
-Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QJsonDocument>
 
 namespace Occ {
 

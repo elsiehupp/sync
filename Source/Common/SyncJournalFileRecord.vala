@@ -20,12 +20,13 @@ public:
         return !_path.isEmpty ();
     }
 
-    /** Returns the numeric part of the full id in _fileId.
-     *
-     * On the server this is sometimes known as the internal file id.
-     *
+    /***********************************************************
+    Returns the numeric part of the full id in _fileId.
+
+    On the server this is sometimes known as the internal file id.
+    
      * It is used in the construction of private links.
-     */
+    ***********************************************************/
     QByteArray numericFileId ();
     QDateTime modDateTime () { return Utility.qDateTimeFromTime_t (_modtime); }
 
@@ -88,7 +89,8 @@ public:
     bool isValid ();
 };
 
-/** Represents a conflict in the conflicts table.
+/***********************************************************
+Represents a conflict in the conflicts table.
 
 In the following the "conflict file" is the file that has the conflict
 tag in the filename, and the base file is the file that it's a conflict for.
@@ -97,52 +99,43 @@ So if "a/foo.txt" is the base file, its conflict file could be
 ***********************************************************/
 class ConflictRecord {
 public:
-    /** Path to the file with the conflict tag in the name
-     *
-     * The path is sync-folder relative.
-     */
+    /***********************************************************
+    Path to the file with the conflict tag in the name
+
+    The path is sync-folder relative.
+    ***********************************************************/
     QByteArray path;
 
     /// File id of the base file
     QByteArray baseFileId;
 
-    /** Modtime of the base file
-     *
-     * may not be available and be -1
-     */
+    /***********************************************************
+    Modtime of the base file
+
+    may not be available and be -1
+    ***********************************************************/
     int64 baseModtime = -1;
 
-    /** Etag of the base file
-     *
-     * may not be available and empty
-     */
+    /***********************************************************
+    Etag of the base file
+
+    may not be available and empty
+    ***********************************************************/
     QByteArray baseEtag;
 
     /***********************************************************
-     * The path of the original file at the time the conflict was created
-     *
-     * Note that in nearly all cases one should query the db by baseFileId and
-     * thus retrieve the *current* base path instead!
-     *
+    The path of the original file at the time the conflict was created
+    
+    Note that in nearly all cases one should query 
+    thus retrieve the *current* base path instead!
+
      * maybe be empty if not available
-     */
+    ***********************************************************/
     QByteArray initialBasePath;
 
     bool isValid () { return !path.isEmpty (); }
 };
-}
 
-
-
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<LGPLv2.1-or-later-Boilerplate>
-***********************************************************/
-
-namespace Occ {
 
     QByteArray SyncJournalFileRecord.numericFileId () {
         // Use the id up until the first non-numeric character

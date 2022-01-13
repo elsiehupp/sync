@@ -124,32 +124,35 @@ enum ItemType {
     ItemTypeDirectory = 2,
     ItemTypeSkip = 3,
 
-    /** The file is a dehydrated placeholder, meaning data isn't available locally */
+    /***********************************************************
+    The file is a dehydrated placeholder, meaning data isn't available locally */
     ItemTypeVirtualFile = 4,
 
-    /** A ItemTypeVirtualFile that wants to be hydrated.
-     *
-     * Actions may put this in the db as a request to a future sync, such as
-     * implicit hydration (when the user wants to access file data) when using
-     * suffix vfs. For pin-state driven hydrations changing the database is
-     * not necessary.
-     *
-     * For some vfs plugins the placeholder files on disk may be marked for
-     * (de-)hydration (like with a file attribute) and then the local discovery
-     * will return this item type.
-     *
-     * The discovery will also use this item type to mark entries for hydration
+    /***********************************************************
+    A ItemTypeVirtualFile that wants to be hydrated.
+
+    Actions may put this in the db as a request to a future sync, such as
+    implicit hydration (when the user wants to access file data) when using
+    suffix vfs. For pin-state driven hydrations changing the database is
+    not necessary.
+    
+    For some vfs plugins the placeholder files on disk may be marked for
+    (de-)hydration (like with a 
+    will return this item type.
+    
+    The discovery will also use this item type to mark entries for hydration
      * if an item's pin state mandates it, such as when encountering a AlwaysLocal
      * file that is dehydrated.
-     */
+    ***********************************************************/
     ItemTypeVirtualFileDownload = 5,
 
-    /** A ItemTypeFile that wants to be dehydrated.
-     *
-     * Similar to ItemTypeVirtualFileDownload, but there's currently no situation
-     * where it's stored in the database since there is no action that triggers a
-     * file dehydration without changing the pin state.
-     */
+    /***********************************************************
+    A ItemTypeFile that wants to be dehydrated.
+
+    Similar to ItemTypeVirtualFileDownload, but there's currently no situation
+    where it's stored in the database since there is no action that triggers a
+    file dehydration without changing the pin state.
+    ***********************************************************/
     ItemTypeVirtualFileDehydration = 6,
 };
 Q_ENUM_NS (ItemType)
@@ -201,7 +204,6 @@ struct OCSYNC_EXPORT csync_file_stat_s {
 /***********************************************************
 }@
 ***********************************************************/
-#endif /* _CSYNC_H */
 /* vim : set ft=c.doxygen ts=8 sw=2 et cindent : */
 
 

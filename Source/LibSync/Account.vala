@@ -1,8 +1,33 @@
 /***********************************************************
 Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <deletejob.h>
+
+// #include <QLoggingCategory>
+// #include <QNetworkReply>
+// #include <QNetworkAccessManager>
+// #include <QSslSocket>
+// #include <QNetworkCookieJar>
+// #include <QNetworkProxy>
+
+// #include <QFileInfo>
+// #include <QDir>
+// #include <QSslKey>
+// #include <QAuthenticator>
+// #include <QStandardPaths>
+// #include <QJsonDocument>
+// #include <QJsonObject>
+// #include <QJsonArray>
+// #include <QLoggingCategory>
+// #include <QHttpMultiPart>
+
+// #include <qsslconfiguration.h>
+// #include <qt5keychain/keychain.h>
+
+using namespace QKeychain;
 
 // #include <QByteArray>
 // #include <QUrl>
@@ -19,11 +44,22 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QPixmap>
 #endif
 
+Q_DECLARE_METATYPE (Occ.AccountPtr)
+Q_DECLARE_METATYPE (Occ.Account *)
+
+const char app_password[] = "_app-password";
+
 // #include <memory>
 
 class QNetworkAccessManager;
 
 namespace QKeychain {
+}
+
+
+namespace {
+    constexpr int pushNotificationsReconnectInterval = 1000 * 60 * 2;
+    constexpr int usernamePrefillServerVersinMinSupportedMajor = 24;
 }
 
 namespace Occ {
@@ -61,11 +97,11 @@ public:
     AccountPtr sharedFromThis ();
 
     /***********************************************************
-     * The user that can be used in dav url.
-     *
-     * This can very well be different frome the login user that's
+    The user that can be used in dav url.
+    
+    This can very well be different frome the login user that's
      * stored in credentials ().user ().
-     */
+    ***********************************************************/
     string davUser ();
     void setDavUser (string &newDavUser);
 
@@ -83,7 +119,8 @@ public:
     /// The internal id of the account.
     string id ();
 
-    /** Server url of the account */
+    /***********************************************************
+    Server url of the account */
     void setUrl (QUrl &url);
     QUrl url () { return _url; }
 
@@ -91,32 +128,36 @@ public:
     void setUserVisibleHost (string &host);
 
     /***********************************************************
-     * @brief The possibly themed dav path for the account. It has
-     *        a trailing slash.
-     * @returns the (themeable) dav path for the account.
-     */
+    @brief The possibly themed dav path for the account. It has
+           a trailing slash.
+    @returns the (themeable) dav path for the account.
+    ***********************************************************/
     string davPath ();
 
-    /** Returns webdav entry URL, based on url () */
+    /***********************************************************
+    Returns webdav entry URL, based on url () */
     QUrl davUrl ();
 
-    /** Returns the legacy permalink url for a file.
-     *
-     * This uses the old way of manually building the url. New code should
-     * use the "privatelink" property accessible via PROPFIND.
-     */
+    /***********************************************************
+    Returns the legacy permalink url for a file.
+
+    This uses the old way of manually building the url. New code should
+    use the "privatelink" property accessible via PROPFIND.
+    ***********************************************************/
     QUrl deprecatedPrivateLinkUrl (QByteArray &numericFileId) const;
 
-    /** Holds the accounts credentials */
+    /***********************************************************
+    Holds the accounts credentials */
     AbstractCredentials *credentials ();
     void setCredentials (AbstractCredentials *cred);
 
-    /** Create a network request on the account's QNAM.
-     *
-     * Network requests in AbstractNetworkJobs are created through
-     * this function. Other places should prefer to use jobs or
-     * sendRequest ().
-     */
+    /***********************************************************
+    Create a network request on the account's QNAM.
+
+    Network requests in AbstractNetworkJobs are created through
+    this function. Other places should prefer to use jobs or
+    sendRequest ().
+    ***********************************************************/
     QNetworkReply *sendRawRequest (QByteArray &verb,
         const QUrl &url,
         QNetworkRequest req = QNetworkRequest (),
@@ -128,16 +169,18 @@ public:
     QNetworkReply *sendRawRequest (QByteArray &verb,
         const QUrl &url, QNetworkRequest req, QHttpMultiPart *data);
 
-    /** Create and start network job for a simple one-off request.
-     *
-     * More complicated requests typically create their own job types.
-     */
+    /***********************************************************
+    Create and start network job for a simple one-off request.
+
+    More complicated requests typically create their own job types.
+    ***********************************************************/
     SimpleNetworkJob *sendRequest (QByteArray &verb,
         const QUrl &url,
         QNetworkRequest req = QNetworkRequest (),
         QIODevice *data = nullptr);
 
-    /** The ssl configuration during the first connection */
+    /***********************************************************
+    The ssl configuration during the first connection */
     QSslConfiguration getOrCreateSslConfig ();
     QSslConfiguration sslConfiguration () { return _sslConfiguration; }
     void setSslConfiguration (QSslConfiguration &config);
@@ -146,7 +189,8 @@ public:
     QByteArray _sessionTicket;
     QList<QSslCertificate> _peerCertificateChain;
 
-    /** The certificates of the account */
+    /***********************************************************
+    The certificates of the account */
     QList<QSslCertificate> approvedCerts () { return _approvedCerts; }
     void setApprovedCerts (QList<QSslCertificate> certs);
     void addApprovedCerts (QList<QSslCertificate> certs);
@@ -163,46 +207,52 @@ public:
     QVariant credentialSetting (string &key) const;
     void setCredentialSetting (string &key, QVariant &value);
 
-    /** Assign a client certificate */
+    /***********************************************************
+    Assign a client certificate */
     void setCertificate (QByteArray certficate = QByteArray (), string privateKey = string ());
 
-    /** Access the server capabilities */
+    /***********************************************************
+    Access the server capabilities */
     const Capabilities &capabilities ();
     void setCapabilities (QVariantMap &caps);
 
-    /** Access the server version
-     *
-     * For servers >= 10.0.0, this can be the empty string until capabilities
-     * have been received.
-     */
+    /***********************************************************
+    Access the server version
+
+    For servers >= 10.0.0, this can be the empty string until capabilities
+    have been received.
+    ***********************************************************/
     string serverVersion ();
 
-    /** Server version for easy comparison.
-     *
-     * Example : serverVersionInt () >= makeServerVersion (11, 2, 3)
-     *
+    /***********************************************************
+    Server version for easy comparison.
+
+    Example : serverVersionInt () >= makeServerVersion (11, 2, 3)
+    
      * Will be 0 if the version is not available yet.
-     */
+    ***********************************************************/
     int serverVersionInt ();
 
     static int makeServerVersion (int majorVersion, int minorVersion, int patchVersion);
     void setServerVersion (string &version);
 
-    /** Whether the server is too old.
-     *
-     * Not supporting server versions is a gradual process. There's a hard
-     * compatibility limit (see ConnectionValidator) that forbids connecting
-     * to extremely old servers. And there's a weak "untested, not
-     * recommended, potentially dangerous" limit, that users might want
-     * to go beyond.
-     *
+    /***********************************************************
+    Whether the server is too old.
+
+    Not supporting server versions is a gradual process. There's a hard
+    compatibility limit (see ConnectionValidator) that forbids connecting
+    to extremely old servers. And there's a weak "untested, not
+    recommended, potentially dangerous" limit, that users might want
+    to go beyond.
+    
      * This function returns true if the server is beyond the weak limit.
-     */
+    ***********************************************************/
     bool serverVersionUnsupported ();
 
     bool isUsernamePrefillSupported ();
 
-    /** True when the server connection is using HTTP2  */
+    /***********************************************************
+    True when the server connection is using HTTP2  */
     bool isHttp2Supported () { return _http2Supported; }
     void setHttp2Supported (bool value) { _http2Supported = value; }
 
@@ -293,12 +343,13 @@ private:
     QMap<string, QVariant> _settingsMap;
     QUrl _url;
 
-    /** If url to use for any user-visible urls.
-     *
-     * If the server configures overwritehost this can be different from
-     * the connection url in _url. We retrieve the visible host through
-     * the ocs/v1.php/config endpoint in ConnectionValidator.
-     */
+    /***********************************************************
+    If url to use for any user-visible urls.
+
+    If the server configures overwritehost this can be different from
+    the connection url in _url. We retrieve the visible host through
+    the ocs/v1.php/config endpoint in ConnectionValidator.
+    ***********************************************************/
     QUrl _userVisibleUrl;
 
     QList<QSslCertificate> _approvedCerts;
@@ -330,12 +381,12 @@ private:
     std.shared_ptr<UserStatusConnector> _userStatusConnector;
 
     /* IMPORTANT - remove later - FIXME MS@2019-12-07 -.
-     * TODO : For "Log out" & "Remove account" : Remove client CA certs and KEY!
-     *
-     *       Disabled as long as selecting another cert is not supported by the UI.
-     *
+    TODO : For "Log out" & "Remove account" : Remove client CA certs and KEY!
+    
+          Disabled as long as selecting another cert is not supported by the UI.
+    
      *       Being able to specify a new certificate is important anyway : expiry etc.
-     *
+
      *       We introduce this dirty hack here, to allow deleting them upon Remote Wipe.
     */
     public:
@@ -345,61 +396,6 @@ private:
         bool _isRemoteWipeRequested_HACK = false;
     // <-- FIXME MS@2019-12-07
 };
-}
-
-Q_DECLARE_METATYPE (Occ.AccountPtr)
-Q_DECLARE_METATYPE (Occ.Account *)
-
-#endif //SERVERCONNECTION_H
-
-
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <deletejob.h>
-
-// #include <QLoggingCategory>
-// #include <QNetworkReply>
-// #include <QNetworkAccessManager>
-// #include <QSslSocket>
-// #include <QNetworkCookieJar>
-// #include <QNetworkProxy>
-
-// #include <QFileInfo>
-// #include <QDir>
-// #include <QSslKey>
-// #include <QAuthenticator>
-// #include <QStandardPaths>
-// #include <QJsonDocument>
-// #include <QJsonObject>
-// #include <QJsonArray>
-// #include <QLoggingCategory>
-// #include <QHttpMultiPart>
-
-// #include <qsslconfiguration.h>
-// #include <qt5keychain/keychain.h>
-
-using namespace QKeychain;
-
-namespace {
-constexpr int pushNotificationsReconnectInterval = 1000 * 60 * 2;
-constexpr int usernamePrefillServerVersinMinSupportedMajor = 24;
-}
-
-namespace Occ {
-
-Q_LOGGING_CATEGORY (lcAccount, "nextcloud.sync.account", QtInfoMsg)
-const char app_password[] = "_app-password";
 
 Account.Account (GLib.Object *parent)
     : GLib.Object (parent)

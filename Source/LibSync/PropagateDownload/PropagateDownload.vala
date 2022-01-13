@@ -1,8 +1,23 @@
 /***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <common/checksums.h>
+// #include <common/asserts.h>
+// #include <common/constants.h>
+
+// #include <QLoggingCategory>
+// #include <QNetworkAccessManager>
+// #include <QFileInfo>
+// #include <QDir>
+// #include <cmath>
+
+#ifdef Q_OS_UNIX
+// #include <unistd.h>
+#endif
+
 // #pragma once
 
 // #include <QBuffer>
@@ -184,14 +199,14 @@ public:
     bool isLikelyFinishedQuickly () override { return _item._size < propagator ().smallFileSize (); }
 
     /***********************************************************
-     * Whether an existing folder with the same name may be deleted before
-     * the download.
-     *
-     * If it's a non-empty folder, it'll be renamed to a conflict-style name
-     * to preserve any non-synced content that may be inside.
-     *
+    Whether an existing folder with the same name may be deleted before
+    the download.
+    
+    If it's a non-empty folder, it'll be renamed to a confl
+    to preserve any non-synced content that may be inside.
+
      * Default : false.
-     */
+    ***********************************************************/
     void setDeleteExistingFolder (bool enabled);
 
 private slots:
@@ -231,41 +246,6 @@ private:
 
     PropagateDownloadEncrypted *_downloadEncryptedHelper = nullptr;
 };
-}
-
-
-
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <common/checksums.h>
-// #include <common/asserts.h>
-// #include <common/constants.h>
-
-// #include <QLoggingCategory>
-// #include <QNetworkAccessManager>
-// #include <QFileInfo>
-// #include <QDir>
-// #include <cmath>
-
-#ifdef Q_OS_UNIX
-// #include <unistd.h>
-#endif
-
-namespace Occ {
-
-Q_LOGGING_CATEGORY (lcGetJob, "nextcloud.sync.networkjob.get", QtInfoMsg)
-Q_LOGGING_CATEGORY (lcPropagateDownload, "nextcloud.sync.propagator.download", QtInfoMsg)
 
 // Always coming in with forward slashes.
 // In csync_excluded_no_ctx we ignore all files with longer than 254 chars
@@ -1039,9 +1019,9 @@ void PropagateDownloadFile.slotGetFinished () {
     _tmpFile.flush ();
 
     /* Check that the size of the GET reply matches the file size. There have been cases
-     * reported that if a server breaks behind a proxy, the GET is still a 200 but is
-     * truncated, as described here : https://github.com/owncloud/mirall/issues/2528
-     */
+    reported that if a server breaks behind a proxy, the GET is still a 200 but is
+    truncated, as described here : https://github.com/owncloud/mirall/issues/2528
+    ***********************************************************/
     const QByteArray sizeHeader ("Content-Length");
     int64 bodySize = job.reply ().rawHeader (sizeHeader).toLongLong ();
     bool hasSizeHeader = !job.reply ().rawHeader (sizeHeader).isEmpty ();

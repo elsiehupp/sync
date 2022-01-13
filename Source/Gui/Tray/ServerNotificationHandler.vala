@@ -1,10 +1,16 @@
-#ifndef NOTIFICATIONHANDLER_H
-const int NOTIFICATIONHANDLER_H
+
 
 // #include <QtCore>
+// #include <QJsonDocument>
+// #include <QJsonObject>
 
 
 namespace Occ {
+
+const string notificationsPath = QLatin1String ("ocs/v2.php/apps/notifications/api/v2/notifications");
+const char propertyAccountStateC[] = "oc_account_state";
+const int successStatusCode = 200;
+const int notModifiedStatusCode = 304;
 
 class ServerNotificationHandler : GLib.Object {
 public:
@@ -25,26 +31,7 @@ private:
     QPointer<JsonApiJob> _notificationJob;
     AccountState *_accountState;
 };
-}
 
-
-
-
-
-
-
-
-// #include <QJsonDocument>
-// #include <QJsonObject>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcServerNotification, "nextcloud.gui.servernotification", QtInfoMsg)
-    
-    const string notificationsPath = QLatin1String ("ocs/v2.php/apps/notifications/api/v2/notifications");
-    const char propertyAccountStateC[] = "oc_account_state";
-    const int successStatusCode = 200;
-    const int notModifiedStatusCode = 304;
     
     ServerNotificationHandler.ServerNotificationHandler (AccountState *accountState, GLib.Object *parent)
         : GLib.Object (parent)

@@ -1,8 +1,15 @@
 /***********************************************************
 Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QFileInfo>
+// #include <QFileIconProvider>
+// #include <QInputDialog>
+// #include <QPointer>
+// #include <QPushButton>
+// #include <QFrame>
 
 // #include <QSharedPointer>
 // #include <QPointer>
@@ -83,18 +90,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QFileInfo>
-// #include <QFileIconProvider>
-// #include <QInputDialog>
-// #include <QPointer>
-// #include <QPushButton>
-// #include <QFrame>
 
 namespace {
     string createRandomPassword () {

@@ -1,12 +1,24 @@
 /***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <pushnotifications.h>
+// #include <syncengine.h>
+
+// #include <QMessageBox>
+// #include <QtCore>
+// #include <QMutableSetIterator>
+// #include <QSet>
+// #include <QNetworkProxy>
 
 // #include <GLib.Object>
 // #include <QQueue>
 // #include <QList>
+
+static const char versionC[] = "version";
+static const int maxFoldersVersion = 1;
 
 
 namespace Occ {
@@ -46,21 +58,24 @@ public:
     int setupFoldersMigration ();
 
     /***********************************************************
-     * Returns a list of keys that can't be read because they are from
-     * future versions.
-     */
+    Returns a list of keys that can't be read because they are from
+    future versions.
+    ***********************************************************/
     static void backwardMigrationSettingsKeys (QStringList *deleteKeys, QStringList *ignoreKeys);
 
     const Folder.Map &map ();
 
-    /** Adds a folder for an account, ensures the journal is gone and saves it in the settings.
+    /***********************************************************
+    Adds a folder for an account, ensures the journal is gone and saves it in the settings.
       */
     Folder *addFolder (AccountState *accountState, FolderDefinition &folderDefinition);
 
-    /** Removes a folder */
+    /***********************************************************
+    Removes a folder */
     void removeFolder (Folder *);
 
-    /** Returns the folder which the file or directory stored in path is in */
+    /***********************************************************
+    Returns the folder which the file or directory stored in path is in */
     Folder *folderForPath (string &path);
 
     /***********************************************************
@@ -70,23 +85,25 @@ public:
       */
     QStringList findFileInLocalFolders (string &relPath, AccountPtr acc);
 
-    /** Returns the folder by alias or \c nullptr if no folder with the alias exists. */
+    /***********************************************************
+    Returns the folder by alias or \c nullptr if no folder with the alias exists. */
     Folder *folder (string &);
 
     /***********************************************************
-     * Migrate accounts from owncloud < 2.0
-     * Creates a folder for a specific configuration, identified by alias.
-     */
+    Migrate accounts from owncloud < 2.0
+    Creates a folder for a specific configuration, identified by alias.
+    ***********************************************************/
     Folder *setupFolderFromOldConfigFile (string &, AccountState *account);
 
     /***********************************************************
-     * Ensures that a given directory does not contain a sync journal file.
-     *
+    Ensures that a given directory does not contain a sync journal file.
+    
      * @returns false if the journal could not be removed, true otherwise.
-     */
+    ***********************************************************/
     static bool ensureJournalGone (string &journalDbFile);
 
-    /** Creates a new and empty local directory. */
+    /***********************************************************
+    Creates a new and empty local directory. */
     bool startFromScratch (string &);
 
     /// Produce text for use in the tray tooltip
@@ -105,74 +122,78 @@ public:
     NavigationPaneHelper &navigationPaneHelper () { return _navigationPaneHelper; }
 
     /***********************************************************
-     * Check if @a path is a valid path for a new folder considering the already sync'ed items.
-     * Make sure that this folder, or any subfolder is not sync'ed already.
-     *
-     * Note that different accounts are allowed to sync to the same folder.
-     *
+    Check if @a path is a valid path for a new folder considering the already sync'ed items.
+    Make sure that this folder, or any subfolder is not sync'ed already.
+    
+    Note that different accounts are allowed to sync to the same folder.
+
      * @returns an empty string if it is allowed, or an error if it is not allowed
-     */
+    ***********************************************************/
     string checkPathValidityForNewFolder (string &path, QUrl &serverUrl = QUrl ()) const;
 
     /***********************************************************
-     * Attempts to find a non-existing, acceptable path for creating a new sync folder.
-     *
-     * Uses \a basePath as the baseline. It'll return this path if it's acceptable.
-     *
-     * Note that this can fail. If someone syncs ~ and \a basePath is ~/ownCloud, no
+    Attempts to find a non-existing, acceptable path for creating a new sync folder.
+    
+    Uses \a basePath as the baseline. It'll return this path if it's acceptable.
+    
+    Note that this can fail. If someone syncs ~ and \a basePath is ~/ownCloud, no
      * subfolder of ~ would be a good candidate. When that happens \a basePath
      * is returned.
-     */
+    ***********************************************************/
     string findGoodPathForNewSyncFolder (string &basePath, QUrl &serverUrl) const;
 
     /***********************************************************
-     * While ignoring hidden files can theoretically be switched per folder,
-     * it's currently a global setting that users can only change for all folders
-     * at once.
-     * These helper functions can be removed once it's properly per-folder.
-     */
+    While ignoring hidden files can theoretically be switched per folder,
+    it's currently a global setting that users can only change for all folders
+    at once.
+    These helper functions can be removed once it's properly per-folder.
+    ***********************************************************/
     bool ignoreHiddenFiles ();
     void setIgnoreHiddenFiles (bool ignore);
 
     /***********************************************************
-     * Access to the current queue of scheduled folders.
-     */
+    Access to the current queue of scheduled folders.
+    ***********************************************************/
     QQueue<Folder> scheduleQueue ();
 
     /***********************************************************
-     * Access to the currently syncing folder.
-     *
-     * Note : This is only the folder that's currently syncing *as-scheduled*. There
-     * may be externally-managed syncs such as from placeholder hydrations.
-     *
+    Access to the currently syncing folder.
+    
+    Note : This is only the folder that's currently syncing *as-scheduled
+    may be externally-managed syncs such as from placeholder hydrations.
+
      * See also isAnySyncRunning ()
-     */
+    ***********************************************************/
     Folder *currentSyncFolder ();
 
     /***********************************************************
-     * Returns true if any folder is currently syncing.
-     *
-     * This might be a FolderMan-scheduled sync, or a externally
+    Returns true if any folder is currently syncing.
+    
+    This might be a FolderMan-scheduled sync, or a externally
      * managed sync like a placeholder hydration.
-     */
+    ***********************************************************/
     bool isAnySyncRunning ();
 
-    /** Removes all folders */
+    /***********************************************************
+    Removes all folders */
     int unloadAndDeleteAllFolders ();
 
     /***********************************************************
-     * If enabled is set to false, no new folders will start to sync.
-     * The current one will finish.
-     */
+    If enabled is set to false, no new folders will start to sync.
+    The current one will finish.
+    ***********************************************************/
     void setSyncEnabled (bool);
 
-    /** Queues a folder for syncing. */
+    /***********************************************************
+    Queues a folder for syncing. */
     void scheduleFolder (Folder *);
 
-    /** Puts a folder in the very front of the queue. */
+    /***********************************************************
+    Puts a folder in the very front of the queue. */
     void scheduleFolderNext (Folder *);
 
-    /** Queues all folders for syncing. */
+    /***********************************************************
+    Queues all folders for syncing. */
     void scheduleAllFolders ();
 
     void setDirtyProxy ();
@@ -187,45 +208,46 @@ signals:
     void folderSyncStateChange (Folder *);
 
     /***********************************************************
-     * Indicates when the schedule queue changes.
-     */
+    Indicates when the schedule queue changes.
+    ***********************************************************/
     void scheduleQueueChanged ();
 
     /***********************************************************
-     * Emitted whenever the list of configured folders changes.
-     */
+    Emitted whenever the list of configured folders changes.
+    ***********************************************************/
     void folderListChanged (Folder.Map &);
 
     /***********************************************************
-     * Emitted once slotRemoveFoldersForAccount is done wiping
-     */
+    Emitted once slotRemoveFoldersForAccount is done wiping
+    ***********************************************************/
     void wipeDone (AccountState *account, bool success);
 
 public slots:
 
     /***********************************************************
-     * Schedules folders of newly connected accounts, terminates and
-     * de-schedules folders of disconnected accounts.
-     */
+    Schedules folders of newly connected accounts, terminates and
+    de-schedules folders of disconnected accounts.
+    ***********************************************************/
     void slotAccountStateChanged ();
 
     /***********************************************************
-     * restart the client as soon as it is possible, ie. no folders syncing.
-     */
+    restart the client as soon as it is possible, ie. no folders syncing.
+    ***********************************************************/
     void slotScheduleAppRestart ();
 
     /***********************************************************
-     * Triggers a sync run once the lock on the given file is removed.
-     *
-     * Automatically detemines the folder that's responsible for the file.
+    Triggers a sync run once the lock on the given file is removed.
+    
+    Automatically detemines the folder that's responsible for the file.
      * See slotWatchedFileUnlocked ().
-     */
+    ***********************************************************/
     void slotSyncOnceFileUnlocks (string &path);
 
     // slot to schedule an ETag job (from Folder only)
     void slotScheduleETagJob (string &alias, RequestEtagJob *job);
 
-    /** Wipe folder */
+    /***********************************************************
+    Wipe folder */
     void slotWipeFolderForAccount (AccountState *accountState);
 
 private slots:
@@ -252,19 +274,19 @@ private slots:
     void slotServerVersionChanged (Account *account);
 
     /***********************************************************
-     * A file whose locks were being monitored has become unlocked.
-     *
-     * This schedules the folder for synchronization that contains
+    A file whose locks were being monitored has become unlocked.
+    
+    This schedules the folder for synchronization that contains
      * the file with the given path.
-     */
+    ***********************************************************/
     void slotWatchedFileUnlocked (string &path);
 
     /***********************************************************
-     * Schedules folders whose time to sync has come.
-     *
-     * Either because a long time has passed since the last sync or
+    Schedules folders whose time to sync has come.
+    
+    Either because a long time has passed since the last sync or
      * because of previous failures.
-     */
+    ***********************************************************/
     void slotScheduleFolderByTime ();
 
     void slotSetupPushNotifications (Folder.Map &);
@@ -272,8 +294,9 @@ private slots:
     void slotConnectToPushNotifications (Account *account);
 
 private:
-    /** Adds a new folder, does not add it to the account settings and
-     *  does not set an account on the new folder.
+    /***********************************************************
+    Adds a new folder, does not add it to the account settings and
+     does not set an account on the new folder.
       */
     Folder *addFolderInternal (FolderDefinition folderDefinition,
         AccountState *accountState, std.unique_ptr<Vfs> vfs);
@@ -281,7 +304,8 @@ private:
     /* unloads a folder object, does not delete it */
     void unloadFolder (Folder *);
 
-    /** Will start a sync after a bit of delay. */
+    /***********************************************************
+    Will start a sync after a bit of delay. */
     void startScheduledSyncSoon ();
 
     // finds all folder configuration files
@@ -340,36 +364,6 @@ private:
     friend class Occ.Application;
     friend class .TestFolderMan;
 };
-
-} // namespace Occ
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <pushnotifications.h>
-// #include <syncengine.h>
-
-// #include <QMessageBox>
-// #include <QtCore>
-// #include <QMutableSetIterator>
-// #include <QSet>
-// #include <QNetworkProxy>
-
-static const char versionC[] = "version";
-static const int maxFoldersVersion = 1;
-
-namespace Occ {
-
-Q_LOGGING_CATEGORY (lcFolderMan, "nextcloud.gui.folder.manager", QtInfoMsg)
 
 FolderMan *FolderMan._instance = nullptr;
 

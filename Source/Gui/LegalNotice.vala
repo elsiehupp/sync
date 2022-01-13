@@ -1,7 +1,7 @@
 /***********************************************************
 Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 // #include <Gtk.Dialog>
@@ -40,11 +40,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
 
 namespace Occ {
 

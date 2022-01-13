@@ -1,8 +1,12 @@
 /***********************************************************
 Copyright (C) by Michael Schuster <michael@schuster.ms>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QApplication>
+
+using namespace QKeychain;
 
 // #pragma once
 
@@ -48,15 +52,15 @@ public:
 #endif
 
     /***********************************************************
-     * @return Whether this job autodeletes itself once finished () has been emitted. Default is true.
-     * @see setAutoDelete ()
-     */
+    @return Whether this job autodeletes itself once finished () has been emitted. Default is true.
+    @see setAutoDelete ()
+    ***********************************************************/
     bool autoDelete ();
 
     /***********************************************************
-     * Set whether this job should autodelete itself once finished () has been emitted.
-     * @see autoDelete ()
-     */
+    Set whether this job should autodelete itself once finished () has been emitted.
+    @see autoDelete ()
+    ***********************************************************/
     void setAutoDelete (bool autoDelete);
 
 protected:
@@ -83,17 +87,17 @@ public:
     WriteJob (string &key, QByteArray &data, GLib.Object *parent = nullptr);
 
     /***********************************************************
-     * Call this method to start the job (async).
-     * You should connect some slot to the finished () signal first.
-     *
+    Call this method to start the job (async).
+    You should connect some slot to the finished () signal first.
+    
      * @see QKeychain.Job.start ()
-     */
+    ***********************************************************/
     void start ();
 
     /***********************************************************
-     * Call this method to start the job synchronously.
-     * Awaits completion with no need to connect some slot to the finished () signal first.
-     *
+    Call this method to start the job synchronously.
+    Awaits completion with no need to connect some slot to the finished () signal first.
+    
      * @return Returns true on succeess (QKeychain.NoError).
     */
     bool exec ();
@@ -114,17 +118,17 @@ public:
     ReadJob (string &key, GLib.Object *parent = nullptr);
 
     /***********************************************************
-     * Call this method to start the job (async).
-     * You should connect some slot to the finished () signal first.
-     *
+    Call this method to start the job (async).
+    You should connect some slot to the finished () signal first.
+    
      * @see QKeychain.Job.start ()
-     */
+    ***********************************************************/
     void start ();
 
     /***********************************************************
-     * Call this method to start the job synchronously.
-     * Awaits completion with no need to connect some slot to the finished () signal first.
-     *
+    Call this method to start the job synchronously.
+    Awaits completion with no need to connect some slot to the finished () signal first.
+    
      * @return Returns true on succeess (QKeychain.NoError).
     */
     bool exec ();
@@ -148,17 +152,17 @@ public:
     DeleteJob (string &key, GLib.Object *parent = nullptr);
 
     /***********************************************************
-     * Call this method to start the job (async).
-     * You should connect some slot to the finished () signal first.
-     *
+    Call this method to start the job (async).
+    You should connect some slot to the finished () signal first.
+    
      * @see QKeychain.Job.start ()
-     */
+    ***********************************************************/
     void start ();
 
     /***********************************************************
-     * Call this method to start the job synchronously.
-     * Awaits completion with no need to connect some slot to the finished () signal first.
-     *
+    Call this method to start the job synchronously.
+    Awaits completion with no need to connect some slot to the finished () signal first.
+    
      * @return Returns true on succeess (QKeychain.NoError).
     */
     bool exec ();
@@ -170,35 +174,7 @@ private slots:
     void slotDeleteJobDone (QKeychain.Job *incomingJob);
 }; // class DeleteJob
 
-} // namespace KeychainChunk
 
-} // namespace Occ
-
-
-
-
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Michael Schuster <michael@schuster.ms>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QApplication>
-
-using namespace QKeychain;
-
-namespace Occ {
-
-Q_LOGGING_CATEGORY (lcKeychainChunk, "nextcloud.sync.credentials.keychainchunk", QtInfoMsg)
-
-namespace KeychainChunk {
 
 #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
 static void addSettingsToJob (Account *account, QKeychain.Job *job) {
@@ -210,7 +186,7 @@ static void addSettingsToJob (Account *account, QKeychain.Job *job) {
 #endif
 
 /***********************************************************
-* Job
+Job
 ***********************************************************/
 Job.Job (GLib.Object *parent)
     : GLib.Object (parent) {

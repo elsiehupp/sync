@@ -1,8 +1,10 @@
 /***********************************************************
 Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QLoggingCategory>
 // #pragma once
 
 // #include <GLib.Object>
@@ -43,27 +45,7 @@ private:
     QByteArray _folderToken;
     string _errorString;
 };
-}
 
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QLoggingCategory>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcEncryptFolderJob, "nextcloud.sync.propagator.encryptfolder", QtInfoMsg)
-    
     EncryptFolderJob.EncryptFolderJob (AccountPtr &account, SyncJournalDb *journal, string &path, QByteArray &fileId, GLib.Object *parent)
         : GLib.Object (parent)
         , _account (account)

@@ -1,8 +1,15 @@
 /***********************************************************
 Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QFile>
+// #include <QDateTime>
+// #include <QLoggingCategory>
+// #include <QNetworkCookie>
+// #include <QDataStream>
+// #include <QDir>
 
 // #include <QNetworkCookieJar>
 
@@ -34,30 +41,7 @@ private:
     QList<QNetworkCookie> removeExpired (QList<QNetworkCookie> &cookies);
 };
 
-} // namespace Occ
 
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QFile>
-// #include <QDateTime>
-// #include <QLoggingCategory>
-// #include <QNetworkCookie>
-// #include <QDataStream>
-// #include <QDir>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcCookieJar, "nextcloud.sync.cookiejar", QtInfoMsg)
-    
     namespace {
         const unsigned int JAR_VERSION = 23;
     }

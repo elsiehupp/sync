@@ -2,8 +2,10 @@
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QLoggingCategory>
 
 // // #include <map>
 // #include <QSet>
@@ -63,29 +65,7 @@ private:
     // A directory that starts/ends propagation will in turn increase/decrease its own parent by 1.
     QHash<string, int> _syncCount;
 };
-}
 
-#endif
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QLoggingCategory>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcStatusTracker, "nextcloud.sync.statustracker", QtInfoMsg)
-    
     static int pathCompare ( const string& lhs, string& rhs ) {
         // Should match Utility.fsCasePreserving, we want don't want to pay for the runtime check on every comparison.
         return lhs.compare (rhs, Qt.CaseSensitive);

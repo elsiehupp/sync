@@ -1,8 +1,11 @@
 /***********************************************************
 Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QFileDialog>
+// #include <QMessageBox>
 
 // #include <GLib.Object>
 
@@ -44,25 +47,6 @@ private:
     string _remoteVersionFilename;
 };
 
-} // namespace Occ
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QFileDialog>
-// #include <QMessageBox>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcConflict, "nextcloud.gui.conflictsolver", QtInfoMsg)
-    
     ConflictSolver.ConflictSolver (Gtk.Widget *parent)
         : GLib.Object (parent)
         , _parentWidget (parent) {

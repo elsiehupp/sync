@@ -1,8 +1,10 @@
 /***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QBuffer>
 
 // #include <QVector>
 // #include <QList>
@@ -25,24 +27,24 @@ public:
     NotificationConfirmJob (AccountPtr account);
 
     /***********************************************************
-     * @brief Set the verb and link for the job
-     *
+    @brief Set the verb and link for the job
+    
      * @param verb currently supported GET PUT POST DELETE
-     */
+    ***********************************************************/
     void setLinkAndVerb (QUrl &link, QByteArray &verb);
 
     /***********************************************************
-     * @brief Start the OCS request
-     */
+    @brief Start the OCS request
+    ***********************************************************/
     void start () override;
 
 signals:
 
     /***********************************************************
-     * Result of the OCS request
-     *
+    Result of the OCS request
+    
      * @param reply the reply
-     */
+    ***********************************************************/
     void jobFinished (string reply, int replyCode);
 
 private slots:
@@ -52,32 +54,7 @@ private:
     QByteArray _verb;
     QUrl _link;
 };
-}
 
-#endif // NotificationConfirmJob_H
-
-
-
-
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QBuffer>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcNotificationsJob, "nextcloud.gui.notifications", QtInfoMsg)
-    
     NotificationConfirmJob.NotificationConfirmJob (AccountPtr account)
         : AbstractNetworkJob (account, "") {
         setIgnoreCredentialFailure (true);

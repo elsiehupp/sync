@@ -1,7 +1,7 @@
 /***********************************************************
 Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 // #pragma once
@@ -9,6 +9,8 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 // #include <GLib.Object>
 // #include <string>
 // #include <QNetworkReply>
+// #include <QFileInfo>
+// #include <QLoggingCategory>
 
 namespace Occ {
 
@@ -57,26 +59,6 @@ protected:
 };
 
 }
-
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QFileInfo>
-// #include <QLoggingCategory>
-
-Q_LOGGING_CATEGORY (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED, "nextcloud.sync.propagator.remove.encrypted")
-
-namespace Occ {
 
 AbstractPropagateRemoteDeleteEncrypted.AbstractPropagateRemoteDeleteEncrypted (OwncloudPropagator *propagator, SyncFileItemPtr item, GLib.Object *parent)
     : GLib.Object (parent)

@@ -1,13 +1,18 @@
 /***********************************************************
 Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 // #pragma once
 
 // #include <QWebSocket>
 // #include <QTimer>
+
+namespace {
+    static constexpr int MAX_ALLOWED_FAILED_AUTHENTICATION_ATTEMPTS = 3;
+    static constexpr int PING_INTERVAL = 30 * 1000;
+}
 
 namespace Occ {
 
@@ -20,68 +25,68 @@ public:
     ~PushNotifications () override;
 
     /***********************************************************
-     * Setup push notifications
-     *
+    Setup push notifications
+    
      * This method needs to be called before push notifications can be used.
-     */
+    ***********************************************************/
     void setup ();
 
     /***********************************************************
-     * Set the interval for reconnection attempts
-     *
+    Set the interval for reconnection attempts
+    
      * @param interval Interval in milliseconds.
-     */
+    ***********************************************************/
     void setReconnectTimerInterval (uint32_t interval);
 
     /***********************************************************
-     * Indicates if push notifications ready to use
-     *
+    Indicates if push notifications ready to use
+    
      * Ready to use means connected and authenticated.
-     */
+    ***********************************************************/
     bool isReady ();
 
     /***********************************************************
-     * Set the interval in which the websocket will ping the server if it is still alive.
-     *
-     * If the websocket does not respond in timeoutInterval, the connection will be terminated.
-     *
+    Set the interval in which the websocket will ping the server if it is still alive.
+    
+    If the websocket does not respond in timeoutInterval, the connection will be terminated.
+
      * @param interval Interval in milliseconds.
-     */
+    ***********************************************************/
     void setPingInterval (int interval);
 
 signals:
     /***********************************************************
-     * Will be emitted after a successful connection and authentication
-     */
+    Will be emitted after a successful connection and authentication
+    ***********************************************************/
     void ready ();
 
     /***********************************************************
-     * Will be emitted if files on the server changed
-     */
+    Will be emitted if files on the server changed
+    ***********************************************************/
     void filesChanged (Account *account);
 
     /***********************************************************
-     * Will be emitted if activities have been changed on the server
-     */
+    Will be emitted if activities have been changed on the server
+    ***********************************************************/
     void activitiesChanged (Account *account);
 
     /***********************************************************
-     * Will be emitted if notifications have been changed on the server
-     */
+    Will be emitted if notifications have been changed on the server
+    ***********************************************************/
     void notificationsChanged (Account *account);
 
     /***********************************************************
-     * Will be emitted if push notifications are unable to authenticate
-     *
+    Will be emitted if push notifications are unable to authenticate
+    
      * It's save to call #PushNotifications.setup () after this signal has been emitted.
-     */
+    ***********************************************************/
     void authenticationFailed ();
 
     /***********************************************************
-     * Will be emitted if push notifications are unable to connect or the connection timed out
-     *
+    Will be emitted if push notifications are unable to connect or the connection timed out
+    
      * It's save to call #PushNotifications.setup () after this signal has been emitted.
-     */
+    ***********************************************************/
     void connectionLost ();
 
 private slots:
@@ -125,30 +130,7 @@ private:
     QTimer _pingTimedOutTimer;
     bool _pongReceivedFromWebSocketServer = false;
 };
-}
 
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-namespace {
-    static constexpr int MAX_ALLOWED_FAILED_AUTHENTICATION_ATTEMPTS = 3;
-    static constexpr int PING_INTERVAL = 30 * 1000;
-    }
-    
-    namespace Occ {
-    
-    Q_LOGGING_CATEGORY (lcPushNotifications, "nextcloud.sync.pushnotifications", QtInfoMsg)
-    
     PushNotifications.PushNotifications (Account *account, GLib.Object *parent)
         : GLib.Object (parent)
         , _account (account)

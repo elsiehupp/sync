@@ -1,8 +1,13 @@
 /***********************************************************
 Copyright (C) by Julius Härtl <jus@bitgrid.net>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+// #include <glib.h>
+// #include <gio/gio.h>
+// #include <cloudprovidersproviderexporter.h>
+
+CloudProvidersProviderExporter *_providerExporter;
 
 // #include <GLib.Object>
 
@@ -31,17 +36,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Julius Härtl <jus@bitgrid.net>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <glib.h>
-// #include <gio/gio.h>
-// #include <cloudprovidersproviderexporter.h>
-
-CloudProvidersProviderExporter *_providerExporter;
 
 void on_name_acquired (GDBusConnection *connection, gchar *name, gpointer user_data) {
     Q_UNUSED (name);

@@ -2,8 +2,18 @@
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QDir>
+// #include <QFileDialog>
+// #include <QUrl>
+// #include <QTimer>
+// #include <QStorageInfo>
+// #include <QMessageBox>
+// #include <QJsonObject>
+
+// #include <folderman.h>
 
 // #include <QWizard>
 
@@ -83,29 +93,13 @@ private:
 
 } // namespace Occ
 
-#endif
 
 
 
 
 
 
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QDir>
-// #include <QFileDialog>
-// #include <QUrl>
-// #include <QTimer>
-// #include <QStorageInfo>
-// #include <QMessageBox>
-// #include <QJsonObject>
-
-// #include <folderman.h>
 
 namespace Occ {
 

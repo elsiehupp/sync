@@ -2,8 +2,11 @@
 Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 Copyright (C) by Michael Schuster <michael@schuster.ms>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QVariant>
+// #include <QVBoxLayout>
 
 // #pragma once
 
@@ -60,15 +63,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
-Copyright (C) by Michael Schuster <michael@schuster.ms>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QVariant>
-// #include <QVBoxLayout>
 
 namespace Occ {
 

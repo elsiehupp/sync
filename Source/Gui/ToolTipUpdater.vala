@@ -1,8 +1,12 @@
 /***********************************************************
 Copyright (C) by Christian Kamm <mail@ckamm.de>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QTreeView>
+// #include <QHelpEvent>
+// #include <QToolTip>
 
 // #include <GLib.Object>
 // #include <QPoint>
@@ -50,15 +54,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Christian Kamm <mail@ckamm.de>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QTreeView>
-// #include <QHelpEvent>
-// #include <QToolTip>
 
 using namespace Occ;
 

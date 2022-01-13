@@ -1,7 +1,7 @@
 /***********************************************************
 Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 // #pragma once
@@ -46,11 +46,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
 
 namespace Occ {
 

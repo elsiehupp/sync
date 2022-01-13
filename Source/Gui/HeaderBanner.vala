@@ -1,8 +1,53 @@
 /***********************************************************
 Copyright (C) by Michael Schuster <michael@schuster.ms>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+/***********************************************************
+Based on Qt sourcecode:
+  qt5/qtbase/src/widgets/dialogs/qwizard.cpp
+
+https://code.qt.io/c
+
+Original license:
+
+Copyright (C) 2016 The 
+Contact : https://www.qt
+
+This file is part of the QtWidgets module of the Qt Toolkit.
+
+$QT_BEGIN_LICENSE:LGPL$
+Commercial License Usage
+Licensees holding valid commercial Qt licenses may use this file in
+accordance with the commercial license 
+Software or, alternatively, in accordance with the terms contained in
+a written agreement between you and The Qt Company. For licensing 
+and conditions see https://www.qt.io/terms-conditions. For further
+information use the contact form at https://www.qt.io/contact-us.
+
+GNU Lesser General Public License Usage
+Alternatively, this file may be 
+General Public License version 3 as published by the Free Softw
+Foundation and appearing in the file LICENSE.LGPL3 included in the
+packaging of this file. Please review the following information to
+ensure the GNU Lesser General Public License version 3 requiremen
+will be met : https://www.gnu.org/licenses/lgpl-3.0.html.
+
+GNU General Public License Usage
+Alternatively, this file may be used under the terms o
+General Public License version 2.0 or (at you
+Public license version 3 or any later version approved by the KDE Free
+Qt Foundation. The licenses are as published by the Free Software
+Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+included in the packaging of this file. Please review the following
+information to ensure the GNU General Public License requirements will
+be met : https://www.gnu.org/licenses/gpl-2.0.html and
+https://www.gnu.org/licenses/gpl-3.0.html.
+
+** $QT_END_LICENSE$
+****************************************************************************/
+
 
 /***********************************************************
 Based on Qt sourcecode:
@@ -49,6 +94,12 @@ https://www.gnu.org/licenses/gpl-3.0.html.
 ****************************************************************************/
 
 // #include <Gtk.Widget>
+// #include <QVBoxLayout>
+// #include <QLabel>
+
+// #include <QPainter>
+// #include <QStyle>
+// #include <QGuiApplication>
 
 
 namespace Occ {
@@ -78,62 +129,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Michael Schuster <michael@schuster.ms>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-/***********************************************************
-Based on Qt sourcecode:
-  qt5/qtbase/src/widgets/dialogs/qwizard.cpp
-
-https://code.qt.io/c
-
-Original license:
-
-Copyright (C) 2016 The 
-Contact : https://www.qt
-
-This file is part of the QtWidgets module of the Qt Toolkit.
-
-$QT_BEGIN_LICENSE:LGPL$
-Commercial License Usage
-Licensees holding valid commercial Qt licenses may use this file in
-accordance with the commercial license 
-Software or, alternatively, in accordance with the terms contained in
-a written agreement between you and The Qt Company. For licensing 
-and conditions see https://www.qt.io/terms-conditions. For further
-information use the contact form at https://www.qt.io/contact-us.
-
-GNU Lesser General Public License Usage
-Alternatively, this file may be 
-General Public License version 3 as published by the Free Softw
-Foundation and appearing in the file LICENSE.LGPL3 included in the
-packaging of this file. Please review the following information to
-ensure the GNU Lesser General Public License version 3 requiremen
-will be met : https://www.gnu.org/licenses/lgpl-3.0.html.
-
-GNU General Public License Usage
-Alternatively, this file may be used under the terms o
-General Public License version 2.0 or (at you
-Public license version 3 or any later version approved by the KDE Free
-Qt Foundation. The licenses are as published by the Free Software
-Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
-included in the packaging of this file. Please review the following
-information to ensure the GNU General Public License requirements will
-be met : https://www.gnu.org/licenses/gpl-2.0.html and
-https://www.gnu.org/licenses/gpl-3.0.html.
-
-** $QT_END_LICENSE$
-****************************************************************************/
-
-// #include <QVBoxLayout>
-// #include <QLabel>
-
-// #include <QPainter>
-// #include <QStyle>
-// #include <QGuiApplication>
 
 namespace Occ {
 

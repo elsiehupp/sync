@@ -1,7 +1,7 @@
 /***********************************************************
 Copyright (C) by Camila Ayres <hello@camila.codes>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 // #include <GLib.Object>
@@ -42,11 +42,6 @@ private slots:
 
 
 
-/***********************************************************
-Copyright (C) by Camila Ayres <hello@camila.codes>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
 
 namespace Occ {
 

@@ -1,8 +1,23 @@
 /***********************************************************
 Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QFileDialog>
+// #include <QMessageBox>
+// #include <QNetworkProxy>
+// #include <QDir>
+// #include <QScopedValueRollback>
+// #include <QMessageBox>
+
+// #include <private/qzipwriter_p.h>
+
+const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
+
+#if ! (QTLEGACY)
+// #include <QOperatingSystemVersion>
+#endif
 
 // #include <Gtk.Widget>
 // #include <QPointer>
@@ -58,26 +73,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QFileDialog>
-// #include <QMessageBox>
-// #include <QNetworkProxy>
-// #include <QDir>
-// #include <QScopedValueRollback>
-// #include <QMessageBox>
-
-// #include <private/qzipwriter_p.h>
-
-const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
-
-#if ! (QTLEGACY)
-// #include <QOperatingSystemVersion>
-#endif
 
 namespace {
 struct ZipEntry {
@@ -210,8 +205,8 @@ GeneralSettings.GeneralSettings (Gtk.Widget *parent)
     _ui.showInExplorerNavigationPaneCheckBox.setVisible (false);
 
     /* Set the left contents margin of the layout to zero to make the checkboxes
-     * align properly vertically , fixes bug #3758
-     */
+    align properly vertically , fixes bug #3758
+    ***********************************************************/
     int m0 = 0;
     int m1 = 0;
     int m2 = 0;

@@ -1,8 +1,12 @@
 /***********************************************************
 Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QBuffer>
+// #include <QJsonDocument>
+// #include <QJsonObject>
 
 // #include <QVector>
 // #include <QList>
@@ -33,95 +37,95 @@ protected:
     OcsJob (AccountPtr account);
 
     /***********************************************************
-     * Set the verb for the job
-     *
+    Set the verb for the job
+    
      * @param verb currently supported PUT POST DELETE
-     */
+    ***********************************************************/
     void setVerb (QByteArray &verb);
 
     /***********************************************************
-     * Add a new parameter to the request.
-     * Depending on the verb this is GET or POST parameter
-     *
-     * @param name The name of the parameter
+    Add a new parameter to the request.
+    Depending on the verb this is GET or POST parameter
+    
+    @param name The name of the parameter
      * @param value The value of the parameter
-     */
+    ***********************************************************/
     void addParam (string &name, string &value);
 
     /***********************************************************
-     * Set the post parameters
-     *
-     * @param postParams list of pairs to add (urlEncoded) to the body of the
+    Set the post parameters
+    
+    @param postParams list of pairs to add (urlEncoded) to the body of the
      * request
-     */
+    ***********************************************************/
     void setPostParams (QList<QPair<string, string>> &postParams);
 
     /***********************************************************
-     * List of expected statuscodes for this request
-     * A warning will be printed to the debug log if a different status code is
-     * encountered
-     *
+    List of expected statuscodes for this request
+    A warning will be printed to the debug log if a different status code is
+    encountered
+    
      * @param code Accepted status code
-     */
+    ***********************************************************/
     void addPassStatusCode (int code);
 
     /***********************************************************
-     * The base path for an OcsJob is always the same. But it could be the case that
-     * certain operations need to append something to the URL.
-     *
+    The base path for an OcsJob is always the same. But it could be the case that
+    certain operations need to append something to the URL.
+    
      * This function appends the common id. so <PATH>/<ID>
-     */
+    ***********************************************************/
     void appendPath (string &id);
 
 public:
     /***********************************************************
-     * Parse the response and return the status code and the message of the
-     * reply (metadata)
-     *
-     * @param json The reply from OCS
-     * @param message The message that is set in the metadata
+    Parse the response and return the status code and the message of the
+    reply (metadata)
+    
+    @param json The reply from OCS
+    @param message The message that is set in the metadata
      * @return The statuscode of the OCS response
-     */
+    ***********************************************************/
     static int getJsonReturnCode (QJsonDocument &json, string &message);
 
     /***********************************************************
-     * @brief Adds header to the request e.g. "If-None-Match"
-     * @param headerName a string with the header name
-     * @param value a string with the value
-     */
+    @brief Adds header to the request e.g. "If-None-Match"
+    @param headerName a string with the header name
+    @param value a string with the value
+    ***********************************************************/
     void addRawHeader (QByteArray &headerName, QByteArray &value);
 
 protected slots:
 
     /***********************************************************
-     * Start the OCS request
-     */
+    Start the OCS request
+    ***********************************************************/
     void start () override;
 
 signals:
 
     /***********************************************************
-     * Result of the OCS request
-     *
+    Result of the OCS request
+    
      * @param reply the reply
-     */
+    ***********************************************************/
     void jobFinished (QJsonDocument reply, int statusCode);
 
     /***********************************************************
-     * The status code was not one of the expected (passing)
-     * status code for this command
-     *
-     * @param statusCode The actual status code
+    The status code was not one of the expected (passing)
+    status code for this command
+    
+    @param statusCode The actual status code
      * @param message The message provided by the server
-     */
+    ***********************************************************/
     void ocsError (int statusCode, string &message);
 
     /***********************************************************
-     * @brief etagResponseHeaderReceived - signal to report the ETag response header value
-     * from ocs api v2
-     * @param value - the ETag response header value
-     * @param statusCode - the OCS status code : 100 (!) for success
-     */
+    @brief etagResponseHeaderReceived - signal to report the ETag response header value
+    from ocs api v2
+    @param value - the ETag response header value
+    @param statusCode - the OCS status code : 100 (!) for success
+    ***********************************************************/
     void etagResponseHeaderReceived (QByteArray &value, int statusCode);
 
 private slots:
@@ -133,28 +137,7 @@ private:
     QVector<int> _passStatusCodes;
     QNetworkRequest _request;
 };
-}
 
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QBuffer>
-// #include <QJsonDocument>
-// #include <QJsonObject>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcOcs, "nextcloud.gui.sharing.ocs", QtInfoMsg)
-    
     OcsJob.OcsJob (AccountPtr account)
         : AbstractNetworkJob (account, "") {
         _passStatusCodes.append (OCS_SUCCESS_STATUS_CODE);

@@ -1,8 +1,11 @@
 /***********************************************************
 Copyright (C) 2016 by Daniel Molkentin <danimo@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QStyle>
+// #include <QStyleOptionFrame>
 
 // #include <QLineEdit>
 // #include <QPaintEvent>
@@ -20,14 +23,18 @@ class PostfixLineEdit : QLineEdit {
 public:
     PostfixLineEdit (Gtk.Widget *parent);
 
-    /** @brief sets an optional postfix shown greyed out */
-    void setPostfix (string &postfix);
-    /** @brief retrives the postfix */
+    /***********************************************************
+    @brief sets an optional postfix shown greyed out */
+    /***********************************************************
+     setPostfix (string &postfix);
+    /***********************************************************
+    @brief retrives the postfix */
     string postfix ();
     /** @brief retrieves combined text () and postfix () */
     string fullText ();
 
-    /** @brief sets text () from full text, discarding prefix () */
+    /***********************************************************
+    @brief sets text () from full text, discarding prefix () */
     void setFullText (string &text);
 
 protected:
@@ -47,14 +54,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) 2016 by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QStyle>
-// #include <QStyleOptionFrame>
 
 namespace Occ {
 

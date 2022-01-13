@@ -179,8 +179,8 @@ public:
 
 private:
     /* Use std.string and std.vector internally on this class
-     * to ease the port to Nlohmann Json API
-     */
+    to ease the port to Nlohmann Json API
+    ***********************************************************/
     void setupEmptyMetadata ();
     void setupExistingMetadata (QByteArray& metadata);
 
@@ -249,9 +249,6 @@ using namespace QKeychain;
 
 namespace Occ {
 
-Q_LOGGING_CATEGORY (lcCse, "nextcloud.sync.clientsideencryption", QtInfoMsg)
-Q_LOGGING_CATEGORY (lcCseDecryption, "nextcloud.e2e", QtInfoMsg)
-Q_LOGGING_CATEGORY (lcCseMetadata, "nextcloud.metadata", QtInfoMsg)
 
 string e2eeBaseUrl () {
     return QStringLiteral ("ocs/v2.php/apps/end_to_end_encryption/api/v1/");
@@ -582,8 +579,8 @@ QByteArray encryptPrivateKey (
     int clen = len;
 
     /* Finalise the encryption. Normally ciphertext bytes may be written at
-     * this stage, but this does not occur in GCM mode
-     */
+    this stage, but this does not occur in GCM mode
+    ***********************************************************/
     if (1 != EVP_EncryptFinal_ex (ctx, unsignedData (ctext) + len, &len)) {
         qCInfo (lcCse ()) << "Error finalizing encryption";
         handleErrors ();
@@ -664,8 +661,8 @@ QByteArray decryptPrivateKey (QByteArray& key, QByteArray& data) {
     int plen = 0;
 
     /* Provide the message to be decrypted, and obtain the plaintext output.
-     * EVP_DecryptUpdate can be called multiple times if necessary
-     */
+    EVP_DecryptUpdate can be called multiple times if necessary
+    ***********************************************************/
     if (!EVP_DecryptUpdate (ctx, unsignedData (ptext), &plen, (unsigned char *)cipherTXT.constData (), cipherTXT.size ())) {
         qCInfo (lcCse ()) << "Could not decrypt";
         return QByteArray ();
@@ -678,8 +675,8 @@ QByteArray decryptPrivateKey (QByteArray& key, QByteArray& data) {
     }
 
     /* Finalise the decryption. A positive return value indicates success,
-     * anything else is a failure - the plaintext is not trustworthy.
-     */
+    anything else is a failure - the plaintext is not trustworthy.
+    ***********************************************************/
     int len = plen;
     if (EVP_DecryptFinal_ex (ctx, unsignedData (ptext) + plen, &len) == 0) {
         qCInfo (lcCse ()) << "Tag did not match!";
@@ -753,8 +750,8 @@ QByteArray decryptStringSymmetric (QByteArray& key, QByteArray& data) {
     int plen = 0;
 
     /* Provide the message to be decrypted, and obtain the plaintext output.
-     * EVP_DecryptUpdate can be called multiple times if necessary
-     */
+    EVP_DecryptUpdate can be called multiple times if necessary
+    ***********************************************************/
     if (!EVP_DecryptUpdate (ctx, unsignedData (ptext), &plen, (unsigned char *)cipherTXT.constData (), cipherTXT.size ())) {
         qCInfo (lcCse ()) << "Could not decrypt";
         return QByteArray ();
@@ -767,8 +764,8 @@ QByteArray decryptStringSymmetric (QByteArray& key, QByteArray& data) {
     }
 
     /* Finalise the decryption. A positive return value indicates success,
-     * anything else is a failure - the plaintext is not trustworthy.
-     */
+    anything else is a failure - the plaintext is not trustworthy.
+    ***********************************************************/
     int len = plen;
     if (EVP_DecryptFinal_ex (ctx, unsignedData (ptext) + plen, &len) == 0) {
         qCInfo (lcCse ()) << "Tag did not match!";
@@ -843,8 +840,8 @@ QByteArray encryptStringSymmetric (QByteArray& key, QByteArray& data) {
     int clen = len;
 
     /* Finalise the encryption. Normally ciphertext bytes may be written at
-     * this stage, but this does not occur in GCM mode
-     */
+    this stage, but this does not occur in GCM mode
+    ***********************************************************/
     if (1 != EVP_EncryptFinal_ex (ctx, unsignedData (ctext) + len, &len)) {
         qCInfo (lcCse ()) << "Error finalizing encryption";
         handleErrors ();
@@ -1544,9 +1541,9 @@ void FolderMetadata.setupExistingMetadata (QByteArray& metadata) {
   for (auto it = metadataKeys.constBegin (), end = metadataKeys.constEnd (); it != end; it++) {
     QByteArray currB64Pass = it.value ().toString ().toLocal8Bit ();
     /***********************************************************
-     * We have to base64 decode the metadatakey here. This was a misunderstanding in the RFC
-     * Now we should be compatible with Android and IOS. Maybe we can fix it later.
-     */
+    We have to base64 decode the metadatakey here. This was a misunderstanding in the RFC
+    Now we should be compatible with Android and IOS. Maybe we can fix it later.
+    ***********************************************************/
     QByteArray b64DecryptedKey = decryptMetadataKey (currB64Pass);
     if (b64DecryptedKey.isEmpty ()) {
       qCDebug (lcCse ()) << "Could not decrypt metadata for key" << it.key ();

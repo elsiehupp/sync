@@ -1,8 +1,10 @@
 /***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QLoggingCategory>
 // #pragma once
 
 namespace Occ {
@@ -30,25 +32,7 @@ public:
 private slots:
     void slotDeleteJobFinished ();
 };
-}
 
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QLoggingCategory>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcPropagateRemoteDelete, "nextcloud.sync.propagator.remotedelete", QtInfoMsg)
-    
     void PropagateRemoteDelete.start () {
         qCInfo (lcPropagateRemoteDelete) << "Start propagate remote delete job for" << _item._file;
     

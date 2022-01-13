@@ -1,8 +1,19 @@
 /***********************************************************
 Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QLoggingCategory>
+// #include <QNetworkRequest>
+// #include <QNetworkReply>
+// #include <QNetworkProxy>
+// #include <QAuthenticator>
+// #include <QSslConfiguration>
+// #include <QNetworkCookie>
+// #include <QNetworkCookieJar>
+// #include <QNetworkConfiguration>
+// #include <QUuid>
 
 // #include <QNetworkAccessManager>
 
@@ -24,37 +35,6 @@ protected:
     QNetworkReply *createRequest (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *outgoingData = nullptr) override;
 };
 
-} // namespace Occ
-
-#endif
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QLoggingCategory>
-// #include <QNetworkRequest>
-// #include <QNetworkReply>
-// #include <QNetworkProxy>
-// #include <QAuthenticator>
-// #include <QSslConfiguration>
-// #include <QNetworkCookie>
-// #include <QNetworkCookieJar>
-// #include <QNetworkConfiguration>
-// #include <QUuid>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcAccessManager, "nextcloud.sync.accessmanager", QtInfoMsg)
-    
     AccessManager.AccessManager (GLib.Object *parent)
         : QNetworkAccessManager (parent) {
     

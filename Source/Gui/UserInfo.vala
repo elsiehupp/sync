@@ -2,8 +2,14 @@
 Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 Copyright (C) by Michael Schuster <michael@schuster.ms>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <theme.h>
+
+// #include <QTimer>
+// #include <QJsonDocument>
+// #include <QJsonObject>
 
 // #include <GLib.Object>
 // #include <QPointer>
@@ -59,10 +65,10 @@ public:
     int64 lastQuotaUsedBytes () { return _lastQuotaUsedBytes; }
 
     /***********************************************************
-     * When the quotainfo is active, it requests the quota at regular interval.
-     * When setting it to active it will request the quota immediately if the last time
-     * the quota was requested was more than the interval
-     */
+    When the quotainfo is active, it requests the quota at regular interval.
+    When setting it to active it will request the quota immediately if the last time
+    the quota was requested was more than the interval
+    ***********************************************************/
     void setActive (bool active);
 
 public slots:
@@ -95,7 +101,6 @@ private:
 
 } // namespace Occ
 
-#endif //USERINFO_H
 
 
 
@@ -106,18 +111,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-Copyright (C) by Michael Schuster <michael@schuster.ms>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <theme.h>
-
-// #include <QTimer>
-// #include <QJsonDocument>
-// #include <QJsonObject>
 
 namespace Occ {
 

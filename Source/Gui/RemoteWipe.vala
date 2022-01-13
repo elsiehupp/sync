@@ -1,5 +1,13 @@
-#ifndef REMOTEWIPE_H
-const int REMOTEWIPE_H
+/***********************************************************
+Copyright (C) by Camila Ayres <hello@camila.codes>
+
+<GPLv3-or-later-Boilerplate>
+***********************************************************/
+
+// #include <QJsonDocument>
+// #include <QJsonObject>
+// #include <QNetworkRequest>
+// #include <QBuffer>
 
 // #include <QNetworkAccessManager>
 
@@ -12,33 +20,33 @@ public:
 
 signals:
     /***********************************************************
-     * Notify if wipe was requested
-     */
+    Notify if wipe was requested
+    ***********************************************************/
     void authorized (AccountState*);
 
     /***********************************************************
-     * Notify if user only needs to login again
-     */
+    Notify if user only needs to login again
+    ***********************************************************/
     void askUserCredentials ();
 
 public slots:
     /***********************************************************
-     * Once receives a 401 or 403 status response it will do a fetch to
-     * <server>/index.php/core/wipe/check
-     */
+    Once receives a 401 or 403 status response it will do a fetch to
+    <server>/index.php/core/wipe/check
+    ***********************************************************/
     void startCheckJobWithAppPassword (string);
 
 private slots:
     /***********************************************************
-     * If wipe is requested, delete account and data, if not continue by asking
-     * the user to login again
-     */
+    If wipe is requested, delete account and data, if not continue by asking
+    the user to login again
+    ***********************************************************/
     void checkJobSlot ();
 
     /***********************************************************
-     * Once the client has wiped all the required data a POST to
-     * <server>/index.php/core/wipe/success
-     */
+    Once the client has wiped all the required data a POST to
+    <server>/index.php/core/wipe/success
+    ***********************************************************/
     void notifyServerSuccessJob (AccountState *accountState, bool);
     void notifyServerSuccessJobSlot ();
 
@@ -52,29 +60,7 @@ private:
 
     friend class .TestRemoteWipe;
 };
-}
-#endif // REMOTEWIPE_H
 
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Camila Ayres <hello@camila.codes>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QJsonDocument>
-// #include <QJsonObject>
-// #include <QNetworkRequest>
-// #include <QBuffer>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcRemoteWipe, "nextcloud.gui.remotewipe", QtInfoMsg)
-    
     RemoteWipe.RemoteWipe (AccountPtr account, GLib.Object *parent)
         : GLib.Object (parent),
           _account (account),

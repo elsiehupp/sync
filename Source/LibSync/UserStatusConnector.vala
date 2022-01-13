@@ -1,7 +1,7 @@
 /***********************************************************
 Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 // #pragma once
@@ -134,11 +134,6 @@ Q_DECLARE_METATYPE (Occ.UserStatus)
 
 
 
-/***********************************************************
-Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
 
 namespace Occ {
 

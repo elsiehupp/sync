@@ -1,8 +1,14 @@
 /***********************************************************
 Copyright (C) by Roeland Jago Douma <rullzer@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QUrl>
+// #include <QJsonDocument>
+// #include <QJsonObject>
+// #include <QJsonArray>
+
 
 // #include <GLib.Object>
 // #include <QDate>
@@ -12,6 +18,7 @@ Copyright (C) by Roeland Jago Douma <rullzer@owncloud.com>
 // #include <QUrl>
 
 
+
 namespace Occ {
 
 
@@ -19,9 +26,9 @@ class Share : GLib.Object {
 
 public:
     /***********************************************************
-     * Possible share types
-     * Need to be in sync with Sharee.Type
-     */
+    Possible share types
+    Need to be in sync with Sharee.Type
+    ***********************************************************/
     enum ShareType {
         TypeUser = Sharee.User,
         TypeGroup = Sharee.Group,
@@ -35,8 +42,8 @@ public:
     using Permissions = SharePermissions;
 
     /***********************************************************
-     * Constructor for shares
-     */
+    Constructor for shares
+    ***********************************************************/
     Share (AccountPtr account,
         const string &id,
         const string &owner,
@@ -48,71 +55,71 @@ public:
         const QSharedPointer<Sharee> shareWith = QSharedPointer<Sharee> (nullptr));
 
     /***********************************************************
-     * The account the share is defined on.
-     */
+    The account the share is defined on.
+    ***********************************************************/
     AccountPtr account ();
 
     string path ();
 
     /***********************************************************
-     * Get the id
-     */
+    Get the id
+    ***********************************************************/
     string getId ();
 
     /***********************************************************
-     * Get the uid_owner
-     */
+    Get the uid_owner
+    ***********************************************************/
     string getUidOwner ();
 
     /***********************************************************
-     * Get the owner display name
-     */
+    Get the owner display name
+    ***********************************************************/
     string getOwnerDisplayName ();
 
     /***********************************************************
-     * Get the shareType
-     */
+    Get the shareType
+    ***********************************************************/
     ShareType getShareType ();
 
     /***********************************************************
-     * Get the shareWith
-     */
+    Get the shareWith
+    ***********************************************************/
     QSharedPointer<Sharee> getShareWith ();
 
     /***********************************************************
-     * Get permissions
-     */
+    Get permissions
+    ***********************************************************/
     Permissions getPermissions ();
 
     /***********************************************************
-     * Set the permissions of a share
-     *
-     * On success the permissionsSet signal is emitted
+    Set the permissions of a share
+    
+    On success the permissionsSet signal is emitted
      * In case of a server error the serverError signal is emitted.
-     */
+    ***********************************************************/
     void setPermissions (Permissions permissions);
 
     /***********************************************************
-     * Set the password for remote share
-     *
-     * On success the passwordSet signal is emitted
+    Set the password for remote share
+    
+    On success the passwordSet signal is emitted
      * In case of a server error the passwordSetError signal is emitted.
-     */
+    ***********************************************************/
     void setPassword (string &password);
 
     bool isPasswordSet ();
 
     /***********************************************************
-     * Deletes a share
-     *
-     * On success the shareDeleted signal is emitted
+    Deletes a share
+    
+    On success the shareDeleted signal is emitted
      * In case of a server error the serverError signal is emitted.
-     */
+    ***********************************************************/
     void deleteShare ();
 
      /***********************************************************
-     * Is it a share with a user or group (local or remote)
-     */
+    Is it a share with a user or group (local or remote)
+    ***********************************************************/
     static bool isShareTypeUserGroupEmailRoomOrRemote (ShareType type);
 
 signals:
@@ -165,78 +172,78 @@ public:
         const string &label);
 
     /***********************************************************
-     * Get the share link
-     */
+    Get the share link
+    ***********************************************************/
     QUrl getLink ();
 
     /***********************************************************
-     * The share's link for direct downloading.
-     */
+    The share's link for direct downloading.
+    ***********************************************************/
     QUrl getDirectDownloadLink ();
 
     /***********************************************************
-     * Get the publicUpload status of this share
-     */
+    Get the publicUpload status of this share
+    ***********************************************************/
     bool getPublicUpload ();
 
     /***********************************************************
-     * Whether directory listings are available (READ permission)
-     */
+    Whether directory listings are available (READ permission)
+    ***********************************************************/
     bool getShowFileListing ();
 
     /***********************************************************
-     * Returns the name of the link share. Can be empty.
-     */
+    Returns the name of the link share. Can be empty.
+    ***********************************************************/
     string getName ();
 
     /***********************************************************
-     * Returns the note of the link share.
-     */
+    Returns the note of the link share.
+    ***********************************************************/
     string getNote ();
 
     /***********************************************************
-     * Returns the label of the link share.
-     */
+    Returns the label of the link share.
+    ***********************************************************/
     string getLabel ();
 
     /***********************************************************
-     * Set the name of the link share.
-     *
+    Set the name of the link share.
+    
      * Emits either nameSet () or serverError ().
-     */
+    ***********************************************************/
     void setName (string &name);
 
     /***********************************************************
-     * Set the note of the link share.
-     */
+    Set the note of the link share.
+    ***********************************************************/
     void setNote (string &note);
 
     /***********************************************************
-     * Returns the token of the link share.
-     */
+    Returns the token of the link share.
+    ***********************************************************/
     string getToken ();
 
     /***********************************************************
-     * Get the expiration date
-     */
+    Get the expiration date
+    ***********************************************************/
     QDate getExpireDate ();
 
     /***********************************************************
-     * Set the expiration date
-     *
-     * On success the expireDateSet signal is emitted
+    Set the expiration date
+    
+    On success the expireDateSet signal is emitted
      * In case of a server error the serverError signal is emitted.
-     */
+    ***********************************************************/
     void setExpireDate (QDate &expireDate);
 
     /***********************************************************
-     * Set the label of the share link.
-     */
+    Set the label of the share link.
+    ***********************************************************/
     void setLabel (string &label);
 
     /***********************************************************
-     * Create OcsShareJob and connect to signal/slots
-     */
+    Create OcsShareJob and connect to signal/slots
+    ***********************************************************/
     template <typename LinkShareSlot>
     OcsShareJob *createShareJob (LinkShareSlot slotFunction);
 
@@ -307,30 +314,30 @@ public:
     ShareManager (AccountPtr _account, GLib.Object *parent = nullptr);
 
     /***********************************************************
-     * Tell the manager to create a link share
-     *
-     * @param path The path of the linkshare relative to the user folder on the server
-     * @param name The name of the created share, may be empty
-     * @param password The password of the share, may be empty
-     *
-     * On success the signal linkShareCreated is emitted
+    Tell the manager to create a link share
+    
+    @param path The path of the linkshare relative to the u
+    @param name The name of the created share, may be empty
+    @param password The password of the share, may be
+    
+    On success the signal linkShareCreated is emitted
      * For older server the linkShareRequiresPassword signal is emitted when it seems appropiate
      * In case of a server error the serverError signal is emitted
-     */
+    ***********************************************************/
     void createLinkShare (string &path,
         const string &name,
         const string &password);
 
     /***********************************************************
-     * Tell the manager to create a new share
-     *
-     * @param path The path of the share relative to the user folder on the server
-     * @param shareType The type of share (TypeUser, TypeGroup, TypeRemote)
-     * @param Permissions The share permissions
-     *
+    Tell the manager to create a new share
+    
+    @param path The path of the share relative to the user folder on the
+    @param shareType The type of share (TypeU
+    @param Permissions The share permissions
+    
      * On success the signal shareCreated is emitted
      * In case of a server error the serverError signal is emitted
-     */
+    ***********************************************************/
     void createShare (string &path,
         const Share.ShareType shareType,
         const string shareWith,
@@ -338,13 +345,13 @@ public:
         const string &password = "");
 
     /***********************************************************
-     * Fetch all the shares for path
-     *
-     * @param path The path to get the shares for relative to the users folder on the server
-     *
+    Fetch all the shares for path
+    
+    @param path The path to get the shares for rel
+    
      * On success the sharesFetched signal is emitted
      * In case of a server error the serverError signal is emitted
-     */
+    ***********************************************************/
     void fetchShares (string &path);
 
 signals:
@@ -353,12 +360,13 @@ signals:
     void sharesFetched (QList<QSharedPointer<Share>> &shares);
     void serverError (int code, string &message);
 
-    /** Emitted when creating a link share with password fails.
-     *
-     * @param message the error message reported by the server
-     *
+    /***********************************************************
+    Emitted when creating a link share with password fails.
+
+    @param message the error message reported by the server
+    
      * See createLinkShare ().
-     */
+    ***********************************************************/
     void linkShareRequiresPassword (string &message);
 
 private slots:
@@ -384,19 +392,6 @@ private:
 
 
 
-
-/***********************************************************
-Copyright (C) by Roeland Jago Douma <rullzer@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QUrl>
-// #include <QJsonDocument>
-// #include <QJsonObject>
-// #include <QJsonArray>
-
-Q_LOGGING_CATEGORY (lcUserGroupShare, "nextcloud.gui.usergroupshare", QtInfoMsg)
 
 namespace Occ {
 
@@ -619,9 +614,9 @@ void LinkShare.slotExpireDateSet (QJsonDocument &reply, QVariant &value) {
     auto data = reply.object ().value ("ocs").toObject ().value ("data").toObject ();
 
     /***********************************************************
-     * If the reply provides a data back (more REST style)
-     * they use this date.
-     */
+    If the reply provides a data back (more REST style)
+    they use this date.
+    ***********************************************************/
     if (data.value ("expiration").isString ()) {
         _expireDate = QDate.fromString (data.value ("expiration").toString (), "yyyy-MM-dd 00:00:00");
     } else {
@@ -696,9 +691,9 @@ void UserGroupShare.slotExpireDateSet (QJsonDocument &reply, QVariant &value) {
     auto data = reply.object ().value ("ocs").toObject ().value ("data").toObject ();
 
     /***********************************************************
-     * If the reply provides a data back (more REST style)
-     * they use this date.
-     */
+    If the reply provides a data back (more REST style)
+    they use this date.
+    ***********************************************************/
     if (data.value ("expiration").isString ()) {
         _expireDate = QDate.fromString (data.value ("expiration").toString (), "yyyy-MM-dd 00:00:00");
     } else {
@@ -726,9 +721,9 @@ void ShareManager.slotLinkShareCreated (QJsonDocument &reply) {
     int code = OcsShareJob.getJsonReturnCode (reply, message);
 
     /***********************************************************
-     * Before we had decent sharing capabilities on the server a 403 "generally"
-     * meant that a share was password protected
-     */
+    Before we had decent sharing capabilities on the server a 403 "generally"
+    meant that a share was password protected
+    ***********************************************************/
     if (code == 403) {
         emit linkShareRequiresPassword (message);
         return;

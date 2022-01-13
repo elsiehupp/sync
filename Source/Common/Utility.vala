@@ -5,6 +5,38 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
 
+// #include <QStandardPaths>
+// #include <QtGlobal>
+
+// Note :  This file must compile without QtGui
+// #include <QCoreApplication>
+// #include <QSettings>
+// #include <QTextStream>
+// #include <QDir>
+// #include <QFile>
+// #include <QUrl>
+// #include <QProcess>
+// #include <GLib.Object>
+// #include <QThread>
+// #include <QDateTime>
+// #include <QSysInfo>
+// #include <QStandardPaths>
+// #include <QCollator>
+// #include <QSysInfo>
+// #include <qrandom.h>
+
+#ifdef Q_OS_UNIX
+// #include <sys/statvfs.h>
+// #include <sys/types.h>
+// #include <unistd.h>
+#endif
+
+// #include <cmath>
+// #include <cstdarg>
+// #include <cstring>
+
+#include "utility_unix.cpp"
+
 // #include <string>
 // #include <QByteArray>
 // #include <QDateTime>
@@ -22,7 +54,8 @@ namespace Occ {
 
 Q_DECLARE_LOGGING_CATEGORY (lcUtility)
 
-/** \addtogroup libsync
+/***********************************************************
+\addtogroup libsync
  @{
 ***********************************************************/
 namespace Utility {
@@ -51,20 +84,20 @@ namespace Utility {
     OCSYNC_EXPORT int convertSizeToInt (size_t &convertVar);
 
     /***********************************************************
-     * Return the amount of free space available.
-     *
+    Return the amount of free space available.
+    
      * \a path must point to a directory
-     */
+    ***********************************************************/
     OCSYNC_EXPORT int64 freeDiskSpace (string &path);
 
     /***********************************************************
-     * @brief compactFormatDouble - formats a double value human readable.
-     *
-     * @param value the value to format.
-     * @param prec the precision.
-     * @param unit an optional unit that is appended if present.
+    @brief compactFormatDouble - formats a double value human readable.
+    
+    @param value the value to 
+    @param prec the precision.
+    @param unit an optional unit that is appended if present.
      * @return the formatted string.
-     */
+    ***********************************************************/
     OCSYNC_EXPORT string compactFormatDouble (double value, int prec, string &unit = string ());
 
     // porting methods
@@ -75,29 +108,29 @@ namespace Utility {
     OCSYNC_EXPORT int64 qDateTimeToTime_t (QDateTime &t);
 
     /***********************************************************
-     * @brief Convert milliseconds duration to human readable string.
-     * @param uint64 msecs the milliseconds to convert to string.
-     * @return an HMS representation of the milliseconds value.
-     *
-     * durationToDescriptiveString1 describes the duration in a single
-     * unit, like "5 minutes" or "2 days".
-     *
+    @brief Convert milliseconds duration to human readable string.
+    @param uint64 msecs the milliseconds to convert to string.
+    @return an HMS representation of the milliseconds value.
+    
+    durationToDescriptiveString1 describ
+    unit, like "5 minutes" or "2 days".
+    
      * durationToDescriptiveString2 uses two units where possible, so
      * "5 minutes 43 seconds" or "1 month 3 days".
-     */
+    ***********************************************************/
     OCSYNC_EXPORT string durationToDescriptiveString1 (uint64 msecs);
     OCSYNC_EXPORT string durationToDescriptiveString2 (uint64 msecs);
 
     /***********************************************************
-     * @brief hasDarkSystray - determines whether the systray is dark or light.
-     *
-     * Use this to check if the OS has a dark or a light systray.
-     *
-     * The value might change during the execution of the program
+    @brief hasDarkSystray - determines whether the systray is dark or light.
+    
+    Use this to check if the OS has a dark or a light systray.
+    
+    The value might change during the execution of the program
      * (e.g. on OS X 10.10).
-     *
+
      * @return bool which is true for systems with dark systray.
-     */
+    ***********************************************************/
     OCSYNC_EXPORT bool hasDarkSystray ();
 
     // convenience OS detection methods
@@ -134,13 +167,13 @@ namespace Utility {
     OCSYNC_EXPORT QByteArray normalizeEtag (QByteArray etag);
 
     /***********************************************************
-     * @brief timeAgoInWords - human readable time span
-     *
-     * Use this to get a string that describes the timespan between the first and
-     * the second timestamp in a human readable and understandable form.
-     *
+    @brief timeAgoInWords - human readable time span
+    
+    Use this to get a string that describes the timespan between the f
+    the second timestamp in a human readable and understandable form.
+
      * If the second parameter is ommitted, the current time is used.
-     */
+    ***********************************************************/
     OCSYNC_EXPORT string timeAgoInWords (QDateTime &dt, QDateTime &from = QDateTime ());
 
     class StopWatch {
@@ -162,63 +195,70 @@ namespace Utility {
     };
 
     /***********************************************************
-     * @brief Sort a QStringList in a way that's appropriate for filenames
-     */
+    @brief Sort a QStringList in a way that's appropriate for filenames
+    ***********************************************************/
     OCSYNC_EXPORT void sortFilenames (QStringList &fileNames);
 
-    /** Appends concatPath and queryItems to the url */
+    /***********************************************************
+    Appends concatPath and queryItems to the url */
     OCSYNC_EXPORT QUrl concatUrlPath (
         const QUrl &url, string &concatPath,
         const QUrlQuery &queryItems = {});
 
-    /**  Returns a new settings pre-set in a specific group.  The Settings will be created
+    /***********************************************************
+     Returns a new settings pre-set in a specific group.  The Settings will be created
          with the given parent. If no parent is specified, the caller must destroy the settings */
     OCSYNC_EXPORT std.unique_ptr<QSettings> settingsWithGroup (string &group, GLib.Object *parent = nullptr);
 
-    /** Sanitizes a string that shall become part of a filename.
-     *
-     * Filters out reserved characters like
-     * - unicode control and format characters
-     * - reserved characters : /, ?, <, >, \, :, *, |, and "
-     *
-     * Warning : This does not sanitize the whole resulting string, so
-     * - unix reserved filenames ('.', '..')
-     * - trailing periods and spaces
-     * - windows reserved filenames ('CON' etc)
+    /***********************************************************
+    Sanitizes a string that shall become part of a filename.
+
+    Filters out reserved characters like
+    - unicode control and format characters
+    - reserved characters : /, ?, <, >, \, :, *, |, and "
+    
+    Warning : This does not sanitize the 
+    - unix reserved filenames ('.
+    - trailing periods and spaces
+    - windows reserved filenames ('CON' etc)
      * will pass unchanged.
-     */
+    ***********************************************************/
     OCSYNC_EXPORT string sanitizeForFileName (string &name);
 
-    /** Returns a file name based on \a fn that's suitable for a conflict.
-     */
+    /***********************************************************
+    Returns a file name based on \a fn that's suitable for a conflict.
+    ***********************************************************/
     OCSYNC_EXPORT string makeConflictFileName (
         const string &fn, QDateTime &dt, string &user);
 
-    /** Returns whether a file name indicates a conflict file
-     */
+    /***********************************************************
+    Returns whether a file name indicates a conflict file
+    ***********************************************************/
     OCSYNC_EXPORT bool isConflictFile (char *name);
     OCSYNC_EXPORT bool isConflictFile (string &name);
 
-    /** Find the base name for a conflict file name, using name pattern only
-     *
-     * Will return an empty string if it's not a conflict file.
-     *
-     * Prefer to use the data from the conflicts table in the journal to determine
+    /***********************************************************
+    Find the base name for a conflict file name, using name pattern only
+
+    Will return an empty string if it's not a conflict file.
+    
+    Prefer to use the data from the conflicts table in the journal to determine
      * a conflict's base file, see SyncJournal.conflictFileBaseName ()
-     */
+    ***********************************************************/
     OCSYNC_EXPORT QByteArray conflictFileBaseNameFromPattern (QByteArray &conflictName);
 
     /***********************************************************
-     * @brief Check whether the path is a root of a Windows drive partition ([c:/, d:/, e:/, etc.)
-     */
+    @brief Check whether the path is a root of a Windows drive partition ([c:/, d:/, e:/, etc.)
+    ***********************************************************/
     OCSYNC_EXPORT bool isPathWindowsDrivePartitionRoot (string &path);
 
     /***********************************************************
-     * @brief Retrieves current logged-in user name from the OS
-     */
+    @brief Retrieves current logged-in user name from the OS
+    ***********************************************************/
     OCSYNC_EXPORT string getCurrentUserName ();
 }
-/** @} */ // \addtogroup
+/***********************************************************
+@} */ // \addtogroup
 
 inline bool Utility.isWindows () {
     return false;
@@ -229,73 +269,20 @@ inline bool Utility.isMac () {
 }
 
 inline bool Utility.isUnix () {
-#ifdef Q_OS_UNIX
     return true;
-#else
-    return false;
-#endif
+
 }
 
 inline bool Utility.isLinux () {
-#if defined (Q_OS_LINUX)
     return true;
-#else
-    return false;
-#endif
 }
 
 inline bool Utility.isBSD () {
-#if defined (Q_OS_FREEBSD) || defined (Q_OS_NETBSD) || defined (Q_OS_OPENBSD)
-    return true;
-#else
     return false;
-#endif
-}
-
 }
 
 
 
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<LGPLv2.1-or-later-Boilerplate>
-***********************************************************/
-
-// Note :  This file must compile without QtGui
-// #include <QCoreApplication>
-// #include <QSettings>
-// #include <QTextStream>
-// #include <QDir>
-// #include <QFile>
-// #include <QUrl>
-// #include <QProcess>
-// #include <GLib.Object>
-// #include <QThread>
-// #include <QDateTime>
-// #include <QSysInfo>
-// #include <QStandardPaths>
-// #include <QCollator>
-// #include <QSysInfo>
-// #include <qrandom.h>
-
-#ifdef Q_OS_UNIX
-// #include <sys/statvfs.h>
-// #include <sys/types.h>
-// #include <unistd.h>
-#endif
-
-// #include <cmath>
-// #include <cstdarg>
-// #include <cstring>
-
-#include "utility_unix.cpp"
-
-namespace Occ {
-
-Q_LOGGING_CATEGORY (lcUtility, "nextcloud.sync.utility", QtInfoMsg)
 
 bool Utility.writeRandomFile (string &fname, int size) {
     int maxSize = 10 * 10 * 1024;
@@ -853,24 +840,7 @@ string Utility.sanitizeForFileName (string &name) {
     return result;
 }
 
-} // namespace Occ
 
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<LGPLv2.1-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QStandardPaths>
-// #include <QtGlobal>
-
-namespace Occ {
 
     static void setupFavLink_private (string &folder) {
         // Nautilus : add to ~/.gtk-bookmarks

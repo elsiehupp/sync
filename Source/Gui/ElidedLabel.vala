@@ -1,8 +1,10 @@
 /***********************************************************
 Copyright (C) by Christian Kamm <mail@ckamm.de>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QResizeEvent>
 
 // #include <QLabel>
 
@@ -36,13 +38,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Christian Kamm <mail@ckamm.de>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QResizeEvent>
 
 namespace Occ {
 

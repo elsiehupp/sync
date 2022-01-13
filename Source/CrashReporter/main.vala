@@ -1,7 +1,7 @@
 /***********************************************************
 Copyright (C) by Dominik Schmidt <domme@tomahawk-player.org>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 // #include <libcrashreporter-gui/CrashReporter.h>

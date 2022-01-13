@@ -1,8 +1,19 @@
 /***********************************************************
 Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <folder.h>
+
+// #include <QPushButton>
+// #include <QDir>
+// #include <qabstractbutton.h>
+// #include <QDialogButtonBox>
+// #include <QFileInfo>
+// #include <QPushButton>
+
+// #include <array>
 
 // #pragma once
 
@@ -57,22 +68,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <folder.h>
-
-// #include <QPushButton>
-// #include <QDir>
-// #include <qabstractbutton.h>
-// #include <QDialogButtonBox>
-// #include <QFileInfo>
-// #include <QPushButton>
-
-// #include <array>
 
 namespace {
     constexpr std.array<QChar, 9> illegalCharacters ({ '\\', '/', ':', '?', '*', '\"', '<', '>', '|' });

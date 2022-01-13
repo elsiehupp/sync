@@ -1,7 +1,7 @@
 /***********************************************************
 Copyright (C) by Camila Ayres <camila@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 
@@ -18,18 +18,18 @@ public:
     OcsNavigationAppsJob (AccountPtr account);
 
     /***********************************************************
-     * Get a list of enabled apps and external sites
-     * visible in the Navigation menu
-     */
+    Get a list of enabled apps and external sites
+    visible in the Navigation menu
+    ***********************************************************/
     void getNavigationApps ();
 
 signals:
     /***********************************************************
-     * Result of the OCS request
-     *
-     * @param reply The reply
+    Result of the OCS request
+    
+    @param reply The reply
      * @param statusCode the status code of the response
-     */
+    ***********************************************************/
     void appsJobFinished (QJsonDocument &reply, int statusCode);
 
 private slots:
@@ -42,11 +42,6 @@ private slots:
 
 
 
-/***********************************************************
-Copyright (C) by Camila Ayres <camila@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
 
 namespace Occ {
 

@@ -1,8 +1,16 @@
 /***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <GLib.Object>
+// #include <QtCore>
+// #include <QtNetwork>
+// #include <QtGui>
+// #include <QtWidgets>
+
+// #include <cstdio>
 
 // #include <GLib.Object>
 // #include <QUrl>
@@ -166,7 +174,6 @@ private:
 };
 }
 
-#endif // OC_UPDATER
 
 
 
@@ -175,19 +182,7 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <GLib.Object>
-// #include <QtCore>
-// #include <QtNetwork>
-// #include <QtGui>
-// #include <QtWidgets>
-
-// #include <cstdio>
 
 namespace Occ {
 

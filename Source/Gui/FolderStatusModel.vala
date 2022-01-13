@@ -1,8 +1,16 @@
 /***********************************************************
 Copyright (C) by Klaas Freitag <freitag@kde.org>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <theme.h>
+// #include <account.h>
+
+// #include <QFileIconProvider>
+// #include <QVarLengthArray>
+// #include <set>
+
 
 // #include <accountfwd.h>
 // #include <QAbstractItemModel>
@@ -10,6 +18,9 @@ Copyright (C) by Klaas Freitag <freitag@kde.org>
 // #include <QVector>
 // #include <QElapsedTimer>
 // #include <QPointer>
+Q_DECLARE_METATYPE (QPersistentModelIndex)
+
+Q_DECLARE_METATYPE (Occ.FolderStatusModel.SubFolderInfo*)
 
 namespace Occ {
 
@@ -93,9 +104,9 @@ public:
     bool isDirty () { return _dirty; }
 
     /***********************************************************
-     * return a QModelIndex for the given path within the given folder.
-     * Note : this method returns an invalid index if the path was not fetched from the server before
-     */
+    return a QModelIndex for the given path within the given folder.
+    Note : this method returns an invalid index if the path was not fetched from the server before
+    ***********************************************************/
     QModelIndex indexForPath (Folder *f, string &path) const;
 
 public slots:
@@ -116,9 +127,9 @@ private slots:
     void slotNewBigFolder ();
 
     /***********************************************************
-     * "In progress" labels for fetching data from the server are only
-     * added after some time to avoid popping.
-     */
+    "In progress" labels for fetching data from the server are only
+    added after some time to avoid popping.
+    ***********************************************************/
     void slotShowFetchProgress ();
 
 private:
@@ -128,10 +139,10 @@ private:
     bool _dirty = false; // If the selective sync checkboxes were changed
 
     /***********************************************************
-     * Keeps track of items that are fetching data from the server.
-     *
+    Keeps track of items that are fetching data from the server.
+    
      * See slotShowPendingFetchProgress ()
-     */
+    ***********************************************************/
     QMap<QPersistentModelIndex, QElapsedTimer> _fetchingItems;
 
 signals:
@@ -142,34 +153,6 @@ signals:
     friend struct SubFolderInfo;
 };
 
-} // namespace Occ
-
-Q_DECLARE_METATYPE (Occ.FolderStatusModel.SubFolderInfo*)
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@kde.org>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <theme.h>
-// #include <account.h>
-
-// #include <QFileIconProvider>
-// #include <QVarLengthArray>
-// #include <set>
-
-Q_DECLARE_METATYPE (QPersistentModelIndex)
-
-namespace Occ {
-
-Q_LOGGING_CATEGORY (lcFolderStatus, "nextcloud.gui.folder.model", QtInfoMsg)
 
 static const char propertyParentIndexC[] = "oc_parentIndex";
 static const char propertyPermissionMap[] = "oc_permissionMap";

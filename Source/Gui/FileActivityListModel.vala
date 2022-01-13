@@ -1,7 +1,7 @@
 /***********************************************************
 Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 // #pragma once
@@ -22,22 +22,6 @@ protected:
 private:
     string _fileId;
 };
-}
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcFileActivityListModel, "nextcloud.gui.fileactivitylistmodel", QtInfoMsg)
-    
     FileActivityListModel.FileActivityListModel (GLib.Object *parent)
         : ActivityListModel (nullptr, parent) {
         setDisplayActions (false);

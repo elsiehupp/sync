@@ -1,8 +1,17 @@
 /***********************************************************
 Copyright (C) by Christian Kamm <mail@ckamm.de>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QClipboard>
+// #include <QApplication>
+// #include <QDesktopServices>
+// #include <QLoggingCategory>
+// #include <QMessageBox>
+// #include <QUrlQuery>
+
+using namespace Occ;
 
 // #include <string>
 // #include <QUrl>
@@ -11,29 +20,34 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 namespace Occ {
 namespace Utility {
 
-    /** Open an url in the browser.
-     *
-     * If launching the browser fails, display a message.
-     */
+    /***********************************************************
+    Open an url in the browser.
+
+    If launching the browser fails, display a message.
+    ***********************************************************/
     bool openBrowser (QUrl &url, Gtk.Widget *errorWidgetParent = nullptr);
 
-    /** Start composing a new email message.
-     *
-     * If launching the email program fails, display a message.
-     */
+    /***********************************************************
+    Start composing a new email message.
+
+    If launching the email program fails, display a message.
+    ***********************************************************/
     bool openEmailComposer (string &subject, string &body,
         Gtk.Widget *errorWidgetParent);
 
-    /** Returns a translated string indicating the current availability.
-     *
-     * This will be used in context menus to describe the current state.
-     */
+    /***********************************************************
+    Returns a translated string indicating the current availability.
+
+    This will be used in context menus to describe the current state.
+    ***********************************************************/
     string vfsCurrentAvailabilityText (VfsItemAvailability availability);
 
-    /** Translated text for "making items always available locally" */
+    /***********************************************************
+    Translated text for "making items always available locally" */
     string vfsPinActionText ();
 
-    /** Translated text for "free up local space" (and unpinning the item) */
+    /***********************************************************
+    Translated text for "free up local space" (and unpinning the item) */
     string vfsFreeSpaceActionText ();
 
 } // namespace Utility
@@ -46,22 +60,6 @@ namespace Utility {
 
 
 
-/***********************************************************
-Copyright (C) by Christian Kamm <mail@ckamm.de>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QClipboard>
-// #include <QApplication>
-// #include <QDesktopServices>
-// #include <QLoggingCategory>
-// #include <QMessageBox>
-// #include <QUrlQuery>
-
-using namespace Occ;
-
-Q_LOGGING_CATEGORY (lcUtility, "nextcloud.gui.utility", QtInfoMsg)
 
 bool Utility.openBrowser (QUrl &url, Gtk.Widget *errorWidgetParent) {
     const QStringList allowedUrlSchemes = {

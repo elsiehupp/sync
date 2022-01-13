@@ -1,8 +1,15 @@
 /***********************************************************
 Copyright (C) by Christian Kamm <mail@ckamm.de>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QLoggingCategory>
+// #include <QTimer>
+
+using namespace Occ;
+
+static const int check_frequency = 20 * 1000; // ms
 
 // #pragma once
 
@@ -34,22 +41,26 @@ class LockWatcher : GLib.Object {
 public:
     LockWatcher (GLib.Object *parent = nullptr);
 
-    /** Start watching a file.
-     *
-     * If the file is not locked later on, the fileUnlocked signal will be
-     * emitted once.
-     */
+    /***********************************************************
+    Start watching a file.
+
+    If the file is not locked later on, the fileUnlocked signal will be
+    emitted once.
+    ***********************************************************/
     void addFile (string &path);
 
-    /** Adjusts the default interval for checking whether the lock is still present */
+    /***********************************************************
+    Adjusts the default interval for checking whether the lock is still present */
     void setCheckInterval (std.chrono.milliseconds interval);
 
-    /** Whether the path is being watched for lock-changes */
+    /***********************************************************
+    Whether the path is being watched for lock-changes */
     bool contains (string &path);
 
 signals:
-    /** Emitted when one of the watched files is no longer
-     *  being locked. */
+    /***********************************************************
+    Emitted when one of the watched files is no longer
+     being locked. */
     void fileUnlocked (string &path);
 
 private slots:
@@ -67,20 +78,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Christian Kamm <mail@ckamm.de>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QLoggingCategory>
-// #include <QTimer>
-
-using namespace Occ;
-
-Q_LOGGING_CATEGORY (lcLockWatcher, "nextcloud.gui.lockwatcher", QtInfoMsg)
-
-static const int check_frequency = 20 * 1000; // ms
 
 LockWatcher.LockWatcher (GLib.Object *parent)
     : GLib.Object (parent) {

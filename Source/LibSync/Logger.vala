@@ -1,8 +1,25 @@
 /***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QDir>
+// #include <QRegularExpression>
+// #include <QStringList>
+// #include <QtGlobal>
+// #include <QTextCodec>
+// #include <qmetaobject.h>
+
+// #include <iostream>
+
+#ifdef ZLIB_FOUND
+// #include <zlib.h>
+#endif
+
+namespace {
+constexpr int CrashLogSize = 20;
+}
 
 // #include <GLib.Object>
 // #include <QList>
@@ -42,20 +59,23 @@ public:
     bool logDebug () { return _logDebug; }
     void setLogDebug (bool debug);
 
-    /** Returns where the automatic logdir would be */
+    /***********************************************************
+    Returns where the automatic logdir would be */
     string temporaryFolderLogDirPath ();
 
-    /** Sets up default dir log setup.
-     *
-     * logdir : a temporary folder
-     * logexpire : 4 hours
-     * logdebug : true
-     *
+    /***********************************************************
+    Sets up default dir log setup.
+
+    logdir : a temporary folder
+    logexpire : 4 hours
+    logdebug : true
+    
      * Used in conjunction with ConfigFile.automaticLogDir
-     */
+    ***********************************************************/
     void setupTemporaryFolderLogDir ();
 
-    /** For switching off via logwindow */
+    /***********************************************************
+    For switching off via logwindow */
     void disableTemporaryFolderLogDir ();
 
     void addLogRule (QSet<string> &rules) {
@@ -109,28 +129,6 @@ private:
 
 
 
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QDir>
-// #include <QRegularExpression>
-// #include <QStringList>
-// #include <QtGlobal>
-// #include <QTextCodec>
-// #include <qmetaobject.h>
-
-// #include <iostream>
-
-#ifdef ZLIB_FOUND
-// #include <zlib.h>
-#endif
-
-namespace {
-constexpr int CrashLogSize = 20;
-}
 namespace Occ {
 
 Logger *Logger.instance () {

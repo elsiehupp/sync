@@ -1,8 +1,23 @@
 /***********************************************************
 Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <networkjobs.h>
+
+// #include <QDateTime>
+// #include <QtGlobal>
+// #include <QJsonDocument>
+// #include <QJsonValue>
+// #include <QLoggingCategory>
+// #include <string>
+// #include <QJsonObject>
+// #include <QJsonArray>
+// #include <qdatetime.h>
+// #include <qjsonarray.h>
+// #include <qjsonobject.h>
+// #include <qloggingcategory.h>
 
 // #pragma once
 
@@ -53,39 +68,7 @@ private:
 
     UserStatus _userStatus;
 };
-}
 
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <networkjobs.h>
-
-// #include <QDateTime>
-// #include <QtGlobal>
-// #include <QJsonDocument>
-// #include <QJsonValue>
-// #include <QLoggingCategory>
-// #include <string>
-// #include <QJsonObject>
-// #include <QJsonArray>
-// #include <qdatetime.h>
-// #include <qjsonarray.h>
-// #include <qjsonobject.h>
-// #include <qloggingcategory.h>
-
-namespace {
-
-    Q_LOGGING_CATEGORY (lcOcsUserStatusConnector, "nextcloud.gui.ocsuserstatusconnector", QtInfoMsg)
-    
     Occ.UserStatus.OnlineStatus stringToUserOnlineStatus (string &status) {
         // it needs to match the Status enum
         const QHash<string, Occ.UserStatus.OnlineStatus> preDefinedStatus { { "online", Occ.UserStatus.OnlineStatus.Online }, { "dnd", Occ.UserStatus.OnlineStatus.DoNotDisturb }, { "away", Occ.UserStatus.OnlineStatus.Away }, { "offline", Occ.UserStatus.OnlineStatus.Offline }, { "invisible", Occ.UserStatus.OnlineStatus.Invisible }

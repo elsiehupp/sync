@@ -1,8 +1,20 @@
 /***********************************************************
 Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <ocsuserstatusconnector.h>
+// #include <qnamespace.h>
+// #include <userstatusconnector.h>
+// #include <theme.h>
+
+// #include <QDateTime>
+// #include <QLoggingCategory>
+
+// #include <algorithm>
+// #include <cmath>
+// #include <cstddef>
 
 // #pragma once
 
@@ -128,39 +140,7 @@ private:
         ClearStageType.Week
     };
 };
-}
 
-
-
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <ocsuserstatusconnector.h>
-// #include <qnamespace.h>
-// #include <userstatusconnector.h>
-// #include <theme.h>
-
-// #include <QDateTime>
-// #include <QLoggingCategory>
-
-// #include <algorithm>
-// #include <cmath>
-// #include <cstddef>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcUserStatusDialogModel, "nextcloud.gui.userstatusdialogmodel", QtInfoMsg)
-    
     UserStatusSelectorModel.UserStatusSelectorModel (GLib.Object *parent)
         : GLib.Object (parent)
         , _dateTimeProvider (new DateTimeProvider) {

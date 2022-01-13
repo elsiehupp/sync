@@ -1,8 +1,16 @@
 /***********************************************************
 Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QDateTime>
+// #include <QDebug>
+// #include <QDesktopServices>
+// #include <QFileInfo>
+// #include <QMimeDatabase>
+// #include <QPushButton>
+// #include <QUrl>
 
 // #include <Gtk.Dialog>
 
@@ -41,25 +49,6 @@ private:
 } // namespace Occ
 
 
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QDateTime>
-// #include <QDebug>
-// #include <QDesktopServices>
-// #include <QFileInfo>
-// #include <QMimeDatabase>
-// #include <QPushButton>
-// #include <QUrl>
 
 namespace {
     void forceHeaderFont (Gtk.Widget *widget) {

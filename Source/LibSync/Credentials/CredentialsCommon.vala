@@ -2,23 +2,7 @@
 Copyright (C) by Klaas Freitag <freitag@kde.org>
 Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-namespace Occ {
-
-} // namespace Occ
-
-#endif
-
-
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@kde.org>
-Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
-
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 // #include <QList>
@@ -27,5 +11,6 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 // #include <QSslConfiguration>
 
 namespace Occ {
+
 
 } // namespace Occ

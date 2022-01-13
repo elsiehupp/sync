@@ -1,8 +1,9 @@
 /***********************************************************
 Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
 
 namespace Occ {
 
@@ -20,13 +21,13 @@ public slots:
     void start () override;
 signals:
     /***********************************************************
-     * @param statusCode the HTTP status code
-     * @param reply the content of the reply
-     *
-     * Signal that the job is done. If the statusCode is 200 (success) reply
-     * will contain the image data in PNG. If the status code is different the content
+    @param statusCode the HTTP status code
+    @param reply the content of the reply
+    
+    Signal that the job is done. If the statusCode is 200 (success) reply
+    will contain the image data in PNG. If the status code is different the content
      * of reply is undefined.
-     */
+    ***********************************************************/
     void jobFinished (int statusCode, QByteArray reply);
 private slots:
     bool finished () override;
@@ -39,12 +40,6 @@ private slots:
 
 
 
-
-/***********************************************************
-Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
 
 namespace Occ {
 

@@ -1,8 +1,18 @@
 /***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QNetworkAccessManager>
+// #include <QFileInfo>
+// #include <QDir>
+// #include <QJsonDocument>
+// #include <QJsonObject>
+// #include <QFileInfo>
+
+// #include <cmath>
+// #include <cstring>
 // #pragma once
 
 // #include <QBuffer>
@@ -187,20 +197,21 @@ protected:
     bool _finished BITFIELD (1); /// Tells that all the jobs have been finished
     bool _deleteExisting BITFIELD (1);
 
-    /** Whether an abort is currently ongoing.
-     *
-     * Important to avoid duplicate aborts since each finishing PUTFileJob might
-     * trigger an abort on error.
-     */
+    /***********************************************************
+    Whether an abort is currently ongoing.
+
+    Important to avoid duplicate aborts since each finishing PUTFileJob might
+    trigger an abort on error.
+    ***********************************************************/
     bool _aborting BITFIELD (1);
 
     /* This is a minified version of the SyncFileItem,
-     * that holds only the specifics about the file that's
-     * being uploaded.
-     *
-     * This is needed if we wanna apply changes on the file
+    that holds only the specifics about the file that's
+    being uploaded.
+    
+    This is needed if we wanna apply changes on the file
      * that's being uploaded while keeping the original on disk.
-     */
+    ***********************************************************/
     struct UploadFileInfo {
       string _file; /// I'm still unsure if I should use a SyncFilePtr here.
       string _path; /// the full path on disk.
@@ -213,11 +224,11 @@ public:
     PropagateUploadFileCommon (OwncloudPropagator *propagator, SyncFileItemPtr &item);
 
     /***********************************************************
-     * Whether an existing entity with the same name may be deleted before
-     * the upload.
-     *
+    Whether an existing entity with the same name may be deleted before
+    the upload.
+    
      * Default : false.
-     */
+    ***********************************************************/
     void setDeleteExisting (bool enabled);
 
     /* start should setup the file, path and size that will be send to the server */
@@ -256,37 +267,38 @@ protected:
     void done (SyncFileItem.Status status, string &errorString = string ()) override;
 
     /***********************************************************
-     * Aborts all running network jobs, except for the ones that mayAbortJob
-     * returns false on and, for async aborts, emits abortFinished when done.
-     */
+    Aborts all running network jobs, except for the ones that mayAbortJob
+    returns false on and, for async aborts, emits abortFinished when done.
+    ***********************************************************/
     void abortNetworkJobs (
         AbortType abortType,
         const std.function<bool (AbstractNetworkJob *job)> &mayAbortJob);
 
     /***********************************************************
-     * Checks whether the current error is one that should reset the whole
-     * transfer if it happens too often. If so : Bump UploadInfo.errorCount
-     * and maybe perform the reset.
-     */
+    Checks whether the current error is one that should reset the whole
+    transfer if it happens too often. If so : Bump UploadInfo.errorCount
+    and maybe perform the reset.
+    ***********************************************************/
     void checkResettingErrors ();
 
     /***********************************************************
-     * Error handling functionality that is shared between jobs.
-     */
+    Error handling functionality that is shared between jobs.
+    ***********************************************************/
     void commonErrorHandling (AbstractNetworkJob *job);
 
     /***********************************************************
-     * Increases the timeout for the final MOVE/PUT for large files.
-     *
-     * This is an unfortunate workaround since the drawback is not being able to
-     * detect real disconnects in a timely manner. Shall go away when the server
-     * response starts coming quicker, or there is some sort of async api.
-     *
+    Increases the timeout for the final MOVE/PUT for large files.
+    
+    This is an unfortunate workaround since the drawback is not being able to
+    detect real disconnects in a timely manner. Shall go away when the s
+    response starts coming quicker, or there is some sort of async api.
+
      * See #6527, enterprise#2480
-     */
+    ***********************************************************/
     static void adjustLastJobTimeout (AbstractNetworkJob *job, int64 fileSize);
 
-    /** Bases headers that need to be sent on the PUT, or in the MOVE for chunking-ng */
+    /***********************************************************
+    Bases headers that need to be sent on the PUT, or in the MOVE for chunking-ng */
     QMap<QByteArray, QByteArray> headers ();
 private:
   PropagateUploadEncrypted *_uploadEncryptedHelper;
@@ -304,16 +316,16 @@ class PropagateUploadFileV1 : PropagateUploadFileCommon {
 
 private:
     /***********************************************************
-     * That's the start chunk that was stored in the database for resuming.
-     * In the non-resuming case it is 0.
-     * If we are resuming, this is the first chunk we need to send
-     */
+    That's the start chunk that was stored in the database for resuming.
+    In the non-resuming case it is 0.
+    If we are resuming, this is the first chunk we need to send
+    ***********************************************************/
     int _startChunk = 0;
     /***********************************************************
-     * This is the next chunk that we need to send. Starting from 0 even if _startChunk != 0
-     * (In other words,  _startChunk + _currentChunk is really the number of the chunk we need to send next)
-     * (In other words, _currentChunk is the number of the chunk that we already sent or started sending)
-     */
+    This is the next chunk that we need to send. Starting from 0 even if _startChunk != 0
+    (In other words,  _startChunk + _currentChunk is really the number of the chunk we need to send next)
+    (In other words, _currentChunk is the number of the chunk that we already sent or started sending)
+    ***********************************************************/
     int _currentChunk = 0;
     int _chunkCount = 0; /// Total number of chunks for this file
     uint _transferId = 0; /// transfer id (part of the url)
@@ -361,9 +373,9 @@ private:
     QMap<int64, ServerChunkInfo> _serverChunks;
 
     /***********************************************************
-     * Return the URL of a chunk.
-     * If chunk == -1, returns the URL of the parent folder containing the chunks
-     */
+    Return the URL of a chunk.
+    If chunk == -1, returns the URL of the parent folder containing the chunks
+    ***********************************************************/
     QUrl chunkUrl (int chunk = -1);
 
 public:
@@ -388,39 +400,7 @@ private slots:
     void slotMoveJobFinished ();
     void slotUploadProgress (int64, int64);
 };
-}
 
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QNetworkAccessManager>
-// #include <QFileInfo>
-// #include <QDir>
-// #include <QJsonDocument>
-// #include <QJsonObject>
-// #include <QFileInfo>
-
-// #include <cmath>
-// #include <cstring>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcPutJob, "nextcloud.sync.networkjob.put", QtInfoMsg)
-    Q_LOGGING_CATEGORY (lcPollJob, "nextcloud.sync.networkjob.poll", QtInfoMsg)
-    Q_LOGGING_CATEGORY (lcPropagateUpload, "nextcloud.sync.propagator.upload", QtInfoMsg)
-    Q_LOGGING_CATEGORY (lcPropagateUploadV1, "nextcloud.sync.propagator.upload.v1", QtInfoMsg)
-    Q_LOGGING_CATEGORY (lcPropagateUploadNG, "nextcloud.sync.propagator.upload.ng", QtInfoMsg)
-    
     PUTFileJob.~PUTFileJob () {
         // Make sure that we destroy the QNetworkReply before our _device of which it keeps an internal pointer.
         setReply (nullptr);

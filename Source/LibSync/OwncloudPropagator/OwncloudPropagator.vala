@@ -1,8 +1,24 @@
 /***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
+Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #pragma once
+
+// #include <QLoggingCategory>
+// #include <QNetworkReply>
+
+// #include <QStack>
+// #include <QFileInfo>
+// #include <QDir>
+// #include <QLoggingCategory>
+// #include <QTimer>
+// #include <GLib.Object>
+// #include <QTimerEvent>
+// #include <QRegularExpression>
+// #include <qmath.h>
 
 // #include <QHash>
 // #include <GLib.Object>
@@ -19,11 +35,13 @@ namespace Occ {
 
 Q_DECLARE_LOGGING_CATEGORY (lcPropagator)
 
-/** Free disk space threshold below which syncs will abort and not even start.
+/***********************************************************
+Free disk space threshold below which syncs will abort and not even start.
 ***********************************************************/
 int64 criticalFreeSpaceLimit ();
 
-/** The client will not intentionally reduce the available free disk space below
+/***********************************************************
+The client will not intentionally reduce the available free disk space below
  this limit.
 
 Uploads will still run and downloads that are small enough will continue too.
@@ -78,60 +96,64 @@ public:
     virtual JobParallelism parallelism () { return FullParallelism; }
 
     /***********************************************************
-     * For "small" jobs
-     */
+    For "small" jobs
+    ***********************************************************/
     virtual bool isLikelyFinishedQuickly () { return false; }
 
-    /** The space that the running jobs need to complete but don't actually use yet.
-     *
-     * Note that this does *not* include the disk space that's already
-     * in use by running jobs for things like a download-in-progress.
-     */
+    /***********************************************************
+    The space that the running jobs need to complete but don't actually use yet.
+
+    Note that this does *not* include the disk space that's already
+    in use by running jobs for things like a download-in-progress.
+    ***********************************************************/
     virtual int64 committedDiskSpace () { return 0; }
 
-    /** Set the associated composite job
-     *
-     * Used only from PropagatorCompositeJob itself, when a job is added
-     * and from PropagateDirectory to associate the subJobs with the first
-     * job.
-     */
+    /***********************************************************
+    Set the associated composite job
+
+    Used only from PropagatorCompositeJob itself, when a job is added
+    and from PropagateDirectory to associate the subJobs with the first
+    job.
+    ***********************************************************/
     void setAssociatedComposite (PropagatorCompositeJob *job) { _associatedComposite = job; }
 
 public slots:
     /***********************************************************
-     * Asynchronous abort requires emit of abortFinished () signal,
-     * while synchronous is expected to abort immedietaly.
+    Asynchronous abort requires emit of abortFinished () signal,
+    while synchronous is expected to abort immedietaly.
     */
     virtual void abort (PropagatorJob.AbortType abortType) {
         if (abortType == AbortType.Asynchronous)
             emit abortFinished ();
     }
 
-    /** Starts this job, or a new subjob
-     * returns true if a job was started.
-     */
+    /***********************************************************
+    Starts this job, or a new subjob
+    returns true if a job was started.
+    ***********************************************************/
     virtual bool scheduleSelfOrChild () = 0;
 signals:
     /***********************************************************
-     * Emitted when the job is fully finished
-     */
+    Emitted when the job is fully finished
+    ***********************************************************/
     void finished (SyncFileItem.Status);
 
     /***********************************************************
-     * Emitted when the abort is fully finished
-     */
+    Emitted when the abort is fully finished
+    ***********************************************************/
     void abortFinished (SyncFileItem.Status status = SyncFileItem.NormalError);
 protected:
     OwncloudPropagator *propagator ();
 
-    /** If this job gets added to a composite job, this will point to the parent.
-     *
-     * For the PropagateDirectory._firstJob it will point to
-     * PropagateDirectory._subJobs.
-     *
-     * That can be useful for jobs that want to spawn follow-up jobs without
+    /***********************************************************
+    If this job gets added to a composite job, this will point to the parent.
+
+    For the PropagateDirectory._firstJob it will point to
+    PropagateDirectory._subJobs.
+    
+    That can be useful for jobs that want to spawn follow-up jobs without
      * becoming composite jobs themselves.
-     */
+    ***********************************************************/
     PropagatorCompositeJob *_associatedComposite = nullptr;
 };
 
@@ -143,9 +165,9 @@ protected:
     virtual void done (SyncFileItem.Status status, string &errorString = string ());
 
     /***********************************************************
-     * set a custom restore job message that is used if the restore job succeeded.
-     * It is displayed in the activity view.
-     */
+    set a custom restore job message that is used if the restore job succeeded.
+    It is displayed in the activity view.
+    ***********************************************************/
     string restoreJobMsg () {
         return _item._isRestoration ? _item._errorString : string ();
     }
@@ -226,10 +248,10 @@ public:
     JobParallelism parallelism () override;
 
     /***********************************************************
-     * Abort synchronously or asynchronously - some jobs
-     * require to be finished without immediete abort (abort on job might
-     * cause conflicts/duplicated files - owncloud/client/issues/5949)
-     */
+    Abort synchronously or asynchronously - some jobs
+    require to be finished without immediete abort (abort on job might
+    cause conflicts/duplicated files - owncloud/client/issues/5949)
+    ***********************************************************/
     void abort (PropagatorJob.AbortType abortType) override {
         if (!_runningJobs.empty ()) {
             _abortsCount = _runningJobs.size ();
@@ -409,73 +431,80 @@ public:
 
     bool _abortRequested = false;
 
-    /** The list of currently active jobs.
+    /***********************************************************
+    The list of currently active jobs.
         This list contains the jobs that are currently using ressources and is used purely to
         know how many jobs there is currently running for the scheduler.
         Jobs add themself to the list when they do an assynchronous operation.
         Jobs can be several time on the list (example, when several chunks are uploaded in parallel)
-     */
+    ***********************************************************/
     QList<PropagateItemJob> _activeJobList;
 
-    /** We detected that another sync is required after this one */
+    /***********************************************************
+    We detected that another sync is required after this one */
     bool _anotherSyncNeeded;
 
-    /** Per-folder quota guesses.
-     *
-     * This starts out empty. When an upload in a folder fails due to insufficent
-     * remote quota, the quota guess is updated to be attempted_size-1 at maximum.
-     *
-     * Note that it will usually just an upper limit for the actual quota - but
-     * since the quota on the server might change at any time it can sometimes be
-     * wrong in the other direction as well.
-     *
+    /***********************************************************
+    Per-folder quota guesses.
+
+    This starts out empty. When an upload in a folder fails due to insufficent
+    remote quota, the quota guess is updated to be attempted_size-1 at maximum.
+    
+    Note that it will usually just an upper limit for the actual quota - but
+    since the quota on the server might ch
+    wrong in the other direction as well.
+
      * This allows skipping of uploads that have a very high likelihood of failure.
-     */
+    ***********************************************************/
     QHash<string, int64> _folderQuota;
 
     /* the maximum number of jobs using bandwidth (uploads or downloads, in parallel) */
     int maximumActiveTransferJob ();
 
-    /** The size to use for upload chunks.
-     *
-     * Will be dynamically adjusted after each chunk upload finishes
-     * if Capabilities.desiredChunkUploadDuration has a target
-     * chunk-upload duration set.
-     */
+    /***********************************************************
+    The size to use for upload chunks.
+
+    Will be dynamically adjusted after each chunk upload finishes
+    if Capabilities.desiredChunkUploadDuration has a target
+    chunk-upload duration set.
+    ***********************************************************/
     int64 _chunkSize;
     int64 smallFileSize ();
 
     /* The maximum number of active jobs in parallel  */
     int hardMaximumActiveJob ();
 
-    /** Check whether a download would clash with an existing file
-     * in filesystems that are only case-preserving.
-     */
+    /***********************************************************
+    Check whether a download would clash with an existing file
+    in filesystems that are only case-preserving.
+    ***********************************************************/
     bool localFileNameClash (string &relfile);
 
-    /** Check whether a file is properly accessible for upload.
-     *
-     * It is possible to create files with filenames that differ
-     * only by case in NTFS, but most operations such as stat and
-     * open only target one of these by default.
-     *
-     * When that happens, we want to avoid uploading incorrect data
+    /***********************************************************
+    Check whether a file is properly accessible for upload.
+
+    It is possible to create files with filenames that differ
+    only by case in NTFS, but most operations such as stat and
+    open only target one of these by default.
+    
+    When that happens, we want to avoid uploading incorrect data
      * and give up on the file.
-     */
+    ***********************************************************/
     bool hasCaseClashAccessibilityProblem (string &relfile);
 
     Q_REQUIRED_RESULT string fullLocalPath (string &tmp_file_name) const;
     string localPath ();
 
     /***********************************************************
-     * Returns the full remote path including the folder root of a
-     * folder sync path.
-     */
+    Returns the full remote path including the folder root of a
+    folder sync path.
+    ***********************************************************/
     Q_REQUIRED_RESULT string fullRemotePath (string &tmp_file_name) const;
     string remotePath ();
 
-    /** Creates the job for an item.
-     */
+    /***********************************************************
+    Creates the job for an item.
+    ***********************************************************/
     PropagateItemJob *createJob (SyncFileItemPtr &item);
 
     void scheduleNextJob ();
@@ -508,20 +537,22 @@ public:
         DiskSpaceCritical
     };
 
-    /** Checks whether there's enough disk space available to complete
-     *  all jobs that are currently running.
-     */
+    /***********************************************************
+    Checks whether there's enough disk space available to complete
+     all jobs that are currently running.
+    ***********************************************************/
     DiskSpaceResult diskSpaceCheck ();
 
-    /** Handles a conflict by renaming the file 'item'.
-     *
-     * Sets up conflict records.
-     *
-     * It also creates a new upload job in composite if the item that's
-     * moved away is a file and conflict uploads are requested.
-     *
+    /***********************************************************
+    Handles a conflict by renaming the file 'item'.
+
+    Sets up conflict records.
+    
+    It also creates a new upload job in composite if the item
+    moved away is a file and conflict uploads are requested.
+
      * Returns true on success, false and error on error.
-     */
+    ***********************************************************/
     bool createConflict (SyncFileItemPtr &item,
         PropagatorCompositeJob *composite, string *error);
 
@@ -529,22 +560,24 @@ public:
     QMap<string, string> _renamedDirectories;
     string adjustRenamedPath (string &original) const;
 
-    /** Update the database for an item.
-     *
-     * Typically after a sync operation succeeded. Updates the inode from
-     * the filesystem.
-     *
+    /***********************************************************
+    Update the database for an item.
+
+    Typically after a sync operation succeeded. Updates the inode from
+    the filesystem.
+    
      * Will also trigger a Vfs.convertToPlaceholder.
-     */
+    ***********************************************************/
     Result<Vfs.ConvertToPlaceholderResult, string> updateMetadata (SyncFileItem &item);
 
-    /** Update the database for an item.
-     *
-     * Typically after a sync operation succeeded. Updates the inode from
-     * the filesystem.
-     *
+    /***********************************************************
+    Update the database for an item.
+
+    Typically after a sync operation succeeded. Updates the inode from
+    the filesystem.
+    
      * Will also trigger a Vfs.convertToPlaceholder.
-     */
+    ***********************************************************/
     static Result<Vfs.ConvertToPlaceholderResult, string> staticUpdateMetadata (SyncFileItem &item, string localDir,
                                                                                  Vfs *vfs, SyncJournalDb * const journal);
 
@@ -572,7 +605,8 @@ private slots:
         emitFinished (SyncFileItem.NormalError);
     }
 
-    /** Emit the finished signal and make sure it is only emitted once */
+    /***********************************************************
+    Emit the finished signal and make sure it is only emitted once */
     void emitFinished (SyncFileItem.Status status) {
         if (!_finishedEmited)
             emit finished (status == SyncFileItem.Success);
@@ -587,14 +621,16 @@ signals:
     void progress (SyncFileItem &, int64 bytes);
     void finished (bool success);
 
-    /** Emitted when propagation has problems with a locked file. */
+    /***********************************************************
+    Emitted when propagation has problems with a locked file. */
     void seenLockedFile (string &fileName);
 
-    /** Emitted when propagation touches a file.
-     *
-     * Used to track our own file modifications such that notifications
-     * from the file watcher about these can be ignored.
-     */
+    /***********************************************************
+    Emitted when propagation touches a file.
+
+    Used to track our own file modifications such that notifications
+    from the file watcher about these can be ignored.
+    ***********************************************************/
     void touchedFile (string &fileName);
 
     void insufficientLocalStorage ();
@@ -649,9 +685,9 @@ public:
     ~CleanupPollsJob () override;
 
     /***********************************************************
-     * Start the job.  After the job is completed, it will emit either finished or aborted, and it
-     * will destroy itself.
-     */
+    Start the job.  After the job is completed, it will emit either finished or aborted, and it
+    will destroy itself.
+    ***********************************************************/
     void start ();
 signals:
     void finished ();
@@ -659,46 +695,7 @@ signals:
 private slots:
     void slotPollFinished ();
 };
-}
 
-#endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QStack>
-// #include <QFileInfo>
-// #include <QDir>
-// #include <QLoggingCategory>
-// #include <QTimer>
-// #include <GLib.Object>
-// #include <QTimerEvent>
-// #include <QRegularExpression>
-// #include <qmath.h>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcPropagator, "nextcloud.sync.propagator", QtInfoMsg)
-    Q_LOGGING_CATEGORY (lcDirectory, "nextcloud.sync.propagator.directory", QtInfoMsg)
-    Q_LOGGING_CATEGORY (lcRootDirectory, "nextcloud.sync.propagator.root.directory", QtInfoMsg)
-    Q_LOGGING_CATEGORY (lcCleanupPolls, "nextcloud.sync.propagator.cleanuppolls", QtInfoMsg)
-    
     int64 criticalFreeSpaceLimit () {
         int64 value = 50 * 1000 * 1000LL;
     
@@ -763,7 +760,8 @@ namespace Occ {
         return 24 * 60 * 60; // 1 day
     }
     
-    /** Creates a blacklist entry, possibly taking into account an old one.
+    /***********************************************************
+    Creates a blacklist entry, possibly taking into account an old one.
     
     The old entry may be invalid, then a fresh entry is created.
     ***********************************************************/
@@ -808,7 +806,8 @@ namespace Occ {
         return entry;
     }
     
-    /** Updates, creates or removes a blacklist entry for the given item.
+    /***********************************************************
+    Updates, creates or removes a blacklist entry for the given item.
     
     May adjust the status or item._errorString.
     ***********************************************************/
@@ -1871,17 +1870,6 @@ namespace Occ {
 
 
 
-/***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #pragma once
-
-// #include <QLoggingCategory>
-// #include <QNetworkReply>
 
 namespace {
 

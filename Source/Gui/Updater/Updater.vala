@@ -1,8 +1,14 @@
 /***********************************************************
 Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QUrl>
+// #include <QUrlQuery>
+// #include <QProcess>
+
+// #include <QSysInfo>
 
 // #include <QLoggingCategory>
 // #include <GLib.Object>
@@ -40,33 +46,7 @@ private:
     static Updater *_instance;
 };
 
-} // namespace Occ
 
-
-
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QUrl>
-// #include <QUrlQuery>
-// #include <QProcess>
-
-// #include <QSysInfo>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcUpdater, "nextcloud.gui.updater", QtInfoMsg)
-    
     Updater *Updater._instance = nullptr;
     
     Updater *Updater.instance () {

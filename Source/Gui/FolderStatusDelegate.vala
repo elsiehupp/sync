@@ -2,7 +2,7 @@
 Copyright (C) by Klaas Freitag <freitag@kde.org>
 Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
 // #pragma once
@@ -47,8 +47,8 @@ public:
         const QModelIndex &index) override;
 
     /***********************************************************
-     * return the position of the option button within the item
-     */
+    return the position of the option button within the item
+    ***********************************************************/
     static QRect optionsButtonRect (QRect within, Qt.LayoutDirection direction);
     static QRect addButtonRect (QRect within, Qt.LayoutDirection direction);
     static QRect errorsListRect (QRect within);

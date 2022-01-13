@@ -1,8 +1,12 @@
 /***********************************************************
 Copyright (C) by Markus Goetz <markus@woboq.com>
 
-<GPLv???-or-later-Boilerplate>
+<GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
+// #include <QLoggingCategory>
+// #include <QTimer>
+// #include <GLib.Object>
 
 // #include <GLib.Object>
 // #include <QTimer>
@@ -84,33 +88,6 @@ private:
     int64 _currentDownloadLimit;
 };
 
-} // namespace Occ
-
-#endif
-
-
-
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Markus Goetz <markus@woboq.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-// #include <QLoggingCategory>
-// #include <QTimer>
-// #include <GLib.Object>
-
-namespace Occ {
-
-    Q_LOGGING_CATEGORY (lcBandwidthManager, "nextcloud.sync.bandwidthmanager", QtInfoMsg)
-    
     // Because of the many layers of buffering inside Qt (and probably the OS and the network)
     // we cannot lower this value much more. If we do, the estimated bw will be very high
     // because the buffers fill fast while the actual network algorithms are not relevant yet.
