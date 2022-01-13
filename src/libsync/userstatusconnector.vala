@@ -25,7 +25,7 @@ enum class ClearAtType {
 };
 
 // TODO : If we can use C++17 make it a std.variant
-struct OWNCLOUDSYNC_EXPORT ClearAt {
+struct ClearAt {
     ClearAtType _type = ClearAtType.Period;
 
     uint64 _timestamp;

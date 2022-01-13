@@ -238,7 +238,7 @@ GeneralSettings.~GeneralSettings () {
 
 QSize GeneralSettings.sizeHint () {
     return {
-        OwnCloudGui.settingsDialogSize ().width (),
+        OwncloudGui.settingsDialogSize ().width (),
         Gtk.Widget.sizeHint ().height ()
     };
 }
@@ -393,7 +393,7 @@ void GeneralSettings.slotIgnoreFilesEditor () {
         _ignoreEditor.setAttribute (Qt.WA_DeleteOnClose, true);
         _ignoreEditor.open ();
     } else {
-        OwnCloudGui.raiseDialog (_ignoreEditor);
+        OwncloudGui.raiseDialog (_ignoreEditor);
     }
 }
 

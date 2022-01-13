@@ -39,7 +39,7 @@ public:
 
     void showMainDialog ();
 
-    OwnCloudGui *gui ();
+    OwncloudGui *gui ();
 
 public slots:
     // TODO : this should not be public
@@ -84,7 +84,7 @@ private:
      */
     bool configVersionMigration ();
 
-    QPointer<OwnCloudGui> _gui;
+    QPointer<OwncloudGui> _gui;
 
     Theme *_theme;
 
@@ -247,7 +247,7 @@ bool Application.configVersionMigration () {
     return true;
 }
 
-OwnCloudGui *Application.gui () {
+OwncloudGui *Application.gui () {
     return _gui;
 }
 
@@ -392,7 +392,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
 
     // Setting up the gui class will allow tray notifications for the
     // setup that follows, like folder setup
-    _gui = new OwnCloudGui (this);
+    _gui = new OwncloudGui (this);
     if (_showLogWindow) {
         _gui.slotToggleLogBrowser (); // _showLogWindow is set in parseOptions.
     }
@@ -412,7 +412,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
     }
 
     connect (FolderMan.instance ().socketApi (), &SocketApi.shareCommandReceived,
-        _gui.data (), &OwnCloudGui.slotShowShareDialog);
+        _gui.data (), &OwncloudGui.slotShowShareDialog);
 
     connect (FolderMan.instance ().socketApi (), &SocketApi.fileActivityCommandReceived,
         Systray.instance (), &Systray.showFileActivityDialog);
@@ -432,7 +432,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
     // Update checks
     auto *updaterScheduler = new UpdaterScheduler (this);
     connect (updaterScheduler, &UpdaterScheduler.updaterAnnouncement,
-        _gui.data (), &OwnCloudGui.slotShowTrayMessage);
+        _gui.data (), &OwncloudGui.slotShowTrayMessage);
     connect (updaterScheduler, &UpdaterScheduler.requestRestart,
         _folderManager.data (), &FolderMan.slotScheduleAppRestart);
 #endif
@@ -441,7 +441,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
     connect (this, &QCoreApplication.aboutToQuit, this, &Application.slotCleanup);
 
     // Allow other classes to hook into isShowingSettingsDialog () signals (re-auth widgets, for example)
-    connect (_gui.data (), &OwnCloudGui.isShowingSettingsDialog, this, &Application.slotGuiIsShowingSettings);
+    connect (_gui.data (), &OwncloudGui.isShowingSettingsDialog, this, &Application.slotGuiIsShowingSettings);
 
     _gui.createTray ();
 }
@@ -462,9 +462,9 @@ Application.~Application () {
 void Application.slotAccountStateRemoved (AccountState *accountState) {
     if (_gui) {
         disconnect (accountState, &AccountState.stateChanged,
-            _gui.data (), &OwnCloudGui.slotAccountStateChanged);
+            _gui.data (), &OwncloudGui.slotAccountStateChanged);
         disconnect (accountState.account ().data (), &Account.serverVersionChanged,
-            _gui.data (), &OwnCloudGui.slotTrayMessageIfServerUnsupported);
+            _gui.data (), &OwncloudGui.slotTrayMessageIfServerUnsupported);
     }
     if (_folderManager) {
         disconnect (accountState, &AccountState.stateChanged,
@@ -483,9 +483,9 @@ void Application.slotAccountStateRemoved (AccountState *accountState) {
 
 void Application.slotAccountStateAdded (AccountState *accountState) {
     connect (accountState, &AccountState.stateChanged,
-        _gui.data (), &OwnCloudGui.slotAccountStateChanged);
+        _gui.data (), &OwncloudGui.slotAccountStateChanged);
     connect (accountState.account ().data (), &Account.serverVersionChanged,
-        _gui.data (), &OwnCloudGui.slotTrayMessageIfServerUnsupported);
+        _gui.data (), &OwncloudGui.slotTrayMessageIfServerUnsupported);
     connect (accountState, &AccountState.stateChanged,
         _folderManager.data (), &FolderMan.slotAccountStateChanged);
     connect (accountState.account ().data (), &Account.serverVersionChanged,

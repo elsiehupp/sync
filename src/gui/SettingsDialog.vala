@@ -15,7 +15,7 @@ namespace Occ {
 namespace Ui {
     class SettingsDialog;
 }
-class OwnCloudGui;
+class OwncloudGui;
 
 /***********************************************************
 @brief The SettingsDialog class
@@ -25,7 +25,7 @@ class SettingsDialog : Gtk.Dialog {
     Q_PROPERTY (Gtk.Widget* currentPage READ currentPage)
 
 public:
-    SettingsDialog (OwnCloudGui *gui, Gtk.Widget *parent = nullptr);
+    SettingsDialog (OwncloudGui *gui, Gtk.Widget *parent = nullptr);
     ~SettingsDialog () override;
 
     Gtk.Widget* currentPage ();
@@ -68,7 +68,7 @@ private:
 
     QToolBar *_toolBar;
 
-    OwnCloudGui *_gui;
+    OwncloudGui *_gui;
 };
 }
 
@@ -135,7 +135,7 @@ namespace {
     
     namespace Occ {
     
-    SettingsDialog.SettingsDialog (OwnCloudGui *gui, Gtk.Widget *parent)
+    SettingsDialog.SettingsDialog (OwncloudGui *gui, Gtk.Widget *parent)
         : Gtk.Dialog (parent)
         , _ui (new Ui.SettingsDialog)
         , _gui (gui) {
@@ -199,15 +199,15 @@ namespace {
     
         auto *showLogWindow = new QAction (this);
         showLogWindow.setShortcut (QKeySequence ("F12"));
-        connect (showLogWindow, &QAction.triggered, gui, &OwnCloudGui.slotToggleLogBrowser);
+        connect (showLogWindow, &QAction.triggered, gui, &OwncloudGui.slotToggleLogBrowser);
         addAction (showLogWindow);
     
         auto *showLogWindow2 = new QAction (this);
         showLogWindow2.setShortcut (QKeySequence (Qt.CTRL + Qt.Key_L));
-        connect (showLogWindow2, &QAction.triggered, gui, &OwnCloudGui.slotToggleLogBrowser);
+        connect (showLogWindow2, &QAction.triggered, gui, &OwncloudGui.slotToggleLogBrowser);
         addAction (showLogWindow2);
     
-        connect (this, &SettingsDialog.onActivate, gui, &OwnCloudGui.slotSettingsDialogActivated);
+        connect (this, &SettingsDialog.onActivate, gui, &OwncloudGui.slotSettingsDialogActivated);
     
         customizeStyle ();
     
@@ -307,9 +307,9 @@ namespace {
         _actionForAccount.insert (s.account ().data (), accountAction);
         accountAction.trigger ();
     
-        connect (accountSettings, &AccountSettings.folderChanged, _gui, &OwnCloudGui.slotFoldersChanged);
+        connect (accountSettings, &AccountSettings.folderChanged, _gui, &OwncloudGui.slotFoldersChanged);
         connect (accountSettings, &AccountSettings.openFolderAlias,
-            _gui, &OwnCloudGui.slotFolderOpenAction);
+            _gui, &OwncloudGui.slotFolderOpenAction);
         connect (accountSettings, &AccountSettings.showIssuesList, this, &SettingsDialog.showIssuesList);
         connect (s.account ().data (), &Account.accountChangedAvatar, this, &SettingsDialog.slotAccountAvatarChanged);
         connect (s.account ().data (), &Account.accountChangedDisplayName, this, &SettingsDialog.slotAccountDisplayNameChanged);

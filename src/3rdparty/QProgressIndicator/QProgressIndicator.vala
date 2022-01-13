@@ -106,3 +106,133 @@ private:
     bool m_displayedWhenStopped = false;
     QColor m_color = Qt.black;
 };
+
+
+
+
+
+
+
+
+
+
+/***********************************************************
+The MIT License (MIT)
+
+Copyright (c) 2011 Morgan Leborgne
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to
+in the Software without restriction, including without limitation the
+to use, copy, modify, merge, publish, distribute, sublicens
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following condi
+
+The above copyright notice and this permission notice shall be included
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+***********************************************************/
+
+// #include <QPainter>
+
+QProgressIndicator.QProgressIndicator (Gtk.Widget* parent)
+    : Gtk.Widget (parent) {
+    setSizePolicy (QSizePolicy.Fixed, QSizePolicy.Fixed);
+    setFocusPolicy (Qt.NoFocus);
+}
+
+bool QProgressIndicator.isAnimated () {
+    return (m_timerId != -1);
+}
+
+void QProgressIndicator.setDisplayedWhenStopped (bool state) {
+    m_displayedWhenStopped = state;
+
+    update ();
+}
+
+bool QProgressIndicator.isDisplayedWhenStopped () {
+    return m_displayedWhenStopped;
+}
+
+void QProgressIndicator.startAnimation () {
+    m_angle = 0;
+
+    if (m_timerId == -1)
+        m_timerId = startTimer (m_delay);
+}
+
+void QProgressIndicator.stopAnimation () {
+    if (m_timerId != -1)
+        killTimer (m_timerId);
+
+    m_timerId = -1;
+
+    update ();
+}
+
+void QProgressIndicator.setAnimationDelay (int delay) {
+    if (m_timerId != -1)
+        killTimer (m_timerId);
+
+    m_delay = delay;
+
+    if (m_timerId != -1)
+        m_timerId = startTimer (m_delay);
+}
+
+void QProgressIndicator.setColor (QColor & color) {
+    m_color = color;
+
+    update ();
+}
+
+QSize QProgressIndicator.sizeHint () {
+    return {20, 20};
+}
+
+int QProgressIndicator.heightForWidth (int w) {
+    return w;
+}
+
+void QProgressIndicator.timerEvent (QTimerEvent * /*event*/) {
+    m_angle = (m_angle+30)%360;
+
+    update ();
+}
+
+void QProgressIndicator.paintEvent (QPaintEvent * /*event*/) {
+    if (!m_displayedWhenStopped && !isAnimated ())
+        return;
+
+    int width = qMin (this.width (), this.height ());
+
+    QPainter p (this);
+    p.setRenderHint (QPainter.Antialiasing);
+
+    int outerRadius = qRound ( (width - 1) * 0.5);
+    int innerRadius = qRound ( (width - 1) * 0.5 * 0.38);
+
+    int capsuleHeight = outerRadius - innerRadius;
+    int capsuleWidth  = qRound ( (width > 32 ) ? capsuleHeight * 0.23 : capsuleHeight * 0.35);
+    int capsuleRadius = capsuleWidth/2;
+
+    for (int i=0; i<12; i++) {
+        QColor color = m_color;
+        color.setAlphaF (1.0f - (static_cast<float> (i) / 12.0f));
+        p.setPen (Qt.NoPen);
+        p.setBrush (color);
+        p.save ();
+        p.translate (rect ().center ());
+        p.rotate (m_angle - i * 30);
+        p.drawRoundedRect (qRound (-capsuleWidth * 0.5), - (innerRadius + capsuleHeight), capsuleWidth, capsuleHeight, capsuleRadius, capsuleRadius);
+        p.restore ();
+    }
+}

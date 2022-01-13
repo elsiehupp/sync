@@ -214,10 +214,10 @@ This assumes the response is XML with a 'error' tag that has a
 
 Returns a null string if no message was found.
 ***********************************************************/
-string OWNCLOUDSYNC_EXPORT extractErrorMessage (QByteArray &errorResponse);
+string extractErrorMessage (QByteArray &errorResponse);
 
 /** Builds a error message based on the error and the reply body. */
-string OWNCLOUDSYNC_EXPORT errorMessage (string &baseError, QByteArray &body);
+string errorMessage (string &baseError, QByteArray &body);
 
 /** Nicer errorString () for QNetworkReply
 
@@ -228,7 +228,7 @@ error might very well have been produced by a PUT request.
 
 This function produces clearer error messages for HTTP errors.
 ***********************************************************/
-string OWNCLOUDSYNC_EXPORT networkReplyErrorString (QNetworkReply &reply);
+string networkReplyErrorString (QNetworkReply &reply);
 
 } // namespace Occ
 

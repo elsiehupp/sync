@@ -21,23 +21,23 @@ string e2eeBaseUrl ();
 
 namespace EncryptionHelper {
     QByteArray generateRandomFilename ();
-    OWNCLOUDSYNC_EXPORT QByteArray generateRandom (int size);
+    QByteArray generateRandom (int size);
     QByteArray generatePassword (string &wordlist, QByteArray& salt);
-    OWNCLOUDSYNC_EXPORT QByteArray encryptPrivateKey (
+    QByteArray encryptPrivateKey (
             const QByteArray& key,
             const QByteArray& privateKey,
             const QByteArray &salt
     );
-    OWNCLOUDSYNC_EXPORT QByteArray decryptPrivateKey (
+    QByteArray decryptPrivateKey (
             const QByteArray& key,
             const QByteArray& data
     );
-    OWNCLOUDSYNC_EXPORT QByteArray extractPrivateKeySalt (QByteArray &data);
-    OWNCLOUDSYNC_EXPORT QByteArray encryptStringSymmetric (
+    QByteArray extractPrivateKeySalt (QByteArray &data);
+    QByteArray encryptStringSymmetric (
             const QByteArray& key,
             const QByteArray& data
     );
-    OWNCLOUDSYNC_EXPORT QByteArray decryptStringSymmetric (
+    QByteArray decryptStringSymmetric (
             const QByteArray& key,
             const QByteArray& data
     );
@@ -54,10 +54,10 @@ namespace EncryptionHelper {
             const QByteArray& data
     );
 
-    OWNCLOUDSYNC_EXPORT bool fileEncryption (QByteArray &key, QByteArray &iv,
+    bool fileEncryption (QByteArray &key, QByteArray &iv,
                       QFile *input, QFile *output, QByteArray& returnTag);
 
-    OWNCLOUDSYNC_EXPORT bool fileDecryption (QByteArray &key, QByteArray &iv,
+    bool fileDecryption (QByteArray &key, QByteArray &iv,
                                QFile *input, QFile *output);
 
 //

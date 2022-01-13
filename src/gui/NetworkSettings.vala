@@ -125,7 +125,7 @@ namespace Occ {
     
     QSize NetworkSettings.sizeHint () {
         return {
-            OwnCloudGui.settingsDialogSize ().width (),
+            OwncloudGui.settingsDialogSize ().width (),
             Gtk.Widget.sizeHint ().height ()
         };
     }

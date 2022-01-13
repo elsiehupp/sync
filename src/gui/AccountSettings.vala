@@ -30,7 +30,7 @@ class AccountSettings : Gtk.Widget {
 public:
     AccountSettings (AccountState *accountState, Gtk.Widget *parent = nullptr);
     ~AccountSettings () override;
-    QSize sizeHint () const override { return OwnCloudGui.settingsDialogSize (); }
+    QSize sizeHint () const override { return OwncloudGui.settingsDialogSize (); }
     bool canEncryptOrDecrypt (FolderStatusModel.SubFolderInfo* folderInfo);
 
 signals:

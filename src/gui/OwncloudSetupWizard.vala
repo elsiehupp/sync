@@ -52,7 +52,7 @@ private:
     OwncloudSetupWizard (GLib.Object *parent = nullptr);
     ~OwncloudSetupWizard () override;
     void startWizard ();
-    void testOwnCloudConnect ();
+    void testOwncloudConnect ();
     void createRemoteFolder ();
     void finalizeSetup (bool);
     bool ensureStartFromScratch (string &localFolder);
@@ -127,7 +127,7 @@ namespace Occ {
             return false;
         }
     
-        OwnCloudGui.raiseDialog (wiz._ocWizard);
+        OwncloudGui.raiseDialog (wiz._ocWizard);
         return true;
     }
     
@@ -374,12 +374,12 @@ namespace Occ {
                                                     .arg (Theme.instance ().appNameGUI ())
                                                     .arg (url));
     
-            testOwnCloudConnect ();
+            testOwncloudConnect ();
         });
         fetchUserNameJob.start ();
     }
     
-    void OwncloudSetupWizard.testOwnCloudConnect () {
+    void OwncloudSetupWizard.testOwncloudConnect () {
         AccountPtr account = _ocWizard.account ();
     
         auto *job = new PropfindJob (account, "/", this);
@@ -418,7 +418,7 @@ namespace Occ {
     
                 qCInfo (lcWizard) << "Setting account url to" << redirectUrl.toString ();
                 _ocWizard.account ().setUrl (redirectUrl);
-                testOwnCloudConnect ();
+                testOwncloudConnect ();
                 return;
             }
             errorMsg = tr ("The authenticated request to the server was redirected to "
