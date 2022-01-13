@@ -40,8 +40,7 @@ namespace OCC {
 OwncloudAdvancedSetupPage::OwncloudAdvancedSetupPage(OwncloudWizard *wizard)
     : QWizardPage()
     , _progressIndi(new QProgressIndicator(this))
-    , _ocWizard(wizard)
-{
+    , _ocWizard(wizard) {
     _ui.setupUi(this);
 
     setupResoultionWidget();
@@ -101,8 +100,7 @@ OwncloudAdvancedSetupPage::OwncloudAdvancedSetupPage(OwncloudWizard *wizard)
 #endif
 }
 
-void OwncloudAdvancedSetupPage::setupCustomization()
-{
+void OwncloudAdvancedSetupPage::setupCustomization() {
     // set defaults for the customize labels.
     _ui.topLabel->hide();
     _ui.bottomLabel->hide();
@@ -122,13 +120,11 @@ void OwncloudAdvancedSetupPage::setupCustomization()
     WizardCommon::customizeHintLabel(_ui.serverAddressLabel);
 }
 
-bool OwncloudAdvancedSetupPage::isComplete() const
-{
+bool OwncloudAdvancedSetupPage::isComplete() const {
     return !_checking && _localFolderValid;
 }
 
-void OwncloudAdvancedSetupPage::initializePage()
-{
+void OwncloudAdvancedSetupPage::initializePage() {
     WizardCommon::initErrorLabel(_ui.errorLabel);
 
     if (!Theme::instance()->showVirtualFilesOption() || bestAvailableVfsMode() == Vfs::Off) {
@@ -184,8 +180,7 @@ void OwncloudAdvancedSetupPage::initializePage()
     }
 }
 
-void OwncloudAdvancedSetupPage::fetchUserAvatar()
-{
+void OwncloudAdvancedSetupPage::fetchUserAvatar() {
     // Reset user avatar
     const auto appIcon = Theme::instance()->applicationIcon();
     _ui.lServerIcon->setPixmap(appIcon.pixmap(48));
@@ -207,8 +202,7 @@ void OwncloudAdvancedSetupPage::fetchUserAvatar()
     avatarJob->start();
 }
 
-void OwncloudAdvancedSetupPage::setUserInformation()
-{
+void OwncloudAdvancedSetupPage::setUserInformation() {
     const auto account = _ocWizard->account();
     const auto serverUrl = account->url().toString();
     setServerAddressLabelUrl(serverUrl);
@@ -216,8 +210,7 @@ void OwncloudAdvancedSetupPage::setUserInformation()
     _ui.userNameLabel->setText(userName);
 }
 
-void OwncloudAdvancedSetupPage::refreshVirtualFilesAvailibility(const QString &path)
-{
+void OwncloudAdvancedSetupPage::refreshVirtualFilesAvailibility(const QString &path) {
     // TODO: remove when UX decision is made
     if (!_ui.rVirtualFileSync->isVisible()) {
         return;
@@ -234,8 +227,7 @@ void OwncloudAdvancedSetupPage::refreshVirtualFilesAvailibility(const QString &p
     //
 }
 
-void OwncloudAdvancedSetupPage::setServerAddressLabelUrl(const QUrl &url)
-{
+void OwncloudAdvancedSetupPage::setServerAddressLabelUrl(const QUrl &url) {
     if (!url.isValid()) {
         return;
     }
@@ -246,8 +238,7 @@ void OwncloudAdvancedSetupPage::setServerAddressLabelUrl(const QUrl &url)
 
 // Called if the user changes the user- or url field. Adjust the texts and
 // evtl. warnings on the dialog.
-void OwncloudAdvancedSetupPage::updateStatus()
-{
+void OwncloudAdvancedSetupPage::updateStatus() {
     const QString locFolder = localFolder();
 
     // check if the local folder exists. If so, and if its not empty, show a warning.
@@ -294,35 +285,30 @@ void OwncloudAdvancedSetupPage::updateStatus()
     emit completeChanged();
 }
 
-void OwncloudAdvancedSetupPage::setResolutionGuiVisible(bool value)
-{
+void OwncloudAdvancedSetupPage::setResolutionGuiVisible(bool value) {
     _ui.syncModeLabel->setVisible(value);
     _ui.rKeepLocal->setVisible(value);
     _ui.cbSyncFromScratch->setVisible(value);
 }
 
 /* obsolete */
-bool OwncloudAdvancedSetupPage::dataChanged()
-{
+bool OwncloudAdvancedSetupPage::dataChanged() {
     return true;
 }
 
-void OwncloudAdvancedSetupPage::startSpinner()
-{
+void OwncloudAdvancedSetupPage::startSpinner() {
     _ui.resultLayout->setEnabled(true);
     _progressIndi->setVisible(true);
     _progressIndi->startAnimation();
 }
 
-void OwncloudAdvancedSetupPage::stopSpinner()
-{
+void OwncloudAdvancedSetupPage::stopSpinner() {
     _ui.resultLayout->setEnabled(false);
     _progressIndi->setVisible(false);
     _progressIndi->stopAnimation();
 }
 
-QUrl OwncloudAdvancedSetupPage::serverUrl() const
-{
+QUrl OwncloudAdvancedSetupPage::serverUrl() const {
     const QString urlString = static_cast<OwncloudWizard *>(wizard())->ocUrl();
     const QString user = static_cast<OwncloudWizard *>(wizard())->getCredentials()->user();
 
@@ -331,35 +317,29 @@ QUrl OwncloudAdvancedSetupPage::serverUrl() const
     return url;
 }
 
-int OwncloudAdvancedSetupPage::nextId() const
-{
+int OwncloudAdvancedSetupPage::nextId() const {
     // tells the caller that this is the last dialog page
     return -1;
 }
 
-QString OwncloudAdvancedSetupPage::localFolder() const
-{
+QString OwncloudAdvancedSetupPage::localFolder() const {
     QString folder = wizard()->property("localFolder").toString();
     return folder;
 }
 
-QStringList OwncloudAdvancedSetupPage::selectiveSyncBlacklist() const
-{
+QStringList OwncloudAdvancedSetupPage::selectiveSyncBlacklist() const {
     return _selectiveSyncBlacklist;
 }
 
-bool OwncloudAdvancedSetupPage::useVirtualFileSync() const
-{
+bool OwncloudAdvancedSetupPage::useVirtualFileSync() const {
     return _ui.rVirtualFileSync->isChecked();
 }
 
-bool OwncloudAdvancedSetupPage::isConfirmBigFolderChecked() const
-{
+bool OwncloudAdvancedSetupPage::isConfirmBigFolderChecked() const {
     return _ui.rSyncEverything->isChecked() && _ui.confCheckBoxSize->isChecked();
 }
 
-bool OwncloudAdvancedSetupPage::validatePage()
-{
+bool OwncloudAdvancedSetupPage::validatePage() {
     if (useVirtualFileSync()) {
         const auto availability = Vfs::checkAvailability(localFolder());
         if (!availability) {
@@ -394,8 +374,7 @@ bool OwncloudAdvancedSetupPage::validatePage()
     }
 }
 
-void OwncloudAdvancedSetupPage::setErrorString(const QString &err)
-{
+void OwncloudAdvancedSetupPage::setErrorString(const QString &err) {
     if (err.isEmpty()) {
         _ui.errorLabel->setVisible(false);
     } else {
@@ -406,23 +385,20 @@ void OwncloudAdvancedSetupPage::setErrorString(const QString &err)
     emit completeChanged();
 }
 
-void OwncloudAdvancedSetupPage::directoriesCreated()
-{
+void OwncloudAdvancedSetupPage::directoriesCreated() {
     _checking = false;
     _created = true;
     stopSpinner();
     emit completeChanged();
 }
 
-void OwncloudAdvancedSetupPage::setRemoteFolder(const QString &remoteFolder)
-{
+void OwncloudAdvancedSetupPage::setRemoteFolder(const QString &remoteFolder) {
     if (!remoteFolder.isEmpty()) {
         _remoteFolder = remoteFolder;
     }
 }
 
-void OwncloudAdvancedSetupPage::slotSelectFolder()
-{
+void OwncloudAdvancedSetupPage::slotSelectFolder() {
     QString dir = QFileDialog::getExistingDirectory(nullptr, tr("Local Sync Folder"), QDir::homePath());
     if (!dir.isEmpty()) {
         // TODO: remove when UX decision is made
@@ -439,8 +415,7 @@ void OwncloudAdvancedSetupPage::slotSelectFolder()
 }
 
 
-void OwncloudAdvancedSetupPage::setLocalFolderPushButtonPath(const QString &path)
-{
+void OwncloudAdvancedSetupPage::setLocalFolderPushButtonPath(const QString &path) {
     const auto homeDir = QDir::homePath().endsWith('/') ? QDir::homePath() : QDir::homePath() + QLatin1Char('/');
 
     if (!path.startsWith(homeDir)) {
@@ -454,8 +429,7 @@ void OwncloudAdvancedSetupPage::setLocalFolderPushButtonPath(const QString &path
     _ui.pbSelectLocalFolder->setText(QDir::toNativeSeparators(prettyPath));
 }
 
-void OwncloudAdvancedSetupPage::slotSelectiveSyncClicked()
-{
+void OwncloudAdvancedSetupPage::slotSelectiveSyncClicked() {
     AccountPtr acc = static_cast<OwncloudWizard *>(wizard())->account();
     auto *dlg = new SelectiveSyncDialog(acc, _remoteFolder, _selectiveSyncBlacklist, this);
     dlg->setAttribute(Qt::WA_DeleteOnClose);
@@ -500,8 +474,7 @@ void OwncloudAdvancedSetupPage::slotSelectiveSyncClicked()
     dlg->open();
 }
 
-void OwncloudAdvancedSetupPage::slotVirtualFileSyncClicked()
-{
+void OwncloudAdvancedSetupPage::slotVirtualFileSyncClicked() {
     if (!_ui.rVirtualFileSync->isChecked()) {
         OwncloudWizard::askExperimentalVirtualFilesFeature(this, [this](bool enable) {
             if (!enable)
@@ -511,8 +484,7 @@ void OwncloudAdvancedSetupPage::slotVirtualFileSyncClicked()
     }
 }
 
-void OwncloudAdvancedSetupPage::slotSyncEverythingClicked()
-{
+void OwncloudAdvancedSetupPage::slotSyncEverythingClicked() {
     _ui.lSelectiveSyncSizeLabel->setText(QString());
     setRadioChecked(_ui.rSyncEverything);
     _selectiveSyncBlacklist.clear();
@@ -521,16 +493,14 @@ void OwncloudAdvancedSetupPage::slotSyncEverythingClicked()
     setErrorString(errorStr);
 }
 
-void OwncloudAdvancedSetupPage::slotQuotaRetrieved(const QVariantMap &result)
-{
+void OwncloudAdvancedSetupPage::slotQuotaRetrieved(const QVariantMap &result) {
     _rSize = result["size"].toDouble();
     _ui.lSyncEverythingSizeLabel->setText(tr("(%1)").arg(Utility::octetsToString(_rSize)));
 
     updateStatus();
 }
 
-qint64 OwncloudAdvancedSetupPage::availableLocalSpace() const
-{
+qint64 OwncloudAdvancedSetupPage::availableLocalSpace() const {
     QString localDir = localFolder();
     QString path = !QDir(localDir).exists() && localDir.contains(QDir::homePath()) ?
                 QDir::homePath() : localDir;
@@ -539,18 +509,15 @@ qint64 OwncloudAdvancedSetupPage::availableLocalSpace() const
     return storage.bytesAvailable();
 }
 
-QString OwncloudAdvancedSetupPage::checkLocalSpace(qint64 remoteSize) const
-{
+QString OwncloudAdvancedSetupPage::checkLocalSpace(qint64 remoteSize) const {
     return (availableLocalSpace()>remoteSize) ? QString() : tr("There isn't enough free space in the local folder!");
 }
 
-void OwncloudAdvancedSetupPage::slotStyleChanged()
-{
+void OwncloudAdvancedSetupPage::slotStyleChanged() {
     customizeStyle();
 }
 
-void OwncloudAdvancedSetupPage::customizeStyle()
-{
+void OwncloudAdvancedSetupPage::customizeStyle() {
     if (_progressIndi) {
         const auto isDarkBackground = Theme::isDarkColor(palette().window().color());
         if (isDarkBackground) {
@@ -564,16 +531,14 @@ void OwncloudAdvancedSetupPage::customizeStyle()
     styleLocalFolderLabel();
 }
 
-void OwncloudAdvancedSetupPage::styleLocalFolderLabel()
-{
+void OwncloudAdvancedSetupPage::styleLocalFolderLabel() {
     const auto backgroundColor = palette().window().color();
     const auto folderIconFileName = Theme::instance()->isBranded() ? Theme::hidpiFileName("folder.png", backgroundColor)
                                                                    : Theme::hidpiFileName(":/client/theme/colored/folder.png");
     _ui.lLocal->setPixmap(folderIconFileName);
 }
 
-void OwncloudAdvancedSetupPage::setRadioChecked(QRadioButton *radio)
-{
+void OwncloudAdvancedSetupPage::setRadioChecked(QRadioButton *radio) {
     // We don't want clicking the radio buttons to immediately adjust the checked state
     // for selective sync and virtual file sync, so we keep them uncheckable until
     // they should be checked.
@@ -586,14 +551,12 @@ void OwncloudAdvancedSetupPage::setRadioChecked(QRadioButton *radio)
         _ui.rVirtualFileSync->setCheckable(false);
 }
 
-void OwncloudAdvancedSetupPage::styleSyncLogo()
-{
+void OwncloudAdvancedSetupPage::styleSyncLogo() {
     const auto syncArrowIcon = Theme::createColorAwareIcon(QLatin1String(":/client/theme/sync-arrow.svg"), palette());
     _ui.syncLogoLabel->setPixmap(syncArrowIcon.pixmap(QSize(50, 50)));
 }
 
-void OwncloudAdvancedSetupPage::setupResoultionWidget()
-{
+void OwncloudAdvancedSetupPage::setupResoultionWidget() {
     for (int i = 0; i < _ui.resolutionWidgetLayout->count(); ++i) {
         auto widget = _ui.resolutionWidgetLayout->itemAt(i)->widget();
         if (!widget) {

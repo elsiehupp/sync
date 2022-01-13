@@ -34,8 +34,7 @@ class BandwidthManager;
  * @brief The UploadDevice class
  * @ingroup libsync
  */
-class UploadDevice : public QIODevice
-{
+class UploadDevice : public QIODevice {
 public:
     UploadDevice(const QString &fileName, qint64 start, qint64 size, BandwidthManager *bwm);
     ~UploadDevice() override;
@@ -85,8 +84,7 @@ public slots:
  * @brief The PUTFileJob class
  * @ingroup libsync
  */
-class PUTFileJob : public AbstractNetworkJob
-{
+class PUTFileJob : public AbstractNetworkJob {
 
 private:
     QIODevice *_device;
@@ -102,8 +100,7 @@ public:
         : AbstractNetworkJob(account, path, parent)
         , _device(device.release())
         , _headers(headers)
-        , _chunk(chunk)
-    {
+        , _chunk(chunk) {
         _device->setParent(this);
     }
     explicit PUTFileJob(AccountPtr account, const QUrl &url, std::unique_ptr<QIODevice> device,
@@ -112,8 +109,7 @@ public:
         , _device(device.release())
         , _headers(headers)
         , _url(url)
-        , _chunk(chunk)
-    {
+        , _chunk(chunk) {
         _device->setParent(this);
     }
     ~PUTFileJob() override;
@@ -124,18 +120,15 @@ public:
 
     bool finished() override;
 
-    QIODevice *device()
-    {
+    QIODevice *device() {
         return _device;
     }
 
-    QString errorString() const override
-    {
+    QString errorString() const override {
         return _errorString.isEmpty() ? AbstractNetworkJob::errorString() : _errorString;
     }
 
-    std::chrono::milliseconds msSinceStart() const
-    {
+    std::chrono::milliseconds msSinceStart() const {
         return std::chrono::milliseconds(_requestTimer.elapsed());
     }
 
@@ -152,8 +145,7 @@ signals:
  * replies with an etag.
  * @ingroup libsync
  */
-class PollJob : public AbstractNetworkJob
-{
+class PollJob : public AbstractNetworkJob {
     SyncJournalDb *_journal;
     QString _localPath;
 
@@ -165,8 +157,7 @@ public:
         : AbstractNetworkJob(account, path, parent)
         , _journal(journal)
         , _localPath(localPath)
-        , _item(item)
-    {
+        , _item(item) {
     }
 
     void start() override;
@@ -198,8 +189,7 @@ class PropagateUploadEncrypted;
  *                                  v
  *        finalize() or abortWithError()  or startPollJob()
  */
-class PropagateUploadFileCommon : public PropagateItemJob
-{
+class PropagateUploadFileCommon : public PropagateItemJob {
 
     struct UploadStatus {
         SyncFileItem::Status status = SyncFileItem::NoStatus;
@@ -324,8 +314,7 @@ private:
  * Propagation job, impementing the old chunking agorithm
  *
  */
-class PropagateUploadFileV1 : public PropagateUploadFileCommon
-{
+class PropagateUploadFileV1 : public PropagateUploadFileCommon {
 
 private:
     /**
@@ -351,8 +340,7 @@ private:
 
 public:
     PropagateUploadFileV1(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
-        : PropagateUploadFileCommon(propagator, item)
-    {
+        : PropagateUploadFileCommon(propagator, item) {
     }
 
     void doStartUpload() override;
@@ -370,8 +358,7 @@ private slots:
  * Propagation job, impementing the new chunking agorithm
  *
  */
-class PropagateUploadFileNG : public PropagateUploadFileCommon
-{
+class PropagateUploadFileNG : public PropagateUploadFileCommon {
 private:
     qint64 _sent = 0; /// amount of data (bytes) that was already sent
     uint _transferId = 0; /// transfer id (part of the url)
@@ -381,8 +368,7 @@ private:
 
     // Map chunk number with its size  from the PROPFIND on resume.
     // (Only used from slotPropfindIterate/slotPropfindFinished because the LsColJob use signals to report data.)
-    struct ServerChunkInfo
-    {
+    struct ServerChunkInfo {
         qint64 size;
         QString originalName;
     };
@@ -396,8 +382,7 @@ private:
 
 public:
     PropagateUploadFileNG(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
-        : PropagateUploadFileCommon(propagator, item)
-    {
+        : PropagateUploadFileCommon(propagator, item) {
     }
 
     void doStartUpload() override;

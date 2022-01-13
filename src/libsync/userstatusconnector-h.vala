@@ -37,8 +37,7 @@ enum class OWNCLOUDSYNC_EXPORT ClearAtType {
 };
 
 // TODO: If we can use C++17 make it a std::variant
-struct OWNCLOUDSYNC_EXPORT ClearAt
-{
+struct OWNCLOUDSYNC_EXPORT ClearAt {
     ClearAtType _type = ClearAtType::Period;
 
     quint64 _timestamp;
@@ -46,8 +45,7 @@ struct OWNCLOUDSYNC_EXPORT ClearAt
     QString _endof;
 };
 
-class OWNCLOUDSYNC_EXPORT UserStatus
-{
+class OWNCLOUDSYNC_EXPORT UserStatus {
     Q_GADGET
 
     Q_PROPERTY(QString id MEMBER _id)
@@ -96,8 +94,7 @@ private:
     Optional<ClearAt> _clearAt;
 };
 
-class OWNCLOUDSYNC_EXPORT UserStatusConnector : public QObject
-{
+class OWNCLOUDSYNC_EXPORT UserStatusConnector : public QObject {
 
 public:
     enum class Error {

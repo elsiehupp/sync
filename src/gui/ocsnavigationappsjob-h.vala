@@ -24,8 +24,7 @@ namespace OCC {
  *
  * Fetching enabled apps from the OCS Apps API
  */
-class OcsNavigationAppsJob : public OcsJob
-{
+class OcsNavigationAppsJob : public OcsJob {
 public:
     explicit OcsNavigationAppsJob(AccountPtr account);
 

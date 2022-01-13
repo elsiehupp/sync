@@ -19,18 +19,15 @@ namespace OCC {
 
 SyncResult::SyncResult() = default;
 
-SyncResult::Status SyncResult::status() const
-{
+SyncResult::Status SyncResult::status() const {
     return _status;
 }
 
-void SyncResult::reset()
-{
+void SyncResult::reset() {
     *this = SyncResult();
 }
 
-QString SyncResult::statusString() const
-{
+QString SyncResult::statusString() const {
     QString re;
     Status stat = status();
 
@@ -69,51 +66,42 @@ QString SyncResult::statusString() const
     return re;
 }
 
-void SyncResult::setStatus(Status stat)
-{
+void SyncResult::setStatus(Status stat) {
     _status = stat;
     _syncTime = QDateTime::currentDateTimeUtc();
 }
 
-QDateTime SyncResult::syncTime() const
-{
+QDateTime SyncResult::syncTime() const {
     return _syncTime;
 }
 
-QStringList SyncResult::errorStrings() const
-{
+QStringList SyncResult::errorStrings() const {
     return _errors;
 }
 
-void SyncResult::appendErrorString(const QString &err)
-{
+void SyncResult::appendErrorString(const QString &err) {
     _errors.append(err);
 }
 
-QString SyncResult::errorString() const
-{
+QString SyncResult::errorString() const {
     if (_errors.isEmpty())
         return QString();
     return _errors.first();
 }
 
-void SyncResult::clearErrors()
-{
+void SyncResult::clearErrors() {
     _errors.clear();
 }
 
-void SyncResult::setFolder(const QString &folder)
-{
+void SyncResult::setFolder(const QString &folder) {
     _folder = folder;
 }
 
-QString SyncResult::folder() const
-{
+QString SyncResult::folder() const {
     return _folder;
 }
 
-void SyncResult::processCompletedItem(const SyncFileItemPtr &item)
-{
+void SyncResult::processCompletedItem(const SyncFileItemPtr &item) {
     if (Progress::isWarningKind(item->_status)) {
         // Count any error conditions, error strings will have priority anyway.
         _foundFilesNotSynced = true;

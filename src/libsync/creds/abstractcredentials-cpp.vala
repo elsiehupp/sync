@@ -25,14 +25,12 @@ Q_LOGGING_CATEGORY(lcCredentials, "nextcloud.sync.credentials", QtInfoMsg)
 
 AbstractCredentials::AbstractCredentials() = default;
 
-void AbstractCredentials::setAccount(Account *account)
-{
+void AbstractCredentials::setAccount(Account *account) {
     ENFORCE(!_account, "should only setAccount once");
     _account = account;
 }
 
-QString AbstractCredentials::keychainKey(const QString &url, const QString &user, const QString &accountId)
-{
+QString AbstractCredentials::keychainKey(const QString &url, const QString &user, const QString &accountId) {
     QString u(url);
     if (u.isEmpty()) {
         qCWarning(lcCredentials) << "Empty url in keyChain, error!";

@@ -27,14 +27,12 @@ const QByteArray XRequestId(){
     return QByteArrayLiteral("X-Request-ID");
 }
 
-bool isTextBody(const QString &s)
-{
+bool isTextBody(const QString &s) {
     static const QRegularExpression regexp(QStringLiteral("^(text/.*|(application/(xml|json|x-www-form-urlencoded)(;|$)))"));
     return regexp.match(s).hasMatch();
 }
 
-void logHttp(const QByteArray &verb, const QString &url, const QByteArray &id, const QString &contentType, const QList<QNetworkReply::RawHeaderPair> &header, QIODevice *device)
-{
+void logHttp(const QByteArray &verb, const QString &url, const QByteArray &id, const QString &contentType, const QList<QNetworkReply::RawHeaderPair> &header, QIODevice *device) {
     const auto reply = qobject_cast<QNetworkReply *>(device);
     const auto contentLength = device ? device->size() : 0;
     QString msg;
@@ -70,8 +68,7 @@ void logHttp(const QByteArray &verb, const QString &url, const QByteArray &id, c
             }
             Q_ASSERT(device->pos() == 0);
             stream << device->peek(PeekSize);
-            if (PeekSize < contentLength)
-            {
+            if (PeekSize < contentLength) {
                 stream << "...(" << (contentLength - PeekSize) << "bytes elided)";
             }
         } else {
@@ -86,8 +83,7 @@ void logHttp(const QByteArray &verb, const QString &url, const QByteArray &id, c
 
 namespace OCC {
 
-void HttpLogger::logRequest(QNetworkReply *reply, QNetworkAccessManager::Operation operation, QIODevice *device)
-{
+void HttpLogger::logRequest(QNetworkReply *reply, QNetworkAccessManager::Operation operation, QIODevice *device) {
     const auto request = reply->request();
     if (!lcNetworkHttp().isInfoEnabled()) {
         return;
@@ -115,8 +111,7 @@ void HttpLogger::logRequest(QNetworkReply *reply, QNetworkAccessManager::Operati
     });
 }
 
-QByteArray HttpLogger::requestVerb(QNetworkAccessManager::Operation operation, const QNetworkRequest &request)
-{
+QByteArray HttpLogger::requestVerb(QNetworkAccessManager::Operation operation, const QNetworkRequest &request) {
     switch (operation) {
     case QNetworkAccessManager::HeadOperation:
         return QByteArrayLiteral("HEAD");

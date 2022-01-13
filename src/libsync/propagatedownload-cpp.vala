@@ -47,8 +47,7 @@ Q_LOGGING_CATEGORY(lcPropagateDownload, "nextcloud.sync.propagator.download", Qt
 // Always coming in with forward slashes.
 // In csync_excluded_no_ctx we ignore all files with longer than 254 chars
 // This function also adds a dot at the beginning of the filename to hide the file on OS X and Linux
-QString OWNCLOUDSYNC_EXPORT createDownloadTmpFileName(const QString &previous)
-{
+QString OWNCLOUDSYNC_EXPORT createDownloadTmpFileName(const QString &previous) {
     QString tmpFileName;
     QString tmpPath;
     int slashPos = previous.lastIndexOf('/');
@@ -86,8 +85,7 @@ GETFileJob::GETFileJob(AccountPtr account, const QString &path, QIODevice *devic
     , _bandwidthManager(nullptr)
     , _hasEmittedFinishedSignal(false)
     , _lastModified()
-    , _contentLength(-1)
-{
+    , _contentLength(-1) {
 }
 
 GETFileJob::GETFileJob(AccountPtr account, const QUrl &url, QIODevice *device,
@@ -107,13 +105,11 @@ GETFileJob::GETFileJob(AccountPtr account, const QUrl &url, QIODevice *device,
     , _bandwidthManager(nullptr)
     , _hasEmittedFinishedSignal(false)
     , _lastModified()
-    , _contentLength(-1)
-{
+    , _contentLength(-1) {
 }
 
 
-void GETFileJob::start()
-{
+void GETFileJob::start() {
     if (_resumeStart > 0) {
         _headers["Range"] = "bytes=" + QByteArray::number(_resumeStart) + '-';
         _headers["Accept-Ranges"] = "bytes";
@@ -144,8 +140,7 @@ void GETFileJob::start()
     AbstractNetworkJob::start();
 }
 
-void GETFileJob::newReplyHook(QNetworkReply *reply)
-{
+void GETFileJob::newReplyHook(QNetworkReply *reply) {
     reply->setReadBufferSize(16 * 1024); // keep low so we can easier limit the bandwidth
 
     connect(reply, &QNetworkReply::metaDataChanged, this, &GETFileJob::slotMetaDataChanged);
@@ -154,8 +149,7 @@ void GETFileJob::newReplyHook(QNetworkReply *reply)
     connect(reply, &QNetworkReply::downloadProgress, this, &GETFileJob::downloadProgress);
 }
 
-void GETFileJob::slotMetaDataChanged()
-{
+void GETFileJob::slotMetaDataChanged() {
     // For some reason setting the read buffer in GETFileJob::start doesn't seem to go
     // through the HTTP layer thread(?)
     reply()->setReadBufferSize(16 * 1024);
@@ -254,45 +248,38 @@ void GETFileJob::slotMetaDataChanged()
     _saveBodyToFile = true;
 }
 
-void GETFileJob::setBandwidthManager(BandwidthManager *bwm)
-{
+void GETFileJob::setBandwidthManager(BandwidthManager *bwm) {
     _bandwidthManager = bwm;
 }
 
-void GETFileJob::setChoked(bool c)
-{
+void GETFileJob::setChoked(bool c) {
     _bandwidthChoked = c;
     QMetaObject::invokeMethod(this, "slotReadyRead", Qt::QueuedConnection);
 }
 
-void GETFileJob::setBandwidthLimited(bool b)
-{
+void GETFileJob::setBandwidthLimited(bool b) {
     _bandwidthLimited = b;
     QMetaObject::invokeMethod(this, "slotReadyRead", Qt::QueuedConnection);
 }
 
-void GETFileJob::giveBandwidthQuota(qint64 q)
-{
+void GETFileJob::giveBandwidthQuota(qint64 q) {
     _bandwidthQuota = q;
     qCDebug(lcGetJob) << "Got" << q << "bytes";
     QMetaObject::invokeMethod(this, "slotReadyRead", Qt::QueuedConnection);
 }
 
-qint64 GETFileJob::currentDownloadPosition()
-{
+qint64 GETFileJob::currentDownloadPosition() {
     if (_device && _device->pos() > 0 && _device->pos() > qint64(_resumeStart)) {
         return _device->pos();
     }
     return _resumeStart;
 }
 
-qint64 GETFileJob::writeToDevice(const QByteArray &data)
-{
+qint64 GETFileJob::writeToDevice(const QByteArray &data) {
     return _device->write(data);
 }
 
-void GETFileJob::slotReadyRead()
-{
+void GETFileJob::slotReadyRead() {
     if (!reply())
         return;
     int bufferSize = qMin(1024 * 8ll, reply()->bytesAvailable());
@@ -349,8 +336,7 @@ void GETFileJob::slotReadyRead()
     }
 }
 
-void GETFileJob::cancel()
-{
+void GETFileJob::cancel() {
     const auto networkReply = reply();
     if (networkReply && networkReply->isRunning()) {
         networkReply->abort();
@@ -360,8 +346,7 @@ void GETFileJob::cancel()
     }
 }
 
-void GETFileJob::onTimedOut()
-{
+void GETFileJob::onTimedOut() {
     qCWarning(lcGetJob) << "Timeout" << (reply() ? reply()->request().url() : path());
     if (!reply())
         return;
@@ -370,8 +355,7 @@ void GETFileJob::onTimedOut()
     reply()->abort();
 }
 
-QString GETFileJob::errorString() const
-{
+QString GETFileJob::errorString() const {
     if (!_errorString.isEmpty()) {
         return _errorString;
     }
@@ -382,20 +366,17 @@ GETEncryptedFileJob::GETEncryptedFileJob(AccountPtr account, const QString &path
     const QMap<QByteArray, QByteArray> &headers, const QByteArray &expectedEtagForResume,
     qint64 resumeStart, EncryptedFile encryptedInfo, QObject *parent)
     : GETFileJob(account, path, device, headers, expectedEtagForResume, resumeStart, parent)
-    , _encryptedFileInfo(encryptedInfo)
-{
+    , _encryptedFileInfo(encryptedInfo) {
 }
 
 GETEncryptedFileJob::GETEncryptedFileJob(AccountPtr account, const QUrl &url, QIODevice *device,
     const QMap<QByteArray, QByteArray> &headers, const QByteArray &expectedEtagForResume,
     qint64 resumeStart, EncryptedFile encryptedInfo, QObject *parent)
     : GETFileJob(account, url, device, headers, expectedEtagForResume, resumeStart, parent)
-    , _encryptedFileInfo(encryptedInfo)
-{
+    , _encryptedFileInfo(encryptedInfo) {
 }
 
-qint64 GETEncryptedFileJob::writeToDevice(const QByteArray &data)
-{
+qint64 GETEncryptedFileJob::writeToDevice(const QByteArray &data) {
     if (!_decryptor) {
         // only initialize the decryptor once, because, according to Qt documentation, metadata might get changed during the processing of the data sometimes
         // https://doc.qt.io/qt-5/qnetworkreply.html#metaDataChanged
@@ -447,8 +428,7 @@ qint64 GETEncryptedFileJob::writeToDevice(const QByteArray &data)
     return data.length();
 }
 
-void PropagateDownloadFile::start()
-{
+void PropagateDownloadFile::start() {
     if (propagator()->_abortRequested)
         return;
     _isEncrypted = false;
@@ -481,8 +461,7 @@ void PropagateDownloadFile::start()
     }
 }
 
-void PropagateDownloadFile::startAfterIsEncryptedIsChecked()
-{
+void PropagateDownloadFile::startAfterIsEncryptedIsChecked() {
     _stopwatch.start();
 
     auto &syncOptions = propagator()->syncOptions();
@@ -559,8 +538,7 @@ void PropagateDownloadFile::startAfterIsEncryptedIsChecked()
     // If the hashes are collision safe and identical, we assume the content is too.
     // For weak checksums, we only do that if the mtimes are also identical.
 
-    const auto csync_is_collision_safe_hash = [](const QByteArray &checksum_header)
-    {
+    const auto csync_is_collision_safe_hash = [](const QByteArray &checksum_header) {
         return checksum_header.startsWith("SHA")
             || checksum_header.startsWith("MD5:");
     };
@@ -586,8 +564,7 @@ void PropagateDownloadFile::startAfterIsEncryptedIsChecked()
     startDownload();
 }
 
-void PropagateDownloadFile::conflictChecksumComputed(const QByteArray &checksumType, const QByteArray &checksum)
-{
+void PropagateDownloadFile::conflictChecksumComputed(const QByteArray &checksumType, const QByteArray &checksum) {
     propagator()->_activeJobList.removeOne(this);
     if (makeChecksumHeader(checksumType, checksum) == _item->_checksumHeader) {
         // No download necessary, just update fs and journal metadata
@@ -618,8 +595,7 @@ void PropagateDownloadFile::conflictChecksumComputed(const QByteArray &checksumT
     startDownload();
 }
 
-void PropagateDownloadFile::startDownload()
-{
+void PropagateDownloadFile::startDownload() {
     if (propagator()->_abortRequested)
         return;
 
@@ -691,8 +667,7 @@ void PropagateDownloadFile::startDownload()
 
         return;
     }
-
-    {
+ {
         SyncJournalDb::DownloadInfo pi;
         pi._etag = _item->_etag;
         pi._tmpfile = tmpFileName;
@@ -728,22 +703,19 @@ void PropagateDownloadFile::startDownload()
     _job->start();
 }
 
-qint64 PropagateDownloadFile::committedDiskSpace() const
-{
+qint64 PropagateDownloadFile::committedDiskSpace() const {
     if (_state == Running) {
         return qBound(0LL, _item->_size - _resumeStart - _downloadProgress, _item->_size);
     }
     return 0;
 }
 
-void PropagateDownloadFile::setDeleteExistingFolder(bool enabled)
-{
+void PropagateDownloadFile::setDeleteExistingFolder(bool enabled) {
     _deleteExisting = enabled;
 }
 
 const char owncloudCustomSoftErrorStringC[] = "owncloud-custom-soft-error-string";
-void PropagateDownloadFile::slotGetFinished()
-{
+void PropagateDownloadFile::slotGetFinished() {
     propagator()->_activeJobList.removeOne(this);
 
     GETFileJob *job = _job;
@@ -923,15 +895,13 @@ void PropagateDownloadFile::slotGetFinished()
     validator->start(_tmpFile.fileName(), checksumHeader);
 }
 
-void PropagateDownloadFile::slotChecksumFail(const QString &errMsg)
-{ 
+void PropagateDownloadFile::slotChecksumFail(const QString &errMsg) {
     FileSystem::remove(_tmpFile.fileName());
     propagator()->_anotherSyncNeeded = true;
     done(SyncFileItem::SoftError, errMsg); // tr("The file downloaded with a broken checksum, will be redownloaded."));
 }
 
-void PropagateDownloadFile::deleteExistingFolder()
-{
+void PropagateDownloadFile::deleteExistingFolder() {
     QString existingDir = propagator()->fullLocalPath(_item->_file);
     if (!QFileInfo(existingDir).isDir()) {
         return;
@@ -953,8 +923,7 @@ void PropagateDownloadFile::deleteExistingFolder()
 }
 
 namespace { // Anonymous namespace for the recall feature
-    static QString makeRecallFileName(const QString &fn)
-    {
+    static QString makeRecallFileName(const QString &fn) {
         QString recallFileName(fn);
         // Add _recall-XXXX  before the extension.
         int dotLocation = recallFileName.lastIndexOf('.');
@@ -969,8 +938,7 @@ namespace { // Anonymous namespace for the recall feature
         return recallFileName;
     }
 
-    void handleRecallFile(const QString &filePath, const QString &folderPath, SyncJournalDb &journal)
-    {
+    void handleRecallFile(const QString &filePath, const QString &folderPath, SyncJournalDb &journal) {
         qCDebug(lcPropagateDownload) << "handleRecallFile: " << filePath;
 
         FileSystem::setFileHidden(filePath, true);
@@ -1013,8 +981,7 @@ namespace { // Anonymous namespace for the recall feature
         }
     }
 
-    static void preserveGroupOwnership(const QString &fileName, const QFileInfo &fi)
-    {
+    static void preserveGroupOwnership(const QString &fileName, const QFileInfo &fi) {
 #ifdef Q_OS_UNIX
         int chownErr = chown(fileName.toLocal8Bit().constData(), -1, fi.groupId());
         if (chownErr) {
@@ -1028,8 +995,7 @@ namespace { // Anonymous namespace for the recall feature
     }
 } // end namespace
 
-void PropagateDownloadFile::transmissionChecksumValidated(const QByteArray &checksumType, const QByteArray &checksum)
-{
+void PropagateDownloadFile::transmissionChecksumValidated(const QByteArray &checksumType, const QByteArray &checksum) {
     const QByteArray theContentChecksumType = propagator()->account()->capabilities().preferredUploadChecksumType();
 
     // Reuse transmission checksum as content checksum.
@@ -1049,8 +1015,7 @@ void PropagateDownloadFile::transmissionChecksumValidated(const QByteArray &chec
     computeChecksum->start(_tmpFile.fileName());
 }
 
-void PropagateDownloadFile::contentChecksumComputed(const QByteArray &checksumType, const QByteArray &checksum)
-{
+void PropagateDownloadFile::contentChecksumComputed(const QByteArray &checksumType, const QByteArray &checksum) {
     _item->_checksumHeader = makeChecksumHeader(checksumType, checksum);
 
     if (_isEncrypted) {
@@ -1065,8 +1030,7 @@ void PropagateDownloadFile::contentChecksumComputed(const QByteArray &checksumTy
     }
 }
 
-void PropagateDownloadFile::downloadFinished()
-{
+void PropagateDownloadFile::downloadFinished() {
     ASSERT(!_tmpFile.isOpen());
     QString fn = propagator()->fullLocalPath(_item->_file);
 
@@ -1212,8 +1176,7 @@ void PropagateDownloadFile::downloadFinished()
     updateMetadata(isConflict);
 }
 
-void PropagateDownloadFile::updateMetadata(bool isConflict)
-{
+void PropagateDownloadFile::updateMetadata(bool isConflict) {
     const QString fn = propagator()->fullLocalPath(_item->_file);
     const auto result = propagator()->updateMetadata(*_item);
     if (!result) {
@@ -1247,8 +1210,7 @@ void PropagateDownloadFile::updateMetadata(bool isConflict)
     }
 }
 
-void PropagateDownloadFile::slotDownloadProgress(qint64 received, qint64)
-{
+void PropagateDownloadFile::slotDownloadProgress(qint64 received, qint64) {
     if (!_job)
         return;
     _downloadProgress = received;
@@ -1256,8 +1218,7 @@ void PropagateDownloadFile::slotDownloadProgress(qint64 received, qint64)
 }
 
 
-void PropagateDownloadFile::abort(PropagatorJob::AbortType abortType)
-{
+void PropagateDownloadFile::abort(PropagatorJob::AbortType abortType) {
     if (_job && _job->reply())
         _job->reply()->abort();
 

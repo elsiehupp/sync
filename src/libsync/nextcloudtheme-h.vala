@@ -21,8 +21,7 @@ namespace OCC {
  * @brief The NextcloudTheme class
  * @ingroup libsync
  */
-class NextcloudTheme : public Theme
-{
+class NextcloudTheme : public Theme {
 public:
     NextcloudTheme();
 

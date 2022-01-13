@@ -39,8 +39,7 @@ Q_LOGGING_CATEGORY(lcDisco, "sync.discovery", QtInfoMsg)
 
 
 bool ProcessDirectoryJob::checkForInvalidFileName(const PathTuple &path,
-    const std::map<QString, Entries> &entries, Entries &entry)
-{
+    const std::map<QString, Entries> &entries, Entries &entry) {
     const auto originalFileName = entry.localEntry.name;
     const auto newFileName = originalFileName.trimmed();
 
@@ -81,8 +80,7 @@ bool ProcessDirectoryJob::checkForInvalidFileName(const PathTuple &path,
     return true;
 }
 
-void ProcessDirectoryJob::start()
-{
+void ProcessDirectoryJob::start() {
     qCInfo(lcDisco) << "STARTING" << _currentFolder._server << _queryServer << _currentFolder._local << _queryLocal;
 
     if (_queryServer == NormalQuery) {
@@ -110,8 +108,7 @@ void ProcessDirectoryJob::start()
     }
 }
 
-void ProcessDirectoryJob::process()
-{
+void ProcessDirectoryJob::process() {
     ASSERT(_localQueryDone && _serverQueryDone);
 
     // Build lookup tables for local, remote and db entries.
@@ -241,8 +238,7 @@ void ProcessDirectoryJob::process()
     QTimer::singleShot(0, _discoveryData, &DiscoveryPhase::scheduleMoreJobs);
 }
 
-bool ProcessDirectoryJob::handleExcluded(const QString &path, const QString &localName, bool isDirectory, bool isHidden, bool isSymlink)
-{
+bool ProcessDirectoryJob::handleExcluded(const QString &path, const QString &localName, bool isDirectory, bool isHidden, bool isSymlink) {
     auto excluded = _discoveryData->_excludes->traversalPatternMatch(path, isDirectory ? ItemTypeDirectory : ItemTypeFile);
 
     // FIXME: move to ExcludedFiles 's regexp ?
@@ -355,8 +351,7 @@ bool ProcessDirectoryJob::handleExcluded(const QString &path, const QString &loc
 
 void ProcessDirectoryJob::processFile(PathTuple path,
     const LocalInfo &localEntry, const RemoteInfo &serverEntry,
-    const SyncJournalFileRecord &dbEntry)
-{
+    const SyncJournalFileRecord &dbEntry) {
     const char *hasServer = serverEntry.isValid() ? "true" : _queryServer == ParentNotChanged ? "db" : "false";
     const char *hasLocal = localEntry.isValid() ? "true" : _queryLocal == ParentNotChanged ? "db" : "false";
     qCInfo(lcDisco).nospace() << "Processing " << path._original
@@ -448,8 +443,7 @@ void ProcessDirectoryJob::processFile(PathTuple path,
 
 // Compute the checksum of the given file and assign the result in item->_checksumHeader
 // Returns true if the checksum was successfully computed
-static bool computeLocalChecksum(const QByteArray &header, const QString &path, const SyncFileItemPtr &item)
-{
+static bool computeLocalChecksum(const QByteArray &header, const QString &path, const SyncFileItemPtr &item) {
     auto type = parseChecksumHeaderType(header);
     if (!type.isEmpty()) {
         // TODO: compute async?
@@ -464,8 +458,7 @@ static bool computeLocalChecksum(const QByteArray &header, const QString &path, 
 
 void ProcessDirectoryJob::processFileAnalyzeRemoteInfo(
     const SyncFileItemPtr &item, PathTuple path, const LocalInfo &localEntry,
-    const RemoteInfo &serverEntry, const SyncJournalFileRecord &dbEntry)
-{
+    const RemoteInfo &serverEntry, const SyncJournalFileRecord &dbEntry) {
     item->_checksumHeader = serverEntry.checksumHeader;
     item->_fileId = serverEntry.fileId;
     item->_remotePerm = serverEntry.remotePerm;
@@ -487,8 +480,7 @@ void ProcessDirectoryJob::processFileAnalyzeRemoteInfo(
         return serverEntry.e2eMangledName.mid(rootPath.length());
     }();
 
-    // Check for missing server data
-    {
+    // Check for missing server data {
         QStringList missingData;
         if (serverEntry.size == -1)
             missingData.append(tr("size"));
@@ -800,8 +792,7 @@ void ProcessDirectoryJob::processFileAnalyzeRemoteInfo(
 
 void ProcessDirectoryJob::processFileAnalyzeLocalInfo(
     const SyncFileItemPtr &item, PathTuple path, const LocalInfo &localEntry,
-    const RemoteInfo &serverEntry, const SyncJournalFileRecord &dbEntry, QueryMode recurseQueryServer)
-{
+    const RemoteInfo &serverEntry, const SyncJournalFileRecord &dbEntry, QueryMode recurseQueryServer) {
     bool noServerEntry = (_queryServer != ParentNotChanged && !serverEntry.isValid())
         || (_queryServer == ParentNotChanged && !dbEntry.isValid());
 
@@ -1263,8 +1254,7 @@ void ProcessDirectoryJob::processFileAnalyzeLocalInfo(
     finalize();
 }
 
-void ProcessDirectoryJob::processFileConflict(const SyncFileItemPtr &item, ProcessDirectoryJob::PathTuple path, const LocalInfo &localEntry, const RemoteInfo &serverEntry, const SyncJournalFileRecord &dbEntry)
-{
+void ProcessDirectoryJob::processFileConflict(const SyncFileItemPtr &item, ProcessDirectoryJob::PathTuple path, const LocalInfo &localEntry, const RemoteInfo &serverEntry, const SyncJournalFileRecord &dbEntry) {
     item->_previousSize = localEntry.size;
     item->_previousModtime = localEntry.modtime;
 
@@ -1336,8 +1326,7 @@ void ProcessDirectoryJob::processFileConflict(const SyncFileItemPtr &item, Proce
 
 void ProcessDirectoryJob::processFileFinalize(
     const SyncFileItemPtr &item, PathTuple path, bool recurse,
-    QueryMode recurseQueryLocal, QueryMode recurseQueryServer)
-{
+    QueryMode recurseQueryLocal, QueryMode recurseQueryServer) {
     // Adjust target path for virtual-suffix files
     if (isVfsWithSuffix()) {
         if (item->_type == ItemTypeVirtualFile) {
@@ -1398,8 +1387,7 @@ void ProcessDirectoryJob::processFileFinalize(
 }
 
 void ProcessDirectoryJob::processBlacklisted(const PathTuple &path, const OCC::LocalInfo &localEntry,
-    const SyncJournalFileRecord &dbEntry)
-{
+    const SyncJournalFileRecord &dbEntry) {
     if (!localEntry.isValid())
         return;
 
@@ -1429,8 +1417,7 @@ void ProcessDirectoryJob::processBlacklisted(const PathTuple &path, const OCC::L
     }
 }
 
-bool ProcessDirectoryJob::checkPermissions(const OCC::SyncFileItemPtr &item)
-{
+bool ProcessDirectoryJob::checkPermissions(const OCC::SyncFileItemPtr &item) {
     if (item->_direction != SyncFileItem::Up) {
         // Currently we only check server-side permissions
         return true;
@@ -1515,8 +1502,7 @@ bool ProcessDirectoryJob::checkPermissions(const OCC::SyncFileItemPtr &item)
 
 auto ProcessDirectoryJob::checkMovePermissions(RemotePermissions srcPerm, const QString &srcPath,
                                                bool isDirectory)
-    -> MovePermissionResult
-{
+    -> MovePermissionResult {
     auto destPerms = !_rootPermissions.isNull() ? _rootPermissions
                                                 : _dirItem ? _dirItem->_remotePerm : _rootPermissions;
     auto filePerms = srcPerm;
@@ -1547,8 +1533,7 @@ auto ProcessDirectoryJob::checkMovePermissions(RemotePermissions srcPerm, const 
     return MovePermissionResult{sourceOK, destinationOK, destinationNewOK};
 }
 
-void ProcessDirectoryJob::subJobFinished()
-{
+void ProcessDirectoryJob::subJobFinished() {
     auto job = qobject_cast<ProcessDirectoryJob *>(sender());
     ASSERT(job);
 
@@ -1564,8 +1549,7 @@ void ProcessDirectoryJob::subJobFinished()
     QTimer::singleShot(0, _discoveryData, &DiscoveryPhase::scheduleMoreJobs);
 }
 
-int ProcessDirectoryJob::processSubJobs(int nbJobs)
-{
+int ProcessDirectoryJob::processSubJobs(int nbJobs) {
     if (_queuedJobs.empty() && _runningJobs.empty() && _pendingAsyncJobs == 0) {
         _pendingAsyncJobs = -1; // We're finished, we don't want to emit finished again
         if (_dirItem) {
@@ -1607,25 +1591,21 @@ int ProcessDirectoryJob::processSubJobs(int nbJobs)
     return started;
 }
 
-void ProcessDirectoryJob::dbError()
-{
+void ProcessDirectoryJob::dbError() {
     _discoveryData->fatalError(tr("Error while reading the database"));
 }
 
-void ProcessDirectoryJob::addVirtualFileSuffix(QString &str) const
-{
+void ProcessDirectoryJob::addVirtualFileSuffix(QString &str) const {
     str.append(_discoveryData->_syncOptions._vfs->fileSuffix());
 }
 
-bool ProcessDirectoryJob::hasVirtualFileSuffix(const QString &str) const
-{
+bool ProcessDirectoryJob::hasVirtualFileSuffix(const QString &str) const {
     if (!isVfsWithSuffix())
         return false;
     return str.endsWith(_discoveryData->_syncOptions._vfs->fileSuffix());
 }
 
-void ProcessDirectoryJob::chopVirtualFileSuffix(QString &str) const
-{
+void ProcessDirectoryJob::chopVirtualFileSuffix(QString &str) const {
     if (!isVfsWithSuffix())
         return;
     bool hasSuffix = hasVirtualFileSuffix(str);
@@ -1634,8 +1614,7 @@ void ProcessDirectoryJob::chopVirtualFileSuffix(QString &str) const
         str.chop(_discoveryData->_syncOptions._vfs->fileSuffix().size());
 }
 
-DiscoverySingleDirectoryJob *ProcessDirectoryJob::startAsyncServerQuery()
-{
+DiscoverySingleDirectoryJob *ProcessDirectoryJob::startAsyncServerQuery() {
     auto serverJob = new DiscoverySingleDirectoryJob(_discoveryData->_account,
         _discoveryData->_remoteFolder + _currentFolder._server, this);
     if (!_dirItem)
@@ -1681,8 +1660,7 @@ DiscoverySingleDirectoryJob *ProcessDirectoryJob::startAsyncServerQuery()
     return serverJob;
 }
 
-void ProcessDirectoryJob::startAsyncLocalQuery()
-{
+void ProcessDirectoryJob::startAsyncLocalQuery() {
     QString localPath = _discoveryData->_localDir + _currentFolder._local;
     auto localJob = new DiscoverySingleLocalDirectoryJob(_discoveryData->_account, localPath, _discoveryData->_syncOptions._vfs.data());
 
@@ -1734,13 +1712,11 @@ void ProcessDirectoryJob::startAsyncLocalQuery()
 }
 
 
-bool ProcessDirectoryJob::isVfsWithSuffix() const
-{
+bool ProcessDirectoryJob::isVfsWithSuffix() const {
     return _discoveryData->_syncOptions._vfs->mode() == Vfs::WithSuffix;
 }
 
-void ProcessDirectoryJob::computePinState(PinState parentState)
-{
+void ProcessDirectoryJob::computePinState(PinState parentState) {
     _pinState = parentState;
     if (_queryLocal != ParentDontExist) {
         if (auto state = _discoveryData->_syncOptions._vfs->pinState(_currentFolder._local)) // ouch! pin local or original?
@@ -1748,8 +1724,7 @@ void ProcessDirectoryJob::computePinState(PinState parentState)
     }
 }
 
-void ProcessDirectoryJob::setupDbPinStateActions(SyncJournalFileRecord &record)
-{
+void ProcessDirectoryJob::setupDbPinStateActions(SyncJournalFileRecord &record) {
     // Only suffix-vfs uses the db for pin states.
     // Other plugins will set localEntry._type according to the file's pin state.
     if (!isVfsWithSuffix())

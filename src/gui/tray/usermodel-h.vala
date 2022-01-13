@@ -20,8 +20,7 @@
 namespace OCC {
 class UnifiedSearchResultsListModel;
 
-class User : public QObject
-{
+class User : public QObject {
     Q_PROPERTY(QString name READ name NOTIFY nameChanged)
     Q_PROPERTY(QString server READ server CONSTANT)
     Q_PROPERTY(bool serverHasUserStatus READ serverHasUserStatus CONSTANT)
@@ -130,8 +129,7 @@ private:
     int _notificationRequestsRunning;
 };
 
-class UserModel : public QAbstractListModel
-{
+class UserModel : public QAbstractListModel {
     Q_PROPERTY(User* currentUser READ currentUser NOTIFY newUserSelected)
     Q_PROPERTY(int currentUserId READ currentUserId NOTIFY newUserSelected)
 public:
@@ -201,15 +199,13 @@ private:
     void buildUserList();
 };
 
-class ImageProvider : public QQuickImageProvider
-{
+class ImageProvider : public QQuickImageProvider {
 public:
     ImageProvider();
     QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize) override;
 };
 
-class UserAppsModel : public QAbstractListModel
-{
+class UserAppsModel : public QAbstractListModel {
 public:
     static UserAppsModel *instance();
     ~UserAppsModel() override = default;

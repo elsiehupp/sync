@@ -46,8 +46,7 @@
 
 using namespace OCC;
 
-void warnSystray()
-{
+void warnSystray() {
     QMessageBox::critical(nullptr, qApp->translate("main.cpp", "System Tray not available"),
         qApp->translate("main.cpp", "%1 requires on a working system tray. "
                                     "If you are running XFCE, please follow "
@@ -56,8 +55,7 @@ void warnSystray()
             .arg(Theme::instance()->appNameGUI()));
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
 #ifdef Q_OS_WIN
     SetDllDirectory(L"");
 #endif
@@ -177,8 +175,7 @@ int main(int argc, char **argv)
 
     // We can't call isSystemTrayAvailable with appmenu-qt5 begause it hides the systemtray
     // (issue #4693)
-    if (qgetenv("QT_QPA_PLATFORMTHEME") != "appmenu-qt5")
-    {
+    if (qgetenv("QT_QPA_PLATFORMTHEME") != "appmenu-qt5") {
         if (!QSystemTrayIcon::isSystemTrayAvailable()) {
             // If the systemtray is not there, we will wait one second for it to maybe start
             // (eg boot time) then we show the settings dialog if there is still no systemtray.

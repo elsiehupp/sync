@@ -10,8 +10,7 @@
 #include "folderwatcher.h"
 #include "common/utility.h"
 
-void touch(const QString &file)
-{
+void touch(const QString &file) {
 #ifdef Q_OS_WIN
     OCC::Utility::writeRandomFile(file);
 #else
@@ -22,8 +21,7 @@ void touch(const QString &file)
 #endif
 }
 
-void mkdir(const QString &file)
-{
+void mkdir(const QString &file) {
 #ifdef Q_OS_WIN
     QDir dir;
     dir.mkdir(file);
@@ -34,8 +32,7 @@ void mkdir(const QString &file)
 #endif
 }
 
-void rmdir(const QString &file)
-{
+void rmdir(const QString &file) {
 #ifdef Q_OS_WIN
     QDir dir;
     dir.rmdir(file);
@@ -46,8 +43,7 @@ void rmdir(const QString &file)
 #endif
 }
 
-void rm(const QString &file)
-{
+void rm(const QString &file) {
 #ifdef Q_OS_WIN
     QFile::remove(file);
 #else
@@ -57,8 +53,7 @@ void rm(const QString &file)
 #endif
 }
 
-void mv(const QString &file1, const QString &file2)
-{
+void mv(const QString &file1, const QString &file2) {
 #ifdef Q_OS_WIN
     QFile::rename(file1, file2);
 #else
@@ -70,16 +65,14 @@ void mv(const QString &file1, const QString &file2)
 
 using namespace OCC;
 
-class TestFolderWatcher : public QObject
-{
+class TestFolderWatcher : public QObject {
 
     QTemporaryDir _root;
     QString _rootPath;
     QScopedPointer<FolderWatcher> _watcher;
     QScopedPointer<QSignalSpy> _pathChangedSpy;
 
-    bool waitForPathChanged(const QString &path)
-    {
+    bool waitForPathChanged(const QString &path) {
         QElapsedTimer t;
         t.start();
         while (t.elapsed() < 5000) {
@@ -102,8 +95,7 @@ class TestFolderWatcher : public QObject
 #endif
 
 public:
-    TestFolderWatcher()
-    {
+    TestFolderWatcher() {
         QDir rootDir(_root.path());
         _rootPath = rootDir.canonicalPath();
         qDebug() << "creating test directory tree in " << _rootPath;
@@ -123,8 +115,7 @@ public:
         _pathChangedSpy.reset(new QSignalSpy(_watcher.data(), SIGNAL(pathChanged(QString))));
     }
 
-    int countFolders(const QString &path)
-    {
+    int countFolders(const QString &path) {
         int n = 0;
         for (const auto &sub : QDir(path).entryList(QDir::Dirs | QDir::NoDotAndDotDot))
             n += 1 + countFolders(path + '/' + sub);
@@ -132,14 +123,12 @@ public:
     }
 
 private slots:
-    void init()
-    {
+    void init() {
         _pathChangedSpy->clear();
         CHECK_WATCH_COUNT(countFolders(_rootPath) + 1);
     }
 
-    void cleanup()
-    {
+    void cleanup() {
         CHECK_WATCH_COUNT(countFolders(_rootPath) + 1);
     }
 

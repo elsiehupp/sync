@@ -19,8 +19,7 @@
 class SocketApiServerPrivate;
 class SocketApiSocketPrivate;
 
-class SocketApiSocket : public QIODevice
-{
+class SocketApiSocket : public QIODevice {
 public:
     SocketApiSocket(QObject *parent, SocketApiSocketPrivate *p);
     ~SocketApiSocket();
@@ -42,8 +41,7 @@ private:
     friend class SocketApiServerPrivate;
 };
 
-class SocketApiServer : public QObject
-{
+class SocketApiServer : public QObject {
 public:
     SocketApiServer();
     ~SocketApiServer();

@@ -32,8 +32,7 @@ namespace OCC {
 
 Q_LOGGING_CATEGORY(lcHttpCredentialsGui, "nextcloud.sync.credentials.http.gui", QtInfoMsg)
 
-void HttpCredentialsGui::askFromUser()
-{
+void HttpCredentialsGui::askFromUser() {
     // This function can be called from AccountState::slotInvalidCredentials,
     // which (indirectly, through HttpCredentials::invalidateToken) schedules
     // a cache wipe of the qnam. We can only execute a network job again once
@@ -41,8 +40,7 @@ void HttpCredentialsGui::askFromUser()
     QTimer::singleShot(100, this, &HttpCredentialsGui::askFromUserAsync);
 }
 
-void HttpCredentialsGui::askFromUserAsync()
-{
+void HttpCredentialsGui::askFromUserAsync() {
     // First, we will check what kind of auth we need.
     auto job = new DetermineAuthTypeJob(_account->sharedFromThis(), this);
     QObject::connect(job, &DetermineAuthTypeJob::authType, this, [this](DetermineAuthTypeJob::AuthType type) {
@@ -67,8 +65,7 @@ void HttpCredentialsGui::askFromUserAsync()
 }
 
 void HttpCredentialsGui::asyncAuthResult(OAuth::Result r, const QString &user,
-    const QString &token, const QString &refreshToken)
-{
+    const QString &token, const QString &refreshToken) {
     switch (r) {
     case OAuth::NotSupported:
         showDialog();
@@ -92,8 +89,7 @@ void HttpCredentialsGui::asyncAuthResult(OAuth::Result r, const QString &user,
     emit asked();
 }
 
-void HttpCredentialsGui::showDialog()
-{
+void HttpCredentialsGui::showDialog() {
     QString msg = tr("Please enter %1 password:<br>"
                      "<br>"
                      "User: %2<br>"
@@ -136,8 +132,7 @@ void HttpCredentialsGui::showDialog()
     });
 }
 
-QString HttpCredentialsGui::requestAppPasswordText(const Account *account)
-{
+QString HttpCredentialsGui::requestAppPasswordText(const Account *account) {
     int version = account->serverVersionInt();
     auto url = account->url().toString();
     if (url.endsWith('/'))

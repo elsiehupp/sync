@@ -33,11 +33,9 @@ class SyncFileItem;
  * @brief The SyncJournalFileRecord class
  * @ingroup libsync
  */
-class OCSYNC_EXPORT SyncJournalFileRecord
-{
+class OCSYNC_EXPORT SyncJournalFileRecord {
 public:
-    bool isValid() const
-    {
+    bool isValid() const {
         return !_path.isEmpty();
     }
 
@@ -74,8 +72,7 @@ bool OCSYNC_EXPORT
 operator==(const SyncJournalFileRecord &lhs,
     const SyncJournalFileRecord &rhs);
 
-class OCSYNC_EXPORT SyncJournalErrorBlacklistRecord
-{
+class OCSYNC_EXPORT SyncJournalErrorBlacklistRecord {
 public:
     enum Category {
         /// Normal errors have no special behavior
@@ -117,8 +114,7 @@ public:
  * So if "a/foo.txt" is the base file, its conflict file could be
  * "a/foo (conflicted copy 1234).txt".
  */
-class OCSYNC_EXPORT ConflictRecord
-{
+class OCSYNC_EXPORT ConflictRecord {
 public:
     /** Path to the file with the conflict tag in the name
      *

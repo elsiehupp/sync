@@ -31,8 +31,7 @@ namespace OCC {
 
 class OcsShareJob;
 
-class Share : public QObject
-{
+class Share : public QObject {
 
 public:
     /**
@@ -165,8 +164,7 @@ private slots:
  * There are several methods in the API that either work differently for
  * link shares or are only available to link shares.
  */
-class LinkShare : public Share
-{
+class LinkShare : public Share {
 public:
     explicit LinkShare(AccountPtr account,
         const QString &id,
@@ -211,7 +209,7 @@ public:
      * Returns the note of the link share.
      */
     QString getNote() const;
-    
+
     /*
      * Returns the label of the link share.
      */
@@ -246,19 +244,19 @@ public:
      * In case of a server error the serverError signal is emitted.
      */
     void setExpireDate(const QDate &expireDate);
-    
+
     /*
      * Set the label of the share link.
      */
     void setLabel(const QString &label);
-    
+
     /*
      * Create OcsShareJob and connect to signal/slots
      */
     template <typename LinkShareSlot>
     OcsShareJob *createShareJob(const LinkShareSlot slotFunction);
-    
-    
+
+
 signals:
     void expireDateSet();
     void noteSet();
@@ -280,8 +278,7 @@ private:
     QString _label;
 };
 
-class UserGroupShare : public Share
-{
+class UserGroupShare : public Share {
 public:
     UserGroupShare(AccountPtr account,
         const QString &id,
@@ -322,8 +319,7 @@ private:
  * of shares. It abstracts away from the OCS Share API, all the usages
  * shares should talk to this manager and not use OCS Share Job directly
  */
-class ShareManager : public QObject
-{
+class ShareManager : public QObject {
 public:
     explicit ShareManager(AccountPtr _account, QObject *parent = nullptr);
 

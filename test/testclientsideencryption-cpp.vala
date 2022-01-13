@@ -15,17 +15,14 @@
 
 using namespace OCC;
 
-class TestClientSideEncryption : public QObject
-{
+class TestClientSideEncryption : public QObject {
 
-    QByteArray convertToOldStorageFormat(const QByteArray &data)
-    {
+    QByteArray convertToOldStorageFormat(const QByteArray &data) {
         return data.split('|').join("fA==");
     }
 
 private slots:
-    void shouldEncryptPrivateKeys()
-    {
+    void shouldEncryptPrivateKeys() {
         // GIVEN
         const auto encryptionKey = QByteArrayLiteral("foo");
         const auto privateKey = QByteArrayLiteral("bar");
@@ -51,8 +48,7 @@ private slots:
         QCOMPARE(salt, originalSalt);
     }
 
-    void shouldDecryptPrivateKeys()
-    {
+    void shouldDecryptPrivateKeys() {
         // GIVEN
         const auto encryptionKey = QByteArrayLiteral("foo");
         const auto originalPrivateKey = QByteArrayLiteral("bar");
@@ -68,8 +64,7 @@ private slots:
         QCOMPARE(salt, originalSalt);
     }
 
-    void shouldDecryptPrivateKeysInOldStorageFormat()
-    {
+    void shouldDecryptPrivateKeysInOldStorageFormat() {
         // GIVEN
         const auto encryptionKey = QByteArrayLiteral("foo");
         const auto originalPrivateKey = QByteArrayLiteral("bar");
@@ -85,8 +80,7 @@ private slots:
         QCOMPARE(salt, originalSalt);
     }
 
-    void shouldSymmetricEncryptStrings()
-    {
+    void shouldSymmetricEncryptStrings() {
         // GIVEN
         const auto encryptionKey = QByteArrayLiteral("foo");
         const auto data = QByteArrayLiteral("bar");
@@ -109,8 +103,7 @@ private slots:
         QVERIFY(!iv.isEmpty());
     }
 
-    void shouldSymmetricDecryptStrings()
-    {
+    void shouldSymmetricDecryptStrings() {
         // GIVEN
         const auto encryptionKey = QByteArrayLiteral("foo");
         const auto originalData = QByteArrayLiteral("bar");
@@ -123,8 +116,7 @@ private slots:
         QCOMPARE(data, originalData);
     }
 
-    void shouldSymmetricDecryptStringsInOldStorageFormat()
-    {
+    void shouldSymmetricDecryptStringsInOldStorageFormat() {
         // GIVEN
         const auto encryptionKey = QByteArrayLiteral("foo");
         const auto originalData = QByteArrayLiteral("bar");
@@ -137,8 +129,7 @@ private slots:
         QCOMPARE(data, originalData);
     }
 
-    void testStreamingDecryptor_data()
-    {
+    void testStreamingDecryptor_data() {
         QTest::addColumn<int>("totalBytes");
         QTest::addColumn<int>("bytesToRead");
 
@@ -148,8 +139,7 @@ private slots:
         QTest::newRow("data4") << 272 << 256;
     }
 
-    void testStreamingDecryptor()
-    {
+    void testStreamingDecryptor() {
         QFETCH(int, totalBytes);
 
         QTemporaryFile dummyInputFile;

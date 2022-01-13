@@ -38,8 +38,7 @@ using AccountAppList = QList<AccountApp *>;
  * @brief Extra info about an ownCloud server account.
  * @ingroup gui
  */
-class AccountState : public QObject, public QSharedData
-{
+class AccountState : public QObject, public QSharedData {
     Q_PROPERTY(AccountPtr account MEMBER _account)
 
 public:
@@ -235,8 +234,7 @@ private:
     bool _isDesktopNotificationsAllowed;
 };
 
-class AccountApp : public QObject
-{
+class AccountApp : public QObject {
 public:
     AccountApp(const QString &name, const QUrl &url,
         const QString &id, const QUrl &iconUrl,

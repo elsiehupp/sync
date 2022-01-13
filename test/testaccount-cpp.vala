@@ -18,12 +18,10 @@
 
 using namespace OCC;
 
-class TestAccount: public QObject
-{
+class TestAccount: public QObject {
 
 private slots:
-    void testAccountDavPath_unitialized_noCrash()
-    {
+    void testAccountDavPath_unitialized_noCrash() {
         AccountPtr account = Account::create();
         account->davPath();
     }

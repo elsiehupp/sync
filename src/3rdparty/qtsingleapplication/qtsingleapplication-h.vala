@@ -36,8 +36,7 @@ namespace SharedTools {
 
 class QtLocalPeer;
 
-class QtSingleApplication : public QApplication
-{
+class QtSingleApplication : public QApplication {
 
 public:
     QtSingleApplication(const QString &id, int &argc, char **argv);

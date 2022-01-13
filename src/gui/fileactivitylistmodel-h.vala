@@ -19,8 +19,7 @@
 
 namespace OCC {
 
-class FileActivityListModel : public ActivityListModel
-{
+class FileActivityListModel : public ActivityListModel {
 
 public:
     explicit FileActivityListModel(QObject *parent = nullptr);

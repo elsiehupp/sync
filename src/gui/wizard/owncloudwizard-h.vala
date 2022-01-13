@@ -42,8 +42,7 @@ class Flow2AuthCredsPage;
  * @brief The OwncloudWizard class
  * @ingroup gui
  */
-class OwncloudWizard : public QWizard
-{
+class OwncloudWizard : public QWizard {
 public:
     enum LogType {
         LogPlain,

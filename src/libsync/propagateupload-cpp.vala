@@ -49,14 +49,12 @@ Q_LOGGING_CATEGORY(lcPropagateUpload, "nextcloud.sync.propagator.upload", QtInfo
 Q_LOGGING_CATEGORY(lcPropagateUploadV1, "nextcloud.sync.propagator.upload.v1", QtInfoMsg)
 Q_LOGGING_CATEGORY(lcPropagateUploadNG, "nextcloud.sync.propagator.upload.ng", QtInfoMsg)
 
-PUTFileJob::~PUTFileJob()
-{
+PUTFileJob::~PUTFileJob() {
     // Make sure that we destroy the QNetworkReply before our _device of which it keeps an internal pointer.
     setReply(nullptr);
 }
 
-void PUTFileJob::start()
-{
+void PUTFileJob::start() {
     QNetworkRequest req;
     for (QMap<QByteArray, QByteArray>::const_iterator it = _headers.begin(); it != _headers.end(); ++it) {
         req.setRawHeader(it.key(), it.value());
@@ -80,8 +78,7 @@ void PUTFileJob::start()
     AbstractNetworkJob::start();
 }
 
-bool PUTFileJob::finished()
-{
+bool PUTFileJob::finished() {
     _device->close();
 
     qCInfo(lcPutJob) << "PUT of" << reply()->request().url().toString() << "FINISHED WITH STATUS"
@@ -93,8 +90,7 @@ bool PUTFileJob::finished()
     return true;
 }
 
-void PollJob::start()
-{
+void PollJob::start() {
     setTimeout(120 * 1000);
     QUrl accountUrl = account()->url();
     QUrl finalUrl = QUrl::fromUserInput(accountUrl.scheme() + QLatin1String("://") + accountUrl.authority()
@@ -104,8 +100,7 @@ void PollJob::start()
     AbstractNetworkJob::start();
 }
 
-bool PollJob::finished()
-{
+bool PollJob::finished() {
     QNetworkReply::NetworkError err = reply()->error();
     if (err != QNetworkReply::NoError) {
         _item->_httpErrorCode = reply()->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
@@ -174,8 +169,7 @@ PropagateUploadFileCommon::PropagateUploadFileCommon(OwncloudPropagator *propaga
     , _deleteExisting(false)
     , _aborting(false)
     , _uploadEncryptedHelper(nullptr)
-    , _uploadingEncrypted(false)
-{
+    , _uploadingEncrypted(false) {
     const auto path = _item->_file;
     const auto slashPosition = path.lastIndexOf('/');
     const auto parentPath = slashPosition >= 0 ? path.left(slashPosition) : QString();
@@ -187,13 +181,11 @@ PropagateUploadFileCommon::PropagateUploadFileCommon(OwncloudPropagator *propaga
     }
 }
 
-void PropagateUploadFileCommon::setDeleteExisting(bool enabled)
-{
+void PropagateUploadFileCommon::setDeleteExisting(bool enabled) {
     _deleteExisting = enabled;
 }
 
-void PropagateUploadFileCommon::start()
-{
+void PropagateUploadFileCommon::start() {
     const auto path = _item->_file;
     const auto slashPosition = path.lastIndexOf('/');
     const auto parentPath = slashPosition >= 0 ? path.left(slashPosition) : QString();
@@ -245,8 +237,7 @@ void PropagateUploadFileCommon::start()
     _uploadEncryptedHelper->start();
 }
 
-void PropagateUploadFileCommon::setupEncryptedFile(const QString& path, const QString& filename, quint64 size)
-{
+void PropagateUploadFileCommon::setupEncryptedFile(const QString& path, const QString& filename, quint64 size) {
     qCDebug(lcPropagateUpload) << "Starting to upload encrypted file" << path << filename << size;
     _uploadingEncrypted = true;
     _fileToUpload._path = path;
@@ -255,8 +246,7 @@ void PropagateUploadFileCommon::setupEncryptedFile(const QString& path, const QS
     startUploadFile();
 }
 
-void PropagateUploadFileCommon::setupUnencryptedFile()
-{
+void PropagateUploadFileCommon::setupUnencryptedFile() {
     _uploadingEncrypted = false;
     _fileToUpload._file = _item->_file;
     _fileToUpload._size = _item->_size;
@@ -303,8 +293,7 @@ void PropagateUploadFileCommon::startUploadFile() {
     job->start();
 }
 
-void PropagateUploadFileCommon::slotComputeContentChecksum()
-{
+void PropagateUploadFileCommon::slotComputeContentChecksum() {
     qDebug() << "Trying to compute the checksum of the file";
     qDebug() << "Still trying to understand if this is the local file or the uploaded one";
     if (propagator()->_abortRequested) {
@@ -347,8 +336,7 @@ void PropagateUploadFileCommon::slotComputeContentChecksum()
     computeChecksum->start(_fileToUpload._path);
 }
 
-void PropagateUploadFileCommon::slotComputeTransmissionChecksum(const QByteArray &contentChecksumType, const QByteArray &contentChecksum)
-{
+void PropagateUploadFileCommon::slotComputeTransmissionChecksum(const QByteArray &contentChecksumType, const QByteArray &contentChecksum) {
     _item->_checksumHeader = makeChecksumHeader(contentChecksumType, contentChecksum);
 
     // Reuse the content checksum as the transmission checksum if possible
@@ -374,8 +362,7 @@ void PropagateUploadFileCommon::slotComputeTransmissionChecksum(const QByteArray
     computeChecksum->start(_fileToUpload._path);
 }
 
-void PropagateUploadFileCommon::slotStartUpload(const QByteArray &transmissionChecksumType, const QByteArray &transmissionChecksum)
-{
+void PropagateUploadFileCommon::slotStartUpload(const QByteArray &transmissionChecksumType, const QByteArray &transmissionChecksum) {
     // Remove ourselfs from the list of active job, before any posible call to done()
     // When we start chunks, we will add it again, once for every chunks.
     propagator()->_activeJobList.removeOne(this);
@@ -434,8 +421,7 @@ void PropagateUploadFileCommon::slotStartUpload(const QByteArray &transmissionCh
     doStartUpload();
 }
 
-void PropagateUploadFileCommon::slotFolderUnlocked(const QByteArray &folderId, int httpReturnCode)
-{
+void PropagateUploadFileCommon::slotFolderUnlocked(const QByteArray &folderId, int httpReturnCode) {
     qDebug() << "Failed to unlock encrypted folder" << folderId;
     if (_uploadStatus.status == SyncFileItem::NoStatus && httpReturnCode != 200) {
         done(SyncFileItem::FatalError, tr("Failed to unlock encrypted folder."));
@@ -444,8 +430,7 @@ void PropagateUploadFileCommon::slotFolderUnlocked(const QByteArray &folderId, i
     }
 }
 
-void PropagateUploadFileCommon::slotOnErrorStartFolderUnlock(SyncFileItem::Status status, const QString &errorString)
-{
+void PropagateUploadFileCommon::slotOnErrorStartFolderUnlock(SyncFileItem::Status status, const QString &errorString) {
     if (_uploadingEncrypted) {
         _uploadStatus = { status, errorString };
         connect(_uploadEncryptedHelper, &PropagateUploadEncrypted::folderUnlocked, this, &PropagateUploadFileCommon::slotFolderUnlocked);
@@ -459,21 +444,18 @@ UploadDevice::UploadDevice(const QString &fileName, qint64 start, qint64 size, B
     : _file(fileName)
     , _start(start)
     , _size(size)
-    , _bandwidthManager(bwm)
-{
+    , _bandwidthManager(bwm) {
     _bandwidthManager->registerUploadDevice(this);
 }
 
 
-UploadDevice::~UploadDevice()
-{
+UploadDevice::~UploadDevice() {
     if (_bandwidthManager) {
         _bandwidthManager->unregisterUploadDevice(this);
     }
 }
 
-bool UploadDevice::open(QIODevice::OpenMode mode)
-{
+bool UploadDevice::open(QIODevice::OpenMode mode) {
     if (mode & QIODevice::WriteOnly)
         return false;
 
@@ -493,20 +475,17 @@ bool UploadDevice::open(QIODevice::OpenMode mode)
     return QIODevice::open(mode);
 }
 
-void UploadDevice::close()
-{
+void UploadDevice::close() {
     _file.close();
     QIODevice::close();
 }
 
-qint64 UploadDevice::writeData(const char *, qint64)
-{
+qint64 UploadDevice::writeData(const char *, qint64) {
     ASSERT(false, "write to read only device");
     return 0;
 }
 
-qint64 UploadDevice::readData(char *data, qint64 maxlen)
-{
+qint64 UploadDevice::readData(char *data, qint64 maxlen) {
     if (_size - _read <= 0) {
         // at end
         if (_bandwidthManager) {
@@ -538,37 +517,31 @@ qint64 UploadDevice::readData(char *data, qint64 maxlen)
     return c;
 }
 
-void UploadDevice::slotJobUploadProgress(qint64 sent, qint64 t)
-{
+void UploadDevice::slotJobUploadProgress(qint64 sent, qint64 t) {
     if (sent == 0 || t == 0) {
         return;
     }
     _readWithProgress = sent;
 }
 
-bool UploadDevice::atEnd() const
-{
+bool UploadDevice::atEnd() const {
     return _read >= _size;
 }
 
-qint64 UploadDevice::size() const
-{
+qint64 UploadDevice::size() const {
     return _size;
 }
 
-qint64 UploadDevice::bytesAvailable() const
-{
+qint64 UploadDevice::bytesAvailable() const {
     return _size - _read + QIODevice::bytesAvailable();
 }
 
 // random access, we can seek
-bool UploadDevice::isSequential() const
-{
+bool UploadDevice::isSequential() const {
     return false;
 }
 
-bool UploadDevice::seek(qint64 pos)
-{
+bool UploadDevice::seek(qint64 pos) {
     if (!QIODevice::seek(pos)) {
         return false;
     }
@@ -580,30 +553,26 @@ bool UploadDevice::seek(qint64 pos)
     return true;
 }
 
-void UploadDevice::giveBandwidthQuota(qint64 bwq)
-{
+void UploadDevice::giveBandwidthQuota(qint64 bwq) {
     if (!atEnd()) {
         _bandwidthQuota = bwq;
         QMetaObject::invokeMethod(this, "readyRead", Qt::QueuedConnection); // tell QNAM that we have quota
     }
 }
 
-void UploadDevice::setBandwidthLimited(bool b)
-{
+void UploadDevice::setBandwidthLimited(bool b) {
     _bandwidthLimited = b;
     QMetaObject::invokeMethod(this, "readyRead", Qt::QueuedConnection);
 }
 
-void UploadDevice::setChoked(bool b)
-{
+void UploadDevice::setChoked(bool b) {
     _choked = b;
     if (!_choked) {
         QMetaObject::invokeMethod(this, "readyRead", Qt::QueuedConnection);
     }
 }
 
-void PropagateUploadFileCommon::startPollJob(const QString &path)
-{
+void PropagateUploadFileCommon::startPollJob(const QString &path) {
     auto *job = new PollJob(propagator()->account(), path, _item,
         propagator()->_journal, propagator()->localPath(), this);
     connect(job, &PollJob::finishedSignal, this, &PropagateUploadFileCommon::slotPollFinished);
@@ -622,8 +591,7 @@ void PropagateUploadFileCommon::startPollJob(const QString &path)
     job->start();
 }
 
-void PropagateUploadFileCommon::slotPollFinished()
-{
+void PropagateUploadFileCommon::slotPollFinished() {
     auto *job = qobject_cast<PollJob *>(sender());
     ASSERT(job);
 
@@ -637,14 +605,12 @@ void PropagateUploadFileCommon::slotPollFinished()
     finalize();
 }
 
-void PropagateUploadFileCommon::done(SyncFileItem::Status status, const QString &errorString)
-{
+void PropagateUploadFileCommon::done(SyncFileItem::Status status, const QString &errorString) {
     _finished = true;
     PropagateItemJob::done(status, errorString);
 }
 
-void PropagateUploadFileCommon::checkResettingErrors()
-{
+void PropagateUploadFileCommon::checkResettingErrors() {
     if (_item->_httpErrorCode == 412
         || propagator()->account()->capabilities().httpErrorCodesThatResetFailingChunkedUploads().contains(_item->_httpErrorCode)) {
         auto uploadInfo = propagator()->_journal->getUploadInfo(_item->_file);
@@ -663,8 +629,7 @@ void PropagateUploadFileCommon::checkResettingErrors()
     }
 }
 
-void PropagateUploadFileCommon::commonErrorHandling(AbstractNetworkJob *job)
-{
+void PropagateUploadFileCommon::commonErrorHandling(AbstractNetworkJob *job) {
     QByteArray replyContent;
     QString errorString = job->errorStringParsingBody(&replyContent);
     qCDebug(lcPropagateUpload) << replyContent; // display the XML error in the debug
@@ -707,8 +672,7 @@ void PropagateUploadFileCommon::commonErrorHandling(AbstractNetworkJob *job)
     abortWithError(status, errorString);
 }
 
-void PropagateUploadFileCommon::adjustLastJobTimeout(AbstractNetworkJob *job, qint64 fileSize)
-{
+void PropagateUploadFileCommon::adjustLastJobTimeout(AbstractNetworkJob *job, qint64 fileSize) {
     constexpr double threeMinutes = 3.0 * 60 * 1000;
 
     job->setTimeout(qBound(
@@ -719,22 +683,19 @@ void PropagateUploadFileCommon::adjustLastJobTimeout(AbstractNetworkJob *job, qi
         static_cast<qint64>(30 * 60 * 1000)));
 }
 
-void PropagateUploadFileCommon::slotJobDestroyed(QObject *job)
-{
+void PropagateUploadFileCommon::slotJobDestroyed(QObject *job) {
     _jobs.erase(std::remove(_jobs.begin(), _jobs.end(), job), _jobs.end());
 }
 
 // This function is used whenever there is an error occuring and jobs might be in progress
-void PropagateUploadFileCommon::abortWithError(SyncFileItem::Status status, const QString &error)
-{
+void PropagateUploadFileCommon::abortWithError(SyncFileItem::Status status, const QString &error) {
     if (_aborting)
         return;
     abort(AbortType::Synchronous);
     done(status, error);
 }
 
-QMap<QByteArray, QByteArray> PropagateUploadFileCommon::headers()
-{
+QMap<QByteArray, QByteArray> PropagateUploadFileCommon::headers() {
     QMap<QByteArray, QByteArray> headers;
     headers[QByteArrayLiteral("Content-Type")] = QByteArrayLiteral("application/octet-stream");
     Q_ASSERT(_item->_modtime > 0);
@@ -786,8 +747,7 @@ QMap<QByteArray, QByteArray> PropagateUploadFileCommon::headers()
     return headers;
 }
 
-void PropagateUploadFileCommon::finalize()
-{
+void PropagateUploadFileCommon::finalize() {
     // Update the quota, if known
     auto quotaIt = propagator()->_folderQuota.find(QFileInfo(_item->_file).path());
     if (quotaIt != propagator()->_folderQuota.end())
@@ -831,8 +791,7 @@ void PropagateUploadFileCommon::finalize()
 
 void PropagateUploadFileCommon::abortNetworkJobs(
     PropagatorJob::AbortType abortType,
-    const std::function<bool(AbstractNetworkJob *)> &mayAbortJob)
-{
+    const std::function<bool(AbstractNetworkJob *)> &mayAbortJob) {
     if (_aborting)
         return;
     _aborting = true;

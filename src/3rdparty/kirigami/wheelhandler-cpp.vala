@@ -9,8 +9,7 @@
 // #include <QQuickItem>
 // #include <QDebug>
 
-class GlobalWheelFilterSingleton
-{
+class GlobalWheelFilterSingleton {
 public:
     GlobalWheelFilter self;
 };
@@ -18,19 +17,16 @@ public:
 Q_GLOBAL_STATIC(GlobalWheelFilterSingleton, privateGlobalWheelFilterSelf)
 
 GlobalWheelFilter::GlobalWheelFilter(QObject *parent)
-    : QObject(parent)
-{
+    : QObject(parent) {
 }
 
 GlobalWheelFilter::~GlobalWheelFilter() = default;
 
-GlobalWheelFilter *GlobalWheelFilter::self()
-{
+GlobalWheelFilter *GlobalWheelFilter::self() {
     return &privateGlobalWheelFilterSelf()->self;
 }
 
-void GlobalWheelFilter::setItemHandlerAssociation(QQuickItem *item, WheelHandler *handler)
-{
+void GlobalWheelFilter::setItemHandlerAssociation(QQuickItem *item, WheelHandler *handler) {
     if (!m_handlersForItem.contains(handler->target())) {
         handler->target()->installEventFilter(this);
     }
@@ -47,8 +43,7 @@ void GlobalWheelFilter::setItemHandlerAssociation(QQuickItem *item, WheelHandler
     });
 }
 
-void GlobalWheelFilter::removeItemHandlerAssociation(QQuickItem *item, WheelHandler *handler)
-{
+void GlobalWheelFilter::removeItemHandlerAssociation(QQuickItem *item, WheelHandler *handler) {
     if (!item || !handler) {
         return;
     }
@@ -58,8 +53,7 @@ void GlobalWheelFilter::removeItemHandlerAssociation(QQuickItem *item, WheelHand
     }
 }
 
-bool GlobalWheelFilter::eventFilter(QObject *watched, QEvent *event)
-{
+bool GlobalWheelFilter::eventFilter(QObject *watched, QEvent *event) {
     if (event->type() == QEvent::Wheel) {
         auto item = qobject_cast<QQuickItem *>(watched);
         if (!item || !item->isEnabled()) {
@@ -92,8 +86,7 @@ bool GlobalWheelFilter::eventFilter(QObject *watched, QEvent *event)
     return QObject::eventFilter(watched, event);
 }
 
-void GlobalWheelFilter::manageWheel(QQuickItem *target, QWheelEvent *event)
-{
+void GlobalWheelFilter::manageWheel(QQuickItem *target, QWheelEvent *event) {
     // Duck typing: accept everyhint that has all the properties we need
     if (target->metaObject()->indexOfProperty("contentX") == -1
         || target->metaObject()->indexOfProperty("contentY") == -1
@@ -182,13 +175,11 @@ void GlobalWheelFilter::manageWheel(QQuickItem *target, QWheelEvent *event)
 
 ////////////////////////////
 KirigamiWheelEvent::KirigamiWheelEvent(QObject *parent)
-    : QObject(parent)
-{}
+    : QObject(parent) {}
 
 KirigamiWheelEvent::~KirigamiWheelEvent() = default;
 
-void KirigamiWheelEvent::initializeFromEvent(QWheelEvent *event)
-{
+void KirigamiWheelEvent::initializeFromEvent(QWheelEvent *event) {
     m_x = event->position().x();
     m_y = event->position().y();
     m_angleDelta = event->angleDelta();
@@ -199,48 +190,39 @@ void KirigamiWheelEvent::initializeFromEvent(QWheelEvent *event)
     m_inverted = event->inverted();
 }
 
-qreal KirigamiWheelEvent::x() const
-{
+qreal KirigamiWheelEvent::x() const {
     return m_x;
 }
 
-qreal KirigamiWheelEvent::y() const
-{
+qreal KirigamiWheelEvent::y() const {
     return m_y;
 }
 
-QPointF KirigamiWheelEvent::angleDelta() const
-{
+QPointF KirigamiWheelEvent::angleDelta() const {
     return m_angleDelta;
 }
 
-QPointF KirigamiWheelEvent::pixelDelta() const
-{
+QPointF KirigamiWheelEvent::pixelDelta() const {
     return m_pixelDelta;
 }
 
-int KirigamiWheelEvent::buttons() const
-{
+int KirigamiWheelEvent::buttons() const {
     return m_buttons;
 }
 
-int KirigamiWheelEvent::modifiers() const
-{
+int KirigamiWheelEvent::modifiers() const {
     return m_modifiers;
 }
 
-bool KirigamiWheelEvent::inverted() const
-{
+bool KirigamiWheelEvent::inverted() const {
     return m_inverted;
 }
 
-bool KirigamiWheelEvent::isAccepted()
-{
+bool KirigamiWheelEvent::isAccepted() {
     return m_accepted;
 }
 
-void KirigamiWheelEvent::setAccepted(bool accepted)
-{
+void KirigamiWheelEvent::setAccepted(bool accepted) {
     m_accepted = accepted;
 }
 
@@ -248,19 +230,16 @@ void KirigamiWheelEvent::setAccepted(bool accepted)
 ///////////////////////////////
 
 WheelHandler::WheelHandler(QObject *parent)
-    : QObject(parent)
-{
+    : QObject(parent) {
 }
 
 WheelHandler::~WheelHandler() = default;
 
-QQuickItem *WheelHandler::target() const
-{
+QQuickItem *WheelHandler::target() const {
     return m_target;
 }
 
-void WheelHandler::setTarget(QQuickItem *target)
-{
+void WheelHandler::setTarget(QQuickItem *target) {
     if (m_target == target) {
         return;
     }

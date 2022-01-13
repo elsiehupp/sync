@@ -30,8 +30,7 @@ class ConfigFile;
  * @brief The ClientProxy class
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT ClientProxy : public QObject
-{
+class OWNCLOUDSYNC_EXPORT ClientProxy : public QObject {
 public:
     explicit ClientProxy(QObject *parent = nullptr);
 
@@ -45,8 +44,7 @@ public slots:
     void setupQtProxyFromConfig();
 };
 
-class OWNCLOUDSYNC_EXPORT SystemProxyRunnable : public QObject, public QRunnable
-{
+class OWNCLOUDSYNC_EXPORT SystemProxyRunnable : public QObject, public QRunnable {
 public:
     SystemProxyRunnable(const QUrl &url);
     void run() override;

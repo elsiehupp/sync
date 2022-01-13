@@ -22,8 +22,7 @@
 
 namespace OCC {
 
-void AbstractCredentialsWizardPage::cleanupPage()
-{
+void AbstractCredentialsWizardPage::cleanupPage() {
     // Reset the credentials when the 'Back' button is used.
 
     AccountPtr account = static_cast<OwncloudWizard *>(wizard())->account();

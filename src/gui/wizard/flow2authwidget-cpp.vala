@@ -35,8 +35,7 @@ Q_LOGGING_CATEGORY(lcFlow2AuthWidget, "nextcloud.gui.wizard.flow2authwidget", Qt
 
 Flow2AuthWidget::Flow2AuthWidget(QWidget *parent)
     : QWidget(parent)
-    , _progressIndi(new QProgressIndicator(this))
-{
+    , _progressIndi(new QProgressIndicator(this)) {
     _ui.setupUi(this);
 
     WizardCommon::initErrorLabel(_ui.errorLabel);
@@ -55,16 +54,14 @@ Flow2AuthWidget::Flow2AuthWidget(QWidget *parent)
     customizeStyle();
 }
 
-void Flow2AuthWidget::setLogo()
-{
+void Flow2AuthWidget::setLogo() {
     const auto backgroundColor = palette().window().color();
     const auto logoIconFileName = Theme::instance()->isBranded() ? Theme::hidpiFileName("external.png", backgroundColor)
                                                                  : Theme::hidpiFileName(":/client/theme/colored/external.png");
     _ui.logoLabel->setPixmap(logoIconFileName);
 }
 
-void Flow2AuthWidget::startAuth(Account *account)
-{
+void Flow2AuthWidget::startAuth(Account *account) {
     Flow2Auth *oldAuth = _asyncAuth.take();
     if(oldAuth)
         oldAuth->deleteLater();
@@ -82,13 +79,11 @@ void Flow2AuthWidget::startAuth(Account *account)
     }
 }
 
-void Flow2AuthWidget::resetAuth(Account *account)
-{
+void Flow2AuthWidget::resetAuth(Account *account) {
     startAuth(account);
 }
 
-void Flow2AuthWidget::slotAuthResult(Flow2Auth::Result r, const QString &errorString, const QString &user, const QString &appPassword)
-{
+void Flow2AuthWidget::slotAuthResult(Flow2Auth::Result r, const QString &errorString, const QString &user, const QString &appPassword) {
     stopSpinner(false);
 
     switch (r) {
@@ -125,8 +120,7 @@ Flow2AuthWidget::~Flow2AuthWidget() {
     _asyncAuth.reset();
 }
 
-void Flow2AuthWidget::slotOpenBrowser()
-{
+void Flow2AuthWidget::slotOpenBrowser() {
     if (_ui.errorLabel)
         _ui.errorLabel->hide();
 
@@ -134,8 +128,7 @@ void Flow2AuthWidget::slotOpenBrowser()
         _asyncAuth->openBrowser();
 }
 
-void Flow2AuthWidget::slotCopyLinkToClipboard()
-{
+void Flow2AuthWidget::slotCopyLinkToClipboard() {
     if (_ui.errorLabel)
         _ui.errorLabel->hide();
 
@@ -143,14 +136,11 @@ void Flow2AuthWidget::slotCopyLinkToClipboard()
         _asyncAuth->copyLinkToClipboard();
 }
 
-void Flow2AuthWidget::slotPollNow()
-{
+void Flow2AuthWidget::slotPollNow() {
     emit pollNow();
 }
 
-void Flow2AuthWidget::slotStatusChanged(Flow2Auth::PollStatus status, int secondsLeft)
-{
-    switch(status)
+void Flow2AuthWidget::slotStatusChanged(Flow2Auth::PollStatus status, int secondsLeft) { {witch(status)
     {
     case Flow2Auth::statusPollCountdown:
         if(_statusUpdateSkipCount > 0) {
@@ -178,8 +168,7 @@ void Flow2AuthWidget::slotStatusChanged(Flow2Auth::PollStatus status, int second
     }
 }
 
-void Flow2AuthWidget::startSpinner()
-{
+void Flow2AuthWidget::startSpinner() {
     _ui.progressLayout->setEnabled(true);
     _ui.statusLabel->setVisible(true);
     _progressIndi->setVisible(true);
@@ -189,8 +178,7 @@ void Flow2AuthWidget::startSpinner()
     _ui.copyLinkLabel->setEnabled(false);
 }
 
-void Flow2AuthWidget::stopSpinner(bool showStatusLabel)
-{
+void Flow2AuthWidget::stopSpinner(bool showStatusLabel) {
     _ui.progressLayout->setEnabled(false);
     _ui.statusLabel->setVisible(showStatusLabel);
     _progressIndi->setVisible(false);
@@ -200,13 +188,11 @@ void Flow2AuthWidget::stopSpinner(bool showStatusLabel)
     _ui.copyLinkLabel->setEnabled(_statusUpdateSkipCount == 0);
 }
 
-void Flow2AuthWidget::slotStyleChanged()
-{
+void Flow2AuthWidget::slotStyleChanged() {
     customizeStyle();
 }
 
-void Flow2AuthWidget::customizeStyle()
-{
+void Flow2AuthWidget::customizeStyle() {
     setLogo();
 
     if (_progressIndi) {

@@ -20,12 +20,10 @@ const int notModifiedStatusCode = 304;
 
 ServerNotificationHandler::ServerNotificationHandler(AccountState *accountState, QObject *parent)
     : QObject(parent)
-    , _accountState(accountState)
-{
+    , _accountState(accountState) {
 }
 
-void ServerNotificationHandler::slotFetchNotifications()
-{
+void ServerNotificationHandler::slotFetchNotifications() {
     // check connectivity and credentials
     if (!(_accountState && _accountState->isConnected() && _accountState->account() && _accountState->account()->credentials() && _accountState->account()->credentials()->ready())) {
         deleteLater();
@@ -54,8 +52,7 @@ void ServerNotificationHandler::slotFetchNotifications()
     _notificationJob->start();
 }
 
-void ServerNotificationHandler::slotEtagResponseHeaderReceived(const QByteArray &value, int statusCode)
-{
+void ServerNotificationHandler::slotEtagResponseHeaderReceived(const QByteArray &value, int statusCode) {
     if (statusCode == successStatusCode) {
         qCWarning(lcServerNotification) << "New Notification ETag Response Header received " << value;
         auto *account = qvariant_cast<AccountState *>(sender()->property(propertyAccountStateC));
@@ -63,16 +60,14 @@ void ServerNotificationHandler::slotEtagResponseHeaderReceived(const QByteArray 
     }
 }
 
-void ServerNotificationHandler::slotAllowDesktopNotificationsChanged(bool isAllowed)
-{
+void ServerNotificationHandler::slotAllowDesktopNotificationsChanged(bool isAllowed) {
     auto *account = qvariant_cast<AccountState *>(sender()->property(propertyAccountStateC));
     if (account != nullptr) {
        account->setDesktopNotificationsAllowed(isAllowed);
     }
 }
 
-void ServerNotificationHandler::slotNotificationsReceived(const QJsonDocument &json, int statusCode)
-{
+void ServerNotificationHandler::slotNotificationsReceived(const QJsonDocument &json, int statusCode) {
     if (statusCode != successStatusCode && statusCode != notModifiedStatusCode) {
         qCWarning(lcServerNotification) << "Notifications failed with status code " << statusCode;
         deleteLater();

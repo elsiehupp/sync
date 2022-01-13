@@ -26,8 +26,7 @@ namespace OCC {
  * @brief The SyncResult class
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT SyncResult
-{
+class OWNCLOUDSYNC_EXPORT SyncResult {
     Q_GADGET
 public:
     enum Status {

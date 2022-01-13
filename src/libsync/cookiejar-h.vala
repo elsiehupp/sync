@@ -23,8 +23,7 @@ namespace OCC {
  * @brief The CookieJar class
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT CookieJar : public QNetworkCookieJar
-{
+class OWNCLOUDSYNC_EXPORT CookieJar : public QNetworkCookieJar {
 public:
     explicit CookieJar(QObject *parent = nullptr);
     ~CookieJar() override;

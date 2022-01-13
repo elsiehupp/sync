@@ -33,8 +33,7 @@ using SyncFileItemPtr = QSharedPointer<SyncFileItem>;
  * @brief The SyncFileItem class
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT SyncFileItem
-{
+class OWNCLOUDSYNC_EXPORT SyncFileItem {
     Q_GADGET
 public:
     enum Direction {
@@ -110,17 +109,14 @@ public:
         , _status(NoStatus)
         , _isRestoration(false)
         , _isSelectiveSync(false)
-        , _isEncrypted(false)
-    {
+        , _isEncrypted(false) {
     }
 
-    friend bool operator==(const SyncFileItem &item1, const SyncFileItem &item2)
-    {
+    friend bool operator==(const SyncFileItem &item1, const SyncFileItem &item2) {
         return item1._originalFile == item2._originalFile;
     }
 
-    friend bool operator<(const SyncFileItem &item1, const SyncFileItem &item2)
-    {
+    friend bool operator<(const SyncFileItem &item1, const SyncFileItem &item2) {
         // Sort by destination
         auto d1 = item1.destination();
         auto d2 = item2.destination();
@@ -153,29 +149,25 @@ public:
         return data1[prefixL] < data2[prefixL];
     }
 
-    QString destination() const
-    {
+    QString destination() const {
         if (!_renameTarget.isEmpty()) {
             return _renameTarget;
         }
         return _file;
     }
 
-    bool isEmpty() const
-    {
+    bool isEmpty() const {
         return _file.isEmpty();
     }
 
-    bool isDirectory() const
-    {
+    bool isDirectory() const {
         return _type == ItemTypeDirectory;
     }
 
     /**
      * True if the item had any kind of error.
      */
-    bool hasErrorStatus() const
-    {
+    bool hasErrorStatus() const {
         return _status == SyncFileItem::SoftError
             || _status == SyncFileItem::NormalError
             || _status == SyncFileItem::FatalError
@@ -185,16 +177,14 @@ public:
     /**
      * Whether this item should appear on the issues tab.
      */
-    bool showInIssuesTab() const
-    {
+    bool showInIssuesTab() const {
         return hasErrorStatus() || _status == SyncFileItem::Conflict;
     }
 
     /**
      * Whether this item should appear on the protocol tab.
      */
-    bool showInProtocolTab() const
-    {
+    bool showInProtocolTab() const {
         return (!showInIssuesTab() || _status == SyncFileItem::Restoration)
             // Don't show conflicts that were resolved as "not a conflict after all"
             && !(_instruction == CSYNC_INSTRUCTION_CONFLICT && _status == SyncFileItem::Success);
@@ -278,8 +268,7 @@ public:
     QString _directDownloadCookies;
 };
 
-inline bool operator<(const SyncFileItemPtr &item1, const SyncFileItemPtr &item2)
-{
+inline bool operator<(const SyncFileItemPtr &item1, const SyncFileItemPtr &item2) {
     return *item1 < *item2;
 }
 

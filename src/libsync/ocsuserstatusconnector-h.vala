@@ -24,8 +24,7 @@ namespace OCC {
 class JsonApiJob;
 class SimpleNetworkJob;
 
-class OWNCLOUDSYNC_EXPORT OcsUserStatusConnector : public UserStatusConnector
-{
+class OWNCLOUDSYNC_EXPORT OcsUserStatusConnector : public UserStatusConnector {
 public:
     explicit OcsUserStatusConnector(AccountPtr account, QObject *parent = nullptr);
 

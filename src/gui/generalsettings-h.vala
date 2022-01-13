@@ -28,8 +28,7 @@ namespace Ui {
  * @brief The GeneralSettings class
  * @ingroup gui
  */
-class GeneralSettings : public QWidget
-{
+class GeneralSettings : public QWidget {
 
 public:
     explicit GeneralSettings(QWidget *parent = nullptr);

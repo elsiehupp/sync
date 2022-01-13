@@ -26,8 +26,7 @@
         return false;              \
     }
 
-bool verifyCalledOnceWithAccount(QSignalSpy &spy, OCC::AccountPtr account)
-{
+bool verifyCalledOnceWithAccount(QSignalSpy &spy, OCC::AccountPtr account) {
     RETURN_FALSE_ON_FAIL(spy.count() == 1);
     auto accountFromSpy = spy.at(0).at(0).value<OCC::Account *>();
     RETURN_FALSE_ON_FAIL(accountFromSpy == account.data());
@@ -35,8 +34,7 @@ bool verifyCalledOnceWithAccount(QSignalSpy &spy, OCC::AccountPtr account)
     return true;
 }
 
-bool failThreeAuthenticationAttempts(FakeWebSocketServer &fakeServer, OCC::AccountPtr account)
-{
+bool failThreeAuthenticationAttempts(FakeWebSocketServer &fakeServer, OCC::AccountPtr account) {
     RETURN_FALSE_ON_FAIL(account);
     RETURN_FALSE_ON_FAIL(account->pushNotifications());
 
@@ -60,12 +58,10 @@ bool failThreeAuthenticationAttempts(FakeWebSocketServer &fakeServer, OCC::Accou
     return true;
 }
 
-class TestPushNotifications : public QObject
-{
+class TestPushNotifications : public QObject {
 
 private slots:
-    void testTryReconnect_capabilitesReportPushNotificationsAvailable_reconnectForEver()
-    {
+    void testTryReconnect_capabilitesReportPushNotificationsAvailable_reconnectForEver() {
         FakeWebSocketServer fakeServer;
         auto account = FakeWebSocketServer::createAccount();
         account->setPushNotificationsReconnectInterval(0);
@@ -78,8 +74,7 @@ private slots:
         QVERIFY(fakeServer.authenticateAccount(account));
     }
 
-    void testSetup_correctCredentials_authenticateAndEmitReady()
-    {
+    void testSetup_correctCredentials_authenticateAndEmitReady() {
         FakeWebSocketServer fakeServer;
         std::unique_ptr<QSignalSpy> filesChangedSpy;
         std::unique_ptr<QSignalSpy> notificationsChangedSpy;
@@ -99,8 +94,7 @@ private slots:
             }));
     }
 
-    void testOnWebSocketTextMessageReceived_notifyFileMessage_emitFilesChanged()
-    {
+    void testOnWebSocketTextMessageReceived_notifyFileMessage_emitFilesChanged() {
         FakeWebSocketServer fakeServer;
         auto account = FakeWebSocketServer::createAccount();
         const auto socket = fakeServer.authenticateAccount(account);
@@ -114,8 +108,7 @@ private slots:
         QVERIFY(verifyCalledOnceWithAccount(filesChangedSpy, account));
     }
 
-    void testOnWebSocketTextMessageReceived_notifyActivityMessage_emitNotification()
-    {
+    void testOnWebSocketTextMessageReceived_notifyActivityMessage_emitNotification() {
         FakeWebSocketServer fakeServer;
         auto account = FakeWebSocketServer::createAccount();
         const auto socket = fakeServer.authenticateAccount(account);
@@ -131,8 +124,7 @@ private slots:
         QVERIFY(verifyCalledOnceWithAccount(activitySpy, account));
     }
 
-    void testOnWebSocketTextMessageReceived_notifyNotificationMessage_emitNotification()
-    {
+    void testOnWebSocketTextMessageReceived_notifyNotificationMessage_emitNotification() {
         FakeWebSocketServer fakeServer;
         auto account = FakeWebSocketServer::createAccount();
         const auto socket = fakeServer.authenticateAccount(account);
@@ -148,8 +140,7 @@ private slots:
         QVERIFY(verifyCalledOnceWithAccount(notificationSpy, account));
     }
 
-    void testOnWebSocketTextMessageReceived_invalidCredentialsMessage_reconnectWebSocket()
-    {
+    void testOnWebSocketTextMessageReceived_invalidCredentialsMessage_reconnectWebSocket() {
         FakeWebSocketServer fakeServer;
         auto account = FakeWebSocketServer::createAccount();
         // Need to set reconnect timer interval to zero for tests
@@ -171,8 +162,7 @@ private slots:
         QCOMPARE(secondPasswordSent, account->credentials()->password());
     }
 
-    void testOnWebSocketError_connectionLost_emitConnectionLost()
-    {
+    void testOnWebSocketError_connectionLost_emitConnectionLost() {
         FakeWebSocketServer fakeServer;
         auto account = FakeWebSocketServer::createAccount();
         QSignalSpy connectionLostSpy(account->pushNotifications(), &OCC::PushNotifications::connectionLost);
@@ -190,8 +180,7 @@ private slots:
         QCOMPARE(pushNotificationsDisabledSpy.count(), 1);
     }
 
-    void testSetup_maxConnectionAttemptsReached_disablePushNotifications()
-    {
+    void testSetup_maxConnectionAttemptsReached_disablePushNotifications() {
         FakeWebSocketServer fakeServer;
         auto account = FakeWebSocketServer::createAccount();
         QSignalSpy pushNotificationsDisabledSpy(account.data(), &OCC::Account::pushNotificationsDisabled);
@@ -201,8 +190,7 @@ private slots:
         QCOMPARE(pushNotificationsDisabledSpy.count(), 1);
     }
 
-    void testOnWebSocketSslError_sslError_disablePushNotifications()
-    {
+    void testOnWebSocketSslError_sslError_disablePushNotifications() {
         FakeWebSocketServer fakeServer;
         auto account = FakeWebSocketServer::createAccount();
         QSignalSpy pushNotificationsDisabledSpy(account.data(), &OCC::Account::pushNotificationsDisabled);
@@ -218,8 +206,7 @@ private slots:
         QCOMPARE(pushNotificationsDisabledSpy.count(), 1);
     }
 
-    void testAccount_web_socket_connectionLost_emitNotificationsDisabled()
-    {
+    void testAccount_web_socket_connectionLost_emitNotificationsDisabled() {
         FakeWebSocketServer fakeServer;
         auto account = FakeWebSocketServer::createAccount();
         // Need to set reconnect timer interval to zero for tests
@@ -245,8 +232,7 @@ private slots:
         QCOMPARE(accountSent, account.data());
     }
 
-    void testAccount_web_socket_authenticationFailed_emitNotificationsDisabled()
-    {
+    void testAccount_web_socket_authenticationFailed_emitNotificationsDisabled() {
         FakeWebSocketServer fakeServer;
         auto account = FakeWebSocketServer::createAccount();
         account->setPushNotificationsReconnectInterval(0);
@@ -261,8 +247,7 @@ private slots:
         QCOMPARE(accountSent, account.data());
     }
 
-    void testPingTimeout_pingTimedOut_reconnect()
-    {
+    void testPingTimeout_pingTimedOut_reconnect() {
         FakeWebSocketServer fakeServer;
         std::unique_ptr<QSignalSpy> filesChangedSpy;
         std::unique_ptr<QSignalSpy> notificationsChangedSpy;

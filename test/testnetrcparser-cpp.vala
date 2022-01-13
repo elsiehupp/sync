@@ -18,8 +18,7 @@ const char testfileEmptyC[] = "netrctestEmpty";
 
 }
 
-class TestNetrcParser : public QObject
-{
+class TestNetrcParser : public QObject {
 
 private slots:
     void initTestCase() {

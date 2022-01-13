@@ -22,8 +22,7 @@ namespace OCC {
  * @brief The FolderStatusDelegate class
  * @ingroup gui
  */
-class FolderStatusDelegate : public QStyledItemDelegate
-{
+class FolderStatusDelegate : public QStyledItemDelegate {
 public:
     FolderStatusDelegate();
 

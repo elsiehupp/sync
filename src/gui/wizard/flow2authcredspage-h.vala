@@ -32,8 +32,7 @@ namespace OCC {
 
 class Flow2AuthWidget;
 
-class Flow2AuthCredsPage : public AbstractCredentialsWizardPage
-{
+class Flow2AuthCredsPage : public AbstractCredentialsWizardPage {
 public:
     Flow2AuthCredsPage();
 

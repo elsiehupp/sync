@@ -12,8 +12,7 @@
 using namespace OCC;
 
 
-class TestDatabaseError : public QObject
-{
+class TestDatabaseError : public QObject {
 
 private slots:
     void testDatabaseError() {

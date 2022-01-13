@@ -27,12 +27,10 @@ namespace OCC {
 GetMetadataApiJob::GetMetadataApiJob(const AccountPtr& account,
                                     const QByteArray& fileId,
                                     QObject* parent)
-: AbstractNetworkJob(account, e2eeBaseUrl() + QStringLiteral("meta-data/") + fileId, parent), _fileId(fileId)
-{
+: AbstractNetworkJob(account, e2eeBaseUrl() + QStringLiteral("meta-data/") + fileId, parent), _fileId(fileId) {
 }
 
-void GetMetadataApiJob::start()
-{
+void GetMetadataApiJob::start() {
     QNetworkRequest req;
     req.setRawHeader("OCS-APIREQUEST", "true");
     QUrlQuery query;
@@ -45,8 +43,7 @@ void GetMetadataApiJob::start()
     AbstractNetworkJob::start();
 }
 
-bool GetMetadataApiJob::finished()
-{
+bool GetMetadataApiJob::finished() {
     int retCode = reply()->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     if (retCode != 200) {
         qCInfo(lcCseJob()) << "error requesting the metadata" << path() << errorString() << retCode;
@@ -63,12 +60,10 @@ StoreMetaDataApiJob::StoreMetaDataApiJob(const AccountPtr& account,
                                                  const QByteArray& fileId,
                                                  const QByteArray& b64Metadata,
                                                  QObject* parent)
-: AbstractNetworkJob(account, e2eeBaseUrl() + QStringLiteral("meta-data/") + fileId, parent), _fileId(fileId), _b64Metadata(b64Metadata)
-{
+: AbstractNetworkJob(account, e2eeBaseUrl() + QStringLiteral("meta-data/") + fileId, parent), _fileId(fileId), _b64Metadata(b64Metadata) {
 }
 
-void StoreMetaDataApiJob::start()
-{
+void StoreMetaDataApiJob::start() {
     QNetworkRequest req;
     req.setRawHeader("OCS-APIREQUEST", "true");
     req.setHeader(QNetworkRequest::ContentTypeHeader, QByteArrayLiteral("application/x-www-form-urlencoded"));
@@ -86,8 +81,7 @@ void StoreMetaDataApiJob::start()
     AbstractNetworkJob::start();
 }
 
-bool StoreMetaDataApiJob::finished()
-{
+bool StoreMetaDataApiJob::finished() {
     int retCode = reply()->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 		if (retCode != 200) {
 			qCInfo(lcCseJob()) << "error sending the metadata" << path() << errorString() << retCode;
@@ -107,12 +101,10 @@ UpdateMetadataApiJob::UpdateMetadataApiJob(const AccountPtr& account,
 : AbstractNetworkJob(account, e2eeBaseUrl() + QStringLiteral("meta-data/") + fileId, parent)
 , _fileId(fileId),
 _b64Metadata(b64Metadata),
-_token(token)
-{
+_token(token) {
 }
 
-void UpdateMetadataApiJob::start()
-{
+void UpdateMetadataApiJob::start() {
     QNetworkRequest req;
     req.setRawHeader("OCS-APIREQUEST", "true");
     req.setHeader(QNetworkRequest::ContentTypeHeader, QByteArrayLiteral("application/x-www-form-urlencoded"));
@@ -137,8 +129,7 @@ void UpdateMetadataApiJob::start()
     AbstractNetworkJob::start();
 }
 
-bool UpdateMetadataApiJob::finished()
-{
+bool UpdateMetadataApiJob::finished() {
     int retCode = reply()->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 		if (retCode != 200) {
 			qCInfo(lcCseJob()) << "error updating the metadata" << path() << errorString() << retCode;
@@ -154,12 +145,10 @@ UnlockEncryptFolderApiJob::UnlockEncryptFolderApiJob(const AccountPtr& account,
                                                  const QByteArray& fileId,
                                                  const QByteArray& token,
                                                  QObject* parent)
-: AbstractNetworkJob(account, e2eeBaseUrl() + QStringLiteral("lock/") + fileId, parent), _fileId(fileId), _token(token)
-{
+: AbstractNetworkJob(account, e2eeBaseUrl() + QStringLiteral("lock/") + fileId, parent), _fileId(fileId), _token(token) {
 }
 
-void UnlockEncryptFolderApiJob::start()
-{
+void UnlockEncryptFolderApiJob::start() {
     QNetworkRequest req;
     req.setRawHeader("OCS-APIREQUEST", "true");
     req.setRawHeader("e2e-token", _token);
@@ -171,8 +160,7 @@ void UnlockEncryptFolderApiJob::start()
     qCInfo(lcCseJob()) << "Starting the request to unlock.";
 }
 
-bool UnlockEncryptFolderApiJob::finished()
-{
+bool UnlockEncryptFolderApiJob::finished() {
     int retCode = reply()->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     if (retCode != 200) {
         qCInfo(lcCseJob()) << "error unlocking file" << path() << errorString() << retCode;
@@ -188,12 +176,10 @@ bool UnlockEncryptFolderApiJob::finished()
 DeleteMetadataApiJob::DeleteMetadataApiJob(const AccountPtr& account,
                                                   const QByteArray& fileId,
                                                  QObject* parent)
-: AbstractNetworkJob(account, e2eeBaseUrl() + QStringLiteral("meta-data/") + fileId, parent), _fileId(fileId)
-{
+: AbstractNetworkJob(account, e2eeBaseUrl() + QStringLiteral("meta-data/") + fileId, parent), _fileId(fileId) {
 }
 
-void DeleteMetadataApiJob::start()
-{
+void DeleteMetadataApiJob::start() {
     QNetworkRequest req;
     req.setRawHeader("OCS-APIREQUEST", "true");
 
@@ -204,8 +190,7 @@ void DeleteMetadataApiJob::start()
     qCInfo(lcCseJob()) << "Starting the request to remove the metadata.";
 }
 
-bool DeleteMetadataApiJob::finished()
-{
+bool DeleteMetadataApiJob::finished() {
     int retCode = reply()->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     if (retCode != 200) {
         qCInfo(lcCseJob()) << "error removing metadata for" << path() << errorString() << retCode;
@@ -218,12 +203,10 @@ bool DeleteMetadataApiJob::finished()
 }
 
 LockEncryptFolderApiJob::LockEncryptFolderApiJob(const AccountPtr& account, const QByteArray& fileId, QObject* parent)
-: AbstractNetworkJob(account, e2eeBaseUrl() + QStringLiteral("lock/") + fileId, parent), _fileId(fileId)
-{
+: AbstractNetworkJob(account, e2eeBaseUrl() + QStringLiteral("lock/") + fileId, parent), _fileId(fileId) {
 }
 
-void LockEncryptFolderApiJob::start()
-{
+void LockEncryptFolderApiJob::start() {
     QNetworkRequest req;
     req.setRawHeader("OCS-APIREQUEST", "true");
     QUrlQuery query;
@@ -236,8 +219,7 @@ void LockEncryptFolderApiJob::start()
     AbstractNetworkJob::start();
 }
 
-bool LockEncryptFolderApiJob::finished()
-{
+bool LockEncryptFolderApiJob::finished() {
     int retCode = reply()->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     if (retCode != 200) {
         qCInfo(lcCseJob()) << "error locking file" << path() << errorString() << retCode;
@@ -257,12 +239,10 @@ bool LockEncryptFolderApiJob::finished()
 }
 
 SetEncryptionFlagApiJob::SetEncryptionFlagApiJob(const AccountPtr& account, const QByteArray& fileId, FlagAction flagAction, QObject* parent)
-: AbstractNetworkJob(account, e2eeBaseUrl() + QStringLiteral("encrypted/") + fileId, parent), _fileId(fileId), _flagAction(flagAction)
-{
+: AbstractNetworkJob(account, e2eeBaseUrl() + QStringLiteral("encrypted/") + fileId, parent), _fileId(fileId), _flagAction(flagAction) {
 }
 
-void SetEncryptionFlagApiJob::start()
-{
+void SetEncryptionFlagApiJob::start() {
     QNetworkRequest req;
     req.setRawHeader("OCS-APIREQUEST", "true");
     QUrl url = Utility::concatUrlPath(account()->url(), path());
@@ -274,8 +254,7 @@ void SetEncryptionFlagApiJob::start()
     AbstractNetworkJob::start();
 }
 
-bool SetEncryptionFlagApiJob::finished()
-{
+bool SetEncryptionFlagApiJob::finished() {
     int retCode = reply()->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     qCInfo(lcCseJob()) << "Encryption Flag Return" << reply()->readAll();
     if (retCode == 200) {
@@ -288,19 +267,16 @@ bool SetEncryptionFlagApiJob::finished()
 }
 
 StorePrivateKeyApiJob::StorePrivateKeyApiJob(const AccountPtr& account, const QString& path, QObject* parent)
-: AbstractNetworkJob(account, path, parent)
-{
+: AbstractNetworkJob(account, path, parent) {
 }
 
-void StorePrivateKeyApiJob::setPrivateKey(const QByteArray& privKey)
-{
+void StorePrivateKeyApiJob::setPrivateKey(const QByteArray& privKey) {
     QByteArray data = "privateKey=";
     data += QUrl::toPercentEncoding(privKey);
     _privKey.setData(data);
 }
 
-void StorePrivateKeyApiJob::start()
-{
+void StorePrivateKeyApiJob::start() {
     QNetworkRequest req;
     req.setRawHeader("OCS-APIREQUEST", "true");
     QUrlQuery query;
@@ -313,8 +289,7 @@ void StorePrivateKeyApiJob::start()
     AbstractNetworkJob::start();
 }
 
-bool StorePrivateKeyApiJob::finished()
-{
+bool StorePrivateKeyApiJob::finished() {
     int retCode = reply()->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     if (retCode != 200)
         qCInfo(lcStorePrivateKeyApiJob()) << "Sending private key ended with"  << path() << errorString() << retCode;
@@ -326,19 +301,16 @@ bool StorePrivateKeyApiJob::finished()
 }
 
 SignPublicKeyApiJob::SignPublicKeyApiJob(const AccountPtr& account, const QString& path, QObject* parent)
-: AbstractNetworkJob(account, path, parent)
-{
+: AbstractNetworkJob(account, path, parent) {
 }
 
-void SignPublicKeyApiJob::setCsr(const QByteArray& csr)
-{
+void SignPublicKeyApiJob::setCsr(const QByteArray& csr) {
     QByteArray data = "csr=";
     data += QUrl::toPercentEncoding(csr);
     _csr.setData(data);
 }
 
-void SignPublicKeyApiJob::start()
-{
+void SignPublicKeyApiJob::start() {
     QNetworkRequest req;
     req.setRawHeader("OCS-APIREQUEST", "true");
     req.setHeader(QNetworkRequest::ContentTypeHeader, QByteArrayLiteral("application/x-www-form-urlencoded"));
@@ -352,8 +324,7 @@ void SignPublicKeyApiJob::start()
     AbstractNetworkJob::start();
 }
 
-bool SignPublicKeyApiJob::finished()
-{
+bool SignPublicKeyApiJob::finished() {
     qCInfo(lcStorePrivateKeyApiJob()) << "Sending CSR ended with"  << path() << errorString() << reply()->attribute(QNetworkRequest::HttpStatusCodeAttribute);
 
     QJsonParseError error;

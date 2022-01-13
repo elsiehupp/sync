@@ -17,8 +17,7 @@ Q_LOGGING_CATEGORY(lcWizardWebiewPage, "nextcloud.gui.wizard.webviewpage", QtInf
 
 
 WebViewPage::WebViewPage(QWidget *parent)
-    : AbstractCredentialsWizardPage()
-{
+    : AbstractCredentialsWizardPage() {
     _ocWizard = qobject_cast<OwncloudWizard *>(parent);
 
     qCInfo(lcWizardWebiewPage()) << "Time for a webview!";
@@ -59,8 +58,7 @@ void WebViewPage::initializePage() {
     resizeWizard();
 }
 
-void WebViewPage::resizeWizard()
-{
+void WebViewPage::resizeWizard() {
     // The webview needs a little bit more space
     auto wizardSizeChanged = tryToSetWizardSize(_originalWizardSize.width() * 2, _originalWizardSize.height() * 2);
 
@@ -73,8 +71,7 @@ void WebViewPage::resizeWizard()
     }
 }
 
-bool WebViewPage::tryToSetWizardSize(int width, int height)
-{
+bool WebViewPage::tryToSetWizardSize(int width, int height) {
     const auto window = _ocWizard->window();
     const auto screenGeometry = QGuiApplication::screenAt(window->pos())->geometry();
     const auto windowWidth = screenGeometry.width();
@@ -88,8 +85,7 @@ bool WebViewPage::tryToSetWizardSize(int width, int height)
     return false;
 }
 
-void WebViewPage::cleanupPage()
-{
+void WebViewPage::cleanupPage() {
     _ocWizard->resize(_originalWizardSize);
     _ocWizard->centerWindow();
 }

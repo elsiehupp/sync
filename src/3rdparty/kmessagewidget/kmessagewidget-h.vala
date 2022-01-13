@@ -93,8 +93,7 @@ class KMessageWidgetPrivate;
  * @author Aurélien Gâteau <agateau@kde.org>
  * @since 4.7
  */
-class KMessageWidget : public QFrame
-{
+class KMessageWidget : public QFrame {
 
     Q_PROPERTY(QString text READ text WRITE setText)
     Q_PROPERTY(bool wordWrap READ wordWrap WRITE setWordWrap)

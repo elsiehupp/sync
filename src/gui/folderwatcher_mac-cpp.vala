@@ -27,13 +27,11 @@ namespace OCC {
 
 FolderWatcherPrivate::FolderWatcherPrivate(FolderWatcher *p, const QString &path)
     : _parent(p)
-    , _folder(path)
-{
+    , _folder(path) {
     this->startWatching();
 }
 
-FolderWatcherPrivate::~FolderWatcherPrivate()
-{
+FolderWatcherPrivate::~FolderWatcherPrivate() {
     FSEventStreamStop(_stream);
     FSEventStreamInvalidate(_stream);
     FSEventStreamRelease(_stream);
@@ -45,8 +43,7 @@ static void callback(
     size_t numEvents,
     void *eventPathsVoid,
     const FSEventStreamEventFlags eventFlags[],
-    const FSEventStreamEventId eventIds[])
-{
+    const FSEventStreamEventId eventIds[]) {
     Q_UNUSED(streamRef)
     Q_UNUSED(eventFlags)
     Q_UNUSED(eventIds)
@@ -82,8 +79,7 @@ static void callback(
     reinterpret_cast<FolderWatcherPrivate *>(clientCallBackInfo)->doNotifyParent(paths);
 }
 
-void FolderWatcherPrivate::startWatching()
-{
+void FolderWatcherPrivate::startWatching() {
     qCDebug(lcFolderWatcher) << "FolderWatcherPrivate::startWatching()" << _folder;
     CFStringRef folderCF = CFStringCreateWithCharacters(0, reinterpret_cast<const UniChar *>(_folder.unicode()),
         _folder.length());
@@ -105,8 +101,7 @@ void FolderWatcherPrivate::startWatching()
     FSEventStreamStart(_stream);
 }
 
-QStringList FolderWatcherPrivate::addCoalescedPaths(const QStringList &paths) const
-{
+QStringList FolderWatcherPrivate::addCoalescedPaths(const QStringList &paths) const {
     QStringList coalescedPaths;
     for (const auto &eventPath : paths) {
         if (QDir(eventPath).exists()) {
@@ -122,8 +117,7 @@ QStringList FolderWatcherPrivate::addCoalescedPaths(const QStringList &paths) co
     return (paths + coalescedPaths);
 }
 
-void FolderWatcherPrivate::doNotifyParent(const QStringList &paths)
-{
+void FolderWatcherPrivate::doNotifyParent(const QStringList &paths) {
     const QStringList totalPaths = addCoalescedPaths(paths);
     _parent->changeDetected(totalPaths);
 }

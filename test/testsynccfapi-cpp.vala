@@ -41,8 +41,7 @@ enum ErrorKind : int {
     Timeout = 1000,
 };
 
-void setPinState(const QString &path, PinState state, cfapi::SetPinRecurseMode mode)
-{
+void setPinState(const QString &path, PinState state, cfapi::SetPinRecurseMode mode) {
     Q_ASSERT(mode == cfapi::Recurse || mode == cfapi::NoRecurse);
 
     const auto p = QDir::toNativeSeparators(path);
@@ -58,21 +57,18 @@ void setPinState(const QString &path, PinState state, cfapi::SetPinRecurseMode m
     }
 }
 
-bool itemInstruction(const ItemCompletedSpy &spy, const QString &path, const SyncInstructions instr)
-{
+bool itemInstruction(const ItemCompletedSpy &spy, const QString &path, const SyncInstructions instr) {
     auto item = spy.findItem(path);
     return item->_instruction == instr;
 }
 
-SyncJournalFileRecord dbRecord(FakeFolder &folder, const QString &path)
-{
+SyncJournalFileRecord dbRecord(FakeFolder &folder, const QString &path) {
     SyncJournalFileRecord record;
     folder.syncJournal().getFileRecord(path, &record);
     return record;
 }
 
-void triggerDownload(FakeFolder &folder, const QByteArray &path)
-{
+void triggerDownload(FakeFolder &folder, const QByteArray &path) {
     auto &journal = folder.syncJournal();
     SyncJournalFileRecord record;
     journal.getFileRecord(path, &record);
@@ -83,8 +79,7 @@ void triggerDownload(FakeFolder &folder, const QByteArray &path)
     journal.schedulePathForRemoteDiscovery(record._path);
 }
 
-void markForDehydration(FakeFolder &folder, const QByteArray &path)
-{
+void markForDehydration(FakeFolder &folder, const QByteArray &path) {
     auto &journal = folder.syncJournal();
     SyncJournalFileRecord record;
     journal.getFileRecord(path, &record);
@@ -95,8 +90,7 @@ void markForDehydration(FakeFolder &folder, const QByteArray &path)
     journal.schedulePathForRemoteDiscovery(record._path);
 }
 
-QSharedPointer<Vfs> setupVfs(FakeFolder &folder)
-{
+QSharedPointer<Vfs> setupVfs(FakeFolder &folder) {
     auto cfapiVfs = QSharedPointer<Vfs>(createVfsFromPlugin(Vfs::WindowsCfApi).release());
     QObject::connect(&folder.syncEngine().syncFileStatusTracker(), &SyncFileStatusTracker::fileStatusChanged,
                      cfapiVfs.data(), &Vfs::fileStatusChanged);
@@ -107,20 +101,17 @@ QSharedPointer<Vfs> setupVfs(FakeFolder &folder)
     return cfapiVfs;
 }
 
-class TestSyncCfApi : public QObject
-{
+class TestSyncCfApi : public QObject {
 
 private slots:
-    void testVirtualFileLifecycle_data()
-    {
+    void testVirtualFileLifecycle_data() {
         QTest::addColumn<bool>("doLocalDiscovery");
 
         QTest::newRow("full local discovery") << true;
         QTest::newRow("skip local discovery") << false;
     }
 
-    void testVirtualFileLifecycle()
-    {
+    void testVirtualFileLifecycle() {
         QFETCH(bool, doLocalDiscovery);
 
         FakeFolder fakeFolder{ FileInfo() };
@@ -250,8 +241,7 @@ private slots:
         cleanup();
     }
 
-    void testVirtualFileConflict()
-    {
+    void testVirtualFileConflict() {
         FakeFolder fakeFolder{ FileInfo() };
         setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -309,8 +299,7 @@ private slots:
         cleanup();
     }
 
-    void testWithNormalSync()
-    {
+    void testWithNormalSync() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -344,8 +333,7 @@ private slots:
         cleanup();
     }
 
-    void testVirtualFileDownload()
-    {
+    void testVirtualFileDownload() {
         FakeFolder fakeFolder{ FileInfo() };
         setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -446,8 +434,7 @@ private slots:
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
     }
 
-    void testVirtualFileDownloadResume()
-    {
+    void testVirtualFileDownloadResume() {
         FakeFolder fakeFolder{ FileInfo() };
         setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -483,8 +470,7 @@ private slots:
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
     }
 
-    void testNewFilesNotVirtual()
-    {
+    void testNewFilesNotVirtual() {
         FakeFolder fakeFolder{ FileInfo() };
         setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -503,8 +489,7 @@ private slots:
         CFVERIFY_NONVIRTUAL(fakeFolder, "A/a2");
     }
 
-    void testDownloadRecursive()
-    {
+    void testDownloadRecursive() {
         FakeFolder fakeFolder{ FileInfo() };
         setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -577,8 +562,7 @@ private slots:
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
     }
 
-    void testRenameVirtual()
-    {
+    void testRenameVirtual() {
         FakeFolder fakeFolder{ FileInfo() };
         setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -626,8 +610,7 @@ private slots:
         cleanup();
     }
 
-    void testRenameVirtual2()
-    {
+    void testRenameVirtual2() {
         FakeFolder fakeFolder{ FileInfo() };
         setupVfs(fakeFolder);
         ItemCompletedSpy completeSpy(fakeFolder);
@@ -677,8 +660,7 @@ private slots:
     }
 
     // Dehydration via sync works
-    void testSyncDehydration()
-    {
+    void testSyncDehydration() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         setupVfs(fakeFolder);
 
@@ -784,8 +766,7 @@ private slots:
         QVERIFY(!hasDehydratedDbEntries("C/c2"));
     }
 
-    void testWipeVirtualSuffixFiles()
-    {
+    void testWipeVirtualSuffixFiles() {
         FakeFolder fakeFolder{ FileInfo{} };
         setupVfs(fakeFolder);
 
@@ -844,8 +825,7 @@ private slots:
         QCOMPARE(fakeFolder.syncJournal().conflictRecordPaths().size(), 1);
     }
 
-    void testNewVirtuals()
-    {
+    void testNewVirtuals() {
         FakeFolder fakeFolder{ FileInfo() };
         setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -925,8 +905,7 @@ private slots:
         CFVERIFY_VIRTUAL(fakeFolder, "unspec/file1");
     }
 
-    void testAvailability()
-    {
+    void testAvailability() {
         FakeFolder fakeFolder{ FileInfo() };
         auto vfs = setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -987,8 +966,7 @@ private slots:
         QCOMPARE(r.error(), Vfs::AvailabilityError::NoSuchItem);
     }
 
-    void testPinStateLocals()
-    {
+    void testPinStateLocals() {
         FakeFolder fakeFolder{ FileInfo() };
         auto vfs = setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -1066,8 +1044,7 @@ private slots:
         QCOMPARE(*vfs->pinState("onlinerenamed2/file1rename"), PinState::OnlineOnly);
     }
 
-    void testEmptyFolderInOnlineOnlyRoot()
-    {
+    void testEmptyFolderInOnlineOnlyRoot() {
         FakeFolder fakeFolder{ FileInfo() };
         setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -1093,8 +1070,7 @@ private slots:
         cleanup();
     }
 
-    void testIncompatiblePins()
-    {
+    void testIncompatiblePins() {
         FakeFolder fakeFolder{ FileInfo() };
         auto vfs = setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -1130,8 +1106,7 @@ private slots:
         CFVERIFY_VIRTUAL(fakeFolder, "local/file1");
     }
 
-    void testOpeningOnlineFileTriggersDownload_data()
-    {
+    void testOpeningOnlineFileTriggersDownload_data() {
         QTest::addColumn<int>("errorKind");
         QTest::newRow("no error") << static_cast<int>(NoError);
         QTest::newRow("400") << 400;
@@ -1143,8 +1118,7 @@ private slots:
         QTest::newRow("Timeout") << static_cast<int>(Timeout);
     }
 
-    void testOpeningOnlineFileTriggersDownload()
-    {
+    void testOpeningOnlineFileTriggersDownload() {
         QFETCH(int, errorKind);
 
         FakeFolder fakeFolder{ FileInfo() };

@@ -24,8 +24,7 @@ namespace OCC {
  *
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT SignPublicKeyApiJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT SignPublicKeyApiJob : public AbstractNetworkJob {
 public:
     explicit SignPublicKeyApiJob(const AccountPtr &account, const QString &path, QObject *parent = nullptr);
 
@@ -66,8 +65,7 @@ private:
  *
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT StorePrivateKeyApiJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT StorePrivateKeyApiJob : public AbstractNetworkJob {
 public:
     explicit StorePrivateKeyApiJob(const AccountPtr &account, const QString &path, QObject *parent = nullptr);
 
@@ -108,8 +106,7 @@ private:
  *
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT SetEncryptionFlagApiJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT SetEncryptionFlagApiJob : public AbstractNetworkJob {
 public:
     enum FlagAction {
         Clear = 0,
@@ -133,8 +130,7 @@ private:
     FlagAction _flagAction = Set;
 };
 
-class OWNCLOUDSYNC_EXPORT LockEncryptFolderApiJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT LockEncryptFolderApiJob : public AbstractNetworkJob {
 public:
     explicit LockEncryptFolderApiJob(const AccountPtr &account, const QByteArray& fileId, QObject *parent = nullptr);
 
@@ -153,8 +149,7 @@ private:
 };
 
 
-class OWNCLOUDSYNC_EXPORT UnlockEncryptFolderApiJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT UnlockEncryptFolderApiJob : public AbstractNetworkJob {
 public:
     explicit UnlockEncryptFolderApiJob (
         const AccountPtr &account,
@@ -179,8 +174,7 @@ private:
 };
 
 
-class OWNCLOUDSYNC_EXPORT StoreMetaDataApiJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT StoreMetaDataApiJob : public AbstractNetworkJob {
 public:
     explicit StoreMetaDataApiJob (
         const AccountPtr &account,
@@ -203,8 +197,7 @@ private:
     QByteArray _b64Metadata;
 };
 
-class OWNCLOUDSYNC_EXPORT UpdateMetadataApiJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT UpdateMetadataApiJob : public AbstractNetworkJob {
 public:
     explicit UpdateMetadataApiJob (
         const AccountPtr &account,
@@ -230,8 +223,7 @@ private:
 };
 
 
-class OWNCLOUDSYNC_EXPORT GetMetadataApiJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT GetMetadataApiJob : public AbstractNetworkJob {
 public:
     explicit GetMetadataApiJob (
         const AccountPtr &account,
@@ -252,8 +244,7 @@ private:
     QByteArray _fileId;
 };
 
-class OWNCLOUDSYNC_EXPORT DeleteMetadataApiJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT DeleteMetadataApiJob : public AbstractNetworkJob {
 public:
     explicit DeleteMetadataApiJob (
         const AccountPtr &account,

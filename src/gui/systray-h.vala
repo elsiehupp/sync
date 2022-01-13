@@ -28,8 +28,7 @@ class QQuickWindow;
 
 namespace OCC {
 
-class AccessManagerFactory : public QQmlNetworkAccessManagerFactory
-{
+class AccessManagerFactory : public QQmlNetworkAccessManagerFactory {
 public:
     AccessManagerFactory();
 
@@ -47,8 +46,7 @@ void setTrayWindowLevelAndVisibleOnAllSpaces(QWindow *window);
  * @ingroup gui
  */
 class Systray
-    : public QSystemTrayIcon
-{
+    : public QSystemTrayIcon {
 
     Q_PROPERTY(QString windowTitle READ windowTitle CONSTANT)
     Q_PROPERTY(bool useNormalWindow READ useNormalWindow CONSTANT)

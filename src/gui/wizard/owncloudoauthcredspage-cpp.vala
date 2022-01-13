@@ -28,8 +28,7 @@
 namespace OCC {
 
 OwncloudOAuthCredsPage::OwncloudOAuthCredsPage()
-    : AbstractCredentialsWizardPage()
-{
+    : AbstractCredentialsWizardPage() {
     _ui.setupUi(this);
 
     Theme *theme = Theme::instance();
@@ -49,8 +48,7 @@ OwncloudOAuthCredsPage::OwncloudOAuthCredsPage()
     connect(_ui.copyLinkButton, &QCommandLinkButton::clicked, this, &OwncloudOAuthCredsPage::slotCopyLinkToClipboard);
 }
 
-void OwncloudOAuthCredsPage::initializePage()
-{
+void OwncloudOAuthCredsPage::initializePage() {
     auto *ocWizard = qobject_cast<OwncloudWizard *>(wizard());
     Q_ASSERT(ocWizard);
     ocWizard->account()->setCredentials(CredentialsFactory::create("http"));
@@ -62,16 +60,14 @@ void OwncloudOAuthCredsPage::initializePage()
     //wizard()->hide();
 }
 
-void OCC::OwncloudOAuthCredsPage::cleanupPage()
-{
+void OCC::OwncloudOAuthCredsPage::cleanupPage() {
     // The next or back button was activated, show the wizard again
     wizard()->show();
     _asyncAuth.reset();
 }
 
 void OwncloudOAuthCredsPage::asyncAuthResult(OAuth::Result r, const QString &user,
-    const QString &token, const QString &refreshToken)
-{
+    const QString &token, const QString &refreshToken) {
     switch (r) {
     case OAuth::NotSupported: {
         /* OAuth not supported (can't open browser), fallback to HTTP credentials */
@@ -97,31 +93,26 @@ void OwncloudOAuthCredsPage::asyncAuthResult(OAuth::Result r, const QString &use
     }
 }
 
-int OwncloudOAuthCredsPage::nextId() const
-{
+int OwncloudOAuthCredsPage::nextId() const {
     return WizardCommon::Page_AdvancedSetup;
 }
 
-void OwncloudOAuthCredsPage::setConnected()
-{
+void OwncloudOAuthCredsPage::setConnected() {
     wizard()->show();
 }
 
-AbstractCredentials *OwncloudOAuthCredsPage::getCredentials() const
-{
+AbstractCredentials *OwncloudOAuthCredsPage::getCredentials() const {
     auto *ocWizard = qobject_cast<OwncloudWizard *>(wizard());
     Q_ASSERT(ocWizard);
     return new HttpCredentialsGui(_user, _token, _refreshToken,
         ocWizard->_clientCertBundle, ocWizard->_clientCertPassword);
 }
 
-bool OwncloudOAuthCredsPage::isComplete() const
-{
+bool OwncloudOAuthCredsPage::isComplete() const {
     return false; /* We can never go forward manually */
 }
 
-void OwncloudOAuthCredsPage::slotOpenBrowser()
-{
+void OwncloudOAuthCredsPage::slotOpenBrowser() {
     if (_ui.errorLabel)
         _ui.errorLabel->hide();
 
@@ -131,8 +122,7 @@ void OwncloudOAuthCredsPage::slotOpenBrowser()
         _asyncAuth->openBrowser();
 }
 
-void OwncloudOAuthCredsPage::slotCopyLinkToClipboard()
-{
+void OwncloudOAuthCredsPage::slotCopyLinkToClipboard() {
     if (_asyncAuth)
         QApplication::clipboard()->setText(_asyncAuth->authorisationLink().toString(QUrl::FullyEncoded));
 }

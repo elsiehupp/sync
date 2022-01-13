@@ -36,8 +36,7 @@ namespace OCC {
  * @brief The OwncloudSetupPage class
  * @ingroup gui
  */
-class OwncloudSetupPage : public QWizardPage
-{
+class OwncloudSetupPage : public QWizardPage {
 public:
     OwncloudSetupPage(QWidget *parent = nullptr);
     ~OwncloudSetupPage() override;

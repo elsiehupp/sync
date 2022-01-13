@@ -25,22 +25,18 @@ namespace OCC {
  * @brief The HttpCredentialsGui class
  * @ingroup gui
  */
-class HttpCredentialsGui : public HttpCredentials
-{
+class HttpCredentialsGui : public HttpCredentials {
 public:
     explicit HttpCredentialsGui()
-        : HttpCredentials()
-    {
+        : HttpCredentials() {
     }
     HttpCredentialsGui(const QString &user, const QString &password,
             const QByteArray &clientCertBundle, const QByteArray &clientCertPassword)
-        : HttpCredentials(user, password, clientCertBundle, clientCertPassword)
-    {
+        : HttpCredentials(user, password, clientCertBundle, clientCertPassword) {
     }
     HttpCredentialsGui(const QString &user, const QString &password, const QString &refreshToken,
             const QByteArray &clientCertBundle, const QByteArray &clientCertPassword)
-        : HttpCredentials(user, password, clientCertBundle, clientCertPassword)
-    {
+        : HttpCredentials(user, password, clientCertBundle, clientCertPassword) {
         _refreshToken = refreshToken;
     }
 

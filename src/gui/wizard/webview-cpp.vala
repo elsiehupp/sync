@@ -24,15 +24,13 @@ namespace OCC {
 Q_LOGGING_CATEGORY(lcWizardWebiew, "nextcloud.gui.wizard.webview", QtInfoMsg)
 
 
-class WebViewPageUrlRequestInterceptor : public QWebEngineUrlRequestInterceptor
-{
+class WebViewPageUrlRequestInterceptor : public QWebEngineUrlRequestInterceptor {
 public:
     WebViewPageUrlRequestInterceptor(QObject *parent = nullptr);
     void interceptRequest(QWebEngineUrlRequestInfo &info) override;
 };
 
-class WebViewPageUrlSchemeHandler : public QWebEngineUrlSchemeHandler
-{
+class WebViewPageUrlSchemeHandler : public QWebEngineUrlSchemeHandler {
 public:
     WebViewPageUrlSchemeHandler(QObject *parent = nullptr);
     void requestStarted(QWebEngineUrlRequestJob *request) override;
@@ -66,8 +64,7 @@ public:
 
 WebView::WebView(QWidget *parent)
     : QWidget(parent),
-      _ui()
-{
+      _ui() {
     _ui.setupUi(this);
 #if QT_VERSION >= 0x051200
     QWebEngineUrlScheme _ncsheme("nc");
@@ -88,8 +85,7 @@ WebView::WebView(QWidget *parent)
     /*
      * Set a proper accept langauge to the language of the client
      * code from: http://code.qt.io/cgit/qt/qtbase.git/tree/src/network/access/qhttpnetworkconnection.cpp
-     */
-    {
+     */ {
         QString systemLocale = QLocale::system().name().replace(QChar::fromLatin1('_'),QChar::fromLatin1('-'));
         QString acceptLanguage;
         if (systemLocale == QLatin1String("C")) {
@@ -187,14 +183,12 @@ QWebEnginePage * WebEnginePage::createWindow(QWebEnginePage::WebWindowType type)
     return view;
 }
 
-void WebEnginePage::setUrl(const QUrl &url)
-{
+void WebEnginePage::setUrl(const QUrl &url) {
     QWebEnginePage::setUrl(url);
     _enforceHttps = url.scheme() == QStringLiteral("https");
 }
 
-bool WebEnginePage::certificateError(const QWebEngineCertificateError &certificateError)
-{
+bool WebEnginePage::certificateError(const QWebEngineCertificateError &certificateError) {
     /**
      * TODO properly improve this.
      * The certificate should be displayed.
@@ -214,8 +208,7 @@ bool WebEnginePage::certificateError(const QWebEngineCertificateError &certifica
     return ret == QMessageBox::Yes;
 }
 
-bool WebEnginePage::acceptNavigationRequest(const QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame)
-{
+bool WebEnginePage::acceptNavigationRequest(const QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame) {
     Q_UNUSED(type);
     Q_UNUSED(isMainFrame);
 
@@ -231,8 +224,7 @@ ExternalWebEnginePage::ExternalWebEnginePage(QWebEngineProfile *profile, QObject
 }
 
 
-bool ExternalWebEnginePage::acceptNavigationRequest(const QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame)
-{
+bool ExternalWebEnginePage::acceptNavigationRequest(const QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame) {
     Q_UNUSED(type);
     Q_UNUSED(isMainFrame);
     Utility::openBrowser(url);

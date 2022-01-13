@@ -4,12 +4,10 @@
 #include "gui/folder.h"
 #include "creds/httpcredentials.h"
 
-class HttpCredentialsTest : public OCC::HttpCredentials
-{
+class HttpCredentialsTest : public OCC::HttpCredentials {
 public:
     HttpCredentialsTest(const QString& user, const QString& password)
-    : HttpCredentials(user, password)
-    {}
+    : HttpCredentials(user, password) {}
 
     void askFromUser() override {
 

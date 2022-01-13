@@ -33,8 +33,7 @@ namespace SharedTools {
 
 class QtLocalPeer;
 
-class QtSingleCoreApplication : public QCoreApplication
-{
+class QtSingleCoreApplication : public QCoreApplication {
 
 public:
     QtSingleCoreApplication(int &argc, char **argv);

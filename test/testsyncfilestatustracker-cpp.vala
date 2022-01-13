@@ -11,14 +11,12 @@
 
 using namespace OCC;
 
-class StatusPushSpy : public QSignalSpy
-{
+class StatusPushSpy : public QSignalSpy {
     SyncEngine &_syncEngine;
 public:
     StatusPushSpy(SyncEngine &syncEngine)
         : QSignalSpy(&syncEngine.syncFileStatusTracker(), SIGNAL(fileStatusChanged(const QString&, SyncFileStatus)))
-        , _syncEngine(syncEngine)
-    { }
+        , _syncEngine(syncEngine) { }
 
     SyncFileStatus statusOf(const QString &relativePath) const {
         QFileInfo file(_syncEngine.localPath(), relativePath);
@@ -49,8 +47,7 @@ public:
     }
 };
 
-class TestSyncFileStatusTracker : public QObject
-{
+class TestSyncFileStatusTracker : public QObject {
 
     void verifyThatPushMatchesPull(const FakeFolder &fakeFolder, const StatusPushSpy &statusSpy) {
         QString root = fakeFolder.localPath();
@@ -380,10 +377,7 @@ private slots:
 
     void parentsGetWarningStatusForError_SibblingStartsWithPath() {
         // A is a parent of A/a1, but A/a is not even if it's a substring of A/a1
-        FakeFolder fakeFolder{{QString{},{
-            {QStringLiteral("A"), {
-                {QStringLiteral("a"), 4},
-                {QStringLiteral("a1"), 4}
+        FakeFolder fakeFolder{{QString{},{ {QStringLiteral("A"), { {QStringLiteral("a"), 4}, {QStringLiteral("a1"), 4}
             }}}}};
         fakeFolder.serverErrorPaths().append("A/a1");
         fakeFolder.localModifier().appendByte("A/a1");

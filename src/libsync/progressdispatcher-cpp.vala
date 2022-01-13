@@ -22,8 +22,7 @@ namespace OCC {
 
 ProgressDispatcher *ProgressDispatcher::_instance = nullptr;
 
-QString Progress::asResultString(const SyncFileItem &item)
-{
+QString Progress::asResultString(const SyncFileItem &item) {
     switch (item._instruction) {
     case CSYNC_INSTRUCTION_SYNC:
     case CSYNC_INSTRUCTION_NEW:
@@ -61,8 +60,7 @@ QString Progress::asResultString(const SyncFileItem &item)
     return QCoreApplication::translate("progress", "Unknown");
 }
 
-QString Progress::asActionString(const SyncFileItem &item)
-{
+QString Progress::asActionString(const SyncFileItem &item) {
     switch (item._instruction) {
     case CSYNC_INSTRUCTION_CONFLICT:
     case CSYNC_INSTRUCTION_SYNC:
@@ -91,8 +89,7 @@ QString Progress::asActionString(const SyncFileItem &item)
     return QString();
 }
 
-bool Progress::isWarningKind(SyncFileItem::Status kind)
-{
+bool Progress::isWarningKind(SyncFileItem::Status kind) {
     return kind == SyncFileItem::SoftError || kind == SyncFileItem::NormalError
         || kind == SyncFileItem::FatalError || kind == SyncFileItem::FileIgnored
         || kind == SyncFileItem::Conflict || kind == SyncFileItem::Restoration
@@ -100,13 +97,11 @@ bool Progress::isWarningKind(SyncFileItem::Status kind)
         || kind == SyncFileItem::FileLocked;
 }
 
-bool Progress::isIgnoredKind(SyncFileItem::Status kind)
-{
+bool Progress::isIgnoredKind(SyncFileItem::Status kind) {
     return kind == SyncFileItem::FileIgnored;
 }
 
-ProgressDispatcher *ProgressDispatcher::instance()
-{
+ProgressDispatcher *ProgressDispatcher::instance() {
     if (!_instance) {
         _instance = new ProgressDispatcher();
     }
@@ -114,32 +109,27 @@ ProgressDispatcher *ProgressDispatcher::instance()
 }
 
 ProgressDispatcher::ProgressDispatcher(QObject *parent)
-    : QObject(parent)
-{
+    : QObject(parent) {
 }
 
 ProgressDispatcher::~ProgressDispatcher() = default;
 
-void ProgressDispatcher::setProgressInfo(const QString &folder, const ProgressInfo &progress)
-{
+void ProgressDispatcher::setProgressInfo(const QString &folder, const ProgressInfo &progress) {
     if (folder.isEmpty())
     // The update phase now also has progress
     //            (progress._currentItems.size() == 0
-    //             && progress._totalFileCount == 0) )
-    {
+    //             && progress._totalFileCount == 0) ) {
         return;
     }
     emit progressInfo(folder, progress);
 }
 
-ProgressInfo::ProgressInfo()
-{
+ProgressInfo::ProgressInfo() {
     connect(&_updateEstimatesTimer, &QTimer::timeout, this, &ProgressInfo::updateEstimates);
     reset();
 }
 
-void ProgressInfo::reset()
-{
+void ProgressInfo::reset() {
     _status = Starting;
 
     _currentItems.clear();
@@ -158,23 +148,19 @@ void ProgressInfo::reset()
     _lastCompletedItem = SyncFileItem();
 }
 
-ProgressInfo::Status ProgressInfo::status() const
-{
+ProgressInfo::Status ProgressInfo::status() const {
     return _status;
 }
 
-void ProgressInfo::startEstimateUpdates()
-{
+void ProgressInfo::startEstimateUpdates() {
     _updateEstimatesTimer.start(1000);
 }
 
-bool ProgressInfo::isUpdatingEstimates() const
-{
+bool ProgressInfo::isUpdatingEstimates() const {
     return _updateEstimatesTimer.isActive();
 }
 
-static bool shouldCountProgress(const SyncFileItem &item)
-{
+static bool shouldCountProgress(const SyncFileItem &item) {
     const auto instruction = item._instruction;
 
     // Skip any ignored, error or non-propagated files and directories.
@@ -188,8 +174,7 @@ static bool shouldCountProgress(const SyncFileItem &item)
     return true;
 }
 
-void ProgressInfo::adjustTotalsForFile(const SyncFileItem &item)
-{
+void ProgressInfo::adjustTotalsForFile(const SyncFileItem &item) {
     if (!shouldCountProgress(item)) {
         return;
     }
@@ -200,33 +185,27 @@ void ProgressInfo::adjustTotalsForFile(const SyncFileItem &item)
     }
 }
 
-qint64 ProgressInfo::totalFiles() const
-{
+qint64 ProgressInfo::totalFiles() const {
     return _fileProgress._total;
 }
 
-qint64 ProgressInfo::completedFiles() const
-{
+qint64 ProgressInfo::completedFiles() const {
     return _fileProgress._completed;
 }
 
-qint64 ProgressInfo::currentFile() const
-{
+qint64 ProgressInfo::currentFile() const {
     return completedFiles() + _currentItems.size();
 }
 
-qint64 ProgressInfo::totalSize() const
-{
+qint64 ProgressInfo::totalSize() const {
     return _sizeProgress._total;
 }
 
-qint64 ProgressInfo::completedSize() const
-{
+qint64 ProgressInfo::completedSize() const {
     return _sizeProgress._completed;
 }
 
-void ProgressInfo::setProgressComplete(const SyncFileItem &item)
-{
+void ProgressInfo::setProgressComplete(const SyncFileItem &item) {
     if (!shouldCountProgress(item)) {
         return;
     }
@@ -240,8 +219,7 @@ void ProgressInfo::setProgressComplete(const SyncFileItem &item)
     _lastCompletedItem = item;
 }
 
-void ProgressInfo::setProgressItem(const SyncFileItem &item, qint64 completed)
-{
+void ProgressInfo::setProgressItem(const SyncFileItem &item, qint64 completed) {
     if (!shouldCountProgress(item)) {
         return;
     }
@@ -255,8 +233,7 @@ void ProgressInfo::setProgressItem(const SyncFileItem &item, qint64 completed)
     _lastCompletedItem = SyncFileItem();
 }
 
-ProgressInfo::Estimates ProgressInfo::totalProgress() const
-{
+ProgressInfo::Estimates ProgressInfo::totalProgress() const {
     Estimates file = _fileProgress.estimates();
     if (_sizeProgress._total == 0) {
         return file;
@@ -315,8 +292,7 @@ ProgressInfo::Estimates ProgressInfo::totalProgress() const
     return size;
 }
 
-quint64 ProgressInfo::optimisticEta() const
-{
+quint64 ProgressInfo::optimisticEta() const {
     // This assumes files and transfers finish as quickly as possible
     // *but* note that maxPerSecond could be serious underestimate
     // (if we never got to fully excercise transfer or files/second)
@@ -325,18 +301,15 @@ quint64 ProgressInfo::optimisticEta() const
         + _sizeProgress.remaining() / _maxBytesPerSecond * 1000;
 }
 
-bool ProgressInfo::trustEta() const
-{
+bool ProgressInfo::trustEta() const {
     return totalProgress().estimatedEta < 100 * optimisticEta();
 }
 
-ProgressInfo::Estimates ProgressInfo::fileProgress(const SyncFileItem &item) const
-{
+ProgressInfo::Estimates ProgressInfo::fileProgress(const SyncFileItem &item) const {
     return _currentItems[item._file]._progress.estimates();
 }
 
-void ProgressInfo::updateEstimates()
-{
+void ProgressInfo::updateEstimates() {
     _sizeProgress.update();
     _fileProgress.update();
 
@@ -353,8 +326,7 @@ void ProgressInfo::updateEstimates()
         _maxBytesPerSecond);
 }
 
-void ProgressInfo::recomputeCompletedSize()
-{
+void ProgressInfo::recomputeCompletedSize() {
     qint64 r = _totalSizeOfCompletedJobs;
     foreach (const ProgressItem &i, _currentItems) {
         if (isSizeDependent(i._item))
@@ -363,8 +335,7 @@ void ProgressInfo::recomputeCompletedSize()
     _sizeProgress.setCompleted(r);
 }
 
-ProgressInfo::Estimates ProgressInfo::Progress::estimates() const
-{
+ProgressInfo::Estimates ProgressInfo::Progress::estimates() const {
     Estimates est;
     est.estimatedBandwidth = _progressPerSec;
     if (_progressPerSec != 0) {
@@ -375,18 +346,15 @@ ProgressInfo::Estimates ProgressInfo::Progress::estimates() const
     return est;
 }
 
-qint64 ProgressInfo::Progress::completed() const
-{
+qint64 ProgressInfo::Progress::completed() const {
     return _completed;
 }
 
-qint64 ProgressInfo::Progress::remaining() const
-{
+qint64 ProgressInfo::Progress::remaining() const {
     return _total - _completed;
 }
 
-void ProgressInfo::Progress::update()
-{
+void ProgressInfo::Progress::update() {
     // A good way to think about the smoothing factor:
     // If we make progress P per sec and then stop making progress at all,
     // after N calls to this function (and thus seconds) the _progressPerSec
@@ -401,8 +369,7 @@ void ProgressInfo::Progress::update()
     _prevCompleted = _completed;
 }
 
-void ProgressInfo::Progress::setCompleted(qint64 completed)
-{
+void ProgressInfo::Progress::setCompleted(qint64 completed) {
     _completed = qMin(completed, _total);
     _prevCompleted = qMin(_prevCompleted, _completed);
 }

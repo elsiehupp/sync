@@ -16,8 +16,7 @@ class WebViewPageUrlRequestInterceptor;
 class WebViewPageUrlSchemeHandler;
 class WebEnginePage;
 
-class WebView : public QWidget
-{
+class WebView : public QWidget {
 public:
     WebView(QWidget *parent = nullptr);
     ~WebView() override;

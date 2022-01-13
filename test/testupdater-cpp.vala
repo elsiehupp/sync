@@ -11,12 +11,10 @@
 
 using namespace OCC;
 
-class TestUpdater : public QObject
-{
+class TestUpdater : public QObject {
 
 private slots:
-    void testVersionToInt()
-    {
+    void testVersionToInt() {
         qint64 lowVersion = Updater::Helper::versionToInt(1,2,80,3000);
         QCOMPARE(Updater::Helper::stringVersionToInt("1.2.80.3000"), lowVersion);
 

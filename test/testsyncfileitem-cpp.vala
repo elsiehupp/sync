@@ -10,8 +10,7 @@
 
 using namespace OCC;
 
-class TestSyncFileItem : public QObject
-{
+class TestSyncFileItem : public QObject {
 
 private slots:
     void initTestCase() {

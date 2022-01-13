@@ -25,8 +25,7 @@
 // #include <QTimer>
 #include "ownclouddolphinpluginhelper.h"
 
-class OwncloudDolphinPlugin : public KOverlayIconPlugin
-{
+class OwncloudDolphinPlugin : public KOverlayIconPlugin {
     Q_PLUGIN_METADATA(IID "com.owncloud.ovarlayiconplugin" FILE "ownclouddolphinoverlayplugin.json")
 
     using StatusMap = QHash<QByteArray, QByteArray>;

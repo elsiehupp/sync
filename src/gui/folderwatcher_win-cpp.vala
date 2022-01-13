@@ -30,8 +30,7 @@
 namespace OCC {
 
 void WatcherThread::watchChanges(size_t fileNotifyBufferSize,
-    bool *increaseBufferSize)
-{
+    bool *increaseBufferSize) {
     *increaseBufferSize = false;
     const QString longPath = FileSystem::longWinPath(_path);
 
@@ -141,8 +140,7 @@ void WatcherThread::watchChanges(size_t fileNotifyBufferSize,
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
             // The prefix is needed for native Windows functions before Windows 10, version 1607
             const bool hasLongPathPrefix = longPath.startsWith(QStringLiteral("\\\\?\\"));
-            if (hasLongPathPrefix)
-            {
+            if (hasLongPathPrefix) {
                 longfile.remove(0, 4);
             }
 #endif
@@ -172,16 +170,14 @@ void WatcherThread::watchChanges(size_t fileNotifyBufferSize,
     closeHandle();
 }
 
-void WatcherThread::closeHandle()
-{
+void WatcherThread::closeHandle() {
     if (_directory) {
         CloseHandle(_directory);
         _directory = nullptr;
     }
 }
 
-void WatcherThread::run()
-{
+void WatcherThread::run() {
     _resultEvent = CreateEvent(nullptr, true, false, nullptr);
     _stopEvent = CreateEvent(nullptr, true, false, nullptr);
 
@@ -205,20 +201,17 @@ void WatcherThread::run()
     }
 }
 
-WatcherThread::~WatcherThread()
-{
+WatcherThread::~WatcherThread() {
     closeHandle();
 }
 
-void WatcherThread::stop()
-{
+void WatcherThread::stop() {
     _done = 1;
     SetEvent(_stopEvent);
 }
 
 FolderWatcherPrivate::FolderWatcherPrivate(FolderWatcher *p, const QString &path)
-    : _parent(p)
-{
+    : _parent(p) {
     _thread = new WatcherThread(path);
     connect(_thread, SIGNAL(changed(const QString &)),
         _parent, SLOT(changeDetected(const QString &)));
@@ -229,8 +222,7 @@ FolderWatcherPrivate::FolderWatcherPrivate(FolderWatcher *p, const QString &path
     _thread->start();
 }
 
-FolderWatcherPrivate::~FolderWatcherPrivate()
-{
+FolderWatcherPrivate::~FolderWatcherPrivate() {
     _thread->stop();
     _thread->wait();
     delete _thread;

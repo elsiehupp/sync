@@ -21,8 +21,7 @@ namespace OCC {
 
 LegalNotice::LegalNotice(QDialog *parent)
     : QDialog(parent)
-    , _ui(new Ui::LegalNotice)
-{
+    , _ui(new Ui::LegalNotice) {
     _ui->setupUi(this);
 
     connect(_ui->closeButton, &QPushButton::clicked, this, &LegalNotice::accept);
@@ -30,13 +29,11 @@ LegalNotice::LegalNotice(QDialog *parent)
     customizeStyle();
 }
 
-LegalNotice::~LegalNotice()
-{
+LegalNotice::~LegalNotice() {
     delete _ui;
 }
 
-void LegalNotice::changeEvent(QEvent *e)
-{
+void LegalNotice::changeEvent(QEvent *e) {
     switch (e->type()) {
     case QEvent::StyleChange:
     case QEvent::PaletteChange:
@@ -50,8 +47,7 @@ void LegalNotice::changeEvent(QEvent *e)
     QDialog::changeEvent(e);
 }
 
-void LegalNotice::customizeStyle()
-{
+void LegalNotice::customizeStyle() {
     QString notice = tr("<p>Copyright 2017-2021 Nextcloud GmbH<br />"
                         "Copyright 2012-2021 ownCloud GmbH</p>");
 

@@ -23,11 +23,9 @@ namespace OCC {
 
 Q_DECLARE_LOGGING_CATEGORY(lcUpdater)
 
-class Updater : public QObject
-{
+class Updater : public QObject {
 public:
-    struct Helper
-    {
+    struct Helper {
         static qint64 stringVersionToInt(const QString &version);
         static qint64 currentVersionToInt();
         static qint64 versionToInt(qint64 major, qint64 minor, qint64 patch, qint64 build);
@@ -43,8 +41,7 @@ public:
 protected:
     static QString clientVersion();
     Updater()
-        : QObject(nullptr)
-    {
+        : QObject(nullptr) {
     }
 
 private:

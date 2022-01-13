@@ -43,13 +43,11 @@ enum ErrorKind : int {
 
 Q_DECLARE_METATYPE(ErrorCategory)
 
-class TestRemoteDiscovery : public QObject
-{
+class TestRemoteDiscovery : public QObject {
 
 private slots:
 
-    void testRemoteDiscoveryError_data()
-    {
+    void testRemoteDiscoveryError_data() {
         qRegisterMetaType<ErrorCategory>();
         QTest::addColumn<int>("errorKind");
         QTest::addColumn<QString>("expectedErrorString");
@@ -71,8 +69,7 @@ private slots:
 
 
     // Check what happens when there is an error.
-    void testRemoteDiscoveryError()
-    {
+    void testRemoteDiscoveryError() {
         QFETCH(int, errorKind);
         QFETCH(QString, expectedErrorString);
         QFETCH(bool, syncSucceeds);
@@ -140,8 +137,7 @@ private slots:
         QCOMPARE(errorSpy[0][0].toString(), QString(fatalErrorPrefix + expectedErrorString));
     }
 
-    void testMissingData()
-    {
+    void testMissingData() {
         FakeFolder fakeFolder{ FileInfo() };
         fakeFolder.remoteModifier().insert("good");
         fakeFolder.remoteModifier().insert("noetag");

@@ -21,8 +21,7 @@
 namespace {
 Q_LOGGING_CATEGORY(lcOcsProfileConnector, "nextcloud.gui.ocsprofileconnector", QtInfoMsg)
 
-OCC::HovercardAction jsonToAction(const QJsonObject &jsonActionObject)
-{
+OCC::HovercardAction jsonToAction(const QJsonObject &jsonActionObject) {
     const auto iconUrl = jsonActionObject.value(QStringLiteral("icon")).toString(QStringLiteral("no-icon"));
     QPixmap iconPixmap;
     OCC::HovercardAction hovercardAction{
@@ -34,8 +33,7 @@ OCC::HovercardAction jsonToAction(const QJsonObject &jsonActionObject)
     return hovercardAction;
 }
 
-OCC::Hovercard jsonToHovercard(const QJsonArray &jsonDataArray)
-{
+OCC::Hovercard jsonToHovercard(const QJsonArray &jsonDataArray) {
     OCC::Hovercard hovercard;
     hovercard._actions.reserve(jsonDataArray.size());
     for (const auto &jsonEntry : jsonDataArray) {
@@ -48,8 +46,7 @@ OCC::Hovercard jsonToHovercard(const QJsonArray &jsonDataArray)
     return hovercard;
 }
 
-OCC::Optional<QPixmap> createPixmapFromSvgData(const QByteArray &iconData)
-{
+OCC::Optional<QPixmap> createPixmapFromSvgData(const QByteArray &iconData) {
     QSvgRenderer svgRenderer;
     if (!svgRenderer.load(iconData)) {
         return {};
@@ -65,8 +62,7 @@ OCC::Optional<QPixmap> createPixmapFromSvgData(const QByteArray &iconData)
     return QPixmap::fromImage(scaledSvg);
 }
 
-OCC::Optional<QPixmap> iconDataToPixmap(const QByteArray iconData)
-{
+OCC::Optional<QPixmap> iconDataToPixmap(const QByteArray iconData) {
     if (!iconData.startsWith("<svg")) {
         return {};
     }
@@ -81,18 +77,15 @@ HovercardAction::HovercardAction() = default;
 HovercardAction::HovercardAction(QString title, QUrl iconUrl, QUrl link)
     : _title(std::move(title))
     , _iconUrl(std::move(iconUrl))
-    , _link(std::move(link))
-{
+    , _link(std::move(link)) {
 }
 
 OcsProfileConnector::OcsProfileConnector(AccountPtr account, QObject *parent)
     : QObject(parent)
-    , _account(account)
-{
+    , _account(account) {
 }
 
-void OcsProfileConnector::fetchHovercard(const QString &userId)
-{
+void OcsProfileConnector::fetchHovercard(const QString &userId) {
     if (_account->serverVersionInt() < Account::makeServerVersion(23, 0, 0)) {
         qInfo(lcOcsProfileConnector) << "Server version" << _account->serverVersion()
                                      << "does not support profile page";
@@ -105,8 +98,7 @@ void OcsProfileConnector::fetchHovercard(const QString &userId)
     job->start();
 }
 
-void OcsProfileConnector::onHovercardFetched(const QJsonDocument &json, int statusCode)
-{
+void OcsProfileConnector::onHovercardFetched(const QJsonDocument &json, int statusCode) {
     qCDebug(lcOcsProfileConnector) << "Hovercard fetched:" << json;
 
     if (statusCode != 200) {
@@ -120,16 +112,14 @@ void OcsProfileConnector::onHovercardFetched(const QJsonDocument &json, int stat
     emit hovercardFetched();
 }
 
-void OcsProfileConnector::setHovercardActionIcon(const std::size_t index, const QPixmap &pixmap)
-{
+void OcsProfileConnector::setHovercardActionIcon(const std::size_t index, const QPixmap &pixmap) {
     auto &hovercardAction = _currentHovercard._actions[index];
     QPixmapCache::insert(hovercardAction._iconUrl.toString(), pixmap);
     hovercardAction._icon = pixmap;
     emit iconLoaded(index);
 }
 
-void OcsProfileConnector::loadHovercardActionIcon(const std::size_t hovercardActionIndex, const QByteArray &iconData)
-{
+void OcsProfileConnector::loadHovercardActionIcon(const std::size_t hovercardActionIndex, const QByteArray &iconData) {
     if (hovercardActionIndex >= _currentHovercard._actions.size()) {
         // Note: Probably could do more checking, like checking if the url is still the same.
         return;
@@ -142,8 +132,7 @@ void OcsProfileConnector::loadHovercardActionIcon(const std::size_t hovercardAct
     qCWarning(lcOcsProfileConnector) << "Could not load Svg icon from data" << iconData;
 }
 
-void OcsProfileConnector::startFetchIconJob(const std::size_t hovercardActionIndex)
-{
+void OcsProfileConnector::startFetchIconJob(const std::size_t hovercardActionIndex) {
     const auto hovercardAction = _currentHovercard._actions[hovercardActionIndex];
     const auto iconJob = new IconJob{_account, hovercardAction._iconUrl, this};
     connect(iconJob, &IconJob::jobFinished,
@@ -153,16 +142,14 @@ void OcsProfileConnector::startFetchIconJob(const std::size_t hovercardActionInd
     });
 }
 
-void OcsProfileConnector::fetchIcons()
-{
+void OcsProfileConnector::fetchIcons() {
     for (auto hovercardActionIndex = 0u; hovercardActionIndex < _currentHovercard._actions.size();
          ++hovercardActionIndex) {
         startFetchIconJob(hovercardActionIndex);
     }
 }
 
-const Hovercard &OcsProfileConnector::hovercard() const
-{
+const Hovercard &OcsProfileConnector::hovercard() const {
     return _currentHovercard;
 }
 }

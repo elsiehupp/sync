@@ -16,18 +16,15 @@
 
 FakePaintDevice::FakePaintDevice() = default;
 
-QPaintEngine *FakePaintDevice::paintEngine() const
-{
+QPaintEngine *FakePaintDevice::paintEngine() const {
     return nullptr;
 }
 
-void FakePaintDevice::setHidpi(bool value)
-{
+void FakePaintDevice::setHidpi(bool value) {
     _hidpi = value;
 }
 
-int FakePaintDevice::metric(QPaintDevice::PaintDeviceMetric metric) const
-{
+int FakePaintDevice::metric(QPaintDevice::PaintDeviceMetric metric) const {
     switch (metric) {
     case QPaintDevice::PdmDevicePixelRatio:
         if (_hidpi) {

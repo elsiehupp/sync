@@ -30,8 +30,7 @@ Q_LOGGING_CATEGORY(lcKeychainChunk, "nextcloud.sync.credentials.keychainchunk", 
 namespace KeychainChunk {
 
 #if defined(KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
-static void addSettingsToJob(Account *account, QKeychain::Job *job)
-{
+static void addSettingsToJob(Account *account, QKeychain::Job *job) {
     Q_UNUSED(account)
     auto settings = ConfigFile::settingsWithGroup(Theme::instance()->appName());
     settings->setParent(job); // make the job parent to make setting deleted properly
@@ -40,8 +39,7 @@ static void addSettingsToJob(Account *account, QKeychain::Job *job)
 #endif
 
 #ifdef Q_OS_WIN
-void jobKeyPrependAppName(QString &key)
-{
+void jobKeyPrependAppName(QString &key) {
     // NOTE: The following is normally done in AbstractCredentials::keychainKey
     //       when an _account is specified by our other ctr overload (see 'kck' in this file).
 
@@ -59,56 +57,46 @@ void jobKeyPrependAppName(QString &key)
 * Job
 */
 Job::Job(QObject *parent)
-    : QObject(parent)
-{
+    : QObject(parent) {
     _serviceName = Theme::instance()->appName();
 }
 
-Job::~Job()
-{
+Job::~Job() {
     _chunkCount = 0;
     _chunkBuffer.clear();
 }
 
-QKeychain::Error Job::error() const
-{
+QKeychain::Error Job::error() const {
     return _error;
 }
 
-QString Job::errorString() const
-{
+QString Job::errorString() const {
     return _errorString;
 }
 
-QByteArray Job::binaryData() const
-{
+QByteArray Job::binaryData() const {
     return _chunkBuffer;
 }
 
-QString Job::textData() const
-{
+QString Job::textData() const {
     return _chunkBuffer;
 }
 
-bool Job::insecureFallback() const
-{
+bool Job::insecureFallback() const {
     return _insecureFallback;
 }
 
 #if defined(KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
-void Job::setInsecureFallback(bool insecureFallback)
-{
+void Job::setInsecureFallback(bool insecureFallback) {
     _insecureFallback = insecureFallback;
 }
 #endif
 
-bool Job::autoDelete() const
-{
+bool Job::autoDelete() const {
     return _autoDelete;
 }
 
-void Job::setAutoDelete(bool autoDelete)
-{
+void Job::setAutoDelete(bool autoDelete) {
     _autoDelete = autoDelete;
 }
 
@@ -116,8 +104,7 @@ void Job::setAutoDelete(bool autoDelete)
 * WriteJob
 */
 WriteJob::WriteJob(Account *account, const QString &key, const QByteArray &data, QObject *parent)
-    : Job(parent)
-{
+    : Job(parent) {
     _account = account;
     _key = key;
 
@@ -128,22 +115,19 @@ WriteJob::WriteJob(Account *account, const QString &key, const QByteArray &data,
 }
 
 WriteJob::WriteJob(const QString &key, const QByteArray &data, QObject *parent)
-    : WriteJob(nullptr, key, data, parent)
-{
+    : WriteJob(nullptr, key, data, parent) {
 #ifdef Q_OS_WIN
     jobKeyPrependAppName(_key);
 #endif
 }
 
-void WriteJob::start()
-{
+void WriteJob::start() {
     _error = QKeychain::NoError;
 
     slotWriteJobDone(nullptr);
 }
 
-bool WriteJob::exec()
-{
+bool WriteJob::exec() {
     start();
 
     QEventLoop waitLoop;
@@ -158,8 +142,7 @@ bool WriteJob::exec()
     return true;
 }
 
-void WriteJob::slotWriteJobDone(QKeychain::Job *incomingJob)
-{
+void WriteJob::slotWriteJobDone(QKeychain::Job *incomingJob) {
     auto writeJob = qobject_cast<QKeychain::WritePasswordJob *>(incomingJob);
 
     // Errors? (writeJob can be nullptr here, see: WriteJob::start)
@@ -239,8 +222,7 @@ void WriteJob::slotWriteJobDone(QKeychain::Job *incomingJob)
 * ReadJob
 */
 ReadJob::ReadJob(Account *account, const QString &key, bool keychainMigration, QObject *parent)
-    : Job(parent)
-{
+    : Job(parent) {
     _account = account;
     _key = key;
 
@@ -251,15 +233,13 @@ ReadJob::ReadJob(Account *account, const QString &key, bool keychainMigration, Q
 }
 
 ReadJob::ReadJob(const QString &key, QObject *parent)
-    : ReadJob(nullptr, key, false, parent)
-{
+    : ReadJob(nullptr, key, false, parent) {
 #ifdef Q_OS_WIN
     jobKeyPrependAppName(_key);
 #endif
 }
 
-void ReadJob::start()
-{
+void ReadJob::start() {
     _chunkCount = 0;
     _chunkBuffer.clear();
     _error = QKeychain::NoError;
@@ -280,8 +260,7 @@ void ReadJob::start()
     job->start();
 }
 
-bool ReadJob::exec()
-{
+bool ReadJob::exec() {
     start();
 
     QEventLoop waitLoop;
@@ -300,8 +279,7 @@ bool ReadJob::exec()
     return false;
 }
 
-void ReadJob::slotReadJobDone(QKeychain::Job *incomingJob)
-{
+void ReadJob::slotReadJobDone(QKeychain::Job *incomingJob) {
     // Errors or next chunk?
     auto readJob = qobject_cast<QKeychain::ReadPasswordJob *>(incomingJob);
     Q_ASSERT(readJob);
@@ -374,8 +352,7 @@ void ReadJob::slotReadJobDone(QKeychain::Job *incomingJob)
 * DeleteJob
 */
 DeleteJob::DeleteJob(Account *account, const QString &key, bool keychainMigration, QObject *parent)
-    : Job(parent)
-{
+    : Job(parent) {
     _account = account;
     _key = key;
 
@@ -383,15 +360,13 @@ DeleteJob::DeleteJob(Account *account, const QString &key, bool keychainMigratio
 }
 
 DeleteJob::DeleteJob(const QString &key, QObject *parent)
-    : DeleteJob(nullptr, key, false, parent)
-{
+    : DeleteJob(nullptr, key, false, parent) {
 #ifdef Q_OS_WIN
     jobKeyPrependAppName(_key);
 #endif
 }
 
-void DeleteJob::start()
-{
+void DeleteJob::start() {
     _chunkCount = 0;
     _error = QKeychain::NoError;
 
@@ -411,8 +386,7 @@ void DeleteJob::start()
     job->start();
 }
 
-bool DeleteJob::exec()
-{
+bool DeleteJob::exec() {
     start();
 
     QEventLoop waitLoop;
@@ -430,8 +404,7 @@ bool DeleteJob::exec()
     return false;
 }
 
-void DeleteJob::slotDeleteJobDone(QKeychain::Job *incomingJob)
-{
+void DeleteJob::slotDeleteJobDone(QKeychain::Job *incomingJob) {
     // Errors or next chunk?
     auto deleteJob = qobject_cast<QKeychain::DeletePasswordJob *>(incomingJob);
     Q_ASSERT(deleteJob);

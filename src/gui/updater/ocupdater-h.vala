@@ -62,8 +62,7 @@ namespace OCC {
  *                +-------------+
  */
 
-class UpdaterScheduler : public QObject
-{
+class UpdaterScheduler : public QObject {
 public:
     UpdaterScheduler(QObject *parent);
 
@@ -82,8 +81,7 @@ private:
  * @brief Class that uses an ownCloud proprietary XML format to fetch update information
  * @ingroup gui
  */
-class OCUpdater : public Updater
-{
+class OCUpdater : public Updater {
 public:
     enum DownloadState { Unknown = 0,
         CheckingServer,
@@ -145,8 +143,7 @@ private:
  * @brief Windows Updater Using NSIS
  * @ingroup gui
  */
-class NSISUpdater : public OCUpdater
-{
+class NSISUpdater : public OCUpdater {
 public:
     explicit NSISUpdater(const QUrl &url);
     bool handleStartup() override;
@@ -171,8 +168,7 @@ private:
  *
  *  @ingroup gui
  */
-class PassiveUpdateNotifier : public OCUpdater
-{
+class PassiveUpdateNotifier : public OCUpdater {
 public:
     explicit PassiveUpdateNotifier(const QUrl &url);
     bool handleStartup() override { return false; }

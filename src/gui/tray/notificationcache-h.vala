@@ -4,11 +4,9 @@
 
 namespace OCC {
 
-class NotificationCache
-{
+class NotificationCache {
 public:
-    struct Notification
-    {
+    struct Notification {
         QString title;
         QString message;
     };

@@ -48,16 +48,14 @@ Q_LOGGING_CATEGORY(lcSystray, "nextcloud.gui.systray")
 
 Systray *Systray::_instance = nullptr;
 
-Systray *Systray::instance()
-{
+Systray *Systray::instance() {
     if (!_instance) {
         _instance = new Systray();
     }
     return _instance;
 }
 
-void Systray::setTrayEngine(QQmlApplicationEngine *trayEngine)
-{
+void Systray::setTrayEngine(QQmlApplicationEngine *trayEngine) {
     _trayEngine = trayEngine;
 
     _trayEngine->setNetworkAccessManagerFactory(&_accessManagerFactory);
@@ -69,8 +67,7 @@ void Systray::setTrayEngine(QQmlApplicationEngine *trayEngine)
 }
 
 Systray::Systray()
-    : QSystemTrayIcon(nullptr)
-{
+    : QSystemTrayIcon(nullptr) {
     qmlRegisterSingletonType<UserModel>("com.nextcloud.desktopclient", 1, 0, "UserModel",
         [](QQmlEngine *, QJSEngine *) -> QObject * {
             return UserModel::instance();
@@ -137,8 +134,7 @@ Systray::Systray()
         this, &Systray::showWindow);
 }
 
-void Systray::create()
-{
+void Systray::create() {
     if (_trayEngine) {
         if (!AccountManager::instance()->accounts().isEmpty()) {
             _trayEngine->rootContext()->setContextProperty("activityModel", UserModel::instance()->currentActivityModel());
@@ -157,8 +153,7 @@ void Systray::create()
     }
 }
 
-void Systray::slotNewUserSelected()
-{
+void Systray::slotNewUserSelected() {
     if (_trayEngine) {
         // Change ActivityModel
         _trayEngine->rootContext()->setContextProperty("activityModel", UserModel::instance()->currentActivityModel());
@@ -168,18 +163,15 @@ void Systray::slotNewUserSelected()
     UserAppsModel::instance()->buildAppList();
 }
 
-void Systray::slotUnpauseAllFolders()
-{
+void Systray::slotUnpauseAllFolders() {
     setPauseOnAllFoldersHelper(false);
 }
 
-void Systray::slotPauseAllFolders()
-{
+void Systray::slotPauseAllFolders() {
     setPauseOnAllFoldersHelper(true);
 }
 
-void Systray::setPauseOnAllFoldersHelper(bool pause)
-{
+void Systray::setPauseOnAllFoldersHelper(bool pause) {
     // For some reason we get the raw pointer from Folder::accountState()
     // that's why we need a list of raw pointers for the call to contains
     // later on...
@@ -203,18 +195,15 @@ void Systray::setPauseOnAllFoldersHelper(bool pause)
     }
 }
 
-bool Systray::isOpen()
-{
+bool Systray::isOpen() {
     return _isOpen;
 }
 
-QString Systray::windowTitle() const
-{
+QString Systray::windowTitle() const {
     return Theme::instance()->appNameGUI();
 }
 
-bool Systray::useNormalWindow() const
-{
+bool Systray::useNormalWindow() const {
     if (!isSystemTrayAvailable()) {
         return true;
     }
@@ -223,18 +212,15 @@ bool Systray::useNormalWindow() const
     return cfg.showMainDialogAsNormalWindow();
 }
 
-Q_INVOKABLE void Systray::setOpened()
-{
+Q_INVOKABLE void Systray::setOpened() {
     _isOpen = true;
 }
 
-Q_INVOKABLE void Systray::setClosed()
-{
+Q_INVOKABLE void Systray::setClosed() {
     _isOpen = false;
 }
 
-void Systray::showMessage(const QString &title, const QString &message, MessageIcon icon)
-{
+void Systray::showMessage(const QString &title, const QString &message, MessageIcon icon) {
 #ifdef USE_FDO_NOTIFICATIONS
     if (QDBusInterface(NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE).isValid()) {
         const QVariantMap hints = {{QStringLiteral("desktop-entry"), LINUX_APPLICATION_ID}};
@@ -249,24 +235,20 @@ void Systray::showMessage(const QString &title, const QString &message, MessageI
         if (canOsXSendUserNotification()) {
         sendOsXUserNotification(title, message);
     } else
-#endif
-    {
+#endif {
         QSystemTrayIcon::showMessage(title, message, icon);
     }
 }
 
-void Systray::setToolTip(const QString &tip)
-{
+void Systray::setToolTip(const QString &tip) {
     QSystemTrayIcon::setToolTip(tr("%1: %2").arg(Theme::instance()->appNameGUI(), tip));
 }
 
-bool Systray::syncIsPaused()
-{
+bool Systray::syncIsPaused() {
     return _syncIsPaused;
 }
 
-void Systray::pauseResumeSync()
-{
+void Systray::pauseResumeSync() {
     if (_syncIsPaused) {
         _syncIsPaused = false;
         slotUnpauseAllFolders();
@@ -280,8 +262,7 @@ void Systray::pauseResumeSync()
 /* Helper functions for cross-platform tray icon position and taskbar orientation detection */
 /********************************************************************************************/
 
-void Systray::positionWindow(QQuickWindow *window) const
-{
+void Systray::positionWindow(QQuickWindow *window) const {
     if (!useNormalWindow()) {
         window->setScreen(currentScreen());
         const auto position = computeWindowPosition(window->width(), window->height());
@@ -289,14 +270,13 @@ void Systray::positionWindow(QQuickWindow *window) const
     }
 }
 
-void Systray::forceWindowInit(QQuickWindow *window) const
-{
+void Systray::forceWindowInit(QQuickWindow *window) const {
     // HACK: At least on Windows, if the systray window is not shown at least once
     // it can prevent session handling to carry on properly, so we show/hide it here
     // this shouldn't flicker
     window->show();
     window->hide();
-    
+
 #ifdef Q_OS_MAC
     // On macOS we need to designate the tray window as visible on all spaces and
     // at the menu bar level, otherwise showing it can cause the current spaces to
@@ -306,8 +286,7 @@ void Systray::forceWindowInit(QQuickWindow *window) const
 #endif
 }
 
-QScreen *Systray::currentScreen() const
-{
+QScreen *Systray::currentScreen() const {
     const auto screens = QGuiApplication::screens();
     const auto cursorPos = QCursor::pos();
 
@@ -322,8 +301,7 @@ QScreen *Systray::currentScreen() const
     return QGuiApplication::primaryScreen();
 }
 
-Systray::TaskBarPosition Systray::taskbarOrientation() const
-{
+Systray::TaskBarPosition Systray::taskbarOrientation() const {
 // macOS: Always on top
 #if defined(Q_OS_MACOS)
     return TaskBarPosition::Top;
@@ -376,8 +354,7 @@ Systray::TaskBarPosition Systray::taskbarOrientation() const
 }
 
 // TODO: Get real taskbar dimensions Linux as well
-QRect Systray::taskbarGeometry() const
-{
+QRect Systray::taskbarGeometry() const {
 #if defined(Q_OS_WIN)
     QRect tbRect = Utility::getTaskbarDimensions();
     //QML side expects effective pixels, convert taskbar dimensions if necessary
@@ -402,15 +379,13 @@ QRect Systray::taskbarGeometry() const
 #endif
 }
 
-QRect Systray::currentScreenRect() const
-{
+QRect Systray::currentScreenRect() const {
     const auto screen = currentScreen();
     Q_ASSERT(screen);
     return screen->geometry();
 }
 
-QPoint Systray::computeWindowReferencePoint() const
-{
+QPoint Systray::computeWindowReferencePoint() const {
     constexpr auto spacing = 4;
     const auto trayIconCenter = calcTrayIconCenter();
     const auto taskbarRect = taskbarGeometry();
@@ -447,8 +422,7 @@ QPoint Systray::computeWindowReferencePoint() const
     Q_UNREACHABLE();
 }
 
-QPoint Systray::computeWindowPosition(int width, int height) const
-{
+QPoint Systray::computeWindowPosition(int width, int height) const {
     const auto referencePoint = computeWindowReferencePoint();
 
     const auto taskbarScreenEdge = taskbarOrientation();
@@ -495,8 +469,7 @@ QPoint Systray::computeWindowPosition(int width, int height) const
     return windowRect.topLeft();
 }
 
-QPoint Systray::calcTrayIconCenter() const
-{
+QPoint Systray::calcTrayIconCenter() const {
     // QSystemTrayIcon::geometry() is broken for ages on most Linux DEs (invalid geometry returned)
     // thus we can use this only for Windows and macOS
 #if defined(Q_OS_WIN) || defined(Q_OS_MACOS)
@@ -509,12 +482,10 @@ QPoint Systray::calcTrayIconCenter() const
 }
 
 AccessManagerFactory::AccessManagerFactory()
-    : QQmlNetworkAccessManagerFactory()
-{
+    : QQmlNetworkAccessManagerFactory() {
 }
 
-QNetworkAccessManager* AccessManagerFactory::create(QObject *parent)
-{
+QNetworkAccessManager* AccessManagerFactory::create(QObject *parent) {
     return new AccessManager(parent);
 }
 

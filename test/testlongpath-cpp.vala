@@ -25,42 +25,35 @@
 // #include <QTest>
 
 
-class TestLongWindowsPath : public QObject
-{
+class TestLongWindowsPath : public QObject {
 
 private Q_SLOTS:
 #ifdef Q_OS_WIN
-    void check_long_win_path()
-    {
-        {
+    void check_long_win_path() { {
             const auto path = QStringLiteral("C://DATA/FILES/MUSIC/MY_MUSIC.mp3"); // check a short path
             const auto exp_path = QStringLiteral("\\\\?\\C:\\\\DATA\\FILES\\MUSIC\\MY_MUSIC.mp3");
             QString new_short = OCC::FileSystem::pathtoUNC(path);
             QCOMPARE(new_short, exp_path);
         }
-
-        {
+ {
             const auto path = QStringLiteral("\\\\foo\\bar/MY_MUSIC.mp3");
             const auto exp_path = QStringLiteral("\\\\foo\\bar\\MY_MUSIC.mp3");
             QString new_short = OCC::FileSystem::pathtoUNC(path);
             QCOMPARE(new_short, exp_path);
         }
-
-        {
+ {
             const auto path = QStringLiteral("//foo\\bar/MY_MUSIC.mp3");
             const auto exp_path = QStringLiteral("\\\\foo\\bar\\MY_MUSIC.mp3");
             QString new_short = OCC::FileSystem::pathtoUNC(path);
             QCOMPARE(new_short, exp_path);
         }
-
-        {
+ {
             const auto path = QStringLiteral("\\foo\\bar");
             const auto exp_path = QStringLiteral("\\\\?\\foo\\bar");
             QString new_short = OCC::FileSystem::pathtoUNC(path);
             QCOMPARE(new_short, exp_path);
         }
-
-        {
+ {
             const auto path = QStringLiteral("/foo/bar");
             const auto exp_path = QStringLiteral("\\\\?\\foo\\bar");
             QString new_short = OCC::FileSystem::pathtoUNC(path);
@@ -87,8 +80,7 @@ private Q_SLOTS:
 #endif
 
 
-    void testLongPathStat_data()
-    {
+    void testLongPathStat_data() {
         QTest::addColumn<QString>("name");
 
         QTest::newRow("long") << QStringLiteral("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
@@ -113,8 +105,7 @@ private Q_SLOTS:
                                                            "olonglonglonglong/自己的云.txt");
     }
 
-    void testLongPathStat()
-    {
+    void testLongPathStat() {
         QTemporaryDir tmp;
         QFETCH(QString, name);
         const QFileInfo longPath(tmp.path() + name);

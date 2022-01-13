@@ -21,8 +21,7 @@
 
 namespace OCC {
 
-class VfsXAttr : public Vfs
-{
+class VfsXAttr : public Vfs {
 
 public:
     explicit VfsXAttr(QObject *parent = nullptr);
@@ -58,8 +57,7 @@ protected:
     void startImpl(const VfsSetupParams &params) override;
 };
 
-class XattrVfsPluginFactory : public QObject, public DefaultPluginFactory<VfsXAttr>
-{
+class XattrVfsPluginFactory : public QObject, public DefaultPluginFactory<VfsXAttr> {
     Q_PLUGIN_METADATA(IID "org.owncloud.PluginFactory" FILE "vfspluginmetadata.json")
     Q_INTERFACES(OCC::PluginFactory)
 };

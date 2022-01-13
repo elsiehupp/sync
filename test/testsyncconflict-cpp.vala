@@ -11,25 +11,21 @@
 
 using namespace OCC;
 
-bool itemSuccessful(const ItemCompletedSpy &spy, const QString &path, const SyncInstructions instr)
-{
+bool itemSuccessful(const ItemCompletedSpy &spy, const QString &path, const SyncInstructions instr) {
     auto item = spy.findItem(path);
     return item->_status == SyncFileItem::Success && item->_instruction == instr;
 }
 
-bool itemConflict(const ItemCompletedSpy &spy, const QString &path)
-{
+bool itemConflict(const ItemCompletedSpy &spy, const QString &path) {
     auto item = spy.findItem(path);
     return item->_status == SyncFileItem::Conflict && item->_instruction == CSYNC_INSTRUCTION_CONFLICT;
 }
 
-bool itemSuccessfulMove(const ItemCompletedSpy &spy, const QString &path)
-{
+bool itemSuccessfulMove(const ItemCompletedSpy &spy, const QString &path) {
     return itemSuccessful(spy, path, CSYNC_INSTRUCTION_RENAME);
 }
 
-QStringList findConflicts(const FileInfo &dir)
-{
+QStringList findConflicts(const FileInfo &dir) {
     QStringList conflicts;
     for (const auto &item : dir.children) {
         if (item.name.contains("(conflicted copy")) {
@@ -39,8 +35,7 @@ QStringList findConflicts(const FileInfo &dir)
     return conflicts;
 }
 
-bool expectAndWipeConflict(FileModifier &local, FileInfo state, const QString path)
-{
+bool expectAndWipeConflict(FileModifier &local, FileInfo state, const QString path) {
     PathComponents pathComponents(path);
     auto base = state.find(pathComponents.parentDirComponents());
     if (!base)
@@ -54,19 +49,16 @@ bool expectAndWipeConflict(FileModifier &local, FileInfo state, const QString pa
     return false;
 }
 
-SyncJournalFileRecord dbRecord(FakeFolder &folder, const QString &path)
-{
+SyncJournalFileRecord dbRecord(FakeFolder &folder, const QString &path) {
     SyncJournalFileRecord record;
     folder.syncJournal().getFileRecord(path, &record);
     return record;
 }
 
-class TestSyncConflict : public QObject
-{
+class TestSyncConflict : public QObject {
 
 private slots:
-    void testNoUpload()
-    {
+    void testNoUpload() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
 
@@ -87,8 +79,7 @@ private slots:
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
     }
 
-    void testUploadAfterDownload()
-    {
+    void testUploadAfterDownload() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         fakeFolder.syncEngine().account()->setCapabilities({ { "uploadConflictFiles", true } });
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -137,8 +128,7 @@ private slots:
         QCOMPARE(remote.find("A/a2")->size, 6);
     }
 
-    void testSeparateUpload()
-    {
+    void testSeparateUpload() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         fakeFolder.syncEngine().account()->setCapabilities({ { "uploadConflictFiles", true } });
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -208,8 +198,7 @@ private slots:
     }
 
     // What happens if we download a conflict file? Is the metadata set up correctly?
-    void testDownloadingConflictFile()
-    {
+    void testDownloadingConflictFile() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         fakeFolder.syncEngine().account()->setCapabilities({ { "uploadConflictFiles", true } });
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -250,8 +239,7 @@ private slots:
     }
 
     // Check that conflict records are removed when the file is gone
-    void testConflictRecordRemoval1()
-    {
+    void testConflictRecordRemoval1() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         fakeFolder.syncEngine().account()->setCapabilities({ { "uploadConflictFiles", true } });
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -278,8 +266,7 @@ private slots:
     }
 
     // Same test, but with uploadConflictFiles == false
-    void testConflictRecordRemoval2()
-    {
+    void testConflictRecordRemoval2() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         fakeFolder.syncEngine().account()->setCapabilities({ { "uploadConflictFiles", false } });
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -315,8 +302,7 @@ private slots:
         QVERIFY(!fakeFolder.syncJournal().conflictRecord(a2conflict).isValid());
     }
 
-    void testConflictFileBaseName_data()
-    {
+    void testConflictFileBaseName_data() {
         QTest::addColumn<QString>("input");
         QTest::addColumn<QString>("output");
 
@@ -388,15 +374,13 @@ private slots:
             << "a/b/foo_conflict-123.txt";
     }
 
-    void testConflictFileBaseName()
-    {
+    void testConflictFileBaseName() {
         QFETCH(QString, input);
         QFETCH(QString, output);
         QCOMPARE(Utility::conflictFileBaseNameFromPattern(input.toUtf8()), output.toUtf8());
     }
 
-    void testLocalDirRemoteFileConflict()
-    {
+    void testLocalDirRemoteFileConflict() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         fakeFolder.syncEngine().account()->setCapabilities({ { "uploadConflictFiles", true } });
         ItemCompletedSpy completeSpy(fakeFolder);
@@ -473,8 +457,7 @@ private slots:
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
     }
 
-    void testLocalFileRemoteDirConflict()
-    {
+    void testLocalFileRemoteDirConflict() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         fakeFolder.syncEngine().account()->setCapabilities({ { "uploadConflictFiles", true } });
         ItemCompletedSpy completeSpy(fakeFolder);
@@ -525,8 +508,7 @@ private slots:
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
     }
 
-    void testTypeConflictWithMove()
-    {
+    void testTypeConflictWithMove() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         ItemCompletedSpy completeSpy(fakeFolder);
 
@@ -558,8 +540,7 @@ private slots:
         // Currently a1 and b1 don't get moved, but redownloaded
     }
 
-    void testTypeChange()
-    {
+    void testTypeChange() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         ItemCompletedSpy completeSpy(fakeFolder);
 
@@ -598,8 +579,7 @@ private slots:
     }
 
     // Test what happens if we remove entries both on the server, and locally
-    void testRemoveRemove()
-    {
+    void testRemoveRemove() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         fakeFolder.remoteModifier().remove("A");
         fakeFolder.localModifier().remove("A");

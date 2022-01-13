@@ -21,13 +21,11 @@ namespace OCC {
 Q_LOGGING_CATEGORY(lcFileActivityListModel, "nextcloud.gui.fileactivitylistmodel", QtInfoMsg)
 
 FileActivityListModel::FileActivityListModel(QObject *parent)
-    : ActivityListModel(nullptr, parent)
-{
+    : ActivityListModel(nullptr, parent) {
     setDisplayActions(false);
 }
 
-void FileActivityListModel::load(AccountState *accountState, const QString &localPath)
-{
+void FileActivityListModel::load(AccountState *accountState, const QString &localPath) {
     Q_ASSERT(accountState);
     if (!accountState || currentlyFetching()) {
         return;
@@ -49,8 +47,7 @@ void FileActivityListModel::load(AccountState *accountState, const QString &loca
     slotRefreshActivity();
 }
 
-void FileActivityListModel::startFetchJob()
-{
+void FileActivityListModel::startFetchJob() {
     if (!accountState()->isConnected()) {
         return;
     }

@@ -28,13 +28,11 @@ namespace {
  * @brief The FakeDesktopServicesUrlHandler
  * overrides QDesktopServices::openUrl
  **/
-class FakeDesktopServicesUrlHandler : public QObject
-{
+class FakeDesktopServicesUrlHandler : public QObject {
 
 public:
     FakeDesktopServicesUrlHandler(QObject *parent = nullptr)
-        : QObject(parent)
-    {}
+        : QObject(parent) {}
 
 public:
 signals:
@@ -45,8 +43,7 @@ signals:
  * @brief The FakeProvider
  * is a simple structure that represents initial list of providers and their properties
  **/
-class FakeProvider
-{
+class FakeProvider {
 public:
     QString _id;
     QString _name;
@@ -55,39 +52,26 @@ public:
 };
 
 // this will be used when initializing fake search results data for each provider
-static const QVector<FakeProvider> fakeProvidersInitInfo = {
-    {QStringLiteral("settings_apps"), QStringLiteral("Apps"), -50, 10},
-    {QStringLiteral("talk-message"), QStringLiteral("Messages"), -2, 17},
-    {QStringLiteral("files"), QStringLiteral("Files"), 5, 3},
-    {QStringLiteral("deck"), QStringLiteral("Deck"), 10, 5},
-    {QStringLiteral("comments"), QStringLiteral("Comments"), 10, 2},
-    {QStringLiteral("mail"), QStringLiteral("Mails"), 10, 15},
-    {QStringLiteral("calendar"), QStringLiteral("Events"), 30, 11}
+static const QVector<FakeProvider> fakeProvidersInitInfo = { {QStringLiteral("settings_apps"), QStringLiteral("Apps"), -50, 10}, {QStringLiteral("talk-message"), QStringLiteral("Messages"), -2, 17}, {QStringLiteral("files"), QStringLiteral("Files"), 5, 3}, {QStringLiteral("deck"), QStringLiteral("Deck"), 10, 5}, {QStringLiteral("comments"), QStringLiteral("Comments"), 10, 2}, {QStringLiteral("mail"), QStringLiteral("Mails"), 10, 15}, {QStringLiteral("calendar"), QStringLiteral("Events"), 30, 11}
 };
 
-static QByteArray fake404Response = R"(
-{"ocs":{"meta":{"status":"failure","statuscode":404,"message":"Invalid query, please check the syntax. API specifications are here: http:\/\/www.freedesktop.org\/wiki\/Specifications\/open-collaboration-services.\n"},"data":[]}}
+static QByteArray fake404Response = R"( {"ocs":{"meta":{"status":"failure","statuscode":404,"message":"Invalid query, please check the syntax. API specifications are here: http:\/\/www.freedesktop.org\/wiki\/Specifications\/open-collaboration-services.\n"},"data":[]}}
 )";
 
-static QByteArray fake400Response = R"(
-{"ocs":{"meta":{"status":"failure","statuscode":400,"message":"Parameter is incorrect.\n"},"data":[]}}
+static QByteArray fake400Response = R"( {"ocs":{"meta":{"status":"failure","statuscode":400,"message":"Parameter is incorrect.\n"},"data":[]}}
 )";
 
-static QByteArray fake500Response = R"(
-{"ocs":{"meta":{"status":"failure","statuscode":500,"message":"Internal Server Error.\n"},"data":[]}}
+static QByteArray fake500Response = R"( {"ocs":{"meta":{"status":"failure","statuscode":500,"message":"Internal Server Error.\n"},"data":[]}}
 )";
 
 /**
  * @brief The FakeSearchResultsStorage
  * emulates the real server storage that contains all the results that UnifiedSearchListmodel will search for
  **/
-class FakeSearchResultsStorage
-{
-    class Provider
+class FakeSearchResultsStorage { {lass Provider
     {
     public:
-        class SearchResult
-        {
+        class SearchResult {
         public:
             QString _thumbnailUrl;
             QString _title;
@@ -108,8 +92,7 @@ class FakeSearchResultsStorage
     FakeSearchResultsStorage() = default;
 
 public:
-    static FakeSearchResultsStorage *instance()
-    {
+    static FakeSearchResultsStorage *instance() {
         if (!_instance) {
             _instance = new FakeSearchResultsStorage();
             _instance->init();
@@ -118,8 +101,7 @@ public:
         return _instance;
     };
 
-    static void destroy()
-    {
+    static void destroy() {
         if (_instance) {
             delete _instance;
         }
@@ -127,14 +109,12 @@ public:
         _instance = nullptr;
     }
 
-    void init()
-    {
+    void init() {
         if (!_searchResultsData.isEmpty()) {
             return;
         }
 
-        _metaSuccess = {{QStringLiteral("status"), QStringLiteral("ok")}, {QStringLiteral("statuscode"), 200},
-            {QStringLiteral("message"), QStringLiteral("OK")}};
+        _metaSuccess = {{QStringLiteral("status"), QStringLiteral("ok")}, {QStringLiteral("statuscode"), 200}, {QStringLiteral("message"), QStringLiteral("OK")}};
 
         initProvidersResponse();
 
@@ -142,21 +122,15 @@ public:
     }
 
     // initialize the JSON response containing the fake list of providers and their properties
-    void initProvidersResponse()
-    {
+    void initProvidersResponse() {
         QList<QVariant> providersList;
 
         for (const auto &fakeProviderInitInfo : fakeProvidersInitInfo) {
-            providersList.push_back(QVariantMap{
-                {QStringLiteral("id"), fakeProviderInitInfo._id},
-                {QStringLiteral("name"), fakeProviderInitInfo._name},
-                {QStringLiteral("order"), fakeProviderInitInfo._order},
+            providersList.push_back(QVariantMap{ {QStringLiteral("id"), fakeProviderInitInfo._id}, {QStringLiteral("name"), fakeProviderInitInfo._name}, {QStringLiteral("order"), fakeProviderInitInfo._order},
             });
         }
 
-        const QVariantMap ocsMap = {
-            {QStringLiteral("meta"), _metaSuccess},
-            {QStringLiteral("data"), providersList}
+        const QVariantMap ocsMap = { {QStringLiteral("meta"), _metaSuccess}, {QStringLiteral("data"), providersList}
         };
 
         _providersResponse =
@@ -164,8 +138,7 @@ public:
     }
 
     // init the map of fake search results for each provider
-    void initSearchResultsData()
-    {
+    void initSearchResultsData() {
         for (const auto &fakeProvider : fakeProvidersInitInfo) {
             auto &providerData = _searchResultsData[fakeProvider._id];
             providerData._id = fakeProvider._id;
@@ -175,8 +148,7 @@ public:
                 providerData._isPaginated = true;
             }
             for (quint32 i = 0; i < fakeProvider._numItemsToInsert; ++i) {
-                providerData._results.push_back(
-                    {"http://example.de/avatar/john/64", QString(QStringLiteral("John Doe in ") + fakeProvider._name),
+                providerData._results.push_back( {"http://example.de/avatar/john/64", QString(QStringLiteral("John Doe in ") + fakeProvider._name),
                         QString(QStringLiteral("We a discussion about ") + fakeProvider._name
                             + QStringLiteral(" already. But, let's have a follow up tomorrow afternoon.")),
                         "http://example.de/call/abcde12345#message_12345", QStringLiteral("icon-talk"), true});
@@ -184,8 +156,7 @@ public:
         }
     }
 
-    const QList<QVariant> resultsForProvider(const QString &providerId, int cursor)
-    {
+    const QList<QVariant> resultsForProvider(const QString &providerId, int cursor) {
         QList<QVariant> list;
 
         const auto results = resultsForProviderAsVector(providerId, cursor);
@@ -195,21 +166,14 @@ public:
         }
 
         for (const auto &result : results) {
-            list.push_back(QVariantMap{
-                {"thumbnailUrl", result._thumbnailUrl},
-                {"title", result._title},
-                {"subline", result._subline},
-                {"resourceUrl", result._resourceUrl},
-                {"icon", result._icon},
-                {"rounded", result._rounded}
+            list.push_back(QVariantMap{ {"thumbnailUrl", result._thumbnailUrl}, {"title", result._title}, {"subline", result._subline}, {"resourceUrl", result._resourceUrl}, {"icon", result._icon}, {"rounded", result._rounded}
             });
         }
 
         return list;
     }
 
-    const QVector<Provider::SearchResult> resultsForProviderAsVector(const QString &providerId, int cursor)
-    {
+    const QVector<Provider::SearchResult> resultsForProviderAsVector(const QString &providerId, int cursor) {
         QVector<Provider::SearchResult> results;
 
         const auto provider = _searchResultsData.value(providerId, Provider());
@@ -229,8 +193,7 @@ public:
         return results;
     }
 
-    const QByteArray queryProvider(const QString &providerId, const QString &searchTerm, int cursor)
-    {
+    const QByteArray queryProvider(const QString &providerId, const QString &searchTerm, int cursor) {
         if (!_searchResultsData.contains(providerId)) {
             return fake404Response;
         }
@@ -240,9 +203,7 @@ public:
         }
 
         if (searchTerm == QStringLiteral("[empty]")) {
-            const QVariantMap dataMap = {{QStringLiteral("name"), _searchResultsData[providerId]._name},
-                {QStringLiteral("isPaginated"), false}, {QStringLiteral("cursor"), 0},
-                {QStringLiteral("entries"), QVariantList{}}};
+            const QVariantMap dataMap = {{QStringLiteral("name"), _searchResultsData[providerId]._name}, {QStringLiteral("isPaginated"), false}, {QStringLiteral("cursor"), 0}, {QStringLiteral("entries"), QVariantList{}}};
 
             const QVariantMap ocsMap = {{QStringLiteral("meta"), _metaSuccess}, {QStringLiteral("data"), dataMap}};
 
@@ -254,10 +215,7 @@ public:
 
         const auto nextCursor = cursor + pageSize;
 
-        const QVariantMap dataMap = {{QStringLiteral("name"), _searchResultsData[providerId]._name},
-            {QStringLiteral("isPaginated"), _searchResultsData[providerId]._isPaginated},
-            {QStringLiteral("cursor"), nextCursor},
-            {QStringLiteral("entries"), resultsForProvider(providerId, cursor)}};
+        const QVariantMap dataMap = {{QStringLiteral("name"), _searchResultsData[providerId]._name}, {QStringLiteral("isPaginated"), _searchResultsData[providerId]._isPaginated}, {QStringLiteral("cursor"), nextCursor}, {QStringLiteral("entries"), resultsForProvider(providerId, cursor)}};
 
         const QVariantMap ocsMap = {{QStringLiteral("meta"), _metaSuccess}, {QStringLiteral("data"), dataMap}};
 
@@ -282,8 +240,7 @@ FakeSearchResultsStorage *FakeSearchResultsStorage::_instance = nullptr;
 
 }
 
-class TestUnifiedSearchListmodel : public QObject
-{
+class TestUnifiedSearchListmodel : public QObject {
 
 public:
     TestUnifiedSearchListmodel() = default;
@@ -299,8 +256,7 @@ public:
     static const int searchResultsReplyDelay = 100;
 
 private slots:
-    void initTestCase()
-    {
+    void initTestCase() {
         fakeQnam.reset(new FakeQNAM({}));
         account = OCC::Account::create();
         account->setCredentials(new FakeCredentials{fakeQnam.data()});
@@ -354,8 +310,7 @@ private slots:
 
         fakeDesktopServicesUrlHandler.reset(new FakeDesktopServicesUrlHandler);
     }
-    void testSetSearchTermStartStopSearch()
-    {
+    void testSetSearchTermStartStopSearch() {
         // make sure the model is empty
         model->setSearchTerm(QStringLiteral(""));
         QVERIFY(model->rowCount() == 0);
@@ -375,7 +330,7 @@ private slots:
         // #3 test that model has not started search yet
         QVERIFY(!model->isSearchInProgress());
 
-        
+
         // #4 test that model has started the search after specific delay
         QSignalSpy searchInProgressChanged(model.data(), &OCC::UnifiedSearchResultsListModel::isSearchInProgressChanged);
         // allow search jobs to get created within the model
@@ -388,8 +343,7 @@ private slots:
         QVERIFY(!model->isSearchInProgress());
     }
 
-    void testSetSearchTermResultsFound()
-    {
+    void testSetSearchTermResultsFound() {
         // make sure the model is empty
         model->setSearchTerm(QStringLiteral(""));
         QVERIFY(model->rowCount() == 0);
@@ -414,8 +368,7 @@ private slots:
         QVERIFY(model->rowCount() > 0);
     }
 
-    void testSetSearchTermResultsNotFound()
-    {
+    void testSetSearchTermResultsNotFound() {
         // make sure the model is empty
         model->setSearchTerm(QStringLiteral(""));
         QVERIFY(model->rowCount() == 0);
@@ -440,8 +393,7 @@ private slots:
         QVERIFY(model->rowCount() == 0);
     }
 
-    void testFetchMoreClicked()
-    {
+    void testFetchMoreClicked() {
         // make sure the model is empty
         model->setSearchTerm(QStringLiteral(""));
         QVERIFY(model->rowCount() == 0);
@@ -520,7 +472,7 @@ private slots:
                     break;
                 }
             }
-            
+
             QCOMPARE(rowsRemoved.count(), 1);
 
             bool isFetchMoreTriggerFound = false;
@@ -540,8 +492,7 @@ private slots:
         }
     }
 
-    void testSearchResultlicked()
-    {
+    void testSearchResultlicked() {
         // make sure the model is empty
         model->setSearchTerm(QStringLiteral(""));
         QVERIFY(model->rowCount() == 0);
@@ -569,7 +520,7 @@ private slots:
         QDesktopServices::setUrlHandler("https", fakeDesktopServicesUrlHandler.data(), "resultClicked");
 
         QSignalSpy resultClicked(fakeDesktopServicesUrlHandler.data(), &FakeDesktopServicesUrlHandler::resultClicked);
- 
+
         //  test click on a result item
         QString urlForClickedResult;
 
@@ -598,8 +549,7 @@ private slots:
         QCOMPARE(urlOpenTriggeredViaDesktopServices, urlForClickedResult);
     }
 
-    void testSetSearchTermResultsError()
-    {
+    void testSetSearchTermResultsError() {
         // make sure the model is empty
         model->setSearchTerm(QStringLiteral(""));
         QVERIFY(model->rowCount() == 0);
@@ -628,8 +578,7 @@ private slots:
         QVERIFY(!model->errorString().isEmpty());
     }
 
-    void cleanupTestCase()
-    {
+    void cleanupTestCase() {
         FakeSearchResultsStorage::destroy();
     }
 };

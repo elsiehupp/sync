@@ -31,8 +31,7 @@ class Folder;
  * @brief The SelectiveSyncWidget contains a folder tree with labels
  * @ingroup gui
  */
-class SelectiveSyncWidget : public QWidget
-{
+class SelectiveSyncWidget : public QWidget {
 public:
     explicit SelectiveSyncWidget(AccountPtr account, QWidget *parent = nullptr);
 
@@ -86,8 +85,7 @@ private:
  * @brief The SelectiveSyncDialog class
  * @ingroup gui
  */
-class SelectiveSyncDialog : public QDialog
-{
+class SelectiveSyncDialog : public QDialog {
 public:
     // Dialog for a specific folder (used from the account settings button)
     explicit SelectiveSyncDialog(AccountPtr account, Folder *folder, QWidget *parent = nullptr, Qt::WindowFlags f = {});

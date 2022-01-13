@@ -17,8 +17,7 @@
 // #include <QPaintDevice>
 // #include <QTest>
 
-class FakePaintDevice : public QPaintDevice
-{
+class FakePaintDevice : public QPaintDevice {
 public:
     FakePaintDevice();
 

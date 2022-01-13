@@ -57,8 +57,7 @@
  * this is the fastest good hash I could find.  There were about 2^^68
  * to choose from.  I only looked at a billion or so.
  */
-#define _c_mix(a,b,c) \
-{ \
+#define _c_mix(a,b,c) \ { \
   (a) -= (b); (a) -= (c); (a) ^= ((c)>>13); \
   (b) -= (c); (b) -= (a); (b) ^= ((a)<<8); \
   (c) -= (a); (c) -= (b); (c) ^= ((b)>>13); \
@@ -88,8 +87,7 @@
  * characteristics with 3-bit deltas or bigger, I didn't test for
  * those.
  */
-#define _c_mix64(a,b,c) \
-{ \
+#define _c_mix64(a,b,c) \ { \
   (a) -= (b); (a) -= (c); (a) ^= ((c)>>43); \
   (b) -= (c); (b) -= (a); (b) ^= ((a)<<9); \
   (c) -= (a); (c) -= (b); (c) ^= ((b)>>8); \
@@ -200,8 +198,7 @@ static inline uint64_t c_jhash64(const uint8_t *k, uint64_t length, uint64_t int
   c = 0x9e3779b97f4a7c13LL; /* the golden ratio; an arbitrary value */
 
   /* handle most of the key */
-  while (len >= 24)
-  {
+  while (len >= 24) {
     a += (k[0]        +((uint64_t)k[ 1]<< 8)+((uint64_t)k[ 2]<<16)+((uint64_t)k[ 3]<<24)
      +((uint64_t)k[4 ]<<32)+((uint64_t)k[ 5]<<40)+((uint64_t)k[ 6]<<48)+((uint64_t)k[ 7]<<56));
     b += (k[8]        +((uint64_t)k[ 9]<< 8)+((uint64_t)k[10]<<16)+((uint64_t)k[11]<<24)

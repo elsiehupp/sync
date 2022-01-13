@@ -6,8 +6,7 @@
 
 namespace OCC {
 
-class UpdateInfo
-{
+class UpdateInfo {
 public:
     void setVersion(const QString &v);
     QString version() const;

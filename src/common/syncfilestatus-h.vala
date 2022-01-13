@@ -25,8 +25,7 @@ namespace OCC {
  * @brief The SyncFileStatus class
  * @ingroup libsync
  */
-class OCSYNC_EXPORT SyncFileStatus
-{
+class OCSYNC_EXPORT SyncFileStatus {
 public:
     enum SyncFileStatusTag {
         StatusNone,
@@ -53,13 +52,11 @@ private:
     bool _shared = false;
 };
 
-inline bool operator==(const SyncFileStatus &a, const SyncFileStatus &b)
-{
+inline bool operator==(const SyncFileStatus &a, const SyncFileStatus &b) {
     return a.tag() == b.tag() && a.shared() == b.shared();
 }
 
-inline bool operator!=(const SyncFileStatus &a, const SyncFileStatus &b)
-{
+inline bool operator!=(const SyncFileStatus &a, const SyncFileStatus &b) {
     return !(a == b);
 }
 }

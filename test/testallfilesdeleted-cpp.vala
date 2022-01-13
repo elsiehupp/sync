@@ -27,13 +27,11 @@ static void changeAllFileId(FileInfo &info) {
  * This test ensure that the SyncEngine::aboutToRemoveAllFiles is correctly called and that when
  * we the user choose to remove all files SyncJournalDb::clearFileTable makes works as expected
  */
-class TestAllFilesDeleted : public QObject
-{
+class TestAllFilesDeleted : public QObject {
 
 private slots:
 
-    void testAllFilesDeletedKeep_data()
-    {
+    void testAllFilesDeletedKeep_data() {
         QTest::addColumn<bool>("deleteOnRemote");
         QTest::newRow("local") << false;
         QTest::newRow("remote") << true;
@@ -44,8 +42,7 @@ private slots:
      * In this test, all files are deleted in the client, or the server, and we simulate
      * that the users press "keep"
      */
-    void testAllFilesDeletedKeep()
-    {
+    void testAllFilesDeletedKeep() {
         QFETCH(bool, deleteOnRemote);
         FakeFolder fakeFolder{FileInfo::A12_B12_C12_S12()};
         ConfigFile config;
@@ -86,16 +83,14 @@ private slots:
                  selectiveSyncBlackList);
     }
 
-    void testAllFilesDeletedDelete_data()
-    {
+    void testAllFilesDeletedDelete_data() {
         testAllFilesDeletedKeep_data();
     }
 
     /*
      * This test is like the previous one but we simulate that the user presses "delete"
      */
-    void testAllFilesDeletedDelete()
-    {
+    void testAllFilesDeletedDelete() {
         QFETCH(bool, deleteOnRemote);
         FakeFolder fakeFolder{FileInfo::A12_B12_C12_S12()};
 
@@ -154,8 +149,7 @@ private slots:
         QCOMPARE(fakeFolder.currentRemoteState(), expectedState);
     }
 
-    void testResetServer()
-    {
+    void testResetServer() {
         FakeFolder fakeFolder{FileInfo::A12_B12_C12_S12()};
 
         int aboutToRemoveAllFilesCalled = 0;
@@ -186,15 +180,13 @@ private slots:
 
     }
 
-    void testDataFingetPrint_data()
-    {
+    void testDataFingetPrint_data() {
         QTest::addColumn<bool>("hasInitialFingerPrint");
         QTest::newRow("initial finger print") << true;
         QTest::newRow("no initial finger print") << false;
     }
 
-    void testDataFingetPrint()
-    {
+    void testDataFingetPrint() {
         QFETCH(bool, hasInitialFingerPrint);
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         fakeFolder.remoteModifier().setContents("C/c1", 'N');

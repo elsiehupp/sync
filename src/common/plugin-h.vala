@@ -23,19 +23,16 @@
 
 namespace OCC {
 
-class OCSYNC_EXPORT PluginFactory
-{
+class OCSYNC_EXPORT PluginFactory {
 public:
     virtual ~PluginFactory();
     virtual QObject* create(QObject* parent) = 0;
 };
 
 template<class PluginClass>
-class DefaultPluginFactory : public PluginFactory
-{
+class DefaultPluginFactory : public PluginFactory {
 public:
-    QObject* create(QObject *parent) override
-    {
+    QObject* create(QObject *parent) override {
         return new PluginClass(parent);
     }
 };

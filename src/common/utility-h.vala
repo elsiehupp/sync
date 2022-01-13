@@ -169,8 +169,7 @@ namespace Utility {
      */
     OCSYNC_EXPORT QString timeAgoInWords(const QDateTime &dt, const QDateTime &from = QDateTime());
 
-    class OCSYNC_EXPORT StopWatch
-    {
+    class OCSYNC_EXPORT StopWatch {
     private:
         QMap<QString, quint64> _lapTimes;
         QDateTime _startTime;
@@ -261,8 +260,7 @@ namespace Utility {
 
     OCSYNC_EXPORT QString formatWinError(long error);
 
-    class OCSYNC_EXPORT NtfsPermissionLookupRAII
-    {
+    class OCSYNC_EXPORT NtfsPermissionLookupRAII {
     public:
         /**
          * NTFS permissions lookup is diabled by default for performance reasons
@@ -280,8 +278,7 @@ namespace Utility {
 }
 /** @} */ // \addtogroup
 
-inline bool Utility::isWindows()
-{
+inline bool Utility::isWindows() {
 #ifdef Q_OS_WIN
     return true;
 #else
@@ -289,8 +286,7 @@ inline bool Utility::isWindows()
 #endif
 }
 
-inline bool Utility::isMac()
-{
+inline bool Utility::isMac() {
 #ifdef Q_OS_MAC
     return true;
 #else
@@ -298,8 +294,7 @@ inline bool Utility::isMac()
 #endif
 }
 
-inline bool Utility::isUnix()
-{
+inline bool Utility::isUnix() {
 #ifdef Q_OS_UNIX
     return true;
 #else
@@ -307,8 +302,7 @@ inline bool Utility::isUnix()
 #endif
 }
 
-inline bool Utility::isLinux()
-{
+inline bool Utility::isLinux() {
 #if defined(Q_OS_LINUX)
     return true;
 #else
@@ -316,8 +310,7 @@ inline bool Utility::isLinux()
 #endif
 }
 
-inline bool Utility::isBSD()
-{
+inline bool Utility::isBSD() {
 #if defined(Q_OS_FREEBSD) || defined(Q_OS_NETBSD) || defined(Q_OS_OPENBSD)
     return true;
 #else

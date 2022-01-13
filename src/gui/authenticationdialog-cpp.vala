@@ -25,8 +25,7 @@ namespace OCC {
 AuthenticationDialog::AuthenticationDialog(const QString &realm, const QString &domain, QWidget *parent)
     : QDialog(parent)
     , _user(new QLineEdit)
-    , _password(new QLineEdit)
-{
+    , _password(new QLineEdit) {
     setWindowTitle(tr("Authentication Required"));
     auto *lay = new QVBoxLayout(this);
     auto *label = new QLabel(tr("Enter username and password for \"%1\" at %2.").arg(realm, domain));
@@ -45,13 +44,11 @@ AuthenticationDialog::AuthenticationDialog(const QString &realm, const QString &
     lay->addWidget(box);
 }
 
-QString AuthenticationDialog::user() const
-{
+QString AuthenticationDialog::user() const {
     return _user->text();
 }
 
-QString AuthenticationDialog::password() const
-{
+QString AuthenticationDialog::password() const {
     return _password->text();
 }
 

@@ -18,32 +18,26 @@ namespace OCC {
 SyncFileStatus::SyncFileStatus() = default;
 
 SyncFileStatus::SyncFileStatus(SyncFileStatusTag tag)
-    : _tag(tag)
-{
+    : _tag(tag) {
 }
 
-void SyncFileStatus::set(SyncFileStatusTag tag)
-{
+void SyncFileStatus::set(SyncFileStatusTag tag) {
     _tag = tag;
 }
 
-SyncFileStatus::SyncFileStatusTag SyncFileStatus::tag() const
-{
+SyncFileStatus::SyncFileStatusTag SyncFileStatus::tag() const {
     return _tag;
 }
 
-void SyncFileStatus::setShared(bool isShared)
-{
+void SyncFileStatus::setShared(bool isShared) {
     _shared = isShared;
 }
 
-bool SyncFileStatus::shared() const
-{
+bool SyncFileStatus::shared() const {
     return _shared;
 }
 
-QString SyncFileStatus::toSocketAPIString() const
-{
+QString SyncFileStatus::toSocketAPIString() const {
     QString statusString;
     bool canBeShared = true;
 

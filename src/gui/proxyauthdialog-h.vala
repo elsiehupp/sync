@@ -26,8 +26,7 @@ namespace Ui {
  *
  * Used by ProxyAuthHandler.
  */
-class ProxyAuthDialog : public QDialog
-{
+class ProxyAuthDialog : public QDialog {
 
 public:
     explicit ProxyAuthDialog(QWidget *parent = nullptr);

@@ -31,8 +31,7 @@ namespace OCC {
 /** Strips quotes and gzip annotations */
 OWNCLOUDSYNC_EXPORT QByteArray parseEtag(const char *header);
 
-struct HttpError
-{
+struct HttpError {
     int code; // HTTP error code
     QString message;
 };
@@ -44,8 +43,7 @@ using HttpResult = Result<T, HttpError>;
  * @brief The EntityExistsJob class
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT EntityExistsJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT EntityExistsJob : public AbstractNetworkJob {
 public:
     explicit EntityExistsJob(AccountPtr account, const QString &path, QObject *parent = nullptr);
     void start() override;
@@ -64,8 +62,7 @@ private slots:
  *
  * This does *not* delete files, it does a http request.
  */
-class OWNCLOUDSYNC_EXPORT DeleteApiJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT DeleteApiJob : public AbstractNetworkJob {
 public:
     explicit DeleteApiJob(AccountPtr account, const QString &path, QObject *parent = nullptr);
     void start() override;
@@ -86,8 +83,7 @@ struct ExtraFolderInfo {
  * @brief The LsColJob class
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT LsColXMLParser : public QObject
-{
+class OWNCLOUDSYNC_EXPORT LsColXMLParser : public QObject {
 public:
     explicit LsColXMLParser();
 
@@ -102,8 +98,7 @@ signals:
     void finishedWithoutError();
 };
 
-class OWNCLOUDSYNC_EXPORT LsColJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT LsColJob : public AbstractNetworkJob {
 public:
     explicit LsColJob(AccountPtr account, const QString &path, QObject *parent = nullptr);
     explicit LsColJob(AccountPtr account, const QUrl &url, QObject *parent = nullptr);
@@ -145,8 +140,7 @@ private:
  *
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT PropfindJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT PropfindJob : public AbstractNetworkJob {
 public:
     explicit PropfindJob(AccountPtr account, const QString &path, QObject *parent = nullptr);
     void start() override;
@@ -181,8 +175,7 @@ private:
  *
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT AvatarJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT AvatarJob : public AbstractNetworkJob {
 public:
     /**
      * @param userId The user for which to obtain the avatar
@@ -219,8 +212,7 @@ private:
  *
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT ProppatchJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT ProppatchJob : public AbstractNetworkJob {
 public:
     explicit ProppatchJob(AccountPtr account, const QString &path, QObject *parent = nullptr);
     void start() override;
@@ -251,8 +243,7 @@ private:
  * @brief The MkColJob class
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT MkColJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT MkColJob : public AbstractNetworkJob {
     QUrl _url; // Only used if the constructor taking a url is taken.
     QMap<QByteArray, QByteArray> _extraHeaders;
 
@@ -275,8 +266,7 @@ private:
  * @brief The CheckServerJob class
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT CheckServerJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT CheckServerJob : public AbstractNetworkJob {
 public:
     explicit CheckServerJob(AccountPtr account, QObject *parent = nullptr);
     void start() override;
@@ -331,8 +321,7 @@ private:
 /**
  * @brief The RequestEtagJob class
  */
-class OWNCLOUDSYNC_EXPORT RequestEtagJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT RequestEtagJob : public AbstractNetworkJob {
 public:
     explicit RequestEtagJob(AccountPtr account, const QString &path, QObject *parent = nullptr);
     void start() override;
@@ -360,8 +349,7 @@ private slots:
  *
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT JsonApiJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT JsonApiJob : public AbstractNetworkJob {
 public:
     enum class Verb {
         Get,
@@ -431,8 +419,7 @@ private:
  * @brief Checks with auth type to use for a server
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT DetermineAuthTypeJob : public QObject
-{
+class OWNCLOUDSYNC_EXPORT DetermineAuthTypeJob : public QObject {
 public:
     enum AuthType {
         NoAuthType, // used only before we got a chance to probe the server
@@ -468,8 +455,7 @@ private:
  *
  * Primarily adds timeout and redirection handling.
  */
-class OWNCLOUDSYNC_EXPORT SimpleNetworkJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT SimpleNetworkJob : public AbstractNetworkJob {
 public:
     explicit SimpleNetworkJob(AccountPtr account, QObject *parent = nullptr);
 

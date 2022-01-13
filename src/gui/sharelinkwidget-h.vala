@@ -45,8 +45,7 @@ class ElidedLabel;
  * @brief The ShareDialog class
  * @ingroup gui
  */
-class ShareLinkWidget : public QWidget
-{
+class ShareLinkWidget : public QWidget {
 
 public:
     explicit ShareLinkWidget(AccountPtr account,
@@ -73,7 +72,7 @@ public slots:
 
 private slots:
     void slotCreateShareLink(const bool clicked);
-    void slotCopyLinkShare(const bool clicked) const;    
+    void slotCopyLinkShare(const bool clicked) const;
 
     void slotCreatePassword();
     void slotPasswordSet();
@@ -90,7 +89,7 @@ private slots:
 
     void slotDeleteAnimationFinished();
     void slotAnimationFinished();
-    
+
     void slotCreateLabel();
     void slotLabelSet();
 
@@ -104,7 +103,7 @@ signals:
 
 private:
     void displayError(const QString &errMsg);
-    
+
     void togglePasswordOptions(const bool enable = true);
     void toggleNoteOptions(const bool enable = true);
     void toggleExpireDateOptions(const bool enable = true);
@@ -119,7 +118,7 @@ private:
     void startAnimation(const int start, const int end);
 
     void customizeStyle();
-    
+
     void displayShareLinkLabel();
 
     Ui::ShareLinkWidget *_ui;

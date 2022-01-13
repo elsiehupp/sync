@@ -46,8 +46,7 @@ enum class ShareDialogStartPage {
  * @brief The ownCloudGui class
  * @ingroup gui
  */
-class ownCloudGui : public QObject
-{
+class ownCloudGui : public QObject {
 public:
     explicit ownCloudGui(Application *parent = nullptr);
 

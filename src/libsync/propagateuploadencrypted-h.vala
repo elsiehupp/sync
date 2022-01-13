@@ -28,8 +28,7 @@ class FolderMetadata;
  *
  */
 
-class PropagateUploadEncrypted : public QObject
-{
+class PropagateUploadEncrypted : public QObject {
   Q_OBJECT
 public:
     PropagateUploadEncrypted(OwncloudPropagator *propagator, const QString &remoteParentPath, SyncFileItemPtr item, QObject *parent = nullptr);

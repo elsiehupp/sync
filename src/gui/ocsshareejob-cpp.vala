@@ -19,8 +19,7 @@
 namespace OCC {
 
 OcsShareeJob::OcsShareeJob(AccountPtr account)
-    : OcsJob(account)
-{
+    : OcsJob(account) {
     setPath("ocs/v2.php/apps/files_sharing/api/v1/sharees");
     connect(this, &OcsJob::jobFinished, this, &OcsShareeJob::jobDone);
 }
@@ -29,8 +28,7 @@ void OcsShareeJob::getSharees(const QString &search,
     const QString &itemType,
     int page,
     int perPage,
-    bool lookup)
-{
+    bool lookup) {
     setVerb("GET");
 
     addParam(QString::fromLatin1("search"), search);
@@ -42,8 +40,7 @@ void OcsShareeJob::getSharees(const QString &search,
     start();
 }
 
-void OcsShareeJob::jobDone(const QJsonDocument &reply)
-{
+void OcsShareeJob::jobDone(const QJsonDocument &reply) {
     emit shareeJobFinished(reply);
 }
 }

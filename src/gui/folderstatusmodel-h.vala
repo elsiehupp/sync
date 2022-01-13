@@ -33,8 +33,7 @@ class LsColJob;
  * @brief The FolderStatusModel class
  * @ingroup gui
  */
-class FolderStatusModel : public QAbstractItemModel
-{
+class FolderStatusModel : public QAbstractItemModel {
 public:
     enum {FileIdRole = Qt::UserRole+1};
 
@@ -54,8 +53,7 @@ public:
     void resetAndFetch(const QModelIndex &parent);
     bool hasChildren(const QModelIndex &parent = QModelIndex()) const override;
 
-    struct SubFolderInfo
-    {
+    struct SubFolderInfo {
         Folder *_folder = nullptr;
         QString _name; // Folder name to be displayed in the UI
         QString _path; // Sub-folder path that should always point to a local filesystem's folder
@@ -83,9 +81,7 @@ public:
         // Reset all subfolders and fetch status
         void resetSubs(FolderStatusModel *model, QModelIndex index);
 
-        struct Progress
-        {
-            bool isNull() const
+        struct Progress { {ool isNull() const
             {
                 return _progressString.isEmpty() && _warningCount == 0 && _overallSyncString.isEmpty();
             }

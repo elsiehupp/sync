@@ -30,8 +30,7 @@ namespace Ui {
 }
 
 
-class InvalidFilenameDialog : public QDialog
-{
+class InvalidFilenameDialog : public QDialog {
 
 public:
     explicit InvalidFilenameDialog(AccountPtr account, Folder *folder, QString filePath, QWidget *parent = nullptr);

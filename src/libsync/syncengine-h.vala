@@ -53,8 +53,7 @@ enum AnotherSyncNeeded {
  * @brief The SyncEngine class
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT SyncEngine : public QObject
-{
+class OWNCLOUDSYNC_EXPORT SyncEngine : public QObject {
 public:
     SyncEngine(AccountPtr account, const QString &localPath,
         const QString &remotePath, SyncJournalDb *journal);

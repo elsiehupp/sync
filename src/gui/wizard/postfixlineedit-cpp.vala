@@ -23,12 +23,10 @@ const int horizontalMargin(4);
 const int verticalMargin(4);
 
 PostfixLineEdit::PostfixLineEdit(QWidget *parent)
-    : QLineEdit(parent)
-{
+    : QLineEdit(parent) {
 }
 
-void PostfixLineEdit::setPostfix(const QString &postfix)
-{
+void PostfixLineEdit::setPostfix(const QString &postfix) {
     _postfix = postfix;
     QFontMetricsF fm(font());
     QMargins tm = textMargins();
@@ -36,18 +34,15 @@ void PostfixLineEdit::setPostfix(const QString &postfix)
     setTextMargins(tm);
 }
 
-QString PostfixLineEdit::postfix() const
-{
+QString PostfixLineEdit::postfix() const {
     return _postfix;
 }
 
-QString PostfixLineEdit::fullText() const
-{
+QString PostfixLineEdit::fullText() const {
     return text() + _postfix;
 }
 
-void PostfixLineEdit::setFullText(const QString &text)
-{
+void PostfixLineEdit::setFullText(const QString &text) {
     QString prefixString = text;
     if (prefixString.endsWith(postfix())) {
         prefixString.chop(postfix().length());
@@ -55,8 +50,7 @@ void PostfixLineEdit::setFullText(const QString &text)
     setText(prefixString);
 }
 
-void PostfixLineEdit::paintEvent(QPaintEvent *pe)
-{
+void PostfixLineEdit::paintEvent(QPaintEvent *pe) {
     QLineEdit::paintEvent(pe);
     QPainter p(this);
 

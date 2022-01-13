@@ -40,8 +40,7 @@
 
 namespace {
 
-QUrl imagePathToUrl(const QString &imagePath)
-{
+QUrl imagePathToUrl(const QString &imagePath) {
     if (imagePath.startsWith(':')) {
         auto url = QUrl();
         url.setScheme(QStringLiteral("qrc"));
@@ -52,8 +51,7 @@ QUrl imagePathToUrl(const QString &imagePath)
     }
 }
 
-bool shouldPreferSvg()
-{
+bool shouldPreferSvg() {
     return QByteArray(APPLICATION_ICON_SET).toUpper() == QByteArrayLiteral("SVG");
 }
 
@@ -63,8 +61,7 @@ namespace OCC {
 
 Theme *Theme::_instance = nullptr;
 
-Theme *Theme::instance()
-{
+Theme *Theme::instance() {
     if (!_instance) {
         _instance = new THEME_CLASS;
         // some themes may not call the base ctor
@@ -75,8 +72,7 @@ Theme *Theme::instance()
 
 Theme::~Theme() = default;
 
-QString Theme::statusHeaderText(SyncResult::Status status) const
-{
+QString Theme::statusHeaderText(SyncResult::Status status) const {
     QString resultStr;
 
     switch (status) {
@@ -114,95 +110,77 @@ QString Theme::statusHeaderText(SyncResult::Status status) const
     return resultStr;
 }
 
-bool Theme::isBranded() const
-{
+bool Theme::isBranded() const {
     return appNameGUI() != QStringLiteral("Nextcloud");
 }
 
-QString Theme::appNameGUI() const
-{
+QString Theme::appNameGUI() const {
     return APPLICATION_NAME;
 }
 
-QString Theme::appName() const
-{
+QString Theme::appName() const {
     return APPLICATION_SHORTNAME;
 }
 
-QUrl Theme::stateOnlineImageSource() const
-{
+QUrl Theme::stateOnlineImageSource() const {
     return imagePathToUrl(themeImagePath("state-ok"));
 }
 
-QUrl Theme::stateOfflineImageSource() const
-{
+QUrl Theme::stateOfflineImageSource() const {
     return imagePathToUrl(themeImagePath("state-offline", 16));
 }
 
-QUrl Theme::statusOnlineImageSource() const
-{
+QUrl Theme::statusOnlineImageSource() const {
     return imagePathToUrl(themeImagePath("user-status-online", 16));
 }
 
-QUrl Theme::statusDoNotDisturbImageSource() const
-{
+QUrl Theme::statusDoNotDisturbImageSource() const {
     return imagePathToUrl(themeImagePath("user-status-dnd", 16));
 }
 
-QUrl Theme::statusAwayImageSource() const
-{
+QUrl Theme::statusAwayImageSource() const {
     return imagePathToUrl(themeImagePath("user-status-away", 16));
 }
 
-QUrl Theme::statusInvisibleImageSource() const
-{
+QUrl Theme::statusInvisibleImageSource() const {
     return imagePathToUrl(themeImagePath("user-status-invisible", 64));
 }
 
-QUrl Theme::syncStatusOk() const
-{
+QUrl Theme::syncStatusOk() const {
     return imagePathToUrl(themeImagePath("state-ok", 16));
 }
 
-QUrl Theme::syncStatusError() const
-{
+QUrl Theme::syncStatusError() const {
     return imagePathToUrl(themeImagePath("state-error", 16));
 }
 
-QUrl Theme::syncStatusRunning() const
-{
+QUrl Theme::syncStatusRunning() const {
     return imagePathToUrl(themeImagePath("state-sync", 16));
 }
 
-QUrl Theme::syncStatusPause() const
-{
+QUrl Theme::syncStatusPause() const {
     return imagePathToUrl(themeImagePath("state-pause", 16));
 }
 
-QUrl Theme::syncStatusWarning() const
-{
+QUrl Theme::syncStatusWarning() const {
     return imagePathToUrl(themeImagePath("state-warning", 16));
 }
 
-QUrl Theme::folderOffline() const
-{
+QUrl Theme::folderOffline() const {
     return imagePathToUrl(themeImagePath("state-offline"));
 }
 
-QString Theme::version() const
-{
+QString Theme::version() const {
     return MIRALL_VERSION_STRING;
 }
 
-QString Theme::configFileName() const
-{
+QString Theme::configFileName() const {
     return QStringLiteral(APPLICATION_EXECUTABLE ".cfg");
 }
 
 #ifndef TOKEN_AUTH_ONLY
 
-QIcon Theme::applicationIcon() const
-{
+QIcon Theme::applicationIcon() const {
     return themeIcon(QStringLiteral(APPLICATION_ICON_NAME "-icon"));
 }
 
@@ -210,8 +188,7 @@ QIcon Theme::applicationIcon() const
  * helper to load a icon from either the icon theme the desktop provides or from
  * the apps Qt resources.
  */
-QIcon Theme::themeIcon(const QString &name, bool sysTray) const
-{
+QIcon Theme::themeIcon(const QString &name, bool sysTray) const {
     QString flavor;
     if (sysTray) {
         flavor = systrayIconFlavor(_mono);
@@ -272,8 +249,7 @@ QIcon Theme::themeIcon(const QString &name, bool sysTray) const
     return cached;
 }
 
-QString Theme::themeImagePath(const QString &name, int size, bool sysTray) const
-{
+QString Theme::themeImagePath(const QString &name, int size, bool sysTray) const {
     const auto flavor = (!isBranded() && sysTray) ? systrayIconFlavor(_mono) : QLatin1String("colored");
     const auto useSvg = shouldPreferSvg();
 
@@ -296,21 +272,18 @@ QString Theme::themeImagePath(const QString &name, int size, bool sysTray) const
     }
 }
 
-bool Theme::isHidpi(QPaintDevice *dev)
-{
+bool Theme::isHidpi(QPaintDevice *dev) {
     const auto devicePixelRatio = dev ? dev->devicePixelRatio() : qApp->primaryScreen()->devicePixelRatio();
     return devicePixelRatio > 1;
 }
 
-QIcon Theme::uiThemeIcon(const QString &iconName, bool uiHasDarkBg) const
-{
+QIcon Theme::uiThemeIcon(const QString &iconName, bool uiHasDarkBg) const {
     QString iconPath = QString(Theme::themePrefix) + (uiHasDarkBg ? "white/" : "black/") + iconName;
     std::string icnPath = iconPath.toUtf8().constData();
     return QIcon(QPixmap(iconPath));
 }
 
-QString Theme::hidpiFileName(const QString &fileName, QPaintDevice *dev)
-{
+QString Theme::hidpiFileName(const QString &fileName, QPaintDevice *dev) {
     if (!Theme::isHidpi(dev)) {
         return fileName;
     }
@@ -328,8 +301,7 @@ QString Theme::hidpiFileName(const QString &fileName, QPaintDevice *dev)
     return fileName;
 }
 
-QString Theme::hidpiFileName(const QString &iconName, const QColor &backgroundColor, QPaintDevice *dev)
-{
+QString Theme::hidpiFileName(const QString &iconName, const QColor &backgroundColor, QPaintDevice *dev) {
     const auto isDarkBackground = Theme::isDarkColor(backgroundColor);
 
     const QString iconPath = QString(Theme::themePrefix) + (isDarkBackground ? "white/" : "black/") + iconName;
@@ -341,29 +313,24 @@ QString Theme::hidpiFileName(const QString &iconName, const QColor &backgroundCo
 #endif
 
 Theme::Theme()
-    : QObject(nullptr)
-{
+    : QObject(nullptr) {
 }
 
 // If this option returns true, the client only supports one folder to sync.
 // The Add-Button is removed accordingly.
-bool Theme::singleSyncFolder() const
-{
+bool Theme::singleSyncFolder() const {
     return false;
 }
 
-bool Theme::multiAccount() const
-{
+bool Theme::multiAccount() const {
     return true;
 }
 
-QString Theme::defaultServerFolder() const
-{
+QString Theme::defaultServerFolder() const {
     return QLatin1String("/");
 }
 
-QString Theme::helpUrl() const
-{
+QString Theme::helpUrl() const {
 #ifdef APPLICATION_HELP_URL
     return QString::fromLatin1(APPLICATION_HELP_URL);
 #else
@@ -371,8 +338,7 @@ QString Theme::helpUrl() const
 #endif
 }
 
-QString Theme::conflictHelpUrl() const
-{
+QString Theme::conflictHelpUrl() const {
     auto baseUrl = helpUrl();
     if (baseUrl.isEmpty())
         return QString();
@@ -381,8 +347,7 @@ QString Theme::conflictHelpUrl() const
     return baseUrl + QStringLiteral("conflicts.html");
 }
 
-QString Theme::overrideServerUrl() const
-{
+QString Theme::overrideServerUrl() const {
 #ifdef APPLICATION_SERVER_URL
     return QString::fromLatin1(APPLICATION_SERVER_URL);
 #else
@@ -390,8 +355,7 @@ QString Theme::overrideServerUrl() const
 #endif
 }
 
-bool Theme::forceOverrideServerUrl() const
-{
+bool Theme::forceOverrideServerUrl() const {
 #ifdef APPLICATION_SERVER_URL_ENFORCE
     return true;
 #else
@@ -399,8 +363,7 @@ bool Theme::forceOverrideServerUrl() const
 #endif
 }
 
-bool Theme::enableStaplingOCSP() const
-{
+bool Theme::enableStaplingOCSP() const {
 #ifdef APPLICATION_OCSP_STAPLING_ENABLED
     return true;
 #else
@@ -408,8 +371,7 @@ bool Theme::enableStaplingOCSP() const
 #endif
 }
 
-bool Theme::forbidBadSSL() const
-{
+bool Theme::forbidBadSSL() const {
 #ifdef APPLICATION_FORBID_BAD_SSL
     return true;
 #else
@@ -417,19 +379,16 @@ bool Theme::forbidBadSSL() const
 #endif
 }
 
-QString Theme::forceConfigAuthType() const
-{
+QString Theme::forceConfigAuthType() const {
     return QString();
 }
 
 
-QString Theme::defaultClientFolder() const
-{
+QString Theme::defaultClientFolder() const {
     return appName();
 }
 
-QString Theme::systrayIconFlavor(bool mono) const
-{
+QString Theme::systrayIconFlavor(bool mono) const {
     QString flavor;
     if (mono) {
         flavor = Utility::hasDarkSystray() ? QLatin1String("white") : QLatin1String("black");
@@ -439,46 +398,38 @@ QString Theme::systrayIconFlavor(bool mono) const
     return flavor;
 }
 
-void Theme::setSystrayUseMonoIcons(bool mono)
-{
+void Theme::setSystrayUseMonoIcons(bool mono) {
     _mono = mono;
     emit systrayUseMonoIconsChanged(mono);
 }
 
-bool Theme::systrayUseMonoIcons() const
-{
+bool Theme::systrayUseMonoIcons() const {
     return _mono;
 }
 
-bool Theme::monoIconsAvailable() const
-{
+bool Theme::monoIconsAvailable() const {
     QString themeDir = QString(Theme::themePrefix) + QString::fromLatin1("%1/").arg(Theme::instance()->systrayIconFlavor(true));
     return QDir(themeDir).exists();
 }
 
-QString Theme::updateCheckUrl() const
-{
+QString Theme::updateCheckUrl() const {
     return APPLICATION_UPDATE_URL;
 }
 
-qint64 Theme::newBigFolderSizeLimit() const
-{
+qint64 Theme::newBigFolderSizeLimit() const {
     // Default to 500MB
     return 500;
 }
 
-bool Theme::wizardHideExternalStorageConfirmationCheckbox() const
-{
+bool Theme::wizardHideExternalStorageConfirmationCheckbox() const {
     return false;
 }
 
-bool Theme::wizardHideFolderSizeLimitCheckbox() const
-{
+bool Theme::wizardHideFolderSizeLimitCheckbox() const {
     return false;
 }
 
-QString Theme::gitSHA1() const
-{
+QString Theme::gitSHA1() const {
     QString devString;
 #ifdef GIT_SHA1
     const QString githubPrefix(QLatin1String(
@@ -497,8 +448,7 @@ QString Theme::gitSHA1() const
     return devString;
 }
 
-QString Theme::about() const
-{
+QString Theme::about() const {
     // Shorten Qt's OS name: "macOS Mojave (10.14)" -> "macOS"
     QStringList osStringList = Utility::platformName().split(QLatin1Char(' '));
     QString osName = osStringList.at(0);
@@ -520,8 +470,7 @@ QString Theme::about() const
     return devString;
 }
 
-QString Theme::aboutDetails() const
-{
+QString Theme::aboutDetails() const {
     QString devString;
     devString = tr("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
               .arg(MIRALL_VERSION_STRING)
@@ -536,8 +485,7 @@ QString Theme::aboutDetails() const
 }
 
 #ifndef TOKEN_AUTH_ONLY
-QVariant Theme::customMedia(CustomMediaType type)
-{
+QVariant Theme::customMedia(CustomMediaType type) {
     QVariant re;
     QString key;
 
@@ -569,8 +517,7 @@ QVariant Theme::customMedia(CustomMediaType type)
     return re;
 }
 
-QIcon Theme::syncStateIcon(SyncResult::Status status, bool sysTray) const
-{
+QIcon Theme::syncStateIcon(SyncResult::Status status, bool sysTray) const {
     // FIXME: Mind the size!
     QString statusIcon;
 
@@ -604,28 +551,23 @@ QIcon Theme::syncStateIcon(SyncResult::Status status, bool sysTray) const
     return themeIcon(statusIcon, sysTray);
 }
 
-QIcon Theme::folderDisabledIcon() const
-{
+QIcon Theme::folderDisabledIcon() const {
     return themeIcon(QLatin1String("state-pause"));
 }
 
-QIcon Theme::folderOfflineIcon(bool sysTray) const
-{
+QIcon Theme::folderOfflineIcon(bool sysTray) const {
     return themeIcon(QLatin1String("state-offline"), sysTray);
 }
 
-QColor Theme::wizardHeaderTitleColor() const
-{
+QColor Theme::wizardHeaderTitleColor() const {
     return {APPLICATION_WIZARD_HEADER_TITLE_COLOR};
 }
 
-QColor Theme::wizardHeaderBackgroundColor() const
-{
+QColor Theme::wizardHeaderBackgroundColor() const {
     return {APPLICATION_WIZARD_HEADER_BACKGROUND_COLOR};
 }
 
-QPixmap Theme::wizardApplicationLogo() const
-{
+QPixmap Theme::wizardApplicationLogo() const {
     if (!Theme::isBranded()) {
         return QPixmap(Theme::hidpiFileName(QString(Theme::themePrefix) + "colored/wizard-nextcloud.png"));
     }
@@ -647,8 +589,7 @@ QPixmap Theme::wizardApplicationLogo() const
 #endif
 }
 
-QPixmap Theme::wizardHeaderLogo() const
-{
+QPixmap Theme::wizardHeaderLogo() const {
 #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
     const auto useSvg = shouldPreferSvg();
     const QString logoBasePath = QString(Theme::themePrefix) + QStringLiteral("colored/wizard_logo");
@@ -666,8 +607,7 @@ QPixmap Theme::wizardHeaderLogo() const
 #endif
 }
 
-QPixmap Theme::wizardHeaderBanner() const
-{
+QPixmap Theme::wizardHeaderBanner() const {
     QColor c = wizardHeaderBackgroundColor();
     if (!c.isValid())
         return QPixmap();
@@ -686,69 +626,56 @@ QPixmap Theme::wizardHeaderBanner() const
 }
 #endif
 
-bool Theme::wizardSelectiveSyncDefaultNothing() const
-{
+bool Theme::wizardSelectiveSyncDefaultNothing() const {
     return false;
 }
 
-bool Theme::linkSharing() const
-{
+bool Theme::linkSharing() const {
     return true;
 }
 
-bool Theme::userGroupSharing() const
-{
+bool Theme::userGroupSharing() const {
     return true;
 }
 
-bool Theme::forceSystemNetworkProxy() const
-{
+bool Theme::forceSystemNetworkProxy() const {
     return false;
 }
 
-Theme::UserIDType Theme::userIDType() const
-{
+Theme::UserIDType Theme::userIDType() const {
     return UserIDType::UserIDUserName;
 }
 
-QString Theme::customUserID() const
-{
+QString Theme::customUserID() const {
     return QString();
 }
 
-QString Theme::userIDHint() const
-{
+QString Theme::userIDHint() const {
     return QString();
 }
 
 
-QString Theme::wizardUrlPostfix() const
-{
+QString Theme::wizardUrlPostfix() const {
     return QString();
 }
 
-QString Theme::wizardUrlHint() const
-{
+QString Theme::wizardUrlHint() const {
     return QString();
 }
 
-QString Theme::quotaBaseFolder() const
-{
+QString Theme::quotaBaseFolder() const {
     return QLatin1String("/");
 }
 
-QString Theme::oauthClientId() const
-{
+QString Theme::oauthClientId() const {
     return "xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69";
 }
 
-QString Theme::oauthClientSecret() const
-{
+QString Theme::oauthClientSecret() const {
     return "UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh";
 }
 
-QString Theme::versionSwitchOutput() const
-{
+QString Theme::versionSwitchOutput() const {
     QString helpText;
     QTextStream stream(&helpText);
     stream << appName()
@@ -767,40 +694,33 @@ QString Theme::versionSwitchOutput() const
     return helpText;
 }
 
-bool Theme::isDarkColor(const QColor &color)
-{
+bool Theme::isDarkColor(const QColor &color) {
     // account for different sensitivity of the human eye to certain colors
     double treshold = 1.0 - (0.299 * color.red() + 0.587 * color.green() + 0.114 * color.blue()) / 255.0;
     return treshold > 0.5;
 }
 
-QColor Theme::getBackgroundAwareLinkColor(const QColor &backgroundColor)
-{
+QColor Theme::getBackgroundAwareLinkColor(const QColor &backgroundColor) {
     return {(isDarkColor(backgroundColor) ? QColor("#6193dc") : QGuiApplication::palette().color(QPalette::Link))};
 }
 
-QColor Theme::getBackgroundAwareLinkColor()
-{
+QColor Theme::getBackgroundAwareLinkColor() {
     return getBackgroundAwareLinkColor(QGuiApplication::palette().base().color());
 }
 
-void Theme::replaceLinkColorStringBackgroundAware(QString &linkString, const QColor &backgroundColor)
-{
+void Theme::replaceLinkColorStringBackgroundAware(QString &linkString, const QColor &backgroundColor) {
     replaceLinkColorString(linkString, getBackgroundAwareLinkColor(backgroundColor));
 }
 
-void Theme::replaceLinkColorStringBackgroundAware(QString &linkString)
-{
+void Theme::replaceLinkColorStringBackgroundAware(QString &linkString) {
     replaceLinkColorStringBackgroundAware(linkString, QGuiApplication::palette().color(QPalette::Base));
 }
 
-void Theme::replaceLinkColorString(QString &linkString, const QColor &newColor)
-{
+void Theme::replaceLinkColorString(QString &linkString, const QColor &newColor) {
     linkString.replace(QRegularExpression("(<a href|<a style='color:#([a-zA-Z0-9]{6});' href)"), QString::fromLatin1("<a style='color:%1;' href").arg(newColor.name()));
 }
 
-QIcon Theme::createColorAwareIcon(const QString &name, const QPalette &palette)
-{
+QIcon Theme::createColorAwareIcon(const QString &name, const QPalette &palette) {
     QSvgRenderer renderer(name);
     QImage img(64, 64, QImage::Format_ARGB32);
     img.fill(Qt::GlobalColor::transparent);
@@ -828,13 +748,11 @@ QIcon Theme::createColorAwareIcon(const QString &name, const QPalette &palette)
     return icon;
 }
 
-QIcon Theme::createColorAwareIcon(const QString &name)
-{
+QIcon Theme::createColorAwareIcon(const QString &name) {
     return createColorAwareIcon(name, QGuiApplication::palette());
 }
 
-QPixmap Theme::createColorAwarePixmap(const QString &name, const QPalette &palette)
-{
+QPixmap Theme::createColorAwarePixmap(const QString &name, const QPalette &palette) {
     QImage img(name);
     QImage inverted(img);
     inverted.invertPixels(QImage::InvertRgb);
@@ -848,35 +766,29 @@ QPixmap Theme::createColorAwarePixmap(const QString &name, const QPalette &palet
     return pixmap;
 }
 
-QPixmap Theme::createColorAwarePixmap(const QString &name)
-{
+QPixmap Theme::createColorAwarePixmap(const QString &name) {
     return createColorAwarePixmap(name, QGuiApplication::palette());
 }
 
-bool Theme::showVirtualFilesOption() const
-{
+bool Theme::showVirtualFilesOption() const {
     const auto vfsMode = bestAvailableVfsMode();
     return ConfigFile().showExperimentalOptions() || vfsMode == Vfs::WindowsCfApi;
 }
 
-bool Theme::enforceVirtualFilesSyncFolder() const
-{
+bool Theme::enforceVirtualFilesSyncFolder() const {
     const auto vfsMode = bestAvailableVfsMode();
     return ENFORCE_VIRTUAL_FILES_SYNC_FOLDER && vfsMode != OCC::Vfs::Off;
 }
 
-QColor Theme::errorBoxTextColor() const
-{
+QColor Theme::errorBoxTextColor() const {
     return QColor{"white"};
 }
 
-QColor Theme::errorBoxBackgroundColor() const
-{
+QColor Theme::errorBoxBackgroundColor() const {
     return QColor{"red"};
 }
 
-QColor Theme::errorBoxBorderColor() const
-{ 
+QColor Theme::errorBoxBorderColor() const {
     return QColor{"black"};
 }
 

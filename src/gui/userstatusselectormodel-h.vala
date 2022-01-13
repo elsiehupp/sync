@@ -29,8 +29,7 @@
 
 namespace OCC {
 
-class UserStatusSelectorModel : public QObject
-{
+class UserStatusSelectorModel : public QObject {
 
     Q_PROPERTY(QString userStatusMessage READ userStatusMessage NOTIFY userStatusChanged)
     Q_PROPERTY(QString userStatusEmoji READ userStatusEmoji WRITE setUserStatusEmoji NOTIFY userStatusChanged)

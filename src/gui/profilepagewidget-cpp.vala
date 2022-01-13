@@ -6,8 +6,7 @@ namespace OCC {
 
 ProfilePageMenu::ProfilePageMenu(AccountPtr account, const QString &shareWithUserId, QWidget *parent)
     : QWidget(parent)
-    , _profileConnector(account)
-{
+    , _profileConnector(account) {
     connect(&_profileConnector, &OcsProfileConnector::hovercardFetched, this, &ProfilePageMenu::onHovercardFetched);
     connect(&_profileConnector, &OcsProfileConnector::iconLoaded, this, &ProfilePageMenu::onIconLoaded);
     _profileConnector.fetchHovercard(shareWithUserId);
@@ -15,13 +14,11 @@ ProfilePageMenu::ProfilePageMenu(AccountPtr account, const QString &shareWithUse
 
 ProfilePageMenu::~ProfilePageMenu() = default;
 
-void ProfilePageMenu::exec(const QPoint &globalPosition)
-{
+void ProfilePageMenu::exec(const QPoint &globalPosition) {
     _menu.exec(globalPosition);
 }
 
-void ProfilePageMenu::onHovercardFetched()
-{
+void ProfilePageMenu::onHovercardFetched() {
     _menu.clear();
 
     const auto hovercardActions = _profileConnector.hovercard()._actions;
@@ -32,8 +29,7 @@ void ProfilePageMenu::onHovercardFetched()
     }
 }
 
-void ProfilePageMenu::onIconLoaded(const std::size_t &hovercardActionIndex)
-{
+void ProfilePageMenu::onIconLoaded(const std::size_t &hovercardActionIndex) {
     const auto hovercardActions = _profileConnector.hovercard()._actions;
     const auto menuActions = _menu.actions();
     if (hovercardActionIndex >= hovercardActions.size()

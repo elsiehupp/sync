@@ -14,8 +14,7 @@
 
 // #include <QTcpServer>
 
-class HttpServer : public QTcpServer
- {
+class HttpServer : public QTcpServer {
      Q_OBJECT
  public:
     HttpServer(qint16 port, QObject* parent = nullptr);

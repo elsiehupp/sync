@@ -25,8 +25,7 @@ namespace OCC {
  * Useful e.g. for setting a fixed domain name.
  */
 
-class PostfixLineEdit : public QLineEdit
-{
+class PostfixLineEdit : public QLineEdit {
 public:
     PostfixLineEdit(QWidget *parent);
 

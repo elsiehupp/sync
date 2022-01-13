@@ -29,8 +29,7 @@ namespace OCC {
 Q_LOGGING_CATEGORY(lcSsl, "nextcloud.gui.ssl", QtInfoMsg)
 
 SslButton::SslButton(QWidget *parent)
-    : QToolButton(parent)
-{
+    : QToolButton(parent) {
     setPopupMode(QToolButton::InstantPopup);
     setAutoRaise(true);
 
@@ -40,8 +39,7 @@ SslButton::SslButton(QWidget *parent)
     setMenu(_menu);
 }
 
-static QString addCertDetailsField(const QString &key, const QString &value)
-{
+static QString addCertDetailsField(const QString &key, const QString &value) {
     if (value.isEmpty())
         return QString();
 
@@ -52,15 +50,13 @@ static QString addCertDetailsField(const QString &key, const QString &value)
 
 
 // necessary indication only, not sufficient for primary validation!
-static bool isSelfSigned(const QSslCertificate &certificate)
-{
+static bool isSelfSigned(const QSslCertificate &certificate) {
     return certificate.issuerInfo(QSslCertificate::CommonName) == certificate.subjectInfo(QSslCertificate::CommonName)
         && certificate.issuerInfo(QSslCertificate::OrganizationalUnitName) == certificate.subjectInfo(QSslCertificate::OrganizationalUnitName);
 }
 
 QMenu *SslButton::buildCertMenu(QMenu *parent, const QSslCertificate &cert,
-    const QList<QSslCertificate> &userApproved, int pos, const QList<QSslCertificate> &systemCaCertificates)
-{
+    const QList<QSslCertificate> &userApproved, int pos, const QList<QSslCertificate> &systemCaCertificates) {
     QString cn = QStringList(cert.subjectInfo(QSslCertificate::CommonName)).join(QChar(';'));
     QString ou = QStringList(cert.subjectInfo(QSslCertificate::OrganizationalUnitName)).join(QChar(';'));
     QString org = QStringList(cert.subjectInfo(QSslCertificate::Organization)).join(QChar(';'));
@@ -157,8 +153,7 @@ QMenu *SslButton::buildCertMenu(QMenu *parent, const QSslCertificate &cert,
     return menu;
 }
 
-void SslButton::updateAccountState(AccountState *accountState)
-{
+void SslButton::updateAccountState(AccountState *accountState) {
     if (!accountState || !accountState->isConnected()) {
         setVisible(false);
         return;
@@ -178,8 +173,7 @@ void SslButton::updateAccountState(AccountState *accountState)
     }
 }
 
-void SslButton::slotUpdateMenu()
-{
+void SslButton::slotUpdateMenu() {
     _menu->clear();
 
     if (!_accountState) {

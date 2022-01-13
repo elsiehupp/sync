@@ -19,18 +19,15 @@
 
 namespace OCC {
 
-bool operator<(const Activity &rhs, const Activity &lhs)
-{
+bool operator<(const Activity &rhs, const Activity &lhs) {
     return rhs._dateTime > lhs._dateTime;
 }
 
-bool operator==(const Activity &rhs, const Activity &lhs)
-{
+bool operator==(const Activity &rhs, const Activity &lhs) {
     return (rhs._type == lhs._type && rhs._id == lhs._id && rhs._accName == lhs._accName);
 }
 
-Activity::Identifier Activity::ident() const
-{
+Activity::Identifier Activity::ident() const {
     return Identifier(_id, _accName);
 }
 }

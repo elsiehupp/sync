@@ -37,8 +37,7 @@ namespace OCC {
 // ==============================================================================
 
 LogBrowser::LogBrowser(QWidget *parent)
-    : QDialog(parent)
-{
+    : QDialog(parent) {
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     setObjectName("LogBrowser"); // for save/restoreGeometry()
     setWindowTitle(tr("Log Output"));
@@ -104,14 +103,12 @@ LogBrowser::LogBrowser(QWidget *parent)
 
 LogBrowser::~LogBrowser() = default;
 
-void LogBrowser::closeEvent(QCloseEvent *)
-{
+void LogBrowser::closeEvent(QCloseEvent *) {
     ConfigFile cfg;
     cfg.saveGeometry(this);
 }
 
-void LogBrowser::togglePermanentLogging(bool enabled)
-{
+void LogBrowser::togglePermanentLogging(bool enabled) {
     ConfigFile().setAutomaticLogDir(enabled);
 
     auto logger = Logger::instance();

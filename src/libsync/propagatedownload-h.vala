@@ -28,8 +28,7 @@ class PropagateDownloadEncrypted;
  * @brief The GETFileJob class
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT GETFileJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT GETFileJob : public AbstractNetworkJob {
     QIODevice *_device;
     QMap<QByteArray, QByteArray> _headers;
     QString _errorString;
@@ -61,16 +60,14 @@ public:
     explicit GETFileJob(AccountPtr account, const QUrl &url, QIODevice *device,
         const QMap<QByteArray, QByteArray> &headers, const QByteArray &expectedEtagForResume,
         qint64 resumeStart, QObject *parent = nullptr);
-    ~GETFileJob() override
-    {
+    ~GETFileJob() override {
         if (_bandwidthManager) {
             _bandwidthManager->unregisterDownloadJob(this);
         }
     }
 
     void start() override;
-    bool finished() override
-    {
+    bool finished() override {
         if (_saveBodyToFile && reply()->bytesAvailable()) {
             return false;
         } else {
@@ -126,8 +123,7 @@ private slots:
  * @brief The GETEncryptedFileJob class that provides file decryption on the fly while the download is running
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT GETEncryptedFileJob : public GETFileJob
-{
+class OWNCLOUDSYNC_EXPORT GETEncryptedFileJob : public GETFileJob {
 
 public:
     // DOES NOT take ownership of the device.
@@ -187,15 +183,13 @@ private:
 
 \endcode
  */
-class PropagateDownloadFile : public PropagateItemJob
-{
+class PropagateDownloadFile : public PropagateItemJob {
 public:
     PropagateDownloadFile(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
         : PropagateItemJob(propagator, item)
         , _resumeStart(0)
         , _downloadProgress(0)
-        , _deleteExisting(false)
-    {
+        , _deleteExisting(false) {
     }
     void start() override;
     qint64 committedDiskSpace() const override;

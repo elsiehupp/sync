@@ -18,8 +18,7 @@ class WheelHandler;
 /**
  * Describes the mouse wheel event
  */
-class KirigamiWheelEvent : public QObject
-{
+class KirigamiWheelEvent : public QObject {
 
     /**
      * x: real
@@ -131,8 +130,7 @@ private:
     bool m_accepted = false;
 };
 
-class GlobalWheelFilter : public QObject
-{
+class GlobalWheelFilter : public QObject {
 
 public:
     GlobalWheelFilter(QObject *parent = nullptr);
@@ -159,8 +157,7 @@ private:
  * This class intercepts the mouse wheel events of its target, and gives them to the user code as a signal, which can be used for custom mouse wheel management code.
  * The handler can block completely the wheel events from its target, and if it's a Flickable, it can automatically handle scrolling on it
  */
-class WheelHandler : public QObject
-{
+class WheelHandler : public QObject {
 
     /**
      * target: Item

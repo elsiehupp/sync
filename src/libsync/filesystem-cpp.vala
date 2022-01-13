@@ -27,8 +27,7 @@
 
 namespace OCC {
 
-bool FileSystem::fileEquals(const QString &fn1, const QString &fn2)
-{
+bool FileSystem::fileEquals(const QString &fn1, const QString &fn2) {
     // compare two files with given filename and return true if they have the same content
     QFile f1(fn1);
     QFile f2(fn2);
@@ -55,8 +54,7 @@ bool FileSystem::fileEquals(const QString &fn1, const QString &fn2)
     return true;
 }
 
-time_t FileSystem::getModTime(const QString &filename)
-{
+time_t FileSystem::getModTime(const QString &filename) {
     csync_file_stat_t stat;
     qint64 result = -1;
     if (csync_vio_local_stat(filename, &stat) != -1
@@ -70,8 +68,7 @@ time_t FileSystem::getModTime(const QString &filename)
     return result;
 }
 
-bool FileSystem::setModTime(const QString &filename, time_t modTime)
-{
+bool FileSystem::setModTime(const QString &filename, time_t modTime) {
     struct timeval times[2];
     times[0].tv_sec = times[1].tv_sec = modTime;
     times[0].tv_usec = times[1].tv_usec = 0;
@@ -86,16 +83,14 @@ bool FileSystem::setModTime(const QString &filename, time_t modTime)
 
 bool FileSystem::fileChanged(const QString &fileName,
     qint64 previousSize,
-    time_t previousMtime)
-{
+    time_t previousMtime) {
     return getSize(fileName) != previousSize
         || getModTime(fileName) != previousMtime;
 }
 
 bool FileSystem::verifyFileUnchanged(const QString &fileName,
     qint64 previousSize,
-    time_t previousMtime)
-{
+    time_t previousMtime) {
     const qint64 actualSize = getSize(fileName);
     const time_t actualMtime = getModTime(fileName);
     if ((actualSize != previousSize && actualMtime > 0) || (actualMtime != previousMtime && previousMtime > 0 && actualMtime > 0)) {
@@ -108,8 +103,7 @@ bool FileSystem::verifyFileUnchanged(const QString &fileName,
 }
 
 #ifdef Q_OS_WIN
-static qint64 getSizeWithCsync(const QString &filename)
-{
+static qint64 getSizeWithCsync(const QString &filename) {
     qint64 result = 0;
     csync_file_stat_t stat;
     if (csync_vio_local_stat(filename, &stat) != -1) {
@@ -121,8 +115,7 @@ static qint64 getSizeWithCsync(const QString &filename)
 }
 #endif
 
-qint64 FileSystem::getSize(const QString &filename)
-{
+qint64 FileSystem::getSize(const QString &filename) {
 #ifdef Q_OS_WIN
     if (isLnkFile(filename)) {
         // Qt handles .lnk as symlink... https://doc.qt.io/qt-5/qfileinfo.html#details
@@ -133,8 +126,7 @@ qint64 FileSystem::getSize(const QString &filename)
 }
 
 // Code inspired from Qt5's QDir::removeRecursively
-bool FileSystem::removeRecursively(const QString &path, const std::function<void(const QString &path, bool isDir)> &onDeleted, QStringList *errors)
-{
+bool FileSystem::removeRecursively(const QString &path, const std::function<void(const QString &path, bool isDir)> &onDeleted, QStringList *errors) {
     bool allRemoved = true;
     QDirIterator di(path, QDir::AllEntries | QDir::Hidden | QDir::System | QDir::NoDotAndDotDot);
 
@@ -180,8 +172,7 @@ bool FileSystem::removeRecursively(const QString &path, const std::function<void
     return allRemoved;
 }
 
-bool FileSystem::getInode(const QString &filename, quint64 *inode)
-{
+bool FileSystem::getInode(const QString &filename, quint64 *inode) {
     csync_file_stat_t fs;
     if (csync_vio_local_stat(filename, &fs) == 0) {
         *inode = fs.inode;

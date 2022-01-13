@@ -32,8 +32,7 @@ using gpointer = void*;
 
 using namespace OCC;
 
-class CloudProviderWrapper : public QObject
-{
+class CloudProviderWrapper : public QObject {
 public:
     explicit CloudProviderWrapper(QObject *parent = nullptr, Folder *folder = nullptr, int folderId = 0, CloudProvidersProviderExporter* cloudprovider = nullptr);
     ~CloudProviderWrapper() override;

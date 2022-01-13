@@ -45,8 +45,7 @@ class ProcessDirectoryJob;
 /**
  * Represent all the meta-data about a file in the server
  */
-struct RemoteInfo
-{
+struct RemoteInfo {
     /** FileName of the entry (this does not contains any directory or path, just the plain name */
     QString name;
     QByteArray etag;
@@ -66,8 +65,7 @@ struct RemoteInfo
     QString directDownloadCookies;
 };
 
-struct LocalInfo
-{
+struct LocalInfo {
     /** FileName of the entry (this does not contains any directory or path, just the plain name */
     QString name;
     QString renameName;
@@ -87,8 +85,7 @@ struct LocalInfo
  *
  * @ingroup libsync
  */
-class DiscoverySingleLocalDirectoryJob : public QObject, public QRunnable
-{
+class DiscoverySingleLocalDirectoryJob : public QObject, public QRunnable {
 public:
     explicit DiscoverySingleLocalDirectoryJob(const AccountPtr &account, const QString &localPath, OCC::Vfs *vfs, QObject *parent = nullptr);
 
@@ -114,8 +111,7 @@ public:
  *
  * @ingroup libsync
  */
-class DiscoverySingleDirectoryJob : public QObject
-{
+class DiscoverySingleDirectoryJob : public QObject {
 public:
     explicit DiscoverySingleDirectoryJob(const AccountPtr &account, const QString &path, QObject *parent = nullptr);
     // Specify that this is the root and we need to check the data-fingerprint
@@ -162,8 +158,7 @@ public:
     QByteArray _dataFingerprint;
 };
 
-class DiscoveryPhase : public QObject
-{
+class DiscoveryPhase : public QObject {
 
     friend class ProcessDirectoryJob;
 

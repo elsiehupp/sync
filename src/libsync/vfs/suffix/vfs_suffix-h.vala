@@ -21,8 +21,7 @@
 
 namespace OCC {
 
-class VfsSuffix : public Vfs
-{
+class VfsSuffix : public Vfs {
 
 public:
     explicit VfsSuffix(QObject *parent = nullptr);
@@ -47,9 +46,7 @@ public:
     bool isDehydratedPlaceholder(const QString &filePath) override;
     bool statTypeVirtualFile(csync_file_stat_t *stat, void *stat_data) override;
 
-    bool setPinState(const QString &folderPath, PinState state) override
-    { return setPinStateInDb(folderPath, state); }
-    Optional<PinState> pinState(const QString &folderPath) override
+    bool setPinState(const QString &folderPath, PinState state) override { return setPinStateInDb(folderPath, state); } {ptional<PinState> pinState(const QString &folderPath) override
     { return pinStateInDb(folderPath); }
     AvailabilityResult availability(const QString &folderPath) override;
 
@@ -60,8 +57,7 @@ protected:
     void startImpl(const VfsSetupParams &params) override;
 };
 
-class SuffixVfsPluginFactory : public QObject, public DefaultPluginFactory<VfsSuffix>
-{
+class SuffixVfsPluginFactory : public QObject, public DefaultPluginFactory<VfsSuffix> {
     Q_PLUGIN_METADATA(IID "org.owncloud.PluginFactory" FILE "vfspluginmetadata.json")
     Q_INTERFACES(OCC::PluginFactory)
 };

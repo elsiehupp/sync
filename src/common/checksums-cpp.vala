@@ -90,8 +90,7 @@ Q_LOGGING_CATEGORY(lcChecksums, "nextcloud.sync.checksums", QtInfoMsg)
 
 #define BUFSIZE qint64(500 * 1024) // 500 KiB
 
-static QByteArray calcCryptoHash(QIODevice *device, QCryptographicHash::Algorithm algo)
-{
+static QByteArray calcCryptoHash(QIODevice *device, QCryptographicHash::Algorithm algo) {
      QByteArray arr;
      QCryptographicHash crypto( algo );
 
@@ -101,20 +100,16 @@ static QByteArray calcCryptoHash(QIODevice *device, QCryptographicHash::Algorith
      return arr;
  }
 
-QByteArray calcMd5(QIODevice *device)
-{
+QByteArray calcMd5(QIODevice *device) {
     return calcCryptoHash(device, QCryptographicHash::Md5);
 }
 
-QByteArray calcSha1(QIODevice *device)
-{
+QByteArray calcSha1(QIODevice *device) {
     return calcCryptoHash(device, QCryptographicHash::Sha1);
 }
 
 #ifdef ZLIB_FOUND
-QByteArray calcAdler32(QIODevice *device)
-{
-    if (device->size() == 0)
+QByteArray calcAdler32(QIODevice *device) { {f (device->size() == 0)
     {
         return QByteArray();
     }
@@ -132,8 +127,7 @@ QByteArray calcAdler32(QIODevice *device)
 }
 #endif
 
-QByteArray makeChecksumHeader(const QByteArray &checksumType, const QByteArray &checksum)
-{
+QByteArray makeChecksumHeader(const QByteArray &checksumType, const QByteArray &checksum) {
     if (checksumType.isEmpty() || checksum.isEmpty())
         return QByteArray();
     QByteArray header = checksumType;
@@ -142,8 +136,7 @@ QByteArray makeChecksumHeader(const QByteArray &checksumType, const QByteArray &
     return header;
 }
 
-QByteArray findBestChecksum(const QByteArray &_checksums)
-{
+QByteArray findBestChecksum(const QByteArray &_checksums) {
     if (_checksums.isEmpty()) {
         return {};
     }
@@ -168,8 +161,7 @@ QByteArray findBestChecksum(const QByteArray &_checksums)
     return {};
 }
 
-bool parseChecksumHeader(const QByteArray &header, QByteArray *type, QByteArray *checksum)
-{
+bool parseChecksumHeader(const QByteArray &header, QByteArray *type, QByteArray *checksum) {
     if (header.isEmpty()) {
         type->clear();
         checksum->clear();
@@ -187,8 +179,7 @@ bool parseChecksumHeader(const QByteArray &header, QByteArray *type, QByteArray 
 }
 
 
-QByteArray parseChecksumHeaderType(const QByteArray &header)
-{
+QByteArray parseChecksumHeaderType(const QByteArray &header) {
     const auto idx = header.indexOf(':');
     if (idx < 0) {
         return QByteArray();
@@ -196,43 +187,36 @@ QByteArray parseChecksumHeaderType(const QByteArray &header)
     return header.left(idx);
 }
 
-bool uploadChecksumEnabled()
-{
+bool uploadChecksumEnabled() {
     static bool enabled = qEnvironmentVariableIsEmpty("OWNCLOUD_DISABLE_CHECKSUM_UPLOAD");
     return enabled;
 }
 
-static bool checksumComputationEnabled()
-{
+static bool checksumComputationEnabled() {
     static bool enabled = qEnvironmentVariableIsEmpty("OWNCLOUD_DISABLE_CHECKSUM_COMPUTATIONS");
     return enabled;
 }
 
 ComputeChecksum::ComputeChecksum(QObject *parent)
-    : QObject(parent)
-{
+    : QObject(parent) {
 }
 
 ComputeChecksum::~ComputeChecksum() = default;
 
-void ComputeChecksum::setChecksumType(const QByteArray &type)
-{
+void ComputeChecksum::setChecksumType(const QByteArray &type) {
     _checksumType = type;
 }
 
-QByteArray ComputeChecksum::checksumType() const
-{
+QByteArray ComputeChecksum::checksumType() const {
     return _checksumType;
 }
 
-void ComputeChecksum::start(const QString &filePath)
-{
+void ComputeChecksum::start(const QString &filePath) {
     qCInfo(lcChecksums) << "Computing" << checksumType() << "checksum of" << filePath << "in a thread";
     startImpl(std::make_unique<QFile>(filePath));
 }
 
-void ComputeChecksum::start(std::unique_ptr<QIODevice> device)
-{
+void ComputeChecksum::start(std::unique_ptr<QIODevice> device) {
     ENFORCE(device);
     qCInfo(lcChecksums) << "Computing" << checksumType() << "checksum of device" << device.get() << "in a thread";
     ASSERT(!device->parent());
@@ -240,8 +224,7 @@ void ComputeChecksum::start(std::unique_ptr<QIODevice> device)
     startImpl(std::move(device));
 }
 
-void ComputeChecksum::startImpl(std::unique_ptr<QIODevice> device)
-{
+void ComputeChecksum::startImpl(std::unique_ptr<QIODevice> device) {
     connect(&_watcher, &QFutureWatcherBase::finished,
         this, &ComputeChecksum::slotCalculationDone,
         Qt::UniqueConnection);
@@ -269,8 +252,7 @@ void ComputeChecksum::startImpl(std::unique_ptr<QIODevice> device)
     }));
 }
 
-QByteArray ComputeChecksum::computeNowOnFile(const QString &filePath, const QByteArray &checksumType)
-{
+QByteArray ComputeChecksum::computeNowOnFile(const QString &filePath, const QByteArray &checksumType) {
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly)) {
         qCWarning(lcChecksums) << "Could not open file" << filePath << "for reading and computing checksum" << file.errorString();
@@ -280,8 +262,7 @@ QByteArray ComputeChecksum::computeNowOnFile(const QString &filePath, const QByt
     return computeNow(&file, checksumType);
 }
 
-QByteArray ComputeChecksum::computeNow(QIODevice *device, const QByteArray &checksumType)
-{
+QByteArray ComputeChecksum::computeNow(QIODevice *device, const QByteArray &checksumType) {
     if (!checksumComputationEnabled()) {
         qCWarning(lcChecksums) << "Checksum computation disabled by environment variable";
         return QByteArray();
@@ -311,8 +292,7 @@ QByteArray ComputeChecksum::computeNow(QIODevice *device, const QByteArray &chec
     return QByteArray();
 }
 
-void ComputeChecksum::slotCalculationDone()
-{
+void ComputeChecksum::slotCalculationDone() {
     QByteArray checksum = _watcher.future().result();
     if (!checksum.isNull()) {
         emit done(_checksumType, checksum);
@@ -323,12 +303,10 @@ void ComputeChecksum::slotCalculationDone()
 
 
 ValidateChecksumHeader::ValidateChecksumHeader(QObject *parent)
-    : QObject(parent)
-{
+    : QObject(parent) {
 }
 
-ComputeChecksum *ValidateChecksumHeader::prepareStart(const QByteArray &checksumHeader)
-{
+ComputeChecksum *ValidateChecksumHeader::prepareStart(const QByteArray &checksumHeader) {
     // If the incoming header is empty no validation can happen. Just continue.
     if (checksumHeader.isEmpty()) {
         emit validated(QByteArray(), QByteArray());
@@ -348,21 +326,18 @@ ComputeChecksum *ValidateChecksumHeader::prepareStart(const QByteArray &checksum
     return calculator;
 }
 
-void ValidateChecksumHeader::start(const QString &filePath, const QByteArray &checksumHeader)
-{
+void ValidateChecksumHeader::start(const QString &filePath, const QByteArray &checksumHeader) {
     if (auto calculator = prepareStart(checksumHeader))
         calculator->start(filePath);
 }
 
-void ValidateChecksumHeader::start(std::unique_ptr<QIODevice> device, const QByteArray &checksumHeader)
-{
+void ValidateChecksumHeader::start(std::unique_ptr<QIODevice> device, const QByteArray &checksumHeader) {
     if (auto calculator = prepareStart(checksumHeader))
         calculator->start(std::move(device));
 }
 
 void ValidateChecksumHeader::slotChecksumCalculated(const QByteArray &checksumType,
-    const QByteArray &checksum)
-{
+    const QByteArray &checksum) {
     if (checksumType != _expectedChecksumType) {
         emit validationFailed(tr("The checksum header contained an unknown checksum type \"%1\"").arg(QString::fromLatin1(_expectedChecksumType)));
         return;
@@ -376,8 +351,7 @@ void ValidateChecksumHeader::slotChecksumCalculated(const QByteArray &checksumTy
 
 CSyncChecksumHook::CSyncChecksumHook() = default;
 
-QByteArray CSyncChecksumHook::hook(const QByteArray &path, const QByteArray &otherChecksumHeader, void * /*this_obj*/)
-{
+QByteArray CSyncChecksumHook::hook(const QByteArray &path, const QByteArray &otherChecksumHeader, void * /*this_obj*/) {
     QByteArray type = parseChecksumHeaderType(QByteArray(otherChecksumHeader));
     if (type.isEmpty())
         return nullptr;

@@ -41,8 +41,7 @@
 // #include <QPainterPath>
 
 namespace {
-const QString TOOLBAR_CSS()
-{
+const QString TOOLBAR_CSS() {
     return QStringLiteral("QToolBar { background: %1; margin: 0; padding: 0; border: none; border-bottom: 1px solid %2; spacing: 0; } "
                           "QToolBar QToolButton { background: %1; border: none; border-bottom: 1px solid %2; margin: 0; padding: 5px; } "
                           "QToolBar QToolBarExtension { padding:0; } "
@@ -55,8 +54,7 @@ const float buttonSizeRatio = 1.618f; // golden ratio
 /** display name with two lines that is displayed in the settings
  * If width is bigger than 0, the string will be ellided so it does not exceed that width
  */
-QString shortDisplayNameForSettings(OCC::Account *account, int width)
-{
+QString shortDisplayNameForSettings(OCC::Account *account, int width) {
     QString user = account->davDisplayName();
     if (user.isEmpty()) {
         user = account->credentials()->user();
@@ -83,8 +81,7 @@ namespace OCC {
 SettingsDialog::SettingsDialog(ownCloudGui *gui, QWidget *parent)
     : QDialog(parent)
     , _ui(new Ui::SettingsDialog)
-    , _gui(gui)
-{
+    , _gui(gui) {
     ConfigFile cfg;
 
     _ui->setupUi(this);
@@ -162,33 +159,28 @@ SettingsDialog::SettingsDialog(ownCloudGui *gui, QWidget *parent)
     cfg.restoreGeometry(this);
 }
 
-SettingsDialog::~SettingsDialog()
-{
+SettingsDialog::~SettingsDialog() {
     delete _ui;
 }
 
-QWidget* SettingsDialog::currentPage()
-{
+QWidget* SettingsDialog::currentPage() {
     return _ui->stack->currentWidget();
 }
 
 // close event is not being called here
-void SettingsDialog::reject()
-{
+void SettingsDialog::reject() {
     ConfigFile cfg;
     cfg.saveGeometry(this);
     QDialog::reject();
 }
 
-void SettingsDialog::accept()
-{
+void SettingsDialog::accept() {
     ConfigFile cfg;
     cfg.saveGeometry(this);
     QDialog::accept();
 }
 
-void SettingsDialog::changeEvent(QEvent *e)
-{
+void SettingsDialog::changeEvent(QEvent *e) {
     switch (e->type()) {
     case QEvent::StyleChange:
     case QEvent::PaletteChange:
@@ -209,29 +201,25 @@ void SettingsDialog::changeEvent(QEvent *e)
     QDialog::changeEvent(e);
 }
 
-void SettingsDialog::slotSwitchPage(QAction *action)
-{
+void SettingsDialog::slotSwitchPage(QAction *action) {
     _ui->stack->setCurrentWidget(_actionGroupWidgets.value(action));
 }
 
-void SettingsDialog::showFirstPage()
-{
+void SettingsDialog::showFirstPage() {
     QList<QAction *> actions = _toolBar->actions();
     if (!actions.empty()) {
         actions.first()->trigger();
     }
 }
 
-void SettingsDialog::showIssuesList(AccountState *account)
-{
+void SettingsDialog::showIssuesList(AccountState *account) {
     const auto userModel = UserModel::instance();
     const auto id = userModel->findUserIdForAccount(account);
     UserModel::instance()->switchCurrentUser(id);
     emit Systray::instance()->showWindow();
 }
 
-void SettingsDialog::accountAdded(AccountState *s)
-{
+void SettingsDialog::accountAdded(AccountState *s) {
     auto height = _toolBar->sizeHint().height();
     bool brandingSingleAccount = !Theme::instance()->multiAccount();
 
@@ -274,8 +262,7 @@ void SettingsDialog::accountAdded(AccountState *s)
     connect(this, &SettingsDialog::styleChanged, accountSettings, &AccountSettings::slotStyleChanged);
 }
 
-void SettingsDialog::slotAccountAvatarChanged()
-{
+void SettingsDialog::slotAccountAvatarChanged() {
     auto *account = static_cast<Account *>(sender());
     if (account && _actionForAccount.contains(account)) {
         QAction *action = _actionForAccount[account];
@@ -288,8 +275,7 @@ void SettingsDialog::slotAccountAvatarChanged()
     }
 }
 
-void SettingsDialog::slotAccountDisplayNameChanged()
-{
+void SettingsDialog::slotAccountDisplayNameChanged() {
     auto *account = static_cast<Account *>(sender());
     if (account && _actionForAccount.contains(account)) {
         QAction *action = _actionForAccount[account];
@@ -302,8 +288,7 @@ void SettingsDialog::slotAccountDisplayNameChanged()
     }
 }
 
-void SettingsDialog::accountRemoved(AccountState *s)
-{
+void SettingsDialog::accountRemoved(AccountState *s) {
     for (auto it = _actionGroupWidgets.begin(); it != _actionGroupWidgets.end(); ++it) {
         auto as = qobject_cast<AccountSettings *>(*it);
         if (!as) {
@@ -335,8 +320,7 @@ void SettingsDialog::accountRemoved(AccountState *s)
     }
 }
 
-void SettingsDialog::customizeStyle()
-{
+void SettingsDialog::customizeStyle() {
     QString highlightColor(palette().highlight().color().name());
     QString highlightTextColor(palette().highlightedText().color().name());
     QString dark(palette().dark().color().name());
@@ -352,19 +336,16 @@ void SettingsDialog::customizeStyle()
     }
 }
 
-class ToolButtonAction : public QWidgetAction
-{
+class ToolButtonAction : public QWidgetAction {
 public:
     explicit ToolButtonAction(const QIcon &icon, const QString &text, QObject *parent)
-        : QWidgetAction(parent)
-    {
+        : QWidgetAction(parent) {
         setText(text);
         setIcon(icon);
     }
 
 
-    QWidget *createWidget(QWidget *parent) override
-    {
+    QWidget *createWidget(QWidget *parent) override {
         auto toolbar = qobject_cast<QToolBar *>(parent);
         if (!toolbar) {
             // this means we are in the extention menu, no special action here
@@ -383,8 +364,7 @@ public:
     }
 };
 
-QAction *SettingsDialog::createActionWithIcon(const QIcon &icon, const QString &text, const QString &iconPath)
-{
+QAction *SettingsDialog::createActionWithIcon(const QIcon &icon, const QString &text, const QString &iconPath) {
     QAction *action = new ToolButtonAction(icon, text, this);
     action->setCheckable(true);
     if (!iconPath.isEmpty()) {
@@ -393,8 +373,7 @@ QAction *SettingsDialog::createActionWithIcon(const QIcon &icon, const QString &
     return action;
 }
 
-QAction *SettingsDialog::createColorAwareAction(const QString &iconPath, const QString &text)
-{
+QAction *SettingsDialog::createColorAwareAction(const QString &iconPath, const QString &text) {
     // all buttons must have the same size in order to keep a good layout
     QIcon coloredIcon = Theme::createColorAwareIcon(iconPath, palette());
     return createActionWithIcon(coloredIcon, text, iconPath);

@@ -18,8 +18,7 @@
 
 namespace OCC {
 
-class PropagateRemoteDeleteEncrypted : public AbstractPropagateRemoteDeleteEncrypted
-{
+class PropagateRemoteDeleteEncrypted : public AbstractPropagateRemoteDeleteEncrypted {
 public:
     PropagateRemoteDeleteEncrypted(OwncloudPropagator *propagator, SyncFileItemPtr item, QObject *parent);
 

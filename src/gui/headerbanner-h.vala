@@ -67,8 +67,7 @@ class QPixmap;
 
 namespace OCC {
 
-class HeaderBanner : public QWidget
-{
+class HeaderBanner : public QWidget {
 public:
     HeaderBanner(QWidget *parent = nullptr);
 

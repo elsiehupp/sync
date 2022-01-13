@@ -132,13 +132,11 @@ std::unique_ptr<csync_file_stat_t> csync_vio_local_readdir(csync_vio_handle_t *h
 }
 
 
-int csync_vio_local_stat(const QString &uri, csync_file_stat_t *buf)
-{
+int csync_vio_local_stat(const QString &uri, csync_file_stat_t *buf) {
     return _csync_vio_local_stat_mb(QFile::encodeName(uri).constData(), buf);
 }
 
-static int _csync_vio_local_stat_mb(const mbchar_t *wuri, csync_file_stat_t *buf)
-{
+static int _csync_vio_local_stat_mb(const mbchar_t *wuri, csync_file_stat_t *buf) {
     csync_stat_t sb;
 
     if (_tstat(wuri, &sb) < 0) {

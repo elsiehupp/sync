@@ -26,8 +26,7 @@ namespace OCC {
 
 Q_LOGGING_CATEGORY(lcPropagateRemoteDelete, "nextcloud.sync.propagator.remotedelete", QtInfoMsg)
 
-void PropagateRemoteDelete::start()
-{
+void PropagateRemoteDelete::start() {
     qCInfo(lcPropagateRemoteDelete) << "Start propagate remote delete job for" << _item->_file;
 
     if (propagator()->_abortRequested)
@@ -56,8 +55,7 @@ void PropagateRemoteDelete::start()
     }
 }
 
-void PropagateRemoteDelete::createDeleteJob(const QString &filename)
-{
+void PropagateRemoteDelete::createDeleteJob(const QString &filename) {
     qCInfo(lcPropagateRemoteDelete) << "Deleting file, local" << _item->_file << "remote" << filename;
 
     _job = new DeleteJob(propagator()->account(),
@@ -69,8 +67,7 @@ void PropagateRemoteDelete::createDeleteJob(const QString &filename)
     _job->start();
 }
 
-void PropagateRemoteDelete::abort(PropagatorJob::AbortType abortType)
-{
+void PropagateRemoteDelete::abort(PropagatorJob::AbortType abortType) {
     if (_job && _job->reply())
         _job->reply()->abort();
 
@@ -79,8 +76,7 @@ void PropagateRemoteDelete::abort(PropagatorJob::AbortType abortType)
     }
 }
 
-void PropagateRemoteDelete::slotDeleteJobFinished()
-{
+void PropagateRemoteDelete::slotDeleteJobFinished() {
     propagator()->_activeJobList.removeOne(this);
 
     ASSERT(_job);

@@ -15,18 +15,15 @@ namespace OCC {
 QString OWNCLOUDSYNC_EXPORT createDownloadTmpFileName(const QString &previous);
 }
 
-class TestNextcloudPropagator : public QObject
-{
+class TestNextcloudPropagator : public QObject {
 
 private slots:
-    void testUpdateErrorFromSession()
-    {
+    void testUpdateErrorFromSession() {
         //OwncloudPropagator propagator(nullptr, QLatin1String("test1"), QLatin1String("test2"), new ProgressDatabase);
         QVERIFY( true );
     }
 
-    void testTmpDownloadFileNameGeneration()
-    {
+    void testTmpDownloadFileNameGeneration() {
         QString fn;
         // without dir
         for (int i = 1; i <= 1000; i++) {
@@ -62,8 +59,7 @@ private slots:
         }
     }
 
-    void testParseEtag()
-    {
+    void testParseEtag() {
         using Test = QPair<const char*, const char*>;
         QList<Test> tests;
         tests.append(Test("\"abcd\"", "abcd"));

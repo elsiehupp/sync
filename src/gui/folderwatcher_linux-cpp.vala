@@ -29,8 +29,7 @@ namespace OCC {
 FolderWatcherPrivate::FolderWatcherPrivate(FolderWatcher *p, const QString &path)
     : QObject()
     , _parent(p)
-    , _folder(path)
-{
+    , _folder(path) {
     _fd = inotify_init();
     if (_fd != -1) {
         _socket.reset(new QSocketNotifier(_fd, QSocketNotifier::Read));
@@ -45,8 +44,7 @@ FolderWatcherPrivate::FolderWatcherPrivate(FolderWatcher *p, const QString &path
 FolderWatcherPrivate::~FolderWatcherPrivate() = default;
 
 // attention: result list passed by reference!
-bool FolderWatcherPrivate::findFoldersBelow(const QDir &dir, QStringList &fullList)
-{
+bool FolderWatcherPrivate::findFoldersBelow(const QDir &dir, QStringList &fullList) {
     bool ok = true;
     if (!(dir.exists() && dir.isReadable())) {
         qCDebug(lcFolderWatcher) << "Non existing path coming in: " << dir.absolutePath();
@@ -69,8 +67,7 @@ bool FolderWatcherPrivate::findFoldersBelow(const QDir &dir, QStringList &fullLi
     return ok;
 }
 
-void FolderWatcherPrivate::inotifyRegisterPath(const QString &path)
-{
+void FolderWatcherPrivate::inotifyRegisterPath(const QString &path) {
     if (path.isEmpty())
         return;
 
@@ -91,8 +88,7 @@ void FolderWatcherPrivate::inotifyRegisterPath(const QString &path)
     }
 }
 
-void FolderWatcherPrivate::slotAddFolderRecursive(const QString &path)
-{
+void FolderWatcherPrivate::slotAddFolderRecursive(const QString &path) {
     if (_pathToWatch.contains(path))
         return;
 
@@ -127,8 +123,7 @@ void FolderWatcherPrivate::slotAddFolderRecursive(const QString &path)
     }
 }
 
-void FolderWatcherPrivate::slotReceivedNotification(int fd)
-{
+void FolderWatcherPrivate::slotReceivedNotification(int fd) {
     int len = 0;
     struct inotify_event *event = nullptr;
     size_t i = 0;
@@ -190,8 +185,7 @@ void FolderWatcherPrivate::slotReceivedNotification(int fd)
     }
 }
 
-void FolderWatcherPrivate::removeFoldersBelow(const QString &path)
-{
+void FolderWatcherPrivate::removeFoldersBelow(const QString &path) {
     auto it = _pathToWatch.find(path);
     if (it == _pathToWatch.end())
         return;

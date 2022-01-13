@@ -40,8 +40,7 @@ namespace OCC {
  *
  * All OCS jobs (e.g. sharing) should extend this class.
  */
-class OcsJob : public AbstractNetworkJob
-{
+class OcsJob : public AbstractNetworkJob {
 
 protected:
     explicit OcsJob(AccountPtr account);

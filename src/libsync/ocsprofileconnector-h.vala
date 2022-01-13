@@ -10,8 +10,7 @@
 
 namespace OCC {
 
-struct OWNCLOUDSYNC_EXPORT HovercardAction
-{
+struct OWNCLOUDSYNC_EXPORT HovercardAction {
 public:
     HovercardAction();
     HovercardAction(QString title, QUrl iconUrl, QUrl link);
@@ -22,13 +21,11 @@ public:
     QUrl _link;
 };
 
-struct OWNCLOUDSYNC_EXPORT Hovercard
-{
+struct OWNCLOUDSYNC_EXPORT Hovercard {
     std::vector<HovercardAction> _actions;
 };
 
-class OWNCLOUDSYNC_EXPORT OcsProfileConnector : public QObject
-{
+class OWNCLOUDSYNC_EXPORT OcsProfileConnector : public QObject {
 public:
     explicit OcsProfileConnector(AccountPtr account, QObject *parent = nullptr);
 

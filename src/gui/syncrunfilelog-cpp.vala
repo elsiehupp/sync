@@ -23,13 +23,11 @@ namespace OCC {
 
 SyncRunFileLog::SyncRunFileLog() = default;
 
-QString SyncRunFileLog::dateTimeStr(const QDateTime &dt)
-{
+QString SyncRunFileLog::dateTimeStr(const QDateTime &dt) {
     return dt.toString(Qt::ISODate);
 }
 
-void SyncRunFileLog::start(const QString &folderPath)
-{
+void SyncRunFileLog::start(const QString &folderPath) {
     const qint64 logfileMaxSize = 10 * 1024 * 1024; // 10MiB
 
     const QString logpath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
@@ -95,8 +93,7 @@ void SyncRunFileLog::start(const QString &folderPath)
     _lapDuration.start();
     _out << "#=#=#=# Syncrun started " << dateTimeStr(QDateTime::currentDateTimeUtc()) << endl;
 }
-void SyncRunFileLog::logItem(const SyncFileItem &item)
-{
+void SyncRunFileLog::logItem(const SyncFileItem &item) {
     // don't log the directory items that are in the list
     if (item._direction == SyncFileItem::None
         || item._instruction == CSYNC_INSTRUCTION_IGNORE) {
@@ -135,15 +132,13 @@ void SyncRunFileLog::logItem(const SyncFileItem &item)
     _out << endl;
 }
 
-void SyncRunFileLog::logLap(const QString &name)
-{
+void SyncRunFileLog::logLap(const QString &name) {
     _out << "#=#=#=#=# " << name << " " << dateTimeStr(QDateTime::currentDateTimeUtc())
          << " (last step: " << _lapDuration.restart() << " msec"
          << ", total: " << _totalDuration.elapsed() << " msec)" << endl;
 }
 
-void SyncRunFileLog::finish()
-{
+void SyncRunFileLog::finish() {
     _out << "#=#=#=# Syncrun finished " << dateTimeStr(QDateTime::currentDateTimeUtc())
          << " (last step: " << _lapDuration.elapsed() << " msec"
          << ", total: " << _totalDuration.elapsed() << " msec)" << endl;

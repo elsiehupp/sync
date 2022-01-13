@@ -25,8 +25,7 @@ class FolderWatcher;
  * @brief The WatcherThread class
  * @ingroup gui
  */
-class WatcherThread : public QThread
-{
+class WatcherThread : public QThread {
 public:
     WatcherThread(const QString &path)
         : QThread()
@@ -34,8 +33,7 @@ public:
         , _directory(0)
         , _resultEvent(0)
         , _stopEvent(0)
-        , _done(false)
-    {
+        , _done(false) {
     }
 
     ~WatcherThread();
@@ -65,8 +63,7 @@ private:
  * @brief Windows implementation of FolderWatcher
  * @ingroup gui
  */
-class FolderWatcherPrivate : public QObject
-{
+class FolderWatcherPrivate : public QObject {
 public:
     FolderWatcherPrivate(FolderWatcher *p, const QString &path);
     ~FolderWatcherPrivate();

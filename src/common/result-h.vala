@@ -22,8 +22,7 @@ namespace OCC {
  * A Result of type T, or an Error
  */
 template <typename T, typename Error>
-class Result
-{
+class Result {
     union {
         T _result;
         Error _error;
@@ -33,19 +32,16 @@ class Result
 public:
     Result(T value)
         : _result(std::move(value))
-        , _isError(false)
-    {
+        , _isError(false) {
     }
     // TODO: This doesn't work if T and Error are too similar
     Result(Error error)
         : _error(std::move(error))
-        , _isError(true)
-    {
+        , _isError(true) {
     }
 
     Result(Result &&other)
-        : _isError(other._isError)
-    {
+        : _isError(other._isError) {
         if (_isError) {
             new (&_error) Error(std::move(other._error));
         } else {
@@ -54,8 +50,7 @@ public:
     }
 
     Result(const Result &other)
-        : _isError(other._isError)
-    {
+        : _isError(other._isError) {
         if (_isError) {
             new (&_error) Error(other._error);
         } else {
@@ -63,8 +58,7 @@ public:
         }
     }
 
-    Result &operator=(Result &&other)
-    {
+    Result &operator=(Result &&other) {
         if (&other != this) {
             _isError = other._isError;
             if (_isError) {
@@ -76,8 +70,7 @@ public:
         return *this;
     }
 
-    Result &operator=(const Result &other)
-    {
+    Result &operator=(const Result &other) {
         if (&other != this) {
             _isError = other._isError;
             if (_isError) {
@@ -89,8 +82,7 @@ public:
         return *this;
     }
 
-    ~Result()
-    {
+    ~Result() {
         if (_isError)
             _error.~Error();
         else
@@ -99,37 +91,31 @@ public:
 
     explicit operator bool() const { return !_isError; }
 
-    const T &operator*() const &
-    {
+    const T &operator*() const & {
         ASSERT(!_isError);
         return _result;
     }
 
-    T operator*() &&
-    {
+    T operator*() && {
         ASSERT(!_isError);
         return std::move(_result);
     }
 
-    const T *operator->() const
-    {
+    const T *operator->() const {
         ASSERT(!_isError);
         return &_result;
     }
 
-    const T &get() const
-    {
+    const T &get() const {
         ASSERT(!_isError)
         return _result;
     }
 
-    const Error &error() const &
-    {
+    const Error &error() const & {
         ASSERT(_isError);
         return _error;
     }
-    Error error() &&
-    {
+    Error error() && {
         ASSERT(_isError);
         return std::move(_error);
     }
@@ -142,8 +128,7 @@ namespace detail {
 }
 
 template <typename Error>
-class Result<void, Error> : public Result<detail::NoResultData, Error>
-{
+class Result<void, Error> : public Result<detail::NoResultData, Error> {
 public:
     using Result<detail::NoResultData, Error>::Result;
     Result() : Result(detail::NoResultData{}) {}
@@ -154,14 +139,12 @@ struct OptionalNoErrorData{};
 }
 
 template <typename T>
-class Optional : public Result<T, detail::OptionalNoErrorData>
-{
+class Optional : public Result<T, detail::OptionalNoErrorData> {
 public:
     using Result<T, detail::OptionalNoErrorData>::Result;
 
     Optional()
-        : Optional(detail::OptionalNoErrorData{})
-    {
+        : Optional(detail::OptionalNoErrorData{}) {
     }
 };
 

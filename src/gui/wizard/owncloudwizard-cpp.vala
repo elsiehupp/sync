@@ -56,8 +56,7 @@ OwncloudWizard::OwncloudWizard(QWidget *parent)
     , _webViewPage(new WebViewPage(this))
 #else // WITH_WEBENGINE
     , _webViewPage(nullptr)
-#endif // WITH_WEBENGINE
-{
+#endif // WITH_WEBENGINE {
     setObjectName("owncloudWizard");
 
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
@@ -118,8 +117,7 @@ OwncloudWizard::OwncloudWizard(QWidget *parent)
     centerWindow();
 }
 
-void OwncloudWizard::centerWindow()
-{
+void OwncloudWizard::centerWindow() {
     const auto wizardWindow = window();
     const auto screen = QGuiApplication::screenAt(wizardWindow->pos())
         ? QGuiApplication::screenAt(wizardWindow->pos())
@@ -131,16 +129,14 @@ void OwncloudWizard::centerWindow()
 }
 
 
-void OwncloudWizard::adjustWizardSize()
-{
+void OwncloudWizard::adjustWizardSize() {
     const auto pageSizes = calculateWizardPageSizes();
     const auto longestSide = calculateLongestSideOfWizardPages(pageSizes);
 
     resize(QSize(longestSide, longestSide));
 }
 
-QList<QSize> OwncloudWizard::calculateWizardPageSizes() const
-{
+QList<QSize> OwncloudWizard::calculateWizardPageSizes() const {
     QList<QSize> pageSizes;
     const auto pIds = pageIds();
 
@@ -153,66 +149,54 @@ QList<QSize> OwncloudWizard::calculateWizardPageSizes() const
     return pageSizes;
 }
 
-int OwncloudWizard::calculateLongestSideOfWizardPages(const QList<QSize> &pageSizes) const
-{
+int OwncloudWizard::calculateLongestSideOfWizardPages(const QList<QSize> &pageSizes) const {
     return std::accumulate(std::cbegin(pageSizes), std::cend(pageSizes), 0, [](int current, const QSize &size) {
         return std::max({ current, size.width(), size.height() });
     });
 }
 
-void OwncloudWizard::setAccount(AccountPtr account)
-{
+void OwncloudWizard::setAccount(AccountPtr account) {
     _account = account;
 }
 
-AccountPtr OwncloudWizard::account() const
-{
+AccountPtr OwncloudWizard::account() const {
     return _account;
 }
 
-QString OwncloudWizard::localFolder() const
-{
+QString OwncloudWizard::localFolder() const {
     return (_advancedSetupPage->localFolder());
 }
 
-QStringList OwncloudWizard::selectiveSyncBlacklist() const
-{
+QStringList OwncloudWizard::selectiveSyncBlacklist() const {
     return _advancedSetupPage->selectiveSyncBlacklist();
 }
 
-bool OwncloudWizard::useVirtualFileSync() const
-{
+bool OwncloudWizard::useVirtualFileSync() const {
     return _advancedSetupPage->useVirtualFileSync();
 }
 
-bool OwncloudWizard::isConfirmBigFolderChecked() const
-{
+bool OwncloudWizard::isConfirmBigFolderChecked() const {
     return _advancedSetupPage->isConfirmBigFolderChecked();
 }
 
-QString OwncloudWizard::ocUrl() const
-{
+QString OwncloudWizard::ocUrl() const {
     QString url = field("OCUrl").toString().simplified();
     return url;
 }
 
-bool OwncloudWizard::registration()
-{
+bool OwncloudWizard::registration() {
     return _registration;
 }
 
-void OwncloudWizard::setRegistration(bool registration)
-{
+void OwncloudWizard::setRegistration(bool registration) {
     _registration = registration;
 }
 
-void OwncloudWizard::setRemoteFolder(const QString &remoteFolder)
-{
+void OwncloudWizard::setRemoteFolder(const QString &remoteFolder) {
     _advancedSetupPage->setRemoteFolder(remoteFolder);
 }
 
-void OwncloudWizard::successfulStep()
-{
+void OwncloudWizard::successfulStep() {
     const int id(currentId());
 
     switch (id) {
@@ -252,8 +236,7 @@ void OwncloudWizard::successfulStep()
     }
 }
 
-void OwncloudWizard::setAuthType(DetermineAuthTypeJob::AuthType type)
-{
+void OwncloudWizard::setAuthType(DetermineAuthTypeJob::AuthType type) {
     _setupPage->setAuthType(type);
 
     if (type == DetermineAuthTypeJob::OAuth) {
@@ -271,8 +254,7 @@ void OwncloudWizard::setAuthType(DetermineAuthTypeJob::AuthType type)
 }
 
 // TODO: update this function
-void OwncloudWizard::slotCurrentPageChanged(int id)
-{
+void OwncloudWizard::slotCurrentPageChanged(int id) {
     qCDebug(lcWizard) << "Current Wizard page changed to " << id;
 
     const auto setNextButtonAsDefault = [this]() {
@@ -312,8 +294,7 @@ void OwncloudWizard::slotCurrentPageChanged(int id)
     }
 }
 
-void OwncloudWizard::displayError(const QString &msg, bool retryHTTPonly)
-{
+void OwncloudWizard::displayError(const QString &msg, bool retryHTTPonly) {
     switch (currentId()) {
     case WizardCommon::Page_ServerSetup:
         _setupPage->setErrorString(msg, retryHTTPonly);
@@ -329,19 +310,16 @@ void OwncloudWizard::displayError(const QString &msg, bool retryHTTPonly)
     }
 }
 
-void OwncloudWizard::appendToConfigurationLog(const QString &msg, LogType /*type*/)
-{
+void OwncloudWizard::appendToConfigurationLog(const QString &msg, LogType /*type*/) {
     _setupLog << msg;
     qCDebug(lcWizard) << "Setup-Log: " << msg;
 }
 
-void OwncloudWizard::setOCUrl(const QString &url)
-{
+void OwncloudWizard::setOCUrl(const QString &url) {
     _setupPage->setServerUrl(url);
 }
 
-AbstractCredentials *OwncloudWizard::getCredentials() const
-{
+AbstractCredentials *OwncloudWizard::getCredentials() const {
     if (_credentialsPage) {
         return _credentialsPage->getCredentials();
     }
@@ -349,8 +327,7 @@ AbstractCredentials *OwncloudWizard::getCredentials() const
     return nullptr;
 }
 
-void OwncloudWizard::changeEvent(QEvent *e)
-{
+void OwncloudWizard::changeEvent(QEvent *e) {
     switch (e->type()) {
     case QEvent::StyleChange:
     case QEvent::PaletteChange:
@@ -371,8 +348,7 @@ void OwncloudWizard::changeEvent(QEvent *e)
     QWizard::changeEvent(e);
 }
 
-void OwncloudWizard::customizeStyle()
-{
+void OwncloudWizard::customizeStyle() {
     // HINT: Customize wizard's own style here, if necessary in the future (Dark-/Light-Mode switching)
 
     // Set background colors
@@ -385,14 +361,12 @@ void OwncloudWizard::customizeStyle()
     setPalette(wizardPalette);
 }
 
-void OwncloudWizard::bringToTop()
-{
+void OwncloudWizard::bringToTop() {
     // bring wizard to top
     ownCloudGui::raiseDialog(this);
 }
 
-void OwncloudWizard::askExperimentalVirtualFilesFeature(QWidget *receiver, const std::function<void(bool enable)> &callback)
-{
+void OwncloudWizard::askExperimentalVirtualFilesFeature(QWidget *receiver, const std::function<void(bool enable)> &callback) {
     const auto bestVfsMode = bestAvailableVfsMode();
     QMessageBox *msgBox = nullptr;
     QPushButton *acceptButton = nullptr;

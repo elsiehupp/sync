@@ -72,17 +72,14 @@ namespace EncryptionHelper {
 //
 class CipherCtx {
 public:
-    CipherCtx() : _ctx(EVP_CIPHER_CTX_new())
-    {
+    CipherCtx() : _ctx(EVP_CIPHER_CTX_new()) {
     }
 
-    ~CipherCtx()
-    {
+    ~CipherCtx() {
         EVP_CIPHER_CTX_free(_ctx);
     }
 
-    operator EVP_CIPHER_CTX*()
-    {
+    operator EVP_CIPHER_CTX*() {
         return _ctx;
     }
 
@@ -91,8 +88,7 @@ private:
     EVP_CIPHER_CTX *_ctx;
 };
 
-class OWNCLOUDSYNC_EXPORT StreamingDecryptor
-{
+class OWNCLOUDSYNC_EXPORT StreamingDecryptor {
 public:
     StreamingDecryptor(const QByteArray &key, const QByteArray &iv, quint64 totalSize);
     ~StreamingDecryptor() = default;

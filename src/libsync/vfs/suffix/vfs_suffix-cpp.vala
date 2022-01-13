@@ -23,24 +23,20 @@
 namespace OCC {
 
 VfsSuffix::VfsSuffix(QObject *parent)
-    : Vfs(parent)
-{
+    : Vfs(parent) {
 }
 
 VfsSuffix::~VfsSuffix() = default;
 
-Vfs::Mode VfsSuffix::mode() const
-{
+Vfs::Mode VfsSuffix::mode() const {
     return WithSuffix;
 }
 
-QString VfsSuffix::fileSuffix() const
-{
+QString VfsSuffix::fileSuffix() const {
     return QStringLiteral(APPLICATION_DOTVIRTUALFILE_SUFFIX);
 }
 
-void VfsSuffix::startImpl(const VfsSetupParams &params)
-{
+void VfsSuffix::startImpl(const VfsSetupParams &params) {
     // It is unsafe for the database to contain any ".owncloud" file entries
     // that are not marked as a virtual file. These could be real .owncloud
     // files that were synced before vfs was enabled.
@@ -53,21 +49,17 @@ void VfsSuffix::startImpl(const VfsSetupParams &params)
         params.journal->deleteFileRecord(path);
 }
 
-void VfsSuffix::stop()
-{
+void VfsSuffix::stop() {
 }
 
-void VfsSuffix::unregisterFolder()
-{
+void VfsSuffix::unregisterFolder() {
 }
 
-bool VfsSuffix::isHydrating() const
-{
+bool VfsSuffix::isHydrating() const {
     return false;
 }
 
-Result<void, QString> VfsSuffix::updateMetadata(const QString &filePath, time_t modtime, qint64, const QByteArray &)
-{
+Result<void, QString> VfsSuffix::updateMetadata(const QString &filePath, time_t modtime, qint64, const QByteArray &) {
     if (modtime <= 0) {
         return {tr("Error updating metadata due to invalid modified time")};
     }
@@ -76,8 +68,7 @@ Result<void, QString> VfsSuffix::updateMetadata(const QString &filePath, time_t 
     return {};
 }
 
-Result<void, QString> VfsSuffix::createPlaceholder(const SyncFileItem &item)
-{
+Result<void, QString> VfsSuffix::createPlaceholder(const SyncFileItem &item) {
     if (item._modtime <= 0) {
         return {tr("Error updating metadata due to invalid modified time")};
     }
@@ -104,8 +95,7 @@ Result<void, QString> VfsSuffix::createPlaceholder(const SyncFileItem &item)
     return {};
 }
 
-Result<void, QString> VfsSuffix::dehydratePlaceholder(const SyncFileItem &item)
-{
+Result<void, QString> VfsSuffix::dehydratePlaceholder(const SyncFileItem &item) {
     SyncFileItem virtualItem(item);
     virtualItem._file = item._renameTarget;
     auto r = createPlaceholder(virtualItem);
@@ -130,22 +120,19 @@ Result<void, QString> VfsSuffix::dehydratePlaceholder(const SyncFileItem &item)
     return {};
 }
 
-Result<Vfs::ConvertToPlaceholderResult, QString> VfsSuffix::convertToPlaceholder(const QString &, const SyncFileItem &, const QString &)
-{
+Result<Vfs::ConvertToPlaceholderResult, QString> VfsSuffix::convertToPlaceholder(const QString &, const SyncFileItem &, const QString &) {
     // Nothing necessary
     return Vfs::ConvertToPlaceholderResult::Ok;
 }
 
-bool VfsSuffix::isDehydratedPlaceholder(const QString &filePath)
-{
+bool VfsSuffix::isDehydratedPlaceholder(const QString &filePath) {
     if (!filePath.endsWith(fileSuffix()))
         return false;
     QFileInfo fi(filePath);
     return fi.exists() && fi.size() == 1;
 }
 
-bool VfsSuffix::statTypeVirtualFile(csync_file_stat_t *stat, void *)
-{
+bool VfsSuffix::statTypeVirtualFile(csync_file_stat_t *stat, void *) {
     if (stat->path.endsWith(fileSuffix().toUtf8())) {
         stat->type = ItemTypeVirtualFile;
         return true;
@@ -153,8 +140,7 @@ bool VfsSuffix::statTypeVirtualFile(csync_file_stat_t *stat, void *)
     return false;
 }
 
-Vfs::AvailabilityResult VfsSuffix::availability(const QString &folderPath)
-{
+Vfs::AvailabilityResult VfsSuffix::availability(const QString &folderPath) {
     return availabilityInDb(folderPath);
 }
 

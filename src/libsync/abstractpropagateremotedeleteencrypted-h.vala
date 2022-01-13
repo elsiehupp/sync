@@ -27,8 +27,7 @@ class OwncloudPropagator;
  * @brief The AbstractPropagateRemoteDeleteEncrypted class is the base class for Propagate Remote Delete Encrypted jobs
  * @ingroup libsync
  */
-class AbstractPropagateRemoteDeleteEncrypted : public QObject
-{
+class AbstractPropagateRemoteDeleteEncrypted : public QObject {
 public:
     AbstractPropagateRemoteDeleteEncrypted(OwncloudPropagator *propagator, SyncFileItemPtr item, QObject *parent);
     ~AbstractPropagateRemoteDeleteEncrypted() override = default;

@@ -51,8 +51,7 @@ BandwidthManager::BandwidthManager(OwncloudPropagator *p)
     , _relativeUploadLimitProgressAtMeasuringRestart(0)
     , _currentUploadLimit(0)
     , _relativeLimitCurrentMeasuredJob(nullptr)
-    , _currentDownloadLimit(0)
-{
+    , _currentDownloadLimit(0) {
     _currentUploadLimit = _propagator->_uploadLimit;
     _currentDownloadLimit = _propagator->_downloadLimit;
 
@@ -89,8 +88,7 @@ BandwidthManager::BandwidthManager(OwncloudPropagator *p)
 
 BandwidthManager::~BandwidthManager() = default;
 
-void BandwidthManager::registerUploadDevice(UploadDevice *p)
-{
+void BandwidthManager::registerUploadDevice(UploadDevice *p) {
     _absoluteUploadDeviceList.push_back(p);
     _relativeUploadDeviceList.push_back(p);
     QObject::connect(p, &QObject::destroyed, this, &BandwidthManager::unregisterUploadDevice);
@@ -107,8 +105,7 @@ void BandwidthManager::registerUploadDevice(UploadDevice *p)
     }
 }
 
-void BandwidthManager::unregisterUploadDevice(QObject *o)
-{
+void BandwidthManager::unregisterUploadDevice(QObject *o) {
     auto p = reinterpret_cast<UploadDevice *>(o); // note, we might already be in the ~QObject
     _absoluteUploadDeviceList.remove(p);
     _relativeUploadDeviceList.remove(p);
@@ -118,8 +115,7 @@ void BandwidthManager::unregisterUploadDevice(QObject *o)
     }
 }
 
-void BandwidthManager::registerDownloadJob(GETFileJob *j)
-{
+void BandwidthManager::registerDownloadJob(GETFileJob *j) {
     _downloadJobList.push_back(j);
     QObject::connect(j, &QObject::destroyed, this, &BandwidthManager::unregisterDownloadJob);
 
@@ -135,8 +131,7 @@ void BandwidthManager::registerDownloadJob(GETFileJob *j)
     }
 }
 
-void BandwidthManager::unregisterDownloadJob(QObject *o)
-{
+void BandwidthManager::unregisterDownloadJob(QObject *o) {
     auto *j = reinterpret_cast<GETFileJob *>(o); // note, we might already be in the ~QObject
     _downloadJobList.remove(j);
     if (_relativeLimitCurrentMeasuredJob == j) {
@@ -145,8 +140,7 @@ void BandwidthManager::unregisterDownloadJob(QObject *o)
     }
 }
 
-void BandwidthManager::relativeUploadMeasuringTimerExpired()
-{
+void BandwidthManager::relativeUploadMeasuringTimerExpired() {
     if (!usingRelativeUploadLimit() || _relativeUploadDeviceList.empty()) {
         // Not in this limiting mode, just wait 1 sec to continue the cycle
         _relativeUploadDelayTimer.setInterval(1000);
@@ -202,8 +196,7 @@ void BandwidthManager::relativeUploadMeasuringTimerExpired()
     _relativeLimitCurrentMeasuredDevice = nullptr;
 }
 
-void BandwidthManager::relativeUploadDelayTimerExpired()
-{
+void BandwidthManager::relativeUploadDelayTimerExpired() {
     // Switch to measuring state
     _relativeUploadMeasuringTimer.start(); // always start to continue the cycle
 
@@ -240,8 +233,7 @@ void BandwidthManager::relativeUploadDelayTimerExpired()
 }
 
 // for downloads:
-void BandwidthManager::relativeDownloadMeasuringTimerExpired()
-{
+void BandwidthManager::relativeDownloadMeasuringTimerExpired() {
     if (!usingRelativeDownloadLimit() || _downloadJobList.empty()) {
         // Not in this limiting mode, just wait 1 sec to continue the cycle
         _relativeDownloadDelayTimer.setInterval(1000);
@@ -297,8 +289,7 @@ void BandwidthManager::relativeDownloadMeasuringTimerExpired()
     _relativeLimitCurrentMeasuredDevice = nullptr;
 }
 
-void BandwidthManager::relativeDownloadDelayTimerExpired()
-{
+void BandwidthManager::relativeDownloadDelayTimerExpired() {
     // Switch to measuring state
     _relativeDownloadMeasuringTimer.start(); // always start to continue the cycle
 
@@ -335,8 +326,7 @@ void BandwidthManager::relativeDownloadDelayTimerExpired()
 
 // end downloads
 
-void BandwidthManager::switchingTimerExpired()
-{
+void BandwidthManager::switchingTimerExpired() {
     qint64 newUploadLimit = _propagator->_uploadLimit;
     if (newUploadLimit != _currentUploadLimit) {
         qCInfo(lcBandwidthManager) << "Upload Bandwidth limit changed" << _currentUploadLimit << newUploadLimit;
@@ -373,8 +363,7 @@ void BandwidthManager::switchingTimerExpired()
     }
 }
 
-void BandwidthManager::absoluteLimitTimerExpired()
-{
+void BandwidthManager::absoluteLimitTimerExpired() {
     if (usingAbsoluteUploadLimit() && !_absoluteUploadDeviceList.empty()) {
         qint64 quotaPerDevice = _currentUploadLimit / qMax((std::list<UploadDevice *>::size_type)1, _absoluteUploadDeviceList.size());
         qCDebug(lcBandwidthManager) << quotaPerDevice << _absoluteUploadDeviceList.size() << _currentUploadLimit;

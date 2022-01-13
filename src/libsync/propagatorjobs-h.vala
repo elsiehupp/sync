@@ -31,12 +31,10 @@ static const char contentMd5HeaderC[] = "Content-MD5";
  * @brief Declaration of the other propagation jobs
  * @ingroup libsync
  */
-class PropagateLocalRemove : public PropagateItemJob
-{
+class PropagateLocalRemove : public PropagateItemJob {
 public:
     PropagateLocalRemove(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
-        : PropagateItemJob(propagator, item)
-    {
+        : PropagateItemJob(propagator, item) {
     }
     void start() override;
 
@@ -50,13 +48,11 @@ private:
  * @brief The PropagateLocalMkdir class
  * @ingroup libsync
  */
-class PropagateLocalMkdir : public PropagateItemJob
-{
+class PropagateLocalMkdir : public PropagateItemJob {
 public:
     PropagateLocalMkdir(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
         : PropagateItemJob(propagator, item)
-        , _deleteExistingFile(false)
-    {
+        , _deleteExistingFile(false) {
     }
     void start() override;
 
@@ -79,12 +75,10 @@ private:
  * @brief The PropagateLocalRename class
  * @ingroup libsync
  */
-class PropagateLocalRename : public PropagateItemJob
-{
+class PropagateLocalRename : public PropagateItemJob {
 public:
     PropagateLocalRename(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
-        : PropagateItemJob(propagator, item)
-    {
+        : PropagateItemJob(propagator, item) {
     }
     void start() override;
     JobParallelism parallelism() override { return _item->isDirectory() ? WaitForFinished : FullParallelism; }

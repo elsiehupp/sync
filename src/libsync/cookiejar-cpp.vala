@@ -31,8 +31,7 @@ namespace {
     const unsigned int JAR_VERSION = 23;
 }
 
-QDataStream &operator<<(QDataStream &stream, const QList<QNetworkCookie> &list)
-{
+QDataStream &operator<<(QDataStream &stream, const QList<QNetworkCookie> &list) {
     stream << JAR_VERSION;
     stream << quint32(list.size());
     for (const auto &cookie : list)
@@ -40,8 +39,7 @@ QDataStream &operator<<(QDataStream &stream, const QList<QNetworkCookie> &list)
     return stream;
 }
 
-QDataStream &operator>>(QDataStream &stream, QList<QNetworkCookie> &list)
-{
+QDataStream &operator>>(QDataStream &stream, QList<QNetworkCookie> &list) {
     list.clear();
 
     quint32 version = 0;
@@ -68,14 +66,12 @@ QDataStream &operator>>(QDataStream &stream, QList<QNetworkCookie> &list)
 }
 
 CookieJar::CookieJar(QObject *parent)
-    : QNetworkCookieJar(parent)
-{
+    : QNetworkCookieJar(parent) {
 }
 
 CookieJar::~CookieJar() = default;
 
-bool CookieJar::setCookiesFromUrl(const QList<QNetworkCookie> &cookieList, const QUrl &url)
-{
+bool CookieJar::setCookiesFromUrl(const QList<QNetworkCookie> &cookieList, const QUrl &url) {
     if (QNetworkCookieJar::setCookiesFromUrl(cookieList, url)) {
         Q_EMIT newCookiesForUrl(cookieList, url);
         return true;
@@ -84,30 +80,25 @@ bool CookieJar::setCookiesFromUrl(const QList<QNetworkCookie> &cookieList, const
     return false;
 }
 
-QList<QNetworkCookie> CookieJar::cookiesForUrl(const QUrl &url) const
-{
+QList<QNetworkCookie> CookieJar::cookiesForUrl(const QUrl &url) const {
     QList<QNetworkCookie> cookies = QNetworkCookieJar::cookiesForUrl(url);
     qCDebug(lcCookieJar) << url << "requests:" << cookies;
     return cookies;
 }
 
-void CookieJar::clearSessionCookies()
-{
+void CookieJar::clearSessionCookies() {
     setAllCookies(removeExpired(allCookies()));
 }
 
-bool CookieJar::save(const QString &fileName)
-{
+bool CookieJar::save(const QString &fileName) {
     const QFileInfo info(fileName);
-    if (!info.dir().exists())
-    {
+    if (!info.dir().exists()) {
         info.dir().mkpath(".");
     }
 
     qCDebug(lcCookieJar) << fileName;
     QFile file(fileName);
-    if (!file.open(QIODevice::WriteOnly))
-    {
+    if (!file.open(QIODevice::WriteOnly)) {
         return false;
     }
     QDataStream stream(&file);
@@ -116,17 +107,14 @@ bool CookieJar::save(const QString &fileName)
     return true;
 }
 
-bool CookieJar::restore(const QString &fileName)
-{
+bool CookieJar::restore(const QString &fileName) {
     const QFileInfo info(fileName);
-    if (!info.exists())
-    {
+    if (!info.exists()) {
         return false;
     }
 
     QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly))
-    {
+    if (!file.open(QIODevice::ReadOnly)) {
         return false;
     }
     QDataStream stream(&file);
@@ -137,8 +125,7 @@ bool CookieJar::restore(const QString &fileName)
     return true;
 }
 
-QList<QNetworkCookie> CookieJar::removeExpired(const QList<QNetworkCookie> &cookies)
-{
+QList<QNetworkCookie> CookieJar::removeExpired(const QList<QNetworkCookie> &cookies) {
     QList<QNetworkCookie> updatedList;
     foreach (const QNetworkCookie &cookie, cookies) {
         if (cookie.expirationDate() > QDateTime::currentDateTimeUtc() && !cookie.isSessionCookie()) {

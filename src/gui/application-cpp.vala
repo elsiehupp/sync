@@ -85,8 +85,7 @@ namespace {
         "  --confdir <dirname>  : Use the given configuration folder.\n"
         "  --background         : launch the application in the background.\n";
 
-    QString applicationTrPath()
-    {
+    QString applicationTrPath() {
         QString devTrPath = qApp->applicationDirPath() + QString::fromLatin1("/../src/gui/");
         if (QDir(devTrPath).exists()) {
             // might miss Qt, QtKeyChain, etc.
@@ -105,8 +104,7 @@ namespace {
 
 // ----------------------------------------------------------------------------------
 
-bool Application::configVersionMigration()
-{
+bool Application::configVersionMigration() {
     QStringList deleteKeys, ignoreKeys;
     AccountManager::backwardMigrationSettingsKeys(&deleteKeys, &ignoreKeys);
     FolderMan::backwardMigrationSettingsKeys(&deleteKeys, &ignoreKeys);
@@ -165,8 +163,7 @@ bool Application::configVersionMigration()
     return true;
 }
 
-ownCloudGui *Application::gui() const
-{
+ownCloudGui *Application::gui() const {
     return _gui;
 }
 
@@ -182,8 +179,7 @@ Application::Application(int &argc, char **argv)
     , _logDebug(true)
     , _userTriggeredConnect(false)
     , _debugMode(false)
-    , _backgroundMode(false)
-{
+    , _backgroundMode(false) {
     _startedAt.start();
 
     qsrand(std::random_device()());
@@ -382,8 +378,7 @@ Application::Application(int &argc, char **argv)
     _gui->createTray();
 }
 
-Application::~Application()
-{
+Application::~Application() {
     // Make sure all folders are gone, otherwise removing the
     // accounts will remove the associated folders from the settings.
     if (_folderManager) {
@@ -396,8 +391,7 @@ Application::~Application()
     AccountManager::instance()->shutdown();
 }
 
-void Application::slotAccountStateRemoved(AccountState *accountState)
-{
+void Application::slotAccountStateRemoved(AccountState *accountState) {
     if (_gui) {
         disconnect(accountState, &AccountState::stateChanged,
             _gui.data(), &ownCloudGui::slotAccountStateChanged);
@@ -419,8 +413,7 @@ void Application::slotAccountStateRemoved(AccountState *accountState)
     }
 }
 
-void Application::slotAccountStateAdded(AccountState *accountState)
-{
+void Application::slotAccountStateAdded(AccountState *accountState) {
     connect(accountState, &AccountState::stateChanged,
         _gui.data(), &ownCloudGui::slotAccountStateChanged);
     connect(accountState->account().data(), &Account::serverVersionChanged,
@@ -433,8 +426,7 @@ void Application::slotAccountStateAdded(AccountState *accountState)
     _gui->slotTrayMessageIfServerUnsupported(accountState->account().data());
 }
 
-void Application::slotCleanup()
-{
+void Application::slotCleanup() {
     AccountManager::instance()->save();
     FolderMan::instance()->unloadAndDeleteAllFolders();
 
@@ -445,15 +437,13 @@ void Application::slotCleanup()
 // FIXME: This is not ideal yet since a ConnectionValidator might already be running and is in
 // progress of timing out in some seconds.
 // Maybe we need 2 validators, one triggered by timer, one by network configuration changes?
-void Application::slotSystemOnlineConfigurationChanged(QNetworkConfiguration cnf)
-{
+void Application::slotSystemOnlineConfigurationChanged(QNetworkConfiguration cnf) {
     if (cnf.state() & QNetworkConfiguration::Active) {
         QMetaObject::invokeMethod(this, "slotCheckConnection", Qt::QueuedConnection);
     }
 }
 
-void Application::slotCheckConnection()
-{
+void Application::slotCheckConnection() {
     const auto list = AccountManager::instance()->accounts();
     for (const auto &accountState : list) {
         AccountState::State state = accountState->state();
@@ -476,13 +466,11 @@ void Application::slotCheckConnection()
     }
 }
 
-void Application::slotCrash()
-{
+void Application::slotCrash() {
     Utility::crash();
 }
 
-void Application::slotownCloudWizardDone(int res)
-{
+void Application::slotownCloudWizardDone(int res) {
     FolderMan *folderMan = FolderMan::instance();
 
     // During the wizard, scheduling of new syncs is disabled
@@ -512,8 +500,7 @@ void Application::slotownCloudWizardDone(int res)
     }
 }
 
-void Application::setupLogging()
-{
+void Application::setupLogging() {
     // might be called from second instance
     auto logger = Logger::instance();
     logger->setLogFile(_logFile);
@@ -537,13 +524,11 @@ void Application::setupLogging()
     qCInfo(lcApplication) << "Arguments:" << qApp->arguments();
 }
 
-void Application::slotUseMonoIconsChanged(bool)
-{
+void Application::slotUseMonoIconsChanged(bool) {
     _gui->slotComputeOverallSyncStatus();
 }
 
-void Application::slotParseMessage(const QString &msg, QObject *)
-{
+void Application::slotParseMessage(const QString &msg, QObject *) {
     if (msg.startsWith(QLatin1String("MSG_PARSEOPTIONS:"))) {
         const int lengthOfMsgPrefix = 17;
         QStringList options = msg.mid(lengthOfMsgPrefix).split(QLatin1Char('|'));
@@ -574,8 +559,7 @@ void Application::slotParseMessage(const QString &msg, QObject *)
     }
 }
 
-void Application::parseOptions(const QStringList &options)
-{
+void Application::parseOptions(const QStringList &options) {
     QStringListIterator it(options);
     // skip file name;
     if (it.hasNext())
@@ -641,8 +625,7 @@ void Application::parseOptions(const QStringList &options)
 // Helpers for displaying messages. Note that there is no console on Windows.
 #ifdef Q_OS_WIN
 // Format as <pre> HTML
-static inline void toHtml(QString &t)
-{
+static inline void toHtml(QString &t) {
     t.replace(QLatin1Char('&'), QLatin1String("&amp;"));
     t.replace(QLatin1Char('<'), QLatin1String("&lt;"));
     t.replace(QLatin1Char('>'), QLatin1String("&gt;"));
@@ -650,22 +633,19 @@ static inline void toHtml(QString &t)
     t.append(QLatin1String("</pre></html>"));
 }
 
-static void displayHelpText(QString t) // No console on Windows.
-{
+static void displayHelpText(QString t) // No console on Windows. {
     toHtml(t);
     QMessageBox::information(0, Theme::instance()->appNameGUI(), t);
 }
 
 #else
 
-static void displayHelpText(const QString &t)
-{
+static void displayHelpText(const QString &t) {
     std::cout << qUtf8Printable(t);
 }
 #endif
 
-void Application::showHelp()
-{
+void Application::showHelp() {
     setHelp();
     QString helpText;
     QTextStream stream(&helpText);
@@ -685,36 +665,30 @@ void Application::showHelp()
     displayHelpText(helpText);
 }
 
-void Application::showVersion()
-{
+void Application::showVersion() {
     displayHelpText(Theme::instance()->versionSwitchOutput());
 }
 
-void Application::showHint(std::string errorHint)
-{
+void Application::showHint(std::string errorHint) {
     static QString binName = QFileInfo(QCoreApplication::applicationFilePath()).fileName();
     std::cerr << errorHint << std::endl;
     std::cerr << "Try '" << binName.toStdString() << " --help' for more information" << std::endl;
     std::exit(1);
 }
 
-bool Application::debugMode()
-{
+bool Application::debugMode() {
     return _debugMode;
 }
 
-bool Application::backgroundMode() const
-{
+bool Application::backgroundMode() const {
     return _backgroundMode;
 }
 
-void Application::setHelp()
-{
+void Application::setHelp() {
     _helpOnly = true;
 }
 
-QString substLang(const QString &lang)
-{
+QString substLang(const QString &lang) {
     // Map the more appropriate script codes
     // to country codes as used by Qt and
     // transifex translation conventions.
@@ -728,8 +702,7 @@ QString substLang(const QString &lang)
     return lang;
 }
 
-void Application::setupTranslations()
-{
+void Application::setupTranslations() {
     QStringList uiLanguages;
 // uiLanguages crashes on Windows with 4.8.0 release builds
 #if (QT_VERSION >= 0x040801) || (QT_VERSION >= 0x040800 && !defined(Q_OS_WIN))
@@ -787,28 +760,23 @@ void Application::setupTranslations()
     }
 }
 
-bool Application::giveHelp()
-{
+bool Application::giveHelp() {
     return _helpOnly;
 }
 
-bool Application::versionOnly()
-{
+bool Application::versionOnly() {
     return _versionOnly;
 }
 
-void Application::showMainDialog()
-{
+void Application::showMainDialog() {
     _gui->slotOpenMainDialog();
 }
 
-void Application::slotGuiIsShowingSettings()
-{
+void Application::slotGuiIsShowingSettings() {
     emit isShowingSettingsDialog();
 }
 
-void Application::openVirtualFile(const QString &filename)
-{
+void Application::openVirtualFile(const QString &filename) {
     QString virtualFileExt = QStringLiteral(APPLICATION_DOTVIRTUALFILE_SUFFIX);
     if (!filename.endsWith(virtualFileExt)) {
         qWarning(lcApplication) << "Can only handle file ending in .owncloud. Unable to open" << filename;
@@ -832,14 +800,12 @@ void Application::openVirtualFile(const QString &filename)
     });
 }
 
-void Application::tryTrayAgain()
-{
+void Application::tryTrayAgain() {
     qCInfo(lcApplication) << "Trying tray icon, tray available:" << QSystemTrayIcon::isSystemTrayAvailable();
     _gui->hideAndShowTray();
 }
 
-bool Application::event(QEvent *event)
-{
+bool Application::event(QEvent *event) {
 #ifdef Q_OS_MAC
     if (event->type() == QEvent::FileOpen) {
         QFileOpenEvent *openEvent = static_cast<QFileOpenEvent *>(event);

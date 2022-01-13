@@ -26,11 +26,9 @@ namespace OCC {
 
 class VfsCfApi;
 
-namespace CfApiWrapper
-{
+namespace CfApiWrapper {
 
-class NEXTCLOUD_CFAPI_EXPORT ConnectionKey
-{
+class NEXTCLOUD_CFAPI_EXPORT ConnectionKey {
 public:
     ConnectionKey();
     inline void *get() const { return _data.get(); }
@@ -39,8 +37,7 @@ private:
     std::unique_ptr<void, void(*)(void *)> _data;
 };
 
-class NEXTCLOUD_CFAPI_EXPORT FileHandle
-{
+class NEXTCLOUD_CFAPI_EXPORT FileHandle {
 public:
     using Deleter = void (*)(void *);
 
@@ -54,8 +51,7 @@ private:
     std::unique_ptr<void, void(*)(void *)> _data;
 };
 
-class NEXTCLOUD_CFAPI_EXPORT PlaceHolderInfo
-{
+class NEXTCLOUD_CFAPI_EXPORT PlaceHolderInfo {
 public:
     using Deleter = void (*)(CF_PLACEHOLDER_BASIC_INFO *);
 

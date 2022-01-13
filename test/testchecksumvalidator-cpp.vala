@@ -18,8 +18,7 @@
 using namespace OCC;
 using namespace OCC::Utility;
 
-    class TestChecksumValidator : public QObject
-    {
+    class TestChecksumValidator : public QObject {
         Q_OBJECT
     private:
         QTemporaryDir _root;
@@ -42,14 +41,12 @@ using namespace OCC::Utility;
          _successDown = true;
     }
 
-    void slotDownError(const QString &errMsg)
-    {
+    void slotDownError(const QString &errMsg) {
          QCOMPARE(_expectedError, errMsg);
          _errorSeen = true;
     }
 
-    static QByteArray shellSum( const QByteArray& cmd, const QString& file )
-    {
+    static QByteArray shellSum( const QByteArray& cmd, const QString& file ) {
         QProcess md5;
         QStringList args;
         args.append(file);
@@ -72,8 +69,7 @@ using namespace OCC::Utility;
         Utility::writeRandomFile( _testfile);
     }
 
-    void testMd5Calc()
-    {
+    void testMd5Calc() {
         QString file( _root.path() + "/file_a.bin");
         QVERIFY(writeRandomFile(file));
         QFileInfo fi(file);
@@ -92,8 +88,7 @@ using namespace OCC::Utility;
         QCOMPARE(sSum, sum);
     }
 
-    void testSha1Calc()
-    {
+    void testSha1Calc() {
         QString file( _root.path() + "/file_b.bin");
         writeRandomFile(file);
         QFileInfo fi(file);

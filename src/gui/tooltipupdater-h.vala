@@ -33,8 +33,7 @@ namespace OCC {
  * and the dataChanged() slot updates the tooltip if Qt::ToolTipRole
  * gets updated while a tooltip is shown.
  */
-class ToolTipUpdater : public QObject
-{
+class ToolTipUpdater : public QObject {
 public:
     ToolTipUpdater(QTreeView *treeView);
 

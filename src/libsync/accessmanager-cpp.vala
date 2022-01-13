@@ -33,8 +33,7 @@ namespace OCC {
 Q_LOGGING_CATEGORY(lcAccessManager, "nextcloud.sync.accessmanager", QtInfoMsg)
 
 AccessManager::AccessManager(QObject *parent)
-    : QNetworkAccessManager(parent)
-{
+    : QNetworkAccessManager(parent) {
 #if defined(Q_OS_MAC)
     // FIXME Workaround http://stackoverflow.com/a/15707366/2941 https://bugreports.qt-project.org/browse/QTBUG-30434
     QNetworkProxy proxy = this->proxy();
@@ -49,13 +48,11 @@ AccessManager::AccessManager(QObject *parent)
     setCookieJar(new CookieJar);
 }
 
-QByteArray AccessManager::generateRequestId()
-{
+QByteArray AccessManager::generateRequestId() {
     return QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 }
 
-QNetworkReply *AccessManager::createRequest(QNetworkAccessManager::Operation op, const QNetworkRequest &request, QIODevice *outgoingData)
-{
+QNetworkReply *AccessManager::createRequest(QNetworkAccessManager::Operation op, const QNetworkRequest &request, QIODevice *outgoingData) {
     QNetworkRequest newRequest(request);
 
     // Respect request specific user agent if any

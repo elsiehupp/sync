@@ -12,8 +12,7 @@
 
 using namespace OCC;
 
-class TestOwnSql : public QObject
-{
+class TestOwnSql : public QObject {
     QTemporaryDir _tempDir;
 
 private slots:
@@ -125,8 +124,7 @@ private slots:
         }
     }
 
-    void testDestructor()
-    {
+    void testDestructor() {
         // This test make sure that the destructor of SqlQuery works even if the SqlDatabase
         // is destroyed before
         QScopedPointer<SqlDatabase> db(new SqlDatabase());

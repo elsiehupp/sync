@@ -33,8 +33,7 @@
 namespace SharedTools {
 
 QtSingleCoreApplication::QtSingleCoreApplication(int &argc, char **argv)
-    : QCoreApplication(argc, argv)
-{
+    : QCoreApplication(argc, argv) {
     peer = new QtLocalPeer(this);
     block = false;
     connect(peer, &QtLocalPeer::messageReceived, this, &QtSingleCoreApplication::messageReceived);
@@ -42,32 +41,27 @@ QtSingleCoreApplication::QtSingleCoreApplication(int &argc, char **argv)
 
 
 QtSingleCoreApplication::QtSingleCoreApplication(const QString &appId, int &argc, char **argv)
-    : QCoreApplication(argc, argv)
-{
+    : QCoreApplication(argc, argv) {
     peer = new QtLocalPeer(this, appId);
     connect(peer, &QtLocalPeer::messageReceived, this, &QtSingleCoreApplication::messageReceived);
 }
 
 
-bool QtSingleCoreApplication::isRunning()
-{
+bool QtSingleCoreApplication::isRunning() {
     return peer->isClient();
 }
 
 
-bool QtSingleCoreApplication::sendMessage(const QString &message, int timeout)
-{
+bool QtSingleCoreApplication::sendMessage(const QString &message, int timeout) {
     return peer->sendMessage(message, timeout, block);
 }
 
 
-QString QtSingleCoreApplication::id() const
-{
+QString QtSingleCoreApplication::id() const {
     return peer->applicationId();
 }
 
-void QtSingleCoreApplication::setBlock(bool value)
-{
+void QtSingleCoreApplication::setBlock(bool value) {
     block = value;
 }
 

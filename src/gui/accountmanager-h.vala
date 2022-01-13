@@ -23,8 +23,7 @@ namespace OCC {
    @brief The AccountManager class
    @ingroup gui
 */
-class AccountManager : public QObject
-{
+class AccountManager : public QObject {
 public:
     static AccountManager *instance();
     ~AccountManager() override = default;

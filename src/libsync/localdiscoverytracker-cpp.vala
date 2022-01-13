@@ -24,21 +24,18 @@ Q_LOGGING_CATEGORY(lcLocalDiscoveryTracker, "sync.localdiscoverytracker", QtInfo
 
 LocalDiscoveryTracker::LocalDiscoveryTracker() = default;
 
-void LocalDiscoveryTracker::addTouchedPath(const QString &relativePath)
-{
+void LocalDiscoveryTracker::addTouchedPath(const QString &relativePath) {
     qCDebug(lcLocalDiscoveryTracker) << "inserted touched" << relativePath;
     _localDiscoveryPaths.insert(relativePath);
 }
 
-void LocalDiscoveryTracker::startSyncFullDiscovery()
-{
+void LocalDiscoveryTracker::startSyncFullDiscovery() {
     _localDiscoveryPaths.clear();
     _previousLocalDiscoveryPaths.clear();
     qCDebug(lcLocalDiscoveryTracker) << "full discovery";
 }
 
-void LocalDiscoveryTracker::startSyncPartialDiscovery()
-{
+void LocalDiscoveryTracker::startSyncPartialDiscovery() {
     if (lcLocalDiscoveryTracker().isDebugEnabled()) {
         QStringList paths;
         for (auto &path : _localDiscoveryPaths)
@@ -50,13 +47,11 @@ void LocalDiscoveryTracker::startSyncPartialDiscovery()
     _localDiscoveryPaths.clear();
 }
 
-const std::set<QString> &LocalDiscoveryTracker::localDiscoveryPaths() const
-{
+const std::set<QString> &LocalDiscoveryTracker::localDiscoveryPaths() const {
     return _localDiscoveryPaths;
 }
 
-void LocalDiscoveryTracker::slotItemCompleted(const SyncFileItemPtr &item)
-{
+void LocalDiscoveryTracker::slotItemCompleted(const SyncFileItemPtr &item) {
     // For successes, we want to wipe the file from the list to ensure we don't
     // rediscover it even if this overall sync fails.
     //
@@ -79,8 +74,7 @@ void LocalDiscoveryTracker::slotItemCompleted(const SyncFileItemPtr &item)
     }
 }
 
-void LocalDiscoveryTracker::slotSyncFinished(bool success)
-{
+void LocalDiscoveryTracker::slotSyncFinished(bool success) {
     if (success) {
         qCDebug(lcLocalDiscoveryTracker) << "sync success, forgetting last sync's local discovery path list";
     } else {

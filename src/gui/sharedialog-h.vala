@@ -37,8 +37,7 @@ class ShareManager;
 class LinkShare;
 class Share;
 
-class ShareDialog : public QDialog
-{
+class ShareDialog : public QDialog {
 
 public:
     explicit ShareDialog(QPointer<AccountState> accountState,

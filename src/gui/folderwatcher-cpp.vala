@@ -41,20 +41,17 @@ Q_LOGGING_CATEGORY(lcFolderWatcher, "nextcloud.gui.folderwatcher", QtInfoMsg)
 
 FolderWatcher::FolderWatcher(Folder *folder)
     : QObject(folder)
-    , _folder(folder)
-{
+    , _folder(folder) {
 }
 
 FolderWatcher::~FolderWatcher() = default;
 
-void FolderWatcher::init(const QString &root)
-{
+void FolderWatcher::init(const QString &root) {
     _d.reset(new FolderWatcherPrivate(this, root));
     _timer.start();
 }
 
-bool FolderWatcher::pathIsIgnored(const QString &path)
-{
+bool FolderWatcher::pathIsIgnored(const QString &path) {
     if (path.isEmpty())
         return true;
     if (!_folder)
@@ -69,8 +66,7 @@ bool FolderWatcher::pathIsIgnored(const QString &path)
     return false;
 }
 
-bool FolderWatcher::isReliable() const
-{
+bool FolderWatcher::isReliable() const {
     return _isReliable;
 }
 
@@ -87,8 +83,7 @@ void FolderWatcher::appendSubPaths(QDir dir, QStringList& subPaths) {
     }
 }
 
-void FolderWatcher::startNotificatonTest(const QString &path)
-{
+void FolderWatcher::startNotificatonTest(const QString &path) {
 #ifdef Q_OS_MAC
     // Testing the folder watcher on OSX is harder because the watcher
     // automatically discards changes that were performed by our process.
@@ -105,8 +100,7 @@ void FolderWatcher::startNotificatonTest(const QString &path)
     startNotificationTestWhenReady();
 }
 
-void FolderWatcher::startNotificationTestWhenReady()
-{
+void FolderWatcher::startNotificationTestWhenReady() {
     if (!_d->_ready) {
         QTimer::singleShot(1000, this, &FolderWatcher::startNotificationTestWhenReady);
         return;
@@ -129,8 +123,7 @@ void FolderWatcher::startNotificationTestWhenReady()
 }
 
 
-int FolderWatcher::testLinuxWatchCount() const
-{
+int FolderWatcher::testLinuxWatchCount() const {
 #ifdef Q_OS_LINUX
     return _d->testWatchCount();
 #else
@@ -138,8 +131,7 @@ int FolderWatcher::testLinuxWatchCount() const
 #endif
 }
 
-void FolderWatcher::changeDetected(const QString &path)
-{
+void FolderWatcher::changeDetected(const QString &path) {
     QFileInfo fileInfo(path);
     QStringList paths(path);
     if (fileInfo.isDir()) {
@@ -149,8 +141,7 @@ void FolderWatcher::changeDetected(const QString &path)
     changeDetected(paths);
 }
 
-void FolderWatcher::changeDetected(const QStringList &paths)
-{
+void FolderWatcher::changeDetected(const QStringList &paths) {
     // TODO: this shortcut doesn't look very reliable:
     //   - why is the timeout only 1 second?
     //   - what if there is more than one file being updated frequently?

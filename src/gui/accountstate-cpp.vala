@@ -44,8 +44,7 @@ AccountState::AccountState(AccountPtr account)
     , _waitingForNewCredentials(false)
     , _maintenanceToConnectedDelay(60000 + (qrand() % (4 * 60000))) // 1-5min delay
     , _remoteWipe(new RemoteWipe(_account))
-    , _isDesktopNotificationsAllowed(true)
-{
+    , _isDesktopNotificationsAllowed(true) {
     qRegisterMetaType<AccountState *>("AccountState*");
 
     connect(account.data(), &Account::invalidCredentials,
@@ -65,38 +64,31 @@ AccountState::AccountState(AccountPtr account)
 
 AccountState::~AccountState() = default;
 
-AccountState *AccountState::loadFromSettings(AccountPtr account, QSettings & /*settings*/)
-{
+AccountState *AccountState::loadFromSettings(AccountPtr account, QSettings & /*settings*/) {
     auto accountState = new AccountState(account);
     return accountState;
 }
 
-void AccountState::writeToSettings(QSettings & /*settings*/)
-{
+void AccountState::writeToSettings(QSettings & /*settings*/) {
 }
 
-AccountPtr AccountState::account() const
-{
+AccountPtr AccountState::account() const {
     return _account;
 }
 
-AccountState::ConnectionStatus AccountState::connectionStatus() const
-{
+AccountState::ConnectionStatus AccountState::connectionStatus() const {
     return _connectionStatus;
 }
 
-QStringList AccountState::connectionErrors() const
-{
+QStringList AccountState::connectionErrors() const {
     return _connectionErrors;
 }
 
-AccountState::State AccountState::state() const
-{
+AccountState::State AccountState::state() const {
     return _state;
 }
 
-void AccountState::setState(State state)
-{
+void AccountState::setState(State state) {
     if (_state != state) {
         qCInfo(lcAccountState) << "AccountState state change: "
                                << stateString(_state) << "->" << stateString(state);
@@ -126,8 +118,7 @@ void AccountState::setState(State state)
     emit stateChanged(_state);
 }
 
-QString AccountState::stateString(State state)
-{
+QString AccountState::stateString(State state) {
     switch (state) {
     case SignedOut:
         return tr("Signed out");
@@ -149,80 +140,67 @@ QString AccountState::stateString(State state)
     return tr("Unknown account state");
 }
 
-bool AccountState::isSignedOut() const
-{
+bool AccountState::isSignedOut() const {
     return _state == SignedOut;
 }
 
-void AccountState::signOutByUi()
-{
+void AccountState::signOutByUi() {
     account()->credentials()->forgetSensitiveData();
     account()->clearCookieJar();
     setState(SignedOut);
 }
 
-void AccountState::freshConnectionAttempt()
-{
+void AccountState::freshConnectionAttempt() {
     if (isConnected())
         setState(Disconnected);
     checkConnectivity();
 }
 
-void AccountState::signIn()
-{
+void AccountState::signIn() {
     if (_state == SignedOut) {
         _waitingForNewCredentials = false;
         setState(Disconnected);
     }
 }
 
-bool AccountState::isConnected() const
-{
+bool AccountState::isConnected() const {
     return _state == Connected;
 }
 
-void AccountState::tagLastSuccessfullETagRequest(const QDateTime &tp)
-{
+void AccountState::tagLastSuccessfullETagRequest(const QDateTime &tp) {
     _timeOfLastETagCheck = tp;
 }
 
-QByteArray AccountState::notificationsEtagResponseHeader() const
-{
+QByteArray AccountState::notificationsEtagResponseHeader() const {
     return _notificationsEtagResponseHeader;
 }
 
-void AccountState::setNotificationsEtagResponseHeader(const QByteArray &value)
-{
+void AccountState::setNotificationsEtagResponseHeader(const QByteArray &value) {
     _notificationsEtagResponseHeader = value;
 }
 
-QByteArray AccountState::navigationAppsEtagResponseHeader() const
-{
+QByteArray AccountState::navigationAppsEtagResponseHeader() const {
     return _navigationAppsEtagResponseHeader;
 }
 
-void AccountState::setNavigationAppsEtagResponseHeader(const QByteArray &value)
-{
+void AccountState::setNavigationAppsEtagResponseHeader(const QByteArray &value) {
     _navigationAppsEtagResponseHeader = value;
 }
 
-bool AccountState::isDesktopNotificationsAllowed() const
-{
+bool AccountState::isDesktopNotificationsAllowed() const {
     return _isDesktopNotificationsAllowed;
 }
 
-void AccountState::setDesktopNotificationsAllowed(bool isAllowed)
-{
+void AccountState::setDesktopNotificationsAllowed(bool isAllowed) {
     if (_isDesktopNotificationsAllowed == isAllowed) {
         return;
     }
-    
+
     _isDesktopNotificationsAllowed = isAllowed;
     emit desktopNotificationsAllowedChanged();
 }
 
-void AccountState::checkConnectivity()
-{
+void AccountState::checkConnectivity() {
     if (isSignedOut() || _waitingForNewCredentials) {
         return;
     }
@@ -278,8 +256,7 @@ void AccountState::checkConnectivity()
     }
 }
 
-void AccountState::slotConnectionValidatorResult(ConnectionValidator::Status status, const QStringList &errors)
-{
+void AccountState::slotConnectionValidatorResult(ConnectionValidator::Status status, const QStringList &errors) {
     if (isSignedOut()) {
         qCWarning(lcAccountState) << "Signed out, ignoring" << status << _account->url().toString();
         return;
@@ -356,8 +333,7 @@ void AccountState::slotConnectionValidatorResult(ConnectionValidator::Status sta
     }
 }
 
-void AccountState::slotHandleRemoteWipeCheck()
-{
+void AccountState::slotHandleRemoteWipeCheck() {
     // make sure it changes account state and icons
     signOutByUi();
 
@@ -369,8 +345,7 @@ void AccountState::slotHandleRemoteWipeCheck()
 }
 
 
-void AccountState::handleInvalidCredentials()
-{
+void AccountState::handleInvalidCredentials() {
     if (isSignedOut() || _waitingForNewCredentials)
         return;
 
@@ -391,8 +366,7 @@ void AccountState::handleInvalidCredentials()
 }
 
 
-void AccountState::slotCredentialsFetched(AbstractCredentials *)
-{
+void AccountState::slotCredentialsFetched(AbstractCredentials *) {
     // Make a connection attempt, no matter whether the credentials are
     // ready or not - we want to check whether we can get an SSL connection
     // going before bothering the user for a password.
@@ -402,8 +376,7 @@ void AccountState::slotCredentialsFetched(AbstractCredentials *)
     checkConnectivity();
 }
 
-void AccountState::slotCredentialsAsked(AbstractCredentials *credentials)
-{
+void AccountState::slotCredentialsAsked(AbstractCredentials *credentials) {
     qCInfo(lcAccountState) << "Credentials asked for" << _account->url().toString()
                            << "are they ready?" << credentials->ready();
 
@@ -425,8 +398,7 @@ void AccountState::slotCredentialsAsked(AbstractCredentials *credentials)
     checkConnectivity();
 }
 
-std::unique_ptr<QSettings> AccountState::settings()
-{
+std::unique_ptr<QSettings> AccountState::settings() {
     auto s = ConfigFile::settingsWithGroup(QLatin1String("Accounts"));
     s->beginGroup(_account->id());
     return s;
@@ -448,13 +420,11 @@ void AccountState::slotEtagResponseHeaderReceived(const QByteArray &value, int s
     }
 }
 
-void AccountState::slotOcsError(int statusCode, const QString &message)
-{
+void AccountState::slotOcsError(int statusCode, const QString &message) {
     qCDebug(lcAccountState) << "Error " << statusCode << " while fetching new navigation apps: " << message;
 }
 
-void AccountState::slotNavigationAppsFetched(const QJsonDocument &reply, int statusCode)
-{
+void AccountState::slotNavigationAppsFetched(const QJsonDocument &reply, int statusCode) {
     if(_account){
         if (statusCode == 304) {
             qCWarning(lcAccountState) << "Status code " << statusCode << " Not Modified - No new navigation apps.";
@@ -482,13 +452,11 @@ void AccountState::slotNavigationAppsFetched(const QJsonDocument &reply, int sta
     }
 }
 
-AccountAppList AccountState::appList() const
-{
+AccountAppList AccountState::appList() const {
     return _apps;
 }
 
-AccountApp* AccountState::findApp(const QString &appId) const
-{
+AccountApp* AccountState::findApp(const QString &appId) const {
     if(!appId.isEmpty()) {
         const auto apps = appList();
         const auto it = std::find_if(apps.cbegin(), apps.cend(), [appId](const auto &app) {
@@ -511,27 +479,22 @@ AccountApp::AccountApp(const QString &name, const QUrl &url,
     , _name(name)
     , _url(url)
     , _id(id)
-    , _iconUrl(iconUrl)
-{
+    , _iconUrl(iconUrl) {
 }
 
-QString AccountApp::name() const
-{
+QString AccountApp::name() const {
     return _name;
 }
 
-QUrl AccountApp::url() const
-{
+QUrl AccountApp::url() const {
     return _url;
 }
 
-QString AccountApp::id() const
-{
+QString AccountApp::id() const {
     return _id;
 }
 
-QUrl AccountApp::iconUrl() const
-{
+QUrl AccountApp::iconUrl() const {
     return _iconUrl;
 }
 

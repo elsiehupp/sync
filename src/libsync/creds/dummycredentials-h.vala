@@ -17,8 +17,7 @@
 
 namespace OCC {
 
-class OWNCLOUDSYNC_EXPORT DummyCredentials : public AbstractCredentials
-{
+class OWNCLOUDSYNC_EXPORT DummyCredentials : public AbstractCredentials {
 
 public:
     QString _user;

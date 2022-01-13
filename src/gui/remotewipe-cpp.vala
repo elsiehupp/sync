@@ -31,8 +31,7 @@ RemoteWipe::RemoteWipe(AccountPtr account, QObject *parent)
       _accountRemoved(false),
       _networkManager(nullptr),
       _networkReplyCheck(nullptr),
-      _networkReplySuccess(nullptr)
-{
+      _networkReplySuccess(nullptr) {
     QObject::connect(AccountManager::instance(), &AccountManager::accountRemoved,
                      this, [=](AccountState *) {
         _accountRemoved = true;
@@ -67,8 +66,7 @@ void RemoteWipe::startCheckJobWithAppPassword(QString pwd){
                      &RemoteWipe::checkJobSlot);
 }
 
-void RemoteWipe::checkJobSlot()
-{
+void RemoteWipe::checkJobSlot() {
     auto jsonData = _networkReplyCheck->readAll();
     QJsonParseError jsonParseError;
     QJsonObject json = QJsonDocument::fromJson(jsonData, &jsonParseError).object();
@@ -146,8 +144,7 @@ void RemoteWipe::notifyServerSuccessJob(AccountState *accountState, bool dataWip
     }
 }
 
-void RemoteWipe::notifyServerSuccessJobSlot()
-{
+void RemoteWipe::notifyServerSuccessJobSlot() {
     auto jsonData = _networkReplySuccess->readAll();
     QJsonParseError jsonParseError;
     QJsonObject json = QJsonDocument::fromJson(jsonData, &jsonParseError).object();

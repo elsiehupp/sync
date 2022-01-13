@@ -30,8 +30,7 @@ namespace OCC {
  * Handle talking to the OCS Share API.
  * For creation, deletion and modification of shares.
  */
-class OcsShareJob : public OcsJob
-{
+class OcsShareJob : public OcsJob {
 public:
     /**
      * Constructor for new shares or listing of shares
@@ -93,7 +92,7 @@ public:
      */
     void setPermissions(const QString &shareId,
         const Share::Permissions permissions);
-    
+
     /**
      * Set share link label
      */

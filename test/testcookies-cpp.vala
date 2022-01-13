@@ -10,12 +10,10 @@
 
 using namespace OCC;
 
-class TestCookies : public QObject
-{
+class TestCookies : public QObject {
 
 private slots:
-    void testCookies()
-    {
+    void testCookies() {
         QTemporaryDir tmp;
         const QString nonexistingPath = tmp.filePath("someNonexistingDir/test.db");
         QNetworkCookie cookieA = QNetworkCookie("foo", "bar");

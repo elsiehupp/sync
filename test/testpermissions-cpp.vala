@@ -25,8 +25,7 @@ static void applyPermissionsFromName(FileInfo &info) {
 
 // Check if the expected rows in the DB are non-empty. Note that in some cases they might be, then we cannot use this function
 // https://github.com/owncloud/client/issues/2038
-static void assertCsyncJournalOk(SyncJournalDb &journal)
-{
+static void assertCsyncJournalOk(SyncJournalDb &journal) {
     // The DB is openend in locked mode: close to allow us to access.
     journal.close();
 
@@ -41,8 +40,7 @@ static void assertCsyncJournalOk(SyncJournalDb &journal)
 #endif
 }
 
-SyncFileItemPtr findDiscoveryItem(const SyncFileItemVector &spy, const QString &path)
-{
+SyncFileItemPtr findDiscoveryItem(const SyncFileItemVector &spy, const QString &path) {
     for (const auto &item : spy) {
         if (item->destination() == path)
             return item;
@@ -50,25 +48,21 @@ SyncFileItemPtr findDiscoveryItem(const SyncFileItemVector &spy, const QString &
     return SyncFileItemPtr(new SyncFileItem);
 }
 
-bool itemInstruction(const ItemCompletedSpy &spy, const QString &path, const SyncInstructions instr)
-{
+bool itemInstruction(const ItemCompletedSpy &spy, const QString &path, const SyncInstructions instr) {
     auto item = spy.findItem(path);
     return item->_instruction == instr;
 }
 
-bool discoveryInstruction(const SyncFileItemVector &spy, const QString &path, const SyncInstructions instr)
-{
+bool discoveryInstruction(const SyncFileItemVector &spy, const QString &path, const SyncInstructions instr) {
     auto item = findDiscoveryItem(spy, path);
     return item->_instruction == instr;
 }
 
-class TestPermissions : public QObject
-{
+class TestPermissions : public QObject {
 
 private slots:
 
-    void t7pl()
-    {
+    void t7pl() {
         FakeFolder fakeFolder{ FileInfo() };
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
 
@@ -338,16 +332,14 @@ private slots:
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
     }
 
-    static void setAllPerm(FileInfo *fi, RemotePermissions perm)
-    {
+    static void setAllPerm(FileInfo *fi, RemotePermissions perm) {
         fi->permissions = perm;
         for (auto &subFi : fi->children)
             setAllPerm(&subFi, perm);
     }
 
     // What happens if the source can't be moved or the target can't be created?
-    void testForbiddenMoves()
-    {
+    void testForbiddenMoves() {
         FakeFolder fakeFolder{FileInfo{}};
 
         // Some of this test depends on the order of discovery. With threading

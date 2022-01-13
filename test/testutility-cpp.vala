@@ -16,23 +16,19 @@ namespace OCC {
 OCSYNC_EXPORT extern bool fsCasePreserving_override;
 }
 
-class TestUtility : public QObject
-{
+class TestUtility : public QObject {
 
 private slots:
-    void initTestCase()
-    {
+    void initTestCase() {
         QStandardPaths::setTestModeEnabled(true);
     }
 
-    void testFormatFingerprint()
-    {
+    void testFormatFingerprint() {
         QVERIFY2(formatFingerprint("68ac906495480a3404beee4874ed853a037a7a8f")
                  == "68:ac:90:64:95:48:0a:34:04:be:ee:48:74:ed:85:3a:03:7a:7a:8f",
 		"Utility::formatFingerprint() is broken");
     }
-    void testOctetsToString()
-    {
+    void testOctetsToString() {
         QLocale::setDefault(QLocale("en"));
         QCOMPARE(octetsToString(999) , QString("999 B"));
         QCOMPARE(octetsToString(1024) , QString("1 KB"));
@@ -55,8 +51,7 @@ private slots:
         QCOMPARE(octetsToString(1024LL*1024*1024), QString("1 GB"));
     }
 
-    void testLaunchOnStartup()
-    {
+    void testLaunchOnStartup() {
         QString postfix = QString::number(OCC::Utility::rand());
 
         const QString appName = QString::fromLatin1("testLaunchOnStartup.%1").arg(postfix);
@@ -69,8 +64,7 @@ private slots:
         QVERIFY(hasLaunchOnStartup(appName) == false);
     }
 
-    void testDurationToDescriptiveString()
-    {
+    void testDurationToDescriptiveString() {
         QLocale::setDefault(QLocale("C"));
         //NOTE: in order for the plural to work we would need to load the english translation
 
@@ -111,8 +105,7 @@ private slots:
 
     }
 
-    void testVersionOfInstalledBinary()
-    {
+    void testVersionOfInstalledBinary() {
         if (isLinux()) {
             // pass the cmd client from our build dir
             // this is a bit inaccurate as it does not test the "real thing"
@@ -129,8 +122,7 @@ private slots:
         }
     }
 
-    void testTimeAgo()
-    {
+    void testTimeAgo() {
         // Both times in same timezone
         QDateTime d1 = QDateTime::fromString("2015-01-24T09:20:30+01:00", Qt::ISODate);
         QDateTime d2 = QDateTime::fromString("2015-01-23T09:20:30+01:00", Qt::ISODate);
@@ -154,8 +146,7 @@ private slots:
         QCOMPARE(s, QLatin1String("Less than a minute ago"));
     }
 
-    void testFsCasePreserving()
-    {
+    void testFsCasePreserving() {
         QVERIFY(isMac() || isWindows() ? fsCasePreserving() : ! fsCasePreserving());
         QScopedValueRollback<bool> scope(OCC::fsCasePreserving_override);
         OCC::fsCasePreserving_override = true;
@@ -164,8 +155,7 @@ private slots:
         QVERIFY(! fsCasePreserving());
     }
 
-    void testFileNamesEqual()
-    {
+    void testFileNamesEqual() {
         QTemporaryDir dir;
         QVERIFY(dir.isValid());
         QDir dir2(dir.path());
@@ -192,8 +182,7 @@ private slots:
         dir.remove();
     }
 
-    void testSanitizeForFileName_data()
-    {
+    void testSanitizeForFileName_data() {
         QTest::addColumn<QString>("input");
         QTest::addColumn<QString>("output");
 
@@ -208,15 +197,13 @@ private slots:
             << "a b c d";
     }
 
-    void testSanitizeForFileName()
-    {
+    void testSanitizeForFileName() {
         QFETCH(QString, input);
         QFETCH(QString, output);
         QCOMPARE(sanitizeForFileName(input), output);
     }
 
-    void testNormalizeEtag()
-    {
+    void testNormalizeEtag() {
         QByteArray str;
 
 #define CHECK_NORMALIZE_ETAG(TEST, EXPECT) \
@@ -235,8 +222,7 @@ private slots:
         CHECK_NORMALIZE_ETAG("\"foo-gzip\"", "foo");
     }
 
-    void testIsPathWindowsDrivePartitionRoot()
-    {
+    void testIsPathWindowsDrivePartitionRoot() {
 #ifdef Q_OS_WIN
         // a non-root of a Windows partition
         QVERIFY(!isPathWindowsDrivePartitionRoot("c:/a"));

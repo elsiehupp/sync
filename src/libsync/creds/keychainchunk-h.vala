@@ -37,8 +37,7 @@ static constexpr int MaxChunks = 10;
 /*
  * @brief: Abstract base class for KeychainChunk jobs.
  */
-class OWNCLOUDSYNC_EXPORT Job : public QObject
-{
+class OWNCLOUDSYNC_EXPORT Job : public QObject {
 public:
     Job(QObject *parent = nullptr);
 
@@ -87,8 +86,7 @@ protected:
 /*
 * @brief: Simple wrapper class for QKeychain::WritePasswordJob, splits too large keychain entry's data into chunks on Windows
 */
-class OWNCLOUDSYNC_EXPORT WriteJob : public KeychainChunk::Job
-{
+class OWNCLOUDSYNC_EXPORT WriteJob : public KeychainChunk::Job {
 public:
     WriteJob(Account *account, const QString &key, const QByteArray &data, QObject *parent = nullptr);
     WriteJob(const QString &key, const QByteArray &data, QObject *parent = nullptr);
@@ -119,8 +117,7 @@ private slots:
 /*
 * @brief: Simple wrapper class for QKeychain::ReadPasswordJob, splits too large keychain entry's data into chunks on Windows
 */
-class OWNCLOUDSYNC_EXPORT ReadJob : public KeychainChunk::Job
-{
+class OWNCLOUDSYNC_EXPORT ReadJob : public KeychainChunk::Job {
 public:
     ReadJob(Account *account, const QString &key, bool keychainMigration, QObject *parent = nullptr);
     ReadJob(const QString &key, QObject *parent = nullptr);
@@ -156,8 +153,7 @@ private:
 /*
 * @brief: Simple wrapper class for QKeychain::DeletePasswordJob
 */
-class OWNCLOUDSYNC_EXPORT DeleteJob : public KeychainChunk::Job
-{
+class OWNCLOUDSYNC_EXPORT DeleteJob : public KeychainChunk::Job {
 public:
     DeleteJob(Account *account, const QString &key, bool keychainMigration, QObject *parent = nullptr);
     DeleteJob(const QString &key, QObject *parent = nullptr);

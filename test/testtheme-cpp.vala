@@ -18,19 +18,16 @@
 #include "themeutils.h"
 #include "iconutils.h"
 
-class TestTheme : public QObject
-{
+class TestTheme : public QObject {
 
 public:
-    TestTheme()
-    {
+    TestTheme() {
         Q_INIT_RESOURCE(resources);
         Q_INIT_RESOURCE(theme);
     }
 
 private slots:
-    void testHidpiFileName_darkBackground_returnPathToWhiteIcon()
-    {
+    void testHidpiFileName_darkBackground_returnPathToWhiteIcon() {
         FakePaintDevice paintDevice;
         const QColor backgroundColor("#000000");
         const QString iconName("icon-name");
@@ -40,8 +37,7 @@ private slots:
         QCOMPARE(iconPath, ":/client/theme/white/" + iconName + ".png");
     }
 
-    void testHidpiFileName_lightBackground_returnPathToBlackIcon()
-    {
+    void testHidpiFileName_lightBackground_returnPathToBlackIcon() {
         FakePaintDevice paintDevice;
         const QColor backgroundColor("#ffffff");
         const QString iconName("icon-name");
@@ -51,8 +47,7 @@ private slots:
         QCOMPARE(iconPath, ":/client/theme/black/" + iconName + ".png");
     }
 
-    void testHidpiFileName_hidpiDevice_returnHidpiIconPath()
-    {
+    void testHidpiFileName_hidpiDevice_returnHidpiIconPath() {
         FakePaintDevice paintDevice;
         paintDevice.setHidpi(true);
         const QColor backgroundColor("#000000");
@@ -63,8 +58,7 @@ private slots:
         QCOMPARE(iconPath, ":/client/theme/white/" + iconName + "@2x.png");
     }
 
-    void testIsDarkColor_nextcloudBlue_returnTrue()
-    {
+    void testIsDarkColor_nextcloudBlue_returnTrue() {
         const QColor color(0, 130, 201);
 
         const auto result = OCC::Theme::isDarkColor(color);
@@ -72,8 +66,7 @@ private slots:
         QCOMPARE(result, true);
     }
 
-    void testIsDarkColor_lightColor_returnFalse()
-    {
+    void testIsDarkColor_lightColor_returnFalse() {
         const QColor color(255, 255, 255);
 
         const auto result = OCC::Theme::isDarkColor(color);
@@ -81,8 +74,7 @@ private slots:
         QCOMPARE(result, false);
     }
 
-    void testIsDarkColor_darkColor_returnTrue()
-    {
+    void testIsDarkColor_darkColor_returnTrue() {
         const QColor color(0, 0, 0);
 
         const auto result = OCC::Theme::isDarkColor(color);
@@ -90,16 +82,14 @@ private slots:
         QCOMPARE(result, true);
     }
 
-    void testIsHidpi_hidpi_returnTrue()
-    {
+    void testIsHidpi_hidpi_returnTrue() {
         FakePaintDevice paintDevice;
         paintDevice.setHidpi(true);
 
         QCOMPARE(OCC::Theme::isHidpi(&paintDevice), true);
     }
 
-    void testIsHidpi_lowdpi_returnFalse()
-    {
+    void testIsHidpi_lowdpi_returnFalse() {
         FakePaintDevice paintDevice;
         paintDevice.setHidpi(false);
 

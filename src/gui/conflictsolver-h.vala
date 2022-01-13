@@ -19,8 +19,7 @@ class QWidget;
 
 namespace OCC {
 
-class ConflictSolver : public QObject
-{
+class ConflictSolver : public QObject {
     Q_PROPERTY(QString localVersionFilename READ localVersionFilename WRITE setLocalVersionFilename NOTIFY localVersionFilenameChanged)
     Q_PROPERTY(QString remoteVersionFilename READ remoteVersionFilename WRITE setRemoteVersionFilename NOTIFY remoteVersionFilenameChanged)
 public:

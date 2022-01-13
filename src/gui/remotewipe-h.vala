@@ -9,8 +9,7 @@ class TestRemoteWipe;
 
 namespace OCC {
 
-class RemoteWipe : public QObject
-{
+class RemoteWipe : public QObject {
 public:
     explicit RemoteWipe(AccountPtr account, QObject *parent = nullptr);
 

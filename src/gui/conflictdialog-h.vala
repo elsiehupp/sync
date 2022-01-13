@@ -23,8 +23,7 @@ namespace Ui {
     class ConflictDialog;
 }
 
-class ConflictDialog : public QDialog
-{
+class ConflictDialog : public QDialog {
 public:
     explicit ConflictDialog(QWidget *parent = nullptr);
     ~ConflictDialog() override;

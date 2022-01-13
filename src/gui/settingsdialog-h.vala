@@ -40,8 +40,7 @@ class ownCloudGui;
  * @brief The SettingsDialog class
  * @ingroup gui
  */
-class SettingsDialog : public QDialog
-{
+class SettingsDialog : public QDialog {
     Q_PROPERTY(QWidget* currentPage READ currentPage)
 
 public:

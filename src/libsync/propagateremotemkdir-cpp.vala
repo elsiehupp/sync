@@ -31,8 +31,7 @@ Q_LOGGING_CATEGORY(lcPropagateRemoteMkdir, "nextcloud.sync.propagator.remotemkdi
 PropagateRemoteMkdir::PropagateRemoteMkdir(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
     : PropagateItemJob(propagator, item)
     , _deleteExisting(false)
-    , _uploadEncryptedHelper(nullptr)
-{
+    , _uploadEncryptedHelper(nullptr) {
     const auto path = _item->_file;
     const auto slashPosition = path.lastIndexOf('/');
     const auto parentPath = slashPosition >= 0 ? path.left(slashPosition) : QString();
@@ -44,8 +43,7 @@ PropagateRemoteMkdir::PropagateRemoteMkdir(OwncloudPropagator *propagator, const
     }
 }
 
-void PropagateRemoteMkdir::start()
-{
+void PropagateRemoteMkdir::start() {
     if (propagator()->_abortRequested)
         return;
 
@@ -65,8 +63,7 @@ void PropagateRemoteMkdir::start()
     _job->start();
 }
 
-void PropagateRemoteMkdir::slotStartMkcolJob()
-{
+void PropagateRemoteMkdir::slotStartMkcolJob() {
     if (propagator()->_abortRequested)
         return;
 
@@ -80,8 +77,7 @@ void PropagateRemoteMkdir::slotStartMkcolJob()
     _job->start();
 }
 
-void PropagateRemoteMkdir::slotStartEncryptedMkcolJob(const QString &path, const QString &filename, quint64 size)
-{
+void PropagateRemoteMkdir::slotStartEncryptedMkcolJob(const QString &path, const QString &filename, quint64 size) {
     Q_UNUSED(path)
     Q_UNUSED(size)
 
@@ -92,8 +88,7 @@ void PropagateRemoteMkdir::slotStartEncryptedMkcolJob(const QString &path, const
     qCDebug(lcPropagateRemoteMkdir) << filename;
 
     auto job = new MkColJob(propagator()->account(),
-                            propagator()->fullRemotePath(filename),
-                            {{"e2e-token", _uploadEncryptedHelper->folderToken() }},
+                            propagator()->fullRemotePath(filename), {{"e2e-token", _uploadEncryptedHelper->folderToken() }},
                             this);
     connect(job, &MkColJob::finishedWithError, this, &PropagateRemoteMkdir::slotMkcolJobFinished);
     connect(job, &MkColJob::finishedWithoutError, this, &PropagateRemoteMkdir::slotMkcolJobFinished);
@@ -101,8 +96,7 @@ void PropagateRemoteMkdir::slotStartEncryptedMkcolJob(const QString &path, const
     _job->start();
 }
 
-void PropagateRemoteMkdir::abort(PropagatorJob::AbortType abortType)
-{
+void PropagateRemoteMkdir::abort(PropagatorJob::AbortType abortType) {
     if (_job && _job->reply())
         _job->reply()->abort();
 
@@ -111,13 +105,11 @@ void PropagateRemoteMkdir::abort(PropagatorJob::AbortType abortType)
     }
 }
 
-void PropagateRemoteMkdir::setDeleteExisting(bool enabled)
-{
+void PropagateRemoteMkdir::setDeleteExisting(bool enabled) {
     _deleteExisting = enabled;
 }
 
-void PropagateRemoteMkdir::finalizeMkColJob(QNetworkReply::NetworkError err, const QString &jobHttpReasonPhraseString, const QString &jobPath)
-{
+void PropagateRemoteMkdir::finalizeMkColJob(QNetworkReply::NetworkError err, const QString &jobHttpReasonPhraseString, const QString &jobPath) {
     if (_item->_httpErrorCode == 405) {
         // This happens when the directory already exists. Nothing to do.
         qDebug(lcPropagateRemoteMkdir) << "Folder" << jobPath << "already exists.";
@@ -167,8 +159,7 @@ void PropagateRemoteMkdir::finalizeMkColJob(QNetworkReply::NetworkError err, con
     propfindJob->start();
 }
 
-void PropagateRemoteMkdir::slotMkdir()
-{
+void PropagateRemoteMkdir::slotMkdir() {
     const auto path = _item->_file;
     const auto slashPosition = path.lastIndexOf('/');
     const auto parentPath = slashPosition >= 0 ? path.left(slashPosition) : QString();
@@ -195,8 +186,7 @@ void PropagateRemoteMkdir::slotMkdir()
     _uploadEncryptedHelper->start();
 }
 
-void PropagateRemoteMkdir::slotMkcolJobFinished()
-{
+void PropagateRemoteMkdir::slotMkcolJobFinished() {
     propagator()->_activeJobList.removeOne(this);
 
     ASSERT(_job);
@@ -225,16 +215,14 @@ void PropagateRemoteMkdir::slotMkcolJobFinished()
     }
 }
 
-void PropagateRemoteMkdir::slotEncryptFolderFinished()
-{
+void PropagateRemoteMkdir::slotEncryptFolderFinished() {
     qCDebug(lcPropagateRemoteMkdir) << "Success making the new folder encrypted";
     propagator()->_activeJobList.removeOne(this);
     _item->_isEncrypted = true;
     success();
 }
 
-void PropagateRemoteMkdir::success()
-{
+void PropagateRemoteMkdir::success() {
     // Never save the etag on first mkdir.
     // Only fully propagated directories should have the etag set.
     auto itemCopy = *_item;

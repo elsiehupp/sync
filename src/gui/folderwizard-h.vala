@@ -35,8 +35,7 @@ class ownCloudInfo;
  * @brief The FormatWarningsWizardPage class
  * @ingroup gui
  */
-class FormatWarningsWizardPage : public QWizardPage
-{
+class FormatWarningsWizardPage : public QWizardPage {
 protected:
     QString formatWarnings(const QStringList &warnings) const;
 };
@@ -45,8 +44,7 @@ protected:
  * @brief Page to ask for the local source folder
  * @ingroup gui
  */
-class FolderWizardLocalPath : public FormatWarningsWizardPage
-{
+class FolderWizardLocalPath : public FormatWarningsWizardPage {
 public:
     explicit FolderWizardLocalPath(const AccountPtr &account);
     ~FolderWizardLocalPath() override;
@@ -71,8 +69,7 @@ private:
  * @ingroup gui
  */
 
-class FolderWizardRemotePath : public FormatWarningsWizardPage
-{
+class FolderWizardRemotePath : public FormatWarningsWizardPage {
 public:
     explicit FolderWizardRemotePath(const AccountPtr &account);
     ~FolderWizardRemotePath() override;
@@ -114,8 +111,7 @@ private:
  * @brief The FolderWizardSelectiveSync class
  * @ingroup gui
  */
-class FolderWizardSelectiveSync : public QWizardPage
-{
+class FolderWizardSelectiveSync : public QWizardPage {
 public:
     explicit FolderWizardSelectiveSync(const AccountPtr &account);
     ~FolderWizardSelectiveSync() override;
@@ -137,8 +133,7 @@ private:
  * @brief The FolderWizard class
  * @ingroup gui
  */
-class FolderWizard : public QWizard
-{
+class FolderWizard : public QWizard {
 public:
     enum {
         Page_Source,

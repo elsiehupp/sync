@@ -46,8 +46,7 @@ Q_DECLARE_LOGGING_CATEGORY(lcSocketApi)
  * @brief The SocketApi class
  * @ingroup gui
  */
-class SocketApi : public QObject
-{
+class SocketApi : public QObject {
 
 public:
     explicit SocketApi(QObject *parent = nullptr);
@@ -77,8 +76,7 @@ private:
     // Helper structure for getting information on a file
     // based on its local path - used for nearly all remote
     // actions.
-    struct FileData
-    {
+    struct FileData {
         static FileData get(const QString &localFile);
         SyncFileStatus syncFileStatus() const;
         SyncJournalFileRecord journalRecord() const;

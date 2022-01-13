@@ -19,8 +19,7 @@
 
 namespace OCC {
 
-class LinkLabel : public QLabel
-{
+class LinkLabel : public QLabel {
 public:
     explicit LinkLabel(QWidget *parent = nullptr);
 

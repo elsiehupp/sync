@@ -23,8 +23,7 @@
 #include "creds/abstractcredentials.h"
 #include "account.h"
 
-class FakeWebSocketServer : public QObject
-{
+class FakeWebSocketServer : public QObject {
 public:
     explicit FakeWebSocketServer(quint16 port = 12345, QObject *parent = nullptr);
 
@@ -63,8 +62,7 @@ private:
     std::unique_ptr<QSignalSpy> _processTextMessageSpy;
 };
 
-class CredentialsStub : public OCC::AbstractCredentials
-{
+class CredentialsStub : public OCC::AbstractCredentials {
 
 public:
     CredentialsStub(const QString &user, const QString &password);

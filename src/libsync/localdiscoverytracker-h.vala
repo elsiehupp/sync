@@ -44,8 +44,7 @@ using SyncFileItemPtr = QSharedPointer<SyncFileItem>;
  *
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT LocalDiscoveryTracker : public QObject
-{
+class OWNCLOUDSYNC_EXPORT LocalDiscoveryTracker : public QObject {
 public:
     LocalDiscoveryTracker();
 

@@ -35,8 +35,7 @@ class OwncloudWizard;
  * @brief The OwncloudSetupWizard class
  * @ingroup gui
  */
-class OwncloudSetupWizard : public QObject
-{
+class OwncloudSetupWizard : public QObject {
 public:
     /** Run the wizard */
     static void runWizard(QObject *obj, const char *amember, QWidget *parent = nullptr);

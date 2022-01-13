@@ -58,12 +58,10 @@
 using namespace OCC;
 
 
-static void nullMessageHandler(QtMsgType, const QMessageLogContext &, const QString &)
-{
+static void nullMessageHandler(QtMsgType, const QMessageLogContext &, const QString &) {
 }
 
-struct CmdOptions
-{
+struct CmdOptions {
     QString source_dir;
     QString target_url;
     QString remotePath = QStringLiteral("/");
@@ -87,11 +85,9 @@ struct CmdOptions
 // So we have to use a global variable
 CmdOptions *opts = nullptr;
 
-class EchoDisabler
-{
+class EchoDisabler {
 public:
-    EchoDisabler()
-    {
+    EchoDisabler() {
 #ifdef Q_OS_WIN
         hStdin = GetStdHandle(STD_INPUT_HANDLE);
         GetConsoleMode(hStdin, &mode);
@@ -104,8 +100,7 @@ public:
 #endif
     }
 
-    ~EchoDisabler()
-    {
+    ~EchoDisabler() {
 #ifdef Q_OS_WIN
         SetConsoleMode(hStdin, mode);
 #else
@@ -122,8 +117,7 @@ private:
 #endif
 };
 
-QString queryPassword(const QString &user)
-{
+QString queryPassword(const QString &user) {
     EchoDisabler disabler;
     std::cout << "Password for user " << qPrintable(user) << ": ";
     std::string s;
@@ -132,31 +126,26 @@ QString queryPassword(const QString &user)
 }
 
 #ifndef TOKEN_AUTH_ONLY
-class HttpCredentialsText : public HttpCredentials
-{
+class HttpCredentialsText : public HttpCredentials {
 public:
     HttpCredentialsText(const QString &user, const QString &password)
         : HttpCredentials(user, password)
         , // FIXME: not working with client certs yet (qknight)
-        _sslTrusted(false)
-    {
+        _sslTrusted(false) {
     }
 
-    void askFromUser() override
-    {
+    void askFromUser() override {
         _password = ::queryPassword(user());
         _ready = true;
         persist();
         emit asked();
     }
 
-    void setSSLTrusted(bool isTrusted)
-    {
+    void setSSLTrusted(bool isTrusted) {
         _sslTrusted = isTrusted;
     }
 
-    bool sslIsTrusted() override
-    {
+    bool sslIsTrusted() override {
         return _sslTrusted;
     }
 
@@ -165,8 +154,7 @@ private:
 };
 #endif /* TOKEN_AUTH_ONLY */
 
-void help()
-{
+void help() {
     const char *binaryName = APPLICATION_EXECUTABLE "cmd";
 
     std::cout << binaryName << " - command line " APPLICATION_NAME " client tool" << std::endl;
@@ -198,14 +186,12 @@ void help()
     exit(0);
 }
 
-void showVersion()
-{
+void showVersion() {
     std::cout << qUtf8Printable(Theme::instance()->versionSwitchOutput());
     exit(0);
 }
 
-void parseOptions(const QStringList &app_args, CmdOptions *options)
-{
+void parseOptions(const QStringList &app_args, CmdOptions *options) {
     QStringList args(app_args);
 
     int argCount = args.count();
@@ -286,8 +272,7 @@ void parseOptions(const QStringList &app_args, CmdOptions *options)
 /* If the selective sync list is different from before, we need to disable the read from db
   (The normal client does it in SelectiveSyncDialog::accept*)
  */
-void selectiveSyncFixup(OCC::SyncJournalDb *journal, const QStringList &newList)
-{
+void selectiveSyncFixup(OCC::SyncJournalDb *journal, const QStringList &newList) {
     SqlDatabase db;
     if (!db.openOrCreateReadWrite(journal->databaseFilePath())) {
         return;
@@ -308,8 +293,7 @@ void selectiveSyncFixup(OCC::SyncJournalDb *journal, const QStringList &newList)
     }
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
 #ifdef Q_OS_WIN
     SetDllDirectory(L"");
 #endif

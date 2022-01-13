@@ -45,8 +45,7 @@ class Folder;
  * @ingroup gui
  */
 
-class FolderWatcher : public QObject
-{
+class FolderWatcher : public QObject {
 public:
     // Construct, connect signals, call init()
     explicit FolderWatcher(Folder *folder = nullptr);

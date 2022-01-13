@@ -31,8 +31,7 @@ namespace OCC {
  * @brief The LogBrowser class
  * @ingroup gui
  */
-class LogBrowser : public QDialog
-{
+class LogBrowser : public QDialog {
 public:
     explicit LogBrowser(QWidget *parent = nullptr);
     ~LogBrowser() override;

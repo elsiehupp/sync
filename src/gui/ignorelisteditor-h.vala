@@ -28,8 +28,7 @@ namespace Ui {
  * @brief The IgnoreListEditor class
  * @ingroup gui
  */
-class IgnoreListEditor : public QDialog
-{
+class IgnoreListEditor : public QDialog {
 
 public:
     IgnoreListEditor(QWidget *parent = nullptr);

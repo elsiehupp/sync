@@ -21,8 +21,7 @@
 
 using namespace OCC;
 
-class TestRemoteWipe: public QObject
-{
+class TestRemoteWipe: public QObject {
 
 private slots:
     // TODO

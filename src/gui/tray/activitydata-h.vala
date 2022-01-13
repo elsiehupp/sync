@@ -23,8 +23,7 @@ namespace OCC {
  * These are part of notifications which are mapped into activities.
  */
 
-class ActivityLink
-{
+class ActivityLink {
     Q_GADGET
 
     Q_PROPERTY(QString label MEMBER _label)
@@ -47,8 +46,7 @@ public:
  * contains all the information describing a single activity.
  */
 
-class Activity
-{
+class Activity {
 public:
     using Identifier = QPair<qlonglong, QString>;
 

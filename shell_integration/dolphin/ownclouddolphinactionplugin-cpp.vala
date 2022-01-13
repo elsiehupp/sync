@@ -30,14 +30,12 @@
 // #include <QtCore/QEventLoop>
 #include "ownclouddolphinpluginhelper.h"
 
-class OwncloudDolphinPluginAction : public KAbstractFileItemActionPlugin
-{
+class OwncloudDolphinPluginAction : public KAbstractFileItemActionPlugin {
 public:
     explicit OwncloudDolphinPluginAction(QObject* parent, const QList<QVariant>&)
         : KAbstractFileItemActionPlugin(parent) { }
 
-    QList<QAction*> actions(const KFileItemListProperties& fileItemInfos, QWidget* parentWidget) override
-    {
+    QList<QAction*> actions(const KFileItemListProperties& fileItemInfos, QWidget* parentWidget) override {
         auto helper = OwncloudDolphinPluginHelper::instance();
         if (!helper->isConnected() || !fileItemInfos.isLocal())
             return {};
@@ -89,15 +87,14 @@ public:
             delete menu;
             return {};
         }
-        
+
         menu->setTitle(helper->contextMenuTitle());
         menu->setIcon(QIcon::fromTheme(helper->contextMenuIconName()));
         return { menu->menuAction() };
     }
 
 
-    QList<QAction *> legacyActions(const KFileItemListProperties &fileItemInfos, QWidget *parentWidget)
-    {
+    QList<QAction *> legacyActions(const KFileItemListProperties &fileItemInfos, QWidget *parentWidget) {
         QList<QUrl> urls = fileItemInfos.urlList();
         if (urls.count() != 1)
             return {};

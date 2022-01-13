@@ -20,14 +20,12 @@
 using namespace OCC;
 
 SyncOptions::SyncOptions()
-    : _vfs(new VfsOff)
-{
+    : _vfs(new VfsOff) {
 }
 
 SyncOptions::~SyncOptions() = default;
 
-void SyncOptions::fillFromEnvironmentVariables()
-{
+void SyncOptions::fillFromEnvironmentVariables() {
     QByteArray chunkSizeEnv = qgetenv("OWNCLOUD_CHUNK_SIZE");
     if (!chunkSizeEnv.isEmpty())
         _initialChunkSize = chunkSizeEnv.toUInt();
@@ -49,25 +47,21 @@ void SyncOptions::fillFromEnvironmentVariables()
         _parallelNetworkJobs = maxParallel;
 }
 
-void SyncOptions::verifyChunkSizes()
-{
+void SyncOptions::verifyChunkSizes() {
     _minChunkSize = qMin(_minChunkSize, _initialChunkSize);
     _maxChunkSize = qMax(_maxChunkSize, _initialChunkSize);
 }
 
-QRegularExpression SyncOptions::fileRegex() const
-{
+QRegularExpression SyncOptions::fileRegex() const {
     return _fileRegex;
 }
 
-void SyncOptions::setFilePattern(const QString &pattern)
-{
+void SyncOptions::setFilePattern(const QString &pattern) {
     // full match or a path ending with this pattern
     setPathPattern(QStringLiteral("(^|/|\\\\)") + pattern + QLatin1Char('$'));
 }
 
-void SyncOptions::setPathPattern(const QString &pattern)
-{
+void SyncOptions::setPathPattern(const QString &pattern) {
     _fileRegex.setPatternOptions(Utility::fsCasePreserving() ? QRegularExpression::CaseInsensitiveOption : QRegularExpression::NoPatternOption);
     _fileRegex.setPattern(pattern);
 }

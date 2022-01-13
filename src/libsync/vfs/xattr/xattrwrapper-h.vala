@@ -22,8 +22,7 @@
 
 namespace OCC {
 
-namespace XAttrWrapper
-{
+namespace XAttrWrapper {
 
 OWNCLOUDSYNC_EXPORT bool hasNextcloudPlaceholderAttributes(const QString &path);
 OWNCLOUDSYNC_EXPORT Result<void, QString> addNextcloudPlaceholderAttributes(const QString &path);

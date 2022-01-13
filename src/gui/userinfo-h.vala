@@ -62,8 +62,7 @@ class JsonApiJob;
    +-> Client Side Encryption Checks --+ --reportResult()
      \endcode
   */
-class UserInfo : public QObject
-{
+class UserInfo : public QObject {
 public:
     explicit UserInfo(OCC::AccountState *accountState, bool allowDisconnectedAccountState, bool fetchAvatarImage, QObject *parent = nullptr);
 

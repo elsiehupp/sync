@@ -76,8 +76,7 @@ QByteArray OCSYNC_EXPORT calcAdler32(QIODevice *device);
  * Computes the checksum of a file.
  * \ingroup libsync
  */
-class OCSYNC_EXPORT ComputeChecksum : public QObject
-{
+class OCSYNC_EXPORT ComputeChecksum : public QObject {
 public:
     explicit ComputeChecksum(QObject *parent = nullptr);
     ~ComputeChecksum() override;
@@ -135,8 +134,7 @@ private:
  * Checks whether a file's checksum matches the expected value.
  * @ingroup libsync
  */
-class OCSYNC_EXPORT ValidateChecksumHeader : public QObject
-{
+class OCSYNC_EXPORT ValidateChecksumHeader : public QObject {
 public:
     explicit ValidateChecksumHeader(QObject *parent = nullptr);
 
@@ -177,8 +175,7 @@ private:
  * Hooks checksum computations into csync.
  * @ingroup libsync
  */
-class OCSYNC_EXPORT CSyncChecksumHook : public QObject
-{
+class OCSYNC_EXPORT CSyncChecksumHook : public QObject {
 public:
     explicit CSyncChecksumHook();
 

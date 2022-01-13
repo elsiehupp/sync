@@ -31,8 +31,7 @@ namespace OCC {
  * All the communication logic is handled in this class.
  *
  */
-class NotificationConfirmJob : public AbstractNetworkJob
-{
+class NotificationConfirmJob : public AbstractNetworkJob {
 
 public:
     explicit NotificationConfirmJob(AccountPtr account);

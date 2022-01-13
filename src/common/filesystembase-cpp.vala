@@ -41,8 +41,7 @@ namespace OCC {
 
 Q_LOGGING_CATEGORY(lcFileSystem, "nextcloud.sync.filesystem", QtInfoMsg)
 
-QString FileSystem::longWinPath(const QString &inpath)
-{
+QString FileSystem::longWinPath(const QString &inpath) {
 #ifdef Q_OS_WIN
     return pathtoUNC(inpath);
 #else
@@ -50,8 +49,7 @@ QString FileSystem::longWinPath(const QString &inpath)
 #endif
 }
 
-void FileSystem::setFileHidden(const QString &filename, bool hidden)
-{
+void FileSystem::setFileHidden(const QString &filename, bool hidden) {
 #ifdef _WIN32
     QString fName = longWinPath(filename);
     DWORD dwAttrs;
@@ -71,8 +69,7 @@ void FileSystem::setFileHidden(const QString &filename, bool hidden)
 #endif
 }
 
-static QFile::Permissions getDefaultWritePermissions()
-{
+static QFile::Permissions getDefaultWritePermissions() {
     QFile::Permissions result = QFile::WriteUser;
 #ifndef Q_OS_WIN
     mode_t mask = umask(0);
@@ -87,8 +84,7 @@ static QFile::Permissions getDefaultWritePermissions()
     return result;
 }
 
-void FileSystem::setFileReadOnly(const QString &filename, bool readonly)
-{
+void FileSystem::setFileReadOnly(const QString &filename, bool readonly) {
     QFile file(filename);
     QFile::Permissions permissions = file.permissions();
 
@@ -103,8 +99,7 @@ void FileSystem::setFileReadOnly(const QString &filename, bool readonly)
     file.setPermissions(permissions);
 }
 
-void FileSystem::setFolderMinimumPermissions(const QString &filename)
-{
+void FileSystem::setFolderMinimumPermissions(const QString &filename) {
 #ifdef Q_OS_MAC
     QFile::Permissions perm = QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner;
     QFile file(filename);
@@ -115,8 +110,7 @@ void FileSystem::setFolderMinimumPermissions(const QString &filename)
 }
 
 
-void FileSystem::setFileReadOnlyWeak(const QString &filename, bool readonly)
-{
+void FileSystem::setFileReadOnlyWeak(const QString &filename, bool readonly) {
     QFile file(filename);
     QFile::Permissions permissions = file.permissions();
 
@@ -129,8 +123,7 @@ void FileSystem::setFileReadOnlyWeak(const QString &filename, bool readonly)
 
 bool FileSystem::rename(const QString &originFileName,
     const QString &destinationFileName,
-    QString *errorString)
-{
+    QString *errorString) {
     bool success = false;
     QString error;
 #ifdef Q_OS_WIN
@@ -145,8 +138,7 @@ bool FileSystem::rename(const QString &originFileName,
             error = Utility::formatWinError(GetLastError());
         }
     } else
-#endif
-    {
+#endif {
         QFile orig(originFileName);
         success = orig.rename(destinationFileName);
         if (!success) {
@@ -167,8 +159,7 @@ bool FileSystem::rename(const QString &originFileName,
 
 bool FileSystem::uncheckedRenameReplace(const QString &originFileName,
     const QString &destinationFileName,
-    QString *errorString)
-{
+    QString *errorString) {
 #ifndef Q_OS_WIN
     bool success = false;
     QFile orig(originFileName);
@@ -213,8 +204,7 @@ bool FileSystem::uncheckedRenameReplace(const QString &originFileName,
     return true;
 }
 
-bool FileSystem::openAndSeekFileSharedRead(QFile *file, QString *errorOrNull, qint64 seek)
-{
+bool FileSystem::openAndSeekFileSharedRead(QFile *file, QString *errorOrNull, qint64 seek) {
     QString errorDummy;
     // avoid many if (errorOrNull) later.
     QString &error = errorOrNull ? *errorOrNull : errorDummy;
@@ -289,8 +279,7 @@ bool FileSystem::openAndSeekFileSharedRead(QFile *file, QString *errorOrNull, qi
 }
 
 #ifdef Q_OS_WIN
-static bool fileExistsWin(const QString &filename)
-{
+static bool fileExistsWin(const QString &filename) {
     WIN32_FIND_DATA FindFileData;
     HANDLE hFind;
     QString fName = FileSystem::longWinPath(filename);
@@ -304,8 +293,7 @@ static bool fileExistsWin(const QString &filename)
 }
 #endif
 
-bool FileSystem::fileExists(const QString &filename, const QFileInfo &fileInfo)
-{
+bool FileSystem::fileExists(const QString &filename, const QFileInfo &fileInfo) {
 #ifdef Q_OS_WIN
     if (isLnkFile(filename)) {
         // Use a native check.
@@ -324,8 +312,7 @@ bool FileSystem::fileExists(const QString &filename, const QFileInfo &fileInfo)
 }
 
 #ifdef Q_OS_WIN
-QString FileSystem::fileSystemForPath(const QString &path)
-{
+QString FileSystem::fileSystemForPath(const QString &path) {
     // See also QStorageInfo (Qt >=5.4) and GetVolumeInformationByHandleW (>= Vista)
     QString drive = path.left(2);
     if (!drive.endsWith(QLatin1Char(':')))
@@ -346,8 +333,7 @@ QString FileSystem::fileSystemForPath(const QString &path)
 }
 #endif
 
-bool FileSystem::remove(const QString &fileName, QString *errorString)
-{
+bool FileSystem::remove(const QString &fileName, QString *errorString) {
 #ifdef Q_OS_WIN
     // You cannot delete a read-only file on windows, but we want to
     // allow that.
@@ -365,8 +351,7 @@ bool FileSystem::remove(const QString &fileName, QString *errorString)
     return true;
 }
 
-bool FileSystem::moveToTrash(const QString &fileName, QString *errorString)
-{
+bool FileSystem::moveToTrash(const QString &fileName, QString *errorString) {
     // TODO: Qt 5.15 bool QFile::moveToTrash()
 #if defined Q_OS_UNIX && !defined Q_OS_MAC
     QString trashPath, trashFilePath, trashInfoPath;
@@ -440,8 +425,7 @@ bool FileSystem::moveToTrash(const QString &fileName, QString *errorString)
 #endif
 }
 
-bool FileSystem::isFileLocked(const QString &fileName)
-{
+bool FileSystem::isFileLocked(const QString &fileName) {
 #ifdef Q_OS_WIN
     // Check if file exists
     const QString fName = longWinPath(fileName);
@@ -470,21 +454,18 @@ bool FileSystem::isFileLocked(const QString &fileName)
     return false;
 }
 
-bool FileSystem::isLnkFile(const QString &filename)
-{
+bool FileSystem::isLnkFile(const QString &filename) {
     return filename.endsWith(QLatin1String(".lnk"));
 }
 
-bool FileSystem::isExcludeFile(const QString &filename)
-{
+bool FileSystem::isExcludeFile(const QString &filename) {
     return filename.compare(QStringLiteral(".sync-exclude.lst"), Qt::CaseInsensitive) == 0
         || filename.compare(QStringLiteral("exclude.lst"), Qt::CaseInsensitive) == 0
         || filename.endsWith(QStringLiteral("/.sync-exclude.lst"), Qt::CaseInsensitive)
         || filename.endsWith(QStringLiteral("/exclude.lst"), Qt::CaseInsensitive);
 }
 
-bool FileSystem::isJunction(const QString &filename)
-{
+bool FileSystem::isJunction(const QString &filename) {
 #ifdef Q_OS_WIN
     WIN32_FIND_DATA findData;
     HANDLE hFind = FindFirstFileEx(reinterpret_cast<const wchar_t *>(longWinPath(filename).utf16()), FindExInfoBasic, &findData, FindExSearchNameMatch, nullptr, 0);
@@ -502,8 +483,7 @@ bool FileSystem::isJunction(const QString &filename)
 }
 
 #ifdef Q_OS_WIN
-QString FileSystem::pathtoUNC(const QString &_str)
-{
+QString FileSystem::pathtoUNC(const QString &_str) {
     Q_ASSERT(QFileInfo(_str).isAbsolute());
     if (_str.isEmpty()) {
         return _str;

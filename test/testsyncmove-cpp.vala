@@ -36,25 +36,21 @@ struct OperationCounter {
     }
 };
 
-bool itemSuccessful(const ItemCompletedSpy &spy, const QString &path, const SyncInstructions instr)
-{
+bool itemSuccessful(const ItemCompletedSpy &spy, const QString &path, const SyncInstructions instr) {
     auto item = spy.findItem(path);
     return item->_status == SyncFileItem::Success && item->_instruction == instr;
 }
 
-bool itemConflict(const ItemCompletedSpy &spy, const QString &path)
-{
+bool itemConflict(const ItemCompletedSpy &spy, const QString &path) {
     auto item = spy.findItem(path);
     return item->_status == SyncFileItem::Conflict && item->_instruction == CSYNC_INSTRUCTION_CONFLICT;
 }
 
-bool itemSuccessfulMove(const ItemCompletedSpy &spy, const QString &path)
-{
+bool itemSuccessfulMove(const ItemCompletedSpy &spy, const QString &path) {
     return itemSuccessful(spy, path, CSYNC_INSTRUCTION_RENAME);
 }
 
-QStringList findConflicts(const FileInfo &dir)
-{
+QStringList findConflicts(const FileInfo &dir) {
     QStringList conflicts;
     for (const auto &item : dir.children) {
         if (item.name.contains("(conflicted copy")) {
@@ -64,8 +60,7 @@ QStringList findConflicts(const FileInfo &dir)
     return conflicts;
 }
 
-bool expectAndWipeConflict(FileModifier &local, FileInfo state, const QString path)
-{
+bool expectAndWipeConflict(FileModifier &local, FileInfo state, const QString path) {
     PathComponents pathComponents(path);
     auto base = state.find(pathComponents.parentDirComponents());
     if (!base)
@@ -79,12 +74,10 @@ bool expectAndWipeConflict(FileModifier &local, FileInfo state, const QString pa
     return false;
 }
 
-class TestSyncMove : public QObject
-{
+class TestSyncMove : public QObject {
 
 private slots:
-    void testMoveCustomRemoteRoot()
-    {
+    void testMoveCustomRemoteRoot() {
         FileInfo subFolder(QStringLiteral("AS"), { { QStringLiteral("f1"), 4 } });
         FileInfo folder(QStringLiteral("A"), { subFolder });
         FileInfo fileInfo({}, { folder });
@@ -95,8 +88,7 @@ private slots:
         OperationCounter counter;
         fakeFolder.setServerOverride(counter.functor());
 
-        // Move file and then move it back again
-        {
+        // Move file and then move it back again {
             counter.reset();
             localModifier.rename(QStringLiteral("AS/f1"), QStringLiteral("f1"));
 
@@ -114,8 +106,7 @@ private slots:
         }
     }
 
-    void testRemoteChangeInMovedFolder()
-    {
+    void testRemoteChangeInMovedFolder() {
         // issue #5192
         FakeFolder fakeFolder{ FileInfo{ QString(), { FileInfo{ QStringLiteral("folder"), { FileInfo{ QStringLiteral("folderA"), { { QStringLiteral("file.txt"), 400 } } }, QStringLiteral("folderB") } } } } };
 
@@ -136,8 +127,7 @@ private slots:
         QCOMPARE(fakeFolder.currentLocalState(), oldState);
     }
 
-    void testSelectiveSyncMovedFolder()
-    {
+    void testSelectiveSyncMovedFolder() {
         // issue #5224
         FakeFolder fakeFolder{ FileInfo{ QString(), { FileInfo{ QStringLiteral("parentFolder"), { FileInfo{ QStringLiteral("subFolderA"), { { QStringLiteral("fileA.txt"), 400 } } }, FileInfo{ QStringLiteral("subFolderB"), { { QStringLiteral("fileB.txt"), 400 } } } } } } } };
 
@@ -145,13 +135,11 @@ private slots:
         auto expectedServerState = fakeFolder.currentRemoteState();
 
         // Remove subFolderA with selectiveSync:
-        fakeFolder.syncEngine().journal()->setSelectiveSyncList(SyncJournalDb::SelectiveSyncBlackList,
-            { "parentFolder/subFolderA/" });
+        fakeFolder.syncEngine().journal()->setSelectiveSyncList(SyncJournalDb::SelectiveSyncBlackList, { "parentFolder/subFolderA/" });
         fakeFolder.syncEngine().journal()->schedulePathForRemoteDiscovery(QByteArrayLiteral("parentFolder/subFolderA/"));
 
         fakeFolder.syncOnce();
-
-        {
+ {
             // Nothing changed on the server
             QCOMPARE(fakeFolder.currentRemoteState(), expectedServerState);
             // The local state should not have subFolderA
@@ -164,8 +152,7 @@ private slots:
         fakeFolder.remoteModifier().rename("parentFolder", "parentFolderRenamed");
         expectedServerState = fakeFolder.currentRemoteState();
         fakeFolder.syncOnce();
-
-        {
+ {
             QCOMPARE(fakeFolder.currentRemoteState(), expectedServerState);
             auto remoteState = fakeFolder.currentRemoteState();
             // The subFolderA should still be there on the server.
@@ -178,8 +165,7 @@ private slots:
         // Rename it again, locally this time.
         fakeFolder.localModifier().rename("parentFolderRenamed", "parentThirdName");
         fakeFolder.syncOnce();
-
-        {
+ {
             auto remoteState = fakeFolder.currentRemoteState();
             // The subFolderA should still be there on the server.
             QVERIFY(remoteState.find("parentThirdName/subFolderA/fileA.txt"));
@@ -197,8 +183,7 @@ private slots:
         }
     }
 
-    void testLocalMoveDetection()
-    {
+    void testLocalMoveDetection() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
 
         int nPUT = 0;
@@ -282,8 +267,7 @@ private slots:
         QCOMPARE(printDbData(fakeFolder.dbState()), printDbData(remoteInfo));
     }
 
-    void testDuplicateFileId_data()
-    {
+    void testDuplicateFileId_data() {
         QTest::addColumn<QString>("prefix");
 
         // There have been bugs related to how the original
@@ -297,8 +281,7 @@ private slots:
     // user, the target user will see duplicate file ids. We need to make
     // sure the move detection and sync still do the right thing in that
     // case.
-    void testDuplicateFileId()
-    {
+    void testDuplicateFileId() {
         QFETCH(QString, prefix);
 
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
@@ -360,8 +343,7 @@ private slots:
         counter.reset();
     }
 
-    void testMovePropagation()
-    {
+    void testMovePropagation() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         auto &local = fakeFolder.localModifier();
         auto &remote = fakeFolder.remoteModifier();
@@ -369,8 +351,7 @@ private slots:
         OperationCounter counter;
         fakeFolder.setServerOverride(counter.functor());
 
-        // Move
-        {
+        // Move {
             counter.reset();
             local.rename("A/a1", "A/a1m");
             remote.rename("B/b1", "B/b1m");
@@ -427,8 +408,7 @@ private slots:
         QCOMPARE(remote.find("A/a1m2")->contentChar, 'W');
         QCOMPARE(remote.find("B/b1m2")->contentChar, 'W');
 
-        // Touch+create on one side, move on the other
-        {
+        // Touch+create on one side, move on the other {
             counter.reset();
             local.appendByte("A/a1m");
             local.insert("A/a1mt");
@@ -452,8 +432,7 @@ private slots:
             QVERIFY(itemConflict(completeSpy, "B/b1mt"));
         }
 
-        // Create new on one side, move to new on the other
-        {
+        // Create new on one side, move to new on the other {
             counter.reset();
             local.insert("A/a1N", 13);
             remote.rename("A/a1mt", "A/a1N");
@@ -501,8 +480,7 @@ private slots:
         QCOMPARE(counter.nMOVE, 0);
         QCOMPARE(counter.nDELETE, 0);
 
-        // Folder move
-        {
+        // Folder move {
             counter.reset();
             local.rename("A", "AM");
             remote.rename("B", "BM");
@@ -522,8 +500,7 @@ private slots:
             QCOMPARE(completeSpy.findItem("BM")->_renameTarget, QStringLiteral("BM"));
         }
 
-        // Folder move with contents touched on the same side
-        {
+        // Folder move with contents touched on the same side {
             counter.reset();
             local.setContents("AM/a2m", 'C');
             // We must change the modtime for it is likely that it did not change between sync.
@@ -621,8 +598,7 @@ private slots:
     }
 
     // These renames can be troublesome on windows
-    void testRenameCaseOnly()
-    {
+    void testRenameCaseOnly() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         auto &local = fakeFolder.localModifier();
         auto &remote = fakeFolder.remoteModifier();
@@ -643,14 +619,12 @@ private slots:
     }
 
     // Check interaction of moves with file type changes
-    void testMoveAndTypeChange()
-    {
+    void testMoveAndTypeChange() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         auto &local = fakeFolder.localModifier();
         auto &remote = fakeFolder.remoteModifier();
 
-        // Touch on one side, rename and mkdir on the other
-        {
+        // Touch on one side, rename and mkdir on the other {
             local.appendByte("A/a1");
             remote.rename("A/a1", "A/a1mq");
             remote.mkdir("A/a1");
@@ -666,8 +640,7 @@ private slots:
 
     // https://github.com/owncloud/client/issues/6629#issuecomment-402450691
     // When a file is moved and the server mtime was not in sync, the local mtime should be kept
-    void testMoveAndMTimeChange()
-    {
+    void testMoveAndMTimeChange() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         OperationCounter counter;
         fakeFolder.setServerOverride(counter.functor());
@@ -697,8 +670,7 @@ private slots:
     }
 
     // Test for https://github.com/owncloud/client/issues/6694
-    void testInvertFolderHierarchy()
-    {
+    void testInvertFolderHierarchy() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         fakeFolder.remoteModifier().mkdir("A/Empty");
         fakeFolder.remoteModifier().mkdir("A/Empty/Foo");
@@ -756,15 +728,13 @@ private slots:
         QCOMPARE(counter.nPUT, 0);
     }
 
-    void testDeepHierarchy_data()
-    {
+    void testDeepHierarchy_data() {
         QTest::addColumn<bool>("local");
         QTest::newRow("remote") << false;
         QTest::newRow("local") << true;
     }
 
-    void testDeepHierarchy()
-    {
+    void testDeepHierarchy() {
         QFETCH(bool, local);
         FakeFolder fakeFolder { FileInfo::A12_B12_C12_S12() };
         auto &modifier = local ? fakeFolder.localModifier() : fakeFolder.remoteModifier();
@@ -805,8 +775,7 @@ private slots:
         QCOMPARE(counter.nPUT, local ? 5 : 0);
     }
 
-    void renameOnBothSides()
-    {
+    void renameOnBothSides() {
         FakeFolder fakeFolder { FileInfo::A12_B12_C12_S12() };
         OperationCounter counter;
         fakeFolder.setServerOverride(counter.functor());
@@ -844,8 +813,7 @@ private slots:
         QCOMPARE(counter.nMOVE, 2);
     }
 
-    void moveFileToDifferentFolderOnBothSides()
-    {
+    void moveFileToDifferentFolderOnBothSides() {
         FakeFolder fakeFolder { FileInfo::A12_B12_C12_S12() };
         OperationCounter counter;
         fakeFolder.setServerOverride(counter.functor());
@@ -873,8 +841,7 @@ private slots:
     }
 
     // Test that deletes don't run before renames
-    void testRenameParallelism()
-    {
+    void testRenameParallelism() {
         FakeFolder fakeFolder{ FileInfo{} };
         fakeFolder.remoteModifier().mkdir("A");
         fakeFolder.remoteModifier().insert("A/file");
@@ -889,15 +856,13 @@ private slots:
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
     }
 
-    void testMovedWithError_data()
-    {
+    void testMovedWithError_data() {
         QTest::addColumn<Vfs::Mode>("vfsMode");
 
         QTest::newRow("Vfs::Off") << Vfs::Off;
         QTest::newRow("Vfs::WithSuffix") << Vfs::WithSuffix;
 #ifdef Q_OS_WIN32
-        if (isVfsPluginAvailable(Vfs::WindowsCfApi))
-        {
+        if (isVfsPluginAvailable(Vfs::WindowsCfApi)) {
             QTest::newRow("Vfs::WindowsCfApi") << Vfs::WindowsCfApi;
         } else {
             QWARN("Skipping Vfs::WindowsCfApi");
@@ -906,12 +871,9 @@ private slots:
 #endif
     }
 
-    void testMovedWithError()
-    {
+    void testMovedWithError() {
         QFETCH(Vfs::Mode, vfsMode);
-        const auto getName = [vfsMode] (const QString &s)
-        {
-            if (vfsMode == Vfs::WithSuffix)
+        const auto getName = [vfsMode] (const QString &s) { {f (vfsMode == Vfs::WithSuffix)
             {
                 return QStringLiteral("%1" APPLICATION_DOTVIRTUALFILE_SUFFIX).arg(s);
             }
@@ -926,8 +888,7 @@ private slots:
 
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
 
-        if (vfsMode != Vfs::Off)
-        {
+        if (vfsMode != Vfs::Off) {
             auto vfs = QSharedPointer<Vfs>(createVfsFromPlugin(vfsMode).release());
             QVERIFY(vfs);
             fakeFolder.switchToVfs(vfs);
@@ -951,16 +912,14 @@ private slots:
         // sync2 file is in error state, checkErrorBlacklisting sets instruction to IGNORED
         fakeFolder.syncOnce();
 
-        if (vfsMode != Vfs::Off)
-        {
+        if (vfsMode != Vfs::Off) {
             fakeFolder.syncJournal().internalPinStates().setForPath("", PinState::AlwaysLocal);
             fakeFolder.syncOnce();
         }
 
         QVERIFY(!fakeFolder.currentLocalState().find(src));
         QVERIFY(fakeFolder.currentLocalState().find(getName(dest)));
-        if (vfsMode == Vfs::WithSuffix)
-        {
+        if (vfsMode == Vfs::WithSuffix) {
             // the placeholder was not restored as it is still in error state
             QVERIFY(!fakeFolder.currentLocalState().find(dest));
         }

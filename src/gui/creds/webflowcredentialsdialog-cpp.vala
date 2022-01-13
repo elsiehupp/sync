@@ -21,8 +21,7 @@ WebFlowCredentialsDialog::WebFlowCredentialsDialog(Account *account, bool useFlo
     , _flow2AuthWidget(nullptr)
 #ifdef WITH_WEBENGINE
     , _webView(nullptr)
-#endif // WITH_WEBENGINE
-{
+#endif // WITH_WEBENGINE {
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
     _layout = new QVBoxLayout(this);
@@ -97,8 +96,7 @@ void WebFlowCredentialsDialog::closeEvent(QCloseEvent* e) {
     emit onClose();
 }
 
-void WebFlowCredentialsDialog::setUrl(const QUrl &url)
-{
+void WebFlowCredentialsDialog::setUrl(const QUrl &url) {
 #ifdef WITH_WEBENGINE
     if (_webView)
         _webView->setUrl(url);
@@ -128,8 +126,7 @@ void WebFlowCredentialsDialog::setError(const QString &error) {
     }
 }
 
-void WebFlowCredentialsDialog::changeEvent(QEvent *e)
-{
+void WebFlowCredentialsDialog::changeEvent(QEvent *e) {
     switch (e->type()) {
     case QEvent::StyleChange:
     case QEvent::PaletteChange:
@@ -150,21 +147,18 @@ void WebFlowCredentialsDialog::changeEvent(QEvent *e)
     QDialog::changeEvent(e);
 }
 
-void WebFlowCredentialsDialog::customizeStyle()
-{
+void WebFlowCredentialsDialog::customizeStyle() {
     // HINT: Customize dialog's own style here, if necessary in the future (Dark-/Light-Mode switching)
 }
 
-void WebFlowCredentialsDialog::slotShowSettingsDialog()
-{
+void WebFlowCredentialsDialog::slotShowSettingsDialog() {
     // bring window to top but slightly delay, to avoid being hidden behind the SettingsDialog
     QTimer::singleShot(100, this, [this] {
         ownCloudGui::raiseDialog(this);
     });
 }
 
-void WebFlowCredentialsDialog::slotFlow2AuthResult(Flow2Auth::Result r, const QString &errorString, const QString &user, const QString &appPassword)
-{
+void WebFlowCredentialsDialog::slotFlow2AuthResult(Flow2Auth::Result r, const QString &errorString, const QString &user, const QString &appPassword) {
     Q_UNUSED(errorString)
     if(r == Flow2Auth::LoggedIn) {
         emit urlCatched(user, appPassword, QString());

@@ -24,25 +24,21 @@
 
 namespace OCC {
 
-struct Emoji
-{
+struct Emoji {
     Emoji(QString u, QString s, bool isCustom = false)
         : unicode(std::move(std::move(u)))
         , shortname(std::move(std::move(s)))
-        , isCustom(isCustom)
-    {
+        , isCustom(isCustom) {
     }
     Emoji() = default;
 
-    friend QDataStream &operator<<(QDataStream &arch, const Emoji &object)
-    {
+    friend QDataStream &operator<<(QDataStream &arch, const Emoji &object) {
         arch << object.unicode;
         arch << object.shortname;
         return arch;
     }
 
-    friend QDataStream &operator>>(QDataStream &arch, Emoji &object)
-    {
+    friend QDataStream &operator>>(QDataStream &arch, Emoji &object) {
         arch >> object.unicode;
         arch >> object.shortname;
         object.isCustom = object.unicode.startsWith("image://");
@@ -59,8 +55,7 @@ struct Emoji
     Q_PROPERTY(bool isCustom MEMBER isCustom)
 };
 
-class EmojiCategoriesModel : public QAbstractListModel
-{
+class EmojiCategoriesModel : public QAbstractListModel {
 public:
     QVariant data(const QModelIndex &index, int role) const override;
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -72,8 +67,7 @@ private:
         LabelRole
     };
 
-    struct Category
-    {
+    struct Category {
         QString emoji;
         QString label;
     };
@@ -81,8 +75,7 @@ private:
     static const std::vector<Category> categories;
 };
 
-class EmojiModel : public QObject
-{
+class EmojiModel : public QObject {
 
     Q_PROPERTY(QVariantList model READ model NOTIFY modelChanged)
     Q_PROPERTY(QAbstractListModel *emojiCategoriesModel READ emojiCategoriesModel CONSTANT)
@@ -100,8 +93,7 @@ class EmojiModel : public QObject
 
 public:
     explicit EmojiModel(QObject *parent = nullptr)
-        : QObject(parent)
-    {
+        : QObject(parent) {
     }
 
     Q_INVOKABLE QVariantList history() const;

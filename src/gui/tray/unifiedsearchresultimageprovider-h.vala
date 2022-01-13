@@ -25,8 +25,7 @@ namespace OCC {
  * Allows to fetch Unified Search result icon from the server or used a local resource
  */
 
-class UnifiedSearchResultImageProvider : public QQuickAsyncImageProvider
-{
+class UnifiedSearchResultImageProvider : public QQuickAsyncImageProvider {
 public:
     QQuickImageResponse *requestImageResponse(const QString &id, const QSize &requestedSize) override;
 };

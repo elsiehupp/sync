@@ -15,8 +15,7 @@
 
 using namespace OCC;
 
-class DesktopServiceHook : public QObject
-{
+class DesktopServiceHook : public QObject {
 signals:
     void hooked(const QUrl &);
 public:
@@ -26,8 +25,7 @@ public:
 static const QUrl sOAuthTestServer("oauthtest://someserver/owncloud");
 
 
-class FakePostReply : public QNetworkReply
-{
+class FakePostReply : public QNetworkReply {
 public:
     std::unique_ptr<QIODevice> payload;
     bool aborted = false;
@@ -36,8 +34,7 @@ public:
 
     FakePostReply(QNetworkAccessManager::Operation op, const QNetworkRequest &request,
                   std::unique_ptr<QIODevice> payload_, QObject *parent)
-        : QNetworkReply{parent}, payload{std::move(payload_)}
-    {
+        : QNetworkReply{parent}, payload{std::move(payload_)} {
         setRequest(request);
         setUrl(request.url());
         setOperation(op);
@@ -104,8 +101,7 @@ public:
 };
 
 
-class OAuthTestCase : public QObject
-{
+class OAuthTestCase : public QObject {
     DesktopServiceHook desktopServiceHook;
 public:
     enum State { StartState, BrowserOpened, TokenAsked, CustomState } state = StartState;
@@ -171,8 +167,7 @@ public:
         replyToBrowserOk = true;
     };
 
-    virtual QNetworkReply *tokenReply(QNetworkAccessManager::Operation op, const QNetworkRequest &req)
-    {
+    virtual QNetworkReply *tokenReply(QNetworkAccessManager::Operation op, const QNetworkRequest &req) {
         ASSERT(state == BrowserOpened);
         state = TokenAsked;
         ASSERT(op == QNetworkAccessManager::PostOperation);
@@ -184,12 +179,7 @@ public:
     }
 
     virtual QByteArray tokenReplyPayload() const {
-        QJsonDocument jsondata(QJsonObject{
-                { "access_token", "123" },
-                { "refresh_token" , "456" },
-                { "message_url",  "owncloud://success"},
-                { "user_id", "789" },
-                { "token_type", "Bearer" }
+        QJsonDocument jsondata(QJsonObject{ { "access_token", "123" }, { "refresh_token" , "456" }, { "message_url",  "owncloud://success"}, { "user_id", "789" }, { "token_type", "Bearer" }
         });
         return jsondata.toJson();
     }
@@ -204,22 +194,18 @@ public:
     }
 };
 
-class TestOAuth: public QObject
-{
+class TestOAuth: public QObject {
 
 private slots:
-    void testBasic()
-    {
+    void testBasic() {
         OAuthTestCase test;
         test.test();
     }
 
     // Test for https://github.com/owncloud/client/pull/6057
-    void testCloseBrowserDontCrash()
-    {
+    void testCloseBrowserDontCrash() {
         struct Test : OAuthTestCase {
-            QNetworkReply *tokenReply(QNetworkAccessManager::Operation op, const QNetworkRequest & req) override
-            {
+            QNetworkReply *tokenReply(QNetworkAccessManager::Operation op, const QNetworkRequest & req) override {
                 ASSERT(browserReply);
                 // simulate the fact that the browser is closing the connection
                 browserReply->abort();
@@ -233,8 +219,7 @@ private slots:
                 return new SlowFakePostReply(op, req, std::move(payload), fakeQnam);
             }
 
-            void browserReplyFinished() override
-            {
+            void browserReplyFinished() override {
                 QCOMPARE(sender(), browserReply.data());
                 QCOMPARE(browserReply->error(), QNetworkReply::OperationCanceledError);
                 replyToBrowserOk = true;
@@ -243,8 +228,7 @@ private slots:
         test.test();
     }
 
-    void testRandomConnections()
-    {
+    void testRandomConnections() {
         // Test that we can send random garbage to the litening socket and it does not prevent the connection
         struct Test : OAuthTestCase {
             QNetworkReply *createBrowserReply(const QNetworkRequest &request) override {
@@ -277,8 +261,7 @@ private slots:
                return nullptr;
             }
 
-            QNetworkReply *tokenReply(QNetworkAccessManager::Operation op, const QNetworkRequest &req) override
-            {
+            QNetworkReply *tokenReply(QNetworkAccessManager::Operation op, const QNetworkRequest &req) override {
                 if (state == CustomState)
                     return new FakeErrorReply{op, req, this, 500};
                 return OAuthTestCase::tokenReply(op, req);
@@ -294,12 +277,10 @@ private slots:
         test.test();
     }
 
-    void testTokenUrlHasRedirect()
-    {
+    void testTokenUrlHasRedirect() {
         struct Test : OAuthTestCase {
             int redirectsDone = 0;
-            QNetworkReply *tokenReply(QNetworkAccessManager::Operation op, const QNetworkRequest & request) override
-            {
+            QNetworkReply *tokenReply(QNetworkAccessManager::Operation op, const QNetworkRequest & request) override {
                 ASSERT(browserReply);
                 // Kind of reproduces what we had in https://github.com/owncloud/enterprise/issues/2951 (not 1:1)
                 if (redirectsDone == 0) {

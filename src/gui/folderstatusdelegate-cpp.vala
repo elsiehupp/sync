@@ -27,8 +27,7 @@
 // #include <QApplication>
 // #include <QMouseEvent>
 
-inline static QFont makeAliasFont(const QFont &normalFont)
-{
+inline static QFont makeAliasFont(const QFont &normalFont) {
     QFont aliasFont = normalFont;
     aliasFont.setBold(true);
     aliasFont.setPointSize(normalFont.pointSize() + 2);
@@ -38,20 +37,17 @@ inline static QFont makeAliasFont(const QFont &normalFont)
 namespace OCC {
 
 FolderStatusDelegate::FolderStatusDelegate()
-    : QStyledItemDelegate()
-{
+    : QStyledItemDelegate() {
     customizeStyle();
 }
 
-QString FolderStatusDelegate::addFolderText()
-{
+QString FolderStatusDelegate::addFolderText() {
     return tr("Add Folder Sync Connection");
 }
 
 // allocate each item size in listview.
 QSize FolderStatusDelegate::sizeHint(const QStyleOptionViewItem &option,
-    const QModelIndex &index) const
-{
+    const QModelIndex &index) const {
     QFont aliasFont = makeAliasFont(option.font);
     QFont font = option.font;
 
@@ -91,8 +87,7 @@ QSize FolderStatusDelegate::sizeHint(const QStyleOptionViewItem &option,
     return {0, h};
 }
 
-int FolderStatusDelegate::rootFolderHeightWithoutErrors(const QFontMetrics &fm, const QFontMetrics &aliasFm)
-{
+int FolderStatusDelegate::rootFolderHeightWithoutErrors(const QFontMetrics &fm, const QFontMetrics &aliasFm) {
     const int aliasMargin = aliasFm.height() / 2;
     const int margin = fm.height() / 4;
 
@@ -107,8 +102,7 @@ int FolderStatusDelegate::rootFolderHeightWithoutErrors(const QFontMetrics &fm, 
 }
 
 void FolderStatusDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
-    const QModelIndex &index) const
-{
+    const QModelIndex &index) const {
     if (index.data(AddButton).toBool()) {
         const_cast<QStyleOptionViewItem &>(option).showDecorationSelected = false;
     }
@@ -344,8 +338,7 @@ void FolderStatusDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     }
 
     painter->restore();
-
-    {
+ {
         QStyleOptionToolButton btnOpt;
         btnOpt.state = option.state;
         btnOpt.state &= ~(QStyle::State_Selected | QStyle::State_HasFocus);
@@ -361,8 +354,7 @@ void FolderStatusDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
 }
 
 bool FolderStatusDelegate::editorEvent(QEvent *event, QAbstractItemModel *model,
-    const QStyleOptionViewItem &option, const QModelIndex &index)
-{
+    const QStyleOptionViewItem &option, const QModelIndex &index) {
     switch (event->type()) {
     case QEvent::MouseButtonPress:
     case QEvent::MouseMove:
@@ -387,8 +379,7 @@ bool FolderStatusDelegate::editorEvent(QEvent *event, QAbstractItemModel *model,
     return QStyledItemDelegate::editorEvent(event, model, option, index);
 }
 
-QRect FolderStatusDelegate::optionsButtonRect(QRect within, Qt::LayoutDirection direction)
-{
+QRect FolderStatusDelegate::optionsButtonRect(QRect within, Qt::LayoutDirection direction) {
     QFont font = QFont();
     QFont aliasFont = makeAliasFont(font);
     QFontMetrics fm(font);
@@ -407,8 +398,7 @@ QRect FolderStatusDelegate::optionsButtonRect(QRect within, Qt::LayoutDirection 
     return QStyle::visualRect(direction, within, r);
 }
 
-QRect FolderStatusDelegate::addButtonRect(QRect within, Qt::LayoutDirection direction)
-{
+QRect FolderStatusDelegate::addButtonRect(QRect within, Qt::LayoutDirection direction) {
     QFontMetrics fm(qApp->font("QPushButton"));
     QStyleOptionButton opt;
     opt.text = addFolderText();
@@ -417,8 +407,7 @@ QRect FolderStatusDelegate::addButtonRect(QRect within, Qt::LayoutDirection dire
     return QStyle::visualRect(direction, within, r);
 }
 
-QRect FolderStatusDelegate::errorsListRect(QRect within)
-{
+QRect FolderStatusDelegate::errorsListRect(QRect within) {
     QFont font = QFont();
     QFont aliasFont = makeAliasFont(font);
     QFontMetrics fm(font);
@@ -427,13 +416,11 @@ QRect FolderStatusDelegate::errorsListRect(QRect within)
     return within;
 }
 
-void FolderStatusDelegate::slotStyleChanged()
-{
+void FolderStatusDelegate::slotStyleChanged() {
     customizeStyle();
 }
 
-void FolderStatusDelegate::customizeStyle()
-{
+void FolderStatusDelegate::customizeStyle() {
     _iconMore = Theme::createColorAwareIcon(QLatin1String(":/client/theme/more.svg"));
 }
 

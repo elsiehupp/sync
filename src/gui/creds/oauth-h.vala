@@ -38,13 +38,11 @@ namespace OCC {
  *              emit result(...)
  *
  */
-class OAuth : public QObject
-{
+class OAuth : public QObject {
 public:
     OAuth(Account *account, QObject *parent)
         : QObject(parent)
-        , _account(account)
-    {
+        , _account(account) {
     }
     ~OAuth() override;
 

@@ -23,13 +23,11 @@
 
 static int verbosity;
 
-int torture_csync_verbosity(void)
-{
+int torture_csync_verbosity(void) {
   return verbosity;
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   struct argument_s arguments;
 
   arguments.verbose = 0;

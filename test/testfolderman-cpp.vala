@@ -18,14 +18,12 @@
 
 using namespace OCC;
 
-class TestFolderMan: public QObject
-{
+class TestFolderMan: public QObject {
 
     FolderMan _fm;
 
 private slots:
-    void testCheckPathValidityForNewFolder()
-    {
+    void testCheckPathValidityForNewFolder() {
 #ifdef Q_OS_WIN
         Utility::NtfsPermissionLookupRAII ntfs_perm;
 #endif
@@ -36,8 +34,7 @@ private slots:
         QVERIFY(dir2.mkpath("sub/ownCloud1/folder/f"));
         QVERIFY(dir2.mkpath("ownCloud2"));
         QVERIFY(dir2.mkpath("sub/free"));
-        QVERIFY(dir2.mkpath("free2/sub"));
-        {
+        QVERIFY(dir2.mkpath("free2/sub")); {
             QFile f(dir.path() + "/sub/file.txt");
             f.open(QFile::WriteOnly);
             f.write("hello");
@@ -155,8 +152,7 @@ private slots:
         QVERIFY(!folderman->checkPathValidityForNewFolder(dirPath + "/ownCloud2/sub/subsub/sub").isNull());
     }
 
-    void testFindGoodPathForNewSyncFolder()
-    {
+    void testFindGoodPathForNewSyncFolder() {
         // SETUP
 
         QTemporaryDir dir;

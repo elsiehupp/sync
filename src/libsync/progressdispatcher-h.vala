@@ -29,8 +29,7 @@ namespace OCC {
  * @brief The ProgressInfo class
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT ProgressInfo : public QObject
-{
+class OWNCLOUDSYNC_EXPORT ProgressInfo : public QObject {
 public:
     ProgressInfo();
 
@@ -98,8 +97,7 @@ public:
     qint64 currentFile() const;
 
     /** Return true if the size needs to be taken in account in the total amount of time */
-    static inline bool isSizeDependent(const SyncFileItem &item)
-    {
+    static inline bool isSizeDependent(const SyncFileItem &item) {
         return !item.isDirectory()
             && (item._instruction == CSYNC_INSTRUCTION_CONFLICT
                 || item._instruction == CSYNC_INSTRUCTION_SYNC
@@ -112,8 +110,7 @@ public:
     /**
      * Holds estimates about progress, returned to the user.
      */
-    struct Estimates
-    {
+    struct Estimates {
         /// Estimated completion amount per second. (of bytes or files)
         qint64 estimatedBandwidth;
 
@@ -125,8 +122,7 @@ public:
      * Holds the current state of something making progress and maintains an
      * estimate of the current progress per second.
      */
-    struct OWNCLOUDSYNC_EXPORT Progress
-    {
+    struct OWNCLOUDSYNC_EXPORT Progress {
         /** Returns the estimates about progress per second and eta. */
         Estimates estimates() const;
 
@@ -162,8 +158,7 @@ public:
 
     Status _status;
 
-    struct OWNCLOUDSYNC_EXPORT ProgressItem
-    {
+    struct OWNCLOUDSYNC_EXPORT ProgressItem {
         SyncFileItem _item;
         Progress _progress;
     };
@@ -259,8 +254,7 @@ enum class ErrorCategory {
  * or the overall sync progress.
  *
  */
-class OWNCLOUDSYNC_EXPORT ProgressDispatcher : public QObject
-{
+class OWNCLOUDSYNC_EXPORT ProgressDispatcher : public QObject {
 
     friend class Folder; // only allow Folder class to access the setting slots.
 public:

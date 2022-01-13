@@ -21,8 +21,7 @@ namespace OCC {
  * @brief The FolderStatusView class
  * @ingroup gui
  */
-class FolderStatusView : public QTreeView
-{
+class FolderStatusView : public QTreeView {
 
 public:
     explicit FolderStatusView(QWidget *parent = nullptr);

@@ -26,8 +26,7 @@ using namespace OCC;
 
 Q_LOGGING_CATEGORY(lcUtility, "nextcloud.gui.utility", QtInfoMsg)
 
-bool Utility::openBrowser(const QUrl &url, QWidget *errorWidgetParent)
-{
+bool Utility::openBrowser(const QUrl &url, QWidget *errorWidgetParent) {
     const QStringList allowedUrlSchemes = {
         "http",
         "https",
@@ -55,12 +54,10 @@ bool Utility::openBrowser(const QUrl &url, QWidget *errorWidgetParent)
     return true;
 }
 
-bool Utility::openEmailComposer(const QString &subject, const QString &body, QWidget *errorWidgetParent)
-{
+bool Utility::openEmailComposer(const QString &subject, const QString &body, QWidget *errorWidgetParent) {
     QUrl url(QLatin1String("mailto:"));
     QUrlQuery query;
-    query.setQueryItems({ { QLatin1String("subject"), subject },
-        { QLatin1String("body"), body } });
+    query.setQueryItems({ { QLatin1String("subject"), subject }, { QLatin1String("body"), body } });
     url.setQuery(query);
 
     if (!QDesktopServices::openUrl(url)) {
@@ -79,8 +76,7 @@ bool Utility::openEmailComposer(const QString &subject, const QString &body, QWi
     return true;
 }
 
-QString Utility::vfsCurrentAvailabilityText(VfsItemAvailability availability)
-{
+QString Utility::vfsCurrentAvailabilityText(VfsItemAvailability availability) {
     switch(availability) {
     case VfsItemAvailability::AlwaysLocal:
         return QCoreApplication::translate("utility", "Always available locally");
@@ -95,12 +91,10 @@ QString Utility::vfsCurrentAvailabilityText(VfsItemAvailability availability)
     Q_UNREACHABLE();
 }
 
-QString Utility::vfsPinActionText()
-{
+QString Utility::vfsPinActionText() {
     return QCoreApplication::translate("utility", "Make always available locally");
 }
 
-QString Utility::vfsFreeSpaceActionText()
-{
+QString Utility::vfsFreeSpaceActionText() {
     return QCoreApplication::translate("utility", "Free up local space");
 }

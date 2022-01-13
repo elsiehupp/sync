@@ -27,37 +27,30 @@ UserStatus::UserStatus(
     , _icon(icon)
     , _state(state)
     , _messagePredefined(messagePredefined)
-    , _clearAt(clearAt)
-{
+    , _clearAt(clearAt) {
 }
 
-QString UserStatus::id() const
-{
+QString UserStatus::id() const {
     return _id;
 }
 
-QString UserStatus::message() const
-{
+QString UserStatus::message() const {
     return _message;
 }
 
-QString UserStatus::icon() const
-{
+QString UserStatus::icon() const {
     return _icon;
 }
 
-auto UserStatus::state() const -> OnlineStatus
-{
+auto UserStatus::state() const -> OnlineStatus {
     return _state;
 }
 
-bool UserStatus::messagePredefined() const
-{
+bool UserStatus::messagePredefined() const {
     return _messagePredefined;
 }
 
-QUrl UserStatus::stateIcon() const
-{
+QUrl UserStatus::stateIcon() const {
     switch (_state) {
     case UserStatus::OnlineStatus::Away:
         return Theme::instance()->statusAwayImageSource();
@@ -76,45 +69,37 @@ QUrl UserStatus::stateIcon() const
     Q_UNREACHABLE();
 }
 
-Optional<ClearAt> UserStatus::clearAt() const
-{
+Optional<ClearAt> UserStatus::clearAt() const {
     return _clearAt;
 }
 
-void UserStatus::setId(const QString &id)
-{
+void UserStatus::setId(const QString &id) {
     _id = id;
 }
 
-void UserStatus::setMessage(const QString &message)
-{
+void UserStatus::setMessage(const QString &message) {
     _message = message;
 }
 
-void UserStatus::setState(OnlineStatus state)
-{
+void UserStatus::setState(OnlineStatus state) {
     _state = state;
 }
 
-void UserStatus::setIcon(const QString &icon)
-{
+void UserStatus::setIcon(const QString &icon) {
     _icon = icon;
 }
 
-void UserStatus::setMessagePredefined(bool value)
-{
+void UserStatus::setMessagePredefined(bool value) {
     _messagePredefined = value;
 }
 
-void UserStatus::setClearAt(const Optional<ClearAt> &dateTime)
-{
+void UserStatus::setClearAt(const Optional<ClearAt> &dateTime) {
     _clearAt = dateTime;
 }
 
 
 UserStatusConnector::UserStatusConnector(QObject *parent)
-    : QObject(parent)
-{
+    : QObject(parent) {
 }
 
 UserStatusConnector::~UserStatusConnector() = default;

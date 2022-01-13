@@ -10,8 +10,7 @@ namespace Ui {
     class IgnoreListTableWidget;
 }
 
-class IgnoreListTableWidget : public QWidget
-{
+class IgnoreListTableWidget : public QWidget {
 
 public:
     IgnoreListTableWidget(QWidget *parent = nullptr);

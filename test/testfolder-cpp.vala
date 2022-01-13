@@ -12,11 +12,9 @@
 
 using namespace OCC;
 
-class TestFolder: public QObject
-{
+class TestFolder: public QObject {
 private slots:
-    void testFolder()
-    {
+    void testFolder() {
         QFETCH(QString, folder);
         QFETCH(QString, expectedFolder);
         Folder *f = new Folder("alias", folder, "http://foo.bar.net");
@@ -24,8 +22,7 @@ private slots:
         delete f;
     }
 
-    void testFolder_data()
-    {
+    void testFolder_data() {
         QTest::addColumn<QString>("folder");
         QTest::addColumn<QString>("expectedFolder");
 

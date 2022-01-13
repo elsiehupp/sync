@@ -59,8 +59,7 @@ class UserStatusConnector;
  * @brief Reimplement this to handle SSL errors from libsync
  * @ingroup libsync
  */
-class AbstractSslErrorHandler
-{
+class AbstractSslErrorHandler {
 public:
     virtual ~AbstractSslErrorHandler() = default;
     virtual bool handleErrors(QList<QSslError>, const QSslConfiguration &conf, QList<QSslCertificate> *, AccountPtr) = 0;
@@ -73,8 +72,7 @@ public:
  * The Account has a name and url. It also has information about credentials,
  * SSL errors and certificates.
  */
-class OWNCLOUDSYNC_EXPORT Account : public QObject
-{
+class OWNCLOUDSYNC_EXPORT Account : public QObject {
     Q_PROPERTY(QString id MEMBER _id)
     Q_PROPERTY(QString davUser MEMBER _davUser)
     Q_PROPERTY(QString displayName MEMBER _displayName)

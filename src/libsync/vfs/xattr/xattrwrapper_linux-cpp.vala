@@ -25,8 +25,7 @@ Q_LOGGING_CATEGORY(lcXAttrWrapper, "nextcloud.sync.vfs.xattr.wrapper", QtInfoMsg
 namespace {
 constexpr auto hydrateExecAttributeName = "user.nextcloud.hydrate_exec";
 
-OCC::Optional<QByteArray> xattrGet(const QByteArray &path, const QByteArray &name)
-{
+OCC::Optional<QByteArray> xattrGet(const QByteArray &path, const QByteArray &name) {
     constexpr auto bufferSize = 256;
     QByteArray result;
     result.resize(bufferSize);
@@ -39,8 +38,7 @@ OCC::Optional<QByteArray> xattrGet(const QByteArray &path, const QByteArray &nam
     }
 }
 
-bool xattrSet(const QByteArray &path, const QByteArray &name, const QByteArray &value)
-{
+bool xattrSet(const QByteArray &path, const QByteArray &name, const QByteArray &value) {
     const auto returnCode = setxattr(path.constData(), name.constData(), value.constData(), value.size() + 1, 0);
     return returnCode == 0;
 }
@@ -48,8 +46,7 @@ bool xattrSet(const QByteArray &path, const QByteArray &name, const QByteArray &
 }
 
 
-bool OCC::XAttrWrapper::hasNextcloudPlaceholderAttributes(const QString &path)
-{
+bool OCC::XAttrWrapper::hasNextcloudPlaceholderAttributes(const QString &path) {
     const auto value = xattrGet(path.toUtf8(), hydrateExecAttributeName);
     if (value) {
         return *value == QByteArrayLiteral(APPLICATION_EXECUTABLE);
@@ -58,8 +55,7 @@ bool OCC::XAttrWrapper::hasNextcloudPlaceholderAttributes(const QString &path)
     }
 }
 
-OCC::Result<void, QString> OCC::XAttrWrapper::addNextcloudPlaceholderAttributes(const QString &path)
-{
+OCC::Result<void, QString> OCC::XAttrWrapper::addNextcloudPlaceholderAttributes(const QString &path) {
     const auto success = xattrSet(path.toUtf8(), hydrateExecAttributeName, APPLICATION_EXECUTABLE);
     if (!success) {
         return QStringLiteral("Failed to set the extended attribute");

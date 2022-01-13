@@ -24,8 +24,7 @@ namespace OCC {
 class SyncJournalDb;
 class SyncEngine;
 
-class SocketUploadJob : public QObject
-{
+class SocketUploadJob : public QObject {
 public:
     SocketUploadJob(const QSharedPointer<SocketApiJobV2> &job);
     void start();

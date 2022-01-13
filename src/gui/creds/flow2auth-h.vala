@@ -26,8 +26,7 @@ namespace OCC {
  *
  * See: https://docs.nextcloud.com/server/latest/developer_manual/client_apis/LoginFlow/index.html#login-flow-v2
  */
-class Flow2Auth : public QObject
-{
+class Flow2Auth : public QObject {
 public:
     enum TokenAction {
         actionOpenBrowser = 1,

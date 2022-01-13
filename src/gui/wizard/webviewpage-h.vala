@@ -9,8 +9,7 @@ class AbstractCredentials;
 class OwncloudWizard;
 class WebView;
 
-class WebViewPage : public AbstractCredentialsWizardPage
-{
+class WebViewPage : public AbstractCredentialsWizardPage {
 public:
     WebViewPage(QWidget *parent = nullptr);
     ~WebViewPage() override;

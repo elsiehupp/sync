@@ -17,19 +17,16 @@
 #include "theme.h"
 #include "iconutils.h"
 
-class TestIconUtils : public QObject
-{
+class TestIconUtils : public QObject {
 
 public:
-    TestIconUtils()
-    {
+    TestIconUtils() {
         Q_INIT_RESOURCE(resources);
         Q_INIT_RESOURCE(theme);
     }
 
 private slots:
-    void testDrawSvgWithCustomFillColor()
-    {
+    void testDrawSvgWithCustomFillColor() {
         const QString blackSvgDirPath{QString{OCC::Theme::themePrefix} + QStringLiteral("black")};
         const QDir blackSvgDir(blackSvgDirPath);
         const QStringList blackImages = blackSvgDir.entryList(QStringList("*.svg"));
@@ -49,8 +46,7 @@ private slots:
         QVERIFY(!OCC::Ui::IconUtils::drawSvgWithCustomFillColor(whiteSvgDirPath + QStringLiteral("/") + whiteImages.at(0), QColorConstants::Svg::blue).isNull());
     }
 
-    void testCreateSvgPixmapWithCustomColor()
-    {
+    void testCreateSvgPixmapWithCustomColor() {
         const QDir blackSvgDir(QString(QString{OCC::Theme::themePrefix}) + QStringLiteral("black"));
         const QStringList blackImages = blackSvgDir.entryList(QStringList("*.svg"));
 
@@ -62,14 +58,13 @@ private slots:
 
         const QDir whiteSvgDir(QString(QString{OCC::Theme::themePrefix}) + QStringLiteral("white"));
         const QStringList whiteImages = whiteSvgDir.entryList(QStringList("*.svg"));
-        
+
         QVERIFY(!whiteImages.isEmpty());
 
         QVERIFY(!OCC::Ui::IconUtils::createSvgImageWithCustomColor(whiteImages.at(0), QColorConstants::Svg::blue).isNull());
     }
 
-    void testPixmapForBackground()
-    {
+    void testPixmapForBackground() {
         const QDir blackSvgDir(QString(QString{OCC::Theme::themePrefix}) + QStringLiteral("black"));
         const QStringList blackImages = blackSvgDir.entryList(QStringList("*.svg"));
 

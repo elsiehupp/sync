@@ -29,46 +29,37 @@ using namespace OCC::XAttrWrapper;
 namespace OCC {
 
 VfsXAttr::VfsXAttr(QObject *parent)
-    : Vfs(parent)
-{
+    : Vfs(parent) {
 }
 
 VfsXAttr::~VfsXAttr() = default;
 
-Vfs::Mode VfsXAttr::mode() const
-{
+Vfs::Mode VfsXAttr::mode() const {
     return XAttr;
 }
 
-QString VfsXAttr::fileSuffix() const
-{
+QString VfsXAttr::fileSuffix() const {
     return QString();
 }
 
-void VfsXAttr::startImpl(const VfsSetupParams &)
-{
+void VfsXAttr::startImpl(const VfsSetupParams &) {
 }
 
-void VfsXAttr::stop()
-{
+void VfsXAttr::stop() {
 }
 
-void VfsXAttr::unregisterFolder()
-{
+void VfsXAttr::unregisterFolder() {
 }
 
-bool VfsXAttr::socketApiPinStateActionsShown() const
-{
+bool VfsXAttr::socketApiPinStateActionsShown() const {
     return true;
 }
 
-bool VfsXAttr::isHydrating() const
-{
+bool VfsXAttr::isHydrating() const {
     return false;
 }
 
-Result<void, QString> VfsXAttr::updateMetadata(const QString &filePath, time_t modtime, qint64, const QByteArray &)
-{
+Result<void, QString> VfsXAttr::updateMetadata(const QString &filePath, time_t modtime, qint64, const QByteArray &) {
     if (modtime <= 0) {
         return {tr("Error updating metadata due to invalid modified time")};
     }
@@ -77,8 +68,7 @@ Result<void, QString> VfsXAttr::updateMetadata(const QString &filePath, time_t m
     return {};
 }
 
-Result<void, QString> VfsXAttr::createPlaceholder(const SyncFileItem &item)
-{
+Result<void, QString> VfsXAttr::createPlaceholder(const SyncFileItem &item) {
     if (item._modtime <= 0) {
         return {tr("Error updating metadata due to invalid modified time")};
     }
@@ -100,8 +90,7 @@ Result<void, QString> VfsXAttr::createPlaceholder(const SyncFileItem &item)
     return xattr::addNextcloudPlaceholderAttributes(path);
 }
 
-Result<void, QString> VfsXAttr::dehydratePlaceholder(const SyncFileItem &item)
-{
+Result<void, QString> VfsXAttr::dehydratePlaceholder(const SyncFileItem &item) {
     const auto path = QString(_setupParams.filesystemPath + item._file);
     QFile file(path);
     if (!file.remove()) {
@@ -120,26 +109,22 @@ Result<void, QString> VfsXAttr::dehydratePlaceholder(const SyncFileItem &item)
     return {};
 }
 
-Result<Vfs::ConvertToPlaceholderResult, QString> VfsXAttr::convertToPlaceholder(const QString &, const SyncFileItem &, const QString &)
-{
+Result<Vfs::ConvertToPlaceholderResult, QString> VfsXAttr::convertToPlaceholder(const QString &, const SyncFileItem &, const QString &) {
     // Nothing necessary
     return {ConvertToPlaceholderResult::Ok};
 }
 
-bool VfsXAttr::needsMetadataUpdate(const SyncFileItem &)
-{
+bool VfsXAttr::needsMetadataUpdate(const SyncFileItem &) {
     return false;
 }
 
-bool VfsXAttr::isDehydratedPlaceholder(const QString &filePath)
-{
+bool VfsXAttr::isDehydratedPlaceholder(const QString &filePath) {
     const auto fi = QFileInfo(filePath);
     return fi.exists() &&
             xattr::hasNextcloudPlaceholderAttributes(filePath);
 }
 
-bool VfsXAttr::statTypeVirtualFile(csync_file_stat_t *stat, void *statData)
-{
+bool VfsXAttr::statTypeVirtualFile(csync_file_stat_t *stat, void *statData) {
     if (stat->type == ItemTypeDirectory) {
         return false;
     }
@@ -170,23 +155,19 @@ bool VfsXAttr::statTypeVirtualFile(csync_file_stat_t *stat, void *statData)
     return false;
 }
 
-bool VfsXAttr::setPinState(const QString &folderPath, PinState state)
-{
+bool VfsXAttr::setPinState(const QString &folderPath, PinState state) {
     return setPinStateInDb(folderPath, state);
 }
 
-Optional<PinState> VfsXAttr::pinState(const QString &folderPath)
-{
+Optional<PinState> VfsXAttr::pinState(const QString &folderPath) {
     return pinStateInDb(folderPath);
 }
 
-Vfs::AvailabilityResult VfsXAttr::availability(const QString &folderPath)
-{
+Vfs::AvailabilityResult VfsXAttr::availability(const QString &folderPath) {
     return availabilityInDb(folderPath);
 }
 
-void VfsXAttr::fileStatusChanged(const QString &, SyncFileStatus)
-{
+void VfsXAttr::fileStatusChanged(const QString &, SyncFileStatus) {
 }
 
 } // namespace OCC

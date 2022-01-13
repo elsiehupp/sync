@@ -25,8 +25,7 @@ namespace OCC {
  *
  * Fetching sharees from the OCS Sharee API
  */
-class OcsShareeJob : public OcsJob
-{
+class OcsShareeJob : public OcsJob {
 public:
     explicit OcsShareeJob(AccountPtr account);
 

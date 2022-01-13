@@ -26,8 +26,7 @@ class QProgressIndicator;
 
 namespace OCC {
 
-class Flow2AuthWidget : public QWidget
-{
+class Flow2AuthWidget : public QWidget {
 public:
     Flow2AuthWidget(QWidget *parent = nullptr);
     ~Flow2AuthWidget() override;

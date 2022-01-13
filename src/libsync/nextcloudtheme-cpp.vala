@@ -29,12 +29,10 @@
 namespace OCC {
 
 NextcloudTheme::NextcloudTheme()
-    : Theme()
-{
+    : Theme() {
 }
 
-QString NextcloudTheme::wizardUrlHint() const
-{
+QString NextcloudTheme::wizardUrlHint() const {
     return QString("https://try.nextcloud.com");
 }
 

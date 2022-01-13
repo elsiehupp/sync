@@ -33,8 +33,7 @@ namespace {
  * manager. If that delay between file-change notification and sync
  * has passed, we should accept the file for upload here.
  */
-inline bool fileIsStillChanging(const OCC::SyncFileItem &item)
-{
+inline bool fileIsStillChanging(const OCC::SyncFileItem &item) {
     const auto modtime = OCC::Utility::qDateTimeFromTime_t(item._modtime);
     const qint64 msSinceMod = modtime.msecsTo(QDateTime::currentDateTimeUtc());
 
@@ -47,8 +46,7 @@ inline bool fileIsStillChanging(const OCC::SyncFileItem &item)
 
 namespace OCC {
 
-inline QByteArray getEtagFromReply(QNetworkReply *reply)
-{
+inline QByteArray getEtagFromReply(QNetworkReply *reply) {
     QByteArray ocEtag = parseEtag(reply->rawHeader("OC-ETag"));
     QByteArray etag = parseEtag(reply->rawHeader("ETag"));
     QByteArray ret = ocEtag;
@@ -65,8 +63,7 @@ inline QByteArray getEtagFromReply(QNetworkReply *reply)
  * Given an error from the network, map to a SyncFileItem::Status error
  */
 inline SyncFileItem::Status classifyError(QNetworkReply::NetworkError nerror,
-    int httpCode, bool *anotherSyncNeeded = nullptr, const QByteArray &errorBody = QByteArray())
-{
+    int httpCode, bool *anotherSyncNeeded = nullptr, const QByteArray &errorBody = QByteArray()) {
     Q_ASSERT(nerror != QNetworkReply::NoError); // we should only be called when there is an error
 
     if (nerror == QNetworkReply::RemoteHostClosedError) {

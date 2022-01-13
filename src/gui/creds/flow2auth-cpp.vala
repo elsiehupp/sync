@@ -36,39 +36,33 @@ Flow2Auth::Flow2Auth(Account *account, QObject *parent)
     : QObject(parent)
     , _account(account)
     , _isBusy(false)
-    , _hasToken(false)
-{
+    , _hasToken(false) {
     _pollTimer.setInterval(1000);
     QObject::connect(&_pollTimer, &QTimer::timeout, this, &Flow2Auth::slotPollTimerTimeout);
 }
 
 Flow2Auth::~Flow2Auth() = default;
 
-void Flow2Auth::start()
-{
+void Flow2Auth::start() {
     // Note: All startup code is in openBrowser() to allow reinitiate a new request with
     //       fresh tokens. Opening the same pollEndpoint link twice triggers an expiration
     //       message by the server (security, intended design).
     openBrowser();
 }
 
-QUrl Flow2Auth::authorisationLink() const
-{
+QUrl Flow2Auth::authorisationLink() const {
     return _loginUrl;
 }
 
-void Flow2Auth::openBrowser()
-{
+void Flow2Auth::openBrowser() {
     fetchNewToken(TokenAction::actionOpenBrowser);
 }
 
-void Flow2Auth::copyLinkToClipboard()
-{
+void Flow2Auth::copyLinkToClipboard() {
     fetchNewToken(TokenAction::actionCopyLinkToClipboard);
 }
 
-void Flow2Auth::fetchNewToken(const TokenAction action)
-{
+void Flow2Auth::fetchNewToken(const TokenAction action) {
     if(_isBusy)
         return;
 
@@ -159,8 +153,7 @@ void Flow2Auth::fetchNewToken(const TokenAction action)
         }
 
 
-        switch(action)
-        {
+        switch(action) {
         case actionOpenBrowser:
             // Try to open Browser
             if (!Utility::openBrowser(authorisationLink())) {
@@ -180,8 +173,7 @@ void Flow2Auth::fetchNewToken(const TokenAction action)
     });
 }
 
-void Flow2Auth::slotPollTimerTimeout()
-{
+void Flow2Auth::slotPollTimerTimeout() {
     if(_isBusy || !_hasToken)
         return;
 
@@ -279,8 +271,7 @@ void Flow2Auth::slotPollTimerTimeout()
     });
 }
 
-void Flow2Auth::slotPollNow()
-{
+void Flow2Auth::slotPollNow() {
     // poll now if we're not already doing so
     if(_isBusy || !_hasToken)
         return;

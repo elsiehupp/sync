@@ -20,8 +20,7 @@
 namespace OCC {
 class SyncJournalDb;
 
-class OWNCLOUDSYNC_EXPORT EncryptFolderJob : public QObject
-{
+class OWNCLOUDSYNC_EXPORT EncryptFolderJob : public QObject {
 public:
     enum Status {
         Success = 0,

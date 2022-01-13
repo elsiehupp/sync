@@ -61,30 +61,26 @@ struct ZipEntry {
     QString zipFilename;
 };
 
-ZipEntry fileInfoToZipEntry(const QFileInfo &info)
-{
+ZipEntry fileInfoToZipEntry(const QFileInfo &info) {
     return {
         info.absoluteFilePath(),
         info.fileName()
     };
 }
 
-ZipEntry fileInfoToLogZipEntry(const QFileInfo &info)
-{
+ZipEntry fileInfoToLogZipEntry(const QFileInfo &info) {
     auto entry = fileInfoToZipEntry(info);
     entry.zipFilename.prepend(QStringLiteral("logs/"));
     return entry;
 }
 
-ZipEntry syncFolderToZipEntry(OCC::Folder *f)
-{
+ZipEntry syncFolderToZipEntry(OCC::Folder *f) {
     const auto journalPath = f->journalDb()->databaseFilePath();
     const auto journalInfo = QFileInfo(journalPath);
     return fileInfoToZipEntry(journalInfo);
 }
 
-QVector<ZipEntry> createFileList()
-{
+QVector<ZipEntry> createFileList() {
     auto list = QVector<ZipEntry>();
     OCC::ConfigFile cfg;
 
@@ -112,8 +108,7 @@ QVector<ZipEntry> createFileList()
     return list;
 }
 
-void createDebugArchive(const QString &filename)
-{
+void createDebugArchive(const QString &filename) {
     const auto entries = createFileList();
 
     QZipWriter zip(filename);
@@ -140,8 +135,7 @@ namespace OCC {
 
 GeneralSettings::GeneralSettings(QWidget *parent)
     : QWidget(parent)
-    , _ui(new Ui::GeneralSettings)
-{
+    , _ui(new Ui::GeneralSettings) {
     _ui->setupUi(this);
 
     connect(_ui->serverNotificationsCheckBox, &QAbstractButton::toggled,
@@ -230,21 +224,18 @@ GeneralSettings::GeneralSettings(QWidget *parent)
     customizeStyle();
 }
 
-GeneralSettings::~GeneralSettings()
-{
+GeneralSettings::~GeneralSettings() {
     delete _ui;
 }
 
-QSize GeneralSettings::sizeHint() const
-{
+QSize GeneralSettings::sizeHint() const {
     return {
         ownCloudGui::settingsDialogSize().width(),
         QWidget::sizeHint().height()
     };
 }
 
-void GeneralSettings::loadMiscSettings()
-{
+void GeneralSettings::loadMiscSettings() {
     QScopedValueRollback<bool> scope(_currentlyLoading, true);
     ConfigFile cfgFile;
     _ui->monoIconsCheckBox->setChecked(cfgFile.monoIcons());
@@ -259,8 +250,7 @@ void GeneralSettings::loadMiscSettings()
 }
 
 #if defined(BUILD_UPDATER)
-void GeneralSettings::slotUpdateInfo()
-{
+void GeneralSettings::slotUpdateInfo() {
     if (ConfigFile().skipUpdateCheck() || !Updater::instance()) {
         // updater disabled on compile
         _ui->updatesGroupBox->setVisible(false);
@@ -306,8 +296,7 @@ void GeneralSettings::slotUpdateInfo()
         this, &GeneralSettings::slotUpdateChannelChanged, Qt::UniqueConnection);
 }
 
-void GeneralSettings::slotUpdateChannelChanged(const QString &channel)
-{
+void GeneralSettings::slotUpdateChannelChanged(const QString &channel) {
     if (channel == ConfigFile().updateChannel())
         return;
 
@@ -350,8 +339,7 @@ void GeneralSettings::slotUpdateChannelChanged(const QString &channel)
     msgBox->open();
 }
 
-void GeneralSettings::slotUpdateCheckNow()
-{
+void GeneralSettings::slotUpdateCheckNow() {
     auto *updater = qobject_cast<OCUpdater *>(Updater::instance());
     if (ConfigFile().skipUpdateCheck()) {
         updater = nullptr; // don't show update info if updates are disabled
@@ -364,16 +352,14 @@ void GeneralSettings::slotUpdateCheckNow()
     }
 }
 
-void GeneralSettings::slotToggleAutoUpdateCheck()
-{
+void GeneralSettings::slotToggleAutoUpdateCheck() {
     ConfigFile cfgFile;
     bool isChecked = _ui->autoCheckForUpdatesCheckBox->isChecked();
     cfgFile.setAutoUpdateCheck(isChecked, QString());
 }
 #endif // defined(BUILD_UPDATER)
 
-void GeneralSettings::saveMiscSettings()
-{
+void GeneralSettings::saveMiscSettings() {
     if (_currentlyLoading)
         return;
     ConfigFile cfgFile;
@@ -387,28 +373,24 @@ void GeneralSettings::saveMiscSettings()
     cfgFile.setConfirmExternalStorage(_ui->newExternalStorage->isChecked());
 }
 
-void GeneralSettings::slotToggleLaunchOnStartup(bool enable)
-{
+void GeneralSettings::slotToggleLaunchOnStartup(bool enable) {
     Theme *theme = Theme::instance();
     Utility::setLaunchOnStartup(theme->appName(), theme->appNameGUI(), enable);
 }
 
-void GeneralSettings::slotToggleOptionalServerNotifications(bool enable)
-{
+void GeneralSettings::slotToggleOptionalServerNotifications(bool enable) {
     ConfigFile cfgFile;
     cfgFile.setOptionalServerNotifications(enable);
 }
 
-void GeneralSettings::slotShowInExplorerNavigationPane(bool checked)
-{
+void GeneralSettings::slotShowInExplorerNavigationPane(bool checked) {
     ConfigFile cfgFile;
     cfgFile.setShowInExplorerNavigationPane(checked);
     // Now update the registry with the change.
     FolderMan::instance()->navigationPaneHelper().setShowInExplorerNavigationPane(checked);
 }
 
-void GeneralSettings::slotIgnoreFilesEditor()
-{
+void GeneralSettings::slotIgnoreFilesEditor() {
     if (_ignoreEditor.isNull()) {
         ConfigFile cfgFile;
         _ignoreEditor = new IgnoreListEditor(this);
@@ -419,8 +401,7 @@ void GeneralSettings::slotIgnoreFilesEditor()
     }
 }
 
-void GeneralSettings::slotCreateDebugArchive()
-{
+void GeneralSettings::slotCreateDebugArchive() {
     const auto filename = QFileDialog::getSaveFileName(this, tr("Create Debug Archive"), QString(), tr("Zip Archives") + " (*.zip)");
     if (filename.isEmpty()) {
         return;
@@ -430,20 +411,17 @@ void GeneralSettings::slotCreateDebugArchive()
     QMessageBox::information(this, tr("Debug Archive Created"), tr("Debug archive is created at %1").arg(filename));
 }
 
-void GeneralSettings::slotShowLegalNotice()
-{
+void GeneralSettings::slotShowLegalNotice() {
     auto notice = new LegalNotice();
     notice->exec();
     delete notice;
 }
 
-void GeneralSettings::slotStyleChanged()
-{
+void GeneralSettings::slotStyleChanged() {
     customizeStyle();
 }
 
-void GeneralSettings::customizeStyle()
-{
+void GeneralSettings::customizeStyle() {
     // setup about section
     QString about = Theme::instance()->about();
     Theme::replaceLinkColorStringBackgroundAware(about);

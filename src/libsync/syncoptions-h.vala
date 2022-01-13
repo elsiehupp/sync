@@ -29,8 +29,7 @@ namespace OCC {
 /**
  * Value class containing the options given to the sync engine
  */
-class OWNCLOUDSYNC_EXPORT SyncOptions
-{
+class OWNCLOUDSYNC_EXPORT SyncOptions {
 public:
     SyncOptions();
     ~SyncOptions();

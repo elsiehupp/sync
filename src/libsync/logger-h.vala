@@ -29,8 +29,7 @@ namespace OCC {
  * @brief The Logger class
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT Logger : public QObject
-{
+class OWNCLOUDSYNC_EXPORT Logger : public QObject {
 public:
     bool isLoggingToFile() const;
 

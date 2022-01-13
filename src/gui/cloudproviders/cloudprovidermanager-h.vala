@@ -20,8 +20,7 @@ using namespace OCC;
 
 class CloudProviderWrapper;
 
-class CloudProviderManager : public QObject
-{
+class CloudProviderManager : public QObject {
 public:
     explicit CloudProviderManager(QObject *parent = nullptr);
     void registerSignals();

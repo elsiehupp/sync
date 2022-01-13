@@ -62,8 +62,7 @@ namespace OCC {
 
 Q_LOGGING_CATEGORY(lcUtility, "nextcloud.sync.utility", QtInfoMsg)
 
-bool Utility::writeRandomFile(const QString &fname, int size)
-{
+bool Utility::writeRandomFile(const QString &fname, int size) {
     int maxSize = 10 * 10 * 1024;
 
     if (size == -1)
@@ -86,8 +85,7 @@ bool Utility::writeRandomFile(const QString &fname, int size)
     return false;
 }
 
-QString Utility::formatFingerprint(const QByteArray &fmhash, bool colonSeparated)
-{
+QString Utility::formatFingerprint(const QByteArray &fmhash, bool colonSeparated) {
     QByteArray hash;
     int steps = fmhash.length() / 2;
     for (int i = 0; i < steps; i++) {
@@ -104,18 +102,15 @@ QString Utility::formatFingerprint(const QByteArray &fmhash, bool colonSeparated
     return fp;
 }
 
-void Utility::setupFavLink(const QString &folder)
-{
+void Utility::setupFavLink(const QString &folder) {
     setupFavLink_private(folder);
 }
 
-void Utility::removeFavLink(const QString &folder)
-{
+void Utility::removeFavLink(const QString &folder) {
     removeFavLink_private(folder);
 }
 
-QString Utility::octetsToString(qint64 octets)
-{
+QString Utility::octetsToString(qint64 octets) {
 #define THE_FACTOR 1024
     static const qint64 kb = THE_FACTOR;
     static const qint64 mb = THE_FACTOR * kb;
@@ -157,8 +152,7 @@ QString Utility::octetsToString(qint64 octets)
 }
 
 // Qtified version of get_platforms() in csync_owncloud.c
-static QLatin1String platform()
-{
+static QLatin1String platform() {
 #if defined(Q_OS_WIN)
     return QLatin1String("Windows");
 #elif defined(Q_OS_MAC)
@@ -180,8 +174,7 @@ static QLatin1String platform()
 #endif
 }
 
-QByteArray Utility::userAgentString()
-{
+QByteArray Utility::userAgentString() {
     return QStringLiteral("Mozilla/5.0 (%1) mirall/%2 (%3, %4-%5 ClientArchitecture: %6 OsArchitecture: %7)")
         .arg(platform(),
             QStringLiteral(MIRALL_VERSION_STRING),
@@ -193,15 +186,13 @@ QByteArray Utility::userAgentString()
         .toLatin1();
 }
 
-QByteArray Utility::friendlyUserAgentString()
-{
+QByteArray Utility::friendlyUserAgentString() {
     const auto pattern = QStringLiteral("%1 (Desktop Client - %2)");
     const auto userAgent = pattern.arg(QSysInfo::machineHostName(), platform());
     return userAgent.toUtf8();
 }
 
-bool Utility::hasSystemLaunchOnStartup(const QString &appName)
-{
+bool Utility::hasSystemLaunchOnStartup(const QString &appName) {
 #if defined(Q_OS_WIN)
     return hasSystemLaunchOnStartup_private(appName);
 #else
@@ -210,18 +201,15 @@ bool Utility::hasSystemLaunchOnStartup(const QString &appName)
 #endif
 }
 
-bool Utility::hasLaunchOnStartup(const QString &appName)
-{
+bool Utility::hasLaunchOnStartup(const QString &appName) {
     return hasLaunchOnStartup_private(appName);
 }
 
-void Utility::setLaunchOnStartup(const QString &appName, const QString &guiName, bool enable)
-{
+void Utility::setLaunchOnStartup(const QString &appName, const QString &guiName, bool enable) {
     setLaunchOnStartup_private(appName, guiName, enable);
 }
 
-qint64 Utility::freeDiskSpace(const QString &path)
-{
+qint64 Utility::freeDiskSpace(const QString &path) {
 #if defined(Q_OS_MAC) || defined(Q_OS_FREEBSD) || defined(Q_OS_FREEBSD_KERNEL) || defined(Q_OS_NETBSD) || defined(Q_OS_OPENBSD)
     struct statvfs stat;
     if (statvfs(path.toLocal8Bit().data(), &stat) == 0) {
@@ -242,8 +230,7 @@ qint64 Utility::freeDiskSpace(const QString &path)
     return -1;
 }
 
-QString Utility::compactFormatDouble(double value, int prec, const QString &unit)
-{
+QString Utility::compactFormatDouble(double value, int prec, const QString &unit) {
     QLocale locale = QLocale::system();
     QChar decPoint = locale.decimalPoint();
     QString str = locale.toString(value, 'f', prec);
@@ -259,23 +246,19 @@ QString Utility::compactFormatDouble(double value, int prec, const QString &unit
     return str;
 }
 
-QString Utility::escape(const QString &in)
-{
+QString Utility::escape(const QString &in) {
     return in.toHtmlEscaped();
 }
 
-int Utility::rand()
-{
+int Utility::rand() {
     return QRandomGenerator::global()->bounded(0, RAND_MAX);
 }
 
-void Utility::sleep(int sec)
-{
+void Utility::sleep(int sec) {
     QThread::sleep(sec);
 }
 
-void Utility::usleep(int usec)
-{
+void Utility::usleep(int usec) {
     QThread::usleep(usec);
 }
 
@@ -287,13 +270,11 @@ OCSYNC_EXPORT bool fsCasePreserving_override = []() -> bool {
     return Utility::isWindows() || Utility::isMac();
 }();
 
-bool Utility::fsCasePreserving()
-{
+bool Utility::fsCasePreserving() {
     return fsCasePreserving_override;
 }
 
-bool Utility::fileNamesEqual(const QString &fn1, const QString &fn2)
-{
+bool Utility::fileNamesEqual(const QString &fn1, const QString &fn2) {
     const QDir fd1(fn1);
     const QDir fd2(fn2);
 
@@ -305,24 +286,20 @@ bool Utility::fileNamesEqual(const QString &fn1, const QString &fn2)
     return re;
 }
 
-QDateTime Utility::qDateTimeFromTime_t(qint64 t)
-{
+QDateTime Utility::qDateTimeFromTime_t(qint64 t) {
     return QDateTime::fromMSecsSinceEpoch(t * 1000);
 }
 
-qint64 Utility::qDateTimeToTime_t(const QDateTime &t)
-{
+qint64 Utility::qDateTimeToTime_t(const QDateTime &t) {
     return t.toMSecsSinceEpoch() / 1000;
 }
 
 namespace {
-    struct Period
-    {
+    struct Period {
         const char *name;
         quint64 msec;
 
-        QString description(quint64 value) const
-        {
+        QString description(quint64 value) const {
             return QCoreApplication::translate("Utility", name, nullptr, value);
         }
     };
@@ -331,19 +308,11 @@ namespace {
 // (it must be in the form ("context", "source", "comment", n)
 #undef QT_TRANSLATE_NOOP
 #define QT_TRANSLATE_NOOP(ctx, str, ...) str
-    Q_DECL_CONSTEXPR Period periods[] = {
-        { QT_TRANSLATE_NOOP("Utility", "%n year(s)", 0, _), 365 * 24 * 3600 * 1000LL },
-        { QT_TRANSLATE_NOOP("Utility", "%n month(s)", 0, _), 30 * 24 * 3600 * 1000LL },
-        { QT_TRANSLATE_NOOP("Utility", "%n day(s)", 0, _), 24 * 3600 * 1000LL },
-        { QT_TRANSLATE_NOOP("Utility", "%n hour(s)", 0, _), 3600 * 1000LL },
-        { QT_TRANSLATE_NOOP("Utility", "%n minute(s)", 0, _), 60 * 1000LL },
-        { QT_TRANSLATE_NOOP("Utility", "%n second(s)", 0, _), 1000LL },
-        { nullptr, 0 }
+    Q_DECL_CONSTEXPR Period periods[] = { { QT_TRANSLATE_NOOP("Utility", "%n year(s)", 0, _), 365 * 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP("Utility", "%n month(s)", 0, _), 30 * 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP("Utility", "%n day(s)", 0, _), 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP("Utility", "%n hour(s)", 0, _), 3600 * 1000LL }, { QT_TRANSLATE_NOOP("Utility", "%n minute(s)", 0, _), 60 * 1000LL }, { QT_TRANSLATE_NOOP("Utility", "%n second(s)", 0, _), 1000LL }, { nullptr, 0 }
     };
 } // anonymous namespace
 
-QString Utility::durationToDescriptiveString2(quint64 msecs)
-{
+QString Utility::durationToDescriptiveString2(quint64 msecs) {
     int p = 0;
     while (periods[p + 1].name && msecs < periods[p].msec) {
         p++;
@@ -364,8 +333,7 @@ QString Utility::durationToDescriptiveString2(quint64 msecs)
     return QCoreApplication::translate("Utility", "%1 %2").arg(firstPart, periods[p + 1].description(secondPartNum));
 }
 
-QString Utility::durationToDescriptiveString1(quint64 msecs)
-{
+QString Utility::durationToDescriptiveString1(quint64 msecs) {
     int p = 0;
     while (periods[p + 1].name && msecs < periods[p].msec) {
         p++;
@@ -375,8 +343,7 @@ QString Utility::durationToDescriptiveString1(quint64 msecs)
     return periods[p].description(amount);
 }
 
-QString Utility::fileNameForGuiUse(const QString &fName)
-{
+QString Utility::fileNameForGuiUse(const QString &fName) {
     if (isMac()) {
         QString n(fName);
         return n.replace(QLatin1Char(':'), QLatin1Char('/'));
@@ -384,8 +351,7 @@ QString Utility::fileNameForGuiUse(const QString &fName)
     return fName;
 }
 
-QByteArray Utility::normalizeEtag(QByteArray etag)
-{
+QByteArray Utility::normalizeEtag(QByteArray etag) {
     /* strip "XXXX-gzip" */
     if (etag.startsWith('"') && etag.endsWith("-gzip\"")) {
         etag.chop(6);
@@ -404,27 +370,23 @@ QByteArray Utility::normalizeEtag(QByteArray etag)
     return etag;
 }
 
-bool Utility::hasDarkSystray()
-{
+bool Utility::hasDarkSystray() {
     return hasDarkSystray_private();
 }
 
 
-QString Utility::platformName()
-{
+QString Utility::platformName() {
     return QSysInfo::prettyProductName();
 }
 
-void Utility::crash()
-{
+void Utility::crash() {
     volatile int *a = (int *)nullptr;
     *a = 1;
 }
 
 // Use this functions to retrieve uint/int (often required by Qt and WIN32) from size_t
 // without compiler warnings about possible truncation
-uint Utility::convertSizeToUint(size_t &convertVar)
-{
+uint Utility::convertSizeToUint(size_t &convertVar) {
     if (convertVar > UINT_MAX) {
         //throw std::bad_cast();
         convertVar = UINT_MAX; // intentionally default to wrong value here to not crash: exception handling TBD
@@ -432,8 +394,7 @@ uint Utility::convertSizeToUint(size_t &convertVar)
     return static_cast<uint>(convertVar);
 }
 
-int Utility::convertSizeToInt(size_t &convertVar)
-{
+int Utility::convertSizeToInt(size_t &convertVar) {
     if (convertVar > INT_MAX) {
         //throw std::bad_cast();
         convertVar = INT_MAX; // intentionally default to wrong value here to not crash: exception handling TBD
@@ -448,8 +409,7 @@ int Utility::convertSizeToInt(size_t &convertVar)
 //
 // This version only delivers output on linux, as Mac and Win get their
 // restarting from the installer.
-QByteArray Utility::versionOfInstalledBinary(const QString &command)
-{
+QByteArray Utility::versionOfInstalledBinary(const QString &command) {
     QByteArray re;
     if (isLinux()) {
         QString binary(command);
@@ -470,8 +430,7 @@ QByteArray Utility::versionOfInstalledBinary(const QString &command)
     return re;
 }
 
-QString Utility::timeAgoInWords(const QDateTime &dt, const QDateTime &from)
-{
+QString Utility::timeAgoInWords(const QDateTime &dt, const QDateTime &from) {
     QDateTime now = QDateTime::currentDateTimeUtc();
 
     if (from.isValid()) {
@@ -519,29 +478,25 @@ QString Utility::timeAgoInWords(const QDateTime &dt, const QDateTime &from)
 
 static const char STOPWATCH_END_TAG[] = "_STOPWATCH_END";
 
-void Utility::StopWatch::start()
-{
+void Utility::StopWatch::start() {
     _startTime = QDateTime::currentDateTimeUtc();
     _timer.start();
 }
 
-quint64 Utility::StopWatch::stop()
-{
+quint64 Utility::StopWatch::stop() {
     addLapTime(QLatin1String(STOPWATCH_END_TAG));
     quint64 duration = _timer.elapsed();
     _timer.invalidate();
     return duration;
 }
 
-void Utility::StopWatch::reset()
-{
+void Utility::StopWatch::reset() {
     _timer.invalidate();
     _startTime.setMSecsSinceEpoch(0);
     _lapTimes.clear();
 }
 
-quint64 Utility::StopWatch::addLapTime(const QString &lapName)
-{
+quint64 Utility::StopWatch::addLapTime(const QString &lapName) {
     if (!_timer.isValid()) {
         start();
     }
@@ -550,13 +505,11 @@ quint64 Utility::StopWatch::addLapTime(const QString &lapName)
     return re;
 }
 
-QDateTime Utility::StopWatch::startTime() const
-{
+QDateTime Utility::StopWatch::startTime() const {
     return _startTime;
 }
 
-QDateTime Utility::StopWatch::timeOfLap(const QString &lapName) const
-{
+QDateTime Utility::StopWatch::timeOfLap(const QString &lapName) const {
     quint64 t = durationOfLap(lapName);
     if (t) {
         QDateTime re(_startTime);
@@ -566,13 +519,11 @@ QDateTime Utility::StopWatch::timeOfLap(const QString &lapName) const
     return QDateTime();
 }
 
-quint64 Utility::StopWatch::durationOfLap(const QString &lapName) const
-{
+quint64 Utility::StopWatch::durationOfLap(const QString &lapName) const {
     return _lapTimes.value(lapName, 0);
 }
 
-void Utility::sortFilenames(QStringList &fileNames)
-{
+void Utility::sortFilenames(QStringList &fileNames) {
     QCollator collator;
     collator.setNumericMode(true);
     collator.setCaseSensitivity(Qt::CaseInsensitive);
@@ -580,8 +531,7 @@ void Utility::sortFilenames(QStringList &fileNames)
 }
 
 QUrl Utility::concatUrlPath(const QUrl &url, const QString &concatPath,
-    const QUrlQuery &queryItems)
-{
+    const QUrlQuery &queryItems) {
     QString path = url.path();
     if (!concatPath.isEmpty()) {
         // avoid '//'
@@ -601,8 +551,7 @@ QUrl Utility::concatUrlPath(const QUrl &url, const QString &concatPath,
 }
 
 QString Utility::makeConflictFileName(
-    const QString &fn, const QDateTime &dt, const QString &user)
-{
+    const QString &fn, const QDateTime &dt, const QString &user) {
     QString conflictFileName(fn);
     // Add conflict tag before the extension.
     int dotLocation = conflictFileName.lastIndexOf(QLatin1Char('.'));
@@ -624,8 +573,7 @@ QString Utility::makeConflictFileName(
     return conflictFileName;
 }
 
-bool Utility::isConflictFile(const char *name)
-{
+bool Utility::isConflictFile(const char *name) {
     const char *bname = std::strrchr(name, '/');
     if (bname) {
         bname += 1;
@@ -644,8 +592,7 @@ bool Utility::isConflictFile(const char *name)
     return false;
 }
 
-bool Utility::isConflictFile(const QString &name)
-{
+bool Utility::isConflictFile(const QString &name) {
     auto bname = name.midRef(name.lastIndexOf(QLatin1Char('/')) + 1);
 
     if (bname.contains(QStringLiteral("_conflict-")))
@@ -657,8 +604,7 @@ bool Utility::isConflictFile(const QString &name)
     return false;
 }
 
-QByteArray Utility::conflictFileBaseNameFromPattern(const QByteArray &conflictName)
-{
+QByteArray Utility::conflictFileBaseNameFromPattern(const QByteArray &conflictName) {
     // This function must be able to deal with conflict files for conflict files.
     // To do this, we scan backwards, for the outermost conflict marker and
     // strip only that to generate the conflict file base name.
@@ -687,8 +633,7 @@ QByteArray Utility::conflictFileBaseNameFromPattern(const QByteArray &conflictNa
     return conflictName.left(tagStart) + conflictName.mid(tagEnd);
 }
 
-bool Utility::isPathWindowsDrivePartitionRoot(const QString &path)
-{
+bool Utility::isPathWindowsDrivePartitionRoot(const QString &path) {
     Q_UNUSED(path)
 #ifdef Q_OS_WIN
     // should be 2 or 3 characters length
@@ -707,8 +652,7 @@ bool Utility::isPathWindowsDrivePartitionRoot(const QString &path)
     return false;
 }
 
-QString Utility::sanitizeForFileName(const QString &name)
-{
+QString Utility::sanitizeForFileName(const QString &name) {
     const auto invalid = QStringLiteral(R"(/?<>\:*|")");
     QString result;
     result.reserve(name.size());

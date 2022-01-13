@@ -32,8 +32,7 @@ Q_LOGGING_CATEGORY(lcOauth, "nextcloud.sync.credentials.oauth", QtInfoMsg)
 OAuth::~OAuth() = default;
 
 static void httpReplyAndClose(QTcpSocket *socket, const char *code, const char *html,
-    const char *moreHeaders = nullptr)
-{
+    const char *moreHeaders = nullptr) {
     if (!socket)
         return; // socket can have been deleted if the browser was closed
     socket->write("HTTP/1.1 ");
@@ -52,8 +51,7 @@ static void httpReplyAndClose(QTcpSocket *socket, const char *code, const char *
     socket->setParent(nullptr);
 }
 
-void OAuth::start()
-{
+void OAuth::start() {
     // Listen on the socket to get a port which will be used in the redirect_uri
     if (!_server.listen(QHostAddress::LocalHost)) {
         emit result(NotSupported, QString());
@@ -161,21 +159,17 @@ void OAuth::start()
     });
 }
 
-QUrl OAuth::authorisationLink() const
-{
+QUrl OAuth::authorisationLink() const {
     Q_ASSERT(_server.isListening());
     QUrlQuery query;
-    query.setQueryItems({ { QLatin1String("response_type"), QLatin1String("code") },
-        { QLatin1String("client_id"), Theme::instance()->oauthClientId() },
-        { QLatin1String("redirect_uri"), QLatin1String("http://localhost:") + QString::number(_server.serverPort()) } });
+    query.setQueryItems({ { QLatin1String("response_type"), QLatin1String("code") }, { QLatin1String("client_id"), Theme::instance()->oauthClientId() }, { QLatin1String("redirect_uri"), QLatin1String("http://localhost:") + QString::number(_server.serverPort()) } });
     if (!_expectedUser.isNull())
         query.addQueryItem("user", _expectedUser);
     QUrl url = Utility::concatUrlPath(_account->url(), QLatin1String("/index.php/apps/oauth2/authorize"), query);
     return url;
 }
 
-bool OAuth::openBrowser()
-{
+bool OAuth::openBrowser() {
     if (!Utility::openBrowser(authorisationLink())) {
         // We cannot open the browser, then we claim we don't support OAuth.
         emit result(NotSupported, QString());

@@ -29,8 +29,7 @@ OwncloudHttpCredsPage::OwncloudHttpCredsPage(QWidget *parent)
     : AbstractCredentialsWizardPage()
     , _ui()
     , _connected(false)
-    , _progressIndi(new QProgressIndicator(this))
-{
+    , _progressIndi(new QProgressIndicator(this)) {
     _ui.setupUi(this);
 
     if (parent) {
@@ -64,8 +63,7 @@ OwncloudHttpCredsPage::OwncloudHttpCredsPage(QWidget *parent)
     setupCustomization();
 }
 
-void OwncloudHttpCredsPage::setupCustomization()
-{
+void OwncloudHttpCredsPage::setupCustomization() {
     // set defaults for the customize labels.
     _ui.topLabel->hide();
     _ui.bottomLabel->hide();
@@ -80,8 +78,7 @@ void OwncloudHttpCredsPage::setupCustomization()
     WizardCommon::setupCustomMedia(variant, _ui.bottomLabel);
 }
 
-void OwncloudHttpCredsPage::initializePage()
-{
+void OwncloudHttpCredsPage::initializePage() {
     WizardCommon::initErrorLabel(_ui.errorLabel);
 
     auto *ocWizard = qobject_cast<OwncloudWizard *>(wizard());
@@ -117,14 +114,12 @@ void OwncloudHttpCredsPage::initializePage()
     _ui.leUsername->setFocus();
 }
 
-void OwncloudHttpCredsPage::cleanupPage()
-{
+void OwncloudHttpCredsPage::cleanupPage() {
     _ui.leUsername->clear();
     _ui.lePassword->clear();
 }
 
-bool OwncloudHttpCredsPage::validatePage()
-{
+bool OwncloudHttpCredsPage::validatePage() {
     if (_ui.leUsername->text().isEmpty() || _ui.lePassword->text().isEmpty()) {
         return false;
     }
@@ -152,33 +147,28 @@ bool OwncloudHttpCredsPage::validatePage()
     return true;
 }
 
-int OwncloudHttpCredsPage::nextId() const
-{
+int OwncloudHttpCredsPage::nextId() const {
     return WizardCommon::Page_AdvancedSetup;
 }
 
-void OwncloudHttpCredsPage::setConnected()
-{
+void OwncloudHttpCredsPage::setConnected() {
     _connected = true;
     stopSpinner();
 }
 
-void OwncloudHttpCredsPage::startSpinner()
-{
+void OwncloudHttpCredsPage::startSpinner() {
     _ui.resultLayout->setEnabled(true);
     _progressIndi->setVisible(true);
     _progressIndi->startAnimation();
 }
 
-void OwncloudHttpCredsPage::stopSpinner()
-{
+void OwncloudHttpCredsPage::stopSpinner() {
     _ui.resultLayout->setEnabled(false);
     _progressIndi->setVisible(false);
     _progressIndi->stopAnimation();
 }
 
-void OwncloudHttpCredsPage::setErrorString(const QString &err)
-{
+void OwncloudHttpCredsPage::setErrorString(const QString &err) {
     if (err.isEmpty()) {
         _ui.errorLabel->setVisible(false);
     } else {
@@ -189,18 +179,15 @@ void OwncloudHttpCredsPage::setErrorString(const QString &err)
     stopSpinner();
 }
 
-AbstractCredentials *OwncloudHttpCredsPage::getCredentials() const
-{
+AbstractCredentials *OwncloudHttpCredsPage::getCredentials() const {
     return new HttpCredentialsGui(_ui.leUsername->text(), _ui.lePassword->text(), _ocWizard->_clientCertBundle, _ocWizard->_clientCertPassword);
 }
 
-void OwncloudHttpCredsPage::slotStyleChanged()
-{
+void OwncloudHttpCredsPage::slotStyleChanged() {
     customizeStyle();
 }
 
-void OwncloudHttpCredsPage::customizeStyle()
-{
+void OwncloudHttpCredsPage::customizeStyle() {
     if(_progressIndi)
         _progressIndi->setColor(QGuiApplication::palette().color(QPalette::Text));
 }

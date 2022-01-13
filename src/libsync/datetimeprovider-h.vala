@@ -6,8 +6,7 @@
 
 namespace OCC {
 
-class OWNCLOUDSYNC_EXPORT DateTimeProvider
-{
+class OWNCLOUDSYNC_EXPORT DateTimeProvider {
 public:
     virtual ~DateTimeProvider();
 

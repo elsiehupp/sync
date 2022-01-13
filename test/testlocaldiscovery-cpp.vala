@@ -12,13 +12,11 @@
 
 using namespace OCC;
 
-class TestLocalDiscovery : public QObject
-{
+class TestLocalDiscovery : public QObject {
 
 private slots:
     // Check correct behavior when local discovery is partially drawn from the db
-    void testLocalDiscoveryStyle()
-    {
+    void testLocalDiscoveryStyle() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
 
         LocalDiscoveryTracker tracker;
@@ -66,8 +64,7 @@ private slots:
         QVERIFY(tracker.localDiscoveryPaths().empty());
     }
 
-    void testLocalDiscoveryDecision()
-    {
+    void testLocalDiscoveryDecision() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         auto &engine = fakeFolder.syncEngine();
 
@@ -76,8 +73,7 @@ private slots:
         QVERIFY(engine.shouldDiscoverLocally("A/X"));
 
         fakeFolder.syncEngine().setLocalDiscoveryOptions(
-            LocalDiscoveryStyle::DatabaseAndFilesystem,
-            { "A/X", "A/X space", "A/X/beta", "foo bar space/touch", "foo/", "zzz", "zzzz" });
+            LocalDiscoveryStyle::DatabaseAndFilesystem, { "A/X", "A/X space", "A/X/beta", "foo bar space/touch", "foo/", "zzz", "zzzz" });
 
         QVERIFY(engine.shouldDiscoverLocally(""));
         QVERIFY(engine.shouldDiscoverLocally("A"));
@@ -104,16 +100,14 @@ private slots:
         QVERIFY(!engine.shouldDiscoverLocally("A/X o"));
 
         fakeFolder.syncEngine().setLocalDiscoveryOptions(
-            LocalDiscoveryStyle::DatabaseAndFilesystem,
-            {});
+            LocalDiscoveryStyle::DatabaseAndFilesystem, {});
 
         QVERIFY(!engine.shouldDiscoverLocally(""));
     }
 
     // Check whether item success and item failure adjusts the
     // tracker correctly.
-    void testTrackerItemCompletion()
-    {
+    void testTrackerItemCompletion() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
 
         LocalDiscoveryTracker tracker;
@@ -163,8 +157,7 @@ private slots:
         QVERIFY(tracker.localDiscoveryPaths().empty());
     }
 
-    void testDirectoryAndSubDirectory()
-    {
+    void testDirectoryAndSubDirectory() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
 
         fakeFolder.localModifier().mkdir("A/newDir");
@@ -175,8 +168,7 @@ private slots:
 
         // Only "A" was modified according to the file system tracker
         fakeFolder.syncEngine().setLocalDiscoveryOptions(
-            LocalDiscoveryStyle::DatabaseAndFilesystem,
-            { "A" });
+            LocalDiscoveryStyle::DatabaseAndFilesystem, { "A" });
 
         QVERIFY(fakeFolder.syncOnce());
 
@@ -185,8 +177,7 @@ private slots:
     }
 
     // Tests the behavior of invalid filename detection
-    void testServerBlacklist()
-    {
+    void testServerBlacklist() {
         FakeFolder fakeFolder { FileInfo::A12_B12_C12_S12() };
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
 
@@ -204,8 +195,7 @@ private slots:
         QVERIFY(!fakeFolder.currentRemoteState().find("C/bar"));
     }
 
-    void testCreateFileWithTrailingSpaces_localAndRemoteTrimmedDoNotExist_renameAndUploadFile()
-    {
+    void testCreateFileWithTrailingSpaces_localAndRemoteTrimmedDoNotExist_renameAndUploadFile() {
         FakeFolder fakeFolder { FileInfo::A12_B12_C12_S12() };
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
         const QString fileWithSpaces1(" foo");
@@ -255,8 +245,7 @@ private slots:
         QVERIFY(!fakeFolder.currentLocalState().find(fileWithSpaces6));
     }
 
-    void testCreateFileWithTrailingSpaces_localTrimmedDoesExist_dontRenameAndUploadFile()
-    {
+    void testCreateFileWithTrailingSpaces_localTrimmedDoesExist_dontRenameAndUploadFile() {
         FakeFolder fakeFolder { FileInfo::A12_B12_C12_S12() };
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
         const QString fileWithSpaces(" foo");
@@ -273,8 +262,7 @@ private slots:
         QVERIFY(fakeFolder.currentLocalState().find(fileTrimmed));
     }
 
-    void testCreateFileWithTrailingSpaces_localTrimmedAlsoCreated_dontRenameAndUploadFile()
-    {
+    void testCreateFileWithTrailingSpaces_localTrimmedAlsoCreated_dontRenameAndUploadFile() {
         FakeFolder fakeFolder { FileInfo::A12_B12_C12_S12() };
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
         const QString fileWithSpaces(" foo");

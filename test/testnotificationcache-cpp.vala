@@ -2,19 +2,16 @@
 
 #include "tray/notificationcache.h"
 
-class TestNotificationCache : public QObject
-{
+class TestNotificationCache : public QObject {
 
 private slots:
-    void testContains_doesNotContainNotification_returnsFalse()
-    {
+    void testContains_doesNotContainNotification_returnsFalse() {
         OCC::NotificationCache notificationCache;
 
         QVERIFY(!notificationCache.contains({ "Title", { "Message" } }));
     }
 
-    void testContains_doesContainNotification_returnTrue()
-    {
+    void testContains_doesContainNotification_returnTrue() {
         OCC::NotificationCache notificationCache;
         const OCC::NotificationCache::Notification notification { "Title", "message" };
 
@@ -23,8 +20,7 @@ private slots:
         QVERIFY(notificationCache.contains(notification));
     }
 
-    void testClear_doesContainNotification_clearNotifications()
-    {
+    void testClear_doesContainNotification_clearNotifications() {
         OCC::NotificationCache notificationCache;
         const OCC::NotificationCache::Notification notification { "Title", "message" };
 

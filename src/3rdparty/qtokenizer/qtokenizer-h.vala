@@ -65,8 +65,7 @@ struct QTokenizerPrivate {
       , delimiters(_delims)
       , isDelim(false)
       , returnDelimiters(false)
-      , returnQuotes(false)
-    {
+      , returnQuotes(false) {
     }
 
     bool isDelimiter(char_type c) const {
@@ -139,8 +138,7 @@ public:
        \sa QStringTokenizer, QByteArrayTokenizer, StringTokenizer, WStringTokenizer
      */
     QTokenizer(const T& string, const T& delimiters)
-        : d(new QTokenizerPrivate<T, const_iterator>(string, delimiters))
-    { }
+        : d(new QTokenizerPrivate<T, const_iterator>(string, delimiters)) { }
 
     /*!
        Whether or not to return delimiters as tokens
@@ -177,8 +175,7 @@ public:
 
        \sa next()
      */
-    bool hasNext()
-    {
+    bool hasNext() {
         typename QTokenizerPrivate<T, const_iterator>::State state;
         d->isDelim = false;
         for (;;) {

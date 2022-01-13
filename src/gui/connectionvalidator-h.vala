@@ -73,8 +73,7 @@ namespace OCC {
 
 class UserInfo;
 
-class ConnectionValidator : public QObject
-{
+class ConnectionValidator : public QObject {
 public:
     explicit ConnectionValidator(AccountStatePtr accountState, QObject *parent = nullptr);
 

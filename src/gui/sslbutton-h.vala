@@ -29,8 +29,7 @@ class AccountState;
  * @brief The SslButton class
  * @ingroup gui
  */
-class SslButton : public QToolButton
-{
+class SslButton : public QToolButton {
 public:
     explicit SslButton(QWidget *parent = nullptr);
     void updateAccountState(AccountState *accountState);

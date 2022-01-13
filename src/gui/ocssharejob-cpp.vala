@@ -22,14 +22,12 @@
 namespace OCC {
 
 OcsShareJob::OcsShareJob(AccountPtr account)
-    : OcsJob(account)
-{
+    : OcsJob(account) {
     setPath("ocs/v2.php/apps/files_sharing/api/v1/shares");
     connect(this, &OcsJob::jobFinished, this, &OcsShareJob::jobDone);
 }
 
-void OcsShareJob::getShares(const QString &path)
-{
+void OcsShareJob::getShares(const QString &path) {
     setVerb("GET");
 
     addParam(QString::fromLatin1("path"), path);
@@ -39,16 +37,14 @@ void OcsShareJob::getShares(const QString &path)
     start();
 }
 
-void OcsShareJob::deleteShare(const QString &shareId)
-{
+void OcsShareJob::deleteShare(const QString &shareId) {
     appendPath(shareId);
     setVerb("DELETE");
 
     start();
 }
 
-void OcsShareJob::setExpireDate(const QString &shareId, const QDate &date)
-{
+void OcsShareJob::setExpireDate(const QString &shareId, const QDate &date) {
     appendPath(shareId);
     setVerb("PUT");
 
@@ -62,8 +58,7 @@ void OcsShareJob::setExpireDate(const QString &shareId, const QDate &date)
     start();
 }
 
-void OcsShareJob::setPassword(const QString &shareId, const QString &password)
-{
+void OcsShareJob::setPassword(const QString &shareId, const QString &password) {
     appendPath(shareId);
     setVerb("PUT");
 
@@ -73,8 +68,7 @@ void OcsShareJob::setPassword(const QString &shareId, const QString &password)
     start();
 }
 
-void OcsShareJob::setNote(const QString &shareId, const QString &note)
-{
+void OcsShareJob::setNote(const QString &shareId, const QString &note) {
     appendPath(shareId);
     setVerb("PUT");
 
@@ -84,8 +78,7 @@ void OcsShareJob::setNote(const QString &shareId, const QString &note)
     start();
 }
 
-void OcsShareJob::setPublicUpload(const QString &shareId, bool publicUpload)
-{
+void OcsShareJob::setPublicUpload(const QString &shareId, bool publicUpload) {
     appendPath(shareId);
     setVerb("PUT");
 
@@ -96,8 +89,7 @@ void OcsShareJob::setPublicUpload(const QString &shareId, bool publicUpload)
     start();
 }
 
-void OcsShareJob::setName(const QString &shareId, const QString &name)
-{
+void OcsShareJob::setName(const QString &shareId, const QString &name) {
     appendPath(shareId);
     setVerb("PUT");
     addParam(QString::fromLatin1("name"), name);
@@ -107,8 +99,7 @@ void OcsShareJob::setName(const QString &shareId, const QString &name)
 }
 
 void OcsShareJob::setPermissions(const QString &shareId,
-    const Share::Permissions permissions)
-{
+    const Share::Permissions permissions) {
     appendPath(shareId);
     setVerb("PUT");
 
@@ -118,21 +109,19 @@ void OcsShareJob::setPermissions(const QString &shareId,
     start();
 }
 
-void OcsShareJob::setLabel(const QString &shareId, const QString &label)
-{
+void OcsShareJob::setLabel(const QString &shareId, const QString &label) {
     appendPath(shareId);
     setVerb("PUT");
-    
+
     addParam(QStringLiteral("label"), label);
     _value = label;
-    
+
     start();
 }
 
 void OcsShareJob::createLinkShare(const QString &path,
     const QString &name,
-    const QString &password)
-{
+    const QString &password) {
     setVerb("POST");
 
     addParam(QString::fromLatin1("path"), path);
@@ -154,8 +143,7 @@ void OcsShareJob::createShare(const QString &path,
     const Share::ShareType shareType,
     const QString &shareWith,
     const Share::Permissions permissions,
-    const QString &password)
-{
+    const QString &password) {
     Q_UNUSED(permissions)
     setVerb("POST");
 
@@ -170,15 +158,13 @@ void OcsShareJob::createShare(const QString &path,
     start();
 }
 
-void OcsShareJob::getSharedWithMe()
-{
+void OcsShareJob::getSharedWithMe() {
     setVerb("GET");
     addParam(QLatin1String("shared_with_me"), QLatin1String("true"));
     start();
 }
 
-void OcsShareJob::jobDone(QJsonDocument reply)
-{
+void OcsShareJob::jobDone(QJsonDocument reply) {
     emit shareJobFinished(reply, _value);
 }
 }

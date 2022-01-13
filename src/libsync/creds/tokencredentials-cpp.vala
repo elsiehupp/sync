@@ -37,19 +37,16 @@ namespace {
 
 } // ns
 
-class TokenCredentialsAccessManager : public AccessManager
-{
+class TokenCredentialsAccessManager : public AccessManager {
 public:
     friend class TokenCredentials;
     TokenCredentialsAccessManager(const TokenCredentials *cred, QObject *parent = nullptr)
         : AccessManager(parent)
-        , _cred(cred)
-    {
+        , _cred(cred) {
     }
 
 protected:
-    QNetworkReply *createRequest(Operation op, const QNetworkRequest &request, QIODevice *outgoingData)
-    {
+    QNetworkReply *createRequest(Operation op, const QNetworkRequest &request, QIODevice *outgoingData) {
         if (_cred->user().isEmpty() || _cred->password().isEmpty()) {
             qCWarning(lcTokenCredentials) << "Empty user/password provided!";
         }
@@ -75,35 +72,29 @@ private:
 TokenCredentials::TokenCredentials()
     : _user()
     , _password()
-    , _ready(false)
-{
+    , _ready(false) {
 }
 
 TokenCredentials::TokenCredentials(const QString &user, const QString &password, const QString &token)
     : _user(user)
     , _password(password)
     , _token(token)
-    , _ready(true)
-{
+    , _ready(true) {
 }
 
-QString TokenCredentials::authType() const
-{
+QString TokenCredentials::authType() const {
     return QString::fromLatin1("token");
 }
 
-QString TokenCredentials::user() const
-{
+QString TokenCredentials::user() const {
     return _user;
 }
 
-QString TokenCredentials::password() const
-{
+QString TokenCredentials::password() const {
     return _password;
 }
 
-QNetworkAccessManager *TokenCredentials::createQNAM() const
-{
+QNetworkAccessManager *TokenCredentials::createQNAM() const {
     AccessManager *qnam = new TokenCredentialsAccessManager(this);
 
     connect(qnam, SIGNAL(authenticationRequired(QNetworkReply *, QAuthenticator *)),
@@ -112,33 +103,28 @@ QNetworkAccessManager *TokenCredentials::createQNAM() const
     return qnam;
 }
 
-bool TokenCredentials::ready() const
-{
+bool TokenCredentials::ready() const {
     return _ready;
 }
 
-void TokenCredentials::fetchFromKeychain()
-{
+void TokenCredentials::fetchFromKeychain() {
     _wasFetched = true;
     Q_EMIT fetched();
 }
 
-void TokenCredentials::askFromUser()
-{
+void TokenCredentials::askFromUser() {
     emit asked();
 }
 
 
-bool TokenCredentials::stillValid(QNetworkReply *reply)
-{
+bool TokenCredentials::stillValid(QNetworkReply *reply) {
     return ((reply->error() != QNetworkReply::AuthenticationRequiredError)
         // returned if user/password or token are incorrect
         && (reply->error() != QNetworkReply::OperationCanceledError
                || !reply->property(authenticationFailedC).toBool()));
 }
 
-void TokenCredentials::invalidateToken()
-{
+void TokenCredentials::invalidateToken() {
     qCInfo(lcTokenCredentials) << "Invalidating token";
     _ready = false;
     _account->clearCookieJar();
@@ -147,18 +133,15 @@ void TokenCredentials::invalidateToken()
     _password = QString();
 }
 
-void TokenCredentials::forgetSensitiveData()
-{
+void TokenCredentials::forgetSensitiveData() {
     invalidateToken();
 }
 
-void TokenCredentials::persist()
-{
+void TokenCredentials::persist() {
 }
 
 
-void TokenCredentials::slotAuthentication(QNetworkReply *reply, QAuthenticator *authenticator)
-{
+void TokenCredentials::slotAuthentication(QNetworkReply *reply, QAuthenticator *authenticator) {
     Q_UNUSED(authenticator)
     // we cannot use QAuthenticator, because it sends username and passwords with latin1
     // instead of utf8 encoding. Instead, we send it manually. Thus, if we reach this signal,

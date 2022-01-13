@@ -23,8 +23,7 @@ class AbstractCredentials;
  * @brief The AbstractCredentialsWizardPage class
  * @ingroup gui
  */
-class AbstractCredentialsWizardPage : public QWizardPage
-{
+class AbstractCredentialsWizardPage : public QWizardPage {
 public:
     void cleanupPage() override;
     virtual AbstractCredentials *getCredentials() const = 0;

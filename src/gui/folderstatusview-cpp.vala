@@ -17,12 +17,10 @@
 
 namespace OCC {
 
-FolderStatusView::FolderStatusView(QWidget *parent) : QTreeView(parent)
-{
+FolderStatusView::FolderStatusView(QWidget *parent) : QTreeView(parent) {
 }
 
-QModelIndex FolderStatusView::indexAt(const QPoint &point) const
-{
+QModelIndex FolderStatusView::indexAt(const QPoint &point) const {
     QModelIndex index = QTreeView::indexAt(point);
     if (index.data(FolderStatusDelegate::AddButton).toBool() && !visualRect(index).contains(point)) {
         return {};
@@ -30,8 +28,7 @@ QModelIndex FolderStatusView::indexAt(const QPoint &point) const
     return index;
 }
 
-QRect FolderStatusView::visualRect(const QModelIndex &index) const
-{
+QRect FolderStatusView::visualRect(const QModelIndex &index) const {
     QRect rect = QTreeView::visualRect(index);
     if (index.data(FolderStatusDelegate::AddButton).toBool()) {
         return FolderStatusDelegate::addButtonRect(rect, layoutDirection());

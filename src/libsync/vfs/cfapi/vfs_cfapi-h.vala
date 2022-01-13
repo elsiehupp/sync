@@ -24,8 +24,7 @@ class HydrationJob;
 class VfsCfApiPrivate;
 class SyncJournalFileRecord;
 
-class VfsCfApi : public Vfs
-{
+class VfsCfApi : public Vfs {
 
 public:
     explicit VfsCfApi(QObject *parent = nullptr);
@@ -88,8 +87,7 @@ private:
     QScopedPointer<VfsCfApiPrivate> d;
 };
 
-class CfApiVfsPluginFactory : public QObject, public DefaultPluginFactory<VfsCfApi>
-{
+class CfApiVfsPluginFactory : public QObject, public DefaultPluginFactory<VfsCfApi> {
     Q_PLUGIN_METADATA(IID "org.owncloud.PluginFactory" FILE "vfspluginmetadata.json")
     Q_INTERFACES(OCC::PluginFactory)
 };

@@ -22,8 +22,7 @@ namespace OCC {
  * @brief Parser for netrc files
  * @ingroup cmd
  */
-class NetrcParser
-{
+class NetrcParser {
 public:
     using LoginPair = QPair<QString, QString>;
 

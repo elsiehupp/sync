@@ -38,8 +38,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(PushNotificationTypes)
  * server
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT Capabilities
-{
+class OWNCLOUDSYNC_EXPORT Capabilities {
 public:
     Capabilities(const QVariantMap &capabilities);
 
@@ -172,8 +171,7 @@ private:
 
 /*-------------------------------------------------------------------------------------*/
 
-class OWNCLOUDSYNC_EXPORT DirectEditor : public QObject
-{
+class OWNCLOUDSYNC_EXPORT DirectEditor : public QObject {
 public:
     DirectEditor(const QString &id, const QString &name, QObject* parent = nullptr);
 

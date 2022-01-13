@@ -26,8 +26,7 @@
 
 namespace OCC {
 
-class SyncStatusSummary : public QObject
-{
+class SyncStatusSummary : public QObject {
 
     Q_PROPERTY(double syncProgress READ syncProgress NOTIFY syncProgressChanged)
     Q_PROPERTY(QUrl syncIcon READ syncIcon NOTIFY syncIconChanged)

@@ -21,8 +21,7 @@ namespace OCC {
 
 class FolderMan;
 
-class NavigationPaneHelper : public QObject
-{
+class NavigationPaneHelper : public QObject {
 public:
     NavigationPaneHelper(FolderMan *folderMan);
 

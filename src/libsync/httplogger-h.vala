@@ -26,8 +26,7 @@ namespace HttpLogger {
     * Helper to construct the HTTP verb used in the request
     */
     QByteArray OWNCLOUDSYNC_EXPORT requestVerb(QNetworkAccessManager::Operation operation, const QNetworkRequest &request);
-    inline QByteArray requestVerb(const QNetworkReply &reply)
-    {
+    inline QByteArray requestVerb(const QNetworkReply &reply) {
         return requestVerb(reply.operation(), reply.request());
     }
 }

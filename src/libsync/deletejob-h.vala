@@ -23,8 +23,7 @@ namespace OCC {
  * @brief The DeleteJob class
  * @ingroup libsync
  */
-class DeleteJob : public AbstractNetworkJob
-{
+class DeleteJob : public AbstractNetworkJob {
 public:
     explicit DeleteJob(AccountPtr account, const QString &path, QObject *parent = nullptr);
     explicit DeleteJob(AccountPtr account, const QUrl &url, QObject *parent = nullptr);

@@ -27,97 +27,78 @@
 Q_LOGGING_CATEGORY(lcHydration, "nextcloud.sync.vfs.hydrationjob", QtInfoMsg)
 
 OCC::HydrationJob::HydrationJob(QObject *parent)
-    : QObject(parent)
-{
+    : QObject(parent) {
 }
 
-OCC::AccountPtr OCC::HydrationJob::account() const
-{
+OCC::AccountPtr OCC::HydrationJob::account() const {
     return _account;
 }
 
-void OCC::HydrationJob::setAccount(const AccountPtr &account)
-{
+void OCC::HydrationJob::setAccount(const AccountPtr &account) {
     _account = account;
 }
 
-QString OCC::HydrationJob::remotePath() const
-{
+QString OCC::HydrationJob::remotePath() const {
     return _remotePath;
 }
 
-void OCC::HydrationJob::setRemotePath(const QString &remotePath)
-{
+void OCC::HydrationJob::setRemotePath(const QString &remotePath) {
     _remotePath = remotePath;
 }
 
-QString OCC::HydrationJob::localPath() const
-{
+QString OCC::HydrationJob::localPath() const {
     return _localPath;
 }
 
-void OCC::HydrationJob::setLocalPath(const QString &localPath)
-{
+void OCC::HydrationJob::setLocalPath(const QString &localPath) {
     _localPath = localPath;
 }
 
-OCC::SyncJournalDb *OCC::HydrationJob::journal() const
-{
+OCC::SyncJournalDb *OCC::HydrationJob::journal() const {
     return _journal;
 }
 
-void OCC::HydrationJob::setJournal(SyncJournalDb *journal)
-{
+void OCC::HydrationJob::setJournal(SyncJournalDb *journal) {
     _journal = journal;
 }
 
-QString OCC::HydrationJob::requestId() const
-{
+QString OCC::HydrationJob::requestId() const {
     return _requestId;
 }
 
-void OCC::HydrationJob::setRequestId(const QString &requestId)
-{
+void OCC::HydrationJob::setRequestId(const QString &requestId) {
     _requestId = requestId;
 }
 
-QString OCC::HydrationJob::folderPath() const
-{
+QString OCC::HydrationJob::folderPath() const {
     return _folderPath;
 }
 
-void OCC::HydrationJob::setFolderPath(const QString &folderPath)
-{
+void OCC::HydrationJob::setFolderPath(const QString &folderPath) {
     _folderPath = folderPath;
 }
 
-bool OCC::HydrationJob::isEncryptedFile() const
-{
+bool OCC::HydrationJob::isEncryptedFile() const {
     return _isEncryptedFile;
 }
 
-void OCC::HydrationJob::setIsEncryptedFile(bool isEncrypted)
-{
+void OCC::HydrationJob::setIsEncryptedFile(bool isEncrypted) {
     _isEncryptedFile = isEncrypted;
 }
 
-QString OCC::HydrationJob::e2eMangledName() const
-{
+QString OCC::HydrationJob::e2eMangledName() const {
     return _e2eMangledName;
 }
 
-void OCC::HydrationJob::setE2eMangledName(const QString &e2eMangledName)
-{
+void OCC::HydrationJob::setE2eMangledName(const QString &e2eMangledName) {
     _e2eMangledName = e2eMangledName;
 }
 
-OCC::HydrationJob::Status OCC::HydrationJob::status() const
-{
+OCC::HydrationJob::Status OCC::HydrationJob::status() const {
     return _status;
 }
 
-void OCC::HydrationJob::start()
-{
+void OCC::HydrationJob::start() {
     Q_ASSERT(_account);
     Q_ASSERT(_journal);
     Q_ASSERT(!_remotePath.isEmpty() && !_localPath.isEmpty());
@@ -160,15 +141,13 @@ void OCC::HydrationJob::start()
     connect(_transferDataServer, &QLocalServer::newConnection, this, &HydrationJob::onNewConnection);
 }
 
-void OCC::HydrationJob::slotFolderIdError()
-{
+void OCC::HydrationJob::slotFolderIdError() {
     // TODO: the following code is borrowed from PropagateDownloadEncrypted (see HydrationJob::onNewConnection() for explanation of next steps)
     qCCritical(lcHydration) << "Failed to get encrypted metadata of folder" << _requestId << _localPath << _folderPath;
     emitFinished(Error);
 }
 
-void OCC::HydrationJob::slotCheckFolderId(const QStringList &list)
-{
+void OCC::HydrationJob::slotCheckFolderId(const QStringList &list) {
     // TODO: the following code is borrowed from PropagateDownloadEncrypted (see HydrationJob::onNewConnection() for explanation of next steps)
     auto job = qobject_cast<LsColJob *>(sender());
     const QString folderId = list.first();
@@ -186,16 +165,14 @@ void OCC::HydrationJob::slotCheckFolderId(const QStringList &list)
     metadataJob->start();
 }
 
-void OCC::HydrationJob::slotFolderEncryptedMetadataError(const QByteArray & /*fileId*/, int /*httpReturnCode*/)
-{
+void OCC::HydrationJob::slotFolderEncryptedMetadataError(const QByteArray & /*fileId*/, int /*httpReturnCode*/) {
     // TODO: the following code is borrowed from PropagateDownloadEncrypted (see HydrationJob::onNewConnection() for explanation of next steps)
     qCCritical(lcHydration) << "Failed to find encrypted metadata information of remote file" << e2eMangledName();
     emitFinished(Error);
     return;
 }
 
-void OCC::HydrationJob::slotCheckFolderEncryptedMetadata(const QJsonDocument &json)
-{
+void OCC::HydrationJob::slotCheckFolderEncryptedMetadata(const QJsonDocument &json) {
     // TODO: the following code is borrowed from PropagateDownloadEncrypted (see HydrationJob::onNewConnection() for explanation of next steps)
     qCDebug(lcHydration) << "Metadata Received reading" << e2eMangledName();
     const QString filename = e2eMangledName();
@@ -224,8 +201,7 @@ void OCC::HydrationJob::slotCheckFolderEncryptedMetadata(const QJsonDocument &js
     emitFinished(Error);
 }
 
-void OCC::HydrationJob::cancel()
-{
+void OCC::HydrationJob::cancel() {
     Q_ASSERT(_signalSocket);
 
     _isCancelled = true;
@@ -240,8 +216,7 @@ void OCC::HydrationJob::cancel()
     emitFinished(Cancelled);
 }
 
-void OCC::HydrationJob::emitFinished(Status status)
-{
+void OCC::HydrationJob::emitFinished(Status status) {
     _status = status;
     _signalSocket->close();
 
@@ -258,16 +233,14 @@ void OCC::HydrationJob::emitFinished(Status status)
     emit finished(this);
 }
 
-void OCC::HydrationJob::onCancellationServerNewConnection()
-{
+void OCC::HydrationJob::onCancellationServerNewConnection() {
     Q_ASSERT(!_signalSocket);
 
     qCInfo(lcHydration) << "Got new connection on cancellation server" << _requestId << _folderPath;
     _signalSocket = _signalServer->nextPendingConnection();
 }
 
-void OCC::HydrationJob::onNewConnection()
-{
+void OCC::HydrationJob::onNewConnection() {
     Q_ASSERT(!_transferDataSocket);
     Q_ASSERT(!_job);
 
@@ -278,8 +251,7 @@ void OCC::HydrationJob::onNewConnection()
     }
 }
 
-void OCC::HydrationJob::finalize(OCC::VfsCfApi *vfs)
-{
+void OCC::HydrationJob::finalize(OCC::VfsCfApi *vfs) {
     // Mark the file as hydrated in the sync journal
     SyncJournalFileRecord record;
     _journal->getFileRecord(_folderPath, &record);
@@ -307,8 +279,7 @@ void OCC::HydrationJob::finalize(OCC::VfsCfApi *vfs)
     _journal->setFileRecord(record);
 }
 
-void OCC::HydrationJob::onGetFinished()
-{
+void OCC::HydrationJob::onGetFinished() {
     qCInfo(lcHydration) << "GETFileJob finished" << _requestId << _folderPath << _job->reply()->error();
 
     const auto isGetJobResultError = _job->reply()->error();
@@ -325,8 +296,7 @@ void OCC::HydrationJob::onGetFinished()
     emitFinished(Success);
 }
 
-void OCC::HydrationJob::handleNewConnection()
-{
+void OCC::HydrationJob::handleNewConnection() {
     qCInfo(lcHydration) << "Got new connection starting GETFileJob" << _requestId << _folderPath;
     _transferDataSocket = _transferDataServer->nextPendingConnection();
     _job = new GETFileJob(_account, _remotePath + _folderPath, _transferDataSocket, {}, {}, 0, this);
@@ -334,8 +304,7 @@ void OCC::HydrationJob::handleNewConnection()
     _job->start();
 }
 
-void OCC::HydrationJob::handleNewConnectionForEncryptedFile()
-{
+void OCC::HydrationJob::handleNewConnectionForEncryptedFile() {
     // TODO: the following code is borrowed from PropagateDownloadEncrypted (should we factor it out and reuse? YES! Should we do it now? Probably not, as, this would imply modifying PropagateDownloadEncrypted, so we need a separate PR)
     qCInfo(lcHydration) << "Got new connection for encrypted file. Getting required info for decryption...";
     const auto rootPath = [=]() {

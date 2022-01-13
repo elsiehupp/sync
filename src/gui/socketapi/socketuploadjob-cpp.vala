@@ -26,8 +26,7 @@
 using namespace OCC;
 
 SocketUploadJob::SocketUploadJob(const QSharedPointer<SocketApiJobV2> &job)
-    : _apiJob(job)
-{
+    : _apiJob(job) {
     connect(job.data(), &SocketApiJobV2::finished, this, &SocketUploadJob::deleteLater);
 
     _localPath = _apiJob->arguments()[QLatin1String("localPath")].toString();
@@ -68,8 +67,7 @@ SocketUploadJob::SocketUploadJob(const QSharedPointer<SocketApiJobV2> &job)
     });
 }
 
-void SocketUploadJob::start()
-{
+void SocketUploadJob::start() {
     auto opt = _engine->syncOptions();
     opt.setFilePattern(_pattern);
     if (!opt.fileRegex().isValid()) {

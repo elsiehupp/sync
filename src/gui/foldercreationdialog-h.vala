@@ -21,8 +21,7 @@ namespace Ui {
 class FolderCreationDialog;
 }
 
-class FolderCreationDialog : public QDialog
-{
+class FolderCreationDialog : public QDialog {
 
 public:
     explicit FolderCreationDialog(const QString &destination, QWidget *parent = nullptr);

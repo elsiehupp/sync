@@ -11,15 +11,13 @@
 
 using namespace OCC;
 
-class TestInotifyWatcher: public FolderWatcherPrivate
-{
+class TestInotifyWatcher: public FolderWatcherPrivate {
 
 private:
     QString _root;
 
 private slots:
-    void initTestCase()
-    {
+    void initTestCase() {
         _root = QDir::tempPath() + "/" + "test_" + QString::number(OCC::Utility::rand());
         qDebug() << "creating test directory tree in " << _root;
         QDir rootDir(_root);

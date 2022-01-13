@@ -44,8 +44,7 @@ class SyncResult;
 class Share;
 class ShareManager;
 
-class AvatarEventFilter : public QObject
-{
+class AvatarEventFilter : public QObject {
 
 public:
     explicit AvatarEventFilter(QObject *parent = nullptr);
@@ -62,8 +61,7 @@ protected:
  * @brief The ShareDialog (user/group) class
  * @ingroup gui
  */
-class ShareUserGroupWidget : public QWidget
-{
+class ShareUserGroupWidget : public QWidget {
 
 public:
     explicit ShareUserGroupWidget(AccountPtr account,
@@ -131,8 +129,7 @@ private:
 /**
  * The widget displayed for each user/group share
  */
-class ShareUserLine : public QWidget
-{
+class ShareUserLine : public QWidget {
 
 public:
     explicit ShareUserLine(AccountPtr account,

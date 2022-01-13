@@ -28,14 +28,12 @@ using namespace QKeychain;
 
 Q_LOGGING_CATEGORY(lcProxy, "nextcloud.gui.credentials.proxy", QtInfoMsg)
 
-ProxyAuthHandler *ProxyAuthHandler::instance()
-{
+ProxyAuthHandler *ProxyAuthHandler::instance() {
     static ProxyAuthHandler inst;
     return &inst;
 }
 
-ProxyAuthHandler::ProxyAuthHandler()
-{
+ProxyAuthHandler::ProxyAuthHandler() {
     _dialog = new ProxyAuthDialog();
 
     _configFile.reset(new ConfigFile);
@@ -44,15 +42,13 @@ ProxyAuthHandler::ProxyAuthHandler()
     _settings->beginGroup(QLatin1String("Credentials"));
 }
 
-ProxyAuthHandler::~ProxyAuthHandler()
-{
+ProxyAuthHandler::~ProxyAuthHandler() {
     delete _dialog;
 }
 
 void ProxyAuthHandler::handleProxyAuthenticationRequired(
     const QNetworkProxy &proxy,
-    QAuthenticator *authenticator)
-{
+    QAuthenticator *authenticator) {
     if (!_dialog) {
         return;
     }
@@ -129,14 +125,12 @@ void ProxyAuthHandler::handleProxyAuthenticationRequired(
             this, &ProxyAuthHandler::slotSenderDestroyed);
     }
 }
- 
-void ProxyAuthHandler::slotSenderDestroyed(QObject *obj)
-{
+
+void ProxyAuthHandler::slotSenderDestroyed(QObject *obj) {
     _gaveCredentialsTo.remove(obj);
 }
 
-bool ProxyAuthHandler::getCredsFromDialog()
-{
+bool ProxyAuthHandler::getCredsFromDialog() {
     // Open the credentials dialog
     if (!_waitingForDialog) {
         _dialog->reset();
@@ -167,8 +161,7 @@ template<class T, typename PointerToMemberFunction>
 void ProxyAuthHandler::execAwait(const T *sender,
                                  PointerToMemberFunction signal,
                                  int &counter,
-                                 const QEventLoop::ProcessEventsFlags flags)
-{
+                                 const QEventLoop::ProcessEventsFlags flags) {
     if (!sender) {
         return;
     }
@@ -181,8 +174,7 @@ void ProxyAuthHandler::execAwait(const T *sender,
     --counter;
 }
 
-bool ProxyAuthHandler::getCredsFromKeychain()
-{
+bool ProxyAuthHandler::getCredsFromKeychain() {
     if (_waitingForDialog) {
         return false;
     }
@@ -224,8 +216,7 @@ bool ProxyAuthHandler::getCredsFromKeychain()
     return false;
 }
 
-void ProxyAuthHandler::storeCredsInKeychain()
-{
+void ProxyAuthHandler::storeCredsInKeychain() {
     if (_waitingForKeychain) {
         return;
     }
@@ -252,12 +243,10 @@ void ProxyAuthHandler::storeCredsInKeychain()
     }
 }
 
-QString ProxyAuthHandler::keychainUsernameKey() const
-{
+QString ProxyAuthHandler::keychainUsernameKey() const {
     return QString::fromLatin1("%1/username").arg(_proxy);
 }
 
-QString ProxyAuthHandler::keychainPasswordKey() const
-{
+QString ProxyAuthHandler::keychainPasswordKey() const {
     return QString::fromLatin1("%1/password").arg(_proxy);
 }

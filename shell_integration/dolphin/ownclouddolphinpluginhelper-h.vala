@@ -33,16 +33,13 @@ public:
     void sendCommand(const char *data);
     QVector<QString> paths() const { return _paths; }
 
-    QString contextMenuTitle() const
-    {
+    QString contextMenuTitle() const {
         return _strings.value("CONTEXT_MENU_TITLE", APPLICATION_NAME);
     }
-    QString shareActionTitle() const
-    {
+    QString shareActionTitle() const {
         return _strings.value("SHARE_MENU_TITLE", "Share …");
     }
-    QString contextMenuIconName() const
-    {
+    QString contextMenuIconName() const {
         return _strings.value("CONTEXT_MENU_ICON", APPLICATION_ICON_NAME);
     }
 

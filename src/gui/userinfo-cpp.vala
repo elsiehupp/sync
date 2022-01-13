@@ -39,23 +39,20 @@ UserInfo::UserInfo(AccountState *accountState, bool allowDisconnectedAccountStat
     , _fetchAvatarImage(fetchAvatarImage)
     , _lastQuotaTotalBytes(0)
     , _lastQuotaUsedBytes(0)
-    , _active(false)
-{
+    , _active(false) {
     connect(accountState, &AccountState::stateChanged,
         this, &UserInfo::slotAccountStateChanged);
     connect(&_jobRestartTimer, &QTimer::timeout, this, &UserInfo::slotFetchInfo);
     _jobRestartTimer.setSingleShot(true);
 }
 
-void UserInfo::setActive(bool active)
-{
+void UserInfo::setActive(bool active) {
     _active = active;
     slotAccountStateChanged();
 }
 
 
-void UserInfo::slotAccountStateChanged()
-{
+void UserInfo::slotAccountStateChanged() {
     if (canGetInfo()) {
         // Obviously assumes there will never be more than thousand of hours between last info
         // received and now, hence why we static_cast
@@ -70,15 +67,13 @@ void UserInfo::slotAccountStateChanged()
     }
 }
 
-void UserInfo::slotRequestFailed()
-{
+void UserInfo::slotRequestFailed() {
     _lastQuotaTotalBytes = 0;
     _lastQuotaUsedBytes = 0;
     _jobRestartTimer.start(failIntervalT);
 }
 
-bool UserInfo::canGetInfo() const
-{
+bool UserInfo::canGetInfo() const {
     if (!_accountState || !_active) {
         return false;
     }
@@ -88,8 +83,7 @@ bool UserInfo::canGetInfo() const
         && account->credentials()->ready();
 }
 
-void UserInfo::slotFetchInfo()
-{
+void UserInfo::slotFetchInfo() {
     if (!canGetInfo()) {
         return;
     }
@@ -107,8 +101,7 @@ void UserInfo::slotFetchInfo()
     _job->start();
 }
 
-void UserInfo::slotUpdateLastInfo(const QJsonDocument &json)
-{
+void UserInfo::slotUpdateLastInfo(const QJsonDocument &json) {
     auto objData = json.object().value("ocs").toObject().value("data").toObject();
 
     AccountPtr account = _accountState->account();
@@ -148,8 +141,7 @@ void UserInfo::slotUpdateLastInfo(const QJsonDocument &json)
         emit fetchedLastInfo(this);
 }
 
-void UserInfo::slotAvatarImage(const QImage &img)
-{
+void UserInfo::slotAvatarImage(const QImage &img) {
     _accountState->account()->setAvatar(img);
 
     emit fetchedLastInfo(this);

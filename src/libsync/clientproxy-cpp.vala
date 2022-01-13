@@ -24,12 +24,10 @@ namespace OCC {
 Q_LOGGING_CATEGORY(lcClientProxy, "nextcloud.sync.clientproxy", QtInfoMsg)
 
 ClientProxy::ClientProxy(QObject *parent)
-    : QObject(parent)
-{
+    : QObject(parent) {
 }
 
-static QNetworkProxy proxyFromConfig(const ConfigFile &cfg)
-{
+static QNetworkProxy proxyFromConfig(const ConfigFile &cfg) {
     QNetworkProxy proxy;
 
     if (cfg.proxyHostName().isEmpty())
@@ -44,8 +42,7 @@ static QNetworkProxy proxyFromConfig(const ConfigFile &cfg)
     return proxy;
 }
 
-bool ClientProxy::isUsingSystemDefault()
-{
+bool ClientProxy::isUsingSystemDefault() {
     OCC::ConfigFile cfg;
 
     // if there is no config file, default to system proxy.
@@ -56,8 +53,7 @@ bool ClientProxy::isUsingSystemDefault()
     return true;
 }
 
-const char *ClientProxy::proxyTypeToCStr(QNetworkProxy::ProxyType type)
-{
+const char *ClientProxy::proxyTypeToCStr(QNetworkProxy::ProxyType type) {
     switch (type) {
     case QNetworkProxy::NoProxy:
         return "NoProxy";
@@ -76,13 +72,11 @@ const char *ClientProxy::proxyTypeToCStr(QNetworkProxy::ProxyType type)
     }
 }
 
-QString ClientProxy::printQNetworkProxy(const QNetworkProxy &proxy)
-{
+QString ClientProxy::printQNetworkProxy(const QNetworkProxy &proxy) {
     return QString("%1://%2:%3").arg(proxyTypeToCStr(proxy.type())).arg(proxy.hostName()).arg(proxy.port());
 }
 
-void ClientProxy::setupQtProxyFromConfig()
-{
+void ClientProxy::setupQtProxyFromConfig() {
     OCC::ConfigFile cfg;
     int proxyType = QNetworkProxy::DefaultProxy;
     QNetworkProxy proxy;
@@ -100,8 +94,7 @@ void ClientProxy::setupQtProxyFromConfig()
             QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
             break;
         case QNetworkProxy::DefaultProxy:
-            qCInfo(lcClientProxy) << "Set proxy configuration to use the preferred system proxy for http tcp connections";
-            {
+            qCInfo(lcClientProxy) << "Set proxy configuration to use the preferred system proxy for http tcp connections"; {
                 QNetworkProxyQuery query;
                 query.setProtocolTag("http");
                 query.setQueryType(QNetworkProxyQuery::TcpSocket);
@@ -128,8 +121,7 @@ void ClientProxy::setupQtProxyFromConfig()
     }
 }
 
-void ClientProxy::lookupSystemProxyAsync(const QUrl &url, QObject *dst, const char *slot)
-{
+void ClientProxy::lookupSystemProxyAsync(const QUrl &url, QObject *dst, const char *slot) {
     auto *runnable = new SystemProxyRunnable(url);
     QObject::connect(runnable, SIGNAL(systemProxyLookedUp(QNetworkProxy)), dst, slot);
     QThreadPool::globalInstance()->start(runnable); // takes ownership and deletes
@@ -138,12 +130,10 @@ void ClientProxy::lookupSystemProxyAsync(const QUrl &url, QObject *dst, const ch
 SystemProxyRunnable::SystemProxyRunnable(const QUrl &url)
     : QObject()
     , QRunnable()
-    , _url(url)
-{
+    , _url(url) {
 }
 
-void SystemProxyRunnable::run()
-{
+void SystemProxyRunnable::run() {
     qRegisterMetaType<QNetworkProxy>("QNetworkProxy");
     QList<QNetworkProxy> proxies = QNetworkProxyFactory::systemProxyForQuery(QNetworkProxyQuery(_url));
 

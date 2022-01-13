@@ -27,8 +27,7 @@ namespace Ui {
  * @brief The LegalNotice class
  * @ingroup gui
  */
-class LegalNotice : public QDialog
-{
+class LegalNotice : public QDialog {
 
 public:
     explicit LegalNotice(QDialog *parent = nullptr);

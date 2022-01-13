@@ -12,8 +12,7 @@
 
 using namespace OCC;
 
-class TestUploadReset : public QObject
-{
+class TestUploadReset : public QObject {
 
 private slots:
 
@@ -21,9 +20,7 @@ private slots:
     void testFileUploadNg() {
         FakeFolder fakeFolder{FileInfo::A12_B12_C12_S12()};
 
-        fakeFolder.syncEngine().account()->setCapabilities({ { "dav", QVariantMap{
-                {"chunking", "1.0"},
-                {"httpErrorCodesThatResetFailingChunkedUploads", QVariantList{500} } } } });
+        fakeFolder.syncEngine().account()->setCapabilities({ { "dav", QVariantMap{ {"chunking", "1.0"}, {"httpErrorCodesThatResetFailingChunkedUploads", QVariantList{500} } } } });
 
         const int size = 100 * 1000 * 1000; // 100 MB
         fakeFolder.localModifier().insert("A/a0", size);

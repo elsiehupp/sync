@@ -18,8 +18,7 @@
 namespace OCC {
 
 /// Label that can elide its text
-class ElidedLabel : public QLabel
-{
+class ElidedLabel : public QLabel {
 public:
     explicit ElidedLabel(QWidget *parent = nullptr);
     explicit ElidedLabel(const QString &text, QWidget *parent = nullptr);

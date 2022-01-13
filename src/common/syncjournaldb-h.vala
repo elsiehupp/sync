@@ -40,8 +40,7 @@ class SyncJournalFileRecord;
  * This class is thread safe. All public functions lock the mutex.
  * @ingroup libsync
  */
-class OCSYNC_EXPORT SyncJournalDb : public QObject
-{
+class OCSYNC_EXPORT SyncJournalDb : public QObject {
 public:
     explicit SyncJournalDb(const QString &dbFilePath, QObject *parent = nullptr);
     ~SyncJournalDb() override;
@@ -77,8 +76,7 @@ public:
         qint64 modtime, qint64 size, quint64 inode);
 
     /// Return value for hasHydratedOrDehydratedFiles()
-    struct HasHydratedDehydrated
-    {
+    struct HasHydratedDehydrated {
         bool hasHydrated = false;
         bool hasDehydrated = false;
     };
@@ -99,15 +97,13 @@ public:
     int wipeErrorBlacklist();
     int errorBlackListEntryCount();
 
-    struct DownloadInfo
-    {
+    struct DownloadInfo {
         QString _tmpfile;
         QByteArray _etag;
         int _errorCount = 0;
         bool _valid = false;
     };
-    struct UploadInfo
-    {
+    struct UploadInfo {
         int _chunk = 0;
         uint _transferid = 0;
         qint64 _size = 0;
@@ -123,8 +119,7 @@ public:
         bool isChunked() const { return _transferid != 0; }
     };
 
-    struct PollInfo
-    {
+    struct PollInfo {
         QString _file; // The relative path of a file
         QString _url; // the poll url. (This pollinfo is invalid if _url is empty)
         qint64 _modtime; // The modtime of the file being uploaded
@@ -276,8 +271,7 @@ public:
      *
      * Use internalPinStates() to get at them.
      */
-    struct OCSYNC_EXPORT PinStateInterface
-    {
+    struct OCSYNC_EXPORT PinStateInterface {
         PinStateInterface(const PinStateInterface &) = delete;
         PinStateInterface(PinStateInterface &&) = delete;
 

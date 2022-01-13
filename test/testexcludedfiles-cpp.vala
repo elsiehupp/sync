@@ -38,33 +38,27 @@ static void setup_init() {
     QVERIFY(excludedFiles->reloadExcludeFiles());
 }
 
-class TestExcludedFiles: public QObject
-{
+class TestExcludedFiles: public QObject {
 
-static auto check_file_full(const char *path)
-{
+static auto check_file_full(const char *path) {
     return excludedFiles->fullPatternMatch(path, ItemTypeFile);
 }
 
-static auto check_dir_full(const char *path)
-{
+static auto check_dir_full(const char *path) {
     return excludedFiles->fullPatternMatch(path, ItemTypeDirectory);
 }
 
-static auto check_file_traversal(const char *path)
-{
+static auto check_file_traversal(const char *path) {
     return excludedFiles->traversalPatternMatch(path, ItemTypeFile);
 }
 
-static auto check_dir_traversal(const char *path)
-{
+static auto check_dir_traversal(const char *path) {
     return excludedFiles->traversalPatternMatch(path, ItemTypeDirectory);
 }
 
 
 private slots:
-    void testFun()
-    {
+    void testFun() {
         ExcludedFiles excluded;
         bool excludeHidden = true;
         bool keepHidden = false;
@@ -88,8 +82,7 @@ private slots:
         QVERIFY(excluded.isExcluded("/a/#b#", "/a", keepHidden));
     }
 
-    void check_csync_exclude_add()
-    {
+    void check_csync_exclude_add() {
         setup();
         excludedFiles->addManualExclude("/tmp/check_csync1/*");
         QCOMPARE(check_file_full("/tmp/check_csync1/foo"), CSYNC_FILE_EXCLUDE_LIST);
@@ -106,8 +99,7 @@ private slots:
         QVERIFY(!excludedFiles->_fullTraversalRegexFile[QStringLiteral("/")].pattern().contains("foo"));
     }
 
-    void check_csync_exclude_add_per_dir()
-    {
+    void check_csync_exclude_add_per_dir() {
         setup();
         excludedFiles->addManualExclude("*", "/tmp/check_csync1/");
         QCOMPARE(check_file_full("/tmp/check_csync1/foo"), CSYNC_FILE_EXCLUDE_LIST);
@@ -123,8 +115,7 @@ private slots:
         QVERIFY(!excludedFiles->_bnameTraversalRegexFile[QStringLiteral("/tmp/check_csync1/")].pattern().contains("foo"));
     }
 
-    void check_csync_excluded()
-    {
+    void check_csync_excluded() {
         setup_init();
         QCOMPARE(check_file_full(""), CSYNC_NOT_EXCLUDED);
         QCOMPARE(check_file_full("/"), CSYNC_NOT_EXCLUDED);
@@ -231,8 +222,7 @@ private slots:
 #endif
     }
 
-    void check_csync_excluded_per_dir()
-    {
+    void check_csync_excluded_per_dir() {
         const auto tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
         excludedFiles.reset(new ExcludedFiles(tempDir + "/"));
         excludedFiles->setWildcardsMatchSlash(false);
@@ -270,8 +260,7 @@ private slots:
         QCOMPARE(check_file_full(QByteArray(fooDir.toUtf8() + "/baz")), CSYNC_NOT_EXCLUDED);
     }
 
-    void check_csync_excluded_traversal_per_dir()
-    {
+    void check_csync_excluded_traversal_per_dir() {
         setup_init();
         QCOMPARE(check_file_traversal("/"), CSYNC_NOT_EXCLUDED);
 
@@ -281,8 +270,7 @@ private slots:
         QCOMPARE(check_file_traversal("latex/songbook/my_manuscript.tex.tmp"), CSYNC_FILE_EXCLUDE_LIST);
     }
 
-    void check_csync_excluded_traversal()
-    {
+    void check_csync_excluded_traversal() {
         setup_init();
         QCOMPARE(check_file_traversal(""), CSYNC_NOT_EXCLUDED);
         QCOMPARE(check_file_traversal("/"), CSYNC_NOT_EXCLUDED);
@@ -427,8 +415,7 @@ private slots:
 #endif
     }
 
-    void check_csync_dir_only()
-    {
+    void check_csync_dir_only() {
         setup();
         excludedFiles->addManualExclude("filedir");
         excludedFiles->addManualExclude("dir/");
@@ -453,8 +440,7 @@ private slots:
         QCOMPARE(check_file_full("dir/foo"), CSYNC_FILE_EXCLUDE_LIST);
     }
 
-    void check_csync_pathes()
-    {
+    void check_csync_pathes() {
         setup_init();
         excludedFiles->addManualExclude("/exclude");
         excludedFiles->reloadExcludeFiles();
@@ -489,8 +475,7 @@ private slots:
         QCOMPARE(check_dir_full("/excludepath/withsubdir/foo"), CSYNC_FILE_EXCLUDE_LIST);
     }
 
-    void check_csync_wildcards()
-    {
+    void check_csync_wildcards() {
         setup();
         excludedFiles->addManualExclude("a/foo*bar");
         excludedFiles->addManualExclude("b/foo*bar*");
@@ -532,8 +517,7 @@ private slots:
         QCOMPARE(check_file_traversal("e/foo/barA"), CSYNC_FILE_EXCLUDE_LIST);
     }
 
-    void check_csync_regex_translation()
-    {
+    void check_csync_regex_translation() {
         setup();
         QByteArray storage;
         auto translate = [&storage](const char *pattern) {
@@ -553,8 +537,7 @@ private slots:
         QCOMPARE(translate("?𠜎?"), "[^/]\\𠜎[^/]"); // 𠜎 is 4-byte utf8
     }
 
-    void check_csync_bname_trigger()
-    {
+    void check_csync_bname_trigger() {
         setup();
         bool wildcardsMatchSlash = false;
         QByteArray storage;
@@ -585,8 +568,7 @@ private slots:
         QCOMPARE(translate("a/abc*/foo*"), "foo*");
     }
 
-    void check_csync_is_windows_reserved_word()
-    {
+    void check_csync_is_windows_reserved_word() {
         auto csync_is_windows_reserved_word = [](const char *fn) {
             QString s = QString::fromLatin1(fn);
             extern bool csync_is_windows_reserved_word(const QStringRef &filename);
@@ -627,8 +609,7 @@ private slots:
     }
 
     /* QT_ENABLE_REGEXP_JIT=0 to get slower results :-) */
-    void check_csync_excluded_performance1()
-    {
+    void check_csync_excluded_performance1() {
         setup_init();
         const int N = 1000;
         int totalRc = 0;
@@ -643,8 +624,7 @@ private slots:
         }
     }
 
-    void check_csync_excluded_performance2()
-    {
+    void check_csync_excluded_performance2() {
         const int N = 1000;
         int totalRc = 0;
 
@@ -657,8 +637,7 @@ private slots:
         }
     }
 
-    void check_csync_exclude_expand_escapes()
-    {
+    void check_csync_exclude_expand_escapes() {
         extern void csync_exclude_expand_escapes(QByteArray &input);
 
         QByteArray line = R"(keep \' \" \? \\ \a \b \f \n \r \t \v \z \#)";
@@ -674,77 +653,59 @@ private slots:
         QVERIFY(0 == strcmp(line.constData(), "\\"));
     }
 
-    void check_version_directive()
-    {
+    void check_version_directive() {
         ExcludedFiles excludes;
         excludes.setClientVersion(ExcludedFiles::Version(2, 5, 0));
 
-        std::vector<std::pair<const char *, bool>> tests = {
-            { "#!version == 2.5.0", true },
-            { "#!version == 2.6.0", false },
-            { "#!version < 2.6.0", true },
-            { "#!version <= 2.6.0", true },
-            { "#!version > 2.6.0", false },
-            { "#!version >= 2.6.0", false },
-            { "#!version < 2.4.0", false },
-            { "#!version <= 2.4.0", false },
-            { "#!version > 2.4.0", true },
-            { "#!version >= 2.4.0", true },
-            { "#!version < 2.5.0", false },
-            { "#!version <= 2.5.0", true },
-            { "#!version > 2.5.0", false },
-            { "#!version >= 2.5.0", true },
+        std::vector<std::pair<const char *, bool>> tests = { { "#!version == 2.5.0", true }, { "#!version == 2.6.0", false }, { "#!version < 2.6.0", true }, { "#!version <= 2.6.0", true }, { "#!version > 2.6.0", false }, { "#!version >= 2.6.0", false }, { "#!version < 2.4.0", false }, { "#!version <= 2.4.0", false }, { "#!version > 2.4.0", true }, { "#!version >= 2.4.0", true }, { "#!version < 2.5.0", false }, { "#!version <= 2.5.0", true }, { "#!version > 2.5.0", false }, { "#!version >= 2.5.0", true },
         };
         for (auto test : tests) {
             QVERIFY(excludes.versionDirectiveKeepNextLine(test.first) == test.second);
         }
     }
-     
-    void testAddExcludeFilePath_addSameFilePath_listSizeDoesNotIncrease()
-    {
+
+    void testAddExcludeFilePath_addSameFilePath_listSizeDoesNotIncrease() {
         excludedFiles.reset(new ExcludedFiles());
         const auto filePath = QString("exclude/.sync-exclude.lst");
-        
+
         excludedFiles->addExcludeFilePath(filePath);
-        excludedFiles->addExcludeFilePath(filePath);        
-        
+        excludedFiles->addExcludeFilePath(filePath);
+
         QCOMPARE(excludedFiles->_excludeFiles.size(), 1);
     }
-    
-    void testAddExcludeFilePath_addDifferentFilePaths_listSizeIncrease()
-    {
+
+    void testAddExcludeFilePath_addDifferentFilePaths_listSizeIncrease() {
         excludedFiles.reset(new ExcludedFiles());
-        
+
         const auto filePath1 = QString("exclude1/.sync-exclude.lst");
         const auto filePath2 = QString("exclude2/.sync-exclude.lst");
-    
+
         excludedFiles->addExcludeFilePath(filePath1);
         excludedFiles->addExcludeFilePath(filePath2);
-        
+
         QCOMPARE(excludedFiles->_excludeFiles.size(), 2);
     }
-    
-    void testAddExcludeFilePath_addDefaultExcludeFile_returnCorrectMap()
-    {
+
+    void testAddExcludeFilePath_addDefaultExcludeFile_returnCorrectMap() {
         const QString basePath("syncFolder/");
         const QString folder1("syncFolder/folder1/");
         const QString folder2(folder1 + "folder2/");
         excludedFiles.reset(new ExcludedFiles(basePath));
-        
+
         const QString defaultExcludeList("desktop-client/config-folder/sync-exclude.lst");
         const QString folder1ExcludeList(folder1 + ".sync-exclude.lst");
         const QString folder2ExcludeList(folder2 + ".sync-exclude.lst");
-        
+
         excludedFiles->addExcludeFilePath(defaultExcludeList);
         excludedFiles->addExcludeFilePath(folder1ExcludeList);
         excludedFiles->addExcludeFilePath(folder2ExcludeList);
-        
+
         QCOMPARE(excludedFiles->_excludeFiles.size(), 3);
         QCOMPARE(excludedFiles->_excludeFiles[basePath].first(), defaultExcludeList);
         QCOMPARE(excludedFiles->_excludeFiles[folder1].first(), folder1ExcludeList);
         QCOMPARE(excludedFiles->_excludeFiles[folder2].first(), folder2ExcludeList);
     }
-    
+
     void testReloadExcludeFiles_fileDoesNotExist_returnFalse() {
         excludedFiles.reset(new ExcludedFiles());
         const QString nonExistingFile("directory/.sync-exclude.lst");
@@ -752,20 +713,19 @@ private slots:
         QCOMPARE(excludedFiles->reloadExcludeFiles(), false);
         QCOMPARE(excludedFiles->_allExcludes.size(), 0);
     }
-    
-    void testReloadExcludeFiles_fileExists_returnTrue()
-    {
+
+    void testReloadExcludeFiles_fileExists_returnTrue() {
         const auto tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
         excludedFiles.reset(new ExcludedFiles(tempDir + "/"));
-        
+
         const auto subTempDir = QStringLiteral("exclude");
         QVERIFY(QDir(tempDir).mkpath(subTempDir));
-        
+
         const auto existingFilePath = QString(tempDir + '/' + subTempDir + "/.sync-exclude.lst");
         QFile excludeList(existingFilePath);
         QVERIFY(excludeList.open(QFile::WriteOnly));
         excludeList.close();
-        
+
         excludedFiles->addExcludeFilePath(existingFilePath);
         QCOMPARE(excludedFiles->reloadExcludeFiles(), true);
         QCOMPARE(excludedFiles->_allExcludes.size(), 1);

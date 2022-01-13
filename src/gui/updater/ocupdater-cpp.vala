@@ -37,8 +37,7 @@ static const char autoUpdateAttemptedC[] = "Updater/autoUpdateAttempted";
 
 
 UpdaterScheduler::UpdaterScheduler(QObject *parent)
-    : QObject(parent)
-{
+    : QObject(parent) {
     connect(&_updateCheckTimer, &QTimer::timeout,
         this, &UpdaterScheduler::slotTimerFired);
 
@@ -57,8 +56,7 @@ UpdaterScheduler::UpdaterScheduler(QObject *parent)
     _updateCheckTimer.start(std::chrono::milliseconds(checkInterval).count());
 }
 
-void UpdaterScheduler::slotTimerFired()
-{
+void UpdaterScheduler::slotTimerFired() {
     ConfigFile cfg;
 
     // re-set the check interval if it changed in the config file meanwhile
@@ -88,17 +86,14 @@ OCUpdater::OCUpdater(const QUrl &url)
     , _updateUrl(url)
     , _state(Unknown)
     , _accessManager(new AccessManager(this))
-    , _timeoutWatchdog(new QTimer(this))
-{
+    , _timeoutWatchdog(new QTimer(this)) {
 }
 
-void OCUpdater::setUpdateUrl(const QUrl &url)
-{
+void OCUpdater::setUpdateUrl(const QUrl &url) {
     _updateUrl = url;
 }
 
-bool OCUpdater::performUpdate()
-{
+bool OCUpdater::performUpdate() {
     ConfigFile cfg;
     QSettings settings(cfg.configFile(), QSettings::IniFormat);
     QString updateFile = settings.value(updateAvailableC).toString();
@@ -122,8 +117,7 @@ bool OCUpdater::performUpdate()
     return false;
 }
 
-void OCUpdater::backgroundCheckForUpdate()
-{
+void OCUpdater::backgroundCheckForUpdate() {
     int dlState = downloadState();
 
     // do the real update check depending on the internal state of updater.
@@ -144,8 +138,7 @@ void OCUpdater::backgroundCheckForUpdate()
     }
 }
 
-QString OCUpdater::statusString(UpdateStatusStringFormat format) const
-{
+QString OCUpdater::statusString(UpdateStatusStringFormat format) const {
     QString updateVersion = _updateInfo.versionString();
 
     switch (downloadState()) {
@@ -178,13 +171,11 @@ QString OCUpdater::statusString(UpdateStatusStringFormat format) const
     }
 }
 
-int OCUpdater::downloadState() const
-{
+int OCUpdater::downloadState() const {
     return _state;
 }
 
-void OCUpdater::setDownloadState(DownloadState state)
-{
+void OCUpdater::setDownloadState(DownloadState state) {
     auto oldState = _state;
     _state = state;
     emit downloadStateChanged();
@@ -197,8 +188,7 @@ void OCUpdater::setDownloadState(DownloadState state)
     }
 }
 
-void OCUpdater::slotStartInstaller()
-{
+void OCUpdater::slotStartInstaller() {
     ConfigFile cfg;
     QSettings settings(cfg.configFile(), QSettings::IniFormat);
     QString updateFile = settings.value(updateAvailableC).toString();
@@ -232,8 +222,7 @@ void OCUpdater::slotStartInstaller()
     qApp->quit();
 }
 
-void OCUpdater::checkForUpdate()
-{
+void OCUpdater::checkForUpdate() {
     QNetworkReply *reply = _accessManager->get(QNetworkRequest(_updateUrl));
     connect(_timeoutWatchdog, &QTimer::timeout, this, &OCUpdater::slotTimedOut);
     _timeoutWatchdog->start(30 * 1000);
@@ -242,13 +231,11 @@ void OCUpdater::checkForUpdate()
     setDownloadState(CheckingServer);
 }
 
-void OCUpdater::slotOpenUpdateUrl()
-{
+void OCUpdater::slotOpenUpdateUrl() {
     QDesktopServices::openUrl(_updateInfo.web());
 }
 
-bool OCUpdater::updateSucceeded() const
-{
+bool OCUpdater::updateSucceeded() const {
     ConfigFile cfg;
     QSettings settings(cfg.configFile(), QSettings::IniFormat);
 
@@ -257,8 +244,7 @@ bool OCUpdater::updateSucceeded() const
     return currentVersion >= targetVersionInt;
 }
 
-void OCUpdater::slotVersionInfoArrived()
-{
+void OCUpdater::slotVersionInfoArrived() {
     _timeoutWatchdog->stop();
     auto *reply = qobject_cast<QNetworkReply *>(sender());
     reply->deleteLater();
@@ -280,28 +266,24 @@ void OCUpdater::slotVersionInfoArrived()
     }
 }
 
-void OCUpdater::slotTimedOut()
-{
+void OCUpdater::slotTimedOut() {
     setDownloadState(DownloadTimedOut);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 NSISUpdater::NSISUpdater(const QUrl &url)
-    : OCUpdater(url)
-{
+    : OCUpdater(url) {
 }
 
-void NSISUpdater::slotWriteFile()
-{
+void NSISUpdater::slotWriteFile() {
     auto *reply = qobject_cast<QNetworkReply *>(sender());
     if (_file->isOpen()) {
         _file->write(reply->readAll());
     }
 }
 
-void NSISUpdater::wipeUpdateData()
-{
+void NSISUpdater::wipeUpdateData() {
     ConfigFile cfg;
     QSettings settings(cfg.configFile(), QSettings::IniFormat);
     QString updateFileName = settings.value(updateAvailableC).toString();
@@ -313,8 +295,7 @@ void NSISUpdater::wipeUpdateData()
     settings.remove(autoUpdateAttemptedC);
 }
 
-void NSISUpdater::slotDownloadFinished()
-{
+void NSISUpdater::slotDownloadFinished() {
     auto *reply = qobject_cast<QNetworkReply *>(sender());
     reply->deleteLater();
     if (reply->error() != QNetworkReply::NoError) {
@@ -342,8 +323,7 @@ void NSISUpdater::slotDownloadFinished()
     settings.setValue(updateAvailableC, _targetFile);
 }
 
-void NSISUpdater::versionInfoArrived(const UpdateInfo &info)
-{
+void NSISUpdater::versionInfoArrived(const UpdateInfo &info) {
     ConfigFile cfg;
     QSettings settings(cfg.configFile(), QSettings::IniFormat);
     qint64 infoVersion = Helper::stringVersionToInt(info.version());
@@ -357,8 +337,7 @@ void NSISUpdater::versionInfoArrived(const UpdateInfo &info)
             << "Available version string:" << info.versionString()
             << "Web url:" << info.web()
             << "Download url:" << info.downloadUrl();
-    if (info.version().isEmpty())
-    {
+    if (info.version().isEmpty()) {
         qCInfo(lcUpdater) << "No version information available at the moment";
         setDownloadState(UpToDate);
     } else if (infoVersion <= currVersion
@@ -388,8 +367,7 @@ void NSISUpdater::versionInfoArrived(const UpdateInfo &info)
     }
 }
 
-void NSISUpdater::showNoUrlDialog(const UpdateInfo &info)
-{
+void NSISUpdater::showNoUrlDialog(const UpdateInfo &info) {
     // if the version tag is set, there is a newer version.
     auto *msgBox = new QDialog;
     msgBox->setAttribute(Qt::WA_DeleteOnClose);
@@ -439,8 +417,7 @@ void NSISUpdater::showNoUrlDialog(const UpdateInfo &info)
     msgBox->open();
 }
 
-void NSISUpdater::showUpdateErrorDialog(const QString &targetVersion)
-{
+void NSISUpdater::showUpdateErrorDialog(const QString &targetVersion) {
     auto msgBox = new QDialog;
     msgBox->setAttribute(Qt::WA_DeleteOnClose);
     msgBox->setWindowFlags(msgBox->windowFlags() & ~Qt::WindowContextHelpButtonHint);
@@ -500,8 +477,7 @@ void NSISUpdater::showUpdateErrorDialog(const QString &targetVersion)
     msgBox->open();
 }
 
-bool NSISUpdater::handleStartup()
-{
+bool NSISUpdater::handleStartup() {
     ConfigFile cfg;
     QSettings settings(cfg.configFile(), QSettings::IniFormat);
     QString updateFileName = settings.value(updateAvailableC).toString();
@@ -531,8 +507,7 @@ bool NSISUpdater::handleStartup()
     return false;
 }
 
-void NSISUpdater::slotSetSeenVersion()
-{
+void NSISUpdater::slotSetSeenVersion() {
     ConfigFile cfg;
     QSettings settings(cfg.configFile(), QSettings::IniFormat);
     settings.setValue(seenVersionC, updateInfo().version());
@@ -541,8 +516,7 @@ void NSISUpdater::slotSetSeenVersion()
 ////////////////////////////////////////////////////////////////////////
 
 PassiveUpdateNotifier::PassiveUpdateNotifier(const QUrl &url)
-    : OCUpdater(url)
-{
+    : OCUpdater(url) {
     // remember the version of the currently running binary. On Linux it might happen that the
     // package management updates the package while the app is running. This is detected in the
     // updater slot: If the installed binary on the hd has a different version than the one
@@ -550,8 +524,7 @@ PassiveUpdateNotifier::PassiveUpdateNotifier(const QUrl &url)
     _runningAppVersion = Utility::versionOfInstalledBinary();
 }
 
-void PassiveUpdateNotifier::backgroundCheckForUpdate()
-{
+void PassiveUpdateNotifier::backgroundCheckForUpdate() {
     if (Utility::isLinux()) {
         // on linux, check if the installed binary is still the same version
         // as the one that is running. If not, restart if possible.
@@ -564,8 +537,7 @@ void PassiveUpdateNotifier::backgroundCheckForUpdate()
     OCUpdater::backgroundCheckForUpdate();
 }
 
-void PassiveUpdateNotifier::versionInfoArrived(const UpdateInfo &info)
-{
+void PassiveUpdateNotifier::versionInfoArrived(const UpdateInfo &info) {
     qint64 currentVer = Helper::currentVersionToInt();
     qint64 remoteVer = Helper::stringVersionToInt(info.version());
 

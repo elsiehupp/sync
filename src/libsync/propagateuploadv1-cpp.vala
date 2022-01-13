@@ -35,8 +35,7 @@
 
 namespace OCC {
 
-void PropagateUploadFileV1::doStartUpload()
-{
+void PropagateUploadFileV1::doStartUpload() {
     _chunkCount = int(std::ceil(_fileToUpload._size / double(chunkSize())));
     _startChunk = 0;
     Q_ASSERT(_item->_modtime > 0);
@@ -82,8 +81,7 @@ void PropagateUploadFileV1::doStartUpload()
     startNextChunk();
 }
 
-void PropagateUploadFileV1::startNextChunk()
-{
+void PropagateUploadFileV1::startNextChunk() {
     if (propagator()->_abortRequested)
         return;
 
@@ -198,8 +196,7 @@ void PropagateUploadFileV1::startNextChunk()
     }
 }
 
-void PropagateUploadFileV1::slotPutFinished()
-{
+void PropagateUploadFileV1::slotPutFinished() {
     auto *job = qobject_cast<PUTFileJob *>(sender());
     ASSERT(job);
 
@@ -336,8 +333,7 @@ void PropagateUploadFileV1::slotPutFinished()
 }
 
 
-void PropagateUploadFileV1::slotUploadProgress(qint64 sent, qint64 total)
-{
+void PropagateUploadFileV1::slotUploadProgress(qint64 sent, qint64 total) {
     // Completion is signaled with sent=0, total=0; avoid accidentally
     // resetting progress due to the sent being zero by ignoring it.
     // finishedSignal() is bound to be emitted soon anyway.
@@ -369,8 +365,7 @@ void PropagateUploadFileV1::slotUploadProgress(qint64 sent, qint64 total)
     propagator()->reportProgress(*_item, amount);
 }
 
-void PropagateUploadFileV1::abort(PropagatorJob::AbortType abortType)
-{
+void PropagateUploadFileV1::abort(PropagatorJob::AbortType abortType) {
     abortNetworkJobs(
         abortType,
         [this, abortType](AbstractNetworkJob *job) {

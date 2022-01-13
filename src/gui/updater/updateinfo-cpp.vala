@@ -11,48 +11,39 @@
 
 namespace OCC {
 
-void UpdateInfo::setVersion(const QString &v)
-{
+void UpdateInfo::setVersion(const QString &v) {
     mVersion = v;
 }
 
-QString UpdateInfo::version() const
-{
+QString UpdateInfo::version() const {
     return mVersion;
 }
 
-void UpdateInfo::setVersionString(const QString &v)
-{
+void UpdateInfo::setVersionString(const QString &v) {
     mVersionString = v;
 }
 
-QString UpdateInfo::versionString() const
-{
+QString UpdateInfo::versionString() const {
     return mVersionString;
 }
 
-void UpdateInfo::setWeb(const QString &v)
-{
+void UpdateInfo::setWeb(const QString &v) {
     mWeb = v;
 }
 
-QString UpdateInfo::web() const
-{
+QString UpdateInfo::web() const {
     return mWeb;
 }
 
-void UpdateInfo::setDownloadUrl(const QString &v)
-{
+void UpdateInfo::setDownloadUrl(const QString &v) {
     mDownloadUrl = v;
 }
 
-QString UpdateInfo::downloadUrl() const
-{
+QString UpdateInfo::downloadUrl() const {
     return mDownloadUrl;
 }
 
-UpdateInfo UpdateInfo::parseElement(const QDomElement &element, bool *ok)
-{
+UpdateInfo UpdateInfo::parseElement(const QDomElement &element, bool *ok) {
     if (element.tagName() != QLatin1String("owncloudclient")) {
         qCCritical(lcUpdater) << "Expected 'owncloudclient', got '" << element.tagName() << "'.";
         if (ok)
@@ -82,8 +73,7 @@ UpdateInfo UpdateInfo::parseElement(const QDomElement &element, bool *ok)
     return result;
 }
 
-UpdateInfo UpdateInfo::parseString(const QString &xml, bool *ok)
-{
+UpdateInfo UpdateInfo::parseString(const QString &xml, bool *ok) {
     QString errorMsg;
     int errorLine = 0, errorCol = 0;
     QDomDocument doc;

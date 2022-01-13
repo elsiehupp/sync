@@ -13,8 +13,7 @@ using namespace OCC;
 
 /* Upload a 1/3 of a file of given size.
  * fakeFolder needs to be synchronized */
-static void partialUpload(FakeFolder &fakeFolder, const QString &name, qint64 size)
-{
+static void partialUpload(FakeFolder &fakeFolder, const QString &name, qint64 size) {
     QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
     QCOMPARE(fakeFolder.uploadState().children.count(), 0); // The state should be clean
 
@@ -41,8 +40,7 @@ static void partialUpload(FakeFolder &fakeFolder, const QString &name, qint64 si
 }
 
 // Reduce max chunk size a bit so we get more chunks
-static void setChunkSize(SyncEngine &engine, qint64 size)
-{
+static void setChunkSize(SyncEngine &engine, qint64 size) {
     SyncOptions options;
     options._maxChunkSize = size;
     options._initialChunkSize = size;
@@ -50,8 +48,7 @@ static void setChunkSize(SyncEngine &engine, qint64 size)
     engine.setSyncOptions(options);
 }
 
-class TestChunkingNG : public QObject
-{
+class TestChunkingNG : public QObject {
 
 private slots:
 
@@ -239,8 +236,7 @@ private slots:
 
     // Check what happens when we abort during the final MOVE and the
     // the final MOVE takes longer than the abort-delay
-    void testLateAbortHard()
-    {
+    void testLateAbortHard() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         fakeFolder.syncEngine().account()->setCapabilities({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", QStringList() << "SHA1" } } } });
         const int size = 15 * 1000 * 1000; // 15 MB
@@ -323,8 +319,7 @@ private slots:
 
     // Check what happens when we abort during the final MOVE and the
     // the final MOVE is short enough for the abort-delay to help
-    void testLateAbortRecoverable()
-    {
+    void testLateAbortRecoverable() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         fakeFolder.syncEngine().account()->setCapabilities({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", QStringList() << "SHA1" } } } });
         const int size = 15 * 1000 * 1000; // 15 MB
@@ -513,14 +508,12 @@ private slots:
 
     // Check what happens when the connection is dropped on the PUT (non-chunking) or MOVE (chunking)
     // for on the issue #5106
-    void connectionDroppedBeforeEtagRecieved_data()
-    {
+    void connectionDroppedBeforeEtagRecieved_data() {
         QTest::addColumn<bool>("chunking");
         QTest::newRow("big file") << true;
         QTest::newRow("small file") << false;
     }
-    void connectionDroppedBeforeEtagRecieved()
-    {
+    void connectionDroppedBeforeEtagRecieved() {
         QFETCH(bool, chunking);
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         fakeFolder.syncEngine().account()->setCapabilities({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", QStringList() << "SHA1" } } } });

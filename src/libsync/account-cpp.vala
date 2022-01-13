@@ -67,8 +67,7 @@ const char app_password[] = "_app-password";
 
 Account::Account(QObject *parent)
     : QObject(parent)
-    , _capabilities(QVariantMap())
-{
+    , _capabilities(QVariantMap()) {
     qRegisterMetaType<AccountPtr>("AccountPtr");
     qRegisterMetaType<Account *>("Account*");
 
@@ -76,49 +75,41 @@ Account::Account(QObject *parent)
     connect(&_pushNotificationsReconnectTimer, &QTimer::timeout, this, &Account::trySetupPushNotifications);
 }
 
-AccountPtr Account::create()
-{
+AccountPtr Account::create() {
     AccountPtr acc = AccountPtr(new Account);
     acc->setSharedThis(acc);
     return acc;
 }
 
-ClientSideEncryption* Account::e2e()
-{
+ClientSideEncryption* Account::e2e() {
     // Qt expects everything in the connect to be a pointer, so return a pointer.
     return &_e2e;
 }
 
 Account::~Account() = default;
 
-QString Account::davPath() const
-{
+QString Account::davPath() const {
     return davPathBase() + QLatin1Char('/') + davUser() + QLatin1Char('/');
 }
 
-void Account::setSharedThis(AccountPtr sharedThis)
-{
+void Account::setSharedThis(AccountPtr sharedThis) {
     _sharedThis = sharedThis.toWeakRef();
     setupUserStatusConnector();
 }
 
-QString Account::davPathBase()
-{
+QString Account::davPathBase() {
     return QStringLiteral("/remote.php/dav/files");
 }
 
-AccountPtr Account::sharedFromThis()
-{
+AccountPtr Account::sharedFromThis() {
     return _sharedThis.toStrongRef();
 }
 
-QString Account::davUser() const
-{
+QString Account::davUser() const {
     return _davUser.isEmpty() && _credentials ? _credentials->user() : _davUser;
 }
 
-void Account::setDavUser(const QString &newDavUser)
-{
+void Account::setDavUser(const QString &newDavUser) {
     if (_davUser == newDavUser)
         return;
     _davUser = newDavUser;
@@ -126,19 +117,16 @@ void Account::setDavUser(const QString &newDavUser)
 }
 
 #ifndef TOKEN_AUTH_ONLY
-QImage Account::avatar() const
-{
+QImage Account::avatar() const {
     return _avatarImg;
 }
-void Account::setAvatar(const QImage &img)
-{
+void Account::setAvatar(const QImage &img) {
     _avatarImg = img;
     emit accountChangedAvatar();
 }
 #endif
 
-QString Account::displayName() const
-{
+QString Account::displayName() const {
     QString dn = QString("%1@%2").arg(credentials()->user(), _url.host());
     int port = url().port();
     if (port > 0 && port != 80 && port != 443) {
@@ -148,29 +136,24 @@ QString Account::displayName() const
     return dn;
 }
 
-QString Account::davDisplayName() const
-{
+QString Account::davDisplayName() const {
     return _displayName;
 }
 
-void Account::setDavDisplayName(const QString &newDisplayName)
-{
+void Account::setDavDisplayName(const QString &newDisplayName) {
     _displayName = newDisplayName;
     emit accountChangedDisplayName();
 }
 
-QString Account::id() const
-{
+QString Account::id() const {
     return _id;
 }
 
-AbstractCredentials *Account::credentials() const
-{
+AbstractCredentials *Account::credentials() const {
     return _credentials.data();
 }
 
-void Account::setCredentials(AbstractCredentials *cred)
-{
+void Account::setCredentials(AbstractCredentials *cred) {
     // set active credential manager
     QNetworkCookieJar *jar = nullptr;
     QNetworkProxy proxy;
@@ -213,13 +196,11 @@ void Account::setCredentials(AbstractCredentials *cred)
     trySetupPushNotifications();
 }
 
-void Account::setPushNotificationsReconnectInterval(int interval)
-{
+void Account::setPushNotificationsReconnectInterval(int interval) {
     _pushNotificationsReconnectTimer.setInterval(interval);
 }
 
-void Account::trySetupPushNotifications()
-{
+void Account::trySetupPushNotifications() {
     // Stop the timer to prevent parallel setup attempts
     _pushNotificationsReconnectTimer.stop();
 
@@ -255,13 +236,11 @@ void Account::trySetupPushNotifications()
     }
 }
 
-QUrl Account::davUrl() const
-{
+QUrl Account::davUrl() const {
     return Utility::concatUrlPath(url(), davPath());
 }
 
-QUrl Account::deprecatedPrivateLinkUrl(const QByteArray &numericFileId) const
-{
+QUrl Account::deprecatedPrivateLinkUrl(const QByteArray &numericFileId) const {
     return Utility::concatUrlPath(_userVisibleUrl,
         QLatin1String("/index.php/f/") + QUrl::toPercentEncoding(QString::fromLatin1(numericFileId)));
 }
@@ -269,8 +248,7 @@ QUrl Account::deprecatedPrivateLinkUrl(const QByteArray &numericFileId) const
 /**
  * clear all cookies. (Session cookies or not)
  */
-void Account::clearCookieJar()
-{
+void Account::clearCookieJar() {
     auto jar = qobject_cast<CookieJar *>(_am->cookieJar());
     ASSERT(jar);
     jar->setAllCookies(QList<QNetworkCookie>());
@@ -280,21 +258,18 @@ void Account::clearCookieJar()
 /*! This shares our official cookie jar (containing all the tasty
     authentication cookies) with another QNAM while making sure
     of not losing its ownership. */
-void Account::lendCookieJarTo(QNetworkAccessManager *guest)
-{
+void Account::lendCookieJarTo(QNetworkAccessManager *guest) {
     auto jar = _am->cookieJar();
     auto oldParent = jar->parent();
     guest->setCookieJar(jar); // takes ownership of our precious cookie jar
     jar->setParent(oldParent); // takes it back
 }
 
-QString Account::cookieJarPath()
-{
+QString Account::cookieJarPath() {
     return QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + "/cookies" + id() + ".db";
 }
 
-void Account::resetNetworkAccessManager()
-{
+void Account::resetNetworkAccessManager() {
     if (!_credentials || !_am) {
         return;
     }
@@ -316,18 +291,15 @@ void Account::resetNetworkAccessManager()
         this, &Account::proxyAuthenticationRequired);
 }
 
-QNetworkAccessManager *Account::networkAccessManager()
-{
+QNetworkAccessManager *Account::networkAccessManager() {
     return _am.data();
 }
 
-QSharedPointer<QNetworkAccessManager> Account::sharedNetworkAccessManager()
-{
+QSharedPointer<QNetworkAccessManager> Account::sharedNetworkAccessManager() {
     return _am;
 }
 
-QNetworkReply *Account::sendRawRequest(const QByteArray &verb, const QUrl &url, QNetworkRequest req, QIODevice *data)
-{
+QNetworkReply *Account::sendRawRequest(const QByteArray &verb, const QUrl &url, QNetworkRequest req, QIODevice *data) {
     req.setUrl(url);
     req.setSslConfiguration(this->getOrCreateSslConfig());
     if (verb == "HEAD" && !data) {
@@ -344,8 +316,7 @@ QNetworkReply *Account::sendRawRequest(const QByteArray &verb, const QUrl &url, 
     return _am->sendCustomRequest(req, verb, data);
 }
 
-QNetworkReply *Account::sendRawRequest(const QByteArray &verb, const QUrl &url, QNetworkRequest req, const QByteArray &data)
-{
+QNetworkReply *Account::sendRawRequest(const QByteArray &verb, const QUrl &url, QNetworkRequest req, const QByteArray &data) {
     req.setUrl(url);
     req.setSslConfiguration(this->getOrCreateSslConfig());
     if (verb == "HEAD" && data.isEmpty()) {
@@ -362,8 +333,7 @@ QNetworkReply *Account::sendRawRequest(const QByteArray &verb, const QUrl &url, 
     return _am->sendCustomRequest(req, verb, data);
 }
 
-QNetworkReply *Account::sendRawRequest(const QByteArray &verb, const QUrl &url, QNetworkRequest req, QHttpMultiPart *data)
-{
+QNetworkReply *Account::sendRawRequest(const QByteArray &verb, const QUrl &url, QNetworkRequest req, QHttpMultiPart *data) {
     req.setUrl(url);
     req.setSslConfiguration(this->getOrCreateSslConfig());
     if (verb == "PUT") {
@@ -374,20 +344,17 @@ QNetworkReply *Account::sendRawRequest(const QByteArray &verb, const QUrl &url, 
     return _am->sendCustomRequest(req, verb, data);
 }
 
-SimpleNetworkJob *Account::sendRequest(const QByteArray &verb, const QUrl &url, QNetworkRequest req, QIODevice *data)
-{
+SimpleNetworkJob *Account::sendRequest(const QByteArray &verb, const QUrl &url, QNetworkRequest req, QIODevice *data) {
     auto job = new SimpleNetworkJob(sharedFromThis());
     job->startRequest(verb, url, req, data);
     return job;
 }
 
-void Account::setSslConfiguration(const QSslConfiguration &config)
-{
+void Account::setSslConfiguration(const QSslConfiguration &config) {
     _sslConfiguration = config;
 }
 
-QSslConfiguration Account::getOrCreateSslConfig()
-{
+QSslConfiguration Account::getOrCreateSslConfig() {
     if (!_sslConfiguration.isNull()) {
         // Will be set by CheckServerJob::finished()
         // We need to use a central shared config to get SSL session tickets
@@ -408,40 +375,33 @@ QSslConfiguration Account::getOrCreateSslConfig()
     return sslConfig;
 }
 
-void Account::setApprovedCerts(const QList<QSslCertificate> certs)
-{
+void Account::setApprovedCerts(const QList<QSslCertificate> certs) {
     _approvedCerts = certs;
     QSslConfiguration::defaultConfiguration().addCaCertificates(certs);
 }
 
-void Account::addApprovedCerts(const QList<QSslCertificate> certs)
-{
+void Account::addApprovedCerts(const QList<QSslCertificate> certs) {
     _approvedCerts += certs;
 }
 
-void Account::resetRejectedCertificates()
-{
+void Account::resetRejectedCertificates() {
     _rejectedCertificates.clear();
 }
 
-void Account::setSslErrorHandler(AbstractSslErrorHandler *handler)
-{
+void Account::setSslErrorHandler(AbstractSslErrorHandler *handler) {
     _sslErrorHandler.reset(handler);
 }
 
-void Account::setUrl(const QUrl &url)
-{
+void Account::setUrl(const QUrl &url) {
     _url = url;
     _userVisibleUrl = url;
 }
 
-void Account::setUserVisibleHost(const QString &host)
-{
+void Account::setUserVisibleHost(const QString &host) {
     _userVisibleUrl.setHost(host);
 }
 
-QVariant Account::credentialSetting(const QString &key) const
-{
+QVariant Account::credentialSetting(const QString &key) const {
     if (_credentials) {
         QString prefix = _credentials->authType();
         QVariant value = _settingsMap.value(prefix + "_" + key);
@@ -453,16 +413,14 @@ QVariant Account::credentialSetting(const QString &key) const
     return QVariant();
 }
 
-void Account::setCredentialSetting(const QString &key, const QVariant &value)
-{
+void Account::setCredentialSetting(const QString &key, const QVariant &value) {
     if (_credentials) {
         QString prefix = _credentials->authType();
         _settingsMap.insert(prefix + "_" + key, value);
     }
 }
 
-void Account::slotHandleSslErrors(QNetworkReply *reply, QList<QSslError> errors)
-{
+void Account::slotHandleSslErrors(QNetworkReply *reply, QList<QSslError> errors) {
     NetworkJobTimeoutPauser pauser(reply);
     QString out;
     QDebug(&out) << "SSL-Errors happened for url " << reply->url().toString();
@@ -534,8 +492,7 @@ void Account::slotHandleSslErrors(QNetworkReply *reply, QList<QSslError> errors)
     }
 }
 
-void Account::slotCredentialsFetched()
-{
+void Account::slotCredentialsFetched() {
     if (_davUser.isEmpty()) {
         qCDebug(lcAccount) << "User id not set. Fetch it.";
         const auto fetchUserNameJob = new JsonApiJob(sharedFromThis(), QStringLiteral("/ocs/v1.php/cloud/user"));
@@ -559,39 +516,33 @@ void Account::slotCredentialsFetched()
     }
 }
 
-void Account::slotCredentialsAsked()
-{
+void Account::slotCredentialsAsked() {
     emit credentialsAsked(_credentials.data());
 }
 
-void Account::handleInvalidCredentials()
-{
+void Account::handleInvalidCredentials() {
     // Retrieving password will trigger remote wipe check job
     retrieveAppPassword();
 
     emit invalidCredentials();
 }
 
-void Account::clearQNAMCache()
-{
+void Account::clearQNAMCache() {
     _am->clearAccessCache();
 }
 
-const Capabilities &Account::capabilities() const
-{
+const Capabilities &Account::capabilities() const {
     return _capabilities;
 }
 
-void Account::setCapabilities(const QVariantMap &caps)
-{
+void Account::setCapabilities(const QVariantMap &caps) {
     _capabilities = Capabilities(caps);
 
     setupUserStatusConnector();
     trySetupPushNotifications();
 }
 
-void Account::setupUserStatusConnector()
-{
+void Account::setupUserStatusConnector() {
     _userStatusConnector = std::make_shared<OcsUserStatusConnector>(sharedFromThis());
     connect(_userStatusConnector.get(), &UserStatusConnector::userStatusFetched, this, [this](const UserStatus &) {
         emit userStatusChanged();
@@ -601,13 +552,11 @@ void Account::setupUserStatusConnector()
     });
 }
 
-QString Account::serverVersion() const
-{
+QString Account::serverVersion() const {
     return _serverVersion;
 }
 
-int Account::serverVersionInt() const
-{
+int Account::serverVersionInt() const {
     // FIXME: Use Qt 5.5 QVersionNumber
     auto components = serverVersion().split('.');
     return makeServerVersion(components.value(0).toInt(),
@@ -615,13 +564,11 @@ int Account::serverVersionInt() const
         components.value(2).toInt());
 }
 
-int Account::makeServerVersion(int majorVersion, int minorVersion, int patchVersion)
-{
+int Account::makeServerVersion(int majorVersion, int minorVersion, int patchVersion) {
     return (majorVersion << 16) + (minorVersion << 8) + patchVersion;
 }
 
-bool Account::serverVersionUnsupported() const
-{
+bool Account::serverVersionUnsupported() const {
     if (serverVersionInt() == 0) {
         // not detected yet, assume it is fine.
         return false;
@@ -630,13 +577,11 @@ bool Account::serverVersionUnsupported() const
                NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_MINOR, NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_PATCH);
 }
 
-bool Account::isUsernamePrefillSupported() const
-{
+bool Account::isUsernamePrefillSupported() const {
     return serverVersionInt() >= makeServerVersion(usernamePrefillServerVersinMinSupportedMajor, 0, 0);
 }
 
-void Account::setServerVersion(const QString &version)
-{
+void Account::setServerVersion(const QString &version) {
     if (version == _serverVersion) {
         return;
     }
@@ -705,8 +650,7 @@ void Account::retrieveAppPassword(){
     job->start();
 }
 
-void Account::deleteAppPassword()
-{
+void Account::deleteAppPassword() {
     const QString kck = AbstractCredentials::keychainKey(
                 url().toString(),
                 credentials()->user() + app_password,
@@ -734,8 +678,7 @@ void Account::deleteAppPassword()
     job->start();
 }
 
-void Account::deleteAppToken()
-{
+void Account::deleteAppToken() {
     const auto deleteAppTokenJob = new DeleteJob(sharedFromThis(), QStringLiteral("/ocs/v2.php/core/apppassword"));
     connect(deleteAppTokenJob, &DeleteJob::finishedSignal, this, [this]() {
         if (const auto deleteJob = qobject_cast<DeleteJob *>(QObject::sender())) {
@@ -753,8 +696,7 @@ void Account::deleteAppToken()
     deleteAppTokenJob->start();
 }
 
-void Account::fetchDirectEditors(const QUrl &directEditingURL, const QString &directEditingETag)
-{
+void Account::fetchDirectEditors(const QUrl &directEditingURL, const QString &directEditingETag) {
     if(directEditingURL.isEmpty() || directEditingETag.isEmpty())
         return;
 
@@ -768,8 +710,7 @@ void Account::fetchDirectEditors(const QUrl &directEditingURL, const QString &di
     }
 }
 
-void Account::slotDirectEditingRecieved(const QJsonDocument &json)
-{
+void Account::slotDirectEditingRecieved(const QJsonDocument &json) {
     auto data = json.object().value("ocs").toObject().value("data").toObject();
     auto editors = data.value("editors").toObject();
 
@@ -798,13 +739,11 @@ void Account::slotDirectEditingRecieved(const QJsonDocument &json)
     }
 }
 
-PushNotifications *Account::pushNotifications() const
-{
+PushNotifications *Account::pushNotifications() const {
     return _pushNotifications;
 }
 
-std::shared_ptr<UserStatusConnector> Account::userStatusConnector() const
-{
+std::shared_ptr<UserStatusConnector> Account::userStatusConnector() const {
     return _userStatusConnector;
 }
 

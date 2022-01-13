@@ -74,8 +74,7 @@ const int GapBetweenLogoAndRightEdge = 5;
 const int ModernHeaderTopMargin = 2;
 
 HeaderBanner::HeaderBanner(QWidget *parent)
-    : QWidget(parent)
-{
+    : QWidget(parent) {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     setBackgroundRole(QPalette::Base);
     titleLabel = new QLabel(this);
@@ -97,8 +96,7 @@ HeaderBanner::HeaderBanner(QWidget *parent)
 }
 
 void HeaderBanner::setup(const QString &title, const QPixmap &logo, const QPixmap &banner,
-                         const Qt::TextFormat titleFormat, const QString &styleSheet)
-{
+                         const Qt::TextFormat titleFormat, const QString &styleSheet) {
     QStyle *style = parentWidget()->style();
     //const int layoutHorizontalSpacing = style->pixelMetric(QStyle::PM_LayoutHorizontalSpacing);
     int topLevelMarginLeft = style->pixelMetric(QStyle::PM_LayoutLeftMargin, nullptr, parentWidget());
@@ -129,8 +127,7 @@ void HeaderBanner::setup(const QString &title, const QPixmap &logo, const QPixma
     updateGeometry();
 }
 
-void HeaderBanner::paintEvent(QPaintEvent * /* event */)
-{
+void HeaderBanner::paintEvent(QPaintEvent * /* event */) {
     QPainter painter(this);
     painter.drawPixmap(0, 0, width(), bannerPixmap.height(), bannerPixmap);
     int x = width() - 2;

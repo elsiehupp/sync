@@ -30,8 +30,7 @@ Q_DECLARE_LOGGING_CATEGORY(lcBulkPropagatorJob)
 class ComputeChecksum;
 class PutMultiFileJob;
 
-class BulkPropagatorJob : public PropagatorJob
-{
+class BulkPropagatorJob : public PropagatorJob {
 
     /* This is a minified version of the SyncFileItem,
      * that holds only the specifics about the file that's
@@ -46,8 +45,7 @@ class BulkPropagatorJob : public PropagatorJob
       qint64 _size;
     };
 
-    struct BulkUploadItem
-    {
+    struct BulkUploadItem {
         AccountPtr _account;
         SyncFileItemPtr _item;
         UploadFileInfo _fileToUpload;

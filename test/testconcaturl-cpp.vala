@@ -18,32 +18,27 @@ using QueryItems = QList<QPair<QString, QString>>;
 
 Q_DECLARE_METATYPE(QueryItems)
 
-static QueryItems make()
-{
+static QueryItems make() {
     return QueryItems();
 }
 
-static QueryItems make(QString key, QString value)
-{
+static QueryItems make(QString key, QString value) {
     QueryItems q;
     q.append(qMakePair(key, value));
     return q;
 }
 
 static QueryItems make(QString key1, QString value1,
-                       QString key2, QString value2)
-{
+                       QString key2, QString value2) {
     QueryItems q;
     q.append(qMakePair(key1, value1));
     q.append(qMakePair(key2, value2));
     return q;
 }
 
-class TestConcatUrl: public QObject
-{
+class TestConcatUrl: public QObject {
 private slots:
-    void testFolder()
-    {
+    void testFolder() {
         QFETCH(QString, base);
         QFETCH(QString, concat);
         QFETCH(QueryItems, query);
@@ -57,8 +52,7 @@ private slots:
         QCOMPARE(result, expectedFull);
     }
 
-    void testFolder_data()
-    {
+    void testFolder_data() {
         QTest::addColumn<QString>("base");
         QTest::addColumn<QString>("concat");
         QTest::addColumn<QueryItems>("query");

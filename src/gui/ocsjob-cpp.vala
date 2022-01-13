@@ -25,42 +25,35 @@ namespace OCC {
 Q_LOGGING_CATEGORY(lcOcs, "nextcloud.gui.sharing.ocs", QtInfoMsg)
 
 OcsJob::OcsJob(AccountPtr account)
-    : AbstractNetworkJob(account, "")
-{
+    : AbstractNetworkJob(account, "") {
     _passStatusCodes.append(OCS_SUCCESS_STATUS_CODE);
     _passStatusCodes.append(OCS_SUCCESS_STATUS_CODE_V2);
     _passStatusCodes.append(OCS_NOT_MODIFIED_STATUS_CODE_V2);
     setIgnoreCredentialFailure(true);
 }
 
-void OcsJob::setVerb(const QByteArray &verb)
-{
+void OcsJob::setVerb(const QByteArray &verb) {
     _verb = verb;
 }
 
-void OcsJob::addParam(const QString &name, const QString &value)
-{
+void OcsJob::addParam(const QString &name, const QString &value) {
     _params.append(qMakePair(name, value));
 }
 
-void OcsJob::addPassStatusCode(int code)
-{
+void OcsJob::addPassStatusCode(int code) {
     _passStatusCodes.append(code);
 }
 
-void OcsJob::appendPath(const QString &id)
-{
+void OcsJob::appendPath(const QString &id) {
     setPath(path() + QLatin1Char('/') + id);
 }
 
-void OcsJob::addRawHeader(const QByteArray &headerName, const QByteArray &value)
-{
+void OcsJob::addRawHeader(const QByteArray &headerName, const QByteArray &value) {
     _request.setRawHeader(headerName, value);
 }
 
 static QUrlQuery percentEncodeQueryItems(
-    const QList<QPair<QString, QString>> &items)
-{
+    const QList<QPair<QString, QString>> &items) {
     QUrlQuery result;
     // Note: QUrlQuery::setQueryItems() does not fully percent encode
     // the query items, see #5042
@@ -72,8 +65,7 @@ static QUrlQuery percentEncodeQueryItems(
     return result;
 }
 
-void OcsJob::start()
-{
+void OcsJob::start() {
     addRawHeader("Ocs-APIREQUEST", "true");
     addRawHeader("Content-Type", "application/x-www-form-urlencoded");
 
@@ -101,8 +93,7 @@ void OcsJob::start()
     AbstractNetworkJob::start();
 }
 
-bool OcsJob::finished()
-{
+bool OcsJob::finished() {
     const QByteArray replyData = reply()->readAll();
 
     QJsonParseError error;
@@ -142,8 +133,7 @@ bool OcsJob::finished()
     return true;
 }
 
-int OcsJob::getJsonReturnCode(const QJsonDocument &json, QString &message)
-{
+int OcsJob::getJsonReturnCode(const QJsonDocument &json, QString &message) {
     //TODO proper checking
     auto meta = json.object().value("ocs").toObject().value("meta").toObject();
     int code = meta.value("statuscode").toInt();

@@ -45,19 +45,16 @@ Q_LOGGING_CATEGORY(lcSql, "nextcloud.sync.database.sql", QtInfoMsg)
 
 SqlDatabase::SqlDatabase() = default;
 
-SqlDatabase::~SqlDatabase()
-{
+SqlDatabase::~SqlDatabase() {
     close();
 }
 
 
-bool SqlDatabase::isOpen()
-{
+bool SqlDatabase::isOpen() {
     return _db != nullptr;
 }
 
-bool SqlDatabase::openHelper(const QString &filename, int sqliteFlags)
-{
+bool SqlDatabase::openHelper(const QString &filename, int sqliteFlags) {
     if (isOpen()) {
         return true;
     }
@@ -88,8 +85,7 @@ bool SqlDatabase::openHelper(const QString &filename, int sqliteFlags)
     return true;
 }
 
-SqlDatabase::CheckDbResult SqlDatabase::checkDb()
-{
+SqlDatabase::CheckDbResult SqlDatabase::checkDb() {
     // quick_check can fail with a disk IO error when diskspace is low
     SqlQuery quick_check(*this);
 
@@ -116,8 +112,7 @@ SqlDatabase::CheckDbResult SqlDatabase::checkDb()
     return CheckDbResult::Ok;
 }
 
-bool SqlDatabase::openOrCreateReadWrite(const QString &filename)
-{
+bool SqlDatabase::openOrCreateReadWrite(const QString &filename) {
     if (isOpen()) {
         return true;
     }
@@ -157,8 +152,7 @@ bool SqlDatabase::openOrCreateReadWrite(const QString &filename)
     return true;
 }
 
-bool SqlDatabase::openReadOnly(const QString &filename)
-{
+bool SqlDatabase::openReadOnly(const QString &filename) {
     if (isOpen()) {
         return true;
     }
@@ -176,15 +170,13 @@ bool SqlDatabase::openReadOnly(const QString &filename)
     return true;
 }
 
-QString SqlDatabase::error() const
-{
+QString SqlDatabase::error() const {
     const QString err(_error);
     // _error.clear();
     return err;
 }
 
-void SqlDatabase::close()
-{
+void SqlDatabase::close() {
     if (_db) {
         foreach (auto q, _queries) {
             q->finish();
@@ -196,8 +188,7 @@ void SqlDatabase::close()
     }
 }
 
-bool SqlDatabase::transaction()
-{
+bool SqlDatabase::transaction() {
     if (!_db) {
         return false;
     }
@@ -205,8 +196,7 @@ bool SqlDatabase::transaction()
     return _errId == SQLITE_OK;
 }
 
-bool SqlDatabase::commit()
-{
+bool SqlDatabase::commit() {
     if (!_db) {
         return false;
     }
@@ -214,8 +204,7 @@ bool SqlDatabase::commit()
     return _errId == SQLITE_OK;
 }
 
-sqlite3 *SqlDatabase::sqliteDb()
-{
+sqlite3 *SqlDatabase::sqliteDb() {
     return _db;
 }
 
@@ -223,12 +212,10 @@ sqlite3 *SqlDatabase::sqliteDb()
 
 SqlQuery::SqlQuery(SqlDatabase &db)
     : _sqldb(&db)
-    , _db(db.sqliteDb())
-{
+    , _db(db.sqliteDb()) {
 }
 
-SqlQuery::~SqlQuery()
-{
+SqlQuery::~SqlQuery() {
     if (_stmt) {
         finish();
     }
@@ -236,13 +223,11 @@ SqlQuery::~SqlQuery()
 
 SqlQuery::SqlQuery(const QByteArray &sql, SqlDatabase &db)
     : _sqldb(&db)
-    , _db(db.sqliteDb())
-{
+    , _db(db.sqliteDb()) {
     prepare(sql);
 }
 
-int SqlQuery::prepare(const QByteArray &sql, bool allow_failure)
-{
+int SqlQuery::prepare(const QByteArray &sql, bool allow_failure) {
     _sql = sql.trimmed();
     if (_stmt) {
         finish();
@@ -275,23 +260,19 @@ int SqlQuery::prepare(const QByteArray &sql, bool allow_failure)
  * There is no overloads to QByteArray::startWith that takes Qt::CaseInsensitive.
  * Returns true if 'a' starts with 'b' in a case insensitive way
  */
-static bool startsWithInsensitive(const QByteArray &a, const QByteArray &b)
-{
+static bool startsWithInsensitive(const QByteArray &a, const QByteArray &b) {
     return a.size() >= b.size() && qstrnicmp(a.constData(), b.constData(), static_cast<uint>(b.size())) == 0;
 }
 
-bool SqlQuery::isSelect()
-{
+bool SqlQuery::isSelect() {
     return startsWithInsensitive(_sql, QByteArrayLiteral("SELECT"));
 }
 
-bool SqlQuery::isPragma()
-{
+bool SqlQuery::isPragma() {
     return startsWithInsensitive(_sql, QByteArrayLiteral("PRAGMA"));
 }
 
-bool SqlQuery::exec()
-{
+bool SqlQuery::exec() {
     qCDebug(lcSql) << "SQL exec" << _sql;
 
     if (!_stmt) {
@@ -333,8 +314,7 @@ bool SqlQuery::exec()
     return true;
 }
 
-auto SqlQuery::next() -> NextResult
-{
+auto SqlQuery::next() -> NextResult {
     const bool firstStep = !sqlite3_stmt_busy(_stmt);
 
     int n = 0;
@@ -360,8 +340,7 @@ auto SqlQuery::next() -> NextResult
     return result;
 }
 
-void SqlQuery::bindValueInternal(int pos, const QVariant &value)
-{
+void SqlQuery::bindValueInternal(int pos, const QVariant &value) {
     int res = -1;
     if (!_stmt) {
         ASSERT(false);
@@ -425,54 +404,44 @@ void SqlQuery::bindValueInternal(int pos, const QVariant &value)
     ASSERT(res == SQLITE_OK);
 }
 
-bool SqlQuery::nullValue(int index)
-{
+bool SqlQuery::nullValue(int index) {
     return sqlite3_column_type(_stmt, index) == SQLITE_NULL;
 }
 
-QString SqlQuery::stringValue(int index)
-{
+QString SqlQuery::stringValue(int index) {
     return QString::fromUtf16(static_cast<const ushort *>(sqlite3_column_text16(_stmt, index)));
 }
 
-int SqlQuery::intValue(int index)
-{
+int SqlQuery::intValue(int index) {
     return sqlite3_column_int(_stmt, index);
 }
 
-quint64 SqlQuery::int64Value(int index)
-{
+quint64 SqlQuery::int64Value(int index) {
     return sqlite3_column_int64(_stmt, index);
 }
 
-QByteArray SqlQuery::baValue(int index)
-{
+QByteArray SqlQuery::baValue(int index) {
     return QByteArray(static_cast<const char *>(sqlite3_column_blob(_stmt, index)),
         sqlite3_column_bytes(_stmt, index));
 }
 
-QString SqlQuery::error() const
-{
+QString SqlQuery::error() const {
     return _error;
 }
 
-int SqlQuery::errorId() const
-{
+int SqlQuery::errorId() const {
     return _errId;
 }
 
-const QByteArray &SqlQuery::lastQuery() const
-{
+const QByteArray &SqlQuery::lastQuery() const {
     return _sql;
 }
 
-int SqlQuery::numRowsAffected()
-{
+int SqlQuery::numRowsAffected() {
     return sqlite3_changes(_db);
 }
 
-void SqlQuery::finish()
-{
+void SqlQuery::finish() {
     if (!_stmt)
         return;
     SQLITE_DO(sqlite3_finalize(_stmt));
@@ -482,8 +451,7 @@ void SqlQuery::finish()
     }
 }
 
-void SqlQuery::reset_and_clear_bindings()
-{
+void SqlQuery::reset_and_clear_bindings() {
     if (_stmt) {
         SQLITE_DO(sqlite3_reset(_stmt));
         SQLITE_DO(sqlite3_clear_bindings(_stmt));

@@ -29,8 +29,7 @@ namespace OCC {
  * @brief Job to fetch a icon
  * @ingroup gui
  */
-class OWNCLOUDSYNC_EXPORT IconJob : public QObject
-{
+class OWNCLOUDSYNC_EXPORT IconJob : public QObject {
 public:
     explicit IconJob(AccountPtr account, const QUrl &url, QObject *parent = nullptr);
 

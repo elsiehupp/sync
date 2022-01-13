@@ -26,8 +26,7 @@ Q_LOGGING_CATEGORY(lcGuiCredentials, "nextcloud.gui.credentials", QtInfoMsg)
 
 namespace CredentialsFactory {
 
-    AbstractCredentials *create(const QString &type)
-    {
+    AbstractCredentials *create(const QString &type) {
         // empty string might happen for old version of configuration
         if (type == "http" || type == "") {
             return new HttpCredentialsGui;

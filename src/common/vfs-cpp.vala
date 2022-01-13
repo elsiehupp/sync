@@ -30,14 +30,12 @@
 using namespace OCC;
 
 Vfs::Vfs(QObject* parent)
-    : QObject(parent)
-{
+    : QObject(parent) {
 }
 
 Vfs::~Vfs() = default;
 
-QString Vfs::modeToString(Mode mode)
-{
+QString Vfs::modeToString(Mode mode) {
     // Note: Strings are used for config and must be stable
     switch (mode) {
     case Off:
@@ -52,8 +50,7 @@ QString Vfs::modeToString(Mode mode)
     return QStringLiteral("off");
 }
 
-Optional<Vfs::Mode> Vfs::modeFromString(const QString &str)
-{
+Optional<Vfs::Mode> Vfs::modeFromString(const QString &str) {
     // Note: Strings are used for config and must be stable
     if (str == QLatin1String("off")) {
         return Off;
@@ -65,8 +62,7 @@ Optional<Vfs::Mode> Vfs::modeFromString(const QString &str)
     return {};
 }
 
-Result<bool, QString> Vfs::checkAvailability(const QString &path)
-{
+Result<bool, QString> Vfs::checkAvailability(const QString &path) {
     const auto mode = bestAvailableVfsMode();
 #ifdef Q_OS_WIN
     if (mode == Mode::WindowsCfApi) {
@@ -82,14 +78,12 @@ Result<bool, QString> Vfs::checkAvailability(const QString &path)
     return true;
 }
 
-void Vfs::start(const VfsSetupParams &params)
-{
+void Vfs::start(const VfsSetupParams &params) {
     _setupParams = params;
     startImpl(params);
 }
 
-bool Vfs::setPinStateInDb(const QString &folderPath, PinState state)
-{
+bool Vfs::setPinStateInDb(const QString &folderPath, PinState state) {
     auto path = folderPath.toUtf8();
     _setupParams.journal->internalPinStates().wipeForPathAndBelow(path);
     if (state != PinState::Inherited)
@@ -97,14 +91,12 @@ bool Vfs::setPinStateInDb(const QString &folderPath, PinState state)
     return true;
 }
 
-Optional<PinState> Vfs::pinStateInDb(const QString &folderPath)
-{
+Optional<PinState> Vfs::pinStateInDb(const QString &folderPath) {
     auto pin = _setupParams.journal->internalPinStates().effectiveForPath(folderPath.toUtf8());
     return pin;
 }
 
-Vfs::AvailabilityResult Vfs::availabilityInDb(const QString &folderPath)
-{
+Vfs::AvailabilityResult Vfs::availabilityInDb(const QString &folderPath) {
     auto path = folderPath.toUtf8();
     auto pin = _setupParams.journal->internalPinStates().effectiveForPathRecursive(path);
     // not being able to retrieve the pin state isn't too bad
@@ -129,14 +121,12 @@ Vfs::AvailabilityResult Vfs::availabilityInDb(const QString &folderPath)
 }
 
 VfsOff::VfsOff(QObject *parent)
-    : Vfs(parent)
-{
+    : Vfs(parent) {
 }
 
 VfsOff::~VfsOff() = default;
 
-static QString modeToPluginName(Vfs::Mode mode)
-{
+static QString modeToPluginName(Vfs::Mode mode) {
     if (mode == Vfs::WithSuffix)
         return QStringLiteral("suffix");
     if (mode == Vfs::WindowsCfApi)
@@ -148,8 +138,7 @@ static QString modeToPluginName(Vfs::Mode mode)
 
 Q_LOGGING_CATEGORY(lcPlugin, "plugins", QtInfoMsg)
 
-bool OCC::isVfsPluginAvailable(Vfs::Mode mode)
-{
+bool OCC::isVfsPluginAvailable(Vfs::Mode mode) {
     // TODO: cache plugins available?
     if (mode == Vfs::Off) {
         return true;
@@ -192,8 +181,7 @@ bool OCC::isVfsPluginAvailable(Vfs::Mode mode)
     return true;
 }
 
-Vfs::Mode OCC::bestAvailableVfsMode()
-{
+Vfs::Mode OCC::bestAvailableVfsMode() {
     if (isVfsPluginAvailable(Vfs::WindowsCfApi)) {
         return Vfs::WindowsCfApi;
     }
@@ -225,8 +213,7 @@ Vfs::Mode OCC::bestAvailableVfsMode()
     return Vfs::Off;
 }
 
-std::unique_ptr<Vfs> OCC::createVfsFromPlugin(Vfs::Mode mode)
-{
+std::unique_ptr<Vfs> OCC::createVfsFromPlugin(Vfs::Mode mode) {
     if (mode == Vfs::Off)
         return std::unique_ptr<Vfs>(new VfsOff);
 

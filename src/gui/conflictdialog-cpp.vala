@@ -26,15 +26,13 @@
 // #include <QUrl>
 
 namespace {
-void forceHeaderFont(QWidget *widget)
-{
+void forceHeaderFont(QWidget *widget) {
     auto font = widget->font();
     font.setPointSizeF(font.pointSizeF() * 1.5);
     widget->setFont(font);
 }
 
-void setBoldFont(QWidget *widget, bool bold)
-{
+void setBoldFont(QWidget *widget, bool bold) {
     auto font = widget->font();
     font.setBold(bold);
     widget->setFont(font);
@@ -46,8 +44,7 @@ namespace OCC {
 ConflictDialog::ConflictDialog(QWidget *parent)
     : QDialog(parent)
     , _ui(new Ui::ConflictDialog)
-    , _solver(new ConflictSolver(this))
-{
+    , _solver(new ConflictSolver(this)) {
     _ui->setupUi(this);
     forceHeaderFont(_ui->conflictMessage);
     _ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
@@ -67,25 +64,21 @@ ConflictDialog::ConflictDialog(QWidget *parent)
     connect(_solver, &ConflictSolver::remoteVersionFilenameChanged, this, &ConflictDialog::updateWidgets);
 }
 
-QString ConflictDialog::baseFilename() const
-{
+QString ConflictDialog::baseFilename() const {
     return _baseFilename;
 }
 
 ConflictDialog::~ConflictDialog() = default;
 
-QString ConflictDialog::localVersionFilename() const
-{
+QString ConflictDialog::localVersionFilename() const {
     return _solver->localVersionFilename();
 }
 
-QString ConflictDialog::remoteVersionFilename() const
-{
+QString ConflictDialog::remoteVersionFilename() const {
     return _solver->remoteVersionFilename();
 }
 
-void ConflictDialog::setBaseFilename(const QString &baseFilename)
-{
+void ConflictDialog::setBaseFilename(const QString &baseFilename) {
     if (_baseFilename == baseFilename) {
         return;
     }
@@ -94,18 +87,15 @@ void ConflictDialog::setBaseFilename(const QString &baseFilename)
     _ui->conflictMessage->setText(tr("Conflicting versions of %1.").arg(_baseFilename));
 }
 
-void ConflictDialog::setLocalVersionFilename(const QString &localVersionFilename)
-{
+void ConflictDialog::setLocalVersionFilename(const QString &localVersionFilename) {
     _solver->setLocalVersionFilename(localVersionFilename);
 }
 
-void ConflictDialog::setRemoteVersionFilename(const QString &remoteVersionFilename)
-{
+void ConflictDialog::setRemoteVersionFilename(const QString &remoteVersionFilename) {
     _solver->setRemoteVersionFilename(remoteVersionFilename);
 }
 
-void ConflictDialog::accept()
-{
+void ConflictDialog::accept() {
     const auto isLocalPicked = _ui->localVersionRadio->isChecked();
     const auto isRemotePicked = _ui->remoteVersionRadio->isChecked();
 
@@ -122,8 +112,7 @@ void ConflictDialog::accept()
     }
 }
 
-void ConflictDialog::updateWidgets()
-{
+void ConflictDialog::updateWidgets() {
     QMimeDatabase mimeDb;
 
     const auto updateGroup = [this, &mimeDb](const QString &filename, QLabel *linkLabel, const QString &linkText, QLabel *mtimeLabel, QLabel *sizeLabel, QToolButton *button) {
@@ -165,8 +154,7 @@ void ConflictDialog::updateWidgets()
     setBoldFont(_ui->remoteVersionMtime, remoteMtime > localMtime);
 }
 
-void ConflictDialog::updateButtonStates()
-{
+void ConflictDialog::updateButtonStates() {
     const auto isLocalPicked = _ui->localVersionRadio->isChecked();
     const auto isRemotePicked = _ui->remoteVersionRadio->isChecked();
     _ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(isLocalPicked || isRemotePicked);

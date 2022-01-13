@@ -36,16 +36,14 @@ Q_LOGGING_CATEGORY(lcUpdater, "nextcloud.gui.updater", QtInfoMsg)
 
 Updater *Updater::_instance = nullptr;
 
-Updater *Updater::instance()
-{
+Updater *Updater::instance() {
     if (!_instance) {
         _instance = create();
     }
     return _instance;
 }
 
-QUrl Updater::updateUrl()
-{
+QUrl Updater::updateUrl() {
     QUrl updateBaseUrl(QString::fromLocal8Bit(qgetenv("OCC_UPDATE_URL")));
     if (updateBaseUrl.isEmpty()) {
         updateBaseUrl = QUrl(QLatin1String(APPLICATION_UPDATE_URL));
@@ -69,8 +67,7 @@ QUrl Updater::updateUrl()
     return updateBaseUrl;
 }
 
-QUrlQuery Updater::getQueryParams()
-{
+QUrlQuery Updater::getQueryParams() {
     QUrlQuery query;
     Theme *theme = Theme::instance();
     QString platform = QStringLiteral("stranger");
@@ -114,8 +111,7 @@ QUrlQuery Updater::getQueryParams()
 }
 
 
-QString Updater::getSystemInfo()
-{
+QString Updater::getSystemInfo() {
 #ifdef Q_OS_LINUX
     QProcess process;
     process.start(QLatin1String("lsb_release"), { QStringLiteral("-a") });
@@ -132,8 +128,7 @@ QString Updater::getSystemInfo()
 }
 
 // To test, cmake with -DAPPLICATION_UPDATE_URL="http://127.0.0.1:8080/test.rss"
-Updater *Updater::create()
-{
+Updater *Updater::create() {
     auto url = updateUrl();
     qCDebug(lcUpdater) << url;
     if (url.isEmpty()) {
@@ -153,19 +148,16 @@ Updater *Updater::create()
 }
 
 
-qint64 Updater::Helper::versionToInt(qint64 major, qint64 minor, qint64 patch, qint64 build)
-{
+qint64 Updater::Helper::versionToInt(qint64 major, qint64 minor, qint64 patch, qint64 build) {
     return major << 56 | minor << 48 | patch << 40 | build;
 }
 
-qint64 Updater::Helper::currentVersionToInt()
-{
+qint64 Updater::Helper::currentVersionToInt() {
     return versionToInt(MIRALL_VERSION_MAJOR, MIRALL_VERSION_MINOR,
         MIRALL_VERSION_PATCH, MIRALL_VERSION_BUILD);
 }
 
-qint64 Updater::Helper::stringVersionToInt(const QString &version)
-{
+qint64 Updater::Helper::stringVersionToInt(const QString &version) {
     if (version.isEmpty())
         return 0;
     QByteArray baVersion = version.toLatin1();
@@ -174,8 +166,7 @@ qint64 Updater::Helper::stringVersionToInt(const QString &version)
     return versionToInt(major, minor, patch, build);
 }
 
-QString Updater::clientVersion()
-{
+QString Updater::clientVersion() {
     return QString::fromLatin1(MIRALL_STRINGIFY(MIRALL_VERSION_FULL));
 }
 

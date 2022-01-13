@@ -21,18 +21,15 @@ namespace OCC {
 Q_LOGGING_CATEGORY(lcDeleteJob, "nextcloud.sync.networkjob.delete", QtInfoMsg)
 
 DeleteJob::DeleteJob(AccountPtr account, const QString &path, QObject *parent)
-    : AbstractNetworkJob(account, path, parent)
-{
+    : AbstractNetworkJob(account, path, parent) {
 }
 
 DeleteJob::DeleteJob(AccountPtr account, const QUrl &url, QObject *parent)
     : AbstractNetworkJob(account, QString(), parent)
-    , _url(url)
-{
+    , _url(url) {
 }
 
-void DeleteJob::start()
-{
+void DeleteJob::start() {
     QNetworkRequest req;
     if (!_folderToken.isEmpty()) {
         req.setRawHeader("e2e-token", _folderToken);
@@ -50,8 +47,7 @@ void DeleteJob::start()
     AbstractNetworkJob::start();
 }
 
-bool DeleteJob::finished()
-{
+bool DeleteJob::finished() {
     qCInfo(lcDeleteJob) << "DELETE of" << reply()->request().url() << "FINISHED WITH STATUS"
                        << replyStatusString();
 
@@ -59,13 +55,11 @@ bool DeleteJob::finished()
     return true;
 }
 
-QByteArray DeleteJob::folderToken() const
-{
+QByteArray DeleteJob::folderToken() const {
     return _folderToken;
 }
 
-void DeleteJob::setFolderToken(const QByteArray &folderToken)
-{
+void DeleteJob::setFolderToken(const QByteArray &folderToken) {
     _folderToken = folderToken;
 }
 

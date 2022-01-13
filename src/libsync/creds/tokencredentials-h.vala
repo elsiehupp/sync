@@ -28,8 +28,7 @@ class Job;
 namespace OCC {
 
 class TokenCredentialsAccessManager;
-class OWNCLOUDSYNC_EXPORT TokenCredentials : public AbstractCredentials
-{
+class OWNCLOUDSYNC_EXPORT TokenCredentials : public AbstractCredentials {
 
 public:
     friend class TokenCredentialsAccessManager;

@@ -22,12 +22,10 @@ namespace Ui {
     Q_LOGGING_CATEGORY(lcSvgImageProvider, "nextcloud.gui.svgimageprovider", QtInfoMsg)
 
     SvgImageProvider::SvgImageProvider()
-        : QQuickImageProvider(QQuickImageProvider::Image)
-    {
+        : QQuickImageProvider(QQuickImageProvider::Image) {
     }
 
-    QImage SvgImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
-    {
+    QImage SvgImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize) {
         Q_ASSERT(!id.isEmpty());
 
         const auto idSplit = id.split(QStringLiteral("/"), Qt::SkipEmptyParts);

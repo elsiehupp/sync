@@ -31,8 +31,7 @@ namespace OCC {
 
 Q_DECLARE_LOGGING_CATEGORY(lcSharing)
 
-class Sharee
-{
+class Sharee {
 public:
     // Keep in sync with Share::ShareType
     enum Type {
@@ -60,8 +59,7 @@ private:
 };
 
 
-class ShareeModel : public QAbstractListModel
-{
+class ShareeModel : public QAbstractListModel {
 public:
     enum LookupMode {
         LocalSearch = 0,

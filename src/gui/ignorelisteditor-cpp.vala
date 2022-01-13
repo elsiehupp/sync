@@ -30,8 +30,7 @@ namespace OCC {
 
 IgnoreListEditor::IgnoreListEditor(QWidget *parent)
     : QDialog(parent)
-    , ui(new Ui::IgnoreListEditor)
-{
+    , ui(new Ui::IgnoreListEditor) {
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     ui->setupUi(this);
 
@@ -62,25 +61,21 @@ IgnoreListEditor::IgnoreListEditor(QWidget *parent)
     ui->syncHiddenFilesCheckBox->setChecked(!FolderMan::instance()->ignoreHiddenFiles());
 }
 
-IgnoreListEditor::~IgnoreListEditor()
-{
+IgnoreListEditor::~IgnoreListEditor() {
     delete ui;
 }
 
-void IgnoreListEditor::setupTableReadOnlyItems()
-{
+void IgnoreListEditor::setupTableReadOnlyItems() {
     ui->ignoreTableWidget->addPattern(".csync_journal.db*", /*deletable=*/false, /*readonly=*/true);
     ui->ignoreTableWidget->addPattern("._sync_*.db*", /*deletable=*/false, /*readonly=*/true);
     ui->ignoreTableWidget->addPattern(".sync_*.db*", /*deletable=*/false, /*readonly=*/true);
 }
 
-bool IgnoreListEditor::ignoreHiddenFiles()
-{
+bool IgnoreListEditor::ignoreHiddenFiles() {
     return !ui->syncHiddenFilesCheckBox->isChecked();
 }
 
-void IgnoreListEditor::slotRestoreDefaults(QAbstractButton *button)
-{
+void IgnoreListEditor::slotRestoreDefaults(QAbstractButton *button) {
     if(ui->buttonBox->buttonRole(button) != QDialogButtonBox::ResetRole)
         return;
 

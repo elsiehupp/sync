@@ -29,8 +29,7 @@ namespace EncryptionHelper {
     class StreamingDecryptor;
 };
 
-class HydrationJob : public QObject
-{
+class HydrationJob : public QObject {
 public:
     enum Status {
         Success = 0,

@@ -61,8 +61,7 @@ class QFile;
  * selective sync blacklist functionality is a different thing
  * entirely.
  */
-class OCSYNC_EXPORT ExcludedFiles : public QObject
-{
+class OCSYNC_EXPORT ExcludedFiles : public QObject {
 public:
     using Version = std::tuple<int, int, int>;
 
@@ -176,18 +175,15 @@ private:
     CSYNC_EXCLUDE_TYPE fullPatternMatch(const QString &path, ItemType filetype) const;
 
     // Our BasePath need to end with '/'
-    class BasePathString : public QString
-    {
+    class BasePathString : public QString {
     public:
         BasePathString(QString &&other)
-            : QString(std::move(other))
-        {
+            : QString(std::move(other)) {
             Q_ASSERT(endsWith(QLatin1Char('/')));
         }
 
         BasePathString(const QString &other)
-            : QString(other)
-        {
+            : QString(other) {
             Q_ASSERT(endsWith(QLatin1Char('/')));
         }
     };

@@ -35,8 +35,7 @@ class SqlQuery;
  * @brief The SqlDatabase class
  * @ingroup libsync
  */
-class OCSYNC_EXPORT SqlDatabase
-{
+class OCSYNC_EXPORT SqlDatabase {
     Q_DISABLE_COPY(SqlDatabase)
 public:
     explicit SqlDatabase();
@@ -94,8 +93,7 @@ private:
     q3.exec(...)
  *
  */
-class OCSYNC_EXPORT SqlQuery
-{
+class OCSYNC_EXPORT SqlQuery {
     Q_DISABLE_COPY(SqlQuery)
 public:
     explicit SqlQuery() = default;
@@ -123,29 +121,25 @@ public:
     bool isPragma();
     bool exec();
 
-    struct NextResult
-    {
+    struct NextResult {
         bool ok = false;
         bool hasData = false;
     };
     NextResult next();
 
     template<class T, typename std::enable_if<std::is_enum<T>::value, int>::type = 0>
-    void bindValue(int pos, const T &value)
-    {
+    void bindValue(int pos, const T &value) {
         qCDebug(lcSql) << "SQL bind" << pos << value;
         bindValueInternal(pos, static_cast<int>(value));
     }
 
     template<class T, typename std::enable_if<!std::is_enum<T>::value, int>::type = 0>
-    void bindValue(int pos, const T &value)
-    {
+    void bindValue(int pos, const T &value) {
         qCDebug(lcSql) << "SQL bind" << pos << value;
         bindValueInternal(pos, value);
     }
 
-    void bindValue(int pos, const QByteArray &value)
-    {
+    void bindValue(int pos, const QByteArray &value) {
         qCDebug(lcSql) << "SQL bind" << pos << QString::fromUtf8(value);
         bindValueInternal(pos, value);
     }

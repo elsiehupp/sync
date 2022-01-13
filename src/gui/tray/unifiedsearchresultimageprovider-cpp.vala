@@ -21,11 +21,9 @@
 // #include <QSvgRenderer>
 
 namespace {
-class AsyncImageResponse : public QQuickImageResponse
-{
+class AsyncImageResponse : public QQuickImageResponse {
 public:
-    AsyncImageResponse(const QString &id, const QSize &requestedSize)
-    {
+    AsyncImageResponse(const QString &id, const QSize &requestedSize) {
         if (id.isEmpty()) {
             setImageAndEmitFinished();
             return;
@@ -41,20 +39,17 @@ public:
         }
     }
 
-    void setImageAndEmitFinished(const QImage &image = {})
-    {
+    void setImageAndEmitFinished(const QImage &image = {}) {
         _image = image;
         emit finished();
     }
 
-    QQuickTextureFactory *textureFactory() const override
-    {
+    QQuickTextureFactory *textureFactory() const override {
         return QQuickTextureFactory::textureFactoryForImage(_image);
     }
 
 private:
-    void processNextImage()
-    {
+    void processNextImage() {
         if (_index < 0 || _index >= _imagePaths.size()) {
             setImageAndEmitFinished();
             return;
@@ -81,8 +76,7 @@ private:
     }
 
 private slots:
-    void slotProcessNetworkReply()
-    {
+    void slotProcessNetworkReply() {
         const auto reply = qobject_cast<QNetworkReply *>(sender());
         if (!reply) {
             setImageAndEmitFinished();
@@ -123,8 +117,7 @@ private slots:
 
 namespace OCC {
 
-QQuickImageResponse *UnifiedSearchResultImageProvider::requestImageResponse(const QString &id, const QSize &requestedSize)
-{
+QQuickImageResponse *UnifiedSearchResultImageProvider::requestImageResponse(const QString &id, const QSize &requestedSize) {
     return new AsyncImageResponse(id, requestedSize);
 }
 

@@ -29,8 +29,7 @@ class SyncFileItem;
  * @brief The SyncRunFileLog class
  * @ingroup gui
  */
-class SyncRunFileLog
-{
+class SyncRunFileLog {
 public:
     SyncRunFileLog();
     void start(const QString &folderPath);

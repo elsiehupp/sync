@@ -11,8 +11,7 @@ Q_LOGGING_CATEGORY(lcFakeWebSocketServer, "nextcloud.test.fakewebserver", QtInfo
 
 FakeWebSocketServer::FakeWebSocketServer(quint16 port, QObject *parent)
     : QObject(parent)
-    , _webSocketServer(new QWebSocketServer(QStringLiteral("Fake Server"), QWebSocketServer::NonSecureMode, this))
-{
+    , _webSocketServer(new QWebSocketServer(QStringLiteral("Fake Server"), QWebSocketServer::NonSecureMode, this)) {
     if (!_webSocketServer->listen(QHostAddress::Any, port)) {
         Q_UNREACHABLE();
     }
@@ -22,13 +21,11 @@ FakeWebSocketServer::FakeWebSocketServer(quint16 port, QObject *parent)
     _processTextMessageSpy = std::make_unique<QSignalSpy>(this, &FakeWebSocketServer::processTextMessage);
 }
 
-FakeWebSocketServer::~FakeWebSocketServer()
-{
+FakeWebSocketServer::~FakeWebSocketServer() {
     close();
 }
 
-QWebSocket *FakeWebSocketServer::authenticateAccount(const OCC::AccountPtr account, std::function<void(OCC::PushNotifications *pushNotifications)> beforeAuthentication, std::function<void(void)> afterAuthentication)
-{
+QWebSocket *FakeWebSocketServer::authenticateAccount(const OCC::AccountPtr account, std::function<void(OCC::PushNotifications *pushNotifications)> beforeAuthentication, std::function<void(void)> afterAuthentication) {
     const auto pushNotifications = account->pushNotifications();
     Q_ASSERT(pushNotifications);
     QSignalSpy readySpy(pushNotifications, &OCC::PushNotifications::ready);
@@ -67,8 +64,7 @@ QWebSocket *FakeWebSocketServer::authenticateAccount(const OCC::AccountPtr accou
     return socket;
 }
 
-void FakeWebSocketServer::close()
-{
+void FakeWebSocketServer::close() {
     if (_webSocketServer->isListening()) {
         qCInfo(lcFakeWebSocketServer) << "Close fake websocket server";
 
@@ -77,14 +73,12 @@ void FakeWebSocketServer::close()
     }
 }
 
-void FakeWebSocketServer::processTextMessageInternal(const QString &message)
-{
+void FakeWebSocketServer::processTextMessageInternal(const QString &message) {
     auto client = qobject_cast<QWebSocket *>(sender());
     emit processTextMessage(client, message);
 }
 
-void FakeWebSocketServer::onNewConnection()
-{
+void FakeWebSocketServer::onNewConnection() {
     qCInfo(lcFakeWebSocketServer) << "New connection on fake websocket server";
 
     auto socket = _webSocketServer->nextPendingConnection();
@@ -95,8 +89,7 @@ void FakeWebSocketServer::onNewConnection()
     _clients << socket;
 }
 
-void FakeWebSocketServer::socketDisconnected()
-{
+void FakeWebSocketServer::socketDisconnected() {
     qCInfo(lcFakeWebSocketServer) << "Socket disconnected";
 
     auto client = qobject_cast<QWebSocket *>(sender());
@@ -107,35 +100,29 @@ void FakeWebSocketServer::socketDisconnected()
     }
 }
 
-bool FakeWebSocketServer::waitForTextMessages() const
-{
+bool FakeWebSocketServer::waitForTextMessages() const {
     return _processTextMessageSpy->wait();
 }
 
-uint32_t FakeWebSocketServer::textMessagesCount() const
-{
+uint32_t FakeWebSocketServer::textMessagesCount() const {
     return _processTextMessageSpy->count();
 }
 
-QString FakeWebSocketServer::textMessage(int messageNumber) const
-{
+QString FakeWebSocketServer::textMessage(int messageNumber) const {
     Q_ASSERT(0 <= messageNumber && messageNumber < _processTextMessageSpy->count());
     return _processTextMessageSpy->at(messageNumber).at(1).toString();
 }
 
-QWebSocket *FakeWebSocketServer::socketForTextMessage(int messageNumber) const
-{
+QWebSocket *FakeWebSocketServer::socketForTextMessage(int messageNumber) const {
     Q_ASSERT(0 <= messageNumber && messageNumber < _processTextMessageSpy->count());
     return _processTextMessageSpy->at(messageNumber).at(0).value<QWebSocket *>();
 }
 
-void FakeWebSocketServer::clearTextMessages()
-{
+void FakeWebSocketServer::clearTextMessages() {
     _processTextMessageSpy->clear();
 }
 
-OCC::AccountPtr FakeWebSocketServer::createAccount(const QString &username, const QString &password)
-{
+OCC::AccountPtr FakeWebSocketServer::createAccount(const QString &username, const QString &password) {
     auto account = OCC::Account::create();
 
     QStringList typeList;
@@ -165,32 +152,26 @@ OCC::AccountPtr FakeWebSocketServer::createAccount(const QString &username, cons
 
 CredentialsStub::CredentialsStub(const QString &user, const QString &password)
     : _user(user)
-    , _password(password)
-{
+    , _password(password) {
 }
 
-QString CredentialsStub::authType() const
-{
+QString CredentialsStub::authType() const {
     return "";
 }
 
-QString CredentialsStub::user() const
-{
+QString CredentialsStub::user() const {
     return _user;
 }
 
-QString CredentialsStub::password() const
-{
+QString CredentialsStub::password() const {
     return _password;
 }
 
-QNetworkAccessManager *CredentialsStub::createQNAM() const
-{
+QNetworkAccessManager *CredentialsStub::createQNAM() const {
     return nullptr;
 }
 
-bool CredentialsStub::ready() const
-{
+bool CredentialsStub::ready() const {
     return false;
 }
 
@@ -198,8 +179,7 @@ void CredentialsStub::fetchFromKeychain() { }
 
 void CredentialsStub::askFromUser() { }
 
-bool CredentialsStub::stillValid(QNetworkReply * /*reply*/)
-{
+bool CredentialsStub::stillValid(QNetworkReply * /*reply*/) {
     return false;
 }
 

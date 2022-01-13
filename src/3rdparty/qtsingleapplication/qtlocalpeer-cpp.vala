@@ -49,8 +49,7 @@ namespace SharedTools {
 
 static const char ack[] = "ack";
 
-QString QtLocalPeer::appSessionId(const QString &appId)
-{
+QString QtLocalPeer::appSessionId(const QString &appId) {
     QByteArray idc = appId.toUtf8();
     quint16 idNum = qChecksum(idc.constData(), idc.size());
     //### could do: two 16bit checksums over separate halves of id, for a 32bit result - improved uniqeness probability. Every-other-char split would be best.
@@ -74,8 +73,7 @@ QString QtLocalPeer::appSessionId(const QString &appId)
 }
 
 QtLocalPeer::QtLocalPeer(QObject *parent, const QString &appId)
-    : QObject(parent), id(appId)
-{
+    : QObject(parent), id(appId) {
     if (id.isEmpty())
         id = QCoreApplication::applicationFilePath();  //### On win, check if this returns .../argv[0] without casefolding; .\MYAPP == .\myapp on Win
 
@@ -88,8 +86,7 @@ QtLocalPeer::QtLocalPeer(QObject *parent, const QString &appId)
     lockFile.open(QIODevice::ReadWrite);
 }
 
-bool QtLocalPeer::isClient()
-{
+bool QtLocalPeer::isClient() {
     if (lockFile.isLocked())
         return false;
 
@@ -105,8 +102,7 @@ bool QtLocalPeer::isClient()
     return false;
 }
 
-bool QtLocalPeer::sendMessage(const QString &message, int timeout, bool block)
-{
+bool QtLocalPeer::sendMessage(const QString &message, int timeout, bool block) {
     if (!isClient())
         return false;
 
@@ -140,8 +136,7 @@ bool QtLocalPeer::sendMessage(const QString &message, int timeout, bool block)
     return res;
 }
 
-void QtLocalPeer::receiveConnection()
-{
+void QtLocalPeer::receiveConnection() {
     QLocalSocket* socket = server->nextPendingConnection();
     if (!socket)
         return;

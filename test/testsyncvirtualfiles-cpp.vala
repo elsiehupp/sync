@@ -15,21 +15,18 @@ using namespace OCC;
 
 #define DVSUFFIX APPLICATION_DOTVIRTUALFILE_SUFFIX
 
-bool itemInstruction(const ItemCompletedSpy &spy, const QString &path, const SyncInstructions instr)
-{
+bool itemInstruction(const ItemCompletedSpy &spy, const QString &path, const SyncInstructions instr) {
     auto item = spy.findItem(path);
     return item->_instruction == instr;
 }
 
-SyncJournalFileRecord dbRecord(FakeFolder &folder, const QString &path)
-{
+SyncJournalFileRecord dbRecord(FakeFolder &folder, const QString &path) {
     SyncJournalFileRecord record;
     folder.syncJournal().getFileRecord(path, &record);
     return record;
 }
 
-void triggerDownload(FakeFolder &folder, const QByteArray &path)
-{
+void triggerDownload(FakeFolder &folder, const QByteArray &path) {
     auto &journal = folder.syncJournal();
     SyncJournalFileRecord record;
     journal.getFileRecord(path + DVSUFFIX, &record);
@@ -40,8 +37,7 @@ void triggerDownload(FakeFolder &folder, const QByteArray &path)
     journal.schedulePathForRemoteDiscovery(record._path);
 }
 
-void markForDehydration(FakeFolder &folder, const QByteArray &path)
-{
+void markForDehydration(FakeFolder &folder, const QByteArray &path) {
     auto &journal = folder.syncJournal();
     SyncJournalFileRecord record;
     journal.getFileRecord(path, &record);
@@ -52,8 +48,7 @@ void markForDehydration(FakeFolder &folder, const QByteArray &path)
     journal.schedulePathForRemoteDiscovery(record._path);
 }
 
-QSharedPointer<Vfs> setupVfs(FakeFolder &folder)
-{
+QSharedPointer<Vfs> setupVfs(FakeFolder &folder) {
     auto suffixVfs = QSharedPointer<Vfs>(createVfsFromPlugin(Vfs::WithSuffix).release());
     folder.switchToVfs(suffixVfs);
 
@@ -64,20 +59,17 @@ QSharedPointer<Vfs> setupVfs(FakeFolder &folder)
     return suffixVfs;
 }
 
-class TestSyncVirtualFiles : public QObject
-{
+class TestSyncVirtualFiles : public QObject {
 
 private slots:
-    void testVirtualFileLifecycle_data()
-    {
+    void testVirtualFileLifecycle_data() {
         QTest::addColumn<bool>("doLocalDiscovery");
 
         QTest::newRow("full local discovery") << true;
         QTest::newRow("skip local discovery") << false;
     }
 
-    void testVirtualFileLifecycle()
-    {
+    void testVirtualFileLifecycle() {
         QFETCH(bool, doLocalDiscovery);
 
         FakeFolder fakeFolder{ FileInfo() };
@@ -199,8 +191,7 @@ private slots:
         cleanup();
     }
 
-    void testVirtualFileConflict()
-    {
+    void testVirtualFileConflict() {
         FakeFolder fakeFolder{ FileInfo() };
         setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -270,8 +261,7 @@ private slots:
         cleanup();
     }
 
-    void testWithNormalSync()
-    {
+    void testWithNormalSync() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -306,8 +296,7 @@ private slots:
         cleanup();
     }
 
-    void testVirtualFileDownload()
-    {
+    void testVirtualFileDownload() {
         FakeFolder fakeFolder{ FileInfo() };
         setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -421,8 +410,7 @@ private slots:
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
     }
 
-    void testVirtualFileDownloadResume()
-    {
+    void testVirtualFileDownloadResume() {
         FakeFolder fakeFolder{ FileInfo() };
         setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -462,8 +450,7 @@ private slots:
         QVERIFY(!dbRecord(fakeFolder, "A/a1" DVSUFFIX).isValid());
     }
 
-    void testNewFilesNotVirtual()
-    {
+    void testNewFilesNotVirtual() {
         FakeFolder fakeFolder{ FileInfo() };
         setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -482,8 +469,7 @@ private slots:
         QVERIFY(!fakeFolder.currentLocalState().find("A/a2" DVSUFFIX));
     }
 
-    void testDownloadRecursive()
-    {
+    void testDownloadRecursive() {
         FakeFolder fakeFolder{ FileInfo() };
         setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -579,8 +565,7 @@ private slots:
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
     }
 
-    void testRenameToVirtual()
-    {
+    void testRenameToVirtual() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -620,8 +605,7 @@ private slots:
         cleanup();
     }
 
-    void testRenameVirtual()
-    {
+    void testRenameVirtual() {
         FakeFolder fakeFolder{ FileInfo() };
         setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -676,8 +660,7 @@ private slots:
         cleanup();
     }
 
-    void testRenameVirtual2()
-    {
+    void testRenameVirtual2() {
         FakeFolder fakeFolder{ FileInfo() };
         setupVfs(fakeFolder);
         ItemCompletedSpy completeSpy(fakeFolder);
@@ -763,8 +746,7 @@ private slots:
     }
 
     // Dehydration via sync works
-    void testSyncDehydration()
-    {
+    void testSyncDehydration() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         setupVfs(fakeFolder);
 
@@ -855,8 +837,7 @@ private slots:
         QCOMPARE(fakeFolder.currentRemoteState(), expectedRemoteState);
     }
 
-    void testWipeVirtualSuffixFiles()
-    {
+    void testWipeVirtualSuffixFiles() {
         FakeFolder fakeFolder{ FileInfo{} };
         setupVfs(fakeFolder);
 
@@ -900,8 +881,7 @@ private slots:
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
     }
 
-    void testNewVirtuals()
-    {
+    void testNewVirtuals() {
         FakeFolder fakeFolder{ FileInfo() };
         setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -979,8 +959,7 @@ private slots:
 
     // Check what happens if vfs-suffixed files exist on the server or locally
     // while the file is hydrated
-    void testSuffixFilesWhileLocalHydrated()
-    {
+    void testSuffixFilesWhileLocalHydrated() {
         FakeFolder fakeFolder{ FileInfo() };
 
         ItemCompletedSpy completeSpy(fakeFolder);
@@ -1100,8 +1079,7 @@ private slots:
     }
 
     // Check what happens if vfs-suffixed files exist on the server or in the db
-    void testExtraFilesLocalDehydrated()
-    {
+    void testExtraFilesLocalDehydrated() {
         FakeFolder fakeFolder{ FileInfo() };
         setupVfs(fakeFolder);
 
@@ -1156,8 +1134,7 @@ private slots:
         cleanup();
     }
 
-    void testAvailability()
-    {
+    void testAvailability() {
         FakeFolder fakeFolder{ FileInfo() };
         auto vfs = setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -1222,8 +1199,7 @@ private slots:
         QCOMPARE(r.error(), Vfs::AvailabilityError::NoSuchItem);
     }
 
-    void testPinStateLocals()
-    {
+    void testPinStateLocals() {
         FakeFolder fakeFolder{ FileInfo() };
         auto vfs = setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
@@ -1304,8 +1280,7 @@ private slots:
         QCOMPARE(*vfs->pinState("onlinerenamed2/file1rename" DVSUFFIX), PinState::OnlineOnly);
     }
 
-    void testIncompatiblePins()
-    {
+    void testIncompatiblePins() {
         FakeFolder fakeFolder{ FileInfo() };
         auto vfs = setupVfs(fakeFolder);
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());

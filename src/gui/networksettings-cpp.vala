@@ -30,8 +30,7 @@ namespace OCC {
 
 NetworkSettings::NetworkSettings(QWidget *parent)
     : QWidget(parent)
-    , _ui(new Ui::NetworkSettings)
-{
+    , _ui(new Ui::NetworkSettings) {
     _ui->setupUi(this);
 
     _ui->hostLineEdit->setPlaceholderText(tr("Hostname of proxy server"));
@@ -85,21 +84,18 @@ NetworkSettings::NetworkSettings(QWidget *parent)
     checkAccountLocalhost();
 }
 
-NetworkSettings::~NetworkSettings()
-{
+NetworkSettings::~NetworkSettings() {
     delete _ui;
 }
 
-QSize NetworkSettings::sizeHint() const
-{
+QSize NetworkSettings::sizeHint() const {
     return {
         ownCloudGui::settingsDialogSize().width(),
         QWidget::sizeHint().height()
     };
 }
 
-void NetworkSettings::loadProxySettings()
-{
+void NetworkSettings::loadProxySettings() {
     if (Theme::instance()->forceSystemNetworkProxy()) {
         _ui->systemProxyRadioButton->setChecked(true);
         _ui->proxyGroupBox->setEnabled(false);
@@ -134,8 +130,7 @@ void NetworkSettings::loadProxySettings()
     _ui->passwordLineEdit->setText(cfgFile.proxyPassword());
 }
 
-void NetworkSettings::loadBWLimitSettings()
-{
+void NetworkSettings::loadBWLimitSettings() {
     ConfigFile cfgFile;
 
     int useDownloadLimit = cfgFile.useDownloadLimit();
@@ -159,8 +154,7 @@ void NetworkSettings::loadBWLimitSettings()
     _ui->uploadSpinBox->setValue(cfgFile.uploadLimit());
 }
 
-void NetworkSettings::saveProxySettings()
-{
+void NetworkSettings::saveProxySettings() {
     ConfigFile cfgFile;
 
     checkEmptyProxyHost();
@@ -194,8 +188,7 @@ void NetworkSettings::saveProxySettings()
     }
 }
 
-void NetworkSettings::saveBWLimitSettings()
-{
+void NetworkSettings::saveBWLimitSettings() {
     ConfigFile cfgFile;
     if (_ui->downloadLimitRadioButton->isChecked()) {
         cfgFile.setUseDownloadLimit(1);
@@ -218,8 +211,7 @@ void NetworkSettings::saveBWLimitSettings()
     FolderMan::instance()->setDirtyNetworkLimits();
 }
 
-void NetworkSettings::checkEmptyProxyHost()
-{
+void NetworkSettings::checkEmptyProxyHost() {
     if (_ui->hostLineEdit->isEnabled() && _ui->hostLineEdit->text().isEmpty()) {
         _ui->hostLineEdit->setStyleSheet("border: 1px solid red");
     } else {
@@ -227,8 +219,7 @@ void NetworkSettings::checkEmptyProxyHost()
     }
 }
 
-void NetworkSettings::showEvent(QShowEvent *event)
-{
+void NetworkSettings::showEvent(QShowEvent *event) {
     if (!event->spontaneous()
         && _ui->manualProxyRadioButton->isChecked()
         && _ui->hostLineEdit->text().isEmpty()) {
@@ -242,8 +233,7 @@ void NetworkSettings::showEvent(QShowEvent *event)
 }
 
 
-void NetworkSettings::checkAccountLocalhost()
-{
+void NetworkSettings::checkAccountLocalhost() {
     bool visible = false;
     if (_ui->manualProxyRadioButton->isChecked()) {
         // Check if at least one account is using localhost, because Qt proxy settings have no

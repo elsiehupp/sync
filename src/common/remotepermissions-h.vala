@@ -28,8 +28,7 @@ namespace OCC {
 /**
  * Class that store in a memory efficient way the remote permission
  */
-class OCSYNC_EXPORT RemotePermissions
-{
+class OCSYNC_EXPORT RemotePermissions {
 private:
     // The first bit tells if the value is set or not
     // The remaining bits correspond to know if the value is set
@@ -74,31 +73,25 @@ public:
     /// read a permissions string received from the server, never null
     static RemotePermissions fromServerString(const QString &);
 
-    bool hasPermission(Permissions p) const
-    {
+    bool hasPermission(Permissions p) const {
         return _value & (1 << static_cast<int>(p));
     }
-    void setPermission(Permissions p)
-    {
+    void setPermission(Permissions p) {
         _value |= (1 << static_cast<int>(p)) | notNullMask;
     }
-    void unsetPermission(Permissions p)
-    {
+    void unsetPermission(Permissions p) {
         _value &= ~(1 << static_cast<int>(p));
     }
 
     bool isNull() const { return !(_value & notNullMask); }
-    friend bool operator==(RemotePermissions a, RemotePermissions b)
-    {
+    friend bool operator==(RemotePermissions a, RemotePermissions b) {
         return a._value == b._value;
     }
-    friend bool operator!=(RemotePermissions a, RemotePermissions b)
-    {
+    friend bool operator!=(RemotePermissions a, RemotePermissions b) {
         return !(a == b);
     }
 
-    friend QDebug operator<<(QDebug &dbg, RemotePermissions p)
-    {
+    friend QDebug operator<<(QDebug &dbg, RemotePermissions p) {
         return dbg << p.toString();
     }
 };

@@ -29,8 +29,7 @@ class OwncloudWizard;
  * @brief The OwncloudAdvancedSetupPage class
  * @ingroup gui
  */
-class OwncloudAdvancedSetupPage : public QWizardPage
-{
+class OwncloudAdvancedSetupPage : public QWizardPage {
 public:
     OwncloudAdvancedSetupPage(OwncloudWizard *wizard);
 

@@ -19,8 +19,7 @@
 
 namespace OCC {
 
-QVariant EmojiCategoriesModel::data(const QModelIndex &index, int role) const
-{
+QVariant EmojiCategoriesModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid()) {
         return {};
     }
@@ -36,39 +35,26 @@ QVariant EmojiCategoriesModel::data(const QModelIndex &index, int role) const
     return {};
 }
 
-int EmojiCategoriesModel::rowCount(const QModelIndex &parent) const
-{
+int EmojiCategoriesModel::rowCount(const QModelIndex &parent) const {
     Q_UNUSED(parent);
     return static_cast<int>(categories.size());
 }
 
-QHash<int, QByteArray> EmojiCategoriesModel::roleNames() const
-{
+QHash<int, QByteArray> EmojiCategoriesModel::roleNames() const {
     QHash<int, QByteArray> roles;
     roles[Roles::EmojiRole] = "emoji";
     roles[Roles::LabelRole] = "label";
     return roles;
 }
 
-const std::vector<EmojiCategoriesModel::Category> EmojiCategoriesModel::categories = {
-    { "⌛️", "history" },
-    { "😏", "people" },
-    { "🌲", "nature" },
-    { "🍛", "food" },
-    { "🚁", "activity" },
-    { "🚅", "travel" },
-    { "💡", "objects" },
-    { "🔣", "symbols" },
-    { "🏁", "flags" },
+const std::vector<EmojiCategoriesModel::Category> EmojiCategoriesModel::categories = { { "⌛️", "history" }, { "😏", "people" }, { "🌲", "nature" }, { "🍛", "food" }, { "🚁", "activity" }, { "🚅", "travel" }, { "💡", "objects" }, { "🔣", "symbols" }, { "🏁", "flags" },
 };
 
-QVariantList EmojiModel::history() const
-{
+QVariantList EmojiModel::history() const {
     return _settings.value("Editor/emojis", QVariantList()).toList();
 }
 
-void EmojiModel::setCategory(const QString &category)
-{
+void EmojiModel::setCategory(const QString &category) {
     if (_category == category) {
         return;
     }
@@ -76,13 +62,11 @@ void EmojiModel::setCategory(const QString &category)
     emit modelChanged();
 }
 
-QAbstractListModel *EmojiModel::emojiCategoriesModel()
-{
+QAbstractListModel *EmojiModel::emojiCategoriesModel() {
     return &_emojiCategoriesModel;
 }
 
-QVariantList EmojiModel::model() const
-{
+QVariantList EmojiModel::model() const {
     if (_category == "history") {
         return history();
     } else if (_category == "people") {
@@ -105,8 +89,7 @@ QVariantList EmojiModel::model() const
     return history();
 }
 
-void EmojiModel::emojiUsed(const QVariant &modelData)
-{
+void EmojiModel::emojiUsed(const QVariant &modelData) {
     auto historyEmojis = history();
 
     auto historyEmojisIter = historyEmojis.begin();

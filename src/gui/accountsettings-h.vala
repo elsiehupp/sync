@@ -46,8 +46,7 @@ class FolderStatusModel;
  * @brief The AccountSettings class
  * @ingroup gui
  */
-class AccountSettings : public QWidget
-{
+class AccountSettings : public QWidget {
     Q_PROPERTY(AccountState* accountState MEMBER _accountState)
 
 public:

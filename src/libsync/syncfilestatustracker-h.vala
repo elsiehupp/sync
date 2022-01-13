@@ -29,8 +29,7 @@ class SyncEngine;
  *        go through the SyncEngine, to be reported as overlay icons in the shell.
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT SyncFileStatusTracker : public QObject
-{
+class OWNCLOUDSYNC_EXPORT SyncFileStatusTracker : public QObject {
 public:
     explicit SyncFileStatusTracker(SyncEngine *syncEngine);
     SyncFileStatus fileStatus(const QString &relativePath);

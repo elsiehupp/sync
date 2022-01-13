@@ -38,8 +38,7 @@ static const char runPathC[] = R"(HKEY_CURRENT_USER\Software\Microsoft\Windows\C
 
 namespace OCC {
 
-static void setupFavLink_private(const QString &folder)
-{
+static void setupFavLink_private(const QString &folder) {
     // First create a Desktop.ini so that the folder and favorite link show our application's icon.
     QFile desktopIni(folder + QLatin1String("/Desktop.ini"));
     if (desktopIni.exists()) {
@@ -83,8 +82,7 @@ static void setupFavLink_private(const QString &folder)
         qCWarning(lcUtility) << "linking" << folder << "to" << linkName << "failed!";
 }
 
-static void removeFavLink_private(const QString &folder)
-{
+static void removeFavLink_private(const QString &folder) {
     const QDir folderDir(folder);
 
     // #1 Remove the Desktop.ini to reset the folder icon
@@ -117,22 +115,19 @@ static void removeFavLink_private(const QString &folder)
     }
 }
 
-bool hasSystemLaunchOnStartup_private(const QString &appName)
-{
+bool hasSystemLaunchOnStartup_private(const QString &appName) {
     QString runPath = QLatin1String(systemRunPathC);
     QSettings settings(runPath, QSettings::NativeFormat);
     return settings.contains(appName);
 }
 
-bool hasLaunchOnStartup_private(const QString &appName)
-{
+bool hasLaunchOnStartup_private(const QString &appName) {
     QString runPath = QLatin1String(runPathC);
     QSettings settings(runPath, QSettings::NativeFormat);
     return settings.contains(appName);
 }
 
-void setLaunchOnStartup_private(const QString &appName, const QString &guiName, bool enable)
-{
+void setLaunchOnStartup_private(const QString &appName, const QString &guiName, bool enable) {
     Q_UNUSED(guiName);
     QString runPath = QLatin1String(runPathC);
     QSettings settings(runPath, QSettings::NativeFormat);
@@ -144,8 +139,7 @@ void setLaunchOnStartup_private(const QString &appName, const QString &guiName, 
 }
 
 // TODO: Right now only detection on toggle/startup, not when windows theme is switched while nextcloud is running
-static inline bool hasDarkSystray_private()
-{
+static inline bool hasDarkSystray_private() {
     if(Utility::registryGetKeyValue(    HKEY_CURRENT_USER,
                                         QStringLiteral(R"(Software\Microsoft\Windows\CurrentVersion\Themes\Personalize)"),
                                         QStringLiteral("SystemUsesLightTheme") ) == 1) {
@@ -156,8 +150,7 @@ static inline bool hasDarkSystray_private()
     }
 }
 
-QRect Utility::getTaskbarDimensions()
-{
+QRect Utility::getTaskbarDimensions() {
     APPBARDATA barData;
     barData.cbSize = sizeof(APPBARDATA);
 
@@ -170,8 +163,7 @@ QRect Utility::getTaskbarDimensions()
     return QRect(barRect.left, barRect.top, (barRect.right - barRect.left), (barRect.bottom - barRect.top));
 }
 
-bool Utility::registryKeyExists(HKEY hRootKey, const QString &subKey)
-{
+bool Utility::registryKeyExists(HKEY hRootKey, const QString &subKey) {
     HKEY hKey;
 
     REGSAM sam = KEY_READ | KEY_WOW64_64KEY;
@@ -181,8 +173,7 @@ bool Utility::registryKeyExists(HKEY hRootKey, const QString &subKey)
     return result != ERROR_FILE_NOT_FOUND;
 }
 
-QVariant Utility::registryGetKeyValue(HKEY hRootKey, const QString &subKey, const QString &valueName)
-{
+QVariant Utility::registryGetKeyValue(HKEY hRootKey, const QString &subKey, const QString &valueName) {
     QVariant value;
 
     HKEY hKey;
@@ -242,8 +233,7 @@ QVariant Utility::registryGetKeyValue(HKEY hRootKey, const QString &subKey, cons
     return value;
 }
 
-bool Utility::registrySetKeyValue(HKEY hRootKey, const QString &subKey, const QString &valueName, DWORD type, const QVariant &value)
-{
+bool Utility::registrySetKeyValue(HKEY hRootKey, const QString &subKey, const QString &valueName, DWORD type, const QVariant &value) {
     HKEY hKey;
     // KEY_WOW64_64KEY is necessary because CLSIDs are "Redirected and reflected only for CLSIDs that do not specify InprocServer32 or InprocHandler32."
     // https://msdn.microsoft.com/en-us/library/windows/desktop/aa384253%28v=vs.85%29.aspx#redirected__shared__and_reflected_keys_under_wow64
@@ -277,8 +267,7 @@ bool Utility::registrySetKeyValue(HKEY hRootKey, const QString &subKey, const QS
     return result == ERROR_SUCCESS;
 }
 
-bool Utility::registryDeleteKeyTree(HKEY hRootKey, const QString &subKey)
-{
+bool Utility::registryDeleteKeyTree(HKEY hRootKey, const QString &subKey) {
     HKEY hKey;
     REGSAM sam = DELETE | KEY_ENUMERATE_SUB_KEYS | KEY_QUERY_VALUE | KEY_SET_VALUE | KEY_WOW64_64KEY;
     LONG result = RegOpenKeyEx(hRootKey, reinterpret_cast<LPCWSTR>(subKey.utf16()), 0, sam, &hKey);
@@ -296,8 +285,7 @@ bool Utility::registryDeleteKeyTree(HKEY hRootKey, const QString &subKey)
     return result == ERROR_SUCCESS;
 }
 
-bool Utility::registryDeleteKeyValue(HKEY hRootKey, const QString &subKey, const QString &valueName)
-{
+bool Utility::registryDeleteKeyValue(HKEY hRootKey, const QString &subKey, const QString &valueName) {
     HKEY hKey;
     REGSAM sam = KEY_WRITE | KEY_WOW64_64KEY;
     LONG result = RegOpenKeyEx(hRootKey, reinterpret_cast<LPCWSTR>(subKey.utf16()), 0, sam, &hKey);
@@ -312,8 +300,7 @@ bool Utility::registryDeleteKeyValue(HKEY hRootKey, const QString &subKey, const
     return result == ERROR_SUCCESS;
 }
 
-bool Utility::registryWalkSubKeys(HKEY hRootKey, const QString &subKey, const std::function<void(HKEY, const QString &)> &callback)
-{
+bool Utility::registryWalkSubKeys(HKEY hRootKey, const QString &subKey, const std::function<void(HKEY, const QString &)> &callback) {
     HKEY hKey;
     REGSAM sam = KEY_READ | KEY_WOW64_64KEY;
     LONG result = RegOpenKeyEx(hRootKey, reinterpret_cast<LPCWSTR>(subKey.utf16()), 0, sam, &hKey);
@@ -354,8 +341,7 @@ bool Utility::registryWalkSubKeys(HKEY hRootKey, const QString &subKey, const st
     return retCode != ERROR_NO_MORE_ITEMS;
 }
 
-DWORD Utility::convertSizeToDWORD(size_t &convertVar)
-{
+DWORD Utility::convertSizeToDWORD(size_t &convertVar) {
     if( convertVar > UINT_MAX ) {
         //throw std::bad_cast();
         convertVar = UINT_MAX; // intentionally default to wrong value here to not crash: exception handling TBD
@@ -363,37 +349,32 @@ DWORD Utility::convertSizeToDWORD(size_t &convertVar)
     return static_cast<DWORD>(convertVar);
 }
 
-void Utility::UnixTimeToFiletime(time_t t, FILETIME *filetime)
-{
+void Utility::UnixTimeToFiletime(time_t t, FILETIME *filetime) {
     LONGLONG ll = Int32x32To64(t, 10000000) + 116444736000000000;
     filetime->dwLowDateTime = (DWORD) ll;
     filetime->dwHighDateTime = ll >>32;
 }
 
-void Utility::FiletimeToLargeIntegerFiletime(FILETIME *filetime, LARGE_INTEGER *hundredNSecs)
-{
+void Utility::FiletimeToLargeIntegerFiletime(FILETIME *filetime, LARGE_INTEGER *hundredNSecs) {
     hundredNSecs->LowPart = filetime->dwLowDateTime;
     hundredNSecs->HighPart = filetime->dwHighDateTime;
 }
 
-void Utility::UnixTimeToLargeIntegerFiletime(time_t t, LARGE_INTEGER *hundredNSecs)
-{
+void Utility::UnixTimeToLargeIntegerFiletime(time_t t, LARGE_INTEGER *hundredNSecs) {
     LONGLONG ll = Int32x32To64(t, 10000000) + 116444736000000000;
     hundredNSecs->LowPart = (DWORD) ll;
     hundredNSecs->HighPart = ll >>32;
 }
 
 
-QString Utility::formatWinError(long errorCode)
-{
+QString Utility::formatWinError(long errorCode) {
     return QStringLiteral("WindowsError: %1: %2").arg(QString::number(errorCode, 16), QString::fromWCharArray(_com_error(errorCode).ErrorMessage()));
 }
 
-QString Utility::getCurrentUserName()
-{
+QString Utility::getCurrentUserName() {
     TCHAR username[UNLEN + 1] = {0};
     DWORD len = sizeof(username) / sizeof(TCHAR);
-    
+
     if (!GetUserName(username, &len)) {
         qCWarning(lcUtility) << "Could not retrieve Windows user name." << formatWinError(GetLastError());
     }
@@ -401,13 +382,11 @@ QString Utility::getCurrentUserName()
     return QString::fromWCharArray(username);
 }
 
-Utility::NtfsPermissionLookupRAII::NtfsPermissionLookupRAII()
-{
+Utility::NtfsPermissionLookupRAII::NtfsPermissionLookupRAII() {
     qt_ntfs_permission_lookup++;
 }
 
-Utility::NtfsPermissionLookupRAII::~NtfsPermissionLookupRAII()
-{
+Utility::NtfsPermissionLookupRAII::~NtfsPermissionLookupRAII() {
     qt_ntfs_permission_lookup--;
 }
 

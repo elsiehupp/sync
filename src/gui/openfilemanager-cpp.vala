@@ -31,8 +31,7 @@
 namespace OCC {
 
 // according to the QStandardDir impl from Qt5
-static QStringList xdgDataDirs()
-{
+static QStringList xdgDataDirs() {
     QStringList dirs;
     // http://standards.freedesktop.org/basedir-spec/latest/
     QString xdgDataDirsEnv = QFile::decodeName(qgetenv("XDG_DATA_DIRS"));
@@ -52,8 +51,7 @@ static QStringList xdgDataDirs()
 }
 
 // Linux impl only, make sure to process %u and %U which might be returned
-static QString findDefaultFileManager()
-{
+static QString findDefaultFileManager() {
     QProcess p;
     p.start("xdg-mime", QStringList() << "query"
                                       << "default"
@@ -81,8 +79,7 @@ static QString findDefaultFileManager()
 }
 
 // early dolphin versions did not have --select
-static bool checkDolphinCanSelect()
-{
+static bool checkDolphinCanSelect() {
     QProcess p;
     p.start("dolphin", QStringList() << "--help", QFile::ReadOnly);
     p.waitForFinished();
@@ -91,8 +88,7 @@ static bool checkDolphinCanSelect()
 
 
 // inspired by Qt Creator's showInGraphicalShell();
-void showInFileManager(const QString &localPath)
-{
+void showInFileManager(const QString &localPath) {
     if (Utility::isWindows()) {
 #ifdef Q_OS_WIN
         #if QTLEGACY

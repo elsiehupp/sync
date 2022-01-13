@@ -26,8 +26,7 @@ namespace KeychainChunk {
 
 class WebFlowCredentialsDialog;
 
-class WebFlowCredentials : public AbstractCredentials
-{
+class WebFlowCredentials : public AbstractCredentials {
     friend class WebFlowCredentialsAccessManager;
 
 public:

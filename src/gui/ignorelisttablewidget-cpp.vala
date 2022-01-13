@@ -16,8 +16,7 @@ static constexpr int readOnlyRows = 3;
 
 IgnoreListTableWidget::IgnoreListTableWidget(QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::IgnoreListTableWidget)
-{
+    , ui(new Ui::IgnoreListTableWidget) {
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     ui->setupUi(this);
 
@@ -41,13 +40,11 @@ IgnoreListTableWidget::IgnoreListTableWidget(QWidget *parent)
     ui->tableWidget->verticalHeader()->setVisible(false);
 }
 
-IgnoreListTableWidget::~IgnoreListTableWidget()
-{
+IgnoreListTableWidget::~IgnoreListTableWidget() {
     delete ui;
 }
 
-void IgnoreListTableWidget::slotItemSelectionChanged()
-{
+void IgnoreListTableWidget::slotItemSelectionChanged() {
     QTableWidgetItem *item = ui->tableWidget->currentItem();
     if (!item) {
         ui->removePushButton->setEnabled(false);
@@ -58,20 +55,17 @@ void IgnoreListTableWidget::slotItemSelectionChanged()
     ui->removePushButton->setEnabled(enable);
 }
 
-void IgnoreListTableWidget::slotRemoveCurrentItem()
-{
+void IgnoreListTableWidget::slotRemoveCurrentItem() {
     ui->tableWidget->removeRow(ui->tableWidget->currentRow());
     if(ui->tableWidget->rowCount() == readOnlyRows)
         ui->removeAllPushButton->setEnabled(false);
 }
 
-void IgnoreListTableWidget::slotRemoveAllItems()
-{
+void IgnoreListTableWidget::slotRemoveAllItems() {
     ui->tableWidget->setRowCount(0);
 }
 
-void IgnoreListTableWidget::slotWriteIgnoreFile(const QString & file)
-{
+void IgnoreListTableWidget::slotWriteIgnoreFile(const QString & file) {
     QFile ignores(file);
     if (ignores.open(QIODevice::WriteOnly)) {
         // rewrites the whole file since now the user can also remove system patterns
@@ -106,8 +100,7 @@ void IgnoreListTableWidget::slotWriteIgnoreFile(const QString & file)
     }
 }
 
-void IgnoreListTableWidget::slotAddPattern()
-{
+void IgnoreListTableWidget::slotAddPattern() {
     bool okClicked = false;
     QString pattern = QInputDialog::getText(this, tr("Add Ignore Pattern"),
         tr("Add a new ignore pattern:"),
@@ -120,8 +113,7 @@ void IgnoreListTableWidget::slotAddPattern()
     ui->tableWidget->scrollToBottom();
 }
 
-void IgnoreListTableWidget::readIgnoreFile(const QString &file, bool readOnly)
-{
+void IgnoreListTableWidget::readIgnoreFile(const QString &file, bool readOnly) {
     QFile ignores(file);
     if (ignores.open(QIODevice::ReadOnly)) {
         while (!ignores.atEnd()) {
@@ -139,8 +131,7 @@ void IgnoreListTableWidget::readIgnoreFile(const QString &file, bool readOnly)
     }
 }
 
-int IgnoreListTableWidget::addPattern(const QString &pattern, bool deletable, bool readOnly)
-{
+int IgnoreListTableWidget::addPattern(const QString &pattern, bool deletable, bool readOnly) {
     int newRow = ui->tableWidget->rowCount();
     ui->tableWidget->setRowCount(newRow + 1);
 

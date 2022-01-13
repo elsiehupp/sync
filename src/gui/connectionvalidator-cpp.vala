@@ -40,12 +40,10 @@ ConnectionValidator::ConnectionValidator(AccountStatePtr accountState, QObject *
     : QObject(parent)
     , _accountState(accountState)
     , _account(accountState->account())
-    , _isCheckingServerAndAuth(false)
-{
+    , _isCheckingServerAndAuth(false) {
 }
 
-void ConnectionValidator::checkServerAndAuth()
-{
+void ConnectionValidator::checkServerAndAuth() {
     if (!_account) {
         _errors << tr("No Nextcloud account configured");
         reportResult(NotConfigured);
@@ -68,8 +66,7 @@ void ConnectionValidator::checkServerAndAuth()
     }
 }
 
-void ConnectionValidator::systemProxyLookupDone(const QNetworkProxy &proxy)
-{
+void ConnectionValidator::systemProxyLookupDone(const QNetworkProxy &proxy) {
     if (!_account) {
         qCWarning(lcConnectionValidator) << "Bailing out, Account had been deleted";
         return;
@@ -86,8 +83,7 @@ void ConnectionValidator::systemProxyLookupDone(const QNetworkProxy &proxy)
 }
 
 // The actual check
-void ConnectionValidator::slotCheckServerAndAuth()
-{
+void ConnectionValidator::slotCheckServerAndAuth() {
     auto *checkJob = new CheckServerJob(_account, this);
     checkJob->setTimeout(timeoutToUseMsec);
     checkJob->setIgnoreCredentialFailure(true);
@@ -97,8 +93,7 @@ void ConnectionValidator::slotCheckServerAndAuth()
     checkJob->start();
 }
 
-void ConnectionValidator::slotStatusFound(const QUrl &url, const QJsonObject &info)
-{
+void ConnectionValidator::slotStatusFound(const QUrl &url, const QJsonObject &info) {
     // Newer servers don't disclose any version in status.php anymore
     // https://github.com/owncloud/core/pull/27473/files
     // so this string can be empty.
@@ -133,8 +128,7 @@ void ConnectionValidator::slotStatusFound(const QUrl &url, const QJsonObject &in
 }
 
 // status.php could not be loaded (network or server issue!).
-void ConnectionValidator::slotNoStatusFound(QNetworkReply *reply)
-{
+void ConnectionValidator::slotNoStatusFound(QNetworkReply *reply) {
     auto job = qobject_cast<CheckServerJob *>(sender());
     qCWarning(lcConnectionValidator) << reply->error() << job->errorString() << reply->peek(1024);
     if (reply->error() == QNetworkReply::SslHandshakeFailedError) {
@@ -152,8 +146,7 @@ void ConnectionValidator::slotNoStatusFound(QNetworkReply *reply)
     reportResult(StatusNotFound);
 }
 
-void ConnectionValidator::slotJobTimeout(const QUrl &url)
-{
+void ConnectionValidator::slotJobTimeout(const QUrl &url) {
     Q_UNUSED(url);
     //_errors.append(tr("Unable to connect to %1").arg(url.toString()));
     _errors.append(tr("Timeout"));
@@ -161,8 +154,7 @@ void ConnectionValidator::slotJobTimeout(const QUrl &url)
 }
 
 
-void ConnectionValidator::checkAuthentication()
-{
+void ConnectionValidator::checkAuthentication() {
     AbstractCredentials *creds = _account->credentials();
 
     if (!creds->ready()) {
@@ -181,8 +173,7 @@ void ConnectionValidator::checkAuthentication()
     job->start();
 }
 
-void ConnectionValidator::slotAuthFailed(QNetworkReply *reply)
-{
+void ConnectionValidator::slotAuthFailed(QNetworkReply *reply) {
     auto job = qobject_cast<PropfindJob *>(sender());
     Status stat = Timeout;
 
@@ -210,8 +201,7 @@ void ConnectionValidator::slotAuthFailed(QNetworkReply *reply)
     reportResult(stat);
 }
 
-void ConnectionValidator::slotAuthSuccess()
-{
+void ConnectionValidator::slotAuthSuccess() {
     _errors.clear();
     if (!_isCheckingServerAndAuth) {
         reportResult(Connected);
@@ -220,8 +210,7 @@ void ConnectionValidator::slotAuthSuccess()
     checkServerCapabilities();
 }
 
-void ConnectionValidator::checkServerCapabilities()
-{
+void ConnectionValidator::checkServerCapabilities() {
     // The main flow now needs the capabilities
     auto *job = new JsonApiJob(_account, QLatin1String("ocs/v1.php/cloud/capabilities"), this);
     job->setTimeout(timeoutToUseMsec);
@@ -229,8 +218,7 @@ void ConnectionValidator::checkServerCapabilities()
     job->start();
 }
 
-void ConnectionValidator::slotCapabilitiesRecieved(const QJsonDocument &json)
-{
+void ConnectionValidator::slotCapabilitiesRecieved(const QJsonDocument &json) {
     auto caps = json.object().value("ocs").toObject().value("data").toObject().value("capabilities").toObject();
     qCInfo(lcConnectionValidator) << "Server capabilities" << caps;
     _account->setCapabilities(caps.toVariantMap());
@@ -249,15 +237,13 @@ void ConnectionValidator::slotCapabilitiesRecieved(const QJsonDocument &json)
     fetchUser();
 }
 
-void ConnectionValidator::fetchUser()
-{
+void ConnectionValidator::fetchUser() {
     auto *userInfo = new UserInfo(_accountState.data(), true, true, this);
     QObject::connect(userInfo, &UserInfo::fetchedLastInfo, this, &ConnectionValidator::slotUserFetched);
     userInfo->setActive(true);
 }
 
-bool ConnectionValidator::setAndCheckServerVersion(const QString &version)
-{
+bool ConnectionValidator::setAndCheckServerVersion(const QString &version) {
     qCInfo(lcConnectionValidator) << _account->url() << "has server version" << version;
     _account->setServerVersion(version);
 
@@ -285,8 +271,7 @@ bool ConnectionValidator::setAndCheckServerVersion(const QString &version)
     return true;
 }
 
-void ConnectionValidator::slotUserFetched(UserInfo *userInfo)
-{
+void ConnectionValidator::slotUserFetched(UserInfo *userInfo) {
     if(userInfo) {
         userInfo->setActive(false);
         userInfo->deleteLater();
@@ -306,8 +291,7 @@ void ConnectionValidator::reportConnected() {
 }
 #endif
 
-void ConnectionValidator::reportResult(Status status)
-{
+void ConnectionValidator::reportResult(Status status) {
     emit connectionResult(status, _errors);
     deleteLater();
 }

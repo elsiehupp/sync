@@ -34,8 +34,7 @@ class InvalidFilenameDialog;
  * Simple list model to provide the list view with data.
  */
 
-class ActivityListModel : public QAbstractListModel
-{
+class ActivityListModel : public QAbstractListModel {
 
     Q_PROPERTY(AccountState *accountState READ accountState CONSTANT)
 public:

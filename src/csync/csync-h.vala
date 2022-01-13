@@ -201,8 +201,7 @@ struct OCSYNC_EXPORT csync_file_stat_s {
     , child_modified(false)
     , has_ignored_files(false)
     , is_hidden(false)
-    , isE2eEncrypted(false)
-  { }
+    , isE2eEncrypted(false) { }
 };
 
 /**

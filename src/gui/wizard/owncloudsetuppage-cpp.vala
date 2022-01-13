@@ -41,8 +41,7 @@ namespace OCC {
 OwncloudSetupPage::OwncloudSetupPage(QWidget *parent)
     : QWizardPage()
     , _progressIndi(new QProgressIndicator(this))
-    , _ocWizard(qobject_cast<OwncloudWizard *>(parent))
-{
+    , _ocWizard(qobject_cast<OwncloudWizard *>(parent)) {
     _ui.setupUi(this);
 
     setupServerAddressDescriptionLabel();
@@ -75,19 +74,16 @@ OwncloudSetupPage::OwncloudSetupPage(QWidget *parent)
     connect(addCertDial, &QDialog::accepted, this, &OwncloudSetupPage::slotCertificateAccepted);
 }
 
-void OwncloudSetupPage::setLogo()
-{
+void OwncloudSetupPage::setLogo() {
     _ui.logoLabel->setPixmap(Theme::instance()->wizardApplicationLogo());
 }
 
-void OwncloudSetupPage::setupServerAddressDescriptionLabel()
-{
+void OwncloudSetupPage::setupServerAddressDescriptionLabel() {
     const auto appName = Theme::instance()->appNameGUI();
     _ui.serverAddressDescriptionLabel->setText(tr("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").arg(appName));
 }
 
-void OwncloudSetupPage::setServerUrl(const QString &newUrl)
-{
+void OwncloudSetupPage::setServerUrl(const QString &newUrl) {
     _ocWizard->setRegistration(false);
     _oCUrl = newUrl;
     if (_oCUrl.isEmpty()) {
@@ -98,8 +94,7 @@ void OwncloudSetupPage::setServerUrl(const QString &newUrl)
     _ui.leUrl->setText(_oCUrl);
 }
 
-void OwncloudSetupPage::setupCustomization()
-{
+void OwncloudSetupPage::setupCustomization() {
     // set defaults for the customize labels.
     _ui.topLabel->hide();
     _ui.bottomLabel->hide();
@@ -120,8 +115,7 @@ void OwncloudSetupPage::setupCustomization()
 }
 
 // slot hit from textChanged of the url entry field.
-void OwncloudSetupPage::slotUrlChanged(const QString &url)
-{
+void OwncloudSetupPage::slotUrlChanged(const QString &url) {
     // Need to set next button as default button here because
     // otherwise the on OSX the next button does not stay the default
     // button
@@ -153,8 +147,7 @@ void OwncloudSetupPage::slotUrlChanged(const QString &url)
     }
 }
 
-void OwncloudSetupPage::slotUrlEditFinished()
-{
+void OwncloudSetupPage::slotUrlEditFinished() {
     QString url = _ui.leUrl->fullText();
     if (QUrl(url).isRelative() && !url.isEmpty()) {
         // no scheme defined, set one
@@ -163,13 +156,11 @@ void OwncloudSetupPage::slotUrlEditFinished()
     }
 }
 
-bool OwncloudSetupPage::isComplete() const
-{
+bool OwncloudSetupPage::isComplete() const {
     return !_ui.leUrl->text().isEmpty() && !_checking;
 }
 
-void OwncloudSetupPage::initializePage()
-{
+void OwncloudSetupPage::initializePage() {
     customizeStyle();
 
     WizardCommon::initErrorLabel(_ui.errorLabel);
@@ -204,8 +195,7 @@ void OwncloudSetupPage::initializePage()
     }
 }
 
-int OwncloudSetupPage::nextId() const
-{
+int OwncloudSetupPage::nextId() const {
     switch (_authType) {
     case DetermineAuthTypeJob::Basic:
         return WizardCommon::Page_HttpCreds;
@@ -223,14 +213,12 @@ int OwncloudSetupPage::nextId() const
     Q_UNREACHABLE();
 }
 
-QString OwncloudSetupPage::url() const
-{
+QString OwncloudSetupPage::url() const {
     QString url = _ui.leUrl->fullText().simplified();
     return url;
 }
 
-bool OwncloudSetupPage::validatePage()
-{
+bool OwncloudSetupPage::validatePage() {
     if (!_authTypeKnown) {
         slotUrlEditFinished();
         QString u = url();
@@ -256,15 +244,13 @@ bool OwncloudSetupPage::validatePage()
     }
 }
 
-void OwncloudSetupPage::setAuthType(DetermineAuthTypeJob::AuthType type)
-{
+void OwncloudSetupPage::setAuthType(DetermineAuthTypeJob::AuthType type) {
     _authTypeKnown = true;
     _authType = type;
     stopSpinner();
 }
 
-void OwncloudSetupPage::setErrorString(const QString &err, bool retryHTTPonly)
-{
+void OwncloudSetupPage::setErrorString(const QString &err, bool retryHTTPonly) {
     if (err.isEmpty()) {
         _ui.errorLabel->setVisible(false);
     } else {
@@ -307,28 +293,24 @@ void OwncloudSetupPage::setErrorString(const QString &err, bool retryHTTPonly)
     stopSpinner();
 }
 
-void OwncloudSetupPage::startSpinner()
-{
+void OwncloudSetupPage::startSpinner() {
     _ui.progressLayout->setEnabled(true);
     _progressIndi->setVisible(true);
     _progressIndi->startAnimation();
 }
 
-void OwncloudSetupPage::stopSpinner()
-{
+void OwncloudSetupPage::stopSpinner() {
     _ui.progressLayout->setEnabled(false);
     _progressIndi->setVisible(false);
     _progressIndi->stopAnimation();
 }
 
-QString subjectInfoHelper(const QSslCertificate &cert, const QByteArray &qa)
-{
+QString subjectInfoHelper(const QSslCertificate &cert, const QByteArray &qa) {
     return cert.subjectInfo(qa).join(QLatin1Char('/'));
 }
 
 //called during the validation of the client certificate.
-void OwncloudSetupPage::slotCertificateAccepted()
-{
+void OwncloudSetupPage::slotCertificateAccepted() {
     QFile certFile(addCertDial->getCertificatePath());
     certFile.open(QFile::ReadOnly);
     QByteArray certData = certFile.readAll();
@@ -354,13 +336,11 @@ void OwncloudSetupPage::slotCertificateAccepted()
 
 OwncloudSetupPage::~OwncloudSetupPage() = default;
 
-void OwncloudSetupPage::slotStyleChanged()
-{
+void OwncloudSetupPage::slotStyleChanged() {
     customizeStyle();
 }
 
-void OwncloudSetupPage::customizeStyle()
-{
+void OwncloudSetupPage::customizeStyle() {
     setLogo();
 
     if (_progressIndi) {

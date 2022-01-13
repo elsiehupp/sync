@@ -39,8 +39,7 @@ int c_utimes(const QString &uri, const struct timeval *times) {
 #define CSYNC_SECONDS_SINCE_1601 11644473600LL
 #define CSYNC_USEC_IN_SEC            1000000LL
 //after Microsoft KB167296
-static void UnixTimevalToFileTime(struct timeval t, LPFILETIME pft)
-{
+static void UnixTimevalToFileTime(struct timeval t, LPFILETIME pft) {
     LONGLONG ll;
     ll = Int32x32To64(t.tv_sec, CSYNC_USEC_IN_SEC*10) + t.tv_usec*10 + CSYNC_SECONDS_SINCE_1601*CSYNC_USEC_IN_SEC*10;
     pft->dwLowDateTime = (DWORD)ll;

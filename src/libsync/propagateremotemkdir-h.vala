@@ -24,8 +24,7 @@ class PropagateUploadEncrypted;
  * @brief The PropagateRemoteMkdir class
  * @ingroup libsync
  */
-class PropagateRemoteMkdir : public PropagateItemJob
-{
+class PropagateRemoteMkdir : public PropagateItemJob {
     QPointer<AbstractNetworkJob> _job;
     bool _deleteExisting;
     PropagateUploadEncrypted *_uploadEncryptedHelper;

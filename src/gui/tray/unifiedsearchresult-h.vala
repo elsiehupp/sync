@@ -26,8 +26,7 @@ namespace OCC {
  * Simple data structure that represents single Unified Search result
  */
 
-struct UnifiedSearchResult
-{
+struct UnifiedSearchResult {
     enum Type : quint8 {
         Default,
         FetchMoreTrigger,

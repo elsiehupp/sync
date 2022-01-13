@@ -40,8 +40,7 @@ namespace OCC {
  * @ingroup gui
  */
 
-class LockWatcher : public QObject
-{
+class LockWatcher : public QObject {
 public:
     explicit LockWatcher(QObject *parent = nullptr);
 

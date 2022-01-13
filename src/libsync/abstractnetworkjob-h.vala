@@ -36,8 +36,7 @@ class AbstractSslErrorHandler;
  * @brief The AbstractNetworkJob class
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT AbstractNetworkJob : public QObject
-{
+class OWNCLOUDSYNC_EXPORT AbstractNetworkJob : public QObject {
 public:
     explicit AbstractNetworkJob(AccountPtr account, const QString &path, QObject *parent = nullptr);
     ~AbstractNetworkJob() override;
@@ -212,8 +211,7 @@ private:
 /**
  * @brief Internal Helper class
  */
-class NetworkJobTimeoutPauser
-{
+class NetworkJobTimeoutPauser {
 public:
     NetworkJobTimeoutPauser(QNetworkReply *reply);
     ~NetworkJobTimeoutPauser();

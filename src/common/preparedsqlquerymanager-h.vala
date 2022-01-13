@@ -24,21 +24,18 @@
 
 namespace OCC {
 
-class OCSYNC_EXPORT PreparedSqlQuery
-{
+class OCSYNC_EXPORT PreparedSqlQuery {
 public:
     ~PreparedSqlQuery();
 
     explicit operator bool() const { return _ok; }
 
-    SqlQuery *operator->() const
-    {
+    SqlQuery *operator->() const {
         Q_ASSERT(_ok);
         return _query;
     }
 
-    SqlQuery &operator*() const &
-    {
+    SqlQuery &operator*() const & {
         Q_ASSERT(_ok);
         return *_query;
     }
@@ -55,8 +52,7 @@ private:
 /**
  * @brief Manage PreparedSqlQuery
  */
-class OCSYNC_EXPORT PreparedSqlQueryManager
-{
+class OCSYNC_EXPORT PreparedSqlQueryManager {
 public:
     enum Key {
         GetFileRecordQuery,

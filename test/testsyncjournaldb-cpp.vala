@@ -13,37 +13,31 @@
 
 using namespace OCC;
 
-class TestSyncJournalDB : public QObject
-{
+class TestSyncJournalDB : public QObject {
 
     QTemporaryDir _tempDir;
 
 public:
     TestSyncJournalDB()
-        : _db((_tempDir.path() + "/sync.db"))
-    {
+        : _db((_tempDir.path() + "/sync.db")) {
         QVERIFY(_tempDir.isValid());
     }
 
-    qint64 dropMsecs(QDateTime time)
-    {
+    qint64 dropMsecs(QDateTime time) {
         return Utility::qDateTimeToTime_t(time);
     }
 
 private slots:
 
-    void initTestCase()
-    {
+    void initTestCase() {
     }
 
-    void cleanupTestCase()
-    {
+    void cleanupTestCase() {
         const QString file = _db.databaseFilePath();
         QFile::remove(file);
     }
 
-    void testFileRecord()
-    {
+    void testFileRecord() {
         SyncJournalFileRecord record;
         QVERIFY(_db.getFileRecord(QByteArrayLiteral("nonexistant"), &record));
         QVERIFY(!record.isValid());
@@ -89,9 +83,7 @@ private slots:
         QVERIFY(!record.isValid());
     }
 
-    void testFileRecordChecksum()
-    {
-        // Try with and without a checksum
+    void testFileRecordChecksum() { {/ Try with and without a checksum
         {
             SyncJournalFileRecord record;
             record._path = "foo-checksum";
@@ -112,8 +104,7 @@ private slots:
             // milliseconds internally, which disappear in sqlite. Go for full seconds here.
             QVERIFY(storedRecord._modtime == record._modtime);
             QVERIFY(storedRecord == record);
-        }
-        {
+        } {
             SyncJournalFileRecord record;
             record._path = "foo-nochecksum";
             record._remotePerm = RemotePermissions::fromDbValue("RW");
@@ -127,8 +118,7 @@ private slots:
         }
     }
 
-    void testDownloadInfo()
-    {
+    void testDownloadInfo() {
         using Info = SyncJournalDb::DownloadInfo;
         Info record = _db.getDownloadInfo("nonexistant");
         QVERIFY(!record._valid);
@@ -147,8 +137,7 @@ private slots:
         QVERIFY(!wipedRecord._valid);
     }
 
-    void testUploadInfo()
-    {
+    void testUploadInfo() {
         using Info = SyncJournalDb::UploadInfo;
         Info record = _db.getUploadInfo("nonexistant");
         QVERIFY(!record._valid);
@@ -169,8 +158,7 @@ private slots:
         QVERIFY(!wipedRecord._valid);
     }
 
-    void testNumericId()
-    {
+    void testNumericId() {
         SyncJournalFileRecord record;
 
         // Typical 8-digit padded id
@@ -182,8 +170,7 @@ private slots:
         QCOMPARE(record.numericFileId(), QByteArray("123456789"));
     }
 
-    void testConflictRecord()
-    {
+    void testConflictRecord() {
         ConflictRecord record;
         record.path = "abc";
         record.baseFileId = "def";
@@ -204,8 +191,7 @@ private slots:
         QVERIFY(!_db.conflictRecord(record.path).isValid());
     }
 
-    void testAvoidReadFromDbOnNextSync()
-    {
+    void testAvoidReadFromDbOnNextSync() {
         auto invalidEtag = QByteArray("_invalid_");
         auto initialEtag = QByteArray("etag");
         auto makeEntry = [&](const QByteArray &path, ItemType type) {
@@ -270,8 +256,7 @@ private slots:
         QCOMPARE(getEtag("foodir/sub"), initialEtag);
     }
 
-    void testRecursiveDelete()
-    {
+    void testRecursiveDelete() {
         auto makeEntry = [&](const QByteArray &path) {
             SyncJournalFileRecord record;
             record._path = path;
@@ -321,8 +306,7 @@ private slots:
         QVERIFY(checkElements());
     }
 
-    void testPinState()
-    {
+    void testPinState() {
         auto make = [&](const QByteArray &path, PinState state) {
             _db.internalPinStates().setForPath(path, state);
             auto pinState = _db.internalPinStates().rawForPath(path);

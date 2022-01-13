@@ -25,8 +25,7 @@ namespace OCC {
 
 class AbstractNetworkJob;
 
-class OWNCLOUDSYNC_EXPORT AbstractCredentials : public QObject
-{
+class OWNCLOUDSYNC_EXPORT AbstractCredentials : public QObject {
 
 public:
     AbstractCredentials();

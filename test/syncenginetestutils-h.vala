@@ -40,8 +40,7 @@ static const QUrl sRootUrl("owncloud://somehost/owncloud/remote.php/dav/");
 static const QUrl sRootUrl2("owncloud://somehost/owncloud/remote.php/dav/files/admin/");
 static const QUrl sUploadUrl("owncloud://somehost/owncloud/remote.php/dav/uploads/admin/");
 
-inline QString getFilePathFromUrl(const QUrl &url)
-{
+inline QString getFilePathFromUrl(const QUrl &url) {
     QString path = url.path();
     if (path.startsWith(sRootUrl2.path()))
         return path.mid(sRootUrl2.path().length());
@@ -73,8 +72,7 @@ public:
     QString fileName() const { return last(); }
 };
 
-class FileModifier
-{
+class FileModifier {
 public:
     virtual ~FileModifier() = default;
     virtual void remove(const QString &relativePath) = 0;
@@ -86,8 +84,7 @@ public:
     virtual void setModTime(const QString &relativePath, const QDateTime &modTime) = 0;
 };
 
-class DiskFileModifier : public FileModifier
-{
+class DiskFileModifier : public FileModifier {
     QDir _rootDir;
 public:
     DiskFileModifier(const QString &rootDirPath) : _rootDir(rootDirPath) { }
@@ -101,8 +98,7 @@ public:
     void setModTime(const QString &relativePath, const QDateTime &modTime) override;
 };
 
-class FileInfo : public FileModifier
-{
+class FileInfo : public FileModifier {
 public:
     static FileInfo A12_B12_C12_S12();
 
@@ -173,8 +169,7 @@ public:
     }
 };
 
-class FakeReply : public QNetworkReply
-{
+class FakeReply : public QNetworkReply {
 public:
     FakeReply(QObject *parent);
     ~FakeReply() override;
@@ -183,8 +178,7 @@ public:
     using QNetworkReply::setRawHeader;
 };
 
-class FakePropfindReply : public FakeReply
-{
+class FakePropfindReply : public FakeReply {
 public:
     QByteArray payload;
 
@@ -200,8 +194,7 @@ public:
     qint64 readData(char *data, qint64 maxlen) override;
 };
 
-class FakePutReply : public FakeReply
-{
+class FakePutReply : public FakeReply {
     FileInfo *fileInfo;
 public:
     FakePutReply(FileInfo &remoteRootFileInfo, QNetworkAccessManager::Operation op, const QNetworkRequest &request, const QByteArray &putPayload, QObject *parent);
@@ -214,8 +207,7 @@ public:
     qint64 readData(char *, qint64) override { return 0; }
 };
 
-class FakePutMultiFileReply : public FakeReply
-{
+class FakePutMultiFileReply : public FakeReply {
 public:
     FakePutMultiFileReply(FileInfo &remoteRootFileInfo, QNetworkAccessManager::Operation op, const QNetworkRequest &request, const QString &contentType, const QByteArray &putPayload, QObject *parent);
 
@@ -234,8 +226,7 @@ private:
     QByteArray _payload;
 };
 
-class FakeMkcolReply : public FakeReply
-{
+class FakeMkcolReply : public FakeReply {
     FileInfo *fileInfo;
 public:
     FakeMkcolReply(FileInfo &remoteRootFileInfo, QNetworkAccessManager::Operation op, const QNetworkRequest &request, QObject *parent);
@@ -246,8 +237,7 @@ public:
     qint64 readData(char *, qint64) override { return 0; }
 };
 
-class FakeDeleteReply : public FakeReply
-{
+class FakeDeleteReply : public FakeReply {
 public:
     FakeDeleteReply(FileInfo &remoteRootFileInfo, QNetworkAccessManager::Operation op, const QNetworkRequest &request, QObject *parent);
 
@@ -257,8 +247,7 @@ public:
     qint64 readData(char *, qint64) override { return 0; }
 };
 
-class FakeMoveReply : public FakeReply
-{
+class FakeMoveReply : public FakeReply {
 public:
     FakeMoveReply(FileInfo &remoteRootFileInfo, QNetworkAccessManager::Operation op, const QNetworkRequest &request, QObject *parent);
 
@@ -268,8 +257,7 @@ public:
     qint64 readData(char *, qint64) override { return 0; }
 };
 
-class FakeGetReply : public FakeReply
-{
+class FakeGetReply : public FakeReply {
 public:
     const FileInfo *fileInfo;
     char payload;
@@ -286,8 +274,7 @@ public:
     qint64 readData(char *data, qint64 maxlen) override;
 };
 
-class FakeGetWithDataReply : public FakeReply
-{
+class FakeGetWithDataReply : public FakeReply {
 public:
     const FileInfo *fileInfo;
     QByteArray payload;
@@ -304,8 +291,7 @@ public:
     qint64 readData(char *data, qint64 maxlen) override;
 };
 
-class FakeChunkMoveReply : public FakeReply
-{
+class FakeChunkMoveReply : public FakeReply {
     FileInfo *fileInfo;
 public:
     FakeChunkMoveReply(FileInfo &uploadsFileInfo, FileInfo &remoteRootFileInfo,
@@ -323,8 +309,7 @@ public:
     qint64 readData(char *, qint64) override { return 0; }
 };
 
-class FakePayloadReply : public FakeReply
-{
+class FakePayloadReply : public FakeReply {
 public:
     FakePayloadReply(QNetworkAccessManager::Operation op, const QNetworkRequest &request,
         const QByteArray &body, QObject *parent);
@@ -343,8 +328,7 @@ public:
 };
 
 
-class FakeErrorReply : public FakeReply
-{
+class FakeErrorReply : public FakeReply {
 public:
     FakeErrorReply(QNetworkAccessManager::Operation op, const QNetworkRequest &request,
         QObject *parent, int httpErrorCode, const QByteArray &body = QByteArray());
@@ -366,8 +350,7 @@ public:
     QByteArray _body;
 };
 
-class FakeJsonErrorReply : public FakeErrorReply
-{
+class FakeJsonErrorReply : public FakeErrorReply {
 public:
     FakeJsonErrorReply(QNetworkAccessManager::Operation op,
                        const QNetworkRequest &request,
@@ -377,8 +360,7 @@ public:
 };
 
 // A reply that never responds
-class FakeHangingReply : public FakeReply
-{
+class FakeHangingReply : public FakeReply {
 public:
     FakeHangingReply(QNetworkAccessManager::Operation op, const QNetworkRequest &request, QObject *parent);
 
@@ -388,19 +370,16 @@ public:
 
 // A delayed reply
 template <class OriginalReply>
-class DelayedReply : public OriginalReply
-{
+class DelayedReply : public OriginalReply {
 public:
     template <typename... Args>
     explicit DelayedReply(quint64 delayMS, Args &&... args)
         : OriginalReply(std::forward<Args>(args)...)
-        , _delayMs(delayMS)
-    {
+        , _delayMs(delayMS) {
     }
     quint64 _delayMs;
 
-    void respond() override
-    {
+    void respond() override {
         QTimer::singleShot(_delayMs, static_cast<OriginalReply *>(this), [this] {
             // Explicit call to bases's respond();
             this->OriginalReply::respond();
@@ -408,8 +387,7 @@ public:
     }
 };
 
-class FakeQNAM : public QNetworkAccessManager
-{
+class FakeQNAM : public QNetworkAccessManager {
 public:
     using Override = std::function<QNetworkReply *(Operation, const QNetworkRequest &, QIODevice *)>;
 
@@ -441,8 +419,7 @@ protected:
         QIODevice *outgoingData = nullptr) override;
 };
 
-class FakeCredentials : public OCC::AbstractCredentials
-{
+class FakeCredentials : public OCC::AbstractCredentials {
     QNetworkAccessManager *_qnam;
 public:
     FakeCredentials(QNetworkAccessManager *qnam) : _qnam{qnam} { }
@@ -459,8 +436,7 @@ public:
     void forgetSensitiveData() override { }
 };
 
-class FakeFolder
-{
+class FakeFolder {
     QTemporaryDir _tempDir;
     DiskFileModifier _localModifier;
     // FIXME: Clarify ownership, double delete
@@ -488,8 +464,7 @@ public:
 
     struct ErrorList {
         FakeQNAM *_qnam;
-        void append(const QString &path, int error = 500)
-        { _qnam->errorPaths().insert(path, error); }
+        void append(const QString &path, int error = 500) { _qnam->errorPaths().insert(path, error); }
         void clear() { _qnam->errorPaths().clear(); }
     };
     ErrorList serverErrorPaths() { return {_fakeQnam}; }
@@ -527,8 +502,7 @@ private:
 };
 
 /* Return the FileInfo for a conflict file for the specified relative filename */
-inline const FileInfo *findConflict(FileInfo &dir, const QString &filename)
-{
+inline const FileInfo *findConflict(FileInfo &dir, const QString &filename) {
     QFileInfo info(filename);
     const FileInfo *parentDir = dir.find(info.path());
     if (!parentDir)
@@ -544,8 +518,7 @@ inline const FileInfo *findConflict(FileInfo &dir, const QString &filename)
 
 struct ItemCompletedSpy : QSignalSpy {
     explicit ItemCompletedSpy(FakeFolder &folder)
-        : QSignalSpy(&folder.syncEngine(), &OCC::SyncEngine::itemCompleted)
-    {}
+        : QSignalSpy(&folder.syncEngine(), &OCC::SyncEngine::itemCompleted) {}
 
     OCC::SyncFileItemPtr findItem(const QString &path) const;
 
@@ -559,8 +532,7 @@ namespace OCC {
     }
 }
 
-inline void addFiles(QStringList &dest, const FileInfo &fi)
-{
+inline void addFiles(QStringList &dest, const FileInfo &fi) {
     if (fi.isDir) {
         dest += QString("%1 - dir").arg(fi.path());
         foreach (const FileInfo &fi, fi.children)
@@ -570,8 +542,7 @@ inline void addFiles(QStringList &dest, const FileInfo &fi)
     }
 }
 
-inline QString toStringNoElide(const FileInfo &fi)
-{
+inline QString toStringNoElide(const FileInfo &fi) {
     QStringList files;
     foreach (const FileInfo &fi, fi.children)
         addFiles(files, fi);
@@ -579,13 +550,11 @@ inline QString toStringNoElide(const FileInfo &fi)
     return QString("FileInfo with %1 files(\n\t%2\n)").arg(files.size()).arg(files.join("\n\t"));
 }
 
-inline char *toString(const FileInfo &fi)
-{
+inline char *toString(const FileInfo &fi) {
     return QTest::toString(toStringNoElide(fi));
 }
 
-inline void addFilesDbData(QStringList &dest, const FileInfo &fi)
-{
+inline void addFilesDbData(QStringList &dest, const FileInfo &fi) {
     // could include etag, permissions etc, but would need extra work
     if (fi.isDir) {
         dest += QString("%1 - %2 %3 %4").arg(
@@ -605,8 +574,7 @@ inline void addFilesDbData(QStringList &dest, const FileInfo &fi)
     }
 }
 
-inline char *printDbData(const FileInfo &fi)
-{
+inline char *printDbData(const FileInfo &fi) {
     QStringList files;
     foreach (const FileInfo &fi, fi.children)
         addFilesDbData(files, fi);

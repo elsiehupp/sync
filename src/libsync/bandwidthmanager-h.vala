@@ -28,8 +28,7 @@ class OwncloudPropagator;
  * @brief The BandwidthManager class
  * @ingroup libsync
  */
-class BandwidthManager : public QObject
-{
+class BandwidthManager : public QObject {
 public:
     BandwidthManager(OwncloudPropagator *p);
     ~BandwidthManager() override;

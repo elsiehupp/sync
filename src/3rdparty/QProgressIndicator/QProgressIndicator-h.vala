@@ -26,15 +26,14 @@
 // #include <QWidget>
 // #include <QColor>
 
-/*! 
+/*!
     \class QProgressIndicator
-    \brief The QProgressIndicator class lets an application display a progress indicator to show that a lengthy task is under way. 
+    \brief The QProgressIndicator class lets an application display a progress indicator to show that a lengthy task is under way.
 
     Progress indicators are indeterminate and do nothing more than spin to show that the application is busy.
     \sa QProgressBar
 */
-class QProgressIndicator : public QWidget
-{
+class QProgressIndicator : public QWidget {
     Q_PROPERTY(int delay READ animationDelay WRITE setAnimationDelay)
     Q_PROPERTY(bool displayedWhenStopped READ isDisplayedWhenStopped WRITE setDisplayedWhenStopped)
     Q_PROPERTY(QColor color READ color WRITE setColor)
@@ -79,12 +78,12 @@ public slots:
 
     /*! Sets the delay between animation steps.
         Setting the \a delay to a value larger than 40 slows the animation, while setting the \a delay to a smaller value speeds it up.
-        \param delay The delay, in milliseconds. 
-        \sa animationDelay 
+        \param delay The delay, in milliseconds.
+        \sa animationDelay
      */
     void setAnimationDelay(int delay);
 
-    /*! Sets whether the component hides itself when it is not animating. 
+    /*! Sets whether the component hides itself when it is not animating.
        \param state The animation state. Set false to hide the progress indicator when it is not animating; otherwise true.
        \sa isDisplayedWhenStopped
      */

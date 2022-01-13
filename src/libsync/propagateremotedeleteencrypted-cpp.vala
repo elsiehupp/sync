@@ -24,27 +24,23 @@ using namespace OCC;
 Q_LOGGING_CATEGORY(PROPAGATE_REMOVE_ENCRYPTED, "nextcloud.sync.propagator.remove.encrypted")
 
 PropagateRemoteDeleteEncrypted::PropagateRemoteDeleteEncrypted(OwncloudPropagator *propagator, SyncFileItemPtr item, QObject *parent)
-    : AbstractPropagateRemoteDeleteEncrypted(propagator, item, parent)
-{
+    : AbstractPropagateRemoteDeleteEncrypted(propagator, item, parent) {
 
 }
 
-void PropagateRemoteDeleteEncrypted::start()
-{
+void PropagateRemoteDeleteEncrypted::start() {
     Q_ASSERT(!_item->_encryptedFileName.isEmpty());
 
     const QFileInfo info(_item->_encryptedFileName);
     startLsColJob(info.path());
 }
 
-void PropagateRemoteDeleteEncrypted::slotFolderUnLockedSuccessfully(const QByteArray &folderId)
-{
+void PropagateRemoteDeleteEncrypted::slotFolderUnLockedSuccessfully(const QByteArray &folderId) {
     AbstractPropagateRemoteDeleteEncrypted::slotFolderUnLockedSuccessfully(folderId);
     emit finished(!_isTaskFailed);
 }
 
-void PropagateRemoteDeleteEncrypted::slotFolderEncryptedMetadataReceived(const QJsonDocument &json, int statusCode)
-{
+void PropagateRemoteDeleteEncrypted::slotFolderEncryptedMetadataReceived(const QJsonDocument &json, int statusCode) {
     if (statusCode == 404) {
         qCDebug(PROPAGATE_REMOVE_ENCRYPTED) << "Metadata not found, but let's proceed with removing the file anyway.";
         deleteRemoteItem(_item->_encryptedFileName);

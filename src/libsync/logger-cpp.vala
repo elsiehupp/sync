@@ -38,15 +38,13 @@ constexpr int CrashLogSize = 20;
 }
 namespace OCC {
 
-Logger *Logger::instance()
-{
+Logger *Logger::instance() {
     static Logger log;
     return &log;
 }
 
 Logger::Logger(QObject *parent)
-    : QObject(parent)
-{
+    : QObject(parent) {
     qSetMessagePattern(QStringLiteral("%{time yyyy-MM-dd hh:mm:ss:zzz} [ %{type} %{category} %{file}:%{line} "
                                       "]%{if-debug}\t[ %{function} ]%{endif}:\t%{message}"));
     _crashLog.resize(CrashLogSize);
@@ -57,38 +55,31 @@ Logger::Logger(QObject *parent)
 #endif
 }
 
-Logger::~Logger()
-{
+Logger::~Logger() {
 #ifndef NO_MSG_HANDLER
     qInstallMessageHandler(nullptr);
 #endif
 }
 
 
-void Logger::postGuiLog(const QString &title, const QString &message)
-{
+void Logger::postGuiLog(const QString &title, const QString &message) {
     emit guiLog(title, message);
 }
 
-void Logger::postOptionalGuiLog(const QString &title, const QString &message)
-{
+void Logger::postOptionalGuiLog(const QString &title, const QString &message) {
     emit optionalGuiLog(title, message);
 }
 
-void Logger::postGuiMessage(const QString &title, const QString &message)
-{
+void Logger::postGuiMessage(const QString &title, const QString &message) {
     emit guiMessage(title, message);
 }
 
-bool Logger::isLoggingToFile() const
-{
+bool Logger::isLoggingToFile() const {
     QMutexLocker lock(&_mutex);
     return _logstream;
 }
 
-void Logger::doLog(QtMsgType type, const QMessageLogContext &ctx, const QString &message)
-{
-    const QString msg = qFormatLogMessage(type, ctx, message);
+void Logger::doLog(QtMsgType type, const QMessageLogContext &ctx, const QString &message) { {onst QString msg = qFormatLogMessage(type, ctx, message);
     {
         QMutexLocker lock(&_mutex);
         _crashLogIndex = (_crashLogIndex + 1) % CrashLogSize;
@@ -109,24 +100,20 @@ void Logger::doLog(QtMsgType type, const QMessageLogContext &ctx, const QString 
     emit logWindowLog(msg);
 }
 
-void Logger::close()
-{
+void Logger::close() {
     dumpCrashLog();
-    if (_logstream)
-    {
+    if (_logstream) {
         _logstream->flush();
         _logFile.close();
         _logstream.reset();
     }
 }
 
-QString Logger::logFile() const
-{
+QString Logger::logFile() const {
     return _logFile.fileName();
 }
 
-void Logger::setLogFile(const QString &name)
-{
+void Logger::setLogFile(const QString &name) {
     QMutexLocker locker(&_mutex);
     if (_logstream) {
         _logstream.reset(nullptr);
@@ -158,28 +145,23 @@ void Logger::setLogFile(const QString &name)
     _logstream->setCodec(QTextCodec::codecForName("UTF-8"));
 }
 
-void Logger::setLogExpire(int expire)
-{
+void Logger::setLogExpire(int expire) {
     _logExpire = expire;
 }
 
-QString Logger::logDir() const
-{
+QString Logger::logDir() const {
     return _logDirectory;
 }
 
-void Logger::setLogDir(const QString &dir)
-{
+void Logger::setLogDir(const QString &dir) {
     _logDirectory = dir;
 }
 
-void Logger::setLogFlush(bool flush)
-{
+void Logger::setLogFlush(bool flush) {
     _doFileFlush = flush;
 }
 
-void Logger::setLogDebug(bool debug)
-{
+void Logger::setLogDebug(bool debug) {
     const QSet<QString> rules = {debug ? QStringLiteral("nextcloud.*.debug=true") : QString()};
     if (debug) {
         addLogRule(rules);
@@ -189,13 +171,11 @@ void Logger::setLogDebug(bool debug)
     _logDebug = debug;
 }
 
-QString Logger::temporaryFolderLogDirPath() const
-{
+QString Logger::temporaryFolderLogDirPath() const {
     return QDir::temp().filePath(QStringLiteral(APPLICATION_SHORTNAME "-logdir"));
 }
 
-void Logger::setupTemporaryFolderLogDir()
-{
+void Logger::setupTemporaryFolderLogDir() {
     auto dir = temporaryFolderLogDirPath();
     if (!QDir().mkpath(dir))
         return;
@@ -205,8 +185,7 @@ void Logger::setupTemporaryFolderLogDir()
     _temporaryFolderLogDir = true;
 }
 
-void Logger::disableTemporaryFolderLogDir()
-{
+void Logger::disableTemporaryFolderLogDir() {
     if (!_temporaryFolderLogDir)
         return;
 
@@ -217,8 +196,7 @@ void Logger::disableTemporaryFolderLogDir()
     _temporaryFolderLogDir = false;
 }
 
-void Logger::setLogRules(const QSet<QString> &rules)
-{
+void Logger::setLogRules(const QSet<QString> &rules) {
     _logRules = rules;
     QString tmp;
     QTextStream out(&tmp);
@@ -229,8 +207,7 @@ void Logger::setLogRules(const QSet<QString> &rules)
     QLoggingCategory::setFilterRules(tmp);
 }
 
-void Logger::dumpCrashLog()
-{
+void Logger::dumpCrashLog() {
     QFile logFile(QDir::tempPath() + QStringLiteral("/" APPLICATION_NAME "-crash.log"));
     if (logFile.open(QFile::WriteOnly)) {
         QTextStream out(&logFile);
@@ -240,8 +217,7 @@ void Logger::dumpCrashLog()
     }
 }
 
-static bool compressLog(const QString &originalName, const QString &targetName)
-{
+static bool compressLog(const QString &originalName, const QString &targetName) {
 #ifdef ZLIB_FOUND
     QFile original(originalName);
     if (!original.open(QIODevice::ReadOnly))
@@ -266,8 +242,7 @@ static bool compressLog(const QString &originalName, const QString &targetName)
 #endif
 }
 
-void Logger::enterNextLogFile()
-{
+void Logger::enterNextLogFile() {
     if (!_logDirectory.isEmpty()) {
 
         QDir dir(_logDirectory);

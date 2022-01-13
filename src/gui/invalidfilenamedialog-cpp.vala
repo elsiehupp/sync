@@ -32,8 +32,7 @@
 namespace {
 constexpr std::array<QChar, 9> illegalCharacters({ '\\', '/', ':', '?', '*', '\"', '<', '>', '|' });
 
-QVector<QChar> getIllegalCharsFromString(const QString &string)
-{
+QVector<QChar> getIllegalCharsFromString(const QString &string) {
     QVector<QChar> result;
     for (const auto &character : string) {
         if (std::find(illegalCharacters.begin(), illegalCharacters.end(), character)
@@ -44,8 +43,7 @@ QVector<QChar> getIllegalCharsFromString(const QString &string)
     return result;
 }
 
-QString illegalCharacterListToString(const QVector<QChar> &illegalCharacters)
-{
+QString illegalCharacterListToString(const QVector<QChar> &illegalCharacters) {
     QString illegalCharactersString;
     if (illegalCharacters.size() > 0) {
         illegalCharactersString += illegalCharacters[0];
@@ -68,8 +66,7 @@ InvalidFilenameDialog::InvalidFilenameDialog(AccountPtr account, Folder *folder,
     , _ui(new Ui::InvalidFilenameDialog)
     , _account(account)
     , _folder(folder)
-    , _filePath(std::move(filePath))
-{
+    , _filePath(std::move(filePath)) {
     Q_ASSERT(_account);
     Q_ASSERT(_folder);
 
@@ -99,16 +96,14 @@ InvalidFilenameDialog::InvalidFilenameDialog(AccountPtr account, Folder *folder,
 
 InvalidFilenameDialog::~InvalidFilenameDialog() = default;
 
-void InvalidFilenameDialog::checkIfAllowedToRename()
-{
+void InvalidFilenameDialog::checkIfAllowedToRename() {
     const auto propfindJob = new PropfindJob(_account, QDir::cleanPath(_folder->remotePath() + _originalFileName));
     propfindJob->setProperties({ "http://owncloud.org/ns:permissions" });
     connect(propfindJob, &PropfindJob::result, this, &InvalidFilenameDialog::onPropfindPermissionSuccess);
     propfindJob->start();
 }
 
-void InvalidFilenameDialog::onPropfindPermissionSuccess(const QVariantMap &values)
-{
+void InvalidFilenameDialog::onPropfindPermissionSuccess(const QVariantMap &values) {
     if (!values.contains("permissions")) {
         return;
     }
@@ -122,8 +117,7 @@ void InvalidFilenameDialog::onPropfindPermissionSuccess(const QVariantMap &value
     }
 }
 
-void InvalidFilenameDialog::accept()
-{
+void InvalidFilenameDialog::accept() {
     _newFilename = _relativeFilePath + _ui->filenameLineEdit->text().trimmed();
     const auto propfindJob = new PropfindJob(_account, QDir::cleanPath(_folder->remotePath() + _newFilename));
     connect(propfindJob, &PropfindJob::result, this, &InvalidFilenameDialog::onRemoteFileAlreadyExists);
@@ -131,8 +125,7 @@ void InvalidFilenameDialog::accept()
     propfindJob->start();
 }
 
-void InvalidFilenameDialog::onFilenameLineEditTextChanged(const QString &text)
-{
+void InvalidFilenameDialog::onFilenameLineEditTextChanged(const QString &text) {
     const auto isNewFileNameDifferent = text != _originalFileName;
     const auto illegalContainedCharacters = getIllegalCharsFromString(text);
     const auto containsIllegalChars = !illegalContainedCharacters.empty() || text.endsWith(QLatin1Char('.'));
@@ -149,8 +142,7 @@ void InvalidFilenameDialog::onFilenameLineEditTextChanged(const QString &text)
         ->setEnabled(isTextValid);
 }
 
-void InvalidFilenameDialog::onMoveJobFinished()
-{
+void InvalidFilenameDialog::onMoveJobFinished() {
     const auto job = qobject_cast<MoveJob *>(sender());
     const auto error = job->reply()->error();
 
@@ -162,16 +154,14 @@ void InvalidFilenameDialog::onMoveJobFinished()
     QDialog::accept();
 }
 
-void InvalidFilenameDialog::onRemoteFileAlreadyExists(const QVariantMap &values)
-{
+void InvalidFilenameDialog::onRemoteFileAlreadyExists(const QVariantMap &values) {
     Q_UNUSED(values);
 
     _ui->errorLabel->setText(tr("Cannot rename file because a file with the same name does already exist on the server. Please pick another name."));
     _ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 }
 
-void InvalidFilenameDialog::onRemoteFileDoesNotExist(QNetworkReply *reply)
-{
+void InvalidFilenameDialog::onRemoteFileDoesNotExist(QNetworkReply *reply) {
     Q_UNUSED(reply);
 
     // File does not exist. We can rename it.

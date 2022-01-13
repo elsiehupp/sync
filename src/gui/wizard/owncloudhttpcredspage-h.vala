@@ -26,8 +26,7 @@ namespace OCC {
 /**
  * @brief The OwncloudHttpCredsPage class
  */
-class OwncloudHttpCredsPage : public AbstractCredentialsWizardPage
-{
+class OwncloudHttpCredsPage : public AbstractCredentialsWizardPage {
 public:
     OwncloudHttpCredsPage(QWidget *parent);
 

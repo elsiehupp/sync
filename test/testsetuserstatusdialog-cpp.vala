@@ -21,11 +21,9 @@
 
 // #include <memory>
 
-class FakeUserStatusConnector : public OCC::UserStatusConnector
-{
+class FakeUserStatusConnector : public OCC::UserStatusConnector {
 public:
-    void fetchUserStatus() override
-    {
+    void fetchUserStatus() override {
         if (_couldNotFetchUserStatus) {
             emit error(Error::CouldNotFetchUserStatus);
             return;
@@ -40,8 +38,7 @@ public:
         emit userStatusFetched(_userStatus);
     }
 
-    void fetchPredefinedStatuses() override
-    {
+    void fetchPredefinedStatuses() override {
         if (_couldNotFetchPredefinedUserStatuses) {
             emit error(Error::CouldNotFetchPredefinedUserStatuses);
             return;
@@ -49,8 +46,7 @@ public:
         emit predefinedStatusesFetched(_predefinedStatuses);
     }
 
-    void setUserStatus(const OCC::UserStatus &userStatus) override
-    {
+    void setUserStatus(const OCC::UserStatus &userStatus) override {
         if (_couldNotSetUserStatusMessage) {
             emit error(Error::CouldNotSetUserStatus);
             return;
@@ -60,8 +56,7 @@ public:
         emit UserStatusConnector::userStatusSet();
     }
 
-    void clearMessage() override
-    {
+    void clearMessage() override {
         if (_couldNotClearUserStatusMessage) {
             emit error(Error::CouldNotClearMessage);
         } else {
@@ -69,19 +64,16 @@ public:
         }
     }
 
-    OCC::UserStatus userStatus() const override
-    {
+    OCC::UserStatus userStatus() const override {
         return {}; // Not implemented
     }
 
-    void setFakeUserStatus(const OCC::UserStatus &userStatus)
-    {
+    void setFakeUserStatus(const OCC::UserStatus &userStatus) {
         _userStatus = userStatus;
     }
 
     void setFakePredefinedStatuses(
-        const std::vector<OCC::UserStatus> &statuses)
-    {
+        const std::vector<OCC::UserStatus> &statuses) {
         _predefinedStatuses = statuses;
     }
 
@@ -89,33 +81,27 @@ public:
 
     bool messageCleared() const { return _isMessageCleared; }
 
-    void setErrorCouldNotFetchPredefinedUserStatuses(bool value)
-    {
+    void setErrorCouldNotFetchPredefinedUserStatuses(bool value) {
         _couldNotFetchPredefinedUserStatuses = value;
     }
 
-    void setErrorCouldNotFetchUserStatus(bool value)
-    {
+    void setErrorCouldNotFetchUserStatus(bool value) {
         _couldNotFetchUserStatus = value;
     }
 
-    void setErrorCouldNotSetUserStatusMessage(bool value)
-    {
+    void setErrorCouldNotSetUserStatusMessage(bool value) {
         _couldNotSetUserStatusMessage = value;
     }
 
-    void setErrorUserStatusNotSupported(bool value)
-    {
+    void setErrorUserStatusNotSupported(bool value) {
         _userStatusNotSupported = value;
     }
 
-    void setErrorEmojisNotSupported(bool value)
-    {
+    void setErrorEmojisNotSupported(bool value) {
         _emojisNotSupported = value;
     }
 
-    void setErrorCouldNotClearUserStatusMessage(bool value)
-    {
+    void setErrorCouldNotClearUserStatusMessage(bool value) {
         _couldNotClearUserStatusMessage = value;
     }
 
@@ -132,8 +118,7 @@ private:
     bool _couldNotClearUserStatusMessage = false;
 };
 
-class FakeDateTimeProvider : public OCC::DateTimeProvider
-{
+class FakeDateTimeProvider : public OCC::DateTimeProvider {
 public:
     void setCurrentDateTime(const QDateTime &dateTime) { _dateTime = dateTime; }
 
@@ -146,8 +131,7 @@ private:
 };
 
 static std::vector<OCC::UserStatus>
-createFakePredefinedStatuses(const QDateTime &currentTime)
-{
+createFakePredefinedStatuses(const QDateTime &currentTime) {
     std::vector<OCC::UserStatus> statuses;
 
     const QString userStatusId("fake-id");
@@ -168,8 +152,7 @@ createFakePredefinedStatuses(const QDateTime &currentTime)
 }
 
 static QDateTime createDateTime(int year = 2021, int month = 7, int day = 27,
-    int hour = 12, int minute = 0, int second = 0)
-{
+    int hour = 12, int minute = 0, int second = 0) {
     QDate fakeDate(year, month, day);
     QTime fakeTime(hour, minute, second);
     QDateTime fakeDateTime;
@@ -180,12 +163,10 @@ static QDateTime createDateTime(int year = 2021, int month = 7, int day = 27,
     return fakeDateTime;
 }
 
-class TestSetUserStatusDialog : public QObject
-{
+class TestSetUserStatusDialog : public QObject {
 
 private slots:
-    void testCtor_fetchStatusAndPredefinedStatuses()
-    {
+    void testCtor_fetchStatusAndPredefinedStatuses() {
         const QDateTime currentDateTime(QDateTime::currentDateTime());
 
         const QString userStatusId("fake-id");
@@ -193,8 +174,7 @@ private slots:
         const QString userStatusIcon("❤");
         const OCC::UserStatus::OnlineStatus userStatusState(OCC::UserStatus::OnlineStatus::DoNotDisturb);
         const bool userStatusMessagePredefined(false);
-        OCC::Optional<OCC::ClearAt> userStatusClearAt;
-        {
+        OCC::Optional<OCC::ClearAt> userStatusClearAt; {
             OCC::ClearAt clearAt;
             clearAt._type = OCC::ClearAtType::Timestamp;
             clearAt._timestamp = currentDateTime.addDays(1).toTime_t();
@@ -235,8 +215,7 @@ private slots:
         }
     }
 
-    void testCtor_noStatusSet_showSensibleDefaults()
-    {
+    void testCtor_noStatusSet_showSensibleDefaults() {
         OCC::UserStatusSelectorModel model(nullptr, nullptr);
 
         QCOMPARE(model.userStatusMessage(), "");
@@ -244,8 +223,7 @@ private slots:
         QCOMPARE(model.clearAt(), tr("Don't clear"));
     }
 
-    void testCtor_fetchStatusButNoStatusSet_showSensibleDefaults()
-    {
+    void testCtor_fetchStatusButNoStatusSet_showSensibleDefaults() {
         auto fakeUserStatusJob = std::make_shared<FakeUserStatusConnector>();
         fakeUserStatusJob->setFakeUserStatus({ "", "", "",
             OCC::UserStatus::OnlineStatus::Offline, false, {} });
@@ -257,8 +235,7 @@ private slots:
         QCOMPARE(model.clearAt(), tr("Don't clear"));
     }
 
-    void testSetOnlineStatus_emitOnlineStatusChanged()
-    {
+    void testSetOnlineStatus_emitOnlineStatusChanged() {
         const OCC::UserStatus::OnlineStatus onlineStatus(OCC::UserStatus::OnlineStatus::Invisible);
         auto fakeUserStatusJob = std::make_shared<FakeUserStatusConnector>();
         OCC::UserStatusSelectorModel model(fakeUserStatusJob);
@@ -270,8 +247,7 @@ private slots:
         QCOMPARE(onlineStatusChangedSpy.count(), 1);
     }
 
-    void testSetUserStatus_setCustomMessage_userStatusSetCorrect()
-    {
+    void testSetUserStatus_setCustomMessage_userStatusSetCorrect() {
         auto fakeUserStatusJob = std::make_shared<FakeUserStatusConnector>();
         OCC::UserStatusSelectorModel model(fakeUserStatusJob);
         QSignalSpy finishedSpy(&model, &OCC::UserStatusSelectorModel::finished);
@@ -299,8 +275,7 @@ private slots:
         QCOMPARE(clearAt->_period, 60 * 30);
     }
 
-    void testSetUserStatusMessage_predefinedStatusWasSet_userStatusSetCorrect()
-    {
+    void testSetUserStatusMessage_predefinedStatusWasSet_userStatusSetCorrect() {
         auto fakeUserStatusJob = std::make_shared<FakeUserStatusConnector>();
         fakeUserStatusJob->setFakePredefinedStatuses(createFakePredefinedStatuses(createDateTime()));
         OCC::UserStatusSelectorModel model(fakeUserStatusJob);
@@ -327,8 +302,7 @@ private slots:
         QCOMPARE(clearAt->_period, 60 * 30);
     }
 
-    void testSetUserStatusEmoji_predefinedStatusWasSet_userStatusSetCorrect()
-    {
+    void testSetUserStatusEmoji_predefinedStatusWasSet_userStatusSetCorrect() {
         auto fakeUserStatusJob = std::make_shared<FakeUserStatusConnector>();
         fakeUserStatusJob->setFakePredefinedStatuses(createFakePredefinedStatuses(createDateTime()));
         OCC::UserStatusSelectorModel model(fakeUserStatusJob);
@@ -355,8 +329,7 @@ private slots:
         QCOMPARE(clearAt->_period, 60 * 30);
     }
 
-    void testSetPredefinedStatus_emitUserStatusChangedAndSetUserStatus()
-    {
+    void testSetPredefinedStatus_emitUserStatusChangedAndSetUserStatus() {
         auto fakeUserStatusJob = std::make_shared<FakeUserStatusConnector>();
         auto fakeDateTimeProvider = std::make_unique<FakeDateTimeProvider>();
         const auto currentTime = createDateTime();
@@ -385,8 +358,7 @@ private slots:
         QCOMPARE(model.clearAt(), tr("1 hour"));
     }
 
-    void testSetClear_setClearAtStage0_emitClearAtChangedAndClearAtSet()
-    {
+    void testSetClear_setClearAtStage0_emitClearAtChangedAndClearAtSet() {
         auto fakeUserStatusJob = std::make_shared<FakeUserStatusConnector>();
         OCC::UserStatusSelectorModel model(fakeUserStatusJob);
         QSignalSpy clearAtChangedSpy(&model, &OCC::UserStatusSelectorModel::clearAtChanged);
@@ -398,8 +370,7 @@ private slots:
         QCOMPARE(model.clearAt(), tr("Don't clear"));
     }
 
-    void testSetClear_setClearAtStage1_emitClearAtChangedAndClearAtSet()
-    {
+    void testSetClear_setClearAtStage1_emitClearAtChangedAndClearAtSet() {
         auto fakeUserStatusJob = std::make_shared<FakeUserStatusConnector>();
         OCC::UserStatusSelectorModel model(fakeUserStatusJob);
         QSignalSpy clearAtChangedSpy(&model, &OCC::UserStatusSelectorModel::clearAtChanged);
@@ -411,8 +382,7 @@ private slots:
         QCOMPARE(model.clearAt(), tr("30 minutes"));
     }
 
-    void testSetClear_setClearAtStage2_emitClearAtChangedAndClearAtSet()
-    {
+    void testSetClear_setClearAtStage2_emitClearAtChangedAndClearAtSet() {
         auto fakeUserStatusJob = std::make_shared<FakeUserStatusConnector>();
         OCC::UserStatusSelectorModel model(fakeUserStatusJob);
         QSignalSpy clearAtChangedSpy(&model, &OCC::UserStatusSelectorModel::clearAtChanged);
@@ -424,8 +394,7 @@ private slots:
         QCOMPARE(model.clearAt(), tr("1 hour"));
     }
 
-    void testSetClear_setClearAtStage3_emitClearAtChangedAndClearAtSet()
-    {
+    void testSetClear_setClearAtStage3_emitClearAtChangedAndClearAtSet() {
         auto fakeUserStatusJob = std::make_shared<FakeUserStatusConnector>();
         OCC::UserStatusSelectorModel model(fakeUserStatusJob);
         QSignalSpy clearAtChangedSpy(&model, &OCC::UserStatusSelectorModel::clearAtChanged);
@@ -437,8 +406,7 @@ private slots:
         QCOMPARE(model.clearAt(), tr("4 hours"));
     }
 
-    void testSetClear_setClearAtStage4_emitClearAtChangedAndClearAtSet()
-    {
+    void testSetClear_setClearAtStage4_emitClearAtChangedAndClearAtSet() {
         auto fakeUserStatusJob = std::make_shared<FakeUserStatusConnector>();
         OCC::UserStatusSelectorModel model(fakeUserStatusJob);
         QSignalSpy clearAtChangedSpy(&model, &OCC::UserStatusSelectorModel::clearAtChanged);
@@ -450,8 +418,7 @@ private slots:
         QCOMPARE(model.clearAt(), tr("Today"));
     }
 
-    void testSetClear_setClearAtStage5_emitClearAtChangedAndClearAtSet()
-    {
+    void testSetClear_setClearAtStage5_emitClearAtChangedAndClearAtSet() {
         auto fakeUserStatusJob = std::make_shared<FakeUserStatusConnector>();
         OCC::UserStatusSelectorModel model(fakeUserStatusJob);
         QSignalSpy clearAtChangedSpy(&model, &OCC::UserStatusSelectorModel::clearAtChanged);
@@ -463,8 +430,7 @@ private slots:
         QCOMPARE(model.clearAt(), tr("This week"));
     }
 
-    void testClearAtStages()
-    {
+    void testClearAtStages() {
         auto fakeUserStatusJob = std::make_shared<FakeUserStatusConnector>();
         OCC::UserStatusSelectorModel model(fakeUserStatusJob);
 
@@ -480,9 +446,7 @@ private slots:
         QCOMPARE(clearAtValues[5], tr("This week"));
     }
 
-    void testClearAt_clearAtTimestamp()
-    {
-        const auto currentTime = createDateTime();
+    void testClearAt_clearAtTimestamp() { {onst auto currentTime = createDateTime();
         {
             OCC::UserStatus userStatus;
             OCC::ClearAt clearAt;
@@ -497,8 +461,7 @@ private slots:
 
             QCOMPARE(model.clearAt(), tr("Less than a minute"));
         }
-
-        {
+ {
             OCC::UserStatus userStatus;
             OCC::ClearAt clearAt;
             clearAt._type = OCC::ClearAtType::Timestamp;
@@ -512,8 +475,7 @@ private slots:
 
             QCOMPARE(model.clearAt(), tr("1 minute"));
         }
-
-        {
+ {
             OCC::UserStatus userStatus;
             OCC::ClearAt clearAt;
             clearAt._type = OCC::ClearAtType::Timestamp;
@@ -527,8 +489,7 @@ private slots:
 
             QCOMPARE(model.clearAt(), tr("30 minutes"));
         }
-
-        {
+ {
             OCC::UserStatus userStatus;
             OCC::ClearAt clearAt;
             clearAt._type = OCC::ClearAtType::Timestamp;
@@ -542,8 +503,7 @@ private slots:
 
             QCOMPARE(model.clearAt(), tr("1 hour"));
         }
-
-        {
+ {
             OCC::UserStatus userStatus;
             OCC::ClearAt clearAt;
             clearAt._type = OCC::ClearAtType::Timestamp;
@@ -557,8 +517,7 @@ private slots:
 
             QCOMPARE(model.clearAt(), tr("4 hours"));
         }
-
-        {
+ {
             OCC::UserStatus userStatus;
             OCC::ClearAt clearAt;
             clearAt._type = OCC::ClearAtType::Timestamp;
@@ -572,8 +531,7 @@ private slots:
 
             QCOMPARE(model.clearAt(), tr("1 day"));
         }
-
-        {
+ {
             OCC::UserStatus userStatus;
             OCC::ClearAt clearAt;
             clearAt._type = OCC::ClearAtType::Timestamp;
@@ -589,9 +547,7 @@ private slots:
         }
     }
 
-    void testClearAt_clearAtEndOf()
-    {
-        {
+    void testClearAt_clearAtEndOf() { {
             OCC::UserStatus userStatus;
             OCC::ClearAt clearAt;
             clearAt._type = OCC::ClearAtType::EndOf;
@@ -602,8 +558,7 @@ private slots:
 
             QCOMPARE(model.clearAt(), tr("Today"));
         }
-
-        {
+ {
             OCC::UserStatus userStatus;
             OCC::ClearAt clearAt;
             clearAt._type = OCC::ClearAtType::EndOf;
@@ -616,9 +571,7 @@ private slots:
         }
     }
 
-    void testClearAt_clearAtAfterPeriod()
-    {
-        {
+    void testClearAt_clearAtAfterPeriod() { {
             OCC::UserStatus userStatus;
             OCC::ClearAt clearAt;
             clearAt._type = OCC::ClearAtType::Period;
@@ -629,8 +582,7 @@ private slots:
 
             QCOMPARE(model.clearAt(), tr("30 minutes"));
         }
-
-        {
+ {
             OCC::UserStatus userStatus;
             OCC::ClearAt clearAt;
             clearAt._type = OCC::ClearAtType::Period;
@@ -643,8 +595,7 @@ private slots:
         }
     }
 
-    void testClearUserStatus()
-    {
+    void testClearUserStatus() {
         auto fakeUserStatusJob = std::make_shared<FakeUserStatusConnector>();
         OCC::UserStatusSelectorModel model(fakeUserStatusJob);
 
@@ -653,8 +604,7 @@ private slots:
         QVERIFY(fakeUserStatusJob->messageCleared());
     }
 
-    void testError_couldNotFetchPredefinedStatuses_emitError()
-    {
+    void testError_couldNotFetchPredefinedStatuses_emitError() {
         auto fakeUserStatusJob = std::make_shared<FakeUserStatusConnector>();
         fakeUserStatusJob->setErrorCouldNotFetchPredefinedUserStatuses(true);
         OCC::UserStatusSelectorModel model(fakeUserStatusJob);
@@ -663,8 +613,7 @@ private slots:
             tr("Could not fetch predefined statuses. Make sure you are connected to the server."));
     }
 
-    void testError_couldNotFetchUserStatus_emitError()
-    {
+    void testError_couldNotFetchUserStatus_emitError() {
         auto fakeUserStatusJob = std::make_shared<FakeUserStatusConnector>();
         fakeUserStatusJob->setErrorCouldNotFetchUserStatus(true);
         OCC::UserStatusSelectorModel model(fakeUserStatusJob);
@@ -673,8 +622,7 @@ private slots:
             tr("Could not fetch user status. Make sure you are connected to the server."));
     }
 
-    void testError_userStatusNotSupported_emitError()
-    {
+    void testError_userStatusNotSupported_emitError() {
         auto fakeUserStatusJob = std::make_shared<FakeUserStatusConnector>();
         fakeUserStatusJob->setErrorUserStatusNotSupported(true);
         OCC::UserStatusSelectorModel model(fakeUserStatusJob);
@@ -683,8 +631,7 @@ private slots:
             tr("User status feature is not supported. You will not be able to set your user status."));
     }
 
-    void testError_couldSetUserStatus_emitError()
-    {
+    void testError_couldSetUserStatus_emitError() {
         auto fakeUserStatusJob = std::make_shared<FakeUserStatusConnector>();
         fakeUserStatusJob->setErrorCouldNotSetUserStatusMessage(true);
         OCC::UserStatusSelectorModel model(fakeUserStatusJob);
@@ -694,8 +641,7 @@ private slots:
             tr("Could not set user status. Make sure you are connected to the server."));
     }
 
-    void testError_emojisNotSupported_emitError()
-    {
+    void testError_emojisNotSupported_emitError() {
         auto fakeUserStatusJob = std::make_shared<FakeUserStatusConnector>();
         fakeUserStatusJob->setErrorEmojisNotSupported(true);
         OCC::UserStatusSelectorModel model(fakeUserStatusJob);
@@ -704,8 +650,7 @@ private slots:
             tr("Emojis feature is not supported. Some user status functionality may not work."));
     }
 
-    void testError_couldNotClearMessage_emitError()
-    {
+    void testError_couldNotClearMessage_emitError() {
         auto fakeUserStatusJob = std::make_shared<FakeUserStatusConnector>();
         fakeUserStatusJob->setErrorCouldNotClearUserStatusMessage(true);
         OCC::UserStatusSelectorModel model(fakeUserStatusJob);
@@ -715,8 +660,7 @@ private slots:
             tr("Could not clear user status message. Make sure you are connected to the server."));
     }
 
-    void testError_setUserStatus_clearErrorMessage()
-    {
+    void testError_setUserStatus_clearErrorMessage() {
         auto fakeUserStatusJob = std::make_shared<FakeUserStatusConnector>();
         OCC::UserStatusSelectorModel model(fakeUserStatusJob);
 
@@ -728,8 +672,7 @@ private slots:
         QVERIFY(model.errorMessage().isEmpty());
     }
 
-    void testError_clearUserStatus_clearErrorMessage()
-    {
+    void testError_clearUserStatus_clearErrorMessage() {
         auto fakeUserStatusJob = std::make_shared<FakeUserStatusConnector>();
         OCC::UserStatusSelectorModel model(fakeUserStatusJob);
 

@@ -17,8 +17,7 @@
 namespace OCC {
 
 IconJob::IconJob(AccountPtr account, const QUrl &url, QObject *parent)
-    : QObject(parent)
-{
+    : QObject(parent) {
     QNetworkRequest request(url);
 #if (QT_VERSION >= 0x050600)
     request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
@@ -27,8 +26,7 @@ IconJob::IconJob(AccountPtr account, const QUrl &url, QObject *parent)
     connect(reply, &QNetworkReply::finished, this, &IconJob::finished);
 }
 
-void IconJob::finished()
-{
+void IconJob::finished() {
     const auto reply = qobject_cast<QNetworkReply *>(sender());
     if (!reply) {
         return;

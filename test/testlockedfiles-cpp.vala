@@ -15,8 +15,7 @@ using namespace OCC;
 
 #ifdef Q_OS_WIN
 // pass combination of FILE_SHARE_READ, FILE_SHARE_WRITE, FILE_SHARE_DELETE
-HANDLE makeHandle(const QString &file, int shareMode)
-{
+HANDLE makeHandle(const QString &file, int shareMode) {
     const auto fName = FileSystem::longWinPath(file);
     const wchar_t *wuri = reinterpret_cast<const wchar_t *>(fName.utf16());
     auto handle = CreateFileW(
@@ -33,12 +32,10 @@ HANDLE makeHandle(const QString &file, int shareMode)
 }
 #endif
 
-class TestLockedFiles : public QObject
-{
+class TestLockedFiles : public QObject {
 
 private slots:
-    void testBasicLockFileWatcher()
-    {
+    void testBasicLockFileWatcher() {
         QTemporaryDir tmp;
         int count = 0;
         QString file;
@@ -50,8 +47,7 @@ private slots:
         const QString tmpFile = tmp.path() + QString::fromUtf8("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
                                                                "elonglonglonglong/flonglonglonglong/glonglonglonglong/hlonglonglonglong/ilonglonglonglong/"
                                                                "jlonglonglonglong/klonglonglonglong/llonglonglonglong/mlonglonglonglong/nlonglonglonglong/"
-                                                               "olonglonglonglong/file🐷.txt");
-        {
+                                                               "olonglonglonglong/file🐷.txt"); {
             // use a long file path to ensure we handle that correctly
             QVERIFY(QFileInfo(tmpFile).dir().mkpath("."));
             QFile tmp(tmpFile);
@@ -100,8 +96,7 @@ private slots:
     }
 
 #ifdef Q_OS_WIN
-    void testLockedFilePropagation()
-    {
+    void testLockedFilePropagation() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
 
         QStringList seenLockedFiles;

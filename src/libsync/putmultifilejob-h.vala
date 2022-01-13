@@ -34,8 +34,7 @@ namespace OCC {
 
 Q_DECLARE_LOGGING_CATEGORY(lcPutMultiFileJob)
 
-struct SingleUploadFileData
-{
+struct SingleUploadFileData {
     std::unique_ptr<UploadDevice> _device;
     QMap<QByteArray, QByteArray> _headers;
 };
@@ -44,16 +43,14 @@ struct SingleUploadFileData
  * @brief The PutMultiFileJob class
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT PutMultiFileJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT PutMultiFileJob : public AbstractNetworkJob {
 
 public:
     explicit PutMultiFileJob(AccountPtr account, const QUrl &url,
                              std::vector<SingleUploadFileData> devices, QObject *parent = nullptr)
         : AbstractNetworkJob(account, {}, parent)
         , _devices(std::move(devices))
-        , _url(url)
-    {
+        , _url(url) {
         _body.setContentType(QHttpMultiPart::RelatedType);
         for(auto &singleDevice : _devices) {
             singleDevice._device->setParent(this);
@@ -68,13 +65,11 @@ public:
 
     bool finished() override;
 
-    QString errorString() const override
-    {
+    QString errorString() const override {
         return _errorString.isEmpty() ? AbstractNetworkJob::errorString() : _errorString;
     }
 
-    std::chrono::milliseconds msSinceStart() const
-    {
+    std::chrono::milliseconds msSinceStart() const {
         return std::chrono::milliseconds(_requestTimer.elapsed());
     }
 

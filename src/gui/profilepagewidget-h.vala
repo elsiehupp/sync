@@ -11,8 +11,7 @@
 
 namespace OCC {
 
-class ProfilePageMenu : public QWidget
-{
+class ProfilePageMenu : public QWidget {
 public:
     explicit ProfilePageMenu(AccountPtr account, const QString &shareWithUserId, QWidget *parent = nullptr);
     ~ProfilePageMenu() override;

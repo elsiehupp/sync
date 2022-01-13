@@ -50,8 +50,7 @@ class SslErrorDialog;
  * @brief The Application class
  * @ingroup gui
  */
-class Application : public SharedTools::QtSingleApplication
-{
+class Application : public SharedTools::QtSingleApplication {
 public:
     explicit Application(int &argc, char **argv);
     ~Application() override;

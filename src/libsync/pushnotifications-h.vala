@@ -24,8 +24,7 @@ namespace OCC {
 class Account;
 class AbstractCredentials;
 
-class OWNCLOUDSYNC_EXPORT PushNotifications : public QObject
-{
+class OWNCLOUDSYNC_EXPORT PushNotifications : public QObject {
 
 public:
     explicit PushNotifications(Account *account, QObject *parent = nullptr);

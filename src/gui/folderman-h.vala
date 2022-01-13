@@ -56,8 +56,7 @@ class LockWatcher;
  *   (_timeScheduler and slotScheduleFolderByTime()
  *    and Folder::slotSyncFinished())
  */
-class FolderMan : public QObject
-{
+class FolderMan : public QObject {
 public:
     ~FolderMan() override;
     static FolderMan *instance();

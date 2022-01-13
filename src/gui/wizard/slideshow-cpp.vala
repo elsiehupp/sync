@@ -27,30 +27,25 @@ static const int Spacing = 6;
 static const int SlideDuration = 1000;
 static const int SlideDistance = 400;
 
-SlideShow::SlideShow(QWidget *parent) : QWidget(parent)
-{
+SlideShow::SlideShow(QWidget *parent) : QWidget(parent) {
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 }
 
-void SlideShow::addSlide(const QPixmap &pixmap, const QString &label)
-{
+void SlideShow::addSlide(const QPixmap &pixmap, const QString &label) {
     _labels += label;
     _pixmaps += pixmap;
     updateGeometry();
 }
 
-bool SlideShow::isActive() const
-{
+bool SlideShow::isActive() const {
     return _timer.isActive();
 }
 
-int SlideShow::interval() const
-{
+int SlideShow::interval() const {
     return _interval;
 }
 
-void SlideShow::setInterval(int interval)
-{
+void SlideShow::setInterval(int interval) {
     if (_interval == interval)
         return;
 
@@ -58,13 +53,11 @@ void SlideShow::setInterval(int interval)
     maybeRestartTimer();
 }
 
-int SlideShow::currentSlide() const
-{
+int SlideShow::currentSlide() const {
     return _currentIndex;
 }
 
-void SlideShow::setCurrentSlide(int index)
-{
+void SlideShow::setCurrentSlide(int index) {
     if (_currentIndex == index)
         return;
 
@@ -85,8 +78,7 @@ void SlideShow::setCurrentSlide(int index)
     emit currentSlideChanged(index);
 }
 
-QSize SlideShow::sizeHint() const
-{
+QSize SlideShow::sizeHint() const {
     QFontMetrics fm = fontMetrics();
     QSize labelSize(0, fm.height());
     for (const QString &label : _labels) {
@@ -107,32 +99,27 @@ QSize SlideShow::sizeHint() const
     };
 }
 
-void SlideShow::startShow(int interval)
-{
+void SlideShow::startShow(int interval) {
     if (interval > 0)
         _interval = interval;
     _timer.start(_interval, this);
 }
 
-void SlideShow::stopShow()
-{
+void SlideShow::stopShow() {
     _timer.stop();
 }
 
-void SlideShow::nextSlide()
-{
+void SlideShow::nextSlide() {
     setCurrentSlide((_currentIndex + 1) % _labels.count());
     _reverse = false;
 }
 
-void SlideShow::prevSlide()
-{
+void SlideShow::prevSlide() {
     setCurrentSlide((_currentIndex > 0 ? _currentIndex : _labels.count()) - 1);
     _reverse = true;
 }
 
-void SlideShow::reset()
-{
+void SlideShow::reset() {
     stopShow();
     _pixmaps.clear();
     _labels.clear();
@@ -140,19 +127,16 @@ void SlideShow::reset()
     update();
 }
 
-void SlideShow::mousePressEvent(QMouseEvent *event)
-{
+void SlideShow::mousePressEvent(QMouseEvent *event) {
     _pressPoint = event->pos();
 }
 
-void SlideShow::mouseReleaseEvent(QMouseEvent *event)
-{
+void SlideShow::mouseReleaseEvent(QMouseEvent *event) {
     if (!_animation && QLineF(_pressPoint, event->pos()).length() < QGuiApplication::styleHints()->startDragDistance())
         emit clicked();
 }
 
-void SlideShow::paintEvent(QPaintEvent *)
-{
+void SlideShow::paintEvent(QPaintEvent *) {
     QPainter painter(this);
 
     if (_animation) {
@@ -174,22 +158,19 @@ void SlideShow::paintEvent(QPaintEvent *)
     }
 }
 
-void SlideShow::timerEvent(QTimerEvent *event)
-{
+void SlideShow::timerEvent(QTimerEvent *event) {
     if (event->timerId() == _timer.timerId())
         nextSlide();
 }
 
-void SlideShow::maybeRestartTimer()
-{
+void SlideShow::maybeRestartTimer() {
     if (!isActive())
         return;
 
     startShow();
 }
 
-void SlideShow::drawSlide(QPainter *painter, int index)
-{
+void SlideShow::drawSlide(QPainter *painter, int index) {
     QString label = _labels.value(index);
     QRect labelRect = style()->itemTextRect(fontMetrics(), rect(), Qt::AlignBottom | Qt::AlignHCenter, isEnabled(), label);
     style()->drawItemText(painter, labelRect, Qt::AlignCenter, palette(), isEnabled(), label, QPalette::WindowText);

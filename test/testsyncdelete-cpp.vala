@@ -11,13 +11,11 @@
 
 using namespace OCC;
 
-class TestSyncDelete : public QObject
-{
+class TestSyncDelete : public QObject {
 
 private slots:
 
-    void testDeleteDirectoryWithNewFile()
-    {
+    void testDeleteDirectoryWithNewFile() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
 
         // Remove a directory on the server with new files on the client
@@ -41,8 +39,7 @@ private slots:
         QCOMPARE(fakeFolder.currentLocalState(), fakeFolder.currentRemoteState());
     }
 
-    void issue1329()
-    {
+    void issue1329() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
 
         fakeFolder.localModifier().remove("B");

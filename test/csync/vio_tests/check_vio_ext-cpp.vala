@@ -34,8 +34,7 @@ static const auto CSYNC_TEST_DIR = []{ return QStringLiteral("%1/csync_test").ar
 #include "torture.h"
 
 namespace {
-int oc_mkdir(const QString &path)
-{
+int oc_mkdir(const QString &path) {
     return QDir(path).mkpath(path) ? 0 : -1;
 }
 
@@ -50,11 +49,9 @@ typedef struct {
 } statevar;
 
 /* remove the complete test dir */
-static int wipe_testdir()
-{
+static int wipe_testdir() {
   QDir tmp(CSYNC_TEST_DIR);
-  if (tmp.exists())
-  {
+  if (tmp.exists()) {
       return tmp.removeRecursively() ? 0 : 1;
   }
   return 0;
@@ -85,8 +82,7 @@ static int setup_testenv(void **state) {
     return 0;
 }
 
-static void output( const char *text )
-{
+static void output( const char *text ) {
     printf("%s\n", text);
 }
 
@@ -108,8 +104,7 @@ static int teardown(void **state) {
 /* This function takes a relative path, prepends it with the CSYNC_TEST_DIR
  * and creates each sub directory.
  */
-static void create_dirs( const char *path )
-{
+static void create_dirs( const char *path ) {
   int rc = -1;
   auto _mypath = QStringLiteral("%1/%2").arg(CSYNC_TEST_DIR, QString::fromUtf8(path)).toUtf8();
   char *mypath = _mypath.data();
@@ -125,8 +120,7 @@ static void create_dirs( const char *path )
 
       auto mb_dir = QString::fromUtf8(mypath);
       rc = oc_mkdir(mb_dir);
-      if(rc)
-      {
+      if(rc) {
           rc = errno;
       }
       assert_int_equal(rc, 0);
@@ -142,13 +136,12 @@ static void create_dirs( const char *path )
  *
  * It appends a listing to the result member of the incoming struct in *state
  * that can be compared later to what was expected in the calling functions.
- * 
+ *
  * The int parameter cnt contains the number of seen files (not dirs) in the
  * whole tree.
  *
  */
-static void traverse_dir(void **state, const QString &dir, int *cnt)
-{
+static void traverse_dir(void **state, const QString &dir, int *cnt) {
     csync_vio_handle_t *dh = nullptr;
     std::unique_ptr<csync_file_stat_t> dirent;
     auto sv = (statevar*) *state;
@@ -199,21 +192,19 @@ static void traverse_dir(void **state, const QString &dir, int *cnt)
 
 }
 
-static void create_file( const char *path, const char *name, const char *content)
-{
+static void create_file( const char *path, const char *name, const char *content) {
     QFile file(QStringLiteral("%1/%2%3").arg(CSYNC_TEST_DIR, QString::fromUtf8(path), QString::fromUtf8(name)));
     assert_int_equal(1, file.open(QIODevice::WriteOnly | QIODevice::NewOnly));
     file.write(content);
 }
 
-static void check_readdir_shorttree(void **state)
-{
+static void check_readdir_shorttree(void **state) {
     auto sv = (statevar*) *state;
 
     const char *t1 = "alibaba/und/die/vierzig/räuber/";
     create_dirs( t1 );
     int files_cnt = 0;
-    
+
     traverse_dir(state, CSYNC_TEST_DIR, &files_cnt);
 
     assert_string_equal(sv->result.constData(),
@@ -228,8 +219,7 @@ static void check_readdir_shorttree(void **state)
     assert_int_equal(files_cnt, 0);
 }
 
-static void check_readdir_with_content(void **state)
-{
+static void check_readdir_with_content(void **state) {
     auto sv = (statevar*) *state;
     int files_cnt = 0;
 
@@ -255,8 +245,7 @@ static void check_readdir_with_content(void **state)
     assert_int_equal(files_cnt, 2); /* Two files in the sub dir */
 }
 
-static void check_readdir_longtree(void **state)
-{
+static void check_readdir_longtree(void **state) {
     auto sv = (statevar*) *state;
 
     /* Strange things here: Compilers only support strings with length of 4k max.
@@ -325,8 +314,7 @@ static void check_readdir_longtree(void **state)
 }
 
 // https://github.com/owncloud/client/issues/3128 https://github.com/owncloud/client/issues/2777
-static void check_readdir_bigunicode(void **state)
-{
+static void check_readdir_bigunicode(void **state) {
     auto sv = (statevar*) *state;
 //    1: ? ASCII: 239 - EF
 //    2: ? ASCII: 187 - BB
@@ -353,8 +341,7 @@ static void check_readdir_bigunicode(void **state)
     assert_int_equal(files_cnt, 0);
 }
 
-int torture_run_tests(void)
-{
+int torture_run_tests(void) {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test_setup_teardown(check_readdir_shorttree, setup_testenv, teardown),
         cmocka_unit_test_setup_teardown(check_readdir_with_content, setup_testenv, teardown),

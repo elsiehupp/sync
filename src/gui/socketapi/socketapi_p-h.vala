@@ -27,8 +27,7 @@
 
 namespace OCC {
 
-class BloomFilter
-{
+class BloomFilter {
     // Initialize with m=1024 bits and k=2 (high and low 16 bits of a qHash).
     // For a client navigating in less than 100 directories, this gives us a probability less than
     // (1-e^(-2*100/1024))^2 = 0.03147872136 false positives.
@@ -36,17 +35,14 @@ class BloomFilter
 
 public:
     BloomFilter()
-        : hashBits(NumBits)
-    {
+        : hashBits(NumBits) {
     }
 
-    void storeHash(uint hash)
-    {
+    void storeHash(uint hash) {
         hashBits.setBit((hash & 0xFFFF) % NumBits); // NOLINT it's uint all the way and the modulo puts us back in the 0..1023 range
         hashBits.setBit((hash >> 16) % NumBits); // NOLINT
     }
-    bool isHashMaybeStored(uint hash) const
-    {
+    bool isHashMaybeStored(uint hash) const {
         return hashBits.testBit((hash & 0xFFFF) % NumBits) // NOLINT
             && hashBits.testBit((hash >> 16) % NumBits); // NOLINT
     }
@@ -55,34 +51,28 @@ private:
     QBitArray hashBits;
 };
 
-class SocketListener
-{
+class SocketListener {
 public:
     QPointer<QIODevice> socket;
 
     explicit SocketListener(QIODevice *_socket)
-        : socket(_socket)
-    {
+        : socket(_socket) {
     }
 
     void sendMessage(const QString &message, bool doWait = false) const;
-    void sendWarning(const QString &message, bool doWait = false) const
-    {
+    void sendWarning(const QString &message, bool doWait = false) const {
         sendMessage(QStringLiteral("WARNING:") + message, doWait);
     }
-    void sendError(const QString &message, bool doWait = false) const
-    {
+    void sendError(const QString &message, bool doWait = false) const {
         sendMessage(QStringLiteral("ERROR:") + message, doWait);
     }
 
-    void sendMessageIfDirectoryMonitored(const QString &message, uint systemDirectoryHash) const
-    {
+    void sendMessageIfDirectoryMonitored(const QString &message, uint systemDirectoryHash) const {
         if (_monitoredDirectoriesBloomFilter.isHashMaybeStored(systemDirectoryHash))
             sendMessage(message, false);
     }
 
-    void registerMonitoredDirectory(uint systemDirectoryHash)
-    {
+    void registerMonitoredDirectory(uint systemDirectoryHash) {
         _monitoredDirectoriesBloomFilter.storeHash(systemDirectoryHash);
     }
 
@@ -90,18 +80,15 @@ private:
     BloomFilter _monitoredDirectoriesBloomFilter;
 };
 
-class ListenerClosure : public QObject
-{
+class ListenerClosure : public QObject {
 public:
     using CallbackFunction = std::function<void()>;
     ListenerClosure(CallbackFunction callback)
-        : callback_(callback)
-    {
+        : callback_(callback) {
     }
 
 public slots:
-    void closureSlot()
-    {
+    void closureSlot() {
         callback_();
         deleteLater();
     }
@@ -110,14 +97,12 @@ private:
     CallbackFunction callback_;
 };
 
-class SocketApiJob : public QObject
-{
+class SocketApiJob : public QObject {
 public:
     explicit SocketApiJob(const QString &jobId, const QSharedPointer<SocketListener> &socketListener, const QJsonObject &arguments)
         : _jobId(jobId)
         , _socketListener(socketListener)
-        , _arguments(arguments)
-    {
+        , _arguments(arguments) {
     }
 
     void resolve(const QString &response = QString());
@@ -134,8 +119,7 @@ protected:
     QJsonObject _arguments;
 };
 
-class SocketApiJobV2 : public QObject
-{
+class SocketApiJobV2 : public QObject {
 public:
     explicit SocketApiJobV2(const QSharedPointer<SocketListener> &socketListener, const QByteArray &command, const QJsonObject &arguments);
 

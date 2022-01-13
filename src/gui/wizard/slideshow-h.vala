@@ -24,8 +24,7 @@ namespace OCC {
  * @brief The SlideShow class
  * @ingroup gui
  */
-class SlideShow : public QWidget
-{
+class SlideShow : public QWidget {
     Q_PROPERTY(int interval READ interval WRITE setInterval)
     Q_PROPERTY(int currentSlide READ currentSlide WRITE setCurrentSlide NOTIFY currentSlideChanged)
 

@@ -35,8 +35,7 @@ class VfsPrivate;
 class SyncFileItem;
 
 /** Collection of parameters for initializing a Vfs instance. */
-struct OCSYNC_EXPORT VfsSetupParams
-{
+struct OCSYNC_EXPORT VfsSetupParams {
     /** The full path to the folder on the local filesystem
      *
      * Always ends with /.
@@ -86,16 +85,14 @@ struct OCSYNC_EXPORT VfsSetupParams
  * An instance is usually created through a plugin via the createVfsFromPlugin()
  * function.
  */
-class OCSYNC_EXPORT Vfs : public QObject
-{
+class OCSYNC_EXPORT Vfs : public QObject {
 
 public:
     /** The kind of VFS in use (or no-VFS)
      *
      * Currently plugins and modes are one-to-one but that's not required.
      */
-    enum Mode
-    {
+    enum Mode {
         Off,
         WithSuffix,
         WindowsCfApi,
@@ -114,8 +111,7 @@ public:
 
     static Result<bool, QString> checkAvailability(const QString &path);
 
-    enum class AvailabilityError
-    {
+    enum class AvailabilityError {
         // Availability can't be retrieved due to db error
         DbError,
         // Availability not available since the item doesn't exist
@@ -284,8 +280,7 @@ protected:
 };
 
 /// Implementation of Vfs for Vfs::Off mode - does nothing
-class OCSYNC_EXPORT VfsOff : public Vfs
-{
+class OCSYNC_EXPORT VfsOff : public Vfs {
 
 public:
     VfsOff(QObject* parent = nullptr);
@@ -335,8 +330,7 @@ OCSYNC_EXPORT std::unique_ptr<Vfs> createVfsFromPlugin(Vfs::Mode mode);
 #define OCC_DEFINE_VFS_FACTORY(name, Type) \
     static_assert (std::is_base_of<OCC::Vfs, Type>::value, "Please define VFS factories only for OCC::Vfs subclasses"); \
     namespace { \
-    void initPlugin() \
-    { \
+    void initPlugin() \ { \
         OCC::Vfs::registerPlugin(QStringLiteral(name), []() -> OCC::Vfs * { return new (Type); }); \
     } \
     Q_COREAPP_STARTUP_FUNCTION(initPlugin) \

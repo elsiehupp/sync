@@ -44,8 +44,7 @@ class LocalDiscoveryTracker;
  * @brief The FolderDefinition class
  * @ingroup gui
  */
-class FolderDefinition
-{
+class FolderDefinition {
 public:
     /// The name of the folder in the ui and internally
     QString alias;
@@ -100,8 +99,7 @@ public:
  * @brief The Folder class
  * @ingroup gui
  */
-class Folder : public QObject
-{
+class Folder : public QObject {
 
 public:
     enum class ChangeReason {

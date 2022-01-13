@@ -35,8 +35,7 @@
 
 namespace OCC {
 
-QUrl PropagateUploadFileNG::chunkUrl(int chunk)
-{
+QUrl PropagateUploadFileNG::chunkUrl(int chunk) {
     QString path = QLatin1String("remote.php/dav/uploads/")
         + propagator()->account()->davUser()
         + QLatin1Char('/') + QString::number(_transferId);
@@ -78,8 +77,7 @@ QUrl PropagateUploadFileNG::chunkUrl(int chunk)
 
  */
 
-void PropagateUploadFileNG::doStartUpload()
-{
+void PropagateUploadFileNG::doStartUpload() {
     propagator()->_activeJobList.append(this);
 
     const SyncJournalDb::UploadInfo progressInfo = propagator()->_journal->getUploadInfo(_item->_file);
@@ -114,8 +112,7 @@ void PropagateUploadFileNG::doStartUpload()
     startNewUpload();
 }
 
-void PropagateUploadFileNG::slotPropfindIterate(const QString &name, const QMap<QString, QString> &properties)
-{
+void PropagateUploadFileNG::slotPropfindIterate(const QString &name, const QMap<QString, QString> &properties) {
     if (name == chunkUrl().path()) {
         return; // skip the info about the path itself
     }
@@ -128,8 +125,7 @@ void PropagateUploadFileNG::slotPropfindIterate(const QString &name, const QMap<
     }
 }
 
-void PropagateUploadFileNG::slotPropfindFinished()
-{
+void PropagateUploadFileNG::slotPropfindFinished() {
     auto job = qobject_cast<LsColJob *>(sender());
     slotJobDestroyed(job); // remove it from the _jobs list
     propagator()->_activeJobList.removeOne(this);
@@ -181,8 +177,7 @@ void PropagateUploadFileNG::slotPropfindFinished()
     startNextChunk();
 }
 
-void PropagateUploadFileNG::slotPropfindFinishedWithError()
-{
+void PropagateUploadFileNG::slotPropfindFinishedWithError() {
     auto job = qobject_cast<LsColJob *>(sender());
     slotJobDestroyed(job); // remove it from the _jobs list
     QNetworkReply::NetworkError err = job->reply()->error();
@@ -197,8 +192,7 @@ void PropagateUploadFileNG::slotPropfindFinishedWithError()
     startNewUpload();
 }
 
-void PropagateUploadFileNG::slotDeleteJobFinished()
-{
+void PropagateUploadFileNG::slotDeleteJobFinished() {
     auto job = qobject_cast<DeleteJob *>(sender());
     ASSERT(job);
     _jobs.remove(_jobs.indexOf(job));
@@ -230,8 +224,7 @@ void PropagateUploadFileNG::slotDeleteJobFinished()
 }
 
 
-void PropagateUploadFileNG::startNewUpload()
-{
+void PropagateUploadFileNG::startNewUpload() {
     ASSERT(propagator()->_activeJobList.count(this) == 1);
     Q_ASSERT(_item->_modtime > 0);
     if (_item->_modtime <= 0) {
@@ -269,8 +262,7 @@ void PropagateUploadFileNG::startNewUpload()
     job->start();
 }
 
-void PropagateUploadFileNG::slotMkColFinished()
-{
+void PropagateUploadFileNG::slotMkColFinished() {
     propagator()->_activeJobList.removeOne(this);
     auto job = qobject_cast<MkColJob *>(sender());
     slotJobDestroyed(job); // remove it from the _jobs list
@@ -287,8 +279,7 @@ void PropagateUploadFileNG::slotMkColFinished()
     startNextChunk();
 }
 
-void PropagateUploadFileNG::startNextChunk()
-{
+void PropagateUploadFileNG::startNextChunk() {
     if (propagator()->_abortRequested)
         return;
 
@@ -367,8 +358,7 @@ void PropagateUploadFileNG::startNextChunk()
     _currentChunk++;
 }
 
-void PropagateUploadFileNG::slotPutFinished()
-{
+void PropagateUploadFileNG::slotPutFinished() {
     auto *job = qobject_cast<PUTFileJob *>(sender());
     ASSERT(job);
 
@@ -463,8 +453,7 @@ void PropagateUploadFileNG::slotPutFinished()
     startNextChunk();
 }
 
-void PropagateUploadFileNG::slotMoveJobFinished()
-{
+void PropagateUploadFileNG::slotMoveJobFinished() {
     propagator()->_activeJobList.removeOne(this);
     auto job = qobject_cast<MoveJob *>(sender());
     slotJobDestroyed(job); // remove it from the _jobs list
@@ -517,8 +506,7 @@ void PropagateUploadFileNG::slotMoveJobFinished()
     finalize();
 }
 
-void PropagateUploadFileNG::slotUploadProgress(qint64 sent, qint64 total)
-{
+void PropagateUploadFileNG::slotUploadProgress(qint64 sent, qint64 total) {
     // Completion is signaled with sent=0, total=0; avoid accidentally
     // resetting progress due to the sent being zero by ignoring it.
     // finishedSignal() is bound to be emitted soon anyway.
@@ -529,8 +517,7 @@ void PropagateUploadFileNG::slotUploadProgress(qint64 sent, qint64 total)
     propagator()->reportProgress(*_item, _sent + sent - total);
 }
 
-void PropagateUploadFileNG::abort(PropagatorJob::AbortType abortType)
-{
+void PropagateUploadFileNG::abort(PropagatorJob::AbortType abortType) {
     abortNetworkJobs(
         abortType,
         [abortType](AbstractNetworkJob *job) {

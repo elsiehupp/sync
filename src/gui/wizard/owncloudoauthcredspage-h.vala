@@ -30,8 +30,7 @@
 namespace OCC {
 
 
-class OwncloudOAuthCredsPage : public AbstractCredentialsWizardPage
-{
+class OwncloudOAuthCredsPage : public AbstractCredentialsWizardPage {
 public:
     OwncloudOAuthCredsPage();
 

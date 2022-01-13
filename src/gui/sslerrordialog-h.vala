@@ -32,8 +32,7 @@ namespace Ui {
  * @brief The SslDialogErrorHandler class
  * @ingroup gui
  */
-class SslDialogErrorHandler : public AbstractSslErrorHandler
-{
+class SslDialogErrorHandler : public AbstractSslErrorHandler {
 public:
     bool handleErrors(QList<QSslError> errors, const QSslConfiguration &conf, QList<QSslCertificate> *certs, AccountPtr) override;
 };
@@ -42,8 +41,7 @@ public:
  * @brief The SslErrorDialog class
  * @ingroup gui
  */
-class SslErrorDialog : public QDialog
-{
+class SslErrorDialog : public QDialog {
 public:
     explicit SslErrorDialog(AccountPtr account, QWidget *parent = nullptr);
     ~SslErrorDialog() override;

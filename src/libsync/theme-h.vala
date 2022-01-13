@@ -32,8 +32,7 @@ class SyncResult;
  * @brief The Theme class
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT Theme : public QObject
-{
+class OWNCLOUDSYNC_EXPORT Theme : public QObject {
     Q_PROPERTY(bool branded READ isBranded CONSTANT)
     Q_PROPERTY(QString appNameGUI READ appNameGUI CONSTANT)
     Q_PROPERTY(QString appName READ appName CONSTANT)
@@ -127,25 +126,25 @@ public:
      * @return QUrl full path to an icon
      */
     QUrl stateOfflineImageSource() const;
-    
+
     /**
      * @brief Returns full path to an online user status icon
      * @return QUrl full path to an icon
      */
     QUrl statusOnlineImageSource() const;
-    
+
     /**
      * @brief Returns full path to an do not disturb user status icon
      * @return QUrl full path to an icon
      */
     QUrl statusDoNotDisturbImageSource() const;
-    
+
     /**
      * @brief Returns full path to an away user status icon
      * @return QUrl full path to an icon
      */
     QUrl statusAwayImageSource() const;
-    
+
     /**
      * @brief Returns full path to an invisible user status icon
      * @return QUrl full path to an icon
@@ -236,7 +235,7 @@ public:
      * When true, the respective UI controls will be disabled
      */
     virtual bool forceOverrideServerUrl() const;
-    
+
     /**
      * Enable OCSP stapling for SSL handshakes
      *
@@ -458,11 +457,11 @@ public:
 	/**
     * @brief Request suitable QIcon resource depending on the background colour of the parent widget.
     *
-    * This should be replaced (TODO) by a real theming implementation for the client UI 
+    * This should be replaced (TODO) by a real theming implementation for the client UI
     * (actually 2019/09/13 only systray theming).
     */
 	virtual QIcon uiThemeIcon(const QString &iconName, bool uiHasDarkBg) const;
-    
+
     /**
      * @brief Perform a calculation to check if a colour is dark or light and accounts for different sensitivity of the human eye.
      *
@@ -471,7 +470,7 @@ public:
      * 2019/12/08: Moved here from SettingsDialog.
      */
     static bool isDarkColor(const QColor &color);
-    
+
     /**
      * @brief Return the colour to be used for HTML links (e.g. used in QLabel), based on the current app palette or given colour (Dark-/Light-Mode switching).
      *
@@ -480,7 +479,7 @@ public:
      * 2019/12/08: Implemented for the Dark Mode on macOS, because the app palette can not account for that (Qt 5.12.5).
      */
     static QColor getBackgroundAwareLinkColor(const QColor &backgroundColor);
-    
+
     /**
      * @brief Return the colour to be used for HTML links (e.g. used in QLabel), based on the current app palette (Dark-/Light-Mode switching).
      *

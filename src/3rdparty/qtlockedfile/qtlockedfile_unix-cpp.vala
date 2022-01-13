@@ -36,8 +36,7 @@
 
 namespace SharedTools {
 
-bool QtLockedFile::lock(LockMode mode, bool block)
-{
+bool QtLockedFile::lock(LockMode mode, bool block) {
     if (!isOpen()) {
         qWarning("QtLockedFile::lock(): file is not opened");
         return false;
@@ -72,8 +71,7 @@ bool QtLockedFile::lock(LockMode mode, bool block)
 }
 
 
-bool QtLockedFile::unlock()
-{
+bool QtLockedFile::unlock() {
     if (!isOpen()) {
         qWarning("QtLockedFile::unlock(): file is not opened");
         return false;
@@ -99,8 +97,7 @@ bool QtLockedFile::unlock()
     return true;
 }
 
-QtLockedFile::~QtLockedFile()
-{
+QtLockedFile::~QtLockedFile() {
     if (isOpen())
         unlock();
 }

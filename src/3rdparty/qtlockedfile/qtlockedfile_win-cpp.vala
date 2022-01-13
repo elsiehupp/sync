@@ -38,8 +38,7 @@ namespace SharedTools {
 #define MUTEX_PREFIX "QtLockedFile mutex "
 #define SEMAPHORE_MAX 100
 
-static QString errorCodeToString(DWORD errorCode)
-{
+static QString errorCodeToString(DWORD errorCode) {
     QString result;
     char *data = 0;
     FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
@@ -55,8 +54,7 @@ static QString errorCodeToString(DWORD errorCode)
     return result;
 }
 
-bool QtLockedFile::lock(LockMode mode, bool block)
-{
+bool QtLockedFile::lock(LockMode mode, bool block) {
     if (!isOpen()) {
         qWarning("QtLockedFile::lock(): file is not opened");
         return false;
@@ -143,8 +141,7 @@ bool QtLockedFile::lock(LockMode mode, bool block)
     return true;
 }
 
-bool QtLockedFile::unlock()
-{
+bool QtLockedFile::unlock() {
     if (!isOpen()) {
         qWarning("QtLockedFile::unlock(): file is not opened");
         return false;
@@ -171,8 +168,7 @@ bool QtLockedFile::unlock()
     return true;
 }
 
-QtLockedFile::~QtLockedFile()
-{
+QtLockedFile::~QtLockedFile() {
     if (isOpen())
         unlock();
     if (m_mutex_hnd != 0) {

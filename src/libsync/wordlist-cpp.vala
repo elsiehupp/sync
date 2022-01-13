@@ -21,8 +21,7 @@ int getRandomNumber(int max) {
     return static_cast<int>(num % max);
 }
 
-QStringList getRandomWords(int nr)
-{
+QStringList getRandomWords(int nr) {
     QStringList wordList = {
         "abandon",
         "ability",
@@ -2084,8 +2083,7 @@ QStringList getRandomWords(int nr)
     return randomWords;
 }
 
-QString getUnifiedString(const QStringList& wList)
-{
+QString getUnifiedString(const QStringList& wList) {
     QString ret;
     for(const auto& str : wList) {
         ret += str;

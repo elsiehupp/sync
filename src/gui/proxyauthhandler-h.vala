@@ -42,8 +42,7 @@ class ProxyAuthDialog;
  * storage are asynchronous operations. This leads to reentrant calls that are
  * fairly complicated to handle.
  */
-class ProxyAuthHandler : public QObject
-{
+class ProxyAuthHandler : public QObject {
 
 public:
     static ProxyAuthHandler *instance();

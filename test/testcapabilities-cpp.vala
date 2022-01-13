@@ -2,12 +2,10 @@
 
 #include "capabilities.h"
 
-class TestCapabilities : public QObject
-{
+class TestCapabilities : public QObject {
 
 private slots:
-    void testPushNotificationsAvailable_pushNotificationsForActivitiesAvailable_returnTrue()
-    {
+    void testPushNotificationsAvailable_pushNotificationsForActivitiesAvailable_returnTrue() {
         QStringList typeList;
         typeList.append("activities");
 
@@ -23,8 +21,7 @@ private slots:
         QCOMPARE(activitiesPushNotificationsAvailable, true);
     }
 
-    void testPushNotificationsAvailable_pushNotificationsForActivitiesNotAvailable_returnFalse()
-    {
+    void testPushNotificationsAvailable_pushNotificationsForActivitiesNotAvailable_returnFalse() {
         QStringList typeList;
         typeList.append("noactivities");
 
@@ -40,8 +37,7 @@ private slots:
         QCOMPARE(activitiesPushNotificationsAvailable, false);
     }
 
-    void testPushNotificationsAvailable_pushNotificationsForFilesAvailable_returnTrue()
-    {
+    void testPushNotificationsAvailable_pushNotificationsForFilesAvailable_returnTrue() {
         QStringList typeList;
         typeList.append("files");
 
@@ -57,8 +53,7 @@ private slots:
         QCOMPARE(filesPushNotificationsAvailable, true);
     }
 
-    void testPushNotificationsAvailable_pushNotificationsForFilesNotAvailable_returnFalse()
-    {
+    void testPushNotificationsAvailable_pushNotificationsForFilesNotAvailable_returnFalse() {
         QStringList typeList;
         typeList.append("nofiles");
 
@@ -74,8 +69,7 @@ private slots:
         QCOMPARE(filesPushNotificationsAvailable, false);
     }
 
-    void testPushNotificationsAvailable_pushNotificationsForNotificationsAvailable_returnTrue()
-    {
+    void testPushNotificationsAvailable_pushNotificationsForNotificationsAvailable_returnTrue() {
         QStringList typeList;
         typeList.append("notifications");
 
@@ -91,8 +85,7 @@ private slots:
         QCOMPARE(notificationsPushNotificationsAvailable, true);
     }
 
-    void testPushNotificationsAvailable_pushNotificationsForNotificationsNotAvailable_returnFalse()
-    {
+    void testPushNotificationsAvailable_pushNotificationsForNotificationsNotAvailable_returnFalse() {
         QStringList typeList;
         typeList.append("nonotifications");
 
@@ -108,8 +101,7 @@ private slots:
         QCOMPARE(notificationsPushNotificationsAvailable, false);
     }
 
-    void testPushNotificationsAvailable_pushNotificationsNotAvailable_returnFalse()
-    {
+    void testPushNotificationsAvailable_pushNotificationsNotAvailable_returnFalse() {
         const auto &capabilities = OCC::Capabilities(QVariantMap());
         const auto activitiesPushNotificationsAvailable = capabilities.availablePushNotifications().testFlag(OCC::PushNotificationType::Activities);
         const auto filesPushNotificationsAvailable = capabilities.availablePushNotifications().testFlag(OCC::PushNotificationType::Files);
@@ -120,8 +112,7 @@ private slots:
         QCOMPARE(notificationsPushNotificationsAvailable, false);
     }
 
-    void testPushNotificationsWebSocketUrl_urlAvailable_returnUrl()
-    {
+    void testPushNotificationsWebSocketUrl_urlAvailable_returnUrl() {
         QString websocketUrl("testurl");
 
         QVariantMap endpointsMap;
@@ -138,8 +129,7 @@ private slots:
         QCOMPARE(capabilities.pushNotificationsWebSocketUrl(), websocketUrl);
     }
 
-    void testUserStatus_userStatusAvailable_returnTrue()
-    {
+    void testUserStatus_userStatusAvailable_returnTrue() {
         QVariantMap userStatusMap;
         userStatusMap["enabled"] = true;
 
@@ -151,8 +141,7 @@ private slots:
         QVERIFY(capabilities.userStatus());
     }
 
-    void testUserStatus_userStatusNotAvailable_returnFalse()
-    {
+    void testUserStatus_userStatusNotAvailable_returnFalse() {
         QVariantMap userStatusMap;
         userStatusMap["enabled"] = false;
 
@@ -164,8 +153,7 @@ private slots:
         QVERIFY(!capabilities.userStatus());
     }
 
-    void testUserStatus_userStatusNotInCapabilites_returnFalse()
-    {
+    void testUserStatus_userStatusNotInCapabilites_returnFalse() {
         QVariantMap capabilitiesMap;
 
         const OCC::Capabilities capabilities(capabilitiesMap);
@@ -173,8 +161,7 @@ private slots:
         QVERIFY(!capabilities.userStatus());
     }
 
-    void testUserStatusSupportsEmoji_supportsEmojiAvailable_returnTrue()
-    {
+    void testUserStatusSupportsEmoji_supportsEmojiAvailable_returnTrue() {
         QVariantMap userStatusMap;
         userStatusMap["enabled"] = true;
         userStatusMap["supports_emoji"] = true;
@@ -187,8 +174,7 @@ private slots:
         QVERIFY(capabilities.userStatus());
     }
 
-    void testUserStatusSupportsEmoji_supportsEmojiNotAvailable_returnFalse()
-    {
+    void testUserStatusSupportsEmoji_supportsEmojiNotAvailable_returnFalse() {
         QVariantMap userStatusMap;
         userStatusMap["enabled"] = true;
         userStatusMap["supports_emoji"] = false;
@@ -201,8 +187,7 @@ private slots:
         QVERIFY(!capabilities.userStatusSupportsEmoji());
     }
 
-    void testUserStatusSupportsEmoji_supportsEmojiNotInCapabilites_returnFalse()
-    {
+    void testUserStatusSupportsEmoji_supportsEmojiNotInCapabilites_returnFalse() {
         QVariantMap userStatusMap;
         userStatusMap["enabled"] = true;
 
@@ -213,38 +198,35 @@ private slots:
 
         QVERIFY(!capabilities.userStatusSupportsEmoji());
     }
-    
-    void testShareDefaultPermissions_defaultSharePermissionsNotInCapabilities_returnZero()
-    {
+
+    void testShareDefaultPermissions_defaultSharePermissionsNotInCapabilities_returnZero() {
         QVariantMap filesSharingMap;
         filesSharingMap["api_enabled"] = false;
-        
+
         QVariantMap capabilitiesMap;
         capabilitiesMap["files_sharing"] = filesSharingMap;
-        
+
         const OCC::Capabilities capabilities(capabilitiesMap);
         const auto defaultSharePermissionsNotInCapabilities = capabilities.shareDefaultPermissions();
 
         QCOMPARE(defaultSharePermissionsNotInCapabilities, {});
     }
-    
-    void testShareDefaultPermissions_defaultSharePermissionsAvailable_returnPermissions()
-    {
+
+    void testShareDefaultPermissions_defaultSharePermissionsAvailable_returnPermissions() {
         QVariantMap filesSharingMap;
         filesSharingMap["api_enabled"] = true;
         filesSharingMap["default_permissions"] = 31;
-        
+
         QVariantMap capabilitiesMap;
         capabilitiesMap["files_sharing"] = filesSharingMap;
-        
+
         const OCC::Capabilities capabilities(capabilitiesMap);
         const auto defaultSharePermissionsAvailable = capabilities.shareDefaultPermissions();
 
         QCOMPARE(defaultSharePermissionsAvailable, 31);
     }
 
-    void testBulkUploadAvailable_bulkUploadAvailable_returnTrue()
-    {
+    void testBulkUploadAvailable_bulkUploadAvailable_returnTrue() {
         QVariantMap bulkuploadMap;
         bulkuploadMap["bulkupload"] = "1.0";
 

@@ -26,8 +26,7 @@ namespace Ui {
  * @brief The NetworkSettings class
  * @ingroup gui
  */
-class NetworkSettings : public QWidget
-{
+class NetworkSettings : public QWidget {
 
 public:
     explicit NetworkSettings(QWidget *parent = nullptr);

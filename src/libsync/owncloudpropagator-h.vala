@@ -60,8 +60,7 @@ class PropagatorCompositeJob;
  *
  * @ingroup libsync
  */
-class PropagatorJob : public QObject
-{
+class PropagatorJob : public QObject {
 
 public:
     explicit PropagatorJob(OwncloudPropagator *propagator);
@@ -158,8 +157,7 @@ protected:
 /*
  * Abstract class to propagate a single item
  */
-class PropagateItemJob : public PropagatorJob
-{
+class PropagateItemJob : public PropagatorJob {
 protected:
     virtual void done(SyncFileItem::Status status, const QString &errorString = QString());
 
@@ -167,12 +165,10 @@ protected:
      * set a custom restore job message that is used if the restore job succeeded.
      * It is displayed in the activity view.
      */
-    QString restoreJobMsg() const
-    {
+    QString restoreJobMsg() const {
         return _item->_isRestoration ? _item->_errorString : QString();
     }
-    void setRestoreJobMsg(const QString &msg = QString())
-    {
+    void setRestoreJobMsg(const QString &msg = QString()) {
         _item->_isRestoration = true;
         _item->_errorString = msg;
     }
@@ -190,8 +186,7 @@ public:
     PropagateItemJob(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
         : PropagatorJob(propagator)
         , _parallelism(FullParallelism)
-        , _item(item)
-    {
+        , _item(item) {
         // we should always execute jobs that process the E2EE API calls as sequential jobs
         // TODO: In fact, we must make sure Lock/Unlock are not colliding and always wait for each other to complete. So, we could refactor this "_parallelism" later
         // so every "PropagateItemJob" that will potentially execute Lock job on E2EE folder will get executed sequentially.
@@ -200,8 +195,7 @@ public:
     }
     ~PropagateItemJob() override;
 
-    bool scheduleSelfOrChild() override
-    {
+    bool scheduleSelfOrChild() override {
         if (_state != NotYetStarted) {
             return false;
         }
@@ -224,8 +218,7 @@ public slots:
  * @brief Job that runs subjobs. It becomes finished only when all subjobs are finished.
  * @ingroup libsync
  */
-class PropagatorCompositeJob : public PropagatorJob
-{
+class PropagatorCompositeJob : public PropagatorJob {
 public:
     QVector<PropagatorJob *> _jobsToDo;
     SyncFileItemVector _tasksToDo;
@@ -235,8 +228,7 @@ public:
 
     explicit PropagatorCompositeJob(OwncloudPropagator *propagator)
         : PropagatorJob(propagator)
-        , _hasError(SyncFileItem::NoStatus), _abortsCount(0)
-    {
+        , _hasError(SyncFileItem::NoStatus), _abortsCount(0) {
     }
 
     // Don't delete jobs in _jobsToDo and _runningJobs: they have parents
@@ -245,8 +237,7 @@ public:
     ~PropagatorCompositeJob() override = default;
 
     void appendJob(PropagatorJob *job);
-    void appendTask(const SyncFileItemPtr &item)
-    {
+    void appendTask(const SyncFileItemPtr &item) {
         _tasksToDo.append(item);
     }
 
@@ -258,8 +249,7 @@ public:
      * require to be finished without immediete abort (abort on job might
      * cause conflicts/duplicated files - owncloud/client/issues/5949)
      */
-    void abort(PropagatorJob::AbortType abortType) override
-    {
+    void abort(PropagatorJob::AbortType abortType) override {
         if (!_runningJobs.empty()) {
             _abortsCount = _runningJobs.size();
             foreach (PropagatorJob *j, _runningJobs) {
@@ -278,8 +268,7 @@ public:
 
 private slots:
     void slotSubJobAbortFinished();
-    bool possiblyRunNextJob(PropagatorJob *next)
-    {
+    bool possiblyRunNextJob(PropagatorJob *next) {
         if (next->_state == NotYetStarted) {
             connect(next, &PropagatorJob::finished, this, &PropagatorCompositeJob::slotSubJobFinished);
         }
@@ -294,8 +283,7 @@ private slots:
  * @brief Propagate a directory, and all its sub entries.
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT PropagateDirectory : public PropagatorJob
-{
+class OWNCLOUDSYNC_EXPORT PropagateDirectory : public PropagatorJob {
 public:
     SyncFileItemPtr _item;
     // e.g: create the directory
@@ -305,20 +293,17 @@ public:
 
     explicit PropagateDirectory(OwncloudPropagator *propagator, const SyncFileItemPtr &item);
 
-    void appendJob(PropagatorJob *job)
-    {
+    void appendJob(PropagatorJob *job) {
         _subJobs.appendJob(job);
     }
 
-    void appendTask(const SyncFileItemPtr &item)
-    {
+    void appendTask(const SyncFileItemPtr &item) {
         _subJobs.appendTask(item);
     }
 
     bool scheduleSelfOrChild() override;
     JobParallelism parallelism() override;
-    void abort(PropagatorJob::AbortType abortType) override
-    {
+    void abort(PropagatorJob::AbortType abortType) override {
         if (_firstJob)
             // Force first job to abort synchronously
             // even if caller allows async abort (asyncAbort)
@@ -330,14 +315,12 @@ public:
         _subJobs.abort(abortType);
     }
 
-    void increaseAffectedCount()
-    {
+    void increaseAffectedCount() {
         _firstJob->_item->_affectedItems++;
     }
 
 
-    qint64 committedDiskSpace() const override
-    {
+    qint64 committedDiskSpace() const override {
         return _subJobs.committedDiskSpace();
     }
 
@@ -355,8 +338,7 @@ private slots:
  * Primary difference to PropagateDirectory is that it keeps track of directory
  * deletions that must happen at the very end.
  */
-class OWNCLOUDSYNC_EXPORT PropagateRootDirectory : public PropagateDirectory
-{
+class OWNCLOUDSYNC_EXPORT PropagateRootDirectory : public PropagateDirectory {
 public:
     PropagatorCompositeJob _dirDeletionJobs;
 
@@ -381,15 +363,12 @@ private:
  * @brief Dummy job that just mark it as completed and ignored
  * @ingroup libsync
  */
-class PropagateIgnoreJob : public PropagateItemJob
-{
+class PropagateIgnoreJob : public PropagateItemJob {
 public:
     PropagateIgnoreJob(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
-        : PropagateItemJob(propagator, item)
-    {
+        : PropagateItemJob(propagator, item) {
     }
-    void start() override
-    {
+    void start() override {
         SyncFileItem::Status status = _item->_status;
         if (status == SyncFileItem::NoStatus) {
             if (_item->_instruction == CSYNC_INSTRUCTION_ERROR) {
@@ -405,8 +384,7 @@ public:
 
 class PropagateUploadFileCommon;
 
-class OWNCLOUDSYNC_EXPORT OwncloudPropagator : public QObject
-{
+class OWNCLOUDSYNC_EXPORT OwncloudPropagator : public QObject {
 public:
     SyncJournalDb *const _journal;
     bool _finishedEmited; // used to ensure that finished is only emitted once
@@ -423,8 +401,7 @@ public:
         , _account(account)
         , _localDir((localDir.endsWith(QChar('/'))) ? localDir : localDir + '/')
         , _remoteFolder((remoteFolder.endsWith(QChar('/'))) ? remoteFolder : remoteFolder + '/')
-        , _bulkUploadBlackList(bulkUploadBlackList)
-    {
+        , _bulkUploadBlackList(bulkUploadBlackList) {
         qRegisterMetaType<PropagatorJob::AbortType>("PropagatorJob::AbortType");
     }
 
@@ -525,8 +502,7 @@ public:
     void scheduleNextJob();
     void reportProgress(const SyncFileItem &, qint64 bytes);
 
-    void abort()
-    {
+    void abort() {
         if (_abortRequested)
             return;
         if (_rootJob) {
@@ -595,8 +571,7 @@ public:
 
     Q_REQUIRED_RESULT bool isDelayedUploadItem(const SyncFileItemPtr &item) const;
 
-    Q_REQUIRED_RESULT const std::deque<SyncFileItemPtr>& delayedTasks() const
-    {
+    Q_REQUIRED_RESULT const std::deque<SyncFileItemPtr>& delayedTasks() const {
         return _delayedTasks;
     }
 
@@ -612,16 +587,14 @@ public:
 
 private slots:
 
-    void abortTimeout()
-    {
+    void abortTimeout() {
         // Abort synchronously and finish
         _rootJob.data()->abort(PropagatorJob::AbortType::Synchronous);
         emitFinished(SyncFileItem::NormalError);
     }
 
     /** Emit the finished signal and make sure it is only emitted once */
-    void emitFinished(SyncFileItem::Status status)
-    {
+    void emitFinished(SyncFileItem::Status status) {
         if (!_finishedEmited)
             emit finished(status == SyncFileItem::Success);
         _finishedEmited = true;
@@ -677,8 +650,7 @@ private:
  * @brief Job that wait for all the poll jobs to be completed
  * @ingroup libsync
  */
-class CleanupPollsJob : public QObject
-{
+class CleanupPollsJob : public QObject {
     QVector<SyncJournalDb::PollInfo> _pollInfos;
     AccountPtr _account;
     SyncJournalDb *_journal;
@@ -693,8 +665,7 @@ public:
         , _account(account)
         , _journal(journal)
         , _localPath(localPath)
-        , _vfs(vfs)
-    {
+        , _vfs(vfs) {
     }
 
     ~CleanupPollsJob() override;

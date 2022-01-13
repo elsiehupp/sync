@@ -54,8 +54,7 @@ AbstractNetworkJob::AbstractNetworkJob(AccountPtr account, const QString &path, 
     , _account(account)
     , _ignoreCredentialFailure(false)
     , _reply(nullptr)
-    , _path(path)
-{
+    , _path(path) {
     // Since we hold a QSharedPointer to the account, this makes no sense. (issue #6893)
     ASSERT(account != parent);
 
@@ -73,8 +72,7 @@ AbstractNetworkJob::AbstractNetworkJob(AccountPtr account, const QString &path, 
     }
 }
 
-void AbstractNetworkJob::setReply(QNetworkReply *reply)
-{
+void AbstractNetworkJob::setReply(QNetworkReply *reply) {
     if (reply)
         reply->setProperty("doNotHandleAuth", true);
 
@@ -83,35 +81,29 @@ void AbstractNetworkJob::setReply(QNetworkReply *reply)
     delete old;
 }
 
-void AbstractNetworkJob::setTimeout(qint64 msec)
-{
+void AbstractNetworkJob::setTimeout(qint64 msec) {
     _timer.start(msec);
 }
 
-void AbstractNetworkJob::resetTimeout()
-{
+void AbstractNetworkJob::resetTimeout() {
     qint64 interval = _timer.interval();
     _timer.stop();
     _timer.start(interval);
 }
 
-void AbstractNetworkJob::setIgnoreCredentialFailure(bool ignore)
-{
+void AbstractNetworkJob::setIgnoreCredentialFailure(bool ignore) {
     _ignoreCredentialFailure = ignore;
 }
 
-void AbstractNetworkJob::setFollowRedirects(bool follow)
-{
+void AbstractNetworkJob::setFollowRedirects(bool follow) {
     _followRedirects = follow;
 }
 
-void AbstractNetworkJob::setPath(const QString &path)
-{
+void AbstractNetworkJob::setPath(const QString &path) {
     _path = path;
 }
 
-void AbstractNetworkJob::setupConnections(QNetworkReply *reply)
-{
+void AbstractNetworkJob::setupConnections(QNetworkReply *reply) {
     connect(reply, &QNetworkReply::finished, this, &AbstractNetworkJob::slotFinished);
     connect(reply, &QNetworkReply::encrypted, this, &AbstractNetworkJob::networkActivity);
     connect(reply->manager(), &QNetworkAccessManager::proxyAuthenticationRequired, this, &AbstractNetworkJob::networkActivity);
@@ -121,15 +113,13 @@ void AbstractNetworkJob::setupConnections(QNetworkReply *reply)
     connect(reply, &QNetworkReply::uploadProgress, this, &AbstractNetworkJob::networkActivity);
 }
 
-QNetworkReply *AbstractNetworkJob::addTimer(QNetworkReply *reply)
-{
+QNetworkReply *AbstractNetworkJob::addTimer(QNetworkReply *reply) {
     reply->setProperty("timer", QVariant::fromValue(&_timer));
     return reply;
 }
 
 QNetworkReply *AbstractNetworkJob::sendRequest(const QByteArray &verb, const QUrl &url,
-    QNetworkRequest req, QIODevice *requestBody)
-{
+    QNetworkRequest req, QIODevice *requestBody) {
     auto reply = _account->sendRawRequest(verb, url, req, requestBody);
     _requestBody = requestBody;
     if (_requestBody) {
@@ -140,8 +130,7 @@ QNetworkReply *AbstractNetworkJob::sendRequest(const QByteArray &verb, const QUr
 }
 
 QNetworkReply *AbstractNetworkJob::sendRequest(const QByteArray &verb, const QUrl &url,
-    QNetworkRequest req, const QByteArray &requestBody)
-{
+    QNetworkRequest req, const QByteArray &requestBody) {
     auto reply = _account->sendRawRequest(verb, url, req, requestBody);
     _requestBody = nullptr;
     adoptRequest(reply);
@@ -151,34 +140,29 @@ QNetworkReply *AbstractNetworkJob::sendRequest(const QByteArray &verb, const QUr
 QNetworkReply *AbstractNetworkJob::sendRequest(const QByteArray &verb,
                                                const QUrl &url,
                                                QNetworkRequest req,
-                                               QHttpMultiPart *requestBody)
-{
+                                               QHttpMultiPart *requestBody) {
     auto reply = _account->sendRawRequest(verb, url, req, requestBody);
     _requestBody = nullptr;
     adoptRequest(reply);
     return reply;
 }
 
-void AbstractNetworkJob::adoptRequest(QNetworkReply *reply)
-{
+void AbstractNetworkJob::adoptRequest(QNetworkReply *reply) {
     addTimer(reply);
     setReply(reply);
     setupConnections(reply);
     newReplyHook(reply);
 }
 
-QUrl AbstractNetworkJob::makeAccountUrl(const QString &relativePath) const
-{
+QUrl AbstractNetworkJob::makeAccountUrl(const QString &relativePath) const {
     return Utility::concatUrlPath(_account->url(), relativePath);
 }
 
-QUrl AbstractNetworkJob::makeDavUrl(const QString &relativePath) const
-{
+QUrl AbstractNetworkJob::makeDavUrl(const QString &relativePath) const {
     return Utility::concatUrlPath(_account->davUrl(), relativePath);
 }
 
-void AbstractNetworkJob::slotFinished()
-{
+void AbstractNetworkJob::slotFinished() {
     _timer.stop();
 
     if (_reply->error() == QNetworkReply::SslHandshakeFailedError) {
@@ -300,19 +284,16 @@ void AbstractNetworkJob::slotFinished()
     }
 }
 
-QByteArray AbstractNetworkJob::responseTimestamp()
-{
+QByteArray AbstractNetworkJob::responseTimestamp() {
     ASSERT(!_responseTimestamp.isEmpty());
     return _responseTimestamp;
 }
 
-QByteArray AbstractNetworkJob::requestId()
-{
+QByteArray AbstractNetworkJob::requestId() {
     return  _reply ? _reply->request().rawHeader("X-Request-ID") : QByteArray();
 }
 
-QString AbstractNetworkJob::errorString() const
-{
+QString AbstractNetworkJob::errorString() const {
     if (_timedout) {
         return tr("Connection timed out");
     } else if (!reply()) {
@@ -324,8 +305,7 @@ QString AbstractNetworkJob::errorString() const
     }
 }
 
-QString AbstractNetworkJob::errorStringParsingBody(QByteArray *body)
-{
+QString AbstractNetworkJob::errorStringParsingBody(QByteArray *body) {
     QString base = errorString();
     if (base.isEmpty() || !reply()) {
         return QString();
@@ -345,13 +325,11 @@ QString AbstractNetworkJob::errorStringParsingBody(QByteArray *body)
     return base;
 }
 
-AbstractNetworkJob::~AbstractNetworkJob()
-{
+AbstractNetworkJob::~AbstractNetworkJob() {
     setReply(nullptr);
 }
 
-void AbstractNetworkJob::start()
-{
+void AbstractNetworkJob::start() {
     _timer.start();
 
     const QUrl url = account()->url();
@@ -361,15 +339,13 @@ void AbstractNetworkJob::start()
     qCInfo(lcNetworkJob) << metaObject()->className() << "created for" << displayUrl << "+" << path() << parentMetaObjectName;
 }
 
-void AbstractNetworkJob::slotTimeout()
-{
+void AbstractNetworkJob::slotTimeout() {
     _timedout = true;
     qCWarning(lcNetworkJob) << "Network job timeout" << (reply() ? reply()->request().url() : path());
     onTimedOut();
 }
 
-void AbstractNetworkJob::onTimedOut()
-{
+void AbstractNetworkJob::onTimedOut() {
     if (reply()) {
         reply()->abort();
     } else {
@@ -387,23 +363,20 @@ QString AbstractNetworkJob::replyStatusString() {
     }
 }
 
-NetworkJobTimeoutPauser::NetworkJobTimeoutPauser(QNetworkReply *reply)
-{
+NetworkJobTimeoutPauser::NetworkJobTimeoutPauser(QNetworkReply *reply) {
     _timer = reply->property("timer").value<QTimer *>();
     if (!_timer.isNull()) {
         _timer->stop();
     }
 }
 
-NetworkJobTimeoutPauser::~NetworkJobTimeoutPauser()
-{
+NetworkJobTimeoutPauser::~NetworkJobTimeoutPauser() {
     if (!_timer.isNull()) {
         _timer->start();
     }
 }
 
-QString extractErrorMessage(const QByteArray &errorResponse)
-{
+QString extractErrorMessage(const QByteArray &errorResponse) {
     QXmlStreamReader reader(errorResponse);
     reader.readNextStartElement();
     if (reader.name() != "error") {
@@ -426,8 +399,7 @@ QString extractErrorMessage(const QByteArray &errorResponse)
     return exception;
 }
 
-QString errorMessage(const QString &baseError, const QByteArray &body)
-{
+QString errorMessage(const QString &baseError, const QByteArray &body) {
     QString msg = baseError;
     QString extra = extractErrorMessage(body);
     if (!extra.isEmpty()) {
@@ -436,8 +408,7 @@ QString errorMessage(const QString &baseError, const QByteArray &body)
     return msg;
 }
 
-QString networkReplyErrorString(const QNetworkReply &reply)
-{
+QString networkReplyErrorString(const QNetworkReply &reply) {
     QString base = reply.errorString();
     int httpStatus = reply.attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     QString httpReason = reply.attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString();
@@ -450,8 +421,7 @@ QString networkReplyErrorString(const QNetworkReply &reply)
     return AbstractNetworkJob::tr(R"(Server replied "%1 %2" to "%3 %4")").arg(QString::number(httpStatus), httpReason, HttpLogger::requestVerb(reply), reply.request().url().toDisplayString());
 }
 
-void AbstractNetworkJob::retry()
-{
+void AbstractNetworkJob::retry() {
     ENFORCE(_reply);
     auto req = _reply->request();
     QUrl requestedUrl = req.url();

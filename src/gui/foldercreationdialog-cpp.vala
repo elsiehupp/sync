@@ -28,8 +28,7 @@ Q_LOGGING_CATEGORY(lcFolderCreationDialog, "nextcloud.gui.foldercreationdialog",
 FolderCreationDialog::FolderCreationDialog(const QString &destination, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::FolderCreationDialog)
-    , _destination(destination)
-{
+    , _destination(destination) {
     ui->setupUi(this);
 
     ui->labelErrorMessage->setVisible(false);
@@ -58,13 +57,11 @@ FolderCreationDialog::FolderCreationDialog(const QString &destination, QWidget *
     ui->newFolderNameEdit->selectAll();
 }
 
-FolderCreationDialog::~FolderCreationDialog()
-{
+FolderCreationDialog::~FolderCreationDialog() {
     delete ui;
 }
 
-void FolderCreationDialog::accept()
-{
+void FolderCreationDialog::accept() {
     Q_ASSERT(!_destination.endsWith('/'));
 
     if (QDir(_destination + "/" + ui->newFolderNameEdit->text()).exists()) {
@@ -79,8 +76,7 @@ void FolderCreationDialog::accept()
     QDialog::accept();
 }
 
-void FolderCreationDialog::slotNewFolderNameEditTextEdited()
-{
+void FolderCreationDialog::slotNewFolderNameEditTextEdited() {
     if (!ui->newFolderNameEdit->text().isEmpty() && QDir(_destination + "/" + ui->newFolderNameEdit->text()).exists()) {
         ui->labelErrorMessage->setVisible(true);
     } else {

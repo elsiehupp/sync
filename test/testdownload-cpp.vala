@@ -15,21 +15,18 @@ using namespace OCC;
 static constexpr qint64 stopAfter = 3'123'668;
 
 /* A FakeGetReply that sends max 'fakeSize' bytes, but whose ContentLength has the corect size */
-class BrokenFakeGetReply : public FakeGetReply
-{
+class BrokenFakeGetReply : public FakeGetReply {
 public:
     using FakeGetReply::FakeGetReply;
     int fakeSize = stopAfter;
 
-    qint64 bytesAvailable() const override
-    {
+    qint64 bytesAvailable() const override {
         if (aborted)
             return 0;
         return std::min(size, fakeSize) + QIODevice::bytesAvailable(); // NOLINT: This is intended to simulare the brokeness
     }
 
-    qint64 readData(char *data, qint64 maxlen) override
-    {
+    qint64 readData(char *data, qint64 maxlen) override {
         qint64 len = std::min(qint64{ fakeSize }, maxlen);
         std::fill_n(data, len, payload);
         size -= len;
@@ -39,8 +36,7 @@ public:
 };
 
 
-SyncFileItemPtr getItem(const QSignalSpy &spy, const QString &path)
-{
+SyncFileItemPtr getItem(const QSignalSpy &spy, const QString &path) {
     for (const QList<QVariant> &args : spy) {
         auto item = args[0].value<SyncFileItemPtr>();
         if (item->destination() == path)
@@ -50,13 +46,11 @@ SyncFileItemPtr getItem(const QSignalSpy &spy, const QString &path)
 }
 
 
-class TestDownload : public QObject
-{
+class TestDownload : public QObject {
 
 private slots:
 
-    void testResume()
-    {
+    void testResume() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         fakeFolder.syncEngine().setIgnoreHiddenFiles(true);
         QSignalSpy completeSpy(&fakeFolder.syncEngine(), SIGNAL(itemCompleted(const SyncFileItemPtr &)));

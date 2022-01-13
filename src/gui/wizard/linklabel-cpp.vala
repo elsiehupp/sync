@@ -17,30 +17,25 @@
 
 namespace OCC {
 
-LinkLabel::LinkLabel(QWidget *parent) : QLabel(parent)
-{
+LinkLabel::LinkLabel(QWidget *parent) : QLabel(parent) {
 
 }
 
-void LinkLabel::setUrl(const QUrl &url)
-{
+void LinkLabel::setUrl(const QUrl &url) {
     this->url = url;
 }
 
-void LinkLabel::enterEvent(QEvent * /*event*/)
-{
+void LinkLabel::enterEvent(QEvent * /*event*/) {
     setFontUnderline(true);
     setCursor(Qt::PointingHandCursor);
 }
 
-void LinkLabel::leaveEvent(QEvent * /*event*/)
-{
+void LinkLabel::leaveEvent(QEvent * /*event*/) {
     setFontUnderline(false);
     setCursor(Qt::ArrowCursor);
 }
 
-void LinkLabel::mouseReleaseEvent(QMouseEvent * /*event*/)
-{
+void LinkLabel::mouseReleaseEvent(QMouseEvent * /*event*/) {
     if (url.isValid()) {
         Utility::openBrowser(url);
     }
@@ -48,8 +43,7 @@ void LinkLabel::mouseReleaseEvent(QMouseEvent * /*event*/)
     emit clicked();
 }
 
-void LinkLabel::setFontUnderline(bool value)
-{
+void LinkLabel::setFontUnderline(bool value) {
     auto labelFont = font();
     labelFont.setUnderline(value);
     setFont(labelFont);

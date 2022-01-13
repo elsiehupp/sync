@@ -68,8 +68,7 @@ namespace OCC {
       which is implemented in HttpCredentialsGui
 
  */
-class OWNCLOUDSYNC_EXPORT HttpCredentials : public AbstractCredentials
-{
+class OWNCLOUDSYNC_EXPORT HttpCredentials : public AbstractCredentials {
     friend class HttpCredentialsAccessManager;
 
 public:

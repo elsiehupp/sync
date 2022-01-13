@@ -41,8 +41,7 @@ Q_LOGGING_CATEGORY(lcPropagateLocalRemove, "nextcloud.sync.propagator.localremov
 Q_LOGGING_CATEGORY(lcPropagateLocalMkdir, "nextcloud.sync.propagator.localmkdir", QtInfoMsg)
 Q_LOGGING_CATEGORY(lcPropagateLocalRename, "nextcloud.sync.propagator.localrename", QtInfoMsg)
 
-QByteArray localFileIdFromFullId(const QByteArray &id)
-{
+QByteArray localFileIdFromFullId(const QByteArray &id) {
     return id.left(8);
 }
 
@@ -54,8 +53,7 @@ QByteArray localFileIdFromFullId(const QByteArray &id)
  *
  * \a path is relative to propagator()->_localDir + _item->_file and should start with a slash
  */
-bool PropagateLocalRemove::removeRecursively(const QString &path)
-{
+bool PropagateLocalRemove::removeRecursively(const QString &path) {
     QString absolute = propagator()->fullLocalPath(_item->_file + path);
     QStringList errors;
     QList<QPair<QString, bool>> deleted;
@@ -87,8 +85,7 @@ bool PropagateLocalRemove::removeRecursively(const QString &path)
     return success;
 }
 
-void PropagateLocalRemove::start()
-{
+void PropagateLocalRemove::start() {
     qCInfo(lcPropagateLocalRemove) << "Start propagate local remove job";
 
     _moveToTrash = propagator()->syncOptions()._moveFilesToTrash;
@@ -131,21 +128,18 @@ void PropagateLocalRemove::start()
     done(SyncFileItem::Success);
 }
 
-void PropagateLocalMkdir::start()
-{
+void PropagateLocalMkdir::start() {
     if (propagator()->_abortRequested)
         return;
 
     startLocalMkdir();
 }
 
-void PropagateLocalMkdir::setDeleteExistingFile(bool enabled)
-{
+void PropagateLocalMkdir::setDeleteExistingFile(bool enabled) {
     _deleteExistingFile = enabled;
 }
 
-void PropagateLocalMkdir::startLocalMkdir()
-{
+void PropagateLocalMkdir::startLocalMkdir() {
     QDir newDir(propagator()->fullLocalPath(_item->_file));
     QString newDirStr = QDir::toNativeSeparators(newDir.path());
 
@@ -205,8 +199,7 @@ void PropagateLocalMkdir::startLocalMkdir()
     done(resultStatus);
 }
 
-void PropagateLocalRename::start()
-{
+void PropagateLocalRename::start() {
     if (propagator()->_abortRequested)
         return;
 

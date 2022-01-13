@@ -27,8 +27,7 @@ namespace Ui {
  * @brief The AddCertificateDialog class
  * @ingroup gui
  */
-class AddCertificateDialog : public QDialog
-{
+class AddCertificateDialog : public QDialog {
 
 public:
     explicit AddCertificateDialog(QWidget *parent = nullptr);

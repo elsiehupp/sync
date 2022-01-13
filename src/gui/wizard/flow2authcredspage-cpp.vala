@@ -29,8 +29,7 @@
 namespace OCC {
 
 Flow2AuthCredsPage::Flow2AuthCredsPage()
-    : AbstractCredentialsWizardPage()
-{
+    : AbstractCredentialsWizardPage() {
     _layout = new QVBoxLayout(this);
 
     _flow2AuthWidget = new Flow2AuthWidget();
@@ -45,8 +44,7 @@ Flow2AuthCredsPage::Flow2AuthCredsPage()
     connect(this, &Flow2AuthCredsPage::pollNow, _flow2AuthWidget, &Flow2AuthWidget::slotPollNow);
 }
 
-void Flow2AuthCredsPage::initializePage()
-{
+void Flow2AuthCredsPage::initializePage() {
     auto *ocWizard = qobject_cast<OwncloudWizard *>(wizard());
     Q_ASSERT(ocWizard);
     ocWizard->account()->setCredentials(CredentialsFactory::create("http"));
@@ -60,8 +58,7 @@ void Flow2AuthCredsPage::initializePage()
     _flow2AuthWidget->slotStyleChanged();
 }
 
-void OCC::Flow2AuthCredsPage::cleanupPage()
-{
+void OCC::Flow2AuthCredsPage::cleanupPage() {
     // The next or back button was activated, show the wizard again
     wizard()->show();
     if(_flow2AuthWidget)
@@ -72,8 +69,7 @@ void OCC::Flow2AuthCredsPage::cleanupPage()
     _user.clear();
 }
 
-void Flow2AuthCredsPage::slotFlow2AuthResult(Flow2Auth::Result r, const QString &errorString, const QString &user, const QString &appPassword)
-{
+void Flow2AuthCredsPage::slotFlow2AuthResult(Flow2Auth::Result r, const QString &errorString, const QString &user, const QString &appPassword) {
     Q_UNUSED(errorString)
     switch (r) {
     case Flow2Auth::NotSupported: {
@@ -102,13 +98,11 @@ void Flow2AuthCredsPage::slotFlow2AuthResult(Flow2Auth::Result r, const QString 
     }
 }
 
-int Flow2AuthCredsPage::nextId() const
-{
+int Flow2AuthCredsPage::nextId() const {
     return WizardCommon::Page_AdvancedSetup;
 }
 
-void Flow2AuthCredsPage::setConnected()
-{
+void Flow2AuthCredsPage::setConnected() {
     auto *ocWizard = qobject_cast<OwncloudWizard *>(wizard());
     Q_ASSERT(ocWizard);
 
@@ -116,8 +110,7 @@ void Flow2AuthCredsPage::setConnected()
     ocWizard->bringToTop();
 }
 
-AbstractCredentials *Flow2AuthCredsPage::getCredentials() const
-{
+AbstractCredentials *Flow2AuthCredsPage::getCredentials() const {
     auto *ocWizard = qobject_cast<OwncloudWizard *>(wizard());
     Q_ASSERT(ocWizard);
     return new WebFlowCredentials(
@@ -129,18 +122,15 @@ AbstractCredentials *Flow2AuthCredsPage::getCredentials() const
     );
 }
 
-bool Flow2AuthCredsPage::isComplete() const
-{
+bool Flow2AuthCredsPage::isComplete() const {
     return false; /* We can never go forward manually */
 }
 
-void Flow2AuthCredsPage::slotPollNow()
-{
+void Flow2AuthCredsPage::slotPollNow() {
     emit pollNow();
 }
 
-void Flow2AuthCredsPage::slotStyleChanged()
-{
+void Flow2AuthCredsPage::slotStyleChanged() {
     emit styleChanged();
 }
 

@@ -28,8 +28,7 @@ namespace Ui {
  * @brief The OwncloudConnectionMethodDialog class
  * @ingroup gui
  */
-class OwncloudConnectionMethodDialog : public QDialog
-{
+class OwncloudConnectionMethodDialog : public QDialog {
 
 public:
     explicit OwncloudConnectionMethodDialog(QWidget *parent = nullptr);

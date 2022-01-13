@@ -34,18 +34,15 @@ namespace {
     const char clientCaCertificatePEMC[] = "_clientCaCertificatePEM";
 } // ns
 
-class WebFlowCredentialsAccessManager : public AccessManager
-{
+class WebFlowCredentialsAccessManager : public AccessManager {
 public:
     WebFlowCredentialsAccessManager(const WebFlowCredentials *cred, QObject *parent = nullptr)
         : AccessManager(parent)
-        , _cred(cred)
-    {
+        , _cred(cred) {
     }
 
 protected:
-    QNetworkReply *createRequest(Operation op, const QNetworkRequest &request, QIODevice *outgoingData) override
-    {
+    QNetworkReply *createRequest(Operation op, const QNetworkRequest &request, QIODevice *outgoingData) override {
         QNetworkRequest req(request);
         if (!req.attribute(WebFlowCredentials::DontAddCredentialsAttribute).toBool()) {
             if (_cred && !_cred->password().isEmpty()) {
@@ -78,8 +75,7 @@ private:
 };
 
 #if defined(KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
-static void addSettingsToJob(Account *account, QKeychain::Job *job)
-{
+static void addSettingsToJob(Account *account, QKeychain::Job *job) {
     Q_UNUSED(account)
     auto settings = ConfigFile::settingsWithGroup(Theme::instance()->appName());
     settings->setParent(job); // make the job parent to make setting deleted properly
@@ -96,8 +92,7 @@ WebFlowCredentials::WebFlowCredentials(const QString &user, const QString &passw
     , _clientSslCertificate(certificate)
     , _clientSslCaCertificates(caCertificates)
     , _ready(true)
-    , _credentialsValid(true)
-{
+    , _credentialsValid(true) {
 
 }
 
@@ -253,8 +248,7 @@ void WebFlowCredentials::persist() {
     }
 }
 
-void WebFlowCredentials::slotWriteClientCertPEMJobDone(KeychainChunk::WriteJob *writeJob)
-{
+void WebFlowCredentials::slotWriteClientCertPEMJobDone(KeychainChunk::WriteJob *writeJob) {
     Q_UNUSED(writeJob)
     // write ssl key if there is one
     if (!_clientSslKey.isNull()) {
@@ -270,8 +264,7 @@ void WebFlowCredentials::slotWriteClientCertPEMJobDone(KeychainChunk::WriteJob *
     }
 }
 
-void WebFlowCredentials::writeSingleClientCaCertPEM()
-{
+void WebFlowCredentials::writeSingleClientCaCertPEM() {
     // write a ca cert if there is any in the queue
     if (!_clientSslCaCertificatesWriteQueue.isEmpty()) {
         // grab and remove the first cert from the queue
@@ -300,8 +293,7 @@ void WebFlowCredentials::writeSingleClientCaCertPEM()
     }
 }
 
-void WebFlowCredentials::slotWriteClientKeyPEMJobDone(KeychainChunk::WriteJob *writeJob)
-{
+void WebFlowCredentials::slotWriteClientKeyPEMJobDone(KeychainChunk::WriteJob *writeJob) {
     Q_UNUSED(writeJob)
     _clientSslCaCertificatesWriteQueue.clear();
 
@@ -317,8 +309,7 @@ void WebFlowCredentials::slotWriteClientKeyPEMJobDone(KeychainChunk::WriteJob *w
     }
 }
 
-void WebFlowCredentials::slotWriteClientCaCertsPEMJobDone(KeychainChunk::WriteJob *writeJob)
-{
+void WebFlowCredentials::slotWriteClientCaCertsPEMJobDone(KeychainChunk::WriteJob *writeJob) {
     // errors / next ca cert?
     if (writeJob && !_clientSslCaCertificates.isEmpty()) {
         if (writeJob->error() != NoError) {
@@ -344,8 +335,7 @@ void WebFlowCredentials::slotWriteClientCaCertsPEMJobDone(KeychainChunk::WriteJo
     job->start();
 }
 
-void WebFlowCredentials::slotWriteJobDone(QKeychain::Job *job)
-{
+void WebFlowCredentials::slotWriteJobDone(QKeychain::Job *job) {
     delete job->settings();
     switch (job->error()) {
     case NoError:
@@ -442,8 +432,7 @@ void WebFlowCredentials::fetchFromKeychainHelper() {
     job->start();
 }
 
-void WebFlowCredentials::slotReadClientCertPEMJobDone(KeychainChunk::ReadJob *readJob)
-{
+void WebFlowCredentials::slotReadClientCertPEMJobDone(KeychainChunk::ReadJob *readJob) {
     // Store PEM in memory
     if (readJob->error() == NoError && readJob->binaryData().length() > 0) {
         QList<QSslCertificate> sslCertificateList = QSslCertificate::fromData(readJob->binaryData(), QSsl::Pem);
@@ -461,8 +450,7 @@ void WebFlowCredentials::slotReadClientCertPEMJobDone(KeychainChunk::ReadJob *re
     job->start();
 }
 
-void WebFlowCredentials::slotReadClientKeyPEMJobDone(KeychainChunk::ReadJob *readJob)
-{
+void WebFlowCredentials::slotReadClientKeyPEMJobDone(KeychainChunk::ReadJob *readJob) {
     // Store key in memory
     if (readJob->error() == NoError && readJob->binaryData().length() > 0) {
         QByteArray clientKeyPEM = readJob->binaryData();
@@ -489,8 +477,7 @@ void WebFlowCredentials::slotReadClientKeyPEMJobDone(KeychainChunk::ReadJob *rea
     readSingleClientCaCertPEM();
 }
 
-void WebFlowCredentials::readSingleClientCaCertPEM()
-{
+void WebFlowCredentials::readSingleClientCaCertPEM() {
     // try to fetch a client ca cert
     if (_clientSslCaCertificates.count() < _clientSslCaCertificatesMaxCount) {
         auto job = new KeychainChunk::ReadJob(_account,

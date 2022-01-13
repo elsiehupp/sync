@@ -25,8 +25,7 @@ namespace OCC {
 Q_LOGGING_CATEGORY(lcNavPane, "nextcloud.gui.folder.navigationpane", QtInfoMsg)
 
 NavigationPaneHelper::NavigationPaneHelper(FolderMan *folderMan)
-    : _folderMan(folderMan)
-{
+    : _folderMan(folderMan) {
     ConfigFile cfg;
     _showInExplorerNavigationPane = cfg.showInExplorerNavigationPane();
 
@@ -39,8 +38,7 @@ NavigationPaneHelper::NavigationPaneHelper(FolderMan *folderMan)
     setShowInExplorerNavigationPane(!_showInExplorerNavigationPane);
 }
 
-void NavigationPaneHelper::setShowInExplorerNavigationPane(bool show)
-{
+void NavigationPaneHelper::setShowInExplorerNavigationPane(bool show) {
     if (_showInExplorerNavigationPane == show)
         return;
 
@@ -53,15 +51,13 @@ void NavigationPaneHelper::setShowInExplorerNavigationPane(bool show)
     scheduleUpdateCloudStorageRegistry();
 }
 
-void NavigationPaneHelper::scheduleUpdateCloudStorageRegistry()
-{
+void NavigationPaneHelper::scheduleUpdateCloudStorageRegistry() {
     // Schedule the update to happen a bit later to avoid doing the update multiple times in a row.
     if (!_updateCloudStorageRegistryTimer.isActive())
         _updateCloudStorageRegistryTimer.start(500);
 }
 
-void NavigationPaneHelper::updateCloudStorageRegistry()
-{
+void NavigationPaneHelper::updateCloudStorageRegistry() {
     // Start by looking at every registered namespace extension for the sidebar, and look for an "ApplicationName" value
     // that matches ours when we saved.
     QVector<QUuid> entriesToRemove;

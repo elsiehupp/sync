@@ -29,8 +29,7 @@ class AccountState;
  * Simple list model to provide the list view with data for the Unified Search results.
  */
 
-class UnifiedSearchResultsListModel : public QAbstractListModel
-{
+class UnifiedSearchResultsListModel : public QAbstractListModel {
 
     Q_PROPERTY(bool isSearchInProgress READ isSearchInProgress NOTIFY isSearchInProgressChanged)
     Q_PROPERTY(QString currentFetchMoreInProgressProviderId READ currentFetchMoreInProgressProviderId NOTIFY
@@ -38,8 +37,7 @@ class UnifiedSearchResultsListModel : public QAbstractListModel
     Q_PROPERTY(QString errorString READ errorString NOTIFY errorStringChanged)
     Q_PROPERTY(QString searchTerm READ searchTerm WRITE setSearchTerm NOTIFY searchTermChanged)
 
-    struct UnifiedSearchProvider
-    {
+    struct UnifiedSearchProvider {
         QString _id;
         QString _name;
         qint32 _cursor = -1; // current pagination value

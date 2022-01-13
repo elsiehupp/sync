@@ -26,8 +26,7 @@ namespace Ui {
     class WelcomePage;
 }
 
-class WelcomePage : public QWizardPage
-{
+class WelcomePage : public QWizardPage {
 
 public:
     explicit WelcomePage(OwncloudWizard *ocWizard);

@@ -24,15 +24,13 @@ namespace OCC {
 WelcomePage::WelcomePage(OwncloudWizard *ocWizard)
     : QWizardPage()
     , _ui(new Ui::WelcomePage)
-    , _ocWizard(ocWizard)
-{
+    , _ocWizard(ocWizard) {
     setupUi();
 }
 
 WelcomePage::~WelcomePage() = default;
 
-void WelcomePage::setupUi()
-{
+void WelcomePage::setupUi() {
     _ui->setupUi(this);
     setupSlideShow();
     setupLoginButton();
@@ -40,19 +38,16 @@ void WelcomePage::setupUi()
     setupHostYourOwnServerLabel();
 }
 
-void WelcomePage::initializePage()
-{
+void WelcomePage::initializePage() {
     customizeStyle();
 }
 
-void WelcomePage::setLoginButtonDefault()
-{
+void WelcomePage::setLoginButtonDefault() {
     _ui->loginButton->setDefault(true);
     _ui->loginButton->setFocus();
 }
 
-void WelcomePage::styleSlideShow()
-{
+void WelcomePage::styleSlideShow() {
     const auto theme = Theme::instance();
     const auto backgroundColor = palette().window().color();
 
@@ -75,15 +70,13 @@ void WelcomePage::styleSlideShow()
     _ui->slideShowPreviousButton->setIcon(theme->uiThemeIcon(QString("control-prev.svg"), isDarkBackground));
 }
 
-void WelcomePage::setupSlideShow()
-{
+void WelcomePage::setupSlideShow() {
     connect(_ui->slideShow, &SlideShow::clicked, _ui->slideShow, &SlideShow::stopShow);
     connect(_ui->slideShowNextButton, &QPushButton::clicked, _ui->slideShow, &SlideShow::nextSlide);
     connect(_ui->slideShowPreviousButton, &QPushButton::clicked, _ui->slideShow, &SlideShow::prevSlide);
 }
 
-void WelcomePage::setupLoginButton()
-{
+void WelcomePage::setupLoginButton() {
     const auto appName = Theme::instance()->appNameGUI();
 
     _ui->loginButton->setText(tr("Log in to your %1").arg(appName));
@@ -93,8 +86,7 @@ void WelcomePage::setupLoginButton()
     });
 }
 
-void WelcomePage::setupCreateAccountButton()
-{
+void WelcomePage::setupCreateAccountButton() {
 #ifdef WITH_WEBENGINE
     connect(_ui->createAccountButton, &QPushButton::clicked, this, [this](bool /*checked*/) {
         _ocWizard->setRegistration(true);
@@ -109,20 +101,17 @@ void WelcomePage::setupCreateAccountButton()
 #endif // WITH_WEBENGINE
 }
 
-void WelcomePage::setupHostYourOwnServerLabel()
-{
+void WelcomePage::setupHostYourOwnServerLabel() {
     _ui->hostYourOwnServerLabel->setText(tr("Host your own server"));
     _ui->hostYourOwnServerLabel->setAlignment(Qt::AlignCenter);
     _ui->hostYourOwnServerLabel->setUrl(QUrl("https://docs.nextcloud.com/server/latest/admin_manual/installation/#installation"));
 }
 
-int WelcomePage::nextId() const
-{
+int WelcomePage::nextId() const {
     return _nextPage;
 }
 
-void WelcomePage::customizeStyle()
-{
+void WelcomePage::customizeStyle() {
     styleSlideShow();
 }
 }

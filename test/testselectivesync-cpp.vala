@@ -12,14 +12,12 @@
 using namespace OCC;
 
 
-class TestSelectiveSync : public QObject
-{
+class TestSelectiveSync : public QObject {
 
 private slots:
 
 
-    void testSelectiveSyncBigFolders()
-    {
+    void testSelectiveSyncBigFolders() {
         FakeFolder fakeFolder { FileInfo::A12_B12_C12_S12() };
         SyncOptions options;
         options._newBigFolderSizeLimit = 20000; // 20 K

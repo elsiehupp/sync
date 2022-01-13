@@ -9,8 +9,7 @@ class QJsonDocument;
 
 namespace OCC {
 
-class ServerNotificationHandler : public QObject
-{
+class ServerNotificationHandler : public QObject {
 public:
     explicit ServerNotificationHandler(AccountState *accountState, QObject *parent = nullptr);
 

@@ -22,8 +22,7 @@ Q_LOGGING_CATEGORY(lcPutMultiFileJob, "nextcloud.sync.networkjob.put.multi", QtI
 
 PutMultiFileJob::~PutMultiFileJob() = default;
 
-void PutMultiFileJob::start()
-{
+void PutMultiFileJob::start() {
     QNetworkRequest req;
 
     for(auto &oneDevice : _devices) {
@@ -52,8 +51,7 @@ void PutMultiFileJob::start()
     AbstractNetworkJob::start();
 }
 
-bool PutMultiFileJob::finished()
-{
+bool PutMultiFileJob::finished() {
     for(const auto &oneDevice : _devices) {
         oneDevice._device->close();
     }

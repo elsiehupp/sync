@@ -24,8 +24,7 @@ namespace OCC {
 
 Q_LOGGING_CATEGORY(lcFileItem, "nextcloud.sync.fileitem", QtInfoMsg)
 
-SyncJournalFileRecord SyncFileItem::toSyncJournalFileRecordWithInode(const QString &localFileName) const
-{
+SyncJournalFileRecord SyncFileItem::toSyncJournalFileRecordWithInode(const QString &localFileName) const {
     SyncJournalFileRecord rec;
     rec._path = destination().toUtf8();
     rec._modtime = _modtime;
@@ -60,8 +59,7 @@ SyncJournalFileRecord SyncFileItem::toSyncJournalFileRecordWithInode(const QStri
     return rec;
 }
 
-SyncFileItemPtr SyncFileItem::fromSyncJournalFileRecord(const SyncJournalFileRecord &rec)
-{
+SyncFileItemPtr SyncFileItem::fromSyncJournalFileRecord(const SyncJournalFileRecord &rec) {
     auto item = SyncFileItemPtr::create();
     item->_file = rec.path();
     item->_inode = rec._inode;

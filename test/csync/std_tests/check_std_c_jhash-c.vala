@@ -13,8 +13,7 @@
 #define MAXPAIR 80
 #define MAXLEN 70
 
-static void check_c_jhash_trials(void **state)
-{
+static void check_c_jhash_trials(void **state) {
   uint8_t qa[MAXLEN+1], qb[MAXLEN+2], *a = &qa[0], *b = &qb[1];
   uint32_t c[HASHSTATE];
   uint32_t d[HASHSTATE];
@@ -81,8 +80,7 @@ static void check_c_jhash_trials(void **state)
   }
 }
 
-static void check_c_jhash_alignment_problems(void **state)
-{
+static void check_c_jhash_alignment_problems(void **state) {
   uint32_t test = 0;
   uint8_t buf[MAXLEN+20];
   uint8_t *b = NULL;
@@ -121,8 +119,7 @@ static void check_c_jhash_alignment_problems(void **state)
   }
 }
 
-static void check_c_jhash_null_strings(void **state)
-{
+static void check_c_jhash_null_strings(void **state) {
   uint8_t buf[1];
   uint32_t h = 0;
   uint32_t i = 0;
@@ -139,8 +136,7 @@ static void check_c_jhash_null_strings(void **state)
   }
 }
 
-static void check_c_jhash64_trials(void **state)
-{
+static void check_c_jhash64_trials(void **state) {
   uint8_t qa[MAXLEN + 1], qb[MAXLEN + 2];
   uint8_t *a = NULL, *b = NULL;
   uint64_t c[HASHSTATE];
@@ -184,8 +180,7 @@ static void check_c_jhash64_trials(void **state)
             b[i] ^= ((k+1)>>(8-j));
              d[0] = c_jhash64(b, hlen, m);
             /* check every bit is 1, 0, set, and not set at least once */
-            for (l=0; l<HASHSTATE; ++l)
-            {
+            for (l=0; l<HASHSTATE; ++l) {
               e[l] &= (c[l]^d[l]);
               f[l] &= ~(c[l]^d[l]);
               g[l] &= c[l];
@@ -226,8 +221,7 @@ static void check_c_jhash64_trials(void **state)
   }
 }
 
-static void check_c_jhash64_alignment_problems(void **state)
-{
+static void check_c_jhash64_alignment_problems(void **state) {
   uint8_t buf[MAXLEN+20];
   uint8_t *b = NULL;
   uint64_t len = 0;
@@ -293,8 +287,7 @@ static void check_c_jhash64_alignment_problems(void **state)
   }
 }
 
-static void check_c_jhash64_null_strings(void **state)
-{
+static void check_c_jhash64_null_strings(void **state) {
   uint8_t buf[1];
   uint64_t h = 0;
   uint64_t i = 0;
@@ -313,8 +306,7 @@ static void check_c_jhash64_null_strings(void **state)
   }
 }
 
-int torture_run_tests(void)
-{
+int torture_run_tests(void) {
   const struct CMUnitTest tests[] = {
       cmocka_unit_test(check_c_jhash_trials),
       cmocka_unit_test(check_c_jhash_alignment_problems),

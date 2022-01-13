@@ -11,15 +11,13 @@
 
 using namespace OCC;
 
-class FakeAsyncReply : public FakeReply
-{
+class FakeAsyncReply : public FakeReply {
     QByteArray _pollLocation;
 
 public:
     FakeAsyncReply(const QByteArray &pollLocation, QNetworkAccessManager::Operation op, const QNetworkRequest &request, QObject *parent)
         : FakeReply { parent }
-        , _pollLocation(pollLocation)
-    {
+        , _pollLocation(pollLocation) {
         setRequest(request);
         setUrl(request.url());
         setOperation(op);
@@ -28,8 +26,7 @@ public:
         QMetaObject::invokeMethod(this, "respond", Qt::QueuedConnection);
     }
 
-    Q_INVOKABLE void respond()
-    {
+    Q_INVOKABLE void respond() {
         setAttribute(QNetworkRequest::HttpStatusCodeAttribute, 202);
         setRawHeader("OC-JobStatus-Location", _pollLocation);
         emit metaDataChanged();
@@ -41,13 +38,11 @@ public:
 };
 
 
-class TestAsyncOp : public QObject
-{
+class TestAsyncOp : public QObject {
 
 private slots:
 
-    void asyncUploadOperations()
-    {
+    void asyncUploadOperations() {
         FakeFolder fakeFolder{ FileInfo::A12_B12_C12_S12() };
         fakeFolder.syncEngine().account()->setCapabilities({ { "dav", QVariantMap{ { "chunking", "1.0" } } } });
         // Reduce max chunk size a bit so we get more chunks
@@ -62,8 +57,7 @@ private slots:
         // the `perform` functor to what needs to be done to complete the transaction.
         // The testcase consist of the `pollRequest` which will be called when the sync engine
         // calls the poll url.
-        struct TestCase
-        {
+        struct TestCase {
             using PollRequest_t = std::function<QNetworkReply *(TestCase *, const QNetworkRequest &request)>;
             PollRequest_t pollRequest;
             std::function<FileInfo *()> perform = nullptr;

@@ -22,8 +22,7 @@ namespace OCC {
  * @brief The MoveJob class
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT MoveJob : public AbstractNetworkJob
-{
+class OWNCLOUDSYNC_EXPORT MoveJob : public AbstractNetworkJob {
     const QString _destination;
     const QUrl _url; // Only used (instead of path) when the constructor taking an URL is used
     QMap<QByteArray, QByteArray> _extraHeaders;
@@ -44,14 +43,12 @@ signals:
  * @brief The PropagateRemoteMove class
  * @ingroup libsync
  */
-class PropagateRemoteMove : public PropagateItemJob
-{
+class PropagateRemoteMove : public PropagateItemJob {
     QPointer<MoveJob> _job;
 
 public:
     PropagateRemoteMove(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
-        : PropagateItemJob(propagator, item)
-    {
+        : PropagateItemJob(propagator, item) {
     }
     void start() override;
     void abort(PropagatorJob::AbortType abortType) override;

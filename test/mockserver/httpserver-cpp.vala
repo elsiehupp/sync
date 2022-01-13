@@ -15,13 +15,11 @@
 #include "httpserver.h"
 
 HttpServer::HttpServer(quint16 port, QObject* parent)
-    : QTcpServer(parent)
-{
+    : QTcpServer(parent) {
     listen(QHostAddress::Any, port);
 }
 
-void HttpServer::readClient()
-{
+void HttpServer::readClient() {
     QTcpSocket* socket = (QTcpSocket*)sender();
     if (socket->canReadLine()) {
         QStringList tokens = QString(socket->readLine()).split(QRegularExpression("[ \r\n][ \r\n]*"));
@@ -44,8 +42,7 @@ void HttpServer::readClient()
         }
     }
 }
-void HttpServer::discardClient()
-{
+void HttpServer::discardClient() {
     QTcpSocket* socket = (QTcpSocket*)sender();
     socket->deleteLater();
 
@@ -53,8 +50,7 @@ void HttpServer::discardClient()
 }
 
 
-void HttpServer::incomingConnection(int socket)
-{
+void HttpServer::incomingConnection(int socket) {
     if (disabled)
         return;
     QTcpSocket* s = new QTcpSocket(this);

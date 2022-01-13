@@ -41,19 +41,16 @@ namespace OCC {
 Q_LOGGING_CATEGORY(lcActivity, "nextcloud.gui.activity", QtInfoMsg)
 
 ActivityListModel::ActivityListModel(QObject *parent)
-    : QAbstractListModel(parent)
-{
+    : QAbstractListModel(parent) {
 }
 
 ActivityListModel::ActivityListModel(AccountState *accountState,
     QObject *parent)
     : QAbstractListModel(parent)
-    , _accountState(accountState)
-{
+    , _accountState(accountState) {
 }
 
-QHash<int, QByteArray> ActivityListModel::roleNames() const
-{
+QHash<int, QByteArray> ActivityListModel::roleNames() const {
     QHash<int, QByteArray> roles;
     roles[DisplayPathRole] = "displayPath";
     roles[PathRole] = "path";
@@ -72,38 +69,31 @@ QHash<int, QByteArray> ActivityListModel::roleNames() const
     return roles;
 }
 
-void ActivityListModel::setAccountState(AccountState *state)
-{
+void ActivityListModel::setAccountState(AccountState *state) {
     _accountState = state;
 }
 
-void ActivityListModel::setCurrentlyFetching(bool value)
-{
+void ActivityListModel::setCurrentlyFetching(bool value) {
     _currentlyFetching = value;
 }
 
-bool ActivityListModel::currentlyFetching() const
-{
+bool ActivityListModel::currentlyFetching() const {
     return _currentlyFetching;
 }
 
-void ActivityListModel::setDoneFetching(bool value)
-{
+void ActivityListModel::setDoneFetching(bool value) {
     _doneFetching = value;
 }
 
-void ActivityListModel::setHideOldActivities(bool value)
-{
+void ActivityListModel::setHideOldActivities(bool value) {
     _hideOldActivities = value;
 }
 
-void ActivityListModel::setDisplayActions(bool value)
-{
+void ActivityListModel::setDisplayActions(bool value) {
     _displayActions = value;
 }
 
-QVariant ActivityListModel::data(const QModelIndex &index, int role) const
-{
+QVariant ActivityListModel::data(const QModelIndex &index, int role) const {
     Activity a;
 
     if (!index.isValid())
@@ -271,13 +261,11 @@ QVariant ActivityListModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-int ActivityListModel::rowCount(const QModelIndex &) const
-{
+int ActivityListModel::rowCount(const QModelIndex &) const {
     return _finalList.count();
 }
 
-bool ActivityListModel::canFetchMore(const QModelIndex &) const
-{
+bool ActivityListModel::canFetchMore(const QModelIndex &) const {
     // We need to be connected to be able to fetch more
     if (_accountState && _accountState->isConnected()) {
         // If the fetching is reported to be done or we are currently fetching we can't fetch more
@@ -289,8 +277,7 @@ bool ActivityListModel::canFetchMore(const QModelIndex &) const
     return false;
 }
 
-void ActivityListModel::startFetchJob()
-{
+void ActivityListModel::startFetchJob() {
     if (!_accountState->isConnected()) {
         return;
     }
@@ -308,8 +295,7 @@ void ActivityListModel::startFetchJob()
     job->start();
 }
 
-void ActivityListModel::activitiesReceived(const QJsonDocument &json, int statusCode)
-{
+void ActivityListModel::activitiesReceived(const QJsonDocument &json, int statusCode) {
     auto activities = json.object().value("ocs").toObject().value("data").toArray();
 
     ActivityList list;
@@ -362,15 +348,13 @@ void ActivityListModel::activitiesReceived(const QJsonDocument &json, int status
     combineActivityLists();
 }
 
-void ActivityListModel::addErrorToActivityList(Activity activity)
-{
+void ActivityListModel::addErrorToActivityList(Activity activity) {
     qCInfo(lcActivity) << "Error successfully added to the notification list: " << activity._subject;
     _notificationErrorsLists.prepend(activity);
     combineActivityLists();
 }
 
-void ActivityListModel::addIgnoredFileToList(Activity newActivity)
-{
+void ActivityListModel::addIgnoredFileToList(Activity newActivity) {
     qCInfo(lcActivity) << "First checking for duplicates then add file to the notification list of ignored files: " << newActivity._file;
 
     bool duplicate = false;
@@ -393,36 +377,31 @@ void ActivityListModel::addIgnoredFileToList(Activity newActivity)
     }
 }
 
-void ActivityListModel::addNotificationToActivityList(Activity activity)
-{
+void ActivityListModel::addNotificationToActivityList(Activity activity) {
     qCInfo(lcActivity) << "Notification successfully added to the notification list: " << activity._subject;
     _notificationLists.prepend(activity);
     combineActivityLists();
 }
 
-void ActivityListModel::clearNotifications()
-{
+void ActivityListModel::clearNotifications() {
     qCInfo(lcActivity) << "Clear the notifications";
     _notificationLists.clear();
     combineActivityLists();
 }
 
-void ActivityListModel::removeActivityFromActivityList(int row)
-{
+void ActivityListModel::removeActivityFromActivityList(int row) {
     Activity activity = _finalList.at(row);
     removeActivityFromActivityList(activity);
     combineActivityLists();
 }
 
-void ActivityListModel::addSyncFileItemToActivityList(Activity activity)
-{
+void ActivityListModel::addSyncFileItemToActivityList(Activity activity) {
     qCInfo(lcActivity) << "Successfully added to the activity list: " << activity._subject;
     _syncFileItemLists.prepend(activity);
     combineActivityLists();
 }
 
-void ActivityListModel::removeActivityFromActivityList(Activity activity)
-{
+void ActivityListModel::removeActivityFromActivityList(Activity activity) {
     qCInfo(lcActivity) << "Activity/Notification/Error successfully dismissed: " << activity._subject;
     qCInfo(lcActivity) << "Trying to remove Activity/Notification/Error from view... ";
 
@@ -448,8 +427,7 @@ void ActivityListModel::removeActivityFromActivityList(Activity activity)
     }
 }
 
-void ActivityListModel::triggerDefaultAction(int activityIndex)
-{
+void ActivityListModel::triggerDefaultAction(int activityIndex) {
     if (activityIndex < 0 || activityIndex >= _finalList.size()) {
         qCWarning(lcActivity) << "Couldn't trigger default action at index" << activityIndex << "/ final list size:" << _finalList.size();
         return;
@@ -514,8 +492,7 @@ void ActivityListModel::triggerDefaultAction(int activityIndex)
     }
 }
 
-void ActivityListModel::triggerAction(int activityIndex, int actionIndex)
-{
+void ActivityListModel::triggerAction(int activityIndex, int actionIndex) {
     if (activityIndex < 0 || activityIndex >= _finalList.size()) {
         qCWarning(lcActivity) << "Couldn't trigger action on activity at index" << activityIndex << "/ final list size:" << _finalList.size();
         return;
@@ -538,13 +515,11 @@ void ActivityListModel::triggerAction(int activityIndex, int actionIndex)
     emit sendNotificationRequest(activity._accName, action._link, action._verb, activityIndex);
 }
 
-AccountState *ActivityListModel::accountState() const
-{
+AccountState *ActivityListModel::accountState() const {
     return _accountState;
 }
 
-void ActivityListModel::combineActivityLists()
-{
+void ActivityListModel::combineActivityLists() {
     ActivityList resultList;
 
     if (_notificationErrorsLists.count() > 0) {
@@ -596,13 +571,11 @@ void ActivityListModel::combineActivityLists()
     }
 }
 
-bool ActivityListModel::canFetchActivities() const
-{
+bool ActivityListModel::canFetchActivities() const {
     return _accountState->isConnected() && _accountState->account()->capabilities().hasActivities();
 }
 
-void ActivityListModel::fetchMore(const QModelIndex &)
-{
+void ActivityListModel::fetchMore(const QModelIndex &) {
     if (canFetchActivities()) {
         startFetchJob();
     } else {
@@ -611,8 +584,7 @@ void ActivityListModel::fetchMore(const QModelIndex &)
     }
 }
 
-void ActivityListModel::slotRefreshActivity()
-{
+void ActivityListModel::slotRefreshActivity() {
     _activityLists.clear();
     _doneFetching = false;
     _currentItem = 0;
@@ -627,8 +599,7 @@ void ActivityListModel::slotRefreshActivity()
     }
 }
 
-void ActivityListModel::slotRemoveAccount()
-{
+void ActivityListModel::slotRemoveAccount() {
     _finalList.clear();
     _activityLists.clear();
     _currentlyFetching = false;

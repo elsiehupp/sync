@@ -10,8 +10,7 @@
 
 using namespace OCC;
 
-class TestXmlParse : public QObject
-{
+class TestXmlParse : public QObject {
 
 private:
   bool _success;
@@ -19,20 +18,17 @@ private:
   QStringList _items;
 
 public slots:
-  void slotDirectoryListingSubFolders(const QStringList& list)
-  {
+  void slotDirectoryListingSubFolders(const QStringList& list) {
      qDebug() << "subfolders: " << list;
      _subdirs.append(list);
   }
 
-  void slotDirectoryListingIterated(const QString& item, const QMap<QString,QString>& )
-  {
+  void slotDirectoryListingIterated(const QString& item, const QMap<QString,QString>& ) {
     qDebug() << "     item: " << item;
     _items.append(item);
   }
 
-  void slotFinishedSuccessfully()
-  {
+  void slotFinishedSuccessfully() {
       _success = true;
   }
 

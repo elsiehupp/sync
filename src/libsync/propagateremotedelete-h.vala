@@ -26,15 +26,13 @@ class AbstractPropagateRemoteDeleteEncrypted;
  * @brief The PropagateRemoteDelete class
  * @ingroup libsync
  */
-class PropagateRemoteDelete : public PropagateItemJob
-{
+class PropagateRemoteDelete : public PropagateItemJob {
     QPointer<DeleteJob> _job;
     AbstractPropagateRemoteDeleteEncrypted *_deleteEncryptedHelper = nullptr;
 
 public:
     PropagateRemoteDelete(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
-        : PropagateItemJob(propagator, item)
-    {
+        : PropagateItemJob(propagator, item) {
     }
     void start() override;
     void createDeleteJob(const QString &filename);

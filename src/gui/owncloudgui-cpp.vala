@@ -62,8 +62,7 @@ ownCloudGui::ownCloudGui(Application *parent)
 #ifdef WITH_LIBCLOUDPROVIDERS
     , _bus(QDBusConnection::sessionBus())
 #endif
-    , _app(parent)
-{
+    , _app(parent) {
     _tray = Systray::instance();
     _tray->setTrayEngine(new QQmlApplicationEngine(this));
     // for the beginning, set the offline icon until the account was verified
@@ -110,19 +109,16 @@ ownCloudGui::ownCloudGui(Application *parent)
         this, &ownCloudGui::slotShowGuiMessage);
 }
 
-void ownCloudGui::createTray()
-{
+void ownCloudGui::createTray() {
     _tray->create();
 }
 
 #ifdef WITH_LIBCLOUDPROVIDERS
-void ownCloudGui::setupCloudProviders()
-{
+void ownCloudGui::setupCloudProviders() {
     new CloudProviderManager(this);
 }
 
-bool ownCloudGui::cloudProviderApiAvailable()
-{
+bool ownCloudGui::cloudProviderApiAvailable() {
     if (!_bus.isConnected()) {
         return false;
     }
@@ -138,8 +134,7 @@ bool ownCloudGui::cloudProviderApiAvailable()
 #endif
 
 // This should rather be in application.... or rather in ConfigFile?
-void ownCloudGui::slotOpenSettingsDialog()
-{
+void ownCloudGui::slotOpenSettingsDialog() {
     // if account is set up, start the configuration wizard.
     if (!AccountManager::instance()->accounts().isEmpty()) {
         if (_settingsDialog.isNull() || QApplication::activeWindow() != _settingsDialog) {
@@ -153,15 +148,13 @@ void ownCloudGui::slotOpenSettingsDialog()
     }
 }
 
-void ownCloudGui::slotOpenMainDialog()
-{
+void ownCloudGui::slotOpenMainDialog() {
     if (!_tray->isOpen()) {
         _tray->showWindow();
     }
 }
 
-void ownCloudGui::slotTrayClicked(QSystemTrayIcon::ActivationReason reason)
-{
+void ownCloudGui::slotTrayClicked(QSystemTrayIcon::ActivationReason reason) {
     if (reason == QSystemTrayIcon::Trigger) {
         if (OwncloudSetupWizard::bringWizardToFrontIfVisible()) {
             // brought wizard to front
@@ -186,8 +179,7 @@ void ownCloudGui::slotTrayClicked(QSystemTrayIcon::ActivationReason reason)
     // or SSL error dialog also comes to front.
 }
 
-void ownCloudGui::slotSyncStateChange(Folder *folder)
-{
+void ownCloudGui::slotSyncStateChange(Folder *folder) {
     slotComputeOverallSyncStatus();
 
     if (!folder) {
@@ -206,23 +198,19 @@ void ownCloudGui::slotSyncStateChange(Folder *folder)
     }
 }
 
-void ownCloudGui::slotFoldersChanged()
-{
+void ownCloudGui::slotFoldersChanged() {
     slotComputeOverallSyncStatus();
 }
 
-void ownCloudGui::slotOpenPath(const QString &path)
-{
+void ownCloudGui::slotOpenPath(const QString &path) {
     showInFileManager(path);
 }
 
-void ownCloudGui::slotAccountStateChanged()
-{
+void ownCloudGui::slotAccountStateChanged() {
     slotComputeOverallSyncStatus();
 }
 
-void ownCloudGui::slotTrayMessageIfServerUnsupported(Account *account)
-{
+void ownCloudGui::slotTrayMessageIfServerUnsupported(Account *account) {
     if (account->serverVersionUnsupported()) {
         slotShowTrayMessage(
             tr("Unsupported Server Version"),
@@ -233,8 +221,7 @@ void ownCloudGui::slotTrayMessageIfServerUnsupported(Account *account)
     }
 }
 
-void ownCloudGui::slotComputeOverallSyncStatus()
-{
+void ownCloudGui::slotComputeOverallSyncStatus() {
     bool allSignedOut = true;
     bool allPaused = true;
     bool allDisconnected = true;
@@ -365,30 +352,26 @@ void ownCloudGui::slotComputeOverallSyncStatus()
     }
 }
 
-void ownCloudGui::hideAndShowTray()
-{
+void ownCloudGui::hideAndShowTray() {
     _tray->hide();
     _tray->show();
 }
 
-void ownCloudGui::slotShowTrayMessage(const QString &title, const QString &msg)
-{
+void ownCloudGui::slotShowTrayMessage(const QString &title, const QString &msg) {
     if (_tray)
         _tray->showMessage(title, msg);
     else
         qCWarning(lcApplication) << "Tray not ready: " << msg;
 }
 
-void ownCloudGui::slotShowOptionalTrayMessage(const QString &title, const QString &msg)
-{
+void ownCloudGui::slotShowOptionalTrayMessage(const QString &title, const QString &msg) {
     slotShowTrayMessage(title, msg);
 }
 
 /*
  * open the folder with the given Alias
  */
-void ownCloudGui::slotFolderOpenAction(const QString &alias)
-{
+void ownCloudGui::slotFolderOpenAction(const QString &alias) {
     Folder *f = FolderMan::instance()->folder(alias);
     if (f) {
         qCInfo(lcApplication) << "opening local url " << f->path();
@@ -407,8 +390,7 @@ void ownCloudGui::slotFolderOpenAction(const QString &alias)
     }
 }
 
-void ownCloudGui::slotUpdateProgress(const QString &folder, const ProgressInfo &progress)
-{
+void ownCloudGui::slotUpdateProgress(const QString &folder, const ProgressInfo &progress) {
     Q_UNUSED(folder);
 
     // FIXME: Lots of messages computed for nothing in this method, needs revisiting
@@ -479,8 +461,7 @@ void ownCloudGui::slotUpdateProgress(const QString &folder, const ProgressInfo &
     }
 }
 
-void ownCloudGui::slotLogin()
-{
+void ownCloudGui::slotLogin() {
     if (auto account = qvariant_cast<AccountStatePtr>(sender()->property(propertyAccountC))) {
         account->account()->resetRejectedCertificates();
         account->signIn();
@@ -492,8 +473,7 @@ void ownCloudGui::slotLogin()
     }
 }
 
-void ownCloudGui::slotLogout()
-{
+void ownCloudGui::slotLogout() {
     auto list = AccountManager::instance()->accounts();
     if (auto account = qvariant_cast<AccountStatePtr>(sender()->property(propertyAccountC))) {
         list.clear();
@@ -505,13 +485,11 @@ void ownCloudGui::slotLogout()
     }
 }
 
-void ownCloudGui::slotNewAccountWizard()
-{
+void ownCloudGui::slotNewAccountWizard() {
     OwncloudSetupWizard::runWizard(qApp, SLOT(slotownCloudWizardDone(int)));
 }
 
-void ownCloudGui::slotShowGuiMessage(const QString &title, const QString &message)
-{
+void ownCloudGui::slotShowGuiMessage(const QString &title, const QString &message) {
     auto *msgBox = new QMessageBox;
     msgBox->setWindowFlags(msgBox->windowFlags() | Qt::WindowStaysOnTopHint);
     msgBox->setAttribute(Qt::WA_DeleteOnClose);
@@ -521,8 +499,7 @@ void ownCloudGui::slotShowGuiMessage(const QString &title, const QString &messag
     msgBox->open();
 }
 
-void ownCloudGui::slotShowSettings()
-{
+void ownCloudGui::slotShowSettings() {
     if (_settingsDialog.isNull()) {
         _settingsDialog = new SettingsDialog(this);
         _settingsDialog->setAttribute(Qt::WA_DeleteOnClose, true);
@@ -531,20 +508,17 @@ void ownCloudGui::slotShowSettings()
     raiseDialog(_settingsDialog.data());
 }
 
-void ownCloudGui::slotSettingsDialogActivated()
-{
+void ownCloudGui::slotSettingsDialogActivated() {
     emit isShowingSettingsDialog();
 }
 
-void ownCloudGui::slotShowSyncProtocol()
-{
+void ownCloudGui::slotShowSyncProtocol() {
     slotShowSettings();
     //_settingsDialog->showActivityPage();
 }
 
 
-void ownCloudGui::slotShutdown()
-{
+void ownCloudGui::slotShutdown() {
     // explicitly close windows. This is somewhat of a hack to ensure
     // that saving the geometries happens ASAP during a OS shutdown
 
@@ -556,8 +530,7 @@ void ownCloudGui::slotShutdown()
     _app->quit();
 }
 
-void ownCloudGui::slotToggleLogBrowser()
-{
+void ownCloudGui::slotToggleLogBrowser() {
     if (_logBrowser.isNull()) {
         // init the log browser.
         _logBrowser = new LogBrowser;
@@ -571,20 +544,17 @@ void ownCloudGui::slotToggleLogBrowser()
     }
 }
 
-void ownCloudGui::slotOpenOwnCloud()
-{
+void ownCloudGui::slotOpenOwnCloud() {
     if (auto account = qvariant_cast<AccountPtr>(sender()->property(propertyAccountC))) {
         Utility::openBrowser(account->url());
     }
 }
 
-void ownCloudGui::slotHelp()
-{
+void ownCloudGui::slotHelp() {
     QDesktopServices::openUrl(QUrl(Theme::instance()->helpUrl()));
 }
 
-void ownCloudGui::raiseDialog(QWidget *raiseWidget)
-{
+void ownCloudGui::raiseDialog(QWidget *raiseWidget) {
     if (raiseWidget && !raiseWidget->parentWidget()) {
         // Qt has a bug which causes parent-less dialogs to pop-under.
         raiseWidget->showNormal();
@@ -597,8 +567,7 @@ void ownCloudGui::raiseDialog(QWidget *raiseWidget)
         if (activeProcessId != qApp->applicationPid()) {
             const auto threadId = GetCurrentThreadId();
             // don't step here with a debugger...
-            if (AttachThreadInput(threadId, activeProcessId, true))
-            {
+            if (AttachThreadInput(threadId, activeProcessId, true)) {
                 const auto hwnd = reinterpret_cast<HWND>(raiseWidget->winId());
                 SetForegroundWindow(hwnd);
                 SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
@@ -610,8 +579,7 @@ void ownCloudGui::raiseDialog(QWidget *raiseWidget)
 }
 
 
-void ownCloudGui::slotShowShareDialog(const QString &sharePath, const QString &localPath, ShareDialogStartPage startPage)
-{
+void ownCloudGui::slotShowShareDialog(const QString &sharePath, const QString &localPath, ShareDialogStartPage startPage) {
     const auto folder = FolderMan::instance()->folderForPath(localPath);
     if (!folder) {
         qCWarning(lcApplication) << "Could not open share dialog for" << localPath << "no responsible folder found";
@@ -648,8 +616,7 @@ void ownCloudGui::slotShowShareDialog(const QString &sharePath, const QString &l
     raiseDialog(w);
 }
 
-void ownCloudGui::slotRemoveDestroyedShareDialogs()
-{
+void ownCloudGui::slotRemoveDestroyedShareDialogs() {
     QMutableMapIterator<QString, QPointer<ShareDialog>> it(_shareDialogs);
     while (it.hasNext()) {
         it.next();

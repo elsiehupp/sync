@@ -48,18 +48,15 @@ namespace {
     const char needRetryC[] = "owncloud-need-retry";
 } // ns
 
-class HttpCredentialsAccessManager : public AccessManager
-{
+class HttpCredentialsAccessManager : public AccessManager {
 public:
     HttpCredentialsAccessManager(const HttpCredentials *cred, QObject *parent = nullptr)
         : AccessManager(parent)
-        , _cred(cred)
-    {
+        , _cred(cred) {
     }
 
 protected:
-    QNetworkReply *createRequest(Operation op, const QNetworkRequest &request, QIODevice *outgoingData) override
-    {
+    QNetworkReply *createRequest(Operation op, const QNetworkRequest &request, QIODevice *outgoingData) override {
         QNetworkRequest req(request);
         if (!req.attribute(HttpCredentials::DontAddCredentialsAttribute).toBool()) {
             if (_cred && !_cred->password().isEmpty()) {
@@ -103,8 +100,7 @@ private:
 };
 
 
-static void addSettingsToJob(Account *account, QKeychain::Job *job)
-{
+static void addSettingsToJob(Account *account, QKeychain::Job *job) {
     Q_UNUSED(account);
     auto settings = ConfigFile::settingsWithGroup(Theme::instance()->appName());
     settings->setParent(job); // make the job parent to make setting deleted properly
@@ -120,38 +116,32 @@ HttpCredentials::HttpCredentials(const QString &user, const QString &password, c
     , _ready(true)
     , _clientCertBundle(clientCertBundle)
     , _clientCertPassword(clientCertPassword)
-    , _retryOnKeyChainError(false)
-{
+    , _retryOnKeyChainError(false) {
     if (!unpackClientCertBundle()) {
         ASSERT(false, "pkcs12 client cert bundle passed to HttpCredentials must be valid");
     }
 }
 
-QString HttpCredentials::authType() const
-{
+QString HttpCredentials::authType() const {
     return QString::fromLatin1("http");
 }
 
-QString HttpCredentials::user() const
-{
+QString HttpCredentials::user() const {
     return _user;
 }
 
-QString HttpCredentials::password() const
-{
+QString HttpCredentials::password() const {
     return _password;
 }
 
-void HttpCredentials::setAccount(Account *account)
-{
+void HttpCredentials::setAccount(Account *account) {
     AbstractCredentials::setAccount(account);
     if (_user.isEmpty()) {
         fetchUser();
     }
 }
 
-QNetworkAccessManager *HttpCredentials::createQNAM() const
-{
+QNetworkAccessManager *HttpCredentials::createQNAM() const {
     AccessManager *qnam = new HttpCredentialsAccessManager(this);
 
     connect(qnam, &QNetworkAccessManager::authenticationRequired,
@@ -160,19 +150,16 @@ QNetworkAccessManager *HttpCredentials::createQNAM() const
     return qnam;
 }
 
-bool HttpCredentials::ready() const
-{
+bool HttpCredentials::ready() const {
     return _ready;
 }
 
-QString HttpCredentials::fetchUser()
-{
+QString HttpCredentials::fetchUser() {
     _user = _account->credentialSetting(QLatin1String(userC)).toString();
     return _user;
 }
 
-void HttpCredentials::fetchFromKeychain()
-{
+void HttpCredentials::fetchFromKeychain() {
     _wasFetched = true;
 
     // User must be fetched from config file
@@ -193,8 +180,7 @@ void HttpCredentials::fetchFromKeychain()
     }
 }
 
-void HttpCredentials::fetchFromKeychainHelper()
-{
+void HttpCredentials::fetchFromKeychainHelper() {
     _clientCertBundle = _account->credentialSetting(QLatin1String(clientCertBundleC)).toByteArray();
     if (!_clientCertBundle.isEmpty()) {
         // New case (>=2.6): We have a bundle in the settings and read the password from
@@ -222,8 +208,7 @@ void HttpCredentials::fetchFromKeychainHelper()
     job->start();
 }
 
-void HttpCredentials::deleteOldKeychainEntries()
-{
+void HttpCredentials::deleteOldKeychainEntries() {
     auto startDeleteJob = [this](QString user) {
         auto *job = new QKeychain::DeletePasswordJob(Theme::instance()->appName());
         addSettingsToJob(_account, job);
@@ -237,8 +222,7 @@ void HttpCredentials::deleteOldKeychainEntries()
     startDeleteJob(_user + clientCertificatePEMC);
 }
 
-bool HttpCredentials::keychainUnavailableRetryLater(QKeychain::ReadPasswordJob *incoming)
-{
+bool HttpCredentials::keychainUnavailableRetryLater(QKeychain::ReadPasswordJob *incoming) {
 #if defined(Q_OS_UNIX) && !defined(Q_OS_MAC)
     Q_ASSERT(!incoming->insecureFallback()); // If insecureFallback is set, the next test would be pointless
     if (_retryOnKeyChainError && (incoming->error() == QKeychain::NoBackendAvailable
@@ -258,8 +242,7 @@ bool HttpCredentials::keychainUnavailableRetryLater(QKeychain::ReadPasswordJob *
     return false;
 }
 
-void HttpCredentials::slotReadClientCertPasswordJobDone(QKeychain::Job *job)
-{
+void HttpCredentials::slotReadClientCertPasswordJobDone(QKeychain::Job *job) {
     auto readJob = qobject_cast<QKeychain::ReadPasswordJob*>(job);
     if (keychainUnavailableRetryLater(readJob))
         return;
@@ -279,8 +262,7 @@ void HttpCredentials::slotReadClientCertPasswordJobDone(QKeychain::Job *job)
     slotReadPasswordFromKeychain();
 }
 
-void HttpCredentials::slotReadClientCertPEMJobDone(QKeychain::Job *incoming)
-{
+void HttpCredentials::slotReadClientCertPEMJobDone(QKeychain::Job *incoming) {
     auto readJob = qobject_cast<QKeychain::ReadPasswordJob*>(incoming);
     if (keychainUnavailableRetryLater(readJob))
         return;
@@ -307,8 +289,7 @@ void HttpCredentials::slotReadClientCertPEMJobDone(QKeychain::Job *incoming)
     job->start();
 }
 
-void HttpCredentials::slotReadClientKeyPEMJobDone(QKeychain::Job *incoming)
-{
+void HttpCredentials::slotReadClientKeyPEMJobDone(QKeychain::Job *incoming) {
     auto readJob = qobject_cast<QKeychain::ReadPasswordJob*>(incoming);
     // Store key in memory
 
@@ -331,8 +312,7 @@ void HttpCredentials::slotReadClientKeyPEMJobDone(QKeychain::Job *incoming)
     slotReadPasswordFromKeychain();
 }
 
-void HttpCredentials::slotReadPasswordFromKeychain()
-{
+void HttpCredentials::slotReadPasswordFromKeychain() {
     const QString kck = keychainKey(
         _account->url().toString(),
         _user,
@@ -347,16 +327,14 @@ void HttpCredentials::slotReadPasswordFromKeychain()
 }
 
 
-bool HttpCredentials::stillValid(QNetworkReply *reply)
-{
+bool HttpCredentials::stillValid(QNetworkReply *reply) {
     return ((reply->error() != QNetworkReply::AuthenticationRequiredError)
         // returned if user or password is incorrect
         && (reply->error() != QNetworkReply::OperationCanceledError
                || !reply->property(authenticationFailedC).toBool()));
 }
 
-void HttpCredentials::slotReadJobDone(QKeychain::Job *incoming)
-{
+void HttpCredentials::slotReadJobDone(QKeychain::Job *incoming) {
     auto *job = static_cast<QKeychain::ReadPasswordJob *>(incoming);
     QKeychain::Error error = job->error();
 
@@ -408,8 +386,7 @@ void HttpCredentials::slotReadJobDone(QKeychain::Job *incoming)
     }
 }
 
-bool HttpCredentials::refreshAccessToken()
-{
+bool HttpCredentials::refreshAccessToken() {
     if (_refreshToken.isEmpty())
         return false;
 
@@ -460,8 +437,7 @@ bool HttpCredentials::refreshAccessToken()
 }
 
 
-void HttpCredentials::invalidateToken()
-{
+void HttpCredentials::invalidateToken() {
     if (!_password.isEmpty()) {
         _previousPassword = _password;
     }
@@ -500,8 +476,7 @@ void HttpCredentials::invalidateToken()
     QTimer::singleShot(0, _account, &Account::clearQNAMCache);
 }
 
-void HttpCredentials::forgetSensitiveData()
-{
+void HttpCredentials::forgetSensitiveData() {
     // need to be done before invalidateToken, so it actually deletes the refresh_token from the keychain
     _refreshToken.clear();
 
@@ -509,8 +484,7 @@ void HttpCredentials::forgetSensitiveData()
     _previousPassword.clear();
 }
 
-void HttpCredentials::persist()
-{
+void HttpCredentials::persist() {
     if (_user.isEmpty()) {
         // We never connected or fetched the user, there is nothing to save.
         return;
@@ -557,8 +531,7 @@ void HttpCredentials::persist()
     }
 }
 
-void HttpCredentials::slotWriteClientCertPasswordJobDone(QKeychain::Job *finishedJob)
-{
+void HttpCredentials::slotWriteClientCertPasswordJobDone(QKeychain::Job *finishedJob) {
     if (finishedJob && finishedJob->error() != QKeychain::NoError) {
         qCWarning(lcHttpCredentials) << "Could not write client cert password to credentials"
                                      << finishedJob->error() << finishedJob->errorString();
@@ -567,8 +540,7 @@ void HttpCredentials::slotWriteClientCertPasswordJobDone(QKeychain::Job *finishe
     slotWritePasswordToKeychain();
 }
 
-void HttpCredentials::slotWriteClientCertPEMJobDone(QKeychain::Job *finishedJob)
-{
+void HttpCredentials::slotWriteClientCertPEMJobDone(QKeychain::Job *finishedJob) {
     if (finishedJob && finishedJob->error() != QKeychain::NoError) {
         qCWarning(lcHttpCredentials) << "Could not write client cert to credentials"
                                      << finishedJob->error() << finishedJob->errorString();
@@ -588,8 +560,7 @@ void HttpCredentials::slotWriteClientCertPEMJobDone(QKeychain::Job *finishedJob)
     }
 }
 
-void HttpCredentials::slotWriteClientKeyPEMJobDone(QKeychain::Job *finishedJob)
-{
+void HttpCredentials::slotWriteClientKeyPEMJobDone(QKeychain::Job *finishedJob) {
     if (finishedJob && finishedJob->error() != QKeychain::NoError) {
         qCWarning(lcHttpCredentials) << "Could not write client key to credentials"
                                      << finishedJob->error() << finishedJob->errorString();
@@ -598,8 +569,7 @@ void HttpCredentials::slotWriteClientKeyPEMJobDone(QKeychain::Job *finishedJob)
     slotWritePasswordToKeychain();
 }
 
-void HttpCredentials::slotWritePasswordToKeychain()
-{
+void HttpCredentials::slotWritePasswordToKeychain() {
     auto *job = new QKeychain::WritePasswordJob(Theme::instance()->appName());
     addSettingsToJob(_account, job);
     job->setInsecureFallback(false);
@@ -609,16 +579,14 @@ void HttpCredentials::slotWritePasswordToKeychain()
     job->start();
 }
 
-void HttpCredentials::slotWriteJobDone(QKeychain::Job *job)
-{
+void HttpCredentials::slotWriteJobDone(QKeychain::Job *job) {
     if (job && job->error() != QKeychain::NoError) {
         qCWarning(lcHttpCredentials) << "Error while writing password"
                                      << job->error() << job->errorString();
     }
 }
 
-void HttpCredentials::slotAuthentication(QNetworkReply *reply, QAuthenticator *authenticator)
-{
+void HttpCredentials::slotAuthentication(QNetworkReply *reply, QAuthenticator *authenticator) {
     if (!_ready)
         return;
     Q_UNUSED(authenticator)
@@ -636,8 +604,7 @@ void HttpCredentials::slotAuthentication(QNetworkReply *reply, QAuthenticator *a
     }
 }
 
-bool HttpCredentials::retryIfNeeded(AbstractNetworkJob *job)
-{
+bool HttpCredentials::retryIfNeeded(AbstractNetworkJob *job) {
     auto *reply = job->reply();
     if (!reply || !reply->property(needRetryC).toBool())
         return false;
@@ -649,8 +616,7 @@ bool HttpCredentials::retryIfNeeded(AbstractNetworkJob *job)
     return true;
 }
 
-bool HttpCredentials::unpackClientCertBundle()
-{
+bool HttpCredentials::unpackClientCertBundle() {
     if (_clientCertBundle.isEmpty())
         return true;
 

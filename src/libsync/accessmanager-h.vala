@@ -25,8 +25,7 @@ namespace OCC {
  * @brief The AccessManager class
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT AccessManager : public QNetworkAccessManager
-{
+class OWNCLOUDSYNC_EXPORT AccessManager : public QNetworkAccessManager {
 
 public:
     static QByteArray generateRequestId();

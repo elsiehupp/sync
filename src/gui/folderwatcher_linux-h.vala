@@ -29,8 +29,7 @@ namespace OCC {
  * @brief Linux (inotify) API implementation of FolderWatcher
  * @ingroup gui
  */
-class FolderWatcherPrivate : public QObject
-{
+class FolderWatcherPrivate : public QObject {
 public:
     FolderWatcherPrivate() = default;
     FolderWatcherPrivate(FolderWatcher *p, const QString &path);

@@ -41,23 +41,20 @@
 
 #include "wordlist.h"
 
-QDebug operator<<(QDebug out, const std::string& str)
-{
+QDebug operator<<(QDebug out, const std::string& str) {
     out << QString::fromStdString(str);
     return out;
 }
 
 using namespace QKeychain;
 
-namespace OCC
-{
+namespace OCC {
 
 Q_LOGGING_CATEGORY(lcCse, "nextcloud.sync.clientsideencryption", QtInfoMsg)
 Q_LOGGING_CATEGORY(lcCseDecryption, "nextcloud.e2e", QtInfoMsg)
 Q_LOGGING_CATEGORY(lcCseMetadata, "nextcloud.metadata", QtInfoMsg)
 
-QString e2eeBaseUrl()
-{
+QString e2eeBaseUrl() {
     return QStringLiteral("ocs/v2.php/apps/end_to_end_encryption/api/v1/");
 }
 
@@ -70,8 +67,7 @@ namespace {
 
     constexpr qint64 blockSize = 1024;
 
-    QList<QByteArray> oldCipherFormatSplit(const QByteArray &cipher)
-    {
+    QList<QByteArray> oldCipherFormatSplit(const QByteArray &cipher) {
         const auto separator = QByteArrayLiteral("fA=="); // BASE64 encoded '|'
         auto result = QList<QByteArray>();
 
@@ -87,8 +83,7 @@ namespace {
         return result;
     }
 
-    QList<QByteArray> splitCipherParts(const QByteArray &data)
-    {
+    QList<QByteArray> splitCipherParts(const QByteArray &data) {
         const auto isOldFormat = !data.contains('|');
         const auto parts = isOldFormat ? oldCipherFormatSplit(data) : data.split('|');
         qCInfo(lcCse()) << "found parts:" << parts << "old format?" << isOldFormat;
@@ -97,8 +92,7 @@ namespace {
 } // ns
 
 namespace {
-    unsigned char* unsignedData(QByteArray& array)
-    {
+    unsigned char* unsignedData(QByteArray& array) {
         return (unsigned char*)array.data();
     }
 
@@ -110,17 +104,14 @@ namespace {
     class CipherCtx {
     public:
         CipherCtx()
-            : _ctx(EVP_CIPHER_CTX_new())
-        {
+            : _ctx(EVP_CIPHER_CTX_new()) {
         }
 
-        ~CipherCtx()
-        {
+        ~CipherCtx() {
             EVP_CIPHER_CTX_free(_ctx);
         }
 
-        operator EVP_CIPHER_CTX*()
-        {
+        operator EVP_CIPHER_CTX*() {
             return _ctx;
         }
 
@@ -133,17 +124,14 @@ namespace {
     class Bio {
     public:
         Bio()
-            : _bio(BIO_new(BIO_s_mem()))
-        {
+            : _bio(BIO_new(BIO_s_mem())) {
         }
 
-        ~Bio()
-        {
+        ~Bio() {
             BIO_free_all(_bio);
         }
 
-        operator BIO*()
-        {
+        operator BIO*() {
             return _bio;
         }
 
@@ -156,12 +144,10 @@ namespace {
     class PKeyCtx {
     public:
         explicit PKeyCtx(int id, ENGINE *e = nullptr)
-            : _ctx(EVP_PKEY_CTX_new_id(id, e))
-        {
+            : _ctx(EVP_PKEY_CTX_new_id(id, e)) {
         }
 
-        ~PKeyCtx()
-        {
+        ~PKeyCtx() {
             EVP_PKEY_CTX_free(_ctx);
         }
 
@@ -169,22 +155,19 @@ namespace {
         // return-value optimization (RVO) is not obligatory
         // and we have a `forKey` static function that returns
         // an instance of this class
-        PKeyCtx(PKeyCtx&& other)
-        {
+        PKeyCtx(PKeyCtx&& other) {
             std::swap(_ctx, other._ctx);
         }
 
         PKeyCtx& operator=(PKeyCtx&& other) = delete;
 
-        static PKeyCtx forKey(EVP_PKEY *pkey, ENGINE *e = nullptr)
-        {
+        static PKeyCtx forKey(EVP_PKEY *pkey, ENGINE *e = nullptr) {
             PKeyCtx ctx;
             ctx._ctx = EVP_PKEY_CTX_new(pkey, e);
             return ctx;
         }
 
-        operator EVP_PKEY_CTX*()
-        {
+        operator EVP_PKEY_CTX*() {
             return _ctx;
         }
 
@@ -198,8 +181,7 @@ namespace {
 
     class PKey {
     public:
-        ~PKey()
-        {
+        ~PKey() {
             EVP_PKEY_free(_pkey);
         }
 
@@ -207,29 +189,25 @@ namespace {
         // return-value optimization (RVO) is not obligatory
         // and we have a static functions that return
         // an instance of this class
-        PKey(PKey&& other)
-        {
+        PKey(PKey&& other) {
             std::swap(_pkey, other._pkey);
         }
 
         PKey& operator=(PKey&& other) = delete;
 
-        static PKey readPublicKey(Bio &bio)
-        {
+        static PKey readPublicKey(Bio &bio) {
             PKey result;
             result._pkey = PEM_read_bio_PUBKEY(bio, nullptr, nullptr, nullptr);
             return result;
         }
 
-        static PKey readPrivateKey(Bio &bio)
-        {
+        static PKey readPrivateKey(Bio &bio) {
             PKey result;
             result._pkey = PEM_read_bio_PrivateKey(bio, nullptr, nullptr, nullptr);
             return result;
         }
 
-        static PKey generate(PKeyCtx& ctx)
-        {
+        static PKey generate(PKeyCtx& ctx) {
             PKey result;
             if (EVP_PKEY_keygen(ctx, &result._pkey) <= 0) {
                 result._pkey = nullptr;
@@ -237,13 +215,11 @@ namespace {
             return result;
         }
 
-        operator EVP_PKEY*()
-        {
+        operator EVP_PKEY*() {
             return _pkey;
         }
 
-        operator EVP_PKEY*() const
-        {
+        operator EVP_PKEY*() const {
             return _pkey;
         }
 
@@ -257,8 +233,7 @@ namespace {
 
     class X509Certificate {
     public:
-        ~X509Certificate()
-        {
+        ~X509Certificate() {
             X509_free(_certificate);
         }
 
@@ -266,27 +241,23 @@ namespace {
         // return-value optimization (RVO) is not obligatory
         // and we have a static functions that return
         // an instance of this class
-        X509Certificate(X509Certificate&& other)
-        {
+        X509Certificate(X509Certificate&& other) {
             std::swap(_certificate, other._certificate);
         }
 
         X509Certificate& operator=(X509Certificate&& other) = delete;
 
-        static X509Certificate readCertificate(Bio &bio)
-        {
+        static X509Certificate readCertificate(Bio &bio) {
             X509Certificate result;
             result._certificate = PEM_read_bio_X509(bio, nullptr, nullptr, nullptr);
             return result;
         }
 
-        operator X509*()
-        {
+        operator X509*() {
             return _certificate;
         }
 
-        operator X509*() const
-        {
+        operator X509*() const {
             return _certificate;
         }
 
@@ -305,8 +276,7 @@ namespace {
         return res;
     }
 
-    QByteArray handleErrors()
-    {
+    QByteArray handleErrors() {
         Bio bioErrors;
         ERR_print_errors(bioErrors); // This line is not printing anything.
         return BIO2ByteArray(bioErrors);
@@ -319,13 +289,11 @@ namespace EncryptionHelper {
 
 
 
-QByteArray generateRandomFilename()
-{
+QByteArray generateRandomFilename() {
     return QUuid::createUuid().toRfc4122().toHex();
 }
 
-QByteArray generateRandom(int size)
-{
+QByteArray generateRandom(int size) {
     QByteArray result(size, '\0');
 
     int ret = RAND_bytes(unsignedData(result), size);
@@ -527,8 +495,7 @@ QByteArray decryptPrivateKey(const QByteArray& key, const QByteArray& data) {
     return QByteArray::fromBase64(result);
 }
 
-QByteArray extractPrivateKeySalt(const QByteArray &data)
-{
+QByteArray extractPrivateKeySalt(const QByteArray &data) {
     const auto parts = splitCipherParts(data);
     if (parts.size() < 3) {
         qCInfo(lcCse()) << "Not enough parts found";
@@ -824,8 +791,7 @@ QByteArray encryptStringAsymmetric(EVP_PKEY *publicKey, const QByteArray& data) 
 
 ClientSideEncryption::ClientSideEncryption() = default;
 
-void ClientSideEncryption::initialize(const AccountPtr &account)
-{
+void ClientSideEncryption::initialize(const AccountPtr &account) {
     Q_ASSERT(account);
 
     qCInfo(lcCse()) << "Initializing";
@@ -838,8 +804,7 @@ void ClientSideEncryption::initialize(const AccountPtr &account)
     fetchFromKeyChain(account);
 }
 
-void ClientSideEncryption::fetchFromKeyChain(const AccountPtr &account)
-{
+void ClientSideEncryption::fetchFromKeyChain(const AccountPtr &account) {
     const QString kck = AbstractCredentials::keychainKey(
                 account->url().toString(),
                 account->credentials()->user() + e2e_cert,
@@ -854,8 +819,7 @@ void ClientSideEncryption::fetchFromKeyChain(const AccountPtr &account)
     job->start();
 }
 
-bool ClientSideEncryption::checkPublicKeyValidity(const AccountPtr &account) const
-{
+bool ClientSideEncryption::checkPublicKeyValidity(const AccountPtr &account) const {
     QByteArray data = EncryptionHelper::generateRandom(64);
 
     Bio publicKeyBio;
@@ -880,8 +844,7 @@ bool ClientSideEncryption::checkPublicKeyValidity(const AccountPtr &account) con
     return true;
 }
 
-bool ClientSideEncryption::checkServerPublicKeyValidity(const QByteArray &serverPublicKeyString) const
-{
+bool ClientSideEncryption::checkServerPublicKeyValidity(const QByteArray &serverPublicKeyString) const {
     Bio serverPublicKeyBio;
     BIO_write(serverPublicKeyBio, serverPublicKeyString.constData(), serverPublicKeyString.size());
     const auto serverPublicKey = PKey::readPrivateKey(serverPublicKeyBio);
@@ -904,8 +867,7 @@ bool ClientSideEncryption::checkServerPublicKeyValidity(const QByteArray &server
     return true;
 }
 
-void ClientSideEncryption::publicKeyFetched(Job *incoming)
-{
+void ClientSideEncryption::publicKeyFetched(Job *incoming) {
     auto *readJob = static_cast<ReadPasswordJob *>(incoming);
     auto account = readJob->property(accountProperty).value<AccountPtr>();
     Q_ASSERT(account);
@@ -941,8 +903,7 @@ void ClientSideEncryption::publicKeyFetched(Job *incoming)
     job->start();
 }
 
-void ClientSideEncryption::privateKeyFetched(Job *incoming)
-{
+void ClientSideEncryption::privateKeyFetched(Job *incoming) {
     auto *readJob = static_cast<ReadPasswordJob *>(incoming);
     auto account = readJob->property(accountProperty).value<AccountPtr>();
     Q_ASSERT(account);
@@ -979,8 +940,7 @@ void ClientSideEncryption::privateKeyFetched(Job *incoming)
     job->start();
 }
 
-void ClientSideEncryption::mnemonicKeyFetched(QKeychain::Job *incoming)
-{
+void ClientSideEncryption::mnemonicKeyFetched(QKeychain::Job *incoming) {
     auto *readJob = static_cast<ReadPasswordJob *>(incoming);
     auto account = readJob->property(accountProperty).value<AccountPtr>();
     Q_ASSERT(account);
@@ -1001,8 +961,7 @@ void ClientSideEncryption::mnemonicKeyFetched(QKeychain::Job *incoming)
     emit initializationFinished();
 }
 
-void ClientSideEncryption::writePrivateKey(const AccountPtr &account)
-{
+void ClientSideEncryption::writePrivateKey(const AccountPtr &account) {
     const QString kck = AbstractCredentials::keychainKey(
                 account->url().toString(),
                 account->credentials()->user() + e2e_private,
@@ -1020,8 +979,7 @@ void ClientSideEncryption::writePrivateKey(const AccountPtr &account)
     job->start();
 }
 
-void ClientSideEncryption::writeCertificate(const AccountPtr &account)
-{
+void ClientSideEncryption::writeCertificate(const AccountPtr &account) {
     const QString kck = AbstractCredentials::keychainKey(
                 account->url().toString(),
                 account->credentials()->user() + e2e_cert,
@@ -1039,8 +997,7 @@ void ClientSideEncryption::writeCertificate(const AccountPtr &account)
     job->start();
 }
 
-void ClientSideEncryption::writeMnemonic(const AccountPtr &account)
-{
+void ClientSideEncryption::writeMnemonic(const AccountPtr &account) {
     const QString kck = AbstractCredentials::keychainKey(
                 account->url().toString(),
                 account->credentials()->user() + e2e_mnemonic,
@@ -1058,8 +1015,7 @@ void ClientSideEncryption::writeMnemonic(const AccountPtr &account)
     job->start();
 }
 
-void ClientSideEncryption::forgetSensitiveData(const AccountPtr &account)
-{
+void ClientSideEncryption::forgetSensitiveData(const AccountPtr &account) {
     _privateKey = QByteArray();
     _certificate = QSslCertificate();
     _publicKey = QSslKey();
@@ -1078,13 +1034,11 @@ void ClientSideEncryption::forgetSensitiveData(const AccountPtr &account)
     startDeleteJob(user + e2e_mnemonic);
 }
 
-void ClientSideEncryption::slotRequestMnemonic()
-{
+void ClientSideEncryption::slotRequestMnemonic() {
     emit showMnemonic(_mnemonic);
 }
 
-void ClientSideEncryption::generateKeyPair(const AccountPtr &account)
-{
+void ClientSideEncryption::generateKeyPair(const AccountPtr &account) {
     // AES/GCM/NoPadding,
     // metadataKeys with RSA/ECB/OAEPWithSHA-256AndMGF1Padding
     qCInfo(lcCse()) << "No public key, generating a pair.";
@@ -1126,18 +1080,12 @@ void ClientSideEncryption::generateKeyPair(const AccountPtr &account)
     generateCSR(account, localKeyPair);
 }
 
-void ClientSideEncryption::generateCSR(const AccountPtr &account, EVP_PKEY *keyPair)
-{
+void ClientSideEncryption::generateCSR(const AccountPtr &account, EVP_PKEY *keyPair) {
     // OpenSSL expects const char.
     auto cnArray = account->davUser().toLocal8Bit();
     qCInfo(lcCse()) << "Getting the following array for the account Id" << cnArray;
 
-    auto certParams = std::map<const char *, const char*>{
-      {"C", "DE"},
-      {"ST", "Baden-Wuerttemberg"},
-      {"L", "Stuttgart"},
-      {"O","Nextcloud"},
-      {"CN", cnArray.constData()}
+    auto certParams = std::map<const char *, const char*>{ {"C", "DE"}, {"ST", "Baden-Wuerttemberg"}, {"L", "Stuttgart"}, {"O","Nextcloud"}, {"CN", cnArray.constData()}
     };
 
     int ret = 0;
@@ -1196,8 +1144,7 @@ void ClientSideEncryption::generateCSR(const AccountPtr &account, EVP_PKEY *keyP
     job->start();
 }
 
-void ClientSideEncryption::encryptPrivateKey(const AccountPtr &account)
-{
+void ClientSideEncryption::encryptPrivateKey(const AccountPtr &account) {
     QStringList list = WordList::getRandomWords(12);
     _mnemonic = list.join(' ');
     _newMnemonicGenerated = true;
@@ -1232,8 +1179,7 @@ void ClientSideEncryption::encryptPrivateKey(const AccountPtr &account)
     job->start();
 }
 
-bool ClientSideEncryption::newMnemonicGenerated() const
-{
+bool ClientSideEncryption::newMnemonicGenerated() const {
     return _newMnemonicGenerated;
 }
 
@@ -1294,8 +1240,7 @@ void ClientSideEncryption::decryptPrivateKey(const AccountPtr &account, const QB
     emit initializationFinished();
 }
 
-void ClientSideEncryption::getPrivateKeyFromServer(const AccountPtr &account)
-{
+void ClientSideEncryption::getPrivateKeyFromServer(const AccountPtr &account) {
     qCInfo(lcCse()) << "Retrieving private key from server";
     auto job = new JsonApiJob(account, e2eeBaseUrl() + "private-key", this);
     connect(job, &JsonApiJob::jsonReceived, [this, account](const QJsonDocument& doc, int retCode) {
@@ -1313,8 +1258,7 @@ void ClientSideEncryption::getPrivateKeyFromServer(const AccountPtr &account)
     job->start();
 }
 
-void ClientSideEncryption::getPublicKeyFromServer(const AccountPtr &account)
-{
+void ClientSideEncryption::getPublicKeyFromServer(const AccountPtr &account) {
     qCInfo(lcCse()) << "Retrieving public key from server";
     auto job = new JsonApiJob(account, e2eeBaseUrl() + "public-key", this);
     connect(job, &JsonApiJob::jsonReceived, [this, account](const QJsonDocument& doc, int retCode) {
@@ -1334,8 +1278,7 @@ void ClientSideEncryption::getPublicKeyFromServer(const AccountPtr &account)
     job->start();
 }
 
-void ClientSideEncryption::fetchAndValidatePublicKeyFromServer(const AccountPtr &account)
-{
+void ClientSideEncryption::fetchAndValidatePublicKeyFromServer(const AccountPtr &account) {
     qCInfo(lcCse()) << "Retrieving public key from server";
     auto job = new JsonApiJob(account, e2eeBaseUrl() + "server-key", this);
     connect(job, &JsonApiJob::jsonReceived, [this, account](const QJsonDocument& doc, int retCode) {
@@ -1365,8 +1308,7 @@ void ClientSideEncryption::fetchAndValidatePublicKeyFromServer(const AccountPtr 
     job->start();
 }
 
-FolderMetadata::FolderMetadata(AccountPtr account, const QByteArray& metadata, int statusCode) : _account(account)
-{
+FolderMetadata::FolderMetadata(AccountPtr account, const QByteArray& metadata, int statusCode) : _account(account) {
     if (metadata.isEmpty() || statusCode == 404) {
         qCInfo(lcCseMetadata()) << "Setupping Empty Metadata";
         setupEmptyMetadata();
@@ -1376,8 +1318,7 @@ FolderMetadata::FolderMetadata(AccountPtr account, const QByteArray& metadata, i
     }
 }
 
-void FolderMetadata::setupExistingMetadata(const QByteArray& metadata)
-{
+void FolderMetadata::setupExistingMetadata(const QByteArray& metadata) {
   /* This is the json response from the server, it contains two extra objects that we are *not* interested.
   * ocs and data.
   */
@@ -1470,8 +1411,7 @@ void FolderMetadata::setupExistingMetadata(const QByteArray& metadata)
 }
 
 // RSA/ECB/OAEPWithSHA-256AndMGF1Padding using private / public key.
-QByteArray FolderMetadata::encryptMetadataKey(const QByteArray& data) const
-{
+QByteArray FolderMetadata::encryptMetadataKey(const QByteArray& data) const {
     Bio publicKeyBio;
     QByteArray publicKeyPem = _account->e2e()->_publicKey.toPem();
     BIO_write(publicKeyBio, publicKeyPem.constData(), publicKeyPem.size());
@@ -1481,8 +1421,7 @@ QByteArray FolderMetadata::encryptMetadataKey(const QByteArray& data) const
     return EncryptionHelper::encryptStringAsymmetric(publicKey, data.toBase64());
 }
 
-QByteArray FolderMetadata::decryptMetadataKey(const QByteArray& encryptedMetadata) const
-{
+QByteArray FolderMetadata::decryptMetadataKey(const QByteArray& encryptedMetadata) const {
     Bio privateKeyBio;
     QByteArray privateKeyPem = _account->e2e()->_privateKey;
     BIO_write(privateKeyBio, privateKeyPem.constData(), privateKeyPem.size());
@@ -1492,8 +1431,7 @@ QByteArray FolderMetadata::decryptMetadataKey(const QByteArray& encryptedMetadat
     QByteArray decryptResult = EncryptionHelper::decryptStringAsymmetric(
                     key, QByteArray::fromBase64(encryptedMetadata));
 
-    if (decryptResult.isEmpty())
-    {
+    if (decryptResult.isEmpty()) {
       qCDebug(lcCse()) << "ERROR. Could not decrypt the metadata key";
       return {};
     }
@@ -1501,13 +1439,11 @@ QByteArray FolderMetadata::decryptMetadataKey(const QByteArray& encryptedMetadat
 }
 
 // AES/GCM/NoPadding (128 bit key size)
-QByteArray FolderMetadata::encryptJsonObject(const QByteArray& obj, const QByteArray pass) const
-{
+QByteArray FolderMetadata::encryptJsonObject(const QByteArray& obj, const QByteArray pass) const {
     return EncryptionHelper::encryptStringSymmetric(pass, obj);
 }
 
-QByteArray FolderMetadata::decryptJsonObject(const QByteArray& encryptedMetadata, const QByteArray& pass) const
-{
+QByteArray FolderMetadata::decryptJsonObject(const QByteArray& encryptedMetadata, const QByteArray& pass) const {
     return EncryptionHelper::decryptStringSymmetric(pass, encryptedMetadata);
 }
 
@@ -1545,9 +1481,7 @@ QByteArray FolderMetadata::encryptedMetadata() {
     QString sharingEncrypted = encryptJsonObject(recepientDoc.toJson(QJsonDocument::Compact), _metadataKeys.last());
     */
 
-    QJsonObject metadata = {
-      {"metadataKeys", metadataKeys},
-      // {"sharing", sharingEncrypted},
+    QJsonObject metadata = { {"metadataKeys", metadataKeys}, {/ {"sharing", sharingEncrypted},
       {"version", 1}
     };
 
@@ -1575,9 +1509,7 @@ QByteArray FolderMetadata::encryptedMetadata() {
         files.insert(it->encryptedFilename, file);
     }
 
-    QJsonObject metaObject = {
-      {"metadata", metadata},
-      {"files", files}
+    QJsonObject metaObject = { {"metadata", metadata}, {"files", files}
     };
 
     QJsonDocument internalMetadata;
@@ -1597,8 +1529,7 @@ void FolderMetadata::addEncryptedFile(const EncryptedFile &f) {
     _files.append(f);
 }
 
-void FolderMetadata::removeEncryptedFile(const EncryptedFile &f)
-{
+void FolderMetadata::removeEncryptedFile(const EncryptedFile &f) {
     for (int i = 0; i < _files.size(); i++) {
         if (_files.at(i).originalFilename == f.originalFilename) {
             _files.removeAt(i);
@@ -1607,8 +1538,7 @@ void FolderMetadata::removeEncryptedFile(const EncryptedFile &f)
     }
 }
 
-void FolderMetadata::removeAllEncryptedFiles()
-{
+void FolderMetadata::removeAllEncryptedFiles() {
     _files.clear();
 }
 
@@ -1616,8 +1546,7 @@ QVector<EncryptedFile> FolderMetadata::files() const {
     return _files;
 }
 
-bool EncryptionHelper::fileEncryption(const QByteArray &key, const QByteArray &iv, QFile *input, QFile *output, QByteArray& returnTag)
-{
+bool EncryptionHelper::fileEncryption(const QByteArray &key, const QByteArray &iv, QFile *input, QFile *output, QByteArray& returnTag) {
     if (!input->open(QIODevice::ReadOnly)) {
       qCDebug(lcCse) << "Could not open input file for reading" << input->errorString();
     }
@@ -1700,8 +1629,7 @@ bool EncryptionHelper::fileEncryption(const QByteArray &key, const QByteArray &i
 }
 
 bool EncryptionHelper::fileDecryption(const QByteArray &key, const QByteArray& iv,
-                               QFile *input, QFile *output)
-{
+                               QFile *input, QFile *output) {
     input->open(QIODevice::ReadOnly);
     output->open(QIODevice::WriteOnly);
 
@@ -1780,8 +1708,7 @@ bool EncryptionHelper::fileDecryption(const QByteArray &key, const QByteArray& i
     return true;
 }
 
-EncryptionHelper::StreamingDecryptor::StreamingDecryptor(const QByteArray &key, const QByteArray &iv, quint64 totalSize) : _totalSize(totalSize)
-{
+EncryptionHelper::StreamingDecryptor::StreamingDecryptor(const QByteArray &key, const QByteArray &iv, quint64 totalSize) : _totalSize(totalSize) {
     if (_ctx && !key.isEmpty() && !iv.isEmpty() && totalSize > 0) {
         _isInitialized = true;
 
@@ -1807,8 +1734,7 @@ EncryptionHelper::StreamingDecryptor::StreamingDecryptor(const QByteArray &key, 
     }
 }
 
-QByteArray EncryptionHelper::StreamingDecryptor::chunkDecryption(const char *input, quint64 chunkSize)
-{
+QByteArray EncryptionHelper::StreamingDecryptor::chunkDecryption(const char *input, quint64 chunkSize) {
     QByteArray byteArray;
     QBuffer buffer(&byteArray);
     buffer.open(QIODevice::WriteOnly);
@@ -1948,13 +1874,11 @@ QByteArray EncryptionHelper::StreamingDecryptor::chunkDecryption(const char *inp
     return byteArray;
 }
 
-bool EncryptionHelper::StreamingDecryptor::isInitialized() const
-{
+bool EncryptionHelper::StreamingDecryptor::isInitialized() const {
     return _isInitialized;
 }
 
-bool EncryptionHelper::StreamingDecryptor::isFinished() const
-{
+bool EncryptionHelper::StreamingDecryptor::isFinished() const {
     return _isFinished;
 }
 }

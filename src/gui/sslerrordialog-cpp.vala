@@ -31,8 +31,7 @@ namespace Utility {
     QString escape(const QStringList &l) { return escape(l.join(';')); }
 }
 
-bool SslDialogErrorHandler::handleErrors(QList<QSslError> errors, const QSslConfiguration &conf, QList<QSslCertificate> *certs, AccountPtr account)
-{
+bool SslDialogErrorHandler::handleErrors(QList<QSslError> errors, const QSslConfiguration &conf, QList<QSslCertificate> *certs, AccountPtr account) {
     (void)conf;
     if (!certs) {
         qCCritical(lcSslErrorDialog) << "Certs parameter required but is NULL!";
@@ -59,8 +58,7 @@ SslErrorDialog::SslErrorDialog(AccountPtr account, QWidget *parent)
     : QDialog(parent)
     , _allTrusted(false)
     , _ui(new Ui::SslErrorDialog)
-    , _account(account)
-{
+    , _account(account) {
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     _ui->setupUi(this);
     setWindowTitle(tr("Untrusted Certificate"));
@@ -81,14 +79,12 @@ SslErrorDialog::SslErrorDialog(AccountPtr account, QWidget *parent)
     }
 }
 
-SslErrorDialog::~SslErrorDialog()
-{
+SslErrorDialog::~SslErrorDialog() {
     delete _ui;
 }
 
 
-QString SslErrorDialog::styleSheet() const
-{
+QString SslErrorDialog::styleSheet() const {
     const QString style = QLatin1String(
         "#cert {margin-left: 5px;} "
         "#ca_error { color:#a00011; margin-left:5px; margin-right:5px; }"
@@ -101,8 +97,7 @@ QString SslErrorDialog::styleSheet() const
 }
 #define QL(x) QLatin1String(x)
 
-bool SslErrorDialog::checkFailingCertsKnown(const QList<QSslError> &errors)
-{
+bool SslErrorDialog::checkFailingCertsKnown(const QList<QSslError> &errors) {
     // check if unknown certs caused errors.
     _unknownCerts.clear();
 
@@ -177,8 +172,7 @@ bool SslErrorDialog::checkFailingCertsKnown(const QList<QSslError> &errors)
     return false;
 }
 
-QString SslErrorDialog::certDiv(QSslCertificate cert) const
-{
+QString SslErrorDialog::certDiv(QSslCertificate cert) const {
     QString msg;
     msg += QL("<div id=\"cert\">");
     msg += QL("<h3>") + tr("with Certificate %1").arg(Utility::escape(cert.subjectInfo(QSslCertificate::CommonName))) + QL("</h3>");
@@ -230,8 +224,7 @@ QString SslErrorDialog::certDiv(QSslCertificate cert) const
     return msg;
 }
 
-bool SslErrorDialog::trustConnection()
-{
+bool SslErrorDialog::trustConnection() {
     if (_allTrusted)
         return true;
 

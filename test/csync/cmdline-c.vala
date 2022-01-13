@@ -32,16 +32,14 @@ static char **cmdline;
 static char doc[] = "csync test";
 
 /* The options we understand. */
-static struct argp_option options[] = {
-  {
+static struct argp_option options[] = { {
     .name  = "verbose",
     .key   = 'v',
     .arg   = NULL,
     .flags = 0,
     .doc   = "Make csync test more verbose",
     .group = 0
-  },
-  {NULL, 0, NULL, 0, NULL, 0}
+  }, {NULL, 0, NULL, 0, NULL, 0}
 };
 
 /* Parse a single option. */

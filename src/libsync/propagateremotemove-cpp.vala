@@ -31,8 +31,7 @@ Q_LOGGING_CATEGORY(lcPropagateRemoteMove, "nextcloud.sync.propagator.remotemove"
 MoveJob::MoveJob(AccountPtr account, const QString &path,
     const QString &destination, QObject *parent)
     : AbstractNetworkJob(account, path, parent)
-    , _destination(destination)
-{
+    , _destination(destination) {
 }
 
 MoveJob::MoveJob(AccountPtr account, const QUrl &url, const QString &destination,
@@ -40,12 +39,10 @@ MoveJob::MoveJob(AccountPtr account, const QUrl &url, const QString &destination
     : AbstractNetworkJob(account, QString(), parent)
     , _destination(destination)
     , _url(url)
-    , _extraHeaders(extraHeaders)
-{
+    , _extraHeaders(extraHeaders) {
 }
 
-void MoveJob::start()
-{
+void MoveJob::start() {
     QNetworkRequest req;
     req.setRawHeader("Destination", QUrl::toPercentEncoding(_destination, "/"));
     for (auto it = _extraHeaders.constBegin(); it != _extraHeaders.constEnd(); ++it) {
@@ -64,8 +61,7 @@ void MoveJob::start()
 }
 
 
-bool MoveJob::finished()
-{
+bool MoveJob::finished() {
     qCInfo(lcMoveJob) << "MOVE of" << reply()->request().url() << "FINISHED WITH STATUS"
                       << replyStatusString();
 
@@ -73,8 +69,7 @@ bool MoveJob::finished()
     return true;
 }
 
-void PropagateRemoteMove::start()
-{
+void PropagateRemoteMove::start() {
     if (propagator()->_abortRequested)
         return;
 
@@ -183,8 +178,7 @@ void PropagateRemoteMove::start()
     _job->start();
 }
 
-void PropagateRemoteMove::abort(PropagatorJob::AbortType abortType)
-{
+void PropagateRemoteMove::abort(PropagatorJob::AbortType abortType) {
     if (_job && _job->reply())
         _job->reply()->abort();
 
@@ -193,8 +187,7 @@ void PropagateRemoteMove::abort(PropagatorJob::AbortType abortType)
     }
 }
 
-void PropagateRemoteMove::slotMoveJobFinished()
-{
+void PropagateRemoteMove::slotMoveJobFinished() {
     propagator()->_activeJobList.removeOne(this);
 
     ASSERT(_job);
@@ -225,8 +218,7 @@ void PropagateRemoteMove::slotMoveJobFinished()
     finalize();
 }
 
-void PropagateRemoteMove::finalize()
-{
+void PropagateRemoteMove::finalize() {
     // Retrieve old db data.
     // if reading from db failed still continue hoping that deleteFileRecord
     // reopens the db successfully.
@@ -280,8 +272,7 @@ void PropagateRemoteMove::finalize()
     done(SyncFileItem::Success);
 }
 
-bool PropagateRemoteMove::adjustSelectiveSync(SyncJournalDb *journal, const QString &from_, const QString &to_)
-{
+bool PropagateRemoteMove::adjustSelectiveSync(SyncJournalDb *journal, const QString &from_, const QString &to_) {
     bool ok = false;
     // We only care about preserving the blacklist.   The white list should anyway be empty.
     // And the undecided list will be repopulated on the next sync, if there is anything too big.

@@ -25,8 +25,7 @@ namespace OCC {
  * Job that allows fetching a preview (of 150x150 for now) of a given file.
  * Once the job has finished the jobFinished signal will be emitted.
  */
-class ThumbnailJob : public AbstractNetworkJob
-{
+class ThumbnailJob : public AbstractNetworkJob {
 public:
     explicit ThumbnailJob(const QString &path, AccountPtr account, QObject *parent = nullptr);
 public slots:

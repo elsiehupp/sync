@@ -45,8 +45,7 @@ class SyncJournalDb;
  *
  * Results are fed outwards via the DiscoveryPhase::itemDiscovered() signal.
  */
-class ProcessDirectoryJob : public QObject
-{
+class ProcessDirectoryJob : public QObject {
 
     struct PathTuple;
 public:
@@ -66,8 +65,7 @@ public:
         qint64 lastSyncTimestamp, QObject *parent)
         : QObject(parent)
         , _lastSyncTimestamp(lastSyncTimestamp)
-        , _discoveryData(data)
-    {
+        , _discoveryData(data) {
         computePinState(basePinState);
     }
 
@@ -81,8 +79,7 @@ public:
         , _queryServer(queryServer)
         , _queryLocal(queryLocal)
         , _discoveryData(parent->_discoveryData)
-        , _currentFolder(path)
-    {
+        , _currentFolder(path) {
         computePinState(parent->_pinState);
     }
 
@@ -90,21 +87,18 @@ public:
     /** Start up to nbJobs, return the number of job started; emit finished() when done */
     int processSubJobs(int nbJobs);
 
-    void setInsideEncryptedTree(bool isInsideEncryptedTree)
-    {
+    void setInsideEncryptedTree(bool isInsideEncryptedTree) {
         _isInsideEncryptedTree = isInsideEncryptedTree;
     }
 
-    bool isInsideEncryptedTree() const
-    {
+    bool isInsideEncryptedTree() const {
         return _isInsideEncryptedTree;
     }
 
     SyncFileItemPtr _dirItem;
 
 private:
-    struct Entries
-    {
+    struct Entries {
         QString nameOverride;
         SyncJournalFileRecord dbEntry;
         RemoteInfo serverEntry;
@@ -124,18 +118,15 @@ private:
      *     local:    A/Y/file
      *     server:   B/X/file
      */
-    struct PathTuple
-    {
+    struct PathTuple {
         QString _original; // Path as in the DB (before the sync)
         QString _target; // Path that will be the result after the sync (and will be in the DB)
         QString _server; // Path on the server (before the sync)
         QString _local; // Path locally (before the sync)
-        static QString pathAppend(const QString &base, const QString &name)
-        {
+        static QString pathAppend(const QString &base, const QString &name) {
             return base.isEmpty() ? name : base + QLatin1Char('/') + name;
         }
-        PathTuple addName(const QString &name) const
-        {
+        PathTuple addName(const QString &name) const {
             PathTuple result;
             result._original = pathAppend(_original, name);
             auto buildString = [&](const QString &other) {
@@ -192,8 +183,7 @@ private:
      */
     bool checkPermissions(const SyncFileItemPtr &item);
 
-    struct MovePermissionResult
-    {
+    struct MovePermissionResult {
         // whether moving/renaming the source is ok
         bool sourceOk = false;
         // whether the destination accepts (always true for renames)

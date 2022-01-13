@@ -18,8 +18,7 @@ class WebView;
 #endif // WITH_WEBENGINE
 class Flow2AuthWidget;
 
-class WebFlowCredentialsDialog : public QDialog
-{
+class WebFlowCredentialsDialog : public QDialog {
 public:
     WebFlowCredentialsDialog(Account *account, bool useFlow2, QWidget *parent = nullptr);
 

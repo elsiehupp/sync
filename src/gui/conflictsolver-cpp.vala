@@ -26,22 +26,18 @@ Q_LOGGING_CATEGORY(lcConflict, "nextcloud.gui.conflictsolver", QtInfoMsg)
 
 ConflictSolver::ConflictSolver(QWidget *parent)
     : QObject(parent)
-    , _parentWidget(parent)
-{
+    , _parentWidget(parent) {
 }
 
-QString ConflictSolver::localVersionFilename() const
-{
+QString ConflictSolver::localVersionFilename() const {
     return _localVersionFilename;
 }
 
-QString ConflictSolver::remoteVersionFilename() const
-{
+QString ConflictSolver::remoteVersionFilename() const {
     return _remoteVersionFilename;
 }
 
-bool ConflictSolver::exec(ConflictSolver::Solution solution)
-{
+bool ConflictSolver::exec(ConflictSolver::Solution solution) {
     switch (solution) {
     case KeepLocalVersion:
         return overwriteRemoteVersion();
@@ -54,8 +50,7 @@ bool ConflictSolver::exec(ConflictSolver::Solution solution)
     return false;
 }
 
-void ConflictSolver::setLocalVersionFilename(const QString &localVersionFilename)
-{
+void ConflictSolver::setLocalVersionFilename(const QString &localVersionFilename) {
     if (_localVersionFilename == localVersionFilename) {
         return;
     }
@@ -64,8 +59,7 @@ void ConflictSolver::setLocalVersionFilename(const QString &localVersionFilename
     emit localVersionFilenameChanged();
 }
 
-void ConflictSolver::setRemoteVersionFilename(const QString &remoteVersionFilename)
-{
+void ConflictSolver::setRemoteVersionFilename(const QString &remoteVersionFilename) {
     if (_remoteVersionFilename == remoteVersionFilename) {
         return;
     }
@@ -74,8 +68,7 @@ void ConflictSolver::setRemoteVersionFilename(const QString &remoteVersionFilena
     emit remoteVersionFilenameChanged();
 }
 
-bool ConflictSolver::deleteLocalVersion()
-{
+bool ConflictSolver::deleteLocalVersion() {
     if (_localVersionFilename.isEmpty()) {
         return false;
     }
@@ -98,8 +91,7 @@ bool ConflictSolver::deleteLocalVersion()
     }
 }
 
-bool ConflictSolver::renameLocalVersion()
-{
+bool ConflictSolver::renameLocalVersion() {
     if (_localVersionFilename.isEmpty()) {
         return false;
     }
@@ -136,8 +128,7 @@ bool ConflictSolver::renameLocalVersion()
     }
 }
 
-bool ConflictSolver::overwriteRemoteVersion()
-{
+bool ConflictSolver::overwriteRemoteVersion() {
     if (_localVersionFilename.isEmpty()) {
         return false;
     }

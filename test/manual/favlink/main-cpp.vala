@@ -15,8 +15,7 @@
 
 // #include <QDir>
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
    QString dir="/tmp/linktest/";
    QDir().mkpath(dir);
    OCC::Utility::setupFavLink(dir);

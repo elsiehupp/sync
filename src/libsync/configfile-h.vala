@@ -33,8 +33,7 @@ class AbstractCredentials;
  * @brief The ConfigFile class
  * @ingroup libsync
  */
-class OWNCLOUDSYNC_EXPORT ConfigFile
-{
+class OWNCLOUDSYNC_EXPORT ConfigFile {
 public:
     ConfigFile();
 
