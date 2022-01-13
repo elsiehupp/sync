@@ -39,7 +39,7 @@ protected:
     /***********************************************************
     Set the verb for the job
     
-     * @param verb currently supported PUT POST DELETE
+    @param verb currently supported PUT POST DELETE
     ***********************************************************/
     void setVerb (QByteArray &verb);
 
@@ -48,7 +48,7 @@ protected:
     Depending on the verb this is GET or POST parameter
     
     @param name The name of the parameter
-     * @param value The value of the parameter
+    @param value The value of the parameter
     ***********************************************************/
     void addParam (string &name, string &value);
 
@@ -56,7 +56,7 @@ protected:
     Set the post parameters
     
     @param postParams list of pairs to add (urlEncoded) to the body of the
-     * request
+    request
     ***********************************************************/
     void setPostParams (QList<QPair<string, string>> &postParams);
 
@@ -65,7 +65,7 @@ protected:
     A warning will be printed to the debug log if a different status code is
     encountered
     
-     * @param code Accepted status code
+    @param code Accepted status code
     ***********************************************************/
     void addPassStatusCode (int code);
 
@@ -73,7 +73,7 @@ protected:
     The base path for an OcsJob is always the same. But it could be the case that
     certain operations need to append something to the URL.
     
-     * This function appends the common id. so <PATH>/<ID>
+    This function appends the common id. so <PATH>/<ID>
     ***********************************************************/
     void appendPath (string &id);
 
@@ -84,7 +84,7 @@ public:
     
     @param json The reply from OCS
     @param message The message that is set in the metadata
-     * @return The statuscode of the OCS response
+    @return The statuscode of the OCS response
     ***********************************************************/
     static int getJsonReturnCode (QJsonDocument &json, string &message);
 
@@ -107,7 +107,7 @@ signals:
     /***********************************************************
     Result of the OCS request
     
-     * @param reply the reply
+    @param reply the reply
     ***********************************************************/
     void jobFinished (QJsonDocument reply, int statusCode);
 
@@ -116,7 +116,7 @@ signals:
     status code for this command
     
     @param statusCode The actual status code
-     * @param message The message provided by the server
+    @param message The message provided by the server
     ***********************************************************/
     void ocsError (int statusCode, string &message);
 

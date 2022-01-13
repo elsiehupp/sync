@@ -141,8 +141,8 @@ enum ItemType {
     will return this item type.
     
     The discovery will also use this item type to mark entries for hydration
-     * if an item's pin state mandates it, such as when encountering a AlwaysLocal
-     * file that is dehydrated.
+    if an item's pin state mandates it, such as when encountering a AlwaysLocal
+    file that is dehydrated.
     ***********************************************************/
     ItemTypeVirtualFileDownload = 5,
 

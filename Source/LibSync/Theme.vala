@@ -82,7 +82,7 @@ public:
     By default, it is considered
     different from "Nextcloud".
 
-     * @return true if branded, false otherwise
+    @return true if branded, false otherwise
     ***********************************************************/
     virtual bool isBranded ();
 
@@ -93,8 +93,8 @@ public:
     special chars and such.
     
     By default, the name is derived from the APPLICATION_NAME
-     * cmake variable.
-
+    cmake variable.
+    
      * @return string with human readable app name.
     ***********************************************************/
     virtual string appNameGUI ();
@@ -110,9 +110,9 @@ public:
     cmake variable, and should be the same. This method is only
     reimplementable for legacy reasons.
     
-     * Warning : Do not modify this value, as many things, e.g. settings
-     * depend on it! You most likely want to modify \ref appNameGUI ().
-
+    Warning : Do not modify this value, as many things, e.g. settings
+    depend on it! You most likely want to modify \ref appNameGUI ().
+    
      * @return string with app name.
     ***********************************************************/
     virtual string appName ();
@@ -219,36 +219,36 @@ public:
     If the function is overridden to return an empty string no help link will be sh
     
     Defaults to helpUrl () + "conflicts.html", which is a page in ownCloud's client
-     * documentation website. If helpUrl () is empty, this function will also return the
-     * empty string.
+    documentation website. If helpUrl () is empty, this function will also return the
+    empty string.
     ***********************************************************/
     virtual string conflictHelpUrl ();
 
     /***********************************************************
     Setting a value here will pre-define the server url.
     
-     * The respective UI controls will be disabled only if forceOverrideServerUrl () is true
+    The respective UI controls will be disabled only if forceOverrideServerUrl () is true
     ***********************************************************/
     virtual string overrideServerUrl ();
 
     /***********************************************************
     Enforce a pre-defined server url.
     
-     * When true, the respective UI controls will be disabled
+    When true, the respective UI controls will be disabled
     ***********************************************************/
     virtual bool forceOverrideServerUrl ();
 
     /***********************************************************
     Enable OCSP stapling for SSL handshakes
     
-     * When true, peer will be requested for Online Certificate Status Protocol response
+    When true, peer will be requested for Online Certificate Status Protocol response
     ***********************************************************/
     virtual bool enableStaplingOCSP ();
 
     /***********************************************************
     Enforce SSL validity
     
-     * When true, trusting the untrusted certificate is not allowed
+    When true, trusting the untrusted certificate is not allowed
     ***********************************************************/
     virtual bool forbidBadSSL ();
 
@@ -305,7 +305,7 @@ public:
     background based on
     \ref wizardHeaderTitleColor ().
     
-     * @return banner for the setup wizard.
+    @return banner for the setup wizard.
     ***********************************************************/
     virtual QPixmap wizardHeaderBanner ();
 #endif
@@ -372,7 +372,7 @@ public:
     /***********************************************************
     @brief Sharing options
     
-     * Allow link sharing and or user/group sharing
+    Allow link sharing and or user/group sharing
     ***********************************************************/
     virtual bool linkSharing ();
     virtual bool userGroupSharing ();
@@ -389,7 +389,7 @@ public:
     
     @value UserIDUserName Wizard asks for user name a
     @value UserIDEmail Wizard asks for an email as ID
-     * @value UserIDCustom Specify string in \ref customUserID
+    @value UserIDCustom Specify string in \ref customUserID
     ***********************************************************/
     enum UserIDType { UserIDUserName = 0,
         UserIDEmail,
@@ -408,7 +408,7 @@ public:
     @note This string cannot be translated, but is still useful for
           referencing brand name IDs (e.g. "ACME ID", when using ACME.)
 
-     * @return An empty string, unless reimplemented
+    @return An empty string, unless reimplemented
     ***********************************************************/
     virtual string customUserID ();
 
@@ -416,7 +416,7 @@ public:
     @brief Demo string to be displayed when no text has been
            entered for the user id (e.g. mylogin@company.com)
     
-     * @return An empty string, unless reimplemented
+    @return An empty string, unless reimplemented
     ***********************************************************/
     virtual string userIDHint ();
 
@@ -424,14 +424,14 @@ public:
     @brief Postfix that will be enforced in a URL. e.g.
            ".myhosting.com".
     
-     * @return An empty string, unless reimplemented
+    @return An empty string, unless reimplemented
     ***********************************************************/
     virtual string wizardUrlPostfix ();
 
     /***********************************************************
     @brief String that will be shown as long as no text has been entered by the user.
     
-     * @return An empty string, unless reimplemented
+    @return An empty string, unless reimplemented
     ***********************************************************/
     virtual string wizardUrlHint ();
 
@@ -442,7 +442,7 @@ public:
     folder than the root. This is the folder on which the client will do
     PROPFIND calls to get "quota-available-bytes" and "quota-used-bytes"
 
-     * Defaults : "/"
+    Defaults : "/"
     ***********************************************************/
     virtual string quotaBaseFolder ();
 
@@ -457,7 +457,7 @@ public:
     @brief What should be output for the --version command line switch.
     
     By default, it's a combination of appName (), version (), the GIT SHA1 and some
-     * important dependency versions.
+    important dependency versions.
     ***********************************************************/
     virtual string versionSwitchOutput ();
 	
@@ -474,7 +474,7 @@ public:
     
     @return True if the specified colour is dark.
 
-     * 2019/12/08 : Moved here from SettingsDialog.
+    2019/12/08 : Moved here from SettingsDialog.
     ***********************************************************/
     static bool isDarkColor (QColor &color);
 
@@ -483,7 +483,7 @@ public:
     
     @return Background-aware colour for HTML links, based on the current app palette or given colour.
 
-     * 2019/12/08 : Implemented for the Dark Mode on macOS, because the app palette can not account for that (Qt 5.12.5).
+    2019/12/08 : Implemented for the Dark Mode on macOS, because the app palette can not account for that (Qt 5.12.5).
     ***********************************************************/
     static QColor getBackgroundAwareLinkColor (QColor &backgroundColor);
 
@@ -492,7 +492,7 @@ public:
     
     @return Background-aware colour for HTML links, based on the current app palette.
 
-     * 2019/12/08 : Implemented for the Dark Mode on macOS, because the app palette can not account for that (Qt 5.12.5).
+    2019/12/08 : Implemented for the Dark Mode on macOS, because the app palette can not account for that (Qt 5.12.5).
     ***********************************************************/
     static QColor getBackgroundAwareLinkColor ();
 
@@ -501,7 +501,7 @@ public:
     
     2019/12/08 : Implemented for the Dark Mode on macOS, because the app palette can not account for that (Qt 5.12.5).
 
-     * This way we also avoid having certain strings re-translated on Transifex.
+    This way we also avoid having certain strings re-translated on Transifex.
     ***********************************************************/
     static void replaceLinkColorStringBackgroundAware (string &linkString, QColor &backgroundColor);
 
@@ -510,7 +510,7 @@ public:
     
     2019/12/08 : Implemented for the Dark Mode on macOS, because the app palette can not account for that (Qt 5.12.5).
 
-     * This way we also avoid having certain strings re-translated on Transifex.
+    This way we also avoid having certain strings re-translated on Transifex.
     ***********************************************************/
     static void replaceLinkColorStringBackgroundAware (string &linkString);
 
@@ -519,7 +519,7 @@ public:
     
     2019/12/19 : Implemented for the Dark Mode on macOS, because the app palette can not account for that (Qt 5.12.5).
 
-     * This way we also avoid having certain strings re-translated on Transifex.
+    This way we also avoid having certain strings re-translated on Transifex.
     ***********************************************************/
     static void replaceLinkColorString (string &linkString, QColor &newColor);
 
@@ -528,7 +528,7 @@ public:
     
     @return QIcon, colour-aware (inverted on dark backgrounds).
 
-     * 2019/12/09 : Moved here from SettingsDialog.
+    2019/12/09 : Moved here from SettingsDialog.
     ***********************************************************/
     static QIcon createColorAwareIcon (string &name, QPalette &palette);
 
@@ -537,7 +537,7 @@ public:
     
     @return QIcon, colour-aware (inverted on dark backgrounds).
 
-     * 2019/12/09 : Moved here from SettingsDialog.
+    2019/12/09 : Moved here from SettingsDialog.
     ***********************************************************/
     static QIcon createColorAwareIcon (string &name);
 
@@ -546,7 +546,7 @@ public:
     
     @return QPixmap, colour-aware (inverted on dark backgrounds).
 
-     * 2019/12/09 : Adapted from createColorAwareIcon.
+    2019/12/09 : Adapted from createColorAwareIcon.
     ***********************************************************/
     static QPixmap createColorAwarePixmap (string &name, QPalette &palette);
 
@@ -555,7 +555,7 @@ public:
     
     @return QPixmap, colour-aware (inverted on dark backgrounds).
 
-     * 2019/12/09 : Adapted from createColorAwareIcon.
+    2019/12/09 : Adapted from createColorAwareIcon.
     ***********************************************************/
     static QPixmap createColorAwarePixmap (string &name);
 
@@ -563,7 +563,7 @@ public:
     @brief Whether to show the option to create folders using "virtual files".
     
     By default, the options are not shown unless experimental options are
-     * manually enabled in the configuration file.
+    manually enabled in the configuration file.
     ***********************************************************/
     virtual bool showVirtualFilesOption ();
 
@@ -636,10 +636,6 @@ QUrl imagePathToUrl (string &imagePath) {
 bool shouldPreferSvg () {
     return QByteArray (APPLICATION_ICON_SET).toUpper () == QByteArrayLiteral ("SVG");
 }
-
-}
-
-namespace Occ {
 
 Theme *Theme._instance = nullptr;
 

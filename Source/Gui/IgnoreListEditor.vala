@@ -41,14 +41,6 @@ private:
     Ui.IgnoreListEditor *ui;
 };
 
-} // namespace Occ
-
-
-
-
-
-
-namespace Occ {
 
     IgnoreListEditor.IgnoreListEditor (Gtk.Widget *parent)
         : Gtk.Dialog (parent)

@@ -62,7 +62,7 @@ public:
     Whether an existing file with the same name may be deleted before
     creating the directory.
     
-     * Default : false.
+    Default : false.
     ***********************************************************/
     void setDeleteExistingFile (bool enabled);
 

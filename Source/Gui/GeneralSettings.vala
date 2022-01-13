@@ -148,9 +148,7 @@ void createDebugArchive (string &filename) {
     const auto buildInfo = string (Occ.Theme.instance ().about () + "\n\n" + Occ.Theme.instance ().aboutDetails ());
     zip.addFile ("__nextcloud_client_buildinfo.txt", buildInfo.toUtf8 ());
 }
-}
 
-namespace Occ {
 
 GeneralSettings.GeneralSettings (Gtk.Widget *parent)
     : Gtk.Widget (parent)

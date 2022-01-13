@@ -76,63 +76,61 @@ function.
 ***********************************************************/
 class Vfs : GLib.Object {
 
-public:
+
     /***********************************************************
     The kind of VFS in use (or no-VFS)
 
     Currently plugins and modes are one-to-one but that's not required.
     ***********************************************************/
-    enum Mode {
+    public enum Mode {
         Off,
         WithSuffix,
         WindowsCfApi,
         XAttr,
     };
-    Q_ENUM (Mode)
-    enum class ConvertToPlaceholderResult {
+    public enum class ConvertToPlaceholderResult {
         Error,
         Ok,
         Locked
     };
-    Q_ENUM (ConvertToPlaceholderResult)
 
-    static string modeToString (Mode mode);
-    static Optional<Mode> modeFromString (string &str);
+    public static string modeToString (Mode mode);
+    public static Optional<Mode> modeFromString (string &str);
 
-    static Result<bool, string> checkAvailability (string &path);
+    public static Result<bool, string> checkAvailability (string &path);
 
-    enum class AvailabilityError {
+    public enum class AvailabilityError {
         // Availability can't be retrieved due to db error
         DbError,
         // Availability not available since the item doesn't exist
         NoSuchItem,
     };
-    using AvailabilityResult = Result<VfsItemAvailability, AvailabilityError>;
+    public using AvailabilityResult = Result<VfsItemAvailability, AvailabilityError>;
 
-public:
-    Vfs (GLib.Object* parent = nullptr);
-    ~Vfs () override;
 
-    virtual Mode mode () const = 0;
+    public Vfs (GLib.Object* parent = nullptr);
+    public ~Vfs () override;
+
+    public virtual Mode mode () const = 0;
 
     /// For WithSuffix modes : the suffix (including the dot)
-    virtual string fileSuffix () const = 0;
+    public virtual string fileSuffix () const = 0;
 
     /// Access to the parameters the instance was start ()ed with.
-    const VfsSetupParams &params () { return _setupParams; }
+    public const VfsSetupParams &params () { return _setupParams; }
 
     /***********************************************************
     Initializes interaction with the VFS provider.
 
     The plugin-specific work is done in startImpl ().
     ***********************************************************/
-    void start (VfsSetupParams &params);
+    public void start (VfsSetupParams &params);
 
     /// Stop interaction with VFS provider. Like when the client application quits.
-    virtual void stop () = 0;
+    public virtual void stop () = 0;
 
     /// Deregister the folder with the sync provider, like when a folder is removed.
-    virtual void unregisterFolder () = 0;
+    public virtual void unregisterFolder () = 0;
 
     /***********************************************************
     Whether the socket api should show pin state options
@@ -140,14 +138,14 @@ public:
     Some plugins might provide alternate shell integration, making the normal
     context menu actions redundant.
     ***********************************************************/
-    virtual bool socketApiPinStateActionsShown () const = 0;
+    public virtual bool socketApiPinStateActionsShown () const = 0;
 
     /***********************************************************
     Return true when download of a file's data is currently ongoing.
 
     See also the beginHydrating () and doneHydrating () signals.
     ***********************************************************/
-    virtual bool isHydrating () const = 0;
+    public virtual bool isHydrating () const = 0;
 
     /***********************************************************
     Update placeholder metadata during discovery.
@@ -155,10 +153,10 @@ public:
     If the remote metadata changes, the local placeholder's metadata should possibly
     change as well.
     ***********************************************************/
-    virtual Q_REQUIRED_RESULT Result<void, string> updateMetadata (string &filePath, time_t modtime, int64 size, QByteArray &fileId) = 0;
+    public virtual Q_REQUIRED_RESULT Result<void, string> updateMetadata (string &filePath, time_t modtime, int64 size, QByteArray &fileId) = 0;
 
     /// Create a new dehydrated placeholder. Called from PropagateDownload.
-    virtual Q_REQUIRED_RESULT Result<void, string> createPlaceholder (SyncFileItem &item) = 0;
+    public virtual Q_REQUIRED_RESULT Result<void, string> createPlaceholder (SyncFileItem &item) = 0;
 
     /***********************************************************
     Convert a hydrated placeholder to a dehydrated one. Called from PropagateDownlaod.
@@ -166,7 +164,7 @@ public:
     This is different from delete+create because preserving some file metadata
     (like pin states) may be essential for some vfs plugins.
     ***********************************************************/
-    virtual Q_REQUIRED_RESULT Result<void, string> dehydratePlaceholder (SyncFileItem &item) = 0;
+    public virtual Q_REQUIRED_RESULT Result<void, string> dehydratePlaceholder (SyncFileItem &item) = 0;
 
     /***********************************************************
     Discovery hook : even unchanged files may need UPDATE_METADATA.
@@ -174,7 +172,7 @@ public:
     For instance cfapi vfs wants local hydrated non-placeholder files to
     become hydrated placeholder files.
     ***********************************************************/
-    virtual Q_REQUIRED_RESULT bool needsMetadataUpdate (SyncFileItem &item) = 0;
+    public virtual Q_REQUIRED_RESULT bool needsMetadataUpdate (SyncFileItem &item) = 0;
 
     /***********************************************************
     Convert a new file to a hydrated placeholder.
@@ -187,16 +185,16 @@ public:
     is a placeholder is acceptable.
     
     replacesFile can optionally contain a filesystem path to a placeholder that this
-     * new placeholder shall supersede, for rename-replace actions with new downloads,
-     * for example.
+    new placeholder shall supersede, for rename-replace actions with new downloads,
+    for example.
     ***********************************************************/
-    virtual Q_REQUIRED_RESULT Result<Vfs.ConvertToPlaceholderResult, string> convertToPlaceholder (
+    public virtual Q_REQUIRED_RESULT Result<Vfs.ConvertToPlaceholderResult, string> convertToPlaceholder (
         const string &filename,
         const SyncFileItem &item,
         const string &replacesFile = string ()) = 0;
 
     /// Determine whether the file at the given absolute path is a dehydrated placeholder.
-    virtual Q_REQUIRED_RESULT bool isDehydratedPlaceholder (string &filePath) = 0;
+    public virtual Q_REQUIRED_RESULT bool isDehydratedPlaceholder (string &filePath) = 0;
 
     /***********************************************************
     Similar to isDehydratedPlaceholder () but used from sync discovery.
@@ -204,9 +202,9 @@ public:
     This function shall set stat.type if appropriate.
     It may rely on stat.path and stat_data (platform specific data).
     
-     * Returning true means that type was fully determined.
+    Returning true means that type was fully determined.
     ***********************************************************/
-    virtual Q_REQUIRED_RESULT bool statTypeVirtualFile (csync_file_stat_t *stat, void *stat_data) = 0;
+    public virtual Q_REQUIRED_RESULT bool statTypeVirtualFile (csync_file_stat_t *stat, void *stat_data) = 0;
 
     /***********************************************************
     Sets the pin state for the item at a path.
@@ -216,9 +214,9 @@ public:
     Usually this would forward to setting the pin state flag in the db table,
     but some vfs plugins will store the pin state in file attributes instead.
 
-     * folderPath is relative to the sync folder. Can be "" for root folder.
+    folderPath is relative to the sync folder. Can be "" for root folder.
     ***********************************************************/
-    virtual Q_REQUIRED_RESULT bool setPinState (string &folderPath, PinState state) = 0;
+    public virtual Q_REQUIRED_RESULT bool setPinState (string &folderPath, PinState state) = 0;
 
     /***********************************************************
     Returns the pin state of an item at a path.
@@ -228,9 +226,9 @@ public:
     
     folderPath is relative to the sync folder. Can be "" for root folder.
 
-     * Returns none on retrieval error.
+    Returns none on retrieval error.
     ***********************************************************/
-    virtual Q_REQUIRED_RESULT Optional<PinState> pinState (string &folderPath) = 0;
+    public virtual Q_REQUIRED_RESULT Optional<PinState> pinState (string &folderPath) = 0;
 
     /***********************************************************
     Returns availability status of an item at a path.
@@ -238,9 +236,9 @@ public:
     The availability is a condensed user-facing version of PinState. See
     VfsItemAvailability for details.
     
-     * folderPath is relative to the sync folder. Can be "" for root folder.
+    folderPath is relative to the sync folder. Can be "" for root folder.
     ***********************************************************/
-    virtual Q_REQUIRED_RESULT AvailabilityResult availability (string &folderPath) = 0;
+    public virtual Q_REQUIRED_RESULT AvailabilityResult availability (string &folderPath) = 0;
 
 public slots:
     /***********************************************************
@@ -267,7 +265,7 @@ protected:
     it.
     
     Usually some registration needs to be done with the backend. This function
-     * should take care of it if necessary.
+    should take care of it if necessary.
     ***********************************************************/
     virtual void startImpl (VfsSetupParams &params) = 0;
 
@@ -283,32 +281,31 @@ protected:
 /// Implementation of Vfs for Vfs.Off mode - does nothing
 class VfsOff : Vfs {
 
-public:
-    VfsOff (GLib.Object* parent = nullptr);
-    ~VfsOff () override;
+    public VfsOff (GLib.Object* parent = nullptr);
+    public ~VfsOff () override;
 
-    Mode mode () const override { return Vfs.Off; }
+    public Mode mode () const override { return Vfs.Off; }
 
-    string fileSuffix () const override { return string (); }
+    public string fileSuffix () const override { return string (); }
 
-    void stop () override {}
-    void unregisterFolder () override {}
+    public void stop () override {}
+    public void unregisterFolder () override {}
 
-    bool socketApiPinStateActionsShown () const override { return false; }
-    bool isHydrating () const override { return false; }
+    public bool socketApiPinStateActionsShown () const override { return false; }
+    public bool isHydrating () const override { return false; }
 
-    Result<void, string> updateMetadata (string &, time_t, int64, QByteArray &) override { return {}; }
-    Result<void, string> createPlaceholder (SyncFileItem &) override { return {}; }
-    Result<void, string> dehydratePlaceholder (SyncFileItem &) override { return {}; }
-    Result<ConvertToPlaceholderResult, string> convertToPlaceholder (string &, SyncFileItem &, string &) override { return ConvertToPlaceholderResult.Ok; }
+    public Result<void, string> updateMetadata (string &, time_t, int64, QByteArray &) override { return {}; }
+    public Result<void, string> createPlaceholder (SyncFileItem &) override { return {}; }
+    public Result<void, string> dehydratePlaceholder (SyncFileItem &) override { return {}; }
+    public Result<ConvertToPlaceholderResult, string> convertToPlaceholder (string &, SyncFileItem &, string &) override { return ConvertToPlaceholderResult.Ok; }
 
-    bool needsMetadataUpdate (SyncFileItem &) override { return false; }
-    bool isDehydratedPlaceholder (string &) override { return false; }
-    bool statTypeVirtualFile (csync_file_stat_t *, void *) override { return false; }
+    public bool needsMetadataUpdate (SyncFileItem &) override { return false; }
+    public bool isDehydratedPlaceholder (string &) override { return false; }
+    public bool statTypeVirtualFile (csync_file_stat_t *, void *) override { return false; }
 
-    bool setPinState (string &, PinState) override { return true; }
-    Optional<PinState> pinState (string &) override { return PinState.AlwaysLocal; }
-    AvailabilityResult availability (string &) override { return VfsItemAvailability.AlwaysLocal; }
+    public bool setPinState (string &, PinState) override { return true; }
+    public Optional<PinState> pinState (string &) override { return PinState.AlwaysLocal; }
+    public AvailabilityResult availability (string &) override { return VfsItemAvailability.AlwaysLocal; }
 
 public slots:
     void fileStatusChanged (string &, SyncFileStatus) override {}

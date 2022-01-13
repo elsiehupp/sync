@@ -61,7 +61,7 @@ public:
     notifications.
     
     For example, this can happen on linux if the inotify user limit from
-     * /proc/sys/fs/inotify/max_user_watches is exceeded.
+    /proc/sys/fs/inotify/max_user_watches is exceeded.
     ***********************************************************/
     bool isReliable ();
 
@@ -69,7 +69,7 @@ public:
     Triggers a change in the path and verifies a notification arrives.
     
     If no notification is seen, the folderwatcher marks itself as unreliable.
-     * The path must be ignored by the watcher.
+    The path must be ignored by the watcher.
     ***********************************************************/
     void startNotificatonTest (string &path);
 
@@ -88,7 +88,7 @@ signals:
     Would happen, for example, if the number of pending notifications
     exceeded the allocated buffer size on Windows. Note that the fold
     watcher could still be able to capture all future notifications -
-     * i.e. isReliable () is orthogonal to losing changes occasionally.
+    i.e. isReliable () is orthogonal to losing changes occasionally.
     ***********************************************************/
     void lostChanges ();
 

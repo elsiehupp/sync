@@ -151,19 +151,7 @@ private:
     FolderWizardSelectiveSync *_folderWizardSelectiveSyncPage;
 };
 
-} // namespace Occ
 
-#endif
-
-
-
-
-
-
-
-
-
-namespace Occ {
 
     string FormatWarningsWizardPage.formatWarnings (QStringList &warnings) {
         string ret;

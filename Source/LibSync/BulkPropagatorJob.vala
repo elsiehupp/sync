@@ -31,7 +31,7 @@ class BulkPropagatorJob : PropagatorJob {
     being uploaded.
     
     This is needed if we wanna apply changes on the file
-     * that's being uploaded while keeping the original on disk.
+    that's being uploaded while keeping the original on disk.
     ***********************************************************/
     struct UploadFileInfo {
       string _file; /// I'm still unsure if I should use a SyncFilePtr here.
@@ -182,9 +182,7 @@ private:
     constexpr auto batchSize = 100;
     
     constexpr auto parallelJobsMaximumCount = 1;
-    }
-    
-    namespace Occ {
+
     
     BulkPropagatorJob.BulkPropagatorJob (OwncloudPropagator *propagator,
                                          const std.deque<SyncFileItemPtr> &items)

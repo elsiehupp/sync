@@ -42,19 +42,6 @@ private:
     OwncloudWizard *_ocWizard;
 };
 
-} // namespace Occ
-
-
-
-
-
-
-
-
-
-
-namespace Occ {
-
     OwncloudHttpCredsPage.OwncloudHttpCredsPage (Gtk.Widget *parent)
         : AbstractCredentialsWizardPage ()
         , _ui ()

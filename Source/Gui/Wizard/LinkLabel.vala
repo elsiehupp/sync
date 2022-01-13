@@ -33,20 +33,6 @@ private:
     QUrl url;
 };
 
-}
-
-
-
-
-
-
-
-
-
-
-
-namespace Occ {
-
     LinkLabel.LinkLabel (Gtk.Widget *parent) : QLabel (parent) {
     
     }

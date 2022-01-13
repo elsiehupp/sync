@@ -53,17 +53,7 @@ private:
     QScopedPointer<QSocketNotifier> _socket;
     int _fd;
 };
-}
 
-#endif
-
-
-
-
-
-
-
-namespace Occ {
 
     FolderWatcherPrivate.FolderWatcherPrivate (FolderWatcher *p, string &path)
         : GLib.Object ()

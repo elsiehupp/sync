@@ -53,17 +53,6 @@ class SuffixVfsPluginFactory : GLib.Object, public DefaultPluginFactory<VfsSuffi
     Q_INTERFACES (Occ.PluginFactory)
 };
 
-} // namespace Occ
-
-
-
-
-
-
-
-
-namespace Occ {
-
     VfsSuffix.VfsSuffix (GLib.Object *parent)
         : Vfs (parent) {
     }

@@ -49,7 +49,7 @@ public:
     
     In chunkingNG, when dynamic chunk size adjustments are d
     starting value and is then gradually adjusted within the
-     * minChunkSize / maxChunkSize bounds.
+    minChunkSize / maxChunkSize bounds.
     ***********************************************************/
     int64 _initialChunkSize = 10 * 1000 * 1000; // 10MB
 

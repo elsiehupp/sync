@@ -29,17 +29,7 @@ private:
     string _text;
     Qt.TextElideMode _elideMode = Qt.ElideNone;
 };
-}
 
-#endif
-
-
-
-
-
-
-
-namespace Occ {
 
     ElidedLabel.ElidedLabel (Gtk.Widget *parent)
         : QLabel (parent) {

@@ -41,20 +41,6 @@ public slots:
 private:
     Ui.OwncloudConnectionMethodDialog *ui;
 };
-}
-
-
-
-
-
-
-
-
-
-
-
-
-namespace Occ {
 
     OwncloudConnectionMethodDialog.OwncloudConnectionMethodDialog (Gtk.Widget *parent)
         : Gtk.Dialog (parent, Qt.CustomizeWindowHint | Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.MSWindowsFixedSizeDialogHint)

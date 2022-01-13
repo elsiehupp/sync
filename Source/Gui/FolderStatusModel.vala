@@ -18,13 +18,9 @@ Copyright (C) by Klaas Freitag <freitag@kde.org>
 // #include <QVector>
 // #include <QElapsedTimer>
 // #include <QPointer>
-Q_DECLARE_METATYPE (QPersistentModelIndex)
 
-Q_DECLARE_METATYPE (Occ.FolderStatusModel.SubFolderInfo*)
 
 namespace Occ {
-
-Q_DECLARE_LOGGING_CATEGORY (lcFolderStatus)
 
 
 /***********************************************************
@@ -141,7 +137,7 @@ private:
     /***********************************************************
     Keeps track of items that are fetching data from the server.
     
-     * See slotShowPendingFetchProgress ()
+    See slotShowPendingFetchProgress ()
     ***********************************************************/
     QMap<QPersistentModelIndex, QElapsedTimer> _fetchingItems;
 

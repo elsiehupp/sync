@@ -18,9 +18,6 @@
 
 namespace Occ {
 
-Q_DECLARE_METATYPE (Occ.HovercardAction)
-Q_DECLARE_METATYPE (Occ.Hovercard)
-
 
 struct HovercardAction {
 public:
@@ -111,9 +108,6 @@ private:
         }
         return createPixmapFromSvgData (iconData);
     }
-    }
-    
-    namespace Occ {
     
     HovercardAction.HovercardAction () = default;
     

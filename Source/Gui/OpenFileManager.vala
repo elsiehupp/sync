@@ -28,15 +28,7 @@ namespace Occ {
 @ingroup gui
 ***********************************************************/
 void showInFileManager (string &localPath);
-}
 
-
-
-
-
-
-
-namespace Occ {
 
 // according to the QStandardDir impl from Qt5
 static QStringList xdgDataDirs () {

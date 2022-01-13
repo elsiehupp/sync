@@ -13,15 +13,15 @@ namespace Occ {
 Q_DECLARE_INTERFACE (Occ.PluginFactory, "org.owncloud.PluginFactory")
 
 class PluginFactory {
-public:
-    virtual ~PluginFactory ();
-    virtual GLib.Object* create (GLib.Object* parent) = 0;
+
+    public virtual ~PluginFactory ();
+    public virtual GLib.Object* create (GLib.Object* parent) = 0;
 };
 
 template<class PluginClass>
 class DefaultPluginFactory : PluginFactory {
-public:
-    GLib.Object* create (GLib.Object *parent) override {
+
+    public GLib.Object* create (GLib.Object *parent) override {
         return new PluginClass (parent);
     }
 };

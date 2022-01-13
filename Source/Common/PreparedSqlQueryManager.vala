@@ -9,17 +9,17 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 namespace Occ {
 
 class PreparedSqlQuery {
-public:
-    ~PreparedSqlQuery ();
 
-    operator bool () { return _ok; }
+    public ~PreparedSqlQuery ();
 
-    SqlQuery *operator. () {
+    public operator bool () { return _ok; }
+
+    public SqlQuery *operator. () {
         Q_ASSERT (_ok);
         return _query;
     }
 
-    SqlQuery &operator* () const & {
+    public SqlQuery &operator* () const & {
         Q_ASSERT (_ok);
         return *_query;
     }
@@ -37,8 +37,8 @@ private:
 @brief Manage PreparedSqlQuery
 ***********************************************************/
 class PreparedSqlQueryManager {
-public:
-    enum Key {
+
+    public enum Key {
         GetFileRecordQuery,
         GetFileRecordQueryByMangledName,
         GetFileRecordQueryByInode,
@@ -81,15 +81,15 @@ public:
 
         PreparedQueryCount
     };
-    PreparedSqlQueryManager () = default;
+    public PreparedSqlQueryManager () = default;
     /***********************************************************
     The queries are reset in the destructor to prevent wal locks
     ***********************************************************/
-    const PreparedSqlQuery get (Key key);
+    public const PreparedSqlQuery get (Key key);
     /***********************************************************
     Prepare the SqlQuery if it was not prepared yet.
     ***********************************************************/
-    const PreparedSqlQuery get (Key key, QByteArray &sql, SqlDatabase &db);
+    public const PreparedSqlQuery get (Key key, QByteArray &sql, SqlDatabase &db);
 
 private:
     SqlQuery _queries[PreparedQueryCount];
@@ -105,7 +105,7 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <sqlite3.h>
+// #include <Sqlite3.h>
 
 using namespace Occ;
 

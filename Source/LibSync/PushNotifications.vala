@@ -27,21 +27,21 @@ public:
     /***********************************************************
     Setup push notifications
     
-     * This method needs to be called before push notifications can be used.
+    This method needs to be called before push notifications can be used.
     ***********************************************************/
     void setup ();
 
     /***********************************************************
     Set the interval for reconnection attempts
     
-     * @param interval Interval in milliseconds.
+    @param interval Interval in milliseconds.
     ***********************************************************/
     void setReconnectTimerInterval (uint32_t interval);
 
     /***********************************************************
     Indicates if push notifications ready to use
     
-     * Ready to use means connected and authenticated.
+    Ready to use means connected and authenticated.
     ***********************************************************/
     bool isReady ();
 
@@ -50,7 +50,7 @@ public:
     
     If the websocket does not respond in timeoutInterval, the connection will be terminated.
 
-     * @param interval Interval in milliseconds.
+    @param interval Interval in milliseconds.
     ***********************************************************/
     void setPingInterval (int interval);
 
@@ -78,14 +78,14 @@ signals:
     /***********************************************************
     Will be emitted if push notifications are unable to authenticate
     
-     * It's save to call #PushNotifications.setup () after this signal has been emitted.
+    It's save to call #PushNotifications.setup () after this signal has been emitted.
     ***********************************************************/
     void authenticationFailed ();
 
     /***********************************************************
     Will be emitted if push notifications are unable to connect or the connection timed out
     
-     * It's save to call #PushNotifications.setup () after this signal has been emitted.
+    It's save to call #PushNotifications.setup () after this signal has been emitted.
     ***********************************************************/
     void connectionLost ();
 

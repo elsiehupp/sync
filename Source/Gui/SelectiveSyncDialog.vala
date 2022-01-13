@@ -107,16 +107,6 @@ private:
     Folder *_folder;
     QPushButton *_okButton;
 };
-}
-
-
-
-
-
-
-
-
-namespace Occ {
 
     class SelectiveSyncTreeViewItem : QTreeWidgetItem {
     public:

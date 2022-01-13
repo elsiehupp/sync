@@ -31,6 +31,29 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 // #include <deque>
 
+
+namespace {
+
+    /***********************************************************
+    We do not want to upload files that are currently being modified.
+    To avoid that, we don't upload files that have a modification time
+    that is too close to the current time.
+    
+    This interacts with the msBetweenRequestAndSync delay in the fol
+    manager. If that delay between file-change notification and sync
+    has passed, we should accept the file for upload here.
+    ***********************************************************/
+    inline bool fileIsStillChanging (Occ.SyncFileItem &item) {
+        const auto modtime = Occ.Utility.qDateTimeFromTime_t (item._modtime);
+        const int64 msSinceMod = modtime.msecsTo (QDateTime.currentDateTimeUtc ());
+    
+        return std.chrono.milliseconds (msSinceMod) < Occ.SyncEngine.minimumFileAgeForUpload
+            // if the mtime is too much in the future we *do* upload the file
+            && msSinceMod > -10000;
+    }
+    
+}
+
 namespace Occ {
 
 Q_DECLARE_LOGGING_CATEGORY (lcPropagator)
@@ -152,7 +175,7 @@ protected:
     PropagateDirectory._subJobs.
     
     That can be useful for jobs that want to spawn follow-up jobs without
-     * becoming composite jobs themselves.
+    becoming composite jobs themselves.
     ***********************************************************/
     PropagatorCompositeJob *_associatedComposite = nullptr;
 };
@@ -454,7 +477,7 @@ public:
     since the quota on the server might ch
     wrong in the other direction as well.
 
-     * This allows skipping of uploads that have a very high likelihood of failure.
+    This allows skipping of uploads that have a very high likelihood of failure.
     ***********************************************************/
     QHash<string, int64> _folderQuota;
 
@@ -488,7 +511,7 @@ public:
     open only target one of these by default.
     
     When that happens, we want to avoid uploading incorrect data
-     * and give up on the file.
+    and give up on the file.
     ***********************************************************/
     bool hasCaseClashAccessibilityProblem (string &relfile);
 
@@ -551,7 +574,7 @@ public:
     It also creates a new upload job in composite if the item
     moved away is a file and conflict uploads are requested.
 
-     * Returns true on success, false and error on error.
+    Returns true on success, false and error on error.
     ***********************************************************/
     bool createConflict (SyncFileItemPtr &item,
         PropagatorCompositeJob *composite, string *error);
@@ -566,7 +589,7 @@ public:
     Typically after a sync operation succeeded. Updates the inode from
     the filesystem.
     
-     * Will also trigger a Vfs.convertToPlaceholder.
+    Will also trigger a Vfs.convertToPlaceholder.
     ***********************************************************/
     Result<Vfs.ConvertToPlaceholderResult, string> updateMetadata (SyncFileItem &item);
 
@@ -576,7 +599,7 @@ public:
     Typically after a sync operation succeeded. Updates the inode from
     the filesystem.
     
-     * Will also trigger a Vfs.convertToPlaceholder.
+    Will also trigger a Vfs.convertToPlaceholder.
     ***********************************************************/
     static Result<Vfs.ConvertToPlaceholderResult, string> staticUpdateMetadata (SyncFileItem &item, string localDir,
                                                                                  Vfs *vfs, SyncJournalDb * const journal);
@@ -1857,43 +1880,6 @@ private slots:
     string OwncloudPropagator.remotePath () {
         return _remoteFolder;
     }
-    
-    }
-    
-
-
-
-
-
-
-
-
-
-
-
-namespace {
-
-    /***********************************************************
-    We do not want to upload files that are currently being modified.
-    To avoid that, we don't upload files that have a modification time
-    that is too close to the current time.
-    
-    This interacts with the msBetweenRequestAndSync delay in the fol
-    manager. If that delay between file-change notification and sync
-    has passed, we should accept the file for upload here.
-    ***********************************************************/
-    inline bool fileIsStillChanging (Occ.SyncFileItem &item) {
-        const auto modtime = Occ.Utility.qDateTimeFromTime_t (item._modtime);
-        const int64 msSinceMod = modtime.msecsTo (QDateTime.currentDateTimeUtc ());
-    
-        return std.chrono.milliseconds (msSinceMod) < Occ.SyncEngine.minimumFileAgeForUpload
-            // if the mtime is too much in the future we *do* upload the file
-            && msSinceMod > -10000;
-    }
-    
-    }
-    
-    namespace Occ {
     
     inline QByteArray getEtagFromReply (QNetworkReply *reply) {
         QByteArray ocEtag = parseEtag (reply.rawHeader ("OC-ETag"));

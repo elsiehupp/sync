@@ -116,8 +116,8 @@ private:
       remote renamed A/ to 
         target :   B/Y/file
         original : A/X/file
-     *     local :    A/Y/file
-     *     server :   B/X/file
+        local :    A/Y/file
+        server :   B/X/file
     ***********************************************************/
     struct PathTuple {
         string _original; // Path as in the DB (before the sync)
@@ -163,7 +163,7 @@ private:
     Can be a file or a directory.
     Usually ends up emitting itemDiscovered () or creating a subdirectory job.
     
-     * This main function delegates some work to the processFile* functions.
+    This main function delegates some work to the processFile* functions.
     ***********************************************************/
     void processFile (PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &);
 
@@ -247,7 +247,7 @@ private:
     
     This function checks whether the combination of file type and pi
     state suggests a hydration or dehydration action and changes the
-     * _type field accordingly.
+    _type field accordingly.
     ***********************************************************/
     void setupDbPinStateActions (SyncJournalFileRecord &record);
 
@@ -276,7 +276,7 @@ private:
     
     They are jobs that need to be completed to finish processing of direct
     entries. This variable is used to ensure this job doesn't finish while
-     * these jobs are still in flight.
+    these jobs are still in flight.
     ***********************************************************/
     int _pendingAsyncJobs = 0;
 

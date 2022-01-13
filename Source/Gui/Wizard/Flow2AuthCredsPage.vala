@@ -51,21 +51,6 @@ private:
     QVBoxLayout *_layout = nullptr;
 };
 
-} // namespace Occ
-
-
-
-
-
-
-
-
-
-
-
-
-namespace Occ {
-
     Flow2AuthCredsPage.Flow2AuthCredsPage ()
         : AbstractCredentialsWizardPage () {
         _layout = new QVBoxLayout (this);

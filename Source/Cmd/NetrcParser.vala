@@ -21,12 +21,12 @@ namespace Occ {
 @ingroup cmd
 ***********************************************************/
 class NetrcParser {
-public:
-    using LoginPair = QPair<string, string>;
 
-    NetrcParser (string &file = string ());
-    bool parse ();
-    LoginPair find (string &machine);
+    public using LoginPair = QPair<string, string>;
+
+    public NetrcParser (string &file = string ());
+    public bool parse ();
+    public LoginPair find (string &machine);
 
 private:
     void tryAddEntryAndClear (string &machine, LoginPair &pair, bool &isDefault);

@@ -97,7 +97,7 @@ public slots:
     
     sharePath is the full remote path to the item,
     localPath is the absolute local path to it (so not relative
-     * to the folder).
+    to the folder).
     ***********************************************************/
     void slotShowShareDialog (string &sharePath, string &localPath, ShareDialogStartPage startPage);
 
@@ -128,15 +128,7 @@ private:
     Application *_app;
 };
 
-} // namespace Occ
 
-
-
-
-
-
-
-namespace Occ {
 
 const char propertyAccountC[] = "oc_account";
 

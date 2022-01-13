@@ -21,16 +21,6 @@ public:
     QRect visualRect (QModelIndex &index) const override;
 };
 
-} // namespace Occ
-
-
-
-
-
-
-
-namespace Occ {
-
     FolderStatusView.FolderStatusView (Gtk.Widget *parent) : QTreeView (parent) {
     }
     

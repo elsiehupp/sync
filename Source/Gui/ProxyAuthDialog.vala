@@ -35,18 +35,6 @@ private:
     Ui.ProxyAuthDialog *ui;
 };
 
-} // namespace Occ
-
-
-
-
-
-
-
-
-
-namespace Occ {
-
     ProxyAuthDialog.ProxyAuthDialog (Gtk.Widget *parent)
         : Gtk.Dialog (parent)
         , ui (new Ui.ProxyAuthDialog) {

@@ -102,17 +102,6 @@ private:
     SyncFileItemPtr _firstItemError;
     SyncFileItemPtr _firstItemLocked;
 };
-}
-
-
-
-
-
-
-
-
-
-namespace Occ {
 
     SyncResult.SyncResult () = default;
     

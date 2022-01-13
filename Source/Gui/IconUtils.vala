@@ -15,23 +15,6 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 // #include <QColor>
 // #include <QPixmap>
 
-namespace Occ {
-namespace Ui {
-namespace IconUtils {
-QPixmap pixmapForBackground (string &fileName, QColor &backgroundColor);
-QImage createSvgImageWithCustomColor (string &fileName, QColor &customColor, QSize *originalSize = nullptr, QSize &requestedSize = {});
-QPixmap createSvgPixmapWithCustomColorCached (string &fileName, QColor &customColor, QSize *originalSize = nullptr, QSize &requestedSize = {});
-QImage drawSvgWithCustomFillColor (string &sourceSvgPath, QColor &fillColor, QSize *originalSize = nullptr, QSize &requestedSize = {});
-}
-}
-}
-
-
-
-
-
-
-
 namespace {
     string findSvgFilePath (string &fileName, QStringList &possibleColors) {
         string result;
@@ -51,11 +34,17 @@ namespace {
     
         return result;
     }
-    }
-    
-    namespace Occ {
-    namespace Ui {
-    namespace IconUtils {
+}
+
+namespace Occ {
+namespace Ui {
+namespace IconUtils {
+
+QPixmap pixmapForBackground (string &fileName, QColor &backgroundColor);
+QImage createSvgImageWithCustomColor (string &fileName, QColor &customColor, QSize *originalSize = nullptr, QSize &requestedSize = {});
+QPixmap createSvgPixmapWithCustomColorCached (string &fileName, QColor &customColor, QSize *originalSize = nullptr, QSize &requestedSize = {});
+QImage drawSvgWithCustomFillColor (string &sourceSvgPath, QColor &fillColor, QSize *originalSize = nullptr, QSize &requestedSize = {});
+
     QPixmap pixmapForBackground (string &fileName, QColor &backgroundColor) {
         Q_ASSERT (!fileName.isEmpty ());
     

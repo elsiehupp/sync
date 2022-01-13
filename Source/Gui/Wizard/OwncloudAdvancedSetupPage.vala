@@ -91,18 +91,6 @@ private:
     OwncloudWizard *_ocWizard;
 };
 
-} // namespace Occ
-
-
-
-
-
-
-
-
-
-namespace Occ {
-
     OwncloudAdvancedSetupPage.OwncloudAdvancedSetupPage (OwncloudWizard *wizard)
         : QWizardPage ()
         , _progressIndi (new QProgressIndicator (this))

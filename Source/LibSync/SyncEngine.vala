@@ -96,7 +96,7 @@ public:
     
     In these cases it isn't desirable to attempt to upload the "unfinished" file
     To avoid that, uploads of files where the distance between the mtime and the
-     * current time is less than this duration are skipped.
+    current time is less than this duration are skipped.
     ***********************************************************/
     static std.chrono.milliseconds minimumFileAgeForUpload;
 
@@ -108,8 +108,8 @@ public:
     be read from the db and scanned on the filesystem.
     
     Note, the style and paths are only retained for the next sync and
-     * revert afterwards. Use _lastLocalDiscoveryStyle to discover the last
-     * sync's style.
+    revert afterwards. Use _lastLocalDiscoveryStyle to discover the last
+    sync's style.
     ***********************************************************/
     void setLocalDiscoveryOptions (LocalDiscoveryStyle style, std.set<string> paths = {});
 
@@ -118,7 +118,7 @@ public:
     given the local discovery options.
     
     Example : If path is 'foo/bar' and style is DatabaseAndFilesystem and dirs contains
-     *     'foo/bar/touched_file', then the result will be true.
+        'foo/bar/touched_file', then the result will be true.
     ***********************************************************/
     bool shouldDiscoverLocally (string &path) const;
 
@@ -133,7 +133,7 @@ public:
     different kind of vfs.
     
     Note that *hydrated* placeholder files might still be left. These will
-     * get cleaned up by Vfs.unregisterFolder ().
+    get cleaned up by Vfs.unregisterFolder ().
     ***********************************************************/
     static void wipeVirtualFiles (string &localPath, SyncJournalDb &journal, Vfs &vfs);
 

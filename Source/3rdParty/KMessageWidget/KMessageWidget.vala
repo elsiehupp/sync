@@ -100,41 +100,39 @@ class KMessageWidget : QFrame {
     Q_PROPERTY (bool closeButtonVisible READ isCloseButtonVisible WRITE setCloseButtonVisible)
     Q_PROPERTY (MessageType messageType READ messageType WRITE setMessageType)
     Q_PROPERTY (QIcon icon READ icon WRITE setIcon)
-public:
 
     /***********************************************************
     Available message types.
     The background colors are chosen depending on the message type.
     ***********************************************************/
-    enum MessageType {
+    public enum MessageType {
         Positive,
         Information,
         Warning,
         Error
     };
-    Q_ENUM (MessageType)
 
     /***********************************************************
     Constructs a KMessageWidget with the specified @p parent.
     ***********************************************************/
-    KMessageWidget (Gtk.Widget *parent = nullptr);
+    public KMessageWidget (Gtk.Widget *parent = nullptr);
 
     /***********************************************************
     Constructs a KMessageWidget with the specified @p parent and
     contents @p text.
     ***********************************************************/
-    KMessageWidget (string &text, Gtk.Widget *parent = nullptr);
+    public KMessageWidget (string &text, Gtk.Widget *parent = nullptr);
 
     /***********************************************************
     Destructor.
     ***********************************************************/
-    ~KMessageWidget () override;
+    public ~KMessageWidget () override;
 
     /***********************************************************
     Get the text of this message widget.
     @see setText ()
     ***********************************************************/
-    string text ();
+    public string text ();
 
     /***********************************************************
     Check whether word wrap is enabled.
@@ -143,24 +141,24 @@ public:
     as required to the available wi
     avoid breaking widget layouts.
 
-     * @see setWordWrap ()
+    @see setWordWrap ()
     ***********************************************************/
-    bool wordWrap ();
+    public bool wordWrap ();
 
     /***********************************************************
     Check whether the close button is visible.
     
-     * @see setCloseButtonVisible ()
+    @see setCloseButtonVisible ()
     ***********************************************************/
-    bool isCloseButtonVisible ();
+    public bool isCloseButtonVisible ();
 
     /***********************************************************
     Get the type of this message.
     By default, the type is set to KMessageWidget.Information.
     
-     * @see KMessageWidget.MessageType, setMessageType ()
+    @see KMessageWidget.MessageType, setMessageType ()
     ***********************************************************/
-    MessageType messageType ();
+    public MessageType messageType ();
 
     /***********************************************************
     Add @p action to the message widget.
@@ -168,39 +166,39 @@ public:
     order the actions were added.
     
     @param action the action to add
-     * @see removeAction (), Gtk.Widget.actions ()
+    @see removeAction (), Gtk.Widget.actions ()
     ***********************************************************/
-    void addAction (QAction *action);
+    public void addAction (QAction *action);
 
     /***********************************************************
     Remove @p action from the message widget.
     
     @param action the action to remove
-     * @see KMessageWidget.MessageType, addAction (), setMessageType ()
+    @see KMessageWidget.MessageType, addAction (), setMessageType ()
     ***********************************************************/
-    void removeAction (QAction *action);
+    public void removeAction (QAction *action);
 
     /***********************************************************
     Returns the preferred size of the message widget.
     ***********************************************************/
-    QSize sizeHint () const override;
+    public QSize sizeHint () const override;
 
     /***********************************************************
     Returns the minimum size of the message widget.
     ***********************************************************/
-    QSize minimumSizeHint () const override;
+    public QSize minimumSizeHint () const override;
 
     /***********************************************************
     Returns the required height for @p width.
     @param width the width in pixels
     ***********************************************************/
-    int heightForWidth (int width) const override;
+    public int heightForWidth (int width) const override;
 
     /***********************************************************
     The icon shown on the left of the text. By default, no icon is shown.
     @since 4.11
     ***********************************************************/
-    QIcon icon ();
+    public QIcon icon ();
 
     /***********************************************************
     Check whether the hide animation started by calling animatedHide ()
@@ -208,9 +206,9 @@ public:
     returns @e false.
     
     @see animatedHide (), hideAnimationFinished ()
-     * @since 5.0
+    @since 5.0
     ***********************************************************/
-    bool isHideAnimationRunning ();
+    public bool isHideAnimationRunning ();
 
     /***********************************************************
     Check whether the show animation started by calling animatedShow ()
@@ -218,9 +216,9 @@ public:
     returns @e false.
     
     @see animatedShow (), showAnimationFinished ()
-     * @since 5.0
+    @since 5.0
     ***********************************************************/
-    bool isShowAnimationRunning ();
+    public bool isShowAnimationRunning ();
 
 public slots:
     /***********************************************************
@@ -228,7 +226,7 @@ public slots:
     If the message widget is already visible, the text changes on the fly.
     
     @param text the text to display, rich text is allowed
-     * @see text ()
+    @see text ()
     ***********************************************************/
     void setText (string &text);
 
@@ -239,7 +237,7 @@ public slots:
     such that the entire text fits.
     
     @param wordWrap disable/enable word wrap
-     * @see wordWrap ()
+    @see wordWrap ()
     ***********************************************************/
     void setWordWrap (bool wordWrap);
 
@@ -247,7 +245,7 @@ public slots:
     Set the visibility of the close button. If @p visible is @e true,
     a close button is shown that calls animatedHide () if clicked.
     
-     * @see closeButtonVisible (), animatedHide ()
+    @see closeButtonVisible (), animatedHide ()
     ***********************************************************/
     void setCloseButtonVisible (bool visible);
 
@@ -257,7 +255,7 @@ public slots:
     Appropriate colors are chosen to mimic the appearance of Kirigami's
     InlineMessage.
     
-     * @see messageType (), KMessageWidget.MessageType
+    @see messageType (), KMessageWidget.MessageType
     ***********************************************************/
     void setMessageType (KMessageWidget.MessageType type);
 
@@ -305,8 +303,8 @@ signals:
           calling hide (), so th
           with animatedH
     
-     * @see animatedHide ()
-     * @since 5.0
+    @see animatedHide ()
+    @since 5.0
     ***********************************************************/
     void hideAnimationFinished ();
 
@@ -319,8 +317,8 @@ signals:
           calling show (), so th
           with animatedS
     
-     * @see animatedShow ()
-     * @since 5.0
+    @see animatedShow ()
+    @since 5.0
     ***********************************************************/
     void showAnimationFinished ();
 
@@ -373,32 +371,31 @@ Copyright (c) 2014 Dominik Haumann <dhaumann@kde.org>
 // KMessageWidgetPrivate
 //---------------------------------------------------------------------
 class KMessageWidgetPrivate {
-    public:
-        void init (KMessageWidget *);
+    public void init (KMessageWidget *);
     
-        KMessageWidget *q;
-        QFrame *content = nullptr;
-        QLabel *iconLabel = nullptr;
-        QLabel *textLabel = nullptr;
-        QToolButton *closeButton = nullptr;
-        QTimeLine *timeLine = nullptr;
-        QIcon icon;
-        bool ignoreShowEventDoingAnimatedShow = false;
-    
-        KMessageWidget.MessageType messageType;
-        bool wordWrap;
-        QList<QToolButton> buttons;
-        QPixmap contentSnapShot;
-    
-        void createLayout ();
-        void applyStyleSheet ();
-        void updateSnapShot ();
-        void updateLayout ();
-        void slotTimeLineChanged (qreal);
-        void slotTimeLineFinished ();
-    
-        int bestContentHeight ();
-    };
+    public KMessageWidget *q;
+    public QFrame *content = nullptr;
+    public QLabel *iconLabel = nullptr;
+    public QLabel *textLabel = nullptr;
+    public QToolButton *closeButton = nullptr;
+    public QTimeLine *timeLine = nullptr;
+    public QIcon icon;
+    public bool ignoreShowEventDoingAnimatedShow = false;
+
+    public KMessageWidget.MessageType messageType;
+    public bool wordWrap;
+    public QList<QToolButton> buttons;
+    public QPixmap contentSnapShot;
+
+    public void createLayout ();
+    public void applyStyleSheet ();
+    public void updateSnapShot ();
+    public void updateLayout ();
+    public void slotTimeLineChanged (qreal);
+    public void slotTimeLineFinished ();
+
+    public int bestContentHeight ();
+};
     
     void KMessageWidgetPrivate.init (KMessageWidget *q_ptr) {
         q = q_ptr;

@@ -106,8 +106,8 @@ struct QTokenizerPrivate {
 
 template <class T, class const_iterator = typename T.const_iterator>
 class QTokenizer {
-public:
-    using char_type = typename T.value_type;
+
+    public using char_type = typename T.value_type;
 
     /***********************************************************
        \class QTokenizer
@@ -134,14 +134,14 @@ public:
 
        \sa QStringTokenizer, QByteArrayTokenizer, StringTokenizer, WStringTokenizer
     ***********************************************************/
-    QTokenizer (T& string, T& delimiters)
+    public QTokenizer (T& string, T& delimiters)
         : d (new QTokenizerPrivate<T, const_iterator> (string, delimiters)) { }
 
     /***********************************************************
        Whether or not to return delimiters as tokens
        \see setQuoteCharacters
     ***********************************************************/
-    void setReturnDelimiters (bool enable) { d.returnDelimiters = enable; }
+    public void setReturnDelimiters (bool enable) { d.returnDelimiters = enable; }
 
     /***********************************************************
        Sets characters that are considered to start and end quotes.
@@ -154,13 +154,13 @@ public:
 
        \param quotes Characters that delimit quotes.
     ***********************************************************/
-    void setQuoteCharacters (T& quotes) { d.quotes = quotes; }
+    public void setQuoteCharacters (T& quotes) { d.quotes = quotes; }
 
     /***********************************************************
        Whether or not to return delimiters as tokens
        \see setQuoteCharacters
     ***********************************************************/
-    void setReturnQuoteCharacters (bool enable) { d.returnQuotes = enable; }
+    public void setReturnQuoteCharacters (bool enable) { d.returnQuotes = enable; }
 
     /***********************************************************
        Retrieve next token.
@@ -169,7 +169,7 @@ public:
 
        \sa next ()
     ***********************************************************/
-    bool hasNext () {
+    public bool hasNext () {
         typename QTokenizerPrivate<T, const_iterator>.State state;
         d.isDelim = false;
         for (;;) {
@@ -193,7 +193,7 @@ public:
     /***********************************************************
        Resets the tokenizer to the starting position.
     ***********************************************************/
-    void reset () {
+    public void reset () {
         d.tokenEnd = d.begin;
     }
 
@@ -201,14 +201,14 @@ public:
        Returns true if the current token is a delimiter,
        if one more more delimiting characters have been set.
     ***********************************************************/
-    bool isDelimiter () { return d.isDelim; }
+    public bool isDelimiter () { return d.isDelim; }
 
     /***********************************************************
        Returns the current token.
 
        Use \c hasNext () to fetch the next token.
     ***********************************************************/
-    T next () {
+    public T next () {
         int len = std.distance (d.tokenBegin, d.tokenEnd);
         const_iterator tmpStart = d.tokenBegin;
         if (!d.returnQuotes && len > 1 && d.isQuote (*d.tokenBegin)) {
@@ -224,14 +224,14 @@ private:
 };
 
 class QStringTokenizer : QTokenizer<string> {
-public:
-    QStringTokenizer (string &string, string &delim) :
+
+    public QStringTokenizer (string &string, string &delim) :
         QTokenizer<string, string.const_iterator> (string, delim) {}
     /***********************************************************
     @brief Like \see next (), but returns a lightweight string reference
     @return A reference to the token within the string
     ***********************************************************/
-    QStringRef stringRef () {
+    public QStringRef stringRef () {
         // If those differences overflow an int we'd have a veeeeeery long string in memory
         int begin = std.distance (d.begin, d.tokenBegin);
         int end = std.distance (d.tokenBegin, d.tokenEnd);

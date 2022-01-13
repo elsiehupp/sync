@@ -1,8 +1,11 @@
-#ifndef WEBFLOWCREDENTIALSDIALOG_H
-const int WEBFLOWCREDENTIALSDIALOG_H
 
 // #include <Gtk.Dialog>
 // #include <QUrl>
+// #include <QVBoxLayout>
+// #include <QLabel>
+
+#ifdef WITH_WEBENGINE
+#endif // WITH_WEBENGINE
 
 
 namespace Occ {
@@ -52,22 +55,6 @@ private:
     QVBoxLayout *_containerLayout;
     HeaderBanner *_headerBanner;
 };
-
-} // namespace Occ
-
-
-
-
-
-
-
-// #include <QVBoxLayout>
-// #include <QLabel>
-
-#ifdef WITH_WEBENGINE
-#endif // WITH_WEBENGINE
-
-namespace Occ {
 
 WebFlowCredentialsDialog.WebFlowCredentialsDialog (Account *account, bool useFlow2, Gtk.Widget *parent)
     : Gtk.Dialog (parent)

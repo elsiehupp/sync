@@ -19,17 +19,17 @@ define QT_QTLOCKEDFILE_EXPORT
 namespace SharedTools {
 
 class QT_QTLOCKEDFILE_EXPORT QtLockedFile : QFile {
-public:
-    enum LockMode { NoLock = 0, ReadLock, WriteLock };
 
-    QtLockedFile ();
-    QtLockedFile (string &name);
-    ~QtLockedFile () override;
+    public enum LockMode { NoLock = 0, ReadLock, WriteLock };
 
-    bool lock (LockMode mode, bool block = true);
-    bool unlock ();
-    bool isLocked ();
-    LockMode lockMode ();
+    public QtLockedFile ();
+    public QtLockedFile (string &name);
+    public ~QtLockedFile () override;
+
+    public bool lock (LockMode mode, bool block = true);
+    public bool unlock ();
+    public bool isLocked ();
+    public LockMode lockMode ();
 
 private:
     LockMode m_lock_mode;

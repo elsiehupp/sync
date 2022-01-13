@@ -38,17 +38,7 @@ private:
     QElapsedTimer _totalDuration;
     QElapsedTimer _lapDuration;
 };
-}
 
-
-
-
-
-
-
-
-
-namespace Occ {
 
     SyncRunFileLog.SyncRunFileLog () = default;
     

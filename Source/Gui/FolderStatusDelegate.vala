@@ -5,10 +5,25 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
+// #include <theme.h>
+// #include <account.h>
+
+// #include <QFileIconProvider>
+// #include <QPainter>
+// #include <QApplication>
+// #include <QMouseEvent>
 // #pragma once
 // #include <QStyledItemDelegate>
 
 namespace Occ {
+
+
+inline static QFont makeAliasFont (QFont &normalFont) {
+    QFont aliasFont = normalFont;
+    aliasFont.setBold (true);
+    aliasFont.setPointSize (normalFont.pointSize () + 2);
+    return aliasFont;
+}
 
 /***********************************************************
 @brief The FolderStatusDelegate class
@@ -65,47 +80,6 @@ private:
 
     QIcon _iconMore;
 };
-
-} // namespace Occ
-
-
-
-
-
-
-
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@kde.org>
-Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
-
- *
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABIL
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-***********************************************************/
-
-// #include <theme.h>
-// #include <account.h>
-
-// #include <QFileIconProvider>
-// #include <QPainter>
-// #include <QApplication>
-// #include <QMouseEvent>
-
-inline static QFont makeAliasFont (QFont &normalFont) {
-    QFont aliasFont = normalFont;
-    aliasFont.setBold (true);
-    aliasFont.setPointSize (normalFont.pointSize () + 2);
-    return aliasFont;
-}
-
-namespace Occ {
 
 FolderStatusDelegate.FolderStatusDelegate ()
     : QStyledItemDelegate () {

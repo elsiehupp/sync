@@ -70,7 +70,7 @@ public:
     logexpire : 4 hours
     logdebug : true
     
-     * Used in conjunction with ConfigFile.automaticLogDir
+    Used in conjunction with ConfigFile.automaticLogDir
     ***********************************************************/
     void setupTemporaryFolderLogDir ();
 
@@ -115,21 +115,6 @@ private:
     QVector<string> _crashLog;
     int _crashLogIndex = 0;
 };
-
-} // namespace Occ
-
-
-
-
-
-
-
-
-
-
-
-
-namespace Occ {
 
 Logger *Logger.instance () {
     static Logger log;

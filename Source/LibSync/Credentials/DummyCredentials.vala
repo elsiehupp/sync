@@ -24,19 +24,6 @@ public:
     void forgetSensitiveData () override{};
 };
 
-} // namespace Occ
-
-#endif
-
-
-
-
-
-
-
-
-namespace Occ {
-
     string DummyCredentials.authType () {
         return string.fromLatin1 ("dummy");
     }

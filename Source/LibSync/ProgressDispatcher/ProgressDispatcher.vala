@@ -63,7 +63,7 @@ public:
     /***********************************************************
     Called when propagation starts.
     
-     * isUpdatingEstimates () will return true afterwards.
+    isUpdatingEstimates () will return true afterwards.
     ***********************************************************/
     void startEstimateUpdates ();
 
@@ -72,7 +72,7 @@ public:
     
     This is used when the SyncEngine wants to indicate a new sync
     is about to start via the transmissionProgress () signal. The
-     * first ProgressInfo will have isUpdatingEstimates () == false.
+    first ProgressInfo will have isUpdatingEstimates () == false.
     ***********************************************************/
     bool isUpdatingEstimates ();
 
@@ -179,7 +179,7 @@ public:
     Get the optimistic eta.
     
     This value is based on the highest observed transfer bandwidth
-     * and files-per-second speed.
+    and files-per-second speed.
     ***********************************************************/
     uint64 optimisticEta ();
 
@@ -187,7 +187,7 @@ public:
     Whether the remaining-time estimate is trusted.
     
     We don't trust it if it is hugely above the optimistic estimate.
-     * See #5046.
+    See #5046.
     ***********************************************************/
     bool trustEta ();
 
@@ -300,21 +300,6 @@ private:
     QElapsedTimer _timer;
     static ProgressDispatcher *_instance;
 };
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-namespace Occ {
 
     ProgressDispatcher *ProgressDispatcher._instance = nullptr;
     

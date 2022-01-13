@@ -20,18 +20,17 @@ namespace SharedTools {
 
 class QtSingleApplication : QApplication {
 
-public:
-    QtSingleApplication (string &id, int &argc, char **argv);
-    ~QtSingleApplication () override;
+    public QtSingleApplication (string &id, int &argc, char **argv);
+    public ~QtSingleApplication () override;
 
-    bool isRunning (int64 pid = -1);
+    public bool isRunning (int64 pid = -1);
 
-    void setActivationWindow (Gtk.Widget* aw, bool activateOnMessage = true);
-    Gtk.Widget* activationWindow ();
-    bool event (QEvent *event) override;
+    public void setActivationWindow (Gtk.Widget* aw, bool activateOnMessage = true);
+    public Gtk.Widget* activationWindow ();
+    public bool event (QEvent *event) override;
 
-    string applicationId ();
-    void setBlock (bool value);
+    public string applicationId ();
+    public void setBlock (bool value);
 
 public slots:
     bool sendMessage (string &message, int timeout = 5000, int64 pid = -1);

@@ -26,22 +26,13 @@ signals:
     
     Signal that the job is done. If the statusCode is 200 (success) reply
     will contain the image data in PNG. If the status code is different the content
-     * of reply is undefined.
+    of reply is undefined.
     ***********************************************************/
     void jobFinished (int statusCode, QByteArray reply);
 private slots:
     bool finished () override;
 };
-}
 
-
-
-
-
-
-
-
-namespace Occ {
 
     ThumbnailJob.ThumbnailJob (string &path, AccountPtr account, GLib.Object *parent)
         : AbstractNetworkJob (account, QLatin1String ("index.php/apps/files/api/v1/thumbnail/150/150/") + path, parent) {

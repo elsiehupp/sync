@@ -21,12 +21,12 @@ namespace SharedTools {
 
 class QtLocalPeer : GLib.Object {
 
-public:
-    QtLocalPeer (GLib.Object *parent = nullptr, string &appId = string ());
-    bool isClient ();
-    bool sendMessage (string &message, int timeout, bool block);
-    string applicationId () { return id; }
-    static string appSessionId (string &appId);
+
+    public QtLocalPeer (GLib.Object *parent = nullptr, string &appId = string ());
+    public bool isClient ();
+    public bool sendMessage (string &message, int timeout, bool block);
+    public string applicationId () { return id; }
+    public static string appSessionId (string &appId);
 
 signals:
     void messageReceived (string &message, GLib.Object *socket);

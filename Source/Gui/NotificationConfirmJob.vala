@@ -29,7 +29,7 @@ public:
     /***********************************************************
     @brief Set the verb and link for the job
     
-     * @param verb currently supported GET PUT POST DELETE
+    @param verb currently supported GET PUT POST DELETE
     ***********************************************************/
     void setLinkAndVerb (QUrl &link, QByteArray &verb);
 
@@ -43,7 +43,7 @@ signals:
     /***********************************************************
     Result of the OCS request
     
-     * @param reply the reply
+    @param reply the reply
     ***********************************************************/
     void jobFinished (string reply, int replyCode);
 

@@ -1488,24 +1488,6 @@ void SocketApiJobV2.doFinish (QJsonObject &obj) {
     Q_EMIT finished ();
 }
 
-} // namespace Occ
-
-#include "socketapi.moc"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-namespace Occ {
 
     class BloomFilter {
         // Initialize with m=1024 bits and k=2 (high and low 16 bits of a qHash).
@@ -1620,7 +1602,4 @@ namespace Occ {
         string _jobId;
         QJsonObject _arguments;
     };
-    }
-    
-    Q_DECLARE_METATYPE (Occ.SocketListener *)
-    
+}

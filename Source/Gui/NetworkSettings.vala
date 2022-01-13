@@ -46,18 +46,6 @@ private:
     Ui.NetworkSettings *_ui;
 };
 
-} // namespace Occ
-
-
-
-
-
-
-
-
-
-namespace Occ {
-
     NetworkSettings.NetworkSettings (Gtk.Widget *parent)
         : Gtk.Widget (parent)
         , _ui (new Ui.NetworkSettings) {

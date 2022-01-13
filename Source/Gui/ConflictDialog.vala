@@ -62,9 +62,7 @@ namespace {
         font.setBold (bold);
         widget.setFont (font);
     }
-    }
-    
-    namespace Occ {
+
     
     ConflictDialog.ConflictDialog (Gtk.Widget *parent)
         : Gtk.Dialog (parent)

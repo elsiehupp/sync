@@ -11,6 +11,10 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 // #include <GLib.Object>
 // #include <QScopedPointer>
 
+namespace xattr {
+    using namespace Occ.XAttrWrapper;
+}
+
 namespace Occ {
 
 class VfsXAttr : Vfs {
@@ -53,20 +57,6 @@ class XattrVfsPluginFactory : GLib.Object, public DefaultPluginFactory<VfsXAttr>
     Q_PLUGIN_METADATA (IID "org.owncloud.PluginFactory" FILE "vfspluginmetadata.json")
     Q_INTERFACES (Occ.PluginFactory)
 };
-
-} // namespace Occ
-
-
-
-
-
-
-
-namespace xattr {
-    using namespace Occ.XAttrWrapper;
-    }
-    
-    namespace Occ {
     
     VfsXAttr.VfsXAttr (GLib.Object *parent)
         : Vfs (parent) {

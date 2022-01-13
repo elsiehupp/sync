@@ -98,7 +98,7 @@ public:
     /***********************************************************
     Ensures that a given directory does not contain a sync journal file.
     
-     * @returns false if the journal could not be removed, true otherwise.
+    @returns false if the journal could not be removed, true otherwise.
     ***********************************************************/
     static bool ensureJournalGone (string &journalDbFile);
 
@@ -127,7 +127,7 @@ public:
     
     Note that different accounts are allowed to sync to the same folder.
 
-     * @returns an empty string if it is allowed, or an error if it is not allowed
+    @returns an empty string if it is allowed, or an error if it is not allowed
     ***********************************************************/
     string checkPathValidityForNewFolder (string &path, QUrl &serverUrl = QUrl ()) const;
 
@@ -137,8 +137,8 @@ public:
     Uses \a basePath as the baseline. It'll return this path if it's acceptable.
     
     Note that this can fail. If someone syncs ~ and \a basePath is ~/ownCloud, no
-     * subfolder of ~ would be a good candidate. When that happens \a basePath
-     * is returned.
+    subfolder of ~ would be a good candidate. When that happens \a basePath
+    is returned.
     ***********************************************************/
     string findGoodPathForNewSyncFolder (string &basePath, QUrl &serverUrl) const;
 
@@ -162,7 +162,7 @@ public:
     Note : This is only the folder that's currently syncing *as-scheduled
     may be externally-managed syncs such as from placeholder hydrations.
 
-     * See also isAnySyncRunning ()
+    See also isAnySyncRunning ()
     ***********************************************************/
     Folder *currentSyncFolder ();
 
@@ -170,7 +170,7 @@ public:
     Returns true if any folder is currently syncing.
     
     This might be a FolderMan-scheduled sync, or a externally
-     * managed sync like a placeholder hydration.
+    managed sync like a placeholder hydration.
     ***********************************************************/
     bool isAnySyncRunning ();
 
@@ -239,7 +239,7 @@ public slots:
     Triggers a sync run once the lock on the given file is removed.
     
     Automatically detemines the folder that's responsible for the file.
-     * See slotWatchedFileUnlocked ().
+    See slotWatchedFileUnlocked ().
     ***********************************************************/
     void slotSyncOnceFileUnlocks (string &path);
 
@@ -277,7 +277,7 @@ private slots:
     A file whose locks were being monitored has become unlocked.
     
     This schedules the folder for synchronization that contains
-     * the file with the given path.
+    the file with the given path.
     ***********************************************************/
     void slotWatchedFileUnlocked (string &path);
 
@@ -285,7 +285,7 @@ private slots:
     Schedules folders whose time to sync has come.
     
     Either because a long time has passed since the last sync or
-     * because of previous failures.
+    because of previous failures.
     ***********************************************************/
     void slotScheduleFolderByTime ();
 

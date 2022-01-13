@@ -31,8 +31,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QDateTime>
 // #include <QTimer>
 
-Q_DECLARE_METATYPE (QTimer *)
-
 namespace Occ {
 
 // If not set, it is overwritten by the Application constructor with the value from the config

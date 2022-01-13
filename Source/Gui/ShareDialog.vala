@@ -17,6 +17,17 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 // #include <Gtk.Dialog>
 // #include <Gtk.Widget>
 
+namespace {
+    string createRandomPassword () {
+        const auto words = Occ.WordList.getRandomWords (10);
+    
+        const auto addFirstLetter = [] (string &current, string &next) . string {
+            return current + next.at (0);
+        };
+    
+        return std.accumulate (std.cbegin (words), std.cend (words), string (), addFirstLetter);
+    }
+}
 
 namespace Occ {
 
@@ -82,28 +93,6 @@ private:
     ShareUserGroupWidget *_userGroupWidget = nullptr;
     QProgressIndicator *_progressIndicator = nullptr;
 };
-
-} // namespace Occ
-
-
-
-
-
-
-
-namespace {
-    string createRandomPassword () {
-        const auto words = Occ.WordList.getRandomWords (10);
-    
-        const auto addFirstLetter = [] (string &current, string &next) . string {
-            return current + next.at (0);
-        };
-    
-        return std.accumulate (std.cbegin (words), std.cend (words), string (), addFirstLetter);
-    }
-    }
-    
-    namespace Occ {
     
     static const int thumbnailSize = 40;
     

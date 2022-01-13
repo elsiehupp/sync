@@ -44,19 +44,6 @@ private:
     string _postfix;
 };
 
-} // namespace Occ
-
-
-
-
-
-
-
-
-
-
-namespace Occ {
-
     const int horizontalMargin (4);
     const int verticalMargin (4);
     

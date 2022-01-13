@@ -133,7 +133,7 @@ public:
     cleaned canonical folder path, like path () but never ends with a /
     
     Wrapper for QDir.cleanPath (path ()) except for "Z:/",
-     * where it returns "Z:" instead of "Z:/".
+    where it returns "Z:" instead of "Z:/".
     ***********************************************************/
     string cleanPath ();
 
@@ -257,7 +257,7 @@ public:
     /***********************************************************
     Sets up this folder's folderWatcher if possible.
     
-     * May be called several times.
+    May be called several times.
     ***********************************************************/
     void registerFolderWatcher ();
 
@@ -343,8 +343,8 @@ public slots:
     in the database. This is necessary since the hydration is not driven by
     the pin state.
 
-     * relativepath is the folder-relative path to the file (including the extension)
-
+    relativepath is the folder-relative path to the file (including the extension)
+    
      * Note, passing directories is not supported. Files only.
     ***********************************************************/
     void implicitlyHydrateFile (string &relativepath);
@@ -513,7 +513,7 @@ private:
     /***********************************************************
     Watches this folder's local directory for changes.
     
-     * Created by registerFolderWatcher (), triggers slotWatchedPathChanged ()
+    Created by registerFolderWatcher (), triggers slotWatchedPathChanged ()
     ***********************************************************/
     QScopedPointer<FolderWatcher> _folderWatcher;
 

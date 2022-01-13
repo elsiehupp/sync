@@ -23,9 +23,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 namespace Occ {
 
-Q_DECLARE_METATYPE (Occ.AccountState *)
-Q_DECLARE_METATYPE (Occ.AccountStatePtr)
-
 class RemoteWipe;
 
 using AccountStatePtr = QExplicitlySharedDataPointer<AccountState>;
@@ -116,7 +113,7 @@ public:
     Connected accounts will be disconnected and try anew.
     Disconnected accounts will go to checkConnectivity ().
     
-     * Useful for when network settings (proxy) change.
+    Useful for when network settings (proxy) change.
     ***********************************************************/
     void freshConnectionAttempt ();
 

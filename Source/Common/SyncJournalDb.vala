@@ -11,7 +11,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QElapsedTimer>
 // #include <QUrl>
 // #include <QDir>
-// #include <sqlite3.h>
+// #include <Sqlite3.h>
 // #include <cstring>
 
 // SQL expression to check whether path.startswith (prefix + '/')
@@ -37,70 +37,70 @@ This class is thread safe. All public functions lock the mutex.
 @ingroup libsync
 ***********************************************************/
 class SyncJournalDb : GLib.Object {
-public:
-    SyncJournalDb (string &dbFilePath, GLib.Object *parent = nullptr);
-    ~SyncJournalDb () override;
+
+    public SyncJournalDb (string &dbFilePath, GLib.Object *parent = nullptr);
+    public ~SyncJournalDb () override;
 
     /// Create a journal path for a specific configuration
-    static string makeDbName (string &localPath,
+    public static string makeDbName (string &localPath,
         const QUrl &remoteUrl,
         const string &remotePath,
         const string &user);
 
     /// Migrate a csync_journal to the new path, if necessary. Returns false on error
-    static bool maybeMigrateDb (string &localPath, string &absoluteJournalPath);
+    public static bool maybeMigrateDb (string &localPath, string &absoluteJournalPath);
 
     // To verify that the record could be found check with SyncJournalFileRecord.isValid ()
-    bool getFileRecord (string &filename, SyncJournalFileRecord *rec) { return getFileRecord (filename.toUtf8 (), rec); }
-    bool getFileRecord (QByteArray &filename, SyncJournalFileRecord *rec);
-    bool getFileRecordByE2eMangledName (string &mangledName, SyncJournalFileRecord *rec);
-    bool getFileRecordByInode (uint64 inode, SyncJournalFileRecord *rec);
-    bool getFileRecordsByFileId (QByteArray &fileId, std.function<void (SyncJournalFileRecord &)> &rowCallback);
-    bool getFilesBelowPath (QByteArray &path, std.function<void (SyncJournalFileRecord&)> &rowCallback);
-    bool listFilesInPath (QByteArray &path, std.function<void (SyncJournalFileRecord&)> &rowCallback);
-    Result<void, string> setFileRecord (SyncJournalFileRecord &record);
+    public bool getFileRecord (string &filename, SyncJournalFileRecord *rec) { return getFileRecord (filename.toUtf8 (), rec); }
+    public bool getFileRecord (QByteArray &filename, SyncJournalFileRecord *rec);
+    public bool getFileRecordByE2eMangledName (string &mangledName, SyncJournalFileRecord *rec);
+    public bool getFileRecordByInode (uint64 inode, SyncJournalFileRecord *rec);
+    public bool getFileRecordsByFileId (QByteArray &fileId, std.function<void (SyncJournalFileRecord &)> &rowCallback);
+    public bool getFilesBelowPath (QByteArray &path, std.function<void (SyncJournalFileRecord&)> &rowCallback);
+    public bool listFilesInPath (QByteArray &path, std.function<void (SyncJournalFileRecord&)> &rowCallback);
+    public Result<void, string> setFileRecord (SyncJournalFileRecord &record);
 
-    void keyValueStoreSet (string &key, QVariant value);
-    int64 keyValueStoreGetInt (string &key, int64 defaultValue);
-    void keyValueStoreDelete (string &key);
+    public void keyValueStoreSet (string &key, QVariant value);
+    public int64 keyValueStoreGetInt (string &key, int64 defaultValue);
+    public void keyValueStoreDelete (string &key);
 
-    bool deleteFileRecord (string &filename, bool recursively = false);
-    bool updateFileRecordChecksum (string &filename,
+    public bool deleteFileRecord (string &filename, bool recursively = false);
+    public bool updateFileRecordChecksum (string &filename,
         const QByteArray &contentChecksum,
         const QByteArray &contentChecksumType);
-    bool updateLocalMetadata (string &filename,
+    public bool updateLocalMetadata (string &filename,
         int64 modtime, int64 size, uint64 inode);
 
     /// Return value for hasHydratedOrDehydratedFiles ()
-    struct HasHydratedDehydrated {
+    public struct HasHydratedDehydrated {
         bool hasHydrated = false;
         bool hasDehydrated = false;
     };
 
     /***********************************************************
     Returns whether the item or any subitems are dehydrated */
-    Optional<HasHydratedDehydrated> hasHydratedOrDehydratedFiles (QByteArray &filename);
+    public Optional<HasHydratedDehydrated> hasHydratedOrDehydratedFiles (QByteArray &filename);
 
-    bool exists ();
-    void walCheckpoint ();
+    public bool exists ();
+    public void walCheckpoint ();
 
-    string databaseFilePath ();
+    public string databaseFilePath ();
 
-    static int64 getPHash (QByteArray &);
+    public static int64 getPHash (QByteArray &);
 
-    void setErrorBlacklistEntry (SyncJournalErrorBlacklistRecord &item);
-    void wipeErrorBlacklistEntry (string &file);
-    void wipeErrorBlacklistCategory (SyncJournalErrorBlacklistRecord.Category category);
-    int wipeErrorBlacklist ();
-    int errorBlackListEntryCount ();
+    public void setErrorBlacklistEntry (SyncJournalErrorBlacklistRecord &item);
+    public void wipeErrorBlacklistEntry (string &file);
+    public void wipeErrorBlacklistCategory (SyncJournalErrorBlacklistRecord.Category category);
+    public int wipeErrorBlacklist ();
+    public int errorBlackListEntryCount ();
 
-    struct DownloadInfo {
+    public struct DownloadInfo {
         string _tmpfile;
         QByteArray _etag;
         int _errorCount = 0;
         bool _valid = false;
     };
-    struct UploadInfo {
+    public struct UploadInfo {
         int _chunk = 0;
         uint _transferid = 0;
         int64 _size = 0;
@@ -116,36 +116,36 @@ public:
         bool isChunked () { return _transferid != 0; }
     };
 
-    struct PollInfo {
+    public struct PollInfo {
         string _file; // The relative path of a file
         string _url; // the poll url. (This pollinfo is invalid if _url is empty)
         int64 _modtime; // The modtime of the file being uploaded
         int64 _fileSize;
     };
 
-    DownloadInfo getDownloadInfo (string &file);
-    void setDownloadInfo (string &file, DownloadInfo &i);
-    QVector<DownloadInfo> getAndDeleteStaleDownloadInfos (QSet<string> &keep);
-    int downloadInfoCount ();
+    public DownloadInfo getDownloadInfo (string &file);
+    public void setDownloadInfo (string &file, DownloadInfo &i);
+    public QVector<DownloadInfo> getAndDeleteStaleDownloadInfos (QSet<string> &keep);
+    public int downloadInfoCount ();
 
-    UploadInfo getUploadInfo (string &file);
-    void setUploadInfo (string &file, UploadInfo &i);
+    public UploadInfo getUploadInfo (string &file);
+    public void setUploadInfo (string &file, UploadInfo &i);
     // Return the list of transfer ids that were removed.
-    QVector<uint> deleteStaleUploadInfos (QSet<string> &keep);
+    public QVector<uint> deleteStaleUploadInfos (QSet<string> &keep);
 
-    SyncJournalErrorBlacklistRecord errorBlacklistEntry (string &);
-    bool deleteStaleErrorBlacklistEntries (QSet<string> &keep);
+    public SyncJournalErrorBlacklistRecord errorBlacklistEntry (string &);
+    public bool deleteStaleErrorBlacklistEntries (QSet<string> &keep);
 
     /// Delete flags table entries that have no metadata correspondent
-    void deleteStaleFlagsEntries ();
+    public void deleteStaleFlagsEntries ();
 
-    void avoidRenamesOnNextSync (string &path) { avoidRenamesOnNextSync (path.toUtf8 ()); }
-    void avoidRenamesOnNextSync (QByteArray &path);
-    void setPollInfo (PollInfo &);
+    public void avoidRenamesOnNextSync (string &path) { avoidRenamesOnNextSync (path.toUtf8 ()); }
+    public void avoidRenamesOnNextSync (QByteArray &path);
+    public void setPollInfo (PollInfo &);
 
-    QVector<PollInfo> getPollInfos ();
+    public QVector<PollInfo> getPollInfos ();
 
-    enum SelectiveSyncListType {
+    public enum SelectiveSyncListType {
         /** The black list is the list of folders that are unselected in the selective sync dialog.
          * For the sync engine, those folders are considered as if they were not there, so the local
          * folders will be deleted */
@@ -159,9 +159,9 @@ public:
         SelectiveSyncUndecidedList = 3
     };
     /* return the specified list from the database */
-    QStringList getSelectiveSyncList (SelectiveSyncListType type, bool *ok);
+    public QStringList getSelectiveSyncList (SelectiveSyncListType type, bool *ok);
     /* Write the selective sync list (remove all other entries of that list */
-    void setSelectiveSyncList (SelectiveSyncListType type, QStringList &list);
+    public void setSelectiveSyncList (SelectiveSyncListType type, QStringList &list);
 
     /***********************************************************
     Make sure that on the next sync fileName and its parents are discovered from the server.
@@ -174,31 +174,31 @@ public:
     
     Since folders in the selective sync list will not be rediscovered (csync_ftw,
     _csync_detect_update skip them), the _invalid_ marker will stay. And any
-     * child items in the db will be ignored when reading a remote tree from the database.
-
-     * Any setFileRecord () call to affected directories before the next sync run will be
-     * adjusted to retain the invalid etag via _etagStorageFilter.
+    child items in the db will be ignored when reading a remote tree from the database.
+    
+    Any setFileRecord () call to affected directories before the next sync run will be
+    adjusted to retain the invalid etag via _etagStorageFilter.
     ***********************************************************/
-    void schedulePathForRemoteDiscovery (string &fileName) { schedulePathForRemoteDiscovery (fileName.toUtf8 ()); }
-    void schedulePathForRemoteDiscovery (QByteArray &fileName);
+    public void schedulePathForRemoteDiscovery (string &fileName) { schedulePathForRemoteDiscovery (fileName.toUtf8 ()); }
+    public void schedulePathForRemoteDiscovery (QByteArray &fileName);
 
     /***********************************************************
     Wipe _etagStorageFilter. Also done implicitly on close ().
     ***********************************************************/
-    void clearEtagStorageFilter ();
+    public void clearEtagStorageFilter ();
 
     /***********************************************************
     Ensures full remote discovery happens on the next sync.
     
-     * Equivalent to calling schedulePathForRemoteDiscovery () for all files.
+    Equivalent to calling schedulePathForRemoteDiscovery () for all files.
     ***********************************************************/
-    void forceRemoteDiscoveryNextSync ();
+    public void forceRemoteDiscoveryNextSync ();
 
     /* Because sqlite transactions are really slow, we encapsulate everything in big transactions
     Commit will actually commit the transaction and create a new one.
     ***********************************************************/
-    void commit (string &context, bool startTrans = true);
-    void commitIfNeededAndStartNewTransaction (string &context);
+    public void commit (string &context, bool startTrans = true);
+    public void commitIfNeededAndStartNewTransaction (string &context);
 
     /***********************************************************
     Open the db if it isn't already.
@@ -206,22 +206,22 @@ public:
     This usually creates some temporary files next to the db file, like
     $dbfile-shm or $dbfile-wal.
     
-     * returns true if it could be openend or is currently opened.
+    returns true if it could be openend or is currently opened.
     ***********************************************************/
-    bool open ();
+    public bool open ();
 
     /***********************************************************
     Returns whether the db is currently openend. */
-    bool isOpen ();
+    public bool isOpen ();
 
     /***********************************************************
     Close the database */
-    void close ();
+    public void close ();
 
     /***********************************************************
     Returns the checksum type for an id.
     ***********************************************************/
-    QByteArray getChecksumType (int checksumTypeId);
+    public QByteArray getChecksumType (int checksumTypeId);
 
     /***********************************************************
     The data-fingerprint used to detect backup
@@ -232,47 +232,47 @@ public:
     // Conflict record functions
 
     /// Store a new or updated record in the database
-    void setConflictRecord (ConflictRecord &record);
+    public void setConflictRecord (ConflictRecord &record);
 
     /// Retrieve a conflict record by path of the file with the conflict tag
-    ConflictRecord conflictRecord (QByteArray &path);
+    public ConflictRecord conflictRecord (QByteArray &path);
 
     /// Delete a conflict record by path of the file with the conflict tag
-    void deleteConflictRecord (QByteArray &path);
+    public void deleteConflictRecord (QByteArray &path);
 
     /// Return all paths of files with a conflict tag in the name and records in the db
-    QByteArrayList conflictRecordPaths ();
+    public QByteArrayList conflictRecordPaths ();
 
     /***********************************************************
     Find the base name for a conflict file name, using journal or name pattern
 
     The path must be sync-folder relative.
     
-     * Will return an empty string if it's not even a conflict file by pattern.
+    Will return an empty string if it's not even a conflict file by pattern.
     ***********************************************************/
-    QByteArray conflictFileBaseName (QByteArray &conflictName);
+    public QByteArray conflictFileBaseName (QByteArray &conflictName);
 
     /***********************************************************
     Delete any file entry. This will force the next sync to re-sync everything as if it was new,
     restoring everyfile on every remote. If a file is there both on the client and server side,
     it will be a conflict that will be automatically resolved if the file is the same.
     ***********************************************************/
-    void clearFileTable ();
+    public void clearFileTable ();
 
     /***********************************************************
     Set the 'ItemTypeVirtualFileDownload' to all the files that have the ItemTypeVirtualFile flag
     within the directory specified path path
     
-     * The path "" marks everything.
+    The path "" marks everything.
     ***********************************************************/
-    void markVirtualFileForDownloadRecursively (QByteArray &path);
+    public void markVirtualFileForDownloadRecursively (QByteArray &path);
 
     /***********************************************************
     Grouping for all functions relating to pin states,
 
     Use internalPinStates () to get at them.
     ***********************************************************/
-    struct OCSYNC_EXPORT PinStateInterface {
+    public struct OCSYNC_EXPORT PinStateInterface {
         PinStateInterface (PinStateInterface &) = delete;
         PinStateInterface (PinStateInterface &&) = delete;
 
@@ -346,7 +346,7 @@ public:
 
         SyncJournalDb *_db;
     };
-    friend struct PinStateInterface;
+    public friend struct PinStateInterface;
 
     /***********************************************************
     Access to PinStates stored in the database.
@@ -354,14 +354,14 @@ public:
     Important : Not all vfs plugins store the pin states in the database,
     prefer to use Vfs.pinState () etc.
     ***********************************************************/
-    PinStateInterface internalPinStates ();
+    public PinStateInterface internalPinStates ();
 
     /***********************************************************
     Only used for auto-test:
     when positive, will decrease the counter for every database operation.
     reaching 0 makes the operation fails
     ***********************************************************/
-    int autotestFailCounter = -1;
+    public int autotestFailCounter = -1;
 
 private:
     int getFileRecordCount ();
@@ -401,7 +401,7 @@ private:
     The list is cleared on close () (end of sync ru
     clearEtagStorageFilter () (start of sync run).
 
-     * The contained paths have a trailing /.
+    The contained paths have a trailing /.
     ***********************************************************/
     QList<QByteArray> _etagStorageFilter;
 
@@ -651,7 +651,7 @@ bool SyncJournalDb.checkConnect () {
         return sqlFail (QStringLiteral ("SELECT sqlite_version ()"), pragma1);
     } else {
         pragma1.next ();
-        qCInfo (lcDb) << "sqlite3 version" << pragma1.stringValue (0);
+        qCInfo (lcDb) << "Sqlite3 version" << pragma1.stringValue (0);
     }
 
     // Set locking mode to avoid issues with WAL on Windows
@@ -663,7 +663,7 @@ bool SyncJournalDb.checkConnect () {
         return sqlFail (QStringLiteral ("Set PRAGMA locking_mode"), pragma1);
     } else {
         pragma1.next ();
-        qCInfo (lcDb) << "sqlite3 locking_mode=" << pragma1.stringValue (0);
+        qCInfo (lcDb) << "Sqlite3 locking_mode=" << pragma1.stringValue (0);
     }
 
     pragma1.prepare ("PRAGMA journal_mode=" + _journalMode + ";");
@@ -671,7 +671,7 @@ bool SyncJournalDb.checkConnect () {
         return sqlFail (QStringLiteral ("Set PRAGMA journal_mode"), pragma1);
     } else {
         pragma1.next ();
-        qCInfo (lcDb) << "sqlite3 journal_mode=" << pragma1.stringValue (0);
+        qCInfo (lcDb) << "Sqlite3 journal_mode=" << pragma1.stringValue (0);
     }
 
     // For debugging purposes, allow temp_store to be set
@@ -681,7 +681,7 @@ bool SyncJournalDb.checkConnect () {
         if (!pragma1.exec ()) {
             return sqlFail (QStringLiteral ("Set PRAGMA temp_store"), pragma1);
         }
-        qCInfo (lcDb) << "sqlite3 with temp_store =" << env_temp_store;
+        qCInfo (lcDb) << "Sqlite3 with temp_store =" << env_temp_store;
     }
 
     // With WAL journal the NORMAL sync mode is safe from corruption,
@@ -693,7 +693,7 @@ bool SyncJournalDb.checkConnect () {
     if (!pragma1.exec ()) {
         return sqlFail (QStringLiteral ("Set PRAGMA synchronous"), pragma1);
     } else {
-        qCInfo (lcDb) << "sqlite3 synchronous=" << synchronousMode;
+        qCInfo (lcDb) << "Sqlite3 synchronous=" << synchronousMode;
     }
 
     pragma1.prepare ("PRAGMA case_sensitive_like = ON;");
@@ -933,7 +933,7 @@ const int SQLITE_IOERR_SHMMAP            (SQLITE_IOERR | (21<<8))
     
      If 1.8.0 caused missing data in the l
      to get back the files that were gone.
-     *  In 1.8.1 we had a fix to re-get the data, but this one here is better
+     In 1.8.1 we had a fix to re-get the data, but this one here is better
     ***********************************************************/
     if (forceRemoteDiscovery) {
         forceRemoteDiscoveryNextSyncLocked ();

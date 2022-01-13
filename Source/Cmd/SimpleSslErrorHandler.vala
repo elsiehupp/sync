@@ -11,8 +11,8 @@ namespace Occ {
 @ingroup cmd
 ***********************************************************/
 class SimpleSslErrorHandler : Occ.AbstractSslErrorHandler {
-public:
-    bool handleErrors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, Occ.AccountPtr) override;
+
+    public bool handleErrors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, Occ.AccountPtr) override;
 };
 
 

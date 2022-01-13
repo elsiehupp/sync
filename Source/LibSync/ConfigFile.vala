@@ -116,7 +116,7 @@ public:
     /***********************************************************
     Creates a backup of the file
     
-     * Returns the path of the new backup.
+    Returns the path of the new backup.
     ***********************************************************/
     string backup ();
 
@@ -144,7 +144,7 @@ public:
     /***********************************************************
     Interval in milliseconds within which full local discovery is required
     
-     * Use -1 to disable regular full local discoveries.
+    Use -1 to disable regular full local discoveries.
     ***********************************************************/
     std.chrono.milliseconds fullLocalDiscoveryInterval ();
 

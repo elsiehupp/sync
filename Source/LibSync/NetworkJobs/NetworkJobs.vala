@@ -120,7 +120,7 @@ public:
     The properties can
      - contain no colon : they refer to a property in the DAV : 
      - contain a colon : and thus specify an explicit namespace,
-     *    e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
+       e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
     ***********************************************************/
     void setProperties (QList<QByteArray> properties);
     QList<QByteArray> properties ();
@@ -160,7 +160,7 @@ public:
     The properties can
      - contain no colon : they refer to a property in the DAV : 
      - contain a colon : and thus specify an explicit namespace,
-     *    e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
+       e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
     ***********************************************************/
     void setProperties (QList<QByteArray> properties);
     QList<QByteArray> properties ();
@@ -233,7 +233,7 @@ public:
     The property keys can
      - contain no colon : they refer to a property in the DAV : 
      - contain a colon : and thus specify an explicit namespace,
-     *    e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
+       e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
     ***********************************************************/
     void setProperties (QMap<QByteArray, QByteArray> properties);
     QMap<QByteArray, QByteArray> properties ();
@@ -382,7 +382,7 @@ public:
     that the format=json para
     need to be set this way.
 
-     * This function needs to be called before start () obviously.
+    This function needs to be called before start () obviously.
     ***********************************************************/
     void addQueryParams (QUrlQuery &params);
     void addRawHeader (QByteArray &headerName, QByteArray &value);

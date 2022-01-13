@@ -172,19 +172,7 @@ private:
     void versionInfoArrived (UpdateInfo &info) override;
     QByteArray _runningAppVersion;
 };
-}
 
-
-
-
-
-
-
-
-
-
-
-namespace Occ {
 
     static const char updateAvailableC[] = "Updater/updateAvailable";
     static const char updateTargetVersionC[] = "Updater/updateTargetVersion";

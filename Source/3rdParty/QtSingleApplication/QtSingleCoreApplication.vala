@@ -18,13 +18,12 @@ namespace SharedTools {
 
 class QtSingleCoreApplication : QCoreApplication {
 
-public:
-    QtSingleCoreApplication (int &argc, char **argv);
-    QtSingleCoreApplication (string &id, int &argc, char **argv);
+    public QtSingleCoreApplication (int &argc, char **argv);
+    public QtSingleCoreApplication (string &id, int &argc, char **argv);
 
-    bool isRunning ();
-    string id ();
-    void setBlock (bool value);
+    public bool isRunning ();
+    public string id ();
+    public void setBlock (bool value);
 
 public slots:
     bool sendMessage (string &message, int timeout = 5000);

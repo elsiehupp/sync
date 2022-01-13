@@ -86,7 +86,7 @@ namespace Utility {
     /***********************************************************
     Return the amount of free space available.
     
-     * \a path must point to a directory
+    \a path must point to a directory
     ***********************************************************/
     OCSYNC_EXPORT int64 freeDiskSpace (string &path);
 
@@ -96,7 +96,7 @@ namespace Utility {
     @param value the value to 
     @param prec the precision.
     @param unit an optional unit that is appended if present.
-     * @return the formatted string.
+    @return the formatted string.
     ***********************************************************/
     OCSYNC_EXPORT string compactFormatDouble (double value, int prec, string &unit = string ());
 
@@ -115,8 +115,8 @@ namespace Utility {
     durationToDescriptiveString1 describ
     unit, like "5 minutes" or "2 days".
     
-     * durationToDescriptiveString2 uses two units where possible, so
-     * "5 minutes 43 seconds" or "1 month 3 days".
+    durationToDescriptiveString2 uses two units where possible, so
+    "5 minutes 43 seconds" or "1 month 3 days".
     ***********************************************************/
     OCSYNC_EXPORT string durationToDescriptiveString1 (uint64 msecs);
     OCSYNC_EXPORT string durationToDescriptiveString2 (uint64 msecs);
@@ -127,8 +127,8 @@ namespace Utility {
     Use this to check if the OS has a dark or a light systray.
     
     The value might change during the execution of the program
-     * (e.g. on OS X 10.10).
-
+    (e.g. on OS X 10.10).
+    
      * @return bool which is true for systems with dark systray.
     ***********************************************************/
     OCSYNC_EXPORT bool hasDarkSystray ();
@@ -172,7 +172,7 @@ namespace Utility {
     Use this to get a string that describes the timespan between the f
     the second timestamp in a human readable and understandable form.
 
-     * If the second parameter is ommitted, the current time is used.
+    If the second parameter is ommitted, the current time is used.
     ***********************************************************/
     OCSYNC_EXPORT string timeAgoInWords (QDateTime &dt, QDateTime &from = QDateTime ());
 
@@ -182,16 +182,16 @@ namespace Utility {
         QDateTime _startTime;
         QElapsedTimer _timer;
 
-    public:
-        void start ();
-        uint64 stop ();
-        uint64 addLapTime (string &lapName);
-        void reset ();
+
+        public void start ();
+        public uint64 stop ();
+        public uint64 addLapTime (string &lapName);
+        public void reset ();
 
         // out helpers, return the measured times.
-        QDateTime startTime ();
-        QDateTime timeOfLap (string &lapName) const;
-        uint64 durationOfLap (string &lapName) const;
+        public QDateTime startTime ();
+        public QDateTime timeOfLap (string &lapName) const;
+        public uint64 durationOfLap (string &lapName) const;
     };
 
     /***********************************************************
@@ -221,7 +221,7 @@ namespace Utility {
     - unix reserved filenames ('.
     - trailing periods and spaces
     - windows reserved filenames ('CON' etc)
-     * will pass unchanged.
+    will pass unchanged.
     ***********************************************************/
     OCSYNC_EXPORT string sanitizeForFileName (string &name);
 
@@ -243,7 +243,7 @@ namespace Utility {
     Will return an empty string if it's not a conflict file.
     
     Prefer to use the data from the conflicts table in the journal to determine
-     * a conflict's base file, see SyncJournal.conflictFileBaseName ()
+    a conflict's base file, see SyncJournal.conflictFileBaseName ()
     ***********************************************************/
     OCSYNC_EXPORT QByteArray conflictFileBaseNameFromPattern (QByteArray &conflictName);
 

@@ -9,6 +9,23 @@ const int USERMODEL_H
 // #include <QHash>
 
 // #include <chrono>
+// #include <pushnotifications.h>
+
+// #include <QDesktopServices>
+// #include <QIcon>
+// #include <QMessageBox>
+// #include <QSvgRenderer>
+// #include <QPainter>
+// #include <QPushButton>
+
+// time span in milliseconds which has to be between two
+// refreshes of the notifications
+const int NOTIFICATION_REQUEST_FREE_PERIOD 15000
+
+namespace {
+constexpr int64 expiredActivitiesCheckIntervalMsecs = 1000 * 60;
+constexpr int64 activityDefaultExpirationTimeMsecs = 1000 * 60 * 10;
+}
 
 namespace Occ {
 
@@ -226,42 +243,6 @@ private:
 
     AccountAppList _apps;
 };
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// #include <pushnotifications.h>
-
-// #include <QDesktopServices>
-// #include <QIcon>
-// #include <QMessageBox>
-// #include <QSvgRenderer>
-// #include <QPainter>
-// #include <QPushButton>
-
-// time span in milliseconds which has to be between two
-// refreshes of the notifications
-const int NOTIFICATION_REQUEST_FREE_PERIOD 15000
-
-namespace {
-constexpr int64 expiredActivitiesCheckIntervalMsecs = 1000 * 60;
-constexpr int64 activityDefaultExpirationTimeMsecs = 1000 * 60 * 10;
-}
-
-namespace Occ {
 
 User.User (AccountStatePtr &account, bool &isCurrent, GLib.Object *parent)
     : GLib.Object (parent)

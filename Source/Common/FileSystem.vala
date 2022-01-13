@@ -46,7 +46,7 @@ namespace FileSystem {
     @brief Marks the file as read-only.
     
     On linux this either revokes all 'w' permissions or restores permissions
-     * according to the umask.
+    according to the umask.
     ***********************************************************/
     void OCSYNC_EXPORT setFileReadOnly (string &filename, bool readonly);
 
@@ -56,8 +56,8 @@ namespace FileSystem {
     It's like setFileReadOnly (), but weaker : if readonly is false and t
     already has write permissions, no change to the permissions is made.
     
-     * This means that it will preserve explicitly set rw-r--r-- permissions even
-     * when the umask is 0002. (setFileReadOnly () would adjust to rw-rw-r--)
+    This means that it will preserve explicitly set rw-r--r-- permissions even
+    when the umask is 0002. (setFileReadOnly () would adjust to rw-rw-r--)
     ***********************************************************/
     void OCSYNC_EXPORT setFileReadOnlyWeak (string &filename, bool readonly);
 
@@ -75,14 +75,14 @@ namespace FileSystem {
     @brief Checks whether a file exists.
     
     Use this over QFileInfo.exists () and QFile.exists () to avoid bugs with lnk
-     * files, see above.
+    files, see above.
     ***********************************************************/
     bool OCSYNC_EXPORT fileExists (string &filename, QFileInfo & = QFileInfo ());
 
     /***********************************************************
     @brief Rename the file \a originFileName to \a destinationFileName.
     
-     * It behaves as QFile.rename () but handles .lnk files correctly on Windows.
+    It behaves as QFile.rename () but handles .lnk files correctly on Windows.
     ***********************************************************/
     bool OCSYNC_EXPORT rename (string &originFileName,
         const string &destinationFileName,
@@ -100,7 +100,7 @@ namespace FileSystem {
     Removes a file.
     
     Equivalent to QFile.remove (), except on Windows, where it will also
-     * successfully remove read-only files.
+    successfully remove read-only files.
     ***********************************************************/
     bool OCSYNC_EXPORT remove (string &fileName, string *errorString = nullptr);
 
@@ -114,7 +114,7 @@ namespace FileSystem {
     This version sets a more permissive sharing mode on Windows.
     
     Warning : The resulting file may have an empty fileName and be unsuitable for use
-     * with QFileInfo! Calling seek () on the QFile with >32bit signed values will fail!
+    with QFileInfo! Calling seek () on the QFile with >32bit signed values will fail!
     ***********************************************************/
     bool OCSYNC_EXPORT openAndSeekFileSharedRead (QFile *file, string *error, int64 seek);
 

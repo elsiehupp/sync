@@ -17,9 +17,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <owncloudlib.h>
 
 
-Q_DECLARE_METATYPE (Occ.SyncFileItem)
-Q_DECLARE_METATYPE (Occ.SyncFileItemPtr)
-
 
 namespace Occ {
 

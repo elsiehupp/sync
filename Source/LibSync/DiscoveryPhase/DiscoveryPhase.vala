@@ -177,7 +177,7 @@ class DiscoveryPhase : GLib.Object {
     that the folder wasn't just renamed. This avoids running the
     discovery on contents in the old location of renamed folders.
     
-     * See findAndCancelDeletedJob ().
+    See findAndCancelDeletedJob ().
     ***********************************************************/
     QMap<string, ProcessDirectoryJob> _queuedDeletedDirectories;
 
@@ -236,7 +236,7 @@ class DiscoveryPhase : GLib.Object {
     Used when having detected a rename : The rename source 
     discovered before and would have looked like a delete.
 
-     * See _deletedItem and _queuedDeletedDirectories.
+    See _deletedItem and _queuedDeletedDirectories.
     ***********************************************************/
     QPair<bool, QByteArray> findAndCancelDeletedJob (string &originalPath);
 

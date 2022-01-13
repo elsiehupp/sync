@@ -88,19 +88,7 @@ bool operator< (Activity &rhs, Activity &lhs);
 A QList based list of Activities
 ***********************************************************/
 using ActivityList = QList<Activity>;
-}
 
-Q_DECLARE_METATYPE (Occ.Activity.Type)
-Q_DECLARE_METATYPE (Occ.ActivityLink)
-
-
-
-
-
-
-
-
-namespace Occ {
 
     bool operator< (Activity &rhs, Activity &lhs) {
         return rhs._dateTime > lhs._dateTime;

@@ -5,8 +5,21 @@ const int WEBFLOWCREDENTIALS_H
 // #include <QSslKey>
 // #include <QNetworkRequest>
 // #include <QQueue>
+// #include <QAuthenticator>
+// #include <QNetworkAccessManager>
+// #include <QNetworkReply>
+// #include <QPointer>
+// #include <QTimer>
+// #include <Gtk.Dialog>
+// #include <QVBoxLayout>
+// #include <QLabel>
 
 class QAuthenticator;
+
+#ifdef WITH_WEBENGINE
+#endif // WITH_WEBENGINE
+
+using namespace QKeychain;
 
 namespace QKeychain {
     class Job;
@@ -75,7 +88,7 @@ private:
     Windows : Workaround for CredWriteW used by QtKeychain
     
              Saving all client CA's within one credential may result in:
-     *          Error : "Credential size exceeds maximum size of 2560"
+             Error : "Credential size exceeds maximum size of 2560"
     ***********************************************************/
     void readSingleClientCaCertPEM ();
     void writeSingleClientCaCertPEM ();
@@ -84,7 +97,7 @@ private:
     Since we're limited by Windows limits, we just create our own
     limit to avoid evil things happening by endless recursion
     
-     * Better than storing the count and relying on maybe-hacked values
+    Better than storing the count and relying on maybe-hacked values
     ***********************************************************/
     static constexpr int _clientSslCaCertificatesMaxCount = 10;
     QQueue<QSslCertificate> _clientSslCaCertificatesWriteQueue;
@@ -119,33 +132,7 @@ protected:
     WebFlowCredentialsDialog *_askDialog = nullptr;
 };
 
-} // namespace Occ
 
-
-
-
-
-
-
-
-
-
-
-// #include <QAuthenticator>
-// #include <QNetworkAccessManager>
-// #include <QNetworkReply>
-// #include <QPointer>
-// #include <QTimer>
-// #include <Gtk.Dialog>
-// #include <QVBoxLayout>
-// #include <QLabel>
-
-#ifdef WITH_WEBENGINE
-#endif // WITH_WEBENGINE
-
-using namespace QKeychain;
-
-namespace Occ {
 
 
 namespace {

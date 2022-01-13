@@ -22,21 +22,6 @@ public:
     virtual AbstractCredentials *getCredentials () const = 0;
 };
 
-} // namespace Occ
-
-
-
-
-
-
-
-
-
-
-
-
-namespace Occ {
-
     void AbstractCredentialsWizardPage.cleanupPage () {
         // Reset the credentials when the 'Back' button is used.
     
@@ -48,5 +33,5 @@ namespace Occ {
             }
         }
     }
-    }
+}
     

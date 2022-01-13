@@ -1,6 +1,10 @@
-#pragma once
+//  #pragma once
 
 // #include <Gtk.Widget>
+// #include <QFile>
+// #include <QInputDialog>
+// #include <QLineEdit>
+// #include <QMessageBox>
 
 
 namespace Occ {
@@ -32,21 +36,7 @@ private:
     string readOnlyTooltip;
     Ui.IgnoreListTableWidget *ui;
 };
-} // namespace Occ
 
-
-
-
-
-
-
-
-// #include <QFile>
-// #include <QInputDialog>
-// #include <QLineEdit>
-// #include <QMessageBox>
-
-namespace Occ {
 
     static constexpr int patternCol = 0;
     static constexpr int deletableCol = 1;

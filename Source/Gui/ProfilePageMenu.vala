@@ -23,15 +23,7 @@ private:
     OcsProfileConnector _profileConnector;
     QMenu _menu;
 };
-}
 
-
-
-
-
-
-
-namespace Occ {
 
     ProfilePageMenu.ProfilePageMenu (AccountPtr account, string &shareWithUserId, Gtk.Widget *parent)
         : Gtk.Widget (parent)

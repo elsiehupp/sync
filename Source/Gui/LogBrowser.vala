@@ -49,19 +49,7 @@ protected slots:
     void togglePermanentLogging (bool enabled);
 };
 
-} // namespace
 
-
-
-
-
-
-
-
-namespace Occ {
-
-    // ==============================================================================
-    
     LogBrowser.LogBrowser (Gtk.Widget *parent)
         : Gtk.Dialog (parent) {
         setWindowFlags (windowFlags () & ~Qt.WindowContextHelpButtonHint);

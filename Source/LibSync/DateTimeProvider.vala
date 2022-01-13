@@ -12,15 +12,7 @@ public:
 
     virtual QDate currentDate ();
 };
-}
 
-
-
-
-
-
-
-namespace Occ {
 
     DateTimeProvider.~DateTimeProvider () = default;
     
@@ -32,5 +24,4 @@ namespace Occ {
         return QDate.currentDate ();
     }
     
-    }
-    
+}

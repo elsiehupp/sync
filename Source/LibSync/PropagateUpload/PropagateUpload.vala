@@ -210,7 +210,7 @@ protected:
     being uploaded.
     
     This is needed if we wanna apply changes on the file
-     * that's being uploaded while keeping the original on disk.
+    that's being uploaded while keeping the original on disk.
     ***********************************************************/
     struct UploadFileInfo {
       string _file; /// I'm still unsure if I should use a SyncFilePtr here.
@@ -227,7 +227,7 @@ public:
     Whether an existing entity with the same name may be deleted before
     the upload.
     
-     * Default : false.
+    Default : false.
     ***********************************************************/
     void setDeleteExisting (bool enabled);
 
@@ -293,7 +293,7 @@ protected:
     detect real disconnects in a timely manner. Shall go away when the s
     response starts coming quicker, or there is some sort of async api.
 
-     * See #6527, enterprise#2480
+    See #6527, enterprise#2480
     ***********************************************************/
     static void adjustLastJobTimeout (AbstractNetworkJob *job, int64 fileSize);
 

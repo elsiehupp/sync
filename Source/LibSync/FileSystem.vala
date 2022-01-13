@@ -42,7 +42,7 @@ namespace FileSystem {
     @brief Get the mtime for a filepath
     
     Use this over QFileInfo.lastModified () to avoid timezone related bugs. See
-     * owncloud/core#9781 for details.
+    owncloud/core#9781 for details.
     ***********************************************************/
     time_t getModTime (string &filename);
 
@@ -52,7 +52,7 @@ namespace FileSystem {
     @brief Get the size for a file
     
     Use this over QFileInfo.size () to avoid bugs with lnk files on Windows.
-     * See https://bugreports.qt.io/browse/QTBUG-24831.
+    See https://bugreports.qt.io/browse/QTBUG-24831.
     ***********************************************************/
     int64 getSize (string &filename);
 
@@ -66,7 +66,7 @@ namespace FileSystem {
     
     Nonexisting files are covered through mtime : they have an mtime of -1.
 
-     * @return true if the file's mtime or size are not what is expected.
+    @return true if the file's mtime or size are not what is expected.
     ***********************************************************/
     bool fileChanged (string &fileName,
         int64 previousSize,
@@ -84,26 +84,14 @@ namespace FileSystem {
     
     Returns true if all removes succeeded.
     onDeleted () is called for each deleted file or directory, including the root.
-     * errors are collected in errors.
+    errors are collected in errors.
     ***********************************************************/
     bool removeRecursively (string &path,
         const std.function<void (string &path, bool isDir)> &onDeleted = nullptr,
         QStringList *errors = nullptr);
 }
 
-/***********************************************************
-@} */
-}
 
-
-
-
-
-
-
-
-
-namespace Occ {
 
     bool FileSystem.fileEquals (string &fn1, string &fn2) {
         // compare two files with given filename and return true if they have the same content

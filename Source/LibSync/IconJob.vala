@@ -27,23 +27,6 @@ signals:
 private slots:
     void finished ();
 };
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-namespace Occ {
 
     IconJob.IconJob (AccountPtr account, QUrl &url, GLib.Object *parent)
         : GLib.Object (parent) {

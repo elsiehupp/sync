@@ -38,16 +38,7 @@ private:
     OwncloudWizard *_ocWizard;
     WizardCommon.Pages _nextPage = WizardCommon.Page_ServerSetup;
 };
-}
 
-
-
-
-
-
-
-
-namespace Occ {
 
     WelcomePage.WelcomePage (OwncloudWizard *ocWizard)
         : QWizardPage ()

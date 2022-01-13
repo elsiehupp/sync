@@ -95,7 +95,7 @@ public:
     Set the permissions of a share
     
     On success the permissionsSet signal is emitted
-     * In case of a server error the serverError signal is emitted.
+    In case of a server error the serverError signal is emitted.
     ***********************************************************/
     void setPermissions (Permissions permissions);
 
@@ -103,7 +103,7 @@ public:
     Set the password for remote share
     
     On success the passwordSet signal is emitted
-     * In case of a server error the passwordSetError signal is emitted.
+    In case of a server error the passwordSetError signal is emitted.
     ***********************************************************/
     void setPassword (string &password);
 
@@ -113,7 +113,7 @@ public:
     Deletes a share
     
     On success the shareDeleted signal is emitted
-     * In case of a server error the serverError signal is emitted.
+    In case of a server error the serverError signal is emitted.
     ***********************************************************/
     void deleteShare ();
 
@@ -209,7 +209,7 @@ public:
     /***********************************************************
     Set the name of the link share.
     
-     * Emits either nameSet () or serverError ().
+    Emits either nameSet () or serverError ().
     ***********************************************************/
     void setName (string &name);
 
@@ -232,7 +232,7 @@ public:
     Set the expiration date
     
     On success the expireDateSet signal is emitted
-     * In case of a server error the serverError signal is emitted.
+    In case of a server error the serverError signal is emitted.
     ***********************************************************/
     void setExpireDate (QDate &expireDate);
 
@@ -321,8 +321,8 @@ public:
     @param password The password of the share, may be
     
     On success the signal linkShareCreated is emitted
-     * For older server the linkShareRequiresPassword signal is emitted when it seems appropiate
-     * In case of a server error the serverError signal is emitted
+    For older server the linkShareRequiresPassword signal is emitted when it seems appropiate
+    In case of a server error the serverError signal is emitted
     ***********************************************************/
     void createLinkShare (string &path,
         const string &name,
@@ -335,8 +335,8 @@ public:
     @param shareType The type of share (TypeU
     @param Permissions The share permissions
     
-     * On success the signal shareCreated is emitted
-     * In case of a server error the serverError signal is emitted
+    On success the signal shareCreated is emitted
+    In case of a server error the serverError signal is emitted
     ***********************************************************/
     void createShare (string &path,
         const Share.ShareType shareType,
@@ -349,8 +349,8 @@ public:
     
     @param path The path to get the shares for rel
     
-     * On success the sharesFetched signal is emitted
-     * In case of a server error the serverError signal is emitted
+    On success the sharesFetched signal is emitted
+    In case of a server error the serverError signal is emitted
     ***********************************************************/
     void fetchShares (string &path);
 
@@ -365,7 +365,7 @@ signals:
 
     @param message the error message reported by the server
     
-     * See createLinkShare ().
+    See createLinkShare ().
     ***********************************************************/
     void linkShareRequiresPassword (string &message);
 
@@ -381,19 +381,7 @@ private:
 
     AccountPtr _account;
 };
-}
 
-
-
-
-
-
-
-
-
-
-
-namespace Occ {
 
 /***********************************************************
 When a share is modified, we need to tell the folders so they can adjust overlay icons

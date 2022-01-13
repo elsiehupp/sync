@@ -49,20 +49,6 @@ protected slots:
     void slotCopyLinkToClipboard ();
 };
 
-} // namespace Occ
-
-
-
-
-
-
-
-
-
-
-
-namespace Occ {
-
     OwncloudOAuthCredsPage.OwncloudOAuthCredsPage ()
         : AbstractCredentialsWizardPage () {
         _ui.setupUi (this);

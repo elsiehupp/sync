@@ -51,7 +51,7 @@ public:
     Creates account objects from a given settings file.
     
     Returns false if there was an error reading the settings,
-     * but note that settings not existing is not an error.
+    but note that settings not existing is not an error.
     ***********************************************************/
     bool restore ();
 

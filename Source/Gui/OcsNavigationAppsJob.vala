@@ -28,22 +28,13 @@ signals:
     Result of the OCS request
     
     @param reply The reply
-     * @param statusCode the status code of the response
+    @param statusCode the status code of the response
     ***********************************************************/
     void appsJobFinished (QJsonDocument &reply, int statusCode);
 
 private slots:
     void jobDone (QJsonDocument &reply, int statusCode);
 };
-}
-
-
-
-
-
-
-
-namespace Occ {
 
     OcsNavigationAppsJob.OcsNavigationAppsJob (AccountPtr account)
         : OcsJob (account) {

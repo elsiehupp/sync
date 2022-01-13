@@ -89,8 +89,8 @@ public:
     it to validate that data was tr
     
     Path : checksums/supportedTypes
-     * Default : []
-     * Possible entries : "Adler32", "MD5", "SHA1"
+    Default : []
+    Possible entries : "Adler32", "MD5", "SHA1"
     ***********************************************************/
     QList<QByteArray> supportedChecksumTypes ();
 
@@ -100,7 +100,7 @@ public:
     
     Path : checksums/preferredUploadType
     Default : empty, meaning "no preference"
-     * Possible values : empty or any of the supportedTypes
+    Possible values : empty or any of the supportedTypes
     ***********************************************************/
     QByteArray preferredUploadChecksumType ();
 
@@ -124,9 +124,9 @@ public:
     checksum err
     unusual error codes such as 503.
 
-     * Path : dav/httpErrorCodesThatResetFailingChunkedUploads
-     * Default : []
-     * Example : [503, 500]
+    Path : dav/httpErrorCodesThatResetFailingChunkedUploads
+    Default : []
+    Example : [503, 500]
     ***********************************************************/
     QList<int> httpErrorCodesThatResetFailingChunkedUploads ();
 
@@ -137,7 +137,7 @@ public:
     For servers >= that version, it defaults to the empty rege
     will indicate invalid characters through an upload error)
 
-     * Note that it just needs to be contained. The regex [ab] is contained in "car".
+    Note that it just needs to be contained. The regex [ab] is contained in "car".
     ***********************************************************/
     string invalidFilenameRegex ();
 

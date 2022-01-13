@@ -31,18 +31,6 @@ private:
     Ui.LegalNotice *_ui;
 };
 
-} // namespace Occ
-
-
-
-
-
-
-
-
-
-namespace Occ {
-
     LegalNotice.LegalNotice (Gtk.Dialog *parent)
         : Gtk.Dialog (parent)
         , _ui (new Ui.LegalNotice) {

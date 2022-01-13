@@ -17,11 +17,9 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 // #include <QSharedPointer>
 // #include <QVector>
 
-Q_DECLARE_METATYPE (QSharedPointer<Occ.Sharee>)
-
 namespace Occ {
 
-Q_DECLARE_LOGGING_CATEGORY (lcSharing)
+
 
 class Sharee {
 public:

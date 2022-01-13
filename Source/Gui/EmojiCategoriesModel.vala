@@ -118,20 +118,6 @@ private:
     EmojiCategoriesModel _emojiCategoriesModel;
 };
 
-}
-
-Q_DECLARE_METATYPE (Occ.Emoji)
-
-
-
-
-
-
-
-
-
-
-namespace Occ {
 
     QVariant EmojiCategoriesModel.data (QModelIndex &index, int role) {
         if (!index.isValid ()) {

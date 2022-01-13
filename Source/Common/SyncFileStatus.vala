@@ -10,15 +10,13 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 namespace Occ {
 
-Q_DECLARE_METATYPE (Occ.SyncFileStatus)
-
 /***********************************************************
 @brief The SyncFileStatus class
 @ingroup libsync
 ***********************************************************/
 class SyncFileStatus {
-public:
-    enum SyncFileStatusTag {
+
+    public enum SyncFileStatusTag {
         StatusNone,
         StatusSync,
         StatusWarning,
@@ -27,16 +25,16 @@ public:
         StatusExcluded,
     };
 
-    SyncFileStatus ();
-    SyncFileStatus (SyncFileStatusTag);
+    public SyncFileStatus ();
+    public SyncFileStatus (SyncFileStatusTag);
 
-    void set (SyncFileStatusTag tag);
-    SyncFileStatusTag tag ();
+    public void set (SyncFileStatusTag tag);
+    public SyncFileStatusTag tag ();
 
-    void setShared (bool isShared);
-    bool shared ();
+    public void setShared (bool isShared);
+    public bool shared ();
 
-    string toSocketAPIString ();
+    public string toSocketAPIString ();
 
 private:
     SyncFileStatusTag _tag = StatusNone;

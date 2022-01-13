@@ -31,11 +31,7 @@ private:
     QLineEdit *_password;
 };
 
-} // namespace Occ
 
-
-
-namespace Occ {
 
     AuthenticationDialog.AuthenticationDialog (string &realm, string &domain, Gtk.Widget *parent)
         : Gtk.Dialog (parent)

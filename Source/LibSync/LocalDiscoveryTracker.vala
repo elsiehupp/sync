@@ -80,7 +80,7 @@ private:
     The paths that should be checked by the next local discovery.
     
     Mostly a collection of files the filewatchers have reported as touched.
-     * Also includes files that have had errors in the last sync run.
+    Also includes files that have had errors in the last sync run.
     ***********************************************************/
     std.set<string> _localDiscoveryPaths;
 
@@ -88,7 +88,7 @@ private:
     The paths that the current sync run used for local discovery.
     
     For failing syncs, this list will be merged into _localDiscoveryPaths
-     * again when the sync is done to make sure everything is retried.
+    again when the sync is done to make sure everything is retried.
     ***********************************************************/
     std.set<string> _previousLocalDiscoveryPaths;
 };

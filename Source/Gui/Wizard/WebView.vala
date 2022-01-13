@@ -136,7 +136,7 @@ WebView.~WebView () {
     _page [1]. Here I delete _page manually so that _profile can be safely
     deleted later.
     
-     * [1] https://doc.qt.io/qt-5/qwebenginepage.html#QWebEnginePage-1
+    [1] https://doc.qt.io/qt-5/qwebenginepage.html#QWebEnginePage-1
     ***********************************************************/
     delete _page;
 }
@@ -212,7 +212,7 @@ bool WebEnginePage.certificateError (QWebEngineCertificateError &certificateErro
     The certificate should be displayed.
     
     Or rather we should do a request with the QNAM and see if it works (then it is in the store).
-     * This is just a quick fix for now.
+    This is just a quick fix for now.
     ***********************************************************/
     QMessageBox messageBox;
     messageBox.setText (tr ("Invalid certificate detected"));

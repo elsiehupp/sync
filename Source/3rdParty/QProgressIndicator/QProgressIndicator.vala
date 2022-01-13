@@ -36,14 +36,14 @@ class QProgressIndicator : Gtk.Widget {
     Q_PROPERTY (int delay READ animationDelay WRITE setAnimationDelay)
     Q_PROPERTY (bool displayedWhenStopped READ isDisplayedWhenStopped WRITE setDisplayedWhenStopped)
     Q_PROPERTY (QColor color READ color WRITE setColor)
-public:
-    QProgressIndicator (Gtk.Widget* parent = nullptr);
+
+    public QProgressIndicator (Gtk.Widget* parent = nullptr);
 
     /*********************************************************** Returns the delay between animation steps.
         \return The number of milliseconds between animation steps. By default, the animation delay is set to 40 milliseconds.
         \sa setAnimationDelay
     ***********************************************************/
-    int animationDelay () {
+    public int animationDelay () {
         return m_delay;
     }
 
@@ -51,23 +51,23 @@ public:
         \return Animation state.
         \sa startAnimation stopAnimation
     ***********************************************************/
-    bool isAnimated ();
+    public bool isAnimated ();
 
     /*********************************************************** Returns a Boolean value indicating whether the receiver shows itself even when it is not animating.
         \return Return true if the progress indicator shows itself even when it is not animating. By default, it returns false.
         \sa setDisplayedWhenStopped
     ***********************************************************/
-    bool isDisplayedWhenStopped ();
+    public bool isDisplayedWhenStopped ();
 
     /*********************************************************** Returns the color of the component.
         \sa setColor
       */
-    const QColor & color () {
+      public const QColor & color () {
         return m_color;
     }
 
-    QSize sizeHint () const override;
-    int heightForWidth (int w) const override;
+    public QSize sizeHint () const override;
+    public int heightForWidth (int w) const override;
 public slots:
     /*********************************************************** Starts the spin animation.
         \sa stopAnimation isAnimated

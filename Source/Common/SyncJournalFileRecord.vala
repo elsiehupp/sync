@@ -15,8 +15,8 @@ namespace Occ {
 @ingroup libsync
 ***********************************************************/
 class SyncJournalFileRecord {
-public:
-    bool isValid () {
+
+    public bool isValid () {
         return !_path.isEmpty ();
     }
 
@@ -25,29 +25,29 @@ public:
 
     On the server this is sometimes known as the internal file id.
     
-     * It is used in the construction of private links.
+    It is used in the construction of private links.
     ***********************************************************/
-    QByteArray numericFileId ();
-    QDateTime modDateTime () { return Utility.qDateTimeFromTime_t (_modtime); }
+    public QByteArray numericFileId ();
+    public QDateTime modDateTime () { return Utility.qDateTimeFromTime_t (_modtime); }
 
-    bool isDirectory () { return _type == ItemTypeDirectory; }
-    bool isFile () { return _type == ItemTypeFile || _type == ItemTypeVirtualFileDehydration; }
-    bool isVirtualFile () { return _type == ItemTypeVirtualFile || _type == ItemTypeVirtualFileDownload; }
-    string path () { return string.fromUtf8 (_path); }
-    string e2eMangledName () { return string.fromUtf8 (_e2eMangledName); }
+    public bool isDirectory () { return _type == ItemTypeDirectory; }
+    public bool isFile () { return _type == ItemTypeFile || _type == ItemTypeVirtualFileDehydration; }
+    public bool isVirtualFile () { return _type == ItemTypeVirtualFile || _type == ItemTypeVirtualFileDownload; }
+    public string path () { return string.fromUtf8 (_path); }
+    public string e2eMangledName () { return string.fromUtf8 (_e2eMangledName); }
 
-    QByteArray _path;
-    uint64 _inode = 0;
-    int64 _modtime = 0;
-    ItemType _type = ItemTypeSkip;
-    QByteArray _etag;
-    QByteArray _fileId;
-    int64 _fileSize = 0;
-    RemotePermissions _remotePerm;
-    bool _serverHasIgnoredFiles = false;
-    QByteArray _checksumHeader;
-    QByteArray _e2eMangledName;
-    bool _isE2eEncrypted = false;
+    public QByteArray _path;
+    public uint64 _inode = 0;
+    public int64 _modtime = 0;
+    public ItemType _type = ItemTypeSkip;
+    public QByteArray _etag;
+    public QByteArray _fileId;
+    public int64 _fileSize = 0;
+    public RemotePermissions _remotePerm;
+    public bool _serverHasIgnoredFiles = false;
+    public QByteArray _checksumHeader;
+    public QByteArray _e2eMangledName;
+    public bool _isE2eEncrypted = false;
 };
 
 bool OCSYNC_EXPORT
@@ -55,8 +55,8 @@ operator== (SyncJournalFileRecord &lhs,
     const SyncJournalFileRecord &rhs);
 
 class SyncJournalErrorBlacklistRecord {
-public:
-    enum Category {
+
+    public enum Category {
         /// Normal errors have no special behavior
         Normal = 0,
         /// These get a special summary message
@@ -64,29 +64,29 @@ public:
     };
 
     /// The number of times the operation was unsuccessful so far.
-    int _retryCount = 0;
+    public int _retryCount = 0;
 
     /// The last error string.
-    string _errorString;
+    public string _errorString;
     /// The error category. Sometimes used for special actions.
-    Category _errorCategory = Category.Normal;
+    public Category _errorCategory = Category.Normal;
 
-    int64 _lastTryModtime = 0;
-    QByteArray _lastTryEtag;
+    public int64 _lastTryModtime = 0;
+    public QByteArray _lastTryEtag;
 
     /// The last time the operation was attempted (in s since epoch).
-    int64 _lastTryTime = 0;
+    public int64 _lastTryTime = 0;
 
     /// The number of seconds the file shall be ignored.
-    int64 _ignoreDuration = 0;
+    public int64 _ignoreDuration = 0;
 
-    string _file;
-    string _renameTarget;
+    public string _file;
+    public string _renameTarget;
 
     /// The last X-Request-ID of the request that failled
-    QByteArray _requestId;
+    public QByteArray _requestId;
 
-    bool isValid ();
+    public bool isValid ();
 };
 
 /***********************************************************
@@ -98,30 +98,30 @@ So if "a/foo.txt" is the base file, its conflict file could be
 "a/foo (conflicted copy 1234).txt".
 ***********************************************************/
 class ConflictRecord {
-public:
+
     /***********************************************************
     Path to the file with the conflict tag in the name
 
     The path is sync-folder relative.
     ***********************************************************/
-    QByteArray path;
+    public QByteArray path;
 
     /// File id of the base file
-    QByteArray baseFileId;
+    public QByteArray baseFileId;
 
     /***********************************************************
     Modtime of the base file
 
     may not be available and be -1
     ***********************************************************/
-    int64 baseModtime = -1;
+    public int64 baseModtime = -1;
 
     /***********************************************************
     Etag of the base file
 
     may not be available and empty
     ***********************************************************/
-    QByteArray baseEtag;
+    public QByteArray baseEtag;
 
     /***********************************************************
     The path of the original file at the time the conflict was created
@@ -129,11 +129,11 @@ public:
     Note that in nearly all cases one should query 
     thus retrieve the *current* base path instead!
 
-     * maybe be empty if not available
+    maybe be empty if not available
     ***********************************************************/
-    QByteArray initialBasePath;
+    public QByteArray initialBasePath;
 
-    bool isValid () { return !path.isEmpty (); }
+    public bool isValid () { return !path.isEmpty (); }
 };
 
 

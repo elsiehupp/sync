@@ -116,26 +116,7 @@ signals:
     void messageCleared ();
     void error (Error error);
 };
-}
 
-Q_DECLARE_METATYPE (Occ.UserStatusConnector *)
-Q_DECLARE_METATYPE (Occ.UserStatus)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-namespace Occ {
 
     UserStatus.UserStatus () = default;
     

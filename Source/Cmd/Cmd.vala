@@ -36,8 +36,8 @@ using namespace Occ;
 @ingroup cmd
 ***********************************************************/
 class Cmd : GLib.Object {
-public:
-    Cmd () : GLib.Object () {
+
+    public Cmd () : GLib.Object () {
     }
 public slots:
     void transmissionProgressSlot () {
@@ -73,15 +73,15 @@ struct CmdOptions {
 CmdOptions *opts = nullptr;
 
 class EchoDisabler {
-public:
-    EchoDisabler () {
+
+    public EchoDisabler () {
         tcgetattr (STDIN_FILENO, &tios);
         termios tios_new = tios;
         tios_new.c_lflag &= ~ECHO;
         tcsetattr (STDIN_FILENO, TCSANOW, &tios_new);
     }
 
-    ~EchoDisabler () {
+    public ~EchoDisabler () {
         tcsetattr (STDIN_FILENO, TCSANOW, &tios);
     }
 
@@ -99,25 +99,25 @@ string queryPassword (string &user) {
 
 #ifndef TOKEN_AUTH_ONLY
 class HttpCredentialsText : HttpCredentials {
-public:
-    HttpCredentialsText (string &user, string &password)
+
+    public HttpCredentialsText (string &user, string &password)
         : HttpCredentials (user, password)
         , // FIXME : not working with client certs yet (qknight)
         _sslTrusted (false) {
     }
 
-    void askFromUser () override {
+    public void askFromUser () override {
         _password = .queryPassword (user ());
         _ready = true;
         persist ();
         emit asked ();
     }
 
-    void setSSLTrusted (bool isTrusted) {
+    public void setSSLTrusted (bool isTrusted) {
         _sslTrusted = isTrusted;
     }
 
-    bool sslIsTrusted () override {
+    public bool sslIsTrusted () override {
         return _sslTrusted;
     }
 

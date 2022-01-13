@@ -22,30 +22,20 @@ public:
     /***********************************************************
     Get a list of sharees
     
-     * @param path Path to request shares for (default all shares)
+    @param path Path to request shares for (default all shares)
     ***********************************************************/
     void getSharees (string &search, string &itemType, int page = 1, int perPage = 50, bool lookup = false);
 signals:
     /***********************************************************
     Result of the OCS request
     
-     * @param reply The reply
+    @param reply The reply
     ***********************************************************/
     void shareeJobFinished (QJsonDocument &reply);
 
 private slots:
     void jobDone (QJsonDocument &reply);
 };
-}
-
-
-
-
-
-
-
-
-namespace Occ {
 
     OcsShareeJob.OcsShareeJob (AccountPtr account)
         : OcsJob (account) {

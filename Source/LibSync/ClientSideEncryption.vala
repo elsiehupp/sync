@@ -1,5 +1,42 @@
-#ifndef CLIENTSIDEENCRYPTION_H
-const int CLIENTSIDEENCRYPTION_H
+
+// #include <openssl/rsa.h>
+// #include <openssl/evp.h>
+// #include <openssl/pem.h>
+// #include <openssl/err.h>
+// #include <openssl/engine.h>
+// #include <openssl/rand.h>
+
+// #include <map>
+// #include <string>
+// #include <algorithm>
+
+// #include <cstdio>
+
+// #include <QDebug>
+// #include <QLoggingCategory>
+// #include <QFileInfo>
+// #include <QDir>
+// #include <QJsonObject>
+// #include <QXmlStreamReader>
+// #include <QXmlStreamNamespaceDeclaration>
+// #include <QStack>
+// #include <QInputDialog>
+// #include <QLineEdit>
+// #include <QIODevice>
+// #include <QUuid>
+// #include <QScopeGuard>
+// #include <QRandomGenerator>
+
+// #include <qt5keychain/keychain.h>
+// #include <common/utility.h>
+// #include <common/constants.h>
+
+QDebug operator<< (QDebug out, std.string& str) {
+    out << string.fromStdString (str);
+    return out;
+}
+
+using namespace QKeychain;
 
 // #include <string>
 // #include <GLib.Object>
@@ -196,58 +233,7 @@ private:
     QVector<QPair<string, string>> _sharing;
 };
 
-} // namespace Occ
-#endif
 
-
-
-
-
-
-
-
-
-
-// #include <openssl/rsa.h>
-// #include <openssl/evp.h>
-// #include <openssl/pem.h>
-// #include <openssl/err.h>
-// #include <openssl/engine.h>
-// #include <openssl/rand.h>
-
-// #include <map>
-// #include <string>
-// #include <algorithm>
-
-// #include <cstdio>
-
-// #include <QDebug>
-// #include <QLoggingCategory>
-// #include <QFileInfo>
-// #include <QDir>
-// #include <QJsonObject>
-// #include <QXmlStreamReader>
-// #include <QXmlStreamNamespaceDeclaration>
-// #include <QStack>
-// #include <QInputDialog>
-// #include <QLineEdit>
-// #include <QIODevice>
-// #include <QUuid>
-// #include <QScopeGuard>
-// #include <QRandomGenerator>
-
-// #include <qt5keychain/keychain.h>
-// #include <common/utility.h>
-// #include <common/constants.h>
-
-QDebug operator<< (QDebug out, std.string& str) {
-    out << string.fromStdString (str);
-    return out;
-}
-
-using namespace QKeychain;
-
-namespace Occ {
 
 
 string e2eeBaseUrl () {

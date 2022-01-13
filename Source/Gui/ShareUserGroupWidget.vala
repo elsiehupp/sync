@@ -38,6 +38,10 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 // #include <qpushbutton.h>
 // #include <qscrollarea.h>
 
+namespace {
+    const char *passwordIsSetPlaceholder = "●●●●●●●●";
+    
+}
 
 namespace Occ {
 
@@ -224,23 +228,7 @@ private:
   QAction *_expirationDateLinkAction;
   QAction *_passwordProtectLinkAction;
 };
-}
 
-
-
-
-
-
-
-
-
-
-namespace {
-    const char *passwordIsSetPlaceholder = "●●●●●●●●";
-    
-    }
-    
-    namespace Occ {
     
     AvatarEventFilter.AvatarEventFilter (GLib.Object *parent)
         : GLib.Object (parent) {

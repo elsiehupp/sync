@@ -38,21 +38,7 @@ private:
     Ui.AddCertificateDialog *ui;
 };
 
-} //End namespace Occ
 
-
-
-
-
-
-
-
-
-
-
-
-
-namespace Occ {
     AddCertificateDialog.AddCertificateDialog (Gtk.Widget *parent)
         : Gtk.Dialog (parent)
         , ui (new Ui.AddCertificateDialog) {

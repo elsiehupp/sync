@@ -219,9 +219,6 @@ private:
     
     const string baseUrl ("/ocs/v2.php/apps/user_status/api/v1");
     const string userStatusBaseUrl = baseUrl + QStringLiteral ("/user_status");
-    }
-    
-    namespace Occ {
     
     OcsUserStatusConnector.OcsUserStatusConnector (AccountPtr account, GLib.Object *parent)
         : UserStatusConnector (parent)

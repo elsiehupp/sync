@@ -31,7 +31,7 @@ public:
     /***********************************************************
     Get all the shares
     
-     * @param path Path to request shares for (default all shares)
+    @param path Path to request shares for (default all shares)
     ***********************************************************/
     void getShares (string &path = "");
 
@@ -44,7 +44,7 @@ public:
     Set the expiration date of a share
     
     @param date The expire date, if this date is invalid the expire date
-     * will be removed
+    will be removed
     ***********************************************************/
     void setExpireDate (string &shareId, QDate &date);
 
@@ -52,7 +52,7 @@ public:
     Set note a share
     
     @param note The note to a share, if the note is empty the
-     * share will be removed
+    share will be removed
     ***********************************************************/
     void setNote (string &shareId, string &note);
 
@@ -60,14 +60,14 @@ public:
     Set the password of a share
     
     @param password The password of the share, if the password is empty the
-     * share will be removed
+    share will be removed
     ***********************************************************/
     void setPassword (string &shareId, string &password);
 
     /***********************************************************
     Set the share to be public upload
     
-     * @param publicUpload Set or remove public upload
+    @param publicUpload Set or remove public upload
     ***********************************************************/
     void setPublicUpload (string &shareId, bool publicUpload);
 
@@ -79,7 +79,7 @@ public:
     /***********************************************************
     Set the permissions
     
-     * @param permissions
+    @param permissions
     ***********************************************************/
     void setPermissions (string &shareId,
         const Share.Permissions permissions);
@@ -93,7 +93,7 @@ public:
     Create a new link share
     
     @param path The path of the file/folder to share
-     * @param password Optionally a password for the share
+    @param password Optionally a password for the share
     ***********************************************************/
     void createLinkShare (string &path, string &name,
         const string &password);
@@ -105,7 +105,7 @@ public:
     @param shareType The type of share (user/group/link/fed
     @param shareWith The uid/gid/federated id to share wit
     @param permissions The permissions the share will have
-     * @param password The password to protect the share with
+    @param password The password to protect the share with
     ***********************************************************/
     void createShare (string &path,
         const Share.ShareType shareType,
@@ -126,7 +126,7 @@ signals:
     This is needed so we can update the share objects properly
     
     @param reply The reply
-     * @param value To what did we set a variable (if we set any).
+    @param value To what did we set a variable (if we set any).
     ***********************************************************/
     void shareJobFinished (QJsonDocument reply, QVariant value);
 
@@ -136,19 +136,7 @@ private slots:
 private:
     QVariant _value;
 };
-}
 
-
-
-
-
-
-
-
-
-
-
-namespace Occ {
 
     OcsShareJob.OcsShareJob (AccountPtr account)
         : OcsJob (account) {

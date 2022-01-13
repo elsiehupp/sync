@@ -16,7 +16,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QFileInfo>
 // #include <QDir>
 
-// #include <sqlite3.h>
+// #include <Sqlite3.h>
 
 const int SQLITE_SLEEP_TIME_USEC 100000
 const int SQLITE_REPEAT_COUNT 20
@@ -33,7 +33,7 @@ const int SQLITE_DO (A)
 // #include <GLib.Object>
 // #include <QVariant>
 
-struct sqlite3;
+struct Sqlite3;
 struct sqlite3_stmt;
 
 namespace Occ {
@@ -46,18 +46,18 @@ OCSYNC_EXPORT Q_DECLARE_LOGGING_CATEGORY (lcSql)
 ***********************************************************/
 class SqlDatabase {
     Q_DISABLE_COPY (SqlDatabase)
-public:
-    SqlDatabase ();
-    ~SqlDatabase ();
 
-    bool isOpen ();
-    bool openOrCreateReadWrite (string &filename);
-    bool openReadOnly (string &filename);
-    bool transaction ();
-    bool commit ();
-    void close ();
-    string error ();
-    sqlite3 *sqliteDb ();
+    public SqlDatabase ();
+    public ~SqlDatabase ();
+
+    public bool isOpen ();
+    public bool openOrCreateReadWrite (string &filename);
+    public bool openReadOnly (string &filename);
+    public bool transaction ();
+    public bool commit ();
+    public void close ();
+    public string error ();
+    public Sqlite3 *sqliteDb ();
 
 private:
     enum class CheckDbResult {
@@ -70,7 +70,7 @@ private:
     bool openHelper (string &filename, int sqliteFlags);
     CheckDbResult checkDb ();
 
-    sqlite3 *_db = nullptr;
+    Sqlite3 *_db = nullptr;
     string _error; // last error string
     int _errId = 0;
 
@@ -104,65 +104,65 @@ There is basically 3 ways to initialize and use a query:
 ***********************************************************/
 class SqlQuery {
     Q_DISABLE_COPY (SqlQuery)
-public:
-    SqlQuery () = default;
-    SqlQuery (SqlDatabase &db);
-    SqlQuery (QByteArray &sql, SqlDatabase &db);
+
+    public SqlQuery () = default;
+    public SqlQuery (SqlDatabase &db);
+    public SqlQuery (QByteArray &sql, SqlDatabase &db);
     /***********************************************************
     Prepare the SqlQuery.
     If the query was already prepared, this will first call finish (), and re-prepare it.
     This function must only be used if the constructor was setting a SqlDatabase
     ***********************************************************/
-    int prepare (QByteArray &sql, bool allow_failure = false);
+    public int prepare (QByteArray &sql, bool allow_failure = false);
 
-    ~SqlQuery ();
-    string error ();
-    int errorId ();
+    public ~SqlQuery ();
+    public string error ();
+    public int errorId ();
 
     /// Checks whether the value at the given column index is NULL
-    bool nullValue (int index);
+    public bool nullValue (int index);
 
-    string stringValue (int index);
-    int intValue (int index);
-    uint64 int64Value (int index);
-    QByteArray baValue (int index);
-    bool isSelect ();
-    bool isPragma ();
-    bool exec ();
+    public string stringValue (int index);
+    public int intValue (int index);
+    public uint64 int64Value (int index);
+    public QByteArray baValue (int index);
+    public bool isSelect ();
+    public bool isPragma ();
+    public bool exec ();
 
-    struct NextResult {
+    public struct NextResult {
         bool ok = false;
         bool hasData = false;
     };
-    NextResult next ();
+    public NextResult next ();
 
-    template<class T, typename std.enable_if<std.is_enum<T>.value, int>.type = 0>
-    void bindValue (int pos, T &value) {
+    public template<class T, typename std.enable_if<std.is_enum<T>.value, int>.type = 0>
+    public void bindValue (int pos, T &value) {
         qCDebug (lcSql) << "SQL bind" << pos << value;
         bindValueInternal (pos, static_cast<int> (value));
     }
 
-    template<class T, typename std.enable_if<!std.is_enum<T>.value, int>.type = 0>
-    void bindValue (int pos, T &value) {
+    public template<class T, typename std.enable_if<!std.is_enum<T>.value, int>.type = 0>
+    public void bindValue (int pos, T &value) {
         qCDebug (lcSql) << "SQL bind" << pos << value;
         bindValueInternal (pos, value);
     }
 
-    void bindValue (int pos, QByteArray &value) {
+    public void bindValue (int pos, QByteArray &value) {
         qCDebug (lcSql) << "SQL bind" << pos << string.fromUtf8 (value);
         bindValueInternal (pos, value);
     }
 
-    const QByteArray &lastQuery ();
-    int numRowsAffected ();
-    void reset_and_clear_bindings ();
+    public const QByteArray &lastQuery ();
+    public int numRowsAffected ();
+    public void reset_and_clear_bindings ();
 
 private:
     void bindValueInternal (int pos, QVariant &value);
     void finish ();
 
     SqlDatabase *_sqldb = nullptr;
-    sqlite3 *_db = nullptr;
+    Sqlite3 *_db = nullptr;
     sqlite3_stmt *_stmt = nullptr;
     string _error;
     int _errId;
@@ -335,7 +335,7 @@ bool SqlDatabase.commit () {
     return _errId == SQLITE_OK;
 }
 
-sqlite3 *SqlDatabase.sqliteDb () {
+Sqlite3 *SqlDatabase.sqliteDb () {
     return _db;
 }
 

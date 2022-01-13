@@ -24,17 +24,6 @@ public:
 
     string wizardUrlHint () const override;
 };
-}
-
-
-
-
-
-
-
-
-
-namespace Occ {
 
 NextcloudTheme.NextcloudTheme ()
     : Theme () {

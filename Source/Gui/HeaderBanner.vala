@@ -121,16 +121,7 @@ private:
     QPixmap bannerPixmap;
 };
 
-} // namespace Occ
 
-
-
-
-
-
-
-
-namespace Occ {
 
     // These fudge terms were needed a few places to obtain pixel-perfect results
     const int GapBetweenLogoAndRightEdge = 5;

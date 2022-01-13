@@ -69,7 +69,7 @@ public:
     Note that sensitive data (like the password used to acquire t
     session cookie) may be retained. See forgetSensitiveData ().
 
-     * ready () must return false afterwards.
+    ready () must return false afterwards.
     ***********************************************************/
     virtual void invalidateToken () = 0;
 
@@ -78,7 +78,7 @@ public:
 
     This should always imply invalidateToken () but may go beyond it.
     
-     * For http auth, this would clear the session cookie and password.
+    For http auth, this would clear the session cookie and password.
     ***********************************************************/
     virtual void forgetSensitiveData () = 0;
 

@@ -82,9 +82,7 @@ namespace HttpLogger {
         stream << "]";
         qCInfo (lcNetworkHttp) << msg;
     }
-    }
-    
-    namespace Occ {
+
     
     void HttpLogger.logRequest (QNetworkReply *reply, QNetworkAccessManager.Operation operation, QIODevice *device) {
         const auto request = reply.request ();

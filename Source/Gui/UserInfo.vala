@@ -99,20 +99,7 @@ private:
     QPointer<JsonApiJob> _job; // the currently running job
 };
 
-} // namespace Occ
 
-
-
-
-
-
-
-
-
-
-
-
-namespace Occ {
 
     namespace {
         static const int defaultIntervalT = 30 * 1000;

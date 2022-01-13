@@ -80,18 +80,6 @@ private:
     AddCertificateDialog *addCertDial = nullptr;
 };
 
-} // namespace Occ
-
-
-
-
-
-
-
-
-
-namespace Occ {
-
     OwncloudSetupPage.OwncloudSetupPage (Gtk.Widget *parent)
         : QWizardPage ()
         , _progressIndi (new QProgressIndicator (this))

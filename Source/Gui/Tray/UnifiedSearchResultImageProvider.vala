@@ -127,13 +127,11 @@ namespace {
         QSize _requestedImageSize;
         int _index = 0;
     };
-    }
-    
-    namespace Occ {
+
     
     QQuickImageResponse *UnifiedSearchResultImageProvider.requestImageResponse (string &id, QSize &requestedSize) {
         return new AsyncImageResponse (id, requestedSize);
     }
     
-    }
+}
     

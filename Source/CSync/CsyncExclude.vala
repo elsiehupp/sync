@@ -64,14 +64,14 @@ public:
     /***********************************************************
     Adds a new path to a file containing exclude patterns.
     
-     * Does not load the file. Use reloadExcludeFiles () afterwards.
+    Does not load the file. Use reloadExcludeFiles () afterwards.
     ***********************************************************/
     void addExcludeFilePath (string &path);
 
     /***********************************************************
     Whether conflict files shall be excluded.
     
-     * Defaults to true.
+    Defaults to true.
     ***********************************************************/
     void setExcludeConflictFiles (bool onoff);
 
@@ -79,7 +79,7 @@ public:
     Checks whether a file or directory should be excluded.
     
     @param filePath     the absolute path to the file
-     * @param basePath     folder path from which to apply exclude rules, ends with a /
+    @param basePath     folder path from which to apply exclude rules, ends with a /
     ***********************************************************/
     bool isExcluded (
         const string &filePath,
@@ -90,7 +90,7 @@ public:
     Adds an exclude pattern anchored to base path
     
     Primarily used in tests. Patterns added this way are preserved when
-     * reloadExcludeFiles () is called.
+    reloadExcludeFiles () is called.
     ***********************************************************/
     void addManualExclude (string &expr);
     void addManualExclude (string &expr, string &basePath);
@@ -98,7 +98,7 @@ public:
     /***********************************************************
     Removes all manually added exclude patterns.
     
-     * Primarily used in tests.
+    Primarily used in tests.
     ***********************************************************/
     void clearManualExcludes ();
 
@@ -122,9 +122,9 @@ public:
     That means for 'foo/bar/file' only ('foo/bar/file', 'file')
     against the exclude patterns.
     
-     * @param Path is folder-relative, should not start with a /.
-
-     * Note that this only matches patterns. It does not check whether the file
+    @param Path is folder-relative, should not start with a /.
+    
+    Note that this only matches patterns. It does not check whether the file
      * or directory pointed to is hidden (or whether it even exists).
     ***********************************************************/
     CSYNC_EXCLUDE_TYPE traversalPatternMatch (string &path, ItemType filetype);
@@ -150,9 +150,9 @@ private:
     
     Example:
     
-     * #!version < 2.5.0
-     * myexclude
-
+    #!version < 2.5.0
+    myexclude
+    
      * Would enable the "myexclude" pattern only for versions before 2.5.0.
     ***********************************************************/
     bool versionDirectiveKeepNextLine (QByteArray &directive) const;
@@ -162,8 +162,8 @@ private:
     
     @param Path is folder-relative, should not start with a /.
     
-     * Note that this only matches patterns. It does not check whether the file
-     * or directory pointed to is hidden (or whether it even exists).
+    Note that this only matches patterns. It does not check whether the file
+    or directory pointed to is hidden (or whether it even exists).
     ***********************************************************/
     CSYNC_EXCLUDE_TYPE fullPatternMatch (string &path, ItemType filetype) const;
 
@@ -203,11 +203,11 @@ private:
     
     The traversal matcher can be extremely fast because it has a fast early-
     case : It checks the bname part of the path against _bnameTraversalRegex
-     * and only runs a simplified _fullTraversalRegex on the whole path if bname
-     * activation for it was triggered.
-
-     * Note : The traversal matcher will return not-excluded on some paths that the
-     * full matcher would exclude. Example : "b" is excluded. traversal ("b/c")
+    and only runs a simplified _fullTraversalRegex on the whole path if bname
+    activation for it was triggered.
+    
+    Note : The traversal matcher will return not-excluded on some paths that
+    full matcher would exclude. Example : "b" is excluded. traversal ("b/c")
      * returns not-excluded because "c" isn't a bname activation pattern.
     ***********************************************************/
     void prepare (BasePathString &basePath);
@@ -242,7 +242,7 @@ private:
     Whether * and ? in patterns can match a /
     
     Unfortunately this was how matching was done on Windows so
-     * it continues to be enabled there.
+    it continues to be enabled there.
     ***********************************************************/
     bool _wildcardsMatchSlash = false;
 

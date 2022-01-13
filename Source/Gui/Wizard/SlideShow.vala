@@ -73,18 +73,6 @@ private:
     QPointer<QVariantAnimation> _animation = nullptr;
 };
 
-} // namespace Occ
-
-
-
-
-
-
-
-
-
-namespace Occ {
-
 static const int Spacing = 6;
 static const int SlideDuration = 1000;
 static const int SlideDistance = 400;

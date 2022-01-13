@@ -124,43 +124,43 @@ Computes the checksum of a file.
 \ingroup libsync
 ***********************************************************/
 class ComputeChecksum : GLib.Object {
-public:
-    ComputeChecksum (GLib.Object *parent = nullptr);
-    ~ComputeChecksum () override;
+
+    public ComputeChecksum (GLib.Object *parent = nullptr);
+    public ~ComputeChecksum () override;
 
     /***********************************************************
     Sets the checksum type to be used. The default is empty.
     ***********************************************************/
-    void setChecksumType (QByteArray &type);
+    public void setChecksumType (QByteArray &type);
 
-    QByteArray checksumType ();
+    public QByteArray checksumType ();
 
     /***********************************************************
     Computes the checksum for the given file path.
     
-     * done () is emitted when the calculation finishes.
+    done () is emitted when the calculation finishes.
     ***********************************************************/
-    void start (string &filePath);
+    public void start (string &filePath);
 
     /***********************************************************
     Computes the checksum for the given device.
     
     done () is emitted when the calculation finishes.
     
-     * The device ownership transfers into the thread that
-     * will compute the checksum. It must not have a parent.
+    The device ownership transfers into the thread that
+    will compute the checksum. It must not have a parent.
     ***********************************************************/
-    void start (std.unique_ptr<QIODevice> device);
+    public void start (std.unique_ptr<QIODevice> device);
 
     /***********************************************************
     Computes the checksum synchronously.
     ***********************************************************/
-    static QByteArray computeNow (QIODevice *device, QByteArray &checksumType);
+    public static QByteArray computeNow (QIODevice *device, QByteArray &checksumType);
 
     /***********************************************************
     Computes the checksum synchronously on file. Convenience wrapper for computeNow ().
     ***********************************************************/
-    static QByteArray computeNowOnFile (string &filePath, QByteArray &checksumType);
+    public static QByteArray computeNowOnFile (string &filePath, QByteArray &checksumType);
 
 signals:
     void done (QByteArray &checksumType, QByteArray &checksum);
@@ -182,27 +182,27 @@ Checks whether a file's checksum matches the expected value.
 @ingroup libsync
 ***********************************************************/
 class ValidateChecksumHeader : GLib.Object {
-public:
-    ValidateChecksumHeader (GLib.Object *parent = nullptr);
+
+    public ValidateChecksumHeader (GLib.Object *parent = nullptr);
 
     /***********************************************************
     Check a file's actual checksum against the provided checksumHeader
     
     If no checksum is there, or if a correct checksum is there, the signal validated (
     will be emitted. In case of any kind of error, the signal validationFailed () will
-     * be emitted.
+    be emitted.
     ***********************************************************/
-    void start (string &filePath, QByteArray &checksumHeader);
+    public void start (string &filePath, QByteArray &checksumHeader);
 
     /***********************************************************
     Check a device's actual checksum against the provided checksumHeader
     
     Like the other start () but works on an device.
     
-     * The device ownership transfers into the thread that
-     * will compute the checksum. It must not have a parent.
+    The device ownership transfers into the thread that
+    will compute the checksum. It must not have a parent.
     ***********************************************************/
-    void start (std.unique_ptr<QIODevice> device, QByteArray &checksumHeader);
+    public void start (std.unique_ptr<QIODevice> device, QByteArray &checksumHeader);
 
 signals:
     void validated (QByteArray &checksumType, QByteArray &checksum);
@@ -223,17 +223,17 @@ Hooks checksum computations into csync.
 @ingroup libsync
 ***********************************************************/
 class CSyncChecksumHook : GLib.Object {
-public:
-    CSyncChecksumHook ();
+
+    public CSyncChecksumHook ();
 
     /***********************************************************
     Returns the checksum value for \a path that is comparable to \a otherChecksum.
     
     Called from csync, whe
     to be set as userdata.
-     * The return value will be owned by csync.
+    The return value will be owned by csync.
     ***********************************************************/
-    static QByteArray hook (QByteArray &path, QByteArray &otherChecksumHeader, void *this_obj);
+    public static QByteArray hook (QByteArray &path, QByteArray &otherChecksumHeader, void *this_obj);
 };
 
 

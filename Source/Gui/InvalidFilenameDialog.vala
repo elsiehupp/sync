@@ -24,6 +24,36 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 // #include <Gtk.Dialog>
 
+namespace {
+    constexpr std.array<QChar, 9> illegalCharacters ({ '\\', '/', ':', '?', '*', '\"', '<', '>', '|' });
+    
+    QVector<QChar> getIllegalCharsFromString (string &string) {
+        QVector<QChar> result;
+        for (auto &character : string) {
+            if (std.find (illegalCharacters.begin (), illegalCharacters.end (), character)
+                != illegalCharacters.end ()) {
+                result.push_back (character);
+            }
+        }
+        return result;
+    }
+    
+    string illegalCharacterListToString (QVector<QChar> &illegalCharacters) {
+        string illegalCharactersString;
+        if (illegalCharacters.size () > 0) {
+            illegalCharactersString += illegalCharacters[0];
+        }
+    
+        for (int i = 1; i < illegalCharacters.count (); ++i) {
+            if (illegalCharactersString.contains (illegalCharacters[i])) {
+                continue;
+            }
+            illegalCharactersString += " " + illegalCharacters[i];
+        }
+        return illegalCharactersString;
+    }
+}
+
 namespace Occ {
 
 
@@ -57,49 +87,7 @@ private:
     void checkIfAllowedToRename ();
     void onPropfindPermissionSuccess (QVariantMap &values);
 };
-}
 
-
-
-
-
-
-
-
-
-
-
-namespace {
-    constexpr std.array<QChar, 9> illegalCharacters ({ '\\', '/', ':', '?', '*', '\"', '<', '>', '|' });
-    
-    QVector<QChar> getIllegalCharsFromString (string &string) {
-        QVector<QChar> result;
-        for (auto &character : string) {
-            if (std.find (illegalCharacters.begin (), illegalCharacters.end (), character)
-                != illegalCharacters.end ()) {
-                result.push_back (character);
-            }
-        }
-        return result;
-    }
-    
-    string illegalCharacterListToString (QVector<QChar> &illegalCharacters) {
-        string illegalCharactersString;
-        if (illegalCharacters.size () > 0) {
-            illegalCharactersString += illegalCharacters[0];
-        }
-    
-        for (int i = 1; i < illegalCharacters.count (); ++i) {
-            if (illegalCharactersString.contains (illegalCharacters[i])) {
-                continue;
-            }
-            illegalCharactersString += " " + illegalCharacters[i];
-        }
-        return illegalCharactersString;
-    }
-    }
-    
-    namespace Occ {
     
     InvalidFilenameDialog.InvalidFilenameDialog (AccountPtr account, Folder *folder, string filePath, Gtk.Widget *parent)
         : Gtk.Dialog (parent)

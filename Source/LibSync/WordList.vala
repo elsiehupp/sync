@@ -1,22 +1,13 @@
 
 // #include <QList>
 // #include <string>
+// #include <openssl/rand.h>
 
 namespace Occ {
     namespace WordList {
         QStringList getRandomWords (int nr);
         string getUnifiedString (QStringList& l);
-    }
-}
 
-
-
-
-
-// #include <openssl/rand.h>
-
-namespace Occ {
-    namespace WordList {
     
     // #include <initializer_list>
     

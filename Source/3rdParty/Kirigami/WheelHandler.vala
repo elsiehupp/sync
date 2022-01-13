@@ -21,14 +21,14 @@ class KirigamiWheelEvent : GLib.Object {
     /***********************************************************
     x : real
     
-     * X coordinate of the mouse pointer
+    X coordinate of the mouse pointer
     ***********************************************************/
     Q_PROPERTY (qreal x READ x CONSTANT)
 
     /***********************************************************
     y : real
     
-     * Y coordinate of the mouse pointer
+    Y coordinate of the mouse pointer
     ***********************************************************/
     Q_PROPERTY (qreal y READ y CONSTANT)
 
@@ -38,14 +38,14 @@ class KirigamiWheelEvent : GLib.Object {
     The distance the wheel is rotated in degrees.
     The x and y coordinates indicate the horizontal and vertical wheels respe
     A positive value indicates it was rotated up/right, negative, bottom/left
-     * This value is more likely to be set in traditional mice.
+    This value is more likely to be set in traditional mice.
     ***********************************************************/
     Q_PROPERTY (QPointF angleDelta READ angleDelta CONSTANT)
 
     /***********************************************************
     pixelDelta : point
     
-     * provides the delta in screen pixels available on high resolution trackpads
+    provides the delta in screen pixels available on high resolution trackpads
     ***********************************************************/
     Q_PROPERTY (QPointF pixelDelta READ pixelDelta CONSTANT)
 
@@ -53,7 +53,7 @@ class KirigamiWheelEvent : GLib.Object {
     buttons : int
     
     it contains an OR combination of the buttons that were pressed during the wheel, they can be:
-     * Qt.LeftButton, Qt.MiddleButton, Qt.RightButton
+    Qt.LeftButton, Qt.MiddleButton, Qt.RightButton
     ***********************************************************/
     Q_PROPERTY (int buttons READ buttons CONSTANT)
 
@@ -64,7 +64,7 @@ class KirigamiWheelEvent : GLib.Object {
     Qt.NoModifier (def
     Qt.ControlModifi
     Qt.ShiftModifier
-     * ...
+    ...
     ***********************************************************/
     Q_PROPERTY (int modifiers READ modifiers CONSTANT)
 
@@ -72,7 +72,7 @@ class KirigamiWheelEvent : GLib.Object {
     inverted : bool
     
     Whether the delta values are inverted
-     * On some platformsthe returned delta are inverted, so positive values would mean bottom/left
+    On some platformsthe returned delta are inverted, so positive values would mean bottom/left
     ***********************************************************/
     Q_PROPERTY (bool inverted READ inverted CONSTANT)
 
@@ -96,26 +96,26 @@ class KirigamiWheelEvent : GLib.Object {
        
      
     }
-     * @endcode
+    @endcode
 
     ***********************************************************/
     Q_PROPERTY (bool accepted READ isAccepted WRITE setAccepted)
 
-public:
-    KirigamiWheelEvent (GLib.Object *parent = nullptr);
-    ~KirigamiWheelEvent () override;
 
-    void initializeFromEvent (QWheelEvent *event);
+    public KirigamiWheelEvent (GLib.Object *parent = nullptr);
+    public ~KirigamiWheelEvent () override;
 
-    qreal x ();
-    qreal y ();
-    QPointF angleDelta ();
-    QPointF pixelDelta ();
-    int buttons ();
-    int modifiers ();
-    bool inverted ();
-    bool isAccepted ();
-    void setAccepted (bool accepted);
+    public void initializeFromEvent (QWheelEvent *event);
+
+    public qreal x ();
+    public qreal y ();
+    public QPointF angleDelta ();
+    public QPointF pixelDelta ();
+    public int buttons ();
+    public int modifiers ();
+    public bool inverted ();
+    public bool isAccepted ();
+    public void setAccepted (bool accepted);
 
 private:
     qreal m_x = 0;
@@ -130,14 +130,14 @@ private:
 
 class GlobalWheelFilter : GLib.Object {
 
-public:
-    GlobalWheelFilter (GLib.Object *parent = nullptr);
-    ~GlobalWheelFilter () override;
 
-    static GlobalWheelFilter *self ();
+    public GlobalWheelFilter (GLib.Object *parent = nullptr);
+    public ~GlobalWheelFilter () override;
 
-    void setItemHandlerAssociation (QQuickItem *item, WheelHandler *handler);
-    void removeItemHandlerAssociation (QQuickItem *item, WheelHandler *handler);
+    public static GlobalWheelFilter *self ();
+
+    public void setItemHandlerAssociation (QQuickItem *item, WheelHandler *handler);
+    public void removeItemHandlerAssociation (QQuickItem *item, WheelHandler *handler);
 
 protected:
     bool eventFilter (GLib.Object *watched, QEvent *event) override;
@@ -161,14 +161,14 @@ class WheelHandler : GLib.Object {
     The target we want to manage wheel events.
     We will receive wheel () signals every time the user 
     the mouse wheel (or scrolls with the touchpad) on top
-     * of that item.
+    of that item.
     ***********************************************************/
     Q_PROPERTY (QQuickItem *target READ target WRITE setTarget NOTIFY targetChanged)
 
     /***********************************************************
     blockTargetWheel : bool
     
-     * If true, the target won't receive any wheel event at all (default true)
+    If true, the target won't receive any wheel event at all (default true)
     ***********************************************************/
     Q_PROPERTY (bool blockTargetWheel MEMBER m_blockTargetWheel NOTIFY blockTargetWheelChanged)
 
@@ -178,12 +178,12 @@ class WheelHandler : GLib.Object {
     ***********************************************************/
     Q_PROPERTY (bool scrollFlickableTarget MEMBER m_scrollFlickableTarget NOTIFY scrollFlickableTargetChanged)
 
-public:
-    WheelHandler (GLib.Object *parent = nullptr);
-    ~WheelHandler () override;
 
-    QQuickItem *target ();
-    void setTarget (QQuickItem *target);
+    public WheelHandler (GLib.Object *parent = nullptr);
+    public ~WheelHandler () override;
+
+    public QQuickItem *target ();
+    public void setTarget (QQuickItem *target);
 
 signals:
     void targetChanged ();
@@ -221,9 +221,8 @@ private:
 // #include <QDebug>
 
 class GlobalWheelFilterSingleton {
-    public:
-        GlobalWheelFilter self;
-    };
+    public GlobalWheelFilter self;
+};
     
     Q_GLOBAL_STATIC (GlobalWheelFilterSingleton, privateGlobalWheelFilterSelf)
     

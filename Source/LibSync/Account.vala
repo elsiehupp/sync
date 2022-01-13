@@ -44,9 +44,6 @@ using namespace QKeychain;
 // #include <QPixmap>
 #endif
 
-Q_DECLARE_METATYPE (Occ.AccountPtr)
-Q_DECLARE_METATYPE (Occ.Account *)
-
 const char app_password[] = "_app-password";
 
 // #include <memory>
@@ -100,7 +97,7 @@ public:
     The user that can be used in dav url.
     
     This can very well be different frome the login user that's
-     * stored in credentials ().user ().
+    stored in credentials ().user ().
     ***********************************************************/
     string davUser ();
     void setDavUser (string &newDavUser);
@@ -229,7 +226,7 @@ public:
 
     Example : serverVersionInt () >= makeServerVersion (11, 2, 3)
     
-     * Will be 0 if the version is not available yet.
+    Will be 0 if the version is not available yet.
     ***********************************************************/
     int serverVersionInt ();
 
@@ -245,7 +242,7 @@ public:
     recommended, potentially dangerous" limit, that users might want
     to go beyond.
     
-     * This function returns true if the server is beyond the weak limit.
+    This function returns true if the server is beyond the weak limit.
     ***********************************************************/
     bool serverVersionUnsupported ();
 
@@ -385,8 +382,8 @@ private:
     
           Disabled as long as selecting another cert is not supported by the UI.
     
-     *       Being able to specify a new certificate is important anyway : expiry etc.
-
+          Being able to specify a new certificate is important anyway : expiry etc.
+    
      *       We introduce this dirty hack here, to allow deleting them upon Remote Wipe.
     */
     public:

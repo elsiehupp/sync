@@ -24,6 +24,42 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 class QStandardItemModel;
 
+
+namespace {
+    const string TOOLBAR_CSS () {
+        return QStringLiteral ("QToolBar { background : %1; margin : 0; padding : 0; border : none; border-bottom : 1px solid %2; spacing : 0; } "
+                              "QToolBar QToolButton { background : %1; border : none; border-bottom : 1px solid %2; margin : 0; padding : 5px; } "
+                              "QToolBar QToolBarExtension { padding:0; } "
+                              "QToolBar QToolButton:checked { background : %3; color : %4; }");
+    }
+    
+    const float buttonSizeRatio = 1.618f; // golden ratio
+    
+    /***********************************************************
+    display name with two lines that is displayed in the settings
+    If width is bigger than 0, the string will be ellided so it does not exceed that width
+    ***********************************************************/
+    string shortDisplayNameForSettings (Occ.Account *account, int width) {
+        string user = account.davDisplayName ();
+        if (user.isEmpty ()) {
+            user = account.credentials ().user ();
+        }
+        string host = account.url ().host ();
+        int port = account.url ().port ();
+        if (port > 0 && port != 80 && port != 443) {
+            host.append (QLatin1Char (':'));
+            host.append (string.number (port));
+        }
+        if (width > 0) {
+            QFont f;
+            QFontMetrics fm (f);
+            host = fm.elidedText (host, Qt.ElideMiddle, width);
+            user = fm.elidedText (user, Qt.ElideRight, width);
+        }
+        return QStringLiteral ("%1\n%2").arg (user, host);
+    }
+}
+
 namespace Occ {
 
 
@@ -85,51 +121,7 @@ private:
 
     OwncloudGui *_gui;
 };
-}
 
-
-
-
-
-
-
-
-namespace {
-    const string TOOLBAR_CSS () {
-        return QStringLiteral ("QToolBar { background : %1; margin : 0; padding : 0; border : none; border-bottom : 1px solid %2; spacing : 0; } "
-                              "QToolBar QToolButton { background : %1; border : none; border-bottom : 1px solid %2; margin : 0; padding : 5px; } "
-                              "QToolBar QToolBarExtension { padding:0; } "
-                              "QToolBar QToolButton:checked { background : %3; color : %4; }");
-    }
-    
-    const float buttonSizeRatio = 1.618f; // golden ratio
-    
-    /***********************************************************
-    display name with two lines that is displayed in the settings
-    If width is bigger than 0, the string will be ellided so it does not exceed that width
-    ***********************************************************/
-    string shortDisplayNameForSettings (Occ.Account *account, int width) {
-        string user = account.davDisplayName ();
-        if (user.isEmpty ()) {
-            user = account.credentials ().user ();
-        }
-        string host = account.url ().host ();
-        int port = account.url ().port ();
-        if (port > 0 && port != 80 && port != 443) {
-            host.append (QLatin1Char (':'));
-            host.append (string.number (port));
-        }
-        if (width > 0) {
-            QFont f;
-            QFontMetrics fm (f);
-            host = fm.elidedText (host, Qt.ElideMiddle, width);
-            user = fm.elidedText (user, Qt.ElideRight, width);
-        }
-        return QStringLiteral ("%1\n%2").arg (user, host);
-    }
-    }
-    
-    namespace Occ {
     
     SettingsDialog.SettingsDialog (OwncloudGui *gui, Gtk.Widget *parent)
         : Gtk.Dialog (parent)

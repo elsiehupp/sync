@@ -38,18 +38,7 @@ struct UnifiedSearchResult {
     string _icons;
     Type _type = Type.Default;
 };
-}
 
-
-
-
-
-
-
-
-
-
-namespace Occ {
 
     string UnifiedSearchResult.typeAsString (UnifiedSearchResult.Type type) {
         string result;

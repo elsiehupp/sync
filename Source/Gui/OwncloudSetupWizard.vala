@@ -73,14 +73,7 @@ private:
     string _initLocalFolder;
     string _remoteFolder;
 };
-}
 
-
-
-
-
-
-namespace Occ {
 
     OwncloudSetupWizard.OwncloudSetupWizard (GLib.Object *parent)
         : GLib.Object (parent)

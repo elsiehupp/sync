@@ -33,7 +33,7 @@ public:
     Whether an existing entity with the same name may be deleted before
     creating the directory.
     
-     * Default : false.
+    Default : false.
     ***********************************************************/
     void setDeleteExisting (bool enabled);
 
