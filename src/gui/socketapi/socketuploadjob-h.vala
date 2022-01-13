@@ -23,8 +23,8 @@ class SyncEngine;
 
 class SocketUploadJob : public QObject {
 public:
-    SocketUploadJob(QSharedPointer<SocketApiJobV2> &job);
-    void start();
+    SocketUploadJob (QSharedPointer<SocketApiJobV2> &job);
+    void start ();
 
 private:
     QSharedPointer<SocketApiJobV2> _apiJob;

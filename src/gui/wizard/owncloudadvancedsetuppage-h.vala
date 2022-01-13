@@ -27,57 +27,57 @@ class OwncloudWizard;
  */
 class OwncloudAdvancedSetupPage : public QWizardPage {
 public:
-    OwncloudAdvancedSetupPage(OwncloudWizard *wizard);
+    OwncloudAdvancedSetupPage (OwncloudWizard *wizard);
 
-    bool isComplete() const override;
-    void initializePage() override;
-    int nextId() const override;
-    bool validatePage() override;
-    QString localFolder() const;
-    QStringList selectiveSyncBlacklist() const;
-    bool useVirtualFileSync() const;
-    bool isConfirmBigFolderChecked() const;
-    void setRemoteFolder(QString &remoteFolder);
-    void setMultipleFoldersExist(bool exist);
-    void directoriesCreated();
+    bool isComplete () const override;
+    void initializePage () override;
+    int nextId () const override;
+    bool validatePage () override;
+    QString localFolder () const;
+    QStringList selectiveSyncBlacklist () const;
+    bool useVirtualFileSync () const;
+    bool isConfirmBigFolderChecked () const;
+    void setRemoteFolder (QString &remoteFolder);
+    void setMultipleFoldersExist (bool exist);
+    void directoriesCreated ();
 
 signals:
-    void createLocalAndRemoteFolders(QString &, QString &);
+    void createLocalAndRemoteFolders (QString &, QString &);
 
 public slots:
-    void setErrorString(QString &);
-    void slotStyleChanged();
+    void setErrorString (QString &);
+    void slotStyleChanged ();
 
 private slots:
-    void slotSelectFolder();
-    void slotSyncEverythingClicked();
-    void slotSelectiveSyncClicked();
-    void slotVirtualFileSyncClicked();
-    void slotQuotaRetrieved(QVariantMap &result);
+    void slotSelectFolder ();
+    void slotSyncEverythingClicked ();
+    void slotSelectiveSyncClicked ();
+    void slotVirtualFileSyncClicked ();
+    void slotQuotaRetrieved (QVariantMap &result);
 
 private:
-    void setRadioChecked(QRadioButton *radio);
+    void setRadioChecked (QRadioButton *radio);
 
-    void setupCustomization();
-    void updateStatus();
-    bool dataChanged();
-    void startSpinner();
-    void stopSpinner();
-    QUrl serverUrl() const;
-    qint64 availableLocalSpace() const;
-    QString checkLocalSpace(qint64 remoteSize) const;
-    void customizeStyle();
-    void setServerAddressLabelUrl(QUrl &url);
-    void setLocalFolderPushButtonPath(QString &path);
-    void styleSyncLogo();
-    void styleLocalFolderLabel();
-    void setResolutionGuiVisible(bool value);
-    void setupResoultionWidget();
-    void fetchUserAvatar();
-    void setUserInformation();
+    void setupCustomization ();
+    void updateStatus ();
+    bool dataChanged ();
+    void startSpinner ();
+    void stopSpinner ();
+    QUrl serverUrl () const;
+    qint64 availableLocalSpace () const;
+    QString checkLocalSpace (qint64 remoteSize) const;
+    void customizeStyle ();
+    void setServerAddressLabelUrl (QUrl &url);
+    void setLocalFolderPushButtonPath (QString &path);
+    void styleSyncLogo ();
+    void styleLocalFolderLabel ();
+    void setResolutionGuiVisible (bool value);
+    void setupResoultionWidget ();
+    void fetchUserAvatar ();
+    void setUserInformation ();
 
     // TODO: remove when UX decision is made
-    void refreshVirtualFilesAvailibility(QString &path);
+    void refreshVirtualFilesAvailibility (QString &path);
 
     Ui_OwncloudAdvancedSetupPage _ui;
     bool _checking = false;

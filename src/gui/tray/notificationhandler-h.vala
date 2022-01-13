@@ -9,18 +9,18 @@ namespace OCC {
 
 class ServerNotificationHandler : public QObject {
 public:
-    explicit ServerNotificationHandler(AccountState *accountState, QObject *parent = nullptr);
+    explicit ServerNotificationHandler (AccountState *accountState, QObject *parent = nullptr);
 
 signals:
-    void newNotificationList(ActivityList);
+    void newNotificationList (ActivityList);
 
 public slots:
-    void slotFetchNotifications();
+    void slotFetchNotifications ();
 
 private slots:
-    void slotNotificationsReceived(QJsonDocument &json, int statusCode);
-    void slotEtagResponseHeaderReceived(QByteArray &value, int statusCode);
-    void slotAllowDesktopNotificationsChanged(bool isAllowed);
+    void slotNotificationsReceived (QJsonDocument &json, int statusCode);
+    void slotEtagResponseHeaderReceived (QByteArray &value, int statusCode);
+    void slotAllowDesktopNotificationsChanged (bool isAllowed);
 
 private:
     QPointer<JsonApiJob> _notificationJob;

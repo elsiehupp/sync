@@ -29,116 +29,116 @@
 
 extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 
-static const char systemRunPathC[] = R"(HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run)";
-static const char runPathC[] = R"(HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run)";
+static const char systemRunPathC[] = R" (HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run)";
+static const char runPathC[] = R" (HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run)";
 
 namespace OCC {
 
-static void setupFavLink_private(QString &folder) {
+static void setupFavLink_private (QString &folder) {
     // First create a Desktop.ini so that the folder and favorite link show our application's icon.
-    QFile desktopIni(folder + QLatin1String("/Desktop.ini"));
-    if (desktopIni.exists()) {
-        qCWarning(lcUtility) << desktopIni.fileName() << "already exists, not overwriting it to set the folder icon.";
+    QFile desktopIni (folder + QLatin1String ("/Desktop.ini"));
+    if (desktopIni.exists ()) {
+        qCWarning (lcUtility) << desktopIni.fileName () << "already exists, not overwriting it to set the folder icon.";
     } else {
-        qCInfo(lcUtility) << "Creating" << desktopIni.fileName() << "to set a folder icon in Explorer.";
-        desktopIni.open(QFile::WriteOnly);
-        desktopIni.write("[.ShellClassInfo]\r\nIconResource=");
-        desktopIni.write(QDir::toNativeSeparators(qApp->applicationFilePath()).toUtf8());
+        qCInfo (lcUtility) << "Creating" << desktopIni.fileName () << "to set a folder icon in Explorer.";
+        desktopIni.open (QFile::WriteOnly);
+        desktopIni.write ("[.ShellClassInfo]\r\nIconResource=");
+        desktopIni.write (QDir::toNativeSeparators (qApp->applicationFilePath ()).toUtf8 ());
 #ifdef APPLICATION_FOLDER_ICON_INDEX
         const auto iconIndex = APPLICATION_FOLDER_ICON_INDEX;
 #else
         const auto iconIndex = "0";
 #endif
-        desktopIni.write(",");
-        desktopIni.write(iconIndex);
-        desktopIni.write("\r\n");
-        desktopIni.close();
+        desktopIni.write (",");
+        desktopIni.write (iconIndex);
+        desktopIni.write ("\r\n");
+        desktopIni.close ();
 
         // Set the folder as system and Desktop.ini as hidden+system for explorer to pick it.
         // https://msdn.microsoft.com/en-us/library/windows/desktop/cc144102
-        DWORD folderAttrs = GetFileAttributesW((wchar_t *)folder.utf16());
-        SetFileAttributesW((wchar_t *)folder.utf16(), folderAttrs | FILE_ATTRIBUTE_SYSTEM);
-        SetFileAttributesW((wchar_t *)desktopIni.fileName().utf16(), FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM);
+        DWORD folderAttrs = GetFileAttributesW ( (wchar_t *)folder.utf16 ());
+        SetFileAttributesW ( (wchar_t *)folder.utf16 (), folderAttrs | FILE_ATTRIBUTE_SYSTEM);
+        SetFileAttributesW ( (wchar_t *)desktopIni.fileName ().utf16 (), FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM);
     }
 
     // Windows Explorer: Place under "Favorites" (Links)
     QString linkName;
-    QDir folderDir(QDir::fromNativeSeparators(folder));
+    QDir folderDir (QDir::fromNativeSeparators (folder));
 
     /* Use new WINAPI functions */
     PWSTR path;
 
-    if (SHGetKnownFolderPath(FOLDERID_Links, 0, nullptr, &path) == S_OK) {
-        QString links = QDir::fromNativeSeparators(QString::fromWCharArray(path));
-        linkName = QDir(links).filePath(folderDir.dirName() + QLatin1String(".lnk"));
-        CoTaskMemFree(path);
+    if (SHGetKnownFolderPath (FOLDERID_Links, 0, nullptr, &path) == S_OK) {
+        QString links = QDir::fromNativeSeparators (QString::fromWCharArray (path));
+        linkName = QDir (links).filePath (folderDir.dirName () + QLatin1String (".lnk"));
+        CoTaskMemFree (path);
     }
-    qCInfo(lcUtility) << "Creating favorite link from" << folder << "to" << linkName;
-    if (!QFile::link(folder, linkName))
-        qCWarning(lcUtility) << "linking" << folder << "to" << linkName << "failed!";
+    qCInfo (lcUtility) << "Creating favorite link from" << folder << "to" << linkName;
+    if (!QFile::link (folder, linkName))
+        qCWarning (lcUtility) << "linking" << folder << "to" << linkName << "failed!";
 }
 
-static void removeFavLink_private(QString &folder) {
-    const QDir folderDir(folder);
+static void removeFavLink_private (QString &folder) {
+    const QDir folderDir (folder);
 
     // #1 Remove the Desktop.ini to reset the folder icon
-    if (!QFile::remove(folderDir.absoluteFilePath(QLatin1String("Desktop.ini")))) {
-        qCWarning(lcUtility) << "Remove Desktop.ini from" << folder
+    if (!QFile::remove (folderDir.absoluteFilePath (QLatin1String ("Desktop.ini")))) {
+        qCWarning (lcUtility) << "Remove Desktop.ini from" << folder
                              << " has failed. Make sure it exists and is not locked by another process.";
     }
 
     // #2 Remove the system file attribute
-    const auto folderAttrs = GetFileAttributesW(folder.toStdWString().c_str());
-    if (!SetFileAttributesW(folder.toStdWString().c_str(), folderAttrs & ~FILE_ATTRIBUTE_SYSTEM)) {
-        qCWarning(lcUtility) << "Remove system file attribute failed for:" << folder;
+    const auto folderAttrs = GetFileAttributesW (folder.toStdWString ().c_str ());
+    if (!SetFileAttributesW (folder.toStdWString ().c_str (), folderAttrs & ~FILE_ATTRIBUTE_SYSTEM)) {
+        qCWarning (lcUtility) << "Remove system file attribute failed for:" << folder;
     }
 
     // #3 Remove the link to this folder
     PWSTR path;
-    if (!SHGetKnownFolderPath(FOLDERID_Links, 0, nullptr, &path) == S_OK) {
-        qCWarning(lcUtility) << "SHGetKnownFolderPath for " << folder << "has failed.";
+    if (!SHGetKnownFolderPath (FOLDERID_Links, 0, nullptr, &path) == S_OK) {
+        qCWarning (lcUtility) << "SHGetKnownFolderPath for " << folder << "has failed.";
         return;
     }
 
-    const QDir links(QString::fromWCharArray(path));
-    CoTaskMemFree(path);
+    const QDir links (QString::fromWCharArray (path));
+    CoTaskMemFree (path);
 
-    const auto linkName = QDir(links).absoluteFilePath(folderDir.dirName() + QLatin1String(".lnk"));
+    const auto linkName = QDir (links).absoluteFilePath (folderDir.dirName () + QLatin1String (".lnk"));
 
-    qCInfo(lcUtility) << "Removing favorite link from" << folder << "to" << linkName;
-    if (!QFile::remove(linkName)) {
-        qCWarning(lcUtility) << "Removing a favorite link from" << folder << "to" << linkName << "failed.";
+    qCInfo (lcUtility) << "Removing favorite link from" << folder << "to" << linkName;
+    if (!QFile::remove (linkName)) {
+        qCWarning (lcUtility) << "Removing a favorite link from" << folder << "to" << linkName << "failed.";
     }
 }
 
-bool hasSystemLaunchOnStartup_private(QString &appName) {
-    QString runPath = QLatin1String(systemRunPathC);
-    QSettings settings(runPath, QSettings::NativeFormat);
-    return settings.contains(appName);
+bool hasSystemLaunchOnStartup_private (QString &appName) {
+    QString runPath = QLatin1String (systemRunPathC);
+    QSettings settings (runPath, QSettings::NativeFormat);
+    return settings.contains (appName);
 }
 
-bool hasLaunchOnStartup_private(QString &appName) {
-    QString runPath = QLatin1String(runPathC);
-    QSettings settings(runPath, QSettings::NativeFormat);
-    return settings.contains(appName);
+bool hasLaunchOnStartup_private (QString &appName) {
+    QString runPath = QLatin1String (runPathC);
+    QSettings settings (runPath, QSettings::NativeFormat);
+    return settings.contains (appName);
 }
 
-void setLaunchOnStartup_private(QString &appName, QString &guiName, bool enable) {
-    Q_UNUSED(guiName);
-    QString runPath = QLatin1String(runPathC);
-    QSettings settings(runPath, QSettings::NativeFormat);
+void setLaunchOnStartup_private (QString &appName, QString &guiName, bool enable) {
+    Q_UNUSED (guiName);
+    QString runPath = QLatin1String (runPathC);
+    QSettings settings (runPath, QSettings::NativeFormat);
     if (enable) {
-        settings.setValue(appName, QDir::toNativeSeparators(QCoreApplication::applicationFilePath()));
+        settings.setValue (appName, QDir::toNativeSeparators (QCoreApplication::applicationFilePath ()));
     } else {
-        settings.remove(appName);
+        settings.remove (appName);
     }
 }
 
 // TODO: Right now only detection on toggle/startup, not when windows theme is switched while nextcloud is running
-static inline bool hasDarkSystray_private() {
-    if(Utility::registryGetKeyValue(    HKEY_CURRENT_USER,
-                                        QStringLiteral(R"(Software\Microsoft\Windows\CurrentVersion\Themes\Personalize)"),
-                                        QStringLiteral("SystemUsesLightTheme") ) == 1) {
+static inline bool hasDarkSystray_private () {
+    if (Utility::registryGetKeyValue (    HKEY_CURRENT_USER,
+                                        QStringLiteral (R" (Software\Microsoft\Windows\CurrentVersion\Themes\Personalize)"),
+                                        QStringLiteral ("SystemUsesLightTheme") ) == 1) {
         return false;
     }
     else {
@@ -146,242 +146,242 @@ static inline bool hasDarkSystray_private() {
     }
 }
 
-QRect Utility::getTaskbarDimensions() {
+QRect Utility::getTaskbarDimensions () {
     APPBARDATA barData;
-    barData.cbSize = sizeof(APPBARDATA);
+    barData.cbSize = sizeof (APPBARDATA);
 
-    BOOL fResult = (BOOL)SHAppBarMessage(ABM_GETTASKBARPOS, &barData);
+    BOOL fResult = (BOOL)SHAppBarMessage (ABM_GETTASKBARPOS, &barData);
     if (!fResult) {
-        return QRect();
+        return QRect ();
     }
 
     RECT barRect = barData.rc;
-    return QRect(barRect.left, barRect.top, (barRect.right - barRect.left), (barRect.bottom - barRect.top));
+    return QRect (barRect.left, barRect.top, (barRect.right - barRect.left), (barRect.bottom - barRect.top));
 }
 
-bool Utility::registryKeyExists(HKEY hRootKey, QString &subKey) {
+bool Utility::registryKeyExists (HKEY hRootKey, QString &subKey) {
     HKEY hKey;
 
     REGSAM sam = KEY_READ | KEY_WOW64_64KEY;
-    LONG result = RegOpenKeyEx(hRootKey, reinterpret_cast<LPCWSTR>(subKey.utf16()), 0, sam, &hKey);
+    LONG result = RegOpenKeyEx (hRootKey, reinterpret_cast<LPCWSTR> (subKey.utf16 ()), 0, sam, &hKey);
 
-    RegCloseKey(hKey);
+    RegCloseKey (hKey);
     return result != ERROR_FILE_NOT_FOUND;
 }
 
-QVariant Utility::registryGetKeyValue(HKEY hRootKey, QString &subKey, QString &valueName) {
+QVariant Utility::registryGetKeyValue (HKEY hRootKey, QString &subKey, QString &valueName) {
     QVariant value;
 
     HKEY hKey;
 
     REGSAM sam = KEY_READ | KEY_WOW64_64KEY;
-    LONG result = RegOpenKeyEx(hRootKey, reinterpret_cast<LPCWSTR>(subKey.utf16()), 0, sam, &hKey);
-    ASSERT(result == ERROR_SUCCESS || result == ERROR_FILE_NOT_FOUND);
+    LONG result = RegOpenKeyEx (hRootKey, reinterpret_cast<LPCWSTR> (subKey.utf16 ()), 0, sam, &hKey);
+    ASSERT (result == ERROR_SUCCESS || result == ERROR_FILE_NOT_FOUND);
     if (result != ERROR_SUCCESS)
         return value;
 
     DWORD type = 0, sizeInBytes = 0;
-    result = RegQueryValueEx(hKey, reinterpret_cast<LPCWSTR>(valueName.utf16()), 0, &type, nullptr, &sizeInBytes);
-    ASSERT(result == ERROR_SUCCESS || result == ERROR_FILE_NOT_FOUND);
+    result = RegQueryValueEx (hKey, reinterpret_cast<LPCWSTR> (valueName.utf16 ()), 0, &type, nullptr, &sizeInBytes);
+    ASSERT (result == ERROR_SUCCESS || result == ERROR_FILE_NOT_FOUND);
     if (result == ERROR_SUCCESS) {
         switch (type) {
         case REG_DWORD:
             DWORD dword;
-            Q_ASSERT(sizeInBytes == sizeof(dword));
-            if (RegQueryValueEx(hKey, reinterpret_cast<LPCWSTR>(valueName.utf16()), 0, &type, reinterpret_cast<LPBYTE>(&dword), &sizeInBytes) == ERROR_SUCCESS) {
-                value = int(dword);
+            Q_ASSERT (sizeInBytes == sizeof (dword));
+            if (RegQueryValueEx (hKey, reinterpret_cast<LPCWSTR> (valueName.utf16 ()), 0, &type, reinterpret_cast<LPBYTE> (&dword), &sizeInBytes) == ERROR_SUCCESS) {
+                value = int (dword);
             }
             break;
         case REG_EXPAND_SZ:
         case REG_SZ: {
             QString string;
-            string.resize(sizeInBytes / sizeof(QChar));
-            result = RegQueryValueEx(hKey, reinterpret_cast<LPCWSTR>(valueName.utf16()), 0, &type, reinterpret_cast<LPBYTE>(string.data()), &sizeInBytes);
+            string.resize (sizeInBytes / sizeof (QChar));
+            result = RegQueryValueEx (hKey, reinterpret_cast<LPCWSTR> (valueName.utf16 ()), 0, &type, reinterpret_cast<LPBYTE> (string.data ()), &sizeInBytes);
 
             if (result == ERROR_SUCCESS) {
-                int newCharSize = sizeInBytes / sizeof(QChar);
+                int newCharSize = sizeInBytes / sizeof (QChar);
                 // From the doc:
                 // If the data has the REG_SZ, REG_MULTI_SZ or REG_EXPAND_SZ type, the string may not have been stored with
                 // the proper terminating null characters. Therefore, even if the function returns ERROR_SUCCESS,
                 // the application should ensure that the string is properly terminated before using it; otherwise, it may overwrite a buffer.
-                if (string.at(newCharSize - 1) == QLatin1Char('\0'))
-                    string.resize(newCharSize - 1);
+                if (string.at (newCharSize - 1) == QLatin1Char ('\0'))
+                    string.resize (newCharSize - 1);
                 value = string;
             }
             break;
         }
         case REG_BINARY: {
             QByteArray buffer;
-            buffer.resize(sizeInBytes);
-            result = RegQueryValueEx(hKey, reinterpret_cast<LPCWSTR>(valueName.utf16()), 0, &type, reinterpret_cast<LPBYTE>(buffer.data()), &sizeInBytes);
+            buffer.resize (sizeInBytes);
+            result = RegQueryValueEx (hKey, reinterpret_cast<LPCWSTR> (valueName.utf16 ()), 0, &type, reinterpret_cast<LPBYTE> (buffer.data ()), &sizeInBytes);
             if (result == ERROR_SUCCESS) {
-                value = buffer.at(12);
+                value = buffer.at (12);
             }
             break;
         }
         default:
-            Q_UNREACHABLE();
+            Q_UNREACHABLE ();
         }
     }
-    ASSERT(result == ERROR_SUCCESS || result == ERROR_FILE_NOT_FOUND);
+    ASSERT (result == ERROR_SUCCESS || result == ERROR_FILE_NOT_FOUND);
 
-    RegCloseKey(hKey);
+    RegCloseKey (hKey);
     return value;
 }
 
-bool Utility::registrySetKeyValue(HKEY hRootKey, QString &subKey, QString &valueName, DWORD type, QVariant &value) {
+bool Utility::registrySetKeyValue (HKEY hRootKey, QString &subKey, QString &valueName, DWORD type, QVariant &value) {
     HKEY hKey;
     // KEY_WOW64_64KEY is necessary because CLSIDs are "Redirected and reflected only for CLSIDs that do not specify InprocServer32 or InprocHandler32."
     // https://msdn.microsoft.com/en-us/library/windows/desktop/aa384253%28v=vs.85%29.aspx#redirected__shared__and_reflected_keys_under_wow64
     // This shouldn't be an issue in our case since we use shell32.dll as InprocServer32, so we could write those registry keys for both 32 and 64bit.
     // FIXME: Not doing so at the moment means that explorer will show the cloud provider, but 32bit processes' open dialogs (like the ownCloud client itself) won't show it.
     REGSAM sam = KEY_WRITE | KEY_WOW64_64KEY;
-    LONG result = RegCreateKeyEx(hRootKey, reinterpret_cast<LPCWSTR>(subKey.utf16()), 0, nullptr, 0, sam, nullptr, &hKey, nullptr);
-    ASSERT(result == ERROR_SUCCESS);
+    LONG result = RegCreateKeyEx (hRootKey, reinterpret_cast<LPCWSTR> (subKey.utf16 ()), 0, nullptr, 0, sam, nullptr, &hKey, nullptr);
+    ASSERT (result == ERROR_SUCCESS);
     if (result != ERROR_SUCCESS)
         return false;
 
     result = -1;
     switch (type) {
     case REG_DWORD: {
-        DWORD dword = value.toInt();
-        result = RegSetValueEx(hKey, reinterpret_cast<LPCWSTR>(valueName.utf16()), 0, type, reinterpret_cast<const BYTE *>(&dword), sizeof(dword));
+        DWORD dword = value.toInt ();
+        result = RegSetValueEx (hKey, reinterpret_cast<LPCWSTR> (valueName.utf16 ()), 0, type, reinterpret_cast<const BYTE *> (&dword), sizeof (dword));
         break;
     }
     case REG_EXPAND_SZ:
     case REG_SZ: {
-        QString string = value.toString();
-        result = RegSetValueEx(hKey, reinterpret_cast<LPCWSTR>(valueName.utf16()), 0, type, reinterpret_cast<const BYTE *>(string.constData()), (string.size() + 1) * sizeof(QChar));
+        QString string = value.toString ();
+        result = RegSetValueEx (hKey, reinterpret_cast<LPCWSTR> (valueName.utf16 ()), 0, type, reinterpret_cast<const BYTE *> (string.constData ()), (string.size () + 1) * sizeof (QChar));
         break;
     }
     default:
-        Q_UNREACHABLE();
+        Q_UNREACHABLE ();
     }
-    ASSERT(result == ERROR_SUCCESS);
+    ASSERT (result == ERROR_SUCCESS);
 
-    RegCloseKey(hKey);
+    RegCloseKey (hKey);
     return result == ERROR_SUCCESS;
 }
 
-bool Utility::registryDeleteKeyTree(HKEY hRootKey, QString &subKey) {
+bool Utility::registryDeleteKeyTree (HKEY hRootKey, QString &subKey) {
     HKEY hKey;
     REGSAM sam = DELETE | KEY_ENUMERATE_SUB_KEYS | KEY_QUERY_VALUE | KEY_SET_VALUE | KEY_WOW64_64KEY;
-    LONG result = RegOpenKeyEx(hRootKey, reinterpret_cast<LPCWSTR>(subKey.utf16()), 0, sam, &hKey);
-    ASSERT(result == ERROR_SUCCESS);
+    LONG result = RegOpenKeyEx (hRootKey, reinterpret_cast<LPCWSTR> (subKey.utf16 ()), 0, sam, &hKey);
+    ASSERT (result == ERROR_SUCCESS);
     if (result != ERROR_SUCCESS)
         return false;
 
-    result = RegDeleteTree(hKey, nullptr);
-    RegCloseKey(hKey);
-    ASSERT(result == ERROR_SUCCESS);
+    result = RegDeleteTree (hKey, nullptr);
+    RegCloseKey (hKey);
+    ASSERT (result == ERROR_SUCCESS);
 
-    result |= RegDeleteKeyEx(hRootKey, reinterpret_cast<LPCWSTR>(subKey.utf16()), sam, 0);
-    ASSERT(result == ERROR_SUCCESS);
+    result |= RegDeleteKeyEx (hRootKey, reinterpret_cast<LPCWSTR> (subKey.utf16 ()), sam, 0);
+    ASSERT (result == ERROR_SUCCESS);
 
     return result == ERROR_SUCCESS;
 }
 
-bool Utility::registryDeleteKeyValue(HKEY hRootKey, QString &subKey, QString &valueName) {
+bool Utility::registryDeleteKeyValue (HKEY hRootKey, QString &subKey, QString &valueName) {
     HKEY hKey;
     REGSAM sam = KEY_WRITE | KEY_WOW64_64KEY;
-    LONG result = RegOpenKeyEx(hRootKey, reinterpret_cast<LPCWSTR>(subKey.utf16()), 0, sam, &hKey);
-    ASSERT(result == ERROR_SUCCESS);
+    LONG result = RegOpenKeyEx (hRootKey, reinterpret_cast<LPCWSTR> (subKey.utf16 ()), 0, sam, &hKey);
+    ASSERT (result == ERROR_SUCCESS);
     if (result != ERROR_SUCCESS)
         return false;
 
-    result = RegDeleteValue(hKey, reinterpret_cast<LPCWSTR>(valueName.utf16()));
-    ASSERT(result == ERROR_SUCCESS);
+    result = RegDeleteValue (hKey, reinterpret_cast<LPCWSTR> (valueName.utf16 ()));
+    ASSERT (result == ERROR_SUCCESS);
 
-    RegCloseKey(hKey);
+    RegCloseKey (hKey);
     return result == ERROR_SUCCESS;
 }
 
-bool Utility::registryWalkSubKeys(HKEY hRootKey, QString &subKey, std::function<void(HKEY, QString &)> &callback) {
+bool Utility::registryWalkSubKeys (HKEY hRootKey, QString &subKey, std::function<void (HKEY, QString &)> &callback) {
     HKEY hKey;
     REGSAM sam = KEY_READ | KEY_WOW64_64KEY;
-    LONG result = RegOpenKeyEx(hRootKey, reinterpret_cast<LPCWSTR>(subKey.utf16()), 0, sam, &hKey);
-    ASSERT(result == ERROR_SUCCESS);
+    LONG result = RegOpenKeyEx (hRootKey, reinterpret_cast<LPCWSTR> (subKey.utf16 ()), 0, sam, &hKey);
+    ASSERT (result == ERROR_SUCCESS);
     if (result != ERROR_SUCCESS)
         return false;
 
     DWORD maxSubKeyNameSize;
     // Get the largest keyname size once instead of relying each call on ERROR_MORE_DATA.
-    result = RegQueryInfoKey(hKey, nullptr, nullptr, nullptr, nullptr, &maxSubKeyNameSize, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
-    ASSERT(result == ERROR_SUCCESS);
+    result = RegQueryInfoKey (hKey, nullptr, nullptr, nullptr, nullptr, &maxSubKeyNameSize, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+    ASSERT (result == ERROR_SUCCESS);
     if (result != ERROR_SUCCESS) {
-        RegCloseKey(hKey);
+        RegCloseKey (hKey);
         return false;
     }
 
     QString subKeyName;
-    subKeyName.reserve(maxSubKeyNameSize + 1);
+    subKeyName.reserve (maxSubKeyNameSize + 1);
 
     DWORD retCode = ERROR_SUCCESS;
     for (DWORD i = 0; retCode == ERROR_SUCCESS; ++i) {
-        Q_ASSERT(unsigned(subKeyName.capacity()) > maxSubKeyNameSize);
+        Q_ASSERT (unsigned (subKeyName.capacity ()) > maxSubKeyNameSize);
         // Make the previously reserved capacity official again.
-        subKeyName.resize(subKeyName.capacity());
-        DWORD subKeyNameSize = subKeyName.size();
-        retCode = RegEnumKeyEx(hKey, i, reinterpret_cast<LPWSTR>(subKeyName.data()), &subKeyNameSize, nullptr, nullptr, nullptr, nullptr);
+        subKeyName.resize (subKeyName.capacity ());
+        DWORD subKeyNameSize = subKeyName.size ();
+        retCode = RegEnumKeyEx (hKey, i, reinterpret_cast<LPWSTR> (subKeyName.data ()), &subKeyNameSize, nullptr, nullptr, nullptr, nullptr);
 
-        ASSERT(result == ERROR_SUCCESS || retCode == ERROR_NO_MORE_ITEMS);
+        ASSERT (result == ERROR_SUCCESS || retCode == ERROR_NO_MORE_ITEMS);
         if (retCode == ERROR_SUCCESS) {
             // subKeyNameSize excludes the trailing \0
-            subKeyName.resize(subKeyNameSize);
+            subKeyName.resize (subKeyNameSize);
             // Pass only the sub keyname, not the full path.
-            callback(hKey, subKeyName);
+            callback (hKey, subKeyName);
         }
     }
 
-    RegCloseKey(hKey);
+    RegCloseKey (hKey);
     return retCode != ERROR_NO_MORE_ITEMS;
 }
 
-DWORD Utility::convertSizeToDWORD(size_t &convertVar) {
-    if( convertVar > UINT_MAX ) {
-        //throw std::bad_cast();
+DWORD Utility::convertSizeToDWORD (size_t &convertVar) {
+    if ( convertVar > UINT_MAX ) {
+        //throw std::bad_cast ();
         convertVar = UINT_MAX; // intentionally default to wrong value here to not crash: exception handling TBD
     }
-    return static_cast<DWORD>(convertVar);
+    return static_cast<DWORD> (convertVar);
 }
 
-void Utility::UnixTimeToFiletime(time_t t, FILETIME *filetime) {
-    LONGLONG ll = Int32x32To64(t, 10000000) + 116444736000000000;
+void Utility::UnixTimeToFiletime (time_t t, FILETIME *filetime) {
+    LONGLONG ll = Int32x32To64 (t, 10000000) + 116444736000000000;
     filetime->dwLowDateTime = (DWORD) ll;
     filetime->dwHighDateTime = ll >>32;
 }
 
-void Utility::FiletimeToLargeIntegerFiletime(FILETIME *filetime, LARGE_INTEGER *hundredNSecs) {
+void Utility::FiletimeToLargeIntegerFiletime (FILETIME *filetime, LARGE_INTEGER *hundredNSecs) {
     hundredNSecs->LowPart = filetime->dwLowDateTime;
     hundredNSecs->HighPart = filetime->dwHighDateTime;
 }
 
-void Utility::UnixTimeToLargeIntegerFiletime(time_t t, LARGE_INTEGER *hundredNSecs) {
-    LONGLONG ll = Int32x32To64(t, 10000000) + 116444736000000000;
+void Utility::UnixTimeToLargeIntegerFiletime (time_t t, LARGE_INTEGER *hundredNSecs) {
+    LONGLONG ll = Int32x32To64 (t, 10000000) + 116444736000000000;
     hundredNSecs->LowPart = (DWORD) ll;
     hundredNSecs->HighPart = ll >>32;
 }
 
-QString Utility::formatWinError(long errorCode) {
-    return QStringLiteral("WindowsError: %1: %2").arg(QString::number(errorCode, 16), QString::fromWCharArray(_com_error(errorCode).ErrorMessage()));
+QString Utility::formatWinError (long errorCode) {
+    return QStringLiteral ("WindowsError: %1: %2").arg (QString::number (errorCode, 16), QString::fromWCharArray (_com_error (errorCode).ErrorMessage ()));
 }
 
-QString Utility::getCurrentUserName() {
+QString Utility::getCurrentUserName () {
     TCHAR username[UNLEN + 1] = {0};
-    DWORD len = sizeof(username) / sizeof(TCHAR);
+    DWORD len = sizeof (username) / sizeof (TCHAR);
 
-    if (!GetUserName(username, &len)) {
-        qCWarning(lcUtility) << "Could not retrieve Windows user name." << formatWinError(GetLastError());
+    if (!GetUserName (username, &len)) {
+        qCWarning (lcUtility) << "Could not retrieve Windows user name." << formatWinError (GetLastError ());
     }
 
-    return QString::fromWCharArray(username);
+    return QString::fromWCharArray (username);
 }
 
-Utility::NtfsPermissionLookupRAII::NtfsPermissionLookupRAII() {
+Utility::NtfsPermissionLookupRAII::NtfsPermissionLookupRAII () {
     qt_ntfs_permission_lookup++;
 }
 
-Utility::NtfsPermissionLookupRAII::~NtfsPermissionLookupRAII() {
+Utility::NtfsPermissionLookupRAII::~NtfsPermissionLookupRAII () {
     qt_ntfs_permission_lookup--;
 }
 

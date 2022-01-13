@@ -25,30 +25,30 @@ class AbstractCredentials;
 class OWNCLOUDSYNC_EXPORT PushNotifications : public QObject {
 
 public:
-    explicit PushNotifications(Account *account, QObject *parent = nullptr);
+    explicit PushNotifications (Account *account, QObject *parent = nullptr);
 
-    ~PushNotifications() override;
+    ~PushNotifications () override;
 
     /**
      * Setup push notifications
      *
      * This method needs to be called before push notifications can be used.
      */
-    void setup();
+    void setup ();
 
     /**
      * Set the interval for reconnection attempts
      *
      * @param interval Interval in milliseconds.
      */
-    void setReconnectTimerInterval(uint32_t interval);
+    void setReconnectTimerInterval (uint32_t interval);
 
     /**
      * Indicates if push notifications ready to use
      *
      * Ready to use means connected and authenticated.
      */
-    bool isReady() const;
+    bool isReady () const;
 
     /**
      * Set the interval in which the websocket will ping the server if it is still alive.
@@ -57,72 +57,72 @@ public:
      *
      * @param interval Interval in milliseconds.
      */
-    void setPingInterval(int interval);
+    void setPingInterval (int interval);
 
 signals:
     /**
      * Will be emitted after a successful connection and authentication
      */
-    void ready();
+    void ready ();
 
     /**
      * Will be emitted if files on the server changed
      */
-    void filesChanged(Account *account);
+    void filesChanged (Account *account);
 
     /**
      * Will be emitted if activities have been changed on the server
      */
-    void activitiesChanged(Account *account);
+    void activitiesChanged (Account *account);
 
     /**
      * Will be emitted if notifications have been changed on the server
      */
-    void notificationsChanged(Account *account);
+    void notificationsChanged (Account *account);
 
     /**
      * Will be emitted if push notifications are unable to authenticate
      *
-     * It's save to call #PushNotifications::setup() after this signal has been emitted.
+     * It's save to call #PushNotifications::setup () after this signal has been emitted.
      */
-    void authenticationFailed();
+    void authenticationFailed ();
 
     /**
      * Will be emitted if push notifications are unable to connect or the connection timed out
      *
-     * It's save to call #PushNotifications::setup() after this signal has been emitted.
+     * It's save to call #PushNotifications::setup () after this signal has been emitted.
      */
-    void connectionLost();
+    void connectionLost ();
 
 private slots:
-    void onWebSocketConnected();
-    void onWebSocketDisconnected();
-    void onWebSocketTextMessageReceived(QString &message);
-    void onWebSocketError(QAbstractSocket::SocketError error);
-    void onWebSocketSslErrors(QList<QSslError> &errors);
-    void onWebSocketPongReceived(quint64 elapsedTime, QByteArray &payload);
-    void onPingTimedOut();
+    void onWebSocketConnected ();
+    void onWebSocketDisconnected ();
+    void onWebSocketTextMessageReceived (QString &message);
+    void onWebSocketError (QAbstractSocket::SocketError error);
+    void onWebSocketSslErrors (QList<QSslError> &errors);
+    void onWebSocketPongReceived (quint64 elapsedTime, QByteArray &payload);
+    void onPingTimedOut ();
 
 private:
-    void openWebSocket();
-    void reconnectToWebSocket();
-    void closeWebSocket();
-    void authenticateOnWebSocket();
-    bool tryReconnectToWebSocket();
-    void initReconnectTimer();
-    void pingWebSocketServer();
-    void startPingTimer();
-    void startPingTimedOutTimer();
+    void openWebSocket ();
+    void reconnectToWebSocket ();
+    void closeWebSocket ();
+    void authenticateOnWebSocket ();
+    bool tryReconnectToWebSocket ();
+    void initReconnectTimer ();
+    void pingWebSocketServer ();
+    void startPingTimer ();
+    void startPingTimedOutTimer ();
 
-    void handleAuthenticated();
-    void handleNotifyFile();
-    void handleInvalidCredentials();
-    void handleNotifyNotification();
-    void handleNotifyActivity();
+    void handleAuthenticated ();
+    void handleNotifyFile ();
+    void handleInvalidCredentials ();
+    void handleNotifyNotification ();
+    void handleNotifyActivity ();
 
-    void emitFilesChanged();
-    void emitNotificationsChanged();
-    void emitActivitiesChanged();
+    void emitFilesChanged ();
+    void emitNotificationsChanged ();
+    void emitActivitiesChanged ();
 
     Account *_account = nullptr;
     QWebSocket *_webSocket;

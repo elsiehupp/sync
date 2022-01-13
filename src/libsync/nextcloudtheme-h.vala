@@ -20,9 +20,9 @@ namespace OCC {
  */
 class NextcloudTheme : public Theme {
 public:
-    NextcloudTheme();
+    NextcloudTheme ();
 
-    QString wizardUrlHint() const override;
+    QString wizardUrlHint () const override;
 };
 }
 #endif // NEXTCLOUD_THEME_H

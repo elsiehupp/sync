@@ -28,15 +28,15 @@ class SyncFileItem;
  */
 class SyncRunFileLog {
 public:
-    SyncRunFileLog();
-    void start(QString &folderPath);
-    void logItem(SyncFileItem &item);
-    void logLap(QString &name);
-    void finish();
+    SyncRunFileLog ();
+    void start (QString &folderPath);
+    void logItem (SyncFileItem &item);
+    void logLap (QString &name);
+    void finish ();
 
 protected:
 private:
-    QString dateTimeStr(QDateTime &dt);
+    QString dateTimeStr (QDateTime &dt);
 
     QScopedPointer<QFile> _file;
     QTextStream _out;

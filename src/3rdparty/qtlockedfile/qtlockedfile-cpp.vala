@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2014 Digia Plc and/or its subsidiary(-ies).
+** Copyright (C) 2014 Digia Plc and/or its subsidiary (-ies).
 ** Contact: http://www.qt-project.org/legal
 **
 ** This file is part of Qt Creator.
@@ -64,12 +64,12 @@ namespace SharedTools {
 
 /*!
     Constructs an unlocked \e QtLockedFile object. This constructor behaves in the same way
-    as \e QFile::QFile().
+    as \e QFile::QFile ().
 
-    \sa QFile::QFile()
+    \sa QFile::QFile ()
 */
-QtLockedFile::QtLockedFile()
-    : QFile() {
+QtLockedFile::QtLockedFile ()
+    : QFile () {
 #ifdef Q_OS_WIN
     m_semaphore_hnd = 0;
     m_mutex_hnd = 0;
@@ -79,12 +79,12 @@ QtLockedFile::QtLockedFile()
 
 /*!
     Constructs an unlocked QtLockedFile object with file \a name. This constructor behaves in
-    the same way as \e QFile::QFile(QString&).
+    the same way as \e QFile::QFile (QString&).
 
-    \sa QFile::QFile()
+    \sa QFile::QFile ()
 */
-QtLockedFile::QtLockedFile(QString &name)
-    : QFile(name) {
+QtLockedFile::QtLockedFile (QString &name)
+    : QFile (name) {
 #ifdef Q_OS_WIN
     m_semaphore_hnd = 0;
     m_mutex_hnd = 0;
@@ -96,23 +96,23 @@ QtLockedFile::QtLockedFile(QString &name)
     Returns \e true if this object has a in read or write lock;
     otherwise returns \e false.
 
-    \sa lockMode()
+    \sa lockMode ()
 */
-bool QtLockedFile::isLocked() const {
+bool QtLockedFile::isLocked () const {
     return m_lock_mode != NoLock;
 }
 
 /*!
     Returns the type of lock currently held by this object, or \e QtLockedFile::NoLock.
 
-    \sa isLocked()
+    \sa isLocked ()
 */
-QtLockedFile::LockMode QtLockedFile::lockMode() const {
+QtLockedFile::LockMode QtLockedFile::lockMode () const {
     return m_lock_mode;
 }
 
 /*!
-    \fn bool QtLockedFile::lock(LockMode mode, bool block = true)
+    \fn bool QtLockedFile::lock (LockMode mode, bool block = true)
 
     Obtains a lock of type \a mode.
 
@@ -127,11 +127,11 @@ QtLockedFile::LockMode QtLockedFile::lockMode() const {
     This function returns \e true if, after it executes, the file is locked by this object,
     and \e false otherwise.
 
-    \sa unlock(), isLocked(), lockMode()
+    \sa unlock (), isLocked (), lockMode ()
 */
 
 /*!
-    \fn bool QtLockedFile::unlock()
+    \fn bool QtLockedFile::unlock ()
 
     Releases a lock.
 
@@ -140,11 +140,11 @@ QtLockedFile::LockMode QtLockedFile::lockMode() const {
     This function returns \e true if, after it executes, the file is not locked by
     this object, and \e false otherwise.
 
-    \sa lock(), isLocked(), lockMode()
+    \sa lock (), isLocked (), lockMode ()
 */
 
 /*!
-    \fn QtLockedFile::~QtLockedFile()
+    \fn QtLockedFile::~QtLockedFile ()
 
     Destroys the \e QtLockedFile object. If any locks were held, they are released.
 */

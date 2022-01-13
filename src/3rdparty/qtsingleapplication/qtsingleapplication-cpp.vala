@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2014 Digia Plc and/or its subsidiary(-ies).
+** Copyright (C) 2014 Digia Plc and/or its subsidiary (-ies).
 ** Contact: http://www.qt-project.org/legal
 **
 ** This file is part of Qt Creator.
@@ -38,33 +38,33 @@ namespace SharedTools {
 
 static const int instancesSize = 1024;
 
-static QString instancesLockFilename(QString &appSessionId) {
-    const QChar slash(QLatin1Char('/'));
-    QString res = QDir::tempPath();
-    if (!res.endsWith(slash))
+static QString instancesLockFilename (QString &appSessionId) {
+    const QChar slash (QLatin1Char ('/'));
+    QString res = QDir::tempPath ();
+    if (!res.endsWith (slash))
         res += slash;
-    return res + appSessionId + QLatin1String("-instances");
+    return res + appSessionId + QLatin1String ("-instances");
 }
 
-QtSingleApplication::QtSingleApplication(QString &appId, int &argc, char **argv)
-    : QApplication(argc, argv),
-      firstPeer(-1),
-      pidPeer(nullptr) {
+QtSingleApplication::QtSingleApplication (QString &appId, int &argc, char **argv)
+    : QApplication (argc, argv),
+      firstPeer (-1),
+      pidPeer (nullptr) {
     this->appId = appId;
 
-    const QString appSessionId = QtLocalPeer::appSessionId(appId);
+    const QString appSessionId = QtLocalPeer::appSessionId (appId);
 
     // This shared memory holds a zero-terminated array of active (or crashed) instances
-    instances = new QSharedMemory(appSessionId, this);
+    instances = new QSharedMemory (appSessionId, this);
     actWin = nullptr;
     block = false;
 
     // First instance creates the shared memory, later instances attach to it
-    const bool created = instances->create(instancesSize);
+    const bool created = instances->create (instancesSize);
     if (!created) {
-        if (!instances->attach()) {
-            qWarning() << "Failed to initialize instances shared memory: "
-                       << instances->errorString();
+        if (!instances->attach ()) {
+            qWarning () << "Failed to initialize instances shared memory: "
+                       << instances->errorString ();
             delete instances;
             instances = nullptr;
             return;
@@ -72,105 +72,105 @@ QtSingleApplication::QtSingleApplication(QString &appId, int &argc, char **argv)
     }
 
     // QtLockedFile is used to workaround QTBUG-10364
-    QtLockedFile lockfile(instancesLockFilename(appSessionId));
+    QtLockedFile lockfile (instancesLockFilename (appSessionId));
 
-    lockfile.open(QtLockedFile::ReadWrite);
-    lockfile.lock(QtLockedFile::WriteLock);
-    auto *pids = static_cast<qint64 *>(instances->data());
+    lockfile.open (QtLockedFile::ReadWrite);
+    lockfile.lock (QtLockedFile::WriteLock);
+    auto *pids = static_cast<qint64 *> (instances->data ());
     if (!created) {
         // Find the first instance that it still running
         // The whole list needs to be iterated in order to append to it
         for (; *pids; ++pids) {
-            if (firstPeer == -1 && isRunning(*pids))
+            if (firstPeer == -1 && isRunning (*pids))
                 firstPeer = *pids;
         }
     }
     // Add current pid to list and terminate it
-    *pids++ = QCoreApplication::applicationPid();
+    *pids++ = QCoreApplication::applicationPid ();
     *pids = 0;
-    pidPeer = new QtLocalPeer(this, appId + QLatin1Char('-') +
-                              QString::number(QCoreApplication::applicationPid()));
-    connect(pidPeer, &QtLocalPeer::messageReceived, this, &QtSingleApplication::messageReceived);
-    pidPeer->isClient();
-    lockfile.unlock();
+    pidPeer = new QtLocalPeer (this, appId + QLatin1Char ('-') +
+                              QString::number (QCoreApplication::applicationPid ()));
+    connect (pidPeer, &QtLocalPeer::messageReceived, this, &QtSingleApplication::messageReceived);
+    pidPeer->isClient ();
+    lockfile.unlock ();
 }
 
-QtSingleApplication::~QtSingleApplication() {
+QtSingleApplication::~QtSingleApplication () {
     if (!instances)
         return;
-    const qint64 appPid = QCoreApplication::applicationPid();
-    QtLockedFile lockfile(instancesLockFilename(QtLocalPeer::appSessionId(appId)));
-    lockfile.open(QtLockedFile::ReadWrite);
-    lockfile.lock(QtLockedFile::WriteLock);
+    const qint64 appPid = QCoreApplication::applicationPid ();
+    QtLockedFile lockfile (instancesLockFilename (QtLocalPeer::appSessionId (appId)));
+    lockfile.open (QtLockedFile::ReadWrite);
+    lockfile.lock (QtLockedFile::WriteLock);
     // Rewrite array, removing current pid and previously crashed ones
-    auto *pids = static_cast<qint64 *>(instances->data());
+    auto *pids = static_cast<qint64 *> (instances->data ());
     qint64 *newpids = pids;
     for (; *pids; ++pids) {
-        if (*pids != appPid && isRunning(*pids))
+        if (*pids != appPid && isRunning (*pids))
             *newpids++ = *pids;
     }
     *newpids = 0;
-    lockfile.unlock();
+    lockfile.unlock ();
 }
 
-bool QtSingleApplication::event(QEvent *event) {
-    if (event->type() == QEvent::FileOpen) {
-        auto *foe = static_cast<QFileOpenEvent*>(event);
-        emit fileOpenRequest(foe->file());
+bool QtSingleApplication::event (QEvent *event) {
+    if (event->type () == QEvent::FileOpen) {
+        auto *foe = static_cast<QFileOpenEvent*> (event);
+        emit fileOpenRequest (foe->file ());
         return true;
     }
-    return QApplication::event(event);
+    return QApplication::event (event);
 }
 
-bool QtSingleApplication::isRunning(qint64 pid) {
+bool QtSingleApplication::isRunning (qint64 pid) {
     if (pid == -1) {
         pid = firstPeer;
         if (pid == -1)
             return false;
     }
 
-    QtLocalPeer peer(this, appId + QLatin1Char('-') + QString::number(pid, 10));
-    return peer.isClient();
+    QtLocalPeer peer (this, appId + QLatin1Char ('-') + QString::number (pid, 10));
+    return peer.isClient ();
 }
 
-bool QtSingleApplication::sendMessage(QString &message, int timeout, qint64 pid) {
+bool QtSingleApplication::sendMessage (QString &message, int timeout, qint64 pid) {
     if (pid == -1) {
         pid = firstPeer;
         if (pid == -1)
             return false;
     }
 
-    QtLocalPeer peer(this, appId + QLatin1Char('-') + QString::number(pid, 10));
-    return peer.sendMessage(message, timeout, block);
+    QtLocalPeer peer (this, appId + QLatin1Char ('-') + QString::number (pid, 10));
+    return peer.sendMessage (message, timeout, block);
 }
 
-QString QtSingleApplication::applicationId() const {
+QString QtSingleApplication::applicationId () const {
     return appId;
 }
 
-void QtSingleApplication::setBlock(bool value) {
+void QtSingleApplication::setBlock (bool value) {
     block = value;
 }
 
-void QtSingleApplication::setActivationWindow(QWidget *aw, bool activateOnMessage) {
+void QtSingleApplication::setActivationWindow (QWidget *aw, bool activateOnMessage) {
     actWin = aw;
     if (!pidPeer)
         return;
     if (activateOnMessage)
-        connect(pidPeer, &QtLocalPeer::messageReceived, this, &QtSingleApplication::activateWindow);
+        connect (pidPeer, &QtLocalPeer::messageReceived, this, &QtSingleApplication::activateWindow);
     else
-        disconnect(pidPeer, &QtLocalPeer::messageReceived, this, &QtSingleApplication::activateWindow);
+        disconnect (pidPeer, &QtLocalPeer::messageReceived, this, &QtSingleApplication::activateWindow);
 }
 
-QWidget* QtSingleApplication::activationWindow() const {
+QWidget* QtSingleApplication::activationWindow () const {
     return actWin;
 }
 
-void QtSingleApplication::activateWindow() {
+void QtSingleApplication::activateWindow () {
     if (actWin) {
-        actWin->setWindowState(actWin->windowState() & ~Qt::WindowMinimized);
-        actWin->raise();
-        actWin->activateWindow();
+        actWin->setWindowState (actWin->windowState () & ~Qt::WindowMinimized);
+        actWin->raise ();
+        actWin->activateWindow ();
     }
 }
 

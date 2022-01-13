@@ -24,21 +24,21 @@ namespace OCC {
 
 class OCSYNC_EXPORT PluginFactory {
 public:
-    virtual ~PluginFactory();
-    virtual QObject* create(QObject* parent) = 0;
+    virtual ~PluginFactory ();
+    virtual QObject* create (QObject* parent) = 0;
 };
 
 template<class PluginClass>
 class DefaultPluginFactory : public PluginFactory {
 public:
-    QObject* create(QObject *parent) override {
-        return new PluginClass(parent);
+    QObject* create (QObject *parent) override {
+        return new PluginClass (parent);
     }
 };
 
 /// Return the expected name of a plugin, for use with QPluginLoader
-QString pluginFileName(QString &type, QString &name);
+QString pluginFileName (QString &type, QString &name);
 
 }
 
-Q_DECLARE_INTERFACE(OCC::PluginFactory, "org.owncloud.PluginFactory")
+Q_DECLARE_INTERFACE (OCC::PluginFactory, "org.owncloud.PluginFactory")

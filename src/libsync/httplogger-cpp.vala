@@ -17,24 +17,24 @@
 // #include <QBuffer>
 
 namespace {
-Q_LOGGING_CATEGORY(lcNetworkHttp, "sync.httplogger", QtWarningMsg)
+Q_LOGGING_CATEGORY (lcNetworkHttp, "sync.httplogger", QtWarningMsg)
 
 const qint64 PeekSize = 1024 * 1024;
 
-const QByteArray XRequestId(){
-    return QByteArrayLiteral("X-Request-ID");
+const QByteArray XRequestId (){
+    return QByteArrayLiteral ("X-Request-ID");
 }
 
-bool isTextBody(QString &s) {
-    static const QRegularExpression regexp(QStringLiteral("^(text/.*|(application/(xml|json|x-www-form-urlencoded)(;|$)))"));
-    return regexp.match(s).hasMatch();
+bool isTextBody (QString &s) {
+    static const QRegularExpression regexp (QStringLiteral ("^ (text/.*| (application/ (xml|json|x-www-form-urlencoded) (;|$)))"));
+    return regexp.match (s).hasMatch ();
 }
 
-void logHttp(QByteArray &verb, QString &url, QByteArray &id, QString &contentType, QList<QNetworkReply::RawHeaderPair> &header, QIODevice *device) {
-    const auto reply = qobject_cast<QNetworkReply *>(device);
-    const auto contentLength = device ? device->size() : 0;
+void logHttp (QByteArray &verb, QString &url, QByteArray &id, QString &contentType, QList<QNetworkReply::RawHeaderPair> &header, QIODevice *device) {
+    const auto reply = qobject_cast<QNetworkReply *> (device);
+    const auto contentLength = device ? device->size () : 0;
     QString msg;
-    QTextStream stream(&msg);
+    QTextStream stream (&msg);
     stream << id << ": ";
     if (!reply) {
         stream << "Request: ";
@@ -43,13 +43,13 @@ void logHttp(QByteArray &verb, QString &url, QByteArray &id, QString &contentTyp
     }
     stream << verb;
     if (reply) {
-        stream << " " << reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+        stream << " " << reply->attribute (QNetworkRequest::HttpStatusCodeAttribute).toInt ();
     }
     stream << " " << url << " Header: { ";
     for (auto &it : header) {
         stream << it.first << ": ";
         if (it.first == "Authorization") {
-            stream << (it.second.startsWith("Bearer ") ? "Bearer" : "Basic");
+            stream << (it.second.startsWith ("Bearer ") ? "Bearer" : "Basic");
             stream << " [redacted]";
         } else {
             stream << it.second;
@@ -58,74 +58,74 @@ void logHttp(QByteArray &verb, QString &url, QByteArray &id, QString &contentTyp
     }
     stream << "} Data: [";
     if (contentLength > 0) {
-        if (isTextBody(contentType)) {
-            if (!device->isOpen()) {
-                Q_ASSERT(dynamic_cast<QBuffer *>(device));
+        if (isTextBody (contentType)) {
+            if (!device->isOpen ()) {
+                Q_ASSERT (dynamic_cast<QBuffer *> (device));
                 // should we close it again?
-                device->open(QIODevice::ReadOnly);
+                device->open (QIODevice::ReadOnly);
             }
-            Q_ASSERT(device->pos() == 0);
-            stream << device->peek(PeekSize);
+            Q_ASSERT (device->pos () == 0);
+            stream << device->peek (PeekSize);
             if (PeekSize < contentLength) {
-                stream << "...(" << (contentLength - PeekSize) << "bytes elided)";
+                stream << "... (" << (contentLength - PeekSize) << "bytes elided)";
             }
         } else {
             stream << contentLength << " bytes of " << contentType << " data";
         }
     }
     stream << "]";
-    qCInfo(lcNetworkHttp) << msg;
+    qCInfo (lcNetworkHttp) << msg;
 }
 }
 
 namespace OCC {
 
-void HttpLogger::logRequest(QNetworkReply *reply, QNetworkAccessManager::Operation operation, QIODevice *device) {
-    const auto request = reply->request();
-    if (!lcNetworkHttp().isInfoEnabled()) {
+void HttpLogger::logRequest (QNetworkReply *reply, QNetworkAccessManager::Operation operation, QIODevice *device) {
+    const auto request = reply->request ();
+    if (!lcNetworkHttp ().isInfoEnabled ()) {
         return;
     }
-    const auto keys = request.rawHeaderList();
+    const auto keys = request.rawHeaderList ();
     QList<QNetworkReply::RawHeaderPair> header;
-    header.reserve(keys.size());
+    header.reserve (keys.size ());
     for (auto &key : keys) {
-        header << qMakePair(key, request.rawHeader(key));
+        header << qMakePair (key, request.rawHeader (key));
     }
-    logHttp(requestVerb(operation, request),
-        request.url().toString(),
-        request.rawHeader(XRequestId()),
-        request.header(QNetworkRequest::ContentTypeHeader).toString(),
+    logHttp (requestVerb (operation, request),
+        request.url ().toString (),
+        request.rawHeader (XRequestId ()),
+        request.header (QNetworkRequest::ContentTypeHeader).toString (),
         header,
         device);
 
-    QObject::connect(reply, &QNetworkReply::finished, reply, [reply] {
-        logHttp(requestVerb(*reply),
-            reply->url().toString(),
-            reply->request().rawHeader(XRequestId()),
-            reply->header(QNetworkRequest::ContentTypeHeader).toString(),
-            reply->rawHeaderPairs(),
+    QObject::connect (reply, &QNetworkReply::finished, reply, [reply] {
+        logHttp (requestVerb (*reply),
+            reply->url ().toString (),
+            reply->request ().rawHeader (XRequestId ()),
+            reply->header (QNetworkRequest::ContentTypeHeader).toString (),
+            reply->rawHeaderPairs (),
             reply);
     });
 }
 
-QByteArray HttpLogger::requestVerb(QNetworkAccessManager::Operation operation, QNetworkRequest &request) {
+QByteArray HttpLogger::requestVerb (QNetworkAccessManager::Operation operation, QNetworkRequest &request) {
     switch (operation) {
     case QNetworkAccessManager::HeadOperation:
-        return QByteArrayLiteral("HEAD");
+        return QByteArrayLiteral ("HEAD");
     case QNetworkAccessManager::GetOperation:
-        return QByteArrayLiteral("GET");
+        return QByteArrayLiteral ("GET");
     case QNetworkAccessManager::PutOperation:
-        return QByteArrayLiteral("PUT");
+        return QByteArrayLiteral ("PUT");
     case QNetworkAccessManager::PostOperation:
-        return QByteArrayLiteral("POST");
+        return QByteArrayLiteral ("POST");
     case QNetworkAccessManager::DeleteOperation:
-        return QByteArrayLiteral("DELETE");
+        return QByteArrayLiteral ("DELETE");
     case QNetworkAccessManager::CustomOperation:
-        return request.attribute(QNetworkRequest::CustomVerbAttribute).toByteArray();
+        return request.attribute (QNetworkRequest::CustomVerbAttribute).toByteArray ();
     case QNetworkAccessManager::UnknownOperation:
         break;
     }
-    Q_UNREACHABLE();
+    Q_UNREACHABLE ();
 }
 
 }

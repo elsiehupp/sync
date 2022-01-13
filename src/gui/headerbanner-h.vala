@@ -68,13 +68,13 @@ namespace OCC {
 
 class HeaderBanner : public QWidget {
 public:
-    HeaderBanner(QWidget *parent = nullptr);
+    HeaderBanner (QWidget *parent = nullptr);
 
-    void setup(QString &title, QPixmap &logo, QPixmap &banner,
+    void setup (QString &title, QPixmap &logo, QPixmap &banner,
                const Qt::TextFormat titleFormat, QString &styleSheet);
 
 protected:
-    void paintEvent(QPaintEvent *event) override;
+    void paintEvent (QPaintEvent *event) override;
 
 private:
     QLabel *titleLabel;

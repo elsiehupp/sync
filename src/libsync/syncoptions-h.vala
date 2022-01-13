@@ -27,8 +27,8 @@ namespace OCC {
  */
 class OWNCLOUDSYNC_EXPORT SyncOptions {
 public:
-    SyncOptions();
-    ~SyncOptions();
+    SyncOptions ();
+    ~SyncOptions ();
 
     /** Maximum size (in Bytes) a folder can have without asking for confirmation.
      * -1 means infinite */
@@ -62,7 +62,7 @@ public:
      *
      * Set to 0 it will disable dynamic chunk sizing.
      */
-    std::chrono::milliseconds _targetChunkUploadDuration = std::chrono::minutes(1);
+    std::chrono::milliseconds _targetChunkUploadDuration = std::chrono::minutes (1);
 
     /** The maximum number of active jobs in parallel  */
     int _parallelNetworkJobs = 6;
@@ -72,7 +72,7 @@ public:
      * Currently reads _initialChunkSize, _minChunkSize, _maxChunkSize,
      * _targetChunkUploadDuration, _parallelNetworkJobs.
      */
-    void fillFromEnvironmentVariables();
+    void fillFromEnvironmentVariables ();
 
     /** Ensure min <= initial <= max
      *
@@ -81,29 +81,29 @@ public:
      * values. To cope with this, adjust min/max to always include the
      * initial chunk size value.
      */
-    void verifyChunkSizes();
+    void verifyChunkSizes ();
 
     /** A regular expression to match file names
      * If no pattern is provided the default is an invalid regular expression.
      */
-    QRegularExpression fileRegex() const;
+    QRegularExpression fileRegex () const;
 
     /**
      * A pattern like *.txt, matching only file names
      */
-    void setFilePattern(QString &pattern);
+    void setFilePattern (QString &pattern);
 
     /**
      * A pattern like /own.*\/.*txt matching the full path
      */
-    void setPathPattern(QString &pattern);
+    void setPathPattern (QString &pattern);
 
 private:
     /**
      * Only sync files that mathc the expression
      * Invalid pattern by default.
      */
-    QRegularExpression _fileRegex = QRegularExpression(QStringLiteral("("));
+    QRegularExpression _fileRegex = QRegularExpression (QStringLiteral (" ("));
 };
 
 }

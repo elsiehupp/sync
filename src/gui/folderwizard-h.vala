@@ -30,7 +30,7 @@ class ownCloudInfo;
  */
 class FormatWarningsWizardPage : public QWizardPage {
 protected:
-    QString formatWarnings(QStringList &warnings) const;
+    QString formatWarnings (QStringList &warnings) const;
 };
 
 /**
@@ -39,16 +39,16 @@ protected:
  */
 class FolderWizardLocalPath : public FormatWarningsWizardPage {
 public:
-    explicit FolderWizardLocalPath(AccountPtr &account);
-    ~FolderWizardLocalPath() override;
+    explicit FolderWizardLocalPath (AccountPtr &account);
+    ~FolderWizardLocalPath () override;
 
-    bool isComplete() const override;
-    void initializePage() override;
-    void cleanupPage() override;
+    bool isComplete () const override;
+    void initializePage () override;
+    void cleanupPage () override;
 
-    void setFolderMap(Folder::Map &fm) { _folderMap = fm; }
+    void setFolderMap (Folder::Map &fm) { _folderMap = fm; }
 protected slots:
-    void slotChooseLocalFolder();
+    void slotChooseLocalFolder ();
 
 private:
     Ui_FolderWizardSourcePage _ui;
@@ -63,35 +63,35 @@ private:
 
 class FolderWizardRemotePath : public FormatWarningsWizardPage {
 public:
-    explicit FolderWizardRemotePath(AccountPtr &account);
-    ~FolderWizardRemotePath() override;
+    explicit FolderWizardRemotePath (AccountPtr &account);
+    ~FolderWizardRemotePath () override;
 
-    bool isComplete() const override;
+    bool isComplete () const override;
 
-    void initializePage() override;
-    void cleanupPage() override;
+    void initializePage () override;
+    void cleanupPage () override;
 
 protected slots:
 
-    void showWarn(QString & = QString()) const;
-    void slotAddRemoteFolder();
-    void slotCreateRemoteFolder(QString &);
-    void slotCreateRemoteFolderFinished();
-    void slotHandleMkdirNetworkError(QNetworkReply *);
-    void slotHandleLsColNetworkError(QNetworkReply *);
-    void slotUpdateDirectories(QStringList &);
-    void slotGatherEncryptedPaths(QString &, QMap<QString, QString> &);
-    void slotRefreshFolders();
-    void slotItemExpanded(QTreeWidgetItem *);
-    void slotCurrentItemChanged(QTreeWidgetItem *);
-    void slotFolderEntryEdited(QString &text);
-    void slotLsColFolderEntry();
-    void slotTypedPathFound(QStringList &subpaths);
+    void showWarn (QString & = QString ()) const;
+    void slotAddRemoteFolder ();
+    void slotCreateRemoteFolder (QString &);
+    void slotCreateRemoteFolderFinished ();
+    void slotHandleMkdirNetworkError (QNetworkReply *);
+    void slotHandleLsColNetworkError (QNetworkReply *);
+    void slotUpdateDirectories (QStringList &);
+    void slotGatherEncryptedPaths (QString &, QMap<QString, QString> &);
+    void slotRefreshFolders ();
+    void slotItemExpanded (QTreeWidgetItem *);
+    void slotCurrentItemChanged (QTreeWidgetItem *);
+    void slotFolderEntryEdited (QString &text);
+    void slotLsColFolderEntry ();
+    void slotTypedPathFound (QStringList &subpaths);
 
 private:
-    LsColJob *runLsColJob(QString &path);
-    void recursiveInsert(QTreeWidgetItem *parent, QStringList pathTrail, QString path);
-    bool selectByPath(QString path);
+    LsColJob *runLsColJob (QString &path);
+    void recursiveInsert (QTreeWidgetItem *parent, QStringList pathTrail, QString path);
+    bool selectByPath (QString path);
     Ui_FolderWizardTargetPage _ui;
     bool _warnWasVisible;
     AccountPtr _account;
@@ -105,16 +105,16 @@ private:
  */
 class FolderWizardSelectiveSync : public QWizardPage {
 public:
-    explicit FolderWizardSelectiveSync(AccountPtr &account);
-    ~FolderWizardSelectiveSync() override;
+    explicit FolderWizardSelectiveSync (AccountPtr &account);
+    ~FolderWizardSelectiveSync () override;
 
-    bool validatePage() override;
+    bool validatePage () override;
 
-    void initializePage() override;
-    void cleanupPage() override;
+    void initializePage () override;
+    void cleanupPage () override;
 
 private slots:
-    void virtualFilesCheckboxClicked();
+    void virtualFilesCheckboxClicked ();
 
 private:
     SelectiveSyncWidget *_selectiveSync;
@@ -133,11 +133,11 @@ public:
         Page_SelectiveSync
     };
 
-    explicit FolderWizard(AccountPtr account, QWidget *parent = nullptr);
-    ~FolderWizard() override;
+    explicit FolderWizard (AccountPtr account, QWidget *parent = nullptr);
+    ~FolderWizard () override;
 
-    bool eventFilter(QObject *watched, QEvent *event) override;
-    void resizeEvent(QResizeEvent *event) override;
+    bool eventFilter (QObject *watched, QEvent *event) override;
+    void resizeEvent (QResizeEvent *event) override;
 
 private:
     FolderWizardLocalPath *_folderWizardSourcePage;

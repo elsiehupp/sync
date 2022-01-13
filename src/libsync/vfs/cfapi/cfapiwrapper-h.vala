@@ -25,55 +25,55 @@ namespace CfApiWrapper {
 
 class NEXTCLOUD_CFAPI_EXPORT ConnectionKey {
 public:
-    ConnectionKey();
-    inline void *get() const { return _data.get(); }
+    ConnectionKey ();
+    inline void *get () const { return _data.get (); }
 
 private:
-    std::unique_ptr<void, void(*)(void *)> _data;
+    std::unique_ptr<void, void (*) (void *)> _data;
 };
 
 class NEXTCLOUD_CFAPI_EXPORT FileHandle {
 public:
-    using Deleter = void (*)(void *);
+    using Deleter = void (*) (void *);
 
-    FileHandle();
-    FileHandle(void *data, Deleter deleter);
+    FileHandle ();
+    FileHandle (void *data, Deleter deleter);
 
-    inline void *get() const { return _data.get(); }
-    inline explicit operator bool() const noexcept { return static_cast<bool>(_data); }
+    inline void *get () const { return _data.get (); }
+    inline explicit operator bool () const noexcept { return static_cast<bool> (_data); }
 
 private:
-    std::unique_ptr<void, void(*)(void *)> _data;
+    std::unique_ptr<void, void (*) (void *)> _data;
 };
 
 class NEXTCLOUD_CFAPI_EXPORT PlaceHolderInfo {
 public:
-    using Deleter = void (*)(CF_PLACEHOLDER_BASIC_INFO *);
+    using Deleter = void (*) (CF_PLACEHOLDER_BASIC_INFO *);
 
-    PlaceHolderInfo();
-    PlaceHolderInfo(CF_PLACEHOLDER_BASIC_INFO *data, Deleter deleter);
+    PlaceHolderInfo ();
+    PlaceHolderInfo (CF_PLACEHOLDER_BASIC_INFO *data, Deleter deleter);
 
-    inline CF_PLACEHOLDER_BASIC_INFO *get() const noexcept { return _data.get(); }
-    inline CF_PLACEHOLDER_BASIC_INFO *operator->() const noexcept { return _data.get(); }
-    inline explicit operator bool() const noexcept { return static_cast<bool>(_data); }
+    inline CF_PLACEHOLDER_BASIC_INFO *get () const noexcept { return _data.get (); }
+    inline CF_PLACEHOLDER_BASIC_INFO *operator-> () const noexcept { return _data.get (); }
+    inline explicit operator bool () const noexcept { return static_cast<bool> (_data); }
 
-    Optional<PinState> pinState() const;
+    Optional<PinState> pinState () const;
 
 private:
     std::unique_ptr<CF_PLACEHOLDER_BASIC_INFO, Deleter> _data;
 };
 
-NEXTCLOUD_CFAPI_EXPORT Result<void, QString> registerSyncRoot(QString &path, QString &providerName, QString &providerVersion, QString &folderAlias, QString &displayName, QString &accountDisplayName);
-NEXTCLOUD_CFAPI_EXPORT Result<void, QString> unregisterSyncRoot(QString &path, QString &providerName, QString &accountDisplayName);
+NEXTCLOUD_CFAPI_EXPORT Result<void, QString> registerSyncRoot (QString &path, QString &providerName, QString &providerVersion, QString &folderAlias, QString &displayName, QString &accountDisplayName);
+NEXTCLOUD_CFAPI_EXPORT Result<void, QString> unregisterSyncRoot (QString &path, QString &providerName, QString &accountDisplayName);
 
-NEXTCLOUD_CFAPI_EXPORT Result<ConnectionKey, QString> connectSyncRoot(QString &path, VfsCfApi *context);
-NEXTCLOUD_CFAPI_EXPORT Result<void, QString> disconnectSyncRoot(ConnectionKey &&key);
+NEXTCLOUD_CFAPI_EXPORT Result<ConnectionKey, QString> connectSyncRoot (QString &path, VfsCfApi *context);
+NEXTCLOUD_CFAPI_EXPORT Result<void, QString> disconnectSyncRoot (ConnectionKey &&key);
 
-NEXTCLOUD_CFAPI_EXPORT bool isSparseFile(QString &path);
+NEXTCLOUD_CFAPI_EXPORT bool isSparseFile (QString &path);
 
-NEXTCLOUD_CFAPI_EXPORT FileHandle handleForPath(QString &path);
+NEXTCLOUD_CFAPI_EXPORT FileHandle handleForPath (QString &path);
 
-PlaceHolderInfo findPlaceholderInfo(FileHandle &handle);
+PlaceHolderInfo findPlaceholderInfo (FileHandle &handle);
 
 enum SetPinRecurseMode {
     NoRecurse = 0,
@@ -81,10 +81,10 @@ enum SetPinRecurseMode {
     ChildrenOnly
 };
 
-NEXTCLOUD_CFAPI_EXPORT Result<OCC::Vfs::ConvertToPlaceholderResult, QString> setPinState(FileHandle &handle, PinState state, SetPinRecurseMode mode);
-NEXTCLOUD_CFAPI_EXPORT Result<void, QString> createPlaceholderInfo(QString &path, time_t modtime, qint64 size, QByteArray &fileId);
-NEXTCLOUD_CFAPI_EXPORT Result<OCC::Vfs::ConvertToPlaceholderResult, QString> updatePlaceholderInfo(FileHandle &handle, time_t modtime, qint64 size, QByteArray &fileId, QString &replacesPath = QString());
-NEXTCLOUD_CFAPI_EXPORT Result<OCC::Vfs::ConvertToPlaceholderResult, QString> convertToPlaceholder(FileHandle &handle, time_t modtime, qint64 size, QByteArray &fileId, QString &replacesPath);
+NEXTCLOUD_CFAPI_EXPORT Result<OCC::Vfs::ConvertToPlaceholderResult, QString> setPinState (FileHandle &handle, PinState state, SetPinRecurseMode mode);
+NEXTCLOUD_CFAPI_EXPORT Result<void, QString> createPlaceholderInfo (QString &path, time_t modtime, qint64 size, QByteArray &fileId);
+NEXTCLOUD_CFAPI_EXPORT Result<OCC::Vfs::ConvertToPlaceholderResult, QString> updatePlaceholderInfo (FileHandle &handle, time_t modtime, qint64 size, QByteArray &fileId, QString &replacesPath = QString ());
+NEXTCLOUD_CFAPI_EXPORT Result<OCC::Vfs::ConvertToPlaceholderResult, QString> convertToPlaceholder (FileHandle &handle, time_t modtime, qint64 size, QByteArray &fileId, QString &replacesPath);
 
 }
 

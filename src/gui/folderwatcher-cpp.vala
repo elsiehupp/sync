@@ -23,60 +23,60 @@
 // #include <QStringList>
 // #include <QTimer>
 
-#if defined(Q_OS_WIN)
-#elif defined(Q_OS_MAC)
-#elif defined(Q_OS_UNIX)
+#if defined (Q_OS_WIN)
+#elif defined (Q_OS_MAC)
+#elif defined (Q_OS_UNIX)
 #endif
 
 namespace OCC {
 
-Q_LOGGING_CATEGORY(lcFolderWatcher, "nextcloud.gui.folderwatcher", QtInfoMsg)
+Q_LOGGING_CATEGORY (lcFolderWatcher, "nextcloud.gui.folderwatcher", QtInfoMsg)
 
-FolderWatcher::FolderWatcher(Folder *folder)
-    : QObject(folder)
-    , _folder(folder) {
+FolderWatcher::FolderWatcher (Folder *folder)
+    : QObject (folder)
+    , _folder (folder) {
 }
 
-FolderWatcher::~FolderWatcher() = default;
+FolderWatcher::~FolderWatcher () = default;
 
-void FolderWatcher::init(QString &root) {
-    _d.reset(new FolderWatcherPrivate(this, root));
-    _timer.start();
+void FolderWatcher::init (QString &root) {
+    _d.reset (new FolderWatcherPrivate (this, root));
+    _timer.start ();
 }
 
-bool FolderWatcher::pathIsIgnored(QString &path) {
-    if (path.isEmpty())
+bool FolderWatcher::pathIsIgnored (QString &path) {
+    if (path.isEmpty ())
         return true;
     if (!_folder)
         return false;
 
 #ifndef OWNCLOUD_TEST
-    if (_folder->isFileExcludedAbsolute(path) && !Utility::isConflictFile(path)) {
-        qCDebug(lcFolderWatcher) << "* Ignoring file" << path;
+    if (_folder->isFileExcludedAbsolute (path) && !Utility::isConflictFile (path)) {
+        qCDebug (lcFolderWatcher) << "* Ignoring file" << path;
         return true;
     }
 #endif
     return false;
 }
 
-bool FolderWatcher::isReliable() const {
+bool FolderWatcher::isReliable () const {
     return _isReliable;
 }
 
-void FolderWatcher::appendSubPaths(QDir dir, QStringList& subPaths) {
-    QStringList newSubPaths = dir.entryList(QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files);
-    for (int i = 0; i < newSubPaths.size(); i++) {
-        QString path = dir.path() + "/" + newSubPaths[i];
-        QFileInfo fileInfo(path);
-        subPaths.append(path);
-        if (fileInfo.isDir()) {
-            QDir dir(path);
-            appendSubPaths(dir, subPaths);
+void FolderWatcher::appendSubPaths (QDir dir, QStringList& subPaths) {
+    QStringList newSubPaths = dir.entryList (QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files);
+    for (int i = 0; i < newSubPaths.size (); i++) {
+        QString path = dir.path () + "/" + newSubPaths[i];
+        QFileInfo fileInfo (path);
+        subPaths.append (path);
+        if (fileInfo.isDir ()) {
+            QDir dir (path);
+            appendSubPaths (dir, subPaths);
         }
     }
 }
 
-void FolderWatcher::startNotificatonTest(QString &path) {
+void FolderWatcher::startNotificatonTest (QString &path) {
 #ifdef Q_OS_MAC
     // Testing the folder watcher on OSX is harder because the watcher
     // automatically discards changes that were performed by our process.
@@ -85,91 +85,91 @@ void FolderWatcher::startNotificatonTest(QString &path) {
     return;
 #endif
 
-    Q_ASSERT(_testNotificationPath.isEmpty());
+    Q_ASSERT (_testNotificationPath.isEmpty ());
     _testNotificationPath = path;
 
     // Don't do the local file modification immediately:
     // wait for FolderWatchPrivate::_ready
-    startNotificationTestWhenReady();
+    startNotificationTestWhenReady ();
 }
 
-void FolderWatcher::startNotificationTestWhenReady() {
+void FolderWatcher::startNotificationTestWhenReady () {
     if (!_d->_ready) {
-        QTimer::singleShot(1000, this, &FolderWatcher::startNotificationTestWhenReady);
+        QTimer::singleShot (1000, this, &FolderWatcher::startNotificationTestWhenReady);
         return;
     }
 
     auto path = _testNotificationPath;
-    if (QFile::exists(path)) {
-        auto mtime = FileSystem::getModTime(path);
-        FileSystem::setModTime(path, mtime + 1);
+    if (QFile::exists (path)) {
+        auto mtime = FileSystem::getModTime (path);
+        FileSystem::setModTime (path, mtime + 1);
     } else {
-        QFile f(path);
-        f.open(QIODevice::WriteOnly | QIODevice::Append);
+        QFile f (path);
+        f.open (QIODevice::WriteOnly | QIODevice::Append);
     }
 
-    QTimer::singleShot(5000, this, [this]() {
-        if (!_testNotificationPath.isEmpty())
-            emit becameUnreliable(tr("The watcher did not receive a test notification."));
-        _testNotificationPath.clear();
+    QTimer::singleShot (5000, this, [this] () {
+        if (!_testNotificationPath.isEmpty ())
+            emit becameUnreliable (tr ("The watcher did not receive a test notification."));
+        _testNotificationPath.clear ();
     });
 }
 
-int FolderWatcher::testLinuxWatchCount() const {
+int FolderWatcher::testLinuxWatchCount () const {
 #ifdef Q_OS_LINUX
-    return _d->testWatchCount();
+    return _d->testWatchCount ();
 #else
     return -1;
 #endif
 }
 
-void FolderWatcher::changeDetected(QString &path) {
-    QFileInfo fileInfo(path);
-    QStringList paths(path);
-    if (fileInfo.isDir()) {
-        QDir dir(path);
-        appendSubPaths(dir, paths);
+void FolderWatcher::changeDetected (QString &path) {
+    QFileInfo fileInfo (path);
+    QStringList paths (path);
+    if (fileInfo.isDir ()) {
+        QDir dir (path);
+        appendSubPaths (dir, paths);
     }
-    changeDetected(paths);
+    changeDetected (paths);
 }
 
-void FolderWatcher::changeDetected(QStringList &paths) {
+void FolderWatcher::changeDetected (QStringList &paths) {
     // TODO: this shortcut doesn't look very reliable:
     //   - why is the timeout only 1 second?
     //   - what if there is more than one file being updated frequently?
     //   - why do we skip the file altogether instead of e.g. reducing the upload frequency?
 
     // Check if the same path was reported within the last second.
-    QSet<QString> pathsSet = paths.toSet();
-    if (pathsSet == _lastPaths && _timer.elapsed() < 1000) {
+    QSet<QString> pathsSet = paths.toSet ();
+    if (pathsSet == _lastPaths && _timer.elapsed () < 1000) {
         // the same path was reported within the last second. Skip.
         return;
     }
     _lastPaths = pathsSet;
-    _timer.restart();
+    _timer.restart ();
 
     QSet<QString> changedPaths;
 
     // ------- handle ignores:
-    for (int i = 0; i < paths.size(); ++i) {
+    for (int i = 0; i < paths.size (); ++i) {
         QString path = paths[i];
-        if (!_testNotificationPath.isEmpty()
-            && Utility::fileNamesEqual(path, _testNotificationPath)) {
-            _testNotificationPath.clear();
+        if (!_testNotificationPath.isEmpty ()
+            && Utility::fileNamesEqual (path, _testNotificationPath)) {
+            _testNotificationPath.clear ();
         }
-        if (pathIsIgnored(path)) {
+        if (pathIsIgnored (path)) {
             continue;
         }
 
-        changedPaths.insert(path);
+        changedPaths.insert (path);
     }
-    if (changedPaths.isEmpty()) {
+    if (changedPaths.isEmpty ()) {
         return;
     }
 
-    qCInfo(lcFolderWatcher) << "Detected changes in paths:" << changedPaths;
+    qCInfo (lcFolderWatcher) << "Detected changes in paths:" << changedPaths;
     foreach (QString &path, changedPaths) {
-        emit pathChanged(path);
+        emit pathChanged (path);
     }
 }
 

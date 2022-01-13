@@ -21,9 +21,9 @@
  */
 class Cmd : public QObject {
 public:
-    Cmd() : QObject() {
+    Cmd () : QObject () {
     }
 public slots:
-    void transmissionProgressSlot() {
+    void transmissionProgressSlot () {
     }
 };

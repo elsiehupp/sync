@@ -40,14 +40,14 @@ class ShareManager;
 class AvatarEventFilter : public QObject {
 
 public:
-    explicit AvatarEventFilter(QObject *parent = nullptr);
+    explicit AvatarEventFilter (QObject *parent = nullptr);
 
 signals:
-    void clicked();
-    void contextMenu(QPoint &globalPosition);
+    void clicked ();
+    void contextMenu (QPoint &globalPosition);
 
 protected:
-    bool eventFilter(QObject *obj, QEvent *event) override;
+    bool eventFilter (QObject *obj, QEvent *event) override;
 };
 
 /**
@@ -57,46 +57,46 @@ protected:
 class ShareUserGroupWidget : public QWidget {
 
 public:
-    explicit ShareUserGroupWidget(AccountPtr account,
+    explicit ShareUserGroupWidget (AccountPtr account,
         const QString &sharePath,
         const QString &localPath,
         SharePermissions maxSharingPermissions,
         const QString &privateLinkUrl,
         QWidget *parent = nullptr);
-    ~ShareUserGroupWidget() override;
+    ~ShareUserGroupWidget () override;
 
 signals:
-    void togglePublicLinkShare(bool);
-    void styleChanged();
+    void togglePublicLinkShare (bool);
+    void styleChanged ();
 
 public slots:
-    void getShares();
-    void slotShareCreated(QSharedPointer<Share> &share);
-    void slotStyleChanged();
+    void getShares ();
+    void slotShareCreated (QSharedPointer<Share> &share);
+    void slotStyleChanged ();
 
 private slots:
-    void slotSharesFetched(QList<QSharedPointer<Share>> &shares);
+    void slotSharesFetched (QList<QSharedPointer<Share>> &shares);
 
-    void on_shareeLineEdit_textChanged(QString &text);
-    void searchForSharees(ShareeModel::LookupMode lookupMode);
-    void slotLineEditTextEdited(QString &text);
+    void on_shareeLineEdit_textChanged (QString &text);
+    void searchForSharees (ShareeModel::LookupMode lookupMode);
+    void slotLineEditTextEdited (QString &text);
 
-    void slotLineEditReturn();
-    void slotCompleterActivated(QModelIndex &index);
-    void slotCompleterHighlighted(QModelIndex &index);
-    void slotShareesReady();
-    void slotAdjustScrollWidgetSize();
-    void slotPrivateLinkShare();
-    void displayError(int code, QString &message);
+    void slotLineEditReturn ();
+    void slotCompleterActivated (QModelIndex &index);
+    void slotCompleterHighlighted (QModelIndex &index);
+    void slotShareesReady ();
+    void slotAdjustScrollWidgetSize ();
+    void slotPrivateLinkShare ();
+    void displayError (int code, QString &message);
 
-    void slotPrivateLinkOpenBrowser();
-    void slotPrivateLinkCopy();
-    void slotPrivateLinkEmail();
+    void slotPrivateLinkOpenBrowser ();
+    void slotPrivateLinkCopy ();
+    void slotPrivateLinkEmail ();
 
 private:
-    void customizeStyle();
+    void customizeStyle ();
 
-    void activateShareeLineEdit();
+    void activateShareeLineEdit ();
 
     Ui::ShareUserGroupWidget *_ui;
     QScrollArea *_parentScrollArea;
@@ -125,76 +125,76 @@ private:
 class ShareUserLine : public QWidget {
 
 public:
-    explicit ShareUserLine(AccountPtr account,
+    explicit ShareUserLine (AccountPtr account,
         QSharedPointer<UserGroupShare> Share,
         SharePermissions maxSharingPermissions,
         bool isFile,
         QWidget *parent = nullptr);
-    ~ShareUserLine() override;
+    ~ShareUserLine () override;
 
-    QSharedPointer<Share> share() const;
+    QSharedPointer<Share> share () const;
 
 signals:
-    void visualDeletionDone();
-    void resizeRequested();
+    void visualDeletionDone ();
+    void resizeRequested ();
 
 public slots:
-    void slotStyleChanged();
+    void slotStyleChanged ();
 
-    void focusPasswordLineEdit();
+    void focusPasswordLineEdit ();
 
 private slots:
-    void on_deleteShareButton_clicked();
-    void slotPermissionsChanged();
-    void slotEditPermissionsChanged();
-    void slotPasswordCheckboxChanged();
-    void slotDeleteAnimationFinished();
+    void on_deleteShareButton_clicked ();
+    void slotPermissionsChanged ();
+    void slotEditPermissionsChanged ();
+    void slotPasswordCheckboxChanged ();
+    void slotDeleteAnimationFinished ();
 
-    void refreshPasswordOptions();
+    void refreshPasswordOptions ();
 
-    void refreshPasswordLineEditPlaceholder();
+    void refreshPasswordLineEditPlaceholder ();
 
-    void slotPasswordSet();
-    void slotPasswordSetError(int statusCode, QString &message);
+    void slotPasswordSet ();
+    void slotPasswordSetError (int statusCode, QString &message);
 
-    void slotShareDeleted();
-    void slotPermissionsSet();
+    void slotShareDeleted ();
+    void slotPermissionsSet ();
 
-    void slotAvatarLoaded(QImage avatar);
+    void slotAvatarLoaded (QImage avatar);
 
-    void setPasswordConfirmed();
+    void setPasswordConfirmed ();
 
-    void slotLineEditPasswordReturnPressed();
+    void slotLineEditPasswordReturnPressed ();
 
-    void slotConfirmPasswordClicked();
+    void slotConfirmPasswordClicked ();
 
-    void onAvatarContextMenu(QPoint &globalPosition);
+    void onAvatarContextMenu (QPoint &globalPosition);
 
 private:
-    void displayPermissions();
-    void loadAvatar();
-    void setDefaultAvatar(int avatarSize);
-    void customizeStyle();
+    void displayPermissions ();
+    void loadAvatar ();
+    void setDefaultAvatar (int avatarSize);
+    void customizeStyle ();
 
-    QPixmap pixmapForShareeType(Sharee::Type type, QColor &backgroundColor = QColor()) const;
-    QColor backgroundColorForShareeType(Sharee::Type type) const;
+    QPixmap pixmapForShareeType (Sharee::Type type, QColor &backgroundColor = QColor ()) const;
+    QColor backgroundColorForShareeType (Sharee::Type type) const;
 
-  void showNoteOptions(bool show);
-  void toggleNoteOptions(bool enable);
-  void onNoteConfirmButtonClicked();
-  void setNote(QString &note);
+  void showNoteOptions (bool show);
+  void toggleNoteOptions (bool enable);
+  void onNoteConfirmButtonClicked ();
+  void setNote (QString &note);
 
-  void toggleExpireDateOptions(bool enable);
-  void showExpireDateOptions(bool show, QDate &initialDate = QDate());
-  void setExpireDate();
+  void toggleExpireDateOptions (bool enable);
+  void showExpireDateOptions (bool show, QDate &initialDate = QDate ());
+  void setExpireDate ();
 
-  void togglePasswordSetProgressAnimation(bool show);
+  void togglePasswordSetProgressAnimation (bool show);
 
-  void enableProgessIndicatorAnimation(bool enable);
-  void disableProgessIndicatorAnimation();
+  void enableProgessIndicatorAnimation (bool enable);
+  void disableProgessIndicatorAnimation ();
 
-  QDate maxExpirationDateForShare(Share::ShareType type, QDate &fallbackDate) const;
-  bool enforceExpirationDateForShare(Share::ShareType type) const;
+  QDate maxExpirationDateForShare (Share::ShareType type, QDate &fallbackDate) const;
+  bool enforceExpirationDateForShare (Share::ShareType type) const;
 
   Ui::ShareUserLine *_ui;
   AccountPtr _account;

@@ -44,78 +44,78 @@ class ElidedLabel;
 class ShareLinkWidget : public QWidget {
 
 public:
-    explicit ShareLinkWidget(AccountPtr account,
+    explicit ShareLinkWidget (AccountPtr account,
         const QString &sharePath,
         const QString &localPath,
         SharePermissions maxSharingPermissions,
         QWidget *parent = nullptr);
-    ~ShareLinkWidget() override;
+    ~ShareLinkWidget () override;
 
-    void toggleButton(bool show);
-    void setupUiOptions();
+    void toggleButton (bool show);
+    void setupUiOptions ();
 
-    void setLinkShare(QSharedPointer<LinkShare> linkShare);
-    QSharedPointer<LinkShare> getLinkShare();
+    void setLinkShare (QSharedPointer<LinkShare> linkShare);
+    QSharedPointer<LinkShare> getLinkShare ();
 
-    void focusPasswordLineEdit();
+    void focusPasswordLineEdit ();
 
 public slots:
-    void slotDeleteShareFetched();
-    void slotToggleShareLinkAnimation(bool start);
-    void slotServerError(int code, QString &message);
-    void slotCreateShareRequiresPassword(QString &message);
-    void slotStyleChanged();
+    void slotDeleteShareFetched ();
+    void slotToggleShareLinkAnimation (bool start);
+    void slotServerError (int code, QString &message);
+    void slotCreateShareRequiresPassword (QString &message);
+    void slotStyleChanged ();
 
 private slots:
-    void slotCreateShareLink(bool clicked);
-    void slotCopyLinkShare(bool clicked) const;
+    void slotCreateShareLink (bool clicked);
+    void slotCopyLinkShare (bool clicked) const;
 
-    void slotCreatePassword();
-    void slotPasswordSet();
-    void slotPasswordSetError(int code, QString &message);
+    void slotCreatePassword ();
+    void slotPasswordSet ();
+    void slotPasswordSetError (int code, QString &message);
 
-    void slotCreateNote();
-    void slotNoteSet();
+    void slotCreateNote ();
+    void slotNoteSet ();
 
-    void slotSetExpireDate();
-    void slotExpireDateSet();
+    void slotSetExpireDate ();
+    void slotExpireDateSet ();
 
-    void slotContextMenuButtonClicked();
-    void slotLinkContextMenuActionTriggered(QAction *action);
+    void slotContextMenuButtonClicked ();
+    void slotLinkContextMenuActionTriggered (QAction *action);
 
-    void slotDeleteAnimationFinished();
-    void slotAnimationFinished();
+    void slotDeleteAnimationFinished ();
+    void slotAnimationFinished ();
 
-    void slotCreateLabel();
-    void slotLabelSet();
+    void slotCreateLabel ();
+    void slotLabelSet ();
 
 signals:
-    void createLinkShare();
-    void deleteLinkShare();
-    void resizeRequested();
-    void visualDeletionDone();
-    void createPassword(QString &password);
-    void createPasswordProcessed();
+    void createLinkShare ();
+    void deleteLinkShare ();
+    void resizeRequested ();
+    void visualDeletionDone ();
+    void createPassword (QString &password);
+    void createPasswordProcessed ();
 
 private:
-    void displayError(QString &errMsg);
+    void displayError (QString &errMsg);
 
-    void togglePasswordOptions(bool enable = true);
-    void toggleNoteOptions(bool enable = true);
-    void toggleExpireDateOptions(bool enable = true);
-    void toggleButtonAnimation(QToolButton *button, QProgressIndicator *progressIndicator, QAction *checkedAction) const;
+    void togglePasswordOptions (bool enable = true);
+    void toggleNoteOptions (bool enable = true);
+    void toggleExpireDateOptions (bool enable = true);
+    void toggleButtonAnimation (QToolButton *button, QProgressIndicator *progressIndicator, QAction *checkedAction) const;
 
     /** Confirm with the user and then delete the share */
-    void confirmAndDeleteShare();
+    void confirmAndDeleteShare ();
 
     /** Retrieve a share's name, accounting for _namesSupported */
-    QString shareName() const;
+    QString shareName () const;
 
-    void startAnimation(int start, int end);
+    void startAnimation (int start, int end);
 
-    void customizeStyle();
+    void customizeStyle ();
 
-    void displayShareLinkLabel();
+    void displayShareLinkLabel ();
 
     Ui::ShareLinkWidget *_ui;
     AccountPtr _account;

@@ -18,10 +18,10 @@
 namespace OCC {
 namespace Ui {
 namespace IconUtils {
-QPixmap pixmapForBackground(QString &fileName, QColor &backgroundColor);
-QImage createSvgImageWithCustomColor(QString &fileName, QColor &customColor, QSize *originalSize = nullptr, QSize &requestedSize = {});
-QPixmap createSvgPixmapWithCustomColorCached(QString &fileName, QColor &customColor, QSize *originalSize = nullptr, QSize &requestedSize = {});
-QImage drawSvgWithCustomFillColor(QString &sourceSvgPath, QColor &fillColor, QSize *originalSize = nullptr, QSize &requestedSize = {});
+QPixmap pixmapForBackground (QString &fileName, QColor &backgroundColor);
+QImage createSvgImageWithCustomColor (QString &fileName, QColor &customColor, QSize *originalSize = nullptr, QSize &requestedSize = {});
+QPixmap createSvgPixmapWithCustomColorCached (QString &fileName, QColor &customColor, QSize *originalSize = nullptr, QSize &requestedSize = {});
+QImage drawSvgWithCustomFillColor (QString &sourceSvgPath, QColor &fillColor, QSize *originalSize = nullptr, QSize &requestedSize = {});
 }
 }
 }

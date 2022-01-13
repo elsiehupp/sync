@@ -18,13 +18,13 @@ namespace OCC {
 
 class PropagateRemoteDeleteEncrypted : public AbstractPropagateRemoteDeleteEncrypted {
 public:
-    PropagateRemoteDeleteEncrypted(OwncloudPropagator *propagator, SyncFileItemPtr item, QObject *parent);
+    PropagateRemoteDeleteEncrypted (OwncloudPropagator *propagator, SyncFileItemPtr item, QObject *parent);
 
-    void start() override;
+    void start () override;
 
 private:
-    void slotFolderUnLockedSuccessfully(QByteArray &folderId) override;
-    void slotFolderEncryptedMetadataReceived(QJsonDocument &json, int statusCode) override;
+    void slotFolderUnLockedSuccessfully (QByteArray &folderId) override;
+    void slotFolderEncryptedMetadataReceived (QJsonDocument &json, int statusCode) override;
 };
 
 }

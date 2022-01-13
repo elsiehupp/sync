@@ -6,10 +6,10 @@ namespace OCC {
 
 class OWNCLOUDSYNC_EXPORT DateTimeProvider {
 public:
-    virtual ~DateTimeProvider();
+    virtual ~DateTimeProvider ();
 
-    virtual QDateTime currentDateTime() const;
+    virtual QDateTime currentDateTime () const;
 
-    virtual QDate currentDate() const;
+    virtual QDate currentDate () const;
 };
 }

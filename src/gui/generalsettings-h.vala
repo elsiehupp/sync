@@ -30,31 +30,31 @@ namespace Ui {
 class GeneralSettings : public QWidget {
 
 public:
-    explicit GeneralSettings(QWidget *parent = nullptr);
-    ~GeneralSettings() override;
-    QSize sizeHint() const override;
+    explicit GeneralSettings (QWidget *parent = nullptr);
+    ~GeneralSettings () override;
+    QSize sizeHint () const override;
 
 public slots:
-    void slotStyleChanged();
+    void slotStyleChanged ();
 
 private slots:
-    void saveMiscSettings();
-    void slotToggleLaunchOnStartup(bool);
-    void slotToggleOptionalServerNotifications(bool);
-    void slotShowInExplorerNavigationPane(bool);
-    void slotIgnoreFilesEditor();
-    void slotCreateDebugArchive();
-    void loadMiscSettings();
-    void slotShowLegalNotice();
-#if defined(BUILD_UPDATER)
-    void slotUpdateInfo();
-    void slotUpdateChannelChanged(QString &channel);
-    void slotUpdateCheckNow();
-    void slotToggleAutoUpdateCheck();
+    void saveMiscSettings ();
+    void slotToggleLaunchOnStartup (bool);
+    void slotToggleOptionalServerNotifications (bool);
+    void slotShowInExplorerNavigationPane (bool);
+    void slotIgnoreFilesEditor ();
+    void slotCreateDebugArchive ();
+    void loadMiscSettings ();
+    void slotShowLegalNotice ();
+#if defined (BUILD_UPDATER)
+    void slotUpdateInfo ();
+    void slotUpdateChannelChanged (QString &channel);
+    void slotUpdateCheckNow ();
+    void slotToggleAutoUpdateCheck ();
 #endif
 
 private:
-    void customizeStyle();
+    void customizeStyle ();
 
     Ui::GeneralSettings *_ui;
     QPointer<IgnoreListEditor> _ignoreEditor;

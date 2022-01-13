@@ -30,25 +30,25 @@ class Flow2AuthWidget;
 
 class Flow2AuthCredsPage : public AbstractCredentialsWizardPage {
 public:
-    Flow2AuthCredsPage();
+    Flow2AuthCredsPage ();
 
-    AbstractCredentials *getCredentials() const override;
+    AbstractCredentials *getCredentials () const override;
 
-    void initializePage() override;
-    void cleanupPage() override;
-    int nextId() const override;
-    void setConnected();
-    bool isComplete() const override;
+    void initializePage () override;
+    void cleanupPage () override;
+    int nextId () const override;
+    void setConnected ();
+    bool isComplete () const override;
 
 public Q_SLOTS:
-    void slotFlow2AuthResult(Flow2Auth::Result, QString &errorString, QString &user, QString &appPassword);
-    void slotPollNow();
-    void slotStyleChanged();
+    void slotFlow2AuthResult (Flow2Auth::Result, QString &errorString, QString &user, QString &appPassword);
+    void slotPollNow ();
+    void slotStyleChanged ();
 
 signals:
-    void connectToOCUrl(QString &);
-    void pollNow();
-    void styleChanged();
+    void connectToOCUrl (QString &);
+    void pollNow ();
+    void styleChanged ();
 
 public:
     QString _user;

@@ -54,15 +54,15 @@ namespace OCC {
                 v
             slotReadJobDone
                 |        |
-                |        +-------> emit fetched()   if OAuth is not used
+                |        +-------> emit fetched ()   if OAuth is not used
                 |
                 v
-            refreshAccessToken()
+            refreshAccessToken ()
                 |
                 v
-            emit fetched()
+            emit fetched ()
 
-   2) If the credentials is still not valid when fetched() is emitted, the ui, will call askFromUser()
+   2) If the credentials is still not valid when fetched () is emitted, the ui, will call askFromUser ()
       which is implemented in HttpCredentialsGui
 
  */
@@ -73,53 +73,53 @@ public:
     /// Don't add credentials if this is set on a QNetworkRequest
     static constexpr QNetworkRequest::Attribute DontAddCredentialsAttribute = QNetworkRequest::User;
 
-    HttpCredentials();
-    explicit HttpCredentials(QString &user, QString &password,
-            const QByteArray &clientCertBundle = QByteArray(), QByteArray &clientCertPassword = QByteArray());
+    HttpCredentials ();
+    explicit HttpCredentials (QString &user, QString &password,
+            const QByteArray &clientCertBundle = QByteArray (), QByteArray &clientCertPassword = QByteArray ());
 
-    QString authType() const override;
-    QNetworkAccessManager *createQNAM() const override;
-    bool ready() const override;
-    void fetchFromKeychain() override;
-    bool stillValid(QNetworkReply *reply) override;
-    void persist() override;
-    QString user() const override;
+    QString authType () const override;
+    QNetworkAccessManager *createQNAM () const override;
+    bool ready () const override;
+    void fetchFromKeychain () override;
+    bool stillValid (QNetworkReply *reply) override;
+    void persist () override;
+    QString user () const override;
     // the password or token
-    QString password() const override;
-    void invalidateToken() override;
-    void forgetSensitiveData() override;
-    QString fetchUser();
-    virtual bool sslIsTrusted() { return false; }
+    QString password () const override;
+    void invalidateToken () override;
+    void forgetSensitiveData () override;
+    QString fetchUser ();
+    virtual bool sslIsTrusted () { return false; }
 
-    /* If we still have a valid refresh token, try to refresh it assynchronously and emit fetched()
+    /* If we still have a valid refresh token, try to refresh it assynchronously and emit fetched ()
      * otherwise return false
      */
-    bool refreshAccessToken();
+    bool refreshAccessToken ();
 
     // To fetch the user name as early as possible
-    void setAccount(Account *account) override;
+    void setAccount (Account *account) override;
 
     // Whether we are using OAuth
-    bool isUsingOAuth() const { return !_refreshToken.isNull(); }
+    bool isUsingOAuth () const { return !_refreshToken.isNull (); }
 
-    bool retryIfNeeded(AbstractNetworkJob *) override;
+    bool retryIfNeeded (AbstractNetworkJob *) override;
 
 private Q_SLOTS:
-    void slotAuthentication(QNetworkReply *, QAuthenticator *);
+    void slotAuthentication (QNetworkReply *, QAuthenticator *);
 
-    void slotReadClientCertPasswordJobDone(QKeychain::Job *);
-    void slotReadClientCertPEMJobDone(QKeychain::Job *);
-    void slotReadClientKeyPEMJobDone(QKeychain::Job *);
+    void slotReadClientCertPasswordJobDone (QKeychain::Job *);
+    void slotReadClientCertPEMJobDone (QKeychain::Job *);
+    void slotReadClientKeyPEMJobDone (QKeychain::Job *);
 
-    void slotReadPasswordFromKeychain();
-    void slotReadJobDone(QKeychain::Job *);
+    void slotReadPasswordFromKeychain ();
+    void slotReadJobDone (QKeychain::Job *);
 
-    void slotWriteClientCertPasswordJobDone(QKeychain::Job *);
-    void slotWriteClientCertPEMJobDone(QKeychain::Job *);
-    void slotWriteClientKeyPEMJobDone(QKeychain::Job *);
+    void slotWriteClientCertPasswordJobDone (QKeychain::Job *);
+    void slotWriteClientCertPEMJobDone (QKeychain::Job *);
+    void slotWriteClientKeyPEMJobDone (QKeychain::Job *);
 
-    void slotWritePasswordToKeychain();
-    void slotWriteJobDone(QKeychain::Job *);
+    void slotWritePasswordToKeychain ();
+    void slotWriteJobDone (QKeychain::Job *);
 
 protected:
     /** Reads data from keychain locations
@@ -129,10 +129,10 @@ protected:
      *   slotReadClientCertPEMJobDone to
      *   slotReadJobDone
      */
-    void fetchFromKeychainHelper();
+    void fetchFromKeychainHelper ();
 
     /// Wipes legacy keychain locations
-    void deleteOldKeychainEntries();
+    void deleteOldKeychainEntries ();
 
     /** Whether to bow out now because a retry will happen later
      *
@@ -142,13 +142,13 @@ protected:
      * If that happens, this function will schedule another try and
      * return true.
      */
-    bool keychainUnavailableRetryLater(QKeychain::ReadPasswordJob *);
+    bool keychainUnavailableRetryLater (QKeychain::ReadPasswordJob *);
 
     /** Takes client cert pkcs12 and unwraps the key/cert.
      *
      * Returns false on failure.
      */
-    bool unpackClientCertBundle();
+    bool unpackClientCertBundle ();
 
     QString _user;
     QString _password; // user's password, or access_token for OAuth

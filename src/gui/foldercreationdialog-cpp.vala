@@ -20,64 +20,64 @@
 
 namespace OCC {
 
-Q_LOGGING_CATEGORY(lcFolderCreationDialog, "nextcloud.gui.foldercreationdialog", QtInfoMsg)
+Q_LOGGING_CATEGORY (lcFolderCreationDialog, "nextcloud.gui.foldercreationdialog", QtInfoMsg)
 
-FolderCreationDialog::FolderCreationDialog(QString &destination, QWidget *parent)
-    : QDialog(parent)
-    , ui(new Ui::FolderCreationDialog)
-    , _destination(destination) {
-    ui->setupUi(this);
+FolderCreationDialog::FolderCreationDialog (QString &destination, QWidget *parent)
+    : QDialog (parent)
+    , ui (new Ui::FolderCreationDialog)
+    , _destination (destination) {
+    ui->setupUi (this);
 
-    ui->labelErrorMessage->setVisible(false);
+    ui->labelErrorMessage->setVisible (false);
 
-    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+    setWindowFlags (windowFlags () & ~Qt::WindowContextHelpButtonHint);
 
-    connect(ui->newFolderNameEdit, &QLineEdit::textChanged, this, &FolderCreationDialog::slotNewFolderNameEditTextEdited);
+    connect (ui->newFolderNameEdit, &QLineEdit::textChanged, this, &FolderCreationDialog::slotNewFolderNameEditTextEdited);
 
-    const QString suggestedFolderNamePrefix = QObject::tr("New folder");
+    const QString suggestedFolderNamePrefix = QObject::tr ("New folder");
 
-    const QString newFolderFullPath = _destination + QLatin1Char('/') + suggestedFolderNamePrefix;
-    if (!QDir(newFolderFullPath).exists()) {
-        ui->newFolderNameEdit->setText(suggestedFolderNamePrefix);
+    const QString newFolderFullPath = _destination + QLatin1Char ('/') + suggestedFolderNamePrefix;
+    if (!QDir (newFolderFullPath).exists ()) {
+        ui->newFolderNameEdit->setText (suggestedFolderNamePrefix);
     } else {
-        for (unsigned int i = 2; i < std::numeric_limits<unsigned int>::max(); ++i) {
-            const QString suggestedPostfix = QString(" (%1)").arg(i);
+        for (unsigned int i = 2; i < std::numeric_limits<unsigned int>::max (); ++i) {
+            const QString suggestedPostfix = QString (" (%1)").arg (i);
 
-            if (!QDir(newFolderFullPath + suggestedPostfix).exists()) {
-                ui->newFolderNameEdit->setText(suggestedFolderNamePrefix + suggestedPostfix);
+            if (!QDir (newFolderFullPath + suggestedPostfix).exists ()) {
+                ui->newFolderNameEdit->setText (suggestedFolderNamePrefix + suggestedPostfix);
                 break;
             }
         }
     }
 
-    ui->newFolderNameEdit->setFocus();
-    ui->newFolderNameEdit->selectAll();
+    ui->newFolderNameEdit->setFocus ();
+    ui->newFolderNameEdit->selectAll ();
 }
 
-FolderCreationDialog::~FolderCreationDialog() {
+FolderCreationDialog::~FolderCreationDialog () {
     delete ui;
 }
 
-void FolderCreationDialog::accept() {
-    Q_ASSERT(!_destination.endsWith('/'));
+void FolderCreationDialog::accept () {
+    Q_ASSERT (!_destination.endsWith ('/'));
 
-    if (QDir(_destination + "/" + ui->newFolderNameEdit->text()).exists()) {
-        ui->labelErrorMessage->setVisible(true);
+    if (QDir (_destination + "/" + ui->newFolderNameEdit->text ()).exists ()) {
+        ui->labelErrorMessage->setVisible (true);
         return;
     }
 
-    if (!QDir(_destination).mkdir(ui->newFolderNameEdit->text())) {
-        QMessageBox::critical(this, tr("Error"), tr("Could not create a folder! Check your write permissions."));
+    if (!QDir (_destination).mkdir (ui->newFolderNameEdit->text ())) {
+        QMessageBox::critical (this, tr ("Error"), tr ("Could not create a folder! Check your write permissions."));
     }
 
-    QDialog::accept();
+    QDialog::accept ();
 }
 
-void FolderCreationDialog::slotNewFolderNameEditTextEdited() {
-    if (!ui->newFolderNameEdit->text().isEmpty() && QDir(_destination + "/" + ui->newFolderNameEdit->text()).exists()) {
-        ui->labelErrorMessage->setVisible(true);
+void FolderCreationDialog::slotNewFolderNameEditTextEdited () {
+    if (!ui->newFolderNameEdit->text ().isEmpty () && QDir (_destination + "/" + ui->newFolderNameEdit->text ()).exists ()) {
+        ui->labelErrorMessage->setVisible (true);
     } else {
-        ui->labelErrorMessage->setVisible(false);
+        ui->labelErrorMessage->setVisible (false);
     }
 }
 

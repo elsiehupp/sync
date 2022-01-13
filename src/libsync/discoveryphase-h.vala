@@ -55,7 +55,7 @@ struct RemoteInfo {
     bool isE2eEncrypted = false;
     QString e2eMangledName;
 
-    bool isValid() const { return !name.isNull(); }
+    bool isValid () const { return !name.isNull (); }
 
     QString directDownloadUrl;
     QString directDownloadCookies;
@@ -73,7 +73,7 @@ struct LocalInfo {
     bool isHidden = false;
     bool isVirtualFile = false;
     bool isSymLink = false;
-    bool isValid() const { return !name.isNull(); }
+    bool isValid () const { return !name.isNull (); }
 };
 
 /**
@@ -83,16 +83,16 @@ struct LocalInfo {
  */
 class DiscoverySingleLocalDirectoryJob : public QObject, public QRunnable {
 public:
-    explicit DiscoverySingleLocalDirectoryJob(AccountPtr &account, QString &localPath, OCC::Vfs *vfs, QObject *parent = nullptr);
+    explicit DiscoverySingleLocalDirectoryJob (AccountPtr &account, QString &localPath, OCC::Vfs *vfs, QObject *parent = nullptr);
 
-    void run() override;
+    void run () override;
 signals:
-    void finished(QVector<LocalInfo> result);
-    void finishedFatalError(QString errorString);
-    void finishedNonFatalError(QString errorString);
+    void finished (QVector<LocalInfo> result);
+    void finishedFatalError (QString errorString);
+    void finishedNonFatalError (QString errorString);
 
-    void itemDiscovered(SyncFileItemPtr item);
-    void childIgnored(bool b);
+    void itemDiscovered (SyncFileItemPtr item);
+    void childIgnored (bool b);
 private slots:
 private:
     QString _localPath;
@@ -108,25 +108,25 @@ public:
  */
 class DiscoverySingleDirectoryJob : public QObject {
 public:
-    explicit DiscoverySingleDirectoryJob(AccountPtr &account, QString &path, QObject *parent = nullptr);
+    explicit DiscoverySingleDirectoryJob (AccountPtr &account, QString &path, QObject *parent = nullptr);
     // Specify that this is the root and we need to check the data-fingerprint
-    void setIsRootPath() { _isRootPath = true; }
-    void start();
-    void abort();
+    void setIsRootPath () { _isRootPath = true; }
+    void start ();
+    void abort ();
 
     // This is not actually a network job, it is just a job
 signals:
-    void firstDirectoryPermissions(RemotePermissions);
-    void etag(QByteArray &, QDateTime &time);
-    void finished(HttpResult<QVector<RemoteInfo>> &result);
+    void firstDirectoryPermissions (RemotePermissions);
+    void etag (QByteArray &, QDateTime &time);
+    void finished (HttpResult<QVector<RemoteInfo>> &result);
 
 private slots:
-    void directoryListingIteratedSlot(QString &, QMap<QString, QString> &);
-    void lsJobFinishedWithoutErrorSlot();
-    void lsJobFinishedWithErrorSlot(QNetworkReply *);
-    void fetchE2eMetadata();
-    void metadataReceived(QJsonDocument &json, int statusCode);
-    void metadataError(QByteArray& fileId, int httpReturnCode);
+    void directoryListingIteratedSlot (QString &, QMap<QString, QString> &);
+    void lsJobFinishedWithoutErrorSlot ();
+    void lsJobFinishedWithErrorSlot (QNetworkReply *);
+    void fetchE2eMetadata ();
+    void metadataReceived (QJsonDocument &json, int statusCode);
+    void metadataError (QByteArray& fileId, int httpReturnCode);
 
 private:
     QVector<RemoteInfo> _results;
@@ -162,8 +162,8 @@ class DiscoveryPhase : public QObject {
     /** Maps the db-path of a deleted item to its SyncFileItem.
      *
      * If it turns out the item was renamed after all, the instruction
-     * can be changed. See findAndCancelDeletedJob(). Note that
-     * itemDiscovered() will already have been emitted for the item.
+     * can be changed. See findAndCancelDeletedJob (). Note that
+     * itemDiscovered () will already have been emitted for the item.
      */
     QMap<QString, SyncFileItemPtr> _deletedItem;
 
@@ -175,7 +175,7 @@ class DiscoveryPhase : public QObject {
      * that the folder wasn't just renamed. This avoids running the
      * discovery on contents in the old location of renamed folders.
      *
-     * See findAndCancelDeletedJob().
+     * See findAndCancelDeletedJob ().
      */
     QMap<QString, ProcessDirectoryJob *> _queuedDeletedDirectories;
 
@@ -188,7 +188,7 @@ class DiscoveryPhase : public QObject {
     //
     // This applies recursively to subdirectories.
     // All entries should have a trailing slash (even files), so lookup with
-    // lowerBound() is reliable.
+    // lowerBound () is reliable.
     //
     // The value of this map doesn't matter.
     QMap<QString, bool> _forbiddenDeletes;
@@ -198,7 +198,7 @@ class DiscoveryPhase : public QObject {
      * Useful for avoiding processing of items that have already been claimed in
      * a rename (would otherwise be discovered as deletions).
      */
-    bool isRenamed(QString &p) const { return _renamedItemsLocal.contains(p) || _renamedItemsRemote.contains(p); }
+    bool isRenamed (QString &p) const { return _renamedItemsLocal.contains (p) || _renamedItemsRemote.contains (p); }
 
     int _currentlyActiveJobs = 0;
 
@@ -206,26 +206,26 @@ class DiscoveryPhase : public QObject {
     QStringList _selectiveSyncBlackList;
     QStringList _selectiveSyncWhiteList;
 
-    void scheduleMoreJobs();
+    void scheduleMoreJobs ();
 
-    bool isInSelectiveSyncBlackList(QString &path) const;
+    bool isInSelectiveSyncBlackList (QString &path) const;
 
     // Check if the new folder should be deselected or not.
     // May be async. "Return" via the callback, true if the item is blacklisted
-    void checkSelectiveSyncNewFolder(QString &path, RemotePermissions rp,
-        std::function<void(bool)> callback);
+    void checkSelectiveSyncNewFolder (QString &path, RemotePermissions rp,
+        std::function<void (bool)> callback);
 
     /** Given an original path, return the target path obtained when renaming is done.
      *
      * Note that it only considers parent directory renames. So if A/B got renamed to C/D,
      * checking A/B/file would yield C/D/file, but checking A/B would yield A/B.
      */
-    QString adjustRenamedPath(QString &original, SyncFileItem::Direction) const;
+    QString adjustRenamedPath (QString &original, SyncFileItem::Direction) const;
 
     /** If the db-path is scheduled for deletion, abort it.
      *
      * Check if there is already a job to delete that item:
-     * If that's not the case, return { false, QByteArray() }.
+     * If that's not the case, return { false, QByteArray () }.
      * If there is such a job, cancel that job and return true and the old etag.
      *
      * Used when having detected a rename: The rename source may have been
@@ -233,7 +233,7 @@ class DiscoveryPhase : public QObject {
      *
      * See _deletedItem and _queuedDeletedDirectories.
      */
-    QPair<bool, QByteArray> findAndCancelDeletedJob(QString &originalPath);
+    QPair<bool, QByteArray> findAndCancelDeletedJob (QString &originalPath);
 
 public:
     // input
@@ -246,34 +246,34 @@ public:
     QRegularExpression _invalidFilenameRx; // FIXME: maybe move in ExcludedFiles
     QStringList _serverBlacklistedFiles; // The blacklist from the capabilities
     bool _ignoreHiddenFiles = false;
-    std::function<bool(QString &)> _shouldDiscoverLocaly;
+    std::function<bool (QString &)> _shouldDiscoverLocaly;
 
-    void startJob(ProcessDirectoryJob *);
+    void startJob (ProcessDirectoryJob *);
 
-    void setSelectiveSyncBlackList(QStringList &list);
-    void setSelectiveSyncWhiteList(QStringList &list);
+    void setSelectiveSyncBlackList (QStringList &list);
+    void setSelectiveSyncWhiteList (QStringList &list);
 
     // output
     QByteArray _dataFingerprint;
     bool _anotherSyncNeeded = false;
 
 signals:
-    void fatalError(QString &errorString);
-    void itemDiscovered(SyncFileItemPtr &item);
-    void finished();
+    void fatalError (QString &errorString);
+    void itemDiscovered (SyncFileItemPtr &item);
+    void finished ();
 
     // A new folder was discovered and was not synced because of the confirmation feature
-    void newBigFolder(QString &folder, bool isExternal);
+    void newBigFolder (QString &folder, bool isExternal);
 
-    /** For excluded items that don't show up in itemDiscovered()
+    /** For excluded items that don't show up in itemDiscovered ()
       *
       * The path is relative to the sync folder, similar to item->_file
       */
-    void silentlyExcluded(QString &folderPath);
+    void silentlyExcluded (QString &folderPath);
 
-    void addErrorToGui(SyncFileItem::Status status, QString &errorMessage, QString &subject);
+    void addErrorToGui (SyncFileItem::Status status, QString &errorMessage, QString &subject);
 };
 
 /// Implementation of DiscoveryPhase::adjustRenamedPath
-QString adjustRenamedPath(QMap<QString, QString> &renamedItems, QString &original);
+QString adjustRenamedPath (QMap<QString, QString> &renamedItems, QString &original);
 }

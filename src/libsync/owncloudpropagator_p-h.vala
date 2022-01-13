@@ -29,11 +29,11 @@ namespace {
  * manager. If that delay between file-change notification and sync
  * has passed, we should accept the file for upload here.
  */
-inline bool fileIsStillChanging(OCC::SyncFileItem &item) {
-    const auto modtime = OCC::Utility::qDateTimeFromTime_t(item._modtime);
-    const qint64 msSinceMod = modtime.msecsTo(QDateTime::currentDateTimeUtc());
+inline bool fileIsStillChanging (OCC::SyncFileItem &item) {
+    const auto modtime = OCC::Utility::qDateTimeFromTime_t (item._modtime);
+    const qint64 msSinceMod = modtime.msecsTo (QDateTime::currentDateTimeUtc ());
 
-    return std::chrono::milliseconds(msSinceMod) < OCC::SyncEngine::minimumFileAgeForUpload
+    return std::chrono::milliseconds (msSinceMod) < OCC::SyncEngine::minimumFileAgeForUpload
         // if the mtime is too much in the future we *do* upload the file
         && msSinceMod > -10000;
 }
@@ -42,15 +42,15 @@ inline bool fileIsStillChanging(OCC::SyncFileItem &item) {
 
 namespace OCC {
 
-inline QByteArray getEtagFromReply(QNetworkReply *reply) {
-    QByteArray ocEtag = parseEtag(reply->rawHeader("OC-ETag"));
-    QByteArray etag = parseEtag(reply->rawHeader("ETag"));
+inline QByteArray getEtagFromReply (QNetworkReply *reply) {
+    QByteArray ocEtag = parseEtag (reply->rawHeader ("OC-ETag"));
+    QByteArray etag = parseEtag (reply->rawHeader ("ETag"));
     QByteArray ret = ocEtag;
-    if (ret.isEmpty()) {
+    if (ret.isEmpty ()) {
         ret = etag;
     }
-    if (ocEtag.length() > 0 && ocEtag != etag) {
-        qCDebug(lcPropagator) << "Quite peculiar, we have an etag != OC-Etag [no problem!]" << etag << ocEtag;
+    if (ocEtag.length () > 0 && ocEtag != etag) {
+        qCDebug (lcPropagator) << "Quite peculiar, we have an etag != OC-Etag [no problem!]" << etag << ocEtag;
     }
     return ret;
 }
@@ -58,9 +58,9 @@ inline QByteArray getEtagFromReply(QNetworkReply *reply) {
 /**
  * Given an error from the network, map to a SyncFileItem::Status error
  */
-inline SyncFileItem::Status classifyError(QNetworkReply::NetworkError nerror,
-    int httpCode, bool *anotherSyncNeeded = nullptr, QByteArray &errorBody = QByteArray()) {
-    Q_ASSERT(nerror != QNetworkReply::NoError); // we should only be called when there is an error
+inline SyncFileItem::Status classifyError (QNetworkReply::NetworkError nerror,
+    int httpCode, bool *anotherSyncNeeded = nullptr, QByteArray &errorBody = QByteArray ()) {
+    Q_ASSERT (nerror != QNetworkReply::NoError); // we should only be called when there is an error
 
     if (nerror == QNetworkReply::RemoteHostClosedError) {
         // Sometimes server bugs lead to a connection close on certain files,
@@ -80,8 +80,8 @@ inline SyncFileItem::Status classifyError(QNetworkReply::NetworkError nerror,
         //      In the future it should return a NormalError and trigger a status.php
         //      check that detects maintenance mode reliably and will terminate the sync run.
         auto probablyMaintenance =
-                errorBody.contains(R"(>Sabre\DAV\Exception\ServiceUnavailable<)")
-                && !errorBody.contains("Storage is temporarily not available");
+                errorBody.contains (R" (>Sabre\DAV\Exception\ServiceUnavailable<)")
+                && !errorBody.contains ("Storage is temporarily not available");
         return probablyMaintenance ? SyncFileItem::FatalError : SyncFileItem::NormalError;
     }
 

@@ -16,44 +16,44 @@
 
 // #include <sys/xattr.h>
 
-Q_LOGGING_CATEGORY(lcXAttrWrapper, "nextcloud.sync.vfs.xattr.wrapper", QtInfoMsg)
+Q_LOGGING_CATEGORY (lcXAttrWrapper, "nextcloud.sync.vfs.xattr.wrapper", QtInfoMsg)
 
 namespace {
 constexpr auto hydrateExecAttributeName = "user.nextcloud.hydrate_exec";
 
-OCC::Optional<QByteArray> xattrGet(QByteArray &path, QByteArray &name) {
+OCC::Optional<QByteArray> xattrGet (QByteArray &path, QByteArray &name) {
     constexpr auto bufferSize = 256;
     QByteArray result;
-    result.resize(bufferSize);
-    const auto count = getxattr(path.constData(), name.constData(), result.data(), bufferSize);
+    result.resize (bufferSize);
+    const auto count = getxattr (path.constData (), name.constData (), result.data (), bufferSize);
     if (count >= 0) {
-        result.resize(static_cast<int>(count) - 1);
+        result.resize (static_cast<int> (count) - 1);
         return result;
     } else {
         return {};
     }
 }
 
-bool xattrSet(QByteArray &path, QByteArray &name, QByteArray &value) {
-    const auto returnCode = setxattr(path.constData(), name.constData(), value.constData(), value.size() + 1, 0);
+bool xattrSet (QByteArray &path, QByteArray &name, QByteArray &value) {
+    const auto returnCode = setxattr (path.constData (), name.constData (), value.constData (), value.size () + 1, 0);
     return returnCode == 0;
 }
 
 }
 
-bool OCC::XAttrWrapper::hasNextcloudPlaceholderAttributes(QString &path) {
-    const auto value = xattrGet(path.toUtf8(), hydrateExecAttributeName);
+bool OCC::XAttrWrapper::hasNextcloudPlaceholderAttributes (QString &path) {
+    const auto value = xattrGet (path.toUtf8 (), hydrateExecAttributeName);
     if (value) {
-        return *value == QByteArrayLiteral(APPLICATION_EXECUTABLE);
+        return *value == QByteArrayLiteral (APPLICATION_EXECUTABLE);
     } else {
         return false;
     }
 }
 
-OCC::Result<void, QString> OCC::XAttrWrapper::addNextcloudPlaceholderAttributes(QString &path) {
-    const auto success = xattrSet(path.toUtf8(), hydrateExecAttributeName, APPLICATION_EXECUTABLE);
+OCC::Result<void, QString> OCC::XAttrWrapper::addNextcloudPlaceholderAttributes (QString &path) {
+    const auto success = xattrSet (path.toUtf8 (), hydrateExecAttributeName, APPLICATION_EXECUTABLE);
     if (!success) {
-        return QStringLiteral("Failed to set the extended attribute");
+        return QStringLiteral ("Failed to set the extended attribute");
     } else {
         return {};
     }

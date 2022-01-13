@@ -25,10 +25,10 @@ namespace OCC {
 class ActivityLink {
     Q_GADGET
 
-    Q_PROPERTY(QString label MEMBER _label)
-    Q_PROPERTY(QString link MEMBER _link)
-    Q_PROPERTY(QByteArray verb MEMBER _verb)
-    Q_PROPERTY(bool primary MEMBER _primary)
+    Q_PROPERTY (QString label MEMBER _label)
+    Q_PROPERTY (QString link MEMBER _link)
+    Q_PROPERTY (QByteArray verb MEMBER _verb)
+    Q_PROPERTY (bool primary MEMBER _primary)
 
 public:
     QString _label;
@@ -80,11 +80,11 @@ public:
      * @return
      */
 
-    Identifier ident() const;
+    Identifier ident () const;
 };
 
-bool operator==(Activity &rhs, Activity &lhs);
-bool operator<(Activity &rhs, Activity &lhs);
+bool operator== (Activity &rhs, Activity &lhs);
+bool operator< (Activity &rhs, Activity &lhs);
 
 /* ==================================================================== */
 /**
@@ -96,7 +96,7 @@ bool operator<(Activity &rhs, Activity &lhs);
 using ActivityList = QList<Activity>;
 }
 
-Q_DECLARE_METATYPE(OCC::Activity::Type)
-Q_DECLARE_METATYPE(OCC::ActivityLink)
+Q_DECLARE_METATYPE (OCC::Activity::Type)
+Q_DECLARE_METATYPE (OCC::ActivityLink)
 
 #endif // ACTIVITYDATA_H

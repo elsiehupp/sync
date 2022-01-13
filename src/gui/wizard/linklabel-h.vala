@@ -21,22 +21,22 @@ namespace OCC {
 
 class LinkLabel : public QLabel {
 public:
-    explicit LinkLabel(QWidget *parent = nullptr);
+    explicit LinkLabel (QWidget *parent = nullptr);
 
-    void setUrl(QUrl &url);
+    void setUrl (QUrl &url);
 
 signals:
-    void clicked();
+    void clicked ();
 
 protected:
-    void enterEvent(QEvent *event) override;
+    void enterEvent (QEvent *event) override;
 
-    void leaveEvent(QEvent *event) override;
+    void leaveEvent (QEvent *event) override;
 
-    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent (QMouseEvent *event) override;
 
 private:
-    void setFontUnderline(bool value);
+    void setFontUnderline (bool value);
 
     QUrl url;
 };

@@ -34,63 +34,63 @@ public:
         Error,
         Cancelled,
     };
-    Q_ENUM(Status)
+    Q_ENUM (Status)
 
-    explicit HydrationJob(QObject *parent = nullptr);
+    explicit HydrationJob (QObject *parent = nullptr);
 
-    AccountPtr account() const;
-    void setAccount(AccountPtr &account);
+    AccountPtr account () const;
+    void setAccount (AccountPtr &account);
 
-    QString remotePath() const;
-    void setRemotePath(QString &remotePath);
+    QString remotePath () const;
+    void setRemotePath (QString &remotePath);
 
-    QString localPath() const;
-    void setLocalPath(QString &localPath);
+    QString localPath () const;
+    void setLocalPath (QString &localPath);
 
-    SyncJournalDb *journal() const;
-    void setJournal(SyncJournalDb *journal);
+    SyncJournalDb *journal () const;
+    void setJournal (SyncJournalDb *journal);
 
-    QString requestId() const;
-    void setRequestId(QString &requestId);
+    QString requestId () const;
+    void setRequestId (QString &requestId);
 
-    QString folderPath() const;
-    void setFolderPath(QString &folderPath);
+    QString folderPath () const;
+    void setFolderPath (QString &folderPath);
 
-    bool isEncryptedFile() const;
-    void setIsEncryptedFile(bool isEncrypted);
+    bool isEncryptedFile () const;
+    void setIsEncryptedFile (bool isEncrypted);
 
-    QString e2eMangledName() const;
-    void setE2eMangledName(QString &e2eMangledName);
+    QString e2eMangledName () const;
+    void setE2eMangledName (QString &e2eMangledName);
 
-    qint64 fileTotalSize() const;
-    void setFileTotalSize(qint64 totalSize);
+    qint64 fileTotalSize () const;
+    void setFileTotalSize (qint64 totalSize);
 
-    Status status() const;
+    Status status () const;
 
-    void start();
-    void cancel();
-    void finalize(OCC::VfsCfApi *vfs);
+    void start ();
+    void cancel ();
+    void finalize (OCC::VfsCfApi *vfs);
 
 public slots:
-    void slotCheckFolderId(QStringList &list);
-    void slotFolderIdError();
-    void slotCheckFolderEncryptedMetadata(QJsonDocument &json);
-    void slotFolderEncryptedMetadataError(QByteArray &fileId, int httpReturnCode);
+    void slotCheckFolderId (QStringList &list);
+    void slotFolderIdError ();
+    void slotCheckFolderEncryptedMetadata (QJsonDocument &json);
+    void slotFolderEncryptedMetadataError (QByteArray &fileId, int httpReturnCode);
 
 signals:
-    void finished(HydrationJob *job);
+    void finished (HydrationJob *job);
 
 private:
-    void emitFinished(Status status);
+    void emitFinished (Status status);
 
-    void onNewConnection();
-    void onCancellationServerNewConnection();
-    void onGetFinished();
+    void onNewConnection ();
+    void onCancellationServerNewConnection ();
+    void onGetFinished ();
 
-    void handleNewConnection();
-    void handleNewConnectionForEncryptedFile();
+    void handleNewConnection ();
+    void handleNewConnectionForEncryptedFile ();
 
-    void startServerAndWaitForConnections();
+    void startServerAndWaitForConnections ();
 
     AccountPtr _account;
     QString _remotePath;

@@ -27,11 +27,11 @@ namespace OCC {
  */
 class OWNCLOUDSYNC_EXPORT ProgressInfo : public QObject {
 public:
-    ProgressInfo();
+    ProgressInfo ();
 
     /** Resets for a new sync run.
      */
-    void reset();
+    void reset ();
 
     /** Records the status of the sync run
      */
@@ -54,52 +54,52 @@ public:
         /**
          * Emitted once when done
          *
-         * Except when SyncEngine jumps directly to finalize() without going
-         * through slotPropagationFinished().
+         * Except when SyncEngine jumps directly to finalize () without going
+         * through slotPropagationFinished ().
          */
         Done
     };
 
-    Status status() const;
+    Status status () const;
 
     /**
      * Called when propagation starts.
      *
-     * isUpdatingEstimates() will return true afterwards.
+     * isUpdatingEstimates () will return true afterwards.
      */
-    void startEstimateUpdates();
+    void startEstimateUpdates ();
 
     /**
-     * Returns true when startEstimateUpdates() was called.
+     * Returns true when startEstimateUpdates () was called.
      *
      * This is used when the SyncEngine wants to indicate a new sync
-     * is about to start via the transmissionProgress() signal. The
-     * first ProgressInfo will have isUpdatingEstimates() == false.
+     * is about to start via the transmissionProgress () signal. The
+     * first ProgressInfo will have isUpdatingEstimates () == false.
      */
-    bool isUpdatingEstimates() const;
+    bool isUpdatingEstimates () const;
 
     /**
      * Increase the file and size totals by the amount indicated in item.
      */
-    void adjustTotalsForFile(SyncFileItem &item);
+    void adjustTotalsForFile (SyncFileItem &item);
 
-    qint64 totalFiles() const;
-    qint64 completedFiles() const;
+    qint64 totalFiles () const;
+    qint64 completedFiles () const;
 
-    qint64 totalSize() const;
-    qint64 completedSize() const;
+    qint64 totalSize () const;
+    qint64 completedSize () const;
 
     /** Number of a file that is currently in progress. */
-    qint64 currentFile() const;
+    qint64 currentFile () const;
 
     /** Return true if the size needs to be taken in account in the total amount of time */
-    static inline bool isSizeDependent(SyncFileItem &item) {
-        return !item.isDirectory()
+    static inline bool isSizeDependent (SyncFileItem &item) {
+        return !item.isDirectory ()
             && (item._instruction == CSYNC_INSTRUCTION_CONFLICT
                 || item._instruction == CSYNC_INSTRUCTION_SYNC
                 || item._instruction == CSYNC_INSTRUCTION_NEW
                 || item._instruction == CSYNC_INSTRUCTION_TYPE_CHANGE)
-            && !(item._type == ItemTypeVirtualFile
+            && ! (item._type == ItemTypeVirtualFile
                  || item._type == ItemTypeVirtualFileDehydration);
     }
 
@@ -120,29 +120,29 @@ public:
      */
     struct OWNCLOUDSYNC_EXPORT Progress {
         /** Returns the estimates about progress per second and eta. */
-        Estimates estimates() const;
+        Estimates estimates () const;
 
-        qint64 completed() const;
-        qint64 remaining() const;
+        qint64 completed () const;
+        qint64 remaining () const;
 
     private:
         /**
          * Update the exponential moving average estimate of _progressPerSec.
          */
-        void update();
+        void update ();
 
         /**
          * Changes the _completed value and does sanity checks on
          * _prevCompleted and _total.
          */
-        void setCompleted(qint64 completed);
+        void setCompleted (qint64 completed);
 
-        // Updated by update()
+        // Updated by update ()
         double _progressPerSec = 0;
         qint64 _prevCompleted = 0;
 
         // Used to get to a good value faster when
-        // progress measurement stats. See update().
+        // progress measurement stats. See update ().
         double _initialSmoothing = 1.0;
 
         // Set and updated by ProgressInfo
@@ -166,14 +166,14 @@ public:
     QString _currentDiscoveredRemoteFolder;
     QString _currentDiscoveredLocalFolder;
 
-    void setProgressComplete(SyncFileItem &item);
+    void setProgressComplete (SyncFileItem &item);
 
-    void setProgressItem(SyncFileItem &item, qint64 completed);
+    void setProgressItem (SyncFileItem &item, qint64 completed);
 
     /**
      * Get the total completion estimate
      */
-    Estimates totalProgress() const;
+    Estimates totalProgress () const;
 
     /**
      * Get the optimistic eta.
@@ -181,7 +181,7 @@ public:
      * This value is based on the highest observed transfer bandwidth
      * and files-per-second speed.
      */
-    quint64 optimisticEta() const;
+    quint64 optimisticEta () const;
 
     /**
      * Whether the remaining-time estimate is trusted.
@@ -189,26 +189,26 @@ public:
      * We don't trust it if it is hugely above the optimistic estimate.
      * See #5046.
      */
-    bool trustEta() const;
+    bool trustEta () const;
 
     /**
      * Get the current file completion estimate structure
      */
-    Estimates fileProgress(SyncFileItem &item) const;
+    Estimates fileProgress (SyncFileItem &item) const;
 
 private slots:
     /**
      * Called every second once started, this function updates the
      * estimates.
      */
-    void updateEstimates();
+    void updateEstimates ();
 
 private:
     // Sets the completed size by summing finished jobs with the progress
     // of active ones.
-    void recomputeCompletedSize();
+    void recomputeCompletedSize ();
 
-    // Triggers the update() slot every second once propagation started.
+    // Triggers the update () slot every second once propagation started.
     QTimer _updateEstimatesTimer;
 
     Progress _sizeProgress;
@@ -224,11 +224,11 @@ private:
 
 namespace Progress {
 
-    OWNCLOUDSYNC_EXPORT QString asActionString(SyncFileItem &item);
-    OWNCLOUDSYNC_EXPORT QString asResultString(SyncFileItem &item);
+    OWNCLOUDSYNC_EXPORT QString asActionString (SyncFileItem &item);
+    OWNCLOUDSYNC_EXPORT QString asResultString (SyncFileItem &item);
 
-    OWNCLOUDSYNC_EXPORT bool isWarningKind(SyncFileItem::Status);
-    OWNCLOUDSYNC_EXPORT bool isIgnoredKind(SyncFileItem::Status);
+    OWNCLOUDSYNC_EXPORT bool isWarningKind (SyncFileItem::Status);
+    OWNCLOUDSYNC_EXPORT bool isIgnoredKind (SyncFileItem::Status);
 }
 
 /** Type of error
@@ -254,8 +254,8 @@ class OWNCLOUDSYNC_EXPORT ProgressDispatcher : public QObject {
 
     friend class Folder; // only allow Folder class to access the setting slots.
 public:
-    static ProgressDispatcher *instance();
-    ~ProgressDispatcher() override;
+    static ProgressDispatcher *instance ();
+    ~ProgressDispatcher () override;
 
 signals:
     /**
@@ -265,16 +265,16 @@ signals:
       @param[out]  progress   A struct with all progress info.
 
      */
-    void progressInfo(QString &folder, ProgressInfo &progress);
+    void progressInfo (QString &folder, ProgressInfo &progress);
     /**
      * @brief: the item was completed by a job
      */
-    void itemCompleted(QString &folder, SyncFileItemPtr &item);
+    void itemCompleted (QString &folder, SyncFileItemPtr &item);
 
     /**
      * @brief A new folder-wide sync error was seen.
      */
-    void syncError(QString &folder, QString &message, ErrorCategory category);
+    void syncError (QString &folder, QString &message, ErrorCategory category);
 
     /**
      * @brief Emitted when an error needs to be added into GUI
@@ -283,18 +283,18 @@ signals:
      * @param[out] full error message
      * @param[out] subject (optional)
      */
-    void addErrorToGui(QString &folder, SyncFileItem::Status status, QString &errorMessage, QString &subject);
+    void addErrorToGui (QString &folder, SyncFileItem::Status status, QString &errorMessage, QString &subject);
 
     /**
      * @brief Emitted for a folder when a sync is done, listing all pending conflicts
      */
-    void folderConflicts(QString &folder, QStringList &conflictPaths);
+    void folderConflicts (QString &folder, QStringList &conflictPaths);
 
 protected:
-    void setProgressInfo(QString &folder, ProgressInfo &progress);
+    void setProgressInfo (QString &folder, ProgressInfo &progress);
 
 private:
-    ProgressDispatcher(QObject *parent = nullptr);
+    ProgressDispatcher (QObject *parent = nullptr);
 
     QElapsedTimer _timer;
     static ProgressDispatcher *_instance;

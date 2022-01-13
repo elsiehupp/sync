@@ -40,7 +40,7 @@ public:
         Up,
         Down
     };
-    Q_ENUM(Direction)
+    Q_ENUM (Direction)
 
     enum Status { // stored in 4 bits
         NoStatus,
@@ -87,56 +87,56 @@ public:
          */
         BlacklistedError
     };
-    Q_ENUM(Status)
+    Q_ENUM (Status)
 
-    SyncJournalFileRecord toSyncJournalFileRecordWithInode(QString &localFileName) const;
+    SyncJournalFileRecord toSyncJournalFileRecordWithInode (QString &localFileName) const;
 
     /** Creates a basic SyncFileItem from a DB record
      *
      * This is intended in particular for read-update-write cycles that need
      * to go through a a SyncFileItem, like PollJob.
      */
-    static SyncFileItemPtr fromSyncJournalFileRecord(SyncJournalFileRecord &rec);
+    static SyncFileItemPtr fromSyncJournalFileRecord (SyncJournalFileRecord &rec);
 
-    SyncFileItem()
-        : _type(ItemTypeSkip)
-        , _direction(None)
-        , _serverHasIgnoredFiles(false)
-        , _hasBlacklistEntry(false)
-        , _errorMayBeBlacklisted(false)
-        , _status(NoStatus)
-        , _isRestoration(false)
-        , _isSelectiveSync(false)
-        , _isEncrypted(false) {
+    SyncFileItem ()
+        : _type (ItemTypeSkip)
+        , _direction (None)
+        , _serverHasIgnoredFiles (false)
+        , _hasBlacklistEntry (false)
+        , _errorMayBeBlacklisted (false)
+        , _status (NoStatus)
+        , _isRestoration (false)
+        , _isSelectiveSync (false)
+        , _isEncrypted (false) {
     }
 
-    friend bool operator==(SyncFileItem &item1, SyncFileItem &item2) {
+    friend bool operator== (SyncFileItem &item1, SyncFileItem &item2) {
         return item1._originalFile == item2._originalFile;
     }
 
-    friend bool operator<(SyncFileItem &item1, SyncFileItem &item2) {
+    friend bool operator< (SyncFileItem &item1, SyncFileItem &item2) {
         // Sort by destination
-        auto d1 = item1.destination();
-        auto d2 = item2.destination();
+        auto d1 = item1.destination ();
+        auto d2 = item2.destination ();
 
         // But this we need to order it so the slash come first. It should be this order:
         //  "foo", "foo/bar", "foo-bar"
         // This is important since we assume that the contents of a folder directly follows
         // its contents
 
-        auto data1 = d1.constData();
-        auto data2 = d2.constData();
+        auto data1 = d1.constData ();
+        auto data2 = d2.constData ();
 
         // Find the length of the largest prefix
         int prefixL = 0;
-        auto minSize = std::min(d1.size(), d2.size());
+        auto minSize = std::min (d1.size (), d2.size ());
         while (prefixL < minSize && data1[prefixL] == data2[prefixL]) {
             prefixL++;
         }
 
-        if (prefixL == d2.size())
+        if (prefixL == d2.size ())
             return false;
-        if (prefixL == d1.size())
+        if (prefixL == d1.size ())
             return true;
 
         if (data1[prefixL] == '/')
@@ -147,45 +147,45 @@ public:
         return data1[prefixL] < data2[prefixL];
     }
 
-    QString destination() const {
-        if (!_renameTarget.isEmpty()) {
+    QString destination () const {
+        if (!_renameTarget.isEmpty ()) {
             return _renameTarget;
         }
         return _file;
     }
 
-    bool isEmpty() const {
-        return _file.isEmpty();
+    bool isEmpty () const {
+        return _file.isEmpty ();
     }
 
-    bool isDirectory() const {
+    bool isDirectory () const {
         return _type == ItemTypeDirectory;
     }
 
     /**
      * True if the item had any kind of error.
      */
-    bool hasErrorStatus() const {
+    bool hasErrorStatus () const {
         return _status == SyncFileItem::SoftError
             || _status == SyncFileItem::NormalError
             || _status == SyncFileItem::FatalError
-            || !_errorString.isEmpty();
+            || !_errorString.isEmpty ();
     }
 
     /**
      * Whether this item should appear on the issues tab.
      */
-    bool showInIssuesTab() const {
-        return hasErrorStatus() || _status == SyncFileItem::Conflict;
+    bool showInIssuesTab () const {
+        return hasErrorStatus () || _status == SyncFileItem::Conflict;
     }
 
     /**
      * Whether this item should appear on the protocol tab.
      */
-    bool showInProtocolTab() const {
-        return (!showInIssuesTab() || _status == SyncFileItem::Restoration)
+    bool showInProtocolTab () const {
+        return (!showInIssuesTab () || _status == SyncFileItem::Restoration)
             // Don't show conflicts that were resolved as "not a conflict after all"
-            && !(_instruction == CSYNC_INSTRUCTION_CONFLICT && _status == SyncFileItem::Success);
+            && ! (_instruction == CSYNC_INSTRUCTION_CONFLICT && _status == SyncFileItem::Success);
     }
 
     // Variables useful for everybody
@@ -198,7 +198,7 @@ public:
 
     /** for renames: the name _file should be renamed to
      * for dehydrations: the name _file should become after dehydration (like adding a suffix)
-     * otherwise empty. Use destination() to find the sync target.
+     * otherwise empty. Use destination () to find the sync target.
      */
     QString _renameTarget;
 
@@ -213,27 +213,27 @@ public:
     /// the encrypted name on the server.
     QString _encryptedFileName;
 
-    ItemType _type BITFIELD(3);
-    Direction _direction BITFIELD(3);
-    bool _serverHasIgnoredFiles BITFIELD(1);
+    ItemType _type BITFIELD (3);
+    Direction _direction BITFIELD (3);
+    bool _serverHasIgnoredFiles BITFIELD (1);
 
     /// Whether there's an entry in the blacklist table.
     /// Note: that entry may have retries left, so this can be true
     /// without the status being FileIgnored.
-    bool _hasBlacklistEntry BITFIELD(1);
+    bool _hasBlacklistEntry BITFIELD (1);
 
     /** If true and NormalError, this error may be blacklisted
      *
      * Note that non-local errors (httpErrorCode!=0) may also be
      * blacklisted independently of this flag.
      */
-    bool _errorMayBeBlacklisted BITFIELD(1);
+    bool _errorMayBeBlacklisted BITFIELD (1);
 
     // Variables useful to report to the user
-    Status _status BITFIELD(4);
-    bool _isRestoration BITFIELD(1); // The original operation was forbidden, and this is a restoration
-    bool _isSelectiveSync BITFIELD(1); // The file is removed or ignored because it is in the selective sync list
-    bool _isEncrypted BITFIELD(1); // The file is E2EE or the content of the directory should be E2EE
+    Status _status BITFIELD (4);
+    bool _isRestoration BITFIELD (1); // The original operation was forbidden, and this is a restoration
+    bool _isSelectiveSync BITFIELD (1); // The file is removed or ignored because it is in the selective sync list
+    bool _isEncrypted BITFIELD (1); // The file is E2EE or the content of the directory should be E2EE
     quint16 _httpErrorCode = 0;
     RemotePermissions _remotePerm;
     QString _errorString; // Contains a string only in case of error
@@ -266,14 +266,14 @@ public:
     QString _directDownloadCookies;
 };
 
-inline bool operator<(SyncFileItemPtr &item1, SyncFileItemPtr &item2) {
+inline bool operator< (SyncFileItemPtr &item1, SyncFileItemPtr &item2) {
     return *item1 < *item2;
 }
 
 using SyncFileItemVector = QVector<SyncFileItemPtr>;
 }
 
-Q_DECLARE_METATYPE(OCC::SyncFileItem)
-Q_DECLARE_METATYPE(OCC::SyncFileItemPtr)
+Q_DECLARE_METATYPE (OCC::SyncFileItem)
+Q_DECLARE_METATYPE (OCC::SyncFileItemPtr)
 
 #endif // SYNCFILEITEM_H

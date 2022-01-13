@@ -29,19 +29,19 @@ namespace OCC {
  * need to make sure that that information is displayed to the user
  * as it changes.
  *
- * To accomplish that, the eventFilter() stores the tooltip's position
- * and the dataChanged() slot updates the tooltip if Qt::ToolTipRole
+ * To accomplish that, the eventFilter () stores the tooltip's position
+ * and the dataChanged () slot updates the tooltip if Qt::ToolTipRole
  * gets updated while a tooltip is shown.
  */
 class ToolTipUpdater : public QObject {
 public:
-    ToolTipUpdater(QTreeView *treeView);
+    ToolTipUpdater (QTreeView *treeView);
 
 protected:
-    bool eventFilter(QObject *obj, QEvent *ev) override;
+    bool eventFilter (QObject *obj, QEvent *ev) override;
 
 private slots:
-    void dataChanged(QModelIndex &topLeft, QModelIndex &bottomRight, QVector<int> &roles);
+    void dataChanged (QModelIndex &topLeft, QModelIndex &bottomRight, QVector<int> &roles);
 
 private:
     QTreeView *_treeView;

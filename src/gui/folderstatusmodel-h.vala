@@ -22,7 +22,7 @@
 class QNetworkReply;
 namespace OCC {
 
-Q_DECLARE_LOGGING_CATEGORY(lcFolderStatus)
+Q_DECLARE_LOGGING_CATEGORY (lcFolderStatus)
 
 class Folder;
 class ProgressInfo;
@@ -36,21 +36,21 @@ class FolderStatusModel : public QAbstractItemModel {
 public:
     enum {FileIdRole = Qt::UserRole+1};
 
-    FolderStatusModel(QObject *parent = nullptr);
-    ~FolderStatusModel() override;
-    void setAccountState(AccountState *accountState);
+    FolderStatusModel (QObject *parent = nullptr);
+    ~FolderStatusModel () override;
+    void setAccountState (AccountState *accountState);
 
-    Qt::ItemFlags flags(QModelIndex &) const override;
-    QVariant data(QModelIndex &index, int role) const override;
-    bool setData(QModelIndex &index, QVariant &value, int role = Qt::EditRole) override;
-    int columnCount(QModelIndex &parent = QModelIndex()) const override;
-    int rowCount(QModelIndex &parent = QModelIndex()) const override;
-    QModelIndex index(int row, int column = 0, QModelIndex &parent = QModelIndex()) const override;
-    QModelIndex parent(QModelIndex &child) const override;
-    bool canFetchMore(QModelIndex &parent) const override;
-    void fetchMore(QModelIndex &parent) override;
-    void resetAndFetch(QModelIndex &parent);
-    bool hasChildren(QModelIndex &parent = QModelIndex()) const override;
+    Qt::ItemFlags flags (QModelIndex &) const override;
+    QVariant data (QModelIndex &index, int role) const override;
+    bool setData (QModelIndex &index, QVariant &value, int role = Qt::EditRole) override;
+    int columnCount (QModelIndex &parent = QModelIndex ()) const override;
+    int rowCount (QModelIndex &parent = QModelIndex ()) const override;
+    QModelIndex index (int row, int column = 0, QModelIndex &parent = QModelIndex ()) const override;
+    QModelIndex parent (QModelIndex &child) const override;
+    bool canFetchMore (QModelIndex &parent) const override;
+    void fetchMore (QModelIndex &parent) override;
+    void resetAndFetch (QModelIndex &parent);
+    bool hasChildren (QModelIndex &parent = QModelIndex ()) const override;
 
     struct SubFolderInfo {
         Folder *_folder = nullptr;
@@ -75,14 +75,14 @@ public:
         Qt::CheckState _checked = Qt::Checked;
 
         // Whether this has a FetchLabel subrow
-        bool hasLabel() const;
+        bool hasLabel () const;
 
         // Reset all subfolders and fetch status
-        void resetSubs(FolderStatusModel *model, QModelIndex index);
+        void resetSubs (FolderStatusModel *model, QModelIndex index);
 
-        struct Progress { {ool isNull() const
+        struct Progress { {ool isNull () const
             {
-                return _progressString.isEmpty() && _warningCount == 0 && _overallSyncString.isEmpty();
+                return _progressString.isEmpty () && _warningCount == 0 && _overallSyncString.isEmpty ();
             }
             QString _progressString;
             QString _overallSyncString;
@@ -98,43 +98,43 @@ public:
         SubFolder,
         AddButton,
         FetchLabel };
-    ItemType classify(QModelIndex &index) const;
-    SubFolderInfo *infoForIndex(QModelIndex &index) const;
-    bool isAnyAncestorEncrypted(QModelIndex &index) const;
+    ItemType classify (QModelIndex &index) const;
+    SubFolderInfo *infoForIndex (QModelIndex &index) const;
+    bool isAnyAncestorEncrypted (QModelIndex &index) const;
     // If the selective sync check boxes were changed
-    bool isDirty() { return _dirty; }
+    bool isDirty () { return _dirty; }
 
     /**
      * return a QModelIndex for the given path within the given folder.
      * Note: this method returns an invalid index if the path was not fetched from the server before
      */
-    QModelIndex indexForPath(Folder *f, QString &path) const;
+    QModelIndex indexForPath (Folder *f, QString &path) const;
 
 public slots:
-    void slotUpdateFolderState(Folder *);
-    void slotApplySelectiveSync();
-    void resetFolders();
-    void slotSyncAllPendingBigFolders();
-    void slotSyncNoPendingBigFolders();
-    void slotSetProgress(ProgressInfo &progress);
+    void slotUpdateFolderState (Folder *);
+    void slotApplySelectiveSync ();
+    void resetFolders ();
+    void slotSyncAllPendingBigFolders ();
+    void slotSyncNoPendingBigFolders ();
+    void slotSetProgress (ProgressInfo &progress);
 
 private slots:
-    void slotUpdateDirectories(QStringList &);
-    void slotGatherPermissions(QString &name, QMap<QString, QString> &properties);
-    void slotGatherEncryptionStatus(QString &href, QMap<QString, QString> &properties);
-    void slotLscolFinishedWithError(QNetworkReply *r);
-    void slotFolderSyncStateChange(Folder *f);
-    void slotFolderScheduleQueueChanged();
-    void slotNewBigFolder();
+    void slotUpdateDirectories (QStringList &);
+    void slotGatherPermissions (QString &name, QMap<QString, QString> &properties);
+    void slotGatherEncryptionStatus (QString &href, QMap<QString, QString> &properties);
+    void slotLscolFinishedWithError (QNetworkReply *r);
+    void slotFolderSyncStateChange (Folder *f);
+    void slotFolderScheduleQueueChanged ();
+    void slotNewBigFolder ();
 
     /**
      * "In progress" labels for fetching data from the server are only
      * added after some time to avoid popping.
      */
-    void slotShowFetchProgress();
+    void slotShowFetchProgress ();
 
 private:
-    QStringList createBlackList(OCC::FolderStatusModel::SubFolderInfo &root,
+    QStringList createBlackList (OCC::FolderStatusModel::SubFolderInfo &root,
         const QStringList &oldBlackList) const;
     const AccountState *_accountState = nullptr;
     bool _dirty = false; // If the selective sync checkboxes were changed
@@ -142,20 +142,20 @@ private:
     /**
      * Keeps track of items that are fetching data from the server.
      *
-     * See slotShowPendingFetchProgress()
+     * See slotShowPendingFetchProgress ()
      */
     QMap<QPersistentModelIndex, QElapsedTimer> _fetchingItems;
 
 signals:
-    void dirtyChanged();
+    void dirtyChanged ();
 
     // Tell the view that this item should be expanded because it has an undecided item
-    void suggestExpand(QModelIndex &);
+    void suggestExpand (QModelIndex &);
     friend struct SubFolderInfo;
 };
 
 } // namespace OCC
 
-Q_DECLARE_METATYPE(OCC::FolderStatusModel::SubFolderInfo*)
+Q_DECLARE_METATYPE (OCC::FolderStatusModel::SubFolderInfo*)
 
 #endif // FOLDERSTATUSMODEL_H

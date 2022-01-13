@@ -20,8 +20,8 @@ namespace OCC {
 namespace Ui {
     class SvgImageProvider : public QQuickImageProvider {
     public:
-        SvgImageProvider();
-        QImage requestImage(QString &id, QSize *size, QSize &requestedSize) override;
+        SvgImageProvider ();
+        QImage requestImage (QString &id, QSize *size, QSize &requestedSize) override;
     };
 }
 }

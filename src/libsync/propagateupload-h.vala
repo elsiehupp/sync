@@ -19,10 +19,10 @@
 
 namespace OCC {
 
-Q_DECLARE_LOGGING_CATEGORY(lcPutJob)
-Q_DECLARE_LOGGING_CATEGORY(lcPropagateUpload)
-Q_DECLARE_LOGGING_CATEGORY(lcPropagateUploadV1)
-Q_DECLARE_LOGGING_CATEGORY(lcPropagateUploadNG)
+Q_DECLARE_LOGGING_CATEGORY (lcPutJob)
+Q_DECLARE_LOGGING_CATEGORY (lcPropagateUpload)
+Q_DECLARE_LOGGING_CATEGORY (lcPropagateUploadV1)
+Q_DECLARE_LOGGING_CATEGORY (lcPropagateUploadNG)
 
 class BandwidthManager;
 
@@ -32,25 +32,25 @@ class BandwidthManager;
  */
 class UploadDevice : public QIODevice {
 public:
-    UploadDevice(QString &fileName, qint64 start, qint64 size, BandwidthManager *bwm);
-    ~UploadDevice() override;
+    UploadDevice (QString &fileName, qint64 start, qint64 size, BandwidthManager *bwm);
+    ~UploadDevice () override;
 
-    bool open(QIODevice::OpenMode mode) override;
-    void close() override;
+    bool open (QIODevice::OpenMode mode) override;
+    void close () override;
 
-    qint64 writeData(char *, qint64) override;
-    qint64 readData(char *data, qint64 maxlen) override;
-    bool atEnd() const override;
-    qint64 size() const override;
-    qint64 bytesAvailable() const override;
-    bool isSequential() const override;
-    bool seek(qint64 pos) override;
+    qint64 writeData (char *, qint64) override;
+    qint64 readData (char *data, qint64 maxlen) override;
+    bool atEnd () const override;
+    qint64 size () const override;
+    qint64 bytesAvailable () const override;
+    bool isSequential () const override;
+    bool seek (qint64 pos) override;
 
-    void setBandwidthLimited(bool);
-    bool isBandwidthLimited() { return _bandwidthLimited; }
-    void setChoked(bool);
-    bool isChoked() { return _choked; }
-    void giveBandwidthQuota(qint64 bwq);
+    void setBandwidthLimited (bool);
+    bool isBandwidthLimited () { return _bandwidthLimited; }
+    void setChoked (bool);
+    bool isChoked () { return _choked; }
+    void giveBandwidthQuota (qint64 bwq);
 
 signals:
 
@@ -70,10 +70,10 @@ private:
     qint64 _bandwidthQuota = 0;
     qint64 _readWithProgress = 0;
     bool _bandwidthLimited = false; // if _bandwidthQuota will be used
-    bool _choked = false; // if upload is paused (readData() will return 0)
+    bool _choked = false; // if upload is paused (readData () will return 0)
     friend class BandwidthManager;
 public slots:
-    void slotJobUploadProgress(qint64 sent, qint64 t);
+    void slotJobUploadProgress (qint64 sent, qint64 t);
 };
 
 /**
@@ -91,46 +91,46 @@ private:
 
 public:
     // Takes ownership of the device
-    explicit PUTFileJob(AccountPtr account, QString &path, std::unique_ptr<QIODevice> device,
+    explicit PUTFileJob (AccountPtr account, QString &path, std::unique_ptr<QIODevice> device,
         const QMap<QByteArray, QByteArray> &headers, int chunk, QObject *parent = nullptr)
-        : AbstractNetworkJob(account, path, parent)
-        , _device(device.release())
-        , _headers(headers)
-        , _chunk(chunk) {
-        _device->setParent(this);
+        : AbstractNetworkJob (account, path, parent)
+        , _device (device.release ())
+        , _headers (headers)
+        , _chunk (chunk) {
+        _device->setParent (this);
     }
-    explicit PUTFileJob(AccountPtr account, QUrl &url, std::unique_ptr<QIODevice> device,
+    explicit PUTFileJob (AccountPtr account, QUrl &url, std::unique_ptr<QIODevice> device,
         const QMap<QByteArray, QByteArray> &headers, int chunk, QObject *parent = nullptr)
-        : AbstractNetworkJob(account, QString(), parent)
-        , _device(device.release())
-        , _headers(headers)
-        , _url(url)
-        , _chunk(chunk) {
-        _device->setParent(this);
+        : AbstractNetworkJob (account, QString (), parent)
+        , _device (device.release ())
+        , _headers (headers)
+        , _url (url)
+        , _chunk (chunk) {
+        _device->setParent (this);
     }
-    ~PUTFileJob() override;
+    ~PUTFileJob () override;
 
     int _chunk;
 
-    void start() override;
+    void start () override;
 
-    bool finished() override;
+    bool finished () override;
 
-    QIODevice *device() {
+    QIODevice *device () {
         return _device;
     }
 
-    QString errorString() const override {
-        return _errorString.isEmpty() ? AbstractNetworkJob::errorString() : _errorString;
+    QString errorString () const override {
+        return _errorString.isEmpty () ? AbstractNetworkJob::errorString () : _errorString;
     }
 
-    std::chrono::milliseconds msSinceStart() const {
-        return std::chrono::milliseconds(_requestTimer.elapsed());
+    std::chrono::milliseconds msSinceStart () const {
+        return std::chrono::milliseconds (_requestTimer.elapsed ());
     }
 
 signals:
-    void finishedSignal();
-    void uploadProgress(qint64, qint64);
+    void finishedSignal ();
+    void uploadProgress (qint64, qint64);
 
 };
 
@@ -148,19 +148,19 @@ class PollJob : public AbstractNetworkJob {
 public:
     SyncFileItemPtr _item;
     // Takes ownership of the device
-    explicit PollJob(AccountPtr account, QString &path, SyncFileItemPtr &item,
+    explicit PollJob (AccountPtr account, QString &path, SyncFileItemPtr &item,
         SyncJournalDb *journal, QString &localPath, QObject *parent)
-        : AbstractNetworkJob(account, path, parent)
-        , _journal(journal)
-        , _localPath(localPath)
-        , _item(item) {
+        : AbstractNetworkJob (account, path, parent)
+        , _journal (journal)
+        , _localPath (localPath)
+        , _item (item) {
     }
 
-    void start() override;
-    bool finished() override;
+    void start () override;
+    bool finished () override;
 
 signals:
-    void finishedSignal();
+    void finishedSignal ();
 };
 
 class PropagateUploadEncrypted;
@@ -171,19 +171,19 @@ class PropagateUploadEncrypted;
  *
  * State Machine:
  *
- *   +---> start()  --> (delete job) -------+
+ *   +---> start ()  --> (delete job) -------+
  *   |                                      |
- *   +--> slotComputeContentChecksum()  <---+
+ *   +--> slotComputeContentChecksum ()  <---+
  *                   |
  *                   v
- *    slotComputeTransmissionChecksum()
+ *    slotComputeTransmissionChecksum ()
  *         |
  *         v
- *    slotStartUpload()  -> doStartUpload()
+ *    slotStartUpload ()  -> doStartUpload ()
  *                                  .
  *                                  .
  *                                  v
- *        finalize() or abortWithError()  or startPollJob()
+ *        finalize () or abortWithError ()  or startPollJob ()
  */
 class PropagateUploadFileCommon : public PropagateItemJob {
 
@@ -194,15 +194,15 @@ class PropagateUploadFileCommon : public PropagateItemJob {
 
 protected:
     QVector<AbstractNetworkJob *> _jobs; /// network jobs that are currently in transit
-    bool _finished BITFIELD(1); /// Tells that all the jobs have been finished
-    bool _deleteExisting BITFIELD(1);
+    bool _finished BITFIELD (1); /// Tells that all the jobs have been finished
+    bool _deleteExisting BITFIELD (1);
 
     /** Whether an abort is currently ongoing.
      *
      * Important to avoid duplicate aborts since each finishing PUTFileJob might
      * trigger an abort on error.
      */
-    bool _aborting BITFIELD(1);
+    bool _aborting BITFIELD (1);
 
     /* This is a minified version of the SyncFileItem,
      * that holds only the specifics about the file that's
@@ -220,7 +220,7 @@ protected:
     QByteArray _transmissionChecksumHeader;
 
 public:
-    PropagateUploadFileCommon(OwncloudPropagator *propagator, SyncFileItemPtr &item);
+    PropagateUploadFileCommon (OwncloudPropagator *propagator, SyncFileItemPtr &item);
 
     /**
      * Whether an existing entity with the same name may be deleted before
@@ -228,62 +228,62 @@ public:
      *
      * Default: false.
      */
-    void setDeleteExisting(bool enabled);
+    void setDeleteExisting (bool enabled);
 
     /* start should setup the file, path and size that will be send to the server */
-    void start() override;
-    void setupEncryptedFile(QString& path, QString& filename, quint64 size);
-    void setupUnencryptedFile();
-    void startUploadFile();
-    void callUnlockFolder();
-    bool isLikelyFinishedQuickly() override { return _item->_size < propagator()->smallFileSize(); }
+    void start () override;
+    void setupEncryptedFile (QString& path, QString& filename, quint64 size);
+    void setupUnencryptedFile ();
+    void startUploadFile ();
+    void callUnlockFolder ();
+    bool isLikelyFinishedQuickly () override { return _item->_size < propagator ()->smallFileSize (); }
 
 private slots:
-    void slotComputeContentChecksum();
+    void slotComputeContentChecksum ();
     // Content checksum computed, compute the transmission checksum
-    void slotComputeTransmissionChecksum(QByteArray &contentChecksumType, QByteArray &contentChecksum);
+    void slotComputeTransmissionChecksum (QByteArray &contentChecksumType, QByteArray &contentChecksum);
     // transmission checksum computed, prepare the upload
-    void slotStartUpload(QByteArray &transmissionChecksumType, QByteArray &transmissionChecksum);
+    void slotStartUpload (QByteArray &transmissionChecksumType, QByteArray &transmissionChecksum);
     // invoked when encrypted folder lock has been released
-    void slotFolderUnlocked(QByteArray &folderId, int httpReturnCode);
+    void slotFolderUnlocked (QByteArray &folderId, int httpReturnCode);
     // invoked on internal error to unlock a folder and faile
-    void slotOnErrorStartFolderUnlock(SyncFileItem::Status status, QString &errorString);
+    void slotOnErrorStartFolderUnlock (SyncFileItem::Status status, QString &errorString);
 
 public:
-    virtual void doStartUpload() = 0;
+    virtual void doStartUpload () = 0;
 
-    void startPollJob(QString &path);
-    void finalize();
-    void abortWithError(SyncFileItem::Status status, QString &error);
+    void startPollJob (QString &path);
+    void finalize ();
+    void abortWithError (SyncFileItem::Status status, QString &error);
 
 public slots:
-    void slotJobDestroyed(QObject *job);
+    void slotJobDestroyed (QObject *job);
 
 private slots:
-    void slotPollFinished();
+    void slotPollFinished ();
 
 protected:
-    void done(SyncFileItem::Status status, QString &errorString = QString()) override;
+    void done (SyncFileItem::Status status, QString &errorString = QString ()) override;
 
     /**
      * Aborts all running network jobs, except for the ones that mayAbortJob
      * returns false on and, for async aborts, emits abortFinished when done.
      */
-    void abortNetworkJobs(
+    void abortNetworkJobs (
         AbortType abortType,
-        const std::function<bool(AbstractNetworkJob *job)> &mayAbortJob);
+        const std::function<bool (AbstractNetworkJob *job)> &mayAbortJob);
 
     /**
      * Checks whether the current error is one that should reset the whole
      * transfer if it happens too often. If so: Bump UploadInfo::errorCount
      * and maybe perform the reset.
      */
-    void checkResettingErrors();
+    void checkResettingErrors ();
 
     /**
      * Error handling functionality that is shared between jobs.
      */
-    void commonErrorHandling(AbstractNetworkJob *job);
+    void commonErrorHandling (AbstractNetworkJob *job);
 
     /**
      * Increases the timeout for the final MOVE/PUT for large files.
@@ -294,10 +294,10 @@ protected:
      *
      * See #6527, enterprise#2480
      */
-    static void adjustLastJobTimeout(AbstractNetworkJob *job, qint64 fileSize);
+    static void adjustLastJobTimeout (AbstractNetworkJob *job, qint64 fileSize);
 
     /** Bases headers that need to be sent on the PUT, or in the MOVE for chunking-ng */
-    QMap<QByteArray, QByteArray> headers();
+    QMap<QByteArray, QByteArray> headers ();
 private:
   PropagateUploadEncrypted *_uploadEncryptedHelper;
   bool _uploadingEncrypted;
@@ -328,24 +328,24 @@ private:
     int _chunkCount = 0; /// Total number of chunks for this file
     uint _transferId = 0; /// transfer id (part of the url)
 
-    qint64 chunkSize() const {
+    qint64 chunkSize () const {
         // Old chunking does not use dynamic chunking algorithm, and does not adjusts the chunk size respectively,
         // thus this value should be used as the one classifing item to be chunked
-        return propagator()->syncOptions()._initialChunkSize;
+        return propagator ()->syncOptions ()._initialChunkSize;
     }
 
 public:
-    PropagateUploadFileV1(OwncloudPropagator *propagator, SyncFileItemPtr &item)
-        : PropagateUploadFileCommon(propagator, item) {
+    PropagateUploadFileV1 (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+        : PropagateUploadFileCommon (propagator, item) {
     }
 
-    void doStartUpload() override;
+    void doStartUpload () override;
 public slots:
-    void abort(PropagatorJob::AbortType abortType) override;
+    void abort (PropagatorJob::AbortType abortType) override;
 private slots:
-    void startNextChunk();
-    void slotPutFinished();
-    void slotUploadProgress(qint64, qint64);
+    void startNextChunk ();
+    void slotPutFinished ();
+    void slotUploadProgress (qint64, qint64);
 };
 
 /**
@@ -374,28 +374,28 @@ private:
      * Return the URL of a chunk.
      * If chunk == -1, returns the URL of the parent folder containing the chunks
      */
-    QUrl chunkUrl(int chunk = -1);
+    QUrl chunkUrl (int chunk = -1);
 
 public:
-    PropagateUploadFileNG(OwncloudPropagator *propagator, SyncFileItemPtr &item)
-        : PropagateUploadFileCommon(propagator, item) {
+    PropagateUploadFileNG (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+        : PropagateUploadFileCommon (propagator, item) {
     }
 
-    void doStartUpload() override;
+    void doStartUpload () override;
 
 private:
-    void startNewUpload();
-    void startNextChunk();
+    void startNewUpload ();
+    void startNextChunk ();
 public slots:
-    void abort(AbortType abortType) override;
+    void abort (AbortType abortType) override;
 private slots:
-    void slotPropfindFinished();
-    void slotPropfindFinishedWithError();
-    void slotPropfindIterate(QString &name, QMap<QString, QString> &properties);
-    void slotDeleteJobFinished();
-    void slotMkColFinished();
-    void slotPutFinished();
-    void slotMoveJobFinished();
-    void slotUploadProgress(qint64, qint64);
+    void slotPropfindFinished ();
+    void slotPropfindFinishedWithError ();
+    void slotPropfindIterate (QString &name, QMap<QString, QString> &properties);
+    void slotDeleteJobFinished ();
+    void slotMkColFinished ();
+    void slotPutFinished ();
+    void slotMoveJobFinished ();
+    void slotUploadProgress (qint64, qint64);
 };
 }

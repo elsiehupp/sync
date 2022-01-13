@@ -32,11 +32,11 @@ namespace Ui {
 class InvalidFilenameDialog : public QDialog {
 
 public:
-    explicit InvalidFilenameDialog(AccountPtr account, Folder *folder, QString filePath, QWidget *parent = nullptr);
+    explicit InvalidFilenameDialog (AccountPtr account, Folder *folder, QString filePath, QWidget *parent = nullptr);
 
-    ~InvalidFilenameDialog() override;
+    ~InvalidFilenameDialog () override;
 
-    void accept() override;
+    void accept () override;
 
 private:
     std::unique_ptr<Ui::InvalidFilenameDialog> _ui;
@@ -48,11 +48,11 @@ private:
     QString _originalFileName;
     QString _newFilename;
 
-    void onFilenameLineEditTextChanged(QString &text);
-    void onMoveJobFinished();
-    void onRemoteFileAlreadyExists(QVariantMap &values);
-    void onRemoteFileDoesNotExist(QNetworkReply *reply);
-    void checkIfAllowedToRename();
-    void onPropfindPermissionSuccess(QVariantMap &values);
+    void onFilenameLineEditTextChanged (QString &text);
+    void onMoveJobFinished ();
+    void onRemoteFileAlreadyExists (QVariantMap &values);
+    void onRemoteFileDoesNotExist (QNetworkReply *reply);
+    void checkIfAllowedToRename ();
+    void onPropfindPermissionSuccess (QVariantMap &values);
 };
 }

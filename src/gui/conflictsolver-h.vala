@@ -19,8 +19,8 @@ class QWidget;
 namespace OCC {
 
 class ConflictSolver : public QObject {
-    Q_PROPERTY(QString localVersionFilename READ localVersionFilename WRITE setLocalVersionFilename NOTIFY localVersionFilenameChanged)
-    Q_PROPERTY(QString remoteVersionFilename READ remoteVersionFilename WRITE setRemoteVersionFilename NOTIFY remoteVersionFilenameChanged)
+    Q_PROPERTY (QString localVersionFilename READ localVersionFilename WRITE setLocalVersionFilename NOTIFY localVersionFilenameChanged)
+    Q_PROPERTY (QString remoteVersionFilename READ remoteVersionFilename WRITE setRemoteVersionFilename NOTIFY remoteVersionFilenameChanged)
 public:
     enum Solution {
         KeepLocalVersion,
@@ -28,25 +28,25 @@ public:
         KeepBothVersions
     };
 
-    explicit ConflictSolver(QWidget *parent = nullptr);
+    explicit ConflictSolver (QWidget *parent = nullptr);
 
-    QString localVersionFilename() const;
-    QString remoteVersionFilename() const;
+    QString localVersionFilename () const;
+    QString remoteVersionFilename () const;
 
-    bool exec(Solution solution);
+    bool exec (Solution solution);
 
 public slots:
-    void setLocalVersionFilename(QString &localVersionFilename);
-    void setRemoteVersionFilename(QString &remoteVersionFilename);
+    void setLocalVersionFilename (QString &localVersionFilename);
+    void setRemoteVersionFilename (QString &remoteVersionFilename);
 
 signals:
-    void localVersionFilenameChanged();
-    void remoteVersionFilenameChanged();
+    void localVersionFilenameChanged ();
+    void remoteVersionFilenameChanged ();
 
 private:
-    bool deleteLocalVersion();
-    bool renameLocalVersion();
-    bool overwriteRemoteVersion();
+    bool deleteLocalVersion ();
+    bool renameLocalVersion ();
+    bool overwriteRemoteVersion ();
 
     QWidget *_parentWidget;
     QString _localVersionFilename;

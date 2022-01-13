@@ -10,39 +10,39 @@ namespace OCC {
 
 class RemoteWipe : public QObject {
 public:
-    explicit RemoteWipe(AccountPtr account, QObject *parent = nullptr);
+    explicit RemoteWipe (AccountPtr account, QObject *parent = nullptr);
 
 signals:
     /**
      * Notify if wipe was requested
      */
-    void authorized(AccountState*);
+    void authorized (AccountState*);
 
     /**
      * Notify if user only needs to login again
      */
-    void askUserCredentials();
+    void askUserCredentials ();
 
 public slots:
     /**
      * Once receives a 401 or 403 status response it will do a fetch to
      * <server>/index.php/core/wipe/check
      */
-    void startCheckJobWithAppPassword(QString);
+    void startCheckJobWithAppPassword (QString);
 
 private slots:
     /**
      * If wipe is requested, delete account and data, if not continue by asking
      * the user to login again
      */
-    void checkJobSlot();
+    void checkJobSlot ();
 
     /**
      * Once the client has wiped all the required data a POST to
      * <server>/index.php/core/wipe/success
      */
-    void notifyServerSuccessJob(AccountState *accountState, bool);
-    void notifyServerSuccessJobSlot();
+    void notifyServerSuccessJob (AccountState *accountState, bool);
+    void notifyServerSuccessJobSlot ();
 
 private:
     AccountPtr _account;

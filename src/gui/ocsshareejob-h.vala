@@ -24,24 +24,24 @@ namespace OCC {
  */
 class OcsShareeJob : public OcsJob {
 public:
-    explicit OcsShareeJob(AccountPtr account);
+    explicit OcsShareeJob (AccountPtr account);
 
     /**
      * Get a list of sharees
      *
      * @param path Path to request shares for (default all shares)
      */
-    void getSharees(QString &search, QString &itemType, int page = 1, int perPage = 50, bool lookup = false);
+    void getSharees (QString &search, QString &itemType, int page = 1, int perPage = 50, bool lookup = false);
 signals:
     /**
      * Result of the OCS request
      *
      * @param reply The reply
      */
-    void shareeJobFinished(QJsonDocument &reply);
+    void shareeJobFinished (QJsonDocument &reply);
 
 private slots:
-    void jobDone(QJsonDocument &reply);
+    void jobDone (QJsonDocument &reply);
 };
 }
 

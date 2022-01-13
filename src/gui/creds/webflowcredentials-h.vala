@@ -31,48 +31,48 @@ public:
     /// Don't add credentials if this is set on a QNetworkRequest
     static constexpr QNetworkRequest::Attribute DontAddCredentialsAttribute = QNetworkRequest::User;
 
-    explicit WebFlowCredentials();
-    WebFlowCredentials(
+    explicit WebFlowCredentials ();
+    WebFlowCredentials (
             const QString &user,
             const QString &password,
-            const QSslCertificate &certificate = QSslCertificate(),
-            const QSslKey &key = QSslKey(),
-            const QList<QSslCertificate> &caCertificates = QList<QSslCertificate>());
+            const QSslCertificate &certificate = QSslCertificate (),
+            const QSslKey &key = QSslKey (),
+            const QList<QSslCertificate> &caCertificates = QList<QSslCertificate> ());
 
-    QString authType() const override;
-    QString user() const override;
-    QString password() const override;
-    QNetworkAccessManager *createQNAM() const override;
+    QString authType () const override;
+    QString user () const override;
+    QString password () const override;
+    QNetworkAccessManager *createQNAM () const override;
 
-    bool ready() const override;
+    bool ready () const override;
 
-    void fetchFromKeychain() override;
-    void askFromUser() override;
+    void fetchFromKeychain () override;
+    void askFromUser () override;
 
-    bool stillValid(QNetworkReply *reply) override;
-    void persist() override;
-    void invalidateToken() override;
-    void forgetSensitiveData() override;
+    bool stillValid (QNetworkReply *reply) override;
+    void persist () override;
+    void invalidateToken () override;
+    void forgetSensitiveData () override;
 
     // To fetch the user name as early as possible
-    void setAccount(Account *account) override;
+    void setAccount (Account *account) override;
 
 private slots:
-    void slotAuthentication(QNetworkReply *reply, QAuthenticator *authenticator);
-    void slotFinished(QNetworkReply *reply);
+    void slotAuthentication (QNetworkReply *reply, QAuthenticator *authenticator);
+    void slotFinished (QNetworkReply *reply);
 
-    void slotAskFromUserCredentialsProvided(QString &user, QString &pass, QString &host);
-    void slotAskFromUserCancelled();
+    void slotAskFromUserCredentialsProvided (QString &user, QString &pass, QString &host);
+    void slotAskFromUserCancelled ();
 
-    void slotReadClientCertPEMJobDone(KeychainChunk::ReadJob *readJob);
-    void slotReadClientKeyPEMJobDone(KeychainChunk::ReadJob *readJob);
-    void slotReadClientCaCertsPEMJobDone(KeychainChunk::ReadJob *readJob);
-    void slotReadPasswordJobDone(QKeychain::Job *incomingJob);
+    void slotReadClientCertPEMJobDone (KeychainChunk::ReadJob *readJob);
+    void slotReadClientKeyPEMJobDone (KeychainChunk::ReadJob *readJob);
+    void slotReadClientCaCertsPEMJobDone (KeychainChunk::ReadJob *readJob);
+    void slotReadPasswordJobDone (QKeychain::Job *incomingJob);
 
-    void slotWriteClientCertPEMJobDone(KeychainChunk::WriteJob *writeJob);
-    void slotWriteClientKeyPEMJobDone(KeychainChunk::WriteJob *writeJob);
-    void slotWriteClientCaCertsPEMJobDone(KeychainChunk::WriteJob *writeJob);
-    void slotWriteJobDone(QKeychain::Job *);
+    void slotWriteClientCertPEMJobDone (KeychainChunk::WriteJob *writeJob);
+    void slotWriteClientKeyPEMJobDone (KeychainChunk::WriteJob *writeJob);
+    void slotWriteClientCaCertsPEMJobDone (KeychainChunk::WriteJob *writeJob);
+    void slotWriteJobDone (QKeychain::Job *);
 
 private:
     /*
@@ -81,8 +81,8 @@ private:
      *          Saving all client CA's within one credential may result in:
      *          Error: "Credential size exceeds maximum size of 2560"
      */
-    void readSingleClientCaCertPEM();
-    void writeSingleClientCaCertPEM();
+    void readSingleClientCaCertPEM ();
+    void writeSingleClientCaCertPEM ();
 
     /*
      * Since we're limited by Windows limits, we just create our own
@@ -102,12 +102,12 @@ protected:
      *   slotReadClientCaCertsPEMJobDone to
      *   slotReadJobDone
      */
-    void fetchFromKeychainHelper();
+    void fetchFromKeychainHelper ();
 
     /// Wipes legacy keychain locations
-    void deleteKeychainEntries(bool oldKeychainEntries = false);
+    void deleteKeychainEntries (bool oldKeychainEntries = false);
 
-    QString fetchUser();
+    QString fetchUser ();
 
     QString _user;
     QString _password;

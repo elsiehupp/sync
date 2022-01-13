@@ -21,7 +21,7 @@
 
 namespace OCC {
 
-Q_LOGGING_CATEGORY(lcTokenCredentials, "nextcloud.sync.credentials.token", QtInfoMsg)
+Q_LOGGING_CATEGORY (lcTokenCredentials, "nextcloud.sync.credentials.token", QtInfoMsg)
 
 namespace {
 
@@ -32,113 +32,113 @@ namespace {
 class TokenCredentialsAccessManager : public AccessManager {
 public:
     friend class TokenCredentials;
-    TokenCredentialsAccessManager(TokenCredentials *cred, QObject *parent = nullptr)
-        : AccessManager(parent)
-        , _cred(cred) {
+    TokenCredentialsAccessManager (TokenCredentials *cred, QObject *parent = nullptr)
+        : AccessManager (parent)
+        , _cred (cred) {
     }
 
 protected:
-    QNetworkReply *createRequest(Operation op, QNetworkRequest &request, QIODevice *outgoingData) {
-        if (_cred->user().isEmpty() || _cred->password().isEmpty()) {
-            qCWarning(lcTokenCredentials) << "Empty user/password provided!";
+    QNetworkReply *createRequest (Operation op, QNetworkRequest &request, QIODevice *outgoingData) {
+        if (_cred->user ().isEmpty () || _cred->password ().isEmpty ()) {
+            qCWarning (lcTokenCredentials) << "Empty user/password provided!";
         }
 
-        QNetworkRequest req(request);
+        QNetworkRequest req (request);
 
-        QByteArray credHash = QByteArray(_cred->user().toUtf8() + ":" + _cred->password().toUtf8()).toBase64();
-        req.setRawHeader(QByteArray("Authorization"), QByteArray("Basic ") + credHash);
+        QByteArray credHash = QByteArray (_cred->user ().toUtf8 () + ":" + _cred->password ().toUtf8 ()).toBase64 ();
+        req.setRawHeader (QByteArray ("Authorization"), QByteArray ("Basic ") + credHash);
 
         // A pre-authenticated cookie
-        QByteArray token = _cred->_token.toUtf8();
-        if (token.length() > 0) {
-            setRawCookie(token, request.url());
+        QByteArray token = _cred->_token.toUtf8 ();
+        if (token.length () > 0) {
+            setRawCookie (token, request.url ());
         }
 
-        return AccessManager::createRequest(op, req, outgoingData);
+        return AccessManager::createRequest (op, req, outgoingData);
     }
 
 private:
     const TokenCredentials *_cred;
 };
 
-TokenCredentials::TokenCredentials()
-    : _user()
-    , _password()
-    , _ready(false) {
+TokenCredentials::TokenCredentials ()
+    : _user ()
+    , _password ()
+    , _ready (false) {
 }
 
-TokenCredentials::TokenCredentials(QString &user, QString &password, QString &token)
-    : _user(user)
-    , _password(password)
-    , _token(token)
-    , _ready(true) {
+TokenCredentials::TokenCredentials (QString &user, QString &password, QString &token)
+    : _user (user)
+    , _password (password)
+    , _token (token)
+    , _ready (true) {
 }
 
-QString TokenCredentials::authType() const {
-    return QString::fromLatin1("token");
+QString TokenCredentials::authType () const {
+    return QString::fromLatin1 ("token");
 }
 
-QString TokenCredentials::user() const {
+QString TokenCredentials::user () const {
     return _user;
 }
 
-QString TokenCredentials::password() const {
+QString TokenCredentials::password () const {
     return _password;
 }
 
-QNetworkAccessManager *TokenCredentials::createQNAM() const {
-    AccessManager *qnam = new TokenCredentialsAccessManager(this);
+QNetworkAccessManager *TokenCredentials::createQNAM () const {
+    AccessManager *qnam = new TokenCredentialsAccessManager (this);
 
-    connect(qnam, SIGNAL(authenticationRequired(QNetworkReply *, QAuthenticator *)),
-        this, SLOT(slotAuthentication(QNetworkReply *, QAuthenticator *)));
+    connect (qnam, SIGNAL (authenticationRequired (QNetworkReply *, QAuthenticator *)),
+        this, SLOT (slotAuthentication (QNetworkReply *, QAuthenticator *)));
 
     return qnam;
 }
 
-bool TokenCredentials::ready() const {
+bool TokenCredentials::ready () const {
     return _ready;
 }
 
-void TokenCredentials::fetchFromKeychain() {
+void TokenCredentials::fetchFromKeychain () {
     _wasFetched = true;
-    Q_EMIT fetched();
+    Q_EMIT fetched ();
 }
 
-void TokenCredentials::askFromUser() {
-    emit asked();
+void TokenCredentials::askFromUser () {
+    emit asked ();
 }
 
-bool TokenCredentials::stillValid(QNetworkReply *reply) {
-    return ((reply->error() != QNetworkReply::AuthenticationRequiredError)
+bool TokenCredentials::stillValid (QNetworkReply *reply) {
+    return ( (reply->error () != QNetworkReply::AuthenticationRequiredError)
         // returned if user/password or token are incorrect
-        && (reply->error() != QNetworkReply::OperationCanceledError
-               || !reply->property(authenticationFailedC).toBool()));
+        && (reply->error () != QNetworkReply::OperationCanceledError
+               || !reply->property (authenticationFailedC).toBool ()));
 }
 
-void TokenCredentials::invalidateToken() {
-    qCInfo(lcTokenCredentials) << "Invalidating token";
+void TokenCredentials::invalidateToken () {
+    qCInfo (lcTokenCredentials) << "Invalidating token";
     _ready = false;
-    _account->clearCookieJar();
-    _token = QString();
-    _user = QString();
-    _password = QString();
+    _account->clearCookieJar ();
+    _token = QString ();
+    _user = QString ();
+    _password = QString ();
 }
 
-void TokenCredentials::forgetSensitiveData() {
-    invalidateToken();
+void TokenCredentials::forgetSensitiveData () {
+    invalidateToken ();
 }
 
-void TokenCredentials::persist() {
+void TokenCredentials::persist () {
 }
 
-void TokenCredentials::slotAuthentication(QNetworkReply *reply, QAuthenticator *authenticator) {
-    Q_UNUSED(authenticator)
+void TokenCredentials::slotAuthentication (QNetworkReply *reply, QAuthenticator *authenticator) {
+    Q_UNUSED (authenticator)
     // we cannot use QAuthenticator, because it sends username and passwords with latin1
     // instead of utf8 encoding. Instead, we send it manually. Thus, if we reach this signal,
     // those credentials were invalid and we terminate.
-    qCWarning(lcTokenCredentials) << "Stop request: Authentication failed for " << reply->url().toString();
-    reply->setProperty(authenticationFailedC, true);
-    reply->close();
+    qCWarning (lcTokenCredentials) << "Stop request: Authentication failed for " << reply->url ().toString ();
+    reply->setProperty (authenticationFailedC, true);
+    reply->close ();
 }
 
 } // namespace OCC

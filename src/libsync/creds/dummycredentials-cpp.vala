@@ -14,42 +14,42 @@
 
 namespace OCC {
 
-QString DummyCredentials::authType() const {
-    return QString::fromLatin1("dummy");
+QString DummyCredentials::authType () const {
+    return QString::fromLatin1 ("dummy");
 }
 
-QString DummyCredentials::user() const {
+QString DummyCredentials::user () const {
     return _user;
 }
 
-QString DummyCredentials::password() const {
-    Q_UNREACHABLE();
-    return QString();
+QString DummyCredentials::password () const {
+    Q_UNREACHABLE ();
+    return QString ();
 }
 
-QNetworkAccessManager *DummyCredentials::createQNAM() const {
+QNetworkAccessManager *DummyCredentials::createQNAM () const {
     return new AccessManager;
 }
 
-bool DummyCredentials::ready() const {
+bool DummyCredentials::ready () const {
     return true;
 }
 
-bool DummyCredentials::stillValid(QNetworkReply *reply) {
-    Q_UNUSED(reply)
+bool DummyCredentials::stillValid (QNetworkReply *reply) {
+    Q_UNUSED (reply)
     return true;
 }
 
-void DummyCredentials::fetchFromKeychain() {
+void DummyCredentials::fetchFromKeychain () {
     _wasFetched = true;
-    Q_EMIT(fetched());
+    Q_EMIT (fetched ());
 }
 
-void DummyCredentials::askFromUser() {
-    Q_EMIT(asked());
+void DummyCredentials::askFromUser () {
+    Q_EMIT (asked ());
 }
 
-void DummyCredentials::persist() {
+void DummyCredentials::persist () {
 }
 
 } // namespace OCC

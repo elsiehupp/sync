@@ -33,13 +33,13 @@ class SyncJournalDb;
  *
  * This job is tightly coupled with the DiscoveryPhase class.
  *
- * After being start()'ed this job will perform work asynchronously and emit finished() when done.
+ * After being start ()'ed this job will perform work asynchronously and emit finished () when done.
  *
  * Internally, this job will call DiscoveryPhase::scheduleMoreJobs when one of its sub-jobs is
- * finished. DiscoveryPhase::scheduleMoreJobs will call processSubJobs() to continue work until
+ * finished. DiscoveryPhase::scheduleMoreJobs will call processSubJobs () to continue work until
  * the job is finished.
  *
- * Results are fed outwards via the DiscoveryPhase::itemDiscovered() signal.
+ * Results are fed outwards via the DiscoveryPhase::itemDiscovered () signal.
  */
 class ProcessDirectoryJob : public QObject {
 
@@ -51,43 +51,43 @@ public:
         ParentNotChanged, // No need to query this folder because it has not changed from what is in the DB
         InBlackList // Do not query this folder because it is in the blacklist (remote entries only)
     };
-    Q_ENUM(QueryMode)
+    Q_ENUM (QueryMode)
 
     /** For creating the root job
      *
      * The base pin state is used if the root dir's pin state can't be retrieved.
      */
-    explicit ProcessDirectoryJob(DiscoveryPhase *data, PinState basePinState,
+    explicit ProcessDirectoryJob (DiscoveryPhase *data, PinState basePinState,
         qint64 lastSyncTimestamp, QObject *parent)
-        : QObject(parent)
-        , _lastSyncTimestamp(lastSyncTimestamp)
-        , _discoveryData(data) {
-        computePinState(basePinState);
+        : QObject (parent)
+        , _lastSyncTimestamp (lastSyncTimestamp)
+        , _discoveryData (data) {
+        computePinState (basePinState);
     }
 
     /// For creating subjobs
-    explicit ProcessDirectoryJob(PathTuple &path, SyncFileItemPtr &dirItem,
+    explicit ProcessDirectoryJob (PathTuple &path, SyncFileItemPtr &dirItem,
         QueryMode queryLocal, QueryMode queryServer, qint64 lastSyncTimestamp,
         ProcessDirectoryJob *parent)
-        : QObject(parent)
-        , _dirItem(dirItem)
-        , _lastSyncTimestamp(lastSyncTimestamp)
-        , _queryServer(queryServer)
-        , _queryLocal(queryLocal)
-        , _discoveryData(parent->_discoveryData)
-        , _currentFolder(path) {
-        computePinState(parent->_pinState);
+        : QObject (parent)
+        , _dirItem (dirItem)
+        , _lastSyncTimestamp (lastSyncTimestamp)
+        , _queryServer (queryServer)
+        , _queryLocal (queryLocal)
+        , _discoveryData (parent->_discoveryData)
+        , _currentFolder (path) {
+        computePinState (parent->_pinState);
     }
 
-    void start();
-    /** Start up to nbJobs, return the number of job started; emit finished() when done */
-    int processSubJobs(int nbJobs);
+    void start ();
+    /** Start up to nbJobs, return the number of job started; emit finished () when done */
+    int processSubJobs (int nbJobs);
 
-    void setInsideEncryptedTree(bool isInsideEncryptedTree) {
+    void setInsideEncryptedTree (bool isInsideEncryptedTree) {
         _isInsideEncryptedTree = isInsideEncryptedTree;
     }
 
-    bool isInsideEncryptedTree() const {
+    bool isInsideEncryptedTree () const {
         return _isInsideEncryptedTree;
     }
 
@@ -119,64 +119,64 @@ private:
         QString _target; // Path that will be the result after the sync (and will be in the DB)
         QString _server; // Path on the server (before the sync)
         QString _local; // Path locally (before the sync)
-        static QString pathAppend(QString &base, QString &name) {
-            return base.isEmpty() ? name : base + QLatin1Char('/') + name;
+        static QString pathAppend (QString &base, QString &name) {
+            return base.isEmpty () ? name : base + QLatin1Char ('/') + name;
         }
-        PathTuple addName(QString &name) const {
+        PathTuple addName (QString &name) const {
             PathTuple result;
-            result._original = pathAppend(_original, name);
-            auto buildString = [&](QString &other) {
+            result._original = pathAppend (_original, name);
+            auto buildString = [&] (QString &other) {
                 // Optimize by trying to keep all string implicitly shared if they are the same (common case)
-                return other == _original ? result._original : pathAppend(other, name);
+                return other == _original ? result._original : pathAppend (other, name);
             };
-            result._target = buildString(_target);
-            result._server = buildString(_server);
-            result._local = buildString(_local);
+            result._target = buildString (_target);
+            result._server = buildString (_server);
+            result._local = buildString (_local);
             return result;
         }
     };
 
-    bool checkForInvalidFileName(PathTuple &path, std::map<QString, Entries> &entries, Entries &entry);
+    bool checkForInvalidFileName (PathTuple &path, std::map<QString, Entries> &entries, Entries &entry);
 
     /** Iterate over entries inside the directory (non-recursively).
      *
      * Called once _serverEntries and _localEntries are filled
-     * Calls processFile() for each non-excluded one.
+     * Calls processFile () for each non-excluded one.
      * Will start scheduling subdir jobs when done.
      */
-    void process();
+    void process ();
 
     // return true if the file is excluded.
     // path is the full relative path of the file. localName is the base name of the local entry.
-    bool handleExcluded(QString &path, QString &localName, bool isDirectory,
+    bool handleExcluded (QString &path, QString &localName, bool isDirectory,
         bool isHidden, bool isSymlink);
 
     /** Reconcile local/remote/db information for a single item.
      *
      * Can be a file or a directory.
-     * Usually ends up emitting itemDiscovered() or creating a subdirectory job.
+     * Usually ends up emitting itemDiscovered () or creating a subdirectory job.
      *
      * This main function delegates some work to the processFile* functions.
      */
-    void processFile(PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &);
+    void processFile (PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &);
 
     /// processFile helper for when remote information is available, typically flows into AnalyzeLocalInfo when done
-    void processFileAnalyzeRemoteInfo(SyncFileItemPtr &item, PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &);
+    void processFileAnalyzeRemoteInfo (SyncFileItemPtr &item, PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &);
 
     /// processFile helper for reconciling local changes
-    void processFileAnalyzeLocalInfo(SyncFileItemPtr &item, PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &, QueryMode recurseQueryServer);
+    void processFileAnalyzeLocalInfo (SyncFileItemPtr &item, PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &, QueryMode recurseQueryServer);
 
     /// processFile helper for local/remote conflicts
-    void processFileConflict(SyncFileItemPtr &item, PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &);
+    void processFileConflict (SyncFileItemPtr &item, PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &);
 
     /// processFile helper for common final processing
-    void processFileFinalize(SyncFileItemPtr &item, PathTuple, bool recurse, QueryMode recurseQueryLocal, QueryMode recurseQueryServer);
+    void processFileFinalize (SyncFileItemPtr &item, PathTuple, bool recurse, QueryMode recurseQueryLocal, QueryMode recurseQueryServer);
 
     /** Checks the permission for this item, if needed, change the item to a restoration item.
      * @return false indicate that this is an error and if it is a directory, one should not recurse
      * inside it.
      */
-    bool checkPermissions(SyncFileItemPtr &item);
+    bool checkPermissions (SyncFileItemPtr &item);
 
     struct MovePermissionResult {
         // whether moving/renaming the source is ok
@@ -191,39 +191,39 @@ private:
      * Check if the move is of a specified file within this directory is allowed.
      * Return true if it is allowed, false otherwise
      */
-    MovePermissionResult checkMovePermissions(RemotePermissions srcPerm, QString &srcPath, bool isDirectory);
+    MovePermissionResult checkMovePermissions (RemotePermissions srcPerm, QString &srcPath, bool isDirectory);
 
-    void processBlacklisted(PathTuple &, LocalInfo &, SyncJournalFileRecord &dbEntry);
-    void subJobFinished();
+    void processBlacklisted (PathTuple &, LocalInfo &, SyncJournalFileRecord &dbEntry);
+    void subJobFinished ();
 
     /** An DB operation failed */
-    void dbError();
+    void dbError ();
 
-    void addVirtualFileSuffix(QString &str) const;
-    bool hasVirtualFileSuffix(QString &str) const;
-    void chopVirtualFileSuffix(QString &str) const;
+    void addVirtualFileSuffix (QString &str) const;
+    bool hasVirtualFileSuffix (QString &str) const;
+    void chopVirtualFileSuffix (QString &str) const;
 
     /** Convenience to detect suffix-vfs modes */
-    bool isVfsWithSuffix() const;
+    bool isVfsWithSuffix () const;
 
     /** Start a remote discovery network job
      *
      * It fills _serverNormalQueryEntries and sets _serverQueryDone when done.
      */
-    DiscoverySingleDirectoryJob *startAsyncServerQuery();
+    DiscoverySingleDirectoryJob *startAsyncServerQuery ();
 
     /** Discover the local directory
       *
       * Fills _localNormalQueryEntries.
       */
-    void startAsyncLocalQuery();
+    void startAsyncLocalQuery ();
 
     /** Sets _pinState, the directory's pin state
      *
      * If the folder exists locally its state is retrieved, otherwise the
      * parent's pin state is inherited.
      */
-    void computePinState(PinState parentState);
+    void computePinState (PinState parentState);
 
     /** Adjust record._type if the db pin state suggests it.
      *
@@ -235,7 +235,7 @@ private:
      * state suggests a hydration or dehydration action and changes the
      * _type field accordingly.
      */
-    void setupDbPinStateActions(SyncJournalFileRecord &record);
+    void setupDbPinStateActions (SyncJournalFileRecord &record);
 
     qint64 _lastSyncTimestamp = 0;
 
@@ -268,7 +268,7 @@ private:
     /** The queued and running jobs for subdirectories.
      *
      * The jobs are enqueued while processind directory entries and
-     * then gradually run via calls to processSubJobs().
+     * then gradually run via calls to processSubJobs ().
      */
     std::deque<ProcessDirectoryJob *> _queuedJobs;
     QVector<ProcessDirectoryJob *> _runningJobs;
@@ -278,12 +278,12 @@ private:
     PathTuple _currentFolder;
     bool _childModified = false; // the directory contains modified item what would prevent deletion
     bool _childIgnored = false; // The directory contains ignored item that would prevent deletion
-    PinState _pinState = PinState::Unspecified; // The directory's pin-state, see computePinState()
+    PinState _pinState = PinState::Unspecified; // The directory's pin-state, see computePinState ()
     bool _isInsideEncryptedTree = false; // this directory is encrypted or is within the tree of directories with root directory encrypted
 
 signals:
-    void finished();
+    void finished ();
     // The root etag of this directory was fetched
-    void etag(QByteArray &, QDateTime &time);
+    void etag (QByteArray &, QDateTime &time);
 };
 }

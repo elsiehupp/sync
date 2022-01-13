@@ -40,28 +40,28 @@ namespace OCC {
 
 class LockWatcher : public QObject {
 public:
-    explicit LockWatcher(QObject *parent = nullptr);
+    explicit LockWatcher (QObject *parent = nullptr);
 
     /** Start watching a file.
      *
      * If the file is not locked later on, the fileUnlocked signal will be
      * emitted once.
      */
-    void addFile(QString &path);
+    void addFile (QString &path);
 
     /** Adjusts the default interval for checking whether the lock is still present */
-    void setCheckInterval(std::chrono::milliseconds interval);
+    void setCheckInterval (std::chrono::milliseconds interval);
 
     /** Whether the path is being watched for lock-changes */
-    bool contains(QString &path);
+    bool contains (QString &path);
 
 signals:
     /** Emitted when one of the watched files is no longer
      *  being locked. */
-    void fileUnlocked(QString &path);
+    void fileUnlocked (QString &path);
 
 private slots:
-    void checkFiles();
+    void checkFiles ();
 
 private:
     QSet<QString> _watchedPaths;

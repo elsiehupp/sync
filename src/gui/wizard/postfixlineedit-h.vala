@@ -26,20 +26,20 @@ namespace OCC {
 
 class PostfixLineEdit : public QLineEdit {
 public:
-    PostfixLineEdit(QWidget *parent);
+    PostfixLineEdit (QWidget *parent);
 
     /** @brief sets an optional postfix shown greyed out */
-    void setPostfix(QString &postfix);
+    void setPostfix (QString &postfix);
     /** @brief retrives the postfix */
-    QString postfix() const;
-    /** @brief retrieves combined text() and postfix() */
-    QString fullText() const;
+    QString postfix () const;
+    /** @brief retrieves combined text () and postfix () */
+    QString fullText () const;
 
-    /** @brief sets text() from full text, discarding prefix() */
-    void setFullText(QString &text);
+    /** @brief sets text () from full text, discarding prefix () */
+    void setFullText (QString &text);
 
 protected:
-    void paintEvent(QPaintEvent *pe) override;
+    void paintEvent (QPaintEvent *pe) override;
 
 private:
     QString _postfix;

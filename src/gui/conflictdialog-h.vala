@@ -24,23 +24,23 @@ namespace Ui {
 
 class ConflictDialog : public QDialog {
 public:
-    explicit ConflictDialog(QWidget *parent = nullptr);
-    ~ConflictDialog() override;
+    explicit ConflictDialog (QWidget *parent = nullptr);
+    ~ConflictDialog () override;
 
-    QString baseFilename() const;
-    QString localVersionFilename() const;
-    QString remoteVersionFilename() const;
+    QString baseFilename () const;
+    QString localVersionFilename () const;
+    QString remoteVersionFilename () const;
 
 public slots:
-    void setBaseFilename(QString &baseFilename);
-    void setLocalVersionFilename(QString &localVersionFilename);
-    void setRemoteVersionFilename(QString &remoteVersionFilename);
+    void setBaseFilename (QString &baseFilename);
+    void setLocalVersionFilename (QString &localVersionFilename);
+    void setRemoteVersionFilename (QString &remoteVersionFilename);
 
-    void accept() override;
+    void accept () override;
 
 private:
-    void updateWidgets();
-    void updateButtonStates();
+    void updateWidgets ();
+    void updateButtonStates ();
 
     QString _baseFilename;
     QScopedPointer<Ui::ConflictDialog> _ui;

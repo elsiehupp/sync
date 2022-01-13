@@ -27,13 +27,13 @@ class PropagateRemoteMkdir : public PropagateItemJob {
     PropagateUploadEncrypted *_uploadEncryptedHelper;
     friend class PropagateDirectory; // So it can access the _item;
 public:
-    PropagateRemoteMkdir(OwncloudPropagator *propagator, SyncFileItemPtr &item);
+    PropagateRemoteMkdir (OwncloudPropagator *propagator, SyncFileItemPtr &item);
 
-    void start() override;
-    void abort(PropagatorJob::AbortType abortType) override;
+    void start () override;
+    void abort (PropagatorJob::AbortType abortType) override;
 
     // Creating a directory should be fast.
-    bool isLikelyFinishedQuickly() override { return true; }
+    bool isLikelyFinishedQuickly () override { return true; }
 
     /**
      * Whether an existing entity with the same name may be deleted before
@@ -41,17 +41,17 @@ public:
      *
      * Default: false.
      */
-    void setDeleteExisting(bool enabled);
+    void setDeleteExisting (bool enabled);
 
 private slots:
-    void slotMkdir();
-    void slotStartMkcolJob();
-    void slotStartEncryptedMkcolJob(QString &path, QString &filename, quint64 size);
-    void slotMkcolJobFinished();
-    void slotEncryptFolderFinished();
-    void success();
+    void slotMkdir ();
+    void slotStartMkcolJob ();
+    void slotStartEncryptedMkcolJob (QString &path, QString &filename, quint64 size);
+    void slotMkcolJobFinished ();
+    void slotEncryptFolderFinished ();
+    void success ();
 
 private:
-    void finalizeMkColJob(QNetworkReply::NetworkError err, QString &jobHttpReasonPhraseString, QString &jobPath);
+    void finalizeMkColJob (QNetworkReply::NetworkError err, QString &jobHttpReasonPhraseString, QString &jobPath);
 };
 }

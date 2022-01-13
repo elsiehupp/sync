@@ -16,15 +16,15 @@
 
 namespace OCC {
 
-bool operator<(Activity &rhs, Activity &lhs) {
+bool operator< (Activity &rhs, Activity &lhs) {
     return rhs._dateTime > lhs._dateTime;
 }
 
-bool operator==(Activity &rhs, Activity &lhs) {
+bool operator== (Activity &rhs, Activity &lhs) {
     return (rhs._type == lhs._type && rhs._id == lhs._id && rhs._accName == lhs._accName);
 }
 
-Activity::Identifier Activity::ident() const {
-    return Identifier(_id, _accName);
+Activity::Identifier Activity::ident () const {
+    return Identifier (_id, _accName);
 }
 }

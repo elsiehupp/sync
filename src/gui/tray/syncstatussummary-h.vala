@@ -23,63 +23,63 @@ namespace OCC {
 
 class SyncStatusSummary : public QObject {
 
-    Q_PROPERTY(double syncProgress READ syncProgress NOTIFY syncProgressChanged)
-    Q_PROPERTY(QUrl syncIcon READ syncIcon NOTIFY syncIconChanged)
-    Q_PROPERTY(bool syncing READ syncing NOTIFY syncingChanged)
-    Q_PROPERTY(QString syncStatusString READ syncStatusString NOTIFY syncStatusStringChanged)
-    Q_PROPERTY(QString syncStatusDetailString READ syncStatusDetailString NOTIFY syncStatusDetailStringChanged)
+    Q_PROPERTY (double syncProgress READ syncProgress NOTIFY syncProgressChanged)
+    Q_PROPERTY (QUrl syncIcon READ syncIcon NOTIFY syncIconChanged)
+    Q_PROPERTY (bool syncing READ syncing NOTIFY syncingChanged)
+    Q_PROPERTY (QString syncStatusString READ syncStatusString NOTIFY syncStatusStringChanged)
+    Q_PROPERTY (QString syncStatusDetailString READ syncStatusDetailString NOTIFY syncStatusDetailStringChanged)
 
 public:
-    explicit SyncStatusSummary(QObject *parent = nullptr);
+    explicit SyncStatusSummary (QObject *parent = nullptr);
 
-    double syncProgress() const;
-    QUrl syncIcon() const;
-    bool syncing() const;
-    QString syncStatusString() const;
-    QString syncStatusDetailString() const;
+    double syncProgress () const;
+    QUrl syncIcon () const;
+    bool syncing () const;
+    QString syncStatusString () const;
+    QString syncStatusDetailString () const;
 
 signals:
-    void syncProgressChanged();
-    void syncIconChanged();
-    void syncingChanged();
-    void syncStatusStringChanged();
-    void syncStatusDetailStringChanged();
+    void syncProgressChanged ();
+    void syncIconChanged ();
+    void syncingChanged ();
+    void syncStatusStringChanged ();
+    void syncStatusDetailStringChanged ();
 
 public slots:
-    void load();
+    void load ();
 
 private:
-    void connectToFoldersProgress(Folder::Map &map);
+    void connectToFoldersProgress (Folder::Map &map);
 
-    void onFolderListChanged(OCC::Folder::Map &folderMap);
-    void onFolderProgressInfo(ProgressInfo &progress);
-    void onFolderSyncStateChanged(Folder *folder);
-    void onIsConnectedChanged();
+    void onFolderListChanged (OCC::Folder::Map &folderMap);
+    void onFolderProgressInfo (ProgressInfo &progress);
+    void onFolderSyncStateChanged (Folder *folder);
+    void onIsConnectedChanged ();
 
-    void setSyncStateForFolder(Folder *folder);
-    void markFolderAsError(Folder *folder);
-    void markFolderAsSuccess(Folder *folder);
-    bool folderErrors() const;
-    bool folderError(Folder *folder) const;
-    void clearFolderErrors();
-    void setSyncStateToConnectedState();
-    bool reloadNeeded(AccountState *accountState) const;
-    void initSyncState();
+    void setSyncStateForFolder (Folder *folder);
+    void markFolderAsError (Folder *folder);
+    void markFolderAsSuccess (Folder *folder);
+    bool folderErrors () const;
+    bool folderError (Folder *folder) const;
+    void clearFolderErrors ();
+    void setSyncStateToConnectedState ();
+    bool reloadNeeded (AccountState *accountState) const;
+    void initSyncState ();
 
-    void setSyncProgress(double value);
-    void setSyncing(bool value);
-    void setSyncStatusString(QString &value);
-    void setSyncStatusDetailString(QString &value);
-    void setSyncIcon(QUrl &value);
-    void setAccountState(AccountStatePtr accountState);
+    void setSyncProgress (double value);
+    void setSyncing (bool value);
+    void setSyncStatusString (QString &value);
+    void setSyncStatusDetailString (QString &value);
+    void setSyncIcon (QUrl &value);
+    void setAccountState (AccountStatePtr accountState);
 
     AccountStatePtr _accountState;
     std::set<QString> _foldersWithErrors;
 
-    QUrl _syncIcon = Theme::instance()->syncStatusOk();
+    QUrl _syncIcon = Theme::instance ()->syncStatusOk ();
     double _progress = 1.0;
     bool _isSyncing = false;
-    QString _syncStatusString = tr("All synced!");
+    QString _syncStatusString = tr ("All synced!");
     QString _syncStatusDetailString;
 };
 }

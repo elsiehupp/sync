@@ -20,17 +20,17 @@ namespace OCC {
 
 class PropagateRemoteDeleteEncryptedRootFolder : public AbstractPropagateRemoteDeleteEncrypted {
 public:
-    PropagateRemoteDeleteEncryptedRootFolder(OwncloudPropagator *propagator, SyncFileItemPtr item, QObject *parent);
+    PropagateRemoteDeleteEncryptedRootFolder (OwncloudPropagator *propagator, SyncFileItemPtr item, QObject *parent);
 
-    void start() override;
+    void start () override;
 
 private:
-    void slotFolderUnLockedSuccessfully(QByteArray &folderId) override;
-    void slotFolderEncryptedMetadataReceived(QJsonDocument &json, int statusCode) override;
-    void slotDeleteNestedRemoteItemFinished();
+    void slotFolderUnLockedSuccessfully (QByteArray &folderId) override;
+    void slotFolderEncryptedMetadataReceived (QJsonDocument &json, int statusCode) override;
+    void slotDeleteNestedRemoteItemFinished ();
 
-    void deleteNestedRemoteItem(QString &filename);
-    void decryptAndRemoteDelete();
+    void deleteNestedRemoteItem (QString &filename);
+    void decryptAndRemoteDelete ();
 
     QMap<QString, OCC::SyncJournalFileRecord> _nestedItems; // Nested files and folders
 };

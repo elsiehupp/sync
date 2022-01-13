@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2014 Digia Plc and/or its subsidiary(-ies).
+** Copyright (C) 2014 Digia Plc and/or its subsidiary (-ies).
 ** Contact: http://www.qt-project.org/legal
 **
 ** This file is part of Qt Creator.
@@ -34,20 +34,20 @@
 
 namespace SharedTools {
 
-bool QtLockedFile::lock(LockMode mode, bool block) {
-    if (!isOpen()) {
-        qWarning("QtLockedFile::lock(): file is not opened");
+bool QtLockedFile::lock (LockMode mode, bool block) {
+    if (!isOpen ()) {
+        qWarning ("QtLockedFile::lock (): file is not opened");
         return false;
     }
 
     if (mode == NoLock)
-        return unlock();
+        return unlock ();
 
     if (mode == m_lock_mode)
         return true;
 
     if (m_lock_mode != NoLock)
-        unlock();
+        unlock ();
 
     struct flock fl;
     fl.l_whence = SEEK_SET;
@@ -55,11 +55,11 @@ bool QtLockedFile::lock(LockMode mode, bool block) {
     fl.l_len = 0;
     fl.l_type = (mode == ReadLock) ? F_RDLCK : F_WRLCK;
     int cmd = block ? F_SETLKW : F_SETLK;
-    int ret = fcntl(handle(), cmd, &fl);
+    int ret = fcntl (handle (), cmd, &fl);
 
     if (ret == -1) {
         if (errno != EINTR && errno != EAGAIN)
-            qWarning("QtLockedFile::lock(): fcntl: %s", strerror(errno));
+            qWarning ("QtLockedFile::lock (): fcntl: %s", strerror (errno));
         return false;
     }
 
@@ -67,13 +67,13 @@ bool QtLockedFile::lock(LockMode mode, bool block) {
     return true;
 }
 
-bool QtLockedFile::unlock() {
-    if (!isOpen()) {
-        qWarning("QtLockedFile::unlock(): file is not opened");
+bool QtLockedFile::unlock () {
+    if (!isOpen ()) {
+        qWarning ("QtLockedFile::unlock (): file is not opened");
         return false;
     }
 
-    if (!isLocked())
+    if (!isLocked ())
         return true;
 
     struct flock fl;
@@ -81,21 +81,21 @@ bool QtLockedFile::unlock() {
     fl.l_start = 0;
     fl.l_len = 0;
     fl.l_type = F_UNLCK;
-    int ret = fcntl(handle(), F_SETLKW, &fl);
+    int ret = fcntl (handle (), F_SETLKW, &fl);
 
     if (ret == -1) {
-        qWarning("QtLockedFile::lock(): fcntl: %s", strerror(errno));
+        qWarning ("QtLockedFile::lock (): fcntl: %s", strerror (errno));
         return false;
     }
 
     m_lock_mode = NoLock;
-    remove();
+    remove ();
     return true;
 }
 
-QtLockedFile::~QtLockedFile() {
-    if (isOpen())
-        unlock();
+QtLockedFile::~QtLockedFile () {
+    if (isOpen ())
+        unlock ();
 }
 
 } // namespace SharedTools

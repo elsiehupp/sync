@@ -23,32 +23,32 @@ class SimpleNetworkJob;
 
 class OWNCLOUDSYNC_EXPORT OcsUserStatusConnector : public UserStatusConnector {
 public:
-    explicit OcsUserStatusConnector(AccountPtr account, QObject *parent = nullptr);
+    explicit OcsUserStatusConnector (AccountPtr account, QObject *parent = nullptr);
 
-    void fetchUserStatus() override;
+    void fetchUserStatus () override;
 
-    void fetchPredefinedStatuses() override;
+    void fetchPredefinedStatuses () override;
 
-    void setUserStatus(UserStatus &userStatus) override;
+    void setUserStatus (UserStatus &userStatus) override;
 
-    void clearMessage() override;
+    void clearMessage () override;
 
-    UserStatus userStatus() const override;
+    UserStatus userStatus () const override;
 
 private:
-    void onUserStatusFetched(QJsonDocument &json, int statusCode);
-    void onPredefinedStatusesFetched(QJsonDocument &json, int statusCode);
-    void onUserStatusOnlineStatusSet(QJsonDocument &json, int statusCode);
-    void onUserStatusMessageSet(QJsonDocument &json, int statusCode);
-    void onMessageCleared(QJsonDocument &json, int statusCode);
+    void onUserStatusFetched (QJsonDocument &json, int statusCode);
+    void onPredefinedStatusesFetched (QJsonDocument &json, int statusCode);
+    void onUserStatusOnlineStatusSet (QJsonDocument &json, int statusCode);
+    void onUserStatusMessageSet (QJsonDocument &json, int statusCode);
+    void onMessageCleared (QJsonDocument &json, int statusCode);
 
-    void logResponse(QString &message, QJsonDocument &json, int statusCode);
-    void startFetchUserStatusJob();
-    void startFetchPredefinedStatuses();
-    void setUserStatusOnlineStatus(UserStatus::OnlineStatus onlineStatus);
-    void setUserStatusMessage(UserStatus &userStatus);
-    void setUserStatusMessagePredefined(UserStatus &userStatus);
-    void setUserStatusMessageCustom(UserStatus &userStatus);
+    void logResponse (QString &message, QJsonDocument &json, int statusCode);
+    void startFetchUserStatusJob ();
+    void startFetchPredefinedStatuses ();
+    void setUserStatusOnlineStatus (UserStatus::OnlineStatus onlineStatus);
+    void setUserStatusMessage (UserStatus &userStatus);
+    void setUserStatusMessagePredefined (UserStatus &userStatus);
+    void setUserStatusMessageCustom (UserStatus &userStatus);
 
     AccountPtr _account;
 

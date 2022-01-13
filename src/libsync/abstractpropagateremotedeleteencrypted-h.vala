@@ -27,32 +27,32 @@ class OwncloudPropagator;
  */
 class AbstractPropagateRemoteDeleteEncrypted : public QObject {
 public:
-    AbstractPropagateRemoteDeleteEncrypted(OwncloudPropagator *propagator, SyncFileItemPtr item, QObject *parent);
-    ~AbstractPropagateRemoteDeleteEncrypted() override = default;
+    AbstractPropagateRemoteDeleteEncrypted (OwncloudPropagator *propagator, SyncFileItemPtr item, QObject *parent);
+    ~AbstractPropagateRemoteDeleteEncrypted () override = default;
 
-    QNetworkReply::NetworkError networkError() const;
-    QString errorString() const;
+    QNetworkReply::NetworkError networkError () const;
+    QString errorString () const;
 
-    virtual void start() = 0;
+    virtual void start () = 0;
 
 signals:
-    void finished(bool success);
+    void finished (bool success);
 
 protected:
-    void storeFirstError(QNetworkReply::NetworkError err);
-    void storeFirstErrorString(QString &errString);
+    void storeFirstError (QNetworkReply::NetworkError err);
+    void storeFirstErrorString (QString &errString);
 
-    void startLsColJob(QString &path);
-    void slotFolderEncryptedIdReceived(QStringList &list);
-    void slotTryLock(QByteArray &folderId);
-    void slotFolderLockedSuccessfully(QByteArray &folderId, QByteArray &token);
-    virtual void slotFolderUnLockedSuccessfully(QByteArray &folderId);
-    virtual void slotFolderEncryptedMetadataReceived(QJsonDocument &json, int statusCode) = 0;
-    void slotDeleteRemoteItemFinished();
+    void startLsColJob (QString &path);
+    void slotFolderEncryptedIdReceived (QStringList &list);
+    void slotTryLock (QByteArray &folderId);
+    void slotFolderLockedSuccessfully (QByteArray &folderId, QByteArray &token);
+    virtual void slotFolderUnLockedSuccessfully (QByteArray &folderId);
+    virtual void slotFolderEncryptedMetadataReceived (QJsonDocument &json, int statusCode) = 0;
+    void slotDeleteRemoteItemFinished ();
 
-    void deleteRemoteItem(QString &filename);
-    void unlockFolder();
-    void taskFailed();
+    void deleteRemoteItem (QString &filename);
+    void unlockFolder ();
+    void taskFailed ();
 
 protected:
     OwncloudPropagator *_propagator = nullptr;

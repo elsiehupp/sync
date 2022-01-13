@@ -43,48 +43,48 @@ enum class ShareDialogStartPage {
  */
 class ownCloudGui : public QObject {
 public:
-    explicit ownCloudGui(Application *parent = nullptr);
+    explicit ownCloudGui (Application *parent = nullptr);
 
-    bool checkAccountExists(bool openSettings);
+    bool checkAccountExists (bool openSettings);
 
-    static void raiseDialog(QWidget *raiseWidget);
-    static QSize settingsDialogSize() { return {800, 500}; }
-    void setupOverlayIcons();
+    static void raiseDialog (QWidget *raiseWidget);
+    static QSize settingsDialogSize () { return {800, 500}; }
+    void setupOverlayIcons ();
 #ifdef WITH_LIBCLOUDPROVIDERS
-    void setupCloudProviders();
-    bool cloudProviderApiAvailable();
+    void setupCloudProviders ();
+    bool cloudProviderApiAvailable ();
 #endif
-    void createTray();
+    void createTray ();
 
-    void hideAndShowTray();
+    void hideAndShowTray ();
 
 signals:
-    void setupProxy();
-    void serverError(int code, QString &message);
-    void isShowingSettingsDialog();
+    void setupProxy ();
+    void serverError (int code, QString &message);
+    void isShowingSettingsDialog ();
 
 public slots:
-    void slotComputeOverallSyncStatus();
-    void slotShowTrayMessage(QString &title, QString &msg);
-    void slotShowOptionalTrayMessage(QString &title, QString &msg);
-    void slotFolderOpenAction(QString &alias);
-    void slotUpdateProgress(QString &folder, ProgressInfo &progress);
-    void slotShowGuiMessage(QString &title, QString &message);
-    void slotFoldersChanged();
-    void slotShowSettings();
-    void slotShowSyncProtocol();
-    void slotShutdown();
-    void slotSyncStateChange(Folder *);
-    void slotTrayClicked(QSystemTrayIcon::ActivationReason reason);
-    void slotToggleLogBrowser();
-    void slotOpenOwnCloud();
-    void slotOpenSettingsDialog();
-    void slotOpenMainDialog();
-    void slotSettingsDialogActivated();
-    void slotHelp();
-    void slotOpenPath(QString &path);
-    void slotAccountStateChanged();
-    void slotTrayMessageIfServerUnsupported(Account *account);
+    void slotComputeOverallSyncStatus ();
+    void slotShowTrayMessage (QString &title, QString &msg);
+    void slotShowOptionalTrayMessage (QString &title, QString &msg);
+    void slotFolderOpenAction (QString &alias);
+    void slotUpdateProgress (QString &folder, ProgressInfo &progress);
+    void slotShowGuiMessage (QString &title, QString &message);
+    void slotFoldersChanged ();
+    void slotShowSettings ();
+    void slotShowSyncProtocol ();
+    void slotShutdown ();
+    void slotSyncStateChange (Folder *);
+    void slotTrayClicked (QSystemTrayIcon::ActivationReason reason);
+    void slotToggleLogBrowser ();
+    void slotOpenOwnCloud ();
+    void slotOpenSettingsDialog ();
+    void slotOpenMainDialog ();
+    void slotSettingsDialogActivated ();
+    void slotHelp ();
+    void slotOpenPath (QString &path);
+    void slotAccountStateChanged ();
+    void slotTrayMessageIfServerUnsupported (Account *account);
 
     /**
      * Open a share dialog for a file or folder.
@@ -93,15 +93,15 @@ public slots:
      * localPath is the absolute local path to it (so not relative
      * to the folder).
      */
-    void slotShowShareDialog(QString &sharePath, QString &localPath, ShareDialogStartPage startPage);
+    void slotShowShareDialog (QString &sharePath, QString &localPath, ShareDialogStartPage startPage);
 
-    void slotRemoveDestroyedShareDialogs();
+    void slotRemoveDestroyedShareDialogs ();
 
-    void slotNewAccountWizard();
+    void slotNewAccountWizard ();
 
 private slots:
-    void slotLogin();
-    void slotLogout();
+    void slotLogin ();
+    void slotLogout ();
 
 private:
     QPointer<Systray> _tray;

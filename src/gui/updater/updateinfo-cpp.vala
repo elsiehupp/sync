@@ -8,59 +8,59 @@
 
 namespace OCC {
 
-void UpdateInfo::setVersion(QString &v) {
+void UpdateInfo::setVersion (QString &v) {
     mVersion = v;
 }
 
-QString UpdateInfo::version() const {
+QString UpdateInfo::version () const {
     return mVersion;
 }
 
-void UpdateInfo::setVersionString(QString &v) {
+void UpdateInfo::setVersionString (QString &v) {
     mVersionString = v;
 }
 
-QString UpdateInfo::versionString() const {
+QString UpdateInfo::versionString () const {
     return mVersionString;
 }
 
-void UpdateInfo::setWeb(QString &v) {
+void UpdateInfo::setWeb (QString &v) {
     mWeb = v;
 }
 
-QString UpdateInfo::web() const {
+QString UpdateInfo::web () const {
     return mWeb;
 }
 
-void UpdateInfo::setDownloadUrl(QString &v) {
+void UpdateInfo::setDownloadUrl (QString &v) {
     mDownloadUrl = v;
 }
 
-QString UpdateInfo::downloadUrl() const {
+QString UpdateInfo::downloadUrl () const {
     return mDownloadUrl;
 }
 
-UpdateInfo UpdateInfo::parseElement(QDomElement &element, bool *ok) {
-    if (element.tagName() != QLatin1String("owncloudclient")) {
-        qCCritical(lcUpdater) << "Expected 'owncloudclient', got '" << element.tagName() << "'.";
+UpdateInfo UpdateInfo::parseElement (QDomElement &element, bool *ok) {
+    if (element.tagName () != QLatin1String ("owncloudclient")) {
+        qCCritical (lcUpdater) << "Expected 'owncloudclient', got '" << element.tagName () << "'.";
         if (ok)
             *ok = false;
-        return UpdateInfo();
+        return UpdateInfo ();
     }
 
-    UpdateInfo result = UpdateInfo();
+    UpdateInfo result = UpdateInfo ();
 
     QDomNode n;
-    for (n = element.firstChild(); !n.isNull(); n = n.nextSibling()) {
-        QDomElement e = n.toElement();
-        if (e.tagName() == QLatin1String("version")) {
-            result.setVersion(e.text());
-        } else if (e.tagName() == QLatin1String("versionstring")) {
-            result.setVersionString(e.text());
-        } else if (e.tagName() == QLatin1String("web")) {
-            result.setWeb(e.text());
-        } else if (e.tagName() == QLatin1String("downloadurl")) {
-            result.setDownloadUrl(e.text());
+    for (n = element.firstChild (); !n.isNull (); n = n.nextSibling ()) {
+        QDomElement e = n.toElement ();
+        if (e.tagName () == QLatin1String ("version")) {
+            result.setVersion (e.text ());
+        } else if (e.tagName () == QLatin1String ("versionstring")) {
+            result.setVersionString (e.text ());
+        } else if (e.tagName () == QLatin1String ("web")) {
+            result.setWeb (e.text ());
+        } else if (e.tagName () == QLatin1String ("downloadurl")) {
+            result.setDownloadUrl (e.text ());
         }
     }
 
@@ -69,22 +69,22 @@ UpdateInfo UpdateInfo::parseElement(QDomElement &element, bool *ok) {
     return result;
 }
 
-UpdateInfo UpdateInfo::parseString(QString &xml, bool *ok) {
+UpdateInfo UpdateInfo::parseString (QString &xml, bool *ok) {
     QString errorMsg;
     int errorLine = 0, errorCol = 0;
     QDomDocument doc;
-    if (!doc.setContent(xml, false, &errorMsg, &errorLine, &errorCol)) {
-        qCWarning(lcUpdater).noquote().nospace() << errorMsg << " at " << errorLine << "," << errorCol
-                                << "\n" <<  xml.splitRef("\n").value(errorLine-1) << "\n"
-                                << QString(" ").repeated(errorCol - 1) << "^\n"
+    if (!doc.setContent (xml, false, &errorMsg, &errorLine, &errorCol)) {
+        qCWarning (lcUpdater).noquote ().nospace () << errorMsg << " at " << errorLine << "," << errorCol
+                                << "\n" <<  xml.splitRef ("\n").value (errorLine-1) << "\n"
+                                << QString (" ").repeated (errorCol - 1) << "^\n"
                                 << "->" << xml << "<-";
         if (ok)
             *ok = false;
-        return UpdateInfo();
+        return UpdateInfo ();
     }
 
     bool documentOk = false;
-    UpdateInfo c = parseElement(doc.documentElement(), &documentOk);
+    UpdateInfo c = parseElement (doc.documentElement (), &documentOk);
     if (ok) {
         *ok = documentOk;
     }

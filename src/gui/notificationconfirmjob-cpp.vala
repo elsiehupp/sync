@@ -16,46 +16,46 @@
 
 namespace OCC {
 
-Q_LOGGING_CATEGORY(lcNotificationsJob, "nextcloud.gui.notifications", QtInfoMsg)
+Q_LOGGING_CATEGORY (lcNotificationsJob, "nextcloud.gui.notifications", QtInfoMsg)
 
-NotificationConfirmJob::NotificationConfirmJob(AccountPtr account)
-    : AbstractNetworkJob(account, "") {
-    setIgnoreCredentialFailure(true);
+NotificationConfirmJob::NotificationConfirmJob (AccountPtr account)
+    : AbstractNetworkJob (account, "") {
+    setIgnoreCredentialFailure (true);
 }
 
-void NotificationConfirmJob::setLinkAndVerb(QUrl &link, QByteArray &verb) {
+void NotificationConfirmJob::setLinkAndVerb (QUrl &link, QByteArray &verb) {
     _link = link;
     _verb = verb;
 }
 
-void NotificationConfirmJob::start() {
-    if (!_link.isValid()) {
-        qCWarning(lcNotificationsJob) << "Attempt to trigger invalid URL: " << _link.toString();
+void NotificationConfirmJob::start () {
+    if (!_link.isValid ()) {
+        qCWarning (lcNotificationsJob) << "Attempt to trigger invalid URL: " << _link.toString ();
         return;
     }
     QNetworkRequest req;
-    req.setRawHeader("Ocs-APIREQUEST", "true");
-    req.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
+    req.setRawHeader ("Ocs-APIREQUEST", "true");
+    req.setRawHeader ("Content-Type", "application/x-www-form-urlencoded");
 
-    sendRequest(_verb, _link, req);
+    sendRequest (_verb, _link, req);
 
-    AbstractNetworkJob::start();
+    AbstractNetworkJob::start ();
 }
 
-bool NotificationConfirmJob::finished() {
+bool NotificationConfirmJob::finished () {
     int replyCode = 0;
     // FIXME: check for the reply code!
-    const QString replyStr = reply()->readAll();
+    const QString replyStr = reply ()->readAll ();
 
-    if (replyStr.contains("<?xml version=\"1.0\"?>")) {
-        const QRegularExpression rex("<statuscode>(\\d+)</statuscode>");
-        const auto rexMatch = rex.match(replyStr);
-        if (rexMatch.hasMatch()) {
+    if (replyStr.contains ("<?xml version=\"1.0\"?>")) {
+        const QRegularExpression rex ("<statuscode> (\\d+)</statuscode>");
+        const auto rexMatch = rex.match (replyStr);
+        if (rexMatch.hasMatch ()) {
             // this is a error message coming back from ocs.
-            replyCode = rexMatch.captured(1).toInt();
+            replyCode = rexMatch.captured (1).toInt ();
         }
     }
-    emit jobFinished(replyStr, replyCode);
+    emit jobFinished (replyStr, replyCode);
 
     return true;
 }

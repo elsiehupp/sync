@@ -27,8 +27,8 @@ enum SharePermission {
     SharePermissionShare    = 1 << 4,
     SharePermissionDefault  = 1 << 30
 };
-Q_DECLARE_FLAGS(SharePermissions, SharePermission)
-Q_DECLARE_OPERATORS_FOR_FLAGS(SharePermissions)
+Q_DECLARE_FLAGS (SharePermissions, SharePermission)
+Q_DECLARE_OPERATORS_FOR_FLAGS (SharePermissions)
 
 } // namespace OCC
 

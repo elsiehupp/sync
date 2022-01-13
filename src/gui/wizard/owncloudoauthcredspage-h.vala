@@ -24,22 +24,22 @@ namespace OCC {
 
 class OwncloudOAuthCredsPage : public AbstractCredentialsWizardPage {
 public:
-    OwncloudOAuthCredsPage();
+    OwncloudOAuthCredsPage ();
 
-    AbstractCredentials *getCredentials() const override;
+    AbstractCredentials *getCredentials () const override;
 
-    void initializePage() override;
-    void cleanupPage() override;
-    int nextId() const override;
-    void setConnected();
-    bool isComplete() const override;
+    void initializePage () override;
+    void cleanupPage () override;
+    int nextId () const override;
+    void setConnected ();
+    bool isComplete () const override;
 
 public Q_SLOTS:
-    void asyncAuthResult(OAuth::Result, QString &user, QString &token,
+    void asyncAuthResult (OAuth::Result, QString &user, QString &token,
         const QString &reniewToken);
 
 signals:
-    void connectToOCUrl(QString &);
+    void connectToOCUrl (QString &);
 
 public:
     QString _user;
@@ -49,8 +49,8 @@ public:
     Ui_OwncloudOAuthCredsPage _ui;
 
 protected slots:
-    void slotOpenBrowser();
-    void slotCopyLinkToClipboard();
+    void slotOpenBrowser ();
+    void slotCopyLinkToClipboard ();
 };
 
 } // namespace OCC

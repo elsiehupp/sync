@@ -29,14 +29,14 @@ namespace Ui {
 class LegalNotice : public QDialog {
 
 public:
-    explicit LegalNotice(QDialog *parent = nullptr);
-    ~LegalNotice() override;
+    explicit LegalNotice (QDialog *parent = nullptr);
+    ~LegalNotice () override;
 
 protected:
-    void changeEvent(QEvent *) override;
+    void changeEvent (QEvent *) override;
 
 private:
-    void customizeStyle();
+    void customizeStyle ();
 
     Ui::LegalNotice *_ui;
 };

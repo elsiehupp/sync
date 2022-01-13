@@ -26,13 +26,13 @@ using SyncFileItemPtr = QSharedPointer<SyncFileItem>;
  * @brief Tracks files that must be rediscovered locally
  *
  * It does this by being notified about
- * - modified files (addTouchedPath(), from file watcher)
- * - starting syncs (startSync*())
- * - finished items (slotItemCompleted(), by SyncEngine signal)
- * - finished syncs (slotSyncFinished(), by SyncEngine signal)
+ * - modified files (addTouchedPath (), from file watcher)
+ * - starting syncs (startSync* ())
+ * - finished items (slotItemCompleted (), by SyncEngine signal)
+ * - finished syncs (slotSyncFinished (), by SyncEngine signal)
  *
- * Then localDiscoveryPaths() can be used to determine paths to rediscover
- * and send to SyncEngine::setLocalDiscoveryOptions().
+ * Then localDiscoveryPaths () can be used to determine paths to rediscover
+ * and send to SyncEngine::setLocalDiscoveryOptions ().
  *
  * This class is primarily used from Folder and separate primarily for
  * readability and testing purposes.
@@ -44,35 +44,35 @@ using SyncFileItemPtr = QSharedPointer<SyncFileItem>;
  */
 class OWNCLOUDSYNC_EXPORT LocalDiscoveryTracker : public QObject {
 public:
-    LocalDiscoveryTracker();
+    LocalDiscoveryTracker ();
 
     /** Adds a path that must be locally rediscovered later.
      *
      * This should be a full relative file path, example:
      *   foo/bar/file.txt
      */
-    void addTouchedPath(QString &relativePath);
+    void addTouchedPath (QString &relativePath);
 
     /** Call when a sync run starts that rediscovers all local files */
-    void startSyncFullDiscovery();
+    void startSyncFullDiscovery ();
 
-    /** Call when a sync using localDiscoveryPaths() starts */
-    void startSyncPartialDiscovery();
+    /** Call when a sync using localDiscoveryPaths () starts */
+    void startSyncPartialDiscovery ();
 
     /** Access list of files that shall be locally rediscovered. */
-    const std::set<QString> &localDiscoveryPaths() const;
+    const std::set<QString> &localDiscoveryPaths () const;
 
 public slots:
     /**
      * Success and failure of sync items adjust what the next sync is
      * supposed to do.
      */
-    void slotItemCompleted(SyncFileItemPtr &item);
+    void slotItemCompleted (SyncFileItemPtr &item);
 
     /**
      * When a sync finishes, the lists must be updated
      */
-    void slotSyncFinished(bool success);
+    void slotSyncFinished (bool success);
 
 private:
     /**

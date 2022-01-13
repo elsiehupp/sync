@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2014 Digia Plc and/or its subsidiary(-ies).
+** Copyright (C) 2014 Digia Plc and/or its subsidiary (-ies).
 ** Contact: http://www.qt-project.org/legal
 **
 ** This file is part of Qt Creator.
@@ -36,18 +36,18 @@ class QtLocalPeer;
 class QtSingleCoreApplication : public QCoreApplication {
 
 public:
-    QtSingleCoreApplication(int &argc, char **argv);
-    QtSingleCoreApplication(QString &id, int &argc, char **argv);
+    QtSingleCoreApplication (int &argc, char **argv);
+    QtSingleCoreApplication (QString &id, int &argc, char **argv);
 
-    bool isRunning();
-    QString id() const;
-    void setBlock(bool value);
+    bool isRunning ();
+    QString id () const;
+    void setBlock (bool value);
 
 public Q_SLOTS:
-    bool sendMessage(QString &message, int timeout = 5000);
+    bool sendMessage (QString &message, int timeout = 5000);
 
 Q_SIGNALS:
-    void messageReceived(QString &message);
+    void messageReceived (QString &message);
 
 private:
     QtLocalPeer* peer;

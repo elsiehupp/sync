@@ -16,31 +16,31 @@
 
 namespace OCC {
 
-ElidedLabel::ElidedLabel(QWidget *parent)
-    : QLabel(parent) {
+ElidedLabel::ElidedLabel (QWidget *parent)
+    : QLabel (parent) {
 }
 
-ElidedLabel::ElidedLabel(QString &text, QWidget *parent)
-    : QLabel(text, parent)
-    , _text(text) {
+ElidedLabel::ElidedLabel (QString &text, QWidget *parent)
+    : QLabel (text, parent)
+    , _text (text) {
 }
 
-void ElidedLabel::setText(QString &text) {
+void ElidedLabel::setText (QString &text) {
     _text = text;
-    QLabel::setText(text);
-    update();
+    QLabel::setText (text);
+    update ();
 }
 
-void ElidedLabel::setElideMode(Qt::TextElideMode elideMode) {
+void ElidedLabel::setElideMode (Qt::TextElideMode elideMode) {
     _elideMode = elideMode;
-    update();
+    update ();
 }
 
-void ElidedLabel::resizeEvent(QResizeEvent *event) {
-    QLabel::resizeEvent(event);
+void ElidedLabel::resizeEvent (QResizeEvent *event) {
+    QLabel::resizeEvent (event);
 
-    QFontMetrics fm = fontMetrics();
-    QString elided = fm.elidedText(_text, _elideMode, event->size().width());
-    QLabel::setText(elided);
+    QFontMetrics fm = fontMetrics ();
+    QString elided = fm.elidedText (_text, _elideMode, event->size ().width ());
+    QLabel::setText (elided);
 }
 }

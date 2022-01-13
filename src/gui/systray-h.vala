@@ -26,15 +26,15 @@ namespace OCC {
 
 class AccessManagerFactory : public QQmlNetworkAccessManagerFactory {
 public:
-    AccessManagerFactory();
+    AccessManagerFactory ();
 
-    QNetworkAccessManager* create(QObject *parent) override;
+    QNetworkAccessManager* create (QObject *parent) override;
 };
 
 #ifdef Q_OS_OSX
-bool canOsXSendUserNotification();
-void sendOsXUserNotification(QString &title, QString &message);
-void setTrayWindowLevelAndVisibleOnAllSpaces(QWindow *window);
+bool canOsXSendUserNotification ();
+void sendOsXUserNotification (QString &title, QString &message);
+void setTrayWindowLevelAndVisibleOnAllSpaces (QWindow *window);
 #endif
 
 /**
@@ -44,64 +44,64 @@ void setTrayWindowLevelAndVisibleOnAllSpaces(QWindow *window);
 class Systray
     : public QSystemTrayIcon {
 
-    Q_PROPERTY(QString windowTitle READ windowTitle CONSTANT)
-    Q_PROPERTY(bool useNormalWindow READ useNormalWindow CONSTANT)
+    Q_PROPERTY (QString windowTitle READ windowTitle CONSTANT)
+    Q_PROPERTY (bool useNormalWindow READ useNormalWindow CONSTANT)
 
 public:
-    static Systray *instance();
-    ~Systray() override = default;
+    static Systray *instance ();
+    ~Systray () override = default;
 
     enum class TaskBarPosition { Bottom, Left, Top, Right };
-    Q_ENUM(TaskBarPosition);
+    Q_ENUM (TaskBarPosition);
 
-    void setTrayEngine(QQmlApplicationEngine *trayEngine);
-    void create();
-    void showMessage(QString &title, QString &message, MessageIcon icon = Information);
-    void setToolTip(QString &tip);
-    bool isOpen();
-    QString windowTitle() const;
-    bool useNormalWindow() const;
+    void setTrayEngine (QQmlApplicationEngine *trayEngine);
+    void create ();
+    void showMessage (QString &title, QString &message, MessageIcon icon = Information);
+    void setToolTip (QString &tip);
+    bool isOpen ();
+    QString windowTitle () const;
+    bool useNormalWindow () const;
 
-    Q_INVOKABLE void pauseResumeSync();
-    Q_INVOKABLE bool syncIsPaused();
-    Q_INVOKABLE void setOpened();
-    Q_INVOKABLE void setClosed();
-    Q_INVOKABLE void positionWindow(QQuickWindow *window) const;
-    Q_INVOKABLE void forceWindowInit(QQuickWindow *window) const;
+    Q_INVOKABLE void pauseResumeSync ();
+    Q_INVOKABLE bool syncIsPaused ();
+    Q_INVOKABLE void setOpened ();
+    Q_INVOKABLE void setClosed ();
+    Q_INVOKABLE void positionWindow (QQuickWindow *window) const;
+    Q_INVOKABLE void forceWindowInit (QQuickWindow *window) const;
 
 signals:
-    void currentUserChanged();
-    void openAccountWizard();
-    void openMainDialog();
-    void openSettings();
-    void openHelp();
-    void shutdown();
+    void currentUserChanged ();
+    void openAccountWizard ();
+    void openMainDialog ();
+    void openSettings ();
+    void openHelp ();
+    void shutdown ();
 
-    void hideWindow();
-    void showWindow();
-    void openShareDialog(QString &sharePath, QString &localPath);
-    void showFileActivityDialog(QString &sharePath, QString &localPath);
+    void hideWindow ();
+    void showWindow ();
+    void openShareDialog (QString &sharePath, QString &localPath);
+    void showFileActivityDialog (QString &sharePath, QString &localPath);
 
 public slots:
-    void slotNewUserSelected();
+    void slotNewUserSelected ();
 
 private slots:
-    void slotUnpauseAllFolders();
-    void slotPauseAllFolders();
+    void slotUnpauseAllFolders ();
+    void slotPauseAllFolders ();
 
 private:
-    void setPauseOnAllFoldersHelper(bool pause);
+    void setPauseOnAllFoldersHelper (bool pause);
 
     static Systray *_instance;
-    Systray();
+    Systray ();
 
-    QScreen *currentScreen() const;
-    QRect currentScreenRect() const;
-    QPoint computeWindowReferencePoint() const;
-    QPoint calcTrayIconCenter() const;
-    TaskBarPosition taskbarOrientation() const;
-    QRect taskbarGeometry() const;
-    QPoint computeWindowPosition(int width, int height) const;
+    QScreen *currentScreen () const;
+    QRect currentScreenRect () const;
+    QPoint computeWindowReferencePoint () const;
+    QPoint calcTrayIconCenter () const;
+    TaskBarPosition taskbarOrientation () const;
+    QRect taskbarGeometry () const;
+    QPoint computeWindowPosition (int width, int height) const;
 
     bool _isOpen = false;
     bool _syncIsPaused = true;

@@ -72,7 +72,7 @@ enum class PinState {
      */
     Unspecified = 3,
 };
-Q_ENUM_NS(PinState)
+Q_ENUM_NS (PinState)
 
 /** A user-facing version of PinState.
  *
@@ -120,7 +120,7 @@ enum class VfsItemAvailability {
      */
     OnlineOnly = 4,
 };
-Q_ENUM_NS(VfsItemAvailability)
+Q_ENUM_NS (VfsItemAvailability)
 }
 using namespace PinStateEnums;
 

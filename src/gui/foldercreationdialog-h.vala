@@ -23,13 +23,13 @@ class FolderCreationDialog;
 class FolderCreationDialog : public QDialog {
 
 public:
-    explicit FolderCreationDialog(QString &destination, QWidget *parent = nullptr);
-    ~FolderCreationDialog() override;
+    explicit FolderCreationDialog (QString &destination, QWidget *parent = nullptr);
+    ~FolderCreationDialog () override;
 
 private slots:
-    void accept() override;
+    void accept () override;
 
-    void slotNewFolderNameEditTextEdited();
+    void slotNewFolderNameEditTextEdited ();
 
 private:
     Ui::FolderCreationDialog *ui;

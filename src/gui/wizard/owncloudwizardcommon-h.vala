@@ -26,11 +26,11 @@ namespace OCC {
 
 namespace WizardCommon {
 
-    void setupCustomMedia(QVariant &variant, QLabel *label);
-    QString titleTemplate();
-    QString subTitleTemplate();
-    void initErrorLabel(QLabel *errorLabel);
-    void customizeHintLabel(QLabel *label);
+    void setupCustomMedia (QVariant &variant, QLabel *label);
+    QString titleTemplate ();
+    QString subTitleTemplate ();
+    void initErrorLabel (QLabel *errorLabel);
+    void customizeHintLabel (QLabel *label);
 
     enum SyncMode {
         SelectiveMode,

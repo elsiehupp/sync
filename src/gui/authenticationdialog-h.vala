@@ -24,10 +24,10 @@ namespace OCC {
  */
 class AuthenticationDialog : public QDialog {
 public:
-    AuthenticationDialog(QString &realm, QString &domain, QWidget *parent = nullptr);
+    AuthenticationDialog (QString &realm, QString &domain, QWidget *parent = nullptr);
 
-    QString user() const;
-    QString password() const;
+    QString user () const;
+    QString password () const;
 
 private:
     QLineEdit *_user;

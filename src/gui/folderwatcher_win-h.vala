@@ -26,29 +26,29 @@ class FolderWatcher;
  */
 class WatcherThread : public QThread {
 public:
-    WatcherThread(QString &path)
-        : QThread()
-        , _path(path + (path.endsWith(QLatin1Char('/')) ? QString() : QStringLiteral("/")))
-        , _directory(0)
-        , _resultEvent(0)
-        , _stopEvent(0)
-        , _done(false) {
+    WatcherThread (QString &path)
+        : QThread ()
+        , _path (path + (path.endsWith (QLatin1Char ('/')) ? QString () : QStringLiteral ("/")))
+        , _directory (0)
+        , _resultEvent (0)
+        , _stopEvent (0)
+        , _done (false) {
     }
 
-    ~WatcherThread();
+    ~WatcherThread ();
 
-    void stop();
+    void stop ();
 
 protected:
-    void run();
-    void watchChanges(size_t fileNotifyBufferSize,
+    void run ();
+    void watchChanges (size_t fileNotifyBufferSize,
         bool *increaseBufferSize);
-    void closeHandle();
+    void closeHandle ();
 
 signals:
-    void changed(QString &path);
-    void lostChanges();
-    void ready();
+    void changed (QString &path);
+    void lostChanges ();
+    void ready ();
 
 private:
     QString _path;
@@ -64,8 +64,8 @@ private:
  */
 class FolderWatcherPrivate : public QObject {
 public:
-    FolderWatcherPrivate(FolderWatcher *p, QString &path);
-    ~FolderWatcherPrivate();
+    FolderWatcherPrivate (FolderWatcher *p, QString &path);
+    ~FolderWatcherPrivate ();
 
     /// Set to non-zero once the WatcherThread is capturing events.
     QAtomicInt _ready;

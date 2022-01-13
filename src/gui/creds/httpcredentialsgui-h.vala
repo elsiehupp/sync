@@ -25,38 +25,38 @@ namespace OCC {
  */
 class HttpCredentialsGui : public HttpCredentials {
 public:
-    explicit HttpCredentialsGui()
-        : HttpCredentials() {
+    explicit HttpCredentialsGui ()
+        : HttpCredentials () {
     }
-    HttpCredentialsGui(QString &user, QString &password,
+    HttpCredentialsGui (QString &user, QString &password,
             const QByteArray &clientCertBundle, QByteArray &clientCertPassword)
-        : HttpCredentials(user, password, clientCertBundle, clientCertPassword) {
+        : HttpCredentials (user, password, clientCertBundle, clientCertPassword) {
     }
-    HttpCredentialsGui(QString &user, QString &password, QString &refreshToken,
+    HttpCredentialsGui (QString &user, QString &password, QString &refreshToken,
             const QByteArray &clientCertBundle, QByteArray &clientCertPassword)
-        : HttpCredentials(user, password, clientCertBundle, clientCertPassword) {
+        : HttpCredentials (user, password, clientCertBundle, clientCertPassword) {
         _refreshToken = refreshToken;
     }
 
     /**
-     * This will query the server and either uses OAuth via _asyncAuth->start()
+     * This will query the server and either uses OAuth via _asyncAuth->start ()
      * or call showDialog to ask the password
      */
-    void askFromUser() override;
+    void askFromUser () override;
     /**
      * In case of oauth, return an URL to the link to open the browser.
      * An invalid URL otherwise
      */
-    QUrl authorisationLink() const { return _asyncAuth ? _asyncAuth->authorisationLink() : QUrl(); }
+    QUrl authorisationLink () const { return _asyncAuth ? _asyncAuth->authorisationLink () : QUrl (); }
 
-    static QString requestAppPasswordText(Account *account);
+    static QString requestAppPasswordText (Account *account);
 private slots:
-    void asyncAuthResult(OAuth::Result, QString &user, QString &accessToken, QString &refreshToken);
-    void showDialog();
-    void askFromUserAsync();
+    void asyncAuthResult (OAuth::Result, QString &user, QString &accessToken, QString &refreshToken);
+    void showDialog ();
+    void askFromUserAsync ();
 
 signals:
-    void authorisationLinkChanged();
+    void authorisationLinkChanged ();
 
 private:
 

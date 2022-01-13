@@ -20,33 +20,33 @@ class QUrlQuery;
 
 namespace OCC {
 
-Q_DECLARE_LOGGING_CATEGORY(lcUpdater)
+Q_DECLARE_LOGGING_CATEGORY (lcUpdater)
 
 class Updater : public QObject {
 public:
     struct Helper {
-        static qint64 stringVersionToInt(QString &version);
-        static qint64 currentVersionToInt();
-        static qint64 versionToInt(qint64 major, qint64 minor, qint64 patch, qint64 build);
+        static qint64 stringVersionToInt (QString &version);
+        static qint64 currentVersionToInt ();
+        static qint64 versionToInt (qint64 major, qint64 minor, qint64 patch, qint64 build);
     };
 
-    static Updater *instance();
-    static QUrl updateUrl();
+    static Updater *instance ();
+    static QUrl updateUrl ();
 
-    virtual void checkForUpdate() = 0;
-    virtual void backgroundCheckForUpdate() = 0;
-    virtual bool handleStartup() = 0;
+    virtual void checkForUpdate () = 0;
+    virtual void backgroundCheckForUpdate () = 0;
+    virtual bool handleStartup () = 0;
 
 protected:
-    static QString clientVersion();
-    Updater()
-        : QObject(nullptr) {
+    static QString clientVersion ();
+    Updater ()
+        : QObject (nullptr) {
     }
 
 private:
-    static QString getSystemInfo();
-    static QUrlQuery getQueryParams();
-    static Updater *create();
+    static QString getSystemInfo ();
+    static QUrlQuery getQueryParams ();
+    static Updater *create ();
     static Updater *_instance;
 };
 

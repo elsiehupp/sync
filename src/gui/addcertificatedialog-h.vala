@@ -29,15 +29,15 @@ namespace Ui {
 class AddCertificateDialog : public QDialog {
 
 public:
-    explicit AddCertificateDialog(QWidget *parent = nullptr);
-    ~AddCertificateDialog() override;
-    QString getCertificatePath();
-    QString getCertificatePasswd();
-    void showErrorMessage(QString message);
-    void reinit();
+    explicit AddCertificateDialog (QWidget *parent = nullptr);
+    ~AddCertificateDialog () override;
+    QString getCertificatePath ();
+    QString getCertificatePasswd ();
+    void showErrorMessage (QString message);
+    void reinit ();
 
 private slots:
-    void on_pushButtonBrowseCertificate_clicked();
+    void on_pushButtonBrowseCertificate_clicked ();
 
 private:
     Ui::AddCertificateDialog *ui;

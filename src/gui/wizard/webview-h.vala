@@ -16,12 +16,12 @@ class WebEnginePage;
 
 class WebView : public QWidget {
 public:
-    WebView(QWidget *parent = nullptr);
-    ~WebView() override;
-    void setUrl(QUrl &url);
+    WebView (QWidget *parent = nullptr);
+    ~WebView () override;
+    void setUrl (QUrl &url);
 
 signals:
-    void urlCatched(QString user, QString pass, QString host);
+    void urlCatched (QString user, QString pass, QString host);
 
 private:
     Ui_WebView _ui;

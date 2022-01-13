@@ -44,38 +44,38 @@ class ProxyAuthDialog;
 class ProxyAuthHandler : public QObject {
 
 public:
-    static ProxyAuthHandler *instance();
+    static ProxyAuthHandler *instance ();
 
-    ~ProxyAuthHandler() override;
+    ~ProxyAuthHandler () override;
 
 public slots:
-    /// Intended for QNetworkAccessManager::proxyAuthenticationRequired()
-    void handleProxyAuthenticationRequired(QNetworkProxy &proxy,
+    /// Intended for QNetworkAccessManager::proxyAuthenticationRequired ()
+    void handleProxyAuthenticationRequired (QNetworkProxy &proxy,
         QAuthenticator *authenticator);
 
 private slots:
-    void slotSenderDestroyed(QObject *);
+    void slotSenderDestroyed (QObject *);
 
 private:
-    ProxyAuthHandler();
+    ProxyAuthHandler ();
 
     /// Runs the ProxyAuthDialog and returns true if new credentials were entered.
-    bool getCredsFromDialog();
+    bool getCredsFromDialog ();
 
     /// Checks the keychain for credentials of the current proxy.
-    bool getCredsFromKeychain();
+    bool getCredsFromKeychain ();
 
     /// Stores the current credentials in the keychain.
-    void storeCredsInKeychain();
+    void storeCredsInKeychain ();
 
     template<class T, typename PointerToMemberFunction>
-    void execAwait(T *sender,
+    void execAwait (T *sender,
                    PointerToMemberFunction signal,
                    int &counter,
                    const QEventLoop::ProcessEventsFlags flags = QEventLoop::AllEvents);
 
-    QString keychainUsernameKey() const;
-    QString keychainPasswordKey() const;
+    QString keychainUsernameKey () const;
+    QString keychainPasswordKey () const;
 
     /// The hostname:port of the current proxy, used for detecting switches
     /// to a different proxy.
@@ -88,7 +88,7 @@ private:
     /// true and we won't bother him again.
     bool _blocked = false;
 
-    /// In several instances handleProxyAuthenticationRequired() can be called
+    /// In several instances handleProxyAuthenticationRequired () can be called
     /// while it is still running. These counters detect what we're currently
     /// waiting for.
     int _waitingForDialog = 0;

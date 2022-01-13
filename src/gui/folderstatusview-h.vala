@@ -23,10 +23,10 @@ namespace OCC {
 class FolderStatusView : public QTreeView {
 
 public:
-    explicit FolderStatusView(QWidget *parent = nullptr);
+    explicit FolderStatusView (QWidget *parent = nullptr);
 
-    QModelIndex indexAt(QPoint &point) const override;
-    QRect visualRect(QModelIndex &index) const override;
+    QModelIndex indexAt (QPoint &point) const override;
+    QRect visualRect (QModelIndex &index) const override;
 };
 
 } // namespace OCC

@@ -22,24 +22,24 @@ namespace OCC {
  */
 class OWNCLOUDSYNC_EXPORT CookieJar : public QNetworkCookieJar {
 public:
-    explicit CookieJar(QObject *parent = nullptr);
-    ~CookieJar() override;
-    bool setCookiesFromUrl(QList<QNetworkCookie> &cookieList, QUrl &url) override;
-    QList<QNetworkCookie> cookiesForUrl(QUrl &url) const override;
+    explicit CookieJar (QObject *parent = nullptr);
+    ~CookieJar () override;
+    bool setCookiesFromUrl (QList<QNetworkCookie> &cookieList, QUrl &url) override;
+    QList<QNetworkCookie> cookiesForUrl (QUrl &url) const override;
 
-    void clearSessionCookies();
+    void clearSessionCookies ();
 
     using QNetworkCookieJar::setAllCookies;
     using QNetworkCookieJar::allCookies;
 
-    bool save(QString &fileName);
-    bool restore(QString &fileName);
+    bool save (QString &fileName);
+    bool restore (QString &fileName);
 
 signals:
-    void newCookiesForUrl(QList<QNetworkCookie> &cookieList, QUrl &url);
+    void newCookiesForUrl (QList<QNetworkCookie> &cookieList, QUrl &url);
 
 private:
-    QList<QNetworkCookie> removeExpired(QList<QNetworkCookie> &cookies);
+    QList<QNetworkCookie> removeExpired (QList<QNetworkCookie> &cookies);
 };
 
 } // namespace OCC

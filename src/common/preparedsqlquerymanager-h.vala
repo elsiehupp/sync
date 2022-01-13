@@ -22,22 +22,22 @@ namespace OCC {
 
 class OCSYNC_EXPORT PreparedSqlQuery {
 public:
-    ~PreparedSqlQuery();
+    ~PreparedSqlQuery ();
 
-    explicit operator bool() const { return _ok; }
+    explicit operator bool () const { return _ok; }
 
-    SqlQuery *operator->() const {
-        Q_ASSERT(_ok);
+    SqlQuery *operator-> () const {
+        Q_ASSERT (_ok);
         return _query;
     }
 
-    SqlQuery &operator*() const & {
-        Q_ASSERT(_ok);
+    SqlQuery &operator* () const & {
+        Q_ASSERT (_ok);
         return *_query;
     }
 
 private:
-    PreparedSqlQuery(SqlQuery *query, bool ok = true);
+    PreparedSqlQuery (SqlQuery *query, bool ok = true);
 
     SqlQuery *_query;
     bool _ok;
@@ -93,19 +93,19 @@ public:
 
         PreparedQueryCount
     };
-    PreparedSqlQueryManager() = default;
+    PreparedSqlQueryManager () = default;
     /**
      * The queries are reset in the destructor to prevent wal locks
      */
-    const PreparedSqlQuery get(Key key);
+    const PreparedSqlQuery get (Key key);
     /**
      * Prepare the SqlQuery if it was not prepared yet.
      */
-    const PreparedSqlQuery get(Key key, QByteArray &sql, SqlDatabase &db);
+    const PreparedSqlQuery get (Key key, QByteArray &sql, SqlDatabase &db);
 
 private:
     SqlQuery _queries[PreparedQueryCount];
-    Q_DISABLE_COPY(PreparedSqlQueryManager)
+    Q_DISABLE_COPY (PreparedSqlQueryManager)
 };
 
 }

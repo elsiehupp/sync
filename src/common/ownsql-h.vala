@@ -24,7 +24,7 @@ struct sqlite3;
 struct sqlite3_stmt;
 
 namespace OCC {
-OCSYNC_EXPORT Q_DECLARE_LOGGING_CATEGORY(lcSql)
+OCSYNC_EXPORT Q_DECLARE_LOGGING_CATEGORY (lcSql)
 
 class SqlQuery;
 
@@ -33,19 +33,19 @@ class SqlQuery;
  * @ingroup libsync
  */
 class OCSYNC_EXPORT SqlDatabase {
-    Q_DISABLE_COPY(SqlDatabase)
+    Q_DISABLE_COPY (SqlDatabase)
 public:
-    explicit SqlDatabase();
-    ~SqlDatabase();
+    explicit SqlDatabase ();
+    ~SqlDatabase ();
 
-    bool isOpen();
-    bool openOrCreateReadWrite(QString &filename);
-    bool openReadOnly(QString &filename);
-    bool transaction();
-    bool commit();
-    void close();
-    QString error() const;
-    sqlite3 *sqliteDb();
+    bool isOpen ();
+    bool openOrCreateReadWrite (QString &filename);
+    bool openReadOnly (QString &filename);
+    bool transaction ();
+    bool commit ();
+    void close ();
+    QString error () const;
+    sqlite3 *sqliteDb ();
 
 private:
     enum class CheckDbResult {
@@ -55,8 +55,8 @@ private:
         NotOk,
     };
 
-    bool openHelper(QString &filename, int sqliteFlags);
-    CheckDbResult checkDb();
+    bool openHelper (QString &filename, int sqliteFlags);
+    CheckDbResult checkDb ();
 
     sqlite3 *_db = nullptr;
     QString _error; // last error string
@@ -74,80 +74,80 @@ private:
  *
     SqlQuery q1;
     [...]
-    q1.initOrReset(...);
-    q1.bindValue(...);
-    q1.exec(...)
+    q1.initOrReset (...);
+    q1.bindValue (...);
+    q1.exec (...)
  *
-    SqlQuery q2(db);
-    q2.prepare(...);
+    SqlQuery q2 (db);
+    q2.prepare (...);
     [...]
-    q2.reset_and_clear_bindings();
-    q2.bindValue(...);
-    q2.exec(...)
+    q2.reset_and_clear_bindings ();
+    q2.bindValue (...);
+    q2.exec (...)
  *
-    SqlQuery q3("...", db);
-    q3.bindValue(...);
-    q3.exec(...)
+    SqlQuery q3 ("...", db);
+    q3.bindValue (...);
+    q3.exec (...)
  *
  */
 class OCSYNC_EXPORT SqlQuery {
-    Q_DISABLE_COPY(SqlQuery)
+    Q_DISABLE_COPY (SqlQuery)
 public:
-    explicit SqlQuery() = default;
-    explicit SqlQuery(SqlDatabase &db);
-    explicit SqlQuery(QByteArray &sql, SqlDatabase &db);
+    explicit SqlQuery () = default;
+    explicit SqlQuery (SqlDatabase &db);
+    explicit SqlQuery (QByteArray &sql, SqlDatabase &db);
     /**
      * Prepare the SqlQuery.
-     * If the query was already prepared, this will first call finish(), and re-prepare it.
+     * If the query was already prepared, this will first call finish (), and re-prepare it.
      * This function must only be used if the constructor was setting a SqlDatabase
      */
-    int prepare(QByteArray &sql, bool allow_failure = false);
+    int prepare (QByteArray &sql, bool allow_failure = false);
 
-    ~SqlQuery();
-    QString error() const;
-    int errorId() const;
+    ~SqlQuery ();
+    QString error () const;
+    int errorId () const;
 
     /// Checks whether the value at the given column index is NULL
-    bool nullValue(int index);
+    bool nullValue (int index);
 
-    QString stringValue(int index);
-    int intValue(int index);
-    quint64 int64Value(int index);
-    QByteArray baValue(int index);
-    bool isSelect();
-    bool isPragma();
-    bool exec();
+    QString stringValue (int index);
+    int intValue (int index);
+    quint64 int64Value (int index);
+    QByteArray baValue (int index);
+    bool isSelect ();
+    bool isPragma ();
+    bool exec ();
 
     struct NextResult {
         bool ok = false;
         bool hasData = false;
     };
-    NextResult next();
+    NextResult next ();
 
     template<class T, typename std::enable_if<std::is_enum<T>::value, int>::type = 0>
-    void bindValue(int pos, T &value) {
-        qCDebug(lcSql) << "SQL bind" << pos << value;
-        bindValueInternal(pos, static_cast<int>(value));
+    void bindValue (int pos, T &value) {
+        qCDebug (lcSql) << "SQL bind" << pos << value;
+        bindValueInternal (pos, static_cast<int> (value));
     }
 
     template<class T, typename std::enable_if<!std::is_enum<T>::value, int>::type = 0>
-    void bindValue(int pos, T &value) {
-        qCDebug(lcSql) << "SQL bind" << pos << value;
-        bindValueInternal(pos, value);
+    void bindValue (int pos, T &value) {
+        qCDebug (lcSql) << "SQL bind" << pos << value;
+        bindValueInternal (pos, value);
     }
 
-    void bindValue(int pos, QByteArray &value) {
-        qCDebug(lcSql) << "SQL bind" << pos << QString::fromUtf8(value);
-        bindValueInternal(pos, value);
+    void bindValue (int pos, QByteArray &value) {
+        qCDebug (lcSql) << "SQL bind" << pos << QString::fromUtf8 (value);
+        bindValueInternal (pos, value);
     }
 
-    const QByteArray &lastQuery() const;
-    int numRowsAffected();
-    void reset_and_clear_bindings();
+    const QByteArray &lastQuery () const;
+    int numRowsAffected ();
+    void reset_and_clear_bindings ();
 
 private:
-    void bindValueInternal(int pos, QVariant &value);
-    void finish();
+    void bindValueInternal (int pos, QVariant &value);
+    void finish ();
 
     SqlDatabase *_sqldb = nullptr;
     sqlite3 *_db = nullptr;

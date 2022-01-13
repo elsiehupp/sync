@@ -26,14 +26,14 @@ namespace OCC {
  */
 class OWNCLOUDSYNC_EXPORT IconJob : public QObject {
 public:
-    explicit IconJob(AccountPtr account, QUrl &url, QObject *parent = nullptr);
+    explicit IconJob (AccountPtr account, QUrl &url, QObject *parent = nullptr);
 
 signals:
-    void jobFinished(QByteArray iconData);
-    void error(QNetworkReply::NetworkError errorType);
+    void jobFinished (QByteArray iconData);
+    void error (QNetworkReply::NetworkError errorType);
 
 private slots:
-    void finished();
+    void finished ();
 };
 }
 

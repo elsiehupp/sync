@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2014 Digia Plc and/or its subsidiary(-ies).
+** Copyright (C) 2014 Digia Plc and/or its subsidiary (-ies).
 ** Contact: http://www.qt-project.org/legal
 **
 ** This file is part of Qt Creator.
@@ -29,7 +29,7 @@
 
 // #include <QApplication>
 
-QT_FORWARD_DECLARE_CLASS(QSharedMemory)
+QT_FORWARD_DECLARE_CLASS (QSharedMemory)
 
 namespace SharedTools {
 
@@ -38,28 +38,28 @@ class QtLocalPeer;
 class QtSingleApplication : public QApplication {
 
 public:
-    QtSingleApplication(QString &id, int &argc, char **argv);
-    ~QtSingleApplication() override;
+    QtSingleApplication (QString &id, int &argc, char **argv);
+    ~QtSingleApplication () override;
 
-    bool isRunning(qint64 pid = -1);
+    bool isRunning (qint64 pid = -1);
 
-    void setActivationWindow(QWidget* aw, bool activateOnMessage = true);
-    QWidget* activationWindow() const;
-    bool event(QEvent *event) override;
+    void setActivationWindow (QWidget* aw, bool activateOnMessage = true);
+    QWidget* activationWindow () const;
+    bool event (QEvent *event) override;
 
-    QString applicationId() const;
-    void setBlock(bool value);
+    QString applicationId () const;
+    void setBlock (bool value);
 
 public Q_SLOTS:
-    bool sendMessage(QString &message, int timeout = 5000, qint64 pid = -1);
-    void activateWindow();
+    bool sendMessage (QString &message, int timeout = 5000, qint64 pid = -1);
+    void activateWindow ();
 
 Q_SIGNALS:
-    void messageReceived(QString &message, QObject *socket);
-    void fileOpenRequest(QString &file);
+    void messageReceived (QString &message, QObject *socket);
+    void fileOpenRequest (QString &file);
 
 private:
-    QString instancesFileName(QString &appId);
+    QString instancesFileName (QString &appId);
 
     qint64 firstPeer;
     QSharedMemory *instances;

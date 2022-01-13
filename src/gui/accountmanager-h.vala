@@ -22,13 +22,13 @@ namespace OCC {
 */
 class AccountManager : public QObject {
 public:
-    static AccountManager *instance();
-    ~AccountManager() override = default;
+    static AccountManager *instance ();
+    ~AccountManager () override = default;
 
     /**
      * Saves the accounts to a given settings file
      */
-    void save(bool saveCredentials = true);
+    void save (bool saveCredentials = true);
 
     /**
      * Creates account objects from a given settings file.
@@ -36,79 +36,79 @@ public:
      * Returns false if there was an error reading the settings,
      * but note that settings not existing is not an error.
      */
-    bool restore();
+    bool restore ();
 
     /**
      * Add this account in the list of saved accounts.
      * Typically called from the wizard
      */
-    AccountState *addAccount(AccountPtr &newAccount);
+    AccountState *addAccount (AccountPtr &newAccount);
 
     /**
      * remove all accounts
      */
-    void shutdown();
+    void shutdown ();
 
     /**
      * Return a list of all accounts.
      * (this is a list of QSharedPointer for internal reasons, one should normally not keep a copy of them)
      */
-    QList<AccountStatePtr> accounts() const;
+    QList<AccountStatePtr> accounts () const;
 
     /**
      * Return the account state pointer for an account identified by its display name
      */
-    AccountStatePtr account(QString &name);
+    AccountStatePtr account (QString &name);
 
     /**
      * Delete the AccountState
      */
-    void deleteAccount(AccountState *account);
+    void deleteAccount (AccountState *account);
 
     /**
      * Creates an account and sets up some basic handlers.
      * Does *not* add the account to the account manager just yet.
      */
-    static AccountPtr createAccount();
+    static AccountPtr createAccount ();
 
     /**
      * Returns the list of settings keys that can't be read because
      * they are from the future.
      */
-    static void backwardMigrationSettingsKeys(QStringList *deleteKeys, QStringList *ignoreKeys);
+    static void backwardMigrationSettingsKeys (QStringList *deleteKeys, QStringList *ignoreKeys);
 
 private:
     // saving and loading Account to settings
-    void saveAccountHelper(Account *account, QSettings &settings, bool saveCredentials = true);
-    AccountPtr loadAccountHelper(QSettings &settings);
+    void saveAccountHelper (Account *account, QSettings &settings, bool saveCredentials = true);
+    AccountPtr loadAccountHelper (QSettings &settings);
 
-    bool restoreFromLegacySettings();
+    bool restoreFromLegacySettings ();
 
-    bool isAccountIdAvailable(QString &id) const;
-    QString generateFreeAccountId() const;
+    bool isAccountIdAvailable (QString &id) const;
+    QString generateFreeAccountId () const;
 
-    // Adds an account to the tracked list, emitting accountAdded()
-    void addAccountState(AccountState *accountState);
+    // Adds an account to the tracked list, emitting accountAdded ()
+    void addAccountState (AccountState *accountState);
 
-    AccountManager() = default;
+    AccountManager () = default;
     QList<AccountStatePtr> _accounts;
     /// Account ids from settings that weren't read
     QSet<QString> _additionalBlockedAccountIds;
 
 public slots:
     /// Saves account data, not including the credentials
-    void saveAccount(Account *a);
+    void saveAccount (Account *a);
 
     /// Saves account state data, not including the account
-    void saveAccountState(AccountState *a);
+    void saveAccountState (AccountState *a);
 
     /// Display a Box with the mnemonic so the user can copy it to a safe place.
-    static void displayMnemonic(QString& mnemonic);
+    static void displayMnemonic (QString& mnemonic);
 
 Q_SIGNALS:
-    void accountAdded(AccountState *account);
-    void accountRemoved(AccountState *account);
-    void accountSyncConnectionRemoved(AccountState *account);
-    void removeAccountFolders(AccountState *account);
+    void accountAdded (AccountState *account);
+    void accountRemoved (AccountState *account);
+    void accountSyncConnectionRemoved (AccountState *account);
+    void removeAccountFolders (AccountState *account);
 };
 }

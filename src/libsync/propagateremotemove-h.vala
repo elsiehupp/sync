@@ -25,15 +25,15 @@ class OWNCLOUDSYNC_EXPORT MoveJob : public AbstractNetworkJob {
     QMap<QByteArray, QByteArray> _extraHeaders;
 
 public:
-    explicit MoveJob(AccountPtr account, QString &path, QString &destination, QObject *parent = nullptr);
-    explicit MoveJob(AccountPtr account, QUrl &url, QString &destination,
+    explicit MoveJob (AccountPtr account, QString &path, QString &destination, QObject *parent = nullptr);
+    explicit MoveJob (AccountPtr account, QUrl &url, QString &destination,
         QMap<QByteArray, QByteArray> _extraHeaders, QObject *parent = nullptr);
 
-    void start() override;
-    bool finished() override;
+    void start () override;
+    bool finished () override;
 
 signals:
-    void finishedSignal();
+    void finishedSignal ();
 };
 
 /**
@@ -44,20 +44,20 @@ class PropagateRemoteMove : public PropagateItemJob {
     QPointer<MoveJob> _job;
 
 public:
-    PropagateRemoteMove(OwncloudPropagator *propagator, SyncFileItemPtr &item)
-        : PropagateItemJob(propagator, item) {
+    PropagateRemoteMove (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+        : PropagateItemJob (propagator, item) {
     }
-    void start() override;
-    void abort(PropagatorJob::AbortType abortType) override;
-    JobParallelism parallelism() override { return _item->isDirectory() ? WaitForFinished : FullParallelism; }
+    void start () override;
+    void abort (PropagatorJob::AbortType abortType) override;
+    JobParallelism parallelism () override { return _item->isDirectory () ? WaitForFinished : FullParallelism; }
 
     /**
      * Rename the directory in the selective sync list
      */
-    static bool adjustSelectiveSync(SyncJournalDb *journal, QString &from, QString &to);
+    static bool adjustSelectiveSync (SyncJournalDb *journal, QString &from, QString &to);
 
 private slots:
-    void slotMoveJobFinished();
-    void finalize();
+    void slotMoveJobFinished ();
+    void finalize ();
 };
 }

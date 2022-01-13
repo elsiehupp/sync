@@ -60,32 +60,32 @@ public:
     bool upgradeVfsMode = false;
 
     /// Saves the folder definition into the current settings group.
-    static void save(QSettings &settings, FolderDefinition &folder);
+    static void save (QSettings &settings, FolderDefinition &folder);
 
     /// Reads a folder definition from the current settings group.
-    static bool load(QSettings &settings, QString &alias,
+    static bool load (QSettings &settings, QString &alias,
         FolderDefinition *folder);
 
-    /** The highest version in the settings that load() can read
+    /** The highest version in the settings that load () can read
      *
      * Version 1: initial version (default if value absent in settings)
      * Version 2: introduction of metadata_parent hash in 2.6.0
      *            (version remains readable by 2.5.1)
      * Version 3: introduction of new windows vfs mode in 2.6.0
      */
-    static int maxSettingsVersion() { return 3; }
+    static int maxSettingsVersion () { return 3; }
 
     /// Ensure / as separator and trailing /.
-    static QString prepareLocalPath(QString &path);
+    static QString prepareLocalPath (QString &path);
 
     /// Remove ending /, then ensure starting '/': so "/foo/bar" and "/".
-    static QString prepareTargetPath(QString &path);
+    static QString prepareTargetPath (QString &path);
 
     /// journalPath relative to localPath.
-    QString absoluteJournalPath() const;
+    QString absoluteJournalPath () const;
 
     /// Returns the relative journal path that's appropriate for this folder and account.
-    QString defaultJournalPath(AccountPtr account);
+    QString defaultJournalPath (AccountPtr account);
 };
 
 /**
@@ -99,13 +99,13 @@ public:
         Other,
         UnLock
     };
-    Q_ENUM(ChangeReason)
+    Q_ENUM (ChangeReason)
 
     /** Create a new Folder
      */
-    Folder(FolderDefinition &definition, AccountState *accountState, std::unique_ptr<Vfs> vfs, QObject *parent = nullptr);
+    Folder (FolderDefinition &definition, AccountState *accountState, std::unique_ptr<Vfs> vfs, QObject *parent = nullptr);
 
-    ~Folder() override;
+    ~Folder () override;
 
     using Map = QMap<QString, Folder *>;
     using MapIterator = QMapIterator<QString, Folder *>;
@@ -113,77 +113,77 @@ public:
     /**
      * The account the folder is configured on.
      */
-    AccountState *accountState() const { return _accountState.data(); }
+    AccountState *accountState () const { return _accountState.data (); }
 
     /**
      * alias or nickname
      */
-    QString alias() const;
-    QString shortGuiRemotePathOrAppName() const; // since 2.0 we don't want to show aliases anymore, show the path instead
+    QString alias () const;
+    QString shortGuiRemotePathOrAppName () const; // since 2.0 we don't want to show aliases anymore, show the path instead
 
     /**
      * short local path to display on the GUI  (native separators)
      */
-    QString shortGuiLocalPath() const;
+    QString shortGuiLocalPath () const;
 
     /**
      * canonical local folder path, always ends with /
      */
-    QString path() const;
+    QString path () const;
 
     /**
-     * cleaned canonical folder path, like path() but never ends with a /
+     * cleaned canonical folder path, like path () but never ends with a /
      *
-     * Wrapper for QDir::cleanPath(path()) except for "Z:/",
+     * Wrapper for QDir::cleanPath (path ()) except for "Z:/",
      * where it returns "Z:" instead of "Z:/".
      */
-    QString cleanPath() const;
+    QString cleanPath () const;
 
     /**
      * remote folder path, usually without trailing /, exception "/"
      */
-    QString remotePath() const;
+    QString remotePath () const;
 
     /**
      * remote folder path, always with a trailing /
      */
-    QString remotePathTrailingSlash() const;
+    QString remotePathTrailingSlash () const;
 
-    void setNavigationPaneClsid(QUuid &clsid) { _definition.navigationPaneClsid = clsid; }
-    QUuid navigationPaneClsid() const { return _definition.navigationPaneClsid; }
+    void setNavigationPaneClsid (QUuid &clsid) { _definition.navigationPaneClsid = clsid; }
+    QUuid navigationPaneClsid () const { return _definition.navigationPaneClsid; }
 
     /**
      * remote folder path with server url
      */
-    QUrl remoteUrl() const;
+    QUrl remoteUrl () const;
 
     /**
      * switch sync on or off
      */
-    void setSyncPaused(bool);
+    void setSyncPaused (bool);
 
-    bool syncPaused() const;
+    bool syncPaused () const;
 
     /**
      * Returns true when the folder may sync.
      */
-    bool canSync() const;
+    bool canSync () const;
 
-    void prepareToSync();
+    void prepareToSync ();
 
     /**
      * True if the folder is busy and can't initiate
      * a synchronization
      */
-    virtual bool isBusy() const;
+    virtual bool isBusy () const;
 
     /** True if the folder is currently synchronizing */
-    bool isSyncRunning() const;
+    bool isSyncRunning () const;
 
     /**
      * return the last sync result with error message and status
      */
-    SyncResult syncResult() const;
+    SyncResult syncResult () const;
 
     /**
       * This is called when the sync folder definition is removed. Do cleanups here.
@@ -192,46 +192,46 @@ public:
       *
       * The folder is not in a valid state afterwards!
       */
-    virtual void wipeForRemoval();
+    virtual void wipeForRemoval ();
 
-    void onAssociatedAccountRemoved();
+    void onAssociatedAccountRemoved ();
 
-    void setSyncState(SyncResult::Status state);
+    void setSyncState (SyncResult::Status state);
 
-    void setDirtyNetworkLimits();
+    void setDirtyNetworkLimits ();
 
     /**
       * Ignore syncing of hidden files or not. This is defined in the
       * folder definition
       */
-    bool ignoreHiddenFiles();
-    void setIgnoreHiddenFiles(bool ignore);
+    bool ignoreHiddenFiles ();
+    void setIgnoreHiddenFiles (bool ignore);
 
     // Used by the Socket API
-    SyncJournalDb *journalDb() { return &_journal; }
-    SyncEngine &syncEngine() { return *_engine; }
-    Vfs &vfs() { return *_vfs; }
+    SyncJournalDb *journalDb () { return &_journal; }
+    SyncEngine &syncEngine () { return *_engine; }
+    Vfs &vfs () { return *_vfs; }
 
-    RequestEtagJob *etagJob() { return _requestEtagJob; }
-    std::chrono::milliseconds msecSinceLastSync() const { return std::chrono::milliseconds(_timeSinceLastSyncDone.elapsed()); }
-    std::chrono::milliseconds msecLastSyncDuration() const { return _lastSyncDuration; }
-    int consecutiveFollowUpSyncs() const { return _consecutiveFollowUpSyncs; }
-    int consecutiveFailingSyncs() const { return _consecutiveFailingSyncs; }
+    RequestEtagJob *etagJob () { return _requestEtagJob; }
+    std::chrono::milliseconds msecSinceLastSync () const { return std::chrono::milliseconds (_timeSinceLastSyncDone.elapsed ()); }
+    std::chrono::milliseconds msecLastSyncDuration () const { return _lastSyncDuration; }
+    int consecutiveFollowUpSyncs () const { return _consecutiveFollowUpSyncs; }
+    int consecutiveFailingSyncs () const { return _consecutiveFailingSyncs; }
 
     /// Saves the folder data in the account's settings.
-    void saveToSettings() const;
+    void saveToSettings () const;
     /// Removes the folder from the account's settings.
-    void removeFromSettings() const;
+    void removeFromSettings () const;
 
     /**
       * Returns whether a file inside this folder should be excluded.
       */
-    bool isFileExcludedAbsolute(QString &fullPath) const;
+    bool isFileExcludedAbsolute (QString &fullPath) const;
 
     /**
       * Returns whether a file inside this folder should be excluded.
       */
-    bool isFileExcludedRelative(QString &relativePath) const;
+    bool isFileExcludedRelative (QString &relativePath) const;
 
     /** Calls schedules this folder on the FolderMan after a short delay.
       *
@@ -242,23 +242,23 @@ public:
       *
       * The delay doesn't reset with subsequent calls.
       */
-    void scheduleThisFolderSoon();
+    void scheduleThisFolderSoon ();
 
     /**
       * Migration: When this flag is true, this folder will save to
       * the backwards-compatible 'Folders' section in the config file.
       */
-    void setSaveBackwardsCompatible(bool save);
+    void setSaveBackwardsCompatible (bool save);
 
     /** Used to have placeholders: save in placeholder config section */
-    void setSaveInFoldersWithPlaceholders() { _saveInFoldersWithPlaceholders = true; }
+    void setSaveInFoldersWithPlaceholders () { _saveInFoldersWithPlaceholders = true; }
 
     /**
      * Sets up this folder's folderWatcher if possible.
      *
      * May be called several times.
      */
-    void registerFolderWatcher();
+    void registerFolderWatcher ();
 
     /** virtual files of some kind are enabled
      *
@@ -266,67 +266,67 @@ public:
      * and never have an automatic virtual file. But when it's on, the shell context menu will allow
      * users to make existing files virtual.
      */
-    bool virtualFilesEnabled() const;
-    void setVirtualFilesEnabled(bool enabled);
+    bool virtualFilesEnabled () const;
+    void setVirtualFilesEnabled (bool enabled);
 
-    void setRootPinState(PinState state);
+    void setRootPinState (PinState state);
 
     /** Whether user desires a switch that couldn't be executed yet, see member */
-    bool isVfsOnOffSwitchPending() const { return _vfsOnOffPending; }
-    void setVfsOnOffSwitchPending(bool pending) { _vfsOnOffPending = pending; }
+    bool isVfsOnOffSwitchPending () const { return _vfsOnOffPending; }
+    void setVfsOnOffSwitchPending (bool pending) { _vfsOnOffPending = pending; }
 
-    void switchToVirtualFiles();
+    void switchToVirtualFiles ();
 
-    void processSwitchedToVirtualFiles();
+    void processSwitchedToVirtualFiles ();
 
     /** Whether this folder should show selective sync ui */
-    bool supportsSelectiveSync() const;
+    bool supportsSelectiveSync () const;
 
-    QString fileFromLocalPath(QString &localPath) const;
+    QString fileFromLocalPath (QString &localPath) const;
 
 signals:
-    void syncStateChange();
-    void syncStarted();
-    void syncFinished(SyncResult &result);
-    void progressInfo(ProgressInfo &progress);
-    void newBigFolderDiscovered(QString &); // A new folder bigger than the threshold was discovered
-    void syncPausedChanged(Folder *, bool paused);
-    void canSyncChanged();
+    void syncStateChange ();
+    void syncStarted ();
+    void syncFinished (SyncResult &result);
+    void progressInfo (ProgressInfo &progress);
+    void newBigFolderDiscovered (QString &); // A new folder bigger than the threshold was discovered
+    void syncPausedChanged (Folder *, bool paused);
+    void canSyncChanged ();
 
     /**
      * Fires for each change inside this folder that wasn't caused
      * by sync activity.
      */
-    void watchedFileChangedExternally(QString &path);
+    void watchedFileChangedExternally (QString &path);
 
 public slots:
 
     /**
        * terminate the current sync run
        */
-    void slotTerminateSync();
+    void slotTerminateSync ();
 
     // connected to the corresponding signals in the SyncEngine
-    void slotAboutToRemoveAllFiles(SyncFileItem::Direction, std::function<void(bool)> callback);
+    void slotAboutToRemoveAllFiles (SyncFileItem::Direction, std::function<void (bool)> callback);
 
     /**
       * Starts a sync operation
       *
       * If the list of changed files is known, it is passed.
       */
-    void startSync(QStringList &pathList = QStringList());
+    void startSync (QStringList &pathList = QStringList ());
 
-    int slotDiscardDownloadProgress();
-    int downloadInfoCount();
-    int slotWipeErrorBlacklist();
-    int errorBlackListEntryCount();
+    int slotDiscardDownloadProgress ();
+    int downloadInfoCount ();
+    int slotWipeErrorBlacklist ();
+    int errorBlackListEntryCount ();
 
     /**
        * Triggered by the folder watcher when a file/dir in this folder
        * changes. Needs to check whether this change should trigger a new
        * sync run to be scheduled.
        */
-    void slotWatchedPathChanged(QString &path, ChangeReason reason);
+    void slotWatchedPathChanged (QString &path, ChangeReason reason);
 
     /**
      * Mark a virtual file as being requested for download, and start a sync.
@@ -343,80 +343,80 @@ public slots:
      *
      * Note, passing directories is not supported. Files only.
      */
-    void implicitlyHydrateFile(QString &relativepath);
+    void implicitlyHydrateFile (QString &relativepath);
 
     /** Adds the path to the local discovery list
      *
-     * A weaker version of slotNextSyncFullLocalDiscovery() that just
+     * A weaker version of slotNextSyncFullLocalDiscovery () that just
      * schedules all parent and child items of the path for local
      * discovery.
      */
-    void schedulePathForLocalDiscovery(QString &relativePath);
+    void schedulePathForLocalDiscovery (QString &relativePath);
 
     /** Ensures that the next sync performs a full local discovery. */
-    void slotNextSyncFullLocalDiscovery();
+    void slotNextSyncFullLocalDiscovery ();
 
 private slots:
-    void slotSyncStarted();
-    void slotSyncFinished(bool);
+    void slotSyncStarted ();
+    void slotSyncFinished (bool);
 
     /** Adds a error message that's not tied to a specific item.
      */
-    void slotSyncError(QString &message, ErrorCategory category = ErrorCategory::Normal);
+    void slotSyncError (QString &message, ErrorCategory category = ErrorCategory::Normal);
 
-    void slotAddErrorToGui(SyncFileItem::Status status, QString &errorMessage, QString &subject = {});
+    void slotAddErrorToGui (SyncFileItem::Status status, QString &errorMessage, QString &subject = {});
 
-    void slotTransmissionProgress(ProgressInfo &pi);
-    void slotItemCompleted(SyncFileItemPtr &);
+    void slotTransmissionProgress (ProgressInfo &pi);
+    void slotItemCompleted (SyncFileItemPtr &);
 
-    void slotRunEtagJob();
-    void etagRetrieved(QByteArray &, QDateTime &tp);
-    void etagRetrievedFromSyncEngine(QByteArray &, QDateTime &time);
+    void slotRunEtagJob ();
+    void etagRetrieved (QByteArray &, QDateTime &tp);
+    void etagRetrievedFromSyncEngine (QByteArray &, QDateTime &time);
 
-    void slotEmitFinishedDelayed();
+    void slotEmitFinishedDelayed ();
 
-    void slotNewBigFolderDiscovered(QString &, bool isExternal);
+    void slotNewBigFolderDiscovered (QString &, bool isExternal);
 
-    void slotLogPropagationStart();
+    void slotLogPropagationStart ();
 
     /** Adds this folder to the list of scheduled folders in the
      *  FolderMan.
      */
-    void slotScheduleThisFolder();
+    void slotScheduleThisFolder ();
 
     /** Adjust sync result based on conflict data from IssuesWidget.
      *
      * This is pretty awkward, but IssuesWidget just keeps better track
      * of conflicts across partial local discovery.
      */
-    void slotFolderConflicts(QString &folder, QStringList &conflictPaths);
+    void slotFolderConflicts (QString &folder, QStringList &conflictPaths);
 
     /** Warn users if they create a file or folder that is selective-sync excluded */
-    void warnOnNewExcludedItem(SyncJournalFileRecord &record, QStringRef &path);
+    void warnOnNewExcludedItem (SyncJournalFileRecord &record, QStringRef &path);
 
     /** Warn users about an unreliable folder watcher */
-    void slotWatcherUnreliable(QString &message);
+    void slotWatcherUnreliable (QString &message);
 
     /** Aborts any running sync and blocks it until hydration is finished.
      *
      * Hydration circumvents the regular SyncEngine and both mustn't be running
      * at the same time.
      */
-    void slotHydrationStarts();
+    void slotHydrationStarts ();
 
     /** Unblocks normal sync operation */
-    void slotHydrationDone();
+    void slotHydrationDone ();
 
 private:
-    void connectSyncRoot();
+    void connectSyncRoot ();
 
-    bool reloadExcludes();
+    bool reloadExcludes ();
 
-    void showSyncResultPopup();
+    void showSyncResultPopup ();
 
-    void checkLocalPath();
+    void checkLocalPath ();
 
-    void setSyncOptions();
+    void setSyncOptions ();
 
     enum LogStatus {
         LogStatusRemove,
@@ -429,12 +429,12 @@ private:
         LogStatusFileLocked
     };
 
-    void createGuiLog(QString &filename, LogStatus status, int count,
-        const QString &renameTarget = QString());
+    void createGuiLog (QString &filename, LogStatus status, int count,
+        const QString &renameTarget = QString ());
 
-    void startVfs();
+    void startVfs ();
 
-    void correctPlaceholderFiles();
+    void correctPlaceholderFiles ();
 
     AccountStatePtr _accountState;
     FolderDefinition _definition;
@@ -497,7 +497,7 @@ private:
     /**
      * Watches this folder's local directory for changes.
      *
-     * Created by registerFolderWatcher(), triggers slotWatchedPathChanged()
+     * Created by registerFolderWatcher (), triggers slotWatchedPathChanged ()
      */
     QScopedPointer<FolderWatcher> _folderWatcher;
 

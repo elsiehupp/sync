@@ -14,19 +14,19 @@
 
 namespace OCC {
 
-OcsNavigationAppsJob::OcsNavigationAppsJob(AccountPtr account)
-    : OcsJob(account) {
-    setPath("ocs/v2.php/core/navigation/apps");
-    connect(this, &OcsNavigationAppsJob::jobFinished, this, &OcsNavigationAppsJob::jobDone);
+OcsNavigationAppsJob::OcsNavigationAppsJob (AccountPtr account)
+    : OcsJob (account) {
+    setPath ("ocs/v2.php/core/navigation/apps");
+    connect (this, &OcsNavigationAppsJob::jobFinished, this, &OcsNavigationAppsJob::jobDone);
 }
 
-void OcsNavigationAppsJob::getNavigationApps() {
-    setVerb("GET");
-    addParam("absolute", "true");
-    start();
+void OcsNavigationAppsJob::getNavigationApps () {
+    setVerb ("GET");
+    addParam ("absolute", "true");
+    start ();
 }
 
-void OcsNavigationAppsJob::jobDone(QJsonDocument &reply, int statusCode) {
-    emit appsJobFinished(reply, statusCode);
+void OcsNavigationAppsJob::jobDone (QJsonDocument &reply, int statusCode) {
+    emit appsJobFinished (reply, statusCode);
 }
 }

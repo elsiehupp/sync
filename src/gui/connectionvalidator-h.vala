@@ -63,7 +63,7 @@ namespace OCC {
         Utilizes the UserInfo class to fetch the user and avatar image
   +-----------------------------------+
   |
-  +-> Client Side Encryption Checks --+ --reportResult()
+  +-> Client Side Encryption Checks --+ --reportResult ()
     \endcode
  */
 
@@ -71,7 +71,7 @@ class UserInfo;
 
 class ConnectionValidator : public QObject {
 public:
-    explicit ConnectionValidator(AccountStatePtr accountState, QObject *parent = nullptr);
+    explicit ConnectionValidator (AccountStatePtr accountState, QObject *parent = nullptr);
 
     enum Status {
         Undefined,
@@ -86,48 +86,48 @@ public:
         MaintenanceMode, // maintenance enabled in status.php
         Timeout // actually also used for other errors on the authed request
     };
-    Q_ENUM(Status);
+    Q_ENUM (Status);
 
     // How often should the Application ask this object to check for the connection?
     enum { DefaultCallingIntervalMsec = 62 * 1000 };
 
 public slots:
     /// Checks the server and the authentication.
-    void checkServerAndAuth();
-    void systemProxyLookupDone(QNetworkProxy &proxy);
+    void checkServerAndAuth ();
+    void systemProxyLookupDone (QNetworkProxy &proxy);
 
     /// Checks authentication only.
-    void checkAuthentication();
+    void checkAuthentication ();
 
 signals:
-    void connectionResult(ConnectionValidator::Status status, QStringList &errors);
+    void connectionResult (ConnectionValidator::Status status, QStringList &errors);
 
 protected slots:
-    void slotCheckServerAndAuth();
+    void slotCheckServerAndAuth ();
 
-    void slotStatusFound(QUrl &url, QJsonObject &info);
-    void slotNoStatusFound(QNetworkReply *reply);
-    void slotJobTimeout(QUrl &url);
+    void slotStatusFound (QUrl &url, QJsonObject &info);
+    void slotNoStatusFound (QNetworkReply *reply);
+    void slotJobTimeout (QUrl &url);
 
-    void slotAuthFailed(QNetworkReply *reply);
-    void slotAuthSuccess();
+    void slotAuthFailed (QNetworkReply *reply);
+    void slotAuthSuccess ();
 
-    void slotCapabilitiesRecieved(QJsonDocument &);
-    void slotUserFetched(UserInfo *userInfo);
+    void slotCapabilitiesRecieved (QJsonDocument &);
+    void slotUserFetched (UserInfo *userInfo);
 
 private:
 #ifndef TOKEN_AUTH_ONLY
-    void reportConnected();
+    void reportConnected ();
 #endif
-    void reportResult(Status status);
-    void checkServerCapabilities();
-    void fetchUser();
+    void reportResult (Status status);
+    void checkServerCapabilities ();
+    void fetchUser ();
 
     /** Sets the account's server version
      *
      * Returns false and reports ServerVersionMismatch for very old servers.
      */
-    bool setAndCheckServerVersion(QString &version);
+    bool setAndCheckServerVersion (QString &version);
 
     QStringList _errors;
     AccountStatePtr _accountState;

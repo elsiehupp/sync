@@ -44,10 +44,10 @@ struct OWNCLOUDSYNC_EXPORT ClearAt {
 class OWNCLOUDSYNC_EXPORT UserStatus {
     Q_GADGET
 
-    Q_PROPERTY(QString id MEMBER _id)
-    Q_PROPERTY(QString message MEMBER _message)
-    Q_PROPERTY(QString icon MEMBER _icon)
-    Q_PROPERTY(OnlineStatus state MEMBER _state)
+    Q_PROPERTY (QString id MEMBER _id)
+    Q_PROPERTY (QString message MEMBER _message)
+    Q_PROPERTY (QString icon MEMBER _icon)
+    Q_PROPERTY (OnlineStatus state MEMBER _state)
 
 public:
     enum class OnlineStatus : quint8 {
@@ -57,29 +57,29 @@ public:
         Offline,
         Invisible
     };
-    Q_ENUM(OnlineStatus);
+    Q_ENUM (OnlineStatus);
 
-    UserStatus();
+    UserStatus ();
 
-    UserStatus(QString &id, QString &message, QString &icon,
+    UserStatus (QString &id, QString &message, QString &icon,
         OnlineStatus state, bool messagePredefined, Optional<ClearAt> &clearAt = {});
 
-    Q_REQUIRED_RESULT QString id() const;
-    Q_REQUIRED_RESULT QString message() const;
-    Q_REQUIRED_RESULT QString icon() const;
-    Q_REQUIRED_RESULT OnlineStatus state() const;
-    Q_REQUIRED_RESULT Optional<ClearAt> clearAt() const;
+    Q_REQUIRED_RESULT QString id () const;
+    Q_REQUIRED_RESULT QString message () const;
+    Q_REQUIRED_RESULT QString icon () const;
+    Q_REQUIRED_RESULT OnlineStatus state () const;
+    Q_REQUIRED_RESULT Optional<ClearAt> clearAt () const;
 
-    void setId(QString &id);
-    void setMessage(QString &message);
-    void setState(OnlineStatus state);
-    void setIcon(QString &icon);
-    void setMessagePredefined(bool value);
-    void setClearAt(Optional<ClearAt> &dateTime);
+    void setId (QString &id);
+    void setMessage (QString &message);
+    void setState (OnlineStatus state);
+    void setIcon (QString &icon);
+    void setMessagePredefined (bool value);
+    void setClearAt (Optional<ClearAt> &dateTime);
 
-    Q_REQUIRED_RESULT bool messagePredefined() const;
+    Q_REQUIRED_RESULT bool messagePredefined () const;
 
-    Q_REQUIRED_RESULT QUrl stateIcon() const;
+    Q_REQUIRED_RESULT QUrl stateIcon () const;
 
 private:
     QString _id;
@@ -101,30 +101,30 @@ public:
         CouldNotSetUserStatus,
         CouldNotClearMessage
     };
-    Q_ENUM(Error)
+    Q_ENUM (Error)
 
-    explicit UserStatusConnector(QObject *parent = nullptr);
+    explicit UserStatusConnector (QObject *parent = nullptr);
 
-    ~UserStatusConnector() override;
+    ~UserStatusConnector () override;
 
-    virtual void fetchUserStatus() = 0;
+    virtual void fetchUserStatus () = 0;
 
-    virtual void fetchPredefinedStatuses() = 0;
+    virtual void fetchPredefinedStatuses () = 0;
 
-    virtual void setUserStatus(UserStatus &userStatus) = 0;
+    virtual void setUserStatus (UserStatus &userStatus) = 0;
 
-    virtual void clearMessage() = 0;
+    virtual void clearMessage () = 0;
 
-    virtual UserStatus userStatus() const = 0;
+    virtual UserStatus userStatus () const = 0;
 
 signals:
-    void userStatusFetched(UserStatus &userStatus);
-    void predefinedStatusesFetched(std::vector<UserStatus> &statuses);
-    void userStatusSet();
-    void messageCleared();
-    void error(Error error);
+    void userStatusFetched (UserStatus &userStatus);
+    void predefinedStatusesFetched (std::vector<UserStatus> &statuses);
+    void userStatusSet ();
+    void messageCleared ();
+    void error (Error error);
 };
 }
 
-Q_DECLARE_METATYPE(OCC::UserStatusConnector *)
-Q_DECLARE_METATYPE(OCC::UserStatus)
+Q_DECLARE_METATYPE (OCC::UserStatusConnector *)
+Q_DECLARE_METATYPE (OCC::UserStatus)

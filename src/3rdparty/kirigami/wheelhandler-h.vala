@@ -25,14 +25,14 @@ class KirigamiWheelEvent : public QObject {
      *
      * X coordinate of the mouse pointer
      */
-    Q_PROPERTY(qreal x READ x CONSTANT)
+    Q_PROPERTY (qreal x READ x CONSTANT)
 
     /**
      * y: real
      *
      * Y coordinate of the mouse pointer
      */
-    Q_PROPERTY(qreal y READ y CONSTANT)
+    Q_PROPERTY (qreal y READ y CONSTANT)
 
     /**
      * angleDelta: point
@@ -42,14 +42,14 @@ class KirigamiWheelEvent : public QObject {
      * A positive value indicates it was rotated up/right, negative, bottom/left
      * This value is more likely to be set in traditional mice.
      */
-    Q_PROPERTY(QPointF angleDelta READ angleDelta CONSTANT)
+    Q_PROPERTY (QPointF angleDelta READ angleDelta CONSTANT)
 
     /**
      * pixelDelta: point
      *
      * provides the delta in screen pixels available on high resolution trackpads
      */
-    Q_PROPERTY(QPointF pixelDelta READ pixelDelta CONSTANT)
+    Q_PROPERTY (QPointF pixelDelta READ pixelDelta CONSTANT)
 
     /**
      * buttons: int
@@ -57,7 +57,7 @@ class KirigamiWheelEvent : public QObject {
      * it contains an OR combination of the buttons that were pressed during the wheel, they can be:
      * Qt.LeftButton, Qt.MiddleButton, Qt.RightButton
      */
-    Q_PROPERTY(int buttons READ buttons CONSTANT)
+    Q_PROPERTY (int buttons READ buttons CONSTANT)
 
     /**
      * modifiers: int
@@ -68,7 +68,7 @@ class KirigamiWheelEvent : public QObject {
      * Qt.ShiftModifier
      * ...
      */
-    Q_PROPERTY(int modifiers READ modifiers CONSTANT)
+    Q_PROPERTY (int modifiers READ modifiers CONSTANT)
 
     /**
      * inverted: bool
@@ -76,7 +76,7 @@ class KirigamiWheelEvent : public QObject {
      * Whether the delta values are inverted
      * On some platformsthe returned delta are inverted, so positive values would mean bottom/left
      */
-    Q_PROPERTY(bool inverted READ inverted CONSTANT)
+    Q_PROPERTY (bool inverted READ inverted CONSTANT)
 
     /**
      * accepted: bool
@@ -101,23 +101,23 @@ class KirigamiWheelEvent : public QObject {
      * @endcode
      *
      */
-    Q_PROPERTY(bool accepted READ isAccepted WRITE setAccepted)
+    Q_PROPERTY (bool accepted READ isAccepted WRITE setAccepted)
 
 public:
-    KirigamiWheelEvent(QObject *parent = nullptr);
-    ~KirigamiWheelEvent() override;
+    KirigamiWheelEvent (QObject *parent = nullptr);
+    ~KirigamiWheelEvent () override;
 
-    void initializeFromEvent(QWheelEvent *event);
+    void initializeFromEvent (QWheelEvent *event);
 
-    qreal x() const;
-    qreal y() const;
-    QPointF angleDelta() const;
-    QPointF pixelDelta() const;
-    int buttons() const;
-    int modifiers() const;
-    bool inverted() const;
-    bool isAccepted();
-    void setAccepted(bool accepted);
+    qreal x () const;
+    qreal y () const;
+    QPointF angleDelta () const;
+    QPointF pixelDelta () const;
+    int buttons () const;
+    int modifiers () const;
+    bool inverted () const;
+    bool isAccepted ();
+    void setAccepted (bool accepted);
 
 private:
     qreal m_x = 0;
@@ -133,19 +133,19 @@ private:
 class GlobalWheelFilter : public QObject {
 
 public:
-    GlobalWheelFilter(QObject *parent = nullptr);
-    ~GlobalWheelFilter() override;
+    GlobalWheelFilter (QObject *parent = nullptr);
+    ~GlobalWheelFilter () override;
 
-    static GlobalWheelFilter *self();
+    static GlobalWheelFilter *self ();
 
-    void setItemHandlerAssociation(QQuickItem *item, WheelHandler *handler);
-    void removeItemHandlerAssociation(QQuickItem *item, WheelHandler *handler);
+    void setItemHandlerAssociation (QQuickItem *item, WheelHandler *handler);
+    void removeItemHandlerAssociation (QQuickItem *item, WheelHandler *handler);
 
 protected:
-    bool eventFilter(QObject *watched, QEvent *event) override;
+    bool eventFilter (QObject *watched, QEvent *event) override;
 
 private:
-    void manageWheel(QQuickItem *target, QWheelEvent *wheel);
+    void manageWheel (QQuickItem *target, QWheelEvent *wheel);
 
     QMultiHash<QQuickItem *, WheelHandler *> m_handlersForItem;
     KirigamiWheelEvent m_wheelEvent;
@@ -161,37 +161,37 @@ class WheelHandler : public QObject {
      * target: Item
      *
      * The target we want to manage wheel events.
-     * We will receive wheel() signals every time the user moves
+     * We will receive wheel () signals every time the user moves
      * the mouse wheel (or scrolls with the touchpad) on top
      * of that item.
      */
-    Q_PROPERTY(QQuickItem *target READ target WRITE setTarget NOTIFY targetChanged)
+    Q_PROPERTY (QQuickItem *target READ target WRITE setTarget NOTIFY targetChanged)
 
     /**
      * blockTargetWheel: bool
      *
      * If true, the target won't receive any wheel event at all (default true)
      */
-    Q_PROPERTY(bool blockTargetWheel MEMBER m_blockTargetWheel NOTIFY blockTargetWheelChanged)
+    Q_PROPERTY (bool blockTargetWheel MEMBER m_blockTargetWheel NOTIFY blockTargetWheelChanged)
 
     /**
      * scrollFlickableTarget: bool
      * If this property is true and the target is a Flickable, wheel events will cause the Flickable to scroll (default true)
      */
-    Q_PROPERTY(bool scrollFlickableTarget MEMBER m_scrollFlickableTarget NOTIFY scrollFlickableTargetChanged)
+    Q_PROPERTY (bool scrollFlickableTarget MEMBER m_scrollFlickableTarget NOTIFY scrollFlickableTargetChanged)
 
 public:
-    explicit WheelHandler(QObject *parent = nullptr);
-    ~WheelHandler() override;
+    explicit WheelHandler (QObject *parent = nullptr);
+    ~WheelHandler () override;
 
-    QQuickItem *target() const;
-    void setTarget(QQuickItem *target);
+    QQuickItem *target () const;
+    void setTarget (QQuickItem *target);
 
 Q_SIGNALS:
-    void targetChanged();
-    void blockTargetWheelChanged();
-    void scrollFlickableTargetChanged();
-    void wheel(KirigamiWheelEvent *wheel);
+    void targetChanged ();
+    void blockTargetWheelChanged ();
+    void scrollFlickableTargetChanged ();
+    void wheel (KirigamiWheelEvent *wheel);
 
 private:
     QPointer<QQuickItem> m_target;

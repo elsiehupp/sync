@@ -26,7 +26,7 @@ class QJsonObject;
 
 namespace OCC {
 
-Q_DECLARE_LOGGING_CATEGORY(lcSharing)
+Q_DECLARE_LOGGING_CATEGORY (lcSharing)
 
 class Sharee {
 public:
@@ -40,14 +40,14 @@ public:
         Room = 10
     };
 
-    explicit Sharee(QString shareWith,
+    explicit Sharee (QString shareWith,
         const QString displayName,
         const Type type);
 
-    QString format() const;
-    QString shareWith() const;
-    QString displayName() const;
-    Type type() const;
+    QString format () const;
+    QString shareWith () const;
+    QString displayName () const;
+    Type type () const;
 
 private:
     QString _shareWith;
@@ -62,27 +62,27 @@ public:
         GlobalSearch = 1
     };
 
-    explicit ShareeModel(AccountPtr &account, QString &type, QObject *parent = nullptr);
+    explicit ShareeModel (AccountPtr &account, QString &type, QObject *parent = nullptr);
 
     using ShareeSet = QVector<QSharedPointer<Sharee>>; // FIXME: make it a QSet<Sharee> when Sharee can be compared
-    void fetch(QString &search, ShareeSet &blacklist, LookupMode lookupMode);
-    int rowCount(QModelIndex &parent = QModelIndex()) const override;
-    QVariant data(QModelIndex &index, int role) const override;
+    void fetch (QString &search, ShareeSet &blacklist, LookupMode lookupMode);
+    int rowCount (QModelIndex &parent = QModelIndex ()) const override;
+    QVariant data (QModelIndex &index, int role) const override;
 
-    QSharedPointer<Sharee> getSharee(int at);
+    QSharedPointer<Sharee> getSharee (int at);
 
-    QString currentSearch() const { return _search; }
+    QString currentSearch () const { return _search; }
 
 signals:
-    void shareesReady();
-    void displayErrorMessage(int code, QString &);
+    void shareesReady ();
+    void displayErrorMessage (int code, QString &);
 
 private slots:
-    void shareesFetched(QJsonDocument &reply);
+    void shareesFetched (QJsonDocument &reply);
 
 private:
-    QSharedPointer<Sharee> parseSharee(QJsonObject &data);
-    void setNewSharees(QVector<QSharedPointer<Sharee>> &newSharees);
+    QSharedPointer<Sharee> parseSharee (QJsonObject &data);
+    void setNewSharees (QVector<QSharedPointer<Sharee>> &newSharees);
 
     AccountPtr _account;
     QString _search;
@@ -93,6 +93,6 @@ private:
 };
 }
 
-Q_DECLARE_METATYPE(QSharedPointer<OCC::Sharee>)
+Q_DECLARE_METATYPE (QSharedPointer<OCC::Sharee>)
 
 #endif //SHAREE_H

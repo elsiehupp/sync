@@ -16,16 +16,16 @@
 
 namespace OCC {
 
-QString UnifiedSearchResult::typeAsString(UnifiedSearchResult::Type type) {
+QString UnifiedSearchResult::typeAsString (UnifiedSearchResult::Type type) {
     QString result;
 
     switch (type) {
     case Default:
-        result = QStringLiteral("Default");
+        result = QStringLiteral ("Default");
         break;
 
     case FetchMoreTrigger:
-        result = QStringLiteral("FetchMoreTrigger");
+        result = QStringLiteral ("FetchMoreTrigger");
         break;
     }
     return result;

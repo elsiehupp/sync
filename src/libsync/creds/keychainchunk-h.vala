@@ -38,34 +38,34 @@ static constexpr int MaxChunks = 10;
  */
 class OWNCLOUDSYNC_EXPORT Job : public QObject {
 public:
-    Job(QObject *parent = nullptr);
+    Job (QObject *parent = nullptr);
 
-    ~Job() override;
+    ~Job () override;
 
-    QKeychain::Error error() const;
-    QString errorString() const;
+    QKeychain::Error error () const;
+    QString errorString () const;
 
-    QByteArray binaryData() const;
-    QString textData() const;
+    QByteArray binaryData () const;
+    QString textData () const;
 
-    bool insecureFallback() const;
+    bool insecureFallback () const;
 
 // If we use it but don't support insecure fallback, give us nice compilation errors ;p
-#if defined(KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
-    void setInsecureFallback(bool insecureFallback);
+#if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
+    void setInsecureFallback (bool insecureFallback);
 #endif
 
     /**
-     * @return Whether this job autodeletes itself once finished() has been emitted. Default is true.
-     * @see setAutoDelete()
+     * @return Whether this job autodeletes itself once finished () has been emitted. Default is true.
+     * @see setAutoDelete ()
      */
-    bool autoDelete() const;
+    bool autoDelete () const;
 
     /**
-     * Set whether this job should autodelete itself once finished() has been emitted.
-     * @see autoDelete()
+     * Set whether this job should autodelete itself once finished () has been emitted.
+     * @see autoDelete ()
      */
-    void setAutoDelete(bool autoDelete);
+    void setAutoDelete (bool autoDelete);
 
 protected:
     QString _serviceName;
@@ -87,30 +87,30 @@ protected:
 */
 class OWNCLOUDSYNC_EXPORT WriteJob : public KeychainChunk::Job {
 public:
-    WriteJob(Account *account, QString &key, QByteArray &data, QObject *parent = nullptr);
-    WriteJob(QString &key, QByteArray &data, QObject *parent = nullptr);
+    WriteJob (Account *account, QString &key, QByteArray &data, QObject *parent = nullptr);
+    WriteJob (QString &key, QByteArray &data, QObject *parent = nullptr);
 
     /**
      * Call this method to start the job (async).
-     * You should connect some slot to the finished() signal first.
+     * You should connect some slot to the finished () signal first.
      *
-     * @see QKeychain::Job::start()
+     * @see QKeychain::Job::start ()
      */
-    void start();
+    void start ();
 
     /**
      * Call this method to start the job synchronously.
-     * Awaits completion with no need to connect some slot to the finished() signal first.
+     * Awaits completion with no need to connect some slot to the finished () signal first.
      *
      * @return Returns true on succeess (QKeychain::NoError).
     */
-    bool exec();
+    bool exec ();
 
 signals:
-    void finished(KeychainChunk::WriteJob *incomingJob);
+    void finished (KeychainChunk::WriteJob *incomingJob);
 
 private slots:
-    void slotWriteJobDone(QKeychain::Job *incomingJob);
+    void slotWriteJobDone (QKeychain::Job *incomingJob);
 }; // class WriteJob
 
 /*
@@ -118,32 +118,32 @@ private slots:
 */
 class OWNCLOUDSYNC_EXPORT ReadJob : public KeychainChunk::Job {
 public:
-    ReadJob(Account *account, QString &key, bool keychainMigration, QObject *parent = nullptr);
-    ReadJob(QString &key, QObject *parent = nullptr);
+    ReadJob (Account *account, QString &key, bool keychainMigration, QObject *parent = nullptr);
+    ReadJob (QString &key, QObject *parent = nullptr);
 
     /**
      * Call this method to start the job (async).
-     * You should connect some slot to the finished() signal first.
+     * You should connect some slot to the finished () signal first.
      *
-     * @see QKeychain::Job::start()
+     * @see QKeychain::Job::start ()
      */
-    void start();
+    void start ();
 
     /**
      * Call this method to start the job synchronously.
-     * Awaits completion with no need to connect some slot to the finished() signal first.
+     * Awaits completion with no need to connect some slot to the finished () signal first.
      *
      * @return Returns true on succeess (QKeychain::NoError).
     */
-    bool exec();
+    bool exec ();
 
 signals:
-    void finished(KeychainChunk::ReadJob *incomingJob);
+    void finished (KeychainChunk::ReadJob *incomingJob);
 
 private slots:
-    void slotReadJobDone(QKeychain::Job *incomingJob);
+    void slotReadJobDone (QKeychain::Job *incomingJob);
 
-#if defined(Q_OS_UNIX) && !defined(Q_OS_MAC)
+#if defined (Q_OS_UNIX) && !defined (Q_OS_MAC)
 private:
     bool _retryOnKeyChainError = true; // true if we haven't done yet any reading from keychain
 #endif
@@ -154,30 +154,30 @@ private:
 */
 class OWNCLOUDSYNC_EXPORT DeleteJob : public KeychainChunk::Job {
 public:
-    DeleteJob(Account *account, QString &key, bool keychainMigration, QObject *parent = nullptr);
-    DeleteJob(QString &key, QObject *parent = nullptr);
+    DeleteJob (Account *account, QString &key, bool keychainMigration, QObject *parent = nullptr);
+    DeleteJob (QString &key, QObject *parent = nullptr);
 
     /**
      * Call this method to start the job (async).
-     * You should connect some slot to the finished() signal first.
+     * You should connect some slot to the finished () signal first.
      *
-     * @see QKeychain::Job::start()
+     * @see QKeychain::Job::start ()
      */
-    void start();
+    void start ();
 
     /**
      * Call this method to start the job synchronously.
-     * Awaits completion with no need to connect some slot to the finished() signal first.
+     * Awaits completion with no need to connect some slot to the finished () signal first.
      *
      * @return Returns true on succeess (QKeychain::NoError).
     */
-    bool exec();
+    bool exec ();
 
 signals:
-    void finished(KeychainChunk::DeleteJob *incomingJob);
+    void finished (KeychainChunk::DeleteJob *incomingJob);
 
 private slots:
-    void slotDeleteJobDone(QKeychain::Job *incomingJob);
+    void slotDeleteJobDone (QKeychain::Job *incomingJob);
 }; // class DeleteJob
 
 } // namespace KeychainChunk

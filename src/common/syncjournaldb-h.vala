@@ -34,60 +34,60 @@ class SyncJournalFileRecord;
  */
 class OCSYNC_EXPORT SyncJournalDb : public QObject {
 public:
-    explicit SyncJournalDb(QString &dbFilePath, QObject *parent = nullptr);
-    ~SyncJournalDb() override;
+    explicit SyncJournalDb (QString &dbFilePath, QObject *parent = nullptr);
+    ~SyncJournalDb () override;
 
     /// Create a journal path for a specific configuration
-    static QString makeDbName(QString &localPath,
+    static QString makeDbName (QString &localPath,
         const QUrl &remoteUrl,
         const QString &remotePath,
         const QString &user);
 
     /// Migrate a csync_journal to the new path, if necessary. Returns false on error
-    static bool maybeMigrateDb(QString &localPath, QString &absoluteJournalPath);
+    static bool maybeMigrateDb (QString &localPath, QString &absoluteJournalPath);
 
-    // To verify that the record could be found check with SyncJournalFileRecord::isValid()
-    bool getFileRecord(QString &filename, SyncJournalFileRecord *rec) { return getFileRecord(filename.toUtf8(), rec); }
-    bool getFileRecord(QByteArray &filename, SyncJournalFileRecord *rec);
-    bool getFileRecordByE2eMangledName(QString &mangledName, SyncJournalFileRecord *rec);
-    bool getFileRecordByInode(quint64 inode, SyncJournalFileRecord *rec);
-    bool getFileRecordsByFileId(QByteArray &fileId, std::function<void(SyncJournalFileRecord &)> &rowCallback);
-    bool getFilesBelowPath(QByteArray &path, std::function<void(SyncJournalFileRecord&)> &rowCallback);
-    bool listFilesInPath(QByteArray &path, std::function<void(SyncJournalFileRecord&)> &rowCallback);
-    Result<void, QString> setFileRecord(SyncJournalFileRecord &record);
+    // To verify that the record could be found check with SyncJournalFileRecord::isValid ()
+    bool getFileRecord (QString &filename, SyncJournalFileRecord *rec) { return getFileRecord (filename.toUtf8 (), rec); }
+    bool getFileRecord (QByteArray &filename, SyncJournalFileRecord *rec);
+    bool getFileRecordByE2eMangledName (QString &mangledName, SyncJournalFileRecord *rec);
+    bool getFileRecordByInode (quint64 inode, SyncJournalFileRecord *rec);
+    bool getFileRecordsByFileId (QByteArray &fileId, std::function<void (SyncJournalFileRecord &)> &rowCallback);
+    bool getFilesBelowPath (QByteArray &path, std::function<void (SyncJournalFileRecord&)> &rowCallback);
+    bool listFilesInPath (QByteArray &path, std::function<void (SyncJournalFileRecord&)> &rowCallback);
+    Result<void, QString> setFileRecord (SyncJournalFileRecord &record);
 
-    void keyValueStoreSet(QString &key, QVariant value);
-    qint64 keyValueStoreGetInt(QString &key, qint64 defaultValue);
-    void keyValueStoreDelete(QString &key);
+    void keyValueStoreSet (QString &key, QVariant value);
+    qint64 keyValueStoreGetInt (QString &key, qint64 defaultValue);
+    void keyValueStoreDelete (QString &key);
 
-    bool deleteFileRecord(QString &filename, bool recursively = false);
-    bool updateFileRecordChecksum(QString &filename,
+    bool deleteFileRecord (QString &filename, bool recursively = false);
+    bool updateFileRecordChecksum (QString &filename,
         const QByteArray &contentChecksum,
         const QByteArray &contentChecksumType);
-    bool updateLocalMetadata(QString &filename,
+    bool updateLocalMetadata (QString &filename,
         qint64 modtime, qint64 size, quint64 inode);
 
-    /// Return value for hasHydratedOrDehydratedFiles()
+    /// Return value for hasHydratedOrDehydratedFiles ()
     struct HasHydratedDehydrated {
         bool hasHydrated = false;
         bool hasDehydrated = false;
     };
 
     /** Returns whether the item or any subitems are dehydrated */
-    Optional<HasHydratedDehydrated> hasHydratedOrDehydratedFiles(QByteArray &filename);
+    Optional<HasHydratedDehydrated> hasHydratedOrDehydratedFiles (QByteArray &filename);
 
-    bool exists();
-    void walCheckpoint();
+    bool exists ();
+    void walCheckpoint ();
 
-    QString databaseFilePath() const;
+    QString databaseFilePath () const;
 
-    static qint64 getPHash(QByteArray &);
+    static qint64 getPHash (QByteArray &);
 
-    void setErrorBlacklistEntry(SyncJournalErrorBlacklistRecord &item);
-    void wipeErrorBlacklistEntry(QString &file);
-    void wipeErrorBlacklistCategory(SyncJournalErrorBlacklistRecord::Category category);
-    int wipeErrorBlacklist();
-    int errorBlackListEntryCount();
+    void setErrorBlacklistEntry (SyncJournalErrorBlacklistRecord &item);
+    void wipeErrorBlacklistEntry (QString &file);
+    void wipeErrorBlacklistCategory (SyncJournalErrorBlacklistRecord::Category category);
+    int wipeErrorBlacklist ();
+    int errorBlackListEntryCount ();
 
     struct DownloadInfo {
         QString _tmpfile;
@@ -108,7 +108,7 @@ public:
          * (As opposed to a small file transfer which is stored in the db so we can detect the case
          * when the upload succeeded, but the connection was dropped before we got the answer)
          */
-        bool isChunked() const { return _transferid != 0; }
+        bool isChunked () const { return _transferid != 0; }
     };
 
     struct PollInfo {
@@ -118,27 +118,27 @@ public:
         qint64 _fileSize;
     };
 
-    DownloadInfo getDownloadInfo(QString &file);
-    void setDownloadInfo(QString &file, DownloadInfo &i);
-    QVector<DownloadInfo> getAndDeleteStaleDownloadInfos(QSet<QString> &keep);
-    int downloadInfoCount();
+    DownloadInfo getDownloadInfo (QString &file);
+    void setDownloadInfo (QString &file, DownloadInfo &i);
+    QVector<DownloadInfo> getAndDeleteStaleDownloadInfos (QSet<QString> &keep);
+    int downloadInfoCount ();
 
-    UploadInfo getUploadInfo(QString &file);
-    void setUploadInfo(QString &file, UploadInfo &i);
+    UploadInfo getUploadInfo (QString &file);
+    void setUploadInfo (QString &file, UploadInfo &i);
     // Return the list of transfer ids that were removed.
-    QVector<uint> deleteStaleUploadInfos(QSet<QString> &keep);
+    QVector<uint> deleteStaleUploadInfos (QSet<QString> &keep);
 
-    SyncJournalErrorBlacklistRecord errorBlacklistEntry(QString &);
-    bool deleteStaleErrorBlacklistEntries(QSet<QString> &keep);
+    SyncJournalErrorBlacklistRecord errorBlacklistEntry (QString &);
+    bool deleteStaleErrorBlacklistEntries (QSet<QString> &keep);
 
     /// Delete flags table entries that have no metadata correspondent
-    void deleteStaleFlagsEntries();
+    void deleteStaleFlagsEntries ();
 
-    void avoidRenamesOnNextSync(QString &path) { avoidRenamesOnNextSync(path.toUtf8()); }
-    void avoidRenamesOnNextSync(QByteArray &path);
-    void setPollInfo(PollInfo &);
+    void avoidRenamesOnNextSync (QString &path) { avoidRenamesOnNextSync (path.toUtf8 ()); }
+    void avoidRenamesOnNextSync (QByteArray &path);
+    void setPollInfo (PollInfo &);
 
-    QVector<PollInfo> getPollInfos();
+    QVector<PollInfo> getPollInfos ();
 
     enum SelectiveSyncListType {
         /** The black list is the list of folders that are unselected in the selective sync dialog.
@@ -154,9 +154,9 @@ public:
         SelectiveSyncUndecidedList = 3
     };
     /* return the specified list from the database */
-    QStringList getSelectiveSyncList(SelectiveSyncListType type, bool *ok);
+    QStringList getSelectiveSyncList (SelectiveSyncListType type, bool *ok);
     /* Write the selective sync list (remove all other entries of that list */
-    void setSelectiveSyncList(SelectiveSyncListType type, QStringList &list);
+    void setSelectiveSyncList (SelectiveSyncListType type, QStringList &list);
 
     /**
      * Make sure that on the next sync fileName and its parents are discovered from the server.
@@ -171,29 +171,29 @@ public:
      * _csync_detect_update skip them), the _invalid_ marker will stay. And any
      * child items in the db will be ignored when reading a remote tree from the database.
      *
-     * Any setFileRecord() call to affected directories before the next sync run will be
+     * Any setFileRecord () call to affected directories before the next sync run will be
      * adjusted to retain the invalid etag via _etagStorageFilter.
      */
-    void schedulePathForRemoteDiscovery(QString &fileName) { schedulePathForRemoteDiscovery(fileName.toUtf8()); }
-    void schedulePathForRemoteDiscovery(QByteArray &fileName);
+    void schedulePathForRemoteDiscovery (QString &fileName) { schedulePathForRemoteDiscovery (fileName.toUtf8 ()); }
+    void schedulePathForRemoteDiscovery (QByteArray &fileName);
 
     /**
-     * Wipe _etagStorageFilter. Also done implicitly on close().
+     * Wipe _etagStorageFilter. Also done implicitly on close ().
      */
-    void clearEtagStorageFilter();
+    void clearEtagStorageFilter ();
 
     /**
      * Ensures full remote discovery happens on the next sync.
      *
-     * Equivalent to calling schedulePathForRemoteDiscovery() for all files.
+     * Equivalent to calling schedulePathForRemoteDiscovery () for all files.
      */
-    void forceRemoteDiscoveryNextSync();
+    void forceRemoteDiscoveryNextSync ();
 
     /* Because sqlite transactions are really slow, we encapsulate everything in big transactions
      * Commit will actually commit the transaction and create a new one.
      */
-    void commit(QString &context, bool startTrans = true);
-    void commitIfNeededAndStartNewTransaction(QString &context);
+    void commit (QString &context, bool startTrans = true);
+    void commitIfNeededAndStartNewTransaction (QString &context);
 
     /** Open the db if it isn't already.
      *
@@ -202,38 +202,38 @@ public:
      *
      * returns true if it could be openend or is currently opened.
      */
-    bool open();
+    bool open ();
 
     /** Returns whether the db is currently openend. */
-    bool isOpen();
+    bool isOpen ();
 
     /** Close the database */
-    void close();
+    void close ();
 
     /**
      * Returns the checksum type for an id.
      */
-    QByteArray getChecksumType(int checksumTypeId);
+    QByteArray getChecksumType (int checksumTypeId);
 
     /**
      * The data-fingerprint used to detect backup
      */
-    void setDataFingerprint(QByteArray &dataFingerprint);
-    QByteArray dataFingerprint();
+    void setDataFingerprint (QByteArray &dataFingerprint);
+    QByteArray dataFingerprint ();
 
     // Conflict record functions
 
     /// Store a new or updated record in the database
-    void setConflictRecord(ConflictRecord &record);
+    void setConflictRecord (ConflictRecord &record);
 
     /// Retrieve a conflict record by path of the file with the conflict tag
-    ConflictRecord conflictRecord(QByteArray &path);
+    ConflictRecord conflictRecord (QByteArray &path);
 
     /// Delete a conflict record by path of the file with the conflict tag
-    void deleteConflictRecord(QByteArray &path);
+    void deleteConflictRecord (QByteArray &path);
 
     /// Return all paths of files with a conflict tag in the name and records in the db
-    QByteArrayList conflictRecordPaths();
+    QByteArrayList conflictRecordPaths ();
 
     /** Find the base name for a conflict file name, using journal or name pattern
      *
@@ -241,14 +241,14 @@ public:
      *
      * Will return an empty string if it's not even a conflict file by pattern.
      */
-    QByteArray conflictFileBaseName(QByteArray &conflictName);
+    QByteArray conflictFileBaseName (QByteArray &conflictName);
 
     /**
      * Delete any file entry. This will force the next sync to re-sync everything as if it was new,
      * restoring everyfile on every remote. If a file is there both on the client and server side,
      * it will be a conflict that will be automatically resolved if the file is the same.
      */
-    void clearFileTable();
+    void clearFileTable ();
 
     /**
      * Set the 'ItemTypeVirtualFileDownload' to all the files that have the ItemTypeVirtualFile flag
@@ -256,15 +256,15 @@ public:
      *
      * The path "" marks everything.
      */
-    void markVirtualFileForDownloadRecursively(QByteArray &path);
+    void markVirtualFileForDownloadRecursively (QByteArray &path);
 
     /** Grouping for all functions relating to pin states,
      *
-     * Use internalPinStates() to get at them.
+     * Use internalPinStates () to get at them.
      */
     struct OCSYNC_EXPORT PinStateInterface {
-        PinStateInterface(PinStateInterface &) = delete;
-        PinStateInterface(PinStateInterface &&) = delete;
+        PinStateInterface (PinStateInterface &) = delete;
+        PinStateInterface (PinStateInterface &&) = delete;
 
         /**
          * Gets the PinState for the path without considering parents.
@@ -276,7 +276,7 @@ public:
          *
          * Returns none on db error.
          */
-        Optional<PinState> rawForPath(QByteArray &path);
+        Optional<PinState> rawForPath (QByteArray &path);
 
         /**
          * Gets the PinState for the path after inheriting from parents.
@@ -292,10 +292,10 @@ public:
          *
          * Returns none on db error.
          */
-        Optional<PinState> effectiveForPath(QByteArray &path);
+        Optional<PinState> effectiveForPath (QByteArray &path);
 
         /**
-         * Like effectiveForPath() but also considers subitem pin states.
+         * Like effectiveForPath () but also considers subitem pin states.
          *
          * If the path's pin state and all subitem's pin states are identical
          * then that pin state will be returned.
@@ -307,7 +307,7 @@ public:
          * It's valid to use the root path "".
          * Returns none on db error.
          */
-        Optional<PinState> effectiveForPathRecursive(QByteArray &path);
+        Optional<PinState> effectiveForPathRecursive (QByteArray &path);
 
         /**
          * Sets a path's pin state.
@@ -315,7 +315,7 @@ public:
          * The path should not have a trailing slash.
          * It's valid to use the root path "".
          */
-        void setForPath(QByteArray &path, PinState state);
+        void setForPath (QByteArray &path, PinState state);
 
         /**
          * Wipes pin states for a path and below.
@@ -324,7 +324,7 @@ public:
          * The path should not have a trailing slash.
          * The path "" wipes every entry.
          */
-        void wipeForPathAndBelow(QByteArray &path);
+        void wipeForPathAndBelow (QByteArray &path);
 
         /**
          * Returns list of all paths with their pin state as in the db.
@@ -332,7 +332,7 @@ public:
          * Returns nothing on db error.
          * Note that this will have an entry for "".
          */
-        Optional<QVector<QPair<QByteArray, PinState>>> rawList();
+        Optional<QVector<QPair<QByteArray, PinState>>> rawList ();
 
         SyncJournalDb *_db;
     };
@@ -341,9 +341,9 @@ public:
     /** Access to PinStates stored in the database.
      *
      * Important: Not all vfs plugins store the pin states in the database,
-     * prefer to use Vfs::pinState() etc.
+     * prefer to use Vfs::pinState () etc.
      */
-    PinStateInterface internalPinStates();
+    PinStateInterface internalPinStates ();
 
     /**
      * Only used for auto-test:
@@ -353,24 +353,24 @@ public:
     int autotestFailCounter = -1;
 
 private:
-    int getFileRecordCount();
-    bool updateDatabaseStructure();
-    bool updateMetadataTableStructure();
-    bool updateErrorBlacklistTableStructure();
-    bool sqlFail(QString &log, SqlQuery &query);
-    void commitInternal(QString &context, bool startTrans = true);
-    void startTransaction();
-    void commitTransaction();
-    QVector<QByteArray> tableColumns(QByteArray &table);
-    bool checkConnect();
+    int getFileRecordCount ();
+    bool updateDatabaseStructure ();
+    bool updateMetadataTableStructure ();
+    bool updateErrorBlacklistTableStructure ();
+    bool sqlFail (QString &log, SqlQuery &query);
+    void commitInternal (QString &context, bool startTrans = true);
+    void startTransaction ();
+    void commitTransaction ();
+    QVector<QByteArray> tableColumns (QByteArray &table);
+    bool checkConnect ();
 
     // Same as forceRemoteDiscoveryNextSync but without acquiring the lock
-    void forceRemoteDiscoveryNextSyncLocked();
+    void forceRemoteDiscoveryNextSyncLocked ();
 
     // Returns the integer id of the checksum type
     //
     // Returns 0 on failure and for empty checksum types.
-    int mapChecksumType(QByteArray &checksumType);
+    int mapChecksumType (QByteArray &checksumType);
 
     SqlDatabase _db;
     QString _dbFile;
@@ -381,14 +381,14 @@ private:
 
     /* Storing etags to these folders, or their parent folders, is filtered out.
      *
-     * When schedulePathForRemoteDiscovery() is called some etags to _invalid_ in the
+     * When schedulePathForRemoteDiscovery () is called some etags to _invalid_ in the
      * database. If this is done during a sync run, a later propagation job might
      * undo that by writing the correct etag to the database instead. This filter
      * will prevent this write and instead guarantee the _invalid_ etag stays in
      * place.
      *
-     * The list is cleared on close() (end of sync run) and explicitly with
-     * clearEtagStorageFilter() (start of sync run).
+     * The list is cleared on close () (end of sync run) and explicitly with
+     * clearEtagStorageFilter () (start of sync run).
      *
      * The contained paths have a trailing /.
      */
@@ -405,10 +405,10 @@ private:
 };
 
 bool OCSYNC_EXPORT
-operator==(SyncJournalDb::DownloadInfo &lhs,
+operator== (SyncJournalDb::DownloadInfo &lhs,
     const SyncJournalDb::DownloadInfo &rhs);
 bool OCSYNC_EXPORT
-operator==(SyncJournalDb::UploadInfo &lhs,
+operator== (SyncJournalDb::UploadInfo &lhs,
     const SyncJournalDb::UploadInfo &rhs);
 
 } // namespace OCC

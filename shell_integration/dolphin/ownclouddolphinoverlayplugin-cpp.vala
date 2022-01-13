@@ -25,77 +25,77 @@
 // #include <QTimer>
 
 class OwncloudDolphinPlugin : public KOverlayIconPlugin {
-    Q_PLUGIN_METADATA(IID "com.owncloud.ovarlayiconplugin" FILE "ownclouddolphinoverlayplugin.json")
+    Q_PLUGIN_METADATA (IID "com.owncloud.ovarlayiconplugin" FILE "ownclouddolphinoverlayplugin.json")
 
     using StatusMap = QHash<QByteArray, QByteArray>;
     StatusMap m_status;
 
 public:
 
-    OwncloudDolphinPlugin() {
-        auto helper = OwncloudDolphinPluginHelper::instance();
-        QObject::connect(helper, &OwncloudDolphinPluginHelper::commandRecieved,
+    OwncloudDolphinPlugin () {
+        auto helper = OwncloudDolphinPluginHelper::instance ();
+        QObject::connect (helper, &OwncloudDolphinPluginHelper::commandRecieved,
                          this, &OwncloudDolphinPlugin::slotCommandRecieved);
     }
 
-    QStringList getOverlays(QUrl& url) override {
-        auto helper = OwncloudDolphinPluginHelper::instance();
-        if (!helper->isConnected())
-            return QStringList();
-        if (!url.isLocalFile())
-            return QStringList();
-        QDir localPath(url.toLocalFile());
-        const QByteArray localFile = localPath.canonicalPath().toUtf8();
+    QStringList getOverlays (QUrl& url) override {
+        auto helper = OwncloudDolphinPluginHelper::instance ();
+        if (!helper->isConnected ())
+            return QStringList ();
+        if (!url.isLocalFile ())
+            return QStringList ();
+        QDir localPath (url.toLocalFile ());
+        const QByteArray localFile = localPath.canonicalPath ().toUtf8 ();
 
-        helper->sendCommand(QByteArray("RETRIEVE_FILE_STATUS:" + localFile + "\n"));
+        helper->sendCommand (QByteArray ("RETRIEVE_FILE_STATUS:" + localFile + "\n"));
 
-        StatusMap::iterator it = m_status.find(localFile);
-        if (it != m_status.constEnd()) {
-            return  overlaysForString(*it);
+        StatusMap::iterator it = m_status.find (localFile);
+        if (it != m_status.constEnd ()) {
+            return  overlaysForString (*it);
         }
-        return QStringList();
+        return QStringList ();
     }
 
 private:
-    QStringList overlaysForString(QByteArray &status) {
+    QStringList overlaysForString (QByteArray &status) {
         QStringList r;
-        if (status.startsWith("NOP"))
+        if (status.startsWith ("NOP"))
             return r;
 
-        if (status.startsWith("OK"))
+        if (status.startsWith ("OK"))
             r << "vcs-normal";
-        if (status.startsWith("SYNC") || status.startsWith("NEW"))
+        if (status.startsWith ("SYNC") || status.startsWith ("NEW"))
             r << "vcs-update-required";
-        if (status.startsWith("IGNORE") || status.startsWith("WARN"))
+        if (status.startsWith ("IGNORE") || status.startsWith ("WARN"))
             r << "vcs-locally-modified-unstaged";
-        if (status.startsWith("ERROR"))
+        if (status.startsWith ("ERROR"))
             r << "vcs-conflicting";
 
-        if (status.contains("+SWM"))
+        if (status.contains ("+SWM"))
             r << "document-share";
 
         return r;
     }
 
-    void slotCommandRecieved(QByteArray &line) {
+    void slotCommandRecieved (QByteArray &line) {
 
-        QList<QByteArray> tokens = line.split(':');
-        if (tokens.count() < 3)
+        QList<QByteArray> tokens = line.split (':');
+        if (tokens.count () < 3)
             return;
         if (tokens[0] != "STATUS" && tokens[0] != "BROADCAST")
             return;
-        if (tokens[2].isEmpty())
+        if (tokens[2].isEmpty ())
             return;
 
         // We can't use tokens[2] because the filename might contain ':'
-        int secondColon = line.indexOf(":", line.indexOf(":") + 1);
-        const QByteArray name = line.mid(secondColon + 1);
+        int secondColon = line.indexOf (":", line.indexOf (":") + 1);
+        const QByteArray name = line.mid (secondColon + 1);
         QByteArray &status = m_status[name]; // reference to the item in the hash
         if (status == tokens[1])
             return;
         status = tokens[1];
 
-        emit overlaysChanged(QUrl::fromLocalFile(QString::fromUtf8(name)), overlaysForString(status));
+        emit overlaysChanged (QUrl::fromLocalFile (QString::fromUtf8 (name)), overlaysForString (status));
     }
 };
 

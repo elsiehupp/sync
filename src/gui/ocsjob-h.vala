@@ -39,14 +39,14 @@ namespace OCC {
 class OcsJob : public AbstractNetworkJob {
 
 protected:
-    explicit OcsJob(AccountPtr account);
+    explicit OcsJob (AccountPtr account);
 
     /**
      * Set the verb for the job
      *
      * @param verb currently supported PUT POST DELETE
      */
-    void setVerb(QByteArray &verb);
+    void setVerb (QByteArray &verb);
 
     /**
      * Add a new parameter to the request.
@@ -55,7 +55,7 @@ protected:
      * @param name The name of the parameter
      * @param value The value of the parameter
      */
-    void addParam(QString &name, QString &value);
+    void addParam (QString &name, QString &value);
 
     /**
      * Set the post parameters
@@ -63,7 +63,7 @@ protected:
      * @param postParams list of pairs to add (urlEncoded) to the body of the
      * request
      */
-    void setPostParams(QList<QPair<QString, QString>> &postParams);
+    void setPostParams (QList<QPair<QString, QString>> &postParams);
 
     /**
      * List of expected statuscodes for this request
@@ -72,7 +72,7 @@ protected:
      *
      * @param code Accepted status code
      */
-    void addPassStatusCode(int code);
+    void addPassStatusCode (int code);
 
     /**
      * The base path for an OcsJob is always the same. But it could be the case that
@@ -80,7 +80,7 @@ protected:
      *
      * This function appends the common id. so <PATH>/<ID>
      */
-    void appendPath(QString &id);
+    void appendPath (QString &id);
 
 public:
     /**
@@ -91,21 +91,21 @@ public:
      * @param message The message that is set in the metadata
      * @return The statuscode of the OCS response
      */
-    static int getJsonReturnCode(QJsonDocument &json, QString &message);
+    static int getJsonReturnCode (QJsonDocument &json, QString &message);
 
     /**
      * @brief Adds header to the request e.g. "If-None-Match"
      * @param headerName a string with the header name
      * @param value a string with the value
      */
-    void addRawHeader(QByteArray &headerName, QByteArray &value);
+    void addRawHeader (QByteArray &headerName, QByteArray &value);
 
 protected slots:
 
     /**
      * Start the OCS request
      */
-    void start() override;
+    void start () override;
 
 signals:
 
@@ -114,7 +114,7 @@ signals:
      *
      * @param reply the reply
      */
-    void jobFinished(QJsonDocument reply, int statusCode);
+    void jobFinished (QJsonDocument reply, int statusCode);
 
     /**
      * The status code was not one of the expected (passing)
@@ -123,7 +123,7 @@ signals:
      * @param statusCode The actual status code
      * @param message The message provided by the server
      */
-    void ocsError(int statusCode, QString &message);
+    void ocsError (int statusCode, QString &message);
 
     /**
      * @brief etagResponseHeaderReceived - signal to report the ETag response header value
@@ -131,10 +131,10 @@ signals:
      * @param value - the ETag response header value
      * @param statusCode - the OCS status code: 100 (!) for success
      */
-    void etagResponseHeaderReceived(QByteArray &value, int statusCode);
+    void etagResponseHeaderReceived (QByteArray &value, int statusCode);
 
 private slots:
-    bool finished() override;
+    bool finished () override;
 
 private:
     QByteArray _verb;

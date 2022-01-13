@@ -28,23 +28,23 @@ namespace OCC {
  */
 class FolderWatcherPrivate : public QObject {
 public:
-    FolderWatcherPrivate() = default;
-    FolderWatcherPrivate(FolderWatcher *p, QString &path);
-    ~FolderWatcherPrivate() override;
+    FolderWatcherPrivate () = default;
+    FolderWatcherPrivate (FolderWatcher *p, QString &path);
+    ~FolderWatcherPrivate () override;
 
-    int testWatchCount() const { return _pathToWatch.size(); }
+    int testWatchCount () const { return _pathToWatch.size (); }
 
     /// On linux the watcher is ready when the ctor finished.
     bool _ready = true;
 
 protected slots:
-    void slotReceivedNotification(int fd);
-    void slotAddFolderRecursive(QString &path);
+    void slotReceivedNotification (int fd);
+    void slotAddFolderRecursive (QString &path);
 
 protected:
-    bool findFoldersBelow(QDir &dir, QStringList &fullList);
-    void inotifyRegisterPath(QString &path);
-    void removeFoldersBelow(QString &path);
+    bool findFoldersBelow (QDir &dir, QStringList &fullList);
+    void inotifyRegisterPath (QString &path);
+    void removeFoldersBelow (QString &path);
 
 private:
     FolderWatcher *_parent;

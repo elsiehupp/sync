@@ -32,13 +32,13 @@ static const char contentMd5HeaderC[] = "Content-MD5";
  */
 class PropagateLocalRemove : public PropagateItemJob {
 public:
-    PropagateLocalRemove(OwncloudPropagator *propagator, SyncFileItemPtr &item)
-        : PropagateItemJob(propagator, item) {
+    PropagateLocalRemove (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+        : PropagateItemJob (propagator, item) {
     }
-    void start() override;
+    void start () override;
 
 private:
-    bool removeRecursively(QString &path);
+    bool removeRecursively (QString &path);
     QString _error;
     bool _moveToTrash;
 };
@@ -49,11 +49,11 @@ private:
  */
 class PropagateLocalMkdir : public PropagateItemJob {
 public:
-    PropagateLocalMkdir(OwncloudPropagator *propagator, SyncFileItemPtr &item)
-        : PropagateItemJob(propagator, item)
-        , _deleteExistingFile(false) {
+    PropagateLocalMkdir (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+        : PropagateItemJob (propagator, item)
+        , _deleteExistingFile (false) {
     }
-    void start() override;
+    void start () override;
 
     /**
      * Whether an existing file with the same name may be deleted before
@@ -61,11 +61,11 @@ public:
      *
      * Default: false.
      */
-    void setDeleteExistingFile(bool enabled);
+    void setDeleteExistingFile (bool enabled);
 
 private:
-    void startLocalMkdir();
-    void startDemanglingName(QString &parentPath);
+    void startLocalMkdir ();
+    void startDemanglingName (QString &parentPath);
 
     bool _deleteExistingFile;
 };
@@ -76,10 +76,10 @@ private:
  */
 class PropagateLocalRename : public PropagateItemJob {
 public:
-    PropagateLocalRename(OwncloudPropagator *propagator, SyncFileItemPtr &item)
-        : PropagateItemJob(propagator, item) {
+    PropagateLocalRename (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+        : PropagateItemJob (propagator, item) {
     }
-    void start() override;
-    JobParallelism parallelism() override { return _item->isDirectory() ? WaitForFinished : FullParallelism; }
+    void start () override;
+    JobParallelism parallelism () override { return _item->isDirectory () ? WaitForFinished : FullParallelism; }
 };
 }

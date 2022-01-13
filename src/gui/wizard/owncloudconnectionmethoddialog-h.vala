@@ -28,8 +28,8 @@ namespace Ui {
 class OwncloudConnectionMethodDialog : public QDialog {
 
 public:
-    explicit OwncloudConnectionMethodDialog(QWidget *parent = nullptr);
-    ~OwncloudConnectionMethodDialog() override;
+    explicit OwncloudConnectionMethodDialog (QWidget *parent = nullptr);
+    ~OwncloudConnectionMethodDialog () override;
     enum {
         Closed = 0,
         No_TLS,
@@ -38,12 +38,12 @@ public:
     };
 
     // The URL that was tried
-    void setUrl(QUrl &);
+    void setUrl (QUrl &);
 
 public slots:
-    void returnNoTLS();
-    void returnClientSideTLS();
-    void returnBack();
+    void returnNoTLS ();
+    void returnClientSideTLS ();
+    void returnBack ();
 
 private:
     Ui::OwncloudConnectionMethodDialog *ui;

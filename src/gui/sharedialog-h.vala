@@ -35,42 +35,42 @@ class Share;
 class ShareDialog : public QDialog {
 
 public:
-    explicit ShareDialog(QPointer<AccountState> accountState,
+    explicit ShareDialog (QPointer<AccountState> accountState,
         const QString &sharePath,
         const QString &localPath,
         SharePermissions maxSharingPermissions,
         const QByteArray &numericFileId,
         ShareDialogStartPage startPage,
         QWidget *parent = nullptr);
-    ~ShareDialog() override;
+    ~ShareDialog () override;
 
 private slots:
-    void done(int r) override;
-    void slotPropfindReceived(QVariantMap &result);
-    void slotPropfindError();
-    void slotThumbnailFetched(int &statusCode, QByteArray &reply);
-    void slotAccountStateChanged(int state);
+    void done (int r) override;
+    void slotPropfindReceived (QVariantMap &result);
+    void slotPropfindError ();
+    void slotThumbnailFetched (int &statusCode, QByteArray &reply);
+    void slotAccountStateChanged (int state);
 
-    void slotSharesFetched(QList<QSharedPointer<Share>> &shares);
-    void slotAddLinkShareWidget(QSharedPointer<LinkShare> &linkShare);
-    void slotDeleteShare();
-    void slotCreateLinkShare();
-    void slotCreatePasswordForLinkShare(QString &password);
-    void slotCreatePasswordForLinkShareProcessed();
-    void slotLinkShareRequiresPassword();
-    void slotAdjustScrollWidgetSize();
+    void slotSharesFetched (QList<QSharedPointer<Share>> &shares);
+    void slotAddLinkShareWidget (QSharedPointer<LinkShare> &linkShare);
+    void slotDeleteShare ();
+    void slotCreateLinkShare ();
+    void slotCreatePasswordForLinkShare (QString &password);
+    void slotCreatePasswordForLinkShareProcessed ();
+    void slotLinkShareRequiresPassword ();
+    void slotAdjustScrollWidgetSize ();
 
 signals:
-    void toggleShareLinkAnimation(bool start);
-    void styleChanged();
+    void toggleShareLinkAnimation (bool start);
+    void styleChanged ();
 
 protected:
-    void changeEvent(QEvent *) override;
+    void changeEvent (QEvent *) override;
 
 private:
-    void showSharingUi();
-    ShareLinkWidget *addLinkShareWidget(QSharedPointer<LinkShare> &linkShare);
-    void initLinkShareWidget();
+    void showSharingUi ();
+    ShareLinkWidget *addLinkShareWidget (QSharedPointer<LinkShare> &linkShare);
+    void initLinkShareWidget ();
 
     Ui::ShareDialog *_ui;
 

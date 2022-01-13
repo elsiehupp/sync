@@ -32,14 +32,14 @@ struct UnifiedSearchResult {
         FetchMoreTrigger,
     };
 
-    static QString typeAsString(UnifiedSearchResult::Type type);
+    static QString typeAsString (UnifiedSearchResult::Type type);
 
     QString _title;
     QString _subline;
     QString _providerId;
     QString _providerName;
     bool _isRounded = false;
-    qint32 _order = std::numeric_limits<qint32>::max();
+    qint32 _order = std::numeric_limits<qint32>::max ();
     QUrl _resourceUrl;
     QString _icons;
     Type _type = Type::Default;

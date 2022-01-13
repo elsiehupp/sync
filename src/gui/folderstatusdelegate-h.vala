@@ -24,7 +24,7 @@ namespace OCC {
  */
 class FolderStatusDelegate : public QStyledItemDelegate {
 public:
-    FolderStatusDelegate();
+    FolderStatusDelegate ();
 
     enum datarole { FolderAliasRole = Qt::UserRole + 100,
         HeaderRole,
@@ -49,26 +49,26 @@ public:
         DataRoleCount
 
     };
-    void paint(QPainter *, QStyleOptionViewItem &, QModelIndex &) const override;
-    QSize sizeHint(QStyleOptionViewItem &, QModelIndex &) const override;
-    bool editorEvent(QEvent *event, QAbstractItemModel *model, QStyleOptionViewItem &option,
+    void paint (QPainter *, QStyleOptionViewItem &, QModelIndex &) const override;
+    QSize sizeHint (QStyleOptionViewItem &, QModelIndex &) const override;
+    bool editorEvent (QEvent *event, QAbstractItemModel *model, QStyleOptionViewItem &option,
         const QModelIndex &index) override;
 
     /**
      * return the position of the option button within the item
      */
-    static QRect optionsButtonRect(QRect within, Qt::LayoutDirection direction);
-    static QRect addButtonRect(QRect within, Qt::LayoutDirection direction);
-    static QRect errorsListRect(QRect within);
-    static int rootFolderHeightWithoutErrors(QFontMetrics &fm, QFontMetrics &aliasFm);
+    static QRect optionsButtonRect (QRect within, Qt::LayoutDirection direction);
+    static QRect addButtonRect (QRect within, Qt::LayoutDirection direction);
+    static QRect errorsListRect (QRect within);
+    static int rootFolderHeightWithoutErrors (QFontMetrics &fm, QFontMetrics &aliasFm);
 
 public slots:
-    void slotStyleChanged();
+    void slotStyleChanged ();
 
 private:
-    void customizeStyle();
+    void customizeStyle ();
 
-    static QString addFolderText();
+    static QString addFolderText ();
     QPersistentModelIndex _pressedIndex;
 
     QIcon _iconMore;

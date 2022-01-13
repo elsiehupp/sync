@@ -9,26 +9,26 @@ class WebView;
 
 class WebViewPage : public AbstractCredentialsWizardPage {
 public:
-    WebViewPage(QWidget *parent = nullptr);
-    ~WebViewPage() override;
+    WebViewPage (QWidget *parent = nullptr);
+    ~WebViewPage () override;
 
-    void initializePage() override;
-    void cleanupPage() override;
-    int nextId() const override;
-    bool isComplete() const override;
+    void initializePage () override;
+    void cleanupPage () override;
+    int nextId () const override;
+    bool isComplete () const override;
 
-    AbstractCredentials* getCredentials() const override;
-    void setConnected();
+    AbstractCredentials* getCredentials () const override;
+    void setConnected ();
 
 signals:
-    void connectToOCUrl(QString&);
+    void connectToOCUrl (QString&);
 
 private slots:
-    void urlCatched(QString user, QString pass, QString host);
+    void urlCatched (QString user, QString pass, QString host);
 
 private:
-    void resizeWizard();
-    bool tryToSetWizardSize(int width, int height);
+    void resizeWizard ();
+    bool tryToSetWizardSize (int width, int height);
 
     OwncloudWizard *_ocWizard;
     WebView *_webView;

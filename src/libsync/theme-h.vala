@@ -31,34 +31,34 @@ class SyncResult;
  * @ingroup libsync
  */
 class OWNCLOUDSYNC_EXPORT Theme : public QObject {
-    Q_PROPERTY(bool branded READ isBranded CONSTANT)
-    Q_PROPERTY(QString appNameGUI READ appNameGUI CONSTANT)
-    Q_PROPERTY(QString appName READ appName CONSTANT)
-    Q_PROPERTY(QUrl stateOnlineImageSource READ stateOnlineImageSource CONSTANT)
-    Q_PROPERTY(QUrl stateOfflineImageSource READ stateOfflineImageSource CONSTANT)
-    Q_PROPERTY(QUrl statusOnlineImageSource READ statusOnlineImageSource CONSTANT)
-    Q_PROPERTY(QUrl statusDoNotDisturbImageSource READ statusDoNotDisturbImageSource CONSTANT)
-    Q_PROPERTY(QUrl statusAwayImageSource READ statusAwayImageSource CONSTANT)
-    Q_PROPERTY(QUrl statusInvisibleImageSource READ statusInvisibleImageSource CONSTANT)
+    Q_PROPERTY (bool branded READ isBranded CONSTANT)
+    Q_PROPERTY (QString appNameGUI READ appNameGUI CONSTANT)
+    Q_PROPERTY (QString appName READ appName CONSTANT)
+    Q_PROPERTY (QUrl stateOnlineImageSource READ stateOnlineImageSource CONSTANT)
+    Q_PROPERTY (QUrl stateOfflineImageSource READ stateOfflineImageSource CONSTANT)
+    Q_PROPERTY (QUrl statusOnlineImageSource READ statusOnlineImageSource CONSTANT)
+    Q_PROPERTY (QUrl statusDoNotDisturbImageSource READ statusDoNotDisturbImageSource CONSTANT)
+    Q_PROPERTY (QUrl statusAwayImageSource READ statusAwayImageSource CONSTANT)
+    Q_PROPERTY (QUrl statusInvisibleImageSource READ statusInvisibleImageSource CONSTANT)
 #ifndef TOKEN_AUTH_ONLY
-    Q_PROPERTY(QIcon folderDisabledIcon READ folderDisabledIcon CONSTANT)
-    Q_PROPERTY(QIcon folderOfflineIcon READ folderOfflineIcon CONSTANT)
-    Q_PROPERTY(QIcon applicationIcon READ applicationIcon CONSTANT)
+    Q_PROPERTY (QIcon folderDisabledIcon READ folderDisabledIcon CONSTANT)
+    Q_PROPERTY (QIcon folderOfflineIcon READ folderOfflineIcon CONSTANT)
+    Q_PROPERTY (QIcon applicationIcon READ applicationIcon CONSTANT)
 #endif
-    Q_PROPERTY(QString version READ version CONSTANT)
-    Q_PROPERTY(QString helpUrl READ helpUrl CONSTANT)
-    Q_PROPERTY(QString conflictHelpUrl READ conflictHelpUrl CONSTANT)
-    Q_PROPERTY(QString overrideServerUrl READ overrideServerUrl)
-    Q_PROPERTY(bool forceOverrideServerUrl READ forceOverrideServerUrl)
+    Q_PROPERTY (QString version READ version CONSTANT)
+    Q_PROPERTY (QString helpUrl READ helpUrl CONSTANT)
+    Q_PROPERTY (QString conflictHelpUrl READ conflictHelpUrl CONSTANT)
+    Q_PROPERTY (QString overrideServerUrl READ overrideServerUrl)
+    Q_PROPERTY (bool forceOverrideServerUrl READ forceOverrideServerUrl)
 #ifndef TOKEN_AUTH_ONLY
-    Q_PROPERTY(QColor wizardHeaderTitleColor READ wizardHeaderTitleColor CONSTANT)
-    Q_PROPERTY(QColor wizardHeaderBackgroundColor READ wizardHeaderBackgroundColor CONSTANT)
+    Q_PROPERTY (QColor wizardHeaderTitleColor READ wizardHeaderTitleColor CONSTANT)
+    Q_PROPERTY (QColor wizardHeaderBackgroundColor READ wizardHeaderBackgroundColor CONSTANT)
 #endif
-    Q_PROPERTY(QString updateCheckUrl READ updateCheckUrl CONSTANT)
+    Q_PROPERTY (QString updateCheckUrl READ updateCheckUrl CONSTANT)
 
-    Q_PROPERTY(QColor errorBoxTextColor READ errorBoxTextColor CONSTANT)
-    Q_PROPERTY(QColor errorBoxBackgroundColor READ errorBoxBackgroundColor CONSTANT)
-    Q_PROPERTY(QColor errorBoxBorderColor READ errorBoxBorderColor CONSTANT)
+    Q_PROPERTY (QColor errorBoxTextColor READ errorBoxTextColor CONSTANT)
+    Q_PROPERTY (QColor errorBoxBackgroundColor READ errorBoxBackgroundColor CONSTANT)
+    Q_PROPERTY (QColor errorBoxBorderColor READ errorBoxBorderColor CONSTANT)
 public:
     enum CustomMediaType {
         oCSetupTop, // ownCloud connect page
@@ -68,9 +68,9 @@ public:
     };
 
     /* returns a singleton instance. */
-    static Theme *instance();
+    static Theme *instance ();
 
-    ~Theme() override;
+    ~Theme () override;
 
     /**
      * @brief isBranded indicates if the current application is branded
@@ -80,7 +80,7 @@ public:
      *
      * @return true if branded, false otherwise
      */
-    virtual bool isBranded() const;
+    virtual bool isBranded () const;
 
     /**
      * @brief appNameGUI - Human readable application name.
@@ -93,7 +93,7 @@ public:
      *
      * @return QString with human readable app name.
      */
-    virtual QString appNameGUI() const;
+    virtual QString appNameGUI () const;
 
     /**
      * @brief appName - Application name (short)
@@ -107,95 +107,95 @@ public:
      * reimplementable for legacy reasons.
      *
      * Warning: Do not modify this value, as many things, e.g. settings
-     * depend on it! You most likely want to modify \ref appNameGUI().
+     * depend on it! You most likely want to modify \ref appNameGUI ().
      *
      * @return QString with app name.
      */
-    virtual QString appName() const;
+    virtual QString appName () const;
 
     /**
      * @brief Returns full path to an online state icon
      * @return QUrl full path to an icon
      */
-    QUrl stateOnlineImageSource() const;
+    QUrl stateOnlineImageSource () const;
 
     /**
      * @brief Returns full path to an offline state icon
      * @return QUrl full path to an icon
      */
-    QUrl stateOfflineImageSource() const;
+    QUrl stateOfflineImageSource () const;
 
     /**
      * @brief Returns full path to an online user status icon
      * @return QUrl full path to an icon
      */
-    QUrl statusOnlineImageSource() const;
+    QUrl statusOnlineImageSource () const;
 
     /**
      * @brief Returns full path to an do not disturb user status icon
      * @return QUrl full path to an icon
      */
-    QUrl statusDoNotDisturbImageSource() const;
+    QUrl statusDoNotDisturbImageSource () const;
 
     /**
      * @brief Returns full path to an away user status icon
      * @return QUrl full path to an icon
      */
-    QUrl statusAwayImageSource() const;
+    QUrl statusAwayImageSource () const;
 
     /**
      * @brief Returns full path to an invisible user status icon
      * @return QUrl full path to an icon
      */
-    QUrl statusInvisibleImageSource() const;
+    QUrl statusInvisibleImageSource () const;
 
-    QUrl syncStatusOk() const;
+    QUrl syncStatusOk () const;
 
-    QUrl syncStatusError() const;
+    QUrl syncStatusError () const;
 
-    QUrl syncStatusRunning() const;
+    QUrl syncStatusRunning () const;
 
-    QUrl syncStatusPause() const;
+    QUrl syncStatusPause () const;
 
-    QUrl syncStatusWarning() const;
+    QUrl syncStatusWarning () const;
 
-    QUrl folderOffline() const;
+    QUrl folderOffline () const;
 
     /**
      * @brief configFileName
      * @return the name of the config file.
      */
-    virtual QString configFileName() const;
+    virtual QString configFileName () const;
 
 #ifndef TOKEN_AUTH_ONLY
-    static QString hidpiFileName(QString &fileName, QPaintDevice *dev = nullptr);
+    static QString hidpiFileName (QString &fileName, QPaintDevice *dev = nullptr);
 
-    static QString hidpiFileName(QString &iconName, QColor &backgroundColor, QPaintDevice *dev = nullptr);
+    static QString hidpiFileName (QString &iconName, QColor &backgroundColor, QPaintDevice *dev = nullptr);
 
-    static bool isHidpi(QPaintDevice *dev = nullptr);
+    static bool isHidpi (QPaintDevice *dev = nullptr);
 
     /**
       * get an sync state icon
       */
-    virtual QIcon syncStateIcon(SyncResult::Status, bool sysTray = false) const;
+    virtual QIcon syncStateIcon (SyncResult::Status, bool sysTray = false) const;
 
-    virtual QIcon folderDisabledIcon() const;
-    virtual QIcon folderOfflineIcon(bool sysTray = false) const;
-    virtual QIcon applicationIcon() const;
+    virtual QIcon folderDisabledIcon () const;
+    virtual QIcon folderOfflineIcon (bool sysTray = false) const;
+    virtual QIcon applicationIcon () const;
 #endif
 
-    virtual QString statusHeaderText(SyncResult::Status) const;
-    virtual QString version() const;
+    virtual QString statusHeaderText (SyncResult::Status) const;
+    virtual QString version () const;
 
     /**
      * Characteristics: bool if more than one sync folder is allowed
      */
-    virtual bool singleSyncFolder() const;
+    virtual bool singleSyncFolder () const;
 
     /**
      * When true, client works with multiple accounts.
      */
-    virtual bool multiAccount() const;
+    virtual bool multiAccount () const;
 
     /**
     * URL to documentation.
@@ -207,71 +207,71 @@ public:
     *
     * Defaults to Nextclouds client documentation website.
     */
-    virtual QString helpUrl() const;
+    virtual QString helpUrl () const;
 
     /**
      * The url to use for showing help on conflicts.
      *
      * If the function is overridden to return an empty string no help link will be shown.
      *
-     * Defaults to helpUrl() + "conflicts.html", which is a page in ownCloud's client
-     * documentation website. If helpUrl() is empty, this function will also return the
+     * Defaults to helpUrl () + "conflicts.html", which is a page in ownCloud's client
+     * documentation website. If helpUrl () is empty, this function will also return the
      * empty string.
      */
-    virtual QString conflictHelpUrl() const;
+    virtual QString conflictHelpUrl () const;
 
     /**
      * Setting a value here will pre-define the server url.
      *
-     * The respective UI controls will be disabled only if forceOverrideServerUrl() is true
+     * The respective UI controls will be disabled only if forceOverrideServerUrl () is true
      */
-    virtual QString overrideServerUrl() const;
+    virtual QString overrideServerUrl () const;
 
     /**
      * Enforce a pre-defined server url.
      *
      * When true, the respective UI controls will be disabled
      */
-    virtual bool forceOverrideServerUrl() const;
+    virtual bool forceOverrideServerUrl () const;
 
     /**
      * Enable OCSP stapling for SSL handshakes
      *
      * When true, peer will be requested for Online Certificate Status Protocol response
      */
-    virtual bool enableStaplingOCSP() const;
+    virtual bool enableStaplingOCSP () const;
 
     /**
      * Enforce SSL validity
      *
      * When true, trusting the untrusted certificate is not allowed
      */
-    virtual bool forbidBadSSL() const;
+    virtual bool forbidBadSSL () const;
 
     /**
      * This is only usefull when previous version had a different overrideServerUrl
      * with a different auth type in that case You should then specify "http" or "shibboleth".
      * Normaly this should be left empty.
      */
-    virtual QString forceConfigAuthType() const;
+    virtual QString forceConfigAuthType () const;
 
     /**
      * The default folder name without path on the server at setup time.
      */
-    virtual QString defaultServerFolder() const;
+    virtual QString defaultServerFolder () const;
 
     /**
      * The default folder name without path on the client side at setup time.
      */
-    virtual QString defaultClientFolder() const;
+    virtual QString defaultClientFolder () const;
 
     /**
      * Override to encforce a particular locale, i.e. "de" or "pt_BR"
      */
-    virtual QString enforcedLocale() const { return QString(); }
+    virtual QString enforcedLocale () const { return QString (); }
 
     /** colored, white or black */
-    QString systrayIconFlavor(bool mono) const;
+    QString systrayIconFlavor (bool mono) const;
 
 #ifndef TOKEN_AUTH_ONLY
     /**
@@ -279,102 +279,102 @@ public:
      * The default implementation will try to look up
      * :/client/theme/<type>.png
      */
-    virtual QVariant customMedia(CustomMediaType type);
+    virtual QVariant customMedia (CustomMediaType type);
 
     /** @return color for the setup wizard */
-    virtual QColor wizardHeaderTitleColor() const;
+    virtual QColor wizardHeaderTitleColor () const;
 
     /** @return color for the setup wizard. */
-    virtual QColor wizardHeaderBackgroundColor() const;
+    virtual QColor wizardHeaderBackgroundColor () const;
 
-    virtual QPixmap wizardApplicationLogo() const;
+    virtual QPixmap wizardApplicationLogo () const;
 
     /** @return logo for the setup wizard. */
-    virtual QPixmap wizardHeaderLogo() const;
+    virtual QPixmap wizardHeaderLogo () const;
 
     /**
      * The default implementation creates a
      * background based on
-     * \ref wizardHeaderTitleColor().
+     * \ref wizardHeaderTitleColor ().
      *
      * @return banner for the setup wizard.
      */
-    virtual QPixmap wizardHeaderBanner() const;
+    virtual QPixmap wizardHeaderBanner () const;
 #endif
 
     /**
      * The SHA sum of the released git commit
      */
-    QString gitSHA1() const;
+    QString gitSHA1 () const;
 
     /**
      * About dialog contents
      */
-    virtual QString about() const;
+    virtual QString about () const;
 
     /**
      * Legal notice dialog version detail contents
      */
-    virtual QString aboutDetails() const;
+    virtual QString aboutDetails () const;
 
     /**
      * Define if the systray icons should be using mono design
      */
-    void setSystrayUseMonoIcons(bool mono);
+    void setSystrayUseMonoIcons (bool mono);
 
     /**
      * Retrieve wether to use mono icons for systray
      */
-    bool systrayUseMonoIcons() const;
+    bool systrayUseMonoIcons () const;
 
     /**
      * Check if mono icons are available
      */
-    bool monoIconsAvailable() const;
+    bool monoIconsAvailable () const;
 
     /**
      * @brief Where to check for new Updates.
      */
-    virtual QString updateCheckUrl() const;
+    virtual QString updateCheckUrl () const;
 
     /**
      * When true, the setup wizard will show the selective sync dialog by default and default
      * to nothing selected
      */
-    virtual bool wizardSelectiveSyncDefaultNothing() const;
+    virtual bool wizardSelectiveSyncDefaultNothing () const;
 
     /**
      * Default option for the newBigFolderSizeLimit.
      * Size in MB of the maximum size of folder before we ask the confirmation.
      * Set -1 to never ask confirmation.  0 to ask confirmation for every folder.
      **/
-    virtual qint64 newBigFolderSizeLimit() const;
+    virtual qint64 newBigFolderSizeLimit () const;
 
     /**
      * Hide the checkbox that says "Ask for confirmation before synchronizing folders larger than X MB"
      * in the account wizard
      */
-    virtual bool wizardHideFolderSizeLimitCheckbox() const;
+    virtual bool wizardHideFolderSizeLimitCheckbox () const;
     /**
      * Hide the checkbox that says "Ask for confirmation before synchronizing external storages"
      * in the account wizard
      */
-    virtual bool wizardHideExternalStorageConfirmationCheckbox() const;
+    virtual bool wizardHideExternalStorageConfirmationCheckbox () const;
 
     /**
      * @brief Sharing options
      *
      * Allow link sharing and or user/group sharing
      */
-    virtual bool linkSharing() const;
-    virtual bool userGroupSharing() const;
+    virtual bool linkSharing () const;
+    virtual bool userGroupSharing () const;
 
     /**
      * If this returns true, the user cannot configure the proxy in the network settings.
      * The proxy settings will be disabled in the configuration dialog.
      * Default returns false.
      */
-    virtual bool forceSystemNetworkProxy() const;
+    virtual bool forceSystemNetworkProxy () const;
 
     /**
      * @brief How to handle the userID
@@ -391,7 +391,7 @@ public:
      *
      *  @return UserIDType::UserIDUserName, unless reimplemented
      */
-    virtual UserIDType userIDType() const;
+    virtual UserIDType userIDType () const;
 
     /**
      * @brief Allows to customize the type of user ID (e.g. user name, email)
@@ -401,7 +401,7 @@ public:
      *
      * @return An empty string, unless reimplemented
      */
-    virtual QString customUserID() const;
+    virtual QString customUserID () const;
 
     /**
      * @brief Demo string to be displayed when no text has been
@@ -409,7 +409,7 @@ public:
      *
      * @return An empty string, unless reimplemented
      */
-    virtual QString userIDHint() const;
+    virtual QString userIDHint () const;
 
     /**
      * @brief Postfix that will be enforced in a URL. e.g.
@@ -417,14 +417,14 @@ public:
      *
      * @return An empty string, unless reimplemented
      */
-    virtual QString wizardUrlPostfix() const;
+    virtual QString wizardUrlPostfix () const;
 
     /**
      * @brief String that will be shown as long as no text has been entered by the user.
      *
      * @return An empty string, unless reimplemented
      */
-    virtual QString wizardUrlHint() const;
+    virtual QString wizardUrlHint () const;
 
     /**
      * @brief the server folder that should be queried for the quota information
@@ -435,22 +435,22 @@ public:
      *
      * Defaults: "/"
      */
-    virtual QString quotaBaseFolder() const;
+    virtual QString quotaBaseFolder () const;
 
     /**
      * The OAuth client_id, secret pair.
      * Note that client that change these value cannot connect to un-branded owncloud servers.
      */
-    virtual QString oauthClientId() const;
-    virtual QString oauthClientSecret() const;
+    virtual QString oauthClientId () const;
+    virtual QString oauthClientSecret () const;
 
     /**
      * @brief What should be output for the --version command line switch.
      *
-     * By default, it's a combination of appName(), version(), the GIT SHA1 and some
+     * By default, it's a combination of appName (), version (), the GIT SHA1 and some
      * important dependency versions.
      */
-    virtual QString versionSwitchOutput() const;
+    virtual QString versionSwitchOutput () const;
 	
 	/**
     * @brief Request suitable QIcon resource depending on the background colour of the parent widget.
@@ -458,7 +458,7 @@ public:
     * This should be replaced (TODO) by a real theming implementation for the client UI
     * (actually 2019/09/13 only systray theming).
     */
-	virtual QIcon uiThemeIcon(QString &iconName, bool uiHasDarkBg) const;
+	virtual QIcon uiThemeIcon (QString &iconName, bool uiHasDarkBg) const;
 
     /**
      * @brief Perform a calculation to check if a colour is dark or light and accounts for different sensitivity of the human eye.
@@ -467,7 +467,7 @@ public:
      *
      * 2019/12/08: Moved here from SettingsDialog.
      */
-    static bool isDarkColor(QColor &color);
+    static bool isDarkColor (QColor &color);
 
     /**
      * @brief Return the colour to be used for HTML links (e.g. used in QLabel), based on the current app palette or given colour (Dark-/Light-Mode switching).
@@ -476,7 +476,7 @@ public:
      *
      * 2019/12/08: Implemented for the Dark Mode on macOS, because the app palette can not account for that (Qt 5.12.5).
      */
-    static QColor getBackgroundAwareLinkColor(QColor &backgroundColor);
+    static QColor getBackgroundAwareLinkColor (QColor &backgroundColor);
 
     /**
      * @brief Return the colour to be used for HTML links (e.g. used in QLabel), based on the current app palette (Dark-/Light-Mode switching).
@@ -485,7 +485,7 @@ public:
      *
      * 2019/12/08: Implemented for the Dark Mode on macOS, because the app palette can not account for that (Qt 5.12.5).
      */
-    static QColor getBackgroundAwareLinkColor();
+    static QColor getBackgroundAwareLinkColor ();
 
     /**
      * @brief Appends a CSS-style colour value to all HTML link tags in a given string, based on the current app palette or given colour (Dark-/Light-Mode switching).
@@ -494,7 +494,7 @@ public:
      *
      * This way we also avoid having certain strings re-translated on Transifex.
      */
-    static void replaceLinkColorStringBackgroundAware(QString &linkString, QColor &backgroundColor);
+    static void replaceLinkColorStringBackgroundAware (QString &linkString, QColor &backgroundColor);
 
     /**
      * @brief Appends a CSS-style colour value to all HTML link tags in a given string, based on the current app palette (Dark-/Light-Mode switching).
@@ -503,7 +503,7 @@ public:
      *
      * This way we also avoid having certain strings re-translated on Transifex.
      */
-    static void replaceLinkColorStringBackgroundAware(QString &linkString);
+    static void replaceLinkColorStringBackgroundAware (QString &linkString);
 
     /**
      * @brief Appends a CSS-style colour value to all HTML link tags in a given string, as specified by newColor.
@@ -512,7 +512,7 @@ public:
      *
      * This way we also avoid having certain strings re-translated on Transifex.
      */
-    static void replaceLinkColorString(QString &linkString, QColor &newColor);
+    static void replaceLinkColorString (QString &linkString, QColor &newColor);
 
     /**
      * @brief Creates a colour-aware icon based on the specified palette's base colour.
@@ -521,7 +521,7 @@ public:
      *
      * 2019/12/09: Moved here from SettingsDialog.
      */
-    static QIcon createColorAwareIcon(QString &name, QPalette &palette);
+    static QIcon createColorAwareIcon (QString &name, QPalette &palette);
 
     /**
      * @brief Creates a colour-aware icon based on the app palette's base colour (Dark-/Light-Mode switching).
@@ -530,7 +530,7 @@ public:
      *
      * 2019/12/09: Moved here from SettingsDialog.
      */
-    static QIcon createColorAwareIcon(QString &name);
+    static QIcon createColorAwareIcon (QString &name);
 
     /**
      * @brief Creates a colour-aware pixmap based on the specified palette's base colour.
@@ -539,7 +539,7 @@ public:
      *
      * 2019/12/09: Adapted from createColorAwareIcon.
      */
-    static QPixmap createColorAwarePixmap(QString &name, QPalette &palette);
+    static QPixmap createColorAwarePixmap (QString &name, QPalette &palette);
 
     /**
      * @brief Creates a colour-aware pixmap based on the app palette's base colour (Dark-/Light-Mode switching).
@@ -548,7 +548,7 @@ public:
      *
      * 2019/12/09: Adapted from createColorAwareIcon.
      */
-    static QPixmap createColorAwarePixmap(QString &name);
+    static QPixmap createColorAwarePixmap (QString &name);
 
     /**
      * @brief Whether to show the option to create folders using "virtual files".
@@ -556,24 +556,24 @@ public:
      * By default, the options are not shown unless experimental options are
      * manually enabled in the configuration file.
      */
-    virtual bool showVirtualFilesOption() const;
+    virtual bool showVirtualFilesOption () const;
 
-    virtual bool enforceVirtualFilesSyncFolder() const;
+    virtual bool enforceVirtualFilesSyncFolder () const;
 
     /** @return color for the ErrorBox text. */
-    virtual QColor errorBoxTextColor() const;
+    virtual QColor errorBoxTextColor () const;
 
     /** @return color for the ErrorBox background. */
-    virtual QColor errorBoxBackgroundColor() const;
+    virtual QColor errorBoxBackgroundColor () const;
 
     /** @return color for the ErrorBox border. */
-    virtual QColor errorBoxBorderColor() const;
+    virtual QColor errorBoxBorderColor () const;
 
     static constexpr const char *themePrefix = ":/client/theme/";
 
 protected:
 #ifndef TOKEN_AUTH_ONLY
-    QIcon themeIcon(QString &name, bool sysTray = false) const;
+    QIcon themeIcon (QString &name, bool sysTray = false) const;
 #endif
     /**
      * @brief Generates image path in the resources
@@ -582,15 +582,15 @@ protected:
      * @param sysTray Whether the image requested is for Systray or not
      * @return QString image path in the resources
      **/
-    QString themeImagePath(QString &name, int size = -1, bool sysTray = false) const;
-    Theme();
+    QString themeImagePath (QString &name, int size = -1, bool sysTray = false) const;
+    Theme ();
 
 signals:
-    void systrayUseMonoIconsChanged(bool);
+    void systrayUseMonoIconsChanged (bool);
 
 private:
-    Theme(Theme const &);
-    Theme &operator=(Theme const &);
+    Theme (Theme const &);
+    Theme &operator= (Theme const &);
 
     static Theme *_instance;
     bool _mono = false;

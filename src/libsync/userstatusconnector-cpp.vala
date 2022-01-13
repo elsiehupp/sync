@@ -14,89 +14,89 @@
 
 namespace OCC {
 
-UserStatus::UserStatus() = default;
+UserStatus::UserStatus () = default;
 
-UserStatus::UserStatus(
+UserStatus::UserStatus (
     const QString &id, QString &message, QString &icon,
     OnlineStatus state, bool messagePredefined, Optional<ClearAt> &clearAt)
-    : _id(id)
-    , _message(message)
-    , _icon(icon)
-    , _state(state)
-    , _messagePredefined(messagePredefined)
-    , _clearAt(clearAt) {
+    : _id (id)
+    , _message (message)
+    , _icon (icon)
+    , _state (state)
+    , _messagePredefined (messagePredefined)
+    , _clearAt (clearAt) {
 }
 
-QString UserStatus::id() const {
+QString UserStatus::id () const {
     return _id;
 }
 
-QString UserStatus::message() const {
+QString UserStatus::message () const {
     return _message;
 }
 
-QString UserStatus::icon() const {
+QString UserStatus::icon () const {
     return _icon;
 }
 
-auto UserStatus::state() const -> OnlineStatus {
+auto UserStatus::state () const -> OnlineStatus {
     return _state;
 }
 
-bool UserStatus::messagePredefined() const {
+bool UserStatus::messagePredefined () const {
     return _messagePredefined;
 }
 
-QUrl UserStatus::stateIcon() const {
+QUrl UserStatus::stateIcon () const {
     switch (_state) {
     case UserStatus::OnlineStatus::Away:
-        return Theme::instance()->statusAwayImageSource();
+        return Theme::instance ()->statusAwayImageSource ();
 
     case UserStatus::OnlineStatus::DoNotDisturb:
-        return Theme::instance()->statusDoNotDisturbImageSource();
+        return Theme::instance ()->statusDoNotDisturbImageSource ();
 
     case UserStatus::OnlineStatus::Invisible:
     case UserStatus::OnlineStatus::Offline:
-        return Theme::instance()->statusInvisibleImageSource();
+        return Theme::instance ()->statusInvisibleImageSource ();
 
     case UserStatus::OnlineStatus::Online:
-        return Theme::instance()->statusOnlineImageSource();
+        return Theme::instance ()->statusOnlineImageSource ();
     }
 
-    Q_UNREACHABLE();
+    Q_UNREACHABLE ();
 }
 
-Optional<ClearAt> UserStatus::clearAt() const {
+Optional<ClearAt> UserStatus::clearAt () const {
     return _clearAt;
 }
 
-void UserStatus::setId(QString &id) {
+void UserStatus::setId (QString &id) {
     _id = id;
 }
 
-void UserStatus::setMessage(QString &message) {
+void UserStatus::setMessage (QString &message) {
     _message = message;
 }
 
-void UserStatus::setState(OnlineStatus state) {
+void UserStatus::setState (OnlineStatus state) {
     _state = state;
 }
 
-void UserStatus::setIcon(QString &icon) {
+void UserStatus::setIcon (QString &icon) {
     _icon = icon;
 }
 
-void UserStatus::setMessagePredefined(bool value) {
+void UserStatus::setMessagePredefined (bool value) {
     _messagePredefined = value;
 }
 
-void UserStatus::setClearAt(Optional<ClearAt> &dateTime) {
+void UserStatus::setClearAt (Optional<ClearAt> &dateTime) {
     _clearAt = dateTime;
 }
 
-UserStatusConnector::UserStatusConnector(QObject *parent)
-    : QObject(parent) {
+UserStatusConnector::UserStatusConnector (QObject *parent)
+    : QObject (parent) {
 }
 
-UserStatusConnector::~UserStatusConnector() = default;
+UserStatusConnector::~UserStatusConnector () = default;
 }

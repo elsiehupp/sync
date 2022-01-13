@@ -20,42 +20,42 @@ class SocketApiSocketPrivate;
 
 class SocketApiSocket : public QIODevice {
 public:
-    SocketApiSocket(QObject *parent, SocketApiSocketPrivate *p);
-    ~SocketApiSocket();
+    SocketApiSocket (QObject *parent, SocketApiSocketPrivate *p);
+    ~SocketApiSocket ();
 
-    qint64 readData(char *data, qint64 maxlen) override;
-    qint64 writeData(char *data, qint64 len) override;
+    qint64 readData (char *data, qint64 maxlen) override;
+    qint64 writeData (char *data, qint64 len) override;
 
-    bool isSequential() const override { return true; }
-    qint64 bytesAvailable() const override;
-    bool canReadLine() const override;
+    bool isSequential () const override { return true; }
+    qint64 bytesAvailable () const override;
+    bool canReadLine () const override;
 
 signals:
-    void disconnected();
+    void disconnected ();
 
 private:
     // Use Qt's p-impl system to hide objective-c types from C++ code including this file
-    Q_DECLARE_PRIVATE(SocketApiSocket)
+    Q_DECLARE_PRIVATE (SocketApiSocket)
     QScopedPointer<SocketApiSocketPrivate> d_ptr;
     friend class SocketApiServerPrivate;
 };
 
 class SocketApiServer : public QObject {
 public:
-    SocketApiServer();
-    ~SocketApiServer();
+    SocketApiServer ();
+    ~SocketApiServer ();
 
-    void close();
-    bool listen(QString &name);
-    SocketApiSocket *nextPendingConnection();
+    void close ();
+    bool listen (QString &name);
+    SocketApiSocket *nextPendingConnection ();
 
-    static bool removeServer(QString &) { return false; }
+    static bool removeServer (QString &) { return false; }
 
 signals:
-    void newConnection();
+    void newConnection ();
 
 private:
-    Q_DECLARE_PRIVATE(SocketApiServer)
+    Q_DECLARE_PRIVATE (SocketApiServer)
     QScopedPointer<SocketApiServerPrivate> d_ptr;
 };
 

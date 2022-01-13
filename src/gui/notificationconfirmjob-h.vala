@@ -30,19 +30,19 @@ namespace OCC {
 class NotificationConfirmJob : public AbstractNetworkJob {
 
 public:
-    explicit NotificationConfirmJob(AccountPtr account);
+    explicit NotificationConfirmJob (AccountPtr account);
 
     /**
      * @brief Set the verb and link for the job
      *
      * @param verb currently supported GET PUT POST DELETE
      */
-    void setLinkAndVerb(QUrl &link, QByteArray &verb);
+    void setLinkAndVerb (QUrl &link, QByteArray &verb);
 
     /**
      * @brief Start the OCS request
      */
-    void start() override;
+    void start () override;
 
 signals:
 
@@ -51,10 +51,10 @@ signals:
      *
      * @param reply the reply
      */
-    void jobFinished(QString reply, int replyCode);
+    void jobFinished (QString reply, int replyCode);
 
 private slots:
-    bool finished() override;
+    bool finished () override;
 
 private:
     QByteArray _verb;

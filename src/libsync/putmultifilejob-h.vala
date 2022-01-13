@@ -27,7 +27,7 @@ class QIODevice;
 
 namespace OCC {
 
-Q_DECLARE_LOGGING_CATEGORY(lcPutMultiFileJob)
+Q_DECLARE_LOGGING_CATEGORY (lcPutMultiFileJob)
 
 struct SingleUploadFileData {
     std::unique_ptr<UploadDevice> _device;
@@ -41,36 +41,36 @@ struct SingleUploadFileData {
 class OWNCLOUDSYNC_EXPORT PutMultiFileJob : public AbstractNetworkJob {
 
 public:
-    explicit PutMultiFileJob(AccountPtr account, QUrl &url,
+    explicit PutMultiFileJob (AccountPtr account, QUrl &url,
                              std::vector<SingleUploadFileData> devices, QObject *parent = nullptr)
-        : AbstractNetworkJob(account, {}, parent)
-        , _devices(std::move(devices))
-        , _url(url) {
-        _body.setContentType(QHttpMultiPart::RelatedType);
-        for(auto &singleDevice : _devices) {
-            singleDevice._device->setParent(this);
-            connect(this, &PutMultiFileJob::uploadProgress,
-                    singleDevice._device.get(), &UploadDevice::slotJobUploadProgress);
+        : AbstractNetworkJob (account, {}, parent)
+        , _devices (std::move (devices))
+        , _url (url) {
+        _body.setContentType (QHttpMultiPart::RelatedType);
+        for (auto &singleDevice : _devices) {
+            singleDevice._device->setParent (this);
+            connect (this, &PutMultiFileJob::uploadProgress,
+                    singleDevice._device.get (), &UploadDevice::slotJobUploadProgress);
         }
     }
 
-    ~PutMultiFileJob() override;
+    ~PutMultiFileJob () override;
 
-    void start() override;
+    void start () override;
 
-    bool finished() override;
+    bool finished () override;
 
-    QString errorString() const override {
-        return _errorString.isEmpty() ? AbstractNetworkJob::errorString() : _errorString;
+    QString errorString () const override {
+        return _errorString.isEmpty () ? AbstractNetworkJob::errorString () : _errorString;
     }
 
-    std::chrono::milliseconds msSinceStart() const {
-        return std::chrono::milliseconds(_requestTimer.elapsed());
+    std::chrono::milliseconds msSinceStart () const {
+        return std::chrono::milliseconds (_requestTimer.elapsed ());
     }
 
 signals:
-    void finishedSignal();
-    void uploadProgress(qint64, qint64);
+    void finishedSignal ();
+    void uploadProgress (qint64, qint64);
 
 private:
     QHttpMultiPart _body;

@@ -32,7 +32,7 @@ namespace Ui {
  */
 class SslDialogErrorHandler : public AbstractSslErrorHandler {
 public:
-    bool handleErrors(QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, AccountPtr) override;
+    bool handleErrors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, AccountPtr) override;
 };
 
 /**
@@ -41,17 +41,17 @@ public:
  */
 class SslErrorDialog : public QDialog {
 public:
-    explicit SslErrorDialog(AccountPtr account, QWidget *parent = nullptr);
-    ~SslErrorDialog() override;
-    bool checkFailingCertsKnown(QList<QSslError> &errors);
-    bool trustConnection();
-    QList<QSslCertificate> unknownCerts() const { return _unknownCerts; }
+    explicit SslErrorDialog (AccountPtr account, QWidget *parent = nullptr);
+    ~SslErrorDialog () override;
+    bool checkFailingCertsKnown (QList<QSslError> &errors);
+    bool trustConnection ();
+    QList<QSslCertificate> unknownCerts () const { return _unknownCerts; }
 
 private:
-    QString styleSheet() const;
+    QString styleSheet () const;
     bool _allTrusted;
 
-    QString certDiv(QSslCertificate) const;
+    QString certDiv (QSslCertificate) const;
 
     QList<QSslCertificate> _unknownCerts;
     QString _customConfigHandle;

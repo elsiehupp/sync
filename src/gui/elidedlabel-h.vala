@@ -19,17 +19,17 @@ namespace OCC {
 /// Label that can elide its text
 class ElidedLabel : public QLabel {
 public:
-    explicit ElidedLabel(QWidget *parent = nullptr);
-    explicit ElidedLabel(QString &text, QWidget *parent = nullptr);
+    explicit ElidedLabel (QWidget *parent = nullptr);
+    explicit ElidedLabel (QString &text, QWidget *parent = nullptr);
 
-    void setText(QString &text);
-    const QString &text() const { return _text; }
+    void setText (QString &text);
+    const QString &text () const { return _text; }
 
-    void setElideMode(Qt::TextElideMode elideMode);
-    Qt::TextElideMode elideMode() const { return _elideMode; }
+    void setElideMode (Qt::TextElideMode elideMode);
+    Qt::TextElideMode elideMode () const { return _elideMode; }
 
 protected:
-    void resizeEvent(QResizeEvent *event) override;
+    void resizeEvent (QResizeEvent *event) override;
 
 private:
     QString _text;

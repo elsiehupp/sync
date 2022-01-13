@@ -28,16 +28,16 @@ class PropagateRemoteDelete : public PropagateItemJob {
     AbstractPropagateRemoteDeleteEncrypted *_deleteEncryptedHelper = nullptr;
 
 public:
-    PropagateRemoteDelete(OwncloudPropagator *propagator, SyncFileItemPtr &item)
-        : PropagateItemJob(propagator, item) {
+    PropagateRemoteDelete (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+        : PropagateItemJob (propagator, item) {
     }
-    void start() override;
-    void createDeleteJob(QString &filename);
-    void abort(PropagatorJob::AbortType abortType) override;
+    void start () override;
+    void createDeleteJob (QString &filename);
+    void abort (PropagatorJob::AbortType abortType) override;
 
-    bool isLikelyFinishedQuickly() override { return !_item->isDirectory(); }
+    bool isLikelyFinishedQuickly () override { return !_item->isDirectory (); }
 
 private slots:
-    void slotDeleteJobFinished();
+    void slotDeleteJobFinished ();
 };
 }

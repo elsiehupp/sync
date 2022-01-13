@@ -25,23 +25,23 @@
 namespace OCC {
 
 struct Emoji {
-    Emoji(QString u, QString s, bool isCustom = false)
-        : unicode(std::move(std::move(u)))
-        , shortname(std::move(std::move(s)))
-        , isCustom(isCustom) {
+    Emoji (QString u, QString s, bool isCustom = false)
+        : unicode (std::move (std::move (u)))
+        , shortname (std::move (std::move (s)))
+        , isCustom (isCustom) {
     }
-    Emoji() = default;
+    Emoji () = default;
 
-    friend QDataStream &operator<<(QDataStream &arch, Emoji &object) {
+    friend QDataStream &operator<< (QDataStream &arch, Emoji &object) {
         arch << object.unicode;
         arch << object.shortname;
         return arch;
     }
 
-    friend QDataStream &operator>>(QDataStream &arch, Emoji &object) {
+    friend QDataStream &operator>> (QDataStream &arch, Emoji &object) {
         arch >> object.unicode;
         arch >> object.shortname;
-        object.isCustom = object.unicode.startsWith("image://");
+        object.isCustom = object.unicode.startsWith ("image://");
         return arch;
     }
 
@@ -50,16 +50,16 @@ struct Emoji {
     bool isCustom = false;
 
     Q_GADGET
-    Q_PROPERTY(QString unicode MEMBER unicode)
-    Q_PROPERTY(QString shortname MEMBER shortname)
-    Q_PROPERTY(bool isCustom MEMBER isCustom)
+    Q_PROPERTY (QString unicode MEMBER unicode)
+    Q_PROPERTY (QString shortname MEMBER shortname)
+    Q_PROPERTY (bool isCustom MEMBER isCustom)
 };
 
 class EmojiCategoriesModel : public QAbstractListModel {
 public:
-    QVariant data(QModelIndex &index, int role) const override;
-    int rowCount(QModelIndex &parent = QModelIndex()) const override;
-    QHash<int, QByteArray> roleNames() const override;
+    QVariant data (QModelIndex &index, int role) const override;
+    int rowCount (QModelIndex &parent = QModelIndex ()) const override;
+    QHash<int, QByteArray> roleNames () const override;
 
 private:
     enum Roles {
@@ -77,35 +77,35 @@ private:
 
 class EmojiModel : public QObject {
 
-    Q_PROPERTY(QVariantList model READ model NOTIFY modelChanged)
-    Q_PROPERTY(QAbstractListModel *emojiCategoriesModel READ emojiCategoriesModel CONSTANT)
+    Q_PROPERTY (QVariantList model READ model NOTIFY modelChanged)
+    Q_PROPERTY (QAbstractListModel *emojiCategoriesModel READ emojiCategoriesModel CONSTANT)
 
-    Q_PROPERTY(QVariantList history READ history NOTIFY historyChanged)
+    Q_PROPERTY (QVariantList history READ history NOTIFY historyChanged)
 
-    Q_PROPERTY(QVariantList people MEMBER people CONSTANT)
-    Q_PROPERTY(QVariantList nature MEMBER nature CONSTANT)
-    Q_PROPERTY(QVariantList food MEMBER food CONSTANT)
-    Q_PROPERTY(QVariantList activity MEMBER activity CONSTANT)
-    Q_PROPERTY(QVariantList travel MEMBER travel CONSTANT)
-    Q_PROPERTY(QVariantList objects MEMBER objects CONSTANT)
-    Q_PROPERTY(QVariantList symbols MEMBER symbols CONSTANT)
-    Q_PROPERTY(QVariantList flags MEMBER flags CONSTANT)
+    Q_PROPERTY (QVariantList people MEMBER people CONSTANT)
+    Q_PROPERTY (QVariantList nature MEMBER nature CONSTANT)
+    Q_PROPERTY (QVariantList food MEMBER food CONSTANT)
+    Q_PROPERTY (QVariantList activity MEMBER activity CONSTANT)
+    Q_PROPERTY (QVariantList travel MEMBER travel CONSTANT)
+    Q_PROPERTY (QVariantList objects MEMBER objects CONSTANT)
+    Q_PROPERTY (QVariantList symbols MEMBER symbols CONSTANT)
+    Q_PROPERTY (QVariantList flags MEMBER flags CONSTANT)
 
 public:
-    explicit EmojiModel(QObject *parent = nullptr)
-        : QObject(parent) {
+    explicit EmojiModel (QObject *parent = nullptr)
+        : QObject (parent) {
     }
 
-    Q_INVOKABLE QVariantList history() const;
-    Q_INVOKABLE void setCategory(QString &category);
-    Q_INVOKABLE void emojiUsed(QVariant &modelData);
+    Q_INVOKABLE QVariantList history () const;
+    Q_INVOKABLE void setCategory (QString &category);
+    Q_INVOKABLE void emojiUsed (QVariant &modelData);
 
-    QVariantList model() const;
-    QAbstractListModel *emojiCategoriesModel();
+    QVariantList model () const;
+    QAbstractListModel *emojiCategoriesModel ();
 
 signals:
-    void historyChanged();
-    void modelChanged();
+    void historyChanged ();
+    void modelChanged ();
 
 private:
     static const QVariantList people;
@@ -125,4 +125,4 @@ private:
 
 }
 
-Q_DECLARE_METATYPE(OCC::Emoji)
+Q_DECLARE_METATYPE (OCC::Emoji)

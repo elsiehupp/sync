@@ -29,23 +29,23 @@ class OWNCLOUDSYNC_EXPORT TokenCredentials : public AbstractCredentials {
 
 public:
     friend class TokenCredentialsAccessManager;
-    TokenCredentials();
-    TokenCredentials(QString &user, QString &password, QString &token);
+    TokenCredentials ();
+    TokenCredentials (QString &user, QString &password, QString &token);
 
-    QString authType() const override;
-    QNetworkAccessManager *createQNAM() const override;
-    bool ready() const override;
-    void askFromUser() override;
-    void fetchFromKeychain() override;
-    bool stillValid(QNetworkReply *reply) override;
-    void persist() override;
-    QString user() const override;
-    void invalidateToken() override;
-    void forgetSensitiveData() override;
+    QString authType () const override;
+    QNetworkAccessManager *createQNAM () const override;
+    bool ready () const override;
+    void askFromUser () override;
+    void fetchFromKeychain () override;
+    bool stillValid (QNetworkReply *reply) override;
+    void persist () override;
+    QString user () const override;
+    void invalidateToken () override;
+    void forgetSensitiveData () override;
 
-    QString password() const;
+    QString password () const;
 private Q_SLOTS:
-    void slotAuthentication(QNetworkReply *, QAuthenticator *);
+    void slotAuthentication (QNetworkReply *, QAuthenticator *);
 
 private:
     QString _user;

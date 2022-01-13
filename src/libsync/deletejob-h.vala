@@ -22,17 +22,17 @@ namespace OCC {
  */
 class DeleteJob : public AbstractNetworkJob {
 public:
-    explicit DeleteJob(AccountPtr account, QString &path, QObject *parent = nullptr);
-    explicit DeleteJob(AccountPtr account, QUrl &url, QObject *parent = nullptr);
+    explicit DeleteJob (AccountPtr account, QString &path, QObject *parent = nullptr);
+    explicit DeleteJob (AccountPtr account, QUrl &url, QObject *parent = nullptr);
 
-    void start() override;
-    bool finished() override;
+    void start () override;
+    bool finished () override;
 
-    QByteArray folderToken() const;
-    void setFolderToken(QByteArray &folderToken);
+    QByteArray folderToken () const;
+    void setFolderToken (QByteArray &folderToken);
 
 signals:
-    void finishedSignal();
+    void finishedSignal ();
 
 private:
     QUrl _url; // Only used if the constructor taking a url is taken.

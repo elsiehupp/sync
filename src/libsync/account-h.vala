@@ -56,8 +56,8 @@ class UserStatusConnector;
  */
 class AbstractSslErrorHandler {
 public:
-    virtual ~AbstractSslErrorHandler() = default;
-    virtual bool handleErrors(QList<QSslError>, QSslConfiguration &conf, QList<QSslCertificate> *, AccountPtr) = 0;
+    virtual ~AbstractSslErrorHandler () = default;
+    virtual bool handleErrors (QList<QSslError>, QSslConfiguration &conf, QList<QSslCertificate> *, AccountPtr) = 0;
 };
 
 /**
@@ -68,144 +68,144 @@ public:
  * SSL errors and certificates.
  */
 class OWNCLOUDSYNC_EXPORT Account : public QObject {
-    Q_PROPERTY(QString id MEMBER _id)
-    Q_PROPERTY(QString davUser MEMBER _davUser)
-    Q_PROPERTY(QString displayName MEMBER _displayName)
-    Q_PROPERTY(QUrl url MEMBER _url)
+    Q_PROPERTY (QString id MEMBER _id)
+    Q_PROPERTY (QString davUser MEMBER _davUser)
+    Q_PROPERTY (QString displayName MEMBER _displayName)
+    Q_PROPERTY (QUrl url MEMBER _url)
 
 public:
-    static AccountPtr create();
-    ~Account() override;
+    static AccountPtr create ();
+    ~Account () override;
 
-    AccountPtr sharedFromThis();
+    AccountPtr sharedFromThis ();
 
     /**
      * The user that can be used in dav url.
      *
      * This can very well be different frome the login user that's
-     * stored in credentials()->user().
+     * stored in credentials ()->user ().
      */
-    QString davUser() const;
-    void setDavUser(QString &newDavUser);
+    QString davUser () const;
+    void setDavUser (QString &newDavUser);
 
-    QString davDisplayName() const;
-    void setDavDisplayName(QString &newDisplayName);
+    QString davDisplayName () const;
+    void setDavDisplayName (QString &newDisplayName);
 
 #ifndef TOKEN_AUTH_ONLY
-    QImage avatar() const;
-    void setAvatar(QImage &img);
+    QImage avatar () const;
+    void setAvatar (QImage &img);
 #endif
 
     /// The name of the account as shown in the toolbar
-    QString displayName() const;
+    QString displayName () const;
 
     /// The internal id of the account.
-    QString id() const;
+    QString id () const;
 
     /** Server url of the account */
-    void setUrl(QUrl &url);
-    QUrl url() const { return _url; }
+    void setUrl (QUrl &url);
+    QUrl url () const { return _url; }
 
     /// Adjusts _userVisibleUrl once the host to use is discovered.
-    void setUserVisibleHost(QString &host);
+    void setUserVisibleHost (QString &host);
 
     /**
      * @brief The possibly themed dav path for the account. It has
      *        a trailing slash.
      * @returns the (themeable) dav path for the account.
      */
-    QString davPath() const;
+    QString davPath () const;
 
-    /** Returns webdav entry URL, based on url() */
-    QUrl davUrl() const;
+    /** Returns webdav entry URL, based on url () */
+    QUrl davUrl () const;
 
     /** Returns the legacy permalink url for a file.
      *
      * This uses the old way of manually building the url. New code should
      * use the "privatelink" property accessible via PROPFIND.
      */
-    QUrl deprecatedPrivateLinkUrl(QByteArray &numericFileId) const;
+    QUrl deprecatedPrivateLinkUrl (QByteArray &numericFileId) const;
 
     /** Holds the accounts credentials */
-    AbstractCredentials *credentials() const;
-    void setCredentials(AbstractCredentials *cred);
+    AbstractCredentials *credentials () const;
+    void setCredentials (AbstractCredentials *cred);
 
     /** Create a network request on the account's QNAM.
      *
      * Network requests in AbstractNetworkJobs are created through
      * this function. Other places should prefer to use jobs or
-     * sendRequest().
+     * sendRequest ().
      */
-    QNetworkReply *sendRawRequest(QByteArray &verb,
+    QNetworkReply *sendRawRequest (QByteArray &verb,
         const QUrl &url,
-        QNetworkRequest req = QNetworkRequest(),
+        QNetworkRequest req = QNetworkRequest (),
         QIODevice *data = nullptr);
 
-    QNetworkReply *sendRawRequest(QByteArray &verb,
+    QNetworkReply *sendRawRequest (QByteArray &verb,
         const QUrl &url, QNetworkRequest req, QByteArray &data);
 
-    QNetworkReply *sendRawRequest(QByteArray &verb,
+    QNetworkReply *sendRawRequest (QByteArray &verb,
         const QUrl &url, QNetworkRequest req, QHttpMultiPart *data);
 
     /** Create and start network job for a simple one-off request.
      *
      * More complicated requests typically create their own job types.
      */
-    SimpleNetworkJob *sendRequest(QByteArray &verb,
+    SimpleNetworkJob *sendRequest (QByteArray &verb,
         const QUrl &url,
-        QNetworkRequest req = QNetworkRequest(),
+        QNetworkRequest req = QNetworkRequest (),
         QIODevice *data = nullptr);
 
     /** The ssl configuration during the first connection */
-    QSslConfiguration getOrCreateSslConfig();
-    QSslConfiguration sslConfiguration() const { return _sslConfiguration; }
-    void setSslConfiguration(QSslConfiguration &config);
+    QSslConfiguration getOrCreateSslConfig ();
+    QSslConfiguration sslConfiguration () const { return _sslConfiguration; }
+    void setSslConfiguration (QSslConfiguration &config);
     // Because of bugs in Qt, we use this to store info needed for the SSL Button
     QSslCipher _sessionCipher;
     QByteArray _sessionTicket;
     QList<QSslCertificate> _peerCertificateChain;
 
     /** The certificates of the account */
-    QList<QSslCertificate> approvedCerts() const { return _approvedCerts; }
-    void setApprovedCerts(QList<QSslCertificate> certs);
-    void addApprovedCerts(QList<QSslCertificate> certs);
+    QList<QSslCertificate> approvedCerts () const { return _approvedCerts; }
+    void setApprovedCerts (QList<QSslCertificate> certs);
+    void addApprovedCerts (QList<QSslCertificate> certs);
 
     // Usually when a user explicitly rejects a certificate we don't
     // ask again. After this call, a dialog will again be shown when
     // the next unknown certificate is encountered.
-    void resetRejectedCertificates();
+    void resetRejectedCertificates ();
 
     // pluggable handler
-    void setSslErrorHandler(AbstractSslErrorHandler *handler);
+    void setSslErrorHandler (AbstractSslErrorHandler *handler);
 
     // To be called by credentials only, for storing username and the like
-    QVariant credentialSetting(QString &key) const;
-    void setCredentialSetting(QString &key, QVariant &value);
+    QVariant credentialSetting (QString &key) const;
+    void setCredentialSetting (QString &key, QVariant &value);
 
     /** Assign a client certificate */
-    void setCertificate(QByteArray certficate = QByteArray(), QString privateKey = QString());
+    void setCertificate (QByteArray certficate = QByteArray (), QString privateKey = QString ());
 
     /** Access the server capabilities */
-    const Capabilities &capabilities() const;
-    void setCapabilities(QVariantMap &caps);
+    const Capabilities &capabilities () const;
+    void setCapabilities (QVariantMap &caps);
 
     /** Access the server version
      *
      * For servers >= 10.0.0, this can be the empty string until capabilities
      * have been received.
      */
-    QString serverVersion() const;
+    QString serverVersion () const;
 
     /** Server version for easy comparison.
      *
-     * Example: serverVersionInt() >= makeServerVersion(11, 2, 3)
+     * Example: serverVersionInt () >= makeServerVersion (11, 2, 3)
      *
      * Will be 0 if the version is not available yet.
      */
-    int serverVersionInt() const;
+    int serverVersionInt () const;
 
-    static int makeServerVersion(int majorVersion, int minorVersion, int patchVersion);
-    void setServerVersion(QString &version);
+    static int makeServerVersion (int majorVersion, int minorVersion, int patchVersion);
+    void setServerVersion (QString &version);
 
     /** Whether the server is too old.
      *
@@ -217,89 +217,89 @@ public:
      *
      * This function returns true if the server is beyond the weak limit.
      */
-    bool serverVersionUnsupported() const;
+    bool serverVersionUnsupported () const;
 
-    bool isUsernamePrefillSupported() const;
+    bool isUsernamePrefillSupported () const;
 
     /** True when the server connection is using HTTP2  */
-    bool isHttp2Supported() { return _http2Supported; }
-    void setHttp2Supported(bool value) { _http2Supported = value; }
+    bool isHttp2Supported () { return _http2Supported; }
+    void setHttp2Supported (bool value) { _http2Supported = value; }
 
-    void clearCookieJar();
-    void lendCookieJarTo(QNetworkAccessManager *guest);
-    QString cookieJarPath();
+    void clearCookieJar ();
+    void lendCookieJarTo (QNetworkAccessManager *guest);
+    QString cookieJarPath ();
 
-    void resetNetworkAccessManager();
-    QNetworkAccessManager *networkAccessManager();
-    QSharedPointer<QNetworkAccessManager> sharedNetworkAccessManager();
+    void resetNetworkAccessManager ();
+    QNetworkAccessManager *networkAccessManager ();
+    QSharedPointer<QNetworkAccessManager> sharedNetworkAccessManager ();
 
-    /// Called by network jobs on credential errors, emits invalidCredentials()
-    void handleInvalidCredentials();
+    /// Called by network jobs on credential errors, emits invalidCredentials ()
+    void handleInvalidCredentials ();
 
-    ClientSideEncryption* e2e();
+    ClientSideEncryption* e2e ();
 
     /// Used in RemoteWipe
-    void retrieveAppPassword();
-    void writeAppPasswordOnce(QString appPassword);
-    void deleteAppPassword();
+    void retrieveAppPassword ();
+    void writeAppPasswordOnce (QString appPassword);
+    void deleteAppPassword ();
 
-    void deleteAppToken();
+    void deleteAppToken ();
 
     /// Direct Editing
     // Check for the directEditing capability
-    void fetchDirectEditors(QUrl &directEditingURL, QString &directEditingETag);
+    void fetchDirectEditors (QUrl &directEditingURL, QString &directEditingETag);
 
-    void setupUserStatusConnector();
-    void trySetupPushNotifications();
-    PushNotifications *pushNotifications() const;
-    void setPushNotificationsReconnectInterval(int interval);
+    void setupUserStatusConnector ();
+    void trySetupPushNotifications ();
+    PushNotifications *pushNotifications () const;
+    void setPushNotificationsReconnectInterval (int interval);
 
-    std::shared_ptr<UserStatusConnector> userStatusConnector() const;
+    std::shared_ptr<UserStatusConnector> userStatusConnector () const;
 
 public slots:
     /// Used when forgetting credentials
-    void clearQNAMCache();
-    void slotHandleSslErrors(QNetworkReply *, QList<QSslError>);
+    void clearQNAMCache ();
+    void slotHandleSslErrors (QNetworkReply *, QList<QSslError>);
 
 signals:
     /// Emitted whenever there's network activity
-    void propagatorNetworkActivity();
+    void propagatorNetworkActivity ();
 
-    /// Triggered by handleInvalidCredentials()
-    void invalidCredentials();
+    /// Triggered by handleInvalidCredentials ()
+    void invalidCredentials ();
 
-    void credentialsFetched(AbstractCredentials *credentials);
-    void credentialsAsked(AbstractCredentials *credentials);
+    void credentialsFetched (AbstractCredentials *credentials);
+    void credentialsAsked (AbstractCredentials *credentials);
 
-    /// Forwards from QNetworkAccessManager::proxyAuthenticationRequired().
-    void proxyAuthenticationRequired(QNetworkProxy &, QAuthenticator *);
+    /// Forwards from QNetworkAccessManager::proxyAuthenticationRequired ().
+    void proxyAuthenticationRequired (QNetworkProxy &, QAuthenticator *);
 
     // e.g. when the approved SSL certificates changed
-    void wantsAccountSaved(Account *acc);
+    void wantsAccountSaved (Account *acc);
 
-    void serverVersionChanged(Account *account, QString &newVersion, QString &oldVersion);
+    void serverVersionChanged (Account *account, QString &newVersion, QString &oldVersion);
 
-    void accountChangedAvatar();
-    void accountChangedDisplayName();
+    void accountChangedAvatar ();
+    void accountChangedDisplayName ();
 
     /// Used in RemoteWipe
-    void appPasswordRetrieved(QString);
+    void appPasswordRetrieved (QString);
 
-    void pushNotificationsReady(Account *account);
-    void pushNotificationsDisabled(Account *account);
+    void pushNotificationsReady (Account *account);
+    void pushNotificationsDisabled (Account *account);
 
-    void userStatusChanged();
+    void userStatusChanged ();
 
 protected Q_SLOTS:
-    void slotCredentialsFetched();
-    void slotCredentialsAsked();
-    void slotDirectEditingRecieved(QJsonDocument &json);
+    void slotCredentialsFetched ();
+    void slotCredentialsAsked ();
+    void slotDirectEditingRecieved (QJsonDocument &json);
 
 private:
-    Account(QObject *parent = nullptr);
-    void setSharedThis(AccountPtr sharedThis);
+    Account (QObject *parent = nullptr);
+    void setSharedThis (AccountPtr sharedThis);
 
-    static QString davPathBase();
+    static QString davPathBase ();
 
     QWeakPointer<Account> _sharedThis;
     QString _id;
@@ -358,15 +358,15 @@ private:
      *       We introduce this dirty hack here, to allow deleting them upon Remote Wipe.
     */
     public:
-        void setRemoteWipeRequested_HACK() { _isRemoteWipeRequested_HACK = true; }
-        bool isRemoteWipeRequested_HACK() { return _isRemoteWipeRequested_HACK; }
+        void setRemoteWipeRequested_HACK () { _isRemoteWipeRequested_HACK = true; }
+        bool isRemoteWipeRequested_HACK () { return _isRemoteWipeRequested_HACK; }
     private:
         bool _isRemoteWipeRequested_HACK = false;
     // <-- FIXME MS@2019-12-07
 };
 }
 
-Q_DECLARE_METATYPE(OCC::AccountPtr)
-Q_DECLARE_METATYPE(OCC::Account *)
+Q_DECLARE_METATYPE (OCC::AccountPtr)
+Q_DECLARE_METATYPE (OCC::Account *)
 
 #endif //SERVERCONNECTION_H

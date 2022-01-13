@@ -24,25 +24,25 @@ public:
         Success = 0,
         Error,
     };
-    Q_ENUM(Status)
+    Q_ENUM (Status)
 
-    explicit EncryptFolderJob(AccountPtr &account, SyncJournalDb *journal, QString &path, QByteArray &fileId, QObject *parent = nullptr);
-    void start();
+    explicit EncryptFolderJob (AccountPtr &account, SyncJournalDb *journal, QString &path, QByteArray &fileId, QObject *parent = nullptr);
+    void start ();
 
-    QString errorString() const;
+    QString errorString () const;
 
 signals:
-    void finished(int status);
+    void finished (int status);
 
 private slots:
-    void slotEncryptionFlagSuccess(QByteArray &folderId);
-    void slotEncryptionFlagError(QByteArray &folderId, int httpReturnCode);
-    void slotLockForEncryptionSuccess(QByteArray &folderId, QByteArray &token);
-    void slotLockForEncryptionError(QByteArray &folderId, int httpReturnCode);
-    void slotUnlockFolderSuccess(QByteArray &folderId);
-    void slotUnlockFolderError(QByteArray &folderId, int httpReturnCode);
-    void slotUploadMetadataSuccess(QByteArray &folderId);
-    void slotUpdateMetadataError(QByteArray &folderId, int httpReturnCode);
+    void slotEncryptionFlagSuccess (QByteArray &folderId);
+    void slotEncryptionFlagError (QByteArray &folderId, int httpReturnCode);
+    void slotLockForEncryptionSuccess (QByteArray &folderId, QByteArray &token);
+    void slotLockForEncryptionError (QByteArray &folderId, int httpReturnCode);
+    void slotUnlockFolderSuccess (QByteArray &folderId);
+    void slotUnlockFolderError (QByteArray &folderId, int httpReturnCode);
+    void slotUploadMetadataSuccess (QByteArray &folderId);
+    void slotUpdateMetadataError (QByteArray &folderId, int httpReturnCode);
 
 private:
     AccountPtr _account;

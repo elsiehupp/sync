@@ -8,19 +8,19 @@ namespace OCC {
 
 class UpdateInfo {
 public:
-    void setVersion(QString &v);
-    QString version() const;
-    void setVersionString(QString &v);
-    QString versionString() const;
-    void setWeb(QString &v);
-    QString web() const;
-    void setDownloadUrl(QString &v);
-    QString downloadUrl() const;
+    void setVersion (QString &v);
+    QString version () const;
+    void setVersionString (QString &v);
+    QString versionString () const;
+    void setWeb (QString &v);
+    QString web () const;
+    void setDownloadUrl (QString &v);
+    QString downloadUrl () const;
     /**
       Parse XML object from DOM element.
      */
-    static UpdateInfo parseElement(QDomElement &element, bool *ok);
-    static UpdateInfo parseString(QString &xml, bool *ok);
+    static UpdateInfo parseElement (QDomElement &element, bool *ok);
+    static UpdateInfo parseString (QString &xml, bool *ok);
 
 private:
     QString mVersion;

@@ -25,12 +25,12 @@ class NetrcParser {
 public:
     using LoginPair = QPair<QString, QString>;
 
-    NetrcParser(QString &file = QString());
-    bool parse();
-    LoginPair find(QString &machine);
+    NetrcParser (QString &file = QString ());
+    bool parse ();
+    LoginPair find (QString &machine);
 
 private:
-    void tryAddEntryAndClear(QString &machine, LoginPair &pair, bool &isDefault);
+    void tryAddEntryAndClear (QString &machine, LoginPair &pair, bool &isDefault);
     QHash<QString, LoginPair> _entries;
     LoginPair _default;
     QString _netrcLocation;

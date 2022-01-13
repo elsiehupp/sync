@@ -20,7 +20,7 @@
 
 namespace OCC {
 
-Q_DECLARE_LOGGING_CATEGORY(lcWizard)
+Q_DECLARE_LOGGING_CATEGORY (lcWizard)
 
 class WelcomePage;
 class OwncloudSetupPage;
@@ -44,33 +44,33 @@ public:
         LogParagraph
     };
 
-    OwncloudWizard(QWidget *parent = nullptr);
+    OwncloudWizard (QWidget *parent = nullptr);
 
-    void setAccount(AccountPtr account);
-    AccountPtr account() const;
-    void setOCUrl(QString &);
-    bool registration();
-    void setRegistration(bool registration);
+    void setAccount (AccountPtr account);
+    AccountPtr account () const;
+    void setOCUrl (QString &);
+    bool registration ();
+    void setRegistration (bool registration);
 
-    void setupCustomMedia(QVariant, QLabel *);
-    QString ocUrl() const;
-    QString localFolder() const;
-    QStringList selectiveSyncBlacklist() const;
-    bool useVirtualFileSync() const;
-    bool isConfirmBigFolderChecked() const;
+    void setupCustomMedia (QVariant, QLabel *);
+    QString ocUrl () const;
+    QString localFolder () const;
+    QStringList selectiveSyncBlacklist () const;
+    bool useVirtualFileSync () const;
+    bool isConfirmBigFolderChecked () const;
 
-    void displayError(QString &, bool retryHTTPonly);
-    AbstractCredentials *getCredentials() const;
+    void displayError (QString &, bool retryHTTPonly);
+    AbstractCredentials *getCredentials () const;
 
-    void bringToTop();
-    void centerWindow();
+    void bringToTop ();
+    void centerWindow ();
 
     /**
      * Shows a dialog explaining the virtual files mode and warning about it
      * being experimental. Calles the callback with true if enabling was
      * chosen.
      */
-    static void askExperimentalVirtualFilesFeature(QWidget *receiver, std::function<void(bool enable)> &callback);
+    static void askExperimentalVirtualFilesFeature (QWidget *receiver, std::function<void (bool enable)> &callback);
 
     // FIXME: Can those be local variables?
     // Set from the OwncloudSetupPage, later used from OwncloudHttpCredsPage
@@ -81,32 +81,32 @@ public:
     QList<QSslCertificate> _clientSslCaCertificates;
 
 public slots:
-    void setAuthType(DetermineAuthTypeJob::AuthType type);
-    void setRemoteFolder(QString &);
-    void appendToConfigurationLog(QString &msg, LogType type = LogParagraph);
-    void slotCurrentPageChanged(int);
-    void successfulStep();
+    void setAuthType (DetermineAuthTypeJob::AuthType type);
+    void setRemoteFolder (QString &);
+    void appendToConfigurationLog (QString &msg, LogType type = LogParagraph);
+    void slotCurrentPageChanged (int);
+    void successfulStep ();
 
 signals:
-    void clearPendingRequests();
-    void determineAuthType(QString &);
-    void connectToOCUrl(QString &);
-    void createLocalAndRemoteFolders(QString &, QString &);
-    // make sure to connect to this, rather than finished(int)!!
-    void basicSetupFinished(int);
-    void skipFolderConfiguration();
-    void needCertificate();
-    void styleChanged();
-    void onActivate();
+    void clearPendingRequests ();
+    void determineAuthType (QString &);
+    void connectToOCUrl (QString &);
+    void createLocalAndRemoteFolders (QString &, QString &);
+    // make sure to connect to this, rather than finished (int)!!
+    void basicSetupFinished (int);
+    void skipFolderConfiguration ();
+    void needCertificate ();
+    void styleChanged ();
+    void onActivate ();
 
 protected:
-    void changeEvent(QEvent *) override;
+    void changeEvent (QEvent *) override;
 
 private:
-    void customizeStyle();
-    void adjustWizardSize();
-    int calculateLongestSideOfWizardPages(QList<QSize> &pageSizes) const;
-    QList<QSize> calculateWizardPageSizes() const;
+    void customizeStyle ();
+    void adjustWizardSize ();
+    int calculateLongestSideOfWizardPages (QList<QSize> &pageSizes) const;
+    QList<QSize> calculateWizardPageSizes () const;
 
     AccountPtr _account;
     WelcomePage *_welcomePage;

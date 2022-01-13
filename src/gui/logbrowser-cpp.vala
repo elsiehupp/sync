@@ -31,89 +31,89 @@ namespace OCC {
 
 // ==============================================================================
 
-LogBrowser::LogBrowser(QWidget *parent)
-    : QDialog(parent) {
-    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    setObjectName("LogBrowser"); // for save/restoreGeometry()
-    setWindowTitle(tr("Log Output"));
-    setMinimumWidth(600);
+LogBrowser::LogBrowser (QWidget *parent)
+    : QDialog (parent) {
+    setWindowFlags (windowFlags () & ~Qt::WindowContextHelpButtonHint);
+    setObjectName ("LogBrowser"); // for save/restoreGeometry ()
+    setWindowTitle (tr ("Log Output"));
+    setMinimumWidth (600);
 
     auto mainLayout = new QVBoxLayout;
 
-    auto label = new QLabel(
-        tr("The client can write debug logs to a temporary folder. "
+    auto label = new QLabel (
+        tr ("The client can write debug logs to a temporary folder. "
            "These logs are very helpful for diagnosing problems.\n"
            "Since log files can get large, the client will start a new one for each sync "
            "run and compress older ones. It will also delete log files after a couple "
            "of hours to avoid consuming too much disk space.\n"
            "If enabled, logs will be written to %1")
-        .arg(Logger::instance()->temporaryFolderLogDirPath()));
-    label->setWordWrap(true);
-    label->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
-    mainLayout->addWidget(label);
+        .arg (Logger::instance ()->temporaryFolderLogDirPath ()));
+    label->setWordWrap (true);
+    label->setTextInteractionFlags (Qt::TextSelectableByMouse);
+    label->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
+    mainLayout->addWidget (label);
 
     // button to permanently save logs
     auto enableLoggingButton = new QCheckBox;
-    enableLoggingButton->setText(tr("Enable logging to temporary folder"));
-    enableLoggingButton->setChecked(ConfigFile().automaticLogDir());
-    connect(enableLoggingButton, &QCheckBox::toggled, this, &LogBrowser::togglePermanentLogging);
-    mainLayout->addWidget(enableLoggingButton);
+    enableLoggingButton->setText (tr ("Enable logging to temporary folder"));
+    enableLoggingButton->setChecked (ConfigFile ().automaticLogDir ());
+    connect (enableLoggingButton, &QCheckBox::toggled, this, &LogBrowser::togglePermanentLogging);
+    mainLayout->addWidget (enableLoggingButton);
 
-    label = new QLabel(
-        tr("This setting persists across client restarts.\n"
+    label = new QLabel (
+        tr ("This setting persists across client restarts.\n"
            "Note that using any logging command line options will override this setting."));
-    label->setWordWrap(true);
-    label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
-    mainLayout->addWidget(label);
+    label->setWordWrap (true);
+    label->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::MinimumExpanding);
+    mainLayout->addWidget (label);
 
     auto openFolderButton = new QPushButton;
-    openFolderButton->setText(tr("Open folder"));
-    connect(openFolderButton, &QPushButton::clicked, this, []() {
-        QString path = Logger::instance()->temporaryFolderLogDirPath();
-        QDir().mkpath(path);
-        QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+    openFolderButton->setText (tr ("Open folder"));
+    connect (openFolderButton, &QPushButton::clicked, this, [] () {
+        QString path = Logger::instance ()->temporaryFolderLogDirPath ();
+        QDir ().mkpath (path);
+        QDesktopServices::openUrl (QUrl::fromLocalFile (path));
     });
-    mainLayout->addWidget(openFolderButton);
+    mainLayout->addWidget (openFolderButton);
 
     auto *btnbox = new QDialogButtonBox;
-    QPushButton *closeBtn = btnbox->addButton(QDialogButtonBox::Close);
-    connect(closeBtn, &QAbstractButton::clicked, this, &QWidget::close);
+    QPushButton *closeBtn = btnbox->addButton (QDialogButtonBox::Close);
+    connect (closeBtn, &QAbstractButton::clicked, this, &QWidget::close);
 
-    mainLayout->addStretch();
-    mainLayout->addWidget(btnbox);
+    mainLayout->addStretch ();
+    mainLayout->addWidget (btnbox);
 
-    setLayout(mainLayout);
+    setLayout (mainLayout);
 
-    setModal(false);
+    setModal (false);
 
-    auto showLogWindow = new QAction(this);
-    showLogWindow->setShortcut(QKeySequence("F12"));
-    connect(showLogWindow, &QAction::triggered, this, &QWidget::close);
-    addAction(showLogWindow);
+    auto showLogWindow = new QAction (this);
+    showLogWindow->setShortcut (QKeySequence ("F12"));
+    connect (showLogWindow, &QAction::triggered, this, &QWidget::close);
+    addAction (showLogWindow);
 
     ConfigFile cfg;
-    cfg.restoreGeometry(this);
+    cfg.restoreGeometry (this);
 }
 
-LogBrowser::~LogBrowser() = default;
+LogBrowser::~LogBrowser () = default;
 
-void LogBrowser::closeEvent(QCloseEvent *) {
+void LogBrowser::closeEvent (QCloseEvent *) {
     ConfigFile cfg;
-    cfg.saveGeometry(this);
+    cfg.saveGeometry (this);
 }
 
-void LogBrowser::togglePermanentLogging(bool enabled) {
-    ConfigFile().setAutomaticLogDir(enabled);
+void LogBrowser::togglePermanentLogging (bool enabled) {
+    ConfigFile ().setAutomaticLogDir (enabled);
 
-    auto logger = Logger::instance();
+    auto logger = Logger::instance ();
     if (enabled) {
-        if (!logger->isLoggingToFile()) {
-            logger->setupTemporaryFolderLogDir();
-            logger->enterNextLogFile();
+        if (!logger->isLoggingToFile ()) {
+            logger->setupTemporaryFolderLogDir ();
+            logger->enterNextLogFile ();
         }
     } else {
-        logger->disableTemporaryFolderLogDir();
+        logger->disableTemporaryFolderLogDir ();
     }
 }
 

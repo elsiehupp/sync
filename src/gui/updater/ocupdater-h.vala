@@ -60,14 +60,14 @@ namespace OCC {
 
 class UpdaterScheduler : public QObject {
 public:
-    UpdaterScheduler(QObject *parent);
+    UpdaterScheduler (QObject *parent);
 
 signals:
-    void updaterAnnouncement(QString &title, QString &msg);
-    void requestRestart();
+    void updaterAnnouncement (QString &title, QString &msg);
+    void requestRestart ();
 
 private slots:
-    void slotTimerFired();
+    void slotTimerFired ();
 
 private:
     QTimer _updateCheckTimer; /** Timer for the regular update check. */
@@ -92,40 +92,40 @@ public:
         PlainText,
         Html,
     };
-    explicit OCUpdater(QUrl &url);
+    explicit OCUpdater (QUrl &url);
 
-    void setUpdateUrl(QUrl &url);
+    void setUpdateUrl (QUrl &url);
 
-    bool performUpdate();
+    bool performUpdate ();
 
-    void checkForUpdate() override;
+    void checkForUpdate () override;
 
-    QString statusString(UpdateStatusStringFormat format = PlainText) const;
-    int downloadState() const;
-    void setDownloadState(DownloadState state);
+    QString statusString (UpdateStatusStringFormat format = PlainText) const;
+    int downloadState () const;
+    void setDownloadState (DownloadState state);
 
 signals:
-    void downloadStateChanged();
-    void newUpdateAvailable(QString &header, QString &message);
-    void requestRestart();
+    void downloadStateChanged ();
+    void newUpdateAvailable (QString &header, QString &message);
+    void requestRestart ();
 
 public slots:
     // FIXME Maybe this should be in the NSISUpdater which should have been called WindowsUpdater
-    void slotStartInstaller();
+    void slotStartInstaller ();
 
 protected slots:
-    void backgroundCheckForUpdate() override;
-    void slotOpenUpdateUrl();
+    void backgroundCheckForUpdate () override;
+    void slotOpenUpdateUrl ();
 
 private slots:
-    void slotVersionInfoArrived();
-    void slotTimedOut();
+    void slotVersionInfoArrived ();
+    void slotTimedOut ();
 
 protected:
-    virtual void versionInfoArrived(UpdateInfo &info) = 0;
-    bool updateSucceeded() const;
-    QNetworkAccessManager *qnam() const { return _accessManager; }
-    UpdateInfo updateInfo() const { return _updateInfo; }
+    virtual void versionInfoArrived (UpdateInfo &info) = 0;
+    bool updateSucceeded () const;
+    QNetworkAccessManager *qnam () const { return _accessManager; }
+    UpdateInfo updateInfo () const { return _updateInfo; }
 
 private:
     QUrl _updateUrl;
@@ -141,18 +141,18 @@ private:
  */
 class NSISUpdater : public OCUpdater {
 public:
-    explicit NSISUpdater(QUrl &url);
-    bool handleStartup() override;
+    explicit NSISUpdater (QUrl &url);
+    bool handleStartup () override;
 private slots:
-    void slotSetSeenVersion();
-    void slotDownloadFinished();
-    void slotWriteFile();
+    void slotSetSeenVersion ();
+    void slotDownloadFinished ();
+    void slotWriteFile ();
 
 private:
-    void wipeUpdateData();
-    void showNoUrlDialog(UpdateInfo &info);
-    void showUpdateErrorDialog(QString &targetVersion);
-    void versionInfoArrived(UpdateInfo &info) override;
+    void wipeUpdateData ();
+    void showNoUrlDialog (UpdateInfo &info);
+    void showUpdateErrorDialog (QString &targetVersion);
+    void versionInfoArrived (UpdateInfo &info) override;
     QScopedPointer<QTemporaryFile> _file;
     QString _targetFile;
 };
@@ -166,12 +166,12 @@ private:
  */
 class PassiveUpdateNotifier : public OCUpdater {
 public:
-    explicit PassiveUpdateNotifier(QUrl &url);
-    bool handleStartup() override { return false; }
-    void backgroundCheckForUpdate() override;
+    explicit PassiveUpdateNotifier (QUrl &url);
+    bool handleStartup () override { return false; }
+    void backgroundCheckForUpdate () override;
 
 private:
-    void versionInfoArrived(UpdateInfo &info) override;
+    void versionInfoArrived (UpdateInfo &info) override;
     QByteArray _runningAppVersion;
 };
 }

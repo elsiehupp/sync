@@ -22,28 +22,28 @@ namespace OCC {
  */
 class OwncloudHttpCredsPage : public AbstractCredentialsWizardPage {
 public:
-    OwncloudHttpCredsPage(QWidget *parent);
+    OwncloudHttpCredsPage (QWidget *parent);
 
-    AbstractCredentials *getCredentials() const override;
+    AbstractCredentials *getCredentials () const override;
 
-    void initializePage() override;
-    void cleanupPage() override;
-    bool validatePage() override;
-    int nextId() const override;
-    void setConnected();
-    void setErrorString(QString &err);
+    void initializePage () override;
+    void cleanupPage () override;
+    bool validatePage () override;
+    int nextId () const override;
+    void setConnected ();
+    void setErrorString (QString &err);
 
 Q_SIGNALS:
-    void connectToOCUrl(QString &);
+    void connectToOCUrl (QString &);
 
 public slots:
-    void slotStyleChanged();
+    void slotStyleChanged ();
 
 private:
-    void startSpinner();
-    void stopSpinner();
-    void setupCustomization();
-    void customizeStyle();
+    void startSpinner ();
+    void stopSpinner ();
+    void setupCustomization ();
+    void customizeStyle ();
 
     Ui_OwncloudHttpCredsPage _ui;
     bool _connected;

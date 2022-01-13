@@ -39,22 +39,22 @@ namespace OCC {
 
 class SyncJournal;
 
-Q_DECLARE_LOGGING_CATEGORY(lcUtility)
+Q_DECLARE_LOGGING_CATEGORY (lcUtility)
 
 /** \addtogroup libsync
  *  @{
  */
 namespace Utility {
-    OCSYNC_EXPORT int rand();
-    OCSYNC_EXPORT void sleep(int sec);
-    OCSYNC_EXPORT void usleep(int usec);
-    OCSYNC_EXPORT QString formatFingerprint(QByteArray &, bool colonSeparated = true);
-    OCSYNC_EXPORT void setupFavLink(QString &folder);
-    OCSYNC_EXPORT void removeFavLink(QString &folder);
-    OCSYNC_EXPORT bool writeRandomFile(QString &fname, int size = -1);
-    OCSYNC_EXPORT QString octetsToString(qint64 octets);
-    OCSYNC_EXPORT QByteArray userAgentString();
-    OCSYNC_EXPORT QByteArray friendlyUserAgentString();
+    OCSYNC_EXPORT int rand ();
+    OCSYNC_EXPORT void sleep (int sec);
+    OCSYNC_EXPORT void usleep (int usec);
+    OCSYNC_EXPORT QString formatFingerprint (QByteArray &, bool colonSeparated = true);
+    OCSYNC_EXPORT void setupFavLink (QString &folder);
+    OCSYNC_EXPORT void removeFavLink (QString &folder);
+    OCSYNC_EXPORT bool writeRandomFile (QString &fname, int size = -1);
+    OCSYNC_EXPORT QString octetsToString (qint64 octets);
+    OCSYNC_EXPORT QByteArray userAgentString ();
+    OCSYNC_EXPORT QByteArray friendlyUserAgentString ();
     /**
       * @brief Return whether launch on startup is enabled system wide.
       *
@@ -63,14 +63,14 @@ namespace Utility {
       *
       * Currently only implemented on Windows.
       */
-    OCSYNC_EXPORT bool hasSystemLaunchOnStartup(QString &appName);
-    OCSYNC_EXPORT bool hasLaunchOnStartup(QString &appName);
-    OCSYNC_EXPORT void setLaunchOnStartup(QString &appName, QString &guiName, bool launch);
-    OCSYNC_EXPORT uint convertSizeToUint(size_t &convertVar);
-    OCSYNC_EXPORT int convertSizeToInt(size_t &convertVar);
+    OCSYNC_EXPORT bool hasSystemLaunchOnStartup (QString &appName);
+    OCSYNC_EXPORT bool hasLaunchOnStartup (QString &appName);
+    OCSYNC_EXPORT void setLaunchOnStartup (QString &appName, QString &guiName, bool launch);
+    OCSYNC_EXPORT uint convertSizeToUint (size_t &convertVar);
+    OCSYNC_EXPORT int convertSizeToInt (size_t &convertVar);
 
 #ifdef Q_OS_WIN
-    OCSYNC_EXPORT DWORD convertSizeToDWORD(size_t &convertVar);
+    OCSYNC_EXPORT DWORD convertSizeToDWORD (size_t &convertVar);
 #endif
 
     /**
@@ -78,7 +78,7 @@ namespace Utility {
      *
      * \a path must point to a directory
      */
-    OCSYNC_EXPORT qint64 freeDiskSpace(QString &path);
+    OCSYNC_EXPORT qint64 freeDiskSpace (QString &path);
 
     /**
      * @brief compactFormatDouble - formats a double value human readable.
@@ -88,14 +88,14 @@ namespace Utility {
      * @param unit an optional unit that is appended if present.
      * @return the formatted string.
      */
-    OCSYNC_EXPORT QString compactFormatDouble(double value, int prec, QString &unit = QString());
+    OCSYNC_EXPORT QString compactFormatDouble (double value, int prec, QString &unit = QString ());
 
     // porting methods
-    OCSYNC_EXPORT QString escape(QString &);
+    OCSYNC_EXPORT QString escape (QString &);
 
     // conversion function QDateTime <-> time_t   (because the ones builtin work on only unsigned 32bit)
-    OCSYNC_EXPORT QDateTime qDateTimeFromTime_t(qint64 t);
-    OCSYNC_EXPORT qint64 qDateTimeToTime_t(QDateTime &t);
+    OCSYNC_EXPORT QDateTime qDateTimeFromTime_t (qint64 t);
+    OCSYNC_EXPORT qint64 qDateTimeToTime_t (QDateTime &t);
 
     /**
      * @brief Convert milliseconds duration to human readable string.
@@ -108,8 +108,8 @@ namespace Utility {
      * durationToDescriptiveString2 uses two units where possible, so
      * "5 minutes 43 seconds" or "1 month 3 days".
      */
-    OCSYNC_EXPORT QString durationToDescriptiveString1(quint64 msecs);
-    OCSYNC_EXPORT QString durationToDescriptiveString2(quint64 msecs);
+    OCSYNC_EXPORT QString durationToDescriptiveString1 (quint64 msecs);
+    OCSYNC_EXPORT QString durationToDescriptiveString2 (quint64 msecs);
 
     /**
      * @brief hasDarkSystray - determines whether the systray is dark or light.
@@ -121,40 +121,40 @@ namespace Utility {
      *
      * @return bool which is true for systems with dark systray.
      */
-    OCSYNC_EXPORT bool hasDarkSystray();
+    OCSYNC_EXPORT bool hasDarkSystray ();
 
     // convenience OS detection methods
-    inline bool isWindows();
-    inline bool isMac();
-    inline bool isUnix();
-    inline bool isLinux(); // use with care
-    inline bool isBSD(); // use with care, does not match OS X
+    inline bool isWindows ();
+    inline bool isMac ();
+    inline bool isUnix ();
+    inline bool isLinux (); // use with care
+    inline bool isBSD (); // use with care, does not match OS X
 
-    OCSYNC_EXPORT QString platformName();
+    OCSYNC_EXPORT QString platformName ();
     // crash helper for --debug
-    OCSYNC_EXPORT void crash();
+    OCSYNC_EXPORT void crash ();
 
     // Case preserving file system underneath?
     // if this function returns true, the file system is case preserving,
     // that means "test" means the same as "TEST" for filenames.
     // if false, the two cases are two different files.
-    OCSYNC_EXPORT bool fsCasePreserving();
+    OCSYNC_EXPORT bool fsCasePreserving ();
 
     // Check if two pathes that MUST exist are equal. This function
-    // uses QDir::canonicalPath() to judge and cares for the systems
+    // uses QDir::canonicalPath () to judge and cares for the systems
     // case sensitivity.
-    OCSYNC_EXPORT bool fileNamesEqual(QString &fn1, QString &fn2);
+    OCSYNC_EXPORT bool fileNamesEqual (QString &fn1, QString &fn2);
 
     // Call the given command with the switch --version and rerun the first line
     // of the output.
     // If command is empty, the function calls the running application which, on
     // Linux, might have changed while this one is running.
-    // For Mac and Windows, it returns QString()
-    OCSYNC_EXPORT QByteArray versionOfInstalledBinary(QString &command = QString());
+    // For Mac and Windows, it returns QString ()
+    OCSYNC_EXPORT QByteArray versionOfInstalledBinary (QString &command = QString ());
 
-    OCSYNC_EXPORT QString fileNameForGuiUse(QString &fName);
+    OCSYNC_EXPORT QString fileNameForGuiUse (QString &fName);
 
-    OCSYNC_EXPORT QByteArray normalizeEtag(QByteArray etag);
+    OCSYNC_EXPORT QByteArray normalizeEtag (QByteArray etag);
 
     /**
      * @brief timeAgoInWords - human readable time span
@@ -164,7 +164,7 @@ namespace Utility {
      *
      * If the second parameter is ommitted, the current time is used.
      */
-    OCSYNC_EXPORT QString timeAgoInWords(QDateTime &dt, QDateTime &from = QDateTime());
+    OCSYNC_EXPORT QString timeAgoInWords (QDateTime &dt, QDateTime &from = QDateTime ());
 
     class OCSYNC_EXPORT StopWatch {
     private:
@@ -173,30 +173,30 @@ namespace Utility {
         QElapsedTimer _timer;
 
     public:
-        void start();
-        quint64 stop();
-        quint64 addLapTime(QString &lapName);
-        void reset();
+        void start ();
+        quint64 stop ();
+        quint64 addLapTime (QString &lapName);
+        void reset ();
 
         // out helpers, return the measured times.
-        QDateTime startTime() const;
-        QDateTime timeOfLap(QString &lapName) const;
-        quint64 durationOfLap(QString &lapName) const;
+        QDateTime startTime () const;
+        QDateTime timeOfLap (QString &lapName) const;
+        quint64 durationOfLap (QString &lapName) const;
     };
 
     /**
      * @brief Sort a QStringList in a way that's appropriate for filenames
      */
-    OCSYNC_EXPORT void sortFilenames(QStringList &fileNames);
+    OCSYNC_EXPORT void sortFilenames (QStringList &fileNames);
 
     /** Appends concatPath and queryItems to the url */
-    OCSYNC_EXPORT QUrl concatUrlPath(
+    OCSYNC_EXPORT QUrl concatUrlPath (
         const QUrl &url, QString &concatPath,
         const QUrlQuery &queryItems = {});
 
     /**  Returns a new settings pre-set in a specific group.  The Settings will be created
          with the given parent. If no parent is specified, the caller must destroy the settings */
-    OCSYNC_EXPORT std::unique_ptr<QSettings> settingsWithGroup(QString &group, QObject *parent = nullptr);
+    OCSYNC_EXPORT std::unique_ptr<QSettings> settingsWithGroup (QString &group, QObject *parent = nullptr);
 
     /** Sanitizes a string that shall become part of a filename.
      *
@@ -210,52 +210,52 @@ namespace Utility {
      * - windows reserved filenames ('CON' etc)
      * will pass unchanged.
      */
-    OCSYNC_EXPORT QString sanitizeForFileName(QString &name);
+    OCSYNC_EXPORT QString sanitizeForFileName (QString &name);
 
     /** Returns a file name based on \a fn that's suitable for a conflict.
      */
-    OCSYNC_EXPORT QString makeConflictFileName(
+    OCSYNC_EXPORT QString makeConflictFileName (
         const QString &fn, QDateTime &dt, QString &user);
 
     /** Returns whether a file name indicates a conflict file
      */
-    OCSYNC_EXPORT bool isConflictFile(char *name);
-    OCSYNC_EXPORT bool isConflictFile(QString &name);
+    OCSYNC_EXPORT bool isConflictFile (char *name);
+    OCSYNC_EXPORT bool isConflictFile (QString &name);
 
     /** Find the base name for a conflict file name, using name pattern only
      *
      * Will return an empty string if it's not a conflict file.
      *
      * Prefer to use the data from the conflicts table in the journal to determine
-     * a conflict's base file, see SyncJournal::conflictFileBaseName()
+     * a conflict's base file, see SyncJournal::conflictFileBaseName ()
      */
-    OCSYNC_EXPORT QByteArray conflictFileBaseNameFromPattern(QByteArray &conflictName);
+    OCSYNC_EXPORT QByteArray conflictFileBaseNameFromPattern (QByteArray &conflictName);
 
     /**
      * @brief Check whether the path is a root of a Windows drive partition ([c:/, d:/, e:/, etc.)
      */
-    OCSYNC_EXPORT bool isPathWindowsDrivePartitionRoot(QString &path);
+    OCSYNC_EXPORT bool isPathWindowsDrivePartitionRoot (QString &path);
 
     /**
      * @brief Retrieves current logged-in user name from the OS
      */
-    OCSYNC_EXPORT QString getCurrentUserName();
+    OCSYNC_EXPORT QString getCurrentUserName ();
 
 #ifdef Q_OS_WIN
-    OCSYNC_EXPORT bool registryKeyExists(HKEY hRootKey, QString &subKey);
-    OCSYNC_EXPORT QVariant registryGetKeyValue(HKEY hRootKey, QString &subKey, QString &valueName);
-    OCSYNC_EXPORT bool registrySetKeyValue(HKEY hRootKey, QString &subKey, QString &valueName, DWORD type, QVariant &value);
-    OCSYNC_EXPORT bool registryDeleteKeyTree(HKEY hRootKey, QString &subKey);
-    OCSYNC_EXPORT bool registryDeleteKeyValue(HKEY hRootKey, QString &subKey, QString &valueName);
-    OCSYNC_EXPORT bool registryWalkSubKeys(HKEY hRootKey, QString &subKey, std::function<void(HKEY, QString &)> &callback);
-    OCSYNC_EXPORT QRect getTaskbarDimensions();
+    OCSYNC_EXPORT bool registryKeyExists (HKEY hRootKey, QString &subKey);
+    OCSYNC_EXPORT QVariant registryGetKeyValue (HKEY hRootKey, QString &subKey, QString &valueName);
+    OCSYNC_EXPORT bool registrySetKeyValue (HKEY hRootKey, QString &subKey, QString &valueName, DWORD type, QVariant &value);
+    OCSYNC_EXPORT bool registryDeleteKeyTree (HKEY hRootKey, QString &subKey);
+    OCSYNC_EXPORT bool registryDeleteKeyValue (HKEY hRootKey, QString &subKey, QString &valueName);
+    OCSYNC_EXPORT bool registryWalkSubKeys (HKEY hRootKey, QString &subKey, std::function<void (HKEY, QString &)> &callback);
+    OCSYNC_EXPORT QRect getTaskbarDimensions ();
 
     // Possibly refactor to share code with UnixTimevalToFileTime in c_time.c
-    OCSYNC_EXPORT void UnixTimeToFiletime(time_t t, FILETIME *filetime);
-    OCSYNC_EXPORT void FiletimeToLargeIntegerFiletime(FILETIME *filetime, LARGE_INTEGER *hundredNSecs);
-    OCSYNC_EXPORT void UnixTimeToLargeIntegerFiletime(time_t t, LARGE_INTEGER *hundredNSecs);
+    OCSYNC_EXPORT void UnixTimeToFiletime (time_t t, FILETIME *filetime);
+    OCSYNC_EXPORT void FiletimeToLargeIntegerFiletime (FILETIME *filetime, LARGE_INTEGER *hundredNSecs);
+    OCSYNC_EXPORT void UnixTimeToLargeIntegerFiletime (time_t t, LARGE_INTEGER *hundredNSecs);
 
-    OCSYNC_EXPORT QString formatWinError(long error);
+    OCSYNC_EXPORT QString formatWinError (long error);
 
     class OCSYNC_EXPORT NtfsPermissionLookupRAII {
     public:
@@ -264,18 +264,18 @@ namespace Utility {
          * Enable it and disable it again once we leave the scope
          * https://doc.qt.io/Qt-5/qfileinfo.html#ntfs-permissions
          */
-        NtfsPermissionLookupRAII();
-        ~NtfsPermissionLookupRAII();
+        NtfsPermissionLookupRAII ();
+        ~NtfsPermissionLookupRAII ();
 
     private:
-        Q_DISABLE_COPY(NtfsPermissionLookupRAII);
+        Q_DISABLE_COPY (NtfsPermissionLookupRAII);
     };
 
 #endif
 }
 /** @} */ // \addtogroup
 
-inline bool Utility::isWindows() {
+inline bool Utility::isWindows () {
 #ifdef Q_OS_WIN
     return true;
 #else
@@ -283,7 +283,7 @@ inline bool Utility::isWindows() {
 #endif
 }
 
-inline bool Utility::isMac() {
+inline bool Utility::isMac () {
 #ifdef Q_OS_MAC
     return true;
 #else
@@ -291,7 +291,7 @@ inline bool Utility::isMac() {
 #endif
 }
 
-inline bool Utility::isUnix() {
+inline bool Utility::isUnix () {
 #ifdef Q_OS_UNIX
     return true;
 #else
@@ -299,16 +299,16 @@ inline bool Utility::isUnix() {
 #endif
 }
 
-inline bool Utility::isLinux() {
-#if defined(Q_OS_LINUX)
+inline bool Utility::isLinux () {
+#if defined (Q_OS_LINUX)
     return true;
 #else
     return false;
 #endif
 }
 
-inline bool Utility::isBSD() {
-#if defined(Q_OS_FREEBSD) || defined(Q_OS_NETBSD) || defined(Q_OS_OPENBSD)
+inline bool Utility::isBSD () {
+#if defined (Q_OS_FREEBSD) || defined (Q_OS_NETBSD) || defined (Q_OS_OPENBSD)
     return true;
 #else
     return false;

@@ -14,29 +14,29 @@ namespace OCC {
  *
  * To be used like this:
  * \code
- * _job = new SignPublicKeyApiJob(account, QLatin1String("ocs/v1.php/foo/bar"), this);
- * _job->setCsr( csr );
- * connect(_job...);
- * _job->start();
+ * _job = new SignPublicKeyApiJob (account, QLatin1String ("ocs/v1.php/foo/bar"), this);
+ * _job->setCsr ( csr );
+ * connect (_job...);
+ * _job->start ();
  * \encode
  *
  * @ingroup libsync
  */
 class OWNCLOUDSYNC_EXPORT SignPublicKeyApiJob : public AbstractNetworkJob {
 public:
-    explicit SignPublicKeyApiJob(AccountPtr &account, QString &path, QObject *parent = nullptr);
+    explicit SignPublicKeyApiJob (AccountPtr &account, QString &path, QObject *parent = nullptr);
 
     /**
      * @brief setCsr - the CSR with the public key.
-     * This function needs to be called before start() obviously.
+     * This function needs to be called before start () obviously.
      */
-    void setCsr(QByteArray& csr);
+    void setCsr (QByteArray& csr);
 
 public slots:
-    void start() override;
+    void start () override;
 
 protected:
-    bool finished() override;
+    bool finished () override;
 signals:
 
     /**
@@ -44,7 +44,7 @@ signals:
      * @param json - the parsed json document
      * @param statusCode - the OCS status code: 100 (!) for success
      */
-    void jsonReceived(QJsonDocument &json, int statusCode);
+    void jsonReceived (QJsonDocument &json, int statusCode);
 
 private:
     QBuffer _csr;
@@ -55,29 +55,29 @@ private:
  *
  * To be used like this:
  * \code
- * _job = new StorePrivateKeyApiJob(account, QLatin1String("ocs/v1.php/foo/bar"), this);
- * _job->setPrivateKey( privKey );
- * connect(_job...);
- * _job->start();
+ * _job = new StorePrivateKeyApiJob (account, QLatin1String ("ocs/v1.php/foo/bar"), this);
+ * _job->setPrivateKey ( privKey );
+ * connect (_job...);
+ * _job->start ();
  * \encode
  *
  * @ingroup libsync
  */
 class OWNCLOUDSYNC_EXPORT StorePrivateKeyApiJob : public AbstractNetworkJob {
 public:
-    explicit StorePrivateKeyApiJob(AccountPtr &account, QString &path, QObject *parent = nullptr);
+    explicit StorePrivateKeyApiJob (AccountPtr &account, QString &path, QObject *parent = nullptr);
 
     /**
      * @brief setCsr - the CSR with the public key.
-     * This function needs to be called before start() obviously.
+     * This function needs to be called before start () obviously.
      */
-    void setPrivateKey(QByteArray& privateKey);
+    void setPrivateKey (QByteArray& privateKey);
 
 public slots:
-    void start() override;
+    void start () override;
 
 protected:
-    bool finished() override;
+    bool finished () override;
 signals:
 
     /**
@@ -85,7 +85,7 @@ signals:
      * @param json - the parsed json document
      * @param statusCode - the OCS status code: 100 (!) for success
      */
-    void jsonReceived(QJsonDocument &json, int statusCode);
+    void jsonReceived (QJsonDocument &json, int statusCode);
 
 private:
     QBuffer _privKey;
@@ -96,9 +96,9 @@ private:
  *
  * To be used like this:
  * \code
- * _job = new SetEncryptionFlagApiJob(account, 2, this);
-  * connect(_job...);
- * _job->start();
+ * _job = new SetEncryptionFlagApiJob (account, 2, this);
+  * connect (_job...);
+ * _job->start ();
  * \encode
  *
  * @ingroup libsync
@@ -110,17 +110,17 @@ public:
         Set = 1
     };
 
-    explicit SetEncryptionFlagApiJob(AccountPtr &account, QByteArray &fileId, FlagAction flagAction = Set, QObject *parent = nullptr);
+    explicit SetEncryptionFlagApiJob (AccountPtr &account, QByteArray &fileId, FlagAction flagAction = Set, QObject *parent = nullptr);
 
 public slots:
-    void start() override;
+    void start () override;
 
 protected:
-    bool finished() override;
+    bool finished () override;
 
 signals:
-    void success(QByteArray &fileId);
-    void error(QByteArray &fileId, int httpReturnCode);
+    void success (QByteArray &fileId);
+    void error (QByteArray &fileId, int httpReturnCode);
 
 private:
     QByteArray _fileId;
@@ -129,17 +129,17 @@ private:
 
 class OWNCLOUDSYNC_EXPORT LockEncryptFolderApiJob : public AbstractNetworkJob {
 public:
-    explicit LockEncryptFolderApiJob(AccountPtr &account, QByteArray& fileId, QObject *parent = nullptr);
+    explicit LockEncryptFolderApiJob (AccountPtr &account, QByteArray& fileId, QObject *parent = nullptr);
 
 public slots:
-    void start() override;
+    void start () override;
 
 protected:
-    bool finished() override;
+    bool finished () override;
 
 signals:
-    void success(QByteArray& fileId, QByteArray& token);
-    void error(QByteArray& fileId, int httpdErrorCode);
+    void success (QByteArray& fileId, QByteArray& token);
+    void error (QByteArray& fileId, int httpdErrorCode);
 
 private:
     QByteArray _fileId;
@@ -154,14 +154,14 @@ public:
         QObject *parent = nullptr);
 
 public slots:
-    void start() override;
+    void start () override;
 
 protected:
-    bool finished() override;
+    bool finished () override;
 
 signals:
-    void success(QByteArray& fileId);
-    void error(QByteArray& fileId, int httpReturnCode);
+    void success (QByteArray& fileId);
+    void error (QByteArray& fileId, int httpReturnCode);
 
 private:
     QByteArray _fileId;
@@ -178,14 +178,14 @@ public:
         QObject *parent = nullptr);
 
 public slots:
-    void start() override;
+    void start () override;
 
 protected:
-    bool finished() override;
+    bool finished () override;
 
 signals:
-    void success(QByteArray& fileId);
-    void error(QByteArray& fileId, int httpReturnCode);
+    void success (QByteArray& fileId);
+    void error (QByteArray& fileId, int httpReturnCode);
 
 private:
     QByteArray _fileId;
@@ -202,14 +202,14 @@ public:
         QObject *parent = nullptr);
 
 public slots:
-    void start() override;
+    void start () override;
 
 protected:
-    bool finished() override;
+    bool finished () override;
 
 signals:
-    void success(QByteArray& fileId);
-    void error(QByteArray& fileId, int httpReturnCode);
+    void success (QByteArray& fileId);
+    void error (QByteArray& fileId, int httpReturnCode);
 
 private:
     QByteArray _fileId;
@@ -225,14 +225,14 @@ public:
         QObject *parent = nullptr);
 
 public slots:
-    void start() override;
+    void start () override;
 
 protected:
-    bool finished() override;
+    bool finished () override;
 
 signals:
-    void jsonReceived(QJsonDocument &json, int statusCode);
-    void error(QByteArray& fileId, int httpReturnCode);
+    void jsonReceived (QJsonDocument &json, int statusCode);
+    void error (QByteArray& fileId, int httpReturnCode);
 
 private:
     QByteArray _fileId;
@@ -246,14 +246,14 @@ public:
         QObject *parent = nullptr);
 
 public slots:
-    void start() override;
+    void start () override;
 
 protected:
-    bool finished() override;
+    bool finished () override;
 
 signals:
-    void success(QByteArray& fileId);
-    void error(QByteArray& fileId, int httpErrorCode);
+    void success (QByteArray& fileId);
+    void error (QByteArray& fileId, int httpErrorCode);
 
 private:
     QByteArray _fileId;

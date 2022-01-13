@@ -25,12 +25,12 @@ namespace OCC {
  */
 class FolderWatcherPrivate {
 public:
-    FolderWatcherPrivate(FolderWatcher *p, QString &path);
-    ~FolderWatcherPrivate();
+    FolderWatcherPrivate (FolderWatcher *p, QString &path);
+    ~FolderWatcherPrivate ();
 
-    void startWatching();
-    QStringList addCoalescedPaths(QStringList &) const;
-    void doNotifyParent(QStringList &);
+    void startWatching ();
+    QStringList addCoalescedPaths (QStringList &) const;
+    void doNotifyParent (QStringList &);
 
     /// On OSX the watcher is ready when the ctor finished.
     bool _ready = true;

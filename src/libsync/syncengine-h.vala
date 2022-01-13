@@ -47,35 +47,35 @@ enum AnotherSyncNeeded {
  */
 class OWNCLOUDSYNC_EXPORT SyncEngine : public QObject {
 public:
-    SyncEngine(AccountPtr account, QString &localPath,
+    SyncEngine (AccountPtr account, QString &localPath,
         const QString &remotePath, SyncJournalDb *journal);
-    ~SyncEngine() override;
+    ~SyncEngine () override;
 
-    Q_INVOKABLE void startSync();
-    void setNetworkLimits(int upload, int download);
+    Q_INVOKABLE void startSync ();
+    void setNetworkLimits (int upload, int download);
 
     /* Abort the sync.  Called from the main thread */
-    void abort();
+    void abort ();
 
-    bool isSyncRunning() const { return _syncRunning; }
+    bool isSyncRunning () const { return _syncRunning; }
 
-    SyncOptions syncOptions() const { return _syncOptions; }
-    void setSyncOptions(SyncOptions &options) { _syncOptions = options; }
-    bool ignoreHiddenFiles() const { return _ignore_hidden_files; }
-    void setIgnoreHiddenFiles(bool ignore) { _ignore_hidden_files = ignore; }
+    SyncOptions syncOptions () const { return _syncOptions; }
+    void setSyncOptions (SyncOptions &options) { _syncOptions = options; }
+    bool ignoreHiddenFiles () const { return _ignore_hidden_files; }
+    void setIgnoreHiddenFiles (bool ignore) { _ignore_hidden_files = ignore; }
 
-    ExcludedFiles &excludedFiles() { return *_excludedFiles; }
-    Utility::StopWatch &stopWatch() { return _stopWatch; }
-    SyncFileStatusTracker &syncFileStatusTracker() { return *_syncFileStatusTracker; }
+    ExcludedFiles &excludedFiles () { return *_excludedFiles; }
+    Utility::StopWatch &stopWatch () { return _stopWatch; }
+    SyncFileStatusTracker &syncFileStatusTracker () { return *_syncFileStatusTracker; }
 
     /* Returns whether another sync is needed to complete the sync */
-    AnotherSyncNeeded isAnotherSyncNeeded() { return _anotherSyncNeeded; }
+    AnotherSyncNeeded isAnotherSyncNeeded () { return _anotherSyncNeeded; }
 
-    bool wasFileTouched(QString &fn) const;
+    bool wasFileTouched (QString &fn) const;
 
-    AccountPtr account() const;
-    SyncJournalDb *journal() const { return _journal; }
-    QString localPath() const { return _localPath; }
+    AccountPtr account () const;
+    SyncJournalDb *journal () const { return _journal; }
+    QString localPath () const { return _localPath; }
 
     /** Duration in ms that uploads should be delayed after a file change
      *
@@ -100,7 +100,7 @@ public:
      * revert afterwards. Use _lastLocalDiscoveryStyle to discover the last
      * sync's style.
      */
-    void setLocalDiscoveryOptions(LocalDiscoveryStyle style, std::set<QString> paths = {});
+    void setLocalDiscoveryOptions (LocalDiscoveryStyle style, std::set<QString> paths = {});
 
     /**
      * Returns whether the given folder-relative path should be locally discovered
@@ -109,10 +109,10 @@ public:
      * Example: If path is 'foo/bar' and style is DatabaseAndFilesystem and dirs contains
      *     'foo/bar/touched_file', then the result will be true.
      */
-    bool shouldDiscoverLocally(QString &path) const;
+    bool shouldDiscoverLocally (QString &path) const;
 
     /** Access the last sync run's local discovery style */
-    LocalDiscoveryStyle lastLocalDiscoveryStyle() const { return _lastLocalDiscoveryStyle; }
+    LocalDiscoveryStyle lastLocalDiscoveryStyle () const { return _lastLocalDiscoveryStyle; }
 
     /** Removes all virtual file db entries and dehydrated local placeholders.
      *
@@ -120,56 +120,56 @@ public:
      * different kind of vfs.
      *
      * Note that *hydrated* placeholder files might still be left. These will
-     * get cleaned up by Vfs::unregisterFolder().
+     * get cleaned up by Vfs::unregisterFolder ().
      */
-    static void wipeVirtualFiles(QString &localPath, SyncJournalDb &journal, Vfs &vfs);
+    static void wipeVirtualFiles (QString &localPath, SyncJournalDb &journal, Vfs &vfs);
 
-    static void switchToVirtualFiles(QString &localPath, SyncJournalDb &journal, Vfs &vfs);
+    static void switchToVirtualFiles (QString &localPath, SyncJournalDb &journal, Vfs &vfs);
 
-    auto getPropagator() { return _propagator; } // for the test
+    auto getPropagator () { return _propagator; } // for the test
 
 signals:
     // During update, before reconcile
-    void rootEtag(QByteArray &, QDateTime &);
+    void rootEtag (QByteArray &, QDateTime &);
 
     // after the above signals. with the items that actually need propagating
-    void aboutToPropagate(SyncFileItemVector &);
+    void aboutToPropagate (SyncFileItemVector &);
 
     // after each item completed by a job (successful or not)
-    void itemCompleted(SyncFileItemPtr &);
+    void itemCompleted (SyncFileItemPtr &);
 
-    void transmissionProgress(ProgressInfo &progress);
+    void transmissionProgress (ProgressInfo &progress);
 
     /// We've produced a new sync error of a type.
-    void syncError(QString &message, ErrorCategory category = ErrorCategory::Normal);
+    void syncError (QString &message, ErrorCategory category = ErrorCategory::Normal);
 
-    void addErrorToGui(SyncFileItem::Status status, QString &errorMessage, QString &subject);
+    void addErrorToGui (SyncFileItem::Status status, QString &errorMessage, QString &subject);
 
-    void finished(bool success);
-    void started();
+    void finished (bool success);
+    void started ();
 
     /**
      * Emited when the sync engine detects that all the files have been removed or change.
      * This usually happen when the server was reset or something.
      * Set *cancel to true in a slot connected from this signal to abort the sync.
      */
-    void aboutToRemoveAllFiles(SyncFileItem::Direction direction, std::function<void(bool)> f);
+    void aboutToRemoveAllFiles (SyncFileItem::Direction direction, std::function<void (bool)> f);
 
     // A new folder was discovered and was not synced because of the confirmation feature
-    void newBigFolder(QString &folder, bool isExternal);
+    void newBigFolder (QString &folder, bool isExternal);
 
     /** Emitted when propagation has problems with a locked file.
      *
      * Forwarded from OwncloudPropagator::seenLockedFile.
      */
-    void seenLockedFile(QString &fileName);
+    void seenLockedFile (QString &fileName);
 
 private slots:
-    void slotFolderDiscovered(bool local, QString &folder);
-    void slotRootEtagReceived(QByteArray &, QDateTime &time);
+    void slotFolderDiscovered (bool local, QString &folder);
+    void slotRootEtagReceived (QByteArray &, QDateTime &time);
 
     /** When the discovery phase discovers an item */
-    void slotItemDiscovered(SyncFileItemPtr &item);
+    void slotItemDiscovered (SyncFileItemPtr &item);
 
     /** Called when a SyncFileItem gets accepted for a sync.
      *
@@ -177,44 +177,44 @@ private slots:
      * can also be called via the propagator for items that are
      * created during propagation.
      */
-    void slotNewItem(SyncFileItemPtr &item);
+    void slotNewItem (SyncFileItemPtr &item);
 
-    void slotItemCompleted(SyncFileItemPtr &item);
-    void slotDiscoveryFinished();
-    void slotPropagationFinished(bool success);
-    void slotProgress(SyncFileItem &item, qint64 curent);
-    void slotCleanPollsJobAborted(QString &error);
+    void slotItemCompleted (SyncFileItemPtr &item);
+    void slotDiscoveryFinished ();
+    void slotPropagationFinished (bool success);
+    void slotProgress (SyncFileItem &item, qint64 curent);
+    void slotCleanPollsJobAborted (QString &error);
 
     /** Records that a file was touched by a job. */
-    void slotAddTouchedFile(QString &fn);
+    void slotAddTouchedFile (QString &fn);
 
     /** Wipes the _touchedFiles hash */
-    void slotClearTouchedFiles();
+    void slotClearTouchedFiles ();
 
     /** Emit a summary error, unless it was seen before */
-    void slotSummaryError(QString &message);
+    void slotSummaryError (QString &message);
 
-    void slotInsufficientLocalStorage();
-    void slotInsufficientRemoteStorage();
+    void slotInsufficientLocalStorage ();
+    void slotInsufficientRemoteStorage ();
 
 private:
-    bool checkErrorBlacklisting(SyncFileItem &item);
+    bool checkErrorBlacklisting (SyncFileItem &item);
 
     // Cleans up unnecessary downloadinfo entries in the journal as well
     // as their temporary files.
-    void deleteStaleDownloadInfos(SyncFileItemVector &syncItems);
+    void deleteStaleDownloadInfos (SyncFileItemVector &syncItems);
 
     // Removes stale uploadinfos from the journal.
-    void deleteStaleUploadInfos(SyncFileItemVector &syncItems);
+    void deleteStaleUploadInfos (SyncFileItemVector &syncItems);
 
     // Removes stale error blacklist entries from the journal.
-    void deleteStaleErrorBlacklistEntries(SyncFileItemVector &syncItems);
+    void deleteStaleErrorBlacklistEntries (SyncFileItemVector &syncItems);
 
     // Removes stale and adds missing conflict records after sync
-    void conflictRecordMaintenance();
+    void conflictRecordMaintenance ();
 
     // cleanup and emit the finished signal
-    void finalize(bool success);
+    void finalize (bool success);
 
     static bool s_anySyncRunning; //true when one sync is running somewhere (for debugging)
 
@@ -246,13 +246,13 @@ private:
      * check if we are allowed to propagate everything, and if we are not, adjust the instructions
      * to recover
      */
-    void checkForPermission(SyncFileItemVector &syncItems);
-    RemotePermissions getPermissions(QString &file) const;
+    void checkForPermission (SyncFileItemVector &syncItems);
+    RemotePermissions getPermissions (QString &file) const;
 
     /**
      * Instead of downloading files from the server, upload the files to the server
      */
-    void restoreOldFiles(SyncFileItemVector &syncItems);
+    void restoreOldFiles (SyncFileItemVector &syncItems);
 
     // true if there is at least one file which was not changed on the server
     bool _hasNoneFiles;

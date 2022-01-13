@@ -29,41 +29,41 @@ namespace OCC {
  */
 class OwncloudSetupPage : public QWizardPage {
 public:
-    OwncloudSetupPage(QWidget *parent = nullptr);
-    ~OwncloudSetupPage() override;
+    OwncloudSetupPage (QWidget *parent = nullptr);
+    ~OwncloudSetupPage () override;
 
-    bool isComplete() const override;
-    void initializePage() override;
-    int nextId() const override;
-    void setServerUrl(QString &);
-    void setAllowPasswordStorage(bool);
-    bool validatePage() override;
-    QString url() const;
-    QString localFolder() const;
-    void setRemoteFolder(QString &remoteFolder);
-    void setMultipleFoldersExist(bool exist);
-    void setAuthType(DetermineAuthTypeJob::AuthType type);
+    bool isComplete () const override;
+    void initializePage () override;
+    int nextId () const override;
+    void setServerUrl (QString &);
+    void setAllowPasswordStorage (bool);
+    bool validatePage () override;
+    QString url () const;
+    QString localFolder () const;
+    void setRemoteFolder (QString &remoteFolder);
+    void setMultipleFoldersExist (bool exist);
+    void setAuthType (DetermineAuthTypeJob::AuthType type);
 
 public slots:
-    void setErrorString(QString &, bool retryHTTPonly);
-    void startSpinner();
-    void stopSpinner();
-    void slotCertificateAccepted();
-    void slotStyleChanged();
+    void setErrorString (QString &, bool retryHTTPonly);
+    void startSpinner ();
+    void stopSpinner ();
+    void slotCertificateAccepted ();
+    void slotStyleChanged ();
 
 protected slots:
-    void slotUrlChanged(QString &);
-    void slotUrlEditFinished();
+    void slotUrlChanged (QString &);
+    void slotUrlEditFinished ();
 
-    void setupCustomization();
+    void setupCustomization ();
 
 signals:
-    void determineAuthType(QString &);
+    void determineAuthType (QString &);
 
 private:
-    void setLogo();
-    void customizeStyle();
-    void setupServerAddressDescriptionLabel();
+    void setLogo ();
+    void customizeStyle ();
+    void setupServerAddressDescriptionLabel ();
 
     Ui_OwncloudSetupPage _ui;
 

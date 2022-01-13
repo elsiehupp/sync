@@ -40,30 +40,30 @@ namespace FileSystem {
     /**
      * @brief compare two files with given filename and return true if they have the same content
      */
-    bool fileEquals(QString &fn1, QString &fn2);
+    bool fileEquals (QString &fn1, QString &fn2);
 
     /**
      * @brief Get the mtime for a filepath
      *
-     * Use this over QFileInfo::lastModified() to avoid timezone related bugs. See
+     * Use this over QFileInfo::lastModified () to avoid timezone related bugs. See
      * owncloud/core#9781 for details.
      */
-    time_t OWNCLOUDSYNC_EXPORT getModTime(QString &filename);
+    time_t OWNCLOUDSYNC_EXPORT getModTime (QString &filename);
 
-    bool OWNCLOUDSYNC_EXPORT setModTime(QString &filename, time_t modTime);
+    bool OWNCLOUDSYNC_EXPORT setModTime (QString &filename, time_t modTime);
 
     /**
      * @brief Get the size for a file
      *
-     * Use this over QFileInfo::size() to avoid bugs with lnk files on Windows.
+     * Use this over QFileInfo::size () to avoid bugs with lnk files on Windows.
      * See https://bugreports.qt.io/browse/QTBUG-24831.
      */
-    qint64 OWNCLOUDSYNC_EXPORT getSize(QString &filename);
+    qint64 OWNCLOUDSYNC_EXPORT getSize (QString &filename);
 
     /**
      * @brief Retrieve a file inode with csync
      */
-    bool OWNCLOUDSYNC_EXPORT getInode(QString &filename, quint64 *inode);
+    bool OWNCLOUDSYNC_EXPORT getInode (QString &filename, quint64 *inode);
 
     /**
      * @brief Check if \a fileName has changed given previous size and mtime
@@ -72,14 +72,14 @@ namespace FileSystem {
      *
      * @return true if the file's mtime or size are not what is expected.
      */
-    bool OWNCLOUDSYNC_EXPORT fileChanged(QString &fileName,
+    bool OWNCLOUDSYNC_EXPORT fileChanged (QString &fileName,
         qint64 previousSize,
         time_t previousMtime);
 
     /**
-     * @brief Like !fileChanged() but with verbose logging if the file *did* change.
+     * @brief Like !fileChanged () but with verbose logging if the file *did* change.
      */
-    bool OWNCLOUDSYNC_EXPORT verifyFileUnchanged(QString &fileName,
+    bool OWNCLOUDSYNC_EXPORT verifyFileUnchanged (QString &fileName,
         qint64 previousSize,
         time_t previousMtime);
 
@@ -87,11 +87,11 @@ namespace FileSystem {
      * Removes a directory and its contents recursively
      *
      * Returns true if all removes succeeded.
-     * onDeleted() is called for each deleted file or directory, including the root.
+     * onDeleted () is called for each deleted file or directory, including the root.
      * errors are collected in errors.
      */
-    bool OWNCLOUDSYNC_EXPORT removeRecursively(QString &path,
-        const std::function<void(QString &path, bool isDir)> &onDeleted = nullptr,
+    bool OWNCLOUDSYNC_EXPORT removeRecursively (QString &path,
+        const std::function<void (QString &path, bool isDir)> &onDeleted = nullptr,
         QStringList *errors = nullptr);
 }
 

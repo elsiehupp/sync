@@ -32,14 +32,14 @@ namespace OCC {
  */
 class LogBrowser : public QDialog {
 public:
-    explicit LogBrowser(QWidget *parent = nullptr);
-    ~LogBrowser() override;
+    explicit LogBrowser (QWidget *parent = nullptr);
+    ~LogBrowser () override;
 
 protected:
-    void closeEvent(QCloseEvent *) override;
+    void closeEvent (QCloseEvent *) override;
 
 protected slots:
-    void togglePermanentLogging(bool enabled);
+    void togglePermanentLogging (bool enabled);
 };
 
 } // namespace

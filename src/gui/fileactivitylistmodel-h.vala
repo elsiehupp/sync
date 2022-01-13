@@ -19,13 +19,13 @@ namespace OCC {
 class FileActivityListModel : public ActivityListModel {
 
 public:
-    explicit FileActivityListModel(QObject *parent = nullptr);
+    explicit FileActivityListModel (QObject *parent = nullptr);
 
 public slots:
-    void load(AccountState *accountState, QString &fileId);
+    void load (AccountState *accountState, QString &fileId);
 
 protected:
-    void startFetchJob() override;
+    void startFetchJob () override;
 
 private:
     QString _fileId;

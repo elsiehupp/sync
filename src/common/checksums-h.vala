@@ -47,25 +47,25 @@ class SyncJournalDb;
  * Example: "ADLER32:1231 SHA1:ab124124 MD5:2131affa21"
  *       -> "SHA1:ab124124"
  */
-OCSYNC_EXPORT QByteArray findBestChecksum(QByteArray &checksums);
+OCSYNC_EXPORT QByteArray findBestChecksum (QByteArray &checksums);
 
 /// Creates a checksum header from type and value.
-OCSYNC_EXPORT QByteArray makeChecksumHeader(QByteArray &checksumType, QByteArray &checksum);
+OCSYNC_EXPORT QByteArray makeChecksumHeader (QByteArray &checksumType, QByteArray &checksum);
 
 /// Parses a checksum header
-OCSYNC_EXPORT bool parseChecksumHeader(QByteArray &header, QByteArray *type, QByteArray *checksum);
+OCSYNC_EXPORT bool parseChecksumHeader (QByteArray &header, QByteArray *type, QByteArray *checksum);
 
 /// Convenience for getting the type from a checksum header, null if none
-OCSYNC_EXPORT QByteArray parseChecksumHeaderType(QByteArray &header);
+OCSYNC_EXPORT QByteArray parseChecksumHeaderType (QByteArray &header);
 
 /// Checks OWNCLOUD_DISABLE_CHECKSUM_UPLOAD
-OCSYNC_EXPORT bool uploadChecksumEnabled();
+OCSYNC_EXPORT bool uploadChecksumEnabled ();
 
 // Exported functions for the tests.
-QByteArray OCSYNC_EXPORT calcMd5(QIODevice *device);
-QByteArray OCSYNC_EXPORT calcSha1(QIODevice *device);
+QByteArray OCSYNC_EXPORT calcMd5 (QIODevice *device);
+QByteArray OCSYNC_EXPORT calcSha1 (QIODevice *device);
 #ifdef ZLIB_FOUND
-QByteArray OCSYNC_EXPORT calcAdler32(QIODevice *device);
+QByteArray OCSYNC_EXPORT calcAdler32 (QIODevice *device);
 #endif
 
 /**
@@ -74,51 +74,51 @@ QByteArray OCSYNC_EXPORT calcAdler32(QIODevice *device);
  */
 class OCSYNC_EXPORT ComputeChecksum : public QObject {
 public:
-    explicit ComputeChecksum(QObject *parent = nullptr);
-    ~ComputeChecksum() override;
+    explicit ComputeChecksum (QObject *parent = nullptr);
+    ~ComputeChecksum () override;
 
     /**
      * Sets the checksum type to be used. The default is empty.
      */
-    void setChecksumType(QByteArray &type);
+    void setChecksumType (QByteArray &type);
 
-    QByteArray checksumType() const;
+    QByteArray checksumType () const;
 
     /**
      * Computes the checksum for the given file path.
      *
-     * done() is emitted when the calculation finishes.
+     * done () is emitted when the calculation finishes.
      */
-    void start(QString &filePath);
+    void start (QString &filePath);
 
     /**
      * Computes the checksum for the given device.
      *
-     * done() is emitted when the calculation finishes.
+     * done () is emitted when the calculation finishes.
      *
      * The device ownership transfers into the thread that
      * will compute the checksum. It must not have a parent.
      */
-    void start(std::unique_ptr<QIODevice> device);
+    void start (std::unique_ptr<QIODevice> device);
 
     /**
      * Computes the checksum synchronously.
      */
-    static QByteArray computeNow(QIODevice *device, QByteArray &checksumType);
+    static QByteArray computeNow (QIODevice *device, QByteArray &checksumType);
 
     /**
-     * Computes the checksum synchronously on file. Convenience wrapper for computeNow().
+     * Computes the checksum synchronously on file. Convenience wrapper for computeNow ().
      */
-    static QByteArray computeNowOnFile(QString &filePath, QByteArray &checksumType);
+    static QByteArray computeNowOnFile (QString &filePath, QByteArray &checksumType);
 
 signals:
-    void done(QByteArray &checksumType, QByteArray &checksum);
+    void done (QByteArray &checksumType, QByteArray &checksum);
 
 private slots:
-    void slotCalculationDone();
+    void slotCalculationDone ();
 
 private:
-    void startImpl(std::unique_ptr<QIODevice> device);
+    void startImpl (std::unique_ptr<QIODevice> device);
 
     QByteArray _checksumType;
 
@@ -132,36 +132,36 @@ private:
  */
 class OCSYNC_EXPORT ValidateChecksumHeader : public QObject {
 public:
-    explicit ValidateChecksumHeader(QObject *parent = nullptr);
+    explicit ValidateChecksumHeader (QObject *parent = nullptr);
 
     /**
      * Check a file's actual checksum against the provided checksumHeader
      *
-     * If no checksum is there, or if a correct checksum is there, the signal validated()
-     * will be emitted. In case of any kind of error, the signal validationFailed() will
+     * If no checksum is there, or if a correct checksum is there, the signal validated ()
+     * will be emitted. In case of any kind of error, the signal validationFailed () will
      * be emitted.
      */
-    void start(QString &filePath, QByteArray &checksumHeader);
+    void start (QString &filePath, QByteArray &checksumHeader);
 
     /**
      * Check a device's actual checksum against the provided checksumHeader
      *
-     * Like the other start() but works on an device.
+     * Like the other start () but works on an device.
      *
      * The device ownership transfers into the thread that
      * will compute the checksum. It must not have a parent.
      */
-    void start(std::unique_ptr<QIODevice> device, QByteArray &checksumHeader);
+    void start (std::unique_ptr<QIODevice> device, QByteArray &checksumHeader);
 
 signals:
-    void validated(QByteArray &checksumType, QByteArray &checksum);
-    void validationFailed(QString &errMsg);
+    void validated (QByteArray &checksumType, QByteArray &checksum);
+    void validationFailed (QString &errMsg);
 
 private slots:
-    void slotChecksumCalculated(QByteArray &checksumType, QByteArray &checksum);
+    void slotChecksumCalculated (QByteArray &checksumType, QByteArray &checksum);
 
 private:
-    ComputeChecksum *prepareStart(QByteArray &checksumHeader);
+    ComputeChecksum *prepareStart (QByteArray &checksumHeader);
 
     QByteArray _expectedChecksumType;
     QByteArray _expectedChecksum;
@@ -173,7 +173,7 @@ private:
  */
 class OCSYNC_EXPORT CSyncChecksumHook : public QObject {
 public:
-    explicit CSyncChecksumHook();
+    explicit CSyncChecksumHook ();
 
     /**
      * Returns the checksum value for \a path that is comparable to \a otherChecksum.
@@ -182,6 +182,6 @@ public:
      * to be set as userdata.
      * The return value will be owned by csync.
      */
-    static QByteArray hook(QByteArray &path, QByteArray &otherChecksumHeader, void *this_obj);
+    static QByteArray hook (QByteArray &path, QByteArray &otherChecksumHeader, void *this_obj);
 };
 }

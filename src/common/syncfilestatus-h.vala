@@ -33,31 +33,31 @@ public:
         StatusExcluded,
     };
 
-    SyncFileStatus();
-    SyncFileStatus(SyncFileStatusTag);
+    SyncFileStatus ();
+    SyncFileStatus (SyncFileStatusTag);
 
-    void set(SyncFileStatusTag tag);
-    SyncFileStatusTag tag() const;
+    void set (SyncFileStatusTag tag);
+    SyncFileStatusTag tag () const;
 
-    void setShared(bool isShared);
-    bool shared() const;
+    void setShared (bool isShared);
+    bool shared () const;
 
-    QString toSocketAPIString() const;
+    QString toSocketAPIString () const;
 
 private:
     SyncFileStatusTag _tag = StatusNone;
     bool _shared = false;
 };
 
-inline bool operator==(SyncFileStatus &a, SyncFileStatus &b) {
-    return a.tag() == b.tag() && a.shared() == b.shared();
+inline bool operator== (SyncFileStatus &a, SyncFileStatus &b) {
+    return a.tag () == b.tag () && a.shared () == b.shared ();
 }
 
-inline bool operator!=(SyncFileStatus &a, SyncFileStatus &b) {
-    return !(a == b);
+inline bool operator!= (SyncFileStatus &a, SyncFileStatus &b) {
+    return ! (a == b);
 }
 }
 
-Q_DECLARE_METATYPE(OCC::SyncFileStatus)
+Q_DECLARE_METATYPE (OCC::SyncFileStatus)
 
 #endif // SYNCFILESTATUS_H

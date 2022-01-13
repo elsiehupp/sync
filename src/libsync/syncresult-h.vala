@@ -37,48 +37,48 @@ public:
         SetupError,
         Paused
     };
-    Q_ENUM(Status);
+    Q_ENUM (Status);
 
-    SyncResult();
-    void reset();
+    SyncResult ();
+    void reset ();
 
-    void appendErrorString(QString &);
-    QString errorString() const;
-    QStringList errorStrings() const;
-    void clearErrors();
+    void appendErrorString (QString &);
+    QString errorString () const;
+    QStringList errorStrings () const;
+    void clearErrors ();
 
-    void setStatus(Status);
-    Status status() const;
-    QString statusString() const;
-    QDateTime syncTime() const;
-    void setFolder(QString &folder);
-    QString folder() const;
+    void setStatus (Status);
+    Status status () const;
+    QString statusString () const;
+    QDateTime syncTime () const;
+    void setFolder (QString &folder);
+    QString folder () const;
 
-    bool foundFilesNotSynced() const { return _foundFilesNotSynced; }
-    bool folderStructureWasChanged() const { return _folderStructureWasChanged; }
+    bool foundFilesNotSynced () const { return _foundFilesNotSynced; }
+    bool folderStructureWasChanged () const { return _folderStructureWasChanged; }
 
-    int numNewItems() const { return _numNewItems; }
-    int numRemovedItems() const { return _numRemovedItems; }
-    int numUpdatedItems() const { return _numUpdatedItems; }
-    int numRenamedItems() const { return _numRenamedItems; }
-    int numNewConflictItems() const { return _numNewConflictItems; }
-    int numOldConflictItems() const { return _numOldConflictItems; }
-    void setNumOldConflictItems(int n) { _numOldConflictItems = n; }
-    int numErrorItems() const { return _numErrorItems; }
-    bool hasUnresolvedConflicts() const { return _numNewConflictItems + _numOldConflictItems > 0; }
+    int numNewItems () const { return _numNewItems; }
+    int numRemovedItems () const { return _numRemovedItems; }
+    int numUpdatedItems () const { return _numUpdatedItems; }
+    int numRenamedItems () const { return _numRenamedItems; }
+    int numNewConflictItems () const { return _numNewConflictItems; }
+    int numOldConflictItems () const { return _numOldConflictItems; }
+    void setNumOldConflictItems (int n) { _numOldConflictItems = n; }
+    int numErrorItems () const { return _numErrorItems; }
+    bool hasUnresolvedConflicts () const { return _numNewConflictItems + _numOldConflictItems > 0; }
 
-    int numLockedItems() const { return _numLockedItems; }
-    bool hasLockedFiles() const { return _numLockedItems > 0; }
+    int numLockedItems () const { return _numLockedItems; }
+    bool hasLockedFiles () const { return _numLockedItems > 0; }
 
-    const SyncFileItemPtr &firstItemNew() const { return _firstItemNew; }
-    const SyncFileItemPtr &firstItemDeleted() const { return _firstItemDeleted; }
-    const SyncFileItemPtr &firstItemUpdated() const { return _firstItemUpdated; }
-    const SyncFileItemPtr &firstItemRenamed() const { return _firstItemRenamed; }
-    const SyncFileItemPtr &firstNewConflictItem() const { return _firstNewConflictItem; }
-    const SyncFileItemPtr &firstItemError() const { return _firstItemError; }
-    const SyncFileItemPtr &firstItemLocked() const { return _firstItemLocked; }
+    const SyncFileItemPtr &firstItemNew () const { return _firstItemNew; }
+    const SyncFileItemPtr &firstItemDeleted () const { return _firstItemDeleted; }
+    const SyncFileItemPtr &firstItemUpdated () const { return _firstItemUpdated; }
+    const SyncFileItemPtr &firstItemRenamed () const { return _firstItemRenamed; }
+    const SyncFileItemPtr &firstNewConflictItem () const { return _firstNewConflictItem; }
+    const SyncFileItemPtr &firstItemError () const { return _firstItemError; }
+    const SyncFileItemPtr &firstItemLocked () const { return _firstItemLocked; }
 
-    void processCompletedItem(SyncFileItemPtr &item);
+    void processCompletedItem (SyncFileItemPtr &item);
 
 private:
     Status _status = Undefined;

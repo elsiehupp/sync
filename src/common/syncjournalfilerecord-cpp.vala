@@ -18,23 +18,23 @@
 
 namespace OCC {
 
-QByteArray SyncJournalFileRecord::numericFileId() const {
+QByteArray SyncJournalFileRecord::numericFileId () const {
     // Use the id up until the first non-numeric character
-    for (int i = 0; i < _fileId.size(); ++i) {
+    for (int i = 0; i < _fileId.size (); ++i) {
         if (_fileId[i] < '0' || _fileId[i] > '9') {
-            return _fileId.left(i);
+            return _fileId.left (i);
         }
     }
     return _fileId;
 }
 
-bool SyncJournalErrorBlacklistRecord::isValid() const {
-    return !_file.isEmpty()
-        && (!_lastTryEtag.isEmpty() || _lastTryModtime != 0)
+bool SyncJournalErrorBlacklistRecord::isValid () const {
+    return !_file.isEmpty ()
+        && (!_lastTryEtag.isEmpty () || _lastTryModtime != 0)
         && _lastTryTime > 0;
 }
 
-bool operator==(SyncJournalFileRecord &lhs,
+bool operator== (SyncJournalFileRecord &lhs,
     const SyncJournalFileRecord &rhs) {
     return lhs._path == rhs._path
         && lhs._inode == rhs._inode

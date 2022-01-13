@@ -22,7 +22,7 @@
 
 namespace OCC {
 
-Q_DECLARE_LOGGING_CATEGORY(lcBulkPropagatorJob)
+Q_DECLARE_LOGGING_CATEGORY (lcBulkPropagatorJob)
 
 class ComputeChecksum;
 class PutMultiFileJob;
@@ -53,61 +53,61 @@ class BulkPropagatorJob : public PropagatorJob {
     };
 
 public:
-    explicit BulkPropagatorJob(OwncloudPropagator *propagator,
+    explicit BulkPropagatorJob (OwncloudPropagator *propagator,
                                const std::deque<SyncFileItemPtr> &items);
 
-    bool scheduleSelfOrChild() override;
+    bool scheduleSelfOrChild () override;
 
-    JobParallelism parallelism() override;
+    JobParallelism parallelism () override;
 
 private slots:
-    void startUploadFile(SyncFileItemPtr item, UploadFileInfo fileToUpload);
+    void startUploadFile (SyncFileItemPtr item, UploadFileInfo fileToUpload);
 
     // Content checksum computed, compute the transmission checksum
-    void slotComputeTransmissionChecksum(SyncFileItemPtr item,
+    void slotComputeTransmissionChecksum (SyncFileItemPtr item,
                                          UploadFileInfo fileToUpload);
 
     // transmission checksum computed, prepare the upload
-    void slotStartUpload(SyncFileItemPtr item,
+    void slotStartUpload (SyncFileItemPtr item,
                          UploadFileInfo fileToUpload,
                          const QByteArray &transmissionChecksumType,
                          const QByteArray &transmissionChecksum);
 
     // invoked on internal error to unlock a folder and faile
-    void slotOnErrorStartFolderUnlock(SyncFileItemPtr item,
+    void slotOnErrorStartFolderUnlock (SyncFileItemPtr item,
                                       SyncFileItem::Status status,
                                       const QString &errorString);
 
-    void slotPutFinished();
+    void slotPutFinished ();
 
-    void slotUploadProgress(SyncFileItemPtr item, qint64 sent, qint64 total);
+    void slotUploadProgress (SyncFileItemPtr item, qint64 sent, qint64 total);
 
-    void slotJobDestroyed(QObject *job);
+    void slotJobDestroyed (QObject *job);
 
 private:
-    void doStartUpload(SyncFileItemPtr item,
+    void doStartUpload (SyncFileItemPtr item,
                        UploadFileInfo fileToUpload,
                        QByteArray transmissionChecksumHeader);
 
-    void adjustLastJobTimeout(AbstractNetworkJob *job,
+    void adjustLastJobTimeout (AbstractNetworkJob *job,
                               qint64 fileSize) const;
 
-    void finalize(QJsonObject &fullReply);
+    void finalize (QJsonObject &fullReply);
 
-    void finalizeOneFile(BulkUploadItem &oneFile);
+    void finalizeOneFile (BulkUploadItem &oneFile);
 
-    void slotPutFinishedOneFile(BulkUploadItem &singleFile,
+    void slotPutFinishedOneFile (BulkUploadItem &singleFile,
                                 OCC::PutMultiFileJob *job,
                                 const QJsonObject &fullReplyObject);
 
-    void done(SyncFileItemPtr item,
+    void done (SyncFileItemPtr item,
               SyncFileItem::Status status,
               const QString &errorString);
 
     /** Bases headers that need to be sent on the PUT, or in the MOVE for chunking-ng */
-    QMap<QByteArray, QByteArray> headers(SyncFileItemPtr item) const;
+    QMap<QByteArray, QByteArray> headers (SyncFileItemPtr item) const;
 
-    void abortWithError(SyncFileItemPtr item,
+    void abortWithError (SyncFileItemPtr item,
                         SyncFileItem::Status status,
                         const QString &error);
 
@@ -116,36 +116,36 @@ private:
      * transfer if it happens too often. If so: Bump UploadInfo::errorCount
      * and maybe perform the reset.
      */
-    void checkResettingErrors(SyncFileItemPtr item) const;
+    void checkResettingErrors (SyncFileItemPtr item) const;
 
     /**
      * Error handling functionality that is shared between jobs.
      */
-    void commonErrorHandling(SyncFileItemPtr item,
+    void commonErrorHandling (SyncFileItemPtr item,
                              const QString &errorMessage);
 
-    bool checkFileStillExists(SyncFileItemPtr item,
+    bool checkFileStillExists (SyncFileItemPtr item,
                               const bool finished,
                               const QString &fullFilePath);
 
-    bool checkFileChanged(SyncFileItemPtr item,
+    bool checkFileChanged (SyncFileItemPtr item,
                           const bool finished,
                           const QString &fullFilePath);
 
-    void computeFileId(SyncFileItemPtr item,
+    void computeFileId (SyncFileItemPtr item,
                        const QJsonObject &fileReply) const;
 
-    void handleFileRestoration(SyncFileItemPtr item,
+    void handleFileRestoration (SyncFileItemPtr item,
                                const QString &errorString) const;
 
-    void handleBulkUploadBlackList(SyncFileItemPtr item) const;
+    void handleBulkUploadBlackList (SyncFileItemPtr item) const;
 
-    void handleJobDoneErrors(SyncFileItemPtr item,
+    void handleJobDoneErrors (SyncFileItemPtr item,
                              SyncFileItem::Status status);
 
-    void triggerUpload();
+    void triggerUpload ();
 
-    void checkPropagationIsDone();
+    void checkPropagationIsDone ();
 
     std::deque<SyncFileItemPtr> _items;
 

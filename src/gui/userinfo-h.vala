@@ -29,7 +29,7 @@ class JsonApiJob;
  * It is typically owned by the AccountSetting page.
  *
  * The user info and quota is requested if these 3 conditions are met:
- *  - This object is active via setActive() (typically if the settings page is visible.)
+ *  - This object is active via setActive () (typically if the settings page is visible.)
  *  - The account is connected.
  *  - Every 30 seconds (defaultIntervalT) or 5 seconds in case of failure (failIntervalT)
  *
@@ -40,7 +40,7 @@ class JsonApiJob;
  * If the fetch job is not finished within 30 seconds, it is cancelled and another one is started
  *
  * Constructor notes:
- *  - allowDisconnectedAccountState: set to true if you want to ignore AccountState's isConnected() state,
+ *  - allowDisconnectedAccountState: set to true if you want to ignore AccountState's isConnected () state,
  *    this is used by ConnectionValidator (prior having a valid AccountState).
  *  - fetchAvatarImage: set to false if you don't want to fetch the avatar image
  *
@@ -58,38 +58,38 @@ class JsonApiJob;
                +-> slotAvatarImage -->
    +-----------------------------------+
    |
-   +-> Client Side Encryption Checks --+ --reportResult()
+   +-> Client Side Encryption Checks --+ --reportResult ()
      \endcode
   */
 class UserInfo : public QObject {
 public:
-    explicit UserInfo(OCC::AccountState *accountState, bool allowDisconnectedAccountState, bool fetchAvatarImage, QObject *parent = nullptr);
+    explicit UserInfo (OCC::AccountState *accountState, bool allowDisconnectedAccountState, bool fetchAvatarImage, QObject *parent = nullptr);
 
-    qint64 lastQuotaTotalBytes() const { return _lastQuotaTotalBytes; }
-    qint64 lastQuotaUsedBytes() const { return _lastQuotaUsedBytes; }
+    qint64 lastQuotaTotalBytes () const { return _lastQuotaTotalBytes; }
+    qint64 lastQuotaUsedBytes () const { return _lastQuotaUsedBytes; }
 
     /**
      * When the quotainfo is active, it requests the quota at regular interval.
      * When setting it to active it will request the quota immediately if the last time
      * the quota was requested was more than the interval
      */
-    void setActive(bool active);
+    void setActive (bool active);
 
 public Q_SLOTS:
-    void slotFetchInfo();
+    void slotFetchInfo ();
 
 private Q_SLOTS:
-    void slotUpdateLastInfo(QJsonDocument &json);
-    void slotAccountStateChanged();
-    void slotRequestFailed();
-    void slotAvatarImage(QImage &img);
+    void slotUpdateLastInfo (QJsonDocument &json);
+    void slotAccountStateChanged ();
+    void slotRequestFailed ();
+    void slotAvatarImage (QImage &img);
 
 Q_SIGNALS:
-    void quotaUpdated(qint64 total, qint64 used);
-    void fetchedLastInfo(UserInfo *userInfo);
+    void quotaUpdated (qint64 total, qint64 used);
+    void fetchedLastInfo (UserInfo *userInfo);
 
 private:
-    bool canGetInfo() const;
+    bool canGetInfo () const;
 
     QPointer<AccountState> _accountState;
     bool _allowDisconnectedAccountState;

@@ -29,24 +29,24 @@ class ConfigFile;
  */
 class OWNCLOUDSYNC_EXPORT ClientProxy : public QObject {
 public:
-    explicit ClientProxy(QObject *parent = nullptr);
+    explicit ClientProxy (QObject *parent = nullptr);
 
-    static bool isUsingSystemDefault();
-    static void lookupSystemProxyAsync(QUrl &url, QObject *dst, char *slot);
+    static bool isUsingSystemDefault ();
+    static void lookupSystemProxyAsync (QUrl &url, QObject *dst, char *slot);
 
-    static QString printQNetworkProxy(QNetworkProxy &proxy);
-    static const char *proxyTypeToCStr(QNetworkProxy::ProxyType type);
+    static QString printQNetworkProxy (QNetworkProxy &proxy);
+    static const char *proxyTypeToCStr (QNetworkProxy::ProxyType type);
 
 public slots:
-    void setupQtProxyFromConfig();
+    void setupQtProxyFromConfig ();
 };
 
 class OWNCLOUDSYNC_EXPORT SystemProxyRunnable : public QObject, public QRunnable {
 public:
-    SystemProxyRunnable(QUrl &url);
-    void run() override;
+    SystemProxyRunnable (QUrl &url);
+    void run () override;
 signals:
-    void systemProxyLookedUp(QNetworkProxy &url);
+    void systemProxyLookedUp (QNetworkProxy &url);
 
 private:
     QUrl _url;

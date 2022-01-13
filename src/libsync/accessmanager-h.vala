@@ -26,12 +26,12 @@ namespace OCC {
 class OWNCLOUDSYNC_EXPORT AccessManager : public QNetworkAccessManager {
 
 public:
-    static QByteArray generateRequestId();
+    static QByteArray generateRequestId ();
 
-    AccessManager(QObject *parent = nullptr);
+    AccessManager (QObject *parent = nullptr);
 
 protected:
-    QNetworkReply *createRequest(QNetworkAccessManager::Operation op, QNetworkRequest &request, QIODevice *outgoingData = nullptr) override;
+    QNetworkReply *createRequest (QNetworkAccessManager::Operation op, QNetworkRequest &request, QIODevice *outgoingData = nullptr) override;
 };
 
 } // namespace OCC

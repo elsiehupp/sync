@@ -25,38 +25,38 @@
 
 class OWNCLOUDDOLPHINPLUGINHELPER_EXPORT OwncloudDolphinPluginHelper : public QObject {
 public:
-    static OwncloudDolphinPluginHelper *instance();
+    static OwncloudDolphinPluginHelper *instance ();
 
-    bool isConnected() const;
-    void sendCommand(char *data);
-    QVector<QString> paths() const { return _paths; }
+    bool isConnected () const;
+    void sendCommand (char *data);
+    QVector<QString> paths () const { return _paths; }
 
-    QString contextMenuTitle() const {
-        return _strings.value("CONTEXT_MENU_TITLE", APPLICATION_NAME);
+    QString contextMenuTitle () const {
+        return _strings.value ("CONTEXT_MENU_TITLE", APPLICATION_NAME);
     }
-    QString shareActionTitle() const {
-        return _strings.value("SHARE_MENU_TITLE", "Share …");
+    QString shareActionTitle () const {
+        return _strings.value ("SHARE_MENU_TITLE", "Share …");
     }
-    QString contextMenuIconName() const {
-        return _strings.value("CONTEXT_MENU_ICON", APPLICATION_ICON_NAME);
+    QString contextMenuIconName () const {
+        return _strings.value ("CONTEXT_MENU_ICON", APPLICATION_ICON_NAME);
     }
 
-    QString copyPrivateLinkTitle() const { return _strings["COPY_PRIVATE_LINK_MENU_TITLE"]; }
-    QString emailPrivateLinkTitle() const { return _strings["EMAIL_PRIVATE_LINK_MENU_TITLE"]; }
+    QString copyPrivateLinkTitle () const { return _strings["COPY_PRIVATE_LINK_MENU_TITLE"]; }
+    QString emailPrivateLinkTitle () const { return _strings["EMAIL_PRIVATE_LINK_MENU_TITLE"]; }
 
-    QByteArray version() { return _version; }
+    QByteArray version () { return _version; }
 
 signals:
-    void commandRecieved(QByteArray &cmd);
+    void commandRecieved (QByteArray &cmd);
 
 protected:
-    void timerEvent(QTimerEvent*) override;
+    void timerEvent (QTimerEvent*) override;
 
 private:
-    OwncloudDolphinPluginHelper();
-    void slotConnected();
-    void slotReadyRead();
-    void tryConnect();
+    OwncloudDolphinPluginHelper ();
+    void slotConnected ();
+    void slotReadyRead ();
+    void tryConnect ();
     QLocalSocket _socket;
     QByteArray _line;
     QVector<QString> _paths;

@@ -32,19 +32,19 @@ public:
     /**
      * Constructor for new shares or listing of shares
      */
-    explicit OcsShareJob(AccountPtr account);
+    explicit OcsShareJob (AccountPtr account);
 
     /**
      * Get all the shares
      *
      * @param path Path to request shares for (default all shares)
      */
-    void getShares(QString &path = "");
+    void getShares (QString &path = "");
 
     /**
      * Delete the current Share
      */
-    void deleteShare(QString &shareId);
+    void deleteShare (QString &shareId);
 
     /**
      * Set the expiration date of a share
@@ -52,7 +52,7 @@ public:
      * @param date The expire date, if this date is invalid the expire date
      * will be removed
      */
-    void setExpireDate(QString &shareId, QDate &date);
+    void setExpireDate (QString &shareId, QDate &date);
 
 	 /**
      * Set note a share
@@ -60,7 +60,7 @@ public:
      * @param note The note to a share, if the note is empty the
      * share will be removed
      */
-    void setNote(QString &shareId, QString &note);
+    void setNote (QString &shareId, QString &note);
 
     /**
      * Set the password of a share
@@ -68,32 +68,32 @@ public:
      * @param password The password of the share, if the password is empty the
      * share will be removed
      */
-    void setPassword(QString &shareId, QString &password);
+    void setPassword (QString &shareId, QString &password);
 
     /**
      * Set the share to be public upload
      *
      * @param publicUpload Set or remove public upload
      */
-    void setPublicUpload(QString &shareId, bool publicUpload);
+    void setPublicUpload (QString &shareId, bool publicUpload);
 
     /**
      * Change the name of a share
      */
-    void setName(QString &shareId, QString &name);
+    void setName (QString &shareId, QString &name);
 
     /**
      * Set the permissions
      *
      * @param permissions
      */
-    void setPermissions(QString &shareId,
+    void setPermissions (QString &shareId,
         const Share::Permissions permissions);
 
     /**
      * Set share link label
      */
-    void setLabel(QString &shareId, QString &label);
+    void setLabel (QString &shareId, QString &label);
 
     /**
      * Create a new link share
@@ -101,7 +101,7 @@ public:
      * @param path The path of the file/folder to share
      * @param password Optionally a password for the share
      */
-    void createLinkShare(QString &path, QString &name,
+    void createLinkShare (QString &path, QString &name,
         const QString &password);
 
     /**
@@ -113,7 +113,7 @@ public:
      * @param permissions The permissions the share will have
      * @param password The password to protect the share with
      */
-    void createShare(QString &path,
+    void createShare (QString &path,
         const Share::ShareType shareType,
         const QString &shareWith = "",
         const Share::Permissions permissions = SharePermissionRead,
@@ -122,7 +122,7 @@ public:
     /**
      * Returns information on the items shared with the current user.
      */
-    void getSharedWithMe();
+    void getSharedWithMe ();
 
 signals:
     /**
@@ -134,10 +134,10 @@ signals:
      * @param reply The reply
      * @param value To what did we set a variable (if we set any).
      */
-    void shareJobFinished(QJsonDocument reply, QVariant value);
+    void shareJobFinished (QJsonDocument reply, QVariant value);
 
 private slots:
-    void jobDone(QJsonDocument reply);
+    void jobDone (QJsonDocument reply);
 
 private:
     QVariant _value;

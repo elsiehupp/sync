@@ -35,7 +35,7 @@ using AccountAppList = QList<AccountApp *>;
  * @ingroup gui
  */
 class AccountState : public QObject, public QSharedData {
-    Q_PROPERTY(AccountPtr account MEMBER _account)
+    Q_PROPERTY (AccountPtr account MEMBER _account)
 
 public:
     enum State {
@@ -73,125 +73,125 @@ public:
     using ConnectionStatus = ConnectionValidator::Status;
 
     /// Use the account as parent
-    explicit AccountState(AccountPtr account);
-    ~AccountState() override;
+    explicit AccountState (AccountPtr account);
+    ~AccountState () override;
 
     /** Creates an account state from settings and an Account object.
      *
      * Use from AccountManager with a prepared QSettings object only.
      */
-    static AccountState *loadFromSettings(AccountPtr account, QSettings &settings);
+    static AccountState *loadFromSettings (AccountPtr account, QSettings &settings);
 
     /** Writes account state information to settings.
      *
      * It does not write the Account data.
      */
-    void writeToSettings(QSettings &settings);
+    void writeToSettings (QSettings &settings);
 
-    AccountPtr account() const;
+    AccountPtr account () const;
 
-    ConnectionStatus connectionStatus() const;
-    QStringList connectionErrors() const;
+    ConnectionStatus connectionStatus () const;
+    QStringList connectionErrors () const;
 
-    State state() const;
-    static QString stateString(State state);
+    State state () const;
+    static QString stateString (State state);
 
-    bool isSignedOut() const;
+    bool isSignedOut () const;
 
-    AccountAppList appList() const;
-    AccountApp* findApp(QString &appId) const;
+    AccountAppList appList () const;
+    AccountApp* findApp (QString &appId) const;
 
     /** A user-triggered sign out which disconnects, stops syncs
      * for the account and forgets the password. */
-    void signOutByUi();
+    void signOutByUi ();
 
     /** Tries to connect from scratch.
      *
      * Does nothing for signed out accounts.
      * Connected accounts will be disconnected and try anew.
-     * Disconnected accounts will go to checkConnectivity().
+     * Disconnected accounts will go to checkConnectivity ().
      *
      * Useful for when network settings (proxy) change.
      */
-    void freshConnectionAttempt();
+    void freshConnectionAttempt ();
 
     /// Move from SignedOut state to Disconnected (attempting to connect)
-    void signIn();
+    void signIn ();
 
-    bool isConnected() const;
+    bool isConnected () const;
 
     /** Returns a new settings object for this account, already in the right groups. */
-    std::unique_ptr<QSettings> settings();
+    std::unique_ptr<QSettings> settings ();
 
     /** Mark the timestamp when the last successful ETag check happened for
      *  this account.
-     *  The checkConnectivity() method uses the timestamp to save a call to
+     *  The checkConnectivity () method uses the timestamp to save a call to
      *  the server to validate the connection if the last successful etag job
      *  was not so long ago.
      */
-    void tagLastSuccessfullETagRequest(QDateTime &tp);
+    void tagLastSuccessfullETagRequest (QDateTime &tp);
 
     /** Saves the ETag Response header from the last Notifications api
      * request with statusCode 200.
     */
-    QByteArray notificationsEtagResponseHeader() const;
+    QByteArray notificationsEtagResponseHeader () const;
 
     /** Returns the ETag Response header from the last Notifications api
      * request with statusCode 200.
     */
-    void setNotificationsEtagResponseHeader(QByteArray &value);
+    void setNotificationsEtagResponseHeader (QByteArray &value);
 
     /** Saves the ETag Response header from the last Navigation Apps api
      * request with statusCode 200.
     */
-    QByteArray navigationAppsEtagResponseHeader() const;
+    QByteArray navigationAppsEtagResponseHeader () const;
 
     /** Returns the ETag Response header from the last Navigation Apps api
      * request with statusCode 200.
     */
-    void setNavigationAppsEtagResponseHeader(QByteArray &value);
+    void setNavigationAppsEtagResponseHeader (QByteArray &value);
 
     ///Asks for user credentials
-    void handleInvalidCredentials();
+    void handleInvalidCredentials ();
 
     /** Returns the notifications status retrieved by the notificatons endpoint
      *  https://github.com/nextcloud/desktop/issues/2318#issuecomment-680698429
     */
-    bool isDesktopNotificationsAllowed() const;
+    bool isDesktopNotificationsAllowed () const;
 
     /** Set desktop notifications status retrieved by the notificatons endpoint
     */
-    void setDesktopNotificationsAllowed(bool isAllowed);
+    void setDesktopNotificationsAllowed (bool isAllowed);
 
 public slots:
     /// Triggers a ping to the server to update state and
     /// connection status and errors.
-    void checkConnectivity();
+    void checkConnectivity ();
 
 private:
-    void setState(State state);
-    void fetchNavigationApps();
+    void setState (State state);
+    void fetchNavigationApps ();
 
 signals:
-    void stateChanged(State state);
-    void isConnectedChanged();
-    void hasFetchedNavigationApps();
-    void statusChanged();
-    void desktopNotificationsAllowedChanged();
+    void stateChanged (State state);
+    void isConnectedChanged ();
+    void hasFetchedNavigationApps ();
+    void statusChanged ();
+    void desktopNotificationsAllowedChanged ();
 
 protected Q_SLOTS:
-    void slotConnectionValidatorResult(ConnectionValidator::Status status, QStringList &errors);
+    void slotConnectionValidatorResult (ConnectionValidator::Status status, QStringList &errors);
 
     /// When client gets a 401 or 403 checks if server requested remote wipe
     /// before asking for user credentials again
-    void slotHandleRemoteWipeCheck();
+    void slotHandleRemoteWipeCheck ();
 
-    void slotCredentialsFetched(AbstractCredentials *creds);
-    void slotCredentialsAsked(AbstractCredentials *creds);
+    void slotCredentialsFetched (AbstractCredentials *creds);
+    void slotCredentialsAsked (AbstractCredentials *creds);
 
-    void slotNavigationAppsFetched(QJsonDocument &reply, int statusCode);
-    void slotEtagResponseHeaderReceived(QByteArray &value, int statusCode);
-    void slotOcsError(int statusCode, QString &message);
+    void slotNavigationAppsFetched (QJsonDocument &reply, int statusCode);
+    void slotEtagResponseHeaderReceived (QByteArray &value, int statusCode);
+    void slotOcsError (int statusCode, QString &message);
 
 private:
     AccountPtr _account;
@@ -232,14 +232,14 @@ private:
 
 class AccountApp : public QObject {
 public:
-    AccountApp(QString &name, QUrl &url,
+    AccountApp (QString &name, QUrl &url,
         const QString &id, QUrl &iconUrl,
         QObject* parent = nullptr);
 
-    QString name() const;
-    QUrl url() const;
-    QString id() const;
-    QUrl iconUrl() const;
+    QString name () const;
+    QUrl url () const;
+    QString id () const;
+    QUrl iconUrl () const;
 
 private:
     QString _name;
@@ -251,7 +251,7 @@ private:
 
 }
 
-Q_DECLARE_METATYPE(OCC::AccountState *)
-Q_DECLARE_METATYPE(OCC::AccountStatePtr)
+Q_DECLARE_METATYPE (OCC::AccountState *)
+Q_DECLARE_METATYPE (OCC::AccountStatePtr)
 
 #endif //ACCOUNTINFO_H

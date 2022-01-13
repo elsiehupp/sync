@@ -27,20 +27,20 @@ namespace Ui {
 class WelcomePage : public QWizardPage {
 
 public:
-    explicit WelcomePage(OwncloudWizard *ocWizard);
-    ~WelcomePage() override;
-    int nextId() const override;
-    void initializePage() override;
-    void setLoginButtonDefault();
+    explicit WelcomePage (OwncloudWizard *ocWizard);
+    ~WelcomePage () override;
+    int nextId () const override;
+    void initializePage () override;
+    void setLoginButtonDefault ();
 
 private:
-    void setupUi();
-    void customizeStyle();
-    void styleSlideShow();
-    void setupSlideShow();
-    void setupLoginButton();
-    void setupCreateAccountButton();
-    void setupHostYourOwnServerLabel();
+    void setupUi ();
+    void customizeStyle ();
+    void styleSlideShow ();
+    void setupSlideShow ();
+    void setupLoginButton ();
+    void setupCreateAccountButton ();
+    void setupHostYourOwnServerLabel ();
 
     QScopedPointer<Ui::WelcomePage> _ui;
 

@@ -29,29 +29,29 @@ class OwncloudPropagator;
  */
 class BandwidthManager : public QObject {
 public:
-    BandwidthManager(OwncloudPropagator *p);
-    ~BandwidthManager() override;
+    BandwidthManager (OwncloudPropagator *p);
+    ~BandwidthManager () override;
 
-    bool usingAbsoluteUploadLimit() { return _currentUploadLimit > 0; }
-    bool usingRelativeUploadLimit() { return _currentUploadLimit < 0; }
-    bool usingAbsoluteDownloadLimit() { return _currentDownloadLimit > 0; }
-    bool usingRelativeDownloadLimit() { return _currentDownloadLimit < 0; }
+    bool usingAbsoluteUploadLimit () { return _currentUploadLimit > 0; }
+    bool usingRelativeUploadLimit () { return _currentUploadLimit < 0; }
+    bool usingAbsoluteDownloadLimit () { return _currentDownloadLimit > 0; }
+    bool usingRelativeDownloadLimit () { return _currentDownloadLimit < 0; }
 
 public slots:
-    void registerUploadDevice(UploadDevice *);
-    void unregisterUploadDevice(QObject *);
+    void registerUploadDevice (UploadDevice *);
+    void unregisterUploadDevice (QObject *);
 
-    void registerDownloadJob(GETFileJob *);
-    void unregisterDownloadJob(QObject *);
+    void registerDownloadJob (GETFileJob *);
+    void unregisterDownloadJob (QObject *);
 
-    void absoluteLimitTimerExpired();
-    void switchingTimerExpired();
+    void absoluteLimitTimerExpired ();
+    void switchingTimerExpired ();
 
-    void relativeUploadMeasuringTimerExpired();
-    void relativeUploadDelayTimerExpired();
+    void relativeUploadMeasuringTimerExpired ();
+    void relativeUploadDelayTimerExpired ();
 
-    void relativeDownloadMeasuringTimerExpired();
-    void relativeDownloadDelayTimerExpired();
+    void relativeDownloadMeasuringTimerExpired ();
+    void relativeDownloadDelayTimerExpired ();
 
 private:
     // for switching between absolute and relative bw limiting

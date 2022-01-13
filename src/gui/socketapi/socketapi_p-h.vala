@@ -29,21 +29,21 @@ namespace OCC {
 class BloomFilter {
     // Initialize with m=1024 bits and k=2 (high and low 16 bits of a qHash).
     // For a client navigating in less than 100 directories, this gives us a probability less than
-    // (1-e^(-2*100/1024))^2 = 0.03147872136 false positives.
+    // (1-e^ (-2*100/1024))^2 = 0.03147872136 false positives.
     const static int NumBits = 1024;
 
 public:
-    BloomFilter()
-        : hashBits(NumBits) {
+    BloomFilter ()
+        : hashBits (NumBits) {
     }
 
-    void storeHash(uint hash) {
-        hashBits.setBit((hash & 0xFFFF) % NumBits); // NOLINT it's uint all the way and the modulo puts us back in the 0..1023 range
-        hashBits.setBit((hash >> 16) % NumBits); // NOLINT
+    void storeHash (uint hash) {
+        hashBits.setBit ( (hash & 0xFFFF) % NumBits); // NOLINT it's uint all the way and the modulo puts us back in the 0..1023 range
+        hashBits.setBit ( (hash >> 16) % NumBits); // NOLINT
     }
-    bool isHashMaybeStored(uint hash) const {
-        return hashBits.testBit((hash & 0xFFFF) % NumBits) // NOLINT
-            && hashBits.testBit((hash >> 16) % NumBits); // NOLINT
+    bool isHashMaybeStored (uint hash) const {
+        return hashBits.testBit ( (hash & 0xFFFF) % NumBits) // NOLINT
+            && hashBits.testBit ( (hash >> 16) % NumBits); // NOLINT
     }
 
 private:
@@ -54,25 +54,25 @@ class SocketListener {
 public:
     QPointer<QIODevice> socket;
 
-    explicit SocketListener(QIODevice *_socket)
-        : socket(_socket) {
+    explicit SocketListener (QIODevice *_socket)
+        : socket (_socket) {
     }
 
-    void sendMessage(QString &message, bool doWait = false) const;
-    void sendWarning(QString &message, bool doWait = false) const {
-        sendMessage(QStringLiteral("WARNING:") + message, doWait);
+    void sendMessage (QString &message, bool doWait = false) const;
+    void sendWarning (QString &message, bool doWait = false) const {
+        sendMessage (QStringLiteral ("WARNING:") + message, doWait);
     }
-    void sendError(QString &message, bool doWait = false) const {
-        sendMessage(QStringLiteral("ERROR:") + message, doWait);
-    }
-
-    void sendMessageIfDirectoryMonitored(QString &message, uint systemDirectoryHash) const {
-        if (_monitoredDirectoriesBloomFilter.isHashMaybeStored(systemDirectoryHash))
-            sendMessage(message, false);
+    void sendError (QString &message, bool doWait = false) const {
+        sendMessage (QStringLiteral ("ERROR:") + message, doWait);
     }
 
-    void registerMonitoredDirectory(uint systemDirectoryHash) {
-        _monitoredDirectoriesBloomFilter.storeHash(systemDirectoryHash);
+    void sendMessageIfDirectoryMonitored (QString &message, uint systemDirectoryHash) const {
+        if (_monitoredDirectoriesBloomFilter.isHashMaybeStored (systemDirectoryHash))
+            sendMessage (message, false);
+    }
+
+    void registerMonitoredDirectory (uint systemDirectoryHash) {
+        _monitoredDirectoriesBloomFilter.storeHash (systemDirectoryHash);
     }
 
 private:
@@ -81,15 +81,15 @@ private:
 
 class ListenerClosure : public QObject {
 public:
-    using CallbackFunction = std::function<void()>;
-    ListenerClosure(CallbackFunction callback)
-        : callback_(callback) {
+    using CallbackFunction = std::function<void ()>;
+    ListenerClosure (CallbackFunction callback)
+        : callback_ (callback) {
     }
 
 public slots:
-    void closureSlot() {
-        callback_();
-        deleteLater();
+    void closureSlot () {
+        callback_ ();
+        deleteLater ();
     }
 
 private:
@@ -98,19 +98,19 @@ private:
 
 class SocketApiJob : public QObject {
 public:
-    explicit SocketApiJob(QString &jobId, QSharedPointer<SocketListener> &socketListener, QJsonObject &arguments)
-        : _jobId(jobId)
-        , _socketListener(socketListener)
-        , _arguments(arguments) {
+    explicit SocketApiJob (QString &jobId, QSharedPointer<SocketListener> &socketListener, QJsonObject &arguments)
+        : _jobId (jobId)
+        , _socketListener (socketListener)
+        , _arguments (arguments) {
     }
 
-    void resolve(QString &response = QString());
+    void resolve (QString &response = QString ());
 
-    void resolve(QJsonObject &response);
+    void resolve (QJsonObject &response);
 
-    const QJsonObject &arguments() { return _arguments; }
+    const QJsonObject &arguments () { return _arguments; }
 
-    void reject(QString &response);
+    void reject (QString &response);
 
 protected:
     QString _jobId;
@@ -120,19 +120,19 @@ protected:
 
 class SocketApiJobV2 : public QObject {
 public:
-    explicit SocketApiJobV2(QSharedPointer<SocketListener> &socketListener, QByteArray &command, QJsonObject &arguments);
+    explicit SocketApiJobV2 (QSharedPointer<SocketListener> &socketListener, QByteArray &command, QJsonObject &arguments);
 
-    void success(QJsonObject &response) const;
-    void failure(QString &error) const;
+    void success (QJsonObject &response) const;
+    void failure (QString &error) const;
 
-    const QJsonObject &arguments() const { return _arguments; }
-    QByteArray command() const { return _command; }
+    const QJsonObject &arguments () const { return _arguments; }
+    QByteArray command () const { return _command; }
 
 Q_SIGNALS:
-    void finished() const;
+    void finished () const;
 
 private:
-    void doFinish(QJsonObject &obj) const;
+    void doFinish (QJsonObject &obj) const;
 
     QSharedPointer<SocketListener> _socketListener;
     const QByteArray _command;
@@ -141,6 +141,6 @@ private:
 };
 }
 
-Q_DECLARE_METATYPE(OCC::SocketListener *)
+Q_DECLARE_METATYPE (OCC::SocketListener *)
 
 #endif // SOCKETAPI_P_H

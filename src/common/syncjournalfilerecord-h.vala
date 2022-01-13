@@ -29,8 +29,8 @@ class SyncFileItem;
  */
 class OCSYNC_EXPORT SyncJournalFileRecord {
 public:
-    bool isValid() const {
-        return !_path.isEmpty();
+    bool isValid () const {
+        return !_path.isEmpty ();
     }
 
     /** Returns the numeric part of the full id in _fileId.
@@ -39,14 +39,14 @@ public:
      *
      * It is used in the construction of private links.
      */
-    QByteArray numericFileId() const;
-    QDateTime modDateTime() const { return Utility::qDateTimeFromTime_t(_modtime); }
+    QByteArray numericFileId () const;
+    QDateTime modDateTime () const { return Utility::qDateTimeFromTime_t (_modtime); }
 
-    bool isDirectory() const { return _type == ItemTypeDirectory; }
-    bool isFile() const { return _type == ItemTypeFile || _type == ItemTypeVirtualFileDehydration; }
-    bool isVirtualFile() const { return _type == ItemTypeVirtualFile || _type == ItemTypeVirtualFileDownload; }
-    QString path() const { return QString::fromUtf8(_path); }
-    QString e2eMangledName() const { return QString::fromUtf8(_e2eMangledName); }
+    bool isDirectory () const { return _type == ItemTypeDirectory; }
+    bool isFile () const { return _type == ItemTypeFile || _type == ItemTypeVirtualFileDehydration; }
+    bool isVirtualFile () const { return _type == ItemTypeVirtualFile || _type == ItemTypeVirtualFileDownload; }
+    QString path () const { return QString::fromUtf8 (_path); }
+    QString e2eMangledName () const { return QString::fromUtf8 (_e2eMangledName); }
 
     QByteArray _path;
     quint64 _inode = 0;
@@ -63,7 +63,7 @@ public:
 };
 
 bool OCSYNC_EXPORT
-operator==(SyncJournalFileRecord &lhs,
+operator== (SyncJournalFileRecord &lhs,
     const SyncJournalFileRecord &rhs);
 
 class OCSYNC_EXPORT SyncJournalErrorBlacklistRecord {
@@ -98,7 +98,7 @@ public:
     /// The last X-Request-ID of the request that failled
     QByteArray _requestId;
 
-    bool isValid() const;
+    bool isValid () const;
 };
 
 /** Represents a conflict in the conflicts table.
@@ -141,7 +141,7 @@ public:
      */
     QByteArray initialBasePath;
 
-    bool isValid() const { return !path.isEmpty(); }
+    bool isValid () const { return !path.isEmpty (); }
 };
 }
 

@@ -26,8 +26,8 @@ enum PushNotificationType {
     Activities = 2,
     Notifications = 4
 };
-Q_DECLARE_FLAGS(PushNotificationTypes, PushNotificationType)
-Q_DECLARE_OPERATORS_FOR_FLAGS(PushNotificationTypes)
+Q_DECLARE_FLAGS (PushNotificationTypes, PushNotificationType)
+Q_DECLARE_OPERATORS_FOR_FLAGS (PushNotificationTypes)
 
 /**
  * @brief The Capabilities class represents the capabilities of an ownCloud
@@ -36,53 +36,53 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(PushNotificationTypes)
  */
 class OWNCLOUDSYNC_EXPORT Capabilities {
 public:
-    Capabilities(QVariantMap &capabilities);
+    Capabilities (QVariantMap &capabilities);
 
-    bool shareAPI() const;
-    bool shareEmailPasswordEnabled() const;
-    bool shareEmailPasswordEnforced() const;
-    bool sharePublicLink() const;
-    bool sharePublicLinkAllowUpload() const;
-    bool sharePublicLinkSupportsUploadOnly() const;
-    bool sharePublicLinkAskOptionalPassword() const;
-    bool sharePublicLinkEnforcePassword() const;
-    bool sharePublicLinkEnforceExpireDate() const;
-    int sharePublicLinkExpireDateDays() const;
-    bool shareInternalEnforceExpireDate() const;
-    int shareInternalExpireDateDays() const;
-    bool shareRemoteEnforceExpireDate() const;
-    int shareRemoteExpireDateDays() const;
-    bool sharePublicLinkMultiple() const;
-    bool shareResharing() const;
-    int shareDefaultPermissions() const;
-    bool chunkingNg() const;
-    bool bulkUpload() const;
-    bool userStatus() const;
-    bool userStatusSupportsEmoji() const;
+    bool shareAPI () const;
+    bool shareEmailPasswordEnabled () const;
+    bool shareEmailPasswordEnforced () const;
+    bool sharePublicLink () const;
+    bool sharePublicLinkAllowUpload () const;
+    bool sharePublicLinkSupportsUploadOnly () const;
+    bool sharePublicLinkAskOptionalPassword () const;
+    bool sharePublicLinkEnforcePassword () const;
+    bool sharePublicLinkEnforceExpireDate () const;
+    int sharePublicLinkExpireDateDays () const;
+    bool shareInternalEnforceExpireDate () const;
+    int shareInternalExpireDateDays () const;
+    bool shareRemoteEnforceExpireDate () const;
+    int shareRemoteExpireDateDays () const;
+    bool sharePublicLinkMultiple () const;
+    bool shareResharing () const;
+    int shareDefaultPermissions () const;
+    bool chunkingNg () const;
+    bool bulkUpload () const;
+    bool userStatus () const;
+    bool userStatusSupportsEmoji () const;
 
     /// Returns which kind of push notfications are available
-    PushNotificationTypes availablePushNotifications() const;
+    PushNotificationTypes availablePushNotifications () const;
 
     /// Websocket url for files push notifications if available
-    QUrl pushNotificationsWebSocketUrl() const;
+    QUrl pushNotificationsWebSocketUrl () const;
 
     /// disable parallel upload in chunking
-    bool chunkingParallelUploadDisabled() const;
+    bool chunkingParallelUploadDisabled () const;
 
     /// Whether the "privatelink" DAV property is available
-    bool privateLinkPropertyAvailable() const;
+    bool privateLinkPropertyAvailable () const;
 
     /// returns true if the capabilities report notifications
-    bool notificationsAvailable() const;
+    bool notificationsAvailable () const;
 
     /// returns true if the server supports client side encryption
-    bool clientSideEncryptionAvailable() const;
+    bool clientSideEncryptionAvailable () const;
 
     /// returns true if the capabilities are loaded already.
-    bool isValid() const;
+    bool isValid () const;
 
     /// return true if the activity app is enabled
-    bool hasActivities() const;
+    bool hasActivities () const;
 
     /**
      * Returns the checksum types the server understands.
@@ -95,7 +95,7 @@ public:
      * Default: []
      * Possible entries: "Adler32", "MD5", "SHA1"
      */
-    QList<QByteArray> supportedChecksumTypes() const;
+    QList<QByteArray> supportedChecksumTypes () const;
 
     /**
      * The checksum algorithm that the server recommends for file uploads.
@@ -105,14 +105,14 @@ public:
      * Default: empty, meaning "no preference"
      * Possible values: empty or any of the supportedTypes
      */
-    QByteArray preferredUploadChecksumType() const;
+    QByteArray preferredUploadChecksumType () const;
 
     /**
-     * Helper that returns the preferredUploadChecksumType() if set, or one
-     * of the supportedChecksumTypes() if it isn't. May return an empty
+     * Helper that returns the preferredUploadChecksumType () if set, or one
+     * of the supportedChecksumTypes () if it isn't. May return an empty
      * QByteArray if no checksum types are supported.
      */
-    QByteArray uploadChecksumType() const;
+    QByteArray uploadChecksumType () const;
 
     /**
      * List of HTTP error codes should be guaranteed to eventually reset
@@ -131,7 +131,7 @@ public:
      * Default: []
      * Example: [503, 500]
      */
-    QList<int> httpErrorCodesThatResetFailingChunkedUploads() const;
+    QList<int> httpErrorCodesThatResetFailingChunkedUploads () const;
 
     /**
      * Regex that, if contained in a filename, will result in it not being uploaded.
@@ -142,22 +142,22 @@ public:
      *
      * Note that it just needs to be contained. The regex [ab] is contained in "car".
      */
-    QString invalidFilenameRegex() const;
+    QString invalidFilenameRegex () const;
 
     /**
      * return the list of filename that should not be uploaded
      */
-    QStringList blacklistedFiles() const;
+    QStringList blacklistedFiles () const;
 
     /**
      * Whether conflict files should remain local (default) or should be uploaded.
      */
-    bool uploadConflictFiles() const;
+    bool uploadConflictFiles () const;
 
     // Direct Editing
-    void addDirectEditor(DirectEditor* directEditor);
-    DirectEditor* getDirectEditorForMimetype(QMimeType &mimeType);
-    DirectEditor* getDirectEditorForOptionalMimetype(QMimeType &mimeType);
+    void addDirectEditor (DirectEditor* directEditor);
+    DirectEditor* getDirectEditorForMimetype (QMimeType &mimeType);
+    DirectEditor* getDirectEditorForOptionalMimetype (QMimeType &mimeType);
 
 private:
     QVariantMap _capabilities;
@@ -169,19 +169,19 @@ private:
 
 class OWNCLOUDSYNC_EXPORT DirectEditor : public QObject {
 public:
-    DirectEditor(QString &id, QString &name, QObject* parent = nullptr);
+    DirectEditor (QString &id, QString &name, QObject* parent = nullptr);
 
-    void addMimetype(QByteArray &mimeType);
-    void addOptionalMimetype(QByteArray &mimeType);
+    void addMimetype (QByteArray &mimeType);
+    void addOptionalMimetype (QByteArray &mimeType);
 
-    bool hasMimetype(QMimeType &mimeType);
-    bool hasOptionalMimetype(QMimeType &mimeType);
+    bool hasMimetype (QMimeType &mimeType);
+    bool hasOptionalMimetype (QMimeType &mimeType);
 
-    QString id() const;
-    QString name() const;
+    QString id () const;
+    QString name () const;
 
-    QList<QByteArray> mimeTypes() const;
-    QList<QByteArray> optionalMimeTypes() const;
+    QList<QByteArray> mimeTypes () const;
+    QList<QByteArray> optionalMimeTypes () const;
 
 private:
     QString _id;

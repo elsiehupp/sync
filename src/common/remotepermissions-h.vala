@@ -35,7 +35,7 @@ private:
     static constexpr int notNullMask = 0x1;
 
     template <typename Char> // can be 'char' or 'ushort' if conversion from QString
-    void fromArray(Char *p);
+    void fromArray (Char *p);
 
 public:
     enum Permissions {
@@ -58,43 +58,43 @@ public:
     };
 
     /// null permissions
-    RemotePermissions() = default;
+    RemotePermissions () = default;
 
     /// array with one character per permission, "" is null, " " is non-null but empty
-    QByteArray toDbValue() const;
+    QByteArray toDbValue () const;
 
     /// output for display purposes, no defined format (same as toDbValue in practice)
-    QString toString() const;
+    QString toString () const;
 
-    /// read value that was written with toDbValue()
-    static RemotePermissions fromDbValue(QByteArray &);
+    /// read value that was written with toDbValue ()
+    static RemotePermissions fromDbValue (QByteArray &);
 
     /// read a permissions string received from the server, never null
-    static RemotePermissions fromServerString(QString &);
+    static RemotePermissions fromServerString (QString &);
 
-    bool hasPermission(Permissions p) const {
-        return _value & (1 << static_cast<int>(p));
+    bool hasPermission (Permissions p) const {
+        return _value & (1 << static_cast<int> (p));
     }
-    void setPermission(Permissions p) {
-        _value |= (1 << static_cast<int>(p)) | notNullMask;
+    void setPermission (Permissions p) {
+        _value |= (1 << static_cast<int> (p)) | notNullMask;
     }
-    void unsetPermission(Permissions p) {
-        _value &= ~(1 << static_cast<int>(p));
+    void unsetPermission (Permissions p) {
+        _value &= ~ (1 << static_cast<int> (p));
     }
 
-    bool isNull() const { return !(_value & notNullMask); }
-    friend bool operator==(RemotePermissions a, RemotePermissions b) {
+    bool isNull () const { return ! (_value & notNullMask); }
+    friend bool operator== (RemotePermissions a, RemotePermissions b) {
         return a._value == b._value;
     }
-    friend bool operator!=(RemotePermissions a, RemotePermissions b) {
-        return !(a == b);
+    friend bool operator!= (RemotePermissions a, RemotePermissions b) {
+        return ! (a == b);
     }
 
-    friend QDebug operator<<(QDebug &dbg, RemotePermissions p) {
-        return dbg << p.toString();
+    friend QDebug operator<< (QDebug &dbg, RemotePermissions p) {
+        return dbg << p.toString ();
     }
 };
 
 } // namespace OCC
 
-Q_DECLARE_METATYPE(OCC::RemotePermissions)
+Q_DECLARE_METATYPE (OCC::RemotePermissions)

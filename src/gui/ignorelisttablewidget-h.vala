@@ -13,23 +13,23 @@ namespace Ui {
 class IgnoreListTableWidget : public QWidget {
 
 public:
-    IgnoreListTableWidget(QWidget *parent = nullptr);
-    ~IgnoreListTableWidget() override;
+    IgnoreListTableWidget (QWidget *parent = nullptr);
+    ~IgnoreListTableWidget () override;
 
-    void readIgnoreFile(QString &file, bool readOnly = false);
-    int addPattern(QString &pattern, bool deletable, bool readOnly);
+    void readIgnoreFile (QString &file, bool readOnly = false);
+    int addPattern (QString &pattern, bool deletable, bool readOnly);
 
 public slots:
-    void slotRemoveAllItems();
-    void slotWriteIgnoreFile(QString & file);
+    void slotRemoveAllItems ();
+    void slotWriteIgnoreFile (QString & file);
 
 private slots:
-    void slotItemSelectionChanged();
-    void slotRemoveCurrentItem();
-    void slotAddPattern();
+    void slotItemSelectionChanged ();
+    void slotRemoveCurrentItem ();
+    void slotAddPattern ();
 
 private:
-    void setupTableReadOnlyItems();
+    void setupTableReadOnlyItems ();
     QString readOnlyTooltip;
     Ui::IgnoreListTableWidget *ui;
 };

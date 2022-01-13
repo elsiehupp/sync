@@ -30,35 +30,35 @@ class Folder;
  */
 class SelectiveSyncWidget : public QWidget {
 public:
-    explicit SelectiveSyncWidget(AccountPtr account, QWidget *parent = nullptr);
+    explicit SelectiveSyncWidget (AccountPtr account, QWidget *parent = nullptr);
 
     /// Returns a list of blacklisted paths, each including the trailing /
-    QStringList createBlackList(QTreeWidgetItem *root = nullptr) const;
+    QStringList createBlackList (QTreeWidgetItem *root = nullptr) const;
 
-    /** Returns the oldBlackList passed into setFolderInfo(), except that
+    /** Returns the oldBlackList passed into setFolderInfo (), except that
      *  a "/" entry is expanded to all top-level folder names.
      */
-    QStringList oldBlackList() const;
+    QStringList oldBlackList () const;
 
     // Estimates the total size of checked items (recursively)
-    qint64 estimatedSize(QTreeWidgetItem *root = nullptr);
+    qint64 estimatedSize (QTreeWidgetItem *root = nullptr);
 
     // oldBlackList is a list of excluded paths, each including a trailing /
-    void setFolderInfo(QString &folderPath, QString &rootName,
-        const QStringList &oldBlackList = QStringList());
+    void setFolderInfo (QString &folderPath, QString &rootName,
+        const QStringList &oldBlackList = QStringList ());
 
-    QSize sizeHint() const override;
+    QSize sizeHint () const override;
 
 private slots:
-    void slotUpdateDirectories(QStringList);
-    void slotItemExpanded(QTreeWidgetItem *);
-    void slotItemChanged(QTreeWidgetItem *, int);
-    void slotLscolFinishedWithError(QNetworkReply *);
-    void slotGatherEncryptedPaths(QString &, QMap<QString, QString> &);
+    void slotUpdateDirectories (QStringList);
+    void slotItemExpanded (QTreeWidgetItem *);
+    void slotItemChanged (QTreeWidgetItem *, int);
+    void slotLscolFinishedWithError (QNetworkReply *);
+    void slotGatherEncryptedPaths (QString &, QMap<QString, QString> &);
 
 private:
-    void refreshFolders();
-    void recursiveInsert(QTreeWidgetItem *parent, QStringList pathTrail, QString path, qint64 size);
+    void refreshFolders ();
+    void recursiveInsert (QTreeWidgetItem *parent, QStringList pathTrail, QString path, qint64 size);
 
     AccountPtr _account;
 
@@ -85,21 +85,21 @@ private:
 class SelectiveSyncDialog : public QDialog {
 public:
     // Dialog for a specific folder (used from the account settings button)
-    explicit SelectiveSyncDialog(AccountPtr account, Folder *folder, QWidget *parent = nullptr, Qt::WindowFlags f = {});
+    explicit SelectiveSyncDialog (AccountPtr account, Folder *folder, QWidget *parent = nullptr, Qt::WindowFlags f = {});
 
     // Dialog for the whole account (Used from the wizard)
-    explicit SelectiveSyncDialog(AccountPtr account, QString &folder, QStringList &blacklist, QWidget *parent = nullptr, Qt::WindowFlags f = {});
+    explicit SelectiveSyncDialog (AccountPtr account, QString &folder, QStringList &blacklist, QWidget *parent = nullptr, Qt::WindowFlags f = {});
 
-    void accept() override;
+    void accept () override;
 
-    QStringList createBlackList() const;
-    QStringList oldBlackList() const;
+    QStringList createBlackList () const;
+    QStringList oldBlackList () const;
 
     // Estimate the size of the total of sync'ed files from the server
-    qint64 estimatedSize();
+    qint64 estimatedSize ();
 
 private:
-    void init(AccountPtr &account);
+    void init (AccountPtr &account);
 
     SelectiveSyncWidget *_selectiveSync;
 

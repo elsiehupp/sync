@@ -23,9 +23,9 @@ namespace OCC {
  */
 class ThumbnailJob : public AbstractNetworkJob {
 public:
-    explicit ThumbnailJob(QString &path, AccountPtr account, QObject *parent = nullptr);
+    explicit ThumbnailJob (QString &path, AccountPtr account, QObject *parent = nullptr);
 public slots:
-    void start() override;
+    void start () override;
 signals:
     /**
      * @param statusCode the HTTP status code
@@ -35,9 +35,9 @@ signals:
      * will contain the image data in PNG. If the status code is different the content
      * of reply is undefined.
      */
-    void jobFinished(int statusCode, QByteArray reply);
+    void jobFinished (int statusCode, QByteArray reply);
 private slots:
-    bool finished() override;
+    bool finished () override;
 };
 }
 

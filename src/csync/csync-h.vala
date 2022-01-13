@@ -42,14 +42,14 @@ namespace OCC {
 class SyncJournalFileRecord;
 }
 
-#if defined(Q_CC_GNU) && !defined(Q_CC_INTEL) && !defined(Q_CC_CLANG) && (__GNUC__ * 100 + __GNUC_MINOR__ < 408)
+#if defined (Q_CC_GNU) && !defined (Q_CC_INTEL) && !defined (Q_CC_CLANG) && (__GNUC__ * 100 + __GNUC_MINOR__ < 408)
 // openSuse 12.3 didn't like enum bitfields.
-#define BITFIELD(size)
-#elif defined(Q_CC_MSVC)
+#define BITFIELD (size)
+#elif defined (Q_CC_MSVC)
 // MSVC stores enum and bool as signed, so we need to add a bit for the sign
-#define BITFIELD(size) :(size+1)
+#define BITFIELD (size) : (size+1)
 #else
-#define BITFIELD(size) :size
+#define BITFIELD (size) :size
 #endif
 
 namespace CSyncEnums {
@@ -90,7 +90,7 @@ enum csync_status_codes_e {
     CSYNC_STATUS_INDIVIDUAL_IS_CONFLICT_FILE,
     CSYNC_STATUS_INDIVIDUAL_CANNOT_ENCODE
 };
-Q_ENUM_NS(csync_status_codes_e)
+Q_ENUM_NS (csync_status_codes_e)
 
 /**
   * Instruction enum. In the file traversal structure, it describes
@@ -115,9 +115,9 @@ enum SyncInstructions {
                                                     but without any propagation (UPDATE|RECONCILE) */
 };
 
-Q_ENUM_NS(SyncInstructions)
+Q_ENUM_NS (SyncInstructions)
 
-// This enum is used with BITFIELD(3) and BITFIELD(4) in several places.
+// This enum is used with BITFIELD (3) and BITFIELD (4) in several places.
 // Also, this value is stored in the database, so beware of value changes.
 enum ItemType {
     ItemTypeFile = 0,
@@ -153,7 +153,7 @@ enum ItemType {
      */
     ItemTypeVirtualFileDehydration = 6,
 };
-Q_ENUM_NS(ItemType)
+Q_ENUM_NS (ItemType)
 }
 
 using namespace CSyncEnums;
@@ -166,11 +166,11 @@ struct OCSYNC_EXPORT csync_file_stat_s {
   uint64_t inode = 0;
 
   OCC::RemotePermissions remotePerm;
-  ItemType type BITFIELD(4);
-  bool child_modified BITFIELD(1);
-  bool has_ignored_files BITFIELD(1); // Specify that a directory, or child directory contains ignored files.
-  bool is_hidden BITFIELD(1); // Not saved in the DB, only used during discovery for local files.
-  bool isE2eEncrypted BITFIELD(1);
+  ItemType type BITFIELD (4);
+  bool child_modified BITFIELD (1);
+  bool has_ignored_files BITFIELD (1); // Specify that a directory, or child directory contains ignored files.
+  bool is_hidden BITFIELD (1); // Not saved in the DB, only used during discovery for local files.
+  bool isE2eEncrypted BITFIELD (1);
 
   QByteArray path;
   QByteArray rename_path;
@@ -191,12 +191,12 @@ struct OCSYNC_EXPORT csync_file_stat_s {
 
   SyncInstructions instruction = CSYNC_INSTRUCTION_NONE; /* u32 */
 
-  csync_file_stat_s()
-    : type(ItemTypeSkip)
-    , child_modified(false)
-    , has_ignored_files(false)
-    , is_hidden(false)
-    , isE2eEncrypted(false) { }
+  csync_file_stat_s ()
+    : type (ItemTypeSkip)
+    , child_modified (false)
+    , has_ignored_files (false)
+    , is_hidden (false)
+    , isE2eEncrypted (false) { }
 };
 
 /**

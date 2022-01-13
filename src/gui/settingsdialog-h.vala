@@ -37,39 +37,39 @@ class ownCloudGui;
  * @ingroup gui
  */
 class SettingsDialog : public QDialog {
-    Q_PROPERTY(QWidget* currentPage READ currentPage)
+    Q_PROPERTY (QWidget* currentPage READ currentPage)
 
 public:
-    explicit SettingsDialog(ownCloudGui *gui, QWidget *parent = nullptr);
-    ~SettingsDialog() override;
+    explicit SettingsDialog (ownCloudGui *gui, QWidget *parent = nullptr);
+    ~SettingsDialog () override;
 
-    QWidget* currentPage();
+    QWidget* currentPage ();
 
 public slots:
-    void showFirstPage();
-    void showIssuesList(AccountState *account);
-    void slotSwitchPage(QAction *action);
-    void slotAccountAvatarChanged();
-    void slotAccountDisplayNameChanged();
+    void showFirstPage ();
+    void showIssuesList (AccountState *account);
+    void slotSwitchPage (QAction *action);
+    void slotAccountAvatarChanged ();
+    void slotAccountDisplayNameChanged ();
 
 signals:
-    void styleChanged();
-    void onActivate();
+    void styleChanged ();
+    void onActivate ();
 
 protected:
-    void reject() override;
-    void accept() override;
-    void changeEvent(QEvent *) override;
+    void reject () override;
+    void accept () override;
+    void changeEvent (QEvent *) override;
 
 private slots:
-    void accountAdded(AccountState *);
-    void accountRemoved(AccountState *);
+    void accountAdded (AccountState *);
+    void accountRemoved (AccountState *);
 
 private:
-    void customizeStyle();
+    void customizeStyle ();
 
-    QAction *createColorAwareAction(QString &iconName, QString &fileName);
-    QAction *createActionWithIcon(QIcon &icon, QString &text, QString &iconPath = QString());
+    QAction *createColorAwareAction (QString &iconName, QString &fileName);
+    QAction *createActionWithIcon (QIcon &icon, QString &text, QString &iconPath = QString ());
 
     Ui::SettingsDialog *const _ui;
 

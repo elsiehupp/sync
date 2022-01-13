@@ -28,16 +28,16 @@ namespace Ui {
 class ProxyAuthDialog : public QDialog {
 
 public:
-    explicit ProxyAuthDialog(QWidget *parent = nullptr);
-    ~ProxyAuthDialog() override;
+    explicit ProxyAuthDialog (QWidget *parent = nullptr);
+    ~ProxyAuthDialog () override;
 
-    void setProxyAddress(QString &address);
+    void setProxyAddress (QString &address);
 
-    QString username() const;
-    QString password() const;
+    QString username () const;
+    QString password () const;
 
     /// Resets the dialog for new credential entry.
-    void reset();
+    void reset ();
 
 private:
     Ui::ProxyAuthDialog *ui;

@@ -24,9 +24,9 @@ namespace OCC {
  *
  * Normal workflow:
  *
- *   --> start()
+ *   --> start ()
  *       |
- *       +----> openBrowser() open the browser to the login page, redirects to http://localhost:xxx
+ *       +----> openBrowser () open the browser to the login page, redirects to http://localhost:xxx
  *       |
  *       +----> _server starts listening on a TCP port waiting for an HTTP request with a 'code'
  *                |
@@ -34,31 +34,31 @@ namespace OCC {
  *             request the access_token and the refresh_token via 'apps/oauth2/api/v1/token'
  *                |
  *                v
- *              emit result(...)
+ *              emit result (...)
  *
  */
 class OAuth : public QObject {
 public:
-    OAuth(Account *account, QObject *parent)
-        : QObject(parent)
-        , _account(account) {
+    OAuth (Account *account, QObject *parent)
+        : QObject (parent)
+        , _account (account) {
     }
-    ~OAuth() override;
+    ~OAuth () override;
 
     enum Result { NotSupported,
         LoggedIn,
         Error };
-    Q_ENUM(Result);
-    void start();
-    bool openBrowser();
-    QUrl authorisationLink() const;
+    Q_ENUM (Result);
+    void start ();
+    bool openBrowser ();
+    QUrl authorisationLink () const;
 
 signals:
     /**
      * The state has changed.
      * when logged in, token has the value of the token.
      */
-    void result(OAuth::Result result, QString &user = QString(), QString &token = QString(), QString &refreshToken = QString());
+    void result (OAuth::Result result, QString &user = QString (), QString &token = QString (), QString &refreshToken = QString ());
 
 private:
     Account *_account;

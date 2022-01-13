@@ -19,17 +19,17 @@ class OWNCLOUDSYNC_EXPORT DummyCredentials : public AbstractCredentials {
 public:
     QString _user;
     QString _password;
-    QString authType() const override;
-    QString user() const override;
-    QString password() const override;
-    QNetworkAccessManager *createQNAM() const override;
-    bool ready() const override;
-    bool stillValid(QNetworkReply *reply) override;
-    void fetchFromKeychain() override;
-    void askFromUser() override;
-    void persist() override;
-    void invalidateToken() override {}
-    void forgetSensitiveData() override{};
+    QString authType () const override;
+    QString user () const override;
+    QString password () const override;
+    QNetworkAccessManager *createQNAM () const override;
+    bool ready () const override;
+    bool stillValid (QNetworkReply *reply) override;
+    void fetchFromKeychain () override;
+    void askFromUser () override;
+    void persist () override;
+    void invalidateToken () override {}
+    void forgetSensitiveData () override{};
 };
 
 } // namespace OCC

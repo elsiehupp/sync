@@ -30,14 +30,14 @@ class AccountState;
  */
 class SslButton : public QToolButton {
 public:
-    explicit SslButton(QWidget *parent = nullptr);
-    void updateAccountState(AccountState *accountState);
+    explicit SslButton (QWidget *parent = nullptr);
+    void updateAccountState (AccountState *accountState);
 
 public slots:
-    void slotUpdateMenu();
+    void slotUpdateMenu ();
 
 private:
-    QMenu *buildCertMenu(QMenu *parent, QSslCertificate &cert,
+    QMenu *buildCertMenu (QMenu *parent, QSslCertificate &cert,
         const QList<QSslCertificate> &userApproved, int pos, QList<QSslCertificate> &systemCaCertificates);
     QPointer<AccountState> _accountState;
     QMenu *_menu;

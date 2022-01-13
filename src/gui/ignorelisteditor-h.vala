@@ -30,16 +30,16 @@ namespace Ui {
 class IgnoreListEditor : public QDialog {
 
 public:
-    IgnoreListEditor(QWidget *parent = nullptr);
-    ~IgnoreListEditor() override;
+    IgnoreListEditor (QWidget *parent = nullptr);
+    ~IgnoreListEditor () override;
 
-    bool ignoreHiddenFiles();
+    bool ignoreHiddenFiles ();
 
 private slots:
-    void slotRestoreDefaults(QAbstractButton *button);
+    void slotRestoreDefaults (QAbstractButton *button);
 
 private:
-    void setupTableReadOnlyItems();
+    void setupTableReadOnlyItems ();
     QString readOnlyTooltip;
     Ui::IgnoreListEditor *ui;
 };

@@ -24,13 +24,13 @@ namespace OCC {
  */
 class OcsNavigationAppsJob : public OcsJob {
 public:
-    explicit OcsNavigationAppsJob(AccountPtr account);
+    explicit OcsNavigationAppsJob (AccountPtr account);
 
     /**
      * Get a list of enabled apps and external sites
      * visible in the Navigation menu
      */
-    void getNavigationApps();
+    void getNavigationApps ();
 
 signals:
     /**
@@ -39,10 +39,10 @@ signals:
      * @param reply The reply
      * @param statusCode the status code of the response
      */
-    void appsJobFinished(QJsonDocument &reply, int statusCode);
+    void appsJobFinished (QJsonDocument &reply, int statusCode);
 
 private slots:
-    void jobDone(QJsonDocument &reply, int statusCode);
+    void jobDone (QJsonDocument &reply, int statusCode);
 };
 }
 

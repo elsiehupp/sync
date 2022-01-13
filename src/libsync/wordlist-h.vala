@@ -6,8 +6,8 @@
 
 namespace OCC {
     namespace WordList {
-        OWNCLOUDSYNC_EXPORT QStringList getRandomWords(int nr);
-        OWNCLOUDSYNC_EXPORT QString getUnifiedString(QStringList& l);
+        OWNCLOUDSYNC_EXPORT QStringList getRandomWords (int nr);
+        OWNCLOUDSYNC_EXPORT QString getUnifiedString (QStringList& l);
     }
 }
 

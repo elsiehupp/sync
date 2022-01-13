@@ -21,15 +21,15 @@ class FolderMan;
 
 class NavigationPaneHelper : public QObject {
 public:
-    NavigationPaneHelper(FolderMan *folderMan);
+    NavigationPaneHelper (FolderMan *folderMan);
 
-    bool showInExplorerNavigationPane() const { return _showInExplorerNavigationPane; }
-    void setShowInExplorerNavigationPane(bool show);
+    bool showInExplorerNavigationPane () const { return _showInExplorerNavigationPane; }
+    void setShowInExplorerNavigationPane (bool show);
 
-    void scheduleUpdateCloudStorageRegistry();
+    void scheduleUpdateCloudStorageRegistry ();
 
 private:
-    void updateCloudStorageRegistry();
+    void updateCloudStorageRegistry ();
 
     FolderMan *_folderMan;
     bool _showInExplorerNavigationPane;

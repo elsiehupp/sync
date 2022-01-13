@@ -23,26 +23,26 @@ namespace Utility {
      *
      * If launching the browser fails, display a message.
      */
-    bool openBrowser(QUrl &url, QWidget *errorWidgetParent = nullptr);
+    bool openBrowser (QUrl &url, QWidget *errorWidgetParent = nullptr);
 
     /** Start composing a new email message.
      *
      * If launching the email program fails, display a message.
      */
-    bool openEmailComposer(QString &subject, QString &body,
+    bool openEmailComposer (QString &subject, QString &body,
         QWidget *errorWidgetParent);
 
     /** Returns a translated string indicating the current availability.
      *
      * This will be used in context menus to describe the current state.
      */
-    QString vfsCurrentAvailabilityText(VfsItemAvailability availability);
+    QString vfsCurrentAvailabilityText (VfsItemAvailability availability);
 
     /** Translated text for "making items always available locally" */
-    QString vfsPinActionText();
+    QString vfsPinActionText ();
 
     /** Translated text for "free up local space" (and unpinning the item) */
-    QString vfsFreeSpaceActionText();
+    QString vfsFreeSpaceActionText ();
 
 } // namespace Utility
 } // namespace OCC

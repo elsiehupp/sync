@@ -29,11 +29,11 @@ class AccountState;
 
 class UnifiedSearchResultsListModel : public QAbstractListModel {
 
-    Q_PROPERTY(bool isSearchInProgress READ isSearchInProgress NOTIFY isSearchInProgressChanged)
-    Q_PROPERTY(QString currentFetchMoreInProgressProviderId READ currentFetchMoreInProgressProviderId NOTIFY
+    Q_PROPERTY (bool isSearchInProgress READ isSearchInProgress NOTIFY isSearchInProgressChanged)
+    Q_PROPERTY (QString currentFetchMoreInProgressProviderId READ currentFetchMoreInProgressProviderId NOTIFY
             currentFetchMoreInProgressProviderIdChanged)
-    Q_PROPERTY(QString errorString READ errorString NOTIFY errorStringChanged)
-    Q_PROPERTY(QString searchTerm READ searchTerm WRITE setSearchTerm NOTIFY searchTermChanged)
+    Q_PROPERTY (QString errorString READ errorString NOTIFY errorStringChanged)
+    Q_PROPERTY (QString searchTerm READ searchTerm WRITE setSearchTerm NOTIFY searchTermChanged)
 
     struct UnifiedSearchProvider {
         QString _id;
@@ -41,7 +41,7 @@ class UnifiedSearchResultsListModel : public QAbstractListModel {
         qint32 _cursor = -1; // current pagination value
         qint32 _pageSize = -1; // how many max items per step of pagination
         bool _isPaginated = false;
-        qint32 _order = std::numeric_limits<qint32>::max(); // sorting order (smaller number has bigger priority)
+        qint32 _order = std::numeric_limits<qint32>::max (); // sorting order (smaller number has bigger priority)
     };
 
 public:
@@ -58,53 +58,53 @@ public:
         TypeAsStringRole,
     };
 
-    explicit UnifiedSearchResultsListModel(AccountState *accountState, QObject *parent = nullptr);
+    explicit UnifiedSearchResultsListModel (AccountState *accountState, QObject *parent = nullptr);
 
-    QVariant data(QModelIndex &index, int role) const override;
-    int rowCount(QModelIndex &parent = QModelIndex()) const override;
+    QVariant data (QModelIndex &index, int role) const override;
+    int rowCount (QModelIndex &parent = QModelIndex ()) const override;
 
-    bool isSearchInProgress() const;
+    bool isSearchInProgress () const;
 
-    QString currentFetchMoreInProgressProviderId() const;
-    QString searchTerm() const;
-    QString errorString() const;
+    QString currentFetchMoreInProgressProviderId () const;
+    QString searchTerm () const;
+    QString errorString () const;
 
-    Q_INVOKABLE void resultClicked(QString &providerId, QUrl &resourceUrl) const;
-    Q_INVOKABLE void fetchMoreTriggerClicked(QString &providerId);
+    Q_INVOKABLE void resultClicked (QString &providerId, QUrl &resourceUrl) const;
+    Q_INVOKABLE void fetchMoreTriggerClicked (QString &providerId);
 
-    QHash<int, QByteArray> roleNames() const override;
+    QHash<int, QByteArray> roleNames () const override;
 
 private:
-    void startSearch();
-    void startSearchForProvider(QString &providerId, qint32 cursor = -1);
+    void startSearch ();
+    void startSearchForProvider (QString &providerId, qint32 cursor = -1);
 
-    void parseResultsForProvider(QJsonObject &data, QString &providerId, bool fetchedMore = false);
+    void parseResultsForProvider (QJsonObject &data, QString &providerId, bool fetchedMore = false);
 
     // append initial search results to the list
-    void appendResults(QVector<UnifiedSearchResult> results, UnifiedSearchProvider &provider);
+    void appendResults (QVector<UnifiedSearchResult> results, UnifiedSearchProvider &provider);
 
     // append pagination results to existing results from the initial search
-    void appendResultsToProvider(QVector<UnifiedSearchResult> &results, UnifiedSearchProvider &provider);
+    void appendResultsToProvider (QVector<UnifiedSearchResult> &results, UnifiedSearchProvider &provider);
 
-    void removeFetchMoreTrigger(QString &providerId);
+    void removeFetchMoreTrigger (QString &providerId);
 
-    void disconnectAndClearSearchJobs();
+    void disconnectAndClearSearchJobs ();
 
-    void clearCurrentFetchMoreInProgressProviderId();
+    void clearCurrentFetchMoreInProgressProviderId ();
 
 signals:
-    void currentFetchMoreInProgressProviderIdChanged();
-    void isSearchInProgressChanged();
-    void errorStringChanged();
-    void searchTermChanged();
+    void currentFetchMoreInProgressProviderIdChanged ();
+    void isSearchInProgressChanged ();
+    void errorStringChanged ();
+    void searchTermChanged ();
 
 public slots:
-    void setSearchTerm(QString &term);
+    void setSearchTerm (QString &term);
 
 private slots:
-    void slotSearchTermEditingFinished();
-    void slotFetchProvidersFinished(QJsonDocument &json, int statusCode);
-    void slotSearchForProviderFinished(QJsonDocument &json, int statusCode);
+    void slotSearchTermEditingFinished ();
+    void slotFetchProvidersFinished (QJsonDocument &json, int statusCode);
+    void slotSearchForProviderFinished (QJsonDocument &json, int statusCode);
 
 private:
     QMap<QString, UnifiedSearchProvider> _providers;

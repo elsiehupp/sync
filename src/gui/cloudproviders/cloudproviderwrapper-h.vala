@@ -32,20 +32,20 @@ using namespace OCC;
 
 class CloudProviderWrapper : public QObject {
 public:
-    explicit CloudProviderWrapper(QObject *parent = nullptr, Folder *folder = nullptr, int folderId = 0, CloudProvidersProviderExporter* cloudprovider = nullptr);
-    ~CloudProviderWrapper() override;
-    CloudProvidersAccountExporter* accountExporter();
-    Folder* folder();
-    GMenuModel* getMenuModel();
-    GActionGroup* getActionGroup();
-    void updateStatusText(QString statusText);
-    void updatePauseStatus();
+    explicit CloudProviderWrapper (QObject *parent = nullptr, Folder *folder = nullptr, int folderId = 0, CloudProvidersProviderExporter* cloudprovider = nullptr);
+    ~CloudProviderWrapper () override;
+    CloudProvidersAccountExporter* accountExporter ();
+    Folder* folder ();
+    GMenuModel* getMenuModel ();
+    GActionGroup* getActionGroup ();
+    void updateStatusText (QString statusText);
+    void updatePauseStatus ();
 
 public slots:
-    void slotSyncStarted();
-    void slotSyncFinished(SyncResult &);
-    void slotUpdateProgress(QString &folder, ProgressInfo &progress);
-    void slotSyncPausedChanged(Folder*, bool);
+    void slotSyncStarted ();
+    void slotSyncFinished (SyncResult &);
+    void slotUpdateProgress (QString &folder, ProgressInfo &progress);
+    void slotSyncPausedChanged (Folder*, bool);
 
 private:
     Folder *_folder;

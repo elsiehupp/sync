@@ -14,104 +14,104 @@
 
 namespace OCC {
 
-SyncResult::SyncResult() = default;
+SyncResult::SyncResult () = default;
 
-SyncResult::Status SyncResult::status() const {
+SyncResult::Status SyncResult::status () const {
     return _status;
 }
 
-void SyncResult::reset() {
-    *this = SyncResult();
+void SyncResult::reset () {
+    *this = SyncResult ();
 }
 
-QString SyncResult::statusString() const {
+QString SyncResult::statusString () const {
     QString re;
-    Status stat = status();
+    Status stat = status ();
 
     switch (stat) {
     case Undefined:
-        re = QLatin1String("Undefined");
+        re = QLatin1String ("Undefined");
         break;
     case NotYetStarted:
-        re = QLatin1String("Not yet Started");
+        re = QLatin1String ("Not yet Started");
         break;
     case SyncRunning:
-        re = QLatin1String("Sync Running");
+        re = QLatin1String ("Sync Running");
         break;
     case Success:
-        re = QLatin1String("Success");
+        re = QLatin1String ("Success");
         break;
     case Error:
-        re = QLatin1String("Error");
+        re = QLatin1String ("Error");
         break;
     case SetupError:
-        re = QLatin1String("SetupError");
+        re = QLatin1String ("SetupError");
         break;
     case SyncPrepare:
-        re = QLatin1String("SyncPrepare");
+        re = QLatin1String ("SyncPrepare");
         break;
     case Problem:
-        re = QLatin1String("Success, some files were ignored.");
+        re = QLatin1String ("Success, some files were ignored.");
         break;
     case SyncAbortRequested:
-        re = QLatin1String("Sync Request aborted by user");
+        re = QLatin1String ("Sync Request aborted by user");
         break;
     case Paused:
-        re = QLatin1String("Sync Paused");
+        re = QLatin1String ("Sync Paused");
         break;
     }
     return re;
 }
 
-void SyncResult::setStatus(Status stat) {
+void SyncResult::setStatus (Status stat) {
     _status = stat;
-    _syncTime = QDateTime::currentDateTimeUtc();
+    _syncTime = QDateTime::currentDateTimeUtc ();
 }
 
-QDateTime SyncResult::syncTime() const {
+QDateTime SyncResult::syncTime () const {
     return _syncTime;
 }
 
-QStringList SyncResult::errorStrings() const {
+QStringList SyncResult::errorStrings () const {
     return _errors;
 }
 
-void SyncResult::appendErrorString(QString &err) {
-    _errors.append(err);
+void SyncResult::appendErrorString (QString &err) {
+    _errors.append (err);
 }
 
-QString SyncResult::errorString() const {
-    if (_errors.isEmpty())
-        return QString();
-    return _errors.first();
+QString SyncResult::errorString () const {
+    if (_errors.isEmpty ())
+        return QString ();
+    return _errors.first ();
 }
 
-void SyncResult::clearErrors() {
-    _errors.clear();
+void SyncResult::clearErrors () {
+    _errors.clear ();
 }
 
-void SyncResult::setFolder(QString &folder) {
+void SyncResult::setFolder (QString &folder) {
     _folder = folder;
 }
 
-QString SyncResult::folder() const {
+QString SyncResult::folder () const {
     return _folder;
 }
 
-void SyncResult::processCompletedItem(SyncFileItemPtr &item) {
-    if (Progress::isWarningKind(item->_status)) {
+void SyncResult::processCompletedItem (SyncFileItemPtr &item) {
+    if (Progress::isWarningKind (item->_status)) {
         // Count any error conditions, error strings will have priority anyway.
         _foundFilesNotSynced = true;
     }
 
-    if (item->isDirectory() && (item->_instruction == CSYNC_INSTRUCTION_NEW
+    if (item->isDirectory () && (item->_instruction == CSYNC_INSTRUCTION_NEW
                                   || item->_instruction == CSYNC_INSTRUCTION_TYPE_CHANGE
                                   || item->_instruction == CSYNC_INSTRUCTION_REMOVE
                                   || item->_instruction == CSYNC_INSTRUCTION_RENAME)) {
         _folderStructureWasChanged = true;
     }
 
-    if(item->_status == SyncFileItem::FileLocked){
+    if (item->_status == SyncFileItem::FileLocked){
         _numLockedItems++;
         if (!_firstItemLocked) {
             _firstItemLocked = item;
@@ -121,7 +121,7 @@ void SyncResult::processCompletedItem(SyncFileItemPtr &item) {
     // Process the item to the gui
     if (item->_status == SyncFileItem::FatalError || item->_status == SyncFileItem::NormalError) {
         //: this displays an error string (%2) for a file %1
-        appendErrorString(QObject::tr("%1: %2").arg(item->_file, item->_errorString));
+        appendErrorString (QObject::tr ("%1: %2").arg (item->_file, item->_errorString));
         _numErrorItems++;
         if (!_firstItemError) {
             _firstItemError = item;
@@ -136,7 +136,7 @@ void SyncResult::processCompletedItem(SyncFileItemPtr &item) {
             _numOldConflictItems++;
         }
     } else {
-        if (!item->hasErrorStatus() && item->_status != SyncFileItem::FileIgnored && item->_direction == SyncFileItem::Down) {
+        if (!item->hasErrorStatus () && item->_status != SyncFileItem::FileIgnored && item->_direction == SyncFileItem::Down) {
             switch (item->_instruction) {
             case CSYNC_INSTRUCTION_NEW:
             case CSYNC_INSTRUCTION_TYPE_CHANGE:

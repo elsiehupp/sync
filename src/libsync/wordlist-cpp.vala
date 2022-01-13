@@ -6,9 +6,9 @@ namespace WordList {
 
 // #include <initializer_list>
 
-int getRandomNumber(int max) {
+int getRandomNumber (int max) {
     unsigned char d[8];
-    RAND_bytes(d, 8);
+    RAND_bytes (d, 8);
 
     unsigned int num = 0;
 
@@ -17,10 +17,10 @@ int getRandomNumber(int max) {
         num += c;
     }
 
-    return static_cast<int>(num % max);
+    return static_cast<int> (num % max);
 }
 
-QStringList getRandomWords(int nr) {
+QStringList getRandomWords (int nr) {
     QStringList wordList = {
         "abandon",
         "ability",
@@ -2073,18 +2073,18 @@ QStringList getRandomWords(int nr) {
     };
 
     QStringList randomWords;
-    while(randomWords.size() != nr) {
-        QString currWord = wordList.at(getRandomNumber(wordList.size()));
-        if (!randomWords.contains(currWord)) {
-            randomWords.append(currWord);
+    while (randomWords.size () != nr) {
+        QString currWord = wordList.at (getRandomNumber (wordList.size ()));
+        if (!randomWords.contains (currWord)) {
+            randomWords.append (currWord);
         }
     }
     return randomWords;
 }
 
-QString getUnifiedString(QStringList& wList) {
+QString getUnifiedString (QStringList& wList) {
     QString ret;
-    for(auto& str : wList) {
+    for (auto& str : wList) {
         ret += str;
     }
     return ret;

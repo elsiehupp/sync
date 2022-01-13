@@ -18,28 +18,28 @@
 
 namespace OCC {
 
-FolderWatcherPrivate::FolderWatcherPrivate(FolderWatcher *p, QString &path)
-    : _parent(p)
-    , _folder(path) {
-    this->startWatching();
+FolderWatcherPrivate::FolderWatcherPrivate (FolderWatcher *p, QString &path)
+    : _parent (p)
+    , _folder (path) {
+    this->startWatching ();
 }
 
-FolderWatcherPrivate::~FolderWatcherPrivate() {
-    FSEventStreamStop(_stream);
-    FSEventStreamInvalidate(_stream);
-    FSEventStreamRelease(_stream);
+FolderWatcherPrivate::~FolderWatcherPrivate () {
+    FSEventStreamStop (_stream);
+    FSEventStreamInvalidate (_stream);
+    FSEventStreamRelease (_stream);
 }
 
-static void callback(
+static void callback (
     ConstFSEventStreamRef streamRef,
     void *clientCallBackInfo,
     size_t numEvents,
     void *eventPathsVoid,
     const FSEventStreamEventFlags eventFlags[],
     const FSEventStreamEventId eventIds[]) {
-    Q_UNUSED(streamRef)
-    Q_UNUSED(eventFlags)
-    Q_UNUSED(eventIds)
+    Q_UNUSED (streamRef)
+    Q_UNUSED (eventFlags)
+    Q_UNUSED (eventIds)
 
     const FSEventStreamEventFlags c_interestingFlags = kFSEventStreamEventFlagItemCreated // for new folder/file
         | kFSEventStreamEventFlagItemRemoved // for rm
@@ -48,39 +48,39 @@ static void callback(
         | kFSEventStreamEventFlagItemModified; // for content change
     //We ignore other flags, e.g. for owner change, xattr change, Finder label change etc
 
-    qCDebug(lcFolderWatcher) << "FolderWatcherPrivate::callback by OS X";
+    qCDebug (lcFolderWatcher) << "FolderWatcherPrivate::callback by OS X";
 
     QStringList paths;
     CFArrayRef eventPaths = (CFArrayRef)eventPathsVoid;
-    for (int i = 0; i < static_cast<int>(numEvents); ++i) {
-        CFStringRef path = reinterpret_cast<CFStringRef>(CFArrayGetValueAtIndex(eventPaths, i));
+    for (int i = 0; i < static_cast<int> (numEvents); ++i) {
+        CFStringRef path = reinterpret_cast<CFStringRef> (CFArrayGetValueAtIndex (eventPaths, i));
 
         QString qstring;
-        CFIndex pathLength = CFStringGetLength(path);
-        qstring.resize(pathLength);
-        CFStringGetCharacters(path, CFRangeMake(0, pathLength), reinterpret_cast<UniChar *>(qstring.data()));
-        QString fn = qstring.normalized(QString::NormalizationForm_C);
+        CFIndex pathLength = CFStringGetLength (path);
+        qstring.resize (pathLength);
+        CFStringGetCharacters (path, CFRangeMake (0, pathLength), reinterpret_cast<UniChar *> (qstring.data ()));
+        QString fn = qstring.normalized (QString::NormalizationForm_C);
 
-        if (!(eventFlags[i] & c_interestingFlags)) {
-            qCDebug(lcFolderWatcher) << "Ignoring non-content changes for" << fn << eventFlags[i];
+        if (! (eventFlags[i] & c_interestingFlags)) {
+            qCDebug (lcFolderWatcher) << "Ignoring non-content changes for" << fn << eventFlags[i];
             continue;
         }
 
-        paths.append(fn);
+        paths.append (fn);
     }
 
-    reinterpret_cast<FolderWatcherPrivate *>(clientCallBackInfo)->doNotifyParent(paths);
+    reinterpret_cast<FolderWatcherPrivate *> (clientCallBackInfo)->doNotifyParent (paths);
 }
 
-void FolderWatcherPrivate::startWatching() {
-    qCDebug(lcFolderWatcher) << "FolderWatcherPrivate::startWatching()" << _folder;
-    CFStringRef folderCF = CFStringCreateWithCharacters(0, reinterpret_cast<const UniChar *>(_folder.unicode()),
-        _folder.length());
-    CFArrayRef pathsToWatch = CFStringCreateArrayBySeparatingStrings(nullptr, folderCF, CFSTR(":"));
+void FolderWatcherPrivate::startWatching () {
+    qCDebug (lcFolderWatcher) << "FolderWatcherPrivate::startWatching ()" << _folder;
+    CFStringRef folderCF = CFStringCreateWithCharacters (0, reinterpret_cast<const UniChar *> (_folder.unicode ()),
+        _folder.length ());
+    CFArrayRef pathsToWatch = CFStringCreateArrayBySeparatingStrings (nullptr, folderCF, CFSTR (":"));
 
     FSEventStreamContext ctx = { 0, this, nullptr, nullptr, nullptr };
 
-    _stream = FSEventStreamCreate(nullptr,
+    _stream = FSEventStreamCreate (nullptr,
         &callback,
         &ctx,
         pathsToWatch,
@@ -88,21 +88,21 @@ void FolderWatcherPrivate::startWatching() {
         0, // latency
         kFSEventStreamCreateFlagUseCFTypes | kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagIgnoreSelf);
 
-    CFRelease(pathsToWatch);
-    CFRelease(folderCF);
-    FSEventStreamScheduleWithRunLoop(_stream, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
-    FSEventStreamStart(_stream);
+    CFRelease (pathsToWatch);
+    CFRelease (folderCF);
+    FSEventStreamScheduleWithRunLoop (_stream, CFRunLoopGetCurrent (), kCFRunLoopDefaultMode);
+    FSEventStreamStart (_stream);
 }
 
-QStringList FolderWatcherPrivate::addCoalescedPaths(QStringList &paths) const {
+QStringList FolderWatcherPrivate::addCoalescedPaths (QStringList &paths) const {
     QStringList coalescedPaths;
     for (auto &eventPath : paths) {
-        if (QDir(eventPath).exists()) {
-            QDirIterator it(eventPath, QDir::AllDirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-            while (it.hasNext()) {
-                auto subfolder = it.next();
-                if (!paths.contains(subfolder)) {
-                    coalescedPaths.append(subfolder);
+        if (QDir (eventPath).exists ()) {
+            QDirIterator it (eventPath, QDir::AllDirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+            while (it.hasNext ()) {
+                auto subfolder = it.next ();
+                if (!paths.contains (subfolder)) {
+                    coalescedPaths.append (subfolder);
                 }
             }
         }
@@ -110,9 +110,9 @@ QStringList FolderWatcherPrivate::addCoalescedPaths(QStringList &paths) const {
     return (paths + coalescedPaths);
 }
 
-void FolderWatcherPrivate::doNotifyParent(QStringList &paths) {
-    const QStringList totalPaths = addCoalescedPaths(paths);
-    _parent->changeDetected(totalPaths);
+void FolderWatcherPrivate::doNotifyParent (QStringList &paths) {
+    const QStringList totalPaths = addCoalescedPaths (paths);
+    _parent->changeDetected (totalPaths);
 }
 
 } // ns mirall

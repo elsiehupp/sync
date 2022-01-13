@@ -20,13 +20,13 @@ class CloudProviderWrapper;
 
 class CloudProviderManager : public QObject {
 public:
-    explicit CloudProviderManager(QObject *parent = nullptr);
-    void registerSignals();
+    explicit CloudProviderManager (QObject *parent = nullptr);
+    void registerSignals ();
 
 signals:
 
 public slots:
-    void slotFolderListChanged(Folder::Map &folderMap);
+    void slotFolderListChanged (Folder::Map &folderMap);
 
 private:
     QMap<QString, CloudProviderWrapper*> _map;

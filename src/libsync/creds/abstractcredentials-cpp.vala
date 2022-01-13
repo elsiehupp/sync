@@ -18,33 +18,33 @@
 
 namespace OCC {
 
-Q_LOGGING_CATEGORY(lcCredentials, "nextcloud.sync.credentials", QtInfoMsg)
+Q_LOGGING_CATEGORY (lcCredentials, "nextcloud.sync.credentials", QtInfoMsg)
 
-AbstractCredentials::AbstractCredentials() = default;
+AbstractCredentials::AbstractCredentials () = default;
 
-void AbstractCredentials::setAccount(Account *account) {
-    ENFORCE(!_account, "should only setAccount once");
+void AbstractCredentials::setAccount (Account *account) {
+    ENFORCE (!_account, "should only setAccount once");
     _account = account;
 }
 
-QString AbstractCredentials::keychainKey(QString &url, QString &user, QString &accountId) {
-    QString u(url);
-    if (u.isEmpty()) {
-        qCWarning(lcCredentials) << "Empty url in keyChain, error!";
-        return QString();
+QString AbstractCredentials::keychainKey (QString &url, QString &user, QString &accountId) {
+    QString u (url);
+    if (u.isEmpty ()) {
+        qCWarning (lcCredentials) << "Empty url in keyChain, error!";
+        return QString ();
     }
-    if (user.isEmpty()) {
-        qCWarning(lcCredentials) << "Error: User is empty!";
-        return QString();
-    }
-
-    if (!u.endsWith(QChar('/'))) {
-        u.append(QChar('/'));
+    if (user.isEmpty ()) {
+        qCWarning (lcCredentials) << "Error: User is empty!";
+        return QString ();
     }
 
-    QString key = user + QLatin1Char(':') + u;
-    if (!accountId.isEmpty()) {
-        key += QLatin1Char(':') + accountId;
+    if (!u.endsWith (QChar ('/'))) {
+        u.append (QChar ('/'));
+    }
+
+    QString key = user + QLatin1Char (':') + u;
+    if (!accountId.isEmpty ()) {
+        key += QLatin1Char (':') + accountId;
     }
 #ifdef Q_OS_WIN
         // On Windows the credential keys aren't namespaced properly
@@ -53,7 +53,7 @@ QString AbstractCredentials::keychainKey(QString &url, QString &user, QString &a
         // It's safe to do that since the key format is changing for 2.4
         // anyway to include the account ids. That means old keys can be
         // migrated to new namespaced keys on windows for 2.4.
-        key.prepend(QCoreApplication::applicationName() + "_");
+        key.prepend (QCoreApplication::applicationName () + "_");
 #endif
     return key;
 }

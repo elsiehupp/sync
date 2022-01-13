@@ -19,42 +19,42 @@ class FolderMetadata;
  * encrypted on the server.
  *
  * emits:
- * finalized() if the encrypted file is ready to be uploaded
- * error() if there was an error with the encryption
- * folderNotEncrypted() if the file is within a folder that's not encrypted.
+ * finalized () if the encrypted file is ready to be uploaded
+ * error () if there was an error with the encryption
+ * folderNotEncrypted () if the file is within a folder that's not encrypted.
  *
  */
 
 class PropagateUploadEncrypted : public QObject {
   Q_OBJECT
 public:
-    PropagateUploadEncrypted(OwncloudPropagator *propagator, QString &remoteParentPath, SyncFileItemPtr item, QObject *parent = nullptr);
-    ~PropagateUploadEncrypted() override = default;
+    PropagateUploadEncrypted (OwncloudPropagator *propagator, QString &remoteParentPath, SyncFileItemPtr item, QObject *parent = nullptr);
+    ~PropagateUploadEncrypted () override = default;
 
-    void start();
+    void start ();
 
-    void unlockFolder();
+    void unlockFolder ();
 
-    bool isUnlockRunning() const { return _isUnlockRunning; }
-    bool isFolderLocked() const { return _isFolderLocked; }
-    const QByteArray folderToken() const { return _folderToken; }
+    bool isUnlockRunning () const { return _isUnlockRunning; }
+    bool isFolderLocked () const { return _isFolderLocked; }
+    const QByteArray folderToken () const { return _folderToken; }
 
 private slots:
-    void slotFolderEncryptedIdReceived(QStringList &list);
-    void slotFolderEncryptedIdError(QNetworkReply *r);
-    void slotFolderLockedSuccessfully(QByteArray& fileId, QByteArray& token);
-    void slotFolderLockedError(QByteArray& fileId, int httpErrorCode);
-    void slotTryLock(QByteArray& fileId);
-    void slotFolderEncryptedMetadataReceived(QJsonDocument &json, int statusCode);
-    void slotFolderEncryptedMetadataError(QByteArray& fileId, int httpReturnCode);
-    void slotUpdateMetadataSuccess(QByteArray& fileId);
-    void slotUpdateMetadataError(QByteArray& fileId, int httpReturnCode);
+    void slotFolderEncryptedIdReceived (QStringList &list);
+    void slotFolderEncryptedIdError (QNetworkReply *r);
+    void slotFolderLockedSuccessfully (QByteArray& fileId, QByteArray& token);
+    void slotFolderLockedError (QByteArray& fileId, int httpErrorCode);
+    void slotTryLock (QByteArray& fileId);
+    void slotFolderEncryptedMetadataReceived (QJsonDocument &json, int statusCode);
+    void slotFolderEncryptedMetadataError (QByteArray& fileId, int httpReturnCode);
+    void slotUpdateMetadataSuccess (QByteArray& fileId);
+    void slotUpdateMetadataError (QByteArray& fileId, int httpReturnCode);
 
 signals:
     // Emmited after the file is encrypted and everythign is setup.
-    void finalized(QString& path, QString& filename, quint64 size);
-    void error();
-    void folderUnlocked(QByteArray &folderId, int httpStatus);
+    void finalized (QString& path, QString& filename, quint64 size);
+    void error ();
+    void folderUnlocked (QByteArray &folderId, int httpStatus);
 
 private:
   OwncloudPropagator *_propagator;

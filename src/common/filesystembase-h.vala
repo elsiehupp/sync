@@ -29,7 +29,7 @@ class QFile;
 
 namespace OCC {
 
-OCSYNC_EXPORT Q_DECLARE_LOGGING_CATEGORY(lcFileSystem)
+OCSYNC_EXPORT Q_DECLARE_LOGGING_CATEGORY (lcFileSystem)
 
 /**
  *  \addtogroup libsync
@@ -44,7 +44,7 @@ namespace FileSystem {
     /**
      * @brief Mark the file as hidden  (only has effects on windows)
      */
-    void OCSYNC_EXPORT setFileHidden(QString &filename, bool hidden);
+    void OCSYNC_EXPORT setFileHidden (QString &filename, bool hidden);
 
     /**
      * @brief Marks the file as read-only.
@@ -52,42 +52,42 @@ namespace FileSystem {
      * On linux this either revokes all 'w' permissions or restores permissions
      * according to the umask.
      */
-    void OCSYNC_EXPORT setFileReadOnly(QString &filename, bool readonly);
+    void OCSYNC_EXPORT setFileReadOnly (QString &filename, bool readonly);
 
     /**
      * @brief Marks the file as read-only.
      *
-     * It's like setFileReadOnly(), but weaker: if readonly is false and the user
+     * It's like setFileReadOnly (), but weaker: if readonly is false and the user
      * already has write permissions, no change to the permissions is made.
      *
      * This means that it will preserve explicitly set rw-r--r-- permissions even
-     * when the umask is 0002. (setFileReadOnly() would adjust to rw-rw-r--)
+     * when the umask is 0002. (setFileReadOnly () would adjust to rw-rw-r--)
      */
-    void OCSYNC_EXPORT setFileReadOnlyWeak(QString &filename, bool readonly);
+    void OCSYNC_EXPORT setFileReadOnlyWeak (QString &filename, bool readonly);
 
     /**
      * @brief Try to set permissions so that other users on the local machine can not
      * go into the folder.
      */
-    void OCSYNC_EXPORT setFolderMinimumPermissions(QString &filename);
+    void OCSYNC_EXPORT setFolderMinimumPermissions (QString &filename);
 
     /** convert a "normal" windows path into a path that can be 32k chars long. */
-    QString OCSYNC_EXPORT longWinPath(QString &inpath);
+    QString OCSYNC_EXPORT longWinPath (QString &inpath);
 
     /**
      * @brief Checks whether a file exists.
      *
-     * Use this over QFileInfo::exists() and QFile::exists() to avoid bugs with lnk
+     * Use this over QFileInfo::exists () and QFile::exists () to avoid bugs with lnk
      * files, see above.
      */
-    bool OCSYNC_EXPORT fileExists(QString &filename, QFileInfo & = QFileInfo());
+    bool OCSYNC_EXPORT fileExists (QString &filename, QFileInfo & = QFileInfo ());
 
     /**
      * @brief Rename the file \a originFileName to \a destinationFileName.
      *
-     * It behaves as QFile::rename() but handles .lnk files correctly on Windows.
+     * It behaves as QFile::rename () but handles .lnk files correctly on Windows.
      */
-    bool OCSYNC_EXPORT rename(QString &originFileName,
+    bool OCSYNC_EXPORT rename (QString &originFileName,
         const QString &destinationFileName,
         QString *errorString = nullptr);
 
@@ -95,37 +95,37 @@ namespace FileSystem {
      * Rename the file \a originFileName to \a destinationFileName, and
      * overwrite the destination if it already exists - without extra checks.
      */
-    bool OCSYNC_EXPORT uncheckedRenameReplace(QString &originFileName,
+    bool OCSYNC_EXPORT uncheckedRenameReplace (QString &originFileName,
         const QString &destinationFileName,
         QString *errorString);
 
     /**
      * Removes a file.
      *
-     * Equivalent to QFile::remove(), except on Windows, where it will also
+     * Equivalent to QFile::remove (), except on Windows, where it will also
      * successfully remove read-only files.
      */
-    bool OCSYNC_EXPORT remove(QString &fileName, QString *errorString = nullptr);
+    bool OCSYNC_EXPORT remove (QString &fileName, QString *errorString = nullptr);
 
     /**
      * Move the specified file or folder to the trash. (Only implemented on linux)
      */
-    bool OCSYNC_EXPORT moveToTrash(QString &filename, QString *errorString);
+    bool OCSYNC_EXPORT moveToTrash (QString &filename, QString *errorString);
 
     /**
-     * Replacement for QFile::open(ReadOnly) followed by a seek().
+     * Replacement for QFile::open (ReadOnly) followed by a seek ().
      * This version sets a more permissive sharing mode on Windows.
      *
      * Warning: The resulting file may have an empty fileName and be unsuitable for use
-     * with QFileInfo! Calling seek() on the QFile with >32bit signed values will fail!
+     * with QFileInfo! Calling seek () on the QFile with >32bit signed values will fail!
      */
-    bool OCSYNC_EXPORT openAndSeekFileSharedRead(QFile *file, QString *error, qint64 seek);
+    bool OCSYNC_EXPORT openAndSeekFileSharedRead (QFile *file, QString *error, qint64 seek);
 
 #ifdef Q_OS_WIN
     /**
      * Returns the file system used at the given path.
      */
-    QString fileSystemForPath(QString &path);
+    QString fileSystemForPath (QString &path);
 
     /*
      * This function takes a path and converts it to a UNC representation of the
@@ -138,28 +138,28 @@ namespace FileSystem {
      *  - A conversion is only done if the path len is larger than 245. Otherwise
      *    the windows API functions work with the normal "unixoid" representation too.
      */
-    QString OCSYNC_EXPORT pathtoUNC(QString &str);
+    QString OCSYNC_EXPORT pathtoUNC (QString &str);
 #endif
 
     /**
      * Returns true when a file is locked. (Windows only)
      */
-    bool OCSYNC_EXPORT isFileLocked(QString &fileName);
+    bool OCSYNC_EXPORT isFileLocked (QString &fileName);
 
     /**
      * Returns whether the file is a shortcut file (ends with .lnk)
      */
-    bool OCSYNC_EXPORT isLnkFile(QString &filename);
+    bool OCSYNC_EXPORT isLnkFile (QString &filename);
 
     /**
      * Returns whether the file is an exclude file (contains patterns to exclude from sync)
      */
-    bool OCSYNC_EXPORT isExcludeFile(QString &filename);
+    bool OCSYNC_EXPORT isExcludeFile (QString &filename);
 
     /**
      * Returns whether the file is a junction (windows only)
      */
-    bool OCSYNC_EXPORT isJunction(QString &filename);
+    bool OCSYNC_EXPORT isJunction (QString &filename);
 }
 
 /** @} */

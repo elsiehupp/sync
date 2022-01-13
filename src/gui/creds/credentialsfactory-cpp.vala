@@ -17,11 +17,11 @@
 
 namespace OCC {
 
-Q_LOGGING_CATEGORY(lcGuiCredentials, "nextcloud.gui.credentials", QtInfoMsg)
+Q_LOGGING_CATEGORY (lcGuiCredentials, "nextcloud.gui.credentials", QtInfoMsg)
 
 namespace CredentialsFactory {
 
-    AbstractCredentials *create(QString &type) {
+    AbstractCredentials *create (QString &type) {
         // empty string might happen for old version of configuration
         if (type == "http" || type == "") {
             return new HttpCredentialsGui;
@@ -30,7 +30,7 @@ namespace CredentialsFactory {
         } else if (type == "webflow") {
             return new WebFlowCredentials;
         } else {
-            qCWarning(lcGuiCredentials, "Unknown credentials type: %s", qPrintable(type));
+            qCWarning (lcGuiCredentials, "Unknown credentials type: %s", qPrintable (type));
             return new DummyCredentials;
         }
     }

@@ -38,36 +38,36 @@ public:
         statusCopyLinkToClipboard
     };
 
-    Flow2Auth(Account *account, QObject *parent);
-    ~Flow2Auth() override;
+    Flow2Auth (Account *account, QObject *parent);
+    ~Flow2Auth () override;
 
     enum Result { NotSupported,
         LoggedIn,
         Error };
-    Q_ENUM(Result);
-    void start();
-    void openBrowser();
-    void copyLinkToClipboard();
-    QUrl authorisationLink() const;
+    Q_ENUM (Result);
+    void start ();
+    void openBrowser ();
+    void copyLinkToClipboard ();
+    QUrl authorisationLink () const;
 
 signals:
     /**
      * The state has changed.
      * when logged in, appPassword has the value of the app password.
      */
-    void result(Flow2Auth::Result result, QString &errorString = QString(),
-                const QString &user = QString(), QString &appPassword = QString());
+    void result (Flow2Auth::Result result, QString &errorString = QString (),
+                const QString &user = QString (), QString &appPassword = QString ());
 
-    void statusChanged(PollStatus status, int secondsLeft);
+    void statusChanged (PollStatus status, int secondsLeft);
 
 public slots:
-    void slotPollNow();
+    void slotPollNow ();
 
 private slots:
-    void slotPollTimerTimeout();
+    void slotPollTimerTimeout ();
 
 private:
-    void fetchNewToken(TokenAction action);
+    void fetchNewToken (TokenAction action);
 
     Account *_account;
     QUrl _loginUrl;

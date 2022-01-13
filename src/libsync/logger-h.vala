@@ -27,31 +27,31 @@ namespace OCC {
  */
 class OWNCLOUDSYNC_EXPORT Logger : public QObject {
 public:
-    bool isLoggingToFile() const;
+    bool isLoggingToFile () const;
 
-    void doLog(QtMsgType type, QMessageLogContext &ctx, QString &message);
+    void doLog (QtMsgType type, QMessageLogContext &ctx, QString &message);
 
-    static Logger *instance();
+    static Logger *instance ();
 
-    void postGuiLog(QString &title, QString &message);
-    void postOptionalGuiLog(QString &title, QString &message);
-    void postGuiMessage(QString &title, QString &message);
+    void postGuiLog (QString &title, QString &message);
+    void postOptionalGuiLog (QString &title, QString &message);
+    void postGuiMessage (QString &title, QString &message);
 
-    QString logFile() const;
-    void setLogFile(QString &name);
+    QString logFile () const;
+    void setLogFile (QString &name);
 
-    void setLogExpire(int expire);
+    void setLogExpire (int expire);
 
-    QString logDir() const;
-    void setLogDir(QString &dir);
+    QString logDir () const;
+    void setLogDir (QString &dir);
 
-    void setLogFlush(bool flush);
+    void setLogFlush (bool flush);
 
-    bool logDebug() const { return _logDebug; }
-    void setLogDebug(bool debug);
+    bool logDebug () const { return _logDebug; }
+    void setLogDebug (bool debug);
 
     /** Returns where the automatic logdir would be */
-    QString temporaryFolderLogDirPath() const;
+    QString temporaryFolderLogDirPath () const;
 
     /** Sets up default dir log setup.
      *
@@ -61,35 +61,35 @@ public:
      *
      * Used in conjunction with ConfigFile::automaticLogDir
      */
-    void setupTemporaryFolderLogDir();
+    void setupTemporaryFolderLogDir ();
 
     /** For switching off via logwindow */
-    void disableTemporaryFolderLogDir();
+    void disableTemporaryFolderLogDir ();
 
-    void addLogRule(QSet<QString> &rules) {
-        setLogRules(_logRules + rules);
+    void addLogRule (QSet<QString> &rules) {
+        setLogRules (_logRules + rules);
     }
-    void removeLogRule(QSet<QString> &rules) {
-        setLogRules(_logRules - rules);
+    void removeLogRule (QSet<QString> &rules) {
+        setLogRules (_logRules - rules);
     }
-    void setLogRules(QSet<QString> &rules);
+    void setLogRules (QSet<QString> &rules);
 
 signals:
-    void logWindowLog(QString &);
+    void logWindowLog (QString &);
 
-    void guiLog(QString &, QString &);
-    void guiMessage(QString &, QString &);
-    void optionalGuiLog(QString &, QString &);
+    void guiLog (QString &, QString &);
+    void guiMessage (QString &, QString &);
+    void optionalGuiLog (QString &, QString &);
 
 public slots:
-    void enterNextLogFile();
+    void enterNextLogFile ();
 
 private:
-    Logger(QObject *parent = nullptr);
-    ~Logger() override;
+    Logger (QObject *parent = nullptr);
+    ~Logger () override;
 
-    void close();
-    void dumpCrashLog();
+    void close ();
+    void dumpCrashLog ();
 
     QFile _logFile;
     bool _doFileFlush = false;

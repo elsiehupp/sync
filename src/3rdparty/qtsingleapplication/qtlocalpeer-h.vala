@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2014 Digia Plc and/or its subsidiary(-ies).
+** Copyright (C) 2014 Digia Plc and/or its subsidiary (-ies).
 ** Contact: http://www.qt-project.org/legal
 **
 ** This file is part of Qt Creator.
@@ -38,17 +38,17 @@ namespace SharedTools {
 class QtLocalPeer : public QObject {
 
 public:
-    explicit QtLocalPeer(QObject *parent = nullptr, QString &appId = QString());
-    bool isClient();
-    bool sendMessage(QString &message, int timeout, bool block);
-    QString applicationId() const { return id; }
-    static QString appSessionId(QString &appId);
+    explicit QtLocalPeer (QObject *parent = nullptr, QString &appId = QString ());
+    bool isClient ();
+    bool sendMessage (QString &message, int timeout, bool block);
+    QString applicationId () const { return id; }
+    static QString appSessionId (QString &appId);
 
 Q_SIGNALS:
-    void messageReceived(QString &message, QObject *socket);
+    void messageReceived (QString &message, QObject *socket);
 
 protected Q_SLOTS:
-    void receiveConnection();
+    void receiveConnection ();
 
 protected:
     QString id;

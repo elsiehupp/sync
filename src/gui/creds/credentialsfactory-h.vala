@@ -23,7 +23,7 @@ class AbstractCredentials;
  */
 namespace CredentialsFactory {
 
-    AbstractCredentials *create(QString &type);
+    AbstractCredentials *create (QString &type);
 
 } // ns CredentialsFactory
 

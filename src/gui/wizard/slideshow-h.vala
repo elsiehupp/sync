@@ -24,44 +24,44 @@ namespace OCC {
  * @ingroup gui
  */
 class SlideShow : public QWidget {
-    Q_PROPERTY(int interval READ interval WRITE setInterval)
-    Q_PROPERTY(int currentSlide READ currentSlide WRITE setCurrentSlide NOTIFY currentSlideChanged)
+    Q_PROPERTY (int interval READ interval WRITE setInterval)
+    Q_PROPERTY (int currentSlide READ currentSlide WRITE setCurrentSlide NOTIFY currentSlideChanged)
 
 public:
-    explicit SlideShow(QWidget* parent = nullptr);
+    explicit SlideShow (QWidget* parent = nullptr);
 
-    void addSlide(QPixmap &pixmap, QString &label);
+    void addSlide (QPixmap &pixmap, QString &label);
 
-    bool isActive() const;
+    bool isActive () const;
 
-    int interval() const;
-    void setInterval(int interval);
+    int interval () const;
+    void setInterval (int interval);
 
-    int currentSlide() const;
-    void setCurrentSlide(int index);
+    int currentSlide () const;
+    void setCurrentSlide (int index);
 
-    QSize sizeHint() const override;
+    QSize sizeHint () const override;
 
 public slots:
-    void startShow(int interval = 0);
-    void stopShow();
-    void nextSlide();
-    void prevSlide();
-    void reset();
+    void startShow (int interval = 0);
+    void stopShow ();
+    void nextSlide ();
+    void prevSlide ();
+    void reset ();
 
 signals:
-    void clicked();
-    void currentSlideChanged(int index);
+    void clicked ();
+    void currentSlideChanged (int index);
 
 protected:
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
-    void paintEvent(QPaintEvent *event) override;
-    void timerEvent(QTimerEvent *event) override;
+    void mousePressEvent (QMouseEvent *event) override;
+    void mouseReleaseEvent (QMouseEvent *event) override;
+    void paintEvent (QPaintEvent *event) override;
+    void timerEvent (QTimerEvent *event) override;
 
 private:
-    void maybeRestartTimer();
-    void drawSlide(QPainter *painter, int index);
+    void maybeRestartTimer ();
+    void drawSlide (QPainter *painter, int index);
 
     bool _reverse = false;
     int _interval = 3500;

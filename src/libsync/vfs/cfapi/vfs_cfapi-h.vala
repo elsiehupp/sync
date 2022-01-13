@@ -24,52 +24,52 @@ class SyncJournalFileRecord;
 class VfsCfApi : public Vfs {
 
 public:
-    explicit VfsCfApi(QObject *parent = nullptr);
-    ~VfsCfApi();
+    explicit VfsCfApi (QObject *parent = nullptr);
+    ~VfsCfApi ();
 
-    Mode mode() const override;
-    QString fileSuffix() const override;
+    Mode mode () const override;
+    QString fileSuffix () const override;
 
-    void stop() override;
-    void unregisterFolder() override;
+    void stop () override;
+    void unregisterFolder () override;
 
-    bool socketApiPinStateActionsShown() const override;
-    bool isHydrating() const override;
+    bool socketApiPinStateActionsShown () const override;
+    bool isHydrating () const override;
 
-    Result<void, QString> updateMetadata(QString &filePath, time_t modtime, qint64 size, QByteArray &fileId) override;
+    Result<void, QString> updateMetadata (QString &filePath, time_t modtime, qint64 size, QByteArray &fileId) override;
 
-    Result<void, QString> createPlaceholder(SyncFileItem &item) override;
-    Result<void, QString> dehydratePlaceholder(SyncFileItem &item) override;
-    Result<Vfs::ConvertToPlaceholderResult, QString> convertToPlaceholder(QString &filename, SyncFileItem &item, QString &replacesFile) override;
+    Result<void, QString> createPlaceholder (SyncFileItem &item) override;
+    Result<void, QString> dehydratePlaceholder (SyncFileItem &item) override;
+    Result<Vfs::ConvertToPlaceholderResult, QString> convertToPlaceholder (QString &filename, SyncFileItem &item, QString &replacesFile) override;
 
-    bool needsMetadataUpdate(SyncFileItem &) override;
-    bool isDehydratedPlaceholder(QString &filePath) override;
-    bool statTypeVirtualFile(csync_file_stat_t *stat, void *statData) override;
+    bool needsMetadataUpdate (SyncFileItem &) override;
+    bool isDehydratedPlaceholder (QString &filePath) override;
+    bool statTypeVirtualFile (csync_file_stat_t *stat, void *statData) override;
 
-    bool setPinState(QString &folderPath, PinState state) override;
-    Optional<PinState> pinState(QString &folderPath) override;
-    AvailabilityResult availability(QString &folderPath) override;
+    bool setPinState (QString &folderPath, PinState state) override;
+    Optional<PinState> pinState (QString &folderPath) override;
+    AvailabilityResult availability (QString &folderPath) override;
 
-    void cancelHydration(QString &requestId, QString &path);
+    void cancelHydration (QString &requestId, QString &path);
 
-    int finalizeHydrationJob(QString &requestId);
+    int finalizeHydrationJob (QString &requestId);
 
 public slots:
-    void requestHydration(QString &requestId, QString &path);
-    void fileStatusChanged(QString &systemFileName, SyncFileStatus fileStatus) override;
+    void requestHydration (QString &requestId, QString &path);
+    void fileStatusChanged (QString &systemFileName, SyncFileStatus fileStatus) override;
 
 signals:
-    void hydrationRequestReady(QString &requestId);
-    void hydrationRequestFailed(QString &requestId);
-    void hydrationRequestFinished(QString &requestId);
+    void hydrationRequestReady (QString &requestId);
+    void hydrationRequestFailed (QString &requestId);
+    void hydrationRequestFinished (QString &requestId);
 
 protected:
-    void startImpl(VfsSetupParams &params) override;
+    void startImpl (VfsSetupParams &params) override;
 
 private:
-    void scheduleHydrationJob(QString &requestId, QString &folderPath, SyncJournalFileRecord &record);
-    void onHydrationJobFinished(HydrationJob *job);
-    HydrationJob *findHydrationJob(QString &requestId) const;
+    void scheduleHydrationJob (QString &requestId, QString &folderPath, SyncJournalFileRecord &record);
+    void onHydrationJobFinished (HydrationJob *job);
+    HydrationJob *findHydrationJob (QString &requestId) const;
 
     struct HasHydratedDehydrated {
         bool hasHydrated = false;
@@ -79,14 +79,14 @@ private:
         Optional<PinState> pinState;
         HasHydratedDehydrated hydrationStatus;
     };
-    HydratationAndPinStates computeRecursiveHydrationAndPinStates(QString &path, Optional<PinState> &basePinState);
+    HydratationAndPinStates computeRecursiveHydrationAndPinStates (QString &path, Optional<PinState> &basePinState);
 
     QScopedPointer<VfsCfApiPrivate> d;
 };
 
 class CfApiVfsPluginFactory : public QObject, public DefaultPluginFactory<VfsCfApi> {
-    Q_PLUGIN_METADATA(IID "org.owncloud.PluginFactory" FILE "vfspluginmetadata.json")
-    Q_INTERFACES(OCC::PluginFactory)
+    Q_PLUGIN_METADATA (IID "org.owncloud.PluginFactory" FILE "vfspluginmetadata.json")
+    Q_INTERFACES (OCC::PluginFactory)
 };
 
 } // namespace OCC

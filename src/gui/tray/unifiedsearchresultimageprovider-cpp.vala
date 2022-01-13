@@ -19,87 +19,87 @@
 namespace {
 class AsyncImageResponse : public QQuickImageResponse {
 public:
-    AsyncImageResponse(QString &id, QSize &requestedSize) {
-        if (id.isEmpty()) {
-            setImageAndEmitFinished();
+    AsyncImageResponse (QString &id, QSize &requestedSize) {
+        if (id.isEmpty ()) {
+            setImageAndEmitFinished ();
             return;
         }
 
-        _imagePaths = id.split(QLatin1Char(';'), Qt::SkipEmptyParts);
+        _imagePaths = id.split (QLatin1Char (';'), Qt::SkipEmptyParts);
         _requestedImageSize = requestedSize;
 
-        if (_imagePaths.isEmpty()) {
-            setImageAndEmitFinished();
+        if (_imagePaths.isEmpty ()) {
+            setImageAndEmitFinished ();
         } else {
-            processNextImage();
+            processNextImage ();
         }
     }
 
-    void setImageAndEmitFinished(QImage &image = {}) {
+    void setImageAndEmitFinished (QImage &image = {}) {
         _image = image;
-        emit finished();
+        emit finished ();
     }
 
-    QQuickTextureFactory *textureFactory() const override {
-        return QQuickTextureFactory::textureFactoryForImage(_image);
+    QQuickTextureFactory *textureFactory () const override {
+        return QQuickTextureFactory::textureFactoryForImage (_image);
     }
 
 private:
-    void processNextImage() {
-        if (_index < 0 || _index >= _imagePaths.size()) {
-            setImageAndEmitFinished();
+    void processNextImage () {
+        if (_index < 0 || _index >= _imagePaths.size ()) {
+            setImageAndEmitFinished ();
             return;
         }
 
-        if (_imagePaths.at(_index).startsWith(QStringLiteral(":/client"))) {
-            setImageAndEmitFinished(QIcon(_imagePaths.at(_index)).pixmap(_requestedImageSize).toImage());
+        if (_imagePaths.at (_index).startsWith (QStringLiteral (":/client"))) {
+            setImageAndEmitFinished (QIcon (_imagePaths.at (_index)).pixmap (_requestedImageSize).toImage ());
             return;
         }
 
-        const auto currentUser = OCC::UserModel::instance()->currentUser();
-        if (currentUser && currentUser->account()) {
-            const QUrl iconUrl(_imagePaths.at(_index));
-            if (iconUrl.isValid() && !iconUrl.scheme().isEmpty()) {
+        const auto currentUser = OCC::UserModel::instance ()->currentUser ();
+        if (currentUser && currentUser->account ()) {
+            const QUrl iconUrl (_imagePaths.at (_index));
+            if (iconUrl.isValid () && !iconUrl.scheme ().isEmpty ()) {
                 // fetch the remote resource
-                const auto reply = currentUser->account()->sendRawRequest(QByteArrayLiteral("GET"), iconUrl);
-                connect(reply, &QNetworkReply::finished, this, &AsyncImageResponse::slotProcessNetworkReply);
+                const auto reply = currentUser->account ()->sendRawRequest (QByteArrayLiteral ("GET"), iconUrl);
+                connect (reply, &QNetworkReply::finished, this, &AsyncImageResponse::slotProcessNetworkReply);
                 ++_index;
                 return;
             }
         }
 
-        setImageAndEmitFinished();
+        setImageAndEmitFinished ();
     }
 
 private slots:
-    void slotProcessNetworkReply() {
-        const auto reply = qobject_cast<QNetworkReply *>(sender());
+    void slotProcessNetworkReply () {
+        const auto reply = qobject_cast<QNetworkReply *> (sender ());
         if (!reply) {
-            setImageAndEmitFinished();
+            setImageAndEmitFinished ();
             return;
         }
 
-        const QByteArray imageData = reply->readAll();
+        const QByteArray imageData = reply->readAll ();
         // server returns "[]" for some some file previews (have no idea why), so, we use another image
         // from the list if available
-        if (imageData.isEmpty() || imageData == QByteArrayLiteral("[]")) {
-            processNextImage();
+        if (imageData.isEmpty () || imageData == QByteArrayLiteral ("[]")) {
+            processNextImage ();
         } else {
-            if (imageData.startsWith(QByteArrayLiteral("<svg"))) {
+            if (imageData.startsWith (QByteArrayLiteral ("<svg"))) {
                 // SVG image needs proper scaling, let's do it with QPainter and QSvgRenderer
                 QSvgRenderer svgRenderer;
-                if (svgRenderer.load(imageData)) {
-                    QImage scaledSvg(_requestedImageSize, QImage::Format_ARGB32);
-                    scaledSvg.fill("transparent");
-                    QPainter painterForSvg(&scaledSvg);
-                    svgRenderer.render(&painterForSvg);
-                    setImageAndEmitFinished(scaledSvg);
+                if (svgRenderer.load (imageData)) {
+                    QImage scaledSvg (_requestedImageSize, QImage::Format_ARGB32);
+                    scaledSvg.fill ("transparent");
+                    QPainter painterForSvg (&scaledSvg);
+                    svgRenderer.render (&painterForSvg);
+                    setImageAndEmitFinished (scaledSvg);
                     return;
                 } else {
-                    processNextImage();
+                    processNextImage ();
                 }
             } else {
-                setImageAndEmitFinished(QImage::fromData(imageData));
+                setImageAndEmitFinished (QImage::fromData (imageData));
             }
         }
     }
@@ -113,8 +113,8 @@ private slots:
 
 namespace OCC {
 
-QQuickImageResponse *UnifiedSearchResultImageProvider::requestImageResponse(QString &id, QSize &requestedSize) {
-    return new AsyncImageResponse(id, requestedSize);
+QQuickImageResponse *UnifiedSearchResultImageProvider::requestImageResponse (QString &id, QSize &requestedSize) {
+    return new AsyncImageResponse (id, requestedSize);
 }
 
 }

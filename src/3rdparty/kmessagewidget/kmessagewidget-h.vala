@@ -36,7 +36,7 @@ class KMessageWidgetPrivate;
  * consider using KMessageWidget instead.
  *
  * Examples of KMessageWidget look as follows, all of them having an icon set
- * with setIcon(), and the first three show a close button:
+ * with setIcon (), and the first three show a close button:
  *
  * \image html kmessagewidget.png "KMessageWidget with different message types"
  *
@@ -95,11 +95,11 @@ class KMessageWidgetPrivate;
  */
 class KMessageWidget : public QFrame {
 
-    Q_PROPERTY(QString text READ text WRITE setText)
-    Q_PROPERTY(bool wordWrap READ wordWrap WRITE setWordWrap)
-    Q_PROPERTY(bool closeButtonVisible READ isCloseButtonVisible WRITE setCloseButtonVisible)
-    Q_PROPERTY(MessageType messageType READ messageType WRITE setMessageType)
-    Q_PROPERTY(QIcon icon READ icon WRITE setIcon)
+    Q_PROPERTY (QString text READ text WRITE setText)
+    Q_PROPERTY (bool wordWrap READ wordWrap WRITE setWordWrap)
+    Q_PROPERTY (bool closeButtonVisible READ isCloseButtonVisible WRITE setCloseButtonVisible)
+    Q_PROPERTY (MessageType messageType READ messageType WRITE setMessageType)
+    Q_PROPERTY (QIcon icon READ icon WRITE setIcon)
 public:
 
     /**
@@ -112,29 +112,29 @@ public:
         Warning,
         Error
     };
-    Q_ENUM(MessageType)
+    Q_ENUM (MessageType)
 
     /**
      * Constructs a KMessageWidget with the specified @p parent.
      */
-    explicit KMessageWidget(QWidget *parent = nullptr);
+    explicit KMessageWidget (QWidget *parent = nullptr);
 
     /**
      * Constructs a KMessageWidget with the specified @p parent and
      * contents @p text.
      */
-    explicit KMessageWidget(QString &text, QWidget *parent = nullptr);
+    explicit KMessageWidget (QString &text, QWidget *parent = nullptr);
 
     /**
      * Destructor.
      */
-    ~KMessageWidget() override;
+    ~KMessageWidget () override;
 
     /**
      * Get the text of this message widget.
-     * @see setText()
+     * @see setText ()
      */
-    QString text() const;
+    QString text () const;
 
     /**
      * Check whether word wrap is enabled.
@@ -143,24 +143,24 @@ public:
      * as required to the available width of the widget. This is useful to
      * avoid breaking widget layouts.
      *
-     * @see setWordWrap()
+     * @see setWordWrap ()
      */
-    bool wordWrap() const;
+    bool wordWrap () const;
 
     /**
      * Check whether the close button is visible.
      *
-     * @see setCloseButtonVisible()
+     * @see setCloseButtonVisible ()
      */
-    bool isCloseButtonVisible() const;
+    bool isCloseButtonVisible () const;
 
     /**
      * Get the type of this message.
      * By default, the type is set to KMessageWidget::Information.
      *
-     * @see KMessageWidget::MessageType, setMessageType()
+     * @see KMessageWidget::MessageType, setMessageType ()
      */
-    MessageType messageType() const;
+    MessageType messageType () const;
 
     /**
      * Add @p action to the message widget.
@@ -168,59 +168,59 @@ public:
      * order the actions were added.
      *
      * @param action the action to add
-     * @see removeAction(), QWidget::actions()
+     * @see removeAction (), QWidget::actions ()
      */
-    void addAction(QAction *action);
+    void addAction (QAction *action);
 
     /**
      * Remove @p action from the message widget.
      *
      * @param action the action to remove
-     * @see KMessageWidget::MessageType, addAction(), setMessageType()
+     * @see KMessageWidget::MessageType, addAction (), setMessageType ()
      */
-    void removeAction(QAction *action);
+    void removeAction (QAction *action);
 
     /**
      * Returns the preferred size of the message widget.
      */
-    QSize sizeHint() const override;
+    QSize sizeHint () const override;
 
     /**
      * Returns the minimum size of the message widget.
      */
-    QSize minimumSizeHint() const override;
+    QSize minimumSizeHint () const override;
 
     /**
      * Returns the required height for @p width.
      * @param width the width in pixels
      */
-    int heightForWidth(int width) const override;
+    int heightForWidth (int width) const override;
 
     /**
      * The icon shown on the left of the text. By default, no icon is shown.
      * @since 4.11
      */
-    QIcon icon() const;
+    QIcon icon () const;
 
     /**
-     * Check whether the hide animation started by calling animatedHide()
+     * Check whether the hide animation started by calling animatedHide ()
      * is still running. If animations are disabled, this function always
      * returns @e false.
      *
-     * @see animatedHide(), hideAnimationFinished()
+     * @see animatedHide (), hideAnimationFinished ()
      * @since 5.0
      */
-    bool isHideAnimationRunning() const;
+    bool isHideAnimationRunning () const;
 
     /**
-     * Check whether the show animation started by calling animatedShow()
+     * Check whether the show animation started by calling animatedShow ()
      * is still running. If animations are disabled, this function always
      * returns @e false.
      *
-     * @see animatedShow(), showAnimationFinished()
+     * @see animatedShow (), showAnimationFinished ()
      * @since 5.0
      */
-    bool isShowAnimationRunning() const;
+    bool isShowAnimationRunning () const;
 
 public Q_SLOTS:
     /**
@@ -228,28 +228,28 @@ public Q_SLOTS:
      * If the message widget is already visible, the text changes on the fly.
      *
      * @param text the text to display, rich text is allowed
-     * @see text()
+     * @see text ()
      */
-    void setText(QString &text);
+    void setText (QString &text);
 
     /**
-     * Set word wrap to @p wordWrap. If word wrap is enabled, the text()
+     * Set word wrap to @p wordWrap. If word wrap is enabled, the text ()
      * of the message widget is wrapped to fit the available width.
      * If word wrap is disabled, the message widget's minimum size is
      * such that the entire text fits.
      *
      * @param wordWrap disable/enable word wrap
-     * @see wordWrap()
+     * @see wordWrap ()
      */
-    void setWordWrap(bool wordWrap);
+    void setWordWrap (bool wordWrap);
 
     /**
      * Set the visibility of the close button. If @p visible is @e true,
-     * a close button is shown that calls animatedHide() if clicked.
+     * a close button is shown that calls animatedHide () if clicked.
      *
-     * @see closeButtonVisible(), animatedHide()
+     * @see closeButtonVisible (), animatedHide ()
      */
-    void setCloseButtonVisible(bool visible);
+    void setCloseButtonVisible (bool visible);
 
     /**
      * Set the message type to @p type.
@@ -257,86 +257,86 @@ public Q_SLOTS:
      * Appropriate colors are chosen to mimic the appearance of Kirigami's
      * InlineMessage.
      *
-     * @see messageType(), KMessageWidget::MessageType
+     * @see messageType (), KMessageWidget::MessageType
      */
-    void setMessageType(KMessageWidget::MessageType type);
+    void setMessageType (KMessageWidget::MessageType type);
 
     /**
      * Show the widget using an animation.
      */
-    void animatedShow();
+    void animatedShow ();
 
     /**
      * Hide the widget using an animation.
      */
-    void animatedHide();
+    void animatedHide ();
 
     /**
      * Define an icon to be shown on the left of the text
      * @since 4.11
      */
-    void setIcon(QIcon &icon);
+    void setIcon (QIcon &icon);
 
 Q_SIGNALS:
     /**
      * This signal is emitted when the user clicks a link in the text label.
      * The URL referred to by the href anchor is passed in contents.
      * @param contents text of the href anchor
-     * @see QLabel::linkActivated()
+     * @see QLabel::linkActivated ()
      * @since 4.10
      */
-    void linkActivated(QString &contents);
+    void linkActivated (QString &contents);
 
     /**
      * This signal is emitted when the user hovers over a link in the text label.
      * The URL referred to by the href anchor is passed in contents.
      * @param contents text of the href anchor
-     * @see QLabel::linkHovered()
+     * @see QLabel::linkHovered ()
      * @since 4.11
      */
-    void linkHovered(QString &contents);
+    void linkHovered (QString &contents);
 
     /**
      * This signal is emitted when the hide animation is finished, started by
-     * calling animatedHide(). If animations are disabled, this signal is
+     * calling animatedHide (). If animations are disabled, this signal is
      * emitted immediately after the message widget got hidden.
      *
      * @note This signal is @e not emitted if the widget was hidden by
-     *       calling hide(), so this signal is only useful in conjunction
-     *       with animatedHide().
+     *       calling hide (), so this signal is only useful in conjunction
+     *       with animatedHide ().
      *
-     * @see animatedHide()
+     * @see animatedHide ()
      * @since 5.0
      */
-    void hideAnimationFinished();
+    void hideAnimationFinished ();
 
     /**
      * This signal is emitted when the show animation is finished, started by
-     * calling animatedShow(). If animations are disabled, this signal is
+     * calling animatedShow (). If animations are disabled, this signal is
      * emitted immediately after the message widget got shown.
      *
      * @note This signal is @e not emitted if the widget was shown by
-     *       calling show(), so this signal is only useful in conjunction
-     *       with animatedShow().
+     *       calling show (), so this signal is only useful in conjunction
+     *       with animatedShow ().
      *
-     * @see animatedShow()
+     * @see animatedShow ()
      * @since 5.0
      */
-    void showAnimationFinished();
+    void showAnimationFinished ();
 
 protected:
-    void paintEvent(QPaintEvent *event) override;
+    void paintEvent (QPaintEvent *event) override;
 
-    bool event(QEvent *event) override;
+    bool event (QEvent *event) override;
 
-    void resizeEvent(QResizeEvent *event) override;
+    void resizeEvent (QResizeEvent *event) override;
 
 private:
     KMessageWidgetPrivate *const d;
     friend class KMessageWidgetPrivate;
 
-    Q_PRIVATE_SLOT(d, void slotTimeLineChanged(qreal))
-    Q_PRIVATE_SLOT(d, void slotTimeLineFinished())
+    Q_PRIVATE_SLOT (d, void slotTimeLineChanged (qreal))
+    Q_PRIVATE_SLOT (d, void slotTimeLineFinished ())
 };
 
 #endif /* KMESSAGEWIDGET_H */

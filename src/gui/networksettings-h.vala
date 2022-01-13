@@ -27,25 +27,25 @@ namespace Ui {
 class NetworkSettings : public QWidget {
 
 public:
-    explicit NetworkSettings(QWidget *parent = nullptr);
-    ~NetworkSettings() override;
-    QSize sizeHint() const override;
+    explicit NetworkSettings (QWidget *parent = nullptr);
+    ~NetworkSettings () override;
+    QSize sizeHint () const override;
 
 private slots:
-    void saveProxySettings();
-    void saveBWLimitSettings();
+    void saveProxySettings ();
+    void saveBWLimitSettings ();
 
     /// Red marking of host field if empty and enabled
-    void checkEmptyProxyHost();
+    void checkEmptyProxyHost ();
 
-    void checkAccountLocalhost();
+    void checkAccountLocalhost ();
 
 protected:
-    void showEvent(QShowEvent *event) override;
+    void showEvent (QShowEvent *event) override;
 
 private:
-    void loadProxySettings();
-    void loadBWLimitSettings();
+    void loadProxySettings ();
+    void loadBWLimitSettings ();
 
     Ui::NetworkSettings *_ui;
 };

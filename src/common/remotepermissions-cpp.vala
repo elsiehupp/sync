@@ -23,48 +23,48 @@ namespace OCC {
 static const char letters[] = " WDNVCKRSMm";
 
 template <typename Char>
-void RemotePermissions::fromArray(Char *p) {
+void RemotePermissions::fromArray (Char *p) {
     _value = notNullMask;
     if (!p)
         return;
     while (*p) {
-        if (auto res = std::strchr(letters, static_cast<char>(*p)))
+        if (auto res = std::strchr (letters, static_cast<char> (*p)))
             _value |= (1 << (res - letters));
         ++p;
     }
 }
 
-QByteArray RemotePermissions::toDbValue() const {
+QByteArray RemotePermissions::toDbValue () const {
     QByteArray result;
-    if (isNull())
+    if (isNull ())
         return result;
-    result.reserve(PermissionsCount);
+    result.reserve (PermissionsCount);
     for (uint i = 1; i <= PermissionsCount; ++i) {
         if (_value & (1 << i))
-            result.append(letters[i]);
+            result.append (letters[i]);
     }
-    if (result.isEmpty()) {
+    if (result.isEmpty ()) {
         // Make sure it is not empty so we can differentiate null and empty permissions
-        result.append(' ');
+        result.append (' ');
     }
     return result;
 }
 
-QString RemotePermissions::toString() const {
-    return QString::fromUtf8(toDbValue());
+QString RemotePermissions::toString () const {
+    return QString::fromUtf8 (toDbValue ());
 }
 
-RemotePermissions RemotePermissions::fromDbValue(QByteArray &value) {
-    if (value.isEmpty())
+RemotePermissions RemotePermissions::fromDbValue (QByteArray &value) {
+    if (value.isEmpty ())
         return {};
     RemotePermissions perm;
-    perm.fromArray(value.constData());
+    perm.fromArray (value.constData ());
     return perm;
 }
 
-RemotePermissions RemotePermissions::fromServerString(QString &value) {
+RemotePermissions RemotePermissions::fromServerString (QString &value) {
     RemotePermissions perm;
-    perm.fromArray(value.utf16());
+    perm.fromArray (value.utf16 ());
     return perm;
 }
 
