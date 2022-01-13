@@ -1,4 +1,4 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
       support, and with no warranty, express or implied, as to its usefulness for
          any purpose.
@@ -21,7 +21,7 @@ public slots:
      _subdirs.append (list);
   }
 
-  void slotDirectoryListingIterated (QString& item, QMap<QString,QString>& ) {
+  void slotDirectoryListingIterated (string& item, QMap<string,string>& ) {
     qDebug () << "     item : " << item;
     _items.append (item);
   }
@@ -95,12 +95,12 @@ private slots:
 
         connect ( &parser, SIGNAL (directoryListingSubfolders (QStringList&)),
                  this, SLOT (slotDirectoryListingSubFolders (QStringList&)) );
-        connect ( &parser, SIGNAL (directoryListingIterated (QString&, QMap<QString,QString>&)),
-                 this, SLOT (slotDirectoryListingIterated (QString&, QMap<QString,QString>&)) );
+        connect ( &parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
+                 this, SLOT (slotDirectoryListingIterated (string&, QMap<string,string>&)) );
         connect ( &parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (slotFinishedSuccessfully ()) );
 
-        QHash <QString, ExtraFolderInfo> sizes;
+        QHash <string, ExtraFolderInfo> sizes;
         QVERIFY (parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
 
         QVERIFY (_success);
@@ -168,12 +168,12 @@ private slots:
 
         connect ( &parser, SIGNAL (directoryListingSubfolders (QStringList&)),
                  this, SLOT (slotDirectoryListingSubFolders (QStringList&)) );
-        connect ( &parser, SIGNAL (directoryListingIterated (QString&, QMap<QString,QString>&)),
-                 this, SLOT (slotDirectoryListingIterated (QString&, QMap<QString,QString>&)) );
+        connect ( &parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
+                 this, SLOT (slotDirectoryListingIterated (string&, QMap<string,string>&)) );
         connect ( &parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (slotFinishedSuccessfully ()) );
 
-        QHash <QString, ExtraFolderInfo> sizes;
+        QHash <string, ExtraFolderInfo> sizes;
         QVERIFY (false == parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
 
         QVERIFY (!_success);
@@ -191,12 +191,12 @@ private slots:
 
         connect ( &parser, SIGNAL (directoryListingSubfolders (QStringList&)),
                  this, SLOT (slotDirectoryListingSubFolders (QStringList&)) );
-        connect ( &parser, SIGNAL (directoryListingIterated (QString&, QMap<QString,QString>&)),
-                 this, SLOT (slotDirectoryListingIterated (QString&, QMap<QString,QString>&)) );
+        connect ( &parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
+                 this, SLOT (slotDirectoryListingIterated (string&, QMap<string,string>&)) );
         connect ( &parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (slotFinishedSuccessfully ()) );
 
-        QHash <QString, ExtraFolderInfo> sizes;
+        QHash <string, ExtraFolderInfo> sizes;
         QVERIFY (false == parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
 
         QVERIFY (!_success);
@@ -213,12 +213,12 @@ private slots:
 
         connect ( &parser, SIGNAL (directoryListingSubfolders (QStringList&)),
                  this, SLOT (slotDirectoryListingSubFolders (QStringList&)) );
-        connect ( &parser, SIGNAL (directoryListingIterated (QString&, QMap<QString,QString>&)),
-                 this, SLOT (slotDirectoryListingIterated (QString&, QMap<QString,QString>&)) );
+        connect ( &parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
+                 this, SLOT (slotDirectoryListingIterated (string&, QMap<string,string>&)) );
         connect ( &parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (slotFinishedSuccessfully ()) );
 
-        QHash <QString, ExtraFolderInfo> sizes;
+        QHash <string, ExtraFolderInfo> sizes;
         QVERIFY (false == parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
 
         QVERIFY (!_success);
@@ -251,12 +251,12 @@ private slots:
 
         connect ( &parser, SIGNAL (directoryListingSubfolders (QStringList&)),
                  this, SLOT (slotDirectoryListingSubFolders (QStringList&)) );
-        connect ( &parser, SIGNAL (directoryListingIterated (QString&, QMap<QString,QString>&)),
-                 this, SLOT (slotDirectoryListingIterated (QString&, QMap<QString,QString>&)) );
+        connect ( &parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
+                 this, SLOT (slotDirectoryListingIterated (string&, QMap<string,string>&)) );
         connect ( &parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (slotFinishedSuccessfully ()) );
 
-        QHash <QString, ExtraFolderInfo> sizes;
+        QHash <string, ExtraFolderInfo> sizes;
         QVERIFY (!parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
         QVERIFY (!_success);
     }
@@ -315,12 +315,12 @@ private slots:
 
         connect ( &parser, SIGNAL (directoryListingSubfolders (QStringList&)),
                  this, SLOT (slotDirectoryListingSubFolders (QStringList&)) );
-        connect ( &parser, SIGNAL (directoryListingIterated (QString&, QMap<QString,QString>&)),
-                 this, SLOT (slotDirectoryListingIterated (QString&, QMap<QString,QString>&)) );
+        connect ( &parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
+                 this, SLOT (slotDirectoryListingIterated (string&, QMap<string,string>&)) );
         connect ( &parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (slotFinishedSuccessfully ()) );
 
-        QHash <QString, ExtraFolderInfo> sizes;
+        QHash <string, ExtraFolderInfo> sizes;
         QVERIFY (false == parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
         QVERIFY (!_success);
     }
@@ -379,12 +379,12 @@ private slots:
 
         connect ( &parser, SIGNAL (directoryListingSubfolders (QStringList&)),
                  this, SLOT (slotDirectoryListingSubFolders (QStringList&)) );
-        connect ( &parser, SIGNAL (directoryListingIterated (QString&, QMap<QString,QString>&)),
-                 this, SLOT (slotDirectoryListingIterated (QString&, QMap<QString,QString>&)) );
+        connect ( &parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
+                 this, SLOT (slotDirectoryListingIterated (string&, QMap<string,string>&)) );
         connect ( &parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (slotFinishedSuccessfully ()) );
 
-        QHash <QString, ExtraFolderInfo> sizes;
+        QHash <string, ExtraFolderInfo> sizes;
         QVERIFY (false == parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
         QVERIFY (!_success);
     }
@@ -443,12 +443,12 @@ private slots:
 
         connect ( &parser, SIGNAL (directoryListingSubfolders (QStringList&)),
                  this, SLOT (slotDirectoryListingSubFolders (QStringList&)) );
-        connect ( &parser, SIGNAL (directoryListingIterated (QString&, QMap<QString,QString>&)),
-                 this, SLOT (slotDirectoryListingIterated (QString&, QMap<QString,QString>&)) );
+        connect ( &parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
+                 this, SLOT (slotDirectoryListingIterated (string&, QMap<string,string>&)) );
         connect ( &parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (slotFinishedSuccessfully ()) );
 
-        QHash <QString, ExtraFolderInfo> sizes;
+        QHash <string, ExtraFolderInfo> sizes;
         QVERIFY (parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
 
         QVERIFY (_success);
@@ -516,12 +516,12 @@ private slots:
 
         connect ( &parser, SIGNAL (directoryListingSubfolders (QStringList&)),
                  this, SLOT (slotDirectoryListingSubFolders (QStringList&)) );
-        connect ( &parser, SIGNAL (directoryListingIterated (QString&, QMap<QString,QString>&)),
-                 this, SLOT (slotDirectoryListingIterated (QString&, QMap<QString,QString>&)) );
+        connect ( &parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
+                 this, SLOT (slotDirectoryListingIterated (string&, QMap<string,string>&)) );
         connect ( &parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (slotFinishedSuccessfully ()) );
 
-        QHash <QString, ExtraFolderInfo> sizes;
+        QHash <string, ExtraFolderInfo> sizes;
         QVERIFY (!parser.parse ( testXml, &sizes, "/oc/remote.php/dav/sharefolder" ));
 
         QVERIFY (!_success);
@@ -581,20 +581,20 @@ private slots:
 
         connect ( &parser, SIGNAL (directoryListingSubfolders (QStringList&)),
                  this, SLOT (slotDirectoryListingSubFolders (QStringList&)) );
-        connect ( &parser, SIGNAL (directoryListingIterated (QString&, QMap<QString,QString>&)),
-                 this, SLOT (slotDirectoryListingIterated (QString&, QMap<QString,QString>&)) );
+        connect ( &parser, SIGNAL (directoryListingIterated (string&, QMap<string,string>&)),
+                 this, SLOT (slotDirectoryListingIterated (string&, QMap<string,string>&)) );
         connect ( &parser, SIGNAL (finishedWithoutError ()),
                  this, SLOT (slotFinishedSuccessfully ()) );
 
-        QHash <QString, ExtraFolderInfo> sizes;
-        QVERIFY (parser.parse ( testXml, &sizes, QString.fromUtf8 ("/ä") ));
+        QHash <string, ExtraFolderInfo> sizes;
+        QVERIFY (parser.parse ( testXml, &sizes, string.fromUtf8 ("/ä") ));
         QVERIFY (_success);
 
-        QVERIFY (_items.contains (QString.fromUtf8 ("/ä/ä.pdf")));
-        QVERIFY (_items.contains (QString.fromUtf8 ("/ä")));
+        QVERIFY (_items.contains (string.fromUtf8 ("/ä/ä.pdf")));
+        QVERIFY (_items.contains (string.fromUtf8 ("/ä")));
         QVERIFY (_items.size () == 2 );
 
-        QVERIFY (_subdirs.contains (QString.fromUtf8 ("/ä")));
+        QVERIFY (_subdirs.contains (string.fromUtf8 ("/ä")));
         QVERIFY (_subdirs.size () == 1);
     }
 

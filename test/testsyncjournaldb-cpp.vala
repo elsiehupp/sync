@@ -1,4 +1,4 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
       support, and with no warranty, express or implied, as to its usefulness for
          any purpose.
@@ -30,7 +30,7 @@ private slots:
     }
 
     void cleanupTestCase () {
-        const QString file = _db.databaseFilePath ();
+        const string file = _db.databaseFilePath ();
         QFile.remove (file);
     }
 

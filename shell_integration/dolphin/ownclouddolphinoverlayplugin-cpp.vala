@@ -1,4 +1,4 @@
-/******************************************************************************
+/*************************************************************
   Copyright (C) 2014 by Olivier Goffart <ogoffart@woboq.com                *
                                                                            *
   This program is free software; you can redistribute it and/or modify     *
@@ -95,7 +95,7 @@ private:
             return;
         status = tokens[1];
 
-        emit overlaysChanged (QUrl.fromLocalFile (QString.fromUtf8 (name)), overlaysForString (status));
+        emit overlaysChanged (QUrl.fromLocalFile (string.fromUtf8 (name)), overlaysForString (status));
     }
 };
 

@@ -1,17 +1,9 @@
-/*
+/***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <QStack>
 // #include <QFileInfo>
@@ -97,7 +89,7 @@ static int64 getMaxBlacklistTime () {
 /** Creates a blacklist entry, possibly taking into account an old one.
 
 The old entry may be invalid, then a fresh entry is created.
-*/
+***********************************************************/
 static SyncJournalErrorBlacklistRecord createBlacklistEntry (
     const SyncJournalErrorBlacklistRecord &old, SyncFileItem &item) {
     SyncJournalErrorBlacklistRecord entry;
@@ -142,7 +134,7 @@ static SyncJournalErrorBlacklistRecord createBlacklistEntry (
 /** Updates, creates or removes a blacklist entry for the given item.
 
 May adjust the status or item._errorString.
-*/
+***********************************************************/
 void blacklistUpdate (SyncJournalDb *journal, SyncFileItem &item) {
     SyncJournalErrorBlacklistRecord oldEntry = journal.errorBlacklistEntry (item._file);
 
@@ -188,7 +180,7 @@ void blacklistUpdate (SyncJournalDb *journal, SyncFileItem &item) {
     }
 }
 
-void PropagateItemJob.done (SyncFileItem.Status statusArg, QString &errorString) {
+void PropagateItemJob.done (SyncFileItem.Status statusArg, string &errorString) {
     // Duplicate calls to done () are a logic error
     ENFORCE (_state != Finished);
     _state = Finished;
@@ -258,7 +250,7 @@ void PropagateItemJob.done (SyncFileItem.Status statusArg, QString &errorString)
 }
 
 void PropagateItemJob.slotRestoreJobFinished (SyncFileItem.Status status) {
-    QString msg;
+    string msg;
     if (_restoreJob) {
         msg = _restoreJob.restoreJobMsg ();
         _restoreJob.setRestoreJobMsg ();
@@ -279,7 +271,7 @@ bool PropagateItemJob.hasEncryptedAncestor () {
 
     const auto path = _item._file;
     const auto slashPosition = path.lastIndexOf ('/');
-    const auto parentPath = slashPosition >= 0 ? path.left (slashPosition) : QString ();
+    const auto parentPath = slashPosition >= 0 ? path.left (slashPosition) : string ();
 
     auto pathComponents = parentPath.split ('/');
     while (!pathComponents.isEmpty ()) {
@@ -409,11 +401,11 @@ void OwncloudPropagator.start (SyncFileItemVector &&items) {
 
     resetDelayedUploadTasks ();
     _rootJob.reset (new PropagateRootDirectory (this));
-    QStack<QPair<QString /* directory name */, PropagateDirectory * /* job */>> directories;
-    directories.push (qMakePair (QString (), _rootJob.data ()));
+    QStack<QPair<string /* directory name */, PropagateDirectory * /* job */>> directories;
+    directories.push (qMakePair (string (), _rootJob.data ()));
     QVector<PropagatorJob> directoriesToRemove;
-    QString removedDirectory;
-    QString maybeConflictDirectory;
+    string removedDirectory;
+    string maybeConflictDirectory;
     foreach (SyncFileItemPtr &item, items) {
         if (!removedDirectory.isEmpty () && item._file.startsWith (removedDirectory)) {
             // this is an item in a directory which is going to be removed.
@@ -488,9 +480,9 @@ void OwncloudPropagator.start (SyncFileItemVector &&items) {
 }
 
 void OwncloudPropagator.startDirectoryPropagation (SyncFileItemPtr &item,
-                                                   QStack<QPair<QString, PropagateDirectory>> &directories,
+                                                   QStack<QPair<string, PropagateDirectory>> &directories,
                                                    QVector<PropagatorJob> &directoriesToRemove,
-                                                   QString &removedDirectory,
+                                                   string &removedDirectory,
                                                    const SyncFileItemVector &items) {
     auto directoryPropagationJob = std.make_unique<PropagateDirectory> (this, item);
 
@@ -532,10 +524,10 @@ void OwncloudPropagator.startDirectoryPropagation (SyncFileItemPtr &item,
 }
 
 void OwncloudPropagator.startFilePropagation (SyncFileItemPtr &item,
-                                              QStack<QPair<QString, PropagateDirectory> > &directories,
+                                              QStack<QPair<string, PropagateDirectory> > &directories,
                                               QVector<PropagatorJob> &directoriesToRemove,
-                                              QString &removedDirectory,
-                                              QString &maybeConflictDirectory) {
+                                              string &removedDirectory,
+                                              string &maybeConflictDirectory) {
     if (item._instruction == CSYNC_INSTRUCTION_TYPE_CHANGE) {
         // will delete directories, so defer execution
         auto job = createJob (item);
@@ -563,8 +555,8 @@ void OwncloudPropagator.setSyncOptions (SyncOptions &syncOptions) {
     _chunkSize = syncOptions._initialChunkSize;
 }
 
-bool OwncloudPropagator.localFileNameClash (QString &relFile) {
-    const QString file (_localDir + relFile);
+bool OwncloudPropagator.localFileNameClash (string &relFile) {
+    const string file (_localDir + relFile);
     Q_ASSERT (!file.isEmpty ());
 
     if (!file.isEmpty () && Utility.fsCasePreserving ()) {
@@ -572,7 +564,7 @@ bool OwncloudPropagator.localFileNameClash (QString &relFile) {
         // On Linux, the file system is case sensitive, but this code is useful for testing.
         // Just check that there is no other file with the same name and different casing.
         QFileInfo fileInfo (file);
-        const QString fn = fileInfo.fileName ();
+        const string fn = fileInfo.fileName ();
         const QStringList list = fileInfo.dir ().entryList ({ fn });
         if (list.count () > 1 || (list.count () == 1 && list[0] != fn)) {
             return true;
@@ -581,16 +573,16 @@ bool OwncloudPropagator.localFileNameClash (QString &relFile) {
     return false;
 }
 
-bool OwncloudPropagator.hasCaseClashAccessibilityProblem (QString &relfile) {
+bool OwncloudPropagator.hasCaseClashAccessibilityProblem (string &relfile) {
     Q_UNUSED (relfile);
     return false;
 }
 
-QString OwncloudPropagator.fullLocalPath (QString &tmp_file_name) {
+string OwncloudPropagator.fullLocalPath (string &tmp_file_name) {
     return _localDir + tmp_file_name;
 }
 
-QString OwncloudPropagator.localPath () {
+string OwncloudPropagator.localPath () {
     return _localDir;
 }
 
@@ -658,21 +650,21 @@ OwncloudPropagator.DiskSpaceResult OwncloudPropagator.diskSpaceCheck () {
 }
 
 bool OwncloudPropagator.createConflict (SyncFileItemPtr &item,
-    PropagatorCompositeJob *composite, QString *error) {
-    QString fn = fullLocalPath (item._file);
+    PropagatorCompositeJob *composite, string *error) {
+    string fn = fullLocalPath (item._file);
 
-    QString renameError;
+    string renameError;
     auto conflictModTime = FileSystem.getModTime (fn);
     if (conflictModTime <= 0) {
         *error = tr ("Impossible to get modification time for file in conflict %1").arg (fn);
         return false;
     }
-    QString conflictUserName;
+    string conflictUserName;
     if (account ().capabilities ().uploadConflictFiles ())
         conflictUserName = account ().davDisplayName ();
-    QString conflictFileName = Utility.makeConflictFileName (
+    string conflictFileName = Utility.makeConflictFileName (
         item._file, Utility.qDateTimeFromTime_t (conflictModTime), conflictUserName);
-    QString conflictFilePath = fullLocalPath (conflictFileName);
+    string conflictFilePath = fullLocalPath (conflictFileName);
 
     emit touchedFile (fn);
     emit touchedFile (conflictFilePath);
@@ -729,17 +721,17 @@ bool OwncloudPropagator.createConflict (SyncFileItemPtr &item,
     return true;
 }
 
-QString OwncloudPropagator.adjustRenamedPath (QString &original) {
+string OwncloudPropagator.adjustRenamedPath (string &original) {
     return Occ.adjustRenamedPath (_renamedDirectories, original);
 }
 
-Result<Vfs.ConvertToPlaceholderResult, QString> OwncloudPropagator.updateMetadata (SyncFileItem &item) {
+Result<Vfs.ConvertToPlaceholderResult, string> OwncloudPropagator.updateMetadata (SyncFileItem &item) {
     return OwncloudPropagator.staticUpdateMetadata (item, _localDir, syncOptions ()._vfs.data (), _journal);
 }
 
-Result<Vfs.ConvertToPlaceholderResult, QString> OwncloudPropagator.staticUpdateMetadata (SyncFileItem &item, QString localDir,
+Result<Vfs.ConvertToPlaceholderResult, string> OwncloudPropagator.staticUpdateMetadata (SyncFileItem &item, string localDir,
                                                                                           Vfs *vfs, SyncJournalDb *const journal) {
-    const QString fsPath = localDir + item.destination ();
+    const string fsPath = localDir + item.destination ();
     const auto result = vfs.convertToPlaceholder (fsPath, item);
     if (!result) {
         return result.error ();
@@ -766,17 +758,17 @@ void OwncloudPropagator.clearDelayedTasks () {
     _delayedTasks.clear ();
 }
 
-void OwncloudPropagator.addToBulkUploadBlackList (QString &file) {
+void OwncloudPropagator.addToBulkUploadBlackList (string &file) {
     qCDebug (lcPropagator) << "black list for bulk upload" << file;
     _bulkUploadBlackList.insert (file);
 }
 
-void OwncloudPropagator.removeFromBulkUploadBlackList (QString &file) {
+void OwncloudPropagator.removeFromBulkUploadBlackList (string &file) {
     qCDebug (lcPropagator) << "black list for bulk upload" << file;
     _bulkUploadBlackList.remove (file);
 }
 
-bool OwncloudPropagator.isInBulkUploadBlackList (QString &file) {
+bool OwncloudPropagator.isInBulkUploadBlackList (string &file) {
     return _bulkUploadBlackList.contains (file);
 }
 
@@ -1181,12 +1173,12 @@ void CleanupPollsJob.slotPollFinished () {
     start ();
 }
 
-QString OwncloudPropagator.fullRemotePath (QString &tmp_file_name) {
+string OwncloudPropagator.fullRemotePath (string &tmp_file_name) {
     // TODO : should this be part of the _item (SyncFileItemPtr)?
     return _remoteFolder + tmp_file_name;
 }
 
-QString OwncloudPropagator.remotePath () {
+string OwncloudPropagator.remotePath () {
     return _remoteFolder;
 }
 

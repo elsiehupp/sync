@@ -3,7 +3,7 @@ Q_LOGGING_CATEGORY (lcPropagateDownloadEncrypted, "nextcloud.sync.propagator.dow
 
 namespace Occ {
 
-PropagateDownloadEncrypted.PropagateDownloadEncrypted (OwncloudPropagator *propagator, QString &localParentPath, SyncFileItemPtr item, GLib.Object *parent)
+PropagateDownloadEncrypted.PropagateDownloadEncrypted (OwncloudPropagator *propagator, string &localParentPath, SyncFileItemPtr item, GLib.Object *parent)
     : GLib.Object (parent)
     , _propagator (propagator)
     , _localParentPath (localParentPath)
@@ -21,7 +21,7 @@ void PropagateDownloadEncrypted.start () {
         }
     } ();
     const auto remoteFilename = _item._encryptedFileName.isEmpty () ? _item._file : _item._encryptedFileName;
-    const auto remotePath = QString (rootPath + remoteFilename);
+    const auto remotePath = string (rootPath + remoteFilename);
     const auto remoteParentPath = remotePath.left (remotePath.lastIndexOf ('/'));
 
     // Is encrypted Now we need the folder-id
@@ -40,7 +40,7 @@ void PropagateDownloadEncrypted.folderIdError () {
 
 void PropagateDownloadEncrypted.checkFolderId (QStringList &list) {
   auto job = qobject_cast<LsColJob> (sender ());
-  const QString folderId = list.first ();
+  const string folderId = list.first ();
   qCDebug (lcPropagateDownloadEncrypted) << "Received id of folder" << folderId;
 
   const ExtraFolderInfo &folderInfo = job._folderInfos.value (folderId);
@@ -63,11 +63,11 @@ void PropagateDownloadEncrypted.folderEncryptedMetadataError (QByteArray & /*fil
 void PropagateDownloadEncrypted.checkFolderEncryptedMetadata (QJsonDocument &json) {
   qCDebug (lcPropagateDownloadEncrypted) << "Metadata Received reading"
                                         << _item._instruction << _item._file << _item._encryptedFileName;
-  const QString filename = _info.fileName ();
+  const string filename = _info.fileName ();
   auto meta = new FolderMetadata (_propagator.account (), json.toJson (QJsonDocument.Compact));
   const QVector<EncryptedFile> files = meta.files ();
 
-  const QString encryptedFilename = _item._encryptedFileName.section (QLatin1Char ('/'), -1);
+  const string encryptedFilename = _item._encryptedFileName.section (QLatin1Char ('/'), -1);
   for (EncryptedFile &file : files) {
     if (encryptedFilename == file.encryptedFilename) {
       _encryptedInfo = file;
@@ -83,10 +83,10 @@ void PropagateDownloadEncrypted.checkFolderEncryptedMetadata (QJsonDocument &jso
 }
 
 // TODO : Fix this. Exported in the wrong place.
-QString createDownloadTmpFileName (QString &previous);
+string createDownloadTmpFileName (string &previous);
 
 bool PropagateDownloadEncrypted.decryptFile (QFile& tmpFile) {
-    const QString tmpFileName = createDownloadTmpFileName (_item._file + QLatin1String ("_dec"));
+    const string tmpFileName = createDownloadTmpFileName (_item._file + QLatin1String ("_dec"));
     qCDebug (lcPropagateDownloadEncrypted) << "Content Checksum Computed starting decryption" << tmpFileName;
 
     tmpFile.close ();
@@ -114,7 +114,7 @@ bool PropagateDownloadEncrypted.decryptFile (QFile& tmpFile) {
     return true;
 }
 
-QString PropagateDownloadEncrypted.errorString () {
+string PropagateDownloadEncrypted.errorString () {
   return _errorString;
 }
 

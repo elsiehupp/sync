@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <QRegularExpression>
 
@@ -53,12 +45,12 @@ QRegularExpression SyncOptions.fileRegex () {
     return _fileRegex;
 }
 
-void SyncOptions.setFilePattern (QString &pattern) {
+void SyncOptions.setFilePattern (string &pattern) {
     // full match or a path ending with this pattern
     setPathPattern (QStringLiteral (" (^|/|\\\\)") + pattern + QLatin1Char ('$'));
 }
 
-void SyncOptions.setPathPattern (QString &pattern) {
+void SyncOptions.setPathPattern (string &pattern) {
     _fileRegex.setPatternOptions (Utility.fsCasePreserving () ? QRegularExpression.CaseInsensitiveOption : QRegularExpression.NoPatternOption);
     _fileRegex.setPattern (pattern);
 }

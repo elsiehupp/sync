@@ -1,9 +1,9 @@
-/*
+/***********************************************************
 Tests are taken form lookup2.c and lookup8.c
 by Bob Jenkins, December 1996, Public Domain.
 
 See http://burtleburtle.net/bob/hash/evahash.html
-*/
+***********************************************************/
 
 const int HASHSTATE = 1
 const int HASHLEN   = 1

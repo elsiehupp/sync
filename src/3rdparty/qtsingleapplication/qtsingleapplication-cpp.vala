@@ -1,30 +1,14 @@
-/****************************************************************************
-**
-** Copyright (C) 2014 Digia Plc and/or its subsidiary (-ies).
-** Contact : http://www.qt-project.org/legal
-**
-** This file is part of Qt Creator.
-**
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
-** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and Digia.  For licensing terms and
-** conditions see http://qt.digia.com/licensing.  For further information
-** use the contact form at http://qt.digia.com/contact-us.
-**
-** GNU Lesser General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 as published by the Free Software
-** Foundation and appearing in the file LICENSE.LGPL included in the
-** packaging of this file.  Please review the following information to
-** ensure the GNU Lesser General Public License version 2.1 requirements
-** will be met : http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
-**
-** In addition, as a special exception, Digia gives you certain additional
-** rights.  These rights are described in the Digia Qt LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
-**
+/***********************************************************
+Copyright (C) 2014 Digia Plc and/or its subsidiary (-ies).
+Contact : http://www.qt-project.org/legal
+
+This file is part of Qt Creator.
+
+<LGPLv2.1-or-later-Boilerplate>
+
+In addition, as a special exception, Digia gives you certain additional
+rights.  These rights are described in the Digia Qt LGPL Exception
+version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 ****************************************************************************/
 
 // #include <qtlockedfile.h>
@@ -32,27 +16,27 @@
 // #include <QDir>
 // #include <QFileOpenEvent>
 // #include <QSharedMemory>
-// #include <QWidget>
+// #include <Gtk.Widget>
 
 namespace SharedTools {
 
 static const int instancesSize = 1024;
 
-static QString instancesLockFilename (QString &appSessionId) {
+static string instancesLockFilename (string &appSessionId) {
     const QChar slash (QLatin1Char ('/'));
-    QString res = QDir.tempPath ();
+    string res = QDir.tempPath ();
     if (!res.endsWith (slash))
         res += slash;
     return res + appSessionId + QLatin1String ("-instances");
 }
 
-QtSingleApplication.QtSingleApplication (QString &appId, int &argc, char **argv)
+QtSingleApplication.QtSingleApplication (string &appId, int &argc, char **argv)
     : QApplication (argc, argv),
       firstPeer (-1),
       pidPeer (nullptr) {
     this.appId = appId;
 
-    const QString appSessionId = QtLocalPeer.appSessionId (appId);
+    const string appSessionId = QtLocalPeer.appSessionId (appId);
 
     // This shared memory holds a zero-terminated array of active (or crashed) instances
     instances = new QSharedMemory (appSessionId, this);
@@ -89,7 +73,7 @@ QtSingleApplication.QtSingleApplication (QString &appId, int &argc, char **argv)
     *pids++ = QCoreApplication.applicationPid ();
     *pids = 0;
     pidPeer = new QtLocalPeer (this, appId + QLatin1Char ('-') +
-                              QString.number (QCoreApplication.applicationPid ()));
+                              string.number (QCoreApplication.applicationPid ()));
     connect (pidPeer, &QtLocalPeer.messageReceived, this, &QtSingleApplication.messageReceived);
     pidPeer.isClient ();
     lockfile.unlock ();
@@ -129,22 +113,22 @@ bool QtSingleApplication.isRunning (int64 pid) {
             return false;
     }
 
-    QtLocalPeer peer (this, appId + QLatin1Char ('-') + QString.number (pid, 10));
+    QtLocalPeer peer (this, appId + QLatin1Char ('-') + string.number (pid, 10));
     return peer.isClient ();
 }
 
-bool QtSingleApplication.sendMessage (QString &message, int timeout, int64 pid) {
+bool QtSingleApplication.sendMessage (string &message, int timeout, int64 pid) {
     if (pid == -1) {
         pid = firstPeer;
         if (pid == -1)
             return false;
     }
 
-    QtLocalPeer peer (this, appId + QLatin1Char ('-') + QString.number (pid, 10));
+    QtLocalPeer peer (this, appId + QLatin1Char ('-') + string.number (pid, 10));
     return peer.sendMessage (message, timeout, block);
 }
 
-QString QtSingleApplication.applicationId () {
+string QtSingleApplication.applicationId () {
     return appId;
 }
 
@@ -152,7 +136,7 @@ void QtSingleApplication.setBlock (bool value) {
     block = value;
 }
 
-void QtSingleApplication.setActivationWindow (QWidget *aw, bool activateOnMessage) {
+void QtSingleApplication.setActivationWindow (Gtk.Widget *aw, bool activateOnMessage) {
     actWin = aw;
     if (!pidPeer)
         return;
@@ -162,7 +146,7 @@ void QtSingleApplication.setActivationWindow (QWidget *aw, bool activateOnMessag
         disconnect (pidPeer, &QtLocalPeer.messageReceived, this, &QtSingleApplication.activateWindow);
 }
 
-QWidget* QtSingleApplication.activationWindow () {
+Gtk.Widget* QtSingleApplication.activationWindow () {
     return actWin;
 }
 

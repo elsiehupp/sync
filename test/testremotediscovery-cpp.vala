@@ -1,9 +1,9 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
 
-*/
+***********************************************************/
 
 // #include <QtTest>
 // #include <syncengine.h>
@@ -48,10 +48,10 @@ private slots:
     void testRemoteDiscoveryError_data () {
         qRegisterMetaType<ErrorCategory> ();
         QTest.addColumn<int> ("errorKind");
-        QTest.addColumn<QString> ("expectedErrorString");
+        QTest.addColumn<string> ("expectedErrorString");
         QTest.addColumn<bool> ("syncSucceeds");
 
-        QString itemErrorMessage = "Internal Server Fake Error";
+        string itemErrorMessage = "Internal Server Fake Error";
 
         QTest.newRow ("400") << 400 << itemErrorMessage << false;
         QTest.newRow ("401") << 401 << itemErrorMessage << false;
@@ -68,7 +68,7 @@ private slots:
     // Check what happens when there is an error.
     void testRemoteDiscoveryError () {
         QFETCH (int, errorKind);
-        QFETCH (QString, expectedErrorString);
+        QFETCH (string, expectedErrorString);
         QFETCH (bool, syncSucceeds);
 
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
@@ -84,8 +84,8 @@ private slots:
         auto oldLocalState = fakeFolder.currentLocalState ();
         auto oldRemoteState = fakeFolder.currentRemoteState ();
 
-        QString errorFolder = "dav/files/admin/B";
-        QString fatalErrorPrefix = "Server replied with an error while reading directory \"B\" : ";
+        string errorFolder = "dav/files/admin/B";
+        string fatalErrorPrefix = "Server replied with an error while reading directory \"B\" : ";
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &req, QIODevice *)
                 . QNetworkReply *{
             if (req.attribute (QNetworkRequest.CustomVerbAttribute) == "PROPFIND" && req.url ().path ().endsWith (errorFolder)) {
@@ -112,7 +112,7 @@ private slots:
         QCOMPARE (oldRemoteState.children["B"], fakeFolder.currentRemoteState ().children["B"]);
         if (!syncSucceeds) {
             QCOMPARE (errorSpy.size (), 1);
-            QCOMPARE (errorSpy[0][0].toString (), QString (fatalErrorPrefix + expectedErrorString));
+            QCOMPARE (errorSpy[0][0].toString (), string (fatalErrorPrefix + expectedErrorString));
         } else {
             QCOMPARE (completeSpy.findItem ("B")._instruction, CSYNC_INSTRUCTION_IGNORE);
             QVERIFY (completeSpy.findItem ("B")._errorString.contains (expectedErrorString));
@@ -131,7 +131,7 @@ private slots:
         errorSpy.clear ();
         QVERIFY (!fakeFolder.syncOnce ());
         QCOMPARE (errorSpy.size (), 1);
-        QCOMPARE (errorSpy[0][0].toString (), QString (fatalErrorPrefix + expectedErrorString));
+        QCOMPARE (errorSpy[0][0].toString (), string (fatalErrorPrefix + expectedErrorString));
     }
 
     void testMissingData () {

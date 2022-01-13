@@ -1,9 +1,9 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
 
-*/
+***********************************************************/
 
 // #include <QtTest>
 // #include <syncengine.h>
@@ -35,7 +35,7 @@ static void assertCsyncJournalOk (SyncJournalDb &journal) {
     QCOMPARE (q.intValue (0), 0);
 }
 
-SyncFileItemPtr findDiscoveryItem (SyncFileItemVector &spy, QString &path) {
+SyncFileItemPtr findDiscoveryItem (SyncFileItemVector &spy, string &path) {
     for (auto &item : spy) {
         if (item.destination () == path)
             return item;
@@ -43,12 +43,12 @@ SyncFileItemPtr findDiscoveryItem (SyncFileItemVector &spy, QString &path) {
     return SyncFileItemPtr (new SyncFileItem);
 }
 
-bool itemInstruction (ItemCompletedSpy &spy, QString &path, SyncInstructions instr) {
+bool itemInstruction (ItemCompletedSpy &spy, string &path, SyncInstructions instr) {
     auto item = spy.findItem (path);
     return item._instruction == instr;
 }
 
-bool discoveryInstruction (SyncFileItemVector &spy, QString &path, SyncInstructions instr) {
+bool discoveryInstruction (SyncFileItemVector &spy, string &path, SyncInstructions instr) {
     auto item = findDiscoveryItem (spy, path);
     return item._instruction == instr;
 }
@@ -72,7 +72,7 @@ private slots:
         const int canBeModifiedSize = 144;
 
         //create some files
-        auto insertIn = [&] (QString &dir) {
+        auto insertIn = [&] (string &dir) {
             fakeFolder.remoteModifier ().insert (dir + "normalFile_PERM_WVND_.data", 100 );
             fakeFolder.remoteModifier ().insert (dir + "cannotBeRemoved_PERM_WVN_.data", 101 );
             fakeFolder.remoteModifier ().insert (dir + "canBeRemoved_PERM_D_.data", 102 );
@@ -102,7 +102,7 @@ private slots:
 
         //2. remove the file that can be removed
         //  (they should properly be gone)
-        auto removeReadOnly = [&] (QString &file)  {
+        auto removeReadOnly = [&] (string &file)  {
             QVERIFY (!QFileInfo (fakeFolder.localPath () + file).permission (QFile.WriteOwner));
             QFile (fakeFolder.localPath () + file).setPermissions (QFile.WriteOwner | QFile.ReadOwner);
             fakeFolder.localModifier ().remove (file);
@@ -112,7 +112,7 @@ private slots:
 
         //3. Edit the files that cannot be modified
         //  (they should be recovered, and a conflict shall be created)
-        auto editReadOnly = [&] (QString &file)  {
+        auto editReadOnly = [&] (string &file)  {
             QVERIFY (!QFileInfo (fakeFolder.localPath () + file).permission (QFile.WriteOwner));
             QFile (fakeFolder.localPath () + file).setPermissions (QFile.WriteOwner | QFile.ReadOwner);
             fakeFolder.localModifier ().appendByte (file);

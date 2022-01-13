@@ -1,39 +1,39 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
 
-*/
+***********************************************************/
 
 // #include <QtTest>
 
-void touch (QString &file) {
-    QString cmd;
-    cmd = QString ("touch %1").arg (file);
+void touch (string &file) {
+    string cmd;
+    cmd = string ("touch %1").arg (file);
     qDebug () << "Command : " << cmd;
     system (cmd.toLocal8Bit ());
 }
 
-void mkdir (QString &file) {
-    QString cmd = QString ("mkdir %1").arg (file);
+void mkdir (string &file) {
+    string cmd = string ("mkdir %1").arg (file);
     qDebug () << "Command : " << cmd;
     system (cmd.toLocal8Bit ());
 }
 
-void rmdir (QString &file) {
-    QString cmd = QString ("rmdir %1").arg (file);
+void rmdir (string &file) {
+    string cmd = string ("rmdir %1").arg (file);
     qDebug () << "Command : " << cmd;
     system (cmd.toLocal8Bit ());
 }
 
-void rm (QString &file) {
-    QString cmd = QString ("rm %1").arg (file);
+void rm (string &file) {
+    string cmd = string ("rm %1").arg (file);
     qDebug () << "Command : " << cmd;
     system (cmd.toLocal8Bit ());
 }
 
-void mv (QString &file1, QString &file2) {
-    QString cmd = QString ("mv %1 %2").arg (file1, file2);
+void mv (string &file1, string &file2) {
+    string cmd = string ("mv %1 %2").arg (file1, file2);
     qDebug () << "Command : " << cmd;
     system (cmd.toLocal8Bit ());
 }
@@ -43,11 +43,11 @@ using namespace Occ;
 class TestFolderWatcher : GLib.Object {
 
     QTemporaryDir _root;
-    QString _rootPath;
+    string _rootPath;
     QScopedPointer<FolderWatcher> _watcher;
     QScopedPointer<QSignalSpy> _pathChangedSpy;
 
-    bool waitForPathChanged (QString &path) {
+    bool waitForPathChanged (string &path) {
         QElapsedTimer t;
         t.start ();
         while (t.elapsed () < 5000) {
@@ -87,10 +87,10 @@ public:
 
         _watcher.reset (new FolderWatcher);
         _watcher.init (_rootPath);
-        _pathChangedSpy.reset (new QSignalSpy (_watcher.data (), SIGNAL (pathChanged (QString))));
+        _pathChangedSpy.reset (new QSignalSpy (_watcher.data (), SIGNAL (pathChanged (string))));
     }
 
-    int countFolders (QString &path) {
+    int countFolders (string &path) {
         int n = 0;
         for (auto &sub : QDir (path).entryList (QDir.Dirs | QDir.NoDotAndDotDot))
             n += 1 + countFolders (path + '/' + sub);
@@ -108,9 +108,9 @@ private slots:
     }
 
     void testACreate () { // create a new file
-        QString file (_rootPath + "/foo.txt");
-        QString cmd;
-        cmd = QString ("echo \"xyz\" > %1").arg (file);
+        string file (_rootPath + "/foo.txt");
+        string cmd;
+        cmd = string ("echo \"xyz\" > %1").arg (file);
         qDebug () << "Command : " << cmd;
         system (cmd.toLocal8Bit ());
 
@@ -118,13 +118,13 @@ private slots:
     }
 
     void testATouch () { // touch an existing file.
-        QString file (_rootPath + "/a1/random.bin");
+        string file (_rootPath + "/a1/random.bin");
         touch (file);
         QVERIFY (waitForPathChanged (file));
     }
 
     void testMove3LevelDirWithFile () {
-        QString file (_rootPath + "/a0/b/c/empty.txt");
+        string file (_rootPath + "/a0/b/c/empty.txt");
         mkdir (_rootPath + "/a0");
         mkdir (_rootPath + "/a0/b");
         mkdir (_rootPath + "/a0/b/c");
@@ -134,24 +134,24 @@ private slots:
     }
 
     void testCreateADir () {
-        QString file (_rootPath+"/a1/b1/new_dir");
+        string file (_rootPath+"/a1/b1/new_dir");
         mkdir (file);
         QVERIFY (waitForPathChanged (file));
 
         // Notifications from that new folder arrive too
-        QString file2 (_rootPath + "/a1/b1/new_dir/contained");
+        string file2 (_rootPath + "/a1/b1/new_dir/contained");
         touch (file2);
         QVERIFY (waitForPathChanged (file2));
     }
 
     void testRemoveADir () {
-        QString file (_rootPath+"/a1/b3/c3");
+        string file (_rootPath+"/a1/b3/c3");
         rmdir (file);
         QVERIFY (waitForPathChanged (file));
     }
 
     void testRemoveAFile () {
-        QString file (_rootPath+"/a1/b2/todelete.bin");
+        string file (_rootPath+"/a1/b2/todelete.bin");
         QVERIFY (QFile.exists (file));
         rm (file);
         QVERIFY (!QFile.exists (file));
@@ -160,8 +160,8 @@ private slots:
     }
 
     void testRenameAFile () {
-        QString file1 (_rootPath+"/a2/renamefile");
-        QString file2 (_rootPath+"/a2/renamefile.renamed");
+        string file1 (_rootPath+"/a2/renamefile");
+        string file2 (_rootPath+"/a2/renamefile.renamed");
         QVERIFY (QFile.exists (file1));
         mv (file1, file2);
         QVERIFY (QFile.exists (file2));
@@ -171,8 +171,8 @@ private slots:
     }
 
     void testMoveAFile () {
-        QString old_file (_rootPath+"/a1/movefile");
-        QString new_file (_rootPath+"/a2/movefile.renamed");
+        string old_file (_rootPath+"/a1/movefile");
+        string new_file (_rootPath+"/a2/movefile.renamed");
         QVERIFY (QFile.exists (old_file));
         mv (old_file, new_file);
         QVERIFY (QFile.exists (new_file));
@@ -182,8 +182,8 @@ private slots:
     }
 
     void testRenameDirectorySameBase () {
-        QString old_file (_rootPath+"/a1/b1");
-        QString new_file (_rootPath+"/a1/brename");
+        string old_file (_rootPath+"/a1/b1");
+        string new_file (_rootPath+"/a1/brename");
         QVERIFY (QFile.exists (old_file));
         mv (old_file, new_file);
         QVERIFY (QFile.exists (new_file));
@@ -193,18 +193,18 @@ private slots:
 
         // Verify that further notifications end up with the correct paths
 
-        QString file (_rootPath+"/a1/brename/c1/random.bin");
+        string file (_rootPath+"/a1/brename/c1/random.bin");
         touch (file);
         QVERIFY (waitForPathChanged (file));
 
-        QString dir (_rootPath+"/a1/brename/newfolder");
+        string dir (_rootPath+"/a1/brename/newfolder");
         mkdir (dir);
         QVERIFY (waitForPathChanged (dir));
     }
 
     void testRenameDirectoryDifferentBase () {
-        QString old_file (_rootPath+"/a1/brename");
-        QString new_file (_rootPath+"/bren");
+        string old_file (_rootPath+"/a1/brename");
+        string new_file (_rootPath+"/bren");
         QVERIFY (QFile.exists (old_file));
         mv (old_file, new_file);
         QVERIFY (QFile.exists (new_file));
@@ -214,11 +214,11 @@ private slots:
 
         // Verify that further notifications end up with the correct paths
 
-        QString file (_rootPath+"/bren/c1/random.bin");
+        string file (_rootPath+"/bren/c1/random.bin");
         touch (file);
         QVERIFY (waitForPathChanged (file));
 
-        QString dir (_rootPath+"/bren/newfolder2");
+        string dir (_rootPath+"/bren/newfolder2");
         mkdir (dir);
         QVERIFY (waitForPathChanged (dir));
     }

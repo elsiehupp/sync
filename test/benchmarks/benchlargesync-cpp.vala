@@ -1,9 +1,9 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
 
-*/
+***********************************************************/
 
 // #include <syncengine.h>
 
@@ -13,17 +13,17 @@ int numDirs = 0;
 int numFiles = 0;
 
 template<int filesPerDir, int dirPerDir, int maxDepth>
-void addBunchOfFiles (int depth, QString &path, FileModifier &fi) {
+void addBunchOfFiles (int depth, string &path, FileModifier &fi) {
     for (int fileNum = 1; fileNum <= filesPerDir; ++fileNum) {
-        QString name = QStringLiteral ("file") + QString.number (fileNum);
+        string name = QStringLiteral ("file") + string.number (fileNum);
         fi.insert (path.isEmpty () ? name : path + "/" + name);
         numFiles++;
     }
     if (depth >= maxDepth)
         return;
     for (int dirNum = 1; dirNum <= dirPerDir; ++dirNum) {
-        QString name = QStringLiteral ("dir") + QString.number (dirNum);
-        QString subPath = path.isEmpty () ? name : path + "/" + name;
+        string name = QStringLiteral ("dir") + string.number (dirNum);
+        string subPath = path.isEmpty () ? name : path + "/" + name;
         fi.mkdir (subPath);
         numDirs++;
         addBunchOfFiles<filesPerDir, dirPerDir, maxDepth> (depth + 1, subPath, fi);

@@ -1,13 +1,13 @@
-/*
+/***********************************************************
 This software is in the public domain, furnished "as is", without technical
 support, and with no warranty, express or implied, as to its usefulness for
 any purpose.
 
-*/
+***********************************************************/
 
 // #include <QtTest>
 // #include <QDir>
-// #include <QString>
+// #include <string>
 
 using namespace Occ;
 using namespace Occ.Utility;
@@ -16,8 +16,8 @@ using namespace Occ.Utility;
         Q_OBJECT
     private:
         QTemporaryDir _root;
-        QString _testfile;
-        QString _expectedError;
+        string _testfile;
+        string _expectedError;
         QByteArray     _expected;
         QByteArray     _expectedType;
         bool           _successDown;
@@ -35,12 +35,12 @@ using namespace Occ.Utility;
          _successDown = true;
     }
 
-    void slotDownError (QString &errMsg) {
+    void slotDownError (string &errMsg) {
          QCOMPARE (_expectedError, errMsg);
          _errorSeen = true;
     }
 
-    static QByteArray shellSum ( const QByteArray& cmd, QString& file ) {
+    static QByteArray shellSum ( const QByteArray& cmd, string& file ) {
         QProcess md5;
         QStringList args;
         args.append (file);
@@ -64,7 +64,7 @@ using namespace Occ.Utility;
     }
 
     void testMd5Calc () {
-        QString file ( _root.path () + "/file_a.bin");
+        string file ( _root.path () + "/file_a.bin");
         QVERIFY (writeRandomFile (file));
         QFileInfo fi (file);
         QVERIFY (fi.exists ());
@@ -83,7 +83,7 @@ using namespace Occ.Utility;
     }
 
     void testSha1Calc () {
-        QString file ( _root.path () + "/file_b.bin");
+        string file ( _root.path () + "/file_b.bin");
         writeRandomFile (file);
         QFileInfo fi (file);
         QVERIFY (fi.exists ());
@@ -186,7 +186,7 @@ using namespace Occ.Utility;
 
         QTRY_VERIFY (_successDown);
 
-        _expectedError = QStringLiteral ("The downloaded file does not match the checksum, it will be resumed. \"543345\" != \"%1\"").arg (QString.fromUtf8 (_expected));
+        _expectedError = QStringLiteral ("The downloaded file does not match the checksum, it will be resumed. \"543345\" != \"%1\"").arg (string.fromUtf8 (_expected));
         _errorSeen = false;
         file.seek (0);
         vali.start (_testfile, "Adler32:543345");

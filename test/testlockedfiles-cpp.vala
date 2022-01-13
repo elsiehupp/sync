@@ -1,9 +1,9 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
 
-*/
+***********************************************************/
 
 // #include <QtTest>
 // #include <syncengine.h>
@@ -17,13 +17,13 @@ private slots:
     void testBasicLockFileWatcher () {
         QTemporaryDir tmp;
         int count = 0;
-        QString file;
+        string file;
 
         LockWatcher watcher;
         watcher.setCheckInterval (std.chrono.milliseconds (50));
-        connect (&watcher, &LockWatcher.fileUnlocked, &watcher, [&] (QString &f) { ++count; file = f; });
+        connect (&watcher, &LockWatcher.fileUnlocked, &watcher, [&] (string &f) { ++count; file = f; });
 
-        const QString tmpFile = tmp.path () + QString.fromUtf8 ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
+        const string tmpFile = tmp.path () + string.fromUtf8 ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
                                                                "elonglonglonglong/flonglonglonglong/glonglonglonglong/hlonglonglonglong/ilonglonglonglong/"
                                                                "jlonglonglonglong/klonglonglonglong/llonglonglonglong/mlonglonglonglong/nlonglonglonglong/"
                                                                "olonglonglonglong/file🐷.txt"); {

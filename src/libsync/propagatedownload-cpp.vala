@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <common/checksums.h>
 // #include <common/asserts.h>
@@ -34,14 +26,14 @@ Q_LOGGING_CATEGORY (lcPropagateDownload, "nextcloud.sync.propagator.download", Q
 // Always coming in with forward slashes.
 // In csync_excluded_no_ctx we ignore all files with longer than 254 chars
 // This function also adds a dot at the beginning of the filename to hide the file on OS X and Linux
-QString OWNCLOUDSYNC_EXPORT createDownloadTmpFileName (QString &previous) {
-    QString tmpFileName;
-    QString tmpPath;
+string OWNCLOUDSYNC_EXPORT createDownloadTmpFileName (string &previous) {
+    string tmpFileName;
+    string tmpPath;
     int slashPos = previous.lastIndexOf ('/');
     // work with both pathed filenames and only filenames
     if (slashPos == -1) {
         tmpFileName = previous;
-        tmpPath = QString ();
+        tmpPath = string ();
     } else {
         tmpFileName = previous.mid (slashPos + 1);
         tmpPath = previous.left (slashPos);
@@ -49,14 +41,14 @@ QString OWNCLOUDSYNC_EXPORT createDownloadTmpFileName (QString &previous) {
     int overhead = 1 + 1 + 2 + 8; // slash dot dot-tilde ffffffff"
     int spaceForFileName = qMin (254, tmpFileName.length () + overhead) - overhead;
     if (tmpPath.length () > 0) {
-        return tmpPath + '/' + '.' + tmpFileName.left (spaceForFileName) + ".~" + (QString.number (uint (Utility.rand () % 0xFFFFFFFF), 16));
+        return tmpPath + '/' + '.' + tmpFileName.left (spaceForFileName) + ".~" + (string.number (uint (Utility.rand () % 0xFFFFFFFF), 16));
     } else {
-        return '.' + tmpFileName.left (spaceForFileName) + ".~" + (QString.number (uint (Utility.rand () % 0xFFFFFFFF), 16));
+        return '.' + tmpFileName.left (spaceForFileName) + ".~" + (string.number (uint (Utility.rand () % 0xFFFFFFFF), 16));
     }
 }
 
 // DOES NOT take ownership of the device.
-GETFileJob.GETFileJob (AccountPtr account, QString &path, QIODevice *device,
+GETFileJob.GETFileJob (AccountPtr account, string &path, QIODevice *device,
     const QMap<QByteArray, QByteArray> &headers, QByteArray &expectedEtagForResume,
     int64 resumeStart, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent)
@@ -341,14 +333,14 @@ void GETFileJob.onTimedOut () {
     reply ().abort ();
 }
 
-QString GETFileJob.errorString () {
+string GETFileJob.errorString () {
     if (!_errorString.isEmpty ()) {
         return _errorString;
     }
     return AbstractNetworkJob.errorString ();
 }
 
-GETEncryptedFileJob.GETEncryptedFileJob (AccountPtr account, QString &path, QIODevice *device,
+GETEncryptedFileJob.GETEncryptedFileJob (AccountPtr account, string &path, QIODevice *device,
     const QMap<QByteArray, QByteArray> &headers, QByteArray &expectedEtagForResume,
     int64 resumeStart, EncryptedFile encryptedInfo, GLib.Object *parent)
     : GETFileJob (account, path, device, headers, expectedEtagForResume, resumeStart, parent)
@@ -423,7 +415,7 @@ void PropagateDownloadFile.start () {
 
     const auto path = _item._file;
     const auto slashPosition = path.lastIndexOf ('/');
-    const auto parentPath = slashPosition >= 0 ? path.left (slashPosition) : QString ();
+    const auto parentPath = slashPosition >= 0 ? path.left (slashPosition) : string ();
 
     SyncJournalFileRecord parentRec;
     propagator ()._journal.getFileRecord (parentPath, &parentRec);
@@ -455,7 +447,7 @@ void PropagateDownloadFile.startAfterIsEncryptedIsChecked () {
 
     // For virtual files just dehydrate or create the file and be done
     if (_item._type == ItemTypeVirtualFileDehydration) {
-        QString fsPath = propagator ().fullLocalPath (_item._file);
+        string fsPath = propagator ().fullLocalPath (_item._file);
         if (!FileSystem.verifyFileUnchanged (fsPath, _item._previousSize, _item._previousModtime)) {
             propagator ()._anotherSyncNeeded = true;
             done (SyncFileItem.SoftError, tr ("File has changed since discovery"));
@@ -593,7 +585,7 @@ void PropagateDownloadFile.startDownload () {
 
     propagator ().reportProgress (*_item, 0);
 
-    QString tmpFileName;
+    string tmpFileName;
     QByteArray expectedEtagForResume;
     const SyncJournalDb.DownloadInfo progressInfo = propagator ()._journal.getDownloadInfo (_item._file);
     if (progressInfo._valid) {
@@ -770,7 +762,7 @@ void PropagateDownloadFile.slotGetFinished () {
         }
 
         QByteArray errorBody;
-        QString errorString = _item._httpErrorCode >= 400 ? job.errorStringParsingBody (&errorBody)
+        string errorString = _item._httpErrorCode >= 400 ? job.errorStringParsingBody (&errorBody)
                                                            : job.errorString ();
         SyncFileItem.Status status = job.errorStatus ();
         if (status == SyncFileItem.NoStatus) {
@@ -881,14 +873,14 @@ void PropagateDownloadFile.slotGetFinished () {
     validator.start (_tmpFile.fileName (), checksumHeader);
 }
 
-void PropagateDownloadFile.slotChecksumFail (QString &errMsg) {
+void PropagateDownloadFile.slotChecksumFail (string &errMsg) {
     FileSystem.remove (_tmpFile.fileName ());
     propagator ()._anotherSyncNeeded = true;
     done (SyncFileItem.SoftError, errMsg); // tr ("The file downloaded with a broken checksum, will be redownloaded."));
 }
 
 void PropagateDownloadFile.deleteExistingFolder () {
-    QString existingDir = propagator ().fullLocalPath (_item._file);
+    string existingDir = propagator ().fullLocalPath (_item._file);
     if (!QFileInfo (existingDir).isDir ()) {
         return;
     }
@@ -902,15 +894,15 @@ void PropagateDownloadFile.deleteExistingFolder () {
         // on error, just try to move it away...
     }
 
-    QString error;
+    string error;
     if (!propagator ().createConflict (_item, _associatedComposite, &error)) {
         done (SyncFileItem.NormalError, error);
     }
 }
 
 namespace { // Anonymous namespace for the recall feature
-    static QString makeRecallFileName (QString &fn) {
-        QString recallFileName (fn);
+    static string makeRecallFileName (string &fn) {
+        string recallFileName (fn);
         // Add _recall-XXXX  before the extension.
         int dotLocation = recallFileName.lastIndexOf ('.');
         // If no extension, add it at the end  (take care of cases like foo/.hidden or foo.bar/file)
@@ -918,13 +910,13 @@ namespace { // Anonymous namespace for the recall feature
             dotLocation = recallFileName.size ();
         }
 
-        QString timeString = QDateTime.currentDateTimeUtc ().toString ("yyyyMMdd-hhmmss");
+        string timeString = QDateTime.currentDateTimeUtc ().toString ("yyyyMMdd-hhmmss");
         recallFileName.insert (dotLocation, "_.sys.admin#recall#-" + timeString);
 
         return recallFileName;
     }
 
-    void handleRecallFile (QString &filePath, QString &folderPath, SyncJournalDb &journal) {
+    void handleRecallFile (string &filePath, string &folderPath, SyncJournalDb &journal) {
         qCDebug (lcPropagateDownload) << "handleRecallFile : " << filePath;
 
         FileSystem.setFileHidden (filePath, true);
@@ -941,14 +933,14 @@ namespace { // Anonymous namespace for the recall feature
             QByteArray line = file.readLine ();
             line.chop (1); // remove trailing \n
 
-            QString recalledFile = QDir.cleanPath (baseDir.filePath (line));
+            string recalledFile = QDir.cleanPath (baseDir.filePath (line));
             if (!recalledFile.startsWith (folderPath) || !recalledFile.startsWith (baseDir.path ())) {
                 qCWarning (lcPropagateDownload) << "Ignoring recall of " << recalledFile;
                 continue;
             }
 
             // Path of the recalled file in the local folder
-            QString localRecalledFile = recalledFile.mid (folderPath.size ());
+            string localRecalledFile = recalledFile.mid (folderPath.size ());
 
             SyncJournalFileRecord record;
             if (!journal.getFileRecord (localRecalledFile, &record) || !record.isValid ()) {
@@ -958,7 +950,7 @@ namespace { // Anonymous namespace for the recall feature
 
             qCInfo (lcPropagateDownload) << "Recalling" << localRecalledFile << "Checksum:" << record._checksumHeader;
 
-            QString targetPath = makeRecallFileName (recalledFile);
+            string targetPath = makeRecallFileName (recalledFile);
 
             qCDebug (lcPropagateDownload) << "Copy recall file : " << recalledFile << " . " << targetPath;
             // Remove the target first, QFile.copy will not overwrite it.
@@ -967,12 +959,12 @@ namespace { // Anonymous namespace for the recall feature
         }
     }
 
-    static void preserveGroupOwnership (QString &fileName, QFileInfo &fi) {
+    static void preserveGroupOwnership (string &fileName, QFileInfo &fi) {
 #ifdef Q_OS_UNIX
         int chownErr = chown (fileName.toLocal8Bit ().constData (), -1, fi.groupId ());
         if (chownErr) {
             // TODO : Consider further error handling!
-            qCWarning (lcPropagateDownload) << QString ("preserveGroupOwnership : chown error %1 : setting group %2 failed on file %3").arg (chownErr).arg (fi.groupId ()).arg (fileName);
+            qCWarning (lcPropagateDownload) << string ("preserveGroupOwnership : chown error %1 : setting group %2 failed on file %3").arg (chownErr).arg (fi.groupId ()).arg (fileName);
         }
 #else
         Q_UNUSED (fileName);
@@ -1018,7 +1010,7 @@ void PropagateDownloadFile.contentChecksumComputed (QByteArray &checksumType, QB
 
 void PropagateDownloadFile.downloadFinished () {
     ASSERT (!_tmpFile.isOpen ());
-    QString fn = propagator ().fullLocalPath (_item._file);
+    string fn = propagator ().fullLocalPath (_item._file);
 
     // In case of file name clash, report an error
     // This can happen if another parallel download saved a clashing file.
@@ -1073,7 +1065,7 @@ void PropagateDownloadFile.downloadFinished () {
     bool isConflict = _item._instruction == CSYNC_INSTRUCTION_CONFLICT
         && (QFileInfo (fn).isDir () || !FileSystem.fileEquals (fn, _tmpFile.fileName ()));
     if (isConflict) {
-        QString error;
+        string error;
         if (!propagator ().createConflict (_item, _associatedComposite, &error)) {
             done (SyncFileItem.SoftError, error);
             return;
@@ -1101,11 +1093,11 @@ void PropagateDownloadFile.downloadFinished () {
         }
     }
 
-    QString error;
+    string error;
     emit propagator ().touchedFile (fn);
     // The fileChanged () check is done above to generate better error messages.
     if (!FileSystem.uncheckedRenameReplace (_tmpFile.fileName (), fn, &error)) {
-        qCWarning (lcPropagateDownload) << QString ("Rename failed : %1 => %2").arg (_tmpFile.fileName ()).arg (fn);
+        qCWarning (lcPropagateDownload) << string ("Rename failed : %1 => %2").arg (_tmpFile.fileName ()).arg (fn);
         // If the file is locked, we want to retry this sync when it
         // becomes available again, otherwise try again directly
         if (FileSystem.isFileLocked (fn)) {
@@ -1133,7 +1125,7 @@ void PropagateDownloadFile.downloadFinished () {
         // If the virtual file used to have a different name and db
         // entry, remove it transfer its old pin state.
         if (_item._type == ItemTypeVirtualFileDownload) {
-            QString virtualFile = _item._file + vfs.fileSuffix ();
+            string virtualFile = _item._file + vfs.fileSuffix ();
             auto fn = propagator ().fullLocalPath (virtualFile);
             qCDebug (lcPropagateDownload) << "Download of previous virtual file finished" << fn;
             QFile.remove (fn);
@@ -1163,7 +1155,7 @@ void PropagateDownloadFile.downloadFinished () {
 }
 
 void PropagateDownloadFile.updateMetadata (bool isConflict) {
-    const QString fn = propagator ().fullLocalPath (_item._file);
+    const string fn = propagator ().fullLocalPath (_item._file);
     const auto result = propagator ().updateMetadata (*_item);
     if (!result) {
         done (SyncFileItem.FatalError, tr ("Error updating metadata : %1").arg (result.error ()));

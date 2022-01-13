@@ -1,9 +1,9 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
 
-*/
+***********************************************************/
 
 // #include <qglobal.h>
 // #include <QTemporaryDir>
@@ -23,7 +23,7 @@ private slots:
 //        QDir dirToRemove (dir.path ());
 //        QVERIFY (dirToRemove.mkpath ("nextcloud"));
 
-//        QString dirPath = dirToRemove.canonicalPath ();
+//        string dirPath = dirToRemove.canonicalPath ();
 
 //        AccountPtr account = Account.create ();
 //        QVERIFY (account);

@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <QLoggingCategory>
 
@@ -41,7 +33,7 @@ bool xattrSet (QByteArray &path, QByteArray &name, QByteArray &value) {
 
 }
 
-bool Occ.XAttrWrapper.hasNextcloudPlaceholderAttributes (QString &path) {
+bool Occ.XAttrWrapper.hasNextcloudPlaceholderAttributes (string &path) {
     const auto value = xattrGet (path.toUtf8 (), hydrateExecAttributeName);
     if (value) {
         return *value == QByteArrayLiteral (APPLICATION_EXECUTABLE);
@@ -50,7 +42,7 @@ bool Occ.XAttrWrapper.hasNextcloudPlaceholderAttributes (QString &path) {
     }
 }
 
-Occ.Result<void, QString> Occ.XAttrWrapper.addNextcloudPlaceholderAttributes (QString &path) {
+Occ.Result<void, string> Occ.XAttrWrapper.addNextcloudPlaceholderAttributes (string &path) {
     const auto success = xattrSet (path.toUtf8 (), hydrateExecAttributeName, APPLICATION_EXECUTABLE);
     if (!success) {
         return QStringLiteral ("Failed to set the extended attribute");

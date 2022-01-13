@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <QRegularExpression>
 // #include <QLoggingCategory>
@@ -25,15 +17,15 @@ const QByteArray XRequestId (){
     return QByteArrayLiteral ("X-Request-ID");
 }
 
-bool isTextBody (QString &s) {
+bool isTextBody (string &s) {
     static const QRegularExpression regexp (QStringLiteral ("^ (text/.*| (application/ (xml|json|x-www-form-urlencoded) (;|$)))"));
     return regexp.match (s).hasMatch ();
 }
 
-void logHttp (QByteArray &verb, QString &url, QByteArray &id, QString &contentType, QList<QNetworkReply.RawHeaderPair> &header, QIODevice *device) {
+void logHttp (QByteArray &verb, string &url, QByteArray &id, string &contentType, QList<QNetworkReply.RawHeaderPair> &header, QIODevice *device) {
     const auto reply = qobject_cast<QNetworkReply> (device);
     const auto contentLength = device ? device.size () : 0;
-    QString msg;
+    string msg;
     QTextStream stream (&msg);
     stream << id << " : ";
     if (!reply) {

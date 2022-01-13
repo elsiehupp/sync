@@ -1,17 +1,9 @@
-/*
+/***********************************************************
 Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <unistd.h>
 
@@ -53,14 +45,14 @@ Reasons this delay can't be very small:
 - it takes time for the change notification to arrive and to be processed by th
 - some time could pass between the client recording that a file will be touched
   and its filesystem operation finishing, triggering the notification
-*/
+***********************************************************/
 static const std.chrono.milliseconds s_touchedFilesMaxAgeMs (3 * 1000);
 
 // doc in header
 std.chrono.milliseconds SyncEngine.minimumFileAgeForUpload (2000);
 
-SyncEngine.SyncEngine (AccountPtr account, QString &localPath,
-    const QString &remotePath, Occ.SyncJournalDb *journal)
+SyncEngine.SyncEngine (AccountPtr account, string &localPath,
+    const string &remotePath, Occ.SyncJournalDb *journal)
     : _account (account)
     , _needsUpdate (false)
     , _syncRunning (false)
@@ -100,12 +92,12 @@ SyncEngine.~SyncEngine () {
     _excludedFiles.reset ();
 }
 
-/**
+/***********************************************************
 Check if the item is in the blacklist.
 If it should not be sync'ed because of the blacklist, update the item with the error instruction
 and proper error message, and return true.
 If the item is not in the blacklist, or the blacklist is stale, return false.
-*/
+***********************************************************/
 bool SyncEngine.checkErrorBlacklisting (SyncFileItem &item) {
     if (!_journal) {
         qCCritical (lcEngine) << "Journal is undefined!";
@@ -182,7 +174,7 @@ static bool isFileTransferInstruction (SyncInstructions instruction) {
 
 void SyncEngine.deleteStaleDownloadInfos (SyncFileItemVector &syncItems) {
     // Find all downloadinfo paths that we want to preserve.
-    QSet<QString> download_file_paths;
+    QSet<string> download_file_paths;
     foreach (SyncFileItemPtr &it, syncItems) {
         if (it._direction == SyncFileItem.Down
             && it._type == ItemTypeFile
@@ -195,7 +187,7 @@ void SyncEngine.deleteStaleDownloadInfos (SyncFileItemVector &syncItems) {
     const QVector<SyncJournalDb.DownloadInfo> deleted_infos =
         _journal.getAndDeleteStaleDownloadInfos (download_file_paths);
     foreach (SyncJournalDb.DownloadInfo &deleted_info, deleted_infos) {
-        const QString tmppath = _propagator.fullLocalPath (deleted_info._tmpfile);
+        const string tmppath = _propagator.fullLocalPath (deleted_info._tmpfile);
         qCInfo (lcEngine) << "Deleting stale temporary file : " << tmppath;
         FileSystem.remove (tmppath);
     }
@@ -203,7 +195,7 @@ void SyncEngine.deleteStaleDownloadInfos (SyncFileItemVector &syncItems) {
 
 void SyncEngine.deleteStaleUploadInfos (SyncFileItemVector &syncItems) {
     // Find all blacklisted paths that we want to preserve.
-    QSet<QString> upload_file_paths;
+    QSet<string> upload_file_paths;
     foreach (SyncFileItemPtr &it, syncItems) {
         if (it._direction == SyncFileItem.Up
             && it._type == ItemTypeFile
@@ -220,7 +212,7 @@ void SyncEngine.deleteStaleUploadInfos (SyncFileItemVector &syncItems) {
         foreach (uint transferId, ids) {
             if (!transferId)
                 continue; // Was not a chunked upload
-            QUrl url = Utility.concatUrlPath (account ().url (), QLatin1String ("remote.php/dav/uploads/") + account ().davUser () + QLatin1Char ('/') + QString.number (transferId));
+            QUrl url = Utility.concatUrlPath (account ().url (), QLatin1String ("remote.php/dav/uploads/") + account ().davUser () + QLatin1Char ('/') + string.number (transferId));
             (new DeleteJob (account (), url, this)).start ();
         }
     }
@@ -228,7 +220,7 @@ void SyncEngine.deleteStaleUploadInfos (SyncFileItemVector &syncItems) {
 
 void SyncEngine.deleteStaleErrorBlacklistEntries (SyncFileItemVector &syncItems) {
     // Find all blacklisted paths that we want to preserve.
-    QSet<QString> blacklist_file_paths;
+    QSet<string> blacklist_file_paths;
     foreach (SyncFileItemPtr &it, syncItems) {
         if (it._hasBlacklistEntry)
             blacklist_file_paths.insert (it._file);
@@ -249,7 +241,7 @@ void SyncEngine.conflictRecordMaintenance () {
     // missing ones.
     const auto conflictRecordPaths = _journal.conflictRecordPaths ();
     for (auto &path : conflictRecordPaths) {
-        auto fsPath = _propagator.fullLocalPath (QString.fromUtf8 (path));
+        auto fsPath = _propagator.fullLocalPath (string.fromUtf8 (path));
         if (!QFileInfo (fsPath).exists ()) {
             _journal.deleteConflictRecord (path);
         }
@@ -302,7 +294,7 @@ void Occ.SyncEngine.slotItemDiscovered (Occ.SyncFileItemPtr &item) {
         // mini-jobs later on, we just update metadata right now.
 
         if (item._direction == SyncFileItem.Down) {
-            QString filePath = _localPath + item._file;
+            string filePath = _localPath + item._file;
 
             // If the 'W' remote permission changed, update the local filesystem
             SyncJournalFileRecord prev;
@@ -457,7 +449,7 @@ void SyncEngine.startSync () {
         qCInfo (lcEngine) << "Sync with existing sync journal";
     }
 
-    QString verStr ("Using Qt ");
+    string verStr ("Using Qt ");
     verStr.append (qVersion ());
 
     verStr.append (" SSL library ").append (QSslSocket.sslLibraryVersionString ().toUtf8 ().data ());
@@ -513,7 +505,7 @@ void SyncEngine.startSync () {
     _discoveryPhase.reset (new DiscoveryPhase);
     _discoveryPhase._account = _account;
     _discoveryPhase._excludes = _excludedFiles.data ();
-    const QString excludeFilePath = _localPath + QStringLiteral (".sync-exclude.lst");
+    const string excludeFilePath = _localPath + QStringLiteral (".sync-exclude.lst");
     if (QFile.exists (excludeFilePath)) {
         _discoveryPhase._excludes.addExcludeFilePath (excludeFilePath);
         _discoveryPhase._excludes.reloadExcludeFiles ();
@@ -526,7 +518,7 @@ void SyncEngine.startSync () {
     if (!_discoveryPhase._remoteFolder.endsWith ('/'))
         _discoveryPhase._remoteFolder+='/';
     _discoveryPhase._syncOptions = _syncOptions;
-    _discoveryPhase._shouldDiscoverLocaly = [this] (QString &s) { return shouldDiscoverLocally (s); };
+    _discoveryPhase._shouldDiscoverLocaly = [this] (string &s) { return shouldDiscoverLocally (s); };
     _discoveryPhase.setSelectiveSyncBlackList (selectiveSyncBlackList);
     _discoveryPhase.setSelectiveSyncWhiteList (_journal.getSelectiveSyncList (SyncJournalDb.SelectiveSyncWhiteList, &ok));
     if (!ok) {
@@ -537,7 +529,7 @@ void SyncEngine.startSync () {
     }
 
     // Check for invalid character in old server version
-    QString invalidFilenamePattern = _account.capabilities ().invalidFilenameRegex ();
+    string invalidFilenamePattern = _account.capabilities ().invalidFilenameRegex ();
     if (invalidFilenamePattern.isNull ()
         && _account.serverVersionInt () < Account.makeServerVersion (8, 1, 0)) {
         // Server versions older than 8.1 don't support some characters in filenames.
@@ -554,7 +546,7 @@ void SyncEngine.startSync () {
 
     connect (_discoveryPhase.data (), &DiscoveryPhase.itemDiscovered, this, &SyncEngine.slotItemDiscovered);
     connect (_discoveryPhase.data (), &DiscoveryPhase.newBigFolder, this, &SyncEngine.newBigFolder);
-    connect (_discoveryPhase.data (), &DiscoveryPhase.fatalError, this, [this] (QString &errorString) {
+    connect (_discoveryPhase.data (), &DiscoveryPhase.fatalError, this, [this] (string &errorString) {
         Q_EMIT syncError (errorString);
         finalize (false);
     });
@@ -569,7 +561,7 @@ void SyncEngine.startSync () {
     connect (_discoveryPhase.data (), &DiscoveryPhase.addErrorToGui, this, &SyncEngine.addErrorToGui);
 }
 
-void SyncEngine.slotFolderDiscovered (bool local, QString &folder) {
+void SyncEngine.slotFolderDiscovered (bool local, string &folder) {
     // Don't wanna overload the UI
     if (!_lastUpdateProgressCallbackCall.isValid () || _lastUpdateProgressCallbackCall.elapsed () >= 200) {
         _lastUpdateProgressCallbackCall.start (); // first call or enough elapsed time
@@ -657,7 +649,7 @@ void SyncEngine.slotDiscoveryFinished () {
         // post update phase script : allow to tweak stuff by a custom script in debug mode.
         if (!qEnvironmentVariableIsEmpty ("OWNCLOUD_POST_UPDATE_SCRIPT")) {
     #ifndef NDEBUG
-            const QString script = qEnvironmentVariable ("OWNCLOUD_POST_UPDATE_SCRIPT");
+            const string script = qEnvironmentVariable ("OWNCLOUD_POST_UPDATE_SCRIPT");
 
             qCDebug (lcEngine) << "Post Update Script : " << script;
             auto scriptArgs = script.split (QRegularExpression ("\\s+"), Qt.SkipEmptyParts);
@@ -736,7 +728,7 @@ void SyncEngine.slotDiscoveryFinished () {
     finish ();
 }
 
-void SyncEngine.slotCleanPollsJobAborted (QString &error) {
+void SyncEngine.slotCleanPollsJobAborted (string &error) {
     syncError (error);
     finalize (false);
 }
@@ -844,10 +836,10 @@ void SyncEngine.restoreOldFiles (SyncFileItemVector &syncItems) {
     }
 }
 
-void SyncEngine.slotAddTouchedFile (QString &fn) {
+void SyncEngine.slotAddTouchedFile (string &fn) {
     QElapsedTimer now;
     now.start ();
-    QString file = QDir.cleanPath (fn);
+    string file = QDir.cleanPath (fn);
 
     // Iterate from the oldest and remove anything older than 15 seconds.
     while (true) {
@@ -873,7 +865,7 @@ void SyncEngine.slotClearTouchedFiles () {
     _touchedFiles.clear ();
 }
 
-bool SyncEngine.wasFileTouched (QString &fn) {
+bool SyncEngine.wasFileTouched (string &fn) {
     // Start from the end (most recent) and look for our path. Check the time just in case.
     auto begin = _touchedFiles.constBegin ();
     for (auto it = _touchedFiles.constEnd (); it != begin; --it) {
@@ -887,7 +879,7 @@ AccountPtr SyncEngine.account () {
     return _account;
 }
 
-void SyncEngine.setLocalDiscoveryOptions (LocalDiscoveryStyle style, std.set<QString> paths) {
+void SyncEngine.setLocalDiscoveryOptions (LocalDiscoveryStyle style, std.set<string> paths) {
     _localDiscoveryStyle = style;
     _localDiscoveryPaths = std.move (paths);
 
@@ -896,7 +888,7 @@ void SyncEngine.setLocalDiscoveryOptions (LocalDiscoveryStyle style, std.set<QSt
     // example, this will remove "foo.bar" if "foo" is in the list. This will mean we might have
     // some false positive, but that's Ok.
     // This invariant is used in SyncEngine.shouldDiscoverLocally
-    QString prev;
+    string prev;
     auto it = _localDiscoveryPaths.begin ();
     while (it != _localDiscoveryPaths.end ()) {
         if (!prev.isNull () && it.startsWith (prev) && (prev.endsWith ('/') || *it == prev || it.at (prev.size ()) <= '/')) {
@@ -908,7 +900,7 @@ void SyncEngine.setLocalDiscoveryOptions (LocalDiscoveryStyle style, std.set<QSt
     }
 }
 
-bool SyncEngine.shouldDiscoverLocally (QString &path) {
+bool SyncEngine.shouldDiscoverLocally (string &path) {
     if (_localDiscoveryStyle == LocalDiscoveryStyle.FilesystemOnly)
         return true;
 
@@ -945,7 +937,7 @@ bool SyncEngine.shouldDiscoverLocally (QString &path) {
     return false;
 }
 
-void SyncEngine.wipeVirtualFiles (QString &localPath, SyncJournalDb &journal, Vfs &vfs) {
+void SyncEngine.wipeVirtualFiles (string &localPath, SyncJournalDb &journal, Vfs &vfs) {
     qCInfo (lcEngine) << "Wiping virtual files inside" << localPath;
     journal.getFilesBelowPath (QByteArray (), [&] (SyncJournalFileRecord &rec) {
         if (rec._type != ItemTypeVirtualFile && rec._type != ItemTypeVirtualFileDownload)
@@ -956,7 +948,7 @@ void SyncEngine.wipeVirtualFiles (QString &localPath, SyncJournalDb &journal, Vf
 
         // If the local file is a dehydrated placeholder, wipe it too.
         // Otherwise leave it to allow the next sync to have a new-new conflict.
-        QString localFile = localPath + rec._path;
+        string localFile = localPath + rec._path;
         if (QFile.exists (localFile) && vfs.isDehydratedPlaceholder (localFile)) {
             qCDebug (lcEngine) << "Removing local dehydrated placeholder" << rec.path ();
             QFile.remove (localFile);
@@ -969,7 +961,7 @@ void SyncEngine.wipeVirtualFiles (QString &localPath, SyncJournalDb &journal, Vf
     // But hydrated placeholders may still be around.
 }
 
-void SyncEngine.switchToVirtualFiles (QString &localPath, SyncJournalDb &journal, Vfs &vfs) {
+void SyncEngine.switchToVirtualFiles (string &localPath, SyncJournalDb &journal, Vfs &vfs) {
     qCInfo (lcEngine) << "Convert to virtual files inside" << localPath;
     journal.getFilesBelowPath ({}, [&] (SyncJournalFileRecord &rec) {
         const auto path = rec.path ();
@@ -978,7 +970,7 @@ void SyncEngine.switchToVirtualFiles (QString &localPath, SyncJournalDb &journal
             return;
         }
         SyncFileItem item;
-        QString localFile = localPath + path;
+        string localFile = localPath + path;
         const auto result = vfs.convertToPlaceholder (localFile, item, localFile);
         if (!result.isValid ()) {
             qCWarning (lcEngine) << "Could not convert file to placeholder" << result.error ();
@@ -1004,7 +996,7 @@ void SyncEngine.abort () {
     }
 }
 
-void SyncEngine.slotSummaryError (QString &message) {
+void SyncEngine.slotSummaryError (string &message) {
     if (_uniqueErrors.contains (message))
         return;
 

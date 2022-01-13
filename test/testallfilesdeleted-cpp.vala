@@ -1,9 +1,9 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
 
-*/
+***********************************************************/
 
 // #include <QtTest>
 // #include <syncengine.h>
@@ -21,10 +21,10 @@ static void changeAllFileId (FileInfo &info) {
     }
 }
 
-/*
+/***********************************************************
 This test ensure that the SyncEngine.aboutToRemoveAllFiles is correctly called and that when
 we the user choose to remove all files SyncJournalDb.clearFileTable makes works as expected
-*/
+***********************************************************/
 class TestAllFilesDeleted : GLib.Object {
 
 private slots:
@@ -36,7 +36,7 @@ private slots:
 
     }
 
-    /*
+    /***********************************************************
      * In this test, all files are deleted in the client, or the server, and we simulate
      * that the users press "keep"
      */
@@ -85,7 +85,7 @@ private slots:
         testAllFilesDeletedKeep_data ();
     }
 
-    /*
+    /***********************************************************
      * This test is like the previous one but we simulate that the user presses "delete"
      */
     void testAllFilesDeletedDelete () {
@@ -120,7 +120,7 @@ private slots:
     }
 
     void testNotDeleteMetaDataChange () {
-        /**
+        /***********************************************************
          * This test make sure that we don't popup a file deleted message if all the metadata have
          * been updated (for example when the server is upgraded or something)
          **/

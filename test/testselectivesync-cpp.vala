@@ -1,9 +1,9 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
 
-*/
+***********************************************************/
 
 // #include <QtTest>
 // #include <syncengine.h>
@@ -53,7 +53,7 @@ private slots:
         QVERIFY (fakeFolder.syncOnce ());
 
         QCOMPARE (newBigFolder.count (), 1);
-        QCOMPARE (newBigFolder.first ()[0].toString (), QString ("A/newBigDir"));
+        QCOMPARE (newBigFolder.first ()[0].toString (), string ("A/newBigDir"));
         QCOMPARE (newBigFolder.first ()[1].toBool (), false);
         newBigFolder.clear ();
 
@@ -63,7 +63,7 @@ private slots:
 
         auto oldSync = fakeFolder.currentLocalState ();
         // syncing again should do the same
-        fakeFolder.syncEngine ().journal ().schedulePathForRemoteDiscovery (QString ("A/newBigDir"));
+        fakeFolder.syncEngine ().journal ().schedulePathForRemoteDiscovery (string ("A/newBigDir"));
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), oldSync);
         QCOMPARE (newBigFolder.count (), 1); // (since we don't have a real Folder, the files were not added to any list)
@@ -74,7 +74,7 @@ private slots:
         // Simulate that we accept all files by seting a wildcard white list
         fakeFolder.syncEngine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncWhiteList,
             QStringList () << QLatin1String ("/"));
-        fakeFolder.syncEngine ().journal ().schedulePathForRemoteDiscovery (QString ("A/newBigDir"));
+        fakeFolder.syncEngine ().journal ().schedulePathForRemoteDiscovery (string ("A/newBigDir"));
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (newBigFolder.count (), 0);
         QCOMPARE (sizeRequests.count (), 0);

@@ -1,4 +1,4 @@
-/*
+/***********************************************************
 libcsync -- a library to sync a directory with another
 
 Copyright (c) 2015-2013 by Klaas Freitag <freitag@owncloud.co
@@ -16,7 +16,7 @@ Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
-*/
+***********************************************************/
 // #include <sys/types.h>
 // #include <sys/stat.h>
 // #include <fcntl.h>
@@ -31,7 +31,7 @@ static const auto CSYNC_TEST_DIR = []{
 } ();
 
 namespace {
-int oc_mkdir (QString &path) {
+int oc_mkdir (string &path) {
     return QDir (path).mkpath (path) ? 0 : -1;
 }
 
@@ -97,10 +97,10 @@ static int teardown (void **state) {
 
 /* This function takes a relative path, prepends it with the CSYNC_TEST_DIR
 and creates each sub directory.
-*/
+***********************************************************/
 static void create_dirs ( const char *path ) {
   int rc = -1;
-  auto _mypath = QStringLiteral ("%1/%2").arg (CSYNC_TEST_DIR, QString.fromUtf8 (path)).toUtf8 ();
+  auto _mypath = QStringLiteral ("%1/%2").arg (CSYNC_TEST_DIR, string.fromUtf8 (path)).toUtf8 ();
   char *mypath = _mypath.data ();
 
   char *p = mypath + CSYNC_TEST_DIR.size () + 1; /* start behind the offset */
@@ -112,7 +112,7 @@ static void create_dirs ( const char *path ) {
     if ( * (p+i) == '/' ) {
       p[i] = '\0';
 
-      auto mb_dir = QString.fromUtf8 (mypath);
+      auto mb_dir = string.fromUtf8 (mypath);
       rc = oc_mkdir (mb_dir);
       if (rc) {
           rc = errno;
@@ -124,7 +124,7 @@ static void create_dirs ( const char *path ) {
   }
 }
 
-/*
+/***********************************************************
 This function uses the vio_opendir, vio_readdir and vio_closedir functions
 to traverse a file tree that was created before by the create_dir function.
 
@@ -134,8 +134,8 @@ that can be compared later to what was expected in the calling functions.
 The int parameter cnt contains the number of seen files (not dirs) in the
 whole tree.
 
-*/
-static void traverse_dir (void **state, QString &dir, int *cnt) {
+***********************************************************/
+static void traverse_dir (void **state, string &dir, int *cnt) {
     csync_vio_handle_t *dh = nullptr;
     std.unique_ptr<csync_file_stat_t> dirent;
     auto sv = (statevar*) *state;
@@ -177,7 +177,7 @@ static void traverse_dir (void **state, QString &dir, int *cnt) {
         }
         output (subdir_out.constData ());
         if ( is_dir ) {
-            traverse_dir (state, QString.fromUtf8 (subdir), cnt);
+            traverse_dir (state, string.fromUtf8 (subdir), cnt);
         }
     }
 
@@ -187,7 +187,7 @@ static void traverse_dir (void **state, QString &dir, int *cnt) {
 }
 
 static void create_file ( const char *path, char *name, char *content) {
-    QFile file (QStringLiteral ("%1/%2%3").arg (CSYNC_TEST_DIR, QString.fromUtf8 (path), QString.fromUtf8 (name)));
+    QFile file (QStringLiteral ("%1/%2%3").arg (CSYNC_TEST_DIR, string.fromUtf8 (path), string.fromUtf8 (name)));
     assert_int_equal (1, file.open (QIODevice.WriteOnly | QIODevice.NewOnly));
     file.write (content);
 }
@@ -202,7 +202,7 @@ static void check_readdir_shorttree (void **state) {
     traverse_dir (state, CSYNC_TEST_DIR, &files_cnt);
 
     assert_string_equal (sv.result.constData (),
-        QString.fromUtf8 ("<DIR> %1/alibaba"
+        string.fromUtf8 ("<DIR> %1/alibaba"
                           "<DIR> %1/alibaba/und"
                           "<DIR> %1/alibaba/und/die"
                           "<DIR> %1/alibaba/und/die/vierzig"
@@ -226,7 +226,7 @@ static void check_readdir_with_content (void **state) {
     traverse_dir (state, CSYNC_TEST_DIR, &files_cnt);
 
     assert_string_equal (sv.result.constData (),
-        QString.fromUtf8 ("<DIR> %1/warum"
+        string.fromUtf8 ("<DIR> %1/warum"
                           "<DIR> %1/warum/nur"
                           "<DIR> %1/warum/nur/40"
                           "<DIR> %1/warum/nur/40/Räuber")
@@ -249,7 +249,7 @@ static void check_readdir_longtree (void **state) {
     const char *t1 = "vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND/NE/BOTTLE/VOLL/RUM/undnochmalallezusammen/VierZig/MannaufDesTotenManns/KISTE/ooooooooooooooooooooooooooohhhhhh/und/BESSER/ZWEI/Butteln/VOLL RUM/";
     create_dirs ( t1 );
 
-    const auto r1 = QString.fromUtf8 (
+    const auto r1 = string.fromUtf8 (
 "<DIR> %1/vierzig"
 "<DIR> %1/vierzig/mann"
 "<DIR> %1/vierzig/mann/auf"
@@ -264,7 +264,7 @@ static void check_readdir_longtree (void **state) {
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll"
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum").arg (CSYNC_TEST_DIR);
 
-    const auto r2 = QString.fromUtf8 (
+    const auto r2 = string.fromUtf8 (
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und"
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so"
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen"
@@ -278,7 +278,7 @@ static void check_readdir_longtree (void **state) {
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE"
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH").arg (CSYNC_TEST_DIR);
 
-    const auto r3 = QString.fromUtf8 (
+    const auto r3 = string.fromUtf8 (
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND"
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND/NE"
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND/NE/BOTTLE"
@@ -312,7 +312,7 @@ static void check_readdir_bigunicode (void **state) {
 //    3 : ? ASCII : 191 - BF
 //    4 : ASCII : 32    - 20
 
-    QString p = QStringLiteral ("%1/%2").arg (CSYNC_TEST_DIR, QStringLiteral ("goodone/"));
+    string p = QStringLiteral ("%1/%2").arg (CSYNC_TEST_DIR, QStringLiteral ("goodone/"));
     int rc = oc_mkdir (p);
     assert_int_equal (rc, 0);
 

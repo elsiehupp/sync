@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <GLib.Object>
 // #include <QMetaType>
@@ -20,7 +12,7 @@ namespace Occ {
 
 ProgressDispatcher *ProgressDispatcher._instance = nullptr;
 
-QString Progress.asResultString (SyncFileItem &item) {
+string Progress.asResultString (SyncFileItem &item) {
     switch (item._instruction) {
     case CSYNC_INSTRUCTION_SYNC:
     case CSYNC_INSTRUCTION_NEW:
@@ -58,7 +50,7 @@ QString Progress.asResultString (SyncFileItem &item) {
     return QCoreApplication.translate ("progress", "Unknown");
 }
 
-QString Progress.asActionString (SyncFileItem &item) {
+string Progress.asActionString (SyncFileItem &item) {
     switch (item._instruction) {
     case CSYNC_INSTRUCTION_CONFLICT:
     case CSYNC_INSTRUCTION_SYNC:
@@ -84,7 +76,7 @@ QString Progress.asActionString (SyncFileItem &item) {
     case CSYNC_INSTRUCTION_EVAL:
         break;
     }
-    return QString ();
+    return string ();
 }
 
 bool Progress.isWarningKind (SyncFileItem.Status kind) {
@@ -112,7 +104,7 @@ ProgressDispatcher.ProgressDispatcher (GLib.Object *parent)
 
 ProgressDispatcher.~ProgressDispatcher () = default;
 
-void ProgressDispatcher.setProgressInfo (QString &folder, ProgressInfo &progress) {
+void ProgressDispatcher.setProgressInfo (string &folder, ProgressInfo &progress) {
     if (folder.isEmpty ())
     // The update phase now also has progress
     //            (progress._currentItems.size () == 0
@@ -312,7 +304,7 @@ void ProgressInfo.updateEstimates () {
     _fileProgress.update ();
 
     // Update progress of all running items.
-    QMutableHashIterator<QString, ProgressItem> it (_currentItems);
+    QMutableHashIterator<string, ProgressItem> it (_currentItems);
     while (it.hasNext ()) {
         it.next ();
         it.value ()._progress.update ();

@@ -1,9 +1,9 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
 
-*/
+***********************************************************/
 
 // #include <QtTest>
 // #include <syncengine.h>
@@ -197,12 +197,12 @@ private slots:
     void testCreateFileWithTrailingSpaces_localAndRemoteTrimmedDoNotExist_renameAndUploadFile () {
         FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
-        const QString fileWithSpaces1 (" foo");
-        const QString fileWithSpaces2 (" bar  ");
-        const QString fileWithSpaces3 ("bla ");
-        const QString fileWithSpaces4 ("A/ foo");
-        const QString fileWithSpaces5 ("A/ bar  ");
-        const QString fileWithSpaces6 ("A/bla ");
+        const string fileWithSpaces1 (" foo");
+        const string fileWithSpaces2 (" bar  ");
+        const string fileWithSpaces3 ("bla ");
+        const string fileWithSpaces4 ("A/ foo");
+        const string fileWithSpaces5 ("A/ bar  ");
+        const string fileWithSpaces6 ("A/bla ");
 
         fakeFolder.localModifier ().insert (fileWithSpaces1);
         fakeFolder.localModifier ().insert (fileWithSpaces2);
@@ -247,8 +247,8 @@ private slots:
     void testCreateFileWithTrailingSpaces_localTrimmedDoesExist_dontRenameAndUploadFile () {
         FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
-        const QString fileWithSpaces (" foo");
-        const QString fileTrimmed ("foo");
+        const string fileWithSpaces (" foo");
+        const string fileTrimmed ("foo");
 
         fakeFolder.localModifier ().insert (fileTrimmed);
         QVERIFY (fakeFolder.syncOnce ());
@@ -264,8 +264,8 @@ private slots:
     void testCreateFileWithTrailingSpaces_localTrimmedAlsoCreated_dontRenameAndUploadFile () {
         FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
-        const QString fileWithSpaces (" foo");
-        const QString fileTrimmed ("foo");
+        const string fileWithSpaces (" foo");
+        const string fileTrimmed ("foo");
 
         fakeFolder.localModifier ().insert (fileTrimmed);
         fakeFolder.localModifier ().insert (fileWithSpaces);

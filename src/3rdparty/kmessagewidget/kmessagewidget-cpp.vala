@@ -3,21 +3,8 @@
 Copyright (c) 2011 Aurélien Gâteau <agateau@kde.org>
 Copyright (c) 2014 Dominik Haumann <dhaumann@kde.org>
 
-This library is free software; you can redistribute it and
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later versi
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GN
-Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-02110-1301  USA
-*/
+<LGPLv2.1-or-later-Boilerplate>
+***********************************************************/
 
 // #include <QAction>
 // #include <QApplication>
@@ -199,7 +186,7 @@ void KMessageWidgetPrivate.applyStyleSheet () {
     const QColor bgFinalColor = QColor (newRed, newGreen, newBlue);
 
     content.setStyleSheet (
-        QString.fromLatin1 (".QFrame {"
+        string.fromLatin1 (".QFrame {"
                               "background-color : %1;"
                               "border-radius : 4px;"
                               "border : 2px solid %2;"
@@ -222,14 +209,14 @@ void KMessageWidgetPrivate.updateLayout () {
 }
 
 void KMessageWidgetPrivate.updateSnapShot () {
-    // Attention : updateSnapShot calls QWidget.render (), which causes the whole
+    // Attention : updateSnapShot calls Gtk.Widget.render (), which causes the whole
     // window layouts to be activated. Calling this method from resizeEvent ()
     // can lead to infinite recursion, see:
     // https://bugs.kde.org/show_bug.cgi?id=311336
     contentSnapShot = QPixmap (content.size () * q.devicePixelRatio ());
     contentSnapShot.setDevicePixelRatio (q.devicePixelRatio ());
     contentSnapShot.fill (Qt.transparent);
-    content.render (&contentSnapShot, QPoint (), QRegion (), QWidget.DrawChildren);
+    content.render (&contentSnapShot, QPoint (), QRegion (), Gtk.Widget.DrawChildren);
 }
 
 void KMessageWidgetPrivate.slotTimeLineChanged (qreal value) {
@@ -264,13 +251,13 @@ int KMessageWidgetPrivate.bestContentHeight () {
 //---------------------------------------------------------------------
 // KMessageWidget
 //---------------------------------------------------------------------
-KMessageWidget.KMessageWidget (QWidget *parent)
+KMessageWidget.KMessageWidget (Gtk.Widget *parent)
     : QFrame (parent)
     , d (new KMessageWidgetPrivate) {
     d.init (this);
 }
 
-KMessageWidget.KMessageWidget (QString &text, QWidget *parent)
+KMessageWidget.KMessageWidget (string &text, Gtk.Widget *parent)
     : QFrame (parent)
     , d (new KMessageWidgetPrivate) {
     d.init (this);
@@ -281,11 +268,11 @@ KMessageWidget.~KMessageWidget () {
     delete d;
 }
 
-QString KMessageWidget.text () {
+string KMessageWidget.text () {
     return d.textLabel.text ();
 }
 
-void KMessageWidget.setText (QString &text) {
+void KMessageWidget.setText (string &text) {
     d.textLabel.setText (text);
     updateGeometry ();
 }

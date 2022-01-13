@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <QTest>
 
@@ -26,7 +18,7 @@ private slots:
     void testHidpiFileName_darkBackground_returnPathToWhiteIcon () {
         FakePaintDevice paintDevice;
         const QColor backgroundColor ("#000000");
-        const QString iconName ("icon-name");
+        const string iconName ("icon-name");
 
         const auto iconPath = Occ.Theme.hidpiFileName (iconName + ".png", backgroundColor, &paintDevice);
 
@@ -36,7 +28,7 @@ private slots:
     void testHidpiFileName_lightBackground_returnPathToBlackIcon () {
         FakePaintDevice paintDevice;
         const QColor backgroundColor ("#ffffff");
-        const QString iconName ("icon-name");
+        const string iconName ("icon-name");
 
         const auto iconPath = Occ.Theme.hidpiFileName (iconName + ".png", backgroundColor, &paintDevice);
 
@@ -47,7 +39,7 @@ private slots:
         FakePaintDevice paintDevice;
         paintDevice.setHidpi (true);
         const QColor backgroundColor ("#000000");
-        const QString iconName ("wizard-files");
+        const string iconName ("wizard-files");
 
         const auto iconPath = Occ.Theme.hidpiFileName (iconName + ".png", backgroundColor, &paintDevice);
 

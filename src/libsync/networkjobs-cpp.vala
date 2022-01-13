@@ -1,17 +1,9 @@
-/*
+/***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <QJsonDocument>
 // #include <QLoggingCategory>
@@ -67,7 +59,7 @@ QByteArray parseEtag (char *header) {
     return arr;
 }
 
-RequestEtagJob.RequestEtagJob (AccountPtr account, QString &path, GLib.Object *parent)
+RequestEtagJob.RequestEtagJob (AccountPtr account, string &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 }
 
@@ -106,7 +98,7 @@ bool RequestEtagJob.finished () {
         while (!reader.atEnd ()) {
             QXmlStreamReader.TokenType type = reader.readNext ();
             if (type == QXmlStreamReader.StartElement && reader.namespaceUri () == QLatin1String ("DAV:")) {
-                QString name = reader.name ().toString ();
+                string name = reader.name ().toString ();
                 if (name == QLatin1String ("getetag")) {
                     auto etagText = reader.readElementText ();
                     auto parsedTag = parseEtag (etagText.toUtf8 ());
@@ -118,7 +110,7 @@ bool RequestEtagJob.finished () {
                 }
             }
         }
-        emit etagRetrieved (etag, QDateTime.fromString (QString.fromUtf8 (_responseTimestamp), Qt.RFC2822Date));
+        emit etagRetrieved (etag, QDateTime.fromString (string.fromUtf8 (_responseTimestamp), Qt.RFC2822Date));
         emit finishedWithResult (etag);
     } else {
         emit finishedWithResult (HttpError{ httpCode, errorString () });
@@ -126,20 +118,20 @@ bool RequestEtagJob.finished () {
     return true;
 }
 
-/*********************************************************************************************/
+/****************************************************************************/
 
-MkColJob.MkColJob (AccountPtr account, QString &path, GLib.Object *parent)
+MkColJob.MkColJob (AccountPtr account, string &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 }
 
-MkColJob.MkColJob (AccountPtr account, QString &path, QMap<QByteArray, QByteArray> &extraHeaders, GLib.Object *parent)
+MkColJob.MkColJob (AccountPtr account, string &path, QMap<QByteArray, QByteArray> &extraHeaders, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent)
     , _extraHeaders (extraHeaders) {
 }
 
 MkColJob.MkColJob (AccountPtr account, QUrl &url,
     const QMap<QByteArray, QByteArray> &extraHeaders, GLib.Object *parent)
-    : AbstractNetworkJob (account, QString (), parent)
+    : AbstractNetworkJob (account, string (), parent)
     , _url (url)
     , _extraHeaders (extraHeaders) {
 }
@@ -173,10 +165,10 @@ bool MkColJob.finished () {
     return true;
 }
 
-/*********************************************************************************************/
+/****************************************************************************/
 // supposed to read <D:collection> when pointing to <D:resourcetype><D:collection></D:resourcetype>..
-static QString readContentsAsString (QXmlStreamReader &reader) {
-    QString result;
+static string readContentsAsString (QXmlStreamReader &reader) {
+    string result;
     int level = 0;
     do {
         QXmlStreamReader.TokenType type = reader.readNext ();
@@ -199,15 +191,15 @@ static QString readContentsAsString (QXmlStreamReader &reader) {
 
 LsColXMLParser.LsColXMLParser () = default;
 
-bool LsColXMLParser.parse (QByteArray &xml, QHash<QString, ExtraFolderInfo> *fileInfo, QString &expectedPath) {
+bool LsColXMLParser.parse (QByteArray &xml, QHash<string, ExtraFolderInfo> *fileInfo, string &expectedPath) {
     // Parse DAV response
     QXmlStreamReader reader (xml);
     reader.addExtraNamespaceDeclaration (QXmlStreamNamespaceDeclaration ("d", "DAV:"));
 
     QStringList folders;
-    QString currentHref;
-    QMap<QString, QString> currentTmpProperties;
-    QMap<QString, QString> currentHttp200Properties;
+    string currentHref;
+    QMap<string, string> currentTmpProperties;
+    QMap<string, string> currentHttp200Properties;
     bool currentPropsHaveHttp200 = false;
     bool insidePropstat = false;
     bool insideProp = false;
@@ -215,13 +207,13 @@ bool LsColXMLParser.parse (QByteArray &xml, QHash<QString, ExtraFolderInfo> *fil
 
     while (!reader.atEnd ()) {
         QXmlStreamReader.TokenType type = reader.readNext ();
-        QString name = reader.name ().toString ();
+        string name = reader.name ().toString ();
         // Start elements with DAV:
         if (type == QXmlStreamReader.StartElement && reader.namespaceUri () == QLatin1String ("DAV:")) {
             if (name == QLatin1String ("href")) {
                 // We don't use URL encoding in our request URL (which is the expected path) (QNAM will do it for us)
                 // but the result will have URL encoding..
-                QString hrefString = QUrl.fromLocalFile (QUrl.fromPercentEncoding (reader.readElementText ().toUtf8 ()))
+                string hrefString = QUrl.fromLocalFile (QUrl.fromPercentEncoding (reader.readElementText ().toUtf8 ()))
                         .adjusted (QUrl.NormalizePathSegments)
                         .path ();
                 if (!hrefString.startsWith (expectedPath)) {
@@ -233,7 +225,7 @@ bool LsColXMLParser.parse (QByteArray &xml, QHash<QString, ExtraFolderInfo> *fil
             } else if (name == QLatin1String ("propstat")) {
                 insidePropstat = true;
             } else if (name == QLatin1String ("status") && insidePropstat) {
-                QString httpStatus = reader.readElementText ();
+                string httpStatus = reader.readElementText ();
                 if (httpStatus.startsWith ("HTTP/1.1 200")) {
                     currentPropsHaveHttp200 = true;
                 } else {
@@ -250,7 +242,7 @@ bool LsColXMLParser.parse (QByteArray &xml, QHash<QString, ExtraFolderInfo> *fil
 
         if (type == QXmlStreamReader.StartElement && insidePropstat && insideProp) {
             // All those elements are properties
-            QString propertyContent = readContentsAsString (reader);
+            string propertyContent = readContentsAsString (reader);
             if (name == QLatin1String ("resourcetype") && propertyContent.contains ("collection")) {
                 folders.append (currentHref);
             } else if (name == QLatin1String ("size")) {
@@ -278,7 +270,7 @@ bool LsColXMLParser.parse (QByteArray &xml, QHash<QString, ExtraFolderInfo> *fil
                 } else if (reader.name () == "propstat") {
                     insidePropstat = false;
                     if (currentPropsHaveHttp200) {
-                        currentHttp200Properties = QMap<QString, QString> (currentTmpProperties);
+                        currentHttp200Properties = QMap<string, string> (currentTmpProperties);
                     }
                     currentTmpProperties.clear ();
                     currentPropsHaveHttp200 = false;
@@ -303,14 +295,14 @@ bool LsColXMLParser.parse (QByteArray &xml, QHash<QString, ExtraFolderInfo> *fil
     return true;
 }
 
-/*********************************************************************************************/
+/****************************************************************************/
 
-LsColJob.LsColJob (AccountPtr account, QString &path, GLib.Object *parent)
+LsColJob.LsColJob (AccountPtr account, string &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 }
 
 LsColJob.LsColJob (AccountPtr account, QUrl &url, GLib.Object *parent)
-    : AbstractNetworkJob (account, QString (), parent)
+    : AbstractNetworkJob (account, string (), parent)
     , _url (url) {
 }
 
@@ -368,7 +360,7 @@ bool LsColJob.finished () {
     qCInfo (lcLsColJob) << "LSCOL of" << reply ().request ().url () << "FINISHED WITH STATUS"
                        << replyStatusString ();
 
-    QString contentType = reply ().header (QNetworkRequest.ContentTypeHeader).toString ();
+    string contentType = reply ().header (QNetworkRequest.ContentTypeHeader).toString ();
     int httpCode = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).toInt ();
     if (httpCode == 207 && contentType.contains ("application/xml; charset=utf-8")) {
         LsColXMLParser parser;
@@ -381,7 +373,7 @@ bool LsColJob.finished () {
         connect (&parser, &LsColXMLParser.finishedWithoutError,
             this, &LsColJob.finishedWithoutError);
 
-        QString expectedPath = reply ().request ().url ().path (); // something like "/owncloud/remote.php/dav/folder"
+        string expectedPath = reply ().request ().url ().path (); // something like "/owncloud/remote.php/dav/folder"
         if (!parser.parse (reply ().readAll (), &_folderInfos, expectedPath)) {
             // XML parse error
             emit finishedWithError (reply ());
@@ -394,7 +386,7 @@ bool LsColJob.finished () {
     return true;
 }
 
-/*********************************************************************************************/
+/****************************************************************************/
 
 namespace {
     const char statusphpC[] = "status.php";
@@ -428,11 +420,11 @@ void CheckServerJob.onTimedOut () {
     deleteLater ();
 }
 
-QString CheckServerJob.version (QJsonObject &info) {
+string CheckServerJob.version (QJsonObject &info) {
     return info.value (QLatin1String ("version")).toString ();
 }
 
-QString CheckServerJob.versionString (QJsonObject &info) {
+string CheckServerJob.versionString (QJsonObject &info) {
     return info.value (QLatin1String ("versionstring")).toString ();
 }
 
@@ -461,7 +453,7 @@ void CheckServerJob.slotRedirected (QNetworkReply *reply, QUrl &targetUrl, int r
     slashStatusPhp.append (statusphpC);
 
     int httpCode = reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).toInt ();
-    QString path = targetUrl.path ();
+    string path = targetUrl.path ();
     if ( (httpCode == 301 || httpCode == 308) // permanent redirection
         && redirectCount == _permanentRedirects // don't apply permanent redirects after a temporary one
         && path.endsWith (slashStatusPhp)) {
@@ -521,9 +513,9 @@ bool CheckServerJob.finished () {
     return true;
 }
 
-/*********************************************************************************************/
+/****************************************************************************/
 
-PropfindJob.PropfindJob (AccountPtr account, QString &path, GLib.Object *parent)
+PropfindJob.PropfindJob (AccountPtr account, string &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 }
 
@@ -583,7 +575,7 @@ bool PropfindJob.finished () {
 
         QVariantMap items;
         // introduced to nesting is ignored
-        QStack<QString> curElement;
+        QStack<string> curElement;
 
         while (!reader.atEnd ()) {
             QXmlStreamReader.TokenType type = reader.readNext ();
@@ -614,15 +606,15 @@ bool PropfindJob.finished () {
     return true;
 }
 
-/*********************************************************************************************/
+/****************************************************************************/
 
 #ifndef TOKEN_AUTH_ONLY
-AvatarJob.AvatarJob (AccountPtr account, QString &userId, int size, GLib.Object *parent)
-    : AbstractNetworkJob (account, QString (), parent) {
+AvatarJob.AvatarJob (AccountPtr account, string &userId, int size, GLib.Object *parent)
+    : AbstractNetworkJob (account, string (), parent) {
     if (account.serverVersionInt () >= Account.makeServerVersion (10, 0, 0)) {
-        _avatarUrl = Utility.concatUrlPath (account.url (), QString ("remote.php/dav/avatars/%1/%2.png").arg (userId, QString.number (size)));
+        _avatarUrl = Utility.concatUrlPath (account.url (), string ("remote.php/dav/avatars/%1/%2.png").arg (userId, string.number (size)));
     } else {
-        _avatarUrl = Utility.concatUrlPath (account.url (), QString ("index.php/avatar/%1/%2").arg (userId, QString.number (size)));
+        _avatarUrl = Utility.concatUrlPath (account.url (), string ("index.php/avatar/%1/%2").arg (userId, string.number (size)));
     }
 }
 
@@ -673,9 +665,9 @@ bool AvatarJob.finished () {
 }
 #endif
 
-/*********************************************************************************************/
+/****************************************************************************/
 
-ProppatchJob.ProppatchJob (AccountPtr account, QString &path, GLib.Object *parent)
+ProppatchJob.ProppatchJob (AccountPtr account, string &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 }
 
@@ -742,9 +734,9 @@ bool ProppatchJob.finished () {
     return true;
 }
 
-/*********************************************************************************************/
+/****************************************************************************/
 
-EntityExistsJob.EntityExistsJob (AccountPtr account, QString &path, GLib.Object *parent)
+EntityExistsJob.EntityExistsJob (AccountPtr account, string &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 }
 
@@ -758,9 +750,9 @@ bool EntityExistsJob.finished () {
     return true;
 }
 
-/*********************************************************************************************/
+/****************************************************************************/
 
-JsonApiJob.JsonApiJob (AccountPtr &account, QString &path, GLib.Object *parent)
+JsonApiJob.JsonApiJob (AccountPtr &account, string &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 }
 
@@ -825,7 +817,7 @@ bool JsonApiJob.finished () {
         return true;
     }
 
-    QString jsonStr = QString.fromUtf8 (reply ().readAll ());
+    string jsonStr = string.fromUtf8 (reply ().readAll ());
     if (jsonStr.contains ("<?xml version=\"1.0\"?>")) {
         const QRegularExpression rex ("<statuscode> (\\d+)</statuscode>");
         const auto rexMatch = rex.match (jsonStr);
@@ -997,7 +989,7 @@ void DetermineAuthTypeJob.checkAllDone () {
 }
 
 SimpleNetworkJob.SimpleNetworkJob (AccountPtr account, GLib.Object *parent)
-    : AbstractNetworkJob (account, QString (), parent) {
+    : AbstractNetworkJob (account, string (), parent) {
 }
 
 QNetworkReply *SimpleNetworkJob.startRequest (QByteArray &verb, QUrl &url,
@@ -1012,7 +1004,7 @@ bool SimpleNetworkJob.finished () {
     return true;
 }
 
-DeleteApiJob.DeleteApiJob (AccountPtr account, QString &path, GLib.Object *parent)
+DeleteApiJob.DeleteApiJob (AccountPtr account, string &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 
 }
@@ -1038,16 +1030,16 @@ bool DeleteApiJob.finished () {
         return true;
     }
 
-    const auto replyData = QString.fromUtf8 (reply ().readAll ());
+    const auto replyData = string.fromUtf8 (reply ().readAll ());
     qCInfo (lcJsonApiJob ()) << "TMX Delete Job" << replyData;
     emit result (httpStatus);
     return true;
 }
 
-void fetchPrivateLinkUrl (AccountPtr account, QString &remotePath,
+void fetchPrivateLinkUrl (AccountPtr account, string &remotePath,
     const QByteArray &numericFileId, GLib.Object *target,
-    std.function<void (QString &url)> targetFun) {
-    QString oldUrl;
+    std.function<void (string &url)> targetFun) {
+    string oldUrl;
     if (!numericFileId.isEmpty ())
         oldUrl = account.deprecatedPrivateLinkUrl (numericFileId).toString (QUrl.FullyEncoded);
 

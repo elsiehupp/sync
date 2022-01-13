@@ -1,18 +1,10 @@
-/*
+/***********************************************************
 Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
-
-/*
+/***********************************************************
 Removing the root encrypted folder is consisted of multiple steps:
 - 1st step is to obtain the folderID via LsColJob so it then can be used for the next step
 - 2nd step is to lock the root folder useing the folderID from the previous step. !!! NOTE : If there are no nested items in the folder, this, and subsequent steps are skipped until step 7.
@@ -21,7 +13,7 @@ Removing the root encrypted folder is consisted of multiple steps:
 - 5th step is to trigger DeleteJob for every nested file and folder of the root folder
 - 6th step is to unlock the root folder using the previously obtained token from locking
 - 7th step is to decrypt and delete the root folder, because it is now possible as it has become empty
-*/
+***********************************************************/
 
 // #include <QFileInfo>
 // #include <QLoggingCategory>
@@ -98,7 +90,7 @@ void PropagateRemoteDeleteEncryptedRootFolder.slotDeleteNestedRemoteItemFinished
         return;
     }
 
-    const QString encryptedFileName = deleteJob.property (encryptedFileNamePropertyKey).toString ();
+    const string encryptedFileName = deleteJob.property (encryptedFileNamePropertyKey).toString ();
 
     if (!encryptedFileName.isEmpty ()) {
         const auto nestedItem = _nestedItems.take (encryptedFileName);
@@ -150,7 +142,7 @@ void PropagateRemoteDeleteEncryptedRootFolder.slotDeleteNestedRemoteItemFinished
     }
 }
 
-void PropagateRemoteDeleteEncryptedRootFolder.deleteNestedRemoteItem (QString &filename) {
+void PropagateRemoteDeleteEncryptedRootFolder.deleteNestedRemoteItem (string &filename) {
     qCInfo (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "Deleting nested encrypted remote item" << filename;
 
     auto deleteJob = new DeleteJob (_propagator.account (), _propagator.fullRemotePath (filename), this);

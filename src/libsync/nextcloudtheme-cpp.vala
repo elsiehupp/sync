@@ -1,18 +1,10 @@
-/*
+/***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
-
-// #include <QString>
+// #include <string>
 // #include <QVariant>
 #ifndef TOKEN_AUTH_ONLY
 // #include <QPixmap>
@@ -26,8 +18,8 @@ NextcloudTheme.NextcloudTheme ()
     : Theme () {
 }
 
-QString NextcloudTheme.wizardUrlHint () {
-    return QString ("https://try.nextcloud.com");
+string NextcloudTheme.wizardUrlHint () {
+    return string ("https://try.nextcloud.com");
 }
 
 }

@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Christian Kamm <mail@ckamm.de>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <QFile>
 
@@ -26,7 +18,7 @@ Vfs.Mode VfsSuffix.mode () {
     return WithSuffix;
 }
 
-QString VfsSuffix.fileSuffix () {
+string VfsSuffix.fileSuffix () {
     return QStringLiteral (APPLICATION_DOTVIRTUALFILE_SUFFIX);
 }
 
@@ -53,7 +45,7 @@ bool VfsSuffix.isHydrating () {
     return false;
 }
 
-Result<void, QString> VfsSuffix.updateMetadata (QString &filePath, time_t modtime, int64, QByteArray &) {
+Result<void, string> VfsSuffix.updateMetadata (string &filePath, time_t modtime, int64, QByteArray &) {
     if (modtime <= 0) {
         return {tr ("Error updating metadata due to invalid modified time")};
     }
@@ -62,22 +54,22 @@ Result<void, QString> VfsSuffix.updateMetadata (QString &filePath, time_t modtim
     return {};
 }
 
-Result<void, QString> VfsSuffix.createPlaceholder (SyncFileItem &item) {
+Result<void, string> VfsSuffix.createPlaceholder (SyncFileItem &item) {
     if (item._modtime <= 0) {
         return {tr ("Error updating metadata due to invalid modified time")};
     }
 
     // The concrete shape of the placeholder is also used in isDehydratedPlaceholder () below
-    QString fn = _setupParams.filesystemPath + item._file;
+    string fn = _setupParams.filesystemPath + item._file;
     if (!fn.endsWith (fileSuffix ())) {
         ASSERT (false, "vfs file isn't ending with suffix");
-        return QString ("vfs file isn't ending with suffix");
+        return string ("vfs file isn't ending with suffix");
     }
 
     QFile file (fn);
     if (file.exists () && file.size () > 1
         && !FileSystem.verifyFileUnchanged (fn, item._size, item._modtime)) {
-        return QString ("Cannot create a placeholder because a file with the placeholder name already exist");
+        return string ("Cannot create a placeholder because a file with the placeholder name already exist");
     }
 
     if (!file.open (QFile.ReadWrite | QFile.Truncate))
@@ -89,7 +81,7 @@ Result<void, QString> VfsSuffix.createPlaceholder (SyncFileItem &item) {
     return {};
 }
 
-Result<void, QString> VfsSuffix.dehydratePlaceholder (SyncFileItem &item) {
+Result<void, string> VfsSuffix.dehydratePlaceholder (SyncFileItem &item) {
     SyncFileItem virtualItem (item);
     virtualItem._file = item._renameTarget;
     auto r = createPlaceholder (virtualItem);
@@ -114,12 +106,12 @@ Result<void, QString> VfsSuffix.dehydratePlaceholder (SyncFileItem &item) {
     return {};
 }
 
-Result<Vfs.ConvertToPlaceholderResult, QString> VfsSuffix.convertToPlaceholder (QString &, SyncFileItem &, QString &) {
+Result<Vfs.ConvertToPlaceholderResult, string> VfsSuffix.convertToPlaceholder (string &, SyncFileItem &, string &) {
     // Nothing necessary
     return Vfs.ConvertToPlaceholderResult.Ok;
 }
 
-bool VfsSuffix.isDehydratedPlaceholder (QString &filePath) {
+bool VfsSuffix.isDehydratedPlaceholder (string &filePath) {
     if (!filePath.endsWith (fileSuffix ()))
         return false;
     QFileInfo fi (filePath);
@@ -134,7 +126,7 @@ bool VfsSuffix.statTypeVirtualFile (csync_file_stat_t *stat, void *) {
     return false;
 }
 
-Vfs.AvailabilityResult VfsSuffix.availability (QString &folderPath) {
+Vfs.AvailabilityResult VfsSuffix.availability (string &folderPath) {
     return availabilityInDb (folderPath);
 }
 

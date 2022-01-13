@@ -1,4 +1,4 @@
-/*
+/***********************************************************
 libcsync -- a library to sync a directory with another
 
 Copyright (c) 2008-2013 by Andreas Schneider <asn@cryptomilk.
@@ -16,7 +16,7 @@ Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
-*/
+***********************************************************/
 
 #ifdef HAVE_ARGP_H
 // #include <argp.h>
@@ -72,7 +72,7 @@ static struct argp argp = {options, parse_opt, NULL, doc, NULL, NULL, NULL};
 #endif /* HAVE_ARGP_H */
 
 void torture_cmdline_parse (int argc, char **argv, struct argument_s *arguments) {
-  /*
+  /***********************************************************
    * Parse our arguments; every option seen by parse_opt will
    * be reflected in arguments.
    */

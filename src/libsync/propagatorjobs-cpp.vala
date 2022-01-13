@@ -1,17 +1,9 @@
-/*
+/***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <qfile.h>
 // #include <qdir.h>
@@ -34,21 +26,21 @@ QByteArray localFileIdFromFullId (QByteArray &id) {
     return id.left (8);
 }
 
-/**
+/***********************************************************
 The code will update the database in case of error.
 If everything goes well (no error, returns true), the caller is responsible for removing the entries
 in the database.  But in case of error, we need to remove the entries from the database of the files
 that were deleted.
 
 \a path is relative to propagator ()._localDir + _item._file and should start with a slash
-*/
-bool PropagateLocalRemove.removeRecursively (QString &path) {
-    QString absolute = propagator ().fullLocalPath (_item._file + path);
+***********************************************************/
+bool PropagateLocalRemove.removeRecursively (string &path) {
+    string absolute = propagator ().fullLocalPath (_item._file + path);
     QStringList errors;
-    QList<QPair<QString, bool>> deleted;
+    QList<QPair<string, bool>> deleted;
     bool success = FileSystem.removeRecursively (
         absolute,
-        [&deleted] (QString &path, bool isDir) {
+        [&deleted] (string &path, bool isDir) {
             // by prepending, a folder deletion may be followed by content deletions
             deleted.prepend (qMakePair (path, isDir));
         },
@@ -57,7 +49,7 @@ bool PropagateLocalRemove.removeRecursively (QString &path) {
     if (!success) {
         // We need to delete the entries from the database now from the deleted vector.
         // Do it while avoiding redundant delete calls to the journal.
-        QString deletedDir;
+        string deletedDir;
         foreach (auto &it, deleted) {
             if (!it.first.startsWith (propagator ().localPath ()))
                 continue;
@@ -82,7 +74,7 @@ void PropagateLocalRemove.start () {
     if (propagator ()._abortRequested)
         return;
 
-    const QString filename = propagator ().fullLocalPath (_item._file);
+    const string filename = propagator ().fullLocalPath (_item._file);
     qCInfo (lcPropagateLocalRemove) << "Going to delete:" << filename;
 
     if (propagator ().localFileNameClash (_item._file)) {
@@ -90,7 +82,7 @@ void PropagateLocalRemove.start () {
         return;
     }
 
-    QString removeError;
+    string removeError;
     if (_moveToTrash) {
         if ( (QDir (filename).exists () || FileSystem.fileExists (filename))
             && !FileSystem.moveToTrash (filename, &removeError)) {
@@ -99,7 +91,7 @@ void PropagateLocalRemove.start () {
         }
     } else {
         if (_item.isDirectory ()) {
-            if (QDir (filename).exists () && !removeRecursively (QString ())) {
+            if (QDir (filename).exists () && !removeRecursively (string ())) {
                 done (SyncFileItem.NormalError, _error);
                 return;
             }
@@ -130,14 +122,14 @@ void PropagateLocalMkdir.setDeleteExistingFile (bool enabled) {
 
 void PropagateLocalMkdir.startLocalMkdir () {
     QDir newDir (propagator ().fullLocalPath (_item._file));
-    QString newDirStr = QDir.toNativeSeparators (newDir.path ());
+    string newDirStr = QDir.toNativeSeparators (newDir.path ());
 
     // When turning something that used to be a file into a directory
     // we need to delete the file first.
     QFileInfo fi (newDirStr);
     if (fi.exists () && fi.isFile ()) {
         if (_deleteExistingFile) {
-            QString removeError;
+            string removeError;
             if (!FileSystem.remove (newDirStr, &removeError)) {
                 done (SyncFileItem.NormalError,
                     tr ("could not delete file %1, error : %2")
@@ -145,7 +137,7 @@ void PropagateLocalMkdir.startLocalMkdir () {
                 return;
             }
         } else if (_item._instruction == CSYNC_INSTRUCTION_CONFLICT) {
-            QString error;
+            string error;
             if (!propagator ().createConflict (_item, _associatedComposite, &error)) {
                 done (SyncFileItem.SoftError, error);
                 return;
@@ -192,8 +184,8 @@ void PropagateLocalRename.start () {
     if (propagator ()._abortRequested)
         return;
 
-    QString existingFile = propagator ().fullLocalPath (propagator ().adjustRenamedPath (_item._file));
-    QString targetFile = propagator ().fullLocalPath (_item._renameTarget);
+    string existingFile = propagator ().fullLocalPath (propagator ().adjustRenamedPath (_item._file));
+    string targetFile = propagator ().fullLocalPath (_item._renameTarget);
 
     // if the file is a file underneath a moved dir, the _item.file is equal
     // to _item.renameTarget and the file is not moved as a result.
@@ -201,7 +193,7 @@ void PropagateLocalRename.start () {
         propagator ().reportProgress (*_item, 0);
         qCDebug (lcPropagateLocalRename) << "MOVE " << existingFile << " => " << targetFile;
 
-        if (QString.compare (_item._file, _item._renameTarget, Qt.CaseInsensitive) != 0
+        if (string.compare (_item._file, _item._renameTarget, Qt.CaseInsensitive) != 0
             && propagator ().localFileNameClash (_item._renameTarget)) {
             // Only use localFileNameClash for the destination if we know that the source was not
             // the one conflicting  (renaming  A.txt . a.txt is OK)
@@ -217,7 +209,7 @@ void PropagateLocalRename.start () {
 
         emit propagator ().touchedFile (existingFile);
         emit propagator ().touchedFile (targetFile);
-        QString renameError;
+        string renameError;
         if (!FileSystem.rename (existingFile, targetFile, &renameError)) {
             done (SyncFileItem.NormalError, renameError);
             return;

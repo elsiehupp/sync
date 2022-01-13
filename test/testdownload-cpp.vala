@@ -1,9 +1,9 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
 
-*/
+***********************************************************/
 
 // #include <QtTest>
 // #include <syncengine.h>
@@ -34,7 +34,7 @@ public:
     }
 };
 
-SyncFileItemPtr getItem (QSignalSpy &spy, QString &path) {
+SyncFileItemPtr getItem (QSignalSpy &spy, string &path) {
     for (QList<QVariant> &args : spy) {
         auto item = args[0].value<SyncFileItemPtr> ();
         if (item.destination () == path)
@@ -64,7 +64,7 @@ private slots:
 
         QVERIFY (!fakeFolder.syncOnce ()); // The sync must fail because not all the file was downloaded
         QCOMPARE (getItem (completeSpy, "A/a0")._status, SyncFileItem.SoftError);
-        QCOMPARE (getItem (completeSpy, "A/a0")._errorString, QString ("The file could not be downloaded completely."));
+        QCOMPARE (getItem (completeSpy, "A/a0")._errorString, string ("The file could not be downloaded completely."));
         QVERIFY (fakeFolder.syncEngine ().isAnotherSyncNeeded ());
 
         // Now, we need to restart, this time, it should resume.
@@ -149,16 +149,16 @@ private slots:
         fakeFolder.localModifier ().setContents ("A/a1", 'B');
 
         bool propConnected = false;
-        QString conflictFile;
+        string conflictFile;
         auto transProgress = connect (&fakeFolder.syncEngine (), &SyncEngine.transmissionProgress,
                                      [&] (ProgressInfo &pi) {
             auto propagator = fakeFolder.syncEngine ().getPropagator ();
             if (pi.status () != ProgressInfo.Propagation || propConnected || !propagator)
                 return;
             propConnected = true;
-            connect (propagator.data (), &OwncloudPropagator.touchedFile, [&] (QString &s) {
+            connect (propagator.data (), &OwncloudPropagator.touchedFile, [&] (string &s) {
                 if (s.contains ("conflicted copy")) {
-                    QCOMPARE (conflictFile, QString ());
+                    QCOMPARE (conflictFile, string ());
                     conflictFile = s;
                     return;
                 }

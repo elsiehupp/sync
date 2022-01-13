@@ -1,9 +1,9 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
 
-*/
+***********************************************************/
 
 // #include <QtTest>
 // #include <syncengine.h>
@@ -12,7 +12,7 @@ using namespace Occ;
 
 /* Upload a 1/3 of a file of given size.
 fakeFolder needs to be synchronized */
-static void partialUpload (FakeFolder &fakeFolder, QString &name, int64 size) {
+static void partialUpload (FakeFolder &fakeFolder, string &name, int64 size) {
     QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     QCOMPARE (fakeFolder.uploadState ().children.count (), 0); // The state should be clean
 
@@ -177,7 +177,7 @@ private slots:
 
         // Add a chunk that makes the file completely uploaded
         fakeFolder.uploadState ().children.first ().insert (
-            QString.number (chunkMap.size ()).rightJustified (16, '0'), size - uploadedSize);
+            string.number (chunkMap.size ()).rightJustified (16, '0'), size - uploadedSize);
 
         bool sawPut = false;
         bool sawDelete = false;
@@ -222,7 +222,7 @@ private slots:
 
         // Add a chunk that makes the file more than completely uploaded
         fakeFolder.uploadState ().children.first ().insert (
-            QString.number (chunkMap.size ()).rightJustified (16, '0'), size - uploadedSize + 100);
+            string.number (chunkMap.size ()).rightJustified (16, '0'), size - uploadedSize + 100);
 
         QVERIFY (fakeFolder.syncOnce ());
 

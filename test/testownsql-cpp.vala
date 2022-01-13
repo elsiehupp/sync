@@ -1,4 +1,4 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
       support, and with no warranty, express or implied, as to its usefulness for
          any purpose.
@@ -103,8 +103,8 @@ private slots:
         SqlQuery q (_db);
         q.prepare (sql);
         q.bindValue (1, 3);
-        q.bindValue (2, QString.fromUtf8 ("пятницы"));
-        q.bindValue (3, QString.fromUtf8 ("проспект"));
+        q.bindValue (2, string.fromUtf8 ("пятницы"));
+        q.bindValue (3, string.fromUtf8 ("проспект"));
         q.bindValue (4, 1403002224);
         QVERIFY (q.exec ());
     }
@@ -115,10 +115,10 @@ private slots:
         q.prepare (sql);
 
         if (q.next ().hasData) {
-            QString name = q.stringValue (1);
-            QString address = q.stringValue (2);
-            QVERIFY ( name == QString.fromUtf8 ("пятницы") );
-            QVERIFY ( address == QString.fromUtf8 ("проспект"));
+            string name = q.stringValue (1);
+            string address = q.stringValue (2);
+            QVERIFY ( name == string.fromUtf8 ("пятницы") );
+            QVERIFY ( address == string.fromUtf8 ("проспект"));
         }
     }
 

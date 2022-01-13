@@ -1,8 +1,8 @@
 // #include <QtTest>
 
 namespace {
-  const QString simple     = QLatin1String ("A simple tokenizer test");
-  const QString quoted     = QLatin1String ("\"Wait for me!\" he shouted");
+  const string simple     = QLatin1String ("A simple tokenizer test");
+  const string quoted     = QLatin1String ("\"Wait for me!\" he shouted");
 }
 
 class TestTokenizer : GLib.Object {
@@ -45,7 +45,7 @@ private slots:
   }
 
   void tokenizeQStringQuoted () {
-    const QString multiquote (QLatin1String ("\"'Billy - the Kid' is dead!\""));
+    const string multiquote (QLatin1String ("\"'Billy - the Kid' is dead!\""));
     QStringTokenizer tokenizer (multiquote, " -");
     tokenizer.setQuoteCharacters ("\"");
     tokenizer.setReturnQuoteCharacters (true);
@@ -57,7 +57,7 @@ private slots:
   }
 
   void tokenizeQStringSkipQuotes () {
-    const QString multiquote (QLatin1String ("\"'Billy - the Kid' is dead!\""));
+    const string multiquote (QLatin1String ("\"'Billy - the Kid' is dead!\""));
     QStringTokenizer tokenizer (multiquote, " ");
     tokenizer.setQuoteCharacters ("\"");
     tokenizer.setReturnQuoteCharacters (false);
@@ -70,7 +70,7 @@ private slots:
   }
 
   void tokenizeQStringWithDelims () {
-    const QString delims (QLatin1String ("I;Insist,On/a-Delimiter"));
+    const string delims (QLatin1String ("I;Insist,On/a-Delimiter"));
     QStringTokenizer tokenizer (delims, ";,/-");
     tokenizer.setReturnDelimiters (true);
 

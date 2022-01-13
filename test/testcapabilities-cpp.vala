@@ -111,7 +111,7 @@ private slots:
     }
 
     void testPushNotificationsWebSocketUrl_urlAvailable_returnUrl () {
-        QString websocketUrl ("testurl");
+        string websocketUrl ("testurl");
 
         QVariantMap endpointsMap;
         endpointsMap["websocket"] = websocketUrl;

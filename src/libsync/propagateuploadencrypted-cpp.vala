@@ -11,7 +11,7 @@ namespace Occ {
 
 Q_LOGGING_CATEGORY (lcPropagateUploadEncrypted, "nextcloud.sync.propagator.upload.encrypted", QtInfoMsg)
 
-PropagateUploadEncrypted.PropagateUploadEncrypted (OwncloudPropagator *propagator, QString &remoteParentPath, SyncFileItemPtr item, GLib.Object *parent)
+PropagateUploadEncrypted.PropagateUploadEncrypted (OwncloudPropagator *propagator, string &remoteParentPath, SyncFileItemPtr item, GLib.Object *parent)
     : GLib.Object (parent)
     , _propagator (propagator)
     , _remoteParentPath (remoteParentPath)
@@ -29,7 +29,7 @@ void PropagateUploadEncrypted.start () {
         }
     } ();
     const auto absoluteRemoteParentPath = [=]{
-        auto path = QString (rootPath + _remoteParentPath);
+        auto path = string (rootPath + _remoteParentPath);
         if (path.endsWith ('/')) {
             path.chop (1);
         }
@@ -61,7 +61,7 @@ the 'loop' :                                                         /
    slotFolderEncryptedIdReceived . slotTryLock . lockError . stillTime? . slotTryLock
 
                                         . success.
-*/
+***********************************************************/
 
 void PropagateUploadEncrypted.slotFolderEncryptedIdReceived (QStringList &list) {
   qCDebug (lcPropagateUploadEncrypted) << "Received id of folder, trying to lock it so we can prepare the metadata";
@@ -112,7 +112,7 @@ void PropagateUploadEncrypted.slotFolderEncryptedMetadataReceived (QJsonDocument
   _metadata = new FolderMetadata (_propagator.account (), json.toJson (QJsonDocument.Compact), statusCode);
 
   QFileInfo info (_propagator.fullLocalPath (_item._file));
-  const QString fileName = info.fileName ();
+  const string fileName = info.fileName ();
 
   // Find existing metadata for this file
   bool found = false;

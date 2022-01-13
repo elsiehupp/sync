@@ -1,4 +1,4 @@
-/******************************************************************************
+/*************************************************************
   Copyright (C) 2014 by Olivier Goffart <ogoffart@woboq.com                *
                                                                            *
   This program is free software; you can redistribute it and/or modify     *
@@ -34,7 +34,7 @@ public:
     OwncloudDolphinPluginAction (GLib.Object* parent, QList<QVariant>&)
         : KAbstractFileItemActionPlugin (parent) { }
 
-    QList<QAction> actions (KFileItemListProperties& fileItemInfos, QWidget* parentWidget) override {
+    QList<QAction> actions (KFileItemListProperties& fileItemInfos, Gtk.Widget* parentWidget) override {
         auto helper = OwncloudDolphinPluginHelper.instance ();
         if (!helper.isConnected () || !fileItemInfos.isLocal ())
             return {};
@@ -46,7 +46,7 @@ public:
         for (auto &url : urls) {
             QDir localPath (url.toLocalFile ());
             auto localFile = localPath.canonicalPath ();
-            if (!std.any_of (paths.begin (), paths.end (), [&] (QString &s) {
+            if (!std.any_of (paths.begin (), paths.end (), [&] (string &s) {
                     return localFile.startsWith (s);
                 }))
                 return {};
@@ -66,7 +66,7 @@ public:
             if (cmd.startsWith ("GET_MENU_ITEMS:END")) {
                 loop.quit ();
             } else if (cmd.startsWith ("MENU_ITEM:")) {
-                auto args = QString.fromUtf8 (cmd).split (QLatin1Char (':'));
+                auto args = string.fromUtf8 (cmd).split (QLatin1Char (':'));
                 if (args.size () < 4)
                     return;
                 auto action = menu.addAction (args.mid (3).join (QLatin1Char (':')));
@@ -92,7 +92,7 @@ public:
         return { menu.menuAction () };
     }
 
-    QList<QAction> legacyActions (KFileItemListProperties &fileItemInfos, QWidget *parentWidget) {
+    QList<QAction> legacyActions (KFileItemListProperties &fileItemInfos, Gtk.Widget *parentWidget) {
         QList<QUrl> urls = fileItemInfos.urlList ();
         if (urls.count () != 1)
             return {};

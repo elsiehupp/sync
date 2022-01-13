@@ -1,18 +1,18 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
 
-*/
+***********************************************************/
 
 // #include <QtTest>
 
 // #include <QUrl>
-// #include <QString>
+// #include <string>
 
 using namespace Occ;
 
-using QueryItems = QList<QPair<QString, QString>>;
+using QueryItems = QList<QPair<string, string>>;
 
 Q_DECLARE_METATYPE (QueryItems)
 
@@ -20,14 +20,14 @@ static QueryItems make () {
     return QueryItems ();
 }
 
-static QueryItems make (QString key, QString value) {
+static QueryItems make (string key, string value) {
     QueryItems q;
     q.append (qMakePair (key, value));
     return q;
 }
 
-static QueryItems make (QString key1, QString value1,
-                       QString key2, QString value2) {
+static QueryItems make (string key1, string value1,
+                       string key2, string value2) {
     QueryItems q;
     q.append (qMakePair (key1, value1));
     q.append (qMakePair (key2, value2));
@@ -37,24 +37,24 @@ static QueryItems make (QString key1, QString value1,
 class TestConcatUrl : public GLib.Object {
 private slots:
     void testFolder () {
-        QFETCH (QString, base);
-        QFETCH (QString, concat);
+        QFETCH (string, base);
+        QFETCH (string, concat);
         QFETCH (QueryItems, query);
-        QFETCH (QString, expected);
+        QFETCH (string, expected);
         QUrl baseUrl ("http://example.com" + base);
         QUrlQuery urlQuery;
         urlQuery.setQueryItems (query);
         QUrl resultUrl = Utility.concatUrlPath (baseUrl, concat, urlQuery);
-        QString result = QString.fromUtf8 (resultUrl.toEncoded ());
-        QString expectedFull = "http://example.com" + expected;
+        string result = string.fromUtf8 (resultUrl.toEncoded ());
+        string expectedFull = "http://example.com" + expected;
         QCOMPARE (result, expectedFull);
     }
 
     void testFolder_data () {
-        QTest.addColumn<QString> ("base");
-        QTest.addColumn<QString> ("concat");
+        QTest.addColumn<string> ("base");
+        QTest.addColumn<string> ("concat");
         QTest.addColumn<QueryItems> ("query");
-        QTest.addColumn<QString> ("expected");
+        QTest.addColumn<string> ("expected");
 
         // Tests about slashes
         QTest.newRow ("noslash1")  << "/baa"  << "foo"  << make () << "/baa/foo";

@@ -1,9 +1,9 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
 
-*/
+***********************************************************/
 
 // #include <QtTest>
 // #include <syncengine.h>
@@ -33,17 +33,17 @@ struct OperationCounter {
     }
 };
 
-bool itemSuccessful (ItemCompletedSpy &spy, QString &path, SyncInstructions instr) {
+bool itemSuccessful (ItemCompletedSpy &spy, string &path, SyncInstructions instr) {
     auto item = spy.findItem (path);
     return item._status == SyncFileItem.Success && item._instruction == instr;
 }
 
-bool itemConflict (ItemCompletedSpy &spy, QString &path) {
+bool itemConflict (ItemCompletedSpy &spy, string &path) {
     auto item = spy.findItem (path);
     return item._status == SyncFileItem.Conflict && item._instruction == CSYNC_INSTRUCTION_CONFLICT;
 }
 
-bool itemSuccessfulMove (ItemCompletedSpy &spy, QString &path) {
+bool itemSuccessfulMove (ItemCompletedSpy &spy, string &path) {
     return itemSuccessful (spy, path, CSYNC_INSTRUCTION_RENAME);
 }
 
@@ -57,7 +57,7 @@ QStringList findConflicts (FileInfo &dir) {
     return conflicts;
 }
 
-bool expectAndWipeConflict (FileModifier &local, FileInfo state, QString path) {
+bool expectAndWipeConflict (FileModifier &local, FileInfo state, string path) {
     PathComponents pathComponents (path);
     auto base = state.find (pathComponents.parentDirComponents ());
     if (!base)
@@ -105,7 +105,7 @@ private slots:
 
     void testRemoteChangeInMovedFolder () {
         // issue #5192
-        FakeFolder fakeFolder{ FileInfo{ QString (), { FileInfo{ QStringLiteral ("folder"), { FileInfo{ QStringLiteral ("folderA"), { { QStringLiteral ("file.txt"), 400 } } }, QStringLiteral ("folderB") } } } } };
+        FakeFolder fakeFolder{ FileInfo{ string (), { FileInfo{ QStringLiteral ("folder"), { FileInfo{ QStringLiteral ("folderA"), { { QStringLiteral ("file.txt"), 400 } } }, QStringLiteral ("folderB") } } } } };
 
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
@@ -126,7 +126,7 @@ private slots:
 
     void testSelectiveSyncMovedFolder () {
         // issue #5224
-        FakeFolder fakeFolder{ FileInfo{ QString (), { FileInfo{ QStringLiteral ("parentFolder"), { FileInfo{ QStringLiteral ("subFolderA"), { { QStringLiteral ("fileA.txt"), 400 } } }, FileInfo{ QStringLiteral ("subFolderB"), { { QStringLiteral ("fileB.txt"), 400 } } } } } } } };
+        FakeFolder fakeFolder{ FileInfo{ string (), { FileInfo{ QStringLiteral ("parentFolder"), { FileInfo{ QStringLiteral ("subFolderA"), { { QStringLiteral ("fileA.txt"), 400 } } }, FileInfo{ QStringLiteral ("subFolderB"), { { QStringLiteral ("fileB.txt"), 400 } } } } } } } };
 
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         auto expectedServerState = fakeFolder.currentRemoteState ();
@@ -265,7 +265,7 @@ private slots:
     }
 
     void testDuplicateFileId_data () {
-        QTest.addColumn<QString> ("prefix");
+        QTest.addColumn<string> ("prefix");
 
         // There have been bugs related to how the original
         // folder and the folder with the duplicate tree are
@@ -279,7 +279,7 @@ private slots:
     // sure the move detection and sync still do the right thing in that
     // case.
     void testDuplicateFileId () {
-        QFETCH (QString, prefix);
+        QFETCH (string, prefix);
 
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         auto &remote = fakeFolder.remoteModifier ();
@@ -862,15 +862,15 @@ private slots:
 
     void testMovedWithError () {
         QFETCH (Vfs.Mode, vfsMode);
-        const auto getName = [vfsMode] (QString &s) { {f (vfsMode == Vfs.WithSuffix)
+        const auto getName = [vfsMode] (string &s) { {f (vfsMode == Vfs.WithSuffix)
             {
                 return QStringLiteral ("%1" APPLICATION_DOTVIRTUALFILE_SUFFIX).arg (s);
             }
             return s;
         };
-        const QString src = "folder/folderA/file.txt";
-        const QString dest = "folder/folderB/file.txt";
-        FakeFolder fakeFolder{ FileInfo{ QString (), { FileInfo{ QStringLiteral ("folder"), { FileInfo{ QStringLiteral ("folderA"), { { QStringLiteral ("file.txt"), 400 } } }, QStringLiteral ("folderB") } } } } };
+        const string src = "folder/folderA/file.txt";
+        const string dest = "folder/folderB/file.txt";
+        FakeFolder fakeFolder{ FileInfo{ string (), { FileInfo{ QStringLiteral ("folder"), { FileInfo{ QStringLiteral ("folderA"), { { QStringLiteral ("file.txt"), 400 } } }, QStringLiteral ("folderB") } } } } };
         auto syncOpts = fakeFolder.syncEngine ().syncOptions ();
         syncOpts._parallelNetworkJobs = 0;
         fakeFolder.syncEngine ().setSyncOptions (syncOpts);

@@ -1,9 +1,9 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
 
-*/
+***********************************************************/
 
 // #include <QtTest>
 // #include <syncengine.h>
@@ -12,12 +12,12 @@ using namespace Occ;
 
 const int DVSUFFIX APPLICATION_DOTVIRTUALFILE_SUFFIX
 
-bool itemInstruction (ItemCompletedSpy &spy, QString &path, SyncInstructions instr) {
+bool itemInstruction (ItemCompletedSpy &spy, string &path, SyncInstructions instr) {
     auto item = spy.findItem (path);
     return item._instruction == instr;
 }
 
-SyncJournalFileRecord dbRecord (FakeFolder &folder, QString &path) {
+SyncJournalFileRecord dbRecord (FakeFolder &folder, string &path) {
     SyncJournalFileRecord record;
     folder.syncJournal ().getFileRecord (path, &record);
     return record;
@@ -785,12 +785,12 @@ private slots:
 
         QVERIFY (fakeFolder.syncOnce ());
 
-        auto isDehydrated = [&] (QString &path) {
-            QString placeholder = path + DVSUFFIX;
+        auto isDehydrated = [&] (string &path) {
+            string placeholder = path + DVSUFFIX;
             return !fakeFolder.currentLocalState ().find (path)
                 && fakeFolder.currentLocalState ().find (placeholder);
         };
-        auto hasDehydratedDbEntries = [&] (QString &path) {
+        auto hasDehydratedDbEntries = [&] (string &path) {
             SyncJournalFileRecord normal, suffix;
             fakeFolder.syncJournal ().getFileRecord (path, &normal);
             fakeFolder.syncJournal ().getFileRecord (path + DVSUFFIX, &suffix);
@@ -1346,7 +1346,7 @@ private slots:
 
         cleanup ();
         // Dehydrate
-        QVERIFY (vfs.setPinState (QString (), PinState.OnlineOnly));
+        QVERIFY (vfs.setPinState (string (), PinState.OnlineOnly));
         QVERIFY (!fakeFolder.syncOnce ());
 
         QVERIFY (itemInstruction (completeSpy, "A/igno" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));

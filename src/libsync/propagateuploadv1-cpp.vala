@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <QNetworkAccessManager>
 // #include <QFileInfo>
@@ -83,7 +75,7 @@ void PropagateUploadFileV1.startNextChunk () {
     headers[QByteArrayLiteral ("OC-Total-Length")] = QByteArray.number (fileSize);
     headers[QByteArrayLiteral ("OC-Chunk-Size")] = QByteArray.number (chunkSize ());
 
-    QString path = _fileToUpload._file;
+    string path = _fileToUpload._file;
 
     int64 chunkStart = 0;
     int64 currentChunkSize = fileSize;
@@ -93,7 +85,7 @@ void PropagateUploadFileV1.startNextChunk () {
         // XOR with chunk size to make sure everything goes well if chunk size changes between runs
         uint transid = _transferId ^ uint (chunkSize ());
         qCInfo (lcPropagateUploadV1) << "Upload chunk" << sendingChunk << "of" << _chunkCount << "transferid (remote)=" << transid;
-        path += QString ("-chunking-%1-%2-%3").arg (transid).arg (_chunkCount).arg (sendingChunk);
+        path += string ("-chunking-%1-%2-%3").arg (transid).arg (_chunkCount).arg (sendingChunk);
 
         headers[QByteArrayLiteral ("OC-Chunked")] = QByteArrayLiteral ("1");
 
@@ -117,7 +109,7 @@ void PropagateUploadFileV1.startNextChunk () {
         headers[checkSumHeaderC] = _transmissionChecksumHeader;
     }
 
-    const QString fileName = _fileToUpload._path;
+    const string fileName = _fileToUpload._path;
     auto device = std.make_unique<UploadDevice> (
             fileName, chunkStart, currentChunkSize, &propagator ()._bandwidthManager);
     if (!device.open (QIODevice.ReadOnly)) {
@@ -205,7 +197,7 @@ void PropagateUploadFileV1.slotPutFinished () {
 
     // The server needs some time to process the request and provide us with a poll URL
     if (_item._httpErrorCode == 202) {
-        QString path = QString.fromUtf8 (job.reply ().rawHeader ("OC-JobStatus-Location"));
+        string path = string.fromUtf8 (job.reply ().rawHeader ("OC-JobStatus-Location"));
         if (path.isEmpty ()) {
             done (SyncFileItem.NormalError, tr ("Poll URL missing"));
             return;
@@ -228,7 +220,7 @@ void PropagateUploadFileV1.slotPutFinished () {
     _finished = etag.length () > 0;
 
     // Check if the file still exists
-    const QString fullFilePath (propagator ().fullLocalPath (_item._file));
+    const string fullFilePath (propagator ().fullLocalPath (_item._file));
     if (!FileSystem.fileExists (fullFilePath)) {
         if (!_finished) {
             abortWithError (SyncFileItem.SoftError, tr ("The local file was removed during sync."));

@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <clientsideencryptionjobs.h>
 
@@ -31,19 +23,19 @@ void Occ.HydrationJob.setAccount (AccountPtr &account) {
     _account = account;
 }
 
-QString Occ.HydrationJob.remotePath () {
+string Occ.HydrationJob.remotePath () {
     return _remotePath;
 }
 
-void Occ.HydrationJob.setRemotePath (QString &remotePath) {
+void Occ.HydrationJob.setRemotePath (string &remotePath) {
     _remotePath = remotePath;
 }
 
-QString Occ.HydrationJob.localPath () {
+string Occ.HydrationJob.localPath () {
     return _localPath;
 }
 
-void Occ.HydrationJob.setLocalPath (QString &localPath) {
+void Occ.HydrationJob.setLocalPath (string &localPath) {
     _localPath = localPath;
 }
 
@@ -55,19 +47,19 @@ void Occ.HydrationJob.setJournal (SyncJournalDb *journal) {
     _journal = journal;
 }
 
-QString Occ.HydrationJob.requestId () {
+string Occ.HydrationJob.requestId () {
     return _requestId;
 }
 
-void Occ.HydrationJob.setRequestId (QString &requestId) {
+void Occ.HydrationJob.setRequestId (string &requestId) {
     _requestId = requestId;
 }
 
-QString Occ.HydrationJob.folderPath () {
+string Occ.HydrationJob.folderPath () {
     return _folderPath;
 }
 
-void Occ.HydrationJob.setFolderPath (QString &folderPath) {
+void Occ.HydrationJob.setFolderPath (string &folderPath) {
     _folderPath = folderPath;
 }
 
@@ -79,11 +71,11 @@ void Occ.HydrationJob.setIsEncryptedFile (bool isEncrypted) {
     _isEncryptedFile = isEncrypted;
 }
 
-QString Occ.HydrationJob.e2eMangledName () {
+string Occ.HydrationJob.e2eMangledName () {
     return _e2eMangledName;
 }
 
-void Occ.HydrationJob.setE2eMangledName (QString &e2eMangledName) {
+void Occ.HydrationJob.setE2eMangledName (string &e2eMangledName) {
     _e2eMangledName = e2eMangledName;
 }
 
@@ -101,7 +93,7 @@ void Occ.HydrationJob.start () {
     Q_ASSERT (_localPath.endsWith ('/'));
     Q_ASSERT (!_folderPath.startsWith ('/'));
 
-    const auto startServer = [this] (QString &serverName) . QLocalServer * {
+    const auto startServer = [this] (string &serverName) . QLocalServer * {
         const auto server = new QLocalServer (this);
         const auto listenResult = server.listen (serverName);
         if (!listenResult) {
@@ -143,7 +135,7 @@ void Occ.HydrationJob.slotFolderIdError () {
 void Occ.HydrationJob.slotCheckFolderId (QStringList &list) {
     // TODO : the following code is borrowed from PropagateDownloadEncrypted (see HydrationJob.onNewConnection () for explanation of next steps)
     auto job = qobject_cast<LsColJob> (sender ());
-    const QString folderId = list.first ();
+    const string folderId = list.first ();
     qCDebug (lcHydration) << "Received id of folder" << folderId;
 
     const ExtraFolderInfo &folderInfo = job._folderInfos.value (folderId);
@@ -168,13 +160,13 @@ void Occ.HydrationJob.slotFolderEncryptedMetadataError (QByteArray & /*fileId*/,
 void Occ.HydrationJob.slotCheckFolderEncryptedMetadata (QJsonDocument &json) {
     // TODO : the following code is borrowed from PropagateDownloadEncrypted (see HydrationJob.onNewConnection () for explanation of next steps)
     qCDebug (lcHydration) << "Metadata Received reading" << e2eMangledName ();
-    const QString filename = e2eMangledName ();
+    const string filename = e2eMangledName ();
     auto meta = new FolderMetadata (_account, json.toJson (QJsonDocument.Compact));
     const QVector<EncryptedFile> files = meta.files ();
 
     EncryptedFile encryptedInfo = {};
 
-    const QString encryptedFileExactName = e2eMangledName ().section (QLatin1Char ('/'), -1);
+    const string encryptedFileExactName = e2eMangledName ().section (QLatin1Char ('/'), -1);
     for (EncryptedFile &file : files) {
         if (encryptedFileExactName == file.encryptedFilename) {
             EncryptedFile encryptedInfo = file;
@@ -310,7 +302,7 @@ void Occ.HydrationJob.handleNewConnectionForEncryptedFile () {
     } ();
 
     const auto remoteFilename = e2eMangledName ();
-    const auto remotePath = QString (rootPath + remoteFilename);
+    const auto remotePath = string (rootPath + remoteFilename);
     const auto remoteParentPath = remotePath.left (remotePath.lastIndexOf ('/'));
 
     auto job = new LsColJob (_account, remoteParentPath, this);

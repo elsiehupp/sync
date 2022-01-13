@@ -1,42 +1,42 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
 
-*/
+***********************************************************/
 
 // #include <QtTest>
 // #include <syncengine.h>
 
 using namespace Occ;
 
-bool itemDidComplete (ItemCompletedSpy &spy, QString &path) {
+bool itemDidComplete (ItemCompletedSpy &spy, string &path) {
     if (auto item = spy.findItem (path)) {
         return item._instruction != CSYNC_INSTRUCTION_NONE && item._instruction != CSYNC_INSTRUCTION_UPDATE_METADATA;
     }
     return false;
 }
 
-bool itemInstruction (ItemCompletedSpy &spy, QString &path, SyncInstructions instr) {
+bool itemInstruction (ItemCompletedSpy &spy, string &path, SyncInstructions instr) {
     auto item = spy.findItem (path);
     return item._instruction == instr;
 }
 
-bool itemDidCompleteSuccessfully (ItemCompletedSpy &spy, QString &path) {
+bool itemDidCompleteSuccessfully (ItemCompletedSpy &spy, string &path) {
     if (auto item = spy.findItem (path)) {
         return item._status == SyncFileItem.Success;
     }
     return false;
 }
 
-bool itemDidCompleteSuccessfullyWithExpectedRank (ItemCompletedSpy &spy, QString &path, int rank) {
+bool itemDidCompleteSuccessfullyWithExpectedRank (ItemCompletedSpy &spy, string &path, int rank) {
     if (auto item = spy.findItemWithExpectedRank (path, rank)) {
         return item._status == SyncFileItem.Success;
     }
     return false;
 }
 
-int itemSuccessfullyCompletedGetRank (ItemCompletedSpy &spy, QString &path) {
+int itemSuccessfullyCompletedGetRank (ItemCompletedSpy &spy, string &path) {
     auto itItem = std.find_if (spy.begin (), spy.end (), [&path] (auto currentItem) {
         auto item = currentItem[0].template value<Occ.SyncFileItemPtr> ();
         return item.destination () == path;
@@ -153,7 +153,7 @@ private slots:
         // fakeFolder.syncOnce ();
         fakeFolder.syncOnce ();
 
-        auto getDbChecksum = [&] (QString path) {
+        auto getDbChecksum = [&] (string path) {
             SyncJournalFileRecord record;
             fakeFolder.syncJournal ().getFileRecord (path, &record);
             return record._checksumHeader;
@@ -189,7 +189,7 @@ private slots:
     void testSelectiveSyncBug () {
         // issue owncloud/enterprise#1965 : files from selective-sync ignored
         // folders are uploaded anyway is some circumstances.
-        FakeFolder fakeFolder{FileInfo{ QString (), {
+        FakeFolder fakeFolder{FileInfo{ string (), {
             FileInfo { QStringLiteral ("parentFolder"), {
                 FileInfo{ QStringLiteral ("subFolderA"), { { QStringLiteral ("fileA.txt"), 400 }, { QStringLiteral ("fileB.txt"), 400, 'o' }, {nfo { QStringLiteral ("subsubFolder") { QStringLiteral ("fileC.txt"), 400 },
                         { QStringLiteral ("fileD.txt"), 400, 'o' }
@@ -298,7 +298,7 @@ private slots:
         QVERIFY (!fakeFolder.syncOnce ());
         QCoreApplication.processEvents (); // should not crash
 
-        QSet<QString> seen;
+        QSet<string> seen;
         for (QList<QVariant> &args : completeSpy) {
             auto item = args[0].value<SyncFileItemPtr> ();
             qDebug () << item._file << item.isDirectory () << item._status;
@@ -385,7 +385,7 @@ private slots:
         QCOMPARE (nGET, expectedGET);
 
         // check that mtime in journal and filesystem agree
-        QString a1path = fakeFolder.localPath () + "A/a1";
+        string a1path = fakeFolder.localPath () + "A/a1";
         SyncJournalFileRecord a1record;
         fakeFolder.syncJournal ().getFileRecord (QByteArray ("A/a1"), &a1record);
         QCOMPARE (a1record._modtime, (int64)FileSystem.getModTime (a1path));
@@ -395,7 +395,7 @@ private slots:
         QCOMPARE (nGET, expectedGET);
     }
 
-    /**
+    /***********************************************************
      * Checks whether SyncFileItems have the expected properties before start
      * of propagation.
      */
@@ -473,7 +473,7 @@ private slots:
         QVERIFY (fakeFolder.syncOnce ());
     }
 
-    /**
+    /***********************************************************
      * Checks whether subsequent large uploads are skipped after a 507 error
      */
     void testInsufficientRemoteStorage () {
@@ -625,7 +625,7 @@ private slots:
 
         // We can't depend on currentLocalState for hidden files since
         // it should rightfully skip things like download temporaries
-        auto localFileExists = [&] (QString name) {
+        auto localFileExists = [&] (string name) {
             return QFileInfo (fakeFolder.localPath () + name).exists ();
         };
 
@@ -763,7 +763,7 @@ private slots:
         QCOMPARE (QFileInfo (fakeFolder.localPath () + "foo").lastModified (), datetime);
     }
 
-    /**
+    /***********************************************************
      * Checks whether subsequent large uploads are skipped after a 507 error
      */
     void testErrorsWithBulkUpload () {
@@ -782,7 +782,7 @@ private slots:
             if (op == QNetworkAccessManager.PostOperation) {
                 ++nPOST;
                 if (contentType.startsWith (QStringLiteral ("multipart/related; boundary="))) {
-                    auto jsonReplyObject = fakeFolder.forEachReplyPart (outgoingData, contentType, [] (QMap<QString, QByteArray> &allHeaders) . QJsonObject {
+                    auto jsonReplyObject = fakeFolder.forEachReplyPart (outgoingData, contentType, [] (QMap<string, QByteArray> &allHeaders) . QJsonObject {
                         auto reply = QJsonObject{};
                         const auto fileName = allHeaders[QStringLiteral ("X-File-Path")];
                         if (fileName.endsWith ("A/big2") ||

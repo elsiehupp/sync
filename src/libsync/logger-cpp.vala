@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <QDir>
 // #include <QRegularExpression>
@@ -41,7 +33,7 @@ Logger.Logger (GLib.Object *parent)
                                       "]%{if-debug}\t[ %{function} ]%{endif}:\t%{message}"));
     _crashLog.resize (CrashLogSize);
 #ifndef NO_MSG_HANDLER
-    qInstallMessageHandler ([] (QtMsgType type, QMessageLogContext &ctx, QString &message) {
+    qInstallMessageHandler ([] (QtMsgType type, QMessageLogContext &ctx, string &message) {
             Logger.instance ().doLog (type, ctx, message);
         });
 #endif
@@ -53,15 +45,15 @@ Logger.~Logger () {
 #endif
 }
 
-void Logger.postGuiLog (QString &title, QString &message) {
+void Logger.postGuiLog (string &title, string &message) {
     emit guiLog (title, message);
 }
 
-void Logger.postOptionalGuiLog (QString &title, QString &message) {
+void Logger.postOptionalGuiLog (string &title, string &message) {
     emit optionalGuiLog (title, message);
 }
 
-void Logger.postGuiMessage (QString &title, QString &message) {
+void Logger.postGuiMessage (string &title, string &message) {
     emit guiMessage (title, message);
 }
 
@@ -70,7 +62,7 @@ bool Logger.isLoggingToFile () {
     return _logstream;
 }
 
-void Logger.doLog (QtMsgType type, QMessageLogContext &ctx, QString &message) { {onst QString msg = qFormatLogMessage (type, ctx, message);
+void Logger.doLog (QtMsgType type, QMessageLogContext &ctx, string &message) { {onst string msg = qFormatLogMessage (type, ctx, message);
     {
         QMutexLocker lock (&_mutex);
         _crashLogIndex = (_crashLogIndex + 1) % CrashLogSize;
@@ -96,11 +88,11 @@ void Logger.close () {
     }
 }
 
-QString Logger.logFile () {
+string Logger.logFile () {
     return _logFile.fileName ();
 }
 
-void Logger.setLogFile (QString &name) {
+void Logger.setLogFile (string &name) {
     QMutexLocker locker (&_mutex);
     if (_logstream) {
         _logstream.reset (nullptr);
@@ -122,7 +114,7 @@ void Logger.setLogFile (QString &name) {
     if (!openSucceeded) {
         locker.unlock (); // Just in case postGuiMessage has a qDebug ()
         postGuiMessage (tr ("Error"),
-            QString (tr ("<nobr>File \"%1\"<br/>cannot be opened for writing.<br/><br/>"
+            string (tr ("<nobr>File \"%1\"<br/>cannot be opened for writing.<br/><br/>"
                        "The log output <b>cannot</b> be saved!</nobr>"))
                 .arg (name));
         return;
@@ -136,11 +128,11 @@ void Logger.setLogExpire (int expire) {
     _logExpire = expire;
 }
 
-QString Logger.logDir () {
+string Logger.logDir () {
     return _logDirectory;
 }
 
-void Logger.setLogDir (QString &dir) {
+void Logger.setLogDir (string &dir) {
     _logDirectory = dir;
 }
 
@@ -149,7 +141,7 @@ void Logger.setLogFlush (bool flush) {
 }
 
 void Logger.setLogDebug (bool debug) {
-    const QSet<QString> rules = {debug ? QStringLiteral ("nextcloud.*.debug=true") : QString ()};
+    const QSet<string> rules = {debug ? QStringLiteral ("nextcloud.*.debug=true") : string ()};
     if (debug) {
         addLogRule (rules);
     } else {
@@ -158,7 +150,7 @@ void Logger.setLogDebug (bool debug) {
     _logDebug = debug;
 }
 
-QString Logger.temporaryFolderLogDirPath () {
+string Logger.temporaryFolderLogDirPath () {
     return QDir.temp ().filePath (QStringLiteral (APPLICATION_SHORTNAME "-logdir"));
 }
 
@@ -177,15 +169,15 @@ void Logger.disableTemporaryFolderLogDir () {
         return;
 
     enterNextLogFile ();
-    setLogDir (QString ());
+    setLogDir (string ());
     setLogDebug (false);
-    setLogFile (QString ());
+    setLogFile (string ());
     _temporaryFolderLogDir = false;
 }
 
-void Logger.setLogRules (QSet<QString> &rules) {
+void Logger.setLogRules (QSet<string> &rules) {
     _logRules = rules;
-    QString tmp;
+    string tmp;
     QTextStream out (&tmp);
     for (auto &p : rules) {
         out << p << QLatin1Char ('\n');
@@ -204,7 +196,7 @@ void Logger.dumpCrashLog () {
     }
 }
 
-static bool compressLog (QString &originalName, QString &targetName) {
+static bool compressLog (string &originalName, string &targetName) {
 #ifdef ZLIB_FOUND
     QFile original (originalName);
     if (!original.open (QIODevice.ReadOnly))
@@ -239,14 +231,14 @@ void Logger.enterNextLogFile () {
 
         // Tentative new log name, will be adjusted if one like this already exists
         QDateTime now = QDateTime.currentDateTime ();
-        QString newLogName = now.toString ("yyyyMMdd_HHmm") + "_owncloud.log";
+        string newLogName = now.toString ("yyyyMMdd_HHmm") + "_owncloud.log";
 
         // Expire old log files and deal with conflicts
         QStringList files = dir.entryList (QStringList ("*owncloud.log.*"),
             QDir.Files, QDir.Name);
         const QRegularExpression rx (QRegularExpression.anchoredPattern (R" (.*owncloud\.log\. (\d+).*)"));
         int maxNumber = -1;
-        foreach (QString &s, files) {
+        foreach (string &s, files) {
             if (_logExpire > 0) {
                 QFileInfo fileInfo (dir.absoluteFilePath (s));
                 if (fileInfo.lastModified ().addSecs (60 * 60 * _logExpire) < now) {
@@ -258,7 +250,7 @@ void Logger.enterNextLogFile () {
                 maxNumber = qMax (maxNumber, rxMatch.captured (1).toInt ());
             }
         }
-        newLogName.append ("." + QString.number (maxNumber + 1));
+        newLogName.append ("." + string.number (maxNumber + 1));
 
         auto previousLog = _logFile.fileName ();
         setLogFile (dir.filePath (newLogName));
@@ -269,7 +261,7 @@ void Logger.enterNextLogFile () {
         if (logToCompress.isEmpty () && files.size () > 0 && !files.last ().endsWith (".gz"))
             logToCompress = dir.absoluteFilePath (files.last ());
         if (!logToCompress.isEmpty ()) {
-            QString compressedName = logToCompress + ".gz";
+            string compressedName = logToCompress + ".gz";
             if (compressLog (logToCompress, compressedName)) {
                 QFile.remove (logToCompress);
             } else {

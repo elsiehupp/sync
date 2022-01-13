@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <csync_exclude.h>
 
@@ -27,7 +19,7 @@ namespace Occ {
 Q_LOGGING_CATEGORY (lcDiscovery, "nextcloud.sync.discovery", QtInfoMsg)
 
 /* Given a sorted list of paths ending with '/', return whether or not the given path is within one of the paths of the list*/
-static bool findPathInList (QStringList &list, QString &path) {
+static bool findPathInList (QStringList &list, string &path) {
     Q_ASSERT (std.is_sorted (list.begin (), list.end ()));
 
     if (list.size () == 1 && list.first () == QLatin1String ("/")) {
@@ -35,7 +27,7 @@ static bool findPathInList (QStringList &list, QString &path) {
         return true;
     }
 
-    QString pathSlash = path + QLatin1Char ('/');
+    string pathSlash = path + QLatin1Char ('/');
 
     // Since the list is sorted, we can do a binary search.
     // If the path is a prefix of another item or right after in the lexical order.
@@ -53,7 +45,7 @@ static bool findPathInList (QStringList &list, QString &path) {
     return pathSlash.startsWith (*it);
 }
 
-bool DiscoveryPhase.isInSelectiveSyncBlackList (QString &path) {
+bool DiscoveryPhase.isInSelectiveSyncBlackList (string &path) {
     if (_selectiveSyncBlackList.isEmpty ()) {
         // If there is no black list, everything is allowed
         return false;
@@ -67,7 +59,7 @@ bool DiscoveryPhase.isInSelectiveSyncBlackList (QString &path) {
     return false;
 }
 
-void DiscoveryPhase.checkSelectiveSyncNewFolder (QString &path, RemotePermissions remotePerm,
+void DiscoveryPhase.checkSelectiveSyncNewFolder (string &path, RemotePermissions remotePerm,
     std.function<void (bool)> callback) {
     if (_syncOptions._confirmExternalStorage && _syncOptions._vfs.mode () == Vfs.Off
         && remotePerm.hasPermission (RemotePermissions.IsMounted)) {
@@ -125,11 +117,11 @@ void DiscoveryPhase.checkSelectiveSyncNewFolder (QString &path, RemotePermission
 }
 
 /* Given a path on the remote, give the path as it is when the rename is done */
-QString DiscoveryPhase.adjustRenamedPath (QString &original, SyncFileItem.Direction d) {
+string DiscoveryPhase.adjustRenamedPath (string &original, SyncFileItem.Direction d) {
     return Occ.adjustRenamedPath (d == SyncFileItem.Down ? _renamedItemsRemote : _renamedItemsLocal, original);
 }
 
-QString adjustRenamedPath (QMap<QString, QString> &renamedItems, QString &original) {
+string adjustRenamedPath (QMap<string, string> &renamedItems, string &original) {
     int slashPos = original.size ();
     while ( (slashPos = original.lastIndexOf ('/', slashPos - 1)) > 0) {
         auto it = renamedItems.constFind (original.left (slashPos));
@@ -140,7 +132,7 @@ QString adjustRenamedPath (QMap<QString, QString> &renamedItems, QString &origin
     return original;
 }
 
-QPair<bool, QByteArray> DiscoveryPhase.findAndCancelDeletedJob (QString &originalPath) {
+QPair<bool, QByteArray> DiscoveryPhase.findAndCancelDeletedJob (string &originalPath) {
     bool result = false;
     QByteArray oldEtag;
     auto it = _deletedItem.find (originalPath);
@@ -224,21 +216,21 @@ void DiscoveryPhase.scheduleMoreJobs () {
     }
 }
 
-DiscoverySingleLocalDirectoryJob.DiscoverySingleLocalDirectoryJob (AccountPtr &account, QString &localPath, Occ.Vfs *vfs, GLib.Object *parent)
+DiscoverySingleLocalDirectoryJob.DiscoverySingleLocalDirectoryJob (AccountPtr &account, string &localPath, Occ.Vfs *vfs, GLib.Object *parent)
  : GLib.Object (parent), QRunnable (), _localPath (localPath), _account (account), _vfs (vfs) {
     qRegisterMetaType<QVector<LocalInfo> > ("QVector<LocalInfo>");
 }
 
 // Use as QRunnable
 void DiscoverySingleLocalDirectoryJob.run () {
-    QString localPath = _localPath;
+    string localPath = _localPath;
     if (localPath.endsWith ('/')) // Happens if _currentFolder._local.isEmpty ()
         localPath.chop (1);
 
     auto dh = csync_vio_local_opendir (localPath);
     if (!dh) {
         qCInfo (lcDiscovery) << "Error while opening directory" << (localPath) << errno;
-        QString errorString = tr ("Error while opening directory %1").arg (localPath);
+        string errorString = tr ("Error while opening directory %1").arg (localPath);
         if (errno == EACCES) {
             errorString = tr ("Directory not accessible on client, permission denied");
             emit finishedNonFatalError (errorString);
@@ -307,7 +299,7 @@ void DiscoverySingleLocalDirectoryJob.run () {
     emit finished (results);
 }
 
-DiscoverySingleDirectoryJob.DiscoverySingleDirectoryJob (AccountPtr &account, QString &path, GLib.Object *parent)
+DiscoverySingleDirectoryJob.DiscoverySingleDirectoryJob (AccountPtr &account, string &path, GLib.Object *parent)
     : GLib.Object (parent)
     , _subPath (path)
     , _account (account)
@@ -360,10 +352,10 @@ void DiscoverySingleDirectoryJob.abort () {
     }
 }
 
-static void propertyMapToRemoteInfo (QMap<QString, QString> &map, RemoteInfo &result) {
+static void propertyMapToRemoteInfo (QMap<string, string> &map, RemoteInfo &result) {
     for (auto it = map.constBegin (); it != map.constEnd (); ++it) {
-        QString property = it.key ();
-        QString value = it.value ();
+        string property = it.key ();
+        string value = it.value ();
         if (property == QLatin1String ("resourcetype")) {
             result.isDirectory = value.contains (QLatin1String ("collection"));
         } else if (property == QLatin1String ("getlastmodified")) {
@@ -412,7 +404,7 @@ static void propertyMapToRemoteInfo (QMap<QString, QString> &map, RemoteInfo &re
     }
 }
 
-void DiscoverySingleDirectoryJob.directoryListingIteratedSlot (QString &file, QMap<QString, QString> &map) {
+void DiscoverySingleDirectoryJob.directoryListingIteratedSlot (string &file, QMap<string, string> &map) {
     if (!_ignoredFirst) {
         // The first entry is for the folder itself, we should process it differently.
         _ignoredFirst = true;
@@ -481,19 +473,19 @@ void DiscoverySingleDirectoryJob.lsJobFinishedWithoutErrorSlot () {
         deleteLater ();
         return;
     } else if (_isE2eEncrypted) {
-        emit etag (_firstEtag, QDateTime.fromString (QString.fromUtf8 (_lsColJob.responseTimestamp ()), Qt.RFC2822Date));
+        emit etag (_firstEtag, QDateTime.fromString (string.fromUtf8 (_lsColJob.responseTimestamp ()), Qt.RFC2822Date));
         fetchE2eMetadata ();
         return;
     }
-    emit etag (_firstEtag, QDateTime.fromString (QString.fromUtf8 (_lsColJob.responseTimestamp ()), Qt.RFC2822Date));
+    emit etag (_firstEtag, QDateTime.fromString (string.fromUtf8 (_lsColJob.responseTimestamp ()), Qt.RFC2822Date));
     emit finished (_results);
     deleteLater ();
 }
 
 void DiscoverySingleDirectoryJob.lsJobFinishedWithErrorSlot (QNetworkReply *r) {
-    QString contentType = r.header (QNetworkRequest.ContentTypeHeader).toString ();
+    string contentType = r.header (QNetworkRequest.ContentTypeHeader).toString ();
     int httpCode = r.attribute (QNetworkRequest.HttpStatusCodeAttribute).toInt ();
-    QString msg = r.errorString ();
+    string msg = r.errorString ();
     qCWarning (lcDiscovery) << "LSCOL job error" << r.errorString () << httpCode << r.error ();
     if (r.error () == QNetworkReply.NoError
         && !contentType.contains ("application/xml; charset=utf-8")) {
@@ -519,7 +511,7 @@ void DiscoverySingleDirectoryJob.metadataReceived (QJsonDocument &json, int stat
     const auto metadata = FolderMetadata (_account, json.toJson (QJsonDocument.Compact), statusCode);
     const auto encryptedFiles = metadata.files ();
 
-    const auto findEncryptedFile = [=] (QString &name) {
+    const auto findEncryptedFile = [=] (string &name) {
         const auto it = std.find_if (std.cbegin (encryptedFiles), std.cend (encryptedFiles), [=] (EncryptedFile &file) {
             return file.encryptedFilename == name;
         });

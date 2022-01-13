@@ -1,30 +1,14 @@
-/****************************************************************************
-**
-** Copyright (C) 2014 Digia Plc and/or its subsidiary (-ies).
-** Contact : http://www.qt-project.org/legal
-**
-** This file is part of Qt Creator.
-**
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
-** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and Digia.  For licensing terms and
-** conditions see http://qt.digia.com/licensing.  For further information
-** use the contact form at http://qt.digia.com/contact-us.
-**
-** GNU Lesser General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 as published by the Free Software
-** Foundation and appearing in the file LICENSE.LGPL included in the
-** packaging of this file.  Please review the following information to
-** ensure the GNU Lesser General Public License version 2.1 requirements
-** will be met : http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
-**
-** In addition, as a special exception, Digia gives you certain additional
-** rights.  These rights are described in the Digia Qt LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
-**
+/***********************************************************
+Copyright (C) 2014 Digia Plc and/or its subsidiary (-ies).
+Contact : http://www.qt-project.org/legal
+
+This file is part of Qt Creator.
+
+<LGPLv2.1-or-later-Boilerplate>
+
+In addition, as a special exception, Digia gives you certain additional
+rights.  These rights are described in the Digia Qt LGPL Exception
+version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 ****************************************************************************/
 
 // #include <QCoreApplication>
@@ -40,25 +24,25 @@ namespace SharedTools {
 
 static const char ack[] = "ack";
 
-QString QtLocalPeer.appSessionId (QString &appId) {
+string QtLocalPeer.appSessionId (string &appId) {
     QByteArray idc = appId.toUtf8 ();
     uint16 idNum = qChecksum (idc.constData (), idc.size ());
     //### could do : two 16bit checksums over separate halves of id, for a 32bit result - improved uniqeness probability. Every-other-char split would be best.
 
-    QString res = QLatin1String ("qtsingleapplication-")
-                 + QString.number (idNum, 16);
-    res += QLatin1Char ('-') + QString.number (.getuid (), 16);
+    string res = QLatin1String ("qtsingleapplication-")
+                 + string.number (idNum, 16);
+    res += QLatin1Char ('-') + string.number (.getuid (), 16);
     return res;
 }
 
-QtLocalPeer.QtLocalPeer (GLib.Object *parent, QString &appId)
+QtLocalPeer.QtLocalPeer (GLib.Object *parent, string &appId)
     : GLib.Object (parent), id (appId) {
     if (id.isEmpty ())
         id = QCoreApplication.applicationFilePath ();  //### On win, check if this returns .../argv[0] without casefolding; .\MYAPP == .\myapp on Win
 
     socketName = appSessionId (id);
     server = new QLocalServer (this);
-    QString lockName = QDir (QDir.tempPath ()).absolutePath ()
+    string lockName = QDir (QDir.tempPath ()).absolutePath ()
                        + QLatin1Char ('/') + socketName
                        + QLatin1String ("-lockfile");
     lockFile.setFileName (lockName);
@@ -81,7 +65,7 @@ bool QtLocalPeer.isClient () {
     return false;
 }
 
-bool QtLocalPeer.sendMessage (QString &message, int timeout, bool block) {
+bool QtLocalPeer.sendMessage (string &message, int timeout, bool block) {
     if (!isClient ())
         return false;
 
@@ -143,7 +127,7 @@ void QtLocalPeer.receiveConnection () {
         return;
     }
     // ### async this
-    QString message = QString.fromUtf8 (uMsg.constData (), uMsg.size ());
+    string message = string.fromUtf8 (uMsg.constData (), uMsg.size ());
     socket.write (ack, qstrlen (ack));
     socket.waitForBytesWritten (1000);
     emit messageReceived (message, socket); // ## (might take a long time to return)

@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <QtCore>
 #ifndef TOKEN_AUTH_ONLY
@@ -31,7 +23,7 @@ const int INCLUDE_FILE (M) QUOTEME (M)
 
 namespace {
 
-QUrl imagePathToUrl (QString &imagePath) {
+QUrl imagePathToUrl (string &imagePath) {
     if (imagePath.startsWith (':')) {
         auto url = QUrl ();
         url.setScheme (QStringLiteral ("qrc"));
@@ -63,8 +55,8 @@ Theme *Theme.instance () {
 
 Theme.~Theme () = default;
 
-QString Theme.statusHeaderText (SyncResult.Status status) {
-    QString resultStr;
+string Theme.statusHeaderText (SyncResult.Status status) {
+    string resultStr;
 
     switch (status) {
     case SyncResult.Undefined:
@@ -105,11 +97,11 @@ bool Theme.isBranded () {
     return appNameGUI () != QStringLiteral ("Nextcloud");
 }
 
-QString Theme.appNameGUI () {
+string Theme.appNameGUI () {
     return APPLICATION_NAME;
 }
 
-QString Theme.appName () {
+string Theme.appName () {
     return APPLICATION_SHORTNAME;
 }
 
@@ -161,11 +153,11 @@ QUrl Theme.folderOffline () {
     return imagePathToUrl (themeImagePath ("state-offline"));
 }
 
-QString Theme.version () {
+string Theme.version () {
     return MIRALL_VERSION_STRING;
 }
 
-QString Theme.configFileName () {
+string Theme.configFileName () {
     return QStringLiteral (APPLICATION_EXECUTABLE ".cfg");
 }
 
@@ -175,19 +167,19 @@ QIcon Theme.applicationIcon () {
     return themeIcon (QStringLiteral (APPLICATION_ICON_NAME "-icon"));
 }
 
-/*
+/***********************************************************
 helper to load a icon from either the icon theme the desktop provides or from
 the apps Qt resources.
-*/
-QIcon Theme.themeIcon (QString &name, bool sysTray) {
-    QString flavor;
+***********************************************************/
+QIcon Theme.themeIcon (string &name, bool sysTray) {
+    string flavor;
     if (sysTray) {
         flavor = systrayIconFlavor (_mono);
     } else {
         flavor = QLatin1String ("colored");
     }
 
-    QString key = name + "," + flavor;
+    string key = name + "," + flavor;
     QIcon &cached = _iconCache[key];
     if (cached.isNull ()) {
         if (QIcon.hasThemeIcon (name)) {
@@ -195,7 +187,7 @@ QIcon Theme.themeIcon (QString &name, bool sysTray) {
             return cached = QIcon.fromTheme (name);
         }
 
-        const QString svgName = QString (Theme.themePrefix) + QString.fromLatin1 ("%1/%2.svg").arg (flavor).arg (name);
+        const string svgName = string (Theme.themePrefix) + string.fromLatin1 ("%1/%2.svg").arg (flavor).arg (name);
         QSvgRenderer renderer (svgName);
         const auto createPixmapFromSvg = [&renderer] (int size) {
             QImage img (size, size, QImage.Format_ARGB32);
@@ -206,7 +198,7 @@ QIcon Theme.themeIcon (QString &name, bool sysTray) {
         };
 
         const auto loadPixmap = [flavor, name] (int size) {
-            const QString pixmapName = QString (Theme.themePrefix) + QString.fromLatin1 ("%1/%2-%3.png").arg (flavor).arg (name).arg (size);
+            const string pixmapName = string (Theme.themePrefix) + string.fromLatin1 ("%1/%2-%3.png").arg (flavor).arg (name).arg (size);
             return QPixmap (pixmapName);
         };
 
@@ -232,21 +224,21 @@ QIcon Theme.themeIcon (QString &name, bool sysTray) {
     return cached;
 }
 
-QString Theme.themeImagePath (QString &name, int size, bool sysTray) {
+string Theme.themeImagePath (string &name, int size, bool sysTray) {
     const auto flavor = (!isBranded () && sysTray) ? systrayIconFlavor (_mono) : QLatin1String ("colored");
     const auto useSvg = shouldPreferSvg ();
 
     // branded client may have several sizes of the same icon
-    const QString filePath = (useSvg || size <= 0)
-            ? QString (Theme.themePrefix) + QString.fromLatin1 ("%1/%2").arg (flavor).arg (name)
-            : QString (Theme.themePrefix) + QString.fromLatin1 ("%1/%2-%3").arg (flavor).arg (name).arg (size);
+    const string filePath = (useSvg || size <= 0)
+            ? string (Theme.themePrefix) + string.fromLatin1 ("%1/%2").arg (flavor).arg (name)
+            : string (Theme.themePrefix) + string.fromLatin1 ("%1/%2-%3").arg (flavor).arg (name).arg (size);
 
-    const QString svgPath = filePath + ".svg";
+    const string svgPath = filePath + ".svg";
     if (useSvg) {
         return svgPath;
     }
 
-    const QString pngPath = filePath + ".png";
+    const string pngPath = filePath + ".png";
     // Use the SVG as fallback if a PNG is missing so that we get a chance to display something
     if (QFile.exists (pngPath)) {
         return pngPath;
@@ -260,13 +252,13 @@ bool Theme.isHidpi (QPaintDevice *dev) {
     return devicePixelRatio > 1;
 }
 
-QIcon Theme.uiThemeIcon (QString &iconName, bool uiHasDarkBg) {
-    QString iconPath = QString (Theme.themePrefix) + (uiHasDarkBg ? "white/" : "black/") + iconName;
+QIcon Theme.uiThemeIcon (string &iconName, bool uiHasDarkBg) {
+    string iconPath = string (Theme.themePrefix) + (uiHasDarkBg ? "white/" : "black/") + iconName;
     std.string icnPath = iconPath.toUtf8 ().constData ();
     return QIcon (QPixmap (iconPath));
 }
 
-QString Theme.hidpiFileName (QString &fileName, QPaintDevice *dev) {
+string Theme.hidpiFileName (string &fileName, QPaintDevice *dev) {
     if (!Theme.isHidpi (dev)) {
         return fileName;
     }
@@ -274,7 +266,7 @@ QString Theme.hidpiFileName (QString &fileName, QPaintDevice *dev) {
 
     const int dotIndex = fileName.lastIndexOf (QLatin1Char ('.'));
     if (dotIndex != -1) {
-        QString at2xfileName = fileName;
+        string at2xfileName = fileName;
         at2xfileName.insert (dotIndex, QStringLiteral ("@2x"));
         if (QFile.exists (at2xfileName)) {
             return at2xfileName;
@@ -283,10 +275,10 @@ QString Theme.hidpiFileName (QString &fileName, QPaintDevice *dev) {
     return fileName;
 }
 
-QString Theme.hidpiFileName (QString &iconName, QColor &backgroundColor, QPaintDevice *dev) {
+string Theme.hidpiFileName (string &iconName, QColor &backgroundColor, QPaintDevice *dev) {
     const auto isDarkBackground = Theme.isDarkColor (backgroundColor);
 
-    const QString iconPath = QString (Theme.themePrefix) + (isDarkBackground ? "white/" : "black/") + iconName;
+    const string iconPath = string (Theme.themePrefix) + (isDarkBackground ? "white/" : "black/") + iconName;
 
     return Theme.hidpiFileName (iconPath, dev);
 }
@@ -307,32 +299,32 @@ bool Theme.multiAccount () {
     return true;
 }
 
-QString Theme.defaultServerFolder () {
+string Theme.defaultServerFolder () {
     return QLatin1String ("/");
 }
 
-QString Theme.helpUrl () {
+string Theme.helpUrl () {
 #ifdef APPLICATION_HELP_URL
-    return QString.fromLatin1 (APPLICATION_HELP_URL);
+    return string.fromLatin1 (APPLICATION_HELP_URL);
 #else
-    return QString.fromLatin1 ("https://docs.nextcloud.com/desktop/%1.%2/").arg (MIRALL_VERSION_MAJOR).arg (MIRALL_VERSION_MINOR);
+    return string.fromLatin1 ("https://docs.nextcloud.com/desktop/%1.%2/").arg (MIRALL_VERSION_MAJOR).arg (MIRALL_VERSION_MINOR);
 #endif
 }
 
-QString Theme.conflictHelpUrl () {
+string Theme.conflictHelpUrl () {
     auto baseUrl = helpUrl ();
     if (baseUrl.isEmpty ())
-        return QString ();
+        return string ();
     if (!baseUrl.endsWith ('/'))
         baseUrl.append ('/');
     return baseUrl + QStringLiteral ("conflicts.html");
 }
 
-QString Theme.overrideServerUrl () {
+string Theme.overrideServerUrl () {
 #ifdef APPLICATION_SERVER_URL
-    return QString.fromLatin1 (APPLICATION_SERVER_URL);
+    return string.fromLatin1 (APPLICATION_SERVER_URL);
 #else
-    return QString ();
+    return string ();
 #endif
 }
 
@@ -360,16 +352,16 @@ bool Theme.forbidBadSSL () {
 #endif
 }
 
-QString Theme.forceConfigAuthType () {
-    return QString ();
+string Theme.forceConfigAuthType () {
+    return string ();
 }
 
-QString Theme.defaultClientFolder () {
+string Theme.defaultClientFolder () {
     return appName ();
 }
 
-QString Theme.systrayIconFlavor (bool mono) {
-    QString flavor;
+string Theme.systrayIconFlavor (bool mono) {
+    string flavor;
     if (mono) {
         flavor = Utility.hasDarkSystray () ? QLatin1String ("white") : QLatin1String ("black");
     } else {
@@ -388,11 +380,11 @@ bool Theme.systrayUseMonoIcons () {
 }
 
 bool Theme.monoIconsAvailable () {
-    QString themeDir = QString (Theme.themePrefix) + QString.fromLatin1 ("%1/").arg (Theme.instance ().systrayIconFlavor (true));
+    string themeDir = string (Theme.themePrefix) + string.fromLatin1 ("%1/").arg (Theme.instance ().systrayIconFlavor (true));
     return QDir (themeDir).exists ();
 }
 
-QString Theme.updateCheckUrl () {
+string Theme.updateCheckUrl () {
     return APPLICATION_UPDATE_URL;
 }
 
@@ -409,12 +401,12 @@ bool Theme.wizardHideFolderSizeLimitCheckbox () {
     return false;
 }
 
-QString Theme.gitSHA1 () {
-    QString devString;
+string Theme.gitSHA1 () {
+    string devString;
 #ifdef GIT_SHA1
-    const QString githubPrefix (QLatin1String (
+    const string githubPrefix (QLatin1String (
         "https://github.com/nextcloud/desktop/commit/"));
-    const QString gitSha1 (QLatin1String (GIT_SHA1));
+    const string gitSha1 (QLatin1String (GIT_SHA1));
     devString = QCoreApplication.translate ("nextcloudTheme.about ()",
         "<p><small>Built from Git revision <a href=\"%1\">%2</a>"
         " on %3, %4 using Qt %5, %6</small></p>")
@@ -428,18 +420,18 @@ QString Theme.gitSHA1 () {
     return devString;
 }
 
-QString Theme.about () {
+string Theme.about () {
     // Shorten Qt's OS name : "macOS Mojave (10.14)" . "macOS"
     QStringList osStringList = Utility.platformName ().split (QLatin1Char (' '));
-    QString osName = osStringList.at (0);
+    string osName = osStringList.at (0);
 
-    QString devString;
+    string devString;
     // : Example text : "<p>Nextcloud Desktop Client</p>"   (%1 is the application name)
     devString = tr ("<p>%1 Desktop Client</p>")
               .arg (APPLICATION_NAME);
 
     devString += tr ("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
-              .arg (QString.fromLatin1 (MIRALL_STRINGIFY (MIRALL_VERSION)) + QString (" (%1)").arg (osName))
+              .arg (string.fromLatin1 (MIRALL_STRINGIFY (MIRALL_VERSION)) + string (" (%1)").arg (osName))
               .arg (helpUrl ());
 
     devString += tr ("<p><small>Using virtual files plugin : %1</small></p>")
@@ -450,8 +442,8 @@ QString Theme.about () {
     return devString;
 }
 
-QString Theme.aboutDetails () {
-    QString devString;
+string Theme.aboutDetails () {
+    string devString;
     devString = tr ("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
               .arg (MIRALL_VERSION_STRING)
               .arg (helpUrl ());
@@ -467,7 +459,7 @@ QString Theme.aboutDetails () {
 #ifndef TOKEN_AUTH_ONLY
 QVariant Theme.customMedia (CustomMediaType type) {
     QVariant re;
-    QString key;
+    string key;
 
     switch (type) {
     case oCSetupTop:
@@ -484,7 +476,7 @@ QVariant Theme.customMedia (CustomMediaType type) {
         break;
     }
 
-    QString imgPath = QString (Theme.themePrefix) + QString.fromLatin1 ("colored/%1.png").arg (key);
+    string imgPath = string (Theme.themePrefix) + string.fromLatin1 ("colored/%1.png").arg (key);
     if (QFile.exists (imgPath)) {
         QPixmap pix (imgPath);
         if (pix.isNull ()) {
@@ -499,7 +491,7 @@ QVariant Theme.customMedia (CustomMediaType type) {
 
 QIcon Theme.syncStateIcon (SyncResult.Status status, bool sysTray) {
     // FIXME : Mind the size!
-    QString statusIcon;
+    string statusIcon;
 
     switch (status) {
     case SyncResult.Undefined:
@@ -549,11 +541,11 @@ QColor Theme.wizardHeaderBackgroundColor () {
 
 QPixmap Theme.wizardApplicationLogo () {
     if (!Theme.isBranded ()) {
-        return QPixmap (Theme.hidpiFileName (QString (Theme.themePrefix) + "colored/wizard-nextcloud.png"));
+        return QPixmap (Theme.hidpiFileName (string (Theme.themePrefix) + "colored/wizard-nextcloud.png"));
     }
 #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
     const auto useSvg = shouldPreferSvg ();
-    const QString logoBasePath = QString (Theme.themePrefix) + QStringLiteral ("colored/wizard_logo");
+    const string logoBasePath = string (Theme.themePrefix) + QStringLiteral ("colored/wizard_logo");
     if (useSvg) {
         const auto maxHeight = Theme.isHidpi () ? 200 : 100;
         const auto maxWidth = 2 * maxHeight;
@@ -572,7 +564,7 @@ QPixmap Theme.wizardApplicationLogo () {
 QPixmap Theme.wizardHeaderLogo () {
 #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
     const auto useSvg = shouldPreferSvg ();
-    const QString logoBasePath = QString (Theme.themePrefix) + QStringLiteral ("colored/wizard_logo");
+    const string logoBasePath = string (Theme.themePrefix) + QStringLiteral ("colored/wizard_logo");
     if (useSvg) {
         const auto maxHeight = 64;
         const auto maxWidth = 2 * maxHeight;
@@ -626,36 +618,36 @@ Theme.UserIDType Theme.userIDType () {
     return UserIDType.UserIDUserName;
 }
 
-QString Theme.customUserID () {
-    return QString ();
+string Theme.customUserID () {
+    return string ();
 }
 
-QString Theme.userIDHint () {
-    return QString ();
+string Theme.userIDHint () {
+    return string ();
 }
 
-QString Theme.wizardUrlPostfix () {
-    return QString ();
+string Theme.wizardUrlPostfix () {
+    return string ();
 }
 
-QString Theme.wizardUrlHint () {
-    return QString ();
+string Theme.wizardUrlHint () {
+    return string ();
 }
 
-QString Theme.quotaBaseFolder () {
+string Theme.quotaBaseFolder () {
     return QLatin1String ("/");
 }
 
-QString Theme.oauthClientId () {
+string Theme.oauthClientId () {
     return "xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69";
 }
 
-QString Theme.oauthClientSecret () {
+string Theme.oauthClientSecret () {
     return "UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh";
 }
 
-QString Theme.versionSwitchOutput () {
-    QString helpText;
+string Theme.versionSwitchOutput () {
+    string helpText;
     QTextStream stream (&helpText);
     stream << appName ()
            << QLatin1String (" version ")
@@ -687,19 +679,19 @@ QColor Theme.getBackgroundAwareLinkColor () {
     return getBackgroundAwareLinkColor (QGuiApplication.palette ().base ().color ());
 }
 
-void Theme.replaceLinkColorStringBackgroundAware (QString &linkString, QColor &backgroundColor) {
+void Theme.replaceLinkColorStringBackgroundAware (string &linkString, QColor &backgroundColor) {
     replaceLinkColorString (linkString, getBackgroundAwareLinkColor (backgroundColor));
 }
 
-void Theme.replaceLinkColorStringBackgroundAware (QString &linkString) {
+void Theme.replaceLinkColorStringBackgroundAware (string &linkString) {
     replaceLinkColorStringBackgroundAware (linkString, QGuiApplication.palette ().color (QPalette.Base));
 }
 
-void Theme.replaceLinkColorString (QString &linkString, QColor &newColor) {
-    linkString.replace (QRegularExpression (" (<a href|<a style='color:# ([a-zA-Z0-9]{6});' href)"), QString.fromLatin1 ("<a style='color:%1;' href").arg (newColor.name ()));
+void Theme.replaceLinkColorString (string &linkString, QColor &newColor) {
+    linkString.replace (QRegularExpression (" (<a href|<a style='color:# ([a-zA-Z0-9]{6});' href)"), string.fromLatin1 ("<a style='color:%1;' href").arg (newColor.name ()));
 }
 
-QIcon Theme.createColorAwareIcon (QString &name, QPalette &palette) {
+QIcon Theme.createColorAwareIcon (string &name, QPalette &palette) {
     QSvgRenderer renderer (name);
     QImage img (64, 64, QImage.Format_ARGB32);
     img.fill (Qt.GlobalColor.transparent);
@@ -727,11 +719,11 @@ QIcon Theme.createColorAwareIcon (QString &name, QPalette &palette) {
     return icon;
 }
 
-QIcon Theme.createColorAwareIcon (QString &name) {
+QIcon Theme.createColorAwareIcon (string &name) {
     return createColorAwareIcon (name, QGuiApplication.palette ());
 }
 
-QPixmap Theme.createColorAwarePixmap (QString &name, QPalette &palette) {
+QPixmap Theme.createColorAwarePixmap (string &name, QPalette &palette) {
     QImage img (name);
     QImage inverted (img);
     inverted.invertPixels (QImage.InvertRgb);
@@ -745,7 +737,7 @@ QPixmap Theme.createColorAwarePixmap (QString &name, QPalette &palette) {
     return pixmap;
 }
 
-QPixmap Theme.createColorAwarePixmap (QString &name) {
+QPixmap Theme.createColorAwarePixmap (string &name) {
     return createColorAwarePixmap (name, QGuiApplication.palette ());
 }
 

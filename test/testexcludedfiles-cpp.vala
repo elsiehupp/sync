@@ -1,9 +1,9 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
 
-*/
+***********************************************************/
 
 // #include <QtTest>
 // #include <QTemporaryDir>
@@ -122,7 +122,7 @@ private slots:
         QCOMPARE (check_file_full (".directory/cache-maximegalon/cache1.txt"), CSYNC_FILE_EXCLUDE_LIST);
         QCOMPARE (check_dir_full ("mozilla/.directory"), CSYNC_FILE_EXCLUDE_LIST);
 
-        /*
+        /***********************************************************
         * Test for patterns in subdirs. '.beagle' is defined as a pattern and has
         * to be found in top dir as well as in directories underneath.
         */
@@ -242,7 +242,7 @@ private slots:
         const auto fooDir = QStringLiteral ("check_csync1/foo");
         QVERIFY (QDir (tempDir).mkpath (fooDir));
 
-        const auto fooExcludeList = QString (tempDir + '/' + fooDir + "/.sync-exclude.lst");
+        const auto fooExcludeList = string (tempDir + '/' + fooDir + "/.sync-exclude.lst");
         QFile excludeList (fooExcludeList);
         QVERIFY (excludeList.open (QFile.WriteOnly));
         QCOMPARE (excludeList.write ("bar"), 3);
@@ -275,7 +275,7 @@ private slots:
         QCOMPARE (check_file_traversal (".kde/share/config/kwin.eventsrc"), CSYNC_NOT_EXCLUDED);
         QCOMPARE (check_dir_traversal ("mozilla/.directory"), CSYNC_FILE_EXCLUDE_LIST);
 
-        /*
+        /***********************************************************
         * Test for patterns in subdirs. '.beagle' is defined as a pattern and has
         * to be found in top dir as well as in directories underneath.
         */
@@ -561,7 +561,7 @@ private slots:
 
     void check_csync_is_windows_reserved_word () {
         auto csync_is_windows_reserved_word = [] (char *fn) {
-            QString s = QString.fromLatin1 (fn);
+            string s = string.fromLatin1 (fn);
             extern bool csync_is_windows_reserved_word (QStringRef &filename);
             return csync_is_windows_reserved_word (&s);
         };
@@ -657,7 +657,7 @@ private slots:
 
     void testAddExcludeFilePath_addSameFilePath_listSizeDoesNotIncrease () {
         excludedFiles.reset (new ExcludedFiles ());
-        const auto filePath = QString ("exclude/.sync-exclude.lst");
+        const auto filePath = string ("exclude/.sync-exclude.lst");
 
         excludedFiles.addExcludeFilePath (filePath);
         excludedFiles.addExcludeFilePath (filePath);
@@ -668,8 +668,8 @@ private slots:
     void testAddExcludeFilePath_addDifferentFilePaths_listSizeIncrease () {
         excludedFiles.reset (new ExcludedFiles ());
 
-        const auto filePath1 = QString ("exclude1/.sync-exclude.lst");
-        const auto filePath2 = QString ("exclude2/.sync-exclude.lst");
+        const auto filePath1 = string ("exclude1/.sync-exclude.lst");
+        const auto filePath2 = string ("exclude2/.sync-exclude.lst");
 
         excludedFiles.addExcludeFilePath (filePath1);
         excludedFiles.addExcludeFilePath (filePath2);
@@ -678,14 +678,14 @@ private slots:
     }
 
     void testAddExcludeFilePath_addDefaultExcludeFile_returnCorrectMap () {
-        const QString basePath ("syncFolder/");
-        const QString folder1 ("syncFolder/folder1/");
-        const QString folder2 (folder1 + "folder2/");
+        const string basePath ("syncFolder/");
+        const string folder1 ("syncFolder/folder1/");
+        const string folder2 (folder1 + "folder2/");
         excludedFiles.reset (new ExcludedFiles (basePath));
 
-        const QString defaultExcludeList ("desktop-client/config-folder/sync-exclude.lst");
-        const QString folder1ExcludeList (folder1 + ".sync-exclude.lst");
-        const QString folder2ExcludeList (folder2 + ".sync-exclude.lst");
+        const string defaultExcludeList ("desktop-client/config-folder/sync-exclude.lst");
+        const string folder1ExcludeList (folder1 + ".sync-exclude.lst");
+        const string folder2ExcludeList (folder2 + ".sync-exclude.lst");
 
         excludedFiles.addExcludeFilePath (defaultExcludeList);
         excludedFiles.addExcludeFilePath (folder1ExcludeList);
@@ -699,7 +699,7 @@ private slots:
 
     void testReloadExcludeFiles_fileDoesNotExist_returnFalse () {
         excludedFiles.reset (new ExcludedFiles ());
-        const QString nonExistingFile ("directory/.sync-exclude.lst");
+        const string nonExistingFile ("directory/.sync-exclude.lst");
         excludedFiles.addExcludeFilePath (nonExistingFile);
         QCOMPARE (excludedFiles.reloadExcludeFiles (), false);
         QCOMPARE (excludedFiles._allExcludes.size (), 0);
@@ -712,7 +712,7 @@ private slots:
         const auto subTempDir = QStringLiteral ("exclude");
         QVERIFY (QDir (tempDir).mkpath (subTempDir));
 
-        const auto existingFilePath = QString (tempDir + '/' + subTempDir + "/.sync-exclude.lst");
+        const auto existingFilePath = string (tempDir + '/' + subTempDir + "/.sync-exclude.lst");
         QFile excludeList (existingFilePath);
         QVERIFY (excludeList.open (QFile.WriteOnly));
         excludeList.close ();

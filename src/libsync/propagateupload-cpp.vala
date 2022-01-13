@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <QNetworkAccessManager>
 // #include <QFileInfo>
@@ -153,7 +145,7 @@ PropagateUploadFileCommon.PropagateUploadFileCommon (OwncloudPropagator *propaga
     , _uploadingEncrypted (false) {
     const auto path = _item._file;
     const auto slashPosition = path.lastIndexOf ('/');
-    const auto parentPath = slashPosition >= 0 ? path.left (slashPosition) : QString ();
+    const auto parentPath = slashPosition >= 0 ? path.left (slashPosition) : string ();
 
     SyncJournalFileRecord parentRec;
     bool ok = propagator._journal.getFileRecord (parentPath, &parentRec);
@@ -169,7 +161,7 @@ void PropagateUploadFileCommon.setDeleteExisting (bool enabled) {
 void PropagateUploadFileCommon.start () {
     const auto path = _item._file;
     const auto slashPosition = path.lastIndexOf ('/');
-    const auto parentPath = slashPosition >= 0 ? path.left (slashPosition) : QString ();
+    const auto parentPath = slashPosition >= 0 ? path.left (slashPosition) : string ();
 
     if (!_item._renameTarget.isEmpty () && _item._file != _item._renameTarget) {
         // Try to rename the file
@@ -217,7 +209,7 @@ void PropagateUploadFileCommon.start () {
     _uploadEncryptedHelper.start ();
 }
 
-void PropagateUploadFileCommon.setupEncryptedFile (QString& path, QString& filename, uint64 size) {
+void PropagateUploadFileCommon.setupEncryptedFile (string& path, string& filename, uint64 size) {
     qCDebug (lcPropagateUpload) << "Starting to upload encrypted file" << path << filename << size;
     _uploadingEncrypted = true;
     _fileToUpload._path = path;
@@ -280,7 +272,7 @@ void PropagateUploadFileCommon.slotComputeContentChecksum () {
         return;
     }
 
-    const QString filePath = propagator ().fullLocalPath (_item._file);
+    const string filePath = propagator ().fullLocalPath (_item._file);
 
     // remember the modtime before checksumming to be able to detect a file
     // change during the checksum calculation - This goes inside of the _item._file
@@ -354,8 +346,8 @@ void PropagateUploadFileCommon.slotStartUpload (QByteArray &transmissionChecksum
         _item._checksumHeader = _transmissionChecksumHeader;
     }
 
-    const QString fullFilePath = _fileToUpload._path;
-    const QString originalFilePath = propagator ().fullLocalPath (_item._file);
+    const string fullFilePath = _fileToUpload._path;
+    const string originalFilePath = propagator ().fullLocalPath (_item._file);
 
     if (!FileSystem.fileExists (fullFilePath)) {
         return slotOnErrorStartFolderUnlock (SyncFileItem.SoftError, tr ("File Removed (start upload) %1").arg (fullFilePath));
@@ -410,7 +402,7 @@ void PropagateUploadFileCommon.slotFolderUnlocked (QByteArray &folderId, int htt
     }
 }
 
-void PropagateUploadFileCommon.slotOnErrorStartFolderUnlock (SyncFileItem.Status status, QString &errorString) {
+void PropagateUploadFileCommon.slotOnErrorStartFolderUnlock (SyncFileItem.Status status, string &errorString) {
     if (_uploadingEncrypted) {
         _uploadStatus = { status, errorString };
         connect (_uploadEncryptedHelper, &PropagateUploadEncrypted.folderUnlocked, this, &PropagateUploadFileCommon.slotFolderUnlocked);
@@ -420,7 +412,7 @@ void PropagateUploadFileCommon.slotOnErrorStartFolderUnlock (SyncFileItem.Status
     }
 }
 
-UploadDevice.UploadDevice (QString &fileName, int64 start, int64 size, BandwidthManager *bwm)
+UploadDevice.UploadDevice (string &fileName, int64 start, int64 size, BandwidthManager *bwm)
     : _file (fileName)
     , _start (start)
     , _size (size)
@@ -442,7 +434,7 @@ bool UploadDevice.open (QIODevice.OpenMode mode) {
     // on all platforms after openAndSeekFileSharedRead ().
     auto fileDiskSize = FileSystem.getSize (_file.fileName ());
 
-    QString openError;
+    string openError;
     if (!FileSystem.openAndSeekFileSharedRead (&_file, &openError, _start)) {
         setErrorString (openError);
         return false;
@@ -551,7 +543,7 @@ void UploadDevice.setChoked (bool b) {
     }
 }
 
-void PropagateUploadFileCommon.startPollJob (QString &path) {
+void PropagateUploadFileCommon.startPollJob (string &path) {
     auto *job = new PollJob (propagator ().account (), path, _item,
         propagator ()._journal, propagator ().localPath (), this);
     connect (job, &PollJob.finishedSignal, this, &PropagateUploadFileCommon.slotPollFinished);
@@ -584,7 +576,7 @@ void PropagateUploadFileCommon.slotPollFinished () {
     finalize ();
 }
 
-void PropagateUploadFileCommon.done (SyncFileItem.Status status, QString &errorString) {
+void PropagateUploadFileCommon.done (SyncFileItem.Status status, string &errorString) {
     _finished = true;
     PropagateItemJob.done (status, errorString);
 }
@@ -610,7 +602,7 @@ void PropagateUploadFileCommon.checkResettingErrors () {
 
 void PropagateUploadFileCommon.commonErrorHandling (AbstractNetworkJob *job) {
     QByteArray replyContent;
-    QString errorString = job.errorStringParsingBody (&replyContent);
+    string errorString = job.errorStringParsingBody (&replyContent);
     qCDebug (lcPropagateUpload) << replyContent; // display the XML error in the debug
 
     if (_item._httpErrorCode == 412) {
@@ -667,7 +659,7 @@ void PropagateUploadFileCommon.slotJobDestroyed (GLib.Object *job) {
 }
 
 // This function is used whenever there is an error occuring and jobs might be in progress
-void PropagateUploadFileCommon.abortWithError (SyncFileItem.Status status, QString &error) {
+void PropagateUploadFileCommon.abortWithError (SyncFileItem.Status status, string &error) {
     if (_aborting)
         return;
     abort (AbortType.Synchronous);
@@ -760,7 +752,7 @@ void PropagateUploadFileCommon.finalize () {
     propagator ()._journal.commit ("upload file start");
 
     if (_uploadingEncrypted) {
-        _uploadStatus = { SyncFileItem.Success, QString () };
+        _uploadStatus = { SyncFileItem.Success, string () };
         connect (_uploadEncryptedHelper, &PropagateUploadEncrypted.folderUnlocked, this, &PropagateUploadFileCommon.slotFolderUnlocked);
         _uploadEncryptedHelper.unlockFolder ();
     } else {

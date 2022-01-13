@@ -1,15 +1,15 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
-*/
+***********************************************************/
 
 // #include <QtTest>
 // #include <QDebug>
 
 using namespace Occ;
 namespace Occ {
-QString OWNCLOUDSYNC_EXPORT createDownloadTmpFileName (QString &previous);
+string OWNCLOUDSYNC_EXPORT createDownloadTmpFileName (string &previous);
 }
 
 class TestNextcloudPropagator : GLib.Object {
@@ -21,11 +21,11 @@ private slots:
     }
 
     void testTmpDownloadFileNameGeneration () {
-        QString fn;
+        string fn;
         // without dir
         for (int i = 1; i <= 1000; i++) {
             fn+="F";
-            QString tmpFileName = createDownloadTmpFileName (fn);
+            string tmpFileName = createDownloadTmpFileName (fn);
             if (tmpFileName.contains ('/')) {
                 tmpFileName = tmpFileName.mid (tmpFileName.lastIndexOf ('/')+1);
             }
@@ -36,7 +36,7 @@ private slots:
         fn = "/Users/guruz/ownCloud/rocks/GPL";
         for (int i = 1; i < 1000; i++) {
             fn+="F";
-            QString tmpFileName = createDownloadTmpFileName (fn);
+            string tmpFileName = createDownloadTmpFileName (fn);
             if (tmpFileName.contains ('/')) {
                 tmpFileName = tmpFileName.mid (tmpFileName.lastIndexOf ('/')+1);
             }
@@ -47,7 +47,7 @@ private slots:
         fn = "rocks/GPL";
         for (int i = 1; i < 1000; i++) {
             fn+="F";
-            QString tmpFileName = createDownloadTmpFileName (fn);
+            string tmpFileName = createDownloadTmpFileName (fn);
             if (tmpFileName.contains ('/')) {
                 tmpFileName = tmpFileName.mid (tmpFileName.lastIndexOf ('/')+1);
             }

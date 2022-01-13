@@ -1,9 +1,9 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
 
-*/
+***********************************************************/
 
 // #include <QtTest/QtTest>
 // #include <QDesktopServices>
@@ -106,7 +106,7 @@ public:
     FakeQNAM *fakeQnam = nullptr;
     QNetworkAccessManager realQNAM;
     QPointer<QNetworkReply> browserReply = nullptr;
-    QString code = generateEtag ();
+    string code = generateEtag ();
     Occ.AccountPtr account;
 
     QScopedPointer<OAuth> oauth;
@@ -135,7 +135,7 @@ public:
     virtual void openBrowserHook (QUrl &url) {
         QCOMPARE (state, StartState);
         state = BrowserOpened;
-        QCOMPARE (url.path (), QString (sOAuthTestServer.path () + "/index.php/apps/oauth2/authorize"));
+        QCOMPARE (url.path (), string (sOAuthTestServer.path () + "/index.php/apps/oauth2/authorize"));
         QVERIFY (url.toString ().startsWith (sOAuthTestServer.toString ()));
         QUrlQuery query (url);
         QCOMPARE (query.queryItemValue (QLatin1String ("response_type")), QLatin1String ("code"));
@@ -177,12 +177,12 @@ public:
         return jsondata.toJson ();
     }
 
-    virtual void oauthResult (OAuth.Result result, QString &user, QString &token , QString &refreshToken) {
+    virtual void oauthResult (OAuth.Result result, string &user, string &token , string &refreshToken) {
         QCOMPARE (state, TokenAsked);
         QCOMPARE (result, OAuth.LoggedIn);
-        QCOMPARE (user, QString ("789"));
-        QCOMPARE (token, QString ("123"));
-        QCOMPARE (refreshToken, QString ("456"));
+        QCOMPARE (user, string ("789"));
+        QCOMPARE (token, string ("123"));
+        QCOMPARE (refreshToken, string ("456"));
         gotAuthOk = true;
     }
 };
@@ -260,8 +260,8 @@ private slots:
                 return OAuthTestCase.tokenReply (op, req);
             }
 
-            void oauthResult (OAuth.Result result, QString &user, QString &token ,
-                             const QString &refreshToken) override {
+            void oauthResult (OAuth.Result result, string &user, string &token ,
+                             const string &refreshToken) override {
                 if (state != CustomState)
                     return OAuthTestCase.oauthResult (result, user, token, refreshToken);
                 QCOMPARE (result, OAuth.Error);

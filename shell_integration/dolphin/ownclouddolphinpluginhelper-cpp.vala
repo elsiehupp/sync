@@ -1,4 +1,4 @@
-/******************************************************************************
+/*************************************************************
   Copyright (C) 2014 by Olivier Goffart <ogoffart@woboq.com                *
                                                                            *
   This program is free software; you can redistribute it and/or modify     *
@@ -61,7 +61,7 @@ void OwncloudDolphinPluginHelper.tryConnect () {
         return;
     }
 
-    QString socketPath = QStandardPaths.locate (QStandardPaths.RuntimeLocation,
+    string socketPath = QStandardPaths.locate (QStandardPaths.RuntimeLocation,
                                                 APPLICATION_SHORTNAME,
                                                 QStandardPaths.LocateDirectory);
     if (socketPath.isEmpty ())
@@ -83,11 +83,11 @@ void OwncloudDolphinPluginHelper.slotReadyRead () {
 
         if (line.startsWith ("REGISTER_PATH:")) {
             auto col = line.indexOf (':');
-            QString file = QString.fromUtf8 (line.constData () + col + 1, line.size () - col - 1);
+            string file = string.fromUtf8 (line.constData () + col + 1, line.size () - col - 1);
             _paths.append (file);
             continue;
         } else if (line.startsWith ("STRING:")) {
-            auto args = QString.fromUtf8 (line).split (QLatin1Char (':'));
+            auto args = string.fromUtf8 (line).split (QLatin1Char (':'));
             if (args.size () >= 3) {
                 _strings[args[1]] = args.mid (2).join (QLatin1Char (':'));
             }

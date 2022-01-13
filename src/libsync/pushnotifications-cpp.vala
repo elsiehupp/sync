@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 namespace {
 static constexpr int MAX_ALLOWED_FAILED_AUTHENTICATION_ATTEMPTS = 3;
@@ -24,7 +16,7 @@ Q_LOGGING_CATEGORY (lcPushNotifications, "nextcloud.sync.pushnotifications", QtI
 PushNotifications.PushNotifications (Account *account, GLib.Object *parent)
     : GLib.Object (parent)
     , _account (account)
-    , _webSocket (new QWebSocket (QString (), QWebSocketProtocol.VersionLatest, this)) {
+    , _webSocket (new QWebSocket (string (), QWebSocketProtocol.VersionLatest, this)) {
     connect (_webSocket, QOverload<QAbstractSocket.SocketError>.of (&QWebSocket.error), this, &PushNotifications.onWebSocketError);
     connect (_webSocket, &QWebSocket.sslErrors, this, &PushNotifications.onWebSocketSslErrors);
     connect (_webSocket, &QWebSocket.connected, this, &PushNotifications.onWebSocketConnected);
@@ -95,7 +87,7 @@ void PushNotifications.onWebSocketDisconnected () {
     qCInfo (lcPushNotifications) << "Disconnected from websocket for account" << _account.url ();
 }
 
-void PushNotifications.onWebSocketTextMessageReceived (QString &message) {
+void PushNotifications.onWebSocketTextMessageReceived (string &message) {
     qCInfo (lcPushNotifications) << "Received push notification:" << message;
 
     if (message == "notify_file") {

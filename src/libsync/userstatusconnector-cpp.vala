@@ -1,23 +1,15 @@
-/*
+/***********************************************************
 Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 namespace Occ {
 
 UserStatus.UserStatus () = default;
 
 UserStatus.UserStatus (
-    const QString &id, QString &message, QString &icon,
+    const string &id, string &message, string &icon,
     OnlineStatus state, bool messagePredefined, Optional<ClearAt> &clearAt)
     : _id (id)
     , _message (message)
@@ -27,15 +19,15 @@ UserStatus.UserStatus (
     , _clearAt (clearAt) {
 }
 
-QString UserStatus.id () {
+string UserStatus.id () {
     return _id;
 }
 
-QString UserStatus.message () {
+string UserStatus.message () {
     return _message;
 }
 
-QString UserStatus.icon () {
+string UserStatus.icon () {
     return _icon;
 }
 
@@ -70,11 +62,11 @@ Optional<ClearAt> UserStatus.clearAt () {
     return _clearAt;
 }
 
-void UserStatus.setId (QString &id) {
+void UserStatus.setId (string &id) {
     _id = id;
 }
 
-void UserStatus.setMessage (QString &message) {
+void UserStatus.setMessage (string &message) {
     _message = message;
 }
 
@@ -82,7 +74,7 @@ void UserStatus.setState (OnlineStatus state) {
     _state = state;
 }
 
-void UserStatus.setIcon (QString &icon) {
+void UserStatus.setIcon (string &icon) {
     _icon = icon;
 }
 

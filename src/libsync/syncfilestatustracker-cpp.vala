@@ -1,17 +1,9 @@
-/*
+/***********************************************************
 Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <QLoggingCategory>
 
@@ -19,24 +11,24 @@ namespace Occ {
 
 Q_LOGGING_CATEGORY (lcStatusTracker, "nextcloud.sync.statustracker", QtInfoMsg)
 
-static int pathCompare ( const QString& lhs, QString& rhs ) {
+static int pathCompare ( const string& lhs, string& rhs ) {
     // Should match Utility.fsCasePreserving, we want don't want to pay for the runtime check on every comparison.
     return lhs.compare (rhs, Qt.CaseSensitive);
 }
 
-static bool pathStartsWith ( const QString& lhs, QString& rhs ) {
+static bool pathStartsWith ( const string& lhs, string& rhs ) {
     return lhs.startsWith (rhs, Qt.CaseSensitive);
 }
 
-bool SyncFileStatusTracker.PathComparator.operator () ( const QString& lhs, QString& rhs ) {
+bool SyncFileStatusTracker.PathComparator.operator () ( const string& lhs, string& rhs ) {
     // This will make sure that the std.map is ordered and queried case-insensitively on macOS and Windows.
     return pathCompare (lhs, rhs) < 0;
 }
 
-SyncFileStatus.SyncFileStatusTag SyncFileStatusTracker.lookupProblem (QString &pathToMatch, SyncFileStatusTracker.ProblemsMap &problemMap) {
+SyncFileStatus.SyncFileStatusTag SyncFileStatusTracker.lookupProblem (string &pathToMatch, SyncFileStatusTracker.ProblemsMap &problemMap) {
     auto lower = problemMap.lower_bound (pathToMatch);
     for (auto it = lower; it != problemMap.cend (); ++it) {
-        const QString &problemPath = it.first;
+        const string &problemPath = it.first;
         SyncFileStatus.SyncFileStatusTag severity = it.second;
 
         if (pathCompare (problemPath, pathToMatch) == 0) {
@@ -58,14 +50,14 @@ SyncFileStatus.SyncFileStatusTag SyncFileStatusTracker.lookupProblem (QString &p
     return SyncFileStatus.StatusNone;
 }
 
-/**
+/***********************************************************
 Whether this item should get an ERROR icon through the Socket API.
 
 The Socket API should only present serious, permanent errors to the us
 In particular SoftErrors should just retain their 'needs to be synced'
 icon as the problem is most likely going to resolve itself quickly and
 automatically.
-*/
+***********************************************************/
 static inline bool hasErrorStatus (SyncFileItem &item) {
     const auto status = item._status;
     return item._instruction == CSYNC_INSTRUCTION_ERROR
@@ -96,12 +88,12 @@ SyncFileStatusTracker.SyncFileStatusTracker (SyncEngine *syncEngine)
     connect (syncEngine, &SyncEngine.finished, this, &SyncFileStatusTracker.slotSyncEngineRunningChanged);
 }
 
-SyncFileStatus SyncFileStatusTracker.fileStatus (QString &relativePath) {
+SyncFileStatus SyncFileStatusTracker.fileStatus (string &relativePath) {
     ASSERT (!relativePath.endsWith (QLatin1Char ('/')));
 
     if (relativePath.isEmpty ()) {
         // This is the root sync folder, it doesn't have an entry in the database and won't be walked by csync, so resolve manually.
-        return resolveSyncAndErrorStatus (QString (), NotShared);
+        return resolveSyncAndErrorStatus (string (), NotShared);
     }
 
     // The SyncEngine won't notify us at all for CSYNC_FILE_SILENTLY_EXCLUDED
@@ -131,22 +123,22 @@ SyncFileStatus SyncFileStatusTracker.fileStatus (QString &relativePath) {
     return resolveSyncAndErrorStatus (relativePath, NotShared, PathUnknown);
 }
 
-void SyncFileStatusTracker.slotPathTouched (QString &fileName) {
-    QString folderPath = _syncEngine.localPath ();
+void SyncFileStatusTracker.slotPathTouched (string &fileName) {
+    string folderPath = _syncEngine.localPath ();
 
     ASSERT (fileName.startsWith (folderPath));
-    QString localPath = fileName.mid (folderPath.size ());
+    string localPath = fileName.mid (folderPath.size ());
     _dirtyPaths.insert (localPath);
 
     emit fileStatusChanged (fileName, SyncFileStatus.StatusSync);
 }
 
-void SyncFileStatusTracker.slotAddSilentlyExcluded (QString &folderPath) {
+void SyncFileStatusTracker.slotAddSilentlyExcluded (string &folderPath) {
     _syncProblems[folderPath] = SyncFileStatus.StatusExcluded;
     emit fileStatusChanged (getSystemDestination (folderPath), resolveSyncAndErrorStatus (folderPath, NotShared));
 }
 
-void SyncFileStatusTracker.incSyncCountAndEmitStatusChanged (QString &relativePath, SharedFlag sharedFlag) {
+void SyncFileStatusTracker.incSyncCountAndEmitStatusChanged (string &relativePath, SharedFlag sharedFlag) {
     // Will return 0 (and increase to 1) if the path wasn't in the map yet
     int count = _syncCount[relativePath]++;
     if (!count) {
@@ -162,11 +154,11 @@ void SyncFileStatusTracker.incSyncCountAndEmitStatusChanged (QString &relativePa
         if (lastSlashIndex != -1)
             incSyncCountAndEmitStatusChanged (relativePath.left (lastSlashIndex), UnknownShared);
         else if (!relativePath.isEmpty ())
-            incSyncCountAndEmitStatusChanged (QString (), UnknownShared);
+            incSyncCountAndEmitStatusChanged (string (), UnknownShared);
     }
 }
 
-void SyncFileStatusTracker.decSyncCountAndEmitStatusChanged (QString &relativePath, SharedFlag sharedFlag) {
+void SyncFileStatusTracker.decSyncCountAndEmitStatusChanged (string &relativePath, SharedFlag sharedFlag) {
     int count = --_syncCount[relativePath];
     if (!count) {
         // Remove from the map, same as 0
@@ -183,7 +175,7 @@ void SyncFileStatusTracker.decSyncCountAndEmitStatusChanged (QString &relativePa
         if (lastSlashIndex != -1)
             decSyncCountAndEmitStatusChanged (relativePath.left (lastSlashIndex), UnknownShared);
         else if (!relativePath.isEmpty ())
-            decSyncCountAndEmitStatusChanged (QString (), UnknownShared);
+            decSyncCountAndEmitStatusChanged (string (), UnknownShared);
     }
 }
 
@@ -219,7 +211,7 @@ void SyncFileStatusTracker.slotAboutToPropagate (SyncFileItemVector &items) {
     // Some metadata status won't trigger files to be synced, make sure that we
     // push the OK status for dirty files that don't need to be propagated.
     // Swap into a copy since fileStatus () reads _dirtyPaths to determine the status
-    QSet<QString> oldDirtyPaths;
+    QSet<string> oldDirtyPaths;
     std.swap (_dirtyPaths, oldDirtyPaths);
     for (auto &oldDirtyPath : qAsConst (oldDirtyPaths))
         emit fileStatusChanged (getSystemDestination (oldDirtyPath), fileStatus (oldDirtyPath));
@@ -229,7 +221,7 @@ void SyncFileStatusTracker.slotAboutToPropagate (SyncFileItemVector &items) {
     for (auto &syncProblem : _syncProblems)
         oldProblems.erase (syncProblem.first);
     for (auto &oldProblem : oldProblems) {
-        const QString &path = oldProblem.first;
+        const string &path = oldProblem.first;
         SyncFileStatus.SyncFileStatusTag severity = oldProblem.second;
         if (severity == SyncFileStatus.StatusError)
             invalidateParentPaths (path);
@@ -263,7 +255,7 @@ void SyncFileStatusTracker.slotItemCompleted (SyncFileItemPtr &item) {
 
 void SyncFileStatusTracker.slotSyncFinished () {
     // Clear the sync counts to reduce the impact of unsymetrical inc/dec calls (e.g. when directory job abort)
-    QHash<QString, int> oldSyncCount;
+    QHash<string, int> oldSyncCount;
     std.swap (_syncCount, oldSyncCount);
     for (auto it = oldSyncCount.begin (); it != oldSyncCount.end (); ++it) {
         // Don't announce folders, fileStatus expect only paths without '/', otherwise it asserts
@@ -276,10 +268,10 @@ void SyncFileStatusTracker.slotSyncFinished () {
 }
 
 void SyncFileStatusTracker.slotSyncEngineRunningChanged () {
-    emit fileStatusChanged (getSystemDestination (QString ()), resolveSyncAndErrorStatus (QString (), NotShared));
+    emit fileStatusChanged (getSystemDestination (string ()), resolveSyncAndErrorStatus (string (), NotShared));
 }
 
-SyncFileStatus SyncFileStatusTracker.resolveSyncAndErrorStatus (QString &relativePath, SharedFlag sharedFlag, PathKnownFlag isPathKnown) {
+SyncFileStatus SyncFileStatusTracker.resolveSyncAndErrorStatus (string &relativePath, SharedFlag sharedFlag, PathKnownFlag isPathKnown) {
     // If it's a new file and that we're not syncing it yet,
     // don't show any icon and wait for the filesystem watcher to trigger a sync.
     SyncFileStatus status (isPathKnown ? SyncFileStatus.StatusUpToDate : SyncFileStatus.StatusNone);
@@ -301,16 +293,16 @@ SyncFileStatus SyncFileStatusTracker.resolveSyncAndErrorStatus (QString &relativ
     return status;
 }
 
-void SyncFileStatusTracker.invalidateParentPaths (QString &path) {
+void SyncFileStatusTracker.invalidateParentPaths (string &path) {
     QStringList splitPath = path.split ('/', Qt.SkipEmptyParts);
     for (int i = 0; i < splitPath.size (); ++i) {
-        QString parentPath = QStringList (splitPath.mid (0, i)).join (QLatin1String ("/"));
+        string parentPath = QStringList (splitPath.mid (0, i)).join (QLatin1String ("/"));
         emit fileStatusChanged (getSystemDestination (parentPath), fileStatus (parentPath));
     }
 }
 
-QString SyncFileStatusTracker.getSystemDestination (QString &relativePath) {
-    QString systemPath = _syncEngine.localPath () + relativePath;
+string SyncFileStatusTracker.getSystemDestination (string &relativePath) {
+    string systemPath = _syncEngine.localPath () + relativePath;
     // SyncEngine.localPath () has a trailing slash, make sure to remove it if the
     // destination is empty.
     if (systemPath.endsWith (QLatin1Char ('/'))) {

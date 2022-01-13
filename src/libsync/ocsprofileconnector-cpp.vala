@@ -67,7 +67,7 @@ namespace Occ {
 
 HovercardAction.HovercardAction () = default;
 
-HovercardAction.HovercardAction (QString title, QUrl iconUrl, QUrl link)
+HovercardAction.HovercardAction (string title, QUrl iconUrl, QUrl link)
     : _title (std.move (title))
     , _iconUrl (std.move (iconUrl))
     , _link (std.move (link)) {
@@ -78,14 +78,14 @@ OcsProfileConnector.OcsProfileConnector (AccountPtr account, GLib.Object *parent
     , _account (account) {
 }
 
-void OcsProfileConnector.fetchHovercard (QString &userId) {
+void OcsProfileConnector.fetchHovercard (string &userId) {
     if (_account.serverVersionInt () < Account.makeServerVersion (23, 0, 0)) {
         qInfo (lcOcsProfileConnector) << "Server version" << _account.serverVersion ()
                                      << "does not support profile page";
         emit error ();
         return;
     }
-    const QString url = QStringLiteral ("/ocs/v2.php/hovercard/v1/%1").arg (userId);
+    const string url = QStringLiteral ("/ocs/v2.php/hovercard/v1/%1").arg (userId);
     const auto job = new JsonApiJob (_account, url, this);
     connect (job, &JsonApiJob.jsonReceived, this, &OcsProfileConnector.onHovercardFetched);
     job.start ();

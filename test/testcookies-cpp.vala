@@ -1,8 +1,8 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
-*/
+***********************************************************/
 
 // #include <QtTest>
 
@@ -13,7 +13,7 @@ class TestCookies : GLib.Object {
 private slots:
     void testCookies () {
         QTemporaryDir tmp;
-        const QString nonexistingPath = tmp.filePath ("someNonexistingDir/test.db");
+        const string nonexistingPath = tmp.filePath ("someNonexistingDir/test.db");
         QNetworkCookie cookieA = QNetworkCookie ("foo", "bar");
         // tomorrow rounded
         cookieA.setExpirationDate (QDateTime.currentDateTimeUtc ().addDays (1).date ().startOfDay ());

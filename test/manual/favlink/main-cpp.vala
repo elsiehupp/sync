@@ -1,22 +1,14 @@
-/*
+/***********************************************************
 Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 #include "../../../src/libsync/utility.h"
 
 // #include <QDir>
 
 int main (int argc, char* argv[]) {
-   QString dir="/tmp/linktest/";
+   string dir="/tmp/linktest/";
    QDir ().mkpath (dir);
    Occ.Utility.setupFavLink (dir);
 }

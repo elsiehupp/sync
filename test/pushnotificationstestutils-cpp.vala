@@ -70,7 +70,7 @@ void FakeWebSocketServer.close () {
     }
 }
 
-void FakeWebSocketServer.processTextMessageInternal (QString &message) {
+void FakeWebSocketServer.processTextMessageInternal (string &message) {
     auto client = qobject_cast<QWebSocket> (sender ());
     emit processTextMessage (client, message);
 }
@@ -105,7 +105,7 @@ uint32_t FakeWebSocketServer.textMessagesCount () {
     return _processTextMessageSpy.count ();
 }
 
-QString FakeWebSocketServer.textMessage (int messageNumber) {
+string FakeWebSocketServer.textMessage (int messageNumber) {
     Q_ASSERT (0 <= messageNumber && messageNumber < _processTextMessageSpy.count ());
     return _processTextMessageSpy.at (messageNumber).at (1).toString ();
 }
@@ -119,7 +119,7 @@ void FakeWebSocketServer.clearTextMessages () {
     _processTextMessageSpy.clear ();
 }
 
-Occ.AccountPtr FakeWebSocketServer.createAccount (QString &username, QString &password) {
+Occ.AccountPtr FakeWebSocketServer.createAccount (string &username, string &password) {
     auto account = Occ.Account.create ();
 
     QStringList typeList;
@@ -127,7 +127,7 @@ Occ.AccountPtr FakeWebSocketServer.createAccount (QString &username, QString &pa
     typeList.append ("activities");
     typeList.append ("notifications");
 
-    QString websocketUrl ("ws://localhost:12345");
+    string websocketUrl ("ws://localhost:12345");
 
     QVariantMap endpointsMap;
     endpointsMap["websocket"] = websocketUrl;
@@ -147,20 +147,20 @@ Occ.AccountPtr FakeWebSocketServer.createAccount (QString &username, QString &pa
     return account;
 }
 
-CredentialsStub.CredentialsStub (QString &user, QString &password)
+CredentialsStub.CredentialsStub (string &user, string &password)
     : _user (user)
     , _password (password) {
 }
 
-QString CredentialsStub.authType () {
+string CredentialsStub.authType () {
     return "";
 }
 
-QString CredentialsStub.user () {
+string CredentialsStub.user () {
     return _user;
 }
 
-QString CredentialsStub.password () {
+string CredentialsStub.password () {
     return _password;
 }
 

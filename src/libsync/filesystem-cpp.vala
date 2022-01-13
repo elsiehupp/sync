@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <QFile>
 // #include <QFileInfo>
@@ -20,7 +12,7 @@ for more details.
 
 namespace Occ {
 
-bool FileSystem.fileEquals (QString &fn1, QString &fn2) {
+bool FileSystem.fileEquals (string &fn1, string &fn2) {
     // compare two files with given filename and return true if they have the same content
     QFile f1 (fn1);
     QFile f2 (fn2);
@@ -47,7 +39,7 @@ bool FileSystem.fileEquals (QString &fn1, QString &fn2) {
     return true;
 }
 
-time_t FileSystem.getModTime (QString &filename) {
+time_t FileSystem.getModTime (string &filename) {
     csync_file_stat_t stat;
     int64 result = -1;
     if (csync_vio_local_stat (filename, &stat) != -1
@@ -61,7 +53,7 @@ time_t FileSystem.getModTime (QString &filename) {
     return result;
 }
 
-bool FileSystem.setModTime (QString &filename, time_t modTime) {
+bool FileSystem.setModTime (string &filename, time_t modTime) {
     struct timeval times[2];
     times[0].tv_sec = times[1].tv_sec = modTime;
     times[0].tv_usec = times[1].tv_usec = 0;
@@ -74,14 +66,14 @@ bool FileSystem.setModTime (QString &filename, time_t modTime) {
     return true;
 }
 
-bool FileSystem.fileChanged (QString &fileName,
+bool FileSystem.fileChanged (string &fileName,
     int64 previousSize,
     time_t previousMtime) {
     return getSize (fileName) != previousSize
         || getModTime (fileName) != previousMtime;
 }
 
-bool FileSystem.verifyFileUnchanged (QString &fileName,
+bool FileSystem.verifyFileUnchanged (string &fileName,
     int64 previousSize,
     time_t previousMtime) {
     const int64 actualSize = getSize (fileName);
@@ -95,12 +87,12 @@ bool FileSystem.verifyFileUnchanged (QString &fileName,
     return true;
 }
 
-int64 FileSystem.getSize (QString &filename) {
+int64 FileSystem.getSize (string &filename) {
     return QFileInfo (filename).size ();
 }
 
 // Code inspired from Qt5's QDir.removeRecursively
-bool FileSystem.removeRecursively (QString &path, std.function<void (QString &path, bool isDir)> &onDeleted, QStringList *errors) {
+bool FileSystem.removeRecursively (string &path, std.function<void (string &path, bool isDir)> &onDeleted, QStringList *errors) {
     bool allRemoved = true;
     QDirIterator di (path, QDir.AllEntries | QDir.Hidden | QDir.System | QDir.NoDotAndDotDot);
 
@@ -114,7 +106,7 @@ bool FileSystem.removeRecursively (QString &path, std.function<void (QString &pa
         if (isDir) {
             removeOk = removeRecursively (path + QLatin1Char ('/') + di.fileName (), onDeleted, errors); // recursive
         } else {
-            QString removeError;
+            string removeError;
             removeOk = FileSystem.remove (di.filePath (), &removeError);
             if (removeOk) {
                 if (onDeleted)
@@ -146,7 +138,7 @@ bool FileSystem.removeRecursively (QString &path, std.function<void (QString &pa
     return allRemoved;
 }
 
-bool FileSystem.getInode (QString &filename, uint64 *inode) {
+bool FileSystem.getInode (string &filename, uint64 *inode) {
     csync_file_stat_t fs;
     if (csync_vio_local_stat (filename, &fs) == 0) {
         *inode = fs.inode;

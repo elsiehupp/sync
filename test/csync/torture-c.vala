@@ -1,4 +1,4 @@
-/*
+/***********************************************************
 libcsync -- a library to sync a directory with another
 
 Copyright (c) 2008-2013 by Andreas Schneider <asn@cryptomilk.
@@ -16,7 +16,7 @@ Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
-*/
+***********************************************************/
 
 static int verbosity;
 

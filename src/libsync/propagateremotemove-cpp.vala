@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <QFile>
 // #include <QStringList>
@@ -21,15 +13,15 @@ namespace Occ {
 Q_LOGGING_CATEGORY (lcMoveJob, "nextcloud.sync.networkjob.move", QtInfoMsg)
 Q_LOGGING_CATEGORY (lcPropagateRemoteMove, "nextcloud.sync.propagator.remotemove", QtInfoMsg)
 
-MoveJob.MoveJob (AccountPtr account, QString &path,
-    const QString &destination, GLib.Object *parent)
+MoveJob.MoveJob (AccountPtr account, string &path,
+    const string &destination, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent)
     , _destination (destination) {
 }
 
-MoveJob.MoveJob (AccountPtr account, QUrl &url, QString &destination,
+MoveJob.MoveJob (AccountPtr account, QUrl &url, string &destination,
     QMap<QByteArray, QByteArray> extraHeaders, GLib.Object *parent)
-    : AbstractNetworkJob (account, QString (), parent)
+    : AbstractNetworkJob (account, string (), parent)
     , _destination (destination)
     , _url (url)
     , _extraHeaders (extraHeaders) {
@@ -65,10 +57,10 @@ void PropagateRemoteMove.start () {
     if (propagator ()._abortRequested)
         return;
 
-    QString origin = propagator ().adjustRenamedPath (_item._file);
+    string origin = propagator ().adjustRenamedPath (_item._file);
     qCDebug (lcPropagateRemoteMove) << origin << _item._renameTarget;
 
-    QString targetFile (propagator ().fullLocalPath (_item._renameTarget));
+    string targetFile (propagator ().fullLocalPath (_item._renameTarget));
 
     if (origin == _item._renameTarget) {
         // The parent has been renamed already so there is nothing more to do.
@@ -81,7 +73,7 @@ void PropagateRemoteMove.start () {
 
             const auto path = _item._file;
             const auto slashPosition = path.lastIndexOf ('/');
-            const auto parentPath = slashPosition >= 0 ? path.left (slashPosition) : QString ();
+            const auto parentPath = slashPosition >= 0 ? path.left (slashPosition) : string ();
 
             SyncJournalFileRecord parentRec;
             bool ok = propagator ()._journal.getFileRecord (parentPath, &parentRec);
@@ -93,7 +85,7 @@ void PropagateRemoteMove.start () {
             const auto remoteParentPath = parentRec._e2eMangledName.isEmpty () ? parentPath : parentRec._e2eMangledName;
 
             const auto lastSlashPosition = _item._encryptedFileName.lastIndexOf ('/');
-            const auto encryptedName = lastSlashPosition >= 0 ? _item._encryptedFileName.mid (lastSlashPosition + 1) : QString ();
+            const auto encryptedName = lastSlashPosition >= 0 ? _item._encryptedFileName.mid (lastSlashPosition + 1) : string ();
 
             if (!encryptedName.isEmpty ()) {
                 _item._encryptedFileName = remoteParentPath + "/" + encryptedName;
@@ -104,8 +96,8 @@ void PropagateRemoteMove.start () {
         return;
     }
 
-    QString remoteSource = propagator ().fullRemotePath (origin);
-    QString remoteDestination = QDir.cleanPath (propagator ().account ().davUrl ().path () + propagator ().fullRemotePath (_item._renameTarget));
+    string remoteSource = propagator ().fullRemotePath (origin);
+    string remoteDestination = QDir.cleanPath (propagator ().account ().davUrl ().path () + propagator ().fullRemotePath (_item._renameTarget));
 
     auto &vfs = propagator ().syncOptions ()._vfs;
     auto itype = _item._type;
@@ -121,7 +113,7 @@ void PropagateRemoteMove.start () {
         if (destinationHadSuffix)
             remoteDestination.chop (suffix.size ());
 
-        QString folderTarget = _item._renameTarget;
+        string folderTarget = _item._renameTarget;
 
         // Users can rename the file *and at the same time* add or remove the vfs
         // suffix. That's a complicated case where a remote rename plus a local hydration
@@ -131,7 +123,7 @@ void PropagateRemoteMove.start () {
         // suffix, since that's what must be propagated to the remote but the local
         // file may have a different name. folderTargetAlt will contain this potential
         // name.
-        QString folderTargetAlt = folderTarget;
+        string folderTargetAlt = folderTarget;
         if (itype == ItemTypeFile) {
             ASSERT (!sourceHadSuffix && !destinationHadSuffix);
 
@@ -145,14 +137,14 @@ void PropagateRemoteMove.start () {
             folderTargetAlt.chop (suffix.size ());
         }
 
-        QString localTarget = propagator ().fullLocalPath (folderTarget);
-        QString localTargetAlt = propagator ().fullLocalPath (folderTargetAlt);
+        string localTarget = propagator ().fullLocalPath (folderTarget);
+        string localTargetAlt = propagator ().fullLocalPath (folderTargetAlt);
 
         // If the expected target doesn't exist but a file with different hydration
         // state does, rename the local file to bring it in line with what the discovery
         // has set up.
         if (!FileSystem.fileExists (localTarget) && FileSystem.fileExists (localTargetAlt)) {
-            QString error;
+            string error;
             if (!FileSystem.uncheckedRenameReplace (localTargetAlt, localTarget, &error)) {
                 done (SyncFileItem.NormalError, tr ("Could not rename %1 to %2, error : %3")
                      .arg (folderTargetAlt, folderTarget, error));
@@ -264,7 +256,7 @@ void PropagateRemoteMove.finalize () {
     done (SyncFileItem.Success);
 }
 
-bool PropagateRemoteMove.adjustSelectiveSync (SyncJournalDb *journal, QString &from_, QString &to_) {
+bool PropagateRemoteMove.adjustSelectiveSync (SyncJournalDb *journal, string &from_, string &to_) {
     bool ok = false;
     // We only care about preserving the blacklist.   The white list should anyway be empty.
     // And the undecided list will be repopulated on the next sync, if there is anything too big.
@@ -275,8 +267,8 @@ bool PropagateRemoteMove.adjustSelectiveSync (SyncJournalDb *journal, QString &f
     bool changed = false;
     ASSERT (!from_.endsWith (QLatin1String ("/")));
     ASSERT (!to_.endsWith (QLatin1String ("/")));
-    QString from = from_ + QLatin1String ("/");
-    QString to = to_ + QLatin1String ("/");
+    string from = from_ + QLatin1String ("/");
+    string to = to_ + QLatin1String ("/");
 
     for (auto &s : list) {
         if (s.startsWith (from)) {

@@ -1,9 +1,9 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
 
-*/
+***********************************************************/
 
 // #include <qglobal.h>
 // #include <QTemporaryDir>
@@ -29,7 +29,7 @@ private slots:
             f.open (QFile.WriteOnly);
             f.write ("hello");
         }
-        QString dirPath = dir2.canonicalPath ();
+        string dirPath = dir2.canonicalPath ();
 
         AccountPtr account = Account.create ();
         QUrl url ("http://example.de");
@@ -50,21 +50,21 @@ private slots:
         }
 
         // those should be allowed
-        // QString FolderMan.checkPathValidityForNewFolder (QString& path, QUrl &serverUrl, bool forNewDirectory)
+        // string FolderMan.checkPathValidityForNewFolder (string& path, QUrl &serverUrl, bool forNewDirectory)
 
-        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/free"), QString ());
-        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/free2/"), QString ());
+        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/free"), string ());
+        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/free2/"), string ());
         // Not an existing directory . Ok
-        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/bliblablu"), QString ());
-        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/free/bliblablu"), QString ());
-        // QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/bliblablu/some/more"), QString ());
+        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/bliblablu"), string ());
+        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/free/bliblablu"), string ());
+        // QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/bliblablu/some/more"), string ());
 
         // A file . Error
         QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/sub/file.txt").isNull ());
 
         // There are folders configured in those folders, url needs to be taken into account : . ERROR
         QUrl url2 (url);
-        const QString user = account.credentials ().user ();
+        const string user = account.credentials ().user ();
         url2.setUserName (user);
 
         // The following both fail because they refer to the same account (user and url)
@@ -74,8 +74,8 @@ private slots:
         // Now it will work because the account is different
         QUrl url3 ("http://anotherexample.org");
         url3.setUserName ("dummy");
-        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/ownCloud1", url3), QString ());
-        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/ownCloud2/", url3), QString ());
+        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/ownCloud1", url3), string ());
+        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/ownCloud2/", url3), string ());
 
         QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath).isNull ());
         QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/sub/ownCloud1/folder").isNull ());
@@ -97,7 +97,7 @@ private slots:
         // link 3 points to an existing sync folder. To make it fail, the account must be the same
         QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/link3", url2).isNull ());
         // while with a different account, this is fine
-        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/link3", url3), QString ());
+        QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/link3", url3), string ());
 
         QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/link4").isNull ());
         QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/link3/folder").isNull ());
@@ -138,7 +138,7 @@ private slots:
         QVERIFY (dir2.mkpath ("ownCloud2/foo"));
         QVERIFY (dir2.mkpath ("sub/free"));
         QVERIFY (dir2.mkpath ("free2/sub"));
-        QString dirPath = dir2.canonicalPath ();
+        string dirPath = dir2.canonicalPath ();
 
         AccountPtr account = Account.create ();
         QUrl url ("http://example.de");
@@ -156,25 +156,25 @@ private slots:
         // TEST
 
         QCOMPARE (folderman.findGoodPathForNewSyncFolder (dirPath + "/oc", url),
-                 QString (dirPath + "/oc"));
+                 string (dirPath + "/oc"));
         QCOMPARE (folderman.findGoodPathForNewSyncFolder (dirPath + "/ownCloud", url),
-                 QString (dirPath + "/ownCloud3"));
+                 string (dirPath + "/ownCloud3"));
         QCOMPARE (folderman.findGoodPathForNewSyncFolder (dirPath + "/ownCloud2", url),
-                 QString (dirPath + "/ownCloud22"));
+                 string (dirPath + "/ownCloud22"));
         QCOMPARE (folderman.findGoodPathForNewSyncFolder (dirPath + "/ownCloud2/foo", url),
-                 QString (dirPath + "/ownCloud2/foo"));
+                 string (dirPath + "/ownCloud2/foo"));
         QCOMPARE (folderman.findGoodPathForNewSyncFolder (dirPath + "/ownCloud2/bar", url),
-                 QString (dirPath + "/ownCloud2/bar"));
+                 string (dirPath + "/ownCloud2/bar"));
         QCOMPARE (folderman.findGoodPathForNewSyncFolder (dirPath + "/sub", url),
-                 QString (dirPath + "/sub2"));
+                 string (dirPath + "/sub2"));
 
         // REMOVE ownCloud2 from the filesystem, but keep a folder sync'ed to it.
         // We should still not suggest this folder as a new folder.
         QDir (dirPath + "/ownCloud2/").removeRecursively ();
         QCOMPARE (folderman.findGoodPathForNewSyncFolder (dirPath + "/ownCloud", url),
-            QString (dirPath + "/ownCloud3"));
+            string (dirPath + "/ownCloud3"));
         QCOMPARE (folderman.findGoodPathForNewSyncFolder (dirPath + "/ownCloud2", url),
-            QString (dirPath + "/ownCloud22"));
+            string (dirPath + "/ownCloud22"));
     }
 };
 

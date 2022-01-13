@@ -1,4 +1,4 @@
-/*
+/***********************************************************
 libcsync -- a library to sync a directory with another
 
 Copyright (c) 2013 by Klaas Freitag <freitag@owncloud.com>
@@ -16,7 +16,7 @@ Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
-*/
+***********************************************************/
 
 // #include <QTemporaryFile>
 // #include <QTest>
@@ -26,25 +26,25 @@ class TestLongWindowsPath : GLib.Object {
 private slots:
 
     void testLongPathStat_data () {
-        QTest.addColumn<QString> ("name");
+        QTest.addColumn<string> ("name");
 
         QTest.newRow ("long") << QStringLiteral ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
                                                 "elonglonglonglong/flonglonglonglong/glonglonglonglong/hlonglonglonglong/ilonglonglonglong/"
                                                 "jlonglonglonglong/klonglonglonglong/llonglonglonglong/mlonglonglonglong/nlonglonglonglong/"
                                                 "olonglonglonglong/file.txt");
-        QTest.newRow ("long emoji") << QString.fromUtf8 ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
+        QTest.newRow ("long emoji") << string.fromUtf8 ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
                                                          "elonglonglonglong/flonglonglonglong/glonglonglonglong/hlonglonglonglong/ilonglonglonglong/"
                                                          "jlonglonglonglong/klonglonglonglong/llonglonglonglong/mlonglonglonglong/nlonglonglonglong/"
                                                          "olonglonglonglong/file🐷.txt");
-        QTest.newRow ("long russian") << QString.fromUtf8 ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
+        QTest.newRow ("long russian") << string.fromUtf8 ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
                                                            "elonglonglonglong/flonglonglonglong/glonglonglonglong/hlonglonglonglong/ilonglonglonglong/"
                                                            "jlonglonglonglong/klonglonglonglong/llonglonglonglong/mlonglonglonglong/nlonglonglonglong/"
                                                            "olonglonglonglong/собственное.txt");
-        QTest.newRow ("long arabic") << QString.fromUtf8 ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
+        QTest.newRow ("long arabic") << string.fromUtf8 ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
                                                           "elonglonglonglong/flonglonglonglong/glonglonglonglong/hlonglonglonglong/ilonglonglonglong/"
                                                           "jlonglonglonglong/klonglonglonglong/llonglonglonglong/mlonglonglonglong/nlonglonglonglong/"
                                                           "olonglonglonglong/السحاب.txt");
-        QTest.newRow ("long chinese") << QString.fromUtf8 ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
+        QTest.newRow ("long chinese") << string.fromUtf8 ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
                                                            "elonglonglonglong/flonglonglonglong/glonglonglonglong/hlonglonglonglong/ilonglonglonglong/"
                                                            "jlonglonglonglong/klonglonglonglong/llonglonglonglong/mlonglonglonglong/nlonglonglonglong/"
                                                            "olonglonglonglong/自己的云.txt");
@@ -52,7 +52,7 @@ private slots:
 
     void testLongPathStat () {
         QTemporaryDir tmp;
-        QFETCH (QString, name);
+        QFETCH (string, name);
         const QFileInfo longPath (tmp.path () + name);
 
         const auto data = QByteArrayLiteral ("hello");

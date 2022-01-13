@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <QFile>
 // #include <QLoggingCategory>
@@ -25,7 +17,7 @@ PropagateRemoteMkdir.PropagateRemoteMkdir (OwncloudPropagator *propagator, SyncF
     , _uploadEncryptedHelper (nullptr) {
     const auto path = _item._file;
     const auto slashPosition = path.lastIndexOf ('/');
-    const auto parentPath = slashPosition >= 0 ? path.left (slashPosition) : QString ();
+    const auto parentPath = slashPosition >= 0 ? path.left (slashPosition) : string ();
 
     SyncJournalFileRecord parentRec;
     bool ok = propagator._journal.getFileRecord (parentPath, &parentRec);
@@ -68,7 +60,7 @@ void PropagateRemoteMkdir.slotStartMkcolJob () {
     _job.start ();
 }
 
-void PropagateRemoteMkdir.slotStartEncryptedMkcolJob (QString &path, QString &filename, uint64 size) {
+void PropagateRemoteMkdir.slotStartEncryptedMkcolJob (string &path, string &filename, uint64 size) {
     Q_UNUSED (path)
     Q_UNUSED (size)
 
@@ -100,7 +92,7 @@ void PropagateRemoteMkdir.setDeleteExisting (bool enabled) {
     _deleteExisting = enabled;
 }
 
-void PropagateRemoteMkdir.finalizeMkColJob (QNetworkReply.NetworkError err, QString &jobHttpReasonPhraseString, QString &jobPath) {
+void PropagateRemoteMkdir.finalizeMkColJob (QNetworkReply.NetworkError err, string &jobHttpReasonPhraseString, string &jobPath) {
     if (_item._httpErrorCode == 405) {
         // This happens when the directory already exists. Nothing to do.
         qDebug (lcPropagateRemoteMkdir) << "Folder" << jobPath << "already exists.";
@@ -153,7 +145,7 @@ void PropagateRemoteMkdir.finalizeMkColJob (QNetworkReply.NetworkError err, QStr
 void PropagateRemoteMkdir.slotMkdir () {
     const auto path = _item._file;
     const auto slashPosition = path.lastIndexOf ('/');
-    const auto parentPath = slashPosition >= 0 ? path.left (slashPosition) : QString ();
+    const auto parentPath = slashPosition >= 0 ? path.left (slashPosition) : string ();
 
     SyncJournalFileRecord parentRec;
     bool ok = propagator ()._journal.getFileRecord (parentPath, &parentRec);

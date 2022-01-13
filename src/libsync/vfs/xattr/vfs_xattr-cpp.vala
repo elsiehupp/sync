@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <QFile>
 
@@ -30,8 +22,8 @@ Vfs.Mode VfsXAttr.mode () {
     return XAttr;
 }
 
-QString VfsXAttr.fileSuffix () {
-    return QString ();
+string VfsXAttr.fileSuffix () {
+    return string ();
 }
 
 void VfsXAttr.startImpl (VfsSetupParams &) {
@@ -51,7 +43,7 @@ bool VfsXAttr.isHydrating () {
     return false;
 }
 
-Result<void, QString> VfsXAttr.updateMetadata (QString &filePath, time_t modtime, int64, QByteArray &) {
+Result<void, string> VfsXAttr.updateMetadata (string &filePath, time_t modtime, int64, QByteArray &) {
     if (modtime <= 0) {
         return {tr ("Error updating metadata due to invalid modified time")};
     }
@@ -60,12 +52,12 @@ Result<void, QString> VfsXAttr.updateMetadata (QString &filePath, time_t modtime
     return {};
 }
 
-Result<void, QString> VfsXAttr.createPlaceholder (SyncFileItem &item) {
+Result<void, string> VfsXAttr.createPlaceholder (SyncFileItem &item) {
     if (item._modtime <= 0) {
         return {tr ("Error updating metadata due to invalid modified time")};
     }
 
-    const auto path = QString (_setupParams.filesystemPath + item._file);
+    const auto path = string (_setupParams.filesystemPath + item._file);
     QFile file (path);
     if (file.exists () && file.size () > 1
         && !FileSystem.verifyFileUnchanged (path, item._size, item._modtime)) {
@@ -82,8 +74,8 @@ Result<void, QString> VfsXAttr.createPlaceholder (SyncFileItem &item) {
     return xattr.addNextcloudPlaceholderAttributes (path);
 }
 
-Result<void, QString> VfsXAttr.dehydratePlaceholder (SyncFileItem &item) {
-    const auto path = QString (_setupParams.filesystemPath + item._file);
+Result<void, string> VfsXAttr.dehydratePlaceholder (SyncFileItem &item) {
+    const auto path = string (_setupParams.filesystemPath + item._file);
     QFile file (path);
     if (!file.remove ()) {
         return QStringLiteral ("Couldn't remove the original file to dehydrate");
@@ -101,7 +93,7 @@ Result<void, QString> VfsXAttr.dehydratePlaceholder (SyncFileItem &item) {
     return {};
 }
 
-Result<Vfs.ConvertToPlaceholderResult, QString> VfsXAttr.convertToPlaceholder (QString &, SyncFileItem &, QString &) {
+Result<Vfs.ConvertToPlaceholderResult, string> VfsXAttr.convertToPlaceholder (string &, SyncFileItem &, string &) {
     // Nothing necessary
     return {ConvertToPlaceholderResult.Ok};
 }
@@ -110,7 +102,7 @@ bool VfsXAttr.needsMetadataUpdate (SyncFileItem &) {
     return false;
 }
 
-bool VfsXAttr.isDehydratedPlaceholder (QString &filePath) {
+bool VfsXAttr.isDehydratedPlaceholder (string &filePath) {
     const auto fi = QFileInfo (filePath);
     return fi.exists () &&
             xattr.hasNextcloudPlaceholderAttributes (filePath);
@@ -127,7 +119,7 @@ bool VfsXAttr.statTypeVirtualFile (csync_file_stat_t *stat, void *statData) {
 
     const auto path = QByteArray (*parentPath + '/' + stat.path);
     const auto pin = [=] {
-        const auto absolutePath = QString.fromUtf8 (path);
+        const auto absolutePath = string.fromUtf8 (path);
         Q_ASSERT (absolutePath.startsWith (params ().filesystemPath.toUtf8 ()));
         const auto folderPath = absolutePath.mid (params ().filesystemPath.length ());
         return pinState (folderPath);
@@ -147,19 +139,19 @@ bool VfsXAttr.statTypeVirtualFile (csync_file_stat_t *stat, void *statData) {
     return false;
 }
 
-bool VfsXAttr.setPinState (QString &folderPath, PinState state) {
+bool VfsXAttr.setPinState (string &folderPath, PinState state) {
     return setPinStateInDb (folderPath, state);
 }
 
-Optional<PinState> VfsXAttr.pinState (QString &folderPath) {
+Optional<PinState> VfsXAttr.pinState (string &folderPath) {
     return pinStateInDb (folderPath);
 }
 
-Vfs.AvailabilityResult VfsXAttr.availability (QString &folderPath) {
+Vfs.AvailabilityResult VfsXAttr.availability (string &folderPath) {
     return availabilityInDb (folderPath);
 }
 
-void VfsXAttr.fileStatusChanged (QString &, SyncFileStatus) {
+void VfsXAttr.fileStatusChanged (string &, SyncFileStatus) {
 }
 
 } // namespace Occ

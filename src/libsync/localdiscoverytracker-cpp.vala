@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Christian Kamm <mail@ckamm.de>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <QLoggingCategory>
 
@@ -20,7 +12,7 @@ Q_LOGGING_CATEGORY (lcLocalDiscoveryTracker, "sync.localdiscoverytracker", QtInf
 
 LocalDiscoveryTracker.LocalDiscoveryTracker () = default;
 
-void LocalDiscoveryTracker.addTouchedPath (QString &relativePath) {
+void LocalDiscoveryTracker.addTouchedPath (string &relativePath) {
     qCDebug (lcLocalDiscoveryTracker) << "inserted touched" << relativePath;
     _localDiscoveryPaths.insert (relativePath);
 }
@@ -43,7 +35,7 @@ void LocalDiscoveryTracker.startSyncPartialDiscovery () {
     _localDiscoveryPaths.clear ();
 }
 
-const std.set<QString> &LocalDiscoveryTracker.localDiscoveryPaths () {
+const std.set<string> &LocalDiscoveryTracker.localDiscoveryPaths () {
     return _localDiscoveryPaths;
 }
 

@@ -1,9 +1,9 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
 
-*/
+***********************************************************/
 
 // #include <QtTest>
 
@@ -13,10 +13,10 @@ class StatusPushSpy : QSignalSpy {
     SyncEngine &_syncEngine;
 public:
     StatusPushSpy (SyncEngine &syncEngine)
-        : QSignalSpy (&syncEngine.syncFileStatusTracker (), SIGNAL (fileStatusChanged (QString&, SyncFileStatus)))
+        : QSignalSpy (&syncEngine.syncFileStatusTracker (), SIGNAL (fileStatusChanged (string&, SyncFileStatus)))
         , _syncEngine (syncEngine) { }
 
-    SyncFileStatus statusOf (QString &relativePath) {
+    SyncFileStatus statusOf (string &relativePath) {
         QFileInfo file (_syncEngine.localPath (), relativePath);
         // Start from the end to get the latest status
         for (int i = size () - 1; i >= 0; --i) {
@@ -26,7 +26,7 @@ public:
         return {};
     }
 
-    bool statusEmittedBefore (QString &firstPath, QString &secondPath) {
+    bool statusEmittedBefore (string &firstPath, string &secondPath) {
         QFileInfo firstFile (_syncEngine.localPath (), firstPath);
         QFileInfo secondFile (_syncEngine.localPath (), secondPath);
         // Start from the end to get the latest status
@@ -48,10 +48,10 @@ public:
 class TestSyncFileStatusTracker : GLib.Object {
 
     void verifyThatPushMatchesPull (FakeFolder &fakeFolder, StatusPushSpy &statusSpy) {
-        QString root = fakeFolder.localPath ();
+        string root = fakeFolder.localPath ();
         QDirIterator it (root, QDir.AllEntries | QDir.NoDotAndDotDot, QDirIterator.Subdirectories);
         while (it.hasNext ()) {
-            QString filePath = it.next ().mid (root.size ());
+            string filePath = it.next ().mid (root.size ());
             SyncFileStatus pushedStatus = statusSpy.statusOf (filePath);
             if (pushedStatus != SyncFileStatus ())
                 QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus (filePath), pushedStatus);
@@ -375,7 +375,7 @@ private slots:
 
     void parentsGetWarningStatusForError_SibblingStartsWithPath () {
         // A is a parent of A/a1, but A/a is not even if it's a substring of A/a1
-        FakeFolder fakeFolder{{QString{},{ {QStringLiteral ("A"), { {QStringLiteral ("a"), 4}, {QStringLiteral ("a1"), 4}
+        FakeFolder fakeFolder{{string{},{ {QStringLiteral ("A"), { {QStringLiteral ("a"), 4}, {QStringLiteral ("a1"), 4}
             }}}}};
         fakeFolder.serverErrorPaths ().append ("A/a1");
         fakeFolder.localModifier ().appendByte ("A/a1");

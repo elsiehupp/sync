@@ -1,26 +1,26 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
 
-*/
+***********************************************************/
 
 // #include <QtTest>
 // #include <syncengine.h>
 
 using namespace Occ;
 
-bool itemSuccessful (ItemCompletedSpy &spy, QString &path, SyncInstructions instr) {
+bool itemSuccessful (ItemCompletedSpy &spy, string &path, SyncInstructions instr) {
     auto item = spy.findItem (path);
     return item._status == SyncFileItem.Success && item._instruction == instr;
 }
 
-bool itemConflict (ItemCompletedSpy &spy, QString &path) {
+bool itemConflict (ItemCompletedSpy &spy, string &path) {
     auto item = spy.findItem (path);
     return item._status == SyncFileItem.Conflict && item._instruction == CSYNC_INSTRUCTION_CONFLICT;
 }
 
-bool itemSuccessfulMove (ItemCompletedSpy &spy, QString &path) {
+bool itemSuccessfulMove (ItemCompletedSpy &spy, string &path) {
     return itemSuccessful (spy, path, CSYNC_INSTRUCTION_RENAME);
 }
 
@@ -34,7 +34,7 @@ QStringList findConflicts (FileInfo &dir) {
     return conflicts;
 }
 
-bool expectAndWipeConflict (FileModifier &local, FileInfo state, QString path) {
+bool expectAndWipeConflict (FileModifier &local, FileInfo state, string path) {
     PathComponents pathComponents (path);
     auto base = state.find (pathComponents.parentDirComponents ());
     if (!base)
@@ -48,7 +48,7 @@ bool expectAndWipeConflict (FileModifier &local, FileInfo state, QString path) {
     return false;
 }
 
-SyncJournalFileRecord dbRecord (FakeFolder &folder, QString &path) {
+SyncJournalFileRecord dbRecord (FakeFolder &folder, string &path) {
     SyncJournalFileRecord record;
     folder.syncJournal ().getFileRecord (path, &record);
     return record;
@@ -83,13 +83,13 @@ private slots:
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "uploadConflictFiles", true } });
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        QMap<QByteArray, QString> conflictMap;
+        QMap<QByteArray, string> conflictMap;
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.PutOperation) {
                 if (request.rawHeader ("OC-Conflict") == "1") {
                     auto baseFileId = request.rawHeader ("OC-ConflictBaseFileId");
                     auto components = request.url ().toString ().split ('/');
-                    QString conflictFile = components.mid (components.size () - 2).join ('/');
+                    string conflictFile = components.mid (components.size () - 2).join ('/');
                     conflictMap[baseFileId] = conflictFile;
                     [&] {
                         QVERIFY (!baseFileId.isEmpty ());
@@ -118,7 +118,7 @@ private slots:
         QCOMPARE (Utility.conflictFileBaseNameFromPattern (conflictMap[a1FileId].toUtf8 ()), QByteArray ("A/a1"));
 
         // Check that the conflict file contains the username
-        QVERIFY (conflictMap[a1FileId].contains (QString (" (conflicted copy %1 ").arg (fakeFolder.syncEngine ().account ().davDisplayName ())));
+        QVERIFY (conflictMap[a1FileId].contains (string (" (conflicted copy %1 ").arg (fakeFolder.syncEngine ().account ().davDisplayName ())));
 
         QCOMPARE (remote.find (conflictMap[a1FileId]).contentChar, 'L');
         QCOMPARE (remote.find ("A/a1").contentChar, 'R');
@@ -132,13 +132,13 @@ private slots:
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "uploadConflictFiles", true } });
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        QMap<QByteArray, QString> conflictMap;
+        QMap<QByteArray, string> conflictMap;
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.PutOperation) {
                 if (request.rawHeader ("OC-Conflict") == "1") {
                     auto baseFileId = request.rawHeader ("OC-ConflictBaseFileId");
                     auto components = request.url ().toString ().split ('/');
-                    QString conflictFile = components.mid (components.size () - 2).join ('/');
+                    string conflictFile = components.mid (components.size () - 2).join ('/');
                     conflictMap[baseFileId] = conflictFile;
                     [&] {
                         QVERIFY (!baseFileId.isEmpty ());
@@ -153,7 +153,7 @@ private slots:
         // file didn't finish in the same sync run that the conflict was created.
         // To do that we need to create a mock conflict record.
         auto a1FileId = fakeFolder.remoteModifier ().find ("A/a1").fileId;
-        QString conflictName = QLatin1String ("A/a1 (conflicted copy me 1234)");
+        string conflictName = QLatin1String ("A/a1 (conflicted copy me 1234)");
         fakeFolder.localModifier ().insert (conflictName, 64, 'L');
         ConflictRecord conflictRecord;
         conflictRecord.path = conflictName.toUtf8 ();
@@ -302,8 +302,8 @@ private slots:
     }
 
     void testConflictFileBaseName_data () {
-        QTest.addColumn<QString> ("input");
-        QTest.addColumn<QString> ("output");
+        QTest.addColumn<string> ("input");
+        QTest.addColumn<string> ("output");
 
         QTest.newRow ("nomatch1")
             << "a/b/foo"
@@ -374,8 +374,8 @@ private slots:
     }
 
     void testConflictFileBaseName () {
-        QFETCH (QString, input);
-        QFETCH (QString, output);
+        QFETCH (string, input);
+        QFETCH (string, output);
         QCOMPARE (Utility.conflictFileBaseNameFromPattern (input.toUtf8 ()), output.toUtf8 ());
     }
 

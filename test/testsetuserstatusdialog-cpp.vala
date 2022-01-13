@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <QTest>
 // #include <QSignalSpy>
@@ -131,9 +123,9 @@ static std.vector<Occ.UserStatus>
 createFakePredefinedStatuses (QDateTime &currentTime) {
     std.vector<Occ.UserStatus> statuses;
 
-    const QString userStatusId ("fake-id");
-    const QString userStatusMessage ("Predefined status");
-    const QString userStatusIcon ("🏖");
+    const string userStatusId ("fake-id");
+    const string userStatusMessage ("Predefined status");
+    const string userStatusIcon ("🏖");
     const Occ.UserStatus.OnlineStatus userStatusState (Occ.UserStatus.OnlineStatus.Online);
     const bool userStatusMessagePredefined (true);
     Occ.Optional<Occ.ClearAt> userStatusClearAt;
@@ -166,9 +158,9 @@ private slots:
     void testCtor_fetchStatusAndPredefinedStatuses () {
         const QDateTime currentDateTime (QDateTime.currentDateTime ());
 
-        const QString userStatusId ("fake-id");
-        const QString userStatusMessage ("Some status");
-        const QString userStatusIcon ("❤");
+        const string userStatusId ("fake-id");
+        const string userStatusMessage ("Some status");
+        const string userStatusIcon ("❤");
         const Occ.UserStatus.OnlineStatus userStatusState (Occ.UserStatus.OnlineStatus.DoNotDisturb);
         const bool userStatusMessagePredefined (false);
         Occ.Optional<Occ.ClearAt> userStatusClearAt; {
@@ -249,8 +241,8 @@ private slots:
         Occ.UserStatusSelectorModel model (fakeUserStatusJob);
         QSignalSpy finishedSpy (&model, &Occ.UserStatusSelectorModel.finished);
 
-        const QString userStatusMessage ("Some status");
-        const QString userStatusIcon ("❤");
+        const string userStatusMessage ("Some status");
+        const string userStatusIcon ("❤");
         const Occ.UserStatus.OnlineStatus userStatusState (Occ.UserStatus.OnlineStatus.Online);
 
         model.setOnlineStatus (userStatusState);
@@ -279,7 +271,7 @@ private slots:
         model.setPredefinedStatus (0);
         QSignalSpy finishedSpy (&model, &Occ.UserStatusSelectorModel.finished);
 
-        const QString userStatusMessage ("Some status");
+        const string userStatusMessage ("Some status");
         const Occ.UserStatus.OnlineStatus userStatusState (Occ.UserStatus.OnlineStatus.Online);
 
         model.setOnlineStatus (userStatusState);
@@ -306,7 +298,7 @@ private slots:
         model.setPredefinedStatus (0);
         QSignalSpy finishedSpy (&model, &Occ.UserStatusSelectorModel.finished);
 
-        const QString userStatusIcon ("❤");
+        const string userStatusIcon ("❤");
         const Occ.UserStatus.OnlineStatus userStatusState (Occ.UserStatus.OnlineStatus.Online);
 
         model.setOnlineStatus (userStatusState);

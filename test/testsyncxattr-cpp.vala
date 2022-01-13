@@ -1,9 +1,9 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
 
-*/
+***********************************************************/
 
 // #include <QtTest>
 // #include <syncengine.h>
@@ -31,12 +31,12 @@ const int CFVERIFY_GONE (folder, path)
 
 using namespace Occ;
 
-bool itemInstruction (ItemCompletedSpy &spy, QString &path, SyncInstructions instr) {
+bool itemInstruction (ItemCompletedSpy &spy, string &path, SyncInstructions instr) {
     auto item = spy.findItem (path);
     return item._instruction == instr;
 }
 
-SyncJournalFileRecord dbRecord (FakeFolder &folder, QString &path) {
+SyncJournalFileRecord dbRecord (FakeFolder &folder, string &path) {
     SyncJournalFileRecord record;
     folder.syncJournal ().getFileRecord (path, &record);
     return record;
@@ -679,11 +679,11 @@ private slots:
 
         QVERIFY (fakeFolder.syncOnce ());
 
-        auto isDehydrated = [&] (QString &path) {
+        auto isDehydrated = [&] (string &path) {
             return xattr.hasNextcloudPlaceholderAttributes (fakeFolder.localPath () + path)
                 && QFileInfo (fakeFolder.localPath () + path).exists ();
         };
-        auto hasDehydratedDbEntries = [&] (QString &path) {
+        auto hasDehydratedDbEntries = [&] (string &path) {
             SyncJournalFileRecord rec;
             fakeFolder.syncJournal ().getFileRecord (path, &rec);
             return rec.isValid () && rec._type == ItemTypeVirtualFile;

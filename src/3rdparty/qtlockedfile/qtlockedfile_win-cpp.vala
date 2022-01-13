@@ -1,30 +1,14 @@
-/****************************************************************************
-**
-** Copyright (C) 2014 Digia Plc and/or its subsidiary (-ies).
-** Contact : http://www.qt-project.org/legal
-**
-** This file is part of Qt Creator.
-**
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
-** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and Digia.  For licensing terms and
-** conditions see http://qt.digia.com/licensing.  For further information
-** use the contact form at http://qt.digia.com/contact-us.
-**
-** GNU Lesser General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 as published by the Free Software
-** Foundation and appearing in the file LICENSE.LGPL included in the
-** packaging of this file.  Please review the following information to
-** ensure the GNU Lesser General Public License version 2.1 requirements
-** will be met : http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
-**
-** In addition, as a special exception, Digia gives you certain additional
-** rights.  These rights are described in the Digia Qt LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
-**
+/***********************************************************
+Copyright (C) 2014 Digia Plc and/or its subsidiary (-ies).
+Contact : http://www.qt-project.org/legal
+
+This file is part of Qt Creator.
+
+<LGPLv2.1-or-later-Boilerplate>
+
+In addition, as a special exception, Digia gives you certain additional
+rights.  These rights are described in the Digia Qt LGPL Exception
+version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 ****************************************************************************/
 
 // #include <qt_windows.h>
@@ -32,17 +16,17 @@
 
 namespace SharedTools {
 
-const int SEMAPHORE_PREFIX "QtLockedFile semaphore "
-const int MUTEX_PREFIX "QtLockedFile mutex "
-const int SEMAPHORE_MAX 100
+const string SEMAPHORE_PREFIX = "QtLockedFile semaphore "
+const string MUTEX_PREFIX ="QtLockedFile mutex "
+const int SEMAPHORE_MAX = 100
 
-static QString errorCodeToString (DWORD errorCode) {
-    QString result;
+static string errorCodeToString (DWORD errorCode) {
+    string result;
     char *data = 0;
     FormatMessageA (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
                     0, errorCode, 0,
                     (char*)&data, 0, 0);
-    result = QString.fromLocal8Bit (data);
+    result = string.fromLocal8Bit (data);
     if (data != 0)
         LocalFree (data);
 
@@ -66,7 +50,7 @@ bool QtLockedFile.lock (LockMode mode, bool block) {
 
     if (m_semaphore_hnd == 0) {
         QFileInfo fi (*this);
-        QString sem_name = QString.fromLatin1 (SEMAPHORE_PREFIX)
+        string sem_name = string.fromLatin1 (SEMAPHORE_PREFIX)
                            + fi.absoluteFilePath ().toLower ();
 
         m_semaphore_hnd = CreateSemaphoreW (0, SEMAPHORE_MAX, SEMAPHORE_MAX,
@@ -87,7 +71,7 @@ bool QtLockedFile.lock (LockMode mode, bool block) {
         decrement = SEMAPHORE_MAX;
         if (m_mutex_hnd == 0) {
             QFileInfo fi (*this);
-            QString mut_name = QString.fromLatin1 (MUTEX_PREFIX)
+            string mut_name = string.fromLatin1 (MUTEX_PREFIX)
                                + fi.absoluteFilePath ().toLower ();
 
             m_mutex_hnd = CreateMutexW (nullptr, FALSE, (TCHAR*)mut_name.utf16 ());

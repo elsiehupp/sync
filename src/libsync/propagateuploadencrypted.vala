@@ -1,0 +1,80 @@
+#ifndef PROPAGATEUPLOADENCRYPTED_H
+const int PROPAGATEUPLOADENCRYPTED_H
+
+// #include <GLib.Object>
+// #include <string>
+// #include <QMap>
+// #include <QByteArray>
+// #include <QJsonDocument>
+// #include <QNetworkReply>
+// #include <QFile>
+// #include <QTemporaryFile>
+
+namespace Occ {
+
+  /* This class is used if the server supports end to end encryption.
+It will fire for *any* folder, encrypted or not, because when the
+client starts the upload request we don't know if the folder is
+encrypted on the server.
+
+emits:
+finalized () if the encrypted file is ready to be
+error () if there was an error with the encryption
+folderNotEncrypted () if the file is within a folder that's not encrypted.
+
+***********************************************************/
+
+class PropagateUploadEncrypted : GLib.Object {
+  Q_OBJECT
+public:
+    PropagateUploadEncrypted (OwncloudPropagator *propagator, string &remoteParentPath, SyncFileItemPtr item, GLib.Object *parent = nullptr);
+    ~PropagateUploadEncrypted () override = default;
+
+    void start ();
+
+    void unlockFolder ();
+
+    bool isUnlockRunning () { return _isUnlockRunning; }
+    bool isFolderLocked () { return _isFolderLocked; }
+    const QByteArray folderToken () { return _folderToken; }
+
+private slots:
+    void slotFolderEncryptedIdReceived (QStringList &list);
+    void slotFolderEncryptedIdError (QNetworkReply *r);
+    void slotFolderLockedSuccessfully (QByteArray& fileId, QByteArray& token);
+    void slotFolderLockedError (QByteArray& fileId, int httpErrorCode);
+    void slotTryLock (QByteArray& fileId);
+    void slotFolderEncryptedMetadataReceived (QJsonDocument &json, int statusCode);
+    void slotFolderEncryptedMetadataError (QByteArray& fileId, int httpReturnCode);
+    void slotUpdateMetadataSuccess (QByteArray& fileId);
+    void slotUpdateMetadataError (QByteArray& fileId, int httpReturnCode);
+
+signals:
+    // Emmited after the file is encrypted and everythign is setup.
+    void finalized (string& path, string& filename, uint64 size);
+    void error ();
+    void folderUnlocked (QByteArray &folderId, int httpStatus);
+
+private:
+  OwncloudPropagator *_propagator;
+  string _remoteParentPath;
+  SyncFileItemPtr _item;
+
+  QByteArray _folderToken;
+  QByteArray _folderId;
+
+  QElapsedTimer _folderLockFirstTry;
+  bool _currentLockingInProgress = false;
+
+  bool _isUnlockRunning = false;
+  bool _isFolderLocked = false;
+
+  QByteArray _generatedKey;
+  QByteArray _generatedIv;
+  FolderMetadata *_metadata;
+  EncryptedFile _encryptedFile;
+  string _completeFileName;
+};
+
+}
+#endif

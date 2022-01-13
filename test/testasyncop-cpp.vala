@@ -1,9 +1,9 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
    support, and with no warranty, express or implied, as to its usefulness for
    any purpose.
 
-*/
+***********************************************************/
 
 // #include <QtTest>
 // #include <syncengine.h>
@@ -60,7 +60,7 @@ private slots:
             PollRequest_t pollRequest;
             std.function<FileInfo * ()> perform = nullptr;
         };
-        QHash<QString, TestCase> testCases;
+        QHash<string, TestCase> testCases;
 
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *outgoingData) . QNetworkReply * {
             auto path = request.url ().path ();
@@ -84,7 +84,7 @@ private slots:
                 };
                 return new FakeAsyncReply ("/async-poll/" + file.toUtf8 (), op, request, &fakeFolder.syncEngine ());
             } else if (request.attribute (QNetworkRequest.CustomVerbAttribute) == "MOVE") {
-                QString file = getFilePathFromUrl (QUrl.fromEncoded (request.rawHeader ("Destination")));
+                string file = getFilePathFromUrl (QUrl.fromEncoded (request.rawHeader ("Destination")));
                 Q_ASSERT (testCases.contains (file));
                 auto &testCase = testCases[file];
                 Q_ASSERT (!testCase.perform);
@@ -128,7 +128,7 @@ private slots:
         };
 
         // Create a testcase by creating a file of a given size locally and assigning it a callback
-        auto insertFile = [&] (QString &file, int64 size, TestCase.PollRequest_t cb) {
+        auto insertFile = [&] (string &file, int64 size, TestCase.PollRequest_t cb) {
             fakeFolder.localModifier ().insert (file, size);
             testCases[file] = { std.move (cb) };
         };

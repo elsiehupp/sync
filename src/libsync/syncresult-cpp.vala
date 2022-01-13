@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 namespace Occ {
 
@@ -24,8 +16,8 @@ void SyncResult.reset () {
     *this = SyncResult ();
 }
 
-QString SyncResult.statusString () {
-    QString re;
+string SyncResult.statusString () {
+    string re;
     Status stat = status ();
 
     switch (stat) {
@@ -76,13 +68,13 @@ QStringList SyncResult.errorStrings () {
     return _errors;
 }
 
-void SyncResult.appendErrorString (QString &err) {
+void SyncResult.appendErrorString (string &err) {
     _errors.append (err);
 }
 
-QString SyncResult.errorString () {
+string SyncResult.errorString () {
     if (_errors.isEmpty ())
-        return QString ();
+        return string ();
     return _errors.first ();
 }
 
@@ -90,11 +82,11 @@ void SyncResult.clearErrors () {
     _errors.clear ();
 }
 
-void SyncResult.setFolder (QString &folder) {
+void SyncResult.setFolder (string &folder) {
     _folder = folder;
 }
 
-QString SyncResult.folder () {
+string SyncResult.folder () {
     return _folder;
 }
 

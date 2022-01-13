@@ -1,4 +1,4 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
       support, and with no warranty, express or implied, as to its usefulness for
          any purpose.
@@ -43,23 +43,23 @@ private slots:
     void testValidNetrc () {
        NetrcParser parser (testfileC);
        QVERIFY (parser.parse ());
-       QCOMPARE (parser.find ("foo"), qMakePair (QString ("bar"), QString ("baz")));
-       QCOMPARE (parser.find ("broken"), qMakePair (QString ("bar2"), QString ()));
-       QCOMPARE (parser.find ("funnysplit"), qMakePair (QString ("bar3"), QString ("baz3")));
-       QCOMPARE (parser.find ("frob"), qMakePair (QString ("user with spaces"), QString ("space pwd")));
+       QCOMPARE (parser.find ("foo"), qMakePair (string ("bar"), string ("baz")));
+       QCOMPARE (parser.find ("broken"), qMakePair (string ("bar2"), string ()));
+       QCOMPARE (parser.find ("funnysplit"), qMakePair (string ("bar3"), string ("baz3")));
+       QCOMPARE (parser.find ("frob"), qMakePair (string ("user with spaces"), string ("space pwd")));
     }
 
     void testEmptyNetrc () {
        NetrcParser parser (testfileEmptyC);
        QVERIFY (!parser.parse ());
-       QCOMPARE (parser.find ("foo"), qMakePair (QString (), QString ()));
+       QCOMPARE (parser.find ("foo"), qMakePair (string (), string ()));
     }
 
     void testValidNetrcWithDefault () {
        NetrcParser parser (testfileWithDefaultC);
        QVERIFY (parser.parse ());
-       QCOMPARE (parser.find ("foo"), qMakePair (QString ("bar"), QString ("baz")));
-       QCOMPARE (parser.find ("dontknow"), qMakePair (QString ("user"), QString ("pass")));
+       QCOMPARE (parser.find ("foo"), qMakePair (string ("bar"), string ("baz")));
+       QCOMPARE (parser.find ("dontknow"), qMakePair (string ("user"), string ("pass")));
     }
 
     void testInvalidNetrc () {

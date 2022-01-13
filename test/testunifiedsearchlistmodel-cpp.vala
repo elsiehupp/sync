@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <QAbstractItemModelTester>
 // #include <QDesktopServices>
@@ -18,7 +10,7 @@ for more details.
 // #include <QTest>
 
 namespace {
-/**
+/***********************************************************
 @brief The FakeDesktopServicesUrlHandler
 overrides QDesktopServices.openUrl
  **/
@@ -33,14 +25,14 @@ signals:
     void resultClicked (QUrl &url);
 };
 
-/**
+/***********************************************************
 @brief The FakeProvider
 is a simple structure that represents initial list of providers and their properties
  **/
 class FakeProvider {
 public:
-    QString _id;
-    QString _name;
+    string _id;
+    string _name;
     int32 _order = std.numeric_limits<int32>.max ();
     uint32 _numItemsToInsert = 5; // how many fake resuls to insert
 };
@@ -58,7 +50,7 @@ static QByteArray fake400Response = R" ( {"ocs":{"meta":{"status":"failure","sta
 static QByteArray fake500Response = R" ( {"ocs":{"meta":{"status":"failure","statuscode":500,"message":"Internal Server Error.\n"},"data":[]}}
 )";
 
-/**
+/***********************************************************
 @brief The FakeSearchResultsStorage
 emulates the real server storage that contains all the results that UnifiedSearchListmodel will search for
  **/
@@ -67,16 +59,16 @@ class FakeSearchResultsStorage { {lass Provider
     public:
         class SearchResult {
         public:
-            QString _thumbnailUrl;
-            QString _title;
-            QString _subline;
-            QString _resourceUrl;
-            QString _icon;
+            string _thumbnailUrl;
+            string _title;
+            string _subline;
+            string _resourceUrl;
+            string _icon;
             bool _rounded;
         };
 
-        QString _id;
-        QString _name;
+        string _id;
+        string _name;
         int32 _order = std.numeric_limits<int32>.max ();
         int32 _cursor = 0;
         bool _isPaginated = false;
@@ -142,15 +134,15 @@ public:
                 providerData._isPaginated = true;
             }
             for (uint32 i = 0; i < fakeProvider._numItemsToInsert; ++i) {
-                providerData._results.push_back ( {"http://example.de/avatar/john/64", QString (QStringLiteral ("John Doe in ") + fakeProvider._name),
-                        QString (QStringLiteral ("We a discussion about ") + fakeProvider._name
+                providerData._results.push_back ( {"http://example.de/avatar/john/64", string (QStringLiteral ("John Doe in ") + fakeProvider._name),
+                        string (QStringLiteral ("We a discussion about ") + fakeProvider._name
                             + QStringLiteral (" already. But, let's have a follow up tomorrow afternoon.")),
                         "http://example.de/call/abcde12345#message_12345", QStringLiteral ("icon-talk"), true});
             }
         }
     }
 
-    const QList<QVariant> resultsForProvider (QString &providerId, int cursor) {
+    const QList<QVariant> resultsForProvider (string &providerId, int cursor) {
         QList<QVariant> list;
 
         const auto results = resultsForProviderAsVector (providerId, cursor);
@@ -167,7 +159,7 @@ public:
         return list;
     }
 
-    const QVector<Provider.SearchResult> resultsForProviderAsVector (QString &providerId, int cursor) {
+    const QVector<Provider.SearchResult> resultsForProviderAsVector (string &providerId, int cursor) {
         QVector<Provider.SearchResult> results;
 
         const auto provider = _searchResultsData.value (providerId, Provider ());
@@ -187,7 +179,7 @@ public:
         return results;
     }
 
-    const QByteArray queryProvider (QString &providerId, QString &searchTerm, int cursor) {
+    const QByteArray queryProvider (string &providerId, string &searchTerm, int cursor) {
         if (!_searchResultsData.contains (providerId)) {
             return fake404Response;
         }
@@ -223,7 +215,7 @@ private:
 
     static const int pageSize = 5;
 
-    QMap<QString, Provider> _searchResultsData;
+    QMap<string, Provider> _searchResultsData;
 
     QByteArray _providersResponse = fake404Response;
 
@@ -281,7 +273,7 @@ private slots:
                     FakeSearchResultsStorage.instance ().fakeProvidersResponseJson (), fakeQnam.data ());
             // handle search for provider
             } else if (path.startsWith (QStringLiteral ("/ocs/v2.php/search/providers")) && !searchTerm.isEmpty ()) {
-                const auto pathSplit = path.mid (QString (QStringLiteral ("/ocs/v2.php/search/providers")).size ())
+                const auto pathSplit = path.mid (string (QStringLiteral ("/ocs/v2.php/search/providers")).size ())
                                            .split (QLatin1Char ('/'), Qt.SkipEmptyParts);
 
                 if (!pathSplit.isEmpty () && path.contains (pathSplit.first ())) {
@@ -515,7 +507,7 @@ private slots:
         QSignalSpy resultClicked (fakeDesktopServicesUrlHandler.data (), &FakeDesktopServicesUrlHandler.resultClicked);
 
         //  test click on a result item
-        QString urlForClickedResult;
+        string urlForClickedResult;
 
         for (int i = 0; i < model.rowCount (); ++i) {
             const auto type = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.TypeRole);

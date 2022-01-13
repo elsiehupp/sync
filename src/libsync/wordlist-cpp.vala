@@ -2074,7 +2074,7 @@ QStringList getRandomWords (int nr) {
 
     QStringList randomWords;
     while (randomWords.size () != nr) {
-        QString currWord = wordList.at (getRandomNumber (wordList.size ()));
+        string currWord = wordList.at (getRandomNumber (wordList.size ()));
         if (!randomWords.contains (currWord)) {
             randomWords.append (currWord);
         }
@@ -2082,8 +2082,8 @@ QStringList getRandomWords (int nr) {
     return randomWords;
 }
 
-QString getUnifiedString (QStringList& wList) {
-    QString ret;
+string getUnifiedString (QStringList& wList) {
+    string ret;
     for (auto& str : wList) {
         ret += str;
     }

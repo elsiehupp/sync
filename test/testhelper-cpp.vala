@@ -1,5 +1,5 @@
 
-Occ.FolderDefinition folderDefinition (QString &path) {
+Occ.FolderDefinition folderDefinition (string &path) {
     Occ.FolderDefinition d;
     d.localPath = path;
     d.targetPath = path;

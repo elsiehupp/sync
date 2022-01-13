@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <networkjobs.h>
 
@@ -19,7 +11,7 @@ for more details.
 // #include <QJsonDocument>
 // #include <QJsonValue>
 // #include <QLoggingCategory>
-// #include <QString>
+// #include <string>
 // #include <QJsonObject>
 // #include <QJsonArray>
 // #include <qdatetime.h>
@@ -31,9 +23,9 @@ namespace {
 
 Q_LOGGING_CATEGORY (lcOcsUserStatusConnector, "nextcloud.gui.ocsuserstatusconnector", QtInfoMsg)
 
-Occ.UserStatus.OnlineStatus stringToUserOnlineStatus (QString &status) {
+Occ.UserStatus.OnlineStatus stringToUserOnlineStatus (string &status) {
     // it needs to match the Status enum
-    const QHash<QString, Occ.UserStatus.OnlineStatus> preDefinedStatus { { "online", Occ.UserStatus.OnlineStatus.Online }, { "dnd", Occ.UserStatus.OnlineStatus.DoNotDisturb }, { "away", Occ.UserStatus.OnlineStatus.Away }, { "offline", Occ.UserStatus.OnlineStatus.Offline }, { "invisible", Occ.UserStatus.OnlineStatus.Invisible }
+    const QHash<string, Occ.UserStatus.OnlineStatus> preDefinedStatus { { "online", Occ.UserStatus.OnlineStatus.Online }, { "dnd", Occ.UserStatus.OnlineStatus.DoNotDisturb }, { "away", Occ.UserStatus.OnlineStatus.Away }, { "offline", Occ.UserStatus.OnlineStatus.Offline }, { "invisible", Occ.UserStatus.OnlineStatus.Invisible }
     };
 
     // api should return invisible, dnd,... toLower () it is to make sure
@@ -41,7 +33,7 @@ Occ.UserStatus.OnlineStatus stringToUserOnlineStatus (QString &status) {
     return preDefinedStatus.value (status.toLower (), Occ.UserStatus.OnlineStatus.Online);
 }
 
-QString onlineStatusToString (Occ.UserStatus.OnlineStatus status) {
+string onlineStatusToString (Occ.UserStatus.OnlineStatus status) {
     switch (status) {
     case Occ.UserStatus.OnlineStatus.Online:
         return QStringLiteral ("online");
@@ -179,8 +171,8 @@ std.vector<Occ.UserStatus> jsonToPredefinedStatuses (QJsonArray jsonDataArray) {
     return statuses;
 }
 
-const QString baseUrl ("/ocs/v2.php/apps/user_status/api/v1");
-const QString userStatusBaseUrl = baseUrl + QStringLiteral ("/user_status");
+const string baseUrl ("/ocs/v2.php/apps/user_status/api/v1");
+const string userStatusBaseUrl = baseUrl + QStringLiteral ("/user_status");
 }
 
 namespace Occ {
@@ -267,7 +259,7 @@ void OcsUserStatusConnector.onPredefinedStatusesFetched (QJsonDocument &json, in
     emit predefinedStatusesFetched (statuses);
 }
 
-void OcsUserStatusConnector.logResponse (QString &message, QJsonDocument &json, int statusCode) {
+void OcsUserStatusConnector.logResponse (string &message, QJsonDocument &json, int statusCode) {
     qCDebug (lcOcsUserStatusConnector) << "Response from:" << message << "Status:" << statusCode << "Json:" << json;
 }
 

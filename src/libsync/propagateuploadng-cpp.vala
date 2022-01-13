@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <QNetworkAccessManager>
 // #include <QFileInfo>
@@ -21,17 +13,17 @@ for more details.
 namespace Occ {
 
 QUrl PropagateUploadFileNG.chunkUrl (int chunk) {
-    QString path = QLatin1String ("remote.php/dav/uploads/")
+    string path = QLatin1String ("remote.php/dav/uploads/")
         + propagator ().account ().davUser ()
-        + QLatin1Char ('/') + QString.number (_transferId);
+        + QLatin1Char ('/') + string.number (_transferId);
     if (chunk >= 0) {
         // We need to do add leading 0 because the server orders the chunk alphabetically
-        path += QLatin1Char ('/') + QString.number (chunk).rightJustified (16, '0'); // 1e16 is 10 petabyte
+        path += QLatin1Char ('/') + string.number (chunk).rightJustified (16, '0'); // 1e16 is 10 petabyte
     }
     return Utility.concatUrlPath (propagator ().account ().url (), path);
 }
 
-/*
+/***********************************************************
   State machine:
 
      *---. doStartUpload ()
@@ -59,7 +51,7 @@ QUrl PropagateUploadFileNG.chunkUrl (int chunk) {
     |
     +. MOVE -----. moveJobFinished () --. finalize ()
 
-*/
+***********************************************************/
 
 void PropagateUploadFileNG.doStartUpload () {
     propagator ()._activeJobList.append (this);
@@ -96,12 +88,12 @@ void PropagateUploadFileNG.doStartUpload () {
     startNewUpload ();
 }
 
-void PropagateUploadFileNG.slotPropfindIterate (QString &name, QMap<QString, QString> &properties) {
+void PropagateUploadFileNG.slotPropfindIterate (string &name, QMap<string, string> &properties) {
     if (name == chunkUrl ().path ()) {
         return; // skip the info about the path itself
     }
     bool ok = false;
-    QString chunkName = name.mid (name.lastIndexOf ('/') + 1);
+    string chunkName = name.mid (name.lastIndexOf ('/') + 1);
     auto chunkId = chunkName.toLongLong (&ok);
     if (ok) {
         ServerChunkInfo chunkinfo = { properties["getcontentlength"].toLongLong (), chunkName };
@@ -278,7 +270,7 @@ void PropagateUploadFileNG.startNextChunk () {
 
         // Finish with a MOVE
         // If we changed the file name, we must store the changed filename in the remote folder, not the original one.
-        QString destination = QDir.cleanPath (propagator ().account ().davUrl ().path ()
+        string destination = QDir.cleanPath (propagator ().account ().davUrl ().path ()
             + propagator ().fullRemotePath (_fileToUpload._file));
         auto headers = PropagateUploadFileCommon.headers ();
 
@@ -304,7 +296,7 @@ void PropagateUploadFileNG.startNextChunk () {
         return;
     }
 
-    const QString fileName = _fileToUpload._path;
+    const string fileName = _fileToUpload._path;
     auto device = std.make_unique<UploadDevice> (
             fileName, _sent, _currentChunkSize, &propagator ()._bandwidthManager);
     if (!device.open (QIODevice.ReadOnly)) {
@@ -397,7 +389,7 @@ void PropagateUploadFileNG.slotPutFinished () {
     _finished = _sent == _item._size;
 
     // Check if the file still exists
-    const QString fullFilePath (propagator ().fullLocalPath (_item._file));
+    const string fullFilePath (propagator ().fullLocalPath (_item._file));
     if (!FileSystem.fileExists (fullFilePath)) {
         if (!_finished) {
             abortWithError (SyncFileItem.SoftError, tr ("The local file was removed during sync."));
@@ -451,7 +443,7 @@ void PropagateUploadFileNG.slotMoveJobFinished () {
     }
 
     if (_item._httpErrorCode == 202) {
-        QString path = QString.fromUtf8 (job.reply ().rawHeader ("OC-JobStatus-Location"));
+        string path = string.fromUtf8 (job.reply ().rawHeader ("OC-JobStatus-Location"));
         if (path.isEmpty ()) {
             done (SyncFileItem.NormalError, tr ("Poll URL missing"));
             return;

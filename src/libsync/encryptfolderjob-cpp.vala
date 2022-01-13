@@ -1,16 +1,8 @@
-/*
+/***********************************************************
 Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published
-the Free Software Foundation; either v
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-for more details.
-*/
+<GPLv???-or-later-Boilerplate>
+***********************************************************/
 
 // #include <QLoggingCategory>
 
@@ -18,7 +10,7 @@ namespace Occ {
 
 Q_LOGGING_CATEGORY (lcEncryptFolderJob, "nextcloud.sync.propagator.encryptfolder", QtInfoMsg)
 
-EncryptFolderJob.EncryptFolderJob (AccountPtr &account, SyncJournalDb *journal, QString &path, QByteArray &fileId, GLib.Object *parent)
+EncryptFolderJob.EncryptFolderJob (AccountPtr &account, SyncJournalDb *journal, string &path, QByteArray &fileId, GLib.Object *parent)
     : GLib.Object (parent)
     , _account (account)
     , _journal (journal)
@@ -33,7 +25,7 @@ void EncryptFolderJob.start () {
     job.start ();
 }
 
-QString EncryptFolderJob.errorString () {
+string EncryptFolderJob.errorString () {
     return _errorString;
 }
 

@@ -1,4 +1,4 @@
-/*
+/***********************************************************
    This software is in the public domain, furnished "as is", without technical
       support, and with no warranty, express or implied, as to its usefulness for
          any purpose.
@@ -11,11 +11,11 @@ using namespace Occ;
 class TestInotifyWatcher : public FolderWatcherPrivate {
 
 private:
-    QString _root;
+    string _root;
 
 private slots:
     void initTestCase () {
-        _root = QDir.tempPath () + "/" + "test_" + QString.number (Occ.Utility.rand ());
+        _root = QDir.tempPath () + "/" + "test_" + string.number (Occ.Utility.rand ());
         qDebug () << "creating test directory tree in " << _root;
         QDir rootDir (_root);
 
@@ -56,7 +56,7 @@ private slots:
 
     void cleanupTestCase () {
         if ( _root.startsWith (QDir.tempPath () )) {
-           system ( QString ("rm -rf %1").arg (_root).toLocal8Bit () );
+           system ( string ("rm -rf %1").arg (_root).toLocal8Bit () );
         }
     }
 };
