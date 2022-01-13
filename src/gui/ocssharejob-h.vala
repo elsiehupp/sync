@@ -12,14 +12,12 @@
  * for more details.
  */
 
-#ifndef OCSSHAREJOB_H
-#define OCSSHAREJOB_H
 
 #include "ocsjob.h"
 #include "sharemanager.h"
-#include <QVector>
-#include <QList>
-#include <QPair>
+// #include <QVector>
+// #include <QList>
+// #include <QPair>
 
 class QJsonDocument;
 
@@ -34,7 +32,6 @@ namespace OCC {
  */
 class OcsShareJob : public OcsJob
 {
-    Q_OBJECT
 public:
     /**
      * Constructor for new shares or listing of shares

@@ -42,21 +42,21 @@
 #include "ignorelisttablewidget.h"
 #include "wizard/owncloudwizard.h"
 
-#include <cmath>
+// #include <cmath>
 
-#include <QDesktopServices>
-#include <QDialogButtonBox>
-#include <QDir>
-#include <QListWidgetItem>
-#include <QMessageBox>
-#include <QAction>
-#include <QVBoxLayout>
-#include <QTreeView>
-#include <QKeySequence>
-#include <QIcon>
-#include <QVariant>
-#include <QJsonDocument>
-#include <QToolTip>
+// #include <QDesktopServices>
+// #include <QDialogButtonBox>
+// #include <QDir>
+// #include <QListWidgetItem>
+// #include <QMessageBox>
+// #include <QAction>
+// #include <QVBoxLayout>
+// #include <QTreeView>
+// #include <QKeySequence>
+// #include <QIcon>
+// #include <QVariant>
+// #include <QJsonDocument>
+// #include <QToolTip>
 
 #include "account.h"
 
@@ -111,7 +111,6 @@ void showEnableE2eeWithVirtualFilesWarningDialog(std::function<void(void)> onAcc
  */
 class MouseCursorChanger : public QObject
 {
-    Q_OBJECT
 public:
     MouseCursorChanger(QObject *parent)
         : QObject(parent)

@@ -27,23 +27,23 @@
 #include "csync_exclude.h"
 
 #ifndef TOKEN_AUTH_ONLY
-#include <QWidget>
-#include <QHeaderView>
+// #include <QWidget>
+// #include <QHeaderView>
 #endif
 
-#include <QCoreApplication>
-#include <QDir>
-#include <QFile>
-#include <QFileInfo>
-#include <QLoggingCategory>
-#include <QSettings>
-#include <QNetworkProxy>
-#include <QStandardPaths>
+// #include <QCoreApplication>
+// #include <QDir>
+// #include <QFile>
+// #include <QFileInfo>
+// #include <QLoggingCategory>
+// #include <QSettings>
+// #include <QNetworkProxy>
+// #include <QStandardPaths>
 
 #define QTLEGACY (QT_VERSION < QT_VERSION_CHECK(5,9,0))
 
 #if !(QTLEGACY)
-#include <QOperatingSystemVersion>
+// #include <QOperatingSystemVersion>
 #endif
 
 #define DEFAULT_REMOTE_POLL_INTERVAL 30000 // default remote poll time in milliseconds

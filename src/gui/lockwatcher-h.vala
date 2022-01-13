@@ -12,17 +12,17 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
 #include "config.h"
 
-#include <QList>
-#include <QObject>
-#include <QString>
-#include <QSet>
-#include <QTimer>
+// #include <QList>
+// #include <QObject>
+// #include <QString>
+// #include <QSet>
+// #include <QTimer>
 
-#include <chrono>
+// #include <chrono>
 
 namespace OCC {
 
@@ -42,7 +42,6 @@ namespace OCC {
 
 class LockWatcher : public QObject
 {
-    Q_OBJECT
 public:
     explicit LockWatcher(QObject *parent = nullptr);
 

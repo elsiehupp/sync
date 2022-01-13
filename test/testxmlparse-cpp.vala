@@ -4,7 +4,7 @@
  *          any purpose.
  *          */
 
-#include <QtTest>
+// #include <QtTest>
 
 #include "networkjobs.h"
 
@@ -12,7 +12,6 @@ using namespace OCC;
 
 class TestXmlParse : public QObject
 {
-    Q_OBJECT
 
 private:
   bool _success;

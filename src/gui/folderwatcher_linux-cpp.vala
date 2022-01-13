@@ -14,15 +14,15 @@
 
 #include "config.h"
 
-#include <sys/inotify.h>
+// #include <sys/inotify.h>
 
 #include "folder.h"
 #include "folderwatcher_linux.h"
 
-#include <cerrno>
-#include <QStringList>
-#include <QObject>
-#include <QVarLengthArray>
+// #include <cerrno>
+// #include <QStringList>
+// #include <QObject>
+// #include <QVarLengthArray>
 
 namespace OCC {
 

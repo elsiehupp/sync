@@ -20,26 +20,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef _C_PRIVATE_H
-#define _C_PRIVATE_H
 
 #include "config_csync.h"
 
 /* cross platform defines */
 #include "config_csync.h"
-#include <sys/types.h>
-#include <sys/stat.h>
+// #include <sys/types.h>
+// #include <sys/stat.h>
 
 #ifdef _WIN32
-#include <windows.h>
-#include <windef.h>
-#include <winbase.h>
-#include <wchar.h>
+// #include <windows.h>
+// #include <windef.h>
+// #include <winbase.h>
+// #include <wchar.h>
 #else
-#include <unistd.h>
+// #include <unistd.h>
 #endif
 
-#include <cerrno>
+// #include <cerrno>
 
 #ifdef __MINGW32__
 #ifndef S_IRGRP
@@ -69,7 +67,7 @@
 #elif defined(_WIN32)
 #define mode_t int
 #else
-#include <fcntl.h>
+// #include <fcntl.h>
 #endif
 
 

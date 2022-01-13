@@ -29,20 +29,18 @@
  * @{
  */
 
-#ifndef _CSYNC_H
-#define _CSYNC_H
 
 #include "std/c_private.h"
 #include "ocsynclib.h"
 
-#include <sys/stat.h>
+// #include <sys/stat.h>
 
-#include <cstdint>
-#include <sys/types.h>
-#include <config_csync.h>
-#include <functional>
-#include <memory>
-#include <QByteArray>
+// #include <cstdint>
+// #include <sys/types.h>
+// #include <config_csync.h>
+// #include <functional>
+// #include <memory>
+// #include <QByteArray>
 #include "common/remotepermissions.h"
 
 namespace OCC {

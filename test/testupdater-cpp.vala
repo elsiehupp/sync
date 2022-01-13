@@ -4,7 +4,7 @@
    any purpose.
 */
 
-#include <QtTest>
+// #include <QtTest>
 
 #include "updater/updater.h"
 #include "updater/ocupdater.h"
@@ -13,7 +13,6 @@ using namespace OCC;
 
 class TestUpdater : public QObject
 {
-    Q_OBJECT
 
 private slots:
     void testVersionToInt()

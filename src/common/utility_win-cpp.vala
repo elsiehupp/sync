@@ -20,16 +20,16 @@
 #include "utility.h"
 #include "gui/configgui.h"
 
-#include <comdef.h>
-#include <Lmcons.h>
-#include <shlguid.h>
-#include <shlobj.h>
-#include <string>
-#include <winbase.h>
-#include <windows.h>
-#include <winerror.h>
+// #include <comdef.h>
+// #include <Lmcons.h>
+// #include <shlguid.h>
+// #include <shlobj.h>
+// #include <string>
+// #include <winbase.h>
+// #include <windows.h>
+// #include <winerror.h>
 
-#include <QLibrary>
+// #include <QLibrary>
 
 extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 

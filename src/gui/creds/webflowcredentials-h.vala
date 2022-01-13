@@ -1,10 +1,10 @@
 #ifndef WEBFLOWCREDENTIALS_H
 #define WEBFLOWCREDENTIALS_H
 
-#include <QSslCertificate>
-#include <QSslKey>
-#include <QNetworkRequest>
-#include <QQueue>
+// #include <QSslCertificate>
+// #include <QSslKey>
+// #include <QNetworkRequest>
+// #include <QQueue>
 
 #include "creds/abstractcredentials.h"
 
@@ -28,7 +28,6 @@ class WebFlowCredentialsDialog;
 
 class WebFlowCredentials : public AbstractCredentials
 {
-    Q_OBJECT
     friend class WebFlowCredentialsAccessManager;
 
 public:

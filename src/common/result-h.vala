@@ -12,7 +12,7 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
 #include "asserts.h"
 

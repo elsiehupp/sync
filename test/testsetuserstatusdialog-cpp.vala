@@ -15,11 +15,11 @@
 #include "userstatusconnector.h"
 #include "userstatusselectormodel.h"
 
-#include <QTest>
-#include <QSignalSpy>
-#include <QDateTime>
+// #include <QTest>
+// #include <QSignalSpy>
+// #include <QDateTime>
 
-#include <memory>
+// #include <memory>
 
 class FakeUserStatusConnector : public OCC::UserStatusConnector
 {
@@ -182,7 +182,6 @@ static QDateTime createDateTime(int year = 2021, int month = 7, int day = 27,
 
 class TestSetUserStatusDialog : public QObject
 {
-    Q_OBJECT
 
 private slots:
     void testCtor_fetchStatusAndPredefinedStatuses()

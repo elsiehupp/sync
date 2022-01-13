@@ -13,10 +13,8 @@
  * for more details.
  */
 
-#ifndef OWNCLOUDCONNECTIONMETHODDIALOG_H
-#define OWNCLOUDCONNECTIONMETHODDIALOG_H
 
-#include <QDialog>
+// #include <QDialog>
 
 #include "ui_owncloudconnectionmethoddialog.h"
 
@@ -32,7 +30,6 @@ namespace Ui {
  */
 class OwncloudConnectionMethodDialog : public QDialog
 {
-    Q_OBJECT
 
 public:
     explicit OwncloudConnectionMethodDialog(QWidget *parent = nullptr);

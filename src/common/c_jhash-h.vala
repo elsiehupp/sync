@@ -21,11 +21,9 @@
  *
  * @{
  */
-#ifndef _C_JHASH_H
-#define _C_JHASH_H
 
-#include <stdint.h> // NOLINT
-#include <QtCore/qglobal.h>
+// #include <stdint.h> // NOLINT
+// #include <QtCore/qglobal.h>
 #ifndef Q_FALLTHROUGH
 #define Q_FALLTHROUGH() // Was added in Qt 5.8
 #endif

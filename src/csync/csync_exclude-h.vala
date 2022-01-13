@@ -18,19 +18,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef _CSYNC_EXCLUDE_H
-#define _CSYNC_EXCLUDE_H
 
 #include "ocsynclib.h"
 
 #include "csync.h"
 
-#include <QObject>
-#include <QSet>
-#include <QString>
-#include <QRegularExpression>
+// #include <QObject>
+// #include <QSet>
+// #include <QString>
+// #include <QRegularExpression>
 
-#include <functional>
+// #include <functional>
 
 enum CSYNC_EXCLUDE_TYPE {
   CSYNC_NOT_EXCLUDED   = 0,
@@ -65,7 +63,6 @@ class QFile;
  */
 class OCSYNC_EXPORT ExcludedFiles : public QObject
 {
-    Q_OBJECT
 public:
     using Version = std::tuple<int, int, int>;
 

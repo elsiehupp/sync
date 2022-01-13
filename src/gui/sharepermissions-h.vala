@@ -12,10 +12,8 @@
  * for more details.
  */
 
-#ifndef SHAREPERMISSIONS_H
-#define SHAREPERMISSIONS_H
 
-#include <qglobal.h>
+// #include <qglobal.h>
 
 namespace OCC {
 

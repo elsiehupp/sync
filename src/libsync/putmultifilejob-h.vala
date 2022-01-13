@@ -12,21 +12,21 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
 #include "abstractnetworkjob.h"
 
 #include "propagateupload.h"
 #include "account.h"
 
-#include <QLoggingCategory>
-#include <QMap>
-#include <QByteArray>
-#include <QUrl>
-#include <QString>
-#include <QElapsedTimer>
-#include <QHttpMultiPart>
-#include <memory>
+// #include <QLoggingCategory>
+// #include <QMap>
+// #include <QByteArray>
+// #include <QUrl>
+// #include <QString>
+// #include <QElapsedTimer>
+// #include <QHttpMultiPart>
+// #include <memory>
 
 class QIODevice;
 
@@ -46,7 +46,6 @@ struct SingleUploadFileData
  */
 class OWNCLOUDSYNC_EXPORT PutMultiFileJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 
 public:
     explicit PutMultiFileJob(AccountPtr account, const QUrl &url,

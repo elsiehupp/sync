@@ -4,8 +4,8 @@
    any purpose.
 */
 
-#include <QtTest>
-#include <QDebug>
+// #include <QtTest>
+// #include <QDebug>
 
 #include "propagatedownload.h"
 #include "owncloudpropagator_p.h"
@@ -17,7 +17,6 @@ QString OWNCLOUDSYNC_EXPORT createDownloadTmpFileName(const QString &previous);
 
 class TestNextcloudPropagator : public QObject
 {
-    Q_OBJECT
 
 private slots:
     void testUpdateErrorFromSession()

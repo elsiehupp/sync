@@ -12,9 +12,9 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
-#include <QObject>
+// #include <QObject>
 #include "discoveryphase.h"
 #include "syncfileitem.h"
 #include "common/asserts.h"
@@ -47,7 +47,6 @@ class SyncJournalDb;
  */
 class ProcessDirectoryJob : public QObject
 {
-    Q_OBJECT
 
     struct PathTuple;
 public:

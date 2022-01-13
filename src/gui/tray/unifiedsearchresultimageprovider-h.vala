@@ -12,10 +12,10 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
-#include <QtCore>
-#include <QQuickImageProvider>
+// #include <QtCore>
+// #include <QQuickImageProvider>
 
 namespace OCC {
 

@@ -16,21 +16,21 @@
 
 #include "config.h"
 
-#include <QDir>
-#include <QRegularExpression>
-#include <QStringList>
-#include <QtGlobal>
-#include <QTextCodec>
-#include <qmetaobject.h>
+// #include <QDir>
+// #include <QRegularExpression>
+// #include <QStringList>
+// #include <QtGlobal>
+// #include <QTextCodec>
+// #include <qmetaobject.h>
 
-#include <iostream>
+// #include <iostream>
 
 #ifdef ZLIB_FOUND
-#include <zlib.h>
+// #include <zlib.h>
 #endif
 
 #ifdef Q_OS_WIN
-#include <io.h> // for stdout
+// #include <io.h> // for stdout
 #endif
 
 namespace {

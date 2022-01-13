@@ -12,14 +12,14 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
-#include <accountfwd.h>
-#include <account.h>
+// #include <accountfwd.h>
+// #include <account.h>
 
-#include <memory>
+// #include <memory>
 
-#include <QDialog>
+// #include <QDialog>
 
 namespace OCC {
 
@@ -32,7 +32,6 @@ namespace Ui {
 
 class InvalidFilenameDialog : public QDialog
 {
-    Q_OBJECT
 
 public:
     explicit InvalidFilenameDialog(AccountPtr account, Folder *folder, QString filePath, QWidget *parent = nullptr);

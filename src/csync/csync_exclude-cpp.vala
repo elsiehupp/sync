@@ -19,7 +19,7 @@
  */
 
 #include "config_csync.h"
-#include <qglobal.h>
+// #include <qglobal.h>
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
@@ -33,9 +33,9 @@
 #include "common/utility.h"
 #include "../version.h"
 
-#include <QString>
-#include <QFileInfo>
-#include <QDir>
+// #include <QString>
+// #include <QFileInfo>
+// #include <QDir>
 
 /** Expands C-like escape sequences (in place)
  */

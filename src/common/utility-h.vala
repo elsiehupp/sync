@@ -17,25 +17,23 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef UTILITY_H
-#define UTILITY_H
 
 
 #include "ocsynclib.h"
-#include <QString>
-#include <QByteArray>
-#include <QDateTime>
-#include <QElapsedTimer>
-#include <QLoggingCategory>
-#include <QMap>
-#include <QUrl>
-#include <QUrlQuery>
-#include <functional>
-#include <memory>
+// #include <QString>
+// #include <QByteArray>
+// #include <QDateTime>
+// #include <QElapsedTimer>
+// #include <QLoggingCategory>
+// #include <QMap>
+// #include <QUrl>
+// #include <QUrlQuery>
+// #include <functional>
+// #include <memory>
 
 #ifdef Q_OS_WIN
-#include <QRect>
-#include <windows.h>
+// #include <QRect>
+// #include <windows.h>
 #endif
 
 class QSettings;

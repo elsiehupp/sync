@@ -5,11 +5,11 @@
  *
  */
 
-#include <QtTest>
+// #include <QtTest>
 #include "syncenginetestutils.h"
 #include "common/vfs.h"
 #include "config.h"
-#include <syncengine.h>
+// #include <syncengine.h>
 
 using namespace OCC;
 
@@ -66,7 +66,6 @@ QSharedPointer<Vfs> setupVfs(FakeFolder &folder)
 
 class TestSyncVirtualFiles : public QObject
 {
-    Q_OBJECT
 
 private slots:
     void testVirtualFileLifecycle_data()

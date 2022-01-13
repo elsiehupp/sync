@@ -14,12 +14,12 @@
 
 #include "guiutility.h"
 
-#include <QClipboard>
-#include <QApplication>
-#include <QDesktopServices>
-#include <QLoggingCategory>
-#include <QMessageBox>
-#include <QUrlQuery>
+// #include <QClipboard>
+// #include <QApplication>
+// #include <QDesktopServices>
+// #include <QLoggingCategory>
+// #include <QMessageBox>
+// #include <QUrlQuery>
 
 #include "common/asserts.h"
 using namespace OCC;

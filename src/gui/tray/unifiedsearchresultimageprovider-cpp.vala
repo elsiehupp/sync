@@ -16,9 +16,9 @@
 
 #include "usermodel.h"
 
-#include <QImage>
-#include <QPainter>
-#include <QSvgRenderer>
+// #include <QImage>
+// #include <QPainter>
+// #include <QSvgRenderer>
 
 namespace {
 class AsyncImageResponse : public QQuickImageResponse

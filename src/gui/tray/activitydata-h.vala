@@ -12,11 +12,9 @@
  * for more details.
  */
 
-#ifndef ACTIVITYDATA_H
-#define ACTIVITYDATA_H
 
-#include <QtCore>
-#include <QIcon>
+// #include <QtCore>
+// #include <QIcon>
 
 namespace OCC {
 /**

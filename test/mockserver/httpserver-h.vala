@@ -12,7 +12,7 @@
  * for more details.
  */
 
-#include <QTcpServer>
+// #include <QTcpServer>
 
 class HttpServer : public QTcpServer
  {

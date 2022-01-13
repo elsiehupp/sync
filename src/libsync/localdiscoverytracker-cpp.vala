@@ -16,7 +16,7 @@
 
 #include "syncfileitem.h"
 
-#include <QLoggingCategory>
+// #include <QLoggingCategory>
 
 using namespace OCC;
 

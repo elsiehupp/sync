@@ -20,10 +20,10 @@
 #include "folderman.h"
 #include "networkjobs.h"
 
-#include <algorithm>
+// #include <algorithm>
 
-#include <QAbstractListModel>
-#include <QDesktopServices>
+// #include <QAbstractListModel>
+// #include <QDesktopServices>
 
 namespace {
 QString imagePlaceholderUrlForProviderId(const QString &providerId)

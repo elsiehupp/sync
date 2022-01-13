@@ -22,7 +22,7 @@
 #include "c_private.h"
 #include "c_time.h"
 
-#include <QFile>
+// #include <QFile>
 
 #ifdef HAVE_UTIMES
 int c_utimes(const QString &uri, const struct timeval *times) {
@@ -34,8 +34,8 @@ int c_utimes(const QString &uri, const struct timeval *times) {
 #ifdef _WIN32
 // implementation for utimes taken from KDE mingw headers
 
-#include <errno.h>
-#include <wtypes.h>
+// #include <errno.h>
+// #include <wtypes.h>
 #define CSYNC_SECONDS_SINCE_1601 11644473600LL
 #define CSYNC_USEC_IN_SEC            1000000LL
 //after Microsoft KB167296

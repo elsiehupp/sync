@@ -19,13 +19,13 @@
 #include "common/utility.h"
 
 #ifdef Q_OS_WIN
-#include <windef.h>
-#include <winbase.h>
+// #include <windef.h>
+// #include <winbase.h>
 #endif
 
-#include <QLoggingCategory>
-#include <QTimer>
-#include <QObject>
+// #include <QLoggingCategory>
+// #include <QTimer>
+// #include <QObject>
 
 namespace OCC {
 

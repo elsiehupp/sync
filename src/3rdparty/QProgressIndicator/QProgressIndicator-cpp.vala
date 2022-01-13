@@ -24,7 +24,7 @@
 
 #include "QProgressIndicator.h"
 
-#include <QPainter>
+// #include <QPainter>
 
 QProgressIndicator::QProgressIndicator(QWidget* parent)
     : QWidget(parent)

@@ -13,27 +13,27 @@
  * for more details.
  */
 
-#include <QJsonDocument>
-#include <QLoggingCategory>
-#include <QNetworkRequest>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QNetworkRequest>
-#include <QSslConfiguration>
-#include <QSslCipher>
-#include <QBuffer>
-#include <QXmlStreamReader>
-#include <QStringList>
-#include <QStack>
-#include <QTimer>
-#include <QMutex>
-#include <QCoreApplication>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <qloggingcategory.h>
+// #include <QJsonDocument>
+// #include <QLoggingCategory>
+// #include <QNetworkRequest>
+// #include <QNetworkAccessManager>
+// #include <QNetworkReply>
+// #include <QNetworkRequest>
+// #include <QSslConfiguration>
+// #include <QSslCipher>
+// #include <QBuffer>
+// #include <QXmlStreamReader>
+// #include <QStringList>
+// #include <QStack>
+// #include <QTimer>
+// #include <QMutex>
+// #include <QCoreApplication>
+// #include <QJsonDocument>
+// #include <QJsonObject>
+// #include <qloggingcategory.h>
 #ifndef TOKEN_AUTH_ONLY
-#include <QPainter>
-#include <QPainterPath>
+// #include <QPainter>
+// #include <QPainterPath>
 #endif
 
 #include "networkjobs.h"

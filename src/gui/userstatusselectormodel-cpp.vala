@@ -15,17 +15,17 @@
 #include "userstatusselectormodel.h"
 #include "tray/usermodel.h"
 
-#include <ocsuserstatusconnector.h>
-#include <qnamespace.h>
-#include <userstatusconnector.h>
-#include <theme.h>
+// #include <ocsuserstatusconnector.h>
+// #include <qnamespace.h>
+// #include <userstatusconnector.h>
+// #include <theme.h>
 
-#include <QDateTime>
-#include <QLoggingCategory>
+// #include <QDateTime>
+// #include <QLoggingCategory>
 
-#include <algorithm>
-#include <cmath>
-#include <cstddef>
+// #include <algorithm>
+// #include <cmath>
+// #include <cstddef>
 
 namespace OCC {
 

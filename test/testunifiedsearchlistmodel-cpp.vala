@@ -18,10 +18,10 @@
 #include "accountstate.h"
 #include "syncenginetestutils.h"
 
-#include <QAbstractItemModelTester>
-#include <QDesktopServices>
-#include <QSignalSpy>
-#include <QTest>
+// #include <QAbstractItemModelTester>
+// #include <QDesktopServices>
+// #include <QSignalSpy>
+// #include <QTest>
 
 namespace {
 /**
@@ -30,7 +30,6 @@ namespace {
  **/
 class FakeDesktopServicesUrlHandler : public QObject
 {
-    Q_OBJECT
 
 public:
     FakeDesktopServicesUrlHandler(QObject *parent = nullptr)
@@ -285,7 +284,6 @@ FakeSearchResultsStorage *FakeSearchResultsStorage::_instance = nullptr;
 
 class TestUnifiedSearchListmodel : public QObject
 {
-    Q_OBJECT
 
 public:
     TestUnifiedSearchListmodel() = default;

@@ -13,12 +13,12 @@
  * for more details.
  */
 
-#include <QAbstractButton>
-#include <QtCore>
-#include <QProcess>
-#include <QMessageBox>
-#include <QDesktopServices>
-#include <QApplication>
+// #include <QAbstractButton>
+// #include <QtCore>
+// #include <QProcess>
+// #include <QMessageBox>
+// #include <QDesktopServices>
+// #include <QApplication>
 
 #include "wizard/owncloudwizardcommon.h"
 #include "wizard/owncloudwizard.h"

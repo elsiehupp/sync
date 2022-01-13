@@ -4,13 +4,13 @@
 #include "clientsideencryption.h"
 #include "account.h"
 
-#include <QFileInfo>
-#include <QDir>
-#include <QUrl>
-#include <QFile>
-#include <QTemporaryFile>
-#include <QLoggingCategory>
-#include <QMimeDatabase>
+// #include <QFileInfo>
+// #include <QDir>
+// #include <QUrl>
+// #include <QFile>
+// #include <QTemporaryFile>
+// #include <QLoggingCategory>
+// #include <QMimeDatabase>
 
 namespace OCC {
 

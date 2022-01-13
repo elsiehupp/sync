@@ -5,10 +5,10 @@
  *
  */
 
-#include <QtTest>
+// #include <QtTest>
 #include "syncenginetestutils.h"
-#include <syncengine.h>
-#include <owncloudpropagator.h>
+// #include <syncengine.h>
+// #include <owncloudpropagator.h>
 
 using namespace OCC;
 
@@ -17,7 +17,6 @@ static constexpr qint64 stopAfter = 3'123'668;
 /* A FakeGetReply that sends max 'fakeSize' bytes, but whose ContentLength has the corect size */
 class BrokenFakeGetReply : public FakeGetReply
 {
-    Q_OBJECT
 public:
     using FakeGetReply::FakeGetReply;
     int fakeSize = stopAfter;
@@ -53,7 +52,6 @@ SyncFileItemPtr getItem(const QSignalSpy &spy, const QString &path)
 
 class TestDownload : public QObject
 {
-    Q_OBJECT
 
 private slots:
 

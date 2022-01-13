@@ -18,9 +18,9 @@
 #include "folderwatcher_mac.h"
 
 
-#include <cerrno>
-#include <QDirIterator>
-#include <QStringList>
+// #include <cerrno>
+// #include <QDirIterator>
+// #include <QStringList>
 
 
 namespace OCC {

@@ -17,17 +17,17 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <cstring>
-#include <cerrno>
-#include <cstdio>
+// #include <sys/types.h>
+// #include <sys/stat.h>
+// #include <fcntl.h>
+// #include <cstring>
+// #include <cerrno>
+// #include <cstdio>
 
 #include "csync.h"
 #include "vio/csync_vio_local.h"
 
-#include <QDir>
+// #include <QDir>
 
 static const auto CSYNC_TEST_DIR = []{ return QStringLiteral("%1/csync_test").arg(QDir::tempPath());}();
 

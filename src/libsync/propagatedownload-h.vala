@@ -11,15 +11,15 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
  */
-#pragma once
+// #pragma once
 
 #include "owncloudlib.h"
 #include "owncloudpropagator.h"
 #include "networkjobs.h"
 #include "clientsideencryption.h"
 
-#include <QBuffer>
-#include <QFile>
+// #include <QBuffer>
+// #include <QFile>
 
 namespace OCC {
 class PropagateDownloadEncrypted;
@@ -30,7 +30,6 @@ class PropagateDownloadEncrypted;
  */
 class OWNCLOUDSYNC_EXPORT GETFileJob : public AbstractNetworkJob
 {
-    Q_OBJECT
     QIODevice *_device;
     QMap<QByteArray, QByteArray> _headers;
     QString _errorString;
@@ -129,7 +128,6 @@ private slots:
  */
 class OWNCLOUDSYNC_EXPORT GETEncryptedFileJob : public GETFileJob
 {
-    Q_OBJECT
 
 public:
     // DOES NOT take ownership of the device.
@@ -191,7 +189,6 @@ private:
  */
 class PropagateDownloadFile : public PropagateItemJob
 {
-    Q_OBJECT
 public:
     PropagateDownloadFile(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
         : PropagateItemJob(propagator, item)

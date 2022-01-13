@@ -24,19 +24,19 @@
 #include "configfile.h"
 #include "accessmanager.h"
 
-#include <QCursor>
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
-#include <QQuickWindow>
-#include <QScreen>
-#include <QMenu>
+// #include <QCursor>
+// #include <QGuiApplication>
+// #include <QQmlApplicationEngine>
+// #include <QQmlContext>
+// #include <QQuickWindow>
+// #include <QScreen>
+// #include <QMenu>
 
 #ifdef USE_FDO_NOTIFICATIONS
-#include <QDBusConnection>
-#include <QDBusInterface>
-#include <QDBusMessage>
-#include <QDBusPendingCall>
+// #include <QDBusConnection>
+// #include <QDBusInterface>
+// #include <QDBusMessage>
+// #include <QDBusPendingCall>
 #define NOTIFICATIONS_SERVICE "org.freedesktop.Notifications"
 #define NOTIFICATIONS_PATH "/org/freedesktop/Notifications"
 #define NOTIFICATIONS_IFACE "org.freedesktop.Notifications"

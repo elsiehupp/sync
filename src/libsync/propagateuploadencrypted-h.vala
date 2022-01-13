@@ -1,14 +1,14 @@
 #ifndef PROPAGATEUPLOADENCRYPTED_H
 #define PROPAGATEUPLOADENCRYPTED_H
 
-#include <QObject>
-#include <QString>
-#include <QMap>
-#include <QByteArray>
-#include <QJsonDocument>
-#include <QNetworkReply>
-#include <QFile>
-#include <QTemporaryFile>
+// #include <QObject>
+// #include <QString>
+// #include <QMap>
+// #include <QByteArray>
+// #include <QJsonDocument>
+// #include <QNetworkReply>
+// #include <QFile>
+// #include <QTemporaryFile>
 
 #include "owncloudpropagator.h"
 #include "clientsideencryption.h"

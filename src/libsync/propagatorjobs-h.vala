@@ -13,10 +13,10 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
 #include "owncloudpropagator.h"
-#include <QFile>
+// #include <QFile>
 
 namespace OCC {
 
@@ -33,7 +33,6 @@ static const char contentMd5HeaderC[] = "Content-MD5";
  */
 class PropagateLocalRemove : public PropagateItemJob
 {
-    Q_OBJECT
 public:
     PropagateLocalRemove(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
         : PropagateItemJob(propagator, item)
@@ -53,7 +52,6 @@ private:
  */
 class PropagateLocalMkdir : public PropagateItemJob
 {
-    Q_OBJECT
 public:
     PropagateLocalMkdir(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
         : PropagateItemJob(propagator, item)
@@ -83,7 +81,6 @@ private:
  */
 class PropagateLocalRename : public PropagateItemJob
 {
-    Q_OBJECT
 public:
     PropagateLocalRename(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
         : PropagateItemJob(propagator, item)

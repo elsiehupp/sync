@@ -12,12 +12,10 @@
  * for more details.
  */
 
-#ifndef SYNCFILESTATUS_H
-#define SYNCFILESTATUS_H
 
-#include <QMetaType>
-#include <QObject>
-#include <QString>
+// #include <QMetaType>
+// #include <QObject>
+// #include <QString>
 
 #include "ocsynclib.h"
 

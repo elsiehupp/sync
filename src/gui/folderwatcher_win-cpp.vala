@@ -12,8 +12,8 @@
  * for more details.
  */
 
-#include <QThread>
-#include <QDir>
+// #include <QThread>
+// #include <QDir>
 
 #include "common/asserts.h"
 #include "common/utility.h"
@@ -23,9 +23,9 @@
 
 #include "common/utility.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <tchar.h>
+// #include <stdlib.h>
+// #include <stdio.h>
+// #include <tchar.h>
 
 namespace OCC {
 

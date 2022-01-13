@@ -19,14 +19,14 @@
 #include "configfile.h"
 #include "common/vfs.h"
 
-#include <QtCore>
+// #include <QtCore>
 #ifndef TOKEN_AUTH_ONLY
-#include <QtGui>
-#include <QStyle>
-#include <QApplication>
+// #include <QtGui>
+// #include <QStyle>
+// #include <QApplication>
 #endif
-#include <QSslSocket>
-#include <QSvgRenderer>
+// #include <QSslSocket>
+// #include <QSvgRenderer>
 
 #include "nextcloudtheme.h"
 

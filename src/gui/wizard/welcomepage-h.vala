@@ -12,9 +12,9 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
-#include <QWizardPage>
+// #include <QWizardPage>
 
 #include "wizard/owncloudwizardcommon.h"
 
@@ -28,7 +28,6 @@ namespace Ui {
 
 class WelcomePage : public QWizardPage
 {
-    Q_OBJECT
 
 public:
     explicit WelcomePage(OwncloudWizard *ocWizard);

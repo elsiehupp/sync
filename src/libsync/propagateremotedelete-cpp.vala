@@ -20,7 +20,7 @@
 #include "deletejob.h"
 #include "common/asserts.h"
 
-#include <QLoggingCategory>
+// #include <QLoggingCategory>
 
 namespace OCC {
 

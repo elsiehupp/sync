@@ -17,7 +17,7 @@
 #include "common/syncjournaldb.h"
 #include "clientsideencryptionjobs.h"
 
-#include <QLoggingCategory>
+// #include <QLoggingCategory>
 
 namespace OCC {
 

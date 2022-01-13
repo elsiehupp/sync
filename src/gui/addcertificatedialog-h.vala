@@ -13,11 +13,9 @@
  * for more details.
  */
 
-#ifndef ADDCERTIFICATEDIALOG_H
-#define ADDCERTIFICATEDIALOG_H
 
-#include <QDialog>
-#include <QString>
+// #include <QDialog>
+// #include <QString>
 
 namespace OCC {
 
@@ -31,7 +29,6 @@ namespace Ui {
  */
 class AddCertificateDialog : public QDialog
 {
-    Q_OBJECT
 
 public:
     explicit AddCertificateDialog(QWidget *parent = nullptr);

@@ -12,8 +12,8 @@
  * for more details.
  */
 
-#include <QFileInfo>
-#include <QLoggingCategory>
+// #include <QFileInfo>
+// #include <QLoggingCategory>
 
 #include "abstractpropagateremotedeleteencrypted.h"
 #include "account.h"

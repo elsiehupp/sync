@@ -20,12 +20,12 @@
 #include "common/checksums.h"
 #include "asserts.h"
 
-#include <QLoggingCategory>
-#include <qtconcurrentrun.h>
-#include <QCryptographicHash>
+// #include <QLoggingCategory>
+// #include <qtconcurrentrun.h>
+// #include <QCryptographicHash>
 
 #ifdef ZLIB_FOUND
-#include <zlib.h>
+// #include <zlib.h>
 #endif
 
 /** \file checksums.cpp

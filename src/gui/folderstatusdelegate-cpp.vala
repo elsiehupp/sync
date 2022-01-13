@@ -19,13 +19,13 @@
 #include "folderstatusview.h"
 #include "folderman.h"
 #include "accountstate.h"
-#include <theme.h>
-#include <account.h>
+// #include <theme.h>
+// #include <account.h>
 
-#include <QFileIconProvider>
-#include <QPainter>
-#include <QApplication>
-#include <QMouseEvent>
+// #include <QFileIconProvider>
+// #include <QPainter>
+// #include <QApplication>
+// #include <QMouseEvent>
 
 inline static QFont makeAliasFont(const QFont &normalFont)
 {

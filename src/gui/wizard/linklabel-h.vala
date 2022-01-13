@@ -12,16 +12,15 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
-#include <QLabel>
-#include <QUrl>
+// #include <QLabel>
+// #include <QUrl>
 
 namespace OCC {
 
 class LinkLabel : public QLabel
 {
-    Q_OBJECT
 public:
     explicit LinkLabel(QWidget *parent = nullptr);
 

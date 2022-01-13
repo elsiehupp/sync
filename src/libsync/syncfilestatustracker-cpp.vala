@@ -20,7 +20,7 @@
 #include "common/asserts.h"
 #include "csync_exclude.h"
 
-#include <QLoggingCategory>
+// #include <QLoggingCategory>
 
 namespace OCC {
 

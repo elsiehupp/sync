@@ -12,11 +12,9 @@
  * for more details.
  */
 
-#ifndef MIRALL_GENERALSETTINGS_H
-#define MIRALL_GENERALSETTINGS_H
 
-#include <QWidget>
-#include <QPointer>
+// #include <QWidget>
+// #include <QPointer>
 
 namespace OCC {
 class IgnoreListEditor;
@@ -32,7 +30,6 @@ namespace Ui {
  */
 class GeneralSettings : public QWidget
 {
-    Q_OBJECT
 
 public:
     explicit GeneralSettings(QWidget *parent = nullptr);

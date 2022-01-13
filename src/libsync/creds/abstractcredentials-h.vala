@@ -12,12 +12,10 @@
  * for more details.
  */
 
-#ifndef MIRALL_CREDS_ABSTRACT_CREDENTIALS_H
-#define MIRALL_CREDS_ABSTRACT_CREDENTIALS_H
 
-#include <QObject>
+// #include <QObject>
 
-#include <csync.h>
+// #include <csync.h>
 #include "owncloudlib.h"
 #include "accountfwd.h"
 
@@ -29,7 +27,6 @@ class AbstractNetworkJob;
 
 class OWNCLOUDSYNC_EXPORT AbstractCredentials : public QObject
 {
-    Q_OBJECT
 
 public:
     AbstractCredentials();

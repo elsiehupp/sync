@@ -12,10 +12,10 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
-#include <QWebSocket>
-#include <QTimer>
+// #include <QWebSocket>
+// #include <QTimer>
 
 #include "capabilities.h"
 
@@ -26,7 +26,6 @@ class AbstractCredentials;
 
 class OWNCLOUDSYNC_EXPORT PushNotifications : public QObject
 {
-    Q_OBJECT
 
 public:
     explicit PushNotifications(Account *account, QObject *parent = nullptr);

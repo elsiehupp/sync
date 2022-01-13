@@ -12,15 +12,13 @@
  * for more details.
  */
 
-#ifndef LOGGER_H
-#define LOGGER_H
 
-#include <QObject>
-#include <QList>
-#include <QDateTime>
-#include <QFile>
-#include <QTextStream>
-#include <qmutex.h>
+// #include <QObject>
+// #include <QList>
+// #include <QDateTime>
+// #include <QFile>
+// #include <QTextStream>
+// #include <qmutex.h>
 
 #include "common/utility.h"
 #include "owncloudlib.h"
@@ -33,7 +31,6 @@ namespace OCC {
  */
 class OWNCLOUDSYNC_EXPORT Logger : public QObject
 {
-    Q_OBJECT
 public:
     bool isLoggingToFile() const;
 

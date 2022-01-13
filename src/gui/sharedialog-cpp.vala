@@ -27,12 +27,12 @@
 #include "thumbnailjob.h"
 #include "wordlist.h"
 
-#include <QFileInfo>
-#include <QFileIconProvider>
-#include <QInputDialog>
-#include <QPointer>
-#include <QPushButton>
-#include <QFrame>
+// #include <QFileInfo>
+// #include <QFileIconProvider>
+// #include <QInputDialog>
+// #include <QPointer>
+// #include <QPushButton>
+// #include <QFrame>
 
 namespace {
 QString createRandomPassword()

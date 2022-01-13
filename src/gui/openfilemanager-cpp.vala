@@ -15,17 +15,17 @@
 
 #include "openfilemanager.h"
 #include "common/utility.h"
-#include <QProcess>
-#include <QSettings>
-#include <QDir>
-#include <QUrl>
-#include <QDesktopServices>
-#include <QApplication>
+// #include <QProcess>
+// #include <QSettings>
+// #include <QDir>
+// #include <QUrl>
+// #include <QDesktopServices>
+// #include <QApplication>
 
 #define QTLEGACY (QT_VERSION < QT_VERSION_CHECK(5,9,0))
 
 #if !(QTLEGACY)
-#include <QOperatingSystemVersion>
+// #include <QOperatingSystemVersion>
 #endif
 
 namespace OCC {

@@ -16,8 +16,8 @@
 #include "networkjobs.h"
 #include "account.h"
 
-#include <QBuffer>
-#include <QJsonDocument>
+// #include <QBuffer>
+// #include <QJsonDocument>
 
 namespace OCC {
 

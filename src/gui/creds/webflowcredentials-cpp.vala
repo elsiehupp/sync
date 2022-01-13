@@ -3,14 +3,14 @@
 #include "creds/httpcredentials.h"
 #include "creds/keychainchunk.h"
 
-#include <QAuthenticator>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QPointer>
-#include <QTimer>
-#include <QDialog>
-#include <QVBoxLayout>
-#include <QLabel>
+// #include <QAuthenticator>
+// #include <QNetworkAccessManager>
+// #include <QNetworkReply>
+// #include <QPointer>
+// #include <QTimer>
+// #include <QDialog>
+// #include <QVBoxLayout>
+// #include <QLabel>
 
 #include "accessmanager.h"
 #include "account.h"

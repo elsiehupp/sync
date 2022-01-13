@@ -12,8 +12,8 @@
  * for more details.
  */
 
-#include <QtGlobal>
-#include <memory>
+// #include <QtGlobal>
+// #include <memory>
 
 #include "emojimodel.h"
 

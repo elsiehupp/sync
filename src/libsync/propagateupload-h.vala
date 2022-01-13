@@ -11,14 +11,14 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
  */
-#pragma once
+// #pragma once
 
 #include "owncloudpropagator.h"
 #include "networkjobs.h"
 
-#include <QBuffer>
-#include <QFile>
-#include <QElapsedTimer>
+// #include <QBuffer>
+// #include <QFile>
+// #include <QElapsedTimer>
 
 
 namespace OCC {
@@ -36,7 +36,6 @@ class BandwidthManager;
  */
 class UploadDevice : public QIODevice
 {
-    Q_OBJECT
 public:
     UploadDevice(const QString &fileName, qint64 start, qint64 size, BandwidthManager *bwm);
     ~UploadDevice() override;
@@ -88,7 +87,6 @@ public slots:
  */
 class PUTFileJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 
 private:
     QIODevice *_device;
@@ -156,7 +154,6 @@ signals:
  */
 class PollJob : public AbstractNetworkJob
 {
-    Q_OBJECT
     SyncJournalDb *_journal;
     QString _localPath;
 
@@ -203,7 +200,6 @@ class PropagateUploadEncrypted;
  */
 class PropagateUploadFileCommon : public PropagateItemJob
 {
-    Q_OBJECT
 
     struct UploadStatus {
         SyncFileItem::Status status = SyncFileItem::NoStatus;
@@ -330,7 +326,6 @@ private:
  */
 class PropagateUploadFileV1 : public PropagateUploadFileCommon
 {
-    Q_OBJECT
 
 private:
     /**
@@ -377,7 +372,6 @@ private slots:
  */
 class PropagateUploadFileNG : public PropagateUploadFileCommon
 {
-    Q_OBJECT
 private:
     qint64 _sent = 0; /// amount of data (bytes) that was already sent
     uint _transferId = 0; /// transfer id (part of the url)

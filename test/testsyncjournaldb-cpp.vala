@@ -4,9 +4,9 @@
  *          any purpose.
  *          */
 
-#include <QtTest>
+// #include <QtTest>
 
-#include <sqlite3.h>
+// #include <sqlite3.h>
 
 #include "common/syncjournaldb.h"
 #include "common/syncjournalfilerecord.h"
@@ -15,7 +15,6 @@ using namespace OCC;
 
 class TestSyncJournalDB : public QObject
 {
-    Q_OBJECT
 
     QTemporaryDir _tempDir;
 

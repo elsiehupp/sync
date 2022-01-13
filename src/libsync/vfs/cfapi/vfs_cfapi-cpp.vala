@@ -14,8 +14,8 @@
 
 #include "vfs_cfapi.h"
 
-#include <QDir>
-#include <QFile>
+// #include <QDir>
+// #include <QFile>
 
 #include "cfapiwrapper.h"
 #include "hydrationjob.h"
@@ -23,8 +23,8 @@
 #include "filesystem.h"
 #include "common/syncjournaldb.h"
 
-#include <cfapi.h>
-#include <comdef.h>
+// #include <cfapi.h>
+// #include <comdef.h>
 
 Q_LOGGING_CATEGORY(lcCfApi, "nextcloud.sync.vfs.cfapi", QtInfoMsg)
 

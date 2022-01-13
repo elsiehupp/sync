@@ -17,18 +17,17 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA               *
  ******************************************************************************/
 
-#include <KOverlayIconPlugin>
-#include <KPluginFactory>
-#include <QtNetwork/QLocalSocket>
-#include <KIOCore/kfileitem.h>
-#include <QDir>
-#include <QTimer>
+// #include <KOverlayIconPlugin>
+// #include <KPluginFactory>
+// #include <QtNetwork/QLocalSocket>
+// #include <KIOCore/kfileitem.h>
+// #include <QDir>
+// #include <QTimer>
 #include "ownclouddolphinpluginhelper.h"
 
 class OwncloudDolphinPlugin : public KOverlayIconPlugin
 {
     Q_PLUGIN_METADATA(IID "com.owncloud.ovarlayiconplugin" FILE "ownclouddolphinoverlayplugin.json")
-    Q_OBJECT
 
     using StatusMap = QHash<QByteArray, QByteArray>;
     StatusMap m_status;

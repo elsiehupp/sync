@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#ifndef MIRALL_CREDS_CREDENTIALS_FACTORY_H
-#define MIRALL_CREDS_CREDENTIALS_FACTORY_H
 
 #include "owncloudlib.h"
 

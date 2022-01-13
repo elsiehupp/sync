@@ -1,10 +1,10 @@
 #include "webviewpage.h"
 
-#include <QWebEngineUrlRequestJob>
-#include <QProgressBar>
-#include <QVBoxLayout>
-#include <QNetworkProxyFactory>
-#include <QScreen>
+// #include <QWebEngineUrlRequestJob>
+// #include <QProgressBar>
+// #include <QVBoxLayout>
+// #include <QNetworkProxyFactory>
+// #include <QScreen>
 
 #include "owncloudwizard.h"
 #include "creds/webflowcredentials.h"

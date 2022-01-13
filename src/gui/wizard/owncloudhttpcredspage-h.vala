@@ -13,8 +13,6 @@
  * for more details.
  */
 
-#ifndef MIRALL_OWNCLOUD_HTTP_CREDS_PAGE_H
-#define MIRALL_OWNCLOUD_HTTP_CREDS_PAGE_H
 
 #include "wizard/abstractcredswizardpage.h"
 #include "wizard/owncloudwizard.h"
@@ -30,7 +28,6 @@ namespace OCC {
  */
 class OwncloudHttpCredsPage : public AbstractCredentialsWizardPage
 {
-    Q_OBJECT
 public:
     OwncloudHttpCredsPage(QWidget *parent);
 

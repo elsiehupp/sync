@@ -13,8 +13,8 @@
  * for more details.
  */
 
-#pragma once
-#include <QStyledItemDelegate>
+// #pragma once
+// #include <QStyledItemDelegate>
 
 namespace OCC {
 
@@ -24,7 +24,6 @@ namespace OCC {
  */
 class FolderStatusDelegate : public QStyledItemDelegate
 {
-    Q_OBJECT
 public:
     FolderStatusDelegate();
 

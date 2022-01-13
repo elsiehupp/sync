@@ -18,10 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301  USA
  */
-#ifndef KMESSAGEWIDGET_H
-#define KMESSAGEWIDGET_H
 
-#include <QFrame>
+// #include <QFrame>
 
 class KMessageWidgetPrivate;
 
@@ -97,7 +95,6 @@ class KMessageWidgetPrivate;
  */
 class KMessageWidget : public QFrame
 {
-    Q_OBJECT
 
     Q_PROPERTY(QString text READ text WRITE setText)
     Q_PROPERTY(bool wordWrap READ wordWrap WRITE setWordWrap)

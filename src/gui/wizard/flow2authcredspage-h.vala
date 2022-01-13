@@ -13,13 +13,13 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
-#include <QList>
-#include <QMap>
-#include <QNetworkCookie>
-#include <QUrl>
-#include <QPointer>
+// #include <QList>
+// #include <QMap>
+// #include <QNetworkCookie>
+// #include <QUrl>
+// #include <QPointer>
 
 #include "wizard/abstractcredswizardpage.h"
 #include "accountfwd.h"
@@ -34,7 +34,6 @@ class Flow2AuthWidget;
 
 class Flow2AuthCredsPage : public AbstractCredentialsWizardPage
 {
-    Q_OBJECT
 public:
     Flow2AuthCredsPage();
 

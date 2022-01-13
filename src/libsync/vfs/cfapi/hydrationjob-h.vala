@@ -11,9 +11,9 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
  */
-#pragma once
+// #pragma once
 
-#include <QObject>
+// #include <QObject>
 
 #include "account.h"
 
@@ -31,7 +31,6 @@ namespace EncryptionHelper {
 
 class HydrationJob : public QObject
 {
-    Q_OBJECT
 public:
     enum Status {
         Success = 0,

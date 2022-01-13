@@ -12,12 +12,10 @@
  * for more details.
  */
 
-#ifndef PINSTATE_H
-#define PINSTATE_H
 
 #include "ocsynclib.h"
 
-#include <QObject>
+// #include <QObject>
 
 namespace OCC {
 

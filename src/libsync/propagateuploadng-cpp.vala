@@ -27,11 +27,11 @@
 #include "deletejob.h"
 #include "common/asserts.h"
 
-#include <QNetworkAccessManager>
-#include <QFileInfo>
-#include <QDir>
-#include <cmath>
-#include <cstring>
+// #include <QNetworkAccessManager>
+// #include <QFileInfo>
+// #include <QDir>
+// #include <cmath>
+// #include <cstring>
 
 namespace OCC {
 

@@ -13,13 +13,11 @@
  * for more details.
  */
 
-#ifndef MIRALL_OWNCLOUD_WIZARD_H
-#define MIRALL_OWNCLOUD_WIZARD_H
 
-#include <QWizard>
-#include <QLoggingCategory>
-#include <QSslKey>
-#include <QSslCertificate>
+// #include <QWizard>
+// #include <QLoggingCategory>
+// #include <QSslKey>
+// #include <QSslCertificate>
 
 #include "networkjobs.h"
 #include "wizard/owncloudwizardcommon.h"
@@ -46,7 +44,6 @@ class Flow2AuthCredsPage;
  */
 class OwncloudWizard : public QWizard
 {
-    Q_OBJECT
 public:
     enum LogType {
         LogPlain,

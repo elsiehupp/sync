@@ -16,12 +16,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef OWNSQL_H
-#define OWNSQL_H
 
-#include <QLoggingCategory>
-#include <QObject>
-#include <QVariant>
+// #include <QLoggingCategory>
+// #include <QObject>
+// #include <QVariant>
 
 #include "ocsynclib.h"
 

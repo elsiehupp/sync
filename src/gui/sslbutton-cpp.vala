@@ -17,12 +17,12 @@
 #include "accountstate.h"
 #include "theme.h"
 
-#include <QMenu>
-#include <QUrl>
-#include <QtNetwork>
-#include <QSslConfiguration>
-#include <QWidgetAction>
-#include <QLabel>
+// #include <QMenu>
+// #include <QUrl>
+// #include <QtNetwork>
+// #include <QSslConfiguration>
+// #include <QWidgetAction>
+// #include <QLabel>
 
 namespace OCC {
 

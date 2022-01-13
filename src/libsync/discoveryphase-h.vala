@@ -12,19 +12,19 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
-#include <QObject>
-#include <QElapsedTimer>
-#include <QStringList>
-#include <csync.h>
-#include <QMap>
-#include <QSet>
+// #include <QObject>
+// #include <QElapsedTimer>
+// #include <QStringList>
+// #include <csync.h>
+// #include <QMap>
+// #include <QSet>
 #include "networkjobs.h"
-#include <QMutex>
-#include <QWaitCondition>
-#include <QRunnable>
-#include <deque>
+// #include <QMutex>
+// #include <QWaitCondition>
+// #include <QRunnable>
+// #include <deque>
 #include "syncoptions.h"
 #include "syncfileitem.h"
 
@@ -89,7 +89,6 @@ struct LocalInfo
  */
 class DiscoverySingleLocalDirectoryJob : public QObject, public QRunnable
 {
-    Q_OBJECT
 public:
     explicit DiscoverySingleLocalDirectoryJob(const AccountPtr &account, const QString &localPath, OCC::Vfs *vfs, QObject *parent = nullptr);
 
@@ -117,7 +116,6 @@ public:
  */
 class DiscoverySingleDirectoryJob : public QObject
 {
-    Q_OBJECT
 public:
     explicit DiscoverySingleDirectoryJob(const AccountPtr &account, const QString &path, QObject *parent = nullptr);
     // Specify that this is the root and we need to check the data-fingerprint
@@ -166,7 +164,6 @@ public:
 
 class DiscoveryPhase : public QObject
 {
-    Q_OBJECT
 
     friend class ProcessDirectoryJob;
 

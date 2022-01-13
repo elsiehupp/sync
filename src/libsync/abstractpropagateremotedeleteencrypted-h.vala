@@ -12,11 +12,11 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
-#include <QObject>
-#include <QString>
-#include <QNetworkReply>
+// #include <QObject>
+// #include <QString>
+// #include <QNetworkReply>
 
 #include "syncfileitem.h"
 
@@ -29,7 +29,6 @@ class OwncloudPropagator;
  */
 class AbstractPropagateRemoteDeleteEncrypted : public QObject
 {
-    Q_OBJECT
 public:
     AbstractPropagateRemoteDeleteEncrypted(OwncloudPropagator *propagator, SyncFileItemPtr item, QObject *parent);
     ~AbstractPropagateRemoteDeleteEncrypted() override = default;

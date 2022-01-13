@@ -5,15 +5,14 @@
  *
  */
 
-#include <QtTest>
+// #include <QtTest>
 #include "syncenginetestutils.h"
-#include <syncengine.h>
+// #include <syncengine.h>
 
 using namespace OCC;
 
 class TestSyncDelete : public QObject
 {
-    Q_OBJECT
 
 private slots:
 

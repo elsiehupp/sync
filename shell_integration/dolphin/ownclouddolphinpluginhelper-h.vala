@@ -17,16 +17,15 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA               *
  ******************************************************************************/
 
-#pragma once
-#include <QObject>
-#include <QBasicTimer>
-#include <QLocalSocket>
-#include <QRegularExpression>
+// #pragma once
+// #include <QObject>
+// #include <QBasicTimer>
+// #include <QLocalSocket>
+// #include <QRegularExpression>
 #include "ownclouddolphinpluginhelper_export.h"
 #include "config.h"
 
 class OWNCLOUDDOLPHINPLUGINHELPER_EXPORT OwncloudDolphinPluginHelper : public QObject {
-    Q_OBJECT
 public:
     static OwncloudDolphinPluginHelper *instance();
 

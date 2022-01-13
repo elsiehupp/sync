@@ -14,11 +14,11 @@
 
 #include "authenticationdialog.h"
 
-#include <QLabel>
-#include <QLineEdit>
-#include <QVBoxLayout>
-#include <QFormLayout>
-#include <QDialogButtonBox>
+// #include <QLabel>
+// #include <QLineEdit>
+// #include <QVBoxLayout>
+// #include <QFormLayout>
+// #include <QDialogButtonBox>
 
 namespace OCC {
 

@@ -12,8 +12,8 @@
  * for more details.
  */
 
-#include <QLoggingCategory>
-#include <QString>
+// #include <QLoggingCategory>
+// #include <QString>
 
 #include "creds/credentialsfactory.h"
 #include "creds/httpcredentialsgui.h"

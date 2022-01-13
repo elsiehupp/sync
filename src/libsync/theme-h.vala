@@ -12,11 +12,9 @@
  * for more details.
  */
 
-#ifndef _THEME_H
-#define _THEME_H
 
-#include <QIcon>
-#include <QObject>
+// #include <QIcon>
+// #include <QObject>
 #include "syncresult.h"
 
 class QString;
@@ -36,7 +34,6 @@ class SyncResult;
  */
 class OWNCLOUDSYNC_EXPORT Theme : public QObject
 {
-    Q_OBJECT
     Q_PROPERTY(bool branded READ isBranded CONSTANT)
     Q_PROPERTY(QString appNameGUI READ appNameGUI CONSTANT)
     Q_PROPERTY(QString appName READ appName CONSTANT)

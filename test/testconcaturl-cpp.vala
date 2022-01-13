@@ -5,10 +5,10 @@
  *
  */
 
-#include <QtTest>
+// #include <QtTest>
 
-#include <QUrl>
-#include <QString>
+// #include <QUrl>
+// #include <QString>
 
 #include "account.h"
 
@@ -41,7 +41,6 @@ static QueryItems make(QString key1, QString value1,
 
 class TestConcatUrl: public QObject
 {
-    Q_OBJECT
 private slots:
     void testFolder()
     {

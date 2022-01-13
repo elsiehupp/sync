@@ -13,16 +13,16 @@
  * for more details.
  */
 
-#include <QLoggingCategory>
-#include <QMutex>
-#include <QNetworkReply>
-#include <QSettings>
-#include <QSslKey>
-#include <QJsonObject>
-#include <QJsonDocument>
-#include <QBuffer>
+// #include <QLoggingCategory>
+// #include <QMutex>
+// #include <QNetworkReply>
+// #include <QSettings>
+// #include <QSslKey>
+// #include <QJsonObject>
+// #include <QJsonDocument>
+// #include <QBuffer>
 
-#include <qt5keychain/keychain.h>
+// #include <qt5keychain/keychain.h>
 
 #include "account.h"
 #include "accessmanager.h"
@@ -31,7 +31,7 @@
 #include "syncengine.h"
 #include "creds/credentialscommon.h"
 #include "creds/httpcredentials.h"
-#include <QAuthenticator>
+// #include <QAuthenticator>
 
 namespace OCC {
 

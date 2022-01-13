@@ -21,13 +21,12 @@
 #include "csync/csync.h"
 #include "csync/vio/csync_vio_local.h"
 
-#include <QTemporaryFile>
-#include <QTest>
+// #include <QTemporaryFile>
+// #include <QTest>
 
 
 class TestLongWindowsPath : public QObject
 {
-    Q_OBJECT
 
 private Q_SLOTS:
 #ifdef Q_OS_WIN

@@ -12,8 +12,8 @@
  * for more details.
  */
 
-#include <QObject>
-#include <QPoint>
+// #include <QObject>
+// #include <QPoint>
 
 class QTreeView;
 class QModelIndex;
@@ -35,7 +35,6 @@ namespace OCC {
  */
 class ToolTipUpdater : public QObject
 {
-    Q_OBJECT
 public:
     ToolTipUpdater(QTreeView *treeView);
 

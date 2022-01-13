@@ -14,7 +14,7 @@
 
 #include "putmultifilejob.h"
 
-#include <QHttpPart>
+// #include <QHttpPart>
 
 namespace OCC {
 

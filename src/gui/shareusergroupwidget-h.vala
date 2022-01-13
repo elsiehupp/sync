@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#ifndef SHAREUSERGROUPWIDGET_H
-#define SHAREUSERGROUPWIDGET_H
 
 #include "accountfwd.h"
 #include "sharemanager.h"
@@ -21,14 +19,14 @@
 #include "sharee.h"
 #include "profilepagewidget.h"
 #include "QProgressIndicator.h"
-#include <QDialog>
-#include <QWidget>
-#include <QSharedPointer>
-#include <QList>
-#include <QVector>
-#include <QTimer>
-#include <qpushbutton.h>
-#include <qscrollarea.h>
+// #include <QDialog>
+// #include <QWidget>
+// #include <QSharedPointer>
+// #include <QList>
+// #include <QVector>
+// #include <QTimer>
+// #include <qpushbutton.h>
+// #include <qscrollarea.h>
 
 class QAction;
 class QCompleter;
@@ -48,7 +46,6 @@ class ShareManager;
 
 class AvatarEventFilter : public QObject
 {
-    Q_OBJECT
 
 public:
     explicit AvatarEventFilter(QObject *parent = nullptr);
@@ -67,7 +64,6 @@ protected:
  */
 class ShareUserGroupWidget : public QWidget
 {
-    Q_OBJECT
 
 public:
     explicit ShareUserGroupWidget(AccountPtr account,
@@ -137,7 +133,6 @@ private:
  */
 class ShareUserLine : public QWidget
 {
-    Q_OBJECT
 
 public:
     explicit ShareUserLine(AccountPtr account,

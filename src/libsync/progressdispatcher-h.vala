@@ -12,16 +12,14 @@
  * for more details.
  */
 
-#ifndef PROGRESSDISPATCHER_H
-#define PROGRESSDISPATCHER_H
 
 #include "owncloudlib.h"
-#include <QObject>
-#include <QHash>
-#include <QTime>
-#include <QQueue>
-#include <QElapsedTimer>
-#include <QTimer>
+// #include <QObject>
+// #include <QHash>
+// #include <QTime>
+// #include <QQueue>
+// #include <QElapsedTimer>
+// #include <QTimer>
 
 #include "syncfileitem.h"
 
@@ -33,7 +31,6 @@ namespace OCC {
  */
 class OWNCLOUDSYNC_EXPORT ProgressInfo : public QObject
 {
-    Q_OBJECT
 public:
     ProgressInfo();
 
@@ -264,7 +261,6 @@ enum class ErrorCategory {
  */
 class OWNCLOUDSYNC_EXPORT ProgressDispatcher : public QObject
 {
-    Q_OBJECT
 
     friend class Folder; // only allow Folder class to access the setting slots.
 public:

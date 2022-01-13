@@ -12,7 +12,7 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
 #include "accountfwd.h"
 #include "networkjobs.h"
@@ -25,7 +25,6 @@ namespace OCC {
  */
 class DeleteJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 public:
     explicit DeleteJob(AccountPtr account, const QString &path, QObject *parent = nullptr);
     explicit DeleteJob(AccountPtr account, const QUrl &url, QObject *parent = nullptr);

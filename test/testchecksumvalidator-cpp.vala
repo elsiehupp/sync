@@ -5,9 +5,9 @@
  *
  */
 
-#include <QtTest>
-#include <QDir>
-#include <QString>
+// #include <QtTest>
+// #include <QDir>
+// #include <QString>
 
 #include "common/checksums.h"
 #include "networkjobs.h"

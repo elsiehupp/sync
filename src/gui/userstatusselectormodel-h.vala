@@ -12,26 +12,25 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
 #include "common/result.h"
 
-#include <userstatusconnector.h>
-#include <datetimeprovider.h>
+// #include <userstatusconnector.h>
+// #include <datetimeprovider.h>
 
-#include <QObject>
-#include <QMetaType>
-#include <QtNumeric>
+// #include <QObject>
+// #include <QMetaType>
+// #include <QtNumeric>
 
-#include <cstddef>
-#include <memory>
-#include <vector>
+// #include <cstddef>
+// #include <memory>
+// #include <vector>
 
 namespace OCC {
 
 class UserStatusSelectorModel : public QObject
 {
-    Q_OBJECT
 
     Q_PROPERTY(QString userStatusMessage READ userStatusMessage NOTIFY userStatusChanged)
     Q_PROPERTY(QString userStatusEmoji READ userStatusEmoji WRITE setUserStatusEmoji NOTIFY userStatusChanged)

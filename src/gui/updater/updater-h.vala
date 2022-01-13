@@ -12,11 +12,9 @@
  * for more details.
  */
 
-#ifndef UPDATER_H
-#define UPDATER_H
 
-#include <QLoggingCategory>
-#include <QObject>
+// #include <QLoggingCategory>
+// #include <QObject>
 
 class QUrl;
 class QUrlQuery;
@@ -27,7 +25,6 @@ Q_DECLARE_LOGGING_CATEGORY(lcUpdater)
 
 class Updater : public QObject
 {
-    Q_OBJECT
 public:
     struct Helper
     {

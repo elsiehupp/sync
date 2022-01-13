@@ -4,7 +4,7 @@
  *          any purpose.
  *          */
 
-#include <QtTest>
+// #include <QtTest>
 
 #include "cmd/netrcparser.h"
 
@@ -20,7 +20,6 @@ const char testfileEmptyC[] = "netrctestEmpty";
 
 class TestNetrcParser : public QObject
 {
-    Q_OBJECT
 
 private slots:
     void initTestCase() {

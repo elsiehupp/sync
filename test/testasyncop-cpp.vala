@@ -5,15 +5,14 @@
  *
  */
 
-#include <QtTest>
+// #include <QtTest>
 #include "syncenginetestutils.h"
-#include <syncengine.h>
+// #include <syncengine.h>
 
 using namespace OCC;
 
 class FakeAsyncReply : public FakeReply
 {
-    Q_OBJECT
     QByteArray _pollLocation;
 
 public:
@@ -44,7 +43,6 @@ public:
 
 class TestAsyncOp : public QObject
 {
-    Q_OBJECT
 
 private slots:
 

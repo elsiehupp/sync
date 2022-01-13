@@ -1,8 +1,8 @@
 #ifndef WEBFLOWCREDENTIALSDIALOG_H
 #define WEBFLOWCREDENTIALSDIALOG_H
 
-#include <QDialog>
-#include <QUrl>
+// #include <QDialog>
+// #include <QUrl>
 
 #include "accountfwd.h"
 #include "creds/flow2auth.h"
@@ -20,7 +20,6 @@ class Flow2AuthWidget;
 
 class WebFlowCredentialsDialog : public QDialog
 {
-    Q_OBJECT
 public:
     WebFlowCredentialsDialog(Account *account, bool useFlow2, QWidget *parent = nullptr);
 

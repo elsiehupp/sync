@@ -19,14 +19,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <cerrno>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <dirent.h>
-#include <cstdio>
+// #include <cerrno>
+// #include <sys/types.h>
+// #include <sys/stat.h>
+// #include <fcntl.h>
+// #include <dirent.h>
+// #include <cstdio>
 
-#include <memory>
+// #include <memory>
 
 #include "c_private.h"
 #include "c_lib.h"
@@ -35,8 +35,8 @@
 #include "vio/csync_vio_local.h"
 #include "common/vfs.h"
 
-#include <QtCore/QLoggingCategory>
-#include <QtCore/QFile>
+// #include <QtCore/QLoggingCategory>
+// #include <QtCore/QFile>
 
 Q_LOGGING_CATEGORY(lcCSyncVIOLocal, "nextcloud.sync.csync.vio_local", QtInfoMsg)
 

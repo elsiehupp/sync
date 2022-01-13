@@ -12,20 +12,20 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
 #include "common/result.h"
 #include "owncloudlib.h"
 
-#include <QObject>
-#include <QString>
-#include <QMetaType>
-#include <QUrl>
-#include <QDateTime>
-#include <QtGlobal>
-#include <QVariant>
+// #include <QObject>
+// #include <QString>
+// #include <QMetaType>
+// #include <QUrl>
+// #include <QDateTime>
+// #include <QtGlobal>
+// #include <QVariant>
 
-#include <vector>
+// #include <vector>
 
 
 namespace OCC {
@@ -98,7 +98,6 @@ private:
 
 class OWNCLOUDSYNC_EXPORT UserStatusConnector : public QObject
 {
-    Q_OBJECT
 
 public:
     enum class Error {

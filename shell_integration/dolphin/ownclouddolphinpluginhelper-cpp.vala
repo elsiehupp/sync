@@ -17,10 +17,10 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA               *
  ******************************************************************************/
 
-#include <QtNetwork/QLocalSocket>
-#include <qcoreevent.h>
-#include <QStandardPaths>
-#include <QFile>
+// #include <QtNetwork/QLocalSocket>
+// #include <qcoreevent.h>
+// #include <QStandardPaths>
+// #include <QFile>
 #include "ownclouddolphinpluginhelper.h"
 
 OwncloudDolphinPluginHelper* OwncloudDolphinPluginHelper::instance()

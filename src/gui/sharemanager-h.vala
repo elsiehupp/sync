@@ -12,19 +12,17 @@
  * for more details.
  */
 
-#ifndef SHAREMANAGER_H
-#define SHAREMANAGER_H
 
 #include "accountfwd.h"
 #include "sharee.h"
 #include "sharepermissions.h"
 
-#include <QObject>
-#include <QDate>
-#include <QString>
-#include <QList>
-#include <QSharedPointer>
-#include <QUrl>
+// #include <QObject>
+// #include <QDate>
+// #include <QString>
+// #include <QList>
+// #include <QSharedPointer>
+// #include <QUrl>
 
 class QJsonDocument;
 class QJsonObject;
@@ -35,7 +33,6 @@ class OcsShareJob;
 
 class Share : public QObject
 {
-    Q_OBJECT
 
 public:
     /**
@@ -170,7 +167,6 @@ private slots:
  */
 class LinkShare : public Share
 {
-    Q_OBJECT
 public:
     explicit LinkShare(AccountPtr account,
         const QString &id,
@@ -286,7 +282,6 @@ private:
 
 class UserGroupShare : public Share
 {
-    Q_OBJECT
 public:
     UserGroupShare(AccountPtr account,
         const QString &id,
@@ -329,7 +324,6 @@ private:
  */
 class ShareManager : public QObject
 {
-    Q_OBJECT
 public:
     explicit ShareManager(AccountPtr _account, QObject *parent = nullptr);
 

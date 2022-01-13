@@ -12,10 +12,10 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
-#include <QPaintDevice>
-#include <QTest>
+// #include <QPaintDevice>
+// #include <QTest>
 
 class FakePaintDevice : public QPaintDevice
 {

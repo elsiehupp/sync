@@ -13,14 +13,12 @@
  */
 
 
-#ifndef CAPABILITIES_H
-#define CAPABILITIES_H
 
 #include "owncloudlib.h"
 
-#include <QVariantMap>
-#include <QStringList>
-#include <QMimeDatabase>
+// #include <QVariantMap>
+// #include <QStringList>
+// #include <QMimeDatabase>
 
 namespace OCC {
 
@@ -176,7 +174,6 @@ private:
 
 class OWNCLOUDSYNC_EXPORT DirectEditor : public QObject
 {
-    Q_OBJECT
 public:
     DirectEditor(const QString &id, const QString &name, QObject* parent = nullptr);
 

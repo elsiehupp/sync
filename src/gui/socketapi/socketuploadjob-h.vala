@@ -12,9 +12,9 @@
  * for more details.
  */
 
-#pragma once
-#include <QObject>
-#include <QTemporaryFile>
+// #pragma once
+// #include <QObject>
+// #include <QTemporaryFile>
 
 #include "socketapi.h"
 #include "account.h"
@@ -26,7 +26,6 @@ class SyncEngine;
 
 class SocketUploadJob : public QObject
 {
-    Q_OBJECT
 public:
     SocketUploadJob(const QSharedPointer<SocketApiJobV2> &job);
     void start();

@@ -14,13 +14,13 @@
 
 #include "nextcloudtheme.h"
 
-#include <QString>
-#include <QVariant>
+// #include <QString>
+// #include <QVariant>
 #ifndef TOKEN_AUTH_ONLY
-#include <QPixmap>
-#include <QIcon>
+// #include <QPixmap>
+// #include <QIcon>
 #endif
-#include <QCoreApplication>
+// #include <QCoreApplication>
 
 #include "config.h"
 #include "common/utility.h"

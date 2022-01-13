@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QWidget>
+// #include <QWidget>
 
 class QAbstractButton;
 
@@ -12,7 +12,6 @@ namespace Ui {
 
 class IgnoreListTableWidget : public QWidget
 {
-    Q_OBJECT
 
 public:
     IgnoreListTableWidget(QWidget *parent = nullptr);

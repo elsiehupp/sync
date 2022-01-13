@@ -12,12 +12,10 @@
  * for more details.
  */
 
-#ifndef MIRALL_FOLDERWIZARD_H
-#define MIRALL_FOLDERWIZARD_H
 
-#include <QWizard>
-#include <QNetworkReply>
-#include <QTimer>
+// #include <QWizard>
+// #include <QNetworkReply>
+// #include <QTimer>
 
 #include "folder.h"
 #include "accountfwd.h"
@@ -39,7 +37,6 @@ class ownCloudInfo;
  */
 class FormatWarningsWizardPage : public QWizardPage
 {
-    Q_OBJECT
 protected:
     QString formatWarnings(const QStringList &warnings) const;
 };
@@ -50,7 +47,6 @@ protected:
  */
 class FolderWizardLocalPath : public FormatWarningsWizardPage
 {
-    Q_OBJECT
 public:
     explicit FolderWizardLocalPath(const AccountPtr &account);
     ~FolderWizardLocalPath() override;
@@ -77,7 +73,6 @@ private:
 
 class FolderWizardRemotePath : public FormatWarningsWizardPage
 {
-    Q_OBJECT
 public:
     explicit FolderWizardRemotePath(const AccountPtr &account);
     ~FolderWizardRemotePath() override;
@@ -121,7 +116,6 @@ private:
  */
 class FolderWizardSelectiveSync : public QWizardPage
 {
-    Q_OBJECT
 public:
     explicit FolderWizardSelectiveSync(const AccountPtr &account);
     ~FolderWizardSelectiveSync() override;
@@ -145,7 +139,6 @@ private:
  */
 class FolderWizard : public QWizard
 {
-    Q_OBJECT
 public:
     enum {
         Page_Source,

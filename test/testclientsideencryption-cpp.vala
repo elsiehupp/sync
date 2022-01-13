@@ -4,12 +4,12 @@
    any purpose.
 */
 
-#include <QtTest>
+// #include <QtTest>
 
-#include <QTemporaryFile>
-#include <QRandomGenerator>
+// #include <QTemporaryFile>
+// #include <QRandomGenerator>
 
-#include <common/constants.h>
+// #include <common/constants.h>
 
 #include "clientsideencryption.h"
 
@@ -17,7 +17,6 @@ using namespace OCC;
 
 class TestClientSideEncryption : public QObject
 {
-    Q_OBJECT
 
     QByteArray convertToOldStorageFormat(const QByteArray &data)
     {

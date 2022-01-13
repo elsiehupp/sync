@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#ifndef OCSNAVIGATIONAPPSJOB_H
-#define OCSNAVIGATIONAPPSJOB_H
 
 #include "ocsjob.h"
 class QJsonDocument;
@@ -28,7 +26,6 @@ namespace OCC {
  */
 class OcsNavigationAppsJob : public OcsJob
 {
-    Q_OBJECT
 public:
     explicit OcsNavigationAppsJob(AccountPtr account);
 

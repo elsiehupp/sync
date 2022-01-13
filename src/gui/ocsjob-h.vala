@@ -12,16 +12,14 @@
  * for more details.
  */
 
-#ifndef OCSJOB_H
-#define OCSJOB_H
 
 #include "accountfwd.h"
 #include "abstractnetworkjob.h"
 
-#include <QVector>
-#include <QList>
-#include <QPair>
-#include <QUrl>
+// #include <QVector>
+// #include <QList>
+// #include <QPair>
+// #include <QUrl>
 
 #define OCS_SUCCESS_STATUS_CODE 100
 // Apparantly the v2.php URLs can return that
@@ -44,7 +42,6 @@ namespace OCC {
  */
 class OcsJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 
 protected:
     explicit OcsJob(AccountPtr account);

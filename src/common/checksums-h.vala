@@ -16,16 +16,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#pragma once
+// #pragma once
 
 #include "ocsynclib.h"
 #include "config.h"
 
-#include <QObject>
-#include <QByteArray>
-#include <QFutureWatcher>
+// #include <QObject>
+// #include <QByteArray>
+// #include <QFutureWatcher>
 
-#include <memory>
+// #include <memory>
 
 class QFile;
 
@@ -78,7 +78,6 @@ QByteArray OCSYNC_EXPORT calcAdler32(QIODevice *device);
  */
 class OCSYNC_EXPORT ComputeChecksum : public QObject
 {
-    Q_OBJECT
 public:
     explicit ComputeChecksum(QObject *parent = nullptr);
     ~ComputeChecksum() override;
@@ -138,7 +137,6 @@ private:
  */
 class OCSYNC_EXPORT ValidateChecksumHeader : public QObject
 {
-    Q_OBJECT
 public:
     explicit ValidateChecksumHeader(QObject *parent = nullptr);
 
@@ -181,7 +179,6 @@ private:
  */
 class OCSYNC_EXPORT CSyncChecksumHook : public QObject
 {
-    Q_OBJECT
 public:
     explicit CSyncChecksumHook();
 

@@ -1,8 +1,8 @@
 #ifndef PROPAGATEDOWNLOADENCRYPTED_H
 #define PROPAGATEDOWNLOADENCRYPTED_H
 
-#include <QObject>
-#include <QFileInfo>
+// #include <QObject>
+// #include <QFileInfo>
 
 #include "syncfileitem.h"
 #include "owncloudpropagator.h"

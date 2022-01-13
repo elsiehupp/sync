@@ -12,7 +12,7 @@
  * for more details.
  */
 
-#include <QTest>
+// #include <QTest>
 
 #include "theme.h"
 #include "themeutils.h"
@@ -20,7 +20,6 @@
 
 class TestTheme : public QObject
 {
-    Q_OBJECT
 
 public:
     TestTheme()

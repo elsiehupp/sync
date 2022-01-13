@@ -12,10 +12,8 @@
  * for more details.
  */
 
-#ifndef CONFLICTDIALOG_H
-#define CONFLICTDIALOG_H
 
-#include <QDialog>
+// #include <QDialog>
 
 namespace OCC {
 
@@ -27,7 +25,6 @@ namespace Ui {
 
 class ConflictDialog : public QDialog
 {
-    Q_OBJECT
 public:
     explicit ConflictDialog(QWidget *parent = nullptr);
     ~ConflictDialog() override;

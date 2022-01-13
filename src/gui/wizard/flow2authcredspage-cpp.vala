@@ -13,8 +13,8 @@
  * for more details.
  */
 
-#include <QVariant>
-#include <QVBoxLayout>
+// #include <QVariant>
+// #include <QVBoxLayout>
 
 #include "flow2authcredspage.h"
 #include "theme.h"

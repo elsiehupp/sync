@@ -4,7 +4,7 @@
  *          any purpose.
  *          */
 
-#include <QtTest>
+// #include <QtTest>
 
 #include "syncfileitem.h"
 
@@ -12,7 +12,6 @@ using namespace OCC;
 
 class TestSyncFileItem : public QObject
 {
-    Q_OBJECT
 
 private slots:
     void initTestCase() {

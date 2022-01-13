@@ -12,9 +12,9 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
-#include <QQuickImageProvider>
+// #include <QQuickImageProvider>
 
 namespace OCC {
 namespace Ui {

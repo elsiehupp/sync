@@ -13,18 +13,18 @@
  * for more details.
  */
 
-#include <QDir>
-#include <QFileDialog>
-#include <QUrl>
-#include <QTimer>
-#include <QPushButton>
-#include <QMessageBox>
-#include <QSsl>
-#include <QSslCertificate>
-#include <QNetworkAccessManager>
-#include <QPropertyAnimation>
-#include <QGraphicsPixmapItem>
-#include <QBuffer>
+// #include <QDir>
+// #include <QFileDialog>
+// #include <QUrl>
+// #include <QTimer>
+// #include <QPushButton>
+// #include <QMessageBox>
+// #include <QSsl>
+// #include <QSslCertificate>
+// #include <QNetworkAccessManager>
+// #include <QPropertyAnimation>
+// #include <QGraphicsPixmapItem>
+// #include <QBuffer>
 
 #include "QProgressIndicator.h"
 

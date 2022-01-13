@@ -14,9 +14,9 @@
 
 #include "httplogger.h"
 
-#include <QRegularExpression>
-#include <QLoggingCategory>
-#include <QBuffer>
+// #include <QRegularExpression>
+// #include <QLoggingCategory>
+// #include <QBuffer>
 
 namespace {
 Q_LOGGING_CATEGORY(lcNetworkHttp, "sync.httplogger", QtWarningMsg)

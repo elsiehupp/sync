@@ -12,7 +12,7 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
 #include "abstractpropagateremotedeleteencrypted.h"
 
@@ -20,7 +20,6 @@ namespace OCC {
 
 class PropagateRemoteDeleteEncrypted : public AbstractPropagateRemoteDeleteEncrypted
 {
-    Q_OBJECT
 public:
     PropagateRemoteDeleteEncrypted(OwncloudPropagator *propagator, SyncFileItemPtr item, QObject *parent);
 

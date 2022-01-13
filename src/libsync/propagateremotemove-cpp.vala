@@ -19,9 +19,9 @@
 #include "common/syncjournalfilerecord.h"
 #include "filesystem.h"
 #include "common/asserts.h"
-#include <QFile>
-#include <QStringList>
-#include <QDir>
+// #include <QFile>
+// #include <QStringList>
+// #include <QDir>
 
 namespace OCC {
 

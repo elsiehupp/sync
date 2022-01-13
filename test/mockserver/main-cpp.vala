@@ -12,7 +12,7 @@
  * for more details.
  */
 
-#include <QCoreApplication>
+// #include <QCoreApplication>
 
 #include "httpserver.h"
 

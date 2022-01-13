@@ -13,10 +13,10 @@
  * for more details.
  */
 
-#pragma once
-#include <QPointer>
-#include <QUrl>
-#include <QTimer>
+// #pragma once
+// #include <QPointer>
+// #include <QUrl>
+// #include <QTimer>
 #include "accountfwd.h"
 
 namespace OCC {
@@ -28,7 +28,6 @@ namespace OCC {
  */
 class Flow2Auth : public QObject
 {
-    Q_OBJECT
 public:
     enum TokenAction {
         actionOpenBrowser = 1,

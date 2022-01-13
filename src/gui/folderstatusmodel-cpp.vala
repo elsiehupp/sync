@@ -16,13 +16,13 @@
 #include "folderman.h"
 #include "accountstate.h"
 #include "common/asserts.h"
-#include <theme.h>
-#include <account.h>
+// #include <theme.h>
+// #include <account.h>
 #include "folderstatusdelegate.h"
 
-#include <QFileIconProvider>
-#include <QVarLengthArray>
-#include <set>
+// #include <QFileIconProvider>
+// #include <QVarLengthArray>
+// #include <set>
 
 Q_DECLARE_METATYPE(QPersistentModelIndex)
 

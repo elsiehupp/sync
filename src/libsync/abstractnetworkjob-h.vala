@@ -13,16 +13,16 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
 #include "owncloudlib.h"
-#include <QObject>
-#include <QNetworkRequest>
-#include <QNetworkReply>
-#include <QPointer>
-#include <QElapsedTimer>
-#include <QDateTime>
-#include <QTimer>
+// #include <QObject>
+// #include <QNetworkRequest>
+// #include <QNetworkReply>
+// #include <QPointer>
+// #include <QElapsedTimer>
+// #include <QDateTime>
+// #include <QTimer>
 #include "accountfwd.h"
 #include "common/asserts.h"
 
@@ -38,7 +38,6 @@ class AbstractSslErrorHandler;
  */
 class OWNCLOUDSYNC_EXPORT AbstractNetworkJob : public QObject
 {
-    Q_OBJECT
 public:
     explicit AbstractNetworkJob(AccountPtr account, const QString &path, QObject *parent = nullptr);
     ~AbstractNetworkJob() override;

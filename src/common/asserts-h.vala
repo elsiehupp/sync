@@ -1,7 +1,7 @@
 #ifndef OWNCLOUD_ASSERTS_H
 #define OWNCLOUD_ASSERTS_H
 
-#include <qglobal.h>
+// #include <qglobal.h>
 
 #if defined(QT_FORCE_ASSERTS) || !defined(QT_NO_DEBUG)
 #define OC_ASSERT_MSG qFatal

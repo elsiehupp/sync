@@ -1,7 +1,7 @@
 #include "webflowcredentialsdialog.h"
 
-#include <QVBoxLayout>
-#include <QLabel>
+// #include <QVBoxLayout>
+// #include <QLabel>
 
 #include "theme.h"
 #include "application.h"

@@ -6,8 +6,8 @@
 
 #include "iconjob.h"
 
-#include <QJsonDocument>
-#include <QJsonObject>
+// #include <QJsonDocument>
+// #include <QJsonObject>
 
 namespace OCC {
 

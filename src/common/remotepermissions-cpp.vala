@@ -17,7 +17,7 @@
  */
 
 #include "remotepermissions.h"
-#include <cstring>
+// #include <cstring>
 
 namespace OCC {
 

@@ -12,13 +12,13 @@
  * for more details.
  */
 
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QLoggingCategory>
-#include <QNetworkReply>
-#include <QNetworkProxyFactory>
-#include <QXmlStreamReader>
+// #include <QJsonDocument>
+// #include <QJsonObject>
+// #include <QJsonArray>
+// #include <QLoggingCategory>
+// #include <QNetworkReply>
+// #include <QNetworkProxyFactory>
+// #include <QXmlStreamReader>
 
 #include "connectionvalidator.h"
 #include "account.h"
@@ -26,7 +26,7 @@
 #include "userinfo.h"
 #include "networkjobs.h"
 #include "clientproxy.h"
-#include <creds/abstractcredentials.h>
+// #include <creds/abstractcredentials.h>
 
 namespace OCC {
 

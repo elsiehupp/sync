@@ -16,17 +16,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <QDateTime>
-#include <QLoggingCategory>
-#include <QString>
-#include <QFile>
-#include <QFileInfo>
-#include <QDir>
+// #include <QDateTime>
+// #include <QLoggingCategory>
+// #include <QString>
+// #include <QFile>
+// #include <QFileInfo>
+// #include <QDir>
 
 #include "ownsql.h"
 #include "common/utility.h"
 #include "common/asserts.h"
-#include <sqlite3.h>
+// #include <sqlite3.h>
 
 #define SQLITE_SLEEP_TIME_USEC 100000
 #define SQLITE_REPEAT_COUNT 20

@@ -12,18 +12,16 @@
  * for more details.
  */
 
-#ifndef ICONJOB_H
-#define ICONJOB_H
 
 #include "account.h"
 #include "accountfwd.h"
 #include "owncloudlib.h"
 
-#include <QObject>
-#include <QByteArray>
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QNetworkReply>
+// #include <QObject>
+// #include <QByteArray>
+// #include <QNetworkAccessManager>
+// #include <QNetworkRequest>
+// #include <QNetworkReply>
 
 namespace OCC {
 
@@ -33,7 +31,6 @@ namespace OCC {
  */
 class OWNCLOUDSYNC_EXPORT IconJob : public QObject
 {
-    Q_OBJECT
 public:
     explicit IconJob(AccountPtr account, const QUrl &url, QObject *parent = nullptr);
 

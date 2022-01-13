@@ -12,14 +12,12 @@
  * for more details.
  */
 
-#ifndef LOCALDISCOVERYTRACKER_H
-#define LOCALDISCOVERYTRACKER_H
 
 #include "owncloudlib.h"
-#include <set>
-#include <QObject>
-#include <QByteArray>
-#include <QSharedPointer>
+// #include <set>
+// #include <QObject>
+// #include <QByteArray>
+// #include <QSharedPointer>
 
 namespace OCC {
 
@@ -48,7 +46,6 @@ using SyncFileItemPtr = QSharedPointer<SyncFileItem>;
  */
 class OWNCLOUDSYNC_EXPORT LocalDiscoveryTracker : public QObject
 {
-    Q_OBJECT
 public:
     LocalDiscoveryTracker();
 

@@ -13,14 +13,14 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
 #include "owncloudpropagator.h"
 #include "syncfileitem.h"
 #include "networkjobs.h"
 #include "syncengine.h"
-#include <QLoggingCategory>
-#include <QNetworkReply>
+// #include <QLoggingCategory>
+// #include <QNetworkReply>
 
 namespace {
 

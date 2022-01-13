@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#ifndef MIRALL_CREDS_DUMMY_CREDENTIALS_H
-#define MIRALL_CREDS_DUMMY_CREDENTIALS_H
 
 #include "creds/abstractcredentials.h"
 
@@ -21,7 +19,6 @@ namespace OCC {
 
 class OWNCLOUDSYNC_EXPORT DummyCredentials : public AbstractCredentials
 {
-    Q_OBJECT
 
 public:
     QString _user;

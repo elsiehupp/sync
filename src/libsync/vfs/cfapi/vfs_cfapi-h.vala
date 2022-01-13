@@ -11,10 +11,10 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
  */
-#pragma once
+// #pragma once
 
-#include <QObject>
-#include <QScopedPointer>
+// #include <QObject>
+// #include <QScopedPointer>
 
 #include "common/vfs.h"
 #include "common/plugin.h"
@@ -26,7 +26,6 @@ class SyncJournalFileRecord;
 
 class VfsCfApi : public Vfs
 {
-    Q_OBJECT
 
 public:
     explicit VfsCfApi(QObject *parent = nullptr);
@@ -91,7 +90,6 @@ private:
 
 class CfApiVfsPluginFactory : public QObject, public DefaultPluginFactory<VfsCfApi>
 {
-    Q_OBJECT
     Q_PLUGIN_METADATA(IID "org.owncloud.PluginFactory" FILE "vfspluginmetadata.json")
     Q_INTERFACES(OCC::PluginFactory)
 };

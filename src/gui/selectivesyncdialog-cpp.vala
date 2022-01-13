@@ -18,17 +18,17 @@
 #include "theme.h"
 #include "folderman.h"
 #include "configfile.h"
-#include <QDialogButtonBox>
-#include <QVBoxLayout>
-#include <QTreeWidget>
-#include <qpushbutton.h>
-#include <QFileIconProvider>
-#include <QHeaderView>
-#include <QSettings>
-#include <QScopedValueRollback>
-#include <QTreeWidgetItem>
-#include <QLabel>
-#include <QVBoxLayout>
+// #include <QDialogButtonBox>
+// #include <QVBoxLayout>
+// #include <QTreeWidget>
+// #include <qpushbutton.h>
+// #include <QFileIconProvider>
+// #include <QHeaderView>
+// #include <QSettings>
+// #include <QScopedValueRollback>
+// #include <QTreeWidgetItem>
+// #include <QLabel>
+// #include <QVBoxLayout>
 
 namespace OCC {
 

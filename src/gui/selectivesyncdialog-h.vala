@@ -12,9 +12,9 @@
  * for more details.
  */
 
-#pragma once
-#include <QDialog>
-#include <QTreeWidget>
+// #pragma once
+// #include <QDialog>
+// #include <QTreeWidget>
 #include "accountfwd.h"
 
 #include "csync_exclude.h"
@@ -33,7 +33,6 @@ class Folder;
  */
 class SelectiveSyncWidget : public QWidget
 {
-    Q_OBJECT
 public:
     explicit SelectiveSyncWidget(AccountPtr account, QWidget *parent = nullptr);
 
@@ -89,7 +88,6 @@ private:
  */
 class SelectiveSyncDialog : public QDialog
 {
-    Q_OBJECT
 public:
     // Dialog for a specific folder (used from the account settings button)
     explicit SelectiveSyncDialog(AccountPtr account, Folder *folder, QWidget *parent = nullptr, Qt::WindowFlags f = {});

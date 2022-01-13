@@ -20,18 +20,18 @@
 #include "theme.h"
 #include "vfs_cfapi.h"
 
-#include <QCoreApplication>
-#include <QEventLoop>
-#include <QDir>
-#include <QFileInfo>
-#include <QLocalSocket>
-#include <QLoggingCategory>
-#include <QUuid>
+// #include <QCoreApplication>
+// #include <QEventLoop>
+// #include <QDir>
+// #include <QFileInfo>
+// #include <QLocalSocket>
+// #include <QLoggingCategory>
+// #include <QUuid>
 
-#include <sddl.h>
-#include <cfapi.h>
-#include <comdef.h>
-#include <ntstatus.h>
+// #include <sddl.h>
+// #include <cfapi.h>
+// #include <comdef.h>
+// #include <ntstatus.h>
 
 Q_LOGGING_CATEGORY(lcCfApiWrapper, "nextcloud.sync.vfs.cfapi.wrapper", QtInfoMsg)
 

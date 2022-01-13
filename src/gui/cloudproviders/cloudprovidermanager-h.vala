@@ -12,10 +12,8 @@
  * for more details.
  */
 
-#ifndef CLOUDPROVIDERMANAGER_H
-#define CLOUDPROVIDERMANAGER_H
 
-#include <QObject>
+// #include <QObject>
 #include "folder.h"
 
 using namespace OCC;
@@ -24,7 +22,6 @@ class CloudProviderWrapper;
 
 class CloudProviderManager : public QObject
 {
-    Q_OBJECT
 public:
     explicit CloudProviderManager(QObject *parent = nullptr);
     void registerSignals();

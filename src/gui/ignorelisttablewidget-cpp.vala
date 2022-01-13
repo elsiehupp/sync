@@ -3,10 +3,10 @@
 
 #include "folderman.h"
 
-#include <QFile>
-#include <QInputDialog>
-#include <QLineEdit>
-#include <QMessageBox>
+// #include <QFile>
+// #include <QInputDialog>
+// #include <QLineEdit>
+// #include <QMessageBox>
 
 namespace OCC {
 

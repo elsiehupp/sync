@@ -13,10 +13,8 @@
  * for more details.
  */
 
-#ifndef MIRALL_OWNCLOUD_WIZARD_COMMON_H
-#define MIRALL_OWNCLOUD_WIZARD_COMMON_H
 
-#include <QString>
+// #include <QString>
 
 class QVariant;
 class QLabel;

@@ -21,7 +21,7 @@
 #include "torture.h"
 
 #ifdef HAVE_ARGP_H
-#include <argp.h>
+// #include <argp.h>
 
 const char *argp_program_version = "csync test 0.2";
 const char *argp_program_bug_address = "<csync-devel@csync.org>";

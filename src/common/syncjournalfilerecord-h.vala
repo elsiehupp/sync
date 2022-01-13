@@ -16,11 +16,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef SYNCJOURNALFILERECORD_H
-#define SYNCJOURNALFILERECORD_H
 
-#include <QString>
-#include <QDateTime>
+// #include <QString>
+// #include <QDateTime>
 
 #include "csync.h"
 #include "ocsynclib.h"

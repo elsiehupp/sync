@@ -11,13 +11,13 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
  */
-#pragma once
+// #pragma once
 
-#include <QObject>
-#include <QScopedPointer>
-#include <QSharedPointer>
+// #include <QObject>
+// #include <QScopedPointer>
+// #include <QSharedPointer>
 
-#include <memory>
+// #include <memory>
 
 #include "ocsynclib.h"
 #include "result.h"
@@ -88,7 +88,6 @@ struct OCSYNC_EXPORT VfsSetupParams
  */
 class OCSYNC_EXPORT Vfs : public QObject
 {
-    Q_OBJECT
 
 public:
     /** The kind of VFS in use (or no-VFS)
@@ -287,7 +286,6 @@ protected:
 /// Implementation of Vfs for Vfs::Off mode - does nothing
 class OCSYNC_EXPORT VfsOff : public Vfs
 {
-    Q_OBJECT
 
 public:
     VfsOff(QObject* parent = nullptr);

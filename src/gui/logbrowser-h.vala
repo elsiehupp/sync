@@ -12,20 +12,18 @@
  * for more details.
  */
 
-#ifndef LOGBROWSER_H
-#define LOGBROWSER_H
 
-#include <QCheckBox>
-#include <QPlainTextEdit>
-#include <QTextStream>
-#include <QFile>
-#include <QObject>
-#include <QList>
-#include <QDateTime>
-#include <QDialog>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QLabel>
+// #include <QCheckBox>
+// #include <QPlainTextEdit>
+// #include <QTextStream>
+// #include <QFile>
+// #include <QObject>
+// #include <QList>
+// #include <QDateTime>
+// #include <QDialog>
+// #include <QLineEdit>
+// #include <QPushButton>
+// #include <QLabel>
 
 namespace OCC {
 
@@ -35,7 +33,6 @@ namespace OCC {
  */
 class LogBrowser : public QDialog
 {
-    Q_OBJECT
 public:
     explicit LogBrowser(QWidget *parent = nullptr);
     ~LogBrowser() override;

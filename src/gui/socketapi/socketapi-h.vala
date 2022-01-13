@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#ifndef SOCKETAPI_H
-#define SOCKETAPI_H
 
 #include "syncfileitem.h"
 #include "common/syncfilestatus.h"
@@ -25,7 +23,7 @@
 #if defined(Q_OS_MAC)
 #include "socketapisocket_mac.h"
 #else
-#include <QLocalServer>
+// #include <QLocalServer>
 using SocketApiServer = QLocalServer;
 #endif
 
@@ -50,7 +48,6 @@ Q_DECLARE_LOGGING_CATEGORY(lcSocketApi)
  */
 class SocketApi : public QObject
 {
-    Q_OBJECT
 
 public:
     explicit SocketApi(QObject *parent = nullptr);

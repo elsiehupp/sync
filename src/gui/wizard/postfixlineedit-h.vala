@@ -12,12 +12,10 @@
  * for more details.
  */
 
-#ifndef OCC_POSTFIXLINEEDIT_H
-#define OCC_POSTFIXLINEEDIT_H
 
-#include <QLineEdit>
-#include <QPaintEvent>
-#include <QPainter>
+// #include <QLineEdit>
+// #include <QPaintEvent>
+// #include <QPainter>
 
 namespace OCC {
 
@@ -29,7 +27,6 @@ namespace OCC {
 
 class PostfixLineEdit : public QLineEdit
 {
-    Q_OBJECT
 public:
     PostfixLineEdit(QWidget *parent);
 

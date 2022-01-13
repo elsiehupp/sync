@@ -6,17 +6,17 @@
 #include "theme.h"
 #include "account.h"
 
-#include <QJsonObject>
-#include <QJsonDocument>
-#include <QJsonArray>
-#include <QLoggingCategory>
-#include <QIcon>
-#include <QPainter>
-#include <QImage>
-#include <QSvgRenderer>
-#include <QNetworkReply>
-#include <QPixmap>
-#include <QPixmapCache>
+// #include <QJsonObject>
+// #include <QJsonDocument>
+// #include <QJsonArray>
+// #include <QLoggingCategory>
+// #include <QIcon>
+// #include <QPainter>
+// #include <QImage>
+// #include <QSvgRenderer>
+// #include <QNetworkReply>
+// #include <QPixmap>
+// #include <QPixmapCache>
 
 namespace {
 Q_LOGGING_CATEGORY(lcOcsProfileConnector, "nextcloud.gui.ocsprofileconnector", QtInfoMsg)

@@ -4,7 +4,7 @@
    any purpose.
 */
 
-#include <QtTest>
+// #include <QtTest>
 
 #include "libsync/cookiejar.h"
 
@@ -12,7 +12,6 @@ using namespace OCC;
 
 class TestCookies : public QObject
 {
-    Q_OBJECT
 
 private slots:
     void testCookies()

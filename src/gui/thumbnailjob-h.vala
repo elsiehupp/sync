@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#ifndef THUMBNAILJOB_H
-#define THUMBNAILJOB_H
 
 #include "networkjobs.h"
 #include "accountfwd.h"
@@ -29,7 +27,6 @@ namespace OCC {
  */
 class ThumbnailJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 public:
     explicit ThumbnailJob(const QString &path, AccountPtr account, QObject *parent = nullptr);
 public slots:

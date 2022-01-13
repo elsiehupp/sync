@@ -12,10 +12,10 @@
  * for more details.
  */
 
-#pragma once
-#include <QPointer>
-#include <QTcpServer>
-#include <QUrl>
+// #pragma once
+// #include <QPointer>
+// #include <QTcpServer>
+// #include <QUrl>
 #include "accountfwd.h"
 
 namespace OCC {
@@ -40,7 +40,6 @@ namespace OCC {
  */
 class OAuth : public QObject
 {
-    Q_OBJECT
 public:
     OAuth(Account *account, QObject *parent)
         : QObject(parent)

@@ -12,15 +12,15 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
  */
-#include <QtGlobal>
+// #include <QtGlobal>
 
-#include <cmath>
-#include <csignal>
-#include <qqml.h>
+// #include <cmath>
+// #include <csignal>
+// #include <qqml.h>
 
 #ifdef Q_OS_UNIX
-#include <sys/time.h>
-#include <sys/resource.h>
+// #include <sys/time.h>
+// #include <sys/resource.h>
 #endif
 
 #include "application.h"
@@ -37,12 +37,12 @@
 #include "updater/updater.h"
 #endif
 
-#include <QTimer>
-#include <QMessageBox>
-#include <QDebug>
-#include <QQuickStyle>
-#include <QQuickWindow>
-#include <QSurfaceFormat>
+// #include <QTimer>
+// #include <QMessageBox>
+// #include <QDebug>
+// #include <QQuickStyle>
+// #include <QQuickWindow>
+// #include <QSurfaceFormat>
 
 using namespace OCC;
 

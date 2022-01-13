@@ -12,13 +12,13 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
-#include <QList>
-#include <QMap>
-#include <QNetworkCookie>
-#include <QUrl>
-#include <QPointer>
+// #include <QList>
+// #include <QMap>
+// #include <QNetworkCookie>
+// #include <QUrl>
+// #include <QPointer>
 
 #include "wizard/abstractcredswizardpage.h"
 #include "accountfwd.h"
@@ -32,7 +32,6 @@ namespace OCC {
 
 class OwncloudOAuthCredsPage : public AbstractCredentialsWizardPage
 {
-    Q_OBJECT
 public:
     OwncloudOAuthCredsPage();
 

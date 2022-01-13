@@ -5,16 +5,15 @@
  *
  */
 
-#include <QtTest>
+// #include <QtTest>
 #include "syncenginetestutils.h"
-#include <syncengine.h>
-#include <localdiscoverytracker.h>
+// #include <syncengine.h>
+// #include <localdiscoverytracker.h>
 
 using namespace OCC;
 
 class TestLocalDiscovery : public QObject
 {
-    Q_OBJECT
 
 private slots:
     // Check correct behavior when local discovery is partially drawn from the db

@@ -14,9 +14,9 @@
 
 #include "tooltipupdater.h"
 
-#include <QTreeView>
-#include <QHelpEvent>
-#include <QToolTip>
+// #include <QTreeView>
+// #include <QHelpEvent>
+// #include <QToolTip>
 
 using namespace OCC;
 

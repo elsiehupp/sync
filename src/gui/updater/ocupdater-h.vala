@@ -12,13 +12,11 @@
  * for more details.
  */
 
-#ifndef OCUPDATER_H
-#define OCUPDATER_H
 
-#include <QObject>
-#include <QUrl>
-#include <QTemporaryFile>
-#include <QTimer>
+// #include <QObject>
+// #include <QUrl>
+// #include <QTemporaryFile>
+// #include <QTimer>
 
 #include "updater/updateinfo.h"
 #include "updater/updater.h"
@@ -66,7 +64,6 @@ namespace OCC {
 
 class UpdaterScheduler : public QObject
 {
-    Q_OBJECT
 public:
     UpdaterScheduler(QObject *parent);
 
@@ -87,7 +84,6 @@ private:
  */
 class OCUpdater : public Updater
 {
-    Q_OBJECT
 public:
     enum DownloadState { Unknown = 0,
         CheckingServer,
@@ -151,7 +147,6 @@ private:
  */
 class NSISUpdater : public OCUpdater
 {
-    Q_OBJECT
 public:
     explicit NSISUpdater(const QUrl &url);
     bool handleStartup() override;
@@ -178,7 +173,6 @@ private:
  */
 class PassiveUpdateNotifier : public OCUpdater
 {
-    Q_OBJECT
 public:
     explicit PassiveUpdateNotifier(const QUrl &url);
     bool handleStartup() override { return false; }

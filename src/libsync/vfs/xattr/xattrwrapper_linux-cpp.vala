@@ -16,9 +16,9 @@
 
 #include "config.h"
 
-#include <QLoggingCategory>
+// #include <QLoggingCategory>
 
-#include <sys/xattr.h>
+// #include <sys/xattr.h>
 
 Q_LOGGING_CATEGORY(lcXAttrWrapper, "nextcloud.sync.vfs.xattr.wrapper", QtInfoMsg)
 

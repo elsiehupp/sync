@@ -13,12 +13,10 @@
  */
 
 
-#ifndef FOLDERMAN_H
-#define FOLDERMAN_H
 
-#include <QObject>
-#include <QQueue>
-#include <QList>
+// #include <QObject>
+// #include <QQueue>
+// #include <QList>
 
 #include "folder.h"
 #include "folderwatcher.h"
@@ -60,7 +58,6 @@ class LockWatcher;
  */
 class FolderMan : public QObject
 {
-    Q_OBJECT
 public:
     ~FolderMan() override;
     static FolderMan *instance();

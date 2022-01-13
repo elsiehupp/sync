@@ -2,18 +2,17 @@
 
 #include "ocsprofileconnector.h"
 
-#include <QBoxLayout>
-#include <QLabel>
-#include <account.h>
-#include <QMenu>
+// #include <QBoxLayout>
+// #include <QLabel>
+// #include <account.h>
+// #include <QMenu>
 
-#include <cstddef>
+// #include <cstddef>
 
 namespace OCC {
 
 class ProfilePageMenu : public QWidget
 {
-    Q_OBJECT
 public:
     explicit ProfilePageMenu(AccountPtr account, const QString &shareWithUserId, QWidget *parent = nullptr);
     ~ProfilePageMenu() override;

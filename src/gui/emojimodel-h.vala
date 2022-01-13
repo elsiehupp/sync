@@ -12,15 +12,15 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
-#include <QObject>
-#include <QSettings>
-#include <QObject>
-#include <QQmlEngine>
-#include <QVariant>
-#include <QVector>
-#include <QAbstractItemModel>
+// #include <QObject>
+// #include <QSettings>
+// #include <QObject>
+// #include <QQmlEngine>
+// #include <QVariant>
+// #include <QVector>
+// #include <QAbstractItemModel>
 
 namespace OCC {
 
@@ -83,7 +83,6 @@ private:
 
 class EmojiModel : public QObject
 {
-    Q_OBJECT
 
     Q_PROPERTY(QVariantList model READ model NOTIFY modelChanged)
     Q_PROPERTY(QAbstractListModel *emojiCategoriesModel READ emojiCategoriesModel CONSTANT)

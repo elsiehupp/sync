@@ -1,16 +1,16 @@
 #ifndef CLIENTSIDEENCRYPTION_H
 #define CLIENTSIDEENCRYPTION_H
 
-#include <QString>
-#include <QObject>
-#include <QJsonDocument>
-#include <QSslCertificate>
-#include <QSslKey>
-#include <QFile>
-#include <QVector>
-#include <QMap>
+// #include <QString>
+// #include <QObject>
+// #include <QJsonDocument>
+// #include <QSslCertificate>
+// #include <QSslKey>
+// #include <QFile>
+// #include <QVector>
+// #include <QMap>
 
-#include <openssl/evp.h>
+// #include <openssl/evp.h>
 
 #include "accountfwd.h"
 #include "networkjobs.h"
@@ -114,7 +114,6 @@ private:
 }
 
 class OWNCLOUDSYNC_EXPORT ClientSideEncryption : public QObject {
-    Q_OBJECT
 public:
     ClientSideEncryption();
     void initialize(const AccountPtr &account);

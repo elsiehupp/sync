@@ -16,12 +16,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#pragma once
+// #pragma once
 
-#include <QString>
-#include <QMetaType>
+// #include <QString>
+// #include <QMetaType>
 #include "ocsynclib.h"
-#include <QDebug>
+// #include <QDebug>
 
 namespace OCC {
 

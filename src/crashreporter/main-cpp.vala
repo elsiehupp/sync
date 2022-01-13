@@ -15,12 +15,12 @@
 
 #include "CrashReporterConfig.h"
 
-#include <libcrashreporter-gui/CrashReporter.h>
+// #include <libcrashreporter-gui/CrashReporter.h>
 
-#include <QApplication>
-#include <QDir>
-#include <QDebug>
-#include <QFileInfo>
+// #include <QApplication>
+// #include <QDir>
+// #include <QDebug>
+// #include <QFileInfo>
 
 int main(int argc, char *argv[])
 {

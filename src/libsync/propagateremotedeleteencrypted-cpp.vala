@@ -16,8 +16,8 @@
 #include "clientsideencryptionjobs.h"
 #include "owncloudpropagator.h"
 #include "encryptfolderjob.h"
-#include <QLoggingCategory>
-#include <QFileInfo>
+// #include <QLoggingCategory>
+// #include <QFileInfo>
 
 using namespace OCC;
 

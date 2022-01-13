@@ -40,19 +40,19 @@
 
 #include "legalnotice.h"
 
-#include <QFileDialog>
-#include <QMessageBox>
-#include <QNetworkProxy>
-#include <QDir>
-#include <QScopedValueRollback>
-#include <QMessageBox>
+// #include <QFileDialog>
+// #include <QMessageBox>
+// #include <QNetworkProxy>
+// #include <QDir>
+// #include <QScopedValueRollback>
+// #include <QMessageBox>
 
-#include <private/qzipwriter_p.h>
+// #include <private/qzipwriter_p.h>
 
 #define QTLEGACY (QT_VERSION < QT_VERSION_CHECK(5,9,0))
 
 #if !(QTLEGACY)
-#include <QOperatingSystemVersion>
+// #include <QOperatingSystemVersion>
 #endif
 
 namespace {

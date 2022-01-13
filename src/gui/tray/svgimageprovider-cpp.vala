@@ -15,7 +15,7 @@
 #include "svgimageprovider.h"
 #include "iconutils.h"
 
-#include <QLoggingCategory>
+// #include <QLoggingCategory>
 
 namespace OCC {
 namespace Ui {

@@ -15,8 +15,8 @@
 #include "lockwatcher.h"
 #include "filesystem.h"
 
-#include <QLoggingCategory>
-#include <QTimer>
+// #include <QLoggingCategory>
+// #include <QTimer>
 
 using namespace OCC;
 

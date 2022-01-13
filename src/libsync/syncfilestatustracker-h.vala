@@ -13,14 +13,12 @@
  * for more details.
  */
 
-#ifndef SYNCFILESTATUSTRACKER_H
-#define SYNCFILESTATUSTRACKER_H
 
 // #include "ownsql.h"
 #include "syncfileitem.h"
 #include "common/syncfilestatus.h"
-#include <map>
-#include <QSet>
+// #include <map>
+// #include <QSet>
 
 namespace OCC {
 
@@ -33,7 +31,6 @@ class SyncEngine;
  */
 class OWNCLOUDSYNC_EXPORT SyncFileStatusTracker : public QObject
 {
-    Q_OBJECT
 public:
     explicit SyncFileStatusTracker(SyncEngine *syncEngine);
     SyncFileStatus fileStatus(const QString &relativePath);

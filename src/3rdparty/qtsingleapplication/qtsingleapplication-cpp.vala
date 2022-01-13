@@ -30,12 +30,12 @@
 #include "qtsingleapplication.h"
 #include "qtlocalpeer.h"
 
-#include <qtlockedfile.h>
+// #include <qtlockedfile.h>
 
-#include <QDir>
-#include <QFileOpenEvent>
-#include <QSharedMemory>
-#include <QWidget>
+// #include <QDir>
+// #include <QFileOpenEvent>
+// #include <QSharedMemory>
+// #include <QWidget>
 
 namespace SharedTools {
 

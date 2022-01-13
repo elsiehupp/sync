@@ -4,7 +4,7 @@
  *          any purpose.
  *          */
 
-#include <QtTest>
+// #include <QtTest>
 
 #include "folderwatcher_linux.h"
 #include "common/utility.h"
@@ -13,7 +13,6 @@ using namespace OCC;
 
 class TestInotifyWatcher: public FolderWatcherPrivate
 {
-    Q_OBJECT
 
 private:
     QString _root;

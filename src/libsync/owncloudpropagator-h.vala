@@ -12,17 +12,15 @@
  * for more details.
  */
 
-#ifndef OWNCLOUDPROPAGATOR_H
-#define OWNCLOUDPROPAGATOR_H
 
-#include <QHash>
-#include <QObject>
-#include <QMap>
-#include <QElapsedTimer>
-#include <QTimer>
-#include <QPointer>
-#include <QIODevice>
-#include <QMutex>
+// #include <QHash>
+// #include <QObject>
+// #include <QMap>
+// #include <QElapsedTimer>
+// #include <QTimer>
+// #include <QPointer>
+// #include <QIODevice>
+// #include <QMutex>
 
 #include "csync.h"
 #include "syncfileitem.h"
@@ -31,7 +29,7 @@
 #include "accountfwd.h"
 #include "syncoptions.h"
 
-#include <deque>
+// #include <deque>
 
 namespace OCC {
 
@@ -64,7 +62,6 @@ class PropagatorCompositeJob;
  */
 class PropagatorJob : public QObject
 {
-    Q_OBJECT
 
 public:
     explicit PropagatorJob(OwncloudPropagator *propagator);
@@ -163,7 +160,6 @@ protected:
  */
 class PropagateItemJob : public PropagatorJob
 {
-    Q_OBJECT
 protected:
     virtual void done(SyncFileItem::Status status, const QString &errorString = QString());
 
@@ -230,7 +226,6 @@ public slots:
  */
 class PropagatorCompositeJob : public PropagatorJob
 {
-    Q_OBJECT
 public:
     QVector<PropagatorJob *> _jobsToDo;
     SyncFileItemVector _tasksToDo;
@@ -301,7 +296,6 @@ private slots:
  */
 class OWNCLOUDSYNC_EXPORT PropagateDirectory : public PropagatorJob
 {
-    Q_OBJECT
 public:
     SyncFileItemPtr _item;
     // e.g: create the directory
@@ -363,7 +357,6 @@ private slots:
  */
 class OWNCLOUDSYNC_EXPORT PropagateRootDirectory : public PropagateDirectory
 {
-    Q_OBJECT
 public:
     PropagatorCompositeJob _dirDeletionJobs;
 
@@ -390,7 +383,6 @@ private:
  */
 class PropagateIgnoreJob : public PropagateItemJob
 {
-    Q_OBJECT
 public:
     PropagateIgnoreJob(OwncloudPropagator *propagator, const SyncFileItemPtr &item)
         : PropagateItemJob(propagator, item)
@@ -415,7 +407,6 @@ class PropagateUploadFileCommon;
 
 class OWNCLOUDSYNC_EXPORT OwncloudPropagator : public QObject
 {
-    Q_OBJECT
 public:
     SyncJournalDb *const _journal;
     bool _finishedEmited; // used to ensure that finished is only emitted once
@@ -688,7 +679,6 @@ private:
  */
 class CleanupPollsJob : public QObject
 {
-    Q_OBJECT
     QVector<SyncJournalDb::PollInfo> _pollInfos;
     AccountPtr _account;
     SyncJournalDb *_journal;

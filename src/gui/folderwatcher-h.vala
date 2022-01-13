@@ -12,21 +12,19 @@
  * for more details.
  */
 
-#ifndef MIRALL_FOLDERWATCHER_H
-#define MIRALL_FOLDERWATCHER_H
 
 #include "config.h"
 
-#include <QList>
-#include <QLoggingCategory>
-#include <QObject>
-#include <QString>
-#include <QStringList>
-#include <QElapsedTimer>
-#include <QHash>
-#include <QScopedPointer>
-#include <QSet>
-#include <QDir>
+// #include <QList>
+// #include <QLoggingCategory>
+// #include <QObject>
+// #include <QString>
+// #include <QStringList>
+// #include <QElapsedTimer>
+// #include <QHash>
+// #include <QScopedPointer>
+// #include <QSet>
+// #include <QDir>
 
 class QTimer;
 
@@ -49,7 +47,6 @@ class Folder;
 
 class FolderWatcher : public QObject
 {
-    Q_OBJECT
 public:
     // Construct, connect signals, call init()
     explicit FolderWatcher(Folder *folder = nullptr);

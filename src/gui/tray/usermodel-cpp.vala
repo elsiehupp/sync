@@ -3,7 +3,7 @@
 
 #include "accountmanager.h"
 #include "owncloudgui.h"
-#include <pushnotifications.h>
+// #include <pushnotifications.h>
 #include "userstatusselectormodel.h"
 #include "syncengine.h"
 #include "ocsjob.h"
@@ -17,12 +17,12 @@
 #include "tray/unifiedsearchresultslistmodel.h"
 #include "userstatusconnector.h"
 
-#include <QDesktopServices>
-#include <QIcon>
-#include <QMessageBox>
-#include <QSvgRenderer>
-#include <QPainter>
-#include <QPushButton>
+// #include <QDesktopServices>
+// #include <QIcon>
+// #include <QMessageBox>
+// #include <QSvgRenderer>
+// #include <QPainter>
+// #include <QPushButton>
 
 // time span in milliseconds which has to be between two
 // refreshes of the notifications

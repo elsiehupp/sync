@@ -17,14 +17,14 @@
 #include "sslerrordialog.h"
 #include "proxyauthhandler.h"
 #include "common/asserts.h"
-#include <theme.h>
-#include <creds/credentialsfactory.h>
-#include <creds/abstractcredentials.h>
-#include <cookiejar.h>
-#include <QSettings>
-#include <QDir>
-#include <QNetworkAccessManager>
-#include <QMessageBox>
+// #include <theme.h>
+// #include <creds/credentialsfactory.h>
+// #include <creds/abstractcredentials.h>
+// #include <cookiejar.h>
+// #include <QSettings>
+// #include <QDir>
+// #include <QNetworkAccessManager>
+// #include <QMessageBox>
 #include "clientsideencryption.h"
 #include "ui_mnemonicdialog.h"
 

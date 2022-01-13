@@ -31,19 +31,19 @@
 #include "syncfileitem.h"
 
 #ifdef Q_OS_WIN
-#include <windef.h>
-#include <winbase.h>
+// #include <windef.h>
+// #include <winbase.h>
 #endif
 
-#include <QStack>
-#include <QFileInfo>
-#include <QDir>
-#include <QLoggingCategory>
-#include <QTimer>
-#include <QObject>
-#include <QTimerEvent>
-#include <QRegularExpression>
-#include <qmath.h>
+// #include <QStack>
+// #include <QFileInfo>
+// #include <QDir>
+// #include <QLoggingCategory>
+// #include <QTimer>
+// #include <QObject>
+// #include <QTimerEvent>
+// #include <QRegularExpression>
+// #include <qmath.h>
 
 namespace OCC {
 

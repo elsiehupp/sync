@@ -14,13 +14,13 @@
 
 #include "iconutils.h"
 
-#include <theme.h>
+// #include <theme.h>
 
-#include <QFile>
-#include <QLoggingCategory>
-#include <QPainter>
-#include <QPixmapCache>
-#include <QSvgRenderer>
+// #include <QFile>
+// #include <QLoggingCategory>
+// #include <QPainter>
+// #include <QPixmapCache>
+// #include <QSvgRenderer>
 
 namespace {
 QString findSvgFilePath(const QString &fileName, const QStringList &possibleColors)

@@ -13,14 +13,12 @@
  * for more details.
  */
 
-#ifndef USERINFO_H
-#define USERINFO_H
 
-#include <QObject>
-#include <QPointer>
-#include <QVariant>
-#include <QTimer>
-#include <QDateTime>
+// #include <QObject>
+// #include <QPointer>
+// #include <QVariant>
+// #include <QTimer>
+// #include <QDateTime>
 
 namespace OCC {
 class AccountState;
@@ -66,7 +64,6 @@ class JsonApiJob;
   */
 class UserInfo : public QObject
 {
-    Q_OBJECT
 public:
     explicit UserInfo(OCC::AccountState *accountState, bool allowDisconnectedAccountState, bool fetchAvatarImage, QObject *parent = nullptr);
 

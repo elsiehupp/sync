@@ -12,12 +12,12 @@
  * for more details.
  */
 
-#include <QRegularExpression>
+// #include <QRegularExpression>
 
 #include "syncrunfilelog.h"
 #include "common/utility.h"
 #include "filesystem.h"
-#include <qfileinfo.h>
+// #include <qfileinfo.h>
 
 namespace OCC {
 

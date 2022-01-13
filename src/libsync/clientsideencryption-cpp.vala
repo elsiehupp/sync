@@ -1,9 +1,9 @@
-#include <openssl/rsa.h>
-#include <openssl/evp.h>
-#include <openssl/pem.h>
-#include <openssl/err.h>
-#include <openssl/engine.h>
-#include <openssl/rand.h>
+// #include <openssl/rsa.h>
+// #include <openssl/evp.h>
+// #include <openssl/pem.h>
+// #include <openssl/err.h>
+// #include <openssl/engine.h>
+// #include <openssl/rand.h>
 
 
 #include "clientsideencryption.h"
@@ -14,30 +14,30 @@
 #include "theme.h"
 #include "creds/abstractcredentials.h"
 
-#include <map>
-#include <string>
-#include <algorithm>
+// #include <map>
+// #include <string>
+// #include <algorithm>
 
-#include <cstdio>
+// #include <cstdio>
 
-#include <QDebug>
-#include <QLoggingCategory>
-#include <QFileInfo>
-#include <QDir>
-#include <QJsonObject>
-#include <QXmlStreamReader>
-#include <QXmlStreamNamespaceDeclaration>
-#include <QStack>
-#include <QInputDialog>
-#include <QLineEdit>
-#include <QIODevice>
-#include <QUuid>
-#include <QScopeGuard>
-#include <QRandomGenerator>
+// #include <QDebug>
+// #include <QLoggingCategory>
+// #include <QFileInfo>
+// #include <QDir>
+// #include <QJsonObject>
+// #include <QXmlStreamReader>
+// #include <QXmlStreamNamespaceDeclaration>
+// #include <QStack>
+// #include <QInputDialog>
+// #include <QLineEdit>
+// #include <QIODevice>
+// #include <QUuid>
+// #include <QScopeGuard>
+// #include <QRandomGenerator>
 
-#include <qt5keychain/keychain.h>
-#include <common/utility.h>
-#include <common/constants.h>
+// #include <qt5keychain/keychain.h>
+// #include <common/utility.h>
+// #include <common/constants.h>
 
 #include "wordlist.h"
 

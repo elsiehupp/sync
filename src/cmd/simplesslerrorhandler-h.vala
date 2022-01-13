@@ -11,8 +11,6 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
  */
-#ifndef SIMPLESSLERRORHANDLER_H
-#define SIMPLESSLERRORHANDLER_H
 
 #include "accountfwd.h"
 

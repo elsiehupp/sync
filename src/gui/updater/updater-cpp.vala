@@ -12,9 +12,9 @@
  * for more details.
  */
 
-#include <QUrl>
-#include <QUrlQuery>
-#include <QProcess>
+// #include <QUrl>
+// #include <QUrlQuery>
+// #include <QProcess>
 
 #include "updater/updater.h"
 #include "updater/sparkleupdater.h"
@@ -28,7 +28,7 @@
 #include "config.h"
 #include "configfile.h"
 
-#include <QSysInfo>
+// #include <QSysInfo>
 
 namespace OCC {
 

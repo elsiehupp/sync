@@ -14,20 +14,20 @@
 
 #include "logbrowser.h"
 
-#include <cstdio>
-#include <iostream>
+// #include <cstdio>
+// #include <iostream>
 
-#include <QDialogButtonBox>
-#include <QLayout>
-#include <QPushButton>
-#include <QLabel>
-#include <QDir>
-#include <QTextStream>
-#include <QMessageBox>
-#include <QCoreApplication>
-#include <QSettings>
-#include <QAction>
-#include <QDesktopServices>
+// #include <QDialogButtonBox>
+// #include <QLayout>
+// #include <QPushButton>
+// #include <QLabel>
+// #include <QDir>
+// #include <QTextStream>
+// #include <QMessageBox>
+// #include <QCoreApplication>
+// #include <QSettings>
+// #include <QAction>
+// #include <QDesktopServices>
 
 #include "configfile.h"
 #include "logger.h"

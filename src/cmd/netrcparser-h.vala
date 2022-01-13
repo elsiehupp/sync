@@ -12,11 +12,9 @@
  * for more details.
  */
 
-#ifndef NETRCPARSER_H
-#define NETRCPARSER_H
 
-#include <QHash>
-#include <QPair>
+// #include <QHash>
+// #include <QPair>
 
 namespace OCC {
 

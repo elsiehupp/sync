@@ -12,10 +12,8 @@
  * for more details.
  */
 
-#ifndef IGNORELISTEDITOR_H
-#define IGNORELISTEDITOR_H
 
-#include <QDialog>
+// #include <QDialog>
 
 class QListWidgetItem;
 class QAbstractButton;
@@ -32,7 +30,6 @@ namespace Ui {
  */
 class IgnoreListEditor : public QDialog
 {
-    Q_OBJECT
 
 public:
     IgnoreListEditor(QWidget *parent = nullptr);

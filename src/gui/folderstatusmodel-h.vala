@@ -12,15 +12,13 @@
  * for more details.
  */
 
-#ifndef FOLDERSTATUSMODEL_H
-#define FOLDERSTATUSMODEL_H
 
-#include <accountfwd.h>
-#include <QAbstractItemModel>
-#include <QLoggingCategory>
-#include <QVector>
-#include <QElapsedTimer>
-#include <QPointer>
+// #include <accountfwd.h>
+// #include <QAbstractItemModel>
+// #include <QLoggingCategory>
+// #include <QVector>
+// #include <QElapsedTimer>
+// #include <QPointer>
 
 class QNetworkReply;
 namespace OCC {
@@ -37,7 +35,6 @@ class LsColJob;
  */
 class FolderStatusModel : public QAbstractItemModel
 {
-    Q_OBJECT
 public:
     enum {FileIdRole = Qt::UserRole+1};
 

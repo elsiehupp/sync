@@ -14,7 +14,7 @@
 
 #include "vfs_suffix.h"
 
-#include <QFile>
+// #include <QFile>
 
 #include "syncfileitem.h"
 #include "filesystem.h"

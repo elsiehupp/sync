@@ -17,18 +17,18 @@
 #include "common/syncjournaldb.h"
 #include "filesystem.h"
 #include "syncfileitem.h"
-#include <QDebug>
-#include <algorithm>
-#include <QEventLoop>
-#include <QDir>
-#include <set>
-#include <QTextCodec>
+// #include <QDebug>
+// #include <algorithm>
+// #include <QEventLoop>
+// #include <QDir>
+// #include <set>
+// #include <QTextCodec>
 #include "vio/csync_vio_local.h"
-#include <QFileInfo>
-#include <QFile>
-#include <QThreadPool>
-#include <common/checksums.h>
-#include <common/constants.h>
+// #include <QFileInfo>
+// #include <QFile>
+// #include <QThreadPool>
+// #include <common/checksums.h>
+// #include <common/constants.h>
 #include "csync_exclude.h"
 #include "csync.h"
 

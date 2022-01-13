@@ -23,16 +23,16 @@
 #include "common/syncjournaldb.h"
 #include "common/syncjournalfilerecord.h"
 #include "filesystem.h"
-#include <qfile.h>
-#include <qdir.h>
-#include <qdiriterator.h>
-#include <qtemporaryfile.h>
-#include <qsavefile.h>
-#include <QDateTime>
-#include <qstack.h>
-#include <QCoreApplication>
+// #include <qfile.h>
+// #include <qdir.h>
+// #include <qdiriterator.h>
+// #include <qtemporaryfile.h>
+// #include <qsavefile.h>
+// #include <QDateTime>
+// #include <qstack.h>
+// #include <QCoreApplication>
 
-#include <ctime>
+// #include <ctime>
 
 
 namespace OCC {

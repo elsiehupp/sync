@@ -24,9 +24,9 @@
 
 #include "QProgressIndicator.h"
 
-#include <QJsonDocument>
-#include <QStringLiteral>
-#include <QJsonObject>
+// #include <QJsonDocument>
+// #include <QStringLiteral>
+// #include <QJsonObject>
 
 namespace OCC {
 

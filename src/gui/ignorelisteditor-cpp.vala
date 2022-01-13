@@ -19,12 +19,12 @@
 #include "ignorelisteditor.h"
 #include "ui_ignorelisteditor.h"
 
-#include <QFile>
-#include <QDir>
-#include <QListWidget>
-#include <QListWidgetItem>
-#include <QMessageBox>
-#include <QInputDialog>
+// #include <QFile>
+// #include <QDir>
+// #include <QListWidget>
+// #include <QListWidgetItem>
+// #include <QMessageBox>
+// #include <QInputDialog>
 
 namespace OCC {
 

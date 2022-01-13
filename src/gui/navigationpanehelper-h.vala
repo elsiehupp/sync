@@ -13,11 +13,9 @@
  */
 
 
-#ifndef NAVIGATIONPANEHELPER_H
-#define NAVIGATIONPANEHELPER_H
 
-#include <QObject>
-#include <QTimer>
+// #include <QObject>
+// #include <QTimer>
 
 namespace OCC {
 
@@ -25,7 +23,6 @@ class FolderMan;
 
 class NavigationPaneHelper : public QObject
 {
-    Q_OBJECT
 public:
     NavigationPaneHelper(FolderMan *folderMan);
 

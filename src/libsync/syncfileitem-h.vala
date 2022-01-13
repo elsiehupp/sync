@@ -12,18 +12,16 @@
  * for more details.
  */
 
-#ifndef SYNCFILEITEM_H
-#define SYNCFILEITEM_H
 
-#include <QVector>
-#include <QString>
-#include <QDateTime>
-#include <QMetaType>
-#include <QSharedPointer>
+// #include <QVector>
+// #include <QString>
+// #include <QDateTime>
+// #include <QMetaType>
+// #include <QSharedPointer>
 
-#include <csync.h>
+// #include <csync.h>
 
-#include <owncloudlib.h>
+// #include <owncloudlib.h>
 
 namespace OCC {
 

@@ -5,9 +5,9 @@
  *
  */
 
-#include <qglobal.h>
-#include <QTemporaryDir>
-#include <QtTest>
+// #include <qglobal.h>
+// #include <QTemporaryDir>
+// #include <QtTest>
 
 #include "common/utility.h"
 #include "folderman.h"
@@ -20,7 +20,6 @@ using namespace OCC;
 
 class TestAccount: public QObject
 {
-    Q_OBJECT
 
 private slots:
     void testAccountDavPath_unitialized_noCrash()

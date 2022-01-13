@@ -13,10 +13,10 @@
  * for more details.
  */
 
-#include <QList>
-#include <QString>
-#include <QSslCertificate>
-#include <QSslConfiguration>
+// #include <QList>
+// #include <QString>
+// #include <QSslCertificate>
+// #include <QSslConfiguration>
 
 #include "creds/credentialscommon.h"
 

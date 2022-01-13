@@ -11,7 +11,7 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
  */
-#pragma once
+// #pragma once
 
 #include "owncloudpropagator.h"
 #include "networkjobs.h"
@@ -24,7 +24,6 @@ namespace OCC {
  */
 class OWNCLOUDSYNC_EXPORT MoveJob : public AbstractNetworkJob
 {
-    Q_OBJECT
     const QString _destination;
     const QUrl _url; // Only used (instead of path) when the constructor taking an URL is used
     QMap<QByteArray, QByteArray> _extraHeaders;
@@ -47,7 +46,6 @@ signals:
  */
 class PropagateRemoteMove : public PropagateItemJob
 {
-    Q_OBJECT
     QPointer<MoveJob> _job;
 
 public:

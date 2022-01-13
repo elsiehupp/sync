@@ -27,17 +27,16 @@
 **
 ****************************************************************************/
 
-#include <qtlockedfile.h>
+// #include <qtlockedfile.h>
 
-#include <QLocalServer>
-#include <QLocalSocket>
-#include <QDir>
+// #include <QLocalServer>
+// #include <QLocalSocket>
+// #include <QDir>
 
 namespace SharedTools {
 
 class QtLocalPeer : public QObject
 {
-    Q_OBJECT
 
 public:
     explicit QtLocalPeer(QObject *parent = nullptr, const QString &appId = QString());

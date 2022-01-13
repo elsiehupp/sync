@@ -18,10 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef _CSYNC_VIO_LOCAL_H
-#define _CSYNC_VIO_LOCAL_H
 
-#include <QString>
+// #include <QString>
 
 struct csync_vio_handle_t;
 namespace OCC {

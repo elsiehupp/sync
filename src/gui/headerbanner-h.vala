@@ -58,10 +58,8 @@
 **
 ****************************************************************************/
 
-#ifndef HEADERBANNER_H
-#define HEADERBANNER_H
 
-#include <QWidget>
+// #include <QWidget>
 
 class QLabel;
 class QGridLayout;
@@ -71,7 +69,6 @@ namespace OCC {
 
 class HeaderBanner : public QWidget
 {
-    Q_OBJECT
 public:
     HeaderBanner(QWidget *parent = nullptr);
 

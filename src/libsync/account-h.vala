@@ -13,26 +13,24 @@
  */
 
 
-#ifndef SERVERCONNECTION_H
-#define SERVERCONNECTION_H
 
-#include <QByteArray>
-#include <QUrl>
-#include <QNetworkCookie>
-#include <QNetworkRequest>
-#include <QSslSocket>
-#include <QSslCertificate>
-#include <QSslConfiguration>
-#include <QSslCipher>
-#include <QSslError>
-#include <QSharedPointer>
+// #include <QByteArray>
+// #include <QUrl>
+// #include <QNetworkCookie>
+// #include <QNetworkRequest>
+// #include <QSslSocket>
+// #include <QSslCertificate>
+// #include <QSslConfiguration>
+// #include <QSslCipher>
+// #include <QSslError>
+// #include <QSharedPointer>
 
 #ifndef TOKEN_AUTH_ONLY
-#include <QPixmap>
+// #include <QPixmap>
 #endif
 
 #include "common/utility.h"
-#include <memory>
+// #include <memory>
 #include "capabilities.h"
 #include "clientsideencryption.h"
 
@@ -77,7 +75,6 @@ public:
  */
 class OWNCLOUDSYNC_EXPORT Account : public QObject
 {
-    Q_OBJECT
     Q_PROPERTY(QString id MEMBER _id)
     Q_PROPERTY(QString davUser MEMBER _davUser)
     Q_PROPERTY(QString displayName MEMBER _displayName)

@@ -19,7 +19,7 @@
 #include "configfile.h"
 #include "creds/abstractcredentials.h"
 
-#include <QApplication>
+// #include <QApplication>
 
 using namespace QKeychain;
 

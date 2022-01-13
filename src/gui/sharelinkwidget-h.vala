@@ -13,20 +13,18 @@
  * for more details.
  */
 
-#ifndef SHARELINKWIDGET_H
-#define SHARELINKWIDGET_H
 
 #include "accountfwd.h"
 #include "sharepermissions.h"
 #include "QProgressIndicator.h"
-#include <QDialog>
-#include <QSharedPointer>
-#include <QList>
-#include <QToolButton>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QLineEdit>
-#include <QWidgetAction>
+// #include <QDialog>
+// #include <QSharedPointer>
+// #include <QList>
+// #include <QToolButton>
+// #include <QHBoxLayout>
+// #include <QLabel>
+// #include <QLineEdit>
+// #include <QWidgetAction>
 
 class QMenu;
 class QTableWidgetItem;
@@ -49,7 +47,6 @@ class ElidedLabel;
  */
 class ShareLinkWidget : public QWidget
 {
-    Q_OBJECT
 
 public:
     explicit ShareLinkWidget(AccountPtr account,

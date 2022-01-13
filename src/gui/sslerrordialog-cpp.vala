@@ -15,9 +15,9 @@
 #include "sslerrordialog.h"
 #include "theme.h"
 
-#include <QtGui>
-#include <QtNetwork>
-#include <QtWidgets>
+// #include <QtGui>
+// #include <QtNetwork>
+// #include <QtWidgets>
 
 
 #include "ui_sslerrordialog.h"

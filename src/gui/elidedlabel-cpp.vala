@@ -14,7 +14,7 @@
 
 #include "elidedlabel.h"
 
-#include <QResizeEvent>
+// #include <QResizeEvent>
 
 namespace OCC {
 

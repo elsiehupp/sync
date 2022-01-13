@@ -14,18 +14,16 @@
  * for more details.
  */
 
-#ifndef SOCKETAPI_P_H
-#define SOCKETAPI_P_H
 
-#include <functional>
-#include <QBitArray>
-#include <QPointer>
+// #include <functional>
+// #include <QBitArray>
+// #include <QPointer>
 
-#include <QJsonDocument>
-#include <QJsonObject>
+// #include <QJsonDocument>
+// #include <QJsonObject>
 
-#include <memory>
-#include <QTimer>
+// #include <memory>
+// #include <QTimer>
 
 namespace OCC {
 
@@ -94,7 +92,6 @@ private:
 
 class ListenerClosure : public QObject
 {
-    Q_OBJECT
 public:
     using CallbackFunction = std::function<void()>;
     ListenerClosure(CallbackFunction callback)
@@ -115,7 +112,6 @@ private:
 
 class SocketApiJob : public QObject
 {
-    Q_OBJECT
 public:
     explicit SocketApiJob(const QString &jobId, const QSharedPointer<SocketListener> &socketListener, const QJsonObject &arguments)
         : _jobId(jobId)
@@ -140,7 +136,6 @@ protected:
 
 class SocketApiJobV2 : public QObject
 {
-    Q_OBJECT
 public:
     explicit SocketApiJobV2(const QSharedPointer<SocketListener> &socketListener, const QByteArray &command, const QJsonObject &arguments);
 

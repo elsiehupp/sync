@@ -12,20 +12,19 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
-#include <functional>
+// #include <functional>
 
-#include <QWebSocketServer>
-#include <QWebSocket>
-#include <QSignalSpy>
+// #include <QWebSocketServer>
+// #include <QWebSocket>
+// #include <QSignalSpy>
 
 #include "creds/abstractcredentials.h"
 #include "account.h"
 
 class FakeWebSocketServer : public QObject
 {
-    Q_OBJECT
 public:
     explicit FakeWebSocketServer(quint16 port = 12345, QObject *parent = nullptr);
 
@@ -66,7 +65,6 @@ private:
 
 class CredentialsStub : public OCC::AbstractCredentials
 {
-    Q_OBJECT
 
 public:
     CredentialsStub(const QString &user, const QString &password);

@@ -16,7 +16,7 @@
 #include "networkjobs.h"
 #include "account.h"
 
-#include <QBuffer>
+// #include <QBuffer>
 
 namespace OCC {
 

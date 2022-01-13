@@ -12,9 +12,9 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
-#include <QMap>
+// #include <QMap>
 
 #include "abstractpropagateremotedeleteencrypted.h"
 #include "syncfileitem.h"
@@ -23,7 +23,6 @@ namespace OCC {
 
 class PropagateRemoteDeleteEncryptedRootFolder : public AbstractPropagateRemoteDeleteEncrypted
 {
-    Q_OBJECT
 public:
     PropagateRemoteDeleteEncryptedRootFolder(OwncloudPropagator *propagator, SyncFileItemPtr item, QObject *parent);
 

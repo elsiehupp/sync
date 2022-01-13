@@ -17,13 +17,13 @@
 
 #include "conflictsolver.h"
 
-#include <QDateTime>
-#include <QDebug>
-#include <QDesktopServices>
-#include <QFileInfo>
-#include <QMimeDatabase>
-#include <QPushButton>
-#include <QUrl>
+// #include <QDateTime>
+// #include <QDebug>
+// #include <QDesktopServices>
+// #include <QFileInfo>
+// #include <QMimeDatabase>
+// #include <QPushButton>
+// #include <QUrl>
 
 namespace {
 void forceHeaderFont(QWidget *widget)

@@ -29,10 +29,10 @@
 
 #include "qtlockedfile.h"
 
-#include <cstring>
-#include <cerrno>
-#include <unistd.h>
-#include <fcntl.h>
+// #include <cstring>
+// #include <cerrno>
+// #include <unistd.h>
+// #include <fcntl.h>
 
 namespace SharedTools {
 

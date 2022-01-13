@@ -1,10 +1,9 @@
-#include <QTest>
+// #include <QTest>
 
 #include "capabilities.h"
 
 class TestCapabilities : public QObject
 {
-    Q_OBJECT
 
 private slots:
     void testPushNotificationsAvailable_pushNotificationsForActivitiesAvailable_returnTrue()

@@ -5,9 +5,9 @@
  *
  */
 
-#include <QtTest>
+// #include <QtTest>
 #include "syncenginetestutils.h"
-#include <syncengine.h>
+// #include <syncengine.h>
 
 using namespace OCC;
 
@@ -55,7 +55,6 @@ int itemSuccessfullyCompletedGetRank(const ItemCompletedSpy &spy, const QString 
 
 class TestSyncEngine : public QObject
 {
-    Q_OBJECT
 
 private slots:
     void testFileDownload() {

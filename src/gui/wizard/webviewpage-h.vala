@@ -11,7 +11,6 @@ class WebView;
 
 class WebViewPage : public AbstractCredentialsWizardPage
 {
-    Q_OBJECT
 public:
     WebViewPage(QWidget *parent = nullptr);
     ~WebViewPage() override;

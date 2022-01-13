@@ -12,11 +12,11 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
-#include <limits>
+// #include <limits>
 
-#include <QtCore>
+// #include <QtCore>
 
 namespace OCC {
 

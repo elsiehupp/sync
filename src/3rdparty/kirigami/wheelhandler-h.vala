@@ -4,12 +4,12 @@
  *  SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
-#pragma once
+// #pragma once
 
-#include <QtQml>
-#include <QPoint>
-#include <QQuickItem>
-#include <QObject>
+// #include <QtQml>
+// #include <QPoint>
+// #include <QQuickItem>
+// #include <QObject>
 
 class QWheelEvent;
 
@@ -20,7 +20,6 @@ class WheelHandler;
  */
 class KirigamiWheelEvent : public QObject
 {
-    Q_OBJECT
 
     /**
      * x: real
@@ -134,7 +133,6 @@ private:
 
 class GlobalWheelFilter : public QObject
 {
-    Q_OBJECT
 
 public:
     GlobalWheelFilter(QObject *parent = nullptr);
@@ -163,7 +161,6 @@ private:
  */
 class WheelHandler : public QObject
 {
-    Q_OBJECT
 
     /**
      * target: Item

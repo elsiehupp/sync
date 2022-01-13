@@ -23,32 +23,32 @@
 #include "version.h"
 
 // Note:  This file must compile without QtGui
-#include <QCoreApplication>
-#include <QSettings>
-#include <QTextStream>
-#include <QDir>
-#include <QFile>
-#include <QUrl>
-#include <QProcess>
-#include <QObject>
-#include <QThread>
-#include <QDateTime>
-#include <QSysInfo>
-#include <QStandardPaths>
-#include <QCollator>
-#include <QSysInfo>
-#include <qrandom.h>
+// #include <QCoreApplication>
+// #include <QSettings>
+// #include <QTextStream>
+// #include <QDir>
+// #include <QFile>
+// #include <QUrl>
+// #include <QProcess>
+// #include <QObject>
+// #include <QThread>
+// #include <QDateTime>
+// #include <QSysInfo>
+// #include <QStandardPaths>
+// #include <QCollator>
+// #include <QSysInfo>
+// #include <qrandom.h>
 
 
 #ifdef Q_OS_UNIX
-#include <sys/statvfs.h>
-#include <sys/types.h>
-#include <unistd.h>
+// #include <sys/statvfs.h>
+// #include <sys/types.h>
+// #include <unistd.h>
 #endif
 
-#include <cmath>
-#include <cstdarg>
-#include <cstring>
+// #include <cmath>
+// #include <cstdarg>
+// #include <cstring>
 
 #if defined(Q_OS_WIN)
 #include "utility_win.cpp"

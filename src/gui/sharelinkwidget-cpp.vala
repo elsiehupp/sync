@@ -23,15 +23,15 @@
 #include "elidedlabel.h"
 
 #include "QProgressIndicator.h"
-#include <QBuffer>
-#include <QClipboard>
-#include <QFileInfo>
-#include <QDesktopServices>
-#include <QMessageBox>
-#include <QMenu>
-#include <QTextEdit>
-#include <QToolButton>
-#include <QPropertyAnimation>
+// #include <QBuffer>
+// #include <QClipboard>
+// #include <QFileInfo>
+// #include <QDesktopServices>
+// #include <QMessageBox>
+// #include <QMenu>
+// #include <QTextEdit>
+// #include <QToolButton>
+// #include <QPropertyAnimation>
 
 namespace {
     const char *passwordIsSetPlaceholder = "●●●●●●●●";

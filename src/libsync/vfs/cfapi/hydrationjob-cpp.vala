@@ -17,12 +17,12 @@
 #include "common/syncjournaldb.h"
 #include "propagatedownload.h"
 #include "vfs/cfapi/vfs_cfapi.h"
-#include <clientsideencryptionjobs.h>
+// #include <clientsideencryptionjobs.h>
 
 #include "filesystem.h"
 
-#include <QLocalServer>
-#include <QLocalSocket>
+// #include <QLocalServer>
+// #include <QLocalSocket>
 
 Q_LOGGING_CATEGORY(lcHydration, "nextcloud.sync.vfs.hydrationjob", QtInfoMsg)
 

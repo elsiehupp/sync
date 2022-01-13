@@ -3,8 +3,8 @@
 
 #include "networkjobs.h"
 #include "accountfwd.h"
-#include <QString>
-#include <QJsonDocument>
+// #include <QString>
+// #include <QJsonDocument>
 
 namespace OCC {
 /* Here are all of the network jobs for the client side encryption.
@@ -26,7 +26,6 @@ namespace OCC {
  */
 class OWNCLOUDSYNC_EXPORT SignPublicKeyApiJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 public:
     explicit SignPublicKeyApiJob(const AccountPtr &account, const QString &path, QObject *parent = nullptr);
 
@@ -69,7 +68,6 @@ private:
  */
 class OWNCLOUDSYNC_EXPORT StorePrivateKeyApiJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 public:
     explicit StorePrivateKeyApiJob(const AccountPtr &account, const QString &path, QObject *parent = nullptr);
 
@@ -112,7 +110,6 @@ private:
  */
 class OWNCLOUDSYNC_EXPORT SetEncryptionFlagApiJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 public:
     enum FlagAction {
         Clear = 0,
@@ -138,7 +135,6 @@ private:
 
 class OWNCLOUDSYNC_EXPORT LockEncryptFolderApiJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 public:
     explicit LockEncryptFolderApiJob(const AccountPtr &account, const QByteArray& fileId, QObject *parent = nullptr);
 
@@ -159,7 +155,6 @@ private:
 
 class OWNCLOUDSYNC_EXPORT UnlockEncryptFolderApiJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 public:
     explicit UnlockEncryptFolderApiJob (
         const AccountPtr &account,
@@ -186,7 +181,6 @@ private:
 
 class OWNCLOUDSYNC_EXPORT StoreMetaDataApiJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 public:
     explicit StoreMetaDataApiJob (
         const AccountPtr &account,
@@ -211,7 +205,6 @@ private:
 
 class OWNCLOUDSYNC_EXPORT UpdateMetadataApiJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 public:
     explicit UpdateMetadataApiJob (
         const AccountPtr &account,
@@ -239,7 +232,6 @@ private:
 
 class OWNCLOUDSYNC_EXPORT GetMetadataApiJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 public:
     explicit GetMetadataApiJob (
         const AccountPtr &account,
@@ -262,7 +254,6 @@ private:
 
 class OWNCLOUDSYNC_EXPORT DeleteMetadataApiJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 public:
     explicit DeleteMetadataApiJob (
         const AccountPtr &account,

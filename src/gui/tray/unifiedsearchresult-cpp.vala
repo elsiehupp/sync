@@ -12,7 +12,7 @@
  * for more details.
  */
 
-#include <QtCore>
+// #include <QtCore>
 
 #include "unifiedsearchresult.h"
 

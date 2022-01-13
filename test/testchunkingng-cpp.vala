@@ -5,9 +5,9 @@
  *
  */
 
-#include <QtTest>
+// #include <QtTest>
 #include "syncenginetestutils.h"
-#include <syncengine.h>
+// #include <syncengine.h>
 
 using namespace OCC;
 
@@ -52,7 +52,6 @@ static void setChunkSize(SyncEngine &engine, qint64 size)
 
 class TestChunkingNG : public QObject
 {
-    Q_OBJECT
 
 private slots:
 

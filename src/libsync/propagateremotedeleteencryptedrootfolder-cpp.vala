@@ -23,8 +23,8 @@
  * - 7th step is to decrypt and delete the root folder, because it is now possible as it has become empty
  */
 
-#include <QFileInfo>
-#include <QLoggingCategory>
+// #include <QFileInfo>
+// #include <QLoggingCategory>
 
 #include "deletejob.h"
 #include "clientsideencryptionjobs.h"

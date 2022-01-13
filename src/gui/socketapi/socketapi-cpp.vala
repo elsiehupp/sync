@@ -42,37 +42,37 @@
 #include "sharemanager.h"
 #endif
 
-#include <array>
-#include <QBitArray>
-#include <QUrl>
-#include <QMetaMethod>
-#include <QMetaObject>
-#include <QStringList>
-#include <QScopedPointer>
-#include <QFile>
-#include <QDir>
-#include <QApplication>
-#include <QLocalSocket>
-#include <QStringBuilder>
-#include <QMessageBox>
-#include <QInputDialog>
-#include <QFileDialog>
+// #include <array>
+// #include <QBitArray>
+// #include <QUrl>
+// #include <QMetaMethod>
+// #include <QMetaObject>
+// #include <QStringList>
+// #include <QScopedPointer>
+// #include <QFile>
+// #include <QDir>
+// #include <QApplication>
+// #include <QLocalSocket>
+// #include <QStringBuilder>
+// #include <QMessageBox>
+// #include <QInputDialog>
+// #include <QFileDialog>
 
 
-#include <QAction>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QWidget>
+// #include <QAction>
+// #include <QJsonArray>
+// #include <QJsonDocument>
+// #include <QJsonObject>
+// #include <QWidget>
 
-#include <QClipboard>
-#include <QDesktopServices>
+// #include <QClipboard>
+// #include <QDesktopServices>
 
-#include <QProcess>
-#include <QStandardPaths>
+// #include <QProcess>
+// #include <QStandardPaths>
 
 #ifdef Q_OS_MAC
-#include <CoreFoundation/CoreFoundation.h>
+// #include <CoreFoundation/CoreFoundation.h>
 #endif
 
 
@@ -647,7 +647,6 @@ void SocketApi::command_EDIT(const QString &localFile, SocketListener *listener)
 
 class GetOrCreatePublicLinkShare : public QObject
 {
-    Q_OBJECT
 public:
     GetOrCreatePublicLinkShare(const AccountPtr &account, const QString &localFile,
         QObject *parent)
@@ -758,7 +757,6 @@ private:
 
 class GetOrCreatePublicLinkShare : public QObject
 {
-    Q_OBJECT
 public:
     GetOrCreatePublicLinkShare(const AccountPtr &, const QString &,
         std::function<void(const QString &link)>, QObject *)

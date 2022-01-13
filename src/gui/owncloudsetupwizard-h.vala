@@ -12,14 +12,12 @@
  * for more details.
  */
 
-#ifndef OWNCLOUDSETUPWIZARD_H
-#define OWNCLOUDSETUPWIZARD_H
 
-#include <QObject>
-#include <QWidget>
-#include <QProcess>
-#include <QNetworkReply>
-#include <QPointer>
+// #include <QObject>
+// #include <QWidget>
+// #include <QProcess>
+// #include <QNetworkReply>
+// #include <QPointer>
 
 #include "accountfwd.h"
 #include "theme.h"
@@ -39,7 +37,6 @@ class OwncloudWizard;
  */
 class OwncloudSetupWizard : public QObject
 {
-    Q_OBJECT
 public:
     /** Run the wizard */
     static void runWizard(QObject *obj, const char *amember, QWidget *parent = nullptr);

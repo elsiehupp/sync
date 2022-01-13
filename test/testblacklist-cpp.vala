@@ -5,9 +5,9 @@
  *
  */
 
-#include <QtTest>
+// #include <QtTest>
 #include "syncenginetestutils.h"
-#include <syncengine.h>
+// #include <syncengine.h>
 
 using namespace OCC;
 
@@ -20,7 +20,6 @@ SyncJournalFileRecord journalRecord(FakeFolder &folder, const QByteArray &path)
 
 class TestBlacklist : public QObject
 {
-    Q_OBJECT
 
 private slots:
     void testBlacklistBasic_data()

@@ -12,7 +12,7 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
 #include "account.h"
 #include "accountstate.h"
@@ -25,7 +25,6 @@ namespace OCC {
 */
 class AccountManager : public QObject
 {
-    Q_OBJECT
 public:
     static AccountManager *instance();
     ~AccountManager() override = default;

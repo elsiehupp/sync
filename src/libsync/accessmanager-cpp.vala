@@ -12,16 +12,16 @@
  * for more details.
  */
 
-#include <QLoggingCategory>
-#include <QNetworkRequest>
-#include <QNetworkReply>
-#include <QNetworkProxy>
-#include <QAuthenticator>
-#include <QSslConfiguration>
-#include <QNetworkCookie>
-#include <QNetworkCookieJar>
-#include <QNetworkConfiguration>
-#include <QUuid>
+// #include <QLoggingCategory>
+// #include <QNetworkRequest>
+// #include <QNetworkReply>
+// #include <QNetworkProxy>
+// #include <QAuthenticator>
+// #include <QSslConfiguration>
+// #include <QNetworkCookie>
+// #include <QNetworkCookieJar>
+// #include <QNetworkConfiguration>
+// #include <QUuid>
 
 #include "cookiejar.h"
 #include "accessmanager.h"

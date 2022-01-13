@@ -32,30 +32,30 @@
 #include "iconutils.h"
 
 #include "QProgressIndicator.h"
-#include <QBuffer>
-#include <QFileIconProvider>
-#include <QClipboard>
-#include <QFileInfo>
-#include <QAbstractProxyModel>
-#include <QCompleter>
-#include <QBoxLayout>
-#include <QIcon>
-#include <QLayout>
-#include <QPropertyAnimation>
-#include <QMenu>
-#include <QAction>
-#include <QDesktopServices>
-#include <QInputDialog>
-#include <QMessageBox>
-#include <QCryptographicHash>
-#include <QColor>
-#include <QPainter>
-#include <QListWidget>
-#include <QSvgRenderer>
-#include <QPushButton>
-#include <QContextMenuEvent>
+// #include <QBuffer>
+// #include <QFileIconProvider>
+// #include <QClipboard>
+// #include <QFileInfo>
+// #include <QAbstractProxyModel>
+// #include <QCompleter>
+// #include <QBoxLayout>
+// #include <QIcon>
+// #include <QLayout>
+// #include <QPropertyAnimation>
+// #include <QMenu>
+// #include <QAction>
+// #include <QDesktopServices>
+// #include <QInputDialog>
+// #include <QMessageBox>
+// #include <QCryptographicHash>
+// #include <QColor>
+// #include <QPainter>
+// #include <QListWidget>
+// #include <QSvgRenderer>
+// #include <QPushButton>
+// #include <QContextMenuEvent>
 
-#include <cstring>
+// #include <cstring>
 
 namespace {
 const char *passwordIsSetPlaceholder = "●●●●●●●●";

@@ -22,21 +22,21 @@
 #include "common/utility.h"
 #include "filesystem.h"
 #include "propagatorjobs.h"
-#include <common/checksums.h>
-#include <common/asserts.h>
-#include <common/constants.h>
+// #include <common/checksums.h>
+// #include <common/asserts.h>
+// #include <common/constants.h>
 #include "clientsideencryptionjobs.h"
 #include "propagatedownloadencrypted.h"
 #include "common/vfs.h"
 
-#include <QLoggingCategory>
-#include <QNetworkAccessManager>
-#include <QFileInfo>
-#include <QDir>
-#include <cmath>
+// #include <QLoggingCategory>
+// #include <QNetworkAccessManager>
+// #include <QFileInfo>
+// #include <QDir>
+// #include <cmath>
 
 #ifdef Q_OS_UNIX
-#include <unistd.h>
+// #include <unistd.h>
 #endif
 
 namespace OCC {

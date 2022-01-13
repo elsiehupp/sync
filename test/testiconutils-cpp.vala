@@ -12,14 +12,13 @@
  * for more details.
  */
 
-#include <QTest>
+// #include <QTest>
 
 #include "theme.h"
 #include "iconutils.h"
 
 class TestIconUtils : public QObject
 {
-    Q_OBJECT
 
 public:
     TestIconUtils()

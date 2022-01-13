@@ -4,9 +4,9 @@
  *          any purpose.
  *          */
 
-#include <QtTest>
+// #include <QtTest>
 
-#include <sqlite3.h>
+// #include <sqlite3.h>
 
 #include "common/ownsql.h"
 
@@ -14,7 +14,6 @@ using namespace OCC;
 
 class TestOwnSql : public QObject
 {
-    Q_OBJECT
     QTemporaryDir _tempDir;
 
 private slots:

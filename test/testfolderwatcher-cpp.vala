@@ -5,7 +5,7 @@
  *
  */
 
-#include <QtTest>
+// #include <QtTest>
 
 #include "folderwatcher.h"
 #include "common/utility.h"
@@ -72,7 +72,6 @@ using namespace OCC;
 
 class TestFolderWatcher : public QObject
 {
-    Q_OBJECT
 
     QTemporaryDir _root;
     QString _rootPath;

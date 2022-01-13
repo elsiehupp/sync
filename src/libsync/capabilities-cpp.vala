@@ -14,11 +14,11 @@
 
 #include "capabilities.h"
 
-#include <QVariantMap>
-#include <QLoggingCategory>
-#include <QUrl>
+// #include <QVariantMap>
+// #include <QLoggingCategory>
+// #include <QUrl>
 
-#include <QDebug>
+// #include <QDebug>
 
 namespace OCC {
 

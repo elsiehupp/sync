@@ -12,15 +12,13 @@
  * for more details.
  */
 
-#ifndef APPLICATION_H
-#define APPLICATION_H
 
-#include <QApplication>
-#include <QPointer>
-#include <QQueue>
-#include <QTimer>
-#include <QElapsedTimer>
-#include <QNetworkConfigurationManager>
+// #include <QApplication>
+// #include <QPointer>
+// #include <QQueue>
+// #include <QTimer>
+// #include <QElapsedTimer>
+// #include <QNetworkConfigurationManager>
 
 #include "qtsingleapplication.h"
 
@@ -54,7 +52,6 @@ class SslErrorDialog;
  */
 class Application : public SharedTools::QtSingleApplication
 {
-    Q_OBJECT
 public:
     explicit Application(int &argc, char **argv);
     ~Application() override;

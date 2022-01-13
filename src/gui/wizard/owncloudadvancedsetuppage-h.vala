@@ -13,10 +13,8 @@
  * for more details.
  */
 
-#ifndef MIRALL_OWNCLOUD_ADVANCED_SETUP_PAGE_H
-#define MIRALL_OWNCLOUD_ADVANCED_SETUP_PAGE_H
 
-#include <QWizard>
+// #include <QWizard>
 
 #include "wizard/owncloudwizardcommon.h"
 #include "ui_owncloudadvancedsetuppage.h"
@@ -33,7 +31,6 @@ class OwncloudWizard;
  */
 class OwncloudAdvancedSetupPage : public QWizardPage
 {
-    Q_OBJECT
 public:
     OwncloudAdvancedSetupPage(OwncloudWizard *wizard);
 

@@ -12,12 +12,10 @@
  * for more details.
  */
 
-#ifndef MIRALL_FOLDERWATCHER_WIN_H
-#define MIRALL_FOLDERWATCHER_WIN_H
 
-#include <QThread>
-#include <QAtomicInt>
-#include <windows.h>
+// #include <QThread>
+// #include <QAtomicInt>
+// #include <windows.h>
 
 namespace OCC {
 
@@ -29,7 +27,6 @@ class FolderWatcher;
  */
 class WatcherThread : public QThread
 {
-    Q_OBJECT
 public:
     WatcherThread(const QString &path)
         : QThread()
@@ -70,7 +67,6 @@ private:
  */
 class FolderWatcherPrivate : public QObject
 {
-    Q_OBJECT
 public:
     FolderWatcherPrivate(FolderWatcher *p, const QString &path);
     ~FolderWatcherPrivate();

@@ -5,7 +5,7 @@
  *
  */
 
-#include <QtTest>
+// #include <QtTest>
 
 #include "common/utility.h"
 #include "folder.h"
@@ -14,7 +14,6 @@ using namespace OCC;
 
 class TestFolder: public QObject
 {
-    Q_OBJECT
 private slots:
     void testFolder()
     {

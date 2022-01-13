@@ -12,13 +12,11 @@
  * for more details.
  */
 
-#ifndef MIRALL_FOLDERWATCHER_MAC_H
-#define MIRALL_FOLDERWATCHER_MAC_H
 
-#include <QObject>
-#include <QString>
+// #include <QObject>
+// #include <QString>
 
-#include <CoreServices/CoreServices.h>
+// #include <CoreServices/CoreServices.h>
 
 
 namespace OCC {

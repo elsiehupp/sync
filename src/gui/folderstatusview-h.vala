@@ -12,10 +12,8 @@
  * for more details.
  */
 
-#ifndef FOLDERSTATUSVIEW_H
-#define FOLDERSTATUSVIEW_H
 
-#include <QTreeView>
+// #include <QTreeView>
 
 namespace OCC {
 
@@ -25,7 +23,6 @@ namespace OCC {
  */
 class FolderStatusView : public QTreeView
 {
-    Q_OBJECT
 
 public:
     explicit FolderStatusView(QWidget *parent = nullptr);

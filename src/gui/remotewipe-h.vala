@@ -2,7 +2,7 @@
 #define REMOTEWIPE_H
 
 #include "accountmanager.h"
-#include <QNetworkAccessManager>
+// #include <QNetworkAccessManager>
 
 class QJsonDocument;
 class TestRemoteWipe;
@@ -11,7 +11,6 @@ namespace OCC {
 
 class RemoteWipe : public QObject
 {
-    Q_OBJECT
 public:
     explicit RemoteWipe(AccountPtr account, QObject *parent = nullptr);
 

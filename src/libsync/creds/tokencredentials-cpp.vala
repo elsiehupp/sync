@@ -13,11 +13,11 @@
  * for more details.
  */
 
-#include <QLoggingCategory>
-#include <QMutex>
-#include <QNetworkReply>
-#include <QSettings>
-#include <QNetworkCookieJar>
+// #include <QLoggingCategory>
+// #include <QMutex>
+// #include <QNetworkReply>
+// #include <QSettings>
+// #include <QNetworkCookieJar>
 
 #include "account.h"
 #include "accessmanager.h"

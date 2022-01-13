@@ -33,22 +33,22 @@
 #include "cloudproviders/cloudprovidermanager.h"
 #endif
 
-#include <QQmlApplicationEngine>
-#include <QDesktopServices>
-#include <QDir>
-#include <QMessageBox>
-#include <QSignalMapper>
+// #include <QQmlApplicationEngine>
+// #include <QDesktopServices>
+// #include <QDir>
+// #include <QMessageBox>
+// #include <QSignalMapper>
 #ifdef WITH_LIBCLOUDPROVIDERS
-#include <QtDBus/QDBusConnection>
-#include <QtDBus/QDBusInterface>
+// #include <QtDBus/QDBusConnection>
+// #include <QtDBus/QDBusInterface>
 #endif
 
 
-#include <QQmlEngine>
-#include <QQmlComponent>
-#include <QQmlApplicationEngine>
-#include <QQuickItem>
-#include <QQmlContext>
+// #include <QQmlEngine>
+// #include <QQmlComponent>
+// #include <QQmlApplicationEngine>
+// #include <QQuickItem>
+// #include <QQmlContext>
 
 namespace OCC {
 

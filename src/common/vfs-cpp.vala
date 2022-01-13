@@ -24,8 +24,8 @@
 
 #include "common/filesystembase.h"
 
-#include <QPluginLoader>
-#include <QLoggingCategory>
+// #include <QPluginLoader>
+// #include <QLoggingCategory>
 
 using namespace OCC;
 

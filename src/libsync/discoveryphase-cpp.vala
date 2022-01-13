@@ -21,16 +21,16 @@
 #include "common/asserts.h"
 #include "common/checksums.h"
 
-#include <csync_exclude.h>
+// #include <csync_exclude.h>
 #include "vio/csync_vio_local.h"
 
-#include <QLoggingCategory>
-#include <QUrl>
-#include <QFile>
-#include <QFileInfo>
-#include <QTextCodec>
-#include <cstring>
-#include <QDateTime>
+// #include <QLoggingCategory>
+// #include <QUrl>
+// #include <QFile>
+// #include <QFileInfo>
+// #include <QTextCodec>
+// #include <cstring>
+// #include <QDateTime>
 
 
 namespace OCC {

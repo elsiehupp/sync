@@ -12,7 +12,7 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
 #include "accountstate.h"
 #include "tray/activitylistmodel.h"
@@ -21,7 +21,6 @@ namespace OCC {
 
 class FileActivityListModel : public ActivityListModel
 {
-    Q_OBJECT
 
 public:
     explicit FileActivityListModel(QObject *parent = nullptr);

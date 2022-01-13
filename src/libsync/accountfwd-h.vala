@@ -12,10 +12,8 @@
  * for more details.
  */
 
-#ifndef SERVERFWD_H
-#define SERVERFWD_H
 
-#include <QSharedPointer>
+// #include <QSharedPointer>
 
 namespace OCC {
 

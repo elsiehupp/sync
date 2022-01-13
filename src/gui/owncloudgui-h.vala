@@ -12,21 +12,19 @@
  * for more details.
  */
 
-#ifndef OWNCLOUDGUI_H
-#define OWNCLOUDGUI_H
 
 #include "systray.h"
 #include "connectionvalidator.h"
 #include "progressdispatcher.h"
 
-#include <QObject>
-#include <QPointer>
-#include <QAction>
-#include <QMenu>
-#include <QSize>
-#include <QTimer>
+// #include <QObject>
+// #include <QPointer>
+// #include <QAction>
+// #include <QMenu>
+// #include <QSize>
+// #include <QTimer>
 #ifdef WITH_LIBCLOUDPROVIDERS
-#include <QDBusConnection>
+// #include <QDBusConnection>
 #endif
 
 namespace OCC {
@@ -50,7 +48,6 @@ enum class ShareDialogStartPage {
  */
 class ownCloudGui : public QObject
 {
-    Q_OBJECT
 public:
     explicit ownCloudGui(Application *parent = nullptr);
 

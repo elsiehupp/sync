@@ -16,15 +16,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef SYNCJOURNALDB_H
-#define SYNCJOURNALDB_H
 
-#include <QObject>
-#include <QDateTime>
-#include <QHash>
-#include <QMutex>
-#include <QVariant>
-#include <functional>
+// #include <QObject>
+// #include <QDateTime>
+// #include <QHash>
+// #include <QMutex>
+// #include <QVariant>
+// #include <functional>
 
 #include "common/utility.h"
 #include "common/ownsql.h"
@@ -44,7 +42,6 @@ class SyncJournalFileRecord;
  */
 class OCSYNC_EXPORT SyncJournalDb : public QObject
 {
-    Q_OBJECT
 public:
     explicit SyncJournalDb(const QString &dbFilePath, QObject *parent = nullptr);
     ~SyncJournalDb() override;

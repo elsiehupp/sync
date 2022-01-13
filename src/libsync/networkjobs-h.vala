@@ -13,17 +13,15 @@
  * for more details.
  */
 
-#ifndef NETWORKJOBS_H
-#define NETWORKJOBS_H
 
 #include "abstractnetworkjob.h"
 
 #include "common/result.h"
 
-#include <QBuffer>
-#include <QUrlQuery>
-#include <QJsonDocument>
-#include <functional>
+// #include <QBuffer>
+// #include <QUrlQuery>
+// #include <QJsonDocument>
+// #include <functional>
 
 class QUrl;
 class QJsonObject;
@@ -48,7 +46,6 @@ using HttpResult = Result<T, HttpError>;
  */
 class OWNCLOUDSYNC_EXPORT EntityExistsJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 public:
     explicit EntityExistsJob(AccountPtr account, const QString &path, QObject *parent = nullptr);
     void start() override;
@@ -69,7 +66,6 @@ private slots:
  */
 class OWNCLOUDSYNC_EXPORT DeleteApiJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 public:
     explicit DeleteApiJob(AccountPtr account, const QString &path, QObject *parent = nullptr);
     void start() override;
@@ -92,7 +88,6 @@ struct ExtraFolderInfo {
  */
 class OWNCLOUDSYNC_EXPORT LsColXMLParser : public QObject
 {
-    Q_OBJECT
 public:
     explicit LsColXMLParser();
 
@@ -109,7 +104,6 @@ signals:
 
 class OWNCLOUDSYNC_EXPORT LsColJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 public:
     explicit LsColJob(AccountPtr account, const QString &path, QObject *parent = nullptr);
     explicit LsColJob(AccountPtr account, const QUrl &url, QObject *parent = nullptr);
@@ -153,7 +147,6 @@ private:
  */
 class OWNCLOUDSYNC_EXPORT PropfindJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 public:
     explicit PropfindJob(AccountPtr account, const QString &path, QObject *parent = nullptr);
     void start() override;
@@ -190,7 +183,6 @@ private:
  */
 class OWNCLOUDSYNC_EXPORT AvatarJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 public:
     /**
      * @param userId The user for which to obtain the avatar
@@ -229,7 +221,6 @@ private:
  */
 class OWNCLOUDSYNC_EXPORT ProppatchJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 public:
     explicit ProppatchJob(AccountPtr account, const QString &path, QObject *parent = nullptr);
     void start() override;
@@ -262,7 +253,6 @@ private:
  */
 class OWNCLOUDSYNC_EXPORT MkColJob : public AbstractNetworkJob
 {
-    Q_OBJECT
     QUrl _url; // Only used if the constructor taking a url is taken.
     QMap<QByteArray, QByteArray> _extraHeaders;
 
@@ -287,7 +277,6 @@ private:
  */
 class OWNCLOUDSYNC_EXPORT CheckServerJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 public:
     explicit CheckServerJob(AccountPtr account, QObject *parent = nullptr);
     void start() override;
@@ -344,7 +333,6 @@ private:
  */
 class OWNCLOUDSYNC_EXPORT RequestEtagJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 public:
     explicit RequestEtagJob(AccountPtr account, const QString &path, QObject *parent = nullptr);
     void start() override;
@@ -374,7 +362,6 @@ private slots:
  */
 class OWNCLOUDSYNC_EXPORT JsonApiJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 public:
     enum class Verb {
         Get,
@@ -446,7 +433,6 @@ private:
  */
 class OWNCLOUDSYNC_EXPORT DetermineAuthTypeJob : public QObject
 {
-    Q_OBJECT
 public:
     enum AuthType {
         NoAuthType, // used only before we got a chance to probe the server
@@ -484,7 +470,6 @@ private:
  */
 class OWNCLOUDSYNC_EXPORT SimpleNetworkJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 public:
     explicit SimpleNetworkJob(AccountPtr account, QObject *parent = nullptr);
 

@@ -20,7 +20,7 @@
 #include "syncresult.h"
 #include "tray/usermodel.h"
 
-#include <theme.h>
+// #include <theme.h>
 
 namespace {
 

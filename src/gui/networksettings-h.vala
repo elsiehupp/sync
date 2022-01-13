@@ -12,10 +12,8 @@
  * for more details.
  */
 
-#ifndef MIRALL_NETWORKSETTINGS_H
-#define MIRALL_NETWORKSETTINGS_H
 
-#include <QWidget>
+// #include <QWidget>
 
 
 namespace OCC {
@@ -30,7 +28,6 @@ namespace Ui {
  */
 class NetworkSettings : public QWidget
 {
-    Q_OBJECT
 
 public:
     explicit NetworkSettings(QWidget *parent = nullptr);

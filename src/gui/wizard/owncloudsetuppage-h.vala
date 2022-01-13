@@ -13,10 +13,8 @@
  * for more details.
  */
 
-#ifndef MIRALL_OWNCLOUD_SETUP_PAGE_H
-#define MIRALL_OWNCLOUD_SETUP_PAGE_H
 
-#include <QWizard>
+// #include <QWizard>
 
 #include "wizard/owncloudwizardcommon.h"
 #include "wizard/owncloudwizard.h"
@@ -40,7 +38,6 @@ namespace OCC {
  */
 class OwncloudSetupPage : public QWizardPage
 {
-    Q_OBJECT
 public:
     OwncloudSetupPage(QWidget *parent = nullptr);
     ~OwncloudSetupPage() override;

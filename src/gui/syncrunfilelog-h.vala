@@ -12,15 +12,13 @@
  * for more details.
  */
 
-#ifndef SYNCRUNFILELOG_H
-#define SYNCRUNFILELOG_H
 
-#include <QFile>
-#include <QTextStream>
-#include <QScopedPointer>
-#include <QElapsedTimer>
-#include <QStandardPaths>
-#include <QDir>
+// #include <QFile>
+// #include <QTextStream>
+// #include <QScopedPointer>
+// #include <QElapsedTimer>
+// #include <QStandardPaths>
+// #include <QDir>
 
 #include "syncfileitem.h"
 

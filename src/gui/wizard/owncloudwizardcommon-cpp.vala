@@ -13,13 +13,13 @@
  * for more details.
  */
 
-#include <QLabel>
-#include <QPixmap>
-#include <QVariant>
-#include <QRadioButton>
-#include <QAbstractButton>
-#include <QCheckBox>
-#include <QSpinBox>
+// #include <QLabel>
+// #include <QPixmap>
+// #include <QVariant>
+// #include <QRadioButton>
+// #include <QAbstractButton>
+// #include <QCheckBox>
+// #include <QSpinBox>
 
 #include "wizard/owncloudwizardcommon.h"
 #include "theme.h"

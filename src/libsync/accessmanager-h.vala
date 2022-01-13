@@ -12,11 +12,9 @@
  * for more details.
  */
 
-#ifndef MIRALL_ACCESS_MANAGER_H
-#define MIRALL_ACCESS_MANAGER_H
 
 #include "owncloudlib.h"
-#include <QNetworkAccessManager>
+// #include <QNetworkAccessManager>
 
 class QByteArray;
 class QUrl;
@@ -29,7 +27,6 @@ namespace OCC {
  */
 class OWNCLOUDSYNC_EXPORT AccessManager : public QNetworkAccessManager
 {
-    Q_OBJECT
 
 public:
     static QByteArray generateRequestId();

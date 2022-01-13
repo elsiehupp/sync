@@ -4,8 +4,8 @@
    any purpose.
 */
 
-#include <QtTest>
-#include <QTemporaryDir>
+// #include <QtTest>
+// #include <QTemporaryDir>
 
 #include "common/utility.h"
 #include "config.h"
@@ -18,7 +18,6 @@ OCSYNC_EXPORT extern bool fsCasePreserving_override;
 
 class TestUtility : public QObject
 {
-    Q_OBJECT
 
 private slots:
     void initTestCase()

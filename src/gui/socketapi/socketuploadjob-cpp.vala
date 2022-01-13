@@ -19,9 +19,9 @@
 #include "common/syncjournaldb.h"
 #include "syncengine.h"
 
-#include <QFileInfo>
-#include <QJsonArray>
-#include <QRegularExpression>
+// #include <QFileInfo>
+// #include <QJsonArray>
+// #include <QRegularExpression>
 
 using namespace OCC;
 

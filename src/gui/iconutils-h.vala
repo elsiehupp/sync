@@ -12,11 +12,9 @@
  * for more details.
  */
 
-#ifndef ICONUTILS_H
-#define ICONUTILS_H
 
-#include <QColor>
-#include <QPixmap>
+// #include <QColor>
+// #include <QPixmap>
 
 namespace OCC {
 namespace Ui {

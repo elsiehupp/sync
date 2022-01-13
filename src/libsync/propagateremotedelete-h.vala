@@ -11,7 +11,7 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
  */
-#pragma once
+// #pragma once
 
 #include "owncloudpropagator.h"
 #include "networkjobs.h"
@@ -28,7 +28,6 @@ class AbstractPropagateRemoteDeleteEncrypted;
  */
 class PropagateRemoteDelete : public PropagateItemJob
 {
-    Q_OBJECT
     QPointer<DeleteJob> _job;
     AbstractPropagateRemoteDeleteEncrypted *_deleteEncryptedHelper = nullptr;
 

@@ -12,9 +12,9 @@
  * for more details.
  */
 
-#include <QLoggingCategory>
-#include <QString>
-#include <QCoreApplication>
+// #include <QLoggingCategory>
+// #include <QString>
+// #include <QCoreApplication>
 
 #include "common/asserts.h"
 #include "creds/abstractcredentials.h"

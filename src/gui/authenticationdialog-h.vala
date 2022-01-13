@@ -12,10 +12,8 @@
  * for more details.
  */
 
-#ifndef MIRALL_AUTHENTICATIONDIALOG_H
-#define MIRALL_AUTHENTICATIONDIALOG_H
 
-#include <QDialog>
+// #include <QDialog>
 
 class QLineEdit;
 
@@ -27,7 +25,6 @@ namespace OCC {
  */
 class AuthenticationDialog : public QDialog
 {
-    Q_OBJECT
 public:
     AuthenticationDialog(const QString &realm, const QString &domain, QWidget *parent = nullptr);
 

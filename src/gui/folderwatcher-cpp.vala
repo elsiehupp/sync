@@ -15,14 +15,14 @@
 // event masks
 #include "folderwatcher.h"
 
-#include <cstdint>
+// #include <cstdint>
 
-#include <QFileInfo>
-#include <QFlags>
-#include <QDir>
-#include <QMutexLocker>
-#include <QStringList>
-#include <QTimer>
+// #include <QFileInfo>
+// #include <QFlags>
+// #include <QDir>
+// #include <QMutexLocker>
+// #include <QStringList>
+// #include <QTimer>
 
 #if defined(Q_OS_WIN)
 #include "folderwatcher_win.h"

@@ -17,18 +17,16 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-#ifndef _TORTURE_H
-#define _TORTURE_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <stdarg.h> // NOLINT sometimes compiled in C mode
-#include <stddef.h> // NOLINT sometimes compiled in C mode
-#include <setjmp.h> // NOLINT sometimes compiled in C mode
+// #include <stdarg.h> // NOLINT sometimes compiled in C mode
+// #include <stddef.h> // NOLINT sometimes compiled in C mode
+// #include <setjmp.h> // NOLINT sometimes compiled in C mode
 
-#include <cmocka.h>
+// #include <cmocka.h>
 
 /* Used by main to communicate with parse_opt. */
 struct argument_s {

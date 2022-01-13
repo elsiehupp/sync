@@ -12,10 +12,10 @@
  * for more details.
  */
 
-#include <QTest>
-#include <QVector>
-#include <QWebSocketServer>
-#include <QSignalSpy>
+// #include <QTest>
+// #include <QVector>
+// #include <QWebSocketServer>
+// #include <QSignalSpy>
 
 #include "accountfwd.h"
 #include "pushnotifications.h"
@@ -62,7 +62,6 @@ bool failThreeAuthenticationAttempts(FakeWebSocketServer &fakeServer, OCC::Accou
 
 class TestPushNotifications : public QObject
 {
-    Q_OBJECT
 
 private slots:
     void testTryReconnect_capabilitesReportPushNotificationsAvailable_reconnectForEver()

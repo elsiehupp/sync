@@ -12,16 +12,16 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
 #include "owncloudpropagator.h"
 #include "abstractnetworkjob.h"
 
-#include <QLoggingCategory>
-#include <QVector>
-#include <QMap>
-#include <QByteArray>
-#include <deque>
+// #include <QLoggingCategory>
+// #include <QVector>
+// #include <QMap>
+// #include <QByteArray>
+// #include <deque>
 
 namespace OCC {
 
@@ -32,7 +32,6 @@ class PutMultiFileJob;
 
 class BulkPropagatorJob : public PropagatorJob
 {
-    Q_OBJECT
 
     /* This is a minified version of the SyncFileItem,
      * that holds only the specifics about the file that's

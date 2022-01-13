@@ -12,10 +12,8 @@
  * for more details.
  */
 
-#ifndef CLOUDPROVIDER_H
-#define CLOUDPROVIDER_H
 
-#include <QObject>
+// #include <QObject>
 #include "folderman.h"
 
 /* Forward declaration required since gio header files interfere with QObject headers */
@@ -36,7 +34,6 @@ using namespace OCC;
 
 class CloudProviderWrapper : public QObject
 {
-    Q_OBJECT
 public:
     explicit CloudProviderWrapper(QObject *parent = nullptr, Folder *folder = nullptr, int folderId = 0, CloudProvidersProviderExporter* cloudprovider = nullptr);
     ~CloudProviderWrapper() override;

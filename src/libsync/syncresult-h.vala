@@ -12,12 +12,10 @@
  * for more details.
  */
 
-#ifndef MIRALL_SYNCRESULT_H
-#define MIRALL_SYNCRESULT_H
 
-#include <QStringList>
-#include <QHash>
-#include <QDateTime>
+// #include <QStringList>
+// #include <QHash>
+// #include <QDateTime>
 
 #include "owncloudlib.h"
 #include "syncfileitem.h"

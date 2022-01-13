@@ -12,23 +12,22 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
 #include "account.h"
 #include "accountfwd.h"
 #include "accountstate.h"
 #include "folderman.h"
 
-#include <theme.h>
-#include <folder.h>
+// #include <theme.h>
+// #include <folder.h>
 
-#include <QObject>
+// #include <QObject>
 
 namespace OCC {
 
 class SyncStatusSummary : public QObject
 {
-    Q_OBJECT
 
     Q_PROPERTY(double syncProgress READ syncProgress NOTIFY syncProgressChanged)
     Q_PROPERTY(QUrl syncIcon READ syncIcon NOTIFY syncIconChanged)

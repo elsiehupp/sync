@@ -14,17 +14,17 @@
  * for more details.
  */
 
-#include <iostream>
-#include <random>
-#include <qcoreapplication.h>
-#include <QStringList>
-#include <QUrl>
-#include <QFile>
-#include <QFileInfo>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QNetworkProxy>
-#include <qdebug.h>
+// #include <iostream>
+// #include <random>
+// #include <qcoreapplication.h>
+// #include <QStringList>
+// #include <QUrl>
+// #include <QFile>
+// #include <QFileInfo>
+// #include <QJsonDocument>
+// #include <QJsonObject>
+// #include <QNetworkProxy>
+// #include <qdebug.h>
 
 #include "account.h"
 #include "configfile.h" // ONLY ACCESS THE STATIC FUNCTIONS!
@@ -49,10 +49,10 @@
 #include "config.h"
 
 #ifdef Q_OS_WIN32
-#include <windows.h>
+// #include <windows.h>
 #else
-#include <termios.h>
-#include <unistd.h>
+// #include <termios.h>
+// #include <unistd.h>
 #endif
 
 using namespace OCC;

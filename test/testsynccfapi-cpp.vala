@@ -5,11 +5,11 @@
  *
  */
 
-#include <QtTest>
+// #include <QtTest>
 #include "syncenginetestutils.h"
 #include "common/vfs.h"
 #include "config.h"
-#include <syncengine.h>
+// #include <syncengine.h>
 
 #include "vfs/cfapi/cfapiwrapper.h"
 
@@ -109,7 +109,6 @@ QSharedPointer<Vfs> setupVfs(FakeFolder &folder)
 
 class TestSyncCfApi : public QObject
 {
-    Q_OBJECT
 
 private slots:
     void testVirtualFileLifecycle_data()

@@ -5,10 +5,10 @@
  *
  */
 
-#include <QtTest>
+// #include <QtTest>
 #include "syncenginetestutils.h"
-#include <syncengine.h>
-#include <localdiscoverytracker.h>
+// #include <syncengine.h>
+// #include <localdiscoverytracker.h>
 
 using namespace OCC;
 
@@ -45,7 +45,6 @@ Q_DECLARE_METATYPE(ErrorCategory)
 
 class TestRemoteDiscovery : public QObject
 {
-    Q_OBJECT
 
 private slots:
 

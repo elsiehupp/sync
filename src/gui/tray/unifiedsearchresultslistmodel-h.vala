@@ -12,13 +12,13 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
 #include "unifiedsearchresult.h"
 
-#include <limits>
+// #include <limits>
 
-#include <QtCore>
+// #include <QtCore>
 
 namespace OCC {
 class AccountState;
@@ -31,7 +31,6 @@ class AccountState;
 
 class UnifiedSearchResultsListModel : public QAbstractListModel
 {
-    Q_OBJECT
 
     Q_PROPERTY(bool isSearchInProgress READ isSearchInProgress NOTIFY isSearchInProgressChanged)
     Q_PROPERTY(QString currentFetchMoreInProgressProviderId READ currentFetchMoreInProgressProviderId NOTIFY

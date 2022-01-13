@@ -14,8 +14,6 @@
  * for more details.
  */
 
-#ifndef MIRALL_FOLDER_H
-#define MIRALL_FOLDER_H
 
 #include "syncresult.h"
 #include "progressdispatcher.h"
@@ -23,12 +21,12 @@
 #include "networkjobs.h"
 #include "syncoptions.h"
 
-#include <QObject>
-#include <QStringList>
-#include <QUuid>
-#include <set>
-#include <chrono>
-#include <memory>
+// #include <QObject>
+// #include <QStringList>
+// #include <QUuid>
+// #include <set>
+// #include <chrono>
+// #include <memory>
 
 class QThread;
 class QSettings;
@@ -104,7 +102,6 @@ public:
  */
 class Folder : public QObject
 {
-    Q_OBJECT
 
 public:
     enum class ChangeReason {

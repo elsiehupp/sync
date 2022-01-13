@@ -12,10 +12,8 @@
  * for more details.
  */
 
-#ifndef MIRALL_COOKIEJAR_H
-#define MIRALL_COOKIEJAR_H
 
-#include <QNetworkCookieJar>
+// #include <QNetworkCookieJar>
 
 #include "owncloudlib.h"
 
@@ -27,7 +25,6 @@ namespace OCC {
  */
 class OWNCLOUDSYNC_EXPORT CookieJar : public QNetworkCookieJar
 {
-    Q_OBJECT
 public:
     explicit CookieJar(QObject *parent = nullptr);
     ~CookieJar() override;

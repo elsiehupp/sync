@@ -16,15 +16,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <QCryptographicHash>
-#include <QFile>
-#include <QLoggingCategory>
-#include <QStringList>
-#include <QElapsedTimer>
-#include <QUrl>
-#include <QDir>
-#include <sqlite3.h>
-#include <cstring>
+// #include <QCryptographicHash>
+// #include <QFile>
+// #include <QLoggingCategory>
+// #include <QStringList>
+// #include <QElapsedTimer>
+// #include <QUrl>
+// #include <QDir>
+// #include <sqlite3.h>
+// #include <cstring>
 
 #include "common/syncjournaldb.h"
 #include "version.h"

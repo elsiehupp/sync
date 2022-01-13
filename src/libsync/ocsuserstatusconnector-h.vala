@@ -12,12 +12,12 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
 #include "accountfwd.h"
 #include "userstatusconnector.h"
 
-#include <QPointer>
+// #include <QPointer>
 
 namespace OCC {
 

@@ -3,10 +3,10 @@
 #include "accountfwd.h"
 #include "owncloudlib.h"
 
-#include <QObject>
-#include <QPixmap>
-#include <QUrl>
-#include <QString>
+// #include <QObject>
+// #include <QPixmap>
+// #include <QUrl>
+// #include <QString>
 
 namespace OCC {
 
@@ -29,7 +29,6 @@ struct OWNCLOUDSYNC_EXPORT Hovercard
 
 class OWNCLOUDSYNC_EXPORT OcsProfileConnector : public QObject
 {
-    Q_OBJECT
 public:
     explicit OcsProfileConnector(AccountPtr account, QObject *parent = nullptr);
 

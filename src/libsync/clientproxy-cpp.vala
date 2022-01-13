@@ -15,9 +15,9 @@
 #include "clientproxy.h"
 
 #include "configfile.h"
-#include <QLoggingCategory>
-#include <QUrl>
-#include <QThreadPool>
+// #include <QLoggingCategory>
+// #include <QUrl>
+// #include <QThreadPool>
 
 namespace OCC {
 

@@ -12,17 +12,14 @@
  * for more details.
  */
 
-#ifndef ELIDEDLABEL_H
-#define ELIDEDLABEL_H
 
-#include <QLabel>
+// #include <QLabel>
 
 namespace OCC {
 
 /// Label that can elide its text
 class ElidedLabel : public QLabel
 {
-    Q_OBJECT
 public:
     explicit ElidedLabel(QWidget *parent = nullptr);
     explicit ElidedLabel(const QString &text, QWidget *parent = nullptr);

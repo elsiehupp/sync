@@ -24,18 +24,18 @@
 #include "filesystem.h"
 #include "lockwatcher.h"
 #include "common/asserts.h"
-#include <pushnotifications.h>
-#include <syncengine.h>
+// #include <pushnotifications.h>
+// #include <syncengine.h>
 
 #ifdef Q_OS_MAC
-#include <CoreServices/CoreServices.h>
+// #include <CoreServices/CoreServices.h>
 #endif
 
-#include <QMessageBox>
-#include <QtCore>
-#include <QMutableSetIterator>
-#include <QSet>
-#include <QNetworkProxy>
+// #include <QMessageBox>
+// #include <QtCore>
+// #include <QMutableSetIterator>
+// #include <QSet>
+// #include <QNetworkProxy>
 
 static const char versionC[] = "version";
 static const int maxFoldersVersion = 1;

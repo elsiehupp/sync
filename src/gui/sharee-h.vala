@@ -12,17 +12,15 @@
  * for more details.
  */
 
-#ifndef SHAREE_H
-#define SHAREE_H
 
-#include <QObject>
-#include <QFlags>
-#include <QAbstractListModel>
-#include <QLoggingCategory>
-#include <QModelIndex>
-#include <QVariant>
-#include <QSharedPointer>
-#include <QVector>
+// #include <QObject>
+// #include <QFlags>
+// #include <QAbstractListModel>
+// #include <QLoggingCategory>
+// #include <QModelIndex>
+// #include <QVariant>
+// #include <QSharedPointer>
+// #include <QVector>
 
 #include "accountfwd.h"
 
@@ -64,7 +62,6 @@ private:
 
 class ShareeModel : public QAbstractListModel
 {
-    Q_OBJECT
 public:
     enum LookupMode {
         LocalSearch = 0,

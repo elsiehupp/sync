@@ -12,13 +12,13 @@
  * for more details.
  */
 
-#include <QtCore>
-#include <QAbstractListModel>
-#include <QDesktopServices>
-#include <QWidget>
-#include <QJsonObject>
-#include <QJsonDocument>
-#include <qloggingcategory.h>
+// #include <QtCore>
+// #include <QAbstractListModel>
+// #include <QDesktopServices>
+// #include <QWidget>
+// #include <QJsonObject>
+// #include <QJsonDocument>
+// #include <qloggingcategory.h>
 
 #include "account.h"
 #include "accountstate.h"

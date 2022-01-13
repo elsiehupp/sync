@@ -27,10 +27,8 @@
 **
 ****************************************************************************/
 
-#ifndef QTSINGLEAPPLICATION_H
-#define QTSINGLEAPPLICATION_H
 
-#include <QApplication>
+// #include <QApplication>
 
 QT_FORWARD_DECLARE_CLASS(QSharedMemory)
 
@@ -40,7 +38,6 @@ class QtLocalPeer;
 
 class QtSingleApplication : public QApplication
 {
-    Q_OBJECT
 
 public:
     QtSingleApplication(const QString &id, int &argc, char **argv);

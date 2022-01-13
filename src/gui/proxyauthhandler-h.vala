@@ -12,17 +12,17 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
 #include "owncloudgui.h"
-#include <QObject>
-#include <QString>
-#include <QNetworkProxy>
-#include <QAuthenticator>
-#include <QPointer>
-#include <QScopedPointer>
-#include <QSettings>
-#include <QSet>
+// #include <QObject>
+// #include <QString>
+// #include <QNetworkProxy>
+// #include <QAuthenticator>
+// #include <QPointer>
+// #include <QScopedPointer>
+// #include <QSettings>
+// #include <QSet>
 
 namespace QKeychain {
 class Job;
@@ -44,7 +44,6 @@ class ProxyAuthDialog;
  */
 class ProxyAuthHandler : public QObject
 {
-    Q_OBJECT
 
 public:
     static ProxyAuthHandler *instance();

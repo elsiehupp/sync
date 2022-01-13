@@ -1,10 +1,9 @@
-#include <QTest>
+// #include <QTest>
 
 #include "tray/notificationcache.h"
 
 class TestNotificationCache : public QObject
 {
-    Q_OBJECT
 
 private slots:
     void testContains_doesNotContainNotification_returnsFalse()

@@ -12,16 +12,16 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
 #include "owncloudlib.h"
 #include "common/vfs.h"
 
-#include <QRegularExpression>
-#include <QSharedPointer>
-#include <QString>
+// #include <QRegularExpression>
+// #include <QSharedPointer>
+// #include <QString>
 
-#include <chrono>
+// #include <chrono>
 
 
 namespace OCC {

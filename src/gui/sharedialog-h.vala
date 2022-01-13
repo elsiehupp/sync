@@ -12,18 +12,16 @@
  * for more details.
  */
 
-#ifndef SHAREDIALOG_H
-#define SHAREDIALOG_H
 
 #include "accountstate.h"
 #include "sharepermissions.h"
 #include "owncloudgui.h"
 
-#include <QSharedPointer>
-#include <QPointer>
-#include <QString>
-#include <QDialog>
-#include <QWidget>
+// #include <QSharedPointer>
+// #include <QPointer>
+// #include <QString>
+// #include <QDialog>
+// #include <QWidget>
 
 class QProgressIndicator;
 
@@ -41,7 +39,6 @@ class Share;
 
 class ShareDialog : public QDialog
 {
-    Q_OBJECT
 
 public:
     explicit ShareDialog(QPointer<AccountState> accountState,

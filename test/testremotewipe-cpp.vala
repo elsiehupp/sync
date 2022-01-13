@@ -5,9 +5,9 @@
  *
  */
 
-#include <qglobal.h>
-#include <QTemporaryDir>
-#include <QtTest>
+// #include <qglobal.h>
+// #include <QTemporaryDir>
+// #include <QtTest>
 
 #include "remotewipe.h"
 
@@ -23,7 +23,6 @@ using namespace OCC;
 
 class TestRemoteWipe: public QObject
 {
-    Q_OBJECT
 
 private slots:
     // TODO

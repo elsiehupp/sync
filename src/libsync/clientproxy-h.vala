@@ -12,15 +12,13 @@
  * for more details.
  */
 
-#ifndef CLIENTPROXY_H
-#define CLIENTPROXY_H
 
-#include <QObject>
-#include <QNetworkProxy>
-#include <QRunnable>
-#include <QUrl>
+// #include <QObject>
+// #include <QNetworkProxy>
+// #include <QRunnable>
+// #include <QUrl>
 
-#include <csync.h>
+// #include <csync.h>
 #include "common/utility.h"
 #include "owncloudlib.h"
 
@@ -34,7 +32,6 @@ class ConfigFile;
  */
 class OWNCLOUDSYNC_EXPORT ClientProxy : public QObject
 {
-    Q_OBJECT
 public:
     explicit ClientProxy(QObject *parent = nullptr);
 
@@ -50,7 +47,6 @@ public slots:
 
 class OWNCLOUDSYNC_EXPORT SystemProxyRunnable : public QObject, public QRunnable
 {
-    Q_OBJECT
 public:
     SystemProxyRunnable(const QUrl &url);
     void run() override;

@@ -13,13 +13,11 @@
  * for more details.
  */
 
-#ifndef MIRALL_CREDS_HTTP_CREDENTIALS_H
-#define MIRALL_CREDS_HTTP_CREDENTIALS_H
 
-#include <QMap>
-#include <QSslCertificate>
-#include <QSslKey>
-#include <QNetworkRequest>
+// #include <QMap>
+// #include <QSslCertificate>
+// #include <QSslKey>
+// #include <QNetworkRequest>
 #include "creds/abstractcredentials.h"
 
 class QNetworkReply;
@@ -72,7 +70,6 @@ namespace OCC {
  */
 class OWNCLOUDSYNC_EXPORT HttpCredentials : public AbstractCredentials
 {
-    Q_OBJECT
     friend class HttpCredentialsAccessManager;
 
 public:

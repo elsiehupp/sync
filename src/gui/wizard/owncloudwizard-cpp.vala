@@ -32,12 +32,12 @@
 
 #include "QProgressIndicator.h"
 
-#include <QtCore>
-#include <QtGui>
-#include <QMessageBox>
-#include <owncloudgui.h>
+// #include <QtCore>
+// #include <QtGui>
+// #include <QMessageBox>
+// #include <owncloudgui.h>
 
-#include <cstdlib>
+// #include <cstdlib>
 
 namespace OCC {
 

@@ -15,7 +15,7 @@
 #include "syncoptions.h"
 #include "common/utility.h"
 
-#include <QRegularExpression>
+// #include <QRegularExpression>
 
 using namespace OCC;
 

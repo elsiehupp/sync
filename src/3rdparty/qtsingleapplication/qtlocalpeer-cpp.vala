@@ -29,20 +29,20 @@
 
 #include "qtlocalpeer.h"
 
-#include <QCoreApplication>
-#include <QDataStream>
-#include <QTime>
+// #include <QCoreApplication>
+// #include <QDataStream>
+// #include <QTime>
 
 #if defined(Q_OS_WIN)
-#include <QLibrary>
-#include <qt_windows.h>
+// #include <QLibrary>
+// #include <qt_windows.h>
 using PProcessIdToSessionId = BOOL (WINAPI*)(DWORD, DWORD*);
 static PProcessIdToSessionId pProcessIdToSessionId = 0;
 #endif
 
 #if defined(Q_OS_UNIX)
-#include <ctime>
-#include <unistd.h>
+// #include <ctime>
+// #include <unistd.h>
 #endif
 
 namespace SharedTools {

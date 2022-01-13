@@ -12,10 +12,8 @@
  * for more details.
  */
 
-#ifndef FOLDERCREATIONDIALOG_H
-#define FOLDERCREATIONDIALOG_H
 
-#include <QDialog>
+// #include <QDialog>
 
 namespace OCC {
 
@@ -25,7 +23,6 @@ class FolderCreationDialog;
 
 class FolderCreationDialog : public QDialog
 {
-    Q_OBJECT
 
 public:
     explicit FolderCreationDialog(const QString &destination, QWidget *parent = nullptr);

@@ -21,8 +21,8 @@
 #include "common/asserts.h"
 #include "encryptfolderjob.h"
 
-#include <QFile>
-#include <QLoggingCategory>
+// #include <QFile>
+// #include <QLoggingCategory>
 
 namespace OCC {
 

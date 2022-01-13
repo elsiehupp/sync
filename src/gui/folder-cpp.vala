@@ -37,14 +37,14 @@
 #include "creds/abstractcredentials.h"
 #include "settingsdialog.h"
 
-#include <QTimer>
-#include <QUrl>
-#include <QDir>
-#include <QSettings>
+// #include <QTimer>
+// #include <QUrl>
+// #include <QDir>
+// #include <QSettings>
 
-#include <QMessageBox>
-#include <QPushButton>
-#include <QApplication>
+// #include <QMessageBox>
+// #include <QPushButton>
+// #include <QApplication>
 
 static const char versionC[] = "version";
 

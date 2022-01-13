@@ -17,8 +17,8 @@
 #include "configfile.h"
 #include "folderman.h"
 
-#include <QDir>
-#include <QCoreApplication>
+// #include <QDir>
+// #include <QCoreApplication>
 
 namespace OCC {
 

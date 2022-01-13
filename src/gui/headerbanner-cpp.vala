@@ -60,12 +60,12 @@
 
 #include "headerbanner.h"
 
-#include <QVBoxLayout>
-#include <QLabel>
+// #include <QVBoxLayout>
+// #include <QLabel>
 
-#include <QPainter>
-#include <QStyle>
-#include <QGuiApplication>
+// #include <QPainter>
+// #include <QStyle>
+// #include <QGuiApplication>
 
 namespace OCC {
 

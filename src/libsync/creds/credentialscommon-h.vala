@@ -13,8 +13,6 @@
  * for more details.
  */
 
-#ifndef MIRALL_CREDS_COMMON_H
-#define MIRALL_CREDS_COMMON_H
 
 #include "owncloudlib.h"
 

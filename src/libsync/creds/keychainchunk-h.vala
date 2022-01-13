@@ -12,12 +12,10 @@
  * for more details.
  */
 
-#pragma once
-#ifndef KEYCHAINCHUNK_H
-#define KEYCHAINCHUNK_H
+// #pragma once
 
-#include <QObject>
-#include <qt5keychain/keychain.h>
+// #include <QObject>
+// #include <qt5keychain/keychain.h>
 #include "accountfwd.h"
 
 // We don't support insecure fallback
@@ -41,7 +39,6 @@ static constexpr int MaxChunks = 10;
  */
 class OWNCLOUDSYNC_EXPORT Job : public QObject
 {
-    Q_OBJECT
 public:
     Job(QObject *parent = nullptr);
 
@@ -92,7 +89,6 @@ protected:
 */
 class OWNCLOUDSYNC_EXPORT WriteJob : public KeychainChunk::Job
 {
-    Q_OBJECT
 public:
     WriteJob(Account *account, const QString &key, const QByteArray &data, QObject *parent = nullptr);
     WriteJob(const QString &key, const QByteArray &data, QObject *parent = nullptr);
@@ -125,7 +121,6 @@ private slots:
 */
 class OWNCLOUDSYNC_EXPORT ReadJob : public KeychainChunk::Job
 {
-    Q_OBJECT
 public:
     ReadJob(Account *account, const QString &key, bool keychainMigration, QObject *parent = nullptr);
     ReadJob(const QString &key, QObject *parent = nullptr);
@@ -163,7 +158,6 @@ private:
 */
 class OWNCLOUDSYNC_EXPORT DeleteJob : public KeychainChunk::Job
 {
-    Q_OBJECT
 public:
     DeleteJob(Account *account, const QString &key, bool keychainMigration, QObject *parent = nullptr);
     DeleteJob(const QString &key, QObject *parent = nullptr);

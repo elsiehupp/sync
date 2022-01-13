@@ -5,16 +5,15 @@
  *
  */
 
-#include <QtTest>
+// #include <QtTest>
 #include "syncenginetestutils.h"
-#include <syncengine.h>
-#include <common/syncjournaldb.h>
+// #include <syncengine.h>
+// #include <common/syncjournaldb.h>
 
 using namespace OCC;
 
 class TestUploadReset : public QObject
 {
-    Q_OBJECT
 
 private slots:
 

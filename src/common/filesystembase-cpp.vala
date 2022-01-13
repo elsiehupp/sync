@@ -20,21 +20,21 @@
 #include "utility.h"
 #include "common/asserts.h"
 
-#include <QDateTime>
-#include <QDir>
-#include <QUrl>
-#include <QFile>
-#include <QCoreApplication>
+// #include <QDateTime>
+// #include <QDir>
+// #include <QUrl>
+// #include <QFile>
+// #include <QCoreApplication>
 
-#include <sys/stat.h>
-#include <sys/types.h>
+// #include <sys/stat.h>
+// #include <sys/types.h>
 
 #ifdef Q_OS_WIN
-#include <windows.h>
-#include <windef.h>
-#include <winbase.h>
-#include <fcntl.h>
-#include <io.h>
+// #include <windows.h>
+// #include <windef.h>
+// #include <winbase.h>
+// #include <fcntl.h>
+// #include <io.h>
 #endif
 
 namespace OCC {

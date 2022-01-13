@@ -13,11 +13,11 @@
  */
 
 #include "slideshow.h"
-#include <QGuiApplication>
-#include <QMouseEvent>
-#include <QPainter>
-#include <QStyle>
-#include <QStyleHints>
+// #include <QGuiApplication>
+// #include <QMouseEvent>
+// #include <QPainter>
+// #include <QStyle>
+// #include <QStyleHints>
 
 #define HASQT5_11 (QT_VERSION >= QT_VERSION_CHECK(5,11,0))
 

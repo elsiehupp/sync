@@ -25,32 +25,32 @@
 #include "pushnotifications.h"
 #include "version.h"
 
-#include <deletejob.h>
+// #include <deletejob.h>
 
 #include "common/asserts.h"
 #include "clientsideencryption.h"
 #include "ocsuserstatusconnector.h"
 
-#include <QLoggingCategory>
-#include <QNetworkReply>
-#include <QNetworkAccessManager>
-#include <QSslSocket>
-#include <QNetworkCookieJar>
-#include <QNetworkProxy>
+// #include <QLoggingCategory>
+// #include <QNetworkReply>
+// #include <QNetworkAccessManager>
+// #include <QSslSocket>
+// #include <QNetworkCookieJar>
+// #include <QNetworkProxy>
 
-#include <QFileInfo>
-#include <QDir>
-#include <QSslKey>
-#include <QAuthenticator>
-#include <QStandardPaths>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QLoggingCategory>
-#include <QHttpMultiPart>
+// #include <QFileInfo>
+// #include <QDir>
+// #include <QSslKey>
+// #include <QAuthenticator>
+// #include <QStandardPaths>
+// #include <QJsonDocument>
+// #include <QJsonObject>
+// #include <QJsonArray>
+// #include <QLoggingCategory>
+// #include <QHttpMultiPart>
 
-#include <qsslconfiguration.h>
-#include <qt5keychain/keychain.h>
+// #include <qsslconfiguration.h>
+// #include <qt5keychain/keychain.h>
 #include "creds/abstractcredentials.h"
 
 using namespace QKeychain;

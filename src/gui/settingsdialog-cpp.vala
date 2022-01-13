@@ -25,20 +25,20 @@
 #include "owncloudgui.h"
 #include "accountmanager.h"
 
-#include <QLabel>
-#include <QStandardItemModel>
-#include <QStackedWidget>
-#include <QPushButton>
-#include <QSettings>
-#include <QToolBar>
-#include <QToolButton>
-#include <QLayout>
-#include <QVBoxLayout>
-#include <QPixmap>
-#include <QImage>
-#include <QWidgetAction>
-#include <QPainter>
-#include <QPainterPath>
+// #include <QLabel>
+// #include <QStandardItemModel>
+// #include <QStackedWidget>
+// #include <QPushButton>
+// #include <QSettings>
+// #include <QToolBar>
+// #include <QToolButton>
+// #include <QLayout>
+// #include <QVBoxLayout>
+// #include <QPixmap>
+// #include <QImage>
+// #include <QWidgetAction>
+// #include <QPainter>
+// #include <QPainterPath>
 
 namespace {
 const QString TOOLBAR_CSS()

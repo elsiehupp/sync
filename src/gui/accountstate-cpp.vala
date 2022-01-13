@@ -22,15 +22,15 @@
 #include "configfile.h"
 #include "ocsnavigationappsjob.h"
 
-#include <QSettings>
-#include <QTimer>
-#include <qfontmetrics.h>
+// #include <QSettings>
+// #include <QTimer>
+// #include <qfontmetrics.h>
 
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QNetworkRequest>
-#include <QBuffer>
+// #include <QJsonDocument>
+// #include <QJsonObject>
+// #include <QJsonArray>
+// #include <QNetworkRequest>
+// #include <QBuffer>
 
 namespace OCC {
 

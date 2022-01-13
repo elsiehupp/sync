@@ -19,11 +19,11 @@
 #include "networkjobs.h"
 #include "folderman.h"
 #include "creds/abstractcredentials.h"
-#include <theme.h>
+// #include <theme.h>
 
-#include <QTimer>
-#include <QJsonDocument>
-#include <QJsonObject>
+// #include <QTimer>
+// #include <QJsonDocument>
+// #include <QJsonObject>
 
 namespace OCC {
 

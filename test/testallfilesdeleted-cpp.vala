@@ -5,10 +5,10 @@
  *
  */
 
-#include <QtTest>
+// #include <QtTest>
 #include "syncenginetestutils.h"
-#include <syncengine.h>
-#include <configfile.h>
+// #include <syncengine.h>
+// #include <configfile.h>
 
 using namespace OCC;
 
@@ -29,7 +29,6 @@ static void changeAllFileId(FileInfo &info) {
  */
 class TestAllFilesDeleted : public QObject
 {
-    Q_OBJECT
 
 private slots:
 

@@ -12,13 +12,11 @@
  * for more details.
  */
 
-#ifndef OCC_SLIDESHOW_H
-#define OCC_SLIDESHOW_H
 
-#include <QWidget>
-#include <QBasicTimer>
-#include <QPointer>
-#include <QVariantAnimation>
+// #include <QWidget>
+// #include <QBasicTimer>
+// #include <QPointer>
+// #include <QVariantAnimation>
 
 namespace OCC {
 
@@ -28,7 +26,6 @@ namespace OCC {
  */
 class SlideShow : public QWidget
 {
-    Q_OBJECT
     Q_PROPERTY(int interval READ interval WRITE setInterval)
     Q_PROPERTY(int currentSlide READ currentSlide WRITE setCurrentSlide NOTIFY currentSlideChanged)
 

@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#ifndef OCSSHAREEJOB_H
-#define OCSSHAREEJOB_H
 
 #include "ocsjob.h"
 
@@ -29,7 +27,6 @@ namespace OCC {
  */
 class OcsShareeJob : public OcsJob
 {
-    Q_OBJECT
 public:
     explicit OcsShareeJob(AccountPtr account);
 

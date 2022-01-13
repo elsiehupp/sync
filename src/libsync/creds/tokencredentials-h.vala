@@ -13,10 +13,8 @@
  * for more details.
  */
 
-#ifndef MIRALL_CREDS_HTTP_CREDENTIALS_H
-#define MIRALL_CREDS_HTTP_CREDENTIALS_H
 
-#include <QMap>
+// #include <QMap>
 
 #include "creds/abstractcredentials.h"
 
@@ -32,7 +30,6 @@ namespace OCC {
 class TokenCredentialsAccessManager;
 class OWNCLOUDSYNC_EXPORT TokenCredentials : public AbstractCredentials
 {
-    Q_OBJECT
 
 public:
     friend class TokenCredentialsAccessManager;

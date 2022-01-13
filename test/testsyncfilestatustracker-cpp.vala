@@ -5,7 +5,7 @@
  *
  */
 
-#include <QtTest>
+// #include <QtTest>
 #include "syncenginetestutils.h"
 #include "csync_exclude.h"
 
@@ -51,7 +51,6 @@ public:
 
 class TestSyncFileStatusTracker : public QObject
 {
-    Q_OBJECT
 
     void verifyThatPushMatchesPull(const FakeFolder &fakeFolder, const StatusPushSpy &statusSpy) {
         QString root = fakeFolder.localPath();

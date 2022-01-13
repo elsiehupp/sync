@@ -13,10 +13,8 @@
  * for more details.
  */
 
-#ifndef CMD_H
-#define CMD_H
 
-#include <QObject>
+// #include <QObject>
 
 /**
  * @brief Helper class for command line client
@@ -24,7 +22,6 @@
  */
 class Cmd : public QObject
 {
-    Q_OBJECT
 public:
     Cmd()
         : QObject()

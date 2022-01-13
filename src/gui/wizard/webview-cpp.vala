@@ -1,20 +1,20 @@
 #include "webview.h"
 
-#include <QWebEnginePage>
-#include <QWebEngineProfile>
-#include <QWebEngineUrlRequestInterceptor>
-#include <QWebEngineUrlRequestJob>
+// #include <QWebEnginePage>
+// #include <QWebEngineProfile>
+// #include <QWebEngineUrlRequestInterceptor>
+// #include <QWebEngineUrlRequestJob>
 #if QT_VERSION >= 0x051200
-#include <QWebEngineUrlScheme>
+// #include <QWebEngineUrlScheme>
 #endif
-#include <QWebEngineUrlSchemeHandler>
-#include <QWebEngineView>
-#include <QDesktopServices>
-#include <QProgressBar>
-#include <QLoggingCategory>
-#include <QLocale>
-#include <QWebEngineCertificateError>
-#include <QMessageBox>
+// #include <QWebEngineUrlSchemeHandler>
+// #include <QWebEngineView>
+// #include <QDesktopServices>
+// #include <QProgressBar>
+// #include <QLoggingCategory>
+// #include <QLocale>
+// #include <QWebEngineCertificateError>
+// #include <QMessageBox>
 
 #include "guiutility.h"
 #include "common/utility.h"
@@ -26,7 +26,6 @@ Q_LOGGING_CATEGORY(lcWizardWebiew, "nextcloud.gui.wizard.webview", QtInfoMsg)
 
 class WebViewPageUrlRequestInterceptor : public QWebEngineUrlRequestInterceptor
 {
-    Q_OBJECT
 public:
     WebViewPageUrlRequestInterceptor(QObject *parent = nullptr);
     void interceptRequest(QWebEngineUrlRequestInfo &info) override;
@@ -34,7 +33,6 @@ public:
 
 class WebViewPageUrlSchemeHandler : public QWebEngineUrlSchemeHandler
 {
-    Q_OBJECT
 public:
     WebViewPageUrlSchemeHandler(QObject *parent = nullptr);
     void requestStarted(QWebEngineUrlRequestJob *request) override;
@@ -44,7 +42,6 @@ Q_SIGNALS:
 };
 
 class WebEnginePage : public QWebEnginePage {
-    Q_OBJECT
 public:
     WebEnginePage(QWebEngineProfile *profile, QObject* parent = nullptr);
     QWebEnginePage * createWindow(QWebEnginePage::WebWindowType type) override;
@@ -62,7 +59,6 @@ private:
 // We need a separate class here, since we cannot simply return the same WebEnginePage object
 // this leads to a strage segfault somewhere deep inside of the QWebEngine code
 class ExternalWebEnginePage : public QWebEnginePage {
-    Q_OBJECT
 public:
     ExternalWebEnginePage(QWebEngineProfile *profile, QObject* parent = nullptr);
     bool acceptNavigationRequest(const QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame) override;

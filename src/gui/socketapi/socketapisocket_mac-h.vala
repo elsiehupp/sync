@@ -12,18 +12,15 @@
  * for more details.
  */
 
-#ifndef SOCKETAPISOCKET_OSX_H
-#define SOCKETAPISOCKET_OSX_H
 
-#include <QAbstractSocket>
-#include <QIODevice>
+// #include <QAbstractSocket>
+// #include <QIODevice>
 
 class SocketApiServerPrivate;
 class SocketApiSocketPrivate;
 
 class SocketApiSocket : public QIODevice
 {
-    Q_OBJECT
 public:
     SocketApiSocket(QObject *parent, SocketApiSocketPrivate *p);
     ~SocketApiSocket();
@@ -47,7 +44,6 @@ private:
 
 class SocketApiServer : public QObject
 {
-    Q_OBJECT
 public:
     SocketApiServer();
     ~SocketApiServer();

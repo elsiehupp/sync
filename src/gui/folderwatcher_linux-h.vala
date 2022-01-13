@@ -12,14 +12,12 @@
  * for more details.
  */
 
-#ifndef MIRALL_FOLDERWATCHER_LINUX_H
-#define MIRALL_FOLDERWATCHER_LINUX_H
 
-#include <QObject>
-#include <QString>
-#include <QSocketNotifier>
-#include <QHash>
-#include <QDir>
+// #include <QObject>
+// #include <QString>
+// #include <QSocketNotifier>
+// #include <QHash>
+// #include <QDir>
 
 #include "folderwatcher.h"
 
@@ -33,7 +31,6 @@ namespace OCC {
  */
 class FolderWatcherPrivate : public QObject
 {
-    Q_OBJECT
 public:
     FolderWatcherPrivate() = default;
     FolderWatcherPrivate(FolderWatcher *p, const QString &path);

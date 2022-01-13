@@ -15,11 +15,11 @@
 #include "filesystem.h"
 
 #include "common/utility.h"
-#include <QFile>
-#include <QFileInfo>
-#include <QDir>
-#include <QDirIterator>
-#include <QCoreApplication>
+// #include <QFile>
+// #include <QFileInfo>
+// #include <QDir>
+// #include <QDirIterator>
+// #include <QCoreApplication>
 
 #include "csync.h"
 #include "vio/csync_vio_local.h"

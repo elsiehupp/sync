@@ -15,8 +15,8 @@
 
 #include "ui_addcertificatedialog.h"
 #include "addcertificatedialog.h"
-#include <QFileDialog>
-#include <QLineEdit>
+// #include <QFileDialog>
+// #include <QLineEdit>
 
 
 namespace OCC {

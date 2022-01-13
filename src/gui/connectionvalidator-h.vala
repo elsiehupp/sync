@@ -12,14 +12,12 @@
  * for more details.
  */
 
-#ifndef CONNECTIONVALIDATOR_H
-#define CONNECTIONVALIDATOR_H
 
 #include "owncloudlib.h"
-#include <QObject>
-#include <QStringList>
-#include <QVariantMap>
-#include <QNetworkReply>
+// #include <QObject>
+// #include <QStringList>
+// #include <QVariantMap>
+// #include <QNetworkReply>
 #include "accountfwd.h"
 #include "clientsideencryption.h"
 
@@ -77,7 +75,6 @@ class UserInfo;
 
 class ConnectionValidator : public QObject
 {
-    Q_OBJECT
 public:
     explicit ConnectionValidator(AccountStatePtr accountState, QObject *parent = nullptr);
 

@@ -14,7 +14,7 @@
 
 #include "deletejob.h"
 #include "account.h"
-#include <QLoggingCategory>
+// #include <QLoggingCategory>
 
 namespace OCC {
 

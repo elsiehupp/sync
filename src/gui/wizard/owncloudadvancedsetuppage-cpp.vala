@@ -13,13 +13,13 @@
  * for more details.
  */
 
-#include <QDir>
-#include <QFileDialog>
-#include <QUrl>
-#include <QTimer>
-#include <QStorageInfo>
-#include <QMessageBox>
-#include <QJsonObject>
+// #include <QDir>
+// #include <QFileDialog>
+// #include <QUrl>
+// #include <QTimer>
+// #include <QStorageInfo>
+// #include <QMessageBox>
+// #include <QJsonObject>
 
 #include "QProgressIndicator.h"
 
@@ -30,7 +30,7 @@
 #include "theme.h"
 #include "configfile.h"
 #include "selectivesyncdialog.h"
-#include <folderman.h>
+// #include <folderman.h>
 #include "creds/abstractcredentials.h"
 #include "networkjobs.h"
 #include "wizard/owncloudwizard.h"

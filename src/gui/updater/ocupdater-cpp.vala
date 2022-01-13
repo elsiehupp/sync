@@ -19,13 +19,13 @@
 
 #include "updater/ocupdater.h"
 
-#include <QObject>
-#include <QtCore>
-#include <QtNetwork>
-#include <QtGui>
-#include <QtWidgets>
+// #include <QObject>
+// #include <QtCore>
+// #include <QtNetwork>
+// #include <QtGui>
+// #include <QtWidgets>
 
-#include <cstdio>
+// #include <cstdio>
 
 namespace OCC {
 

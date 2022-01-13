@@ -5,8 +5,8 @@
  *
  */
 
-#include <QtTest/QtTest>
-#include <QDesktopServices>
+// #include <QtTest/QtTest>
+// #include <QDesktopServices>
 
 #include "gui/creds/oauth.h"
 #include "syncenginetestutils.h"
@@ -17,7 +17,6 @@ using namespace OCC;
 
 class DesktopServiceHook : public QObject
 {
-    Q_OBJECT
 signals:
     void hooked(const QUrl &);
 public:
@@ -29,7 +28,6 @@ static const QUrl sOAuthTestServer("oauthtest://someserver/owncloud");
 
 class FakePostReply : public QNetworkReply
 {
-    Q_OBJECT
 public:
     std::unique_ptr<QIODevice> payload;
     bool aborted = false;
@@ -97,7 +95,6 @@ public:
 
 // Reply with a small delay
 class SlowFakePostReply : public FakePostReply {
-    Q_OBJECT
 public:
     using FakePostReply::FakePostReply;
     void respond() override {
@@ -109,7 +106,6 @@ public:
 
 class OAuthTestCase : public QObject
 {
-    Q_OBJECT
     DesktopServiceHook desktopServiceHook;
 public:
     enum State { StartState, BrowserOpened, TokenAsked, CustomState } state = StartState;
@@ -210,7 +206,6 @@ public:
 
 class TestOAuth: public QObject
 {
-    Q_OBJECT
 
 private slots:
     void testBasic()

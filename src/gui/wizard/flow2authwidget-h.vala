@@ -15,8 +15,8 @@
 #ifndef FLOW2AUTHWIDGET_H
 #define FLOW2AUTHWIDGET_H
 
-#include <QUrl>
-#include <QWidget>
+// #include <QUrl>
+// #include <QWidget>
 
 #include "creds/flow2auth.h"
 
@@ -28,7 +28,6 @@ namespace OCC {
 
 class Flow2AuthWidget : public QWidget
 {
-    Q_OBJECT
 public:
     Flow2AuthWidget(QWidget *parent = nullptr);
     ~Flow2AuthWidget() override;

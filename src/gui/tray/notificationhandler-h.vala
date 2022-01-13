@@ -1,7 +1,7 @@
 #ifndef NOTIFICATIONHANDLER_H
 #define NOTIFICATIONHANDLER_H
 
-#include <QtCore>
+// #include <QtCore>
 
 #include "usermodel.h"
 
@@ -11,7 +11,6 @@ namespace OCC {
 
 class ServerNotificationHandler : public QObject
 {
-    Q_OBJECT
 public:
     explicit ServerNotificationHandler(AccountState *accountState, QObject *parent = nullptr);
 

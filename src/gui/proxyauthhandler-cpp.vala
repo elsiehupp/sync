@@ -19,9 +19,9 @@
 #include "configfile.h"
 #include "account.h"
 
-#include <QApplication>
+// #include <QApplication>
 
-#include <qt5keychain/keychain.h>
+// #include <qt5keychain/keychain.h>
 
 using namespace OCC;
 using namespace QKeychain;

@@ -31,15 +31,15 @@
 #include "clientsideencryption.h"
 #include "clientsideencryptionjobs.h"
 
-#include <QNetworkAccessManager>
-#include <QFileInfo>
-#include <QDir>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QFileInfo>
+// #include <QNetworkAccessManager>
+// #include <QFileInfo>
+// #include <QDir>
+// #include <QJsonDocument>
+// #include <QJsonObject>
+// #include <QFileInfo>
 
-#include <cmath>
-#include <cstring>
+// #include <cmath>
+// #include <cstring>
 
 namespace OCC {
 

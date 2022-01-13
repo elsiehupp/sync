@@ -12,10 +12,8 @@
  * for more details.
  */
 
-#ifndef MIRALL_WIZARD_ABSTRACT_CREDS_WIZARD_PAGE_H
-#define MIRALL_WIZARD_ABSTRACT_CREDS_WIZARD_PAGE_H
 
-#include <QWizardPage>
+// #include <QWizardPage>
 
 namespace OCC {
 

@@ -13,17 +13,17 @@
  * for more details.
  */
 
-#include <QInputDialog>
-#include <QLabel>
-#include <QDesktopServices>
-#include <QNetworkReply>
-#include <QTimer>
-#include <QBuffer>
+// #include <QInputDialog>
+// #include <QLabel>
+// #include <QDesktopServices>
+// #include <QNetworkReply>
+// #include <QTimer>
+// #include <QBuffer>
 #include "creds/httpcredentialsgui.h"
 #include "theme.h"
 #include "account.h"
 #include "networkjobs.h"
-#include <QMessageBox>
+// #include <QMessageBox>
 #include "common/asserts.h"
 
 using namespace QKeychain;

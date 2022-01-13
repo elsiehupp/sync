@@ -12,8 +12,6 @@
  * for more details.
  */
 
-#ifndef NEXTCLOUD_THEME_H
-#define NEXTCLOUD_THEME_H
 
 #include "theme.h"
 
@@ -25,7 +23,6 @@ namespace OCC {
  */
 class NextcloudTheme : public Theme
 {
-    Q_OBJECT
 public:
     NextcloudTheme();
 

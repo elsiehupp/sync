@@ -15,10 +15,10 @@
 #include "remotewipe.h"
 #include "folderman.h"
 
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QNetworkRequest>
-#include <QBuffer>
+// #include <QJsonDocument>
+// #include <QJsonObject>
+// #include <QNetworkRequest>
+// #include <QBuffer>
 
 namespace OCC {
 

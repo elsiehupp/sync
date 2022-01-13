@@ -1,8 +1,8 @@
 #ifndef WEBVIEW_H
 #define WEBVIEW_H
 
-#include <QUrl>
-#include <QWidget>
+// #include <QUrl>
+// #include <QWidget>
 
 #include "ui_webview.h"
 
@@ -18,7 +18,6 @@ class WebEnginePage;
 
 class WebView : public QWidget
 {
-    Q_OBJECT
 public:
     WebView(QWidget *parent = nullptr);
     ~WebView() override;

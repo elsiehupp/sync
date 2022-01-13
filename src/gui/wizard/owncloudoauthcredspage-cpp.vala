@@ -12,9 +12,9 @@
  * for more details.
  */
 
-#include <QVariant>
-#include <QMenu>
-#include <QClipboard>
+// #include <QVariant>
+// #include <QMenu>
+// #include <QClipboard>
 
 #include "wizard/owncloudoauthcredspage.h"
 #include "theme.h"

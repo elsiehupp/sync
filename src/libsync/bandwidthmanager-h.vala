@@ -12,13 +12,11 @@
  * for more details.
  */
 
-#ifndef BANDWIDTHMANAGER_H
-#define BANDWIDTHMANAGER_H
 
-#include <QObject>
-#include <QTimer>
-#include <QIODevice>
-#include <list>
+// #include <QObject>
+// #include <QTimer>
+// #include <QIODevice>
+// #include <list>
 
 namespace OCC {
 
@@ -32,7 +30,6 @@ class OwncloudPropagator;
  */
 class BandwidthManager : public QObject
 {
-    Q_OBJECT
 public:
     BandwidthManager(OwncloudPropagator *p);
     ~BandwidthManager() override;

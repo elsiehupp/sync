@@ -12,10 +12,8 @@
  * for more details.
  */
 
-#ifndef ACTIVITYLISTMODEL_H
-#define ACTIVITYLISTMODEL_H
 
-#include <QtCore>
+// #include <QtCore>
 
 #include "activitydata.h"
 
@@ -38,7 +36,6 @@ class InvalidFilenameDialog;
 
 class ActivityListModel : public QAbstractListModel
 {
-    Q_OBJECT
 
     Q_PROPERTY(AccountState *accountState READ accountState CONSTANT)
 public:

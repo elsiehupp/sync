@@ -13,16 +13,14 @@
  */
 
 
-#ifndef ACCOUNTINFO_H
-#define ACCOUNTINFO_H
 
-#include <QByteArray>
-#include <QElapsedTimer>
-#include <QPointer>
+// #include <QByteArray>
+// #include <QElapsedTimer>
+// #include <QPointer>
 #include "connectionvalidator.h"
 #include "creds/abstractcredentials.h"
 
-#include <memory>
+// #include <memory>
 
 class QSettings;
 
@@ -42,7 +40,6 @@ using AccountAppList = QList<AccountApp *>;
  */
 class AccountState : public QObject, public QSharedData
 {
-    Q_OBJECT
     Q_PROPERTY(AccountPtr account MEMBER _account)
 
 public:
@@ -240,7 +237,6 @@ private:
 
 class AccountApp : public QObject
 {
-    Q_OBJECT
 public:
     AccountApp(const QString &name, const QUrl &url,
         const QString &id, const QUrl &iconUrl,

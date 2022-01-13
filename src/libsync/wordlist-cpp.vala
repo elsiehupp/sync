@@ -1,11 +1,11 @@
 
 #include "wordlist.h"
-#include <openssl/rand.h>
+// #include <openssl/rand.h>
 
 namespace OCC {
 namespace WordList {
 
-#include <initializer_list>
+// #include <initializer_list>
 
 int getRandomNumber(int max) {
     unsigned char d[8];

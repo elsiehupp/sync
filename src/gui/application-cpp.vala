@@ -16,8 +16,8 @@
 
 #include "application.h"
 
-#include <iostream>
-#include <random>
+// #include <iostream>
+// #include <random>
 
 #include "config.h"
 #include "account.h"
@@ -48,18 +48,18 @@
 #include "config.h"
 
 #if defined(Q_OS_WIN)
-#include <windows.h>
+// #include <windows.h>
 #endif
 
 #if defined(WITH_CRASHREPORTER)
-#include <libcrashreporter-handler/Handler.h>
+// #include <libcrashreporter-handler/Handler.h>
 #endif
 
-#include <QTranslator>
-#include <QMenu>
-#include <QMessageBox>
-#include <QDesktopServices>
-#include <QGuiApplication>
+// #include <QTranslator>
+// #include <QMenu>
+// #include <QMessageBox>
+// #include <QDesktopServices>
+// #include <QGuiApplication>
 
 class QSocket;
 

@@ -13,15 +13,15 @@
  * for more details.
  */
 
-#include <QDesktopServices>
-#include <QApplication>
-#include <QClipboard>
-#include <QTimer>
-#include <QBuffer>
+// #include <QDesktopServices>
+// #include <QApplication>
+// #include <QClipboard>
+// #include <QTimer>
+// #include <QBuffer>
 #include "account.h"
 #include "flow2auth.h"
-#include <QJsonObject>
-#include <QJsonDocument>
+// #include <QJsonObject>
+// #include <QJsonDocument>
 #include "theme.h"
 #include "networkjobs.h"
 #include "configfile.h"

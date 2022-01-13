@@ -12,15 +12,15 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
 #include "config.h"
 
-#include <QString>
-#include <ctime>
-#include <functional>
+// #include <QString>
+// #include <ctime>
+// #include <functional>
 
-#include <owncloudlib.h>
+// #include <owncloudlib.h>
 // Chain in the base include and extend the namespace
 #include "common/filesystembase.h"
 

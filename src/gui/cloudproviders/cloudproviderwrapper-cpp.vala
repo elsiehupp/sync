@@ -13,16 +13,16 @@
  * for more details.
  */
 
-#include <glib.h>
-#include <gio/gio.h>
-#include <cloudprovidersaccountexporter.h>
-#include <cloudprovidersproviderexporter.h>
+// #include <glib.h>
+// #include <gio/gio.h>
+// #include <cloudprovidersaccountexporter.h>
+// #include <cloudprovidersproviderexporter.h>
 
 #include "cloudproviderwrapper.h"
-#include <account.h>
-#include <folder.h>
-#include <accountstate.h>
-#include <QDesktopServices>
+// #include <account.h>
+// #include <folder.h>
+// #include <accountstate.h>
+// #include <QDesktopServices>
 #include "openfilemanager.h"
 #include "owncloudgui.h"
 #include "application.h"

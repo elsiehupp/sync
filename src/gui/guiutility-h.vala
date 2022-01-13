@@ -12,12 +12,10 @@
  * for more details.
  */
 
-#ifndef GUIUTILITY_H
-#define GUIUTILITY_H
 
-#include <QString>
-#include <QUrl>
-#include <QWidget>
+// #include <QString>
+// #include <QUrl>
+// #include <QWidget>
 
 #include "common/pinstate.h"
 

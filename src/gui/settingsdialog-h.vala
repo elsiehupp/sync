@@ -12,11 +12,9 @@
  * for more details.
  */
 
-#ifndef SETTINGSDIALOG_H
-#define SETTINGSDIALOG_H
 
-#include <QDialog>
-#include <QStyledItemDelegate>
+// #include <QDialog>
+// #include <QStyledItemDelegate>
 
 #include "progressdispatcher.h"
 #include "owncloudgui.h"
@@ -44,7 +42,6 @@ class ownCloudGui;
  */
 class SettingsDialog : public QDialog
 {
-    Q_OBJECT
     Q_PROPERTY(QWidget* currentPage READ currentPage)
 
 public:

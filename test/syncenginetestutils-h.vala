@@ -4,7 +4,7 @@
  *    any purpose.
  *
  */
-#pragma once
+// #pragma once
 
 #include "account.h"
 #include "common/result.h"
@@ -17,16 +17,16 @@
 #include "common/vfs.h"
 #include "csync_exclude.h"
 
-#include <QDir>
-#include <QNetworkReply>
-#include <QMap>
-#include <QtTest>
+// #include <QDir>
+// #include <QNetworkReply>
+// #include <QMap>
+// #include <QtTest>
 
-#include <cstring>
-#include <memory>
+// #include <cstring>
+// #include <memory>
 
-#include <cookiejar.h>
-#include <QTimer>
+// #include <cookiejar.h>
+// #include <QTimer>
 
 class QJsonDocument;
 
@@ -175,7 +175,6 @@ public:
 
 class FakeReply : public QNetworkReply
 {
-    Q_OBJECT
 public:
     FakeReply(QObject *parent);
     ~FakeReply() override;
@@ -186,7 +185,6 @@ public:
 
 class FakePropfindReply : public FakeReply
 {
-    Q_OBJECT
 public:
     QByteArray payload;
 
@@ -204,7 +202,6 @@ public:
 
 class FakePutReply : public FakeReply
 {
-    Q_OBJECT
     FileInfo *fileInfo;
 public:
     FakePutReply(FileInfo &remoteRootFileInfo, QNetworkAccessManager::Operation op, const QNetworkRequest &request, const QByteArray &putPayload, QObject *parent);
@@ -219,7 +216,6 @@ public:
 
 class FakePutMultiFileReply : public FakeReply
 {
-    Q_OBJECT
 public:
     FakePutMultiFileReply(FileInfo &remoteRootFileInfo, QNetworkAccessManager::Operation op, const QNetworkRequest &request, const QString &contentType, const QByteArray &putPayload, QObject *parent);
 
@@ -240,7 +236,6 @@ private:
 
 class FakeMkcolReply : public FakeReply
 {
-    Q_OBJECT
     FileInfo *fileInfo;
 public:
     FakeMkcolReply(FileInfo &remoteRootFileInfo, QNetworkAccessManager::Operation op, const QNetworkRequest &request, QObject *parent);
@@ -253,7 +248,6 @@ public:
 
 class FakeDeleteReply : public FakeReply
 {
-    Q_OBJECT
 public:
     FakeDeleteReply(FileInfo &remoteRootFileInfo, QNetworkAccessManager::Operation op, const QNetworkRequest &request, QObject *parent);
 
@@ -265,7 +259,6 @@ public:
 
 class FakeMoveReply : public FakeReply
 {
-    Q_OBJECT
 public:
     FakeMoveReply(FileInfo &remoteRootFileInfo, QNetworkAccessManager::Operation op, const QNetworkRequest &request, QObject *parent);
 
@@ -277,7 +270,6 @@ public:
 
 class FakeGetReply : public FakeReply
 {
-    Q_OBJECT
 public:
     const FileInfo *fileInfo;
     char payload;
@@ -296,7 +288,6 @@ public:
 
 class FakeGetWithDataReply : public FakeReply
 {
-    Q_OBJECT
 public:
     const FileInfo *fileInfo;
     QByteArray payload;
@@ -315,7 +306,6 @@ public:
 
 class FakeChunkMoveReply : public FakeReply
 {
-    Q_OBJECT
     FileInfo *fileInfo;
 public:
     FakeChunkMoveReply(FileInfo &uploadsFileInfo, FileInfo &remoteRootFileInfo,
@@ -335,7 +325,6 @@ public:
 
 class FakePayloadReply : public FakeReply
 {
-    Q_OBJECT
 public:
     FakePayloadReply(QNetworkAccessManager::Operation op, const QNetworkRequest &request,
         const QByteArray &body, QObject *parent);
@@ -356,7 +345,6 @@ public:
 
 class FakeErrorReply : public FakeReply
 {
-    Q_OBJECT
 public:
     FakeErrorReply(QNetworkAccessManager::Operation op, const QNetworkRequest &request,
         QObject *parent, int httpErrorCode, const QByteArray &body = QByteArray());
@@ -380,7 +368,6 @@ public:
 
 class FakeJsonErrorReply : public FakeErrorReply
 {
-    Q_OBJECT
 public:
     FakeJsonErrorReply(QNetworkAccessManager::Operation op,
                        const QNetworkRequest &request,
@@ -392,7 +379,6 @@ public:
 // A reply that never responds
 class FakeHangingReply : public FakeReply
 {
-    Q_OBJECT
 public:
     FakeHangingReply(QNetworkAccessManager::Operation op, const QNetworkRequest &request, QObject *parent);
 

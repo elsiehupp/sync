@@ -5,8 +5,8 @@
  *
  */
 
-#include <QtTest>
-#include <QTemporaryDir>
+// #include <QtTest>
+// #include <QTemporaryDir>
 
 #include "csync_exclude.h"
 
@@ -40,7 +40,6 @@ static void setup_init() {
 
 class TestExcludedFiles: public QObject
 {
-    Q_OBJECT
 
 static auto check_file_full(const char *path)
 {

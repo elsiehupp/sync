@@ -12,10 +12,8 @@
  * for more details.
  */
 
-#ifndef LEGALNOTICE_H
-#define LEGALNOTICE_H
 
-#include <QDialog>
+// #include <QDialog>
 
 namespace OCC {
 class IgnoreListEditor;
@@ -31,7 +29,6 @@ namespace Ui {
  */
 class LegalNotice : public QDialog
 {
-    Q_OBJECT
 
 public:
     explicit LegalNotice(QDialog *parent = nullptr);

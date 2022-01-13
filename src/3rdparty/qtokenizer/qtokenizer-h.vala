@@ -39,12 +39,10 @@
 **
 ****************************************************************************/
 
-#ifndef TOKENIZER_H
-#define TOKENIZER_H
 
-#include <QString>
-#include <QByteArray>
-#include <QSharedPointer>
+// #include <QString>
+// #include <QByteArray>
+// #include <QSharedPointer>
 
 QT_BEGIN_NAMESPACE
 

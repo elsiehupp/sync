@@ -5,11 +5,11 @@
  *
  */
 
-#include <QtTest>
+// #include <QtTest>
 #include "syncenginetestutils.h"
 #include "lockwatcher.h"
-#include <syncengine.h>
-#include <localdiscoverytracker.h>
+// #include <syncengine.h>
+// #include <localdiscoverytracker.h>
 
 using namespace OCC;
 
@@ -35,7 +35,6 @@ HANDLE makeHandle(const QString &file, int shareMode)
 
 class TestLockedFiles : public QObject
 {
-    Q_OBJECT
 
 private slots:
     void testBasicLockFileWatcher()

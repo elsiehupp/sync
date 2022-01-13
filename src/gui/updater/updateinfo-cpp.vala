@@ -3,11 +3,11 @@
 #include "updateinfo.h"
 #include "updater.h"
 
-#include <QtDebug>
-#include <QFile>
-#include <QDomDocument>
-#include <QtCore/QtDebug>
-#include <QtCore/QFile>
+// #include <QtDebug>
+// #include <QFile>
+// #include <QDomDocument>
+// #include <QtCore/QtDebug>
+// #include <QtCore/QFile>
 
 namespace OCC {
 

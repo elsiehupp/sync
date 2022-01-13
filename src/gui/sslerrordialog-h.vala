@@ -11,13 +11,11 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
  */
-#ifndef SSLERRORDIALOG_H
-#define SSLERRORDIALOG_H
 
-#include <QtCore>
-#include <QDialog>
-#include <QSslCertificate>
-#include <QList>
+// #include <QtCore>
+// #include <QDialog>
+// #include <QSslCertificate>
+// #include <QList>
 
 #include "account.h"
 
@@ -46,7 +44,6 @@ public:
  */
 class SslErrorDialog : public QDialog
 {
-    Q_OBJECT
 public:
     explicit SslErrorDialog(AccountPtr account, QWidget *parent = nullptr);
     ~SslErrorDialog() override;

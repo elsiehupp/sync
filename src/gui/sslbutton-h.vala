@@ -12,12 +12,10 @@
  * for more details.
  */
 
-#ifndef SSLBUTTON_H
-#define SSLBUTTON_H
 
-#include <QToolButton>
-#include <QPointer>
-#include <QSsl>
+// #include <QToolButton>
+// #include <QPointer>
+// #include <QSsl>
 
 class QAction;
 class QSslCertificate;
@@ -33,7 +31,6 @@ class AccountState;
  */
 class SslButton : public QToolButton
 {
-    Q_OBJECT
 public:
     explicit SslButton(QWidget *parent = nullptr);
     void updateAccountState(AccountState *accountState);

@@ -26,12 +26,12 @@
 #include "common/checksums.h"
 #include "networkjobs.h"
 
-#include <QFileInfo>
-#include <QDir>
-#include <QJsonDocument>
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QJsonValue>
+// #include <QFileInfo>
+// #include <QDir>
+// #include <QJsonDocument>
+// #include <QJsonArray>
+// #include <QJsonObject>
+// #include <QJsonValue>
 
 namespace OCC {
 

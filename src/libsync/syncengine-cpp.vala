@@ -32,30 +32,30 @@
 #include "common/vfs.h"
 
 #ifdef Q_OS_WIN
-#include <windows.h>
+// #include <windows.h>
 #else
-#include <unistd.h>
+// #include <unistd.h>
 #endif
 
-#include <climits>
-#include <cassert>
-#include <chrono>
+// #include <climits>
+// #include <cassert>
+// #include <chrono>
 
-#include <QCoreApplication>
-#include <QSslSocket>
-#include <QDir>
-#include <QLoggingCategory>
-#include <QMutexLocker>
-#include <QThread>
-#include <QStringList>
-#include <QTextStream>
-#include <QTime>
-#include <QUrl>
-#include <QSslCertificate>
-#include <QProcess>
-#include <QElapsedTimer>
-#include <QFileInfo>
-#include <qtextcodec.h>
+// #include <QCoreApplication>
+// #include <QSslSocket>
+// #include <QDir>
+// #include <QLoggingCategory>
+// #include <QMutexLocker>
+// #include <QThread>
+// #include <QStringList>
+// #include <QTextStream>
+// #include <QTime>
+// #include <QUrl>
+// #include <QSslCertificate>
+// #include <QProcess>
+// #include <QElapsedTimer>
+// #include <QFileInfo>
+// #include <qtextcodec.h>
 
 namespace OCC {
 

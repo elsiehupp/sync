@@ -5,11 +5,11 @@
  *
  */
 
-#include <QtTest>
+// #include <QtTest>
 #include "syncenginetestutils.h"
 #include "common/vfs.h"
 #include "config.h"
-#include <syncengine.h>
+// #include <syncengine.h>
 
 #include "vfs/xattr/xattrwrapper.h"
 
@@ -89,7 +89,6 @@ QSharedPointer<Vfs> setupVfs(FakeFolder &folder)
 
 class TestSyncXAttr : public QObject
 {
-    Q_OBJECT
 
 private slots:
     void testVirtualFileLifecycle_data()

@@ -12,9 +12,9 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
-#include <QtGlobal>
+// #include <QtGlobal>
 
 namespace OCC {
 namespace Constants {

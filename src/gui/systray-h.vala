@@ -12,15 +12,13 @@
  * for more details.
  */
 
-#ifndef SYSTRAY_H
-#define SYSTRAY_H
 
-#include <QSystemTrayIcon>
+// #include <QSystemTrayIcon>
 
 #include "accountmanager.h"
 #include "tray/usermodel.h"
 
-#include <QQmlNetworkAccessManagerFactory>
+// #include <QQmlNetworkAccessManagerFactory>
 
 class QScreen;
 class QQmlApplicationEngine;
@@ -51,7 +49,6 @@ void setTrayWindowLevelAndVisibleOnAllSpaces(QWindow *window);
 class Systray
     : public QSystemTrayIcon
 {
-    Q_OBJECT
 
     Q_PROPERTY(QString windowTitle READ windowTitle CONSTANT)
     Q_PROPERTY(bool useNormalWindow READ useNormalWindow CONSTANT)

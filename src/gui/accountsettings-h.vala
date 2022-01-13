@@ -12,14 +12,12 @@
  * for more details.
  */
 
-#ifndef ACCOUNTSETTINGS_H
-#define ACCOUNTSETTINGS_H
 
-#include <QWidget>
-#include <QUrl>
-#include <QPointer>
-#include <QHash>
-#include <QTimer>
+// #include <QWidget>
+// #include <QUrl>
+// #include <QPointer>
+// #include <QHash>
+// #include <QTimer>
 
 #include "folder.h"
 #include "userinfo.h"
@@ -50,7 +48,6 @@ class FolderStatusModel;
  */
 class AccountSettings : public QWidget
 {
-    Q_OBJECT
     Q_PROPERTY(AccountState* accountState MEMBER _accountState)
 
 public:

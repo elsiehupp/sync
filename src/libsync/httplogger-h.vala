@@ -11,12 +11,12 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
  */
-#pragma once
+// #pragma once
 
 #include "owncloudlib.h"
 
-#include <QNetworkReply>
-#include <QUrl>
+// #include <QNetworkReply>
+// #include <QUrl>
 
 namespace OCC {
 namespace HttpLogger {

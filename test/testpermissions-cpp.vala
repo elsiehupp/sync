@@ -5,9 +5,9 @@
  *
  */
 
-#include <QtTest>
+// #include <QtTest>
 #include "syncenginetestutils.h"
-#include <syncengine.h>
+// #include <syncengine.h>
 #include "common/ownsql.h"
 
 using namespace OCC;
@@ -64,7 +64,6 @@ bool discoveryInstruction(const SyncFileItemVector &spy, const QString &path, co
 
 class TestPermissions : public QObject
 {
-    Q_OBJECT
 
 private slots:
 

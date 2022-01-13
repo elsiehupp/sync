@@ -1,12 +1,12 @@
 #ifndef USERMODEL_H
 #define USERMODEL_H
 
-#include <QAbstractListModel>
-#include <QImage>
-#include <QDateTime>
-#include <QStringList>
-#include <QQuickImageProvider>
-#include <QHash>
+// #include <QAbstractListModel>
+// #include <QImage>
+// #include <QDateTime>
+// #include <QStringList>
+// #include <QQuickImageProvider>
+// #include <QHash>
 
 #include "activitylistmodel.h"
 #include "accountfwd.h"
@@ -15,14 +15,13 @@
 #include "notificationcache.h"
 #include "userstatusselectormodel.h"
 #include "userstatusconnector.h"
-#include <chrono>
+// #include <chrono>
 
 namespace OCC {
 class UnifiedSearchResultsListModel;
 
 class User : public QObject
 {
-    Q_OBJECT
     Q_PROPERTY(QString name READ name NOTIFY nameChanged)
     Q_PROPERTY(QString server READ server CONSTANT)
     Q_PROPERTY(bool serverHasUserStatus READ serverHasUserStatus CONSTANT)
@@ -133,7 +132,6 @@ private:
 
 class UserModel : public QAbstractListModel
 {
-    Q_OBJECT
     Q_PROPERTY(User* currentUser READ currentUser NOTIFY newUserSelected)
     Q_PROPERTY(int currentUserId READ currentUserId NOTIFY newUserSelected)
 public:
@@ -212,7 +210,6 @@ public:
 
 class UserAppsModel : public QAbstractListModel
 {
-    Q_OBJECT
 public:
     static UserAppsModel *instance();
     ~UserAppsModel() override = default;

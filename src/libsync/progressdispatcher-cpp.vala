@@ -14,9 +14,9 @@
 
 #include "progressdispatcher.h"
 
-#include <QObject>
-#include <QMetaType>
-#include <QCoreApplication>
+// #include <QObject>
+// #include <QMetaType>
+// #include <QCoreApplication>
 
 namespace OCC {
 

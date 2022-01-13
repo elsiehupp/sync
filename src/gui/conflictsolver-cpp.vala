@@ -14,8 +14,8 @@
 
 #include "conflictsolver.h"
 
-#include <QFileDialog>
-#include <QMessageBox>
+// #include <QFileDialog>
+// #include <QMessageBox>
 
 #include "common/utility.h"
 #include "filesystem.h"

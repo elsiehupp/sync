@@ -12,16 +12,14 @@
  * for more details.
  */
 
-#ifndef CONFIGFILE_H
-#define CONFIGFILE_H
 
 #include "owncloudlib.h"
-#include <memory>
-#include <QSharedPointer>
-#include <QSettings>
-#include <QString>
-#include <QVariant>
-#include <chrono>
+// #include <memory>
+// #include <QSharedPointer>
+// #include <QSettings>
+// #include <QString>
+// #include <QVariant>
+// #include <chrono>
 
 class QWidget;
 class QHeaderView;

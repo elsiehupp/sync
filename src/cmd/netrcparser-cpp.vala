@@ -12,13 +12,13 @@
  * for more details.
  */
 
-#include <QDir>
-#include <QFile>
-#include <QTextStream>
+// #include <QDir>
+// #include <QFile>
+// #include <QTextStream>
 
-#include <qtokenizer.h>
+// #include <qtokenizer.h>
 
-#include <QDebug>
+// #include <QDebug>
 
 #include "netrcparser.h"
 

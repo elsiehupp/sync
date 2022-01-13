@@ -18,10 +18,10 @@
 #include "folderman.h"
 #include "accountstate.h"
 
-#include <QUrl>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
+// #include <QUrl>
+// #include <QJsonDocument>
+// #include <QJsonObject>
+// #include <QJsonArray>
 
 Q_LOGGING_CATEGORY(lcUserGroupShare, "nextcloud.gui.usergroupshare", QtInfoMsg)
 

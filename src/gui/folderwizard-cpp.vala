@@ -24,22 +24,22 @@
 #include "wizard/owncloudwizard.h"
 #include "common/asserts.h"
 
-#include <QDesktopServices>
-#include <QDir>
-#include <QFileDialog>
-#include <QFileInfo>
-#include <QFileIconProvider>
-#include <QInputDialog>
-#include <QUrl>
-#include <QValidator>
-#include <QWizardPage>
-#include <QTreeWidget>
-#include <QVBoxLayout>
-#include <QEvent>
-#include <QCheckBox>
-#include <QMessageBox>
+// #include <QDesktopServices>
+// #include <QDir>
+// #include <QFileDialog>
+// #include <QFileInfo>
+// #include <QFileIconProvider>
+// #include <QInputDialog>
+// #include <QUrl>
+// #include <QValidator>
+// #include <QWizardPage>
+// #include <QTreeWidget>
+// #include <QVBoxLayout>
+// #include <QEvent>
+// #include <QCheckBox>
+// #include <QMessageBox>
 
-#include <cstdlib>
+// #include <cstdlib>
 
 namespace OCC {
 

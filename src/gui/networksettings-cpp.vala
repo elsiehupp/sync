@@ -22,9 +22,9 @@
 #include "folderman.h"
 #include "accountmanager.h"
 
-#include <QNetworkProxy>
-#include <QString>
-#include <QList>
+// #include <QNetworkProxy>
+// #include <QString>
+// #include <QList>
 
 namespace OCC {
 

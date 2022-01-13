@@ -13,11 +13,11 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 #include "creds/httpcredentials.h"
 #include "creds/oauth.h"
-#include <QPointer>
-#include <QTcpServer>
+// #include <QPointer>
+// #include <QTcpServer>
 
 namespace OCC {
 
@@ -27,7 +27,6 @@ namespace OCC {
  */
 class HttpCredentialsGui : public HttpCredentials
 {
-    Q_OBJECT
 public:
     explicit HttpCredentialsGui()
         : HttpCredentials()

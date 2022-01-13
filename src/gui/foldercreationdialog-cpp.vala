@@ -15,11 +15,11 @@
 #include "foldercreationdialog.h"
 #include "ui_foldercreationdialog.h"
 
-#include <limits>
+// #include <limits>
 
-#include <QDir>
-#include <QMessageBox>
-#include <QLoggingCategory>
+// #include <QDir>
+// #include <QMessageBox>
+// #include <QLoggingCategory>
 
 namespace OCC {
 

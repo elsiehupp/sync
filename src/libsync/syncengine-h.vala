@@ -13,18 +13,18 @@
  * for more details.
  */
 
-#pragma once
+// #pragma once
 
-#include <cstdint>
+// #include <cstdint>
 
-#include <QMutex>
-#include <QThread>
-#include <QString>
-#include <QSet>
-#include <QMap>
-#include <QStringList>
-#include <QSharedPointer>
-#include <set>
+// #include <QMutex>
+// #include <QThread>
+// #include <QString>
+// #include <QSet>
+// #include <QMap>
+// #include <QStringList>
+// #include <QSharedPointer>
+// #include <set>
 
 #include "syncfileitem.h"
 #include "progressdispatcher.h"
@@ -55,7 +55,6 @@ enum AnotherSyncNeeded {
  */
 class OWNCLOUDSYNC_EXPORT SyncEngine : public QObject
 {
-    Q_OBJECT
 public:
     SyncEngine(AccountPtr account, const QString &localPath,
         const QString &remotePath, SyncJournalDb *journal);

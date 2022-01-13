@@ -18,16 +18,16 @@
 #include "propagateremotemove.h"
 #include "ui_invalidfilenamedialog.h"
 
-#include <folder.h>
+// #include <folder.h>
 
-#include <QPushButton>
-#include <QDir>
-#include <qabstractbutton.h>
-#include <QDialogButtonBox>
-#include <QFileInfo>
-#include <QPushButton>
+// #include <QPushButton>
+// #include <QDir>
+// #include <qabstractbutton.h>
+// #include <QDialogButtonBox>
+// #include <QFileInfo>
+// #include <QPushButton>
 
-#include <array>
+// #include <array>
 
 namespace {
 constexpr std::array<QChar, 9> illegalCharacters({ '\\', '/', ':', '?', '*', '\"', '<', '>', '|' });

@@ -12,16 +12,14 @@
  * for more details.
  */
 
-#ifndef NOTIFICATIONCONFIRMJOB_H
-#define NOTIFICATIONCONFIRMJOB_H
 
 #include "accountfwd.h"
 #include "abstractnetworkjob.h"
 
-#include <QVector>
-#include <QList>
-#include <QPair>
-#include <QUrl>
+// #include <QVector>
+// #include <QList>
+// #include <QPair>
+// #include <QUrl>
 
 namespace OCC {
 
@@ -35,7 +33,6 @@ namespace OCC {
  */
 class NotificationConfirmJob : public AbstractNetworkJob
 {
-    Q_OBJECT
 
 public:
     explicit NotificationConfirmJob(AccountPtr account);

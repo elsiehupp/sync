@@ -18,8 +18,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef _CSYNC_VERSION_H
-#define _CSYNC_VERSION_H
 
 #define CSYNC_STRINGIFY(s) CSYNC_TOSTRING(s)
 #define CSYNC_TOSTRING(s) #s

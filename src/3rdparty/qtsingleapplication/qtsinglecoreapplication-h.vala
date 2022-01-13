@@ -27,7 +27,7 @@
 **
 ****************************************************************************/
 
-#include <QCoreApplication>
+// #include <QCoreApplication>
 
 namespace SharedTools {
 
@@ -35,7 +35,6 @@ class QtLocalPeer;
 
 class QtSingleCoreApplication : public QCoreApplication
 {
-    Q_OBJECT
 
 public:
     QtSingleCoreApplication(int &argc, char **argv);
