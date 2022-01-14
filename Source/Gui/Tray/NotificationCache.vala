@@ -4,7 +4,7 @@
 
 namespace Occ {
 
-class NotificationCache {
+class Notification_cache {
 public:
     struct Notification {
         string title;
@@ -18,26 +18,26 @@ public:
     void clear ();
 
 private:
-    uint calculateKey (Notification &notification) const;
+    uint calculate_key (Notification &notification) const;
 
     QSet<uint> _notifications;
 };
 
 
-    bool NotificationCache.contains (Notification &notification) {
-        return _notifications.find (calculateKey (notification)) != _notifications.end ();
+    bool Notification_cache.contains (Notification &notification) {
+        return _notifications.find (calculate_key (notification)) != _notifications.end ();
     }
     
-    void NotificationCache.insert (Notification &notification) {
-        _notifications.insert (calculateKey (notification));
+    void Notification_cache.insert (Notification &notification) {
+        _notifications.insert (calculate_key (notification));
     }
     
-    void NotificationCache.clear () {
+    void Notification_cache.clear () {
         _notifications.clear ();
     }
     
-    uint NotificationCache.calculateKey (Notification &notification) {
-        return qHash (notification.title + notification.message);
+    uint Notification_cache.calculate_key (Notification &notification) {
+        return q_hash (notification.title + notification.message);
     }
     }
     

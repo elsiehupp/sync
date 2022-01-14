@@ -1,4 +1,4 @@
-// #include <QtTest>
+// #include <Qt_test>
 
 namespace {
   const string simple     = QLatin1String ("A simple tokenizer test");
@@ -8,119 +8,119 @@ namespace {
 class TestTokenizer : GLib.Object {
   Q_OBJECT
 private slots:
-  void tokenizeQStringSimple () {
+  void tokenize_q_string_simple () {
     QStringTokenizer tokenizer (simple, " ");
 
-    QCOMPARE (tokenizer.hasNext (), true);
+    QCOMPARE (tokenizer.has_next (), true);
     QCOMPARE (tokenizer.next (), QLatin1String ("A"));
 
-    QCOMPARE (tokenizer.hasNext (), true);
+    QCOMPARE (tokenizer.has_next (), true);
     QCOMPARE (tokenizer.next (), QLatin1String ("simple"));
 
-    QCOMPARE (tokenizer.hasNext (), true);
+    QCOMPARE (tokenizer.has_next (), true);
     QCOMPARE (tokenizer.next (), QLatin1String ("tokenizer"));
 
-    QCOMPARE (tokenizer.hasNext (), true);
+    QCOMPARE (tokenizer.has_next (), true);
     QCOMPARE (tokenizer.next (), QLatin1String ("test"));
 
-    QCOMPARE (tokenizer.hasNext (), false);
+    QCOMPARE (tokenizer.has_next (), false);
   }
 
-  void tokenizeQStringSimpleRef () {
+  void tokenize_q_string_simple_ref () {
     QStringTokenizer tokenizer (simple, " ");
 
-    QCOMPARE (tokenizer.hasNext (), true);
-    QVERIFY (tokenizer.stringRef () == QLatin1String ("A"));
+    QCOMPARE (tokenizer.has_next (), true);
+    QVERIFY (tokenizer.string_ref () == QLatin1String ("A"));
 
-    QCOMPARE (tokenizer.hasNext (), true);
-    QVERIFY (tokenizer.stringRef () == QLatin1String ("simple"));
+    QCOMPARE (tokenizer.has_next (), true);
+    QVERIFY (tokenizer.string_ref () == QLatin1String ("simple"));
 
-    QCOMPARE (tokenizer.hasNext (), true);
-    QVERIFY (tokenizer.stringRef () == QLatin1String ("tokenizer"));
+    QCOMPARE (tokenizer.has_next (), true);
+    QVERIFY (tokenizer.string_ref () == QLatin1String ("tokenizer"));
 
-    QCOMPARE (tokenizer.hasNext (), true);
-    QVERIFY (tokenizer.stringRef () == QLatin1String ("test"));
+    QCOMPARE (tokenizer.has_next (), true);
+    QVERIFY (tokenizer.string_ref () == QLatin1String ("test"));
 
-    QCOMPARE (tokenizer.hasNext (), false);
+    QCOMPARE (tokenizer.has_next (), false);
   }
 
-  void tokenizeQStringQuoted () {
+  void tokenize_q_string_quoted () {
     const string multiquote (QLatin1String ("\"'Billy - the Kid' is dead!\""));
     QStringTokenizer tokenizer (multiquote, " -");
-    tokenizer.setQuoteCharacters ("\"");
-    tokenizer.setReturnQuoteCharacters (true);
+    tokenizer.set_quote_characters ("\"");
+    tokenizer.set_return_quote_characters (true);
 
-    QCOMPARE (tokenizer.hasNext (), true);
+    QCOMPARE (tokenizer.has_next (), true);
     QCOMPARE (tokenizer.next (), QLatin1String ("\"'Billy - the Kid' is dead!\""));
 
-    QCOMPARE (tokenizer.hasNext (), false);
+    QCOMPARE (tokenizer.has_next (), false);
   }
 
-  void tokenizeQStringSkipQuotes () {
+  void tokenize_q_string_skip_quotes () {
     const string multiquote (QLatin1String ("\"'Billy - the Kid' is dead!\""));
     QStringTokenizer tokenizer (multiquote, " ");
-    tokenizer.setQuoteCharacters ("\"");
-    tokenizer.setReturnQuoteCharacters (false);
+    tokenizer.set_quote_characters ("\"");
+    tokenizer.set_return_quote_characters (false);
 
-    QCOMPARE (tokenizer.hasNext (), true);
+    QCOMPARE (tokenizer.has_next (), true);
     QCOMPARE (tokenizer.next (), QLatin1String ("'Billy - the Kid' is dead!"));
-    QCOMPARE (tokenizer.stringRef ().toString (), QLatin1String ("'Billy - the Kid' is dead!"));
+    QCOMPARE (tokenizer.string_ref ().to_string (), QLatin1String ("'Billy - the Kid' is dead!"));
 
-    QCOMPARE (tokenizer.hasNext (), false);
+    QCOMPARE (tokenizer.has_next (), false);
   }
 
-  void tokenizeQStringWithDelims () {
+  void tokenize_q_string_with_delims () {
     const string delims (QLatin1String ("I;Insist,On/a-Delimiter"));
     QStringTokenizer tokenizer (delims, ";,/-");
-    tokenizer.setReturnDelimiters (true);
+    tokenizer.set_return_delimiters (true);
 
-    QCOMPARE (tokenizer.hasNext (), true);
-    QCOMPARE (tokenizer.isDelimiter (), false);
+    QCOMPARE (tokenizer.has_next (), true);
+    QCOMPARE (tokenizer.is_delimiter (), false);
 
-    QCOMPARE (tokenizer.hasNext (), true);
-    QCOMPARE (tokenizer.isDelimiter (), true);
+    QCOMPARE (tokenizer.has_next (), true);
+    QCOMPARE (tokenizer.is_delimiter (), true);
 
-    QCOMPARE (tokenizer.hasNext (), true);
-    QCOMPARE (tokenizer.isDelimiter (), false);
+    QCOMPARE (tokenizer.has_next (), true);
+    QCOMPARE (tokenizer.is_delimiter (), false);
 
-    QCOMPARE (tokenizer.hasNext (), true);
-    QCOMPARE (tokenizer.isDelimiter (), true);
+    QCOMPARE (tokenizer.has_next (), true);
+    QCOMPARE (tokenizer.is_delimiter (), true);
 
-    QCOMPARE (tokenizer.hasNext (), true);
-    QCOMPARE (tokenizer.isDelimiter (), false);
+    QCOMPARE (tokenizer.has_next (), true);
+    QCOMPARE (tokenizer.is_delimiter (), false);
 
-    QCOMPARE (tokenizer.hasNext (), true);
-    QCOMPARE (tokenizer.isDelimiter (), true);
+    QCOMPARE (tokenizer.has_next (), true);
+    QCOMPARE (tokenizer.is_delimiter (), true);
 
-    QCOMPARE (tokenizer.hasNext (), true);
-    QCOMPARE (tokenizer.isDelimiter (), false);
+    QCOMPARE (tokenizer.has_next (), true);
+    QCOMPARE (tokenizer.is_delimiter (), false);
 
-    QCOMPARE (tokenizer.hasNext (), true);
-    QCOMPARE (tokenizer.isDelimiter (), true);
+    QCOMPARE (tokenizer.has_next (), true);
+    QCOMPARE (tokenizer.is_delimiter (), true);
 
-    QCOMPARE (tokenizer.hasNext (), true);
-    QCOMPARE (tokenizer.isDelimiter (), false);
+    QCOMPARE (tokenizer.has_next (), true);
+    QCOMPARE (tokenizer.is_delimiter (), false);
 
-    QCOMPARE (tokenizer.hasNext (), false);
+    QCOMPARE (tokenizer.has_next (), false);
   }
 
-  void resetTokenizer () {
+  void reset_tokenizer () {
     for (int i = 0; i < 2; i++) {
       QStringTokenizer tokenizer (simple, " ");
 
-      QCOMPARE (tokenizer.hasNext (), true);
+      QCOMPARE (tokenizer.has_next (), true);
       QCOMPARE (tokenizer.next (), QLatin1String ("A"));
 
-      QCOMPARE (tokenizer.hasNext (), true);
+      QCOMPARE (tokenizer.has_next (), true);
       QCOMPARE (tokenizer.next (), QLatin1String ("simple"));
 
-      QCOMPARE (tokenizer.hasNext (), true);
+      QCOMPARE (tokenizer.has_next (), true);
       QCOMPARE (tokenizer.next (), QLatin1String ("tokenizer"));
 
-      QCOMPARE (tokenizer.hasNext (), true);
+      QCOMPARE (tokenizer.has_next (), true);
       QCOMPARE (tokenizer.next (), QLatin1String ("test"));
 
-      QCOMPARE (tokenizer.hasNext (), false);
+      QCOMPARE (tokenizer.has_next (), false);
 
       tokenizer.reset ();
     }

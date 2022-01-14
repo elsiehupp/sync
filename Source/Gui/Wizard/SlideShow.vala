@@ -5,229 +5,229 @@ Copyright (C) 2018 by J-P Nurmi <jpnurmi@gmail.com>
 ***********************************************************/
 
 // #include <QGuiApplication>
-// #include <QMouseEvent>
+// #include <QMouse_event>
 // #include <QPainter>
 // #include <QStyle>
-// #include <QStyleHints>
+// #include <QStyle_hints>
 
 const int HASQT5_11 (QT_VERSION >= QT_VERSION_CHECK (5,11,0))
 
 // #include <Gtk.Widget>
-// #include <QBasicTimer>
+// #include <QBasic_timer>
 // #include <QPointer>
-// #include <QVariantAnimation>
+// #include <QVariant_animation>
 
 namespace Occ {
 
 /***********************************************************
-@brief The SlideShow class
+@brief The Slide_show class
 @ingroup gui
 ***********************************************************/
-class SlideShow : Gtk.Widget {
-    Q_PROPERTY (int interval READ interval WRITE setInterval)
-    Q_PROPERTY (int currentSlide READ currentSlide WRITE setCurrentSlide NOTIFY currentSlideChanged)
+class Slide_show : Gtk.Widget {
+    Q_PROPERTY (int interval READ interval WRITE set_interval)
+    Q_PROPERTY (int current_slide READ current_slide WRITE set_current_slide NOTIFY current_slide_changed)
 
 public:
-    SlideShow (Gtk.Widget* parent = nullptr);
+    Slide_show (Gtk.Widget* parent = nullptr);
 
-    void addSlide (QPixmap &pixmap, string &label);
+    void add_slide (QPixmap &pixmap, string &label);
 
-    bool isActive ();
+    bool is_active ();
 
     int interval ();
-    void setInterval (int interval);
+    void set_interval (int interval);
 
-    int currentSlide ();
-    void setCurrentSlide (int index);
+    int current_slide ();
+    void set_current_slide (int index);
 
-    QSize sizeHint () const override;
+    QSize size_hint () const override;
 
 public slots:
-    void startShow (int interval = 0);
-    void stopShow ();
-    void nextSlide ();
-    void prevSlide ();
+    void start_show (int interval = 0);
+    void stop_show ();
+    void next_slide ();
+    void prev_slide ();
     void reset ();
 
 signals:
     void clicked ();
-    void currentSlideChanged (int index);
+    void current_slide_changed (int index);
 
 protected:
-    void mousePressEvent (QMouseEvent *event) override;
-    void mouseReleaseEvent (QMouseEvent *event) override;
-    void paintEvent (QPaintEvent *event) override;
-    void timerEvent (QTimerEvent *event) override;
+    void mouse_press_event (QMouse_event *event) override;
+    void mouse_release_event (QMouse_event *event) override;
+    void paint_event (QPaint_event *event) override;
+    void timer_event (QTimer_event *event) override;
 
 private:
-    void maybeRestartTimer ();
-    void drawSlide (QPainter *painter, int index);
+    void maybe_restart_timer ();
+    void draw_slide (QPainter *painter, int index);
 
     bool _reverse = false;
     int _interval = 3500;
-    int _currentIndex = 0;
-    QPoint _pressPoint;
-    QBasicTimer _timer;
+    int _current_index = 0;
+    QPoint _press_point;
+    QBasic_timer _timer;
     QStringList _labels;
     QVector<QPixmap> _pixmaps;
-    QPointer<QVariantAnimation> _animation = nullptr;
+    QPointer<QVariant_animation> _animation = nullptr;
 };
 
 static const int Spacing = 6;
-static const int SlideDuration = 1000;
-static const int SlideDistance = 400;
+static const int Slide_duration = 1000;
+static const int Slide_distance = 400;
 
-SlideShow.SlideShow (Gtk.Widget *parent) : Gtk.Widget (parent) {
-    setSizePolicy (QSizePolicy.Minimum, QSizePolicy.Minimum);
+Slide_show.Slide_show (Gtk.Widget *parent) : Gtk.Widget (parent) {
+    set_size_policy (QSize_policy.Minimum, QSize_policy.Minimum);
 }
 
-void SlideShow.addSlide (QPixmap &pixmap, string &label) {
+void Slide_show.add_slide (QPixmap &pixmap, string &label) {
     _labels += label;
     _pixmaps += pixmap;
-    updateGeometry ();
+    update_geometry ();
 }
 
-bool SlideShow.isActive () {
-    return _timer.isActive ();
+bool Slide_show.is_active () {
+    return _timer.is_active ();
 }
 
-int SlideShow.interval () {
+int Slide_show.interval () {
     return _interval;
 }
 
-void SlideShow.setInterval (int interval) {
+void Slide_show.set_interval (int interval) {
     if (_interval == interval)
         return;
 
     _interval = interval;
-    maybeRestartTimer ();
+    maybe_restart_timer ();
 }
 
-int SlideShow.currentSlide () {
-    return _currentIndex;
+int Slide_show.current_slide () {
+    return _current_index;
 }
 
-void SlideShow.setCurrentSlide (int index) {
-    if (_currentIndex == index)
+void Slide_show.set_current_slide (int index) {
+    if (_current_index == index)
         return;
 
     if (!_animation) {
-        _animation = new QVariantAnimation (this);
-        _animation.setDuration (SlideDuration);
-        _animation.setEasingCurve (QEasingCurve.OutCubic);
-        _animation.setStartValue (static_cast<qreal> (_currentIndex));
-        connect (_animation.data (), SIGNAL (valueChanged (QVariant)), this, SLOT (update ()));
+        _animation = new QVariant_animation (this);
+        _animation.set_duration (Slide_duration);
+        _animation.set_easing_curve (QEasing_curve.Out_cubic);
+        _animation.set_start_value (static_cast<qreal> (_current_index));
+        connect (_animation.data (), SIGNAL (value_changed (QVariant)), this, SLOT (update ()));
     }
-    _animation.setEndValue (static_cast<qreal> (index));
+    _animation.set_end_value (static_cast<qreal> (index));
     _animation.start (QAbstractAnimation.DeleteWhenStopped);
 
-    _reverse = index < _currentIndex;
-    _currentIndex = index;
-    maybeRestartTimer ();
+    _reverse = index < _current_index;
+    _current_index = index;
+    maybe_restart_timer ();
     update ();
-    emit currentSlideChanged (index);
+    emit current_slide_changed (index);
 }
 
-QSize SlideShow.sizeHint () {
-    QFontMetrics fm = fontMetrics ();
-    QSize labelSize (0, fm.height ());
+QSize Slide_show.size_hint () {
+    QFont_metrics fm = font_metrics ();
+    QSize label_size (0, fm.height ());
     for (string &label : _labels) {
 #if (HASQT5_11)
-        labelSize.setWidth (std.max (fm.horizontalAdvance (label), labelSize.width ()));
+        label_size.set_width (std.max (fm.horizontal_advance (label), label_size.width ()));
 #else
-        labelSize.setWidth (std.max (fm.width (label), labelSize.width ()));
+        label_size.set_width (std.max (fm.width (label), label_size.width ()));
 #endif
     }
-    QSize pixmapSize;
+    QSize pixmap_size;
     for (QPixmap &pixmap : _pixmaps) {
-        pixmapSize.setWidth (std.max (pixmap.width (), pixmapSize.width ()));
-        pixmapSize.setHeight (std.max (pixmap.height (), pixmapSize.height ()));
+        pixmap_size.set_width (std.max (pixmap.width (), pixmap_size.width ()));
+        pixmap_size.set_height (std.max (pixmap.height (), pixmap_size.height ()));
     }
     return {
-        std.max (labelSize.width (), pixmapSize.width ()),
-        labelSize.height () + Spacing + pixmapSize.height ()
+        std.max (label_size.width (), pixmap_size.width ()),
+        label_size.height () + Spacing + pixmap_size.height ()
     };
 }
 
-void SlideShow.startShow (int interval) {
+void Slide_show.start_show (int interval) {
     if (interval > 0)
         _interval = interval;
     _timer.start (_interval, this);
 }
 
-void SlideShow.stopShow () {
+void Slide_show.stop_show () {
     _timer.stop ();
 }
 
-void SlideShow.nextSlide () {
-    setCurrentSlide ( (_currentIndex + 1) % _labels.count ());
+void Slide_show.next_slide () {
+    set_current_slide ( (_current_index + 1) % _labels.count ());
     _reverse = false;
 }
 
-void SlideShow.prevSlide () {
-    setCurrentSlide ( (_currentIndex > 0 ? _currentIndex : _labels.count ()) - 1);
+void Slide_show.prev_slide () {
+    set_current_slide ( (_current_index > 0 ? _current_index : _labels.count ()) - 1);
     _reverse = true;
 }
 
-void SlideShow.reset () {
-    stopShow ();
+void Slide_show.reset () {
+    stop_show ();
     _pixmaps.clear ();
     _labels.clear ();
-    updateGeometry ();
+    update_geometry ();
     update ();
 }
 
-void SlideShow.mousePressEvent (QMouseEvent *event) {
-    _pressPoint = event.pos ();
+void Slide_show.mouse_press_event (QMouse_event *event) {
+    _press_point = event.pos ();
 }
 
-void SlideShow.mouseReleaseEvent (QMouseEvent *event) {
-    if (!_animation && QLineF (_pressPoint, event.pos ()).length () < QGuiApplication.styleHints ().startDragDistance ())
+void Slide_show.mouse_release_event (QMouse_event *event) {
+    if (!_animation && QLine_f (_press_point, event.pos ()).length () < QGuiApplication.style_hints ().start_drag_distance ())
         emit clicked ();
 }
 
-void SlideShow.paintEvent (QPaintEvent *) {
+void Slide_show.paint_event (QPaint_event *) {
     QPainter painter (this);
 
     if (_animation) {
-        int from = _animation.startValue ().toInt ();
-        int to = _animation.endValue ().toInt ();
-        qreal progress = _animation.easingCurve ().valueForProgress (_animation.currentTime () / static_cast<qreal> (_animation.duration ()));
+        int from = _animation.start_value ().to_int ();
+        int to = _animation.end_value ().to_int ();
+        qreal progress = _animation.easing_curve ().value_for_progress (_animation.current_time () / static_cast<qreal> (_animation.duration ()));
 
         painter.save ();
-        painter.setOpacity (1.0 - progress);
-        painter.translate (progress * (_reverse ? SlideDistance : -SlideDistance), 0);
-        drawSlide (&painter, from);
+        painter.set_opacity (1.0 - progress);
+        painter.translate (progress * (_reverse ? Slide_distance : -Slide_distance), 0);
+        draw_slide (&painter, from);
 
         painter.restore ();
-        painter.setOpacity (progress);
-        painter.translate ( (1.0 - progress) * (_reverse ? -SlideDistance : SlideDistance), 0);
-        drawSlide (&painter, to);
+        painter.set_opacity (progress);
+        painter.translate ( (1.0 - progress) * (_reverse ? -Slide_distance : Slide_distance), 0);
+        draw_slide (&painter, to);
     } else {
-        drawSlide (&painter, _currentIndex);
+        draw_slide (&painter, _current_index);
     }
 }
 
-void SlideShow.timerEvent (QTimerEvent *event) {
-    if (event.timerId () == _timer.timerId ())
-        nextSlide ();
+void Slide_show.timer_event (QTimer_event *event) {
+    if (event.timer_id () == _timer.timer_id ())
+        next_slide ();
 }
 
-void SlideShow.maybeRestartTimer () {
-    if (!isActive ())
+void Slide_show.maybe_restart_timer () {
+    if (!is_active ())
         return;
 
-    startShow ();
+    start_show ();
 }
 
-void SlideShow.drawSlide (QPainter *painter, int index) {
+void Slide_show.draw_slide (QPainter *painter, int index) {
     string label = _labels.value (index);
-    QRect labelRect = style ().itemTextRect (fontMetrics (), rect (), Qt.AlignBottom | Qt.AlignHCenter, isEnabled (), label);
-    style ().drawItemText (painter, labelRect, Qt.AlignCenter, palette (), isEnabled (), label, QPalette.WindowText);
+    QRect label_rect = style ().item_text_rect (font_metrics (), rect (), Qt.Align_bottom | Qt.Align_hCenter, is_enabled (), label);
+    style ().draw_item_text (painter, label_rect, Qt.AlignCenter, palette (), is_enabled (), label, QPalette.Window_text);
 
     QPixmap pixmap = _pixmaps.value (index);
-    QRect pixmapRect = style ().itemPixmapRect (QRect (0, 0, width (), labelRect.top () - Spacing), Qt.AlignCenter, pixmap);
-    style ().drawItemPixmap (painter, pixmapRect, Qt.AlignCenter, pixmap);
+    QRect pixmap_rect = style ().item_pixmap_rect (QRect (0, 0, width (), label_rect.top () - Spacing), Qt.AlignCenter, pixmap);
+    style ().draw_item_pixmap (painter, pixmap_rect, Qt.AlignCenter, pixmap);
 }
 
 } // namespace Occ

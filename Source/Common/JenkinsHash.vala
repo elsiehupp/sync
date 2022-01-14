@@ -16,14 +16,14 @@ See http://burtleburtle.net/bob/hash/evahash.html
 
 @brief Interface of the cynapses jhash implementation
 
-@defgroup cynJHashInternals cynapses libc jhash function
-@ingroup cynLibraryAPI
+@defgroup cyn_jHash_internals cynapses libc jhash function
+@ingroup cyn_library_a_p_i
 
 @{
 ***********************************************************/
 
 // #include <stdint.h> // NOLINT
-// #include <QtCore/qglobal.h>
+// #include <Qt_core/qglobal.h>
 #ifndef Q_FALLTHROUGH
 const int Q_FALLTHROUGH () // Was added in Qt 5.8
 #endif

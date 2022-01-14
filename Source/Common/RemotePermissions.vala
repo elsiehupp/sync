@@ -27,56 +27,56 @@ private:
     // The first bit tells if the value is set or not
     // The remaining bits correspond to know if the value is set
     uint16 _value = 0;
-    static constexpr int notNullMask = 0x1;
+    static constexpr int not_null_mask = 0x1;
 
     template <typename Char> // can be 'char' or 'ushort' if conversion from string
-    void fromArray (Char *p);
+    void from_array (Char *p);
 
     public enum Permissions {
-        CanWrite = 1,             // W
-        CanDelete = 2,            // D
-        CanRename = 3,            // N
-        CanMove = 4,              // V
-        CanAddFile = 5,           // C
-        CanAddSubDirectories = 6, // K
-        CanReshare = 7,           // R
-        // Note : on the server, this means SharedWithMe, but in discoveryphase.cpp we also set
+        Can_write = 1,             // W
+        Can_delete = 2,            // D
+        Can_rename = 3,            // N
+        Can_move = 4,              // V
+        Can_add_file = 5,           // C
+        Can_add_sub_directories = 6, // K
+        Can_reshare = 7,           // R
+        // Note : on the server, this means Shared_with_me, but in discoveryphase.cpp we also set
         // this permission when the server reports the any "share-types"
-        IsShared = 8,             // S
-        IsMounted = 9,            // M
-        IsMountedSub = 10,        // m (internal : set if the parent dir has IsMounted)
+        Is_shared = 8,             // S
+        Is_mounted = 9,            // M
+        Is_mounted_sub = 10,        // m (internal : set if the parent dir has Is_mounted)
 
         // Note : when adding support for more permissions, we need to invalid the cache in the database.
-        // (by setting forceRemoteDiscovery in SyncJournalDb.checkConnect)
-        PermissionsCount = IsMountedSub
+        // (by setting force_remote_discovery in SyncJournalDb.check_connect)
+        PermissionsCount = Is_mounted_sub
     };
 
     /// null permissions
     public RemotePermissions () = default;
 
     /// array with one character per permission, "" is null, " " is non-null but empty
-    public QByteArray toDbValue ();
+    public QByteArray to_db_value ();
 
-    /// output for display purposes, no defined format (same as toDbValue in practice)
-    public string toString ();
+    /// output for display purposes, no defined format (same as to_db_value in practice)
+    public string to_string ();
 
-    /// read value that was written with toDbValue ()
-    public static RemotePermissions fromDbValue (QByteArray &);
+    /// read value that was written with to_db_value ()
+    public static RemotePermissions from_db_value (QByteArray &);
 
     /// read a permissions string received from the server, never null
-    public static RemotePermissions fromServerString (string &);
+    public static RemotePermissions from_server_string (string &);
 
-    public bool hasPermission (Permissions p) {
+    public bool has_permission (Permissions p) {
         return _value & (1 << static_cast<int> (p));
     }
-    public void setPermission (Permissions p) {
-        _value |= (1 << static_cast<int> (p)) | notNullMask;
+    public void set_permission (Permissions p) {
+        _value |= (1 << static_cast<int> (p)) | not_null_mask;
     }
-    public void unsetPermission (Permissions p) {
+    public void unset_permission (Permissions p) {
         _value &= ~ (1 << static_cast<int> (p));
     }
 
-    public bool isNull () { return ! (_value & notNullMask); }
+    public bool is_null () { return ! (_value & not_null_mask); }
     public friend bool operator== (RemotePermissions a, RemotePermissions b) {
         return a._value == b._value;
     }
@@ -85,7 +85,7 @@ private:
     }
 
     public friend QDebug operator<< (QDebug &dbg, RemotePermissions p) {
-        return dbg << p.toString ();
+        return dbg << p.to_string ();
     }
 };
 
@@ -94,8 +94,8 @@ private:
     static const char letters[] = " WDNVCKRSMm";
     
     template <typename Char>
-    void RemotePermissions.fromArray (Char *p) {
-        _value = notNullMask;
+    void RemotePermissions.from_array (Char *p) {
+        _value = not_null_mask;
         if (!p)
             return;
         while (*p) {
@@ -105,37 +105,37 @@ private:
         }
     }
     
-    QByteArray RemotePermissions.toDbValue () {
+    QByteArray RemotePermissions.to_db_value () {
         QByteArray result;
-        if (isNull ())
+        if (is_null ())
             return result;
         result.reserve (PermissionsCount);
         for (uint i = 1; i <= PermissionsCount; ++i) {
             if (_value & (1 << i))
                 result.append (letters[i]);
         }
-        if (result.isEmpty ()) {
+        if (result.is_empty ()) {
             // Make sure it is not empty so we can differentiate null and empty permissions
             result.append (' ');
         }
         return result;
     }
     
-    string RemotePermissions.toString () {
-        return string.fromUtf8 (toDbValue ());
+    string RemotePermissions.to_string () {
+        return string.from_utf8 (to_db_value ());
     }
     
-    RemotePermissions RemotePermissions.fromDbValue (QByteArray &value) {
-        if (value.isEmpty ())
+    RemotePermissions RemotePermissions.from_db_value (QByteArray &value) {
+        if (value.is_empty ())
             return {};
         RemotePermissions perm;
-        perm.fromArray (value.constData ());
+        perm.from_array (value.const_data ());
         return perm;
     }
     
-    RemotePermissions RemotePermissions.fromServerString (string &value) {
+    RemotePermissions RemotePermissions.from_server_string (string &value) {
         RemotePermissions perm;
-        perm.fromArray (value.utf16 ());
+        perm.from_array (value.utf16 ());
         return perm;
     }
     

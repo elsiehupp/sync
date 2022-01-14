@@ -1,11 +1,11 @@
 #ifndef USERMODEL_H
 const int USERMODEL_H
 
-// #include <QAbstractListModel>
+// #include <QAbstract_list_model>
 // #include <QImage>
 // #include <QDateTime>
 // #include <QStringList>
-// #include <QQuickImageProvider>
+// #include <QQuick_image_provider>
 // #include <QHash>
 
 // #include <chrono>
@@ -14,7 +14,7 @@ const int USERMODEL_H
 // #include <QDesktopServices>
 // #include <QIcon>
 // #include <QMessageBox>
-// #include <QSvgRenderer>
+// #include <QSvg_renderer>
 // #include <QPainter>
 // #include <QPushButton>
 
@@ -23,527 +23,527 @@ const int USERMODEL_H
 const int NOTIFICATION_REQUEST_FREE_PERIOD 15000
 
 namespace {
-constexpr int64 expiredActivitiesCheckIntervalMsecs = 1000 * 60;
-constexpr int64 activityDefaultExpirationTimeMsecs = 1000 * 60 * 10;
+constexpr int64 expired_activities_check_interval_msecs = 1000 * 60;
+constexpr int64 activity_default_expiration_time_msecs = 1000 * 60 * 10;
 }
 
 namespace Occ {
 
 class User : GLib.Object {
-    Q_PROPERTY (string name READ name NOTIFY nameChanged)
+    Q_PROPERTY (string name READ name NOTIFY name_changed)
     Q_PROPERTY (string server READ server CONSTANT)
-    Q_PROPERTY (bool serverHasUserStatus READ serverHasUserStatus CONSTANT)
-    Q_PROPERTY (QUrl statusIcon READ statusIcon NOTIFY statusChanged)
-    Q_PROPERTY (string statusEmoji READ statusEmoji NOTIFY statusChanged)
-    Q_PROPERTY (string statusMessage READ statusMessage NOTIFY statusChanged)
-    Q_PROPERTY (bool desktopNotificationsAllowed READ isDesktopNotificationsAllowed NOTIFY desktopNotificationsAllowedChanged)
-    Q_PROPERTY (bool hasLocalFolder READ hasLocalFolder NOTIFY hasLocalFolderChanged)
-    Q_PROPERTY (bool serverHasTalk READ serverHasTalk NOTIFY serverHasTalkChanged)
-    Q_PROPERTY (string avatar READ avatarUrl NOTIFY avatarChanged)
-    Q_PROPERTY (bool isConnected READ isConnected NOTIFY accountStateChanged)
-    Q_PROPERTY (UnifiedSearchResultsListModel* unifiedSearchResultsListModel READ getUnifiedSearchResultsListModel CONSTANT)
+    Q_PROPERTY (bool server_has_user_status READ server_has_user_status CONSTANT)
+    Q_PROPERTY (QUrl status_icon READ status_icon NOTIFY status_changed)
+    Q_PROPERTY (string status_emoji READ status_emoji NOTIFY status_changed)
+    Q_PROPERTY (string status_message READ status_message NOTIFY status_changed)
+    Q_PROPERTY (bool desktop_notifications_allowed READ is_desktop_notifications_allowed NOTIFY desktop_notifications_allowed_changed)
+    Q_PROPERTY (bool has_local_folder READ has_local_folder NOTIFY has_local_folder_changed)
+    Q_PROPERTY (bool server_has_talk READ server_has_talk NOTIFY server_has_talk_changed)
+    Q_PROPERTY (string avatar READ avatar_url NOTIFY avatar_changed)
+    Q_PROPERTY (bool is_connected READ is_connected NOTIFY account_state_changed)
+    Q_PROPERTY (Unified_search_results_list_model* unified_search_results_list_model READ get_unified_search_results_list_model CONSTANT)
 public:
-    User (AccountStatePtr &account, bool &isCurrent = false, GLib.Object *parent = nullptr);
+    User (AccountStatePtr &account, bool &is_current = false, GLib.Object *parent = nullptr);
 
     AccountPtr account ();
-    AccountStatePtr accountState ();
+    AccountStatePtr account_state ();
 
-    bool isConnected ();
-    bool isCurrentUser ();
-    void setCurrentUser (bool &isCurrent);
-    Folder *getFolder ();
-    ActivityListModel *getActivityModel ();
-    UnifiedSearchResultsListModel *getUnifiedSearchResultsListModel ();
-    void openLocalFolder ();
+    bool is_connected ();
+    bool is_current_user ();
+    void set_current_user (bool &is_current);
+    Folder *get_folder ();
+    Activity_list_model *get_activity_model ();
+    Unified_search_results_list_model *get_unified_search_results_list_model ();
+    void open_local_folder ();
     string name ();
     string server (bool shortened = true) const;
-    bool hasLocalFolder ();
-    bool serverHasTalk ();
-    bool serverHasUserStatus ();
-    AccountApp *talkApp ();
-    bool hasActivities ();
-    AccountAppList appList ();
+    bool has_local_folder ();
+    bool server_has_talk ();
+    bool server_has_user_status ();
+    AccountApp *talk_app ();
+    bool has_activities ();
+    AccountAppList app_list ();
     QImage avatar ();
     void login ();
     void logout ();
-    void removeAccount ();
-    string avatarUrl ();
-    bool isDesktopNotificationsAllowed ();
-    UserStatus.OnlineStatus status ();
-    string statusMessage ();
-    QUrl statusIcon ();
-    string statusEmoji ();
-    void processCompletedSyncItem (Folder *folder, SyncFileItemPtr &item);
+    void remove_account ();
+    string avatar_url ();
+    bool is_desktop_notifications_allowed ();
+    User_status.Online_status status ();
+    string status_message ();
+    QUrl status_icon ();
+    string status_emoji ();
+    void process_completed_sync_item (Folder *folder, Sync_file_item_ptr &item);
 
 signals:
-    void guiLog (string &, string &);
-    void nameChanged ();
-    void hasLocalFolderChanged ();
-    void serverHasTalkChanged ();
-    void avatarChanged ();
-    void accountStateChanged ();
-    void statusChanged ();
-    void desktopNotificationsAllowedChanged ();
+    void gui_log (string &, string &);
+    void name_changed ();
+    void has_local_folder_changed ();
+    void server_has_talk_changed ();
+    void avatar_changed ();
+    void account_state_changed ();
+    void status_changed ();
+    void desktop_notifications_allowed_changed ();
 
 public slots:
-    void slotItemCompleted (string &folder, SyncFileItemPtr &item);
-    void slotProgressInfo (string &folder, ProgressInfo &progress);
-    void slotAddError (string &folderAlias, string &message, ErrorCategory category);
-    void slotAddErrorToGui (string &folderAlias, SyncFileItem.Status status, string &errorMessage, string &subject = {});
-    void slotNotificationRequestFinished (int statusCode);
-    void slotNotifyNetworkError (QNetworkReply *reply);
-    void slotEndNotificationRequest (int replyCode);
-    void slotNotifyServerFinished (string &reply, int replyCode);
-    void slotSendNotificationRequest (string &accountName, string &link, QByteArray &verb, int row);
-    void slotBuildNotificationDisplay (ActivityList &list);
-    void slotRefreshNotifications ();
-    void slotRefreshActivities ();
-    void slotRefresh ();
-    void slotRefreshUserStatus ();
-    void slotRefreshImmediately ();
-    void setNotificationRefreshInterval (std.chrono.milliseconds interval);
-    void slotRebuildNavigationAppList ();
+    void slot_item_completed (string &folder, Sync_file_item_ptr &item);
+    void slot_progress_info (string &folder, Progress_info &progress);
+    void slot_add_error (string &folder_alias, string &message, Error_category category);
+    void slot_add_error_to_gui (string &folder_alias, SyncFileItem.Status status, string &error_message, string &subject = {});
+    void slot_notification_request_finished (int status_code);
+    void slot_notify_network_error (QNetworkReply *reply);
+    void slot_end_notification_request (int reply_code);
+    void slot_notify_server_finished (string &reply, int reply_code);
+    void slot_send_notification_request (string &account_name, string &link, QByteArray &verb, int row);
+    void slot_build_notification_display (Activity_list &list);
+    void slot_refresh_notifications ();
+    void slot_refresh_activities ();
+    void slot_refresh ();
+    void slot_refresh_user_status ();
+    void slot_refresh_immediately ();
+    void set_notification_refresh_interval (std.chrono.milliseconds interval);
+    void slot_rebuild_navigation_app_list ();
 
 private:
-    void slotPushNotificationsReady ();
-    void slotDisconnectPushNotifications ();
-    void slotReceivedPushNotification (Account *account);
-    void slotReceivedPushActivity (Account *account);
-    void slotCheckExpiredActivities ();
+    void slot_push_notifications_ready ();
+    void slot_disconnect_push_notifications ();
+    void slot_received_push_notification (Account *account);
+    void slot_received_push_activity (Account *account);
+    void slot_check_expired_activities ();
 
-    void connectPushNotifications ();
-    bool checkPushNotificationsAreReady ();
+    void connect_push_notifications ();
+    bool check_push_notifications_are_ready ();
 
-    bool isActivityOfCurrentAccount (Folder *folder) const;
-    bool isUnsolvableConflict (SyncFileItemPtr &item) const;
+    bool is_activity_of_current_account (Folder *folder) const;
+    bool is_unsolvable_conflict (Sync_file_item_ptr &item) const;
 
-    void showDesktopNotification (string &title, string &message);
+    void show_desktop_notification (string &title, string &message);
 
 private:
     AccountStatePtr _account;
-    bool _isCurrentUser;
-    ActivityListModel *_activityModel;
-    UnifiedSearchResultsListModel *_unifiedSearchResultsModel;
-    ActivityList _blacklistedNotifications;
+    bool _is_current_user;
+    Activity_list_model *_activity_model;
+    Unified_search_results_list_model *_unified_search_results_model;
+    Activity_list _blacklisted_notifications;
 
-    QTimer _expiredActivitiesCheckTimer;
-    QTimer _notificationCheckTimer;
-    QHash<AccountState *, QElapsedTimer> _timeSinceLastCheck;
+    QTimer _expired_activities_check_timer;
+    QTimer _notification_check_timer;
+    QHash<AccountState *, QElapsedTimer> _time_since_last_check;
 
-    QElapsedTimer _guiLogTimer;
-    NotificationCache _notificationCache;
+    QElapsedTimer _gui_log_timer;
+    Notification_cache _notification_cache;
 
     // number of currently running notification requests. If non zero,
     // no query for notifications is started.
-    int _notificationRequestsRunning;
+    int _notification_requests_running;
 };
 
-class UserModel : QAbstractListModel {
-    Q_PROPERTY (User* currentUser READ currentUser NOTIFY newUserSelected)
-    Q_PROPERTY (int currentUserId READ currentUserId NOTIFY newUserSelected)
+class User_model : QAbstract_list_model {
+    Q_PROPERTY (User* current_user READ current_user NOTIFY new_user_selected)
+    Q_PROPERTY (int current_user_id READ current_user_id NOTIFY new_user_selected)
 public:
-    static UserModel *instance ();
-    ~UserModel () override = default;
+    static User_model *instance ();
+    ~User_model () override = default;
 
-    void addUser (AccountStatePtr &user, bool &isCurrent = false);
-    int currentUserIndex ();
+    void add_user (AccountStatePtr &user, bool &is_current = false);
+    int current_user_index ();
 
-    int rowCount (QModelIndex &parent = QModelIndex ()) const override;
+    int row_count (QModelIndex &parent = QModelIndex ()) const override;
 
-    QVariant data (QModelIndex &index, int role = Qt.DisplayRole) const override;
+    QVariant data (QModelIndex &index, int role = Qt.Display_role) const override;
 
-    QImage avatarById (int &id);
+    QImage avatar_by_id (int &id);
 
-    User *currentUser ();
+    User *current_user ();
 
-    int findUserIdForAccount (AccountState *account) const;
+    int find_user_id_for_account (AccountState *account) const;
 
-    Q_INVOKABLE void fetchCurrentActivityModel ();
-    Q_INVOKABLE void openCurrentAccountLocalFolder ();
-    Q_INVOKABLE void openCurrentAccountTalk ();
-    Q_INVOKABLE void openCurrentAccountServer ();
-    Q_INVOKABLE int numUsers ();
-    Q_INVOKABLE string currentUserServer ();
-    int currentUserId ();
-    Q_INVOKABLE bool isUserConnected (int &id);
-    Q_INVOKABLE void switchCurrentUser (int &id);
+    Q_INVOKABLE void fetch_current_activity_model ();
+    Q_INVOKABLE void open_current_account_local_folder ();
+    Q_INVOKABLE void open_current_account_talk ();
+    Q_INVOKABLE void open_current_account_server ();
+    Q_INVOKABLE int num_users ();
+    Q_INVOKABLE string current_user_server ();
+    int current_user_id ();
+    Q_INVOKABLE bool is_user_connected (int &id);
+    Q_INVOKABLE void switch_current_user (int &id);
     Q_INVOKABLE void login (int &id);
     Q_INVOKABLE void logout (int &id);
-    Q_INVOKABLE void removeAccount (int &id);
+    Q_INVOKABLE void remove_account (int &id);
 
-    Q_INVOKABLE std.shared_ptr<Occ.UserStatusConnector> userStatusConnector (int id);
+    Q_INVOKABLE std.shared_ptr<Occ.User_status_connector> user_status_connector (int id);
 
-    ActivityListModel *currentActivityModel ();
+    Activity_list_model *current_activity_model ();
 
-    enum UserRoles {
-        NameRole = Qt.UserRole + 1,
-        ServerRole,
-        ServerHasUserStatusRole,
-        StatusIconRole,
-        StatusEmojiRole,
-        StatusMessageRole,
-        DesktopNotificationsAllowedRole,
-        AvatarRole,
-        IsCurrentUserRole,
-        IsConnectedRole,
-        IdRole
+    enum User_roles {
+        Name_role = Qt.User_role + 1,
+        Server_role,
+        Server_has_user_status_role,
+        Status_icon_role,
+        Status_emoji_role,
+        Status_message_role,
+        Desktop_notifications_allowed_role,
+        Avatar_role,
+        Is_current_user_role,
+        Is_connected_role,
+        Id_role
     };
 
-    AccountAppList appList ();
+    AccountAppList app_list ();
 
 signals:
-    Q_INVOKABLE void addAccount ();
-    Q_INVOKABLE void newUserSelected ();
+    Q_INVOKABLE void add_account ();
+    Q_INVOKABLE void new_user_selected ();
 
 protected:
-    QHash<int, QByteArray> roleNames () const override;
+    QHash<int, QByteArray> role_names () const override;
 
 private:
-    static UserModel *_instance;
-    UserModel (GLib.Object *parent = nullptr);
+    static User_model *_instance;
+    User_model (GLib.Object *parent = nullptr);
     QList<User> _users;
-    int _currentUserId = 0;
+    int _current_user_id = 0;
     bool _init = true;
 
-    void buildUserList ();
+    void build_user_list ();
 };
 
-class ImageProvider : QQuickImageProvider {
+class Image_provider : QQuick_image_provider {
 public:
-    ImageProvider ();
-    QImage requestImage (string &id, QSize *size, QSize &requestedSize) override;
+    Image_provider ();
+    QImage request_image (string &id, QSize *size, QSize &requested_size) override;
 };
 
-class UserAppsModel : QAbstractListModel {
+class User_apps_model : QAbstract_list_model {
 public:
-    static UserAppsModel *instance ();
-    ~UserAppsModel () override = default;
+    static User_apps_model *instance ();
+    ~User_apps_model () override = default;
 
-    int rowCount (QModelIndex &parent = QModelIndex ()) const override;
+    int row_count (QModelIndex &parent = QModelIndex ()) const override;
 
-    QVariant data (QModelIndex &index, int role = Qt.DisplayRole) const override;
+    QVariant data (QModelIndex &index, int role = Qt.Display_role) const override;
 
-    enum UserAppsRoles {
-        NameRole = Qt.UserRole + 1,
-        UrlRole,
-        IconUrlRole
+    enum User_apps_roles {
+        Name_role = Qt.User_role + 1,
+        Url_role,
+        Icon_url_role
     };
 
-    void buildAppList ();
+    void build_app_list ();
 
 public slots:
-    void openAppUrl (QUrl &url);
+    void open_app_url (QUrl &url);
 
 protected:
-    QHash<int, QByteArray> roleNames () const override;
+    QHash<int, QByteArray> role_names () const override;
 
 private:
-    static UserAppsModel *_instance;
-    UserAppsModel (GLib.Object *parent = nullptr);
+    static User_apps_model *_instance;
+    User_apps_model (GLib.Object *parent = nullptr);
 
     AccountAppList _apps;
 };
 
-User.User (AccountStatePtr &account, bool &isCurrent, GLib.Object *parent)
+User.User (AccountStatePtr &account, bool &is_current, GLib.Object *parent)
     : GLib.Object (parent)
     , _account (account)
-    , _isCurrentUser (isCurrent)
-    , _activityModel (new ActivityListModel (_account.data (), this))
-    , _unifiedSearchResultsModel (new UnifiedSearchResultsListModel (_account.data (), this))
-    , _notificationRequestsRunning (0) {
-    connect (ProgressDispatcher.instance (), &ProgressDispatcher.progressInfo,
-        this, &User.slotProgressInfo);
-    connect (ProgressDispatcher.instance (), &ProgressDispatcher.itemCompleted,
-        this, &User.slotItemCompleted);
-    connect (ProgressDispatcher.instance (), &ProgressDispatcher.syncError,
-        this, &User.slotAddError);
-    connect (ProgressDispatcher.instance (), &ProgressDispatcher.addErrorToGui,
-        this, &User.slotAddErrorToGui);
+    , _is_current_user (is_current)
+    , _activity_model (new Activity_list_model (_account.data (), this))
+    , _unified_search_results_model (new Unified_search_results_list_model (_account.data (), this))
+    , _notification_requests_running (0) {
+    connect (Progress_dispatcher.instance (), &Progress_dispatcher.progress_info,
+        this, &User.slot_progress_info);
+    connect (Progress_dispatcher.instance (), &Progress_dispatcher.item_completed,
+        this, &User.slot_item_completed);
+    connect (Progress_dispatcher.instance (), &Progress_dispatcher.sync_error,
+        this, &User.slot_add_error);
+    connect (Progress_dispatcher.instance (), &Progress_dispatcher.add_error_to_gui,
+        this, &User.slot_add_error_to_gui);
 
-    connect (&_notificationCheckTimer, &QTimer.timeout,
-        this, &User.slotRefresh);
+    connect (&_notification_check_timer, &QTimer.timeout,
+        this, &User.slot_refresh);
 
-    connect (&_expiredActivitiesCheckTimer, &QTimer.timeout,
-        this, &User.slotCheckExpiredActivities);
+    connect (&_expired_activities_check_timer, &QTimer.timeout,
+        this, &User.slot_check_expired_activities);
 
-    connect (_account.data (), &AccountState.stateChanged,
-            [=] () { if (isConnected ()) {slotRefreshImmediately ();} });
-    connect (_account.data (), &AccountState.stateChanged, this, &User.accountStateChanged);
-    connect (_account.data (), &AccountState.hasFetchedNavigationApps,
-        this, &User.slotRebuildNavigationAppList);
-    connect (_account.account ().data (), &Account.accountChangedDisplayName, this, &User.nameChanged);
+    connect (_account.data (), &AccountState.state_changed,
+            [=] () { if (is_connected ()) {slot_refresh_immediately ();} });
+    connect (_account.data (), &AccountState.state_changed, this, &User.account_state_changed);
+    connect (_account.data (), &AccountState.has_fetched_navigation_apps,
+        this, &User.slot_rebuild_navigation_app_list);
+    connect (_account.account ().data (), &Account.account_changed_display_name, this, &User.name_changed);
 
-    connect (FolderMan.instance (), &FolderMan.folderListChanged, this, &User.hasLocalFolderChanged);
+    connect (FolderMan.instance (), &FolderMan.folder_list_changed, this, &User.has_local_folder_changed);
 
-    connect (this, &User.guiLog, Logger.instance (), &Logger.guiLog);
+    connect (this, &User.gui_log, Logger.instance (), &Logger.gui_log);
 
-    connect (_account.account ().data (), &Account.accountChangedAvatar, this, &User.avatarChanged);
-    connect (_account.account ().data (), &Account.userStatusChanged, this, &User.statusChanged);
-    connect (_account.data (), &AccountState.desktopNotificationsAllowedChanged, this, &User.desktopNotificationsAllowedChanged);
+    connect (_account.account ().data (), &Account.account_changed_avatar, this, &User.avatar_changed);
+    connect (_account.account ().data (), &Account.user_status_changed, this, &User.status_changed);
+    connect (_account.data (), &AccountState.desktop_notifications_allowed_changed, this, &User.desktop_notifications_allowed_changed);
 
-    connect (_activityModel, &ActivityListModel.sendNotificationRequest, this, &User.slotSendNotificationRequest);
+    connect (_activity_model, &Activity_list_model.send_notification_request, this, &User.slot_send_notification_request);
 }
 
-void User.showDesktopNotification (string &title, string &message) {
+void User.show_desktop_notification (string &title, string &message) {
     ConfigFile cfg;
-    if (!cfg.optionalServerNotifications () || !isDesktopNotificationsAllowed ()) {
+    if (!cfg.optional_server_notifications () || !is_desktop_notifications_allowed ()) {
         return;
     }
 
     // after one hour, clear the gui log notification store
-    constexpr int64 clearGuiLogInterval = 60 * 60 * 1000;
-    if (_guiLogTimer.elapsed () > clearGuiLogInterval) {
-        _notificationCache.clear ();
+    constexpr int64 clear_gui_log_interval = 60 * 60 * 1000;
+    if (_gui_log_timer.elapsed () > clear_gui_log_interval) {
+        _notification_cache.clear ();
     }
 
-    const NotificationCache.Notification notification { title, message };
-    if (_notificationCache.contains (notification)) {
+    const Notification_cache.Notification notification { title, message };
+    if (_notification_cache.contains (notification)) {
         return;
     }
 
-    _notificationCache.insert (notification);
-    emit guiLog (notification.title, notification.message);
+    _notification_cache.insert (notification);
+    emit gui_log (notification.title, notification.message);
     // restart the gui log timer now that we show a new notification
-    _guiLogTimer.start ();
+    _gui_log_timer.start ();
 }
 
-void User.slotBuildNotificationDisplay (ActivityList &list) {
-    _activityModel.clearNotifications ();
+void User.slot_build_notification_display (Activity_list &list) {
+    _activity_model.clear_notifications ();
 
     foreach (auto activity, list) {
-        if (_blacklistedNotifications.contains (activity)) {
-            qCInfo (lcActivity) << "Activity in blacklist, skip";
+        if (_blacklisted_notifications.contains (activity)) {
+            q_c_info (lc_activity) << "Activity in blacklist, skip";
             continue;
         }
-        const auto message = AccountManager.instance ().accounts ().count () == 1 ? "" : activity._accName;
-        showDesktopNotification (activity._subject, message);
-        _activityModel.addNotificationToActivityList (activity);
+        const auto message = AccountManager.instance ().accounts ().count () == 1 ? "" : activity._acc_name;
+        show_desktop_notification (activity._subject, message);
+        _activity_model.add_notification_to_activity_list (activity);
     }
 }
 
-void User.setNotificationRefreshInterval (std.chrono.milliseconds interval) {
-    if (!checkPushNotificationsAreReady ()) {
-        qCDebug (lcActivity) << "Starting Notification refresh timer with " << interval.count () / 1000 << " sec interval";
-        _notificationCheckTimer.start (interval.count ());
+void User.set_notification_refresh_interval (std.chrono.milliseconds interval) {
+    if (!check_push_notifications_are_ready ()) {
+        q_c_debug (lc_activity) << "Starting Notification refresh timer with " << interval.count () / 1000 << " sec interval";
+        _notification_check_timer.start (interval.count ());
     }
 }
 
-void User.slotPushNotificationsReady () {
-    qCInfo (lcActivity) << "Push notifications are ready";
+void User.slot_push_notifications_ready () {
+    q_c_info (lc_activity) << "Push notifications are ready";
 
-    if (_notificationCheckTimer.isActive ()) {
+    if (_notification_check_timer.is_active ()) {
         // as we are now able to use push notifications - let's stop the polling timer
-        _notificationCheckTimer.stop ();
+        _notification_check_timer.stop ();
     }
 
-    connectPushNotifications ();
+    connect_push_notifications ();
 }
 
-void User.slotDisconnectPushNotifications () {
-    disconnect (_account.account ().pushNotifications (), &PushNotifications.notificationsChanged, this, &User.slotReceivedPushNotification);
-    disconnect (_account.account ().pushNotifications (), &PushNotifications.activitiesChanged, this, &User.slotReceivedPushActivity);
+void User.slot_disconnect_push_notifications () {
+    disconnect (_account.account ().push_notifications (), &Push_notifications.notifications_changed, this, &User.slot_received_push_notification);
+    disconnect (_account.account ().push_notifications (), &Push_notifications.activities_changed, this, &User.slot_received_push_activity);
 
-    disconnect (_account.account ().data (), &Account.pushNotificationsDisabled, this, &User.slotDisconnectPushNotifications);
+    disconnect (_account.account ().data (), &Account.push_notifications_disabled, this, &User.slot_disconnect_push_notifications);
 
-    // connection to WebSocket may have dropped or an error occured, so we need to bring back the polling until we have re-established the connection
-    setNotificationRefreshInterval (ConfigFile ().notificationRefreshInterval ());
+    // connection to Web_socket may have dropped or an error occured, so we need to bring back the polling until we have re-established the connection
+    set_notification_refresh_interval (ConfigFile ().notification_refresh_interval ());
 }
 
-void User.slotReceivedPushNotification (Account *account) {
+void User.slot_received_push_notification (Account *account) {
     if (account.id () == _account.account ().id ()) {
-        slotRefreshNotifications ();
+        slot_refresh_notifications ();
     }
 }
 
-void User.slotReceivedPushActivity (Account *account) {
+void User.slot_received_push_activity (Account *account) {
     if (account.id () == _account.account ().id ()) {
-        slotRefreshActivities ();
+        slot_refresh_activities ();
     }
 }
 
-void User.slotCheckExpiredActivities () {
-    for (Activity &activity : _activityModel.errorsList ()) {
-        if (activity._expireAtMsecs > 0 && QDateTime.currentDateTime ().toMSecsSinceEpoch () >= activity._expireAtMsecs) {
-            _activityModel.removeActivityFromActivityList (activity);
+void User.slot_check_expired_activities () {
+    for (Activity &activity : _activity_model.errors_list ()) {
+        if (activity._expire_at_msecs > 0 && QDateTime.current_date_time ().to_m_secs_since_epoch () >= activity._expire_at_msecs) {
+            _activity_model.remove_activity_from_activity_list (activity);
         }
     }
 
-    if (_activityModel.errorsList ().size () == 0) {
-        _expiredActivitiesCheckTimer.stop ();
+    if (_activity_model.errors_list ().size () == 0) {
+        _expired_activities_check_timer.stop ();
     }
 }
 
-void User.connectPushNotifications () {
-    connect (_account.account ().data (), &Account.pushNotificationsDisabled, this, &User.slotDisconnectPushNotifications, Qt.UniqueConnection);
+void User.connect_push_notifications () {
+    connect (_account.account ().data (), &Account.push_notifications_disabled, this, &User.slot_disconnect_push_notifications, Qt.UniqueConnection);
 
-    connect (_account.account ().pushNotifications (), &PushNotifications.notificationsChanged, this, &User.slotReceivedPushNotification, Qt.UniqueConnection);
-    connect (_account.account ().pushNotifications (), &PushNotifications.activitiesChanged, this, &User.slotReceivedPushActivity, Qt.UniqueConnection);
+    connect (_account.account ().push_notifications (), &Push_notifications.notifications_changed, this, &User.slot_received_push_notification, Qt.UniqueConnection);
+    connect (_account.account ().push_notifications (), &Push_notifications.activities_changed, this, &User.slot_received_push_activity, Qt.UniqueConnection);
 }
 
-bool User.checkPushNotificationsAreReady () {
-    const auto pushNotifications = _account.account ().pushNotifications ();
+bool User.check_push_notifications_are_ready () {
+    const auto push_notifications = _account.account ().push_notifications ();
 
-    const auto pushActivitiesAvailable = _account.account ().capabilities ().availablePushNotifications () & PushNotificationType.Activities;
-    const auto pushNotificationsAvailable = _account.account ().capabilities ().availablePushNotifications () & PushNotificationType.Notifications;
+    const auto push_activities_available = _account.account ().capabilities ().available_push_notifications () & Push_notification_type.Activities;
+    const auto push_notifications_available = _account.account ().capabilities ().available_push_notifications () & Push_notification_type.Notifications;
 
-    const auto pushActivitiesAndNotificationsAvailable = pushActivitiesAvailable && pushNotificationsAvailable;
+    const auto push_activities_and_notifications_available = push_activities_available && push_notifications_available;
 
-    if (pushActivitiesAndNotificationsAvailable && pushNotifications && pushNotifications.isReady ()) {
-        connectPushNotifications ();
+    if (push_activities_and_notifications_available && push_notifications && push_notifications.is_ready ()) {
+        connect_push_notifications ();
         return true;
     } else {
-        connect (_account.account ().data (), &Account.pushNotificationsReady, this, &User.slotPushNotificationsReady, Qt.UniqueConnection);
+        connect (_account.account ().data (), &Account.push_notifications_ready, this, &User.slot_push_notifications_ready, Qt.UniqueConnection);
         return false;
     }
 }
 
-void User.slotRefreshImmediately () {
-    if (_account.data () && _account.data ().isConnected ()) {
-        slotRefreshActivities ();
+void User.slot_refresh_immediately () {
+    if (_account.data () && _account.data ().is_connected ()) {
+        slot_refresh_activities ();
     }
-    slotRefreshNotifications ();
+    slot_refresh_notifications ();
 }
 
-void User.slotRefresh () {
-    slotRefreshUserStatus ();
+void User.slot_refresh () {
+    slot_refresh_user_status ();
 
-    if (checkPushNotificationsAreReady ()) {
-        // we are relying on WebSocket push notifications - ignore refresh attempts from UI
-        _timeSinceLastCheck[_account.data ()].invalidate ();
+    if (check_push_notifications_are_ready ()) {
+        // we are relying on Web_socket push notifications - ignore refresh attempts from UI
+        _time_since_last_check[_account.data ()].invalidate ();
         return;
     }
 
     // QElapsedTimer isn't actually constructed as invalid.
-    if (!_timeSinceLastCheck.contains (_account.data ())) {
-        _timeSinceLastCheck[_account.data ()].invalidate ();
+    if (!_time_since_last_check.contains (_account.data ())) {
+        _time_since_last_check[_account.data ()].invalidate ();
     }
-    QElapsedTimer &timer = _timeSinceLastCheck[_account.data ()];
+    QElapsedTimer &timer = _time_since_last_check[_account.data ()];
 
     // Fetch Activities only if visible and if last check is longer than 15 secs ago
-    if (timer.isValid () && timer.elapsed () < NOTIFICATION_REQUEST_FREE_PERIOD) {
-        qCDebug (lcActivity) << "Do not check as last check is only secs ago : " << timer.elapsed () / 1000;
+    if (timer.is_valid () && timer.elapsed () < NOTIFICATION_REQUEST_FREE_PERIOD) {
+        q_c_debug (lc_activity) << "Do not check as last check is only secs ago : " << timer.elapsed () / 1000;
         return;
     }
-    if (_account.data () && _account.data ().isConnected ()) {
-        if (!timer.isValid ()) {
-            slotRefreshActivities ();
+    if (_account.data () && _account.data ().is_connected ()) {
+        if (!timer.is_valid ()) {
+            slot_refresh_activities ();
         }
-        slotRefreshNotifications ();
+        slot_refresh_notifications ();
         timer.start ();
     }
 }
 
-void User.slotRefreshActivities () {
-    _activityModel.slotRefreshActivity ();
+void User.slot_refresh_activities () {
+    _activity_model.slot_refresh_activity ();
 }
 
-void User.slotRefreshUserStatus () {
-    if (_account.data () && _account.data ().isConnected ()) {
-        _account.account ().userStatusConnector ().fetchUserStatus ();
+void User.slot_refresh_user_status () {
+    if (_account.data () && _account.data ().is_connected ()) {
+        _account.account ().user_status_connector ().fetch_user_status ();
     }
 }
 
-void User.slotRefreshNotifications () {
+void User.slot_refresh_notifications () {
     // start a server notification handler if no notification requests
     // are running
-    if (_notificationRequestsRunning == 0) {
-        auto *snh = new ServerNotificationHandler (_account.data ());
-        connect (snh, &ServerNotificationHandler.newNotificationList,
-            this, &User.slotBuildNotificationDisplay);
+    if (_notification_requests_running == 0) {
+        auto *snh = new Server_notification_handler (_account.data ());
+        connect (snh, &Server_notification_handler.new_notification_list,
+            this, &User.slot_build_notification_display);
 
-        snh.slotFetchNotifications ();
+        snh.slot_fetch_notifications ();
     } else {
-        qCWarning (lcActivity) << "Notification request counter not zero.";
+        q_c_warning (lc_activity) << "Notification request counter not zero.";
     }
 }
 
-void User.slotRebuildNavigationAppList () {
-    emit serverHasTalkChanged ();
+void User.slot_rebuild_navigation_app_list () {
+    emit server_has_talk_changed ();
     // Rebuild App list
-    UserAppsModel.instance ().buildAppList ();
+    User_apps_model.instance ().build_app_list ();
 }
 
-void User.slotNotificationRequestFinished (int statusCode) {
-    int row = sender ().property ("activityRow").toInt ();
+void User.slot_notification_request_finished (int status_code) {
+    int row = sender ().property ("activity_row").to_int ();
 
     // the ocs API returns stat code 100 or 200 inside the xml if it succeeded.
-    if (statusCode != OCS_SUCCESS_STATUS_CODE && statusCode != OCS_SUCCESS_STATUS_CODE_V2) {
-        qCWarning (lcActivity) << "Notification Request to Server failed, leave notification visible.";
+    if (status_code != OCS_SUCCESS_STATUS_CODE && status_code != OCS_SUCCESS_STATUS_CODE_V2) {
+        q_c_warning (lc_activity) << "Notification Request to Server failed, leave notification visible.";
     } else {
         // to do use the model to rebuild the list or remove the item
-        qCWarning (lcActivity) << "Notification Request to Server successed, rebuilding list.";
-        _activityModel.removeActivityFromActivityList (row);
+        q_c_warning (lc_activity) << "Notification Request to Server successed, rebuilding list.";
+        _activity_model.remove_activity_from_activity_list (row);
     }
 }
 
-void User.slotEndNotificationRequest (int replyCode) {
-    _notificationRequestsRunning--;
-    slotNotificationRequestFinished (replyCode);
+void User.slot_end_notification_request (int reply_code) {
+    _notification_requests_running--;
+    slot_notification_request_finished (reply_code);
 }
 
-void User.slotSendNotificationRequest (string &accountName, string &link, QByteArray &verb, int row) {
-    qCInfo (lcActivity) << "Server Notification Request " << verb << link << "on account" << accountName;
+void User.slot_send_notification_request (string &account_name, string &link, QByteArray &verb, int row) {
+    q_c_info (lc_activity) << "Server Notification Request " << verb << link << "on account" << account_name;
 
-    const QStringList validVerbs = QStringList () << "GET"
+    const QStringList valid_verbs = QStringList () << "GET"
                                                  << "PUT"
                                                  << "POST"
                                                  << "DELETE";
 
-    if (validVerbs.contains (verb)) {
-        AccountStatePtr acc = AccountManager.instance ().account (accountName);
+    if (valid_verbs.contains (verb)) {
+        AccountStatePtr acc = AccountManager.instance ().account (account_name);
         if (acc) {
-            auto *job = new NotificationConfirmJob (acc.account ());
+            auto *job = new Notification_confirm_job (acc.account ());
             QUrl l (link);
-            job.setLinkAndVerb (l, verb);
-            job.setProperty ("activityRow", QVariant.fromValue (row));
-            connect (job, &AbstractNetworkJob.networkError,
-                this, &User.slotNotifyNetworkError);
-            connect (job, &NotificationConfirmJob.jobFinished,
-                this, &User.slotNotifyServerFinished);
+            job.set_link_and_verb (l, verb);
+            job.set_property ("activity_row", QVariant.from_value (row));
+            connect (job, &AbstractNetworkJob.network_error,
+                this, &User.slot_notify_network_error);
+            connect (job, &Notification_confirm_job.job_finished,
+                this, &User.slot_notify_server_finished);
             job.start ();
 
             // count the number of running notification requests. If this member var
             // is larger than zero, no new fetching of notifications is started
-            _notificationRequestsRunning++;
+            _notification_requests_running++;
         }
     } else {
-        qCWarning (lcActivity) << "Notification Links : Invalid verb:" << verb;
+        q_c_warning (lc_activity) << "Notification Links : Invalid verb:" << verb;
     }
 }
 
-void User.slotNotifyNetworkError (QNetworkReply *reply) {
-    auto *job = qobject_cast<NotificationConfirmJob> (sender ());
+void User.slot_notify_network_error (QNetworkReply *reply) {
+    auto *job = qobject_cast<Notification_confirm_job> (sender ());
     if (!job) {
         return;
     }
 
-    int resultCode = reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).toInt ();
+    int result_code = reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
 
-    slotEndNotificationRequest (resultCode);
-    qCWarning (lcActivity) << "Server notify job failed with code " << resultCode;
+    slot_end_notification_request (result_code);
+    q_c_warning (lc_activity) << "Server notify job failed with code " << result_code;
 }
 
-void User.slotNotifyServerFinished (string &reply, int replyCode) {
-    auto *job = qobject_cast<NotificationConfirmJob> (sender ());
+void User.slot_notify_server_finished (string &reply, int reply_code) {
+    auto *job = qobject_cast<Notification_confirm_job> (sender ());
     if (!job) {
         return;
     }
 
-    slotEndNotificationRequest (replyCode);
-    qCInfo (lcActivity) << "Server Notification reply code" << replyCode << reply;
+    slot_end_notification_request (reply_code);
+    q_c_info (lc_activity) << "Server Notification reply code" << reply_code << reply;
 }
 
-void User.slotProgressInfo (string &folder, ProgressInfo &progress) {
-    if (progress.status () == ProgressInfo.Reconcile) {
+void User.slot_progress_info (string &folder, Progress_info &progress) {
+    if (progress.status () == Progress_info.Reconcile) {
         // Wipe all non-persistent entries - as well as the persistent ones
         // in cases where a local discovery was done.
         auto f = FolderMan.instance ().folder (folder);
         if (!f)
             return;
-        const auto &engine = f.syncEngine ();
-        const auto style = engine.lastLocalDiscoveryStyle ();
-        foreach (Activity activity, _activityModel.errorsList ()) {
-            if (activity._expireAtMsecs != -1) {
+        const auto &engine = f.sync_engine ();
+        const auto style = engine.last_local_discovery_style ();
+        foreach (Activity activity, _activity_model.errors_list ()) {
+            if (activity._expire_at_msecs != -1) {
                 // we process expired activities in a different slot
                 continue;
             }
@@ -551,208 +551,208 @@ void User.slotProgressInfo (string &folder, ProgressInfo &progress) {
                 continue;
             }
 
-            if (style == LocalDiscoveryStyle.FilesystemOnly) {
-                _activityModel.removeActivityFromActivityList (activity);
+            if (style == Local_discovery_style.Filesystem_only) {
+                _activity_model.remove_activity_from_activity_list (activity);
                 continue;
             }
 
             if (activity._status == SyncFileItem.Conflict && !QFileInfo (f.path () + activity._file).exists ()) {
-                _activityModel.removeActivityFromActivityList (activity);
+                _activity_model.remove_activity_from_activity_list (activity);
                 continue;
             }
 
-            if (activity._status == SyncFileItem.FileLocked && !QFileInfo (f.path () + activity._file).exists ()) {
-                _activityModel.removeActivityFromActivityList (activity);
+            if (activity._status == SyncFileItem.File_locked && !QFileInfo (f.path () + activity._file).exists ()) {
+                _activity_model.remove_activity_from_activity_list (activity);
                 continue;
             }
 
-            if (activity._status == SyncFileItem.FileIgnored && !QFileInfo (f.path () + activity._file).exists ()) {
-                _activityModel.removeActivityFromActivityList (activity);
+            if (activity._status == SyncFileItem.File_ignored && !QFileInfo (f.path () + activity._file).exists ()) {
+                _activity_model.remove_activity_from_activity_list (activity);
                 continue;
             }
 
             if (!QFileInfo (f.path () + activity._file).exists ()) {
-                _activityModel.removeActivityFromActivityList (activity);
+                _activity_model.remove_activity_from_activity_list (activity);
                 continue;
             }
 
-            auto path = QFileInfo (activity._file).dir ().path ().toUtf8 ();
+            auto path = QFileInfo (activity._file).dir ().path ().to_utf8 ();
             if (path == ".")
                 path.clear ();
 
-            if (engine.shouldDiscoverLocally (path))
-                _activityModel.removeActivityFromActivityList (activity);
+            if (engine.should_discover_locally (path))
+                _activity_model.remove_activity_from_activity_list (activity);
         }
     }
 
-    if (progress.status () == ProgressInfo.Done) {
+    if (progress.status () == Progress_info.Done) {
         // We keep track very well of pending conflicts.
         // Inform other components about them.
         QStringList conflicts;
-        foreach (Activity activity, _activityModel.errorsList ()) {
+        foreach (Activity activity, _activity_model.errors_list ()) {
             if (activity._folder == folder
                 && activity._status == SyncFileItem.Conflict) {
                 conflicts.append (activity._file);
             }
         }
 
-        emit ProgressDispatcher.instance ().folderConflicts (folder, conflicts);
+        emit Progress_dispatcher.instance ().folder_conflicts (folder, conflicts);
     }
 }
 
-void User.slotAddError (string &folderAlias, string &message, ErrorCategory category) {
-    auto folderInstance = FolderMan.instance ().folder (folderAlias);
-    if (!folderInstance)
+void User.slot_add_error (string &folder_alias, string &message, Error_category category) {
+    auto folder_instance = FolderMan.instance ().folder (folder_alias);
+    if (!folder_instance)
         return;
 
-    if (folderInstance.accountState () == _account.data ()) {
-        qCWarning (lcActivity) << "Item " << folderInstance.shortGuiLocalPath () << " retrieved resulted in " << message;
+    if (folder_instance.account_state () == _account.data ()) {
+        q_c_warning (lc_activity) << "Item " << folder_instance.short_gui_local_path () << " retrieved resulted in " << message;
 
         Activity activity;
-        activity._type = Activity.SyncResultType;
+        activity._type = Activity.Sync_result_type;
         activity._status = SyncResult.Error;
-        activity._dateTime = QDateTime.fromString (QDateTime.currentDateTime ().toString (), Qt.ISODate);
+        activity._date_time = QDateTime.from_string (QDateTime.current_date_time ().to_string (), Qt.ISODate);
         activity._subject = message;
-        activity._message = folderInstance.shortGuiLocalPath ();
-        activity._link = folderInstance.shortGuiLocalPath ();
-        activity._accName = folderInstance.accountState ().account ().displayName ();
-        activity._folder = folderAlias;
+        activity._message = folder_instance.short_gui_local_path ();
+        activity._link = folder_instance.short_gui_local_path ();
+        activity._acc_name = folder_instance.account_state ().account ().display_name ();
+        activity._folder = folder_alias;
 
-        if (category == ErrorCategory.InsufficientRemoteStorage) {
-            ActivityLink link;
+        if (category == Error_category.Insufficient_remote_storage) {
+            Activity_link link;
             link._label = tr ("Retry all uploads");
-            link._link = folderInstance.path ();
+            link._link = folder_instance.path ();
             link._verb = "";
             link._primary = true;
             activity._links.append (link);
         }
 
         // add 'other errors' to activity list
-        _activityModel.addErrorToActivityList (activity);
+        _activity_model.add_error_to_activity_list (activity);
     }
 }
 
-void User.slotAddErrorToGui (string &folderAlias, SyncFileItem.Status status, string &errorMessage, string &subject) {
-    const auto folderInstance = FolderMan.instance ().folder (folderAlias);
-    if (!folderInstance) {
+void User.slot_add_error_to_gui (string &folder_alias, SyncFileItem.Status status, string &error_message, string &subject) {
+    const auto folder_instance = FolderMan.instance ().folder (folder_alias);
+    if (!folder_instance) {
         return;
     }
 
-    if (folderInstance.accountState () == _account.data ()) {
-        qCWarning (lcActivity) << "Item " << folderInstance.shortGuiLocalPath () << " retrieved resulted in " << errorMessage;
+    if (folder_instance.account_state () == _account.data ()) {
+        q_c_warning (lc_activity) << "Item " << folder_instance.short_gui_local_path () << " retrieved resulted in " << error_message;
 
         Activity activity;
-        activity._type = Activity.SyncFileItemType;
+        activity._type = Activity.Sync_file_item_type;
         activity._status = status;
-        const auto currentDateTime = QDateTime.currentDateTime ();
-        activity._dateTime = QDateTime.fromString (currentDateTime.toString (), Qt.ISODate);
-        activity._expireAtMsecs = currentDateTime.addMSecs (activityDefaultExpirationTimeMsecs).toMSecsSinceEpoch ();
-        activity._subject = !subject.isEmpty () ? subject : folderInstance.shortGuiLocalPath ();
-        activity._message = errorMessage;
-        activity._link = folderInstance.shortGuiLocalPath ();
-        activity._accName = folderInstance.accountState ().account ().displayName ();
-        activity._folder = folderAlias;
+        const auto current_date_time = QDateTime.current_date_time ();
+        activity._date_time = QDateTime.from_string (current_date_time.to_string (), Qt.ISODate);
+        activity._expire_at_msecs = current_date_time.add_m_secs (activity_default_expiration_time_msecs).to_m_secs_since_epoch ();
+        activity._subject = !subject.is_empty () ? subject : folder_instance.short_gui_local_path ();
+        activity._message = error_message;
+        activity._link = folder_instance.short_gui_local_path ();
+        activity._acc_name = folder_instance.account_state ().account ().display_name ();
+        activity._folder = folder_alias;
 
         // add 'other errors' to activity list
-        _activityModel.addErrorToActivityList (activity);
+        _activity_model.add_error_to_activity_list (activity);
 
-        showDesktopNotification (activity._subject, activity._message);
+        show_desktop_notification (activity._subject, activity._message);
 
-        if (!_expiredActivitiesCheckTimer.isActive ()) {
-            _expiredActivitiesCheckTimer.start (expiredActivitiesCheckIntervalMsecs);
+        if (!_expired_activities_check_timer.is_active ()) {
+            _expired_activities_check_timer.start (expired_activities_check_interval_msecs);
         }
     }
 }
 
-bool User.isActivityOfCurrentAccount (Folder *folder) {
-    return folder.accountState () == _account.data ();
+bool User.is_activity_of_current_account (Folder *folder) {
+    return folder.account_state () == _account.data ();
 }
 
-bool User.isUnsolvableConflict (SyncFileItemPtr &item) {
+bool User.is_unsolvable_conflict (Sync_file_item_ptr &item) {
     // We just care about conflict issues that we are able to resolve
-    return item._status == SyncFileItem.Conflict && !Utility.isConflictFile (item._file);
+    return item._status == SyncFileItem.Conflict && !Utility.is_conflict_file (item._file);
 }
 
-void User.processCompletedSyncItem (Folder *folder, SyncFileItemPtr &item) {
+void User.process_completed_sync_item (Folder *folder, Sync_file_item_ptr &item) {
     Activity activity;
-    activity._type = Activity.SyncFileItemType; //client activity
+    activity._type = Activity.Sync_file_item_type; //client activity
     activity._status = item._status;
-    activity._dateTime = QDateTime.currentDateTime ();
-    activity._message = item._originalFile;
-    activity._link = folder.accountState ().account ().url ();
-    activity._accName = folder.accountState ().account ().displayName ();
+    activity._date_time = QDateTime.current_date_time ();
+    activity._message = item._original_file;
+    activity._link = folder.account_state ().account ().url ();
+    activity._acc_name = folder.account_state ().account ().display_name ();
     activity._file = item._file;
     activity._folder = folder.alias ();
-    activity._fileAction = "";
+    activity._file_action = "";
 
     if (item._instruction == CSYNC_INSTRUCTION_REMOVE) {
-        activity._fileAction = "file_deleted";
+        activity._file_action = "file_deleted";
     } else if (item._instruction == CSYNC_INSTRUCTION_NEW) {
-        activity._fileAction = "file_created";
+        activity._file_action = "file_created";
     } else if (item._instruction == CSYNC_INSTRUCTION_RENAME) {
-        activity._fileAction = "file_renamed";
+        activity._file_action = "file_renamed";
     } else {
-        activity._fileAction = "file_changed";
+        activity._file_action = "file_changed";
     }
 
-    if (item._status == SyncFileItem.NoStatus || item._status == SyncFileItem.Success) {
-        qCWarning (lcActivity) << "Item " << item._file << " retrieved successfully.";
+    if (item._status == SyncFileItem.No_status || item._status == SyncFileItem.Success) {
+        q_c_warning (lc_activity) << "Item " << item._file << " retrieved successfully.";
 
         if (item._direction != SyncFileItem.Up) {
-            activity._message = tr ("Synced %1").arg (item._originalFile);
-        } else if (activity._fileAction == "file_renamed") {
-            activity._message = tr ("You renamed %1").arg (item._originalFile);
-        } else if (activity._fileAction == "file_deleted") {
-            activity._message = tr ("You deleted %1").arg (item._originalFile);
-        } else if (activity._fileAction == "file_created") {
-            activity._message = tr ("You created %1").arg (item._originalFile);
+            activity._message = tr ("Synced %1").arg (item._original_file);
+        } else if (activity._file_action == "file_renamed") {
+            activity._message = tr ("You renamed %1").arg (item._original_file);
+        } else if (activity._file_action == "file_deleted") {
+            activity._message = tr ("You deleted %1").arg (item._original_file);
+        } else if (activity._file_action == "file_created") {
+            activity._message = tr ("You created %1").arg (item._original_file);
         } else {
-            activity._message = tr ("You changed %1").arg (item._originalFile);
+            activity._message = tr ("You changed %1").arg (item._original_file);
         }
 
-        _activityModel.addSyncFileItemToActivityList (activity);
+        _activity_model.add_sync_file_item_to_activity_list (activity);
     } else {
-        qCWarning (lcActivity) << "Item " << item._file << " retrieved resulted in error " << item._errorString;
-        activity._subject = item._errorString;
+        q_c_warning (lc_activity) << "Item " << item._file << " retrieved resulted in error " << item._error_string;
+        activity._subject = item._error_string;
 
-        if (item._status == SyncFileItem.Status.FileIgnored) {
-            _activityModel.addIgnoredFileToList (activity);
+        if (item._status == SyncFileItem.Status.File_ignored) {
+            _activity_model.add_ignored_file_to_list (activity);
         } else {
             // add 'protocol error' to activity list
-            if (item._status == SyncFileItem.Status.FileNameInvalid) {
-                showDesktopNotification (item._file, activity._subject);
+            if (item._status == SyncFileItem.Status.File_name_invalid) {
+                show_desktop_notification (item._file, activity._subject);
             }
-            _activityModel.addErrorToActivityList (activity);
+            _activity_model.add_error_to_activity_list (activity);
         }
     }
 }
 
-void User.slotItemCompleted (string &folder, SyncFileItemPtr &item) {
-    auto folderInstance = FolderMan.instance ().folder (folder);
+void User.slot_item_completed (string &folder, Sync_file_item_ptr &item) {
+    auto folder_instance = FolderMan.instance ().folder (folder);
 
-    if (!folderInstance || !isActivityOfCurrentAccount (folderInstance) || isUnsolvableConflict (item)) {
+    if (!folder_instance || !is_activity_of_current_account (folder_instance) || is_unsolvable_conflict (item)) {
         return;
     }
 
-    qCWarning (lcActivity) << "Item " << item._file << " retrieved resulted in " << item._errorString;
-    processCompletedSyncItem (folderInstance, item);
+    q_c_warning (lc_activity) << "Item " << item._file << " retrieved resulted in " << item._error_string;
+    process_completed_sync_item (folder_instance, item);
 }
 
 AccountPtr User.account () {
     return _account.account ();
 }
 
-AccountStatePtr User.accountState () {
+AccountStatePtr User.account_state () {
     return _account;
 }
 
-void User.setCurrentUser (bool &isCurrent) {
-    _isCurrentUser = isCurrent;
+void User.set_current_user (bool &is_current) {
+    _is_current_user = is_current;
 }
 
-Folder *User.getFolder () {
+Folder *User.get_folder () {
     foreach (Folder *folder, FolderMan.instance ().map ()) {
-        if (folder.accountState () == _account.data ()) {
+        if (folder.account_state () == _account.data ()) {
             return folder;
         }
     }
@@ -760,34 +760,34 @@ Folder *User.getFolder () {
     return nullptr;
 }
 
-ActivityListModel *User.getActivityModel () {
-    return _activityModel;
+Activity_list_model *User.get_activity_model () {
+    return _activity_model;
 }
 
-UnifiedSearchResultsListModel *User.getUnifiedSearchResultsListModel () {
-    return _unifiedSearchResultsModel;
+Unified_search_results_list_model *User.get_unified_search_results_list_model () {
+    return _unified_search_results_model;
 }
 
-void User.openLocalFolder () {
-    const auto folder = getFolder ();
+void User.open_local_folder () {
+    const auto folder = get_folder ();
 
     if (folder) {
-        QDesktopServices.openUrl (QUrl.fromLocalFile (folder.path ()));
+        QDesktopServices.open_url (QUrl.from_local_file (folder.path ()));
     }
 }
 
 void User.login () {
-    _account.account ().resetRejectedCertificates ();
-    _account.signIn ();
+    _account.account ().reset_rejected_certificates ();
+    _account.sign_in ();
 }
 
 void User.logout () {
-    _account.signOutByUi ();
+    _account.sign_out_by_ui ();
 }
 
 string User.name () {
-    // If davDisplayName is empty (can be several reasons, simplest is missing login at startup), fall back to username
-    string name = _account.account ().davDisplayName ();
+    // If dav_display_name is empty (can be several reasons, simplest is missing login at startup), fall back to username
+    string name = _account.account ().dav_display_name ();
     if (name == "") {
         name = _account.account ().credentials ().user ();
     }
@@ -795,369 +795,369 @@ string User.name () {
 }
 
 string User.server (bool shortened) {
-    string serverUrl = _account.account ().url ().toString ();
+    string server_url = _account.account ().url ().to_string ();
     if (shortened) {
-        serverUrl.replace (QLatin1String ("https://"), QLatin1String (""));
-        serverUrl.replace (QLatin1String ("http://"), QLatin1String (""));
+        server_url.replace (QLatin1String ("https://"), QLatin1String (""));
+        server_url.replace (QLatin1String ("http://"), QLatin1String (""));
     }
-    return serverUrl;
+    return server_url;
 }
 
-UserStatus.OnlineStatus User.status () {
-    return _account.account ().userStatusConnector ().userStatus ().state ();
+User_status.Online_status User.status () {
+    return _account.account ().user_status_connector ().user_status ().state ();
 }
 
-string User.statusMessage () {
-    return _account.account ().userStatusConnector ().userStatus ().message ();
+string User.status_message () {
+    return _account.account ().user_status_connector ().user_status ().message ();
 }
 
-QUrl User.statusIcon () {
-    return _account.account ().userStatusConnector ().userStatus ().stateIcon ();
+QUrl User.status_icon () {
+    return _account.account ().user_status_connector ().user_status ().state_icon ();
 }
 
-string User.statusEmoji () {
-    return _account.account ().userStatusConnector ().userStatus ().icon ();
+string User.status_emoji () {
+    return _account.account ().user_status_connector ().user_status ().icon ();
 }
 
-bool User.serverHasUserStatus () {
-    return _account.account ().capabilities ().userStatus ();
+bool User.server_has_user_status () {
+    return _account.account ().capabilities ().user_status ();
 }
 
 QImage User.avatar () {
-    return AvatarJob.makeCircularAvatar (_account.account ().avatar ());
+    return Avatar_job.make_circular_avatar (_account.account ().avatar ());
 }
 
-string User.avatarUrl () {
-    if (avatar ().isNull ()) {
+string User.avatar_url () {
+    if (avatar ().is_null ()) {
         return string ();
     }
 
     return QStringLiteral ("image://avatars/") + _account.account ().id ();
 }
 
-bool User.hasLocalFolder () {
-    return getFolder () != nullptr;
+bool User.has_local_folder () {
+    return get_folder () != nullptr;
 }
 
-bool User.serverHasTalk () {
-    return talkApp () != nullptr;
+bool User.server_has_talk () {
+    return talk_app () != nullptr;
 }
 
-AccountApp *User.talkApp () {
-    return _account.findApp (QStringLiteral ("spreed"));
+AccountApp *User.talk_app () {
+    return _account.find_app (QStringLiteral ("spreed"));
 }
 
-bool User.hasActivities () {
-    return _account.account ().capabilities ().hasActivities ();
+bool User.has_activities () {
+    return _account.account ().capabilities ().has_activities ();
 }
 
-AccountAppList User.appList () {
-    return _account.appList ();
+AccountAppList User.app_list () {
+    return _account.app_list ();
 }
 
-bool User.isCurrentUser () {
-    return _isCurrentUser;
+bool User.is_current_user () {
+    return _is_current_user;
 }
 
-bool User.isConnected () {
-    return (_account.connectionStatus () == AccountState.ConnectionStatus.Connected);
+bool User.is_connected () {
+    return (_account.connection_status () == AccountState.ConnectionStatus.Connected);
 }
 
-bool User.isDesktopNotificationsAllowed () {
-    return _account.data ().isDesktopNotificationsAllowed ();
+bool User.is_desktop_notifications_allowed () {
+    return _account.data ().is_desktop_notifications_allowed ();
 }
 
-void User.removeAccount () {
-    AccountManager.instance ().deleteAccount (_account.data ());
+void User.remove_account () {
+    AccountManager.instance ().delete_account (_account.data ());
     AccountManager.instance ().save ();
 }
 
 /*-------------------------------------------------------------------------------------*/
 
-UserModel *UserModel._instance = nullptr;
+User_model *User_model._instance = nullptr;
 
-UserModel *UserModel.instance () {
+User_model *User_model.instance () {
     if (!_instance) {
-        _instance = new UserModel ();
+        _instance = new User_model ();
     }
     return _instance;
 }
 
-UserModel.UserModel (GLib.Object *parent)
-    : QAbstractListModel (parent) {
+User_model.User_model (GLib.Object *parent)
+    : QAbstract_list_model (parent) {
     // TODO : Remember selected user from last quit via settings file
     if (AccountManager.instance ().accounts ().size () > 0) {
-        buildUserList ();
+        build_user_list ();
     }
 
-    connect (AccountManager.instance (), &AccountManager.accountAdded,
-        this, &UserModel.buildUserList);
+    connect (AccountManager.instance (), &AccountManager.account_added,
+        this, &User_model.build_user_list);
 }
 
-void UserModel.buildUserList () {
+void User_model.build_user_list () {
     for (int i = 0; i < AccountManager.instance ().accounts ().size (); i++) {
         auto user = AccountManager.instance ().accounts ().at (i);
-        addUser (user);
+        add_user (user);
     }
     if (_init) {
-        _users.first ().setCurrentUser (true);
+        _users.first ().set_current_user (true);
         _init = false;
     }
 }
 
-Q_INVOKABLE int UserModel.numUsers () {
+Q_INVOKABLE int User_model.num_users () {
     return _users.size ();
 }
 
-Q_INVOKABLE int UserModel.currentUserId () {
-    return _currentUserId;
+Q_INVOKABLE int User_model.current_user_id () {
+    return _current_user_id;
 }
 
-Q_INVOKABLE bool UserModel.isUserConnected (int &id) {
+Q_INVOKABLE bool User_model.is_user_connected (int &id) {
     if (id < 0 || id >= _users.size ())
         return false;
 
-    return _users[id].isConnected ();
+    return _users[id].is_connected ();
 }
 
-QImage UserModel.avatarById (int &id) {
+QImage User_model.avatar_by_id (int &id) {
     if (id < 0 || id >= _users.size ())
         return {};
 
     return _users[id].avatar ();
 }
 
-Q_INVOKABLE string UserModel.currentUserServer () {
-    if (_currentUserId < 0 || _currentUserId >= _users.size ())
+Q_INVOKABLE string User_model.current_user_server () {
+    if (_current_user_id < 0 || _current_user_id >= _users.size ())
         return {};
 
-    return _users[_currentUserId].server ();
+    return _users[_current_user_id].server ();
 }
 
-void UserModel.addUser (AccountStatePtr &user, bool &isCurrent) {
-    bool containsUser = false;
-    for (auto &u : qAsConst (_users)) {
+void User_model.add_user (AccountStatePtr &user, bool &is_current) {
+    bool contains_user = false;
+    for (auto &u : q_as_const (_users)) {
         if (u.account () == user.account ()) {
-            containsUser = true;
+            contains_user = true;
             continue;
         }
     }
 
-    if (!containsUser) {
-        int row = rowCount ();
-        beginInsertRows (QModelIndex (), row, row);
+    if (!contains_user) {
+        int row = row_count ();
+        begin_insert_rows (QModelIndex (), row, row);
 
-        User *u = new User (user, isCurrent);
+        User *u = new User (user, is_current);
 
-        connect (u, &User.avatarChanged, this, [this, row] {
-           emit dataChanged (index (row, 0), index (row, 0), {UserModel.AvatarRole});
+        connect (u, &User.avatar_changed, this, [this, row] {
+           emit data_changed (index (row, 0), index (row, 0), {User_model.Avatar_role});
         });
 
-        connect (u, &User.statusChanged, this, [this, row] {
-            emit dataChanged (index (row, 0), index (row, 0), {UserModel.StatusIconRole,
-			    				    UserModel.StatusEmojiRole,
-                                                            UserModel.StatusMessageRole});
+        connect (u, &User.status_changed, this, [this, row] {
+            emit data_changed (index (row, 0), index (row, 0), {User_model.Status_icon_role,
+			    				    User_model.Status_emoji_role,
+                                                            User_model.Status_message_role});
         });
 
-        connect (u, &User.desktopNotificationsAllowedChanged, this, [this, row] {
-            emit dataChanged (index (row, 0), index (row, 0), { UserModel.DesktopNotificationsAllowedRole });
+        connect (u, &User.desktop_notifications_allowed_changed, this, [this, row] {
+            emit data_changed (index (row, 0), index (row, 0), { User_model.Desktop_notifications_allowed_role });
         });
 
-        connect (u, &User.accountStateChanged, this, [this, row] {
-            emit dataChanged (index (row, 0), index (row, 0), { UserModel.IsConnectedRole });
+        connect (u, &User.account_state_changed, this, [this, row] {
+            emit data_changed (index (row, 0), index (row, 0), { User_model.Is_connected_role });
         });
 
         _users << u;
-        if (isCurrent) {
-            _currentUserId = _users.indexOf (_users.last ());
+        if (is_current) {
+            _current_user_id = _users.index_of (_users.last ());
         }
 
-        endInsertRows ();
+        end_insert_rows ();
         ConfigFile cfg;
-        _users.last ().setNotificationRefreshInterval (cfg.notificationRefreshInterval ());
-        emit newUserSelected ();
+        _users.last ().set_notification_refresh_interval (cfg.notification_refresh_interval ());
+        emit new_user_selected ();
     }
 }
 
-int UserModel.currentUserIndex () {
-    return _currentUserId;
+int User_model.current_user_index () {
+    return _current_user_id;
 }
 
-Q_INVOKABLE void UserModel.openCurrentAccountLocalFolder () {
-    if (_currentUserId < 0 || _currentUserId >= _users.size ())
+Q_INVOKABLE void User_model.open_current_account_local_folder () {
+    if (_current_user_id < 0 || _current_user_id >= _users.size ())
         return;
 
-    _users[_currentUserId].openLocalFolder ();
+    _users[_current_user_id].open_local_folder ();
 }
 
-Q_INVOKABLE void UserModel.openCurrentAccountTalk () {
-    if (!currentUser ())
+Q_INVOKABLE void User_model.open_current_account_talk () {
+    if (!current_user ())
         return;
 
-    const auto talkApp = currentUser ().talkApp ();
-    if (talkApp) {
-        Utility.openBrowser (talkApp.url ());
+    const auto talk_app = current_user ().talk_app ();
+    if (talk_app) {
+        Utility.open_browser (talk_app.url ());
     } else {
-        qCWarning (lcActivity) << "The Talk app is not enabled on" << currentUser ().server ();
+        q_c_warning (lc_activity) << "The Talk app is not enabled on" << current_user ().server ();
     }
 }
 
-Q_INVOKABLE void UserModel.openCurrentAccountServer () {
-    if (_currentUserId < 0 || _currentUserId >= _users.size ())
+Q_INVOKABLE void User_model.open_current_account_server () {
+    if (_current_user_id < 0 || _current_user_id >= _users.size ())
         return;
 
-    string url = _users[_currentUserId].server (false);
-    if (!url.startsWith ("http://") && !url.startsWith ("https://")) {
-        url = "https://" + _users[_currentUserId].server (false);
+    string url = _users[_current_user_id].server (false);
+    if (!url.starts_with ("http://") && !url.starts_with ("https://")) {
+        url = "https://" + _users[_current_user_id].server (false);
     }
 
-    QDesktopServices.openUrl (url);
+    QDesktopServices.open_url (url);
 }
 
-Q_INVOKABLE void UserModel.switchCurrentUser (int &id) {
-    if (_currentUserId < 0 || _currentUserId >= _users.size ())
+Q_INVOKABLE void User_model.switch_current_user (int &id) {
+    if (_current_user_id < 0 || _current_user_id >= _users.size ())
         return;
 
-    _users[_currentUserId].setCurrentUser (false);
-    _users[id].setCurrentUser (true);
-    _currentUserId = id;
-    emit newUserSelected ();
+    _users[_current_user_id].set_current_user (false);
+    _users[id].set_current_user (true);
+    _current_user_id = id;
+    emit new_user_selected ();
 }
 
-Q_INVOKABLE void UserModel.login (int &id) {
+Q_INVOKABLE void User_model.login (int &id) {
     if (id < 0 || id >= _users.size ())
         return;
 
     _users[id].login ();
 }
 
-Q_INVOKABLE void UserModel.logout (int &id) {
+Q_INVOKABLE void User_model.logout (int &id) {
     if (id < 0 || id >= _users.size ())
         return;
 
     _users[id].logout ();
 }
 
-Q_INVOKABLE void UserModel.removeAccount (int &id) {
+Q_INVOKABLE void User_model.remove_account (int &id) {
     if (id < 0 || id >= _users.size ())
         return;
 
-    QMessageBox messageBox (QMessageBox.Question,
+    QMessageBox message_box (QMessageBox.Question,
         tr ("Confirm Account Removal"),
         tr ("<p>Do you really want to remove the connection to the account <i>%1</i>?</p>"
            "<p><b>Note:</b> This will <b>not</b> delete any files.</p>")
             .arg (_users[id].name ()),
         QMessageBox.NoButton);
-    QPushButton *yesButton =
-        messageBox.addButton (tr ("Remove connection"), QMessageBox.YesRole);
-    messageBox.addButton (tr ("Cancel"), QMessageBox.NoRole);
+    QPushButton *yes_button =
+        message_box.add_button (tr ("Remove connection"), QMessageBox.YesRole);
+    message_box.add_button (tr ("Cancel"), QMessageBox.NoRole);
 
-    messageBox.exec ();
-    if (messageBox.clickedButton () != yesButton) {
+    message_box.exec ();
+    if (message_box.clicked_button () != yes_button) {
         return;
     }
 
-    if (_users[id].isCurrentUser () && _users.count () > 1) {
-        id == 0 ? switchCurrentUser (1) : switchCurrentUser (0);
+    if (_users[id].is_current_user () && _users.count () > 1) {
+        id == 0 ? switch_current_user (1) : switch_current_user (0);
     }
 
     _users[id].logout ();
-    _users[id].removeAccount ();
+    _users[id].remove_account ();
 
-    beginRemoveRows (QModelIndex (), id, id);
-    _users.removeAt (id);
-    endRemoveRows ();
+    begin_remove_rows (QModelIndex (), id, id);
+    _users.remove_at (id);
+    end_remove_rows ();
 }
 
-std.shared_ptr<Occ.UserStatusConnector> UserModel.userStatusConnector (int id) {
+std.shared_ptr<Occ.User_status_connector> User_model.user_status_connector (int id) {
     if (id < 0 || id >= _users.size ()) {
         return nullptr;
     }
 
-    return _users[id].account ().userStatusConnector ();
+    return _users[id].account ().user_status_connector ();
 }
 
-int UserModel.rowCount (QModelIndex &parent) {
+int User_model.row_count (QModelIndex &parent) {
     Q_UNUSED (parent);
     return _users.count ();
 }
 
-QVariant UserModel.data (QModelIndex &index, int role) {
+QVariant User_model.data (QModelIndex &index, int role) {
     if (index.row () < 0 || index.row () >= _users.count ()) {
         return QVariant ();
     }
 
-    if (role == NameRole) {
+    if (role == Name_role) {
         return _users[index.row ()].name ();
-    } else if (role == ServerRole) {
+    } else if (role == Server_role) {
         return _users[index.row ()].server ();
-    } else if (role == ServerHasUserStatusRole) {
-        return _users[index.row ()].serverHasUserStatus ();
-    } else if (role == StatusIconRole) {
-        return _users[index.row ()].statusIcon ();
-    } else if (role == StatusEmojiRole) {
-        return _users[index.row ()].statusEmoji ();
-    } else if (role == StatusMessageRole) {
-        return _users[index.row ()].statusMessage ();
-    } else if (role == DesktopNotificationsAllowedRole) {
-        return _users[index.row ()].isDesktopNotificationsAllowed ();
-    } else if (role == AvatarRole) {
-        return _users[index.row ()].avatarUrl ();
-    } else if (role == IsCurrentUserRole) {
-        return _users[index.row ()].isCurrentUser ();
-    } else if (role == IsConnectedRole) {
-        return _users[index.row ()].isConnected ();
-    } else if (role == IdRole) {
+    } else if (role == Server_has_user_status_role) {
+        return _users[index.row ()].server_has_user_status ();
+    } else if (role == Status_icon_role) {
+        return _users[index.row ()].status_icon ();
+    } else if (role == Status_emoji_role) {
+        return _users[index.row ()].status_emoji ();
+    } else if (role == Status_message_role) {
+        return _users[index.row ()].status_message ();
+    } else if (role == Desktop_notifications_allowed_role) {
+        return _users[index.row ()].is_desktop_notifications_allowed ();
+    } else if (role == Avatar_role) {
+        return _users[index.row ()].avatar_url ();
+    } else if (role == Is_current_user_role) {
+        return _users[index.row ()].is_current_user ();
+    } else if (role == Is_connected_role) {
+        return _users[index.row ()].is_connected ();
+    } else if (role == Id_role) {
         return index.row ();
     }
     return QVariant ();
 }
 
-QHash<int, QByteArray> UserModel.roleNames () {
+QHash<int, QByteArray> User_model.role_names () {
     QHash<int, QByteArray> roles;
-    roles[NameRole] = "name";
-    roles[ServerRole] = "server";
-    roles[ServerHasUserStatusRole] = "serverHasUserStatus";
-    roles[StatusIconRole] = "statusIcon";
-    roles[StatusEmojiRole] = "statusEmoji";
-    roles[StatusMessageRole] = "statusMessage";
-    roles[DesktopNotificationsAllowedRole] = "desktopNotificationsAllowed";
-    roles[AvatarRole] = "avatar";
-    roles[IsCurrentUserRole] = "isCurrentUser";
-    roles[IsConnectedRole] = "isConnected";
-    roles[IdRole] = "id";
+    roles[Name_role] = "name";
+    roles[Server_role] = "server";
+    roles[Server_has_user_status_role] = "server_has_user_status";
+    roles[Status_icon_role] = "status_icon";
+    roles[Status_emoji_role] = "status_emoji";
+    roles[Status_message_role] = "status_message";
+    roles[Desktop_notifications_allowed_role] = "desktop_notifications_allowed";
+    roles[Avatar_role] = "avatar";
+    roles[Is_current_user_role] = "is_current_user";
+    roles[Is_connected_role] = "is_connected";
+    roles[Id_role] = "id";
     return roles;
 }
 
-ActivityListModel *UserModel.currentActivityModel () {
-    if (currentUserIndex () < 0 || currentUserIndex () >= _users.size ())
+Activity_list_model *User_model.current_activity_model () {
+    if (current_user_index () < 0 || current_user_index () >= _users.size ())
         return nullptr;
 
-    return _users[currentUserIndex ()].getActivityModel ();
+    return _users[current_user_index ()].get_activity_model ();
 }
 
-void UserModel.fetchCurrentActivityModel () {
-    if (currentUserId () < 0 || currentUserId () >= _users.size ())
+void User_model.fetch_current_activity_model () {
+    if (current_user_id () < 0 || current_user_id () >= _users.size ())
         return;
 
-    _users[currentUserId ()].slotRefresh ();
+    _users[current_user_id ()].slot_refresh ();
 }
 
-AccountAppList UserModel.appList () {
-    if (_currentUserId < 0 || _currentUserId >= _users.size ())
+AccountAppList User_model.app_list () {
+    if (_current_user_id < 0 || _current_user_id >= _users.size ())
         return {};
 
-    return _users[_currentUserId].appList ();
+    return _users[_current_user_id].app_list ();
 }
 
-User *UserModel.currentUser () {
-    if (currentUserId () < 0 || currentUserId () >= _users.size ())
+User *User_model.current_user () {
+    if (current_user_id () < 0 || current_user_id () >= _users.size ())
         return nullptr;
 
-    return _users[currentUserId ()];
+    return _users[current_user_id ()];
 }
 
-int UserModel.findUserIdForAccount (AccountState *account) {
+int User_model.find_user_id_for_account (AccountState *account) {
     const auto it = std.find_if (std.cbegin (_users), std.cend (_users), [=] (User *user) {
         return user.account ().id () == account.account ().id ();
     });
@@ -1172,100 +1172,100 @@ int UserModel.findUserIdForAccount (AccountState *account) {
 
 /*-------------------------------------------------------------------------------------*/
 
-ImageProvider.ImageProvider ()
-    : QQuickImageProvider (QQuickImageProvider.Image) {
+Image_provider.Image_provider ()
+    : QQuick_image_provider (QQuick_image_provider.Image) {
 }
 
-QImage ImageProvider.requestImage (string &id, QSize *size, QSize &requestedSize) {
+QImage Image_provider.request_image (string &id, QSize *size, QSize &requested_size) {
     Q_UNUSED (size)
-    Q_UNUSED (requestedSize)
+    Q_UNUSED (requested_size)
 
-    const auto makeIcon = [] (string &path) {
+    const auto make_icon = [] (string &path) {
         QImage image (128, 128, QImage.Format_ARGB32);
-        image.fill (Qt.GlobalColor.transparent);
+        image.fill (Qt.Global_color.transparent);
         QPainter painter (&image);
-        QSvgRenderer renderer (path);
+        QSvg_renderer renderer (path);
         renderer.render (&painter);
         return image;
     };
 
-    if (id == QLatin1String ("fallbackWhite")) {
-        return makeIcon (QStringLiteral (":/client/theme/white/user.svg"));
+    if (id == QLatin1String ("fallback_white")) {
+        return make_icon (QStringLiteral (":/client/theme/white/user.svg"));
     }
 
-    if (id == QLatin1String ("fallbackBlack")) {
-        return makeIcon (QStringLiteral (":/client/theme/black/user.svg"));
+    if (id == QLatin1String ("fallback_black")) {
+        return make_icon (QStringLiteral (":/client/theme/black/user.svg"));
     }
 
-    const int uid = id.toInt ();
-    return UserModel.instance ().avatarById (uid);
+    const int uid = id.to_int ();
+    return User_model.instance ().avatar_by_id (uid);
 }
 
 /*-------------------------------------------------------------------------------------*/
 
-UserAppsModel *UserAppsModel._instance = nullptr;
+User_apps_model *User_apps_model._instance = nullptr;
 
-UserAppsModel *UserAppsModel.instance () {
+User_apps_model *User_apps_model.instance () {
     if (!_instance) {
-        _instance = new UserAppsModel ();
+        _instance = new User_apps_model ();
     }
     return _instance;
 }
 
-UserAppsModel.UserAppsModel (GLib.Object *parent)
-    : QAbstractListModel (parent) {
+User_apps_model.User_apps_model (GLib.Object *parent)
+    : QAbstract_list_model (parent) {
 }
 
-void UserAppsModel.buildAppList () {
-    if (rowCount () > 0) {
-        beginRemoveRows (QModelIndex (), 0, rowCount () - 1);
+void User_apps_model.build_app_list () {
+    if (row_count () > 0) {
+        begin_remove_rows (QModelIndex (), 0, row_count () - 1);
         _apps.clear ();
-        endRemoveRows ();
+        end_remove_rows ();
     }
 
-    if (UserModel.instance ().appList ().count () > 0) {
-        const auto talkApp = UserModel.instance ().currentUser ().talkApp ();
-        foreach (AccountApp *app, UserModel.instance ().appList ()) {
+    if (User_model.instance ().app_list ().count () > 0) {
+        const auto talk_app = User_model.instance ().current_user ().talk_app ();
+        foreach (AccountApp *app, User_model.instance ().app_list ()) {
             // Filter out Talk because we have a dedicated button for it
-            if (talkApp && app.id () == talkApp.id ())
+            if (talk_app && app.id () == talk_app.id ())
                 continue;
 
-            beginInsertRows (QModelIndex (), rowCount (), rowCount ());
+            begin_insert_rows (QModelIndex (), row_count (), row_count ());
             _apps << app;
-            endInsertRows ();
+            end_insert_rows ();
         }
     }
 }
 
-void UserAppsModel.openAppUrl (QUrl &url) {
-    Utility.openBrowser (url);
+void User_apps_model.open_app_url (QUrl &url) {
+    Utility.open_browser (url);
 }
 
-int UserAppsModel.rowCount (QModelIndex &parent) {
+int User_apps_model.row_count (QModelIndex &parent) {
     Q_UNUSED (parent);
     return _apps.count ();
 }
 
-QVariant UserAppsModel.data (QModelIndex &index, int role) {
+QVariant User_apps_model.data (QModelIndex &index, int role) {
     if (index.row () < 0 || index.row () >= _apps.count ()) {
         return QVariant ();
     }
 
-    if (role == NameRole) {
+    if (role == Name_role) {
         return _apps[index.row ()].name ();
-    } else if (role == UrlRole) {
+    } else if (role == Url_role) {
         return _apps[index.row ()].url ();
-    } else if (role == IconUrlRole) {
-        return _apps[index.row ()].iconUrl ().toString ();
+    } else if (role == Icon_url_role) {
+        return _apps[index.row ()].icon_url ().to_string ();
     }
     return QVariant ();
 }
 
-QHash<int, QByteArray> UserAppsModel.roleNames () {
+QHash<int, QByteArray> User_apps_model.role_names () {
     QHash<int, QByteArray> roles;
-    roles[NameRole] = "appName";
-    roles[UrlRole] = "appUrl";
-    roles[IconUrlRole] = "appIconUrl";
+    roles[Name_role] = "app_name";
+    roles[Url_role] = "app_url";
+    roles[Icon_url_role] = "app_icon_url";
     return roles;
 }
 

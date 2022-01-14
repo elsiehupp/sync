@@ -36,7 +36,7 @@ to "OK Only" message boxes. If you want to avoid a modal KMe
 consider using KMessageWidget instead.
 
 Examples of KMessageWidget look as follows, all of them having an icon
-with setIcon (), and the first three show a close button:
+with set_icon (), and the first three show a close button:
 
 \image html kmessagewidget.png "KMessageWidget
 
@@ -95,17 +95,17 @@ Example of acceptable uses:
 ***********************************************************/
 class KMessageWidget : QFrame {
 
-    Q_PROPERTY (string text READ text WRITE setText)
-    Q_PROPERTY (bool wordWrap READ wordWrap WRITE setWordWrap)
-    Q_PROPERTY (bool closeButtonVisible READ isCloseButtonVisible WRITE setCloseButtonVisible)
-    Q_PROPERTY (MessageType messageType READ messageType WRITE setMessageType)
-    Q_PROPERTY (QIcon icon READ icon WRITE setIcon)
+    Q_PROPERTY (string text READ text WRITE set_text)
+    Q_PROPERTY (bool word_wrap READ word_wrap WRITE set_word_wrap)
+    Q_PROPERTY (bool close_button_visible READ is_close_button_visible WRITE set_close_button_visible)
+    Q_PROPERTY (Message_type message_type READ message_type WRITE set_message_type)
+    Q_PROPERTY (QIcon icon READ icon WRITE set_icon)
 
     /***********************************************************
     Available message types.
     The background colors are chosen depending on the message type.
     ***********************************************************/
-    public enum MessageType {
+    public enum Message_type {
         Positive,
         Information,
         Warning,
@@ -130,7 +130,7 @@ class KMessageWidget : QFrame {
 
     /***********************************************************
     Get the text of this message widget.
-    @see setText ()
+    @see set_text ()
     ***********************************************************/
     public string text ();
 
@@ -141,24 +141,24 @@ class KMessageWidget : QFrame {
     as required to the available wi
     avoid breaking widget layouts.
 
-    @see setWordWrap ()
+    @see set_word_wrap ()
     ***********************************************************/
-    public bool wordWrap ();
+    public bool word_wrap ();
 
     /***********************************************************
     Check whether the close button is visible.
     
-    @see setCloseButtonVisible ()
+    @see set_close_button_visible ()
     ***********************************************************/
-    public bool isCloseButtonVisible ();
+    public bool is_close_button_visible ();
 
     /***********************************************************
     Get the type of this message.
     By default, the type is set to KMessageWidget.Information.
     
-    @see KMessageWidget.MessageType, setMessageType ()
+    @see KMessageWidget.Message_type, set_message_type ()
     ***********************************************************/
-    public MessageType messageType ();
+    public Message_type message_type ();
 
     /***********************************************************
     Add @p action to the message widget.
@@ -166,33 +166,33 @@ class KMessageWidget : QFrame {
     order the actions were added.
     
     @param action the action to add
-    @see removeAction (), Gtk.Widget.actions ()
+    @see remove_action (), Gtk.Widget.actions ()
     ***********************************************************/
-    public void addAction (QAction *action);
+    public void add_action (QAction *action);
 
     /***********************************************************
     Remove @p action from the message widget.
     
     @param action the action to remove
-    @see KMessageWidget.MessageType, addAction (), setMessageType ()
+    @see KMessageWidget.Message_type, add_action (), set_message_type ()
     ***********************************************************/
-    public void removeAction (QAction *action);
+    public void remove_action (QAction *action);
 
     /***********************************************************
     Returns the preferred size of the message widget.
     ***********************************************************/
-    public QSize sizeHint () const override;
+    public QSize size_hint () const override;
 
     /***********************************************************
     Returns the minimum size of the message widget.
     ***********************************************************/
-    public QSize minimumSizeHint () const override;
+    public QSize minimum_size_hint () const override;
 
     /***********************************************************
     Returns the required height for @p width.
     @param width the width in pixels
     ***********************************************************/
-    public int heightForWidth (int width) const override;
+    public int height_for_width (int width) const override;
 
     /***********************************************************
     The icon shown on the left of the text. By default, no icon is shown.
@@ -201,24 +201,24 @@ class KMessageWidget : QFrame {
     public QIcon icon ();
 
     /***********************************************************
-    Check whether the hide animation started by calling animatedHide ()
+    Check whether the hide animation started by calling animated_hide ()
     is still running. If animations are disabled, this function always
     returns @e false.
     
-    @see animatedHide (), hideAnimationFinished ()
+    @see animated_hide (), hide_animation_finished ()
     @since 5.0
     ***********************************************************/
-    public bool isHideAnimationRunning ();
+    public bool is_hide_animation_running ();
 
     /***********************************************************
-    Check whether the show animation started by calling animatedShow ()
+    Check whether the show animation started by calling animated_show ()
     is still running. If animations are disabled, this function always
     returns @e false.
     
-    @see animatedShow (), showAnimationFinished ()
+    @see animated_show (), show_animation_finished ()
     @since 5.0
     ***********************************************************/
-    public bool isShowAnimationRunning ();
+    public bool is_show_animation_running ();
 
 public slots:
     /***********************************************************
@@ -228,113 +228,113 @@ public slots:
     @param text the text to display, rich text is allowed
     @see text ()
     ***********************************************************/
-    void setText (string &text);
+    void set_text (string &text);
 
     /***********************************************************
-    Set word wrap to @p wordWrap. If word wrap is enabled, the text ()
+    Set word wrap to @p word_wrap. If word wrap is enabled, the text ()
     of the message widget is wrapped to fit the available width.
     If word wrap is disabled, the message widget's minimum size is
     such that the entire text fits.
     
-    @param wordWrap disable/enable word wrap
-    @see wordWrap ()
+    @param word_wrap disable/enable word wrap
+    @see word_wrap ()
     ***********************************************************/
-    void setWordWrap (bool wordWrap);
+    void set_word_wrap (bool word_wrap);
 
     /***********************************************************
     Set the visibility of the close button. If @p visible is @e true,
-    a close button is shown that calls animatedHide () if clicked.
+    a close button is shown that calls animated_hide () if clicked.
     
-    @see closeButtonVisible (), animatedHide ()
+    @see close_button_visible (), animated_hide ()
     ***********************************************************/
-    void setCloseButtonVisible (bool visible);
+    void set_close_button_visible (bool visible);
 
     /***********************************************************
     Set the message type to @p type.
     By default, the message type is set to KMessageWidget.Information.
     Appropriate colors are chosen to mimic the appearance of Kirigami's
-    InlineMessage.
+    Inline_message.
     
-    @see messageType (), KMessageWidget.MessageType
+    @see message_type (), KMessageWidget.Message_type
     ***********************************************************/
-    void setMessageType (KMessageWidget.MessageType type);
+    void set_message_type (KMessageWidget.Message_type type);
 
     /***********************************************************
     Show the widget using an animation.
     ***********************************************************/
-    void animatedShow ();
+    void animated_show ();
 
     /***********************************************************
     Hide the widget using an animation.
     ***********************************************************/
-    void animatedHide ();
+    void animated_hide ();
 
     /***********************************************************
     Define an icon to be shown on the left of the text
     @since 4.11
     ***********************************************************/
-    void setIcon (QIcon &icon);
+    void set_icon (QIcon &icon);
 
 signals:
     /***********************************************************
     This signal is emitted when the user clicks a link in the text label.
     The URL referred to by the href anchor is passed in contents.
     @param contents text of the href anchor
-    @see QLabel.linkActivated ()
+    @see QLabel.link_activated ()
     @since 4.10
     ***********************************************************/
-    void linkActivated (string &contents);
+    void link_activated (string &contents);
 
     /***********************************************************
     This signal is emitted when the user hovers over a link in the text label.
     The URL referred to by the href anchor is passed in contents.
     @param contents text of the href anchor
-    @see QLabel.linkHovered ()
+    @see QLabel.link_hovered ()
     @since 4.11
     ***********************************************************/
-    void linkHovered (string &contents);
+    void link_hovered (string &contents);
 
     /***********************************************************
     This signal is emitted when the hide animation is finished, started by
-    calling animatedHide (). If animations are disabled, this signal is
+    calling animated_hide (). If animations are disabled, this signal is
     emitted immediately after the message widget got hidden.
     
     @note This signal is @e not emitted if the widget was hidden by
           calling hide (), so th
-          with animatedH
+          with animated_h
     
-    @see animatedHide ()
+    @see animated_hide ()
     @since 5.0
     ***********************************************************/
-    void hideAnimationFinished ();
+    void hide_animation_finished ();
 
     /***********************************************************
     This signal is emitted when the show animation is finished, started by
-    calling animatedShow (). If animations are disabled, this signal is
+    calling animated_show (). If animations are disabled, this signal is
     emitted immediately after the message widget got shown.
     
     @note This signal is @e not emitted if the widget was shown by
           calling show (), so th
-          with animatedS
+          with animated_s
     
-    @see animatedShow ()
+    @see animated_show ()
     @since 5.0
     ***********************************************************/
-    void showAnimationFinished ();
+    void show_animation_finished ();
 
 protected:
-    void paintEvent (QPaintEvent *event) override;
+    void paint_event (QPaint_event *event) override;
 
     bool event (QEvent *event) override;
 
-    void resizeEvent (QResizeEvent *event) override;
+    void resize_event (QResize_event *event) override;
 
 private:
     KMessageWidgetPrivate *const d;
     friend class KMessageWidgetPrivate;
 
-    Q_PRIVATE_SLOT (d, void slotTimeLineChanged (qreal))
-    Q_PRIVATE_SLOT (d, void slotTimeLineFinished ())
+    Q_PRIVATE_SLOT (d, void slot_time_line_changed (qreal))
+    Q_PRIVATE_SLOT (d, void slot_time_line_finished ())
 };
 
 
@@ -358,12 +358,12 @@ Copyright (c) 2014 Dominik Haumann <dhaumann@kde.org>
 // #include <QAction>
 // #include <QApplication>
 // #include <QEvent>
-// #include <QGridLayout>
-// #include <QHBoxLayout>
+// #include <QGrid_layout>
+// #include <QHBox_layout>
 // #include <QLabel>
 // #include <QPainter>
-// #include <QShowEvent>
-// #include <QTimeLine>
+// #include <QShow_event>
+// #include <QTime_line>
 // #include <QToolButton>
 // #include <QStyle>
 
@@ -375,166 +375,166 @@ class KMessageWidgetPrivate {
     
     public KMessageWidget *q;
     public QFrame *content = nullptr;
-    public QLabel *iconLabel = nullptr;
-    public QLabel *textLabel = nullptr;
-    public QToolButton *closeButton = nullptr;
-    public QTimeLine *timeLine = nullptr;
+    public QLabel *icon_label = nullptr;
+    public QLabel *text_label = nullptr;
+    public QToolButton *close_button = nullptr;
+    public QTime_line *time_line = nullptr;
     public QIcon icon;
-    public bool ignoreShowEventDoingAnimatedShow = false;
+    public bool ignore_show_event_doing_animated_show = false;
 
-    public KMessageWidget.MessageType messageType;
-    public bool wordWrap;
+    public KMessageWidget.Message_type message_type;
+    public bool word_wrap;
     public QList<QToolButton> buttons;
-    public QPixmap contentSnapShot;
+    public QPixmap content_snap_shot;
 
-    public void createLayout ();
-    public void applyStyleSheet ();
-    public void updateSnapShot ();
-    public void updateLayout ();
-    public void slotTimeLineChanged (qreal);
-    public void slotTimeLineFinished ();
+    public void create_layout ();
+    public void apply_style_sheet ();
+    public void update_snap_shot ();
+    public void update_layout ();
+    public void slot_time_line_changed (qreal);
+    public void slot_time_line_finished ();
 
-    public int bestContentHeight ();
+    public int best_content_height ();
 };
     
     void KMessageWidgetPrivate.init (KMessageWidget *q_ptr) {
         q = q_ptr;
     
-        q.setSizePolicy (QSizePolicy.Minimum, QSizePolicy.Fixed);
+        q.set_size_policy (QSize_policy.Minimum, QSize_policy.Fixed);
     
-        // Note : when changing the value 500, also update KMessageWidgetTest
-        timeLine = new QTimeLine (500, q);
-        GLib.Object.connect (timeLine, SIGNAL (valueChanged (qreal)), q, SLOT (slotTimeLineChanged (qreal)));
-        GLib.Object.connect (timeLine, SIGNAL (finished ()), q, SLOT (slotTimeLineFinished ()));
+        // Note : when changing the value 500, also update KMessage_widget_test
+        time_line = new QTime_line (500, q);
+        GLib.Object.connect (time_line, SIGNAL (value_changed (qreal)), q, SLOT (slot_time_line_changed (qreal)));
+        GLib.Object.connect (time_line, SIGNAL (finished ()), q, SLOT (slot_time_line_finished ()));
     
         content = new QFrame (q);
-        content.setObjectName (QStringLiteral ("contentWidget"));
-        content.setSizePolicy (QSizePolicy.Expanding, QSizePolicy.Fixed);
+        content.set_object_name (QStringLiteral ("content_widget"));
+        content.set_size_policy (QSize_policy.Expanding, QSize_policy.Fixed);
     
-        wordWrap = false;
+        word_wrap = false;
     
-        iconLabel = new QLabel (content);
-        iconLabel.setSizePolicy (QSizePolicy.Fixed, QSizePolicy.Fixed);
-        iconLabel.hide ();
+        icon_label = new QLabel (content);
+        icon_label.set_size_policy (QSize_policy.Fixed, QSize_policy.Fixed);
+        icon_label.hide ();
     
-        textLabel = new QLabel (content);
-        textLabel.setSizePolicy (QSizePolicy.Expanding, QSizePolicy.Fixed);
-        textLabel.setTextInteractionFlags (Qt.TextBrowserInteraction);
-        GLib.Object.connect (textLabel, &QLabel.linkActivated, q, &KMessageWidget.linkActivated);
-        GLib.Object.connect (textLabel, &QLabel.linkHovered, q, &KMessageWidget.linkHovered);
+        text_label = new QLabel (content);
+        text_label.set_size_policy (QSize_policy.Expanding, QSize_policy.Fixed);
+        text_label.set_text_interaction_flags (Qt.Text_browser_interaction);
+        GLib.Object.connect (text_label, &QLabel.link_activated, q, &KMessageWidget.link_activated);
+        GLib.Object.connect (text_label, &QLabel.link_hovered, q, &KMessageWidget.link_hovered);
     
-        auto *closeAction = new QAction (q);
-        closeAction.setText (KMessageWidget.tr ("&Close"));
-        closeAction.setToolTip (KMessageWidget.tr ("Close message"));
-        closeAction.setIcon (QIcon (":/client/theme/close.svg")); // ivan : NC customization
+        auto *close_action = new QAction (q);
+        close_action.set_text (KMessageWidget.tr ("&Close"));
+        close_action.set_tool_tip (KMessageWidget.tr ("Close message"));
+        close_action.set_icon (QIcon (":/client/theme/close.svg")); // ivan : NC customization
     
-        GLib.Object.connect (closeAction, &QAction.triggered, q, &KMessageWidget.animatedHide);
+        GLib.Object.connect (close_action, &QAction.triggered, q, &KMessageWidget.animated_hide);
     
-        closeButton = new QToolButton (content);
-        closeButton.setAutoRaise (true);
-        closeButton.setDefaultAction (closeAction);
+        close_button = new QToolButton (content);
+        close_button.set_auto_raise (true);
+        close_button.set_default_action (close_action);
     
-        q.setMessageType (KMessageWidget.Information);
+        q.set_message_type (KMessageWidget.Information);
     }
     
-    void KMessageWidgetPrivate.createLayout () {
+    void KMessageWidgetPrivate.create_layout () {
         delete content.layout ();
     
         content.resize (q.size ());
     
-        qDeleteAll (buttons);
+        q_delete_all (buttons);
         buttons.clear ();
     
         Q_FOREACH (QAction *action, q.actions ()) {
             auto *button = new QToolButton (content);
-            button.setDefaultAction (action);
-            button.setToolButtonStyle (Qt.ToolButtonTextBesideIcon);
+            button.set_default_action (action);
+            button.set_tool_button_style (Qt.Tool_button_text_beside_icon);
             buttons.append (button);
         }
     
-        // AutoRaise reduces visual clutter, but we don't want to turn it on if
+        // Auto_raise reduces visual clutter, but we don't want to turn it on if
         // there are other buttons, otherwise the close button will look different
         // from the others.
-        closeButton.setAutoRaise (buttons.isEmpty ());
+        close_button.set_auto_raise (buttons.is_empty ());
     
-        if (wordWrap) {
-            auto *layout = new QGridLayout (content);
+        if (word_wrap) {
+            auto *layout = new QGrid_layout (content);
             // Set alignment to make sure icon does not move down if text wraps
-            layout.addWidget (iconLabel, 0, 0, 1, 1, Qt.AlignHCenter | Qt.AlignTop);
-            layout.addWidget (textLabel, 0, 1);
+            layout.add_widget (icon_label, 0, 0, 1, 1, Qt.Align_hCenter | Qt.Align_top);
+            layout.add_widget (text_label, 0, 1);
     
-            if (buttons.isEmpty ()) {
+            if (buttons.is_empty ()) {
                 // Use top-vertical alignment like the icon does.
-                layout.addWidget (closeButton, 0, 2, 1, 1, Qt.AlignHCenter | Qt.AlignTop);
+                layout.add_widget (close_button, 0, 2, 1, 1, Qt.Align_hCenter | Qt.Align_top);
             } else {
                 // Use an additional layout in row 1 for the buttons.
-                auto *buttonLayout = new QHBoxLayout;
-                buttonLayout.addStretch ();
+                auto *button_layout = new QHBox_layout;
+                button_layout.add_stretch ();
                 Q_FOREACH (QToolButton *button, buttons) {
                     // For some reason, calling show () is necessary if wordwrap is true,
                     // otherwise the buttons do not show up. It is not needed if
                     // wordwrap is false.
                     button.show ();
-                    buttonLayout.addWidget (button);
+                    button_layout.add_widget (button);
                 }
-                buttonLayout.addWidget (closeButton);
-                layout.addItem (buttonLayout, 1, 0, 1, 2);
+                button_layout.add_widget (close_button);
+                layout.add_item (button_layout, 1, 0, 1, 2);
             }
         } else {
-            auto *layout = new QHBoxLayout (content);
-            layout.addWidget (iconLabel);
-            layout.addWidget (textLabel);
+            auto *layout = new QHBox_layout (content);
+            layout.add_widget (icon_label);
+            layout.add_widget (text_label);
     
-            for (QToolButton *button : qAsConst (buttons)) {
-                layout.addWidget (button);
+            for (QToolButton *button : q_as_const (buttons)) {
+                layout.add_widget (button);
             }
     
-            layout.addWidget (closeButton);
+            layout.add_widget (close_button);
         };
     
-        if (q.isVisible ()) {
-            q.setFixedHeight (content.sizeHint ().height ());
+        if (q.is_visible ()) {
+            q.set_fixed_height (content.size_hint ().height ());
         }
-        q.updateGeometry ();
+        q.update_geometry ();
     }
     
-    void KMessageWidgetPrivate.applyStyleSheet () {
-        QColor bgBaseColor;
+    void KMessageWidgetPrivate.apply_style_sheet () {
+        QColor bg_base_color;
     
-        // We have to hardcode colors here because KWidgetsAddons is a tier 1 framework
+        // We have to hardcode colors here because KWidgets_addons is a tier 1 framework
         // and therefore can't depend on any other KDE Frameworks
         // The following RGB color values come from the "default" scheme in kcolorscheme.cpp
-        switch (messageType) {
+        switch (message_type) {
         case KMessageWidget.Positive:
-            bgBaseColor.setRgb (39, 174,  96); // Window : ForegroundPositive
+            bg_base_color.set_rgb (39, 174,  96); // Window : Foreground_positive
             break;
         case KMessageWidget.Information:
-            bgBaseColor.setRgb (61, 174, 233); // Window : ForegroundActive
+            bg_base_color.set_rgb (61, 174, 233); // Window : Foreground_active
             break;
         case KMessageWidget.Warning:
-            bgBaseColor.setRgb (246, 116, 0); // Window : ForegroundNeutral
+            bg_base_color.set_rgb (246, 116, 0); // Window : Foreground_neutral
             break;
         case KMessageWidget.Error:
-            bgBaseColor.setRgb (218, 68, 83); // Window : ForegroundNegative
+            bg_base_color.set_rgb (218, 68, 83); // Window : Foreground_negative
             break;
         }
-        const qreal bgBaseColorAlpha = 0.2;
-        bgBaseColor.setAlphaF (bgBaseColorAlpha);
+        const qreal bg_base_color_alpha = 0.2;
+        bg_base_color.set_alpha_f (bg_base_color_alpha);
     
         const QPalette palette = QGuiApplication.palette ();
-        const QColor windowColor = palette.window ().color ();
-        const QColor textColor = palette.text ().color ();
-        const QColor border = bgBaseColor;
+        const QColor window_color = palette.window ().color ();
+        const QColor text_color = palette.text ().color ();
+        const QColor border = bg_base_color;
     
-        // Generate a final background color from overlaying bgBaseColor over windowColor
-        const int newRed = qRound (bgBaseColor.red () * bgBaseColorAlpha) + qRound (windowColor.red () * (1 - bgBaseColorAlpha));
-        const int newGreen = qRound (bgBaseColor.green () * bgBaseColorAlpha) + qRound (windowColor.green () * (1 - bgBaseColorAlpha));
-        const int newBlue = qRound (bgBaseColor.blue () * bgBaseColorAlpha) + qRound (windowColor.blue () * (1 - bgBaseColorAlpha));
+        // Generate a final background color from overlaying bg_base_color over window_color
+        const int new_red = q_round (bg_base_color.red () * bg_base_color_alpha) + q_round (window_color.red () * (1 - bg_base_color_alpha));
+        const int new_green = q_round (bg_base_color.green () * bg_base_color_alpha) + q_round (window_color.green () * (1 - bg_base_color_alpha));
+        const int new_blue = q_round (bg_base_color.blue () * bg_base_color_alpha) + q_round (window_color.blue () * (1 - bg_base_color_alpha));
     
-        const QColor bgFinalColor = QColor (newRed, newGreen, newBlue);
+        const QColor bg_final_color = QColor (new_red, new_green, new_blue);
     
-        content.setStyleSheet (
-            string.fromLatin1 (".QFrame {"
+        content.set_style_sheet (
+            string.from_latin1 (".QFrame {"
                                   "background-color : %1;"
                                   "border-radius : 4px;"
                                   "border : 2px solid %2;"
@@ -542,56 +542,56 @@ class KMessageWidgetPrivate {
                                   "}"
                                   ".QLabel { color : %4; }"
                                  )
-            .arg (bgFinalColor.name ())
+            .arg (bg_final_color.name ())
             .arg (border.name ())
-            // DefaultFrameWidth returns the size of the external margin + border width. We know our border is 1px, so we subtract this from the frame normal QStyle FrameWidth to get our margin
-            .arg (q.style ().pixelMetric (QStyle.PM_DefaultFrameWidth, nullptr, q) - 1)
-            .arg (textColor.name ())
+            // Default_frame_width returns the size of the external margin + border width. We know our border is 1px, so we subtract this from the frame normal QStyle Frame_width to get our margin
+            .arg (q.style ().pixel_metric (QStyle.PM_Default_frame_width, nullptr, q) - 1)
+            .arg (text_color.name ())
         );
     }
     
-    void KMessageWidgetPrivate.updateLayout () {
+    void KMessageWidgetPrivate.update_layout () {
         if (content.layout ()) {
-            createLayout ();
+            create_layout ();
         }
     }
     
-    void KMessageWidgetPrivate.updateSnapShot () {
-        // Attention : updateSnapShot calls Gtk.Widget.render (), which causes the whole
-        // window layouts to be activated. Calling this method from resizeEvent ()
+    void KMessageWidgetPrivate.update_snap_shot () {
+        // Attention : update_snap_shot calls Gtk.Widget.render (), which causes the whole
+        // window layouts to be activated. Calling this method from resize_event ()
         // can lead to infinite recursion, see:
         // https://bugs.kde.org/show_bug.cgi?id=311336
-        contentSnapShot = QPixmap (content.size () * q.devicePixelRatio ());
-        contentSnapShot.setDevicePixelRatio (q.devicePixelRatio ());
-        contentSnapShot.fill (Qt.transparent);
-        content.render (&contentSnapShot, QPoint (), QRegion (), Gtk.Widget.DrawChildren);
+        content_snap_shot = QPixmap (content.size () * q.device_pixel_ratio ());
+        content_snap_shot.set_device_pixel_ratio (q.device_pixel_ratio ());
+        content_snap_shot.fill (Qt.transparent);
+        content.render (&content_snap_shot, QPoint (), QRegion (), Gtk.Widget.Draw_children);
     }
     
-    void KMessageWidgetPrivate.slotTimeLineChanged (qreal value) {
-        q.setFixedHeight (qMin (qRound (value * 2.0), 1) * content.height ());
+    void KMessageWidgetPrivate.slot_time_line_changed (qreal value) {
+        q.set_fixed_height (q_min (q_round (value * 2.0), 1) * content.height ());
         q.update ();
     }
     
-    void KMessageWidgetPrivate.slotTimeLineFinished () {
-        if (timeLine.direction () == QTimeLine.Forward) {
+    void KMessageWidgetPrivate.slot_time_line_finished () {
+        if (time_line.direction () == QTime_line.Forward) {
             // Show
             // We set the whole geometry here, because it may be wrong if a
             // KMessageWidget is shown right when the toplevel window is created.
-            content.setGeometry (0, 0, q.width (), bestContentHeight ());
+            content.set_geometry (0, 0, q.width (), best_content_height ());
     
             // notify about finished animation
-            emit q.showAnimationFinished ();
+            emit q.show_animation_finished ();
         } else {
             // hide and notify about finished animation
             q.hide ();
-            emit q.hideAnimationFinished ();
+            emit q.hide_animation_finished ();
         }
     }
     
-    int KMessageWidgetPrivate.bestContentHeight () {
-        int height = content.heightForWidth (q.width ());
+    int KMessageWidgetPrivate.best_content_height () {
+        int height = content.height_for_width (q.width ());
         if (height == -1) {
-            height = content.sizeHint ().height ();
+            height = content.size_hint ().height ();
         }
         return height;
     }
@@ -609,7 +609,7 @@ class KMessageWidgetPrivate {
         : QFrame (parent)
         , d (new KMessageWidgetPrivate) {
         d.init (this);
-        setText (text);
+        set_text (text);
     }
     
     KMessageWidget.~KMessageWidget () {
@@ -617,194 +617,194 @@ class KMessageWidgetPrivate {
     }
     
     string KMessageWidget.text () {
-        return d.textLabel.text ();
+        return d.text_label.text ();
     }
     
-    void KMessageWidget.setText (string &text) {
-        d.textLabel.setText (text);
-        updateGeometry ();
+    void KMessageWidget.set_text (string &text) {
+        d.text_label.set_text (text);
+        update_geometry ();
     }
     
-    KMessageWidget.MessageType KMessageWidget.messageType () {
-        return d.messageType;
+    KMessageWidget.Message_type KMessageWidget.message_type () {
+        return d.message_type;
     }
     
-    void KMessageWidget.setMessageType (KMessageWidget.MessageType type) {
-        d.messageType = type;
-        d.applyStyleSheet ();
+    void KMessageWidget.set_message_type (KMessageWidget.Message_type type) {
+        d.message_type = type;
+        d.apply_style_sheet ();
     }
     
-    QSize KMessageWidget.sizeHint () {
-        ensurePolished ();
-        return d.content.sizeHint ();
+    QSize KMessageWidget.size_hint () {
+        ensure_polished ();
+        return d.content.size_hint ();
     }
     
-    QSize KMessageWidget.minimumSizeHint () {
-        ensurePolished ();
-        return d.content.minimumSizeHint ();
+    QSize KMessageWidget.minimum_size_hint () {
+        ensure_polished ();
+        return d.content.minimum_size_hint ();
     }
     
     bool KMessageWidget.event (QEvent *event) {
         if (event.type () == QEvent.Polish && !d.content.layout ()) {
-            d.createLayout ();
-        } else if (event.type () == QEvent.PaletteChange) {
-            d.applyStyleSheet ();
-        } else if (event.type () == QEvent.Show && !d.ignoreShowEventDoingAnimatedShow) {
+            d.create_layout ();
+        } else if (event.type () == QEvent.Palette_change) {
+            d.apply_style_sheet ();
+        } else if (event.type () == QEvent.Show && !d.ignore_show_event_doing_animated_show) {
             if ( (height () != d.content.height ()) || (d.content.pos ().y () != 0)) {
                 d.content.move (0, 0);
-                setFixedHeight (d.content.height ());
+                set_fixed_height (d.content.height ());
             }
         }
         return QFrame.event (event);
     }
     
-    void KMessageWidget.resizeEvent (QResizeEvent *event) {
-        QFrame.resizeEvent (event);
+    void KMessageWidget.resize_event (QResize_event *event) {
+        QFrame.resize_event (event);
     
-        if (d.timeLine.state () == QTimeLine.NotRunning) {
-            d.content.resize (width (), d.bestContentHeight ());
+        if (d.time_line.state () == QTime_line.Not_running) {
+            d.content.resize (width (), d.best_content_height ());
         }
     }
     
-    int KMessageWidget.heightForWidth (int width) {
-        ensurePolished ();
-        return d.content.heightForWidth (width);
+    int KMessageWidget.height_for_width (int width) {
+        ensure_polished ();
+        return d.content.height_for_width (width);
     }
     
-    void KMessageWidget.paintEvent (QPaintEvent *event) {
-        QFrame.paintEvent (event);
-        if (d.timeLine.state () == QTimeLine.Running) {
+    void KMessageWidget.paint_event (QPaint_event *event) {
+        QFrame.paint_event (event);
+        if (d.time_line.state () == QTime_line.Running) {
             QPainter painter (this);
-            painter.setOpacity (d.timeLine.currentValue () * d.timeLine.currentValue ());
-            painter.drawPixmap (0, 0, d.contentSnapShot);
+            painter.set_opacity (d.time_line.current_value () * d.time_line.current_value ());
+            painter.draw_pixmap (0, 0, d.content_snap_shot);
         }
     }
     
-    bool KMessageWidget.wordWrap () {
-        return d.wordWrap;
+    bool KMessageWidget.word_wrap () {
+        return d.word_wrap;
     }
     
-    void KMessageWidget.setWordWrap (bool wordWrap) {
-        d.wordWrap = wordWrap;
-        d.textLabel.setWordWrap (wordWrap);
-        QSizePolicy policy = sizePolicy ();
-        policy.setHeightForWidth (wordWrap);
-        setSizePolicy (policy);
-        d.updateLayout ();
-        // Without this, when user does wordWrap . !wordWrap . wordWrap, a minimum
+    void KMessageWidget.set_word_wrap (bool word_wrap) {
+        d.word_wrap = word_wrap;
+        d.text_label.set_word_wrap (word_wrap);
+        QSize_policy policy = size_policy ();
+        policy.set_height_for_width (word_wrap);
+        set_size_policy (policy);
+        d.update_layout ();
+        // Without this, when user does word_wrap . !word_wrap . word_wrap, a minimum
         // height is set, causing the widget to be too high.
         // Mostly visible in test programs.
-        if (wordWrap) {
-            setMinimumHeight (0);
+        if (word_wrap) {
+            set_minimum_height (0);
         }
     }
     
-    bool KMessageWidget.isCloseButtonVisible () {
-        return d.closeButton.isVisible ();
+    bool KMessageWidget.is_close_button_visible () {
+        return d.close_button.is_visible ();
     }
     
-    void KMessageWidget.setCloseButtonVisible (bool show) {
-        d.closeButton.setVisible (show);
-        updateGeometry ();
+    void KMessageWidget.set_close_button_visible (bool show) {
+        d.close_button.set_visible (show);
+        update_geometry ();
     }
     
-    void KMessageWidget.addAction (QAction *action) {
-        QFrame.addAction (action);
-        d.updateLayout ();
+    void KMessageWidget.add_action (QAction *action) {
+        QFrame.add_action (action);
+        d.update_layout ();
     }
     
-    void KMessageWidget.removeAction (QAction *action) {
-        QFrame.removeAction (action);
-        d.updateLayout ();
+    void KMessageWidget.remove_action (QAction *action) {
+        QFrame.remove_action (action);
+        d.update_layout ();
     }
     
-    void KMessageWidget.animatedShow () {
-        // Test before styleHint, as there might have been a style change while animation was running
-        if (isHideAnimationRunning ()) {
-            d.timeLine.stop ();
-            emit hideAnimationFinished ();
+    void KMessageWidget.animated_show () {
+        // Test before style_hint, as there might have been a style change while animation was running
+        if (is_hide_animation_running ()) {
+            d.time_line.stop ();
+            emit hide_animation_finished ();
         }
     
-        if (!style ().styleHint (QStyle.SH_Widget_Animate, nullptr, this)
-         || (parentWidget () && !parentWidget ().isVisible ())) {
+        if (!style ().style_hint (QStyle.SH_Widget_Animate, nullptr, this)
+         || (parent_widget () && !parent_widget ().is_visible ())) {
             show ();
-            emit showAnimationFinished ();
+            emit show_animation_finished ();
             return;
         }
     
-        if (isVisible () && (d.timeLine.state () == QTimeLine.NotRunning) && (height () == d.bestContentHeight ()) && (d.content.pos ().y () == 0)) {
-            emit showAnimationFinished ();
+        if (is_visible () && (d.time_line.state () == QTime_line.Not_running) && (height () == d.best_content_height ()) && (d.content.pos ().y () == 0)) {
+            emit show_animation_finished ();
             return;
         }
     
-        d.ignoreShowEventDoingAnimatedShow = true;
+        d.ignore_show_event_doing_animated_show = true;
         show ();
-        d.ignoreShowEventDoingAnimatedShow = false;
-        setFixedHeight (0);
-        int wantedHeight = d.bestContentHeight ();
-        d.content.setGeometry (0, -wantedHeight, width (), wantedHeight);
+        d.ignore_show_event_doing_animated_show = false;
+        set_fixed_height (0);
+        int wanted_height = d.best_content_height ();
+        d.content.set_geometry (0, -wanted_height, width (), wanted_height);
     
-        d.updateSnapShot ();
+        d.update_snap_shot ();
     
-        d.timeLine.setDirection (QTimeLine.Forward);
-        if (d.timeLine.state () == QTimeLine.NotRunning) {
-            d.timeLine.start ();
+        d.time_line.set_direction (QTime_line.Forward);
+        if (d.time_line.state () == QTime_line.Not_running) {
+            d.time_line.start ();
         }
     }
     
-    void KMessageWidget.animatedHide () {
-        // test this before isVisible, as animatedShow might have been called directly before,
+    void KMessageWidget.animated_hide () {
+        // test this before is_visible, as animated_show might have been called directly before,
         // so the first timeline event is not yet done and the widget is still hidden
-        // And before styleHint, as there might have been a style change while animation was running
-        if (isShowAnimationRunning ()) {
-            d.timeLine.stop ();
-            emit showAnimationFinished ();
+        // And before style_hint, as there might have been a style change while animation was running
+        if (is_show_animation_running ()) {
+            d.time_line.stop ();
+            emit show_animation_finished ();
         }
     
-        if (!style ().styleHint (QStyle.SH_Widget_Animate, nullptr, this)) {
+        if (!style ().style_hint (QStyle.SH_Widget_Animate, nullptr, this)) {
             hide ();
-            emit hideAnimationFinished ();
+            emit hide_animation_finished ();
             return;
         }
     
-        if (!isVisible ()) {
+        if (!is_visible ()) {
             // explicitly hide it, so it stays hidden in case it is only not visible due to the parents
             hide ();
-            emit hideAnimationFinished ();
+            emit hide_animation_finished ();
             return;
         }
     
         d.content.move (0, -d.content.height ());
-        d.updateSnapShot ();
+        d.update_snap_shot ();
     
-        d.timeLine.setDirection (QTimeLine.Backward);
-        if (d.timeLine.state () == QTimeLine.NotRunning) {
-            d.timeLine.start ();
+        d.time_line.set_direction (QTime_line.Backward);
+        if (d.time_line.state () == QTime_line.Not_running) {
+            d.time_line.start ();
         }
     }
     
-    bool KMessageWidget.isHideAnimationRunning () {
-        return (d.timeLine.direction () == QTimeLine.Backward)
-            && (d.timeLine.state () == QTimeLine.Running);
+    bool KMessageWidget.is_hide_animation_running () {
+        return (d.time_line.direction () == QTime_line.Backward)
+            && (d.time_line.state () == QTime_line.Running);
     }
     
-    bool KMessageWidget.isShowAnimationRunning () {
-        return (d.timeLine.direction () == QTimeLine.Forward)
-            && (d.timeLine.state () == QTimeLine.Running);
+    bool KMessageWidget.is_show_animation_running () {
+        return (d.time_line.direction () == QTime_line.Forward)
+            && (d.time_line.state () == QTime_line.Running);
     }
     
     QIcon KMessageWidget.icon () {
         return d.icon;
     }
     
-    void KMessageWidget.setIcon (QIcon &icon) {
+    void KMessageWidget.set_icon (QIcon &icon) {
         d.icon = icon;
-        if (d.icon.isNull ()) {
-            d.iconLabel.hide ();
+        if (d.icon.is_null ()) {
+            d.icon_label.hide ();
         } else {
-            const int size = style ().pixelMetric (QStyle.PM_ToolBarIconSize);
-            d.iconLabel.setPixmap (d.icon.pixmap (size));
-            d.iconLabel.show ();
+            const int size = style ().pixel_metric (QStyle.PM_Tool_bar_icon_size);
+            d.icon_label.set_pixmap (d.icon.pixmap (size));
+            d.icon_label.show ();
         }
     }
     

@@ -26,84 +26,84 @@ SOFTWARE.
 // #include <QColor>
 
 /***********************************************************
-    \class QProgressIndicator
-    \brief The QProgressIndicator class lets an application display a progress indicator to show that a lengthy task is under way.
+    \class QProgress_indicator
+    \brief The QProgress_indicator class lets an application display a progress indicator to show that a lengthy task is under way.
 
     Progress indicators are indeterminate and do nothing more than spin to show that the application is busy.
     \sa QProgressBar
 ***********************************************************/
-class QProgressIndicator : Gtk.Widget {
-    Q_PROPERTY (int delay READ animationDelay WRITE setAnimationDelay)
-    Q_PROPERTY (bool displayedWhenStopped READ isDisplayedWhenStopped WRITE setDisplayedWhenStopped)
-    Q_PROPERTY (QColor color READ color WRITE setColor)
+class QProgress_indicator : Gtk.Widget {
+    Q_PROPERTY (int delay READ animation_delay WRITE set_animation_delay)
+    Q_PROPERTY (bool displayed_when_stopped READ is_displayed_when_stopped WRITE set_displayed_when_stopped)
+    Q_PROPERTY (QColor color READ color WRITE set_color)
 
-    public QProgressIndicator (Gtk.Widget* parent = nullptr);
+    public QProgress_indicator (Gtk.Widget* parent = nullptr);
 
     /*********************************************************** Returns the delay between animation steps.
         \return The number of milliseconds between animation steps. By default, the animation delay is set to 40 milliseconds.
-        \sa setAnimationDelay
+        \sa set_animation_delay
     ***********************************************************/
-    public int animationDelay () {
+    public int animation_delay () {
         return m_delay;
     }
 
     /*********************************************************** Returns a Boolean value indicating whether the component is currently animated.
         \return Animation state.
-        \sa startAnimation stopAnimation
+        \sa start_animation stop_animation
     ***********************************************************/
-    public bool isAnimated ();
+    public bool is_animated ();
 
     /*********************************************************** Returns a Boolean value indicating whether the receiver shows itself even when it is not animating.
         \return Return true if the progress indicator shows itself even when it is not animating. By default, it returns false.
-        \sa setDisplayedWhenStopped
+        \sa set_displayed_when_stopped
     ***********************************************************/
-    public bool isDisplayedWhenStopped ();
+    public bool is_displayed_when_stopped ();
 
     /*********************************************************** Returns the color of the component.
-        \sa setColor
+        \sa set_color
       */
       public const QColor & color () {
         return m_color;
     }
 
-    public QSize sizeHint () const override;
-    public int heightForWidth (int w) const override;
+    public QSize size_hint () const override;
+    public int height_for_width (int w) const override;
 public slots:
     /*********************************************************** Starts the spin animation.
-        \sa stopAnimation isAnimated
+        \sa stop_animation is_animated
     ***********************************************************/
-    void startAnimation ();
+    void start_animation ();
 
     /*********************************************************** Stops the spin animation.
-        \sa startAnimation isAnimated
+        \sa start_animation is_animated
     ***********************************************************/
-    void stopAnimation ();
+    void stop_animation ();
 
     /*********************************************************** Sets the delay between animation steps.
         Setting the \a delay to a value larger than 40 slows the animation, while setting the \a delay to a smaller value speeds it up.
         \param delay The delay, in milliseconds.
-        \sa animationDelay
+        \sa animation_delay
     ***********************************************************/
-    void setAnimationDelay (int delay);
+    void set_animation_delay (int delay);
 
     /*********************************************************** Sets whether the component hides itself when it is not animating.
        \param state The animation state. Set false to hide the progress indicator when it is not animating; otherwise true.
-       \sa isDisplayedWhenStopped
+       \sa is_displayed_when_stopped
     ***********************************************************/
-    void setDisplayedWhenStopped (bool state);
+    void set_displayed_when_stopped (bool state);
 
     /*********************************************************** Sets the color of the components to the given color.
         \sa color
     ***********************************************************/
-    void setColor (QColor & color);
+    void set_color (QColor & color);
 protected:
-    void timerEvent (QTimerEvent * event) override;
-    void paintEvent (QPaintEvent * event) override;
+    void timer_event (QTimer_event * event) override;
+    void paint_event (QPaint_event * event) override;
 private:
     int m_angle = 0;
-    int m_timerId = -1;
+    int m_timer_id = -1;
     int m_delay = 40;
-    bool m_displayedWhenStopped = false;
+    bool m_displayed_when_stopped = false;
     QColor m_color = Qt.black;
 };
 
@@ -142,97 +142,97 @@ SOFTWARE.
 
 // #include <QPainter>
 
-QProgressIndicator.QProgressIndicator (Gtk.Widget* parent)
+QProgress_indicator.QProgress_indicator (Gtk.Widget* parent)
     : Gtk.Widget (parent) {
-    setSizePolicy (QSizePolicy.Fixed, QSizePolicy.Fixed);
-    setFocusPolicy (Qt.NoFocus);
+    set_size_policy (QSize_policy.Fixed, QSize_policy.Fixed);
+    set_focus_policy (Qt.No_focus);
 }
 
-bool QProgressIndicator.isAnimated () {
-    return (m_timerId != -1);
+bool QProgress_indicator.is_animated () {
+    return (m_timer_id != -1);
 }
 
-void QProgressIndicator.setDisplayedWhenStopped (bool state) {
-    m_displayedWhenStopped = state;
+void QProgress_indicator.set_displayed_when_stopped (bool state) {
+    m_displayed_when_stopped = state;
 
     update ();
 }
 
-bool QProgressIndicator.isDisplayedWhenStopped () {
-    return m_displayedWhenStopped;
+bool QProgress_indicator.is_displayed_when_stopped () {
+    return m_displayed_when_stopped;
 }
 
-void QProgressIndicator.startAnimation () {
+void QProgress_indicator.start_animation () {
     m_angle = 0;
 
-    if (m_timerId == -1)
-        m_timerId = startTimer (m_delay);
+    if (m_timer_id == -1)
+        m_timer_id = start_timer (m_delay);
 }
 
-void QProgressIndicator.stopAnimation () {
-    if (m_timerId != -1)
-        killTimer (m_timerId);
+void QProgress_indicator.stop_animation () {
+    if (m_timer_id != -1)
+        kill_timer (m_timer_id);
 
-    m_timerId = -1;
+    m_timer_id = -1;
 
     update ();
 }
 
-void QProgressIndicator.setAnimationDelay (int delay) {
-    if (m_timerId != -1)
-        killTimer (m_timerId);
+void QProgress_indicator.set_animation_delay (int delay) {
+    if (m_timer_id != -1)
+        kill_timer (m_timer_id);
 
     m_delay = delay;
 
-    if (m_timerId != -1)
-        m_timerId = startTimer (m_delay);
+    if (m_timer_id != -1)
+        m_timer_id = start_timer (m_delay);
 }
 
-void QProgressIndicator.setColor (QColor & color) {
+void QProgress_indicator.set_color (QColor & color) {
     m_color = color;
 
     update ();
 }
 
-QSize QProgressIndicator.sizeHint () {
+QSize QProgress_indicator.size_hint () {
     return {20, 20};
 }
 
-int QProgressIndicator.heightForWidth (int w) {
+int QProgress_indicator.height_for_width (int w) {
     return w;
 }
 
-void QProgressIndicator.timerEvent (QTimerEvent * /*event*/) {
+void QProgress_indicator.timer_event (QTimer_event * /*event*/) {
     m_angle = (m_angle+30)%360;
 
     update ();
 }
 
-void QProgressIndicator.paintEvent (QPaintEvent * /*event*/) {
-    if (!m_displayedWhenStopped && !isAnimated ())
+void QProgress_indicator.paint_event (QPaint_event * /*event*/) {
+    if (!m_displayed_when_stopped && !is_animated ())
         return;
 
-    int width = qMin (this.width (), this.height ());
+    int width = q_min (this.width (), this.height ());
 
     QPainter p (this);
-    p.setRenderHint (QPainter.Antialiasing);
+    p.set_render_hint (QPainter.Antialiasing);
 
-    int outerRadius = qRound ( (width - 1) * 0.5);
-    int innerRadius = qRound ( (width - 1) * 0.5 * 0.38);
+    int outer_radius = q_round ( (width - 1) * 0.5);
+    int inner_radius = q_round ( (width - 1) * 0.5 * 0.38);
 
-    int capsuleHeight = outerRadius - innerRadius;
-    int capsuleWidth  = qRound ( (width > 32 ) ? capsuleHeight * 0.23 : capsuleHeight * 0.35);
-    int capsuleRadius = capsuleWidth/2;
+    int capsule_height = outer_radius - inner_radius;
+    int capsule_width  = q_round ( (width > 32 ) ? capsule_height * 0.23 : capsule_height * 0.35);
+    int capsule_radius = capsule_width/2;
 
     for (int i=0; i<12; i++) {
         QColor color = m_color;
-        color.setAlphaF (1.0f - (static_cast<float> (i) / 12.0f));
-        p.setPen (Qt.NoPen);
-        p.setBrush (color);
+        color.set_alpha_f (1.0f - (static_cast<float> (i) / 12.0f));
+        p.set_pen (Qt.No_pen);
+        p.set_brush (color);
         p.save ();
         p.translate (rect ().center ());
         p.rotate (m_angle - i * 30);
-        p.drawRoundedRect (qRound (-capsuleWidth * 0.5), - (innerRadius + capsuleHeight), capsuleWidth, capsuleHeight, capsuleRadius, capsuleRadius);
+        p.draw_rounded_rect (q_round (-capsule_width * 0.5), - (inner_radius + capsule_height), capsule_width, capsule_height, capsule_radius, capsule_radius);
         p.restore ();
     }
 }

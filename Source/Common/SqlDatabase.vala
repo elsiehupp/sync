@@ -23,9 +23,9 @@ const int SQLITE_REPEAT_COUNT 20
 
 const int SQLITE_DO (A)
     if (1) {
-        _errId = (A);
-        if (_errId != SQLITE_OK && _errId != SQLITE_DONE && _errId != SQLITE_ROW) {
-            _error = string.fromUtf8 (sqlite3_errmsg (_db));
+        _err_id = (A);
+        if (_err_id != SQLITE_OK && _err_id != SQLITE_DONE && _err_id != SQLITE_ROW) {
+            _error = string.from_utf8 (sqlite3_errmsg (_db));
         }
     }
 
@@ -37,7 +37,7 @@ struct Sqlite3;
 struct sqlite3_stmt;
 
 namespace Occ {
-OCSYNC_EXPORT Q_DECLARE_LOGGING_CATEGORY (lcSql)
+OCSYNC_EXPORT Q_DECLARE_LOGGING_CATEGORY (lc_sql)
 
 
 /***********************************************************
@@ -50,29 +50,29 @@ class SqlDatabase {
     public SqlDatabase ();
     public ~SqlDatabase ();
 
-    public bool isOpen ();
-    public bool openOrCreateReadWrite (string &filename);
-    public bool openReadOnly (string &filename);
+    public bool is_open ();
+    public bool open_or_create_read_write (string &filename);
+    public bool open_read_only (string &filename);
     public bool transaction ();
     public bool commit ();
     public void close ();
     public string error ();
-    public Sqlite3 *sqliteDb ();
+    public Sqlite3 *sqlite_db ();
 
 private:
     enum class CheckDbResult {
         Ok,
-        CantPrepare,
-        CantExec,
-        NotOk,
+        Cant_prepare,
+        Cant_exec,
+        Not_ok,
     };
 
-    bool openHelper (string &filename, int sqliteFlags);
-    CheckDbResult checkDb ();
+    bool open_helper (string &filename, int sqlite_flags);
+    CheckDbResult check_db ();
 
     Sqlite3 *_db = nullptr;
     string _error; // last error string
-    int _errId = 0;
+    int _err_id = 0;
 
     friend class SqlQuery;
     QSet<SqlQuery> _queries;
@@ -86,19 +86,19 @@ There is basically 3 ways to initialize and use a query:
 
     SqlQuery q1;
     [...]
-    q1.initOrReset (...);
-    q1.bindValue (...);
+    q1.init_or_reset (...);
+    q1.bind_value (...);
     q1.exec (...)
 
     SqlQuery q2 (db);
     q2.prepare (...);
     [...]
     q2.reset_and_clear_bindings ();
-    q2.bindValue (...);
+    q2.bind_value (...);
     q2.exec (...)
 
     SqlQuery q3 ("...", db);
-    q3.bindValue (...);
+    q3.bind_value (...);
     q3.exec (...)
 
 ***********************************************************/
@@ -117,55 +117,55 @@ class SqlQuery {
 
     public ~SqlQuery ();
     public string error ();
-    public int errorId ();
+    public int error_id ();
 
     /// Checks whether the value at the given column index is NULL
-    public bool nullValue (int index);
+    public bool null_value (int index);
 
-    public string stringValue (int index);
-    public int intValue (int index);
+    public string string_value (int index);
+    public int int_value (int index);
     public uint64 int64Value (int index);
-    public QByteArray baValue (int index);
-    public bool isSelect ();
-    public bool isPragma ();
+    public QByteArray ba_value (int index);
+    public bool is_select ();
+    public bool is_pragma ();
     public bool exec ();
 
     public struct NextResult {
         bool ok = false;
-        bool hasData = false;
+        bool has_data = false;
     };
     public NextResult next ();
 
     public template<class T, typename std.enable_if<std.is_enum<T>.value, int>.type = 0>
-    public void bindValue (int pos, T &value) {
-        qCDebug (lcSql) << "SQL bind" << pos << value;
-        bindValueInternal (pos, static_cast<int> (value));
+    public void bind_value (int pos, T &value) {
+        q_c_debug (lc_sql) << "SQL bind" << pos << value;
+        bind_value_internal (pos, static_cast<int> (value));
     }
 
     public template<class T, typename std.enable_if<!std.is_enum<T>.value, int>.type = 0>
-    public void bindValue (int pos, T &value) {
-        qCDebug (lcSql) << "SQL bind" << pos << value;
-        bindValueInternal (pos, value);
+    public void bind_value (int pos, T &value) {
+        q_c_debug (lc_sql) << "SQL bind" << pos << value;
+        bind_value_internal (pos, value);
     }
 
-    public void bindValue (int pos, QByteArray &value) {
-        qCDebug (lcSql) << "SQL bind" << pos << string.fromUtf8 (value);
-        bindValueInternal (pos, value);
+    public void bind_value (int pos, QByteArray &value) {
+        q_c_debug (lc_sql) << "SQL bind" << pos << string.from_utf8 (value);
+        bind_value_internal (pos, value);
     }
 
-    public const QByteArray &lastQuery ();
-    public int numRowsAffected ();
+    public const QByteArray &last_query ();
+    public int num_rows_affected ();
     public void reset_and_clear_bindings ();
 
 private:
-    void bindValueInternal (int pos, QVariant &value);
+    void bind_value_internal (int pos, QVariant &value);
     void finish ();
 
     SqlDatabase *_sqldb = nullptr;
     Sqlite3 *_db = nullptr;
     sqlite3_stmt *_stmt = nullptr;
     string _error;
-    int _errId;
+    int _err_id;
     QByteArray _sql;
 
     friend class SqlDatabase;
@@ -181,25 +181,25 @@ SqlDatabase.~SqlDatabase () {
     close ();
 }
 
-bool SqlDatabase.isOpen () {
+bool SqlDatabase.is_open () {
     return _db != nullptr;
 }
 
-bool SqlDatabase.openHelper (string &filename, int sqliteFlags) {
-    if (isOpen ()) {
+bool SqlDatabase.open_helper (string &filename, int sqlite_flags) {
+    if (is_open ()) {
         return true;
     }
 
-    sqliteFlags |= SQLITE_OPEN_NOMUTEX;
+    sqlite_flags |= SQLITE_OPEN_NOMUTEX;
 
-    SQLITE_DO (sqlite3_open_v2 (filename.toUtf8 ().constData (), &_db, sqliteFlags, nullptr));
+    SQLITE_DO (sqlite3_open_v2 (filename.to_utf8 ().const_data (), &_db, sqlite_flags, nullptr));
 
-    if (_errId != SQLITE_OK) {
-        qCWarning (lcSql) << "Error:" << _error << "for" << filename;
-        if (_errId == SQLITE_CANTOPEN) {
-            qCWarning (lcSql) << "CANTOPEN extended errcode : " << sqlite3_extended_errcode (_db);
+    if (_err_id != SQLITE_OK) {
+        q_c_warning (lc_sql) << "Error:" << _error << "for" << filename;
+        if (_err_id == SQLITE_CANTOPEN) {
+            q_c_warning (lc_sql) << "CANTOPEN extended errcode : " << sqlite3_extended_errcode (_db);
 #if SQLITE_VERSION_NUMBER >= 3012000
-            qCWarning (lcSql) << "CANTOPEN system errno : " << sqlite3_system_errno (_db);
+            q_c_warning (lc_sql) << "CANTOPEN system errno : " << sqlite3_system_errno (_db);
 #endif
         }
         close ();
@@ -207,7 +207,7 @@ bool SqlDatabase.openHelper (string &filename, int sqliteFlags) {
     }
 
     if (!_db) {
-        qCWarning (lcSql) << "Error : no database for" << filename;
+        q_c_warning (lc_sql) << "Error : no database for" << filename;
         return false;
     }
 
@@ -216,84 +216,84 @@ bool SqlDatabase.openHelper (string &filename, int sqliteFlags) {
     return true;
 }
 
-SqlDatabase.CheckDbResult SqlDatabase.checkDb () {
+SqlDatabase.CheckDbResult SqlDatabase.check_db () {
     // quick_check can fail with a disk IO error when diskspace is low
     SqlQuery quick_check (*this);
 
     if (quick_check.prepare ("PRAGMA quick_check;", /*allow_failure=*/true) != SQLITE_OK) {
-        qCWarning (lcSql) << "Error preparing quick_check on database";
-        _errId = quick_check.errorId ();
+        q_c_warning (lc_sql) << "Error preparing quick_check on database";
+        _err_id = quick_check.error_id ();
         _error = quick_check.error ();
-        return CheckDbResult.CantPrepare;
+        return CheckDbResult.Cant_prepare;
     }
     if (!quick_check.exec ()) {
-        qCWarning (lcSql) << "Error running quick_check on database";
-        _errId = quick_check.errorId ();
+        q_c_warning (lc_sql) << "Error running quick_check on database";
+        _err_id = quick_check.error_id ();
         _error = quick_check.error ();
-        return CheckDbResult.CantExec;
+        return CheckDbResult.Cant_exec;
     }
 
     quick_check.next ();
-    string result = quick_check.stringValue (0);
+    string result = quick_check.string_value (0);
     if (result != QLatin1String ("ok")) {
-        qCWarning (lcSql) << "quick_check returned failure:" << result;
-        return CheckDbResult.NotOk;
+        q_c_warning (lc_sql) << "quick_check returned failure:" << result;
+        return CheckDbResult.Not_ok;
     }
 
     return CheckDbResult.Ok;
 }
 
-bool SqlDatabase.openOrCreateReadWrite (string &filename) {
-    if (isOpen ()) {
+bool SqlDatabase.open_or_create_read_write (string &filename) {
+    if (is_open ()) {
         return true;
     }
 
-    if (!openHelper (filename, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE)) {
+    if (!open_helper (filename, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE)) {
         return false;
     }
 
-    auto checkResult = checkDb ();
-    if (checkResult != CheckDbResult.Ok) {
-        if (checkResult == CheckDbResult.CantPrepare) {
+    auto check_result = check_db ();
+    if (check_result != CheckDbResult.Ok) {
+        if (check_result == CheckDbResult.Cant_prepare) {
             // When disk space is low, preparing may fail even though the db is fine.
             // Typically CANTOPEN or IOERR.
-            int64 freeSpace = Utility.freeDiskSpace (QFileInfo (filename).dir ().absolutePath ());
-            if (freeSpace != -1 && freeSpace < 1000000) {
-                qCWarning (lcSql) << "Can't prepare consistency check and disk space is low:" << freeSpace;
+            int64 free_space = Utility.free_disk_space (QFileInfo (filename).dir ().absolute_path ());
+            if (free_space != -1 && free_space < 1000000) {
+                q_c_warning (lc_sql) << "Can't prepare consistency check and disk space is low:" << free_space;
                 close ();
                 return false;
             }
 
             // Even when there's enough disk space, it might very well be that the
             // file is on a read-only filesystem and can't be opened because of that.
-            if (_errId == SQLITE_CANTOPEN) {
-                qCWarning (lcSql) << "Can't open db to prepare consistency check, aborting";
+            if (_err_id == SQLITE_CANTOPEN) {
+                q_c_warning (lc_sql) << "Can't open db to prepare consistency check, aborting";
                 close ();
                 return false;
             }
         }
 
-        qCCritical (lcSql) << "Consistency check failed, removing broken db" << filename;
+        q_c_critical (lc_sql) << "Consistency check failed, removing broken db" << filename;
         close ();
         QFile.remove (filename);
 
-        return openHelper (filename, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
+        return open_helper (filename, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
     }
 
     return true;
 }
 
-bool SqlDatabase.openReadOnly (string &filename) {
-    if (isOpen ()) {
+bool SqlDatabase.open_read_only (string &filename) {
+    if (is_open ()) {
         return true;
     }
 
-    if (!openHelper (filename, SQLITE_OPEN_READONLY)) {
+    if (!open_helper (filename, SQLITE_OPEN_READONLY)) {
         return false;
     }
 
-    if (checkDb () != CheckDbResult.Ok) {
-        qCWarning (lcSql) << "Consistency check failed in readonly mode, giving up" << filename;
+    if (check_db () != CheckDbResult.Ok) {
+        q_c_warning (lc_sql) << "Consistency check failed in readonly mode, giving up" << filename;
         close ();
         return false;
     }
@@ -313,8 +313,8 @@ void SqlDatabase.close () {
             q.finish ();
         }
         SQLITE_DO (sqlite3_close (_db));
-        if (_errId != SQLITE_OK)
-            qCWarning (lcSql) << "Closing database failed" << _error;
+        if (_err_id != SQLITE_OK)
+            q_c_warning (lc_sql) << "Closing database failed" << _error;
         _db = nullptr;
     }
 }
@@ -324,7 +324,7 @@ bool SqlDatabase.transaction () {
         return false;
     }
     SQLITE_DO (sqlite3_exec (_db, "BEGIN", nullptr, nullptr, nullptr));
-    return _errId == SQLITE_OK;
+    return _err_id == SQLITE_OK;
 }
 
 bool SqlDatabase.commit () {
@@ -332,10 +332,10 @@ bool SqlDatabase.commit () {
         return false;
     }
     SQLITE_DO (sqlite3_exec (_db, "COMMIT", nullptr, nullptr, nullptr));
-    return _errId == SQLITE_OK;
+    return _err_id == SQLITE_OK;
 }
 
-Sqlite3 *SqlDatabase.sqliteDb () {
+Sqlite3 *SqlDatabase.sqlite_db () {
     return _db;
 }
 
@@ -343,7 +343,7 @@ Sqlite3 *SqlDatabase.sqliteDb () {
 
 SqlQuery.SqlQuery (SqlDatabase &db)
     : _sqldb (&db)
-    , _db (db.sqliteDb ()) {
+    , _db (db.sqlite_db ()) {
 }
 
 SqlQuery.~SqlQuery () {
@@ -354,7 +354,7 @@ SqlQuery.~SqlQuery () {
 
 SqlQuery.SqlQuery (QByteArray &sql, SqlDatabase &db)
     : _sqldb (&db)
-    , _db (db.sqliteDb ()) {
+    , _db (db.sqlite_db ()) {
     prepare (sql);
 }
 
@@ -363,56 +363,56 @@ int SqlQuery.prepare (QByteArray &sql, bool allow_failure) {
     if (_stmt) {
         finish ();
     }
-    if (!_sql.isEmpty ()) {
+    if (!_sql.is_empty ()) {
         int n = 0;
         int rc = 0;
         do {
-            rc = sqlite3_prepare_v2 (_db, _sql.constData (), -1, &_stmt, nullptr);
+            rc = sqlite3_prepare_v2 (_db, _sql.const_data (), -1, &_stmt, nullptr);
             if ( (rc == SQLITE_BUSY) || (rc == SQLITE_LOCKED)) {
                 n++;
                 Occ.Utility.usleep (SQLITE_SLEEP_TIME_USEC);
             }
         } while ( (n < SQLITE_REPEAT_COUNT) && ( (rc == SQLITE_BUSY) || (rc == SQLITE_LOCKED)));
-        _errId = rc;
+        _err_id = rc;
 
-        if (_errId != SQLITE_OK) {
-            _error = string.fromUtf8 (sqlite3_errmsg (_db));
-            qCWarning (lcSql) << "Sqlite prepare statement error:" << _error << "in" << _sql;
+        if (_err_id != SQLITE_OK) {
+            _error = string.from_utf8 (sqlite3_errmsg (_db));
+            q_c_warning (lc_sql) << "Sqlite prepare statement error:" << _error << "in" << _sql;
             ENFORCE (allow_failure, "SQLITE Prepare error");
         } else {
             ASSERT (_stmt);
             _sqldb._queries.insert (this);
         }
     }
-    return _errId;
+    return _err_id;
 }
 
 /***********************************************************
-There is no overloads to QByteArray.startWith that takes Qt.CaseInsensitive.
+There is no overloads to QByteArray.start_with that takes Qt.CaseInsensitive.
 Returns true if 'a' starts with 'b' in a case insensitive way
 ***********************************************************/
-static bool startsWithInsensitive (QByteArray &a, QByteArray &b) {
-    return a.size () >= b.size () && qstrnicmp (a.constData (), b.constData (), static_cast<uint> (b.size ())) == 0;
+static bool starts_with_insensitive (QByteArray &a, QByteArray &b) {
+    return a.size () >= b.size () && qstrnicmp (a.const_data (), b.const_data (), static_cast<uint> (b.size ())) == 0;
 }
 
-bool SqlQuery.isSelect () {
-    return startsWithInsensitive (_sql, QByteArrayLiteral ("SELECT"));
+bool SqlQuery.is_select () {
+    return starts_with_insensitive (_sql, QByteArrayLiteral ("SELECT"));
 }
 
-bool SqlQuery.isPragma () {
-    return startsWithInsensitive (_sql, QByteArrayLiteral ("PRAGMA"));
+bool SqlQuery.is_pragma () {
+    return starts_with_insensitive (_sql, QByteArrayLiteral ("PRAGMA"));
 }
 
 bool SqlQuery.exec () {
-    qCDebug (lcSql) << "SQL exec" << _sql;
+    q_c_debug (lc_sql) << "SQL exec" << _sql;
 
     if (!_stmt) {
-        qCWarning (lcSql) << "Can't exec query, statement unprepared.";
+        q_c_warning (lc_sql) << "Can't exec query, statement unprepared.";
         return false;
     }
 
     // Don't do anything for selects, that is how we use the lib :-|
-    if (!isSelect () && !isPragma ()) {
+    if (!is_select () && !is_pragma ()) {
         int rc = 0, n = 0;
         do {
             rc = sqlite3_step (_stmt);
@@ -425,33 +425,33 @@ bool SqlQuery.exec () {
                 n++;
             }
         } while ( (n < SQLITE_REPEAT_COUNT) && ( (rc == SQLITE_BUSY) || (rc == SQLITE_LOCKED)));
-        _errId = rc;
+        _err_id = rc;
 
-        if (_errId != SQLITE_DONE && _errId != SQLITE_ROW) {
-            _error = string.fromUtf8 (sqlite3_errmsg (_db));
-            qCWarning (lcSql) << "Sqlite exec statement error:" << _errId << _error << "in" << _sql;
-            if (_errId == SQLITE_IOERR) {
-                qCWarning (lcSql) << "IOERR extended errcode : " << sqlite3_extended_errcode (_db);
+        if (_err_id != SQLITE_DONE && _err_id != SQLITE_ROW) {
+            _error = string.from_utf8 (sqlite3_errmsg (_db));
+            q_c_warning (lc_sql) << "Sqlite exec statement error:" << _err_id << _error << "in" << _sql;
+            if (_err_id == SQLITE_IOERR) {
+                q_c_warning (lc_sql) << "IOERR extended errcode : " << sqlite3_extended_errcode (_db);
 #if SQLITE_VERSION_NUMBER >= 3012000
-                qCWarning (lcSql) << "IOERR system errno : " << sqlite3_system_errno (_db);
+                q_c_warning (lc_sql) << "IOERR system errno : " << sqlite3_system_errno (_db);
 #endif
             }
         } else {
-            qCDebug (lcSql) << "Last exec affected" << numRowsAffected () << "rows.";
+            q_c_debug (lc_sql) << "Last exec affected" << num_rows_affected () << "rows.";
         }
-        return (_errId == SQLITE_DONE); // either SQLITE_ROW or SQLITE_DONE
+        return (_err_id == SQLITE_DONE); // either SQLITE_ROW or SQLITE_DONE
     }
 
     return true;
 }
 
 auto SqlQuery.next () . NextResult {
-    const bool firstStep = !sqlite3_stmt_busy (_stmt);
+    const bool first_step = !sqlite3_stmt_busy (_stmt);
 
     int n = 0;
     forever {
-        _errId = sqlite3_step (_stmt);
-        if (n < SQLITE_REPEAT_COUNT && firstStep && (_errId == SQLITE_LOCKED || _errId == SQLITE_BUSY)) {
+        _err_id = sqlite3_step (_stmt);
+        if (n < SQLITE_REPEAT_COUNT && first_step && (_err_id == SQLITE_LOCKED || _err_id == SQLITE_BUSY)) {
             sqlite3_reset (_stmt); // not necessary after sqlite version 3.6.23.1
             n++;
             Occ.Utility.usleep (SQLITE_SLEEP_TIME_USEC);
@@ -461,17 +461,17 @@ auto SqlQuery.next () . NextResult {
     }
 
     NextResult result;
-    result.ok = _errId == SQLITE_ROW || _errId == SQLITE_DONE;
-    result.hasData = _errId == SQLITE_ROW;
+    result.ok = _err_id == SQLITE_ROW || _err_id == SQLITE_DONE;
+    result.has_data = _err_id == SQLITE_ROW;
     if (!result.ok) {
-        _error = string.fromUtf8 (sqlite3_errmsg (_db));
-        qCWarning (lcSql) << "Sqlite step statement error:" << _errId << _error << "in" << _sql;
+        _error = string.from_utf8 (sqlite3_errmsg (_db));
+        q_c_warning (lc_sql) << "Sqlite step statement error:" << _err_id << _error << "in" << _sql;
     }
 
     return result;
 }
 
-void SqlQuery.bindValueInternal (int pos, QVariant &value) {
+void SqlQuery.bind_value_internal (int pos, QVariant &value) {
     int res = -1;
     if (!_stmt) {
         ASSERT (false);
@@ -481,34 +481,34 @@ void SqlQuery.bindValueInternal (int pos, QVariant &value) {
     switch (value.type ()) {
     case QVariant.Int:
     case QVariant.Bool:
-        res = sqlite3_bind_int (_stmt, pos, value.toInt ());
+        res = sqlite3_bind_int (_stmt, pos, value.to_int ());
         break;
     case QVariant.Double:
-        res = sqlite3_bind_double (_stmt, pos, value.toDouble ());
+        res = sqlite3_bind_double (_stmt, pos, value.to_double ());
         break;
     case QVariant.UInt:
-    case QVariant.LongLong:
-    case QVariant.ULongLong:
-        res = sqlite3_bind_int64 (_stmt, pos, value.toLongLong ());
+    case QVariant.Long_long:
+    case QVariant.ULong_long:
+        res = sqlite3_bind_int64 (_stmt, pos, value.to_long_long ());
         break;
-    case QVariant.DateTime : {
-        const QDateTime dateTime = value.toDateTime ();
-        const string str = dateTime.toString (QStringLiteral ("yyyy-MM-ddThh:mm:ss.zzz"));
+    case QVariant.Date_time : {
+        const QDateTime date_time = value.to_date_time ();
+        const string str = date_time.to_string (QStringLiteral ("yyyy-MM-dd_thh:mm:ss.zzz"));
         res = sqlite3_bind_text16 (_stmt, pos, str.utf16 (),
             str.size () * static_cast<int> (sizeof (ushort)), SQLITE_TRANSIENT);
         break;
     }
     case QVariant.Time : {
-        const QTime time = value.toTime ();
-        const string str = time.toString (QStringLiteral ("hh:mm:ss.zzz"));
+        const QTime time = value.to_time ();
+        const string str = time.to_string (QStringLiteral ("hh:mm:ss.zzz"));
         res = sqlite3_bind_text16 (_stmt, pos, str.utf16 (),
             str.size () * static_cast<int> (sizeof (ushort)), SQLITE_TRANSIENT);
         break;
     }
     case QVariant.String : {
-        if (!value.toString ().isNull ()) {
+        if (!value.to_string ().is_null ()) {
             // lifetime of string == lifetime of its qvariant
-            const auto *str = static_cast<const string> (value.constData ());
+            const auto *str = static_cast<const string> (value.const_data ());
             res = sqlite3_bind_text16 (_stmt, pos, str.utf16 (),
                 (str.size ()) * static_cast<int> (sizeof (QChar)), SQLITE_TRANSIENT);
         } else {
@@ -516,13 +516,13 @@ void SqlQuery.bindValueInternal (int pos, QVariant &value) {
         }
         break;
     }
-    case QVariant.ByteArray : {
-        auto ba = value.toByteArray ();
-        res = sqlite3_bind_text (_stmt, pos, ba.constData (), ba.size (), SQLITE_TRANSIENT);
+    case QVariant.Byte_array : {
+        auto ba = value.to_byte_array ();
+        res = sqlite3_bind_text (_stmt, pos, ba.const_data (), ba.size (), SQLITE_TRANSIENT);
         break;
     }
     default : {
-        string str = value.toString ();
+        string str = value.to_string ();
         // SQLITE_TRANSIENT makes sure that sqlite buffers the data
         res = sqlite3_bind_text16 (_stmt, pos, str.utf16 (),
             (str.size ()) * static_cast<int> (sizeof (QChar)), SQLITE_TRANSIENT);
@@ -530,20 +530,20 @@ void SqlQuery.bindValueInternal (int pos, QVariant &value) {
     }
     }
     if (res != SQLITE_OK) {
-        qCWarning (lcSql) << "ERROR binding SQL value:" << value << "error:" << res;
+        q_c_warning (lc_sql) << "ERROR binding SQL value:" << value << "error:" << res;
     }
     ASSERT (res == SQLITE_OK);
 }
 
-bool SqlQuery.nullValue (int index) {
+bool SqlQuery.null_value (int index) {
     return sqlite3_column_type (_stmt, index) == SQLITE_NULL;
 }
 
-string SqlQuery.stringValue (int index) {
-    return string.fromUtf16 (static_cast<const ushort> (sqlite3_column_text16 (_stmt, index)));
+string SqlQuery.string_value (int index) {
+    return string.from_utf16 (static_cast<const ushort> (sqlite3_column_text16 (_stmt, index)));
 }
 
-int SqlQuery.intValue (int index) {
+int SqlQuery.int_value (int index) {
     return sqlite3_column_int (_stmt, index);
 }
 
@@ -551,7 +551,7 @@ uint64 SqlQuery.int64Value (int index) {
     return sqlite3_column_int64 (_stmt, index);
 }
 
-QByteArray SqlQuery.baValue (int index) {
+QByteArray SqlQuery.ba_value (int index) {
     return QByteArray (static_cast<const char> (sqlite3_column_blob (_stmt, index)),
         sqlite3_column_bytes (_stmt, index));
 }
@@ -560,15 +560,15 @@ string SqlQuery.error () {
     return _error;
 }
 
-int SqlQuery.errorId () {
-    return _errId;
+int SqlQuery.error_id () {
+    return _err_id;
 }
 
-const QByteArray &SqlQuery.lastQuery () {
+const QByteArray &SqlQuery.last_query () {
     return _sql;
 }
 
-int SqlQuery.numRowsAffected () {
+int SqlQuery.num_rows_affected () {
     return sqlite3_changes (_db);
 }
 

@@ -12,167 +12,167 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 
 namespace Occ {
 
-class VfsSuffix : Vfs {
+class Vfs_suffix : Vfs {
 
 public:
-    VfsSuffix (GLib.Object *parent = nullptr);
-    ~VfsSuffix () override;
+    Vfs_suffix (GLib.Object *parent = nullptr);
+    ~Vfs_suffix () override;
 
     Mode mode () const override;
-    string fileSuffix () const override;
+    string file_suffix () const override;
 
     void stop () override;
-    void unregisterFolder () override;
+    void unregister_folder () override;
 
-    bool socketApiPinStateActionsShown () const override { return true; }
-    bool isHydrating () const override;
+    bool socket_api_pin_state_actions_shown () const override { return true; }
+    bool is_hydrating () const override;
 
-    Result<void, string> updateMetadata (string &filePath, time_t modtime, int64 size, QByteArray &fileId) override;
+    Result<void, string> update_metadata (string &file_path, time_t modtime, int64 size, QByteArray &file_id) override;
 
-    Result<void, string> createPlaceholder (SyncFileItem &item) override;
-    Result<void, string> dehydratePlaceholder (SyncFileItem &item) override;
-    Result<Vfs.ConvertToPlaceholderResult, string> convertToPlaceholder (string &filename, SyncFileItem &item, string &) override;
+    Result<void, string> create_placeholder (SyncFileItem &item) override;
+    Result<void, string> dehydrate_placeholder (SyncFileItem &item) override;
+    Result<Vfs.ConvertToPlaceholderResult, string> convert_to_placeholder (string &filename, SyncFileItem &item, string &) override;
 
-    bool needsMetadataUpdate (SyncFileItem &) override { return false; }
-    bool isDehydratedPlaceholder (string &filePath) override;
-    bool statTypeVirtualFile (csync_file_stat_t *stat, void *stat_data) override;
+    bool needs_metadata_update (SyncFileItem &) override { return false; }
+    bool is_dehydrated_placeholder (string &file_path) override;
+    bool stat_type_virtual_file (csync_file_stat_t *stat, void *stat_data) override;
 
-    bool setPinState (string &folderPath, PinState state) override { return setPinStateInDb (folderPath, state); } {ptional<PinState> pinState (string &folderPath) override
-    { return pinStateInDb (folderPath); }
-    AvailabilityResult availability (string &folderPath) override;
+    bool set_pin_state (string &folder_path, PinState state) override { return set_pin_state_in_db (folder_path, state); } {ptional<PinState> pin_state (string &folder_path) override
+    { return pin_state_in_db (folder_path); }
+    AvailabilityResult availability (string &folder_path) override;
 
 public slots:
-    void fileStatusChanged (string &, SyncFileStatus) override {}
+    void file_status_changed (string &, SyncFileStatus) override {}
 
 protected:
-    void startImpl (VfsSetupParams &params) override;
+    void start_impl (VfsSetupParams &params) override;
 };
 
-class SuffixVfsPluginFactory : GLib.Object, public DefaultPluginFactory<VfsSuffix> {
+class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_suffix> {
     Q_PLUGIN_METADATA (IID "org.owncloud.PluginFactory" FILE "vfspluginmetadata.json")
     Q_INTERFACES (Occ.PluginFactory)
 };
 
-    VfsSuffix.VfsSuffix (GLib.Object *parent)
+    Vfs_suffix.Vfs_suffix (GLib.Object *parent)
         : Vfs (parent) {
     }
     
-    VfsSuffix.~VfsSuffix () = default;
+    Vfs_suffix.~Vfs_suffix () = default;
     
-    Vfs.Mode VfsSuffix.mode () {
+    Vfs.Mode Vfs_suffix.mode () {
         return WithSuffix;
     }
     
-    string VfsSuffix.fileSuffix () {
+    string Vfs_suffix.file_suffix () {
         return QStringLiteral (APPLICATION_DOTVIRTUALFILE_SUFFIX);
     }
     
-    void VfsSuffix.startImpl (VfsSetupParams &params) {
+    void Vfs_suffix.start_impl (VfsSetupParams &params) {
         // It is unsafe for the database to contain any ".owncloud" file entries
         // that are not marked as a virtual file. These could be real .owncloud
         // files that were synced before vfs was enabled.
-        QByteArrayList toWipe;
-        params.journal.getFilesBelowPath ("", [&toWipe] (SyncJournalFileRecord &rec) {
-            if (!rec.isVirtualFile () && rec._path.endsWith (APPLICATION_DOTVIRTUALFILE_SUFFIX))
-                toWipe.append (rec._path);
+        QByte_array_list to_wipe;
+        params.journal.get_files_below_path ("", [&to_wipe] (SyncJournalFileRecord &rec) {
+            if (!rec.is_virtual_file () && rec._path.ends_with (APPLICATION_DOTVIRTUALFILE_SUFFIX))
+                to_wipe.append (rec._path);
         });
-        for (auto &path : toWipe)
-            params.journal.deleteFileRecord (path);
+        for (auto &path : to_wipe)
+            params.journal.delete_file_record (path);
     }
     
-    void VfsSuffix.stop () {
+    void Vfs_suffix.stop () {
     }
     
-    void VfsSuffix.unregisterFolder () {
+    void Vfs_suffix.unregister_folder () {
     }
     
-    bool VfsSuffix.isHydrating () {
+    bool Vfs_suffix.is_hydrating () {
         return false;
     }
     
-    Result<void, string> VfsSuffix.updateMetadata (string &filePath, time_t modtime, int64, QByteArray &) {
+    Result<void, string> Vfs_suffix.update_metadata (string &file_path, time_t modtime, int64, QByteArray &) {
         if (modtime <= 0) {
             return {tr ("Error updating metadata due to invalid modified time")};
         }
     
-        FileSystem.setModTime (filePath, modtime);
+        FileSystem.set_mod_time (file_path, modtime);
         return {};
     }
     
-    Result<void, string> VfsSuffix.createPlaceholder (SyncFileItem &item) {
+    Result<void, string> Vfs_suffix.create_placeholder (SyncFileItem &item) {
         if (item._modtime <= 0) {
             return {tr ("Error updating metadata due to invalid modified time")};
         }
     
-        // The concrete shape of the placeholder is also used in isDehydratedPlaceholder () below
-        string fn = _setupParams.filesystemPath + item._file;
-        if (!fn.endsWith (fileSuffix ())) {
+        // The concrete shape of the placeholder is also used in is_dehydrated_placeholder () below
+        string fn = _setup_params.filesystem_path + item._file;
+        if (!fn.ends_with (file_suffix ())) {
             ASSERT (false, "vfs file isn't ending with suffix");
             return string ("vfs file isn't ending with suffix");
         }
     
         QFile file (fn);
         if (file.exists () && file.size () > 1
-            && !FileSystem.verifyFileUnchanged (fn, item._size, item._modtime)) {
+            && !FileSystem.verify_file_unchanged (fn, item._size, item._modtime)) {
             return string ("Cannot create a placeholder because a file with the placeholder name already exist");
         }
     
         if (!file.open (QFile.ReadWrite | QFile.Truncate))
-            return file.errorString ();
+            return file.error_string ();
     
         file.write (" ");
         file.close ();
-        FileSystem.setModTime (fn, item._modtime);
+        FileSystem.set_mod_time (fn, item._modtime);
         return {};
     }
     
-    Result<void, string> VfsSuffix.dehydratePlaceholder (SyncFileItem &item) {
-        SyncFileItem virtualItem (item);
-        virtualItem._file = item._renameTarget;
-        auto r = createPlaceholder (virtualItem);
+    Result<void, string> Vfs_suffix.dehydrate_placeholder (SyncFileItem &item) {
+        SyncFileItem virtual_item (item);
+        virtual_item._file = item._rename_target;
+        auto r = create_placeholder (virtual_item);
         if (!r)
             return r;
     
-        if (item._file != item._renameTarget) { // can be the same when renaming foo . foo.owncloud to dehydrate
-            QFile.remove (_setupParams.filesystemPath + item._file);
+        if (item._file != item._rename_target) { // can be the same when renaming foo . foo.owncloud to dehydrate
+            QFile.remove (_setup_params.filesystem_path + item._file);
         }
     
         // Move the item's pin state
-        auto pin = _setupParams.journal.internalPinStates ().rawForPath (item._file.toUtf8 ());
+        auto pin = _setup_params.journal.internal_pin_states ().raw_for_path (item._file.to_utf8 ());
         if (pin && *pin != PinState.Inherited) {
-            setPinState (item._renameTarget, *pin);
-            setPinState (item._file, PinState.Inherited);
+            set_pin_state (item._rename_target, *pin);
+            set_pin_state (item._file, PinState.Inherited);
         }
     
         // Ensure the pin state isn't contradictory
-        pin = pinState (item._renameTarget);
+        pin = pin_state (item._rename_target);
         if (pin && *pin == PinState.AlwaysLocal)
-            setPinState (item._renameTarget, PinState.Unspecified);
+            set_pin_state (item._rename_target, PinState.Unspecified);
         return {};
     }
     
-    Result<Vfs.ConvertToPlaceholderResult, string> VfsSuffix.convertToPlaceholder (string &, SyncFileItem &, string &) {
+    Result<Vfs.ConvertToPlaceholderResult, string> Vfs_suffix.convert_to_placeholder (string &, SyncFileItem &, string &) {
         // Nothing necessary
         return Vfs.ConvertToPlaceholderResult.Ok;
     }
     
-    bool VfsSuffix.isDehydratedPlaceholder (string &filePath) {
-        if (!filePath.endsWith (fileSuffix ()))
+    bool Vfs_suffix.is_dehydrated_placeholder (string &file_path) {
+        if (!file_path.ends_with (file_suffix ()))
             return false;
-        QFileInfo fi (filePath);
+        QFileInfo fi (file_path);
         return fi.exists () && fi.size () == 1;
     }
     
-    bool VfsSuffix.statTypeVirtualFile (csync_file_stat_t *stat, void *) {
-        if (stat.path.endsWith (fileSuffix ().toUtf8 ())) {
-            stat.type = ItemTypeVirtualFile;
+    bool Vfs_suffix.stat_type_virtual_file (csync_file_stat_t *stat, void *) {
+        if (stat.path.ends_with (file_suffix ().to_utf8 ())) {
+            stat.type = Item_type_virtual_file;
             return true;
         }
         return false;
     }
     
-    Vfs.AvailabilityResult VfsSuffix.availability (string &folderPath) {
-        return availabilityInDb (folderPath);
+    Vfs.AvailabilityResult Vfs_suffix.availability (string &folder_path) {
+        return availability_in_db (folder_path);
     }
     
     } // namespace Occ

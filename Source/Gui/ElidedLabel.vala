@@ -4,59 +4,59 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QResizeEvent>
+// #include <QResize_event>
 
 // #include <QLabel>
 
 namespace Occ {
 
 /// Label that can elide its text
-class ElidedLabel : QLabel {
+class Elided_label : QLabel {
 public:
-    ElidedLabel (Gtk.Widget *parent = nullptr);
-    ElidedLabel (string &text, Gtk.Widget *parent = nullptr);
+    Elided_label (Gtk.Widget *parent = nullptr);
+    Elided_label (string &text, Gtk.Widget *parent = nullptr);
 
-    void setText (string &text);
+    void set_text (string &text);
     const string &text () { return _text; }
 
-    void setElideMode (Qt.TextElideMode elideMode);
-    Qt.TextElideMode elideMode () { return _elideMode; }
+    void set_elide_mode (Qt.Text_elide_mode elide_mode);
+    Qt.Text_elide_mode elide_mode () { return _elide_mode; }
 
 protected:
-    void resizeEvent (QResizeEvent *event) override;
+    void resize_event (QResize_event *event) override;
 
 private:
     string _text;
-    Qt.TextElideMode _elideMode = Qt.ElideNone;
+    Qt.Text_elide_mode _elide_mode = Qt.Elide_none;
 };
 
 
-    ElidedLabel.ElidedLabel (Gtk.Widget *parent)
+    Elided_label.Elided_label (Gtk.Widget *parent)
         : QLabel (parent) {
     }
     
-    ElidedLabel.ElidedLabel (string &text, Gtk.Widget *parent)
+    Elided_label.Elided_label (string &text, Gtk.Widget *parent)
         : QLabel (text, parent)
         , _text (text) {
     }
     
-    void ElidedLabel.setText (string &text) {
+    void Elided_label.set_text (string &text) {
         _text = text;
-        QLabel.setText (text);
+        QLabel.set_text (text);
         update ();
     }
     
-    void ElidedLabel.setElideMode (Qt.TextElideMode elideMode) {
-        _elideMode = elideMode;
+    void Elided_label.set_elide_mode (Qt.Text_elide_mode elide_mode) {
+        _elide_mode = elide_mode;
         update ();
     }
     
-    void ElidedLabel.resizeEvent (QResizeEvent *event) {
-        QLabel.resizeEvent (event);
+    void Elided_label.resize_event (QResize_event *event) {
+        QLabel.resize_event (event);
     
-        QFontMetrics fm = fontMetrics ();
-        string elided = fm.elidedText (_text, _elideMode, event.size ().width ());
-        QLabel.setText (elided);
+        QFont_metrics fm = font_metrics ();
+        string elided = fm.elided_text (_text, _elide_mode, event.size ().width ());
+        QLabel.set_text (elided);
     }
     }
     

@@ -40,35 +40,35 @@ class Cmd : GLib.Object {
     public Cmd () : GLib.Object () {
     }
 public slots:
-    void transmissionProgressSlot () {
+    void transmission_progress_slot () {
     }
 };
 
 
-static void nullMessageHandler (QtMsgType, QMessageLogContext &, string &) {
+static void null_message_handler (Qt_msg_type, QMessage_log_context &, string &) {
 }
 
 struct CmdOptions {
     string source_dir;
     string target_url;
-    string remotePath = QStringLiteral ("/");
+    string remote_path = QStringLiteral ("/");
     string config_directory;
     string user;
     string password;
     string proxy;
     bool silent;
-    bool trustSSL;
-    bool useNetrc;
+    bool trust_s_sL;
+    bool use_netrc;
     bool interactive;
-    bool ignoreHiddenFiles;
+    bool ignore_hidden_files;
     string exclude;
     string unsyncedfolders;
-    int restartTimes;
+    int restart_times;
     int downlimit;
     int uplimit;
 };
 
-// we can't use csync_set_userdata because the SyncEngine sets it already.
+// we can't use csync_set_userdata because the Sync_engine sets it already.
 // So we have to use a global variable
 CmdOptions *opts = nullptr;
 
@@ -89,12 +89,12 @@ private:
     termios tios;
 };
 
-string queryPassword (string &user) {
+string query_password (string &user) {
     EchoDisabler disabler;
-    std.cout << "Password for user " << qPrintable (user) << " : ";
+    std.cout << "Password for user " << q_printable (user) << " : ";
     std.string s;
     std.getline (std.cin, s);
-    return string.fromStdString (s);
+    return string.from_std_string (s);
 }
 
 #ifndef TOKEN_AUTH_ONLY
@@ -103,35 +103,35 @@ class HttpCredentialsText : HttpCredentials {
     public HttpCredentialsText (string &user, string &password)
         : HttpCredentials (user, password)
         , // FIXME : not working with client certs yet (qknight)
-        _sslTrusted (false) {
+        _ssl_trusted (false) {
     }
 
-    public void askFromUser () override {
-        _password = .queryPassword (user ());
+    public void ask_from_user () override {
+        _password = .query_password (user ());
         _ready = true;
         persist ();
         emit asked ();
     }
 
-    public void setSSLTrusted (bool isTrusted) {
-        _sslTrusted = isTrusted;
+    public void set_s_sLTrusted (bool is_trusted) {
+        _ssl_trusted = is_trusted;
     }
 
-    public bool sslIsTrusted () override {
-        return _sslTrusted;
+    public bool ssl_is_trusted () override {
+        return _ssl_trusted;
     }
 
 private:
-    bool _sslTrusted;
+    bool _ssl_trusted;
 };
 #endif /* TOKEN_AUTH_ONLY */
 
 void help () {
-    const char *binaryName = APPLICATION_EXECUTABLE "cmd";
+    const char *binary_name = APPLICATION_EXECUTABLE "cmd";
 
-    std.cout << binaryName << " - command line " APPLICATION_NAME " client tool" << std.endl;
+    std.cout << binary_name << " - command line " APPLICATION_NAME " client tool" << std.endl;
     std.cout << "" << std.endl;
-    std.cout << "Usage : " << binaryName << " [OPTION] <source_dir> <server_url>" << std.endl;
+    std.cout << "Usage : " << binary_name << " [OPTION] <source_dir> <server_url>" << std.endl;
     std.cout << "" << std.endl;
     std.cout << "A proxy can either be set manually using --httpproxy." << std.endl;
     std.cout << "Otherwise, the setting from a configured sync client will be used." << std.endl;
@@ -158,110 +158,110 @@ void help () {
     exit (0);
 }
 
-void showVersion () {
-    std.cout << qUtf8Printable (Theme.instance ().versionSwitchOutput ());
+void show_version () {
+    std.cout << q_utf8Printable (Theme.instance ().version_switch_output ());
     exit (0);
 }
 
-void parseOptions (QStringList &app_args, CmdOptions *options) {
+void parse_options (QStringList &app_args, CmdOptions *options) {
     QStringList args (app_args);
 
-    int argCount = args.count ();
+    int arg_count = args.count ();
 
-    if (argCount < 3) {
-        if (argCount >= 2) {
+    if (arg_count < 3) {
+        if (arg_count >= 2) {
             const string option = args.at (1);
             if (option == "-v" || option == "--version") {
-                showVersion ();
+                show_version ();
             }
         }
         help ();
     }
 
-    options.target_url = args.takeLast ();
+    options.target_url = args.take_last ();
 
-    options.source_dir = args.takeLast ();
-    if (!options.source_dir.endsWith ('/')) {
+    options.source_dir = args.take_last ();
+    if (!options.source_dir.ends_with ('/')) {
         options.source_dir.append ('/');
     }
     QFileInfo fi (options.source_dir);
     if (!fi.exists ()) {
-        std.cerr << "Source dir '" << qPrintable (options.source_dir) << "' does not exist." << std.endl;
+        std.cerr << "Source dir '" << q_printable (options.source_dir) << "' does not exist." << std.endl;
         exit (1);
     }
-    options.source_dir = fi.absoluteFilePath ();
+    options.source_dir = fi.absolute_file_path ();
 
     QStringListIterator it (args);
     // skip file name;
-    if (it.hasNext ())
+    if (it.has_next ())
         it.next ();
 
-    while (it.hasNext ()) {
+    while (it.has_next ()) {
         const string option = it.next ();
 
-        if (option == "--httpproxy" && !it.peekNext ().startsWith ("-")) {
+        if (option == "--httpproxy" && !it.peek_next ().starts_with ("-")) {
             options.proxy = it.next ();
         } else if (option == "-s" || option == "--silent") {
             options.silent = true;
         } else if (option == "--trust") {
-            options.trustSSL = true;
+            options.trust_s_sL = true;
         } else if (option == "-n") {
-            options.useNetrc = true;
+            options.use_netrc = true;
         } else if (option == "-h") {
-            options.ignoreHiddenFiles = false;
+            options.ignore_hidden_files = false;
         } else if (option == "--non-interactive") {
             options.interactive = false;
-        } else if ( (option == "-u" || option == "--user") && !it.peekNext ().startsWith ("-")) {
+        } else if ( (option == "-u" || option == "--user") && !it.peek_next ().starts_with ("-")) {
             options.user = it.next ();
-        } else if ( (option == "-p" || option == "--password") && !it.peekNext ().startsWith ("-")) {
+        } else if ( (option == "-p" || option == "--password") && !it.peek_next ().starts_with ("-")) {
             options.password = it.next ();
-        } else if (option == "--exclude" && !it.peekNext ().startsWith ("-")) {
+        } else if (option == "--exclude" && !it.peek_next ().starts_with ("-")) {
             options.exclude = it.next ();
-        } else if (option == "--unsyncedfolders" && !it.peekNext ().startsWith ("-")) {
+        } else if (option == "--unsyncedfolders" && !it.peek_next ().starts_with ("-")) {
             options.unsyncedfolders = it.next ();
-        } else if (option == "--max-sync-retries" && !it.peekNext ().startsWith ("-")) {
-            options.restartTimes = it.next ().toInt ();
-        } else if (option == "--uplimit" && !it.peekNext ().startsWith ("-")) {
-            options.uplimit = it.next ().toInt () * 1000;
-        } else if (option == "--downlimit" && !it.peekNext ().startsWith ("-")) {
-            options.downlimit = it.next ().toInt () * 1000;
+        } else if (option == "--max-sync-retries" && !it.peek_next ().starts_with ("-")) {
+            options.restart_times = it.next ().to_int ();
+        } else if (option == "--uplimit" && !it.peek_next ().starts_with ("-")) {
+            options.uplimit = it.next ().to_int () * 1000;
+        } else if (option == "--downlimit" && !it.peek_next ().starts_with ("-")) {
+            options.downlimit = it.next ().to_int () * 1000;
         } else if (option == "--logdebug") {
-            Logger.instance ().setLogFile ("-");
-            Logger.instance ().setLogDebug (true);
-        } else if (option == "--path" && !it.peekNext ().startsWith ("-")) {
-            options.remotePath = it.next ();
+            Logger.instance ().set_log_file ("-");
+            Logger.instance ().set_log_debug (true);
+        } else if (option == "--path" && !it.peek_next ().starts_with ("-")) {
+            options.remote_path = it.next ();
         }
         else {
             help ();
         }
     }
 
-    if (options.target_url.isEmpty () || options.source_dir.isEmpty ()) {
+    if (options.target_url.is_empty () || options.source_dir.is_empty ()) {
         help ();
     }
 }
 
 /* If the selective sync list is different from before, we need to disable the read from db
-  (The normal client does it in SelectiveSyncDialog.accept*)
+  (The normal client does it in Selective_sync_dialog.accept*)
 ***********************************************************/
-void selectiveSyncFixup (Occ.SyncJournalDb *journal, QStringList &newList) {
+void selective_sync_fixup (Occ.SyncJournalDb *journal, QStringList &new_list) {
     SqlDatabase db;
-    if (!db.openOrCreateReadWrite (journal.databaseFilePath ())) {
+    if (!db.open_or_create_read_write (journal.database_file_path ())) {
         return;
     }
 
     bool ok = false;
 
-    const auto selectiveSyncList = journal.getSelectiveSyncList (SyncJournalDb.SelectiveSyncBlackList, &ok);
-    const QSet<string> oldBlackListSet (selectiveSyncList.begin (), selectiveSyncList.end ());
+    const auto selective_sync_list = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, &ok);
+    const QSet<string> old_black_list_set (selective_sync_list.begin (), selective_sync_list.end ());
     if (ok) {
-        const QSet<string> blackListSet (newList.begin (), newList.end ());
-        const auto changes = (oldBlackListSet - blackListSet) + (blackListSet - oldBlackListSet);
+        const QSet<string> black_list_set (new_list.begin (), new_list.end ());
+        const auto changes = (old_black_list_set - black_list_set) + (black_list_set - old_black_list_set);
         for (auto &it : changes) {
-            journal.schedulePathForRemoteDiscovery (it);
+            journal.schedule_path_for_remote_discovery (it);
         }
 
-        journal.setSelectiveSyncList (SyncJournalDb.SelectiveSyncBlackList, newList);
+        journal.set_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, new_list);
     }
 }
 
@@ -270,37 +270,37 @@ int main (int argc, char **argv) {
 
     CmdOptions options;
     options.silent = false;
-    options.trustSSL = false;
-    options.useNetrc = false;
+    options.trust_s_sL = false;
+    options.use_netrc = false;
     options.interactive = true;
-    options.ignoreHiddenFiles = false; // Default is to sync hidden files
-    options.restartTimes = 3;
+    options.ignore_hidden_files = false; // Default is to sync hidden files
+    options.restart_times = 3;
     options.uplimit = 0;
     options.downlimit = 0;
 
-    parseOptions (app.arguments (), &options);
+    parse_options (app.arguments (), &options);
 
     if (options.silent) {
-        qInstallMessageHandler (nullMessageHandler);
+        q_install_message_handler (null_message_handler);
     } else {
-        qSetMessagePattern ("%{time MM-dd hh:mm:ss:zzz} [ %{type} %{category} ]%{if-debug}\t[ %{function} ]%{endif}:\t%{message}");
+        q_set_message_pattern ("%{time MM-dd hh:mm:ss:zzz} [ %{type} %{category} ]%{if-debug}\t[ %{function} ]%{endif}:\t%{message}");
     }
 
     AccountPtr account = Account.create ();
 
     if (!account) {
-        qFatal ("Could not initialize account!");
+        q_fatal ("Could not initialize account!");
         return EXIT_FAILURE;
     }
 
     if (options.target_url.contains ("/webdav", Qt.CaseInsensitive) || options.target_url.contains ("/dav", Qt.CaseInsensitive)) {
-        qWarning ("Dav or webdav in server URL.");
+        q_warning ("Dav or webdav in server URL.");
         std.cerr << "Error! Please specify only the base URL of your host with username and password. Example:" << std.endl
                   << "http (s)://username:password@cloud.example.com" << std.endl;
         return EXIT_FAILURE;
     }
 
-    QUrl hostUrl = QUrl.fromUserInput ( (options.target_url.endsWith (QLatin1Char ('/')) || options.target_url.endsWith (QLatin1Char ('\\'))) ? options.target_url.chopped (1) : options.target_url);
+    QUrl host_url = QUrl.from_user_input ( (options.target_url.ends_with (QLatin1Char ('/')) || options.target_url.ends_with (QLatin1Char ('\\'))) ? options.target_url.chopped (1) : options.target_url);
 
     // Order of retrieval attempt (later attempts override earlier ones):
     // 1. From URL
@@ -308,93 +308,93 @@ int main (int argc, char **argv) {
     // 3. From netrc (if enabled)
     // 4. From prompt (if interactive)
 
-    string user = hostUrl.userName ();
-    string password = hostUrl.password ();
+    string user = host_url.user_name ();
+    string password = host_url.password ();
 
-    if (!options.user.isEmpty ()) {
+    if (!options.user.is_empty ()) {
         user = options.user;
     }
 
-    if (!options.password.isEmpty ()) {
+    if (!options.password.is_empty ()) {
         password = options.password;
     }
 
-    if (options.useNetrc) {
+    if (options.use_netrc) {
         NetrcParser parser;
         if (parser.parse ()) {
-            NetrcParser.LoginPair pair = parser.find (hostUrl.host ());
+            NetrcParser.Login_pair pair = parser.find (host_url.host ());
             user = pair.first;
             password = pair.second;
         }
     }
 
     if (options.interactive) {
-        if (user.isEmpty ()) {
+        if (user.is_empty ()) {
             std.cout << "Please enter user name : ";
             std.string s;
             std.getline (std.cin, s);
-            user = string.fromStdString (s);
+            user = string.from_std_string (s);
         }
-        if (password.isEmpty ()) {
-            password = queryPassword (user);
+        if (password.is_empty ()) {
+            password = query_password (user);
         }
     }
 
     // Find the folder and the original owncloud url
 
-    hostUrl.setScheme (hostUrl.scheme ().replace ("owncloud", "http"));
+    host_url.set_scheme (host_url.scheme ().replace ("owncloud", "http"));
 
-    QUrl credentialFreeUrl = hostUrl;
-    credentialFreeUrl.setUserName (string ());
-    credentialFreeUrl.setPassword (string ());
+    QUrl credential_free_url = host_url;
+    credential_free_url.set_user_name (string ());
+    credential_free_url.set_password (string ());
 
-    const string folder = options.remotePath;
+    const string folder = options.remote_path;
 
-    if (!options.proxy.isNull ()) {
+    if (!options.proxy.is_null ()) {
         string host;
         int port = 0;
         bool ok = false;
 
-        QStringList pList = options.proxy.split (':');
-        if (pList.count () == 3) {
+        QStringList p_list = options.proxy.split (':');
+        if (p_list.count () == 3) {
             // http : //192.168.178.23 : 8080
             //  0            1            2
-            host = pList.at (1);
-            if (host.startsWith ("//"))
+            host = p_list.at (1);
+            if (host.starts_with ("//"))
                 host.remove (0, 2);
 
-            port = pList.at (2).toInt (&ok);
+            port = p_list.at (2).to_int (&ok);
 
-            QNetworkProxyFactory.setUseSystemConfiguration (false);
-            QNetworkProxy.setApplicationProxy (QNetworkProxy (QNetworkProxy.HttpProxy, host, port));
+            QNetworkProxyFactory.set_use_system_configuration (false);
+            QNetworkProxy.set_application_proxy (QNetworkProxy (QNetworkProxy.Http_proxy, host, port));
         } else {
-            qFatal ("Could not read httpproxy. The proxy should have the format \"http://hostname:port\".");
+            q_fatal ("Could not read httpproxy. The proxy should have the format \"http://hostname:port\".");
         }
     }
 
-    auto *sslErrorHandler = new SimpleSslErrorHandler;
+    auto *ssl_error_handler = new Simple_sslErrorHandler;
 
 #ifdef TOKEN_AUTH_ONLY
-    auto *cred = new TokenCredentials (user, password, "");
-    account.setCredentials (cred);
+    auto *cred = new Token_credentials (user, password, "");
+    account.set_credentials (cred);
 #else
     auto *cred = new HttpCredentialsText (user, password);
-    account.setCredentials (cred);
-    if (options.trustSSL) {
-        cred.setSSLTrusted (true);
+    account.set_credentials (cred);
+    if (options.trust_s_sL) {
+        cred.set_s_sLTrusted (true);
     }
 #endif
 
-    account.setUrl (hostUrl);
-    account.setSslErrorHandler (sslErrorHandler);
+    account.set_url (host_url);
+    account.set_ssl_error_handler (ssl_error_handler);
 
-    QEventLoop loop;
+    QEvent_loop loop;
     auto *job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/capabilities"));
-    GLib.Object.connect (job, &JsonApiJob.jsonReceived, [&] (QJsonDocument &json) {
-        auto caps = json.object ().value ("ocs").toObject ().value ("data").toObject ().value ("capabilities").toObject ();
-        qDebug () << "Server capabilities" << caps;
-        account.setCapabilities (caps.toVariantMap ());
-        account.setServerVersion (caps["core"].toObject ()["status"].toObject ()["version"].toString ());
+    GLib.Object.connect (job, &JsonApiJob.json_received, [&] (QJsonDocument &json) {
+        auto caps = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
+        q_debug () << "Server capabilities" << caps;
+        account.set_capabilities (caps.to_variant_map ());
+        account.set_server_version (caps["core"].to_object ()["status"].to_object ()["version"].to_string ());
         loop.quit ();
     });
     job.start ();
@@ -406,92 +406,92 @@ int main (int argc, char **argv) {
     }
 
     job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/user"));
-    GLib.Object.connect (job, &JsonApiJob.jsonReceived, [&] (QJsonDocument &json) {
-        const QJsonObject data = json.object ().value ("ocs").toObject ().value ("data").toObject ();
-        account.setDavUser (data.value ("id").toString ());
-        account.setDavDisplayName (data.value ("display-name").toString ());
+    GLib.Object.connect (job, &JsonApiJob.json_received, [&] (QJsonDocument &json) {
+        const QJsonObject data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
+        account.set_dav_user (data.value ("id").to_string ());
+        account.set_dav_display_name (data.value ("display-name").to_string ());
         loop.quit ();
     });
     job.start ();
     loop.exec ();
 
     // much lower age than the default since this utility is usually made to be run right after a change in the tests
-    SyncEngine.minimumFileAgeForUpload = std.chrono.milliseconds (0);
+    Sync_engine.minimum_file_age_for_upload = std.chrono.milliseconds (0);
 
-    int restartCount = 0;
+    int restart_count = 0;
 restart_sync:
 
     opts = &options;
 
-    QStringList selectiveSyncList;
-    if (!options.unsyncedfolders.isEmpty ()) {
+    QStringList selective_sync_list;
+    if (!options.unsyncedfolders.is_empty ()) {
         QFile f (options.unsyncedfolders);
-        if (!f.open (QFile.ReadOnly)) {
-            qCritical () << "Could not open file containing the list of unsynced folders : " << options.unsyncedfolders;
+        if (!f.open (QFile.Read_only)) {
+            q_critical () << "Could not open file containing the list of unsynced folders : " << options.unsyncedfolders;
         } else {
             // filter out empty lines and comments
-            selectiveSyncList = string.fromUtf8 (f.readAll ()).split ('\n').filter (QRegularExpression ("\\S+")).filter (QRegularExpression ("^[^#]"));
+            selective_sync_list = string.from_utf8 (f.read_all ()).split ('\n').filter (QRegularExpression ("\\S+")).filter (QRegularExpression ("^[^#]"));
 
-            for (int i = 0; i < selectiveSyncList.count (); ++i) {
-                if (!selectiveSyncList.at (i).endsWith (QLatin1Char ('/'))) {
-                    selectiveSyncList[i].append (QLatin1Char ('/'));
+            for (int i = 0; i < selective_sync_list.count (); ++i) {
+                if (!selective_sync_list.at (i).ends_with (QLatin1Char ('/'))) {
+                    selective_sync_list[i].append (QLatin1Char ('/'));
                 }
             }
         }
     }
 
     Cmd cmd;
-    string dbPath = options.source_dir + SyncJournalDb.makeDbName (options.source_dir, credentialFreeUrl, folder, user);
-    SyncJournalDb db (dbPath);
+    string db_path = options.source_dir + SyncJournalDb.make_db_name (options.source_dir, credential_free_url, folder, user);
+    SyncJournalDb db (db_path);
 
-    if (!selectiveSyncList.empty ()) {
-        selectiveSyncFixup (&db, selectiveSyncList);
+    if (!selective_sync_list.empty ()) {
+        selective_sync_fixup (&db, selective_sync_list);
     }
 
-    SyncOptions opt;
-    opt.fillFromEnvironmentVariables ();
-    opt.verifyChunkSizes ();
-    SyncEngine engine (account, options.source_dir, folder, &db);
-    engine.setIgnoreHiddenFiles (options.ignoreHiddenFiles);
-    engine.setNetworkLimits (options.uplimit, options.downlimit);
-    GLib.Object.connect (&engine, &SyncEngine.finished,
+    Sync_options opt;
+    opt.fill_from_environment_variables ();
+    opt.verify_chunk_sizes ();
+    Sync_engine engine (account, options.source_dir, folder, &db);
+    engine.set_ignore_hidden_files (options.ignore_hidden_files);
+    engine.set_network_limits (options.uplimit, options.downlimit);
+    GLib.Object.connect (&engine, &Sync_engine.finished,
         [&app] (bool result) { app.exit (result ? EXIT_SUCCESS : EXIT_FAILURE); });
-    GLib.Object.connect (&engine, &SyncEngine.transmissionProgress, &cmd, &Cmd.transmissionProgressSlot);
-    GLib.Object.connect (&engine, &SyncEngine.syncError,
-        [] (string &error) { qWarning () << "Sync error:" << error; });
+    GLib.Object.connect (&engine, &Sync_engine.transmission_progress, &cmd, &Cmd.transmission_progress_slot);
+    GLib.Object.connect (&engine, &Sync_engine.sync_error,
+        [] (string &error) { q_warning () << "Sync error:" << error; });
 
     // Exclude lists
 
-    bool hasUserExcludeFile = !options.exclude.isEmpty ();
-    string systemExcludeFile = ConfigFile.excludeFileFromSystem ();
+    bool has_user_exclude_file = !options.exclude.is_empty ();
+    string system_exclude_file = ConfigFile.exclude_file_from_system ();
 
     // Always try to load the user-provided exclude list if one is specified
-    if (hasUserExcludeFile) {
-        engine.excludedFiles ().addExcludeFilePath (options.exclude);
+    if (has_user_exclude_file) {
+        engine.excluded_files ().add_exclude_file_path (options.exclude);
     }
     // Load the system list if available, or if there's no user-provided list
-    if (!hasUserExcludeFile || QFile.exists (systemExcludeFile)) {
-        engine.excludedFiles ().addExcludeFilePath (systemExcludeFile);
+    if (!has_user_exclude_file || QFile.exists (system_exclude_file)) {
+        engine.excluded_files ().add_exclude_file_path (system_exclude_file);
     }
 
-    if (!engine.excludedFiles ().reloadExcludeFiles ()) {
-        qFatal ("Cannot load system exclude list or list supplied via --exclude");
+    if (!engine.excluded_files ().reload_exclude_files ()) {
+        q_fatal ("Cannot load system exclude list or list supplied via --exclude");
         return EXIT_FAILURE;
     }
 
     // Have to be done async, else, an error before exec () does not terminate the event loop.
-    QMetaObject.invokeMethod (&engine, "startSync", Qt.QueuedConnection);
+    QMetaObject.invoke_method (&engine, "start_sync", Qt.QueuedConnection);
 
-    int resultCode = app.exec ();
+    int result_code = app.exec ();
 
-    if (engine.isAnotherSyncNeeded () != NoFollowUpSync) {
-        if (restartCount < options.restartTimes) {
-            restartCount++;
-            qDebug () << "Restarting Sync, because another sync is needed" << restartCount;
+    if (engine.is_another_sync_needed () != No_follow_up_sync) {
+        if (restart_count < options.restart_times) {
+            restart_count++;
+            q_debug () << "Restarting Sync, because another sync is needed" << restart_count;
             goto restart_sync;
         }
-        qWarning () << "Another sync is needed, but not done because restart count is exceeded" << restartCount;
+        q_warning () << "Another sync is needed, but not done because restart count is exceeded" << restart_count;
     }
 
-    return resultCode;
+    return result_code;
 }

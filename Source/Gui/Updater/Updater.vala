@@ -16,32 +16,32 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 namespace Occ {
 
-Q_DECLARE_LOGGING_CATEGORY (lcUpdater)
+Q_DECLARE_LOGGING_CATEGORY (lc_updater)
 
 class Updater : GLib.Object {
 public:
     struct Helper {
-        static int64 stringVersionToInt (string &version);
-        static int64 currentVersionToInt ();
-        static int64 versionToInt (int64 major, int64 minor, int64 patch, int64 build);
+        static int64 string_version_to_int (string &version);
+        static int64 current_version_to_int ();
+        static int64 version_to_int (int64 major, int64 minor, int64 patch, int64 build);
     };
 
     static Updater *instance ();
-    static QUrl updateUrl ();
+    static QUrl update_url ();
 
-    virtual void checkForUpdate () = 0;
-    virtual void backgroundCheckForUpdate () = 0;
-    virtual bool handleStartup () = 0;
+    virtual void check_for_update () = 0;
+    virtual void background_check_for_update () = 0;
+    virtual bool handle_startup () = 0;
 
 protected:
-    static string clientVersion ();
+    static string client_version ();
     Updater ()
         : GLib.Object (nullptr) {
     }
 
 private:
-    static string getSystemInfo ();
-    static QUrlQuery getQueryParams ();
+    static string get_system_info ();
+    static QUrlQuery get_query_params ();
     static Updater *create ();
     static Updater *_instance;
 };
@@ -56,76 +56,76 @@ private:
         return _instance;
     }
     
-    QUrl Updater.updateUrl () {
-        QUrl updateBaseUrl (string.fromLocal8Bit (qgetenv ("OCC_UPDATE_URL")));
-        if (updateBaseUrl.isEmpty ()) {
-            updateBaseUrl = QUrl (QLatin1String (APPLICATION_UPDATE_URL));
+    QUrl Updater.update_url () {
+        QUrl update_base_url (string.from_local8Bit (qgetenv ("OCC_UPDATE_URL")));
+        if (update_base_url.is_empty ()) {
+            update_base_url = QUrl (QLatin1String (APPLICATION_UPDATE_URL));
         }
-        if (!updateBaseUrl.isValid () || updateBaseUrl.host () == ".") {
+        if (!update_base_url.is_valid () || update_base_url.host () == ".") {
             return QUrl ();
         }
     
-        auto urlQuery = getQueryParams ();
+        auto url_query = get_query_params ();
     
-        updateBaseUrl.setQuery (urlQuery);
+        update_base_url.set_query (url_query);
     
-        return updateBaseUrl;
+        return update_base_url;
     }
     
-    QUrlQuery Updater.getQueryParams () {
+    QUrlQuery Updater.get_query_params () {
         QUrlQuery query;
         Theme *theme = Theme.instance ();
         string platform = QStringLiteral ("stranger");
-        if (Utility.isLinux ()) {
+        if (Utility.is_linux ()) {
             platform = QStringLiteral ("linux");
-        } else if (Utility.isBSD ()) {
+        } else if (Utility.is_b_sD ()) {
             platform = QStringLiteral ("bsd");
-        } else if (Utility.isWindows ()) {
+        } else if (Utility.is_windows ()) {
             platform = QStringLiteral ("win32");
-        } else if (Utility.isMac ()) {
+        } else if (Utility.is_mac ()) {
             platform = QStringLiteral ("macos");
         }
     
-        string sysInfo = getSystemInfo ();
-        if (!sysInfo.isEmpty ()) {
-            query.addQueryItem (QStringLiteral ("client"), sysInfo);
+        string sys_info = get_system_info ();
+        if (!sys_info.is_empty ()) {
+            query.add_query_item (QStringLiteral ("client"), sys_info);
         }
-        query.addQueryItem (QStringLiteral ("version"), clientVersion ());
-        query.addQueryItem (QStringLiteral ("platform"), platform);
-        query.addQueryItem (QStringLiteral ("osRelease"), QSysInfo.productType ());
-        query.addQueryItem (QStringLiteral ("osVersion"), QSysInfo.productVersion ());
-        query.addQueryItem (QStringLiteral ("kernelVersion"), QSysInfo.kernelVersion ());
-        query.addQueryItem (QStringLiteral ("oem"), theme.appName ());
-        query.addQueryItem (QStringLiteral ("buildArch"), QSysInfo.buildCpuArchitecture ());
-        query.addQueryItem (QStringLiteral ("currentArch"), QSysInfo.currentCpuArchitecture ());
+        query.add_query_item (QStringLiteral ("version"), client_version ());
+        query.add_query_item (QStringLiteral ("platform"), platform);
+        query.add_query_item (QStringLiteral ("os_release"), QSysInfo.product_type ());
+        query.add_query_item (QStringLiteral ("os_version"), QSysInfo.product_version ());
+        query.add_query_item (QStringLiteral ("kernel_version"), QSysInfo.kernel_version ());
+        query.add_query_item (QStringLiteral ("oem"), theme.app_name ());
+        query.add_query_item (QStringLiteral ("build_arch"), QSysInfo.build_cpu_architecture ());
+        query.add_query_item (QStringLiteral ("current_arch"), QSysInfo.current_cpu_architecture ());
     
         string suffix = QStringLiteral (MIRALL_STRINGIFY (MIRALL_VERSION_SUFFIX));
-        query.addQueryItem (QStringLiteral ("versionsuffix"), suffix);
+        query.add_query_item (QStringLiteral ("versionsuffix"), suffix);
     
-        auto channel = ConfigFile ().updateChannel ();
+        auto channel = ConfigFile ().update_channel ();
         if (channel != QLatin1String ("stable")) {
-            query.addQueryItem (QStringLiteral ("channel"), channel);
+            query.add_query_item (QStringLiteral ("channel"), channel);
         }
     
-        // updateSegment (see configfile.h)
+        // update_segment (see configfile.h)
         ConfigFile cfg;
-        auto updateSegment = cfg.updateSegment ();
-        query.addQueryItem (QLatin1String ("updatesegment"), string.number (updateSegment));
+        auto update_segment = cfg.update_segment ();
+        query.add_query_item (QLatin1String ("updatesegment"), string.number (update_segment));
     
         return query;
     }
     
-    string Updater.getSystemInfo () {
+    string Updater.get_system_info () {
     #ifdef Q_OS_LINUX
         QProcess process;
         process.start (QLatin1String ("lsb_release"), { QStringLiteral ("-a") });
-        process.waitForFinished ();
-        QByteArray output = process.readAllStandardOutput ();
-        qCDebug (lcUpdater) << "Sys Info size : " << output.length ();
+        process.wait_for_finished ();
+        QByteArray output = process.read_all_standard_output ();
+        q_c_debug (lc_updater) << "Sys Info size : " << output.length ();
         if (output.length () > 1024)
             output.clear (); // don't send too much.
     
-        return string.fromLocal8Bit (output.toBase64 ());
+        return string.from_local8Bit (output.to_base64 ());
     #else
         return string ();
     #endif
@@ -133,36 +133,36 @@ private:
     
     // To test, cmake with -DAPPLICATION_UPDATE_URL="http://127.0.0.1:8080/test.rss"
     Updater *Updater.create () {
-        auto url = updateUrl ();
-        qCDebug (lcUpdater) << url;
-        if (url.isEmpty ()) {
-            qCWarning (lcUpdater) << "Not a valid updater URL, will not do update check";
+        auto url = update_url ();
+        q_c_debug (lc_updater) << url;
+        if (url.is_empty ()) {
+            q_c_warning (lc_updater) << "Not a valid updater URL, will not do update check";
             return nullptr;
         }
         // the best we can do is notify about updates
-        return new PassiveUpdateNotifier (url);
+        return new Passive_update_notifier (url);
     }
     
-    int64 Updater.Helper.versionToInt (int64 major, int64 minor, int64 patch, int64 build) {
+    int64 Updater.Helper.version_to_int (int64 major, int64 minor, int64 patch, int64 build) {
         return major << 56 | minor << 48 | patch << 40 | build;
     }
     
-    int64 Updater.Helper.currentVersionToInt () {
-        return versionToInt (MIRALL_VERSION_MAJOR, MIRALL_VERSION_MINOR,
+    int64 Updater.Helper.current_version_to_int () {
+        return version_to_int (MIRALL_VERSION_MAJOR, MIRALL_VERSION_MINOR,
             MIRALL_VERSION_PATCH, MIRALL_VERSION_BUILD);
     }
     
-    int64 Updater.Helper.stringVersionToInt (string &version) {
-        if (version.isEmpty ())
+    int64 Updater.Helper.string_version_to_int (string &version) {
+        if (version.is_empty ())
             return 0;
-        QByteArray baVersion = version.toLatin1 ();
+        QByteArray ba_version = version.to_latin1 ();
         int major = 0, minor = 0, patch = 0, build = 0;
-        sscanf (baVersion, "%d.%d.%d.%d", &major, &minor, &patch, &build);
-        return versionToInt (major, minor, patch, build);
+        sscanf (ba_version, "%d.%d.%d.%d", &major, &minor, &patch, &build);
+        return version_to_int (major, minor, patch, build);
     }
     
-    string Updater.clientVersion () {
-        return string.fromLatin1 (MIRALL_STRINGIFY (MIRALL_VERSION_FULL));
+    string Updater.client_version () {
+        return string.from_latin1 (MIRALL_STRINGIFY (MIRALL_VERSION_FULL));
     }
     
     } // namespace Occ

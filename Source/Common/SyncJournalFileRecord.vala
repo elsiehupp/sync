@@ -16,38 +16,38 @@ namespace Occ {
 ***********************************************************/
 class SyncJournalFileRecord {
 
-    public bool isValid () {
-        return !_path.isEmpty ();
+    public bool is_valid () {
+        return !_path.is_empty ();
     }
 
     /***********************************************************
-    Returns the numeric part of the full id in _fileId.
+    Returns the numeric part of the full id in _file_id.
 
     On the server this is sometimes known as the internal file id.
     
     It is used in the construction of private links.
     ***********************************************************/
-    public QByteArray numericFileId ();
-    public QDateTime modDateTime () { return Utility.qDateTimeFromTime_t (_modtime); }
+    public QByteArray numeric_file_id ();
+    public QDateTime mod_date_time () { return Utility.q_date_time_from_time_t (_modtime); }
 
-    public bool isDirectory () { return _type == ItemTypeDirectory; }
-    public bool isFile () { return _type == ItemTypeFile || _type == ItemTypeVirtualFileDehydration; }
-    public bool isVirtualFile () { return _type == ItemTypeVirtualFile || _type == ItemTypeVirtualFileDownload; }
-    public string path () { return string.fromUtf8 (_path); }
-    public string e2eMangledName () { return string.fromUtf8 (_e2eMangledName); }
+    public bool is_directory () { return _type == ItemTypeDirectory; }
+    public bool is_file () { return _type == ItemTypeFile || _type == ItemTypeVirtualFileDehydration; }
+    public bool is_virtual_file () { return _type == Item_type_virtual_file || _type == Item_type_virtual_file_download; }
+    public string path () { return string.from_utf8 (_path); }
+    public string e2e_mangled_name () { return string.from_utf8 (_e2e_mangled_name); }
 
     public QByteArray _path;
     public uint64 _inode = 0;
     public int64 _modtime = 0;
-    public ItemType _type = ItemTypeSkip;
+    public ItemType _type = Item_type_skip;
     public QByteArray _etag;
-    public QByteArray _fileId;
-    public int64 _fileSize = 0;
-    public RemotePermissions _remotePerm;
-    public bool _serverHasIgnoredFiles = false;
-    public QByteArray _checksumHeader;
-    public QByteArray _e2eMangledName;
-    public bool _isE2eEncrypted = false;
+    public QByteArray _file_id;
+    public int64 _file_size = 0;
+    public RemotePermissions _remote_perm;
+    public bool _server_has_ignored_files = false;
+    public QByteArray _checksum_header;
+    public QByteArray _e2e_mangled_name;
+    public bool _is_e2e_encrypted = false;
 };
 
 bool OCSYNC_EXPORT
@@ -60,33 +60,33 @@ class SyncJournalErrorBlacklistRecord {
         /// Normal errors have no special behavior
         Normal = 0,
         /// These get a special summary message
-        InsufficientRemoteStorage
+        Insufficient_remote_storage
     };
 
     /// The number of times the operation was unsuccessful so far.
-    public int _retryCount = 0;
+    public int _retry_count = 0;
 
     /// The last error string.
-    public string _errorString;
+    public string _error_string;
     /// The error category. Sometimes used for special actions.
-    public Category _errorCategory = Category.Normal;
+    public Category _error_category = Category.Normal;
 
-    public int64 _lastTryModtime = 0;
-    public QByteArray _lastTryEtag;
+    public int64 _last_try_modtime = 0;
+    public QByteArray _last_try_etag;
 
     /// The last time the operation was attempted (in s since epoch).
-    public int64 _lastTryTime = 0;
+    public int64 _last_try_time = 0;
 
     /// The number of seconds the file shall be ignored.
-    public int64 _ignoreDuration = 0;
+    public int64 _ignore_duration = 0;
 
     public string _file;
-    public string _renameTarget;
+    public string _rename_target;
 
     /// The last X-Request-ID of the request that failled
-    public QByteArray _requestId;
+    public QByteArray _request_id;
 
-    public bool isValid ();
+    public bool is_valid ();
 };
 
 /***********************************************************
@@ -97,7 +97,7 @@ tag in the filename, and the base file is the file that it's a conflict for.
 So if "a/foo.txt" is the base file, its conflict file could be
 "a/foo (conflicted copy 1234).txt".
 ***********************************************************/
-class ConflictRecord {
+class Conflict_record {
 
     /***********************************************************
     Path to the file with the conflict tag in the name
@@ -107,21 +107,21 @@ class ConflictRecord {
     public QByteArray path;
 
     /// File id of the base file
-    public QByteArray baseFileId;
+    public QByteArray base_file_id;
 
     /***********************************************************
     Modtime of the base file
 
     may not be available and be -1
     ***********************************************************/
-    public int64 baseModtime = -1;
+    public int64 base_modtime = -1;
 
     /***********************************************************
     Etag of the base file
 
     may not be available and empty
     ***********************************************************/
-    public QByteArray baseEtag;
+    public QByteArray base_etag;
 
     /***********************************************************
     The path of the original file at the time the conflict was created
@@ -131,26 +131,26 @@ class ConflictRecord {
 
     maybe be empty if not available
     ***********************************************************/
-    public QByteArray initialBasePath;
+    public QByteArray initial_base_path;
 
-    public bool isValid () { return !path.isEmpty (); }
+    public bool is_valid () { return !path.is_empty (); }
 };
 
 
-    QByteArray SyncJournalFileRecord.numericFileId () {
+    QByteArray SyncJournalFileRecord.numeric_file_id () {
         // Use the id up until the first non-numeric character
-        for (int i = 0; i < _fileId.size (); ++i) {
-            if (_fileId[i] < '0' || _fileId[i] > '9') {
-                return _fileId.left (i);
+        for (int i = 0; i < _file_id.size (); ++i) {
+            if (_file_id[i] < '0' || _file_id[i] > '9') {
+                return _file_id.left (i);
             }
         }
-        return _fileId;
+        return _file_id;
     }
     
-    bool SyncJournalErrorBlacklistRecord.isValid () {
-        return !_file.isEmpty ()
-            && (!_lastTryEtag.isEmpty () || _lastTryModtime != 0)
-            && _lastTryTime > 0;
+    bool SyncJournalErrorBlacklistRecord.is_valid () {
+        return !_file.is_empty ()
+            && (!_last_try_etag.is_empty () || _last_try_modtime != 0)
+            && _last_try_time > 0;
     }
     
     bool operator== (SyncJournalFileRecord &lhs,
@@ -160,11 +160,11 @@ class ConflictRecord {
             && lhs._modtime == rhs._modtime
             && lhs._type == rhs._type
             && lhs._etag == rhs._etag
-            && lhs._fileId == rhs._fileId
-            && lhs._fileSize == rhs._fileSize
-            && lhs._remotePerm == rhs._remotePerm
-            && lhs._serverHasIgnoredFiles == rhs._serverHasIgnoredFiles
-            && lhs._checksumHeader == rhs._checksumHeader;
+            && lhs._file_id == rhs._file_id
+            && lhs._file_size == rhs._file_size
+            && lhs._remote_perm == rhs._remote_perm
+            && lhs._server_has_ignored_files == rhs._server_has_ignored_files
+            && lhs._checksum_header == rhs._checksum_header;
     }
     }
     

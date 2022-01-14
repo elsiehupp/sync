@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 @brief Application developer interface for c
 
-@defgroup csyncPublicAPI csync public API
+@defgroup csync_public_a_p_i csync public API
 
 @{
 ***********************************************************/
@@ -42,7 +42,7 @@ namespace Occ {
 }
 
 #if defined (Q_CC_GNU) && !defined (Q_CC_INTEL) && !defined (Q_CC_CLANG) && (__GNUC__ * 100 + __GNUC_MINOR__ < 408)
-// openSuse 12.3 didn't like enum bitfields.
+// open_suse 12.3 didn't like enum bitfields.
 const int BITFIELD (size)
 #elif defined (Q_CC_MSVC)
 // MSVC stores enum and bool as signed, so we need to add a bit for the sign
@@ -51,7 +51,7 @@ const int BITFIELD (size) : (size+1)
 const int BITFIELD (size) :size
 #endif
 
-namespace CSyncEnums {
+namespace CSync_enums {
 OCSYNC_EXPORT Q_NAMESPACE
 
 enum csync_status_codes_e {
@@ -95,7 +95,7 @@ Q_ENUM_NS (csync_status_codes_e)
   * Instruction enum. In the file traversal structure, it describes
   * the csync state of a file.
   */
-enum SyncInstructions {
+enum Sync_instructions {
     CSYNC_INSTRUCTION_NONE            = 0,       /* Nothing to do (UPDATE|RECONCILE) */
     CSYNC_INSTRUCTION_EVAL            = 1 << 0,  /* There was changed compared to the DB (UPDATE) */
     CSYNC_INSTRUCTION_REMOVE          = 1 << 1,  /* The file need to be removed (RECONCILE) */
@@ -114,22 +114,22 @@ enum SyncInstructions {
                                                     but without any propagation (UPDATE|RECONCILE) */
 };
 
-Q_ENUM_NS (SyncInstructions)
+Q_ENUM_NS (Sync_instructions)
 
 // This enum is used with BITFIELD (3) and BITFIELD (4) in several places.
 // Also, this value is stored in the database, so beware of value changes.
 enum ItemType {
     ItemTypeFile = 0,
-    ItemTypeSoftLink = 1,
+    Item_type_soft_link = 1,
     ItemTypeDirectory = 2,
-    ItemTypeSkip = 3,
+    Item_type_skip = 3,
 
     /***********************************************************
     The file is a dehydrated placeholder, meaning data isn't available locally */
-    ItemTypeVirtualFile = 4,
+    Item_type_virtual_file = 4,
 
     /***********************************************************
-    A ItemTypeVirtualFile that wants to be hydrated.
+    A Item_type_virtual_file that wants to be hydrated.
 
     Actions may put this in the db as a request to a future sync, such as
     implicit hydration (when the user wants to access file data) when using
@@ -144,12 +144,12 @@ enum ItemType {
     if an item's pin state mandates it, such as when encountering a AlwaysLocal
     file that is dehydrated.
     ***********************************************************/
-    ItemTypeVirtualFileDownload = 5,
+    Item_type_virtual_file_download = 5,
 
     /***********************************************************
     A ItemTypeFile that wants to be dehydrated.
 
-    Similar to ItemTypeVirtualFileDownload, but there's currently no situation
+    Similar to Item_type_virtual_file_download, but there's currently no situation
     where it's stored in the database since there is no action that triggers a
     file dehydration without changing the pin state.
     ***********************************************************/
@@ -158,8 +158,8 @@ enum ItemType {
 Q_ENUM_NS (ItemType)
 }
 
-using namespace CSyncEnums;
-using CSYNC_STATUS = CSyncEnums.csync_status_codes_e;
+using namespace CSync_enums;
+using CSYNC_STATUS = CSync_enums.csync_status_codes_e;
 typedef struct csync_file_stat_s csync_file_stat_t;
 
 struct OCSYNC_EXPORT csync_file_stat_s {
@@ -167,38 +167,38 @@ struct OCSYNC_EXPORT csync_file_stat_s {
   int64_t size = 0;
   uint64_t inode = 0;
 
-  Occ.RemotePermissions remotePerm;
+  Occ.RemotePermissions remote_perm;
   ItemType type BITFIELD (4);
   bool child_modified BITFIELD (1);
   bool has_ignored_files BITFIELD (1); // Specify that a directory, or child directory contains ignored files.
   bool is_hidden BITFIELD (1); // Not saved in the DB, only used during discovery for local files.
-  bool isE2eEncrypted BITFIELD (1);
+  bool is_e2e_encrypted BITFIELD (1);
 
   QByteArray path;
   QByteArray rename_path;
   QByteArray etag;
   QByteArray file_id;
-  QByteArray directDownloadUrl;
-  QByteArray directDownloadCookies;
+  QByteArray direct_download_url;
+  QByteArray direct_download_cookies;
   QByteArray original_path; // only set if locale conversion fails
 
   // In the local tree, this can hold a checksum and its type if it is
   //   computed during discovery for some reason.
   // In the remote tree, this will have the server checksum, if available.
   // In both cases, the format is "SHA1:baff".
-  QByteArray checksumHeader;
-  QByteArray e2eMangledName;
+  QByteArray checksum_header;
+  QByteArray e2e_mangled_name;
 
   CSYNC_STATUS error_status = CSYNC_STATUS_OK;
 
-  SyncInstructions instruction = CSYNC_INSTRUCTION_NONE; /* u32 */
+  Sync_instructions instruction = CSYNC_INSTRUCTION_NONE; /* u32 */
 
   csync_file_stat_s ()
-    : type (ItemTypeSkip)
+    : type (Item_type_skip)
     , child_modified (false)
     , has_ignored_files (false)
     , is_hidden (false)
-    , isE2eEncrypted (false) { }
+    , is_e2e_encrypted (false) { }
 };
 
 /***********************************************************

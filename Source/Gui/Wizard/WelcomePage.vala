@@ -6,132 +6,132 @@ Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 // #pragma once
 
-// #include <QWizardPage>
+// #include <QWizard_page>
 
 namespace Occ {
 
 
 namespace Ui {
-    class WelcomePage;
+    class Welcome_page;
 }
 
-class WelcomePage : QWizardPage {
+class Welcome_page : QWizard_page {
 
 public:
-    WelcomePage (OwncloudWizard *ocWizard);
-    ~WelcomePage () override;
-    int nextId () const override;
-    void initializePage () override;
-    void setLoginButtonDefault ();
+    Welcome_page (OwncloudWizard *oc_wizard);
+    ~Welcome_page () override;
+    int next_id () const override;
+    void initialize_page () override;
+    void set_login_button_default ();
 
 private:
-    void setupUi ();
-    void customizeStyle ();
-    void styleSlideShow ();
-    void setupSlideShow ();
-    void setupLoginButton ();
-    void setupCreateAccountButton ();
-    void setupHostYourOwnServerLabel ();
+    void setup_ui ();
+    void customize_style ();
+    void style_slide_show ();
+    void setup_slide_show ();
+    void setup_login_button ();
+    void setup_create_account_button ();
+    void setup_host_your_own_server_label ();
 
-    QScopedPointer<Ui.WelcomePage> _ui;
+    QScopedPointer<Ui.Welcome_page> _ui;
 
-    OwncloudWizard *_ocWizard;
-    WizardCommon.Pages _nextPage = WizardCommon.Page_ServerSetup;
+    OwncloudWizard *_oc_wizard;
+    Wizard_common.Pages _next_page = Wizard_common.Page_Server_setup;
 };
 
 
-    WelcomePage.WelcomePage (OwncloudWizard *ocWizard)
-        : QWizardPage ()
-        , _ui (new Ui.WelcomePage)
-        , _ocWizard (ocWizard) {
-        setupUi ();
+    Welcome_page.Welcome_page (OwncloudWizard *oc_wizard)
+        : QWizard_page ()
+        , _ui (new Ui.Welcome_page)
+        , _oc_wizard (oc_wizard) {
+        setup_ui ();
     }
     
-    WelcomePage.~WelcomePage () = default;
+    Welcome_page.~Welcome_page () = default;
     
-    void WelcomePage.setupUi () {
-        _ui.setupUi (this);
-        setupSlideShow ();
-        setupLoginButton ();
-        setupCreateAccountButton ();
-        setupHostYourOwnServerLabel ();
+    void Welcome_page.setup_ui () {
+        _ui.setup_ui (this);
+        setup_slide_show ();
+        setup_login_button ();
+        setup_create_account_button ();
+        setup_host_your_own_server_label ();
     }
     
-    void WelcomePage.initializePage () {
-        customizeStyle ();
+    void Welcome_page.initialize_page () {
+        customize_style ();
     }
     
-    void WelcomePage.setLoginButtonDefault () {
-        _ui.loginButton.setDefault (true);
-        _ui.loginButton.setFocus ();
+    void Welcome_page.set_login_button_default () {
+        _ui.login_button.set_default (true);
+        _ui.login_button.set_focus ();
     }
     
-    void WelcomePage.styleSlideShow () {
+    void Welcome_page.style_slide_show () {
         const auto theme = Theme.instance ();
-        const auto backgroundColor = palette ().window ().color ();
+        const auto background_color = palette ().window ().color ();
     
-        const auto wizardNextcloudIconFileName = theme.isBranded () ? Theme.hidpiFileName ("wizard-nextcloud.png", backgroundColor)
-                                                                    : Theme.hidpiFileName (":/client/theme/colored/wizard-nextcloud.png");
-        const auto wizardFilesIconFileName = theme.isBranded () ? Theme.hidpiFileName ("wizard-files.png", backgroundColor)
-                                                                : Theme.hidpiFileName (":/client/theme/colored/wizard-files.png");
-        const auto wizardGroupwareIconFileName = theme.isBranded () ? Theme.hidpiFileName ("wizard-groupware.png", backgroundColor)
-                                                                    : Theme.hidpiFileName (":/client/theme/colored/wizard-groupware.png");
-        const auto wizardTalkIconFileName = theme.isBranded () ? Theme.hidpiFileName ("wizard-talk.png", backgroundColor)
-                                                               : Theme.hidpiFileName (":/client/theme/colored/wizard-talk.png");
+        const auto wizard_nextcloud_icon_file_name = theme.is_branded () ? Theme.hidpi_file_name ("wizard-nextcloud.png", background_color)
+                                                                    : Theme.hidpi_file_name (":/client/theme/colored/wizard-nextcloud.png");
+        const auto wizard_files_icon_file_name = theme.is_branded () ? Theme.hidpi_file_name ("wizard-files.png", background_color)
+                                                                : Theme.hidpi_file_name (":/client/theme/colored/wizard-files.png");
+        const auto wizard_groupware_icon_file_name = theme.is_branded () ? Theme.hidpi_file_name ("wizard-groupware.png", background_color)
+                                                                    : Theme.hidpi_file_name (":/client/theme/colored/wizard-groupware.png");
+        const auto wizard_talk_icon_file_name = theme.is_branded () ? Theme.hidpi_file_name ("wizard-talk.png", background_color)
+                                                               : Theme.hidpi_file_name (":/client/theme/colored/wizard-talk.png");
     
-        _ui.slideShow.addSlide (wizardNextcloudIconFileName, tr ("Keep your data secure and under your control"));
-        _ui.slideShow.addSlide (wizardFilesIconFileName, tr ("Secure collaboration & file exchange"));
-        _ui.slideShow.addSlide (wizardGroupwareIconFileName, tr ("Easy-to-use web mail, calendaring & contacts"));
-        _ui.slideShow.addSlide (wizardTalkIconFileName, tr ("Screensharing, online meetings & web conferences"));
+        _ui.slide_show.add_slide (wizard_nextcloud_icon_file_name, tr ("Keep your data secure and under your control"));
+        _ui.slide_show.add_slide (wizard_files_icon_file_name, tr ("Secure collaboration & file exchange"));
+        _ui.slide_show.add_slide (wizard_groupware_icon_file_name, tr ("Easy-to-use web mail, calendaring & contacts"));
+        _ui.slide_show.add_slide (wizard_talk_icon_file_name, tr ("Screensharing, online meetings & web conferences"));
     
-        const auto isDarkBackground = Theme.isDarkColor (backgroundColor);
-        _ui.slideShowNextButton.setIcon (theme.uiThemeIcon (string ("control-next.svg"), isDarkBackground));
-        _ui.slideShowPreviousButton.setIcon (theme.uiThemeIcon (string ("control-prev.svg"), isDarkBackground));
+        const auto is_dark_background = Theme.is_dark_color (background_color);
+        _ui.slide_show_next_button.set_icon (theme.ui_theme_icon (string ("control-next.svg"), is_dark_background));
+        _ui.slide_show_previous_button.set_icon (theme.ui_theme_icon (string ("control-prev.svg"), is_dark_background));
     }
     
-    void WelcomePage.setupSlideShow () {
-        connect (_ui.slideShow, &SlideShow.clicked, _ui.slideShow, &SlideShow.stopShow);
-        connect (_ui.slideShowNextButton, &QPushButton.clicked, _ui.slideShow, &SlideShow.nextSlide);
-        connect (_ui.slideShowPreviousButton, &QPushButton.clicked, _ui.slideShow, &SlideShow.prevSlide);
+    void Welcome_page.setup_slide_show () {
+        connect (_ui.slide_show, &Slide_show.clicked, _ui.slide_show, &Slide_show.stop_show);
+        connect (_ui.slide_show_next_button, &QPushButton.clicked, _ui.slide_show, &Slide_show.next_slide);
+        connect (_ui.slide_show_previous_button, &QPushButton.clicked, _ui.slide_show, &Slide_show.prev_slide);
     }
     
-    void WelcomePage.setupLoginButton () {
-        const auto appName = Theme.instance ().appNameGUI ();
+    void Welcome_page.setup_login_button () {
+        const auto app_name = Theme.instance ().app_name_g_u_i ();
     
-        _ui.loginButton.setText (tr ("Log in to your %1").arg (appName));
-        connect (_ui.loginButton, &QPushButton.clicked, this, [this] (bool /*checked*/) {
-            _nextPage = WizardCommon.Page_ServerSetup;
-            _ocWizard.next ();
+        _ui.login_button.set_text (tr ("Log in to your %1").arg (app_name));
+        connect (_ui.login_button, &QPushButton.clicked, this, [this] (bool /*checked*/) {
+            _next_page = Wizard_common.Page_Server_setup;
+            _oc_wizard.next ();
         });
     }
     
-    void WelcomePage.setupCreateAccountButton () {
+    void Welcome_page.setup_create_account_button () {
     #ifdef WITH_WEBENGINE
-        connect (_ui.createAccountButton, &QPushButton.clicked, this, [this] (bool /*checked*/) {
-            _ocWizard.setRegistration (true);
-            _nextPage = WizardCommon.Page_WebView;
-            _ocWizard.next ();
+        connect (_ui.create_account_button, &QPushButton.clicked, this, [this] (bool /*checked*/) {
+            _oc_wizard.set_registration (true);
+            _next_page = Wizard_common.Page_Web_view;
+            _oc_wizard.next ();
         });
     #else // WITH_WEBENGINE
-        connect (_ui.createAccountButton, &QPushButton.clicked, this, [this] (bool /*checked*/) {
-            _ocWizard.setRegistration (true);
-            Utility.openBrowser (QStringLiteral ("https://nextcloud.com/register"));
+        connect (_ui.create_account_button, &QPushButton.clicked, this, [this] (bool /*checked*/) {
+            _oc_wizard.set_registration (true);
+            Utility.open_browser (QStringLiteral ("https://nextcloud.com/register"));
         });
     #endif // WITH_WEBENGINE
     }
     
-    void WelcomePage.setupHostYourOwnServerLabel () {
-        _ui.hostYourOwnServerLabel.setText (tr ("Host your own server"));
-        _ui.hostYourOwnServerLabel.setAlignment (Qt.AlignCenter);
-        _ui.hostYourOwnServerLabel.setUrl (QUrl ("https://docs.nextcloud.com/server/latest/admin_manual/installation/#installation"));
+    void Welcome_page.setup_host_your_own_server_label () {
+        _ui.host_your_own_server_label.set_text (tr ("Host your own server"));
+        _ui.host_your_own_server_label.set_alignment (Qt.AlignCenter);
+        _ui.host_your_own_server_label.set_url (QUrl ("https://docs.nextcloud.com/server/latest/admin_manual/installation/#installation"));
     }
     
-    int WelcomePage.nextId () {
-        return _nextPage;
+    int Welcome_page.next_id () {
+        return _next_page;
     }
     
-    void WelcomePage.customizeStyle () {
-        styleSlideShow ();
+    void Welcome_page.customize_style () {
+        style_slide_show ();
     }
     }
     

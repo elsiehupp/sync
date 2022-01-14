@@ -8,7 +8,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QMessageBox>
 // #include <QNetworkProxy>
 // #include <QDir>
-// #include <QScopedValueRollback>
+// #include <QScoped_value_rollback>
 // #include <QMessageBox>
 
 // #include <private/qzipwriter_p.h>
@@ -16,7 +16,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
 
 #if ! (QTLEGACY)
-// #include <QOperatingSystemVersion>
+// #include <QOperating_system_version>
 #endif
 
 // #include <Gtk.Widget>
@@ -25,45 +25,45 @@ const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
 namespace Occ {
 
 namespace Ui {
-    class GeneralSettings;
+    class General_settings;
 }
 
 /***********************************************************
-@brief The GeneralSettings class
+@brief The General_settings class
 @ingroup gui
 ***********************************************************/
-class GeneralSettings : Gtk.Widget {
+class General_settings : Gtk.Widget {
 
 public:
-    GeneralSettings (Gtk.Widget *parent = nullptr);
-    ~GeneralSettings () override;
-    QSize sizeHint () const override;
+    General_settings (Gtk.Widget *parent = nullptr);
+    ~General_settings () override;
+    QSize size_hint () const override;
 
 public slots:
-    void slotStyleChanged ();
+    void slot_style_changed ();
 
 private slots:
-    void saveMiscSettings ();
-    void slotToggleLaunchOnStartup (bool);
-    void slotToggleOptionalServerNotifications (bool);
-    void slotShowInExplorerNavigationPane (bool);
-    void slotIgnoreFilesEditor ();
-    void slotCreateDebugArchive ();
-    void loadMiscSettings ();
-    void slotShowLegalNotice ();
+    void save_misc_settings ();
+    void slot_toggle_launch_on_startup (bool);
+    void slot_toggle_optional_server_notifications (bool);
+    void slot_show_in_explorer_navigation_pane (bool);
+    void slot_ignore_files_editor ();
+    void slot_create_debug_archive ();
+    void load_misc_settings ();
+    void slot_show_legal_notice ();
 #if defined (BUILD_UPDATER)
-    void slotUpdateInfo ();
-    void slotUpdateChannelChanged (string &channel);
-    void slotUpdateCheckNow ();
-    void slotToggleAutoUpdateCheck ();
+    void slot_update_info ();
+    void slot_update_channel_changed (string &channel);
+    void slot_update_check_now ();
+    void slot_toggle_auto_update_check ();
 #endif
 
 private:
-    void customizeStyle ();
+    void customize_style ();
 
-    Ui.GeneralSettings *_ui;
-    QPointer<IgnoreListEditor> _ignoreEditor;
-    bool _currentlyLoading = false;
+    Ui.General_settings *_ui;
+    QPointer<Ignore_list_editor> _ignore_editor;
+    bool _currently_loading = false;
 };
 
 } // namespace Occ
@@ -75,132 +75,132 @@ private:
 
 
 namespace {
-struct ZipEntry {
-    string localFilename;
-    string zipFilename;
+struct Zip_entry {
+    string local_filename;
+    string zip_filename;
 };
 
-ZipEntry fileInfoToZipEntry (QFileInfo &info) {
+Zip_entry file_info_to_zip_entry (QFileInfo &info) {
     return {
-        info.absoluteFilePath (),
-        info.fileName ()
+        info.absolute_file_path (),
+        info.file_name ()
     };
 }
 
-ZipEntry fileInfoToLogZipEntry (QFileInfo &info) {
-    auto entry = fileInfoToZipEntry (info);
-    entry.zipFilename.prepend (QStringLiteral ("logs/"));
+Zip_entry file_info_to_log_zip_entry (QFileInfo &info) {
+    auto entry = file_info_to_zip_entry (info);
+    entry.zip_filename.prepend (QStringLiteral ("logs/"));
     return entry;
 }
 
-ZipEntry syncFolderToZipEntry (Occ.Folder *f) {
-    const auto journalPath = f.journalDb ().databaseFilePath ();
-    const auto journalInfo = QFileInfo (journalPath);
-    return fileInfoToZipEntry (journalInfo);
+Zip_entry sync_folder_to_zip_entry (Occ.Folder *f) {
+    const auto journal_path = f.journal_db ().database_file_path ();
+    const auto journal_info = QFileInfo (journal_path);
+    return file_info_to_zip_entry (journal_info);
 }
 
-QVector<ZipEntry> createFileList () {
-    auto list = QVector<ZipEntry> ();
+QVector<Zip_entry> create_file_list () {
+    auto list = QVector<Zip_entry> ();
     Occ.ConfigFile cfg;
 
-    list.append (fileInfoToZipEntry (QFileInfo (cfg.configFile ())));
+    list.append (file_info_to_zip_entry (QFileInfo (cfg.config_file ())));
 
     const auto logger = Occ.Logger.instance ();
 
-    if (!logger.logDir ().isEmpty ()) {
+    if (!logger.log_dir ().is_empty ()) {
         list.append ({string (), QStringLiteral ("logs")});
 
-        QDir dir (logger.logDir ());
-        const auto infoList = dir.entryInfoList (QDir.Files);
-        std.transform (std.cbegin (infoList), std.cend (infoList),
+        QDir dir (logger.log_dir ());
+        const auto info_list = dir.entry_info_list (QDir.Files);
+        std.transform (std.cbegin (info_list), std.cend (info_list),
                        std.back_inserter (list),
-                       fileInfoToLogZipEntry);
-    } else if (!logger.logFile ().isEmpty ()) {
-        list.append (fileInfoToZipEntry (QFileInfo (logger.logFile ())));
+                       file_info_to_log_zip_entry);
+    } else if (!logger.log_file ().is_empty ()) {
+        list.append (file_info_to_zip_entry (QFileInfo (logger.log_file ())));
     }
 
     const auto folders = Occ.FolderMan.instance ().map ().values ();
     std.transform (std.cbegin (folders), std.cend (folders),
                    std.back_inserter (list),
-                   syncFolderToZipEntry);
+                   sync_folder_to_zip_entry);
 
     return list;
 }
 
-void createDebugArchive (string &filename) {
-    const auto entries = createFileList ();
+void create_debug_archive (string &filename) {
+    const auto entries = create_file_list ();
 
-    QZipWriter zip (filename);
+    QZip_writer zip (filename);
     for (auto &entry : entries) {
-        if (entry.localFilename.isEmpty ()) {
-            zip.addDirectory (entry.zipFilename);
+        if (entry.local_filename.is_empty ()) {
+            zip.add_directory (entry.zip_filename);
         } else {
-            QFile file (entry.localFilename);
-            if (!file.open (QFile.ReadOnly)) {
+            QFile file (entry.local_filename);
+            if (!file.open (QFile.Read_only)) {
                 continue;
             }
-            zip.addFile (entry.zipFilename, &file);
+            zip.add_file (entry.zip_filename, &file);
         }
     }
 
-    zip.addFile ("__nextcloud_client_parameters.txt", QCoreApplication.arguments ().join (' ').toUtf8 ());
+    zip.add_file ("__nextcloud_client_parameters.txt", QCoreApplication.arguments ().join (' ').to_utf8 ());
 
-    const auto buildInfo = string (Occ.Theme.instance ().about () + "\n\n" + Occ.Theme.instance ().aboutDetails ());
-    zip.addFile ("__nextcloud_client_buildinfo.txt", buildInfo.toUtf8 ());
+    const auto build_info = string (Occ.Theme.instance ().about () + "\n\n" + Occ.Theme.instance ().about_details ());
+    zip.add_file ("__nextcloud_client_buildinfo.txt", build_info.to_utf8 ());
 }
 
 
-GeneralSettings.GeneralSettings (Gtk.Widget *parent)
+General_settings.General_settings (Gtk.Widget *parent)
     : Gtk.Widget (parent)
-    , _ui (new Ui.GeneralSettings) {
-    _ui.setupUi (this);
+    , _ui (new Ui.General_settings) {
+    _ui.setup_ui (this);
 
-    connect (_ui.serverNotificationsCheckBox, &QAbstractButton.toggled,
-        this, &GeneralSettings.slotToggleOptionalServerNotifications);
-    _ui.serverNotificationsCheckBox.setToolTip (tr ("Server notifications that require attention."));
+    connect (_ui.server_notifications_check_box, &QAbstractButton.toggled,
+        this, &General_settings.slot_toggle_optional_server_notifications);
+    _ui.server_notifications_check_box.set_tool_tip (tr ("Server notifications that require attention."));
 
-    connect (_ui.showInExplorerNavigationPaneCheckBox, &QAbstractButton.toggled, this, &GeneralSettings.slotShowInExplorerNavigationPane);
+    connect (_ui.show_in_explorer_navigation_pane_check_box, &QAbstractButton.toggled, this, &General_settings.slot_show_in_explorer_navigation_pane);
 
     // Rename 'Explorer' appropriately on non-Windows
 
-    if (Utility.hasSystemLaunchOnStartup (Theme.instance ().appName ())) {
-        _ui.autostartCheckBox.setChecked (true);
-        _ui.autostartCheckBox.setDisabled (true);
-        _ui.autostartCheckBox.setToolTip (tr ("You cannot disable autostart because system-wide autostart is enabled."));
+    if (Utility.has_system_launch_on_startup (Theme.instance ().app_name ())) {
+        _ui.autostart_check_box.set_checked (true);
+        _ui.autostart_check_box.set_disabled (true);
+        _ui.autostart_check_box.set_tool_tip (tr ("You cannot disable autostart because system-wide autostart is enabled."));
     } else {
-        const bool hasAutoStart = Utility.hasLaunchOnStartup (Theme.instance ().appName ());
+        const bool has_auto_start = Utility.has_launch_on_startup (Theme.instance ().app_name ());
         // make sure the binary location is correctly set
-        slotToggleLaunchOnStartup (hasAutoStart);
-        _ui.autostartCheckBox.setChecked (hasAutoStart);
-        connect (_ui.autostartCheckBox, &QAbstractButton.toggled, this, &GeneralSettings.slotToggleLaunchOnStartup);
+        slot_toggle_launch_on_startup (has_auto_start);
+        _ui.autostart_check_box.set_checked (has_auto_start);
+        connect (_ui.autostart_check_box, &QAbstractButton.toggled, this, &General_settings.slot_toggle_launch_on_startup);
     }
 
     // setup about section
     string about = Theme.instance ().about ();
-    _ui.aboutLabel.setTextInteractionFlags (Qt.TextSelectableByMouse | Qt.TextBrowserInteraction);
-    _ui.aboutLabel.setText (about);
-    _ui.aboutLabel.setOpenExternalLinks (true);
+    _ui.about_label.set_text_interaction_flags (Qt.Text_selectable_by_mouse | Qt.Text_browser_interaction);
+    _ui.about_label.set_text (about);
+    _ui.about_label.set_open_external_links (true);
 
     // About legal notice
-    connect (_ui.legalNoticeButton, &QPushButton.clicked, this, &GeneralSettings.slotShowLegalNotice);
+    connect (_ui.legal_notice_button, &QPushButton.clicked, this, &General_settings.slot_show_legal_notice);
 
-    loadMiscSettings ();
-    // updater info now set in : customizeStyle
-    //slotUpdateInfo ();
+    load_misc_settings ();
+    // updater info now set in : customize_style
+    //slot_update_info ();
 
     // misc
-    connect (_ui.monoIconsCheckBox, &QAbstractButton.toggled, this, &GeneralSettings.saveMiscSettings);
-    connect (_ui.crashreporterCheckBox, &QAbstractButton.toggled, this, &GeneralSettings.saveMiscSettings);
-    connect (_ui.newFolderLimitCheckBox, &QAbstractButton.toggled, this, &GeneralSettings.saveMiscSettings);
-    connect (_ui.newFolderLimitSpinBox, static_cast<void (QSpinBox.*) (int)> (&QSpinBox.valueChanged), this, &GeneralSettings.saveMiscSettings);
-    connect (_ui.newExternalStorage, &QAbstractButton.toggled, this, &GeneralSettings.saveMiscSettings);
+    connect (_ui.mono_icons_check_box, &QAbstractButton.toggled, this, &General_settings.save_misc_settings);
+    connect (_ui.crashreporter_check_box, &QAbstractButton.toggled, this, &General_settings.save_misc_settings);
+    connect (_ui.new_folder_limit_check_box, &QAbstractButton.toggled, this, &General_settings.save_misc_settings);
+    connect (_ui.new_folder_limit_spin_box, static_cast<void (QSpin_box.*) (int)> (&QSpin_box.value_changed), this, &General_settings.save_misc_settings);
+    connect (_ui.new_external_storage, &QAbstractButton.toggled, this, &General_settings.save_misc_settings);
 
 #ifndef WITH_CRASHREPORTER
-    _ui.crashreporterCheckBox.setVisible (false);
+    _ui.crashreporter_check_box.set_visible (false);
 #endif
 
     // Hide on non-Windows
-    _ui.showInExplorerNavigationPaneCheckBox.setVisible (false);
+    _ui.show_in_explorer_navigation_pane_check_box.set_visible (false);
 
     /* Set the left contents margin of the layout to zero to make the checkboxes
     align properly vertically , fixes bug #3758
@@ -209,93 +209,93 @@ GeneralSettings.GeneralSettings (Gtk.Widget *parent)
     int m1 = 0;
     int m2 = 0;
     int m3 = 0;
-    _ui.horizontalLayout_3.getContentsMargins (&m0, &m1, &m2, &m3);
-    _ui.horizontalLayout_3.setContentsMargins (0, m1, m2, m3);
+    _ui.horizontal_layout_3.get_contents_margins (&m0, &m1, &m2, &m3);
+    _ui.horizontal_layout_3.set_contents_margins (0, m1, m2, m3);
 
     // OEM themes are not obliged to ship mono icons, so there
     // is no point in offering an option
-    _ui.monoIconsCheckBox.setVisible (Theme.instance ().monoIconsAvailable ());
+    _ui.mono_icons_check_box.set_visible (Theme.instance ().mono_icons_available ());
 
-    connect (_ui.ignoredFilesButton, &QAbstractButton.clicked, this, &GeneralSettings.slotIgnoreFilesEditor);
-    connect (_ui.debugArchiveButton, &QAbstractButton.clicked, this, &GeneralSettings.slotCreateDebugArchive);
+    connect (_ui.ignored_files_button, &QAbstractButton.clicked, this, &General_settings.slot_ignore_files_editor);
+    connect (_ui.debug_archive_button, &QAbstractButton.clicked, this, &General_settings.slot_create_debug_archive);
 
-    // accountAdded means the wizard was finished and the wizard might change some options.
-    connect (AccountManager.instance (), &AccountManager.accountAdded, this, &GeneralSettings.loadMiscSettings);
+    // account_added means the wizard was finished and the wizard might change some options.
+    connect (AccountManager.instance (), &AccountManager.account_added, this, &General_settings.load_misc_settings);
 
-    customizeStyle ();
+    customize_style ();
 }
 
-GeneralSettings.~GeneralSettings () {
+General_settings.~General_settings () {
     delete _ui;
 }
 
-QSize GeneralSettings.sizeHint () {
+QSize General_settings.size_hint () {
     return {
-        OwncloudGui.settingsDialogSize ().width (),
-        Gtk.Widget.sizeHint ().height ()
+        OwncloudGui.settings_dialog_size ().width (),
+        Gtk.Widget.size_hint ().height ()
     };
 }
 
-void GeneralSettings.loadMiscSettings () {
-    QScopedValueRollback<bool> scope (_currentlyLoading, true);
-    ConfigFile cfgFile;
-    _ui.monoIconsCheckBox.setChecked (cfgFile.monoIcons ());
-    _ui.serverNotificationsCheckBox.setChecked (cfgFile.optionalServerNotifications ());
-    _ui.showInExplorerNavigationPaneCheckBox.setChecked (cfgFile.showInExplorerNavigationPane ());
-    _ui.crashreporterCheckBox.setChecked (cfgFile.crashReporter ());
-    auto newFolderLimit = cfgFile.newBigFolderSizeLimit ();
-    _ui.newFolderLimitCheckBox.setChecked (newFolderLimit.first);
-    _ui.newFolderLimitSpinBox.setValue (newFolderLimit.second);
-    _ui.newExternalStorage.setChecked (cfgFile.confirmExternalStorage ());
-    _ui.monoIconsCheckBox.setChecked (cfgFile.monoIcons ());
+void General_settings.load_misc_settings () {
+    QScoped_value_rollback<bool> scope (_currently_loading, true);
+    ConfigFile cfg_file;
+    _ui.mono_icons_check_box.set_checked (cfg_file.mono_icons ());
+    _ui.server_notifications_check_box.set_checked (cfg_file.optional_server_notifications ());
+    _ui.show_in_explorer_navigation_pane_check_box.set_checked (cfg_file.show_in_explorer_navigation_pane ());
+    _ui.crashreporter_check_box.set_checked (cfg_file.crash_reporter ());
+    auto new_folder_limit = cfg_file.new_big_folder_size_limit ();
+    _ui.new_folder_limit_check_box.set_checked (new_folder_limit.first);
+    _ui.new_folder_limit_spin_box.set_value (new_folder_limit.second);
+    _ui.new_external_storage.set_checked (cfg_file.confirm_external_storage ());
+    _ui.mono_icons_check_box.set_checked (cfg_file.mono_icons ());
 }
 
 #if defined (BUILD_UPDATER)
-void GeneralSettings.slotUpdateInfo () {
-    if (ConfigFile ().skipUpdateCheck () || !Updater.instance ()) {
+void General_settings.slot_update_info () {
+    if (ConfigFile ().skip_update_check () || !Updater.instance ()) {
         // updater disabled on compile
-        _ui.updatesGroupBox.setVisible (false);
+        _ui.updates_group_box.set_visible (false);
         return;
     }
 
     // Note : the sparkle-updater is not an OCUpdater
     auto *ocupdater = qobject_cast<OCUpdater> (Updater.instance ());
     if (ocupdater) {
-        connect (ocupdater, &OCUpdater.downloadStateChanged, this, &GeneralSettings.slotUpdateInfo, Qt.UniqueConnection);
-        connect (_ui.restartButton, &QAbstractButton.clicked, ocupdater, &OCUpdater.slotStartInstaller, Qt.UniqueConnection);
-        connect (_ui.restartButton, &QAbstractButton.clicked, qApp, &QApplication.quit, Qt.UniqueConnection);
-        connect (_ui.updateButton, &QAbstractButton.clicked, this, &GeneralSettings.slotUpdateCheckNow, Qt.UniqueConnection);
-        connect (_ui.autoCheckForUpdatesCheckBox, &QAbstractButton.toggled, this, &GeneralSettings.slotToggleAutoUpdateCheck);
+        connect (ocupdater, &OCUpdater.download_state_changed, this, &General_settings.slot_update_info, Qt.UniqueConnection);
+        connect (_ui.restart_button, &QAbstractButton.clicked, ocupdater, &OCUpdater.slot_start_installer, Qt.UniqueConnection);
+        connect (_ui.restart_button, &QAbstractButton.clicked, q_app, &QApplication.quit, Qt.UniqueConnection);
+        connect (_ui.update_button, &QAbstractButton.clicked, this, &General_settings.slot_update_check_now, Qt.UniqueConnection);
+        connect (_ui.auto_check_for_updates_check_box, &QAbstractButton.toggled, this, &General_settings.slot_toggle_auto_update_check);
 
-        string status = ocupdater.statusString (OCUpdater.UpdateStatusStringFormat.Html);
-        Theme.replaceLinkColorStringBackgroundAware (status);
+        string status = ocupdater.status_string (OCUpdater.Update_status_string_format.Html);
+        Theme.replace_link_color_string_background_aware (status);
 
-        _ui.updateStateLabel.setOpenExternalLinks (false);
-        connect (_ui.updateStateLabel, &QLabel.linkActivated, this, [] (string &link) {
-            Utility.openBrowser (QUrl (link));
+        _ui.update_state_label.set_open_external_links (false);
+        connect (_ui.update_state_label, &QLabel.link_activated, this, [] (string &link) {
+            Utility.open_browser (QUrl (link));
         });
-        _ui.updateStateLabel.setText (status);
+        _ui.update_state_label.set_text (status);
 
-        _ui.restartButton.setVisible (ocupdater.downloadState () == OCUpdater.DownloadComplete);
+        _ui.restart_button.set_visible (ocupdater.download_state () == OCUpdater.Download_complete);
 
-        _ui.updateButton.setEnabled (ocupdater.downloadState () != OCUpdater.CheckingServer &&
-                                      ocupdater.downloadState () != OCUpdater.Downloading &&
-                                      ocupdater.downloadState () != OCUpdater.DownloadComplete);
+        _ui.update_button.set_enabled (ocupdater.download_state () != OCUpdater.Checking_server &&
+                                      ocupdater.download_state () != OCUpdater.Downloading &&
+                                      ocupdater.download_state () != OCUpdater.Download_complete);
 
-        _ui.autoCheckForUpdatesCheckBox.setChecked (ConfigFile ().autoUpdateCheck ());
+        _ui.auto_check_for_updates_check_box.set_checked (ConfigFile ().auto_update_check ());
     }
 
     // Channel selection
-    _ui.updateChannel.setCurrentIndex (ConfigFile ().updateChannel () == "beta" ? 1 : 0);
-    connect (_ui.updateChannel, &QComboBox.currentTextChanged,
-        this, &GeneralSettings.slotUpdateChannelChanged, Qt.UniqueConnection);
+    _ui.update_channel.set_current_index (ConfigFile ().update_channel () == "beta" ? 1 : 0);
+    connect (_ui.update_channel, &QCombo_box.current_text_changed,
+        this, &General_settings.slot_update_channel_changed, Qt.UniqueConnection);
 }
 
-void GeneralSettings.slotUpdateChannelChanged (string &channel) {
-    if (channel == ConfigFile ().updateChannel ())
+void General_settings.slot_update_channel_changed (string &channel) {
+    if (channel == ConfigFile ().update_channel ())
         return;
 
-    auto msgBox = new QMessageBox (
+    auto msg_box = new QMessageBox (
         QMessageBox.Warning,
         tr ("Change update channel?"),
         tr ("The update channel determines which client updates will be offered "
@@ -311,116 +311,116 @@ void GeneralSettings.slotUpdateChannelChanged (string &channel) {
            "version."),
         QMessageBox.NoButton,
         this);
-    auto acceptButton = msgBox.addButton (tr ("Change update channel"), QMessageBox.AcceptRole);
-    msgBox.addButton (tr ("Cancel"), QMessageBox.RejectRole);
-    connect (msgBox, &QMessageBox.finished, msgBox, [this, channel, msgBox, acceptButton] {
-        msgBox.deleteLater ();
-        if (msgBox.clickedButton () == acceptButton) {
-            ConfigFile ().setUpdateChannel (channel);
+    auto accept_button = msg_box.add_button (tr ("Change update channel"), QMessageBox.AcceptRole);
+    msg_box.add_button (tr ("Cancel"), QMessageBox.RejectRole);
+    connect (msg_box, &QMessageBox.finished, msg_box, [this, channel, msg_box, accept_button] {
+        msg_box.delete_later ();
+        if (msg_box.clicked_button () == accept_button) {
+            ConfigFile ().set_update_channel (channel);
             if (auto updater = qobject_cast<OCUpdater> (Updater.instance ())) {
-                updater.setUpdateUrl (Updater.updateUrl ());
-                updater.checkForUpdate ();
+                updater.set_update_url (Updater.update_url ());
+                updater.check_for_update ();
             }
         } else {
-            _ui.updateChannel.setCurrentText (ConfigFile ().updateChannel ());
+            _ui.update_channel.set_current_text (ConfigFile ().update_channel ());
         }
     });
-    msgBox.open ();
+    msg_box.open ();
 }
 
-void GeneralSettings.slotUpdateCheckNow () {
+void General_settings.slot_update_check_now () {
     auto *updater = qobject_cast<OCUpdater> (Updater.instance ());
-    if (ConfigFile ().skipUpdateCheck ()) {
+    if (ConfigFile ().skip_update_check ()) {
         updater = nullptr; // don't show update info if updates are disabled
     }
 
     if (updater) {
-        _ui.updateButton.setEnabled (false);
+        _ui.update_button.set_enabled (false);
 
-        updater.checkForUpdate ();
+        updater.check_for_update ();
     }
 }
 
-void GeneralSettings.slotToggleAutoUpdateCheck () {
-    ConfigFile cfgFile;
-    bool isChecked = _ui.autoCheckForUpdatesCheckBox.isChecked ();
-    cfgFile.setAutoUpdateCheck (isChecked, string ());
+void General_settings.slot_toggle_auto_update_check () {
+    ConfigFile cfg_file;
+    bool is_checked = _ui.auto_check_for_updates_check_box.is_checked ();
+    cfg_file.set_auto_update_check (is_checked, string ());
 }
 #endif // defined (BUILD_UPDATER)
 
-void GeneralSettings.saveMiscSettings () {
-    if (_currentlyLoading)
+void General_settings.save_misc_settings () {
+    if (_currently_loading)
         return;
-    ConfigFile cfgFile;
-    bool isChecked = _ui.monoIconsCheckBox.isChecked ();
-    cfgFile.setMonoIcons (isChecked);
-    Theme.instance ().setSystrayUseMonoIcons (isChecked);
-    cfgFile.setCrashReporter (_ui.crashreporterCheckBox.isChecked ());
+    ConfigFile cfg_file;
+    bool is_checked = _ui.mono_icons_check_box.is_checked ();
+    cfg_file.set_mono_icons (is_checked);
+    Theme.instance ().set_systray_use_mono_icons (is_checked);
+    cfg_file.set_crash_reporter (_ui.crashreporter_check_box.is_checked ());
 
-    cfgFile.setNewBigFolderSizeLimit (_ui.newFolderLimitCheckBox.isChecked (),
-        _ui.newFolderLimitSpinBox.value ());
-    cfgFile.setConfirmExternalStorage (_ui.newExternalStorage.isChecked ());
+    cfg_file.set_new_big_folder_size_limit (_ui.new_folder_limit_check_box.is_checked (),
+        _ui.new_folder_limit_spin_box.value ());
+    cfg_file.set_confirm_external_storage (_ui.new_external_storage.is_checked ());
 }
 
-void GeneralSettings.slotToggleLaunchOnStartup (bool enable) {
+void General_settings.slot_toggle_launch_on_startup (bool enable) {
     Theme *theme = Theme.instance ();
-    Utility.setLaunchOnStartup (theme.appName (), theme.appNameGUI (), enable);
+    Utility.set_launch_on_startup (theme.app_name (), theme.app_name_g_u_i (), enable);
 }
 
-void GeneralSettings.slotToggleOptionalServerNotifications (bool enable) {
-    ConfigFile cfgFile;
-    cfgFile.setOptionalServerNotifications (enable);
+void General_settings.slot_toggle_optional_server_notifications (bool enable) {
+    ConfigFile cfg_file;
+    cfg_file.set_optional_server_notifications (enable);
 }
 
-void GeneralSettings.slotShowInExplorerNavigationPane (bool checked) {
-    ConfigFile cfgFile;
-    cfgFile.setShowInExplorerNavigationPane (checked);
+void General_settings.slot_show_in_explorer_navigation_pane (bool checked) {
+    ConfigFile cfg_file;
+    cfg_file.set_show_in_explorer_navigation_pane (checked);
     // Now update the registry with the change.
-    FolderMan.instance ().navigationPaneHelper ().setShowInExplorerNavigationPane (checked);
+    FolderMan.instance ().navigation_pane_helper ().set_show_in_explorer_navigation_pane (checked);
 }
 
-void GeneralSettings.slotIgnoreFilesEditor () {
-    if (_ignoreEditor.isNull ()) {
-        ConfigFile cfgFile;
-        _ignoreEditor = new IgnoreListEditor (this);
-        _ignoreEditor.setAttribute (Qt.WA_DeleteOnClose, true);
-        _ignoreEditor.open ();
+void General_settings.slot_ignore_files_editor () {
+    if (_ignore_editor.is_null ()) {
+        ConfigFile cfg_file;
+        _ignore_editor = new Ignore_list_editor (this);
+        _ignore_editor.set_attribute (Qt.WA_DeleteOnClose, true);
+        _ignore_editor.open ();
     } else {
-        OwncloudGui.raiseDialog (_ignoreEditor);
+        OwncloudGui.raise_dialog (_ignore_editor);
     }
 }
 
-void GeneralSettings.slotCreateDebugArchive () {
-    const auto filename = QFileDialog.getSaveFileName (this, tr ("Create Debug Archive"), string (), tr ("Zip Archives") + " (*.zip)");
-    if (filename.isEmpty ()) {
+void General_settings.slot_create_debug_archive () {
+    const auto filename = QFileDialog.get_save_file_name (this, tr ("Create Debug Archive"), string (), tr ("Zip Archives") + " (*.zip)");
+    if (filename.is_empty ()) {
         return;
     }
 
-    createDebugArchive (filename);
+    create_debug_archive (filename);
     QMessageBox.information (this, tr ("Debug Archive Created"), tr ("Debug archive is created at %1").arg (filename));
 }
 
-void GeneralSettings.slotShowLegalNotice () {
-    auto notice = new LegalNotice ();
+void General_settings.slot_show_legal_notice () {
+    auto notice = new Legal_notice ();
     notice.exec ();
     delete notice;
 }
 
-void GeneralSettings.slotStyleChanged () {
-    customizeStyle ();
+void General_settings.slot_style_changed () {
+    customize_style ();
 }
 
-void GeneralSettings.customizeStyle () {
+void General_settings.customize_style () {
     // setup about section
     string about = Theme.instance ().about ();
-    Theme.replaceLinkColorStringBackgroundAware (about);
-    _ui.aboutLabel.setText (about);
+    Theme.replace_link_color_string_background_aware (about);
+    _ui.about_label.set_text (about);
 
 #if defined (BUILD_UPDATER)
     // updater info
-    slotUpdateInfo ();
+    slot_update_info ();
 #else
-    _ui.updatesGroupBox.setVisible (false);
+    _ui.updates_group_box.set_visible (false);
 #endif
 }
 

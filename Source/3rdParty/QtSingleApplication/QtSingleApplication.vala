@@ -13,7 +13,7 @@ version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 
 // #include <QApplication>
 
-QT_FORWARD_DECLARE_CLASS (QSharedMemory)
+QT_FORWARD_DECLARE_CLASS (QShared_memory)
 
 namespace SharedTools {
 
@@ -23,31 +23,31 @@ class QtSingleApplication : QApplication {
     public QtSingleApplication (string &id, int &argc, char **argv);
     public ~QtSingleApplication () override;
 
-    public bool isRunning (int64 pid = -1);
+    public bool is_running (int64 pid = -1);
 
-    public void setActivationWindow (Gtk.Widget* aw, bool activateOnMessage = true);
-    public Gtk.Widget* activationWindow ();
+    public void set_activation_window (Gtk.Widget* aw, bool activate_on_message = true);
+    public Gtk.Widget* activation_window ();
     public bool event (QEvent *event) override;
 
-    public string applicationId ();
-    public void setBlock (bool value);
+    public string application_id ();
+    public void set_block (bool value);
 
 public slots:
-    bool sendMessage (string &message, int timeout = 5000, int64 pid = -1);
-    void activateWindow ();
+    bool send_message (string &message, int timeout = 5000, int64 pid = -1);
+    void activate_window ();
 
 signals:
-    void messageReceived (string &message, GLib.Object *socket);
-    void fileOpenRequest (string &file);
+    void message_received (string &message, GLib.Object *socket);
+    void file_open_request (string &file);
 
 private:
-    string instancesFileName (string &appId);
+    string instances_file_name (string &app_id);
 
-    int64 firstPeer;
-    QSharedMemory *instances;
-    QtLocalPeer *pidPeer;
-    Gtk.Widget *actWin;
-    string appId;
+    int64 first_peer;
+    QShared_memory *instances;
+    QtLocalPeer *pid_peer;
+    Gtk.Widget *act_win;
+    string app_id;
     bool block;
 };
 
@@ -78,41 +78,41 @@ version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 // #include <qtlockedfile.h>
 
 // #include <QDir>
-// #include <QFileOpenEvent>
-// #include <QSharedMemory>
+// #include <QFile_open_event>
+// #include <QShared_memory>
 // #include <Gtk.Widget>
 
 namespace SharedTools {
 
-    static const int instancesSize = 1024;
+    static const int instances_size = 1024;
     
-    static string instancesLockFilename (string &appSessionId) {
+    static string instances_lock_filename (string &app_session_id) {
         const QChar slash (QLatin1Char ('/'));
-        string res = QDir.tempPath ();
-        if (!res.endsWith (slash))
+        string res = QDir.temp_path ();
+        if (!res.ends_with (slash))
             res += slash;
-        return res + appSessionId + QLatin1String ("-instances");
+        return res + app_session_id + QLatin1String ("-instances");
     }
     
-    QtSingleApplication.QtSingleApplication (string &appId, int &argc, char **argv)
+    QtSingleApplication.QtSingleApplication (string &app_id, int &argc, char **argv)
         : QApplication (argc, argv),
-          firstPeer (-1),
-          pidPeer (nullptr) {
-        this.appId = appId;
+          first_peer (-1),
+          pid_peer (nullptr) {
+        this.app_id = app_id;
     
-        const string appSessionId = QtLocalPeer.appSessionId (appId);
+        const string app_session_id = QtLocalPeer.app_session_id (app_id);
     
         // This shared memory holds a zero-terminated array of active (or crashed) instances
-        instances = new QSharedMemory (appSessionId, this);
-        actWin = nullptr;
+        instances = new QShared_memory (app_session_id, this);
+        act_win = nullptr;
         block = false;
     
         // First instance creates the shared memory, later instances attach to it
-        const bool created = instances.create (instancesSize);
+        const bool created = instances.create (instances_size);
         if (!created) {
             if (!instances.attach ()) {
-                qWarning () << "Failed to initialize instances shared memory : "
-                           << instances.errorString ();
+                q_warning () << "Failed to initialize instances shared memory : "
+                           << instances.error_string ();
                 delete instances;
                 instances = nullptr;
                 return;
@@ -120,41 +120,41 @@ namespace SharedTools {
         }
     
         // QtLockedFile is used to workaround QTBUG-10364
-        QtLockedFile lockfile (instancesLockFilename (appSessionId));
+        QtLockedFile lockfile (instances_lock_filename (app_session_id));
     
         lockfile.open (QtLockedFile.ReadWrite);
-        lockfile.lock (QtLockedFile.WriteLock);
+        lockfile.lock (QtLockedFile.LockMode.WRITE_LOCK);
         auto *pids = static_cast<int64> (instances.data ());
         if (!created) {
             // Find the first instance that it still running
             // The whole list needs to be iterated in order to append to it
             for (; *pids; ++pids) {
-                if (firstPeer == -1 && isRunning (*pids))
-                    firstPeer = *pids;
+                if (first_peer == -1 && is_running (*pids))
+                    first_peer = *pids;
             }
         }
         // Add current pid to list and terminate it
-        *pids++ = QCoreApplication.applicationPid ();
+        *pids++ = QCoreApplication.application_pid ();
         *pids = 0;
-        pidPeer = new QtLocalPeer (this, appId + QLatin1Char ('-') +
-                                  string.number (QCoreApplication.applicationPid ()));
-        connect (pidPeer, &QtLocalPeer.messageReceived, this, &QtSingleApplication.messageReceived);
-        pidPeer.isClient ();
+        pid_peer = new QtLocalPeer (this, app_id + QLatin1Char ('-') +
+                                  string.number (QCoreApplication.application_pid ()));
+        connect (pid_peer, &QtLocalPeer.message_received, this, &QtSingleApplication.message_received);
+        pid_peer.is_client ();
         lockfile.unlock ();
     }
     
     QtSingleApplication.~QtSingleApplication () {
         if (!instances)
             return;
-        const int64 appPid = QCoreApplication.applicationPid ();
-        QtLockedFile lockfile (instancesLockFilename (QtLocalPeer.appSessionId (appId)));
+        const int64 app_pid = QCoreApplication.application_pid ();
+        QtLockedFile lockfile (instances_lock_filename (QtLocalPeer.app_session_id (app_id)));
         lockfile.open (QtLockedFile.ReadWrite);
-        lockfile.lock (QtLockedFile.WriteLock);
+        lockfile.lock (QtLockedFile.LockMode.WRITE_LOCK);
         // Rewrite array, removing current pid and previously crashed ones
         auto *pids = static_cast<int64> (instances.data ());
         int64 *newpids = pids;
         for (; *pids; ++pids) {
-            if (*pids != appPid && isRunning (*pids))
+            if (*pids != app_pid && is_running (*pids))
                 *newpids++ = *pids;
         }
         *newpids = 0;
@@ -162,63 +162,63 @@ namespace SharedTools {
     }
     
     bool QtSingleApplication.event (QEvent *event) {
-        if (event.type () == QEvent.FileOpen) {
-            auto *foe = static_cast<QFileOpenEvent> (event);
-            emit fileOpenRequest (foe.file ());
+        if (event.type () == QEvent.File_open) {
+            auto *foe = static_cast<QFile_open_event> (event);
+            emit file_open_request (foe.file ());
             return true;
         }
         return QApplication.event (event);
     }
     
-    bool QtSingleApplication.isRunning (int64 pid) {
+    bool QtSingleApplication.is_running (int64 pid) {
         if (pid == -1) {
-            pid = firstPeer;
+            pid = first_peer;
             if (pid == -1)
                 return false;
         }
     
-        QtLocalPeer peer (this, appId + QLatin1Char ('-') + string.number (pid, 10));
-        return peer.isClient ();
+        QtLocalPeer peer (this, app_id + QLatin1Char ('-') + string.number (pid, 10));
+        return peer.is_client ();
     }
     
-    bool QtSingleApplication.sendMessage (string &message, int timeout, int64 pid) {
+    bool QtSingleApplication.send_message (string &message, int timeout, int64 pid) {
         if (pid == -1) {
-            pid = firstPeer;
+            pid = first_peer;
             if (pid == -1)
                 return false;
         }
     
-        QtLocalPeer peer (this, appId + QLatin1Char ('-') + string.number (pid, 10));
-        return peer.sendMessage (message, timeout, block);
+        QtLocalPeer peer (this, app_id + QLatin1Char ('-') + string.number (pid, 10));
+        return peer.send_message (message, timeout, block);
     }
     
-    string QtSingleApplication.applicationId () {
-        return appId;
+    string QtSingleApplication.application_id () {
+        return app_id;
     }
     
-    void QtSingleApplication.setBlock (bool value) {
+    void QtSingleApplication.set_block (bool value) {
         block = value;
     }
     
-    void QtSingleApplication.setActivationWindow (Gtk.Widget *aw, bool activateOnMessage) {
-        actWin = aw;
-        if (!pidPeer)
+    void QtSingleApplication.set_activation_window (Gtk.Widget *aw, bool activate_on_message) {
+        act_win = aw;
+        if (!pid_peer)
             return;
-        if (activateOnMessage)
-            connect (pidPeer, &QtLocalPeer.messageReceived, this, &QtSingleApplication.activateWindow);
+        if (activate_on_message)
+            connect (pid_peer, &QtLocalPeer.message_received, this, &QtSingleApplication.activate_window);
         else
-            disconnect (pidPeer, &QtLocalPeer.messageReceived, this, &QtSingleApplication.activateWindow);
+            disconnect (pid_peer, &QtLocalPeer.message_received, this, &QtSingleApplication.activate_window);
     }
     
-    Gtk.Widget* QtSingleApplication.activationWindow () {
-        return actWin;
+    Gtk.Widget* QtSingleApplication.activation_window () {
+        return act_win;
     }
     
-    void QtSingleApplication.activateWindow () {
-        if (actWin) {
-            actWin.setWindowState (actWin.windowState () & ~Qt.WindowMinimized);
-            actWin.raise ();
-            actWin.activateWindow ();
+    void QtSingleApplication.activate_window () {
+        if (act_win) {
+            act_win.set_window_state (act_win.window_state () & ~Qt.Window_minimized);
+            act_win.raise ();
+            act_win.activate_window ();
         }
     }
     

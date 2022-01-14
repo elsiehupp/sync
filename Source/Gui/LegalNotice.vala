@@ -9,71 +9,71 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 namespace Occ {
 
 namespace Ui {
-    class LegalNotice;
+    class Legal_notice;
 }
 
 /***********************************************************
-@brief The LegalNotice class
+@brief The Legal_notice class
 @ingroup gui
 ***********************************************************/
-class LegalNotice : Gtk.Dialog {
+class Legal_notice : Gtk.Dialog {
 
 public:
-    LegalNotice (Gtk.Dialog *parent = nullptr);
-    ~LegalNotice () override;
+    Legal_notice (Gtk.Dialog *parent = nullptr);
+    ~Legal_notice () override;
 
 protected:
-    void changeEvent (QEvent *) override;
+    void change_event (QEvent *) override;
 
 private:
-    void customizeStyle ();
+    void customize_style ();
 
-    Ui.LegalNotice *_ui;
+    Ui.Legal_notice *_ui;
 };
 
-    LegalNotice.LegalNotice (Gtk.Dialog *parent)
+    Legal_notice.Legal_notice (Gtk.Dialog *parent)
         : Gtk.Dialog (parent)
-        , _ui (new Ui.LegalNotice) {
-        _ui.setupUi (this);
+        , _ui (new Ui.Legal_notice) {
+        _ui.setup_ui (this);
     
-        connect (_ui.closeButton, &QPushButton.clicked, this, &LegalNotice.accept);
+        connect (_ui.close_button, &QPushButton.clicked, this, &Legal_notice.accept);
     
-        customizeStyle ();
+        customize_style ();
     }
     
-    LegalNotice.~LegalNotice () {
+    Legal_notice.~Legal_notice () {
         delete _ui;
     }
     
-    void LegalNotice.changeEvent (QEvent *e) {
+    void Legal_notice.change_event (QEvent *e) {
         switch (e.type ()) {
-        case QEvent.StyleChange:
-        case QEvent.PaletteChange:
-        case QEvent.ThemeChange:
-            customizeStyle ();
+        case QEvent.Style_change:
+        case QEvent.Palette_change:
+        case QEvent.Theme_change:
+            customize_style ();
             break;
         default:
             break;
         }
     
-        Gtk.Dialog.changeEvent (e);
+        Gtk.Dialog.change_event (e);
     }
     
-    void LegalNotice.customizeStyle () {
-        string notice = tr ("<p>Copyright 2017-2021 Nextcloud GmbH<br />"
-                            "Copyright 2012-2021 ownCloud GmbH</p>");
+    void Legal_notice.customize_style () {
+        string notice = tr ("<p>Copyright 2017-2021 Nextcloud Gmb_h<br />"
+                            "Copyright 2012-2021 own_cloud Gmb_h</p>");
     
         notice += tr ("<p>Licensed under the GNU General Public License (GPL) Version 2.0 or any later version.</p>");
     
         notice += "<p>&nbsp;</p>";
-        notice += Theme.instance ().aboutDetails ();
+        notice += Theme.instance ().about_details ();
     
-        Theme.replaceLinkColorStringBackgroundAware (notice);
+        Theme.replace_link_color_string_background_aware (notice);
     
-        _ui.notice.setTextInteractionFlags (Qt.TextSelectableByMouse | Qt.TextBrowserInteraction);
-        _ui.notice.setText (notice);
-        _ui.notice.setWordWrap (true);
-        _ui.notice.setOpenExternalLinks (true);
+        _ui.notice.set_text_interaction_flags (Qt.Text_selectable_by_mouse | Qt.Text_browser_interaction);
+        _ui.notice.set_text (notice);
+        _ui.notice.set_word_wrap (true);
+        _ui.notice.set_open_external_links (true);
     }
     
     } // namespace Occ

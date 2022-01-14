@@ -11,21 +11,21 @@ class DummyCredentials : AbstractCredentials {
 public:
     string _user;
     string _password;
-    string authType () const override;
+    string auth_type () const override;
     string user () const override;
     string password () const override;
-    QNetworkAccessManager *createQNAM () const override;
+    QNetworkAccessManager *create_qNAM () const override;
     bool ready () const override;
-    bool stillValid (QNetworkReply *reply) override;
-    void fetchFromKeychain () override;
-    void askFromUser () override;
+    bool still_valid (QNetworkReply *reply) override;
+    void fetch_from_keychain () override;
+    void ask_from_user () override;
     void persist () override;
-    void invalidateToken () override {}
-    void forgetSensitiveData () override{};
+    void invalidate_token () override {}
+    void forget_sensitive_data () override{};
 };
 
-    string DummyCredentials.authType () {
-        return string.fromLatin1 ("dummy");
+    string DummyCredentials.auth_type () {
+        return string.from_latin1 ("dummy");
     }
     
     string DummyCredentials.user () {
@@ -37,7 +37,7 @@ public:
         return string ();
     }
     
-    QNetworkAccessManager *DummyCredentials.createQNAM () {
+    QNetworkAccessManager *DummyCredentials.create_qNAM () {
         return new AccessManager;
     }
     
@@ -45,17 +45,17 @@ public:
         return true;
     }
     
-    bool DummyCredentials.stillValid (QNetworkReply *reply) {
+    bool DummyCredentials.still_valid (QNetworkReply *reply) {
         Q_UNUSED (reply)
         return true;
     }
     
-    void DummyCredentials.fetchFromKeychain () {
-        _wasFetched = true;
+    void DummyCredentials.fetch_from_keychain () {
+        _was_fetched = true;
         Q_EMIT (fetched ());
     }
     
-    void DummyCredentials.askFromUser () {
+    void DummyCredentials.ask_from_user () {
         Q_EMIT (asked ());
     }
     

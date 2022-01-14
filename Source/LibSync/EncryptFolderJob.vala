@@ -19,125 +19,125 @@ public:
     };
     Q_ENUM (Status)
 
-    EncryptFolderJob (AccountPtr &account, SyncJournalDb *journal, string &path, QByteArray &fileId, GLib.Object *parent = nullptr);
+    EncryptFolderJob (AccountPtr &account, SyncJournalDb *journal, string &path, QByteArray &file_id, GLib.Object *parent = nullptr);
     void start ();
 
-    string errorString ();
+    string error_string ();
 
 signals:
     void finished (int status);
 
 private slots:
-    void slotEncryptionFlagSuccess (QByteArray &folderId);
-    void slotEncryptionFlagError (QByteArray &folderId, int httpReturnCode);
-    void slotLockForEncryptionSuccess (QByteArray &folderId, QByteArray &token);
-    void slotLockForEncryptionError (QByteArray &folderId, int httpReturnCode);
-    void slotUnlockFolderSuccess (QByteArray &folderId);
-    void slotUnlockFolderError (QByteArray &folderId, int httpReturnCode);
-    void slotUploadMetadataSuccess (QByteArray &folderId);
-    void slotUpdateMetadataError (QByteArray &folderId, int httpReturnCode);
+    void slot_encryption_flag_success (QByteArray &folder_id);
+    void slot_encryption_flag_error (QByteArray &folder_id, int http_return_code);
+    void slot_lock_for_encryption_success (QByteArray &folder_id, QByteArray &token);
+    void slot_lock_for_encryption_error (QByteArray &folder_id, int http_return_code);
+    void slot_unlock_folder_success (QByteArray &folder_id);
+    void slot_unlock_folder_error (QByteArray &folder_id, int http_return_code);
+    void slot_upload_metadata_success (QByteArray &folder_id);
+    void slot_update_metadata_error (QByteArray &folder_id, int http_return_code);
 
 private:
     AccountPtr _account;
     SyncJournalDb *_journal;
     string _path;
-    QByteArray _fileId;
-    QByteArray _folderToken;
-    string _errorString;
+    QByteArray _file_id;
+    QByteArray _folder_token;
+    string _error_string;
 };
 
-    EncryptFolderJob.EncryptFolderJob (AccountPtr &account, SyncJournalDb *journal, string &path, QByteArray &fileId, GLib.Object *parent)
+    EncryptFolderJob.EncryptFolderJob (AccountPtr &account, SyncJournalDb *journal, string &path, QByteArray &file_id, GLib.Object *parent)
         : GLib.Object (parent)
         , _account (account)
         , _journal (journal)
         , _path (path)
-        , _fileId (fileId) {
+        , _file_id (file_id) {
     }
     
     void EncryptFolderJob.start () {
-        auto job = new Occ.SetEncryptionFlagApiJob (_account, _fileId, Occ.SetEncryptionFlagApiJob.Set, this);
-        connect (job, &Occ.SetEncryptionFlagApiJob.success, this, &EncryptFolderJob.slotEncryptionFlagSuccess);
-        connect (job, &Occ.SetEncryptionFlagApiJob.error, this, &EncryptFolderJob.slotEncryptionFlagError);
+        auto job = new Occ.Set_encryption_flag_api_job (_account, _file_id, Occ.Set_encryption_flag_api_job.Set, this);
+        connect (job, &Occ.Set_encryption_flag_api_job.success, this, &EncryptFolderJob.slot_encryption_flag_success);
+        connect (job, &Occ.Set_encryption_flag_api_job.error, this, &EncryptFolderJob.slot_encryption_flag_error);
         job.start ();
     }
     
-    string EncryptFolderJob.errorString () {
-        return _errorString;
+    string EncryptFolderJob.error_string () {
+        return _error_string;
     }
     
-    void EncryptFolderJob.slotEncryptionFlagSuccess (QByteArray &fileId) {
+    void EncryptFolderJob.slot_encryption_flag_success (QByteArray &file_id) {
         SyncJournalFileRecord rec;
-        _journal.getFileRecord (_path, &rec);
-        if (rec.isValid ()) {
-            rec._isE2eEncrypted = true;
-            _journal.setFileRecord (rec);
+        _journal.get_file_record (_path, &rec);
+        if (rec.is_valid ()) {
+            rec._is_e2e_encrypted = true;
+            _journal.set_file_record (rec);
         }
     
-        auto lockJob = new LockEncryptFolderApiJob (_account, fileId, this);
-        connect (lockJob, &LockEncryptFolderApiJob.success,
-                this, &EncryptFolderJob.slotLockForEncryptionSuccess);
-        connect (lockJob, &LockEncryptFolderApiJob.error,
-                this, &EncryptFolderJob.slotLockForEncryptionError);
-        lockJob.start ();
+        auto lock_job = new Lock_encrypt_folder_api_job (_account, file_id, this);
+        connect (lock_job, &Lock_encrypt_folder_api_job.success,
+                this, &EncryptFolderJob.slot_lock_for_encryption_success);
+        connect (lock_job, &Lock_encrypt_folder_api_job.error,
+                this, &EncryptFolderJob.slot_lock_for_encryption_error);
+        lock_job.start ();
     }
     
-    void EncryptFolderJob.slotEncryptionFlagError (QByteArray &fileId, int httpErrorCode) {
-        qDebug () << "Error on the encryption flag of" << fileId << "HTTP code:" << httpErrorCode;
+    void EncryptFolderJob.slot_encryption_flag_error (QByteArray &file_id, int http_error_code) {
+        q_debug () << "Error on the encryption flag of" << file_id << "HTTP code:" << http_error_code;
         emit finished (Error);
     }
     
-    void EncryptFolderJob.slotLockForEncryptionSuccess (QByteArray &fileId, QByteArray &token) {
-        _folderToken = token;
+    void EncryptFolderJob.slot_lock_for_encryption_success (QByteArray &file_id, QByteArray &token) {
+        _folder_token = token;
     
-        FolderMetadata emptyMetadata (_account);
-        auto encryptedMetadata = emptyMetadata.encryptedMetadata ();
-        if (encryptedMetadata.isEmpty ()) {
+        Folder_metadata empty_metadata (_account);
+        auto encrypted_metadata = empty_metadata.encrypted_metadata ();
+        if (encrypted_metadata.is_empty ()) {
             //TODO : Mark the folder as unencrypted as the metadata generation failed.
-            _errorString = tr ("Could not generate the metadata for encryption, Unlocking the folder.\n"
-                              "This can be an issue with your OpenSSL libraries.");
+            _error_string = tr ("Could not generate the metadata for encryption, Unlocking the folder.\n"
+                              "This can be an issue with your Open_s_sL libraries.");
             emit finished (Error);
             return;
         }
     
-        auto storeMetadataJob = new StoreMetaDataApiJob (_account, fileId, emptyMetadata.encryptedMetadata (), this);
-        connect (storeMetadataJob, &StoreMetaDataApiJob.success,
-                this, &EncryptFolderJob.slotUploadMetadataSuccess);
-        connect (storeMetadataJob, &StoreMetaDataApiJob.error,
-                this, &EncryptFolderJob.slotUpdateMetadataError);
-        storeMetadataJob.start ();
+        auto store_metadata_job = new Store_meta_data_api_job (_account, file_id, empty_metadata.encrypted_metadata (), this);
+        connect (store_metadata_job, &Store_meta_data_api_job.success,
+                this, &EncryptFolderJob.slot_upload_metadata_success);
+        connect (store_metadata_job, &Store_meta_data_api_job.error,
+                this, &EncryptFolderJob.slot_update_metadata_error);
+        store_metadata_job.start ();
     }
     
-    void EncryptFolderJob.slotUploadMetadataSuccess (QByteArray &folderId) {
-        auto unlockJob = new UnlockEncryptFolderApiJob (_account, folderId, _folderToken, this);
-        connect (unlockJob, &UnlockEncryptFolderApiJob.success,
-                        this, &EncryptFolderJob.slotUnlockFolderSuccess);
-        connect (unlockJob, &UnlockEncryptFolderApiJob.error,
-                        this, &EncryptFolderJob.slotUnlockFolderError);
-        unlockJob.start ();
+    void EncryptFolderJob.slot_upload_metadata_success (QByteArray &folder_id) {
+        auto unlock_job = new Unlock_encrypt_folder_api_job (_account, folder_id, _folder_token, this);
+        connect (unlock_job, &Unlock_encrypt_folder_api_job.success,
+                        this, &EncryptFolderJob.slot_unlock_folder_success);
+        connect (unlock_job, &Unlock_encrypt_folder_api_job.error,
+                        this, &EncryptFolderJob.slot_unlock_folder_error);
+        unlock_job.start ();
     }
     
-    void EncryptFolderJob.slotUpdateMetadataError (QByteArray &folderId, int httpReturnCode) {
-        Q_UNUSED (httpReturnCode);
+    void EncryptFolderJob.slot_update_metadata_error (QByteArray &folder_id, int http_return_code) {
+        Q_UNUSED (http_return_code);
     
-        auto unlockJob = new UnlockEncryptFolderApiJob (_account, folderId, _folderToken, this);
-        connect (unlockJob, &UnlockEncryptFolderApiJob.success,
-                        this, &EncryptFolderJob.slotUnlockFolderSuccess);
-        connect (unlockJob, &UnlockEncryptFolderApiJob.error,
-                        this, &EncryptFolderJob.slotUnlockFolderError);
-        unlockJob.start ();
+        auto unlock_job = new Unlock_encrypt_folder_api_job (_account, folder_id, _folder_token, this);
+        connect (unlock_job, &Unlock_encrypt_folder_api_job.success,
+                        this, &EncryptFolderJob.slot_unlock_folder_success);
+        connect (unlock_job, &Unlock_encrypt_folder_api_job.error,
+                        this, &EncryptFolderJob.slot_unlock_folder_error);
+        unlock_job.start ();
     }
     
-    void EncryptFolderJob.slotLockForEncryptionError (QByteArray &fileId, int httpErrorCode) {
-        qCInfo (lcEncryptFolderJob ()) << "Locking error for" << fileId << "HTTP code:" << httpErrorCode;
+    void EncryptFolderJob.slot_lock_for_encryption_error (QByteArray &file_id, int http_error_code) {
+        q_c_info (lc_encrypt_folder_job ()) << "Locking error for" << file_id << "HTTP code:" << http_error_code;
         emit finished (Error);
     }
     
-    void EncryptFolderJob.slotUnlockFolderError (QByteArray &fileId, int httpErrorCode) {
-        qCInfo (lcEncryptFolderJob ()) << "Unlocking error for" << fileId << "HTTP code:" << httpErrorCode;
+    void EncryptFolderJob.slot_unlock_folder_error (QByteArray &file_id, int http_error_code) {
+        q_c_info (lc_encrypt_folder_job ()) << "Unlocking error for" << file_id << "HTTP code:" << http_error_code;
         emit finished (Error);
     }
-    void EncryptFolderJob.slotUnlockFolderSuccess (QByteArray &fileId) {
-        qCInfo (lcEncryptFolderJob ()) << "Unlocking success for" << fileId;
+    void EncryptFolderJob.slot_unlock_folder_success (QByteArray &file_id) {
+        q_c_info (lc_encrypt_folder_job ()) << "Unlocking success for" << file_id;
         emit finished (Success);
     }
     

@@ -7,25 +7,25 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 namespace Occ {
 
 /***********************************************************
-@brief The SimpleSslErrorHandler class
+@brief The Simple_sslErrorHandler class
 @ingroup cmd
 ***********************************************************/
-class SimpleSslErrorHandler : Occ.AbstractSslErrorHandler {
+class Simple_sslErrorHandler : Occ.Abstract_sslErrorHandler {
 
-    public bool handleErrors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, Occ.AccountPtr) override;
+    public bool handle_errors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, Occ.AccountPtr) override;
 };
 
 
-    bool SimpleSslErrorHandler.handleErrors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, Occ.AccountPtr account) {
+    bool Simple_sslErrorHandler.handle_errors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, Occ.AccountPtr account) {
         (void)account;
         (void)conf;
     
         if (!certs) {
-            qDebug () << "Certs parameter required but is NULL!";
+            q_debug () << "Certs parameter required but is NULL!";
             return false;
         }
     
-        for (auto &error : qAsConst (errors)) {
+        for (auto &error : q_as_const (errors)) {
             certs.append (error.certificate ());
         }
         return true;

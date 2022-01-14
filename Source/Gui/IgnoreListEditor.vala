@@ -6,8 +6,8 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 // #include <QFile>
 // #include <QDir>
-// #include <QListWidget>
-// #include <QListWidgetItem>
+// #include <QList_widget>
+// #include <QListWidgetTtem>
 // #include <QMessageBox>
 // #include <QInputDialog>
 
@@ -17,87 +17,87 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 namespace Occ {
 
 namespace Ui {
-    class IgnoreListEditor;
+    class Ignore_list_editor;
 }
 
 /***********************************************************
-@brief The IgnoreListEditor class
+@brief The Ignore_list_editor class
 @ingroup gui
 ***********************************************************/
-class IgnoreListEditor : Gtk.Dialog {
+class Ignore_list_editor : Gtk.Dialog {
 
 public:
-    IgnoreListEditor (Gtk.Widget *parent = nullptr);
-    ~IgnoreListEditor () override;
+    Ignore_list_editor (Gtk.Widget *parent = nullptr);
+    ~Ignore_list_editor () override;
 
-    bool ignoreHiddenFiles ();
+    bool ignore_hidden_files ();
 
 private slots:
-    void slotRestoreDefaults (QAbstractButton *button);
+    void slot_restore_defaults (QAbstractButton *button);
 
 private:
-    void setupTableReadOnlyItems ();
-    string readOnlyTooltip;
-    Ui.IgnoreListEditor *ui;
+    void setup_table_read_only_items ();
+    string read_only_tooltip;
+    Ui.Ignore_list_editor *ui;
 };
 
 
-    IgnoreListEditor.IgnoreListEditor (Gtk.Widget *parent)
+    Ignore_list_editor.Ignore_list_editor (Gtk.Widget *parent)
         : Gtk.Dialog (parent)
-        , ui (new Ui.IgnoreListEditor) {
-        setWindowFlags (windowFlags () & ~Qt.WindowContextHelpButtonHint);
-        ui.setupUi (this);
+        , ui (new Ui.Ignore_list_editor) {
+        set_window_flags (window_flags () & ~Qt.Window_context_help_button_hint);
+        ui.setup_ui (this);
     
-        ConfigFile cfgFile;
-        //FIXME This is not true. The entries are hardcoded below in setupTableReadOnlyItems
-        readOnlyTooltip = tr ("This entry is provided by the system at \"%1\" "
+        ConfigFile cfg_file;
+        //FIXME This is not true. The entries are hardcoded below in setup_table_read_only_items
+        read_only_tooltip = tr ("This entry is provided by the system at \"%1\" "
                              "and cannot be modified in this view.")
-                              .arg (QDir.toNativeSeparators (cfgFile.excludeFile (ConfigFile.SystemScope)));
+                              .arg (QDir.to_native_separators (cfg_file.exclude_file (ConfigFile.System_scope)));
     
-        setupTableReadOnlyItems ();
-        const auto userConfig = cfgFile.excludeFile (ConfigFile.Scope.UserScope);
-        ui.ignoreTableWidget.readIgnoreFile (userConfig);
+        setup_table_read_only_items ();
+        const auto user_config = cfg_file.exclude_file (ConfigFile.Scope.User_scope);
+        ui.ignore_table_widget.read_ignore_file (user_config);
     
         connect (this, &Gtk.Dialog.accepted, [=] () {
-            ui.ignoreTableWidget.slotWriteIgnoreFile (userConfig);
+            ui.ignore_table_widget.slot_write_ignore_file (user_config);
             /* handle the hidden file checkbox */
     
-            /* the ignoreHiddenFiles flag is a folder specific setting, but for now, it is
+            /* the ignore_hidden_files flag is a folder specific setting, but for now, it is
             * handled globally. Save it to every folder that is defined.
-            * TODO this can now be fixed, simply attach this IgnoreListEditor to top-level account
+            * TODO this can now be fixed, simply attach this Ignore_list_editor to top-level account
             * settings
             */
-            FolderMan.instance ().setIgnoreHiddenFiles (ignoreHiddenFiles ());
+            FolderMan.instance ().set_ignore_hidden_files (ignore_hidden_files ());
         });
-        connect (ui.buttonBox, &QDialogButtonBox.clicked,
-                this, &IgnoreListEditor.slotRestoreDefaults);
+        connect (ui.button_box, &QDialogButtonBox.clicked,
+                this, &Ignore_list_editor.slot_restore_defaults);
     
-        ui.syncHiddenFilesCheckBox.setChecked (!FolderMan.instance ().ignoreHiddenFiles ());
+        ui.sync_hidden_files_check_box.set_checked (!FolderMan.instance ().ignore_hidden_files ());
     }
     
-    IgnoreListEditor.~IgnoreListEditor () {
+    Ignore_list_editor.~Ignore_list_editor () {
         delete ui;
     }
     
-    void IgnoreListEditor.setupTableReadOnlyItems () {
-        ui.ignoreTableWidget.addPattern (".csync_journal.db*", /*deletable=*/false, /*readonly=*/true);
-        ui.ignoreTableWidget.addPattern ("._sync_*.db*", /*deletable=*/false, /*readonly=*/true);
-        ui.ignoreTableWidget.addPattern (".sync_*.db*", /*deletable=*/false, /*readonly=*/true);
+    void Ignore_list_editor.setup_table_read_only_items () {
+        ui.ignore_table_widget.add_pattern (".csync_journal.db*", /*deletable=*/false, /*readonly=*/true);
+        ui.ignore_table_widget.add_pattern ("._sync_*.db*", /*deletable=*/false, /*readonly=*/true);
+        ui.ignore_table_widget.add_pattern (".sync_*.db*", /*deletable=*/false, /*readonly=*/true);
     }
     
-    bool IgnoreListEditor.ignoreHiddenFiles () {
-        return !ui.syncHiddenFilesCheckBox.isChecked ();
+    bool Ignore_list_editor.ignore_hidden_files () {
+        return !ui.sync_hidden_files_check_box.is_checked ();
     }
     
-    void IgnoreListEditor.slotRestoreDefaults (QAbstractButton *button) {
-        if (ui.buttonBox.buttonRole (button) != QDialogButtonBox.ResetRole)
+    void Ignore_list_editor.slot_restore_defaults (QAbstractButton *button) {
+        if (ui.button_box.button_role (button) != QDialogButtonBox.Reset_role)
             return;
     
-        ui.ignoreTableWidget.slotRemoveAllItems ();
+        ui.ignore_table_widget.slot_remove_all_items ();
     
-        ConfigFile cfgFile;
-        setupTableReadOnlyItems ();
-        ui.ignoreTableWidget.readIgnoreFile (cfgFile.excludeFile (ConfigFile.SystemScope), false);
+        ConfigFile cfg_file;
+        setup_table_read_only_items ();
+        ui.ignore_table_widget.read_ignore_file (cfg_file.exclude_file (ConfigFile.System_scope), false);
     }
     
     } // namespace Occ

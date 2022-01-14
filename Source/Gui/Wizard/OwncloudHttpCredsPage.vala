@@ -9,204 +9,204 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 namespace Occ {
 
 /***********************************************************
-@brief The OwncloudHttpCredsPage class
+@brief The Owncloud_http_creds_page class
 ***********************************************************/
-class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
+class Owncloud_http_creds_page : Abstract_credentials_wizard_page {
 public:
-    OwncloudHttpCredsPage (Gtk.Widget *parent);
+    Owncloud_http_creds_page (Gtk.Widget *parent);
 
-    AbstractCredentials *getCredentials () const override;
+    AbstractCredentials *get_credentials () const override;
 
-    void initializePage () override;
-    void cleanupPage () override;
-    bool validatePage () override;
-    int nextId () const override;
-    void setConnected ();
-    void setErrorString (string &err);
+    void initialize_page () override;
+    void cleanup_page () override;
+    bool validate_page () override;
+    int next_id () const override;
+    void set_connected ();
+    void set_error_string (string &err);
 
 signals:
-    void connectToOCUrl (string &);
+    void connect_to_oCUrl (string &);
 
 public slots:
-    void slotStyleChanged ();
+    void slot_style_changed ();
 
 private:
-    void startSpinner ();
-    void stopSpinner ();
-    void setupCustomization ();
-    void customizeStyle ();
+    void start_spinner ();
+    void stop_spinner ();
+    void setup_customization ();
+    void customize_style ();
 
-    Ui_OwncloudHttpCredsPage _ui;
+    Ui_Owncloud_http_creds_page _ui;
     bool _connected;
-    QProgressIndicator *_progressIndi;
-    OwncloudWizard *_ocWizard;
+    QProgress_indicator *_progress_indi;
+    OwncloudWizard *_oc_wizard;
 };
 
-    OwncloudHttpCredsPage.OwncloudHttpCredsPage (Gtk.Widget *parent)
-        : AbstractCredentialsWizardPage ()
+    Owncloud_http_creds_page.Owncloud_http_creds_page (Gtk.Widget *parent)
+        : Abstract_credentials_wizard_page ()
         , _ui ()
         , _connected (false)
-        , _progressIndi (new QProgressIndicator (this)) {
-        _ui.setupUi (this);
+        , _progress_indi (new QProgress_indicator (this)) {
+        _ui.setup_ui (this);
     
         if (parent) {
-            _ocWizard = qobject_cast<OwncloudWizard> (parent);
+            _oc_wizard = qobject_cast<OwncloudWizard> (parent);
         }
     
-        registerField (QLatin1String ("OCUser*"), _ui.leUsername);
-        registerField (QLatin1String ("OCPasswd*"), _ui.lePassword);
+        register_field (QLatin1String ("OCUser*"), _ui.le_username);
+        register_field (QLatin1String ("OCPasswd*"), _ui.le_password);
     
         Theme *theme = Theme.instance ();
-        switch (theme.userIDType ()) {
-        case Theme.UserIDUserName:
+        switch (theme.user_iDType ()) {
+        case Theme.User_iDUser_name:
             // default, handled in ui file
             break;
-        case Theme.UserIDEmail:
-            _ui.usernameLabel.setText (tr ("&Email"));
+        case Theme.User_iDEmail:
+            _ui.username_label.set_text (tr ("&Email"));
             break;
-        case Theme.UserIDCustom:
-            _ui.usernameLabel.setText (theme.customUserID ());
+        case Theme.User_iDCustom:
+            _ui.username_label.set_text (theme.custom_user_iD ());
             break;
         default:
             break;
         }
-        _ui.leUsername.setPlaceholderText (theme.userIDHint ());
+        _ui.le_username.set_placeholder_text (theme.user_iDHint ());
     
-        setTitle (WizardCommon.titleTemplate ().arg (tr ("Connect to %1").arg (Theme.instance ().appNameGUI ())));
-        setSubTitle (WizardCommon.subTitleTemplate ().arg (tr ("Enter user credentials")));
+        set_title (Wizard_common.title_template ().arg (tr ("Connect to %1").arg (Theme.instance ().app_name_g_u_i ())));
+        set_sub_title (Wizard_common.sub_title_template ().arg (tr ("Enter user credentials")));
     
-        _ui.resultLayout.addWidget (_progressIndi);
-        stopSpinner ();
-        setupCustomization ();
+        _ui.result_layout.add_widget (_progress_indi);
+        stop_spinner ();
+        setup_customization ();
     }
     
-    void OwncloudHttpCredsPage.setupCustomization () {
+    void Owncloud_http_creds_page.setup_customization () {
         // set defaults for the customize labels.
-        _ui.topLabel.hide ();
-        _ui.bottomLabel.hide ();
+        _ui.top_label.hide ();
+        _ui.bottom_label.hide ();
     
         Theme *theme = Theme.instance ();
-        QVariant variant = theme.customMedia (Theme.oCSetupTop);
-        if (!variant.isNull ()) {
-            WizardCommon.setupCustomMedia (variant, _ui.topLabel);
+        QVariant variant = theme.custom_media (Theme.o_c_setup_top);
+        if (!variant.is_null ()) {
+            Wizard_common.setup_custom_media (variant, _ui.top_label);
         }
     
-        variant = theme.customMedia (Theme.oCSetupBottom);
-        WizardCommon.setupCustomMedia (variant, _ui.bottomLabel);
+        variant = theme.custom_media (Theme.o_c_setup_bottom);
+        Wizard_common.setup_custom_media (variant, _ui.bottom_label);
     }
     
-    void OwncloudHttpCredsPage.initializePage () {
-        WizardCommon.initErrorLabel (_ui.errorLabel);
+    void Owncloud_http_creds_page.initialize_page () {
+        Wizard_common.init_error_label (_ui.error_label);
     
-        auto *ocWizard = qobject_cast<OwncloudWizard> (wizard ());
-        AbstractCredentials *cred = ocWizard.account ().credentials ();
-        auto *httpCreds = qobject_cast<HttpCredentials> (cred);
-        if (httpCreds) {
-            const string user = httpCreds.fetchUser ();
-            if (!user.isEmpty ()) {
-                _ui.leUsername.setText (user);
+        auto *oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+        AbstractCredentials *cred = oc_wizard.account ().credentials ();
+        auto *http_creds = qobject_cast<HttpCredentials> (cred);
+        if (http_creds) {
+            const string user = http_creds.fetch_user ();
+            if (!user.is_empty ()) {
+                _ui.le_username.set_text (user);
             }
         } else {
-            QUrl url = ocWizard.account ().url ();
+            QUrl url = oc_wizard.account ().url ();
     
             // If the final url does not have a username, check the
             // user specified url too. Sometimes redirects can lose
             // the user:pw information.
-            if (url.userName ().isEmpty ()) {
-                url = ocWizard.ocUrl ();
+            if (url.user_name ().is_empty ()) {
+                url = oc_wizard.oc_url ();
             }
     
-            const string user = url.userName ();
+            const string user = url.user_name ();
             const string password = url.password ();
     
-            if (!user.isEmpty ()) {
-                _ui.leUsername.setText (user);
+            if (!user.is_empty ()) {
+                _ui.le_username.set_text (user);
             }
-            if (!password.isEmpty ()) {
-                _ui.lePassword.setText (password);
+            if (!password.is_empty ()) {
+                _ui.le_password.set_text (password);
             }
         }
-        _ui.tokenLabel.setText (HttpCredentialsGui.requestAppPasswordText (ocWizard.account ().data ()));
-        _ui.tokenLabel.setVisible (!_ui.tokenLabel.text ().isEmpty ());
-        _ui.leUsername.setFocus ();
+        _ui.token_label.set_text (HttpCredentialsGui.request_app_password_text (oc_wizard.account ().data ()));
+        _ui.token_label.set_visible (!_ui.token_label.text ().is_empty ());
+        _ui.le_username.set_focus ();
     }
     
-    void OwncloudHttpCredsPage.cleanupPage () {
-        _ui.leUsername.clear ();
-        _ui.lePassword.clear ();
+    void Owncloud_http_creds_page.cleanup_page () {
+        _ui.le_username.clear ();
+        _ui.le_password.clear ();
     }
     
-    bool OwncloudHttpCredsPage.validatePage () {
-        if (_ui.leUsername.text ().isEmpty () || _ui.lePassword.text ().isEmpty ()) {
+    bool Owncloud_http_creds_page.validate_page () {
+        if (_ui.le_username.text ().is_empty () || _ui.le_password.text ().is_empty ()) {
             return false;
         }
     
         if (!_connected) {
-            _ui.errorLabel.setVisible (false);
-            startSpinner ();
+            _ui.error_label.set_visible (false);
+            start_spinner ();
     
             // Reset cookies to ensure the username / password is actually used
-            auto *ocWizard = qobject_cast<OwncloudWizard> (wizard ());
-            ocWizard.account ().clearCookieJar ();
+            auto *oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+            oc_wizard.account ().clear_cookie_jar ();
     
-            emit completeChanged ();
-            emit connectToOCUrl (field ("OCUrl").toString ().simplified ());
+            emit complete_changed ();
+            emit connect_to_oCUrl (field ("OCUrl").to_string ().simplified ());
     
             return false;
         } else {
             // Reset, to require another connection attempt next time
             _connected = false;
     
-            emit completeChanged ();
-            stopSpinner ();
+            emit complete_changed ();
+            stop_spinner ();
             return true;
         }
         return true;
     }
     
-    int OwncloudHttpCredsPage.nextId () {
-        return WizardCommon.Page_AdvancedSetup;
+    int Owncloud_http_creds_page.next_id () {
+        return Wizard_common.Page_Advanced_setup;
     }
     
-    void OwncloudHttpCredsPage.setConnected () {
+    void Owncloud_http_creds_page.set_connected () {
         _connected = true;
-        stopSpinner ();
+        stop_spinner ();
     }
     
-    void OwncloudHttpCredsPage.startSpinner () {
-        _ui.resultLayout.setEnabled (true);
-        _progressIndi.setVisible (true);
-        _progressIndi.startAnimation ();
+    void Owncloud_http_creds_page.start_spinner () {
+        _ui.result_layout.set_enabled (true);
+        _progress_indi.set_visible (true);
+        _progress_indi.start_animation ();
     }
     
-    void OwncloudHttpCredsPage.stopSpinner () {
-        _ui.resultLayout.setEnabled (false);
-        _progressIndi.setVisible (false);
-        _progressIndi.stopAnimation ();
+    void Owncloud_http_creds_page.stop_spinner () {
+        _ui.result_layout.set_enabled (false);
+        _progress_indi.set_visible (false);
+        _progress_indi.stop_animation ();
     }
     
-    void OwncloudHttpCredsPage.setErrorString (string &err) {
-        if (err.isEmpty ()) {
-            _ui.errorLabel.setVisible (false);
+    void Owncloud_http_creds_page.set_error_string (string &err) {
+        if (err.is_empty ()) {
+            _ui.error_label.set_visible (false);
         } else {
-            _ui.errorLabel.setVisible (true);
-            _ui.errorLabel.setText (err);
+            _ui.error_label.set_visible (true);
+            _ui.error_label.set_text (err);
         }
-        emit completeChanged ();
-        stopSpinner ();
+        emit complete_changed ();
+        stop_spinner ();
     }
     
-    AbstractCredentials *OwncloudHttpCredsPage.getCredentials () {
-        return new HttpCredentialsGui (_ui.leUsername.text (), _ui.lePassword.text (), _ocWizard._clientCertBundle, _ocWizard._clientCertPassword);
+    AbstractCredentials *Owncloud_http_creds_page.get_credentials () {
+        return new HttpCredentialsGui (_ui.le_username.text (), _ui.le_password.text (), _oc_wizard._client_cert_bundle, _oc_wizard._client_cert_password);
     }
     
-    void OwncloudHttpCredsPage.slotStyleChanged () {
-        customizeStyle ();
+    void Owncloud_http_creds_page.slot_style_changed () {
+        customize_style ();
     }
     
-    void OwncloudHttpCredsPage.customizeStyle () {
-        if (_progressIndi)
-            _progressIndi.setColor (QGuiApplication.palette ().color (QPalette.Text));
+    void Owncloud_http_creds_page.customize_style () {
+        if (_progress_indi)
+            _progress_indi.set_color (QGuiApplication.palette ().color (QPalette.Text));
     }
     
     } // namespace Occ

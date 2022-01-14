@@ -26,13 +26,13 @@ class AddCertificateDialog : Gtk.Dialog {
 public:
     AddCertificateDialog (Gtk.Widget *parent = nullptr);
     ~AddCertificateDialog () override;
-    string getCertificatePath ();
-    string getCertificatePasswd ();
-    void showErrorMessage (string message);
+    string get_certificate_path ();
+    string get_certificate_passwd ();
+    void show_error_message (string message);
     void reinit ();
 
 private slots:
-    void on_pushButtonBrowseCertificate_clicked ();
+    void on_push_button_browse_certificate_clicked ();
 
 private:
     Ui.AddCertificateDialog *ui;
@@ -42,35 +42,35 @@ private:
     AddCertificateDialog.AddCertificateDialog (Gtk.Widget *parent)
         : Gtk.Dialog (parent)
         , ui (new Ui.AddCertificateDialog) {
-        ui.setupUi (this);
-        ui.labelErrorCertif.setText ("");
+        ui.setup_ui (this);
+        ui.label_error_certif.set_text ("");
     }
     
     AddCertificateDialog.~AddCertificateDialog () {
         delete ui;
     }
     
-    void AddCertificateDialog.on_pushButtonBrowseCertificate_clicked () {
-        string fileName = QFileDialog.getOpenFileName (this, tr ("Select a certificate"), "", tr ("Certificate files (*.p12 *.pfx)"));
-        ui.lineEditCertificatePath.setText (fileName);
+    void AddCertificateDialog.on_push_button_browse_certificate_clicked () {
+        string file_name = QFileDialog.get_open_file_name (this, tr ("Select a certificate"), "", tr ("Certificate files (*.p12 *.pfx)"));
+        ui.line_edit_certificate_path.set_text (file_name);
     }
     
-    string AddCertificateDialog.getCertificatePath () {
-        return ui.lineEditCertificatePath.text ();
+    string AddCertificateDialog.get_certificate_path () {
+        return ui.line_edit_certificate_path.text ();
     }
     
-    string AddCertificateDialog.getCertificatePasswd () {
-        return ui.lineEditPWDCertificate.text ();
+    string AddCertificateDialog.get_certificate_passwd () {
+        return ui.line_edit_p_wDCertificate.text ();
     }
     
-    void AddCertificateDialog.showErrorMessage (string message) {
-        ui.labelErrorCertif.setText (message);
+    void AddCertificateDialog.show_error_message (string message) {
+        ui.label_error_certif.set_text (message);
     }
     
     void AddCertificateDialog.reinit () {
-        ui.labelErrorCertif.clear ();
-        ui.lineEditCertificatePath.clear ();
-        ui.lineEditPWDCertificate.clear ();
+        ui.label_error_certif.clear ();
+        ui.line_edit_certificate_path.clear ();
+        ui.line_edit_p_wDCertificate.clear ();
     }
     }
     

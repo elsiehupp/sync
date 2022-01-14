@@ -25,30 +25,30 @@ namespace Utility {
 
     If launching the browser fails, display a message.
     ***********************************************************/
-    bool openBrowser (QUrl &url, Gtk.Widget *errorWidgetParent = nullptr);
+    bool open_browser (QUrl &url, Gtk.Widget *error_widget_parent = nullptr);
 
     /***********************************************************
     Start composing a new email message.
 
     If launching the email program fails, display a message.
     ***********************************************************/
-    bool openEmailComposer (string &subject, string &body,
-        Gtk.Widget *errorWidgetParent);
+    bool open_email_composer (string &subject, string &body,
+        Gtk.Widget *error_widget_parent);
 
     /***********************************************************
     Returns a translated string indicating the current availability.
 
     This will be used in context menus to describe the current state.
     ***********************************************************/
-    string vfsCurrentAvailabilityText (VfsItemAvailability availability);
+    string vfs_current_availability_text (VfsItemAvailability availability);
 
     /***********************************************************
     Translated text for "making items always available locally" */
-    string vfsPinActionText ();
+    string vfs_pin_action_text ();
 
     /***********************************************************
     Translated text for "free up local space" (and unpinning the item) */
-    string vfsFreeSpaceActionText ();
+    string vfs_free_space_action_text ();
 
 } // namespace Utility
 } // namespace Occ
@@ -61,57 +61,57 @@ namespace Utility {
 
 
 
-bool Utility.openBrowser (QUrl &url, Gtk.Widget *errorWidgetParent) {
-    const QStringList allowedUrlSchemes = {
+bool Utility.open_browser (QUrl &url, Gtk.Widget *error_widget_parent) {
+    const QStringList allowed_url_schemes = {
         "http",
         "https",
         "oauthtest"
     };
 
-    if (!allowedUrlSchemes.contains (url.scheme ())) {
-        qCWarning (lcUtility) << "URL format is not supported, or it has been compromised for:" << url.toString ();
+    if (!allowed_url_schemes.contains (url.scheme ())) {
+        q_c_warning (lc_utility) << "URL format is not supported, or it has been compromised for:" << url.to_string ();
         return false;
     }
 
-    if (!QDesktopServices.openUrl (url)) {
-        if (errorWidgetParent) {
+    if (!QDesktopServices.open_url (url)) {
+        if (error_widget_parent) {
             QMessageBox.warning (
-                errorWidgetParent,
+                error_widget_parent,
                 QCoreApplication.translate ("utility", "Could not open browser"),
                 QCoreApplication.translate ("utility",
                     "There was an error when launching the browser to go to "
                     "URL %1. Maybe no default browser is configured?")
-                    .arg (url.toString ()));
+                    .arg (url.to_string ()));
         }
-        qCWarning (lcUtility) << "QDesktopServices.openUrl failed for" << url;
+        q_c_warning (lc_utility) << "QDesktopServices.open_url failed for" << url;
         return false;
     }
     return true;
 }
 
-bool Utility.openEmailComposer (string &subject, string &body, Gtk.Widget *errorWidgetParent) {
+bool Utility.open_email_composer (string &subject, string &body, Gtk.Widget *error_widget_parent) {
     QUrl url (QLatin1String ("mailto:"));
     QUrlQuery query;
-    query.setQueryItems ({ { QLatin1String ("subject"), subject }, { QLatin1String ("body"), body } });
-    url.setQuery (query);
+    query.set_query_items ({ { QLatin1String ("subject"), subject }, { QLatin1String ("body"), body } });
+    url.set_query (query);
 
-    if (!QDesktopServices.openUrl (url)) {
-        if (errorWidgetParent) {
+    if (!QDesktopServices.open_url (url)) {
+        if (error_widget_parent) {
             QMessageBox.warning (
-                errorWidgetParent,
+                error_widget_parent,
                 QCoreApplication.translate ("utility", "Could not open email client"),
                 QCoreApplication.translate ("utility",
                     "There was an error when launching the email client to "
                     "create a new message. Maybe no default email client is "
                     "configured?"));
         }
-        qCWarning (lcUtility) << "QDesktopServices.openUrl failed for" << url;
+        q_c_warning (lc_utility) << "QDesktopServices.open_url failed for" << url;
         return false;
     }
     return true;
 }
 
-string Utility.vfsCurrentAvailabilityText (VfsItemAvailability availability) {
+string Utility.vfs_current_availability_text (VfsItemAvailability availability) {
     switch (availability) {
     case VfsItemAvailability.AlwaysLocal:
         return QCoreApplication.translate ("utility", "Always available locally");
@@ -126,10 +126,10 @@ string Utility.vfsCurrentAvailabilityText (VfsItemAvailability availability) {
     Q_UNREACHABLE ();
 }
 
-string Utility.vfsPinActionText () {
+string Utility.vfs_pin_action_text () {
     return QCoreApplication.translate ("utility", "Make always available locally");
 }
 
-string Utility.vfsFreeSpaceActionText () {
+string Utility.vfs_free_space_action_text () {
     return QCoreApplication.translate ("utility", "Free up local space");
 }

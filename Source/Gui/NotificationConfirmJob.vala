@@ -14,24 +14,24 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 namespace Occ {
 
 /***********************************************************
-@brief The NotificationConfirmJob class
+@brief The Notification_confirm_job class
 @ingroup gui
 
 Class to call an action-link of a notification coming from the server.
 All the communication logic is handled in this class.
 
 ***********************************************************/
-class NotificationConfirmJob : AbstractNetworkJob {
+class Notification_confirm_job : AbstractNetworkJob {
 
 public:
-    NotificationConfirmJob (AccountPtr account);
+    Notification_confirm_job (AccountPtr account);
 
     /***********************************************************
     @brief Set the verb and link for the job
     
     @param verb currently supported GET PUT POST DELETE
     ***********************************************************/
-    void setLinkAndVerb (QUrl &link, QByteArray &verb);
+    void set_link_and_verb (QUrl &link, QByteArray &verb);
 
     /***********************************************************
     @brief Start the OCS request
@@ -45,7 +45,7 @@ signals:
     
     @param reply the reply
     ***********************************************************/
-    void jobFinished (string reply, int replyCode);
+    void job_finished (string reply, int reply_code);
 
 private slots:
     bool finished () override;
@@ -55,44 +55,44 @@ private:
     QUrl _link;
 };
 
-    NotificationConfirmJob.NotificationConfirmJob (AccountPtr account)
+    Notification_confirm_job.Notification_confirm_job (AccountPtr account)
         : AbstractNetworkJob (account, "") {
-        setIgnoreCredentialFailure (true);
+        set_ignore_credential_failure (true);
     }
     
-    void NotificationConfirmJob.setLinkAndVerb (QUrl &link, QByteArray &verb) {
+    void Notification_confirm_job.set_link_and_verb (QUrl &link, QByteArray &verb) {
         _link = link;
         _verb = verb;
     }
     
-    void NotificationConfirmJob.start () {
-        if (!_link.isValid ()) {
-            qCWarning (lcNotificationsJob) << "Attempt to trigger invalid URL : " << _link.toString ();
+    void Notification_confirm_job.start () {
+        if (!_link.is_valid ()) {
+            q_c_warning (lc_notifications_job) << "Attempt to trigger invalid URL : " << _link.to_string ();
             return;
         }
         QNetworkRequest req;
-        req.setRawHeader ("Ocs-APIREQUEST", "true");
-        req.setRawHeader ("Content-Type", "application/x-www-form-urlencoded");
+        req.set_raw_header ("Ocs-APIREQUEST", "true");
+        req.set_raw_header ("Content-Type", "application/x-www-form-urlencoded");
     
-        sendRequest (_verb, _link, req);
+        send_request (_verb, _link, req);
     
         AbstractNetworkJob.start ();
     }
     
-    bool NotificationConfirmJob.finished () {
-        int replyCode = 0;
+    bool Notification_confirm_job.finished () {
+        int reply_code = 0;
         // FIXME : check for the reply code!
-        const string replyStr = reply ().readAll ();
+        const string reply_str = reply ().read_all ();
     
-        if (replyStr.contains ("<?xml version=\"1.0\"?>")) {
+        if (reply_str.contains ("<?xml version=\"1.0\"?>")) {
             const QRegularExpression rex ("<statuscode> (\\d+)</statuscode>");
-            const auto rexMatch = rex.match (replyStr);
-            if (rexMatch.hasMatch ()) {
+            const auto rex_match = rex.match (reply_str);
+            if (rex_match.has_match ()) {
                 // this is a error message coming back from ocs.
-                replyCode = rexMatch.captured (1).toInt ();
+                reply_code = rex_match.captured (1).to_int ();
             }
         }
-        emit jobFinished (replyStr, replyCode);
+        emit job_finished (reply_str, reply_code);
     
         return true;
     }

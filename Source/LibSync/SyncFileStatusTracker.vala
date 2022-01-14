@@ -15,355 +15,355 @@ namespace Occ {
 
 /***********************************************************
 @brief Takes care of tracking the status of individual files as they
-       go through the SyncEngine, to be reported as overlay icons in the shell.
+       go through the Sync_engine, to be reported as overlay icons in the shell.
 @ingroup libsync
 ***********************************************************/
 class SyncFileStatusTracker : GLib.Object {
 public:
-    SyncFileStatusTracker (SyncEngine *syncEngine);
-    SyncFileStatus fileStatus (string &relativePath);
+    SyncFileStatusTracker (Sync_engine *sync_engine);
+    SyncFileStatus file_status (string &relative_path);
 
 public slots:
-    void slotPathTouched (string &fileName);
+    void slot_path_touched (string &file_name);
     // path relative to folder
-    void slotAddSilentlyExcluded (string &folderPath);
+    void slot_add_silently_excluded (string &folder_path);
 
 signals:
-    void fileStatusChanged (string &systemFileName, SyncFileStatus fileStatus);
+    void file_status_changed (string &system_file_name, SyncFileStatus file_status);
 
 private slots:
-    void slotAboutToPropagate (SyncFileItemVector &items);
-    void slotItemCompleted (SyncFileItemPtr &item);
-    void slotSyncFinished ();
-    void slotSyncEngineRunningChanged ();
+    void slot_about_to_propagate (Sync_file_item_vector &items);
+    void slot_item_completed (Sync_file_item_ptr &item);
+    void slot_sync_finished ();
+    void slot_sync_engine_running_changed ();
 
 private:
-    struct PathComparator {
+    struct Path_comparator {
         bool operator () ( const string& lhs, string& rhs ) const;
     };
-    using ProblemsMap = std.map<string, SyncFileStatus.SyncFileStatusTag, PathComparator>;
-    SyncFileStatus.SyncFileStatusTag lookupProblem (string &pathToMatch, ProblemsMap &problemMap);
+    using Problems_map = std.map<string, SyncFileStatus.SyncFileStatusTag, Path_comparator>;
+    SyncFileStatus.SyncFileStatusTag lookup_problem (string &path_to_match, Problems_map &problem_map);
 
-    enum SharedFlag { UnknownShared,
-        NotShared,
+    enum Shared_flag { Unknown_shared,
+        Not_shared,
         Shared };
-    enum PathKnownFlag { PathUnknown = 0,
-        PathKnown };
-    SyncFileStatus resolveSyncAndErrorStatus (string &relativePath, SharedFlag sharedState, PathKnownFlag isPathKnown = PathKnown);
+    enum Path_known_flag { Path_unknown = 0,
+        Path_known };
+    SyncFileStatus resolve_sync_and_error_status (string &relative_path, Shared_flag shared_state, Path_known_flag is_path_known = Path_known);
 
-    void invalidateParentPaths (string &path);
-    string getSystemDestination (string &relativePath);
-    void incSyncCountAndEmitStatusChanged (string &relativePath, SharedFlag sharedState);
-    void decSyncCountAndEmitStatusChanged (string &relativePath, SharedFlag sharedState);
+    void invalidate_parent_paths (string &path);
+    string get_system_destination (string &relative_path);
+    void inc_sync_count_and_emit_status_changed (string &relative_path, Shared_flag shared_state);
+    void dec_sync_count_and_emit_status_changed (string &relative_path, Shared_flag shared_state);
 
-    SyncEngine *_syncEngine;
+    Sync_engine *_sync_engine;
 
-    ProblemsMap _syncProblems;
-    QSet<string> _dirtyPaths;
+    Problems_map _sync_problems;
+    QSet<string> _dirty_paths;
     // Counts the number direct children currently being synced (has unfinished propagation jobs).
     // We'll show a file/directory as SYNC as long as its sync count is > 0.
     // A directory that starts/ends propagation will in turn increase/decrease its own parent by 1.
-    QHash<string, int> _syncCount;
+    QHash<string, int> _sync_count;
 };
 
-    static int pathCompare ( const string& lhs, string& rhs ) {
-        // Should match Utility.fsCasePreserving, we want don't want to pay for the runtime check on every comparison.
+    static int path_compare ( const string& lhs, string& rhs ) {
+        // Should match Utility.fs_case_preserving, we want don't want to pay for the runtime check on every comparison.
         return lhs.compare (rhs, Qt.CaseSensitive);
     }
     
-    static bool pathStartsWith ( const string& lhs, string& rhs ) {
-        return lhs.startsWith (rhs, Qt.CaseSensitive);
+    static bool path_starts_with ( const string& lhs, string& rhs ) {
+        return lhs.starts_with (rhs, Qt.CaseSensitive);
     }
     
-    bool SyncFileStatusTracker.PathComparator.operator () ( const string& lhs, string& rhs ) {
-        // This will make sure that the std.map is ordered and queried case-insensitively on macOS and Windows.
-        return pathCompare (lhs, rhs) < 0;
+    bool SyncFileStatusTracker.Path_comparator.operator () ( const string& lhs, string& rhs ) {
+        // This will make sure that the std.map is ordered and queried case-insensitively on mac_o_s and Windows.
+        return path_compare (lhs, rhs) < 0;
     }
     
-    SyncFileStatus.SyncFileStatusTag SyncFileStatusTracker.lookupProblem (string &pathToMatch, SyncFileStatusTracker.ProblemsMap &problemMap) {
-        auto lower = problemMap.lower_bound (pathToMatch);
-        for (auto it = lower; it != problemMap.cend (); ++it) {
-            const string &problemPath = it.first;
+    SyncFileStatus.SyncFileStatusTag SyncFileStatusTracker.lookup_problem (string &path_to_match, SyncFileStatusTracker.Problems_map &problem_map) {
+        auto lower = problem_map.lower_bound (path_to_match);
+        for (auto it = lower; it != problem_map.cend (); ++it) {
+            const string &problem_path = it.first;
             SyncFileStatus.SyncFileStatusTag severity = it.second;
     
-            if (pathCompare (problemPath, pathToMatch) == 0) {
+            if (path_compare (problem_path, path_to_match) == 0) {
                 return severity;
-            } else if (severity == SyncFileStatus.StatusError
-                && pathStartsWith (problemPath, pathToMatch)
-                && (pathToMatch.isEmpty () || problemPath.at (pathToMatch.size ()) == '/')) {
-                return SyncFileStatus.StatusWarning;
-            } else if (!pathStartsWith (problemPath, pathToMatch)) {
+            } else if (severity == SyncFileStatus.SyncFileStatusTag.STATUS_ERROR
+                && path_starts_with (problem_path, path_to_match)
+                && (path_to_match.is_empty () || problem_path.at (path_to_match.size ()) == '/')) {
+                return SyncFileStatus.SyncFileStatusTag.STATUS_WARNING;
+            } else if (!path_starts_with (problem_path, path_to_match)) {
                 // Starting at lower_bound we get the first path that is not smaller,
                 // since : "a/" < "a/aa" < "a/aa/aaa" < "a/ab/aba"
-                // If problemMap keys are ["a/aa/aaa", "a/ab/aba"] and pathToMatch == "a/aa",
-                // lower_bound (pathToMatch) will point to "a/aa/aaa", and the moment that
-                // problemPath.startsWith (pathToMatch) == false, we know that we've looked
+                // If problem_map keys are ["a/aa/aaa", "a/ab/aba"] and path_to_match == "a/aa",
+                // lower_bound (path_to_match) will point to "a/aa/aaa", and the moment that
+                // problem_path.starts_with (path_to_match) == false, we know that we've looked
                 // at everything that interest us.
                 break;
             }
         }
-        return SyncFileStatus.StatusNone;
+        return SyncFileStatus.SyncFileStatusTag.STATUS_NONE;
     }
     
     /***********************************************************
     Whether this item should get an ERROR icon through the Socket API.
     
     The Socket API should only present serious, permanent errors to the us
-    In particular SoftErrors should just retain their 'needs to be synced'
+    In particular Soft_errors should just retain their 'needs to be synced'
     icon as the problem is most likely going to resolve itself quickly and
     automatically.
     ***********************************************************/
-    static inline bool hasErrorStatus (SyncFileItem &item) {
+    static inline bool has_error_status (SyncFileItem &item) {
         const auto status = item._status;
         return item._instruction == CSYNC_INSTRUCTION_ERROR
-            || status == SyncFileItem.NormalError
-            || status == SyncFileItem.FatalError
-            || status == SyncFileItem.DetailError
-            || status == SyncFileItem.BlacklistedError
-            || item._hasBlacklistEntry;
+            || status == SyncFileItem.Normal_error
+            || status == SyncFileItem.Fatal_error
+            || status == SyncFileItem.Detail_error
+            || status == SyncFileItem.Blacklisted_error
+            || item._has_blacklist_entry;
     }
     
-    static inline bool hasExcludedStatus (SyncFileItem &item) {
+    static inline bool has_excluded_status (SyncFileItem &item) {
         const auto status = item._status;
         return item._instruction == CSYNC_INSTRUCTION_IGNORE
-            || status == SyncFileItem.FileIgnored
+            || status == SyncFileItem.File_ignored
             || status == SyncFileItem.Conflict
             || status == SyncFileItem.Restoration
-            || status == SyncFileItem.FileLocked;
+            || status == SyncFileItem.File_locked;
     }
     
-    SyncFileStatusTracker.SyncFileStatusTracker (SyncEngine *syncEngine)
-        : _syncEngine (syncEngine) {
-        connect (syncEngine, &SyncEngine.aboutToPropagate,
-            this, &SyncFileStatusTracker.slotAboutToPropagate);
-        connect (syncEngine, &SyncEngine.itemCompleted,
-            this, &SyncFileStatusTracker.slotItemCompleted);
-        connect (syncEngine, &SyncEngine.finished, this, &SyncFileStatusTracker.slotSyncFinished);
-        connect (syncEngine, &SyncEngine.started, this, &SyncFileStatusTracker.slotSyncEngineRunningChanged);
-        connect (syncEngine, &SyncEngine.finished, this, &SyncFileStatusTracker.slotSyncEngineRunningChanged);
+    SyncFileStatusTracker.SyncFileStatusTracker (Sync_engine *sync_engine)
+        : _sync_engine (sync_engine) {
+        connect (sync_engine, &Sync_engine.about_to_propagate,
+            this, &SyncFileStatusTracker.slot_about_to_propagate);
+        connect (sync_engine, &Sync_engine.item_completed,
+            this, &SyncFileStatusTracker.slot_item_completed);
+        connect (sync_engine, &Sync_engine.finished, this, &SyncFileStatusTracker.slot_sync_finished);
+        connect (sync_engine, &Sync_engine.started, this, &SyncFileStatusTracker.slot_sync_engine_running_changed);
+        connect (sync_engine, &Sync_engine.finished, this, &SyncFileStatusTracker.slot_sync_engine_running_changed);
     }
     
-    SyncFileStatus SyncFileStatusTracker.fileStatus (string &relativePath) {
-        ASSERT (!relativePath.endsWith (QLatin1Char ('/')));
+    SyncFileStatus SyncFileStatusTracker.file_status (string &relative_path) {
+        ASSERT (!relative_path.ends_with (QLatin1Char ('/')));
     
-        if (relativePath.isEmpty ()) {
+        if (relative_path.is_empty ()) {
             // This is the root sync folder, it doesn't have an entry in the database and won't be walked by csync, so resolve manually.
-            return resolveSyncAndErrorStatus (string (), NotShared);
+            return resolve_sync_and_error_status (string (), Not_shared);
         }
     
-        // The SyncEngine won't notify us at all for CSYNC_FILE_SILENTLY_EXCLUDED
+        // The Sync_engine won't notify us at all for CSYNC_FILE_SILENTLY_EXCLUDED
         // and CSYNC_FILE_EXCLUDE_AND_REMOVE excludes. Even though it's possible
         // that the status of CSYNC_FILE_EXCLUDE_LIST excludes will change if the user
         // update the exclude list at runtime and doing it statically here removes
-        // our ability to notify changes through the fileStatusChanged signal,
+        // our ability to notify changes through the file_status_changed signal,
         // it's an acceptable compromize to treat all exclude types the same.
         // Update : This extra check shouldn't hurt even though silently excluded files
-        // are now available via slotAddSilentlyExcluded ().
-        if (_syncEngine.excludedFiles ().isExcluded (_syncEngine.localPath () + relativePath,
-                _syncEngine.localPath (),
-                _syncEngine.ignoreHiddenFiles ())) {
-            return SyncFileStatus.StatusExcluded;
+        // are now available via slot_add_silently_excluded ().
+        if (_sync_engine.excluded_files ().is_excluded (_sync_engine.local_path () + relative_path,
+                _sync_engine.local_path (),
+                _sync_engine.ignore_hidden_files ())) {
+            return SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
         }
     
-        if (_dirtyPaths.contains (relativePath))
-            return SyncFileStatus.StatusSync;
+        if (_dirty_paths.contains (relative_path))
+            return SyncFileStatus.SyncFileStatusTag.STATUS_SYNC;
     
         // First look it up in the database to know if it's shared
         SyncJournalFileRecord rec;
-        if (_syncEngine.journal ().getFileRecord (relativePath, &rec) && rec.isValid ()) {
-            return resolveSyncAndErrorStatus (relativePath, rec._remotePerm.hasPermission (RemotePermissions.IsShared) ? Shared : NotShared);
+        if (_sync_engine.journal ().get_file_record (relative_path, &rec) && rec.is_valid ()) {
+            return resolve_sync_and_error_status (relative_path, rec._remote_perm.has_permission (RemotePermissions.Is_shared) ? Shared : Not_shared);
         }
     
         // Must be a new file not yet in the database, check if it's syncing or has an error.
-        return resolveSyncAndErrorStatus (relativePath, NotShared, PathUnknown);
+        return resolve_sync_and_error_status (relative_path, Not_shared, Path_unknown);
     }
     
-    void SyncFileStatusTracker.slotPathTouched (string &fileName) {
-        string folderPath = _syncEngine.localPath ();
+    void SyncFileStatusTracker.slot_path_touched (string &file_name) {
+        string folder_path = _sync_engine.local_path ();
     
-        ASSERT (fileName.startsWith (folderPath));
-        string localPath = fileName.mid (folderPath.size ());
-        _dirtyPaths.insert (localPath);
+        ASSERT (file_name.starts_with (folder_path));
+        string local_path = file_name.mid (folder_path.size ());
+        _dirty_paths.insert (local_path);
     
-        emit fileStatusChanged (fileName, SyncFileStatus.StatusSync);
+        emit file_status_changed (file_name, SyncFileStatus.SyncFileStatusTag.STATUS_SYNC);
     }
     
-    void SyncFileStatusTracker.slotAddSilentlyExcluded (string &folderPath) {
-        _syncProblems[folderPath] = SyncFileStatus.StatusExcluded;
-        emit fileStatusChanged (getSystemDestination (folderPath), resolveSyncAndErrorStatus (folderPath, NotShared));
+    void SyncFileStatusTracker.slot_add_silently_excluded (string &folder_path) {
+        _sync_problems[folder_path] = SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
+        emit file_status_changed (get_system_destination (folder_path), resolve_sync_and_error_status (folder_path, Not_shared));
     }
     
-    void SyncFileStatusTracker.incSyncCountAndEmitStatusChanged (string &relativePath, SharedFlag sharedFlag) {
+    void SyncFileStatusTracker.inc_sync_count_and_emit_status_changed (string &relative_path, Shared_flag shared_flag) {
         // Will return 0 (and increase to 1) if the path wasn't in the map yet
-        int count = _syncCount[relativePath]++;
+        int count = _sync_count[relative_path]++;
         if (!count) {
-            SyncFileStatus status = sharedFlag == UnknownShared
-                ? fileStatus (relativePath)
-                : resolveSyncAndErrorStatus (relativePath, sharedFlag);
-            emit fileStatusChanged (getSystemDestination (relativePath), status);
+            SyncFileStatus status = shared_flag == Unknown_shared
+                ? file_status (relative_path)
+                : resolve_sync_and_error_status (relative_path, shared_flag);
+            emit file_status_changed (get_system_destination (relative_path), status);
     
             // We passed from OK to SYNC, increment the parent to keep it marked as
             // SYNC while we propagate ourselves and our own children.
-            ASSERT (!relativePath.endsWith ('/'));
-            int lastSlashIndex = relativePath.lastIndexOf ('/');
-            if (lastSlashIndex != -1)
-                incSyncCountAndEmitStatusChanged (relativePath.left (lastSlashIndex), UnknownShared);
-            else if (!relativePath.isEmpty ())
-                incSyncCountAndEmitStatusChanged (string (), UnknownShared);
+            ASSERT (!relative_path.ends_with ('/'));
+            int last_slash_index = relative_path.last_index_of ('/');
+            if (last_slash_index != -1)
+                inc_sync_count_and_emit_status_changed (relative_path.left (last_slash_index), Unknown_shared);
+            else if (!relative_path.is_empty ())
+                inc_sync_count_and_emit_status_changed (string (), Unknown_shared);
         }
     }
     
-    void SyncFileStatusTracker.decSyncCountAndEmitStatusChanged (string &relativePath, SharedFlag sharedFlag) {
-        int count = --_syncCount[relativePath];
+    void SyncFileStatusTracker.dec_sync_count_and_emit_status_changed (string &relative_path, Shared_flag shared_flag) {
+        int count = --_sync_count[relative_path];
         if (!count) {
             // Remove from the map, same as 0
-            _syncCount.remove (relativePath);
+            _sync_count.remove (relative_path);
     
-            SyncFileStatus status = sharedFlag == UnknownShared
-                ? fileStatus (relativePath)
-                : resolveSyncAndErrorStatus (relativePath, sharedFlag);
-            emit fileStatusChanged (getSystemDestination (relativePath), status);
+            SyncFileStatus status = shared_flag == Unknown_shared
+                ? file_status (relative_path)
+                : resolve_sync_and_error_status (relative_path, shared_flag);
+            emit file_status_changed (get_system_destination (relative_path), status);
     
             // We passed from SYNC to OK, decrement our parent.
-            ASSERT (!relativePath.endsWith ('/'));
-            int lastSlashIndex = relativePath.lastIndexOf ('/');
-            if (lastSlashIndex != -1)
-                decSyncCountAndEmitStatusChanged (relativePath.left (lastSlashIndex), UnknownShared);
-            else if (!relativePath.isEmpty ())
-                decSyncCountAndEmitStatusChanged (string (), UnknownShared);
+            ASSERT (!relative_path.ends_with ('/'));
+            int last_slash_index = relative_path.last_index_of ('/');
+            if (last_slash_index != -1)
+                dec_sync_count_and_emit_status_changed (relative_path.left (last_slash_index), Unknown_shared);
+            else if (!relative_path.is_empty ())
+                dec_sync_count_and_emit_status_changed (string (), Unknown_shared);
         }
     }
     
-    void SyncFileStatusTracker.slotAboutToPropagate (SyncFileItemVector &items) {
-        ASSERT (_syncCount.isEmpty ());
+    void SyncFileStatusTracker.slot_about_to_propagate (Sync_file_item_vector &items) {
+        ASSERT (_sync_count.is_empty ());
     
-        ProblemsMap oldProblems;
-        std.swap (_syncProblems, oldProblems);
+        Problems_map old_problems;
+        std.swap (_sync_problems, old_problems);
     
-        foreach (SyncFileItemPtr &item, items) {
-            qCDebug (lcStatusTracker) << "Investigating" << item.destination () << item._status << item._instruction;
-            _dirtyPaths.remove (item.destination ());
+        foreach (Sync_file_item_ptr &item, items) {
+            q_c_debug (lc_status_tracker) << "Investigating" << item.destination () << item._status << item._instruction;
+            _dirty_paths.remove (item.destination ());
     
-            if (hasErrorStatus (*item)) {
-                _syncProblems[item.destination ()] = SyncFileStatus.StatusError;
-                invalidateParentPaths (item.destination ());
-            } else if (hasExcludedStatus (*item)) {
-                _syncProblems[item.destination ()] = SyncFileStatus.StatusExcluded;
+            if (has_error_status (*item)) {
+                _sync_problems[item.destination ()] = SyncFileStatus.SyncFileStatusTag.STATUS_ERROR;
+                invalidate_parent_paths (item.destination ());
+            } else if (has_excluded_status (*item)) {
+                _sync_problems[item.destination ()] = SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
             }
     
-            SharedFlag sharedFlag = item._remotePerm.hasPermission (RemotePermissions.IsShared) ? Shared : NotShared;
+            Shared_flag shared_flag = item._remote_perm.has_permission (RemotePermissions.Is_shared) ? Shared : Not_shared;
             if (item._instruction != CSYNC_INSTRUCTION_NONE
                 && item._instruction != CSYNC_INSTRUCTION_UPDATE_METADATA
                 && item._instruction != CSYNC_INSTRUCTION_IGNORE
                 && item._instruction != CSYNC_INSTRUCTION_ERROR) {
                 // Mark this path as syncing for instructions that will result in propagation.
-                incSyncCountAndEmitStatusChanged (item.destination (), sharedFlag);
+                inc_sync_count_and_emit_status_changed (item.destination (), shared_flag);
             } else {
-                emit fileStatusChanged (getSystemDestination (item.destination ()), resolveSyncAndErrorStatus (item.destination (), sharedFlag));
+                emit file_status_changed (get_system_destination (item.destination ()), resolve_sync_and_error_status (item.destination (), shared_flag));
             }
         }
     
         // Some metadata status won't trigger files to be synced, make sure that we
         // push the OK status for dirty files that don't need to be propagated.
-        // Swap into a copy since fileStatus () reads _dirtyPaths to determine the status
-        QSet<string> oldDirtyPaths;
-        std.swap (_dirtyPaths, oldDirtyPaths);
-        for (auto &oldDirtyPath : qAsConst (oldDirtyPaths))
-            emit fileStatusChanged (getSystemDestination (oldDirtyPath), fileStatus (oldDirtyPath));
+        // Swap into a copy since file_status () reads _dirty_paths to determine the status
+        QSet<string> old_dirty_paths;
+        std.swap (_dirty_paths, old_dirty_paths);
+        for (auto &old_dirty_path : q_as_const (old_dirty_paths))
+            emit file_status_changed (get_system_destination (old_dirty_path), file_status (old_dirty_path));
     
         // Make sure to push any status that might have been resolved indirectly since the last sync
         // (like an error file being deleted from disk)
-        for (auto &syncProblem : _syncProblems)
-            oldProblems.erase (syncProblem.first);
-        for (auto &oldProblem : oldProblems) {
-            const string &path = oldProblem.first;
-            SyncFileStatus.SyncFileStatusTag severity = oldProblem.second;
-            if (severity == SyncFileStatus.StatusError)
-                invalidateParentPaths (path);
-            emit fileStatusChanged (getSystemDestination (path), fileStatus (path));
+        for (auto &sync_problem : _sync_problems)
+            old_problems.erase (sync_problem.first);
+        for (auto &old_problem : old_problems) {
+            const string &path = old_problem.first;
+            SyncFileStatus.SyncFileStatusTag severity = old_problem.second;
+            if (severity == SyncFileStatus.SyncFileStatusTag.STATUS_ERROR)
+                invalidate_parent_paths (path);
+            emit file_status_changed (get_system_destination (path), file_status (path));
         }
     }
     
-    void SyncFileStatusTracker.slotItemCompleted (SyncFileItemPtr &item) {
-        qCDebug (lcStatusTracker) << "Item completed" << item.destination () << item._status << item._instruction;
+    void SyncFileStatusTracker.slot_item_completed (Sync_file_item_ptr &item) {
+        q_c_debug (lc_status_tracker) << "Item completed" << item.destination () << item._status << item._instruction;
     
-        if (hasErrorStatus (*item)) {
-            _syncProblems[item.destination ()] = SyncFileStatus.StatusError;
-            invalidateParentPaths (item.destination ());
-        } else if (hasExcludedStatus (*item)) {
-            _syncProblems[item.destination ()] = SyncFileStatus.StatusExcluded;
+        if (has_error_status (*item)) {
+            _sync_problems[item.destination ()] = SyncFileStatus.SyncFileStatusTag.STATUS_ERROR;
+            invalidate_parent_paths (item.destination ());
+        } else if (has_excluded_status (*item)) {
+            _sync_problems[item.destination ()] = SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
         } else {
-            _syncProblems.erase (item.destination ());
+            _sync_problems.erase (item.destination ());
         }
     
-        SharedFlag sharedFlag = item._remotePerm.hasPermission (RemotePermissions.IsShared) ? Shared : NotShared;
+        Shared_flag shared_flag = item._remote_perm.has_permission (RemotePermissions.Is_shared) ? Shared : Not_shared;
         if (item._instruction != CSYNC_INSTRUCTION_NONE
             && item._instruction != CSYNC_INSTRUCTION_UPDATE_METADATA
             && item._instruction != CSYNC_INSTRUCTION_IGNORE
             && item._instruction != CSYNC_INSTRUCTION_ERROR) {
-            // decSyncCount calls *must* be symetric with incSyncCount calls in slotAboutToPropagate
-            decSyncCountAndEmitStatusChanged (item.destination (), sharedFlag);
+            // dec_sync_count calls *must* be symetric with inc_sync_count calls in slot_about_to_propagate
+            dec_sync_count_and_emit_status_changed (item.destination (), shared_flag);
         } else {
-            emit fileStatusChanged (getSystemDestination (item.destination ()), resolveSyncAndErrorStatus (item.destination (), sharedFlag));
+            emit file_status_changed (get_system_destination (item.destination ()), resolve_sync_and_error_status (item.destination (), shared_flag));
         }
     }
     
-    void SyncFileStatusTracker.slotSyncFinished () {
+    void SyncFileStatusTracker.slot_sync_finished () {
         // Clear the sync counts to reduce the impact of unsymetrical inc/dec calls (e.g. when directory job abort)
-        QHash<string, int> oldSyncCount;
-        std.swap (_syncCount, oldSyncCount);
-        for (auto it = oldSyncCount.begin (); it != oldSyncCount.end (); ++it) {
-            // Don't announce folders, fileStatus expect only paths without '/', otherwise it asserts
-            if (it.key ().endsWith ('/')) {
+        QHash<string, int> old_sync_count;
+        std.swap (_sync_count, old_sync_count);
+        for (auto it = old_sync_count.begin (); it != old_sync_count.end (); ++it) {
+            // Don't announce folders, file_status expect only paths without '/', otherwise it asserts
+            if (it.key ().ends_with ('/')) {
                 continue;
             }
     
-            emit fileStatusChanged (getSystemDestination (it.key ()), fileStatus (it.key ()));
+            emit file_status_changed (get_system_destination (it.key ()), file_status (it.key ()));
         }
     }
     
-    void SyncFileStatusTracker.slotSyncEngineRunningChanged () {
-        emit fileStatusChanged (getSystemDestination (string ()), resolveSyncAndErrorStatus (string (), NotShared));
+    void SyncFileStatusTracker.slot_sync_engine_running_changed () {
+        emit file_status_changed (get_system_destination (string ()), resolve_sync_and_error_status (string (), Not_shared));
     }
     
-    SyncFileStatus SyncFileStatusTracker.resolveSyncAndErrorStatus (string &relativePath, SharedFlag sharedFlag, PathKnownFlag isPathKnown) {
+    SyncFileStatus SyncFileStatusTracker.resolve_sync_and_error_status (string &relative_path, Shared_flag shared_flag, Path_known_flag is_path_known) {
         // If it's a new file and that we're not syncing it yet,
         // don't show any icon and wait for the filesystem watcher to trigger a sync.
-        SyncFileStatus status (isPathKnown ? SyncFileStatus.StatusUpToDate : SyncFileStatus.StatusNone);
-        if (_syncCount.value (relativePath)) {
-            status.set (SyncFileStatus.StatusSync);
+        SyncFileStatus status (is_path_known ? SyncFileStatus.SyncFileStatusTag.STATUS_UP_TO_DATE : SyncFileStatus.SyncFileStatusTag.STATUS_NONE);
+        if (_sync_count.value (relative_path)) {
+            status.set (SyncFileStatus.SyncFileStatusTag.STATUS_SYNC);
         } else {
             // After a sync finished, we need to show the users issues from that last sync like the activity list does.
             // Also used for parent directories showing a warning for an error child.
-            SyncFileStatus.SyncFileStatusTag problemStatus = lookupProblem (relativePath, _syncProblems);
-            if (problemStatus != SyncFileStatus.StatusNone)
-                status.set (problemStatus);
+            SyncFileStatus.SyncFileStatusTag problem_status = lookup_problem (relative_path, _sync_problems);
+            if (problem_status != SyncFileStatus.SyncFileStatusTag.STATUS_NONE)
+                status.set (problem_status);
         }
     
-        ASSERT (sharedFlag != UnknownShared,
+        ASSERT (shared_flag != Unknown_shared,
             "The shared status needs to have been fetched from a SyncFileItem or the DB at this point.");
-        if (sharedFlag == Shared)
-            status.setShared (true);
+        if (shared_flag == Shared)
+            status.set_shared (true);
     
         return status;
     }
     
-    void SyncFileStatusTracker.invalidateParentPaths (string &path) {
-        QStringList splitPath = path.split ('/', Qt.SkipEmptyParts);
-        for (int i = 0; i < splitPath.size (); ++i) {
-            string parentPath = QStringList (splitPath.mid (0, i)).join (QLatin1String ("/"));
-            emit fileStatusChanged (getSystemDestination (parentPath), fileStatus (parentPath));
+    void SyncFileStatusTracker.invalidate_parent_paths (string &path) {
+        QStringList split_path = path.split ('/', Qt.Skip_empty_parts);
+        for (int i = 0; i < split_path.size (); ++i) {
+            string parent_path = QStringList (split_path.mid (0, i)).join (QLatin1String ("/"));
+            emit file_status_changed (get_system_destination (parent_path), file_status (parent_path));
         }
     }
     
-    string SyncFileStatusTracker.getSystemDestination (string &relativePath) {
-        string systemPath = _syncEngine.localPath () + relativePath;
-        // SyncEngine.localPath () has a trailing slash, make sure to remove it if the
+    string SyncFileStatusTracker.get_system_destination (string &relative_path) {
+        string system_path = _sync_engine.local_path () + relative_path;
+        // Sync_engine.local_path () has a trailing slash, make sure to remove it if the
         // destination is empty.
-        if (systemPath.endsWith (QLatin1Char ('/'))) {
-            systemPath.truncate (systemPath.length () - 1);
+        if (system_path.ends_with (QLatin1Char ('/'))) {
+            system_path.truncate (system_path.length () - 1);
         }
-        return systemPath;
+        return system_path;
     }
     }
     

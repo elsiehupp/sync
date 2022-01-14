@@ -9,7 +9,7 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 
 namespace Occ {
 
-namespace PinStateEnums {
+namespace Pin_state_enums {
 OCSYNC_EXPORT Q_NAMESPACE
 
 /***********************************************************
@@ -126,7 +126,7 @@ enum class VfsItemAvailability {
 };
 Q_ENUM_NS (VfsItemAvailability)
 }
-using namespace PinStateEnums;
+using namespace Pin_state_enums;
 
 }
 

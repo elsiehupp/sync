@@ -37,21 +37,21 @@ the file is still being locked.
 @ingroup gui
 ***********************************************************/
 
-class LockWatcher : GLib.Object {
+class Lock_watcher : GLib.Object {
 public:
-    LockWatcher (GLib.Object *parent = nullptr);
+    Lock_watcher (GLib.Object *parent = nullptr);
 
     /***********************************************************
     Start watching a file.
 
-    If the file is not locked later on, the fileUnlocked signal will be
+    If the file is not locked later on, the file_unlocked signal will be
     emitted once.
     ***********************************************************/
-    void addFile (string &path);
+    void add_file (string &path);
 
     /***********************************************************
     Adjusts the default interval for checking whether the lock is still present */
-    void setCheckInterval (std.chrono.milliseconds interval);
+    void set_check_interval (std.chrono.milliseconds interval);
 
     /***********************************************************
     Whether the path is being watched for lock-changes */
@@ -61,13 +61,13 @@ signals:
     /***********************************************************
     Emitted when one of the watched files is no longer
      being locked. */
-    void fileUnlocked (string &path);
+    void file_unlocked (string &path);
 
 private slots:
-    void checkFiles ();
+    void check_files ();
 
 private:
-    QSet<string> _watchedPaths;
+    QSet<string> _watched_paths;
     QTimer _timer;
 };
 }
@@ -79,39 +79,39 @@ private:
 
 
 
-LockWatcher.LockWatcher (GLib.Object *parent)
+Lock_watcher.Lock_watcher (GLib.Object *parent)
     : GLib.Object (parent) {
     connect (&_timer, &QTimer.timeout,
-        this, &LockWatcher.checkFiles);
+        this, &Lock_watcher.check_files);
     _timer.start (check_frequency);
 }
 
-void LockWatcher.addFile (string &path) {
-    qCInfo (lcLockWatcher) << "Watching for lock of" << path << "being released";
-    _watchedPaths.insert (path);
+void Lock_watcher.add_file (string &path) {
+    q_c_info (lc_lock_watcher) << "Watching for lock of" << path << "being released";
+    _watched_paths.insert (path);
 }
 
-void LockWatcher.setCheckInterval (std.chrono.milliseconds interval) {
+void Lock_watcher.set_check_interval (std.chrono.milliseconds interval) {
     _timer.start (interval.count ());
 }
 
-bool LockWatcher.contains (string &path) {
-    return _watchedPaths.contains (path);
+bool Lock_watcher.contains (string &path) {
+    return _watched_paths.contains (path);
 }
 
-void LockWatcher.checkFiles () {
+void Lock_watcher.check_files () {
     QSet<string> unlocked;
 
-    foreach (string &path, _watchedPaths) {
-        if (!FileSystem.isFileLocked (path)) {
-            qCInfo (lcLockWatcher) << "Lock of" << path << "was released";
-            emit fileUnlocked (path);
+    foreach (string &path, _watched_paths) {
+        if (!FileSystem.is_file_locked (path)) {
+            q_c_info (lc_lock_watcher) << "Lock of" << path << "was released";
+            emit file_unlocked (path);
             unlocked.insert (path);
         }
     }
 
-    // Doing it this way instead of with a QMutableSetIterator
-    // ensures that calling back into addFile from connected
+    // Doing it this way instead of with a QMutable_set_iterator
+    // ensures that calling back into add_file from connected
     // slots isn't a problem.
-    _watchedPaths.subtract (unlocked);
+    _watched_paths.subtract (unlocked);
 }

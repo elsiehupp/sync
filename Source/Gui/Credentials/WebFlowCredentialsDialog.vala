@@ -13,199 +13,199 @@ namespace Occ {
 #ifdef WITH_WEBENGINE
 #endif // WITH_WEBENGINE
 
-class WebFlowCredentialsDialog : Gtk.Dialog {
+class Web_flow_credentials_dialog : Gtk.Dialog {
 public:
-    WebFlowCredentialsDialog (Account *account, bool useFlow2, Gtk.Widget *parent = nullptr);
+    Web_flow_credentials_dialog (Account *account, bool use_flow2, Gtk.Widget *parent = nullptr);
 
-    void setUrl (QUrl &url);
-    void setInfo (string &msg);
-    void setError (string &error);
+    void set_url (QUrl &url);
+    void set_info (string &msg);
+    void set_error (string &error);
 
-    bool isUsingFlow2 () {
-        return _useFlow2;
+    bool is_using_flow2 () {
+        return _use_flow2;
     }
 
 protected:
-    void closeEvent (QCloseEvent * e) override;
-    void changeEvent (QEvent *) override;
+    void close_event (QClose_event * e) override;
+    void change_event (QEvent *) override;
 
 public slots:
-    void slotFlow2AuthResult (Flow2Auth.Result, string &errorString, string &user, string &appPassword);
-    void slotShowSettingsDialog ();
+    void slot_flow2Auth_result (Flow2Auth.Result, string &error_string, string &user, string &app_password);
+    void slot_show_settings_dialog ();
 
 signals:
-    void urlCatched (string user, string pass, string host);
-    void styleChanged ();
-    void onActivate ();
-    void onClose ();
+    void url_catched (string user, string pass, string host);
+    void style_changed ();
+    void on_activate ();
+    void on_close ();
 
 private:
-    void customizeStyle ();
+    void customize_style ();
 
-    bool _useFlow2;
+    bool _use_flow2;
 
-    Flow2AuthWidget *_flow2AuthWidget;
+    Flow2Auth_widget *_flow2Auth_widget;
 #ifdef WITH_WEBENGINE
-    WebView *_webView;
+    Web_view *_web_view;
 #endif // WITH_WEBENGINE
 
-    QLabel *_errorLabel;
-    QLabel *_infoLabel;
+    QLabel *_error_label;
+    QLabel *_info_label;
     QVBoxLayout *_layout;
-    QVBoxLayout *_containerLayout;
-    HeaderBanner *_headerBanner;
+    QVBoxLayout *_container_layout;
+    Header_banner *_header_banner;
 };
 
-WebFlowCredentialsDialog.WebFlowCredentialsDialog (Account *account, bool useFlow2, Gtk.Widget *parent)
+Web_flow_credentials_dialog.Web_flow_credentials_dialog (Account *account, bool use_flow2, Gtk.Widget *parent)
     : Gtk.Dialog (parent)
-    , _useFlow2 (useFlow2)
-    , _flow2AuthWidget (nullptr)
+    , _use_flow2 (use_flow2)
+    , _flow2Auth_widget (nullptr)
 #ifdef WITH_WEBENGINE
-    , _webView (nullptr)
+    , _web_view (nullptr)
 #endif // WITH_WEBENGINE {
-    setWindowFlags (windowFlags () & ~Qt.WindowContextHelpButtonHint);
+    set_window_flags (window_flags () & ~Qt.Window_context_help_button_hint);
 
     _layout = new QVBoxLayout (this);
     int spacing = _layout.spacing ();
     int margin = _layout.margin ();
-    _layout.setSpacing (0);
-    _layout.setMargin (0);
+    _layout.set_spacing (0);
+    _layout.set_margin (0);
 
-    _containerLayout = new QVBoxLayout (this);
-    _containerLayout.setSpacing (spacing);
-    _containerLayout.setMargin (margin);
+    _container_layout = new QVBoxLayout (this);
+    _container_layout.set_spacing (spacing);
+    _container_layout.set_margin (margin);
 
-    _infoLabel = new QLabel ();
-    _infoLabel.setAlignment (Qt.AlignCenter);
-    _containerLayout.addWidget (_infoLabel);
+    _info_label = new QLabel ();
+    _info_label.set_alignment (Qt.AlignCenter);
+    _container_layout.add_widget (_info_label);
 
-    if (_useFlow2) {
-        _flow2AuthWidget = new Flow2AuthWidget ();
-        _containerLayout.addWidget (_flow2AuthWidget);
+    if (_use_flow2) {
+        _flow2Auth_widget = new Flow2Auth_widget ();
+        _container_layout.add_widget (_flow2Auth_widget);
 
-        connect (_flow2AuthWidget, &Flow2AuthWidget.authResult, this, &WebFlowCredentialsDialog.slotFlow2AuthResult);
+        connect (_flow2Auth_widget, &Flow2Auth_widget.auth_result, this, &Web_flow_credentials_dialog.slot_flow2Auth_result);
 
-        // Connect styleChanged events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-        connect (this, &WebFlowCredentialsDialog.styleChanged, _flow2AuthWidget, &Flow2AuthWidget.slotStyleChanged);
+        // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
+        connect (this, &Web_flow_credentials_dialog.style_changed, _flow2Auth_widget, &Flow2Auth_widget.slot_style_changed);
 
         // allow Flow2 page to poll on window activation
-        connect (this, &WebFlowCredentialsDialog.onActivate, _flow2AuthWidget, &Flow2AuthWidget.slotPollNow);
+        connect (this, &Web_flow_credentials_dialog.on_activate, _flow2Auth_widget, &Flow2Auth_widget.slot_poll_now);
 
-        _flow2AuthWidget.startAuth (account);
+        _flow2Auth_widget.start_auth (account);
     } else {
 #ifdef WITH_WEBENGINE
-        _webView = new WebView ();
-        _containerLayout.addWidget (_webView);
+        _web_view = new Web_view ();
+        _container_layout.add_widget (_web_view);
 
-        connect (_webView, &WebView.urlCatched, this, &WebFlowCredentialsDialog.urlCatched);
+        connect (_web_view, &Web_view.url_catched, this, &Web_flow_credentials_dialog.url_catched);
 #endif // WITH_WEBENGINE
     }
 
-    auto app = static_cast<Application> (qApp);
-    connect (app, &Application.isShowingSettingsDialog, this, &WebFlowCredentialsDialog.slotShowSettingsDialog);
+    auto app = static_cast<Application> (q_app);
+    connect (app, &Application.is_showing_settings_dialog, this, &Web_flow_credentials_dialog.slot_show_settings_dialog);
 
-    _errorLabel = new QLabel ();
-    _errorLabel.hide ();
-    _containerLayout.addWidget (_errorLabel);
+    _error_label = new QLabel ();
+    _error_label.hide ();
+    _container_layout.add_widget (_error_label);
 
-    WizardCommon.initErrorLabel (_errorLabel);
+    Wizard_common.init_error_label (_error_label);
 
-    _layout.addLayout (_containerLayout);
-    setLayout (_layout);
+    _layout.add_layout (_container_layout);
+    set_layout (_layout);
 
-    customizeStyle ();
+    customize_style ();
 }
 
-void WebFlowCredentialsDialog.closeEvent (QCloseEvent* e) {
+void Web_flow_credentials_dialog.close_event (QClose_event* e) {
     Q_UNUSED (e)
 
 #ifdef WITH_WEBENGINE
-    if (_webView) {
-        // Force calling WebView.~WebView () earlier so that _profile and _page are
+    if (_web_view) {
+        // Force calling Web_view.~Web_view () earlier so that _profile and _page are
         // deleted in the correct order.
-        _webView.deleteLater ();
-        _webView = nullptr;
+        _web_view.delete_later ();
+        _web_view = nullptr;
     }
 #endif // WITH_WEBENGINE
 
-    if (_flow2AuthWidget) {
-        _flow2AuthWidget.resetAuth ();
-        _flow2AuthWidget.deleteLater ();
-        _flow2AuthWidget = nullptr;
+    if (_flow2Auth_widget) {
+        _flow2Auth_widget.reset_auth ();
+        _flow2Auth_widget.delete_later ();
+        _flow2Auth_widget = nullptr;
     }
 
-    emit onClose ();
+    emit on_close ();
 }
 
-void WebFlowCredentialsDialog.setUrl (QUrl &url) {
+void Web_flow_credentials_dialog.set_url (QUrl &url) {
 #ifdef WITH_WEBENGINE
-    if (_webView)
-        _webView.setUrl (url);
+    if (_web_view)
+        _web_view.set_url (url);
 #else // WITH_WEBENGINE
     Q_UNUSED (url);
 #endif // WITH_WEBENGINE
 }
 
-void WebFlowCredentialsDialog.setInfo (string &msg) {
-    _infoLabel.setText (msg);
+void Web_flow_credentials_dialog.set_info (string &msg) {
+    _info_label.set_text (msg);
 }
 
-void WebFlowCredentialsDialog.setError (string &error) {
+void Web_flow_credentials_dialog.set_error (string &error) {
     // bring window to top
-    slotShowSettingsDialog ();
+    slot_show_settings_dialog ();
 
-    if (_useFlow2 && _flow2AuthWidget) {
-        _flow2AuthWidget.setError (error);
+    if (_use_flow2 && _flow2Auth_widget) {
+        _flow2Auth_widget.set_error (error);
         return;
     }
 
-    if (error.isEmpty ()) {
-        _errorLabel.hide ();
+    if (error.is_empty ()) {
+        _error_label.hide ();
     } else {
-        _errorLabel.setText (error);
-        _errorLabel.show ();
+        _error_label.set_text (error);
+        _error_label.show ();
     }
 }
 
-void WebFlowCredentialsDialog.changeEvent (QEvent *e) {
+void Web_flow_credentials_dialog.change_event (QEvent *e) {
     switch (e.type ()) {
-    case QEvent.StyleChange:
-    case QEvent.PaletteChange:
-    case QEvent.ThemeChange:
-        customizeStyle ();
+    case QEvent.Style_change:
+    case QEvent.Palette_change:
+    case QEvent.Theme_change:
+        customize_style ();
 
         // Notify the other widgets (Dark-/Light-Mode switching)
-        emit styleChanged ();
+        emit style_changed ();
         break;
-    case QEvent.ActivationChange:
-        if (isActiveWindow ())
-            emit onActivate ();
+    case QEvent.Activation_change:
+        if (is_active_window ())
+            emit on_activate ();
         break;
     default:
         break;
     }
 
-    Gtk.Dialog.changeEvent (e);
+    Gtk.Dialog.change_event (e);
 }
 
-void WebFlowCredentialsDialog.customizeStyle () {
+void Web_flow_credentials_dialog.customize_style () {
     // HINT : Customize dialog's own style here, if necessary in the future (Dark-/Light-Mode switching)
 }
 
-void WebFlowCredentialsDialog.slotShowSettingsDialog () {
-    // bring window to top but slightly delay, to avoid being hidden behind the SettingsDialog
-    QTimer.singleShot (100, this, [this] {
-        OwncloudGui.raiseDialog (this);
+void Web_flow_credentials_dialog.slot_show_settings_dialog () {
+    // bring window to top but slightly delay, to avoid being hidden behind the Settings_dialog
+    QTimer.single_shot (100, this, [this] {
+        OwncloudGui.raise_dialog (this);
     });
 }
 
-void WebFlowCredentialsDialog.slotFlow2AuthResult (Flow2Auth.Result r, string &errorString, string &user, string &appPassword) {
-    Q_UNUSED (errorString)
+void Web_flow_credentials_dialog.slot_flow2Auth_result (Flow2Auth.Result r, string &error_string, string &user, string &app_password) {
+    Q_UNUSED (error_string)
     if (r == Flow2Auth.LoggedIn) {
-        emit urlCatched (user, appPassword, string ());
+        emit url_catched (user, app_password, string ());
     } else {
         // bring window to top
-        slotShowSettingsDialog ();
+        slot_show_settings_dialog ();
     }
 }
 

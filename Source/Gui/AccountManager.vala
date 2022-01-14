@@ -18,19 +18,19 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 namespace Occ {
     
 namespace {
-    static const char urlC[] = "url";
-    static const char authTypeC[] = "authType";
-    static const char userC[] = "user";
-    static const char httpUserC[] = "http_user";
-    static const char davUserC[] = "dav_user";
-    static const char caCertsKeyC[] = "CaCertificates";
-    static const char accountsC[] = "Accounts";
-    static const char versionC[] = "version";
-    static const char serverVersionC[] = "serverVersion";
+    static const char url_c[] = "url";
+    static const char auth_type_c[] = "auth_type";
+    static const char user_c[] = "user";
+    static const char http_user_c[] = "http_user";
+    static const char dav_user_c[] = "dav_user";
+    static const char ca_certs_key_c[] = "CaCertificates";
+    static const char accounts_c[] = "Accounts";
+    static const char version_c[] = "version";
+    static const char server_version_c[] = "server_version";
     
     // The maximum versions that this client can read
-    static const int maxAccountsVersion = 2;
-    static const int maxAccountVersion = 1;
+    static const int max_accounts_version = 2;
+    static const int max_account_version = 1;
     }
 
 /***********************************************************
@@ -38,14 +38,14 @@ namespace {
    @ingroup gui
 ***********************************************************/
 class AccountManager : GLib.Object {
-public:
-    static AccountManager *instance ();
-    ~AccountManager () override = default;
+
+    public static AccountManager *instance ();
+    public ~AccountManager () override = default;
 
     /***********************************************************
     Saves the accounts to a given settings file
     ***********************************************************/
-    void save (bool saveCredentials = true);
+    public void save (bool save_credentials = true);
 
     /***********************************************************
     Creates account objects from a given settings file.
@@ -53,80 +53,80 @@ public:
     Returns false if there was an error reading the settings,
     but note that settings not existing is not an error.
     ***********************************************************/
-    bool restore ();
+    public bool restore ();
 
     /***********************************************************
     Add this account in the list of saved accounts.
     Typically called from the wizard
     ***********************************************************/
-    AccountState *addAccount (AccountPtr &newAccount);
+    public AccountState *add_account (AccountPtr &new_account);
 
     /***********************************************************
     remove all accounts
     ***********************************************************/
-    void shutdown ();
+    public void shutdown ();
 
     /***********************************************************
     Return a list of all accounts.
     (this is a list of QSharedPointer for internal reasons, one should normally not keep a copy of them)
     ***********************************************************/
-    QList<AccountStatePtr> accounts ();
+    public QList<AccountStatePtr> accounts ();
 
     /***********************************************************
     Return the account state pointer for an account identified by its display name
     ***********************************************************/
-    AccountStatePtr account (string &name);
+    public AccountStatePtr account (string &name);
 
     /***********************************************************
     Delete the AccountState
     ***********************************************************/
-    void deleteAccount (AccountState *account);
+    public void delete_account (AccountState *account);
 
     /***********************************************************
     Creates an account and sets up some basic handlers.
     Does *not* add the account to the account manager just yet.
     ***********************************************************/
-    static AccountPtr createAccount ();
+    public static AccountPtr create_account ();
 
     /***********************************************************
     Returns the list of settings keys that can't be read because
     they are from the future.
     ***********************************************************/
-    static void backwardMigrationSettingsKeys (QStringList *deleteKeys, QStringList *ignoreKeys);
+    public static void backward_migration_settings_keys (QStringList *delete_keys, QStringList *ignore_keys);
 
 private:
     // saving and loading Account to settings
-    void saveAccountHelper (Account *account, QSettings &settings, bool saveCredentials = true);
-    AccountPtr loadAccountHelper (QSettings &settings);
+    void save_account_helper (Account *account, QSettings &settings, bool save_credentials = true);
+    AccountPtr load_account_helper (QSettings &settings);
 
-    bool restoreFromLegacySettings ();
+    bool restore_from_legacy_settings ();
 
-    bool isAccountIdAvailable (string &id) const;
-    string generateFreeAccountId ();
+    bool is_account_id_available (string &id) const;
+    string generate_free_account_id ();
 
-    // Adds an account to the tracked list, emitting accountAdded ()
-    void addAccountState (AccountState *accountState);
+    // Adds an account to the tracked list, emitting account_added ()
+    void add_account_state (AccountState *account_state);
 
     AccountManager () = default;
     QList<AccountStatePtr> _accounts;
     /// Account ids from settings that weren't read
-    QSet<string> _additionalBlockedAccountIds;
+    QSet<string> _additional_blocked_account_ids;
 
 public slots:
     /// Saves account data, not including the credentials
-    void saveAccount (Account *a);
+    void save_account (Account *a);
 
     /// Saves account state data, not including the account
-    void saveAccountState (AccountState *a);
+    void save_account_state (AccountState *a);
 
     /// Display a Box with the mnemonic so the user can copy it to a safe place.
-    static void displayMnemonic (string& mnemonic);
+    static void display_mnemonic (string& mnemonic);
 
 signals:
-    void accountAdded (AccountState *account);
-    void accountRemoved (AccountState *account);
-    void accountSyncConnectionRemoved (AccountState *account);
-    void removeAccountFolders (AccountState *account);
+    void account_added (AccountState *account);
+    void account_removed (AccountState *account);
+    void account_sync_connection_removed (AccountState *account);
+    void remove_account_folders (AccountState *account);
 };
 
     
@@ -137,301 +137,301 @@ signals:
     }
     
     bool AccountManager.restore () {
-        QStringList skipSettingsKeys;
-        backwardMigrationSettingsKeys (&skipSettingsKeys, &skipSettingsKeys);
+        QStringList skip_settings_keys;
+        backward_migration_settings_keys (&skip_settings_keys, &skip_settings_keys);
     
-        auto settings = ConfigFile.settingsWithGroup (QLatin1String (accountsC));
-        if (settings.status () != QSettings.NoError || !settings.isWritable ()) {
-            qCWarning (lcAccountManager) << "Could not read settings from" << settings.fileName ()
+        auto settings = ConfigFile.settings_with_group (QLatin1String (accounts_c));
+        if (settings.status () != QSettings.NoError || !settings.is_writable ()) {
+            q_c_warning (lc_account_manager) << "Could not read settings from" << settings.file_name ()
                                         << settings.status ();
             return false;
         }
     
-        if (skipSettingsKeys.contains (settings.group ())) {
+        if (skip_settings_keys.contains (settings.group ())) {
             // Should not happen : bad container keys should have been deleted
-            qCWarning (lcAccountManager) << "Accounts structure is too new, ignoring";
+            q_c_warning (lc_account_manager) << "Accounts structure is too new, ignoring";
             return true;
         }
     
         // If there are no accounts, check the old format.
-        if (settings.childGroups ().isEmpty ()
-            && !settings.contains (QLatin1String (versionC))) {
-            restoreFromLegacySettings ();
+        if (settings.child_groups ().is_empty ()
+            && !settings.contains (QLatin1String (version_c))) {
+            restore_from_legacy_settings ();
             return true;
         }
     
-        for (auto &accountId : settings.childGroups ()) {
-            settings.beginGroup (accountId);
-            if (!skipSettingsKeys.contains (settings.group ())) {
-                if (auto acc = loadAccountHelper (*settings)) {
-                    acc._id = accountId;
-                    if (auto accState = AccountState.loadFromSettings (acc, *settings)) {
-                        auto jar = qobject_cast<CookieJar> (acc._am.cookieJar ());
+        for (auto &account_id : settings.child_groups ()) {
+            settings.begin_group (account_id);
+            if (!skip_settings_keys.contains (settings.group ())) {
+                if (auto acc = load_account_helper (*settings)) {
+                    acc._id = account_id;
+                    if (auto acc_state = AccountState.load_from_settings (acc, *settings)) {
+                        auto jar = qobject_cast<CookieJar> (acc._am.cookie_jar ());
                         ASSERT (jar);
                         if (jar)
-                            jar.restore (acc.cookieJarPath ());
-                        addAccountState (accState);
+                            jar.restore (acc.cookie_jar_path ());
+                        add_account_state (acc_state);
                     }
                 }
             } else {
-                qCInfo (lcAccountManager) << "Account" << accountId << "is too new, ignoring";
-                _additionalBlockedAccountIds.insert (accountId);
+                q_c_info (lc_account_manager) << "Account" << account_id << "is too new, ignoring";
+                _additional_blocked_account_ids.insert (account_id);
             }
-            settings.endGroup ();
+            settings.end_group ();
         }
     
         return true;
     }
     
-    void AccountManager.backwardMigrationSettingsKeys (QStringList *deleteKeys, QStringList *ignoreKeys) {
-        auto settings = ConfigFile.settingsWithGroup (QLatin1String (accountsC));
-        const int accountsVersion = settings.value (QLatin1String (versionC)).toInt ();
-        if (accountsVersion <= maxAccountsVersion) {
-            foreach (auto &accountId, settings.childGroups ()) {
-                settings.beginGroup (accountId);
-                const int accountVersion = settings.value (QLatin1String (versionC), 1).toInt ();
-                if (accountVersion > maxAccountVersion) {
-                    ignoreKeys.append (settings.group ());
+    void AccountManager.backward_migration_settings_keys (QStringList *delete_keys, QStringList *ignore_keys) {
+        auto settings = ConfigFile.settings_with_group (QLatin1String (accounts_c));
+        const int accounts_version = settings.value (QLatin1String (version_c)).to_int ();
+        if (accounts_version <= max_accounts_version) {
+            foreach (auto &account_id, settings.child_groups ()) {
+                settings.begin_group (account_id);
+                const int account_version = settings.value (QLatin1String (version_c), 1).to_int ();
+                if (account_version > max_account_version) {
+                    ignore_keys.append (settings.group ());
                 }
-                settings.endGroup ();
+                settings.end_group ();
             }
         } else {
-            deleteKeys.append (settings.group ());
+            delete_keys.append (settings.group ());
         }
     }
     
-    bool AccountManager.restoreFromLegacySettings () {
-        qCInfo (lcAccountManager) << "Migrate : restoreFromLegacySettings, checking settings group"
-                                 << Theme.instance ().appName ();
+    bool AccountManager.restore_from_legacy_settings () {
+        q_c_info (lc_account_manager) << "Migrate : restore_from_legacy_settings, checking settings group"
+                                 << Theme.instance ().app_name ();
     
         // try to open the correctly themed settings
-        auto settings = ConfigFile.settingsWithGroup (Theme.instance ().appName ());
+        auto settings = ConfigFile.settings_with_group (Theme.instance ().app_name ());
     
-        // if the settings file could not be opened, the childKeys list is empty
+        // if the settings file could not be opened, the child_keys list is empty
         // then try to load settings from a very old place
-        if (settings.childKeys ().isEmpty ()) {
-            // Now try to open the original ownCloud settings to see if they exist.
-            string oCCfgFile = QDir.fromNativeSeparators (settings.fileName ());
-            // replace the last two segments with ownCloud/owncloud.cfg
-            oCCfgFile = oCCfgFile.left (oCCfgFile.lastIndexOf ('/'));
-            oCCfgFile = oCCfgFile.left (oCCfgFile.lastIndexOf ('/'));
-            oCCfgFile += QLatin1String ("/ownCloud/owncloud.cfg");
+        if (settings.child_keys ().is_empty ()) {
+            // Now try to open the original own_cloud settings to see if they exist.
+            string o_c_cfg_file = QDir.from_native_separators (settings.file_name ());
+            // replace the last two segments with own_cloud/owncloud.cfg
+            o_c_cfg_file = o_c_cfg_file.left (o_c_cfg_file.last_index_of ('/'));
+            o_c_cfg_file = o_c_cfg_file.left (o_c_cfg_file.last_index_of ('/'));
+            o_c_cfg_file += QLatin1String ("/own_cloud/owncloud.cfg");
     
-            qCInfo (lcAccountManager) << "Migrate : checking old config " << oCCfgFile;
+            q_c_info (lc_account_manager) << "Migrate : checking old config " << o_c_cfg_file;
     
-            QFileInfo fi (oCCfgFile);
-            if (fi.isReadable ()) {
-                std.unique_ptr<QSettings> oCSettings (new QSettings (oCCfgFile, QSettings.IniFormat));
-                oCSettings.beginGroup (QLatin1String ("ownCloud"));
+            QFileInfo fi (o_c_cfg_file);
+            if (fi.is_readable ()) {
+                std.unique_ptr<QSettings> o_c_settings (new QSettings (o_c_cfg_file, QSettings.IniFormat));
+                o_c_settings.begin_group (QLatin1String ("own_cloud"));
     
-                // Check the theme url to see if it is the same url that the oC config was for
-                string overrideUrl = Theme.instance ().overrideServerUrl ();
-                if (!overrideUrl.isEmpty ()) {
-                    if (overrideUrl.endsWith ('/')) {
-                        overrideUrl.chop (1);
+                // Check the theme url to see if it is the same url that the o_c config was for
+                string override_url = Theme.instance ().override_server_url ();
+                if (!override_url.is_empty ()) {
+                    if (override_url.ends_with ('/')) {
+                        override_url.chop (1);
                     }
-                    string oCUrl = oCSettings.value (QLatin1String (urlC)).toString ();
-                    if (oCUrl.endsWith ('/')) {
-                        oCUrl.chop (1);
+                    string o_c_url = o_c_settings.value (QLatin1String (url_c)).to_string ();
+                    if (o_c_url.ends_with ('/')) {
+                        o_c_url.chop (1);
                     }
     
                     // in case the urls are equal reset the settings object to read from
-                    // the ownCloud settings object
-                    qCInfo (lcAccountManager) << "Migrate oC config if " << oCUrl << " == " << overrideUrl << ":"
-                                             << (oCUrl == overrideUrl ? "Yes" : "No");
-                    if (oCUrl == overrideUrl) {
-                        settings = std.move (oCSettings);
+                    // the own_cloud settings object
+                    q_c_info (lc_account_manager) << "Migrate o_c config if " << o_c_url << " == " << override_url << ":"
+                                             << (o_c_url == override_url ? "Yes" : "No");
+                    if (o_c_url == override_url) {
+                        settings = std.move (o_c_settings);
                     }
                 }
             }
         }
     
         // Try to load the single account.
-        if (!settings.childKeys ().isEmpty ()) {
-            if (auto acc = loadAccountHelper (*settings)) {
-                addAccount (acc);
+        if (!settings.child_keys ().is_empty ()) {
+            if (auto acc = load_account_helper (*settings)) {
+                add_account (acc);
                 return true;
             }
         }
         return false;
     }
     
-    void AccountManager.save (bool saveCredentials) {
-        auto settings = ConfigFile.settingsWithGroup (QLatin1String (accountsC));
-        settings.setValue (QLatin1String (versionC), maxAccountsVersion);
-        for (auto &acc : qAsConst (_accounts)) {
-            settings.beginGroup (acc.account ().id ());
-            saveAccountHelper (acc.account ().data (), *settings, saveCredentials);
-            acc.writeToSettings (*settings);
-            settings.endGroup ();
+    void AccountManager.save (bool save_credentials) {
+        auto settings = ConfigFile.settings_with_group (QLatin1String (accounts_c));
+        settings.set_value (QLatin1String (version_c), max_accounts_version);
+        for (auto &acc : q_as_const (_accounts)) {
+            settings.begin_group (acc.account ().id ());
+            save_account_helper (acc.account ().data (), *settings, save_credentials);
+            acc.write_to_settings (*settings);
+            settings.end_group ();
         }
     
         settings.sync ();
-        qCInfo (lcAccountManager) << "Saved all account settings, status:" << settings.status ();
+        q_c_info (lc_account_manager) << "Saved all account settings, status:" << settings.status ();
     }
     
-    void AccountManager.saveAccount (Account *a) {
-        qCDebug (lcAccountManager) << "Saving account" << a.url ().toString ();
-        auto settings = ConfigFile.settingsWithGroup (QLatin1String (accountsC));
-        settings.beginGroup (a.id ());
-        saveAccountHelper (a, *settings, false); // don't save credentials they might not have been loaded yet
-        settings.endGroup ();
+    void AccountManager.save_account (Account *a) {
+        q_c_debug (lc_account_manager) << "Saving account" << a.url ().to_string ();
+        auto settings = ConfigFile.settings_with_group (QLatin1String (accounts_c));
+        settings.begin_group (a.id ());
+        save_account_helper (a, *settings, false); // don't save credentials they might not have been loaded yet
+        settings.end_group ();
     
         settings.sync ();
-        qCDebug (lcAccountManager) << "Saved account settings, status:" << settings.status ();
+        q_c_debug (lc_account_manager) << "Saved account settings, status:" << settings.status ();
     }
     
-    void AccountManager.saveAccountState (AccountState *a) {
-        qCDebug (lcAccountManager) << "Saving account state" << a.account ().url ().toString ();
-        auto settings = ConfigFile.settingsWithGroup (QLatin1String (accountsC));
-        settings.beginGroup (a.account ().id ());
-        a.writeToSettings (*settings);
-        settings.endGroup ();
+    void AccountManager.save_account_state (AccountState *a) {
+        q_c_debug (lc_account_manager) << "Saving account state" << a.account ().url ().to_string ();
+        auto settings = ConfigFile.settings_with_group (QLatin1String (accounts_c));
+        settings.begin_group (a.account ().id ());
+        a.write_to_settings (*settings);
+        settings.end_group ();
     
         settings.sync ();
-        qCDebug (lcAccountManager) << "Saved account state settings, status:" << settings.status ();
+        q_c_debug (lc_account_manager) << "Saved account state settings, status:" << settings.status ();
     }
     
-    void AccountManager.saveAccountHelper (Account *acc, QSettings &settings, bool saveCredentials) {
-        settings.setValue (QLatin1String (versionC), maxAccountVersion);
-        settings.setValue (QLatin1String (urlC), acc._url.toString ());
-        settings.setValue (QLatin1String (davUserC), acc._davUser);
-        settings.setValue (QLatin1String (serverVersionC), acc._serverVersion);
+    void AccountManager.save_account_helper (Account *acc, QSettings &settings, bool save_credentials) {
+        settings.set_value (QLatin1String (version_c), max_account_version);
+        settings.set_value (QLatin1String (url_c), acc._url.to_string ());
+        settings.set_value (QLatin1String (dav_user_c), acc._dav_user);
+        settings.set_value (QLatin1String (server_version_c), acc._server_version);
         if (acc._credentials) {
-            if (saveCredentials) {
+            if (save_credentials) {
                 // Only persist the credentials if the parameter is set, on migration from 1.8.x
                 // we want to save the accounts but not overwrite the credentials
                 // (This is easier than asynchronously fetching the credentials from keychain and then
                 // re-persisting them)
                 acc._credentials.persist ();
             }
-            for (auto &key : acc._settingsMap.keys ()) {
-                settings.setValue (key, acc._settingsMap.value (key));
+            for (auto &key : acc._settings_map.keys ()) {
+                settings.set_value (key, acc._settings_map.value (key));
             }
-            settings.setValue (QLatin1String (authTypeC), acc._credentials.authType ());
+            settings.set_value (QLatin1String (auth_type_c), acc._credentials.auth_type ());
     
             // HACK : Save http_user also as user
-            if (acc._settingsMap.contains (httpUserC))
-                settings.setValue (userC, acc._settingsMap.value (httpUserC));
+            if (acc._settings_map.contains (http_user_c))
+                settings.set_value (user_c, acc._settings_map.value (http_user_c));
         }
     
         // Save accepted certificates.
-        settings.beginGroup (QLatin1String ("General"));
-        qCInfo (lcAccountManager) << "Saving " << acc.approvedCerts ().count () << " unknown certs.";
+        settings.begin_group (QLatin1String ("General"));
+        q_c_info (lc_account_manager) << "Saving " << acc.approved_certs ().count () << " unknown certs.";
         QByteArray certs;
-        for (auto &cert : acc.approvedCerts ()) {
-            certs += cert.toPem () + '\n';
+        for (auto &cert : acc.approved_certs ()) {
+            certs += cert.to_pem () + '\n';
         }
-        if (!certs.isEmpty ()) {
-            settings.setValue (QLatin1String (caCertsKeyC), certs);
+        if (!certs.is_empty ()) {
+            settings.set_value (QLatin1String (ca_certs_key_c), certs);
         }
-        settings.endGroup ();
+        settings.end_group ();
     
         // Save cookies.
         if (acc._am) {
-            auto *jar = qobject_cast<CookieJar> (acc._am.cookieJar ());
+            auto *jar = qobject_cast<CookieJar> (acc._am.cookie_jar ());
             if (jar) {
-                qCInfo (lcAccountManager) << "Saving cookies." << acc.cookieJarPath ();
-                if (!jar.save (acc.cookieJarPath ())) {
-                    qCWarning (lcAccountManager) << "Failed to save cookies to" << acc.cookieJarPath ();
+                q_c_info (lc_account_manager) << "Saving cookies." << acc.cookie_jar_path ();
+                if (!jar.save (acc.cookie_jar_path ())) {
+                    q_c_warning (lc_account_manager) << "Failed to save cookies to" << acc.cookie_jar_path ();
                 }
             }
         }
     }
     
-    AccountPtr AccountManager.loadAccountHelper (QSettings &settings) {
-        auto urlConfig = settings.value (QLatin1String (urlC));
-        if (!urlConfig.isValid ()) {
+    AccountPtr AccountManager.load_account_helper (QSettings &settings) {
+        auto url_config = settings.value (QLatin1String (url_c));
+        if (!url_config.is_valid ()) {
             // No URL probably means a corrupted entry in the account settings
-            qCWarning (lcAccountManager) << "No URL for account " << settings.group ();
+            q_c_warning (lc_account_manager) << "No URL for account " << settings.group ();
             return AccountPtr ();
         }
     
-        auto acc = createAccount ();
+        auto acc = create_account ();
     
-        string authType = settings.value (QLatin1String (authTypeC)).toString ();
+        string auth_type = settings.value (QLatin1String (auth_type_c)).to_string ();
     
         // There was an account-type saving bug when 'skip folder config' was used
-        // See #5408. This attempts to fix up the "dummy" authType
-        if (authType == QLatin1String ("dummy")) {
+        // See #5408. This attempts to fix up the "dummy" auth_type
+        if (auth_type == QLatin1String ("dummy")) {
             if (settings.contains (QLatin1String ("http_user"))) {
-                authType = "http";
+                auth_type = "http";
             } else if (settings.contains (QLatin1String ("shibboleth_shib_user"))) {
-                authType = "shibboleth";
+                auth_type = "shibboleth";
             }
         }
     
-        string overrideUrl = Theme.instance ().overrideServerUrl ();
-        string forceAuth = Theme.instance ().forceConfigAuthType ();
-        if (!forceAuth.isEmpty () && !overrideUrl.isEmpty ()) {
-            // If forceAuth is set, this might also mean the overrideURL has changed.
+        string override_url = Theme.instance ().override_server_url ();
+        string force_auth = Theme.instance ().force_config_auth_type ();
+        if (!force_auth.is_empty () && !override_url.is_empty ()) {
+            // If force_auth is set, this might also mean the override_uRL has changed.
             // See enterprise issues #1126
-            acc.setUrl (overrideUrl);
-            authType = forceAuth;
+            acc.set_url (override_url);
+            auth_type = force_auth;
         } else {
-            acc.setUrl (urlConfig.toUrl ());
+            acc.set_url (url_config.to_url ());
         }
     
         // Migrate to webflow
-        if (authType == QLatin1String ("http")) {
-            authType = "webflow";
-            settings.setValue (QLatin1String (authTypeC), authType);
+        if (auth_type == QLatin1String ("http")) {
+            auth_type = "webflow";
+            settings.set_value (QLatin1String (auth_type_c), auth_type);
     
-            for (string &key : settings.childKeys ()) {
-                if (!key.startsWith ("http_"))
+            for (string &key : settings.child_keys ()) {
+                if (!key.starts_with ("http_"))
                     continue;
-                auto newkey = string.fromLatin1 ("webflow_").append (key.mid (5));
-                settings.setValue (newkey, settings.value ( (key)));
+                auto newkey = string.from_latin1 ("webflow_").append (key.mid (5));
+                settings.set_value (newkey, settings.value ( (key)));
                 settings.remove (key);
             }
         }
     
-        qCInfo (lcAccountManager) << "Account for" << acc.url () << "using auth type" << authType;
+        q_c_info (lc_account_manager) << "Account for" << acc.url () << "using auth type" << auth_type;
     
-        acc._serverVersion = settings.value (QLatin1String (serverVersionC)).toString ();
-        acc._davUser = settings.value (QLatin1String (davUserC), "").toString ();
+        acc._server_version = settings.value (QLatin1String (server_version_c)).to_string ();
+        acc._dav_user = settings.value (QLatin1String (dav_user_c), "").to_string ();
     
         // We want to only restore settings for that auth type and the user value
-        acc._settingsMap.insert (QLatin1String (userC), settings.value (userC));
-        string authTypePrefix = authType + "_";
-        for (auto &key : settings.childKeys ()) {
-            if (!key.startsWith (authTypePrefix))
+        acc._settings_map.insert (QLatin1String (user_c), settings.value (user_c));
+        string auth_type_prefix = auth_type + "_";
+        for (auto &key : settings.child_keys ()) {
+            if (!key.starts_with (auth_type_prefix))
                 continue;
-            acc._settingsMap.insert (key, settings.value (key));
+            acc._settings_map.insert (key, settings.value (key));
         }
     
-        acc.setCredentials (CredentialsFactory.create (authType));
+        acc.set_credentials (CredentialsFactory.create (auth_type));
     
         // now the server cert, it is in the general group
-        settings.beginGroup (QLatin1String ("General"));
-        const auto certs = QSslCertificate.fromData (settings.value (caCertsKeyC).toByteArray ());
-        qCInfo (lcAccountManager) << "Restored : " << certs.count () << " unknown certs.";
-        acc.setApprovedCerts (certs);
-        settings.endGroup ();
+        settings.begin_group (QLatin1String ("General"));
+        const auto certs = QSslCertificate.from_data (settings.value (ca_certs_key_c).to_byte_array ());
+        q_c_info (lc_account_manager) << "Restored : " << certs.count () << " unknown certs.";
+        acc.set_approved_certs (certs);
+        settings.end_group ();
     
         return acc;
     }
     
     AccountStatePtr AccountManager.account (string &name) {
         const auto it = std.find_if (_accounts.cbegin (), _accounts.cend (), [name] (auto &acc) {
-            return acc.account ().displayName () == name;
+            return acc.account ().display_name () == name;
         });
         return it != _accounts.cend () ? *it : AccountStatePtr ();
     }
     
-    AccountState *AccountManager.addAccount (AccountPtr &newAccount) {
-        auto id = newAccount.id ();
-        if (id.isEmpty () || !isAccountIdAvailable (id)) {
-            id = generateFreeAccountId ();
+    AccountState *AccountManager.add_account (AccountPtr &new_account) {
+        auto id = new_account.id ();
+        if (id.is_empty () || !is_account_id_available (id)) {
+            id = generate_free_account_id ();
         }
-        newAccount._id = id;
+        new_account._id = id;
     
-        auto newAccountState = new AccountState (newAccount);
-        addAccountState (newAccountState);
-        return newAccountState;
+        auto new_account_state = new AccountState (new_account);
+        add_account_state (new_account_state);
+        return new_account_state;
     }
     
-    void AccountManager.deleteAccount (AccountState *account) {
+    void AccountManager.delete_account (AccountState *account) {
         auto it = std.find (_accounts.begin (), _accounts.end (), account);
         if (it == _accounts.end ()) {
             return;
@@ -440,52 +440,52 @@ signals:
         _accounts.erase (it);
     
         // Forget account credentials, cookies
-        account.account ().credentials ().forgetSensitiveData ();
-        QFile.remove (account.account ().cookieJarPath ());
+        account.account ().credentials ().forget_sensitive_data ();
+        QFile.remove (account.account ().cookie_jar_path ());
     
-        auto settings = ConfigFile.settingsWithGroup (QLatin1String (accountsC));
+        auto settings = ConfigFile.settings_with_group (QLatin1String (accounts_c));
         settings.remove (account.account ().id ());
     
         // Forget E2E keys
-        account.account ().e2e ().forgetSensitiveData (account.account ());
+        account.account ().e2e ().forget_sensitive_data (account.account ());
     
-        account.account ().deleteAppToken ();
+        account.account ().delete_app_token ();
     
-        emit accountSyncConnectionRemoved (account);
-        emit accountRemoved (account);
+        emit account_sync_connection_removed (account);
+        emit account_removed (account);
     }
     
-    AccountPtr AccountManager.createAccount () {
+    AccountPtr AccountManager.create_account () {
         AccountPtr acc = Account.create ();
-        acc.setSslErrorHandler (new SslDialogErrorHandler);
-        connect (acc.data (), &Account.proxyAuthenticationRequired,
-            ProxyAuthHandler.instance (), &ProxyAuthHandler.handleProxyAuthenticationRequired);
+        acc.set_ssl_error_handler (new SslDialogErrorHandler);
+        connect (acc.data (), &Account.proxy_authentication_required,
+            ProxyAuthHandler.instance (), &ProxyAuthHandler.handle_proxy_authentication_required);
     
         return acc;
     }
     
-    void AccountManager.displayMnemonic (string& mnemonic) {
+    void AccountManager.display_mnemonic (string& mnemonic) {
         auto *widget = new Gtk.Dialog;
         Ui_Dialog ui;
-        ui.setupUi (widget);
-        widget.setWindowTitle (tr ("End to end encryption mnemonic"));
-        ui.label.setText (tr ("To protect your Cryptographic Identity, we encrypt it with a mnemonic of 12 dictionary words. "
+        ui.setup_ui (widget);
+        widget.set_window_title (tr ("End to end encryption mnemonic"));
+        ui.label.set_text (tr ("To protect your Cryptographic Identity, we encrypt it with a mnemonic of 12 dictionary words. "
                              "Please note these down and keep them safe. "
                              "They will be needed to add other devices to your account (like your mobile phone or laptop)."));
-        ui.textEdit.setText (mnemonic);
-        ui.textEdit.focusWidget ();
-        ui.textEdit.selectAll ();
-        ui.textEdit.setAlignment (Qt.AlignCenter);
+        ui.text_edit.set_text (mnemonic);
+        ui.text_edit.focus_widget ();
+        ui.text_edit.select_all ();
+        ui.text_edit.set_alignment (Qt.AlignCenter);
         widget.exec ();
-        widget.resize (widget.sizeHint ());
+        widget.resize (widget.size_hint ());
     }
     
     void AccountManager.shutdown () {
-        const auto accountsCopy = _accounts;
+        const auto accounts_copy = _accounts;
         _accounts.clear ();
-        for (auto &acc : accountsCopy) {
-            emit accountRemoved (acc.data ());
-            emit removeAccountFolders (acc.data ());
+        for (auto &acc : accounts_copy) {
+            emit account_removed (acc.data ());
+            emit remove_account_folders (acc.data ());
         }
     }
     
@@ -493,8 +493,8 @@ signals:
          return _accounts;
     }
     
-    bool AccountManager.isAccountIdAvailable (string &id) {
-        if (_additionalBlockedAccountIds.contains (id))
+    bool AccountManager.is_account_id_available (string &id) {
+        if (_additional_blocked_account_ids.contains (id))
             return false;
     
         return std.none_of (_accounts.cbegin (), _accounts.cend (), [id] (auto &acc) {
@@ -502,25 +502,25 @@ signals:
         });
     }
     
-    string AccountManager.generateFreeAccountId () {
+    string AccountManager.generate_free_account_id () {
         int i = 0;
         forever {
             string id = string.number (i);
-            if (isAccountIdAvailable (id)) {
+            if (is_account_id_available (id)) {
                 return id;
             }
             ++i;
         }
     }
     
-    void AccountManager.addAccountState (AccountState *accountState) {
-        GLib.Object.connect (accountState.account ().data (),
-            &Account.wantsAccountSaved,
-            this, &AccountManager.saveAccount);
+    void AccountManager.add_account_state (AccountState *account_state) {
+        GLib.Object.connect (account_state.account ().data (),
+            &Account.wants_account_saved,
+            this, &AccountManager.save_account);
     
-        AccountStatePtr ptr (accountState);
+        AccountStatePtr ptr (account_state);
         _accounts << ptr;
-        emit accountAdded (accountState);
+        emit account_added (account_state);
     }
     }
     

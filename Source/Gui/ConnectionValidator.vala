@@ -23,9 +23,9 @@ namespace Occ {
 
 /***********************************************************
 This is a job-like class to check that the server is up and that we are connected.
-There are two entry points : checkServerAndAuth and checkAuthentication
-checkAuthentication is the quick version that only does the propfind
-while checkServerAndAuth is doing the 4 calls.
+There are two entry points : check_server_and_auth and check_authentication
+check_authentication is the quick version that only does the propfind
+while check_server_and_auth is doing the 4 calls.
 
 We cannot use the capabilites call to test the l
 https://github.com/owncloud/core/issues/12930
@@ -33,46 +33,46 @@ https://github.com/owncloud/core/issues/12930
 Here follows the state machine
 
 \code{.unparsed}
-*--. checkServerAndAuth  (check status.php)
+*--. check_server_and_auth  (check status.php)
         Will asynchronously check for system proxy (if using system proxy)
-        And then invoke slotCheckServerAndAuth
+        And then invoke slot_check_server_and_auth
         CheckServerJob
         |
-        +. slotNoStatusFound -. X
+        +. slot_no_status_found -. X
         |
-        +. slotJobTimeout -. X
+        +. slot_job_timeout -. X
         |
-        +. slotStatusFound --+-. X (if credentials are still missing)
+        +. slot_status_found --+-. X (if credentials are still missing)
                               |
   +---------------------------+
   |
-*-+. checkAuthentication (PROPFIND on root)
+*-+. check_authentication (PROPFIND on root)
         PropfindJob
         |
-        +. slotAuthFailed -. X
+        +. slot_auth_failed -. X
         |
-        +. slotAuthSuccess --+-. X (depending if coming from checkServerAndAuth or not)
+        +. slot_auth_success --+-. X (depending if coming from check_server_and_auth or not)
                               |
   +---------------------------+
   |
-  +. checkServerCapabilities --------------v (in parallel)
+  +. check_server_capabilities --------------v (in parallel)
         JsonApiJob (cloud/capabilities)
-        +. slotCapabilitiesRecieved -+
+        +. slot_capabilities_recieved -+
                                       |
     +---------------------------------+
     |
-  fetchUser
+  fetch_user
         Utilizes the UserInfo class to fetch the user and avatar image
   +-----------------------------------+
   |
-  +. Client Side Encryption Checks --+ --reportResult ()
+  +. Client Side Encryption Checks --+ --report_result ()
     \endcode
 ***********************************************************/
 
 
 class ConnectionValidator : GLib.Object {
 public:
-    ConnectionValidator (AccountStatePtr accountState, GLib.Object *parent = nullptr);
+    ConnectionValidator (AccountStatePtr account_state, GLib.Object *parent = nullptr);
 
     enum Status {
         Undefined,
@@ -94,310 +94,310 @@ public:
 
 public slots:
     /// Checks the server and the authentication.
-    void checkServerAndAuth ();
-    void systemProxyLookupDone (QNetworkProxy &proxy);
+    void check_server_and_auth ();
+    void system_proxy_lookup_done (QNetworkProxy &proxy);
 
     /// Checks authentication only.
-    void checkAuthentication ();
+    void check_authentication ();
 
 signals:
-    void connectionResult (ConnectionValidator.Status status, QStringList &errors);
+    void connection_result (ConnectionValidator.Status status, QStringList &errors);
 
 protected slots:
-    void slotCheckServerAndAuth ();
+    void slot_check_server_and_auth ();
 
-    void slotStatusFound (QUrl &url, QJsonObject &info);
-    void slotNoStatusFound (QNetworkReply *reply);
-    void slotJobTimeout (QUrl &url);
+    void slot_status_found (QUrl &url, QJsonObject &info);
+    void slot_no_status_found (QNetworkReply *reply);
+    void slot_job_timeout (QUrl &url);
 
-    void slotAuthFailed (QNetworkReply *reply);
-    void slotAuthSuccess ();
+    void slot_auth_failed (QNetworkReply *reply);
+    void slot_auth_success ();
 
-    void slotCapabilitiesRecieved (QJsonDocument &);
-    void slotUserFetched (UserInfo *userInfo);
+    void slot_capabilities_recieved (QJsonDocument &);
+    void slot_user_fetched (UserInfo *user_info);
 
 private:
 #ifndef TOKEN_AUTH_ONLY
-    void reportConnected ();
+    void report_connected ();
 #endif
-    void reportResult (Status status);
-    void checkServerCapabilities ();
-    void fetchUser ();
+    void report_result (Status status);
+    void check_server_capabilities ();
+    void fetch_user ();
 
     /***********************************************************
     Sets the account's server version
 
     Returns false and reports ServerVersionMismatch for very old servers.
     ***********************************************************/
-    bool setAndCheckServerVersion (string &version);
+    bool set_and_check_server_version (string &version);
 
     QStringList _errors;
-    AccountStatePtr _accountState;
+    AccountStatePtr _account_state;
     AccountPtr _account;
-    bool _isCheckingServerAndAuth;
+    bool _is_checking_server_and_auth;
 };
 
     // Make sure the timeout for this job is less than how often we get called
     // This makes sure we get tried often enough without "ConnectionValidator already running"
-    static int64 timeoutToUseMsec = qMax (1000, ConnectionValidator.DefaultCallingIntervalMsec - 5 * 1000);
+    static int64 timeout_to_use_msec = q_max (1000, ConnectionValidator.DefaultCallingIntervalMsec - 5 * 1000);
     
-    ConnectionValidator.ConnectionValidator (AccountStatePtr accountState, GLib.Object *parent)
+    ConnectionValidator.ConnectionValidator (AccountStatePtr account_state, GLib.Object *parent)
         : GLib.Object (parent)
-        , _accountState (accountState)
-        , _account (accountState.account ())
-        , _isCheckingServerAndAuth (false) {
+        , _account_state (account_state)
+        , _account (account_state.account ())
+        , _is_checking_server_and_auth (false) {
     }
     
-    void ConnectionValidator.checkServerAndAuth () {
+    void ConnectionValidator.check_server_and_auth () {
         if (!_account) {
             _errors << tr ("No Nextcloud account configured");
-            reportResult (NotConfigured);
+            report_result (NotConfigured);
             return;
         }
-        qCDebug (lcConnectionValidator) << "Checking server and authentication";
+        q_c_debug (lc_connection_validator) << "Checking server and authentication";
     
-        _isCheckingServerAndAuth = true;
+        _is_checking_server_and_auth = true;
     
         // Lookup system proxy in a thread https://github.com/owncloud/client/issues/2993
-        if (ClientProxy.isUsingSystemDefault ()) {
-            qCDebug (lcConnectionValidator) << "Trying to look up system proxy";
-            ClientProxy.lookupSystemProxyAsync (_account.url (),
-                this, SLOT (systemProxyLookupDone (QNetworkProxy)));
+        if (ClientProxy.is_using_system_default ()) {
+            q_c_debug (lc_connection_validator) << "Trying to look up system proxy";
+            ClientProxy.lookup_system_proxy_async (_account.url (),
+                this, SLOT (system_proxy_lookup_done (QNetworkProxy)));
         } else {
             // We want to reset the QNAM proxy so that the global proxy settings are used (via ClientProxy settings)
-            _account.networkAccessManager ().setProxy (QNetworkProxy (QNetworkProxy.DefaultProxy));
+            _account.network_access_manager ().set_proxy (QNetworkProxy (QNetworkProxy.DefaultProxy));
             // use a queued invocation so we're as asynchronous as with the other code path
-            QMetaObject.invokeMethod (this, "slotCheckServerAndAuth", Qt.QueuedConnection);
+            QMetaObject.invoke_method (this, "slot_check_server_and_auth", Qt.QueuedConnection);
         }
     }
     
-    void ConnectionValidator.systemProxyLookupDone (QNetworkProxy &proxy) {
+    void ConnectionValidator.system_proxy_lookup_done (QNetworkProxy &proxy) {
         if (!_account) {
-            qCWarning (lcConnectionValidator) << "Bailing out, Account had been deleted";
+            q_c_warning (lc_connection_validator) << "Bailing out, Account had been deleted";
             return;
         }
     
         if (proxy.type () != QNetworkProxy.NoProxy) {
-            qCInfo (lcConnectionValidator) << "Setting QNAM proxy to be system proxy" << ClientProxy.printQNetworkProxy (proxy);
+            q_c_info (lc_connection_validator) << "Setting QNAM proxy to be system proxy" << ClientProxy.print_q_network_proxy (proxy);
         } else {
-            qCInfo (lcConnectionValidator) << "No system proxy set by OS";
+            q_c_info (lc_connection_validator) << "No system proxy set by OS";
         }
-        _account.networkAccessManager ().setProxy (proxy);
+        _account.network_access_manager ().set_proxy (proxy);
     
-        slotCheckServerAndAuth ();
+        slot_check_server_and_auth ();
     }
     
     // The actual check
-    void ConnectionValidator.slotCheckServerAndAuth () {
-        auto *checkJob = new CheckServerJob (_account, this);
-        checkJob.setTimeout (timeoutToUseMsec);
-        checkJob.setIgnoreCredentialFailure (true);
-        connect (checkJob, &CheckServerJob.instanceFound, this, &ConnectionValidator.slotStatusFound);
-        connect (checkJob, &CheckServerJob.instanceNotFound, this, &ConnectionValidator.slotNoStatusFound);
-        connect (checkJob, &CheckServerJob.timeout, this, &ConnectionValidator.slotJobTimeout);
-        checkJob.start ();
+    void ConnectionValidator.slot_check_server_and_auth () {
+        auto *check_job = new CheckServerJob (_account, this);
+        check_job.set_timeout (timeout_to_use_msec);
+        check_job.set_ignore_credential_failure (true);
+        connect (check_job, &CheckServerJob.instance_found, this, &ConnectionValidator.slot_status_found);
+        connect (check_job, &CheckServerJob.instance_not_found, this, &ConnectionValidator.slot_no_status_found);
+        connect (check_job, &CheckServerJob.timeout, this, &ConnectionValidator.slot_job_timeout);
+        check_job.start ();
     }
     
-    void ConnectionValidator.slotStatusFound (QUrl &url, QJsonObject &info) {
+    void ConnectionValidator.slot_status_found (QUrl &url, QJsonObject &info) {
         // Newer servers don't disclose any version in status.php anymore
         // https://github.com/owncloud/core/pull/27473/files
         // so this string can be empty.
-        string serverVersion = CheckServerJob.version (info);
+        string server_version = CheckServerJob.version (info);
     
         // status.php was found.
-        qCInfo (lcConnectionValidator) << "** Application : ownCloud found : "
+        q_c_info (lc_connection_validator) << "** Application : own_cloud found : "
                                       << url << " with version "
-                                      << CheckServerJob.versionString (info)
-                                      << " (" << serverVersion << ")";
+                                      << CheckServerJob.version_string (info)
+                                      << " (" << server_version << ")";
     
         // Update server url in case of redirection
         if (_account.url () != url) {
-            qCInfo (lcConnectionValidator ()) << "status.php was redirected to" << url.toString ();
-            _account.setUrl (url);
-            _account.wantsAccountSaved (_account.data ());
+            q_c_info (lc_connection_validator ()) << "status.php was redirected to" << url.to_string ();
+            _account.set_url (url);
+            _account.wants_account_saved (_account.data ());
         }
     
-        if (!serverVersion.isEmpty () && !setAndCheckServerVersion (serverVersion)) {
+        if (!server_version.is_empty () && !set_and_check_server_version (server_version)) {
             return;
         }
     
         // Check for maintenance mode : Servers send "true", so go through QVariant
         // to parse it correctly.
-        if (info["maintenance"].toVariant ().toBool ()) {
-            reportResult (MaintenanceMode);
+        if (info["maintenance"].to_variant ().to_bool ()) {
+            report_result (MaintenanceMode);
             return;
         }
     
         // now check the authentication
-        QTimer.singleShot (0, this, &ConnectionValidator.checkAuthentication);
+        QTimer.single_shot (0, this, &ConnectionValidator.check_authentication);
     }
     
     // status.php could not be loaded (network or server issue!).
-    void ConnectionValidator.slotNoStatusFound (QNetworkReply *reply) {
+    void ConnectionValidator.slot_no_status_found (QNetworkReply *reply) {
         auto job = qobject_cast<CheckServerJob> (sender ());
-        qCWarning (lcConnectionValidator) << reply.error () << job.errorString () << reply.peek (1024);
+        q_c_warning (lc_connection_validator) << reply.error () << job.error_string () << reply.peek (1024);
         if (reply.error () == QNetworkReply.SslHandshakeFailedError) {
-            reportResult (SslError);
+            report_result (SslError);
             return;
         }
     
-        if (!_account.credentials ().stillValid (reply)) {
+        if (!_account.credentials ().still_valid (reply)) {
             // Note : Why would this happen on a status.php request?
             _errors.append (tr ("Authentication error : Either username or password are wrong."));
         } else {
-            //_errors.append (tr ("Unable to connect to %1").arg (_account.url ().toString ()));
-            _errors.append (job.errorString ());
+            //_errors.append (tr ("Unable to connect to %1").arg (_account.url ().to_string ()));
+            _errors.append (job.error_string ());
         }
-        reportResult (StatusNotFound);
+        report_result (StatusNotFound);
     }
     
-    void ConnectionValidator.slotJobTimeout (QUrl &url) {
+    void ConnectionValidator.slot_job_timeout (QUrl &url) {
         Q_UNUSED (url);
-        //_errors.append (tr ("Unable to connect to %1").arg (url.toString ()));
+        //_errors.append (tr ("Unable to connect to %1").arg (url.to_string ()));
         _errors.append (tr ("Timeout"));
-        reportResult (Timeout);
+        report_result (Timeout);
     }
     
-    void ConnectionValidator.checkAuthentication () {
+    void ConnectionValidator.check_authentication () {
         AbstractCredentials *creds = _account.credentials ();
     
         if (!creds.ready ()) {
-            reportResult (CredentialsNotReady);
+            report_result (CredentialsNotReady);
             return;
         }
     
         // simply GET the webdav root, will fail if credentials are wrong.
-        // continue in slotAuthCheck here :-)
-        qCDebug (lcConnectionValidator) << "# Check whether authenticated propfind works.";
+        // continue in slot_auth_check here :-)
+        q_c_debug (lc_connection_validator) << "# Check whether authenticated propfind works.";
         auto *job = new PropfindJob (_account, "/", this);
-        job.setTimeout (timeoutToUseMsec);
-        job.setProperties (QList<QByteArray> () << "getlastmodified");
-        connect (job, &PropfindJob.result, this, &ConnectionValidator.slotAuthSuccess);
-        connect (job, &PropfindJob.finishedWithError, this, &ConnectionValidator.slotAuthFailed);
+        job.set_timeout (timeout_to_use_msec);
+        job.set_properties (QList<QByteArray> () << "getlastmodified");
+        connect (job, &PropfindJob.result, this, &ConnectionValidator.slot_auth_success);
+        connect (job, &PropfindJob.finished_with_error, this, &ConnectionValidator.slot_auth_failed);
         job.start ();
     }
     
-    void ConnectionValidator.slotAuthFailed (QNetworkReply *reply) {
+    void ConnectionValidator.slot_auth_failed (QNetworkReply *reply) {
         auto job = qobject_cast<PropfindJob> (sender ());
         Status stat = Timeout;
     
         if (reply.error () == QNetworkReply.SslHandshakeFailedError) {
-            _errors << job.errorStringParsingBody ();
+            _errors << job.error_string_parsing_body ();
             stat = SslError;
     
         } else if (reply.error () == QNetworkReply.AuthenticationRequiredError
-            || !_account.credentials ().stillValid (reply)) {
-            qCWarning (lcConnectionValidator) << "******** Password is wrong!" << reply.error () << job.errorString ();
+            || !_account.credentials ().still_valid (reply)) {
+            q_c_warning (lc_connection_validator) << "******** Password is wrong!" << reply.error () << job.error_string ();
             _errors << tr ("The provided credentials are not correct");
             stat = CredentialsWrong;
     
         } else if (reply.error () != QNetworkReply.NoError) {
-            _errors << job.errorStringParsingBody ();
+            _errors << job.error_string_parsing_body ();
     
-            const int httpStatus =
-                reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).toInt ();
-            if (httpStatus == 503) {
+            const int http_status =
+                reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+            if (http_status == 503) {
                 _errors.clear ();
                 stat = ServiceUnavailable;
             }
         }
     
-        reportResult (stat);
+        report_result (stat);
     }
     
-    void ConnectionValidator.slotAuthSuccess () {
+    void ConnectionValidator.slot_auth_success () {
         _errors.clear ();
-        if (!_isCheckingServerAndAuth) {
-            reportResult (Connected);
+        if (!_is_checking_server_and_auth) {
+            report_result (Connected);
             return;
         }
-        checkServerCapabilities ();
+        check_server_capabilities ();
     }
     
-    void ConnectionValidator.checkServerCapabilities () {
+    void ConnectionValidator.check_server_capabilities () {
         // The main flow now needs the capabilities
         auto *job = new JsonApiJob (_account, QLatin1String ("ocs/v1.php/cloud/capabilities"), this);
-        job.setTimeout (timeoutToUseMsec);
-        GLib.Object.connect (job, &JsonApiJob.jsonReceived, this, &ConnectionValidator.slotCapabilitiesRecieved);
+        job.set_timeout (timeout_to_use_msec);
+        GLib.Object.connect (job, &JsonApiJob.json_received, this, &ConnectionValidator.slot_capabilities_recieved);
         job.start ();
     }
     
-    void ConnectionValidator.slotCapabilitiesRecieved (QJsonDocument &json) {
-        auto caps = json.object ().value ("ocs").toObject ().value ("data").toObject ().value ("capabilities").toObject ();
-        qCInfo (lcConnectionValidator) << "Server capabilities" << caps;
-        _account.setCapabilities (caps.toVariantMap ());
+    void ConnectionValidator.slot_capabilities_recieved (QJsonDocument &json) {
+        auto caps = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
+        q_c_info (lc_connection_validator) << "Server capabilities" << caps;
+        _account.set_capabilities (caps.to_variant_map ());
     
         // New servers also report the version in the capabilities
-        string serverVersion = caps["core"].toObject ()["status"].toObject ()["version"].toString ();
-        if (!serverVersion.isEmpty () && !setAndCheckServerVersion (serverVersion)) {
+        string server_version = caps["core"].to_object ()["status"].to_object ()["version"].to_string ();
+        if (!server_version.is_empty () && !set_and_check_server_version (server_version)) {
             return;
         }
     
-        // Check for the directEditing capability
-        QUrl directEditingURL = QUrl (caps["files"].toObject ()["directEditing"].toObject ()["url"].toString ());
-        string directEditingETag = caps["files"].toObject ()["directEditing"].toObject ()["etag"].toString ();
-        _account.fetchDirectEditors (directEditingURL, directEditingETag);
+        // Check for the direct_editing capability
+        QUrl direct_editing_uRL = QUrl (caps["files"].to_object ()["direct_editing"].to_object ()["url"].to_string ());
+        string direct_editing_e_tag = caps["files"].to_object ()["direct_editing"].to_object ()["etag"].to_string ();
+        _account.fetch_direct_editors (direct_editing_uRL, direct_editing_e_tag);
     
-        fetchUser ();
+        fetch_user ();
     }
     
-    void ConnectionValidator.fetchUser () {
-        auto *userInfo = new UserInfo (_accountState.data (), true, true, this);
-        GLib.Object.connect (userInfo, &UserInfo.fetchedLastInfo, this, &ConnectionValidator.slotUserFetched);
-        userInfo.setActive (true);
+    void ConnectionValidator.fetch_user () {
+        auto *user_info = new UserInfo (_account_state.data (), true, true, this);
+        GLib.Object.connect (user_info, &UserInfo.fetched_last_info, this, &ConnectionValidator.slot_user_fetched);
+        user_info.set_active (true);
     }
     
-    bool ConnectionValidator.setAndCheckServerVersion (string &version) {
-        qCInfo (lcConnectionValidator) << _account.url () << "has server version" << version;
-        _account.setServerVersion (version);
+    bool ConnectionValidator.set_and_check_server_version (string &version) {
+        q_c_info (lc_connection_validator) << _account.url () << "has server version" << version;
+        _account.set_server_version (version);
     
         // We cannot deal with servers < 7.0.0
-        if (_account.serverVersionInt ()
-            && _account.serverVersionInt () < Account.makeServerVersion (7, 0, 0)) {
+        if (_account.server_version_int ()
+            && _account.server_version_int () < Account.make_server_version (7, 0, 0)) {
             _errors.append (tr ("The configured server for this client is too old"));
             _errors.append (tr ("Please update to the latest server and restart the client."));
-            reportResult (ServerVersionMismatch);
+            report_result (ServerVersionMismatch);
             return false;
         }
         // We attempt to work with servers >= 7.0.0 but warn users.
-        // Check usages of Account.serverVersionUnsupported () for details.
+        // Check usages of Account.server_version_unsupported () for details.
     
     #if QT_VERSION >= QT_VERSION_CHECK (5, 9, 0)
         // Record that the server supports HTTP/2
-        // Actual decision if we should use HTTP/2 is done in AccessManager.createRequest
+        // Actual decision if we should use HTTP/2 is done in AccessManager.create_request
         if (auto job = qobject_cast<AbstractNetworkJob> (sender ())) {
             if (auto reply = job.reply ()) {
-                _account.setHttp2Supported (
-                    reply.attribute (QNetworkRequest.HTTP2WasUsedAttribute).toBool ());
+                _account.set_http2Supported (
+                    reply.attribute (QNetworkRequest.HTTP2WasUsedAttribute).to_bool ());
             }
         }
     #endif
         return true;
     }
     
-    void ConnectionValidator.slotUserFetched (UserInfo *userInfo) {
-        if (userInfo) {
-            userInfo.setActive (false);
-            userInfo.deleteLater ();
+    void ConnectionValidator.slot_user_fetched (UserInfo *user_info) {
+        if (user_info) {
+            user_info.set_active (false);
+            user_info.delete_later ();
         }
     
     #ifndef TOKEN_AUTH_ONLY
-        connect (_account.e2e (), &ClientSideEncryption.initializationFinished, this, &ConnectionValidator.reportConnected);
+        connect (_account.e2e (), &ClientSideEncryption.initialization_finished, this, &ConnectionValidator.report_connected);
         _account.e2e ().initialize (_account);
     #else
-        reportResult (Connected);
+        report_result (Connected);
     #endif
     }
     
     #ifndef TOKEN_AUTH_ONLY
-    void ConnectionValidator.reportConnected () {
-        reportResult (Connected);
+    void ConnectionValidator.report_connected () {
+        report_result (Connected);
     }
     #endif
     
-    void ConnectionValidator.reportResult (Status status) {
-        emit connectionResult (status, _errors);
-        deleteLater ();
+    void ConnectionValidator.report_result (Status status) {
+        emit connection_result (status, _errors);
+        delete_later ();
     }
     
     } // namespace Occ

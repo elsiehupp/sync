@@ -10,8 +10,8 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 // #include <QNetworkProxy>
 // #include <QAuthenticator>
 // #include <QSslConfiguration>
-// #include <QNetworkCookie>
-// #include <QNetworkCookieJar>
+// #include <QNetwork_cookie>
+// #include <QNetwork_cookie_jar>
 // #include <QNetworkConfiguration>
 // #include <QUuid>
 
@@ -27,12 +27,12 @@ namespace Occ {
 class AccessManager : QNetworkAccessManager {
 
 public:
-    static QByteArray generateRequestId ();
+    static QByteArray generate_request_id ();
 
     AccessManager (GLib.Object *parent = nullptr);
 
 protected:
-    QNetworkReply *createRequest (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *outgoingData = nullptr) override;
+    QNetworkReply *create_request (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *outgoing_data = nullptr) override;
 };
 
     AccessManager.AccessManager (GLib.Object *parent)
@@ -40,50 +40,50 @@ protected:
     
     #ifndef Q_OS_LINUX
         // Atempt to workaround for https://github.com/owncloud/client/issues/3969
-        setConfiguration (QNetworkConfiguration ());
+        set_configuration (QNetworkConfiguration ());
     #endif
-        setCookieJar (new CookieJar);
+        set_cookie_jar (new CookieJar);
     }
     
-    QByteArray AccessManager.generateRequestId () {
-        return QUuid.createUuid ().toByteArray (QUuid.WithoutBraces);
+    QByteArray AccessManager.generate_request_id () {
+        return QUuid.create_uuid ().to_byte_array (QUuid.Without_braces);
     }
     
-    QNetworkReply *AccessManager.createRequest (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *outgoingData) {
-        QNetworkRequest newRequest (request);
+    QNetworkReply *AccessManager.create_request (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *outgoing_data) {
+        QNetworkRequest new_request (request);
     
         // Respect request specific user agent if any
-        if (!newRequest.header (QNetworkRequest.UserAgentHeader).isValid ()) {
-            newRequest.setHeader (QNetworkRequest.UserAgentHeader, Utility.userAgentString ());
+        if (!new_request.header (QNetworkRequest.UserAgentHeader).is_valid ()) {
+            new_request.set_header (QNetworkRequest.UserAgentHeader, Utility.user_agent_string ());
         }
     
         // Some firewalls reject requests that have a "User-Agent" but no "Accept" header
-        newRequest.setRawHeader (QByteArray ("Accept"), "*/*");
+        new_request.set_raw_header (QByteArray ("Accept"), "*/*");
     
-        QByteArray verb = newRequest.attribute (QNetworkRequest.CustomVerbAttribute).toByteArray ();
-        // For PROPFIND (assumed to be a WebDAV op), set xml/utf8 as content type/encoding
+        QByteArray verb = new_request.attribute (QNetworkRequest.Custom_verb_attribute).to_byte_array ();
+        // For PROPFIND (assumed to be a Web_dAV op), set xml/utf8 as content type/encoding
         // This needs extension
         if (verb == "PROPFIND") {
-            newRequest.setHeader (QNetworkRequest.ContentTypeHeader, QLatin1String ("text/xml; charset=utf-8"));
+            new_request.set_header (QNetworkRequest.ContentTypeHeader, QLatin1String ("text/xml; charset=utf-8"));
         }
     
         // Generate a new request id
-        QByteArray requestId = generateRequestId ();
-        qInfo (lcAccessManager) << op << verb << newRequest.url ().toString () << "has X-Request-ID" << requestId;
-        newRequest.setRawHeader ("X-Request-ID", requestId);
+        QByteArray request_id = generate_request_id ();
+        q_info (lc_access_manager) << op << verb << new_request.url ().to_string () << "has X-Request-ID" << request_id;
+        new_request.set_raw_header ("X-Request-ID", request_id);
     
     #if QT_VERSION >= QT_VERSION_CHECK (5, 9, 4)
         // only enable HTTP2 with Qt 5.9.4 because old Qt have too many bugs (e.g. QTBUG-64359 is fixed in >= Qt 5.9.4)
-        if (newRequest.url ().scheme () == "https") { // Not for "http" : QTBUG-61397
+        if (new_request.url ().scheme () == "https") { // Not for "http" : QTBUG-61397
             // http2 seems to cause issues, as with our recommended server setup we don't support http2, disable it by default for now
-            static const bool http2EnabledEnv = qEnvironmentVariableIntValue ("OWNCLOUD_HTTP2_ENABLED") == 1;
+            static const bool http2Enabled_env = q_environment_variable_int_value ("OWNCLOUD_HTTP2_ENABLED") == 1;
     
-            newRequest.setAttribute (QNetworkRequest.HTTP2AllowedAttribute, http2EnabledEnv);
+            new_request.set_attribute (QNetworkRequest.HTTP2Allowed_attribute, http2Enabled_env);
         }
     #endif
     
-        const auto reply = QNetworkAccessManager.createRequest (op, newRequest, outgoingData);
-        HttpLogger.logRequest (reply, op, outgoingData);
+        const auto reply = QNetworkAccessManager.create_request (op, new_request, outgoing_data);
+        Http_logger.log_request (reply, op, outgoing_data);
         return reply;
     }
     

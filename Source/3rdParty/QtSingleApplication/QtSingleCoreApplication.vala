@@ -16,20 +16,20 @@ version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 namespace SharedTools {
 
 
-class QtSingleCoreApplication : QCoreApplication {
+class Qt_singleCoreApplication : QCoreApplication {
 
-    public QtSingleCoreApplication (int &argc, char **argv);
-    public QtSingleCoreApplication (string &id, int &argc, char **argv);
+    public Qt_singleCoreApplication (int &argc, char **argv);
+    public Qt_singleCoreApplication (string &id, int &argc, char **argv);
 
-    public bool isRunning ();
+    public bool is_running ();
     public string id ();
-    public void setBlock (bool value);
+    public void set_block (bool value);
 
 public slots:
-    bool sendMessage (string &message, int timeout = 5000);
+    bool send_message (string &message, int timeout = 5000);
 
 signals:
-    void messageReceived (string &message);
+    void message_received (string &message);
 
 private:
     QtLocalPeer* peer;
@@ -64,32 +64,32 @@ version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 
 namespace SharedTools {
 
-    QtSingleCoreApplication.QtSingleCoreApplication (int &argc, char **argv)
+    Qt_singleCoreApplication.Qt_singleCoreApplication (int &argc, char **argv)
         : QCoreApplication (argc, argv) {
         peer = new QtLocalPeer (this);
         block = false;
-        connect (peer, &QtLocalPeer.messageReceived, this, &QtSingleCoreApplication.messageReceived);
+        connect (peer, &QtLocalPeer.message_received, this, &Qt_singleCoreApplication.message_received);
     }
     
-    QtSingleCoreApplication.QtSingleCoreApplication (string &appId, int &argc, char **argv)
+    Qt_singleCoreApplication.Qt_singleCoreApplication (string &app_id, int &argc, char **argv)
         : QCoreApplication (argc, argv) {
-        peer = new QtLocalPeer (this, appId);
-        connect (peer, &QtLocalPeer.messageReceived, this, &QtSingleCoreApplication.messageReceived);
+        peer = new QtLocalPeer (this, app_id);
+        connect (peer, &QtLocalPeer.message_received, this, &Qt_singleCoreApplication.message_received);
     }
     
-    bool QtSingleCoreApplication.isRunning () {
-        return peer.isClient ();
+    bool Qt_singleCoreApplication.is_running () {
+        return peer.is_client ();
     }
     
-    bool QtSingleCoreApplication.sendMessage (string &message, int timeout) {
-        return peer.sendMessage (message, timeout, block);
+    bool Qt_singleCoreApplication.send_message (string &message, int timeout) {
+        return peer.send_message (message, timeout, block);
     }
     
-    string QtSingleCoreApplication.id () {
-        return peer.applicationId ();
+    string Qt_singleCoreApplication.id () {
+        return peer.application_id ();
     }
     
-    void QtSingleCoreApplication.setBlock (bool value) {
+    void Qt_singleCoreApplication.set_block (bool value) {
         block = value;
     }
     

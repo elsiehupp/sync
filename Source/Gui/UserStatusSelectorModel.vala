@@ -23,7 +23,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 // #include <GLib.Object>
 // #include <QMetaType>
-// #include <QtNumeric>
+// #include <Qt_numeric>
 
 // #include <cstddef>
 // #include <memory>
@@ -31,350 +31,350 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 namespace Occ {
 
-class UserStatusSelectorModel : GLib.Object {
+class User_status_selector_model : GLib.Object {
 
-    Q_PROPERTY (string userStatusMessage READ userStatusMessage NOTIFY userStatusChanged)
-    Q_PROPERTY (string userStatusEmoji READ userStatusEmoji WRITE setUserStatusEmoji NOTIFY userStatusChanged)
-    Q_PROPERTY (Occ.UserStatus.OnlineStatus onlineStatus READ onlineStatus WRITE setOnlineStatus NOTIFY onlineStatusChanged)
-    Q_PROPERTY (int predefinedStatusesCount READ predefinedStatusesCount NOTIFY predefinedStatusesChanged)
-    Q_PROPERTY (QStringList clearAtValues READ clearAtValues CONSTANT)
-    Q_PROPERTY (string clearAt READ clearAt NOTIFY clearAtChanged)
-    Q_PROPERTY (string errorMessage READ errorMessage NOTIFY errorMessageChanged)
-    Q_PROPERTY (QUrl onlineIcon READ onlineIcon CONSTANT)
-    Q_PROPERTY (QUrl awayIcon READ awayIcon CONSTANT)
-    Q_PROPERTY (QUrl dndIcon READ dndIcon CONSTANT)
-    Q_PROPERTY (QUrl invisibleIcon READ invisibleIcon CONSTANT)
+    Q_PROPERTY (string user_status_message READ user_status_message NOTIFY user_status_changed)
+    Q_PROPERTY (string user_status_emoji READ user_status_emoji WRITE set_user_status_emoji NOTIFY user_status_changed)
+    Q_PROPERTY (Occ.User_status.Online_status online_status READ online_status WRITE set_online_status NOTIFY online_status_changed)
+    Q_PROPERTY (int predefined_statuses_count READ predefined_statuses_count NOTIFY predefined_statuses_changed)
+    Q_PROPERTY (QStringList clear_at_values READ clear_at_values CONSTANT)
+    Q_PROPERTY (string clear_at READ clear_at NOTIFY clear_at_changed)
+    Q_PROPERTY (string error_message READ error_message NOTIFY error_message_changed)
+    Q_PROPERTY (QUrl online_icon READ online_icon CONSTANT)
+    Q_PROPERTY (QUrl away_icon READ away_icon CONSTANT)
+    Q_PROPERTY (QUrl dnd_icon READ dnd_icon CONSTANT)
+    Q_PROPERTY (QUrl invisible_icon READ invisible_icon CONSTANT)
 
 public:
-    UserStatusSelectorModel (GLib.Object *parent = nullptr);
+    User_status_selector_model (GLib.Object *parent = nullptr);
 
-    UserStatusSelectorModel (std.shared_ptr<UserStatusConnector> userStatusConnector,
+    User_status_selector_model (std.shared_ptr<User_status_connector> user_status_connector,
         GLib.Object *parent = nullptr);
 
-    UserStatusSelectorModel (std.shared_ptr<UserStatusConnector> userStatusConnector,
-        std.unique_ptr<DateTimeProvider> dateTimeProvider,
+    User_status_selector_model (std.shared_ptr<User_status_connector> user_status_connector,
+        std.unique_ptr<Date_time_provider> date_time_provider,
         GLib.Object *parent = nullptr);
 
-    UserStatusSelectorModel (UserStatus &userStatus,
-        std.unique_ptr<DateTimeProvider> dateTimeProvider,
+    User_status_selector_model (User_status &user_status,
+        std.unique_ptr<Date_time_provider> date_time_provider,
         GLib.Object *parent = nullptr);
 
-    UserStatusSelectorModel (UserStatus &userStatus,
+    User_status_selector_model (User_status &user_status,
         GLib.Object *parent = nullptr);
 
     Q_INVOKABLE void load (int id);
 
-    Q_REQUIRED_RESULT UserStatus.OnlineStatus onlineStatus ();
-    Q_INVOKABLE void setOnlineStatus (Occ.UserStatus.OnlineStatus status);
+    Q_REQUIRED_RESULT User_status.Online_status online_status ();
+    Q_INVOKABLE void set_online_status (Occ.User_status.Online_status status);
 
-    Q_REQUIRED_RESULT QUrl onlineIcon ();
-    Q_REQUIRED_RESULT QUrl awayIcon ();
-    Q_REQUIRED_RESULT QUrl dndIcon ();
-    Q_REQUIRED_RESULT QUrl invisibleIcon ();
+    Q_REQUIRED_RESULT QUrl online_icon ();
+    Q_REQUIRED_RESULT QUrl away_icon ();
+    Q_REQUIRED_RESULT QUrl dnd_icon ();
+    Q_REQUIRED_RESULT QUrl invisible_icon ();
 
-    Q_REQUIRED_RESULT string userStatusMessage ();
-    Q_INVOKABLE void setUserStatusMessage (string &message);
-    void setUserStatusEmoji (string &emoji);
-    Q_REQUIRED_RESULT string userStatusEmoji ();
+    Q_REQUIRED_RESULT string user_status_message ();
+    Q_INVOKABLE void set_user_status_message (string &message);
+    void set_user_status_emoji (string &emoji);
+    Q_REQUIRED_RESULT string user_status_emoji ();
 
-    Q_INVOKABLE void setUserStatus ();
-    Q_INVOKABLE void clearUserStatus ();
+    Q_INVOKABLE void set_user_status ();
+    Q_INVOKABLE void clear_user_status ();
 
-    Q_REQUIRED_RESULT int predefinedStatusesCount ();
-    Q_INVOKABLE UserStatus predefinedStatus (int index) const;
-    Q_INVOKABLE string predefinedStatusClearAt (int index) const;
-    Q_INVOKABLE void setPredefinedStatus (int index);
+    Q_REQUIRED_RESULT int predefined_statuses_count ();
+    Q_INVOKABLE User_status predefined_status (int index) const;
+    Q_INVOKABLE string predefined_status_clear_at (int index) const;
+    Q_INVOKABLE void set_predefined_status (int index);
 
-    Q_REQUIRED_RESULT QStringList clearAtValues ();
-    Q_REQUIRED_RESULT string clearAt ();
-    Q_INVOKABLE void setClearAt (int index);
+    Q_REQUIRED_RESULT QStringList clear_at_values ();
+    Q_REQUIRED_RESULT string clear_at ();
+    Q_INVOKABLE void set_clear_at (int index);
 
-    Q_REQUIRED_RESULT string errorMessage ();
+    Q_REQUIRED_RESULT string error_message ();
 
 signals:
-    void errorMessageChanged ();
-    void userStatusChanged ();
-    void onlineStatusChanged ();
-    void clearAtChanged ();
-    void predefinedStatusesChanged ();
+    void error_message_changed ();
+    void user_status_changed ();
+    void online_status_changed ();
+    void clear_at_changed ();
+    void predefined_statuses_changed ();
     void finished ();
 
 private:
-    enum class ClearStageType {
-        DontClear,
-        HalfHour,
-        OneHour,
-        FourHour,
+    enum class Clear_stage_type {
+        Dont_clear,
+        Half_hour,
+        One_hour,
+        Four_hour,
         Today,
         Week
     };
 
     void init ();
     void reset ();
-    void onUserStatusFetched (UserStatus &userStatus);
-    void onPredefinedStatusesFetched (std.vector<UserStatus> &statuses);
-    void onUserStatusSet ();
-    void onMessageCleared ();
-    void onError (UserStatusConnector.Error error);
+    void on_user_status_fetched (User_status &user_status);
+    void on_predefined_statuses_fetched (std.vector<User_status> &statuses);
+    void on_user_status_set ();
+    void on_message_cleared ();
+    void on_error (User_status_connector.Error error);
 
-    Q_REQUIRED_RESULT string clearAtStageToString (ClearStageType stage) const;
-    Q_REQUIRED_RESULT string clearAtReadable (Optional<ClearAt> &clearAt) const;
-    Q_REQUIRED_RESULT string timeDifferenceToString (int differenceSecs) const;
-    Q_REQUIRED_RESULT Optional<ClearAt> clearStageTypeToDateTime (ClearStageType type) const;
-    void setError (string &reason);
-    void clearError ();
+    Q_REQUIRED_RESULT string clear_at_stage_to_string (Clear_stage_type stage) const;
+    Q_REQUIRED_RESULT string clear_at_readable (Optional<Clear_at> &clear_at) const;
+    Q_REQUIRED_RESULT string time_difference_to_string (int difference_secs) const;
+    Q_REQUIRED_RESULT Optional<Clear_at> clear_stage_type_to_date_time (Clear_stage_type type) const;
+    void set_error (string &reason);
+    void clear_error ();
 
-    std.shared_ptr<UserStatusConnector> _userStatusConnector {};
-    std.vector<UserStatus> _predefinedStatuses;
-    UserStatus _userStatus;
-    std.unique_ptr<DateTimeProvider> _dateTimeProvider;
+    std.shared_ptr<User_status_connector> _user_status_connector {};
+    std.vector<User_status> _predefined_statuses;
+    User_status _user_status;
+    std.unique_ptr<Date_time_provider> _date_time_provider;
 
-    string _errorMessage;
+    string _error_message;
 
-    std.vector<ClearStageType> _clearStages = {
-        ClearStageType.DontClear,
-        ClearStageType.HalfHour,
-        ClearStageType.OneHour,
-        ClearStageType.FourHour,
-        ClearStageType.Today,
-        ClearStageType.Week
+    std.vector<Clear_stage_type> _clear_stages = {
+        Clear_stage_type.Dont_clear,
+        Clear_stage_type.Half_hour,
+        Clear_stage_type.One_hour,
+        Clear_stage_type.Four_hour,
+        Clear_stage_type.Today,
+        Clear_stage_type.Week
     };
 };
 
-    UserStatusSelectorModel.UserStatusSelectorModel (GLib.Object *parent)
+    User_status_selector_model.User_status_selector_model (GLib.Object *parent)
         : GLib.Object (parent)
-        , _dateTimeProvider (new DateTimeProvider) {
-        _userStatus.setIcon ("😀");
+        , _date_time_provider (new Date_time_provider) {
+        _user_status.set_icon ("😀");
     }
     
-    UserStatusSelectorModel.UserStatusSelectorModel (std.shared_ptr<UserStatusConnector> userStatusConnector, GLib.Object *parent)
+    User_status_selector_model.User_status_selector_model (std.shared_ptr<User_status_connector> user_status_connector, GLib.Object *parent)
         : GLib.Object (parent)
-        , _userStatusConnector (userStatusConnector)
-        , _userStatus ("no-id", "", "😀", UserStatus.OnlineStatus.Online, false, {})
-        , _dateTimeProvider (new DateTimeProvider) {
-        _userStatus.setIcon ("😀");
+        , _user_status_connector (user_status_connector)
+        , _user_status ("no-id", "", "😀", User_status.Online_status.Online, false, {})
+        , _date_time_provider (new Date_time_provider) {
+        _user_status.set_icon ("😀");
         init ();
     }
     
-    UserStatusSelectorModel.UserStatusSelectorModel (std.shared_ptr<UserStatusConnector> userStatusConnector,
-        std.unique_ptr<DateTimeProvider> dateTimeProvider,
+    User_status_selector_model.User_status_selector_model (std.shared_ptr<User_status_connector> user_status_connector,
+        std.unique_ptr<Date_time_provider> date_time_provider,
         GLib.Object *parent)
         : GLib.Object (parent)
-        , _userStatusConnector (userStatusConnector)
-        , _dateTimeProvider (std.move (dateTimeProvider)) {
-        _userStatus.setIcon ("😀");
+        , _user_status_connector (user_status_connector)
+        , _date_time_provider (std.move (date_time_provider)) {
+        _user_status.set_icon ("😀");
         init ();
     }
     
-    UserStatusSelectorModel.UserStatusSelectorModel (UserStatus &userStatus,
-        std.unique_ptr<DateTimeProvider> dateTimeProvider, GLib.Object *parent)
+    User_status_selector_model.User_status_selector_model (User_status &user_status,
+        std.unique_ptr<Date_time_provider> date_time_provider, GLib.Object *parent)
         : GLib.Object (parent)
-        , _userStatus (userStatus)
-        , _dateTimeProvider (std.move (dateTimeProvider)) {
-        _userStatus.setIcon ("😀");
+        , _user_status (user_status)
+        , _date_time_provider (std.move (date_time_provider)) {
+        _user_status.set_icon ("😀");
     }
     
-    UserStatusSelectorModel.UserStatusSelectorModel (UserStatus &userStatus,
+    User_status_selector_model.User_status_selector_model (User_status &user_status,
         GLib.Object *parent)
         : GLib.Object (parent)
-        , _userStatus (userStatus) {
-        _userStatus.setIcon ("😀");
+        , _user_status (user_status) {
+        _user_status.set_icon ("😀");
     }
     
-    void UserStatusSelectorModel.load (int id) {
+    void User_status_selector_model.load (int id) {
         reset ();
-        _userStatusConnector = UserModel.instance ().userStatusConnector (id);
+        _user_status_connector = User_model.instance ().user_status_connector (id);
         init ();
     }
     
-    void UserStatusSelectorModel.reset () {
-        if (_userStatusConnector) {
-            disconnect (_userStatusConnector.get (), &UserStatusConnector.userStatusFetched, this,
-                &UserStatusSelectorModel.onUserStatusFetched);
-            disconnect (_userStatusConnector.get (), &UserStatusConnector.predefinedStatusesFetched, this,
-                &UserStatusSelectorModel.onPredefinedStatusesFetched);
-            disconnect (_userStatusConnector.get (), &UserStatusConnector.error, this,
-                &UserStatusSelectorModel.onError);
-            disconnect (_userStatusConnector.get (), &UserStatusConnector.userStatusSet, this,
-                &UserStatusSelectorModel.onUserStatusSet);
-            disconnect (_userStatusConnector.get (), &UserStatusConnector.messageCleared, this,
-                &UserStatusSelectorModel.onMessageCleared);
+    void User_status_selector_model.reset () {
+        if (_user_status_connector) {
+            disconnect (_user_status_connector.get (), &User_status_connector.user_status_fetched, this,
+                &User_status_selector_model.on_user_status_fetched);
+            disconnect (_user_status_connector.get (), &User_status_connector.predefined_statuses_fetched, this,
+                &User_status_selector_model.on_predefined_statuses_fetched);
+            disconnect (_user_status_connector.get (), &User_status_connector.error, this,
+                &User_status_selector_model.on_error);
+            disconnect (_user_status_connector.get (), &User_status_connector.user_status_set, this,
+                &User_status_selector_model.on_user_status_set);
+            disconnect (_user_status_connector.get (), &User_status_connector.message_cleared, this,
+                &User_status_selector_model.on_message_cleared);
         }
-        _userStatusConnector = nullptr;
+        _user_status_connector = nullptr;
     }
     
-    void UserStatusSelectorModel.init () {
-        if (!_userStatusConnector) {
+    void User_status_selector_model.init () {
+        if (!_user_status_connector) {
             return;
         }
     
-        connect (_userStatusConnector.get (), &UserStatusConnector.userStatusFetched, this,
-            &UserStatusSelectorModel.onUserStatusFetched);
-        connect (_userStatusConnector.get (), &UserStatusConnector.predefinedStatusesFetched, this,
-            &UserStatusSelectorModel.onPredefinedStatusesFetched);
-        connect (_userStatusConnector.get (), &UserStatusConnector.error, this,
-            &UserStatusSelectorModel.onError);
-        connect (_userStatusConnector.get (), &UserStatusConnector.userStatusSet, this,
-            &UserStatusSelectorModel.onUserStatusSet);
-        connect (_userStatusConnector.get (), &UserStatusConnector.messageCleared, this,
-            &UserStatusSelectorModel.onMessageCleared);
+        connect (_user_status_connector.get (), &User_status_connector.user_status_fetched, this,
+            &User_status_selector_model.on_user_status_fetched);
+        connect (_user_status_connector.get (), &User_status_connector.predefined_statuses_fetched, this,
+            &User_status_selector_model.on_predefined_statuses_fetched);
+        connect (_user_status_connector.get (), &User_status_connector.error, this,
+            &User_status_selector_model.on_error);
+        connect (_user_status_connector.get (), &User_status_connector.user_status_set, this,
+            &User_status_selector_model.on_user_status_set);
+        connect (_user_status_connector.get (), &User_status_connector.message_cleared, this,
+            &User_status_selector_model.on_message_cleared);
     
-        _userStatusConnector.fetchUserStatus ();
-        _userStatusConnector.fetchPredefinedStatuses ();
+        _user_status_connector.fetch_user_status ();
+        _user_status_connector.fetch_predefined_statuses ();
     }
     
-    void UserStatusSelectorModel.onUserStatusSet () {
+    void User_status_selector_model.on_user_status_set () {
         emit finished ();
     }
     
-    void UserStatusSelectorModel.onMessageCleared () {
+    void User_status_selector_model.on_message_cleared () {
         emit finished ();
     }
     
-    void UserStatusSelectorModel.onError (UserStatusConnector.Error error) {
-        qCWarning (lcUserStatusDialogModel) << "Error:" << error;
+    void User_status_selector_model.on_error (User_status_connector.Error error) {
+        q_c_warning (lc_user_status_dialog_model) << "Error:" << error;
     
         switch (error) {
-        case UserStatusConnector.Error.CouldNotFetchPredefinedUserStatuses:
-            setError (tr ("Could not fetch predefined statuses. Make sure you are connected to the server."));
+        case User_status_connector.Error.Could_not_fetch_predefined_user_statuses:
+            set_error (tr ("Could not fetch predefined statuses. Make sure you are connected to the server."));
             return;
     
-        case UserStatusConnector.Error.CouldNotFetchUserStatus:
-            setError (tr ("Could not fetch user status. Make sure you are connected to the server."));
+        case User_status_connector.Error.Could_not_fetch_user_status:
+            set_error (tr ("Could not fetch user status. Make sure you are connected to the server."));
             return;
     
-        case UserStatusConnector.Error.UserStatusNotSupported:
-            setError (tr ("User status feature is not supported. You will not be able to set your user status."));
+        case User_status_connector.Error.User_status_not_supported:
+            set_error (tr ("User status feature is not supported. You will not be able to set your user status."));
             return;
     
-        case UserStatusConnector.Error.EmojisNotSupported:
-            setError (tr ("Emojis feature is not supported. Some user status functionality may not work."));
+        case User_status_connector.Error.Emojis_not_supported:
+            set_error (tr ("Emojis feature is not supported. Some user status functionality may not work."));
             return;
     
-        case UserStatusConnector.Error.CouldNotSetUserStatus:
-            setError (tr ("Could not set user status. Make sure you are connected to the server."));
+        case User_status_connector.Error.Could_not_set_user_status:
+            set_error (tr ("Could not set user status. Make sure you are connected to the server."));
             return;
     
-        case UserStatusConnector.Error.CouldNotClearMessage:
-            setError (tr ("Could not clear user status message. Make sure you are connected to the server."));
+        case User_status_connector.Error.Could_not_clear_message:
+            set_error (tr ("Could not clear user status message. Make sure you are connected to the server."));
             return;
         }
     
         Q_UNREACHABLE ();
     }
     
-    void UserStatusSelectorModel.setError (string &reason) {
-        _errorMessage = reason;
-        emit errorMessageChanged ();
+    void User_status_selector_model.set_error (string &reason) {
+        _error_message = reason;
+        emit error_message_changed ();
     }
     
-    void UserStatusSelectorModel.clearError () {
-        setError ("");
+    void User_status_selector_model.clear_error () {
+        set_error ("");
     }
     
-    void UserStatusSelectorModel.setOnlineStatus (UserStatus.OnlineStatus status) {
-        if (status == _userStatus.state ()) {
+    void User_status_selector_model.set_online_status (User_status.Online_status status) {
+        if (status == _user_status.state ()) {
             return;
         }
     
-        _userStatus.setState (status);
-        emit onlineStatusChanged ();
+        _user_status.set_state (status);
+        emit online_status_changed ();
     }
     
-    QUrl UserStatusSelectorModel.onlineIcon () {
-        return Theme.instance ().statusOnlineImageSource ();
+    QUrl User_status_selector_model.online_icon () {
+        return Theme.instance ().status_online_image_source ();
     }
     
-    QUrl UserStatusSelectorModel.awayIcon () {
-        return Theme.instance ().statusAwayImageSource ();
+    QUrl User_status_selector_model.away_icon () {
+        return Theme.instance ().status_away_image_source ();
     }
-    QUrl UserStatusSelectorModel.dndIcon () {
-        return Theme.instance ().statusDoNotDisturbImageSource ();
+    QUrl User_status_selector_model.dnd_icon () {
+        return Theme.instance ().status_do_not_disturb_image_source ();
     }
-    QUrl UserStatusSelectorModel.invisibleIcon () {
-        return Theme.instance ().statusInvisibleImageSource ();
-    }
-    
-    UserStatus.OnlineStatus UserStatusSelectorModel.onlineStatus () {
-        return _userStatus.state ();
+    QUrl User_status_selector_model.invisible_icon () {
+        return Theme.instance ().status_invisible_image_source ();
     }
     
-    string UserStatusSelectorModel.userStatusMessage () {
-        return _userStatus.message ();
+    User_status.Online_status User_status_selector_model.online_status () {
+        return _user_status.state ();
     }
     
-    void UserStatusSelectorModel.setUserStatusMessage (string &message) {
-        _userStatus.setMessage (message);
-        _userStatus.setMessagePredefined (false);
-        emit userStatusChanged ();
+    string User_status_selector_model.user_status_message () {
+        return _user_status.message ();
     }
     
-    void UserStatusSelectorModel.setUserStatusEmoji (string &emoji) {
-        _userStatus.setIcon (emoji);
-        _userStatus.setMessagePredefined (false);
-        emit userStatusChanged ();
+    void User_status_selector_model.set_user_status_message (string &message) {
+        _user_status.set_message (message);
+        _user_status.set_message_predefined (false);
+        emit user_status_changed ();
     }
     
-    string UserStatusSelectorModel.userStatusEmoji () {
-        return _userStatus.icon ();
+    void User_status_selector_model.set_user_status_emoji (string &emoji) {
+        _user_status.set_icon (emoji);
+        _user_status.set_message_predefined (false);
+        emit user_status_changed ();
     }
     
-    void UserStatusSelectorModel.onUserStatusFetched (UserStatus &userStatus) {
-        if (userStatus.state () != UserStatus.OnlineStatus.Offline) {
-            _userStatus.setState (userStatus.state ());
+    string User_status_selector_model.user_status_emoji () {
+        return _user_status.icon ();
+    }
+    
+    void User_status_selector_model.on_user_status_fetched (User_status &user_status) {
+        if (user_status.state () != User_status.Online_status.Offline) {
+            _user_status.set_state (user_status.state ());
         }
-        _userStatus.setMessage (userStatus.message ());
-        _userStatus.setMessagePredefined (userStatus.messagePredefined ());
-        _userStatus.setId (userStatus.id ());
-        _userStatus.setClearAt (userStatus.clearAt ());
+        _user_status.set_message (user_status.message ());
+        _user_status.set_message_predefined (user_status.message_predefined ());
+        _user_status.set_id (user_status.id ());
+        _user_status.set_clear_at (user_status.clear_at ());
     
-        if (!userStatus.icon ().isEmpty ()) {
-            _userStatus.setIcon (userStatus.icon ());
+        if (!user_status.icon ().is_empty ()) {
+            _user_status.set_icon (user_status.icon ());
         }
     
-        emit userStatusChanged ();
-        emit onlineStatusChanged ();
-        emit clearAtChanged ();
+        emit user_status_changed ();
+        emit online_status_changed ();
+        emit clear_at_changed ();
     }
     
-    Optional<ClearAt> UserStatusSelectorModel.clearStageTypeToDateTime (ClearStageType type) {
+    Optional<Clear_at> User_status_selector_model.clear_stage_type_to_date_time (Clear_stage_type type) {
         switch (type) {
-        case ClearStageType.DontClear:
+        case Clear_stage_type.Dont_clear:
             return {};
     
-        case ClearStageType.HalfHour : {
-            ClearAt clearAt;
-            clearAt._type = ClearAtType.Period;
-            clearAt._period = 60 * 30;
-            return clearAt;
+        case Clear_stage_type.Half_hour : {
+            Clear_at clear_at;
+            clear_at._type = Clear_at_type.Period;
+            clear_at._period = 60 * 30;
+            return clear_at;
         }
     
-        case ClearStageType.OneHour : {
-            ClearAt clearAt;
-            clearAt._type = ClearAtType.Period;
-            clearAt._period = 60 * 60;
-            return clearAt;
+        case Clear_stage_type.One_hour : {
+            Clear_at clear_at;
+            clear_at._type = Clear_at_type.Period;
+            clear_at._period = 60 * 60;
+            return clear_at;
         }
     
-        case ClearStageType.FourHour : {
-            ClearAt clearAt;
-            clearAt._type = ClearAtType.Period;
-            clearAt._period = 60 * 60 * 4;
-            return clearAt;
+        case Clear_stage_type.Four_hour : {
+            Clear_at clear_at;
+            clear_at._type = Clear_at_type.Period;
+            clear_at._period = 60 * 60 * 4;
+            return clear_at;
         }
     
-        case ClearStageType.Today : {
-            ClearAt clearAt;
-            clearAt._type = ClearAtType.EndOf;
-            clearAt._endof = "day";
-            return clearAt;
+        case Clear_stage_type.Today : {
+            Clear_at clear_at;
+            clear_at._type = Clear_at_type.End_of;
+            clear_at._endof = "day";
+            return clear_at;
         }
     
-        case ClearStageType.Week : {
-            ClearAt clearAt;
-            clearAt._type = ClearAtType.EndOf;
-            clearAt._endof = "week";
-            return clearAt;
+        case Clear_stage_type.Week : {
+            Clear_at clear_at;
+            clear_at._type = Clear_at_type.End_of;
+            clear_at._endof = "week";
+            return clear_at;
         }
     
         default:
@@ -382,72 +382,72 @@ private:
         }
     }
     
-    void UserStatusSelectorModel.setUserStatus () {
-        Q_ASSERT (_userStatusConnector);
-        if (!_userStatusConnector) {
+    void User_status_selector_model.set_user_status () {
+        Q_ASSERT (_user_status_connector);
+        if (!_user_status_connector) {
             return;
         }
     
-        clearError ();
-        _userStatusConnector.setUserStatus (_userStatus);
+        clear_error ();
+        _user_status_connector.set_user_status (_user_status);
     }
     
-    void UserStatusSelectorModel.clearUserStatus () {
-        Q_ASSERT (_userStatusConnector);
-        if (!_userStatusConnector) {
+    void User_status_selector_model.clear_user_status () {
+        Q_ASSERT (_user_status_connector);
+        if (!_user_status_connector) {
             return;
         }
     
-        clearError ();
-        _userStatusConnector.clearMessage ();
+        clear_error ();
+        _user_status_connector.clear_message ();
     }
     
-    void UserStatusSelectorModel.onPredefinedStatusesFetched (std.vector<UserStatus> &statuses) {
-        _predefinedStatuses = statuses;
-        emit predefinedStatusesChanged ();
+    void User_status_selector_model.on_predefined_statuses_fetched (std.vector<User_status> &statuses) {
+        _predefined_statuses = statuses;
+        emit predefined_statuses_changed ();
     }
     
-    UserStatus UserStatusSelectorModel.predefinedStatus (int index) {
-        Q_ASSERT (0 <= index && index < static_cast<int> (_predefinedStatuses.size ()));
-        return _predefinedStatuses[index];
+    User_status User_status_selector_model.predefined_status (int index) {
+        Q_ASSERT (0 <= index && index < static_cast<int> (_predefined_statuses.size ()));
+        return _predefined_statuses[index];
     }
     
-    int UserStatusSelectorModel.predefinedStatusesCount () {
-        return static_cast<int> (_predefinedStatuses.size ());
+    int User_status_selector_model.predefined_statuses_count () {
+        return static_cast<int> (_predefined_statuses.size ());
     }
     
-    void UserStatusSelectorModel.setPredefinedStatus (int index) {
-        Q_ASSERT (0 <= index && index < static_cast<int> (_predefinedStatuses.size ()));
+    void User_status_selector_model.set_predefined_status (int index) {
+        Q_ASSERT (0 <= index && index < static_cast<int> (_predefined_statuses.size ()));
     
-        _userStatus.setMessagePredefined (true);
-        const auto predefinedStatus = _predefinedStatuses[index];
-        _userStatus.setId (predefinedStatus.id ());
-        _userStatus.setMessage (predefinedStatus.message ());
-        _userStatus.setIcon (predefinedStatus.icon ());
-        _userStatus.setClearAt (predefinedStatus.clearAt ());
+        _user_status.set_message_predefined (true);
+        const auto predefined_status = _predefined_statuses[index];
+        _user_status.set_id (predefined_status.id ());
+        _user_status.set_message (predefined_status.message ());
+        _user_status.set_icon (predefined_status.icon ());
+        _user_status.set_clear_at (predefined_status.clear_at ());
     
-        emit userStatusChanged ();
-        emit clearAtChanged ();
+        emit user_status_changed ();
+        emit clear_at_changed ();
     }
     
-    string UserStatusSelectorModel.clearAtStageToString (ClearStageType stage) {
+    string User_status_selector_model.clear_at_stage_to_string (Clear_stage_type stage) {
         switch (stage) {
-        case ClearStageType.DontClear:
+        case Clear_stage_type.Dont_clear:
             return tr ("Don't clear");
     
-        case ClearStageType.HalfHour:
+        case Clear_stage_type.Half_hour:
             return tr ("30 minutes");
     
-        case ClearStageType.OneHour:
+        case Clear_stage_type.One_hour:
             return tr ("1 hour");
     
-        case ClearStageType.FourHour:
+        case Clear_stage_type.Four_hour:
             return tr ("4 hours");
     
-        case ClearStageType.Today:
+        case Clear_stage_type.Today:
             return tr ("Today");
     
-        case ClearStageType.Week:
+        case Clear_stage_type.Week:
             return tr ("This week");
     
         default:
@@ -455,68 +455,68 @@ private:
         }
     }
     
-    QStringList UserStatusSelectorModel.clearAtValues () {
-        QStringList clearAtStages;
-        std.transform (_clearStages.begin (), _clearStages.end (),
-            std.back_inserter (clearAtStages),
-            [this] (ClearStageType &stage) { return clearAtStageToString (stage); });
+    QStringList User_status_selector_model.clear_at_values () {
+        QStringList clear_at_stages;
+        std.transform (_clear_stages.begin (), _clear_stages.end (),
+            std.back_inserter (clear_at_stages),
+            [this] (Clear_stage_type &stage) { return clear_at_stage_to_string (stage); });
     
-        return clearAtStages;
+        return clear_at_stages;
     }
     
-    void UserStatusSelectorModel.setClearAt (int index) {
-        Q_ASSERT (0 <= index && index < static_cast<int> (_clearStages.size ()));
-        _userStatus.setClearAt (clearStageTypeToDateTime (_clearStages[index]));
-        emit clearAtChanged ();
+    void User_status_selector_model.set_clear_at (int index) {
+        Q_ASSERT (0 <= index && index < static_cast<int> (_clear_stages.size ()));
+        _user_status.set_clear_at (clear_stage_type_to_date_time (_clear_stages[index]));
+        emit clear_at_changed ();
     }
     
-    string UserStatusSelectorModel.errorMessage () {
-        return _errorMessage;
+    string User_status_selector_model.error_message () {
+        return _error_message;
     }
     
-    string UserStatusSelectorModel.timeDifferenceToString (int differenceSecs) {
-        if (differenceSecs < 60) {
+    string User_status_selector_model.time_difference_to_string (int difference_secs) {
+        if (difference_secs < 60) {
             return tr ("Less than a minute");
-        } else if (differenceSecs < 60 * 60) {
-            const auto minutesLeft = std.ceil (differenceSecs / 60.0);
-            if (minutesLeft == 1) {
+        } else if (difference_secs < 60 * 60) {
+            const auto minutes_left = std.ceil (difference_secs / 60.0);
+            if (minutes_left == 1) {
                 return tr ("1 minute");
             } else {
-                return tr ("%1 minutes").arg (minutesLeft);
+                return tr ("%1 minutes").arg (minutes_left);
             }
-        } else if (differenceSecs < 60 * 60 * 24) {
-            const auto hoursLeft = std.ceil (differenceSecs / 60.0 / 60.0);
-            if (hoursLeft == 1) {
+        } else if (difference_secs < 60 * 60 * 24) {
+            const auto hours_left = std.ceil (difference_secs / 60.0 / 60.0);
+            if (hours_left == 1) {
                 return tr ("1 hour");
             } else {
-                return tr ("%1 hours").arg (hoursLeft);
+                return tr ("%1 hours").arg (hours_left);
             }
         } else {
-            const auto daysLeft = std.ceil (differenceSecs / 60.0 / 60.0 / 24.0);
-            if (daysLeft == 1) {
+            const auto days_left = std.ceil (difference_secs / 60.0 / 60.0 / 24.0);
+            if (days_left == 1) {
                 return tr ("1 day");
             } else {
-                return tr ("%1 days").arg (daysLeft);
+                return tr ("%1 days").arg (days_left);
             }
         }
     }
     
-    string UserStatusSelectorModel.clearAtReadable (Optional<ClearAt> &clearAt) {
-        if (clearAt) {
-            switch (clearAt._type) {
-            case ClearAtType.Period : {
-                return timeDifferenceToString (clearAt._period);
+    string User_status_selector_model.clear_at_readable (Optional<Clear_at> &clear_at) {
+        if (clear_at) {
+            switch (clear_at._type) {
+            case Clear_at_type.Period : {
+                return time_difference_to_string (clear_at._period);
             }
     
-            case ClearAtType.Timestamp : {
-                const int difference = static_cast<int> (clearAt._timestamp - _dateTimeProvider.currentDateTime ().toTime_t ());
-                return timeDifferenceToString (difference);
+            case Clear_at_type.Timestamp : {
+                const int difference = static_cast<int> (clear_at._timestamp - _date_time_provider.current_date_time ().to_time_t ());
+                return time_difference_to_string (difference);
             }
     
-            case ClearAtType.EndOf : {
-                if (clearAt._endof == "day") {
+            case Clear_at_type.End_of : {
+                if (clear_at._endof == "day") {
                     return tr ("Today");
-                } else if (clearAt._endof == "week") {
+                } else if (clear_at._endof == "week") {
                     return tr ("This week");
                 }
                 Q_UNREACHABLE ();
@@ -529,12 +529,12 @@ private:
         return tr ("Don't clear");
     }
     
-    string UserStatusSelectorModel.predefinedStatusClearAt (int index) {
-        return clearAtReadable (predefinedStatus (index).clearAt ());
+    string User_status_selector_model.predefined_status_clear_at (int index) {
+        return clear_at_readable (predefined_status (index).clear_at ());
     }
     
-    string UserStatusSelectorModel.clearAt () {
-        return clearAtReadable (_userStatus.clearAt ());
+    string User_status_selector_model.clear_at () {
+        return clear_at_readable (_user_status.clear_at ());
     }
     }
     

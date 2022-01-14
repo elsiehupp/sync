@@ -8,12 +8,12 @@ Copyright (C) by Camila Ayres <camila@nextcloud.com>
 namespace Occ {
 
 /***********************************************************
-@brief The OcsAppsJob class
+@brief The Ocs_apps_job class
 @ingroup gui
 
 Fetching enabled apps from the OCS Apps API
 ***********************************************************/
-class OcsNavigationAppsJob : OcsJob {
+class OcsNavigationAppsJob : Ocs_job {
 public:
     OcsNavigationAppsJob (AccountPtr account);
 
@@ -21,35 +21,35 @@ public:
     Get a list of enabled apps and external sites
     visible in the Navigation menu
     ***********************************************************/
-    void getNavigationApps ();
+    void get_navigation_apps ();
 
 signals:
     /***********************************************************
     Result of the OCS request
     
     @param reply The reply
-    @param statusCode the status code of the response
+    @param status_code the status code of the response
     ***********************************************************/
-    void appsJobFinished (QJsonDocument &reply, int statusCode);
+    void apps_job_finished (QJsonDocument &reply, int status_code);
 
 private slots:
-    void jobDone (QJsonDocument &reply, int statusCode);
+    void job_done (QJsonDocument &reply, int status_code);
 };
 
     OcsNavigationAppsJob.OcsNavigationAppsJob (AccountPtr account)
-        : OcsJob (account) {
-        setPath ("ocs/v2.php/core/navigation/apps");
-        connect (this, &OcsNavigationAppsJob.jobFinished, this, &OcsNavigationAppsJob.jobDone);
+        : Ocs_job (account) {
+        set_path ("ocs/v2.php/core/navigation/apps");
+        connect (this, &OcsNavigationAppsJob.job_finished, this, &OcsNavigationAppsJob.job_done);
     }
     
-    void OcsNavigationAppsJob.getNavigationApps () {
-        setVerb ("GET");
-        addParam ("absolute", "true");
+    void OcsNavigationAppsJob.get_navigation_apps () {
+        set_verb ("GET");
+        add_param ("absolute", "true");
         start ();
     }
     
-    void OcsNavigationAppsJob.jobDone (QJsonDocument &reply, int statusCode) {
-        emit appsJobFinished (reply, statusCode);
+    void OcsNavigationAppsJob.job_done (QJsonDocument &reply, int status_code) {
+        emit apps_job_finished (reply, status_code);
     }
     }
     

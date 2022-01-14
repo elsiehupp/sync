@@ -11,7 +11,7 @@ Copyright (C) 2015 by Klaas Freitag <freitag@owncloud.com>
 // #include <QDesktopServices>
 // #include <QMessageBox>
 // #include <QMenu>
-// #include <QTextEdit>
+// #include <QText_edit>
 // #include <QToolButton>
 // #include <QPropertyAnimation>
 
@@ -19,708 +19,708 @@ Copyright (C) 2015 by Klaas Freitag <freitag@owncloud.com>
 // #include <QSharedPointer>
 // #include <QList>
 // #include <QToolButton>
-// #include <QHBoxLayout>
+// #include <QHBox_layout>
 // #include <QLabel>
 // #include <QLineEdit>
-// #include <QWidgetAction>
+// #include <QWidget_action>
 
 
 namespace Occ {
 
 namespace {
-    const char *passwordIsSetPlaceholder = "●●●●●●●●";
+    const char *password_is_set_placeholder = "●●●●●●●●";
 }
 
 namespace Ui {
-    class ShareLinkWidget;
+    class Share_link_widget;
 }
 
 class Share;
 
 /***********************************************************
-@brief The ShareDialog class
+@brief The Share_dialog class
 @ingroup gui
 ***********************************************************/
-class ShareLinkWidget : Gtk.Widget {
+class Share_link_widget : Gtk.Widget {
 
 public:
-    ShareLinkWidget (AccountPtr account,
-        const string &sharePath,
-        const string &localPath,
-        SharePermissions maxSharingPermissions,
+    Share_link_widget (AccountPtr account,
+        const string &share_path,
+        const string &local_path,
+        Share_permissions max_sharing_permissions,
         Gtk.Widget *parent = nullptr);
-    ~ShareLinkWidget () override;
+    ~Share_link_widget () override;
 
-    void toggleButton (bool show);
-    void setupUiOptions ();
+    void toggle_button (bool show);
+    void setup_ui_options ();
 
-    void setLinkShare (QSharedPointer<LinkShare> linkShare);
-    QSharedPointer<LinkShare> getLinkShare ();
+    void set_link_share (QSharedPointer<Link_share> link_share);
+    QSharedPointer<Link_share> get_link_share ();
 
-    void focusPasswordLineEdit ();
+    void focus_password_line_edit ();
 
 public slots:
-    void slotDeleteShareFetched ();
-    void slotToggleShareLinkAnimation (bool start);
-    void slotServerError (int code, string &message);
-    void slotCreateShareRequiresPassword (string &message);
-    void slotStyleChanged ();
+    void slot_delete_share_fetched ();
+    void slot_toggle_share_link_animation (bool start);
+    void slot_server_error (int code, string &message);
+    void slot_create_share_requires_password (string &message);
+    void slot_style_changed ();
 
 private slots:
-    void slotCreateShareLink (bool clicked);
-    void slotCopyLinkShare (bool clicked) const;
+    void slot_create_share_link (bool clicked);
+    void slot_copy_link_share (bool clicked) const;
 
-    void slotCreatePassword ();
-    void slotPasswordSet ();
-    void slotPasswordSetError (int code, string &message);
+    void slot_create_password ();
+    void slot_password_set ();
+    void slot_password_set_error (int code, string &message);
 
-    void slotCreateNote ();
-    void slotNoteSet ();
+    void slot_create_note ();
+    void slot_note_set ();
 
-    void slotSetExpireDate ();
-    void slotExpireDateSet ();
+    void slot_set_expire_date ();
+    void slot_expire_date_set ();
 
-    void slotContextMenuButtonClicked ();
-    void slotLinkContextMenuActionTriggered (QAction *action);
+    void slot_context_menu_button_clicked ();
+    void slot_link_context_menu_action_triggered (QAction *action);
 
-    void slotDeleteAnimationFinished ();
-    void slotAnimationFinished ();
+    void slot_delete_animation_finished ();
+    void slot_animation_finished ();
 
-    void slotCreateLabel ();
-    void slotLabelSet ();
+    void slot_create_label ();
+    void slot_label_set ();
 
 signals:
-    void createLinkShare ();
-    void deleteLinkShare ();
-    void resizeRequested ();
-    void visualDeletionDone ();
-    void createPassword (string &password);
-    void createPasswordProcessed ();
+    void create_link_share ();
+    void delete_link_share ();
+    void resize_requested ();
+    void visual_deletion_done ();
+    void create_password (string &password);
+    void create_password_processed ();
 
 private:
-    void displayError (string &errMsg);
+    void display_error (string &err_msg);
 
-    void togglePasswordOptions (bool enable = true);
-    void toggleNoteOptions (bool enable = true);
-    void toggleExpireDateOptions (bool enable = true);
-    void toggleButtonAnimation (QToolButton *button, QProgressIndicator *progressIndicator, QAction *checkedAction) const;
+    void toggle_password_options (bool enable = true);
+    void toggle_note_options (bool enable = true);
+    void toggle_expire_date_options (bool enable = true);
+    void toggle_button_animation (QToolButton *button, QProgress_indicator *progress_indicator, QAction *checked_action) const;
 
     /***********************************************************
     Confirm with the user and then delete the share */
-    void confirmAndDeleteShare ();
+    void confirm_and_delete_share ();
 
     /***********************************************************
-    Retrieve a share's name, accounting for _namesSupported */
-    string shareName ();
+    Retrieve a share's name, accounting for _names_supported */
+    string share_name ();
 
-    void startAnimation (int start, int end);
+    void start_animation (int start, int end);
 
-    void customizeStyle ();
+    void customize_style ();
 
-    void displayShareLinkLabel ();
+    void display_share_link_label ();
 
-    Ui.ShareLinkWidget *_ui;
+    Ui.Share_link_widget *_ui;
     AccountPtr _account;
-    string _sharePath;
-    string _localPath;
-    string _shareUrl;
+    string _share_path;
+    string _local_path;
+    string _share_url;
 
-    QSharedPointer<LinkShare> _linkShare;
+    QSharedPointer<Link_share> _link_share;
 
-    bool _isFile;
-    bool _passwordRequired;
-    bool _expiryRequired;
-    bool _namesSupported;
-    bool _noteRequired;
+    bool _is_file;
+    bool _password_required;
+    bool _expiry_required;
+    bool _names_supported;
+    bool _note_required;
 
-    QMenu *_linkContextMenu;
-    QAction *_readOnlyLinkAction;
-    QAction *_allowEditingLinkAction;
-    QAction *_allowUploadEditingLinkAction;
-    QAction *_allowUploadLinkAction;
-    QAction *_passwordProtectLinkAction;
-    QAction *_expirationDateLinkAction;
-    QAction *_unshareLinkAction;
-    QAction *_addAnotherLinkAction;
-    QAction *_noteLinkAction;
-    QHBoxLayout *_shareLinkLayout{};
-    QLabel *_shareLinkLabel{};
-    ElidedLabel *_shareLinkElidedLabel{};
-    QLineEdit *_shareLinkEdit{};
-    QToolButton *_shareLinkButton{};
-    QProgressIndicator *_shareLinkProgressIndicator{};
-    Gtk.Widget *_shareLinkDefaultWidget{};
-    QWidgetAction *_shareLinkWidgetAction{};
+    QMenu *_link_context_menu;
+    QAction *_read_only_link_action;
+    QAction *_allow_editing_link_action;
+    QAction *_allow_upload_editing_link_action;
+    QAction *_allow_upload_link_action;
+    QAction *_password_protect_link_action;
+    QAction *_expiration_date_link_action;
+    QAction *_unshare_link_action;
+    QAction *_add_another_link_action;
+    QAction *_note_link_action;
+    QHBox_layout *_share_link_layout{};
+    QLabel *_share_link_label{};
+    Elided_label *_share_link_elided_label{};
+    QLineEdit *_share_link_edit{};
+    QToolButton *_share_link_button{};
+    QProgress_indicator *_share_link_progress_indicator{};
+    Gtk.Widget *_share_link_default_widget{};
+    QWidget_action *_share_link_widget_action{};
 };
 
 
-ShareLinkWidget.ShareLinkWidget (AccountPtr account,
-    const string &sharePath,
-    const string &localPath,
-    SharePermissions maxSharingPermissions,
+Share_link_widget.Share_link_widget (AccountPtr account,
+    const string &share_path,
+    const string &local_path,
+    Share_permissions max_sharing_permissions,
     Gtk.Widget *parent)
     : Gtk.Widget (parent)
-    , _ui (new Ui.ShareLinkWidget)
+    , _ui (new Ui.Share_link_widget)
     , _account (account)
-    , _sharePath (sharePath)
-    , _localPath (localPath)
-    , _linkShare (nullptr)
-    , _passwordRequired (false)
-    , _expiryRequired (false)
-    , _namesSupported (true)
-    , _noteRequired (false)
-    , _linkContextMenu (nullptr)
-    , _readOnlyLinkAction (nullptr)
-    , _allowEditingLinkAction (nullptr)
-    , _allowUploadEditingLinkAction (nullptr)
-    , _allowUploadLinkAction (nullptr)
-    , _passwordProtectLinkAction (nullptr)
-    , _expirationDateLinkAction (nullptr)
-    , _unshareLinkAction (nullptr)
-    , _noteLinkAction (nullptr) {
-    _ui.setupUi (this);
+    , _share_path (share_path)
+    , _local_path (local_path)
+    , _link_share (nullptr)
+    , _password_required (false)
+    , _expiry_required (false)
+    , _names_supported (true)
+    , _note_required (false)
+    , _link_context_menu (nullptr)
+    , _read_only_link_action (nullptr)
+    , _allow_editing_link_action (nullptr)
+    , _allow_upload_editing_link_action (nullptr)
+    , _allow_upload_link_action (nullptr)
+    , _password_protect_link_action (nullptr)
+    , _expiration_date_link_action (nullptr)
+    , _unshare_link_action (nullptr)
+    , _note_link_action (nullptr) {
+    _ui.setup_ui (this);
 
-    _ui.shareLinkToolButton.hide ();
+    _ui.share_link_tool_button.hide ();
 
     //Is this a file or folder?
-    QFileInfo fi (localPath);
-    _isFile = fi.isFile ();
+    QFileInfo fi (local_path);
+    _is_file = fi.is_file ();
 
-    connect (_ui.enableShareLink, &QPushButton.clicked, this, &ShareLinkWidget.slotCreateShareLink);
-    connect (_ui.lineEdit_password, &QLineEdit.returnPressed, this, &ShareLinkWidget.slotCreatePassword);
-    connect (_ui.confirmPassword, &QAbstractButton.clicked, this, &ShareLinkWidget.slotCreatePassword);
-    connect (_ui.confirmNote, &QAbstractButton.clicked, this, &ShareLinkWidget.slotCreateNote);
-    connect (_ui.confirmExpirationDate, &QAbstractButton.clicked, this, &ShareLinkWidget.slotSetExpireDate);
+    connect (_ui.enable_share_link, &QPushButton.clicked, this, &Share_link_widget.slot_create_share_link);
+    connect (_ui.line_edit_password, &QLineEdit.return_pressed, this, &Share_link_widget.slot_create_password);
+    connect (_ui.confirm_password, &QAbstractButton.clicked, this, &Share_link_widget.slot_create_password);
+    connect (_ui.confirm_note, &QAbstractButton.clicked, this, &Share_link_widget.slot_create_note);
+    connect (_ui.confirm_expiration_date, &QAbstractButton.clicked, this, &Share_link_widget.slot_set_expire_date);
 
-    _ui.errorLabel.hide ();
+    _ui.error_label.hide ();
 
-    auto sharingPossible = true;
-    if (!_account.capabilities ().sharePublicLink ()) {
-        qCWarning (lcShareLink) << "Link shares have been disabled";
-        sharingPossible = false;
-    } else if (! (maxSharingPermissions & SharePermissionShare)) {
-        qCWarning (lcShareLink) << "The file can not be shared because it was shared without sharing permission.";
-        sharingPossible = false;
+    auto sharing_possible = true;
+    if (!_account.capabilities ().share_public_link ()) {
+        q_c_warning (lc_share_link) << "Link shares have been disabled";
+        sharing_possible = false;
+    } else if (! (max_sharing_permissions & Share_permission_share)) {
+        q_c_warning (lc_share_link) << "The file can not be shared because it was shared without sharing permission.";
+        sharing_possible = false;
     }
 
-    _ui.enableShareLink.setChecked (false);
-    _ui.shareLinkToolButton.setEnabled (false);
-    _ui.shareLinkToolButton.hide ();
+    _ui.enable_share_link.set_checked (false);
+    _ui.share_link_tool_button.set_enabled (false);
+    _ui.share_link_tool_button.hide ();
 
     // Older servers don't support multiple public link shares
-    if (!_account.capabilities ().sharePublicLinkMultiple ()) {
-        _namesSupported = false;
+    if (!_account.capabilities ().share_public_link_multiple ()) {
+        _names_supported = false;
     }
 
-    togglePasswordOptions (false);
-    toggleExpireDateOptions (false);
-    toggleNoteOptions (false);
+    toggle_password_options (false);
+    toggle_expire_date_options (false);
+    toggle_note_options (false);
 
-    _ui.noteProgressIndicator.setVisible (false);
-    _ui.passwordProgressIndicator.setVisible (false);
-    _ui.expirationDateProgressIndicator.setVisible (false);
-    _ui.sharelinkProgressIndicator.setVisible (false);
+    _ui.note_progress_indicator.set_visible (false);
+    _ui.password_progress_indicator.set_visible (false);
+    _ui.expiration_date_progress_indicator.set_visible (false);
+    _ui.sharelink_progress_indicator.set_visible (false);
 
     // check if the file is already inside of a synced folder
-    if (sharePath.isEmpty ()) {
-        qCWarning (lcShareLink) << "Unable to share files not in a sync folder.";
+    if (share_path.is_empty ()) {
+        q_c_warning (lc_share_link) << "Unable to share files not in a sync folder.";
         return;
     }
 }
 
-ShareLinkWidget.~ShareLinkWidget () {
+Share_link_widget.~Share_link_widget () {
     delete _ui;
 }
 
-void ShareLinkWidget.slotToggleShareLinkAnimation (bool start) {
-    _ui.sharelinkProgressIndicator.setVisible (start);
+void Share_link_widget.slot_toggle_share_link_animation (bool start) {
+    _ui.sharelink_progress_indicator.set_visible (start);
     if (start) {
-        if (!_ui.sharelinkProgressIndicator.isAnimated ()) {
-            _ui.sharelinkProgressIndicator.startAnimation ();
+        if (!_ui.sharelink_progress_indicator.is_animated ()) {
+            _ui.sharelink_progress_indicator.start_animation ();
         }
     } else {
-        _ui.sharelinkProgressIndicator.stopAnimation ();
+        _ui.sharelink_progress_indicator.stop_animation ();
     }
 }
 
-void ShareLinkWidget.toggleButtonAnimation (QToolButton *button, QProgressIndicator *progressIndicator, QAction *checkedAction) {
-    auto startAnimation = false;
-    const auto actionIsChecked = checkedAction.isChecked ();
-    if (!progressIndicator.isAnimated () && actionIsChecked) {
-        progressIndicator.startAnimation ();
-        startAnimation = true;
+void Share_link_widget.toggle_button_animation (QToolButton *button, QProgress_indicator *progress_indicator, QAction *checked_action) {
+    auto start_animation = false;
+    const auto action_is_checked = checked_action.is_checked ();
+    if (!progress_indicator.is_animated () && action_is_checked) {
+        progress_indicator.start_animation ();
+        start_animation = true;
     } else {
-        progressIndicator.stopAnimation ();
+        progress_indicator.stop_animation ();
     }
 
-    button.setVisible (!startAnimation && actionIsChecked);
-    progressIndicator.setVisible (startAnimation && actionIsChecked);
+    button.set_visible (!start_animation && action_is_checked);
+    progress_indicator.set_visible (start_animation && action_is_checked);
 }
 
-void ShareLinkWidget.setLinkShare (QSharedPointer<LinkShare> linkShare) {
-    _linkShare = linkShare;
+void Share_link_widget.set_link_share (QSharedPointer<Link_share> link_share) {
+    _link_share = link_share;
 }
 
-QSharedPointer<LinkShare> ShareLinkWidget.getLinkShare () {
-    return _linkShare;
+QSharedPointer<Link_share> Share_link_widget.get_link_share () {
+    return _link_share;
 }
 
-void ShareLinkWidget.focusPasswordLineEdit () {
-    _ui.lineEdit_password.setFocus ();
+void Share_link_widget.focus_password_line_edit () {
+    _ui.line_edit_password.set_focus ();
 }
 
-void ShareLinkWidget.setupUiOptions () {
-    connect (_linkShare.data (), &LinkShare.noteSet, this, &ShareLinkWidget.slotNoteSet);
-    connect (_linkShare.data (), &LinkShare.passwordSet, this, &ShareLinkWidget.slotPasswordSet);
-    connect (_linkShare.data (), &LinkShare.passwordSetError, this, &ShareLinkWidget.slotPasswordSetError);
-    connect (_linkShare.data (), &LinkShare.labelSet, this, &ShareLinkWidget.slotLabelSet);
+void Share_link_widget.setup_ui_options () {
+    connect (_link_share.data (), &Link_share.note_set, this, &Share_link_widget.slot_note_set);
+    connect (_link_share.data (), &Link_share.password_set, this, &Share_link_widget.slot_password_set);
+    connect (_link_share.data (), &Link_share.password_set_error, this, &Share_link_widget.slot_password_set_error);
+    connect (_link_share.data (), &Link_share.label_set, this, &Share_link_widget.slot_label_set);
 
     // Prepare permissions check and create group action
-    const QDate expireDate = _linkShare.data ().getExpireDate ().isValid () ? _linkShare.data ().getExpireDate () : QDate ();
-    const SharePermissions perm = _linkShare.data ().getPermissions ();
+    const QDate expire_date = _link_share.data ().get_expire_date ().is_valid () ? _link_share.data ().get_expire_date () : QDate ();
+    const Share_permissions perm = _link_share.data ().get_permissions ();
     auto checked = false;
-    auto *permissionsGroup = new QActionGroup (this);
+    auto *permissions_group = new QAction_group (this);
 
     // Prepare sharing menu
-    _linkContextMenu = new QMenu (this);
+    _link_context_menu = new QMenu (this);
 
     // radio button style
-    permissionsGroup.setExclusive (true);
+    permissions_group.set_exclusive (true);
 
-    if (_isFile) {
-        checked = (perm & SharePermissionRead) && (perm & SharePermissionUpdate);
-        _allowEditingLinkAction = _linkContextMenu.addAction (tr ("Allow editing"));
-        _allowEditingLinkAction.setCheckable (true);
-        _allowEditingLinkAction.setChecked (checked);
+    if (_is_file) {
+        checked = (perm & Share_permission_read) && (perm & Share_permission_update);
+        _allow_editing_link_action = _link_context_menu.add_action (tr ("Allow editing"));
+        _allow_editing_link_action.set_checkable (true);
+        _allow_editing_link_action.set_checked (checked);
 
     } else {
-        checked = (perm == SharePermissionRead);
-        _readOnlyLinkAction = permissionsGroup.addAction (tr ("View only"));
-        _readOnlyLinkAction.setCheckable (true);
-        _readOnlyLinkAction.setChecked (checked);
+        checked = (perm == Share_permission_read);
+        _read_only_link_action = permissions_group.add_action (tr ("View only"));
+        _read_only_link_action.set_checkable (true);
+        _read_only_link_action.set_checked (checked);
 
-        checked = (perm & SharePermissionRead) && (perm & SharePermissionCreate)
-            && (perm & SharePermissionUpdate) && (perm & SharePermissionDelete);
-        _allowUploadEditingLinkAction = permissionsGroup.addAction (tr ("Allow upload and editing"));
-        _allowUploadEditingLinkAction.setCheckable (true);
-        _allowUploadEditingLinkAction.setChecked (checked);
+        checked = (perm & Share_permission_read) && (perm & Share_permission_create)
+            && (perm & Share_permission_update) && (perm & Share_permission_delete);
+        _allow_upload_editing_link_action = permissions_group.add_action (tr ("Allow upload and editing"));
+        _allow_upload_editing_link_action.set_checkable (true);
+        _allow_upload_editing_link_action.set_checked (checked);
 
-        checked = (perm == SharePermissionCreate);
-        _allowUploadLinkAction = permissionsGroup.addAction (tr ("File drop (upload only)"));
-        _allowUploadLinkAction.setCheckable (true);
-        _allowUploadLinkAction.setChecked (checked);
+        checked = (perm == Share_permission_create);
+        _allow_upload_link_action = permissions_group.add_action (tr ("File drop (upload only)"));
+        _allow_upload_link_action.set_checkable (true);
+        _allow_upload_link_action.set_checked (checked);
     }
 
-    _shareLinkElidedLabel = new Occ.ElidedLabel (this);
-    _shareLinkElidedLabel.setElideMode (Qt.ElideRight);
-    displayShareLinkLabel ();
-    _ui.horizontalLayout.insertWidget (2, _shareLinkElidedLabel);
+    _share_link_elided_label = new Occ.Elided_label (this);
+    _share_link_elided_label.set_elide_mode (Qt.Elide_right);
+    display_share_link_label ();
+    _ui.horizontal_layout.insert_widget (2, _share_link_elided_label);
 
-    _shareLinkLayout = new QHBoxLayout (this);
+    _share_link_layout = new QHBox_layout (this);
 
-    _shareLinkLabel = new QLabel (this);
-    _shareLinkLabel.setPixmap (string (":/client/theme/black/edit.svg"));
-    _shareLinkLayout.addWidget (_shareLinkLabel);
+    _share_link_label = new QLabel (this);
+    _share_link_label.set_pixmap (string (":/client/theme/black/edit.svg"));
+    _share_link_layout.add_widget (_share_link_label);
 
-    _shareLinkEdit = new QLineEdit (this);
-    connect (_shareLinkEdit, &QLineEdit.returnPressed, this, &ShareLinkWidget.slotCreateLabel);
-    _shareLinkEdit.setPlaceholderText (tr ("Link name"));
-    _shareLinkEdit.setText (_linkShare.data ().getLabel ());
-    _shareLinkLayout.addWidget (_shareLinkEdit);
+    _share_link_edit = new QLineEdit (this);
+    connect (_share_link_edit, &QLineEdit.return_pressed, this, &Share_link_widget.slot_create_label);
+    _share_link_edit.set_placeholder_text (tr ("Link name"));
+    _share_link_edit.set_text (_link_share.data ().get_label ());
+    _share_link_layout.add_widget (_share_link_edit);
 
-    _shareLinkButton = new QToolButton (this);
-    connect (_shareLinkButton, &QToolButton.clicked, this, &ShareLinkWidget.slotCreateLabel);
-    _shareLinkButton.setIcon (QIcon (":/client/theme/confirm.svg"));
-    _shareLinkButton.setToolButtonStyle (Qt.ToolButtonIconOnly);
-    _shareLinkLayout.addWidget (_shareLinkButton);
+    _share_link_button = new QToolButton (this);
+    connect (_share_link_button, &QToolButton.clicked, this, &Share_link_widget.slot_create_label);
+    _share_link_button.set_icon (QIcon (":/client/theme/confirm.svg"));
+    _share_link_button.set_tool_button_style (Qt.Tool_button_icon_only);
+    _share_link_layout.add_widget (_share_link_button);
 
-    _shareLinkProgressIndicator = new QProgressIndicator (this);
-    _shareLinkProgressIndicator.setVisible (false);
-    _shareLinkLayout.addWidget (_shareLinkProgressIndicator);
+    _share_link_progress_indicator = new QProgress_indicator (this);
+    _share_link_progress_indicator.set_visible (false);
+    _share_link_layout.add_widget (_share_link_progress_indicator);
 
-    _shareLinkDefaultWidget = new Gtk.Widget (this);
-    _shareLinkDefaultWidget.setLayout (_shareLinkLayout);
+    _share_link_default_widget = new Gtk.Widget (this);
+    _share_link_default_widget.set_layout (_share_link_layout);
 
-    _shareLinkWidgetAction = new QWidgetAction (this);
-    _shareLinkWidgetAction.setDefaultWidget (_shareLinkDefaultWidget);
-    _shareLinkWidgetAction.setCheckable (true);
-    _linkContextMenu.addAction (_shareLinkWidgetAction);
+    _share_link_widget_action = new QWidget_action (this);
+    _share_link_widget_action.set_default_widget (_share_link_default_widget);
+    _share_link_widget_action.set_checkable (true);
+    _link_context_menu.add_action (_share_link_widget_action);
 
     // Adds permissions actions (radio button style)
-    if (_isFile) {
-        _linkContextMenu.addAction (_allowEditingLinkAction);
+    if (_is_file) {
+        _link_context_menu.add_action (_allow_editing_link_action);
     } else {
-        _linkContextMenu.addAction (_readOnlyLinkAction);
-        _linkContextMenu.addAction (_allowUploadEditingLinkAction);
-        _linkContextMenu.addAction (_allowUploadLinkAction);
+        _link_context_menu.add_action (_read_only_link_action);
+        _link_context_menu.add_action (_allow_upload_editing_link_action);
+        _link_context_menu.add_action (_allow_upload_link_action);
     }
 
     // Adds action to display note widget (check box)
-    _noteLinkAction = _linkContextMenu.addAction (tr ("Note to recipient"));
-    _noteLinkAction.setCheckable (true);
+    _note_link_action = _link_context_menu.add_action (tr ("Note to recipient"));
+    _note_link_action.set_checkable (true);
 
-    if (_linkShare.getNote ().isSimpleText () && !_linkShare.getNote ().isEmpty ()) {
-        _ui.textEdit_note.setText (_linkShare.getNote ());
-        _noteLinkAction.setChecked (true);
-        toggleNoteOptions ();
+    if (_link_share.get_note ().is_simple_text () && !_link_share.get_note ().is_empty ()) {
+        _ui.text_edit_note.set_text (_link_share.get_note ());
+        _note_link_action.set_checked (true);
+        toggle_note_options ();
     }
 
     // Adds action to display password widget (check box)
-    _passwordProtectLinkAction = _linkContextMenu.addAction (tr ("Password protect"));
-    _passwordProtectLinkAction.setCheckable (true);
+    _password_protect_link_action = _link_context_menu.add_action (tr ("Password protect"));
+    _password_protect_link_action.set_checkable (true);
 
-    if (_linkShare.data ().isPasswordSet ()) {
-        _passwordProtectLinkAction.setChecked (true);
-        _ui.lineEdit_password.setPlaceholderText (string.fromUtf8 (passwordIsSetPlaceholder));
-        togglePasswordOptions ();
+    if (_link_share.data ().is_password_set ()) {
+        _password_protect_link_action.set_checked (true);
+        _ui.line_edit_password.set_placeholder_text (string.from_utf8 (password_is_set_placeholder));
+        toggle_password_options ();
     }
 
     // If password is enforced then don't allow users to disable it
-    if (_account.capabilities ().sharePublicLinkEnforcePassword ()) {
-        if (_linkShare.data ().isPasswordSet ()) {
-            _passwordProtectLinkAction.setChecked (true);
-            _passwordProtectLinkAction.setEnabled (false);
+    if (_account.capabilities ().share_public_link_enforce_password ()) {
+        if (_link_share.data ().is_password_set ()) {
+            _password_protect_link_action.set_checked (true);
+            _password_protect_link_action.set_enabled (false);
         }
-        _passwordRequired = true;
+        _password_required = true;
     }
 
     // Adds action to display expiration date widget (check box)
-    _expirationDateLinkAction = _linkContextMenu.addAction (tr ("Set expiration date"));
-    _expirationDateLinkAction.setCheckable (true);
-    if (!expireDate.isNull ()) {
-        _ui.calendar.setDate (expireDate);
-        _expirationDateLinkAction.setChecked (true);
-        toggleExpireDateOptions ();
+    _expiration_date_link_action = _link_context_menu.add_action (tr ("Set expiration date"));
+    _expiration_date_link_action.set_checkable (true);
+    if (!expire_date.is_null ()) {
+        _ui.calendar.set_date (expire_date);
+        _expiration_date_link_action.set_checked (true);
+        toggle_expire_date_options ();
     }
-    connect (_ui.calendar, &QDateTimeEdit.dateChanged, this, &ShareLinkWidget.slotSetExpireDate);
-    connect (_linkShare.data (), &LinkShare.expireDateSet, this, &ShareLinkWidget.slotExpireDateSet);
+    connect (_ui.calendar, &QDate_time_edit.date_changed, this, &Share_link_widget.slot_set_expire_date);
+    connect (_link_share.data (), &Link_share.expire_date_set, this, &Share_link_widget.slot_expire_date_set);
 
     // If expiredate is enforced do not allow disable and set max days
-    if (_account.capabilities ().sharePublicLinkEnforceExpireDate ()) {
-        _ui.calendar.setMaximumDate (QDate.currentDate ().addDays (
-            _account.capabilities ().sharePublicLinkExpireDateDays ()));
-        _expirationDateLinkAction.setChecked (true);
-        _expirationDateLinkAction.setEnabled (false);
-        _expiryRequired = true;
+    if (_account.capabilities ().share_public_link_enforce_expire_date ()) {
+        _ui.calendar.set_maximum_date (QDate.current_date ().add_days (
+            _account.capabilities ().share_public_link_expire_date_days ()));
+        _expiration_date_link_action.set_checked (true);
+        _expiration_date_link_action.set_enabled (false);
+        _expiry_required = true;
     }
 
     // Adds action to unshare widget (check box)
-    _unshareLinkAction = _linkContextMenu.addAction (QIcon (":/client/theme/delete.svg"),
+    _unshare_link_action = _link_context_menu.add_action (QIcon (":/client/theme/delete.svg"),
         tr ("Delete link"));
 
-    _linkContextMenu.addSeparator ();
+    _link_context_menu.add_separator ();
 
-    _addAnotherLinkAction = _linkContextMenu.addAction (QIcon (":/client/theme/add.svg"),
+    _add_another_link_action = _link_context_menu.add_action (QIcon (":/client/theme/add.svg"),
         tr ("Add another link"));
 
-    _ui.enableShareLink.setIcon (QIcon (":/client/theme/copy.svg"));
-    disconnect (_ui.enableShareLink, &QPushButton.clicked, this, &ShareLinkWidget.slotCreateShareLink);
-    connect (_ui.enableShareLink, &QPushButton.clicked, this, &ShareLinkWidget.slotCopyLinkShare);
+    _ui.enable_share_link.set_icon (QIcon (":/client/theme/copy.svg"));
+    disconnect (_ui.enable_share_link, &QPushButton.clicked, this, &Share_link_widget.slot_create_share_link);
+    connect (_ui.enable_share_link, &QPushButton.clicked, this, &Share_link_widget.slot_copy_link_share);
 
-    connect (_linkContextMenu, &QMenu.triggered,
-        this, &ShareLinkWidget.slotLinkContextMenuActionTriggered);
+    connect (_link_context_menu, &QMenu.triggered,
+        this, &Share_link_widget.slot_link_context_menu_action_triggered);
 
-    _ui.shareLinkToolButton.setMenu (_linkContextMenu);
-    _ui.shareLinkToolButton.setEnabled (true);
-    _ui.enableShareLink.setEnabled (true);
-    _ui.enableShareLink.setChecked (true);
+    _ui.share_link_tool_button.set_menu (_link_context_menu);
+    _ui.share_link_tool_button.set_enabled (true);
+    _ui.enable_share_link.set_enabled (true);
+    _ui.enable_share_link.set_checked (true);
 
     // show sharing options
-    _ui.shareLinkToolButton.show ();
+    _ui.share_link_tool_button.show ();
 
-    customizeStyle ();
+    customize_style ();
 }
 
-void ShareLinkWidget.slotCreateNote () {
-    const auto note = _ui.textEdit_note.toPlainText ();
-    if (!_linkShare || _linkShare.getNote () == note || note.isEmpty ()) {
+void Share_link_widget.slot_create_note () {
+    const auto note = _ui.text_edit_note.to_plain_text ();
+    if (!_link_share || _link_share.get_note () == note || note.is_empty ()) {
         return;
     }
 
-    toggleButtonAnimation (_ui.confirmNote, _ui.noteProgressIndicator, _noteLinkAction);
-    _ui.errorLabel.hide ();
-    _linkShare.setNote (note);
+    toggle_button_animation (_ui.confirm_note, _ui.note_progress_indicator, _note_link_action);
+    _ui.error_label.hide ();
+    _link_share.set_note (note);
 }
 
-void ShareLinkWidget.slotNoteSet () {
-    toggleButtonAnimation (_ui.confirmNote, _ui.noteProgressIndicator, _noteLinkAction);
+void Share_link_widget.slot_note_set () {
+    toggle_button_animation (_ui.confirm_note, _ui.note_progress_indicator, _note_link_action);
 }
 
-void ShareLinkWidget.slotCopyLinkShare (bool clicked) {
+void Share_link_widget.slot_copy_link_share (bool clicked) {
     Q_UNUSED (clicked);
 
-    QApplication.clipboard ().setText (_linkShare.getLink ().toString ());
+    QApplication.clipboard ().set_text (_link_share.get_link ().to_string ());
 }
 
-void ShareLinkWidget.slotExpireDateSet () {
-    toggleButtonAnimation (_ui.confirmExpirationDate, _ui.expirationDateProgressIndicator, _expirationDateLinkAction);
+void Share_link_widget.slot_expire_date_set () {
+    toggle_button_animation (_ui.confirm_expiration_date, _ui.expiration_date_progress_indicator, _expiration_date_link_action);
 }
 
-void ShareLinkWidget.slotSetExpireDate () {
-    if (!_linkShare) {
+void Share_link_widget.slot_set_expire_date () {
+    if (!_link_share) {
         return;
     }
 
-    toggleButtonAnimation (_ui.confirmExpirationDate, _ui.expirationDateProgressIndicator, _expirationDateLinkAction);
-    _ui.errorLabel.hide ();
-    _linkShare.setExpireDate (_ui.calendar.date ());
+    toggle_button_animation (_ui.confirm_expiration_date, _ui.expiration_date_progress_indicator, _expiration_date_link_action);
+    _ui.error_label.hide ();
+    _link_share.set_expire_date (_ui.calendar.date ());
 }
 
-void ShareLinkWidget.slotCreatePassword () {
-    if (!_linkShare || _ui.lineEdit_password.text ().isEmpty ()) {
+void Share_link_widget.slot_create_password () {
+    if (!_link_share || _ui.line_edit_password.text ().is_empty ()) {
         return;
     }
 
-    toggleButtonAnimation (_ui.confirmPassword, _ui.passwordProgressIndicator, _passwordProtectLinkAction);
-    _ui.errorLabel.hide ();
-    emit createPassword (_ui.lineEdit_password.text ());
+    toggle_button_animation (_ui.confirm_password, _ui.password_progress_indicator, _password_protect_link_action);
+    _ui.error_label.hide ();
+    emit create_password (_ui.line_edit_password.text ());
 }
 
-void ShareLinkWidget.slotCreateShareLink (bool clicked) {
+void Share_link_widget.slot_create_share_link (bool clicked) {
     Q_UNUSED (clicked);
-    slotToggleShareLinkAnimation (true);
-    emit createLinkShare ();
+    slot_toggle_share_link_animation (true);
+    emit create_link_share ();
 }
 
-void ShareLinkWidget.slotPasswordSet () {
-    toggleButtonAnimation (_ui.confirmPassword, _ui.passwordProgressIndicator, _passwordProtectLinkAction);
+void Share_link_widget.slot_password_set () {
+    toggle_button_animation (_ui.confirm_password, _ui.password_progress_indicator, _password_protect_link_action);
 
-    _ui.lineEdit_password.setText ({});
+    _ui.line_edit_password.set_text ({});
 
-    if (_linkShare.isPasswordSet ()) {
-        _ui.lineEdit_password.setEnabled (true);
-        _ui.lineEdit_password.setPlaceholderText (string.fromUtf8 (passwordIsSetPlaceholder));
+    if (_link_share.is_password_set ()) {
+        _ui.line_edit_password.set_enabled (true);
+        _ui.line_edit_password.set_placeholder_text (string.from_utf8 (password_is_set_placeholder));
     } else {
-        _ui.lineEdit_password.setPlaceholderText ({});
+        _ui.line_edit_password.set_placeholder_text ({});
     }
 
-    emit createPasswordProcessed ();
+    emit create_password_processed ();
 }
 
-void ShareLinkWidget.slotPasswordSetError (int code, string &message) {
-    toggleButtonAnimation (_ui.confirmPassword, _ui.passwordProgressIndicator, _passwordProtectLinkAction);
+void Share_link_widget.slot_password_set_error (int code, string &message) {
+    toggle_button_animation (_ui.confirm_password, _ui.password_progress_indicator, _password_protect_link_action);
 
-    slotServerError (code, message);
-    togglePasswordOptions ();
-    _ui.lineEdit_password.setFocus ();
-    emit createPasswordProcessed ();
+    slot_server_error (code, message);
+    toggle_password_options ();
+    _ui.line_edit_password.set_focus ();
+    emit create_password_processed ();
 }
 
-void ShareLinkWidget.startAnimation (int start, int end) {
-    auto *animation = new QPropertyAnimation (this, "maximumHeight", this);
+void Share_link_widget.start_animation (int start, int end) {
+    auto *animation = new QPropertyAnimation (this, "maximum_height", this);
 
-    animation.setDuration (500);
-    animation.setStartValue (start);
-    animation.setEndValue (end);
+    animation.set_duration (500);
+    animation.set_start_value (start);
+    animation.set_end_value (end);
 
-    connect (animation, &QAbstractAnimation.finished, this, &ShareLinkWidget.slotAnimationFinished);
+    connect (animation, &QAbstractAnimation.finished, this, &Share_link_widget.slot_animation_finished);
     if (end < start) // that is to remove the widget, not to show it
-        connect (animation, &QAbstractAnimation.finished, this, &ShareLinkWidget.slotDeleteAnimationFinished);
-    connect (animation, &QVariantAnimation.valueChanged, this, &ShareLinkWidget.resizeRequested);
+        connect (animation, &QAbstractAnimation.finished, this, &Share_link_widget.slot_delete_animation_finished);
+    connect (animation, &QVariant_animation.value_changed, this, &Share_link_widget.resize_requested);
 
     animation.start ();
 }
 
-void ShareLinkWidget.slotDeleteShareFetched () {
-    slotToggleShareLinkAnimation (false);
+void Share_link_widget.slot_delete_share_fetched () {
+    slot_toggle_share_link_animation (false);
 
-    _linkShare.clear ();
-    togglePasswordOptions (false);
-    toggleNoteOptions (false);
-    toggleExpireDateOptions (false);
-    emit deleteLinkShare ();
+    _link_share.clear ();
+    toggle_password_options (false);
+    toggle_note_options (false);
+    toggle_expire_date_options (false);
+    emit delete_link_share ();
 }
 
-void ShareLinkWidget.toggleNoteOptions (bool enable) {
-    _ui.noteLabel.setVisible (enable);
-    _ui.textEdit_note.setVisible (enable);
-    _ui.confirmNote.setVisible (enable);
-    _ui.textEdit_note.setText (enable && _linkShare ? _linkShare.getNote () : string ());
+void Share_link_widget.toggle_note_options (bool enable) {
+    _ui.note_label.set_visible (enable);
+    _ui.text_edit_note.set_visible (enable);
+    _ui.confirm_note.set_visible (enable);
+    _ui.text_edit_note.set_text (enable && _link_share ? _link_share.get_note () : string ());
 
-    if (!enable && _linkShare && !_linkShare.getNote ().isEmpty ()) {
-        _linkShare.setNote ({});
+    if (!enable && _link_share && !_link_share.get_note ().is_empty ()) {
+        _link_share.set_note ({});
     }
 }
 
-void ShareLinkWidget.slotAnimationFinished () {
-    emit resizeRequested ();
-    deleteLater ();
+void Share_link_widget.slot_animation_finished () {
+    emit resize_requested ();
+    delete_later ();
 }
 
-void ShareLinkWidget.slotCreateLabel () {
-    const auto labelText = _shareLinkEdit.text ();
-    if (!_linkShare || _linkShare.getLabel () == labelText || labelText.isEmpty ()) {
+void Share_link_widget.slot_create_label () {
+    const auto label_text = _share_link_edit.text ();
+    if (!_link_share || _link_share.get_label () == label_text || label_text.is_empty ()) {
         return;
     }
-    _shareLinkWidgetAction.setChecked (true);
-    toggleButtonAnimation (_shareLinkButton, _shareLinkProgressIndicator, _shareLinkWidgetAction);
-    _ui.errorLabel.hide ();
-    _linkShare.setLabel (_shareLinkEdit.text ());
+    _share_link_widget_action.set_checked (true);
+    toggle_button_animation (_share_link_button, _share_link_progress_indicator, _share_link_widget_action);
+    _ui.error_label.hide ();
+    _link_share.set_label (_share_link_edit.text ());
 }
 
-void ShareLinkWidget.slotLabelSet () {
-    toggleButtonAnimation (_shareLinkButton, _shareLinkProgressIndicator, _shareLinkWidgetAction);
-    displayShareLinkLabel ();
+void Share_link_widget.slot_label_set () {
+    toggle_button_animation (_share_link_button, _share_link_progress_indicator, _share_link_widget_action);
+    display_share_link_label ();
 }
 
-void ShareLinkWidget.slotDeleteAnimationFinished () {
+void Share_link_widget.slot_delete_animation_finished () {
     // There is a painting bug where a small line of this widget isn't
     // properly cleared. This explicit repaint () call makes sure any trace of
     // the share widget is removed once it's destroyed. #4189
-    connect (this, SIGNAL (destroyed (GLib.Object *)), parentWidget (), SLOT (repaint ()));
+    connect (this, SIGNAL (destroyed (GLib.Object *)), parent_widget (), SLOT (repaint ()));
 }
 
-void ShareLinkWidget.slotCreateShareRequiresPassword (string &message) {
-    slotToggleShareLinkAnimation (message.isEmpty ());
+void Share_link_widget.slot_create_share_requires_password (string &message) {
+    slot_toggle_share_link_animation (message.is_empty ());
 
-    if (!message.isEmpty ()) {
-        _ui.errorLabel.setText (message);
-        _ui.errorLabel.show ();
+    if (!message.is_empty ()) {
+        _ui.error_label.set_text (message);
+        _ui.error_label.show ();
     }
 
-    _passwordRequired = true;
+    _password_required = true;
 
-    togglePasswordOptions ();
+    toggle_password_options ();
 }
 
-void ShareLinkWidget.togglePasswordOptions (bool enable) {
-    _ui.passwordLabel.setVisible (enable);
-    _ui.lineEdit_password.setVisible (enable);
-    _ui.confirmPassword.setVisible (enable);
-    _ui.lineEdit_password.setFocus ();
+void Share_link_widget.toggle_password_options (bool enable) {
+    _ui.password_label.set_visible (enable);
+    _ui.line_edit_password.set_visible (enable);
+    _ui.confirm_password.set_visible (enable);
+    _ui.line_edit_password.set_focus ();
 
-    if (!enable && _linkShare && _linkShare.isPasswordSet ()) {
-        _linkShare.setPassword ({});
-    }
-}
-
-void ShareLinkWidget.toggleExpireDateOptions (bool enable) {
-    _ui.expirationLabel.setVisible (enable);
-    _ui.calendar.setVisible (enable);
-    _ui.confirmExpirationDate.setVisible (enable);
-
-    const auto date = enable ? _linkShare.getExpireDate () : QDate.currentDate ().addDays (1);
-    _ui.calendar.setDate (date);
-    _ui.calendar.setMinimumDate (QDate.currentDate ().addDays (1));
-    _ui.calendar.setMaximumDate (
-        QDate.currentDate ().addDays (_account.capabilities ().sharePublicLinkExpireDateDays ()));
-    _ui.calendar.setFocus ();
-
-    if (!enable && _linkShare && _linkShare.getExpireDate ().isValid ()) {
-        _linkShare.setExpireDate ({});
+    if (!enable && _link_share && _link_share.is_password_set ()) {
+        _link_share.set_password ({});
     }
 }
 
-void ShareLinkWidget.confirmAndDeleteShare () {
-    auto messageBox = new QMessageBox (
+void Share_link_widget.toggle_expire_date_options (bool enable) {
+    _ui.expiration_label.set_visible (enable);
+    _ui.calendar.set_visible (enable);
+    _ui.confirm_expiration_date.set_visible (enable);
+
+    const auto date = enable ? _link_share.get_expire_date () : QDate.current_date ().add_days (1);
+    _ui.calendar.set_date (date);
+    _ui.calendar.set_minimum_date (QDate.current_date ().add_days (1));
+    _ui.calendar.set_maximum_date (
+        QDate.current_date ().add_days (_account.capabilities ().share_public_link_expire_date_days ()));
+    _ui.calendar.set_focus ();
+
+    if (!enable && _link_share && _link_share.get_expire_date ().is_valid ()) {
+        _link_share.set_expire_date ({});
+    }
+}
+
+void Share_link_widget.confirm_and_delete_share () {
+    auto message_box = new QMessageBox (
         QMessageBox.Question,
         tr ("Confirm Link Share Deletion"),
         tr ("<p>Do you really want to delete the public link share <i>%1</i>?</p>"
            "<p>Note : This action cannot be undone.</p>")
-            .arg (shareName ()),
+            .arg (share_name ()),
         QMessageBox.NoButton,
         this);
-    QPushButton *yesButton =
-        messageBox.addButton (tr ("Delete"), QMessageBox.YesRole);
-    messageBox.addButton (tr ("Cancel"), QMessageBox.NoRole);
+    QPushButton *yes_button =
+        message_box.add_button (tr ("Delete"), QMessageBox.YesRole);
+    message_box.add_button (tr ("Cancel"), QMessageBox.NoRole);
 
-    connect (messageBox, &QMessageBox.finished, this,
-        [messageBox, yesButton, this] () {
-            if (messageBox.clickedButton () == yesButton) {
-                this.slotToggleShareLinkAnimation (true);
-                this._linkShare.deleteShare ();
+    connect (message_box, &QMessageBox.finished, this,
+        [message_box, yes_button, this] () {
+            if (message_box.clicked_button () == yes_button) {
+                this.slot_toggle_share_link_animation (true);
+                this._link_share.delete_share ();
             }
         });
-    messageBox.open ();
+    message_box.open ();
 }
 
-string ShareLinkWidget.shareName () {
-    string name = _linkShare.getName ();
-    if (!name.isEmpty ())
+string Share_link_widget.share_name () {
+    string name = _link_share.get_name ();
+    if (!name.is_empty ())
         return name;
-    if (!_namesSupported)
+    if (!_names_supported)
         return tr ("Public link");
-    return _linkShare.getToken ();
+    return _link_share.get_token ();
 }
 
-void ShareLinkWidget.slotContextMenuButtonClicked () {
-    _linkContextMenu.exec (QCursor.pos ());
+void Share_link_widget.slot_context_menu_button_clicked () {
+    _link_context_menu.exec (QCursor.pos ());
 }
 
-void ShareLinkWidget.slotLinkContextMenuActionTriggered (QAction *action) {
-    const auto state = action.isChecked ();
-    SharePermissions perm = SharePermissionRead;
+void Share_link_widget.slot_link_context_menu_action_triggered (QAction *action) {
+    const auto state = action.is_checked ();
+    Share_permissions perm = Share_permission_read;
 
-    if (action == _addAnotherLinkAction) {
-        emit createLinkShare ();
+    if (action == _add_another_link_action) {
+        emit create_link_share ();
 
-    } else if (action == _readOnlyLinkAction && state) {
-        _linkShare.setPermissions (perm);
+    } else if (action == _read_only_link_action && state) {
+        _link_share.set_permissions (perm);
 
-    } else if (action == _allowEditingLinkAction && state) {
-        perm |= SharePermissionUpdate;
-        _linkShare.setPermissions (perm);
+    } else if (action == _allow_editing_link_action && state) {
+        perm |= Share_permission_update;
+        _link_share.set_permissions (perm);
 
-    } else if (action == _allowUploadEditingLinkAction && state) {
-        perm |= SharePermissionCreate | SharePermissionUpdate | SharePermissionDelete;
-        _linkShare.setPermissions (perm);
+    } else if (action == _allow_upload_editing_link_action && state) {
+        perm |= Share_permission_create | Share_permission_update | Share_permission_delete;
+        _link_share.set_permissions (perm);
 
-    } else if (action == _allowUploadLinkAction && state) {
-        perm = SharePermissionCreate;
-        _linkShare.setPermissions (perm);
+    } else if (action == _allow_upload_link_action && state) {
+        perm = Share_permission_create;
+        _link_share.set_permissions (perm);
 
-    } else if (action == _passwordProtectLinkAction) {
-        togglePasswordOptions (state);
+    } else if (action == _password_protect_link_action) {
+        toggle_password_options (state);
 
-    } else if (action == _expirationDateLinkAction) {
-        toggleExpireDateOptions (state);
+    } else if (action == _expiration_date_link_action) {
+        toggle_expire_date_options (state);
 
-    } else if (action == _noteLinkAction) {
-        toggleNoteOptions (state);
+    } else if (action == _note_link_action) {
+        toggle_note_options (state);
 
-    } else if (action == _unshareLinkAction) {
-        confirmAndDeleteShare ();
+    } else if (action == _unshare_link_action) {
+        confirm_and_delete_share ();
     }
 }
 
-void ShareLinkWidget.slotServerError (int code, string &message) {
-    slotToggleShareLinkAnimation (false);
+void Share_link_widget.slot_server_error (int code, string &message) {
+    slot_toggle_share_link_animation (false);
 
-    qCWarning (lcSharing) << "Error from server" << code << message;
-    displayError (message);
+    q_c_warning (lc_sharing) << "Error from server" << code << message;
+    display_error (message);
 }
 
-void ShareLinkWidget.displayError (string &errMsg) {
-    _ui.errorLabel.setText (errMsg);
-    _ui.errorLabel.show ();
+void Share_link_widget.display_error (string &err_msg) {
+    _ui.error_label.set_text (err_msg);
+    _ui.error_label.show ();
 }
 
-void ShareLinkWidget.slotStyleChanged () {
-    customizeStyle ();
+void Share_link_widget.slot_style_changed () {
+    customize_style ();
 }
 
-void ShareLinkWidget.customizeStyle () {
-    _unshareLinkAction.setIcon (Theme.createColorAwareIcon (":/client/theme/delete.svg"));
+void Share_link_widget.customize_style () {
+    _unshare_link_action.set_icon (Theme.create_color_aware_icon (":/client/theme/delete.svg"));
 
-    _addAnotherLinkAction.setIcon (Theme.createColorAwareIcon (":/client/theme/add.svg"));
+    _add_another_link_action.set_icon (Theme.create_color_aware_icon (":/client/theme/add.svg"));
 
-    _ui.enableShareLink.setIcon (Theme.createColorAwareIcon (":/client/theme/copy.svg"));
+    _ui.enable_share_link.set_icon (Theme.create_color_aware_icon (":/client/theme/copy.svg"));
 
-    _ui.shareLinkIconLabel.setPixmap (Theme.createColorAwarePixmap (":/client/theme/public.svg"));
+    _ui.share_link_icon_label.set_pixmap (Theme.create_color_aware_pixmap (":/client/theme/public.svg"));
 
-    _ui.shareLinkToolButton.setIcon (Theme.createColorAwareIcon (":/client/theme/more.svg"));
+    _ui.share_link_tool_button.set_icon (Theme.create_color_aware_icon (":/client/theme/more.svg"));
 
-    _ui.confirmNote.setIcon (Theme.createColorAwareIcon (":/client/theme/confirm.svg"));
-    _ui.confirmPassword.setIcon (Theme.createColorAwareIcon (":/client/theme/confirm.svg"));
-    _ui.confirmExpirationDate.setIcon (Theme.createColorAwareIcon (":/client/theme/confirm.svg"));
+    _ui.confirm_note.set_icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
+    _ui.confirm_password.set_icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
+    _ui.confirm_expiration_date.set_icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
 
-    _ui.passwordProgressIndicator.setColor (QGuiApplication.palette ().color (QPalette.Text));
+    _ui.password_progress_indicator.set_color (QGuiApplication.palette ().color (QPalette.Text));
 }
 
-void ShareLinkWidget.displayShareLinkLabel () {
-    _shareLinkElidedLabel.clear ();
-    if (!_linkShare.getLabel ().isEmpty ()) {
-        _shareLinkElidedLabel.setText (string (" (%1)").arg (_linkShare.getLabel ()));
+void Share_link_widget.display_share_link_label () {
+    _share_link_elided_label.clear ();
+    if (!_link_share.get_label ().is_empty ()) {
+        _share_link_elided_label.set_text (string (" (%1)").arg (_link_share.get_label ()));
     }
 }
 

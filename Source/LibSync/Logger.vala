@@ -8,7 +8,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QRegularExpression>
 // #include <QStringList>
 // #include <QtGlobal>
-// #include <QTextCodec>
+// #include <QText_codec>
 // #include <qmetaobject.h>
 
 // #include <iostream>
@@ -18,7 +18,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 #endif
 
 namespace {
-constexpr int CrashLogSize = 20;
+constexpr int Crash_log_size = 20;
 }
 
 // #include <GLib.Object>
@@ -36,32 +36,32 @@ namespace Occ {
 ***********************************************************/
 class Logger : GLib.Object {
 public:
-    bool isLoggingToFile ();
+    bool is_logging_to_file ();
 
-    void doLog (QtMsgType type, QMessageLogContext &ctx, string &message);
+    void do_log (Qt_msg_type type, QMessage_log_context &ctx, string &message);
 
     static Logger *instance ();
 
-    void postGuiLog (string &title, string &message);
-    void postOptionalGuiLog (string &title, string &message);
-    void postGuiMessage (string &title, string &message);
+    void post_gui_log (string &title, string &message);
+    void post_optional_gui_log (string &title, string &message);
+    void post_gui_message (string &title, string &message);
 
-    string logFile ();
-    void setLogFile (string &name);
+    string log_file ();
+    void set_log_file (string &name);
 
-    void setLogExpire (int expire);
+    void set_log_expire (int expire);
 
-    string logDir ();
-    void setLogDir (string &dir);
+    string log_dir ();
+    void set_log_dir (string &dir);
 
-    void setLogFlush (bool flush);
+    void set_log_flush (bool flush);
 
-    bool logDebug () { return _logDebug; }
-    void setLogDebug (bool debug);
+    bool log_debug () { return _log_debug; }
+    void set_log_debug (bool debug);
 
     /***********************************************************
     Returns where the automatic logdir would be */
-    string temporaryFolderLogDirPath ();
+    string temporary_folder_log_dir_path ();
 
     /***********************************************************
     Sets up default dir log setup.
@@ -70,50 +70,50 @@ public:
     logexpire : 4 hours
     logdebug : true
     
-    Used in conjunction with ConfigFile.automaticLogDir
+    Used in conjunction with ConfigFile.automatic_log_dir
     ***********************************************************/
-    void setupTemporaryFolderLogDir ();
+    void setup_temporary_folder_log_dir ();
 
     /***********************************************************
     For switching off via logwindow */
-    void disableTemporaryFolderLogDir ();
+    void disable_temporary_folder_log_dir ();
 
-    void addLogRule (QSet<string> &rules) {
-        setLogRules (_logRules + rules);
+    void add_log_rule (QSet<string> &rules) {
+        set_log_rules (_log_rules + rules);
     }
-    void removeLogRule (QSet<string> &rules) {
-        setLogRules (_logRules - rules);
+    void remove_log_rule (QSet<string> &rules) {
+        set_log_rules (_log_rules - rules);
     }
-    void setLogRules (QSet<string> &rules);
+    void set_log_rules (QSet<string> &rules);
 
 signals:
-    void logWindowLog (string &);
+    void log_window_log (string &);
 
-    void guiLog (string &, string &);
-    void guiMessage (string &, string &);
-    void optionalGuiLog (string &, string &);
+    void gui_log (string &, string &);
+    void gui_message (string &, string &);
+    void optional_gui_log (string &, string &);
 
 public slots:
-    void enterNextLogFile ();
+    void enter_next_log_file ();
 
 private:
     Logger (GLib.Object *parent = nullptr);
     ~Logger () override;
 
     void close ();
-    void dumpCrashLog ();
+    void dump_crash_log ();
 
-    QFile _logFile;
-    bool _doFileFlush = false;
-    int _logExpire = 0;
-    bool _logDebug = false;
+    QFile _log_file;
+    bool _do_file_flush = false;
+    int _log_expire = 0;
+    bool _log_debug = false;
     QScopedPointer<QTextStream> _logstream;
     mutable QMutex _mutex;
-    string _logDirectory;
-    bool _temporaryFolderLogDir = false;
-    QSet<string> _logRules;
-    QVector<string> _crashLog;
-    int _crashLogIndex = 0;
+    string _log_directory;
+    bool _temporary_folder_log_dir = false;
+    QSet<string> _log_rules;
+    QVector<string> _crash_log;
+    int _crash_log_index = 0;
 };
 
 Logger *Logger.instance () {
@@ -123,184 +123,184 @@ Logger *Logger.instance () {
 
 Logger.Logger (GLib.Object *parent)
     : GLib.Object (parent) {
-    qSetMessagePattern (QStringLiteral ("%{time yyyy-MM-dd hh:mm:ss:zzz} [ %{type} %{category} %{file}:%{line} "
+    q_set_message_pattern (QStringLiteral ("%{time yyyy-MM-dd hh:mm:ss:zzz} [ %{type} %{category} %{file}:%{line} "
                                       "]%{if-debug}\t[ %{function} ]%{endif}:\t%{message}"));
-    _crashLog.resize (CrashLogSize);
+    _crash_log.resize (Crash_log_size);
 #ifndef NO_MSG_HANDLER
-    qInstallMessageHandler ([] (QtMsgType type, QMessageLogContext &ctx, string &message) {
-            Logger.instance ().doLog (type, ctx, message);
+    q_install_message_handler ([] (Qt_msg_type type, QMessage_log_context &ctx, string &message) {
+            Logger.instance ().do_log (type, ctx, message);
         });
 #endif
 }
 
 Logger.~Logger () {
 #ifndef NO_MSG_HANDLER
-    qInstallMessageHandler (nullptr);
+    q_install_message_handler (nullptr);
 #endif
 }
 
-void Logger.postGuiLog (string &title, string &message) {
-    emit guiLog (title, message);
+void Logger.post_gui_log (string &title, string &message) {
+    emit gui_log (title, message);
 }
 
-void Logger.postOptionalGuiLog (string &title, string &message) {
-    emit optionalGuiLog (title, message);
+void Logger.post_optional_gui_log (string &title, string &message) {
+    emit optional_gui_log (title, message);
 }
 
-void Logger.postGuiMessage (string &title, string &message) {
-    emit guiMessage (title, message);
+void Logger.post_gui_message (string &title, string &message) {
+    emit gui_message (title, message);
 }
 
-bool Logger.isLoggingToFile () {
+bool Logger.is_logging_to_file () {
     QMutexLocker lock (&_mutex);
     return _logstream;
 }
 
-void Logger.doLog (QtMsgType type, QMessageLogContext &ctx, string &message) { {onst string msg = qFormatLogMessage (type, ctx, message);
+void Logger.do_log (Qt_msg_type type, QMessage_log_context &ctx, string &message) { {onst string msg = q_format_log_message (type, ctx, message);
     {
         QMutexLocker lock (&_mutex);
-        _crashLogIndex = (_crashLogIndex + 1) % CrashLogSize;
-        _crashLog[_crashLogIndex] = msg;
+        _crash_log_index = (_crash_log_index + 1) % Crash_log_size;
+        _crash_log[_crash_log_index] = msg;
         if (_logstream) {
             (*_logstream) << msg << Qt.endl;
-            if (_doFileFlush)
+            if (_do_file_flush)
                 _logstream.flush ();
         }
-        if (type == QtFatalMsg) {
+        if (type == Qt_fatal_msg) {
             close ();
         }
     }
-    emit logWindowLog (msg);
+    emit log_window_log (msg);
 }
 
 void Logger.close () {
-    dumpCrashLog ();
+    dump_crash_log ();
     if (_logstream) {
         _logstream.flush ();
-        _logFile.close ();
+        _log_file.close ();
         _logstream.reset ();
     }
 }
 
-string Logger.logFile () {
-    return _logFile.fileName ();
+string Logger.log_file () {
+    return _log_file.file_name ();
 }
 
-void Logger.setLogFile (string &name) {
+void Logger.set_log_file (string &name) {
     QMutexLocker locker (&_mutex);
     if (_logstream) {
         _logstream.reset (nullptr);
-        _logFile.close ();
+        _log_file.close ();
     }
 
-    if (name.isEmpty ()) {
+    if (name.is_empty ()) {
         return;
     }
 
-    bool openSucceeded = false;
+    bool open_succeeded = false;
     if (name == QLatin1String ("-")) {
-        openSucceeded = _logFile.open (stdout, QIODevice.WriteOnly);
+        open_succeeded = _log_file.open (stdout, QIODevice.WriteOnly);
     } else {
-        _logFile.setFileName (name);
-        openSucceeded = _logFile.open (QIODevice.WriteOnly);
+        _log_file.set_file_name (name);
+        open_succeeded = _log_file.open (QIODevice.WriteOnly);
     }
 
-    if (!openSucceeded) {
-        locker.unlock (); // Just in case postGuiMessage has a qDebug ()
-        postGuiMessage (tr ("Error"),
+    if (!open_succeeded) {
+        locker.unlock (); // Just in case post_gui_message has a q_debug ()
+        post_gui_message (tr ("Error"),
             string (tr ("<nobr>File \"%1\"<br/>cannot be opened for writing.<br/><br/>"
                        "The log output <b>cannot</b> be saved!</nobr>"))
                 .arg (name));
         return;
     }
 
-    _logstream.reset (new QTextStream (&_logFile));
-    _logstream.setCodec (QTextCodec.codecForName ("UTF-8"));
+    _logstream.reset (new QTextStream (&_log_file));
+    _logstream.set_codec (QText_codec.codec_for_name ("UTF-8"));
 }
 
-void Logger.setLogExpire (int expire) {
-    _logExpire = expire;
+void Logger.set_log_expire (int expire) {
+    _log_expire = expire;
 }
 
-string Logger.logDir () {
-    return _logDirectory;
+string Logger.log_dir () {
+    return _log_directory;
 }
 
-void Logger.setLogDir (string &dir) {
-    _logDirectory = dir;
+void Logger.set_log_dir (string &dir) {
+    _log_directory = dir;
 }
 
-void Logger.setLogFlush (bool flush) {
-    _doFileFlush = flush;
+void Logger.set_log_flush (bool flush) {
+    _do_file_flush = flush;
 }
 
-void Logger.setLogDebug (bool debug) {
+void Logger.set_log_debug (bool debug) {
     const QSet<string> rules = {debug ? QStringLiteral ("nextcloud.*.debug=true") : string ()};
     if (debug) {
-        addLogRule (rules);
+        add_log_rule (rules);
     } else {
-        removeLogRule (rules);
+        remove_log_rule (rules);
     }
-    _logDebug = debug;
+    _log_debug = debug;
 }
 
-string Logger.temporaryFolderLogDirPath () {
-    return QDir.temp ().filePath (QStringLiteral (APPLICATION_SHORTNAME "-logdir"));
+string Logger.temporary_folder_log_dir_path () {
+    return QDir.temp ().file_path (QStringLiteral (APPLICATION_SHORTNAME "-logdir"));
 }
 
-void Logger.setupTemporaryFolderLogDir () {
-    auto dir = temporaryFolderLogDirPath ();
+void Logger.setup_temporary_folder_log_dir () {
+    auto dir = temporary_folder_log_dir_path ();
     if (!QDir ().mkpath (dir))
         return;
-    setLogDebug (true);
-    setLogExpire (4 /*hours*/);
-    setLogDir (dir);
-    _temporaryFolderLogDir = true;
+    set_log_debug (true);
+    set_log_expire (4 /*hours*/);
+    set_log_dir (dir);
+    _temporary_folder_log_dir = true;
 }
 
-void Logger.disableTemporaryFolderLogDir () {
-    if (!_temporaryFolderLogDir)
+void Logger.disable_temporary_folder_log_dir () {
+    if (!_temporary_folder_log_dir)
         return;
 
-    enterNextLogFile ();
-    setLogDir (string ());
-    setLogDebug (false);
-    setLogFile (string ());
-    _temporaryFolderLogDir = false;
+    enter_next_log_file ();
+    set_log_dir (string ());
+    set_log_debug (false);
+    set_log_file (string ());
+    _temporary_folder_log_dir = false;
 }
 
-void Logger.setLogRules (QSet<string> &rules) {
-    _logRules = rules;
+void Logger.set_log_rules (QSet<string> &rules) {
+    _log_rules = rules;
     string tmp;
     QTextStream out (&tmp);
     for (auto &p : rules) {
         out << p << QLatin1Char ('\n');
     }
-    qDebug () << tmp;
-    QLoggingCategory.setFilterRules (tmp);
+    q_debug () << tmp;
+    QLoggingCategory.set_filter_rules (tmp);
 }
 
-void Logger.dumpCrashLog () {
-    QFile logFile (QDir.tempPath () + QStringLiteral ("/" APPLICATION_NAME "-crash.log"));
-    if (logFile.open (QFile.WriteOnly)) {
-        QTextStream out (&logFile);
-        for (int i = 1; i <= CrashLogSize; ++i) {
-            out << _crashLog[ (_crashLogIndex + i) % CrashLogSize] << QLatin1Char ('\n');
+void Logger.dump_crash_log () {
+    QFile log_file (QDir.temp_path () + QStringLiteral ("/" APPLICATION_NAME "-crash.log"));
+    if (log_file.open (QFile.WriteOnly)) {
+        QTextStream out (&log_file);
+        for (int i = 1; i <= Crash_log_size; ++i) {
+            out << _crash_log[ (_crash_log_index + i) % Crash_log_size] << QLatin1Char ('\n');
         }
     }
 }
 
-static bool compressLog (string &originalName, string &targetName) {
+static bool compress_log (string &original_name, string &target_name) {
 #ifdef ZLIB_FOUND
-    QFile original (originalName);
-    if (!original.open (QIODevice.ReadOnly))
+    QFile original (original_name);
+    if (!original.open (QIODevice.Read_only))
         return false;
-    auto compressed = gzopen (targetName.toUtf8 (), "wb");
+    auto compressed = gzopen (target_name.to_utf8 (), "wb");
     if (!compressed) {
         return false;
     }
 
-    while (!original.atEnd ()) {
+    while (!original.at_end ()) {
         auto data = original.read (1024 * 1024);
         auto written = gzwrite (compressed, data.data (), data.size ());
         if (written != data.size ()) {
@@ -315,51 +315,51 @@ static bool compressLog (string &originalName, string &targetName) {
 #endif
 }
 
-void Logger.enterNextLogFile () {
-    if (!_logDirectory.isEmpty ()) {
+void Logger.enter_next_log_file () {
+    if (!_log_directory.is_empty ()) {
 
-        QDir dir (_logDirectory);
+        QDir dir (_log_directory);
         if (!dir.exists ()) {
             dir.mkpath (".");
         }
 
         // Tentative new log name, will be adjusted if one like this already exists
-        QDateTime now = QDateTime.currentDateTime ();
-        string newLogName = now.toString ("yyyyMMdd_HHmm") + "_owncloud.log";
+        QDateTime now = QDateTime.current_date_time ();
+        string new_log_name = now.to_string ("yyyy_mMdd_HHmm") + "_owncloud.log";
 
         // Expire old log files and deal with conflicts
-        QStringList files = dir.entryList (QStringList ("*owncloud.log.*"),
+        QStringList files = dir.entry_list (QStringList ("*owncloud.log.*"),
             QDir.Files, QDir.Name);
-        const QRegularExpression rx (QRegularExpression.anchoredPattern (R" (.*owncloud\.log\. (\d+).*)"));
-        int maxNumber = -1;
+        const QRegularExpression rx (QRegularExpression.anchored_pattern (R" (.*owncloud\.log\. (\d+).*)"));
+        int max_number = -1;
         foreach (string &s, files) {
-            if (_logExpire > 0) {
-                QFileInfo fileInfo (dir.absoluteFilePath (s));
-                if (fileInfo.lastModified ().addSecs (60 * 60 * _logExpire) < now) {
+            if (_log_expire > 0) {
+                QFileInfo file_info (dir.absolute_file_path (s));
+                if (file_info.last_modified ().add_secs (60 * 60 * _log_expire) < now) {
                     dir.remove (s);
                 }
             }
-            const auto rxMatch = rx.match (s);
-            if (s.startsWith (newLogName) && rxMatch.hasMatch ()) {
-                maxNumber = qMax (maxNumber, rxMatch.captured (1).toInt ());
+            const auto rx_match = rx.match (s);
+            if (s.starts_with (new_log_name) && rx_match.has_match ()) {
+                max_number = q_max (max_number, rx_match.captured (1).to_int ());
             }
         }
-        newLogName.append ("." + string.number (maxNumber + 1));
+        new_log_name.append ("." + string.number (max_number + 1));
 
-        auto previousLog = _logFile.fileName ();
-        setLogFile (dir.filePath (newLogName));
+        auto previous_log = _log_file.file_name ();
+        set_log_file (dir.file_path (new_log_name));
 
         // Compress the previous log file. On a restart this can be the most recent
         // log file.
-        auto logToCompress = previousLog;
-        if (logToCompress.isEmpty () && files.size () > 0 && !files.last ().endsWith (".gz"))
-            logToCompress = dir.absoluteFilePath (files.last ());
-        if (!logToCompress.isEmpty ()) {
-            string compressedName = logToCompress + ".gz";
-            if (compressLog (logToCompress, compressedName)) {
-                QFile.remove (logToCompress);
+        auto log_to_compress = previous_log;
+        if (log_to_compress.is_empty () && files.size () > 0 && !files.last ().ends_with (".gz"))
+            log_to_compress = dir.absolute_file_path (files.last ());
+        if (!log_to_compress.is_empty ()) {
+            string compressed_name = log_to_compress + ".gz";
+            if (compress_log (log_to_compress, compressed_name)) {
+                QFile.remove (log_to_compress);
             } else {
-                QFile.remove (compressedName);
+                QFile.remove (compressed_name);
             }
         }
     }

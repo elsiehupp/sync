@@ -21,23 +21,23 @@ namespace Occ {
 /***********************************************************
 Value class containing the options given to the sync engine
 ***********************************************************/
-class SyncOptions {
+class Sync_options {
 public:
-    SyncOptions ();
-    ~SyncOptions ();
+    Sync_options ();
+    ~Sync_options ();
 
     /***********************************************************
     Maximum size (in Bytes) a folder can have without asking for confirmation.
     -1 means infinite */
-    int64 _newBigFolderSizeLimit = -1;
+    int64 _new_big_folder_size_limit = -1;
 
     /***********************************************************
     If a confirmation should be asked for external storages */
-    bool _confirmExternalStorage = false;
+    bool _confirm_external_storage = false;
 
     /***********************************************************
     If remotely deleted files are needed to move to trash */
-    bool _moveFilesToTrash = false;
+    bool _move_files_to_trash = false;
 
     /***********************************************************
     Create a virtual file for new files instead of downloading. May not be null */
@@ -47,38 +47,38 @@ public:
     The initial un-adjusted chunk size in bytes for chunked uploads, both
     for old and new chunking algorithm, which classifies the item to be chunked
     
-    In chunkingNG, when dynamic chunk size adjustments are d
+    In chunking_nG, when dynamic chunk size adjustments are d
     starting value and is then gradually adjusted within the
-    minChunkSize / maxChunkSize bounds.
+    min_chunk_size / max_chunk_size bounds.
     ***********************************************************/
-    int64 _initialChunkSize = 10 * 1000 * 1000; // 10MB
+    int64 _initial_chunk_size = 10 * 1000 * 1000; // 10MB
 
     /***********************************************************
     The minimum chunk size in bytes for chunked uploads */
-    int64 _minChunkSize = 1 * 1000 * 1000; // 1MB
+    int64 _min_chunk_size = 1 * 1000 * 1000; // 1MB
 
     /***********************************************************
     The maximum chunk size in bytes for chunked uploads */
-    int64 _maxChunkSize = 1000 * 1000 * 1000; // 1000MB
+    int64 _max_chunk_size = 1000 * 1000 * 1000; // 1000MB
 
     /***********************************************************
     The target duration of chunk uploads for dynamic chunk sizing.
 
     Set to 0 it will disable dynamic chunk sizing.
     ***********************************************************/
-    std.chrono.milliseconds _targetChunkUploadDuration = std.chrono.minutes (1);
+    std.chrono.milliseconds _target_chunk_upload_duration = std.chrono.minutes (1);
 
     /***********************************************************
     The maximum number of active jobs in parallel  */
-    int _parallelNetworkJobs = 6;
+    int _parallel_network_jobs = 6;
 
     /***********************************************************
     Reads settings from env vars where available.
 
-    Currently reads _initialChunkSize, _minChunkSize, _maxChunkSize,
-    _targetChunkUploadDuration, _parallelNetworkJobs.
+    Currently reads _initial_chunk_size, _min_chunk_size, _max_chunk_size,
+    _target_chunk_upload_duration, _parallel_network_jobs.
     ***********************************************************/
-    void fillFromEnvironmentVariables ();
+    void fill_from_environment_variables ();
 
     /***********************************************************
     Ensure min <= initial <= max
@@ -88,30 +88,30 @@ public:
     values. To cope with this, adjust min/max to always include the
     initial chunk size value.
     ***********************************************************/
-    void verifyChunkSizes ();
+    void verify_chunk_sizes ();
 
     /***********************************************************
     A regular expression to match file names
     If no pattern is provided the default is an invalid regular expression.
     ***********************************************************/
-    QRegularExpression fileRegex ();
+    QRegularExpression file_regex ();
 
     /***********************************************************
     A pattern like *.txt, matching only file names
     ***********************************************************/
-    void setFilePattern (string &pattern);
+    void set_file_pattern (string &pattern);
 
     /***********************************************************
     A pattern like /own.*\/.*txt matching the full path
     ***********************************************************/
-    void setPathPattern (string &pattern);
+    void set_path_pattern (string &pattern);
 
 private:
     /***********************************************************
     Only sync files that mathc the expression
     Invalid pattern by default.
     ***********************************************************/
-    QRegularExpression _fileRegex = QRegularExpression (QStringLiteral (" ("));
+    QRegularExpression _file_regex = QRegularExpression (QStringLiteral (" ("));
 };
 
 }
@@ -123,49 +123,49 @@ private:
 
 
 
-SyncOptions.SyncOptions ()
+Sync_options.Sync_options ()
     : _vfs (new VfsOff) {
 }
 
-SyncOptions.~SyncOptions () = default;
+Sync_options.~Sync_options () = default;
 
-void SyncOptions.fillFromEnvironmentVariables () {
-    QByteArray chunkSizeEnv = qgetenv ("OWNCLOUD_CHUNK_SIZE");
-    if (!chunkSizeEnv.isEmpty ())
-        _initialChunkSize = chunkSizeEnv.toUInt ();
+void Sync_options.fill_from_environment_variables () {
+    QByteArray chunk_size_env = qgetenv ("OWNCLOUD_CHUNK_SIZE");
+    if (!chunk_size_env.is_empty ())
+        _initial_chunk_size = chunk_size_env.to_u_int ();
 
-    QByteArray minChunkSizeEnv = qgetenv ("OWNCLOUD_MIN_CHUNK_SIZE");
-    if (!minChunkSizeEnv.isEmpty ())
-        _minChunkSize = minChunkSizeEnv.toUInt ();
+    QByteArray min_chunk_size_env = qgetenv ("OWNCLOUD_MIN_CHUNK_SIZE");
+    if (!min_chunk_size_env.is_empty ())
+        _min_chunk_size = min_chunk_size_env.to_u_int ();
 
-    QByteArray maxChunkSizeEnv = qgetenv ("OWNCLOUD_MAX_CHUNK_SIZE");
-    if (!maxChunkSizeEnv.isEmpty ())
-        _maxChunkSize = maxChunkSizeEnv.toUInt ();
+    QByteArray max_chunk_size_env = qgetenv ("OWNCLOUD_MAX_CHUNK_SIZE");
+    if (!max_chunk_size_env.is_empty ())
+        _max_chunk_size = max_chunk_size_env.to_u_int ();
 
-    QByteArray targetChunkUploadDurationEnv = qgetenv ("OWNCLOUD_TARGET_CHUNK_UPLOAD_DURATION");
-    if (!targetChunkUploadDurationEnv.isEmpty ())
-        _targetChunkUploadDuration = std.chrono.milliseconds (targetChunkUploadDurationEnv.toUInt ());
+    QByteArray target_chunk_upload_duration_env = qgetenv ("OWNCLOUD_TARGET_CHUNK_UPLOAD_DURATION");
+    if (!target_chunk_upload_duration_env.is_empty ())
+        _target_chunk_upload_duration = std.chrono.milliseconds (target_chunk_upload_duration_env.to_u_int ());
 
-    int maxParallel = qgetenv ("OWNCLOUD_MAX_PARALLEL").toInt ();
-    if (maxParallel > 0)
-        _parallelNetworkJobs = maxParallel;
+    int max_parallel = qgetenv ("OWNCLOUD_MAX_PARALLEL").to_int ();
+    if (max_parallel > 0)
+        _parallel_network_jobs = max_parallel;
 }
 
-void SyncOptions.verifyChunkSizes () {
-    _minChunkSize = qMin (_minChunkSize, _initialChunkSize);
-    _maxChunkSize = qMax (_maxChunkSize, _initialChunkSize);
+void Sync_options.verify_chunk_sizes () {
+    _min_chunk_size = q_min (_min_chunk_size, _initial_chunk_size);
+    _max_chunk_size = q_max (_max_chunk_size, _initial_chunk_size);
 }
 
-QRegularExpression SyncOptions.fileRegex () {
-    return _fileRegex;
+QRegularExpression Sync_options.file_regex () {
+    return _file_regex;
 }
 
-void SyncOptions.setFilePattern (string &pattern) {
+void Sync_options.set_file_pattern (string &pattern) {
     // full match or a path ending with this pattern
-    setPathPattern (QStringLiteral (" (^|/|\\\\)") + pattern + QLatin1Char ('$'));
+    set_path_pattern (QStringLiteral (" (^|/|\\\\)") + pattern + QLatin1Char ('$'));
 }
 
-void SyncOptions.setPathPattern (string &pattern) {
-    _fileRegex.setPatternOptions (Utility.fsCasePreserving () ? QRegularExpression.CaseInsensitiveOption : QRegularExpression.NoPatternOption);
-    _fileRegex.setPattern (pattern);
+void Sync_options.set_path_pattern (string &pattern) {
+    _file_regex.set_pattern_options (Utility.fs_case_preserving () ? QRegularExpression.Case_insensitive_option : QRegularExpression.No_pattern_option);
+    _file_regex.set_pattern (pattern);
 }

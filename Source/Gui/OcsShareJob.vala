@@ -15,30 +15,30 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 namespace Occ {
 
 /***********************************************************
-@brief The OcsShareJob class
+@brief The Ocs_share_job class
 @ingroup gui
 
 Handle talking to the OCS Share API.
 For creation, deletion and modification of shares.
 ***********************************************************/
-class OcsShareJob : OcsJob {
+class Ocs_share_job : Ocs_job {
 public:
     /***********************************************************
     Constructor for new shares or listing of shares
     ***********************************************************/
-    OcsShareJob (AccountPtr account);
+    Ocs_share_job (AccountPtr account);
 
     /***********************************************************
     Get all the shares
     
     @param path Path to request shares for (default all shares)
     ***********************************************************/
-    void getShares (string &path = "");
+    void get_shares (string &path = "");
 
     /***********************************************************
     Delete the current Share
     ***********************************************************/
-    void deleteShare (string &shareId);
+    void delete_share (string &share_id);
 
     /***********************************************************
     Set the expiration date of a share
@@ -46,7 +46,7 @@ public:
     @param date The expire date, if this date is invalid the expire date
     will be removed
     ***********************************************************/
-    void setExpireDate (string &shareId, QDate &date);
+    void set_expire_date (string &share_id, QDate &date);
 
 	 /***********************************************************
     Set note a share
@@ -54,7 +54,7 @@ public:
     @param note The note to a share, if the note is empty the
     share will be removed
     ***********************************************************/
-    void setNote (string &shareId, string &note);
+    void set_note (string &share_id, string &note);
 
     /***********************************************************
     Set the password of a share
@@ -62,32 +62,32 @@ public:
     @param password The password of the share, if the password is empty the
     share will be removed
     ***********************************************************/
-    void setPassword (string &shareId, string &password);
+    void set_password (string &share_id, string &password);
 
     /***********************************************************
     Set the share to be public upload
     
-    @param publicUpload Set or remove public upload
+    @param public_upload Set or remove public upload
     ***********************************************************/
-    void setPublicUpload (string &shareId, bool publicUpload);
+    void set_public_upload (string &share_id, bool public_upload);
 
     /***********************************************************
     Change the name of a share
     ***********************************************************/
-    void setName (string &shareId, string &name);
+    void set_name (string &share_id, string &name);
 
     /***********************************************************
     Set the permissions
     
     @param permissions
     ***********************************************************/
-    void setPermissions (string &shareId,
+    void set_permissions (string &share_id,
         const Share.Permissions permissions);
 
     /***********************************************************
     Set share link label
     ***********************************************************/
-    void setLabel (string &shareId, string &label);
+    void set_label (string &share_id, string &label);
 
     /***********************************************************
     Create a new link share
@@ -95,28 +95,28 @@ public:
     @param path The path of the file/folder to share
     @param password Optionally a password for the share
     ***********************************************************/
-    void createLinkShare (string &path, string &name,
+    void create_link_share (string &path, string &name,
         const string &password);
 
     /***********************************************************
     Create a new share
     
     @param path The path of the file/folder to share
-    @param shareType The type of share (user/group/link/fed
-    @param shareWith The uid/gid/federated id to share wit
+    @param share_type The type of share (user/group/link/fed
+    @param share_with The uid/gid/federated id to share wit
     @param permissions The permissions the share will have
     @param password The password to protect the share with
     ***********************************************************/
-    void createShare (string &path,
-        const Share.ShareType shareType,
-        const string &shareWith = "",
-        const Share.Permissions permissions = SharePermissionRead,
+    void create_share (string &path,
+        const Share.Share_type share_type,
+        const string &share_with = "",
+        const Share.Permissions permissions = Share_permission_read,
         const string &password = "");
 
     /***********************************************************
     Returns information on the items shared with the current user.
     ***********************************************************/
-    void getSharedWithMe ();
+    void get_shared_with_me ();
 
 signals:
     /***********************************************************
@@ -128,161 +128,161 @@ signals:
     @param reply The reply
     @param value To what did we set a variable (if we set any).
     ***********************************************************/
-    void shareJobFinished (QJsonDocument reply, QVariant value);
+    void share_job_finished (QJsonDocument reply, QVariant value);
 
 private slots:
-    void jobDone (QJsonDocument reply);
+    void job_done (QJsonDocument reply);
 
 private:
     QVariant _value;
 };
 
 
-    OcsShareJob.OcsShareJob (AccountPtr account)
-        : OcsJob (account) {
-        setPath ("ocs/v2.php/apps/files_sharing/api/v1/shares");
-        connect (this, &OcsJob.jobFinished, this, &OcsShareJob.jobDone);
+    Ocs_share_job.Ocs_share_job (AccountPtr account)
+        : Ocs_job (account) {
+        set_path ("ocs/v2.php/apps/files_sharing/api/v1/shares");
+        connect (this, &Ocs_job.job_finished, this, &Ocs_share_job.job_done);
     }
     
-    void OcsShareJob.getShares (string &path) {
-        setVerb ("GET");
+    void Ocs_share_job.get_shares (string &path) {
+        set_verb ("GET");
     
-        addParam (string.fromLatin1 ("path"), path);
-        addParam (string.fromLatin1 ("reshares"), string ("true"));
-        addPassStatusCode (404);
+        add_param (string.from_latin1 ("path"), path);
+        add_param (string.from_latin1 ("reshares"), string ("true"));
+        add_pass_status_code (404);
     
         start ();
     }
     
-    void OcsShareJob.deleteShare (string &shareId) {
-        appendPath (shareId);
-        setVerb ("DELETE");
+    void Ocs_share_job.delete_share (string &share_id) {
+        append_path (share_id);
+        set_verb ("DELETE");
     
         start ();
     }
     
-    void OcsShareJob.setExpireDate (string &shareId, QDate &date) {
-        appendPath (shareId);
-        setVerb ("PUT");
+    void Ocs_share_job.set_expire_date (string &share_id, QDate &date) {
+        append_path (share_id);
+        set_verb ("PUT");
     
-        if (date.isValid ()) {
-            addParam (string.fromLatin1 ("expireDate"), date.toString ("yyyy-MM-dd"));
+        if (date.is_valid ()) {
+            add_param (string.from_latin1 ("expire_date"), date.to_string ("yyyy-MM-dd"));
         } else {
-            addParam (string.fromLatin1 ("expireDate"), string ());
+            add_param (string.from_latin1 ("expire_date"), string ());
         }
         _value = date;
     
         start ();
     }
     
-    void OcsShareJob.setPassword (string &shareId, string &password) {
-        appendPath (shareId);
-        setVerb ("PUT");
+    void Ocs_share_job.set_password (string &share_id, string &password) {
+        append_path (share_id);
+        set_verb ("PUT");
     
-        addParam (string.fromLatin1 ("password"), password);
+        add_param (string.from_latin1 ("password"), password);
         _value = password;
     
         start ();
     }
     
-    void OcsShareJob.setNote (string &shareId, string &note) {
-        appendPath (shareId);
-        setVerb ("PUT");
+    void Ocs_share_job.set_note (string &share_id, string &note) {
+        append_path (share_id);
+        set_verb ("PUT");
     
-        addParam (string.fromLatin1 ("note"), note);
+        add_param (string.from_latin1 ("note"), note);
         _value = note;
     
         start ();
     }
     
-    void OcsShareJob.setPublicUpload (string &shareId, bool publicUpload) {
-        appendPath (shareId);
-        setVerb ("PUT");
+    void Ocs_share_job.set_public_upload (string &share_id, bool public_upload) {
+        append_path (share_id);
+        set_verb ("PUT");
     
-        const string value = string.fromLatin1 (publicUpload ? "true" : "false");
-        addParam (string.fromLatin1 ("publicUpload"), value);
-        _value = publicUpload;
+        const string value = string.from_latin1 (public_upload ? "true" : "false");
+        add_param (string.from_latin1 ("public_upload"), value);
+        _value = public_upload;
     
         start ();
     }
     
-    void OcsShareJob.setName (string &shareId, string &name) {
-        appendPath (shareId);
-        setVerb ("PUT");
-        addParam (string.fromLatin1 ("name"), name);
+    void Ocs_share_job.set_name (string &share_id, string &name) {
+        append_path (share_id);
+        set_verb ("PUT");
+        add_param (string.from_latin1 ("name"), name);
         _value = name;
     
         start ();
     }
     
-    void OcsShareJob.setPermissions (string &shareId,
+    void Ocs_share_job.set_permissions (string &share_id,
         const Share.Permissions permissions) {
-        appendPath (shareId);
-        setVerb ("PUT");
+        append_path (share_id);
+        set_verb ("PUT");
     
-        addParam (string.fromLatin1 ("permissions"), string.number (permissions));
+        add_param (string.from_latin1 ("permissions"), string.number (permissions));
         _value = (int)permissions;
     
         start ();
     }
     
-    void OcsShareJob.setLabel (string &shareId, string &label) {
-        appendPath (shareId);
-        setVerb ("PUT");
+    void Ocs_share_job.set_label (string &share_id, string &label) {
+        append_path (share_id);
+        set_verb ("PUT");
     
-        addParam (QStringLiteral ("label"), label);
+        add_param (QStringLiteral ("label"), label);
         _value = label;
     
         start ();
     }
     
-    void OcsShareJob.createLinkShare (string &path,
+    void Ocs_share_job.create_link_share (string &path,
         const string &name,
         const string &password) {
-        setVerb ("POST");
+        set_verb ("POST");
     
-        addParam (string.fromLatin1 ("path"), path);
-        addParam (string.fromLatin1 ("shareType"), string.number (Share.TypeLink));
+        add_param (string.from_latin1 ("path"), path);
+        add_param (string.from_latin1 ("share_type"), string.number (Share.Type_link));
     
-        if (!name.isEmpty ()) {
-            addParam (string.fromLatin1 ("name"), name);
+        if (!name.is_empty ()) {
+            add_param (string.from_latin1 ("name"), name);
         }
-        if (!password.isEmpty ()) {
-            addParam (string.fromLatin1 ("password"), password);
+        if (!password.is_empty ()) {
+            add_param (string.from_latin1 ("password"), password);
         }
     
-        addPassStatusCode (403);
+        add_pass_status_code (403);
     
         start ();
     }
     
-    void OcsShareJob.createShare (string &path,
-        const Share.ShareType shareType,
-        const string &shareWith,
+    void Ocs_share_job.create_share (string &path,
+        const Share.Share_type share_type,
+        const string &share_with,
         const Share.Permissions permissions,
         const string &password) {
         Q_UNUSED (permissions)
-        setVerb ("POST");
+        set_verb ("POST");
     
-        addParam (string.fromLatin1 ("path"), path);
-        addParam (string.fromLatin1 ("shareType"), string.number (shareType));
-        addParam (string.fromLatin1 ("shareWith"), shareWith);
+        add_param (string.from_latin1 ("path"), path);
+        add_param (string.from_latin1 ("share_type"), string.number (share_type));
+        add_param (string.from_latin1 ("share_with"), share_with);
     
-        if (!password.isEmpty ()) {
-            addParam (string.fromLatin1 ("password"), password);
+        if (!password.is_empty ()) {
+            add_param (string.from_latin1 ("password"), password);
         }
     
         start ();
     }
     
-    void OcsShareJob.getSharedWithMe () {
-        setVerb ("GET");
-        addParam (QLatin1String ("shared_with_me"), QLatin1String ("true"));
+    void Ocs_share_job.get_shared_with_me () {
+        set_verb ("GET");
+        add_param (QLatin1String ("shared_with_me"), QLatin1String ("true"));
         start ();
     }
     
-    void OcsShareJob.jobDone (QJsonDocument reply) {
-        emit shareJobFinished (reply, _value);
+    void Ocs_share_job.job_done (QJsonDocument reply) {
+        emit share_job_finished (reply, _value);
     }
     }
     

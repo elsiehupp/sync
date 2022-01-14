@@ -23,240 +23,261 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 namespace Occ {
 
-class RemoteWipe;
-
 using AccountStatePtr = QExplicitlySharedDataPointer<AccountState>;
 using AccountAppList = QList<AccountApp>;
 
 /***********************************************************
-@brief Extra info about an ownCloud server account.
+@brief Extra info about an own_cloud server account.
 @ingroup gui
 ***********************************************************/
 class AccountState : GLib.Object, public QSharedData {
     Q_PROPERTY (AccountPtr account MEMBER _account)
 
-public:
-    enum State {
-        /// Not even attempting to connect, most likely because the
-        /// user explicitly signed out or cancelled a credential dialog.
+    public enum State {
+        /***********************************************************
+        Not even attempting to connect, most likely because the
+        user explicitly signed out or cancelled a credential dialog.
+        ***********************************************************/
         SignedOut,
 
-        /// Account would like to be connected but hasn't heard back yet.
+        /***********************************************************
+        Account would like to be connected but hasn't heard back yet.
+        ***********************************************************/
         Disconnected,
 
-        /// The account is successfully talking to the server.
+        /***********************************************************
+        The account is successfully talking to the server.
+        ***********************************************************/
         Connected,
 
-        /// There's a temporary problem with talking to the server,
-        /// don't bother the user too much and try again.
+        /***********************************************************
+        There's a temporary problem with talking to the server,
+        don't bother the user too much and try again.
+        ***********************************************************/
         ServiceUnavailable,
 
-        /// Similar to ServiceUnavailable, but we know the server is down
-        /// for maintenance
+        /***********************************************************
+        Similar to ServiceUnavailable, but we know the server is down
+        for maintenance
+        ***********************************************************/
         MaintenanceMode,
 
-        /// Could not communicate with the server for some reason.
-        /// We assume this may resolve itself over time and will try
-        /// again automatically.
+        /***********************************************************
+        Could not communicate with the server for some reason.
+        We assume this may resolve itself over time and will try
+        again automatically.
+        ***********************************************************/
         NetworkError,
 
-        /// Server configuration error. (For example : unsupported version)
+        /***********************************************************
+        Server configuration error. (For example : unsupported version)
+        ***********************************************************/
         ConfigurationError,
 
-        /// We are currently asking the user for credentials
+        /***********************************************************
+        We are currently asking the user for credentials
+        ***********************************************************/
         AskingCredentials
     };
 
-    /// The actual current connectivity status.
-    using ConnectionStatus = ConnectionValidator.Status;
+    /***********************************************************
+    The actual current connectivity status.
+    ***********************************************************/
+    public using ConnectionStatus = ConnectionValidator.Status;
 
-    /// Use the account as parent
-    AccountState (AccountPtr account);
-    ~AccountState () override;
+    /***********************************************************
+    Use the account as parent
+    ***********************************************************/
+    public AccountState (AccountPtr account);
+    public ~AccountState () override;
 
     /***********************************************************
     Creates an account state from settings and an Account object.
 
     Use from AccountManager with a prepared QSettings object only.
     ***********************************************************/
-    static AccountState *loadFromSettings (AccountPtr account, QSettings &settings);
+    public static AccountState *load_from_settings (AccountPtr account, QSettings &settings);
 
     /***********************************************************
     Writes account state information to settings.
 
     It does not write the Account data.
     ***********************************************************/
-    void writeToSettings (QSettings &settings);
+    public void write_to_settings (QSettings &settings);
 
-    AccountPtr account ();
+    public AccountPtr account ();
 
-    ConnectionStatus connectionStatus ();
-    QStringList connectionErrors ();
+    public ConnectionStatus connection_status ();
+    public QStringList connection_errors ();
 
-    State state ();
-    static string stateString (State state);
+    public State state ();
+    public static string state_string (State state);
 
-    bool isSignedOut ();
+    public bool is_signed_out ();
 
-    AccountAppList appList ();
-    AccountApp* findApp (string &appId) const;
+    public AccountAppList app_list ();
+    public AccountApp* find_app (string &app_id) const;
 
     /***********************************************************
     A user-triggered sign out which disconnects, stops syncs
     for the account and forgets the password. */
-    void signOutByUi ();
+    public void sign_out_by_ui ();
 
     /***********************************************************
     Tries to connect from scratch.
 
     Does nothing for signed out accounts.
     Connected accounts will be disconnected and try anew.
-    Disconnected accounts will go to checkConnectivity ().
+    Disconnected accounts will go to slot_check_connectivity ().
     
     Useful for when network settings (proxy) change.
     ***********************************************************/
-    void freshConnectionAttempt ();
+    public void fresh_connection_attempt ();
 
-    /// Move from SignedOut state to Disconnected (attempting to connect)
-    void signIn ();
+    /***********************************************************
+    Move from SignedOut state to Disconnected (attempting to connect)
+    public void sign_in ();
 
-    bool isConnected ();
+    public bool is_connected ();
 
     /***********************************************************
     Returns a new settings object for this account, already in the right groups. */
-    std.unique_ptr<QSettings> settings ();
+    public std.unique_ptr<QSettings> settings ();
 
     /***********************************************************
     Mark the timestamp when the last successful ETag check happened for
-     this account.
-     The checkConnectivity () method uses the timestamp to save a call to
-     the server to validate the connection if the last successful etag job
-     was not so long ago.
+    this account.
+    The slot_check_connectivity () method uses the timestamp to save a call to
+    the server to validate the connection if the last successful etag job
+    was not so long ago.
     ***********************************************************/
-    void tagLastSuccessfullETagRequest (QDateTime &tp);
+    public void tag_last_successfull_e_tag_request (QDateTime &tp);
 
     /***********************************************************
     Saves the ETag Response header from the last Notifications api
-    request with statusCode 200.
-    */
-    QByteArray notificationsEtagResponseHeader ();
+    request with status_code 200.
+    ***********************************************************/
+    public QByteArray notifications_etag_response_header ();
 
     /***********************************************************
     Returns the ETag Response header from the last Notifications api
-    request with statusCode 200.
-    */
-    void setNotificationsEtagResponseHeader (QByteArray &value);
+    request with status_code 200.
+    ***********************************************************/
+    void set_notifications_etag_response_header (QByteArray &value);
 
     /***********************************************************
     Saves the ETag Response header from the last Navigation Apps api
-    request with statusCode 200.
-    */
-    QByteArray navigationAppsEtagResponseHeader ();
+    request with status_code 200.
+    ***********************************************************/
+    public QByteArray navigation_apps_etag_response_header ();
 
     /***********************************************************
     Returns the ETag Response header from the last Navigation Apps api
-    request with statusCode 200.
-    */
-    void setNavigationAppsEtagResponseHeader (QByteArray &value);
+    request with status_code 200.
+    ***********************************************************/
+    public void set_navigation_apps_etag_response_header (QByteArray &value);
 
-    ///Asks for user credentials
-    void handleInvalidCredentials ();
+    /***********************************************************
+    Asks for user credentials
+    ***********************************************************/
+    public void handle_invalid_credentials ();
 
     /***********************************************************
     Returns the notifications status retrieved by the notificatons endpoint
-     https://github.com/nextcloud/desktop/issues/2318#issuecomment-680698429
-    */
-    bool isDesktopNotificationsAllowed ();
+    https://github.com/nextcloud/desktop/issues/2318#issuecomment-680698429
+    ***********************************************************/
+    public bool is_desktop_notifications_allowed ();
 
     /***********************************************************
     Set desktop notifications status retrieved by the notificatons endpoint
-    */
-    void setDesktopNotificationsAllowed (bool isAllowed);
+    ***********************************************************/
+    public void set_desktop_notifications_allowed (bool is_allowed);
 
-public slots:
-    /// Triggers a ping to the server to update state and
-    /// connection status and errors.
-    void checkConnectivity ();
+    /***********************************************************
+    Triggers a ping to the server to update state and
+    connection status and errors.
+    ***********************************************************/
+    public void slot_check_connectivity ();
 
-private:
-    void setState (State state);
-    void fetchNavigationApps ();
+    private void set_state (State state);
+    private void fetch_navigation_apps ();
 
-signals:
-    void stateChanged (State state);
-    void isConnectedChanged ();
-    void hasFetchedNavigationApps ();
-    void statusChanged ();
-    void desktopNotificationsAllowedChanged ();
 
-protected slots:
-    void slotConnectionValidatorResult (ConnectionValidator.Status status, QStringList &errors);
+    signal void state_changed (State state);
+    signal void is_connected_changed ();
+    signal void has_fetched_navigation_apps ();
+    signal void status_changed ();
+    signal void desktop_notifications_allowed_changed ();
 
-    /// When client gets a 401 or 403 checks if server requested remote wipe
-    /// before asking for user credentials again
-    void slotHandleRemoteWipeCheck ();
+    protected void slot_connection_validator_result (ConnectionValidator.Status status, QStringList &errors);
 
-    void slotCredentialsFetched (AbstractCredentials *creds);
-    void slotCredentialsAsked (AbstractCredentials *creds);
+    /***********************************************************
+    When client gets a 401 or 403 checks if server requested remote wipe
+    before asking for user credentials again
+    ***********************************************************/
+    protected void slot_handle_remote_wipe_check ();
 
-    void slotNavigationAppsFetched (QJsonDocument &reply, int statusCode);
-    void slotEtagResponseHeaderReceived (QByteArray &value, int statusCode);
-    void slotOcsError (int statusCode, string &message);
+    protected void slot_credentials_fetched (AbstractCredentials *creds);
+    protected void slot_credentials_asked (AbstractCredentials *creds);
+
+    protected void slot_navigation_apps_fetched (QJsonDocument &reply, int status_code);
+    protected void slot_etag_response_header_received (QByteArray &value, int status_code);
+    protected void slot_ocs_error (int status_code, string &message);
 
 private:
     AccountPtr _account;
     State _state;
-    ConnectionStatus _connectionStatus;
-    QStringList _connectionErrors;
-    bool _waitingForNewCredentials;
-    QDateTime _timeOfLastETagCheck;
-    QPointer<ConnectionValidator> _connectionValidator;
-    QByteArray _notificationsEtagResponseHeader;
-    QByteArray _navigationAppsEtagResponseHeader;
+    ConnectionStatus _connection_status;
+    QStringList _connection_errors;
+    bool _waiting_for_new_credentials;
+    QDateTime _time_of_last_e_tag_check;
+    QPointer<ConnectionValidator> _connection_validator;
+    QByteArray _notifications_etag_response_header;
+    QByteArray _navigation_apps_etag_response_header;
 
     /***********************************************************
     Starts counting when the server starts being back up after 503 or
     maintenance mode. The account will only become connected once this
-    timer exceeds the _maintenanceToConnectedDelay value.
+    timer exceeds the _maintenance_to_connected_delay value.
     ***********************************************************/
-    QElapsedTimer _timeSinceMaintenanceOver;
+    QElapsedTimer _time_since_maintenance_over;
 
     /***********************************************************
     Milliseconds for which to delay reconnection after 503/maintenance.
     ***********************************************************/
-    int _maintenanceToConnectedDelay;
+    int _maintenance_to_connected_delay;
 
     /***********************************************************
     Connects remote wipe check with the account
     the log out triggers the check (loads app password . create request)
     ***********************************************************/
-    RemoteWipe *_remoteWipe;
+    RemoteWipe *_remote_wipe;
 
     /***********************************************************
     Holds the App names and URLs available on the server
     ***********************************************************/
     AccountAppList _apps;
 
-    bool _isDesktopNotificationsAllowed;
+    bool _is_desktop_notifications_allowed;
 };
 
 class AccountApp : GLib.Object {
 public:
     AccountApp (string &name, QUrl &url,
-        const string &id, QUrl &iconUrl,
+        const string &id, QUrl &icon_url,
         GLib.Object* parent = nullptr);
 
     string name ();
     QUrl url ();
     string id ();
-    QUrl iconUrl ();
+    QUrl icon_url ();
 
 private:
     string _name;
     QUrl _url;
 
     string _id;
-    QUrl _iconUrl;
+    QUrl _icon_url;
 };
 
 
@@ -264,85 +285,85 @@ private:
         : GLib.Object ()
         , _account (account)
         , _state (AccountState.Disconnected)
-        , _connectionStatus (ConnectionValidator.Undefined)
-        , _waitingForNewCredentials (false)
-        , _maintenanceToConnectedDelay (60000 + (qrand () % (4 * 60000))) // 1-5min delay
-        , _remoteWipe (new RemoteWipe (_account))
-        , _isDesktopNotificationsAllowed (true) {
-        qRegisterMetaType<AccountState> ("AccountState*");
+        , _connection_status (ConnectionValidator.Undefined)
+        , _waiting_for_new_credentials (false)
+        , _maintenance_to_connected_delay (60000 + (qrand () % (4 * 60000))) // 1-5min delay
+        , _remote_wipe (new RemoteWipe (_account))
+        , _is_desktop_notifications_allowed (true) {
+        q_register_meta_type<AccountState> ("AccountState*");
     
-        connect (account.data (), &Account.invalidCredentials,
-            this, &AccountState.slotHandleRemoteWipeCheck);
-        connect (account.data (), &Account.credentialsFetched,
-            this, &AccountState.slotCredentialsFetched);
-        connect (account.data (), &Account.credentialsAsked,
-            this, &AccountState.slotCredentialsAsked);
+        connect (account.data (), &Account.invalid_credentials,
+            this, &AccountState.slot_handle_remote_wipe_check);
+        connect (account.data (), &Account.credentials_fetched,
+            this, &AccountState.slot_credentials_fetched);
+        connect (account.data (), &Account.credentials_asked,
+            this, &AccountState.slot_credentials_asked);
     
-        connect (this, &AccountState.isConnectedChanged, [=]{
+        connect (this, &AccountState.is_connected_changed, [=]{
             // Get the Apps available on the server if we're now connected.
-            if (isConnected ()) {
-                fetchNavigationApps ();
+            if (is_connected ()) {
+                fetch_navigation_apps ();
             }
         });
     }
     
     AccountState.~AccountState () = default;
     
-    AccountState *AccountState.loadFromSettings (AccountPtr account, QSettings & /*settings*/) {
-        auto accountState = new AccountState (account);
-        return accountState;
+    AccountState *AccountState.load_from_settings (AccountPtr account, QSettings & /*settings*/) {
+        auto account_state = new AccountState (account);
+        return account_state;
     }
     
-    void AccountState.writeToSettings (QSettings & /*settings*/) {
+    void AccountState.write_to_settings (QSettings & /*settings*/) {
     }
     
     AccountPtr AccountState.account () {
         return _account;
     }
     
-    AccountState.ConnectionStatus AccountState.connectionStatus () {
-        return _connectionStatus;
+    AccountState.ConnectionStatus AccountState.connection_status () {
+        return _connection_status;
     }
     
-    QStringList AccountState.connectionErrors () {
-        return _connectionErrors;
+    QStringList AccountState.connection_errors () {
+        return _connection_errors;
     }
     
     AccountState.State AccountState.state () {
         return _state;
     }
     
-    void AccountState.setState (State state) {
+    void AccountState.set_state (State state) {
         if (_state != state) {
-            qCInfo (lcAccountState) << "AccountState state change : "
-                                   << stateString (_state) << "." << stateString (state);
-            State oldState = _state;
+            q_c_info (lc_account_state) << "AccountState state change : "
+                                   << state_string (_state) << "." << state_string (state);
+            State old_state = _state;
             _state = state;
     
             if (_state == SignedOut) {
-                _connectionStatus = ConnectionValidator.Undefined;
-                _connectionErrors.clear ();
-            } else if (oldState == SignedOut && _state == Disconnected) {
+                _connection_status = ConnectionValidator.Undefined;
+                _connection_errors.clear ();
+            } else if (old_state == SignedOut && _state == Disconnected) {
                 // If we stop being voluntarily signed-out, try to connect and
                 // auth right now!
-                checkConnectivity ();
+                slot_check_connectivity ();
             } else if (_state == ServiceUnavailable) {
                 // Check if we are actually down for maintenance.
                 // To do this we must clear the connection validator that just
                 // produced the 503. It's finished anyway and will delete itself.
-                _connectionValidator.clear ();
-                checkConnectivity ();
+                _connection_validator.clear ();
+                slot_check_connectivity ();
             }
-            if (oldState == Connected || _state == Connected) {
-                emit isConnectedChanged ();
+            if (old_state == Connected || _state == Connected) {
+                emit is_connected_changed ();
             }
         }
     
-        // might not have changed but the underlying _connectionErrors might have
-        emit stateChanged (_state);
+        // might not have changed but the underlying _connection_errors might have
+        emit state_changed (_state);
     }
     
-    string AccountState.stateString (State state) {
+    string AccountState.state_string (State state) {
         switch (state) {
         case SignedOut:
             return tr ("Signed out");
@@ -364,102 +385,102 @@ private:
         return tr ("Unknown account state");
     }
     
-    bool AccountState.isSignedOut () {
+    bool AccountState.is_signed_out () {
         return _state == SignedOut;
     }
     
-    void AccountState.signOutByUi () {
-        account ().credentials ().forgetSensitiveData ();
-        account ().clearCookieJar ();
-        setState (SignedOut);
+    void AccountState.sign_out_by_ui () {
+        account ().credentials ().forget_sensitive_data ();
+        account ().clear_cookie_jar ();
+        set_state (SignedOut);
     }
     
-    void AccountState.freshConnectionAttempt () {
-        if (isConnected ())
-            setState (Disconnected);
-        checkConnectivity ();
+    void AccountState.fresh_connection_attempt () {
+        if (is_connected ())
+            set_state (Disconnected);
+        slot_check_connectivity ();
     }
     
-    void AccountState.signIn () {
+    void AccountState.sign_in () {
         if (_state == SignedOut) {
-            _waitingForNewCredentials = false;
-            setState (Disconnected);
+            _waiting_for_new_credentials = false;
+            set_state (Disconnected);
         }
     }
     
-    bool AccountState.isConnected () {
+    bool AccountState.is_connected () {
         return _state == Connected;
     }
     
-    void AccountState.tagLastSuccessfullETagRequest (QDateTime &tp) {
-        _timeOfLastETagCheck = tp;
+    void AccountState.tag_last_successfull_e_tag_request (QDateTime &tp) {
+        _time_of_last_e_tag_check = tp;
     }
     
-    QByteArray AccountState.notificationsEtagResponseHeader () {
-        return _notificationsEtagResponseHeader;
+    QByteArray AccountState.notifications_etag_response_header () {
+        return _notifications_etag_response_header;
     }
     
-    void AccountState.setNotificationsEtagResponseHeader (QByteArray &value) {
-        _notificationsEtagResponseHeader = value;
+    void AccountState.set_notifications_etag_response_header (QByteArray &value) {
+        _notifications_etag_response_header = value;
     }
     
-    QByteArray AccountState.navigationAppsEtagResponseHeader () {
-        return _navigationAppsEtagResponseHeader;
+    QByteArray AccountState.navigation_apps_etag_response_header () {
+        return _navigation_apps_etag_response_header;
     }
     
-    void AccountState.setNavigationAppsEtagResponseHeader (QByteArray &value) {
-        _navigationAppsEtagResponseHeader = value;
+    void AccountState.set_navigation_apps_etag_response_header (QByteArray &value) {
+        _navigation_apps_etag_response_header = value;
     }
     
-    bool AccountState.isDesktopNotificationsAllowed () {
-        return _isDesktopNotificationsAllowed;
+    bool AccountState.is_desktop_notifications_allowed () {
+        return _is_desktop_notifications_allowed;
     }
     
-    void AccountState.setDesktopNotificationsAllowed (bool isAllowed) {
-        if (_isDesktopNotificationsAllowed == isAllowed) {
+    void AccountState.set_desktop_notifications_allowed (bool is_allowed) {
+        if (_is_desktop_notifications_allowed == is_allowed) {
             return;
         }
     
-        _isDesktopNotificationsAllowed = isAllowed;
-        emit desktopNotificationsAllowedChanged ();
+        _is_desktop_notifications_allowed = is_allowed;
+        emit desktop_notifications_allowed_changed ();
     }
     
-    void AccountState.checkConnectivity () {
-        if (isSignedOut () || _waitingForNewCredentials) {
+    void AccountState.slot_check_connectivity () {
+        if (is_signed_out () || _waiting_for_new_credentials) {
             return;
         }
     
-        if (_connectionValidator) {
-            qCWarning (lcAccountState) << "ConnectionValidator already running, ignoring" << account ().displayName ();
+        if (_connection_validator) {
+            q_c_warning (lc_account_state) << "ConnectionValidator already running, ignoring" << account ().display_name ();
             return;
         }
     
         // If we never fetched credentials, do that now - otherwise connection attempts
         // make little sense, we might be missing client certs.
-        if (!account ().credentials ().wasFetched ()) {
-            _waitingForNewCredentials = true;
-            account ().credentials ().fetchFromKeychain ();
+        if (!account ().credentials ().was_fetched ()) {
+            _waiting_for_new_credentials = true;
+            account ().credentials ().fetch_from_keychain ();
             return;
         }
     
         // IF the account is connected the connection check can be skipped
         // if the last successful etag check job is not so long ago.
-        const auto polltime = std.chrono.duration_cast<std.chrono.seconds> (ConfigFile ().remotePollInterval ());
-        const auto elapsed = _timeOfLastETagCheck.secsTo (QDateTime.currentDateTimeUtc ());
-        if (isConnected () && _timeOfLastETagCheck.isValid ()
+        const auto polltime = std.chrono.duration_cast<std.chrono.seconds> (ConfigFile ().remote_poll_interval ());
+        const auto elapsed = _time_of_last_e_tag_check.secs_to (QDateTime.current_date_time_utc ());
+        if (is_connected () && _time_of_last_e_tag_check.is_valid ()
             && elapsed <= polltime.count ()) {
-            qCDebug (lcAccountState) << account ().displayName () << "The last ETag check succeeded within the last " << polltime.count () << "s (" << elapsed << "s). No connection check needed!";
+            q_c_debug (lc_account_state) << account ().display_name () << "The last ETag check succeeded within the last " << polltime.count () << "s (" << elapsed << "s). No connection check needed!";
             return;
         }
     
-        auto *conValidator = new ConnectionValidator (AccountStatePtr (this));
-        _connectionValidator = conValidator;
-        connect (conValidator, &ConnectionValidator.connectionResult,
-            this, &AccountState.slotConnectionValidatorResult);
-        if (isConnected ()) {
+        auto *con_validator = new ConnectionValidator (AccountStatePtr (this));
+        _connection_validator = con_validator;
+        connect (con_validator, &ConnectionValidator.connection_result,
+            this, &AccountState.slot_connection_validator_result);
+        if (is_connected ()) {
             // Use a small authed propfind as a minimal ping when we're
             // already connected.
-            conValidator.checkAuthentication ();
+            con_validator.check_authentication ();
         } else {
             // Check the server and then the auth.
     
@@ -470,219 +491,219 @@ private:
             // and #2973.
             // As an attempted workaround, reset the QNAM regularly if the account is
             // disconnected.
-            account ().resetNetworkAccessManager ();
+            account ().reset_network_access_manager ();
     
             // If we don't reset the ssl config a second CheckServerJob can produce a
             // ssl config that does not have a sensible certificate chain.
-            account ().setSslConfiguration (QSslConfiguration ());
+            account ().set_ssl_configuration (QSslConfiguration ());
             //#endif
-            conValidator.checkServerAndAuth ();
+            con_validator.check_server_and_auth ();
         }
     }
     
-    void AccountState.slotConnectionValidatorResult (ConnectionValidator.Status status, QStringList &errors) {
-        if (isSignedOut ()) {
-            qCWarning (lcAccountState) << "Signed out, ignoring" << status << _account.url ().toString ();
+    void AccountState.slot_connection_validator_result (ConnectionValidator.Status status, QStringList &errors) {
+        if (is_signed_out ()) {
+            q_c_warning (lc_account_state) << "Signed out, ignoring" << status << _account.url ().to_string ();
             return;
         }
     
         // Come online gradually from 503 or maintenance mode
         if (status == ConnectionValidator.Connected
-            && (_connectionStatus == ConnectionValidator.ServiceUnavailable
-                || _connectionStatus == ConnectionValidator.MaintenanceMode)) {
-            if (!_timeSinceMaintenanceOver.isValid ()) {
-                qCInfo (lcAccountState) << "AccountState reconnection : delaying for"
-                                       << _maintenanceToConnectedDelay << "ms";
-                _timeSinceMaintenanceOver.start ();
-                QTimer.singleShot (_maintenanceToConnectedDelay + 100, this, &AccountState.checkConnectivity);
+            && (_connection_status == ConnectionValidator.ServiceUnavailable
+                || _connection_status == ConnectionValidator.MaintenanceMode)) {
+            if (!_time_since_maintenance_over.is_valid ()) {
+                q_c_info (lc_account_state) << "AccountState reconnection : delaying for"
+                                       << _maintenance_to_connected_delay << "ms";
+                _time_since_maintenance_over.start ();
+                QTimer.single_shot (_maintenance_to_connected_delay + 100, this, &AccountState.slot_check_connectivity);
                 return;
-            } else if (_timeSinceMaintenanceOver.elapsed () < _maintenanceToConnectedDelay) {
-                qCInfo (lcAccountState) << "AccountState reconnection : only"
-                                       << _timeSinceMaintenanceOver.elapsed () << "ms have passed";
+            } else if (_time_since_maintenance_over.elapsed () < _maintenance_to_connected_delay) {
+                q_c_info (lc_account_state) << "AccountState reconnection : only"
+                                       << _time_since_maintenance_over.elapsed () << "ms have passed";
                 return;
             }
         }
     
-        if (_connectionStatus != status) {
-            qCInfo (lcAccountState) << "AccountState connection status change : "
-                                   << _connectionStatus << "."
+        if (_connection_status != status) {
+            q_c_info (lc_account_state) << "AccountState connection status change : "
+                                   << _connection_status << "."
                                    << status;
-            _connectionStatus = status;
+            _connection_status = status;
         }
-        _connectionErrors = errors;
+        _connection_errors = errors;
     
         switch (status) {
         case ConnectionValidator.Connected:
             if (_state != Connected) {
-                setState (Connected);
+                set_state (Connected);
     
                 // Get the Apps available on the server.
-                fetchNavigationApps ();
+                fetch_navigation_apps ();
     
                 // Setup push notifications after a successful connection
-                account ().trySetupPushNotifications ();
+                account ().try_setup_push_notifications ();
             }
             break;
         case ConnectionValidator.Undefined:
         case ConnectionValidator.NotConfigured:
-            setState (Disconnected);
+            set_state (Disconnected);
             break;
         case ConnectionValidator.ServerVersionMismatch:
-            setState (ConfigurationError);
+            set_state (ConfigurationError);
             break;
         case ConnectionValidator.StatusNotFound:
             // This can happen either because the server does not exist
             // or because we are having network issues. The latter one is
             // much more likely, so keep trying to connect.
-            setState (NetworkError);
+            set_state (NetworkError);
             break;
         case ConnectionValidator.CredentialsWrong:
         case ConnectionValidator.CredentialsNotReady:
-            handleInvalidCredentials ();
+            handle_invalid_credentials ();
             break;
         case ConnectionValidator.SslError:
-            setState (SignedOut);
+            set_state (SignedOut);
             break;
         case ConnectionValidator.ServiceUnavailable:
-            _timeSinceMaintenanceOver.invalidate ();
-            setState (ServiceUnavailable);
+            _time_since_maintenance_over.invalidate ();
+            set_state (ServiceUnavailable);
             break;
         case ConnectionValidator.MaintenanceMode:
-            _timeSinceMaintenanceOver.invalidate ();
-            setState (MaintenanceMode);
+            _time_since_maintenance_over.invalidate ();
+            set_state (MaintenanceMode);
             break;
         case ConnectionValidator.Timeout:
-            setState (NetworkError);
+            set_state (NetworkError);
             break;
         }
     }
     
-    void AccountState.slotHandleRemoteWipeCheck () {
+    void AccountState.slot_handle_remote_wipe_check () {
         // make sure it changes account state and icons
-        signOutByUi ();
+        sign_out_by_ui ();
     
-        qCInfo (lcAccountState) << "Invalid credentials for" << _account.url ().toString ()
+        q_c_info (lc_account_state) << "Invalid credentials for" << _account.url ().to_string ()
                                << "checking for remote wipe request";
     
-        _waitingForNewCredentials = false;
-        setState (SignedOut);
+        _waiting_for_new_credentials = false;
+        set_state (SignedOut);
     }
     
-    void AccountState.handleInvalidCredentials () {
-        if (isSignedOut () || _waitingForNewCredentials)
+    void AccountState.handle_invalid_credentials () {
+        if (is_signed_out () || _waiting_for_new_credentials)
             return;
     
-        qCInfo (lcAccountState) << "Invalid credentials for" << _account.url ().toString ()
+        q_c_info (lc_account_state) << "Invalid credentials for" << _account.url ().to_string ()
                                << "asking user";
     
-        _waitingForNewCredentials = true;
-        setState (AskingCredentials);
+        _waiting_for_new_credentials = true;
+        set_state (AskingCredentials);
     
         if (account ().credentials ().ready ()) {
-            account ().credentials ().invalidateToken ();
+            account ().credentials ().invalidate_token ();
         }
         if (auto creds = qobject_cast<HttpCredentials> (account ().credentials ())) {
-            if (creds.refreshAccessToken ())
+            if (creds.refresh_access_token ())
                 return;
         }
-        account ().credentials ().askFromUser ();
+        account ().credentials ().ask_from_user ();
     }
     
-    void AccountState.slotCredentialsFetched (AbstractCredentials *) {
+    void AccountState.slot_credentials_fetched (AbstractCredentials *) {
         // Make a connection attempt, no matter whether the credentials are
         // ready or not - we want to check whether we can get an SSL connection
         // going before bothering the user for a password.
-        qCInfo (lcAccountState) << "Fetched credentials for" << _account.url ().toString ()
+        q_c_info (lc_account_state) << "Fetched credentials for" << _account.url ().to_string ()
                                << "attempting to connect";
-        _waitingForNewCredentials = false;
-        checkConnectivity ();
+        _waiting_for_new_credentials = false;
+        slot_check_connectivity ();
     }
     
-    void AccountState.slotCredentialsAsked (AbstractCredentials *credentials) {
-        qCInfo (lcAccountState) << "Credentials asked for" << _account.url ().toString ()
+    void AccountState.slot_credentials_asked (AbstractCredentials *credentials) {
+        q_c_info (lc_account_state) << "Credentials asked for" << _account.url ().to_string ()
                                << "are they ready?" << credentials.ready ();
     
-        _waitingForNewCredentials = false;
+        _waiting_for_new_credentials = false;
     
         if (!credentials.ready ()) {
             // User canceled the connection or did not give a password
-            setState (SignedOut);
+            set_state (SignedOut);
             return;
         }
     
-        if (_connectionValidator) {
+        if (_connection_validator) {
             // When new credentials become available we always want to restart the
             // connection validation, even if it's currently running.
-            _connectionValidator.deleteLater ();
-            _connectionValidator = nullptr;
+            _connection_validator.delete_later ();
+            _connection_validator = nullptr;
         }
     
-        checkConnectivity ();
+        slot_check_connectivity ();
     }
     
     std.unique_ptr<QSettings> AccountState.settings () {
-        auto s = ConfigFile.settingsWithGroup (QLatin1String ("Accounts"));
-        s.beginGroup (_account.id ());
+        auto s = ConfigFile.settings_with_group (QLatin1String ("Accounts"));
+        s.begin_group (_account.id ());
         return s;
     }
     
-    void AccountState.fetchNavigationApps (){
+    void AccountState.fetch_navigation_apps (){
         auto *job = new OcsNavigationAppsJob (_account);
-        job.addRawHeader ("If-None-Match", navigationAppsEtagResponseHeader ());
-        connect (job, &OcsNavigationAppsJob.appsJobFinished, this, &AccountState.slotNavigationAppsFetched);
-        connect (job, &OcsNavigationAppsJob.etagResponseHeaderReceived, this, &AccountState.slotEtagResponseHeaderReceived);
-        connect (job, &OcsNavigationAppsJob.ocsError, this, &AccountState.slotOcsError);
-        job.getNavigationApps ();
+        job.add_raw_header ("If-None-Match", navigation_apps_etag_response_header ());
+        connect (job, &OcsNavigationAppsJob.apps_job_finished, this, &AccountState.slot_navigation_apps_fetched);
+        connect (job, &OcsNavigationAppsJob.etag_response_header_received, this, &AccountState.slot_etag_response_header_received);
+        connect (job, &OcsNavigationAppsJob.ocs_error, this, &AccountState.slot_ocs_error);
+        job.get_navigation_apps ();
     }
     
-    void AccountState.slotEtagResponseHeaderReceived (QByteArray &value, int statusCode){
-        if (statusCode == 200){
-            qCDebug (lcAccountState) << "New navigation apps ETag Response Header received " << value;
-            setNavigationAppsEtagResponseHeader (value);
+    void AccountState.slot_etag_response_header_received (QByteArray &value, int status_code){
+        if (status_code == 200){
+            q_c_debug (lc_account_state) << "New navigation apps ETag Response Header received " << value;
+            set_navigation_apps_etag_response_header (value);
         }
     }
     
-    void AccountState.slotOcsError (int statusCode, string &message) {
-        qCDebug (lcAccountState) << "Error " << statusCode << " while fetching new navigation apps : " << message;
+    void AccountState.slot_ocs_error (int status_code, string &message) {
+        q_c_debug (lc_account_state) << "Error " << status_code << " while fetching new navigation apps : " << message;
     }
     
-    void AccountState.slotNavigationAppsFetched (QJsonDocument &reply, int statusCode) {
+    void AccountState.slot_navigation_apps_fetched (QJsonDocument &reply, int status_code) {
         if (_account){
-            if (statusCode == 304) {
-                qCWarning (lcAccountState) << "Status code " << statusCode << " Not Modified - No new navigation apps.";
+            if (status_code == 304) {
+                q_c_warning (lc_account_state) << "Status code " << status_code << " Not Modified - No new navigation apps.";
             } else {
                 _apps.clear ();
     
-                if (!reply.isEmpty ()){
-                    auto element = reply.object ().value ("ocs").toObject ().value ("data");
-                    const auto navLinks = element.toArray ();
+                if (!reply.is_empty ()){
+                    auto element = reply.object ().value ("ocs").to_object ().value ("data");
+                    const auto nav_links = element.to_array ();
     
-                    if (navLinks.size () > 0){
-                        for (QJsonValue &value : navLinks) {
-                            auto navLink = value.toObject ();
+                    if (nav_links.size () > 0){
+                        for (QJsonValue &value : nav_links) {
+                            auto nav_link = value.to_object ();
     
-                            auto *app = new AccountApp (navLink.value ("name").toString (), QUrl (navLink.value ("href").toString ()),
-                                navLink.value ("id").toString (), QUrl (navLink.value ("icon").toString ()));
+                            auto *app = new AccountApp (nav_link.value ("name").to_string (), QUrl (nav_link.value ("href").to_string ()),
+                                nav_link.value ("id").to_string (), QUrl (nav_link.value ("icon").to_string ()));
     
                             _apps << app;
                         }
                     }
                 }
     
-                emit hasFetchedNavigationApps ();
+                emit has_fetched_navigation_apps ();
             }
         }
     }
     
-    AccountAppList AccountState.appList () {
+    AccountAppList AccountState.app_list () {
         return _apps;
     }
     
-    AccountApp* AccountState.findApp (string &appId) {
-        if (!appId.isEmpty ()) {
-            const auto apps = appList ();
-            const auto it = std.find_if (apps.cbegin (), apps.cend (), [appId] (auto &app) {
-                return app.id () == appId;
+    AccountApp* AccountState.find_app (string &app_id) {
+        if (!app_id.is_empty ()) {
+            const auto apps = app_list ();
+            const auto it = std.find_if (apps.cbegin (), apps.cend (), [app_id] (auto &app) {
+                return app.id () == app_id;
             });
             if (it != apps.cend ()) {
                 return *it;
@@ -691,17 +712,15 @@ private:
     
         return nullptr;
     }
-    
-    /*-------------------------------------------------------------------------------------*/
-    
+
     AccountApp.AccountApp (string &name, QUrl &url,
-        const string &id, QUrl &iconUrl,
+        const string &id, QUrl &icon_url,
         GLib.Object *parent)
         : GLib.Object (parent)
         , _name (name)
         , _url (url)
         , _id (id)
-        , _iconUrl (iconUrl) {
+        , _icon_url (icon_url) {
     }
     
     string AccountApp.name () {
@@ -716,11 +735,10 @@ private:
         return _id;
     }
     
-    QUrl AccountApp.iconUrl () {
-        return _iconUrl;
+    QUrl AccountApp.icon_url () {
+        return _icon_url;
     }
     
-    /*-------------------------------------------------------------------------------------*/
-    
-    } // namespace Occ
+
+} // namespace Occ
     

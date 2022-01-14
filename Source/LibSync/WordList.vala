@@ -4,14 +4,14 @@
 // #include <openssl/rand.h>
 
 namespace Occ {
-    namespace WordList {
-        QStringList getRandomWords (int nr);
-        string getUnifiedString (QStringList& l);
+    namespace Word_list {
+        QStringList get_random_words (int nr);
+        string get_unified_string (QStringList& l);
 
     
     // #include <initializer_list>
     
-    int getRandomNumber (int max) {
+    int get_random_number (int max) {
         unsigned char d[8];
         RAND_bytes (d, 8);
     
@@ -25,8 +25,8 @@ namespace Occ {
         return static_cast<int> (num % max);
     }
     
-    QStringList getRandomWords (int nr) {
-        QStringList wordList = {
+    QStringList get_random_words (int nr) {
+        QStringList word_list = {
             "abandon",
             "ability",
             "able",
@@ -2077,19 +2077,19 @@ namespace Occ {
             "zoo"
         };
     
-        QStringList randomWords;
-        while (randomWords.size () != nr) {
-            string currWord = wordList.at (getRandomNumber (wordList.size ()));
-            if (!randomWords.contains (currWord)) {
-                randomWords.append (currWord);
+        QStringList random_words;
+        while (random_words.size () != nr) {
+            string curr_word = word_list.at (get_random_number (word_list.size ()));
+            if (!random_words.contains (curr_word)) {
+                random_words.append (curr_word);
             }
         }
-        return randomWords;
+        return random_words;
     }
     
-    string getUnifiedString (QStringList& wList) {
+    string get_unified_string (QStringList& w_list) {
         string ret;
-        for (auto& str : wList) {
+        for (auto& str : w_list) {
             ret += str;
         }
         return ret;

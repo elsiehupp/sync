@@ -11,58 +11,58 @@ Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 namespace Occ {
 
-class LinkLabel : QLabel {
+class Link_label : QLabel {
 public:
-    LinkLabel (Gtk.Widget *parent = nullptr);
+    Link_label (Gtk.Widget *parent = nullptr);
 
-    void setUrl (QUrl &url);
+    void set_url (QUrl &url);
 
 signals:
     void clicked ();
 
 protected:
-    void enterEvent (QEvent *event) override;
+    void enter_event (QEvent *event) override;
 
-    void leaveEvent (QEvent *event) override;
+    void leave_event (QEvent *event) override;
 
-    void mouseReleaseEvent (QMouseEvent *event) override;
+    void mouse_release_event (QMouse_event *event) override;
 
 private:
-    void setFontUnderline (bool value);
+    void set_font_underline (bool value);
 
     QUrl url;
 };
 
-    LinkLabel.LinkLabel (Gtk.Widget *parent) : QLabel (parent) {
+    Link_label.Link_label (Gtk.Widget *parent) : QLabel (parent) {
     
     }
     
-    void LinkLabel.setUrl (QUrl &url) {
+    void Link_label.set_url (QUrl &url) {
         this.url = url;
     }
     
-    void LinkLabel.enterEvent (QEvent * /*event*/) {
-        setFontUnderline (true);
-        setCursor (Qt.PointingHandCursor);
+    void Link_label.enter_event (QEvent * /*event*/) {
+        set_font_underline (true);
+        set_cursor (Qt.PointingHandCursor);
     }
     
-    void LinkLabel.leaveEvent (QEvent * /*event*/) {
-        setFontUnderline (false);
-        setCursor (Qt.ArrowCursor);
+    void Link_label.leave_event (QEvent * /*event*/) {
+        set_font_underline (false);
+        set_cursor (Qt.ArrowCursor);
     }
     
-    void LinkLabel.mouseReleaseEvent (QMouseEvent * /*event*/) {
-        if (url.isValid ()) {
-            Utility.openBrowser (url);
+    void Link_label.mouse_release_event (QMouse_event * /*event*/) {
+        if (url.is_valid ()) {
+            Utility.open_browser (url);
         }
     
         emit clicked ();
     }
     
-    void LinkLabel.setFontUnderline (bool value) {
-        auto labelFont = font ();
-        labelFont.setUnderline (value);
-        setFont (labelFont);
+    void Link_label.set_font_underline (bool value) {
+        auto label_font = font ();
+        label_font.set_underline (value);
+        set_font (label_font);
     }
     
     }

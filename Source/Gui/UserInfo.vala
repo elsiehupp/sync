@@ -22,12 +22,12 @@ namespace Occ {
 /***********************************************************
 @brief handles getting the user info and quota to display in the UI
 
-It is typically owned by the AccountSetting page.
+It is typically owned by the Account_setting page.
 
 The user info and quota is r
- - This object is active via setActive () (typically if the settings page is visible.)
+ - This object is active via set_active () (typically if the settings page is visible.)
  - The account is connected.
- - Every 30 seconds (defaultIntervalT) or 5 seconds in case of failure (failIntervalT)
+ - Every 30 seconds (default_interval_t) or 5 seconds in case of failure (fail_interval_t)
 
 We only request the info when the UI is visible otherwise this might slow down the server with
 too many requests.
@@ -36,65 +36,65 @@ quota is not updated fast enough when changed on the server.
 If the fetch job is not finished within 30 seconds, it is cancelled and another
 
 Constructor notes:
- - allowDisconnectedAccountState : set to true if you want to ignore AccountState's isConnected () state,
+ - allow_disconnected_account_state : set to true if you want to ignore AccountState's is_connected () state,
    this is used by ConnectionValidator (prior having a valid AccountState).
- - fetchAvatarImage : set to false if you don't want to fetch the avatar image
+ - fetch_avatar_image : set to false if you don't want to fetch the avatar image
 
 @ingroup gui
 
 Here follows the state machine
 
  \code{.unparsed}
- *--. slotFetchInfo
+ *--. slot_fetch_info
          JsonApiJob (ocs/v1.php/cloud/user)
          |
-         +. slotUpdateLastInfo
-               AvatarJob (if _fetchAvatarImage is true)
+         +. slot_update_last_info
+               Avatar_job (if _fetch_avatar_image is true)
                |
-               +. slotAvatarImage -.
+               +. slot_avatar_image -.
    +-----------------------------------+
    |
-   +. Client Side Encryption Checks --+ --reportResult ()
+   +. Client Side Encryption Checks --+ --report_result ()
      \endcode
   */
 class UserInfo : GLib.Object {
 public:
-    UserInfo (Occ.AccountState *accountState, bool allowDisconnectedAccountState, bool fetchAvatarImage, GLib.Object *parent = nullptr);
+    UserInfo (Occ.AccountState *account_state, bool allow_disconnected_account_state, bool fetch_avatar_image, GLib.Object *parent = nullptr);
 
-    int64 lastQuotaTotalBytes () { return _lastQuotaTotalBytes; }
-    int64 lastQuotaUsedBytes () { return _lastQuotaUsedBytes; }
+    int64 last_quota_total_bytes () { return _last_quota_total_bytes; }
+    int64 last_quota_used_bytes () { return _last_quota_used_bytes; }
 
     /***********************************************************
     When the quotainfo is active, it requests the quota at regular interval.
     When setting it to active it will request the quota immediately if the last time
     the quota was requested was more than the interval
     ***********************************************************/
-    void setActive (bool active);
+    void set_active (bool active);
 
 public slots:
-    void slotFetchInfo ();
+    void slot_fetch_info ();
 
 private slots:
-    void slotUpdateLastInfo (QJsonDocument &json);
-    void slotAccountStateChanged ();
-    void slotRequestFailed ();
-    void slotAvatarImage (QImage &img);
+    void slot_update_last_info (QJsonDocument &json);
+    void slot_account_state_changed ();
+    void slot_request_failed ();
+    void slot_avatar_image (QImage &img);
 
 signals:
-    void quotaUpdated (int64 total, int64 used);
-    void fetchedLastInfo (UserInfo *userInfo);
+    void quota_updated (int64 total, int64 used);
+    void fetched_last_info (UserInfo *user_info);
 
 private:
-    bool canGetInfo ();
+    bool can_get_info ();
 
-    QPointer<AccountState> _accountState;
-    bool _allowDisconnectedAccountState;
-    bool _fetchAvatarImage;
+    QPointer<AccountState> _account_state;
+    bool _allow_disconnected_account_state;
+    bool _fetch_avatar_image;
 
-    int64 _lastQuotaTotalBytes;
-    int64 _lastQuotaUsedBytes;
-    QTimer _jobRestartTimer;
-    QDateTime _lastInfoReceived; // the time at which the user info and quota was received last
+    int64 _last_quota_total_bytes;
+    int64 _last_quota_used_bytes;
+    QTimer _job_restart_timer;
+    QDateTime _last_info_received; // the time at which the user info and quota was received last
     bool _active; // if we should check at regular interval (when the UI is visible)
     QPointer<JsonApiJob> _job; // the currently running job
 };
@@ -102,122 +102,122 @@ private:
 
 
     namespace {
-        static const int defaultIntervalT = 30 * 1000;
-        static const int failIntervalT = 5 * 1000;
+        static const int default_interval_t = 30 * 1000;
+        static const int fail_interval_t = 5 * 1000;
     }
     
-    UserInfo.UserInfo (AccountState *accountState, bool allowDisconnectedAccountState, bool fetchAvatarImage, GLib.Object *parent)
+    UserInfo.UserInfo (AccountState *account_state, bool allow_disconnected_account_state, bool fetch_avatar_image, GLib.Object *parent)
         : GLib.Object (parent)
-        , _accountState (accountState)
-        , _allowDisconnectedAccountState (allowDisconnectedAccountState)
-        , _fetchAvatarImage (fetchAvatarImage)
-        , _lastQuotaTotalBytes (0)
-        , _lastQuotaUsedBytes (0)
+        , _account_state (account_state)
+        , _allow_disconnected_account_state (allow_disconnected_account_state)
+        , _fetch_avatar_image (fetch_avatar_image)
+        , _last_quota_total_bytes (0)
+        , _last_quota_used_bytes (0)
         , _active (false) {
-        connect (accountState, &AccountState.stateChanged,
-            this, &UserInfo.slotAccountStateChanged);
-        connect (&_jobRestartTimer, &QTimer.timeout, this, &UserInfo.slotFetchInfo);
-        _jobRestartTimer.setSingleShot (true);
+        connect (account_state, &AccountState.state_changed,
+            this, &UserInfo.slot_account_state_changed);
+        connect (&_job_restart_timer, &QTimer.timeout, this, &UserInfo.slot_fetch_info);
+        _job_restart_timer.set_single_shot (true);
     }
     
-    void UserInfo.setActive (bool active) {
+    void UserInfo.set_active (bool active) {
         _active = active;
-        slotAccountStateChanged ();
+        slot_account_state_changed ();
     }
     
-    void UserInfo.slotAccountStateChanged () {
-        if (canGetInfo ()) {
+    void UserInfo.slot_account_state_changed () {
+        if (can_get_info ()) {
             // Obviously assumes there will never be more than thousand of hours between last info
             // received and now, hence why we static_cast
-            auto elapsed = static_cast<int> (_lastInfoReceived.msecsTo (QDateTime.currentDateTime ()));
-            if (_lastInfoReceived.isNull () || elapsed >= defaultIntervalT) {
-                slotFetchInfo ();
+            auto elapsed = static_cast<int> (_last_info_received.msecs_to (QDateTime.current_date_time ()));
+            if (_last_info_received.is_null () || elapsed >= default_interval_t) {
+                slot_fetch_info ();
             } else {
-                _jobRestartTimer.start (defaultIntervalT - elapsed);
+                _job_restart_timer.start (default_interval_t - elapsed);
             }
         } else {
-            _jobRestartTimer.stop ();
+            _job_restart_timer.stop ();
         }
     }
     
-    void UserInfo.slotRequestFailed () {
-        _lastQuotaTotalBytes = 0;
-        _lastQuotaUsedBytes = 0;
-        _jobRestartTimer.start (failIntervalT);
+    void UserInfo.slot_request_failed () {
+        _last_quota_total_bytes = 0;
+        _last_quota_used_bytes = 0;
+        _job_restart_timer.start (fail_interval_t);
     }
     
-    bool UserInfo.canGetInfo () {
-        if (!_accountState || !_active) {
+    bool UserInfo.can_get_info () {
+        if (!_account_state || !_active) {
             return false;
         }
-        AccountPtr account = _accountState.account ();
-        return (_accountState.isConnected () || _allowDisconnectedAccountState)
+        AccountPtr account = _account_state.account ();
+        return (_account_state.is_connected () || _allow_disconnected_account_state)
             && account.credentials ()
             && account.credentials ().ready ();
     }
     
-    void UserInfo.slotFetchInfo () {
-        if (!canGetInfo ()) {
+    void UserInfo.slot_fetch_info () {
+        if (!can_get_info ()) {
             return;
         }
     
         if (_job) {
             // The previous job was not finished?  Then we cancel it!
-            _job.deleteLater ();
+            _job.delete_later ();
         }
     
-        AccountPtr account = _accountState.account ();
+        AccountPtr account = _account_state.account ();
         _job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/user"), this);
-        _job.setTimeout (20 * 1000);
-        connect (_job.data (), &JsonApiJob.jsonReceived, this, &UserInfo.slotUpdateLastInfo);
-        connect (_job.data (), &AbstractNetworkJob.networkError, this, &UserInfo.slotRequestFailed);
+        _job.set_timeout (20 * 1000);
+        connect (_job.data (), &JsonApiJob.json_received, this, &UserInfo.slot_update_last_info);
+        connect (_job.data (), &AbstractNetworkJob.network_error, this, &UserInfo.slot_request_failed);
         _job.start ();
     }
     
-    void UserInfo.slotUpdateLastInfo (QJsonDocument &json) {
-        auto objData = json.object ().value ("ocs").toObject ().value ("data").toObject ();
+    void UserInfo.slot_update_last_info (QJsonDocument &json) {
+        auto obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
     
-        AccountPtr account = _accountState.account ();
+        AccountPtr account = _account_state.account ();
     
         // User Info
-        string user = objData.value ("id").toString ();
-        if (!user.isEmpty ()) {
-            account.setDavUser (user);
+        string user = obj_data.value ("id").to_string ();
+        if (!user.is_empty ()) {
+            account.set_dav_user (user);
         }
-        string displayName = objData.value ("display-name").toString ();
-        if (!displayName.isEmpty ()) {
-            account.setDavDisplayName (displayName);
+        string display_name = obj_data.value ("display-name").to_string ();
+        if (!display_name.is_empty ()) {
+            account.set_dav_display_name (display_name);
         }
     
         // Quota
-        auto objQuota = objData.value ("quota").toObject ();
-        int64 used = objQuota.value ("used").toDouble ();
-        int64 total = objQuota.value ("quota").toDouble ();
+        auto obj_quota = obj_data.value ("quota").to_object ();
+        int64 used = obj_quota.value ("used").to_double ();
+        int64 total = obj_quota.value ("quota").to_double ();
     
-        if (_lastInfoReceived.isNull () || _lastQuotaUsedBytes != used || _lastQuotaTotalBytes != total) {
-            _lastQuotaUsedBytes = used;
-            _lastQuotaTotalBytes = total;
-            emit quotaUpdated (_lastQuotaTotalBytes, _lastQuotaUsedBytes);
+        if (_last_info_received.is_null () || _last_quota_used_bytes != used || _last_quota_total_bytes != total) {
+            _last_quota_used_bytes = used;
+            _last_quota_total_bytes = total;
+            emit quota_updated (_last_quota_total_bytes, _last_quota_used_bytes);
         }
     
-        _jobRestartTimer.start (defaultIntervalT);
-        _lastInfoReceived = QDateTime.currentDateTime ();
+        _job_restart_timer.start (default_interval_t);
+        _last_info_received = QDateTime.current_date_time ();
     
         // Avatar Image
-        if (_fetchAvatarImage) {
-            auto *job = new AvatarJob (account, account.davUser (), 128, this);
-            job.setTimeout (20 * 1000);
-            GLib.Object.connect (job, &AvatarJob.avatarPixmap, this, &UserInfo.slotAvatarImage);
+        if (_fetch_avatar_image) {
+            auto *job = new Avatar_job (account, account.dav_user (), 128, this);
+            job.set_timeout (20 * 1000);
+            GLib.Object.connect (job, &Avatar_job.avatar_pixmap, this, &UserInfo.slot_avatar_image);
             job.start ();
         }
         else
-            emit fetchedLastInfo (this);
+            emit fetched_last_info (this);
     }
     
-    void UserInfo.slotAvatarImage (QImage &img) {
-        _accountState.account ().setAvatar (img);
+    void UserInfo.slot_avatar_image (QImage &img) {
+        _account_state.account ().set_avatar (img);
     
-        emit fetchedLastInfo (this);
+        emit fetched_last_info (this);
     }
     
     } // namespace Occ

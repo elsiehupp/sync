@@ -13,42 +13,42 @@ const int FLOW2AUTHWIDGET_H
 
 namespace Occ {
 
-class Flow2AuthWidget : Gtk.Widget {
+class Flow2Auth_widget : Gtk.Widget {
 public:
-    Flow2AuthWidget (Gtk.Widget *parent = nullptr);
-    ~Flow2AuthWidget () override;
+    Flow2Auth_widget (Gtk.Widget *parent = nullptr);
+    ~Flow2Auth_widget () override;
 
-    void startAuth (Account *account);
-    void resetAuth (Account *account = nullptr);
-    void setError (string &error);
+    void start_auth (Account *account);
+    void reset_auth (Account *account = nullptr);
+    void set_error (string &error);
 
 public slots:
-    void slotAuthResult (Flow2Auth.Result, string &errorString, string &user, string &appPassword);
-    void slotPollNow ();
-    void slotStatusChanged (Flow2Auth.PollStatus status, int secondsLeft);
-    void slotStyleChanged ();
+    void slot_auth_result (Flow2Auth.Result, string &error_string, string &user, string &app_password);
+    void slot_poll_now ();
+    void slot_status_changed (Flow2Auth.PollStatus status, int seconds_left);
+    void slot_style_changed ();
 
 signals:
-    void authResult (Flow2Auth.Result, string &errorString, string &user, string &appPassword);
-    void pollNow ();
+    void auth_result (Flow2Auth.Result, string &error_string, string &user, string &app_password);
+    void poll_now ();
 
 private:
     Account *_account = nullptr;
-    QScopedPointer<Flow2Auth> _asyncAuth;
-    Ui_Flow2AuthWidget _ui;
+    QScopedPointer<Flow2Auth> _async_auth;
+    Ui_Flow2Auth_widget _ui;
 
 protected slots:
-    void slotOpenBrowser ();
-    void slotCopyLinkToClipboard ();
+    void slot_open_browser ();
+    void slot_copy_link_to_clipboard ();
 
 private:
-    void startSpinner ();
-    void stopSpinner (bool showStatusLabel);
-    void customizeStyle ();
-    void setLogo ();
+    void start_spinner ();
+    void stop_spinner (bool show_status_label);
+    void customize_style ();
+    void set_logo ();
 
-    QProgressIndicator *_progressIndi;
-    int _statusUpdateSkipCount = 0;
+    QProgress_indicator *_progress_indi;
+    int _status_update_skip_count = 0;
 };
 
 } // namespace Occ

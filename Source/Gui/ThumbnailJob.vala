@@ -12,40 +12,40 @@ namespace Occ {
 @ingroup gui
 
 Job that allows fetching a preview (of 150x150 for now) of a given file.
-Once the job has finished the jobFinished signal will be emitted.
+Once the job has finished the job_finished signal will be emitted.
 ***********************************************************/
-class ThumbnailJob : AbstractNetworkJob {
+class Thumbnail_job : AbstractNetworkJob {
 public:
-    ThumbnailJob (string &path, AccountPtr account, GLib.Object *parent = nullptr);
+    Thumbnail_job (string &path, AccountPtr account, GLib.Object *parent = nullptr);
 public slots:
     void start () override;
 signals:
     /***********************************************************
-    @param statusCode the HTTP status code
+    @param status_code the HTTP status code
     @param reply the content of the reply
     
-    Signal that the job is done. If the statusCode is 200 (success) reply
+    Signal that the job is done. If the status_code is 200 (success) reply
     will contain the image data in PNG. If the status code is different the content
     of reply is undefined.
     ***********************************************************/
-    void jobFinished (int statusCode, QByteArray reply);
+    void job_finished (int status_code, QByteArray reply);
 private slots:
     bool finished () override;
 };
 
 
-    ThumbnailJob.ThumbnailJob (string &path, AccountPtr account, GLib.Object *parent)
+    Thumbnail_job.Thumbnail_job (string &path, AccountPtr account, GLib.Object *parent)
         : AbstractNetworkJob (account, QLatin1String ("index.php/apps/files/api/v1/thumbnail/150/150/") + path, parent) {
-        setIgnoreCredentialFailure (true);
+        set_ignore_credential_failure (true);
     }
     
-    void ThumbnailJob.start () {
-        sendRequest ("GET", makeAccountUrl (path ()));
+    void Thumbnail_job.start () {
+        send_request ("GET", make_account_url (path ()));
         AbstractNetworkJob.start ();
     }
     
-    bool ThumbnailJob.finished () {
-        emit jobFinished (reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).toInt (), reply ().readAll ());
+    bool Thumbnail_job.finished () {
+        emit job_finished (reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int (), reply ().read_all ());
         return true;
     }
     }

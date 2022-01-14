@@ -18,190 +18,190 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 namespace Occ {
 
-enum class ClearAtType {
+enum class Clear_at_type {
     Period,
-    EndOf,
+    End_of,
     Timestamp
 };
 
 // TODO : If we can use C++17 make it a std.variant
-struct ClearAt {
-    ClearAtType _type = ClearAtType.Period;
+struct Clear_at {
+    Clear_at_type _type = Clear_at_type.Period;
 
     uint64 _timestamp;
     int _period;
     string _endof;
 };
 
-class UserStatus {
+class User_status {
     Q_GADGET
 
     Q_PROPERTY (string id MEMBER _id)
     Q_PROPERTY (string message MEMBER _message)
     Q_PROPERTY (string icon MEMBER _icon)
-    Q_PROPERTY (OnlineStatus state MEMBER _state)
+    Q_PROPERTY (Online_status state MEMBER _state)
 
 public:
-    enum class OnlineStatus : uint8 {
+    enum class Online_status : uint8 {
         Online,
-        DoNotDisturb,
+        Do_not_disturb,
         Away,
         Offline,
         Invisible
     };
-    Q_ENUM (OnlineStatus);
+    Q_ENUM (Online_status);
 
-    UserStatus ();
+    User_status ();
 
-    UserStatus (string &id, string &message, string &icon,
-        OnlineStatus state, bool messagePredefined, Optional<ClearAt> &clearAt = {});
+    User_status (string &id, string &message, string &icon,
+        Online_status state, bool message_predefined, Optional<Clear_at> &clear_at = {});
 
     Q_REQUIRED_RESULT string id ();
     Q_REQUIRED_RESULT string message ();
     Q_REQUIRED_RESULT string icon ();
-    Q_REQUIRED_RESULT OnlineStatus state ();
-    Q_REQUIRED_RESULT Optional<ClearAt> clearAt ();
+    Q_REQUIRED_RESULT Online_status state ();
+    Q_REQUIRED_RESULT Optional<Clear_at> clear_at ();
 
-    void setId (string &id);
-    void setMessage (string &message);
-    void setState (OnlineStatus state);
-    void setIcon (string &icon);
-    void setMessagePredefined (bool value);
-    void setClearAt (Optional<ClearAt> &dateTime);
+    void set_id (string &id);
+    void set_message (string &message);
+    void set_state (Online_status state);
+    void set_icon (string &icon);
+    void set_message_predefined (bool value);
+    void set_clear_at (Optional<Clear_at> &date_time);
 
-    Q_REQUIRED_RESULT bool messagePredefined ();
+    Q_REQUIRED_RESULT bool message_predefined ();
 
-    Q_REQUIRED_RESULT QUrl stateIcon ();
+    Q_REQUIRED_RESULT QUrl state_icon ();
 
 private:
     string _id;
     string _message;
     string _icon;
-    OnlineStatus _state = OnlineStatus.Online;
-    bool _messagePredefined;
-    Optional<ClearAt> _clearAt;
+    Online_status _state = Online_status.Online;
+    bool _message_predefined;
+    Optional<Clear_at> _clear_at;
 };
 
-class UserStatusConnector : GLib.Object {
+class User_status_connector : GLib.Object {
 
 public:
     enum class Error {
-        CouldNotFetchUserStatus,
-        CouldNotFetchPredefinedUserStatuses,
-        UserStatusNotSupported,
-        EmojisNotSupported,
-        CouldNotSetUserStatus,
-        CouldNotClearMessage
+        Could_not_fetch_user_status,
+        Could_not_fetch_predefined_user_statuses,
+        User_status_not_supported,
+        Emojis_not_supported,
+        Could_not_set_user_status,
+        Could_not_clear_message
     };
     Q_ENUM (Error)
 
-    UserStatusConnector (GLib.Object *parent = nullptr);
+    User_status_connector (GLib.Object *parent = nullptr);
 
-    ~UserStatusConnector () override;
+    ~User_status_connector () override;
 
-    virtual void fetchUserStatus () = 0;
+    virtual void fetch_user_status () = 0;
 
-    virtual void fetchPredefinedStatuses () = 0;
+    virtual void fetch_predefined_statuses () = 0;
 
-    virtual void setUserStatus (UserStatus &userStatus) = 0;
+    virtual void set_user_status (User_status &user_status) = 0;
 
-    virtual void clearMessage () = 0;
+    virtual void clear_message () = 0;
 
-    virtual UserStatus userStatus () const = 0;
+    virtual User_status user_status () const = 0;
 
 signals:
-    void userStatusFetched (UserStatus &userStatus);
-    void predefinedStatusesFetched (std.vector<UserStatus> &statuses);
-    void userStatusSet ();
-    void messageCleared ();
+    void user_status_fetched (User_status &user_status);
+    void predefined_statuses_fetched (std.vector<User_status> &statuses);
+    void user_status_set ();
+    void message_cleared ();
     void error (Error error);
 };
 
 
-    UserStatus.UserStatus () = default;
+    User_status.User_status () = default;
     
-    UserStatus.UserStatus (
+    User_status.User_status (
         const string &id, string &message, string &icon,
-        OnlineStatus state, bool messagePredefined, Optional<ClearAt> &clearAt)
+        Online_status state, bool message_predefined, Optional<Clear_at> &clear_at)
         : _id (id)
         , _message (message)
         , _icon (icon)
         , _state (state)
-        , _messagePredefined (messagePredefined)
-        , _clearAt (clearAt) {
+        , _message_predefined (message_predefined)
+        , _clear_at (clear_at) {
     }
     
-    string UserStatus.id () {
+    string User_status.id () {
         return _id;
     }
     
-    string UserStatus.message () {
+    string User_status.message () {
         return _message;
     }
     
-    string UserStatus.icon () {
+    string User_status.icon () {
         return _icon;
     }
     
-    auto UserStatus.state () const . OnlineStatus {
+    auto User_status.state () const . Online_status {
         return _state;
     }
     
-    bool UserStatus.messagePredefined () {
-        return _messagePredefined;
+    bool User_status.message_predefined () {
+        return _message_predefined;
     }
     
-    QUrl UserStatus.stateIcon () {
+    QUrl User_status.state_icon () {
         switch (_state) {
-        case UserStatus.OnlineStatus.Away:
-            return Theme.instance ().statusAwayImageSource ();
+        case User_status.Online_status.Away:
+            return Theme.instance ().status_away_image_source ();
     
-        case UserStatus.OnlineStatus.DoNotDisturb:
-            return Theme.instance ().statusDoNotDisturbImageSource ();
+        case User_status.Online_status.Do_not_disturb:
+            return Theme.instance ().status_do_not_disturb_image_source ();
     
-        case UserStatus.OnlineStatus.Invisible:
-        case UserStatus.OnlineStatus.Offline:
-            return Theme.instance ().statusInvisibleImageSource ();
+        case User_status.Online_status.Invisible:
+        case User_status.Online_status.Offline:
+            return Theme.instance ().status_invisible_image_source ();
     
-        case UserStatus.OnlineStatus.Online:
-            return Theme.instance ().statusOnlineImageSource ();
+        case User_status.Online_status.Online:
+            return Theme.instance ().status_online_image_source ();
         }
     
         Q_UNREACHABLE ();
     }
     
-    Optional<ClearAt> UserStatus.clearAt () {
-        return _clearAt;
+    Optional<Clear_at> User_status.clear_at () {
+        return _clear_at;
     }
     
-    void UserStatus.setId (string &id) {
+    void User_status.set_id (string &id) {
         _id = id;
     }
     
-    void UserStatus.setMessage (string &message) {
+    void User_status.set_message (string &message) {
         _message = message;
     }
     
-    void UserStatus.setState (OnlineStatus state) {
+    void User_status.set_state (Online_status state) {
         _state = state;
     }
     
-    void UserStatus.setIcon (string &icon) {
+    void User_status.set_icon (string &icon) {
         _icon = icon;
     }
     
-    void UserStatus.setMessagePredefined (bool value) {
-        _messagePredefined = value;
+    void User_status.set_message_predefined (bool value) {
+        _message_predefined = value;
     }
     
-    void UserStatus.setClearAt (Optional<ClearAt> &dateTime) {
-        _clearAt = dateTime;
+    void User_status.set_clear_at (Optional<Clear_at> &date_time) {
+        _clear_at = date_time;
     }
     
-    UserStatusConnector.UserStatusConnector (GLib.Object *parent)
+    User_status_connector.User_status_connector (GLib.Object *parent)
         : GLib.Object (parent) {
     }
     
-    UserStatusConnector.~UserStatusConnector () = default;
+    User_status_connector.~User_status_connector () = default;
     }
     

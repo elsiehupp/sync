@@ -17,12 +17,12 @@ namespace Occ {
 class SyncFileStatus {
 
     public enum SyncFileStatusTag {
-        StatusNone,
-        StatusSync,
-        StatusWarning,
-        StatusUpToDate,
-        StatusError,
-        StatusExcluded,
+        SyncFileStatusTag.STATUS_NONE,
+        SyncFileStatusTag.STATUS_SYNC,
+        SyncFileStatusTag.STATUS_WARNING,
+        SyncFileStatusTag.STATUS_UP_TO_DATE,
+        SyncFileStatusTag.STATUS_ERROR,
+        SyncFileStatusTag.STATUS_EXCLUDED,
     };
 
     public SyncFileStatus ();
@@ -31,13 +31,13 @@ class SyncFileStatus {
     public void set (SyncFileStatusTag tag);
     public SyncFileStatusTag tag ();
 
-    public void setShared (bool isShared);
+    public void set_shared (bool is_shared);
     public bool shared ();
 
-    public string toSocketAPIString ();
+    public string to_socket_api_string ();
 
 private:
-    SyncFileStatusTag _tag = StatusNone;
+    SyncFileStatusTag _tag = SyncFileStatusTag.STATUS_NONE;
     bool _shared = false;
 };
 
@@ -63,46 +63,46 @@ inline bool operator!= (SyncFileStatus &a, SyncFileStatus &b) {
         return _tag;
     }
     
-    void SyncFileStatus.setShared (bool isShared) {
-        _shared = isShared;
+    void SyncFileStatus.set_shared (bool is_shared) {
+        _shared = is_shared;
     }
     
     bool SyncFileStatus.shared () {
         return _shared;
     }
     
-    string SyncFileStatus.toSocketAPIString () {
-        string statusString;
-        bool canBeShared = true;
+    string SyncFileStatus.to_socket_api_string () {
+        string status_string;
+        bool can_be_shared = true;
     
         switch (_tag) {
-        case StatusNone:
-            statusString = QStringLiteral ("NOP");
-            canBeShared = false;
+        case SyncFileStatusTag.STATUS_NONE:
+            status_string = QStringLiteral ("NOP");
+            can_be_shared = false;
             break;
-        case StatusSync:
-            statusString = QStringLiteral ("SYNC");
+        case SyncFileStatusTag.STATUS_SYNC:
+            status_string = QStringLiteral ("SYNC");
             break;
-        case StatusWarning:
+        case SyncFileStatusTag.STATUS_WARNING:
             // The protocol says IGNORE, but all implementations show a yellow warning sign.
-            statusString = QStringLiteral ("IGNORE");
+            status_string = QStringLiteral ("IGNORE");
             break;
-        case StatusUpToDate:
-            statusString = QStringLiteral ("OK");
+        case SyncFileStatusTag.STATUS_UP_TO_DATE:
+            status_string = QStringLiteral ("OK");
             break;
-        case StatusError:
-            statusString = QStringLiteral ("ERROR");
+        case SyncFileStatusTag.STATUS_ERROR:
+            status_string = QStringLiteral ("ERROR");
             break;
-        case StatusExcluded:
+        case SyncFileStatusTag.STATUS_EXCLUDED:
             // The protocol says IGNORE, but all implementations show a yellow warning sign.
-            statusString = QStringLiteral ("IGNORE");
+            status_string = QStringLiteral ("IGNORE");
             break;
         }
-        if (canBeShared && _shared) {
-            statusString += QLatin1String ("+SWM");
+        if (can_be_shared && _shared) {
+            status_string += QLatin1String ("+SWM");
         }
     
-        return statusString;
+        return status_string;
     }
     }
     

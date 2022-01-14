@@ -16,42 +16,42 @@ namespace Occ {
 @brief Job to fetch a icon
 @ingroup gui
 ***********************************************************/
-class IconJob : GLib.Object {
+class Icon_job : GLib.Object {
 public:
-    IconJob (AccountPtr account, QUrl &url, GLib.Object *parent = nullptr);
+    Icon_job (AccountPtr account, QUrl &url, GLib.Object *parent = nullptr);
 
 signals:
-    void jobFinished (QByteArray iconData);
-    void error (QNetworkReply.NetworkError errorType);
+    void job_finished (QByteArray icon_data);
+    void error (QNetworkReply.NetworkError error_type);
 
 private slots:
     void finished ();
 };
 
-    IconJob.IconJob (AccountPtr account, QUrl &url, GLib.Object *parent)
+    Icon_job.Icon_job (AccountPtr account, QUrl &url, GLib.Object *parent)
         : GLib.Object (parent) {
         QNetworkRequest request (url);
     #if (QT_VERSION >= 0x050600)
-        request.setAttribute (QNetworkRequest.FollowRedirectsAttribute, true);
+        request.set_attribute (QNetworkRequest.Follow_redirects_attribute, true);
     #endif
-        const auto reply = account.sendRawRequest (QByteArrayLiteral ("GET"), url, request);
-        connect (reply, &QNetworkReply.finished, this, &IconJob.finished);
+        const auto reply = account.send_raw_request (QByteArrayLiteral ("GET"), url, request);
+        connect (reply, &QNetworkReply.finished, this, &Icon_job.finished);
     }
     
-    void IconJob.finished () {
+    void Icon_job.finished () {
         const auto reply = qobject_cast<QNetworkReply> (sender ());
         if (!reply) {
             return;
         }
-        deleteLater ();
+        delete_later ();
     
-        const auto networkError = reply.error ();
-        if (networkError != QNetworkReply.NoError) {
-            emit error (networkError);
+        const auto network_error = reply.error ();
+        if (network_error != QNetworkReply.NoError) {
+            emit error (network_error);
             return;
         }
     
-        emit jobFinished (reply.readAll ());
+        emit job_finished (reply.read_all ());
     }
     }
     

@@ -4,19 +4,19 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QtCore>
+// #include <Qt_core>
 
-// #include <QtCore>
+// #include <Qt_core>
 // #include <QIcon>
 
 namespace Occ {
 /***********************************************************
-@brief The ActivityLink class describes actions of an activity
+@brief The Activity_link class describes actions of an activity
 
 These are part of notifications which are mapped into activities.
 ***********************************************************/
 
-class ActivityLink {
+class Activity_link {
     Q_GADGET
 
     Q_PROPERTY (string label MEMBER _label)
@@ -44,30 +44,30 @@ public:
     using Identifier = QPair<qlonglong, string>;
 
     enum Type {
-        ActivityType,
-        NotificationType,
-        SyncResultType,
-        SyncFileItemType
+        Activity_type,
+        Notification_type,
+        Sync_result_type,
+        Sync_file_item_type
     };
 
     Type _type;
     qlonglong _id;
-    string _fileAction;
-    string _objectType;
+    string _file_action;
+    string _object_type;
     string _subject;
     string _message;
     string _folder;
     string _file;
     QUrl _link;
-    QDateTime _dateTime;
-    int64 _expireAtMsecs = -1;
-    string _accName;
+    QDateTime _date_time;
+    int64 _expire_at_msecs = -1;
+    string _acc_name;
     string _icon;
 
     // Stores information about the error
     int _status;
 
-    QVector<ActivityLink> _links;
+    QVector<Activity_link> _links;
     /***********************************************************
     @brief Sort operator to sort the list youngest first.
     @param val
@@ -82,24 +82,24 @@ bool operator< (Activity &rhs, Activity &lhs);
 
 /* ==================================================================== */
 /***********************************************************
-@brief The ActivityList
+@brief The Activity_list
 @ingroup gui
 
 A QList based list of Activities
 ***********************************************************/
-using ActivityList = QList<Activity>;
+using Activity_list = QList<Activity>;
 
 
     bool operator< (Activity &rhs, Activity &lhs) {
-        return rhs._dateTime > lhs._dateTime;
+        return rhs._date_time > lhs._date_time;
     }
     
     bool operator== (Activity &rhs, Activity &lhs) {
-        return (rhs._type == lhs._type && rhs._id == lhs._id && rhs._accName == lhs._accName);
+        return (rhs._type == lhs._type && rhs._id == lhs._id && rhs._acc_name == lhs._acc_name);
     }
     
     Activity.Identifier Activity.ident () {
-        return Identifier (_id, _accName);
+        return Identifier (_id, _acc_name);
     }
     }
     

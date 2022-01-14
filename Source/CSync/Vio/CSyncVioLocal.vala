@@ -75,8 +75,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 // #include <memory>
 
-// #include <QtCore/QLoggingCategory>
-// #include <QtCore/QFile>
+// #include <Qt_core/QLoggingCategory>
+// #include <Qt_core/QFile>
 
 
 /***********************************************************
@@ -93,9 +93,9 @@ static int _csync_vio_local_stat_mb (mbchar_t *wuri, csync_file_stat_t *buf);
 csync_vio_handle_t *csync_vio_local_opendir (string &name) {
     QScopedPointer<csync_vio_handle_t> handle (new csync_vio_handle_t{});
 
-    auto dirname = QFile.encodeName (name);
+    auto dirname = QFile.encode_name (name);
 
-    handle.dh = _topendir (dirname.constData ());
+    handle.dh = _topendir (dirname.const_data ());
     if (!handle.dh) {
         return nullptr;
     }
@@ -123,11 +123,11 @@ std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t *h
   } while (qstrcmp (dirent.d_name, ".") == 0 || qstrcmp (dirent.d_name, "..") == 0);
 
   file_stat = std.make_unique<csync_file_stat_t> ();
-  file_stat.path = QFile.decodeName (dirent.d_name).toUtf8 ();
-  QByteArray fullPath = handle.path % '/' % QByteArray () % const_cast<const char> (dirent.d_name);
-  if (file_stat.path.isNull ()) {
-      file_stat.original_path = fullPath;
-      qCWarning (lcCSyncVIOLocal) << "Invalid characters in file/directory name, please rename:" << dirent.d_name << handle.path;
+  file_stat.path = QFile.decode_name (dirent.d_name).to_utf8 ();
+  QByteArray full_path = handle.path % '/' % QByteArray () % const_cast<const char> (dirent.d_name);
+  if (file_stat.path.is_null ()) {
+      file_stat.original_path = full_path;
+      q_c_warning (lc_c_sync_v_iOLocal) << "Invalid characters in file/directory name, please rename:" << dirent.d_name << handle.path;
   }
 
   /* Check for availability of d_type, see manpage. */
@@ -151,19 +151,19 @@ std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t *h
   }
 #endif
 
-  if (file_stat.path.isNull ())
+  if (file_stat.path.is_null ())
       return file_stat;
 
-  if (_csync_vio_local_stat_mb (fullPath.constData (), file_stat.get ()) < 0) {
+  if (_csync_vio_local_stat_mb (full_path.const_data (), file_stat.get ()) < 0) {
       // Will get excluded by _csync_detect_update.
-      file_stat.type = ItemTypeSkip;
+      file_stat.type = Item_type_skip;
   }
 
   // Override type for virtual files if desired
   if (vfs) {
       // Directly modifies file_stat.type.
       // We can ignore the return value since we're done here anyway.
-      const auto result = vfs.statTypeVirtualFile (file_stat.get (), &handle.path);
+      const auto result = vfs.stat_type_virtual_file (file_stat.get (), &handle.path);
       Q_UNUSED (result)
   }
 
@@ -171,7 +171,7 @@ std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t *h
 }
 
 int csync_vio_local_stat (string &uri, csync_file_stat_t *buf) {
-    return _csync_vio_local_stat_mb (QFile.encodeName (uri).constData (), buf);
+    return _csync_vio_local_stat_mb (QFile.encode_name (uri).const_data (), buf);
 }
 
 static int _csync_vio_local_stat_mb (mbchar_t *wuri, csync_file_stat_t *buf) {
@@ -190,10 +190,10 @@ static int _csync_vio_local_stat_mb (mbchar_t *wuri, csync_file_stat_t *buf) {
       break;
     case S_IFLNK:
     case S_IFSOCK:
-      buf.type = ItemTypeSoftLink;
+      buf.type = Item_type_soft_link;
       break;
     default:
-      buf.type = ItemTypeSkip;
+      buf.type = Item_type_skip;
       break;
   }
 

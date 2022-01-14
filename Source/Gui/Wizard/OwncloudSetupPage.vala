@@ -15,7 +15,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 // #include <QSslCertificate>
 // #include <QNetworkAccessManager>
 // #include <QPropertyAnimation>
-// #include <QGraphicsPixmapItem>
+// #include <QGraphics_pixmap_item>
 // #include <QBuffer>
 
 // #include <QWizard>
@@ -26,299 +26,299 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 namespace Occ {
 
 /***********************************************************
-@brief The OwncloudSetupPage class
+@brief The Owncloud_setup_page class
 @ingroup gui
 ***********************************************************/
-class OwncloudSetupPage : QWizardPage {
+class Owncloud_setup_page : QWizard_page {
 public:
-    OwncloudSetupPage (Gtk.Widget *parent = nullptr);
-    ~OwncloudSetupPage () override;
+    Owncloud_setup_page (Gtk.Widget *parent = nullptr);
+    ~Owncloud_setup_page () override;
 
-    bool isComplete () const override;
-    void initializePage () override;
-    int nextId () const override;
-    void setServerUrl (string &);
-    void setAllowPasswordStorage (bool);
-    bool validatePage () override;
+    bool is_complete () const override;
+    void initialize_page () override;
+    int next_id () const override;
+    void set_server_url (string &);
+    void set_allow_password_storage (bool);
+    bool validate_page () override;
     string url ();
-    string localFolder ();
-    void setRemoteFolder (string &remoteFolder);
-    void setMultipleFoldersExist (bool exist);
-    void setAuthType (DetermineAuthTypeJob.AuthType type);
+    string local_folder ();
+    void set_remote_folder (string &remote_folder);
+    void set_multiple_folders_exist (bool exist);
+    void set_auth_type (DetermineAuthTypeJob.AuthType type);
 
 public slots:
-    void setErrorString (string &, bool retryHTTPonly);
-    void startSpinner ();
-    void stopSpinner ();
-    void slotCertificateAccepted ();
-    void slotStyleChanged ();
+    void set_error_string (string &, bool retry_h_t_tPonly);
+    void start_spinner ();
+    void stop_spinner ();
+    void slot_certificate_accepted ();
+    void slot_style_changed ();
 
 protected slots:
-    void slotUrlChanged (string &);
-    void slotUrlEditFinished ();
+    void slot_url_changed (string &);
+    void slot_url_edit_finished ();
 
-    void setupCustomization ();
+    void setup_customization ();
 
 signals:
-    void determineAuthType (string &);
+    void determine_auth_type (string &);
 
 private:
-    void setLogo ();
-    void customizeStyle ();
-    void setupServerAddressDescriptionLabel ();
+    void set_logo ();
+    void customize_style ();
+    void setup_server_address_description_label ();
 
-    Ui_OwncloudSetupPage _ui;
+    Ui_Owncloud_setup_page _ui;
 
-    string _oCUrl;
-    string _ocUser;
-    bool _authTypeKnown = false;
+    string _o_c_url;
+    string _oc_user;
+    bool _auth_type_known = false;
     bool _checking = false;
-    DetermineAuthTypeJob.AuthType _authType = DetermineAuthTypeJob.Basic;
+    DetermineAuthTypeJob.AuthType _auth_type = DetermineAuthTypeJob.Basic;
 
-    QProgressIndicator *_progressIndi;
-    OwncloudWizard *_ocWizard;
-    AddCertificateDialog *addCertDial = nullptr;
+    QProgress_indicator *_progress_indi;
+    OwncloudWizard *_oc_wizard;
+    AddCertificateDialog *add_cert_dial = nullptr;
 };
 
-    OwncloudSetupPage.OwncloudSetupPage (Gtk.Widget *parent)
-        : QWizardPage ()
-        , _progressIndi (new QProgressIndicator (this))
-        , _ocWizard (qobject_cast<OwncloudWizard> (parent)) {
-        _ui.setupUi (this);
+    Owncloud_setup_page.Owncloud_setup_page (Gtk.Widget *parent)
+        : QWizard_page ()
+        , _progress_indi (new QProgress_indicator (this))
+        , _oc_wizard (qobject_cast<OwncloudWizard> (parent)) {
+        _ui.setup_ui (this);
     
-        setupServerAddressDescriptionLabel ();
+        setup_server_address_description_label ();
     
         Theme *theme = Theme.instance ();
-        if (theme.overrideServerUrl ().isEmpty ()) {
-            _ui.leUrl.setPostfix (theme.wizardUrlPostfix ());
-            _ui.leUrl.setPlaceholderText (theme.wizardUrlHint ());
-        } else if (Theme.instance ().forceOverrideServerUrl ()) {
-            _ui.leUrl.setEnabled (false);
+        if (theme.override_server_url ().is_empty ()) {
+            _ui.le_url.set_postfix (theme.wizard_url_postfix ());
+            _ui.le_url.set_placeholder_text (theme.wizard_url_hint ());
+        } else if (Theme.instance ().force_override_server_url ()) {
+            _ui.le_url.set_enabled (false);
         }
     
-        registerField (QLatin1String ("OCUrl*"), _ui.leUrl);
+        register_field (QLatin1String ("OCUrl*"), _ui.le_url);
     
-        auto sizePolicy = _progressIndi.sizePolicy ();
-        sizePolicy.setRetainSizeWhenHidden (true);
-        _progressIndi.setSizePolicy (sizePolicy);
+        auto size_policy = _progress_indi.size_policy ();
+        size_policy.set_retain_size_when_hidden (true);
+        _progress_indi.set_size_policy (size_policy);
     
-        _ui.progressLayout.addWidget (_progressIndi);
-        stopSpinner ();
+        _ui.progress_layout.add_widget (_progress_indi);
+        stop_spinner ();
     
-        setupCustomization ();
+        setup_customization ();
     
-        slotUrlChanged (QLatin1String ("")); // don't jitter UI
-        connect (_ui.leUrl, &QLineEdit.textChanged, this, &OwncloudSetupPage.slotUrlChanged);
-        connect (_ui.leUrl, &QLineEdit.editingFinished, this, &OwncloudSetupPage.slotUrlEditFinished);
+        slot_url_changed (QLatin1String ("")); // don't jitter UI
+        connect (_ui.le_url, &QLineEdit.text_changed, this, &Owncloud_setup_page.slot_url_changed);
+        connect (_ui.le_url, &QLineEdit.editing_finished, this, &Owncloud_setup_page.slot_url_edit_finished);
     
-        addCertDial = new AddCertificateDialog (this);
-        connect (addCertDial, &Gtk.Dialog.accepted, this, &OwncloudSetupPage.slotCertificateAccepted);
+        add_cert_dial = new AddCertificateDialog (this);
+        connect (add_cert_dial, &Gtk.Dialog.accepted, this, &Owncloud_setup_page.slot_certificate_accepted);
     }
     
-    void OwncloudSetupPage.setLogo () {
-        _ui.logoLabel.setPixmap (Theme.instance ().wizardApplicationLogo ());
+    void Owncloud_setup_page.set_logo () {
+        _ui.logo_label.set_pixmap (Theme.instance ().wizard_application_logo ());
     }
     
-    void OwncloudSetupPage.setupServerAddressDescriptionLabel () {
-        const auto appName = Theme.instance ().appNameGUI ();
-        _ui.serverAddressDescriptionLabel.setText (tr ("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").arg (appName));
+    void Owncloud_setup_page.setup_server_address_description_label () {
+        const auto app_name = Theme.instance ().app_name_g_u_i ();
+        _ui.server_address_description_label.set_text (tr ("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").arg (app_name));
     }
     
-    void OwncloudSetupPage.setServerUrl (string &newUrl) {
-        _ocWizard.setRegistration (false);
-        _oCUrl = newUrl;
-        if (_oCUrl.isEmpty ()) {
-            _ui.leUrl.clear ();
+    void Owncloud_setup_page.set_server_url (string &new_url) {
+        _oc_wizard.set_registration (false);
+        _o_c_url = new_url;
+        if (_o_c_url.is_empty ()) {
+            _ui.le_url.clear ();
             return;
         }
     
-        _ui.leUrl.setText (_oCUrl);
+        _ui.le_url.set_text (_o_c_url);
     }
     
-    void OwncloudSetupPage.setupCustomization () {
+    void Owncloud_setup_page.setup_customization () {
         // set defaults for the customize labels.
-        _ui.topLabel.hide ();
-        _ui.bottomLabel.hide ();
+        _ui.top_label.hide ();
+        _ui.bottom_label.hide ();
     
         Theme *theme = Theme.instance ();
-        QVariant variant = theme.customMedia (Theme.oCSetupTop);
-        if (!variant.isNull ()) {
-            WizardCommon.setupCustomMedia (variant, _ui.topLabel);
+        QVariant variant = theme.custom_media (Theme.o_c_setup_top);
+        if (!variant.is_null ()) {
+            Wizard_common.setup_custom_media (variant, _ui.top_label);
         }
     
-        variant = theme.customMedia (Theme.oCSetupBottom);
-        WizardCommon.setupCustomMedia (variant, _ui.bottomLabel);
+        variant = theme.custom_media (Theme.o_c_setup_bottom);
+        Wizard_common.setup_custom_media (variant, _ui.bottom_label);
     
-        auto leUrlPalette = _ui.leUrl.palette ();
-        leUrlPalette.setColor (QPalette.Text, Qt.black);
-        leUrlPalette.setColor (QPalette.Base, Qt.white);
-        _ui.leUrl.setPalette (leUrlPalette);
+        auto le_url_palette = _ui.le_url.palette ();
+        le_url_palette.set_color (QPalette.Text, Qt.black);
+        le_url_palette.set_color (QPalette.Base, Qt.white);
+        _ui.le_url.set_palette (le_url_palette);
     }
     
-    // slot hit from textChanged of the url entry field.
-    void OwncloudSetupPage.slotUrlChanged (string &url) {
+    // slot hit from text_changed of the url entry field.
+    void Owncloud_setup_page.slot_url_changed (string &url) {
         // Need to set next button as default button here because
         // otherwise the on OSX the next button does not stay the default
         // button
-        auto nextButton = qobject_cast<QPushButton> (_ocWizard.button (QWizard.NextButton));
-        if (nextButton) {
-            nextButton.setDefault (true);
+        auto next_button = qobject_cast<QPushButton> (_oc_wizard.button (QWizard.Next_button));
+        if (next_button) {
+            next_button.set_default (true);
         }
     
-        _authTypeKnown = false;
+        _auth_type_known = false;
     
-        string newUrl = url;
-        if (url.endsWith ("index.php")) {
-            newUrl.chop (9);
+        string new_url = url;
+        if (url.ends_with ("index.php")) {
+            new_url.chop (9);
         }
-        if (_ocWizard && _ocWizard.account ()) {
-            string webDavPath = _ocWizard.account ().davPath ();
-            if (url.endsWith (webDavPath)) {
-                newUrl.chop (webDavPath.length ());
+        if (_oc_wizard && _oc_wizard.account ()) {
+            string web_dav_path = _oc_wizard.account ().dav_path ();
+            if (url.ends_with (web_dav_path)) {
+                new_url.chop (web_dav_path.length ());
             }
-            if (webDavPath.endsWith (QLatin1Char ('/'))) {
-                webDavPath.chop (1); // cut off the slash
-                if (url.endsWith (webDavPath)) {
-                    newUrl.chop (webDavPath.length ());
+            if (web_dav_path.ends_with (QLatin1Char ('/'))) {
+                web_dav_path.chop (1); // cut off the slash
+                if (url.ends_with (web_dav_path)) {
+                    new_url.chop (web_dav_path.length ());
                 }
             }
         }
-        if (newUrl != url) {
-            _ui.leUrl.setText (newUrl);
+        if (new_url != url) {
+            _ui.le_url.set_text (new_url);
         }
     }
     
-    void OwncloudSetupPage.slotUrlEditFinished () {
-        string url = _ui.leUrl.fullText ();
-        if (QUrl (url).isRelative () && !url.isEmpty ()) {
+    void Owncloud_setup_page.slot_url_edit_finished () {
+        string url = _ui.le_url.full_text ();
+        if (QUrl (url).is_relative () && !url.is_empty ()) {
             // no scheme defined, set one
             url.prepend ("https://");
-            _ui.leUrl.setFullText (url);
+            _ui.le_url.set_full_text (url);
         }
     }
     
-    bool OwncloudSetupPage.isComplete () {
-        return !_ui.leUrl.text ().isEmpty () && !_checking;
+    bool Owncloud_setup_page.is_complete () {
+        return !_ui.le_url.text ().is_empty () && !_checking;
     }
     
-    void OwncloudSetupPage.initializePage () {
-        customizeStyle ();
+    void Owncloud_setup_page.initialize_page () {
+        customize_style ();
     
-        WizardCommon.initErrorLabel (_ui.errorLabel);
+        Wizard_common.init_error_label (_ui.error_label);
     
-        _authTypeKnown = false;
+        _auth_type_known = false;
         _checking = false;
     
-        QAbstractButton *nextButton = wizard ().button (QWizard.NextButton);
-        auto *pushButton = qobject_cast<QPushButton> (nextButton);
-        if (pushButton) {
-            pushButton.setDefault (true);
+        QAbstractButton *next_button = wizard ().button (QWizard.Next_button);
+        auto *push_button = qobject_cast<QPushButton> (next_button);
+        if (push_button) {
+            push_button.set_default (true);
         }
     
-        _ui.leUrl.setFocus ();
+        _ui.le_url.set_focus ();
     
-        const auto isServerUrlOverridden = !Theme.instance ().overrideServerUrl ().isEmpty ();
-        if (isServerUrlOverridden && !Theme.instance ().forceOverrideServerUrl ()) {
+        const auto is_server_url_overridden = !Theme.instance ().override_server_url ().is_empty ();
+        if (is_server_url_overridden && !Theme.instance ().force_override_server_url ()) {
             // If the url is overwritten but we don't force to use that url
             // Just focus the next button to let the user navigate quicker
-            if (nextButton) {
-                nextButton.setFocus ();
+            if (next_button) {
+                next_button.set_focus ();
             }
-        } else if (isServerUrlOverridden) {
+        } else if (is_server_url_overridden) {
             // If the overwritten url is not empty and we force this overwritten url
             // we just check the server type and switch to next page
             // immediately.
-            setCommitPage (true);
-            // Hack : setCommitPage () changes caption, but after an error this page could still be visible
-            setButtonText (QWizard.CommitButton, tr ("&Next >"));
-            validatePage ();
-            setVisible (false);
+            set_commit_page (true);
+            // Hack : set_commit_page () changes caption, but after an error this page could still be visible
+            set_button_text (QWizard.Commit_button, tr ("&Next >"));
+            validate_page ();
+            set_visible (false);
         }
     }
     
-    int OwncloudSetupPage.nextId () {
-        switch (_authType) {
+    int Owncloud_setup_page.next_id () {
+        switch (_auth_type) {
         case DetermineAuthTypeJob.Basic:
-            return WizardCommon.Page_HttpCreds;
+            return Wizard_common.Page_Http_creds;
         case DetermineAuthTypeJob.OAuth:
-            return WizardCommon.Page_OAuthCreds;
-        case DetermineAuthTypeJob.LoginFlowV2:
-            return WizardCommon.Page_Flow2AuthCreds;
+            return Wizard_common.Page_OAuth_creds;
+        case DetermineAuthTypeJob.Login_flow_v2:
+            return Wizard_common.Page_Flow2Auth_creds;
     #ifdef WITH_WEBENGINE
-        case DetermineAuthTypeJob.WebViewFlow:
-            return WizardCommon.Page_WebView;
+        case DetermineAuthTypeJob.Web_view_flow:
+            return Wizard_common.Page_Web_view;
     #endif // WITH_WEBENGINE
-        case DetermineAuthTypeJob.NoAuthType:
-            return WizardCommon.Page_HttpCreds;
+        case DetermineAuthTypeJob.No_auth_type:
+            return Wizard_common.Page_Http_creds;
         }
         Q_UNREACHABLE ();
     }
     
-    string OwncloudSetupPage.url () {
-        string url = _ui.leUrl.fullText ().simplified ();
+    string Owncloud_setup_page.url () {
+        string url = _ui.le_url.full_text ().simplified ();
         return url;
     }
     
-    bool OwncloudSetupPage.validatePage () {
-        if (!_authTypeKnown) {
-            slotUrlEditFinished ();
+    bool Owncloud_setup_page.validate_page () {
+        if (!_auth_type_known) {
+            slot_url_edit_finished ();
             string u = url ();
             QUrl qurl (u);
-            if (!qurl.isValid () || qurl.host ().isEmpty ()) {
-                setErrorString (tr ("Server address does not seem to be valid"), false);
+            if (!qurl.is_valid () || qurl.host ().is_empty ()) {
+                set_error_string (tr ("Server address does not seem to be valid"), false);
                 return false;
             }
     
-            setErrorString (string (), false);
+            set_error_string (string (), false);
             _checking = true;
-            startSpinner ();
-            emit completeChanged ();
+            start_spinner ();
+            emit complete_changed ();
     
-            emit determineAuthType (u);
+            emit determine_auth_type (u);
             return false;
         } else {
             // connecting is running
-            stopSpinner ();
+            stop_spinner ();
             _checking = false;
-            emit completeChanged ();
+            emit complete_changed ();
             return true;
         }
     }
     
-    void OwncloudSetupPage.setAuthType (DetermineAuthTypeJob.AuthType type) {
-        _authTypeKnown = true;
-        _authType = type;
-        stopSpinner ();
+    void Owncloud_setup_page.set_auth_type (DetermineAuthTypeJob.AuthType type) {
+        _auth_type_known = true;
+        _auth_type = type;
+        stop_spinner ();
     }
     
-    void OwncloudSetupPage.setErrorString (string &err, bool retryHTTPonly) {
-        if (err.isEmpty ()) {
-            _ui.errorLabel.setVisible (false);
+    void Owncloud_setup_page.set_error_string (string &err, bool retry_h_t_tPonly) {
+        if (err.is_empty ()) {
+            _ui.error_label.set_visible (false);
         } else {
-            if (retryHTTPonly) {
-                QUrl url (_ui.leUrl.fullText ());
+            if (retry_h_t_tPonly) {
+                QUrl url (_ui.le_url.full_text ());
                 if (url.scheme () == "https") {
                     // Ask the user how to proceed when connecting to a https:// URL fails.
                     // It is possible that the server is secured with client-side TLS certificates,
                     // but that it has no way of informing the owncloud client that this is the case.
     
-                    OwncloudConnectionMethodDialog dialog;
-                    dialog.setUrl (url);
+                    Owncloud_connection_method_dialog dialog;
+                    dialog.set_url (url);
                     // FIXME : Synchronous dialogs are not so nice because of event loop recursion
-                    int retVal = dialog.exec ();
+                    int ret_val = dialog.exec ();
     
-                    switch (retVal) {
-                    case OwncloudConnectionMethodDialog.No_TLS : {
-                        url.setScheme ("http");
-                        _ui.leUrl.setFullText (url.toString ());
+                    switch (ret_val) {
+                    case Owncloud_connection_method_dialog.No_TLS : {
+                        url.set_scheme ("http");
+                        _ui.le_url.set_full_text (url.to_string ());
                         // skip ahead to next page, since the user would expect us to retry automatically
                         wizard ().next ();
                     } break;
-                    case OwncloudConnectionMethodDialog.Client_Side_TLS:
-                        addCertDial.show ();
+                    case Owncloud_connection_method_dialog.Client_Side_TLS:
+                        add_cert_dial.show ();
                         break;
-                    case OwncloudConnectionMethodDialog.Closed:
-                    case OwncloudConnectionMethodDialog.Back:
+                    case Owncloud_connection_method_dialog.Closed:
+                    case Owncloud_connection_method_dialog.Back:
                     default:
                         // No-op.
                         break;
@@ -326,74 +326,74 @@ private:
                 }
             }
     
-            _ui.errorLabel.setVisible (true);
-            _ui.errorLabel.setText (err);
+            _ui.error_label.set_visible (true);
+            _ui.error_label.set_text (err);
         }
         _checking = false;
-        emit completeChanged ();
-        stopSpinner ();
+        emit complete_changed ();
+        stop_spinner ();
     }
     
-    void OwncloudSetupPage.startSpinner () {
-        _ui.progressLayout.setEnabled (true);
-        _progressIndi.setVisible (true);
-        _progressIndi.startAnimation ();
+    void Owncloud_setup_page.start_spinner () {
+        _ui.progress_layout.set_enabled (true);
+        _progress_indi.set_visible (true);
+        _progress_indi.start_animation ();
     }
     
-    void OwncloudSetupPage.stopSpinner () {
-        _ui.progressLayout.setEnabled (false);
-        _progressIndi.setVisible (false);
-        _progressIndi.stopAnimation ();
+    void Owncloud_setup_page.stop_spinner () {
+        _ui.progress_layout.set_enabled (false);
+        _progress_indi.set_visible (false);
+        _progress_indi.stop_animation ();
     }
     
-    string subjectInfoHelper (QSslCertificate &cert, QByteArray &qa) {
-        return cert.subjectInfo (qa).join (QLatin1Char ('/'));
+    string subject_info_helper (QSslCertificate &cert, QByteArray &qa) {
+        return cert.subject_info (qa).join (QLatin1Char ('/'));
     }
     
     //called during the validation of the client certificate.
-    void OwncloudSetupPage.slotCertificateAccepted () {
-        QFile certFile (addCertDial.getCertificatePath ());
-        certFile.open (QFile.ReadOnly);
-        QByteArray certData = certFile.readAll ();
-        QByteArray certPassword = addCertDial.getCertificatePasswd ().toLocal8Bit ();
+    void Owncloud_setup_page.slot_certificate_accepted () {
+        QFile cert_file (add_cert_dial.get_certificate_path ());
+        cert_file.open (QFile.Read_only);
+        QByteArray cert_data = cert_file.read_all ();
+        QByteArray cert_password = add_cert_dial.get_certificate_passwd ().to_local8Bit ();
     
-        QBuffer certDataBuffer (&certData);
-        certDataBuffer.open (QIODevice.ReadOnly);
-        if (QSslCertificate.importPkcs12 (&certDataBuffer,
-                &_ocWizard._clientSslKey, &_ocWizard._clientSslCertificate,
-                &_ocWizard._clientSslCaCertificates, certPassword)) {
-            _ocWizard._clientCertBundle = certData;
-            _ocWizard._clientCertPassword = certPassword;
+        QBuffer cert_data_buffer (&cert_data);
+        cert_data_buffer.open (QIODevice.Read_only);
+        if (QSslCertificate.import_pkcs12 (&cert_data_buffer,
+                &_oc_wizard._client_ssl_key, &_oc_wizard._client_ssl_certificate,
+                &_oc_wizard._client_ssl_ca_certificates, cert_password)) {
+            _oc_wizard._client_cert_bundle = cert_data;
+            _oc_wizard._client_cert_password = cert_password;
     
-            addCertDial.reinit (); // FIXME : Why not just have this only created on use?
+            add_cert_dial.reinit (); // FIXME : Why not just have this only created on use?
     
-            // The extracted SSL key and cert gets added to the QSslConfiguration in checkServer ()
-            validatePage ();
+            // The extracted SSL key and cert gets added to the QSslConfiguration in check_server ()
+            validate_page ();
         } else {
-            addCertDial.showErrorMessage (tr ("Could not load certificate. Maybe wrong password?"));
-            addCertDial.show ();
+            add_cert_dial.show_error_message (tr ("Could not load certificate. Maybe wrong password?"));
+            add_cert_dial.show ();
         }
     }
     
-    OwncloudSetupPage.~OwncloudSetupPage () = default;
+    Owncloud_setup_page.~Owncloud_setup_page () = default;
     
-    void OwncloudSetupPage.slotStyleChanged () {
-        customizeStyle ();
+    void Owncloud_setup_page.slot_style_changed () {
+        customize_style ();
     }
     
-    void OwncloudSetupPage.customizeStyle () {
-        setLogo ();
+    void Owncloud_setup_page.customize_style () {
+        set_logo ();
     
-        if (_progressIndi) {
-            const auto isDarkBackground = Theme.isDarkColor (palette ().window ().color ());
-            if (isDarkBackground) {
-                _progressIndi.setColor (Qt.white);
+        if (_progress_indi) {
+            const auto is_dark_background = Theme.is_dark_color (palette ().window ().color ());
+            if (is_dark_background) {
+                _progress_indi.set_color (Qt.white);
             } else {
-                _progressIndi.setColor (Qt.black);
+                _progress_indi.set_color (Qt.black);
             }
         }
     
-        WizardCommon.customizeHintLabel (_ui.serverAddressDescriptionLabel);
+        Wizard_common.customize_hint_label (_ui.server_address_description_label);
     }
     
     } // namespace Occ

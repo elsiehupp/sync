@@ -12,92 +12,92 @@ namespace Occ {
 
 
 /***********************************************************
-@brief The PropagateRemoteDelete class
+@brief The Propagate_remote_delete class
 @ingroup libsync
 ***********************************************************/
-class PropagateRemoteDelete : PropagateItemJob {
-    QPointer<DeleteJob> _job;
-    AbstractPropagateRemoteDeleteEncrypted *_deleteEncryptedHelper = nullptr;
+class Propagate_remote_delete : Propagate_item_job {
+    QPointer<Delete_job> _job;
+    Abstract_propagate_remote_delete_encrypted *_delete_encrypted_helper = nullptr;
 
 public:
-    PropagateRemoteDelete (OwncloudPropagator *propagator, SyncFileItemPtr &item)
-        : PropagateItemJob (propagator, item) {
+    Propagate_remote_delete (Owncloud_propagator *propagator, Sync_file_item_ptr &item)
+        : Propagate_item_job (propagator, item) {
     }
     void start () override;
-    void createDeleteJob (string &filename);
-    void abort (PropagatorJob.AbortType abortType) override;
+    void create_delete_job (string &filename);
+    void abort (Propagator_job.Abort_type abort_type) override;
 
-    bool isLikelyFinishedQuickly () override { return !_item.isDirectory (); }
+    bool is_likely_finished_quickly () override { return !_item.is_directory (); }
 
 private slots:
-    void slotDeleteJobFinished ();
+    void slot_delete_job_finished ();
 };
 
-    void PropagateRemoteDelete.start () {
-        qCInfo (lcPropagateRemoteDelete) << "Start propagate remote delete job for" << _item._file;
+    void Propagate_remote_delete.start () {
+        q_c_info (lc_propagate_remote_delete) << "Start propagate remote delete job for" << _item._file;
     
-        if (propagator ()._abortRequested)
+        if (propagator ()._abort_requested)
             return;
     
-        if (!_item._encryptedFileName.isEmpty () || _item._isEncrypted) {
-            if (!_item._encryptedFileName.isEmpty ()) {
-                _deleteEncryptedHelper = new PropagateRemoteDeleteEncrypted (propagator (), _item, this);
+        if (!_item._encrypted_file_name.is_empty () || _item._is_encrypted) {
+            if (!_item._encrypted_file_name.is_empty ()) {
+                _delete_encrypted_helper = new Propagate_remote_delete_encrypted (propagator (), _item, this);
             } else {
-                _deleteEncryptedHelper = new PropagateRemoteDeleteEncryptedRootFolder (propagator (), _item, this);
+                _delete_encrypted_helper = new Propagate_remote_delete_encrypted_root_folder (propagator (), _item, this);
             }
-            connect (_deleteEncryptedHelper, &AbstractPropagateRemoteDeleteEncrypted.finished, this, [this] (bool success) {
+            connect (_delete_encrypted_helper, &Abstract_propagate_remote_delete_encrypted.finished, this, [this] (bool success) {
                 if (!success) {
-                    SyncFileItem.Status status = SyncFileItem.NormalError;
-                    if (_deleteEncryptedHelper.networkError () != QNetworkReply.NoError && _deleteEncryptedHelper.networkError () != QNetworkReply.ContentNotFoundError) {
-                        status = classifyError (_deleteEncryptedHelper.networkError (), _item._httpErrorCode, &propagator ()._anotherSyncNeeded);
+                    SyncFileItem.Status status = SyncFileItem.Normal_error;
+                    if (_delete_encrypted_helper.network_error () != QNetworkReply.NoError && _delete_encrypted_helper.network_error () != QNetworkReply.ContentNotFoundError) {
+                        status = classify_error (_delete_encrypted_helper.network_error (), _item._http_error_code, &propagator ()._another_sync_needed);
                     }
-                    done (status, _deleteEncryptedHelper.errorString ());
+                    done (status, _delete_encrypted_helper.error_string ());
                 } else {
                     done (SyncFileItem.Success);
                 }
             });
-            _deleteEncryptedHelper.start ();
+            _delete_encrypted_helper.start ();
         } else {
-            createDeleteJob (_item._file);
+            create_delete_job (_item._file);
         }
     }
     
-    void PropagateRemoteDelete.createDeleteJob (string &filename) {
-        qCInfo (lcPropagateRemoteDelete) << "Deleting file, local" << _item._file << "remote" << filename;
+    void Propagate_remote_delete.create_delete_job (string &filename) {
+        q_c_info (lc_propagate_remote_delete) << "Deleting file, local" << _item._file << "remote" << filename;
     
-        _job = new DeleteJob (propagator ().account (),
-            propagator ().fullRemotePath (filename),
+        _job = new Delete_job (propagator ().account (),
+            propagator ().full_remote_path (filename),
             this);
     
-        connect (_job.data (), &DeleteJob.finishedSignal, this, &PropagateRemoteDelete.slotDeleteJobFinished);
-        propagator ()._activeJobList.append (this);
+        connect (_job.data (), &Delete_job.finished_signal, this, &Propagate_remote_delete.slot_delete_job_finished);
+        propagator ()._active_job_list.append (this);
         _job.start ();
     }
     
-    void PropagateRemoteDelete.abort (PropagatorJob.AbortType abortType) {
+    void Propagate_remote_delete.abort (Propagator_job.Abort_type abort_type) {
         if (_job && _job.reply ())
             _job.reply ().abort ();
     
-        if (abortType == AbortType.Asynchronous) {
-            emit abortFinished ();
+        if (abort_type == Abort_type.Asynchronous) {
+            emit abort_finished ();
         }
     }
     
-    void PropagateRemoteDelete.slotDeleteJobFinished () {
-        propagator ()._activeJobList.removeOne (this);
+    void Propagate_remote_delete.slot_delete_job_finished () {
+        propagator ()._active_job_list.remove_one (this);
     
         ASSERT (_job);
     
         QNetworkReply.NetworkError err = _job.reply ().error ();
-        const int httpStatus = _job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).toInt ();
-        _item._httpErrorCode = httpStatus;
-        _item._responseTimeStamp = _job.responseTimestamp ();
-        _item._requestId = _job.requestId ();
+        const int http_status = _job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+        _item._http_error_code = http_status;
+        _item._response_time_stamp = _job.response_timestamp ();
+        _item._request_id = _job.request_id ();
     
         if (err != QNetworkReply.NoError && err != QNetworkReply.ContentNotFoundError) {
-            SyncFileItem.Status status = classifyError (err, _item._httpErrorCode,
-                &propagator ()._anotherSyncNeeded);
-            done (status, _job.errorString ());
+            SyncFileItem.Status status = classify_error (err, _item._http_error_code,
+                &propagator ()._another_sync_needed);
+            done (status, _job.error_string ());
             return;
         }
     
@@ -105,18 +105,18 @@ private slots:
         // a file is gone from the server. It not being there in the first place
         // is ok. This will happen for files that are in the DB but not on
         // the server or the local file system.
-        if (httpStatus != 204 && httpStatus != 404) {
+        if (http_status != 204 && http_status != 404) {
             // Normally we expect "204 No Content"
             // If it is not the case, it might be because of a proxy or gateway intercepting the request, so we must
             // throw an error.
-            done (SyncFileItem.NormalError,
+            done (SyncFileItem.Normal_error,
                 tr ("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
-                    .arg (_item._httpErrorCode)
-                    .arg (_job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).toString ()));
+                    .arg (_item._http_error_code)
+                    .arg (_job.reply ().attribute (QNetworkRequest.Http_reason_phrase_attribute).to_string ()));
             return;
         }
     
-        propagator ()._journal.deleteFileRecord (_item._originalFile, _item.isDirectory ());
+        propagator ()._journal.delete_file_record (_item._original_file, _item.is_directory ());
         propagator ()._journal.commit ("Remote Remove");
     
         done (SyncFileItem.Success);

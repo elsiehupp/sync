@@ -7,29 +7,29 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 // #include <accountmanager.h>
 
-// #include <QWizardPage>
+// #include <QWizard_page>
 
 namespace Occ {
 
 
 /***********************************************************
-@brief The AbstractCredentialsWizardPage class
+@brief The Abstract_credentials_wizard_page class
 @ingroup gui
 ***********************************************************/
-class AbstractCredentialsWizardPage : QWizardPage {
+class Abstract_credentials_wizard_page : QWizard_page {
 public:
-    void cleanupPage () override;
-    virtual AbstractCredentials *getCredentials () const = 0;
+    void cleanup_page () override;
+    virtual AbstractCredentials *get_credentials () const = 0;
 };
 
-    void AbstractCredentialsWizardPage.cleanupPage () {
+    void Abstract_credentials_wizard_page.cleanup_page () {
         // Reset the credentials when the 'Back' button is used.
     
         AccountPtr account = static_cast<OwncloudWizard> (wizard ()).account ();
         AbstractCredentials *creds = account.credentials ();
         if (creds) {
             if (!creds.inherits ("DummyCredentials")) {
-                account.setCredentials (CredentialsFactory.create ("dummy"));
+                account.set_credentials (CredentialsFactory.create ("dummy"));
             }
         }
     }

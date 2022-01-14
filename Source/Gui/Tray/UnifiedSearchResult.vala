@@ -4,43 +4,43 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QtCore>
+// #include <Qt_core>
 
 // #pragma once
 
 // #include <limits>
 
-// #include <QtCore>
+// #include <Qt_core>
 
 namespace Occ {
 
 /***********************************************************
-@brief The UnifiedSearchResult class
+@brief The Unified_search_result class
 @ingroup gui
 Simple data structure that represents single Unified Search result
 ***********************************************************/
 
-struct UnifiedSearchResult {
+struct Unified_search_result {
     enum Type : uint8 {
         Default,
-        FetchMoreTrigger,
+        Fetch_more_trigger,
     };
 
-    static string typeAsString (UnifiedSearchResult.Type type);
+    static string type_as_string (Unified_search_result.Type type);
 
     string _title;
     string _subline;
-    string _providerId;
-    string _providerName;
-    bool _isRounded = false;
+    string _provider_id;
+    string _provider_name;
+    bool _is_rounded = false;
     int32 _order = std.numeric_limits<int32>.max ();
-    QUrl _resourceUrl;
+    QUrl _resource_url;
     string _icons;
     Type _type = Type.Default;
 };
 
 
-    string UnifiedSearchResult.typeAsString (UnifiedSearchResult.Type type) {
+    string Unified_search_result.type_as_string (Unified_search_result.Type type) {
         string result;
     
         switch (type) {
@@ -48,8 +48,8 @@ struct UnifiedSearchResult {
             result = QStringLiteral ("Default");
             break;
     
-        case FetchMoreTrigger:
-            result = QStringLiteral ("FetchMoreTrigger");
+        case Fetch_more_trigger:
+            result = QStringLiteral ("Fetch_more_trigger");
             break;
         }
         return result;

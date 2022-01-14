@@ -9,7 +9,7 @@ Copyright (C) 2015 by Christian Kamm <kamm@incasoftware.de>
 namespace Occ {
 
 namespace Ui {
-    class ProxyAuthDialog;
+    class Proxy_auth_dialog;
 }
 
 /***********************************************************
@@ -17,13 +17,13 @@ namespace Ui {
 
 Used by ProxyAuthHandler.
 ***********************************************************/
-class ProxyAuthDialog : Gtk.Dialog {
+class Proxy_auth_dialog : Gtk.Dialog {
 
 public:
-    ProxyAuthDialog (Gtk.Widget *parent = nullptr);
-    ~ProxyAuthDialog () override;
+    Proxy_auth_dialog (Gtk.Widget *parent = nullptr);
+    ~Proxy_auth_dialog () override;
 
-    void setProxyAddress (string &address);
+    void set_proxy_address (string &address);
 
     string username ();
     string password ();
@@ -32,35 +32,35 @@ public:
     void reset ();
 
 private:
-    Ui.ProxyAuthDialog *ui;
+    Ui.Proxy_auth_dialog *ui;
 };
 
-    ProxyAuthDialog.ProxyAuthDialog (Gtk.Widget *parent)
+    Proxy_auth_dialog.Proxy_auth_dialog (Gtk.Widget *parent)
         : Gtk.Dialog (parent)
-        , ui (new Ui.ProxyAuthDialog) {
-        ui.setupUi (this);
+        , ui (new Ui.Proxy_auth_dialog) {
+        ui.setup_ui (this);
     }
     
-    ProxyAuthDialog.~ProxyAuthDialog () {
+    Proxy_auth_dialog.~Proxy_auth_dialog () {
         delete ui;
     }
     
-    void ProxyAuthDialog.setProxyAddress (string &address) {
-        ui.proxyAddress.setText (address);
+    void Proxy_auth_dialog.set_proxy_address (string &address) {
+        ui.proxy_address.set_text (address);
     }
     
-    string ProxyAuthDialog.username () {
-        return ui.usernameEdit.text ();
+    string Proxy_auth_dialog.username () {
+        return ui.username_edit.text ();
     }
     
-    string ProxyAuthDialog.password () {
-        return ui.passwordEdit.text ();
+    string Proxy_auth_dialog.password () {
+        return ui.password_edit.text ();
     }
     
-    void ProxyAuthDialog.reset () {
-        ui.usernameEdit.setFocus ();
-        ui.usernameEdit.clear ();
-        ui.passwordEdit.clear ();
+    void Proxy_auth_dialog.reset () {
+        ui.username_edit.set_focus ();
+        ui.username_edit.clear ();
+        ui.password_edit.clear ();
     }
     
     } // namespace Occ

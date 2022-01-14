@@ -5,7 +5,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QtCore>
+// #include <Qt_core>
 // #include <QtGui>
 // #include <QMessageBox>
 // #include <owncloudgui.h>
@@ -14,15 +14,15 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
 // #include <QWizard>
 // #include <QLoggingCategory>
-// #include <QSslKey>
+// #include <QSsl_key>
 // #include <QSslCertificate>
 
 namespace Occ {
 
-Q_DECLARE_LOGGING_CATEGORY (lcWizard)
+Q_DECLARE_LOGGING_CATEGORY (lc_wizard)
 
-class OwncloudOAuthCredsPage;
-class AbstractCredentialsWizardPage;
+class Owncloud_oAuth_creds_page;
+class Abstract_credentials_wizard_page;
 
 /***********************************************************
 @brief The OwncloudWizard class
@@ -30,87 +30,87 @@ class AbstractCredentialsWizardPage;
 ***********************************************************/
 class OwncloudWizard : QWizard {
 public:
-    enum LogType {
-        LogPlain,
-        LogParagraph
+    enum Log_type {
+        Log_plain,
+        Log_paragraph
     };
 
     OwncloudWizard (Gtk.Widget *parent = nullptr);
 
-    void setAccount (AccountPtr account);
+    void set_account (AccountPtr account);
     AccountPtr account ();
-    void setOCUrl (string &);
+    void set_oCUrl (string &);
     bool registration ();
-    void setRegistration (bool registration);
+    void set_registration (bool registration);
 
-    void setupCustomMedia (QVariant, QLabel *);
-    string ocUrl ();
-    string localFolder ();
-    QStringList selectiveSyncBlacklist ();
-    bool useVirtualFileSync ();
-    bool isConfirmBigFolderChecked ();
+    void setup_custom_media (QVariant, QLabel *);
+    string oc_url ();
+    string local_folder ();
+    QStringList selective_sync_blacklist ();
+    bool use_virtual_file_sync ();
+    bool is_confirm_big_folder_checked ();
 
-    void displayError (string &, bool retryHTTPonly);
-    AbstractCredentials *getCredentials ();
+    void display_error (string &, bool retry_h_t_tPonly);
+    AbstractCredentials *get_credentials ();
 
-    void bringToTop ();
-    void centerWindow ();
+    void bring_to_top ();
+    void center_window ();
 
     /***********************************************************
     Shows a dialog explaining the virtual files mode and warning about it
     being experimental. Calles the callback with true if enabling was
     chosen.
     ***********************************************************/
-    static void askExperimentalVirtualFilesFeature (Gtk.Widget *receiver, std.function<void (bool enable)> &callback);
+    static void ask_experimental_virtual_files_feature (Gtk.Widget *receiver, std.function<void (bool enable)> &callback);
 
     // FIXME : Can those be local variables?
-    // Set from the OwncloudSetupPage, later used from OwncloudHttpCredsPage
-    QByteArray _clientCertBundle; // raw, potentially encrypted pkcs12 bundle provided by the user
-    QByteArray _clientCertPassword; // password for the pkcs12
-    QSslKey _clientSslKey; // key extracted from pkcs12
-    QSslCertificate _clientSslCertificate; // cert extracted from pkcs12
-    QList<QSslCertificate> _clientSslCaCertificates;
+    // Set from the Owncloud_setup_page, later used from Owncloud_http_creds_page
+    QByteArray _client_cert_bundle; // raw, potentially encrypted pkcs12 bundle provided by the user
+    QByteArray _client_cert_password; // password for the pkcs12
+    QSsl_key _client_ssl_key; // key extracted from pkcs12
+    QSslCertificate _client_ssl_certificate; // cert extracted from pkcs12
+    QList<QSslCertificate> _client_ssl_ca_certificates;
 
 public slots:
-    void setAuthType (DetermineAuthTypeJob.AuthType type);
-    void setRemoteFolder (string &);
-    void appendToConfigurationLog (string &msg, LogType type = LogParagraph);
-    void slotCurrentPageChanged (int);
-    void successfulStep ();
+    void set_auth_type (DetermineAuthTypeJob.AuthType type);
+    void set_remote_folder (string &);
+    void append_to_configuration_log (string &msg, Log_type type = Log_paragraph);
+    void slot_current_page_changed (int);
+    void successful_step ();
 
 signals:
-    void clearPendingRequests ();
-    void determineAuthType (string &);
-    void connectToOCUrl (string &);
-    void createLocalAndRemoteFolders (string &, string &);
+    void clear_pending_requests ();
+    void determine_auth_type (string &);
+    void connect_to_oCUrl (string &);
+    void create_local_and_remote_folders (string &, string &);
     // make sure to connect to this, rather than finished (int)!!
-    void basicSetupFinished (int);
-    void skipFolderConfiguration ();
-    void needCertificate ();
-    void styleChanged ();
-    void onActivate ();
+    void basic_setup_finished (int);
+    void skip_folder_configuration ();
+    void need_certificate ();
+    void style_changed ();
+    void on_activate ();
 
 protected:
-    void changeEvent (QEvent *) override;
+    void change_event (QEvent *) override;
 
 private:
-    void customizeStyle ();
-    void adjustWizardSize ();
-    int calculateLongestSideOfWizardPages (QList<QSize> &pageSizes) const;
-    QList<QSize> calculateWizardPageSizes ();
+    void customize_style ();
+    void adjust_wizard_size ();
+    int calculate_longest_side_of_wizard_pages (QList<QSize> &page_sizes) const;
+    QList<QSize> calculate_wizard_page_sizes ();
 
     AccountPtr _account;
-    WelcomePage *_welcomePage;
-    OwncloudSetupPage *_setupPage;
-    OwncloudHttpCredsPage *_httpCredsPage;
-    OwncloudOAuthCredsPage *_browserCredsPage;
-    Flow2AuthCredsPage *_flow2CredsPage;
-    OwncloudAdvancedSetupPage *_advancedSetupPage;
-    OwncloudWizardResultPage *_resultPage;
-    AbstractCredentialsWizardPage *_credentialsPage = nullptr;
-    WebViewPage *_webViewPage = nullptr;
+    Welcome_page *_welcome_page;
+    Owncloud_setup_page *_setup_page;
+    Owncloud_http_creds_page *_http_creds_page;
+    Owncloud_oAuth_creds_page *_browser_creds_page;
+    Flow2Auth_creds_page *_flow2Creds_page;
+    Owncloud_advanced_setup_page *_advanced_setup_page;
+    Owncloud_wizard_result_page *_result_page;
+    Abstract_credentials_wizard_page *_credentials_page = nullptr;
+    Web_view_page *_web_view_page = nullptr;
 
-    QStringList _setupLog;
+    QStringList _setup_log;
 
     bool _registration = false;
 
@@ -121,114 +121,114 @@ private:
     OwncloudWizard.OwncloudWizard (Gtk.Widget *parent)
         : QWizard (parent)
         , _account (nullptr)
-        , _welcomePage (new WelcomePage (this))
-        , _setupPage (new OwncloudSetupPage (this))
-        , _httpCredsPage (new OwncloudHttpCredsPage (this))
-        , _browserCredsPage (new OwncloudOAuthCredsPage)
-        , _flow2CredsPage (new Flow2AuthCredsPage)
-        , _advancedSetupPage (new OwncloudAdvancedSetupPage (this))
+        , _welcome_page (new Welcome_page (this))
+        , _setup_page (new Owncloud_setup_page (this))
+        , _http_creds_page (new Owncloud_http_creds_page (this))
+        , _browser_creds_page (new Owncloud_oAuth_creds_page)
+        , _flow2Creds_page (new Flow2Auth_creds_page)
+        , _advanced_setup_page (new Owncloud_advanced_setup_page (this))
     #ifdef WITH_WEBENGINE
-        , _webViewPage (new WebViewPage (this))
+        , _web_view_page (new Web_view_page (this))
     #else // WITH_WEBENGINE
-        , _webViewPage (nullptr)
+        , _web_view_page (nullptr)
     #endif // WITH_WEBENGINE {
-        setObjectName ("owncloudWizard");
+        set_object_name ("owncloud_wizard");
     
-        setWindowFlags (windowFlags () & ~Qt.WindowContextHelpButtonHint);
-        setPage (WizardCommon.Page_Welcome, _welcomePage);
-        setPage (WizardCommon.Page_ServerSetup, _setupPage);
-        setPage (WizardCommon.Page_HttpCreds, _httpCredsPage);
-        setPage (WizardCommon.Page_OAuthCreds, _browserCredsPage);
-        setPage (WizardCommon.Page_Flow2AuthCreds, _flow2CredsPage);
-        setPage (WizardCommon.Page_AdvancedSetup, _advancedSetupPage);
+        set_window_flags (window_flags () & ~Qt.Window_context_help_button_hint);
+        set_page (Wizard_common.Page_Welcome, _welcome_page);
+        set_page (Wizard_common.Page_Server_setup, _setup_page);
+        set_page (Wizard_common.Page_Http_creds, _http_creds_page);
+        set_page (Wizard_common.Page_OAuth_creds, _browser_creds_page);
+        set_page (Wizard_common.Page_Flow2Auth_creds, _flow2Creds_page);
+        set_page (Wizard_common.Page_Advanced_setup, _advanced_setup_page);
     #ifdef WITH_WEBENGINE
-        setPage (WizardCommon.Page_WebView, _webViewPage);
+        set_page (Wizard_common.Page_Web_view, _web_view_page);
     #endif // WITH_WEBENGINE
     
-        connect (this, &Gtk.Dialog.finished, this, &OwncloudWizard.basicSetupFinished);
+        connect (this, &Gtk.Dialog.finished, this, &OwncloudWizard.basic_setup_finished);
     
         // note : start Id is set by the calling class depending on if the
         // welcome text is to be shown or not.
     
-        connect (this, &QWizard.currentIdChanged, this, &OwncloudWizard.slotCurrentPageChanged);
-        connect (_setupPage, &OwncloudSetupPage.determineAuthType, this, &OwncloudWizard.determineAuthType);
-        connect (_httpCredsPage, &OwncloudHttpCredsPage.connectToOCUrl, this, &OwncloudWizard.connectToOCUrl);
-        connect (_browserCredsPage, &OwncloudOAuthCredsPage.connectToOCUrl, this, &OwncloudWizard.connectToOCUrl);
-        connect (_flow2CredsPage, &Flow2AuthCredsPage.connectToOCUrl, this, &OwncloudWizard.connectToOCUrl);
+        connect (this, &QWizard.current_id_changed, this, &OwncloudWizard.slot_current_page_changed);
+        connect (_setup_page, &Owncloud_setup_page.determine_auth_type, this, &OwncloudWizard.determine_auth_type);
+        connect (_http_creds_page, &Owncloud_http_creds_page.connect_to_oCUrl, this, &OwncloudWizard.connect_to_oCUrl);
+        connect (_browser_creds_page, &Owncloud_oAuth_creds_page.connect_to_oCUrl, this, &OwncloudWizard.connect_to_oCUrl);
+        connect (_flow2Creds_page, &Flow2Auth_creds_page.connect_to_oCUrl, this, &OwncloudWizard.connect_to_oCUrl);
     #ifdef WITH_WEBENGINE
-        connect (_webViewPage, &WebViewPage.connectToOCUrl, this, &OwncloudWizard.connectToOCUrl);
+        connect (_web_view_page, &Web_view_page.connect_to_oCUrl, this, &OwncloudWizard.connect_to_oCUrl);
     #endif // WITH_WEBENGINE
-        connect (_advancedSetupPage, &OwncloudAdvancedSetupPage.createLocalAndRemoteFolders,
-            this, &OwncloudWizard.createLocalAndRemoteFolders);
-        connect (this, &QWizard.customButtonClicked, this, &OwncloudWizard.skipFolderConfiguration);
+        connect (_advanced_setup_page, &Owncloud_advanced_setup_page.create_local_and_remote_folders,
+            this, &OwncloudWizard.create_local_and_remote_folders);
+        connect (this, &QWizard.custom_button_clicked, this, &OwncloudWizard.skip_folder_configuration);
     
         Theme *theme = Theme.instance ();
-        setWindowTitle (tr ("Add %1 account").arg (theme.appNameGUI ()));
-        setWizardStyle (QWizard.ModernStyle);
-        setOption (QWizard.NoBackButtonOnStartPage);
-        setOption (QWizard.NoBackButtonOnLastPage);
-        setOption (QWizard.NoCancelButton);
-        setButtonText (QWizard.CustomButton1, tr ("Skip folders configuration"));
+        set_window_title (tr ("Add %1 account").arg (theme.app_name_g_u_i ()));
+        set_wizard_style (QWizard.Modern_style);
+        set_option (QWizard.No_back_button_on_start_page);
+        set_option (QWizard.No_back_button_on_last_page);
+        set_option (QWizard.No_cancel_button);
+        set_button_text (QWizard.Custom_button1, tr ("Skip folders configuration"));
     
         // Change the next buttons size policy since we hide it on the
         // welcome page but want it to fill it's space that we don't get
         // flickering when the page changes
-        auto nextButtonSizePolicy = button (QWizard.NextButton).sizePolicy ();
-        nextButtonSizePolicy.setRetainSizeWhenHidden (true);
-        button (QWizard.NextButton).setSizePolicy (nextButtonSizePolicy);
+        auto next_button_size_policy = button (QWizard.Next_button).size_policy ();
+        next_button_size_policy.set_retain_size_when_hidden (true);
+        button (QWizard.Next_button).set_size_policy (next_button_size_policy);
     
-        // Connect styleChanged events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-        connect (this, &OwncloudWizard.styleChanged, _setupPage, &OwncloudSetupPage.slotStyleChanged);
-        connect (this, &OwncloudWizard.styleChanged, _advancedSetupPage, &OwncloudAdvancedSetupPage.slotStyleChanged);
-        connect (this, &OwncloudWizard.styleChanged, _flow2CredsPage, &Flow2AuthCredsPage.slotStyleChanged);
+        // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
+        connect (this, &OwncloudWizard.style_changed, _setup_page, &Owncloud_setup_page.slot_style_changed);
+        connect (this, &OwncloudWizard.style_changed, _advanced_setup_page, &Owncloud_advanced_setup_page.slot_style_changed);
+        connect (this, &OwncloudWizard.style_changed, _flow2Creds_page, &Flow2Auth_creds_page.slot_style_changed);
     
-        customizeStyle ();
+        customize_style ();
     
         // allow Flow2 page to poll on window activation
-        connect (this, &OwncloudWizard.onActivate, _flow2CredsPage, &Flow2AuthCredsPage.slotPollNow);
+        connect (this, &OwncloudWizard.on_activate, _flow2Creds_page, &Flow2Auth_creds_page.slot_poll_now);
     
-        adjustWizardSize ();
-        centerWindow ();
+        adjust_wizard_size ();
+        center_window ();
     }
     
-    void OwncloudWizard.centerWindow () {
-        const auto wizardWindow = window ();
-        const auto screen = QGuiApplication.screenAt (wizardWindow.pos ())
-            ? QGuiApplication.screenAt (wizardWindow.pos ())
-            : QGuiApplication.primaryScreen ();
-        const auto screenGeometry = screen.geometry ();
-        const auto windowGeometry = wizardWindow.geometry ();
-        const auto newWindowPosition = screenGeometry.center () - QPoint (windowGeometry.width () / 2, windowGeometry.height () / 2);
-        wizardWindow.move (newWindowPosition);
+    void OwncloudWizard.center_window () {
+        const auto wizard_window = window ();
+        const auto screen = QGuiApplication.screen_at (wizard_window.pos ())
+            ? QGuiApplication.screen_at (wizard_window.pos ())
+            : QGuiApplication.primary_screen ();
+        const auto screen_geometry = screen.geometry ();
+        const auto window_geometry = wizard_window.geometry ();
+        const auto new_window_position = screen_geometry.center () - QPoint (window_geometry.width () / 2, window_geometry.height () / 2);
+        wizard_window.move (new_window_position);
     }
     
-    void OwncloudWizard.adjustWizardSize () {
-        const auto pageSizes = calculateWizardPageSizes ();
-        const auto longestSide = calculateLongestSideOfWizardPages (pageSizes);
+    void OwncloudWizard.adjust_wizard_size () {
+        const auto page_sizes = calculate_wizard_page_sizes ();
+        const auto longest_side = calculate_longest_side_of_wizard_pages (page_sizes);
     
-        resize (QSize (longestSide, longestSide));
+        resize (QSize (longest_side, longest_side));
     }
     
-    QList<QSize> OwncloudWizard.calculateWizardPageSizes () {
-        QList<QSize> pageSizes;
-        const auto pIds = pageIds ();
+    QList<QSize> OwncloudWizard.calculate_wizard_page_sizes () {
+        QList<QSize> page_sizes;
+        const auto p_ids = page_ids ();
     
-        std.transform (pIds.cbegin (), pIds.cend (), std.back_inserter (pageSizes), [this] (int pageId) {
-            auto p = page (pageId);
-            p.adjustSize ();
-            return p.sizeHint ();
+        std.transform (p_ids.cbegin (), p_ids.cend (), std.back_inserter (page_sizes), [this] (int page_id) {
+            auto p = page (page_id);
+            p.adjust_size ();
+            return p.size_hint ();
         });
     
-        return pageSizes;
+        return page_sizes;
     }
     
-    int OwncloudWizard.calculateLongestSideOfWizardPages (QList<QSize> &pageSizes) {
-        return std.accumulate (std.cbegin (pageSizes), std.cend (pageSizes), 0, [] (int current, QSize &size) {
+    int OwncloudWizard.calculate_longest_side_of_wizard_pages (QList<QSize> &page_sizes) {
+        return std.accumulate (std.cbegin (page_sizes), std.cend (page_sizes), 0, [] (int current, QSize &size) {
             return std.max ({ current, size.width (), size.height () });
         });
     }
     
-    void OwncloudWizard.setAccount (AccountPtr account) {
+    void OwncloudWizard.set_account (AccountPtr account) {
         _account = account;
     }
     
@@ -236,24 +236,24 @@ private:
         return _account;
     }
     
-    string OwncloudWizard.localFolder () {
-        return (_advancedSetupPage.localFolder ());
+    string OwncloudWizard.local_folder () {
+        return (_advanced_setup_page.local_folder ());
     }
     
-    QStringList OwncloudWizard.selectiveSyncBlacklist () {
-        return _advancedSetupPage.selectiveSyncBlacklist ();
+    QStringList OwncloudWizard.selective_sync_blacklist () {
+        return _advanced_setup_page.selective_sync_blacklist ();
     }
     
-    bool OwncloudWizard.useVirtualFileSync () {
-        return _advancedSetupPage.useVirtualFileSync ();
+    bool OwncloudWizard.use_virtual_file_sync () {
+        return _advanced_setup_page.use_virtual_file_sync ();
     }
     
-    bool OwncloudWizard.isConfirmBigFolderChecked () {
-        return _advancedSetupPage.isConfirmBigFolderChecked ();
+    bool OwncloudWizard.is_confirm_big_folder_checked () {
+        return _advanced_setup_page.is_confirm_big_folder_checked ();
     }
     
-    string OwncloudWizard.ocUrl () {
-        string url = field ("OCUrl").toString ().simplified ();
+    string OwncloudWizard.oc_url () {
+        string url = field ("OCUrl").to_string ().simplified ();
         return url;
     }
     
@@ -261,194 +261,194 @@ private:
         return _registration;
     }
     
-    void OwncloudWizard.setRegistration (bool registration) {
+    void OwncloudWizard.set_registration (bool registration) {
         _registration = registration;
     }
     
-    void OwncloudWizard.setRemoteFolder (string &remoteFolder) {
-        _advancedSetupPage.setRemoteFolder (remoteFolder);
+    void OwncloudWizard.set_remote_folder (string &remote_folder) {
+        _advanced_setup_page.set_remote_folder (remote_folder);
     }
     
-    void OwncloudWizard.successfulStep () {
-        const int id (currentId ());
+    void OwncloudWizard.successful_step () {
+        const int id (current_id ());
     
         switch (id) {
-        case WizardCommon.Page_HttpCreds:
-            _httpCredsPage.setConnected ();
+        case Wizard_common.Page_Http_creds:
+            _http_creds_page.set_connected ();
             break;
     
-        case WizardCommon.Page_OAuthCreds:
-            _browserCredsPage.setConnected ();
+        case Wizard_common.Page_OAuth_creds:
+            _browser_creds_page.set_connected ();
             break;
     
-        case WizardCommon.Page_Flow2AuthCreds:
-            _flow2CredsPage.setConnected ();
+        case Wizard_common.Page_Flow2Auth_creds:
+            _flow2Creds_page.set_connected ();
             break;
     
     #ifdef WITH_WEBENGINE
-        case WizardCommon.Page_WebView:
-            _webViewPage.setConnected ();
+        case Wizard_common.Page_Web_view:
+            _web_view_page.set_connected ();
             break;
     #endif // WITH_WEBENGINE
     
-        case WizardCommon.Page_AdvancedSetup:
-            _advancedSetupPage.directoriesCreated ();
+        case Wizard_common.Page_Advanced_setup:
+            _advanced_setup_page.directories_created ();
             break;
     
-        case WizardCommon.Page_ServerSetup:
-            qCWarning (lcWizard, "Should not happen at this stage.");
+        case Wizard_common.Page_Server_setup:
+            q_c_warning (lc_wizard, "Should not happen at this stage.");
             break;
         }
     
-        OwncloudGui.raiseDialog (this);
-        if (nextId () == -1) {
-            disconnect (this, &Gtk.Dialog.finished, this, &OwncloudWizard.basicSetupFinished);
-            emit basicSetupFinished (Gtk.Dialog.Accepted);
+        OwncloudGui.raise_dialog (this);
+        if (next_id () == -1) {
+            disconnect (this, &Gtk.Dialog.finished, this, &OwncloudWizard.basic_setup_finished);
+            emit basic_setup_finished (Gtk.Dialog.Accepted);
         } else {
             next ();
         }
     }
     
-    void OwncloudWizard.setAuthType (DetermineAuthTypeJob.AuthType type) {
-        _setupPage.setAuthType (type);
+    void OwncloudWizard.set_auth_type (DetermineAuthTypeJob.AuthType type) {
+        _setup_page.set_auth_type (type);
     
         if (type == DetermineAuthTypeJob.OAuth) {
-            _credentialsPage = _browserCredsPage;
-        } else if (type == DetermineAuthTypeJob.LoginFlowV2) {
-            _credentialsPage = _flow2CredsPage;
+            _credentials_page = _browser_creds_page;
+        } else if (type == DetermineAuthTypeJob.Login_flow_v2) {
+            _credentials_page = _flow2Creds_page;
     #ifdef WITH_WEBENGINE
-        } else if (type == DetermineAuthTypeJob.WebViewFlow) {
-            _credentialsPage = _webViewPage;
+        } else if (type == DetermineAuthTypeJob.Web_view_flow) {
+            _credentials_page = _web_view_page;
     #endif // WITH_WEBENGINE
         } else { // try Basic auth even for "Unknown"
-            _credentialsPage = _httpCredsPage;
+            _credentials_page = _http_creds_page;
         }
         next ();
     }
     
     // TODO : update this function
-    void OwncloudWizard.slotCurrentPageChanged (int id) {
-        qCDebug (lcWizard) << "Current Wizard page changed to " << id;
+    void OwncloudWizard.slot_current_page_changed (int id) {
+        q_c_debug (lc_wizard) << "Current Wizard page changed to " << id;
     
-        const auto setNextButtonAsDefault = [this] () {
-            auto nextButton = qobject_cast<QPushButton> (button (QWizard.NextButton));
-            if (nextButton) {
-                nextButton.setDefault (true);
+        const auto set_next_button_as_default = [this] () {
+            auto next_button = qobject_cast<QPushButton> (button (QWizard.Next_button));
+            if (next_button) {
+                next_button.set_default (true);
             }
         };
     
-        if (id == WizardCommon.Page_Welcome) {
+        if (id == Wizard_common.Page_Welcome) {
             // Set next button to just hidden so it retains it's layout
-            button (QWizard.NextButton).setHidden (true);
+            button (QWizard.Next_button).set_hidden (true);
             // Need to set it from here, otherwise it has no effect
-            _welcomePage.setLoginButtonDefault ();
+            _welcome_page.set_login_button_default ();
         } else if (
     #ifdef WITH_WEBENGINE
-            id == WizardCommon.Page_WebView ||
+            id == Wizard_common.Page_Web_view ||
     #endif // WITH_WEBENGINE
-            id == WizardCommon.Page_Flow2AuthCreds) {
-            setButtonLayout ({ QWizard.Stretch, QWizard.BackButton });
-        } else if (id == WizardCommon.Page_AdvancedSetup) {
-            setButtonLayout ({ QWizard.Stretch, QWizard.CustomButton1, QWizard.BackButton, QWizard.FinishButton });
-            setNextButtonAsDefault ();
+            id == Wizard_common.Page_Flow2Auth_creds) {
+            set_button_layout ({ QWizard.Stretch, QWizard.Back_button });
+        } else if (id == Wizard_common.Page_Advanced_setup) {
+            set_button_layout ({ QWizard.Stretch, QWizard.Custom_button1, QWizard.Back_button, QWizard.Finish_button });
+            set_next_button_as_default ();
         } else {
-            setButtonLayout ({ QWizard.Stretch, QWizard.BackButton, QWizard.NextButton });
-            setNextButtonAsDefault ();
+            set_button_layout ({ QWizard.Stretch, QWizard.Back_button, QWizard.Next_button });
+            set_next_button_as_default ();
         }
     
-        if (id == WizardCommon.Page_ServerSetup) {
-            emit clearPendingRequests ();
+        if (id == Wizard_common.Page_Server_setup) {
+            emit clear_pending_requests ();
         }
     
-        if (id == WizardCommon.Page_AdvancedSetup && (_credentialsPage == _browserCredsPage || _credentialsPage == _flow2CredsPage)) {
-            // For OAuth, disable the back button in the Page_AdvancedSetup because we don't want
+        if (id == Wizard_common.Page_Advanced_setup && (_credentials_page == _browser_creds_page || _credentials_page == _flow2Creds_page)) {
+            // For OAuth, disable the back button in the Page_Advanced_setup because we don't want
             // to re-open the browser.
-            button (QWizard.BackButton).setEnabled (false);
+            button (QWizard.Back_button).set_enabled (false);
         }
     }
     
-    void OwncloudWizard.displayError (string &msg, bool retryHTTPonly) {
-        switch (currentId ()) {
-        case WizardCommon.Page_ServerSetup:
-            _setupPage.setErrorString (msg, retryHTTPonly);
+    void OwncloudWizard.display_error (string &msg, bool retry_h_t_tPonly) {
+        switch (current_id ()) {
+        case Wizard_common.Page_Server_setup:
+            _setup_page.set_error_string (msg, retry_h_t_tPonly);
             break;
     
-        case WizardCommon.Page_HttpCreds:
-            _httpCredsPage.setErrorString (msg);
+        case Wizard_common.Page_Http_creds:
+            _http_creds_page.set_error_string (msg);
             break;
     
-        case WizardCommon.Page_AdvancedSetup:
-            _advancedSetupPage.setErrorString (msg);
+        case Wizard_common.Page_Advanced_setup:
+            _advanced_setup_page.set_error_string (msg);
             break;
         }
     }
     
-    void OwncloudWizard.appendToConfigurationLog (string &msg, LogType /*type*/) {
-        _setupLog << msg;
-        qCDebug (lcWizard) << "Setup-Log : " << msg;
+    void OwncloudWizard.append_to_configuration_log (string &msg, Log_type /*type*/) {
+        _setup_log << msg;
+        q_c_debug (lc_wizard) << "Setup-Log : " << msg;
     }
     
-    void OwncloudWizard.setOCUrl (string &url) {
-        _setupPage.setServerUrl (url);
+    void OwncloudWizard.set_oCUrl (string &url) {
+        _setup_page.set_server_url (url);
     }
     
-    AbstractCredentials *OwncloudWizard.getCredentials () {
-        if (_credentialsPage) {
-            return _credentialsPage.getCredentials ();
+    AbstractCredentials *OwncloudWizard.get_credentials () {
+        if (_credentials_page) {
+            return _credentials_page.get_credentials ();
         }
     
         return nullptr;
     }
     
-    void OwncloudWizard.changeEvent (QEvent *e) {
+    void OwncloudWizard.change_event (QEvent *e) {
         switch (e.type ()) {
-        case QEvent.StyleChange:
-        case QEvent.PaletteChange:
-        case QEvent.ThemeChange:
-            customizeStyle ();
+        case QEvent.Style_change:
+        case QEvent.Palette_change:
+        case QEvent.Theme_change:
+            customize_style ();
     
             // Notify the other widgets (Dark-/Light-Mode switching)
-            emit styleChanged ();
+            emit style_changed ();
             break;
-        case QEvent.ActivationChange:
-            if (isActiveWindow ())
-                emit onActivate ();
+        case QEvent.Activation_change:
+            if (is_active_window ())
+                emit on_activate ();
             break;
         default:
             break;
         }
     
-        QWizard.changeEvent (e);
+        QWizard.change_event (e);
     }
     
-    void OwncloudWizard.customizeStyle () {
+    void OwncloudWizard.customize_style () {
         // HINT : Customize wizard's own style here, if necessary in the future (Dark-/Light-Mode switching)
     
         // Set background colors
-        auto wizardPalette = palette ();
-        const auto backgroundColor = wizardPalette.color (QPalette.Window);
-        wizardPalette.setColor (QPalette.Base, backgroundColor);
+        auto wizard_palette = palette ();
+        const auto background_color = wizard_palette.color (QPalette.Window);
+        wizard_palette.set_color (QPalette.Base, background_color);
         // Set separator color
-        wizardPalette.setColor (QPalette.Mid, backgroundColor);
+        wizard_palette.set_color (QPalette.Mid, background_color);
     
-        setPalette (wizardPalette);
+        set_palette (wizard_palette);
     }
     
-    void OwncloudWizard.bringToTop () {
+    void OwncloudWizard.bring_to_top () {
         // bring wizard to top
-        OwncloudGui.raiseDialog (this);
+        OwncloudGui.raise_dialog (this);
     }
     
-    void OwncloudWizard.askExperimentalVirtualFilesFeature (Gtk.Widget *receiver, std.function<void (bool enable)> &callback) {
-        const auto bestVfsMode = bestAvailableVfsMode ();
-        QMessageBox *msgBox = nullptr;
-        QPushButton *acceptButton = nullptr;
-        switch (bestVfsMode) {
+    void OwncloudWizard.ask_experimental_virtual_files_feature (Gtk.Widget *receiver, std.function<void (bool enable)> &callback) {
+        const auto best_vfs_mode = best_available_vfs_mode ();
+        QMessageBox *msg_box = nullptr;
+        QPushButton *accept_button = nullptr;
+        switch (best_vfs_mode) {
         case Vfs.WindowsCfApi:
             callback (true);
             return;
         case Vfs.WithSuffix:
-            msgBox = new QMessageBox (
+            msg_box = new QMessageBox (
                 QMessageBox.Warning,
                 tr ("Enable experimental feature?"),
                 tr ("When the \"virtual files\" mode is enabled no files will be downloaded initially. "
@@ -465,19 +465,19 @@ private:
                    "issues that come up.")
                     .arg (APPLICATION_DOTVIRTUALFILE_SUFFIX),
                 QMessageBox.NoButton, receiver);
-            acceptButton = msgBox.addButton (tr ("Enable experimental placeholder mode"), QMessageBox.AcceptRole);
-            msgBox.addButton (tr ("Stay safe"), QMessageBox.RejectRole);
+            accept_button = msg_box.add_button (tr ("Enable experimental placeholder mode"), QMessageBox.AcceptRole);
+            msg_box.add_button (tr ("Stay safe"), QMessageBox.RejectRole);
             break;
         case Vfs.XAttr:
         case Vfs.Off:
             Q_UNREACHABLE ();
         }
     
-        connect (msgBox, &QMessageBox.accepted, receiver, [callback, msgBox, acceptButton] {
-            callback (msgBox.clickedButton () == acceptButton);
-            msgBox.deleteLater ();
+        connect (msg_box, &QMessageBox.accepted, receiver, [callback, msg_box, accept_button] {
+            callback (msg_box.clicked_button () == accept_button);
+            msg_box.delete_later ();
         });
-        msgBox.open ();
+        msg_box.open ();
     }
     
     } // end namespace

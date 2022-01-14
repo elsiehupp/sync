@@ -26,7 +26,7 @@ public:
 private slots:
     void accept () override;
 
-    void slotNewFolderNameEditTextEdited ();
+    void slot_new_folder_name_edit_text_edited ();
 
 private:
     Ui.FolderCreationDialog *ui;
@@ -39,32 +39,32 @@ private:
         : Gtk.Dialog (parent)
         , ui (new Ui.FolderCreationDialog)
         , _destination (destination) {
-        ui.setupUi (this);
+        ui.setup_ui (this);
     
-        ui.labelErrorMessage.setVisible (false);
+        ui.label_error_message.set_visible (false);
     
-        setWindowFlags (windowFlags () & ~Qt.WindowContextHelpButtonHint);
+        set_window_flags (window_flags () & ~Qt.Window_context_help_button_hint);
     
-        connect (ui.newFolderNameEdit, &QLineEdit.textChanged, this, &FolderCreationDialog.slotNewFolderNameEditTextEdited);
+        connect (ui.new_folder_name_edit, &QLineEdit.text_changed, this, &FolderCreationDialog.slot_new_folder_name_edit_text_edited);
     
-        const string suggestedFolderNamePrefix = GLib.Object.tr ("New folder");
+        const string suggested_folder_name_prefix = GLib.Object.tr ("New folder");
     
-        const string newFolderFullPath = _destination + QLatin1Char ('/') + suggestedFolderNamePrefix;
-        if (!QDir (newFolderFullPath).exists ()) {
-            ui.newFolderNameEdit.setText (suggestedFolderNamePrefix);
+        const string new_folder_full_path = _destination + QLatin1Char ('/') + suggested_folder_name_prefix;
+        if (!QDir (new_folder_full_path).exists ()) {
+            ui.new_folder_name_edit.set_text (suggested_folder_name_prefix);
         } else {
             for (unsigned int i = 2; i < std.numeric_limits<unsigned int>.max (); ++i) {
-                const string suggestedPostfix = string (" (%1)").arg (i);
+                const string suggested_postfix = string (" (%1)").arg (i);
     
-                if (!QDir (newFolderFullPath + suggestedPostfix).exists ()) {
-                    ui.newFolderNameEdit.setText (suggestedFolderNamePrefix + suggestedPostfix);
+                if (!QDir (new_folder_full_path + suggested_postfix).exists ()) {
+                    ui.new_folder_name_edit.set_text (suggested_folder_name_prefix + suggested_postfix);
                     break;
                 }
             }
         }
     
-        ui.newFolderNameEdit.setFocus ();
-        ui.newFolderNameEdit.selectAll ();
+        ui.new_folder_name_edit.set_focus ();
+        ui.new_folder_name_edit.select_all ();
     }
     
     FolderCreationDialog.~FolderCreationDialog () {
@@ -72,25 +72,25 @@ private:
     }
     
     void FolderCreationDialog.accept () {
-        Q_ASSERT (!_destination.endsWith ('/'));
+        Q_ASSERT (!_destination.ends_with ('/'));
     
-        if (QDir (_destination + "/" + ui.newFolderNameEdit.text ()).exists ()) {
-            ui.labelErrorMessage.setVisible (true);
+        if (QDir (_destination + "/" + ui.new_folder_name_edit.text ()).exists ()) {
+            ui.label_error_message.set_visible (true);
             return;
         }
     
-        if (!QDir (_destination).mkdir (ui.newFolderNameEdit.text ())) {
+        if (!QDir (_destination).mkdir (ui.new_folder_name_edit.text ())) {
             QMessageBox.critical (this, tr ("Error"), tr ("Could not create a folder! Check your write permissions."));
         }
     
         Gtk.Dialog.accept ();
     }
     
-    void FolderCreationDialog.slotNewFolderNameEditTextEdited () {
-        if (!ui.newFolderNameEdit.text ().isEmpty () && QDir (_destination + "/" + ui.newFolderNameEdit.text ()).exists ()) {
-            ui.labelErrorMessage.setVisible (true);
+    void FolderCreationDialog.slot_new_folder_name_edit_text_edited () {
+        if (!ui.new_folder_name_edit.text ().is_empty () && QDir (_destination + "/" + ui.new_folder_name_edit.text ()).exists ()) {
+            ui.label_error_message.set_visible (true);
         } else {
-            ui.labelErrorMessage.setVisible (false);
+            ui.label_error_message.set_visible (false);
         }
     }
     

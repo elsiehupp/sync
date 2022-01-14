@@ -1,6 +1,6 @@
 #pragma once
 
-// #include <QBoxLayout>
+// #include <QBox_layout>
 // #include <QLabel>
 // #include <account.h>
 // #include <QMenu>
@@ -9,56 +9,56 @@
 
 namespace Occ {
 
-class ProfilePageMenu : Gtk.Widget {
+class Profile_page_menu : Gtk.Widget {
 public:
-    ProfilePageMenu (AccountPtr account, string &shareWithUserId, Gtk.Widget *parent = nullptr);
-    ~ProfilePageMenu () override;
+    Profile_page_menu (AccountPtr account, string &share_with_user_id, Gtk.Widget *parent = nullptr);
+    ~Profile_page_menu () override;
 
-    void exec (QPoint &globalPosition);
+    void exec (QPoint &global_position);
 
 private:
-    void onHovercardFetched ();
-    void onIconLoaded (std.size_t &hovercardActionIndex);
+    void on_hovercard_fetched ();
+    void on_icon_loaded (std.size_t &hovercard_action_index);
 
-    OcsProfileConnector _profileConnector;
+    Ocs_profile_connector _profile_connector;
     QMenu _menu;
 };
 
 
-    ProfilePageMenu.ProfilePageMenu (AccountPtr account, string &shareWithUserId, Gtk.Widget *parent)
+    Profile_page_menu.Profile_page_menu (AccountPtr account, string &share_with_user_id, Gtk.Widget *parent)
         : Gtk.Widget (parent)
-        , _profileConnector (account) {
-        connect (&_profileConnector, &OcsProfileConnector.hovercardFetched, this, &ProfilePageMenu.onHovercardFetched);
-        connect (&_profileConnector, &OcsProfileConnector.iconLoaded, this, &ProfilePageMenu.onIconLoaded);
-        _profileConnector.fetchHovercard (shareWithUserId);
+        , _profile_connector (account) {
+        connect (&_profile_connector, &Ocs_profile_connector.hovercard_fetched, this, &Profile_page_menu.on_hovercard_fetched);
+        connect (&_profile_connector, &Ocs_profile_connector.icon_loaded, this, &Profile_page_menu.on_icon_loaded);
+        _profile_connector.fetch_hovercard (share_with_user_id);
     }
     
-    ProfilePageMenu.~ProfilePageMenu () = default;
+    Profile_page_menu.~Profile_page_menu () = default;
     
-    void ProfilePageMenu.exec (QPoint &globalPosition) {
-        _menu.exec (globalPosition);
+    void Profile_page_menu.exec (QPoint &global_position) {
+        _menu.exec (global_position);
     }
     
-    void ProfilePageMenu.onHovercardFetched () {
+    void Profile_page_menu.on_hovercard_fetched () {
         _menu.clear ();
     
-        const auto hovercardActions = _profileConnector.hovercard ()._actions;
-        for (auto &hovercardAction : hovercardActions) {
-            const auto action = _menu.addAction (hovercardAction._icon, hovercardAction._title);
-            const auto link = hovercardAction._link;
-            connect (action, &QAction.triggered, action, [link] (bool) { Utility.openBrowser (link); });
+        const auto hovercard_actions = _profile_connector.hovercard ()._actions;
+        for (auto &hovercard_action : hovercard_actions) {
+            const auto action = _menu.add_action (hovercard_action._icon, hovercard_action._title);
+            const auto link = hovercard_action._link;
+            connect (action, &QAction.triggered, action, [link] (bool) { Utility.open_browser (link); });
         }
     }
     
-    void ProfilePageMenu.onIconLoaded (std.size_t &hovercardActionIndex) {
-        const auto hovercardActions = _profileConnector.hovercard ()._actions;
-        const auto menuActions = _menu.actions ();
-        if (hovercardActionIndex >= hovercardActions.size ()
-            || hovercardActionIndex >= static_cast<std.size_t> (menuActions.size ())) {
+    void Profile_page_menu.on_icon_loaded (std.size_t &hovercard_action_index) {
+        const auto hovercard_actions = _profile_connector.hovercard ()._actions;
+        const auto menu_actions = _menu.actions ();
+        if (hovercard_action_index >= hovercard_actions.size ()
+            || hovercard_action_index >= static_cast<std.size_t> (menu_actions.size ())) {
             return;
         }
-        const auto menuAction = menuActions[static_cast<int> (hovercardActionIndex)];
-        menuAction.setIcon (hovercardActions[hovercardActionIndex]._icon);
+        const auto menu_action = menu_actions[static_cast<int> (hovercard_action_index)];
+        menu_action.set_icon (hovercard_actions[hovercard_action_index]._icon);
     }
     }
     

@@ -7,7 +7,7 @@ Copyright (C) by Julius Härtl <jus@bitgrid.net>
 // #include <gio/gio.h>
 // #include <cloudprovidersproviderexporter.h>
 
-CloudProvidersProviderExporter *_providerExporter;
+CloudProvidersProviderExporter *_provider_exporter;
 
 // #include <GLib.Object>
 
@@ -17,12 +17,12 @@ using namespace Occ;
 class CloudProviderManager : GLib.Object {
 public:
     CloudProviderManager (GLib.Object *parent = nullptr);
-    void registerSignals ();
+    void register_signals ();
 
 signals:
 
 public slots:
-    void slotFolderListChanged (Folder.Map &folderMap);
+    void slot_folder_list_changed (Folder.Map &folder_map);
 
 private:
     QMap<string, CloudProviderWrapper> _map;
@@ -41,22 +41,22 @@ void on_name_acquired (GDBusConnection *connection, gchar *name, gpointer user_d
     Q_UNUSED (name);
     CloudProviderManager *self;
     self = static_cast<CloudProviderManager> (user_data);
-    _providerExporter = cloud_providers_provider_exporter_new (connection, LIBCLOUDPROVIDERS_DBUS_BUS_NAME, LIBCLOUDPROVIDERS_DBUS_OBJECT_PATH);
-    cloud_providers_provider_exporter_set_name (_providerExporter, APPLICATION_NAME);
-    self.registerSignals ();
+    _provider_exporter = cloud_providers_provider_exporter_new (connection, LIBCLOUDPROVIDERS_DBUS_BUS_NAME, LIBCLOUDPROVIDERS_DBUS_OBJECT_PATH);
+    cloud_providers_provider_exporter_set_name (_provider_exporter, APPLICATION_NAME);
+    self.register_signals ();
 }
 
 void on_name_lost (GDBusConnection *connection, gchar *name, gpointer user_data) {
     Q_UNUSED (connection);
     Q_UNUSED (name);
     Q_UNUSED (user_data);
-    g_clear_object (&_providerExporter);
+    g_clear_object (&_provider_exporter);
 }
 
-void CloudProviderManager.registerSignals () {
-    Occ.FolderMan *folderManager = Occ.FolderMan.instance ();
-    connect (folderManager, SIGNAL (folderListChanged (Folder.Map &)), SLOT (slotFolderListChanged (Folder.Map &)));
-    slotFolderListChanged (folderManager.map ());
+void CloudProviderManager.register_signals () {
+    Occ.FolderMan *folder_manager = Occ.FolderMan.instance ();
+    connect (folder_manager, SIGNAL (folder_list_changed (Folder.Map &)), SLOT (slot_folder_list_changed (Folder.Map &)));
+    slot_folder_list_changed (folder_manager.map ());
 }
 
 CloudProviderManager.CloudProviderManager (GLib.Object *parent) : GLib.Object (parent) {
@@ -64,22 +64,22 @@ CloudProviderManager.CloudProviderManager (GLib.Object *parent) : GLib.Object (p
     g_bus_own_name (G_BUS_TYPE_SESSION, LIBCLOUDPROVIDERS_DBUS_BUS_NAME, G_BUS_NAME_OWNER_FLAGS_NONE, nullptr, on_name_acquired, nullptr, this, nullptr);
 }
 
-void CloudProviderManager.slotFolderListChanged (Folder.Map &folderMap) {
+void CloudProviderManager.slot_folder_list_changed (Folder.Map &folder_map) {
     QMapIterator<string, CloudProviderWrapper> i (_map);
-    while (i.hasNext ()) {
+    while (i.has_next ()) {
         i.next ();
-        if (!folderMap.contains (i.key ())) {
-            cloud_providers_provider_exporter_remove_account (_providerExporter, i.value ().accountExporter ());
+        if (!folder_map.contains (i.key ())) {
+            cloud_providers_provider_exporter_remove_account (_provider_exporter, i.value ().account_exporter ());
             delete _map.find (i.key ()).value ();
             _map.remove (i.key ());
         }
     }
 
-    Folder.MapIterator j (folderMap);
-    while (j.hasNext ()) {
+    Folder.MapIterator j (folder_map);
+    while (j.has_next ()) {
         j.next ();
         if (!_map.contains (j.key ())) {
-            auto *cpo = new CloudProviderWrapper (this, j.value (), _folder_index++, _providerExporter);
+            auto *cpo = new CloudProviderWrapper (this, j.value (), _folder_index++, _provider_exporter);
             _map.insert (j.key (), cpo);
         }
     }

@@ -35,7 +35,7 @@ namespace CrashReporter {
 
 namespace Occ {
 
-Q_DECLARE_LOGGING_CATEGORY (lcApplication)
+Q_DECLARE_LOGGING_CATEGORY (lc_application)
 
 
 /***********************************************************
@@ -47,98 +47,98 @@ public:
     Application (int &argc, char **argv);
     ~Application () override;
 
-    bool giveHelp ();
-    void showHelp ();
-    void showHint (std.string errorHint);
-    bool debugMode ();
-    bool backgroundMode ();
-    bool versionOnly (); // only display the version?
-    void showVersion ();
+    bool give_help ();
+    void show_help ();
+    void show_hint (std.string error_hint);
+    bool debug_mode ();
+    bool background_mode ();
+    bool version_only (); // only display the version?
+    void show_version ();
 
-    void showMainDialog ();
+    void show_main_dialog ();
 
     OwncloudGui *gui ();
 
 public slots:
     // TODO : this should not be public
-    void slotownCloudWizardDone (int);
-    void slotCrash ();
+    void slotown_cloud_wizard_done (int);
+    void slot_crash ();
     /***********************************************************
     Will download a virtual file, and open the result.
     The argument is the filename of the virtual file (including the extension)
     ***********************************************************/
-    void openVirtualFile (string &filename);
+    void open_virtual_file (string &filename);
 
     /// Attempt to show () the tray icon again. Used if no systray was available initially.
-    void tryTrayAgain ();
+    void try_tray_again ();
 
 protected:
-    void parseOptions (QStringList &);
-    void setupTranslations ();
-    void setupLogging ();
+    void parse_options (QStringList &);
+    void setup_translations ();
+    void setup_logging ();
     bool event (QEvent *event) override;
 
 signals:
-    void folderRemoved ();
-    void folderStateChanged (Folder *);
-    void isShowingSettingsDialog ();
+    void folder_removed ();
+    void folder_state_changed (Folder *);
+    void is_showing_settings_dialog ();
 
 protected slots:
-    void slotParseMessage (string &, GLib.Object *);
-    void slotCheckConnection ();
-    void slotUseMonoIconsChanged (bool);
-    void slotCleanup ();
-    void slotAccountStateAdded (AccountState *accountState);
-    void slotAccountStateRemoved (AccountState *accountState);
-    void slotSystemOnlineConfigurationChanged (QNetworkConfiguration);
-    void slotGuiIsShowingSettings ();
+    void slot_parse_message (string &, GLib.Object *);
+    void slot_check_connection ();
+    void slot_use_mono_icons_changed (bool);
+    void slot_cleanup ();
+    void slot_account_state_added (AccountState *account_state);
+    void slot_account_state_removed (AccountState *account_state);
+    void slot_system_online_configuration_changed (QNetworkConfiguration);
+    void slot_gui_is_showing_settings ();
 
 private:
-    void setHelp ();
+    void set_help ();
 
     /***********************************************************
     Maybe a newer version of the client was used with this config file:
     if so, backup, confirm with user and remove the config that can't be read.
     ***********************************************************/
-    bool configVersionMigration ();
+    bool config_version_migration ();
 
     QPointer<OwncloudGui> _gui;
 
     Theme *_theme;
 
-    bool _helpOnly;
-    bool _versionOnly;
+    bool _help_only;
+    bool _version_only;
 
-    QElapsedTimer _startedAt;
+    QElapsedTimer _started_at;
 
     // options from command line:
-    bool _showLogWindow;
-    bool _quitInstance = false;
-    string _logFile;
-    string _logDir;
-    int _logExpire;
-    bool _logFlush;
-    bool _logDebug;
-    bool _userTriggeredConnect;
-    bool _debugMode;
-    bool _backgroundMode;
+    bool _show_log_window;
+    bool _quit_instance = false;
+    string _log_file;
+    string _log_dir;
+    int _log_expire;
+    bool _log_flush;
+    bool _log_debug;
+    bool _user_triggered_connect;
+    bool _debug_mode;
+    bool _background_mode;
 
     ClientProxy _proxy;
 
-    QNetworkConfigurationManager _networkConfigurationManager;
-    QTimer _checkConnectionTimer;
+    QNetworkConfigurationManager _network_configuration_manager;
+    QTimer _check_connection_timer;
 
 #if defined (WITH_CRASHREPORTER)
-    QScopedPointer<CrashReporter.Handler> _crashHandler;
+    QScopedPointer<CrashReporter.Handler> _crash_handler;
 #endif
-    QScopedPointer<FolderMan> _folderManager;
+    QScopedPointer<FolderMan> _folder_manager;
 };
 
 
 
 namespace {
 
-    static const char optionsC[] =
+    static const char options_c[] =
         "Options:\n"
         "  --help, -h           : show this help screen.\n"
         "  --version, -v        : show version information.\n"
@@ -154,47 +154,47 @@ namespace {
         "  --confdir <dirname>  : Use the given configuration folder.\n"
         "  --background         : launch the application in the background.\n";
 
-    string applicationTrPath () {
-        string devTrPath = qApp.applicationDirPath () + string.fromLatin1 ("/../src/gui/");
-        if (QDir (devTrPath).exists ()) {
+    string application_tr_path () {
+        string dev_tr_path = q_app.application_dir_path () + string.from_latin1 ("/../src/gui/");
+        if (QDir (dev_tr_path).exists ()) {
             // might miss Qt, QtKeyChain, etc.
-            qCWarning (lcApplication) << "Running from build location! Translations may be incomplete!";
-            return devTrPath;
+            q_c_warning (lc_application) << "Running from build location! Translations may be incomplete!";
+            return dev_tr_path;
         }
 #if defined (Q_OS_UNIX)
-        return string.fromLatin1 (SHAREDIR "/" APPLICATION_EXECUTABLE "/i18n/");
+        return string.from_latin1 (SHAREDIR "/" APPLICATION_EXECUTABLE "/i18n/");
 #endif
     }
 }
 
 // ----------------------------------------------------------------------------------
 
-bool Application.configVersionMigration () {
-    QStringList deleteKeys, ignoreKeys;
-    AccountManager.backwardMigrationSettingsKeys (&deleteKeys, &ignoreKeys);
-    FolderMan.backwardMigrationSettingsKeys (&deleteKeys, &ignoreKeys);
+bool Application.config_version_migration () {
+    QStringList delete_keys, ignore_keys;
+    AccountManager.backward_migration_settings_keys (&delete_keys, &ignore_keys);
+    FolderMan.backward_migration_settings_keys (&delete_keys, &ignore_keys);
 
-    ConfigFile configFile;
+    ConfigFile config_file;
 
     // Did the client version change?
     // (The client version is adjusted further down)
-    bool versionChanged = configFile.clientVersionString () != MIRALL_VERSION_STRING;
+    bool version_changed = config_file.client_version_string () != MIRALL_VERSION_STRING;
 
     // We want to message the user either for destructive changes,
     // or if we're ignoring something and the client version changed.
-    bool warningMessage = !deleteKeys.isEmpty () || (!ignoreKeys.isEmpty () && versionChanged);
+    bool warning_message = !delete_keys.is_empty () || (!ignore_keys.is_empty () && version_changed);
 
-    if (!versionChanged && !warningMessage)
+    if (!version_changed && !warning_message)
         return true;
 
-    const auto backupFile = configFile.backup ();
+    const auto backup_file = config_file.backup ();
 
-    if (warningMessage) {
-        string boldMessage;
-        if (!deleteKeys.isEmpty ()) {
-            boldMessage = tr ("Continuing will mean <b>deleting these settings</b>.");
+    if (warning_message) {
+        string bold_message;
+        if (!delete_keys.is_empty ()) {
+            bold_message = tr ("Continuing will mean <b>deleting these settings</b>.");
         } else {
-            boldMessage = tr ("Continuing will mean <b>ignoring these settings</b>.");
+            bold_message = tr ("Continuing will mean <b>ignoring these settings</b>.");
         }
 
         QMessageBox box (
@@ -206,25 +206,25 @@ bool Application.configVersionMigration () {
                "%1<br>"
                "<br>"
                "The current configuration file was already backed up to <i>%2</i>.")
-                .arg (boldMessage, backupFile));
-        box.addButton (tr ("Quit"), QMessageBox.AcceptRole);
-        auto continueBtn = box.addButton (tr ("Continue"), QMessageBox.DestructiveRole);
+                .arg (bold_message, backup_file));
+        box.add_button (tr ("Quit"), QMessageBox.AcceptRole);
+        auto continue_btn = box.add_button (tr ("Continue"), QMessageBox.DestructiveRole);
 
         box.exec ();
-        if (box.clickedButton () != continueBtn) {
-            QTimer.singleShot (0, qApp, SLOT (quit ()));
+        if (box.clicked_button () != continue_btn) {
+            QTimer.single_shot (0, q_app, SLOT (quit ()));
             return false;
         }
 
-        auto settings = ConfigFile.settingsWithGroup ("foo");
-        settings.endGroup ();
+        auto settings = ConfigFile.settings_with_group ("foo");
+        settings.end_group ();
 
         // Wipe confusing keys from the future, ignore the others
-        for (auto &badKey : deleteKeys)
-            settings.remove (badKey);
+        for (auto &bad_key : delete_keys)
+            settings.remove (bad_key);
     }
 
-    configFile.setClientVersionString (MIRALL_VERSION_STRING);
+    config_file.set_client_version_string (MIRALL_VERSION_STRING);
     return true;
 }
 
@@ -233,66 +233,66 @@ OwncloudGui *Application.gui () {
 }
 
 Application.Application (int &argc, char **argv)
-    : SharedTools.QtSingleApplication (Theme.instance ().appName (), argc, argv)
+    : SharedTools.QtSingleApplication (Theme.instance ().app_name (), argc, argv)
     , _gui (nullptr)
     , _theme (Theme.instance ())
-    , _helpOnly (false)
-    , _versionOnly (false)
-    , _showLogWindow (false)
-    , _logExpire (0)
-    , _logFlush (false)
-    , _logDebug (true)
-    , _userTriggeredConnect (false)
-    , _debugMode (false)
-    , _backgroundMode (false) {
-    _startedAt.start ();
+    , _help_only (false)
+    , _version_only (false)
+    , _show_log_window (false)
+    , _log_expire (0)
+    , _log_flush (false)
+    , _log_debug (true)
+    , _user_triggered_connect (false)
+    , _debug_mode (false)
+    , _background_mode (false) {
+    _started_at.start ();
 
     qsrand (std.random_device () ());
 
     // TODO : Can't set this without breaking current config paths
-    //    setOrganizationName (QLatin1String (APPLICATION_VENDOR));
-    setOrganizationDomain (QLatin1String (APPLICATION_REV_DOMAIN));
+    //    set_organization_name (QLatin1String (APPLICATION_VENDOR));
+    set_organization_domain (QLatin1String (APPLICATION_REV_DOMAIN));
 
-    // setDesktopFilename to provide wayland compatibility (in general : conformance with naming standards)
-    // but only on Qt >= 5.7, where setDesktopFilename was introduced
+    // set_desktop_filename to provide wayland compatibility (in general : conformance with naming standards)
+    // but only on Qt >= 5.7, where set_desktop_filename was introduced
 #if (QT_VERSION >= 0x050700)
-    string desktopFileName = string (QLatin1String (LINUX_APPLICATION_ID)
+    string desktop_file_name = string (QLatin1String (LINUX_APPLICATION_ID)
                                         + QLatin1String (".desktop"));
-    setDesktopFileName (desktopFileName);
+    set_desktop_file_name (desktop_file_name);
 #endif
 
-    setApplicationName (_theme.appName ());
-    setWindowIcon (_theme.applicationIcon ());
+    set_application_name (_theme.app_name ());
+    set_window_icon (_theme.application_icon ());
 
     if (!ConfigFile ().exists ()) {
         // Migrate from version <= 2.4
-        setApplicationName (_theme.appNameGUI ());
+        set_application_name (_theme.app_name_g_u_i ());
 #ifndef QT_WARNING_DISABLE_DEPRECATED // Was added in Qt 5.9
 const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-declarations")
 #endif
         QT_WARNING_PUSH
         QT_WARNING_DISABLE_DEPRECATED
-        // We need to use the deprecated QDesktopServices.storageLocation because of its Qt4
+        // We need to use the deprecated QDesktopServices.storage_location because of its Qt4
         // behavior of adding "data" to the path
-        string oldDir = QDesktopServices.storageLocation (QDesktopServices.DataLocation);
-        if (oldDir.endsWith ('/')) oldDir.chop (1); // macOS 10.11.x does not like trailing slash for rename/move.
+        string old_dir = QDesktopServices.storage_location (QDesktopServices.DataLocation);
+        if (old_dir.ends_with ('/')) old_dir.chop (1); // mac_o_s 10.11.x does not like trailing slash for rename/move.
         QT_WARNING_POP
-        setApplicationName (_theme.appName ());
-        if (QFileInfo (oldDir).isDir ()) {
-            auto confDir = ConfigFile ().configPath ();
-            if (confDir.endsWith ('/')) confDir.chop (1);  // macOS 10.11.x does not like trailing slash for rename/move.
-            qCInfo (lcApplication) << "Migrating old config from" << oldDir << "to" << confDir;
+        set_application_name (_theme.app_name ());
+        if (QFileInfo (old_dir).is_dir ()) {
+            auto conf_dir = ConfigFile ().config_path ();
+            if (conf_dir.ends_with ('/')) conf_dir.chop (1);  // mac_o_s 10.11.x does not like trailing slash for rename/move.
+            q_c_info (lc_application) << "Migrating old config from" << old_dir << "to" << conf_dir;
 
-            if (!QFile.rename (oldDir, confDir)) {
-                qCWarning (lcApplication) << "Failed to move the old config directory to its new location (" << oldDir << "to" << confDir << ")";
+            if (!QFile.rename (old_dir, conf_dir)) {
+                q_c_warning (lc_application) << "Failed to move the old config directory to its new location (" << old_dir << "to" << conf_dir << ")";
 
                 // Try to move the files one by one
-                if (QFileInfo (confDir).isDir () || QDir ().mkdir (confDir)) {
-                    const QStringList filesList = QDir (oldDir).entryList (QDir.Files);
-                    qCInfo (lcApplication) << "Will move the individual files" << filesList;
-                    for (auto &name : filesList) {
-                        if (!QFile.rename (oldDir + "/" + name,  confDir + "/" + name)) {
-                            qCWarning (lcApplication) << "Fallback move of " << name << "also failed";
+                if (QFileInfo (conf_dir).is_dir () || QDir ().mkdir (conf_dir)) {
+                    const QStringList files_list = QDir (old_dir).entry_list (QDir.Files);
+                    q_c_info (lc_application) << "Will move the individual files" << files_list;
+                    for (auto &name : files_list) {
+                        if (!QFile.rename (old_dir + "/" + name,  conf_dir + "/" + name)) {
+                            q_c_warning (lc_application) << "Fallback move of " << name << "also failed";
                         }
                     }
                 }
@@ -300,50 +300,50 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
         }
     }
 
-    parseOptions (arguments ());
+    parse_options (arguments ());
     //no need to waste time;
-    if (_helpOnly || _versionOnly)
+    if (_help_only || _version_only)
         return;
 
-    if (_quitInstance) {
-        QTimer.singleShot (0, qApp, &QApplication.quit);
+    if (_quit_instance) {
+        QTimer.single_shot (0, q_app, &QApplication.quit);
         return;
     }
 
-    if (isRunning ())
+    if (is_running ())
         return;
 
 #if defined (WITH_CRASHREPORTER)
-    if (ConfigFile ().crashReporter ()) {
+    if (ConfigFile ().crash_reporter ()) {
         auto reporter = QStringLiteral (CRASHREPORTER_EXECUTABLE);
-        _crashHandler.reset (new CrashReporter.Handler (QDir.tempPath (), true, reporter));
+        _crash_handler.reset (new CrashReporter.Handler (QDir.temp_path (), true, reporter));
     }
 #endif
 
-    setupLogging ();
-    setupTranslations ();
+    setup_logging ();
+    setup_translations ();
 
-    if (!configVersionMigration ()) {
+    if (!config_version_migration ()) {
         return;
     }
 
     ConfigFile cfg;
     // The timeout is initialized with an environment variable, if not, override with the value from the config
-    if (!AbstractNetworkJob.httpTimeout)
-        AbstractNetworkJob.httpTimeout = cfg.timeout ();
+    if (!AbstractNetworkJob.http_timeout)
+        AbstractNetworkJob.http_timeout = cfg.timeout ();
 
     // Check vfs plugins
-    if (Theme.instance ().showVirtualFilesOption () && bestAvailableVfsMode () == Vfs.Off) {
-        qCWarning (lcApplication) << "Theme wants to show vfs mode, but no vfs plugins are available";
+    if (Theme.instance ().show_virtual_files_option () && best_available_vfs_mode () == Vfs.Off) {
+        q_c_warning (lc_application) << "Theme wants to show vfs mode, but no vfs plugins are available";
     }
-    if (isVfsPluginAvailable (Vfs.WindowsCfApi))
-        qCInfo (lcApplication) << "VFS windows plugin is available";
-    if (isVfsPluginAvailable (Vfs.WithSuffix))
-        qCInfo (lcApplication) << "VFS suffix plugin is available";
+    if (is_vfs_plugin_available (Vfs.WindowsCfApi))
+        q_c_info (lc_application) << "VFS windows plugin is available";
+    if (is_vfs_plugin_available (Vfs.WithSuffix))
+        q_c_info (lc_application) << "VFS suffix plugin is available";
 
-    _folderManager.reset (new FolderMan);
+    _folder_manager.reset (new FolderMan);
 
-    connect (this, &SharedTools.QtSingleApplication.messageReceived, this, &Application.slotParseMessage);
+    connect (this, &SharedTools.QtSingleApplication.message_received, this, &Application.slot_parse_message);
 
     if (!AccountManager.instance ().restore ()) {
         // If there is an error reading the account settings, try again
@@ -351,371 +351,371 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
         // (non-existence is not an error)
         Utility.sleep (5);
         if (!AccountManager.instance ().restore ()) {
-            qCCritical (lcApplication) << "Could not read the account settings, quitting";
+            q_c_critical (lc_application) << "Could not read the account settings, quitting";
             QMessageBox.critical (
                 nullptr,
                 tr ("Error accessing the configuration file"),
                 tr ("There was an error while accessing the configuration "
                    "file at %1. Please make sure the file can be accessed by your user.")
-                    .arg (ConfigFile ().configFile ()),
-                tr ("Quit %1").arg (Theme.instance ().appNameGUI ()));
-            QTimer.singleShot (0, qApp, SLOT (quit ()));
+                    .arg (ConfigFile ().config_file ()),
+                tr ("Quit %1").arg (Theme.instance ().app_name_g_u_i ()));
+            QTimer.single_shot (0, q_app, SLOT (quit ()));
             return;
         }
     }
 
-    FolderMan.instance ().setSyncEnabled (true);
+    FolderMan.instance ().set_sync_enabled (true);
 
-    setQuitOnLastWindowClosed (false);
+    set_quit_on_last_window_closed (false);
 
-    _theme.setSystrayUseMonoIcons (cfg.monoIcons ());
-    connect (_theme, &Theme.systrayUseMonoIconsChanged, this, &Application.slotUseMonoIconsChanged);
+    _theme.set_systray_use_mono_icons (cfg.mono_icons ());
+    connect (_theme, &Theme.systray_use_mono_icons_changed, this, &Application.slot_use_mono_icons_changed);
 
     // Setting up the gui class will allow tray notifications for the
     // setup that follows, like folder setup
     _gui = new OwncloudGui (this);
-    if (_showLogWindow) {
-        _gui.slotToggleLogBrowser (); // _showLogWindow is set in parseOptions.
+    if (_show_log_window) {
+        _gui.slot_toggle_log_browser (); // _show_log_window is set in parse_options.
     }
 #if WITH_LIBCLOUDPROVIDERS
-    _gui.setupCloudProviders ();
+    _gui.setup_cloud_providers ();
 #endif
 
-    FolderMan.instance ().setupFolders ();
-    _proxy.setupQtProxyFromConfig (); // folders have to be defined first, than we set up the Qt proxy.
+    FolderMan.instance ().setup_folders ();
+    _proxy.setup_qt_proxy_from_config (); // folders have to be defined first, than we set up the Qt proxy.
 
-    connect (AccountManager.instance (), &AccountManager.accountAdded,
-        this, &Application.slotAccountStateAdded);
-    connect (AccountManager.instance (), &AccountManager.accountRemoved,
-        this, &Application.slotAccountStateRemoved);
+    connect (AccountManager.instance (), &AccountManager.account_added,
+        this, &Application.slot_account_state_added);
+    connect (AccountManager.instance (), &AccountManager.account_removed,
+        this, &Application.slot_account_state_removed);
     for (auto &ai : AccountManager.instance ().accounts ()) {
-        slotAccountStateAdded (ai.data ());
+        slot_account_state_added (ai.data ());
     }
 
-    connect (FolderMan.instance ().socketApi (), &SocketApi.shareCommandReceived,
-        _gui.data (), &OwncloudGui.slotShowShareDialog);
+    connect (FolderMan.instance ().socket_api (), &SocketApi.share_command_received,
+        _gui.data (), &OwncloudGui.slot_show_share_dialog);
 
-    connect (FolderMan.instance ().socketApi (), &SocketApi.fileActivityCommandReceived,
-        Systray.instance (), &Systray.showFileActivityDialog);
+    connect (FolderMan.instance ().socket_api (), &SocketApi.file_activity_command_received,
+        Systray.instance (), &Systray.show_file_activity_dialog);
 
     // startup procedure.
-    connect (&_checkConnectionTimer, &QTimer.timeout, this, &Application.slotCheckConnection);
-    _checkConnectionTimer.setInterval (ConnectionValidator.DefaultCallingIntervalMsec); // check for connection every 32 seconds.
-    _checkConnectionTimer.start ();
+    connect (&_check_connection_timer, &QTimer.timeout, this, &Application.slot_check_connection);
+    _check_connection_timer.set_interval (ConnectionValidator.DefaultCallingIntervalMsec); // check for connection every 32 seconds.
+    _check_connection_timer.start ();
     // Also check immediately
-    QTimer.singleShot (0, this, &Application.slotCheckConnection);
+    QTimer.single_shot (0, this, &Application.slot_check_connection);
 
-    // Can't use onlineStateChanged because it is always true on modern systems because of many interfaces
-    connect (&_networkConfigurationManager, &QNetworkConfigurationManager.configurationChanged,
-        this, &Application.slotSystemOnlineConfigurationChanged);
+    // Can't use online_state_changed because it is always true on modern systems because of many interfaces
+    connect (&_network_configuration_manager, &QNetworkConfigurationManager.configuration_changed,
+        this, &Application.slot_system_online_configuration_changed);
 
 #if defined (BUILD_UPDATER)
     // Update checks
-    auto *updaterScheduler = new UpdaterScheduler (this);
-    connect (updaterScheduler, &UpdaterScheduler.updaterAnnouncement,
-        _gui.data (), &OwncloudGui.slotShowTrayMessage);
-    connect (updaterScheduler, &UpdaterScheduler.requestRestart,
-        _folderManager.data (), &FolderMan.slotScheduleAppRestart);
+    auto *updater_scheduler = new UpdaterScheduler (this);
+    connect (updater_scheduler, &UpdaterScheduler.updater_announcement,
+        _gui.data (), &OwncloudGui.slot_show_tray_message);
+    connect (updater_scheduler, &UpdaterScheduler.request_restart,
+        _folder_manager.data (), &FolderMan.slot_schedule_app_restart);
 #endif
 
     // Cleanup at Quit.
-    connect (this, &QCoreApplication.aboutToQuit, this, &Application.slotCleanup);
+    connect (this, &QCoreApplication.about_to_quit, this, &Application.slot_cleanup);
 
-    // Allow other classes to hook into isShowingSettingsDialog () signals (re-auth widgets, for example)
-    connect (_gui.data (), &OwncloudGui.isShowingSettingsDialog, this, &Application.slotGuiIsShowingSettings);
+    // Allow other classes to hook into is_showing_settings_dialog () signals (re-auth widgets, for example)
+    connect (_gui.data (), &OwncloudGui.is_showing_settings_dialog, this, &Application.slot_gui_is_showing_settings);
 
-    _gui.createTray ();
+    _gui.create_tray ();
 }
 
 Application.~Application () {
     // Make sure all folders are gone, otherwise removing the
     // accounts will remove the associated folders from the settings.
-    if (_folderManager) {
-        _folderManager.unloadAndDeleteAllFolders ();
+    if (_folder_manager) {
+        _folder_manager.unload_and_delete_all_folders ();
     }
 
     // Remove the account from the account manager so it can be deleted.
-    disconnect (AccountManager.instance (), &AccountManager.accountRemoved,
-        this, &Application.slotAccountStateRemoved);
+    disconnect (AccountManager.instance (), &AccountManager.account_removed,
+        this, &Application.slot_account_state_removed);
     AccountManager.instance ().shutdown ();
 }
 
-void Application.slotAccountStateRemoved (AccountState *accountState) {
+void Application.slot_account_state_removed (AccountState *account_state) {
     if (_gui) {
-        disconnect (accountState, &AccountState.stateChanged,
-            _gui.data (), &OwncloudGui.slotAccountStateChanged);
-        disconnect (accountState.account ().data (), &Account.serverVersionChanged,
-            _gui.data (), &OwncloudGui.slotTrayMessageIfServerUnsupported);
+        disconnect (account_state, &AccountState.state_changed,
+            _gui.data (), &OwncloudGui.slot_account_state_changed);
+        disconnect (account_state.account ().data (), &Account.server_version_changed,
+            _gui.data (), &OwncloudGui.slot_tray_message_if_server_unsupported);
     }
-    if (_folderManager) {
-        disconnect (accountState, &AccountState.stateChanged,
-            _folderManager.data (), &FolderMan.slotAccountStateChanged);
-        disconnect (accountState.account ().data (), &Account.serverVersionChanged,
-            _folderManager.data (), &FolderMan.slotServerVersionChanged);
+    if (_folder_manager) {
+        disconnect (account_state, &AccountState.state_changed,
+            _folder_manager.data (), &FolderMan.slot_account_state_changed);
+        disconnect (account_state.account ().data (), &Account.server_version_changed,
+            _folder_manager.data (), &FolderMan.slot_server_version_changed);
     }
 
     // if there is no more account, show the wizard.
-    if (_gui && AccountManager.instance ().accounts ().isEmpty ()) {
+    if (_gui && AccountManager.instance ().accounts ().is_empty ()) {
         // allow to add a new account if there is non any more. Always think
         // about single account theming!
-        OwncloudSetupWizard.runWizard (this, SLOT (slotownCloudWizardDone (int)));
+        OwncloudSetupWizard.run_wizard (this, SLOT (slotown_cloud_wizard_done (int)));
     }
 }
 
-void Application.slotAccountStateAdded (AccountState *accountState) {
-    connect (accountState, &AccountState.stateChanged,
-        _gui.data (), &OwncloudGui.slotAccountStateChanged);
-    connect (accountState.account ().data (), &Account.serverVersionChanged,
-        _gui.data (), &OwncloudGui.slotTrayMessageIfServerUnsupported);
-    connect (accountState, &AccountState.stateChanged,
-        _folderManager.data (), &FolderMan.slotAccountStateChanged);
-    connect (accountState.account ().data (), &Account.serverVersionChanged,
-        _folderManager.data (), &FolderMan.slotServerVersionChanged);
+void Application.slot_account_state_added (AccountState *account_state) {
+    connect (account_state, &AccountState.state_changed,
+        _gui.data (), &OwncloudGui.slot_account_state_changed);
+    connect (account_state.account ().data (), &Account.server_version_changed,
+        _gui.data (), &OwncloudGui.slot_tray_message_if_server_unsupported);
+    connect (account_state, &AccountState.state_changed,
+        _folder_manager.data (), &FolderMan.slot_account_state_changed);
+    connect (account_state.account ().data (), &Account.server_version_changed,
+        _folder_manager.data (), &FolderMan.slot_server_version_changed);
 
-    _gui.slotTrayMessageIfServerUnsupported (accountState.account ().data ());
+    _gui.slot_tray_message_if_server_unsupported (account_state.account ().data ());
 }
 
-void Application.slotCleanup () {
+void Application.slot_cleanup () {
     AccountManager.instance ().save ();
-    FolderMan.instance ().unloadAndDeleteAllFolders ();
+    FolderMan.instance ().unload_and_delete_all_folders ();
 
-    _gui.slotShutdown ();
-    _gui.deleteLater ();
+    _gui.slot_shutdown ();
+    _gui.delete_later ();
 }
 
 // FIXME : This is not ideal yet since a ConnectionValidator might already be running and is in
 // progress of timing out in some seconds.
 // Maybe we need 2 validators, one triggered by timer, one by network configuration changes?
-void Application.slotSystemOnlineConfigurationChanged (QNetworkConfiguration cnf) {
+void Application.slot_system_online_configuration_changed (QNetworkConfiguration cnf) {
     if (cnf.state () & QNetworkConfiguration.Active) {
-        QMetaObject.invokeMethod (this, "slotCheckConnection", Qt.QueuedConnection);
+        QMetaObject.invoke_method (this, "slot_check_connection", Qt.QueuedConnection);
     }
 }
 
-void Application.slotCheckConnection () {
+void Application.slot_check_connection () {
     const auto list = AccountManager.instance ().accounts ();
-    for (auto &accountState : list) {
-        AccountState.State state = accountState.state ();
+    for (auto &account_state : list) {
+        AccountState.State state = account_state.state ();
 
         // Don't check if we're manually signed out or
         // when the error is permanent.
-        const auto pushNotifications = accountState.account ().pushNotifications ();
-        const auto pushNotificationsAvailable = (pushNotifications && pushNotifications.isReady ());
+        const auto push_notifications = account_state.account ().push_notifications ();
+        const auto push_notifications_available = (push_notifications && push_notifications.is_ready ());
         if (state != AccountState.SignedOut && state != AccountState.ConfigurationError
-            && state != AccountState.AskingCredentials && !pushNotificationsAvailable) {
-            accountState.checkConnectivity ();
+            && state != AccountState.AskingCredentials && !push_notifications_available) {
+            account_state.slot_check_connectivity ();
         }
     }
 
-    if (list.isEmpty ()) {
+    if (list.is_empty ()) {
         // let gui open the setup wizard
-        _gui.slotOpenSettingsDialog ();
+        _gui.slot_open_settings_dialog ();
 
-        _checkConnectionTimer.stop (); // don't popup the wizard on interval;
+        _check_connection_timer.stop (); // don't popup the wizard on interval;
     }
 }
 
-void Application.slotCrash () {
+void Application.slot_crash () {
     Utility.crash ();
 }
 
-void Application.slotownCloudWizardDone (int res) {
-    FolderMan *folderMan = FolderMan.instance ();
+void Application.slotown_cloud_wizard_done (int res) {
+    FolderMan *folder_man = FolderMan.instance ();
 
     // During the wizard, scheduling of new syncs is disabled
-    folderMan.setSyncEnabled (true);
+    folder_man.set_sync_enabled (true);
 
     if (res == Gtk.Dialog.Accepted) {
         // Check connectivity of the newly created account
-        _checkConnectionTimer.start ();
-        slotCheckConnection ();
+        _check_connection_timer.start ();
+        slot_check_connection ();
 
         // If one account is configured : enable autostart
 #ifndef QT_DEBUG
-        bool shouldSetAutoStart = AccountManager.instance ().accounts ().size () == 1;
+        bool should_set_auto_start = AccountManager.instance ().accounts ().size () == 1;
 #else
-        bool shouldSetAutoStart = false;
+        bool should_set_auto_start = false;
 #endif
-        if (shouldSetAutoStart) {
-            Utility.setLaunchOnStartup (_theme.appName (), _theme.appNameGUI (), true);
+        if (should_set_auto_start) {
+            Utility.set_launch_on_startup (_theme.app_name (), _theme.app_name_g_u_i (), true);
         }
 
-        Systray.instance ().showWindow ();
+        Systray.instance ().show_window ();
     }
 }
 
-void Application.setupLogging () {
+void Application.setup_logging () {
     // might be called from second instance
     auto logger = Logger.instance ();
-    logger.setLogFile (_logFile);
-    if (_logFile.isEmpty ()) {
-        logger.setLogDir (_logDir.isEmpty () ? ConfigFile ().logDir () : _logDir);
+    logger.set_log_file (_log_file);
+    if (_log_file.is_empty ()) {
+        logger.set_log_dir (_log_dir.is_empty () ? ConfigFile ().log_dir () : _log_dir);
     }
-    logger.setLogExpire (_logExpire > 0 ? _logExpire : ConfigFile ().logExpire ());
-    logger.setLogFlush (_logFlush || ConfigFile ().logFlush ());
-    logger.setLogDebug (_logDebug || ConfigFile ().logDebug ());
-    if (!logger.isLoggingToFile () && ConfigFile ().automaticLogDir ()) {
-        logger.setupTemporaryFolderLogDir ();
+    logger.set_log_expire (_log_expire > 0 ? _log_expire : ConfigFile ().log_expire ());
+    logger.set_log_flush (_log_flush || ConfigFile ().log_flush ());
+    logger.set_log_debug (_log_debug || ConfigFile ().log_debug ());
+    if (!logger.is_logging_to_file () && ConfigFile ().automatic_log_dir ()) {
+        logger.setup_temporary_folder_log_dir ();
     }
 
-    logger.enterNextLogFile ();
+    logger.enter_next_log_file ();
 
-    qCInfo (lcApplication) << "##################" << _theme.appName ()
+    q_c_info (lc_application) << "##################" << _theme.app_name ()
                           << "locale:" << QLocale.system ().name ()
                           << "ui_lang:" << property ("ui_lang")
                           << "version:" << _theme.version ()
-                          << "os:" << Utility.platformName ();
-    qCInfo (lcApplication) << "Arguments:" << qApp.arguments ();
+                          << "os:" << Utility.platform_name ();
+    q_c_info (lc_application) << "Arguments:" << q_app.arguments ();
 }
 
-void Application.slotUseMonoIconsChanged (bool) {
-    _gui.slotComputeOverallSyncStatus ();
+void Application.slot_use_mono_icons_changed (bool) {
+    _gui.slot_compute_overall_sync_status ();
 }
 
-void Application.slotParseMessage (string &msg, GLib.Object *) {
-    if (msg.startsWith (QLatin1String ("MSG_PARSEOPTIONS:"))) {
-        const int lengthOfMsgPrefix = 17;
-        QStringList options = msg.mid (lengthOfMsgPrefix).split (QLatin1Char ('|'));
-        _showLogWindow = false;
-        parseOptions (options);
-        setupLogging ();
-        if (_showLogWindow) {
-            _gui.slotToggleLogBrowser (); // _showLogWindow is set in parseOptions.
+void Application.slot_parse_message (string &msg, GLib.Object *) {
+    if (msg.starts_with (QLatin1String ("MSG_PARSEOPTIONS:"))) {
+        const int length_of_msg_prefix = 17;
+        QStringList options = msg.mid (length_of_msg_prefix).split (QLatin1Char ('|'));
+        _show_log_window = false;
+        parse_options (options);
+        setup_logging ();
+        if (_show_log_window) {
+            _gui.slot_toggle_log_browser (); // _show_log_window is set in parse_options.
         }
-        if (_quitInstance) {
-            qApp.quit ();
+        if (_quit_instance) {
+            q_app.quit ();
         }
 
-    } else if (msg.startsWith (QLatin1String ("MSG_SHOWMAINDIALOG"))) {
-        qCInfo (lcApplication) << "Running for" << _startedAt.elapsed () / 1000.0 << "sec";
-        if (_startedAt.elapsed () < 10 * 1000) {
+    } else if (msg.starts_with (QLatin1String ("MSG_SHOWMAINDIALOG"))) {
+        q_c_info (lc_application) << "Running for" << _started_at.elapsed () / 1000.0 << "sec";
+        if (_started_at.elapsed () < 10 * 1000) {
             // This call is mirrored with the one in int main ()
-            qCWarning (lcApplication) << "Ignoring MSG_SHOWMAINDIALOG, possibly double-invocation of client via session restore and auto start";
+            q_c_warning (lc_application) << "Ignoring MSG_SHOWMAINDIALOG, possibly double-invocation of client via session restore and auto start";
             return;
         }
 
         // Show the main dialog only if there is at least one account configured
-        if (!AccountManager.instance ().accounts ().isEmpty ()) {
-            showMainDialog ();
+        if (!AccountManager.instance ().accounts ().is_empty ()) {
+            show_main_dialog ();
         } else {
-            _gui.slotNewAccountWizard ();
+            _gui.slot_new_account_wizard ();
         }
     }
 }
 
-void Application.parseOptions (QStringList &options) {
+void Application.parse_options (QStringList &options) {
     QStringListIterator it (options);
     // skip file name;
-    if (it.hasNext ())
+    if (it.has_next ())
         it.next ();
 
     //parse options; if help or bad option exit
-    while (it.hasNext ()) {
+    while (it.has_next ()) {
         string option = it.next ();
         if (option == QLatin1String ("--help") || option == QLatin1String ("-h")) {
-            setHelp ();
+            set_help ();
             break;
         } else if (option == QLatin1String ("--quit") || option == QLatin1String ("-q")) {
-            _quitInstance = true;
+            _quit_instance = true;
         } else if (option == QLatin1String ("--logwindow") || option == QLatin1String ("-l")) {
-            _showLogWindow = true;
+            _show_log_window = true;
         } else if (option == QLatin1String ("--logfile")) {
-            if (it.hasNext () && !it.peekNext ().startsWith (QLatin1String ("--"))) {
-                _logFile = it.next ();
+            if (it.has_next () && !it.peek_next ().starts_with (QLatin1String ("--"))) {
+                _log_file = it.next ();
             } else {
-                showHint ("Log file not specified");
+                show_hint ("Log file not specified");
             }
         } else if (option == QLatin1String ("--logdir")) {
-            if (it.hasNext () && !it.peekNext ().startsWith (QLatin1String ("--"))) {
-                _logDir = it.next ();
+            if (it.has_next () && !it.peek_next ().starts_with (QLatin1String ("--"))) {
+                _log_dir = it.next ();
             } else {
-                showHint ("Log dir not specified");
+                show_hint ("Log dir not specified");
             }
         } else if (option == QLatin1String ("--logexpire")) {
-            if (it.hasNext () && !it.peekNext ().startsWith (QLatin1String ("--"))) {
-                _logExpire = it.next ().toInt ();
+            if (it.has_next () && !it.peek_next ().starts_with (QLatin1String ("--"))) {
+                _log_expire = it.next ().to_int ();
             } else {
-                showHint ("Log expiration not specified");
+                show_hint ("Log expiration not specified");
             }
         } else if (option == QLatin1String ("--logflush")) {
-            _logFlush = true;
+            _log_flush = true;
         } else if (option == QLatin1String ("--logdebug")) {
-            _logDebug = true;
+            _log_debug = true;
         } else if (option == QLatin1String ("--confdir")) {
-            if (it.hasNext () && !it.peekNext ().startsWith (QLatin1String ("--"))) {
-                string confDir = it.next ();
-                if (!ConfigFile.setConfDir (confDir)) {
-                    showHint ("Invalid path passed to --confdir");
+            if (it.has_next () && !it.peek_next ().starts_with (QLatin1String ("--"))) {
+                string conf_dir = it.next ();
+                if (!ConfigFile.set_conf_dir (conf_dir)) {
+                    show_hint ("Invalid path passed to --confdir");
                 }
             } else {
-                showHint ("Path for confdir not specified");
+                show_hint ("Path for confdir not specified");
             }
         } else if (option == QLatin1String ("--debug")) {
-            _logDebug = true;
-            _debugMode = true;
+            _log_debug = true;
+            _debug_mode = true;
         } else if (option == QLatin1String ("--background")) {
-            _backgroundMode = true;
+            _background_mode = true;
         } else if (option == QLatin1String ("--version") || option == QLatin1String ("-v")) {
-            _versionOnly = true;
-        } else if (option.endsWith (QStringLiteral (APPLICATION_DOTVIRTUALFILE_SUFFIX))) {
+            _version_only = true;
+        } else if (option.ends_with (QStringLiteral (APPLICATION_DOTVIRTUALFILE_SUFFIX))) {
             // virtual file, open it after the Folder were created (if the app is not terminated)
-            QTimer.singleShot (0, this, [this, option] { openVirtualFile (option); });
+            QTimer.single_shot (0, this, [this, option] { open_virtual_file (option); });
         } else {
-            showHint ("Unrecognized option '" + option.toStdString () + "'");
+            show_hint ("Unrecognized option '" + option.to_std_string () + "'");
         }
     }
 }
 
 // Helpers for displaying messages. Note that there is no console on Windows.
 
-static void displayHelpText (string &t) {
-    std.cout << qUtf8Printable (t);
+static void display_help_text (string &t) {
+    std.cout << q_utf8Printable (t);
 }
 
-void Application.showHelp () {
-    setHelp ();
-    string helpText;
-    QTextStream stream (&helpText);
-    stream << _theme.appName ()
+void Application.show_help () {
+    set_help ();
+    string help_text;
+    QTextStream stream (&help_text);
+    stream << _theme.app_name ()
            << QLatin1String (" version ")
            << _theme.version () << endl;
 
     stream << QLatin1String ("File synchronisation desktop utility.") << endl
            << endl
-           << QLatin1String (optionsC);
+           << QLatin1String (options_c);
 
-    if (_theme.appName () == QLatin1String ("ownCloud"))
+    if (_theme.app_name () == QLatin1String ("own_cloud"))
         stream << endl
                << "For more information, see http://www.owncloud.org" << endl
                << endl;
 
-    displayHelpText (helpText);
+    display_help_text (help_text);
 }
 
-void Application.showVersion () {
-    displayHelpText (Theme.instance ().versionSwitchOutput ());
+void Application.show_version () {
+    display_help_text (Theme.instance ().version_switch_output ());
 }
 
-void Application.showHint (std.string errorHint) {
-    static string binName = QFileInfo (QCoreApplication.applicationFilePath ()).fileName ();
-    std.cerr << errorHint << std.endl;
-    std.cerr << "Try '" << binName.toStdString () << " --help' for more information" << std.endl;
+void Application.show_hint (std.string error_hint) {
+    static string bin_name = QFileInfo (QCoreApplication.application_file_path ()).file_name ();
+    std.cerr << error_hint << std.endl;
+    std.cerr << "Try '" << bin_name.to_std_string () << " --help' for more information" << std.endl;
     std.exit (1);
 }
 
-bool Application.debugMode () {
-    return _debugMode;
+bool Application.debug_mode () {
+    return _debug_mode;
 }
 
-bool Application.backgroundMode () {
-    return _backgroundMode;
+bool Application.background_mode () {
+    return _background_mode;
 }
 
-void Application.setHelp () {
-    _helpOnly = true;
+void Application.set_help () {
+    _help_only = true;
 }
 
-string substLang (string &lang) {
+string subst_lang (string &lang) {
     // Map the more appropriate script codes
     // to country codes as used by Qt and
     // transifex translation conventions.
@@ -729,101 +729,101 @@ string substLang (string &lang) {
     return lang;
 }
 
-void Application.setupTranslations () {
-    QStringList uiLanguages;
-    uiLanguages = QLocale.system ().uiLanguages ();
+void Application.setup_translations () {
+    QStringList ui_languages;
+    ui_languages = QLocale.system ().ui_languages ();
 
-    string enforcedLocale = Theme.instance ().enforcedLocale ();
-    if (!enforcedLocale.isEmpty ())
-        uiLanguages.prepend (enforcedLocale);
+    string enforced_locale = Theme.instance ().enforced_locale ();
+    if (!enforced_locale.is_empty ())
+        ui_languages.prepend (enforced_locale);
 
     auto *translator = new QTranslator (this);
-    auto *qtTranslator = new QTranslator (this);
-    auto *qtkeychainTranslator = new QTranslator (this);
+    auto *qt_translator = new QTranslator (this);
+    auto *qtkeychain_translator = new QTranslator (this);
 
-    for (string lang : qAsConst (uiLanguages)) {
+    for (string lang : q_as_const (ui_languages)) {
         lang.replace (QLatin1Char ('-'), QLatin1Char ('_')); // work around QTBUG-25973
-        lang = substLang (lang);
-        const string trPath = applicationTrPath ();
-        const string trFile = QLatin1String ("client_") + lang;
-        if (translator.load (trFile, trPath) || lang.startsWith (QLatin1String ("en"))) {
+        lang = subst_lang (lang);
+        const string tr_path = application_tr_path ();
+        const string tr_file = QLatin1String ("client_") + lang;
+        if (translator.load (tr_file, tr_path) || lang.starts_with (QLatin1String ("en"))) {
             // Permissive approach : Qt and keychain translations
             // may be missing, but Qt translations must be there in order
             // for us to accept the language. Otherwise, we try with the next.
             // "en" is an exception as it is the default language and may not
             // have a translation file provided.
-            qCInfo (lcApplication) << "Using" << lang << "translation";
-            setProperty ("ui_lang", lang);
-            const string qtTrPath = QLibraryInfo.location (QLibraryInfo.TranslationsPath);
-            const string qtTrFile = QLatin1String ("qt_") + lang;
-            const string qtBaseTrFile = QLatin1String ("qtbase_") + lang;
-            if (!qtTranslator.load (qtTrFile, qtTrPath)) {
-                if (!qtTranslator.load (qtTrFile, trPath)) {
-                    if (!qtTranslator.load (qtBaseTrFile, qtTrPath)) {
-                        qtTranslator.load (qtBaseTrFile, trPath);
+            q_c_info (lc_application) << "Using" << lang << "translation";
+            set_property ("ui_lang", lang);
+            const string qt_tr_path = QLibraryInfo.location (QLibraryInfo.TranslationsPath);
+            const string qt_tr_file = QLatin1String ("qt_") + lang;
+            const string qt_base_tr_file = QLatin1String ("qtbase_") + lang;
+            if (!qt_translator.load (qt_tr_file, qt_tr_path)) {
+                if (!qt_translator.load (qt_tr_file, tr_path)) {
+                    if (!qt_translator.load (qt_base_tr_file, qt_tr_path)) {
+                        qt_translator.load (qt_base_tr_file, tr_path);
                     }
                 }
             }
-            const string qtkeychainTrFile = QLatin1String ("qtkeychain_") + lang;
-            if (!qtkeychainTranslator.load (qtkeychainTrFile, qtTrPath)) {
-                qtkeychainTranslator.load (qtkeychainTrFile, trPath);
+            const string qtkeychain_tr_file = QLatin1String ("qtkeychain_") + lang;
+            if (!qtkeychain_translator.load (qtkeychain_tr_file, qt_tr_path)) {
+                qtkeychain_translator.load (qtkeychain_tr_file, tr_path);
             }
-            if (!translator.isEmpty ())
-                installTranslator (translator);
-            if (!qtTranslator.isEmpty ())
-                installTranslator (qtTranslator);
-            if (!qtkeychainTranslator.isEmpty ())
-                installTranslator (qtkeychainTranslator);
+            if (!translator.is_empty ())
+                install_translator (translator);
+            if (!qt_translator.is_empty ())
+                install_translator (qt_translator);
+            if (!qtkeychain_translator.is_empty ())
+                install_translator (qtkeychain_translator);
             break;
         }
-        if (property ("ui_lang").isNull ())
-            setProperty ("ui_lang", "C");
+        if (property ("ui_lang").is_null ())
+            set_property ("ui_lang", "C");
     }
 }
 
-bool Application.giveHelp () {
-    return _helpOnly;
+bool Application.give_help () {
+    return _help_only;
 }
 
-bool Application.versionOnly () {
-    return _versionOnly;
+bool Application.version_only () {
+    return _version_only;
 }
 
-void Application.showMainDialog () {
-    _gui.slotOpenMainDialog ();
+void Application.show_main_dialog () {
+    _gui.slot_open_main_dialog ();
 }
 
-void Application.slotGuiIsShowingSettings () {
-    emit isShowingSettingsDialog ();
+void Application.slot_gui_is_showing_settings () {
+    emit is_showing_settings_dialog ();
 }
 
-void Application.openVirtualFile (string &filename) {
-    string virtualFileExt = QStringLiteral (APPLICATION_DOTVIRTUALFILE_SUFFIX);
-    if (!filename.endsWith (virtualFileExt)) {
-        qWarning (lcApplication) << "Can only handle file ending in .owncloud. Unable to open" << filename;
+void Application.open_virtual_file (string &filename) {
+    string virtual_file_ext = QStringLiteral (APPLICATION_DOTVIRTUALFILE_SUFFIX);
+    if (!filename.ends_with (virtual_file_ext)) {
+        q_warning (lc_application) << "Can only handle file ending in .owncloud. Unable to open" << filename;
         return;
     }
-    auto folder = FolderMan.instance ().folderForPath (filename);
+    auto folder = FolderMan.instance ().folder_for_path (filename);
     if (!folder) {
-        qWarning (lcApplication) << "Can't find sync folder for" << filename;
+        q_warning (lc_application) << "Can't find sync folder for" << filename;
         // TODO : show a QMessageBox for errors
         return;
     }
-    string relativePath = QDir.cleanPath (filename).mid (folder.cleanPath ().length () + 1);
-    folder.implicitlyHydrateFile (relativePath);
-    string normalName = filename.left (filename.size () - virtualFileExt.size ());
+    string relative_path = QDir.clean_path (filename).mid (folder.clean_path ().length () + 1);
+    folder.implicitly_hydrate_file (relative_path);
+    string normal_name = filename.left (filename.size () - virtual_file_ext.size ());
     auto con = QSharedPointer<QMetaObject.Connection>.create ();
-    *con = connect (folder, &Folder.syncFinished, folder, [folder, con, normalName] {
+    *con = connect (folder, &Folder.sync_finished, folder, [folder, con, normal_name] {
         folder.disconnect (*con);
-        if (QFile.exists (normalName)) {
-            QDesktopServices.openUrl (QUrl.fromLocalFile (normalName));
+        if (QFile.exists (normal_name)) {
+            QDesktopServices.open_url (QUrl.from_local_file (normal_name));
         }
     });
 }
 
-void Application.tryTrayAgain () {
-    qCInfo (lcApplication) << "Trying tray icon, tray available:" << QSystemTrayIcon.isSystemTrayAvailable ();
-    _gui.hideAndShowTray ();
+void Application.try_tray_again () {
+    q_c_info (lc_application) << "Trying tray icon, tray available:" << QSystemTrayIcon.is_system_tray_available ();
+    _gui.hide_and_show_tray ();
 }
 
 bool Application.event (QEvent *event) {

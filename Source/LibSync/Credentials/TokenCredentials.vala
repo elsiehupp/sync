@@ -9,7 +9,7 @@ Copyright (c) by Markus Goetz <guruz@owncloud.com>
 // #include <QMutex>
 // #include <QNetworkReply>
 // #include <QSettings>
-// #include <QNetworkCookieJar>
+// #include <QNetwork_cookie_jar>
 
 // #include <QMap>
 
@@ -19,27 +19,27 @@ namespace QKeychain {
 
 namespace Occ {
 
-class TokenCredentials : AbstractCredentials {
+class Token_credentials : AbstractCredentials {
 
 public:
-    friend class TokenCredentialsAccessManager;
-    TokenCredentials ();
-    TokenCredentials (string &user, string &password, string &token);
+    friend class Token_credentials_access_manager;
+    Token_credentials ();
+    Token_credentials (string &user, string &password, string &token);
 
-    string authType () const override;
-    QNetworkAccessManager *createQNAM () const override;
+    string auth_type () const override;
+    QNetworkAccessManager *create_qNAM () const override;
     bool ready () const override;
-    void askFromUser () override;
-    void fetchFromKeychain () override;
-    bool stillValid (QNetworkReply *reply) override;
+    void ask_from_user () override;
+    void fetch_from_keychain () override;
+    bool still_valid (QNetworkReply *reply) override;
     void persist () override;
     string user () const override;
-    void invalidateToken () override;
-    void forgetSensitiveData () override;
+    void invalidate_token () override;
+    void forget_sensitive_data () override;
 
     string password ();
 private slots:
-    void slotAuthentication (QNetworkReply *, QAuthenticator *);
+    void slot_authentication (QNetworkReply *, QAuthenticator *);
 
 private:
     string _user;
@@ -51,119 +51,119 @@ private:
 
     namespace {
     
-        const char authenticationFailedC[] = "owncloud-authentication-failed";
+        const char authentication_failed_c[] = "owncloud-authentication-failed";
     
     } // ns
     
-    class TokenCredentialsAccessManager : AccessManager {
+    class Token_credentials_access_manager : AccessManager {
     public:
-        friend class TokenCredentials;
-        TokenCredentialsAccessManager (TokenCredentials *cred, GLib.Object *parent = nullptr)
+        friend class Token_credentials;
+        Token_credentials_access_manager (Token_credentials *cred, GLib.Object *parent = nullptr)
             : AccessManager (parent)
             , _cred (cred) {
         }
     
     protected:
-        QNetworkReply *createRequest (Operation op, QNetworkRequest &request, QIODevice *outgoingData) {
-            if (_cred.user ().isEmpty () || _cred.password ().isEmpty ()) {
-                qCWarning (lcTokenCredentials) << "Empty user/password provided!";
+        QNetworkReply *create_request (Operation op, QNetworkRequest &request, QIODevice *outgoing_data) {
+            if (_cred.user ().is_empty () || _cred.password ().is_empty ()) {
+                q_c_warning (lc_token_credentials) << "Empty user/password provided!";
             }
     
             QNetworkRequest req (request);
     
-            QByteArray credHash = QByteArray (_cred.user ().toUtf8 () + ":" + _cred.password ().toUtf8 ()).toBase64 ();
-            req.setRawHeader (QByteArray ("Authorization"), QByteArray ("Basic ") + credHash);
+            QByteArray cred_hash = QByteArray (_cred.user ().to_utf8 () + ":" + _cred.password ().to_utf8 ()).to_base64 ();
+            req.set_raw_header (QByteArray ("Authorization"), QByteArray ("Basic ") + cred_hash);
     
             // A pre-authenticated cookie
-            QByteArray token = _cred._token.toUtf8 ();
+            QByteArray token = _cred._token.to_utf8 ();
             if (token.length () > 0) {
-                setRawCookie (token, request.url ());
+                set_raw_cookie (token, request.url ());
             }
     
-            return AccessManager.createRequest (op, req, outgoingData);
+            return AccessManager.create_request (op, req, outgoing_data);
         }
     
     private:
-        const TokenCredentials *_cred;
+        const Token_credentials *_cred;
     };
     
-    TokenCredentials.TokenCredentials ()
+    Token_credentials.Token_credentials ()
         : _user ()
         , _password ()
         , _ready (false) {
     }
     
-    TokenCredentials.TokenCredentials (string &user, string &password, string &token)
+    Token_credentials.Token_credentials (string &user, string &password, string &token)
         : _user (user)
         , _password (password)
         , _token (token)
         , _ready (true) {
     }
     
-    string TokenCredentials.authType () {
-        return string.fromLatin1 ("token");
+    string Token_credentials.auth_type () {
+        return string.from_latin1 ("token");
     }
     
-    string TokenCredentials.user () {
+    string Token_credentials.user () {
         return _user;
     }
     
-    string TokenCredentials.password () {
+    string Token_credentials.password () {
         return _password;
     }
     
-    QNetworkAccessManager *TokenCredentials.createQNAM () {
-        AccessManager *qnam = new TokenCredentialsAccessManager (this);
+    QNetworkAccessManager *Token_credentials.create_qNAM () {
+        AccessManager *qnam = new Token_credentials_access_manager (this);
     
-        connect (qnam, SIGNAL (authenticationRequired (QNetworkReply *, QAuthenticator *)),
-            this, SLOT (slotAuthentication (QNetworkReply *, QAuthenticator *)));
+        connect (qnam, SIGNAL (authentication_required (QNetworkReply *, QAuthenticator *)),
+            this, SLOT (slot_authentication (QNetworkReply *, QAuthenticator *)));
     
         return qnam;
     }
     
-    bool TokenCredentials.ready () {
+    bool Token_credentials.ready () {
         return _ready;
     }
     
-    void TokenCredentials.fetchFromKeychain () {
-        _wasFetched = true;
+    void Token_credentials.fetch_from_keychain () {
+        _was_fetched = true;
         Q_EMIT fetched ();
     }
     
-    void TokenCredentials.askFromUser () {
+    void Token_credentials.ask_from_user () {
         emit asked ();
     }
     
-    bool TokenCredentials.stillValid (QNetworkReply *reply) {
+    bool Token_credentials.still_valid (QNetworkReply *reply) {
         return ( (reply.error () != QNetworkReply.AuthenticationRequiredError)
             // returned if user/password or token are incorrect
-            && (reply.error () != QNetworkReply.OperationCanceledError
-                   || !reply.property (authenticationFailedC).toBool ()));
+            && (reply.error () != QNetworkReply.Operation_canceled_error
+                   || !reply.property (authentication_failed_c).to_bool ()));
     }
     
-    void TokenCredentials.invalidateToken () {
-        qCInfo (lcTokenCredentials) << "Invalidating token";
+    void Token_credentials.invalidate_token () {
+        q_c_info (lc_token_credentials) << "Invalidating token";
         _ready = false;
-        _account.clearCookieJar ();
+        _account.clear_cookie_jar ();
         _token = string ();
         _user = string ();
         _password = string ();
     }
     
-    void TokenCredentials.forgetSensitiveData () {
-        invalidateToken ();
+    void Token_credentials.forget_sensitive_data () {
+        invalidate_token ();
     }
     
-    void TokenCredentials.persist () {
+    void Token_credentials.persist () {
     }
     
-    void TokenCredentials.slotAuthentication (QNetworkReply *reply, QAuthenticator *authenticator) {
+    void Token_credentials.slot_authentication (QNetworkReply *reply, QAuthenticator *authenticator) {
         Q_UNUSED (authenticator)
         // we cannot use QAuthenticator, because it sends username and passwords with latin1
         // instead of utf8 encoding. Instead, we send it manually. Thus, if we reach this signal,
         // those credentials were invalid and we terminate.
-        qCWarning (lcTokenCredentials) << "Stop request : Authentication failed for " << reply.url ().toString ();
-        reply.setProperty (authenticationFailedC, true);
+        q_c_warning (lc_token_credentials) << "Stop request : Authentication failed for " << reply.url ().to_string ();
+        reply.set_property (authentication_failed_c, true);
         reply.close ();
     }
     

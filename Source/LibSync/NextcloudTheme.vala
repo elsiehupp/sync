@@ -15,21 +15,21 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 namespace Occ {
 
 /***********************************************************
-@brief The NextcloudTheme class
+@brief The Nextcloud_theme class
 @ingroup libsync
 ***********************************************************/
-class NextcloudTheme : Theme {
+class Nextcloud_theme : Theme {
 public:
-    NextcloudTheme ();
+    Nextcloud_theme ();
 
-    string wizardUrlHint () const override;
+    string wizard_url_hint () const override;
 };
 
-NextcloudTheme.NextcloudTheme ()
+Nextcloud_theme.Nextcloud_theme ()
     : Theme () {
 }
 
-string NextcloudTheme.wizardUrlHint () {
+string Nextcloud_theme.wizard_url_hint () {
     return string ("https://try.nextcloud.com");
 }
 

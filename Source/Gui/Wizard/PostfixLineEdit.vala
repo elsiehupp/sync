@@ -5,10 +5,10 @@ Copyright (C) 2016 by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 // #include <QStyle>
-// #include <QStyleOptionFrame>
+// #include <QStyle_option_frame>
 
 // #include <QLineEdit>
-// #include <QPaintEvent>
+// #include <QPaint_event>
 // #include <QPainter>
 
 namespace Occ {
@@ -19,78 +19,78 @@ namespace Occ {
 Useful e.g. for setting a fixed domain name.
 ***********************************************************/
 
-class PostfixLineEdit : QLineEdit {
+class Postfix_line_edit : QLineEdit {
 public:
-    PostfixLineEdit (Gtk.Widget *parent);
+    Postfix_line_edit (Gtk.Widget *parent);
 
     /***********************************************************
     @brief sets an optional postfix shown greyed out */
     /***********************************************************
-     setPostfix (string &postfix);
+     set_postfix (string &postfix);
     /***********************************************************
     @brief retrives the postfix */
     string postfix ();
     /** @brief retrieves combined text () and postfix () */
-    string fullText ();
+    string full_text ();
 
     /***********************************************************
     @brief sets text () from full text, discarding prefix () */
-    void setFullText (string &text);
+    void set_full_text (string &text);
 
 protected:
-    void paintEvent (QPaintEvent *pe) override;
+    void paint_event (QPaint_event *pe) override;
 
 private:
     string _postfix;
 };
 
-    const int horizontalMargin (4);
-    const int verticalMargin (4);
+    const int horizontal_margin (4);
+    const int vertical_margin (4);
     
-    PostfixLineEdit.PostfixLineEdit (Gtk.Widget *parent)
+    Postfix_line_edit.Postfix_line_edit (Gtk.Widget *parent)
         : QLineEdit (parent) {
     }
     
-    void PostfixLineEdit.setPostfix (string &postfix) {
+    void Postfix_line_edit.set_postfix (string &postfix) {
         _postfix = postfix;
-        QFontMetricsF fm (font ());
-        QMargins tm = textMargins ();
-        tm.setRight (tm.right () + qRound (fm.width (_postfix)) + verticalMargin);
-        setTextMargins (tm);
+        QFont_metrics_f fm (font ());
+        QMargins tm = text_margins ();
+        tm.set_right (tm.right () + q_round (fm.width (_postfix)) + vertical_margin);
+        set_text_margins (tm);
     }
     
-    string PostfixLineEdit.postfix () {
+    string Postfix_line_edit.postfix () {
         return _postfix;
     }
     
-    string PostfixLineEdit.fullText () {
+    string Postfix_line_edit.full_text () {
         return text () + _postfix;
     }
     
-    void PostfixLineEdit.setFullText (string &text) {
-        string prefixString = text;
-        if (prefixString.endsWith (postfix ())) {
-            prefixString.chop (postfix ().length ());
+    void Postfix_line_edit.set_full_text (string &text) {
+        string prefix_string = text;
+        if (prefix_string.ends_with (postfix ())) {
+            prefix_string.chop (postfix ().length ());
         }
-        setText (prefixString);
+        set_text (prefix_string);
     }
     
-    void PostfixLineEdit.paintEvent (QPaintEvent *pe) {
-        QLineEdit.paintEvent (pe);
+    void Postfix_line_edit.paint_event (QPaint_event *pe) {
+        QLineEdit.paint_event (pe);
         QPainter p (this);
     
         //
-        p.setPen (palette ().color (QPalette.Disabled, QPalette.Text));
-        QFontMetricsF fm (font ());
-        int start = rect ().right () - qRound (fm.width (_postfix));
-        QStyleOptionFrame panel;
-        initStyleOption (&panel);
-        QRect r = style ().subElementRect (QStyle.SE_LineEditContents, &panel, this);
-        r.setTop (r.top () + horizontalMargin - 1);
-        QRect postfixRect (r);
+        p.set_pen (palette ().color (QPalette.Disabled, QPalette.Text));
+        QFont_metrics_f fm (font ());
+        int start = rect ().right () - q_round (fm.width (_postfix));
+        QStyle_option_frame panel;
+        init_style_option (&panel);
+        QRect r = style ().sub_element_rect (QStyle.SE_Line_edit_contents, &panel, this);
+        r.set_top (r.top () + horizontal_margin - 1);
+        QRect postfix_rect (r);
     
-        postfixRect.setLeft (start - verticalMargin);
-        p.drawText (postfixRect, _postfix);
+        postfix_rect.set_left (start - vertical_margin);
+        p.draw_text (postfix_rect, _postfix);
     }
     
     } // namespace Occ

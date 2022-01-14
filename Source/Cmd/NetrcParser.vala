@@ -22,93 +22,93 @@ namespace Occ {
 ***********************************************************/
 class NetrcParser {
 
-    public using LoginPair = QPair<string, string>;
+    public using Login_pair = QPair<string, string>;
 
     public NetrcParser (string &file = string ());
     public bool parse ();
-    public LoginPair find (string &machine);
+    public Login_pair find (string &machine);
 
 private:
-    void tryAddEntryAndClear (string &machine, LoginPair &pair, bool &isDefault);
-    QHash<string, LoginPair> _entries;
-    LoginPair _default;
-    string _netrcLocation;
+    void try_add_entry_and_clear (string &machine, Login_pair &pair, bool &is_default);
+    QHash<string, Login_pair> _entries;
+    Login_pair _default;
+    string _netrc_location;
 };
 
 
 
     namespace {
-        string defaultKeyword = QLatin1String ("default");
-        string machineKeyword = QLatin1String ("machine");
-        string loginKeyword = QLatin1String ("login");
-        string passwordKeyword = QLatin1String ("password");
+        string default_keyword = QLatin1String ("default");
+        string machine_keyword = QLatin1String ("machine");
+        string login_keyword = QLatin1String ("login");
+        string password_keyword = QLatin1String ("password");
     }
     
     NetrcParser.NetrcParser (string &file) {
-        _netrcLocation = file;
-        if (_netrcLocation.isEmpty ()) {
-            _netrcLocation = QDir.homePath () + QLatin1String ("/.netrc");
+        _netrc_location = file;
+        if (_netrc_location.is_empty ()) {
+            _netrc_location = QDir.home_path () + QLatin1String ("/.netrc");
         }
     }
     
-    void NetrcParser.tryAddEntryAndClear (string &machine, LoginPair &pair, bool &isDefault) {
-        if (isDefault) {
+    void NetrcParser.try_add_entry_and_clear (string &machine, Login_pair &pair, bool &is_default) {
+        if (is_default) {
             _default = pair;
-        } else if (!machine.isEmpty () && !pair.first.isEmpty ()) {
+        } else if (!machine.is_empty () && !pair.first.is_empty ()) {
             _entries.insert (machine, pair);
         }
-        pair = qMakePair (string (), string ());
+        pair = q_make_pair (string (), string ());
         machine.clear ();
-        isDefault = false;
+        is_default = false;
     }
     
     bool NetrcParser.parse () {
-        QFile netrc (_netrcLocation);
-        if (!netrc.open (QIODevice.ReadOnly)) {
+        QFile netrc (_netrc_location);
+        if (!netrc.open (QIODevice.Read_only)) {
             return false;
         }
-        string content = netrc.readAll ();
+        string content = netrc.read_all ();
     
         QStringTokenizer tokenizer (content, " \n\t");
-        tokenizer.setQuoteCharacters ("\"'");
+        tokenizer.set_quote_characters ("\"'");
     
-        LoginPair pair;
+        Login_pair pair;
         string machine;
-        bool isDefault = false;
-        while (tokenizer.hasNext ()) {
+        bool is_default = false;
+        while (tokenizer.has_next ()) {
             string key = tokenizer.next ();
-            if (key == defaultKeyword) {
-                tryAddEntryAndClear (machine, pair, isDefault);
-                isDefault = true;
+            if (key == default_keyword) {
+                try_add_entry_and_clear (machine, pair, is_default);
+                is_default = true;
                 continue; // don't read a value
             }
     
-            if (!tokenizer.hasNext ()) {
-                qDebug () << "error fetching value for" << key;
+            if (!tokenizer.has_next ()) {
+                q_debug () << "error fetching value for" << key;
                 return false;
             }
             string value = tokenizer.next ();
     
-            if (key == machineKeyword) {
-                tryAddEntryAndClear (machine, pair, isDefault);
+            if (key == machine_keyword) {
+                try_add_entry_and_clear (machine, pair, is_default);
                 machine = value;
-            } else if (key == loginKeyword) {
+            } else if (key == login_keyword) {
                 pair.first = value;
-            } else if (key == passwordKeyword) {
+            } else if (key == password_keyword) {
                 pair.second = value;
             } // ignore unsupported tokens
         }
-        tryAddEntryAndClear (machine, pair, isDefault);
+        try_add_entry_and_clear (machine, pair, is_default);
     
-        if (!_entries.isEmpty () || _default != qMakePair (string (), string ())) {
+        if (!_entries.is_empty () || _default != q_make_pair (string (), string ())) {
             return true;
         } else {
             return false;
         }
     }
     
-    NetrcParser.LoginPair NetrcParser.find (string &machine) {
-        QHash<string, LoginPair>.const_iterator it = _entries.find (machine);
+    NetrcParser.Login_pair NetrcParser.find (string &machine) {
+        QHash<string, Login_pair>.Const_iterator it = _entries.find (machine);
         if (it != _entries.end ()) {
             return *it;
         } else {

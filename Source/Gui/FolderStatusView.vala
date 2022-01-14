@@ -9,33 +9,33 @@ Copyright (C) 2018 by J-P Nurmi <jpnurmi@gmail.com>
 namespace Occ {
 
 /***********************************************************
-@brief The FolderStatusView class
+@brief The Folder_status_view class
 @ingroup gui
 ***********************************************************/
-class FolderStatusView : QTreeView {
+class Folder_status_view : QTreeView {
 
 public:
-    FolderStatusView (Gtk.Widget *parent = nullptr);
+    Folder_status_view (Gtk.Widget *parent = nullptr);
 
-    QModelIndex indexAt (QPoint &point) const override;
-    QRect visualRect (QModelIndex &index) const override;
+    QModelIndex index_at (QPoint &point) const override;
+    QRect visual_rect (QModelIndex &index) const override;
 };
 
-    FolderStatusView.FolderStatusView (Gtk.Widget *parent) : QTreeView (parent) {
+    Folder_status_view.Folder_status_view (Gtk.Widget *parent) : QTreeView (parent) {
     }
     
-    QModelIndex FolderStatusView.indexAt (QPoint &point) {
-        QModelIndex index = QTreeView.indexAt (point);
-        if (index.data (FolderStatusDelegate.AddButton).toBool () && !visualRect (index).contains (point)) {
+    QModelIndex Folder_status_view.index_at (QPoint &point) {
+        QModelIndex index = QTreeView.index_at (point);
+        if (index.data (FolderStatusDelegate.AddButton).to_bool () && !visual_rect (index).contains (point)) {
             return {};
         }
         return index;
     }
     
-    QRect FolderStatusView.visualRect (QModelIndex &index) {
-        QRect rect = QTreeView.visualRect (index);
-        if (index.data (FolderStatusDelegate.AddButton).toBool ()) {
-            return FolderStatusDelegate.addButtonRect (rect, layoutDirection ());
+    QRect Folder_status_view.visual_rect (QModelIndex &index) {
+        QRect rect = QTreeView.visual_rect (index);
+        if (index.data (FolderStatusDelegate.AddButton).to_bool ()) {
+            return FolderStatusDelegate.add_button_rect (rect, layout_direction ());
         }
         return rect;
     }

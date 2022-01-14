@@ -4,7 +4,7 @@ Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QHttpPart>
+// #include <QHttp_part>
 
 // #pragma once
 
@@ -14,108 +14,108 @@ Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
 // #include <QUrl>
 // #include <string>
 // #include <QElapsedTimer>
-// #include <QHttpMultiPart>
+// #include <QHttp_multi_part>
 // #include <memory>
 
 
 namespace Occ {
 
-Q_DECLARE_LOGGING_CATEGORY (lcPutMultiFileJob)
+Q_DECLARE_LOGGING_CATEGORY (lc_put_multi_file_job)
 
-struct SingleUploadFileData {
-    std.unique_ptr<UploadDevice> _device;
+struct Single_upload_file_data {
+    std.unique_ptr<Upload_device> _device;
     QMap<QByteArray, QByteArray> _headers;
 };
 
 /***********************************************************
-@brief The PutMultiFileJob class
+@brief The Put_multi_file_job class
 @ingroup libsync
 ***********************************************************/
-class PutMultiFileJob : AbstractNetworkJob {
+class Put_multi_file_job : AbstractNetworkJob {
 
 public:
-    PutMultiFileJob (AccountPtr account, QUrl &url,
-                             std.vector<SingleUploadFileData> devices, GLib.Object *parent = nullptr)
+    Put_multi_file_job (AccountPtr account, QUrl &url,
+                             std.vector<Single_upload_file_data> devices, GLib.Object *parent = nullptr)
         : AbstractNetworkJob (account, {}, parent)
         , _devices (std.move (devices))
         , _url (url) {
-        _body.setContentType (QHttpMultiPart.RelatedType);
-        for (auto &singleDevice : _devices) {
-            singleDevice._device.setParent (this);
-            connect (this, &PutMultiFileJob.uploadProgress,
-                    singleDevice._device.get (), &UploadDevice.slotJobUploadProgress);
+        _body.set_content_type (QHttp_multi_part.Related_type);
+        for (auto &single_device : _devices) {
+            single_device._device.set_parent (this);
+            connect (this, &Put_multi_file_job.upload_progress,
+                    single_device._device.get (), &Upload_device.slot_job_upload_progress);
         }
     }
 
-    ~PutMultiFileJob () override;
+    ~Put_multi_file_job () override;
 
     void start () override;
 
     bool finished () override;
 
-    string errorString () const override {
-        return _errorString.isEmpty () ? AbstractNetworkJob.errorString () : _errorString;
+    string error_string () const override {
+        return _error_string.is_empty () ? AbstractNetworkJob.error_string () : _error_string;
     }
 
-    std.chrono.milliseconds msSinceStart () {
-        return std.chrono.milliseconds (_requestTimer.elapsed ());
+    std.chrono.milliseconds ms_since_start () {
+        return std.chrono.milliseconds (_request_timer.elapsed ());
     }
 
 signals:
-    void finishedSignal ();
-    void uploadProgress (int64, int64);
+    void finished_signal ();
+    void upload_progress (int64, int64);
 
 private:
-    QHttpMultiPart _body;
-    std.vector<SingleUploadFileData> _devices;
-    string _errorString;
+    QHttp_multi_part _body;
+    std.vector<Single_upload_file_data> _devices;
+    string _error_string;
     QUrl _url;
-    QElapsedTimer _requestTimer;
+    QElapsedTimer _request_timer;
 };
 
 
-    PutMultiFileJob.~PutMultiFileJob () = default;
+    Put_multi_file_job.~Put_multi_file_job () = default;
     
-    void PutMultiFileJob.start () {
+    void Put_multi_file_job.start () {
         QNetworkRequest req;
     
-        for (auto &oneDevice : _devices) {
-            auto onePart = QHttpPart{};
+        for (auto &one_device : _devices) {
+            auto one_part = QHttp_part{};
     
-            onePart.setBodyDevice (oneDevice._device.get ());
+            one_part.set_body_device (one_device._device.get ());
     
-            for (QMap<QByteArray, QByteArray>.const_iterator it = oneDevice._headers.begin (); it != oneDevice._headers.end (); ++it) {
-                onePart.setRawHeader (it.key (), it.value ());
+            for (QMap<QByteArray, QByteArray>.Const_iterator it = one_device._headers.begin (); it != one_device._headers.end (); ++it) {
+                one_part.set_raw_header (it.key (), it.value ());
             }
     
-            req.setPriority (QNetworkRequest.LowPriority); // Long uploads must not block non-propagation jobs.
+            req.set_priority (QNetworkRequest.Low_priority); // Long uploads must not block non-propagation jobs.
     
-            _body.append (onePart);
+            _body.append (one_part);
         }
     
-        sendRequest ("POST", _url, req, &_body);
+        send_request ("POST", _url, req, &_body);
     
         if (reply ().error () != QNetworkReply.NoError) {
-            qCWarning (lcPutMultiFileJob) << " Network error : " << reply ().errorString ();
+            q_c_warning (lc_put_multi_file_job) << " Network error : " << reply ().error_string ();
         }
     
-        connect (reply (), &QNetworkReply.uploadProgress, this, &PutMultiFileJob.uploadProgress);
-        connect (this, &AbstractNetworkJob.networkActivity, account ().data (), &Account.propagatorNetworkActivity);
-        _requestTimer.start ();
+        connect (reply (), &QNetworkReply.upload_progress, this, &Put_multi_file_job.upload_progress);
+        connect (this, &AbstractNetworkJob.network_activity, account ().data (), &Account.propagator_network_activity);
+        _request_timer.start ();
         AbstractNetworkJob.start ();
     }
     
-    bool PutMultiFileJob.finished () {
-        for (auto &oneDevice : _devices) {
-            oneDevice._device.close ();
+    bool Put_multi_file_job.finished () {
+        for (auto &one_device : _devices) {
+            one_device._device.close ();
         }
     
-        qCInfo (lcPutMultiFileJob) << "POST of" << reply ().request ().url ().toString () << path () << "FINISHED WITH STATUS"
-                         << replyStatusString ()
+        q_c_info (lc_put_multi_file_job) << "POST of" << reply ().request ().url ().to_string () << path () << "FINISHED WITH STATUS"
+                         << reply_status_string ()
                          << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute)
-                         << reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute);
+                         << reply ().attribute (QNetworkRequest.Http_reason_phrase_attribute);
     
-        emit finishedSignal ();
+        emit finished_signal ();
         return true;
     }
     

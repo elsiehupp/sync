@@ -8,90 +8,90 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 // #include <QLabel>
 // #include <QPixmap>
 // #include <QVariant>
-// #include <QRadioButton>
+// #include <QRadio_button>
 // #include <QAbstractButton>
 // #include <QCheckBox>
-// #include <QSpinBox>
+// #include <QSpin_box>
 
 // #include <string>
 
-class QSpinBox;
+class QSpin_box;
 
 namespace Occ {
 
-namespace WizardCommon {
+namespace Wizard_common {
 
-    void setupCustomMedia (QVariant &variant, QLabel *label);
-    string titleTemplate ();
-    string subTitleTemplate ();
-    void initErrorLabel (QLabel *errorLabel);
-    void customizeHintLabel (QLabel *label);
+    void setup_custom_media (QVariant &variant, QLabel *label);
+    string title_template ();
+    string sub_title_template ();
+    void init_error_label (QLabel *error_label);
+    void customize_hint_label (QLabel *label);
 
-    enum SyncMode {
-        SelectiveMode,
-        BoxMode
+    enum Sync_mode {
+        Selective_mode,
+        Box_mode
     };
 
     enum Pages {
         Page_Welcome,
-        Page_ServerSetup,
-        Page_HttpCreds,
-        Page_OAuthCreds,
-        Page_Flow2AuthCreds,
+        Page_Server_setup,
+        Page_Http_creds,
+        Page_OAuth_creds,
+        Page_Flow2Auth_creds,
 #ifdef WITH_WEBENGINE
-        Page_WebView,
+        Page_Web_view,
 #endif // WITH_WEBENGINE
-        Page_AdvancedSetup,
+        Page_Advanced_setup,
     };
 
-    void setupCustomMedia (QVariant &variant, QLabel *label) {
+    void setup_custom_media (QVariant &variant, QLabel *label) {
         if (!label)
             return;
 
         QPixmap pix = variant.value<QPixmap> ();
-        if (!pix.isNull ()) {
-            label.setPixmap (pix);
-            label.setAlignment (Qt.AlignTop | Qt.AlignRight);
-            label.setVisible (true);
+        if (!pix.is_null ()) {
+            label.set_pixmap (pix);
+            label.set_alignment (Qt.Align_top | Qt.Align_right);
+            label.set_visible (true);
         } else {
-            string str = variant.toString ();
-            if (!str.isEmpty ()) {
-                label.setText (str);
-                label.setTextFormat (Qt.RichText);
-                label.setVisible (true);
-                label.setOpenExternalLinks (true);
+            string str = variant.to_string ();
+            if (!str.is_empty ()) {
+                label.set_text (str);
+                label.set_text_format (Qt.RichText);
+                label.set_visible (true);
+                label.set_open_external_links (true);
             }
         }
     }
 
-    string titleTemplate () {
-        return string.fromLatin1 (R" (<font color="%1" size="5">)").arg (Theme.instance ().wizardHeaderTitleColor ().name ()) + string.fromLatin1 ("%1</font>");
+    string title_template () {
+        return string.from_latin1 (R" (<font color="%1" size="5">)").arg (Theme.instance ().wizard_header_title_color ().name ()) + string.from_latin1 ("%1</font>");
     }
 
-    string subTitleTemplate () {
-        return string.fromLatin1 ("<font color=\"%1\">").arg (Theme.instance ().wizardHeaderTitleColor ().name ()) + string.fromLatin1 ("%1</font>");
+    string sub_title_template () {
+        return string.from_latin1 ("<font color=\"%1\">").arg (Theme.instance ().wizard_header_title_color ().name ()) + string.from_latin1 ("%1</font>");
     }
 
-    void initErrorLabel (QLabel *errorLabel) {
+    void init_error_label (QLabel *error_label) {
         string style = QLatin1String ("border : 1px solid #eed3d7; border-radius : 5px; padding : 3px;"
                                         "background-color : #f2dede; color : #b94a48;");
 
-        errorLabel.setStyleSheet (style);
-        errorLabel.setWordWrap (true);
-        auto sizePolicy = errorLabel.sizePolicy ();
-        sizePolicy.setRetainSizeWhenHidden (true);
-        errorLabel.setSizePolicy (sizePolicy);
-        errorLabel.setVisible (false);
+        error_label.set_style_sheet (style);
+        error_label.set_word_wrap (true);
+        auto size_policy = error_label.size_policy ();
+        size_policy.set_retain_size_when_hidden (true);
+        error_label.set_size_policy (size_policy);
+        error_label.set_visible (false);
     }
 
-    void customizeHintLabel (QLabel *label) {
+    void customize_hint_label (QLabel *label) {
         auto palette = label.palette ();
-        QColor textColor = palette.color (QPalette.Text);
-        textColor.setAlpha (128);
-        palette.setColor (QPalette.Text, textColor);
-        label.setPalette (palette);
+        QColor text_color = palette.color (QPalette.Text);
+        text_color.set_alpha (128);
+        palette.set_color (QPalette.Text, text_color);
+        label.set_palette (palette);
     }
 
-} // ns WizardCommon
+} // ns Wizard_common
 
 } // namespace Occ

@@ -5,12 +5,12 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 ***********************************************************/
 
 // #include <QBuffer>
-// #include <QFileIconProvider>
+// #include <QFile_icon_provider>
 // #include <QClipboard>
 // #include <QFileInfo>
-// #include <QAbstractProxyModel>
+// #include <QAbstract_proxy_model>
 // #include <QCompleter>
-// #include <QBoxLayout>
+// #include <QBox_layout>
 // #include <QIcon>
 // #include <QLayout>
 // #include <QPropertyAnimation>
@@ -22,10 +22,10 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 // #include <QCryptographicHash>
 // #include <QColor>
 // #include <QPainter>
-// #include <QListWidget>
-// #include <QSvgRenderer>
+// #include <QList_widget>
+// #include <QSvg_renderer>
 // #include <QPushButton>
-// #include <QContextMenuEvent>
+// #include <QContext_menu_event>
 
 // #include <cstring>
 
@@ -39,505 +39,505 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 // #include <qscrollarea.h>
 
 namespace {
-    const char *passwordIsSetPlaceholder = "●●●●●●●●";
+    const char *password_is_set_placeholder = "●●●●●●●●";
     
 }
 
 namespace Occ {
 
 namespace Ui {
-    class ShareUserGroupWidget;
-    class ShareUserLine;
+    class Share_user_group_widget;
+    class Share_user_line;
 }
 
-class ShareManager;
+class Share_manager;
 
-class AvatarEventFilter : GLib.Object {
+class Avatar_event_filter : GLib.Object {
 
 public:
-    AvatarEventFilter (GLib.Object *parent = nullptr);
+    Avatar_event_filter (GLib.Object *parent = nullptr);
 
 signals:
     void clicked ();
-    void contextMenu (QPoint &globalPosition);
+    void context_menu (QPoint &global_position);
 
 protected:
-    bool eventFilter (GLib.Object *obj, QEvent *event) override;
+    bool event_filter (GLib.Object *obj, QEvent *event) override;
 };
 
 /***********************************************************
-@brief The ShareDialog (user/group) class
+@brief The Share_dialog (user/group) class
 @ingroup gui
 ***********************************************************/
-class ShareUserGroupWidget : Gtk.Widget {
+class Share_user_group_widget : Gtk.Widget {
 
 public:
-    ShareUserGroupWidget (AccountPtr account,
-        const string &sharePath,
-        const string &localPath,
-        SharePermissions maxSharingPermissions,
-        const string &privateLinkUrl,
+    Share_user_group_widget (AccountPtr account,
+        const string &share_path,
+        const string &local_path,
+        Share_permissions max_sharing_permissions,
+        const string &private_link_url,
         Gtk.Widget *parent = nullptr);
-    ~ShareUserGroupWidget () override;
+    ~Share_user_group_widget () override;
 
 signals:
-    void togglePublicLinkShare (bool);
-    void styleChanged ();
+    void toggle_public_link_share (bool);
+    void style_changed ();
 
 public slots:
-    void getShares ();
-    void slotShareCreated (QSharedPointer<Share> &share);
-    void slotStyleChanged ();
+    void get_shares ();
+    void slot_share_created (QSharedPointer<Share> &share);
+    void slot_style_changed ();
 
 private slots:
-    void slotSharesFetched (QList<QSharedPointer<Share>> &shares);
+    void slot_shares_fetched (QList<QSharedPointer<Share>> &shares);
 
-    void on_shareeLineEdit_textChanged (string &text);
-    void searchForSharees (ShareeModel.LookupMode lookupMode);
-    void slotLineEditTextEdited (string &text);
+    void on_sharee_line_edit_text_changed (string &text);
+    void search_for_sharees (Sharee_model.Lookup_mode lookup_mode);
+    void slot_line_edit_text_edited (string &text);
 
-    void slotLineEditReturn ();
-    void slotCompleterActivated (QModelIndex &index);
-    void slotCompleterHighlighted (QModelIndex &index);
-    void slotShareesReady ();
-    void slotAdjustScrollWidgetSize ();
-    void slotPrivateLinkShare ();
-    void displayError (int code, string &message);
+    void slot_line_edit_return ();
+    void slot_completer_activated (QModelIndex &index);
+    void slot_completer_highlighted (QModelIndex &index);
+    void slot_sharees_ready ();
+    void slot_adjust_scroll_widget_size ();
+    void slot_private_link_share ();
+    void display_error (int code, string &message);
 
-    void slotPrivateLinkOpenBrowser ();
-    void slotPrivateLinkCopy ();
-    void slotPrivateLinkEmail ();
+    void slot_private_link_open_browser ();
+    void slot_private_link_copy ();
+    void slot_private_link_email ();
 
 private:
-    void customizeStyle ();
+    void customize_style ();
 
-    void activateShareeLineEdit ();
+    void activate_sharee_line_edit ();
 
-    Ui.ShareUserGroupWidget *_ui;
-    QScrollArea *_parentScrollArea;
+    Ui.Share_user_group_widget *_ui;
+    QScroll_area *_parent_scroll_area;
     AccountPtr _account;
-    string _sharePath;
-    string _localPath;
-    SharePermissions _maxSharingPermissions;
-    string _privateLinkUrl;
+    string _share_path;
+    string _local_path;
+    Share_permissions _max_sharing_permissions;
+    string _private_link_url;
 
     QCompleter *_completer;
-    ShareeModel *_completerModel;
-    QTimer _completionTimer;
+    Sharee_model *_completer_model;
+    QTimer _completion_timer;
 
-    bool _isFile;
-    bool _disableCompleterActivated; // in order to avoid that we share the contents twice
-    ShareManager *_manager;
+    bool _is_file;
+    bool _disable_completer_activated; // in order to avoid that we share the contents twice
+    Share_manager *_manager;
 
-    QProgressIndicator _pi_sharee;
+    QProgress_indicator _pi_sharee;
 
-    string _lastCreatedShareId;
+    string _last_created_share_id;
 };
 
 /***********************************************************
 The widget displayed for each user/group share
 ***********************************************************/
-class ShareUserLine : Gtk.Widget {
+class Share_user_line : Gtk.Widget {
 
 public:
-    ShareUserLine (AccountPtr account,
-        QSharedPointer<UserGroupShare> Share,
-        SharePermissions maxSharingPermissions,
-        bool isFile,
+    Share_user_line (AccountPtr account,
+        QSharedPointer<User_group_share> Share,
+        Share_permissions max_sharing_permissions,
+        bool is_file,
         Gtk.Widget *parent = nullptr);
-    ~ShareUserLine () override;
+    ~Share_user_line () override;
 
     QSharedPointer<Share> share ();
 
 signals:
-    void visualDeletionDone ();
-    void resizeRequested ();
+    void visual_deletion_done ();
+    void resize_requested ();
 
 public slots:
-    void slotStyleChanged ();
+    void slot_style_changed ();
 
-    void focusPasswordLineEdit ();
+    void focus_password_line_edit ();
 
 private slots:
-    void on_deleteShareButton_clicked ();
-    void slotPermissionsChanged ();
-    void slotEditPermissionsChanged ();
-    void slotPasswordCheckboxChanged ();
-    void slotDeleteAnimationFinished ();
+    void on_delete_share_button_clicked ();
+    void slot_permissions_changed ();
+    void slot_edit_permissions_changed ();
+    void slot_password_checkbox_changed ();
+    void slot_delete_animation_finished ();
 
-    void refreshPasswordOptions ();
+    void refresh_password_options ();
 
-    void refreshPasswordLineEditPlaceholder ();
+    void refresh_password_line_edit_placeholder ();
 
-    void slotPasswordSet ();
-    void slotPasswordSetError (int statusCode, string &message);
+    void slot_password_set ();
+    void slot_password_set_error (int status_code, string &message);
 
-    void slotShareDeleted ();
-    void slotPermissionsSet ();
+    void slot_share_deleted ();
+    void slot_permissions_set ();
 
-    void slotAvatarLoaded (QImage avatar);
+    void slot_avatar_loaded (QImage avatar);
 
-    void setPasswordConfirmed ();
+    void set_password_confirmed ();
 
-    void slotLineEditPasswordReturnPressed ();
+    void slot_line_edit_password_return_pressed ();
 
-    void slotConfirmPasswordClicked ();
+    void slot_confirm_password_clicked ();
 
-    void onAvatarContextMenu (QPoint &globalPosition);
+    void on_avatar_context_menu (QPoint &global_position);
 
 private:
-    void displayPermissions ();
-    void loadAvatar ();
-    void setDefaultAvatar (int avatarSize);
-    void customizeStyle ();
+    void display_permissions ();
+    void load_avatar ();
+    void set_default_avatar (int avatar_size);
+    void customize_style ();
 
-    QPixmap pixmapForShareeType (Sharee.Type type, QColor &backgroundColor = QColor ()) const;
-    QColor backgroundColorForShareeType (Sharee.Type type) const;
+    QPixmap pixmap_for_sharee_type (Sharee.Type type, QColor &background_color = QColor ()) const;
+    QColor background_color_for_sharee_type (Sharee.Type type) const;
 
-  void showNoteOptions (bool show);
-  void toggleNoteOptions (bool enable);
-  void onNoteConfirmButtonClicked ();
-  void setNote (string &note);
+  void show_note_options (bool show);
+  void toggle_note_options (bool enable);
+  void on_note_confirm_button_clicked ();
+  void set_note (string &note);
 
-  void toggleExpireDateOptions (bool enable);
-  void showExpireDateOptions (bool show, QDate &initialDate = QDate ());
-  void setExpireDate ();
+  void toggle_expire_date_options (bool enable);
+  void show_expire_date_options (bool show, QDate &initial_date = QDate ());
+  void set_expire_date ();
 
-  void togglePasswordSetProgressAnimation (bool show);
+  void toggle_password_set_progress_animation (bool show);
 
-  void enableProgessIndicatorAnimation (bool enable);
-  void disableProgessIndicatorAnimation ();
+  void enable_progess_indicator_animation (bool enable);
+  void disable_progess_indicator_animation ();
 
-  QDate maxExpirationDateForShare (Share.ShareType type, QDate &fallbackDate) const;
-  bool enforceExpirationDateForShare (Share.ShareType type) const;
+  QDate max_expiration_date_for_share (Share.Share_type type, QDate &fallback_date) const;
+  bool enforce_expiration_date_for_share (Share.Share_type type) const;
 
-  Ui.ShareUserLine *_ui;
+  Ui.Share_user_line *_ui;
   AccountPtr _account;
-  QSharedPointer<UserGroupShare> _share;
-  bool _isFile;
+  QSharedPointer<User_group_share> _share;
+  bool _is_file;
 
-  ProfilePageMenu _profilePageMenu;
+  Profile_page_menu _profile_page_menu;
 
-  // _permissionEdit is a checkbox
-  QAction *_permissionReshare;
-  QAction *_deleteShareButton;
-  QAction *_permissionCreate;
-  QAction *_permissionChange;
-  QAction *_permissionDelete;
-  QAction *_noteLinkAction;
-  QAction *_expirationDateLinkAction;
-  QAction *_passwordProtectLinkAction;
+  // _permission_edit is a checkbox
+  QAction *_permission_reshare;
+  QAction *_delete_share_button;
+  QAction *_permission_create;
+  QAction *_permission_change;
+  QAction *_permission_delete;
+  QAction *_note_link_action;
+  QAction *_expiration_date_link_action;
+  QAction *_password_protect_link_action;
 };
 
     
-    AvatarEventFilter.AvatarEventFilter (GLib.Object *parent)
+    Avatar_event_filter.Avatar_event_filter (GLib.Object *parent)
         : GLib.Object (parent) {
     }
     
-    bool AvatarEventFilter.eventFilter (GLib.Object *obj, QEvent *event) {
-        if (event.type () == QEvent.ContextMenu) {
-            const auto contextMenuEvent = dynamic_cast<QContextMenuEvent> (event);
-            if (!contextMenuEvent) {
+    bool Avatar_event_filter.event_filter (GLib.Object *obj, QEvent *event) {
+        if (event.type () == QEvent.Context_menu) {
+            const auto context_menu_event = dynamic_cast<QContext_menu_event> (event);
+            if (!context_menu_event) {
                 return false;
             }
-            emit contextMenu (contextMenuEvent.globalPos ());
+            emit context_menu (context_menu_event.global_pos ());
             return true;
         }
-        return GLib.Object.eventFilter (obj, event);
+        return GLib.Object.event_filter (obj, event);
     }
     
-    ShareUserGroupWidget.ShareUserGroupWidget (AccountPtr account,
-        const string &sharePath,
-        const string &localPath,
-        SharePermissions maxSharingPermissions,
-        const string &privateLinkUrl,
+    Share_user_group_widget.Share_user_group_widget (AccountPtr account,
+        const string &share_path,
+        const string &local_path,
+        Share_permissions max_sharing_permissions,
+        const string &private_link_url,
         Gtk.Widget *parent)
         : Gtk.Widget (parent)
-        , _ui (new Ui.ShareUserGroupWidget)
+        , _ui (new Ui.Share_user_group_widget)
         , _account (account)
-        , _sharePath (sharePath)
-        , _localPath (localPath)
-        , _maxSharingPermissions (maxSharingPermissions)
-        , _privateLinkUrl (privateLinkUrl)
-        , _disableCompleterActivated (false) {
-        setAttribute (Qt.WA_DeleteOnClose);
-        setObjectName ("SharingDialogUG"); // required as group for saveGeometry call
+        , _share_path (share_path)
+        , _local_path (local_path)
+        , _max_sharing_permissions (max_sharing_permissions)
+        , _private_link_url (private_link_url)
+        , _disable_completer_activated (false) {
+        set_attribute (Qt.WA_DeleteOnClose);
+        set_object_name ("Sharing_dialog_uG"); // required as group for save_geometry call
     
-        _ui.setupUi (this);
+        _ui.setup_ui (this);
     
         //Is this a file or folder?
-        _isFile = QFileInfo (localPath).isFile ();
+        _is_file = QFileInfo (local_path).is_file ();
     
         _completer = new QCompleter (this);
-        _completerModel = new ShareeModel (_account,
-            _isFile ? QLatin1String ("file") : QLatin1String ("folder"),
+        _completer_model = new Sharee_model (_account,
+            _is_file ? QLatin1String ("file") : QLatin1String ("folder"),
             _completer);
-        connect (_completerModel, &ShareeModel.shareesReady, this, &ShareUserGroupWidget.slotShareesReady);
-        connect (_completerModel, &ShareeModel.displayErrorMessage, this, &ShareUserGroupWidget.displayError);
+        connect (_completer_model, &Sharee_model.sharees_ready, this, &Share_user_group_widget.slot_sharees_ready);
+        connect (_completer_model, &Sharee_model.display_error_message, this, &Share_user_group_widget.display_error);
     
-        _completer.setModel (_completerModel);
-        _completer.setCaseSensitivity (Qt.CaseInsensitive);
-        _completer.setCompletionMode (QCompleter.UnfilteredPopupCompletion);
-        _ui.shareeLineEdit.setCompleter (_completer);
+        _completer.set_model (_completer_model);
+        _completer.set_case_sensitivity (Qt.CaseInsensitive);
+        _completer.set_completion_mode (QCompleter.Unfiltered_popup_completion);
+        _ui.sharee_line_edit.set_completer (_completer);
     
-        auto searchGloballyAction = new QAction (_ui.shareeLineEdit);
-        searchGloballyAction.setIcon (QIcon (":/client/theme/magnifying-glass.svg"));
-        searchGloballyAction.setToolTip (tr ("Search globally"));
+        auto search_globally_action = new QAction (_ui.sharee_line_edit);
+        search_globally_action.set_icon (QIcon (":/client/theme/magnifying-glass.svg"));
+        search_globally_action.set_tool_tip (tr ("Search globally"));
     
-        connect (searchGloballyAction, &QAction.triggered, this, [this] () {
-            searchForSharees (ShareeModel.GlobalSearch);
+        connect (search_globally_action, &QAction.triggered, this, [this] () {
+            search_for_sharees (Sharee_model.Global_search);
         });
     
-        _ui.shareeLineEdit.addAction (searchGloballyAction, QLineEdit.LeadingPosition);
+        _ui.sharee_line_edit.add_action (search_globally_action, QLineEdit.Leading_position);
     
-        _manager = new ShareManager (_account, this);
-        connect (_manager, &ShareManager.sharesFetched, this, &ShareUserGroupWidget.slotSharesFetched);
-        connect (_manager, &ShareManager.shareCreated, this, &ShareUserGroupWidget.slotShareCreated);
-        connect (_manager, &ShareManager.serverError, this, &ShareUserGroupWidget.displayError);
-        connect (_ui.shareeLineEdit, &QLineEdit.returnPressed, this, &ShareUserGroupWidget.slotLineEditReturn);
-        connect (_ui.confirmShare, &QAbstractButton.clicked, this, &ShareUserGroupWidget.slotLineEditReturn);
-        //TODO connect (_ui.privateLinkText, &QLabel.linkActivated, this, &ShareUserGroupWidget.slotPrivateLinkShare);
+        _manager = new Share_manager (_account, this);
+        connect (_manager, &Share_manager.shares_fetched, this, &Share_user_group_widget.slot_shares_fetched);
+        connect (_manager, &Share_manager.share_created, this, &Share_user_group_widget.slot_share_created);
+        connect (_manager, &Share_manager.server_error, this, &Share_user_group_widget.display_error);
+        connect (_ui.sharee_line_edit, &QLineEdit.return_pressed, this, &Share_user_group_widget.slot_line_edit_return);
+        connect (_ui.confirm_share, &QAbstractButton.clicked, this, &Share_user_group_widget.slot_line_edit_return);
+        //TODO connect (_ui.private_link_text, &QLabel.link_activated, this, &Share_user_group_widget.slot_private_link_share);
     
-        // By making the next two QueuedConnections we can override
+        // By making the next two Queued_connections we can override
         // the strings the completer sets on the line edit.
-        connect (_completer, SIGNAL (activated (QModelIndex)), SLOT (slotCompleterActivated (QModelIndex)),
+        connect (_completer, SIGNAL (activated (QModelIndex)), SLOT (slot_completer_activated (QModelIndex)),
             Qt.QueuedConnection);
-        connect (_completer, SIGNAL (highlighted (QModelIndex)), SLOT (slotCompleterHighlighted (QModelIndex)),
+        connect (_completer, SIGNAL (highlighted (QModelIndex)), SLOT (slot_completer_highlighted (QModelIndex)),
             Qt.QueuedConnection);
     
-        // Queued connection so this signal is recieved after textChanged
-        connect (_ui.shareeLineEdit, &QLineEdit.textEdited,
-            this, &ShareUserGroupWidget.slotLineEditTextEdited, Qt.QueuedConnection);
-        _ui.shareeLineEdit.installEventFilter (this);
-        connect (&_completionTimer, &QTimer.timeout, this, [this] () {
-            searchForSharees (ShareeModel.LocalSearch);
+        // Queued connection so this signal is recieved after text_changed
+        connect (_ui.sharee_line_edit, &QLineEdit.text_edited,
+            this, &Share_user_group_widget.slot_line_edit_text_edited, Qt.QueuedConnection);
+        _ui.sharee_line_edit.install_event_filter (this);
+        connect (&_completion_timer, &QTimer.timeout, this, [this] () {
+            search_for_sharees (Sharee_model.Local_search);
         });
-        _completionTimer.setSingleShot (true);
-        _completionTimer.setInterval (600);
+        _completion_timer.set_single_shot (true);
+        _completion_timer.set_interval (600);
     
-        _ui.errorLabel.hide ();
+        _ui.error_label.hide ();
     
         // TODO Progress Indicator where should it go?
         // Setup the sharee search progress indicator
-        //_ui.shareeHorizontalLayout.addWidget (&_pi_sharee);
+        //_ui.sharee_horizontal_layout.add_widget (&_pi_sharee);
     
-        _parentScrollArea = parentWidget ().findChild<QScrollArea> ("scrollArea");
+        _parent_scroll_area = parent_widget ().find_child<QScroll_area> ("scroll_area");
     
-        customizeStyle ();
+        customize_style ();
     }
     
-    ShareUserGroupWidget.~ShareUserGroupWidget () {
+    Share_user_group_widget.~Share_user_group_widget () {
         delete _ui;
     }
     
-    void ShareUserGroupWidget.on_shareeLineEdit_textChanged (string &) {
-        _completionTimer.stop ();
-        emit togglePublicLinkShare (false);
+    void Share_user_group_widget.on_sharee_line_edit_text_changed (string &) {
+        _completion_timer.stop ();
+        emit toggle_public_link_share (false);
     }
     
-    void ShareUserGroupWidget.slotLineEditTextEdited (string &text) {
-        _disableCompleterActivated = false;
-        // First textChanged is called first and we stopped the timer when the text is changed, programatically or not
+    void Share_user_group_widget.slot_line_edit_text_edited (string &text) {
+        _disable_completer_activated = false;
+        // First text_changed is called first and we stopped the timer when the text is changed, programatically or not
         // Then we restart the timer here if the user touched a key
-        if (!text.isEmpty ()) {
-            _completionTimer.start ();
-            emit togglePublicLinkShare (true);
+        if (!text.is_empty ()) {
+            _completion_timer.start ();
+            emit toggle_public_link_share (true);
         }
     }
     
-    void ShareUserGroupWidget.slotLineEditReturn () {
-        _disableCompleterActivated = false;
+    void Share_user_group_widget.slot_line_edit_return () {
+        _disable_completer_activated = false;
         // did the user type in one of the options?
-        const auto text = _ui.shareeLineEdit.text ();
-        for (int i = 0; i < _completerModel.rowCount (); ++i) {
-            const auto sharee = _completerModel.getSharee (i);
+        const auto text = _ui.sharee_line_edit.text ();
+        for (int i = 0; i < _completer_model.row_count (); ++i) {
+            const auto sharee = _completer_model.get_sharee (i);
             if (sharee.format () == text
-                || sharee.displayName () == text
-                || sharee.shareWith () == text) {
-                slotCompleterActivated (_completerModel.index (i));
+                || sharee.display_name () == text
+                || sharee.share_with () == text) {
+                slot_completer_activated (_completer_model.index (i));
                 // make sure we do not send the same item twice (because return is called when we press
                 // return to activate an item inthe completer)
-                _disableCompleterActivated = true;
+                _disable_completer_activated = true;
                 return;
             }
         }
     
         // nothing found? try to refresh completion
-        _completionTimer.start ();
+        _completion_timer.start ();
     }
     
-    void ShareUserGroupWidget.searchForSharees (ShareeModel.LookupMode lookupMode) {
-        if (_ui.shareeLineEdit.text ().isEmpty ()) {
+    void Share_user_group_widget.search_for_sharees (Sharee_model.Lookup_mode lookup_mode) {
+        if (_ui.sharee_line_edit.text ().is_empty ()) {
             return;
         }
     
-        _ui.shareeLineEdit.setEnabled (false);
-        _completionTimer.stop ();
-        _pi_sharee.startAnimation ();
-        ShareeModel.ShareeSet blacklist;
+        _ui.sharee_line_edit.set_enabled (false);
+        _completion_timer.stop ();
+        _pi_sharee.start_animation ();
+        Sharee_model.Sharee_set blacklist;
     
         // Add the current user to _sharees since we can't share with ourself
-        QSharedPointer<Sharee> currentUser (new Sharee (_account.credentials ().user (), "", Sharee.Type.User));
-        blacklist << currentUser;
+        QSharedPointer<Sharee> current_user (new Sharee (_account.credentials ().user (), "", Sharee.Type.User));
+        blacklist << current_user;
     
-        foreach (auto sw, _parentScrollArea.findChildren<ShareUserLine> ()) {
-            blacklist << sw.share ().getShareWith ();
+        foreach (auto sw, _parent_scroll_area.find_children<Share_user_line> ()) {
+            blacklist << sw.share ().get_share_with ();
         }
-        _ui.errorLabel.hide ();
-        _completerModel.fetch (_ui.shareeLineEdit.text (), blacklist, lookupMode);
+        _ui.error_label.hide ();
+        _completer_model.fetch (_ui.sharee_line_edit.text (), blacklist, lookup_mode);
     }
     
-    void ShareUserGroupWidget.getShares () {
-        _manager.fetchShares (_sharePath);
+    void Share_user_group_widget.get_shares () {
+        _manager.fetch_shares (_share_path);
     }
     
-    void ShareUserGroupWidget.slotShareCreated (QSharedPointer<Share> &share) {
-        if (share && _account.capabilities ().shareEmailPasswordEnabled () && !_account.capabilities ().shareEmailPasswordEnforced ()) {
+    void Share_user_group_widget.slot_share_created (QSharedPointer<Share> &share) {
+        if (share && _account.capabilities ().share_email_password_enabled () && !_account.capabilities ().share_email_password_enforced ()) {
             // remember this share Id so we can set it's password Line Edit to focus later
-            _lastCreatedShareId = share.getId ();
+            _last_created_share_id = share.get_id ();
         }
         // fetch all shares including the one we've just created
-        getShares ();
+        get_shares ();
     }
     
-    void ShareUserGroupWidget.slotSharesFetched (QList<QSharedPointer<Share>> &shares) {
-        QScrollArea *scrollArea = _parentScrollArea;
+    void Share_user_group_widget.slot_shares_fetched (QList<QSharedPointer<Share>> &shares) {
+        QScroll_area *scroll_area = _parent_scroll_area;
     
-        auto newViewPort = new Gtk.Widget (scrollArea);
-        auto layout = new QVBoxLayout (newViewPort);
-        layout.setContentsMargins (0, 0, 0, 0);
+        auto new_view_port = new Gtk.Widget (scroll_area);
+        auto layout = new QVBoxLayout (new_view_port);
+        layout.set_contents_margins (0, 0, 0, 0);
         int x = 0;
         int height = 0;
-        QList<string> linkOwners ({});
+        QList<string> link_owners ({});
     
-        ShareUserLine *justCreatedShareThatNeedsPassword = nullptr;
+        Share_user_line *just_created_share_that_needs_password = nullptr;
     
         foreach (auto &share, shares) {
-            // We don't handle link shares, only TypeUser or TypeGroup
-            if (share.getShareType () == Share.TypeLink) {
-                if (!share.getUidOwner ().isEmpty () &&
-                        share.getUidOwner () != share.account ().davUser ()){
-                    linkOwners.append (share.getOwnerDisplayName ());
+            // We don't handle link shares, only Type_user or Type_group
+            if (share.get_share_type () == Share.Type_link) {
+                if (!share.get_uid_owner ().is_empty () &&
+                        share.get_uid_owner () != share.account ().dav_user ()){
+                    link_owners.append (share.get_owner_display_name ());
                  }
                 continue;
             }
     
             // the owner of the file that shared it first
             // leave out if it's the current user
-            if (x == 0 && !share.getUidOwner ().isEmpty () && ! (share.getUidOwner () == _account.credentials ().user ())) {
-                _ui.mainOwnerLabel.setText (string ("Shared with you by ").append (share.getOwnerDisplayName ()));
+            if (x == 0 && !share.get_uid_owner ().is_empty () && ! (share.get_uid_owner () == _account.credentials ().user ())) {
+                _ui.main_owner_label.set_text (string ("Shared with you by ").append (share.get_owner_display_name ()));
             }
     
-            Q_ASSERT (Share.isShareTypeUserGroupEmailRoomOrRemote (share.getShareType ()));
-            auto userGroupShare = qSharedPointerDynamicCast<UserGroupShare> (share);
-            auto *s = new ShareUserLine (_account, userGroupShare, _maxSharingPermissions, _isFile, _parentScrollArea);
-            connect (s, &ShareUserLine.resizeRequested, this, &ShareUserGroupWidget.slotAdjustScrollWidgetSize);
-            connect (s, &ShareUserLine.visualDeletionDone, this, &ShareUserGroupWidget.getShares);
-            s.setBackgroundRole (layout.count () % 2 == 0 ? QPalette.Base : QPalette.AlternateBase);
+            Q_ASSERT (Share.is_share_type_user_group_email_room_or_remote (share.get_share_type ()));
+            auto user_group_share = q_shared_pointer_dynamic_cast<User_group_share> (share);
+            auto *s = new Share_user_line (_account, user_group_share, _max_sharing_permissions, _is_file, _parent_scroll_area);
+            connect (s, &Share_user_line.resize_requested, this, &Share_user_group_widget.slot_adjust_scroll_widget_size);
+            connect (s, &Share_user_line.visual_deletion_done, this, &Share_user_group_widget.get_shares);
+            s.set_background_role (layout.count () % 2 == 0 ? QPalette.Base : QPalette.Alternate_base);
     
-            // Connect styleChanged events to our widget, so it can adapt (Dark-/Light-Mode switching)
-            connect (this, &ShareUserGroupWidget.styleChanged, s, &ShareUserLine.slotStyleChanged);
+            // Connect style_changed events to our widget, so it can adapt (Dark-/Light-Mode switching)
+            connect (this, &Share_user_group_widget.style_changed, s, &Share_user_line.slot_style_changed);
     
-            layout.addWidget (s);
+            layout.add_widget (s);
     
-            if (!_lastCreatedShareId.isEmpty () && share.getId () == _lastCreatedShareId) {
-                _lastCreatedShareId = string ();
-                if (_account.capabilities ().shareEmailPasswordEnabled () && !_account.capabilities ().shareEmailPasswordEnforced ()) {
-                    justCreatedShareThatNeedsPassword = s;
+            if (!_last_created_share_id.is_empty () && share.get_id () == _last_created_share_id) {
+                _last_created_share_id = string ();
+                if (_account.capabilities ().share_email_password_enabled () && !_account.capabilities ().share_email_password_enforced ()) {
+                    just_created_share_that_needs_password = s;
                 }
             }
     
             x++;
             if (x <= 3) {
-                height = newViewPort.sizeHint ().height ();
+                height = new_view_port.size_hint ().height ();
             }
         }
     
-        foreach (string &owner, linkOwners) {
-            auto ownerLabel = new QLabel (string (owner + " shared via link"));
-            layout.addWidget (ownerLabel);
-            ownerLabel.setVisible (true);
+        foreach (string &owner, link_owners) {
+            auto owner_label = new QLabel (string (owner + " shared via link"));
+            layout.add_widget (owner_label);
+            owner_label.set_visible (true);
     
             x++;
             if (x <= 6) {
-                height = newViewPort.sizeHint ().height ();
+                height = new_view_port.size_hint ().height ();
             }
         }
     
-        scrollArea.setFrameShape (x > 6 ? QFrame.StyledPanel : QFrame.NoFrame);
-        scrollArea.setVisible (!shares.isEmpty ());
-        scrollArea.setFixedHeight (height);
-        scrollArea.setWidget (newViewPort);
+        scroll_area.set_frame_shape (x > 6 ? QFrame.Styled_panel : QFrame.No_frame);
+        scroll_area.set_visible (!shares.is_empty ());
+        scroll_area.set_fixed_height (height);
+        scroll_area.set_widget (new_view_port);
     
-        _disableCompleterActivated = false;
-        activateShareeLineEdit ();
+        _disable_completer_activated = false;
+        activate_sharee_line_edit ();
     
-        if (justCreatedShareThatNeedsPassword) {
+        if (just_created_share_that_needs_password) {
             // always set focus to a password Line Edit when the new email share is created on a server with optional passwords enabled for email shares
-            justCreatedShareThatNeedsPassword.focusPasswordLineEdit ();
+            just_created_share_that_needs_password.focus_password_line_edit ();
         }
     }
     
-    void ShareUserGroupWidget.slotAdjustScrollWidgetSize () {
-        QScrollArea *scrollArea = _parentScrollArea;
-        const auto shareUserLineChilds = scrollArea.findChildren<ShareUserLine> ();
+    void Share_user_group_widget.slot_adjust_scroll_widget_size () {
+        QScroll_area *scroll_area = _parent_scroll_area;
+        const auto share_user_line_childs = scroll_area.find_children<Share_user_line> ();
     
         // Ask the child widgets to calculate their size
-        for (auto shareUserLineChild : shareUserLineChilds) {
-            shareUserLineChild.adjustSize ();
+        for (auto share_user_line_child : share_user_line_childs) {
+            share_user_line_child.adjust_size ();
         }
     
-        const auto shareUserLineChildsCount = shareUserLineChilds.count ();
-        scrollArea.setVisible (shareUserLineChildsCount > 0);
-        if (shareUserLineChildsCount > 0 && shareUserLineChildsCount <= 3) {
-            scrollArea.setFixedHeight (scrollArea.widget ().sizeHint ().height ());
+        const auto share_user_line_childs_count = share_user_line_childs.count ();
+        scroll_area.set_visible (share_user_line_childs_count > 0);
+        if (share_user_line_childs_count > 0 && share_user_line_childs_count <= 3) {
+            scroll_area.set_fixed_height (scroll_area.widget ().size_hint ().height ());
         }
-        scrollArea.setFrameShape (shareUserLineChildsCount > 3 ? QFrame.StyledPanel : QFrame.NoFrame);
+        scroll_area.set_frame_shape (share_user_line_childs_count > 3 ? QFrame.Styled_panel : QFrame.No_frame);
     }
     
-    void ShareUserGroupWidget.slotPrivateLinkShare () {
+    void Share_user_group_widget.slot_private_link_share () {
         auto menu = new QMenu (this);
-        menu.setAttribute (Qt.WA_DeleteOnClose);
+        menu.set_attribute (Qt.WA_DeleteOnClose);
     
-        // this icon is not handled by slotStyleChanged () . customizeStyle but we can live with that
-        menu.addAction (Theme.createColorAwareIcon (":/client/theme/copy.svg"),
+        // this icon is not handled by slot_style_changed () . customize_style but we can live with that
+        menu.add_action (Theme.create_color_aware_icon (":/client/theme/copy.svg"),
                         tr ("Copy link"),
-            this, SLOT (slotPrivateLinkCopy ()));
+            this, SLOT (slot_private_link_copy ()));
     
         menu.exec (QCursor.pos ());
     }
     
-    void ShareUserGroupWidget.slotShareesReady () {
-        activateShareeLineEdit ();
+    void Share_user_group_widget.slot_sharees_ready () {
+        activate_sharee_line_edit ();
     
-        _pi_sharee.stopAnimation ();
-        if (_completerModel.rowCount () == 0) {
-            displayError (0, tr ("No results for \"%1\"").arg (_completerModel.currentSearch ()));
+        _pi_sharee.stop_animation ();
+        if (_completer_model.row_count () == 0) {
+            display_error (0, tr ("No results for \"%1\"").arg (_completer_model.current_search ()));
         }
     
         // if no rows are present in the model - complete () will hide the completer
         _completer.complete ();
     }
     
-    void ShareUserGroupWidget.slotCompleterActivated (QModelIndex &index) {
-        if (_disableCompleterActivated)
+    void Share_user_group_widget.slot_completer_activated (QModelIndex &index) {
+        if (_disable_completer_activated)
             return;
         // The index is an index from the QCompletion model which is itelf a proxy
-        // model proxying the _completerModel
-        auto sharee = qvariant_cast<QSharedPointer<Sharee>> (index.data (Qt.UserRole));
-        if (sharee.isNull ()) {
+        // model proxying the _completer_model
+        auto sharee = qvariant_cast<QSharedPointer<Sharee>> (index.data (Qt.User_role));
+        if (sharee.is_null ()) {
             return;
         }
     
     // TODO Progress Indicator where should it go?
-    //    auto indicator = new QProgressIndicator (viewPort);
-    //    indicator.startAnimation ();
+    //    auto indicator = new QProgress_indicator (view_port);
+    //    indicator.start_animation ();
     //    if (layout.count () == 1) {
     //        // No shares yet! Remove the label, add some stretch.
-    //        delete layout.itemAt (0).widget ();
-    //        layout.addStretch (1);
+    //        delete layout.item_at (0).widget ();
+    //        layout.add_stretch (1);
     //    }
-    //    layout.insertWidget (layout.count () - 1, indicator);
+    //    layout.insert_widget (layout.count () - 1, indicator);
     
         /***********************************************************
          * Don't send the reshare permissions for federated shares for servers <9.1
@@ -545,289 +545,289 @@ private:
          * https://github.com/owncloud/client/issues/4996
          */
     
-        _lastCreatedShareId = string ();
+        _last_created_share_id = string ();
     
         string password;
-        if (sharee.type () == Sharee.Email && _account.capabilities ().shareEmailPasswordEnforced ()) {
-            _ui.shareeLineEdit.clear ();
+        if (sharee.type () == Sharee.Email && _account.capabilities ().share_email_password_enforced ()) {
+            _ui.sharee_line_edit.clear ();
             // always show a dialog for password-enforced email shares
             bool ok = false;
     
             do {
-                password = QInputDialog.getText (
+                password = QInputDialog.get_text (
                     this,
                     tr ("Password for share required"),
                     tr ("Please enter a password for your email share:"),
                     QLineEdit.Password,
                     string (),
                     &ok);
-            } while (password.isEmpty () && ok);
+            } while (password.is_empty () && ok);
     
             if (!ok) {
                 return;
             }
         }
     
-        _manager.createShare (_sharePath, Share.ShareType (sharee.type ()),
-            sharee.shareWith (), _maxSharingPermissions, password);
+        _manager.create_share (_share_path, Share.Share_type (sharee.type ()),
+            sharee.share_with (), _max_sharing_permissions, password);
     
-        _ui.shareeLineEdit.setEnabled (false);
-        _ui.shareeLineEdit.clear ();
+        _ui.sharee_line_edit.set_enabled (false);
+        _ui.sharee_line_edit.clear ();
     }
     
-    void ShareUserGroupWidget.slotCompleterHighlighted (QModelIndex &index) {
-        // By default the completer would set the text to EditRole,
+    void Share_user_group_widget.slot_completer_highlighted (QModelIndex &index) {
+        // By default the completer would set the text to Edit_role,
         // override that here.
-        _ui.shareeLineEdit.setText (index.data (Qt.DisplayRole).toString ());
+        _ui.sharee_line_edit.set_text (index.data (Qt.Display_role).to_string ());
     }
     
-    void ShareUserGroupWidget.displayError (int code, string &message) {
-        _pi_sharee.stopAnimation ();
+    void Share_user_group_widget.display_error (int code, string &message) {
+        _pi_sharee.stop_animation ();
     
         // Also remove the spinner in the widget list, if any
-        foreach (auto pi, _parentScrollArea.findChildren<QProgressIndicator> ()) {
+        foreach (auto pi, _parent_scroll_area.find_children<QProgress_indicator> ()) {
             delete pi;
         }
     
-        qCWarning (lcSharing) << "Sharing error from server" << code << message;
-        _ui.errorLabel.setText (message);
-        _ui.errorLabel.show ();
-        activateShareeLineEdit ();
+        q_c_warning (lc_sharing) << "Sharing error from server" << code << message;
+        _ui.error_label.set_text (message);
+        _ui.error_label.show ();
+        activate_sharee_line_edit ();
     }
     
-    void ShareUserGroupWidget.slotPrivateLinkOpenBrowser () {
-        Utility.openBrowser (_privateLinkUrl, this);
+    void Share_user_group_widget.slot_private_link_open_browser () {
+        Utility.open_browser (_private_link_url, this);
     }
     
-    void ShareUserGroupWidget.slotPrivateLinkCopy () {
-        QApplication.clipboard ().setText (_privateLinkUrl);
+    void Share_user_group_widget.slot_private_link_copy () {
+        QApplication.clipboard ().set_text (_private_link_url);
     }
     
-    void ShareUserGroupWidget.slotPrivateLinkEmail () {
-        Utility.openEmailComposer (
+    void Share_user_group_widget.slot_private_link_email () {
+        Utility.open_email_composer (
             tr ("I shared something with you"),
-            _privateLinkUrl,
+            _private_link_url,
             this);
     }
     
-    void ShareUserGroupWidget.slotStyleChanged () {
-        customizeStyle ();
+    void Share_user_group_widget.slot_style_changed () {
+        customize_style ();
     
-        // Notify the other widgets (ShareUserLine in this case, Dark-/Light-Mode switching)
-        emit styleChanged ();
+        // Notify the other widgets (Share_user_line in this case, Dark-/Light-Mode switching)
+        emit style_changed ();
     }
     
-    void ShareUserGroupWidget.customizeStyle () {
-        _ui.confirmShare.setIcon (Theme.createColorAwareIcon (":/client/theme/confirm.svg"));
+    void Share_user_group_widget.customize_style () {
+        _ui.confirm_share.set_icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
     
-        _pi_sharee.setColor (QGuiApplication.palette ().color (QPalette.Text));
+        _pi_sharee.set_color (QGuiApplication.palette ().color (QPalette.Text));
     
-        foreach (auto pi, _parentScrollArea.findChildren<QProgressIndicator> ()) {
-            pi.setColor (QGuiApplication.palette ().color (QPalette.Text));;
+        foreach (auto pi, _parent_scroll_area.find_children<QProgress_indicator> ()) {
+            pi.set_color (QGuiApplication.palette ().color (QPalette.Text));;
         }
     }
     
-    void ShareUserGroupWidget.activateShareeLineEdit () {
-        _ui.shareeLineEdit.setEnabled (true);
-        _ui.shareeLineEdit.setFocus ();
+    void Share_user_group_widget.activate_sharee_line_edit () {
+        _ui.sharee_line_edit.set_enabled (true);
+        _ui.sharee_line_edit.set_focus ();
     }
     
-    ShareUserLine.ShareUserLine (AccountPtr account, QSharedPointer<UserGroupShare> share,
-        SharePermissions maxSharingPermissions, bool isFile, Gtk.Widget *parent)
+    Share_user_line.Share_user_line (AccountPtr account, QSharedPointer<User_group_share> share,
+        Share_permissions max_sharing_permissions, bool is_file, Gtk.Widget *parent)
         : Gtk.Widget (parent)
-        , _ui (new Ui.ShareUserLine)
+        , _ui (new Ui.Share_user_line)
         , _account (account)
         , _share (share)
-        , _isFile (isFile)
-        , _profilePageMenu (account, share.getShareWith ().shareWith ()) {
+        , _is_file (is_file)
+        , _profile_page_menu (account, share.get_share_with ().share_with ()) {
         Q_ASSERT (_share);
-        _ui.setupUi (this);
+        _ui.setup_ui (this);
     
-        _ui.sharedWith.setElideMode (Qt.ElideRight);
-        _ui.sharedWith.setText (share.getShareWith ().format ());
+        _ui.shared_with.set_elide_mode (Qt.Elide_right);
+        _ui.shared_with.set_text (share.get_share_with ().format ());
     
         // adds permissions
         // can edit permission
-        bool enabled = (maxSharingPermissions & SharePermissionUpdate);
-        if (!_isFile) enabled = enabled && (maxSharingPermissions & SharePermissionCreate &&
-                                          maxSharingPermissions & SharePermissionDelete);
-        _ui.permissionsEdit.setEnabled (enabled);
-        connect (_ui.permissionsEdit, &QAbstractButton.clicked, this, &ShareUserLine.slotEditPermissionsChanged);
-        connect (_ui.noteConfirmButton, &QAbstractButton.clicked, this, &ShareUserLine.onNoteConfirmButtonClicked);
-        connect (_ui.calendar, &QDateTimeEdit.dateChanged, this, &ShareUserLine.setExpireDate);
+        bool enabled = (max_sharing_permissions & Share_permission_update);
+        if (!_is_file) enabled = enabled && (max_sharing_permissions & Share_permission_create &&
+                                          max_sharing_permissions & Share_permission_delete);
+        _ui.permissions_edit.set_enabled (enabled);
+        connect (_ui.permissions_edit, &QAbstractButton.clicked, this, &Share_user_line.slot_edit_permissions_changed);
+        connect (_ui.note_confirm_button, &QAbstractButton.clicked, this, &Share_user_line.on_note_confirm_button_clicked);
+        connect (_ui.calendar, &QDate_time_edit.date_changed, this, &Share_user_line.set_expire_date);
     
-        connect (_share.data (), &UserGroupShare.noteSet, this, &ShareUserLine.disableProgessIndicatorAnimation);
-        connect (_share.data (), &UserGroupShare.noteSetError, this, &ShareUserLine.disableProgessIndicatorAnimation);
-        connect (_share.data (), &UserGroupShare.expireDateSet, this, &ShareUserLine.disableProgessIndicatorAnimation);
+        connect (_share.data (), &User_group_share.note_set, this, &Share_user_line.disable_progess_indicator_animation);
+        connect (_share.data (), &User_group_share.note_set_error, this, &Share_user_line.disable_progess_indicator_animation);
+        connect (_share.data (), &User_group_share.expire_date_set, this, &Share_user_line.disable_progess_indicator_animation);
     
-        connect (_ui.confirmPassword, &QToolButton.clicked, this, &ShareUserLine.slotConfirmPasswordClicked);
-        connect (_ui.lineEdit_password, &QLineEdit.returnPressed, this, &ShareUserLine.slotLineEditPasswordReturnPressed);
+        connect (_ui.confirm_password, &QToolButton.clicked, this, &Share_user_line.slot_confirm_password_clicked);
+        connect (_ui.line_edit_password, &QLineEdit.return_pressed, this, &Share_user_line.slot_line_edit_password_return_pressed);
     
         // create menu with checkable permissions
         auto *menu = new QMenu (this);
-        _permissionReshare= new QAction (tr ("Can reshare"), this);
-        _permissionReshare.setCheckable (true);
-        _permissionReshare.setEnabled (maxSharingPermissions & SharePermissionShare);
-        menu.addAction (_permissionReshare);
-        connect (_permissionReshare, &QAction.triggered, this, &ShareUserLine.slotPermissionsChanged);
+        _permission_reshare= new QAction (tr ("Can reshare"), this);
+        _permission_reshare.set_checkable (true);
+        _permission_reshare.set_enabled (max_sharing_permissions & Share_permission_share);
+        menu.add_action (_permission_reshare);
+        connect (_permission_reshare, &QAction.triggered, this, &Share_user_line.slot_permissions_changed);
     
-        showNoteOptions (false);
+        show_note_options (false);
     
-        const bool isNoteSupported = _share.getShareType () != Share.ShareType.TypeEmail && _share.getShareType () != Share.ShareType.TypeRoom;
+        const bool is_note_supported = _share.get_share_type () != Share.Share_type.Type_email && _share.get_share_type () != Share.Share_type.Type_room;
     
-        if (isNoteSupported) {
-            _noteLinkAction = new QAction (tr ("Note to recipient"));
-            _noteLinkAction.setCheckable (true);
-            menu.addAction (_noteLinkAction);
-            connect (_noteLinkAction, &QAction.triggered, this, &ShareUserLine.toggleNoteOptions);
-            if (!_share.getNote ().isEmpty ()) {
-                _noteLinkAction.setChecked (true);
-                showNoteOptions (true);
+        if (is_note_supported) {
+            _note_link_action = new QAction (tr ("Note to recipient"));
+            _note_link_action.set_checkable (true);
+            menu.add_action (_note_link_action);
+            connect (_note_link_action, &QAction.triggered, this, &Share_user_line.toggle_note_options);
+            if (!_share.get_note ().is_empty ()) {
+                _note_link_action.set_checked (true);
+                show_note_options (true);
             }
         }
     
-        showExpireDateOptions (false);
+        show_expire_date_options (false);
     
-        const bool isExpirationDateSupported = _share.getShareType () != Share.ShareType.TypeEmail;
+        const bool is_expiration_date_supported = _share.get_share_type () != Share.Share_type.Type_email;
     
-        if (isExpirationDateSupported) {
+        if (is_expiration_date_supported) {
             // email shares do not support expiration dates
-            _expirationDateLinkAction = new QAction (tr ("Set expiration date"));
-            _expirationDateLinkAction.setCheckable (true);
-            menu.addAction (_expirationDateLinkAction);
-            connect (_expirationDateLinkAction, &QAction.triggered, this, &ShareUserLine.toggleExpireDateOptions);
-            const auto expireDate = _share.getExpireDate ().isValid () ? share.data ().getExpireDate () : QDate ();
-            if (!expireDate.isNull ()) {
-                _expirationDateLinkAction.setChecked (true);
-                showExpireDateOptions (true, expireDate);
+            _expiration_date_link_action = new QAction (tr ("Set expiration date"));
+            _expiration_date_link_action.set_checkable (true);
+            menu.add_action (_expiration_date_link_action);
+            connect (_expiration_date_link_action, &QAction.triggered, this, &Share_user_line.toggle_expire_date_options);
+            const auto expire_date = _share.get_expire_date ().is_valid () ? share.data ().get_expire_date () : QDate ();
+            if (!expire_date.is_null ()) {
+                _expiration_date_link_action.set_checked (true);
+                show_expire_date_options (true, expire_date);
             }
         }
     
-        menu.addSeparator ();
+        menu.add_separator ();
     
           // Adds action to delete share widget
-          QIcon deleteicon = QIcon.fromTheme (QLatin1String ("user-trash"),QIcon (QLatin1String (":/client/theme/delete.svg")));
-          _deleteShareButton= new QAction (deleteicon,tr ("Unshare"), this);
+          QIcon deleteicon = QIcon.from_theme (QLatin1String ("user-trash"),QIcon (QLatin1String (":/client/theme/delete.svg")));
+          _delete_share_button= new QAction (deleteicon,tr ("Unshare"), this);
     
-        menu.addAction (_deleteShareButton);
-        connect (_deleteShareButton, &QAction.triggered, this, &ShareUserLine.on_deleteShareButton_clicked);
+        menu.add_action (_delete_share_button);
+        connect (_delete_share_button, &QAction.triggered, this, &Share_user_line.on_delete_share_button_clicked);
     
         /***********************************************************
          * Files can't have create or delete permissions
          */
-        if (!_isFile) {
-            _permissionCreate = new QAction (tr ("Can create"), this);
-            _permissionCreate.setCheckable (true);
-            _permissionCreate.setEnabled (maxSharingPermissions & SharePermissionCreate);
-            menu.addAction (_permissionCreate);
-            connect (_permissionCreate, &QAction.triggered, this, &ShareUserLine.slotPermissionsChanged);
+        if (!_is_file) {
+            _permission_create = new QAction (tr ("Can create"), this);
+            _permission_create.set_checkable (true);
+            _permission_create.set_enabled (max_sharing_permissions & Share_permission_create);
+            menu.add_action (_permission_create);
+            connect (_permission_create, &QAction.triggered, this, &Share_user_line.slot_permissions_changed);
     
-            _permissionChange = new QAction (tr ("Can change"), this);
-            _permissionChange.setCheckable (true);
-            _permissionChange.setEnabled (maxSharingPermissions & SharePermissionUpdate);
-            menu.addAction (_permissionChange);
-            connect (_permissionChange, &QAction.triggered, this, &ShareUserLine.slotPermissionsChanged);
+            _permission_change = new QAction (tr ("Can change"), this);
+            _permission_change.set_checkable (true);
+            _permission_change.set_enabled (max_sharing_permissions & Share_permission_update);
+            menu.add_action (_permission_change);
+            connect (_permission_change, &QAction.triggered, this, &Share_user_line.slot_permissions_changed);
     
-            _permissionDelete = new QAction (tr ("Can delete"), this);
-            _permissionDelete.setCheckable (true);
-            _permissionDelete.setEnabled (maxSharingPermissions & SharePermissionDelete);
-            menu.addAction (_permissionDelete);
-            connect (_permissionDelete, &QAction.triggered, this, &ShareUserLine.slotPermissionsChanged);
+            _permission_delete = new QAction (tr ("Can delete"), this);
+            _permission_delete.set_checkable (true);
+            _permission_delete.set_enabled (max_sharing_permissions & Share_permission_delete);
+            menu.add_action (_permission_delete);
+            connect (_permission_delete, &QAction.triggered, this, &Share_user_line.slot_permissions_changed);
         }
     
         // Adds action to display password widget (check box)
-        if (_share.getShareType () == Share.TypeEmail && (_share.isPasswordSet () || _account.capabilities ().shareEmailPasswordEnabled ())) {
-            _passwordProtectLinkAction = new QAction (tr ("Password protect"), this);
-            _passwordProtectLinkAction.setCheckable (true);
-            _passwordProtectLinkAction.setChecked (_share.isPasswordSet ());
+        if (_share.get_share_type () == Share.Type_email && (_share.is_password_set () || _account.capabilities ().share_email_password_enabled ())) {
+            _password_protect_link_action = new QAction (tr ("Password protect"), this);
+            _password_protect_link_action.set_checkable (true);
+            _password_protect_link_action.set_checked (_share.is_password_set ());
             // checkbox can be checked/unchedkec if the password is not yet set or if it's not enforced
-            _passwordProtectLinkAction.setEnabled (!_share.isPasswordSet () || !_account.capabilities ().shareEmailPasswordEnforced ());
+            _password_protect_link_action.set_enabled (!_share.is_password_set () || !_account.capabilities ().share_email_password_enforced ());
     
-            menu.addAction (_passwordProtectLinkAction);
-            connect (_passwordProtectLinkAction, &QAction.triggered, this, &ShareUserLine.slotPasswordCheckboxChanged);
+            menu.add_action (_password_protect_link_action);
+            connect (_password_protect_link_action, &QAction.triggered, this, &Share_user_line.slot_password_checkbox_changed);
     
-            refreshPasswordLineEditPlaceholder ();
+            refresh_password_line_edit_placeholder ();
     
-            connect (_share.data (), &Share.passwordSet, this, &ShareUserLine.slotPasswordSet);
-            connect (_share.data (), &Share.passwordSetError, this, &ShareUserLine.slotPasswordSetError);
+            connect (_share.data (), &Share.password_set, this, &Share_user_line.slot_password_set);
+            connect (_share.data (), &Share.password_set_error, this, &Share_user_line.slot_password_set_error);
         }
     
-        refreshPasswordOptions ();
+        refresh_password_options ();
     
-        _ui.errorLabel.hide ();
+        _ui.error_label.hide ();
     
-        _ui.permissionToolButton.setMenu (menu);
-        _ui.permissionToolButton.setPopupMode (QToolButton.InstantPopup);
+        _ui.permission_tool_button.set_menu (menu);
+        _ui.permission_tool_button.set_popup_mode (QToolButton.Instant_popup);
     
-        _ui.passwordProgressIndicator.setVisible (false);
+        _ui.password_progress_indicator.set_visible (false);
     
         // Set the permissions checkboxes
-        displayPermissions ();
+        display_permissions ();
     
         /***********************************************************
          * We don't show permission share for federated shares with server <9.1
          * https://github.com/owncloud/core/issues/22122#issuecomment-185637344
          * https://github.com/owncloud/client/issues/4996
          */
-        if (share.getShareType () == Share.TypeRemote
-            && share.account ().serverVersionInt () < Account.makeServerVersion (9, 1, 0)) {
-            _permissionReshare.setVisible (false);
-            _ui.permissionToolButton.setVisible (false);
+        if (share.get_share_type () == Share.Type_remote
+            && share.account ().server_version_int () < Account.make_server_version (9, 1, 0)) {
+            _permission_reshare.set_visible (false);
+            _ui.permission_tool_button.set_visible (false);
         }
     
-        connect (share.data (), &Share.permissionsSet, this, &ShareUserLine.slotPermissionsSet);
-        connect (share.data (), &Share.shareDeleted, this, &ShareUserLine.slotShareDeleted);
+        connect (share.data (), &Share.permissions_set, this, &Share_user_line.slot_permissions_set);
+        connect (share.data (), &Share.share_deleted, this, &Share_user_line.slot_share_deleted);
     
-        if (!share.account ().capabilities ().shareResharing ()) {
-            _permissionReshare.setVisible (false);
+        if (!share.account ().capabilities ().share_resharing ()) {
+            _permission_reshare.set_visible (false);
         }
     
-        const auto avatarEventFilter = new AvatarEventFilter (_ui.avatar);
-        connect (avatarEventFilter, &AvatarEventFilter.contextMenu, this, &ShareUserLine.onAvatarContextMenu);
-        _ui.avatar.installEventFilter (avatarEventFilter);
+        const auto avatar_event_filter = new Avatar_event_filter (_ui.avatar);
+        connect (avatar_event_filter, &Avatar_event_filter.context_menu, this, &Share_user_line.on_avatar_context_menu);
+        _ui.avatar.install_event_filter (avatar_event_filter);
     
-        loadAvatar ();
+        load_avatar ();
     
-        customizeStyle ();
+        customize_style ();
     }
     
-    void ShareUserLine.onAvatarContextMenu (QPoint &globalPosition) {
-        if (_share.getShareType () == Share.TypeUser) {
-            _profilePageMenu.exec (globalPosition);
+    void Share_user_line.on_avatar_context_menu (QPoint &global_position) {
+        if (_share.get_share_type () == Share.Type_user) {
+            _profile_page_menu.exec (global_position);
         }
     }
     
-    void ShareUserLine.loadAvatar () {
-        const int avatarSize = 36;
+    void Share_user_line.load_avatar () {
+        const int avatar_size = 36;
     
         // Set size of the placeholder
-        _ui.avatar.setMinimumHeight (avatarSize);
-        _ui.avatar.setMinimumWidth (avatarSize);
-        _ui.avatar.setMaximumHeight (avatarSize);
-        _ui.avatar.setMaximumWidth (avatarSize);
-        _ui.avatar.setAlignment (Qt.AlignCenter);
+        _ui.avatar.set_minimum_height (avatar_size);
+        _ui.avatar.set_minimum_width (avatar_size);
+        _ui.avatar.set_maximum_height (avatar_size);
+        _ui.avatar.set_maximum_width (avatar_size);
+        _ui.avatar.set_alignment (Qt.AlignCenter);
     
-        setDefaultAvatar (avatarSize);
+        set_default_avatar (avatar_size);
     
         /* Start the network job to fetch the avatar data.
          *
          * Currently only regular users can have avatars.
          */
-        if (_share.getShareWith ().type () == Sharee.User) {
-            auto *job = new AvatarJob (_share.account (), _share.getShareWith ().shareWith (), avatarSize, this);
-            connect (job, &AvatarJob.avatarPixmap, this, &ShareUserLine.slotAvatarLoaded);
+        if (_share.get_share_with ().type () == Sharee.User) {
+            auto *job = new Avatar_job (_share.account (), _share.get_share_with ().share_with (), avatar_size, this);
+            connect (job, &Avatar_job.avatar_pixmap, this, &Share_user_line.slot_avatar_loaded);
             job.start ();
         }
     }
     
-    void ShareUserLine.setDefaultAvatar (int avatarSize) {
+    void Share_user_line.set_default_avatar (int avatar_size) {
         /* Create the fallback avatar.
          *
          * This will be shown until the avatar image data arrives.
          */
     
         // See core/js/placeholder.js for details on colors and styling
-        const auto backgroundColor = backgroundColorForShareeType (_share.getShareWith ().type ());
+        const auto background_color = background_color_for_sharee_type (_share.get_share_with ().type ());
         const string style = string (R" (* {
             color : #fff;
             background-color : %1;
@@ -835,262 +835,262 @@ private:
             text-align : center;
             line-height : %2px;
             font-size : %2px;
-        })").arg (backgroundColor.name (), string.number (avatarSize / 2));
-        _ui.avatar.setStyleSheet (style);
+        })").arg (background_color.name (), string.number (avatar_size / 2));
+        _ui.avatar.set_style_sheet (style);
     
-        const auto pixmap = pixmapForShareeType (_share.getShareWith ().type (), backgroundColor);
+        const auto pixmap = pixmap_for_sharee_type (_share.get_share_with ().type (), background_color);
     
-        if (!pixmap.isNull ()) {
-            _ui.avatar.setPixmap (pixmap);
+        if (!pixmap.is_null ()) {
+            _ui.avatar.set_pixmap (pixmap);
         } else {
-            qCDebug (lcSharing) << "pixmap is null for share type : " << _share.getShareWith ().type ();
+            q_c_debug (lc_sharing) << "pixmap is null for share type : " << _share.get_share_with ().type ();
     
             // The avatar label is the first character of the user name.
-            const auto text = _share.getShareWith ().displayName ();
-            _ui.avatar.setText (text.at (0).toUpper ());
+            const auto text = _share.get_share_with ().display_name ();
+            _ui.avatar.set_text (text.at (0).to_upper ());
         }
     }
     
-    void ShareUserLine.slotAvatarLoaded (QImage avatar) {
-        if (avatar.isNull ())
+    void Share_user_line.slot_avatar_loaded (QImage avatar) {
+        if (avatar.is_null ())
             return;
     
-        avatar = AvatarJob.makeCircularAvatar (avatar);
-        _ui.avatar.setPixmap (QPixmap.fromImage (avatar));
+        avatar = Avatar_job.make_circular_avatar (avatar);
+        _ui.avatar.set_pixmap (QPixmap.from_image (avatar));
     
         // Remove the stylesheet for the fallback avatar
-        _ui.avatar.setStyleSheet ("");
+        _ui.avatar.set_style_sheet ("");
     }
     
-    void ShareUserLine.on_deleteShareButton_clicked () {
-        setEnabled (false);
-        _share.deleteShare ();
+    void Share_user_line.on_delete_share_button_clicked () {
+        set_enabled (false);
+        _share.delete_share ();
     }
     
-    ShareUserLine.~ShareUserLine () {
+    Share_user_line.~Share_user_line () {
         delete _ui;
     }
     
-    void ShareUserLine.slotEditPermissionsChanged () {
-        setEnabled (false);
+    void Share_user_line.slot_edit_permissions_changed () {
+        set_enabled (false);
     
         // Can never manually be set to "partial".
         // This works because the state cycle for clicking is
         // unchecked . partial . checked . unchecked.
-        if (_ui.permissionsEdit.checkState () == Qt.PartiallyChecked) {
-            _ui.permissionsEdit.setCheckState (Qt.Checked);
+        if (_ui.permissions_edit.check_state () == Qt.Partially_checked) {
+            _ui.permissions_edit.set_check_state (Qt.Checked);
         }
     
-        Share.Permissions permissions = SharePermissionRead;
+        Share.Permissions permissions = Share_permission_read;
     
         //  folders edit = CREATE, READ, UPDATE, DELETE
         //  files edit = READ + UPDATE
-        if (_ui.permissionsEdit.checkState () == Qt.Checked) {
+        if (_ui.permissions_edit.check_state () == Qt.Checked) {
     
             /***********************************************************
              * Files can't have create or delete permisisons
              */
-            if (!_isFile) {
-                if (_permissionChange.isEnabled ())
-                    permissions |= SharePermissionUpdate;
-                if (_permissionCreate.isEnabled ())
-                    permissions |= SharePermissionCreate;
-                if (_permissionDelete.isEnabled ())
-                    permissions |= SharePermissionDelete;
+            if (!_is_file) {
+                if (_permission_change.is_enabled ())
+                    permissions |= Share_permission_update;
+                if (_permission_create.is_enabled ())
+                    permissions |= Share_permission_create;
+                if (_permission_delete.is_enabled ())
+                    permissions |= Share_permission_delete;
             } else {
-                permissions |= SharePermissionUpdate;
+                permissions |= Share_permission_update;
             }
         }
     
-        if (_isFile && _permissionReshare.isEnabled () && _permissionReshare.isChecked ())
-            permissions |= SharePermissionShare;
+        if (_is_file && _permission_reshare.is_enabled () && _permission_reshare.is_checked ())
+            permissions |= Share_permission_share;
     
-        _share.setPermissions (permissions);
+        _share.set_permissions (permissions);
     }
     
-    void ShareUserLine.slotPermissionsChanged () {
-        setEnabled (false);
+    void Share_user_line.slot_permissions_changed () {
+        set_enabled (false);
     
-        Share.Permissions permissions = SharePermissionRead;
+        Share.Permissions permissions = Share_permission_read;
     
-        if (_permissionReshare.isChecked ())
-            permissions |= SharePermissionShare;
+        if (_permission_reshare.is_checked ())
+            permissions |= Share_permission_share;
     
-        if (!_isFile) {
-            if (_permissionChange.isChecked ())
-                permissions |= SharePermissionUpdate;
-            if (_permissionCreate.isChecked ())
-                permissions |= SharePermissionCreate;
-            if (_permissionDelete.isChecked ())
-                permissions |= SharePermissionDelete;
+        if (!_is_file) {
+            if (_permission_change.is_checked ())
+                permissions |= Share_permission_update;
+            if (_permission_create.is_checked ())
+                permissions |= Share_permission_create;
+            if (_permission_delete.is_checked ())
+                permissions |= Share_permission_delete;
         } else {
-            if (_ui.permissionsEdit.isChecked ())
-                permissions |= SharePermissionUpdate;
+            if (_ui.permissions_edit.is_checked ())
+                permissions |= Share_permission_update;
         }
     
-        _share.setPermissions (permissions);
+        _share.set_permissions (permissions);
     }
     
-    void ShareUserLine.slotPasswordCheckboxChanged () {
-        if (!_passwordProtectLinkAction.isChecked ()) {
-            _ui.errorLabel.hide ();
-            _ui.errorLabel.clear ();
+    void Share_user_line.slot_password_checkbox_changed () {
+        if (!_password_protect_link_action.is_checked ()) {
+            _ui.error_label.hide ();
+            _ui.error_label.clear ();
     
-            if (!_share.isPasswordSet ()) {
-                _ui.lineEdit_password.clear ();
-                refreshPasswordOptions ();
+            if (!_share.is_password_set ()) {
+                _ui.line_edit_password.clear ();
+                refresh_password_options ();
             } else {
-                // do not call refreshPasswordOptions here, as it will be called after the network request is complete
-                togglePasswordSetProgressAnimation (true);
-                _share.setPassword (string ());
+                // do not call refresh_password_options here, as it will be called after the network request is complete
+                toggle_password_set_progress_animation (true);
+                _share.set_password (string ());
             }
         } else {
-            refreshPasswordOptions ();
+            refresh_password_options ();
     
-            if (_ui.lineEdit_password.isVisible () && _ui.lineEdit_password.isEnabled ()) {
-                focusPasswordLineEdit ();
+            if (_ui.line_edit_password.is_visible () && _ui.line_edit_password.is_enabled ()) {
+                focus_password_line_edit ();
             }
         }
     }
     
-    void ShareUserLine.slotDeleteAnimationFinished () {
-        emit resizeRequested ();
-        emit visualDeletionDone ();
-        deleteLater ();
+    void Share_user_line.slot_delete_animation_finished () {
+        emit resize_requested ();
+        emit visual_deletion_done ();
+        delete_later ();
     
         // There is a painting bug where a small line of this widget isn't
         // properly cleared. This explicit repaint () call makes sure any trace of
         // the share widget is removed once it's destroyed. #4189
-        connect (this, SIGNAL (destroyed (GLib.Object *)), parentWidget (), SLOT (repaint ()));
+        connect (this, SIGNAL (destroyed (GLib.Object *)), parent_widget (), SLOT (repaint ()));
     }
     
-    void ShareUserLine.refreshPasswordOptions () {
-        const bool isPasswordEnabled = _share.getShareType () == Share.TypeEmail && _passwordProtectLinkAction.isChecked ();
+    void Share_user_line.refresh_password_options () {
+        const bool is_password_enabled = _share.get_share_type () == Share.Type_email && _password_protect_link_action.is_checked ();
     
-        _ui.passwordLabel.setVisible (isPasswordEnabled);
-        _ui.lineEdit_password.setEnabled (isPasswordEnabled);
-        _ui.lineEdit_password.setVisible (isPasswordEnabled);
-        _ui.confirmPassword.setVisible (isPasswordEnabled);
+        _ui.password_label.set_visible (is_password_enabled);
+        _ui.line_edit_password.set_enabled (is_password_enabled);
+        _ui.line_edit_password.set_visible (is_password_enabled);
+        _ui.confirm_password.set_visible (is_password_enabled);
     
-        emit resizeRequested ();
+        emit resize_requested ();
     }
     
-    void ShareUserLine.refreshPasswordLineEditPlaceholder () {
-        if (_share.isPasswordSet ()) {
-            _ui.lineEdit_password.setPlaceholderText (string.fromUtf8 (passwordIsSetPlaceholder));
+    void Share_user_line.refresh_password_line_edit_placeholder () {
+        if (_share.is_password_set ()) {
+            _ui.line_edit_password.set_placeholder_text (string.from_utf8 (password_is_set_placeholder));
         } else {
-            _ui.lineEdit_password.setPlaceholderText ("");
+            _ui.line_edit_password.set_placeholder_text ("");
         }
     }
     
-    void ShareUserLine.slotPasswordSet () {
-        togglePasswordSetProgressAnimation (false);
-        _ui.lineEdit_password.setEnabled (true);
-        _ui.confirmPassword.setEnabled (true);
+    void Share_user_line.slot_password_set () {
+        toggle_password_set_progress_animation (false);
+        _ui.line_edit_password.set_enabled (true);
+        _ui.confirm_password.set_enabled (true);
     
-        _ui.lineEdit_password.setText ("");
+        _ui.line_edit_password.set_text ("");
     
-        _passwordProtectLinkAction.setEnabled (!_share.isPasswordSet () || !_account.capabilities ().shareEmailPasswordEnforced ());
+        _password_protect_link_action.set_enabled (!_share.is_password_set () || !_account.capabilities ().share_email_password_enforced ());
     
-        refreshPasswordLineEditPlaceholder ();
+        refresh_password_line_edit_placeholder ();
     
-        refreshPasswordOptions ();
+        refresh_password_options ();
     }
     
-    void ShareUserLine.slotPasswordSetError (int statusCode, string &message) {
-        qCWarning (lcSharing) << "Error from server" << statusCode << message;
+    void Share_user_line.slot_password_set_error (int status_code, string &message) {
+        q_c_warning (lc_sharing) << "Error from server" << status_code << message;
     
-        togglePasswordSetProgressAnimation (false);
+        toggle_password_set_progress_animation (false);
     
-        _ui.lineEdit_password.setEnabled (true);
-        _ui.confirmPassword.setEnabled (true);
+        _ui.line_edit_password.set_enabled (true);
+        _ui.confirm_password.set_enabled (true);
     
-        refreshPasswordLineEditPlaceholder ();
+        refresh_password_line_edit_placeholder ();
     
-        refreshPasswordOptions ();
+        refresh_password_options ();
     
-        focusPasswordLineEdit ();
+        focus_password_line_edit ();
     
-        _ui.errorLabel.show ();
-        _ui.errorLabel.setText (message);
+        _ui.error_label.show ();
+        _ui.error_label.set_text (message);
     
-        emit resizeRequested ();
+        emit resize_requested ();
     }
     
-    void ShareUserLine.slotShareDeleted () {
-        auto *animation = new QPropertyAnimation (this, "maximumHeight", this);
+    void Share_user_line.slot_share_deleted () {
+        auto *animation = new QPropertyAnimation (this, "maximum_height", this);
     
-        animation.setDuration (500);
-        animation.setStartValue (height ());
-        animation.setEndValue (0);
+        animation.set_duration (500);
+        animation.set_start_value (height ());
+        animation.set_end_value (0);
     
-        connect (animation, &QAbstractAnimation.finished, this, &ShareUserLine.slotDeleteAnimationFinished);
-        connect (animation, &QVariantAnimation.valueChanged, this, &ShareUserLine.resizeRequested);
+        connect (animation, &QAbstractAnimation.finished, this, &Share_user_line.slot_delete_animation_finished);
+        connect (animation, &QVariant_animation.value_changed, this, &Share_user_line.resize_requested);
     
         animation.start ();
     }
     
-    void ShareUserLine.slotPermissionsSet () {
-        displayPermissions ();
-        setEnabled (true);
+    void Share_user_line.slot_permissions_set () {
+        display_permissions ();
+        set_enabled (true);
     }
     
-    QSharedPointer<Share> ShareUserLine.share () {
+    QSharedPointer<Share> Share_user_line.share () {
         return _share;
     }
     
-    void ShareUserLine.displayPermissions () {
-        auto perm = _share.getPermissions ();
+    void Share_user_line.display_permissions () {
+        auto perm = _share.get_permissions ();
     
     //  folders edit = CREATE, READ, UPDATE, DELETE
     //  files edit = READ + UPDATE
-        if (perm & SharePermissionUpdate && (_isFile ||
-                                             (perm & SharePermissionCreate && perm & SharePermissionDelete))) {
-            _ui.permissionsEdit.setCheckState (Qt.Checked);
-        } else if (!_isFile && perm & (SharePermissionUpdate | SharePermissionCreate | SharePermissionDelete)) {
-            _ui.permissionsEdit.setCheckState (Qt.PartiallyChecked);
-        } else if (perm & SharePermissionRead) {
-            _ui.permissionsEdit.setCheckState (Qt.Unchecked);
+        if (perm & Share_permission_update && (_is_file ||
+                                             (perm & Share_permission_create && perm & Share_permission_delete))) {
+            _ui.permissions_edit.set_check_state (Qt.Checked);
+        } else if (!_is_file && perm & (Share_permission_update | Share_permission_create | Share_permission_delete)) {
+            _ui.permissions_edit.set_check_state (Qt.Partially_checked);
+        } else if (perm & Share_permission_read) {
+            _ui.permissions_edit.set_check_state (Qt.Unchecked);
         }
     
     //  edit is independent of reshare
-        if (perm & SharePermissionShare)
-            _permissionReshare.setChecked (true);
+        if (perm & Share_permission_share)
+            _permission_reshare.set_checked (true);
     
-        if (!_isFile){
-            _permissionCreate.setChecked (perm & SharePermissionCreate);
-            _permissionChange.setChecked (perm & SharePermissionUpdate);
-            _permissionDelete.setChecked (perm & SharePermissionDelete);
+        if (!_is_file){
+            _permission_create.set_checked (perm & Share_permission_create);
+            _permission_change.set_checked (perm & Share_permission_update);
+            _permission_delete.set_checked (perm & Share_permission_delete);
         }
     }
     
-    void ShareUserLine.slotStyleChanged () {
-        customizeStyle ();
+    void Share_user_line.slot_style_changed () {
+        customize_style ();
     }
     
-    void ShareUserLine.focusPasswordLineEdit () {
-        _ui.lineEdit_password.setFocus ();
+    void Share_user_line.focus_password_line_edit () {
+        _ui.line_edit_password.set_focus ();
     }
     
-    void ShareUserLine.customizeStyle () {
-        _ui.permissionToolButton.setIcon (Theme.createColorAwareIcon (":/client/theme/more.svg"));
+    void Share_user_line.customize_style () {
+        _ui.permission_tool_button.set_icon (Theme.create_color_aware_icon (":/client/theme/more.svg"));
     
-        QIcon deleteicon = QIcon.fromTheme (QLatin1String ("user-trash"),Theme.createColorAwareIcon (QLatin1String (":/client/theme/delete.svg")));
-        _deleteShareButton.setIcon (deleteicon);
+        QIcon deleteicon = QIcon.from_theme (QLatin1String ("user-trash"),Theme.create_color_aware_icon (QLatin1String (":/client/theme/delete.svg")));
+        _delete_share_button.set_icon (deleteicon);
     
-        _ui.noteConfirmButton.setIcon (Theme.createColorAwareIcon (":/client/theme/confirm.svg"));
-        _ui.progressIndicator.setColor (QGuiApplication.palette ().color (QPalette.WindowText));
+        _ui.note_confirm_button.set_icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
+        _ui.progress_indicator.set_color (QGuiApplication.palette ().color (QPalette.Window_text));
     
-        // make sure to force BackgroundRole to QPalette.WindowText for a lable, because it's parent always has a different role set that applies to children unless customized
-        _ui.errorLabel.setBackgroundRole (QPalette.WindowText);
+        // make sure to force Background_role to QPalette.Window_text for a lable, because it's parent always has a different role set that applies to children unless customized
+        _ui.error_label.set_background_role (QPalette.Window_text);
     }
     
-    QPixmap ShareUserLine.pixmapForShareeType (Sharee.Type type, QColor &backgroundColor) {
+    QPixmap Share_user_line.pixmap_for_sharee_type (Sharee.Type type, QColor &background_color) {
         switch (type) {
         case Sharee.Room:
-            return Ui.IconUtils.pixmapForBackground (QStringLiteral ("talk-app.svg"), backgroundColor);
+            return Ui.Icon_utils.pixmap_for_background (QStringLiteral ("talk-app.svg"), background_color);
         case Sharee.Email:
-            return Ui.IconUtils.pixmapForBackground (QStringLiteral ("email.svg"), backgroundColor);
+            return Ui.Icon_utils.pixmap_for_background (QStringLiteral ("email.svg"), background_color);
         case Sharee.Group:
         case Sharee.Federated:
         case Sharee.Circle:
@@ -1101,12 +1101,12 @@ private:
         return {};
     }
     
-    QColor ShareUserLine.backgroundColorForShareeType (Sharee.Type type) {
+    QColor Share_user_line.background_color_for_sharee_type (Sharee.Type type) {
         switch (type) {
         case Sharee.Room:
-            return Theme.instance ().wizardHeaderBackgroundColor ();
+            return Theme.instance ().wizard_header_background_color ();
         case Sharee.Email:
-            return Theme.instance ().wizardHeaderTitleColor ();
+            return Theme.instance ().wizard_header_title_color ();
         case Sharee.Group:
         case Sharee.Federated:
         case Sharee.Circle:
@@ -1114,159 +1114,159 @@ private:
             break;
         }
     
-        const auto calculateBackgroundBasedOnText = [this] () {
-            const auto hash = QCryptographicHash.hash (_ui.sharedWith.text ().toUtf8 (), QCryptographicHash.Md5);
+        const auto calculate_background_based_on_text = [this] () {
+            const auto hash = QCryptographicHash.hash (_ui.shared_with.text ().to_utf8 (), QCryptographicHash.Md5);
             Q_ASSERT (hash.size () > 0);
             if (hash.size () == 0) {
-                qCWarning (lcSharing) << "Failed to calculate hash color for share:" << _share.path ();
+                q_c_warning (lc_sharing) << "Failed to calculate hash color for share:" << _share.path ();
                 return QColor{};
             }
             const double hue = static_cast<uint8> (hash[0]) / 255.;
-            return QColor.fromHslF (hue, 0.7, 0.68);
+            return QColor.from_hsl_f (hue, 0.7, 0.68);
         };
     
-        return calculateBackgroundBasedOnText ();
+        return calculate_background_based_on_text ();
     }
     
-    void ShareUserLine.showNoteOptions (bool show) {
-        _ui.noteLabel.setVisible (show);
-        _ui.noteTextEdit.setVisible (show);
-        _ui.noteConfirmButton.setVisible (show);
+    void Share_user_line.show_note_options (bool show) {
+        _ui.note_label.set_visible (show);
+        _ui.note_text_edit.set_visible (show);
+        _ui.note_confirm_button.set_visible (show);
     
         if (show) {
-            const auto note = _share.getNote ();
-            _ui.noteTextEdit.setText (note);
-            _ui.noteTextEdit.setFocus ();
+            const auto note = _share.get_note ();
+            _ui.note_text_edit.set_text (note);
+            _ui.note_text_edit.set_focus ();
         }
     
-        emit resizeRequested ();
+        emit resize_requested ();
     }
     
-    void ShareUserLine.toggleNoteOptions (bool enable) {
-        showNoteOptions (enable);
+    void Share_user_line.toggle_note_options (bool enable) {
+        show_note_options (enable);
     
         if (!enable) {
             // Delete note
-            _share.setNote (string ());
+            _share.set_note (string ());
         }
     }
     
-    void ShareUserLine.onNoteConfirmButtonClicked () {
-        setNote (_ui.noteTextEdit.toPlainText ());
+    void Share_user_line.on_note_confirm_button_clicked () {
+        set_note (_ui.note_text_edit.to_plain_text ());
     }
     
-    void ShareUserLine.setNote (string &note) {
-        enableProgessIndicatorAnimation (true);
-        _share.setNote (note);
+    void Share_user_line.set_note (string &note) {
+        enable_progess_indicator_animation (true);
+        _share.set_note (note);
     }
     
-    void ShareUserLine.toggleExpireDateOptions (bool enable) {
-        showExpireDateOptions (enable);
+    void Share_user_line.toggle_expire_date_options (bool enable) {
+        show_expire_date_options (enable);
     
         if (!enable) {
-            _share.setExpireDate (QDate ());
+            _share.set_expire_date (QDate ());
         }
     }
     
-    void ShareUserLine.showExpireDateOptions (bool show, QDate &initialDate) {
-        _ui.expirationLabel.setVisible (show);
-        _ui.calendar.setVisible (show);
+    void Share_user_line.show_expire_date_options (bool show, QDate &initial_date) {
+        _ui.expiration_label.set_visible (show);
+        _ui.calendar.set_visible (show);
     
         if (show) {
-            _ui.calendar.setMinimumDate (QDate.currentDate ().addDays (1));
-            _ui.calendar.setDate (initialDate.isValid () ? initialDate : _ui.calendar.minimumDate ());
-            _ui.calendar.setFocus ();
+            _ui.calendar.set_minimum_date (QDate.current_date ().add_days (1));
+            _ui.calendar.set_date (initial_date.is_valid () ? initial_date : _ui.calendar.minimum_date ());
+            _ui.calendar.set_focus ();
     
-            if (enforceExpirationDateForShare (_share.getShareType ())) {
-                _ui.calendar.setMaximumDate (maxExpirationDateForShare (_share.getShareType (), _ui.calendar.maximumDate ()));
-                _expirationDateLinkAction.setChecked (true);
-                _expirationDateLinkAction.setEnabled (false);
+            if (enforce_expiration_date_for_share (_share.get_share_type ())) {
+                _ui.calendar.set_maximum_date (max_expiration_date_for_share (_share.get_share_type (), _ui.calendar.maximum_date ()));
+                _expiration_date_link_action.set_checked (true);
+                _expiration_date_link_action.set_enabled (false);
             }
         }
     
-        emit resizeRequested ();
+        emit resize_requested ();
     }
     
-    void ShareUserLine.setExpireDate () {
-        enableProgessIndicatorAnimation (true);
-        _share.setExpireDate (_ui.calendar.date ());
+    void Share_user_line.set_expire_date () {
+        enable_progess_indicator_animation (true);
+        _share.set_expire_date (_ui.calendar.date ());
     }
     
-    void ShareUserLine.enableProgessIndicatorAnimation (bool enable) {
+    void Share_user_line.enable_progess_indicator_animation (bool enable) {
         if (enable) {
-            if (!_ui.progressIndicator.isAnimated ()) {
-                _ui.progressIndicator.startAnimation ();
+            if (!_ui.progress_indicator.is_animated ()) {
+                _ui.progress_indicator.start_animation ();
             }
         } else {
-            _ui.progressIndicator.stopAnimation ();
+            _ui.progress_indicator.stop_animation ();
         }
     }
     
-    void ShareUserLine.togglePasswordSetProgressAnimation (bool show) {
+    void Share_user_line.toggle_password_set_progress_animation (bool show) {
         // button and progress indicator are interchanged depending on if the network request is in progress or not
-        _ui.confirmPassword.setVisible (!show && _passwordProtectLinkAction.isChecked ());
-        _ui.passwordProgressIndicator.setVisible (show);
+        _ui.confirm_password.set_visible (!show && _password_protect_link_action.is_checked ());
+        _ui.password_progress_indicator.set_visible (show);
         if (show) {
-            if (!_ui.passwordProgressIndicator.isAnimated ()) {
-                _ui.passwordProgressIndicator.startAnimation ();
+            if (!_ui.password_progress_indicator.is_animated ()) {
+                _ui.password_progress_indicator.start_animation ();
             }
         } else {
-            _ui.passwordProgressIndicator.stopAnimation ();
+            _ui.password_progress_indicator.stop_animation ();
         }
     }
     
-    void ShareUserLine.disableProgessIndicatorAnimation () {
-        enableProgessIndicatorAnimation (false);
+    void Share_user_line.disable_progess_indicator_animation () {
+        enable_progess_indicator_animation (false);
     }
     
-    QDate ShareUserLine.maxExpirationDateForShare (Share.ShareType type, QDate &fallbackDate) {
-        auto daysToExpire = 0;
-        if (type == Share.ShareType.TypeRemote) {
-            daysToExpire = _account.capabilities ().shareRemoteExpireDateDays ();
-        } else if (type == Share.ShareType.TypeEmail) {
-           daysToExpire = _account.capabilities ().sharePublicLinkExpireDateDays ();
+    QDate Share_user_line.max_expiration_date_for_share (Share.Share_type type, QDate &fallback_date) {
+        auto days_to_expire = 0;
+        if (type == Share.Share_type.Type_remote) {
+            days_to_expire = _account.capabilities ().share_remote_expire_date_days ();
+        } else if (type == Share.Share_type.Type_email) {
+           days_to_expire = _account.capabilities ().share_public_link_expire_date_days ();
         } else {
-            daysToExpire = _account.capabilities ().shareInternalExpireDateDays ();
+            days_to_expire = _account.capabilities ().share_internal_expire_date_days ();
         }
     
-        if (daysToExpire > 0) {
-            return QDate.currentDate ().addDays (daysToExpire);
+        if (days_to_expire > 0) {
+            return QDate.current_date ().add_days (days_to_expire);
         }
     
-        return fallbackDate;
+        return fallback_date;
     }
     
-    bool ShareUserLine.enforceExpirationDateForShare (Share.ShareType type) {
-        if (type == Share.ShareType.TypeRemote) {
-            return _account.capabilities ().shareRemoteEnforceExpireDate ();
-        } else if (type == Share.ShareType.TypeEmail) {
-            return _account.capabilities ().sharePublicLinkEnforceExpireDate ();
+    bool Share_user_line.enforce_expiration_date_for_share (Share.Share_type type) {
+        if (type == Share.Share_type.Type_remote) {
+            return _account.capabilities ().share_remote_enforce_expire_date ();
+        } else if (type == Share.Share_type.Type_email) {
+            return _account.capabilities ().share_public_link_enforce_expire_date ();
         }
     
-        return _account.capabilities ().shareInternalEnforceExpireDate ();
+        return _account.capabilities ().share_internal_enforce_expire_date ();
     }
     
-    void ShareUserLine.setPasswordConfirmed () {
-        if (_ui.lineEdit_password.text ().isEmpty ()) {
+    void Share_user_line.set_password_confirmed () {
+        if (_ui.line_edit_password.text ().is_empty ()) {
             return;
         }
     
-        _ui.lineEdit_password.setEnabled (false);
-        _ui.confirmPassword.setEnabled (false);
+        _ui.line_edit_password.set_enabled (false);
+        _ui.confirm_password.set_enabled (false);
     
-        _ui.errorLabel.hide ();
-        _ui.errorLabel.clear ();
+        _ui.error_label.hide ();
+        _ui.error_label.clear ();
     
-        togglePasswordSetProgressAnimation (true);
-        _share.setPassword (_ui.lineEdit_password.text ());
+        toggle_password_set_progress_animation (true);
+        _share.set_password (_ui.line_edit_password.text ());
     }
     
-    void ShareUserLine.slotLineEditPasswordReturnPressed () {
-        setPasswordConfirmed ();
+    void Share_user_line.slot_line_edit_password_return_pressed () {
+        set_password_confirmed ();
     }
     
-    void ShareUserLine.slotConfirmPasswordClicked () {
-        setPasswordConfirmed ();
+    void Share_user_line.slot_confirm_password_clicked () {
+        set_password_confirmed ();
     }
     }
     

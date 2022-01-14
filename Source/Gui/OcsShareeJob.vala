@@ -10,57 +10,57 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 namespace Occ {
 
 /***********************************************************
-@brief The OcsShareeJob class
+@brief The Ocs_sharee_job class
 @ingroup gui
 
 Fetching sharees from the OCS Sharee API
 ***********************************************************/
-class OcsShareeJob : OcsJob {
+class Ocs_sharee_job : Ocs_job {
 public:
-    OcsShareeJob (AccountPtr account);
+    Ocs_sharee_job (AccountPtr account);
 
     /***********************************************************
     Get a list of sharees
     
     @param path Path to request shares for (default all shares)
     ***********************************************************/
-    void getSharees (string &search, string &itemType, int page = 1, int perPage = 50, bool lookup = false);
+    void get_sharees (string &search, string &item_type, int page = 1, int per_page = 50, bool lookup = false);
 signals:
     /***********************************************************
     Result of the OCS request
     
     @param reply The reply
     ***********************************************************/
-    void shareeJobFinished (QJsonDocument &reply);
+    void sharee_job_finished (QJsonDocument &reply);
 
 private slots:
-    void jobDone (QJsonDocument &reply);
+    void job_done (QJsonDocument &reply);
 };
 
-    OcsShareeJob.OcsShareeJob (AccountPtr account)
-        : OcsJob (account) {
-        setPath ("ocs/v2.php/apps/files_sharing/api/v1/sharees");
-        connect (this, &OcsJob.jobFinished, this, &OcsShareeJob.jobDone);
+    Ocs_sharee_job.Ocs_sharee_job (AccountPtr account)
+        : Ocs_job (account) {
+        set_path ("ocs/v2.php/apps/files_sharing/api/v1/sharees");
+        connect (this, &Ocs_job.job_finished, this, &Ocs_sharee_job.job_done);
     }
     
-    void OcsShareeJob.getSharees (string &search,
-        const string &itemType,
+    void Ocs_sharee_job.get_sharees (string &search,
+        const string &item_type,
         int page,
-        int perPage,
+        int per_page,
         bool lookup) {
-        setVerb ("GET");
+        set_verb ("GET");
     
-        addParam (string.fromLatin1 ("search"), search);
-        addParam (string.fromLatin1 ("itemType"), itemType);
-        addParam (string.fromLatin1 ("page"), string.number (page));
-        addParam (string.fromLatin1 ("perPage"), string.number (perPage));
-        addParam (string.fromLatin1 ("lookup"), QVariant (lookup).toString ());
+        add_param (string.from_latin1 ("search"), search);
+        add_param (string.from_latin1 ("item_type"), item_type);
+        add_param (string.from_latin1 ("page"), string.number (page));
+        add_param (string.from_latin1 ("per_page"), string.number (per_page));
+        add_param (string.from_latin1 ("lookup"), QVariant (lookup).to_string ());
     
         start ();
     }
     
-    void OcsShareeJob.jobDone (QJsonDocument &reply) {
-        emit shareeJobFinished (reply);
+    void Ocs_sharee_job.job_done (QJsonDocument &reply) {
+        emit sharee_job_finished (reply);
     }
     }
     

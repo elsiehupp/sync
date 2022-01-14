@@ -17,19 +17,19 @@ using namespace Occ;
 
 namespace Occ {
 
-using SyncFileItemPtr = QSharedPointer<SyncFileItem>;
+using Sync_file_item_ptr = QSharedPointer<SyncFileItem>;
 
 /***********************************************************
 @brief Tracks files that must be rediscovered locally
 
 It does this by being notified about
-- modified files (addTouchedPath
-- starting syncs (startSync* ())
-- finished items (slotItemCompleted (), by SyncEngine signal)
-- finished syncs (slotSyncFinished (), by SyncEngine signal)
+- modified files (add_touched_path
+- starting syncs (start_sync* ())
+- finished items (slot_item_completed (), by Sync_engine signal)
+- finished syncs (slot_sync_finished (), by Sync_engine signal)
 
-Then localDiscoveryPaths () can be used to determine paths to redis
-and send to SyncEngine.setLocalDisco
+Then local_discovery_paths () can be used to determine paths to redis
+and send to Sync_engine.set_local_disco
 
 This class is primarily used from Folder and separate primarily for
 readability and testing purposes.
@@ -39,9 +39,9 @@ relative to the folder that is being synced, without a starting slash.
 
 @ingroup libsync
 ***********************************************************/
-class LocalDiscoveryTracker : GLib.Object {
+class Local_discovery_tracker : GLib.Object {
 public:
-    LocalDiscoveryTracker ();
+    Local_discovery_tracker ();
 
     /***********************************************************
     Adds a path that must be locally rediscovered later.
@@ -49,31 +49,31 @@ public:
     This should be a full relative file path, example:
       foo/bar/file.txt
     ***********************************************************/
-    void addTouchedPath (string &relativePath);
+    void add_touched_path (string &relative_path);
 
     /***********************************************************
     Call when a sync run starts that rediscovers all local files */
-    void startSyncFullDiscovery ();
+    void start_sync_full_discovery ();
 
     /***********************************************************
-    Call when a sync using localDiscoveryPaths () starts */
-    void startSyncPartialDiscovery ();
+    Call when a sync using local_discovery_paths () starts */
+    void start_sync_partial_discovery ();
 
     /***********************************************************
     Access list of files that shall be locally rediscovered. */
-    const std.set<string> &localDiscoveryPaths ();
+    const std.set<string> &local_discovery_paths ();
 
 public slots:
     /***********************************************************
     Success and failure of sync items adjust what the next sync is
     supposed to do.
     ***********************************************************/
-    void slotItemCompleted (SyncFileItemPtr &item);
+    void slot_item_completed (Sync_file_item_ptr &item);
 
     /***********************************************************
     When a sync finishes, the lists must be updated
     ***********************************************************/
-    void slotSyncFinished (bool success);
+    void slot_sync_finished (bool success);
 
 private:
     /***********************************************************
@@ -82,15 +82,15 @@ private:
     Mostly a collection of files the filewatchers have reported as touched.
     Also includes files that have had errors in the last sync run.
     ***********************************************************/
-    std.set<string> _localDiscoveryPaths;
+    std.set<string> _local_discovery_paths;
 
     /***********************************************************
     The paths that the current sync run used for local discovery.
     
-    For failing syncs, this list will be merged into _localDiscoveryPaths
+    For failing syncs, this list will be merged into _local_discovery_paths
     again when the sync is done to make sure everything is retried.
     ***********************************************************/
-    std.set<string> _previousLocalDiscoveryPaths;
+    std.set<string> _previous_local_discovery_paths;
 };
 
 } // namespace Occ
@@ -105,68 +105,68 @@ private:
 
 
 
-LocalDiscoveryTracker.LocalDiscoveryTracker () = default;
+Local_discovery_tracker.Local_discovery_tracker () = default;
 
-void LocalDiscoveryTracker.addTouchedPath (string &relativePath) {
-    qCDebug (lcLocalDiscoveryTracker) << "inserted touched" << relativePath;
-    _localDiscoveryPaths.insert (relativePath);
+void Local_discovery_tracker.add_touched_path (string &relative_path) {
+    q_c_debug (lc_local_discovery_tracker) << "inserted touched" << relative_path;
+    _local_discovery_paths.insert (relative_path);
 }
 
-void LocalDiscoveryTracker.startSyncFullDiscovery () {
-    _localDiscoveryPaths.clear ();
-    _previousLocalDiscoveryPaths.clear ();
-    qCDebug (lcLocalDiscoveryTracker) << "full discovery";
+void Local_discovery_tracker.start_sync_full_discovery () {
+    _local_discovery_paths.clear ();
+    _previous_local_discovery_paths.clear ();
+    q_c_debug (lc_local_discovery_tracker) << "full discovery";
 }
 
-void LocalDiscoveryTracker.startSyncPartialDiscovery () {
-    if (lcLocalDiscoveryTracker ().isDebugEnabled ()) {
+void Local_discovery_tracker.start_sync_partial_discovery () {
+    if (lc_local_discovery_tracker ().is_debug_enabled ()) {
         QStringList paths;
-        for (auto &path : _localDiscoveryPaths)
+        for (auto &path : _local_discovery_paths)
             paths.append (path);
-        qCDebug (lcLocalDiscoveryTracker) << "partial discovery with paths : " << paths;
+        q_c_debug (lc_local_discovery_tracker) << "partial discovery with paths : " << paths;
     }
 
-    _previousLocalDiscoveryPaths = std.move (_localDiscoveryPaths);
-    _localDiscoveryPaths.clear ();
+    _previous_local_discovery_paths = std.move (_local_discovery_paths);
+    _local_discovery_paths.clear ();
 }
 
-const std.set<string> &LocalDiscoveryTracker.localDiscoveryPaths () {
-    return _localDiscoveryPaths;
+const std.set<string> &Local_discovery_tracker.local_discovery_paths () {
+    return _local_discovery_paths;
 }
 
-void LocalDiscoveryTracker.slotItemCompleted (SyncFileItemPtr &item) {
+void Local_discovery_tracker.slot_item_completed (Sync_file_item_ptr &item) {
     // For successes, we want to wipe the file from the list to ensure we don't
     // rediscover it even if this overall sync fails.
     //
     // For failures, we want to add the file to the list so the next sync
     // will be able to retry it.
     if (item._status == SyncFileItem.Success
-        || item._status == SyncFileItem.FileIgnored
+        || item._status == SyncFileItem.File_ignored
         || item._status == SyncFileItem.Restoration
         || item._status == SyncFileItem.Conflict
-        || (item._status == SyncFileItem.NoStatus
+        || (item._status == SyncFileItem.No_status
                && (item._instruction == CSYNC_INSTRUCTION_NONE
                       || item._instruction == CSYNC_INSTRUCTION_UPDATE_METADATA))) {
-        if (_previousLocalDiscoveryPaths.erase (item._file.toUtf8 ()))
-            qCDebug (lcLocalDiscoveryTracker) << "wiped successful item" << item._file;
-        if (!item._renameTarget.isEmpty () && _previousLocalDiscoveryPaths.erase (item._renameTarget.toUtf8 ()))
-            qCDebug (lcLocalDiscoveryTracker) << "wiped successful item" << item._renameTarget;
+        if (_previous_local_discovery_paths.erase (item._file.to_utf8 ()))
+            q_c_debug (lc_local_discovery_tracker) << "wiped successful item" << item._file;
+        if (!item._rename_target.is_empty () && _previous_local_discovery_paths.erase (item._rename_target.to_utf8 ()))
+            q_c_debug (lc_local_discovery_tracker) << "wiped successful item" << item._rename_target;
     } else {
-        _localDiscoveryPaths.insert (item._file.toUtf8 ());
-        qCDebug (lcLocalDiscoveryTracker) << "inserted error item" << item._file;
+        _local_discovery_paths.insert (item._file.to_utf8 ());
+        q_c_debug (lc_local_discovery_tracker) << "inserted error item" << item._file;
     }
 }
 
-void LocalDiscoveryTracker.slotSyncFinished (bool success) {
+void Local_discovery_tracker.slot_sync_finished (bool success) {
     if (success) {
-        qCDebug (lcLocalDiscoveryTracker) << "sync success, forgetting last sync's local discovery path list";
+        q_c_debug (lc_local_discovery_tracker) << "sync success, forgetting last sync's local discovery path list";
     } else {
         // On overall-failure we can't forget about last sync's local discovery
         // paths yet, reuse them for the next sync again.
         // C++17 : Could use std.set.merge ().
-        _localDiscoveryPaths.insert (
-            _previousLocalDiscoveryPaths.begin (), _previousLocalDiscoveryPaths.end ());
-        qCDebug (lcLocalDiscoveryTracker) << "sync failed, keeping last sync's local discovery path list";
+        _local_discovery_paths.insert (
+            _previous_local_discovery_paths.begin (), _previous_local_discovery_paths.end ());
+        q_c_debug (lc_local_discovery_tracker) << "sync failed, keeping last sync's local discovery path list";
     }
-    _previousLocalDiscoveryPaths.clear ();
+    _previous_local_discovery_paths.clear ();
 }

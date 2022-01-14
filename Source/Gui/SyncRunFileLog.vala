@@ -18,64 +18,64 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 namespace Occ {
 
 /***********************************************************
-@brief The SyncRunFileLog class
+@brief The Sync_run_file_log class
 @ingroup gui
 ***********************************************************/
-class SyncRunFileLog {
+class Sync_run_file_log {
 public:
-    SyncRunFileLog ();
-    void start (string &folderPath);
-    void logItem (SyncFileItem &item);
-    void logLap (string &name);
+    Sync_run_file_log ();
+    void start (string &folder_path);
+    void log_item (SyncFileItem &item);
+    void log_lap (string &name);
     void finish ();
 
 protected:
 private:
-    string dateTimeStr (QDateTime &dt);
+    string date_time_str (QDateTime &dt);
 
     QScopedPointer<QFile> _file;
     QTextStream _out;
-    QElapsedTimer _totalDuration;
-    QElapsedTimer _lapDuration;
+    QElapsedTimer _total_duration;
+    QElapsedTimer _lap_duration;
 };
 
 
-    SyncRunFileLog.SyncRunFileLog () = default;
+    Sync_run_file_log.Sync_run_file_log () = default;
     
-    string SyncRunFileLog.dateTimeStr (QDateTime &dt) {
-        return dt.toString (Qt.ISODate);
+    string Sync_run_file_log.date_time_str (QDateTime &dt) {
+        return dt.to_string (Qt.ISODate);
     }
     
-    void SyncRunFileLog.start (string &folderPath) {
-        const int64 logfileMaxSize = 10 * 1024 * 1024; // 10MiB
+    void Sync_run_file_log.start (string &folder_path) {
+        const int64 logfile_max_size = 10 * 1024 * 1024; // 10Mi_b
     
-        const string logpath = QStandardPaths.writableLocation (QStandardPaths.AppDataLocation);
+        const string logpath = QStandardPaths.writable_location (QStandardPaths.App_data_location);
         if (!QDir (logpath).exists ()) {
             QDir ().mkdir (logpath);
         }
     
-        int length = folderPath.split (QLatin1String ("/")).length ();
-        string filenameSingle = folderPath.split (QLatin1String ("/")).at (length - 2);
-        string filename = logpath + QLatin1String ("/") + filenameSingle + QLatin1String ("_sync.log");
+        int length = folder_path.split (QLatin1String ("/")).length ();
+        string filename_single = folder_path.split (QLatin1String ("/")).at (length - 2);
+        string filename = logpath + QLatin1String ("/") + filename_single + QLatin1String ("_sync.log");
     
-        int depthIndex = 2;
+        int depth_index = 2;
         while (QFile.exists (filename)) {
     
             QFile file (filename);
-            file.open (QIODevice.ReadOnly| QIODevice.Text);
+            file.open (QIODevice.Read_only| QIODevice.Text);
             QTextStream in (&file);
-            string line = in.readLine ();
+            string line = in.read_line ();
     
-            if (string.compare (folderPath,line,Qt.CaseSensitive)!=0) {
-                depthIndex++;
-                if (depthIndex <= length) {
-                    filenameSingle = folderPath.split (QLatin1String ("/")).at (length - depthIndex) + string ("_") ///
-                            + filenameSingle;
-                    filename = logpath+ QLatin1String ("/") + filenameSingle + QLatin1String ("_sync.log");
+            if (string.compare (folder_path,line,Qt.CaseSensitive)!=0) {
+                depth_index++;
+                if (depth_index <= length) {
+                    filename_single = folder_path.split (QLatin1String ("/")).at (length - depth_index) + string ("_") ///
+                            + filename_single;
+                    filename = logpath+ QLatin1String ("/") + filename_single + QLatin1String ("_sync.log");
                 }
                 else {
-                    filenameSingle = filenameSingle + QLatin1String ("_1");
-                    filename = logpath + QLatin1String ("/") + filenameSingle + QLatin1String ("_sync.log");
+                    filename_single = filename_single + QLatin1String ("_1");
+                    filename = logpath + QLatin1String ("/") + filename_single + QLatin1String ("_sync.log");
                 }
             }
             else break;
@@ -84,44 +84,44 @@ private:
         // When the file is too big, just rename it to an old name.
         QFileInfo info (filename);
         bool exists = info.exists ();
-        if (exists && info.size () > logfileMaxSize) {
+        if (exists && info.size () > logfile_max_size) {
             exists = false;
-            string newFilename = filename + QLatin1String (".1");
-            QFile.remove (newFilename);
-            QFile.rename (filename, newFilename);
+            string new_filename = filename + QLatin1String (".1");
+            QFile.remove (new_filename);
+            QFile.rename (filename, new_filename);
         }
         _file.reset (new QFile (filename));
     
         _file.open (QIODevice.WriteOnly | QIODevice.Append | QIODevice.Text);
-        _out.setDevice (_file.data ());
+        _out.set_device (_file.data ());
     
         if (!exists) {
-            _out << folderPath << endl;
+            _out << folder_path << endl;
             // We are creating a new file, add the note.
             _out << "# timestamp | duration | file | instruction | dir | modtime | etag | "
-                    "size | fileId | status | errorString | http result code | "
+                    "size | file_id | status | error_string | http result code | "
                     "other size | other modtime | X-Request-ID"
                  << endl;
     
-            FileSystem.setFileHidden (filename, true);
+            FileSystem.set_file_hidden (filename, true);
         }
     
-        _totalDuration.start ();
-        _lapDuration.start ();
-        _out << "#=#=#=# Syncrun started " << dateTimeStr (QDateTime.currentDateTimeUtc ()) << endl;
+        _total_duration.start ();
+        _lap_duration.start ();
+        _out << "#=#=#=# Syncrun started " << date_time_str (QDateTime.current_date_time_utc ()) << endl;
     }
-    void SyncRunFileLog.logItem (SyncFileItem &item) {
+    void Sync_run_file_log.log_item (SyncFileItem &item) {
         // don't log the directory items that are in the list
         if (item._direction == SyncFileItem.None
             || item._instruction == CSYNC_INSTRUCTION_IGNORE) {
             return;
         }
-        string ts = string.fromLatin1 (item._responseTimeStamp);
+        string ts = string.from_latin1 (item._response_time_stamp);
         if (ts.length () > 6) {
             const QRegularExpression rx (R" ( (\d\d:\d\d:\d\d))");
-            const auto rxMatch = rx.match (ts);
-            if (rxMatch.hasMatch ()) {
-                ts = rxMatch.captured (0);
+            const auto rx_match = rx.match (ts);
+            if (rx_match.has_match ()) {
+                ts = rx_match.captured (0);
             }
         }
     
@@ -131,34 +131,34 @@ private:
         if (item._instruction != CSYNC_INSTRUCTION_RENAME) {
             _out << item.destination () << L;
         } else {
-            _out << item._file << QLatin1String (" . ") << item._renameTarget << L;
+            _out << item._file << QLatin1String (" . ") << item._rename_target << L;
         }
         _out << item._instruction << L;
         _out << item._direction << L;
         _out << string.number (item._modtime) << L;
         _out << item._etag << L;
         _out << string.number (item._size) << L;
-        _out << item._fileId << L;
+        _out << item._file_id << L;
         _out << item._status << L;
-        _out << item._errorString << L;
-        _out << string.number (item._httpErrorCode) << L;
-        _out << string.number (item._previousSize) << L;
-        _out << string.number (item._previousModtime) << L;
-        _out << item._requestId << L;
+        _out << item._error_string << L;
+        _out << string.number (item._http_error_code) << L;
+        _out << string.number (item._previous_size) << L;
+        _out << string.number (item._previous_modtime) << L;
+        _out << item._request_id << L;
     
         _out << endl;
     }
     
-    void SyncRunFileLog.logLap (string &name) {
-        _out << "#=#=#=#=# " << name << " " << dateTimeStr (QDateTime.currentDateTimeUtc ())
-             << " (last step : " << _lapDuration.restart () << " msec"
-             << ", total : " << _totalDuration.elapsed () << " msec)" << endl;
+    void Sync_run_file_log.log_lap (string &name) {
+        _out << "#=#=#=#=# " << name << " " << date_time_str (QDateTime.current_date_time_utc ())
+             << " (last step : " << _lap_duration.restart () << " msec"
+             << ", total : " << _total_duration.elapsed () << " msec)" << endl;
     }
     
-    void SyncRunFileLog.finish () {
-        _out << "#=#=#=# Syncrun finished " << dateTimeStr (QDateTime.currentDateTimeUtc ())
-             << " (last step : " << _lapDuration.elapsed () << " msec"
-             << ", total : " << _totalDuration.elapsed () << " msec)" << endl;
+    void Sync_run_file_log.finish () {
+        _out << "#=#=#=# Syncrun finished " << date_time_str (QDateTime.current_date_time_utc ())
+             << " (last step : " << _lap_duration.elapsed () << " msec"
+             << ", total : " << _total_duration.elapsed () << " msec)" << endl;
         _file.close ();
     }
     }

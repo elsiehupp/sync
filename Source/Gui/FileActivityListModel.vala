@@ -8,65 +8,65 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 namespace Occ {
 
-class FileActivityListModel : ActivityListModel {
+class File_activity_list_model : Activity_list_model {
 
 public:
-    FileActivityListModel (GLib.Object *parent = nullptr);
+    File_activity_list_model (GLib.Object *parent = nullptr);
 
 public slots:
-    void load (AccountState *accountState, string &fileId);
+    void load (AccountState *account_state, string &file_id);
 
 protected:
-    void startFetchJob () override;
+    void start_fetch_job () override;
 
 private:
-    string _fileId;
+    string _file_id;
 };
-    FileActivityListModel.FileActivityListModel (GLib.Object *parent)
-        : ActivityListModel (nullptr, parent) {
-        setDisplayActions (false);
+    File_activity_list_model.File_activity_list_model (GLib.Object *parent)
+        : Activity_list_model (nullptr, parent) {
+        set_display_actions (false);
     }
     
-    void FileActivityListModel.load (AccountState *accountState, string &localPath) {
-        Q_ASSERT (accountState);
-        if (!accountState || currentlyFetching ()) {
+    void File_activity_list_model.load (AccountState *account_state, string &local_path) {
+        Q_ASSERT (account_state);
+        if (!account_state || currently_fetching ()) {
             return;
         }
-        setAccountState (accountState);
+        set_account_state (account_state);
     
-        const auto folder = FolderMan.instance ().folderForPath (localPath);
+        const auto folder = FolderMan.instance ().folder_for_path (local_path);
         if (!folder) {
             return;
         }
     
-        const auto file = folder.fileFromLocalPath (localPath);
-        SyncJournalFileRecord fileRecord;
-        if (!folder.journalDb ().getFileRecord (file, &fileRecord) || !fileRecord.isValid ()) {
+        const auto file = folder.file_from_local_path (local_path);
+        SyncJournalFileRecord file_record;
+        if (!folder.journal_db ().get_file_record (file, &file_record) || !file_record.is_valid ()) {
             return;
         }
     
-        _fileId = fileRecord._fileId;
-        slotRefreshActivity ();
+        _file_id = file_record._file_id;
+        slot_refresh_activity ();
     }
     
-    void FileActivityListModel.startFetchJob () {
-        if (!accountState ().isConnected ()) {
+    void File_activity_list_model.start_fetch_job () {
+        if (!account_state ().is_connected ()) {
             return;
         }
-        setCurrentlyFetching (true);
+        set_currently_fetching (true);
     
         const string url (QStringLiteral ("ocs/v2.php/apps/activity/api/v2/activity/filter"));
-        auto job = new JsonApiJob (accountState ().account (), url, this);
-        GLib.Object.connect (job, &JsonApiJob.jsonReceived,
-            this, &FileActivityListModel.activitiesReceived);
+        auto job = new JsonApiJob (account_state ().account (), url, this);
+        GLib.Object.connect (job, &JsonApiJob.json_received,
+            this, &File_activity_list_model.activities_received);
     
         QUrlQuery params;
-        params.addQueryItem (QStringLiteral ("sort"), QStringLiteral ("asc"));
-        params.addQueryItem (QStringLiteral ("object_type"), "files");
-        params.addQueryItem (QStringLiteral ("object_id"), _fileId);
-        job.addQueryParams (params);
-        setDoneFetching (true);
-        setHideOldActivities (true);
+        params.add_query_item (QStringLiteral ("sort"), QStringLiteral ("asc"));
+        params.add_query_item (QStringLiteral ("object_type"), "files");
+        params.add_query_item (QStringLiteral ("object_id"), _file_id);
+        job.add_query_params (params);
+        set_done_fetching (true);
+        set_hide_old_activities (true);
         job.start ();
     }
     }

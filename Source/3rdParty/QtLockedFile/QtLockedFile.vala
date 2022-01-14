@@ -13,14 +13,15 @@ version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 
 // #include <QFile>
 
-define QT_QTLOCKEDFILE_EXPORT
-
-
 namespace SharedTools {
 
-class QT_QTLOCKEDFILE_EXPORT QtLockedFile : QFile {
+class QtLockedFile : QFile {
 
-    public enum LockMode { NoLock = 0, ReadLock, WriteLock };
+    public enum LockMode {
+        NO_LOCK = 0,
+        READ_LOCK,
+        WRITE_LOCK
+    };
 
     public QtLockedFile ();
     public QtLockedFile (string &name);
@@ -28,8 +29,8 @@ class QT_QTLOCKEDFILE_EXPORT QtLockedFile : QFile {
 
     public bool lock (LockMode mode, bool block = true);
     public bool unlock ();
-    public bool isLocked ();
-    public LockMode lockMode ();
+    public bool is_locked ();
+    public LockMode lock_mode ();
 
 private:
     LockMode m_lock_mode;
@@ -90,9 +91,9 @@ namespace SharedTools {
     
     This enum describes the available lock modes.
     
-    \value ReadLock A read lock.
-    \value WriteLock A write lock.
-    \value NoLock Neither a read lock nor a write lock.
+    \value LockMode.READ_LOCK A read lock.
+    \value LockMode.WRITE_LOCK A write lock.
+    \value LockMode.NO_LOCK Neither a read lock nor a write lock.
     ***********************************************************/
     
     /***********************************************************
@@ -103,7 +104,7 @@ namespace SharedTools {
     ***********************************************************/
     QtLockedFile.QtLockedFile ()
         : QFile () {
-        m_lock_mode = NoLock;
+        m_lock_mode = LockMode.NO_LOCK;
     }
     
     /***********************************************************
@@ -114,25 +115,25 @@ namespace SharedTools {
     ***********************************************************/
     QtLockedFile.QtLockedFile (string &name)
         : QFile (name) {
-        m_lock_mode = NoLock;
+        m_lock_mode = LockMode.NO_LOCK;
     }
     
     /***********************************************************
     Returns \e true if this object has a in read or write lock;
     otherwise returns \e false.
     
-    \sa lockMode ()
+    \sa lock_mode ()
     ***********************************************************/
-    bool QtLockedFile.isLocked () {
-        return m_lock_mode != NoLock;
+    bool QtLockedFile.is_locked () {
+        return m_lock_mode != LockMode.NO_LOCK;
     }
     
     /***********************************************************
-    Returns the type of lock currently held by this object, or \e QtLockedFile.NoLock.
+    Returns the type of lock currently held by this object, or \e QtLockedFile.LockMode.NO_LOCK.
     
-    \sa isLocked ()
+    \sa is_locked ()
     ***********************************************************/
-    QtLockedFile.LockMode QtLockedFile.lockMode () {
+    QtLockedFile.LockMode QtLockedFile.lock_mode () {
         return m_lock_mode;
     }
     
@@ -152,7 +153,7 @@ namespace SharedTools {
     This function returns \e true if, after it executes, the file is locked by this object,
     and \e false otherwise.
     
-    \sa unlock (), isLocked (), lockMode ()
+    \sa unlock (), is_locked (), lock_mode ()
     ***********************************************************/
     
     /***********************************************************
@@ -165,7 +166,7 @@ namespace SharedTools {
     This function returns \e true if, after it executes, the file is not locked by
     this object, and \e false otherwise.
     
-    \sa lock (), isLocked (), lockMode ()
+    \sa lock (), is_locked (), lock_mode ()
     ***********************************************************/
     
     /***********************************************************
@@ -210,31 +211,31 @@ version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 namespace SharedTools {
 
     bool QtLockedFile.lock (LockMode mode, bool block) {
-        if (!isOpen ()) {
-            qWarning ("QtLockedFile.lock () : file is not opened");
+        if (!is_open ()) {
+            q_warning ("QtLockedFile.lock () : file is not opened");
             return false;
         }
     
-        if (mode == NoLock)
+        if (mode == LockMode.NO_LOCK)
             return unlock ();
     
         if (mode == m_lock_mode)
             return true;
     
-        if (m_lock_mode != NoLock)
+        if (m_lock_mode != LockMode.NO_LOCK)
             unlock ();
     
         struct flock fl;
         fl.l_whence = SEEK_SET;
         fl.l_start = 0;
         fl.l_len = 0;
-        fl.l_type = (mode == ReadLock) ? F_RDLCK : F_WRLCK;
+        fl.l_type = (mode == LockMode.READ_LOCK) ? F_RDLCK : F_WRLCK;
         int cmd = block ? F_SETLKW : F_SETLK;
         int ret = fcntl (handle (), cmd, &fl);
     
         if (ret == -1) {
             if (errno != EINTR && errno != EAGAIN)
-                qWarning ("QtLockedFile.lock () : fcntl : %s", strerror (errno));
+                q_warning ("QtLockedFile.lock () : fcntl : %s", strerror (errno));
             return false;
         }
     
@@ -243,12 +244,12 @@ namespace SharedTools {
     }
     
     bool QtLockedFile.unlock () {
-        if (!isOpen ()) {
-            qWarning ("QtLockedFile.unlock () : file is not opened");
+        if (!is_open ()) {
+            q_warning ("QtLockedFile.unlock () : file is not opened");
             return false;
         }
     
-        if (!isLocked ())
+        if (!is_locked ())
             return true;
     
         struct flock fl;
@@ -259,17 +260,17 @@ namespace SharedTools {
         int ret = fcntl (handle (), F_SETLKW, &fl);
     
         if (ret == -1) {
-            qWarning ("QtLockedFile.lock () : fcntl : %s", strerror (errno));
+            q_warning ("QtLockedFile.lock () : fcntl : %s", strerror (errno));
             return false;
         }
     
-        m_lock_mode = NoLock;
+        m_lock_mode = LockMode.NO_LOCK;
         remove ();
         return true;
     }
     
     QtLockedFile.~QtLockedFile () {
-        if (isOpen ())
+        if (is_open ())
             unlock ();
     }
     

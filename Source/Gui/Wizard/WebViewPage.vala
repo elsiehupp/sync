@@ -1,5 +1,5 @@
 
-// #include <QWebEngineUrlRequestJob>
+// #include <QWeb_engine_url_request_job>
 // #include <QProgressBar>
 // #include <QVBoxLayout>
 // #include <QNetworkProxyFactory>
@@ -8,142 +8,142 @@
 namespace Occ {
 
 
-class WebViewPage : AbstractCredentialsWizardPage {
+class Web_view_page : Abstract_credentials_wizard_page {
 public:
-    WebViewPage (Gtk.Widget *parent = nullptr);
-    ~WebViewPage () override;
+    Web_view_page (Gtk.Widget *parent = nullptr);
+    ~Web_view_page () override;
 
-    void initializePage () override;
-    void cleanupPage () override;
-    int nextId () const override;
-    bool isComplete () const override;
+    void initialize_page () override;
+    void cleanup_page () override;
+    int next_id () const override;
+    bool is_complete () const override;
 
-    AbstractCredentials* getCredentials () const override;
-    void setConnected ();
+    AbstractCredentials* get_credentials () const override;
+    void set_connected ();
 
 signals:
-    void connectToOCUrl (string&);
+    void connect_to_oCUrl (string&);
 
 private slots:
-    void urlCatched (string user, string pass, string host);
+    void url_catched (string user, string pass, string host);
 
 private:
-    void resizeWizard ();
-    bool tryToSetWizardSize (int width, int height);
+    void resize_wizard ();
+    bool try_to_set_wizard_size (int width, int height);
 
-    OwncloudWizard *_ocWizard;
-    WebView *_webView;
+    OwncloudWizard *_oc_wizard;
+    Web_view *_web_view;
 
     string _user;
     string _pass;
 
-    bool _useSystemProxy;
+    bool _use_system_proxy;
 
-    QSize _originalWizardSize;
+    QSize _original_wizard_size;
 };
 
 
-    WebViewPage.WebViewPage (Gtk.Widget *parent)
-        : AbstractCredentialsWizardPage () {
-        _ocWizard = qobject_cast<OwncloudWizard> (parent);
+    Web_view_page.Web_view_page (Gtk.Widget *parent)
+        : Abstract_credentials_wizard_page () {
+        _oc_wizard = qobject_cast<OwncloudWizard> (parent);
     
-        qCInfo (lcWizardWebiewPage ()) << "Time for a webview!";
-        _webView = new WebView (this);
+        q_c_info (lc_wizard_webiew_page ()) << "Time for a webview!";
+        _web_view = new Web_view (this);
     
         auto *layout = new QVBoxLayout (this);
-        layout.setMargin (0);
-        layout.addWidget (_webView);
-        setLayout (layout);
+        layout.set_margin (0);
+        layout.add_widget (_web_view);
+        set_layout (layout);
     
-        connect (_webView, &WebView.urlCatched, this, &WebViewPage.urlCatched);
+        connect (_web_view, &Web_view.url_catched, this, &Web_view_page.url_catched);
     
-        //_useSystemProxy = QNetworkProxyFactory.usesSystemConfiguration ();
+        //_use_system_proxy = QNetworkProxyFactory.uses_system_configuration ();
     }
     
-    WebViewPage.~WebViewPage () = default;
+    Web_view_page.~Web_view_page () = default;
     //{
-    //    QNetworkProxyFactory.setUseSystemConfiguration (_useSystemProxy);
+    //    QNetworkProxyFactory.set_use_system_configuration (_use_system_proxy);
     //}
     
-    void WebViewPage.initializePage () {
-        //QNetworkProxy.setApplicationProxy (QNetworkProxy.applicationProxy ());
+    void Web_view_page.initialize_page () {
+        //QNetworkProxy.set_application_proxy (QNetworkProxy.application_proxy ());
     
         string url;
-        if (_ocWizard.registration ()) {
+        if (_oc_wizard.registration ()) {
             url = "https://nextcloud.com/register";
         } else {
-            url = _ocWizard.ocUrl ();
-            if (!url.endsWith ('/')) {
+            url = _oc_wizard.oc_url ();
+            if (!url.ends_with ('/')) {
                 url += "/";
             }
             url += "index.php/login/flow";
         }
-        qCInfo (lcWizardWebiewPage ()) << "Url to auth at : " << url;
-        _webView.setUrl (QUrl (url));
+        q_c_info (lc_wizard_webiew_page ()) << "Url to auth at : " << url;
+        _web_view.set_url (QUrl (url));
     
-        _originalWizardSize = _ocWizard.size ();
-        resizeWizard ();
+        _original_wizard_size = _oc_wizard.size ();
+        resize_wizard ();
     }
     
-    void WebViewPage.resizeWizard () {
+    void Web_view_page.resize_wizard () {
         // The webview needs a little bit more space
-        auto wizardSizeChanged = tryToSetWizardSize (_originalWizardSize.width () * 2, _originalWizardSize.height () * 2);
+        auto wizard_size_changed = try_to_set_wizard_size (_original_wizard_size.width () * 2, _original_wizard_size.height () * 2);
     
-        if (!wizardSizeChanged) {
-            wizardSizeChanged = tryToSetWizardSize (static_cast<int> (_originalWizardSize.width () * 1.5), static_cast<int> (_originalWizardSize.height () * 1.5));
+        if (!wizard_size_changed) {
+            wizard_size_changed = try_to_set_wizard_size (static_cast<int> (_original_wizard_size.width () * 1.5), static_cast<int> (_original_wizard_size.height () * 1.5));
         }
     
-        if (wizardSizeChanged) {
-            _ocWizard.centerWindow ();
+        if (wizard_size_changed) {
+            _oc_wizard.center_window ();
         }
     }
     
-    bool WebViewPage.tryToSetWizardSize (int width, int height) {
-        const auto window = _ocWizard.window ();
-        const auto screenGeometry = QGuiApplication.screenAt (window.pos ()).geometry ();
-        const auto windowWidth = screenGeometry.width ();
-        const auto windowHeight = screenGeometry.height ();
+    bool Web_view_page.try_to_set_wizard_size (int width, int height) {
+        const auto window = _oc_wizard.window ();
+        const auto screen_geometry = QGuiApplication.screen_at (window.pos ()).geometry ();
+        const auto window_width = screen_geometry.width ();
+        const auto window_height = screen_geometry.height ();
     
-        if (width < windowWidth && height < windowHeight) {
-            _ocWizard.resize (width, height);
+        if (width < window_width && height < window_height) {
+            _oc_wizard.resize (width, height);
             return true;
         }
     
         return false;
     }
     
-    void WebViewPage.cleanupPage () {
-        _ocWizard.resize (_originalWizardSize);
-        _ocWizard.centerWindow ();
+    void Web_view_page.cleanup_page () {
+        _oc_wizard.resize (_original_wizard_size);
+        _oc_wizard.center_window ();
     }
     
-    int WebViewPage.nextId () {
-        return WizardCommon.Page_AdvancedSetup;
+    int Web_view_page.next_id () {
+        return Wizard_common.Page_Advanced_setup;
     }
     
-    bool WebViewPage.isComplete () {
+    bool Web_view_page.is_complete () {
         return false;
     }
     
-    AbstractCredentials* WebViewPage.getCredentials () {
-        return new WebFlowCredentials (_user, _pass, _ocWizard._clientSslCertificate, _ocWizard._clientSslKey);
+    AbstractCredentials* Web_view_page.get_credentials () {
+        return new WebFlowCredentials (_user, _pass, _oc_wizard._client_ssl_certificate, _oc_wizard._client_ssl_key);
     }
     
-    void WebViewPage.setConnected () {
-        qCInfo (lcWizardWebiewPage ()) << "YAY! we are connected!";
+    void Web_view_page.set_connected () {
+        q_c_info (lc_wizard_webiew_page ()) << "YAY! we are connected!";
     }
     
-    void WebViewPage.urlCatched (string user, string pass, string host) {
-        qCInfo (lcWizardWebiewPage ()) << "Got user : " << user << ", server : " << host;
+    void Web_view_page.url_catched (string user, string pass, string host) {
+        q_c_info (lc_wizard_webiew_page ()) << "Got user : " << user << ", server : " << host;
     
         _user = user;
         _pass = pass;
     
-        AccountPtr account = _ocWizard.account ();
-        account.setUrl (host);
+        AccountPtr account = _oc_wizard.account ();
+        account.set_url (host);
     
-        qCInfo (lcWizardWebiewPage ()) << "URL : " << field ("OCUrl").toString ();
-        emit connectToOCUrl (host);
+        q_c_info (lc_wizard_webiew_page ()) << "URL : " << field ("OCUrl").to_string ();
+        emit connect_to_oCUrl (host);
     }
     
     }

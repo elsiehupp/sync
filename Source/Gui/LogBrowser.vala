@@ -20,7 +20,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QDesktopServices>
 
 // #include <QCheckBox>
-// #include <QPlainTextEdit>
+// #include <QPlain_text_edit>
 // #include <QTextStream>
 // #include <QFile>
 // #include <GLib.Object>
@@ -34,30 +34,30 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 namespace Occ {
 
 /***********************************************************
-@brief The LogBrowser class
+@brief The Log_browser class
 @ingroup gui
 ***********************************************************/
-class LogBrowser : Gtk.Dialog {
+class Log_browser : Gtk.Dialog {
 public:
-    LogBrowser (Gtk.Widget *parent = nullptr);
-    ~LogBrowser () override;
+    Log_browser (Gtk.Widget *parent = nullptr);
+    ~Log_browser () override;
 
 protected:
-    void closeEvent (QCloseEvent *) override;
+    void close_event (QClose_event *) override;
 
 protected slots:
-    void togglePermanentLogging (bool enabled);
+    void toggle_permanent_logging (bool enabled);
 };
 
 
-    LogBrowser.LogBrowser (Gtk.Widget *parent)
+    Log_browser.Log_browser (Gtk.Widget *parent)
         : Gtk.Dialog (parent) {
-        setWindowFlags (windowFlags () & ~Qt.WindowContextHelpButtonHint);
-        setObjectName ("LogBrowser"); // for save/restoreGeometry ()
-        setWindowTitle (tr ("Log Output"));
-        setMinimumWidth (600);
+        set_window_flags (window_flags () & ~Qt.Window_context_help_button_hint);
+        set_object_name ("Log_browser"); // for save/restore_geometry ()
+        set_window_title (tr ("Log Output"));
+        set_minimum_width (600);
     
-        auto mainLayout = new QVBoxLayout;
+        auto main_layout = new QVBoxLayout;
     
         auto label = new QLabel (
             tr ("The client can write debug logs to a temporary folder. "
@@ -66,73 +66,73 @@ protected slots:
                "run and compress older ones. It will also delete log files after a couple "
                "of hours to avoid consuming too much disk space.\n"
                "If enabled, logs will be written to %1")
-            .arg (Logger.instance ().temporaryFolderLogDirPath ()));
-        label.setWordWrap (true);
-        label.setTextInteractionFlags (Qt.TextSelectableByMouse);
-        label.setSizePolicy (QSizePolicy.Expanding, QSizePolicy.MinimumExpanding);
-        mainLayout.addWidget (label);
+            .arg (Logger.instance ().temporary_folder_log_dir_path ()));
+        label.set_word_wrap (true);
+        label.set_text_interaction_flags (Qt.Text_selectable_by_mouse);
+        label.set_size_policy (QSize_policy.Expanding, QSize_policy.Minimum_expanding);
+        main_layout.add_widget (label);
     
         // button to permanently save logs
-        auto enableLoggingButton = new QCheckBox;
-        enableLoggingButton.setText (tr ("Enable logging to temporary folder"));
-        enableLoggingButton.setChecked (ConfigFile ().automaticLogDir ());
-        connect (enableLoggingButton, &QCheckBox.toggled, this, &LogBrowser.togglePermanentLogging);
-        mainLayout.addWidget (enableLoggingButton);
+        auto enable_logging_button = new QCheckBox;
+        enable_logging_button.set_text (tr ("Enable logging to temporary folder"));
+        enable_logging_button.set_checked (ConfigFile ().automatic_log_dir ());
+        connect (enable_logging_button, &QCheckBox.toggled, this, &Log_browser.toggle_permanent_logging);
+        main_layout.add_widget (enable_logging_button);
     
         label = new QLabel (
             tr ("This setting persists across client restarts.\n"
                "Note that using any logging command line options will override this setting."));
-        label.setWordWrap (true);
-        label.setSizePolicy (QSizePolicy.Expanding, QSizePolicy.MinimumExpanding);
-        mainLayout.addWidget (label);
+        label.set_word_wrap (true);
+        label.set_size_policy (QSize_policy.Expanding, QSize_policy.Minimum_expanding);
+        main_layout.add_widget (label);
     
-        auto openFolderButton = new QPushButton;
-        openFolderButton.setText (tr ("Open folder"));
-        connect (openFolderButton, &QPushButton.clicked, this, [] () {
-            string path = Logger.instance ().temporaryFolderLogDirPath ();
+        auto open_folder_button = new QPushButton;
+        open_folder_button.set_text (tr ("Open folder"));
+        connect (open_folder_button, &QPushButton.clicked, this, [] () {
+            string path = Logger.instance ().temporary_folder_log_dir_path ();
             QDir ().mkpath (path);
-            QDesktopServices.openUrl (QUrl.fromLocalFile (path));
+            QDesktopServices.open_url (QUrl.from_local_file (path));
         });
-        mainLayout.addWidget (openFolderButton);
+        main_layout.add_widget (open_folder_button);
     
         auto *btnbox = new QDialogButtonBox;
-        QPushButton *closeBtn = btnbox.addButton (QDialogButtonBox.Close);
-        connect (closeBtn, &QAbstractButton.clicked, this, &Gtk.Widget.close);
+        QPushButton *close_btn = btnbox.add_button (QDialogButtonBox.Close);
+        connect (close_btn, &QAbstractButton.clicked, this, &Gtk.Widget.close);
     
-        mainLayout.addStretch ();
-        mainLayout.addWidget (btnbox);
+        main_layout.add_stretch ();
+        main_layout.add_widget (btnbox);
     
-        setLayout (mainLayout);
+        set_layout (main_layout);
     
-        setModal (false);
+        set_modal (false);
     
-        auto showLogWindow = new QAction (this);
-        showLogWindow.setShortcut (QKeySequence ("F12"));
-        connect (showLogWindow, &QAction.triggered, this, &Gtk.Widget.close);
-        addAction (showLogWindow);
+        auto show_log_window = new QAction (this);
+        show_log_window.set_shortcut (QKeySequence ("F12"));
+        connect (show_log_window, &QAction.triggered, this, &Gtk.Widget.close);
+        add_action (show_log_window);
     
         ConfigFile cfg;
-        cfg.restoreGeometry (this);
+        cfg.restore_geometry (this);
     }
     
-    LogBrowser.~LogBrowser () = default;
+    Log_browser.~Log_browser () = default;
     
-    void LogBrowser.closeEvent (QCloseEvent *) {
+    void Log_browser.close_event (QClose_event *) {
         ConfigFile cfg;
-        cfg.saveGeometry (this);
+        cfg.save_geometry (this);
     }
     
-    void LogBrowser.togglePermanentLogging (bool enabled) {
-        ConfigFile ().setAutomaticLogDir (enabled);
+    void Log_browser.toggle_permanent_logging (bool enabled) {
+        ConfigFile ().set_automatic_log_dir (enabled);
     
         auto logger = Logger.instance ();
         if (enabled) {
-            if (!logger.isLoggingToFile ()) {
-                logger.setupTemporaryFolderLogDir ();
-                logger.enterNextLogFile ();
+            if (!logger.is_logging_to_file ()) {
+                logger.setup_temporary_folder_log_dir ();
+                logger.enter_next_log_file ();
             }
         } else {
-            logger.disableTemporaryFolderLogDir ();
+            logger.disable_temporary_folder_log_dir ();
         }
     }
     
