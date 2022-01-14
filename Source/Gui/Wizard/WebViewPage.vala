@@ -32,7 +32,7 @@ private:
     bool try_to_set_wizard_size (int width, int height);
 
     OwncloudWizard *_oc_wizard;
-    Web_view *_web_view;
+    WebView *_web_view;
 
     string _user;
     string _pass;
@@ -48,14 +48,14 @@ private:
         _oc_wizard = qobject_cast<OwncloudWizard> (parent);
     
         q_c_info (lc_wizard_webiew_page ()) << "Time for a webview!";
-        _web_view = new Web_view (this);
+        _web_view = new WebView (this);
     
         auto *layout = new QVBoxLayout (this);
         layout.set_margin (0);
         layout.add_widget (_web_view);
         set_layout (layout);
     
-        connect (_web_view, &Web_view.url_catched, this, &Web_view_page.url_catched);
+        connect (_web_view, &WebView.url_catched, this, &Web_view_page.url_catched);
     
         //_use_system_proxy = QNetworkProxyFactory.uses_system_configuration ();
     }
@@ -118,7 +118,7 @@ private:
     }
     
     int Web_view_page.next_id () {
-        return Wizard_common.Page_Advanced_setup;
+        return WizardCommon.Page_Advanced_setup;
     }
     
     bool Web_view_page.is_complete () {

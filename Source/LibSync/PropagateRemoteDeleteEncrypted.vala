@@ -16,7 +16,7 @@ namespace Occ {
 
 class Propagate_remote_delete_encrypted : Abstract_propagate_remote_delete_encrypted {
 public:
-    Propagate_remote_delete_encrypted (Owncloud_propagator *propagator, Sync_file_item_ptr item, GLib.Object *parent);
+    Propagate_remote_delete_encrypted (Owncloud_propagator *propagator, SyncFileItemPtr item, GLib.Object *parent);
 
     void start () override;
 
@@ -33,7 +33,7 @@ private:
 
 
 
-Propagate_remote_delete_encrypted.Propagate_remote_delete_encrypted (Owncloud_propagator *propagator, Sync_file_item_ptr item, GLib.Object *parent)
+Propagate_remote_delete_encrypted.Propagate_remote_delete_encrypted (Owncloud_propagator *propagator, SyncFileItemPtr item, GLib.Object *parent)
     : Abstract_propagate_remote_delete_encrypted (propagator, item, parent) {
 
 }

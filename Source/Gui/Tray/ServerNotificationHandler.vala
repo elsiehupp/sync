@@ -1,6 +1,6 @@
 
 
-// #include <Qt_core>
+// #include <QtCore>
 // #include <QJsonDocument>
 // #include <QJsonObject>
 

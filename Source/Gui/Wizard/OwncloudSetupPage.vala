@@ -143,11 +143,11 @@ private:
         Theme *theme = Theme.instance ();
         QVariant variant = theme.custom_media (Theme.o_c_setup_top);
         if (!variant.is_null ()) {
-            Wizard_common.setup_custom_media (variant, _ui.top_label);
+            WizardCommon.setup_custom_media (variant, _ui.top_label);
         }
     
         variant = theme.custom_media (Theme.o_c_setup_bottom);
-        Wizard_common.setup_custom_media (variant, _ui.bottom_label);
+        WizardCommon.setup_custom_media (variant, _ui.bottom_label);
     
         auto le_url_palette = _ui.le_url.palette ();
         le_url_palette.set_color (QPalette.Text, Qt.black);
@@ -204,7 +204,7 @@ private:
     void Owncloud_setup_page.initialize_page () {
         customize_style ();
     
-        Wizard_common.init_error_label (_ui.error_label);
+        WizardCommon.init_error_label (_ui.error_label);
     
         _auth_type_known = false;
         _checking = false;
@@ -239,17 +239,17 @@ private:
     int Owncloud_setup_page.next_id () {
         switch (_auth_type) {
         case DetermineAuthTypeJob.Basic:
-            return Wizard_common.Page_Http_creds;
+            return WizardCommon.Page_Http_creds;
         case DetermineAuthTypeJob.OAuth:
-            return Wizard_common.Page_OAuth_creds;
-        case DetermineAuthTypeJob.Login_flow_v2:
-            return Wizard_common.Page_Flow2Auth_creds;
+            return WizardCommon.Page_OAuth_creds;
+        case DetermineAuthTypeJob.LoginFlowV2:
+            return WizardCommon.Page_Flow2Auth_creds;
     #ifdef WITH_WEBENGINE
-        case DetermineAuthTypeJob.Web_view_flow:
-            return Wizard_common.Page_Web_view;
+        case DetermineAuthTypeJob.WebViewFlow:
+            return WizardCommon.Page_Web_view;
     #endif // WITH_WEBENGINE
         case DetermineAuthTypeJob.No_auth_type:
-            return Wizard_common.Page_Http_creds;
+            return WizardCommon.Page_Http_creds;
         }
         Q_UNREACHABLE ();
     }
@@ -393,7 +393,7 @@ private:
             }
         }
     
-        Wizard_common.customize_hint_label (_ui.server_address_description_label);
+        WizardCommon.customize_hint_label (_ui.server_address_description_label);
     }
     
     } // namespace Occ

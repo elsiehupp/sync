@@ -18,12 +18,12 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 namespace Occ {
 
 /***********************************************************
-@brief The Progress_info class
+@brief The ProgressInfo class
 @ingroup libsync
 ***********************************************************/
-class Progress_info : GLib.Object {
+class ProgressInfo : GLib.Object {
 public:
-    Progress_info ();
+    ProgressInfo ();
 
     /***********************************************************
     Resets for a new sync run.
@@ -52,7 +52,7 @@ public:
         /***********************************************************
          * Emitted once when done
          *
-         * Except when Sync_engine jumps directly to finalize () without going
+         * Except when SyncEngine jumps directly to finalize () without going
          * through slot_propagation_finished ().
          */
         Done
@@ -70,9 +70,9 @@ public:
     /***********************************************************
     Returns true when start_estimate_updates () was called.
     
-    This is used when the Sync_engine wants to indicate a new sync
+    This is used when the SyncEngine wants to indicate a new sync
     is about to start via the transmission_progress () signal. The
-    first Progress_info will have is_updating_estimates () == false.
+    first ProgressInfo will have is_updating_estimates () == false.
     ***********************************************************/
     bool is_updating_estimates ();
 
@@ -145,11 +145,11 @@ public:
         // progress measurement stats. See update ().
         double _initial_smoothing = 1.0;
 
-        // Set and updated by Progress_info
+        // Set and updated by ProgressInfo
         int64 _completed = 0;
         int64 _total = 0;
 
-        friend class Progress_info;
+        friend class ProgressInfo;
     };
 
     Status _status;
@@ -235,9 +235,9 @@ namespace Progress {
 Type of error
 
 Used for Progress_dispatcher.sync_error. May trigger error interactivity
-in Issues_widget.
+in IssuesWidget.
 ***********************************************************/
-enum class Error_category {
+enum class ErrorCategory {
     Normal,
     Insufficient_remote_storage,
 };
@@ -266,16 +266,16 @@ signals:
       @param[out]  progress   A struct with all progress info.
 
     ***********************************************************/
-    void progress_info (string &folder, Progress_info &progress);
+    void progress_info (string &folder, ProgressInfo &progress);
     /***********************************************************
     @brief : the item was completed by a job
     ***********************************************************/
-    void item_completed (string &folder, Sync_file_item_ptr &item);
+    void item_completed (string &folder, SyncFileItemPtr &item);
 
     /***********************************************************
     @brief A new folder-wide sync error was seen.
     ***********************************************************/
-    void sync_error (string &folder, string &message, Error_category category);
+    void sync_error (string &folder, string &message, ErrorCategory category);
 
     /***********************************************************
     @brief Emitted when an error needs to be added into GUI
@@ -292,7 +292,7 @@ signals:
     void folder_conflicts (string &folder, QStringList &conflict_paths);
 
 protected:
-    void set_progress_info (string &folder, Progress_info &progress);
+    void set_progress_info (string &folder, ProgressInfo &progress);
 
 private:
     Progress_dispatcher (GLib.Object *parent = nullptr);
@@ -395,7 +395,7 @@ private:
     
     Progress_dispatcher.~Progress_dispatcher () = default;
     
-    void Progress_dispatcher.set_progress_info (string &folder, Progress_info &progress) {
+    void Progress_dispatcher.set_progress_info (string &folder, ProgressInfo &progress) {
         if (folder.is_empty ())
         // The update phase now also has progress
         //            (progress._current_items.size () == 0
@@ -405,12 +405,12 @@ private:
         emit progress_info (folder, progress);
     }
     
-    Progress_info.Progress_info () {
-        connect (&_update_estimates_timer, &QTimer.timeout, this, &Progress_info.update_estimates);
+    ProgressInfo.ProgressInfo () {
+        connect (&_update_estimates_timer, &QTimer.timeout, this, &ProgressInfo.update_estimates);
         reset ();
     }
     
-    void Progress_info.reset () {
+    void ProgressInfo.reset () {
         _status = Starting;
     
         _current_items.clear ();
@@ -429,15 +429,15 @@ private:
         _last_completed_item = SyncFileItem ();
     }
     
-    Progress_info.Status Progress_info.status () {
+    ProgressInfo.Status ProgressInfo.status () {
         return _status;
     }
     
-    void Progress_info.start_estimate_updates () {
+    void ProgressInfo.start_estimate_updates () {
         _update_estimates_timer.start (1000);
     }
     
-    bool Progress_info.is_updating_estimates () {
+    bool ProgressInfo.is_updating_estimates () {
         return _update_estimates_timer.is_active ();
     }
     
@@ -455,7 +455,7 @@ private:
         return true;
     }
     
-    void Progress_info.adjust_totals_for_file (SyncFileItem &item) {
+    void ProgressInfo.adjust_totals_for_file (SyncFileItem &item) {
         if (!should_count_progress (item)) {
             return;
         }
@@ -466,41 +466,41 @@ private:
         }
     }
     
-    int64 Progress_info.total_files () {
+    int64 ProgressInfo.total_files () {
         return _file_progress._total;
     }
     
-    int64 Progress_info.completed_files () {
+    int64 ProgressInfo.completed_files () {
         return _file_progress._completed;
     }
     
-    int64 Progress_info.current_file () {
+    int64 ProgressInfo.current_file () {
         return completed_files () + _current_items.size ();
     }
     
-    int64 Progress_info.total_size () {
+    int64 ProgressInfo.total_size () {
         return _size_progress._total;
     }
     
-    int64 Progress_info.completed_size () {
+    int64 ProgressInfo.completed_size () {
         return _size_progress._completed;
     }
     
-    void Progress_info.set_progress_complete (SyncFileItem &item) {
+    void ProgressInfo.set_progress_complete (SyncFileItem &item) {
         if (!should_count_progress (item)) {
             return;
         }
     
         _current_items.remove (item._file);
         _file_progress.set_completed (_file_progress._completed + item._affected_items);
-        if (Progress_info.is_size_dependent (item)) {
+        if (ProgressInfo.is_size_dependent (item)) {
             _total_size_of_completed_jobs += item._size;
         }
         recompute_completed_size ();
         _last_completed_item = item;
     }
     
-    void Progress_info.set_progress_item (SyncFileItem &item, int64 completed) {
+    void ProgressInfo.set_progress_item (SyncFileItem &item, int64 completed) {
         if (!should_count_progress (item)) {
             return;
         }
@@ -514,7 +514,7 @@ private:
         _last_completed_item = SyncFileItem ();
     }
     
-    Progress_info.Estimates Progress_info.total_progress () {
+    ProgressInfo.Estimates ProgressInfo.total_progress () {
         Estimates file = _file_progress.estimates ();
         if (_size_progress._total == 0) {
             return file;
@@ -573,7 +573,7 @@ private:
         return size;
     }
     
-    uint64 Progress_info.optimistic_eta () {
+    uint64 ProgressInfo.optimistic_eta () {
         // This assumes files and transfers finish as quickly as possible
         // *but* note that max_per_second could be serious underestimate
         // (if we never got to fully excercise transfer or files/second)
@@ -582,15 +582,15 @@ private:
             + _size_progress.remaining () / _max_bytes_per_second * 1000;
     }
     
-    bool Progress_info.trust_eta () {
+    bool ProgressInfo.trust_eta () {
         return total_progress ().estimated_eta < 100 * optimistic_eta ();
     }
     
-    Progress_info.Estimates Progress_info.file_progress (SyncFileItem &item) {
+    ProgressInfo.Estimates ProgressInfo.file_progress (SyncFileItem &item) {
         return _current_items[item._file]._progress.estimates ();
     }
     
-    void Progress_info.update_estimates () {
+    void ProgressInfo.update_estimates () {
         _size_progress.update ();
         _file_progress.update ();
     
@@ -607,7 +607,7 @@ private:
             _max_bytes_per_second);
     }
     
-    void Progress_info.recompute_completed_size () {
+    void ProgressInfo.recompute_completed_size () {
         int64 r = _total_size_of_completed_jobs;
         foreach (Progress_item &i, _current_items) {
             if (is_size_dependent (i._item))
@@ -616,7 +616,7 @@ private:
         _size_progress.set_completed (r);
     }
     
-    Progress_info.Estimates Progress_info.Progress.estimates () {
+    ProgressInfo.Estimates ProgressInfo.Progress.estimates () {
         Estimates est;
         est.estimated_bandwidth = _progress_per_sec;
         if (_progress_per_sec != 0) {
@@ -627,15 +627,15 @@ private:
         return est;
     }
     
-    int64 Progress_info.Progress.completed () {
+    int64 ProgressInfo.Progress.completed () {
         return _completed;
     }
     
-    int64 Progress_info.Progress.remaining () {
+    int64 ProgressInfo.Progress.remaining () {
         return _total - _completed;
     }
     
-    void Progress_info.Progress.update () {
+    void ProgressInfo.Progress.update () {
         // A good way to think about the smoothing factor:
         // If we make progress P per sec and then stop making progress at all,
         // after N calls to this function (and thus seconds) the _progress_per_sec
@@ -650,7 +650,7 @@ private:
         _prev_completed = _completed;
     }
     
-    void Progress_info.Progress.set_completed (int64 completed) {
+    void ProgressInfo.Progress.set_completed (int64 completed) {
         _completed = q_min (completed, _total);
         _prev_completed = q_min (_prev_completed, _completed);
     }

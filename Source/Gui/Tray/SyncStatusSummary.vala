@@ -46,7 +46,7 @@ private:
     void connect_to_folders_progress (Folder.Map &map);
 
     void on_folder_list_changed (Occ.Folder.Map &folder_map);
-    void on_folder_progress_info (Progress_info &progress);
+    void on_folder_progress_info (ProgressInfo &progress);
     void on_folder_sync_state_changed (Folder *folder);
     void on_is_connected_changed ();
 
@@ -243,7 +243,7 @@ namespace {
         return overall_percent / 100.0;
     }
     
-    void Sync_status_summary.on_folder_progress_info (Progress_info &progress) {
+    void Sync_status_summary.on_folder_progress_info (ProgressInfo &progress) {
         const int64 completed_size = progress.completed_size ();
         const int64 current_file = progress.current_file ();
         const int64 completed_file = progress.completed_files ();

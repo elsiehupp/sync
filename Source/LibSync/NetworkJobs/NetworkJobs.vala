@@ -333,11 +333,11 @@ private:
 };
 
 /***********************************************************
-@brief The Request_etag_job class
+@brief The RequestEtagJob class
 ***********************************************************/
-class Request_etag_job : AbstractNetworkJob {
+class RequestEtagJob : AbstractNetworkJob {
 public:
-    Request_etag_job (AccountPtr account, string &path, GLib.Object *parent = nullptr);
+    RequestEtagJob (AccountPtr account, string &path, GLib.Object *parent = nullptr);
     void start () override;
 
 signals:
@@ -438,11 +438,11 @@ public:
     enum AuthType {
         No_auth_type, // used only before we got a chance to probe the server
 #ifdef WITH_WEBENGINE
-        Web_view_flow,
+        WebViewFlow,
 #endif // WITH_WEBENGINE
         Basic, // also the catch-all fallback for backwards compatibility reasons
         OAuth,
-        Login_flow_v2
+        LoginFlowV2
     };
     Q_ENUM (AuthType)
 
@@ -522,11 +522,11 @@ QByteArray parse_etag (char *header) {
     return arr;
 }
 
-Request_etag_job.Request_etag_job (AccountPtr account, string &path, GLib.Object *parent)
+RequestEtagJob.RequestEtagJob (AccountPtr account, string &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 }
 
-void Request_etag_job.start () {
+void RequestEtagJob.start () {
     QNetworkRequest req;
     req.set_raw_header ("Depth", "0");
 
@@ -548,7 +548,7 @@ void Request_etag_job.start () {
     AbstractNetworkJob.start ();
 }
 
-bool Request_etag_job.finished () {
+bool RequestEtagJob.finished () {
     q_c_info (lc_etag_job) << "Request Etag of" << reply ().request ().url () << "FINISHED WITH STATUS"
                       <<  reply_status_string ();
 
@@ -1361,7 +1361,7 @@ void DetermineAuthTypeJob.start () {
             && (www_authenticate_header.starts_with ("Basic") || www_authenticate_header.starts_with ("Bearer"))) {
             _result_get = Basic;
         } else {
-            _result_get = Login_flow_v2;
+            _result_get = LoginFlowV2;
         }
         _get_done = true;
         check_all_done ();
@@ -1383,7 +1383,7 @@ void DetermineAuthTypeJob.start () {
     });
     connect (old_flow_required, &JsonApiJob.json_received, this, [this] (QJsonDocument &json, int status_code) {
         if (status_code == 200) {
-            _result_old_flow = Login_flow_v2;
+            _result_old_flow = LoginFlowV2;
 
             auto data = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
             auto gs = data.value ("globalscale");
@@ -1392,7 +1392,7 @@ void DetermineAuthTypeJob.start () {
                 if (flow != QJsonValue.Undefined) {
                     if (flow.to_int () == 1) {
 #ifdef WITH_WEBENGINE
-                        _result_old_flow = Web_view_flow;
+                        _result_old_flow = WebViewFlow;
 #else // WITH_WEBENGINE
                         q_c_warning (lc_determine_auth_type_job) << "Server does only support flow1, but this client was compiled without support for flow1";
 #endif // WITH_WEBENGINE
@@ -1422,21 +1422,21 @@ void DetermineAuthTypeJob.check_all_done () {
     auto result = _result_propfind;
 
 #ifdef WITH_WEBENGINE
-    // Web_view_flow > OAuth > Basic
+    // WebViewFlow > OAuth > Basic
     if (_account.server_version_int () >= Account.make_server_version (12, 0, 0)) {
-        result = Web_view_flow;
+        result = WebViewFlow;
     }
 #endif // WITH_WEBENGINE
 
-    // Login_flow_v2 > Web_view_flow > OAuth > Basic
+    // LoginFlowV2 > WebViewFlow > OAuth > Basic
     if (_account.server_version_int () >= Account.make_server_version (16, 0, 0)) {
-        result = Login_flow_v2;
+        result = LoginFlowV2;
     }
 
 #ifdef WITH_WEBENGINE
     // If we determined that we need the webview flow (GS for example) then we switch to that
-    if (_result_old_flow == Web_view_flow) {
-        result = Web_view_flow;
+    if (_result_old_flow == WebViewFlow) {
+        result = WebViewFlow;
     }
 #endif // WITH_WEBENGINE
 

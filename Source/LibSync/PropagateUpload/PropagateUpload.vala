@@ -147,9 +147,9 @@ class Poll_job : AbstractNetworkJob {
     string _local_path;
 
 public:
-    Sync_file_item_ptr _item;
+    SyncFileItemPtr _item;
     // Takes ownership of the device
-    Poll_job (AccountPtr account, string &path, Sync_file_item_ptr &item,
+    Poll_job (AccountPtr account, string &path, SyncFileItemPtr &item,
         SyncJournalDb *journal, string &local_path, GLib.Object *parent)
         : AbstractNetworkJob (account, path, parent)
         , _journal (journal)
@@ -221,7 +221,7 @@ protected:
     QByteArray _transmission_checksum_header;
 
 public:
-    Propagate_upload_file_common (Owncloud_propagator *propagator, Sync_file_item_ptr &item);
+    Propagate_upload_file_common (Owncloud_propagator *propagator, SyncFileItemPtr &item);
 
     /***********************************************************
     Whether an existing entity with the same name may be deleted before
@@ -337,7 +337,7 @@ private:
     }
 
 public:
-    Propagate_upload_file_v1 (Owncloud_propagator *propagator, Sync_file_item_ptr &item)
+    Propagate_upload_file_v1 (Owncloud_propagator *propagator, SyncFileItemPtr &item)
         : Propagate_upload_file_common (propagator, item) {
     }
 
@@ -379,7 +379,7 @@ private:
     QUrl chunk_url (int chunk = -1);
 
 public:
-    Propagate_upload_file_nG (Owncloud_propagator *propagator, Sync_file_item_ptr &item)
+    Propagate_upload_file_nG (Owncloud_propagator *propagator, SyncFileItemPtr &item)
         : Propagate_upload_file_common (propagator, item) {
     }
 
@@ -515,7 +515,7 @@ private slots:
         return true;
     }
     
-    Propagate_upload_file_common.Propagate_upload_file_common (Owncloud_propagator *propagator, Sync_file_item_ptr &item)
+    Propagate_upload_file_common.Propagate_upload_file_common (Owncloud_propagator *propagator, SyncFileItemPtr &item)
         : Propagate_item_job (propagator, item)
         , _finished (false)
         , _delete_existing (false)
@@ -635,11 +635,11 @@ private slots:
         }
     
         q_debug () << "Deleting the current";
-        auto job = new Delete_job (propagator ().account (),
+        auto job = new DeleteJob (propagator ().account (),
             propagator ().full_remote_path (_file_to_upload._file),
             this);
         _jobs.append (job);
-        connect (job, &Delete_job.finished_signal, this, &Propagate_upload_file_common.slot_compute_content_checksum);
+        connect (job, &DeleteJob.finished_signal, this, &Propagate_upload_file_common.slot_compute_content_checksum);
         connect (job, &GLib.Object.destroyed, this, &Propagate_upload_file_common.slot_job_destroyed);
         job.start ();
     }

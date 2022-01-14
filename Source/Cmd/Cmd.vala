@@ -68,7 +68,7 @@ struct CmdOptions {
     int uplimit;
 };
 
-// we can't use csync_set_userdata because the Sync_engine sets it already.
+// we can't use csync_set_userdata because the SyncEngine sets it already.
 // So we have to use a global variable
 CmdOptions *opts = nullptr;
 
@@ -416,7 +416,7 @@ int main (int argc, char **argv) {
     loop.exec ();
 
     // much lower age than the default since this utility is usually made to be run right after a change in the tests
-    Sync_engine.minimum_file_age_for_upload = std.chrono.milliseconds (0);
+    SyncEngine.minimum_file_age_for_upload = std.chrono.milliseconds (0);
 
     int restart_count = 0;
 restart_sync:
@@ -451,13 +451,13 @@ restart_sync:
     Sync_options opt;
     opt.fill_from_environment_variables ();
     opt.verify_chunk_sizes ();
-    Sync_engine engine (account, options.source_dir, folder, &db);
+    SyncEngine engine (account, options.source_dir, folder, &db);
     engine.set_ignore_hidden_files (options.ignore_hidden_files);
     engine.set_network_limits (options.uplimit, options.downlimit);
-    GLib.Object.connect (&engine, &Sync_engine.finished,
+    GLib.Object.connect (&engine, &SyncEngine.finished,
         [&app] (bool result) { app.exit (result ? EXIT_SUCCESS : EXIT_FAILURE); });
-    GLib.Object.connect (&engine, &Sync_engine.transmission_progress, &cmd, &Cmd.transmission_progress_slot);
-    GLib.Object.connect (&engine, &Sync_engine.sync_error,
+    GLib.Object.connect (&engine, &SyncEngine.transmission_progress, &cmd, &Cmd.transmission_progress_slot);
+    GLib.Object.connect (&engine, &SyncEngine.sync_error,
         [] (string &error) { q_warning () << "Sync error:" << error; });
 
     // Exclude lists

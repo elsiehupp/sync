@@ -16,11 +16,11 @@ namespace Occ {
 @ingroup libsync
 ***********************************************************/
 class Propagate_remote_delete : Propagate_item_job {
-    QPointer<Delete_job> _job;
+    QPointer<DeleteJob> _job;
     Abstract_propagate_remote_delete_encrypted *_delete_encrypted_helper = nullptr;
 
 public:
-    Propagate_remote_delete (Owncloud_propagator *propagator, Sync_file_item_ptr &item)
+    Propagate_remote_delete (Owncloud_propagator *propagator, SyncFileItemPtr &item)
         : Propagate_item_job (propagator, item) {
     }
     void start () override;
@@ -65,11 +65,11 @@ private slots:
     void Propagate_remote_delete.create_delete_job (string &filename) {
         q_c_info (lc_propagate_remote_delete) << "Deleting file, local" << _item._file << "remote" << filename;
     
-        _job = new Delete_job (propagator ().account (),
+        _job = new DeleteJob (propagator ().account (),
             propagator ().full_remote_path (filename),
             this);
     
-        connect (_job.data (), &Delete_job.finished_signal, this, &Propagate_remote_delete.slot_delete_job_finished);
+        connect (_job.data (), &DeleteJob.finished_signal, this, &Propagate_remote_delete.slot_delete_job_finished);
         propagator ()._active_job_list.append (this);
         _job.start ();
     }

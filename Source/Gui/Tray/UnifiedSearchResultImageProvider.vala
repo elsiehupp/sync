@@ -10,7 +10,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
 // #pragma once
 
-// #include <Qt_core>
+// #include <QtCore>
 // #include <QQuick_image_provider>
 
 namespace Occ {

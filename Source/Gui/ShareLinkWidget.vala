@@ -145,7 +145,7 @@ private:
     QAction *_note_link_action;
     QHBox_layout *_share_link_layout{};
     QLabel *_share_link_label{};
-    Elided_label *_share_link_elided_label{};
+    ElidedLabel *_share_link_elided_label{};
     QLineEdit *_share_link_edit{};
     QToolButton *_share_link_button{};
     QProgress_indicator *_share_link_progress_indicator{};
@@ -311,7 +311,7 @@ void Share_link_widget.setup_ui_options () {
         _allow_upload_link_action.set_checked (checked);
     }
 
-    _share_link_elided_label = new Occ.Elided_label (this);
+    _share_link_elided_label = new Occ.ElidedLabel (this);
     _share_link_elided_label.set_elide_mode (Qt.Elide_right);
     display_share_link_label ();
     _ui.horizontal_layout.insert_widget (2, _share_link_elided_label);

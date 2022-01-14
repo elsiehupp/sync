@@ -73,7 +73,7 @@ private:
     QTree_widget *_folder_tree;
 
     // During account setup we want to filter out excluded folders from the
-    // view without having a Folder.Sync_engine.Excluded_files instance.
+    // view without having a Folder.SyncEngine.Excluded_files instance.
     Excluded_files _excluded_files;
 
     QStringList _encrypted_paths;
@@ -273,7 +273,7 @@ private:
             path_to_remove.append ('/');
     
         // Check for excludes.
-        QMutable_list_iterator<string> it (list);
+        QMutableListIterator<string> it (list);
         while (it.has_next ()) {
             it.next ();
             if (_excluded_files.is_excluded (it.value (), path_to_remove, FolderMan.instance ().ignore_hidden_files ()))

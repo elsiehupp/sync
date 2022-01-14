@@ -4,15 +4,15 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <Qt_core>
-// #include <QAbstract_list_model>
+// #include <QtCore>
+// #include <QAbstractListModel>
 // #include <QDesktopServices>
 // #include <Gtk.Widget>
 // #include <QJsonObject>
 // #include <QJsonDocument>
 // #include <qloggingcategory.h>
 
-// #include <Qt_core>
+// #include <QtCore>
 
 
 namespace Occ {
@@ -21,13 +21,13 @@ Q_DECLARE_LOGGING_CATEGORY (lc_activity)
 
 
 /***********************************************************
-@brief The Activity_list_model
+@brief The ActivityListModel
 @ingroup gui
 
 Simple list model to provide the list view with data.
 ***********************************************************/
 
-class Activity_list_model : QAbstract_list_model {
+class ActivityListModel : QAbstractListModel {
 
     Q_PROPERTY (AccountState *account_state READ account_state CONSTANT)
 public:
@@ -53,9 +53,9 @@ public:
     };
     Q_ENUM (Data_role)
 
-    Activity_list_model (GLib.Object *parent = nullptr);
+    ActivityListModel (GLib.Object *parent = nullptr);
 
-    Activity_list_model (AccountState *account_state,
+    ActivityListModel (AccountState *account_state,
         GLib.Object *parent = nullptr);
 
     QVariant data (QModelIndex &index, int role) const override;
@@ -129,17 +129,17 @@ private:
     bool _hide_old_activities = true;
 };
 
-    Activity_list_model.Activity_list_model (GLib.Object *parent)
-        : QAbstract_list_model (parent) {
+    ActivityListModel.ActivityListModel (GLib.Object *parent)
+        : QAbstractListModel (parent) {
     }
     
-    Activity_list_model.Activity_list_model (AccountState *account_state,
+    ActivityListModel.ActivityListModel (AccountState *account_state,
         GLib.Object *parent)
-        : QAbstract_list_model (parent)
+        : QAbstractListModel (parent)
         , _account_state (account_state) {
     }
     
-    QHash<int, QByteArray> Activity_list_model.role_names () {
+    QHash<int, QByteArray> ActivityListModel.role_names () {
         QHash<int, QByteArray> roles;
         roles[Display_path_role] = "display_path";
         roles[Path_role] = "path";
@@ -158,31 +158,31 @@ private:
         return roles;
     }
     
-    void Activity_list_model.set_account_state (AccountState *state) {
+    void ActivityListModel.set_account_state (AccountState *state) {
         _account_state = state;
     }
     
-    void Activity_list_model.set_currently_fetching (bool value) {
+    void ActivityListModel.set_currently_fetching (bool value) {
         _currently_fetching = value;
     }
     
-    bool Activity_list_model.currently_fetching () {
+    bool ActivityListModel.currently_fetching () {
         return _currently_fetching;
     }
     
-    void Activity_list_model.set_done_fetching (bool value) {
+    void ActivityListModel.set_done_fetching (bool value) {
         _done_fetching = value;
     }
     
-    void Activity_list_model.set_hide_old_activities (bool value) {
+    void ActivityListModel.set_hide_old_activities (bool value) {
         _hide_old_activities = value;
     }
     
-    void Activity_list_model.set_display_actions (bool value) {
+    void ActivityListModel.set_display_actions (bool value) {
         _display_actions = value;
     }
     
-    QVariant Activity_list_model.data (QModelIndex &index, int role) {
+    QVariant ActivityListModel.data (QModelIndex &index, int role) {
         Activity a;
     
         if (!index.is_valid ())
@@ -350,11 +350,11 @@ private:
         return QVariant ();
     }
     
-    int Activity_list_model.row_count (QModelIndex &) {
+    int ActivityListModel.row_count (QModelIndex &) {
         return _final_list.count ();
     }
     
-    bool Activity_list_model.can_fetch_more (QModelIndex &) {
+    bool ActivityListModel.can_fetch_more (QModelIndex &) {
         // We need to be connected to be able to fetch more
         if (_account_state && _account_state.is_connected ()) {
             // If the fetching is reported to be done or we are currently fetching we can't fetch more
@@ -366,13 +366,13 @@ private:
         return false;
     }
     
-    void Activity_list_model.start_fetch_job () {
+    void ActivityListModel.start_fetch_job () {
         if (!_account_state.is_connected ()) {
             return;
         }
         auto *job = new JsonApiJob (_account_state.account (), QLatin1String ("ocs/v2.php/apps/activity/api/v2/activity"), this);
         GLib.Object.connect (job, &JsonApiJob.json_received,
-            this, &Activity_list_model.activities_received);
+            this, &ActivityListModel.activities_received);
     
         QUrlQuery params;
         params.add_query_item (QLatin1String ("since"), string.number (_current_item));
@@ -384,7 +384,7 @@ private:
         job.start ();
     }
     
-    void Activity_list_model.activities_received (QJsonDocument &json, int status_code) {
+    void ActivityListModel.activities_received (QJsonDocument &json, int status_code) {
         auto activities = json.object ().value ("ocs").to_object ().value ("data").to_array ();
     
         Activity_list list;
@@ -437,13 +437,13 @@ private:
         combine_activity_lists ();
     }
     
-    void Activity_list_model.add_error_to_activity_list (Activity activity) {
+    void ActivityListModel.add_error_to_activity_list (Activity activity) {
         q_c_info (lc_activity) << "Error successfully added to the notification list : " << activity._subject;
         _notification_errors_lists.prepend (activity);
         combine_activity_lists ();
     }
     
-    void Activity_list_model.add_ignored_file_to_list (Activity new_activity) {
+    void ActivityListModel.add_ignored_file_to_list (Activity new_activity) {
         q_c_info (lc_activity) << "First checking for duplicates then add file to the notification list of ignored files : " << new_activity._file;
     
         bool duplicate = false;
@@ -466,31 +466,31 @@ private:
         }
     }
     
-    void Activity_list_model.add_notification_to_activity_list (Activity activity) {
+    void ActivityListModel.add_notification_to_activity_list (Activity activity) {
         q_c_info (lc_activity) << "Notification successfully added to the notification list : " << activity._subject;
         _notification_lists.prepend (activity);
         combine_activity_lists ();
     }
     
-    void Activity_list_model.clear_notifications () {
+    void ActivityListModel.clear_notifications () {
         q_c_info (lc_activity) << "Clear the notifications";
         _notification_lists.clear ();
         combine_activity_lists ();
     }
     
-    void Activity_list_model.remove_activity_from_activity_list (int row) {
+    void ActivityListModel.remove_activity_from_activity_list (int row) {
         Activity activity = _final_list.at (row);
         remove_activity_from_activity_list (activity);
         combine_activity_lists ();
     }
     
-    void Activity_list_model.add_sync_file_item_to_activity_list (Activity activity) {
+    void ActivityListModel.add_sync_file_item_to_activity_list (Activity activity) {
         q_c_info (lc_activity) << "Successfully added to the activity list : " << activity._subject;
         _sync_file_item_lists.prepend (activity);
         combine_activity_lists ();
     }
     
-    void Activity_list_model.remove_activity_from_activity_list (Activity activity) {
+    void ActivityListModel.remove_activity_from_activity_list (Activity activity) {
         q_c_info (lc_activity) << "Activity/Notification/Error successfully dismissed : " << activity._subject;
         q_c_info (lc_activity) << "Trying to remove Activity/Notification/Error from view... ";
     
@@ -516,7 +516,7 @@ private:
         }
     }
     
-    void Activity_list_model.trigger_default_action (int activity_index) {
+    void ActivityListModel.trigger_default_action (int activity_index) {
         if (activity_index < 0 || activity_index >= _final_list.size ()) {
             q_c_warning (lc_activity) << "Couldn't trigger default action at index" << activity_index << "/ final list size:" << _final_list.size ();
             return;
@@ -581,7 +581,7 @@ private:
         }
     }
     
-    void Activity_list_model.trigger_action (int activity_index, int action_index) {
+    void ActivityListModel.trigger_action (int activity_index, int action_index) {
         if (activity_index < 0 || activity_index >= _final_list.size ()) {
             q_c_warning (lc_activity) << "Couldn't trigger action on activity at index" << activity_index << "/ final list size:" << _final_list.size ();
             return;
@@ -604,11 +604,11 @@ private:
         emit send_notification_request (activity._acc_name, action._link, action._verb, activity_index);
     }
     
-    AccountState *Activity_list_model.account_state () {
+    AccountState *ActivityListModel.account_state () {
         return _account_state;
     }
     
-    void Activity_list_model.combine_activity_lists () {
+    void ActivityListModel.combine_activity_lists () {
         Activity_list result_list;
     
         if (_notification_errors_lists.count () > 0) {
@@ -660,11 +660,11 @@ private:
         }
     }
     
-    bool Activity_list_model.can_fetch_activities () {
+    bool ActivityListModel.can_fetch_activities () {
         return _account_state.is_connected () && _account_state.account ().capabilities ().has_activities ();
     }
     
-    void Activity_list_model.fetch_more (QModelIndex &) {
+    void ActivityListModel.fetch_more (QModelIndex &) {
         if (can_fetch_activities ()) {
             start_fetch_job ();
         } else {
@@ -673,7 +673,7 @@ private:
         }
     }
     
-    void Activity_list_model.slot_refresh_activity () {
+    void ActivityListModel.slot_refresh_activity () {
         _activity_lists.clear ();
         _done_fetching = false;
         _current_item = 0;
@@ -688,7 +688,7 @@ private:
         }
     }
     
-    void Activity_list_model.slot_remove_account () {
+    void ActivityListModel.slot_remove_account () {
         _final_list.clear ();
         _activity_lists.clear ();
         _currently_fetching = false;

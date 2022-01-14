@@ -111,7 +111,7 @@ private:
         , _max_sharing_permissions (max_sharing_permissions)
         , _private_link_url (account_state.account ().deprecated_private_link_url (numeric_file_id).to_string (QUrl.FullyEncoded))
         , _start_page (start_page) {
-        set_window_flags (window_flags () & ~Qt.Window_context_help_button_hint);
+        set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         set_attribute (Qt.WA_DeleteOnClose);
         set_object_name ("Sharing_dialog"); // required as group for save_geometry call
     
@@ -448,9 +448,9 @@ private:
     
     void Share_dialog.change_event (QEvent *e) {
         switch (e.type ()) {
-        case QEvent.Style_change:
-        case QEvent.Palette_change:
-        case QEvent.Theme_change:
+        case QEvent.StyleChange:
+        case QEvent.PaletteChange:
+        case QEvent.ThemeChange:
             // Notify the other widgets (Dark-/Light-Mode switching)
             emit style_changed ();
             break;

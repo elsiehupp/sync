@@ -4,7 +4,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <Qt_core>
+// #include <QtCore>
 #ifndef TOKEN_AUTH_ONLY
 // #include <QtGui>
 // #include <QStyle>
@@ -474,7 +474,7 @@ public:
     
     @return True if the specified colour is dark.
 
-    2019/12/08 : Moved here from Settings_dialog.
+    2019/12/08 : Moved here from SettingsDialog.
     ***********************************************************/
     static bool is_dark_color (QColor &color);
 
@@ -528,7 +528,7 @@ public:
     
     @return QIcon, colour-aware (inverted on dark backgrounds).
 
-    2019/12/09 : Moved here from Settings_dialog.
+    2019/12/09 : Moved here from SettingsDialog.
     ***********************************************************/
     static QIcon create_color_aware_icon (string &name, QPalette &palette);
 
@@ -537,7 +537,7 @@ public:
     
     @return QIcon, colour-aware (inverted on dark backgrounds).
 
-    2019/12/09 : Moved here from Settings_dialog.
+    2019/12/09 : Moved here from SettingsDialog.
     ***********************************************************/
     static QIcon create_color_aware_icon (string &name);
 

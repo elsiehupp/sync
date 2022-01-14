@@ -45,7 +45,7 @@ private:
     Ignore_list_editor.Ignore_list_editor (Gtk.Widget *parent)
         : Gtk.Dialog (parent)
         , ui (new Ui.Ignore_list_editor) {
-        set_window_flags (window_flags () & ~Qt.Window_context_help_button_hint);
+        set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         ui.setup_ui (this);
     
         ConfigFile cfg_file;

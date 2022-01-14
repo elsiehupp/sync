@@ -8,7 +8,7 @@ Copyright (C) by Klaas Freitag <freitag@kde.org>
 // #include <account.h>
 
 // #include <QFile_icon_provider>
-// #include <QVar_length_array>
+// #include <QVarLengthArray>
 // #include <set>
 
 
@@ -111,7 +111,7 @@ public slots:
     void reset_folders ();
     void slot_sync_all_pending_big_folders ();
     void slot_sync_no_pending_big_folders ();
-    void slot_set_progress (Progress_info &progress);
+    void slot_set_progress (ProgressInfo &progress);
 
 private slots:
     void slot_update_directories (QStringList &);
@@ -818,7 +818,7 @@ void FolderStatusModel.slot_update_directories (QStringList &list) {
         sorted_subfolders.remove_first (); // skip the parent item (first in the list)
     Utility.sort_filenames (sorted_subfolders);
 
-    QVar_length_array<int, 10> undecided_indexes;
+    QVarLengthArray<int, 10> undecided_indexes;
 
     QVector<SubFolderInfo> new_subs;
     new_subs.reserve (sorted_subfolders.size ());
@@ -1028,7 +1028,7 @@ void FolderStatusModel.slot_apply_selective_sync () {
     reset_folders ();
 }
 
-void FolderStatusModel.slot_set_progress (Progress_info &progress) {
+void FolderStatusModel.slot_set_progress (ProgressInfo &progress) {
     auto par = qobject_cast<Gtk.Widget> (GLib.Object.parent ());
     if (!par.is_visible ()) {
         return; // for https://github.com/owncloud/client/issues/2648#issuecomment-71377909
@@ -1057,7 +1057,7 @@ void FolderStatusModel.slot_set_progress (Progress_info &progress) {
           << FolderStatusDelegate.Warning_count
           << Qt.ToolTipRole;
 
-    if (progress.status () == Progress_info.Discovery) {
+    if (progress.status () == ProgressInfo.Discovery) {
         if (!progress._current_discovered_remote_folder.is_empty ()) {
             pi._overall_sync_string = tr ("Checking for changes in remote \"%1\"").arg (progress._current_discovered_remote_folder);
             emit data_changed (index (folder_index), index (folder_index), roles);
@@ -1069,7 +1069,7 @@ void FolderStatusModel.slot_set_progress (Progress_info &progress) {
         }
     }
 
-    if (progress.status () == Progress_info.Reconcile) {
+    if (progress.status () == ProgressInfo.Reconcile) {
         pi._overall_sync_string = tr ("Reconciling changes");
         emit data_changed (index (folder_index), index (folder_index), roles);
         return;
@@ -1090,8 +1090,8 @@ void FolderStatusModel.slot_set_progress (Progress_info &progress) {
     uint64 estimated_up_bw = 0;
     uint64 estimated_down_bw = 0;
     string all_filenames;
-    foreach (Progress_info.Progress_item &citm, progress._current_items) {
-        if (cur_item_progress == -1 || (Progress_info.is_size_dependent (citm._item)
+    foreach (ProgressInfo.Progress_item &citm, progress._current_items) {
+        if (cur_item_progress == -1 || (ProgressInfo.is_size_dependent (citm._item)
                                          && bigger_item_size < citm._item._size)) {
             cur_item_progress = citm._progress.completed ();
             cur_item = citm._item;
@@ -1119,7 +1119,7 @@ void FolderStatusModel.slot_set_progress (Progress_info &progress) {
     string kind_string = Progress.as_action_string (cur_item);
 
     string file_progress_string;
-    if (Progress_info.is_size_dependent (cur_item)) {
+    if (ProgressInfo.is_size_dependent (cur_item)) {
         string s1 = Utility.octets_to_string (cur_item_progress);
         string s2 = Utility.octets_to_string (cur_item._size);
         //uint64 estimated_bw = progress.file_progress (cur_item).estimated_bandwidth;

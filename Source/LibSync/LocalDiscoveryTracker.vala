@@ -17,7 +17,7 @@ using namespace Occ;
 
 namespace Occ {
 
-using Sync_file_item_ptr = QSharedPointer<SyncFileItem>;
+using SyncFileItemPtr = QSharedPointer<SyncFileItem>;
 
 /***********************************************************
 @brief Tracks files that must be rediscovered locally
@@ -25,11 +25,11 @@ using Sync_file_item_ptr = QSharedPointer<SyncFileItem>;
 It does this by being notified about
 - modified files (add_touched_path
 - starting syncs (start_sync* ())
-- finished items (slot_item_completed (), by Sync_engine signal)
-- finished syncs (slot_sync_finished (), by Sync_engine signal)
+- finished items (slot_item_completed (), by SyncEngine signal)
+- finished syncs (slot_sync_finished (), by SyncEngine signal)
 
 Then local_discovery_paths () can be used to determine paths to redis
-and send to Sync_engine.set_local_disco
+and send to SyncEngine.set_local_disco
 
 This class is primarily used from Folder and separate primarily for
 readability and testing purposes.
@@ -68,7 +68,7 @@ public slots:
     Success and failure of sync items adjust what the next sync is
     supposed to do.
     ***********************************************************/
-    void slot_item_completed (Sync_file_item_ptr &item);
+    void slot_item_completed (SyncFileItemPtr &item);
 
     /***********************************************************
     When a sync finishes, the lists must be updated
@@ -134,7 +134,7 @@ const std.set<string> &Local_discovery_tracker.local_discovery_paths () {
     return _local_discovery_paths;
 }
 
-void Local_discovery_tracker.slot_item_completed (Sync_file_item_ptr &item) {
+void Local_discovery_tracker.slot_item_completed (SyncFileItemPtr &item) {
     // For successes, we want to wipe the file from the list to ensure we don't
     // rediscover it even if this overall sync fails.
     //

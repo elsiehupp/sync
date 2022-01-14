@@ -72,8 +72,8 @@ private:
         }
         _ui.le_username.set_placeholder_text (theme.user_iDHint ());
     
-        set_title (Wizard_common.title_template ().arg (tr ("Connect to %1").arg (Theme.instance ().app_name_g_u_i ())));
-        set_sub_title (Wizard_common.sub_title_template ().arg (tr ("Enter user credentials")));
+        set_title (WizardCommon.title_template ().arg (tr ("Connect to %1").arg (Theme.instance ().app_name_g_u_i ())));
+        set_sub_title (WizardCommon.sub_title_template ().arg (tr ("Enter user credentials")));
     
         _ui.result_layout.add_widget (_progress_indi);
         stop_spinner ();
@@ -88,15 +88,15 @@ private:
         Theme *theme = Theme.instance ();
         QVariant variant = theme.custom_media (Theme.o_c_setup_top);
         if (!variant.is_null ()) {
-            Wizard_common.setup_custom_media (variant, _ui.top_label);
+            WizardCommon.setup_custom_media (variant, _ui.top_label);
         }
     
         variant = theme.custom_media (Theme.o_c_setup_bottom);
-        Wizard_common.setup_custom_media (variant, _ui.bottom_label);
+        WizardCommon.setup_custom_media (variant, _ui.bottom_label);
     }
     
     void Owncloud_http_creds_page.initialize_page () {
-        Wizard_common.init_error_label (_ui.error_label);
+        WizardCommon.init_error_label (_ui.error_label);
     
         auto *oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
         AbstractCredentials *cred = oc_wizard.account ().credentials ();
@@ -165,7 +165,7 @@ private:
     }
     
     int Owncloud_http_creds_page.next_id () {
-        return Wizard_common.Page_Advanced_setup;
+        return WizardCommon.Page_Advanced_setup;
     }
     
     void Owncloud_http_creds_page.set_connected () {

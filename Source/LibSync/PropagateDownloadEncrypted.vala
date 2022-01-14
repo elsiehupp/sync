@@ -10,7 +10,7 @@ namespace Occ {
 class Propagate_download_encrypted : GLib.Object {
   Q_OBJECT
 public:
-  Propagate_download_encrypted (Owncloud_propagator *propagator, string &local_parent_path, Sync_file_item_ptr item, GLib.Object *parent = nullptr);
+  Propagate_download_encrypted (Owncloud_propagator *propagator, string &local_parent_path, SyncFileItemPtr item, GLib.Object *parent = nullptr);
   void start ();
   bool decrypt_file (QFile& tmp_file);
   string error_string ();
@@ -30,7 +30,7 @@ signals:
 private:
   Owncloud_propagator *_propagator;
   string _local_parent_path;
-  Sync_file_item_ptr _item;
+  SyncFileItemPtr _item;
   QFileInfo _info;
   Encrypted_file _encrypted_info;
   string _error_string;
@@ -38,7 +38,7 @@ private:
 
 
 
-Propagate_download_encrypted.Propagate_download_encrypted (Owncloud_propagator *propagator, string &local_parent_path, Sync_file_item_ptr item, GLib.Object *parent)
+Propagate_download_encrypted.Propagate_download_encrypted (Owncloud_propagator *propagator, string &local_parent_path, SyncFileItemPtr item, GLib.Object *parent)
     : GLib.Object (parent)
     , _propagator (propagator)
     , _local_parent_path (local_parent_path)

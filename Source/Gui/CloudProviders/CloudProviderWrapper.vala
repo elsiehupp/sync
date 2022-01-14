@@ -51,7 +51,7 @@ public:
 public slots:
     void slot_sync_started ();
     void slot_sync_finished (SyncResult &);
-    void slot_update_progress (string &folder, Progress_info &progress);
+    void slot_update_progress (string &folder, ProgressInfo &progress);
     void slot_sync_paused_changed (Folder*, bool);
 
 private:
@@ -87,7 +87,7 @@ CloudProviderWrapper.CloudProviderWrapper (GLib.Object *parent, Folder *folder, 
     action_group = get_action_group ();
     cloud_providers_account_exporter_set_action_group (_cloud_provider_account, action_group);
 
-    connect (Progress_dispatcher.instance (), SIGNAL (progress_info (string, Progress_info)), this, SLOT (slot_update_progress (string, Progress_info)));
+    connect (Progress_dispatcher.instance (), SIGNAL (progress_info (string, ProgressInfo)), this, SLOT (slot_update_progress (string, ProgressInfo)));
     connect (_folder, SIGNAL (sync_started ()), this, SLOT (slot_sync_started ()));
     connect (_folder, SIGNAL (sync_finished (SyncResult)), this, SLOT (slot_sync_finished (SyncResult)));
     connect (_folder, SIGNAL (sync_paused_changed (Folder*,bool)), this, SLOT (slot_sync_paused_changed (Folder*, bool)));
@@ -123,7 +123,7 @@ static GMenu_item *menu_item_new_submenu (string &label, GMenu_model *submenu) {
     return g_menu_item_new_submenu (label.to_utf8 ().data (), submenu);
 }
 
-void CloudProviderWrapper.slot_update_progress (string &folder, Progress_info &progress) {
+void CloudProviderWrapper.slot_update_progress (string &folder, ProgressInfo &progress) {
     // Only update progress for the current folder
     Folder *f = FolderMan.instance ().folder (folder);
     if (f != _folder)

@@ -20,7 +20,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 namespace Occ {
 
-using Sync_file_item_ptr = QSharedPointer<SyncFileItem>;
+using SyncFileItemPtr = QSharedPointer<SyncFileItem>;
 
 /***********************************************************
 @brief The SyncFileItem class
@@ -91,7 +91,7 @@ public:
     This is intended in particular for read-update-write cycles that need
     to go through a a SyncFileItem, like Poll_job.
     ***********************************************************/
-    static Sync_file_item_ptr from_sync_journal_file_record (SyncJournalFileRecord &rec);
+    static SyncFileItemPtr from_sync_journal_file_record (SyncJournalFileRecord &rec);
 
     SyncFileItem ()
         : _type (Item_type_skip)
@@ -265,11 +265,11 @@ public:
     string _direct_download_cookies;
 };
 
-inline bool operator< (Sync_file_item_ptr &item1, Sync_file_item_ptr &item2) {
+inline bool operator< (SyncFileItemPtr &item1, SyncFileItemPtr &item2) {
     return *item1 < *item2;
 }
 
-using Sync_file_item_vector = QVector<Sync_file_item_ptr>;
+using Sync_file_item_vector = QVector<SyncFileItemPtr>;
 
 
     SyncJournalFileRecord SyncFileItem.to_sync_journal_file_record_with_inode (string &local_file_name) {
@@ -307,8 +307,8 @@ using Sync_file_item_vector = QVector<Sync_file_item_ptr>;
         return rec;
     }
     
-    Sync_file_item_ptr SyncFileItem.from_sync_journal_file_record (SyncJournalFileRecord &rec) {
-        auto item = Sync_file_item_ptr.create ();
+    SyncFileItemPtr SyncFileItem.from_sync_journal_file_record (SyncJournalFileRecord &rec) {
+        auto item = SyncFileItemPtr.create ();
         item._file = rec.path ();
         item._inode = rec._inode;
         item._modtime = rec._modtime;

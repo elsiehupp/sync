@@ -41,10 +41,10 @@ int main (int argc, char **argv) {
     Q_INIT_RESOURCE (theme);
 
     qml_register_type<Sync_status_summary> ("com.nextcloud.desktopclient", 1, 0, "Sync_status_summary");
-    qml_register_type<Emoji_model> ("com.nextcloud.desktopclient", 1, 0, "Emoji_model");
+    qml_register_type<EmojiModel> ("com.nextcloud.desktopclient", 1, 0, "EmojiModel");
     qml_register_type<User_status_selector_model> ("com.nextcloud.desktopclient", 1, 0, "User_status_selector_model");
-    qml_register_type<Occ.Activity_list_model> ("com.nextcloud.desktopclient", 1, 0, "Activity_list_model");
-    qml_register_type<Occ.File_activity_list_model> ("com.nextcloud.desktopclient", 1, 0, "File_activity_list_model");
+    qml_register_type<Occ.ActivityListModel> ("com.nextcloud.desktopclient", 1, 0, "ActivityListModel");
+    qml_register_type<Occ.FileActivityListModel> ("com.nextcloud.desktopclient", 1, 0, "FileActivityListModel");
     qml_register_uncreatable_type<Occ.Unified_search_results_list_model> (
         "com.nextcloud.desktopclient", 1, 0, "Unified_search_results_list_model", "Unified_search_results_list_model");
     q_register_meta_type<Unified_search_results_list_model> ("Unified_search_results_list_model*");

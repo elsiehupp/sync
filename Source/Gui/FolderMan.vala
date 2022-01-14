@@ -8,8 +8,8 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <syncengine.h>
 
 // #include <QMessageBox>
-// #include <Qt_core>
-// #include <QMutable_set_iterator>
+// #include <QtCore>
+// #include <QMutableSetIterator>
 // #include <QSet>
 // #include <QNetworkProxy>
 
@@ -23,7 +23,7 @@ static const int max_folders_version = 1;
 
 namespace Occ {
 
-class Lock_watcher;
+class LockWatcher;
 
 /***********************************************************
 @brief The FolderMan class
@@ -119,7 +119,7 @@ public:
     static string unescape_alias (string &);
 
     SocketApi *socket_api ();
-    Navigation_pane_helper &navigation_pane_helper () { return _navigation_pane_helper; }
+    NavigationPaneHelper &navigation_pane_helper () { return _navigation_pane_helper; }
 
     /***********************************************************
     Check if @a path is a valid path for a new folder considering the already sync'ed items.
@@ -244,7 +244,7 @@ public slots:
     void slot_sync_once_file_unlocks (string &path);
 
     // slot to schedule an ETag job (from Folder only)
-    void slot_schedule_e_tag_job (string &alias, Request_etag_job *job);
+    void slot_schedule_e_tag_job (string &alias, RequestEtagJob *job);
 
     /***********************************************************
     Wipe folder */
@@ -340,10 +340,10 @@ private:
     /// Starts regular etag query jobs
     QTimer _etag_poll_timer;
     /// The currently running etag query
-    QPointer<Request_etag_job> _current_etag_job;
+    QPointer<RequestEtagJob> _current_etag_job;
 
     /// Watches files that couldn't be synced due to locks
-    QScopedPointer<Lock_watcher> _lock_watcher;
+    QScopedPointer<LockWatcher> _lock_watcher;
 
     /// Occasionally schedules folders
     QTimer _time_scheduler;
@@ -355,21 +355,21 @@ private:
     QTimer _start_scheduled_sync_timer;
 
     QScopedPointer<SocketApi> _socket_api;
-    Navigation_pane_helper _navigation_pane_helper;
+    NavigationPaneHelper _navigation_pane_helper;
 
     bool _app_restart_required = false;
 
     static FolderMan *_instance;
     FolderMan (GLib.Object *parent = nullptr);
     friend class Occ.Application;
-    friend class .Test_folder_man;
+    friend class .TestFolderMan;
 };
 
 FolderMan *FolderMan._instance = nullptr;
 
 FolderMan.FolderMan (GLib.Object *parent)
     : GLib.Object (parent)
-    , _lock_watcher (new Lock_watcher)
+    , _lock_watcher (new LockWatcher)
     , _navigation_pane_helper (this) {
     ASSERT (!_instance);
     _instance = this;
@@ -399,7 +399,7 @@ FolderMan.FolderMan (GLib.Object *parent)
     connect (AccountManager.instance (), &AccountManager.account_sync_connection_removed,
         this, &FolderMan.slot_account_removed);
 
-    connect (_lock_watcher.data (), &Lock_watcher.file_unlocked,
+    connect (_lock_watcher.data (), &LockWatcher.file_unlocked,
         this, &FolderMan.slot_watched_file_unlocked);
 
     connect (this, &FolderMan.folder_list_changed, this, &FolderMan.slot_setup_push_notifications);
@@ -517,7 +517,7 @@ int FolderMan.setup_folders () {
 
         // See Folder.save_to_settings for details about why these exists.
         process (QStringLiteral ("Multifolders"), false, false);
-        process (QStringLiteral ("Folders_with_placeholders"), false, true);
+        process (QStringLiteral ("FoldersWithPlaceholders"), false, true);
 
         settings.end_group (); // <account>
     }
@@ -553,7 +553,7 @@ void FolderMan.setup_folders_helper (QSettings &settings, AccountStatePtr accoun
                 folder_definition.journal_path = default_journal_path;
             }
 
-            // Migration #2 : journal_path might be absolute (in Data_app_dir most likely) move it back to the root of local tree
+            // Migration #2 : journal_path might be absolute (in DataAppDir most likely) move it back to the root of local tree
             if (folder_definition.journal_path.at (0) != QChar ('.')) {
                 QFile old_journal (folder_definition.journal_path);
                 QFile old_journal_shm (folder_definition.journal_path + QStringLiteral ("-shm"));
@@ -698,7 +698,7 @@ void FolderMan.backward_migration_settings_keys (QStringList *delete_keys, QStri
         settings.begin_group (account_id);
         process_subgroup ("Folders");
         process_subgroup ("Multifolders");
-        process_subgroup ("Folders_with_placeholders");
+        process_subgroup ("FoldersWithPlaceholders");
         settings.end_group ();
     }
 }
@@ -956,7 +956,7 @@ void FolderMan.schedule_folder_next (Folder *f) {
     start_scheduled_sync_soon ();
 }
 
-void FolderMan.slot_schedule_e_tag_job (string & /*alias*/, Request_etag_job *job) {
+void FolderMan.slot_schedule_e_tag_job (string & /*alias*/, RequestEtagJob *job) {
     GLib.Object.connect (job, &GLib.Object.destroyed, this, &FolderMan.slot_etag_job_destroyed);
     QMetaObject.invoke_method (this, "slot_run_one_etag_job", Qt.QueuedConnection);
     // maybe : add to queue
@@ -1022,7 +1022,7 @@ void FolderMan.slot_account_state_changed () {
             }
         }
 
-        QMutable_list_iterator<Folder> it (_scheduled_folders);
+        QMutableListIterator<Folder> it (_scheduled_folders);
         while (it.has_next ()) {
             Folder *f = it.next ();
             if (f.account_state () == account_state) {
@@ -1133,7 +1133,7 @@ void FolderMan.slot_start_scheduled_folder_sync () {
 
 bool FolderMan.push_notifications_files_ready (Account *account) {
     const auto push_notifications = account.push_notifications ();
-    const auto push_files_available = account.capabilities ().available_push_notifications () & Push_notification_type.Files;
+    const auto push_files_available = account.capabilities ().available_push_notifications () & PushNotificationType.Files;
 
     return push_files_available && push_notifications && push_notifications.is_ready ();
 }
@@ -1221,7 +1221,7 @@ void FolderMan.slot_account_removed (AccountState *account_state) {
 }
 
 void FolderMan.slot_remove_folders_for_account (AccountState *account_state) {
-    QVar_length_array<Folder *, 16> folders_to_remove;
+    QVarLengthArray<Folder *, 16> folders_to_remove;
     Folder.MapIterator i (_folder_map);
     while (i.has_next ()) {
         i.next ();
@@ -1260,7 +1260,7 @@ void FolderMan.slot_server_version_changed (Account *account) {
 void FolderMan.slot_watched_file_unlocked (string &path) {
     if (Folder *f = folder_for_path (path)) {
         // Treat this equivalently to the file being reported by the file watcher
-        f.slot_watched_path_changed (path, Folder.Change_reason.Un_lock);
+        f.slot_watched_path_changed (path, Folder.ChangeReason.UnLock);
     }
 }
 
@@ -1288,7 +1288,7 @@ void FolderMan.slot_schedule_folder_by_time () {
         // Retry a couple of times after failure; or regularly if requested
         bool sync_again =
             (f.consecutive_failing_syncs () > 0 && f.consecutive_failing_syncs () < 3)
-            || f.sync_engine ().is_another_sync_needed () == Delayed_follow_up;
+            || f.sync_engine ().is_another_sync_needed () == DelayedFollowUp;
         auto sync_again_delay = std.chrono.seconds (10); // 10s for the first retry-after-fail
         if (f.consecutive_failing_syncs () > 1)
             sync_again_delay = std.chrono.seconds (60); // 60s for each further attempt
@@ -1581,7 +1581,7 @@ bool FolderMan.start_from_scratch (string &local_folder) {
 }
 
 void FolderMan.slot_wipe_folder_for_account (AccountState *account_state) {
-    QVar_length_array<Folder *, 16> folders_to_remove;
+    QVarLengthArray<Folder *, 16> folders_to_remove;
     Folder.MapIterator i (_folder_map);
     while (i.has_next ()) {
         i.next ();

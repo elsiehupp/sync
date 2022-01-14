@@ -42,7 +42,7 @@ using namespace QKeychain;
 // #include <GLib.Object>
 // #include <QJsonDocument>
 // #include <QSslCertificate>
-// #include <QSsl_key>
+// #include <QSslKey>
 // #include <QFile>
 // #include <QVector>
 // #include <QMap>
@@ -81,7 +81,7 @@ namespace Encryption_helper {
 
     QByteArray private_key_to_pem (QByteArray key);
 
-    //TODO : change those two EVP_PKEY into QSsl_key.
+    //TODO : change those two EVP_PKEY into QSslKey.
     QByteArray encrypt_string_asymmetric (
             EVP_PKEY *public_key,
             const QByteArray& data
@@ -185,9 +185,9 @@ private:
     bool is_initialized = false;
 
 public:
-    //QSsl_key _private_key;
+    //QSslKey _private_key;
     QByteArray _private_key;
-    QSsl_key _public_key;
+    QSslKey _public_key;
     QSslCertificate _certificate;
     string _mnemonic;
     bool _new_mnemonic_generated = false;
@@ -988,11 +988,11 @@ void ClientSideEncryption.fetch_from_key_chain (AccountPtr &account) {
                 account.id ()
     );
 
-    auto *job = new Read_password_job (Theme.instance ().app_name ());
+    auto *job = new ReadPasswordJob (Theme.instance ().app_name ());
     job.set_property (account_property, QVariant.from_value (account));
     job.set_insecure_fallback (false);
     job.set_key (kck);
-    connect (job, &Read_password_job.finished, this, &ClientSideEncryption.public_key_fetched);
+    connect (job, &ReadPasswordJob.finished, this, &ClientSideEncryption.public_key_fetched);
     job.start ();
 }
 
@@ -1045,7 +1045,7 @@ bool ClientSideEncryption.check_server_public_key_validity (QByteArray &server_p
 }
 
 void ClientSideEncryption.public_key_fetched (Job *incoming) {
-    auto *read_job = static_cast<Read_password_job> (incoming);
+    auto *read_job = static_cast<ReadPasswordJob> (incoming);
     auto account = read_job.property (account_property).value<AccountPtr> ();
     Q_ASSERT (account);
 
@@ -1072,28 +1072,28 @@ void ClientSideEncryption.public_key_fetched (Job *incoming) {
                 account.id ()
     );
 
-    auto *job = new Read_password_job (Theme.instance ().app_name ());
+    auto *job = new ReadPasswordJob (Theme.instance ().app_name ());
     job.set_property (account_property, QVariant.from_value (account));
     job.set_insecure_fallback (false);
     job.set_key (kck);
-    connect (job, &Read_password_job.finished, this, &ClientSideEncryption.private_key_fetched);
+    connect (job, &ReadPasswordJob.finished, this, &ClientSideEncryption.private_key_fetched);
     job.start ();
 }
 
 void ClientSideEncryption.private_key_fetched (Job *incoming) {
-    auto *read_job = static_cast<Read_password_job> (incoming);
+    auto *read_job = static_cast<ReadPasswordJob> (incoming);
     auto account = read_job.property (account_property).value<AccountPtr> ();
     Q_ASSERT (account);
 
     // Error or no valid public key error out
     if (read_job.error () != NoError || read_job.binary_data ().length () == 0) {
         _certificate = QSslCertificate ();
-        _public_key = QSsl_key ();
+        _public_key = QSslKey ();
         get_public_key_from_server (account);
         return;
     }
 
-    //_private_key = QSsl_key (read_job.binary_data (), QSsl.Rsa, QSsl.Pem, QSsl.Private_key);
+    //_private_key = QSslKey (read_job.binary_data (), QSsl.Rsa, QSsl.Pem, QSsl.Private_key);
     _private_key = read_job.binary_data ();
 
     if (_private_key.is_null ()) {
@@ -1109,23 +1109,23 @@ void ClientSideEncryption.private_key_fetched (Job *incoming) {
                 account.id ()
     );
 
-    auto *job = new Read_password_job (Theme.instance ().app_name ());
+    auto *job = new ReadPasswordJob (Theme.instance ().app_name ());
     job.set_property (account_property, QVariant.from_value (account));
     job.set_insecure_fallback (false);
     job.set_key (kck);
-    connect (job, &Read_password_job.finished, this, &ClientSideEncryption.mnemonic_key_fetched);
+    connect (job, &ReadPasswordJob.finished, this, &ClientSideEncryption.mnemonic_key_fetched);
     job.start ();
 }
 
 void ClientSideEncryption.mnemonic_key_fetched (QKeychain.Job *incoming) {
-    auto *read_job = static_cast<Read_password_job> (incoming);
+    auto *read_job = static_cast<ReadPasswordJob> (incoming);
     auto account = read_job.property (account_property).value<AccountPtr> ();
     Q_ASSERT (account);
 
     // Error or no valid public key error out
     if (read_job.error () != NoError || read_job.text_data ().length () == 0) {
         _certificate = QSslCertificate ();
-        _public_key = QSsl_key ();
+        _public_key = QSslKey ();
         _private_key = QByteArray ();
         get_public_key_from_server (account);
         return;
@@ -1145,11 +1145,11 @@ void ClientSideEncryption.write_private_key (AccountPtr &account) {
                 account.id ()
     );
 
-    auto *job = new Write_password_job (Theme.instance ().app_name ());
+    auto *job = new WritePasswordJob (Theme.instance ().app_name ());
     job.set_insecure_fallback (false);
     job.set_key (kck);
     job.set_binary_data (_private_key);
-    connect (job, &Write_password_job.finished, [] (Job *incoming) {
+    connect (job, &WritePasswordJob.finished, [] (Job *incoming) {
         Q_UNUSED (incoming);
         q_c_info (lc_cse ()) << "Private key stored in keychain";
     });
@@ -1163,11 +1163,11 @@ void ClientSideEncryption.write_certificate (AccountPtr &account) {
                 account.id ()
     );
 
-    auto *job = new Write_password_job (Theme.instance ().app_name ());
+    auto *job = new WritePasswordJob (Theme.instance ().app_name ());
     job.set_insecure_fallback (false);
     job.set_key (kck);
     job.set_binary_data (_certificate.to_pem ());
-    connect (job, &Write_password_job.finished, [] (Job *incoming) {
+    connect (job, &WritePasswordJob.finished, [] (Job *incoming) {
         Q_UNUSED (incoming);
         q_c_info (lc_cse ()) << "Certificate stored in keychain";
     });
@@ -1181,11 +1181,11 @@ void ClientSideEncryption.write_mnemonic (AccountPtr &account) {
                 account.id ()
     );
 
-    auto *job = new Write_password_job (Theme.instance ().app_name ());
+    auto *job = new WritePasswordJob (Theme.instance ().app_name ());
     job.set_insecure_fallback (false);
     job.set_key (kck);
     job.set_text_data (_mnemonic);
-    connect (job, &Write_password_job.finished, [] (Job *incoming) {
+    connect (job, &WritePasswordJob.finished, [] (Job *incoming) {
         Q_UNUSED (incoming);
         q_c_info (lc_cse ()) << "Mnemonic stored in keychain";
     });
@@ -1195,11 +1195,11 @@ void ClientSideEncryption.write_mnemonic (AccountPtr &account) {
 void ClientSideEncryption.forget_sensitive_data (AccountPtr &account) {
     _private_key = QByteArray ();
     _certificate = QSslCertificate ();
-    _public_key = QSsl_key ();
+    _public_key = QSslKey ();
     _mnemonic = string ();
 
     auto start_delete_job = [account] (string user) {
-        auto *job = new Delete_password_job (Theme.instance ().app_name ());
+        auto *job = new DeletePasswordJob (Theme.instance ().app_name ());
         job.set_insecure_fallback (false);
         job.set_key (AbstractCredentials.keychain_key (account.url ().to_string (), user, account.id ()));
         job.start ();
@@ -1249,7 +1249,7 @@ void ClientSideEncryption.generate_key_pair (AccountPtr &account) {
         return;
     }
     QByteArray key = BIO2Byte_array (priv_key);
-    //_private_key = QSsl_key (key, QSsl.Rsa, QSsl.Pem, QSsl.Private_key);
+    //_private_key = QSslKey (key, QSsl.Rsa, QSsl.Pem, QSsl.Private_key);
     _private_key = key;
 
     q_c_info (lc_cse ()) << "Keys generated correctly, sending to server.";
@@ -1394,7 +1394,7 @@ void ClientSideEncryption.decrypt_private_key (AccountPtr &account, QByteArray &
             q_c_info (lc_cse ()) << "Generated key:" << pass;
 
             QByteArray private_key = Encryption_helper.decrypt_private_key (pass, key);
-            //_private_key = QSsl_key (private_key, QSsl.Rsa, QSsl.Pem, QSsl.Private_key);
+            //_private_key = QSslKey (private_key, QSsl.Rsa, QSsl.Pem, QSsl.Private_key);
             _private_key = private_key;
 
             q_c_info (lc_cse ()) << "Private key : " << _private_key;
@@ -1472,7 +1472,7 @@ void ClientSideEncryption.fetch_and_validate_public_key_from_server (AccountPtr 
             } else {
                 q_c_info (lc_cse ()) << "Error invalid server public key";
                 _certificate = QSslCertificate ();
-                _public_key = QSsl_key ();
+                _public_key = QSslKey ();
                 _private_key = QByteArray ();
                 get_public_key_from_server (account);
                 return;

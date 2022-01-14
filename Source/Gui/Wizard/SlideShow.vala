@@ -129,7 +129,7 @@ void Slide_show.set_current_slide (int index) {
 }
 
 QSize Slide_show.size_hint () {
-    QFont_metrics fm = font_metrics ();
+    QFontMetrics fm = font_metrics ();
     QSize label_size (0, fm.height ());
     for (string &label : _labels) {
 #if (HASQT5_11)

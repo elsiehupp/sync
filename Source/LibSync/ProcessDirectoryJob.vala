@@ -69,7 +69,7 @@ public:
     }
 
     /// For creating subjobs
-    Process_directory_job (Path_tuple &path, Sync_file_item_ptr &dir_item,
+    Process_directory_job (Path_tuple &path, SyncFileItemPtr &dir_item,
         Query_mode query_local, Query_mode query_server, int64 last_sync_timestamp,
         Process_directory_job *parent)
         : GLib.Object (parent)
@@ -95,7 +95,7 @@ public:
         return _is_inside_encrypted_tree;
     }
 
-    Sync_file_item_ptr _dir_item;
+    SyncFileItemPtr _dir_item;
 
 private:
     struct Entries {
@@ -168,23 +168,23 @@ private:
     void process_file (Path_tuple, Local_info &, Remote_info &, SyncJournalFileRecord &);
 
     /// process_file helper for when remote information is available, typically flows into Analyze_local_info when done
-    void process_file_analyze_remote_info (Sync_file_item_ptr &item, Path_tuple, Local_info &, Remote_info &, SyncJournalFileRecord &);
+    void process_file_analyze_remote_info (SyncFileItemPtr &item, Path_tuple, Local_info &, Remote_info &, SyncJournalFileRecord &);
 
     /// process_file helper for reconciling local changes
-    void process_file_analyze_local_info (Sync_file_item_ptr &item, Path_tuple, Local_info &, Remote_info &, SyncJournalFileRecord &, Query_mode recurse_query_server);
+    void process_file_analyze_local_info (SyncFileItemPtr &item, Path_tuple, Local_info &, Remote_info &, SyncJournalFileRecord &, Query_mode recurse_query_server);
 
     /// process_file helper for local/remote conflicts
-    void process_file_conflict (Sync_file_item_ptr &item, Path_tuple, Local_info &, Remote_info &, SyncJournalFileRecord &);
+    void process_file_conflict (SyncFileItemPtr &item, Path_tuple, Local_info &, Remote_info &, SyncJournalFileRecord &);
 
     /// process_file helper for common final processing
-    void process_file_finalize (Sync_file_item_ptr &item, Path_tuple, bool recurse, Query_mode recurse_query_local, Query_mode recurse_query_server);
+    void process_file_finalize (SyncFileItemPtr &item, Path_tuple, bool recurse, Query_mode recurse_query_local, Query_mode recurse_query_server);
 
     /***********************************************************
     Checks the permission for this item, if needed, change the item to a restoration item.
     @return false indicate that this is an error and if it is a directory, one should not recurse
     inside it.
     ***********************************************************/
-    bool check_permissions (Sync_file_item_ptr &item);
+    bool check_permissions (SyncFileItemPtr &item);
 
     struct Move_permission_result {
         // whether moving/renaming the source is ok
@@ -324,7 +324,7 @@ signals:
             }
     
             if (!error_message.is_empty ()) {
-                auto item = Sync_file_item_ptr.create ();
+                auto item = SyncFileItemPtr.create ();
                 if (entry.local_entry.is_directory) {
                     item._type = CSync_enums.ItemTypeDirectory;
                 } else {
@@ -539,7 +539,7 @@ signals:
             return true;
         }
     
-        auto item = Sync_file_item_ptr.create ();
+        auto item = SyncFileItemPtr.create ();
         item._file = path;
         item._original_file = path;
         item._instruction = CSYNC_INSTRUCTION_IGNORE;
@@ -703,7 +703,7 @@ signals:
     
     // Compute the checksum of the given file and assign the result in item._checksum_header
     // Returns true if the checksum was successfully computed
-    static bool compute_local_checksum (QByteArray &header, string &path, Sync_file_item_ptr &item) {
+    static bool compute_local_checksum (QByteArray &header, string &path, SyncFileItemPtr &item) {
         auto type = parse_checksum_header_type (header);
         if (!type.is_empty ()) {
             // TODO : compute async?
@@ -717,7 +717,7 @@ signals:
     }
     
     void Process_directory_job.process_file_analyze_remote_info (
-        const Sync_file_item_ptr &item, Path_tuple path, Local_info &local_entry,
+        const SyncFileItemPtr &item, Path_tuple path, Local_info &local_entry,
         const Remote_info &server_entry, SyncJournalFileRecord &db_entry) {
         item._checksum_header = server_entry.checksum_header;
         item._file_id = server_entry.file_id;
@@ -1010,8 +1010,8 @@ signals:
             } else {
                 // we need to make a request to the server to know that the original file is deleted on the server
                 _pending_async_jobs++;
-                auto job = new Request_etag_job (_discovery_data._account, _discovery_data._remote_folder + original_path, this);
-                connect (job, &Request_etag_job.finished_with_result, this, [=] (Http_result<QByteArray> &etag) mutable {
+                auto job = new RequestEtagJob (_discovery_data._account, _discovery_data._remote_folder + original_path, this);
+                connect (job, &RequestEtagJob.finished_with_result, this, [=] (Http_result<QByteArray> &etag) mutable {
                     _pending_async_jobs--;
                     QTimer.single_shot (0, _discovery_data, &Discovery_phase.schedule_more_jobs);
                     if (etag || etag.error ().code != 404 ||
@@ -1051,7 +1051,7 @@ signals:
     }
     
     void Process_directory_job.process_file_analyze_local_info (
-        const Sync_file_item_ptr &item, Path_tuple path, Local_info &local_entry,
+        const SyncFileItemPtr &item, Path_tuple path, Local_info &local_entry,
         const Remote_info &server_entry, SyncJournalFileRecord &db_entry, Query_mode recurse_query_server) {
         bool no_server_entry = (_query_server != Parent_not_changed && !server_entry.is_valid ())
             || (_query_server == Parent_not_changed && !db_entry.is_valid ());
@@ -1491,8 +1491,8 @@ signals:
             string server_original_path = _discovery_data._remote_folder + _discovery_data.adjust_renamed_path (original_path, SyncFileItem.Down);
             if (base.is_virtual_file () && is_vfs_with_suffix ())
                 chop_virtual_file_suffix (server_original_path);
-            auto job = new Request_etag_job (_discovery_data._account, server_original_path, this);
-            connect (job, &Request_etag_job.finished_with_result, this, [=] (Http_result<QByteArray> &etag) mutable {
+            auto job = new RequestEtagJob (_discovery_data._account, server_original_path, this);
+            connect (job, &RequestEtagJob.finished_with_result, this, [=] (Http_result<QByteArray> &etag) mutable {
                 if (!etag || (etag.get () != base._etag && !item.is_directory ()) || _discovery_data.is_renamed (original_path)) {
                     q_c_info (lc_disco) << "Can't rename because the etag has changed or the directory is gone" << original_path;
                     // Can't be a rename, leave it as a new.
@@ -1514,7 +1514,7 @@ signals:
         finalize ();
     }
     
-    void Process_directory_job.process_file_conflict (Sync_file_item_ptr &item, Process_directory_job.Path_tuple path, Local_info &local_entry, Remote_info &server_entry, SyncJournalFileRecord &db_entry) {
+    void Process_directory_job.process_file_conflict (SyncFileItemPtr &item, Process_directory_job.Path_tuple path, Local_info &local_entry, Remote_info &server_entry, SyncJournalFileRecord &db_entry) {
         item._previous_size = local_entry.size;
         item._previous_modtime = local_entry.modtime;
     
@@ -1585,7 +1585,7 @@ signals:
     }
     
     void Process_directory_job.process_file_finalize (
-        const Sync_file_item_ptr &item, Path_tuple path, bool recurse,
+        const SyncFileItemPtr &item, Path_tuple path, bool recurse,
         Query_mode recurse_query_local, Query_mode recurse_query_server) {
         // Adjust target path for virtual-suffix files
         if (is_vfs_with_suffix ()) {
@@ -1677,7 +1677,7 @@ signals:
         }
     }
     
-    bool Process_directory_job.check_permissions (Occ.Sync_file_item_ptr &item) {
+    bool Process_directory_job.check_permissions (Occ.SyncFileItemPtr &item) {
         if (item._direction != SyncFileItem.Up) {
             // Currently we only check server-side permissions
             return true;

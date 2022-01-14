@@ -10,7 +10,7 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 
 // #include <GLib.Object>
 // #include <QFlags>
-// #include <QAbstract_list_model>
+// #include <QAbstractListModel>
 // #include <QLoggingCategory>
 // #include <QModelIndex>
 // #include <QVariant>
@@ -48,7 +48,7 @@ private:
     Type _type;
 };
 
-class Sharee_model : QAbstract_list_model {
+class Sharee_model : QAbstractListModel {
 public:
     enum Lookup_mode {
         Local_search = 0,
@@ -124,7 +124,7 @@ private:
     }
     
     Sharee_model.Sharee_model (AccountPtr &account, string &type, GLib.Object *parent)
-        : QAbstract_list_model (parent)
+        : QAbstractListModel (parent)
         , _account (account)
         , _type (type) {
     }

@@ -43,7 +43,7 @@ public:
     ~Log_browser () override;
 
 protected:
-    void close_event (QClose_event *) override;
+    void close_event (QCloseEvent *) override;
 
 protected slots:
     void toggle_permanent_logging (bool enabled);
@@ -52,7 +52,7 @@ protected slots:
 
     Log_browser.Log_browser (Gtk.Widget *parent)
         : Gtk.Dialog (parent) {
-        set_window_flags (window_flags () & ~Qt.Window_context_help_button_hint);
+        set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         set_object_name ("Log_browser"); // for save/restore_geometry ()
         set_window_title (tr ("Log Output"));
         set_minimum_width (600);
@@ -117,7 +117,7 @@ protected slots:
     
     Log_browser.~Log_browser () = default;
     
-    void Log_browser.close_event (QClose_event *) {
+    void Log_browser.close_event (QCloseEvent *) {
         ConfigFile cfg;
         cfg.save_geometry (this);
     }

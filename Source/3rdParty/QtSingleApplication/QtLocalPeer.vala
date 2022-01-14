@@ -64,7 +64,7 @@ version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 ****************************************************************************/
 
 // #include <QCoreApplication>
-// #include <QData_stream>
+// #include <QDataStream>
 // #include <QTime>
 
 #if defined (Q_OS_UNIX)
@@ -137,7 +137,7 @@ bool QtLocalPeer.send_message (string &message, int timeout, bool block) {
         return false;
 
     QByteArray u_msg (message.to_utf8 ());
-    QData_stream ds (&socket);
+    QDataStream ds (&socket);
     ds.write_bytes (u_msg.const_data (), u_msg.size ());
     bool res = socket.wait_for_bytes_written (timeout);
     res &= socket.wait_for_ready_read (timeout); // wait for ack
@@ -158,7 +158,7 @@ void QtLocalPeer.receive_connection () {
             return;
         socket.wait_for_ready_read (1000);
     }
-    QData_stream ds (socket);
+    QDataStream ds (socket);
     QByteArray u_msg;
     uint32 remaining = 0;
     ds >> remaining;

@@ -460,7 +460,7 @@ void SocketApi.slot_read_socket () {
             return out;
         } ();
 
-        const auto argument = arg_pos != -1 ? line.mid_ref (arg_pos + 1) : QString_ref ();
+        const auto argument = arg_pos != -1 ? line.mid_ref (arg_pos + 1) : QStringRef ();
         if (command.starts_with ("ASYNC_")) {
             auto arguments = argument.split ('|');
             if (arguments.size () != 2) {

@@ -47,7 +47,7 @@ namespace {
         const auto modtime = Occ.Utility.q_date_time_from_time_t (item._modtime);
         const int64 ms_since_mod = modtime.msecs_to (QDateTime.current_date_time_utc ());
     
-        return std.chrono.milliseconds (ms_since_mod) < Occ.Sync_engine.minimum_file_age_for_upload
+        return std.chrono.milliseconds (ms_since_mod) < Occ.SyncEngine.minimum_file_age_for_upload
             // if the mtime is too much in the future we *do* upload the file
             && ms_since_mod > -10000;
     }
@@ -209,7 +209,7 @@ private:
     Job_parallelism _parallelism;
 
 public:
-    Propagate_item_job (Owncloud_propagator *propagator, Sync_file_item_ptr &item)
+    Propagate_item_job (Owncloud_propagator *propagator, SyncFileItemPtr &item)
         : Propagator_job (propagator)
         , _parallelism (Full_parallelism)
         , _item (item) {
@@ -234,7 +234,7 @@ public:
 
     Job_parallelism parallelism () override { return _parallelism; }
 
-    Sync_file_item_ptr _item;
+    SyncFileItemPtr _item;
 
 public slots:
     virtual void start () = 0;
@@ -263,7 +263,7 @@ public:
     ~Propagator_composite_job () override = default;
 
     void append_job (Propagator_job *job);
-    void append_task (Sync_file_item_ptr &item) {
+    void append_task (SyncFileItemPtr &item) {
         _tasks_to_do.append (item);
     }
 
@@ -311,19 +311,19 @@ private slots:
 ***********************************************************/
 class Propagate_directory : Propagator_job {
 public:
-    Sync_file_item_ptr _item;
+    SyncFileItemPtr _item;
     // e.g : create the directory
     QScopedPointer<Propagate_item_job> _first_job;
 
     Propagator_composite_job _sub_jobs;
 
-    Propagate_directory (Owncloud_propagator *propagator, Sync_file_item_ptr &item);
+    Propagate_directory (Owncloud_propagator *propagator, SyncFileItemPtr &item);
 
     void append_job (Propagator_job *job) {
         _sub_jobs.append_job (job);
     }
 
-    void append_task (Sync_file_item_ptr &item) {
+    void append_task (SyncFileItemPtr &item) {
         _sub_jobs.append_task (item);
     }
 
@@ -390,7 +390,7 @@ private:
 ***********************************************************/
 class Propagate_ignore_job : Propagate_item_job {
 public:
-    Propagate_ignore_job (Owncloud_propagator *propagator, Sync_file_item_ptr &item)
+    Propagate_ignore_job (Owncloud_propagator *propagator, SyncFileItemPtr &item)
         : Propagate_item_job (propagator, item) {
     }
     void start () override {
@@ -433,13 +433,13 @@ public:
 
     void start (Sync_file_item_vector &&_synced_items);
 
-    void start_directory_propagation (Sync_file_item_ptr &item,
+    void start_directory_propagation (SyncFileItemPtr &item,
                                    QStack<QPair<string, Propagate_directory>> &directories,
                                    QVector<Propagator_job> &directories_to_remove,
                                    string &removed_directory,
                                    const Sync_file_item_vector &items);
 
-    void start_file_propagation (Sync_file_item_ptr &item,
+    void start_file_propagation (SyncFileItemPtr &item,
                               QStack<QPair<string, Propagate_directory>> &directories,
                               QVector<Propagator_job> &directories_to_remove,
                               string &removed_directory,
@@ -528,7 +528,7 @@ public:
     /***********************************************************
     Creates the job for an item.
     ***********************************************************/
-    Propagate_item_job *create_job (Sync_file_item_ptr &item);
+    Propagate_item_job *create_job (SyncFileItemPtr &item);
 
     void schedule_next_job ();
     void report_progress (SyncFileItem &, int64 bytes);
@@ -576,7 +576,7 @@ public:
 
     Returns true on success, false and error on error.
     ***********************************************************/
-    bool create_conflict (Sync_file_item_ptr &item,
+    bool create_conflict (SyncFileItemPtr &item,
         Propagator_composite_job *composite, string *error);
 
     // Map original path (as in the DB) to target final path
@@ -604,9 +604,9 @@ public:
     static Result<Vfs.ConvertToPlaceholderResult, string> static_update_metadata (SyncFileItem &item, string local_dir,
                                                                                  Vfs *vfs, SyncJournalDb * const journal);
 
-    Q_REQUIRED_RESULT bool is_delayed_upload_item (Sync_file_item_ptr &item) const;
+    Q_REQUIRED_RESULT bool is_delayed_upload_item (SyncFileItemPtr &item) const;
 
-    Q_REQUIRED_RESULT const std.deque<Sync_file_item_ptr>& delayed_tasks () {
+    Q_REQUIRED_RESULT const std.deque<SyncFileItemPtr>& delayed_tasks () {
         return _delayed_tasks;
     }
 
@@ -639,8 +639,8 @@ private slots:
     void schedule_next_job_impl ();
 
 signals:
-    void new_item (Sync_file_item_ptr &);
-    void item_completed (Sync_file_item_ptr &);
+    void new_item (SyncFileItemPtr &);
+    void item_completed (SyncFileItemPtr &);
     void progress (SyncFileItem &, int64 bytes);
     void finished (bool success);
 
@@ -660,10 +660,10 @@ signals:
     void insufficient_remote_storage ();
 
 private:
-    std.unique_ptr<Propagate_upload_file_common> create_upload_job (Sync_file_item_ptr item,
+    std.unique_ptr<Propagate_upload_file_common> create_upload_job (SyncFileItemPtr item,
                                                                bool delete_existing);
 
-    void push_delayed_upload_task (Sync_file_item_ptr item);
+    void push_delayed_upload_task (SyncFileItemPtr item);
 
     void reset_delayed_upload_tasks ();
 
@@ -675,7 +675,7 @@ private:
     const string _local_dir; // absolute path to the local directory. ends with '/'
     const string _remote_folder; // remote folder, ends with '/'
 
-    std.deque<Sync_file_item_ptr> _delayed_tasks;
+    std.deque<SyncFileItemPtr> _delayed_tasks;
     bool _schedule_delayed_tasks = false;
 
     QSet<string> &_bulk_upload_black_list;
@@ -987,7 +987,7 @@ private slots:
     
     // ================================================================================
     
-    Propagate_item_job *Owncloud_propagator.create_job (Sync_file_item_ptr &item) {
+    Propagate_item_job *Owncloud_propagator.create_job (SyncFileItemPtr &item) {
         bool delete_existing = item._instruction == CSYNC_INSTRUCTION_TYPE_CHANGE;
         switch (item._instruction) {
         case CSYNC_INSTRUCTION_REMOVE:
@@ -1039,7 +1039,7 @@ private slots:
         return nullptr;
     }
     
-    std.unique_ptr<Propagate_upload_file_common> Owncloud_propagator.create_upload_job (Sync_file_item_ptr item, bool delete_existing) {
+    std.unique_ptr<Propagate_upload_file_common> Owncloud_propagator.create_upload_job (SyncFileItemPtr item, bool delete_existing) {
         auto job = std.unique_ptr<Propagate_upload_file_common>{};
     
         if (item._size > sync_options ()._initial_chunk_size && account ().capabilities ().chunking_ng ()) {
@@ -1056,7 +1056,7 @@ private slots:
         return job;
     }
     
-    void Owncloud_propagator.push_delayed_upload_task (Sync_file_item_ptr item) {
+    void Owncloud_propagator.push_delayed_upload_task (SyncFileItemPtr item) {
         _delayed_tasks.push_back (item);
     }
     
@@ -1080,11 +1080,11 @@ private slots:
     
         const auto regex = sync_options ().file_regex ();
         if (regex.is_valid ()) {
-            QSet<QString_ref> names;
+            QSet<QStringRef> names;
             for (auto &i : items) {
                 if (regex.match (i._file).has_match ()) {
                     int index = -1;
-                    QString_ref ref;
+                    QStringRef ref;
                     do {
                         ref = i._file.mid_ref (0, index);
                         names.insert (ref);
@@ -1093,7 +1093,7 @@ private slots:
                 }
             }
             items.erase (std.remove_if (items.begin (), items.end (), [&names] (auto i) {
-                return !names.contains (QString_ref { &i._file });
+                return !names.contains (QStringRef { &i._file });
             }),
                 items.end ());
         }
@@ -1105,7 +1105,7 @@ private slots:
         QVector<Propagator_job> directories_to_remove;
         string removed_directory;
         string maybe_conflict_directory;
-        foreach (Sync_file_item_ptr &item, items) {
+        foreach (SyncFileItemPtr &item, items) {
             if (!removed_directory.is_empty () && item._file.starts_with (removed_directory)) {
                 // this is an item in a directory which is going to be removed.
                 auto *del_dir_job = qobject_cast<Propagate_directory> (directories_to_remove.first ());
@@ -1178,7 +1178,7 @@ private slots:
         schedule_next_job ();
     }
     
-    void Owncloud_propagator.start_directory_propagation (Sync_file_item_ptr &item,
+    void Owncloud_propagator.start_directory_propagation (SyncFileItemPtr &item,
                                                        QStack<QPair<string, Propagate_directory>> &directories,
                                                        QVector<Propagator_job> &directories_to_remove,
                                                        string &removed_directory,
@@ -1192,7 +1192,7 @@ private slots:
             // check_for_permissions () has already run and used the permissions
             // of the file we're about to delete to decide whether uploading
             // to the new dir is ok...
-            foreach (Sync_file_item_ptr &dir_item, items) {
+            foreach (SyncFileItemPtr &dir_item, items) {
                 if (dir_item.destination ().starts_with (item.destination () + "/")) {
                     dir_item._instruction = CSYNC_INSTRUCTION_NONE;
                     _another_sync_needed = true;
@@ -1222,7 +1222,7 @@ private slots:
         directories.push (q_make_pair (item.destination () + "/", directory_propagation_job.release ()));
     }
     
-    void Owncloud_propagator.start_file_propagation (Sync_file_item_ptr &item,
+    void Owncloud_propagator.start_file_propagation (SyncFileItemPtr &item,
                                                   QStack<QPair<string, Propagate_directory> > &directories,
                                                   QVector<Propagator_job> &directories_to_remove,
                                                   string &removed_directory,
@@ -1348,7 +1348,7 @@ private slots:
         return Disk_space_ok;
     }
     
-    bool Owncloud_propagator.create_conflict (Sync_file_item_ptr &item,
+    bool Owncloud_propagator.create_conflict (SyncFileItemPtr &item,
         Propagator_composite_job *composite, string *error) {
         string fn = full_local_path (item._file);
     
@@ -1402,7 +1402,7 @@ private slots:
         // Create a new upload job if the new conflict file should be uploaded
         if (account ().capabilities ().upload_conflict_files ()) {
             if (composite && !QFileInfo (conflict_file_path).is_dir ()) {
-                Sync_file_item_ptr conflict_item = Sync_file_item_ptr (new SyncFileItem);
+                SyncFileItemPtr conflict_item = SyncFileItemPtr (new SyncFileItem);
                 conflict_item._file = conflict_file_name;
                 conflict_item._type = ItemTypeFile;
                 conflict_item._direction = SyncFileItem.Up;
@@ -1445,7 +1445,7 @@ private slots:
         return Vfs.ConvertToPlaceholderResult.Ok;
     }
     
-    bool Owncloud_propagator.is_delayed_upload_item (Sync_file_item_ptr &item) {
+    bool Owncloud_propagator.is_delayed_upload_item (SyncFileItemPtr &item) {
         return account ().capabilities ().bulk_upload () && !_schedule_delayed_tasks && !item._is_encrypted && _sync_options._min_chunk_size > item._size && !is_in_bulk_upload_black_list (item._file);
     }
     
@@ -1538,7 +1538,7 @@ private slots:
         // Now it's our turn, check if we have something left to do.
         // First, convert a task to a job if necessary
         while (_jobs_to_do.is_empty () && !_tasks_to_do.is_empty ()) {
-            Sync_file_item_ptr next_task = _tasks_to_do.first ();
+            SyncFileItemPtr next_task = _tasks_to_do.first ();
             _tasks_to_do.remove (0);
             Propagator_job *job = propagator ().create_job (next_task);
             if (!job) {
@@ -1613,7 +1613,7 @@ private slots:
     
     // ================================================================================
     
-    Propagate_directory.Propagate_directory (Owncloud_propagator *propagator, Sync_file_item_ptr &item)
+    Propagate_directory.Propagate_directory (Owncloud_propagator *propagator, SyncFileItemPtr &item)
         : Propagator_job (propagator)
         , _item (item)
         , _first_job (propagator.create_job (item))
@@ -1721,7 +1721,7 @@ private slots:
     }
     
     Propagate_root_directory.Propagate_root_directory (Owncloud_propagator *propagator)
-        : Propagate_directory (propagator, Sync_file_item_ptr (new SyncFileItem))
+        : Propagate_directory (propagator, SyncFileItemPtr (new SyncFileItem))
         , _dir_deletion_jobs (propagator) {
         connect (&_dir_deletion_jobs, &Propagator_job.finished, this, &Propagate_root_directory.slot_dir_deletion_jobs_finished);
     }
@@ -1839,7 +1839,7 @@ private slots:
     
         auto info = _poll_infos.first ();
         _poll_infos.pop_front ();
-        Sync_file_item_ptr item (new SyncFileItem);
+        SyncFileItemPtr item (new SyncFileItem);
         item._file = info._file;
         item._modtime = info._modtime;
         item._size = info._file_size;
@@ -1873,7 +1873,7 @@ private slots:
     }
     
     string Owncloud_propagator.full_remote_path (string &tmp_file_name) {
-        // TODO : should this be part of the _item (Sync_file_item_ptr)?
+        // TODO : should this be part of the _item (SyncFileItemPtr)?
         return _remote_folder + tmp_file_name;
     }
     

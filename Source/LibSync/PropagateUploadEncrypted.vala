@@ -33,7 +33,7 @@ folder_not_encrypted () if the file is within a folder that's not encrypted.
 class Propagate_upload_encrypted : GLib.Object {
   Q_OBJECT
 public:
-    Propagate_upload_encrypted (Owncloud_propagator *propagator, string &remote_parent_path, Sync_file_item_ptr item, GLib.Object *parent = nullptr);
+    Propagate_upload_encrypted (Owncloud_propagator *propagator, string &remote_parent_path, SyncFileItemPtr item, GLib.Object *parent = nullptr);
     ~Propagate_upload_encrypted () override = default;
 
     void start ();
@@ -64,7 +64,7 @@ signals:
 private:
   Owncloud_propagator *_propagator;
   string _remote_parent_path;
-  Sync_file_item_ptr _item;
+  SyncFileItemPtr _item;
 
   QByteArray _folder_token;
   QByteArray _folder_id;
@@ -83,7 +83,7 @@ private:
 };
 
 
-  Propagate_upload_encrypted.Propagate_upload_encrypted (Owncloud_propagator *propagator, string &remote_parent_path, Sync_file_item_ptr item, GLib.Object *parent)
+  Propagate_upload_encrypted.Propagate_upload_encrypted (Owncloud_propagator *propagator, string &remote_parent_path, SyncFileItemPtr item, GLib.Object *parent)
       : GLib.Object (parent)
       , _propagator (propagator)
       , _remote_parent_path (remote_parent_path)

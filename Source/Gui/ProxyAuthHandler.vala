@@ -94,8 +94,8 @@ private:
     /// The QSettings instance to securely store username/password in the keychain.
     QScopedPointer<QSettings> _settings;
 
-    /// Pointer to the most-recently-run Read_password_job, needed due to reentrancy.
-    QScopedPointer<QKeychain.Read_password_job> _read_password_job;
+    /// Pointer to the most-recently-run ReadPasswordJob, needed due to reentrancy.
+    QScopedPointer<QKeychain.ReadPasswordJob> _read_password_job;
 
     /// For checking the proxy config settings.
     QScopedPointer<ConfigFile> _config_file;
@@ -272,7 +272,7 @@ bool ProxyAuthHandler.get_creds_from_keychain () {
             return false;
         }
 
-        _read_password_job.reset (new Read_password_job (Theme.instance ().app_name ()));
+        _read_password_job.reset (new ReadPasswordJob (Theme.instance ().app_name ()));
         _read_password_job.set_settings (_settings.data ());
         _read_password_job.set_insecure_fallback (false);
         _read_password_job.set_key (keychain_password_key ());
@@ -295,8 +295,8 @@ bool ProxyAuthHandler.get_creds_from_keychain () {
     }
 
     _username.clear ();
-    if (_read_password_job.error () != Entry_not_found) {
-        q_c_warning (lc_proxy) << "Read_password_job failed with" << _read_password_job.error_string ();
+    if (_read_password_job.error () != EntryNotFound) {
+        q_c_warning (lc_proxy) << "ReadPasswordJob failed with" << _read_password_job.error_string ();
     }
     return false;
 }
@@ -310,7 +310,7 @@ void ProxyAuthHandler.store_creds_in_keychain () {
 
     _settings.set_value (keychain_username_key (), _username);
 
-    auto job = new Write_password_job (Theme.instance ().app_name (), this);
+    auto job = new WritePasswordJob (Theme.instance ().app_name (), this);
     job.set_settings (_settings.data ());
     job.set_insecure_fallback (false);
     job.set_key (keychain_password_key ());
@@ -324,7 +324,7 @@ void ProxyAuthHandler.store_creds_in_keychain () {
 
     job.delete_later ();
     if (job.error () != NoError) {
-        q_c_warning (lc_proxy) << "Write_password_job failed with" << job.error_string ();
+        q_c_warning (lc_proxy) << "WritePasswordJob failed with" << job.error_string ();
     }
 }
 

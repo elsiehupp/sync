@@ -18,7 +18,7 @@ using namespace QKeychain;
 
 namespace Occ {
 
-namespace Keychain_chunk {
+namespace KeychainChunk {
 
 /***********************************************************
 * Workaround for Windows:
@@ -30,7 +30,7 @@ static constexpr int Chunk_size = 2048;
 static constexpr int Max_chunks = 10;
 
 /***********************************************************
-@brief : Abstract base class for Keychain_chunk jobs.
+@brief : Abstract base class for KeychainChunk jobs.
 ***********************************************************/
 class Job : GLib.Object {
 public:
@@ -79,12 +79,12 @@ protected:
 }; // class Job
 
 /***********************************************************
-* @brief : Simple wrapper class for QKeychain.Write_password_job, splits too large keychain entry's data into chunks on Windows
+* @brief : Simple wrapper class for QKeychain.WritePasswordJob, splits too large keychain entry's data into chunks on Windows
 ***********************************************************/
-class Write_job : Keychain_chunk.Job {
+class WriteJob : KeychainChunk.Job {
 public:
-    Write_job (Account *account, string &key, QByteArray &data, GLib.Object *parent = nullptr);
-    Write_job (string &key, QByteArray &data, GLib.Object *parent = nullptr);
+    WriteJob (Account *account, string &key, QByteArray &data, GLib.Object *parent = nullptr);
+    WriteJob (string &key, QByteArray &data, GLib.Object *parent = nullptr);
 
     /***********************************************************
     Call this method to start the job (async).
@@ -103,19 +103,19 @@ public:
     bool exec ();
 
 signals:
-    void finished (Keychain_chunk.Write_job *incoming_job);
+    void finished (KeychainChunk.WriteJob *incoming_job);
 
 private slots:
     void slot_write_job_done (QKeychain.Job *incoming_job);
-}; // class Write_job
+}; // class WriteJob
 
 /***********************************************************
-* @brief : Simple wrapper class for QKeychain.Read_password_job, splits too large keychain entry's data into chunks on Windows
+* @brief : Simple wrapper class for QKeychain.ReadPasswordJob, splits too large keychain entry's data into chunks on Windows
 ***********************************************************/
-class Read_job : Keychain_chunk.Job {
+class ReadJob : KeychainChunk.Job {
 public:
-    Read_job (Account *account, string &key, bool keychain_migration, GLib.Object *parent = nullptr);
-    Read_job (string &key, GLib.Object *parent = nullptr);
+    ReadJob (Account *account, string &key, bool keychain_migration, GLib.Object *parent = nullptr);
+    ReadJob (string &key, GLib.Object *parent = nullptr);
 
     /***********************************************************
     Call this method to start the job (async).
@@ -134,22 +134,22 @@ public:
     bool exec ();
 
 signals:
-    void finished (Keychain_chunk.Read_job *incoming_job);
+    void finished (KeychainChunk.ReadJob *incoming_job);
 
 private slots:
     void slot_read_job_done (QKeychain.Job *incoming_job);
 
 private:
     bool _retry_on_key_chain_error = true; // true if we haven't done yet any reading from keychain
-}; // class Read_job
+}; // class ReadJob
 
 /***********************************************************
-* @brief : Simple wrapper class for QKeychain.Delete_password_job
+* @brief : Simple wrapper class for QKeychain.DeletePasswordJob
 ***********************************************************/
-class Delete_job : Keychain_chunk.Job {
+class DeleteJob : KeychainChunk.Job {
 public:
-    Delete_job (Account *account, string &key, bool keychain_migration, GLib.Object *parent = nullptr);
-    Delete_job (string &key, GLib.Object *parent = nullptr);
+    DeleteJob (Account *account, string &key, bool keychain_migration, GLib.Object *parent = nullptr);
+    DeleteJob (string &key, GLib.Object *parent = nullptr);
 
     /***********************************************************
     Call this method to start the job (async).
@@ -168,11 +168,11 @@ public:
     bool exec ();
 
 signals:
-    void finished (Keychain_chunk.Delete_job *incoming_job);
+    void finished (KeychainChunk.DeleteJob *incoming_job);
 
 private slots:
     void slot_delete_job_done (QKeychain.Job *incoming_job);
-}; // class Delete_job
+}; // class DeleteJob
 
 
 
@@ -233,9 +233,9 @@ void Job.set_auto_delete (bool auto_delete) {
 }
 
 /***********************************************************
-* Write_job
+* WriteJob
 ***********************************************************/
-Write_job.Write_job (Account *account, string &key, QByteArray &data, GLib.Object *parent)
+WriteJob.WriteJob (Account *account, string &key, QByteArray &data, GLib.Object *parent)
     : Job (parent) {
     _account = account;
     _key = key;
@@ -246,35 +246,35 @@ Write_job.Write_job (Account *account, string &key, QByteArray &data, GLib.Objec
     _chunk_count = 0;
 }
 
-Write_job.Write_job (string &key, QByteArray &data, GLib.Object *parent)
-    : Write_job (nullptr, key, data, parent) {
+WriteJob.WriteJob (string &key, QByteArray &data, GLib.Object *parent)
+    : WriteJob (nullptr, key, data, parent) {
 }
 
-void Write_job.start () {
+void WriteJob.start () {
     _error = QKeychain.NoError;
 
     slot_write_job_done (nullptr);
 }
 
-bool Write_job.exec () {
+bool WriteJob.exec () {
     start ();
 
     QEvent_loop wait_loop;
-    connect (this, &Write_job.finished, &wait_loop, &QEvent_loop.quit);
+    connect (this, &WriteJob.finished, &wait_loop, &QEvent_loop.quit);
     wait_loop.exec ();
 
     if (error () != NoError) {
-        q_c_warning (lc_keychain_chunk) << "Write_password_job failed with" << error_string ();
+        q_c_warning (lc_keychain_chunk) << "WritePasswordJob failed with" << error_string ();
         return false;
     }
 
     return true;
 }
 
-void Write_job.slot_write_job_done (QKeychain.Job *incoming_job) {
-    auto write_job = qobject_cast<QKeychain.Write_password_job> (incoming_job);
+void WriteJob.slot_write_job_done (QKeychain.Job *incoming_job) {
+    auto write_job = qobject_cast<QKeychain.WritePasswordJob> (incoming_job);
 
-    // Errors? (write_job can be nullptr here, see : Write_job.start)
+    // Errors? (write_job can be nullptr here, see : WriteJob.start)
     if (write_job) {
         _error = write_job.error ();
         _error_string = write_job.error_string ();
@@ -295,8 +295,8 @@ void Write_job.slot_write_job_done (QKeychain.Job *incoming_job) {
         auto index = (_chunk_count++);
 
         // keep the limit
-        if (_chunk_count > Keychain_chunk.Max_chunks) {
-            q_c_warning (lc_keychain_chunk) << "Maximum chunk count exceeded while writing" << write_job.key () << "chunk" << string.number (index) << "cutting off after" << string.number (Keychain_chunk.Max_chunks) << "chunks";
+        if (_chunk_count > KeychainChunk.Max_chunks) {
+            q_c_warning (lc_keychain_chunk) << "Maximum chunk count exceeded while writing" << write_job.key () << "chunk" << string.number (index) << "cutting off after" << string.number (KeychainChunk.Max_chunks) << "chunks";
 
             write_job.delete_later ();
 
@@ -317,12 +317,12 @@ void Write_job.slot_write_job_done (QKeychain.Job *incoming_job) {
                 _account.id ()
             ) : key_with_index;
 
-        auto job = new QKeychain.Write_password_job (_service_name, this);
+        auto job = new QKeychain.WritePasswordJob (_service_name, this);
 #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
         add_settings_to_job (_account, job);
 #endif
         job.set_insecure_fallback (_insecure_fallback);
-        connect (job, &QKeychain.Job.finished, this, &Keychain_chunk.Write_job.slot_write_job_done);
+        connect (job, &QKeychain.Job.finished, this, &KeychainChunk.WriteJob.slot_write_job_done);
         // only add the key's (sub)"index" after the first element, to stay compatible with older versions and non-Windows
         job.set_key (kck);
         job.set_binary_data (chunk);
@@ -341,9 +341,9 @@ void Write_job.slot_write_job_done (QKeychain.Job *incoming_job) {
 }
 
 /***********************************************************
-* Read_job
+* ReadJob
 ***********************************************************/
-Read_job.Read_job (Account *account, string &key, bool keychain_migration, GLib.Object *parent)
+ReadJob.ReadJob (Account *account, string &key, bool keychain_migration, GLib.Object *parent)
     : Job (parent) {
     _account = account;
     _key = key;
@@ -354,11 +354,11 @@ Read_job.Read_job (Account *account, string &key, bool keychain_migration, GLib.
     _chunk_buffer.clear ();
 }
 
-Read_job.Read_job (string &key, GLib.Object *parent)
-    : Read_job (nullptr, key, false, parent) {
+ReadJob.ReadJob (string &key, GLib.Object *parent)
+    : ReadJob (nullptr, key, false, parent) {
 }
 
-void Read_job.start () {
+void ReadJob.start () {
     _chunk_count = 0;
     _chunk_buffer.clear ();
     _error = QKeychain.NoError;
@@ -369,21 +369,21 @@ void Read_job.start () {
             _keychain_migration ? string () : _account.id ()
         ) : _key;
 
-    auto job = new QKeychain.Read_password_job (_service_name, this);
+    auto job = new QKeychain.ReadPasswordJob (_service_name, this);
 #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
     add_settings_to_job (_account, job);
 #endif
     job.set_insecure_fallback (_insecure_fallback);
     job.set_key (kck);
-    connect (job, &QKeychain.Job.finished, this, &Keychain_chunk.Read_job.slot_read_job_done);
+    connect (job, &QKeychain.Job.finished, this, &KeychainChunk.ReadJob.slot_read_job_done);
     job.start ();
 }
 
-bool Read_job.exec () {
+bool ReadJob.exec () {
     start ();
 
     QEvent_loop wait_loop;
-    connect (this, &Read_job.finished, &wait_loop, &QEvent_loop.quit);
+    connect (this, &ReadJob.finished, &wait_loop, &QEvent_loop.quit);
     wait_loop.exec ();
 
     if (error () == NoError) {
@@ -392,15 +392,15 @@ bool Read_job.exec () {
 
     _chunk_count = 0;
     _chunk_buffer.clear ();
-    if (error () != Entry_not_found) {
-        q_c_warning (lc_keychain_chunk) << "Read_password_job failed with" << error_string ();
+    if (error () != EntryNotFound) {
+        q_c_warning (lc_keychain_chunk) << "ReadPasswordJob failed with" << error_string ();
     }
     return false;
 }
 
-void Read_job.slot_read_job_done (QKeychain.Job *incoming_job) {
+void ReadJob.slot_read_job_done (QKeychain.Job *incoming_job) {
     // Errors or next chunk?
-    auto read_job = qobject_cast<QKeychain.Read_password_job> (incoming_job);
+    auto read_job = qobject_cast<QKeychain.ReadPasswordJob> (incoming_job);
     Q_ASSERT (read_job);
 
     if (read_job.error () == NoError && !read_job.binary_data ().is_empty ()) {
@@ -412,17 +412,17 @@ void Read_job.slot_read_job_done (QKeychain.Job *incoming_job) {
                     || read_job.error () == QKeychain.Other_error)) {
                 // Could be that the backend was not yet available. Wait some extra seconds.
                 // (Issues #4274 and #6522)
-                // (For kwallet, the error is Other_error instead of No_backend_available, maybe a bug in Qt_keychain)
+                // (For kwallet, the error is Other_error instead of No_backend_available, maybe a bug in QtKeychain)
                 q_c_info (lc_keychain_chunk) << "Backend unavailable (yet?) Retrying in a few seconds." << read_job.error_string ();
-                QTimer.single_shot (10000, this, &Read_job.start);
+                QTimer.single_shot (10000, this, &ReadJob.start);
                 _retry_on_key_chain_error = false;
                 read_job.delete_later ();
                 return;
             }
             _retry_on_key_chain_error = false;
         }
-        if (read_job.error () != QKeychain.Entry_not_found ||
-            ( (read_job.error () == QKeychain.Entry_not_found) && _chunk_count == 0)) {
+        if (read_job.error () != QKeychain.EntryNotFound ||
+            ( (read_job.error () == QKeychain.EntryNotFound) && _chunk_count == 0)) {
             _error = read_job.error ();
             _error_string = read_job.error_string ();
             q_c_warning (lc_keychain_chunk) << "Unable to read" << read_job.key () << "chunk" << string.number (_chunk_count) << read_job.error_string ();
@@ -439,9 +439,9 @@ void Read_job.slot_read_job_done (QKeychain.Job *incoming_job) {
 }
 
 /***********************************************************
-* Delete_job
+* DeleteJob
 ***********************************************************/
-Delete_job.Delete_job (Account *account, string &key, bool keychain_migration, GLib.Object *parent)
+DeleteJob.DeleteJob (Account *account, string &key, bool keychain_migration, GLib.Object *parent)
     : Job (parent) {
     _account = account;
     _key = key;
@@ -449,11 +449,11 @@ Delete_job.Delete_job (Account *account, string &key, bool keychain_migration, G
     _keychain_migration = keychain_migration;
 }
 
-Delete_job.Delete_job (string &key, GLib.Object *parent)
-    : Delete_job (nullptr, key, false, parent) {
+DeleteJob.DeleteJob (string &key, GLib.Object *parent)
+    : DeleteJob (nullptr, key, false, parent) {
 }
 
-void Delete_job.start () {
+void DeleteJob.start () {
     _chunk_count = 0;
     _error = QKeychain.NoError;
 
@@ -463,21 +463,21 @@ void Delete_job.start () {
             _keychain_migration ? string () : _account.id ()
         ) : _key;
 
-    auto job = new QKeychain.Delete_password_job (_service_name, this);
+    auto job = new QKeychain.DeletePasswordJob (_service_name, this);
 #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
     add_settings_to_job (_account, job);
 #endif
     job.set_insecure_fallback (_insecure_fallback);
     job.set_key (kck);
-    connect (job, &QKeychain.Job.finished, this, &Keychain_chunk.Delete_job.slot_delete_job_done);
+    connect (job, &QKeychain.Job.finished, this, &KeychainChunk.DeleteJob.slot_delete_job_done);
     job.start ();
 }
 
-bool Delete_job.exec () {
+bool DeleteJob.exec () {
     start ();
 
     QEvent_loop wait_loop;
-    connect (this, &Delete_job.finished, &wait_loop, &QEvent_loop.quit);
+    connect (this, &DeleteJob.finished, &wait_loop, &QEvent_loop.quit);
     wait_loop.exec ();
 
     if (error () == NoError) {
@@ -485,22 +485,22 @@ bool Delete_job.exec () {
     }
 
     _chunk_count = 0;
-    if (error () != Entry_not_found) {
-        q_c_warning (lc_keychain_chunk) << "Delete_password_job failed with" << error_string ();
+    if (error () != EntryNotFound) {
+        q_c_warning (lc_keychain_chunk) << "DeletePasswordJob failed with" << error_string ();
     }
     return false;
 }
 
-void Delete_job.slot_delete_job_done (QKeychain.Job *incoming_job) {
+void DeleteJob.slot_delete_job_done (QKeychain.Job *incoming_job) {
     // Errors or next chunk?
-    auto delete_job = qobject_cast<QKeychain.Delete_password_job> (incoming_job);
+    auto delete_job = qobject_cast<QKeychain.DeletePasswordJob> (incoming_job);
     Q_ASSERT (delete_job);
 
     if (delete_job.error () == NoError) {
         _chunk_count++;
     } else {
-        if (delete_job.error () != QKeychain.Entry_not_found ||
-            ( (delete_job.error () == QKeychain.Entry_not_found) && _chunk_count == 0)) {
+        if (delete_job.error () != QKeychain.EntryNotFound ||
+            ( (delete_job.error () == QKeychain.EntryNotFound) && _chunk_count == 0)) {
             _error = delete_job.error ();
             _error_string = delete_job.error_string ();
             q_c_warning (lc_keychain_chunk) << "Unable to delete" << delete_job.key () << "chunk" << string.number (_chunk_count) << delete_job.error_string ();
@@ -516,6 +516,6 @@ void Delete_job.slot_delete_job_done (QKeychain.Job *incoming_job) {
     }
 }
 
-} // namespace Keychain_chunk
+} // namespace KeychainChunk
 
 } // namespace Occ

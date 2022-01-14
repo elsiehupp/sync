@@ -104,9 +104,9 @@ https://www.gnu.org/licenses/gpl-3.0.html.
 
 namespace Occ {
 
-class Header_banner : Gtk.Widget {
+class HeaderBanner : Gtk.Widget {
 public:
-    Header_banner (Gtk.Widget *parent = nullptr);
+    HeaderBanner (Gtk.Widget *parent = nullptr);
 
     void setup (string &title, QPixmap &logo, QPixmap &banner,
                const Qt.Text_format title_format, string &style_sheet);
@@ -127,7 +127,7 @@ private:
     const int Gap_between_logo_and_right_edge = 5;
     const int Modern_header_top_margin = 2;
     
-    Header_banner.Header_banner (Gtk.Widget *parent)
+    HeaderBanner.HeaderBanner (Gtk.Widget *parent)
         : Gtk.Widget (parent) {
         set_size_policy (QSize_policy.Expanding, QSize_policy.Fixed);
         set_background_role (QPalette.Base);
@@ -149,7 +149,7 @@ private:
         layout.add_widget (logo_label, 1, 5, 5, 1);
     }
     
-    void Header_banner.setup (string &title, QPixmap &logo, QPixmap &banner,
+    void HeaderBanner.setup (string &title, QPixmap &logo, QPixmap &banner,
                              const Qt.Text_format title_format, string &style_sheet) {
         QStyle *style = parent_widget ().style ();
         //const int layout_horizontal_spacing = style.pixel_metric (QStyle.PM_Layout_horizontal_spacing);
@@ -181,7 +181,7 @@ private:
         update_geometry ();
     }
     
-    void Header_banner.paint_event (QPaint_event * /* event */) {
+    void HeaderBanner.paint_event (QPaint_event * /* event */) {
         QPainter painter (this);
         painter.draw_pixmap (0, 0, width (), banner_pixmap.height (), banner_pixmap);
         int x = width () - 2;

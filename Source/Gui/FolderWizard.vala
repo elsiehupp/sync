@@ -143,7 +143,7 @@ public:
     ~FolderWizard () override;
 
     bool event_filter (GLib.Object *watched, QEvent *event) override;
-    void resize_event (QResize_event *event) override;
+    void resize_event (QResizeEvent *event) override;
 
 private:
     Folder_wizard_local_path *_folder_wizard_source_page;
@@ -682,7 +682,7 @@ private:
         , _folder_wizard_source_page (new Folder_wizard_local_path (account))
         , _folder_wizard_target_page (nullptr)
         , _folder_wizard_selective_sync_page (new Folder_wizard_selective_sync (account)) {
-        set_window_flags (window_flags () & ~Qt.Window_context_help_button_hint);
+        set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         set_page (Page_Source, _folder_wizard_source_page);
         _folder_wizard_source_page.install_event_filter (this);
         if (!Theme.instance ().single_sync_folder ()) {
@@ -707,7 +707,7 @@ private:
         return QWizard.event_filter (watched, event);
     }
     
-    void FolderWizard.resize_event (QResize_event *event) {
+    void FolderWizard.resize_event (QResizeEvent *event) {
         QWizard.resize_event (event);
     
         // workaround for QTBUG-22819 : when the error label word wrap, the minimum height is not adjusted

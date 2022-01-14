@@ -8,7 +8,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QDateTime>
 // #include <QLoggingCategory>
 // #include <QNetwork_cookie>
-// #include <QData_stream>
+// #include <QDataStream>
 // #include <QDir>
 
 // #include <QNetwork_cookie_jar>
@@ -46,7 +46,7 @@ private:
         const unsigned int JAR_VERSION = 23;
     }
     
-    QData_stream &operator<< (QData_stream &stream, QList<QNetwork_cookie> &list) {
+    QDataStream &operator<< (QDataStream &stream, QList<QNetwork_cookie> &list) {
         stream << JAR_VERSION;
         stream << uint32 (list.size ());
         for (auto &cookie : list)
@@ -54,7 +54,7 @@ private:
         return stream;
     }
     
-    QData_stream &operator>> (QData_stream &stream, QList<QNetwork_cookie> &list) {
+    QDataStream &operator>> (QDataStream &stream, QList<QNetwork_cookie> &list) {
         list.clear ();
     
         uint32 version = 0;
@@ -116,7 +116,7 @@ private:
         if (!file.open (QIODevice.WriteOnly)) {
             return false;
         }
-        QData_stream stream (&file);
+        QDataStream stream (&file);
         stream << remove_expired (all_cookies ());
         file.close ();
         return true;
@@ -132,7 +132,7 @@ private:
         if (!file.open (QIODevice.Read_only)) {
             return false;
         }
-        QData_stream stream (&file);
+        QDataStream stream (&file);
         QList<QNetwork_cookie> list;
         stream >> list;
         set_all_cookies (remove_expired (list));

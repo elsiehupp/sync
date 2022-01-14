@@ -47,9 +47,9 @@ private:
     
     void Legal_notice.change_event (QEvent *e) {
         switch (e.type ()) {
-        case QEvent.Style_change:
-        case QEvent.Palette_change:
-        case QEvent.Theme_change:
+        case QEvent.StyleChange:
+        case QEvent.PaletteChange:
+        case QEvent.ThemeChange:
             customize_style ();
             break;
         default:

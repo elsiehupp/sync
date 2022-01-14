@@ -23,7 +23,7 @@ See http://burtleburtle.net/bob/hash/evahash.html
 ***********************************************************/
 
 // #include <stdint.h> // NOLINT
-// #include <Qt_core/qglobal.h>
+// #include <QtCore/qglobal.h>
 #ifndef Q_FALLTHROUGH
 const int Q_FALLTHROUGH () // Was added in Qt 5.8
 #endif

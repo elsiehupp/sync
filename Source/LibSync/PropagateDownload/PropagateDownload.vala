@@ -186,7 +186,7 @@ This is the flow:
 ***********************************************************/
 class Propagate_download_file : Propagate_item_job {
 public:
-    Propagate_download_file (Owncloud_propagator *propagator, Sync_file_item_ptr &item)
+    Propagate_download_file (Owncloud_propagator *propagator, SyncFileItemPtr &item)
         : Propagate_item_job (propagator, item)
         , _resume_start (0)
         , _download_progress (0)
@@ -1063,7 +1063,7 @@ void Propagate_download_file.slot_get_finished () {
 
     // Did the file come with conflict headers? If so, store them now!
     // If we download conflict files but the server doesn't send conflict
-    // headers, the record will be established by Sync_engine.conflict_record_maintenance.
+    // headers, the record will be established by SyncEngine.conflict_record_maintenance.
     // (we can't reliably determine the file id of the base file here,
     // it might still be downloaded in a parallel job and not exist in
     // the database yet!)

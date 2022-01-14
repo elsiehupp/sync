@@ -15,7 +15,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 // #include <QFileInfo>
 // #include <QDir>
-// #include <QSsl_key>
+// #include <QSslKey>
 // #include <QAuthenticator>
 // #include <QStandardPaths>
 // #include <QJsonDocument>
@@ -533,7 +533,7 @@ void Account.try_setup_push_notifications () {
     // Stop the timer to prevent parallel setup attempts
     _push_notifications_reconnect_timer.stop ();
 
-    if (_capabilities.available_push_notifications () != Push_notification_type.None) {
+    if (_capabilities.available_push_notifications () != PushNotificationType.None) {
         q_c_info (lc_account) << "Try to setup push notifications";
 
         if (!_push_notifications) {
@@ -938,12 +938,12 @@ void Account.write_app_password_once (string app_password){
                 id ()
     );
 
-    auto *job = new Write_password_job (Theme.instance ().app_name ());
+    auto *job = new WritePasswordJob (Theme.instance ().app_name ());
     job.set_insecure_fallback (false);
     job.set_key (kck);
     job.set_binary_data (app_password.to_latin1 ());
-    connect (job, &Write_password_job.finished, [this] (Job *incoming) {
-        auto *write_job = static_cast<Write_password_job> (incoming);
+    connect (job, &WritePasswordJob.finished, [this] (Job *incoming) {
+        auto *write_job = static_cast<WritePasswordJob> (incoming);
         if (write_job.error () == NoError)
             q_c_info (lc_account) << "app_password stored in keychain";
         else
@@ -962,11 +962,11 @@ void Account.retrieve_app_password (){
                 id ()
     );
 
-    auto *job = new Read_password_job (Theme.instance ().app_name ());
+    auto *job = new ReadPasswordJob (Theme.instance ().app_name ());
     job.set_insecure_fallback (false);
     job.set_key (kck);
-    connect (job, &Read_password_job.finished, [this] (Job *incoming) {
-        auto *read_job = static_cast<Read_password_job> (incoming);
+    connect (job, &ReadPasswordJob.finished, [this] (Job *incoming) {
+        auto *read_job = static_cast<ReadPasswordJob> (incoming);
         string pwd ("");
         // Error or no valid public key error out
         if (read_job.error () == NoError &&
@@ -991,11 +991,11 @@ void Account.delete_app_password () {
         return;
     }
 
-    auto *job = new Delete_password_job (Theme.instance ().app_name ());
+    auto *job = new DeletePasswordJob (Theme.instance ().app_name ());
     job.set_insecure_fallback (false);
     job.set_key (kck);
-    connect (job, &Delete_password_job.finished, [this] (Job *incoming) {
-        auto *delete_job = static_cast<Delete_password_job> (incoming);
+    connect (job, &DeletePasswordJob.finished, [this] (Job *incoming) {
+        auto *delete_job = static_cast<DeletePasswordJob> (incoming);
         if (delete_job.error () == NoError)
             q_c_info (lc_account) << "app_password deleted from keychain";
         else
@@ -1008,9 +1008,9 @@ void Account.delete_app_password () {
 }
 
 void Account.delete_app_token () {
-    const auto delete_app_token_job = new Delete_job (shared_from_this (), QStringLiteral ("/ocs/v2.php/core/apppassword"));
-    connect (delete_app_token_job, &Delete_job.finished_signal, this, [this] () {
-        if (auto delete_job = qobject_cast<Delete_job> (GLib.Object.sender ())) {
+    const auto delete_app_token_job = new DeleteJob (shared_from_this (), QStringLiteral ("/ocs/v2.php/core/apppassword"));
+    connect (delete_app_token_job, &DeleteJob.finished_signal, this, [this] () {
+        if (auto delete_job = qobject_cast<DeleteJob> (GLib.Object.sender ())) {
             const auto http_code = delete_job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
             if (http_code != 200) {
                 q_c_warning (lc_account) << "App_token remove failed for user : " << display_name () << " with code : " << http_code;
@@ -1019,7 +1019,7 @@ void Account.delete_app_token () {
             }
         } else {
             Q_ASSERT (false);
-            q_c_warning (lc_account) << "The sender is not a Delete_job instance.";
+            q_c_warning (lc_account) << "The sender is not a DeleteJob instance.";
         }
     });
     delete_app_token_job.start ();

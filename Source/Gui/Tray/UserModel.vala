@@ -1,7 +1,7 @@
 #ifndef USERMODEL_H
 const int USERMODEL_H
 
-// #include <QAbstract_list_model>
+// #include <QAbstractListModel>
 // #include <QImage>
 // #include <QDateTime>
 // #include <QStringList>
@@ -52,7 +52,7 @@ public:
     bool is_current_user ();
     void set_current_user (bool &is_current);
     Folder *get_folder ();
-    Activity_list_model *get_activity_model ();
+    ActivityListModel *get_activity_model ();
     Unified_search_results_list_model *get_unified_search_results_list_model ();
     void open_local_folder ();
     string name ();
@@ -73,7 +73,7 @@ public:
     string status_message ();
     QUrl status_icon ();
     string status_emoji ();
-    void process_completed_sync_item (Folder *folder, Sync_file_item_ptr &item);
+    void process_completed_sync_item (Folder *folder, SyncFileItemPtr &item);
 
 signals:
     void gui_log (string &, string &);
@@ -86,9 +86,9 @@ signals:
     void desktop_notifications_allowed_changed ();
 
 public slots:
-    void slot_item_completed (string &folder, Sync_file_item_ptr &item);
-    void slot_progress_info (string &folder, Progress_info &progress);
-    void slot_add_error (string &folder_alias, string &message, Error_category category);
+    void slot_item_completed (string &folder, SyncFileItemPtr &item);
+    void slot_progress_info (string &folder, ProgressInfo &progress);
+    void slot_add_error (string &folder_alias, string &message, ErrorCategory category);
     void slot_add_error_to_gui (string &folder_alias, SyncFileItem.Status status, string &error_message, string &subject = {});
     void slot_notification_request_finished (int status_code);
     void slot_notify_network_error (QNetworkReply *reply);
@@ -115,14 +115,14 @@ private:
     bool check_push_notifications_are_ready ();
 
     bool is_activity_of_current_account (Folder *folder) const;
-    bool is_unsolvable_conflict (Sync_file_item_ptr &item) const;
+    bool is_unsolvable_conflict (SyncFileItemPtr &item) const;
 
     void show_desktop_notification (string &title, string &message);
 
 private:
     AccountStatePtr _account;
     bool _is_current_user;
-    Activity_list_model *_activity_model;
+    ActivityListModel *_activity_model;
     Unified_search_results_list_model *_unified_search_results_model;
     Activity_list _blacklisted_notifications;
 
@@ -138,7 +138,7 @@ private:
     int _notification_requests_running;
 };
 
-class User_model : QAbstract_list_model {
+class User_model : QAbstractListModel {
     Q_PROPERTY (User* current_user READ current_user NOTIFY new_user_selected)
     Q_PROPERTY (int current_user_id READ current_user_id NOTIFY new_user_selected)
 public:
@@ -173,7 +173,7 @@ public:
 
     Q_INVOKABLE std.shared_ptr<Occ.User_status_connector> user_status_connector (int id);
 
-    Activity_list_model *current_activity_model ();
+    ActivityListModel *current_activity_model ();
 
     enum User_roles {
         Name_role = Qt.User_role + 1,
@@ -214,7 +214,7 @@ public:
     QImage request_image (string &id, QSize *size, QSize &requested_size) override;
 };
 
-class User_apps_model : QAbstract_list_model {
+class User_apps_model : QAbstractListModel {
 public:
     static User_apps_model *instance ();
     ~User_apps_model () override = default;
@@ -248,7 +248,7 @@ User.User (AccountStatePtr &account, bool &is_current, GLib.Object *parent)
     : GLib.Object (parent)
     , _account (account)
     , _is_current_user (is_current)
-    , _activity_model (new Activity_list_model (_account.data (), this))
+    , _activity_model (new ActivityListModel (_account.data (), this))
     , _unified_search_results_model (new Unified_search_results_list_model (_account.data (), this))
     , _notification_requests_running (0) {
     connect (Progress_dispatcher.instance (), &Progress_dispatcher.progress_info,
@@ -281,7 +281,7 @@ User.User (AccountStatePtr &account, bool &is_current, GLib.Object *parent)
     connect (_account.account ().data (), &Account.user_status_changed, this, &User.status_changed);
     connect (_account.data (), &AccountState.desktop_notifications_allowed_changed, this, &User.desktop_notifications_allowed_changed);
 
-    connect (_activity_model, &Activity_list_model.send_notification_request, this, &User.slot_send_notification_request);
+    connect (_activity_model, &ActivityListModel.send_notification_request, this, &User.slot_send_notification_request);
 }
 
 void User.show_desktop_notification (string &title, string &message) {
@@ -383,8 +383,8 @@ void User.connect_push_notifications () {
 bool User.check_push_notifications_are_ready () {
     const auto push_notifications = _account.account ().push_notifications ();
 
-    const auto push_activities_available = _account.account ().capabilities ().available_push_notifications () & Push_notification_type.Activities;
-    const auto push_notifications_available = _account.account ().capabilities ().available_push_notifications () & Push_notification_type.Notifications;
+    const auto push_activities_available = _account.account ().capabilities ().available_push_notifications () & PushNotificationType.Activities;
+    const auto push_notifications_available = _account.account ().capabilities ().available_push_notifications () & PushNotificationType.Notifications;
 
     const auto push_activities_and_notifications_available = push_activities_available && push_notifications_available;
 
@@ -533,8 +533,8 @@ void User.slot_notify_server_finished (string &reply, int reply_code) {
     q_c_info (lc_activity) << "Server Notification reply code" << reply_code << reply;
 }
 
-void User.slot_progress_info (string &folder, Progress_info &progress) {
-    if (progress.status () == Progress_info.Reconcile) {
+void User.slot_progress_info (string &folder, ProgressInfo &progress) {
+    if (progress.status () == ProgressInfo.Reconcile) {
         // Wipe all non-persistent entries - as well as the persistent ones
         // in cases where a local discovery was done.
         auto f = FolderMan.instance ().folder (folder);
@@ -585,7 +585,7 @@ void User.slot_progress_info (string &folder, Progress_info &progress) {
         }
     }
 
-    if (progress.status () == Progress_info.Done) {
+    if (progress.status () == ProgressInfo.Done) {
         // We keep track very well of pending conflicts.
         // Inform other components about them.
         QStringList conflicts;
@@ -600,7 +600,7 @@ void User.slot_progress_info (string &folder, Progress_info &progress) {
     }
 }
 
-void User.slot_add_error (string &folder_alias, string &message, Error_category category) {
+void User.slot_add_error (string &folder_alias, string &message, ErrorCategory category) {
     auto folder_instance = FolderMan.instance ().folder (folder_alias);
     if (!folder_instance)
         return;
@@ -618,7 +618,7 @@ void User.slot_add_error (string &folder_alias, string &message, Error_category 
         activity._acc_name = folder_instance.account_state ().account ().display_name ();
         activity._folder = folder_alias;
 
-        if (category == Error_category.Insufficient_remote_storage) {
+        if (category == ErrorCategory.Insufficient_remote_storage) {
             Activity_link link;
             link._label = tr ("Retry all uploads");
             link._link = folder_instance.path ();
@@ -668,12 +668,12 @@ bool User.is_activity_of_current_account (Folder *folder) {
     return folder.account_state () == _account.data ();
 }
 
-bool User.is_unsolvable_conflict (Sync_file_item_ptr &item) {
+bool User.is_unsolvable_conflict (SyncFileItemPtr &item) {
     // We just care about conflict issues that we are able to resolve
     return item._status == SyncFileItem.Conflict && !Utility.is_conflict_file (item._file);
 }
 
-void User.process_completed_sync_item (Folder *folder, Sync_file_item_ptr &item) {
+void User.process_completed_sync_item (Folder *folder, SyncFileItemPtr &item) {
     Activity activity;
     activity._type = Activity.Sync_file_item_type; //client activity
     activity._status = item._status;
@@ -727,7 +727,7 @@ void User.process_completed_sync_item (Folder *folder, Sync_file_item_ptr &item)
     }
 }
 
-void User.slot_item_completed (string &folder, Sync_file_item_ptr &item) {
+void User.slot_item_completed (string &folder, SyncFileItemPtr &item) {
     auto folder_instance = FolderMan.instance ().folder (folder);
 
     if (!folder_instance || !is_activity_of_current_account (folder_instance) || is_unsolvable_conflict (item)) {
@@ -760,7 +760,7 @@ Folder *User.get_folder () {
     return nullptr;
 }
 
-Activity_list_model *User.get_activity_model () {
+ActivityListModel *User.get_activity_model () {
     return _activity_model;
 }
 
@@ -884,7 +884,7 @@ User_model *User_model.instance () {
 }
 
 User_model.User_model (GLib.Object *parent)
-    : QAbstract_list_model (parent) {
+    : QAbstractListModel (parent) {
     // TODO : Remember selected user from last quit via settings file
     if (AccountManager.instance ().accounts ().size () > 0) {
         build_user_list ();
@@ -1129,7 +1129,7 @@ QHash<int, QByteArray> User_model.role_names () {
     return roles;
 }
 
-Activity_list_model *User_model.current_activity_model () {
+ActivityListModel *User_model.current_activity_model () {
     if (current_user_index () < 0 || current_user_index () >= _users.size ())
         return nullptr;
 
@@ -1213,7 +1213,7 @@ User_apps_model *User_apps_model.instance () {
 }
 
 User_apps_model.User_apps_model (GLib.Object *parent)
-    : QAbstract_list_model (parent) {
+    : QAbstractListModel (parent) {
 }
 
 void User_apps_model.build_app_list () {

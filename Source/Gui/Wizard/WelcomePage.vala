@@ -36,7 +36,7 @@ private:
     QScopedPointer<Ui.Welcome_page> _ui;
 
     OwncloudWizard *_oc_wizard;
-    Wizard_common.Pages _next_page = Wizard_common.Page_Server_setup;
+    WizardCommon.Pages _next_page = WizardCommon.Page_Server_setup;
 };
 
 
@@ -100,7 +100,7 @@ private:
     
         _ui.login_button.set_text (tr ("Log in to your %1").arg (app_name));
         connect (_ui.login_button, &QPushButton.clicked, this, [this] (bool /*checked*/) {
-            _next_page = Wizard_common.Page_Server_setup;
+            _next_page = WizardCommon.Page_Server_setup;
             _oc_wizard.next ();
         });
     }
@@ -109,7 +109,7 @@ private:
     #ifdef WITH_WEBENGINE
         connect (_ui.create_account_button, &QPushButton.clicked, this, [this] (bool /*checked*/) {
             _oc_wizard.set_registration (true);
-            _next_page = Wizard_common.Page_Web_view;
+            _next_page = WizardCommon.Page_Web_view;
             _oc_wizard.next ();
         });
     #else // WITH_WEBENGINE

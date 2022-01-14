@@ -20,7 +20,7 @@ namespace Occ {
 ***********************************************************/
 class Abstract_propagate_remote_delete_encrypted : GLib.Object {
 public:
-    Abstract_propagate_remote_delete_encrypted (Owncloud_propagator *propagator, Sync_file_item_ptr item, GLib.Object *parent);
+    Abstract_propagate_remote_delete_encrypted (Owncloud_propagator *propagator, SyncFileItemPtr item, GLib.Object *parent);
     ~Abstract_propagate_remote_delete_encrypted () override = default;
 
     QNetworkReply.NetworkError network_error ();
@@ -49,7 +49,7 @@ protected:
 
 protected:
     Owncloud_propagator *_propagator = nullptr;
-    Sync_file_item_ptr _item;
+    SyncFileItemPtr _item;
     QByteArray _folder_token;
     QByteArray _folder_id;
     bool _folder_locked = false;
@@ -60,7 +60,7 @@ protected:
 
 }
 
-Abstract_propagate_remote_delete_encrypted.Abstract_propagate_remote_delete_encrypted (Owncloud_propagator *propagator, Sync_file_item_ptr item, GLib.Object *parent)
+Abstract_propagate_remote_delete_encrypted.Abstract_propagate_remote_delete_encrypted (Owncloud_propagator *propagator, SyncFileItemPtr item, GLib.Object *parent)
     : GLib.Object (parent)
     , _propagator (propagator)
     , _item (item) {}
@@ -128,12 +128,12 @@ void Abstract_propagate_remote_delete_encrypted.slot_folder_un_locked_successful
 }
 
 void Abstract_propagate_remote_delete_encrypted.slot_delete_remote_item_finished () {
-    auto *delete_job = qobject_cast<Delete_job> (GLib.Object.sender ());
+    auto *delete_job = qobject_cast<DeleteJob> (GLib.Object.sender ());
 
     Q_ASSERT (delete_job);
 
     if (!delete_job) {
-        q_c_critical (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Sender is not a Delete_job instance.";
+        q_c_critical (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Sender is not a DeleteJob instance.";
         task_failed ();
         return;
     }
@@ -177,10 +177,10 @@ void Abstract_propagate_remote_delete_encrypted.slot_delete_remote_item_finished
 void Abstract_propagate_remote_delete_encrypted.delete_remote_item (string &filename) {
     q_c_info (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Deleting nested encrypted item" << filename;
 
-    auto delete_job = new Delete_job (_propagator.account (), _propagator.full_remote_path (filename), this);
+    auto delete_job = new DeleteJob (_propagator.account (), _propagator.full_remote_path (filename), this);
     delete_job.set_folder_token (_folder_token);
 
-    connect (delete_job, &Delete_job.finished_signal, this, &Abstract_propagate_remote_delete_encrypted.slot_delete_remote_item_finished);
+    connect (delete_job, &DeleteJob.finished_signal, this, &Abstract_propagate_remote_delete_encrypted.slot_delete_remote_item_finished);
 
     delete_job.start ();
 }

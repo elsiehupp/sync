@@ -21,7 +21,7 @@ class Propagate_remote_mkdir : Propagate_item_job {
     Propagate_upload_encrypted *_upload_encrypted_helper;
     friend class Propagate_directory; // So it can access the _item;
 public:
-    Propagate_remote_mkdir (Owncloud_propagator *propagator, Sync_file_item_ptr &item);
+    Propagate_remote_mkdir (Owncloud_propagator *propagator, SyncFileItemPtr &item);
 
     void start () override;
     void abort (Propagator_job.Abort_type abort_type) override;
@@ -49,7 +49,7 @@ private:
     void finalize_mk_col_job (QNetworkReply.NetworkError err, string &job_http_reason_phrase_string, string &job_path);
 };
 
-    Propagate_remote_mkdir.Propagate_remote_mkdir (Owncloud_propagator *propagator, Sync_file_item_ptr &item)
+    Propagate_remote_mkdir.Propagate_remote_mkdir (Owncloud_propagator *propagator, SyncFileItemPtr &item)
         : Propagate_item_job (propagator, item)
         , _delete_existing (false)
         , _upload_encrypted_helper (nullptr) {
@@ -77,10 +77,10 @@ private:
             return;
         }
     
-        _job = new Delete_job (propagator ().account (),
+        _job = new DeleteJob (propagator ().account (),
             propagator ().full_remote_path (_item._file),
             this);
-        connect (qobject_cast<Delete_job> (_job), &Delete_job.finished_signal, this, &Propagate_remote_mkdir.slot_mkdir);
+        connect (qobject_cast<DeleteJob> (_job), &DeleteJob.finished_signal, this, &Propagate_remote_mkdir.slot_mkdir);
         _job.start ();
     }
     

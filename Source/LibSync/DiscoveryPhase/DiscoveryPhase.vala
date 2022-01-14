@@ -91,7 +91,7 @@ signals:
     void finished_fatal_error (string error_string);
     void finished_non_fatal_error (string error_string);
 
-    void item_discovered (Sync_file_item_ptr item);
+    void item_discovered (SyncFileItemPtr item);
     void child_ignored (bool b);
 private slots:
 private:
@@ -166,7 +166,7 @@ class Discovery_phase : GLib.Object {
     can be changed. See find_and_cancel_deleted_job (). Note that
     item_discovered () will already have been emitted for the item.
     ***********************************************************/
-    QMap<string, Sync_file_item_ptr> _deleted_item;
+    QMap<string, SyncFileItemPtr> _deleted_item;
 
     /***********************************************************
     Maps the db-path of a deleted folder to its queued job.
@@ -264,7 +264,7 @@ public:
 
 signals:
     void fatal_error (string &error_string);
-    void item_discovered (Sync_file_item_ptr &item);
+    void item_discovered (SyncFileItemPtr &item);
     void finished ();
 
     // A new folder was discovered and was not synced because of the confirmation feature
@@ -526,7 +526,7 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
             i.name = codec.to_unicode (dirent.path, dirent.path.size (), &state);
             if (state.invalid_chars > 0 || state.remaining_chars > 0) {
                 emit child_ignored (true);
-                auto item = Sync_file_item_ptr.create ();
+                auto item = SyncFileItemPtr.create ();
                 //item._file = _current_folder._target + i.name;
                 // FIXME ^^ do we really need to use _target or is local fine?
                 item._file = _local_path + i.name;
@@ -718,7 +718,7 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
             _results.push_back (std.move (result));
         }
     
-        //This works in concerto with the Request_etag_job and the Folder object to check if the remote folder changed.
+        //This works in concerto with the RequestEtagJob and the Folder object to check if the remote folder changed.
         if (map.contains ("getetag")) {
             if (_first_etag.is_empty ()) {
                 _first_etag = parse_etag (map.value (QStringLiteral ("getetag")).to_utf8 ()); // for directory itself

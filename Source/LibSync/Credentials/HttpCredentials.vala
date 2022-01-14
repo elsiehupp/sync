@@ -9,7 +9,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 // #include <QMutex>
 // #include <QNetworkReply>
 // #include <QSettings>
-// #include <QSsl_key>
+// #include <QSslKey>
 // #include <QJsonObject>
 // #include <QJsonDocument>
 // #include <QBuffer>
@@ -20,7 +20,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
 // #include <QMap>
 // #include <QSslCertificate>
-// #include <QSsl_key>
+// #include <QSslKey>
 // #include <QNetworkRequest>
 
 
@@ -35,8 +35,8 @@ namespace {
     const char is_oAuth_c[] = "oauth";
     const char client_cert_bundle_c[] = "client_cert_pkcs12";
     const char client_cert_password_c[] = "_client_cert_password";
-    const char client_certificate_pEMC[] = "_client_certificate_pEM";
-    const char client_key_pEMC[] = "_client_key_pEM";
+    const char client_certificate_pemC[] = "_client_certificate_pem";
+    const char client_key_pemC[] = "_client_key_pem";
     const char authentication_failed_c[] = "owncloud-authentication-failed";
     const char need_retry_c[] = "owncloud-need-retry";
 } // ns
@@ -58,10 +58,10 @@ namespace {
    ---.  fetch_from_keychain
                 |                           }
                 v                            }
-          slot_read_client_cert_pEMJob_done       }     There are first 3 Qt_keychain jobs to fetch
+          slot_read_client_cert_pem_job_done       }     There are first 3 QtKeychain jobs to fetch
                 |                             }   the TLS client keys, if any, and the password
                 v                            }      (or refresh token
-          slot_read_client_key_pEMJob_done        }
+          slot_read_client_key_pem_job_done        }
                 |                           }
                 v
             slot_read_job_done
@@ -120,15 +120,15 @@ private slots:
     void slot_authentication (QNetworkReply *, QAuthenticator *);
 
     void slot_read_client_cert_password_job_done (QKeychain.Job *);
-    void slot_read_client_cert_pEMJob_done (QKeychain.Job *);
-    void slot_read_client_key_pEMJob_done (QKeychain.Job *);
+    void slot_read_client_cert_pem_job_done (QKeychain.Job *);
+    void slot_read_client_key_pem_job_done (QKeychain.Job *);
 
     void slot_read_password_from_keychain ();
     void slot_read_job_done (QKeychain.Job *);
 
     void slot_write_client_cert_password_job_done (QKeychain.Job *);
-    void slot_write_client_cert_pEMJob_done (QKeychain.Job *);
-    void slot_write_client_key_pEMJob_done (QKeychain.Job *);
+    void slot_write_client_cert_pem_job_done (QKeychain.Job *);
+    void slot_write_client_key_pem_job_done (QKeychain.Job *);
 
     void slot_write_password_to_keychain ();
     void slot_write_job_done (QKeychain.Job *);
@@ -138,8 +138,8 @@ protected:
     Reads data from keychain locations
 
     Goes through
-      slot_read_client_cert_pEMJob_done to
-      slot_read_client_cert_pEMJob_done to
+      slot_read_client_cert_pem_job_done to
+      slot_read_client_cert_pem_job_done to
       slot_read_job_done
     ***********************************************************/
     void fetch_from_keychain_helper ();
@@ -156,7 +156,7 @@ protected:
     If that happens, this function will schedule another try and
     return true.
     ***********************************************************/
-    bool keychain_unavailable_retry_later (QKeychain.Read_password_job *);
+    bool keychain_unavailable_retry_later (QKeychain.ReadPasswordJob *);
 
     /***********************************************************
     Takes client cert pkcs12 and unwraps the key/cert.
@@ -175,7 +175,7 @@ protected:
     bool _is_renewing_oAuth_token = false;
     QByteArray _client_cert_bundle;
     QByteArray _client_cert_password;
-    QSsl_key _client_ssl_key;
+    QSslKey _client_ssl_key;
     QSslCertificate _client_ssl_certificate;
     bool _keychain_migration = false;
     bool _retry_on_key_chain_error = true; // true if we haven't done yet any reading from keychain
@@ -321,7 +321,7 @@ protected:
         if (!_client_cert_bundle.is_empty ()) {
             // New case (>=2.6) : We have a bundle in the settings and read the password from
             // the keychain
-            auto job = new QKeychain.Read_password_job (Theme.instance ().app_name ());
+            auto job = new QKeychain.ReadPasswordJob (Theme.instance ().app_name ());
             add_settings_to_job (_account, job);
             job.set_insecure_fallback (false);
             job.set_key (keychain_key (_account.url ().to_string (), _user + client_cert_password_c, _account.id ()));
@@ -333,20 +333,20 @@ protected:
         // Old case (pre 2.6) : Read client cert and then key from keychain
         const string kck = keychain_key (
             _account.url ().to_string (),
-            _user + client_certificate_pEMC,
+            _user + client_certificate_pemC,
             _keychain_migration ? string () : _account.id ());
     
-        auto *job = new QKeychain.Read_password_job (Theme.instance ().app_name ());
+        auto *job = new QKeychain.ReadPasswordJob (Theme.instance ().app_name ());
         add_settings_to_job (_account, job);
         job.set_insecure_fallback (false);
         job.set_key (kck);
-        connect (job, &QKeychain.Job.finished, this, &HttpCredentials.slot_read_client_cert_pEMJob_done);
+        connect (job, &QKeychain.Job.finished, this, &HttpCredentials.slot_read_client_cert_pem_job_done);
         job.start ();
     }
     
     void HttpCredentials.delete_old_keychain_entries () {
         auto start_delete_job = [this] (string user) {
-            auto *job = new QKeychain.Delete_password_job (Theme.instance ().app_name ());
+            auto *job = new QKeychain.DeletePasswordJob (Theme.instance ().app_name ());
             add_settings_to_job (_account, job);
             job.set_insecure_fallback (true);
             job.set_key (keychain_key (_account.url ().to_string (), user, string ()));
@@ -354,17 +354,17 @@ protected:
         };
     
         start_delete_job (_user);
-        start_delete_job (_user + client_key_pEMC);
-        start_delete_job (_user + client_certificate_pEMC);
+        start_delete_job (_user + client_key_pemC);
+        start_delete_job (_user + client_certificate_pemC);
     }
     
-    bool HttpCredentials.keychain_unavailable_retry_later (QKeychain.Read_password_job *incoming) {
+    bool HttpCredentials.keychain_unavailable_retry_later (QKeychain.ReadPasswordJob *incoming) {
         Q_ASSERT (!incoming.insecure_fallback ()); // If insecure_fallback is set, the next test would be pointless
         if (_retry_on_key_chain_error && (incoming.error () == QKeychain.No_backend_available
                 || incoming.error () == QKeychain.Other_error)) {
             // Could be that the backend was not yet available. Wait some extra seconds.
             // (Issues #4274 and #6522)
-            // (For kwallet, the error is Other_error instead of No_backend_available, maybe a bug in Qt_keychain)
+            // (For kwallet, the error is Other_error instead of No_backend_available, maybe a bug in QtKeychain)
             q_c_info (lc_http_credentials) << "Backend unavailable (yet?) Retrying in a few seconds." << incoming.error_string ();
             QTimer.single_shot (10000, this, &HttpCredentials.fetch_from_keychain_helper);
             _retry_on_key_chain_error = false;
@@ -375,7 +375,7 @@ protected:
     }
     
     void HttpCredentials.slot_read_client_cert_password_job_done (QKeychain.Job *job) {
-        auto read_job = qobject_cast<QKeychain.Read_password_job> (job);
+        auto read_job = qobject_cast<QKeychain.ReadPasswordJob> (job);
         if (keychain_unavailable_retry_later (read_job))
             return;
     
@@ -394,8 +394,8 @@ protected:
         slot_read_password_from_keychain ();
     }
     
-    void HttpCredentials.slot_read_client_cert_pEMJob_done (QKeychain.Job *incoming) {
-        auto read_job = qobject_cast<QKeychain.Read_password_job> (incoming);
+    void HttpCredentials.slot_read_client_cert_pem_job_done (QKeychain.Job *incoming) {
+        auto read_job = qobject_cast<QKeychain.ReadPasswordJob> (incoming);
         if (keychain_unavailable_retry_later (read_job))
             return;
     
@@ -410,31 +410,31 @@ protected:
         // Load key too
         const string kck = keychain_key (
             _account.url ().to_string (),
-            _user + client_key_pEMC,
+            _user + client_key_pemC,
             _keychain_migration ? string () : _account.id ());
     
-        auto *job = new QKeychain.Read_password_job (Theme.instance ().app_name ());
+        auto *job = new QKeychain.ReadPasswordJob (Theme.instance ().app_name ());
         add_settings_to_job (_account, job);
         job.set_insecure_fallback (false);
         job.set_key (kck);
-        connect (job, &QKeychain.Read_password_job.finished, this, &HttpCredentials.slot_read_client_key_pEMJob_done);
+        connect (job, &QKeychain.ReadPasswordJob.finished, this, &HttpCredentials.slot_read_client_key_pem_job_done);
         job.start ();
     }
     
-    void HttpCredentials.slot_read_client_key_pEMJob_done (QKeychain.Job *incoming) {
-        auto read_job = qobject_cast<QKeychain.Read_password_job> (incoming);
+    void HttpCredentials.slot_read_client_key_pem_job_done (QKeychain.Job *incoming) {
+        auto read_job = qobject_cast<QKeychain.ReadPasswordJob> (incoming);
         // Store key in memory
     
         if (read_job.error () == QKeychain.NoError && read_job.binary_data ().length () > 0) {
-            QByteArray client_key_pEM = read_job.binary_data ();
+            QByteArray client_key_pem = read_job.binary_data ();
             // FIXME Unfortunately Qt has a bug and we can't just use QSsl.Opaque to let it
             // load whatever we have. So we try until it works.
-            _client_ssl_key = QSsl_key (client_key_pEM, QSsl.Rsa);
+            _client_ssl_key = QSslKey (client_key_pem, QSsl.Rsa);
             if (_client_ssl_key.is_null ()) {
-                _client_ssl_key = QSsl_key (client_key_pEM, QSsl.Dsa);
+                _client_ssl_key = QSslKey (client_key_pem, QSsl.Dsa);
             }
             if (_client_ssl_key.is_null ()) {
-                _client_ssl_key = QSsl_key (client_key_pEM, QSsl.Ec);
+                _client_ssl_key = QSslKey (client_key_pem, QSsl.Ec);
             }
             if (_client_ssl_key.is_null ()) {
                 q_c_warning (lc_http_credentials) << "Could not load SSL key into Qt!";
@@ -450,11 +450,11 @@ protected:
             _user,
             _keychain_migration ? string () : _account.id ());
     
-        auto *job = new QKeychain.Read_password_job (Theme.instance ().app_name ());
+        auto *job = new QKeychain.ReadPasswordJob (Theme.instance ().app_name ());
         add_settings_to_job (_account, job);
         job.set_insecure_fallback (false);
         job.set_key (kck);
-        connect (job, &QKeychain.Read_password_job.finished, this, &HttpCredentials.slot_read_job_done);
+        connect (job, &QKeychain.ReadPasswordJob.finished, this, &HttpCredentials.slot_read_job_done);
         job.start ();
     }
     
@@ -466,12 +466,12 @@ protected:
     }
     
     void HttpCredentials.slot_read_job_done (QKeychain.Job *incoming) {
-        auto *job = static_cast<QKeychain.Read_password_job> (incoming);
+        auto *job = static_cast<QKeychain.ReadPasswordJob> (incoming);
         QKeychain.Error error = job.error ();
     
         // If we can't find the credentials at the keys that include the account id,
         // try to read them from the legacy locations that don't have a account id.
-        if (!_keychain_migration && error == QKeychain.Entry_not_found) {
+        if (!_keychain_migration && error == QKeychain.EntryNotFound) {
             q_c_warning (lc_http_credentials)
                 << "Could not find keychain entries, attempting to read from legacy locations";
             _keychain_migration = true;
@@ -502,7 +502,7 @@ protected:
             // we come here if the password is empty or any other keychain
             // error happend.
     
-            _fetch_error_string = job.error () != QKeychain.Entry_not_found ? job.error_string () : string ();
+            _fetch_error_string = job.error () != QKeychain.EntryNotFound ? job.error_string () : string ();
     
             _password = string ();
             _ready = false;
@@ -579,7 +579,7 @@ protected:
     
         const string kck = keychain_key (_account.url ().to_string (), _user, _account.id ());
         if (kck.is_empty ()) {
-            q_c_warning (lc_http_credentials) << "Invalidate_token : User is empty, bailing out!";
+            q_c_warning (lc_http_credentials) << "InvalidateToken : User is empty, bailing out!";
             return;
         }
     
@@ -592,7 +592,7 @@ protected:
             return;
         }
     
-        auto *job = new QKeychain.Delete_password_job (Theme.instance ().app_name ());
+        auto *job = new QKeychain.DeletePasswordJob (Theme.instance ().app_name ());
         add_settings_to_job (_account, job);
         job.set_insecure_fallback (true);
         job.set_key (kck);
@@ -600,8 +600,8 @@ protected:
     
         // let QNAM forget about the password
         // This needs to be done later in the event loop because we might be called (directly or
-        // indirectly) from QNetwork_access_manager_private.authentication_required, which itself
-        // is a called from a Blocking_queued_connection from the Qt HTTP thread. And clearing the
+        // indirectly) from QNetworkAccessManagerPrivate.authentication_required, which itself
+        // is a called from a BlockingQueuedConnection from the Qt HTTP thread. And clearing the
         // cache needs to synchronize again with the HTTP thread.
         QTimer.single_shot (0, _account, &Account.clear_qNAMCache);
     }
@@ -635,7 +635,7 @@ protected:
             // and we'll just store the bundle password in the keychain. That's prefered
             // since the keychain on older Windows platforms can only store a limited number
             // of bytes per entry and key/cert may exceed that.
-            auto *job = new QKeychain.Write_password_job (Theme.instance ().app_name ());
+            auto *job = new QKeychain.WritePasswordJob (Theme.instance ().app_name ());
             add_settings_to_job (_account, job);
             job.set_insecure_fallback (false);
             connect (job, &QKeychain.Job.finished, this, &HttpCredentials.slot_write_client_cert_password_job_done);
@@ -648,11 +648,11 @@ protected:
             // Option 2, pre 2.6 configs : We used to store the raw cert/key in the keychain and
             // still do so if no bundle is available. We can't currently migrate to Option 1
             // because we have no functions for creating an encrypted pkcs12 bundle.
-            auto *job = new QKeychain.Write_password_job (Theme.instance ().app_name ());
+            auto *job = new QKeychain.WritePasswordJob (Theme.instance ().app_name ());
             add_settings_to_job (_account, job);
             job.set_insecure_fallback (false);
-            connect (job, &QKeychain.Job.finished, this, &HttpCredentials.slot_write_client_cert_pEMJob_done);
-            job.set_key (keychain_key (_account.url ().to_string (), _user + client_certificate_pEMC, _account.id ()));
+            connect (job, &QKeychain.Job.finished, this, &HttpCredentials.slot_write_client_cert_pem_job_done);
+            job.set_key (keychain_key (_account.url ().to_string (), _user + client_certificate_pemC, _account.id ()));
             job.set_binary_data (_client_ssl_certificate.to_pem ());
             job.start ();
         } else {
@@ -670,7 +670,7 @@ protected:
         slot_write_password_to_keychain ();
     }
     
-    void HttpCredentials.slot_write_client_cert_pEMJob_done (QKeychain.Job *finished_job) {
+    void HttpCredentials.slot_write_client_cert_pem_job_done (QKeychain.Job *finished_job) {
         if (finished_job && finished_job.error () != QKeychain.NoError) {
             q_c_warning (lc_http_credentials) << "Could not write client cert to credentials"
                                          << finished_job.error () << finished_job.error_string ();
@@ -678,19 +678,19 @@ protected:
     
         // write ssl key if there is one
         if (!_client_ssl_key.is_null ()) {
-            auto *job = new QKeychain.Write_password_job (Theme.instance ().app_name ());
+            auto *job = new QKeychain.WritePasswordJob (Theme.instance ().app_name ());
             add_settings_to_job (_account, job);
             job.set_insecure_fallback (false);
-            connect (job, &QKeychain.Job.finished, this, &HttpCredentials.slot_write_client_key_pEMJob_done);
-            job.set_key (keychain_key (_account.url ().to_string (), _user + client_key_pEMC, _account.id ()));
+            connect (job, &QKeychain.Job.finished, this, &HttpCredentials.slot_write_client_key_pem_job_done);
+            job.set_key (keychain_key (_account.url ().to_string (), _user + client_key_pemC, _account.id ()));
             job.set_binary_data (_client_ssl_key.to_pem ());
             job.start ();
         } else {
-            slot_write_client_key_pEMJob_done (nullptr);
+            slot_write_client_key_pem_job_done (nullptr);
         }
     }
     
-    void HttpCredentials.slot_write_client_key_pEMJob_done (QKeychain.Job *finished_job) {
+    void HttpCredentials.slot_write_client_key_pem_job_done (QKeychain.Job *finished_job) {
         if (finished_job && finished_job.error () != QKeychain.NoError) {
             q_c_warning (lc_http_credentials) << "Could not write client key to credentials"
                                          << finished_job.error () << finished_job.error_string ();
@@ -700,7 +700,7 @@ protected:
     }
     
     void HttpCredentials.slot_write_password_to_keychain () {
-        auto *job = new QKeychain.Write_password_job (Theme.instance ().app_name ());
+        auto *job = new QKeychain.WritePasswordJob (Theme.instance ().app_name ());
         add_settings_to_job (_account, job);
         job.set_insecure_fallback (false);
         connect (job, &QKeychain.Job.finished, this, &HttpCredentials.slot_write_job_done);

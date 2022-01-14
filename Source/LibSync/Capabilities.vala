@@ -17,13 +17,13 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 namespace Occ {
 
 
-enum Push_notification_type {
+enum PushNotificationType {
     None = 0,
     Files = 1,
     Activities = 2,
     Notifications = 4
 };
-Q_DECLARE_FLAGS (Push_notification_types, Push_notification_type)
+Q_DECLARE_FLAGS (Push_notification_types, PushNotificationType)
 Q_DECLARE_OPERATORS_FOR_FLAGS (Push_notification_types)
 
 /***********************************************************
@@ -375,22 +375,22 @@ private:
     
     Push_notification_types Capabilities.available_push_notifications () {
         if (!_capabilities.contains ("notify_push")) {
-            return Push_notification_type.None;
+            return PushNotificationType.None;
         }
     
         const auto types = _capabilities["notify_push"].to_map ()["type"].to_string_list ();
         Push_notification_types push_notification_types;
     
         if (types.contains ("files")) {
-            push_notification_types.set_flag (Push_notification_type.Files);
+            push_notification_types.set_flag (PushNotificationType.Files);
         }
     
         if (types.contains ("activities")) {
-            push_notification_types.set_flag (Push_notification_type.Activities);
+            push_notification_types.set_flag (PushNotificationType.Activities);
         }
     
         if (types.contains ("notifications")) {
-            push_notification_types.set_flag (Push_notification_type.Notifications);
+            push_notification_types.set_flag (PushNotificationType.Notifications);
         }
     
         return push_notification_types;

@@ -45,7 +45,7 @@ private:
     IgnoreListTableWidget.IgnoreListTableWidget (Gtk.Widget *parent)
         : Gtk.Widget (parent)
         , ui (new Ui.IgnoreListTableWidget) {
-        set_window_flags (window_flags () & ~Qt.Window_context_help_button_hint);
+        set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         ui.setup_ui (this);
     
         ui.description_label.set_text (tr ("Files or folders matching a pattern will not be synchronized.\n\n"

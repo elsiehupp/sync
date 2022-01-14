@@ -8,7 +8,7 @@ Copyright (C) by Klaas Freitag <freitag@kde.org>
 // #include <Qt_network>
 // #include <Qt_widgets>
 
-// #include <Qt_core>
+// #include <QtCore>
 // #include <Gtk.Dialog>
 // #include <QSslCertificate>
 // #include <QList>
@@ -86,7 +86,7 @@ private:
         , _all_trusted (false)
         , _ui (new Ui.Ssl_error_dialog)
         , _account (account) {
-        set_window_flags (window_flags () & ~Qt.Window_context_help_button_hint);
+        set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         _ui.setup_ui (this);
         set_window_title (tr ("Untrusted Certificate"));
         QPushButton *ok_button =

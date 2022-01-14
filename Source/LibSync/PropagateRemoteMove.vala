@@ -40,7 +40,7 @@ class Propagate_remote_move : Propagate_item_job {
     QPointer<Move_job> _job;
 
 public:
-    Propagate_remote_move (Owncloud_propagator *propagator, Sync_file_item_ptr &item)
+    Propagate_remote_move (Owncloud_propagator *propagator, SyncFileItemPtr &item)
         : Propagate_item_job (propagator, item) {
     }
     void start () override;

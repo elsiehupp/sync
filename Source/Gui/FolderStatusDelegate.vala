@@ -33,7 +33,8 @@ class FolderStatusDelegate : QStyled_item_delegate {
 public:
     FolderStatusDelegate ();
 
-    enum datarole { FolderAliasRole = Qt.User_role + 100,
+    enum datarole {
+        FolderAliasRole = Qt.User_role + 100,
         Header_role,
         FolderPathRole, // for a SubFolder it's the complete path
         Folder_second_path_role,
@@ -67,7 +68,7 @@ public:
     static QRect options_button_rect (QRect within, Qt.Layout_direction direction);
     static QRect add_button_rect (QRect within, Qt.Layout_direction direction);
     static QRect errors_list_rect (QRect within);
-    static int root_folder_height_without_errors (QFont_metrics &fm, QFont_metrics &alias_fm);
+    static int root_folder_height_without_errors (QFontMetrics &fm, QFontMetrics &alias_fm);
 
 public slots:
     void slot_style_changed ();
@@ -96,13 +97,13 @@ QSize FolderStatusDelegate.size_hint (QStyleOptionViewItem &option,
     QFont alias_font = make_alias_font (option.font);
     QFont font = option.font;
 
-    QFont_metrics fm (font);
-    QFont_metrics alias_fm (alias_font);
+    QFontMetrics fm (font);
+    QFontMetrics alias_fm (alias_font);
 
     auto classif = static_cast<const FolderStatusModel> (index.model ()).classify (index);
     if (classif == FolderStatusModel.AddButton) {
         const int margins = alias_fm.height (); // same as 2*alias_margin of paint
-        QFont_metrics fm (q_app.font ("QPushButton"));
+        QFontMetrics fm (q_app.font ("QPushButton"));
         QStyle_option_button opt;
         static_cast<QStyle_option &> (opt) = option;
         opt.text = add_folder_text ();
@@ -132,7 +133,7 @@ QSize FolderStatusDelegate.size_hint (QStyleOptionViewItem &option,
     return {0, h};
 }
 
-int FolderStatusDelegate.root_folder_height_without_errors (QFont_metrics &fm, QFont_metrics &alias_fm) {
+int FolderStatusDelegate.root_folder_height_without_errors (QFontMetrics &fm, QFontMetrics &alias_fm) {
     const int alias_margin = alias_fm.height () / 2;
     const int margin = fm.height () / 4;
 
@@ -163,9 +164,9 @@ void FolderStatusDelegate.paint (QPainter *painter, QStyleOptionViewItem &option
 
     progress_font.set_point_size (sub_font.point_size () - 2);
 
-    QFont_metrics sub_fm (sub_font);
-    QFont_metrics alias_fm (alias_font);
-    QFont_metrics progress_fm (progress_font);
+    QFontMetrics sub_fm (sub_font);
+    QFontMetrics alias_fm (alias_font);
+    QFontMetrics progress_fm (progress_font);
 
     int alias_margin = alias_fm.height () / 2;
     int margin = sub_fm.height () / 4;
@@ -425,8 +426,8 @@ bool FolderStatusDelegate.editor_event (QEvent *event, QAbstractItemModel *model
 QRect FolderStatusDelegate.options_button_rect (QRect within, Qt.Layout_direction direction) {
     QFont font = QFont ();
     QFont alias_font = make_alias_font (font);
-    QFont_metrics fm (font);
-    QFont_metrics alias_fm (alias_font);
+    QFontMetrics fm (font);
+    QFontMetrics alias_fm (alias_font);
     within.set_height (FolderStatusDelegate.root_folder_height_without_errors (fm, alias_fm));
 
     QStyle_option_tool_button opt;
@@ -442,7 +443,7 @@ QRect FolderStatusDelegate.options_button_rect (QRect within, Qt.Layout_directio
 }
 
 QRect FolderStatusDelegate.add_button_rect (QRect within, Qt.Layout_direction direction) {
-    QFont_metrics fm (q_app.font ("QPushButton"));
+    QFontMetrics fm (q_app.font ("QPushButton"));
     QStyle_option_button opt;
     opt.text = add_folder_text ();
     QSize size = QApplication.style ().size_from_contents (QStyle.CT_Push_button, &opt, fm.size (Qt.Text_single_line, opt.text)).expanded_to (QApplication.global_strut ());
@@ -453,8 +454,8 @@ QRect FolderStatusDelegate.add_button_rect (QRect within, Qt.Layout_direction di
 QRect FolderStatusDelegate.errors_list_rect (QRect within) {
     QFont font = QFont ();
     QFont alias_font = make_alias_font (font);
-    QFont_metrics fm (font);
-    QFont_metrics alias_fm (alias_font);
+    QFontMetrics fm (font);
+    QFontMetrics alias_fm (alias_font);
     within.set_top (within.top () + FolderStatusDelegate.root_folder_height_without_errors (fm, alias_fm));
     return within;
 }

@@ -43,7 +43,7 @@ private:
     
         ui.label_error_message.set_visible (false);
     
-        set_window_flags (window_flags () & ~Qt.Window_context_help_button_hint);
+        set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
     
         connect (ui.new_folder_name_edit, &QLineEdit.text_changed, this, &FolderCreationDialog.slot_new_folder_name_edit_text_edited);
     

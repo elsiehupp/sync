@@ -13,9 +13,9 @@ namespace Occ {
 #ifdef WITH_WEBENGINE
 #endif // WITH_WEBENGINE
 
-class Web_flow_credentials_dialog : Gtk.Dialog {
+class WebFlowCredentialsDialog : Gtk.Dialog {
 public:
-    Web_flow_credentials_dialog (Account *account, bool use_flow2, Gtk.Widget *parent = nullptr);
+    WebFlowCredentialsDialog (Account *account, bool use_flow2, Gtk.Widget *parent = nullptr);
 
     void set_url (QUrl &url);
     void set_info (string &msg);
@@ -26,11 +26,11 @@ public:
     }
 
 protected:
-    void close_event (QClose_event * e) override;
+    void close_event (QCloseEvent * e) override;
     void change_event (QEvent *) override;
 
 public slots:
-    void slot_flow2Auth_result (Flow2Auth.Result, string &error_string, string &user, string &app_password);
+    void slot_flow_2_auth_result (Flow2Auth.Result, string &error_string, string &user, string &app_password);
     void slot_show_settings_dialog ();
 
 signals:
@@ -44,26 +44,26 @@ private:
 
     bool _use_flow2;
 
-    Flow2Auth_widget *_flow2Auth_widget;
+    Flow2AuthWidget *_flow_2_auth_widget;
 #ifdef WITH_WEBENGINE
-    Web_view *_web_view;
+    WebView *_web_view;
 #endif // WITH_WEBENGINE
 
     QLabel *_error_label;
     QLabel *_info_label;
     QVBoxLayout *_layout;
     QVBoxLayout *_container_layout;
-    Header_banner *_header_banner;
+    HeaderBanner *_header_banner;
 };
 
-Web_flow_credentials_dialog.Web_flow_credentials_dialog (Account *account, bool use_flow2, Gtk.Widget *parent)
+WebFlowCredentialsDialog.WebFlowCredentialsDialog (Account *account, bool use_flow2, Gtk.Widget *parent)
     : Gtk.Dialog (parent)
     , _use_flow2 (use_flow2)
-    , _flow2Auth_widget (nullptr)
+    , _flow_2_auth_widget (nullptr)
 #ifdef WITH_WEBENGINE
     , _web_view (nullptr)
 #endif // WITH_WEBENGINE {
-    set_window_flags (window_flags () & ~Qt.Window_context_help_button_hint);
+    set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
 
     _layout = new QVBoxLayout (this);
     int spacing = _layout.spacing ();
@@ -80,35 +80,35 @@ Web_flow_credentials_dialog.Web_flow_credentials_dialog (Account *account, bool 
     _container_layout.add_widget (_info_label);
 
     if (_use_flow2) {
-        _flow2Auth_widget = new Flow2Auth_widget ();
-        _container_layout.add_widget (_flow2Auth_widget);
+        _flow_2_auth_widget = new Flow2AuthWidget ();
+        _container_layout.add_widget (_flow_2_auth_widget);
 
-        connect (_flow2Auth_widget, &Flow2Auth_widget.auth_result, this, &Web_flow_credentials_dialog.slot_flow2Auth_result);
+        connect (_flow_2_auth_widget, &Flow2AuthWidget.auth_result, this, &WebFlowCredentialsDialog.slot_flow_2_auth_result);
 
         // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-        connect (this, &Web_flow_credentials_dialog.style_changed, _flow2Auth_widget, &Flow2Auth_widget.slot_style_changed);
+        connect (this, &WebFlowCredentialsDialog.style_changed, _flow_2_auth_widget, &Flow2AuthWidget.slot_style_changed);
 
         // allow Flow2 page to poll on window activation
-        connect (this, &Web_flow_credentials_dialog.on_activate, _flow2Auth_widget, &Flow2Auth_widget.slot_poll_now);
+        connect (this, &WebFlowCredentialsDialog.on_activate, _flow_2_auth_widget, &Flow2AuthWidget.slot_poll_now);
 
-        _flow2Auth_widget.start_auth (account);
+        _flow_2_auth_widget.start_auth (account);
     } else {
 #ifdef WITH_WEBENGINE
-        _web_view = new Web_view ();
+        _web_view = new WebView ();
         _container_layout.add_widget (_web_view);
 
-        connect (_web_view, &Web_view.url_catched, this, &Web_flow_credentials_dialog.url_catched);
+        connect (_web_view, &WebView.url_catched, this, &WebFlowCredentialsDialog.url_catched);
 #endif // WITH_WEBENGINE
     }
 
     auto app = static_cast<Application> (q_app);
-    connect (app, &Application.is_showing_settings_dialog, this, &Web_flow_credentials_dialog.slot_show_settings_dialog);
+    connect (app, &Application.is_showing_settings_dialog, this, &WebFlowCredentialsDialog.slot_show_settings_dialog);
 
     _error_label = new QLabel ();
     _error_label.hide ();
     _container_layout.add_widget (_error_label);
 
-    Wizard_common.init_error_label (_error_label);
+    WizardCommon.init_error_label (_error_label);
 
     _layout.add_layout (_container_layout);
     set_layout (_layout);
@@ -116,28 +116,28 @@ Web_flow_credentials_dialog.Web_flow_credentials_dialog (Account *account, bool 
     customize_style ();
 }
 
-void Web_flow_credentials_dialog.close_event (QClose_event* e) {
+void WebFlowCredentialsDialog.close_event (QCloseEvent* e) {
     Q_UNUSED (e)
 
 #ifdef WITH_WEBENGINE
     if (_web_view) {
-        // Force calling Web_view.~Web_view () earlier so that _profile and _page are
+        // Force calling WebView.~WebView () earlier so that _profile and _page are
         // deleted in the correct order.
         _web_view.delete_later ();
         _web_view = nullptr;
     }
 #endif // WITH_WEBENGINE
 
-    if (_flow2Auth_widget) {
-        _flow2Auth_widget.reset_auth ();
-        _flow2Auth_widget.delete_later ();
-        _flow2Auth_widget = nullptr;
+    if (_flow_2_auth_widget) {
+        _flow_2_auth_widget.reset_auth ();
+        _flow_2_auth_widget.delete_later ();
+        _flow_2_auth_widget = nullptr;
     }
 
     emit on_close ();
 }
 
-void Web_flow_credentials_dialog.set_url (QUrl &url) {
+void WebFlowCredentialsDialog.set_url (QUrl &url) {
 #ifdef WITH_WEBENGINE
     if (_web_view)
         _web_view.set_url (url);
@@ -146,16 +146,16 @@ void Web_flow_credentials_dialog.set_url (QUrl &url) {
 #endif // WITH_WEBENGINE
 }
 
-void Web_flow_credentials_dialog.set_info (string &msg) {
+void WebFlowCredentialsDialog.set_info (string &msg) {
     _info_label.set_text (msg);
 }
 
-void Web_flow_credentials_dialog.set_error (string &error) {
+void WebFlowCredentialsDialog.set_error (string &error) {
     // bring window to top
     slot_show_settings_dialog ();
 
-    if (_use_flow2 && _flow2Auth_widget) {
-        _flow2Auth_widget.set_error (error);
+    if (_use_flow2 && _flow_2_auth_widget) {
+        _flow_2_auth_widget.set_error (error);
         return;
     }
 
@@ -167,17 +167,17 @@ void Web_flow_credentials_dialog.set_error (string &error) {
     }
 }
 
-void Web_flow_credentials_dialog.change_event (QEvent *e) {
+void WebFlowCredentialsDialog.change_event (QEvent *e) {
     switch (e.type ()) {
-    case QEvent.Style_change:
-    case QEvent.Palette_change:
-    case QEvent.Theme_change:
+    case QEvent.StyleChange:
+    case QEvent.PaletteChange:
+    case QEvent.ThemeChange:
         customize_style ();
 
         // Notify the other widgets (Dark-/Light-Mode switching)
         emit style_changed ();
         break;
-    case QEvent.Activation_change:
+    case QEvent.ActivationChange:
         if (is_active_window ())
             emit on_activate ();
         break;
@@ -188,18 +188,18 @@ void Web_flow_credentials_dialog.change_event (QEvent *e) {
     Gtk.Dialog.change_event (e);
 }
 
-void Web_flow_credentials_dialog.customize_style () {
+void WebFlowCredentialsDialog.customize_style () {
     // HINT : Customize dialog's own style here, if necessary in the future (Dark-/Light-Mode switching)
 }
 
-void Web_flow_credentials_dialog.slot_show_settings_dialog () {
-    // bring window to top but slightly delay, to avoid being hidden behind the Settings_dialog
+void WebFlowCredentialsDialog.slot_show_settings_dialog () {
+    // bring window to top but slightly delay, to avoid being hidden behind the SettingsDialog
     QTimer.single_shot (100, this, [this] {
         OwncloudGui.raise_dialog (this);
     });
 }
 
-void Web_flow_credentials_dialog.slot_flow2Auth_result (Flow2Auth.Result r, string &error_string, string &user, string &app_password) {
+void WebFlowCredentialsDialog.slot_flow_2_auth_result (Flow2Auth.Result r, string &error_string, string &user, string &app_password) {
     Q_UNUSED (error_string)
     if (r == Flow2Auth.LoggedIn) {
         emit url_catched (user, app_password, string ());

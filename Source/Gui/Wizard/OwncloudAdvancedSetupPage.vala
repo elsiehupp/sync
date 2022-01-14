@@ -155,16 +155,16 @@ private:
         Theme *theme = Theme.instance ();
         QVariant variant = theme.custom_media (Theme.o_c_setup_top);
         if (!variant.is_null ()) {
-            Wizard_common.setup_custom_media (variant, _ui.top_label);
+            WizardCommon.setup_custom_media (variant, _ui.top_label);
         }
     
         variant = theme.custom_media (Theme.o_c_setup_bottom);
-        Wizard_common.setup_custom_media (variant, _ui.bottom_label);
+        WizardCommon.setup_custom_media (variant, _ui.bottom_label);
     
-        Wizard_common.customize_hint_label (_ui.l_free_space);
-        Wizard_common.customize_hint_label (_ui.l_sync_everything_size_label);
-        Wizard_common.customize_hint_label (_ui.l_selective_sync_size_label);
-        Wizard_common.customize_hint_label (_ui.server_address_label);
+        WizardCommon.customize_hint_label (_ui.l_free_space);
+        WizardCommon.customize_hint_label (_ui.l_sync_everything_size_label);
+        WizardCommon.customize_hint_label (_ui.l_selective_sync_size_label);
+        WizardCommon.customize_hint_label (_ui.server_address_label);
     }
     
     bool Owncloud_advanced_setup_page.is_complete () {
@@ -172,7 +172,7 @@ private:
     }
     
     void Owncloud_advanced_setup_page.initialize_page () {
-        Wizard_common.init_error_label (_ui.error_label);
+        WizardCommon.init_error_label (_ui.error_label);
     
         if (!Theme.instance ().show_virtual_files_option () || best_available_vfs_mode () == Vfs.Off) {
             // If the layout were wrapped in a widget, the auto-grouping of the

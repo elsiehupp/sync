@@ -140,25 +140,25 @@ void Systray.set_tray_engine (QQml_application_engine *tray_engine) {
 Systray.Systray ()
     : QSystemTrayIcon (nullptr) {
     qml_register_singleton_type<User_model> ("com.nextcloud.desktopclient", 1, 0, "User_model",
-        [] (QQml_engine *, QJSEngine *) . GLib.Object * {
+        [] (QQmlEngine *, QJSEngine *) . GLib.Object * {
             return User_model.instance ();
         }
     );
 
     qml_register_singleton_type<User_apps_model> ("com.nextcloud.desktopclient", 1, 0, "User_apps_model",
-        [] (QQml_engine *, QJSEngine *) . GLib.Object * {
+        [] (QQmlEngine *, QJSEngine *) . GLib.Object * {
             return User_apps_model.instance ();
         }
     );
 
     qml_register_singleton_type<Systray> ("com.nextcloud.desktopclient", 1, 0, "Theme",
-        [] (QQml_engine *, QJSEngine *) . GLib.Object * {
+        [] (QQmlEngine *, QJSEngine *) . GLib.Object * {
             return Theme.instance ();
         }
     );
 
     qml_register_singleton_type<Systray> ("com.nextcloud.desktopclient", 1, 0, "Systray",
-        [] (QQml_engine *, QJSEngine *) . GLib.Object * {
+        [] (QQmlEngine *, QJSEngine *) . GLib.Object * {
             return Systray.instance ();
         }
     );

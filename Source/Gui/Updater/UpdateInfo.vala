@@ -6,8 +6,8 @@
 // #include <Qt_debug>
 // #include <QFile>
 // #include <QDom_document>
-// #include <Qt_core/Qt_debug>
-// #include <Qt_core/QFile>
+// #include <QtCore/Qt_debug>
+// #include <QtCore/QFile>
 
 namespace Occ {
 

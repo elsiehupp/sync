@@ -35,7 +35,7 @@ static const char content_md5Header_c[] = "Content-MD5";
 ***********************************************************/
 class Propagate_local_remove : Propagate_item_job {
 public:
-    Propagate_local_remove (Owncloud_propagator *propagator, Sync_file_item_ptr &item)
+    Propagate_local_remove (Owncloud_propagator *propagator, SyncFileItemPtr &item)
         : Propagate_item_job (propagator, item) {
     }
     void start () override;
@@ -52,7 +52,7 @@ private:
 ***********************************************************/
 class Propagate_local_mkdir : Propagate_item_job {
 public:
-    Propagate_local_mkdir (Owncloud_propagator *propagator, Sync_file_item_ptr &item)
+    Propagate_local_mkdir (Owncloud_propagator *propagator, SyncFileItemPtr &item)
         : Propagate_item_job (propagator, item)
         , _delete_existing_file (false) {
     }
@@ -79,7 +79,7 @@ private:
 ***********************************************************/
 class Propagate_local_rename : Propagate_item_job {
 public:
-    Propagate_local_rename (Owncloud_propagator *propagator, Sync_file_item_ptr &item)
+    Propagate_local_rename (Owncloud_propagator *propagator, SyncFileItemPtr &item)
         : Propagate_item_job (propagator, item) {
     }
     void start () override;

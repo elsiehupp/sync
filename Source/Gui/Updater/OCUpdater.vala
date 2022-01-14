@@ -5,7 +5,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 // #include <GLib.Object>
-// #include <Qt_core>
+// #include <QtCore>
 // #include <Qt_network>
 // #include <QtGui>
 // #include <Qt_widgets>
@@ -514,7 +514,7 @@ private:
         // if the version tag is set, there is a newer version.
         auto *msg_box = new Gtk.Dialog;
         msg_box.set_attribute (Qt.WA_DeleteOnClose);
-        msg_box.set_window_flags (msg_box.window_flags () & ~Qt.Window_context_help_button_hint);
+        msg_box.set_window_flags (msg_box.window_flags () & ~Qt.WindowContextHelpButtonHint);
     
         QIcon info_icon = msg_box.style ().standard_icon (QStyle.SP_Message_box_information);
         int icon_size = msg_box.style ().pixel_metric (QStyle.PM_Message_box_icon_size);
@@ -563,7 +563,7 @@ private:
     void NSISUpdater.show_update_error_dialog (string &target_version) {
         auto msg_box = new Gtk.Dialog;
         msg_box.set_attribute (Qt.WA_DeleteOnClose);
-        msg_box.set_window_flags (msg_box.window_flags () & ~Qt.Window_context_help_button_hint);
+        msg_box.set_window_flags (msg_box.window_flags () & ~Qt.WindowContextHelpButtonHint);
     
         QIcon info_icon = msg_box.style ().standard_icon (QStyle.SP_Message_box_information);
         int icon_size = msg_box.style ().pixel_metric (QStyle.PM_Message_box_icon_size);

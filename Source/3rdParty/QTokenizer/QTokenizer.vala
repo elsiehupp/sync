@@ -231,7 +231,7 @@ class QStringTokenizer : QTokenizer<string> {
     @brief Like \see next (), but returns a lightweight string reference
     @return A reference to the token within the string
     ***********************************************************/
-    public QString_ref string_ref () {
+    public QStringRef string_ref () {
         // If those differences overflow an int we'd have a veeeeeery long string in memory
         int begin = std.distance (d.begin, d.token_begin);
         int end = std.distance (d.token_begin, d.token_end);
@@ -239,7 +239,7 @@ class QStringTokenizer : QTokenizer<string> {
             begin++;
             end -= 2;
         }
-        return QString_ref (&d.string, begin, end);
+        return QStringRef (&d.string, begin, end);
     }
 };
 

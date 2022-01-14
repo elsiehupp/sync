@@ -33,7 +33,7 @@ public:
     bool is_complete () const override;
 
 public slots:
-    void slot_flow2Auth_result (Flow2Auth.Result, string &error_string, string &user, string &app_password);
+    void slot_flow_2_auth_result (Flow2Auth.Result, string &error_string, string &user, string &app_password);
     void slot_poll_now ();
     void slot_style_changed ();
 
@@ -47,7 +47,7 @@ public:
     string _app_password;
 
 private:
-    Flow2Auth_widget *_flow2Auth_widget = nullptr;
+    Flow2AuthWidget *_flow_2_auth_widget = nullptr;
     QVBoxLayout *_layout = nullptr;
 };
 
@@ -55,16 +55,16 @@ private:
         : Abstract_credentials_wizard_page () {
         _layout = new QVBoxLayout (this);
     
-        _flow2Auth_widget = new Flow2Auth_widget ();
-        _layout.add_widget (_flow2Auth_widget);
+        _flow_2_auth_widget = new Flow2AuthWidget ();
+        _layout.add_widget (_flow_2_auth_widget);
     
-        connect (_flow2Auth_widget, &Flow2Auth_widget.auth_result, this, &Flow2Auth_creds_page.slot_flow2Auth_result);
+        connect (_flow_2_auth_widget, &Flow2AuthWidget.auth_result, this, &Flow2Auth_creds_page.slot_flow_2_auth_result);
     
         // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-        connect (this, &Flow2Auth_creds_page.style_changed, _flow2Auth_widget, &Flow2Auth_widget.slot_style_changed);
+        connect (this, &Flow2Auth_creds_page.style_changed, _flow_2_auth_widget, &Flow2AuthWidget.slot_style_changed);
     
         // allow Flow2 page to poll on window activation
-        connect (this, &Flow2Auth_creds_page.poll_now, _flow2Auth_widget, &Flow2Auth_widget.slot_poll_now);
+        connect (this, &Flow2Auth_creds_page.poll_now, _flow_2_auth_widget, &Flow2AuthWidget.slot_poll_now);
     }
     
     void Flow2Auth_creds_page.initialize_page () {
@@ -72,27 +72,27 @@ private:
         Q_ASSERT (oc_wizard);
         oc_wizard.account ().set_credentials (CredentialsFactory.create ("http"));
     
-        if (_flow2Auth_widget)
-            _flow2Auth_widget.start_auth (oc_wizard.account ().data ());
+        if (_flow_2_auth_widget)
+            _flow_2_auth_widget.start_auth (oc_wizard.account ().data ());
     
         // Don't hide the wizard (avoid user confusion)!
         //wizard ().hide ();
     
-        _flow2Auth_widget.slot_style_changed ();
+        _flow_2_auth_widget.slot_style_changed ();
     }
     
     void Occ.Flow2Auth_creds_page.cleanup_page () {
         // The next or back button was activated, show the wizard again
         wizard ().show ();
-        if (_flow2Auth_widget)
-            _flow2Auth_widget.reset_auth ();
+        if (_flow_2_auth_widget)
+            _flow_2_auth_widget.reset_auth ();
     
         // Forget sensitive data
         _app_password.clear ();
         _user.clear ();
     }
     
-    void Flow2Auth_creds_page.slot_flow2Auth_result (Flow2Auth.Result r, string &error_string, string &user, string &app_password) {
+    void Flow2Auth_creds_page.slot_flow_2_auth_result (Flow2Auth.Result r, string &error_string, string &user, string &app_password) {
         Q_UNUSED (error_string)
         switch (r) {
         case Flow2Auth.NotSupported : {
@@ -122,7 +122,7 @@ private:
     }
     
     int Flow2Auth_creds_page.next_id () {
-        return Wizard_common.Page_Advanced_setup;
+        return WizardCommon.Page_Advanced_setup;
     }
     
     void Flow2Auth_creds_page.set_connected () {

@@ -62,15 +62,15 @@ public:
     int num_locked_items () { return _num_locked_items; }
     bool has_locked_files () { return _num_locked_items > 0; }
 
-    const Sync_file_item_ptr &first_item_new () { return _first_item_new; }
-    const Sync_file_item_ptr &first_item_deleted () { return _first_item_deleted; }
-    const Sync_file_item_ptr &first_item_updated () { return _first_item_updated; }
-    const Sync_file_item_ptr &first_item_renamed () { return _first_item_renamed; }
-    const Sync_file_item_ptr &first_new_conflict_item () { return _first_new_conflict_item; }
-    const Sync_file_item_ptr &first_item_error () { return _first_item_error; }
-    const Sync_file_item_ptr &first_item_locked () { return _first_item_locked; }
+    const SyncFileItemPtr &first_item_new () { return _first_item_new; }
+    const SyncFileItemPtr &first_item_deleted () { return _first_item_deleted; }
+    const SyncFileItemPtr &first_item_updated () { return _first_item_updated; }
+    const SyncFileItemPtr &first_item_renamed () { return _first_item_renamed; }
+    const SyncFileItemPtr &first_new_conflict_item () { return _first_new_conflict_item; }
+    const SyncFileItemPtr &first_item_error () { return _first_item_error; }
+    const SyncFileItemPtr &first_item_locked () { return _first_item_locked; }
 
-    void process_completed_item (Sync_file_item_ptr &item);
+    void process_completed_item (SyncFileItemPtr &item);
 
 private:
     Status _status = Undefined;
@@ -94,13 +94,13 @@ private:
     int _num_error_items = 0;
     int _num_locked_items = 0;
 
-    Sync_file_item_ptr _first_item_new;
-    Sync_file_item_ptr _first_item_deleted;
-    Sync_file_item_ptr _first_item_updated;
-    Sync_file_item_ptr _first_item_renamed;
-    Sync_file_item_ptr _first_new_conflict_item;
-    Sync_file_item_ptr _first_item_error;
-    Sync_file_item_ptr _first_item_locked;
+    SyncFileItemPtr _first_item_new;
+    SyncFileItemPtr _first_item_deleted;
+    SyncFileItemPtr _first_item_updated;
+    SyncFileItemPtr _first_item_renamed;
+    SyncFileItemPtr _first_new_conflict_item;
+    SyncFileItemPtr _first_item_error;
+    SyncFileItemPtr _first_item_locked;
 };
 
     SyncResult.SyncResult () = default;
@@ -187,7 +187,7 @@ private:
         return _folder;
     }
     
-    void SyncResult.process_completed_item (Sync_file_item_ptr &item) {
+    void SyncResult.process_completed_item (SyncFileItemPtr &item) {
         if (Progress.is_warning_kind (item._status)) {
             // Count any error conditions, error strings will have priority anyway.
             _found_files_not_synced = true;

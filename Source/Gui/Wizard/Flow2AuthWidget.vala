@@ -13,10 +13,10 @@ const int FLOW2AUTHWIDGET_H
 
 namespace Occ {
 
-class Flow2Auth_widget : Gtk.Widget {
+class Flow2AuthWidget : Gtk.Widget {
 public:
-    Flow2Auth_widget (Gtk.Widget *parent = nullptr);
-    ~Flow2Auth_widget () override;
+    Flow2AuthWidget (Gtk.Widget *parent = nullptr);
+    ~Flow2AuthWidget () override;
 
     void start_auth (Account *account);
     void reset_auth (Account *account = nullptr);

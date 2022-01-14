@@ -19,7 +19,7 @@ class QSpin_box;
 
 namespace Occ {
 
-namespace Wizard_common {
+namespace WizardCommon {
 
     void setup_custom_media (QVariant &variant, QLabel *label);
     string title_template ();
@@ -92,6 +92,6 @@ namespace Wizard_common {
         label.set_palette (palette);
     }
 
-} // ns Wizard_common
+} // ns WizardCommon
 
 } // namespace Occ

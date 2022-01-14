@@ -18,12 +18,12 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 namespace Occ {
 
 /***********************************************************
-@brief The Sync_run_file_log class
+@brief The SyncRunFileLog class
 @ingroup gui
 ***********************************************************/
-class Sync_run_file_log {
+class SyncRunFileLog {
 public:
-    Sync_run_file_log ();
+    SyncRunFileLog ();
     void start (string &folder_path);
     void log_item (SyncFileItem &item);
     void log_lap (string &name);
@@ -40,13 +40,13 @@ private:
 };
 
 
-    Sync_run_file_log.Sync_run_file_log () = default;
+    SyncRunFileLog.SyncRunFileLog () = default;
     
-    string Sync_run_file_log.date_time_str (QDateTime &dt) {
+    string SyncRunFileLog.date_time_str (QDateTime &dt) {
         return dt.to_string (Qt.ISODate);
     }
     
-    void Sync_run_file_log.start (string &folder_path) {
+    void SyncRunFileLog.start (string &folder_path) {
         const int64 logfile_max_size = 10 * 1024 * 1024; // 10Mi_b
     
         const string logpath = QStandardPaths.writable_location (QStandardPaths.App_data_location);
@@ -110,7 +110,7 @@ private:
         _lap_duration.start ();
         _out << "#=#=#=# Syncrun started " << date_time_str (QDateTime.current_date_time_utc ()) << endl;
     }
-    void Sync_run_file_log.log_item (SyncFileItem &item) {
+    void SyncRunFileLog.log_item (SyncFileItem &item) {
         // don't log the directory items that are in the list
         if (item._direction == SyncFileItem.None
             || item._instruction == CSYNC_INSTRUCTION_IGNORE) {
@@ -149,13 +149,13 @@ private:
         _out << endl;
     }
     
-    void Sync_run_file_log.log_lap (string &name) {
+    void SyncRunFileLog.log_lap (string &name) {
         _out << "#=#=#=#=# " << name << " " << date_time_str (QDateTime.current_date_time_utc ())
              << " (last step : " << _lap_duration.restart () << " msec"
              << ", total : " << _total_duration.elapsed () << " msec)" << endl;
     }
     
-    void Sync_run_file_log.finish () {
+    void SyncRunFileLog.finish () {
         _out << "#=#=#=# Syncrun finished " << date_time_str (QDateTime.current_date_time_utc ())
              << " (last step : " << _lap_duration.elapsed () << " msec"
              << ", total : " << _total_duration.elapsed () << " msec)" << endl;

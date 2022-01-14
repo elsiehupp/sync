@@ -15,12 +15,12 @@ namespace Occ {
 
 /***********************************************************
 @brief Takes care of tracking the status of individual files as they
-       go through the Sync_engine, to be reported as overlay icons in the shell.
+       go through the SyncEngine, to be reported as overlay icons in the shell.
 @ingroup libsync
 ***********************************************************/
 class SyncFileStatusTracker : GLib.Object {
 public:
-    SyncFileStatusTracker (Sync_engine *sync_engine);
+    SyncFileStatusTracker (SyncEngine *sync_engine);
     SyncFileStatus file_status (string &relative_path);
 
 public slots:
@@ -33,7 +33,7 @@ signals:
 
 private slots:
     void slot_about_to_propagate (Sync_file_item_vector &items);
-    void slot_item_completed (Sync_file_item_ptr &item);
+    void slot_item_completed (SyncFileItemPtr &item);
     void slot_sync_finished ();
     void slot_sync_engine_running_changed ();
 
@@ -56,7 +56,7 @@ private:
     void inc_sync_count_and_emit_status_changed (string &relative_path, Shared_flag shared_state);
     void dec_sync_count_and_emit_status_changed (string &relative_path, Shared_flag shared_state);
 
-    Sync_engine *_sync_engine;
+    SyncEngine *_sync_engine;
 
     Problems_map _sync_problems;
     QSet<string> _dirty_paths;
@@ -132,15 +132,15 @@ private:
             || status == SyncFileItem.File_locked;
     }
     
-    SyncFileStatusTracker.SyncFileStatusTracker (Sync_engine *sync_engine)
+    SyncFileStatusTracker.SyncFileStatusTracker (SyncEngine *sync_engine)
         : _sync_engine (sync_engine) {
-        connect (sync_engine, &Sync_engine.about_to_propagate,
+        connect (sync_engine, &SyncEngine.about_to_propagate,
             this, &SyncFileStatusTracker.slot_about_to_propagate);
-        connect (sync_engine, &Sync_engine.item_completed,
+        connect (sync_engine, &SyncEngine.item_completed,
             this, &SyncFileStatusTracker.slot_item_completed);
-        connect (sync_engine, &Sync_engine.finished, this, &SyncFileStatusTracker.slot_sync_finished);
-        connect (sync_engine, &Sync_engine.started, this, &SyncFileStatusTracker.slot_sync_engine_running_changed);
-        connect (sync_engine, &Sync_engine.finished, this, &SyncFileStatusTracker.slot_sync_engine_running_changed);
+        connect (sync_engine, &SyncEngine.finished, this, &SyncFileStatusTracker.slot_sync_finished);
+        connect (sync_engine, &SyncEngine.started, this, &SyncFileStatusTracker.slot_sync_engine_running_changed);
+        connect (sync_engine, &SyncEngine.finished, this, &SyncFileStatusTracker.slot_sync_engine_running_changed);
     }
     
     SyncFileStatus SyncFileStatusTracker.file_status (string &relative_path) {
@@ -151,7 +151,7 @@ private:
             return resolve_sync_and_error_status (string (), Not_shared);
         }
     
-        // The Sync_engine won't notify us at all for CSYNC_FILE_SILENTLY_EXCLUDED
+        // The SyncEngine won't notify us at all for CSYNC_FILE_SILENTLY_EXCLUDED
         // and CSYNC_FILE_EXCLUDE_AND_REMOVE excludes. Even though it's possible
         // that the status of CSYNC_FILE_EXCLUDE_LIST excludes will change if the user
         // update the exclude list at runtime and doing it statically here removes
@@ -240,7 +240,7 @@ private:
         Problems_map old_problems;
         std.swap (_sync_problems, old_problems);
     
-        foreach (Sync_file_item_ptr &item, items) {
+        foreach (SyncFileItemPtr &item, items) {
             q_c_debug (lc_status_tracker) << "Investigating" << item.destination () << item._status << item._instruction;
             _dirty_paths.remove (item.destination ());
     
@@ -284,7 +284,7 @@ private:
         }
     }
     
-    void SyncFileStatusTracker.slot_item_completed (Sync_file_item_ptr &item) {
+    void SyncFileStatusTracker.slot_item_completed (SyncFileItemPtr &item) {
         q_c_debug (lc_status_tracker) << "Item completed" << item.destination () << item._status << item._instruction;
     
         if (has_error_status (*item)) {
@@ -358,7 +358,7 @@ private:
     
     string SyncFileStatusTracker.get_system_destination (string &relative_path) {
         string system_path = _sync_engine.local_path () + relative_path;
-        // Sync_engine.local_path () has a trailing slash, make sure to remove it if the
+        // SyncEngine.local_path () has a trailing slash, make sure to remove it if the
         // destination is empty.
         if (system_path.ends_with (QLatin1Char ('/'))) {
             system_path.truncate (system_path.length () - 1);

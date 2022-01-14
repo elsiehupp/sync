@@ -37,9 +37,9 @@ the file is still being locked.
 @ingroup gui
 ***********************************************************/
 
-class Lock_watcher : GLib.Object {
+class LockWatcher : GLib.Object {
 public:
-    Lock_watcher (GLib.Object *parent = nullptr);
+    LockWatcher (GLib.Object *parent = nullptr);
 
     /***********************************************************
     Start watching a file.
@@ -79,27 +79,27 @@ private:
 
 
 
-Lock_watcher.Lock_watcher (GLib.Object *parent)
+LockWatcher.LockWatcher (GLib.Object *parent)
     : GLib.Object (parent) {
     connect (&_timer, &QTimer.timeout,
-        this, &Lock_watcher.check_files);
+        this, &LockWatcher.check_files);
     _timer.start (check_frequency);
 }
 
-void Lock_watcher.add_file (string &path) {
+void LockWatcher.add_file (string &path) {
     q_c_info (lc_lock_watcher) << "Watching for lock of" << path << "being released";
     _watched_paths.insert (path);
 }
 
-void Lock_watcher.set_check_interval (std.chrono.milliseconds interval) {
+void LockWatcher.set_check_interval (std.chrono.milliseconds interval) {
     _timer.start (interval.count ());
 }
 
-bool Lock_watcher.contains (string &path) {
+bool LockWatcher.contains (string &path) {
     return _watched_paths.contains (path);
 }
 
-void Lock_watcher.check_files () {
+void LockWatcher.check_files () {
     QSet<string> unlocked;
 
     foreach (string &path, _watched_paths) {
@@ -110,7 +110,7 @@ void Lock_watcher.check_files () {
         }
     }
 
-    // Doing it this way instead of with a QMutable_set_iterator
+    // Doing it this way instead of with a QMutableSetIterator
     // ensures that calling back into add_file from connected
     // slots isn't a problem.
     _watched_paths.subtract (unlocked);

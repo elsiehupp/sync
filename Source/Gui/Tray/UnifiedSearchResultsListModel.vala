@@ -6,14 +6,14 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
 // #include <algorithm>
 
-// #include <QAbstract_list_model>
+// #include <QAbstractListModel>
 // #include <QDesktopServices>
 
 // #pragma once
 
 // #include <limits>
 
-// #include <Qt_core>
+// #include <QtCore>
 
 namespace Occ {
 
@@ -23,7 +23,7 @@ namespace Occ {
 Simple list model to provide the list view with data for the Unified Search results.
 ***********************************************************/
 
-class Unified_search_results_list_model : QAbstract_list_model {
+class Unified_search_results_list_model : QAbstractListModel {
 
     Q_PROPERTY (bool is_search_in_progress READ is_search_in_progress NOTIFY is_search_in_progress_changed)
     Q_PROPERTY (string current_fetch_more_in_progress_provider_id READ current_fetch_more_in_progress_provider_id NOTIFY
@@ -278,7 +278,7 @@ namespace {
     constexpr int minimum_entres_number_to_show_load_more = 5;
 
     Unified_search_results_list_model.Unified_search_results_list_model (AccountState *account_state, GLib.Object *parent)
-        : QAbstract_list_model (parent)
+        : QAbstractListModel (parent)
         , _account_state (account_state) {
     }
     
@@ -320,7 +320,7 @@ namespace {
     }
     
     QHash<int, QByteArray> Unified_search_results_list_model.role_names () {
-        auto roles = QAbstract_list_model.role_names ();
+        auto roles = QAbstractListModel.role_names ();
         roles[Provider_name_role] = "provider_name";
         roles[Provider_id_role] = "provider_id";
         roles[Icons_role] = "icons";

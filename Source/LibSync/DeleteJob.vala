@@ -11,13 +11,13 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 namespace Occ {
 
 /***********************************************************
-@brief The Delete_job class
+@brief The DeleteJob class
 @ingroup libsync
 ***********************************************************/
-class Delete_job : AbstractNetworkJob {
+class DeleteJob : AbstractNetworkJob {
 public:
-    Delete_job (AccountPtr account, string &path, GLib.Object *parent = nullptr);
-    Delete_job (AccountPtr account, QUrl &url, GLib.Object *parent = nullptr);
+    DeleteJob (AccountPtr account, string &path, GLib.Object *parent = nullptr);
+    DeleteJob (AccountPtr account, QUrl &url, GLib.Object *parent = nullptr);
 
     void start () override;
     bool finished () override;
@@ -33,16 +33,16 @@ private:
     QByteArray _folder_token;
 };
 
-    Delete_job.Delete_job (AccountPtr account, string &path, GLib.Object *parent)
+    DeleteJob.DeleteJob (AccountPtr account, string &path, GLib.Object *parent)
         : AbstractNetworkJob (account, path, parent) {
     }
     
-    Delete_job.Delete_job (AccountPtr account, QUrl &url, GLib.Object *parent)
+    DeleteJob.DeleteJob (AccountPtr account, QUrl &url, GLib.Object *parent)
         : AbstractNetworkJob (account, string (), parent)
         , _url (url) {
     }
     
-    void Delete_job.start () {
+    void DeleteJob.start () {
         QNetworkRequest req;
         if (!_folder_token.is_empty ()) {
             req.set_raw_header ("e2e-token", _folder_token);
@@ -60,7 +60,7 @@ private:
         AbstractNetworkJob.start ();
     }
     
-    bool Delete_job.finished () {
+    bool DeleteJob.finished () {
         q_c_info (lc_delete_job) << "DELETE of" << reply ().request ().url () << "FINISHED WITH STATUS"
                            << reply_status_string ();
     
@@ -68,11 +68,11 @@ private:
         return true;
     }
     
-    QByteArray Delete_job.folder_token () {
+    QByteArray DeleteJob.folder_token () {
         return _folder_token;
     }
     
-    void Delete_job.set_folder_token (QByteArray &folder_token) {
+    void DeleteJob.set_folder_token (QByteArray &folder_token) {
         _folder_token = folder_token;
     }
     

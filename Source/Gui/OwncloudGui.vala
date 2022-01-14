@@ -17,7 +17,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <Qt_d_bus/QDBus_interface>
 #endif
 
-// #include <QQml_engine>
+// #include <QQmlEngine>
 // #include <QQml_component>
 // #include <QQml_application_engine>
 // #include <QQuick_item>
@@ -74,7 +74,7 @@ public slots:
     void slot_show_tray_message (string &title, string &msg);
     void slot_show_optional_tray_message (string &title, string &msg);
     void slot_folder_open_action (string &alias);
-    void slot_update_progress (string &folder, Progress_info &progress);
+    void slot_update_progress (string &folder, ProgressInfo &progress);
     void slot_show_gui_message (string &title, string &message);
     void slot_folders_changed ();
     void slot_show_settings ();
@@ -111,7 +111,7 @@ private slots:
 
 private:
     QPointer<Systray> _tray;
-    QPointer<Settings_dialog> _settings_dialog;
+    QPointer<SettingsDialog> _settings_dialog;
     QPointer<Log_browser> _log_browser;
 
 #ifdef WITH_LIBCLOUDPROVIDERS
@@ -446,11 +446,11 @@ void OwncloudGui.slot_folder_open_action (string &alias) {
     }
 }
 
-void OwncloudGui.slot_update_progress (string &folder, Progress_info &progress) {
+void OwncloudGui.slot_update_progress (string &folder, ProgressInfo &progress) {
     Q_UNUSED (folder);
 
     // FIXME : Lots of messages computed for nothing in this method, needs revisiting
-    if (progress.status () == Progress_info.Discovery) {
+    if (progress.status () == ProgressInfo.Discovery) {
 #if 0
         if (!progress._current_discovered_remote_folder.is_empty ()) {
             _action_status.set_text (tr ("Checking for changes in remote \"%1\"")
@@ -460,10 +460,10 @@ void OwncloudGui.slot_update_progress (string &folder, Progress_info &progress) 
                                        .arg (progress._current_discovered_local_folder));
         }
 #endif
-    } else if (progress.status () == Progress_info.Done) {
+    } else if (progress.status () == ProgressInfo.Done) {
         QTimer.single_shot (2000, this, &OwncloudGui.slot_compute_overall_sync_status);
     }
-    if (progress.status () != Progress_info.Propagation) {
+    if (progress.status () != ProgressInfo.Propagation) {
         return;
     }
 
@@ -557,7 +557,7 @@ void OwncloudGui.slot_show_gui_message (string &title, string &message) {
 
 void OwncloudGui.slot_show_settings () {
     if (_settings_dialog.is_null ()) {
-        _settings_dialog = new Settings_dialog (this);
+        _settings_dialog = new SettingsDialog (this);
         _settings_dialog.set_attribute (Qt.WA_DeleteOnClose, true);
         _settings_dialog.show ();
     }

@@ -9,7 +9,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <cerrno>
 // #include <QStringList>
 // #include <GLib.Object>
-// #include <QVar_length_array>
+// #include <QVarLengthArray>
 
 // #include <GLib.Object>
 // #include <string>
@@ -157,7 +157,7 @@ private:
         struct inotify_event *event = nullptr;
         size_t i = 0;
         int error = 0;
-        QVar_length_array<char, 2048> buffer (2048);
+        QVarLengthArray<char, 2048> buffer (2048);
     
         len = read (fd, buffer.data (), buffer.size ());
         error = errno;

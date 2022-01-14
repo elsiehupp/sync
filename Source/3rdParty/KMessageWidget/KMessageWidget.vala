@@ -327,7 +327,7 @@ protected:
 
     bool event (QEvent *event) override;
 
-    void resize_event (QResize_event *event) override;
+    void resize_event (QResizeEvent *event) override;
 
 private:
     KMessageWidgetPrivate *const d;
@@ -647,7 +647,7 @@ class KMessageWidgetPrivate {
     bool KMessageWidget.event (QEvent *event) {
         if (event.type () == QEvent.Polish && !d.content.layout ()) {
             d.create_layout ();
-        } else if (event.type () == QEvent.Palette_change) {
+        } else if (event.type () == QEvent.PaletteChange) {
             d.apply_style_sheet ();
         } else if (event.type () == QEvent.Show && !d.ignore_show_event_doing_animated_show) {
             if ( (height () != d.content.height ()) || (d.content.pos ().y () != 0)) {
@@ -658,7 +658,7 @@ class KMessageWidgetPrivate {
         return QFrame.event (event);
     }
     
-    void KMessageWidget.resize_event (QResize_event *event) {
+    void KMessageWidget.resize_event (QResizeEvent *event) {
         QFrame.resize_event (event);
     
         if (d.time_line.state () == QTime_line.Not_running) {

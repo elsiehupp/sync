@@ -22,10 +22,10 @@
 namespace Occ {
 
 
-class Web_view : Gtk.Widget {
+class WebView : Gtk.Widget {
 public:
-    Web_view (Gtk.Widget *parent = nullptr);
-    ~Web_view () override;
+    WebView (Gtk.Widget *parent = nullptr);
+    ~WebView () override;
     void set_url (QUrl &url);
 
 signals:
@@ -81,7 +81,7 @@ public:
     bool accept_navigation_request (QUrl &url, QWeb_engine_page.Navigation_type type, bool is_main_frame) override;
 };
 
-Web_view.Web_view (Gtk.Widget *parent)
+WebView.WebView (Gtk.Widget *parent)
     : Gtk.Widget (parent),
       _ui () {
     _ui.setup_ui (this);
@@ -121,14 +121,14 @@ Web_view.Web_view (Gtk.Widget *parent)
     _ui.vertical_layout.add_widget (_webview);
 
     connect (_webview, &QWeb_engine_view.load_progress, _ui.progress_bar, &QProgressBar.set_value);
-    connect (_scheme_handler, &Web_view_page_url_scheme_handler.url_catched, this, &Web_view.url_catched);
+    connect (_scheme_handler, &Web_view_page_url_scheme_handler.url_catched, this, &WebView.url_catched);
 }
 
-void Web_view.set_url (QUrl &url) {
+void WebView.set_url (QUrl &url) {
     _page.set_url (url);
 }
 
-Web_view.~Web_view () {
+WebView.~WebView () {
     /***********************************************************
     The Qt implmentation deletes children in the order they are added to the
     object tree, so in this case _page is deleted after _profile, which

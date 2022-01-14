@@ -13,9 +13,9 @@ Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
 namespace Occ {
 
 
-class Navigation_pane_helper : GLib.Object {
+class NavigationPaneHelper : GLib.Object {
 public:
-    Navigation_pane_helper (FolderMan *folder_man);
+    NavigationPaneHelper (FolderMan *folder_man);
 
     bool show_in_explorer_navigation_pane () { return _show_in_explorer_navigation_pane; }
     void set_show_in_explorer_navigation_pane (bool show);
@@ -30,13 +30,13 @@ private:
     QTimer _update_cloud_storage_registry_timer;
 };
 
-    Navigation_pane_helper.Navigation_pane_helper (FolderMan *folder_man)
+    NavigationPaneHelper.NavigationPaneHelper (FolderMan *folder_man)
         : _folder_man (folder_man) {
         ConfigFile cfg;
         _show_in_explorer_navigation_pane = cfg.show_in_explorer_navigation_pane ();
     
         _update_cloud_storage_registry_timer.set_single_shot (true);
-        connect (&_update_cloud_storage_registry_timer, &QTimer.timeout, this, &Navigation_pane_helper.update_cloud_storage_registry);
+        connect (&_update_cloud_storage_registry_timer, &QTimer.timeout, this, &NavigationPaneHelper.update_cloud_storage_registry);
     
         // Ensure that the folder integration stays persistent in Explorer,
         // the uninstaller removes the folder upon updating the client.
@@ -44,7 +44,7 @@ private:
         set_show_in_explorer_navigation_pane (!_show_in_explorer_navigation_pane);
     }
     
-    void Navigation_pane_helper.set_show_in_explorer_navigation_pane (bool show) {
+    void NavigationPaneHelper.set_show_in_explorer_navigation_pane (bool show) {
         if (_show_in_explorer_navigation_pane == show)
             return;
     
@@ -57,13 +57,13 @@ private:
         schedule_update_cloud_storage_registry ();
     }
     
-    void Navigation_pane_helper.schedule_update_cloud_storage_registry () {
+    void NavigationPaneHelper.schedule_update_cloud_storage_registry () {
         // Schedule the update to happen a bit later to avoid doing the update multiple times in a row.
         if (!_update_cloud_storage_registry_timer.is_active ())
             _update_cloud_storage_registry_timer.start (500);
     }
     
-    void Navigation_pane_helper.update_cloud_storage_registry () {
+    void NavigationPaneHelper.update_cloud_storage_registry () {
         // Start by looking at every registered namespace extension for the sidebar, and look for an "Application_name" value
         // that matches ours when we saved.
         QVector<QUuid> entries_to_remove;

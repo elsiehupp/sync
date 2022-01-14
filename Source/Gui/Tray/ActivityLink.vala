@@ -4,9 +4,9 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <Qt_core>
+// #include <QtCore>
 
-// #include <Qt_core>
+// #include <QtCore>
 // #include <QIcon>
 
 namespace Occ {

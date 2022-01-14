@@ -10,7 +10,7 @@ Removing the root encrypted folder is consisted of multiple steps:
 - 2nd step is to lock the root folder useing the folder_iD from the previous step. !!! NOTE : If there are no nested items in the folder, this, and subsequent steps are skipped until step 7.
 - 3rd step is to obtain the root folder's metadata (it contains list of nested files and folders)
 - 4th step is to remove the nested files and folders from the metadata and send it to the server via Update_metadata_api_job
-- 5th step is to trigger Delete_job for every nested file and folder of the root folder
+- 5th step is to trigger DeleteJob for every nested file and folder of the root folder
 - 6th step is to unlock the root folder using the previously obtained token from locking
 - 7th step is to decrypt and delete the root folder, because it is now possible as it has become empty
 ***********************************************************/
@@ -31,7 +31,7 @@ namespace {
 
 class Propagate_remote_delete_encrypted_root_folder : Abstract_propagate_remote_delete_encrypted {
 public:
-    Propagate_remote_delete_encrypted_root_folder (Owncloud_propagator *propagator, Sync_file_item_ptr item, GLib.Object *parent);
+    Propagate_remote_delete_encrypted_root_folder (Owncloud_propagator *propagator, SyncFileItemPtr item, GLib.Object *parent);
 
     void start () override;
 
@@ -56,7 +56,7 @@ private:
 
 
 
-Propagate_remote_delete_encrypted_root_folder.Propagate_remote_delete_encrypted_root_folder (Owncloud_propagator *propagator, Sync_file_item_ptr item, GLib.Object *parent)
+Propagate_remote_delete_encrypted_root_folder.Propagate_remote_delete_encrypted_root_folder (Owncloud_propagator *propagator, SyncFileItemPtr item, GLib.Object *parent)
     : Abstract_propagate_remote_delete_encrypted (propagator, item, parent) {
 
 }
@@ -112,7 +112,7 @@ void Propagate_remote_delete_encrypted_root_folder.slot_folder_encrypted_metadat
 }
 
 void Propagate_remote_delete_encrypted_root_folder.slot_delete_nested_remote_item_finished () {
-    auto *delete_job = qobject_cast<Delete_job> (GLib.Object.sender ());
+    auto *delete_job = qobject_cast<DeleteJob> (GLib.Object.sender ());
 
     Q_ASSERT (delete_job);
 
@@ -175,11 +175,11 @@ void Propagate_remote_delete_encrypted_root_folder.slot_delete_nested_remote_ite
 void Propagate_remote_delete_encrypted_root_folder.delete_nested_remote_item (string &filename) {
     q_c_info (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "Deleting nested encrypted remote item" << filename;
 
-    auto delete_job = new Delete_job (_propagator.account (), _propagator.full_remote_path (filename), this);
+    auto delete_job = new DeleteJob (_propagator.account (), _propagator.full_remote_path (filename), this);
     delete_job.set_folder_token (_folder_token);
     delete_job.set_property (encrypted_file_name_property_key, filename);
 
-    connect (delete_job, &Delete_job.finished_signal, this, &Propagate_remote_delete_encrypted_root_folder.slot_delete_nested_remote_item_finished);
+    connect (delete_job, &DeleteJob.finished_signal, this, &Propagate_remote_delete_encrypted_root_folder.slot_delete_nested_remote_item_finished);
 
     delete_job.start ();
 }

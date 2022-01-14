@@ -39,7 +39,7 @@ QUrl Propagate_upload_file_nG.chunk_url (int chunk) {
       slot_mk_col_finished ()                                         |                      |
           |                                                       no                    yes
           |                                                       |                      |
-          |                                                       |                  Delete_job
+          |                                                       |                  DeleteJob
           |                                                       |                      |
     +-----+<------------------------------------------------------+<---  slot_delete_job_finished ()
     |
@@ -81,7 +81,7 @@ void Propagate_upload_file_nG.do_start_upload () {
         // The upload info is stale. remove the stale chunks on the server
         _transfer_id = progress_info._transferid;
         // Fire and forget. Any error will be ignored.
-        (new Delete_job (propagator ().account (), chunk_url (), this)).start ();
+        (new DeleteJob (propagator ().account (), chunk_url (), this)).start ();
         // start_new_upload will reset the _transfer_id and the UploadInfo in the db.
     }
 
@@ -123,7 +123,7 @@ void Propagate_upload_file_nG.slot_propfind_finished () {
 
         // Wipe the old chunking data.
         // Fire and forget. Any error will be ignored.
-        (new Delete_job (propagator ().account (), chunk_url (), this)).start ();
+        (new DeleteJob (propagator ().account (), chunk_url (), this)).start ();
 
         propagator ()._active_job_list.append (this);
         start_new_upload ();
@@ -141,8 +141,8 @@ void Propagate_upload_file_nG.slot_propfind_finished () {
         // we should remove the later chunks. Otherwise when we do dynamic chunk sizing, we may end up
         // with corruptions if there are too many chunks, or if we abort and there are still stale chunks.
         for (auto &server_chunk : q_as_const (_server_chunks)) {
-            auto job = new Delete_job (propagator ().account (), Utility.concat_url_path (chunk_url (), server_chunk.original_name), this);
-            GLib.Object.connect (job, &Delete_job.finished_signal, this, &Propagate_upload_file_nG.slot_delete_job_finished);
+            auto job = new DeleteJob (propagator ().account (), Utility.concat_url_path (chunk_url (), server_chunk.original_name), this);
+            GLib.Object.connect (job, &DeleteJob.finished_signal, this, &Propagate_upload_file_nG.slot_delete_job_finished);
             _jobs.append (job);
             job.start ();
         }
@@ -169,7 +169,7 @@ void Propagate_upload_file_nG.slot_propfind_finished_with_error () {
 }
 
 void Propagate_upload_file_nG.slot_delete_job_finished () {
-    auto job = qobject_cast<Delete_job> (sender ());
+    auto job = qobject_cast<DeleteJob> (sender ());
     ASSERT (job);
     _jobs.remove (_jobs.index_of (job));
 
@@ -182,7 +182,7 @@ void Propagate_upload_file_nG.slot_delete_job_finished () {
             abort_with_error (status, job.error_string ());
             return;
         } else {
-            q_c_warning (lc_propagate_upload_nG) << "Delete_job errored out" << job.error_string () << job.reply ().url ();
+            q_c_warning (lc_propagate_upload_nG) << "DeleteJob errored out" << job.error_string () << job.reply ().url ();
             _remove_job_error = true;
             // Let the other jobs finish
         }

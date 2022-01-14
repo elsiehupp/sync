@@ -7,7 +7,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 ***********************************************************/
 
 // #include <QAbstractButton>
-// #include <Qt_core>
+// #include <QtCore>
 // #include <QProcess>
 // #include <QMessageBox>
 // #include <QDesktopServices>
@@ -151,9 +151,9 @@ private:
         _oc_wizard.set_remote_folder (_remote_folder);
     
     #ifdef WITH_PROVIDERS
-        const auto start_page = Wizard_common.Page_Welcome;
+        const auto start_page = WizardCommon.Page_Welcome;
     #else // WITH_PROVIDERS
-        const auto start_page = Wizard_common.Page_Server_setup;
+        const auto start_page = WizardCommon.Page_Server_setup;
     #endif // WITH_PROVIDERS
         _oc_wizard.set_start_id (start_page);
     
@@ -438,10 +438,10 @@ private:
     
         // bring wizard to top
         _oc_wizard.bring_to_top ();
-        if (_oc_wizard.current_id () == Wizard_common.Page_OAuth_creds || _oc_wizard.current_id () == Wizard_common.Page_Flow2Auth_creds) {
+        if (_oc_wizard.current_id () == WizardCommon.Page_OAuth_creds || _oc_wizard.current_id () == WizardCommon.Page_Flow2Auth_creds) {
             _oc_wizard.back ();
         }
-        _oc_wizard.display_error (error_msg, _oc_wizard.current_id () == Wizard_common.Page_Server_setup && check_downgrade_advised (reply));
+        _oc_wizard.display_error (error_msg, _oc_wizard.current_id () == WizardCommon.Page_Server_setup && check_downgrade_advised (reply));
     }
     
     bool OwncloudSetupWizard.check_downgrade_advised (QNetworkReply *reply) {

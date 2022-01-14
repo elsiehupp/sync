@@ -5,7 +5,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <Qt_core>
+// #include <QtCore>
 // #include <QtGui>
 // #include <QMessageBox>
 // #include <owncloudgui.h>
@@ -14,7 +14,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
 // #include <QWizard>
 // #include <QLoggingCategory>
-// #include <QSsl_key>
+// #include <QSslKey>
 // #include <QSslCertificate>
 
 namespace Occ {
@@ -67,7 +67,7 @@ public:
     // Set from the Owncloud_setup_page, later used from Owncloud_http_creds_page
     QByteArray _client_cert_bundle; // raw, potentially encrypted pkcs12 bundle provided by the user
     QByteArray _client_cert_password; // password for the pkcs12
-    QSsl_key _client_ssl_key; // key extracted from pkcs12
+    QSslKey _client_ssl_key; // key extracted from pkcs12
     QSslCertificate _client_ssl_certificate; // cert extracted from pkcs12
     QList<QSslCertificate> _client_ssl_ca_certificates;
 
@@ -134,15 +134,15 @@ private:
     #endif // WITH_WEBENGINE {
         set_object_name ("owncloud_wizard");
     
-        set_window_flags (window_flags () & ~Qt.Window_context_help_button_hint);
-        set_page (Wizard_common.Page_Welcome, _welcome_page);
-        set_page (Wizard_common.Page_Server_setup, _setup_page);
-        set_page (Wizard_common.Page_Http_creds, _http_creds_page);
-        set_page (Wizard_common.Page_OAuth_creds, _browser_creds_page);
-        set_page (Wizard_common.Page_Flow2Auth_creds, _flow2Creds_page);
-        set_page (Wizard_common.Page_Advanced_setup, _advanced_setup_page);
+        set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
+        set_page (WizardCommon.Page_Welcome, _welcome_page);
+        set_page (WizardCommon.Page_Server_setup, _setup_page);
+        set_page (WizardCommon.Page_Http_creds, _http_creds_page);
+        set_page (WizardCommon.Page_OAuth_creds, _browser_creds_page);
+        set_page (WizardCommon.Page_Flow2Auth_creds, _flow2Creds_page);
+        set_page (WizardCommon.Page_Advanced_setup, _advanced_setup_page);
     #ifdef WITH_WEBENGINE
-        set_page (Wizard_common.Page_Web_view, _web_view_page);
+        set_page (WizardCommon.Page_Web_view, _web_view_page);
     #endif // WITH_WEBENGINE
     
         connect (this, &Gtk.Dialog.finished, this, &OwncloudWizard.basic_setup_finished);
@@ -273,29 +273,29 @@ private:
         const int id (current_id ());
     
         switch (id) {
-        case Wizard_common.Page_Http_creds:
+        case WizardCommon.Page_Http_creds:
             _http_creds_page.set_connected ();
             break;
     
-        case Wizard_common.Page_OAuth_creds:
+        case WizardCommon.Page_OAuth_creds:
             _browser_creds_page.set_connected ();
             break;
     
-        case Wizard_common.Page_Flow2Auth_creds:
+        case WizardCommon.Page_Flow2Auth_creds:
             _flow2Creds_page.set_connected ();
             break;
     
     #ifdef WITH_WEBENGINE
-        case Wizard_common.Page_Web_view:
+        case WizardCommon.Page_Web_view:
             _web_view_page.set_connected ();
             break;
     #endif // WITH_WEBENGINE
     
-        case Wizard_common.Page_Advanced_setup:
+        case WizardCommon.Page_Advanced_setup:
             _advanced_setup_page.directories_created ();
             break;
     
-        case Wizard_common.Page_Server_setup:
+        case WizardCommon.Page_Server_setup:
             q_c_warning (lc_wizard, "Should not happen at this stage.");
             break;
         }
@@ -314,10 +314,10 @@ private:
     
         if (type == DetermineAuthTypeJob.OAuth) {
             _credentials_page = _browser_creds_page;
-        } else if (type == DetermineAuthTypeJob.Login_flow_v2) {
+        } else if (type == DetermineAuthTypeJob.LoginFlowV2) {
             _credentials_page = _flow2Creds_page;
     #ifdef WITH_WEBENGINE
-        } else if (type == DetermineAuthTypeJob.Web_view_flow) {
+        } else if (type == DetermineAuthTypeJob.WebViewFlow) {
             _credentials_page = _web_view_page;
     #endif // WITH_WEBENGINE
         } else { // try Basic auth even for "Unknown"
@@ -337,18 +337,18 @@ private:
             }
         };
     
-        if (id == Wizard_common.Page_Welcome) {
+        if (id == WizardCommon.Page_Welcome) {
             // Set next button to just hidden so it retains it's layout
             button (QWizard.Next_button).set_hidden (true);
             // Need to set it from here, otherwise it has no effect
             _welcome_page.set_login_button_default ();
         } else if (
     #ifdef WITH_WEBENGINE
-            id == Wizard_common.Page_Web_view ||
+            id == WizardCommon.Page_Web_view ||
     #endif // WITH_WEBENGINE
-            id == Wizard_common.Page_Flow2Auth_creds) {
+            id == WizardCommon.Page_Flow2Auth_creds) {
             set_button_layout ({ QWizard.Stretch, QWizard.Back_button });
-        } else if (id == Wizard_common.Page_Advanced_setup) {
+        } else if (id == WizardCommon.Page_Advanced_setup) {
             set_button_layout ({ QWizard.Stretch, QWizard.Custom_button1, QWizard.Back_button, QWizard.Finish_button });
             set_next_button_as_default ();
         } else {
@@ -356,11 +356,11 @@ private:
             set_next_button_as_default ();
         }
     
-        if (id == Wizard_common.Page_Server_setup) {
+        if (id == WizardCommon.Page_Server_setup) {
             emit clear_pending_requests ();
         }
     
-        if (id == Wizard_common.Page_Advanced_setup && (_credentials_page == _browser_creds_page || _credentials_page == _flow2Creds_page)) {
+        if (id == WizardCommon.Page_Advanced_setup && (_credentials_page == _browser_creds_page || _credentials_page == _flow2Creds_page)) {
             // For OAuth, disable the back button in the Page_Advanced_setup because we don't want
             // to re-open the browser.
             button (QWizard.Back_button).set_enabled (false);
@@ -369,15 +369,15 @@ private:
     
     void OwncloudWizard.display_error (string &msg, bool retry_h_t_tPonly) {
         switch (current_id ()) {
-        case Wizard_common.Page_Server_setup:
+        case WizardCommon.Page_Server_setup:
             _setup_page.set_error_string (msg, retry_h_t_tPonly);
             break;
     
-        case Wizard_common.Page_Http_creds:
+        case WizardCommon.Page_Http_creds:
             _http_creds_page.set_error_string (msg);
             break;
     
-        case Wizard_common.Page_Advanced_setup:
+        case WizardCommon.Page_Advanced_setup:
             _advanced_setup_page.set_error_string (msg);
             break;
         }
@@ -402,15 +402,15 @@ private:
     
     void OwncloudWizard.change_event (QEvent *e) {
         switch (e.type ()) {
-        case QEvent.Style_change:
-        case QEvent.Palette_change:
-        case QEvent.Theme_change:
+        case QEvent.StyleChange:
+        case QEvent.PaletteChange:
+        case QEvent.ThemeChange:
             customize_style ();
     
             // Notify the other widgets (Dark-/Light-Mode switching)
             emit style_changed ();
             break;
-        case QEvent.Activation_change:
+        case QEvent.ActivationChange:
             if (is_active_window ())
                 emit on_activate ();
             break;

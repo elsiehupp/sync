@@ -8,10 +8,10 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 namespace Occ {
 
-class File_activity_list_model : Activity_list_model {
+class FileActivityListModel : ActivityListModel {
 
 public:
-    File_activity_list_model (GLib.Object *parent = nullptr);
+    FileActivityListModel (GLib.Object *parent = nullptr);
 
 public slots:
     void load (AccountState *account_state, string &file_id);
@@ -22,12 +22,12 @@ protected:
 private:
     string _file_id;
 };
-    File_activity_list_model.File_activity_list_model (GLib.Object *parent)
-        : Activity_list_model (nullptr, parent) {
+    FileActivityListModel.FileActivityListModel (GLib.Object *parent)
+        : ActivityListModel (nullptr, parent) {
         set_display_actions (false);
     }
     
-    void File_activity_list_model.load (AccountState *account_state, string &local_path) {
+    void FileActivityListModel.load (AccountState *account_state, string &local_path) {
         Q_ASSERT (account_state);
         if (!account_state || currently_fetching ()) {
             return;
@@ -49,7 +49,7 @@ private:
         slot_refresh_activity ();
     }
     
-    void File_activity_list_model.start_fetch_job () {
+    void FileActivityListModel.start_fetch_job () {
         if (!account_state ().is_connected ()) {
             return;
         }
@@ -58,7 +58,7 @@ private:
         const string url (QStringLiteral ("ocs/v2.php/apps/activity/api/v2/activity/filter"));
         auto job = new JsonApiJob (account_state ().account (), url, this);
         GLib.Object.connect (job, &JsonApiJob.json_received,
-            this, &File_activity_list_model.activities_received);
+            this, &FileActivityListModel.activities_received);
     
         QUrlQuery params;
         params.add_query_item (QStringLiteral ("sort"), QStringLiteral ("asc"));

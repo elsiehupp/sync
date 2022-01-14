@@ -57,14 +57,14 @@ protected slots:
         _ui.top_label.hide ();
         _ui.bottom_label.hide ();
         QVariant variant = theme.custom_media (Theme.o_c_setup_top);
-        Wizard_common.setup_custom_media (variant, _ui.top_label);
+        WizardCommon.setup_custom_media (variant, _ui.top_label);
         variant = theme.custom_media (Theme.o_c_setup_bottom);
-        Wizard_common.setup_custom_media (variant, _ui.bottom_label);
+        WizardCommon.setup_custom_media (variant, _ui.bottom_label);
     
-        Wizard_common.init_error_label (_ui.error_label);
+        WizardCommon.init_error_label (_ui.error_label);
     
-        set_title (Wizard_common.title_template ().arg (tr ("Connect to %1").arg (Theme.instance ().app_name_g_u_i ())));
-        set_sub_title (Wizard_common.sub_title_template ().arg (tr ("Login in your browser")));
+        set_title (WizardCommon.title_template ().arg (tr ("Connect to %1").arg (Theme.instance ().app_name_g_u_i ())));
+        set_sub_title (WizardCommon.sub_title_template ().arg (tr ("Login in your browser")));
     
         connect (_ui.open_link_button, &QCommand_link_button.clicked, this, &Owncloud_oAuth_creds_page.slot_open_browser);
         connect (_ui.copy_link_button, &QCommand_link_button.clicked, this, &Owncloud_oAuth_creds_page.slot_copy_link_to_clipboard);
@@ -116,7 +116,7 @@ protected slots:
     }
     
     int Owncloud_oAuth_creds_page.next_id () {
-        return Wizard_common.Page_Advanced_setup;
+        return WizardCommon.Page_Advanced_setup;
     }
     
     void Owncloud_oAuth_creds_page.set_connected () {

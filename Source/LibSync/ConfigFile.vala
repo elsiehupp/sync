@@ -818,11 +818,11 @@ void ConfigFile.set_proxy_type (int proxy_type,
             settings.remove (QLatin1String (proxy_pass_c));
 
             // Delete password from keychain
-            auto job = new Keychain_chunk.Delete_job (keychain_proxy_password_key ());
+            auto job = new KeychainChunk.DeleteJob (keychain_proxy_password_key ());
             job.exec ();
         } else {
             // Write password to keychain
-            auto job = new Keychain_chunk.Write_job (keychain_proxy_password_key (), pass.to_utf8 ());
+            auto job = new KeychainChunk.WriteJob (keychain_proxy_password_key (), pass.to_utf8 ());
             if (job.exec ()) {
                 // Security : Don't keep password in config file
                 settings.remove (QLatin1String (proxy_pass_c));
@@ -902,7 +902,7 @@ string ConfigFile.proxy_password () {
 
     if (!pass.is_empty ()) {
         // Security : Migrate password from config file to keychain
-        auto job = new Keychain_chunk.Write_job (key, pass.to_utf8 ());
+        auto job = new KeychainChunk.WriteJob (key, pass.to_utf8 ());
         if (job.exec ()) {
             QSettings settings (config_file (), QSettings.IniFormat);
             settings.remove (QLatin1String (proxy_pass_c));
@@ -910,7 +910,7 @@ string ConfigFile.proxy_password () {
         }
     } else {
         // Read password from keychain
-        auto job = new Keychain_chunk.Read_job (key);
+        auto job = new KeychainChunk.ReadJob (key);
         if (job.exec ()) {
             pass = job.text_data ();
         }
