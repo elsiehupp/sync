@@ -7,11 +7,11 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QFile>
 // #include <QDateTime>
 // #include <QLoggingCategory>
-// #include <QNetwork_cookie>
+// #include <QNetworkCookie>
 // #include <QDataStream>
 // #include <QDir>
 
-// #include <QNetwork_cookie_jar>
+// #include <QNetworkCookieJar>
 
 namespace Occ {
 
@@ -19,26 +19,26 @@ namespace Occ {
 @brief The CookieJar class
 @ingroup libsync
 ***********************************************************/
-class CookieJar : QNetwork_cookie_jar {
+class CookieJar : QNetworkCookieJar {
 public:
     CookieJar (GLib.Object *parent = nullptr);
     ~CookieJar () override;
-    bool set_cookies_from_url (QList<QNetwork_cookie> &cookie_list, QUrl &url) override;
-    QList<QNetwork_cookie> cookies_for_url (QUrl &url) const override;
+    bool set_cookies_from_url (QList<QNetworkCookie> &cookie_list, QUrl &url) override;
+    QList<QNetworkCookie> cookies_for_url (QUrl &url) const override;
 
     void clear_session_cookies ();
 
-    using QNetwork_cookie_jar.set_all_cookies;
-    using QNetwork_cookie_jar.all_cookies;
+    using QNetworkCookieJar.set_all_cookies;
+    using QNetworkCookieJar.all_cookies;
 
     bool save (string &file_name);
     bool restore (string &file_name);
 
 signals:
-    void new_cookies_for_url (QList<QNetwork_cookie> &cookie_list, QUrl &url);
+    void new_cookies_for_url (QList<QNetworkCookie> &cookie_list, QUrl &url);
 
 private:
-    QList<QNetwork_cookie> remove_expired (QList<QNetwork_cookie> &cookies);
+    QList<QNetworkCookie> remove_expired (QList<QNetworkCookie> &cookies);
 };
 
 
@@ -46,7 +46,7 @@ private:
         const unsigned int JAR_VERSION = 23;
     }
 
-    QDataStream &operator<< (QDataStream &stream, QList<QNetwork_cookie> &list) {
+    QDataStream &operator<< (QDataStream &stream, QList<QNetworkCookie> &list) {
         stream << JAR_VERSION;
         stream << uint32 (list.size ());
         for (auto &cookie : list)
@@ -54,7 +54,7 @@ private:
         return stream;
     }
 
-    QDataStream &operator>> (QDataStream &stream, QList<QNetwork_cookie> &list) {
+    QDataStream &operator>> (QDataStream &stream, QList<QNetworkCookie> &list) {
         list.clear ();
 
         uint32 version = 0;
@@ -68,7 +68,7 @@ private:
         for (uint32 i = 0; i < count; ++i) {
             QByteArray value;
             stream >> value;
-            QList<QNetwork_cookie> new_cookies = QNetwork_cookie.parse_cookies (value);
+            QList<QNetworkCookie> new_cookies = QNetworkCookie.parse_cookies (value);
             if (new_cookies.count () == 0 && value.length () != 0) {
                 q_c_warning (lc_cookie_jar) << "CookieJar : Unable to parse saved cookie:" << value;
             }
@@ -81,13 +81,13 @@ private:
     }
 
     CookieJar.CookieJar (GLib.Object *parent)
-        : QNetwork_cookie_jar (parent) {
+        : QNetworkCookieJar (parent) {
     }
 
     CookieJar.~CookieJar () = default;
 
-    bool CookieJar.set_cookies_from_url (QList<QNetwork_cookie> &cookie_list, QUrl &url) {
-        if (QNetwork_cookie_jar.set_cookies_from_url (cookie_list, url)) {
+    bool CookieJar.set_cookies_from_url (QList<QNetworkCookie> &cookie_list, QUrl &url) {
+        if (QNetworkCookieJar.set_cookies_from_url (cookie_list, url)) {
             Q_EMIT new_cookies_for_url (cookie_list, url);
             return true;
         }
@@ -95,8 +95,8 @@ private:
         return false;
     }
 
-    QList<QNetwork_cookie> CookieJar.cookies_for_url (QUrl &url) {
-        QList<QNetwork_cookie> cookies = QNetwork_cookie_jar.cookies_for_url (url);
+    QList<QNetworkCookie> CookieJar.cookies_for_url (QUrl &url) {
+        QList<QNetworkCookie> cookies = QNetworkCookieJar.cookies_for_url (url);
         q_c_debug (lc_cookie_jar) << url << "requests:" << cookies;
         return cookies;
     }
@@ -129,20 +129,20 @@ private:
         }
 
         QFile file (file_name);
-        if (!file.open (QIODevice.Read_only)) {
+        if (!file.open (QIODevice.ReadOnly)) {
             return false;
         }
         QDataStream stream (&file);
-        QList<QNetwork_cookie> list;
+        QList<QNetworkCookie> list;
         stream >> list;
         set_all_cookies (remove_expired (list));
         file.close ();
         return true;
     }
 
-    QList<QNetwork_cookie> CookieJar.remove_expired (QList<QNetwork_cookie> &cookies) {
-        QList<QNetwork_cookie> updated_list;
-        foreach (QNetwork_cookie &cookie, cookies) {
+    QList<QNetworkCookie> CookieJar.remove_expired (QList<QNetworkCookie> &cookies) {
+        QList<QNetworkCookie> updated_list;
+        foreach (QNetworkCookie &cookie, cookies) {
             if (cookie.expiration_date () > QDateTime.current_date_time_utc () && !cookie.is_session_cookie ()) {
                 updated_list << cookie;
             }

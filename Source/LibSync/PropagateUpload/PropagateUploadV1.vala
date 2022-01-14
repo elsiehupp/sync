@@ -12,7 +12,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
 namespace Occ {
 
-void Propagate_upload_file_v1.do_start_upload () {
+void PropagateUploadFileV1.do_start_upload () {
     _chunk_count = int (std.ceil (_file_to_upload._size / double (chunk_size ())));
     _start_chunk = 0;
     Q_ASSERT (_item._modtime > 0);
@@ -58,7 +58,7 @@ void Propagate_upload_file_v1.do_start_upload () {
     start_next_chunk ();
 }
 
-void Propagate_upload_file_v1.start_next_chunk () {
+void PropagateUploadFileV1.start_next_chunk () {
     if (propagator ()._abort_requested)
         return;
 
@@ -71,7 +71,7 @@ void Propagate_upload_file_v1.start_next_chunk () {
         return;
     }
     int64 file_size = _file_to_upload._size;
-    auto headers = Propagate_upload_file_common.headers ();
+    auto headers = PropagateUploadFileCommon.headers ();
     headers[QByteArrayLiteral ("OC-Total-Length")] = QByteArray.number (file_size);
     headers[QByteArrayLiteral ("OC-Chunk-Size")] = QByteArray.number (chunk_size ());
 
@@ -110,9 +110,9 @@ void Propagate_upload_file_v1.start_next_chunk () {
     }
 
     const string file_name = _file_to_upload._path;
-    auto device = std.make_unique<Upload_device> (
+    auto device = std.make_unique<UploadDevice> (
             file_name, chunk_start, current_chunk_size, &propagator ()._bandwidth_manager);
-    if (!device.open (QIODevice.Read_only)) {
+    if (!device.open (QIODevice.ReadOnly)) {
         q_c_warning (lc_propagate_upload_v1) << "Could not prepare upload device : " << device.error_string ();
 
         // If the file is currently locked, we want to retry the sync
@@ -121,7 +121,7 @@ void Propagate_upload_file_v1.start_next_chunk () {
             emit propagator ().seen_locked_file (file_name);
         }
         // Soft error because this is likely caused by the user modifying his files while syncing
-        abort_with_error (SyncFileItem.Soft_error, device.error_string ());
+        abort_with_error (SyncFileItem.SoftError, device.error_string ());
         return;
     }
 
@@ -129,10 +129,10 @@ void Propagate_upload_file_v1.start_next_chunk () {
     auto device_ptr = device.get (); // for connections later
     auto *job = new PUTFile_job (propagator ().account (), propagator ().full_remote_path (path), std.move (device), headers, _current_chunk, this);
     _jobs.append (job);
-    connect (job, &PUTFile_job.finished_signal, this, &Propagate_upload_file_v1.slot_put_finished);
-    connect (job, &PUTFile_job.upload_progress, this, &Propagate_upload_file_v1.slot_upload_progress);
-    connect (job, &PUTFile_job.upload_progress, device_ptr, &Upload_device.slot_job_upload_progress);
-    connect (job, &GLib.Object.destroyed, this, &Propagate_upload_file_common.slot_job_destroyed);
+    connect (job, &PUTFile_job.finished_signal, this, &PropagateUploadFileV1.slot_put_finished);
+    connect (job, &PUTFile_job.upload_progress, this, &PropagateUploadFileV1.slot_upload_progress);
+    connect (job, &PUTFile_job.upload_progress, device_ptr, &UploadDevice.slot_job_upload_progress);
+    connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.slot_job_destroyed);
     if (is_final_chunk)
         adjust_last_job_timeout (job, file_size);
     job.start ();
@@ -173,7 +173,7 @@ void Propagate_upload_file_v1.start_next_chunk () {
     }
 }
 
-void Propagate_upload_file_v1.slot_put_finished () {
+void PropagateUploadFileV1.slot_put_finished () {
     auto *job = qobject_cast<PUTFile_job> (sender ());
     ASSERT (job);
 
@@ -199,7 +199,7 @@ void Propagate_upload_file_v1.slot_put_finished () {
     if (_item._http_error_code == 202) {
         string path = string.from_utf8 (job.reply ().raw_header ("OC-Job_status-Location"));
         if (path.is_empty ()) {
-            done (SyncFileItem.Normal_error, tr ("Poll URL missing"));
+            done (SyncFileItem.NormalError, tr ("Poll URL missing"));
             return;
         }
         _finished = true;
@@ -223,7 +223,7 @@ void Propagate_upload_file_v1.slot_put_finished () {
     const string full_file_path (propagator ().full_local_path (_item._file));
     if (!FileSystem.file_exists (full_file_path)) {
         if (!_finished) {
-            abort_with_error (SyncFileItem.Soft_error, tr ("The local file was removed during sync."));
+            abort_with_error (SyncFileItem.SoftError, tr ("The local file was removed during sync."));
             return;
         } else {
             propagator ()._another_sync_needed = true;
@@ -238,7 +238,7 @@ void Propagate_upload_file_v1.slot_put_finished () {
     if (!FileSystem.verify_file_unchanged (full_file_path, _item._size, _item._modtime)) {
         propagator ()._another_sync_needed = true;
         if (!_finished) {
-            abort_with_error (SyncFileItem.Soft_error, tr ("Local file changed during sync."));
+            abort_with_error (SyncFileItem.SoftError, tr ("Local file changed during sync."));
             // FIXME :  the legacy code was retrying for a few seconds.
             //         and also checking that after the last chunk, and removed the file in case of INSTRUCTION_NEW
             return;
@@ -252,7 +252,7 @@ void Propagate_upload_file_v1.slot_put_finished () {
                 // just wait for the other job to finish.
                 return;
             }
-            done (SyncFileItem.Normal_error, tr ("The server did not acknowledge the last chunk. (No e-tag was present)"));
+            done (SyncFileItem.NormalError, tr ("The server did not acknowledge the last chunk. (No e-tag was present)"));
             return;
         }
 
@@ -289,7 +289,7 @@ void Propagate_upload_file_v1.slot_put_finished () {
     // the following code only happens after all chunks were uploaded.
 
     // the file id should only be empty for new files up- or downloaded
-    QByteArray fid = job.reply ().raw_header ("OC-File_iD");
+    QByteArray fid = job.reply ().raw_header ("OC-FileID");
     if (!fid.is_empty ()) {
         if (!_item._file_id.is_empty () && _item._file_id != fid) {
             q_c_warning (lc_propagate_upload_v1) << "File ID changed!" << _item._file_id << fid;
@@ -309,7 +309,7 @@ void Propagate_upload_file_v1.slot_put_finished () {
     finalize ();
 }
 
-void Propagate_upload_file_v1.slot_upload_progress (int64 sent, int64 total) {
+void PropagateUploadFileV1.slot_upload_progress (int64 sent, int64 total) {
     // Completion is signaled with sent=0, total=0; avoid accidentally
     // resetting progress due to the sent being zero by ignoring it.
     // finished_signal () is bound to be emitted soon anyway.
@@ -341,12 +341,12 @@ void Propagate_upload_file_v1.slot_upload_progress (int64 sent, int64 total) {
     propagator ().report_progress (*_item, amount);
 }
 
-void Propagate_upload_file_v1.abort (Propagator_job.Abort_type abort_type) {
+void PropagateUploadFileV1.abort (PropagatorJob.AbortType abort_type) {
     abort_network_jobs (
         abort_type,
         [this, abort_type] (AbstractNetworkJob *job) {
             if (auto *put_job = qobject_cast<PUTFile_job> (job)){
-                if (abort_type == Abort_type.Asynchronous
+                if (abort_type == AbortType.Asynchronous
                     && _chunk_count > 0
                     && ( ( (_current_chunk + _start_chunk) % _chunk_count) == 0)
                     && put_job.device ().at_end ()) {

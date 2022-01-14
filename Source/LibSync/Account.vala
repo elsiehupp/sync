@@ -9,8 +9,8 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QLoggingCategory>
 // #include <QNetworkReply>
 // #include <QNetworkAccessManager>
-// #include <QSsl_socket>
-// #include <QNetwork_cookie_jar>
+// #include <QSslSocket>
+// #include <QNetworkCookieJar>
 // #include <QNetworkProxy>
 
 // #include <QFileInfo>
@@ -22,7 +22,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QJsonObject>
 // #include <QJsonArray>
 // #include <QLoggingCategory>
-// #include <QHttp_multi_part>
+// #include <QHttpMultiPart>
 
 // #include <qsslconfiguration.h>
 // #include <qt5keychain/keychain.h>
@@ -31,12 +31,12 @@ using namespace QKeychain;
 
 // #include <QByteArray>
 // #include <QUrl>
-// #include <QNetwork_cookie>
+// #include <QNetworkCookie>
 // #include <QNetworkRequest>
-// #include <QSsl_socket>
+// #include <QSslSocket>
 // #include <QSslCertificate>
 // #include <QSslConfiguration>
-// #include <QSsl_cipher>
+// #include <QSslCipher>
 // #include <QSslError>
 // #include <QSharedPointer>
 
@@ -62,15 +62,15 @@ namespace {
 namespace Occ {
 
 using AccountPtr = QSharedPointer<Account>;
-class User_status_connector;
+class UserStatusConnector;
 
 /***********************************************************
 @brief Reimplement this to handle SSL errors from libsync
 @ingroup libsync
 ***********************************************************/
-class Abstract_sslErrorHandler {
+class AbstractSslErrorHandler {
 public:
-    virtual ~Abstract_sslErrorHandler () = default;
+    virtual ~AbstractSslErrorHandler () = default;
     virtual bool handle_errors (QList<QSslError>, QSslConfiguration &conf, QList<QSslCertificate> *, AccountPtr) = 0;
 };
 
@@ -156,7 +156,7 @@ public:
     /***********************************************************
     Create a network request on the account's QNAM.
 
-    Network requests in Abstract_network_jobs are created through
+    Network requests in AbstractNetworkJobs are created through
     this function. Other places should prefer to use jobs or
     send_request ().
     ***********************************************************/
@@ -169,7 +169,7 @@ public:
         const QUrl &url, QNetworkRequest req, QByteArray &data);
 
     QNetworkReply *send_raw_request (QByteArray &verb,
-        const QUrl &url, QNetworkRequest req, QHttp_multi_part *data);
+        const QUrl &url, QNetworkRequest req, QHttpMultiPart *data);
 
     /***********************************************************
     Create and start network job for a simple one-off request.
@@ -190,7 +190,7 @@ public:
     }
     void set_ssl_configuration (QSslConfiguration &config);
     // Because of bugs in Qt, we use this to store info needed for the SSL Button
-    QSsl_cipher _session_cipher;
+    QSslCipher _session_cipher;
     QByteArray _session_ticket;
     QList<QSslCertificate> _peer_certificate_chain;
 
@@ -209,7 +209,7 @@ public:
     void reset_rejected_certificates ();
 
     // pluggable handler
-    void set_ssl_error_handler (Abstract_sslErrorHandler *handler);
+    void set_ssl_error_handler (AbstractSslErrorHandler *handler);
 
     // To be called by credentials only, for storing username and the like
     QVariant credential_setting (string &key) const;
@@ -297,10 +297,10 @@ public:
 
     void setup_user_status_connector ();
     void try_setup_push_notifications ();
-    Push_notifications *push_notifications ();
+    PushNotifications *push_notifications ();
     void set_push_notifications_reconnect_interval (int interval);
 
-    std.shared_ptr<User_status_connector> user_status_connector ();
+    std.shared_ptr<UserStatusConnector> user_status_connector ();
 
 public slots:
     /// Used when forgetting credentials
@@ -347,7 +347,7 @@ private:
 
     static string dav_path_base ();
 
-    QWeak_pointer<Account> _shared_this;
+    QWeakPointer<Account> _shared_this;
     string _id;
     string _dav_user;
     string _display_name;
@@ -371,7 +371,7 @@ private:
     QSslConfiguration _ssl_configuration;
     Capabilities _capabilities;
     string _server_version;
-    QScopedPointer<Abstract_sslErrorHandler> _ssl_error_handler;
+    QScopedPointer<AbstractSslErrorHandler> _ssl_error_handler;
     QSharedPointer<QNetworkAccessManager> _am;
     QScopedPointer<AbstractCredentials> _credentials;
     bool _http2Supported = false;
@@ -391,9 +391,9 @@ private:
     // Direct Editing
     string _last_direct_editing_e_tag;
 
-    Push_notifications *_push_notifications = nullptr;
+    PushNotifications *_push_notifications = nullptr;
 
-    std.shared_ptr<User_status_connector> _user_status_connector;
+    std.shared_ptr<UserStatusConnector> _user_status_connector;
 
     /* IMPORTANT - remove later - FIXME MS@2019-12-07 -.
     TODO : For "Log out" & "Remove account" : Remove client CA certs and KEY!
@@ -506,7 +506,7 @@ AbstractCredentials *Account.credentials () {
 
 void Account.set_credentials (AbstractCredentials *cred) {
     // set active credential manager
-    QNetwork_cookie_jar *jar = nullptr;
+    QNetworkCookieJar *jar = nullptr;
     QNetworkProxy proxy;
 
     if (_am) {
@@ -559,9 +559,9 @@ void Account.try_setup_push_notifications () {
         q_c_info (lc_account) << "Try to setup push notifications";
 
         if (!_push_notifications) {
-            _push_notifications = new Push_notifications (this, this);
+            _push_notifications = new PushNotifications (this, this);
 
-            connect (_push_notifications, &Push_notifications.ready, this, [this] () {
+            connect (_push_notifications, &PushNotifications.ready, this, [this] () {
                 _push_notifications_reconnect_timer.stop ();
                 emit push_notifications_ready (this);
             });
@@ -579,8 +579,8 @@ void Account.try_setup_push_notifications () {
                 }
             };
 
-            connect (_push_notifications, &Push_notifications.connection_lost, this, disable_push_notifications);
-            connect (_push_notifications, &Push_notifications.authentication_failed, this, disable_push_notifications);
+            connect (_push_notifications, &PushNotifications.connection_lost, this, disable_push_notifications);
+            connect (_push_notifications, &PushNotifications.authentication_failed, this, disable_push_notifications);
         }
         // If push notifications already running it is no problem to call setup again
         _push_notifications.setup ();
@@ -602,7 +602,7 @@ clear all cookies. (Session cookies or not)
 void Account.clear_cookie_jar () {
     auto jar = qobject_cast<CookieJar> (_am.cookie_jar ());
     ASSERT (jar);
-    jar.set_all_cookies (QList<QNetwork_cookie> ());
+    jar.set_all_cookies (QList<QNetworkCookie> ());
     emit wants_account_saved (this);
 }
 
@@ -619,7 +619,7 @@ void Account.lend_cookie_jar_to (QNetworkAccessManager *guest) {
 }
 
 string Account.cookie_jar_path () {
-    return QStandardPaths.writable_location (QStandardPaths.App_config_location) + "/cookies" + id () + ".db";
+    return QStandardPaths.writable_location (QStandardPaths.AppConfigLocation) + "/cookies" + id () + ".db";
 }
 
 void Account.reset_network_access_manager () {
@@ -628,7 +628,7 @@ void Account.reset_network_access_manager () {
     }
 
     q_c_debug (lc_account) << "Resetting QNAM";
-    QNetwork_cookie_jar *jar = _am.cookie_jar ();
+    QNetworkCookieJar *jar = _am.cookie_jar ();
     QNetworkProxy proxy = _am.proxy ();
 
     // Use a QSharedPointer to allow locking the life of the QNAM on the stack.
@@ -686,7 +686,7 @@ QNetworkReply *Account.send_raw_request (QByteArray &verb, QUrl &url, QNetworkRe
     return _am.send_custom_request (req, verb, data);
 }
 
-QNetworkReply *Account.send_raw_request (QByteArray &verb, QUrl &url, QNetworkRequest req, QHttp_multi_part *data) {
+QNetworkReply *Account.send_raw_request (QByteArray &verb, QUrl &url, QNetworkRequest req, QHttpMultiPart *data) {
     req.set_url (url);
     req.set_ssl_configuration (this.get_or_create_ssl_config ());
     if (verb == "PUT") {
@@ -719,9 +719,9 @@ QSslConfiguration Account.get_or_create_ssl_config () {
     QSslConfiguration ssl_config = QSslConfiguration.default_configuration ();
 
     // Try hard to re-use session for different requests
-    ssl_config.set_ssl_option (QSsl.Ssl_option_disable_session_tickets, false);
-    ssl_config.set_ssl_option (QSsl.Ssl_option_disable_session_sharing, false);
-    ssl_config.set_ssl_option (QSsl.Ssl_option_disable_session_persistence, false);
+    ssl_config.set_ssl_option (QSsl.SslOptionDisableSessionTickets, false);
+    ssl_config.set_ssl_option (QSsl.SslOptionDisableSessionSharing, false);
+    ssl_config.set_ssl_option (QSsl.SslOptionDisableSessionPersistence, false);
 
     ssl_config.set_ocsp_stapling_enabled (Theme.instance ().enable_stapling_oCSP ());
 
@@ -741,7 +741,7 @@ void Account.reset_rejected_certificates () {
     _rejected_certificates.clear ();
 }
 
-void Account.set_ssl_error_handler (Abstract_sslErrorHandler *handler) {
+void Account.set_ssl_error_handler (AbstractSslErrorHandler *handler) {
     _ssl_error_handler.reset (handler);
 }
 
@@ -774,7 +774,7 @@ void Account.set_credential_setting (string &key, QVariant &value) {
 }
 
 void Account.slot_handle_ssl_errors (QNetworkReply *reply, QList<QSslError> errors) {
-    Network_job_timeout_pauser pauser (reply);
+    NetworkJobTimeoutPauser pauser (reply);
     string out;
     QDebug (&out) << "SSL-Errors happened for url " << reply.url ().to_string ();
     foreach (QSslError &error, errors) {
@@ -896,11 +896,11 @@ void Account.set_capabilities (QVariantMap &caps) {
 }
 
 void Account.setup_user_status_connector () {
-    _user_status_connector = std.make_shared<Ocs_user_status_connector> (shared_from_this ());
-    connect (_user_status_connector.get (), &User_status_connector.user_status_fetched, this, [this] (User_status &) {
+    _user_status_connector = std.make_shared<OcsUserStatusConnector> (shared_from_this ());
+    connect (_user_status_connector.get (), &UserStatusConnector.user_status_fetched, this, [this] (UserStatus &) {
         emit user_status_changed ();
     });
-    connect (_user_status_connector.get (), &User_status_connector.message_cleared, this, [this] {
+    connect (_user_status_connector.get (), &UserStatusConnector.message_cleared, this, [this] {
         emit user_status_changed ();
     });
 }
@@ -910,7 +910,7 @@ string Account.server_version () {
 }
 
 int Account.server_version_int () {
-    // FIXME : Use Qt 5.5 QVersion_number
+    // FIXME : Use Qt 5.5 QVersionNumber
     auto components = server_version ().split ('.');
     return make_server_version (components.value (0).to_int (),
         components.value (1).to_int (),
@@ -1037,9 +1037,9 @@ void Account.delete_app_token () {
         if (auto delete_job = qobject_cast<DeleteJob> (GLib.Object.sender ())) {
             const auto http_code = delete_job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
             if (http_code != 200) {
-                q_c_warning (lc_account) << "App_token remove failed for user : " << display_name () << " with code : " << http_code;
+                q_c_warning (lc_account) << "AppToken remove failed for user : " << display_name () << " with code : " << http_code;
             } else {
-                q_c_info (lc_account) << "App_token for user : " << display_name () << " has been removed.";
+                q_c_info (lc_account) << "AppToken for user : " << display_name () << " has been removed.";
             }
         } else {
             Q_ASSERT (false);
@@ -1077,7 +1077,7 @@ void Account.slot_direct_editing_recieved (QJsonDocument &json) {
             auto mime_types = editor.value ("mimetypes").to_array ();
             auto optional_mime_types = editor.value ("optional_mimetypes").to_array ();
 
-            auto *direct_editor = new Direct_editor (id, name);
+            auto *direct_editor = new DirectEditor (id, name);
 
             foreach (auto mime_type, mime_types) {
                 direct_editor.add_mimetype (mime_type.to_string ().to_latin1 ());
@@ -1092,11 +1092,11 @@ void Account.slot_direct_editing_recieved (QJsonDocument &json) {
     }
 }
 
-Push_notifications *Account.push_notifications () {
+PushNotifications *Account.push_notifications () {
     return _push_notifications;
 }
 
-std.shared_ptr<User_status_connector> Account.user_status_connector () {
+std.shared_ptr<UserStatusConnector> Account.user_status_connector () {
     return _user_status_connector;
 }
 

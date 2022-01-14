@@ -66,7 +66,7 @@ private:
     void exec_await (T *sender,
                    Pointer_to_member_function signal,
                    int &counter,
-                   const QEvent_loop.Process_events_flags flags = QEvent_loop.All_events);
+                   const QEventLoop.Process_events_flags flags = QEventLoop.All_events);
 
     string keychain_username_key ();
     string keychain_password_key ();
@@ -150,7 +150,7 @@ void ProxyAuthHandler.handle_proxy_authentication_required (
 
         // If the user explicitly configured the proxy in the
         // network settings, don't ask about it.
-        if (_config_file.proxy_type () == QNetworkProxy.Http_proxy
+        if (_config_file.proxy_type () == QNetworkProxy.HttpProxy
             || _config_file.proxy_type () == QNetworkProxy.Socks5Proxy) {
             _blocked = true;
         }
@@ -229,7 +229,7 @@ bool ProxyAuthHandler.get_creds_from_dialog () {
         exec_await (_dialog.data (),
                   &Gtk.Dialog.finished,
                   _waiting_for_dialog,
-                  QEvent_loop.Exclude_socket_notifiers);
+                  QEventLoop.Exclude_socket_notifiers);
     }
 
     if (_dialog && _dialog.result () == Gtk.Dialog.Accepted) {
@@ -245,13 +245,13 @@ template<class T, typename Pointer_to_member_function>
 void ProxyAuthHandler.exec_await (T *sender,
                                  Pointer_to_member_function signal,
                                  int &counter,
-                                 const QEvent_loop.Process_events_flags flags) {
+                                 const QEventLoop.Process_events_flags flags) {
     if (!sender) {
         return;
     }
 
-    QEvent_loop wait_loop;
-    connect (sender, signal, &wait_loop, &QEvent_loop.quit);
+    QEventLoop wait_loop;
+    connect (sender, signal, &wait_loop, &QEventLoop.quit);
 
     ++counter;
     wait_loop.exec (flags);

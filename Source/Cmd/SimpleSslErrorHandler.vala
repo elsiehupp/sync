@@ -10,7 +10,7 @@ namespace Occ {
 @brief The Simple_sslErrorHandler class
 @ingroup cmd
 ***********************************************************/
-class Simple_sslErrorHandler : Occ.Abstract_sslErrorHandler {
+class Simple_sslErrorHandler : Occ.AbstractSslErrorHandler {
 
     public bool handle_errors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, Occ.AccountPtr) override;
 };

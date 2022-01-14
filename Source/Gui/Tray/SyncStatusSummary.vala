@@ -196,7 +196,7 @@ namespace {
             mark_folder_as_error (folder);
             break;
         case SyncResult.Sync_running:
-        case SyncResult.Not_yet_started:
+        case SyncResult.NotYetStarted:
             set_syncing (true);
             set_sync_status_string (tr ("Syncing"));
             set_sync_status_detail_string ("");

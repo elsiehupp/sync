@@ -95,7 +95,7 @@ Q_ENUM_NS (csync_status_codes_e)
 Instruction enum. In the file traversal structure, it describes
 the csync state of a file.
 ***********************************************************/
-enum Sync_instructions {
+enum SyncInstructions {
     CSYNC_INSTRUCTION_NONE            = 0,       // Nothing to do (UPDATE|RECONCILE)
     CSYNC_INSTRUCTION_EVAL            = 1 << 0,  // There was changed compared to the DB (UPDATE)
     CSYNC_INSTRUCTION_REMOVE          = 1 << 1,  // The file need to be removed (RECONCILE)
@@ -114,7 +114,7 @@ enum Sync_instructions {
                                                     but without any propagation (UPDATE|RECONCILE) */
 };
 
-Q_ENUM_NS (Sync_instructions)
+Q_ENUM_NS (SyncInstructions)
 
 /***********************************************************
 This enum is used with BITFIELD (3) and BITFIELD (4) in several places.
@@ -122,17 +122,17 @@ Also, this value is stored in the database, so beware of value changes.
 ***********************************************************/
 enum ItemType {
     ItemTypeFile = 0,
-    Item_type_soft_link = 1,
+    ItemTypeSoftLink = 1,
     ItemTypeDirectory = 2,
-    Item_type_skip = 3,
+    ItemTypeSkip = 3,
 
     /***********************************************************
     The file is a dehydrated placeholder, meaning data isn't available locally
     ***********************************************************/
-    Item_type_virtual_file = 4,
+    ItemTypeVirtualFile = 4,
 
     /***********************************************************
-    A Item_type_virtual_file that wants to be hydrated.
+    A ItemTypeVirtualFile that wants to be hydrated.
 
     Actions may put this in the db as a request to a future sync, such as
     implicit hydration (when the user wants to access file data) when using
@@ -147,12 +147,12 @@ enum ItemType {
     if an item's pin state mandates it, such as when encountering a AlwaysLocal
     file that is dehydrated.
     ***********************************************************/
-    Item_type_virtual_file_download = 5,
+    ItemTypeVirtualFileDownload = 5,
 
     /***********************************************************
     A ItemTypeFile that wants to be dehydrated.
 
-    Similar to Item_type_virtual_file_download, but there's currently no situation
+    Similar to ItemTypeVirtualFileDownload, but there's currently no situation
     where it's stored in the database since there is no action that triggers a
     file dehydration without changing the pin state.
     ***********************************************************/
@@ -194,10 +194,10 @@ struct OCSYNC_EXPORT csync_file_stat_s {
 
   CSYNC_STATUS error_status = CSYNC_STATUS_OK;
 
-  Sync_instructions instruction = CSYNC_INSTRUCTION_NONE; // u32
+  SyncInstructions instruction = CSYNC_INSTRUCTION_NONE; // u32
 
   csync_file_stat_s ()
-    : type (Item_type_skip)
+    : type (ItemTypeSkip)
     , child_modified (false)
     , has_ignored_files (false)
     , is_hidden (false)

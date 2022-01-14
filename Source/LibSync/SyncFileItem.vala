@@ -37,11 +37,11 @@ public:
     Q_ENUM (Direction)
 
     enum Status { // stored in 4 bits
-        No_status,
+        NoStatus,
 
-        Fatal_error, ///< Error that causes the sync to stop
-        Normal_error, ///< Error attached to a particular file
-        Soft_error, ///< More like an information
+        FatalError, ///< Error that causes the sync to stop
+        NormalError, ///< Error attached to a particular file
+        SoftError, ///< More like an information
 
         Success, ///< The file was properly synced
 
@@ -53,14 +53,14 @@ public:
         ***********************************************************/
         Conflict,
 
-        File_ignored, ///< The file is in the ignored list (or blacklisted with no retries left)
-        File_locked, ///< The file is locked
+        FileIgnored, ///< The file is in the ignored list (or blacklisted with no retries left)
+        FileLocked, ///< The file is locked
         Restoration, ///< The file was restored because what should have been done was not allowed
 
         /***********************************************************
         The filename is invalid on this platform and could not created.
         ***********************************************************/
-        File_name_invalid,
+        FileNameInvalid,
 
         /***********************************************************
         For errors that should only appear in the error view.
@@ -70,9 +70,9 @@ public:
 
         These errors do cause the sync to fail.
 
-        A Normal_error that isn't as prominent.
+        A NormalError that isn't as prominent.
         ***********************************************************/
-        Detail_error,
+        DetailError,
 
         /***********************************************************
         For files whose errors were blacklisted
@@ -80,9 +80,9 @@ public:
         If an file is blacklisted due to an error it isn't even reattempted. These
         errors should appear in the issues tab but should be silent otherwise.
 
-        A Soft_error caused by blacklisting.
+        A SoftError caused by blacklisting.
         ***********************************************************/
-        Blacklisted_error
+        BlacklistedError
     };
     Q_ENUM (Status)
 
@@ -92,17 +92,17 @@ public:
     Creates a basic SyncFileItem from a DB record
 
     This is intended in particular for read-update-write cycles that need
-    to go through a a SyncFileItem, like Poll_job.
+    to go through a a SyncFileItem, like PollJob.
     ***********************************************************/
     static SyncFileItemPtr from_sync_journal_file_record (SyncJournalFileRecord &rec);
 
     SyncFileItem ()
-        : _type (Item_type_skip)
+        : _type (ItemTypeSkip)
         , _direction (None)
         , _server_has_ignored_files (false)
         , _has_blacklist_entry (false)
         , _error_may_be_blacklisted (false)
-        , _status (No_status)
+        , _status (NoStatus)
         , _is_restoration (false)
         , _is_selective_sync (false)
         , _is_encrypted (false) {
@@ -164,9 +164,9 @@ public:
     True if the item had any kind of error.
     ***********************************************************/
     bool has_error_status () {
-        return _status == SyncFileItem.Soft_error
-            || _status == SyncFileItem.Normal_error
-            || _status == SyncFileItem.Fatal_error
+        return _status == SyncFileItem.SoftError
+            || _status == SyncFileItem.NormalError
+            || _status == SyncFileItem.FatalError
             || !_error_string.is_empty ();
     }
 
@@ -220,11 +220,11 @@ public:
 
     /// Whether there's an entry in the blacklist table.
     /// Note : that entry may have retries left, so this can be true
-    /// without the status being File_ignored.
+    /// without the status being FileIgnored.
     bool _has_blacklist_entry BITFIELD (1);
 
     /***********************************************************
-    If true and Normal_error, this error may be blacklisted
+    If true and NormalError, this error may be blacklisted
 
     Note that non-local errors (http_error_code!=0) may also be
     blacklisted independently of this flag.
@@ -245,7 +245,7 @@ public:
     // usually this value is 1, but for removes on dirs, it might be much higher.
 
     // Variables used by the propagator
-    Sync_instructions _instruction = CSYNC_INSTRUCTION_NONE;
+    SyncInstructions _instruction = CSYNC_INSTRUCTION_NONE;
     time_t _modtime = 0;
     QByteArray _etag;
     int64 _size = 0;
@@ -272,7 +272,7 @@ inline bool operator< (SyncFileItemPtr &item1, SyncFileItemPtr &item2) {
     return *item1 < *item2;
 }
 
-using Sync_file_item_vector = QVector<SyncFileItemPtr>;
+using SyncFileItemVector = QVector<SyncFileItemPtr>;
 
 
     SyncJournalFileRecord SyncFileItem.to_sync_journal_file_record_with_inode (string &local_file_name) {
@@ -282,10 +282,10 @@ using Sync_file_item_vector = QVector<SyncFileItemPtr>;
 
         // Some types should never be written to the database when propagation completes
         rec._type = _type;
-        if (rec._type == Item_type_virtual_file_download)
+        if (rec._type == ItemTypeVirtualFileDownload)
             rec._type = ItemTypeFile;
         if (rec._type == ItemTypeVirtualFileDehydration)
-            rec._type = Item_type_virtual_file;
+            rec._type = ItemTypeVirtualFile;
 
         rec._etag = _etag;
         rec._file_id = _file_id;

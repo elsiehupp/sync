@@ -4,9 +4,9 @@
 
 namespace Occ {
 
-class Date_time_provider {
+class DateTimeProvider {
 public:
-    virtual ~Date_time_provider ();
+    virtual ~DateTimeProvider ();
 
     virtual QDateTime current_date_time ();
 
@@ -14,13 +14,13 @@ public:
 };
 
 
-    Date_time_provider.~Date_time_provider () = default;
+    DateTimeProvider.~DateTimeProvider () = default;
 
-    QDateTime Date_time_provider.current_date_time () {
+    QDateTime DateTimeProvider.current_date_time () {
         return QDateTime.current_date_time ();
     }
 
-    QDate Date_time_provider.current_date () {
+    QDate DateTimeProvider.current_date () {
         return QDate.current_date ();
     }
 

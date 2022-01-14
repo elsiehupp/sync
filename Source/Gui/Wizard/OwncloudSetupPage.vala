@@ -248,7 +248,7 @@ private:
         case DetermineAuthTypeJob.WebViewFlow:
             return WizardCommon.Page_Web_view;
     #endif // WITH_WEBENGINE
-        case DetermineAuthTypeJob.No_auth_type:
+        case DetermineAuthTypeJob.NoAuthType:
             return WizardCommon.Page_Http_creds;
         }
         Q_UNREACHABLE ();
@@ -353,12 +353,12 @@ private:
     //called during the validation of the client certificate.
     void Owncloud_setup_page.slot_certificate_accepted () {
         QFile cert_file (add_cert_dial.get_certificate_path ());
-        cert_file.open (QFile.Read_only);
+        cert_file.open (QFile.ReadOnly);
         QByteArray cert_data = cert_file.read_all ();
         QByteArray cert_password = add_cert_dial.get_certificate_passwd ().to_local8Bit ();
 
         QBuffer cert_data_buffer (&cert_data);
-        cert_data_buffer.open (QIODevice.Read_only);
+        cert_data_buffer.open (QIODevice.ReadOnly);
         if (QSslCertificate.import_pkcs12 (&cert_data_buffer,
                 &_oc_wizard._client_ssl_key, &_oc_wizard._client_ssl_certificate,
                 &_oc_wizard._client_ssl_ca_certificates, cert_password)) {

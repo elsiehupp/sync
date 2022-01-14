@@ -18,13 +18,13 @@
 // #include <QDir>
 // #include <QJsonObject>
 // #include <QXmlStreamReader>
-// #include <QXml_stream_namespace_declaration>
+// #include <QXmlStreamNamespaceDeclaration>
 // #include <QStack>
 // #include <QInputDialog>
 // #include <QLineEdit>
 // #include <QIODevice>
 // #include <QUuid>
-// #include <QScope_guard>
+// #include <QScopeGuard>
 // #include <QRandomGenerator>
 
 // #include <qt5keychain/keychain.h>
@@ -56,7 +56,7 @@ namespace Occ {
 
 string e2ee_base_url ();
 
-namespace Encryption_helper {
+namespace EncryptionHelper {
     QByteArray generate_random_filename ();
     QByteArray generate_random (int size);
     QByteArray generate_password (string &wordlist, QByteArray& salt);
@@ -98,15 +98,15 @@ namespace Encryption_helper {
                                QFile *input, QFile *output);
 
 //
-// Simple classes for safe (RAII) handling of Open_s_sL
+// Simple classes for safe (RAII) handling of OpenSSL
 // data structures
 //
-class Cipher_ctx {
+class CipherCtx {
 public:
-    Cipher_ctx () : _ctx (EVP_CIPHER_CTX_new ()) {
+    CipherCtx () : _ctx (EVP_CIPHER_CTX_new ()) {
     }
 
-    ~Cipher_ctx () {
+    ~CipherCtx () {
         EVP_CIPHER_CTX_free (_ctx);
     }
 
@@ -115,14 +115,14 @@ public:
     }
 
 private:
-    Q_DISABLE_COPY (Cipher_ctx)
+    Q_DISABLE_COPY (CipherCtx)
     EVP_CIPHER_CTX *_ctx;
 };
 
-class Streaming_decryptor {
+class StreamingDecryptor {
 public:
-    Streaming_decryptor (QByteArray &key, QByteArray &iv, uint64 total_size);
-    ~Streaming_decryptor () = default;
+    StreamingDecryptor (QByteArray &key, QByteArray &iv, uint64 total_size);
+    ~StreamingDecryptor () = default;
 
     QByteArray chunk_decryption (char *input, uint64 chunk_size);
 
@@ -130,9 +130,9 @@ public:
     bool is_finished ();
 
 private:
-    Q_DISABLE_COPY (Streaming_decryptor)
+    Q_DISABLE_COPY (StreamingDecryptor)
 
-    Cipher_ctx _ctx;
+    CipherCtx _ctx;
     bool _is_initialized = false;
     bool _is_finished = false;
     uint64 _decrypted_so_far = 0;
@@ -196,7 +196,7 @@ public:
 /***********************************************************
 Generates the Metadata for the folder
 ***********************************************************/
-struct Encrypted_file {
+struct EncryptedFile {
     QByteArray encryption_key;
     QByteArray mimetype;
     QByteArray initialization_vector;
@@ -207,14 +207,14 @@ struct Encrypted_file {
     int metadata_key;
 };
 
-class Folder_metadata {
+class FolderMetadata {
 public:
-    Folder_metadata (AccountPtr account, QByteArray& metadata = QByteArray (), int status_code = -1);
+    FolderMetadata (AccountPtr account, QByteArray& metadata = QByteArray (), int status_code = -1);
     QByteArray encrypted_metadata ();
-    void add_encrypted_file (Encrypted_file& f);
-    void remove_encrypted_file (Encrypted_file& f);
+    void add_encrypted_file (EncryptedFile& f);
+    void remove_encrypted_file (EncryptedFile& f);
     void remove_all_encrypted_files ();
-    QVector<Encrypted_file> files ();
+    QVector<EncryptedFile> files ();
 
 private:
     /* Use std.string and std.vector internally on this class
@@ -229,7 +229,7 @@ private:
     QByteArray encrypt_json_object (QByteArray& obj, QByteArray pass) const;
     QByteArray decrypt_json_object (QByteArray& encrypted_json_blob, QByteArray& pass) const;
 
-    QVector<Encrypted_file> _files;
+    QVector<EncryptedFile> _files;
     QMap<int, QByteArray> _metadata_keys;
     AccountPtr _account;
     QVector<QPair<string, string>> _sharing;
@@ -281,17 +281,17 @@ namespace {
     }
 
     //
-    // Simple classes for safe (RAII) handling of Open_s_sL
+    // Simple classes for safe (RAII) handling of OpenSSL
     // data structures
     //
 
-    class Cipher_ctx {
+    class CipherCtx {
     public:
-        Cipher_ctx ()
+        CipherCtx ()
             : _ctx (EVP_CIPHER_CTX_new ()) {
         }
 
-        ~Cipher_ctx () {
+        ~CipherCtx () {
             EVP_CIPHER_CTX_free (_ctx);
         }
 
@@ -300,7 +300,7 @@ namespace {
         }
 
     private:
-        Q_DISABLE_COPY (Cipher_ctx)
+        Q_DISABLE_COPY (CipherCtx)
 
         EVP_CIPHER_CTX* _ctx;
     };
@@ -325,13 +325,13 @@ namespace {
         BIO* _bio;
     };
 
-    class PKey_ctx {
+    class PKeyCtx {
     public:
-        PKey_ctx (int id, ENGINE *e = nullptr)
+        PKeyCtx (int id, ENGINE *e = nullptr)
             : _ctx (EVP_PKEY_CTX_new_id (id, e)) {
         }
 
-        ~PKey_ctx () {
+        ~PKeyCtx () {
             EVP_PKEY_CTX_free (_ctx);
         }
 
@@ -339,14 +339,14 @@ namespace {
         // return-value optimization (RVO) is not obligatory
         // and we have a `for_key` static function that returns
         // an instance of this class
-        PKey_ctx (PKey_ctx&& other) {
+        PKeyCtx (PKeyCtx&& other) {
             std.swap (_ctx, other._ctx);
         }
 
-        PKey_ctx& operator= (PKey_ctx&& other) = delete;
+        PKeyCtx& operator= (PKeyCtx&& other) = delete;
 
-        static PKey_ctx for_key (EVP_PKEY *pkey, ENGINE *e = nullptr) {
-            PKey_ctx ctx;
+        static PKeyCtx for_key (EVP_PKEY *pkey, ENGINE *e = nullptr) {
+            PKeyCtx ctx;
             ctx._ctx = EVP_PKEY_CTX_new (pkey, e);
             return ctx;
         }
@@ -356,9 +356,9 @@ namespace {
         }
 
     private:
-        Q_DISABLE_COPY (PKey_ctx)
+        Q_DISABLE_COPY (PKeyCtx)
 
-        PKey_ctx () = default;
+        PKeyCtx () = default;
 
         EVP_PKEY_CTX* _ctx = nullptr;
     };
@@ -391,7 +391,7 @@ namespace {
             return result;
         }
 
-        static PKey generate (PKey_ctx& ctx) {
+        static PKey generate (PKeyCtx& ctx) {
             PKey result;
             if (EVP_PKEY_keygen (ctx, &result._pkey) <= 0) {
                 result._pkey = nullptr;
@@ -467,7 +467,7 @@ namespace {
     }
 }
 
-namespace Encryption_helper {
+namespace EncryptionHelper {
 
 QByteArray generate_random_filename () {
     return QUuid.create_uuid ().to_rfc4122 ().to_hex ();
@@ -522,7 +522,7 @@ QByteArray encrypt_private_key (
 
     QByteArray iv = generate_random (12);
 
-    Cipher_ctx ctx;
+    CipherCtx ctx;
 
     // Create and initialise the context
     if (!ctx) {
@@ -620,7 +620,7 @@ QByteArray decrypt_private_key (QByteArray& key, QByteArray& data) {
     cipher_t_xT.chop (Occ.Constants.e2Ee_tag_size);
 
     // Init
-    Cipher_ctx ctx;
+    CipherCtx ctx;
 
     // Create and initialise the context
     if (!ctx) {
@@ -659,7 +659,7 @@ QByteArray decrypt_private_key (QByteArray& key, QByteArray& data) {
         return QByteArray ();
     }
 
-    // Set expected e2Ee_tag value. Works in Open_s_sL 1.0.1d and later
+    // Set expected e2Ee_tag value. Works in OpenSSL 1.0.1d and later
     if (!EVP_CIPHER_CTX_ctrl (ctx, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), (unsigned char *)e2Ee_tag.const_data ())) {
         q_c_info (lc_cse ()) << "Could not set e2Ee_tag";
         return QByteArray ();
@@ -713,7 +713,7 @@ QByteArray decrypt_string_symmetric (QByteArray& key, QByteArray& data) {
     cipher_t_xT.chop (Occ.Constants.e2Ee_tag_size);
 
     // Init
-    Cipher_ctx ctx;
+    CipherCtx ctx;
 
     // Create and initialise the context
     if (!ctx) {
@@ -751,7 +751,7 @@ QByteArray decrypt_string_symmetric (QByteArray& key, QByteArray& data) {
         return QByteArray ();
     }
 
-    // Set expected e2Ee_tag value. Works in Open_s_sL 1.0.1d and later
+    // Set expected e2Ee_tag value. Works in OpenSSL 1.0.1d and later
     if (!EVP_CIPHER_CTX_ctrl (ctx, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), (unsigned char *)e2Ee_tag.const_data ())) {
         q_c_info (lc_cse ()) << "Could not set e2Ee_tag";
         return QByteArray ();
@@ -784,7 +784,7 @@ QByteArray private_key_to_pem (QByteArray key) {
 QByteArray encrypt_string_symmetric (QByteArray& key, QByteArray& data) {
     QByteArray iv = generate_random (16);
 
-    Cipher_ctx ctx;
+    CipherCtx ctx;
 
     // Create and initialise the context
     if (!ctx) {
@@ -868,7 +868,7 @@ QByteArray decrypt_string_asymmetric (EVP_PKEY *private_key, QByteArray& data) {
     int err = -1;
 
     q_c_info (lc_cse_decryption ()) << "Start to work the decryption.";
-    auto ctx = PKey_ctx.for_key (private_key, ENGINE_get_default_RSA ());
+    auto ctx = PKeyCtx.for_key (private_key, ENGINE_get_default_RSA ());
     if (!ctx) {
         q_c_info (lc_cse_decryption ()) << "Could not create the PKEY context.";
         handle_errors ();
@@ -928,7 +928,7 @@ QByteArray decrypt_string_asymmetric (EVP_PKEY *private_key, QByteArray& data) {
 QByteArray encrypt_string_asymmetric (EVP_PKEY *public_key, QByteArray& data) {
     int err = -1;
 
-    auto ctx = PKey_ctx.for_key (public_key, ENGINE_get_default_RSA ());
+    auto ctx = PKeyCtx.for_key (public_key, ENGINE_get_default_RSA ());
     if (!ctx) {
         q_c_info (lc_cse ()) << "Could not initialize the pkey context.";
         exit (1);
@@ -1006,21 +1006,21 @@ void ClientSideEncryption.fetch_from_key_chain (AccountPtr &account) {
 }
 
 bool ClientSideEncryption.check_public_key_validity (AccountPtr &account) {
-    QByteArray data = Encryption_helper.generate_random (64);
+    QByteArray data = EncryptionHelper.generate_random (64);
 
     Bio public_key_bio;
     QByteArray public_key_pem = account.e2e ()._public_key.to_pem ();
     BIO_write (public_key_bio, public_key_pem.const_data (), public_key_pem.size ());
     auto public_key = PKey.read_public_key (public_key_bio);
 
-    auto encrypted_data = Encryption_helper.encrypt_string_asymmetric (public_key, data.to_base64 ());
+    auto encrypted_data = EncryptionHelper.encrypt_string_asymmetric (public_key, data.to_base64 ());
 
     Bio private_key_bio;
     QByteArray private_key_pem = account.e2e ()._private_key;
     BIO_write (private_key_bio, private_key_pem.const_data (), private_key_pem.size ());
     auto key = PKey.read_private_key (private_key_bio);
 
-    QByteArray decrypt_result = QByteArray.from_base64 (Encryption_helper.decrypt_string_asymmetric ( key, QByteArray.from_base64 (encrypted_data)));
+    QByteArray decrypt_result = QByteArray.from_base64 (EncryptionHelper.decrypt_string_asymmetric ( key, QByteArray.from_base64 (encrypted_data)));
 
     if (data != decrypt_result) {
         q_c_info (lc_cse ()) << "invalid private key";
@@ -1102,7 +1102,7 @@ void ClientSideEncryption.private_key_fetched (Job *incoming) {
         return;
     }
 
-    //_private_key = QSslKey (read_job.binary_data (), QSsl.Rsa, QSsl.Pem, QSsl.Private_key);
+    //_private_key = QSslKey (read_job.binary_data (), QSsl.Rsa, QSsl.Pem, QSsl.PrivateKey);
     _private_key = read_job.binary_data ();
 
     if (_private_key.is_null ()) {
@@ -1231,7 +1231,7 @@ void ClientSideEncryption.generate_key_pair (AccountPtr &account) {
     const int rsa_key_len = 2048;
 
     // Init RSA
-    PKey_ctx ctx (EVP_PKEY_RSA);
+    PKeyCtx ctx (EVP_PKEY_RSA);
 
     if (EVP_PKEY_keygen_init (ctx) <= 0) {
         q_c_info (lc_cse ()) << "Couldn't initialize the key generator";
@@ -1258,7 +1258,7 @@ void ClientSideEncryption.generate_key_pair (AccountPtr &account) {
         return;
     }
     QByteArray key = BIO2Byte_array (priv_key);
-    //_private_key = QSslKey (key, QSsl.Rsa, QSsl.Pem, QSsl.Private_key);
+    //_private_key = QSslKey (key, QSsl.Rsa, QSsl.Pem, QSsl.PrivateKey);
     _private_key = key;
 
     q_c_info (lc_cse ()) << "Keys generated correctly, sending to server.";
@@ -1266,7 +1266,7 @@ void ClientSideEncryption.generate_key_pair (AccountPtr &account) {
 }
 
 void ClientSideEncryption.generate_c_sR (AccountPtr &account, EVP_PKEY *key_pair) {
-    // Open_s_sL expects const char.
+    // OpenSSL expects const char.
     auto cn_array = account.dav_user ().to_local8Bit ();
     q_c_info (lc_cse ()) << "Getting the following array for the account Id" << cn_array;
 
@@ -1319,10 +1319,10 @@ void ClientSideEncryption.generate_c_sR (AccountPtr &account, EVP_PKEY *key_pair
     q_c_info (lc_cse ()) << "Returning the certificate";
     q_c_info (lc_cse ()) << output;
 
-    auto job = new Sign_public_key_api_job (account, e2ee_base_url () + "public-key", this);
+    auto job = new SignPublicKeyApiJob (account, e2ee_base_url () + "public-key", this);
     job.set_csr (output);
 
-    connect (job, &Sign_public_key_api_job.json_received, [this, account] (QJsonDocument& json, int ret_code) {
+    connect (job, &SignPublicKeyApiJob.json_received, [this, account] (QJsonDocument& json, int ret_code) {
         if (ret_code == 200) {
             string cert = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("public-key").to_string ();
             _certificate = QSslCertificate (cert.to_local8Bit (), QSsl.Pem);
@@ -1345,14 +1345,14 @@ void ClientSideEncryption.encrypt_private_key (AccountPtr &account) {
     string pass_phrase = list.join (string ()).to_lower ();
     q_c_info (lc_cse ()) << "Passphrase Generated:" << pass_phrase;
 
-    auto salt = Encryption_helper.generate_random (40);
-    auto secret_key = Encryption_helper.generate_password (pass_phrase, salt);
-    auto crypted_text = Encryption_helper.encrypt_private_key (secret_key, Encryption_helper.private_key_to_pem (_private_key), salt);
+    auto salt = EncryptionHelper.generate_random (40);
+    auto secret_key = EncryptionHelper.generate_password (pass_phrase, salt);
+    auto crypted_text = EncryptionHelper.encrypt_private_key (secret_key, EncryptionHelper.private_key_to_pem (_private_key), salt);
 
     // Send private key to the server
-    auto job = new Store_private_key_api_job (account, e2ee_base_url () + "private-key", this);
+    auto job = new StorePrivateKeyApiJob (account, e2ee_base_url () + "private-key", this);
     job.set_private_key (crypted_text);
-    connect (job, &Store_private_key_api_job.json_received, [this, account] (QJsonDocument& doc, int ret_code) {
+    connect (job, &StorePrivateKeyApiJob.json_received, [this, account] (QJsonDocument& doc, int ret_code) {
         Q_UNUSED (doc);
         switch (ret_code) {
             case 200:
@@ -1402,13 +1402,13 @@ void ClientSideEncryption.decrypt_private_key (AccountPtr &account, QByteArray &
             q_c_info (lc_cse ()) << "mnemonic:" << mnemonic;
 
             // split off salt
-            const auto salt = Encryption_helper.extract_private_key_salt (key);
+            const auto salt = EncryptionHelper.extract_private_key_salt (key);
 
-            auto pass = Encryption_helper.generate_password (mnemonic, salt);
+            auto pass = EncryptionHelper.generate_password (mnemonic, salt);
             q_c_info (lc_cse ()) << "Generated key:" << pass;
 
-            QByteArray private_key = Encryption_helper.decrypt_private_key (pass, key);
-            //_private_key = QSslKey (private_key, QSsl.Rsa, QSsl.Pem, QSsl.Private_key);
+            QByteArray private_key = EncryptionHelper.decrypt_private_key (pass, key);
+            //_private_key = QSslKey (private_key, QSsl.Rsa, QSsl.Pem, QSsl.PrivateKey);
             _private_key = private_key;
 
             q_c_info (lc_cse ()) << "Private key : " << _private_key;
@@ -1498,7 +1498,7 @@ void ClientSideEncryption.fetch_and_validate_public_key_from_server (AccountPtr 
     job.start ();
 }
 
-Folder_metadata.Folder_metadata (AccountPtr account, QByteArray& metadata, int status_code) : _account (account) {
+FolderMetadata.FolderMetadata (AccountPtr account, QByteArray& metadata, int status_code) : _account (account) {
     if (metadata.is_empty () || status_code == 404) {
         q_c_info (lc_cse_metadata ()) << "Setupping Empty Metadata";
         setup_empty_metadata ();
@@ -1508,7 +1508,7 @@ Folder_metadata.Folder_metadata (AccountPtr account, QByteArray& metadata, int s
     }
 }
 
-void Folder_metadata.setup_existing_metadata (QByteArray& metadata) {
+void FolderMetadata.setup_existing_metadata (QByteArray& metadata) {
 /* This is the json response from the server, it contains two extra objects that we are *not* interested.
 * ocs and data.
 */
@@ -1571,7 +1571,7 @@ for (auto it = metadata_keys.const_begin (), end = metadata_keys.const_end (); i
   }
 
     for (auto it = files.const_begin (), end = files.const_end (); it != end; it++) {
-        Encrypted_file file;
+        EncryptedFile file;
         file.encrypted_filename = it.key ();
 
         auto file_obj = it.value ().to_object ();
@@ -1601,24 +1601,24 @@ for (auto it = metadata_keys.const_begin (), end = metadata_keys.const_end (); i
 }
 
 // RSA/ECB/OAEPWith_sHA-256And_mGF1Padding using private / public key.
-QByteArray Folder_metadata.encrypt_metadata_key (QByteArray& data) {
+QByteArray FolderMetadata.encrypt_metadata_key (QByteArray& data) {
     Bio public_key_bio;
     QByteArray public_key_pem = _account.e2e ()._public_key.to_pem ();
     BIO_write (public_key_bio, public_key_pem.const_data (), public_key_pem.size ());
     auto public_key = PKey.read_public_key (public_key_bio);
 
     // The metadata key is binary so base64 encode it first
-    return Encryption_helper.encrypt_string_asymmetric (public_key, data.to_base64 ());
+    return EncryptionHelper.encrypt_string_asymmetric (public_key, data.to_base64 ());
 }
 
-QByteArray Folder_metadata.decrypt_metadata_key (QByteArray& encrypted_metadata) {
+QByteArray FolderMetadata.decrypt_metadata_key (QByteArray& encrypted_metadata) {
     Bio private_key_bio;
     QByteArray private_key_pem = _account.e2e ()._private_key;
     BIO_write (private_key_bio, private_key_pem.const_data (), private_key_pem.size ());
     auto key = PKey.read_private_key (private_key_bio);
 
     // Also base64 decode the result
-    QByteArray decrypt_result = Encryption_helper.decrypt_string_asymmetric (
+    QByteArray decrypt_result = EncryptionHelper.decrypt_string_asymmetric (
                     key, QByteArray.from_base64 (encrypted_metadata));
 
     if (decrypt_result.is_empty ()) {
@@ -1629,17 +1629,17 @@ QByteArray Folder_metadata.decrypt_metadata_key (QByteArray& encrypted_metadata)
 }
 
 // AES/GCM/No_padding (128 bit key size)
-QByteArray Folder_metadata.encrypt_json_object (QByteArray& obj, QByteArray pass) {
-    return Encryption_helper.encrypt_string_symmetric (pass, obj);
+QByteArray FolderMetadata.encrypt_json_object (QByteArray& obj, QByteArray pass) {
+    return EncryptionHelper.encrypt_string_symmetric (pass, obj);
 }
 
-QByteArray Folder_metadata.decrypt_json_object (QByteArray& encrypted_metadata, QByteArray& pass) {
-    return Encryption_helper.decrypt_string_symmetric (pass, encrypted_metadata);
+QByteArray FolderMetadata.decrypt_json_object (QByteArray& encrypted_metadata, QByteArray& pass) {
+    return EncryptionHelper.decrypt_string_symmetric (pass, encrypted_metadata);
 }
 
-void Folder_metadata.setup_empty_metadata () {
+void FolderMetadata.setup_empty_metadata () {
     q_c_debug (lc_cse) << "Settint up empty metadata";
-    QByteArray new_metadata_pass = Encryption_helper.generate_random (16);
+    QByteArray new_metadata_pass = EncryptionHelper.generate_random (16);
     _metadata_keys.insert (0, new_metadata_pass);
 
     string public_key = _account.e2e ()._public_key.to_pem ().to_base64 ();
@@ -1648,7 +1648,7 @@ void Folder_metadata.setup_empty_metadata () {
     _sharing.append ({display_name, public_key});
 }
 
-QByteArray Folder_metadata.encrypted_metadata () {
+QByteArray FolderMetadata.encrypted_metadata () {
     q_c_debug (lc_cse) << "Generating metadata";
 
     QJsonObject metadata_keys;
@@ -1712,7 +1712,7 @@ QByteArray Folder_metadata.encrypted_metadata () {
     return internal_metadata.to_json ();
 }
 
-void Folder_metadata.add_encrypted_file (Encrypted_file &f) {
+void FolderMetadata.add_encrypted_file (EncryptedFile &f) {
 
     for (int i = 0; i < _files.size (); i++) {
         if (_files.at (i).original_filename == f.original_filename) {
@@ -1724,7 +1724,7 @@ void Folder_metadata.add_encrypted_file (Encrypted_file &f) {
     _files.append (f);
 }
 
-void Folder_metadata.remove_encrypted_file (Encrypted_file &f) {
+void FolderMetadata.remove_encrypted_file (EncryptedFile &f) {
     for (int i = 0; i < _files.size (); i++) {
         if (_files.at (i).original_filename == f.original_filename) {
             _files.remove_at (i);
@@ -1733,16 +1733,16 @@ void Folder_metadata.remove_encrypted_file (Encrypted_file &f) {
     }
 }
 
-void Folder_metadata.remove_all_encrypted_files () {
+void FolderMetadata.remove_all_encrypted_files () {
     _files.clear ();
 }
 
-QVector<Encrypted_file> Folder_metadata.files () {
+QVector<EncryptedFile> FolderMetadata.files () {
     return _files;
 }
 
-bool Encryption_helper.file_encryption (QByteArray &key, QByteArray &iv, QFile *input, QFile *output, QByteArray& return_tag) {
-    if (!input.open (QIODevice.Read_only)) {
+bool EncryptionHelper.file_encryption (QByteArray &key, QByteArray &iv, QFile *input, QFile *output, QByteArray& return_tag) {
+    if (!input.open (QIODevice.ReadOnly)) {
       q_c_debug (lc_cse) << "Could not open input file for reading" << input.error_string ();
     }
     if (!output.open (QIODevice.WriteOnly)) {
@@ -1750,7 +1750,7 @@ bool Encryption_helper.file_encryption (QByteArray &key, QByteArray &iv, QFile *
     }
 
     // Init
-    Cipher_ctx ctx;
+    CipherCtx ctx;
 
     // Create and initialise the context
     if (!ctx) {
@@ -1823,13 +1823,13 @@ bool Encryption_helper.file_encryption (QByteArray &key, QByteArray &iv, QFile *
     return true;
 }
 
-bool Encryption_helper.file_decryption (QByteArray &key, QByteArray& iv,
+bool EncryptionHelper.file_decryption (QByteArray &key, QByteArray& iv,
                                QFile *input, QFile *output) {
-    input.open (QIODevice.Read_only);
+    input.open (QIODevice.ReadOnly);
     output.open (QIODevice.WriteOnly);
 
     // Init
-    Cipher_ctx ctx;
+    CipherCtx ctx;
 
     // Create and initialise the context
     if (!ctx) {
@@ -1886,7 +1886,7 @@ bool Encryption_helper.file_decryption (QByteArray &key, QByteArray& iv,
 
     const QByteArray e2Ee_tag = input.read (Occ.Constants.e2Ee_tag_size);
 
-    // Set expected e2Ee_tag value. Works in Open_s_sL 1.0.1d and later
+    // Set expected e2Ee_tag value. Works in OpenSSL 1.0.1d and later
     if (!EVP_CIPHER_CTX_ctrl (ctx, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), (unsigned char *)e2Ee_tag.const_data ())) {
         q_c_info (lc_cse ()) << "Could not set expected e2Ee_tag";
         return false;
@@ -1903,7 +1903,7 @@ bool Encryption_helper.file_decryption (QByteArray &key, QByteArray& iv,
     return true;
 }
 
-Encryption_helper.Streaming_decryptor.Streaming_decryptor (QByteArray &key, QByteArray &iv, uint64 total_size) : _total_size (total_size) {
+EncryptionHelper.StreamingDecryptor.StreamingDecryptor (QByteArray &key, QByteArray &iv, uint64 total_size) : _total_size (total_size) {
     if (_ctx && !key.is_empty () && !iv.is_empty () && total_size > 0) {
         _is_initialized = true;
 
@@ -1929,7 +1929,7 @@ Encryption_helper.Streaming_decryptor.Streaming_decryptor (QByteArray &key, QByt
     }
 }
 
-QByteArray Encryption_helper.Streaming_decryptor.chunk_decryption (char *input, uint64 chunk_size) {
+QByteArray EncryptionHelper.StreamingDecryptor.chunk_decryption (char *input, uint64 chunk_size) {
     QByteArray byte_array;
     QBuffer buffer (&byte_array);
     buffer.open (QIODevice.WriteOnly);
@@ -2036,7 +2036,7 @@ QByteArray Encryption_helper.Streaming_decryptor.chunk_decryption (char *input, 
 
         QByteArray e2Ee_tag = QByteArray (input + input_pos, Occ.Constants.e2Ee_tag_size);
 
-        // Set expected e2Ee_tag value. Works in Open_s_sL 1.0.1d and later
+        // Set expected e2Ee_tag value. Works in OpenSSL 1.0.1d and later
         if (!EVP_CIPHER_CTX_ctrl (_ctx, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), reinterpret_cast<unsigned char> (e2Ee_tag.data ()))) {
             q_critical (lc_cse ()) << "Could not set expected e2Ee_tag";
             return QByteArray ();
@@ -2069,11 +2069,11 @@ QByteArray Encryption_helper.Streaming_decryptor.chunk_decryption (char *input, 
     return byte_array;
 }
 
-bool Encryption_helper.Streaming_decryptor.is_initialized () {
+bool EncryptionHelper.StreamingDecryptor.is_initialized () {
     return _is_initialized;
 }
 
-bool Encryption_helper.Streaming_decryptor.is_finished () {
+bool EncryptionHelper.StreamingDecryptor.is_finished () {
     return _is_finished;
 }
 }

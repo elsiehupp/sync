@@ -49,7 +49,7 @@ Here follows the state machine
          JsonApiJob (ocs/v1.php/cloud/user)
          |
          +. slot_update_last_info
-               Avatar_job (if _fetch_avatar_image is true)
+               AvatarJob (if _fetch_avatar_image is true)
                |
                +. slot_avatar_image -.
    +-----------------------------------+
@@ -209,9 +209,9 @@ private:
 
         // Avatar Image
         if (_fetch_avatar_image) {
-            auto *job = new Avatar_job (account, account.dav_user (), 128, this);
+            auto *job = new AvatarJob (account, account.dav_user (), 128, this);
             job.set_timeout (20 * 1000);
-            GLib.Object.connect (job, &Avatar_job.avatar_pixmap, this, &UserInfo.slot_avatar_image);
+            GLib.Object.connect (job, &AvatarJob.avatar_pixmap, this, &UserInfo.slot_avatar_image);
             job.start ();
         }
         else

@@ -275,18 +275,18 @@ private:
             } else if (a._type == Activity.Sync_result_type) {
                 return "qrc:///client/theme/black/state-error.svg";
             } else if (a._type == Activity.Sync_file_item_type) {
-                if (a._status == SyncFileItem.Normal_error
-                    || a._status == SyncFileItem.Fatal_error
-                    || a._status == SyncFileItem.Detail_error
-                    || a._status == SyncFileItem.Blacklisted_error) {
+                if (a._status == SyncFileItem.NormalError
+                    || a._status == SyncFileItem.FatalError
+                    || a._status == SyncFileItem.DetailError
+                    || a._status == SyncFileItem.BlacklistedError) {
                     return "qrc:///client/theme/black/state-error.svg";
-                } else if (a._status == SyncFileItem.Soft_error
+                } else if (a._status == SyncFileItem.SoftError
                     || a._status == SyncFileItem.Conflict
                     || a._status == SyncFileItem.Restoration
-                    || a._status == SyncFileItem.File_locked
-                    || a._status == SyncFileItem.File_name_invalid) {
+                    || a._status == SyncFileItem.FileLocked
+                    || a._status == SyncFileItem.FileNameInvalid) {
                     return "qrc:///client/theme/black/state-warning.svg";
-                } else if (a._status == SyncFileItem.File_ignored) {
+                } else if (a._status == SyncFileItem.FileIgnored) {
                     return "qrc:///client/theme/black/state-info.svg";
                 } else {
                     // File sync successful
@@ -346,7 +346,7 @@ private:
         case Display_actions:
             return _display_actions;
         case Shareable_role:
-            return !data (index, Path_role).to_string ().is_empty () && _display_actions && a._file_action != "file_deleted" && a._status != SyncFileItem.File_ignored;
+            return !data (index, Path_role).to_string ().is_empty () && _display_actions && a._file_action != "file_deleted" && a._status != SyncFileItem.FileIgnored;
         default:
             return QVariant ();
         }
@@ -559,7 +559,7 @@ private:
             _current_conflict_dialog.open ();
             OwncloudGui.raise_dialog (_current_conflict_dialog);
             return;
-        } else if (activity._status == SyncFileItem.File_name_invalid) {
+        } else if (activity._status == SyncFileItem.FileNameInvalid) {
             if (!_current_invalid_filename_dialog.is_null ()) {
                 _current_invalid_filename_dialog.close ();
             }

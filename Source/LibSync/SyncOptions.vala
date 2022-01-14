@@ -21,10 +21,10 @@ namespace Occ {
 /***********************************************************
 Value class containing the options given to the sync engine
 ***********************************************************/
-class Sync_options {
+class SyncOptions {
 public:
-    Sync_options ();
-    ~Sync_options ();
+    SyncOptions ();
+    ~SyncOptions ();
 
     /***********************************************************
     Maximum size (in Bytes) a folder can have without asking for confirmation.
@@ -130,13 +130,13 @@ private:
 
 
 
-Sync_options.Sync_options ()
+SyncOptions.SyncOptions ()
     : _vfs (new VfsOff) {
 }
 
-Sync_options.~Sync_options () = default;
+SyncOptions.~SyncOptions () = default;
 
-void Sync_options.fill_from_environment_variables () {
+void SyncOptions.fill_from_environment_variables () {
     QByteArray chunk_size_env = qgetenv ("OWNCLOUD_CHUNK_SIZE");
     if (!chunk_size_env.is_empty ())
         _initial_chunk_size = chunk_size_env.to_u_int ();
@@ -158,21 +158,21 @@ void Sync_options.fill_from_environment_variables () {
         _parallel_network_jobs = max_parallel;
 }
 
-void Sync_options.verify_chunk_sizes () {
+void SyncOptions.verify_chunk_sizes () {
     _min_chunk_size = q_min (_min_chunk_size, _initial_chunk_size);
     _max_chunk_size = q_max (_max_chunk_size, _initial_chunk_size);
 }
 
-QRegularExpression Sync_options.file_regex () {
+QRegularExpression SyncOptions.file_regex () {
     return _file_regex;
 }
 
-void Sync_options.set_file_pattern (string &pattern) {
+void SyncOptions.set_file_pattern (string &pattern) {
     // full match or a path ending with this pattern
     set_path_pattern (QStringLiteral (" (^|/|\\\\)") + pattern + QLatin1Char ('$'));
 }
 
-void Sync_options.set_path_pattern (string &pattern) {
+void SyncOptions.set_path_pattern (string &pattern) {
     _file_regex.set_pattern_options (Utility.fs_case_preserving () ? QRegularExpression.Case_insensitive_option : QRegularExpression.No_pattern_option);
     _file_regex.set_pattern (pattern);
 }

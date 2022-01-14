@@ -6,7 +6,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
 // #include <QImage>
 // #include <QPainter>
-// #include <QSvg_renderer>
+// #include <QSvgRenderer>
 
 // #pragma once
 
@@ -104,8 +104,8 @@ namespace {
                 process_next_image ();
             } else {
                 if (image_data.starts_with (QByteArrayLiteral ("<svg"))) {
-                    // SVG image needs proper scaling, let's do it with QPainter and QSvg_renderer
-                    QSvg_renderer svg_renderer;
+                    // SVG image needs proper scaling, let's do it with QPainter and QSvgRenderer
+                    QSvgRenderer svg_renderer;
                     if (svg_renderer.load (image_data)) {
                         QImage scaled_svg (_requested_image_size, QImage.Format_ARGB32);
                         scaled_svg.fill ("transparent");

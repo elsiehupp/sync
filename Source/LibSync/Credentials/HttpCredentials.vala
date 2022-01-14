@@ -32,7 +32,7 @@ namespace Occ {
 
 namespace {
     const char user_c[] = "user";
-    const char is_oAuth_c[] = "oauth";
+    const char is_oauth_c[] = "oauth";
     const char client_cert_bundle_c[] = "client_cert_pkcs12";
     const char client_cert_password_c[] = "_client_cert_password";
     const char client_certificate_pemC[] = "_client_certificate_pem";
@@ -43,8 +43,8 @@ namespace {
 
 /***********************************************************
    The authentication system is this way because of Shibboleth.
-   There used to be two different ways to authenticate : Shibboleth and HTTP Basic Auth.
-   AbstractCredentials can be inherited from both Shibboleth_crendentials and HttpCredentials.
+   There used to be two different ways to authenticate: Shibboleth and HTTP Basic Auth.
+   AbstractCredentials can be inherited from both ShibbolethCrendentials and HttpCredentials.
 
    HttpCredentials is then split in HttpCredentials and HttpCredentialsGui.
 
@@ -176,7 +176,7 @@ protected:
 
     string _fetch_error_string;
     bool _ready = false;
-    bool _is_renewing_oAuth_token = false;
+    bool _is_renewing_oauth_token = false;
     QByteArray _client_cert_bundle;
     QByteArray _client_cert_password;
     QSslKey _client_ssl_key;
@@ -225,7 +225,7 @@ protected:
 
             auto *reply = AccessManager.create_request (op, req, outgoing_data);
 
-            if (_cred._is_renewing_oAuth_token) {
+            if (_cred._is_renewing_oauth_token) {
                 // We know this is going to fail, but we have no way to queue it there, so we will
                 // simply restart the job after the failure.
                 reply.set_property (need_retry_c, true);
@@ -364,11 +364,11 @@ protected:
 
     bool HttpCredentials.keychain_unavailable_retry_later (QKeychain.ReadPasswordJob *incoming) {
         Q_ASSERT (!incoming.insecure_fallback ()); // If insecure_fallback is set, the next test would be pointless
-        if (_retry_on_key_chain_error && (incoming.error () == QKeychain.No_backend_available
-                || incoming.error () == QKeychain.Other_error)) {
+        if (_retry_on_key_chain_error && (incoming.error () == QKeychain.NoBackendAvailable
+                || incoming.error () == QKeychain.OtherError)) {
             // Could be that the backend was not yet available. Wait some extra seconds.
             // (Issues #4274 and #6522)
-            // (For kwallet, the error is Other_error instead of No_backend_available, maybe a bug in QtKeychain)
+            // (For kwallet, the error is OtherError instead of NoBackendAvailable, maybe a bug in QtKeychain)
             q_c_info (lc_http_credentials) << "Backend unavailable (yet?) Retrying in a few seconds." << incoming.error_string ();
             QTimer.single_shot (10000, this, &HttpCredentials.fetch_from_keychain_helper);
             _retry_on_key_chain_error = false;
@@ -465,7 +465,7 @@ protected:
     bool HttpCredentials.still_valid (QNetworkReply *reply) {
         return ( (reply.error () != QNetworkReply.AuthenticationRequiredError)
             // returned if user or password is incorrect
-            && (reply.error () != QNetworkReply.Operation_canceled_error
+            && (reply.error () != QNetworkReply.OperationCanceledError
                    || !reply.property (authentication_failed_c).to_bool ()));
     }
 
@@ -483,7 +483,7 @@ protected:
             return;
         }
 
-        bool is_oauth = _account.credential_setting (QLatin1String (is_oAuth_c)).to_bool ();
+        bool is_oauth = _account.credential_setting (QLatin1String (is_oauth_c)).to_bool ();
         if (is_oauth) {
             _refresh_token = job.text_data ();
         } else {
@@ -559,7 +559,7 @@ protected:
                 _refresh_token = json["refresh_token"].to_string ();
                 persist ();
             }
-            _is_renewing_oAuth_token = false;
+            _is_renewing_oauth_token = false;
             for (auto &job : _retry_queue) {
                 if (job)
                     job.retry ();
@@ -567,7 +567,7 @@ protected:
             _retry_queue.clear ();
             emit fetched ();
         });
-        _is_renewing_oAuth_token = true;
+        _is_renewing_oauth_token = true;
         return true;
     }
 
@@ -625,7 +625,7 @@ protected:
         }
 
         _account.set_credential_setting (QLatin1String (user_c), _user);
-        _account.set_credential_setting (QLatin1String (is_oAuth_c), is_using_oAuth ());
+        _account.set_credential_setting (QLatin1String (is_oauth_c), is_using_oAuth ());
         if (!_client_cert_bundle.is_empty ()) {
             // Note that the _client_cert_bundle will often be cleared after usage,
             // it's just written if it gets passed into the constructor.
@@ -729,7 +729,7 @@ protected:
         q_c_warning (lc_http_credentials) << "Stop request : Authentication failed for " << reply.url ().to_string ();
         reply.set_property (authentication_failed_c, true);
 
-        if (_is_renewing_oAuth_token) {
+        if (_is_renewing_oauth_token) {
             reply.set_property (need_retry_c, true);
         } else if (is_using_oAuth () && !reply.property (need_retry_c).to_bool ()) {
             reply.set_property (need_retry_c, true);
@@ -742,7 +742,7 @@ protected:
         auto *reply = job.reply ();
         if (!reply || !reply.property (need_retry_c).to_bool ())
             return false;
-        if (_is_renewing_oAuth_token) {
+        if (_is_renewing_oauth_token) {
             _retry_queue.append (job);
         } else {
             job.retry ();
@@ -755,7 +755,7 @@ protected:
             return true;
 
         QBuffer cert_buffer (&_client_cert_bundle);
-        cert_buffer.open (QIODevice.Read_only);
+        cert_buffer.open (QIODevice.ReadOnly);
         QList<QSslCertificate> client_ca_certificates;
         return QSslCertificate.import_pkcs12 (
                 &cert_buffer, &_client_ssl_key, &_client_ssl_certificate, &client_ca_certificates, _client_cert_password);

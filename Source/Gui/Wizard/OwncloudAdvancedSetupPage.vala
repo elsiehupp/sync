@@ -236,13 +236,13 @@ private:
         if (Theme.is_hidpi ()) {
             avatar_size *= 2;
         }
-        const auto avatar_job = new Avatar_job (account, account.dav_user (), avatar_size, this);
+        const auto avatar_job = new AvatarJob (account, account.dav_user (), avatar_size, this);
         avatar_job.set_timeout (20 * 1000);
-        GLib.Object.connect (avatar_job, &Avatar_job.avatar_pixmap, this, [this] (QImage &avatar_image) {
+        GLib.Object.connect (avatar_job, &AvatarJob.avatar_pixmap, this, [this] (QImage &avatar_image) {
             if (avatar_image.is_null ()) {
                 return;
             }
-            const auto avatar_pixmap = QPixmap.from_image (Avatar_job.make_circular_avatar (avatar_image));
+            const auto avatar_pixmap = QPixmap.from_image (AvatarJob.make_circular_avatar (avatar_image));
             _ui.l_server_icon.set_pixmap (avatar_pixmap);
         });
         avatar_job.start ();

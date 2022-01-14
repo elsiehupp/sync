@@ -45,7 +45,7 @@ public slots:
 };
 
 
-static void null_message_handler (Qt_msg_type, QMessage_log_context &, string &) {
+static void null_message_handler (QtMsgType, QMessageLogContext &, string &) {
 }
 
 struct CmdOptions {
@@ -366,7 +366,7 @@ int main (int argc, char **argv) {
             port = p_list.at (2).to_int (&ok);
 
             QNetworkProxyFactory.set_use_system_configuration (false);
-            QNetworkProxy.set_application_proxy (QNetworkProxy (QNetworkProxy.Http_proxy, host, port));
+            QNetworkProxy.set_application_proxy (QNetworkProxy (QNetworkProxy.HttpProxy, host, port));
         } else {
             q_fatal ("Could not read httpproxy. The proxy should have the format \"http://hostname:port\".");
         }
@@ -375,7 +375,7 @@ int main (int argc, char **argv) {
     auto *ssl_error_handler = new Simple_sslErrorHandler;
 
 #ifdef TOKEN_AUTH_ONLY
-    auto *cred = new Token_credentials (user, password, "");
+    auto *cred = new TokenCredentials (user, password, "");
     account.set_credentials (cred);
 #else
     auto *cred = new HttpCredentialsText (user, password);
@@ -388,7 +388,7 @@ int main (int argc, char **argv) {
     account.set_url (host_url);
     account.set_ssl_error_handler (ssl_error_handler);
 
-    QEvent_loop loop;
+    QEventLoop loop;
     auto *job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/capabilities"));
     GLib.Object.connect (job, &JsonApiJob.json_received, [&] (QJsonDocument &json) {
         auto caps = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
@@ -426,7 +426,7 @@ restart_sync:
     QStringList selective_sync_list;
     if (!options.unsyncedfolders.is_empty ()) {
         QFile f (options.unsyncedfolders);
-        if (!f.open (QFile.Read_only)) {
+        if (!f.open (QFile.ReadOnly)) {
             q_critical () << "Could not open file containing the list of unsynced folders : " << options.unsyncedfolders;
         } else {
             // filter out empty lines and comments
@@ -448,7 +448,7 @@ restart_sync:
         selective_sync_fixup (&db, selective_sync_list);
     }
 
-    Sync_options opt;
+    SyncOptions opt;
     opt.fill_from_environment_variables ();
     opt.verify_chunk_sizes ();
     SyncEngine engine (account, options.source_dir, folder, &db);

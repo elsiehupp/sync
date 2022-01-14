@@ -23,7 +23,7 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 // #include <QColor>
 // #include <QPainter>
 // #include <QList_widget>
-// #include <QSvg_renderer>
+// #include <QSvgRenderer>
 // #include <QPushButton>
 // #include <QContext_menu_event>
 
@@ -811,8 +811,8 @@ private:
         Currently only regular users can have avatars.
          */
         if (_share.get_share_with ().type () == Sharee.User) {
-            auto *job = new Avatar_job (_share.account (), _share.get_share_with ().share_with (), avatar_size, this);
-            connect (job, &Avatar_job.avatar_pixmap, this, &Share_user_line.slot_avatar_loaded);
+            auto *job = new AvatarJob (_share.account (), _share.get_share_with ().share_with (), avatar_size, this);
+            connect (job, &AvatarJob.avatar_pixmap, this, &Share_user_line.slot_avatar_loaded);
             job.start ();
         }
     }
@@ -852,7 +852,7 @@ private:
         if (avatar.is_null ())
             return;
 
-        avatar = Avatar_job.make_circular_avatar (avatar);
+        avatar = AvatarJob.make_circular_avatar (avatar);
         _ui.avatar.set_pixmap (QPixmap.from_image (avatar));
 
         // Remove the stylesheet for the fallback avatar

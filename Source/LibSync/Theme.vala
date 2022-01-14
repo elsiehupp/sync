@@ -10,8 +10,8 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QStyle>
 // #include <QApplication>
 #endif
-// #include <QSsl_socket>
-// #include <QSvg_renderer>
+// #include <QSslSocket>
+// #include <QSvgRenderer>
 
 #ifdef THEME_INCLUDE
 const int Mirall Occ // namespace hack to make old themes work
@@ -670,7 +670,7 @@ string Theme.status_header_text (SyncResult.Status status) {
     case SyncResult.Undefined:
         result_str = QCoreApplication.translate ("theme", "Status undefined");
         break;
-    case SyncResult.Not_yet_started:
+    case SyncResult.NotYetStarted:
         result_str = QCoreApplication.translate ("theme", "Waiting to start sync");
         break;
     case SyncResult.Sync_running:
@@ -796,7 +796,7 @@ QIcon Theme.theme_icon (string &name, bool sys_tray) {
         }
 
         const string svg_name = string (Theme.theme_prefix) + string.from_latin1 ("%1/%2.svg").arg (flavor).arg (name);
-        QSvg_renderer renderer (svg_name);
+        QSvgRenderer renderer (svg_name);
         const auto create_pixmap_from_svg = [&renderer] (int size) {
             QImage img (size, size, QImage.Format_ARGB32);
             img.fill (Qt.Global_color.transparent);
@@ -1026,7 +1026,7 @@ string Theme.git_sHA1 () {
                     .arg (__DATE__)
                     .arg (__TIME__)
                     .arg (q_version ())
-                    .arg (QSsl_socket.ssl_library_version_string ());
+                    .arg (QSslSocket.ssl_library_version_string ());
 #endif
     return dev_string;
 }
@@ -1109,7 +1109,7 @@ QIcon Theme.sync_state_icon (SyncResult.Status status, bool sys_tray) {
         // this can happen if no sync connections are configured.
         status_icon = QLatin1String ("state-warning");
         break;
-    case SyncResult.Not_yet_started:
+    case SyncResult.NotYetStarted:
     case SyncResult.Sync_running:
         status_icon = QLatin1String ("state-sync");
         break;
@@ -1271,7 +1271,7 @@ string Theme.version_switch_output () {
     if (!QGuiApplication.platform_name ().is_empty ())
         stream << "Using Qt platform plugin '" << QGuiApplication.platform_name () << "'" << Qt.endl;
 
-    stream << "Using '" << QSsl_socket.ssl_library_version_string () << "'" << Qt.endl;
+    stream << "Using '" << QSslSocket.ssl_library_version_string () << "'" << Qt.endl;
     stream << "Running on " << Utility.platform_name () << ", " << QSysInfo.current_cpu_architecture () << Qt.endl;
     return help_text;
 }
@@ -1305,7 +1305,7 @@ void Theme.replace_link_color_string (string &link_string, QColor &new_color) {
 }
 
 QIcon Theme.create_color_aware_icon (string &name, QPalette &palette) {
-    QSvg_renderer renderer (name);
+    QSvgRenderer renderer (name);
     QImage img (64, 64, QImage.Format_ARGB32);
     img.fill (Qt.Global_color.transparent);
     QPainter img_painter (&img);

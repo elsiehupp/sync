@@ -54,7 +54,7 @@ private:
         _ui.user_line_edit.set_placeholder_text (tr ("Username for proxy server"));
         _ui.password_line_edit.set_placeholder_text (tr ("Password for proxy server"));
 
-        _ui.type_combo_box.add_item (tr ("HTTP (S) proxy"), QNetworkProxy.Http_proxy);
+        _ui.type_combo_box.add_item (tr ("HTTP (S) proxy"), QNetworkProxy.HttpProxy);
         _ui.type_combo_box.add_item (tr ("SOCKS5 proxy"), QNetworkProxy.Socks5Proxy);
 
         _ui.auth_requiredcheck_box.set_enabled (true);
@@ -129,7 +129,7 @@ private:
             _ui.system_proxy_radio_button.set_checked (true);
             break;
         case QNetworkProxy.Socks5Proxy:
-        case QNetworkProxy.Http_proxy:
+        case QNetworkProxy.HttpProxy:
             _ui.type_combo_box.set_current_index (_ui.type_combo_box.find_data (type));
             _ui.manual_proxy_radio_button.set_checked (true);
             break;

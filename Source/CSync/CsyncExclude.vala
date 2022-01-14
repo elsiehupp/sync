@@ -54,12 +54,12 @@ Excluded files and ignored files are the same thing. But the
 selective sync blacklist functionality is a different thing
 entirely.
 ***********************************************************/
-class Excluded_files : GLib.Object {
+class ExcludedFiles : GLib.Object {
 
     public using Version = std.tuple<int, int, int>;
 
-    public Excluded_files (string &local_path = QStringLiteral ("/"));
-    public ~Excluded_files () override;
+    public ExcludedFiles (string &local_path = QStringLiteral ("/"));
+    public ~ExcludedFiles () override;
 
     /***********************************************************
     Adds a new path to a file containing exclude patterns.
@@ -498,7 +498,7 @@ static string left_include_last (string &arr, QChar &c) {
 
 using namespace Occ;
 
-Excluded_files.Excluded_files (string &local_path)
+ExcludedFiles.ExcludedFiles (string &local_path)
     : _local_path (local_path)
     , _client_version (MIRALL_VERSION_MAJOR, MIRALL_VERSION_MINOR, MIRALL_VERSION_PATCH) {
     Q_ASSERT (_local_path.ends_with (QStringLiteral ("/")));
@@ -510,9 +510,9 @@ Excluded_files.Excluded_files (string &local_path)
         return;
 }
 
-Excluded_files.~Excluded_files () = default;
+ExcludedFiles.~ExcludedFiles () = default;
 
-void Excluded_files.add_exclude_file_path (string &path) {
+void ExcludedFiles.add_exclude_file_path (string &path) {
     const QFileInfo exclude_file_info (path);
     const auto file_name = exclude_file_info.file_name ();
     const auto base_path = file_name.compare (QStringLiteral ("sync-exclude.lst"), Qt.CaseInsensitive) == 0
@@ -524,15 +524,15 @@ void Excluded_files.add_exclude_file_path (string &path) {
     }
 }
 
-void Excluded_files.set_exclude_conflict_files (bool onoff) {
+void ExcludedFiles.set_exclude_conflict_files (bool onoff) {
     _exclude_conflict_files = onoff;
 }
 
-void Excluded_files.add_manual_exclude (string &expr) {
+void ExcludedFiles.add_manual_exclude (string &expr) {
     add_manual_exclude (expr, _local_path);
 }
 
-void Excluded_files.add_manual_exclude (string &expr, string &base_path) {
+void ExcludedFiles.add_manual_exclude (string &expr, string &base_path) {
     Q_ASSERT (base_path.ends_with (QLatin1Char ('/')));
 
     auto key = base_path;
@@ -541,21 +541,21 @@ void Excluded_files.add_manual_exclude (string &expr, string &base_path) {
     prepare (key);
 }
 
-void Excluded_files.clear_manual_excludes () {
+void ExcludedFiles.clear_manual_excludes () {
     _manual_excludes.clear ();
     reload_exclude_files ();
 }
 
-void Excluded_files.set_wildcards_match_slash (bool onoff) {
+void ExcludedFiles.set_wildcards_match_slash (bool onoff) {
     _wildcards_match_slash = onoff;
     prepare ();
 }
 
-void Excluded_files.set_client_version (Excluded_files.Version version) {
+void ExcludedFiles.set_client_version (ExcludedFiles.Version version) {
     _client_version = version;
 }
 
-void Excluded_files.load_exclude_file_patterns (string &base_path, QFile &file) {
+void ExcludedFiles.load_exclude_file_patterns (string &base_path, QFile &file) {
     QStringList patterns;
     while (!file.at_end ()) {
         QByteArray line = file.read_line ().trimmed ();
@@ -576,7 +576,7 @@ void Excluded_files.load_exclude_file_patterns (string &base_path, QFile &file) 
     }
 }
 
-bool Excluded_files.reload_exclude_files () {
+bool ExcludedFiles.reload_exclude_files () {
     _all_excludes.clear ();
     // clear all regex
     _bname_traversal_regex_file.clear ();
@@ -591,7 +591,7 @@ bool Excluded_files.reload_exclude_files () {
     for (auto& base_path : keys) {
         for (auto &exclude_file : _exclude_files.value (base_path)) {
             QFile file (exclude_file);
-            if (file.exists () && file.open (QIODevice.Read_only)) {
+            if (file.exists () && file.open (QIODevice.ReadOnly)) {
                 load_exclude_file_patterns (base_path, file);
             } else {
                 success = false;
@@ -609,7 +609,7 @@ bool Excluded_files.reload_exclude_files () {
     return success;
 }
 
-bool Excluded_files.version_directive_keep_next_line (QByteArray &directive) {
+bool ExcludedFiles.version_directive_keep_next_line (QByteArray &directive) {
     if (!directive.starts_with ("#!version"))
         return true;
     QByte_array_list args = directive.split (' ');
@@ -634,7 +634,7 @@ bool Excluded_files.version_directive_keep_next_line (QByteArray &directive) {
     return true;
 }
 
-bool Excluded_files.is_excluded (
+bool ExcludedFiles.is_excluded (
     const string &file_path,
     const string &base_path,
     bool exclude_hidden) {
@@ -674,7 +674,7 @@ bool Excluded_files.is_excluded (
     return full_pattern_match (relative_path, type) != CSYNC_NOT_EXCLUDED;
 }
 
-CSYNC_EXCLUDE_TYPE Excluded_files.traversal_pattern_match (string &path, ItemType filetype) {
+CSYNC_EXCLUDE_TYPE ExcludedFiles.traversal_pattern_match (string &path, ItemType filetype) {
     auto match = _csync_excluded_common (path, _exclude_conflict_files);
     if (match != CSYNC_NOT_EXCLUDED)
         return match;
@@ -752,7 +752,7 @@ CSYNC_EXCLUDE_TYPE Excluded_files.traversal_pattern_match (string &path, ItemTyp
     return CSYNC_NOT_EXCLUDED;
 }
 
-CSYNC_EXCLUDE_TYPE Excluded_files.full_pattern_match (string &p, ItemType filetype) {
+CSYNC_EXCLUDE_TYPE ExcludedFiles.full_pattern_match (string &p, ItemType filetype) {
     auto match = _csync_excluded_common (p, _exclude_conflict_files);
     if (match != CSYNC_NOT_EXCLUDED)
         return match;
@@ -796,7 +796,7 @@ On linux we used to use fnmatch with FNM_PATHNAME, but the windows function we u
 didn't have that behavior. wildcards_match_slash can be used to control which behavior
 the resulting regex shall use.
 ***********************************************************/
-string Excluded_files.convert_to_regexp_syntax (string exclude, bool wildcards_match_slash) {
+string ExcludedFiles.convert_to_regexp_syntax (string exclude, bool wildcards_match_slash) {
     // Translate *, ?, [...] to their regex variants.
     // The escape sequences \*, \?, \[. \\ have a special meaning,
     // the other ones have already been expanded before
@@ -885,7 +885,7 @@ string Excluded_files.convert_to_regexp_syntax (string exclude, bool wildcards_m
     return regex;
 }
 
-string Excluded_files.extract_bname_trigger (string &exclude, bool wildcards_match_slash) {
+string ExcludedFiles.extract_bname_trigger (string &exclude, bool wildcards_match_slash) {
     // We can definitely drop everything to the left of a / - that will never match
     // any bname.
     string pattern = exclude.mid (exclude.last_index_of (QLatin1Char ('/')) + 1);
@@ -922,7 +922,7 @@ string Excluded_files.extract_bname_trigger (string &exclude, bool wildcards_mat
     return pattern;
 }
 
-void Excluded_files.prepare () {
+void ExcludedFiles.prepare () {
     // clear all regex
     _bname_traversal_regex_file.clear ();
     _bname_traversal_regex_dir.clear ();
@@ -936,7 +936,7 @@ void Excluded_files.prepare () {
         prepare (base_path);
 }
 
-void Excluded_files.prepare (Base_path_string & base_path) {
+void ExcludedFiles.prepare (Base_path_string & base_path) {
     Q_ASSERT (_all_excludes.contains (base_path));
 
     // Build regular expressions for the different cases.

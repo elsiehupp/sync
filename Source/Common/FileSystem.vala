@@ -111,7 +111,7 @@ namespace FileSystem {
     bool OCSYNC_EXPORT move_to_trash (string &filename, string *error_string);
 
     /***********************************************************
-    Replacement for QFile.open (Read_only) followed by a seek ().
+    Replacement for QFile.open (ReadOnly) followed by a seek ().
     This version sets a more permissive sharing mode on Windows.
 
     Warning : The resulting file may have an empty file_name and be unsuitable for use
@@ -268,7 +268,7 @@ namespace FileSystem {
         string &error = error_or_null ? *error_or_null : error_dummy;
         error.clear ();
 
-        if (!file.open (QFile.Read_only)) {
+        if (!file.open (QFile.ReadOnly)) {
             error = file.error_string ();
             return false;
         }

@@ -387,7 +387,7 @@ void ComputeChecksum.start_impl (std.unique_ptr<QIODevice> device) {
     // Bug : The thread will keep running even if ComputeChecksum is deleted.
     auto type = checksum_type ();
     _watcher.set_future (Qt_concurrent.run ([shared_device, type] () {
-        if (!shared_device.open (QIODevice.Read_only)) {
+        if (!shared_device.open (QIODevice.ReadOnly)) {
             if (auto file = qobject_cast<QFile> (shared_device.data ())) {
                 q_c_warning (lc_checksums) << "Could not open file" << file.file_name ()
                         << "for reading to compute a checksum" << file.error_string ();
@@ -405,7 +405,7 @@ void ComputeChecksum.start_impl (std.unique_ptr<QIODevice> device) {
 
 QByteArray ComputeChecksum.compute_now_on_file (string &file_path, QByteArray &checksum_type) {
     QFile file (file_path);
-    if (!file.open (QIODevice.Read_only)) {
+    if (!file.open (QIODevice.ReadOnly)) {
         q_c_warning (lc_checksums) << "Could not open file" << file_path << "for reading and computing checksum" << file.error_string ();
         return QByteArray ();
     }

@@ -60,7 +60,7 @@ using Socket_api_server = QLocal_server;
 
 namespace Occ {
 
-class Direct_editor;
+class DirectEditor;
 
 Q_DECLARE_LOGGING_CATEGORY (lc_socket_api)
 
@@ -169,7 +169,7 @@ private:
 
     /// Direct Editing
     Q_INVOKABLE void command_EDIT (string &local_file, Socket_listener *listener);
-    Direct_editor* get_direct_editor_for_local_file (string &local_file);
+    DirectEditor* get_direct_editor_for_local_file (string &local_file);
 
 #if GUI_TESTING
     Q_INVOKABLE void command_ASYNC_ASSERT_ICON_IS_EQUAL (QSharedPointer<Socket_api_job> &job);
@@ -685,7 +685,7 @@ void SocketApi.command_EDIT (string &local_file, Socket_listener *listener) {
     if (!record.is_valid ())
         return;
 
-    Direct_editor* editor = get_direct_editor_for_local_file (file_data.local_path);
+    DirectEditor* editor = get_direct_editor_for_local_file (file_data.local_path);
     if (!editor)
         return;
 
@@ -1178,7 +1178,7 @@ void SocketApi.command_GET_MENU_ITEMS (string &argument, Occ.Socket_listener *li
             listener.send_message (QLatin1String ("MENU_ITEM:ACTIVITY") + flag_string + tr ("Activity"));
         }
 
-        Direct_editor* editor = get_direct_editor_for_local_file (file_data.local_path);
+        DirectEditor* editor = get_direct_editor_for_local_file (file_data.local_path);
         if (editor) {
             //listener.send_message (QLatin1String ("MENU_ITEM:EDIT") + flag_string + tr ("Edit via ") + editor.name ());
             listener.send_message (QLatin1String ("MENU_ITEM:EDIT") + flag_string + tr ("Edit"));
@@ -1296,7 +1296,7 @@ void SocketApi.command_GET_MENU_ITEMS (string &argument, Occ.Socket_listener *li
     listener.send_message (string ("GET_MENU_ITEMS:END"));
 }
 
-Direct_editor* SocketApi.get_direct_editor_for_local_file (string &local_file) {
+DirectEditor* SocketApi.get_direct_editor_for_local_file (string &local_file) {
     File_data file_data = File_data.get (local_file);
     auto capabilities = file_data.folder.account_state ().account ().capabilities ();
 
@@ -1305,9 +1305,9 @@ Direct_editor* SocketApi.get_direct_editor_for_local_file (string &local_file) {
         const auto mime_match_mode = record.is_virtual_file () ? QMimeDatabase.Match_extension : QMimeDatabase.Match_default;
 
         QMimeDatabase db;
-        QMime_type type = db.mime_type_for_file (local_file, mime_match_mode);
+        QMimeType type = db.mime_type_for_file (local_file, mime_match_mode);
 
-        Direct_editor* editor = capabilities.get_direct_editor_for_mimetype (type);
+        DirectEditor* editor = capabilities.get_direct_editor_for_mimetype (type);
         if (!editor) {
             editor = capabilities.get_direct_editor_for_optional_mimetype (type);
         }

@@ -396,7 +396,7 @@ private:
 
         // If there were redirects on the *authed* requests, also store
         // the updated server URL, similar to redirects on status.php.
-        QUrl redirect_url = reply.attribute (QNetworkRequest.Redirection_target_attribute).to_url ();
+        QUrl redirect_url = reply.attribute (QNetworkRequest.RedirectionTargetAttribute).to_url ();
         if (!redirect_url.is_empty ()) {
             q_c_info (lc_wizard) << "Authed request was redirected to" << redirect_url.to_string ();
 
@@ -434,7 +434,7 @@ private:
 
             // Something else went wrong, maybe the response was 200 but with invalid data.
         } else {
-            error_msg = tr ("There was an invalid response to an authenticated Web_dAV request");
+            error_msg = tr ("There was an invalid response to an authenticated WebDAV request");
         }
 
         // bring wizard to top
@@ -529,17 +529,17 @@ private:
             END - Sanitize URL paths to eliminate double-slashes
             ***********************************************************/
 
-            auto *job = new Entity_exists_job (_oc_wizard.account (), new_url_path, this);
-            connect (job, &Entity_exists_job.exists, this, &OwncloudSetupWizard.slot_remote_folder_exists);
+            auto *job = new EntityExistsJob (_oc_wizard.account (), new_url_path, this);
+            connect (job, &EntityExistsJob.exists, this, &OwncloudSetupWizard.slot_remote_folder_exists);
             job.start ();
         } else {
             finalize_setup (false);
         }
     }
 
-    // ### TODO move into Entity_exists_job once we decide if/how to return gui strings from jobs
+    // ### TODO move into EntityExistsJob once we decide if/how to return gui strings from jobs
     void OwncloudSetupWizard.slot_remote_folder_exists (QNetworkReply *reply) {
-        auto job = qobject_cast<Entity_exists_job> (sender ());
+        auto job = qobject_cast<EntityExistsJob> (sender ());
         bool ok = true;
         string error;
         QNetworkReply.NetworkError err_id = reply.error ();
@@ -568,9 +568,9 @@ private:
     void OwncloudSetupWizard.create_remote_folder () {
         _oc_wizard.append_to_configuration_log (tr ("creating folder on Nextcloud : %1").arg (_remote_folder));
 
-        auto *job = new Mk_col_job (_oc_wizard.account (), _remote_folder, this);
-        connect (job, &Mk_col_job.finished_with_error, this, &OwncloudSetupWizard.slot_create_remote_folder_finished);
-        connect (job, &Mk_col_job.finished_without_error, this, [this] {
+        auto *job = new MkColJob (_oc_wizard.account (), _remote_folder, this);
+        connect (job, &MkColJob.finished_with_error, this, &OwncloudSetupWizard.slot_create_remote_folder_finished);
+        connect (job, &MkColJob.finished_without_error, this, [this] {
             _oc_wizard.append_to_configuration_log (tr ("Remote folder %1 created successfully.").arg (_remote_folder));
             finalize_setup (true);
         });
@@ -590,7 +590,7 @@ private:
             _oc_wizard.display_error (tr ("The folder creation resulted in HTTP error code %1").arg (static_cast<int> (error)), false);
 
             _oc_wizard.append_to_configuration_log (tr ("The folder creation resulted in HTTP error code %1").arg (static_cast<int> (error)));
-        } else if (error == QNetworkReply.Operation_canceled_error) {
+        } else if (error == QNetworkReply.OperationCanceledError) {
             _oc_wizard.display_error (tr ("The remote folder creation failed because the provided credentials "
                                        "are wrong!"
                                        "<br/>Please go back and check your credentials.</p>"),

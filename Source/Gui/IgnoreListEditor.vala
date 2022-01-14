@@ -51,10 +51,10 @@ private:
         //FIXME This is not true. The entries are hardcoded below in setup_table_read_only_items
         read_only_tooltip = tr ("This entry is provided by the system at \"%1\" "
                              "and cannot be modified in this view.")
-                              .arg (QDir.to_native_separators (cfg_file.exclude_file (ConfigFile.System_scope)));
+                              .arg (QDir.to_native_separators (cfg_file.exclude_file (ConfigFile.SystemScope)));
 
         setup_table_read_only_items ();
-        const auto user_config = cfg_file.exclude_file (ConfigFile.Scope.User_scope);
+        const auto user_config = cfg_file.exclude_file (ConfigFile.Scope.UserScope);
         ui.ignore_table_widget.read_ignore_file (user_config);
 
         connect (this, &Gtk.Dialog.accepted, [=] () {
@@ -96,7 +96,7 @@ private:
 
         ConfigFile cfg_file;
         setup_table_read_only_items ();
-        ui.ignore_table_widget.read_ignore_file (cfg_file.exclude_file (ConfigFile.System_scope), false);
+        ui.ignore_table_widget.read_ignore_file (cfg_file.exclude_file (ConfigFile.SystemScope), false);
     }
 
     } // namespace Occ

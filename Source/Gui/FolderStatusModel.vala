@@ -59,7 +59,7 @@ class FolderStatusModel : QAbstractItemModel {
         bool _is_encrypted = false;
 
         bool _fetched = false; // If we did the LSCOL for this folder already
-        QPointer<Ls_col_job> _fetching_job; // Currently running Ls_col_job
+        QPointer<LsColJob> _fetching_job; // Currently running LsColJob
         bool _has_error = false; // If the last fetching job ended in an error
         string _last_error_string;
         bool _fetching_label = false; // Whether a 'fetching in progress' label is shown.
@@ -699,14 +699,14 @@ void FolderStatusModel.fetch_more (QModelIndex &parent) {
     info.reset_subs (this, parent);
     string path = info._folder.remote_path_trailing_slash ();
 
-    // info._path always contains non-mangled name, so we need to use mangled when requesting nested folders for encrypted subfolders as required by Ls_col_job
+    // info._path always contains non-mangled name, so we need to use mangled when requesting nested folders for encrypted subfolders as required by LsColJob
     const string info_path = (info._is_encrypted && !info._e2e_mangled_name.is_empty ()) ? info._e2e_mangled_name : info._path;
 
     if (info_path != QLatin1String ("/")) {
         path += info_path;
     }
 
-    auto *job = new Ls_col_job (_account_state.account (), path, this);
+    auto *job = new LsColJob (_account_state.account (), path, this);
     info._fetching_job = job;
     auto props = QList<QByteArray> () << "resourcetype"
                                      << "http://owncloud.org/ns:size"
@@ -718,13 +718,13 @@ void FolderStatusModel.fetch_more (QModelIndex &parent) {
     job.set_properties (props);
 
     job.set_timeout (60 * 1000);
-    connect (job, &Ls_col_job.directory_listing_subfolders,
+    connect (job, &LsColJob.directory_listing_subfolders,
         this, &FolderStatusModel.slot_update_directories);
-    connect (job, &Ls_col_job.finished_with_error,
+    connect (job, &LsColJob.finished_with_error,
         this, &FolderStatusModel.slot_lscol_finished_with_error);
-    connect (job, &Ls_col_job.directory_listing_iterated,
+    connect (job, &LsColJob.directory_listing_iterated,
         this, &FolderStatusModel.slot_gather_permissions);
-    connect (job, &Ls_col_job.directory_listing_iterated,
+    connect (job, &LsColJob.directory_listing_iterated,
             this, &FolderStatusModel.slot_gather_encryption_status);
 
     job.start ();
@@ -751,7 +751,7 @@ void FolderStatusModel.slot_gather_permissions (string &href, QMap<string, strin
     auto job = sender ();
     auto permission_map = job.property (property_permission_map).to_map ();
     job.set_property (property_permission_map, QVariant ()); // avoid a detach of the map while it is modified
-    ASSERT (!href.ends_with (QLatin1Char ('/')), "Ls_col_xMLParser.parse should remove the trailing slash before calling us.");
+    ASSERT (!href.ends_with (QLatin1Char ('/')), "LsColXMLParser.parse should remove the trailing slash before calling us.");
     permission_map[href] = *it;
     job.set_property (property_permission_map, permission_map);
 }
@@ -764,13 +764,13 @@ void FolderStatusModel.slot_gather_encryption_status (string &href, QMap<string,
     auto job = sender ();
     auto encryption_map = job.property (property_encryption_map).to_map ();
     job.set_property (property_encryption_map, QVariant ()); // avoid a detach of the map while it is modified
-    ASSERT (!href.ends_with (QLatin1Char ('/')), "Ls_col_xMLParser.parse should remove the trailing slash before calling us.");
+    ASSERT (!href.ends_with (QLatin1Char ('/')), "LsColXMLParser.parse should remove the trailing slash before calling us.");
     encryption_map[href] = *it;
     job.set_property (property_encryption_map, encryption_map);
 }
 
 void FolderStatusModel.slot_update_directories (QStringList &list) {
-    auto job = qobject_cast<Ls_col_job> (sender ());
+    auto job = qobject_cast<LsColJob> (sender ());
     ASSERT (job);
     QModelIndex idx = qvariant_cast<QPersistent_model_index> (job.property (property_parent_index_c));
     auto parent_info = info_for_index (idx);
@@ -847,7 +847,7 @@ void FolderStatusModel.slot_update_directories (QStringList &list) {
             new_info._name = remove_trailing_slash (rec._path).split ('/').last ();
             if (rec._is_e2e_encrypted && !rec._e2e_mangled_name.is_empty ()) {
                 // we must use local path for Settings Dialog's filesystem tree, otherwise open and create new folder actions won't work
-                // hence, we are storing _e2e_mangled_name separately so it can be use later for Ls_col_job
+                // hence, we are storing _e2e_mangled_name separately so it can be use later for LsColJob
                 new_info._e2e_mangled_name = relative_path;
                 new_info._path = rec._path;
             }
@@ -920,7 +920,7 @@ void FolderStatusModel.slot_update_directories (QStringList &list) {
 }
 
 void FolderStatusModel.slot_lscol_finished_with_error (QNetworkReply *r) {
-    auto job = qobject_cast<Ls_col_job> (sender ());
+    auto job = qobject_cast<LsColJob> (sender ());
     ASSERT (job);
     QModelIndex idx = qvariant_cast<QPersistent_model_index> (job.property (property_parent_index_c));
     if (!idx.is_valid ()) {
@@ -1225,7 +1225,7 @@ void FolderStatusModel.slot_folder_sync_state_change (Folder *f) {
     if (!f.can_sync () || state == SyncResult.Problem || state == SyncResult.Success || state == SyncResult.Error) {
         // Reset progress info.
         pi = SubFolderInfo.Progress ();
-    } else if (state == SyncResult.Not_yet_started) {
+    } else if (state == SyncResult.NotYetStarted) {
         FolderMan *folder_man = FolderMan.instance ();
         int pos = folder_man.schedule_queue ().index_of (f);
         for (auto other : folder_man.map ()) {

@@ -173,7 +173,7 @@ class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_s
 
     bool Vfs_suffix.stat_type_virtual_file (csync_file_stat_t *stat, void *) {
         if (stat.path.ends_with (file_suffix ().to_utf8 ())) {
-            stat.type = Item_type_virtual_file;
+            stat.type = ItemTypeVirtualFile;
             return true;
         }
         return false;

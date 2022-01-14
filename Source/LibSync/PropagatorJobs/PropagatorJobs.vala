@@ -33,10 +33,10 @@ static const char content_md5Header_c[] = "Content-MD5";
 @brief Declaration of the other propagation jobs
 @ingroup libsync
 ***********************************************************/
-class Propagate_local_remove : Propagate_item_job {
+class PropagateLocalRemove : PropagateItemJob {
 public:
-    Propagate_local_remove (Owncloud_propagator *propagator, SyncFileItemPtr &item)
-        : Propagate_item_job (propagator, item) {
+    PropagateLocalRemove (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+        : PropagateItemJob (propagator, item) {
     }
     void start () override;
 
@@ -47,13 +47,13 @@ private:
 };
 
 /***********************************************************
-@brief The Propagate_local_mkdir class
+@brief The PropagateLocalMkdir class
 @ingroup libsync
 ***********************************************************/
-class Propagate_local_mkdir : Propagate_item_job {
+class PropagateLocalMkdir : PropagateItemJob {
 public:
-    Propagate_local_mkdir (Owncloud_propagator *propagator, SyncFileItemPtr &item)
-        : Propagate_item_job (propagator, item)
+    PropagateLocalMkdir (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+        : PropagateItemJob (propagator, item)
         , _delete_existing_file (false) {
     }
     void start () override;
@@ -74,17 +74,17 @@ private:
 };
 
 /***********************************************************
-@brief The Propagate_local_rename class
+@brief The PropagateLocalRename class
 @ingroup libsync
 ***********************************************************/
-class Propagate_local_rename : Propagate_item_job {
+class PropagateLocalRename : PropagateItemJob {
 public:
-    Propagate_local_rename (Owncloud_propagator *propagator, SyncFileItemPtr &item)
-        : Propagate_item_job (propagator, item) {
+    PropagateLocalRename (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+        : PropagateItemJob (propagator, item) {
     }
     void start () override;
-    Job_parallelism parallelism () override {
-        return _item.is_directory () ? Wait_for_finished : Full_parallelism;
+    JobParallelism parallelism () override {
+        return _item.is_directory () ? WaitForFinished : FullParallelism;
     }
 };
 
@@ -100,7 +100,7 @@ public:
 
     \a path is relative to propagator ()._local_dir + _item._file and should start with a slash
     ***********************************************************/
-    bool Propagate_local_remove.remove_recursively (string &path) {
+    bool PropagateLocalRemove.remove_recursively (string &path) {
         string absolute = propagator ().full_local_path (_item._file + path);
         QStringList errors;
         QList<QPair<string, bool>> deleted;
@@ -132,7 +132,7 @@ public:
         return success;
     }
 
-    void Propagate_local_remove.start () {
+    void PropagateLocalRemove.start () {
         q_c_info (lc_propagate_local_remove) << "Start propagate local remove job";
 
         _move_to_trash = propagator ().sync_options ()._move_files_to_trash;
@@ -144,7 +144,7 @@ public:
         q_c_info (lc_propagate_local_remove) << "Going to delete:" << filename;
 
         if (propagator ().local_file_name_clash (_item._file)) {
-            done (SyncFileItem.Normal_error, tr ("Could not remove %1 because of a local file name clash").arg (QDir.to_native_separators (filename)));
+            done (SyncFileItem.NormalError, tr ("Could not remove %1 because of a local file name clash").arg (QDir.to_native_separators (filename)));
             return;
         }
 
@@ -152,19 +152,19 @@ public:
         if (_move_to_trash) {
             if ( (QDir (filename).exists () || FileSystem.file_exists (filename))
                 && !FileSystem.move_to_trash (filename, &remove_error)) {
-                done (SyncFileItem.Normal_error, remove_error);
+                done (SyncFileItem.NormalError, remove_error);
                 return;
             }
         } else {
             if (_item.is_directory ()) {
                 if (QDir (filename).exists () && !remove_recursively (string ())) {
-                    done (SyncFileItem.Normal_error, _error);
+                    done (SyncFileItem.NormalError, _error);
                     return;
                 }
             } else {
                 if (FileSystem.file_exists (filename)
                     && !FileSystem.remove (filename, &remove_error)) {
-                    done (SyncFileItem.Normal_error, remove_error);
+                    done (SyncFileItem.NormalError, remove_error);
                     return;
                 }
             }
@@ -175,18 +175,18 @@ public:
         done (SyncFileItem.Success);
     }
 
-    void Propagate_local_mkdir.start () {
+    void PropagateLocalMkdir.start () {
         if (propagator ()._abort_requested)
             return;
 
         start_local_mkdir ();
     }
 
-    void Propagate_local_mkdir.set_delete_existing_file (bool enabled) {
+    void PropagateLocalMkdir.set_delete_existing_file (bool enabled) {
         _delete_existing_file = enabled;
     }
 
-    void Propagate_local_mkdir.start_local_mkdir () {
+    void PropagateLocalMkdir.start_local_mkdir () {
         QDir new_dir (propagator ().full_local_path (_item._file));
         string new_dir_str = QDir.to_native_separators (new_dir.path ());
 
@@ -197,7 +197,7 @@ public:
             if (_delete_existing_file) {
                 string remove_error;
                 if (!FileSystem.remove (new_dir_str, &remove_error)) {
-                    done (SyncFileItem.Normal_error,
+                    done (SyncFileItem.NormalError,
                         tr ("could not delete file %1, error : %2")
                             .arg (new_dir_str, remove_error));
                     return;
@@ -205,7 +205,7 @@ public:
             } else if (_item._instruction == CSYNC_INSTRUCTION_CONFLICT) {
                 string error;
                 if (!propagator ().create_conflict (_item, _associated_composite, &error)) {
-                    done (SyncFileItem.Soft_error, error);
+                    done (SyncFileItem.SoftError, error);
                     return;
                 }
             }
@@ -213,13 +213,13 @@ public:
 
         if (Utility.fs_case_preserving () && propagator ().local_file_name_clash (_item._file)) {
             q_c_warning (lc_propagate_local_mkdir) << "New folder to create locally already exists with different case:" << _item._file;
-            done (SyncFileItem.Normal_error, tr ("Attention, possible case sensitivity clash with %1").arg (new_dir_str));
+            done (SyncFileItem.NormalError, tr ("Attention, possible case sensitivity clash with %1").arg (new_dir_str));
             return;
         }
         emit propagator ().touched_file (new_dir_str);
         QDir local_dir (propagator ().local_path ());
         if (!local_dir.mkpath (_item._file)) {
-            done (SyncFileItem.Normal_error, tr ("Could not create folder %1").arg (new_dir_str));
+            done (SyncFileItem.NormalError, tr ("Could not create folder %1").arg (new_dir_str));
             return;
         }
 
@@ -232,10 +232,10 @@ public:
         new_item._etag = "_invalid_";
         const auto result = propagator ().update_metadata (new_item);
         if (!result) {
-            done (SyncFileItem.Fatal_error, tr ("Error updating metadata : %1").arg (result.error ()));
+            done (SyncFileItem.FatalError, tr ("Error updating metadata : %1").arg (result.error ()));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-            done (SyncFileItem.Soft_error, tr ("The file %1 is currently in use").arg (new_item._file));
+            done (SyncFileItem.SoftError, tr ("The file %1 is currently in use").arg (new_item._file));
             return;
         }
         propagator ()._journal.commit ("local_mkdir");
@@ -246,7 +246,7 @@ public:
         done (result_status);
     }
 
-    void Propagate_local_rename.start () {
+    void PropagateLocalRename.start () {
         if (propagator ()._abort_requested)
             return;
 
@@ -266,7 +266,7 @@ public:
 
                 // Fixme : the file that is the reason for the clash could be named here,
                 // it would have to come out the local_file_name_clash function
-                done (SyncFileItem.Normal_error,
+                done (SyncFileItem.NormalError,
                     tr ("File %1 cannot be renamed to %2 because of a local file name clash")
                         .arg (QDir.to_native_separators (_item._file))
                         .arg (QDir.to_native_separators (_item._rename_target)));
@@ -277,7 +277,7 @@ public:
             emit propagator ().touched_file (target_file);
             string rename_error;
             if (!FileSystem.rename (existing_file, target_file, &rename_error)) {
-                done (SyncFileItem.Normal_error, rename_error);
+                done (SyncFileItem.NormalError, rename_error);
                 return;
             }
         }
@@ -301,22 +301,22 @@ public:
             }
             const auto result = propagator ().update_metadata (new_item);
             if (!result) {
-                done (SyncFileItem.Fatal_error, tr ("Error updating metadata : %1").arg (result.error ()));
+                done (SyncFileItem.FatalError, tr ("Error updating metadata : %1").arg (result.error ()));
                 return;
             } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-                done (SyncFileItem.Soft_error, tr ("The file %1 is currently in use").arg (new_item._file));
+                done (SyncFileItem.SoftError, tr ("The file %1 is currently in use").arg (new_item._file));
                 return;
             }
         } else {
             propagator ()._renamed_directories.insert (old_file, _item._rename_target);
-            if (!Propagate_remote_move.adjust_selective_sync (propagator ()._journal, old_file, _item._rename_target)) {
-                done (SyncFileItem.Fatal_error, tr ("Failed to rename file"));
+            if (!PropagateRemoteMove.adjust_selective_sync (propagator ()._journal, old_file, _item._rename_target)) {
+                done (SyncFileItem.FatalError, tr ("Failed to rename file"));
                 return;
             }
         }
         if (pin_state && *pin_state != PinState.Inherited
             && !vfs.set_pin_state (_item._rename_target, *pin_state)) {
-            done (SyncFileItem.Normal_error, tr ("Error setting pin state"));
+            done (SyncFileItem.NormalError, tr ("Error setting pin state"));
             return;
         }
 

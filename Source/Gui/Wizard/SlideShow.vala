@@ -57,7 +57,7 @@ protected:
     void mouse_press_event (QMouse_event *event) override;
     void mouse_release_event (QMouse_event *event) override;
     void paint_event (QPaint_event *event) override;
-    void timer_event (QTimer_event *event) override;
+    void timer_event (QTimerEvent *event) override;
 
 private:
     void maybe_restart_timer ();
@@ -208,7 +208,7 @@ void Slide_show.paint_event (QPaint_event *) {
     }
 }
 
-void Slide_show.timer_event (QTimer_event *event) {
+void Slide_show.timer_event (QTimerEvent *event) {
     if (event.timer_id () == _timer.timer_id ())
         next_slide ();
 }

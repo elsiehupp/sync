@@ -24,7 +24,7 @@ namespace Ui {
 @brief The SslDialogErrorHandler class
 @ingroup gui
 ***********************************************************/
-class SslDialogErrorHandler : Abstract_sslErrorHandler {
+class SslDialogErrorHandler : AbstractSslErrorHandler {
 
     public bool handle_errors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, AccountPtr) override;
 };

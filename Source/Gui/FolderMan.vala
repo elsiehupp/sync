@@ -1732,7 +1732,7 @@ void FolderMan.tray_overall_status (QList<Folder> &folders,
 
                 switch (sync_status) {
                 case SyncResult.Undefined:
-                case SyncResult.Not_yet_started:
+                case SyncResult.NotYetStarted:
                     various++;
                     break;
                 case SyncResult.Sync_prepare:
@@ -1776,7 +1776,7 @@ string FolderMan.tray_tooltip_status_string (
     case SyncResult.Undefined:
         folder_message = tr ("Undefined State.");
         break;
-    case SyncResult.Not_yet_started:
+    case SyncResult.NotYetStarted:
         folder_message = tr ("Waiting to start syncing.");
         break;
     case SyncResult.Sync_prepare:
@@ -1985,7 +1985,7 @@ void FolderMan.slot_setup_push_notifications (Folder.Map &folder_map) {
     for (auto folder : folder_map) {
         const auto account = folder.account_state ().account ();
 
-        // See if the account already provides the Push_notifications object and if yes connect to it.
+        // See if the account already provides the PushNotifications object and if yes connect to it.
         // If we can't connect at this point, the signals will be connected in slot_push_notifications_ready ()
         // after the Push_notification object emitted the ready signal
         slot_connect_to_push_notifications (account.data ());
@@ -2012,7 +2012,7 @@ void FolderMan.slot_connect_to_push_notifications (Account *account) {
 
     if (push_notifications_files_ready (account)) {
         q_c_info (lc_folder_man) << "Push notifications ready";
-        connect (push_notifications, &Push_notifications.files_changed, this, &FolderMan.slot_process_files_push_notification, Qt.UniqueConnection);
+        connect (push_notifications, &PushNotifications.files_changed, this, &FolderMan.slot_process_files_push_notification, Qt.UniqueConnection);
     }
 }
 

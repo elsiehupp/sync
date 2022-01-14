@@ -6,10 +6,10 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
 /***********************************************************
 Removing the root encrypted folder is consisted of multiple steps:
-- 1st step is to obtain the folder_iD via Ls_col_job so it then can be used for the next step
+- 1st step is to obtain the folder_iD via LsColJob so it then can be used for the next step
 - 2nd step is to lock the root folder useing the folder_iD from the previous step. !!! NOTE : If there are no nested items in the folder, this, and subsequent steps are skipped until step 7.
 - 3rd step is to obtain the root folder's metadata (it contains list of nested files and folders)
-- 4th step is to remove the nested files and folders from the metadata and send it to the server via Update_metadata_api_job
+- 4th step is to remove the nested files and folders from the metadata and send it to the server via UpdateMetadataApiJob
 - 5th step is to trigger DeleteJob for every nested file and folder of the root folder
 - 6th step is to unlock the root folder using the previously obtained token from locking
 - 7th step is to decrypt and delete the root folder, because it is now possible as it has become empty
@@ -29,9 +29,9 @@ namespace {
     const char* encrypted_file_name_property_key = "encrypted_file_name";
 }
 
-class Propagate_remote_delete_encrypted_root_folder : Abstract_propagate_remote_delete_encrypted {
+class Propagate_remote_delete_encrypted_root_folder : AbstractPropagateRemoteDeleteEncrypted {
 public:
-    Propagate_remote_delete_encrypted_root_folder (Owncloud_propagator *propagator, SyncFileItemPtr item, GLib.Object *parent);
+    Propagate_remote_delete_encrypted_root_folder (OwncloudPropagator *propagator, SyncFileItemPtr item, GLib.Object *parent);
 
     void start () override;
 
@@ -56,8 +56,8 @@ private:
 
 
 
-Propagate_remote_delete_encrypted_root_folder.Propagate_remote_delete_encrypted_root_folder (Owncloud_propagator *propagator, SyncFileItemPtr item, GLib.Object *parent)
-    : Abstract_propagate_remote_delete_encrypted (propagator, item, parent) {
+Propagate_remote_delete_encrypted_root_folder.Propagate_remote_delete_encrypted_root_folder (OwncloudPropagator *propagator, SyncFileItemPtr item, GLib.Object *parent)
+    : AbstractPropagateRemoteDeleteEncrypted (propagator, item, parent) {
 
 }
 
@@ -78,7 +78,7 @@ void Propagate_remote_delete_encrypted_root_folder.start () {
 }
 
 void Propagate_remote_delete_encrypted_root_folder.slot_folder_un_locked_successfully (QByteArray &folder_id) {
-    Abstract_propagate_remote_delete_encrypted.slot_folder_un_locked_successfully (folder_id);
+    AbstractPropagateRemoteDeleteEncrypted.slot_folder_un_locked_successfully (folder_id);
     decrypt_and_remote_delete ();
 }
 
@@ -92,7 +92,7 @@ void Propagate_remote_delete_encrypted_root_folder.slot_folder_encrypted_metadat
         return;
     }
 
-    Folder_metadata metadata (_propagator.account (), json.to_json (QJsonDocument.Compact), status_code);
+    FolderMetadata metadata (_propagator.account (), json.to_json (QJsonDocument.Compact), status_code);
 
     q_c_debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "It's a root encrypted folder. Let's remove nested items first.";
 
@@ -100,14 +100,14 @@ void Propagate_remote_delete_encrypted_root_folder.slot_folder_encrypted_metadat
 
     q_c_debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) << "Metadata updated, sending to the server.";
 
-    auto job = new Update_metadata_api_job (_propagator.account (), _folder_id, metadata.encrypted_metadata (), _folder_token);
-    connect (job, &Update_metadata_api_job.success, this, [this] (QByteArray& file_id) {
+    auto job = new UpdateMetadataApiJob (_propagator.account (), _folder_id, metadata.encrypted_metadata (), _folder_token);
+    connect (job, &UpdateMetadataApiJob.success, this, [this] (QByteArray& file_id) {
         Q_UNUSED (file_id);
         for (auto it = _nested_items.const_begin (); it != _nested_items.const_end (); ++it) {
             delete_nested_remote_item (it.key ());
         }
     });
-    connect (job, &Update_metadata_api_job.error, this, &Propagate_remote_delete_encrypted_root_folder.task_failed);
+    connect (job, &UpdateMetadataApiJob.error, this, &Propagate_remote_delete_encrypted_root_folder.task_failed);
     job.start ();
 }
 
@@ -152,7 +152,7 @@ void Propagate_remote_delete_encrypted_root_folder.slot_delete_nested_remote_ite
         // throw an error.
         store_first_error_string (tr ("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
                         .arg (http_error_code)
-                        .arg (delete_job.reply ().attribute (QNetworkRequest.Http_reason_phrase_attribute).to_string ()));
+                        .arg (delete_job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_string ()));
         if (_item._http_error_code == 0) {
             _item._http_error_code = http_error_code;
         }
@@ -185,12 +185,12 @@ void Propagate_remote_delete_encrypted_root_folder.delete_nested_remote_item (st
 }
 
 void Propagate_remote_delete_encrypted_root_folder.decrypt_and_remote_delete () {
-    auto job = new Occ.Set_encryption_flag_api_job (_propagator.account (), _item._file_id, Occ.Set_encryption_flag_api_job.Clear, this);
-    connect (job, &Occ.Set_encryption_flag_api_job.success, this, [this] (QByteArray &file_id) {
+    auto job = new Occ.SetEncryptionFlagApiJob (_propagator.account (), _item._file_id, Occ.SetEncryptionFlagApiJob.Clear, this);
+    connect (job, &Occ.SetEncryptionFlagApiJob.success, this, [this] (QByteArray &file_id) {
         Q_UNUSED (file_id);
         delete_remote_item (_item._file);
     });
-    connect (job, &Occ.Set_encryption_flag_api_job.error, this, [this] (QByteArray &file_id, int http_return_code) {
+    connect (job, &Occ.SetEncryptionFlagApiJob.error, this, [this] (QByteArray &file_id, int http_return_code) {
         Q_UNUSED (file_id);
         _item._http_error_code = http_return_code;
         task_failed ();

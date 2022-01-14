@@ -106,7 +106,7 @@ public slots:
     ***********************************************************/
     void set_color (QColor & color);
 protected:
-    void timer_event (QTimer_event * event) override;
+    void timer_event (QTimerEvent * event) override;
     void paint_event (QPaint_event * event) override;
 private:
     int m_angle = 0;
@@ -211,7 +211,7 @@ int QProgress_indicator.height_for_width (int w) {
     return w;
 }
 
-void QProgress_indicator.timer_event (QTimer_event * /*event*/) {
+void QProgress_indicator.timer_event (QTimerEvent * /*event*/) {
     m_angle = (m_angle+30)%360;
 
     update ();

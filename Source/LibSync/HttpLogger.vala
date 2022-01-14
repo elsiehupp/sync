@@ -13,7 +13,7 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 // #include <QUrl>
 
 namespace Occ {
-namespace Http_logger {
+namespace HttpLogger {
     void log_request (QNetworkReply *reply, QNetworkAccessManager.Operation operation, QIODevice *device);
 
     /***********************************************************
@@ -25,9 +25,9 @@ namespace Http_logger {
     }
 }
 
-    const int64 Peek_size = 1024 * 1024;
+    const int64 PeekSize = 1024 * 1024;
 
-    const QByteArray XRequest_id (){
+    const QByteArray XRequestId (){
         return QByteArrayLiteral ("X-Request-ID");
     }
 
@@ -36,7 +36,7 @@ namespace Http_logger {
         return regexp.match (s).has_match ();
     }
 
-    void log_http (QByteArray &verb, string &url, QByteArray &id, string &content_type, QList<QNetworkReply.Raw_header_pair> &header, QIODevice *device) {
+    void log_http (QByteArray &verb, string &url, QByteArray &id, string &content_type, QList<QNetworkReply.RawHeaderPair> &header, QIODevice *device) {
         const auto reply = qobject_cast<QNetworkReply> (device);
         const auto content_length = device ? device.size () : 0;
         string msg;
@@ -68,12 +68,12 @@ namespace Http_logger {
                 if (!device.is_open ()) {
                     Q_ASSERT (dynamic_cast<QBuffer> (device));
                     // should we close it again?
-                    device.open (QIODevice.Read_only);
+                    device.open (QIODevice.ReadOnly);
                 }
                 Q_ASSERT (device.pos () == 0);
-                stream << device.peek (Peek_size);
-                if (Peek_size < content_length) {
-                    stream << "... (" << (content_length - Peek_size) << "bytes elided)";
+                stream << device.peek (PeekSize);
+                if (PeekSize < content_length) {
+                    stream << "... (" << (content_length - PeekSize) << "bytes elided)";
                 }
             } else {
                 stream << content_length << " bytes of " << content_type << " data";
@@ -84,20 +84,20 @@ namespace Http_logger {
     }
 
 
-    void Http_logger.log_request (QNetworkReply *reply, QNetworkAccessManager.Operation operation, QIODevice *device) {
+    void HttpLogger.log_request (QNetworkReply *reply, QNetworkAccessManager.Operation operation, QIODevice *device) {
         const auto request = reply.request ();
         if (!lc_network_http ().is_info_enabled ()) {
             return;
         }
         const auto keys = request.raw_header_list ();
-        QList<QNetworkReply.Raw_header_pair> header;
+        QList<QNetworkReply.RawHeaderPair> header;
         header.reserve (keys.size ());
         for (auto &key : keys) {
             header << q_make_pair (key, request.raw_header (key));
         }
         log_http (request_verb (operation, request),
             request.url ().to_string (),
-            request.raw_header (XRequest_id ()),
+            request.raw_header (XRequestId ()),
             request.header (QNetworkRequest.ContentTypeHeader).to_string (),
             header,
             device);
@@ -105,28 +105,28 @@ namespace Http_logger {
         GLib.Object.connect (reply, &QNetworkReply.finished, reply, [reply] {
             log_http (request_verb (*reply),
                 reply.url ().to_string (),
-                reply.request ().raw_header (XRequest_id ()),
+                reply.request ().raw_header (XRequestId ()),
                 reply.header (QNetworkRequest.ContentTypeHeader).to_string (),
                 reply.raw_header_pairs (),
                 reply);
         });
     }
 
-    QByteArray Http_logger.request_verb (QNetworkAccessManager.Operation operation, QNetworkRequest &request) {
+    QByteArray HttpLogger.request_verb (QNetworkAccessManager.Operation operation, QNetworkRequest &request) {
         switch (operation) {
-        case QNetworkAccessManager.Head_operation:
+        case QNetworkAccessManager.HeadOperation:
             return QByteArrayLiteral ("HEAD");
-        case QNetworkAccessManager.Get_operation:
+        case QNetworkAccessManager.GetOperation:
             return QByteArrayLiteral ("GET");
-        case QNetworkAccessManager.Put_operation:
+        case QNetworkAccessManager.PutOperation:
             return QByteArrayLiteral ("PUT");
-        case QNetworkAccessManager.Post_operation:
+        case QNetworkAccessManager.PostOperation:
             return QByteArrayLiteral ("POST");
-        case QNetworkAccessManager.Delete_operation:
+        case QNetworkAccessManager.DeleteOperation:
             return QByteArrayLiteral ("DELETE");
-        case QNetworkAccessManager.Custom_operation:
-            return request.attribute (QNetworkRequest.Custom_verb_attribute).to_byte_array ();
-        case QNetworkAccessManager.Unknown_operation:
+        case QNetworkAccessManager.CustomOperation:
+            return request.attribute (QNetworkRequest.CustomVerbAttribute).to_byte_array ();
+        case QNetworkAccessManager.UnknownOperation:
             break;
         }
         Q_UNREACHABLE ();

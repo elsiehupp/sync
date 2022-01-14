@@ -175,7 +175,7 @@ private:
         AccountPtr account = _account_state.account ();
         if (account.url ().scheme () == QLatin1String ("https")) {
             set_icon (QIcon (QLatin1String (":/client/theme/lock-https.svg")));
-            QSsl_cipher cipher = account._session_cipher;
+            QSslCipher cipher = account._session_cipher;
             set_tool_tip (tr ("This connection is encrypted using %1 bit %2.\n").arg (cipher.used_bits ()).arg (cipher.name ()));
         } else {
             set_icon (QIcon (QLatin1String (":/client/theme/lock-http.svg")));
@@ -228,7 +228,7 @@ private:
             }
             chain = tmp_chain;
 
-            // find trust anchor (informational only, verification is done by QSsl_socket!)
+            // find trust anchor (informational only, verification is done by QSslSocket!)
             for (QSslCertificate &root_cA : system_certs) {
                 if (root_cA.issuer_info (QSslCertificate.Common_name) == chain.last ().issuer_info (QSslCertificate.Common_name)
                     && root_cA.issuer_info (QSslCertificate.Organization) == chain.last ().issuer_info (QSslCertificate.Organization)) {

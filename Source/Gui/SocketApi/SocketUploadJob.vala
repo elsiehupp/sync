@@ -103,9 +103,9 @@ void Socket_upload_job.start () {
     _engine.set_sync_options (opt);
 
     // create the dir, fail if it already exists
-    auto mkdir = new Occ.Mk_col_job (_engine.account (), _remote_path);
-    connect (mkdir, &Occ.Mk_col_job.finished_without_error, _engine, &Occ.SyncEngine.start_sync);
-    connect (mkdir, &Occ.Mk_col_job.finished_with_error, this, [this] (QNetworkReply *reply) {
+    auto mkdir = new Occ.MkColJob (_engine.account (), _remote_path);
+    connect (mkdir, &Occ.MkColJob.finished_without_error, _engine, &Occ.SyncEngine.start_sync);
+    connect (mkdir, &Occ.MkColJob.finished_with_error, this, [this] (QNetworkReply *reply) {
         if (reply.error () == 202) {
             _api_job.failure (QStringLiteral ("Destination %1 already exists").arg (_remote_path));
         } else {

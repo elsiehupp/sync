@@ -32,7 +32,7 @@ signals:
     void file_status_changed (string &system_file_name, SyncFileStatus file_status);
 
 private slots:
-    void slot_about_to_propagate (Sync_file_item_vector &items);
+    void slot_about_to_propagate (SyncFileItemVector &items);
     void slot_item_completed (SyncFileItemPtr &item);
     void slot_sync_finished ();
     void slot_sync_engine_running_changed ();
@@ -120,20 +120,20 @@ private:
     static inline bool has_error_status (SyncFileItem &item) {
         const auto status = item._status;
         return item._instruction == CSYNC_INSTRUCTION_ERROR
-            || status == SyncFileItem.Normal_error
-            || status == SyncFileItem.Fatal_error
-            || status == SyncFileItem.Detail_error
-            || status == SyncFileItem.Blacklisted_error
+            || status == SyncFileItem.NormalError
+            || status == SyncFileItem.FatalError
+            || status == SyncFileItem.DetailError
+            || status == SyncFileItem.BlacklistedError
             || item._has_blacklist_entry;
     }
 
     static inline bool has_excluded_status (SyncFileItem &item) {
         const auto status = item._status;
         return item._instruction == CSYNC_INSTRUCTION_IGNORE
-            || status == SyncFileItem.File_ignored
+            || status == SyncFileItem.FileIgnored
             || status == SyncFileItem.Conflict
             || status == SyncFileItem.Restoration
-            || status == SyncFileItem.File_locked;
+            || status == SyncFileItem.FileLocked;
     }
 
     SyncFileStatusTracker.SyncFileStatusTracker (SyncEngine *sync_engine)
@@ -175,7 +175,7 @@ private:
         // First look it up in the database to know if it's shared
         SyncJournalFileRecord rec;
         if (_sync_engine.journal ().get_file_record (relative_path, &rec) && rec.is_valid ()) {
-            return resolve_sync_and_error_status (relative_path, rec._remote_perm.has_permission (RemotePermissions.Is_shared) ? Shared : Not_shared);
+            return resolve_sync_and_error_status (relative_path, rec._remote_perm.has_permission (RemotePermissions.IsShared) ? Shared : Not_shared);
         }
 
         // Must be a new file not yet in the database, check if it's syncing or has an error.
@@ -238,7 +238,7 @@ private:
         }
     }
 
-    void SyncFileStatusTracker.slot_about_to_propagate (Sync_file_item_vector &items) {
+    void SyncFileStatusTracker.slot_about_to_propagate (SyncFileItemVector &items) {
         ASSERT (_sync_count.is_empty ());
 
         Problems_map old_problems;
@@ -255,7 +255,7 @@ private:
                 _sync_problems[item.destination ()] = SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
             }
 
-            Shared_flag shared_flag = item._remote_perm.has_permission (RemotePermissions.Is_shared) ? Shared : Not_shared;
+            Shared_flag shared_flag = item._remote_perm.has_permission (RemotePermissions.IsShared) ? Shared : Not_shared;
             if (item._instruction != CSYNC_INSTRUCTION_NONE
                 && item._instruction != CSYNC_INSTRUCTION_UPDATE_METADATA
                 && item._instruction != CSYNC_INSTRUCTION_IGNORE
@@ -300,7 +300,7 @@ private:
             _sync_problems.erase (item.destination ());
         }
 
-        Shared_flag shared_flag = item._remote_perm.has_permission (RemotePermissions.Is_shared) ? Shared : Not_shared;
+        Shared_flag shared_flag = item._remote_perm.has_permission (RemotePermissions.IsShared) ? Shared : Not_shared;
         if (item._instruction != CSYNC_INSTRUCTION_NONE
             && item._instruction != CSYNC_INSTRUCTION_UPDATE_METADATA
             && item._instruction != CSYNC_INSTRUCTION_IGNORE

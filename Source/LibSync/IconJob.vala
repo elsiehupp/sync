@@ -16,9 +16,9 @@ namespace Occ {
 @brief Job to fetch a icon
 @ingroup gui
 ***********************************************************/
-class Icon_job : GLib.Object {
+class IconJob : GLib.Object {
 public:
-    Icon_job (AccountPtr account, QUrl &url, GLib.Object *parent = nullptr);
+    IconJob (AccountPtr account, QUrl &url, GLib.Object *parent = nullptr);
 
 signals:
     void job_finished (QByteArray icon_data);
@@ -28,17 +28,17 @@ private slots:
     void finished ();
 };
 
-    Icon_job.Icon_job (AccountPtr account, QUrl &url, GLib.Object *parent)
+    IconJob.IconJob (AccountPtr account, QUrl &url, GLib.Object *parent)
         : GLib.Object (parent) {
         QNetworkRequest request (url);
     #if (QT_VERSION >= 0x050600)
-        request.set_attribute (QNetworkRequest.Follow_redirects_attribute, true);
+        request.set_attribute (QNetworkRequest.FollowRedirectsAttribute, true);
     #endif
         const auto reply = account.send_raw_request (QByteArrayLiteral ("GET"), url, request);
-        connect (reply, &QNetworkReply.finished, this, &Icon_job.finished);
+        connect (reply, &QNetworkReply.finished, this, &IconJob.finished);
     }
 
-    void Icon_job.finished () {
+    void IconJob.finished () {
         const auto reply = qobject_cast<QNetworkReply> (sender ());
         if (!reply) {
             return;

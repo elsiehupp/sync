@@ -49,7 +49,7 @@ private:
     void SyncRunFileLog.start (string &folder_path) {
         const int64 logfile_max_size = 10 * 1024 * 1024; // 10Mi_b
 
-        const string logpath = QStandardPaths.writable_location (QStandardPaths.App_data_location);
+        const string logpath = QStandardPaths.writable_location (QStandardPaths.AppDataLocation);
         if (!QDir (logpath).exists ()) {
             QDir ().mkdir (logpath);
         }
@@ -62,7 +62,7 @@ private:
         while (QFile.exists (filename)) {
 
             QFile file (filename);
-            file.open (QIODevice.Read_only| QIODevice.Text);
+            file.open (QIODevice.ReadOnly| QIODevice.Text);
             QTextStream in (&file);
             string line = in.read_line ();
 

@@ -8,7 +8,7 @@
 // #include <QDir>
 // #include <QJsonObject>
 // #include <QXmlStreamReader>
-// #include <QXml_stream_namespace_declaration>
+// #include <QXmlStreamNamespaceDeclaration>
 // #include <QStack>
 // #include <QInputDialog>
 // #include <QLineEdit>
@@ -23,7 +23,7 @@ anything that goes thru the server and expects a response, is here.
 
 To be
 \code
-_job = new Sign_publi
+_job = new SignPubli
 _job.set_csr ( csr
 connect (_job.
 _job.start
@@ -31,9 +31,9 @@ _job.start
 
 @ingroup libsync
 ***********************************************************/
-class Sign_public_key_api_job : AbstractNetworkJob {
+class SignPublicKeyApiJob : AbstractNetworkJob {
 public:
-    Sign_public_key_api_job (AccountPtr &account, string &path, GLib.Object *parent = nullptr);
+    SignPublicKeyApiJob (AccountPtr &account, string &path, GLib.Object *parent = nullptr);
 
     /***********************************************************
     @brief set_csr - the CSR with the public key.
@@ -60,11 +60,11 @@ private:
 };
 
 /***********************************************************
-@brief Job to upload the Private_key that return JSON
+@brief Job to upload the PrivateKey that return JSON
 
 To be
 \code
-_job = new Store_private_key_api_jo
+_job = new StorePrivateKeyApiJob
 _job.set_private_key
 connect (_job.
 _job.start
@@ -72,9 +72,9 @@ _job.start
 
 @ingroup libsync
 ***********************************************************/
-class Store_private_key_api_job : AbstractNetworkJob {
+class StorePrivateKeyApiJob : AbstractNetworkJob {
 public:
-    Store_private_key_api_job (AccountPtr &account, string &path, GLib.Object *parent = nullptr);
+    StorePrivateKeyApiJob (AccountPtr &account, string &path, GLib.Object *parent = nullptr);
 
     /***********************************************************
     @brief set_csr - the CSR with the public key.
@@ -112,14 +112,14 @@ _job.start ();
 
 @ingroup libsync
 ***********************************************************/
-class Set_encryption_flag_api_job : AbstractNetworkJob {
+class SetEncryptionFlagApiJob : AbstractNetworkJob {
 public:
-    enum Flag_action {
+    enum FlagAction {
         Clear = 0,
         Set = 1
     };
 
-    Set_encryption_flag_api_job (AccountPtr &account, QByteArray &file_id, Flag_action flag_action = Set, GLib.Object *parent = nullptr);
+    SetEncryptionFlagApiJob (AccountPtr &account, QByteArray &file_id, FlagAction flag_action = Set, GLib.Object *parent = nullptr);
 
 public slots:
     void start () override;
@@ -133,12 +133,12 @@ signals:
 
 private:
     QByteArray _file_id;
-    Flag_action _flag_action = Set;
+    FlagAction _flag_action = Set;
 };
 
-class Lock_encrypt_folder_api_job : AbstractNetworkJob {
+class LockEncryptFolderApiJob : AbstractNetworkJob {
 public:
-    Lock_encrypt_folder_api_job (AccountPtr &account, QByteArray& file_id, GLib.Object *parent = nullptr);
+    LockEncryptFolderApiJob (AccountPtr &account, QByteArray& file_id, GLib.Object *parent = nullptr);
 
 public slots:
     void start () override;
@@ -154,9 +154,9 @@ private:
     QByteArray _file_id;
 };
 
-class Unlock_encrypt_folder_api_job : AbstractNetworkJob {
+class UnlockEncryptFolderApiJob : AbstractNetworkJob {
 public:
-    Unlock_encrypt_folder_api_job (
+    UnlockEncryptFolderApiJob (
         const AccountPtr &account,
         const QByteArray& file_id,
         const QByteArray& token,
@@ -178,9 +178,9 @@ private:
     QBuffer *_token_buf;
 };
 
-class Store_meta_data_api_job : AbstractNetworkJob {
+class StoreMetaDataApiJob : AbstractNetworkJob {
 public:
-    Store_meta_data_api_job (
+    StoreMetaDataApiJob (
         const AccountPtr &account,
         const QByteArray& file_id,
         const QByteArray& b64Metadata,
@@ -201,9 +201,9 @@ private:
     QByteArray _b64Metadata;
 };
 
-class Update_metadata_api_job : AbstractNetworkJob {
+class UpdateMetadataApiJob : AbstractNetworkJob {
 public:
-    Update_metadata_api_job (
+    UpdateMetadataApiJob (
         const AccountPtr &account,
         const QByteArray& file_id,
         const QByteArray& b64Metadata,
@@ -226,9 +226,9 @@ private:
     QByteArray _token;
 };
 
-class Get_metadata_api_job : AbstractNetworkJob {
+class GetMetadataApiJob : AbstractNetworkJob {
 public:
-    Get_metadata_api_job (
+    GetMetadataApiJob (
         const AccountPtr &account,
         const QByteArray& file_id,
         GLib.Object *parent = nullptr);
@@ -247,9 +247,9 @@ private:
     QByteArray _file_id;
 };
 
-class Delete_metadata_api_job : AbstractNetworkJob {
+class DeleteMetadataApiJob : AbstractNetworkJob {
 public:
-    Delete_metadata_api_job (
+    DeleteMetadataApiJob (
         const AccountPtr &account,
         const QByteArray& file_id,
         GLib.Object *parent = nullptr);
@@ -270,13 +270,13 @@ private:
 
 
 
-Get_metadata_api_job.Get_metadata_api_job (AccountPtr& account,
+GetMetadataApiJob.GetMetadataApiJob (AccountPtr& account,
                                     const QByteArray& file_id,
                                     GLib.Object* parent)
  : AbstractNetworkJob (account, e2ee_base_url () + QStringLiteral ("meta-data/") + file_id, parent), _file_id (file_id) {
 }
 
-void Get_metadata_api_job.start () {
+void GetMetadataApiJob.start () {
     QNetworkRequest req;
     req.set_raw_header ("OCS-APIREQUEST", "true");
     QUrlQuery query;
@@ -289,7 +289,7 @@ void Get_metadata_api_job.start () {
     AbstractNetworkJob.start ();
 }
 
-bool Get_metadata_api_job.finished () {
+bool GetMetadataApiJob.finished () {
     int ret_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
     if (ret_code != 200) {
         q_c_info (lc_cse_job ()) << "error requesting the metadata" << path () << error_string () << ret_code;
@@ -302,14 +302,14 @@ bool Get_metadata_api_job.finished () {
     return true;
 }
 
-Store_meta_data_api_job.Store_meta_data_api_job (AccountPtr& account,
+StoreMetaDataApiJob.StoreMetaDataApiJob (AccountPtr& account,
                                                  const QByteArray& file_id,
                                                  const QByteArray& b64Metadata,
                                                  GLib.Object* parent)
  : AbstractNetworkJob (account, e2ee_base_url () + QStringLiteral ("meta-data/") + file_id, parent), _file_id (file_id), _b64Metadata (b64Metadata) {
 }
 
-void Store_meta_data_api_job.start () {
+void StoreMetaDataApiJob.start () {
     QNetworkRequest req;
     req.set_raw_header ("OCS-APIREQUEST", "true");
     req.set_header (QNetworkRequest.ContentTypeHeader, QByteArrayLiteral ("application/x-www-form-urlencoded"));
@@ -327,7 +327,7 @@ void Store_meta_data_api_job.start () {
     AbstractNetworkJob.start ();
 }
 
-bool Store_meta_data_api_job.finished () {
+bool StoreMetaDataApiJob.finished () {
     int ret_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
 		if (ret_code != 200) {
 			q_c_info (lc_cse_job ()) << "error sending the metadata" << path () << error_string () << ret_code;
@@ -339,7 +339,7 @@ bool Store_meta_data_api_job.finished () {
     return true;
 }
 
-Update_metadata_api_job.Update_metadata_api_job (AccountPtr& account,
+UpdateMetadataApiJob.UpdateMetadataApiJob (AccountPtr& account,
                                                  const QByteArray& file_id,
                                                  const QByteArray& b64Metadata,
                                                  const QByteArray& token,
@@ -350,7 +350,7 @@ _b64Metadata (b64Metadata),
 _token (token) {
 }
 
-void Update_metadata_api_job.start () {
+void UpdateMetadataApiJob.start () {
     QNetworkRequest req;
     req.set_raw_header ("OCS-APIREQUEST", "true");
     req.set_header (QNetworkRequest.ContentTypeHeader, QByteArrayLiteral ("application/x-www-form-urlencoded"));
@@ -375,7 +375,7 @@ void Update_metadata_api_job.start () {
     AbstractNetworkJob.start ();
 }
 
-bool Update_metadata_api_job.finished () {
+bool UpdateMetadataApiJob.finished () {
     int ret_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
 		if (ret_code != 200) {
 			q_c_info (lc_cse_job ()) << "error updating the metadata" << path () << error_string () << ret_code;
@@ -387,14 +387,14 @@ bool Update_metadata_api_job.finished () {
     return true;
 }
 
-Unlock_encrypt_folder_api_job.Unlock_encrypt_folder_api_job (AccountPtr& account,
+UnlockEncryptFolderApiJob.UnlockEncryptFolderApiJob (AccountPtr& account,
                                                  const QByteArray& file_id,
                                                  const QByteArray& token,
                                                  GLib.Object* parent)
  : AbstractNetworkJob (account, e2ee_base_url () + QStringLiteral ("lock/") + file_id, parent), _file_id (file_id), _token (token) {
 }
 
-void Unlock_encrypt_folder_api_job.start () {
+void UnlockEncryptFolderApiJob.start () {
     QNetworkRequest req;
     req.set_raw_header ("OCS-APIREQUEST", "true");
     req.set_raw_header ("e2e-token", _token);
@@ -406,7 +406,7 @@ void Unlock_encrypt_folder_api_job.start () {
     q_c_info (lc_cse_job ()) << "Starting the request to unlock.";
 }
 
-bool Unlock_encrypt_folder_api_job.finished () {
+bool UnlockEncryptFolderApiJob.finished () {
     int ret_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
     if (ret_code != 200) {
         q_c_info (lc_cse_job ()) << "error unlocking file" << path () << error_string () << ret_code;
@@ -418,13 +418,13 @@ bool Unlock_encrypt_folder_api_job.finished () {
     return true;
 }
 
-Delete_metadata_api_job.Delete_metadata_api_job (AccountPtr& account,
+DeleteMetadataApiJob.DeleteMetadataApiJob (AccountPtr& account,
                                                   const QByteArray& file_id,
                                                  GLib.Object* parent)
  : AbstractNetworkJob (account, e2ee_base_url () + QStringLiteral ("meta-data/") + file_id, parent), _file_id (file_id) {
 }
 
-void Delete_metadata_api_job.start () {
+void DeleteMetadataApiJob.start () {
     QNetworkRequest req;
     req.set_raw_header ("OCS-APIREQUEST", "true");
 
@@ -435,7 +435,7 @@ void Delete_metadata_api_job.start () {
     q_c_info (lc_cse_job ()) << "Starting the request to remove the metadata.";
 }
 
-bool Delete_metadata_api_job.finished () {
+bool DeleteMetadataApiJob.finished () {
     int ret_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
     if (ret_code != 200) {
         q_c_info (lc_cse_job ()) << "error removing metadata for" << path () << error_string () << ret_code;
@@ -447,11 +447,11 @@ bool Delete_metadata_api_job.finished () {
     return true;
 }
 
-Lock_encrypt_folder_api_job.Lock_encrypt_folder_api_job (AccountPtr& account, QByteArray& file_id, GLib.Object* parent)
+LockEncryptFolderApiJob.LockEncryptFolderApiJob (AccountPtr& account, QByteArray& file_id, GLib.Object* parent)
  : AbstractNetworkJob (account, e2ee_base_url () + QStringLiteral ("lock/") + file_id, parent), _file_id (file_id) {
 }
 
-void Lock_encrypt_folder_api_job.start () {
+void LockEncryptFolderApiJob.start () {
     QNetworkRequest req;
     req.set_raw_header ("OCS-APIREQUEST", "true");
     QUrlQuery query;
@@ -464,7 +464,7 @@ void Lock_encrypt_folder_api_job.start () {
     AbstractNetworkJob.start ();
 }
 
-bool Lock_encrypt_folder_api_job.finished () {
+bool LockEncryptFolderApiJob.finished () {
     int ret_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
     if (ret_code != 200) {
         q_c_info (lc_cse_job ()) << "error locking file" << path () << error_string () << ret_code;
@@ -483,11 +483,11 @@ bool Lock_encrypt_folder_api_job.finished () {
     return true;
 }
 
-Set_encryption_flag_api_job.Set_encryption_flag_api_job (AccountPtr& account, QByteArray& file_id, Flag_action flag_action, GLib.Object* parent)
+SetEncryptionFlagApiJob.SetEncryptionFlagApiJob (AccountPtr& account, QByteArray& file_id, FlagAction flag_action, GLib.Object* parent)
  : AbstractNetworkJob (account, e2ee_base_url () + QStringLiteral ("encrypted/") + file_id, parent), _file_id (file_id), _flag_action (flag_action) {
 }
 
-void Set_encryption_flag_api_job.start () {
+void SetEncryptionFlagApiJob.start () {
     QNetworkRequest req;
     req.set_raw_header ("OCS-APIREQUEST", "true");
     QUrl url = Utility.concat_url_path (account ().url (), path ());
@@ -499,7 +499,7 @@ void Set_encryption_flag_api_job.start () {
     AbstractNetworkJob.start ();
 }
 
-bool Set_encryption_flag_api_job.finished () {
+bool SetEncryptionFlagApiJob.finished () {
     int ret_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
     q_c_info (lc_cse_job ()) << "Encryption Flag Return" << reply ().read_all ();
     if (ret_code == 200) {
@@ -511,17 +511,17 @@ bool Set_encryption_flag_api_job.finished () {
     return true;
 }
 
-Store_private_key_api_job.Store_private_key_api_job (AccountPtr& account, string& path, GLib.Object* parent)
+StorePrivateKeyApiJob.StorePrivateKeyApiJob (AccountPtr& account, string& path, GLib.Object* parent)
  : AbstractNetworkJob (account, path, parent) {
 }
 
-void Store_private_key_api_job.set_private_key (QByteArray& priv_key) {
+void StorePrivateKeyApiJob.set_private_key (QByteArray& priv_key) {
     QByteArray data = "private_key=";
     data += QUrl.to_percent_encoding (priv_key);
     _priv_key.set_data (data);
 }
 
-void Store_private_key_api_job.start () {
+void StorePrivateKeyApiJob.start () {
     QNetworkRequest req;
     req.set_raw_header ("OCS-APIREQUEST", "true");
     QUrlQuery query;
@@ -534,7 +534,7 @@ void Store_private_key_api_job.start () {
     AbstractNetworkJob.start ();
 }
 
-bool Store_private_key_api_job.finished () {
+bool StorePrivateKeyApiJob.finished () {
     int ret_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
     if (ret_code != 200)
         q_c_info (lc_store_private_key_api_job ()) << "Sending private key ended with"  << path () << error_string () << ret_code;
@@ -545,17 +545,17 @@ bool Store_private_key_api_job.finished () {
     return true;
 }
 
-Sign_public_key_api_job.Sign_public_key_api_job (AccountPtr& account, string& path, GLib.Object* parent)
+SignPublicKeyApiJob.SignPublicKeyApiJob (AccountPtr& account, string& path, GLib.Object* parent)
  : AbstractNetworkJob (account, path, parent) {
 }
 
-void Sign_public_key_api_job.set_csr (QByteArray& csr) {
+void SignPublicKeyApiJob.set_csr (QByteArray& csr) {
     QByteArray data = "csr=";
     data += QUrl.to_percent_encoding (csr);
     _csr.set_data (data);
 }
 
-void Sign_public_key_api_job.start () {
+void SignPublicKeyApiJob.start () {
     QNetworkRequest req;
     req.set_raw_header ("OCS-APIREQUEST", "true");
     req.set_header (QNetworkRequest.ContentTypeHeader, QByteArrayLiteral ("application/x-www-form-urlencoded"));
@@ -569,7 +569,7 @@ void Sign_public_key_api_job.start () {
     AbstractNetworkJob.start ();
 }
 
-bool Sign_public_key_api_job.finished () {
+bool SignPublicKeyApiJob.finished () {
     q_c_info (lc_store_private_key_api_job ()) << "Sending CSR ended with"  << path () << error_string () << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute);
 
     QJsonParseError error;

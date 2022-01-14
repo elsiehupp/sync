@@ -16,7 +16,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
 
 #if ! (QTLEGACY)
-// #include <QOperating_system_version>
+// #include <QOperatingSystemVersion>
 #endif
 
 // #include <Gtk.Widget>
@@ -135,7 +135,7 @@ void create_debug_archive (string &filename) {
             zip.add_directory (entry.zip_filename);
         } else {
             QFile file (entry.local_filename);
-            if (!file.open (QFile.Read_only)) {
+            if (!file.open (QFile.ReadOnly)) {
                 continue;
             }
             zip.add_file (entry.zip_filename, &file);

@@ -121,7 +121,7 @@ class SyncJournalDb : GLib.Object {
         }
     };
 
-    public struct Poll_info {
+    public struct PollInfo {
         string _file; // The relative path of a file
         string _url; // the poll url. (This pollinfo is invalid if _url is empty)
         int64 _modtime; // The modtime of the file being uploaded
@@ -148,9 +148,9 @@ class SyncJournalDb : GLib.Object {
         avoid_renames_on_next_sync (path.to_utf8 ());
     }
     public void avoid_renames_on_next_sync (QByteArray &path);
-    public void set_poll_info (Poll_info &);
+    public void set_poll_info (PollInfo &);
 
-    public QVector<Poll_info> get_poll_infos ();
+    public QVector<PollInfo> get_poll_infos ();
 
     public enum Selective_sync_list_type {
         /***********************************************************
@@ -253,10 +253,10 @@ class SyncJournalDb : GLib.Object {
     // Conflict record functions
 
     /// Store a new or updated record in the database
-    public void set_conflict_record (Conflict_record &record);
+    public void set_conflict_record (ConflictRecord &record);
 
     /// Retrieve a conflict record by path of the file with the conflict tag
-    public Conflict_record conflict_record (QByteArray &path);
+    public ConflictRecord conflict_record (QByteArray &path);
 
     /// Delete a conflict record by path of the file with the conflict tag
     public void delete_conflict_record (QByteArray &path);
@@ -281,7 +281,7 @@ class SyncJournalDb : GLib.Object {
     public void clear_file_table ();
 
     /***********************************************************
-    Set the 'Item_type_virtual_file_download' to all the files that have the Item_type_virtual_file flag
+    Set the 'ItemTypeVirtualFileDownload' to all the files that have the ItemTypeVirtualFile flag
     within the directory specified path path
 
     The path "" marks everything.
@@ -1774,7 +1774,7 @@ Optional<SyncJournalDb.Has_hydrated_dehydrated> SyncJournalDb.has_hydrated_or_de
         auto type = static_cast<ItemType> (query.int_value (0));
         if (type == ItemTypeFile || type == ItemTypeVirtualFileDehydration)
             result.has_hydrated = true;
-        if (type == Item_type_virtual_file || type == Item_type_virtual_file_download)
+        if (type == ItemTypeVirtualFile || type == ItemTypeVirtualFileDownload)
             result.has_dehydrated = true;
     }
 
@@ -2174,10 +2174,10 @@ void SyncJournalDb.set_error_blacklist_entry (SyncJournalErrorBlacklistRecord &i
     query.exec ();
 }
 
-QVector<SyncJournalDb.Poll_info> SyncJournalDb.get_poll_infos () {
+QVector<SyncJournalDb.PollInfo> SyncJournalDb.get_poll_infos () {
     QMutexLocker locker (&_mutex);
 
-    QVector<SyncJournalDb.Poll_info> res;
+    QVector<SyncJournalDb.PollInfo> res;
 
     if (!check_connect ())
         return res;
@@ -2189,7 +2189,7 @@ QVector<SyncJournalDb.Poll_info> SyncJournalDb.get_poll_infos () {
     }
 
     while (query.next ().has_data) {
-        Poll_info info;
+        PollInfo info;
         info._file = query.string_value (0);
         info._modtime = query.int64Value (1);
         info._file_size = query.int64Value (2);
@@ -2199,7 +2199,7 @@ QVector<SyncJournalDb.Poll_info> SyncJournalDb.get_poll_infos () {
     return res;
 }
 
-void SyncJournalDb.set_poll_info (SyncJournalDb.Poll_info &info) {
+void SyncJournalDb.set_poll_info (SyncJournalDb.PollInfo &info) {
     QMutexLocker locker (&_mutex);
     if (!check_connect ()) {
         return;
@@ -2454,7 +2454,7 @@ void SyncJournalDb.set_data_fingerprint (QByteArray &data_fingerprint) {
     set_data_fingerprint_query2.exec ();
 }
 
-void SyncJournalDb.set_conflict_record (Conflict_record &record) {
+void SyncJournalDb.set_conflict_record (ConflictRecord &record) {
     QMutexLocker locker (&_mutex);
     if (!check_connect ())
         return;
@@ -2472,8 +2472,8 @@ void SyncJournalDb.set_conflict_record (Conflict_record &record) {
     ASSERT (query.exec ())
 }
 
-Conflict_record SyncJournalDb.conflict_record (QByteArray &path) {
-    Conflict_record entry;
+ConflictRecord SyncJournalDb.conflict_record (QByteArray &path) {
+    ConflictRecord entry;
 
     QMutexLocker locker (&_mutex);
     if (!check_connect ()) {
@@ -2549,7 +2549,7 @@ void SyncJournalDb.mark_virtual_file_for_download_recursively (QByteArray &path)
     if (!check_connect ())
         return;
 
-    static_assert (Item_type_virtual_file == 4 && Item_type_virtual_file_download == 5, "");
+    static_assert (ItemTypeVirtualFile == 4 && ItemTypeVirtualFileDownload == 5, "");
     SqlQuery query ("UPDATE metadata SET type=5 WHERE "
                    " (" IS_PREFIX_PATH_OF ("?1", "path") " OR ?1 == '') "
                    "AND type=4;", _db);

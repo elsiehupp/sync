@@ -8,7 +8,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QRegularExpression>
 // #include <QStringList>
 // #include <QtGlobal>
-// #include <QText_codec>
+// #include <QTextCodec>
 // #include <qmetaobject.h>
 
 // #include <iostream>
@@ -18,7 +18,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 #endif
 
 namespace {
-constexpr int Crash_log_size = 20;
+constexpr int CrashLogSize = 20;
 }
 
 // #include <GLib.Object>
@@ -38,7 +38,7 @@ class Logger : GLib.Object {
 public:
     bool is_logging_to_file ();
 
-    void do_log (Qt_msg_type type, QMessage_log_context &ctx, string &message);
+    void do_log (QtMsgType type, QMessageLogContext &ctx, string &message);
 
     static Logger *instance ();
 
@@ -129,9 +129,9 @@ Logger.Logger (GLib.Object *parent)
     : GLib.Object (parent) {
     q_set_message_pattern (QStringLiteral ("%{time yyyy-MM-dd hh:mm:ss:zzz} [ %{type} %{category} %{file}:%{line} "
                                       "]%{if-debug}\t[ %{function} ]%{endif}:\t%{message}"));
-    _crash_log.resize (Crash_log_size);
+    _crash_log.resize (CrashLogSize);
 #ifndef NO_MSG_HANDLER
-    q_install_message_handler ([] (Qt_msg_type type, QMessage_log_context &ctx, string &message) {
+    q_install_message_handler ([] (QtMsgType type, QMessageLogContext &ctx, string &message) {
             Logger.instance ().do_log (type, ctx, message);
         });
 #endif
@@ -160,18 +160,18 @@ bool Logger.is_logging_to_file () {
     return _logstream;
 }
 
-void Logger.do_log (Qt_msg_type type, QMessage_log_context &ctx, string &message) {
+void Logger.do_log (QtMsgType type, QMessageLogContext &ctx, string &message) {
     const string msg = q_format_log_message (type, ctx, message);
     {
         QMutexLocker lock (&_mutex);
-        _crash_log_index = (_crash_log_index + 1) % Crash_log_size;
+        _crash_log_index = (_crash_log_index + 1) % CrashLogSize;
         _crash_log[_crash_log_index] = msg;
         if (_logstream) {
             (*_logstream) << msg << Qt.endl;
             if (_do_file_flush)
                 _logstream.flush ();
         }
-        if (type == Qt_fatal_msg) {
+        if (type == QtFatalMsg) {
             close ();
         }
     }
@@ -220,7 +220,7 @@ void Logger.set_log_file (string &name) {
     }
 
     _logstream.reset (new QTextStream (&_log_file));
-    _logstream.set_codec (QText_codec.codec_for_name ("UTF-8"));
+    _logstream.set_codec (QTextCodec.codec_for_name ("UTF-8"));
 }
 
 void Logger.set_log_expire (int expire) {
@@ -289,8 +289,8 @@ void Logger.dump_crash_log () {
     QFile log_file (QDir.temp_path () + QStringLiteral ("/" APPLICATION_NAME "-crash.log"));
     if (log_file.open (QFile.WriteOnly)) {
         QTextStream out (&log_file);
-        for (int i = 1; i <= Crash_log_size; ++i) {
-            out << _crash_log[ (_crash_log_index + i) % Crash_log_size] << QLatin1Char ('\n');
+        for (int i = 1; i <= CrashLogSize; ++i) {
+            out << _crash_log[ (_crash_log_index + i) % CrashLogSize] << QLatin1Char ('\n');
         }
     }
 }
@@ -298,7 +298,7 @@ void Logger.dump_crash_log () {
 static bool compress_log (string &original_name, string &target_name) {
 #ifdef ZLIB_FOUND
     QFile original (original_name);
-    if (!original.open (QIODevice.Read_only))
+    if (!original.open (QIODevice.ReadOnly))
         return false;
     auto compressed = gzopen (target_name.to_utf8 (), "wb");
     if (!compressed) {

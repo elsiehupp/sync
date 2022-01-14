@@ -26,8 +26,8 @@ namespace KeychainChunk {
 * Split the keychain entry's data into chunks of 2048 bytes,
 * to allow 4k (4096 bit) keys / large certs to be saved (see limits in webflowcredentials.h)
 ***********************************************************/
-static constexpr int Chunk_size = 2048;
-static constexpr int Max_chunks = 10;
+static constexpr int ChunkSize = 2048;
+static constexpr int MaxChunks = 10;
 
 /***********************************************************
 @brief : Abstract base class for KeychainChunk jobs.
@@ -259,8 +259,8 @@ void WriteJob.start () {
 bool WriteJob.exec () {
     start ();
 
-    QEvent_loop wait_loop;
-    connect (this, &WriteJob.finished, &wait_loop, &QEvent_loop.quit);
+    QEventLoop wait_loop;
+    connect (this, &WriteJob.finished, &wait_loop, &QEventLoop.quit);
     wait_loop.exec ();
 
     if (error () != NoError) {
@@ -295,8 +295,8 @@ void WriteJob.slot_write_job_done (QKeychain.Job *incoming_job) {
         auto index = (_chunk_count++);
 
         // keep the limit
-        if (_chunk_count > KeychainChunk.Max_chunks) {
-            q_c_warning (lc_keychain_chunk) << "Maximum chunk count exceeded while writing" << write_job.key () << "chunk" << string.number (index) << "cutting off after" << string.number (KeychainChunk.Max_chunks) << "chunks";
+        if (_chunk_count > KeychainChunk.MaxChunks) {
+            q_c_warning (lc_keychain_chunk) << "Maximum chunk count exceeded while writing" << write_job.key () << "chunk" << string.number (index) << "cutting off after" << string.number (KeychainChunk.MaxChunks) << "chunks";
 
             write_job.delete_later ();
 
@@ -382,8 +382,8 @@ void ReadJob.start () {
 bool ReadJob.exec () {
     start ();
 
-    QEvent_loop wait_loop;
-    connect (this, &ReadJob.finished, &wait_loop, &QEvent_loop.quit);
+    QEventLoop wait_loop;
+    connect (this, &ReadJob.finished, &wait_loop, &QEventLoop.quit);
     wait_loop.exec ();
 
     if (error () == NoError) {
@@ -408,11 +408,11 @@ void ReadJob.slot_read_job_done (QKeychain.Job *incoming_job) {
         _chunk_count++;
     } else {
         if (!read_job.insecure_fallback ()) { // If insecure_fallback is set, the next test would be pointless
-            if (_retry_on_key_chain_error && (read_job.error () == QKeychain.No_backend_available
-                    || read_job.error () == QKeychain.Other_error)) {
+            if (_retry_on_key_chain_error && (read_job.error () == QKeychain.NoBackendAvailable
+                    || read_job.error () == QKeychain.OtherError)) {
                 // Could be that the backend was not yet available. Wait some extra seconds.
                 // (Issues #4274 and #6522)
-                // (For kwallet, the error is Other_error instead of No_backend_available, maybe a bug in QtKeychain)
+                // (For kwallet, the error is OtherError instead of NoBackendAvailable, maybe a bug in QtKeychain)
                 q_c_info (lc_keychain_chunk) << "Backend unavailable (yet?) Retrying in a few seconds." << read_job.error_string ();
                 QTimer.single_shot (10000, this, &ReadJob.start);
                 _retry_on_key_chain_error = false;
@@ -476,8 +476,8 @@ void DeleteJob.start () {
 bool DeleteJob.exec () {
     start ();
 
-    QEvent_loop wait_loop;
-    connect (this, &DeleteJob.finished, &wait_loop, &QEvent_loop.quit);
+    QEventLoop wait_loop;
+    connect (this, &DeleteJob.finished, &wait_loop, &QEventLoop.quit);
     wait_loop.exec ();
 
     if (error () == NoError) {

@@ -10,7 +10,7 @@ namespace Occ {
 class Propagate_download_encrypted : GLib.Object {
   Q_OBJECT
 public:
-  Propagate_download_encrypted (Owncloud_propagator *propagator, string &local_parent_path, SyncFileItemPtr item, GLib.Object *parent = nullptr);
+  Propagate_download_encrypted (OwncloudPropagator *propagator, string &local_parent_path, SyncFileItemPtr item, GLib.Object *parent = nullptr);
   void start ();
   bool decrypt_file (QFile& tmp_file);
   string error_string ();
@@ -28,17 +28,17 @@ signals:
   void decryption_finished ();
 
 private:
-  Owncloud_propagator *_propagator;
+  OwncloudPropagator *_propagator;
   string _local_parent_path;
   SyncFileItemPtr _item;
   QFileInfo _info;
-  Encrypted_file _encrypted_info;
+  EncryptedFile _encrypted_info;
   string _error_string;
 };
 
 
 
-Propagate_download_encrypted.Propagate_download_encrypted (Owncloud_propagator *propagator, string &local_parent_path, SyncFileItemPtr item, GLib.Object *parent)
+Propagate_download_encrypted.Propagate_download_encrypted (OwncloudPropagator *propagator, string &local_parent_path, SyncFileItemPtr item, GLib.Object *parent)
     : GLib.Object (parent)
     , _propagator (propagator)
     , _local_parent_path (local_parent_path)
@@ -60,11 +60,11 @@ void Propagate_download_encrypted.start () {
     const auto remote_parent_path = remote_path.left (remote_path.last_index_of ('/'));
 
     // Is encrypted Now we need the folder-id
-    auto job = new Ls_col_job (_propagator.account (), remote_parent_path, this);
+    auto job = new LsColJob (_propagator.account (), remote_parent_path, this);
     job.set_properties ({"resourcetype", "http://owncloud.org/ns:fileid"});
-    connect (job, &Ls_col_job.directory_listing_subfolders,
+    connect (job, &LsColJob.directory_listing_subfolders,
             this, &Propagate_download_encrypted.check_folder_id);
-    connect (job, &Ls_col_job.finished_with_error,
+    connect (job, &LsColJob.finished_with_error,
             this, &Propagate_download_encrypted.folder_id_error);
     job.start ();
 }
@@ -74,17 +74,17 @@ void Propagate_download_encrypted.folder_id_error () {
 }
 
 void Propagate_download_encrypted.check_folder_id (QStringList &list) {
-  auto job = qobject_cast<Ls_col_job> (sender ());
+  auto job = qobject_cast<LsColJob> (sender ());
   const string folder_id = list.first ();
   q_c_debug (lc_propagate_download_encrypted) << "Received id of folder" << folder_id;
 
-  const Extra_folder_info &folder_info = job._folder_infos.value (folder_id);
+  const ExtraFolderInfo &folder_info = job._folder_infos.value (folder_id);
 
   // Now that we have the folder-id we need it's JSON metadata
-  auto metadata_job = new Get_metadata_api_job (_propagator.account (), folder_info.file_id);
-  connect (metadata_job, &Get_metadata_api_job.json_received,
+  auto metadata_job = new GetMetadataApiJob (_propagator.account (), folder_info.file_id);
+  connect (metadata_job, &GetMetadataApiJob.json_received,
           this, &Propagate_download_encrypted.check_folder_encrypted_metadata);
-  connect (metadata_job, &Get_metadata_api_job.error,
+  connect (metadata_job, &GetMetadataApiJob.error,
           this, &Propagate_download_encrypted.folder_encrypted_metadata_error);
 
   metadata_job.start ();
@@ -99,11 +99,11 @@ void Propagate_download_encrypted.check_folder_encrypted_metadata (QJsonDocument
   q_c_debug (lc_propagate_download_encrypted) << "Metadata Received reading"
                                         << _item._instruction << _item._file << _item._encrypted_file_name;
   const string filename = _info.file_name ();
-  auto meta = new Folder_metadata (_propagator.account (), json.to_json (QJsonDocument.Compact));
-  const QVector<Encrypted_file> files = meta.files ();
+  auto meta = new FolderMetadata (_propagator.account (), json.to_json (QJsonDocument.Compact));
+  const QVector<EncryptedFile> files = meta.files ();
 
   const string encrypted_filename = _item._encrypted_file_name.section (QLatin1Char ('/'), -1);
-  for (Encrypted_file &file : files) {
+  for (EncryptedFile &file : files) {
     if (encrypted_filename == file.encrypted_filename) {
       _encrypted_info = file;
 
@@ -126,7 +126,7 @@ bool Propagate_download_encrypted.decrypt_file (QFile& tmp_file) {
 
     tmp_file.close ();
     QFile _tmp_output (_propagator.full_local_path (tmp_file_name), this);
-    Encryption_helper.file_decryption (_encrypted_info.encryption_key,
+    EncryptionHelper.file_decryption (_encrypted_info.encryption_key,
                                      _encrypted_info.initialization_vector,
                                      &tmp_file,
                                      &_tmp_output);

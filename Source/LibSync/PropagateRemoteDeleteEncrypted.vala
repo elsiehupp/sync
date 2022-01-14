@@ -14,9 +14,9 @@ using namespace Occ;
 
 namespace Occ {
 
-class Propagate_remote_delete_encrypted : Abstract_propagate_remote_delete_encrypted {
+class Propagate_remote_delete_encrypted : AbstractPropagateRemoteDeleteEncrypted {
 public:
-    Propagate_remote_delete_encrypted (Owncloud_propagator *propagator, SyncFileItemPtr item, GLib.Object *parent);
+    Propagate_remote_delete_encrypted (OwncloudPropagator *propagator, SyncFileItemPtr item, GLib.Object *parent);
 
     void start () override;
 
@@ -33,8 +33,8 @@ private:
 
 
 
-Propagate_remote_delete_encrypted.Propagate_remote_delete_encrypted (Owncloud_propagator *propagator, SyncFileItemPtr item, GLib.Object *parent)
-    : Abstract_propagate_remote_delete_encrypted (propagator, item, parent) {
+Propagate_remote_delete_encrypted.Propagate_remote_delete_encrypted (OwncloudPropagator *propagator, SyncFileItemPtr item, GLib.Object *parent)
+    : AbstractPropagateRemoteDeleteEncrypted (propagator, item, parent) {
 
 }
 
@@ -46,7 +46,7 @@ void Propagate_remote_delete_encrypted.start () {
 }
 
 void Propagate_remote_delete_encrypted.slot_folder_un_locked_successfully (QByteArray &folder_id) {
-    Abstract_propagate_remote_delete_encrypted.slot_folder_un_locked_successfully (folder_id);
+    AbstractPropagateRemoteDeleteEncrypted.slot_folder_un_locked_successfully (folder_id);
     emit finished (!_is_task_failed);
 }
 
@@ -57,7 +57,7 @@ void Propagate_remote_delete_encrypted.slot_folder_encrypted_metadata_received (
         return;
     }
 
-    Folder_metadata metadata (_propagator.account (), json.to_json (QJsonDocument.Compact), status_code);
+    FolderMetadata metadata (_propagator.account (), json.to_json (QJsonDocument.Compact), status_code);
 
     q_c_debug (PROPAGATE_REMOVE_ENCRYPTED) << "Metadata Received, preparing it for removal of the file";
 
@@ -66,8 +66,8 @@ void Propagate_remote_delete_encrypted.slot_folder_encrypted_metadata_received (
 
     // Find existing metadata for this file
     bool found = false;
-    const QVector<Encrypted_file> files = metadata.files ();
-    for (Encrypted_file &file : files) {
+    const QVector<EncryptedFile> files = metadata.files ();
+    for (EncryptedFile &file : files) {
         if (file.original_filename == file_name) {
             metadata.remove_encrypted_file (file);
             found = true;
@@ -83,11 +83,11 @@ void Propagate_remote_delete_encrypted.slot_folder_encrypted_metadata_received (
 
     q_c_debug (PROPAGATE_REMOVE_ENCRYPTED) << "Metadata updated, sending to the server.";
 
-    auto job = new Update_metadata_api_job (_propagator.account (), _folder_id, metadata.encrypted_metadata (), _folder_token);
-    connect (job, &Update_metadata_api_job.success, this, [this] (QByteArray& file_id) {
+    auto job = new UpdateMetadataApiJob (_propagator.account (), _folder_id, metadata.encrypted_metadata (), _folder_token);
+    connect (job, &UpdateMetadataApiJob.success, this, [this] (QByteArray& file_id) {
         Q_UNUSED (file_id);
         delete_remote_item (_item._encrypted_file_name);
     });
-    connect (job, &Update_metadata_api_job.error, this, &Propagate_remote_delete_encrypted.task_failed);
+    connect (job, &UpdateMetadataApiJob.error, this, &Propagate_remote_delete_encrypted.task_failed);
     job.start ();
 }

@@ -102,7 +102,7 @@ public:
                 || item._instruction == CSYNC_INSTRUCTION_SYNC
                 || item._instruction == CSYNC_INSTRUCTION_NEW
                 || item._instruction == CSYNC_INSTRUCTION_TYPE_CHANGE)
-            && ! (item._type == Item_type_virtual_file
+            && ! (item._type == ItemTypeVirtualFile
                  || item._type == ItemTypeVirtualFileDehydration);
     }
 
@@ -244,7 +244,7 @@ in IssuesWidget.
 ***********************************************************/
 enum class ErrorCategory {
     Normal,
-    Insufficient_remote_storage,
+    InsufficientRemoteStorage,
 };
 
 /***********************************************************
@@ -314,7 +314,7 @@ private:
         case CSYNC_INSTRUCTION_NEW:
         case CSYNC_INSTRUCTION_TYPE_CHANGE:
             if (item._direction != SyncFileItem.Up) {
-                if (item._type == Item_type_virtual_file) {
+                if (item._type == ItemTypeVirtualFile) {
                     return QCoreApplication.translate ("progress", "Virtual file created");
                 } else if (item._type == ItemTypeVirtualFileDehydration) {
                     return QCoreApplication.translate ("progress", "Replaced by virtual file");
@@ -376,15 +376,15 @@ private:
     }
 
     bool Progress.is_warning_kind (SyncFileItem.Status kind) {
-        return kind == SyncFileItem.Soft_error || kind == SyncFileItem.Normal_error
-            || kind == SyncFileItem.Fatal_error || kind == SyncFileItem.File_ignored
+        return kind == SyncFileItem.SoftError || kind == SyncFileItem.NormalError
+            || kind == SyncFileItem.FatalError || kind == SyncFileItem.FileIgnored
             || kind == SyncFileItem.Conflict || kind == SyncFileItem.Restoration
-            || kind == SyncFileItem.Detail_error || kind == SyncFileItem.Blacklisted_error
-            || kind == SyncFileItem.File_locked;
+            || kind == SyncFileItem.DetailError || kind == SyncFileItem.BlacklistedError
+            || kind == SyncFileItem.FileLocked;
     }
 
     bool Progress.is_ignored_kind (SyncFileItem.Status kind) {
-        return kind == SyncFileItem.File_ignored;
+        return kind == SyncFileItem.FileIgnored;
     }
 
     Progress_dispatcher *Progress_dispatcher.instance () {

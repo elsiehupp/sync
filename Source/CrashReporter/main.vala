@@ -32,7 +32,7 @@ int main (int argc, char *argv[]) {
     const QFileInfo crash_log (QDir.temp_path () + QStringLiteral ("/" CRASHREPORTER_PRODUCT_NAME "-crash.log"));
     if (crash_log.exists ()) {
         QFile in_file (crash_log.file_path ());
-        if (in_file.open (QFile.Read_only)) {
+        if (in_file.open (QFile.ReadOnly)) {
             reporter.set_comment (in_file.read_all ());
         }
     }
@@ -74,7 +74,7 @@ int main (int argc, char *argv[]) {
     // TODO:
     // send log
     //    QFile log_file ( INSERT_FILE_PATH_HERE );
-    //    log_file.open ( QFile.Read_only );
+    //    log_file.open ( QFile.ReadOnly );
     //    reporter.set_report_data ( "upload_file_miralllog", q_compress ( log_file.read_all () ), "application/x-gzip", QFileInfo ( INSERT_FILE_PATH_HERE ).file_name ().to_utf8 ());
     //    log_file.close ();
 

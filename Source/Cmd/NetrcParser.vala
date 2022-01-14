@@ -64,7 +64,7 @@ private:
 
     bool NetrcParser.parse () {
         QFile netrc (_netrc_location);
-        if (!netrc.open (QIODevice.Read_only)) {
+        if (!netrc.open (QIODevice.ReadOnly)) {
             return false;
         }
         string content = netrc.read_all ();

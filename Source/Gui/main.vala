@@ -49,10 +49,10 @@ int main (int argc, char **argv) {
         "com.nextcloud.desktopclient", 1, 0, "Unified_search_results_list_model", "Unified_search_results_list_model");
     q_register_meta_type<Unified_search_results_list_model> ("Unified_search_results_list_model*");
 
-    qml_register_uncreatable_type<Occ.User_status> ("com.nextcloud.desktopclient", 1, 0, "User_status", "Access to Status enum");
+    qml_register_uncreatable_type<Occ.UserStatus> ("com.nextcloud.desktopclient", 1, 0, "UserStatus", "Access to Status enum");
 
     q_register_meta_type_stream_operators<Emoji> ();
-    q_register_meta_type<Occ.User_status> ("User_status");
+    q_register_meta_type<Occ.UserStatus> ("UserStatus");
 
     // Work around a bug in KDE's qqc2-desktop-style which breaks
     // buttons with icons not based on a name, by forcing a style name
@@ -61,7 +61,7 @@ int main (int argc, char **argv) {
     // Can be removed once the bug in qqc2-desktop-style is gone.
     QQuick_style.set_style ("Default");
 
-    // Open_s_sL 1.1.0 : No explicit initialisation or de-initialisation is necessary.
+    // OpenSSL 1.1.0 : No explicit initialisation or de-initialisation is necessary.
 
     QCoreApplication.set_attribute (Qt.AA_Use_high_dpi_pixmaps, true);
     QCoreApplication.set_attribute (Qt.AA_Enable_high_dpi_scaling, true);

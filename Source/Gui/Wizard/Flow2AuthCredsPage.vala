@@ -12,7 +12,7 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 
 // #include <QList>
 // #include <QMap>
-// #include <QNetwork_cookie>
+// #include <QNetworkCookie>
 // #include <QUrl>
 // #include <QPointer>
 

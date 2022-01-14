@@ -28,13 +28,13 @@ Q_DECLARE_LOGGING_CATEGORY (lc_propagate_upload_nG)
 
 
 /***********************************************************
-@brief The Upload_device class
+@brief The UploadDevice class
 @ingroup libsync
 ***********************************************************/
-class Upload_device : QIODevice {
+class UploadDevice : QIODevice {
 public:
-    Upload_device (string &file_name, int64 start, int64 size, Bandwidth_manager *bwm);
-    ~Upload_device () override;
+    UploadDevice (string &file_name, int64 start, int64 size, BandwidthManager *bwm);
+    ~UploadDevice () override;
 
     bool open (QIODevice.Open_mode mode) override;
     void close () override;
@@ -71,12 +71,12 @@ private:
     int64 _read = 0;
 
     // Bandwidth manager related
-    QPointer<Bandwidth_manager> _bandwidth_manager;
+    QPointer<BandwidthManager> _bandwidth_manager;
     int64 _bandwidth_quota = 0;
     int64 _read_with_progress = 0;
     bool _bandwidth_limited = false; // if _bandwidth_quota will be used
     bool _choked = false; // if upload is paused (read_data () will return 0)
-    friend class Bandwidth_manager;
+    friend class BandwidthManager;
 public slots:
     void slot_job_upload_progress (int64 sent, int64 t);
 };
@@ -146,14 +146,14 @@ If the server replies
 replies with an etag.
 @ingroup libsync
 ***********************************************************/
-class Poll_job : AbstractNetworkJob {
+class PollJob : AbstractNetworkJob {
     SyncJournalDb *_journal;
     string _local_path;
 
 public:
     SyncFileItemPtr _item;
     // Takes ownership of the device
-    Poll_job (AccountPtr account, string &path, SyncFileItemPtr &item,
+    PollJob (AccountPtr account, string &path, SyncFileItemPtr &item,
         SyncJournalDb *journal, string &local_path, GLib.Object *parent)
         : AbstractNetworkJob (account, path, parent)
         , _journal (journal)
@@ -170,7 +170,7 @@ signals:
 
 
 /***********************************************************
-@brief The Propagate_upload_file_common class is the code common between all chunking algorithms
+@brief The PropagateUploadFileCommon class is the code common between all chunking algorithms
 @ingroup libsync
 
 State Machine:
@@ -189,10 +189,10 @@ State Machine:
                                  v
        finalize () or abort_with_error ()  or start_poll_job ()
 ***********************************************************/
-class Propagate_upload_file_common : Propagate_item_job {
+class PropagateUploadFileCommon : PropagateItemJob {
 
     struct Upload_status {
-        SyncFileItem.Status status = SyncFileItem.No_status;
+        SyncFileItem.Status status = SyncFileItem.NoStatus;
         string message;
     };
 
@@ -216,16 +216,16 @@ protected:
     This is needed if we wanna apply changes on the file
     that's being uploaded while keeping the original on disk.
     ***********************************************************/
-    struct Upload_file_info {
-      string _file; /// I'm still unsure if I should use a Sync_file_ptr here.
+    struct UploadFileInfo {
+      string _file; /// I'm still unsure if I should use a SyncFilePtr here.
       string _path; /// the full path on disk.
       int64 _size;
     };
-    Upload_file_info _file_to_upload;
+    UploadFileInfo _file_to_upload;
     QByteArray _transmission_checksum_header;
 
 public:
-    Propagate_upload_file_common (Owncloud_propagator *propagator, SyncFileItemPtr &item);
+    PropagateUploadFileCommon (OwncloudPropagator *propagator, SyncFileItemPtr &item);
 
     /***********************************************************
     Whether an existing entity with the same name may be deleted before
@@ -279,7 +279,7 @@ protected:
     returns false on and, for async aborts, emits abort_finished when done.
     ***********************************************************/
     void abort_network_jobs (
-        Abort_type abort_type,
+        AbortType abort_type,
         const std.function<bool (AbstractNetworkJob *job)> &may_abort_job);
 
     /***********************************************************
@@ -321,7 +321,7 @@ private:
 Propagation job, impementing the old chunking agorithm
 
 ***********************************************************/
-class Propagate_upload_file_v1 : Propagate_upload_file_common {
+class PropagateUploadFileV1 : PropagateUploadFileCommon {
 
 private:
     /***********************************************************
@@ -346,13 +346,13 @@ private:
     }
 
 public:
-    Propagate_upload_file_v1 (Owncloud_propagator *propagator, SyncFileItemPtr &item)
-        : Propagate_upload_file_common (propagator, item) {
+    PropagateUploadFileV1 (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+        : PropagateUploadFileCommon (propagator, item) {
     }
 
     void do_start_upload () override;
 public slots:
-    void abort (Propagator_job.Abort_type abort_type) override;
+    void abort (PropagatorJob.AbortType abort_type) override;
 private slots:
     void start_next_chunk ();
     void slot_put_finished ();
@@ -365,7 +365,7 @@ private slots:
 Propagation job, impementing the new chunking agorithm
 
 ***********************************************************/
-class Propagate_upload_file_nG : Propagate_upload_file_common {
+class PropagateUploadFileNG : PropagateUploadFileCommon {
 private:
     int64 _sent = 0; /// amount of data (bytes) that was already sent
     uint _transfer_id = 0; /// transfer id (part of the url)
@@ -374,7 +374,7 @@ private:
     bool _remove_job_error = false; /// If not null, there was an error removing the job
 
     // Map chunk number with its size  from the PROPFIND on resume.
-    // (Only used from slot_propfind_iterate/slot_propfind_finished because the Ls_col_job use signals to report data.)
+    // (Only used from slot_propfind_iterate/slot_propfind_finished because the LsColJob use signals to report data.)
     struct Server_chunk_info {
         int64 size;
         string original_name;
@@ -388,8 +388,8 @@ private:
     QUrl chunk_url (int chunk = -1);
 
 public:
-    Propagate_upload_file_nG (Owncloud_propagator *propagator, SyncFileItemPtr &item)
-        : Propagate_upload_file_common (propagator, item) {
+    PropagateUploadFileNG (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+        : PropagateUploadFileCommon (propagator, item) {
     }
 
     void do_start_upload () override;
@@ -398,7 +398,7 @@ private:
     void start_new_upload ();
     void start_next_chunk ();
 public slots:
-    void abort (Abort_type abort_type) override;
+    void abort (AbortType abort_type) override;
 private slots:
     void slot_propfind_finished ();
     void slot_propfind_finished_with_error ();
@@ -445,13 +445,13 @@ private slots:
         q_c_info (lc_put_job) << "PUT of" << reply ().request ().url ().to_string () << "FINISHED WITH STATUS"
                          << reply_status_string ()
                          << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute)
-                         << reply ().attribute (QNetworkRequest.Http_reason_phrase_attribute);
+                         << reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute);
 
         emit finished_signal ();
         return true;
     }
 
-    void Poll_job.start () {
+    void PollJob.start () {
         set_timeout (120 * 1000);
         QUrl account_url = account ().url ();
         QUrl final_url = QUrl.from_user_input (account_url.scheme () + QLatin1String ("://") + account_url.authority ()
@@ -461,7 +461,7 @@ private slots:
         AbstractNetworkJob.start ();
     }
 
-    bool Poll_job.finished () {
+    bool PollJob.finished () {
         QNetworkReply.NetworkError err = reply ().error ();
         if (err != QNetworkReply.NoError) {
             _item._http_error_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
@@ -469,10 +469,10 @@ private slots:
             _item._status = classify_error (err, _item._http_error_code);
             _item._error_string = error_string ();
 
-            if (_item._status == SyncFileItem.Fatal_error || _item._http_error_code >= 400) {
-                if (_item._status != SyncFileItem.Fatal_error
+            if (_item._status == SyncFileItem.FatalError || _item._http_error_code >= 400) {
+                if (_item._status != SyncFileItem.FatalError
                     && _item._http_error_code != 503) {
-                    SyncJournalDb.Poll_info info;
+                    SyncJournalDb.PollInfo info;
                     info._file = _item._file;
                     // no info._url removes it from the database
                     _journal.set_poll_info (info);
@@ -481,7 +481,7 @@ private slots:
                 emit finished_signal ();
                 return true;
             }
-            QTimer.single_shot (8 * 1000, this, &Poll_job.start);
+            QTimer.single_shot (8 * 1000, this, &PollJob.start);
             return false;
         }
 
@@ -491,14 +491,14 @@ private slots:
         q_c_info (lc_poll_job) << ">" << json_data << "<" << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int () << json << json_parse_error.error_string ();
         if (json_parse_error.error != QJsonParseError.NoError) {
             _item._error_string = tr ("Invalid JSON reply from the poll URL");
-            _item._status = SyncFileItem.Normal_error;
+            _item._status = SyncFileItem.NormalError;
             emit finished_signal ();
             return true;
         }
 
         auto status = json["status"].to_string ();
         if (status == QLatin1String ("init") || status == QLatin1String ("started")) {
-            QTimer.single_shot (5 * 1000, this, &Poll_job.start);
+            QTimer.single_shot (5 * 1000, this, &PollJob.start);
             return false;
         }
 
@@ -514,7 +514,7 @@ private slots:
             _item._error_string = json["error_message"].to_string ();
         }
 
-        SyncJournalDb.Poll_info info;
+        SyncJournalDb.PollInfo info;
         info._file = _item._file;
         // no info._url removes it from the database
         _journal.set_poll_info (info);
@@ -524,8 +524,8 @@ private slots:
         return true;
     }
 
-    Propagate_upload_file_common.Propagate_upload_file_common (Owncloud_propagator *propagator, SyncFileItemPtr &item)
-        : Propagate_item_job (propagator, item)
+    PropagateUploadFileCommon.PropagateUploadFileCommon (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+        : PropagateItemJob (propagator, item)
         , _finished (false)
         , _delete_existing (false)
         , _aborting (false)
@@ -542,11 +542,11 @@ private slots:
         }
     }
 
-    void Propagate_upload_file_common.set_delete_existing (bool enabled) {
+    void PropagateUploadFileCommon.set_delete_existing (bool enabled) {
         _delete_existing = enabled;
     }
 
-    void Propagate_upload_file_common.start () {
+    void PropagateUploadFileCommon.start () {
         const auto path = _item._file;
         const auto slash_position = path.last_index_of ('/');
         const auto parent_path = slash_position >= 0 ? path.left (slash_position) : string ();
@@ -557,7 +557,7 @@ private slots:
             const auto new_file_path_absolute = propagator ().full_local_path (_item._rename_target);
             const auto rename_success = QFile.rename (original_file_path_absolute, new_file_path_absolute);
             if (!rename_success) {
-                done (SyncFileItem.Normal_error, "File contains trailing spaces and couldn't be renamed");
+                done (SyncFileItem.NormalError, "File contains trailing spaces and couldn't be renamed");
                 return;
             }
             _item._file = _item._rename_target;
@@ -565,7 +565,7 @@ private slots:
             Q_ASSERT (_item._modtime > 0);
             if (_item._modtime <= 0) {
                 q_c_warning (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
-                slot_on_error_start_folder_unlock (SyncFileItem.Normal_error, tr ("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (_item._file)));
+                slot_on_error_start_folder_unlock (SyncFileItem.NormalError, tr ("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (_item._file)));
                 return;
             }
         }
@@ -573,7 +573,7 @@ private slots:
         SyncJournalFileRecord parent_rec;
         bool ok = propagator ()._journal.get_file_record (parent_path, &parent_rec);
         if (!ok) {
-            done (SyncFileItem.Normal_error);
+            done (SyncFileItem.NormalError);
             return;
         }
 
@@ -589,15 +589,15 @@ private slots:
         const auto remote_parent_path = parent_rec._e2e_mangled_name.is_empty () ? parent_path : parent_rec._e2e_mangled_name;
         _upload_encrypted_helper = new Propagate_upload_encrypted (propagator (), remote_parent_path, _item, this);
         connect (_upload_encrypted_helper, &Propagate_upload_encrypted.finalized,
-                this, &Propagate_upload_file_common.setup_encrypted_file);
+                this, &PropagateUploadFileCommon.setup_encrypted_file);
         connect (_upload_encrypted_helper, &Propagate_upload_encrypted.error, [this] {
             q_c_debug (lc_propagate_upload) << "Error setting up encryption.";
-            done (SyncFileItem.Fatal_error, tr ("Failed to upload encrypted file."));
+            done (SyncFileItem.FatalError, tr ("Failed to upload encrypted file."));
         });
         _upload_encrypted_helper.start ();
     }
 
-    void Propagate_upload_file_common.setup_encrypted_file (string& path, string& filename, uint64 size) {
+    void PropagateUploadFileCommon.setup_encrypted_file (string& path, string& filename, uint64 size) {
         q_c_debug (lc_propagate_upload) << "Starting to upload encrypted file" << path << filename << size;
         _uploading_encrypted = true;
         _file_to_upload._path = path;
@@ -606,7 +606,7 @@ private slots:
         start_upload_file ();
     }
 
-    void Propagate_upload_file_common.setup_unencrypted_file () {
+    void PropagateUploadFileCommon.setup_unencrypted_file () {
         _uploading_encrypted = false;
         _file_to_upload._file = _item._file;
         _file_to_upload._size = _item._size;
@@ -614,14 +614,14 @@ private slots:
         start_upload_file ();
     }
 
-    void Propagate_upload_file_common.start_upload_file () {
+    void PropagateUploadFileCommon.start_upload_file () {
         if (propagator ()._abort_requested) {
             return;
         }
 
         // Check if the specific file can be accessed
         if (propagator ().has_case_clash_accessibility_problem (_file_to_upload._file)) {
-            done (SyncFileItem.Normal_error, tr ("File %1 cannot be uploaded because another file with the same name, differing only in case, exists").arg (QDir.to_native_separators (_item._file)));
+            done (SyncFileItem.NormalError, tr ("File %1 cannot be uploaded because another file with the same name, differing only in case, exists").arg (QDir.to_native_separators (_item._file)));
             return;
         }
 
@@ -632,7 +632,7 @@ private slots:
             // Necessary for blacklisting logic
             _item._http_error_code = 507;
             emit propagator ().insufficient_remote_storage ();
-            done (SyncFileItem.Detail_error, tr ("Upload of %1 exceeds the quota for the folder").arg (Utility.octets_to_string (_file_to_upload._size)));
+            done (SyncFileItem.DetailError, tr ("Upload of %1 exceeds the quota for the folder").arg (Utility.octets_to_string (_file_to_upload._size)));
             return;
         }
 
@@ -648,12 +648,12 @@ private slots:
             propagator ().full_remote_path (_file_to_upload._file),
             this);
         _jobs.append (job);
-        connect (job, &DeleteJob.finished_signal, this, &Propagate_upload_file_common.slot_compute_content_checksum);
-        connect (job, &GLib.Object.destroyed, this, &Propagate_upload_file_common.slot_job_destroyed);
+        connect (job, &DeleteJob.finished_signal, this, &PropagateUploadFileCommon.slot_compute_content_checksum);
+        connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.slot_job_destroyed);
         job.start ();
     }
 
-    void Propagate_upload_file_common.slot_compute_content_checksum () {
+    void PropagateUploadFileCommon.slot_compute_content_checksum () {
         q_debug () << "Trying to compute the checksum of the file";
         q_debug () << "Still trying to understand if this is the local file or the uploaded one";
         if (propagator ()._abort_requested) {
@@ -668,7 +668,7 @@ private slots:
         // probably temporary one.
         _item._modtime = FileSystem.get_mod_time (file_path);
         if (_item._modtime <= 0) {
-            slot_on_error_start_folder_unlock (SyncFileItem.Normal_error, tr ("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (_item._file)));
+            slot_on_error_start_folder_unlock (SyncFileItem.NormalError, tr ("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (_item._file)));
             return;
         }
 
@@ -690,13 +690,13 @@ private slots:
         compute_checksum.set_checksum_type (checksum_type);
 
         connect (compute_checksum, &ComputeChecksum.done,
-            this, &Propagate_upload_file_common.slot_compute_transmission_checksum);
+            this, &PropagateUploadFileCommon.slot_compute_transmission_checksum);
         connect (compute_checksum, &ComputeChecksum.done,
             compute_checksum, &GLib.Object.delete_later);
         compute_checksum.start (_file_to_upload._path);
     }
 
-    void Propagate_upload_file_common.slot_compute_transmission_checksum (QByteArray &content_checksum_type, QByteArray &content_checksum) {
+    void PropagateUploadFileCommon.slot_compute_transmission_checksum (QByteArray &content_checksum_type, QByteArray &content_checksum) {
         _item._checksum_header = make_checksum_header (content_checksum_type, content_checksum);
 
         // Reuse the content checksum as the transmission checksum if possible
@@ -716,13 +716,13 @@ private slots:
         }
 
         connect (compute_checksum, &ComputeChecksum.done,
-            this, &Propagate_upload_file_common.slot_start_upload);
+            this, &PropagateUploadFileCommon.slot_start_upload);
         connect (compute_checksum, &ComputeChecksum.done,
             compute_checksum, &GLib.Object.delete_later);
         compute_checksum.start (_file_to_upload._path);
     }
 
-    void Propagate_upload_file_common.slot_start_upload (QByteArray &transmission_checksum_type, QByteArray &transmission_checksum) {
+    void PropagateUploadFileCommon.slot_start_upload (QByteArray &transmission_checksum_type, QByteArray &transmission_checksum) {
         // Remove ourselfs from the list of active job, before any posible call to done ()
         // When we start chunks, we will add it again, once for every chunks.
         propagator ()._active_job_list.remove_one (this);
@@ -738,23 +738,23 @@ private slots:
         const string original_file_path = propagator ().full_local_path (_item._file);
 
         if (!FileSystem.file_exists (full_file_path)) {
-            return slot_on_error_start_folder_unlock (SyncFileItem.Soft_error, tr ("File Removed (start upload) %1").arg (full_file_path));
+            return slot_on_error_start_folder_unlock (SyncFileItem.SoftError, tr ("File Removed (start upload) %1").arg (full_file_path));
         }
         if (_item._modtime <= 0) {
-            slot_on_error_start_folder_unlock (SyncFileItem.Normal_error, tr ("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (_item._file)));
+            slot_on_error_start_folder_unlock (SyncFileItem.NormalError, tr ("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (_item._file)));
             return;
         }
         Q_ASSERT (_item._modtime > 0);
         if (_item._modtime <= 0) {
             q_c_warning (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
         }
-        time_t prev_modtime = _item._modtime; // the _item value was set in Propagate_upload_file.start ()
+        time_t prev_modtime = _item._modtime; // the _item value was set in PropagateUploadFile.start ()
         // but a potential checksum calculation could have taken some time during which the file could
         // have been changed again, so better check again here.
 
         _item._modtime = FileSystem.get_mod_time (original_file_path);
         if (_item._modtime <= 0) {
-            slot_on_error_start_folder_unlock (SyncFileItem.Normal_error, tr ("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (_item._file)));
+            slot_on_error_start_folder_unlock (SyncFileItem.NormalError, tr ("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (_item._file)));
             return;
         }
         Q_ASSERT (_item._modtime > 0);
@@ -764,7 +764,7 @@ private slots:
         if (prev_modtime != _item._modtime) {
             propagator ()._another_sync_needed = true;
             q_debug () << "prev_modtime" << prev_modtime << "Curr" << _item._modtime;
-            return slot_on_error_start_folder_unlock (SyncFileItem.Soft_error, tr ("Local file changed during syncing. It will be resumed."));
+            return slot_on_error_start_folder_unlock (SyncFileItem.SoftError, tr ("Local file changed during syncing. It will be resumed."));
         }
 
         _file_to_upload._size = FileSystem.get_size (full_file_path);
@@ -775,34 +775,34 @@ private slots:
         // or not yet fully copied to the destination.
         if (file_is_still_changing (*_item)) {
             propagator ()._another_sync_needed = true;
-            return slot_on_error_start_folder_unlock (SyncFileItem.Soft_error, tr ("Local file changed during sync."));
+            return slot_on_error_start_folder_unlock (SyncFileItem.SoftError, tr ("Local file changed during sync."));
         }
 
         do_start_upload ();
     }
 
-    void Propagate_upload_file_common.slot_folder_unlocked (QByteArray &folder_id, int http_return_code) {
+    void PropagateUploadFileCommon.slot_folder_unlocked (QByteArray &folder_id, int http_return_code) {
         q_debug () << "Failed to unlock encrypted folder" << folder_id;
-        if (_upload_status.status == SyncFileItem.No_status && http_return_code != 200) {
-            done (SyncFileItem.Fatal_error, tr ("Failed to unlock encrypted folder."));
+        if (_upload_status.status == SyncFileItem.NoStatus && http_return_code != 200) {
+            done (SyncFileItem.FatalError, tr ("Failed to unlock encrypted folder."));
         } else {
             done (_upload_status.status, _upload_status.message);
         }
     }
 
-    void Propagate_upload_file_common.slot_on_error_start_folder_unlock (SyncFileItem.Status status, string &error_string) {
+    void PropagateUploadFileCommon.slot_on_error_start_folder_unlock (SyncFileItem.Status status, string &error_string) {
         if (_uploading_encrypted) {
             _upload_status = {
                 status, error_string
             };
-            connect (_upload_encrypted_helper, &Propagate_upload_encrypted.folder_unlocked, this, &Propagate_upload_file_common.slot_folder_unlocked);
+            connect (_upload_encrypted_helper, &Propagate_upload_encrypted.folder_unlocked, this, &PropagateUploadFileCommon.slot_folder_unlocked);
             _upload_encrypted_helper.unlock_folder ();
         } else {
             done (status, error_string);
         }
     }
 
-    Upload_device.Upload_device (string &file_name, int64 start, int64 size, Bandwidth_manager *bwm)
+    UploadDevice.UploadDevice (string &file_name, int64 start, int64 size, BandwidthManager *bwm)
         : _file (file_name)
         , _start (start)
         , _size (size)
@@ -810,13 +810,13 @@ private slots:
         _bandwidth_manager.register_upload_device (this);
     }
 
-    Upload_device.~Upload_device () {
+    UploadDevice.~UploadDevice () {
         if (_bandwidth_manager) {
             _bandwidth_manager.unregister_upload_device (this);
         }
     }
 
-    bool Upload_device.open (QIODevice.Open_mode mode) {
+    bool UploadDevice.open (QIODevice.Open_mode mode) {
         if (mode & QIODevice.WriteOnly)
             return false;
 
@@ -836,17 +836,17 @@ private slots:
         return QIODevice.open (mode);
     }
 
-    void Upload_device.close () {
+    void UploadDevice.close () {
         _file.close ();
         QIODevice.close ();
     }
 
-    int64 Upload_device.write_data (char *, int64) {
+    int64 UploadDevice.write_data (char *, int64) {
         ASSERT (false, "write to read only device");
         return 0;
     }
 
-    int64 Upload_device.read_data (char *data, int64 maxlen) {
+    int64 UploadDevice.read_data (char *data, int64 maxlen) {
         if (_size - _read <= 0) {
             // at end
             if (_bandwidth_manager) {
@@ -878,31 +878,31 @@ private slots:
         return c;
     }
 
-    void Upload_device.slot_job_upload_progress (int64 sent, int64 t) {
+    void UploadDevice.slot_job_upload_progress (int64 sent, int64 t) {
         if (sent == 0 || t == 0) {
             return;
         }
         _read_with_progress = sent;
     }
 
-    bool Upload_device.at_end () {
+    bool UploadDevice.at_end () {
         return _read >= _size;
     }
 
-    int64 Upload_device.size () {
+    int64 UploadDevice.size () {
         return _size;
     }
 
-    int64 Upload_device.bytes_available () {
+    int64 UploadDevice.bytes_available () {
         return _size - _read + QIODevice.bytes_available ();
     }
 
     // random access, we can seek
-    bool Upload_device.is_sequential () {
+    bool UploadDevice.is_sequential () {
         return false;
     }
 
-    bool Upload_device.seek (int64 pos) {
+    bool UploadDevice.seek (int64 pos) {
         if (!QIODevice.seek (pos)) {
             return false;
         }
@@ -914,30 +914,30 @@ private slots:
         return true;
     }
 
-    void Upload_device.give_bandwidth_quota (int64 bwq) {
+    void UploadDevice.give_bandwidth_quota (int64 bwq) {
         if (!at_end ()) {
             _bandwidth_quota = bwq;
             QMetaObject.invoke_method (this, "ready_read", Qt.QueuedConnection); // tell QNAM that we have quota
         }
     }
 
-    void Upload_device.set_bandwidth_limited (bool b) {
+    void UploadDevice.set_bandwidth_limited (bool b) {
         _bandwidth_limited = b;
         QMetaObject.invoke_method (this, "ready_read", Qt.QueuedConnection);
     }
 
-    void Upload_device.set_choked (bool b) {
+    void UploadDevice.set_choked (bool b) {
         _choked = b;
         if (!_choked) {
             QMetaObject.invoke_method (this, "ready_read", Qt.QueuedConnection);
         }
     }
 
-    void Propagate_upload_file_common.start_poll_job (string &path) {
-        auto *job = new Poll_job (propagator ().account (), path, _item,
+    void PropagateUploadFileCommon.start_poll_job (string &path) {
+        auto *job = new PollJob (propagator ().account (), path, _item,
             propagator ()._journal, propagator ().local_path (), this);
-        connect (job, &Poll_job.finished_signal, this, &Propagate_upload_file_common.slot_poll_finished);
-        SyncJournalDb.Poll_info info;
+        connect (job, &PollJob.finished_signal, this, &PropagateUploadFileCommon.slot_poll_finished);
+        SyncJournalDb.PollInfo info;
         info._file = _item._file;
         info._url = path;
         info._modtime = _item._modtime;
@@ -952,8 +952,8 @@ private slots:
         job.start ();
     }
 
-    void Propagate_upload_file_common.slot_poll_finished () {
-        auto *job = qobject_cast<Poll_job> (sender ());
+    void PropagateUploadFileCommon.slot_poll_finished () {
+        auto *job = qobject_cast<PollJob> (sender ());
         ASSERT (job);
 
         propagator ()._active_job_list.remove_one (this);
@@ -966,12 +966,12 @@ private slots:
         finalize ();
     }
 
-    void Propagate_upload_file_common.done (SyncFileItem.Status status, string &error_string) {
+    void PropagateUploadFileCommon.done (SyncFileItem.Status status, string &error_string) {
         _finished = true;
-        Propagate_item_job.done (status, error_string);
+        PropagateItemJob.done (status, error_string);
     }
 
-    void Propagate_upload_file_common.check_resetting_errors () {
+    void PropagateUploadFileCommon.check_resetting_errors () {
         if (_item._http_error_code == 412
             || propagator ().account ().capabilities ().http_error_codes_that_reset_failing_chunked_uploads ().contains (_item._http_error_code)) {
             auto upload_info = propagator ()._journal.get_upload_info (_item._file);
@@ -990,7 +990,7 @@ private slots:
         }
     }
 
-    void Propagate_upload_file_common.common_error_handling (AbstractNetworkJob *job) {
+    void PropagateUploadFileCommon.common_error_handling (AbstractNetworkJob *job) {
         QByteArray reply_content;
         string error_string = job.error_string_parsing_body (&reply_content);
         q_c_debug (lc_propagate_upload) << reply_content; // display the XML error in the debug
@@ -1025,7 +1025,7 @@ private slots:
             }
 
             // Set up the error
-            status = SyncFileItem.Detail_error;
+            status = SyncFileItem.DetailError;
             error_string = tr ("Upload of %1 exceeds the quota for the folder").arg (Utility.octets_to_string (_file_to_upload._size));
             emit propagator ().insufficient_remote_storage ();
         }
@@ -1033,7 +1033,7 @@ private slots:
         abort_with_error (status, error_string);
     }
 
-    void Propagate_upload_file_common.adjust_last_job_timeout (AbstractNetworkJob *job, int64 file_size) {
+    void PropagateUploadFileCommon.adjust_last_job_timeout (AbstractNetworkJob *job, int64 file_size) {
         constexpr double three_minutes = 3.0 * 60 * 1000;
 
         job.set_timeout (q_bound (
@@ -1044,19 +1044,19 @@ private slots:
             static_cast<int64> (30 * 60 * 1000)));
     }
 
-    void Propagate_upload_file_common.slot_job_destroyed (GLib.Object *job) {
+    void PropagateUploadFileCommon.slot_job_destroyed (GLib.Object *job) {
         _jobs.erase (std.remove (_jobs.begin (), _jobs.end (), job), _jobs.end ());
     }
 
     // This function is used whenever there is an error occuring and jobs might be in progress
-    void Propagate_upload_file_common.abort_with_error (SyncFileItem.Status status, string &error) {
+    void PropagateUploadFileCommon.abort_with_error (SyncFileItem.Status status, string &error) {
         if (_aborting)
             return;
-        abort (Abort_type.Synchronous);
+        abort (AbortType.Synchronous);
         done (status, error);
     }
 
-    QMap<QByteArray, QByteArray> Propagate_upload_file_common.headers () {
+    QMap<QByteArray, QByteArray> PropagateUploadFileCommon.headers () {
         QMap<QByteArray, QByteArray> headers;
         headers[QByteArrayLiteral ("Content-Type")] = QByteArrayLiteral ("application/octet-stream");
         Q_ASSERT (_item._modtime > 0);
@@ -1065,7 +1065,7 @@ private slots:
         }
         headers[QByteArrayLiteral ("X-OC-Mtime")] = QByteArray.number (int64 (_item._modtime));
         if (q_environment_variable_int_value ("OWNCLOUD_LAZYOPS"))
-            headers[QByteArrayLiteral ("OC-Lazy_ops")] = QByteArrayLiteral ("true");
+            headers[QByteArrayLiteral ("OC-LazyOps")] = QByteArrayLiteral ("true");
 
         if (_item._file.contains (QLatin1String (".sys.admin#recall#"))) {
             // This is a file recall triggered by the admin.  Note : the
@@ -1092,13 +1092,13 @@ private slots:
         if (conflict_record.is_valid ()) {
             headers[QByteArrayLiteral ("OC-Conflict")] = "1";
             if (!conflict_record.initial_base_path.is_empty ())
-                headers[QByteArrayLiteral ("OC-Conflict_initial_base_path")] = conflict_record.initial_base_path;
+                headers[QByteArrayLiteral ("OC-ConflictInitialBasePath")] = conflict_record.initial_base_path;
             if (!conflict_record.base_file_id.is_empty ())
-                headers[QByteArrayLiteral ("OC-Conflict_base_file_id")] = conflict_record.base_file_id;
+                headers[QByteArrayLiteral ("OC-ConflictBaseFileId")] = conflict_record.base_file_id;
             if (conflict_record.base_modtime != -1)
-                headers[QByteArrayLiteral ("OC-Conflict_base_mtime")] = QByteArray.number (conflict_record.base_modtime);
+                headers[QByteArrayLiteral ("OC-ConflictBaseMtime")] = QByteArray.number (conflict_record.base_modtime);
             if (!conflict_record.base_etag.is_empty ())
-                headers[QByteArrayLiteral ("OC-Conflict_base_etag")] = conflict_record.base_etag;
+                headers[QByteArrayLiteral ("OC-ConflictBaseEtag")] = conflict_record.base_etag;
         }
 
         if (_upload_encrypted_helper && !_upload_encrypted_helper.folder_token ().is_empty ()) {
@@ -1108,7 +1108,7 @@ private slots:
         return headers;
     }
 
-    void Propagate_upload_file_common.finalize () {
+    void PropagateUploadFileCommon.finalize () {
         // Update the quota, if known
         auto quota_it = propagator ()._folder_quota.find (QFileInfo (_item._file).path ());
         if (quota_it != propagator ()._folder_quota.end ())
@@ -1117,10 +1117,10 @@ private slots:
         // Update the database entry
         const auto result = propagator ().update_metadata (*_item);
         if (!result) {
-            done (SyncFileItem.Fatal_error, tr ("Error updating metadata : %1").arg (result.error ()));
+            done (SyncFileItem.FatalError, tr ("Error updating metadata : %1").arg (result.error ()));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-            done (SyncFileItem.Soft_error, tr ("The file %1 is currently in use").arg (_item._file));
+            done (SyncFileItem.SoftError, tr ("The file %1 is currently in use").arg (_item._file));
             return;
         }
 
@@ -1145,15 +1145,15 @@ private slots:
             _upload_status = {
                 SyncFileItem.Success, string ()
             };
-            connect (_upload_encrypted_helper, &Propagate_upload_encrypted.folder_unlocked, this, &Propagate_upload_file_common.slot_folder_unlocked);
+            connect (_upload_encrypted_helper, &Propagate_upload_encrypted.folder_unlocked, this, &PropagateUploadFileCommon.slot_folder_unlocked);
             _upload_encrypted_helper.unlock_folder ();
         } else {
             done (SyncFileItem.Success);
         }
     }
 
-    void Propagate_upload_file_common.abort_network_jobs (
-        Propagator_job.Abort_type abort_type,
+    void PropagateUploadFileCommon.abort_network_jobs (
+        PropagatorJob.AbortType abort_type,
         const std.function<bool (AbstractNetworkJob *)> &may_abort_job) {
         if (_aborting)
             return;
@@ -1186,14 +1186,14 @@ private slots:
                 continue;
 
             // Abort the job
-            if (abort_type == Abort_type.Asynchronous) {
+            if (abort_type == AbortType.Asynchronous) {
                 // Connect to finished signal of job reply to asynchonously finish the abort
                 connect (reply, &QNetworkReply.finished, this, one_abort_finished);
             }
             reply.abort ();
         }
 
-        if (*running_count == 0 && abort_type == Abort_type.Asynchronous)
+        if (*running_count == 0 && abort_type == AbortType.Asynchronous)
             emit abort_finished ();
     }
     }

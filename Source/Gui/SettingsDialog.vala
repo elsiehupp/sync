@@ -17,7 +17,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QImage>
 // #include <QWidget_action>
 // #include <QPainter>
-// #include <QPainter_path>
+// #include <QPainterPath>
 
 // #include <Gtk.Dialog>
 // #include <QStyled_item_delegate>
@@ -273,7 +273,7 @@ private:
             account_action = create_color_aware_action (QLatin1String (":/client/theme/account.svg"),
                 action_text);
         } else {
-            QIcon icon (QPixmap.from_image (Avatar_job.make_circular_avatar (avatar)));
+            QIcon icon (QPixmap.from_image (AvatarJob.make_circular_avatar (avatar)));
             account_action = create_action_with_icon (icon, action_text);
         }
 
@@ -312,7 +312,7 @@ private:
             if (action) {
                 QImage pix = account.avatar ();
                 if (!pix.is_null ()) {
-                    action.set_icon (QPixmap.from_image (Avatar_job.make_circular_avatar (pix)));
+                    action.set_icon (QPixmap.from_image (AvatarJob.make_circular_avatar (pix)));
                 }
             }
         }

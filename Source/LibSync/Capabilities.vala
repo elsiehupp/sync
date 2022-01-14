@@ -23,8 +23,8 @@ enum PushNotificationType {
     Activities = 2,
     Notifications = 4
 };
-Q_DECLARE_FLAGS (Push_notification_types, PushNotificationType)
-Q_DECLARE_OPERATORS_FOR_FLAGS (Push_notification_types)
+Q_DECLARE_FLAGS (PushNotificationTypes, PushNotificationType)
+Q_DECLARE_OPERATORS_FOR_FLAGS (PushNotificationTypes)
 
 /***********************************************************
 @brief The Capabilities class represents the capabilities of an own_cloud
@@ -58,7 +58,7 @@ public:
     bool user_status_supports_emoji ();
 
     /// Returns which kind of push notfications are available
-    Push_notification_types available_push_notifications ();
+    PushNotificationTypes available_push_notifications ();
 
     /// Websocket url for files push notifications if available
     QUrl push_notifications_web_socket_url ();
@@ -152,27 +152,27 @@ public:
     bool upload_conflict_files ();
 
     // Direct Editing
-    void add_direct_editor (Direct_editor* direct_editor);
-    Direct_editor* get_direct_editor_for_mimetype (QMime_type &mime_type);
-    Direct_editor* get_direct_editor_for_optional_mimetype (QMime_type &mime_type);
+    void add_direct_editor (DirectEditor* direct_editor);
+    DirectEditor* get_direct_editor_for_mimetype (QMimeType &mime_type);
+    DirectEditor* get_direct_editor_for_optional_mimetype (QMimeType &mime_type);
 
 private:
     QVariantMap _capabilities;
 
-    QList<Direct_editor> _direct_editors;
+    QList<DirectEditor> _direct_editors;
 };
 
 /*-------------------------------------------------------------------------------------*/
 
-class Direct_editor : GLib.Object {
+class DirectEditor : GLib.Object {
 public:
-    Direct_editor (string &id, string &name, GLib.Object* parent = nullptr);
+    DirectEditor (string &id, string &name, GLib.Object* parent = nullptr);
 
     void add_mimetype (QByteArray &mime_type);
     void add_optional_mimetype (QByteArray &mime_type);
 
-    bool has_mimetype (QMime_type &mime_type);
-    bool has_optional_mimetype (QMime_type &mime_type);
+    bool has_mimetype (QMimeType &mime_type);
+    bool has_optional_mimetype (QMimeType &mime_type);
 
     string id ();
     string name ();
@@ -373,13 +373,13 @@ private:
         return user_status_map.value ("supports_emoji", false).to_bool ();
     }
 
-    Push_notification_types Capabilities.available_push_notifications () {
+    PushNotificationTypes Capabilities.available_push_notifications () {
         if (!_capabilities.contains ("notify_push")) {
             return PushNotificationType.None;
         }
 
         const auto types = _capabilities["notify_push"].to_map ()["type"].to_string_list ();
-        Push_notification_types push_notification_types;
+        PushNotificationTypes push_notification_types;
 
         if (types.contains ("files")) {
             push_notification_types.set_flag (PushNotificationType.Files);
@@ -437,13 +437,13 @@ private:
     /*-------------------------------------------------------------------------------------*/
 
     // Direct Editing
-    void Capabilities.add_direct_editor (Direct_editor* direct_editor) {
+    void Capabilities.add_direct_editor (DirectEditor* direct_editor) {
         if (direct_editor)
             _direct_editors.append (direct_editor);
     }
 
-    Direct_editor* Capabilities.get_direct_editor_for_mimetype (QMime_type &mime_type) {
-        foreach (Direct_editor* editor, _direct_editors) {
+    DirectEditor* Capabilities.get_direct_editor_for_mimetype (QMimeType &mime_type) {
+        foreach (DirectEditor* editor, _direct_editors) {
             if (editor.has_mimetype (mime_type))
                 return editor;
         }
@@ -451,8 +451,8 @@ private:
         return nullptr;
     }
 
-    Direct_editor* Capabilities.get_direct_editor_for_optional_mimetype (QMime_type &mime_type) {
-        foreach (Direct_editor* editor, _direct_editors) {
+    DirectEditor* Capabilities.get_direct_editor_for_optional_mimetype (QMimeType &mime_type) {
+        foreach (DirectEditor* editor, _direct_editors) {
             if (editor.has_optional_mimetype (mime_type))
                 return editor;
         }
@@ -462,41 +462,41 @@ private:
 
     /*-------------------------------------------------------------------------------------*/
 
-    Direct_editor.Direct_editor (string &id, string &name, GLib.Object* parent)
+    DirectEditor.DirectEditor (string &id, string &name, GLib.Object* parent)
         : GLib.Object (parent)
         , _id (id)
         , _name (name) {
     }
 
-    string Direct_editor.id () {
+    string DirectEditor.id () {
         return _id;
     }
 
-    string Direct_editor.name () {
+    string DirectEditor.name () {
         return _name;
     }
 
-    void Direct_editor.add_mimetype (QByteArray &mime_type) {
+    void DirectEditor.add_mimetype (QByteArray &mime_type) {
         _mime_types.append (mime_type);
     }
 
-    void Direct_editor.add_optional_mimetype (QByteArray &mime_type) {
+    void DirectEditor.add_optional_mimetype (QByteArray &mime_type) {
         _optional_mime_types.append (mime_type);
     }
 
-    QList<QByteArray> Direct_editor.mime_types () {
+    QList<QByteArray> DirectEditor.mime_types () {
         return _mime_types;
     }
 
-    QList<QByteArray> Direct_editor.optional_mime_types () {
+    QList<QByteArray> DirectEditor.optional_mime_types () {
         return _optional_mime_types;
     }
 
-    bool Direct_editor.has_mimetype (QMime_type &mime_type) {
+    bool DirectEditor.has_mimetype (QMimeType &mime_type) {
         return _mime_types.contains (mime_type.name ().to_latin1 ());
     }
 
-    bool Direct_editor.has_optional_mimetype (QMime_type &mime_type) {
+    bool DirectEditor.has_optional_mimetype (QMimeType &mime_type) {
         return _optional_mime_types.contains (mime_type.name ().to_latin1 ());
     }
 

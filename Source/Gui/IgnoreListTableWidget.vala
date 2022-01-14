@@ -63,7 +63,7 @@ private:
                 this, &IgnoreListTableWidget.slot_remove_all_items);
 
         ui.table_widget.resize_columns_to_contents ();
-        ui.table_widget.horizontal_header ().set_section_resize_mode (pattern_col, QHeader_view.Stretch);
+        ui.table_widget.horizontal_header ().set_section_resize_mode (pattern_col, QHeaderView.Stretch);
         ui.table_widget.vertical_header ().set_visible (false);
     }
 
@@ -142,7 +142,7 @@ private:
 
     void IgnoreListTableWidget.read_ignore_file (string &file, bool read_only) {
         QFile ignores (file);
-        if (ignores.open (QIODevice.Read_only)) {
+        if (ignores.open (QIODevice.ReadOnly)) {
             while (!ignores.at_end ()) {
                 string line = string.from_utf8 (ignores.read_line ());
                 line.chop (1);

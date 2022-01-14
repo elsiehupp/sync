@@ -7,7 +7,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 // #include <QFile>
 // #include <QFileInfo>
 // #include <QDir>
-// #include <QDir_iterator>
+// #include <QDirIterator>
 // #include <QCoreApplication>
 
 // #pragma once
@@ -97,7 +97,7 @@ namespace FileSystem {
         // compare two files with given filename and return true if they have the same content
         QFile f1 (fn1);
         QFile f2 (fn2);
-        if (!f1.open (QIODevice.Read_only) || !f2.open (QIODevice.Read_only)) {
+        if (!f1.open (QIODevice.ReadOnly) || !f2.open (QIODevice.ReadOnly)) {
             q_c_warning (lc_file_system) << "file_equals : Failed to open " << fn1 << "or" << fn2;
             return false;
         }
@@ -106,13 +106,13 @@ namespace FileSystem {
             return false;
         }
 
-        const int Buffer_size = 16 * 1024;
-        QByteArray buffer1 (Buffer_size, 0);
-        QByteArray buffer2 (Buffer_size, 0);
+        const int BufferSize = 16 * 1024;
+        QByteArray buffer1 (BufferSize, 0);
+        QByteArray buffer2 (BufferSize, 0);
         // the files have the same size, compare all of it
         while (!f1.at_end ()){
-            f1.read (buffer1.data (), Buffer_size);
-            f2.read (buffer2.data (), Buffer_size);
+            f1.read (buffer1.data (), BufferSize);
+            f2.read (buffer2.data (), BufferSize);
             if (buffer1 != buffer2) {
                 return false;
             }
@@ -175,7 +175,7 @@ namespace FileSystem {
     // Code inspired from Qt5's QDir.remove_recursively
     bool FileSystem.remove_recursively (string &path, std.function<void (string &path, bool is_dir)> &on_deleted, QStringList *errors) {
         bool all_removed = true;
-        QDir_iterator di (path, QDir.AllEntries | QDir.Hidden | QDir.System | QDir.NoDotAndDotDot);
+        QDirIterator di (path, QDir.AllEntries | QDir.Hidden | QDir.System | QDir.NoDotAndDotDot);
 
         while (di.has_next ()) {
             di.next ();

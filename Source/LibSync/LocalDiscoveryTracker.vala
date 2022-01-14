@@ -39,9 +39,9 @@ relative to the folder that is being synced, without a starting slash.
 
 @ingroup libsync
 ***********************************************************/
-class Local_discovery_tracker : GLib.Object {
+class LocalDiscoveryTracker : GLib.Object {
 public:
-    Local_discovery_tracker ();
+    LocalDiscoveryTracker ();
 
     /***********************************************************
     Adds a path that must be locally rediscovered later.
@@ -108,20 +108,20 @@ private:
 
 
 
-Local_discovery_tracker.Local_discovery_tracker () = default;
+LocalDiscoveryTracker.LocalDiscoveryTracker () = default;
 
-void Local_discovery_tracker.add_touched_path (string &relative_path) {
+void LocalDiscoveryTracker.add_touched_path (string &relative_path) {
     q_c_debug (lc_local_discovery_tracker) << "inserted touched" << relative_path;
     _local_discovery_paths.insert (relative_path);
 }
 
-void Local_discovery_tracker.start_sync_full_discovery () {
+void LocalDiscoveryTracker.start_sync_full_discovery () {
     _local_discovery_paths.clear ();
     _previous_local_discovery_paths.clear ();
     q_c_debug (lc_local_discovery_tracker) << "full discovery";
 }
 
-void Local_discovery_tracker.start_sync_partial_discovery () {
+void LocalDiscoveryTracker.start_sync_partial_discovery () {
     if (lc_local_discovery_tracker ().is_debug_enabled ()) {
         QStringList paths;
         for (auto &path : _local_discovery_paths)
@@ -133,21 +133,21 @@ void Local_discovery_tracker.start_sync_partial_discovery () {
     _local_discovery_paths.clear ();
 }
 
-const std.set<string> &Local_discovery_tracker.local_discovery_paths () {
+const std.set<string> &LocalDiscoveryTracker.local_discovery_paths () {
     return _local_discovery_paths;
 }
 
-void Local_discovery_tracker.slot_item_completed (SyncFileItemPtr &item) {
+void LocalDiscoveryTracker.slot_item_completed (SyncFileItemPtr &item) {
     // For successes, we want to wipe the file from the list to ensure we don't
     // rediscover it even if this overall sync fails.
     //
     // For failures, we want to add the file to the list so the next sync
     // will be able to retry it.
     if (item._status == SyncFileItem.Success
-        || item._status == SyncFileItem.File_ignored
+        || item._status == SyncFileItem.FileIgnored
         || item._status == SyncFileItem.Restoration
         || item._status == SyncFileItem.Conflict
-        || (item._status == SyncFileItem.No_status
+        || (item._status == SyncFileItem.NoStatus
                && (item._instruction == CSYNC_INSTRUCTION_NONE
                       || item._instruction == CSYNC_INSTRUCTION_UPDATE_METADATA))) {
         if (_previous_local_discovery_paths.erase (item._file.to_utf8 ()))
@@ -160,7 +160,7 @@ void Local_discovery_tracker.slot_item_completed (SyncFileItemPtr &item) {
     }
 }
 
-void Local_discovery_tracker.slot_sync_finished (bool success) {
+void LocalDiscoveryTracker.slot_sync_finished (bool success) {
     if (success) {
         q_c_debug (lc_local_discovery_tracker) << "sync success, forgetting last sync's local discovery path list";
     } else {

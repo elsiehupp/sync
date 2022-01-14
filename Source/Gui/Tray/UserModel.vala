@@ -14,7 +14,7 @@ const int USERMODEL_H
 // #include <QDesktopServices>
 // #include <QIcon>
 // #include <QMessageBox>
-// #include <QSvg_renderer>
+// #include <QSvgRenderer>
 // #include <QPainter>
 // #include <QPushButton>
 
@@ -69,7 +69,7 @@ public:
     void remove_account ();
     string avatar_url ();
     bool is_desktop_notifications_allowed ();
-    User_status.Online_status status ();
+    UserStatus.OnlineStatus status ();
     string status_message ();
     QUrl status_icon ();
     string status_emoji ();
@@ -171,7 +171,7 @@ public:
     Q_INVOKABLE void logout (int &id);
     Q_INVOKABLE void remove_account (int &id);
 
-    Q_INVOKABLE std.shared_ptr<Occ.User_status_connector> user_status_connector (int id);
+    Q_INVOKABLE std.shared_ptr<Occ.UserStatusConnector> user_status_connector (int id);
 
     ActivityListModel *current_activity_model ();
 
@@ -347,8 +347,8 @@ void User.slot_push_notifications_ready () {
 }
 
 void User.slot_disconnect_push_notifications () {
-    disconnect (_account.account ().push_notifications (), &Push_notifications.notifications_changed, this, &User.slot_received_push_notification);
-    disconnect (_account.account ().push_notifications (), &Push_notifications.activities_changed, this, &User.slot_received_push_activity);
+    disconnect (_account.account ().push_notifications (), &PushNotifications.notifications_changed, this, &User.slot_received_push_notification);
+    disconnect (_account.account ().push_notifications (), &PushNotifications.activities_changed, this, &User.slot_received_push_activity);
 
     disconnect (_account.account ().data (), &Account.push_notifications_disabled, this, &User.slot_disconnect_push_notifications);
 
@@ -383,8 +383,8 @@ void User.slot_check_expired_activities () {
 void User.connect_push_notifications () {
     connect (_account.account ().data (), &Account.push_notifications_disabled, this, &User.slot_disconnect_push_notifications, Qt.UniqueConnection);
 
-    connect (_account.account ().push_notifications (), &Push_notifications.notifications_changed, this, &User.slot_received_push_notification, Qt.UniqueConnection);
-    connect (_account.account ().push_notifications (), &Push_notifications.activities_changed, this, &User.slot_received_push_activity, Qt.UniqueConnection);
+    connect (_account.account ().push_notifications (), &PushNotifications.notifications_changed, this, &User.slot_received_push_notification, Qt.UniqueConnection);
+    connect (_account.account ().push_notifications (), &PushNotifications.activities_changed, this, &User.slot_received_push_activity, Qt.UniqueConnection);
 }
 
 bool User.check_push_notifications_are_ready () {
@@ -558,7 +558,7 @@ void User.slot_progress_info (string &folder, ProgressInfo &progress) {
                 continue;
             }
 
-            if (style == Local_discovery_style.Filesystem_only) {
+            if (style == LocalDiscoveryStyle.FilesystemOnly) {
                 _activity_model.remove_activity_from_activity_list (activity);
                 continue;
             }
@@ -568,12 +568,12 @@ void User.slot_progress_info (string &folder, ProgressInfo &progress) {
                 continue;
             }
 
-            if (activity._status == SyncFileItem.File_locked && !QFileInfo (f.path () + activity._file).exists ()) {
+            if (activity._status == SyncFileItem.FileLocked && !QFileInfo (f.path () + activity._file).exists ()) {
                 _activity_model.remove_activity_from_activity_list (activity);
                 continue;
             }
 
-            if (activity._status == SyncFileItem.File_ignored && !QFileInfo (f.path () + activity._file).exists ()) {
+            if (activity._status == SyncFileItem.FileIgnored && !QFileInfo (f.path () + activity._file).exists ()) {
                 _activity_model.remove_activity_from_activity_list (activity);
                 continue;
             }
@@ -625,7 +625,7 @@ void User.slot_add_error (string &folder_alias, string &message, ErrorCategory c
         activity._acc_name = folder_instance.account_state ().account ().display_name ();
         activity._folder = folder_alias;
 
-        if (category == ErrorCategory.Insufficient_remote_storage) {
+        if (category == ErrorCategory.InsufficientRemoteStorage) {
             Activity_link link;
             link._label = tr ("Retry all uploads");
             link._link = folder_instance.path ();
@@ -702,7 +702,7 @@ void User.process_completed_sync_item (Folder *folder, SyncFileItemPtr &item) {
         activity._file_action = "file_changed";
     }
 
-    if (item._status == SyncFileItem.No_status || item._status == SyncFileItem.Success) {
+    if (item._status == SyncFileItem.NoStatus || item._status == SyncFileItem.Success) {
         q_c_warning (lc_activity) << "Item " << item._file << " retrieved successfully.";
 
         if (item._direction != SyncFileItem.Up) {
@@ -722,11 +722,11 @@ void User.process_completed_sync_item (Folder *folder, SyncFileItemPtr &item) {
         q_c_warning (lc_activity) << "Item " << item._file << " retrieved resulted in error " << item._error_string;
         activity._subject = item._error_string;
 
-        if (item._status == SyncFileItem.Status.File_ignored) {
+        if (item._status == SyncFileItem.Status.FileIgnored) {
             _activity_model.add_ignored_file_to_list (activity);
         } else {
             // add 'protocol error' to activity list
-            if (item._status == SyncFileItem.Status.File_name_invalid) {
+            if (item._status == SyncFileItem.Status.FileNameInvalid) {
                 show_desktop_notification (item._file, activity._subject);
             }
             _activity_model.add_error_to_activity_list (activity);
@@ -810,7 +810,7 @@ string User.server (bool shortened) {
     return server_url;
 }
 
-User_status.Online_status User.status () {
+UserStatus.OnlineStatus User.status () {
     return _account.account ().user_status_connector ().user_status ().state ();
 }
 
@@ -831,7 +831,7 @@ bool User.server_has_user_status () {
 }
 
 QImage User.avatar () {
-    return Avatar_job.make_circular_avatar (_account.account ().avatar ());
+    return AvatarJob.make_circular_avatar (_account.account ().avatar ());
 }
 
 string User.avatar_url () {
@@ -1080,7 +1080,7 @@ Q_INVOKABLE void User_model.remove_account (int &id) {
     end_remove_rows ();
 }
 
-std.shared_ptr<Occ.User_status_connector> User_model.user_status_connector (int id) {
+std.shared_ptr<Occ.UserStatusConnector> User_model.user_status_connector (int id) {
     if (id < 0 || id >= _users.size ()) {
         return nullptr;
     }
@@ -1195,7 +1195,7 @@ QImage Image_provider.request_image (string &id, QSize *size, QSize &requested_s
         QImage image (128, 128, QImage.Format_ARGB32);
         image.fill (Qt.Global_color.transparent);
         QPainter painter (&image);
-        QSvg_renderer renderer (path);
+        QSvgRenderer renderer (path);
         renderer.render (&painter);
         return image;
     };

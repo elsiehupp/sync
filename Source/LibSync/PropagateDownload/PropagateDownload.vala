@@ -26,10 +26,10 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 namespace Occ {
 
 /***********************************************************
-@brief The GETFile_job class
+@brief The GETFileJob class
 @ingroup libsync
 ***********************************************************/
-class GETFile_job : AbstractNetworkJob {
+class GETFileJob : AbstractNetworkJob {
     QIODevice *_device;
     QMap<QByteArray, QByteArray> _headers;
     string _error_string;
@@ -42,7 +42,7 @@ class GETFile_job : AbstractNetworkJob {
     bool _bandwidth_limited; // if _bandwidth_quota will be used
     bool _bandwidth_choked; // if download is paused (won't read on ready_read ())
     int64 _bandwidth_quota;
-    QPointer<Bandwidth_manager> _bandwidth_manager;
+    QPointer<BandwidthManager> _bandwidth_manager;
     bool _has_emitted_finished_signal;
     time_t _last_modified;
 
@@ -54,14 +54,14 @@ protected:
 
 public:
     // DOES NOT take ownership of the device.
-    GETFile_job (AccountPtr account, string &path, QIODevice *device,
+    GETFileJob (AccountPtr account, string &path, QIODevice *device,
         const QMap<QByteArray, QByteArray> &headers, QByteArray &expected_etag_for_resume,
         int64 resume_start, GLib.Object *parent = nullptr);
     // For direct_download_url:
-    GETFile_job (AccountPtr account, QUrl &url, QIODevice *device,
+    GETFileJob (AccountPtr account, QUrl &url, QIODevice *device,
         const QMap<QByteArray, QByteArray> &headers, QByteArray &expected_etag_for_resume,
         int64 resume_start, GLib.Object *parent = nullptr);
-    ~GETFile_job () override {
+    ~GETFileJob () override {
         if (_bandwidth_manager) {
             _bandwidth_manager.unregister_download_job (this);
         }
@@ -87,7 +87,7 @@ public:
 
     void new_reply_hook (QNetworkReply *reply) override;
 
-    void set_bandwidth_manager (Bandwidth_manager *bwm);
+    void set_bandwidth_manager (BandwidthManager *bwm);
     void set_choked (bool c);
     void set_bandwidth_limited (bool b);
     void give_bandwidth_quota (int64 q);
@@ -142,30 +142,30 @@ private slots:
 @brief The GETEncrypted_file_job class that provides file decryption on the fly while the download is running
 @ingroup libsync
 ***********************************************************/
-class GETEncrypted_file_job : GETFile_job {
+class GETEncrypted_file_job : GETFileJob {
 
 public:
     // DOES NOT take ownership of the device.
     GETEncrypted_file_job (AccountPtr account, string &path, QIODevice *device,
         const QMap<QByteArray, QByteArray> &headers, QByteArray &expected_etag_for_resume,
-        int64 resume_start, Encrypted_file encrypted_info, GLib.Object *parent = nullptr);
+        int64 resume_start, EncryptedFile encrypted_info, GLib.Object *parent = nullptr);
     GETEncrypted_file_job (AccountPtr account, QUrl &url, QIODevice *device,
         const QMap<QByteArray, QByteArray> &headers, QByteArray &expected_etag_for_resume,
-        int64 resume_start, Encrypted_file encrypted_info, GLib.Object *parent = nullptr);
+        int64 resume_start, EncryptedFile encrypted_info, GLib.Object *parent = nullptr);
     ~GETEncrypted_file_job () override = default;
 
 protected:
     int64 write_to_device (QByteArray &data) override;
 
 private:
-    QSharedPointer<Encryption_helper.Streaming_decryptor> _decryptor;
-    Encrypted_file _encrypted_file_info = {};
+    QSharedPointer<EncryptionHelper.StreamingDecryptor> _decryptor;
+    EncryptedFile _encrypted_file_info = {};
     QByteArray _pending_bytes;
     int64 _processed_so_far = 0;
 };
 
 /***********************************************************
-@brief The Propagate_download_file class
+@brief The PropagateDownloadFile class
 @ingroup libsync
 
 This is the flow:
@@ -182,7 +182,7 @@ This is the flow:
     |                         checksum differs?    |
     +. start_download () <--------------------------+
           |                                        |
-          +. run a GETFile_job                     | checksum identical?
+          +. run a GETFileJob                     | checksum identical?
                                                    |
       done?. slot_get_finished ()                    |
                 |                                  |
@@ -202,10 +202,10 @@ This is the flow:
 
 \endcode
 ***********************************************************/
-class Propagate_download_file : Propagate_item_job {
+class PropagateDownloadFile : PropagateItemJob {
 public:
-    Propagate_download_file (Owncloud_propagator *propagator, SyncFileItemPtr &item)
-        : Propagate_item_job (propagator, item)
+    PropagateDownloadFile (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+        : PropagateItemJob (propagator, item)
         , _resume_start (0)
         , _download_progress (0)
         , _delete_existing (false) {
@@ -235,7 +235,7 @@ private slots:
     void conflict_checksum_computed (QByteArray &checksum_type, QByteArray &checksum);
     /// Called to start downloading the remote file
     void start_download ();
-    /// Called when the GETFile_job finishes
+    /// Called when the GETFileJob finishes
     void slot_get_finished ();
     /// Called when the download's checksum header was validated
     void transmission_checksum_validated (QByteArray &checksum_type, QByteArray &checksum);
@@ -245,7 +245,7 @@ private slots:
     /// Called when it's time to update the db metadata
     void update_metadata (bool is_conflict);
 
-    void abort (Propagator_job.Abort_type abort_type) override;
+    void abort (PropagatorJob.AbortType abort_type) override;
     void slot_download_progress (int64, int64);
     void slot_checksum_fail (string &err_msg);
 
@@ -255,12 +255,12 @@ private:
 
     int64 _resume_start;
     int64 _download_progress;
-    QPointer<GETFile_job> _job;
+    QPointer<GETFileJob> _job;
     QFile _tmp_file;
     bool _delete_existing;
     bool _is_encrypted = false;
-    Encrypted_file _encrypted_info;
-    Conflict_record _conflict_record;
+    EncryptedFile _encrypted_info;
+    ConflictRecord _conflict_record;
 
     QElapsedTimer _stopwatch;
 
@@ -292,7 +292,7 @@ string create_download_tmp_file_name (string &previous) {
 }
 
 // DOES NOT take ownership of the device.
-GETFile_job.GETFile_job (AccountPtr account, string &path, QIODevice *device,
+GETFileJob.GETFileJob (AccountPtr account, string &path, QIODevice *device,
     const QMap<QByteArray, QByteArray> &headers, QByteArray &expected_etag_for_resume,
     int64 resume_start, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent)
@@ -301,7 +301,7 @@ GETFile_job.GETFile_job (AccountPtr account, string &path, QIODevice *device,
     , _expected_etag_for_resume (expected_etag_for_resume)
     , _expected_content_length (-1)
     , _resume_start (resume_start)
-    , _error_status (SyncFileItem.No_status)
+    , _error_status (SyncFileItem.NoStatus)
     , _bandwidth_limited (false)
     , _bandwidth_choked (false)
     , _bandwidth_quota (0)
@@ -311,7 +311,7 @@ GETFile_job.GETFile_job (AccountPtr account, string &path, QIODevice *device,
     , _content_length (-1) {
 }
 
-GETFile_job.GETFile_job (AccountPtr account, QUrl &url, QIODevice *device,
+GETFileJob.GETFileJob (AccountPtr account, QUrl &url, QIODevice *device,
     const QMap<QByteArray, QByteArray> &headers, QByteArray &expected_etag_for_resume,
     int64 resume_start, GLib.Object *parent)
     : AbstractNetworkJob (account, url.to_encoded (), parent)
@@ -320,7 +320,7 @@ GETFile_job.GETFile_job (AccountPtr account, QUrl &url, QIODevice *device,
     , _expected_etag_for_resume (expected_etag_for_resume)
     , _expected_content_length (-1)
     , _resume_start (resume_start)
-    , _error_status (SyncFileItem.No_status)
+    , _error_status (SyncFileItem.NoStatus)
     , _direct_download_url (url)
     , _bandwidth_limited (false)
     , _bandwidth_choked (false)
@@ -331,7 +331,7 @@ GETFile_job.GETFile_job (AccountPtr account, QUrl &url, QIODevice *device,
     , _content_length (-1) {
 }
 
-void GETFile_job.start () {
+void GETFileJob.start () {
     if (_resume_start > 0) {
         _headers["Range"] = "bytes=" + QByteArray.number (_resume_start) + '-';
         _headers["Accept-Ranges"] = "bytes";
@@ -362,17 +362,17 @@ void GETFile_job.start () {
     AbstractNetworkJob.start ();
 }
 
-void GETFile_job.new_reply_hook (QNetworkReply *reply) {
+void GETFileJob.new_reply_hook (QNetworkReply *reply) {
     reply.set_read_buffer_size (16 * 1024); // keep low so we can easier limit the bandwidth
 
-    connect (reply, &QNetworkReply.meta_data_changed, this, &GETFile_job.slot_meta_data_changed);
-    connect (reply, &QIODevice.ready_read, this, &GETFile_job.slot_ready_read);
-    connect (reply, &QNetworkReply.finished, this, &GETFile_job.slot_ready_read);
-    connect (reply, &QNetworkReply.download_progress, this, &GETFile_job.download_progress);
+    connect (reply, &QNetworkReply.meta_data_changed, this, &GETFileJob.slot_meta_data_changed);
+    connect (reply, &QIODevice.ready_read, this, &GETFileJob.slot_ready_read);
+    connect (reply, &QNetworkReply.finished, this, &GETFileJob.slot_ready_read);
+    connect (reply, &QNetworkReply.download_progress, this, &GETFileJob.download_progress);
 }
 
-void GETFile_job.slot_meta_data_changed () {
-    // For some reason setting the read buffer in GETFile_job.start doesn't seem to go
+void GETFileJob.slot_meta_data_changed () {
+    // For some reason setting the read buffer in GETFileJob.start doesn't seem to go
     // through the HTTP layer thread (?)
     reply ().set_read_buffer_size (16 * 1024);
 
@@ -383,8 +383,8 @@ void GETFile_job.slot_meta_data_changed () {
         // Redirects and auth failures (oauth token renew) are handled by AbstractNetworkJob and
         // will end up restarting the job. We do not want to process further data from the initial
         // request. new_reply_hook () will reestablish signal connections for the follow-up request.
-        bool ok = disconnect (reply (), &QNetworkReply.finished, this, &GETFile_job.slot_ready_read)
-            && disconnect (reply (), &QNetworkReply.ready_read, this, &GETFile_job.slot_ready_read);
+        bool ok = disconnect (reply (), &QNetworkReply.finished, this, &GETFileJob.slot_ready_read)
+            && disconnect (reply (), &QNetworkReply.ready_read, this, &GETFileJob.slot_ready_read);
         ASSERT (ok);
         return;
     }
@@ -410,14 +410,14 @@ void GETFile_job.slot_meta_data_changed () {
     } else if (_etag.is_empty ()) {
         q_c_warning (lc_get_job) << "No E-Tag reply by server, considering it invalid";
         _error_string = tr ("No E-Tag received from server, check Proxy/Gateway");
-        _error_status = SyncFileItem.Normal_error;
+        _error_status = SyncFileItem.NormalError;
         reply ().abort ();
         return;
     } else if (!_expected_etag_for_resume.is_empty () && _expected_etag_for_resume != _etag) {
         q_c_warning (lc_get_job) << "We received a different E-Tag for resuming!"
                             << _expected_etag_for_resume << "vs" << _etag;
         _error_string = tr ("We received a different E-Tag for resuming. Retrying next time.");
-        _error_status = SyncFileItem.Normal_error;
+        _error_status = SyncFileItem.NormalError;
         reply ().abort ();
         return;
     }
@@ -428,7 +428,7 @@ void GETFile_job.slot_meta_data_changed () {
         q_c_warning (lc_get_job) << "We received a different content length than expected!"
                             << _expected_content_length << "vs" << _content_length;
         _error_string = tr ("We received an unexpected download Content-Length.");
-        _error_status = SyncFileItem.Normal_error;
+        _error_status = SyncFileItem.NormalError;
         reply ().abort ();
         return;
     }
@@ -449,14 +449,14 @@ void GETFile_job.slot_meta_data_changed () {
             _device.close ();
             if (!_device.open (QIODevice.WriteOnly)) {
                 _error_string = _device.error_string ();
-                _error_status = SyncFileItem.Normal_error;
+                _error_status = SyncFileItem.NormalError;
                 reply ().abort ();
                 return;
             }
             _resume_start = 0;
         } else {
             _error_string = tr ("Server returned wrong content-range");
-            _error_status = SyncFileItem.Normal_error;
+            _error_status = SyncFileItem.NormalError;
             reply ().abort ();
             return;
         }
@@ -470,38 +470,38 @@ void GETFile_job.slot_meta_data_changed () {
     _save_body_to_file = true;
 }
 
-void GETFile_job.set_bandwidth_manager (Bandwidth_manager *bwm) {
+void GETFileJob.set_bandwidth_manager (BandwidthManager *bwm) {
     _bandwidth_manager = bwm;
 }
 
-void GETFile_job.set_choked (bool c) {
+void GETFileJob.set_choked (bool c) {
     _bandwidth_choked = c;
     QMetaObject.invoke_method (this, "slot_ready_read", Qt.QueuedConnection);
 }
 
-void GETFile_job.set_bandwidth_limited (bool b) {
+void GETFileJob.set_bandwidth_limited (bool b) {
     _bandwidth_limited = b;
     QMetaObject.invoke_method (this, "slot_ready_read", Qt.QueuedConnection);
 }
 
-void GETFile_job.give_bandwidth_quota (int64 q) {
+void GETFileJob.give_bandwidth_quota (int64 q) {
     _bandwidth_quota = q;
     q_c_debug (lc_get_job) << "Got" << q << "bytes";
     QMetaObject.invoke_method (this, "slot_ready_read", Qt.QueuedConnection);
 }
 
-int64 GETFile_job.current_download_position () {
+int64 GETFileJob.current_download_position () {
     if (_device && _device.pos () > 0 && _device.pos () > int64 (_resume_start)) {
         return _device.pos ();
     }
     return _resume_start;
 }
 
-int64 GETFile_job.write_to_device (QByteArray &data) {
+int64 GETFileJob.write_to_device (QByteArray &data) {
     return _device.write (data);
 }
 
-void GETFile_job.slot_ready_read () {
+void GETFileJob.slot_ready_read () {
     if (!reply ())
         return;
     int buffer_size = q_min (1024 * 8ll, reply ().bytes_available ());
@@ -525,7 +525,7 @@ void GETFile_job.slot_ready_read () {
         const int64 read_bytes = reply ().read (buffer.data (), to_read);
         if (read_bytes < 0) {
             _error_string = network_reply_error_string (*reply ());
-            _error_status = SyncFileItem.Normal_error;
+            _error_status = SyncFileItem.NormalError;
             q_c_warning (lc_get_job) << "Error while reading from device : " << _error_string;
             reply ().abort ();
             return;
@@ -534,7 +534,7 @@ void GETFile_job.slot_ready_read () {
         const int64 written_bytes = write_to_device (QByteArray.from_raw_data (buffer.const_data (), read_bytes));
         if (written_bytes != read_bytes) {
             _error_string = _device.error_string ();
-            _error_status = SyncFileItem.Normal_error;
+            _error_status = SyncFileItem.NormalError;
             q_c_warning (lc_get_job) << "Error while writing to file" << written_bytes << read_bytes << _error_string;
             reply ().abort ();
             return;
@@ -558,7 +558,7 @@ void GETFile_job.slot_ready_read () {
     }
 }
 
-void GETFile_job.cancel () {
+void GETFileJob.cancel () {
     const auto network_reply = reply ();
     if (network_reply && network_reply.is_running ()) {
         network_reply.abort ();
@@ -568,16 +568,16 @@ void GETFile_job.cancel () {
     }
 }
 
-void GETFile_job.on_timed_out () {
+void GETFileJob.on_timed_out () {
     q_c_warning (lc_get_job) << "Timeout" << (reply () ? reply ().request ().url () : path ());
     if (!reply ())
         return;
     _error_string = tr ("Connection Timeout");
-    _error_status = SyncFileItem.Fatal_error;
+    _error_status = SyncFileItem.FatalError;
     reply ().abort ();
 }
 
-string GETFile_job.error_string () {
+string GETFileJob.error_string () {
     if (!_error_string.is_empty ()) {
         return _error_string;
     }
@@ -586,15 +586,15 @@ string GETFile_job.error_string () {
 
 GETEncrypted_file_job.GETEncrypted_file_job (AccountPtr account, string &path, QIODevice *device,
     const QMap<QByteArray, QByteArray> &headers, QByteArray &expected_etag_for_resume,
-    int64 resume_start, Encrypted_file encrypted_info, GLib.Object *parent)
-    : GETFile_job (account, path, device, headers, expected_etag_for_resume, resume_start, parent)
+    int64 resume_start, EncryptedFile encrypted_info, GLib.Object *parent)
+    : GETFileJob (account, path, device, headers, expected_etag_for_resume, resume_start, parent)
     , _encrypted_file_info (encrypted_info) {
 }
 
 GETEncrypted_file_job.GETEncrypted_file_job (AccountPtr account, QUrl &url, QIODevice *device,
     const QMap<QByteArray, QByteArray> &headers, QByteArray &expected_etag_for_resume,
-    int64 resume_start, Encrypted_file encrypted_info, GLib.Object *parent)
-    : GETFile_job (account, url, device, headers, expected_etag_for_resume, resume_start, parent)
+    int64 resume_start, EncryptedFile encrypted_info, GLib.Object *parent)
+    : GETFileJob (account, url, device, headers, expected_etag_for_resume, resume_start, parent)
     , _encrypted_file_info (encrypted_info) {
 }
 
@@ -602,7 +602,7 @@ int64 GETEncrypted_file_job.write_to_device (QByteArray &data) {
     if (!_decryptor) {
         // only initialize the decryptor once, because, according to Qt documentation, metadata might get changed during the processing of the data sometimes
         // https://doc.qt.io/qt-5/qnetworkreply.html#meta_data_changed
-        _decryptor.reset (new Encryption_helper.Streaming_decryptor (_encrypted_file_info.encryption_key, _encrypted_file_info.initialization_vector, _content_length));
+        _decryptor.reset (new EncryptionHelper.StreamingDecryptor (_encrypted_file_info.encryption_key, _encrypted_file_info.initialization_vector, _content_length));
     }
 
     if (!_decryptor.is_initialized ()) {
@@ -631,7 +631,7 @@ int64 GETEncrypted_file_job.write_to_device (QByteArray &data) {
             return -1;
         }
 
-        GETFile_job.write_to_device (decrypted_chunk);
+        GETFileJob.write_to_device (decrypted_chunk);
 
         return data.length ();
     }
@@ -643,14 +643,14 @@ int64 GETEncrypted_file_job.write_to_device (QByteArray &data) {
         return -1;
     }
 
-    GETFile_job.write_to_device (decrypted_chunk);
+    GETFileJob.write_to_device (decrypted_chunk);
 
     _processed_so_far += data.length ();
 
     return data.length ();
 }
 
-void Propagate_download_file.start () {
+void PropagateDownloadFile.start () {
     if (propagator ()._abort_requested)
         return;
     _is_encrypted = false;
@@ -676,14 +676,14 @@ void Propagate_download_file.start () {
           start_after_is_encrypted_is_checked ();
         });
         connect (_download_encrypted_helper, &Propagate_download_encrypted.failed, [this] {
-          done (SyncFileItem.Normal_error,
+          done (SyncFileItem.NormalError,
                tr ("File %1 cannot be downloaded because encryption information is missing.").arg (QDir.to_native_separators (_item._file)));
         });
         _download_encrypted_helper.start ();
     }
 }
 
-void Propagate_download_file.start_after_is_encrypted_is_checked () {
+void PropagateDownloadFile.start_after_is_encrypted_is_checked () {
     _stopwatch.start ();
 
     auto &sync_options = propagator ().sync_options ();
@@ -694,51 +694,51 @@ void Propagate_download_file.start_after_is_encrypted_is_checked () {
         string fs_path = propagator ().full_local_path (_item._file);
         if (!FileSystem.verify_file_unchanged (fs_path, _item._previous_size, _item._previous_modtime)) {
             propagator ()._another_sync_needed = true;
-            done (SyncFileItem.Soft_error, tr ("File has changed since discovery"));
+            done (SyncFileItem.SoftError, tr ("File has changed since discovery"));
             return;
         }
 
         q_c_debug (lc_propagate_download) << "dehydrating file" << _item._file;
         auto r = vfs.dehydrate_placeholder (*_item);
         if (!r) {
-            done (SyncFileItem.Normal_error, r.error ());
+            done (SyncFileItem.NormalError, r.error ());
             return;
         }
         propagator ()._journal.delete_file_record (_item._original_file);
         update_metadata (false);
 
         if (!_item._remote_perm.is_null () && !_item._remote_perm.has_permission (RemotePermissions.Can_write)) {
-            // make sure Read_only flag is preserved for placeholder, similarly to regular files
+            // make sure ReadOnly flag is preserved for placeholder, similarly to regular files
             FileSystem.set_file_read_only (propagator ().full_local_path (_item._file), true);
         }
 
         return;
     }
-    if (vfs.mode () == Vfs.Off && _item._type == Item_type_virtual_file) {
+    if (vfs.mode () == Vfs.Off && _item._type == ItemTypeVirtualFile) {
         q_c_warning (lc_propagate_download) << "ignored virtual file type of" << _item._file;
         _item._type = ItemTypeFile;
     }
-    if (_item._type == Item_type_virtual_file) {
+    if (_item._type == ItemTypeVirtualFile) {
         if (propagator ().local_file_name_clash (_item._file)) {
-            done (SyncFileItem.Normal_error, tr ("File %1 cannot be downloaded because of a local file name clash!").arg (QDir.to_native_separators (_item._file)));
+            done (SyncFileItem.NormalError, tr ("File %1 cannot be downloaded because of a local file name clash!").arg (QDir.to_native_separators (_item._file)));
             return;
         }
 
         q_c_debug (lc_propagate_download) << "creating virtual file" << _item._file;
         // do a klaas' case clash check.
         if (propagator ().local_file_name_clash (_item._file)) {
-            done (SyncFileItem.Normal_error, tr ("File %1 can not be downloaded because of a local file name clash!").arg (QDir.to_native_separators (_item._file)));
+            done (SyncFileItem.NormalError, tr ("File %1 can not be downloaded because of a local file name clash!").arg (QDir.to_native_separators (_item._file)));
             return;
         }
         auto r = vfs.create_placeholder (*_item);
         if (!r) {
-            done (SyncFileItem.Normal_error, r.error ());
+            done (SyncFileItem.NormalError, r.error ());
             return;
         }
         update_metadata (false);
 
         if (!_item._remote_perm.is_null () && !_item._remote_perm.has_permission (RemotePermissions.Can_write)) {
-            // make sure Read_only flag is preserved for placeholder, similarly to regular files
+            // make sure ReadOnly flag is preserved for placeholder, similarly to regular files
             FileSystem.set_file_read_only (propagator ().full_local_path (_item._file), true);
         }
 
@@ -777,7 +777,7 @@ void Propagate_download_file.start_after_is_encrypted_is_checked () {
         auto compute_checksum = new ComputeChecksum (this);
         compute_checksum.set_checksum_type (parse_checksum_header_type (_item._checksum_header));
         connect (compute_checksum, &ComputeChecksum.done,
-            this, &Propagate_download_file.conflict_checksum_computed);
+            this, &PropagateDownloadFile.conflict_checksum_computed);
         propagator ()._active_job_list.append (this);
         compute_checksum.start (propagator ().full_local_path (_item._file));
         return;
@@ -786,7 +786,7 @@ void Propagate_download_file.start_after_is_encrypted_is_checked () {
     start_download ();
 }
 
-void Propagate_download_file.conflict_checksum_computed (QByteArray &checksum_type, QByteArray &checksum) {
+void PropagateDownloadFile.conflict_checksum_computed (QByteArray &checksum_type, QByteArray &checksum) {
     propagator ()._active_job_list.remove_one (this);
     if (make_checksum_header (checksum_type, checksum) == _item._checksum_header) {
         // No download necessary, just update fs and journal metadata
@@ -817,13 +817,13 @@ void Propagate_download_file.conflict_checksum_computed (QByteArray &checksum_ty
     start_download ();
 }
 
-void Propagate_download_file.start_download () {
+void PropagateDownloadFile.start_download () {
     if (propagator ()._abort_requested)
         return;
 
     // do a klaas' case clash check.
     if (propagator ().local_file_name_clash (_item._file)) {
-        done (SyncFileItem.Normal_error, tr ("File %1 cannot be downloaded because of a local file name clash!").arg (QDir.to_native_separators (_item._file)));
+        done (SyncFileItem.NormalError, tr ("File %1 cannot be downloaded because of a local file name clash!").arg (QDir.to_native_separators (_item._file)));
         return;
     }
 
@@ -861,7 +861,7 @@ void Propagate_download_file.start_download () {
         FileSystem.set_file_read_only (_tmp_file.file_name (), false);
     if (!_tmp_file.open (QIODevice.Append | QIODevice.Unbuffered)) {
         q_c_warning (lc_propagate_download) << "could not open temporary file" << _tmp_file.file_name ();
-        done (SyncFileItem.Normal_error, _tmp_file.error_string ());
+        done (SyncFileItem.NormalError, _tmp_file.error_string ());
         return;
     }
     // Hide temporary after creation
@@ -869,16 +869,16 @@ void Propagate_download_file.start_download () {
 
     // If there's not enough space to fully download this file, stop.
     const auto disk_space_result = propagator ().disk_space_check ();
-    if (disk_space_result != Owncloud_propagator.Disk_space_ok) {
-        if (disk_space_result == Owncloud_propagator.Disk_space_failure) {
-            // Using Detail_error here will make the error not pop up in the account
+    if (disk_space_result != OwncloudPropagator.DiskSpaceOk) {
+        if (disk_space_result == OwncloudPropagator.DiskSpaceFailure) {
+            // Using DetailError here will make the error not pop up in the account
             // tab : instead we'll generate a general "disk space low" message and show
             // these detail errors only in the error view.
-            done (SyncFileItem.Detail_error,
+            done (SyncFileItem.DetailError,
                 tr ("The download would reduce free local disk space below the limit"));
             emit propagator ().insufficient_local_storage ();
-        } else if (disk_space_result == Owncloud_propagator.Disk_space_critical) {
-            done (SyncFileItem.Fatal_error,
+        } else if (disk_space_result == OwncloudPropagator.DiskSpaceCritical) {
+            done (SyncFileItem.FatalError,
                 tr ("Free space on disk is less than %1").arg (Utility.octets_to_string (critical_free_space_limit ())));
         }
 
@@ -902,7 +902,7 @@ void Propagate_download_file.start_download () {
 
     if (_item._direct_download_url.is_empty ()) {
         // Normal job, download from o_c instance
-        _job = new GETFile_job (propagator ().account (),
+        _job = new GETFileJob (propagator ().account (),
             propagator ().full_remote_path (_is_encrypted ? _item._encrypted_file_name : _item._file),
             &_tmp_file, headers, expected_etag_for_resume, _resume_start, this);
     } else {
@@ -914,33 +914,33 @@ void Propagate_download_file.start_download () {
         }
 
         QUrl url = QUrl.from_user_input (_item._direct_download_url);
-        _job = new GETFile_job (propagator ().account (),
+        _job = new GETFileJob (propagator ().account (),
             url,
             &_tmp_file, headers, expected_etag_for_resume, _resume_start, this);
     }
     _job.set_bandwidth_manager (&propagator ()._bandwidth_manager);
-    connect (_job.data (), &GETFile_job.finished_signal, this, &Propagate_download_file.slot_get_finished);
-    connect (_job.data (), &GETFile_job.download_progress, this, &Propagate_download_file.slot_download_progress);
+    connect (_job.data (), &GETFileJob.finished_signal, this, &PropagateDownloadFile.slot_get_finished);
+    connect (_job.data (), &GETFileJob.download_progress, this, &PropagateDownloadFile.slot_download_progress);
     propagator ()._active_job_list.append (this);
     _job.start ();
 }
 
-int64 Propagate_download_file.committed_disk_space () {
+int64 PropagateDownloadFile.committed_disk_space () {
     if (_state == Running) {
         return q_bound (0LL, _item._size - _resume_start - _download_progress, _item._size);
     }
     return 0;
 }
 
-void Propagate_download_file.set_delete_existing_folder (bool enabled) {
+void PropagateDownloadFile.set_delete_existing_folder (bool enabled) {
     _delete_existing = enabled;
 }
 
 const char owncloud_custom_soft_error_string_c[] = "owncloud-custom-soft-error-string";
-void Propagate_download_file.slot_get_finished () {
+void PropagateDownloadFile.slot_get_finished () {
     propagator ()._active_job_list.remove_one (this);
 
-    GETFile_job *job = _job;
+    GETFileJob *job = _job;
     ASSERT (job);
 
     _item._http_error_code = job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
@@ -976,7 +976,7 @@ void Propagate_download_file.slot_get_finished () {
             propagator ()._journal.set_download_info (_item._file, SyncJournalDb.DownloadInfo ());
         }
 
-        if (!_item._direct_download_url.is_empty () && err != QNetworkReply.Operation_canceled_error) {
+        if (!_item._direct_download_url.is_empty () && err != QNetworkReply.OperationCanceledError) {
             // If this was with a direct download, retry without direct download
             q_c_warning (lc_propagate_download) << "Direct download of" << _item._direct_download_url << "failed. Retrying through owncloud.";
             _item._direct_download_url.clear ();
@@ -988,16 +988,16 @@ void Propagate_download_file.slot_get_finished () {
         // set a custom error string to make this a soft error. In contrast to the default hard error this won't bring down
         // the whole sync and allows for a custom error message.
         QNetworkReply *reply = job.reply ();
-        if (err == QNetworkReply.Operation_canceled_error && reply.property (owncloud_custom_soft_error_string_c).is_valid ()) {
+        if (err == QNetworkReply.OperationCanceledError && reply.property (owncloud_custom_soft_error_string_c).is_valid ()) {
             job.set_error_string (reply.property (owncloud_custom_soft_error_string_c).to_string ());
-            job.set_error_status (SyncFileItem.Soft_error);
+            job.set_error_status (SyncFileItem.SoftError);
         } else if (bad_range_header) {
             // Can't do this in classify_error () because 416 without a
-            // Range header should result in Normal_error.
-            job.set_error_status (SyncFileItem.Soft_error);
+            // Range header should result in NormalError.
+            job.set_error_status (SyncFileItem.SoftError);
         } else if (file_not_found) {
             job.set_error_string (tr ("File was deleted from server"));
-            job.set_error_status (SyncFileItem.Soft_error);
+            job.set_error_status (SyncFileItem.SoftError);
 
             // As a precaution against bugs that cause our database and the
             // reality on the server to diverge, rediscover this folder on the
@@ -1009,7 +1009,7 @@ void Propagate_download_file.slot_get_finished () {
         string error_string = _item._http_error_code >= 400 ? job.error_string_parsing_body (&error_body)
                                                            : job.error_string ();
         SyncFileItem.Status status = job.error_status ();
-        if (status == SyncFileItem.No_status) {
+        if (status == SyncFileItem.NoStatus) {
             status = classify_error (err, _item._http_error_code,
                 &propagator ()._another_sync_needed, error_body);
         }
@@ -1022,7 +1022,7 @@ void Propagate_download_file.slot_get_finished () {
 
     if (!job.etag ().is_empty ()) {
         // The etag will be empty if we used a direct download URL.
-        // (If it was really empty by the server, the GETFile_job will have errored
+        // (If it was really empty by the server, the GETFileJob will have errored
         _item._etag = parse_etag (job.etag ());
     }
     if (job.last_modified ()) {
@@ -1062,20 +1062,20 @@ void Propagate_download_file.slot_get_finished () {
         // This happened when trying to resume a file. The Content-Range header was files, Content-Length was == 0
         q_c_debug (lc_propagate_download) << body_size << _item._size << _tmp_file.size () << job.resume_start ();
         FileSystem.remove (_tmp_file.file_name ());
-        done (SyncFileItem.Soft_error, QLatin1String ("Broken webserver returning empty content length for non-empty file on resume"));
+        done (SyncFileItem.SoftError, QLatin1String ("Broken webserver returning empty content length for non-empty file on resume"));
         return;
     }
 
     if (body_size > 0 && body_size != _tmp_file.size () - job.resume_start ()) {
         q_c_debug (lc_propagate_download) << body_size << _tmp_file.size () << job.resume_start ();
         propagator ()._another_sync_needed = true;
-        done (SyncFileItem.Soft_error, tr ("The file could not be downloaded completely."));
+        done (SyncFileItem.SoftError, tr ("The file could not be downloaded completely."));
         return;
     }
 
     if (_tmp_file.size () == 0 && _item._size > 0) {
         FileSystem.remove (_tmp_file.file_name ());
-        done (SyncFileItem.Normal_error,
+        done (SyncFileItem.NormalError,
             tr ("The downloaded file is empty, but the server said it should have been %1.")
                 .arg (Utility.octets_to_string (_item._size)));
         return;
@@ -1089,11 +1089,11 @@ void Propagate_download_file.slot_get_finished () {
     // the database yet!)
     if (job.reply ().raw_header ("OC-Conflict") == "1") {
         _conflict_record.path = _item._file.to_utf8 ();
-        _conflict_record.initial_base_path = job.reply ().raw_header ("OC-Conflict_initial_base_path");
-        _conflict_record.base_file_id = job.reply ().raw_header ("OC-Conflict_base_file_id");
-        _conflict_record.base_etag = job.reply ().raw_header ("OC-Conflict_base_etag");
+        _conflict_record.initial_base_path = job.reply ().raw_header ("OC-ConflictInitialBasePath");
+        _conflict_record.base_file_id = job.reply ().raw_header ("OC-ConflictBaseFileId");
+        _conflict_record.base_etag = job.reply ().raw_header ("OC-ConflictBaseEtag");
 
-        auto mtime_header = job.reply ().raw_header ("OC-Conflict_base_mtime");
+        auto mtime_header = job.reply ().raw_header ("OC-ConflictBaseMtime");
         if (!mtime_header.is_empty ())
             _conflict_record.base_modtime = mtime_header.to_long_long ();
 
@@ -1107,9 +1107,9 @@ void Propagate_download_file.slot_get_finished () {
     // as this is (still) also correct.
     auto *validator = new Validate_checksum_header (this);
     connect (validator, &Validate_checksum_header.validated,
-        this, &Propagate_download_file.transmission_checksum_validated);
+        this, &PropagateDownloadFile.transmission_checksum_validated);
     connect (validator, &Validate_checksum_header.validation_failed,
-        this, &Propagate_download_file.slot_checksum_fail);
+        this, &PropagateDownloadFile.slot_checksum_fail);
     auto checksum_header = find_best_checksum (job.reply ().raw_header (check_sum_header_c));
     auto content_md5Header = job.reply ().raw_header (content_md5Header_c);
     if (checksum_header.is_empty () && !content_md5Header.is_empty ())
@@ -1117,13 +1117,13 @@ void Propagate_download_file.slot_get_finished () {
     validator.start (_tmp_file.file_name (), checksum_header);
 }
 
-void Propagate_download_file.slot_checksum_fail (string &err_msg) {
+void PropagateDownloadFile.slot_checksum_fail (string &err_msg) {
     FileSystem.remove (_tmp_file.file_name ());
     propagator ()._another_sync_needed = true;
-    done (SyncFileItem.Soft_error, err_msg); // tr ("The file downloaded with a broken checksum, will be redownloaded."));
+    done (SyncFileItem.SoftError, err_msg); // tr ("The file downloaded with a broken checksum, will be redownloaded."));
 }
 
-void Propagate_download_file.delete_existing_folder () {
+void PropagateDownloadFile.delete_existing_folder () {
     string existing_dir = propagator ().full_local_path (_item._file);
     if (!QFileInfo (existing_dir).is_dir ()) {
         return;
@@ -1140,7 +1140,7 @@ void Propagate_download_file.delete_existing_folder () {
 
     string error;
     if (!propagator ().create_conflict (_item, _associated_composite, &error)) {
-        done (SyncFileItem.Normal_error, error);
+        done (SyncFileItem.NormalError, error);
     }
 }
 
@@ -1166,7 +1166,7 @@ namespace { // Anonymous namespace for the recall feature
         FileSystem.set_file_hidden (file_path, true);
 
         QFile file (file_path);
-        if (!file.open (QIODevice.Read_only)) {
+        if (!file.open (QIODevice.ReadOnly)) {
             q_c_warning (lc_propagate_download) << "Could not open recall file" << file.error_string ();
             return;
         }
@@ -1217,7 +1217,7 @@ namespace { // Anonymous namespace for the recall feature
     }
 } // end namespace
 
-void Propagate_download_file.transmission_checksum_validated (QByteArray &checksum_type, QByteArray &checksum) {
+void PropagateDownloadFile.transmission_checksum_validated (QByteArray &checksum_type, QByteArray &checksum) {
     const QByteArray the_content_checksum_type = propagator ().account ().capabilities ().preferred_upload_checksum_type ();
 
     // Reuse transmission checksum as content checksum.
@@ -1233,18 +1233,18 @@ void Propagate_download_file.transmission_checksum_validated (QByteArray &checks
     compute_checksum.set_checksum_type (the_content_checksum_type);
 
     connect (compute_checksum, &ComputeChecksum.done,
-        this, &Propagate_download_file.content_checksum_computed);
+        this, &PropagateDownloadFile.content_checksum_computed);
     compute_checksum.start (_tmp_file.file_name ());
 }
 
-void Propagate_download_file.content_checksum_computed (QByteArray &checksum_type, QByteArray &checksum) {
+void PropagateDownloadFile.content_checksum_computed (QByteArray &checksum_type, QByteArray &checksum) {
     _item._checksum_header = make_checksum_header (checksum_type, checksum);
 
     if (_is_encrypted) {
         if (_download_encrypted_helper.decrypt_file (_tmp_file)) {
           download_finished ();
         } else {
-          done (SyncFileItem.Normal_error, _download_encrypted_helper.error_string ());
+          done (SyncFileItem.NormalError, _download_encrypted_helper.error_string ());
         }
 
     } else {
@@ -1252,20 +1252,20 @@ void Propagate_download_file.content_checksum_computed (QByteArray &checksum_typ
     }
 }
 
-void Propagate_download_file.download_finished () {
+void PropagateDownloadFile.download_finished () {
     ASSERT (!_tmp_file.is_open ());
     string fn = propagator ().full_local_path (_item._file);
 
     // In case of file name clash, report an error
     // This can happen if another parallel download saved a clashing file.
     if (propagator ().local_file_name_clash (_item._file)) {
-        done (SyncFileItem.Normal_error, tr ("File %1 cannot be saved because of a local file name clash!").arg (QDir.to_native_separators (_item._file)));
+        done (SyncFileItem.NormalError, tr ("File %1 cannot be saved because of a local file name clash!").arg (QDir.to_native_separators (_item._file)));
         return;
     }
 
     if (_item._modtime <= 0) {
         FileSystem.remove (_tmp_file.file_name ());
-        done (SyncFileItem.Normal_error, tr ("File %1 has invalid modified time reported by server. Do not save it.").arg (QDir.to_native_separators (_item._file)));
+        done (SyncFileItem.NormalError, tr ("File %1 has invalid modified time reported by server. Do not save it.").arg (QDir.to_native_separators (_item._file)));
         return;
     }
     Q_ASSERT (_item._modtime > 0);
@@ -1278,7 +1278,7 @@ void Propagate_download_file.download_finished () {
     _item._modtime = FileSystem.get_mod_time (_tmp_file.file_name ());
     if (_item._modtime <= 0) {
         FileSystem.remove (_tmp_file.file_name ());
-        done (SyncFileItem.Normal_error, tr ("File %1 has invalid modified time reported by server. Do not save it.").arg (QDir.to_native_separators (_item._file)));
+        done (SyncFileItem.NormalError, tr ("File %1 has invalid modified time reported by server. Do not save it.").arg (QDir.to_native_separators (_item._file)));
         return;
     }
     Q_ASSERT (_item._modtime > 0);
@@ -1298,7 +1298,7 @@ void Propagate_download_file.download_finished () {
         // Make the file a hydrated placeholder if possible
         const auto result = propagator ().sync_options ()._vfs.convert_to_placeholder (_tmp_file.file_name (), *_item, fn);
         if (!result) {
-            done (SyncFileItem.Normal_error, result.error ());
+            done (SyncFileItem.NormalError, result.error ());
             return;
         }
     }
@@ -1311,7 +1311,7 @@ void Propagate_download_file.download_finished () {
     if (is_conflict) {
         string error;
         if (!propagator ().create_conflict (_item, _associated_composite, &error)) {
-            done (SyncFileItem.Soft_error, error);
+            done (SyncFileItem.SoftError, error);
             return;
         }
         previous_file_exists = false;
@@ -1321,7 +1321,7 @@ void Propagate_download_file.download_finished () {
 
     // In the case of an hydration, this size is likely to change for placeholders
     // (except with the cfapi backend)
-    const auto is_virtual_download = _item._type == Item_type_virtual_file_download;
+    const auto is_virtual_download = _item._type == ItemTypeVirtualFileDownload;
     const auto is_cf_api_vfs = vfs && vfs.mode () == Vfs.WindowsCfApi;
     if (previous_file_exists && (is_cf_api_vfs || !is_virtual_download)) {
         // Check whether the existing file has changed since the discovery
@@ -1332,7 +1332,7 @@ void Propagate_download_file.download_finished () {
         const time_t expected_mtime = _item._previous_modtime;
         if (!FileSystem.verify_file_unchanged (fn, expected_size, expected_mtime)) {
             propagator ()._another_sync_needed = true;
-            done (SyncFileItem.Soft_error, tr ("File has changed since discovery"));
+            done (SyncFileItem.SoftError, tr ("File has changed since discovery"));
             return;
         }
     }
@@ -1350,7 +1350,7 @@ void Propagate_download_file.download_finished () {
             propagator ()._another_sync_needed = true;
         }
 
-        done (SyncFileItem.Soft_error, error);
+        done (SyncFileItem.SoftError, error);
         return;
     }
 
@@ -1368,7 +1368,7 @@ void Propagate_download_file.download_finished () {
     if (vfs && vfs.mode () == Vfs.WithSuffix) {
         // If the virtual file used to have a different name and db
         // entry, remove it transfer its old pin state.
-        if (_item._type == Item_type_virtual_file_download) {
+        if (_item._type == ItemTypeVirtualFileDownload) {
             string virtual_file = _item._file + vfs.file_suffix ();
             auto fn = propagator ().full_local_path (virtual_file);
             q_c_debug (lc_propagate_download) << "Download of previous virtual file finished" << fn;
@@ -1398,14 +1398,14 @@ void Propagate_download_file.download_finished () {
     update_metadata (is_conflict);
 }
 
-void Propagate_download_file.update_metadata (bool is_conflict) {
+void PropagateDownloadFile.update_metadata (bool is_conflict) {
     const string fn = propagator ().full_local_path (_item._file);
     const auto result = propagator ().update_metadata (*_item);
     if (!result) {
-        done (SyncFileItem.Fatal_error, tr ("Error updating metadata : %1").arg (result.error ()));
+        done (SyncFileItem.FatalError, tr ("Error updating metadata : %1").arg (result.error ()));
         return;
     } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-        done (SyncFileItem.Soft_error, tr ("The file %1 is currently in use").arg (_item._file));
+        done (SyncFileItem.SoftError, tr ("The file %1 is currently in use").arg (_item._file));
         return;
     }
 
@@ -1420,7 +1420,7 @@ void Propagate_download_file.update_metadata (bool is_conflict) {
     done (is_conflict ? SyncFileItem.Conflict : SyncFileItem.Success);
 
     // handle the special recall file
-    if (!_item._remote_perm.has_permission (RemotePermissions.Is_shared)
+    if (!_item._remote_perm.has_permission (RemotePermissions.IsShared)
         && (_item._file == QLatin1String (".sys.admin#recall#")
                || _item._file.ends_with (QLatin1String ("/.sys.admin#recall#")))) {
         handle_recall_file (fn, propagator ().local_path (), *propagator ()._journal);
@@ -1432,18 +1432,18 @@ void Propagate_download_file.update_metadata (bool is_conflict) {
     }
 }
 
-void Propagate_download_file.slot_download_progress (int64 received, int64) {
+void PropagateDownloadFile.slot_download_progress (int64 received, int64) {
     if (!_job)
         return;
     _download_progress = received;
     propagator ().report_progress (*_item, _resume_start + received);
 }
 
-void Propagate_download_file.abort (Propagator_job.Abort_type abort_type) {
+void PropagateDownloadFile.abort (PropagatorJob.AbortType abort_type) {
     if (_job && _job.reply ())
         _job.reply ().abort ();
 
-    if (abort_type == Abort_type.Asynchronous) {
+    if (abort_type == AbortType.Asynchronous) {
         emit abort_finished ();
     }
 }

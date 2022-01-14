@@ -42,13 +42,13 @@ private:
         Can_reshare = 7,           // R
         // Note : on the server, this means Shared_with_me, but in discoveryphase.cpp we also set
         // this permission when the server reports the any "share-types"
-        Is_shared = 8,             // S
-        Is_mounted = 9,            // M
-        Is_mounted_sub = 10,        // m (internal : set if the parent dir has Is_mounted)
+        IsShared = 8,             // S
+        IsMounted = 9,            // M
+        IsMountedSub = 10,        // m (internal : set if the parent dir has IsMounted)
 
         // Note : when adding support for more permissions, we need to invalid the cache in the database.
         // (by setting force_remote_discovery in SyncJournalDb.check_connect)
-        PermissionsCount = Is_mounted_sub
+        PermissionsCount = IsMountedSub
     };
 
     /// null permissions

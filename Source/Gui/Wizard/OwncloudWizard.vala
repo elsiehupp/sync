@@ -21,7 +21,7 @@ namespace Occ {
 
 Q_DECLARE_LOGGING_CATEGORY (lc_wizard)
 
-class Owncloud_oAuth_creds_page;
+class Owncloud_oauth_creds_page;
 class Abstract_credentials_wizard_page;
 
 /***********************************************************
@@ -103,7 +103,7 @@ private:
     Welcome_page *_welcome_page;
     Owncloud_setup_page *_setup_page;
     Owncloud_http_creds_page *_http_creds_page;
-    Owncloud_oAuth_creds_page *_browser_creds_page;
+    Owncloud_oauth_creds_page *_browser_creds_page;
     Flow2Auth_creds_page *_flow2Creds_page;
     Owncloud_advanced_setup_page *_advanced_setup_page;
     Owncloud_wizard_result_page *_result_page;
@@ -124,7 +124,7 @@ private:
         , _welcome_page (new Welcome_page (this))
         , _setup_page (new Owncloud_setup_page (this))
         , _http_creds_page (new Owncloud_http_creds_page (this))
-        , _browser_creds_page (new Owncloud_oAuth_creds_page)
+        , _browser_creds_page (new Owncloud_oauth_creds_page)
         , _flow2Creds_page (new Flow2Auth_creds_page)
         , _advanced_setup_page (new Owncloud_advanced_setup_page (this))
     #ifdef WITH_WEBENGINE
@@ -153,7 +153,7 @@ private:
         connect (this, &QWizard.current_id_changed, this, &OwncloudWizard.slot_current_page_changed);
         connect (_setup_page, &Owncloud_setup_page.determine_auth_type, this, &OwncloudWizard.determine_auth_type);
         connect (_http_creds_page, &Owncloud_http_creds_page.connect_to_oCUrl, this, &OwncloudWizard.connect_to_oCUrl);
-        connect (_browser_creds_page, &Owncloud_oAuth_creds_page.connect_to_oCUrl, this, &OwncloudWizard.connect_to_oCUrl);
+        connect (_browser_creds_page, &Owncloud_oauth_creds_page.connect_to_oCUrl, this, &OwncloudWizard.connect_to_oCUrl);
         connect (_flow2Creds_page, &Flow2Auth_creds_page.connect_to_oCUrl, this, &OwncloudWizard.connect_to_oCUrl);
     #ifdef WITH_WEBENGINE
         connect (_web_view_page, &Web_view_page.connect_to_oCUrl, this, &OwncloudWizard.connect_to_oCUrl);

@@ -556,7 +556,7 @@ private:
     /***********************************************************
     Keeps track of locally dirty files so we can skip local discovery sometimes.
     ***********************************************************/
-    QScopedPointer<Local_discovery_tracker> _local_discovery_tracker;
+    QScopedPointer<LocalDiscoveryTracker> _local_discovery_tracker;
 
     /***********************************************************
     The vfs mode instance (created by plugin) to use. Never null.
@@ -579,7 +579,7 @@ Folder.Folder (FolderDefinition &definition,
     _time_since_last_sync_start.start ();
     _time_since_last_sync_done.start ();
 
-    SyncResult.Status status = SyncResult.Not_yet_started;
+    SyncResult.Status status = SyncResult.NotYetStarted;
     if (definition.paused) {
         status = SyncResult.Paused;
     }
@@ -626,11 +626,11 @@ Folder.Folder (FolderDefinition &definition,
     connect (Progress_dispatcher.instance (), &Progress_dispatcher.folder_conflicts,
         this, &Folder.slot_folder_conflicts);
 
-    _local_discovery_tracker.reset (new Local_discovery_tracker);
+    _local_discovery_tracker.reset (new LocalDiscoveryTracker);
     connect (_engine.data (), &SyncEngine.finished,
-        _local_discovery_tracker.data (), &Local_discovery_tracker.slot_sync_finished);
+        _local_discovery_tracker.data (), &LocalDiscoveryTracker.slot_sync_finished);
     connect (_engine.data (), &SyncEngine.item_completed,
-        _local_discovery_tracker.data (), &Local_discovery_tracker.slot_item_completed);
+        _local_discovery_tracker.data (), &LocalDiscoveryTracker.slot_item_completed);
 
     // Potentially upgrade suffix vfs to windows vfs
     ENFORCE (_vfs);
@@ -782,7 +782,7 @@ void Folder.set_sync_paused (bool paused) {
     save_to_settings ();
 
     if (!paused) {
-        set_sync_state (SyncResult.Not_yet_started);
+        set_sync_state (SyncResult.NotYetStarted);
     } else {
         set_sync_state (SyncResult.Paused);
     }
@@ -808,7 +808,7 @@ SyncResult Folder.sync_result () {
 
 void Folder.prepare_to_sync () {
     _sync_result.reset ();
-    _sync_result.set_status (SyncResult.Not_yet_started);
+    _sync_result.set_status (SyncResult.NotYetStarted);
 }
 
 void Folder.slot_run_etag_job () {
@@ -1097,7 +1097,7 @@ void Folder.implicitly_hydrate_file (string &relativepath) {
         q_c_info (lc_folder) << "The file is not virtual";
         return;
     }
-    record._type = Item_type_virtual_file_download;
+    record._type = ItemTypeVirtualFileDownload;
     _journal.set_file_record (record);
 
     // Change the file's pin state if it's contradictory to being hydrated
@@ -1319,12 +1319,12 @@ void Folder.start_sync (QStringList &path_list) {
         && !periodic_full_local_discovery_now) {
         q_c_info (lc_folder) << "Allowing local discovery to read from the database";
         _engine.set_local_discovery_options (
-            Local_discovery_style.Database_and_filesystem,
+            LocalDiscoveryStyle.DatabaseAndFilesystem,
             _local_discovery_tracker.local_discovery_paths ());
         _local_discovery_tracker.start_sync_partial_discovery ();
     } else {
         q_c_info (lc_folder) << "Forbidding local discovery to read from the database";
-        _engine.set_local_discovery_options (Local_discovery_style.Filesystem_only);
+        _engine.set_local_discovery_options (LocalDiscoveryStyle.FilesystemOnly);
         _local_discovery_tracker.start_sync_full_discovery ();
     }
 
@@ -1351,7 +1351,7 @@ void Folder.correct_placeholder_files () {
 }
 
 void Folder.set_sync_options () {
-    Sync_options opt;
+    SyncOptions opt;
     ConfigFile cfg_file;
 
     auto new_folder_limit = cfg_file.new_big_folder_size_limit ();
@@ -1411,7 +1411,7 @@ void Folder.slot_sync_started () {
 void Folder.slot_sync_finished (bool success) {
     q_c_info (lc_folder) << "Client version" << q_printable (Theme.instance ().version ())
                      << " Qt" << q_version ()
-                     << " SSL " << QSsl_socket.ssl_library_version_string ().to_utf8 ().data ()
+                     << " SSL " << QSslSocket.ssl_library_version_string ().to_utf8 ().data ()
         ;
 
     bool sync_error = !_sync_result.error_strings ().is_empty ();
@@ -1453,7 +1453,7 @@ void Folder.slot_sync_finished (bool success) {
     if ( (_sync_result.status () == SyncResult.Success
             || _sync_result.status () == SyncResult.Problem)
         && success) {
-        if (_engine.last_local_discovery_style () == Local_discovery_style.Filesystem_only) {
+        if (_engine.last_local_discovery_style () == LocalDiscoveryStyle.FilesystemOnly) {
             _time_since_last_full_local_discovery.start ();
         }
     }

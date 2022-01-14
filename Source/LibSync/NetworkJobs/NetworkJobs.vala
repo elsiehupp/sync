@@ -12,7 +12,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QNetworkReply>
 // #include <QNetworkRequest>
 // #include <QSslConfiguration>
-// #include <QSsl_cipher>
+// #include <QSslCipher>
 // #include <QBuffer>
 // #include <QXmlStreamReader>
 // #include <QStringList>
@@ -25,7 +25,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <qloggingcategory.h>
 #ifndef TOKEN_AUTH_ONLY
 // #include <QPainter>
-// #include <QPainter_path>
+// #include <QPainterPath>
 #endif
 
 // #include <QBuffer>
@@ -41,21 +41,21 @@ Strips quotes and gzip annotations
 ***********************************************************/
 QByteArray parse_etag (char *header);
 
-struct Http_error {
+struct HttpError {
     int code; // HTTP error code
     string message;
 };
 
 template <typename T>
-using Http_result = Result<T, Http_error>;
+using HttpResult = Result<T, HttpError>;
 
 /***********************************************************
-@brief The Entity_exists_job class
+@brief The EntityExistsJob class
 @ingroup libsync
 ***********************************************************/
-class Entity_exists_job : AbstractNetworkJob {
+class EntityExistsJob : AbstractNetworkJob {
 public:
-    Entity_exists_job (AccountPtr account, string &path, GLib.Object *parent = nullptr);
+    EntityExistsJob (AccountPtr account, string &path, GLib.Object *parent = nullptr);
     void start () override;
 
 signals:
@@ -72,9 +72,9 @@ See Nextcloud API usage for the possible DELETE requests.
 
 This does *not* delete files, it does a http request.
 ***********************************************************/
-class Delete_api_job : AbstractNetworkJob {
+class DeleteApiJob : AbstractNetworkJob {
 public:
-    Delete_api_job (AccountPtr account, string &path, GLib.Object *parent = nullptr);
+    DeleteApiJob (AccountPtr account, string &path, GLib.Object *parent = nullptr);
     void start () override;
 
 signals:
@@ -84,21 +84,21 @@ private slots:
     bool finished () override;
 };
 
-struct Extra_folder_info {
+struct ExtraFolderInfo {
     QByteArray file_id;
     int64 size = -1;
 };
 
 /***********************************************************
-@brief The Ls_col_job class
+@brief The LsColJob class
 @ingroup libsync
 ***********************************************************/
-class Ls_col_xMLParser : GLib.Object {
+class LsColXMLParser : GLib.Object {
 public:
-    Ls_col_xMLParser ();
+    LsColXMLParser ();
 
     bool parse (QByteArray &xml,
-               QHash<string, Extra_folder_info> *sizes,
+               QHash<string, ExtraFolderInfo> *sizes,
                const string &expected_path);
 
 signals:
@@ -108,12 +108,12 @@ signals:
     void finished_without_error ();
 };
 
-class Ls_col_job : AbstractNetworkJob {
+class LsColJob : AbstractNetworkJob {
 public:
-    Ls_col_job (AccountPtr account, string &path, GLib.Object *parent = nullptr);
-    Ls_col_job (AccountPtr account, QUrl &url, GLib.Object *parent = nullptr);
+    LsColJob (AccountPtr account, string &path, GLib.Object *parent = nullptr);
+    LsColJob (AccountPtr account, QUrl &url, GLib.Object *parent = nullptr);
     void start () override;
-    QHash<string, Extra_folder_info> _folder_infos;
+    QHash<string, ExtraFolderInfo> _folder_infos;
 
     /***********************************************************
     Used to specify which properties shall be retrieved.
@@ -146,7 +146,7 @@ private:
 Setting the desired properties with set_properties
 
 Note that this job is only for querying one item.
-There is also the Ls_col_job which can be used to list collections
+There is also the LsColJob which can be used to list collections
 
 @ingroup libsync
 ***********************************************************/
@@ -185,13 +185,13 @@ If the server does not have the avatar, the result Pixmap is empty.
 
 @ingroup libsync
 ***********************************************************/
-class Avatar_job : AbstractNetworkJob {
+class AvatarJob : AbstractNetworkJob {
 public:
     /***********************************************************
     @param user_id The user for which to obtain the avatar
     @param size The size of the avatar (square so size*size)
     ***********************************************************/
-    Avatar_job (AccountPtr account, string &user_id, int size, GLib.Object *parent = nullptr);
+    AvatarJob (AccountPtr account, string &user_id, int size, GLib.Object *parent = nullptr);
 
     void start () override;
 
@@ -224,9 +224,9 @@ WARNING : Untested!
 
 @ingroup libsync
 ***********************************************************/
-class Proppatch_job : AbstractNetworkJob {
+class ProppatchJob : AbstractNetworkJob {
 public:
-    Proppatch_job (AccountPtr account, string &path, GLib.Object *parent = nullptr);
+    ProppatchJob (AccountPtr account, string &path, GLib.Object *parent = nullptr);
     void start () override;
 
     /***********************************************************
@@ -252,17 +252,17 @@ private:
 };
 
 /***********************************************************
-@brief The Mk_col_job class
+@brief The MkColJob class
 @ingroup libsync
 ***********************************************************/
-class Mk_col_job : AbstractNetworkJob {
+class MkColJob : AbstractNetworkJob {
     QUrl _url; // Only used if the constructor taking a url is taken.
     QMap<QByteArray, QByteArray> _extra_headers;
 
 public:
-    Mk_col_job (AccountPtr account, string &path, GLib.Object *parent = nullptr);
-    Mk_col_job (AccountPtr account, string &path, QMap<QByteArray, QByteArray> &extra_headers, GLib.Object *parent = nullptr);
-    Mk_col_job (AccountPtr account, QUrl &url,
+    MkColJob (AccountPtr account, string &path, GLib.Object *parent = nullptr);
+    MkColJob (AccountPtr account, string &path, QMap<QByteArray, QByteArray> &extra_headers, GLib.Object *parent = nullptr);
+    MkColJob (AccountPtr account, QUrl &url,
         const QMap<QByteArray, QByteArray> &extra_headers, GLib.Object *parent = nullptr);
     void start () override;
 
@@ -345,7 +345,7 @@ public:
 
 signals:
     void etag_retrieved (QByteArray &etag, QDateTime &time);
-    void finished_with_result (Http_result<QByteArray> &etag);
+    void finished_with_result (HttpResult<QByteArray> &etag);
 
 private slots:
     bool finished () override;
@@ -439,7 +439,7 @@ private:
 class DetermineAuthTypeJob : GLib.Object {
 public:
     enum AuthType {
-        No_auth_type, // used only before we got a chance to probe the server
+        NoAuthType, // used only before we got a chance to probe the server
 #ifdef WITH_WEBENGINE
         WebViewFlow,
 #endif // WITH_WEBENGINE
@@ -458,9 +458,9 @@ private:
     void check_all_done ();
 
     AccountPtr _account;
-    AuthType _result_get = No_auth_type;
-    AuthType _result_propfind = No_auth_type;
-    AuthType _result_old_flow = No_auth_type;
+    AuthType _result_get = NoAuthType;
+    AuthType _result_propfind = NoAuthType;
+    AuthType _result_old_flow = NoAuthType;
     bool _get_done = false;
     bool _propfind_done = false;
     bool _old_flow_done = false;
@@ -541,7 +541,7 @@ void RequestEtagJob.start () {
                    "</d:propfind>\n");
     auto *buf = new QBuffer (this);
     buf.set_data (xml);
-    buf.open (QIODevice.Read_only);
+    buf.open (QIODevice.ReadOnly);
     // assumes ownership
     send_request ("PROPFIND", make_dav_url (path ()), req, buf);
 
@@ -559,11 +559,11 @@ bool RequestEtagJob.finished () {
     if (http_code == 207) {
         // Parse DAV response
         QXmlStreamReader reader (reply ());
-        reader.add_extra_namespace_declaration (QXml_stream_namespace_declaration (QStringLiteral ("d"), QStringLiteral ("DAV:")));
+        reader.add_extra_namespace_declaration (QXmlStreamNamespaceDeclaration (QStringLiteral ("d"), QStringLiteral ("DAV:")));
         QByteArray etag;
         while (!reader.at_end ()) {
-            QXmlStreamReader.Token_type type = reader.read_next ();
-            if (type == QXmlStreamReader.Start_element && reader.namespace_uri () == QLatin1String ("DAV:")) {
+            QXmlStreamReader.TokenType type = reader.read_next ();
+            if (type == QXmlStreamReader.StartElement && reader.namespace_uri () == QLatin1String ("DAV:")) {
                 string name = reader.name ().to_string ();
                 if (name == QLatin1String ("getetag")) {
                     auto etag_text = reader.read_element_text ();
@@ -579,7 +579,7 @@ bool RequestEtagJob.finished () {
         emit etag_retrieved (etag, QDateTime.from_string (string.from_utf8 (_response_timestamp), Qt.RFC2822Date));
         emit finished_with_result (etag);
     } else {
-        emit finished_with_result (Http_error {
+        emit finished_with_result (HttpError {
             http_code, error_string ()
         });
     }
@@ -588,23 +588,23 @@ bool RequestEtagJob.finished () {
 
 /****************************************************************************/
 
-Mk_col_job.Mk_col_job (AccountPtr account, string &path, GLib.Object *parent)
+MkColJob.MkColJob (AccountPtr account, string &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 }
 
-Mk_col_job.Mk_col_job (AccountPtr account, string &path, QMap<QByteArray, QByteArray> &extra_headers, GLib.Object *parent)
+MkColJob.MkColJob (AccountPtr account, string &path, QMap<QByteArray, QByteArray> &extra_headers, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent)
     , _extra_headers (extra_headers) {
 }
 
-Mk_col_job.Mk_col_job (AccountPtr account, QUrl &url,
+MkColJob.MkColJob (AccountPtr account, QUrl &url,
     const QMap<QByteArray, QByteArray> &extra_headers, GLib.Object *parent)
     : AbstractNetworkJob (account, string (), parent)
     , _url (url)
     , _extra_headers (extra_headers) {
 }
 
-void Mk_col_job.start () {
+void MkColJob.start () {
     // add 'Content-Length : 0' header (see https://github.com/owncloud/client/issues/3256)
     QNetworkRequest req;
     req.set_raw_header ("Content-Length", "0");
@@ -621,7 +621,7 @@ void Mk_col_job.start () {
     AbstractNetworkJob.start ();
 }
 
-bool Mk_col_job.finished () {
+bool MkColJob.finished () {
     q_c_info (lc_mk_col_job) << "MKCOL of" << reply ().request ().url () << "FINISHED WITH STATUS"
                        << reply_status_string ();
 
@@ -639,13 +639,13 @@ static string read_contents_as_string (QXmlStreamReader &reader) {
     string result;
     int level = 0;
     do {
-        QXmlStreamReader.Token_type type = reader.read_next ();
-        if (type == QXmlStreamReader.Start_element) {
+        QXmlStreamReader.TokenType type = reader.read_next ();
+        if (type == QXmlStreamReader.StartElement) {
             level++;
             result += "<" + reader.name ().to_string () + ">";
         } else if (type == QXmlStreamReader.Characters) {
             result += reader.text ();
-        } else if (type == QXmlStreamReader.End_element) {
+        } else if (type == QXmlStreamReader.EndElement) {
             level--;
             if (level < 0) {
                 break;
@@ -657,12 +657,12 @@ static string read_contents_as_string (QXmlStreamReader &reader) {
     return result;
 }
 
-Ls_col_xMLParser.Ls_col_xMLParser () = default;
+LsColXMLParser.LsColXMLParser () = default;
 
-bool Ls_col_xMLParser.parse (QByteArray &xml, QHash<string, Extra_folder_info> *file_info, string &expected_path) {
+bool LsColXMLParser.parse (QByteArray &xml, QHash<string, ExtraFolderInfo> *file_info, string &expected_path) {
     // Parse DAV response
     QXmlStreamReader reader (xml);
-    reader.add_extra_namespace_declaration (QXml_stream_namespace_declaration ("d", "DAV:"));
+    reader.add_extra_namespace_declaration (QXmlStreamNamespaceDeclaration ("d", "DAV:"));
 
     QStringList folders;
     string current_href;
@@ -674,15 +674,15 @@ bool Ls_col_xMLParser.parse (QByteArray &xml, QHash<string, Extra_folder_info> *
     bool inside_multi_status = false;
 
     while (!reader.at_end ()) {
-        QXmlStreamReader.Token_type type = reader.read_next ();
+        QXmlStreamReader.TokenType type = reader.read_next ();
         string name = reader.name ().to_string ();
         // Start elements with DAV:
-        if (type == QXmlStreamReader.Start_element && reader.namespace_uri () == QLatin1String ("DAV:")) {
+        if (type == QXmlStreamReader.StartElement && reader.namespace_uri () == QLatin1String ("DAV:")) {
             if (name == QLatin1String ("href")) {
                 // We don't use URL encoding in our request URL (which is the expected path) (QNAM will do it for us)
                 // but the result will have URL encoding..
                 string href_string = QUrl.from_local_file (QUrl.from_percent_encoding (reader.read_element_text ().to_utf8 ()))
-                        .adjusted (QUrl.Normalize_path_segments)
+                        .adjusted (QUrl.NormalizePathSegments)
                         .path ();
                 if (!href_string.starts_with (expected_path)) {
                     q_c_warning (lc_ls_col_job) << "Invalid href" << href_string << "expected starting with" << expected_path;
@@ -708,7 +708,7 @@ bool Ls_col_xMLParser.parse (QByteArray &xml, QHash<string, Extra_folder_info> *
             }
         }
 
-        if (type == QXmlStreamReader.Start_element && inside_propstat && inside_prop) {
+        if (type == QXmlStreamReader.StartElement && inside_propstat && inside_prop) {
             // All those elements are properties
             string property_content = read_contents_as_string (reader);
             if (name == QLatin1String ("resourcetype") && property_content.contains ("collection")) {
@@ -726,7 +726,7 @@ bool Ls_col_xMLParser.parse (QByteArray &xml, QHash<string, Extra_folder_info> *
         }
 
         // End elements with DAV:
-        if (type == QXmlStreamReader.End_element) {
+        if (type == QXmlStreamReader.EndElement) {
             if (reader.namespace_uri () == QLatin1String ("DAV:")) {
                 if (reader.name () == "response") {
                     if (current_href.ends_with ('/')) {
@@ -754,7 +754,7 @@ bool Ls_col_xMLParser.parse (QByteArray &xml, QHash<string, Extra_folder_info> *
         q_c_warning (lc_ls_col_job) << "ERROR" << reader.error_string () << xml;
         return false;
     } else if (!inside_multi_status) {
-        q_c_warning (lc_ls_col_job) << "ERROR no Web_dAV response?" << xml;
+        q_c_warning (lc_ls_col_job) << "ERROR no WebDAV response?" << xml;
         return false;
     } else {
         emit directory_listing_subfolders (folders);
@@ -765,24 +765,24 @@ bool Ls_col_xMLParser.parse (QByteArray &xml, QHash<string, Extra_folder_info> *
 
 /****************************************************************************/
 
-Ls_col_job.Ls_col_job (AccountPtr account, string &path, GLib.Object *parent)
+LsColJob.LsColJob (AccountPtr account, string &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 }
 
-Ls_col_job.Ls_col_job (AccountPtr account, QUrl &url, GLib.Object *parent)
+LsColJob.LsColJob (AccountPtr account, QUrl &url, GLib.Object *parent)
     : AbstractNetworkJob (account, string (), parent)
     , _url (url) {
 }
 
-void Ls_col_job.set_properties (QList<QByteArray> properties) {
+void LsColJob.set_properties (QList<QByteArray> properties) {
     _properties = properties;
 }
 
-QList<QByteArray> Ls_col_job.properties () {
+QList<QByteArray> LsColJob.properties () {
     return _properties;
 }
 
-void Ls_col_job.start () {
+void LsColJob.start () {
     QList<QByteArray> properties = _properties;
 
     if (properties.is_empty ()) {
@@ -812,7 +812,7 @@ void Ls_col_job.start () {
                     "</d:propfind>\n");
     auto *buf = new QBuffer (this);
     buf.set_data (xml);
-    buf.open (QIODevice.Read_only);
+    buf.open (QIODevice.ReadOnly);
     if (_url.is_valid ()) {
         send_request ("PROPFIND", _url, req, buf);
     } else {
@@ -824,22 +824,22 @@ void Ls_col_job.start () {
 // TODO : Instead of doing all in this slot, we should iteratively parse in ready_read (). This
 // would allow us to be more asynchronous in processing while data is coming from the network,
 // not all in one big blob at the end.
-bool Ls_col_job.finished () {
+bool LsColJob.finished () {
     q_c_info (lc_ls_col_job) << "LSCOL of" << reply ().request ().url () << "FINISHED WITH STATUS"
                        << reply_status_string ();
 
     string content_type = reply ().header (QNetworkRequest.ContentTypeHeader).to_string ();
     int http_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
     if (http_code == 207 && content_type.contains ("application/xml; charset=utf-8")) {
-        Ls_col_xMLParser parser;
-        connect (&parser, &Ls_col_xMLParser.directory_listing_subfolders,
-            this, &Ls_col_job.directory_listing_subfolders);
-        connect (&parser, &Ls_col_xMLParser.directory_listing_iterated,
-            this, &Ls_col_job.directory_listing_iterated);
-        connect (&parser, &Ls_col_xMLParser.finished_with_error,
-            this, &Ls_col_job.finished_with_error);
-        connect (&parser, &Ls_col_xMLParser.finished_without_error,
-            this, &Ls_col_job.finished_without_error);
+        LsColXMLParser parser;
+        connect (&parser, &LsColXMLParser.directory_listing_subfolders,
+            this, &LsColJob.directory_listing_subfolders);
+        connect (&parser, &LsColXMLParser.directory_listing_iterated,
+            this, &LsColJob.directory_listing_iterated);
+        connect (&parser, &LsColXMLParser.finished_with_error,
+            this, &LsColJob.finished_with_error);
+        connect (&parser, &LsColXMLParser.finished_without_error,
+            this, &LsColJob.finished_without_error);
 
         string expected_path = reply ().request ().url ().path (); // something like "/owncloud/remote.php/dav/folder"
         if (!parser.parse (reply ().read_all (), &_folder_infos, expected_path)) {
@@ -997,7 +997,7 @@ void PropfindJob.start () {
     // Always have a higher priority than the propagator because we use this from the UI
     // and really want this to be done first (no matter what internal scheduling QNAM uses).
     // Also possibly useful for avoiding false timeouts.
-    req.set_priority (QNetworkRequest.High_priority);
+    req.set_priority (QNetworkRequest.HighPriority);
     req.set_raw_header ("Depth", "0");
     QByteArray prop_str;
     foreach (QByteArray &prop, properties) {
@@ -1016,7 +1016,7 @@ void PropfindJob.start () {
 
     auto *buf = new QBuffer (this);
     buf.set_data (xml);
-    buf.open (QIODevice.Read_only);
+    buf.open (QIODevice.ReadOnly);
     send_request ("PROPFIND", make_dav_url (path ()), req, buf);
 
     AbstractNetworkJob.start ();
@@ -1039,22 +1039,22 @@ bool PropfindJob.finished () {
     if (http_result_code == 207) {
         // Parse DAV response
         QXmlStreamReader reader (reply ());
-        reader.add_extra_namespace_declaration (QXml_stream_namespace_declaration ("d", "DAV:"));
+        reader.add_extra_namespace_declaration (QXmlStreamNamespaceDeclaration ("d", "DAV:"));
 
         QVariantMap items;
         // introduced to nesting is ignored
         QStack<string> cur_element;
 
         while (!reader.at_end ()) {
-            QXmlStreamReader.Token_type type = reader.read_next ();
-            if (type == QXmlStreamReader.Start_element) {
+            QXmlStreamReader.TokenType type = reader.read_next ();
+            if (type == QXmlStreamReader.StartElement) {
                 if (!cur_element.is_empty () && cur_element.top () == QLatin1String ("prop")) {
-                    items.insert (reader.name ().to_string (), reader.read_element_text (QXmlStreamReader.Skip_child_elements));
+                    items.insert (reader.name ().to_string (), reader.read_element_text (QXmlStreamReader.SkipChildElements));
                 } else {
                     cur_element.push (reader.name ().to_string ());
                 }
             }
-            if (type == QXmlStreamReader.End_element) {
+            if (type == QXmlStreamReader.EndElement) {
                 if (cur_element.top () == reader.name ()) {
                     cur_element.pop ();
                 }
@@ -1068,7 +1068,7 @@ bool PropfindJob.finished () {
         }
     } else {
         q_c_warning (lc_propfind_job) << "*not* successful, http result code is" << http_result_code
-                                 << (http_result_code == 302 ? reply ().header (QNetworkRequest.Location_header).to_string () : QLatin1String (""));
+                                 << (http_result_code == 302 ? reply ().header (QNetworkRequest.LocationHeader).to_string () : QLatin1String (""));
         emit finished_with_error (reply ());
     }
     return true;
@@ -1077,7 +1077,7 @@ bool PropfindJob.finished () {
 /****************************************************************************/
 
 #ifndef TOKEN_AUTH_ONLY
-Avatar_job.Avatar_job (AccountPtr account, string &user_id, int size, GLib.Object *parent)
+AvatarJob.AvatarJob (AccountPtr account, string &user_id, int size, GLib.Object *parent)
     : AbstractNetworkJob (account, string (), parent) {
     if (account.server_version_int () >= Account.make_server_version (10, 0, 0)) {
         _avatar_url = Utility.concat_url_path (account.url (), string ("remote.php/dav/avatars/%1/%2.png").arg (user_id, string.number (size)));
@@ -1086,13 +1086,13 @@ Avatar_job.Avatar_job (AccountPtr account, string &user_id, int size, GLib.Objec
     }
 }
 
-void Avatar_job.start () {
+void AvatarJob.start () {
     QNetworkRequest req;
     send_request ("GET", _avatar_url, req);
     AbstractNetworkJob.start ();
 }
 
-QImage Avatar_job.make_circular_avatar (QImage &base_avatar) {
+QImage AvatarJob.make_circular_avatar (QImage &base_avatar) {
     if (base_avatar.is_null ()) {
         return {};
     }
@@ -1105,7 +1105,7 @@ QImage Avatar_job.make_circular_avatar (QImage &base_avatar) {
     QPainter painter (&avatar);
     painter.set_render_hint (QPainter.Antialiasing);
 
-    QPainter_path path;
+    QPainterPath path;
     path.add_ellipse (0, 0, dim, dim);
     painter.set_clip_path (path);
 
@@ -1115,7 +1115,7 @@ QImage Avatar_job.make_circular_avatar (QImage &base_avatar) {
     return avatar;
 }
 
-bool Avatar_job.finished () {
+bool AvatarJob.finished () {
     int http_result_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
 
     QImage av_image;
@@ -1135,11 +1135,11 @@ bool Avatar_job.finished () {
 
 /****************************************************************************/
 
-Proppatch_job.Proppatch_job (AccountPtr account, string &path, GLib.Object *parent)
+ProppatchJob.ProppatchJob (AccountPtr account, string &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 }
 
-void Proppatch_job.start () {
+void ProppatchJob.start () {
     if (_properties.is_empty ()) {
         q_c_warning (lc_proppatch_job) << "Proppatch with no properties!";
     }
@@ -1173,20 +1173,20 @@ void Proppatch_job.start () {
 
     auto *buf = new QBuffer (this);
     buf.set_data (xml);
-    buf.open (QIODevice.Read_only);
+    buf.open (QIODevice.ReadOnly);
     send_request ("PROPPATCH", make_dav_url (path ()), req, buf);
     AbstractNetworkJob.start ();
 }
 
-void Proppatch_job.set_properties (QMap<QByteArray, QByteArray> properties) {
+void ProppatchJob.set_properties (QMap<QByteArray, QByteArray> properties) {
     _properties = properties;
 }
 
-QMap<QByteArray, QByteArray> Proppatch_job.properties () {
+QMap<QByteArray, QByteArray> ProppatchJob.properties () {
     return _properties;
 }
 
-bool Proppatch_job.finished () {
+bool ProppatchJob.finished () {
     q_c_info (lc_proppatch_job) << "PROPPATCH of" << reply ().request ().url () << "FINISHED WITH STATUS"
                            << reply_status_string ();
 
@@ -1196,7 +1196,7 @@ bool Proppatch_job.finished () {
         emit success ();
     } else {
         q_c_warning (lc_proppatch_job) << "*not* successful, http result code is" << http_result_code
-                                  << (http_result_code == 302 ? reply ().header (QNetworkRequest.Location_header).to_string () : QLatin1String (""));
+                                  << (http_result_code == 302 ? reply ().header (QNetworkRequest.LocationHeader).to_string () : QLatin1String (""));
         emit finished_with_error ();
     }
     return true;
@@ -1204,16 +1204,16 @@ bool Proppatch_job.finished () {
 
 /****************************************************************************/
 
-Entity_exists_job.Entity_exists_job (AccountPtr account, string &path, GLib.Object *parent)
+EntityExistsJob.EntityExistsJob (AccountPtr account, string &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 }
 
-void Entity_exists_job.start () {
+void EntityExistsJob.start () {
     send_request ("HEAD", make_account_url (path ()));
     AbstractNetworkJob.start ();
 }
 
-bool Entity_exists_job.finished () {
+bool EntityExistsJob.finished () {
     emit exists (reply ());
     return true;
 }
@@ -1339,7 +1339,7 @@ void DetermineAuthTypeJob.start () {
     // Prevent HttpCredentialsAccessManager from setting an Authorization header.
     req.set_attribute (HttpCredentials.DontAddCredentialsAttribute, true);
     // Don't reuse previous auth credentials
-    req.set_attribute (QNetworkRequest.Authentication_reuse_attribute, QNetworkRequest.Manual);
+    req.set_attribute (QNetworkRequest.AuthenticationReuseAttribute, QNetworkRequest.Manual);
 
     // Start three parallel requests
 
@@ -1420,9 +1420,9 @@ void DetermineAuthTypeJob.check_all_done () {
         return;
     }
 
-    Q_ASSERT (_result_get != No_auth_type);
-    Q_ASSERT (_result_propfind != No_auth_type);
-    Q_ASSERT (_result_old_flow != No_auth_type);
+    Q_ASSERT (_result_get != NoAuthType);
+    Q_ASSERT (_result_propfind != NoAuthType);
+    Q_ASSERT (_result_old_flow != NoAuthType);
 
     auto result = _result_propfind;
 
@@ -1472,12 +1472,12 @@ bool SimpleNetworkJob.finished () {
     return true;
 }
 
-Delete_api_job.Delete_api_job (AccountPtr account, string &path, GLib.Object *parent)
+DeleteApiJob.DeleteApiJob (AccountPtr account, string &path, GLib.Object *parent)
     : AbstractNetworkJob (account, path, parent) {
 
 }
 
-void Delete_api_job.start () {
+void DeleteApiJob.start () {
     QNetworkRequest req;
     req.set_raw_header ("OCS-APIREQUEST", "true");
     QUrl url = Utility.concat_url_path (account ().url (), path ());
@@ -1485,7 +1485,7 @@ void Delete_api_job.start () {
     AbstractNetworkJob.start ();
 }
 
-bool Delete_api_job.finished () {
+bool DeleteApiJob.finished () {
     q_c_info (lc_json_api_job) << "JsonApiJob of" << reply ().request ().url () << "FINISHED WITH STATUS"
                          << reply ().error ()
                          << (reply ().error () == QNetworkReply.NoError ? QLatin1String ("") : error_string ());

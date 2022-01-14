@@ -39,7 +39,7 @@ class SyncJournalFileRecord {
         return _type == ItemTypeFile || _type == ItemTypeVirtualFileDehydration;
     }
     public bool is_virtual_file () {
-        return _type == Item_type_virtual_file || _type == Item_type_virtual_file_download;
+        return _type == ItemTypeVirtualFile || _type == ItemTypeVirtualFileDownload;
     }
     public string path () {
         return string.from_utf8 (_path);
@@ -51,7 +51,7 @@ class SyncJournalFileRecord {
     public QByteArray _path;
     public uint64 _inode = 0;
     public int64 _modtime = 0;
-    public ItemType _type = Item_type_skip;
+    public ItemType _type = ItemTypeSkip;
     public QByteArray _etag;
     public QByteArray _file_id;
     public int64 _file_size = 0;
@@ -72,7 +72,7 @@ class SyncJournalErrorBlacklistRecord {
         /// Normal errors have no special behavior
         Normal = 0,
         /// These get a special summary message
-        Insufficient_remote_storage
+        InsufficientRemoteStorage
     };
 
     /// The number of times the operation was unsuccessful so far.
@@ -109,7 +109,7 @@ tag in the filename, and the base file is the file that it's a conflict for.
 So if "a/foo.txt" is the base file, its conflict file could be
 "a/foo (conflicted copy 1234).txt".
 ***********************************************************/
-class Conflict_record {
+class ConflictRecord {
 
     /***********************************************************
     Path to the file with the conflict tag in the name

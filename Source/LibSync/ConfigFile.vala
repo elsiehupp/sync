@@ -6,7 +6,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 #ifndef TOKEN_AUTH_ONLY
 // #include <Gtk.Widget>
-// #include <QHeader_view>
+// #include <QHeaderView>
 #endif
 
 // #include <QCoreApplication>
@@ -21,7 +21,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
 
 #if ! (QTLEGACY)
-// #include <QOperating_system_version>
+// #include <QOperatingSystemVersion>
 #endif
 
 const int DEFAULT_REMOTE_POLL_INTERVAL 30000 // default remote poll time in milliseconds
@@ -106,8 +106,8 @@ public:
     ConfigFile ();
 
     enum Scope {
-        User_scope,
-        System_scope
+        UserScope,
+        SystemScope
     };
 
     string config_path ();
@@ -273,8 +273,8 @@ public:
     string update_channel ();
     void set_update_channel (string &channel);
 
-    void save_geometry_header (QHeader_view *header);
-    void restore_geometry_header (QHeader_view *header);
+    void save_geometry_header (QHeaderView *header);
+    void restore_geometry_header (QHeaderView *header);
 
     string certificate_path ();
     void set_certificate_path (string &c_path);
@@ -294,8 +294,8 @@ public:
     ***********************************************************/
     static std.unique_ptr<QSettings> settings_with_group (string &group, GLib.Object *parent = nullptr);
 
-    /// Add the system and user exclude file path to the Excluded_files instance.
-    static void setup_default_exclude_file_paths (Excluded_files &excluded_files);
+    /// Add the system and user exclude file path to the ExcludedFiles instance.
+    static void setup_default_exclude_file_paths (ExcludedFiles &excluded_files);
 
 protected:
     QVariant get_policy_setting (string &policy, QVariant &default_value = QVariant ()) const;
@@ -312,7 +312,7 @@ private:
     string keychain_proxy_password_key ();
 
 private:
-    using Shared_creds = QSharedPointer<AbstractCredentials>;
+    using SharedCreds = QSharedPointer<AbstractCredentials>;
 
     static bool _asked_user;
     static string _o_c_version;
@@ -451,7 +451,7 @@ void ConfigFile.restore_geometry (Gtk.Widget *w) {
 #endif
 }
 
-void ConfigFile.save_geometry_header (QHeader_view *header) {
+void ConfigFile.save_geometry_header (QHeaderView *header) {
 #ifndef TOKEN_AUTH_ONLY
     if (!header)
         return;
@@ -464,7 +464,7 @@ void ConfigFile.save_geometry_header (QHeader_view *header) {
 #endif
 }
 
-void ConfigFile.restore_geometry_header (QHeader_view *header) {
+void ConfigFile.restore_geometry_header (QHeaderView *header) {
 #ifndef TOKEN_AUTH_ONLY
     if (!header)
         return;
@@ -481,14 +481,14 @@ QVariant ConfigFile.get_policy_setting (string &setting, QVariant &default_value
         // check for policies first and return immediately if a value is found.
         QSettings user_policy (string.from_latin1 (R" (HKEY_CURRENT_USER\Software\Policies\%1\%2)")
                                  .arg (APPLICATION_VENDOR, Theme.instance ().app_name_g_u_i ()),
-            QSettings.Native_format);
+            QSettings.NativeFormat);
         if (user_policy.contains (setting)) {
             return user_policy.value (setting);
         }
 
         QSettings machine_policy (string.from_latin1 (R" (HKEY_LOCAL_MACHINE\Software\Policies\%1\%2)")
                                     .arg (APPLICATION_VENDOR, Theme.instance ().app_name_g_u_i ()),
-            QSettings.Native_format);
+            QSettings.NativeFormat);
         if (machine_policy.contains (setting)) {
             return machine_policy.value (setting);
         }
@@ -499,16 +499,16 @@ QVariant ConfigFile.get_policy_setting (string &setting, QVariant &default_value
 string ConfigFile.config_path () {
     if (_conf_dir.is_empty ()) {
         if (!Utility.is_windows ()) {
-            // On Unix, use the App_config_location for the settings, that's configurable with the XDG_CONFIG_HOME env variable.
-            _conf_dir = QStandardPaths.writable_location (QStandardPaths.App_config_location);
+            // On Unix, use the AppConfigLocation for the settings, that's configurable with the XDG_CONFIG_HOME env variable.
+            _conf_dir = QStandardPaths.writable_location (QStandardPaths.AppConfigLocation);
         } else {
-            // On Windows, use App_data_location, that's where the roaming data is and where we should store the config file
-             auto new_location = QStandardPaths.writable_location (QStandardPaths.App_data_location);
+            // On Windows, use AppDataLocation, that's where the roaming data is and where we should store the config file
+             auto new_location = QStandardPaths.writable_location (QStandardPaths.AppDataLocation);
 
              // Check if this is the first time loading the new location
              if (!QFileInfo (new_location).is_dir ()) {
                  // Migrate data to the new locations
-                 auto old_location = QStandardPaths.writable_location (QStandardPaths.App_config_location);
+                 auto old_location = QStandardPaths.writable_location (QStandardPaths.AppConfigLocation);
 
                  // Only migrate if the old location exists.
                  if (QFileInfo (old_location).is_dir ()) {
@@ -535,7 +535,7 @@ string ConfigFile.exclude_file (Scope scope) {
     QFileInfo fi;
 
     switch (scope) {
-    case User_scope:
+    case UserScope:
         fi.set_file (config_path (), excl_file);
 
         if (!fi.is_readable ()) {
@@ -545,7 +545,7 @@ string ConfigFile.exclude_file (Scope scope) {
             fi.set_file (config_path (), excl_file);
         }
         return fi.absolute_file_path ();
-    case System_scope:
+    case SystemScope:
         return ConfigFile.exclude_file_from_system ();
     }
 
@@ -829,7 +829,7 @@ void ConfigFile.set_proxy_type (int proxy_type,
 
     settings.set_value (QLatin1String (proxy_type_c), proxy_type);
 
-    if (proxy_type == QNetworkProxy.Http_proxy || proxy_type == QNetworkProxy.Socks5Proxy) {
+    if (proxy_type == QNetworkProxy.HttpProxy || proxy_type == QNetworkProxy.Socks5Proxy) {
         settings.set_value (QLatin1String (proxy_host_c), host);
         settings.set_value (QLatin1String (proxy_port_c), port);
         settings.set_value (QLatin1String (proxy_needs_auth_c), needs_auth);
@@ -858,13 +858,13 @@ QVariant ConfigFile.get_value (string &param, string &group,
     const QVariant &default_value) {
     QVariant system_setting;
     if (Utility.is_mac ()) {
-        QSettings system_settings (QLatin1String ("/Library/Preferences/" APPLICATION_REV_DOMAIN ".plist"), QSettings.Native_format);
+        QSettings system_settings (QLatin1String ("/Library/Preferences/" APPLICATION_REV_DOMAIN ".plist"), QSettings.NativeFormat);
         if (!group.is_empty ()) {
             system_settings.begin_group (group);
         }
         system_setting = system_settings.value (param, default_value);
     } else if (Utility.is_unix ()) {
-        QSettings system_settings (string (SYSCONFDIR "/%1/%1.conf").arg (Theme.instance ().app_name ()), QSettings.Native_format);
+        QSettings system_settings (string (SYSCONFDIR "/%1/%1.conf").arg (Theme.instance ().app_name ()), QSettings.NativeFormat);
         if (!group.is_empty ()) {
             system_settings.begin_group (group);
         }
@@ -872,7 +872,7 @@ QVariant ConfigFile.get_value (string &param, string &group,
     } else { // Windows
         QSettings system_settings (string.from_latin1 (R" (HKEY_LOCAL_MACHINE\Software\%1\%2)")
                                      .arg (APPLICATION_VENDOR, Theme.instance ().app_name_g_u_i ()),
-            QSettings.Native_format);
+            QSettings.NativeFormat);
         if (!group.is_empty ()) {
             system_settings.begin_group (group);
         }
@@ -1147,10 +1147,10 @@ std.unique_ptr<QSettings> ConfigFile.settings_with_group (string &group, GLib.Ob
     return settings;
 }
 
-void ConfigFile.setup_default_exclude_file_paths (Excluded_files &excluded_files) {
+void ConfigFile.setup_default_exclude_file_paths (ExcludedFiles &excluded_files) {
     ConfigFile cfg;
-    string system_list = cfg.exclude_file (ConfigFile.System_scope);
-    string user_list = cfg.exclude_file (ConfigFile.User_scope);
+    string system_list = cfg.exclude_file (ConfigFile.SystemScope);
+    string user_list = cfg.exclude_file (ConfigFile.UserScope);
 
     if (!QFile.exists (user_list)) {
         q_c_info (lc_config_file) << "User defined ignore list does not exist:" << user_list;

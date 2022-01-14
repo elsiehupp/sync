@@ -9,7 +9,7 @@ Copyright (c) by Markus Goetz <guruz@owncloud.com>
 // #include <QMutex>
 // #include <QNetworkReply>
 // #include <QSettings>
-// #include <QNetwork_cookie_jar>
+// #include <QNetworkCookieJar>
 
 // #include <QMap>
 
@@ -19,12 +19,12 @@ namespace QKeychain {
 
 namespace Occ {
 
-class Token_credentials : AbstractCredentials {
+class TokenCredentials : AbstractCredentials {
 
 public:
-    friend class Token_credentials_access_manager;
-    Token_credentials ();
-    Token_credentials (string &user, string &password, string &token);
+    friend class TokenCredentialsAccessManager;
+    TokenCredentials ();
+    TokenCredentials (string &user, string &password, string &token);
 
     string auth_type () const override;
     QNetworkAccessManager *create_qNAM () const override;
@@ -55,10 +55,10 @@ private:
 
     } // ns
 
-    class Token_credentials_access_manager : AccessManager {
+    class TokenCredentialsAccessManager : AccessManager {
     public:
-        friend class Token_credentials;
-        Token_credentials_access_manager (Token_credentials *cred, GLib.Object *parent = nullptr)
+        friend class TokenCredentials;
+        TokenCredentialsAccessManager (TokenCredentials *cred, GLib.Object *parent = nullptr)
             : AccessManager (parent)
             , _cred (cred) {
         }
@@ -84,36 +84,36 @@ private:
         }
 
     private:
-        const Token_credentials *_cred;
+        const TokenCredentials *_cred;
     };
 
-    Token_credentials.Token_credentials ()
+    TokenCredentials.TokenCredentials ()
         : _user ()
         , _password ()
         , _ready (false) {
     }
 
-    Token_credentials.Token_credentials (string &user, string &password, string &token)
+    TokenCredentials.TokenCredentials (string &user, string &password, string &token)
         : _user (user)
         , _password (password)
         , _token (token)
         , _ready (true) {
     }
 
-    string Token_credentials.auth_type () {
+    string TokenCredentials.auth_type () {
         return string.from_latin1 ("token");
     }
 
-    string Token_credentials.user () {
+    string TokenCredentials.user () {
         return _user;
     }
 
-    string Token_credentials.password () {
+    string TokenCredentials.password () {
         return _password;
     }
 
-    QNetworkAccessManager *Token_credentials.create_qNAM () {
-        AccessManager *qnam = new Token_credentials_access_manager (this);
+    QNetworkAccessManager *TokenCredentials.create_qNAM () {
+        AccessManager *qnam = new TokenCredentialsAccessManager (this);
 
         connect (qnam, SIGNAL (authentication_required (QNetworkReply *, QAuthenticator *)),
             this, SLOT (slot_authentication (QNetworkReply *, QAuthenticator *)));
@@ -121,27 +121,27 @@ private:
         return qnam;
     }
 
-    bool Token_credentials.ready () {
+    bool TokenCredentials.ready () {
         return _ready;
     }
 
-    void Token_credentials.fetch_from_keychain () {
+    void TokenCredentials.fetch_from_keychain () {
         _was_fetched = true;
         Q_EMIT fetched ();
     }
 
-    void Token_credentials.ask_from_user () {
+    void TokenCredentials.ask_from_user () {
         emit asked ();
     }
 
-    bool Token_credentials.still_valid (QNetworkReply *reply) {
+    bool TokenCredentials.still_valid (QNetworkReply *reply) {
         return ( (reply.error () != QNetworkReply.AuthenticationRequiredError)
             // returned if user/password or token are incorrect
-            && (reply.error () != QNetworkReply.Operation_canceled_error
+            && (reply.error () != QNetworkReply.OperationCanceledError
                    || !reply.property (authentication_failed_c).to_bool ()));
     }
 
-    void Token_credentials.invalidate_token () {
+    void TokenCredentials.invalidate_token () {
         q_c_info (lc_token_credentials) << "Invalidating token";
         _ready = false;
         _account.clear_cookie_jar ();
@@ -150,14 +150,14 @@ private:
         _password = string ();
     }
 
-    void Token_credentials.forget_sensitive_data () {
+    void TokenCredentials.forget_sensitive_data () {
         invalidate_token ();
     }
 
-    void Token_credentials.persist () {
+    void TokenCredentials.persist () {
     }
 
-    void Token_credentials.slot_authentication (QNetworkReply *reply, QAuthenticator *authenticator) {
+    void TokenCredentials.slot_authentication (QNetworkReply *reply, QAuthenticator *authenticator) {
         Q_UNUSED (authenticator)
         // we cannot use QAuthenticator, because it sends username and passwords with latin1
         // instead of utf8 encoding. Instead, we send it manually. Thus, if we reach this signal,

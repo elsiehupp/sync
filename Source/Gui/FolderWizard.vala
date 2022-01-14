@@ -97,7 +97,7 @@ protected slots:
     void slot_typed_path_found (QStringList &subpaths);
 
 private:
-    Ls_col_job *run_ls_col_job (string &path);
+    LsColJob *run_ls_col_job (string &path);
     void recursive_insert (QTree_widget_item *parent, QStringList path_trail, string path);
     bool select_by_path (string path);
     Ui_Folder_wizard_target_page _ui;
@@ -268,7 +268,7 @@ private:
         _lscol_timer.set_single_shot (true);
         connect (&_lscol_timer, &QTimer.timeout, this, &Folder_wizard_remote_path.slot_ls_col_folder_entry);
 
-        _ui.folder_tree_widget.header ().set_section_resize_mode (0, QHeader_view.Resize_to_contents);
+        _ui.folder_tree_widget.header ().set_section_resize_mode (0, QHeaderView.Resize_to_contents);
         // Make sure that there will be a scrollbar when the contents is too wide
         _ui.folder_tree_widget.header ().set_stretch_last_section (false);
     }
@@ -301,9 +301,9 @@ private:
         }
         full_path += "/" + folder;
 
-        auto *job = new Mk_col_job (_account, full_path, this);
+        auto *job = new MkColJob (_account, full_path, this);
         /* check the owncloud configuration file and query the own_cloud */
-        connect (job, &Mk_col_job.finished_without_error,
+        connect (job, &MkColJob.finished_without_error,
             this, &Folder_wizard_remote_path.slot_create_remote_folder_finished);
         connect (job, &AbstractNetworkJob.network_error, this, &Folder_wizard_remote_path.slot_handle_mkdir_network_error);
         job.start ();
@@ -313,7 +313,7 @@ private:
         q_c_debug (lc_wizard) << "webdav mkdir request finished";
         show_warn (tr ("Folder was successfully created on %1.").arg (Theme.instance ().app_name_g_u_i ()));
         slot_refresh_folders ();
-        _ui.folder_entry.set_text (static_cast<Mk_col_job> (sender ()).path ());
+        _ui.folder_entry.set_text (static_cast<MkColJob> (sender ()).path ());
         slot_ls_col_folder_entry ();
     }
 
@@ -337,7 +337,7 @@ private:
             show_warn (string ()); // hides the warning pane
             return;
         }
-        auto job = qobject_cast<Ls_col_job> (sender ());
+        auto job = qobject_cast<LsColJob> (sender ());
         ASSERT (job);
         show_warn (tr ("Failed to list a folder. Error : %1")
                      .arg (job.error_string_parsing_body ()));
@@ -495,13 +495,13 @@ private:
         if (path.starts_with (QLatin1Char ('/')))
             path = path.mid (1);
 
-        Ls_col_job *job = run_ls_col_job (path);
+        LsColJob *job = run_ls_col_job (path);
         // No error handling, no updating, we do this manually
         // because of extra logic in the typed-path case.
         disconnect (job, nullptr, this, nullptr);
-        connect (job, &Ls_col_job.finished_with_error,
+        connect (job, &LsColJob.finished_with_error,
             this, &Folder_wizard_remote_path.slot_handle_ls_col_network_error);
-        connect (job, &Ls_col_job.directory_listing_subfolders,
+        connect (job, &LsColJob.directory_listing_subfolders,
             this, &Folder_wizard_remote_path.slot_typed_path_found);
     }
 
@@ -510,18 +510,18 @@ private:
         select_by_path (_ui.folder_entry.text ());
     }
 
-    Ls_col_job *Folder_wizard_remote_path.run_ls_col_job (string &path) {
-        auto *job = new Ls_col_job (_account, path, this);
+    LsColJob *Folder_wizard_remote_path.run_ls_col_job (string &path) {
+        auto *job = new LsColJob (_account, path, this);
         auto props = QList<QByteArray> () << "resourcetype";
         if (_account.capabilities ().client_side_encryption_available ()) {
             props << "http://nextcloud.org/ns:is-encrypted";
         }
         job.set_properties (props);
-        connect (job, &Ls_col_job.directory_listing_subfolders,
+        connect (job, &LsColJob.directory_listing_subfolders,
             this, &Folder_wizard_remote_path.slot_update_directories);
-        connect (job, &Ls_col_job.finished_with_error,
+        connect (job, &LsColJob.finished_with_error,
             this, &Folder_wizard_remote_path.slot_handle_ls_col_network_error);
-        connect (job, &Ls_col_job.directory_listing_iterated,
+        connect (job, &LsColJob.directory_listing_iterated,
             this, &Folder_wizard_remote_path.slot_gather_encrypted_paths);
         job.start ();
 

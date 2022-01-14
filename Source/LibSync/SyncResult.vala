@@ -19,7 +19,7 @@ class SyncResult {
 public:
     enum Status {
         Undefined,
-        Not_yet_started,
+        NotYetStarted,
         Sync_prepare,
         Sync_running,
         Sync_abort_requested,
@@ -114,7 +114,7 @@ public:
 
 private:
     Status _status = Undefined;
-    Sync_file_item_vector _sync_items;
+    SyncFileItemVector _sync_items;
     QDateTime _sync_time;
     string _folder;
     /***********************************************************
@@ -161,7 +161,7 @@ private:
         case Undefined:
             re = QLatin1String ("Undefined");
             break;
-        case Not_yet_started:
+        case NotYetStarted:
             re = QLatin1String ("Not yet Started");
             break;
         case Sync_running:
@@ -240,7 +240,7 @@ private:
             _folder_structure_was_changed = true;
         }
 
-        if (item._status == SyncFileItem.File_locked){
+        if (item._status == SyncFileItem.FileLocked){
             _num_locked_items++;
             if (!_first_item_locked) {
                 _first_item_locked = item;
@@ -248,7 +248,7 @@ private:
         }
 
         // Process the item to the gui
-        if (item._status == SyncFileItem.Fatal_error || item._status == SyncFileItem.Normal_error) {
+        if (item._status == SyncFileItem.FatalError || item._status == SyncFileItem.NormalError) {
             // : this displays an error string (%2) for a file %1
             append_error_string (GLib.Object.tr ("%1 : %2").arg (item._file, item._error_string));
             _num_error_items++;
@@ -265,7 +265,7 @@ private:
                 _num_old_conflict_items++;
             }
         } else {
-            if (!item.has_error_status () && item._status != SyncFileItem.File_ignored && item._direction == SyncFileItem.Down) {
+            if (!item.has_error_status () && item._status != SyncFileItem.FileIgnored && item._direction == SyncFileItem.Down) {
                 switch (item._instruction) {
                 case CSYNC_INSTRUCTION_NEW:
                 case CSYNC_INSTRUCTION_TYPE_CHANGE:

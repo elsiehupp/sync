@@ -156,7 +156,7 @@ std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t *h
 
   if (_csync_vio_local_stat_mb (full_path.const_data (), file_stat.get ()) < 0) {
       // Will get excluded by _csync_detect_update.
-      file_stat.type = Item_type_skip;
+      file_stat.type = ItemTypeSkip;
   }
 
   // Override type for virtual files if desired
@@ -190,10 +190,10 @@ static int _csync_vio_local_stat_mb (mbchar_t *wuri, csync_file_stat_t *buf) {
       break;
     case S_IFLNK:
     case S_IFSOCK:
-      buf.type = Item_type_soft_link;
+      buf.type = ItemTypeSoftLink;
       break;
     default:
-      buf.type = Item_type_skip;
+      buf.type = ItemTypeSkip;
       break;
   }
 

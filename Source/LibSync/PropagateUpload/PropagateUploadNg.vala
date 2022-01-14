@@ -12,7 +12,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
 namespace Occ {
 
-QUrl Propagate_upload_file_nG.chunk_url (int chunk) {
+QUrl PropagateUploadFileNG.chunk_url (int chunk) {
     string path = QLatin1String ("remote.php/dav/uploads/")
         + propagator ().account ().dav_user ()
         + QLatin1Char ('/') + string.number (_transfer_id);
@@ -53,7 +53,7 @@ QUrl Propagate_upload_file_nG.chunk_url (int chunk) {
 
 ***********************************************************/
 
-void Propagate_upload_file_nG.do_start_upload () {
+void PropagateUploadFileNG.do_start_upload () {
     propagator ()._active_job_list.append (this);
 
     const SyncJournalDb.UploadInfo progress_info = propagator ()._journal.get_upload_info (_item._file);
@@ -65,16 +65,16 @@ void Propagate_upload_file_nG.do_start_upload () {
             && progress_info._size == _item._size) {
         _transfer_id = progress_info._transferid;
         auto url = chunk_url ();
-        auto job = new Ls_col_job (propagator ().account (), url, this);
+        auto job = new LsColJob (propagator ().account (), url, this);
         _jobs.append (job);
         job.set_properties (QList<QByteArray> () << "resourcetype"
                                                << "getcontentlength");
-        connect (job, &Ls_col_job.finished_without_error, this, &Propagate_upload_file_nG.slot_propfind_finished);
-        connect (job, &Ls_col_job.finished_with_error,
-            this, &Propagate_upload_file_nG.slot_propfind_finished_with_error);
-        connect (job, &GLib.Object.destroyed, this, &Propagate_upload_file_common.slot_job_destroyed);
-        connect (job, &Ls_col_job.directory_listing_iterated,
-            this, &Propagate_upload_file_nG.slot_propfind_iterate);
+        connect (job, &LsColJob.finished_without_error, this, &PropagateUploadFileNG.slot_propfind_finished);
+        connect (job, &LsColJob.finished_with_error,
+            this, &PropagateUploadFileNG.slot_propfind_finished_with_error);
+        connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.slot_job_destroyed);
+        connect (job, &LsColJob.directory_listing_iterated,
+            this, &PropagateUploadFileNG.slot_propfind_iterate);
         job.start ();
         return;
     } else if (progress_info._valid && progress_info.is_chunked ()) {
@@ -88,7 +88,7 @@ void Propagate_upload_file_nG.do_start_upload () {
     start_new_upload ();
 }
 
-void Propagate_upload_file_nG.slot_propfind_iterate (string &name, QMap<string, string> &properties) {
+void PropagateUploadFileNG.slot_propfind_iterate (string &name, QMap<string, string> &properties) {
     if (name == chunk_url ().path ()) {
         return; // skip the info about the path itself
     }
@@ -104,8 +104,8 @@ void Propagate_upload_file_nG.slot_propfind_iterate (string &name, QMap<string, 
     }
 }
 
-void Propagate_upload_file_nG.slot_propfind_finished () {
-    auto job = qobject_cast<Ls_col_job> (sender ());
+void PropagateUploadFileNG.slot_propfind_finished () {
+    auto job = qobject_cast<LsColJob> (sender ());
     slot_job_destroyed (job); // remove it from the _jobs list
     propagator ()._active_job_list.remove_one (this);
 
@@ -145,7 +145,7 @@ void Propagate_upload_file_nG.slot_propfind_finished () {
         // with corruptions if there are too many chunks, or if we abort and there are still stale chunks.
         for (auto &server_chunk : q_as_const (_server_chunks)) {
             auto job = new DeleteJob (propagator ().account (), Utility.concat_url_path (chunk_url (), server_chunk.original_name), this);
-            GLib.Object.connect (job, &DeleteJob.finished_signal, this, &Propagate_upload_file_nG.slot_delete_job_finished);
+            GLib.Object.connect (job, &DeleteJob.finished_signal, this, &PropagateUploadFileNG.slot_delete_job_finished);
             _jobs.append (job);
             job.start ();
         }
@@ -156,13 +156,13 @@ void Propagate_upload_file_nG.slot_propfind_finished () {
     start_next_chunk ();
 }
 
-void Propagate_upload_file_nG.slot_propfind_finished_with_error () {
-    auto job = qobject_cast<Ls_col_job> (sender ());
+void PropagateUploadFileNG.slot_propfind_finished_with_error () {
+    auto job = qobject_cast<LsColJob> (sender ());
     slot_job_destroyed (job); // remove it from the _jobs list
     QNetworkReply.NetworkError err = job.reply ().error ();
     auto http_error_code = job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
     auto status = classify_error (err, http_error_code, &propagator ()._another_sync_needed);
-    if (status == SyncFileItem.Fatal_error) {
+    if (status == SyncFileItem.FatalError) {
         _item._request_id = job.request_id ();
         propagator ()._active_job_list.remove_one (this);
         abort_with_error (status, job.error_string_parsing_body ());
@@ -171,7 +171,7 @@ void Propagate_upload_file_nG.slot_propfind_finished_with_error () {
     start_new_upload ();
 }
 
-void Propagate_upload_file_nG.slot_delete_job_finished () {
+void PropagateUploadFileNG.slot_delete_job_finished () {
     auto job = qobject_cast<DeleteJob> (sender ());
     ASSERT (job);
     _jobs.remove (_jobs.index_of (job));
@@ -180,7 +180,7 @@ void Propagate_upload_file_nG.slot_delete_job_finished () {
     if (err != QNetworkReply.NoError && err != QNetworkReply.ContentNotFoundError) {
         const int http_status = job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
         SyncFileItem.Status status = classify_error (err, http_status);
-        if (status == SyncFileItem.Fatal_error) {
+        if (status == SyncFileItem.FatalError) {
             _item._request_id = job.request_id ();
             abort_with_error (status, job.error_string ());
             return;
@@ -202,7 +202,7 @@ void Propagate_upload_file_nG.slot_delete_job_finished () {
     }
 }
 
-void Propagate_upload_file_nG.start_new_upload () {
+void PropagateUploadFileNG.start_new_upload () {
     ASSERT (propagator ()._active_job_list.count (this) == 1);
     Q_ASSERT (_item._modtime > 0);
     if (_item._modtime <= 0) {
@@ -230,19 +230,19 @@ void Propagate_upload_file_nG.start_new_upload () {
 
     // But we should send the temporary (or something) one.
     headers["OC-Total-Length"] = QByteArray.number (_file_to_upload._size);
-    auto job = new Mk_col_job (propagator ().account (), chunk_url (), headers, this);
+    auto job = new MkColJob (propagator ().account (), chunk_url (), headers, this);
 
-    connect (job, &Mk_col_job.finished_with_error,
-        this, &Propagate_upload_file_nG.slot_mk_col_finished);
-    connect (job, &Mk_col_job.finished_without_error,
-        this, &Propagate_upload_file_nG.slot_mk_col_finished);
-    connect (job, &GLib.Object.destroyed, this, &Propagate_upload_file_common.slot_job_destroyed);
+    connect (job, &MkColJob.finished_with_error,
+        this, &PropagateUploadFileNG.slot_mk_col_finished);
+    connect (job, &MkColJob.finished_without_error,
+        this, &PropagateUploadFileNG.slot_mk_col_finished);
+    connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.slot_job_destroyed);
     job.start ();
 }
 
-void Propagate_upload_file_nG.slot_mk_col_finished () {
+void PropagateUploadFileNG.slot_mk_col_finished () {
     propagator ()._active_job_list.remove_one (this);
-    auto job = qobject_cast<Mk_col_job> (sender ());
+    auto job = qobject_cast<MkColJob> (sender ());
     slot_job_destroyed (job); // remove it from the _jobs list
     QNetworkReply.NetworkError err = job.reply ().error ();
     _item._http_error_code = job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
@@ -257,7 +257,7 @@ void Propagate_upload_file_nG.slot_mk_col_finished () {
     start_next_chunk ();
 }
 
-void Propagate_upload_file_nG.start_next_chunk () {
+void PropagateUploadFileNG.start_next_chunk () {
     if (propagator ()._abort_requested)
         return;
 
@@ -275,7 +275,7 @@ void Propagate_upload_file_nG.start_next_chunk () {
         // If we changed the file name, we must store the changed filename in the remote folder, not the original one.
         string destination = QDir.clean_path (propagator ().account ().dav_url ().path ()
             + propagator ().full_remote_path (_file_to_upload._file));
-        auto headers = Propagate_upload_file_common.headers ();
+        auto headers = PropagateUploadFileCommon.headers ();
 
         // "If-Match applies to the source, but we are interested in comparing the etag of the destination
         auto if_match = headers.take (QByteArrayLiteral ("If-Match"));
@@ -291,8 +291,8 @@ void Propagate_upload_file_nG.start_next_chunk () {
         auto job = new Move_job (propagator ().account (), Utility.concat_url_path (chunk_url (), "/.file"),
             destination, headers, this);
         _jobs.append (job);
-        connect (job, &Move_job.finished_signal, this, &Propagate_upload_file_nG.slot_move_job_finished);
-        connect (job, &GLib.Object.destroyed, this, &Propagate_upload_file_common.slot_job_destroyed);
+        connect (job, &Move_job.finished_signal, this, &PropagateUploadFileNG.slot_move_job_finished);
+        connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.slot_job_destroyed);
         propagator ()._active_job_list.append (this);
         adjust_last_job_timeout (job, file_size);
         job.start ();
@@ -300,9 +300,9 @@ void Propagate_upload_file_nG.start_next_chunk () {
     }
 
     const string file_name = _file_to_upload._path;
-    auto device = std.make_unique<Upload_device> (
+    auto device = std.make_unique<UploadDevice> (
             file_name, _sent, _current_chunk_size, &propagator ()._bandwidth_manager);
-    if (!device.open (QIODevice.Read_only)) {
+    if (!device.open (QIODevice.ReadOnly)) {
         q_c_warning (lc_propagate_upload_nG) << "Could not prepare upload device : " << device.error_string ();
 
         // If the file is currently locked, we want to retry the sync
@@ -311,7 +311,7 @@ void Propagate_upload_file_nG.start_next_chunk () {
             emit propagator ().seen_locked_file (file_name);
         }
         // Soft error because this is likely caused by the user modifying his files while syncing
-        abort_with_error (SyncFileItem.Soft_error, device.error_string ());
+        abort_with_error (SyncFileItem.SoftError, device.error_string ());
         return;
     }
 
@@ -325,18 +325,18 @@ void Propagate_upload_file_nG.start_next_chunk () {
     auto device_ptr = device.get (); // for connections later
     auto *job = new PUTFile_job (propagator ().account (), url, std.move (device), headers, _current_chunk, this);
     _jobs.append (job);
-    connect (job, &PUTFile_job.finished_signal, this, &Propagate_upload_file_nG.slot_put_finished);
+    connect (job, &PUTFile_job.finished_signal, this, &PropagateUploadFileNG.slot_put_finished);
     connect (job, &PUTFile_job.upload_progress,
-        this, &Propagate_upload_file_nG.slot_upload_progress);
+        this, &PropagateUploadFileNG.slot_upload_progress);
     connect (job, &PUTFile_job.upload_progress,
-        device_ptr, &Upload_device.slot_job_upload_progress);
-    connect (job, &GLib.Object.destroyed, this, &Propagate_upload_file_common.slot_job_destroyed);
+        device_ptr, &UploadDevice.slot_job_upload_progress);
+    connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.slot_job_destroyed);
     job.start ();
     propagator ()._active_job_list.append (this);
     _current_chunk++;
 }
 
-void Propagate_upload_file_nG.slot_put_finished () {
+void PropagateUploadFileNG.slot_put_finished () {
     auto *job = qobject_cast<PUTFile_job> (sender ());
     ASSERT (job);
 
@@ -395,7 +395,7 @@ void Propagate_upload_file_nG.slot_put_finished () {
     const string full_file_path (propagator ().full_local_path (_item._file));
     if (!FileSystem.file_exists (full_file_path)) {
         if (!_finished) {
-            abort_with_error (SyncFileItem.Soft_error, tr ("The local file was removed during sync."));
+            abort_with_error (SyncFileItem.SoftError, tr ("The local file was removed during sync."));
             return;
         } else {
             propagator ()._another_sync_needed = true;
@@ -410,7 +410,7 @@ void Propagate_upload_file_nG.slot_put_finished () {
     if (!FileSystem.verify_file_unchanged (full_file_path, _item._size, _item._modtime)) {
         propagator ()._another_sync_needed = true;
         if (!_finished) {
-            abort_with_error (SyncFileItem.Soft_error, tr ("Local file changed during sync."));
+            abort_with_error (SyncFileItem.SoftError, tr ("Local file changed during sync."));
             return;
         }
     }
@@ -431,7 +431,7 @@ void Propagate_upload_file_nG.slot_put_finished () {
     start_next_chunk ();
 }
 
-void Propagate_upload_file_nG.slot_move_job_finished () {
+void PropagateUploadFileNG.slot_move_job_finished () {
     propagator ()._active_job_list.remove_one (this);
     auto job = qobject_cast<Move_job> (sender ());
     slot_job_destroyed (job); // remove it from the _jobs list
@@ -448,7 +448,7 @@ void Propagate_upload_file_nG.slot_move_job_finished () {
     if (_item._http_error_code == 202) {
         string path = string.from_utf8 (job.reply ().raw_header ("OC-Job_status-Location"));
         if (path.is_empty ()) {
-            done (SyncFileItem.Normal_error, tr ("Poll URL missing"));
+            done (SyncFileItem.NormalError, tr ("Poll URL missing"));
             return;
         }
         _finished = true;
@@ -457,14 +457,14 @@ void Propagate_upload_file_nG.slot_move_job_finished () {
     }
 
     if (_item._http_error_code != 201 && _item._http_error_code != 204) {
-        abort_with_error (SyncFileItem.Normal_error, tr ("Unexpected return code from server (%1)").arg (_item._http_error_code));
+        abort_with_error (SyncFileItem.NormalError, tr ("Unexpected return code from server (%1)").arg (_item._http_error_code));
         return;
     }
 
-    QByteArray fid = job.reply ().raw_header ("OC-File_iD");
+    QByteArray fid = job.reply ().raw_header ("OC-FileID");
     if (fid.is_empty ()) {
-        q_c_warning (lc_propagate_upload_nG) << "Server did not return a OC-File_iD" << _item._file;
-        abort_with_error (SyncFileItem.Normal_error, tr ("Missing File ID from server"));
+        q_c_warning (lc_propagate_upload_nG) << "Server did not return a OC-FileID" << _item._file;
+        abort_with_error (SyncFileItem.NormalError, tr ("Missing File ID from server"));
         return;
     } else {
         // the old file id should only be empty for new files uploaded
@@ -478,13 +478,13 @@ void Propagate_upload_file_nG.slot_move_job_finished () {
     ;
     if (_item._etag.is_empty ()) {
         q_c_warning (lc_propagate_upload_nG) << "Server did not return an ETAG" << _item._file;
-        abort_with_error (SyncFileItem.Normal_error, tr ("Missing ETag from server"));
+        abort_with_error (SyncFileItem.NormalError, tr ("Missing ETag from server"));
         return;
     }
     finalize ();
 }
 
-void Propagate_upload_file_nG.slot_upload_progress (int64 sent, int64 total) {
+void PropagateUploadFileNG.slot_upload_progress (int64 sent, int64 total) {
     // Completion is signaled with sent=0, total=0; avoid accidentally
     // resetting progress due to the sent being zero by ignoring it.
     // finished_signal () is bound to be emitted soon anyway.
@@ -495,11 +495,11 @@ void Propagate_upload_file_nG.slot_upload_progress (int64 sent, int64 total) {
     propagator ().report_progress (*_item, _sent + sent - total);
 }
 
-void Propagate_upload_file_nG.abort (Propagator_job.Abort_type abort_type) {
+void PropagateUploadFileNG.abort (PropagatorJob.AbortType abort_type) {
     abort_network_jobs (
         abort_type,
         [abort_type] (AbstractNetworkJob *job) {
-            return abort_type != Abort_type.Asynchronous || !qobject_cast<Move_job> (job);
+            return abort_type != AbortType.Asynchronous || !qobject_cast<Move_job> (job);
         });
 }
 

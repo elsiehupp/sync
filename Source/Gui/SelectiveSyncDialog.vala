@@ -9,7 +9,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 // #include <QTree_widget>
 // #include <qpushbutton.h>
 // #include <QFile_icon_provider>
-// #include <QHeader_view>
+// #include <QHeaderView>
 // #include <QSettings>
 // #include <QScoped_value_rollback>
 // #include <QTree_widget_item>
@@ -73,8 +73,8 @@ private:
     QTree_widget *_folder_tree;
 
     // During account setup we want to filter out excluded folders from the
-    // view without having a Folder.SyncEngine.Excluded_files instance.
-    Excluded_files _excluded_files;
+    // view without having a Folder.SyncEngine.ExcludedFiles instance.
+    ExcludedFiles _excluded_files;
 
     QStringList _encrypted_paths;
 };
@@ -157,8 +157,8 @@ private:
         _folder_tree.set_sorting_enabled (true);
         _folder_tree.sort_by_column (0, Qt.Ascending_order);
         _folder_tree.set_column_count (2);
-        _folder_tree.header ().set_section_resize_mode (0, QHeader_view.QHeader_view.Resize_to_contents);
-        _folder_tree.header ().set_section_resize_mode (1, QHeader_view.QHeader_view.Resize_to_contents);
+        _folder_tree.header ().set_section_resize_mode (0, QHeaderView.QHeaderView.Resize_to_contents);
+        _folder_tree.header ().set_section_resize_mode (1, QHeaderView.QHeaderView.Resize_to_contents);
         _folder_tree.header ().set_stretch_last_section (true);
         _folder_tree.header_item ().set_text (0, tr ("Name"));
         _folder_tree.header_item ().set_text (1, tr ("Size"));
@@ -174,18 +174,18 @@ private:
     void Selective_sync_widget.refresh_folders () {
         _encrypted_paths.clear ();
 
-        auto *job = new Ls_col_job (_account, _folder_path, this);
+        auto *job = new LsColJob (_account, _folder_path, this);
         auto props = QList<QByteArray> () << "resourcetype"
                                          << "http://owncloud.org/ns:size";
         if (_account.capabilities ().client_side_encryption_available ()) {
             props << "http://nextcloud.org/ns:is-encrypted";
         }
         job.set_properties (props);
-        connect (job, &Ls_col_job.directory_listing_subfolders,
+        connect (job, &LsColJob.directory_listing_subfolders,
             this, &Selective_sync_widget.slot_update_directories);
-        connect (job, &Ls_col_job.finished_with_error,
+        connect (job, &LsColJob.finished_with_error,
             this, &Selective_sync_widget.slot_lscol_finished_with_error);
-        connect (job, &Ls_col_job.directory_listing_iterated,
+        connect (job, &LsColJob.directory_listing_iterated,
             this, &Selective_sync_widget.slot_gather_encrypted_paths);
         job.start ();
         _folder_tree.clear ();
@@ -257,7 +257,7 @@ private:
     }
 
     void Selective_sync_widget.slot_update_directories (QStringList list) {
-        auto job = qobject_cast<Ls_col_job> (sender ());
+        auto job = qobject_cast<LsColJob> (sender ());
         QScoped_value_rollback<bool> is_inserting (_inserting);
         _inserting = true;
 
@@ -379,10 +379,10 @@ private:
         if (!_folder_path.is_empty ()) {
             prefix = _folder_path + QLatin1Char ('/');
         }
-        auto *job = new Ls_col_job (_account, prefix + dir, this);
+        auto *job = new LsColJob (_account, prefix + dir, this);
         job.set_properties (QList<QByteArray> () << "resourcetype"
                                                << "http://owncloud.org/ns:size");
-        connect (job, &Ls_col_job.directory_listing_subfolders,
+        connect (job, &LsColJob.directory_listing_subfolders,
             this, &Selective_sync_widget.slot_update_directories);
         job.start ();
     }

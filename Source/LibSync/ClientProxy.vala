@@ -6,7 +6,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 // #include <QLoggingCategory>
 // #include <QUrl>
-// #include <QThread_pool>
+// #include <QThreadPool>
 
 // #include <GLib.Object>
 // #include <QNetworkProxy>
@@ -30,15 +30,15 @@ public:
     static void lookup_system_proxy_async (QUrl &url, GLib.Object *dst, char *slot);
 
     static string print_q_network_proxy (QNetworkProxy &proxy);
-    static const char *proxy_type_to_c_str (QNetworkProxy.Proxy_type type);
+    static const char *proxy_type_to_c_str (QNetworkProxy.ProxyType type);
 
 public slots:
     void setup_qt_proxy_from_config ();
 };
 
-class System_proxy_runnable : GLib.Object, public QRunnable {
+class SystemProxyRunnable : GLib.Object, public QRunnable {
 public:
-    System_proxy_runnable (QUrl &url);
+    SystemProxyRunnable (QUrl &url);
     void run () override;
 signals:
     void system_proxy_looked_up (QNetworkProxy &url);
@@ -78,7 +78,7 @@ private:
         return true;
     }
 
-    const char *ClientProxy.proxy_type_to_c_str (QNetworkProxy.Proxy_type type) {
+    const char *ClientProxy.proxy_type_to_c_str (QNetworkProxy.ProxyType type) {
         switch (type) {
         case QNetworkProxy.NoProxy:
             return "NoProxy";
@@ -86,12 +86,12 @@ private:
             return "DefaultProxy";
         case QNetworkProxy.Socks5Proxy:
             return "Socks5Proxy";
-        case QNetworkProxy.Http_proxy:
-            return "Http_proxy";
-        case QNetworkProxy.Http_caching_proxy:
-            return "Http_caching_proxy";
-        case QNetworkProxy.Ftp_caching_proxy:
-            return "Ftp_caching_proxy";
+        case QNetworkProxy.HttpProxy:
+            return "HttpProxy";
+        case QNetworkProxy.HttpCachingProxy:
+            return "HttpCachingProxy";
+        case QNetworkProxy.FtpCachingProxy:
+            return "FtpCachingProxy";
         default:
             return "NoProxy";
         }
@@ -120,9 +120,9 @@ private:
                 break;
             case QNetworkProxy.DefaultProxy:
                 q_c_info (lc_client_proxy) << "Set proxy configuration to use the preferred system proxy for http tcp connections"; {
-                    QNetwork_proxy_query query;
+                    QNetworkProxyQuery query;
                     query.set_protocol_tag ("http");
-                    query.set_query_type (QNetwork_proxy_query.Tcp_socket);
+                    query.set_query_type (QNetworkProxyQuery.TcpSocket);
                     auto proxies = QNetworkProxyFactory.proxy_for_query (query);
                     proxy = proxies.first ();
                 }
@@ -135,8 +135,8 @@ private:
                 QNetworkProxyFactory.set_use_system_configuration (false);
                 QNetworkProxy.set_application_proxy (proxy);
                 break;
-            case QNetworkProxy.Http_proxy:
-                proxy.set_type (QNetworkProxy.Http_proxy);
+            case QNetworkProxy.HttpProxy:
+                proxy.set_type (QNetworkProxy.HttpProxy);
                 q_c_info (lc_client_proxy) << "Set proxy configuration to HTTP" << print_q_network_proxy (proxy);
                 QNetworkProxyFactory.set_use_system_configuration (false);
                 QNetworkProxy.set_application_proxy (proxy);
@@ -147,20 +147,20 @@ private:
     }
 
     void ClientProxy.lookup_system_proxy_async (QUrl &url, GLib.Object *dst, char *slot) {
-        auto *runnable = new System_proxy_runnable (url);
+        auto *runnable = new SystemProxyRunnable (url);
         GLib.Object.connect (runnable, SIGNAL (system_proxy_looked_up (QNetworkProxy)), dst, slot);
-        QThread_pool.global_instance ().start (runnable); // takes ownership and deletes
+        QThreadPool.global_instance ().start (runnable); // takes ownership and deletes
     }
 
-    System_proxy_runnable.System_proxy_runnable (QUrl &url)
+    SystemProxyRunnable.SystemProxyRunnable (QUrl &url)
         : GLib.Object ()
         , QRunnable ()
         , _url (url) {
     }
 
-    void System_proxy_runnable.run () {
+    void SystemProxyRunnable.run () {
         q_register_meta_type<QNetworkProxy> ("QNetworkProxy");
-        QList<QNetworkProxy> proxies = QNetworkProxyFactory.system_proxy_for_query (QNetwork_proxy_query (_url));
+        QList<QNetworkProxy> proxies = QNetworkProxyFactory.system_proxy_for_query (QNetworkProxyQuery (_url));
 
         if (proxies.is_empty ()) {
             emit system_proxy_looked_up (QNetworkProxy (QNetworkProxy.NoProxy));

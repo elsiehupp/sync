@@ -9,8 +9,8 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 // #include <QFile>
 // #include <QLoggingCategory>
 // #include <QPainter>
-// #include <QPixmap_cache>
-// #include <QSvg_renderer>
+// #include <QPixmapCache>
+// #include <QSvgRenderer>
 
 // #include <QColor>
 // #include <QPixmap>
@@ -118,7 +118,7 @@ QImage draw_svg_with_custom_fill_color (string &source_svg_path, QColor &fill_co
         const string cache_key = file_name + QStringLiteral (",") + custom_color_name;
 
         // check for existing QPixmap in cache
-        if (QPixmap_cache.find (cache_key, &cached_pixmap)) {
+        if (QPixmapCache.find (cache_key, &cached_pixmap)) {
             if (original_size) {
                 *original_size = {};
             }
@@ -128,7 +128,7 @@ QImage draw_svg_with_custom_fill_color (string &source_svg_path, QColor &fill_co
         cached_pixmap = QPixmap.from_image (create_svg_image_with_custom_color (file_name, custom_color, original_size, requested_size));
 
         if (!cached_pixmap.is_null ()) {
-            QPixmap_cache.insert (cache_key, cached_pixmap);
+            QPixmapCache.insert (cache_key, cached_pixmap);
         }
 
         return cached_pixmap;
@@ -136,7 +136,7 @@ QImage draw_svg_with_custom_fill_color (string &source_svg_path, QColor &fill_co
 
     QImage draw_svg_with_custom_fill_color (
         const string &source_svg_path, QColor &fill_color, QSize *original_size, QSize &requested_size) {
-        QSvg_renderer svg_renderer;
+        QSvgRenderer svg_renderer;
 
         if (!svg_renderer.load (source_svg_path)) {
             q_c_warning (lc_icon_utils) << "Could no load initial SVG image";

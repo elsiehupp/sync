@@ -16,7 +16,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
 
 #if ! (QTLEGACY)
-// #include <QOperating_system_version>
+// #include <QOperatingSystemVersion>
 #endif
 // #pragma once
 
@@ -56,7 +56,7 @@ static string find_default_file_manager () {
     p.start ("xdg-mime", QStringList () << "query"
                                       << "default"
                                       << "inode/directory",
-        QFile.Read_only);
+        QFile.ReadOnly);
     p.wait_for_finished ();
     string file_name = string.from_utf8 (p.read_all ().trimmed ());
     if (file_name.is_empty ())
@@ -81,7 +81,7 @@ static string find_default_file_manager () {
 // early dolphin versions did not have --select
 static bool check_dolphin_can_select () {
     QProcess p;
-    p.start ("dolphin", QStringList () << "--help", QFile.Read_only);
+    p.start ("dolphin", QStringList () << "--help", QFile.ReadOnly);
     p.wait_for_finished ();
     return p.read_all ().contains ("--select");
 }

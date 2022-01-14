@@ -12,20 +12,20 @@ namespace Occ {
 
 
 /***********************************************************
-@brief The Propagate_remote_delete class
+@brief The PropagateRemoteDelete class
 @ingroup libsync
 ***********************************************************/
-class Propagate_remote_delete : Propagate_item_job {
+class PropagateRemoteDelete : PropagateItemJob {
     QPointer<DeleteJob> _job;
-    Abstract_propagate_remote_delete_encrypted *_delete_encrypted_helper = nullptr;
+    AbstractPropagateRemoteDeleteEncrypted *_delete_encrypted_helper = nullptr;
 
 public:
-    Propagate_remote_delete (Owncloud_propagator *propagator, SyncFileItemPtr &item)
-        : Propagate_item_job (propagator, item) {
+    PropagateRemoteDelete (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+        : PropagateItemJob (propagator, item) {
     }
     void start () override;
     void create_delete_job (string &filename);
-    void abort (Propagator_job.Abort_type abort_type) override;
+    void abort (PropagatorJob.AbortType abort_type) override;
 
     bool is_likely_finished_quickly () override {
         return !_item.is_directory ();
@@ -35,7 +35,7 @@ private slots:
     void slot_delete_job_finished ();
 };
 
-    void Propagate_remote_delete.start () {
+    void PropagateRemoteDelete.start () {
         q_c_info (lc_propagate_remote_delete) << "Start propagate remote delete job for" << _item._file;
 
         if (propagator ()._abort_requested)
@@ -47,9 +47,9 @@ private slots:
             } else {
                 _delete_encrypted_helper = new Propagate_remote_delete_encrypted_root_folder (propagator (), _item, this);
             }
-            connect (_delete_encrypted_helper, &Abstract_propagate_remote_delete_encrypted.finished, this, [this] (bool success) {
+            connect (_delete_encrypted_helper, &AbstractPropagateRemoteDeleteEncrypted.finished, this, [this] (bool success) {
                 if (!success) {
-                    SyncFileItem.Status status = SyncFileItem.Normal_error;
+                    SyncFileItem.Status status = SyncFileItem.NormalError;
                     if (_delete_encrypted_helper.network_error () != QNetworkReply.NoError && _delete_encrypted_helper.network_error () != QNetworkReply.ContentNotFoundError) {
                         status = classify_error (_delete_encrypted_helper.network_error (), _item._http_error_code, &propagator ()._another_sync_needed);
                     }
@@ -64,28 +64,28 @@ private slots:
         }
     }
 
-    void Propagate_remote_delete.create_delete_job (string &filename) {
+    void PropagateRemoteDelete.create_delete_job (string &filename) {
         q_c_info (lc_propagate_remote_delete) << "Deleting file, local" << _item._file << "remote" << filename;
 
         _job = new DeleteJob (propagator ().account (),
             propagator ().full_remote_path (filename),
             this);
 
-        connect (_job.data (), &DeleteJob.finished_signal, this, &Propagate_remote_delete.slot_delete_job_finished);
+        connect (_job.data (), &DeleteJob.finished_signal, this, &PropagateRemoteDelete.slot_delete_job_finished);
         propagator ()._active_job_list.append (this);
         _job.start ();
     }
 
-    void Propagate_remote_delete.abort (Propagator_job.Abort_type abort_type) {
+    void PropagateRemoteDelete.abort (PropagatorJob.AbortType abort_type) {
         if (_job && _job.reply ())
             _job.reply ().abort ();
 
-        if (abort_type == Abort_type.Asynchronous) {
+        if (abort_type == AbortType.Asynchronous) {
             emit abort_finished ();
         }
     }
 
-    void Propagate_remote_delete.slot_delete_job_finished () {
+    void PropagateRemoteDelete.slot_delete_job_finished () {
         propagator ()._active_job_list.remove_one (this);
 
         ASSERT (_job);
@@ -111,10 +111,10 @@ private slots:
             // Normally we expect "204 No Content"
             // If it is not the case, it might be because of a proxy or gateway intercepting the request, so we must
             // throw an error.
-            done (SyncFileItem.Normal_error,
+            done (SyncFileItem.NormalError,
                 tr ("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
                     .arg (_item._http_error_code)
-                    .arg (_job.reply ().attribute (QNetworkRequest.Http_reason_phrase_attribute).to_string ()));
+                    .arg (_job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_string ()));
             return;
         }
 

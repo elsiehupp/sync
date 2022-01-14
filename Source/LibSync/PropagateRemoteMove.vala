@@ -33,20 +33,20 @@ signals:
 };
 
 /***********************************************************
-@brief The Propagate_remote_move class
+@brief The PropagateRemoteMove class
 @ingroup libsync
 ***********************************************************/
-class Propagate_remote_move : Propagate_item_job {
+class PropagateRemoteMove : PropagateItemJob {
     QPointer<Move_job> _job;
 
 public:
-    Propagate_remote_move (Owncloud_propagator *propagator, SyncFileItemPtr &item)
-        : Propagate_item_job (propagator, item) {
+    PropagateRemoteMove (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+        : PropagateItemJob (propagator, item) {
     }
     void start () override;
-    void abort (Propagator_job.Abort_type abort_type) override;
-    Job_parallelism parallelism () override {
-        return _item.is_directory () ? Wait_for_finished : Full_parallelism;
+    void abort (PropagatorJob.AbortType abort_type) override;
+    JobParallelism parallelism () override {
+        return _item.is_directory () ? WaitForFinished : FullParallelism;
     }
 
     /***********************************************************
@@ -99,7 +99,7 @@ private slots:
         return true;
     }
 
-    void Propagate_remote_move.start () {
+    void PropagateRemoteMove.start () {
         if (propagator ()._abort_requested)
             return;
 
@@ -124,7 +124,7 @@ private slots:
                 SyncJournalFileRecord parent_rec;
                 bool ok = propagator ()._journal.get_file_record (parent_path, &parent_rec);
                 if (!ok) {
-                    done (SyncFileItem.Normal_error);
+                    done (SyncFileItem.NormalError);
                     return;
                 }
 
@@ -147,7 +147,7 @@ private slots:
 
         auto &vfs = propagator ().sync_options ()._vfs;
         auto itype = _item._type;
-        ASSERT (itype != Item_type_virtual_file_download && itype != ItemTypeVirtualFileDehydration);
+        ASSERT (itype != ItemTypeVirtualFileDownload && itype != ItemTypeVirtualFileDehydration);
         if (vfs.mode () == Vfs.WithSuffix && itype != ItemTypeDirectory) {
             const auto suffix = vfs.file_suffix ();
             bool source_had_suffix = remote_source.ends_with (suffix);
@@ -176,7 +176,7 @@ private slots:
                 // If foo . bar.owncloud, the rename target will be "bar"
                 folder_target_alt = folder_target + suffix;
 
-            } else if (itype == Item_type_virtual_file) {
+            } else if (itype == ItemTypeVirtualFile) {
                 ASSERT (source_had_suffix && destination_had_suffix);
 
                 // If foo.owncloud . bar, the rename target will be "bar.owncloud"
@@ -192,7 +192,7 @@ private slots:
             if (!FileSystem.file_exists (local_target) && FileSystem.file_exists (local_target_alt)) {
                 string error;
                 if (!FileSystem.unchecked_rename_replace (local_target_alt, local_target, &error)) {
-                    done (SyncFileItem.Normal_error, tr ("Could not rename %1 to %2, error : %3")
+                    done (SyncFileItem.NormalError, tr ("Could not rename %1 to %2, error : %3")
                          .arg (folder_target_alt, folder_target, error));
                     return;
                 }
@@ -203,21 +203,21 @@ private slots:
         q_c_debug (lc_propagate_remote_move) << remote_source << remote_destination;
 
         _job = new Move_job (propagator ().account (), remote_source, remote_destination, this);
-        connect (_job.data (), &Move_job.finished_signal, this, &Propagate_remote_move.slot_move_job_finished);
+        connect (_job.data (), &Move_job.finished_signal, this, &PropagateRemoteMove.slot_move_job_finished);
         propagator ()._active_job_list.append (this);
         _job.start ();
     }
 
-    void Propagate_remote_move.abort (Propagator_job.Abort_type abort_type) {
+    void PropagateRemoteMove.abort (PropagatorJob.AbortType abort_type) {
         if (_job && _job.reply ())
             _job.reply ().abort ();
 
-        if (abort_type == Abort_type.Asynchronous) {
+        if (abort_type == AbortType.Asynchronous) {
             emit abort_finished ();
         }
     }
 
-    void Propagate_remote_move.slot_move_job_finished () {
+    void PropagateRemoteMove.slot_move_job_finished () {
         propagator ()._active_job_list.remove_one (this);
 
         ASSERT (_job);
@@ -238,17 +238,17 @@ private slots:
             // Normally we expect "201 Created"
             // If it is not the case, it might be because of a proxy or gateway intercepting the request, so we must
             // throw an error.
-            done (SyncFileItem.Normal_error,
+            done (SyncFileItem.NormalError,
                 tr ("Wrong HTTP code returned by server. Expected 201, but received \"%1 %2\".")
                     .arg (_item._http_error_code)
-                    .arg (_job.reply ().attribute (QNetworkRequest.Http_reason_phrase_attribute).to_string ()));
+                    .arg (_job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_string ()));
             return;
         }
 
         finalize ();
     }
 
-    void Propagate_remote_move.finalize () {
+    void PropagateRemoteMove.finalize () {
         // Retrieve old db data.
         // if reading from db failed still continue hoping that delete_file_record
         // reopens the db successfully.
@@ -278,22 +278,22 @@ private slots:
         }
         const auto result = propagator ().update_metadata (new_item);
         if (!result) {
-            done (SyncFileItem.Fatal_error, tr ("Error updating metadata : %1").arg (result.error ()));
+            done (SyncFileItem.FatalError, tr ("Error updating metadata : %1").arg (result.error ()));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-            done (SyncFileItem.Soft_error, tr ("The file %1 is currently in use").arg (new_item._file));
+            done (SyncFileItem.SoftError, tr ("The file %1 is currently in use").arg (new_item._file));
             return;
         }
         if (pin_state && *pin_state != PinState.Inherited
             && !vfs.set_pin_state (new_item._rename_target, *pin_state)) {
-            done (SyncFileItem.Normal_error, tr ("Error setting pin state"));
+            done (SyncFileItem.NormalError, tr ("Error setting pin state"));
             return;
         }
 
         if (_item.is_directory ()) {
             propagator ()._renamed_directories.insert (_item._file, _item._rename_target);
             if (!adjust_selective_sync (propagator ()._journal, _item._file, _item._rename_target)) {
-                done (SyncFileItem.Fatal_error, tr ("Error writing metadata to the database"));
+                done (SyncFileItem.FatalError, tr ("Error writing metadata to the database"));
                 return;
             }
         }
@@ -302,7 +302,7 @@ private slots:
         done (SyncFileItem.Success);
     }
 
-    bool Propagate_remote_move.adjust_selective_sync (SyncJournalDb *journal, string &from_, string &to_) {
+    bool PropagateRemoteMove.adjust_selective_sync (SyncJournalDb *journal, string &from_, string &to_) {
         bool ok = false;
         // We only care about preserving the blacklist.   The white list should anyway be empty.
         // And the undecided list will be repopulated on the next sync, if there is anything too big.

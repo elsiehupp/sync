@@ -173,7 +173,7 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
 
         if (xattr.has_nextcloud_placeholder_attributes (path)) {
             const auto should_download = pin && (*pin == PinState.AlwaysLocal);
-            stat.type = should_download ? Item_type_virtual_file_download : Item_type_virtual_file;
+            stat.type = should_download ? ItemTypeVirtualFileDownload : ItemTypeVirtualFile;
             return true;
         } else {
             const auto should_dehydrate = pin && (*pin == PinState.OnlineOnly);
