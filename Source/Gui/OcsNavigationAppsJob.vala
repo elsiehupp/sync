@@ -14,19 +14,19 @@ namespace Occ {
 Fetching enabled apps from the OCS Apps API
 ***********************************************************/
 class OcsNavigationAppsJob : Ocs_job {
-public:
-    OcsNavigationAppsJob (AccountPtr account);
+
+    public OcsNavigationAppsJob (AccountPtr account);
 
     /***********************************************************
     Get a list of enabled apps and external sites
     visible in the Navigation menu
     ***********************************************************/
-    void get_navigation_apps ();
+    public void get_navigation_apps ();
 
 signals:
     /***********************************************************
     Result of the OCS request
-    
+
     @param reply The reply
     @param status_code the status code of the response
     ***********************************************************/
@@ -41,13 +41,13 @@ private slots:
         set_path ("ocs/v2.php/core/navigation/apps");
         connect (this, &OcsNavigationAppsJob.job_finished, this, &OcsNavigationAppsJob.job_done);
     }
-    
+
     void OcsNavigationAppsJob.get_navigation_apps () {
         set_verb ("GET");
         add_param ("absolute", "true");
         start ();
     }
-    
+
     void OcsNavigationAppsJob.job_done (QJsonDocument &reply, int status_code) {
         emit apps_job_finished (reply, status_code);
     }

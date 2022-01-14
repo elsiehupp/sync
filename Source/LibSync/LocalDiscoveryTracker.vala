@@ -47,20 +47,23 @@ public:
     Adds a path that must be locally rediscovered later.
 
     This should be a full relative file path, example:
-      foo/bar/file.txt
+    foo/bar/file.txt
     ***********************************************************/
     void add_touched_path (string &relative_path);
 
     /***********************************************************
-    Call when a sync run starts that rediscovers all local files */
+    Call when a sync run starts that rediscovers all local files
+    ***********************************************************/
     void start_sync_full_discovery ();
 
     /***********************************************************
-    Call when a sync using local_discovery_paths () starts */
+    Call when a sync using local_discovery_paths () starts
+    ***********************************************************/
     void start_sync_partial_discovery ();
 
     /***********************************************************
-    Access list of files that shall be locally rediscovered. */
+    Access list of files that shall be locally rediscovered.
+    ***********************************************************/
     const std.set<string> &local_discovery_paths ();
 
 public slots:
@@ -78,7 +81,7 @@ public slots:
 private:
     /***********************************************************
     The paths that should be checked by the next local discovery.
-    
+
     Mostly a collection of files the filewatchers have reported as touched.
     Also includes files that have had errors in the last sync run.
     ***********************************************************/
@@ -86,7 +89,7 @@ private:
 
     /***********************************************************
     The paths that the current sync run used for local discovery.
-    
+
     For failing syncs, this list will be merged into _local_discovery_paths
     again when the sync is done to make sure everything is retried.
     ***********************************************************/

@@ -24,9 +24,9 @@ namespace Occ {
 @ingroup gui
 ***********************************************************/
 class Ssl_button : QToolButton {
-public:
-    Ssl_button (Gtk.Widget *parent = nullptr);
-    void update_account_state (AccountState *account_state);
+
+    public Ssl_button (Gtk.Widget *parent = nullptr);
+    public void update_account_state (AccountState *account_state);
 
 public slots:
     void slot_update_menu ();
@@ -43,28 +43,28 @@ private:
         : QToolButton (parent) {
         set_popup_mode (QToolButton.Instant_popup);
         set_auto_raise (true);
-    
+
         _menu = new QMenu (this);
         GLib.Object.connect (_menu, &QMenu.about_to_show,
             this, &Ssl_button.slot_update_menu);
         set_menu (_menu);
     }
-    
+
     static string add_cert_details_field (string &key, string &value) {
         if (value.is_empty ())
             return string ();
-    
+
         return QLatin1String ("<tr><td style=\"vertical-align : top;\"><b>") + key
             + QLatin1String ("</b></td><td style=\"vertical-align : bottom;\">") + value
             + QLatin1String ("</td></tr>");
     }
-    
+
     // necessary indication only, not sufficient for primary validation!
     static bool is_self_signed (QSslCertificate &certificate) {
         return certificate.issuer_info (QSslCertificate.Common_name) == certificate.subject_info (QSslCertificate.Common_name)
             && certificate.issuer_info (QSslCertificate.Organizational_unit_name) == certificate.subject_info (QSslCertificate.Organizational_unit_name);
     }
-    
+
     QMenu *Ssl_button.build_cert_menu (QMenu *parent, QSslCertificate &cert,
         const QList<QSslCertificate> &user_approved, int pos, QList<QSslCertificate> &system_ca_certificates) {
         string cn = QStringList (cert.subject_info (QSslCertificate.Common_name)).join (QChar (';'));
@@ -85,14 +85,14 @@ private:
         string effective_date = cert.effective_date ().date ().to_string ();
         string expiry_date = cert.expiry_date ().date ().to_string ();
         string sna = QStringList (cert.subject_alternative_names ().values ()).join (" ");
-    
+
         string details;
         QTextStream stream (&details);
-    
+
         stream << QLatin1String ("<html><body>");
-    
+
         stream << tr ("<h3>Certificate Details</h3>");
-    
+
         stream << QLatin1String ("<table>");
         stream << add_cert_details_field (tr ("Common Name (CN):"), Utility.escape (cn));
         stream << add_cert_details_field (tr ("Subject Alternative Names:"), Utility.escape (sna).replace (" ", "<br/>"));
@@ -102,28 +102,28 @@ private:
         stream << add_cert_details_field (tr ("Country:"), Utility.escape (country));
         stream << add_cert_details_field (tr ("Serial:"), Utility.escape (serial));
         stream << QLatin1String ("</table>");
-    
+
         stream << tr ("<h3>Issuer</h3>");
-    
+
         stream << QLatin1String ("<table>");
         stream << add_cert_details_field (tr ("Issuer:"), Utility.escape (issuer));
         stream << add_cert_details_field (tr ("Issued on:"), Utility.escape (effective_date));
         stream << add_cert_details_field (tr ("Expires on:"), Utility.escape (expiry_date));
         stream << QLatin1String ("</table>");
-    
+
         stream << tr ("<h3>Fingerprints</h3>");
-    
+
         stream << QLatin1String ("<table>");
-    
+
         stream << add_cert_details_field (tr ("SHA-256:"), sha256escaped);
         stream << add_cert_details_field (tr ("SHA-1:"), Utility.escape (sha1));
         stream << QLatin1String ("</table>");
-    
+
         if (user_approved.contains (cert)) {
             stream << tr ("<p><b>Note:</b> This certificate was manually approved</p>");
         }
         stream << QLatin1String ("</body></html>");
-    
+
         string txt;
         if (pos > 0) {
             txt += string (2 * pos, ' ');
@@ -133,9 +133,9 @@ private:
                 txt += QChar (' ');
             }
         }
-    
+
         string cert_id = cn.is_empty () ? ou : cn;
-    
+
         if (system_ca_certificates.contains (cert)) {
             txt += cert_id;
         } else {
@@ -145,13 +145,13 @@ private:
                 txt += tr ("%1").arg (cert_id);
             }
         }
-    
+
         // create label first
         auto *label = new QLabel (parent);
         label.set_style_sheet (QLatin1String ("QLabel { padding : 8px; }"));
         label.set_text_format (Qt.RichText);
         label.set_text (details);
-    
+
         // plug label into widget action
         auto *action = new QWidget_action (parent);
         action.set_default_widget (label);
@@ -159,10 +159,10 @@ private:
         auto *menu = new QMenu (parent);
         menu.menu_action ().set_text (txt);
         menu.add_action (action);
-    
+
         return menu;
     }
-    
+
     void Ssl_button.update_account_state (AccountState *account_state) {
         if (!account_state || !account_state.is_connected ()) {
             set_visible (false);
@@ -171,7 +171,7 @@ private:
             set_visible (true);
         }
         _account_state = account_state;
-    
+
         AccountPtr account = _account_state.account ();
         if (account.url ().scheme () == QLatin1String ("https")) {
             set_icon (QIcon (QLatin1String (":/client/theme/lock-https.svg")));
@@ -182,44 +182,44 @@ private:
             set_tool_tip (tr ("This connection is NOT secure as it is not encrypted.\n"));
         }
     }
-    
+
     void Ssl_button.slot_update_menu () {
         _menu.clear ();
-    
+
         if (!_account_state) {
             return;
         }
-    
+
         AccountPtr account = _account_state.account ();
-    
+
         _menu.add_action (tr ("Server version : %1").arg (account.server_version ())).set_enabled (false);
-    
+
         if (account.is_http2Supported ()) {
             _menu.add_action ("HTTP/2").set_enabled (false);
         }
-    
+
         if (account.url ().scheme () == QLatin1String ("https")) {
             string ssl_version = account._session_cipher.protocol_string ()
                 + ", " + account._session_cipher.authentication_method ()
                 + ", " + account._session_cipher.key_exchange_method ()
                 + ", " + account._session_cipher.encryption_method ();
             _menu.add_action (ssl_version).set_enabled (false);
-    
+
             if (account._session_ticket.is_empty ()) {
                 _menu.add_action (tr ("No support for SSL session tickets/identifiers")).set_enabled (false);
             }
-    
+
             QList<QSslCertificate> chain = account._peer_certificate_chain;
-    
+
             if (chain.is_empty ()) {
                 q_c_warning (lc_ssl) << "Empty certificate chain";
                 return;
             }
-    
+
             _menu.add_action (tr ("Certificate information:")).set_enabled (false);
-    
+
             const auto system_certs = QSslConfiguration.system_ca_certificates ();
-    
+
             QList<QSslCertificate> tmp_chain;
             foreach (QSslCertificate cert, chain) {
                 tmp_chain << cert;
@@ -227,7 +227,7 @@ private:
                     break;
             }
             chain = tmp_chain;
-    
+
             // find trust anchor (informational only, verification is done by QSsl_socket!)
             for (QSslCertificate &root_cA : system_certs) {
                 if (root_cA.issuer_info (QSslCertificate.Common_name) == chain.last ().issuer_info (QSslCertificate.Common_name)
@@ -236,7 +236,7 @@ private:
                     break;
                 }
             }
-    
+
             QList_iterator<QSslCertificate> it (chain);
             it.to_back ();
             int i = 0;
@@ -248,6 +248,6 @@ private:
             _menu.add_action (tr ("The connection is not secure")).set_enabled (false);
         }
     }
-    
+
     } // namespace Occ
     

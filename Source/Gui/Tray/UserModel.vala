@@ -267,7 +267,11 @@ User.User (AccountStatePtr &account, bool &is_current, GLib.Object *parent)
         this, &User.slot_check_expired_activities);
 
     connect (_account.data (), &AccountState.state_changed,
-            [=] () { if (is_connected ()) {slot_refresh_immediately ();} });
+            [=] () {
+                if (is_connected ()) {
+                    slot_refresh_immediately ();
+                }
+            });
     connect (_account.data (), &AccountState.state_changed, this, &User.account_state_changed);
     connect (_account.data (), &AccountState.has_fetched_navigation_apps,
         this, &User.slot_rebuild_navigation_app_list);
@@ -296,7 +300,10 @@ void User.show_desktop_notification (string &title, string &message) {
         _notification_cache.clear ();
     }
 
-    const Notification_cache.Notification notification { title, message };
+    const Notification_cache.Notification notification {
+        title,
+        message
+    };
     if (_notification_cache.contains (notification)) {
         return;
     }
@@ -960,11 +967,15 @@ void User_model.add_user (AccountStatePtr &user, bool &is_current) {
         });
 
         connect (u, &User.desktop_notifications_allowed_changed, this, [this, row] {
-            emit data_changed (index (row, 0), index (row, 0), { User_model.Desktop_notifications_allowed_role });
+            emit data_changed (index (row, 0), index (row, 0), {
+                User_model.Desktop_notifications_allowed_role
+            });
         });
 
         connect (u, &User.account_state_changed, this, [this, row] {
-            emit data_changed (index (row, 0), index (row, 0), { User_model.Is_connected_role });
+            emit data_changed (index (row, 0), index (row, 0), {
+                User_model.Is_connected_role
+            });
         });
 
         _users << u;

@@ -70,13 +70,13 @@ namespace Utility {
     OCSYNC_EXPORT QByteArray user_agent_string ();
     OCSYNC_EXPORT QByteArray friendly_user_agent_string ();
     /***********************************************************
-      * @brief Return whether launch on startup is enabled system wide.
-      *
-      * If this returns true, the checkbox for user specific launch
-      * on startup will be hidden.
-      *
-      * Currently only implemented on Windows.
-      */
+    @brief Return whether launch on startup is enabled system wide.
+
+    If this returns true, the checkbox
+    on startup will be hidden.
+
+    Currently only implemented on Windows.
+    ***********************************************************/
     OCSYNC_EXPORT bool has_system_launch_on_startup (string &app_name);
     OCSYNC_EXPORT bool has_launch_on_startup (string &app_name);
     OCSYNC_EXPORT void set_launch_on_startup (string &app_name, string &gui_name, bool launch);
@@ -85,15 +85,15 @@ namespace Utility {
 
     /***********************************************************
     Return the amount of free space available.
-    
+
     \a path must point to a directory
     ***********************************************************/
     OCSYNC_EXPORT int64 free_disk_space (string &path);
 
     /***********************************************************
     @brief compact_format_double - formats a double value human readable.
-    
-    @param value the value to 
+
+    @param value the value to
     @param prec the precision.
     @param unit an optional unit that is appended if present.
     @return the formatted string.
@@ -111,10 +111,10 @@ namespace Utility {
     @brief Convert milliseconds duration to human readable string.
     @param uint64 msecs the milliseconds to convert to string.
     @return an HMS representation of the milliseconds value.
-    
+
     duration_to_descriptive_string1 describ
     unit, like "5 minutes" or "2 days".
-    
+
     duration_to_descriptive_string2 uses two units where possible, so
     "5 minutes 43 seconds" or "1 month 3 days".
     ***********************************************************/
@@ -123,13 +123,13 @@ namespace Utility {
 
     /***********************************************************
     @brief has_dark_systray - determines whether the systray is dark or light.
-    
+
     Use this to check if the OS has a dark or a light systray.
-    
+
     The value might change during the execution of the program
     (e.g. on OS X 10.10).
-    
-     * @return bool which is true for systems with dark systray.
+
+    @return bool which is true for systems with dark systray.
     ***********************************************************/
     OCSYNC_EXPORT bool has_dark_systray ();
 
@@ -168,7 +168,7 @@ namespace Utility {
 
     /***********************************************************
     @brief time_ago_in_words - human readable time span
-    
+
     Use this to get a string that describes the timespan between the f
     the second timestamp in a human readable and understandable form.
 
@@ -200,14 +200,16 @@ namespace Utility {
     OCSYNC_EXPORT void sort_filenames (QStringList &file_names);
 
     /***********************************************************
-    Appends concat_path and query_items to the url */
+    Appends concat_path and query_items to the url
+    ***********************************************************/
     OCSYNC_EXPORT QUrl concat_url_path (
         const QUrl &url, string &concat_path,
         const QUrlQuery &query_items = {});
 
     /***********************************************************
-     Returns a new settings pre-set in a specific group.  The Settings will be created
-         with the given parent. If no parent is specified, the caller must destroy the settings */
+    Returns a new settings pre-set in a specific group.  The Settings will be created
+    with the given parent. If no parent is specified, the caller must destroy the settings
+    ***********************************************************/
     OCSYNC_EXPORT std.unique_ptr<QSettings> settings_with_group (string &group, GLib.Object *parent = nullptr);
 
     /***********************************************************
@@ -216,8 +218,8 @@ namespace Utility {
     Filters out reserved characters like
     - unicode control and format characters
     - reserved characters : /, ?, <, >, \, :, *, |, and "
-    
-    Warning : This does not sanitize the 
+
+    Warning : This does not sanitize the
     - unix reserved filenames ('.
     - trailing periods and spaces
     - windows reserved filenames ('CON' etc)
@@ -241,7 +243,7 @@ namespace Utility {
     Find the base name for a conflict file name, using name pattern only
 
     Will return an empty string if it's not a conflict file.
-    
+
     Prefer to use the data from the conflicts table in the journal to determine
     a conflict's base file, see SyncJournal.conflict_file_base_name ()
     ***********************************************************/
@@ -257,8 +259,7 @@ namespace Utility {
     ***********************************************************/
     OCSYNC_EXPORT string get_current_user_name ();
 }
-/***********************************************************
-@} */ // \addtogroup
+
 
 inline bool Utility.is_windows () {
     return false;
@@ -541,16 +542,16 @@ string Utility.file_name_for_gui_use (string &f_name) {
 }
 
 QByteArray Utility.normalize_etag (QByteArray etag) {
-    /* strip "XXXX-gzip" */
+    // strip "XXXX-gzip"
     if (etag.starts_with ('"') && etag.ends_with ("-gzip\"")) {
         etag.chop (6);
         etag.remove (0, 1);
     }
-    /* strip trailing -gzip */
+    // strip trailing -gzip
     if (etag.ends_with ("-gzip")) {
         etag.chop (5);
     }
-    /* strip normal quotes */
+    // strip normal quotes
     if (etag.starts_with ('"') && etag.ends_with ('"')) {
         etag.chop (1);
         etag.remove (0, 1);
@@ -662,7 +663,13 @@ string Utility.time_ago_in_words (QDateTime &dt, QDateTime &from) {
     return GLib.Object.tr ("Some time ago");
 }
 
-/* --------------------------------------------------------------------------- */
+
+
+
+
+
+
+
 
 static const char STOPWATCH_END_TAG[] = "_STOPWATCH_END";
 
@@ -855,11 +862,11 @@ string Utility.sanitize_for_file_name (string &name) {
             }
         }
     }
-    
+
     static void remove_fav_link_private (string &folder) {
         Q_UNUSED (folder)
     }
-    
+
     // returns the autostart directory the linux way
     // and respects the XDG_CONFIG_HOME env variable
     string get_user_autostart_dir_private () {
@@ -867,7 +874,7 @@ string Utility.sanitize_for_file_name (string &name) {
         config += QLatin1String ("/autostart/");
         return config;
     }
-    
+
     bool has_launch_on_startup_private (string &app_name) {
         Q_UNUSED (app_name)
         string desktop_file_location = get_user_autostart_dir_private ()
@@ -875,7 +882,7 @@ string Utility.sanitize_for_file_name (string &name) {
                                         + QLatin1String (".desktop");
         return QFile.exists (desktop_file_location);
     }
-    
+
     void set_launch_on_startup_private (string &app_name, string &gui_name, bool enable) {
         Q_UNUSED (app_name)
         string user_auto_start_path = get_user_autostart_dir_private ();
@@ -897,7 +904,7 @@ string Utility.sanitize_for_file_name (string &name) {
             const string app_image_path = q_environment_variable ("APPIMAGE");
             const bool running_inside_app_image = !app_image_path.is_null () && QFile.exists (app_image_path);
             const string executable_path = running_inside_app_image ? app_image_path : QCoreApplication.application_file_path ();
-    
+
             QTextStream ts (&ini_file);
             ts.set_codec ("UTF-8");
             ts << QLatin1String ("[Desktop Entry]\n")
@@ -917,14 +924,14 @@ string Utility.sanitize_for_file_name (string &name) {
             }
         }
     }
-    
+
     static inline bool has_dark_systray_private () {
         return true;
     }
-    
+
     string Utility.get_current_user_name () {
         return {};
     }
-    
+
     } // namespace Occ
     

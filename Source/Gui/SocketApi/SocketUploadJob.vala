@@ -18,9 +18,9 @@ namespace Occ {
 
 
 class Socket_upload_job : GLib.Object {
-public:
-    Socket_upload_job (QSharedPointer<Socket_api_job_v2> &job);
-    void start ();
+
+    public Socket_upload_job (QSharedPointer<Socket_api_job_v2> &job);
+    public void start ();
 
 private:
     QSharedPointer<Socket_api_job_v2> _api_job;
@@ -76,7 +76,16 @@ Socket_upload_job.Socket_upload_job (QSharedPointer<Socket_api_job_v2> &job)
 
     connect (_engine, &Occ.SyncEngine.finished, this, [this] (bool ok) {
         if (ok) {
-            _api_job.success ({ { "local_path", _local_path }, { "synced_files", QJsonArray.from_string_list (_synced_files) } });
+            _api_job.success ({
+                {
+                    "local_path",
+                    _local_path
+                },
+                {
+                    "synced_files",
+                    QJsonArray.from_string_list (_synced_files)
+                }
+            });
         }
     });
     connect (_engine, &Occ.SyncEngine.sync_error, this, [this] (string &error, ErrorCategory) {

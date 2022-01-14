@@ -75,49 +75,49 @@ private:
 
 
     Put_multi_file_job.~Put_multi_file_job () = default;
-    
+
     void Put_multi_file_job.start () {
         QNetworkRequest req;
-    
+
         for (auto &one_device : _devices) {
             auto one_part = QHttp_part{};
-    
+
             one_part.set_body_device (one_device._device.get ());
-    
+
             for (QMap<QByteArray, QByteArray>.Const_iterator it = one_device._headers.begin (); it != one_device._headers.end (); ++it) {
                 one_part.set_raw_header (it.key (), it.value ());
             }
-    
+
             req.set_priority (QNetworkRequest.Low_priority); // Long uploads must not block non-propagation jobs.
-    
+
             _body.append (one_part);
         }
-    
+
         send_request ("POST", _url, req, &_body);
-    
+
         if (reply ().error () != QNetworkReply.NoError) {
             q_c_warning (lc_put_multi_file_job) << " Network error : " << reply ().error_string ();
         }
-    
+
         connect (reply (), &QNetworkReply.upload_progress, this, &Put_multi_file_job.upload_progress);
         connect (this, &AbstractNetworkJob.network_activity, account ().data (), &Account.propagator_network_activity);
         _request_timer.start ();
         AbstractNetworkJob.start ();
     }
-    
+
     bool Put_multi_file_job.finished () {
         for (auto &one_device : _devices) {
             one_device._device.close ();
         }
-    
+
         q_c_info (lc_put_multi_file_job) << "POST of" << reply ().request ().url ().to_string () << path () << "FINISHED WITH STATUS"
                          << reply_status_string ()
                          << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute)
                          << reply ().attribute (QNetworkRequest.Http_reason_phrase_attribute);
-    
+
         emit finished_signal ();
         return true;
     }
-    
+
     }
     

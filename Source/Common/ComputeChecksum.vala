@@ -137,16 +137,16 @@ class ComputeChecksum : GLib.Object {
 
     /***********************************************************
     Computes the checksum for the given file path.
-    
+
     done () is emitted when the calculation finishes.
     ***********************************************************/
     public void start (string &file_path);
 
     /***********************************************************
     Computes the checksum for the given device.
-    
+
     done () is emitted when the calculation finishes.
-    
+
     The device ownership transfers into the thread that
     will compute the checksum. It must not have a parent.
     ***********************************************************/
@@ -187,7 +187,7 @@ class Validate_checksum_header : GLib.Object {
 
     /***********************************************************
     Check a file's actual checksum against the provided checksum_header
-    
+
     If no checksum is there, or if a correct checksum is there, the signal validated (
     will be emitted. In case of any kind of error, the signal validation_failed () will
     be emitted.
@@ -196,9 +196,9 @@ class Validate_checksum_header : GLib.Object {
 
     /***********************************************************
     Check a device's actual checksum against the provided checksum_header
-    
+
     Like the other start () but works on an device.
-    
+
     The device ownership transfers into the thread that
     will compute the checksum. It must not have a parent.
     ***********************************************************/
@@ -228,7 +228,7 @@ class CSyncChecksumHook : GLib.Object {
 
     /***********************************************************
     Returns the checksum value for \a path that is comparable to \a other_checksum.
-    
+
     Called from csync, whe
     to be set as userdata.
     The return value will be owned by csync.
@@ -259,7 +259,9 @@ QByteArray calc_sha1 (QIODevice *device) {
 }
 
 #ifdef ZLIB_FOUND
-QByteArray calc_adler32 (QIODevice *device) { {f (device.size () == 0)
+QByteArray calc_adler32 (QIODevice *device) {
+    {
+        f (device.size () == 0)
     {
         return QByteArray ();
     }

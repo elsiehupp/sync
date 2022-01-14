@@ -20,11 +20,11 @@ namespace Occ {
 @ingroup gui
 ***********************************************************/
 class AuthenticationDialog : Gtk.Dialog {
-public:
-    AuthenticationDialog (string &realm, string &domain, Gtk.Widget *parent = nullptr);
 
-    string user ();
-    string password ();
+    public AuthenticationDialog (string &realm, string &domain, Gtk.Widget *parent = nullptr);
+
+    public string user ();
+    public string password ();
 
 private:
     QLineEdit *_user;
@@ -42,26 +42,26 @@ private:
         auto *label = new QLabel (tr ("Enter username and password for \"%1\" at %2.").arg (realm, domain));
         label.set_text_format (Qt.PlainText);
         lay.add_widget (label);
-    
+
         auto *form = new QFormLayout;
         form.add_row (tr ("&User:"), _user);
         form.add_row (tr ("&Password:"), _password);
         lay.add_layout (form);
         _password.set_echo_mode (QLineEdit.Password);
-    
+
         auto *box = new QDialogButtonBox (QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal);
         connect (box, &QDialogButtonBox.accepted, this, &Gtk.Dialog.accept);
         connect (box, &QDialogButtonBox.rejected, this, &Gtk.Dialog.reject);
         lay.add_widget (box);
     }
-    
+
     string AuthenticationDialog.user () {
         return _user.text ();
     }
-    
+
     string AuthenticationDialog.password () {
         return _password.text ();
     }
-    
+
     } // namespace Occ
     

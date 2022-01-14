@@ -38,9 +38,9 @@ public:
         Starting,
 
         /***********************************************************
-         * Emitted once without _current_discovered_folder when it starts,
-         * then for each folder.
-         */
+        Emitted once without _current_discovered_folder when it starts,
+        then for each folder.
+        ***********************************************************/
         Discovery,
 
         /// Emitted once when reconcile starts
@@ -50,11 +50,11 @@ public:
         Propagation,
 
         /***********************************************************
-         * Emitted once when done
-         *
-         * Except when SyncEngine jumps directly to finalize () without going
-         * through slot_propagation_finished ().
-         */
+        Emitted once when done
+
+        Except when SyncEngine jumps directly to finalize () without going
+        through slot_propagation_finished ().
+        ***********************************************************/
         Done
     };
 
@@ -62,14 +62,14 @@ public:
 
     /***********************************************************
     Called when propagation starts.
-    
+
     is_updating_estimates () will return true afterwards.
     ***********************************************************/
     void start_estimate_updates ();
 
     /***********************************************************
     Returns true when start_estimate_updates () was called.
-    
+
     This is used when the SyncEngine wants to indicate a new sync
     is about to start via the transmission_progress () signal. The
     first ProgressInfo will have is_updating_estimates () == false.
@@ -88,11 +88,14 @@ public:
     int64 completed_size ();
 
     /***********************************************************
-    Number of a file that is currently in progress. */
+    Number of a file that is currently in progress.
+    ***********************************************************/
     int64 current_file ();
 
     /***********************************************************
-    Return true if the size needs to be taken in account in the total amount of time */
+    Return true if the size needs to be taken in account in the
+    total amount of time
+    ***********************************************************/
     static inline bool is_size_dependent (SyncFileItem &item) {
         return !item.is_directory ()
             && (item._instruction == CSYNC_INSTRUCTION_CONFLICT
@@ -119,7 +122,9 @@ public:
     estimate of the current progress per second.
     ***********************************************************/
     struct Progress {
-        /** Returns the estimates about progress per second and eta. */
+        /***********************************************************
+        Returns the estimates about progress per second and eta.
+        ***********************************************************/
         Estimates estimates ();
 
         int64 completed ();
@@ -127,14 +132,14 @@ public:
 
     private:
         /***********************************************************
-         * Update the exponential moving average estimate of _progress_per_sec.
-         */
+        Update the exponential moving average estimate of _progress_per_sec.
+        ***********************************************************/
         void update ();
 
         /***********************************************************
-         * Changes the _completed value and does sanity checks on
-         * _prev_completed and _total.
-         */
+        Changes the _completed value and does sanity checks on
+        _prev_completed and _total.
+        ***********************************************************/
         void set_completed (int64 completed);
 
         // Updated by update ()
@@ -177,7 +182,7 @@ public:
 
     /***********************************************************
     Get the optimistic eta.
-    
+
     This value is based on the highest observed transfer bandwidth
     and files-per-second speed.
     ***********************************************************/
@@ -185,7 +190,7 @@ public:
 
     /***********************************************************
     Whether the remaining-time estimate is trusted.
-    
+
     We don't trust it if it is hugely above the optimistic estimate.
     See #5046.
     ***********************************************************/
@@ -302,7 +307,7 @@ private:
 };
 
     Progress_dispatcher *Progress_dispatcher._instance = nullptr;
-    
+
     string Progress.as_result_string (SyncFileItem &item) {
         switch (item._instruction) {
         case CSYNC_INSTRUCTION_SYNC:
@@ -340,7 +345,7 @@ private:
         }
         return QCoreApplication.translate ("progress", "Unknown");
     }
-    
+
     string Progress.as_action_string (SyncFileItem &item) {
         switch (item._instruction) {
         case CSYNC_INSTRUCTION_CONFLICT:
@@ -369,7 +374,7 @@ private:
         }
         return string ();
     }
-    
+
     bool Progress.is_warning_kind (SyncFileItem.Status kind) {
         return kind == SyncFileItem.Soft_error || kind == SyncFileItem.Normal_error
             || kind == SyncFileItem.Fatal_error || kind == SyncFileItem.File_ignored
@@ -377,24 +382,24 @@ private:
             || kind == SyncFileItem.Detail_error || kind == SyncFileItem.Blacklisted_error
             || kind == SyncFileItem.File_locked;
     }
-    
+
     bool Progress.is_ignored_kind (SyncFileItem.Status kind) {
         return kind == SyncFileItem.File_ignored;
     }
-    
+
     Progress_dispatcher *Progress_dispatcher.instance () {
         if (!_instance) {
             _instance = new Progress_dispatcher ();
         }
         return _instance;
     }
-    
+
     Progress_dispatcher.Progress_dispatcher (GLib.Object *parent)
         : GLib.Object (parent) {
     }
-    
+
     Progress_dispatcher.~Progress_dispatcher () = default;
-    
+
     void Progress_dispatcher.set_progress_info (string &folder, ProgressInfo &progress) {
         if (folder.is_empty ())
         // The update phase now also has progress
@@ -404,46 +409,46 @@ private:
         }
         emit progress_info (folder, progress);
     }
-    
+
     ProgressInfo.ProgressInfo () {
         connect (&_update_estimates_timer, &QTimer.timeout, this, &ProgressInfo.update_estimates);
         reset ();
     }
-    
+
     void ProgressInfo.reset () {
         _status = Starting;
-    
+
         _current_items.clear ();
         _current_discovered_remote_folder.clear ();
         _current_discovered_local_folder.clear ();
         _size_progress = Progress ();
         _file_progress = Progress ();
         _total_size_of_completed_jobs = 0;
-    
+
         // Historically, these starting estimates were way lower, but that lead
         // to gross overestimation of ETA when a good estimate wasn't available.
         _max_bytes_per_second = 2000000.0; // 2 MB/s
         _max_files_per_second = 10.0;
-    
+
         _update_estimates_timer.stop ();
         _last_completed_item = SyncFileItem ();
     }
-    
+
     ProgressInfo.Status ProgressInfo.status () {
         return _status;
     }
-    
+
     void ProgressInfo.start_estimate_updates () {
         _update_estimates_timer.start (1000);
     }
-    
+
     bool ProgressInfo.is_updating_estimates () {
         return _update_estimates_timer.is_active ();
     }
-    
+
     static bool should_count_progress (SyncFileItem &item) {
         const auto instruction = item._instruction;
-    
+
         // Skip any ignored, error or non-propagated files and directories.
         if (instruction == CSYNC_INSTRUCTION_NONE
             || instruction == CSYNC_INSTRUCTION_UPDATE_METADATA
@@ -451,46 +456,46 @@ private:
             || instruction == CSYNC_INSTRUCTION_ERROR) {
             return false;
         }
-    
+
         return true;
     }
-    
+
     void ProgressInfo.adjust_totals_for_file (SyncFileItem &item) {
         if (!should_count_progress (item)) {
             return;
         }
-    
+
         _file_progress._total += item._affected_items;
         if (is_size_dependent (item)) {
             _size_progress._total += item._size;
         }
     }
-    
+
     int64 ProgressInfo.total_files () {
         return _file_progress._total;
     }
-    
+
     int64 ProgressInfo.completed_files () {
         return _file_progress._completed;
     }
-    
+
     int64 ProgressInfo.current_file () {
         return completed_files () + _current_items.size ();
     }
-    
+
     int64 ProgressInfo.total_size () {
         return _size_progress._total;
     }
-    
+
     int64 ProgressInfo.completed_size () {
         return _size_progress._completed;
     }
-    
+
     void ProgressInfo.set_progress_complete (SyncFileItem &item) {
         if (!should_count_progress (item)) {
             return;
         }
-    
+
         _current_items.remove (item._file);
         _file_progress.set_completed (_file_progress._completed + item._affected_items);
         if (ProgressInfo.is_size_dependent (item)) {
@@ -499,29 +504,29 @@ private:
         recompute_completed_size ();
         _last_completed_item = item;
     }
-    
+
     void ProgressInfo.set_progress_item (SyncFileItem &item, int64 completed) {
         if (!should_count_progress (item)) {
             return;
         }
-    
+
         _current_items[item._file]._item = item;
         _current_items[item._file]._progress._total = item._size;
         _current_items[item._file]._progress.set_completed (completed);
         recompute_completed_size ();
-    
+
         // This seems dubious!
         _last_completed_item = SyncFileItem ();
     }
-    
+
     ProgressInfo.Estimates ProgressInfo.total_progress () {
         Estimates file = _file_progress.estimates ();
         if (_size_progress._total == 0) {
             return file;
         }
-    
+
         Estimates size = _size_progress.estimates ();
-    
+
         // Ideally the remaining time would be modeled as:
         //   remaning_file_sizes / transfer_speed
         //   + remaining_file_count * per_file_overhead
@@ -547,7 +552,7 @@ private:
         // for instance), we gradually prefer an optimistic estimate and
         // assume the remaining transfer will be done with the highest speed
         // we've seen.
-    
+
         // Compute a value that is 0 when fps is <=L*max and 1 when fps is >=U*max
         double fps = _file_progress._progress_per_sec;
         double fps_l = 0.5;
@@ -556,7 +561,7 @@ private:
             q_bound (0.0,
                 (fps - fps_l * _max_files_per_second) / ( (fps_u - fps_l) * _max_files_per_second),
                 1.0);
-    
+
         // Compute a value that is 0 when transfer is >= U*max and
         // 1 when transfer is <= L*max
         double trans = _size_progress._progress_per_sec;
@@ -565,48 +570,48 @@ private:
         double slow_transfer = 1.0 - q_bound (0.0,
                                         (trans - trans_l * _max_bytes_per_second) / ( (trans_u - trans_l) * _max_bytes_per_second),
                                         1.0);
-    
+
         double be_optimistic = near_max_fps * slow_transfer;
         size.estimated_eta = uint64 ( (1.0 - be_optimistic) * size.estimated_eta
             + be_optimistic * optimistic_eta ());
-    
+
         return size;
     }
-    
+
     uint64 ProgressInfo.optimistic_eta () {
         // This assumes files and transfers finish as quickly as possible
         // *but* note that max_per_second could be serious underestimate
         // (if we never got to fully excercise transfer or files/second)
-    
+
         return _file_progress.remaining () / _max_files_per_second * 1000
             + _size_progress.remaining () / _max_bytes_per_second * 1000;
     }
-    
+
     bool ProgressInfo.trust_eta () {
         return total_progress ().estimated_eta < 100 * optimistic_eta ();
     }
-    
+
     ProgressInfo.Estimates ProgressInfo.file_progress (SyncFileItem &item) {
         return _current_items[item._file]._progress.estimates ();
     }
-    
+
     void ProgressInfo.update_estimates () {
         _size_progress.update ();
         _file_progress.update ();
-    
+
         // Update progress of all running items.
         QMutable_hash_iterator<string, Progress_item> it (_current_items);
         while (it.has_next ()) {
             it.next ();
             it.value ()._progress.update ();
         }
-    
+
         _max_files_per_second = q_max (_file_progress._progress_per_sec,
             _max_files_per_second);
         _max_bytes_per_second = q_max (_size_progress._progress_per_sec,
             _max_bytes_per_second);
     }
-    
+
     void ProgressInfo.recompute_completed_size () {
         int64 r = _total_size_of_completed_jobs;
         foreach (Progress_item &i, _current_items) {
@@ -615,7 +620,7 @@ private:
         }
         _size_progress.set_completed (r);
     }
-    
+
     ProgressInfo.Estimates ProgressInfo.Progress.estimates () {
         Estimates est;
         est.estimated_bandwidth = _progress_per_sec;
@@ -626,15 +631,15 @@ private:
         }
         return est;
     }
-    
+
     int64 ProgressInfo.Progress.completed () {
         return _completed;
     }
-    
+
     int64 ProgressInfo.Progress.remaining () {
         return _total - _completed;
     }
-    
+
     void ProgressInfo.Progress.update () {
         // A good way to think about the smoothing factor:
         // If we make progress P per sec and then stop making progress at all,
@@ -649,7 +654,7 @@ private:
         _progress_per_sec = smoothing * _progress_per_sec + (1.0 - smoothing) * static_cast<double> (_completed - _prev_completed);
         _prev_completed = _completed;
     }
-    
+
     void ProgressInfo.Progress.set_completed (int64 completed) {
         _completed = q_min (completed, _total);
         _prev_completed = q_min (_prev_completed, _completed);

@@ -25,8 +25,8 @@ namespace Ui {
 @ingroup gui
 ***********************************************************/
 class SslDialogErrorHandler : Abstract_sslErrorHandler {
-public:
-    bool handle_errors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, AccountPtr) override;
+
+    public bool handle_errors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, AccountPtr) override;
 };
 
 /***********************************************************
@@ -34,12 +34,14 @@ public:
 @ingroup gui
 ***********************************************************/
 class Ssl_error_dialog : Gtk.Dialog {
-public:
-    Ssl_error_dialog (AccountPtr account, Gtk.Widget *parent = nullptr);
-    ~Ssl_error_dialog () override;
-    bool check_failing_certs_known (QList<QSslError> &errors);
-    bool trust_connection ();
-    QList<QSslCertificate> unknown_certs () { return _unknown_certs; }
+
+    public Ssl_error_dialog (AccountPtr account, Gtk.Widget *parent = nullptr);
+    public ~Ssl_error_dialog () override;
+    public bool check_failing_certs_known (QList<QSslError> &errors);
+    public bool trust_connection ();
+    public QList<QSslCertificate> unknown_certs () {
+        return _unknown_certs;
+    }
 
 private:
     string style_sheet ();
@@ -55,16 +57,18 @@ private:
 
     namespace Utility {
         //  Used for QSSLCertificate.subject_info which returns a QStringList in Qt5, but a string in Qt4
-        string escape (QStringList &l) { return escape (l.join (';')); }
+        string escape (QStringList &l) {
+            return escape (l.join (';'));
+        }
     }
-    
+
     bool SslDialogErrorHandler.handle_errors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, AccountPtr account) {
         (void)conf;
         if (!certs) {
             q_c_critical (lc_ssl_error_dialog) << "Certs parameter required but is NULL!";
             return false;
         }
-    
+
         Ssl_error_dialog dlg (account);
         // whether the failing certs have previously been accepted
         if (dlg.check_failing_certs_known (errors)) {
@@ -80,7 +84,7 @@ private:
         }
         return false;
     }
-    
+
     Ssl_error_dialog.Ssl_error_dialog (AccountPtr account, Gtk.Widget *parent)
         : Gtk.Dialog (parent)
         , _all_trusted (false)
@@ -94,22 +98,22 @@ private:
         QPushButton *cancel_button =
             _ui._dialog_button_box.button (QDialogButtonBox.Cancel);
         ok_button.set_enabled (false);
-    
+
         _ui._cb_trust_connect.set_enabled (!Theme.instance ().forbid_bad_s_sL ());
         connect (_ui._cb_trust_connect, &QAbstractButton.clicked,
             ok_button, &Gtk.Widget.set_enabled);
-    
+
         if (ok_button) {
             ok_button.set_default (true);
             connect (ok_button, &QAbstractButton.clicked, this, &Gtk.Dialog.accept);
             connect (cancel_button, &QAbstractButton.clicked, this, &Gtk.Dialog.reject);
         }
     }
-    
+
     Ssl_error_dialog.~Ssl_error_dialog () {
         delete _ui;
     }
-    
+
     string Ssl_error_dialog.style_sheet () {
         const string style = QLatin1String (
             "#cert {margin-left : 5px;} "
@@ -118,21 +122,21 @@ private:
             "#ccert { margin-left : 5px; }"
             "#issuer { margin-left : 5px; }"
             "tt { font-size : small; }");
-    
+
         return style;
     }
     const int QL (x) QLatin1String (x)
-    
+
     bool Ssl_error_dialog.check_failing_certs_known (QList<QSslError> &errors) {
         // check if unknown certs caused errors.
         _unknown_certs.clear ();
-    
+
         QStringList error_strings;
-    
+
         QStringList additional_error_strings;
-    
+
         QList<QSslCertificate> trusted_certs = _account.approved_certs ();
-    
+
         for (int i = 0; i < errors.count (); ++i) {
             QSslError error = errors.at (i);
             if (trusted_certs.contains (error.certificate ()) || _unknown_certs.contains (error.certificate ())) {
@@ -145,17 +149,17 @@ private:
                 additional_error_strings.append (error.error_string ());
             }
         }
-    
+
         // if there are no errors left, all Certs were known.
         if (error_strings.is_empty ()) {
             _all_trusted = true;
             return true;
         }
-    
+
         string msg = QL ("<html><head>");
         msg += QL ("<link rel='stylesheet' type='text/css' href='format.css'>");
         msg += QL ("</head><body>");
-    
+
         auto host = _account.url ().host ();
         msg += QL ("<h3>") + tr ("Cannot connect securely to <i>%1</i>:").arg (host) + QL ("</h3>");
         // loop over the unknown certs and line up their errors.
@@ -174,38 +178,38 @@ private:
                 msg += QL ("<hr/>");
             }
         }
-    
+
         if (!additional_error_strings.is_empty ()) {
             msg += QL ("<h4>") + tr ("Additional errors:") + QL ("</h4>");
-    
+
             for (auto &error_string : additional_error_strings) {
                 msg += QL ("<div id=\"ca_error\">");
                 msg += QL ("<p>") + error_string + QL ("</p>");
                 msg += QL ("</div>");
             }
         }
-    
+
         msg += QL ("</div></body></html>");
-    
+
         auto *doc = new QText_document (nullptr);
         string style = style_sheet ();
         doc.add_resource (QText_document.Style_sheet_resource, QUrl (QL ("format.css")), style);
         doc.set_html (msg);
-    
+
         _ui._tb_errors.set_document (doc);
         _ui._tb_errors.show ();
-    
+
         return false;
     }
-    
+
     string Ssl_error_dialog.cert_div (QSslCertificate cert) {
         string msg;
         msg += QL ("<div id=\"cert\">");
         msg += QL ("<h3>") + tr ("with Certificate %1").arg (Utility.escape (cert.subject_info (QSslCertificate.Common_name))) + QL ("</h3>");
-    
+
         msg += QL ("<div id=\"ccert\">");
         QStringList li;
-    
+
         string org = Utility.escape (cert.subject_info (QSslCertificate.Organization));
         string unit = Utility.escape (cert.subject_info (QSslCertificate.Organizational_unit_name));
         string country = Utility.escape (cert.subject_info (QSslCertificate.Country_name));
@@ -219,14 +223,14 @@ private:
         li << tr ("Unit : %1").arg (unit);
         li << tr ("Country : %1").arg (country);
         msg += QL ("<p>") + li.join (QL ("<br/>")) + QL ("</p>");
-    
+
         msg += QL ("<p>");
-    
+
         if (cert.effective_date () < QDateTime (QDate (2016, 1, 1), QTime (), Qt.UTC)) {
         string sha1sum = Utility.format_fingerprint (cert.digest (QCryptographicHash.Sha1).to_hex ());
             msg += tr ("Fingerprint (SHA1) : <tt>%1</tt>").arg (sha1sum) + QL ("<br/>");
         }
-    
+
         string sha256sum = Utility.format_fingerprint (cert.digest (QCryptographicHash.Sha256).to_hex ());
         string sha512sum = Utility.format_fingerprint (cert.digest (QCryptographicHash.Sha512).to_hex ());
         msg += tr ("Fingerprint (SHA-256) : <tt>%1</tt>").arg (sha256sum) + QL ("<br/>");
@@ -234,9 +238,9 @@ private:
         msg += QL ("<br/>");
         msg += tr ("Effective Date : %1").arg (cert.effective_date ().to_string ()) + QL ("<br/>");
         msg += tr ("Expiration Date : %1").arg (cert.expiry_date ().to_string ()) + QL ("</p>");
-    
+
         msg += QL ("</div>");
-    
+
         msg += QL ("<h3>") + tr ("Issuer : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Common_name))) + QL ("</h3>");
         msg += QL ("<div id=\"issuer\">");
         li.clear ();
@@ -246,19 +250,19 @@ private:
         msg += QL ("<p>") + li.join (QL ("<br/>")) + QL ("</p>");
         msg += QL ("</div>");
         msg += QL ("</div>");
-    
+
         return msg;
     }
-    
+
     bool Ssl_error_dialog.trust_connection () {
         if (_all_trusted)
             return true;
-    
+
         bool stat = (_ui._cb_trust_connect.check_state () == Qt.Checked);
         q_c_info (lc_ssl_error_dialog) << "SSL-Connection is trusted : " << stat;
-    
+
         return stat;
     }
-    
+
     } // end namespace
     

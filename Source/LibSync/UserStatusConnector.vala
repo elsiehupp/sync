@@ -119,7 +119,7 @@ signals:
 
 
     User_status.User_status () = default;
-    
+
     User_status.User_status (
         const string &id, string &message, string &icon,
         Online_status state, bool message_predefined, Optional<Clear_at> &clear_at)
@@ -130,78 +130,78 @@ signals:
         , _message_predefined (message_predefined)
         , _clear_at (clear_at) {
     }
-    
+
     string User_status.id () {
         return _id;
     }
-    
+
     string User_status.message () {
         return _message;
     }
-    
+
     string User_status.icon () {
         return _icon;
     }
-    
+
     auto User_status.state () const . Online_status {
         return _state;
     }
-    
+
     bool User_status.message_predefined () {
         return _message_predefined;
     }
-    
+
     QUrl User_status.state_icon () {
         switch (_state) {
         case User_status.Online_status.Away:
             return Theme.instance ().status_away_image_source ();
-    
+
         case User_status.Online_status.Do_not_disturb:
             return Theme.instance ().status_do_not_disturb_image_source ();
-    
+
         case User_status.Online_status.Invisible:
         case User_status.Online_status.Offline:
             return Theme.instance ().status_invisible_image_source ();
-    
+
         case User_status.Online_status.Online:
             return Theme.instance ().status_online_image_source ();
         }
-    
+
         Q_UNREACHABLE ();
     }
-    
+
     Optional<Clear_at> User_status.clear_at () {
         return _clear_at;
     }
-    
+
     void User_status.set_id (string &id) {
         _id = id;
     }
-    
+
     void User_status.set_message (string &message) {
         _message = message;
     }
-    
+
     void User_status.set_state (Online_status state) {
         _state = state;
     }
-    
+
     void User_status.set_icon (string &icon) {
         _icon = icon;
     }
-    
+
     void User_status.set_message_predefined (bool value) {
         _message_predefined = value;
     }
-    
+
     void User_status.set_clear_at (Optional<Clear_at> &date_time) {
         _clear_at = date_time;
     }
-    
+
     User_status_connector.User_status_connector (GLib.Object *parent)
         : GLib.Object (parent) {
     }
-    
+
     User_status_connector.~User_status_connector () = default;
     }
     

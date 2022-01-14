@@ -36,35 +36,34 @@ namespace KeychainChunk {
 class WebFlowCredentials : AbstractCredentials {
     friend class WebFlowCredentialsAccessManager;
 
-public:
     /// Don't add credentials if this is set on a QNetworkRequest
-    static constexpr QNetworkRequest.Attribute DontAddCredentialsAttribute = QNetworkRequest.User;
+    public static constexpr QNetworkRequest.Attribute DontAddCredentialsAttribute = QNetworkRequest.User;
 
-    WebFlowCredentials ();
-    WebFlowCredentials (
+    public WebFlowCredentials ();
+    public WebFlowCredentials (
             const string &user,
             const string &password,
             const QSslCertificate &certificate = QSslCertificate (),
             const QSslKey &key = QSslKey (),
             const QList<QSslCertificate> &ca_certificates = QList<QSslCertificate> ());
 
-    string auth_type () const override;
-    string user () const override;
-    string password () const override;
-    QNetworkAccessManager *create_qNAM () const override;
+    public string auth_type () const override;
+    public string user () const override;
+    public string password () const override;
+    public QNetworkAccessManager *create_qNAM () const override;
 
-    bool ready () const override;
+    public bool ready () const override;
 
-    void fetch_from_keychain () override;
-    void ask_from_user () override;
+    public void fetch_from_keychain () override;
+    public void ask_from_user () override;
 
-    bool still_valid (QNetworkReply *reply) override;
-    void persist () override;
-    void invalidate_token () override;
-    void forget_sensitive_data () override;
+    public bool still_valid (QNetworkReply *reply) override;
+    public void persist () override;
+    public void invalidate_token () override;
+    public void forget_sensitive_data () override;
 
     // To fetch the user name as early as possible
-    void set_account (Account *account) override;
+    public void set_account (Account *account) override;
 
 private slots:
     void slot_authentication (QNetworkReply *reply, QAuthenticator *authenticator);
@@ -86,7 +85,7 @@ private slots:
 private:
     /***********************************************************
     Windows : Workaround for CredWriteW used by QtKeychain
-    
+
              Saving all client CA's within one credential may result in:
              Error : "Credential size exceeds maximum size of 2560"
     ***********************************************************/
@@ -96,7 +95,7 @@ private:
     /***********************************************************
     Since we're limited by Windows limits, we just create our own
     limit to avoid evil things happening by endless recursion
-    
+
     Better than storing the count and relying on maybe-hacked values
     ***********************************************************/
     static constexpr int _client_ssl_ca_certificates_max_count = 10;
@@ -143,8 +142,8 @@ namespace {
 } // ns
 
 class WebFlowCredentialsAccessManager : AccessManager {
-public:
-    WebFlowCredentialsAccessManager (WebFlowCredentials *cred, GLib.Object *parent = nullptr)
+
+    public WebFlowCredentialsAccessManager (WebFlowCredentials *cred, GLib.Object *parent = nullptr)
         : AccessManager (parent)
         , _cred (cred) {
     }
@@ -679,13 +678,13 @@ void WebFlowCredentials.delete_keychain_entries (bool old_keychain_entries) {
     start_delete_job (_user);
 
     /* IMPORTANT - remove later - FIXME MS@2019-12-07 -.
-      * TODO : For "Log out" & "Remove account" : Remove client CA certs and KEY!
-      *
-      *       Disabled as long as selecting another cert is not supported by the UI.
-      *
-      *       Being able to specify a new certificate is important anyway : expiry etc.
-      *
-      *       We introduce this dirty hack here, to allow deleting them upon Remote Wipe.
+    TODO : For "Log out" & "Remove account" : Remove client CA certs and KEY!
+
+          Disabled as long as selecting another cert is not supported by the UI.
+
+          Being able to specify a new certificate is important anyway : expiry etc.
+
+           We introduce this dirty hack here, to allow deleting them upon Remote Wipe.
     ***********************************************************/
     if (_account.is_remote_wipe_requested_HACK ()) {
     // <-- FIXME MS@2019-12-07

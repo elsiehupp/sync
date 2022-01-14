@@ -15,13 +15,13 @@ public:
 
 
     Date_time_provider.~Date_time_provider () = default;
-    
+
     QDateTime Date_time_provider.current_date_time () {
         return QDateTime.current_date_time ();
     }
-    
+
     QDate Date_time_provider.current_date () {
         return QDate.current_date ();
     }
-    
+
 }

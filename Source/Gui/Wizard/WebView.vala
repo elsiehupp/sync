@@ -135,7 +135,7 @@ WebView.~WebView () {
     violates the assumption that _profile should exist longer than
     _page [1]. Here I delete _page manually so that _profile can be safely
     deleted later.
-    
+
     [1] https://doc.qt.io/qt-5/qwebenginepage.html#QWeb_engine_page-1
     ***********************************************************/
     delete _page;
@@ -210,7 +210,7 @@ bool Web_engine_page.certificate_error (QWeb_engine_certificate_error &certifica
     /***********************************************************
     TODO properly improve this.
     The certificate should be displayed.
-    
+
     Or rather we should do a request with the QNAM and see if it works (then it is in the store).
     This is just a quick fix for now.
     ***********************************************************/

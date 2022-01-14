@@ -57,69 +57,69 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
     Q_PLUGIN_METADATA (IID "org.owncloud.PluginFactory" FILE "vfspluginmetadata.json")
     Q_INTERFACES (Occ.PluginFactory)
 };
-    
+
     Vfs_xAttr.Vfs_xAttr (GLib.Object *parent)
         : Vfs (parent) {
     }
-    
+
     Vfs_xAttr.~Vfs_xAttr () = default;
-    
+
     Vfs.Mode Vfs_xAttr.mode () {
         return XAttr;
     }
-    
+
     string Vfs_xAttr.file_suffix () {
         return string ();
     }
-    
+
     void Vfs_xAttr.start_impl (VfsSetupParams &) {
     }
-    
+
     void Vfs_xAttr.stop () {
     }
-    
+
     void Vfs_xAttr.unregister_folder () {
     }
-    
+
     bool Vfs_xAttr.socket_api_pin_state_actions_shown () {
         return true;
     }
-    
+
     bool Vfs_xAttr.is_hydrating () {
         return false;
     }
-    
+
     Result<void, string> Vfs_xAttr.update_metadata (string &file_path, time_t modtime, int64, QByteArray &) {
         if (modtime <= 0) {
             return {tr ("Error updating metadata due to invalid modified time")};
         }
-    
+
         FileSystem.set_mod_time (file_path, modtime);
         return {};
     }
-    
+
     Result<void, string> Vfs_xAttr.create_placeholder (SyncFileItem &item) {
         if (item._modtime <= 0) {
             return {tr ("Error updating metadata due to invalid modified time")};
         }
-    
+
         const auto path = string (_setup_params.filesystem_path + item._file);
         QFile file (path);
         if (file.exists () && file.size () > 1
             && !FileSystem.verify_file_unchanged (path, item._size, item._modtime)) {
             return QStringLiteral ("Cannot create a placeholder because a file with the placeholder name already exist");
         }
-    
+
         if (!file.open (QFile.ReadWrite | QFile.Truncate)) {
             return file.error_string ();
         }
-    
+
         file.write (" ");
         file.close ();
         FileSystem.set_mod_time (path, item._modtime);
         return xattr.add_nextcloud_placeholder_attributes (path);
     }
-    
+
     Result<void, string> Vfs_xAttr.dehydrate_placeholder (SyncFileItem &item) {
         const auto path = string (_setup_params.filesystem_path + item._file);
         QFile file (path);
@@ -130,7 +130,7 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
         if (!r) {
             return r;
         }
-    
+
         // Ensure the pin state isn't contradictory
         const auto pin = pin_state (item._file);
         if (pin && *pin == PinState.AlwaysLocal) {
@@ -138,31 +138,31 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
         }
         return {};
     }
-    
+
     Result<Vfs.ConvertToPlaceholderResult, string> Vfs_xAttr.convert_to_placeholder (string &, SyncFileItem &, string &) {
         // Nothing necessary
         return {ConvertToPlaceholderResult.Ok};
     }
-    
+
     bool Vfs_xAttr.needs_metadata_update (SyncFileItem &) {
         return false;
     }
-    
+
     bool Vfs_xAttr.is_dehydrated_placeholder (string &file_path) {
         const auto fi = QFileInfo (file_path);
         return fi.exists () &&
                 xattr.has_nextcloud_placeholder_attributes (file_path);
     }
-    
+
     bool Vfs_xAttr.stat_type_virtual_file (csync_file_stat_t *stat, void *stat_data) {
         if (stat.type == ItemTypeDirectory) {
             return false;
         }
-    
+
         const auto parent_path = static_cast<QByteArray> (stat_data);
         Q_ASSERT (!parent_path.ends_with ('/'));
         Q_ASSERT (!stat.path.starts_with ('/'));
-    
+
         const auto path = QByteArray (*parent_path + '/' + stat.path);
         const auto pin = [=] {
             const auto absolute_path = string.from_utf8 (path);
@@ -170,7 +170,7 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
             const auto folder_path = absolute_path.mid (params ().filesystem_path.length ());
             return pin_state (folder_path);
         } ();
-    
+
         if (xattr.has_nextcloud_placeholder_attributes (path)) {
             const auto should_download = pin && (*pin == PinState.AlwaysLocal);
             stat.type = should_download ? Item_type_virtual_file_download : Item_type_virtual_file;
@@ -184,21 +184,21 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
         }
         return false;
     }
-    
+
     bool Vfs_xAttr.set_pin_state (string &folder_path, PinState state) {
         return set_pin_state_in_db (folder_path, state);
     }
-    
+
     Optional<PinState> Vfs_xAttr.pin_state (string &folder_path) {
         return pin_state_in_db (folder_path);
     }
-    
+
     Vfs.AvailabilityResult Vfs_xAttr.availability (string &folder_path) {
         return availability_in_db (folder_path);
     }
-    
+
     void Vfs_xAttr.file_status_changed (string &, SyncFileStatus) {
     }
-    
+
     } // namespace Occ
     

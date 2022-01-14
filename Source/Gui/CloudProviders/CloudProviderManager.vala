@@ -15,9 +15,9 @@ using namespace Occ;
 
 
 class CloudProviderManager : GLib.Object {
-public:
-    CloudProviderManager (GLib.Object *parent = nullptr);
-    void register_signals ();
+
+    public CloudProviderManager (GLib.Object *parent = nullptr);
+    public void register_signals ();
 
 signals:
 

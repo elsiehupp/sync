@@ -43,14 +43,14 @@ private:
         string login_keyword = QLatin1String ("login");
         string password_keyword = QLatin1String ("password");
     }
-    
+
     NetrcParser.NetrcParser (string &file) {
         _netrc_location = file;
         if (_netrc_location.is_empty ()) {
             _netrc_location = QDir.home_path () + QLatin1String ("/.netrc");
         }
     }
-    
+
     void NetrcParser.try_add_entry_and_clear (string &machine, Login_pair &pair, bool &is_default) {
         if (is_default) {
             _default = pair;
@@ -61,17 +61,17 @@ private:
         machine.clear ();
         is_default = false;
     }
-    
+
     bool NetrcParser.parse () {
         QFile netrc (_netrc_location);
         if (!netrc.open (QIODevice.Read_only)) {
             return false;
         }
         string content = netrc.read_all ();
-    
+
         QStringTokenizer tokenizer (content, " \n\t");
         tokenizer.set_quote_characters ("\"'");
-    
+
         Login_pair pair;
         string machine;
         bool is_default = false;
@@ -82,13 +82,13 @@ private:
                 is_default = true;
                 continue; // don't read a value
             }
-    
+
             if (!tokenizer.has_next ()) {
                 q_debug () << "error fetching value for" << key;
                 return false;
             }
             string value = tokenizer.next ();
-    
+
             if (key == machine_keyword) {
                 try_add_entry_and_clear (machine, pair, is_default);
                 machine = value;
@@ -99,14 +99,14 @@ private:
             } // ignore unsupported tokens
         }
         try_add_entry_and_clear (machine, pair, is_default);
-    
+
         if (!_entries.is_empty () || _default != q_make_pair (string (), string ())) {
             return true;
         } else {
             return false;
         }
     }
-    
+
     NetrcParser.Login_pair NetrcParser.find (string &machine) {
         QHash<string, Login_pair>.Const_iterator it = _entries.find (machine);
         if (it != _entries.end ()) {
@@ -115,6 +115,6 @@ private:
             return _default;
         }
     }
-    
+
     } // namespace Occ
     

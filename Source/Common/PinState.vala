@@ -35,7 +35,7 @@ enum class PinState {
 
     For example new remote files start out in this state, following
     the state of their parent folder.
-    
+
     This state is used purely for resetting pin states to their derived
     value. The effective state for an item will never be "Inherited".
     ***********************************************************/
@@ -54,7 +54,7 @@ enum class PinState {
 
     Also known as "unpinned". Unpinned hydrated files shall be dehydrated
     as soon as possible.
-    
+
     If a unpinned file becomes hydrated (such as due to an implicit hydration
     where the user requested access to the file's data) its pin state changes
     to Unspecified.
@@ -64,7 +64,7 @@ enum class PinState {
     /***********************************************************
     The user hasn't made a decision. The client or platform may hydrate or
     dehydrate as they see fit.
-    
+
     New remote files in unspecified directories start unspecified, and
     dehydrated (which is an arbitrary decision).
     ***********************************************************/
@@ -99,7 +99,7 @@ enum class VfsItemAvailability {
 
     This may change if the platform or client decide to dehydrate items
     that have Unspecified pin state.
-    
+
     A folder with no file contents will have this availability.
     ***********************************************************/
     AllHydrated = 1,

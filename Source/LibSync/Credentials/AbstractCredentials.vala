@@ -37,12 +37,16 @@ public:
     virtual QNetworkAccessManager *create_qNAM () const = 0;
 
     /***********************************************************
-    Whether there are credentials that can be used for a connection attempt. */
+    Whether there are credentials that can be used for a connection attempt.
+    ***********************************************************/
     virtual bool ready () const = 0;
 
     /***********************************************************
-    Whether fetch_from_keychain () was called before. */
-    bool was_fetched () { return _was_fetched; }
+    Whether fetch_from_keychain () was called before.
+    ***********************************************************/
+    bool was_fetched () {
+        return _was_fetched;
+    }
 
     /***********************************************************
     Trigger (async) fetching of credential information
@@ -65,7 +69,7 @@ public:
     Invalidates token used to authorize requests, it will no longer be used.
 
     For http auth, this would be the session cookie.
-    
+
     Note that sensitive data (like the password used to acquire t
     session cookie) may be retained. See forget_sensitive_data ().
 
@@ -77,7 +81,7 @@ public:
     Clears out all sensitive data; used for fully signing out users.
 
     This should always imply invalidate_token () but may go beyond it.
-    
+
     For http auth, this would clear the session cookie and password.
     ***********************************************************/
     virtual void forget_sensitive_data () = 0;
@@ -85,8 +89,11 @@ public:
     static string keychain_key (string &url, string &user, string &account_id);
 
     /***********************************************************
-    If the job need to be restarted or queue, this does it and returns true. */
-    virtual bool retry_if_needed (AbstractNetworkJob *) { return false; }
+    If the job need to be restarted or queue, this does it and returns true.
+    ***********************************************************/
+    virtual bool retry_if_needed (AbstractNetworkJob *) {
+        return false;
+    }
 
 signals:
     /***********************************************************
@@ -112,12 +119,12 @@ protected:
 
 
     AbstractCredentials.AbstractCredentials () = default;
-    
+
     void AbstractCredentials.set_account (Account *account) {
         ENFORCE (!_account, "should only set_account once");
         _account = account;
     }
-    
+
     string AbstractCredentials.keychain_key (string &url, string &user, string &account_id) {
         string u (url);
         if (u.is_empty ()) {
@@ -128,11 +135,11 @@ protected:
             q_c_warning (lc_credentials) << "Error : User is empty!";
             return string ();
         }
-    
+
         if (!u.ends_with (QChar ('/'))) {
             u.append (QChar ('/'));
         }
-    
+
         string key = user + QLatin1Char (':') + u;
         if (!account_id.is_empty ()) {
             key += QLatin1Char (':') + account_id;

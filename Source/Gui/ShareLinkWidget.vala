@@ -43,21 +43,20 @@ class Share;
 ***********************************************************/
 class Share_link_widget : Gtk.Widget {
 
-public:
-    Share_link_widget (AccountPtr account,
+    public Share_link_widget (AccountPtr account,
         const string &share_path,
         const string &local_path,
         Share_permissions max_sharing_permissions,
         Gtk.Widget *parent = nullptr);
-    ~Share_link_widget () override;
+    public ~Share_link_widget () override;
 
-    void toggle_button (bool show);
-    void setup_ui_options ();
+    public void toggle_button (bool show);
+    public void setup_ui_options ();
 
-    void set_link_share (QSharedPointer<Link_share> link_share);
-    QSharedPointer<Link_share> get_link_share ();
+    public void set_link_share (QSharedPointer<Link_share> link_share);
+    public QSharedPointer<Link_share> get_link_share ();
 
-    void focus_password_line_edit ();
+    public void focus_password_line_edit ();
 
 public slots:
     void slot_delete_share_fetched ();
@@ -106,11 +105,13 @@ private:
     void toggle_button_animation (QToolButton *button, QProgress_indicator *progress_indicator, QAction *checked_action) const;
 
     /***********************************************************
-    Confirm with the user and then delete the share */
+    Confirm with the user and then delete the share
+    ***********************************************************/
     void confirm_and_delete_share ();
 
     /***********************************************************
-    Retrieve a share's name, accounting for _names_supported */
+    Retrieve a share's name, accounting for _names_supported
+    ***********************************************************/
     string share_name ();
 
     void start_animation (int start, int end);

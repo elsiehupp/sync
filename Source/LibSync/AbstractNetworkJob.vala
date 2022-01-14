@@ -48,16 +48,24 @@ class AbstractNetworkJob : GLib.Object {
 
     public virtual void start ();
 
-    public AccountPtr account () { return _account; }
+    public AccountPtr account () {
+        return _account;
+    }
 
     public void set_path (string &path);
-    public string path () { return _path; }
+    public string path () {
+        return _path;
+    }
 
     public void set_reply (QNetworkReply *reply);
-    public QNetworkReply *reply () { return _reply; }
+    public QNetworkReply *reply () {
+        return _reply;
+    }
 
     public void set_ignore_credential_failure (bool ignore);
-    public bool ignore_credential_failure () { return _ignore_credential_failure; }
+    public bool ignore_credential_failure () {
+        return _ignore_credential_failure;
+    }
 
     /***********************************************************
     Whether to handle redirects transparently.
@@ -71,18 +79,30 @@ class AbstractNetworkJob : GLib.Object {
     requests where custom handling is necessary.
     ***********************************************************/
     public void set_follow_redirects (bool follow);
-    public bool follow_redirects () { return _follow_redirects; }
+    public bool follow_redirects () {
+        return _follow_redirects;
+    }
 
     public QByteArray response_timestamp ();
-    /* Content of the X-Request-ID header. (Only set after the request is sent) */
-    public QByteArray request_id ();
 
-    public int64 timeout_msec () { return _timer.interval (); }
-    public bool timed_out () { return _timedout; }
 
     /***********************************************************
-    Returns an error message, if any. */
+    Content of the X-Request-ID header. (Only set after the request is sent)
+    ***********************************************************/
+    public QByteArray request_id ();
+
+    public int64 timeout_msec () {
+        return _timer.interval ();
+    }
+    public bool timed_out () {
+        return _timedout;
+    }
+
+    /***********************************************************
+    Returns an error message, if any.
+    ***********************************************************/
     public virtual string error_string ();
+
 
     /***********************************************************
     Like error_string, but also checking the reply body for information.
@@ -97,8 +117,10 @@ class AbstractNetworkJob : GLib.Object {
     ***********************************************************/
     public string error_string_parsing_body (QByteArray *body = nullptr);
 
+
     /***********************************************************
-    Make a new request */
+    Make a new request
+    ***********************************************************/
     public void retry ();
 
     /***********************************************************
@@ -177,7 +199,9 @@ protected:
     /// Like make_account_url () but uses the account's dav base path
     QUrl make_dav_url (string &relative_path) const;
 
-    int max_redirects () { return 10; }
+    int max_redirects () {
+        return 10;
+    }
 
     /***********************************************************
     Called at the end of QNetworkReply.finished processing.
@@ -248,7 +272,8 @@ Returns a null string if no message was found.
 string extract_error_message (QByteArray &error_response);
 
 /***********************************************************
-Builds a error message based on the error and the reply body. */
+Builds a error message based on the error and the reply body.
+***********************************************************/
 string error_message (string &base_error, QByteArray &body);
 
 /***********************************************************

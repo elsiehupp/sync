@@ -27,40 +27,40 @@ public:
     string DummyCredentials.auth_type () {
         return string.from_latin1 ("dummy");
     }
-    
+
     string DummyCredentials.user () {
         return _user;
     }
-    
+
     string DummyCredentials.password () {
         Q_UNREACHABLE ();
         return string ();
     }
-    
+
     QNetworkAccessManager *DummyCredentials.create_qNAM () {
         return new AccessManager;
     }
-    
+
     bool DummyCredentials.ready () {
         return true;
     }
-    
+
     bool DummyCredentials.still_valid (QNetworkReply *reply) {
         Q_UNUSED (reply)
         return true;
     }
-    
+
     void DummyCredentials.fetch_from_keychain () {
         _was_fetched = true;
         Q_EMIT (fetched ());
     }
-    
+
     void DummyCredentials.ask_from_user () {
         Q_EMIT (asked ());
     }
-    
+
     void DummyCredentials.persist () {
     }
-    
+
     } // namespace Occ
     

@@ -63,21 +63,21 @@ class Excluded_files : GLib.Object {
 
     /***********************************************************
     Adds a new path to a file containing exclude patterns.
-    
+
     Does not load the file. Use reload_exclude_files () afterwards.
     ***********************************************************/
     public void add_exclude_file_path (string &path);
 
     /***********************************************************
     Whether conflict files shall be excluded.
-    
+
     Defaults to true.
     ***********************************************************/
     public void set_exclude_conflict_files (bool onoff);
 
     /***********************************************************
     Checks whether a file or directory should be excluded.
-    
+
     @param file_path     the absolute path to the file
     @param base_path     folder path from which to apply exclude rules, ends with a /
     ***********************************************************/
@@ -88,7 +88,7 @@ class Excluded_files : GLib.Object {
 
     /***********************************************************
     Adds an exclude pattern anchored to base path
-    
+
     Primarily used in tests. Patterns added this way are preserved when
     reload_exclude_files () is called.
     ***********************************************************/
@@ -97,7 +97,7 @@ class Excluded_files : GLib.Object {
 
     /***********************************************************
     Removes all manually added exclude patterns.
-    
+
     Primarily used in tests.
     ***********************************************************/
     public void clear_manual_excludes ();
@@ -114,18 +114,18 @@ class Excluded_files : GLib.Object {
 
     /***********************************************************
     @brief Check if the given path should be excluded in a traversal situation.
-    
+
     It does only part of the work that full () does because it's as
     that all leading directories have been run
     before. This can be significantly faster.
-    
+
     That means for 'foo/bar/file' only ('foo/bar/file', 'file')
     against the exclude patterns.
-    
+
     @param Path is folder-relative, should not start with a /.
-    
+
     Note that this only matches patterns. It does not check whether the file
-     * or directory pointed to is hidden (or whether it even exists).
+    or directory pointed to is hidden (or whether it even exists).
     ***********************************************************/
     public CSYNC_EXCLUDE_TYPE traversal_pattern_match (string &path, ItemType filetype);
 
@@ -143,25 +143,25 @@ private:
     /***********************************************************
     Returns true if the version directive indicates the next line
     should be skipped.
-    
+
     A version directive has the form "#!version <op> <version>"
     where <op> c
     like 2.5.
-    
+
     Example:
-    
+
     #!version < 2.5.0
     myexclude
-    
-     * Would enable the "myexclude" pattern only for versions before 2.5.0.
+
+    Would enable the "myexclude" pattern only for versions before 2.5.0.
     ***********************************************************/
     bool version_directive_keep_next_line (QByteArray &directive) const;
 
     /***********************************************************
     @brief Match the exclude pattern against the full path.
-    
+
     @param Path is folder-relative, should not start with a /.
-    
+
     Note that this only matches patterns. It does not check whether the file
     or directory pointed to is hidden (or whether it even exists).
     ***********************************************************/
@@ -182,32 +182,32 @@ private:
 
     /***********************************************************
     Generate optimized regular expressions for the exclude patterns anchored to base_path.
-    
+
     The optimization works in two steps : First, all supported patterns are put
-    into _full_regex_file/_full_regex_dir. These regexes 
+    into _full_regex_file/_full_regex_dir. These regexes
     path to determine whether it is excluded or not.
-    
+
     The second is a performance optimization. The particularly common use
     case for excludes during
     the full path every time, we check each parent path with the traversal
     function incrementally.
-    
+
     Example : When the sync run eventually arrives at "a/b/c it can assume
     that the traversal m
     and just needs to run the traversal matcher on "a/b/c".
-    
+
     The full matcher is equivalent to or-combining the traversal match resul
     of all parent paths:
       full ("a/b/c/d") == traversal (
-    
+
     The traversal matcher can be extremely fast because it has a fast early-
     case : It checks the bname part of the path against _bname_traversal_regex
     and only runs a simplified _full_traversal_regex on the whole path if bname
     activation for it was triggered.
-    
+
     Note : The traversal matcher will return not-excluded on some paths that
     full matcher would exclude. Example : "b" is excluded. traversal ("b/c")
-     * returns not-excluded because "c" isn't a bname activation pattern.
+    returns not-excluded because "c" isn't a bname activation pattern.
     ***********************************************************/
     void prepare (Base_path_string &base_path);
 
@@ -239,7 +239,7 @@ private:
 
     /***********************************************************
     Whether * and ? in patterns can match a /
-    
+
     Unfortunately this was how matching was done on Windows so
     it continues to be enabled there.
     ***********************************************************/
@@ -337,12 +337,36 @@ OCSYNC_EXPORT void csync_exclude_expand_escapes (QByteArray &input) {
 // See http://support.microsoft.com/kb/74496 and
 // https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247 (v=vs.85).aspx
 // Additionally, we ignore '$Recycle.Bin', see https://github.com/owncloud/client/issues/2955
-static const char *win_reserved_words_3[] = { "CON", "PRN", "AUX", "NUL" };
-static const char *win_reserved_words_4[] = {
-    "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
-    "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
+static const char *win_reserved_words_3[] = {
+    "CON",
+    "PRN",
+    "AUX",
+    "NUL"
 };
-static const char *win_reserved_words_n[] = { "CLOCK$", "$Recycle.Bin" };
+static const char *win_reserved_words_4[] = {
+    "COM1",
+    "COM2",
+    "COM3",
+    "COM4",
+    "COM5",
+    "COM6",
+    "COM7",
+    "COM8",
+    "COM9",
+    "LPT1",
+    "LPT2",
+    "LPT3",
+    "LPT4",
+    "LPT5",
+    "LPT6",
+    "LPT7",
+    "LPT8",
+    "LPT9"
+};
+static const char *win_reserved_words_n[] = {
+    "CLOCK$",
+    "$Recycle.Bin"
+};
 
 /***********************************************************
 @brief Checks if filename is considered reserved by Windows
@@ -875,7 +899,9 @@ string Excluded_files.extract_bname_trigger (string &exclude, bool wildcards_mat
     // - "foo*bar*" can match "foo_x/Xbar_x", pattern is "*bar*"
     // - "foo?bar" can match "foo/bar" but also "foo_xbar", pattern is "*bar"
 
-    auto is_wildcard = [] (QChar c) { return c == QLatin1Char ('*') || c == QLatin1Char ('?'); };
+    auto is_wildcard = [] (QChar c) {
+        return c == QLatin1Char ('*') || c == QLatin1Char ('?');
+    };
 
     // First, skip wildcards on the very right of the pattern
     int i = pattern.size () - 1;

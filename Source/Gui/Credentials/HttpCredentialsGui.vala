@@ -26,15 +26,15 @@ namespace Occ {
 @ingroup gui
 ***********************************************************/
 class HttpCredentialsGui : HttpCredentials {
-public:
-    HttpCredentialsGui ()
+
+    public HttpCredentialsGui ()
         : HttpCredentials () {
     }
-    HttpCredentialsGui (string &user, string &password,
+    public HttpCredentialsGui (string &user, string &password,
             const QByteArray &client_cert_bundle, QByteArray &client_cert_password)
         : HttpCredentials (user, password, client_cert_bundle, client_cert_password) {
     }
-    HttpCredentialsGui (string &user, string &password, string &refresh_token,
+    public HttpCredentialsGui (string &user, string &password, string &refresh_token,
             const QByteArray &client_cert_bundle, QByteArray &client_cert_password)
         : HttpCredentials (user, password, client_cert_bundle, client_cert_password) {
         _refresh_token = refresh_token;
@@ -44,12 +44,14 @@ public:
     This will query the server and either uses OAuth via _async_auth.start ()
     or call show_dialog to ask the password
     ***********************************************************/
-    void ask_from_user () override;
+    public void ask_from_user () override;
     /***********************************************************
     In case of oauth, return an URL to the link to open the browser.
     An invalid URL otherwise
     ***********************************************************/
-    QUrl authorisation_link () { return _async_auth ? _async_auth.authorisation_link () : QUrl (); }
+    public QUrl authorisation_link () {
+        return _async_auth ? _async_auth.authorisation_link () : QUrl ();
+    }
 
     static string request_app_password_text (Account *account);
 private slots:

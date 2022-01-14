@@ -95,7 +95,7 @@ public:
 
     /***********************************************************
     The user that can be used in dav url.
-    
+
     This can very well be different frome the login user that's
     stored in credentials ().user ().
     ***********************************************************/
@@ -117,9 +117,12 @@ public:
     string id ();
 
     /***********************************************************
-    Server url of the account */
+    Server url of the account
+    ***********************************************************/
     void set_url (QUrl &url);
-    QUrl url () { return _url; }
+    QUrl url () {
+        return _url;
+    }
 
     /// Adjusts _user_visible_url once the host to use is discovered.
     void set_user_visible_host (string &host);
@@ -132,7 +135,8 @@ public:
     string dav_path ();
 
     /***********************************************************
-    Returns webdav entry URL, based on url () */
+    Returns webdav entry URL, based on url ()
+    ***********************************************************/
     QUrl dav_url ();
 
     /***********************************************************
@@ -144,7 +148,8 @@ public:
     QUrl deprecated_private_link_url (QByteArray &numeric_file_id) const;
 
     /***********************************************************
-    Holds the accounts credentials */
+    Holds the accounts credentials
+    ***********************************************************/
     AbstractCredentials *credentials ();
     void set_credentials (AbstractCredentials *cred);
 
@@ -177,9 +182,12 @@ public:
         QIODevice *data = nullptr);
 
     /***********************************************************
-    The ssl configuration during the first connection */
+    The ssl configuration during the first connection
+    ***********************************************************/
     QSslConfiguration get_or_create_ssl_config ();
-    QSslConfiguration ssl_configuration () { return _ssl_configuration; }
+    QSslConfiguration ssl_configuration () {
+        return _ssl_configuration;
+    }
     void set_ssl_configuration (QSslConfiguration &config);
     // Because of bugs in Qt, we use this to store info needed for the SSL Button
     QSsl_cipher _session_cipher;
@@ -187,8 +195,11 @@ public:
     QList<QSslCertificate> _peer_certificate_chain;
 
     /***********************************************************
-    The certificates of the account */
-    QList<QSslCertificate> approved_certs () { return _approved_certs; }
+    The certificates of the account
+    ***********************************************************/
+    QList<QSslCertificate> approved_certs () {
+        return _approved_certs;
+    }
     void set_approved_certs (QList<QSslCertificate> certs);
     void add_approved_certs (QList<QSslCertificate> certs);
 
@@ -205,11 +216,13 @@ public:
     void set_credential_setting (string &key, QVariant &value);
 
     /***********************************************************
-    Assign a client certificate */
+    Assign a client certificate
+    ***********************************************************/
     void set_certificate (QByteArray certficate = QByteArray (), string private_key = string ());
 
     /***********************************************************
-    Access the server capabilities */
+    Access the server capabilities
+    ***********************************************************/
     const Capabilities &capabilities ();
     void set_capabilities (QVariantMap &caps);
 
@@ -225,7 +238,7 @@ public:
     Server version for easy comparison.
 
     Example : server_version_int () >= make_server_version (11, 2, 3)
-    
+
     Will be 0 if the version is not available yet.
     ***********************************************************/
     int server_version_int ();
@@ -241,7 +254,7 @@ public:
     to extremely old servers. And there's a weak "untested, not
     recommended, potentially dangerous" limit, that users might want
     to go beyond.
-    
+
     This function returns true if the server is beyond the weak limit.
     ***********************************************************/
     bool server_version_unsupported ();
@@ -249,9 +262,14 @@ public:
     bool is_username_prefill_supported ();
 
     /***********************************************************
-    True when the server connection is using HTTP2  */
-    bool is_http2Supported () { return _http2Supported; }
-    void set_http2Supported (bool value) { _http2Supported = value; }
+    True when the server connection is using HTTP2
+    ***********************************************************/
+    bool is_http2Supported () {
+        return _http2Supported;
+    }
+    void set_http2Supported (bool value) {
+        _http2Supported = value;
+    }
 
     void clear_cookie_jar ();
     void lend_cookie_jar_to (QNetworkAccessManager *guest);
@@ -379,16 +397,20 @@ private:
 
     /* IMPORTANT - remove later - FIXME MS@2019-12-07 -.
     TODO : For "Log out" & "Remove account" : Remove client CA certs and KEY!
-    
+
           Disabled as long as selecting another cert is not supported by the UI.
-    
+
           Being able to specify a new certificate is important anyway : expiry etc.
-    
-     *       We introduce this dirty hack here, to allow deleting them upon Remote Wipe.
+
+          We introduce this dirty hack here, to allow deleting them upon Remote Wipe.
     ***********************************************************/
     public:
-        void set_remote_wipe_requested_HACK () { _is_remote_wipe_requested_HACK = true; }
-        bool is_remote_wipe_requested_HACK () { return _is_remote_wipe_requested_HACK; }
+        void set_remote_wipe_requested_HACK () {
+            _is_remote_wipe_requested_HACK = true;
+        }
+        bool is_remote_wipe_requested_HACK () {
+            return _is_remote_wipe_requested_HACK;
+        }
     private:
         bool _is_remote_wipe_requested_HACK = false;
     // <-- FIXME MS@2019-12-07
@@ -584,9 +606,11 @@ void Account.clear_cookie_jar () {
     emit wants_account_saved (this);
 }
 
-/*********************************************************** This shares our official cookie jar (containing all the tasty
-    authentication cookies) with another QNAM while making sure
-    of not losing its ownership. */
+/***********************************************************
+This shares our official cookie jar (containing all the tasty
+authentication cookies) with another QNAM while making sure
+of not losing its ownership.
+***********************************************************/
 void Account.lend_cookie_jar_to (QNetworkAccessManager *guest) {
     auto jar = _am.cookie_jar ();
     auto old_parent = jar.parent ();

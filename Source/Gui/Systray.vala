@@ -31,10 +31,10 @@ class QWindow;
 namespace Occ {
 
 class Access_manager_factory : QQml_network_access_manager_factory {
-public:
-    Access_manager_factory ();
 
-    QNetworkAccessManager* create (GLib.Object *parent) override;
+    public Access_manager_factory ();
+
+    public QNetworkAccessManager* create (GLib.Object *parent) override;
 };
 
 #ifdef Q_OS_OSX
@@ -53,27 +53,30 @@ class Systray
     Q_PROPERTY (string window_title READ window_title CONSTANT)
     Q_PROPERTY (bool use_normal_window READ use_normal_window CONSTANT)
 
-public:
-    static Systray *instance ();
-    ~Systray () override = default;
+    public static Systray *instance ();
+    public ~Systray () override = default;
 
-    enum class Task_bar_position { Bottom, Left, Top, Right };
-    Q_ENUM (Task_bar_position);
+    public enum class Task_bar_position {
+        Bottom,
+        Left,
+        Top,
+        Right
+    };
 
-    void set_tray_engine (QQml_application_engine *tray_engine);
-    void create ();
-    void show_message (string &title, string &message, Message_icon icon = Information);
-    void set_tool_tip (string &tip);
-    bool is_open ();
-    string window_title ();
-    bool use_normal_window ();
+    public void set_tray_engine (QQml_application_engine *tray_engine);
+    public void create ();
+    public void show_message (string &title, string &message, Message_icon icon = Information);
+    public void set_tool_tip (string &tip);
+    public bool is_open ();
+    public string window_title ();
+    public bool use_normal_window ();
 
-    Q_INVOKABLE void pause_resume_sync ();
-    Q_INVOKABLE bool sync_is_paused ();
-    Q_INVOKABLE void set_opened ();
-    Q_INVOKABLE void set_closed ();
-    Q_INVOKABLE void position_window (QQuick_window *window) const;
-    Q_INVOKABLE void force_window_init (QQuick_window *window) const;
+    public Q_INVOKABLE void pause_resume_sync ();
+    public Q_INVOKABLE bool sync_is_paused ();
+    public Q_INVOKABLE void set_opened ();
+    public Q_INVOKABLE void set_closed ();
+    public Q_INVOKABLE void position_window (QQuick_window *window) const;
+    public Q_INVOKABLE void force_window_init (QQuick_window *window) const;
 
 signals:
     void current_user_changed ();
@@ -181,13 +184,17 @@ Systray.Systray ()
     connect (context_menu, &QMenu.about_to_show, [=] {
         const auto folders = FolderMan.instance ().map ();
 
-        const auto all_paused = std.all_of (std.cbegin (folders), std.cend (folders), [] (Folder *f) { return f.sync_paused (); });
+        const auto all_paused = std.all_of (std.cbegin (folders), std.cend (folders), [] (Folder *f) {
+            return f.sync_paused ();
+        });
         const auto pause_text = folders.size () > 1 ? tr ("Pause sync for all") : tr ("Pause sync");
         pause_action.set_text (pause_text);
         pause_action.set_visible (!all_paused);
         pause_action.set_enabled (!all_paused);
 
-        const auto any_paused = std.any_of (std.cbegin (folders), std.cend (folders), [] (Folder *f) { return f.sync_paused (); });
+        const auto any_paused = std.any_of (std.cbegin (folders), std.cend (folders), [] (Folder *f) {
+            return f.sync_paused ();
+        });
         const auto resume_text = folders.size () > 1 ? tr ("Resume sync for all") : tr ("Resume sync");
         resume_action.set_text (resume_text);
         resume_action.set_visible (any_paused);

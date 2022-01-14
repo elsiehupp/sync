@@ -48,21 +48,23 @@ enum class Share_dialog_start_page {
 @ingroup gui
 ***********************************************************/
 class OwncloudGui : GLib.Object {
-public:
-    OwncloudGui (Application *parent = nullptr);
 
-    bool check_account_exists (bool open_settings);
+    public OwncloudGui (Application *parent = nullptr);
 
-    static void raise_dialog (Gtk.Widget *raise_widget);
-    static QSize settings_dialog_size () { return {800, 500}; }
-    void setup_overlay_icons ();
+    public bool check_account_exists (bool open_settings);
+
+    public static void raise_dialog (Gtk.Widget *raise_widget);
+    public static QSize settings_dialog_size () {
+        return {800, 500};
+    }
+    public void setup_overlay_icons ();
 #ifdef WITH_LIBCLOUDPROVIDERS
-    void setup_cloud_providers ();
-    bool cloud_provider_api_available ();
+    public void setup_cloud_providers ();
+    public bool cloud_provider_api_available ();
 #endif
-    void create_tray ();
+    public void create_tray ();
 
-    void hide_and_show_tray ();
+    public void hide_and_show_tray ();
 
 signals:
     void setup_proxy ();
@@ -94,7 +96,7 @@ public slots:
 
     /***********************************************************
     Open a share dialog for a file or folder.
-    
+
     share_path is the full remote path to the item,
     local_path is the absolute local path to it (so not relative
     to the folder).
@@ -505,7 +507,9 @@ void OwncloudGui.slot_update_progress (string &folder, ProgressInfo &progress) {
         if (f) {
             string full_path = f.path () + '/' + progress._last_completed_item._file;
             if (QFile (full_path).exists ()) {
-                connect (action, &QAction.triggered, this, [this, full_path] { this.slot_open_path (full_path); });
+                connect (action, &QAction.triggered, this, [this, full_path] {
+                    this.slot_open_path (full_path);
+                });
             } else {
                 action.set_enabled (false);
             }

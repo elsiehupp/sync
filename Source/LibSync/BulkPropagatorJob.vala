@@ -29,7 +29,7 @@ class Bulk_propagator_job : Propagator_job {
     /* This is a minified version of the SyncFileItem,
     that holds only the specifics about the file that's
     being uploaded.
-    
+
     This is needed if we wanna apply changes on the file
     that's being uploaded while keeping the original on disk.
     ***********************************************************/
@@ -102,7 +102,8 @@ private:
               const string &error_string);
 
     /***********************************************************
-    Bases headers that need to be sent on the PUT, or in the MOVE for chunking-ng */
+    Bases headers that need to be sent on the PUT, or in the MOVE for chunking-ng
+    ***********************************************************/
     QMap<QByteArray, QByteArray> headers (SyncFileItemPtr item) const;
 
     void abort_with_error (SyncFileItemPtr item,
@@ -157,7 +158,7 @@ private:
 };
 
 
-    
+
     QByteArray get_etag_from_json_reply (QJsonObject &reply) {
         const auto oc_etag = Occ.parse_etag (reply.value ("OC-ETag").to_string ().to_latin1 ());
         const auto ETag = Occ.parse_etag (reply.value ("ETag").to_string ().to_latin1 ());
@@ -174,16 +175,16 @@ private:
         }
         return ret;
     }
-    
+
     QByteArray get_header_from_json_reply (QJsonObject &reply, QByteArray &header_name) {
         return reply.value (header_name).to_string ().to_latin1 ();
     }
-    
+
     constexpr auto batch_size = 100;
-    
+
     constexpr auto parallel_jobs_maximum_count = 1;
 
-    
+
     Bulk_propagator_job.Bulk_propagator_job (Owncloud_propagator *propagator,
                                          const std.deque<SyncFileItemPtr> &items)
         : Propagator_job (propagator)
@@ -191,7 +192,7 @@ private:
         _files_to_upload.reserve (batch_size);
         _pending_checksum_files.reserve (batch_size);
     }
-    
+
     bool Bulk_propagator_job.schedule_self_or_child () {
         if (_items.empty ()) {
             return false;
@@ -199,7 +200,7 @@ private:
         if (!_pending_checksum_files.empty ()) {
             return false;
         }
-    
+
         _state = Running;
         for (int i = 0; i < batch_size && !_items.empty (); ++i) {
             auto current_item = _items.front ();
@@ -213,35 +214,35 @@ private:
                 start_upload_file (current_item, file_to_upload);
             }); // We could be in a different thread (neon jobs)
         }
-    
+
         return _items.empty () && _files_to_upload.empty ();
     }
-    
+
     Propagator_job.Job_parallelism Bulk_propagator_job.parallelism () {
         return Propagator_job.Job_parallelism.Full_parallelism;
     }
-    
+
     void Bulk_propagator_job.start_upload_file (SyncFileItemPtr item, Upload_file_info file_to_upload) {
         if (propagator ()._abort_requested) {
             return;
         }
-    
+
         // Check if the specific file can be accessed
         if (propagator ().has_case_clash_accessibility_problem (file_to_upload._file)) {
             done (item, SyncFileItem.Normal_error, tr ("File %1 cannot be uploaded because another file with the same name, differing only in case, exists").arg (QDir.to_native_separators (item._file)));
             return;
         }
-    
+
         return slot_compute_transmission_checksum (item, file_to_upload);
     }
-    
+
     void Bulk_propagator_job.do_start_upload (SyncFileItemPtr item,
                                           Upload_file_info file_to_upload,
                                           QByteArray transmission_checksum_header) {
         if (propagator ()._abort_requested) {
             return;
         }
-    
+
         // write the checksum in the database, so if the POST is sent
         // to the server, but the connection drops before we get the etag, we can check the checksum
         // in reconcile (issue #5106)
@@ -255,10 +256,10 @@ private:
         pi._size = item._size;
         propagator ()._journal.set_upload_info (item._file, pi);
         propagator ()._journal.commit ("Upload info");
-    
+
         auto current_headers = headers (item);
         current_headers[QByteArrayLiteral ("Content-Length")] = QByteArray.number (file_to_upload._size);
-    
+
         if (!item._rename_target.is_empty () && item._file != item._rename_target) {
             // Try to rename the file
             const auto original_file_path_absolute = propagator ().full_local_path (item._file);
@@ -279,28 +280,28 @@ private:
                 return;
             }
         }
-    
+
         const auto remote_path = propagator ().full_remote_path (file_to_upload._file);
-    
+
         current_headers["X-File-MD5"] = transmission_checksum_header;
-    
+
         Bulk_upload_item new_upload_file{propagator ().account (), item, file_to_upload,
                     remote_path, file_to_upload._path,
                     file_to_upload._size, current_headers};
-    
+
         q_c_info (lc_bulk_propagator_job) << remote_path << "transmission checksum" << transmission_checksum_header << file_to_upload._path;
         _files_to_upload.push_back (std.move (new_upload_file));
         _pending_checksum_files.remove (item._file);
-    
+
         if (_pending_checksum_files.empty ()) {
             trigger_upload ();
         }
     }
-    
+
     void Bulk_propagator_job.trigger_upload () {
         auto upload_parameters_data = std.vector<Single_upload_file_data>{};
         upload_parameters_data.reserve (_files_to_upload.size ());
-    
+
         int timeout = 0;
         for (auto &single_file : _files_to_upload) {
             // job takes ownership of device via a QScopedPointer. Job deletes itself when finishing
@@ -308,34 +309,34 @@ private:
                     single_file._local_path, 0, single_file._file_size, &propagator ()._bandwidth_manager);
             if (!device.open (QIODevice.Read_only)) {
                 q_c_warning (lc_bulk_propagator_job) << "Could not prepare upload device : " << device.error_string ();
-    
+
                 // If the file is currently locked, we want to retry the sync
                 // when it becomes available again.
                 if (FileSystem.is_file_locked (single_file._local_path)) {
                     emit propagator ().seen_locked_file (single_file._local_path);
                 }
-    
+
                 abort_with_error (single_file._item, SyncFileItem.Normal_error, device.error_string ());
                 emit finished (SyncFileItem.Normal_error);
-    
+
                 return;
             }
             single_file._headers["X-File-Path"] = single_file._remote_path.to_utf8 ();
             upload_parameters_data.push_back ({std.move (device), single_file._headers});
             timeout += single_file._file_size;
         }
-    
+
         const auto bulk_upload_url = Utility.concat_url_path (propagator ().account ().url (), QStringLiteral ("/remote.php/dav/bulk"));
         auto job = std.make_unique<Put_multi_file_job> (propagator ().account (), bulk_upload_url, std.move (upload_parameters_data), this);
         connect (job.get (), &Put_multi_file_job.finished_signal, this, &Bulk_propagator_job.slot_put_finished);
-    
+
         for (auto &single_file : _files_to_upload) {
             connect (job.get (), &Put_multi_file_job.upload_progress,
                     this, [this, single_file] (int64 sent, int64 total) {
                 slot_upload_progress (single_file._item, sent, total);
             });
         }
-    
+
         adjust_last_job_timeout (job.get (), timeout);
         _jobs.append (job.get ());
         job.release ().start ();
@@ -343,14 +344,14 @@ private:
             schedule_self_or_child ();
         }
     }
-    
+
     void Bulk_propagator_job.check_propagation_is_done () {
         if (_items.empty ()) {
             if (!_jobs.empty () || !_pending_checksum_files.empty ()) {
                 // just wait for the other job to finish.
                 return;
             }
-    
+
             q_c_info (lc_bulk_propagator_job) << "final status" << _final_status;
             emit finished (_final_status);
             propagator ().schedule_next_job ();
@@ -358,13 +359,13 @@ private:
             schedule_self_or_child ();
         }
     }
-    
+
     void Bulk_propagator_job.slot_compute_transmission_checksum (SyncFileItemPtr item,
                                                             Upload_file_info file_to_upload) {
         // Reuse the content checksum as the transmission checksum if possible
         const auto supported_transmission_checksums =
             propagator ().account ().capabilities ().supported_checksum_types ();
-    
+
         // Compute the transmission checksum.
         auto compute_checksum = std.make_unique<ComputeChecksum> (this);
         if (upload_checksum_enabled ()) {
@@ -372,7 +373,7 @@ private:
         } else {
             compute_checksum.set_checksum_type (QByteArray ());
         }
-    
+
         connect (compute_checksum.get (), &ComputeChecksum.done,
                 this, [this, item, file_to_upload] (QByteArray &content_checksum_type, QByteArray &content_checksum) {
             slot_start_upload (item, file_to_upload, content_checksum_type, content_checksum);
@@ -381,18 +382,18 @@ private:
                 compute_checksum.get (), &GLib.Object.delete_later);
         compute_checksum.release ().start (file_to_upload._path);
     }
-    
+
     void Bulk_propagator_job.slot_start_upload (SyncFileItemPtr item,
                                             Upload_file_info file_to_upload,
                                             const QByteArray &transmission_checksum_type,
                                             const QByteArray &transmission_checksum) {
         const auto transmission_checksum_header = make_checksum_header (transmission_checksum_type, transmission_checksum);
-    
+
         item._checksum_header = transmission_checksum_header;
-    
+
         const string full_file_path = file_to_upload._path;
         const string original_file_path = propagator ().full_local_path (item._file);
-    
+
         if (!FileSystem.file_exists (full_file_path)) {
             _pending_checksum_files.remove (item._file);
             slot_on_error_start_folder_unlock (item, SyncFileItem.Soft_error, tr ("File Removed (start upload) %1").arg (full_file_path));
@@ -402,7 +403,7 @@ private:
         const time_t prev_modtime = item._modtime; // the _item value was set in Propagate_upload_file.start ()
         // but a potential checksum calculation could have taken some time during which the file could
         // have been changed again, so better check again here.
-    
+
         item._modtime = FileSystem.get_mod_time (original_file_path);
         if (item._modtime <= 0) {
             _pending_checksum_files.remove (item._file);
@@ -418,10 +419,10 @@ private:
             check_propagation_is_done ();
             return;
         }
-    
+
         file_to_upload._size = FileSystem.get_size (full_file_path);
         item._size = FileSystem.get_size (original_file_path);
-    
+
         // But skip the file if the mtime is too close to 'now'!
         // That usually indicates a file that is still being changed
         // or not yet fully copied to the destination.
@@ -432,39 +433,39 @@ private:
             check_propagation_is_done ();
             return;
         }
-    
+
         do_start_upload (item, file_to_upload, transmission_checksum);
     }
-    
+
     void Bulk_propagator_job.slot_on_error_start_folder_unlock (SyncFileItemPtr item,
                                                          SyncFileItem.Status status,
                                                          const string &error_string) {
         q_c_info (lc_bulk_propagator_job ()) << status << error_string;
         done (item, status, error_string);
     }
-    
+
     void Bulk_propagator_job.slot_put_finished_one_file (Bulk_upload_item &single_file,
                                                    Put_multi_file_job *job,
                                                    const QJsonObject &file_reply) {
         bool finished = false;
-    
+
         q_c_info (lc_bulk_propagator_job ()) << single_file._item._file << "file headers" << file_reply;
-    
+
         if (file_reply.contains ("error") && !file_reply[QStringLiteral ("error")].to_bool ()) {
             single_file._item._http_error_code = static_cast<uint16> (200);
         } else {
             single_file._item._http_error_code = static_cast<uint16> (412);
         }
-    
+
         single_file._item._response_time_stamp = job.response_timestamp ();
         single_file._item._request_id = job.request_id ();
         if (single_file._item._http_error_code != 200) {
             common_error_handling (single_file._item, file_reply[QStringLiteral ("message")].to_string ());
             return;
         }
-    
+
         single_file._item._status = SyncFileItem.Success;
-    
+
         // Check the file again post upload.
         // Two cases must be considered separately : If the upload is finished,
         // the file is on the server and has a changed ETag. In that case,
@@ -476,24 +477,24 @@ private:
         // the server hasn't registered the new file yet.
         const auto etag = get_etag_from_json_reply (file_reply);
         finished = etag.length () > 0;
-    
+
         const auto full_file_path (propagator ().full_local_path (single_file._item._file));
-    
+
         // Check if the file still exists
         if (!check_file_still_exists (single_file._item, finished, full_file_path)) {
             return;
         }
-    
+
         // Check whether the file changed since discovery. the file check here is the original and not the temporary.
         if (!check_file_changed (single_file._item, finished, full_file_path)) {
             return;
         }
-    
+
         // the file id should only be empty for new files up- or downloaded
         compute_file_id (single_file._item, file_reply);
-    
+
         single_file._item._etag = etag;
-    
+
         if (get_header_from_json_reply (file_reply, "X-OC-MTime") != "accepted") {
             // X-OC-MTime is supported since owncloud 5.0.   But not when chunking.
             // Normally Owncloud 6 always puts X-OC-MTime
@@ -501,17 +502,17 @@ private:
             // Well, the mtime was not set
         }
     }
-    
+
     void Bulk_propagator_job.slot_put_finished () {
         auto *job = qobject_cast<Put_multi_file_job> (sender ());
         Q_ASSERT (job);
-    
+
         slot_job_destroyed (job); // remove it from the _jobs list
-    
+
         const auto reply_data = job.reply ().read_all ();
         const auto reply_json = QJsonDocument.from_json (reply_data);
         const auto full_reply_object = reply_json.object ();
-    
+
         for (auto &single_file : _files_to_upload) {
             if (!full_reply_object.contains (single_file._remote_path)) {
                 continue;
@@ -519,10 +520,10 @@ private:
             const auto single_reply_object = full_reply_object[single_file._remote_path].to_object ();
             slot_put_finished_one_file (single_file, job, single_reply_object);
         }
-    
+
         finalize (full_reply_object);
     }
-    
+
     void Bulk_propagator_job.slot_upload_progress (SyncFileItemPtr item, int64 sent, int64 total) {
         // Completion is signaled with sent=0, total=0; avoid accidentally
         // resetting progress due to the sent being zero by ignoring it.
@@ -533,14 +534,14 @@ private:
         }
         propagator ().report_progress (*item, sent - total);
     }
-    
+
     void Bulk_propagator_job.slot_job_destroyed (GLib.Object *job) {
         _jobs.erase (std.remove (_jobs.begin (), _jobs.end (), job), _jobs.end ());
     }
-    
+
     void Bulk_propagator_job.adjust_last_job_timeout (AbstractNetworkJob *job, int64 file_size) {
         constexpr double three_minutes = 3.0 * 60 * 1000;
-    
+
         job.set_timeout (q_bound (
             job.timeout_msec (),
             // Calculate 3 minutes for each gigabyte of data
@@ -548,7 +549,7 @@ private:
             // Maximum of 30 minutes
                             static_cast<int64> (30 * 60 * 1000)));
     }
-    
+
     void Bulk_propagator_job.finalize_one_file (Bulk_upload_item &one_file) {
         // Update the database entry
         const auto result = propagator ().update_metadata (*one_file._item);
@@ -559,7 +560,7 @@ private:
             done (one_file._item, SyncFileItem.Soft_error, tr ("The file %1 is currently in use").arg (one_file._item._file));
             return;
         }
-    
+
         // Files that were new on the remote shouldn't have online-only pin state
         // even if their parent folder is online-only.
         if (one_file._item._instruction == CSYNC_INSTRUCTION_NEW
@@ -570,16 +571,16 @@ private:
                 q_c_warning (lc_bulk_propagator_job) << "Could not set pin state of" << one_file._item._file << "to unspecified";
             }
         }
-    
+
         // Remove from the progress database:
         propagator ()._journal.set_upload_info (one_file._item._file, SyncJournalDb.UploadInfo ());
         propagator ()._journal.commit ("upload file start");
     }
-    
+
     void Bulk_propagator_job.finalize (QJsonObject &full_reply) {
         for (auto single_file_it = std.begin (_files_to_upload); single_file_it != std.end (_files_to_upload); ) {
             const auto &single_file = *single_file_it;
-    
+
             if (!full_reply.contains (single_file._remote_path)) {
                 ++single_file_it;
                 continue;
@@ -587,42 +588,42 @@ private:
             if (!single_file._item.has_error_status ()) {
                 finalize_one_file (single_file);
             }
-    
+
             done (single_file._item, single_file._item._status, {});
-    
+
             single_file_it = _files_to_upload.erase (single_file_it);
         }
-    
+
         check_propagation_is_done ();
     }
-    
+
     void Bulk_propagator_job.done (SyncFileItemPtr item,
                                  SyncFileItem.Status status,
                                  const string &error_string) {
         item._status = status;
         item._error_string = error_string;
-    
+
         q_c_info (lc_bulk_propagator_job) << "Item completed" << item.destination () << item._status << item._instruction << item._error_string;
-    
+
         handle_file_restoration (item, error_string);
-    
+
         if (propagator ()._abort_requested && (item._status == SyncFileItem.Normal_error
                                               || item._status == SyncFileItem.Fatal_error)) {
             // an abort request is ongoing. Change the status to Soft-Error
             item._status = SyncFileItem.Soft_error;
         }
-    
+
         if (item._status != SyncFileItem.Success) {
             // Blacklist handling
             handle_bulk_upload_black_list (item);
             propagator ()._another_sync_needed = true;
         }
-    
+
         handle_job_done_errors (item, status);
-    
+
         emit propagator ().item_completed (item);
     }
-    
+
     QMap<QByteArray, QByteArray> Bulk_propagator_job.headers (SyncFileItemPtr item) {
         QMap<QByteArray, QByteArray> headers;
         headers[QByteArrayLiteral ("Content-Type")] = QByteArrayLiteral ("application/octet-stream");
@@ -630,18 +631,18 @@ private:
         if (q_environment_variable_int_value ("OWNCLOUD_LAZYOPS")) {
             headers[QByteArrayLiteral ("OC-Lazy_ops")] = QByteArrayLiteral ("true");
         }
-    
+
         if (item._file.contains (QLatin1String (".sys.admin#recall#"))) {
             // This is a file recall triggered by the admin.  Note : the
             // recall list file created by the admin and downloaded by the
             // client (.sys.admin#recall#) also falls into this category
             // (albeit users are not supposed to mess up with it)
-    
+
             // We use a special tag header so that the server may decide to store this file away in some admin stage area
             // And not directly in the user's area (which would trigger redownloads etc).
             headers["OC-Tag"] = ".sys.admin#recall#";
         }
-    
+
         if (!item._etag.is_empty () && item._etag != "empty_etag"
             && item._instruction != CSYNC_INSTRUCTION_NEW // On new files never send a If-Match
             && item._instruction != CSYNC_INSTRUCTION_TYPE_CHANGE) {
@@ -649,7 +650,7 @@ private:
             //  csync_owncloud.c's owncloud_file_id always strips the quotes.
             headers[QByteArrayLiteral ("If-Match")] = '"' + item._etag + '"';
         }
-    
+
         // Set up a conflict file header pointing to the original file
         auto conflict_record = propagator ()._journal.conflict_record (item._file.to_utf8 ());
         if (conflict_record.is_valid ()) {
@@ -667,17 +668,17 @@ private:
                 headers[QByteArrayLiteral ("OC-Conflict_base_etag")] = conflict_record.base_etag;
             }
         }
-    
+
         return headers;
     }
-    
+
     void Bulk_propagator_job.abort_with_error (SyncFileItemPtr item,
                                            SyncFileItem.Status status,
                                            const string &error) {
         abort (Abort_type.Synchronous);
         done (item, status, error);
     }
-    
+
     void Bulk_propagator_job.check_resetting_errors (SyncFileItemPtr item) {
         if (item._http_error_code == 412
             || propagator ().account ().capabilities ().http_error_codes_that_reset_failing_chunked_uploads ().contains (item._http_error_code)) {
@@ -696,15 +697,15 @@ private:
             propagator ()._journal.commit ("Upload info");
         }
     }
-    
+
     void Bulk_propagator_job.common_error_handling (SyncFileItemPtr item,
                                                 const string &error_message) {
         // Ensure errors that should eventually reset the chunked upload are tracked.
         check_resetting_errors (item);
-    
+
         abort_with_error (item, SyncFileItem.Normal_error, error_message);
     }
-    
+
     bool Bulk_propagator_job.check_file_still_exists (SyncFileItemPtr item,
                                                  const bool finished,
                                                  const string &full_file_path) {
@@ -716,10 +717,10 @@ private:
                 propagator ()._another_sync_needed = true;
             }
         }
-    
+
         return true;
     }
-    
+
     bool Bulk_propagator_job.check_file_changed (SyncFileItemPtr item,
                                              const bool finished,
                                              const string &full_file_path) {
@@ -732,10 +733,10 @@ private:
                 return false;
             }
         }
-    
+
         return true;
     }
-    
+
     void Bulk_propagator_job.compute_file_id (SyncFileItemPtr item,
                                           const QJsonObject &file_reply) {
         const auto fid = get_header_from_json_reply (file_reply, "OC-File_iD");
@@ -746,7 +747,7 @@ private:
             item._file_id = fid;
         }
     }
-    
+
     void Bulk_propagator_job.handle_file_restoration (SyncFileItemPtr item,
                                                   const string &error_string) {
         if (item._is_restoration) {
@@ -762,11 +763,11 @@ private:
             }
         }
     }
-    
+
     void Bulk_propagator_job.handle_bulk_upload_black_list (SyncFileItemPtr item) {
         propagator ().add_to_bulk_upload_black_list (item._file);
     }
-    
+
     void Bulk_propagator_job.handle_job_done_errors (SyncFileItemPtr item,
                                                 SyncFileItem.Status status) {
         if (item.has_error_status ()) {
@@ -774,12 +775,12 @@ private:
         } else {
             q_c_info (lc_propagator) << "Completed propagation of" << item.destination () << "by" << this << "with status" << item._status;
         }
-    
+
         if (item._status == SyncFileItem.Fatal_error) {
             // Abort all remaining jobs.
             propagator ().abort ();
         }
-    
+
         switch (item._status) {
         case SyncFileItem.Blacklisted_error:
         case SyncFileItem.Conflict:
@@ -802,6 +803,6 @@ private:
             break;
         }
     }
-    
+
     }
     

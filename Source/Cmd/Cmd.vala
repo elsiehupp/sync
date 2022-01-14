@@ -455,10 +455,14 @@ restart_sync:
     engine.set_ignore_hidden_files (options.ignore_hidden_files);
     engine.set_network_limits (options.uplimit, options.downlimit);
     GLib.Object.connect (&engine, &SyncEngine.finished,
-        [&app] (bool result) { app.exit (result ? EXIT_SUCCESS : EXIT_FAILURE); });
+        [&app] (bool result) {
+            app.exit (result ? EXIT_SUCCESS : EXIT_FAILURE);
+        });
     GLib.Object.connect (&engine, &SyncEngine.transmission_progress, &cmd, &Cmd.transmission_progress_slot);
     GLib.Object.connect (&engine, &SyncEngine.sync_error,
-        [] (string &error) { q_warning () << "Sync error:" << error; });
+        [] (string &error) {
+            q_warning () << "Sync error:" << error;
+        });
 
     // Exclude lists
 

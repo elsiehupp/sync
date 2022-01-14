@@ -12,7 +12,7 @@ https://code.qt.io/c
 
 Original license:
 
-Copyright (C) 2016 The 
+Copyright (C) 2016 The
 Contact : https://www.qt
 
 This file is part of the Qt_widgets module of the Qt Toolkit.
@@ -20,14 +20,14 @@ This file is part of the Qt_widgets module of the Qt Toolkit.
 $QT_BEGIN_LICENSE:LGPL$
 Commercial License Usage
 Licensees holding valid commercial Qt licenses may use this file in
-accordance with the commercial license 
+accordance with the commercial license
 Software or, alternatively, in accordance with the terms contained in
-a written agreement between you and The Qt Company. For licensing 
+a written agreement between you and The Qt Company. For licensing
 and conditions see https://www.qt.io/terms-conditions. For further
 information use the contact form at https://www.qt.io/contact-us.
 
 GNU Lesser General Public License Usage
-Alternatively, this file may be 
+Alternatively, this file may be
 General Public License version 3 as published by the Free Softw
 Foundation and appearing in the file LICENSE.LGPL3 included in the
 packaging of this file. Please review the following information to
@@ -57,7 +57,7 @@ https://code.qt.io/c
 
 Original license:
 
-Copyright (C) 2016 The 
+Copyright (C) 2016 The
 Contact : https://www.qt
 
 This file is part of the Qt_widgets module of the Qt Toolkit.
@@ -65,14 +65,14 @@ This file is part of the Qt_widgets module of the Qt Toolkit.
 $QT_BEGIN_LICENSE:LGPL$
 Commercial License Usage
 Licensees holding valid commercial Qt licenses may use this file in
-accordance with the commercial license 
+accordance with the commercial license
 Software or, alternatively, in accordance with the terms contained in
-a written agreement between you and The Qt Company. For licensing 
+a written agreement between you and The Qt Company. For licensing
 and conditions see https://www.qt.io/terms-conditions. For further
 information use the contact form at https://www.qt.io/contact-us.
 
 GNU Lesser General Public License Usage
-Alternatively, this file may be 
+Alternatively, this file may be
 General Public License version 3 as published by the Free Softw
 Foundation and appearing in the file LICENSE.LGPL3 included in the
 packaging of this file. Please review the following information to
@@ -105,10 +105,10 @@ https://www.gnu.org/licenses/gpl-3.0.html.
 namespace Occ {
 
 class HeaderBanner : Gtk.Widget {
-public:
-    HeaderBanner (Gtk.Widget *parent = nullptr);
 
-    void setup (string &title, QPixmap &logo, QPixmap &banner,
+    public HeaderBanner (Gtk.Widget *parent = nullptr);
+
+    public void setup (string &title, QPixmap &logo, QPixmap &banner,
                const Qt.Text_format title_format, string &style_sheet);
 
 protected:
@@ -126,7 +126,7 @@ private:
     // These fudge terms were needed a few places to obtain pixel-perfect results
     const int Gap_between_logo_and_right_edge = 5;
     const int Modern_header_top_margin = 2;
-    
+
     HeaderBanner.HeaderBanner (Gtk.Widget *parent)
         : Gtk.Widget (parent) {
         set_size_policy (QSize_policy.Expanding, QSize_policy.Fixed);
@@ -148,7 +148,7 @@ private:
         layout.add_widget (title_label, 1, 1, 5, 1);
         layout.add_widget (logo_label, 1, 5, 5, 1);
     }
-    
+
     void HeaderBanner.setup (string &title, QPixmap &logo, QPixmap &banner,
                              const Qt.Text_format title_format, string &style_sheet) {
         QStyle *style = parent_widget ().style ();
@@ -157,7 +157,7 @@ private:
         int top_level_margin_right = style.pixel_metric (QStyle.PM_Layout_right_margin, nullptr, parent_widget ());
         int top_level_margin_top = style.pixel_metric (QStyle.PM_Layout_top_margin, nullptr, parent_widget ());
         //int top_level_margin_bottom = style.pixel_metric (QStyle.PM_Layout_bottom_margin, 0, parent_widget ());
-    
+
         layout.set_row_minimum_height (0, Modern_header_top_margin);
         layout.set_row_minimum_height (1, top_level_margin_top - Modern_header_top_margin - 1);
         layout.set_row_minimum_height (6, 3);
@@ -180,7 +180,7 @@ private:
         }
         update_geometry ();
     }
-    
+
     void HeaderBanner.paint_event (QPaint_event * /* event */) {
         QPainter painter (this);
         painter.draw_pixmap (0, 0, width (), banner_pixmap.height (), banner_pixmap);
@@ -193,6 +193,6 @@ private:
         painter.draw_point (x + 1, y);
         painter.draw_line (0, y + 1, x + 1, y + 1);
     }
-    
+
     } // namespace Occ
     

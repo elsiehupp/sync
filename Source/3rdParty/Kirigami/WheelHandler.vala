@@ -20,21 +20,21 @@ class KirigamiWheelEvent : GLib.Object {
 
     /***********************************************************
     x : real
-    
+
     X coordinate of the mouse pointer
     ***********************************************************/
     Q_PROPERTY (qreal x READ x CONSTANT)
 
     /***********************************************************
     y : real
-    
+
     Y coordinate of the mouse pointer
     ***********************************************************/
     Q_PROPERTY (qreal y READ y CONSTANT)
 
     /***********************************************************
     angle_delta : point
-    
+
     The distance the wheel is rotated in degrees.
     The x and y coordinates indicate the horizontal and vertical wheels respe
     A positive value indicates it was rotated up/right, negative, bottom/left
@@ -44,14 +44,14 @@ class KirigamiWheelEvent : GLib.Object {
 
     /***********************************************************
     pixel_delta : point
-    
+
     provides the delta in screen pixels available on high resolution trackpads
     ***********************************************************/
     Q_PROPERTY (QPoint_f pixel_delta READ pixel_delta CONSTANT)
 
     /***********************************************************
     buttons : int
-    
+
     it contains an OR combination of the buttons that were pressed during the wheel, they can be:
     Qt.Left_button, Qt.Middle_button, Qt.Right_button
     ***********************************************************/
@@ -59,8 +59,8 @@ class KirigamiWheelEvent : GLib.Object {
 
     /***********************************************************
     modifiers : int
-    
-    Keyboard mobifiers that were pressed 
+
+    Keyboard mobifiers that were pressed
     Qt.No_modifier (def
     Qt.Control_modifi
     Qt.Shift_modifier
@@ -70,7 +70,7 @@ class KirigamiWheelEvent : GLib.Object {
 
     /***********************************************************
     inverted : bool
-    
+
     Whether the delta values are inverted
     On some platformsthe returned delta are inverted, so positive values would mean bottom/left
     ***********************************************************/
@@ -78,13 +78,13 @@ class KirigamiWheelEvent : GLib.Object {
 
     /***********************************************************
     accepted : bool
-    
+
     If set, the event shouldn't be managed anymore,
     for i
     @code
     // This handler handles automatically the scroll of
     // flickable_item, unless Ctrl is pressed, in this c
-    // app has custom code 
+    // app has custom code
     Kirigami.WheelHandler {
       target : flickable_item
       block_target_wheel : true
@@ -92,9 +92,9 @@ class KirigamiWheelEvent : GLib.Object {
       on_wheel : {
            if (wheel.modifiers & Qt.C
                wheel.accepted = true;
-           
-       
-     
+
+
+
     }
     @endcode
 
@@ -157,9 +157,9 @@ class WheelHandler : GLib.Object {
 
     /***********************************************************
     target : Item
-    
+
     The target we want to manage wheel events.
-    We will receive wheel () signals every time the user 
+    We will receive wheel () signals every time the user
     the mouse wheel (or scrolls with the touchpad) on top
     of that item.
     ***********************************************************/
@@ -167,7 +167,7 @@ class WheelHandler : GLib.Object {
 
     /***********************************************************
     block_target_wheel : bool
-    
+
     If true, the target won't receive any wheel event at all (default true)
     ***********************************************************/
     Q_PROPERTY (bool block_target_wheel MEMBER m_block_target_wheel NOTIFY block_target_wheel_changed)
@@ -223,36 +223,36 @@ private:
 class GlobalWheelFilter_singleton {
     public GlobalWheelFilter self;
 };
-    
+
     Q_GLOBAL_STATIC (GlobalWheelFilter_singleton, private_global_wheel_filter_self)
-    
+
     GlobalWheelFilter.GlobalWheelFilter (GLib.Object *parent)
         : GLib.Object (parent) {
     }
-    
+
     GlobalWheelFilter.~GlobalWheelFilter () = default;
-    
+
     GlobalWheelFilter *GlobalWheelFilter.self () {
         return &private_global_wheel_filter_self ().self;
     }
-    
+
     void GlobalWheelFilter.set_item_handler_association (QQuick_item *item, WheelHandler *handler) {
         if (!m_handlers_for_item.contains (handler.target ())) {
             handler.target ().install_event_filter (this);
         }
         m_handlers_for_item.insert (item, handler);
-    
+
         connect (item, &GLib.Object.destroyed, this, [this] (GLib.Object *obj) {
             auto item = static_cast<QQuick_item> (obj);
             m_handlers_for_item.remove (item);
         });
-    
+
         connect (handler, &GLib.Object.destroyed, this, [this] (GLib.Object *obj) {
             auto handler = static_cast<WheelHandler> (obj);
             remove_item_handler_association (handler.target (), handler);
         });
     }
-    
+
     void GlobalWheelFilter.remove_item_handler_association (QQuick_item *item, WheelHandler *handler) {
         if (!item || !handler) {
             return;
@@ -262,7 +262,7 @@ class GlobalWheelFilter_singleton {
             item.remove_event_filter (this);
         }
     }
-    
+
     bool GlobalWheelFilter.event_filter (GLib.Object *watched, QEvent *event) {
         if (event.type () == QEvent.Wheel) {
             auto item = qobject_cast<QQuick_item> (watched);
@@ -271,10 +271,10 @@ class GlobalWheelFilter_singleton {
             }
             auto we = static_cast<QWheel_event> (event);
             m_wheel_event.initialize_from_event (we);
-    
+
             bool should_block = false;
             bool should_scroll_flickable = false;
-    
+
             for (auto *handler : m_handlers_for_item.values (item)) {
                 if (handler.m_block_target_wheel) {
                     should_block = true;
@@ -284,18 +284,18 @@ class GlobalWheelFilter_singleton {
                 }
                 emit handler.wheel (&m_wheel_event);
             }
-    
+
             if (should_scroll_flickable && !m_wheel_event.is_accepted ()) {
                 manage_wheel (item, we);
             }
-    
+
             if (should_block) {
                 return true;
             }
         }
         return GLib.Object.event_filter (watched, event);
     }
-    
+
     void GlobalWheelFilter.manage_wheel (QQuick_item *target, QWheel_event *event) {
         // Duck typing : accept everyhint that has all the properties we need
         if (target.meta_object ().index_of_property ("content_x") == -1
@@ -310,7 +310,7 @@ class GlobalWheelFilter_singleton {
             || target.meta_object ().index_of_property ("origin_y") == -1) {
             return;
         }
-    
+
         qreal content_width = target.property ("content_width").to_real ();
         qreal content_height = target.property ("content_height").to_real ();
         qreal content_x = target.property ("content_x").to_real ();
@@ -321,17 +321,17 @@ class GlobalWheelFilter_singleton {
         qreal right_margin = target.property ("right_margin").to_real ();
         qreal origin_x = target.property ("origin_x").to_real ();
         qreal origin_y = target.property ("origin_y").to_real ();
-    
+
         // Scroll Y
         if (content_height > target.height ()) {
-    
+
             int y = event.pixel_delta ().y () != 0 ? event.pixel_delta ().y () : event.angle_delta ().y () / 8;
-    
+
             //if we don't have a pixeldelta, apply the configured mouse wheel lines
             if (!event.pixel_delta ().y ()) {
                 y *= 3; // Magic copied value from Kirigami.Settings
             }
-    
+
             // Scroll one page regardless of delta:
             if ( (event.modifiers () & Qt.Control_modifier) || (event.modifiers () & Qt.Shift_modifier)) {
                 if (y > 0) {
@@ -340,28 +340,28 @@ class GlobalWheelFilter_singleton {
                     y = -target.height ();
                 }
             }
-    
+
             qreal min_yExtent = top_margin - origin_y;
             qreal max_yExtent = target.height () - (content_height + bottom_margin + origin_y);
-    
+
             target.set_property ("content_y", q_min (-max_yExtent, q_max (-min_yExtent, content_y - y)));
         }
-    
+
         //Scroll X
         if (content_width > target.width ()) {
-    
+
             int x = event.pixel_delta ().x () != 0 ? event.pixel_delta ().x () : event.angle_delta ().x () / 8;
-    
+
             // Special case : when can't scroll vertically, scroll horizontally with vertical wheel as well
             if (x == 0 && content_height <= target.height ()) {
                 x = event.pixel_delta ().y () != 0 ? event.pixel_delta ().y () : event.angle_delta ().y () / 8;
             }
-    
+
             //if we don't have a pixeldelta, apply the configured mouse wheel lines
             if (!event.pixel_delta ().x ()) {
                 x *= 3; // Magic copied value from Kirigami.Settings
             }
-    
+
             // Scroll one page regardless of delta:
             if ( (event.modifiers () & Qt.Control_modifier) || (event.modifiers () & Qt.Shift_modifier)) {
                 if (x > 0) {
@@ -370,24 +370,24 @@ class GlobalWheelFilter_singleton {
                     x = -target.width ();
                 }
             }
-    
+
             qreal min_xExtent = left_margin - origin_x;
             qreal max_xExtent = target.width () - (content_width + right_margin + origin_x);
-    
+
             target.set_property ("content_x", q_min (-max_xExtent, q_max (-min_xExtent, content_x - x)));
         }
-    
+
         //this is just for making the scrollbar
         target.meta_object ().invoke_method (target, "flick", Q_ARG (double, 0), Q_ARG (double, 1));
         target.meta_object ().invoke_method (target, "cancel_flick");
     }
-    
+
     ////////////////////////////
     KirigamiWheelEvent.KirigamiWheelEvent (GLib.Object *parent)
         : GLib.Object (parent) {}
-    
+
     KirigamiWheelEvent.~KirigamiWheelEvent () = default;
-    
+
     void KirigamiWheelEvent.initialize_from_event (QWheel_event *event) {
         m_x = event.position ().x ();
         m_y = event.position ().y ();
@@ -398,70 +398,70 @@ class GlobalWheelFilter_singleton {
         m_accepted = false;
         m_inverted = event.inverted ();
     }
-    
+
     qreal KirigamiWheelEvent.x () {
         return m_x;
     }
-    
+
     qreal KirigamiWheelEvent.y () {
         return m_y;
     }
-    
+
     QPoint_f KirigamiWheelEvent.angle_delta () {
         return m_angle_delta;
     }
-    
+
     QPoint_f KirigamiWheelEvent.pixel_delta () {
         return m_pixel_delta;
     }
-    
+
     int KirigamiWheelEvent.buttons () {
         return m_buttons;
     }
-    
+
     int KirigamiWheelEvent.modifiers () {
         return m_modifiers;
     }
-    
+
     bool KirigamiWheelEvent.inverted () {
         return m_inverted;
     }
-    
+
     bool KirigamiWheelEvent.is_accepted () {
         return m_accepted;
     }
-    
+
     void KirigamiWheelEvent.set_accepted (bool accepted) {
         m_accepted = accepted;
     }
-    
+
     ///////////////////////////////
-    
+
     WheelHandler.WheelHandler (GLib.Object *parent)
         : GLib.Object (parent) {
     }
-    
+
     WheelHandler.~WheelHandler () = default;
-    
+
     QQuick_item *WheelHandler.target () {
         return m_target;
     }
-    
+
     void WheelHandler.set_target (QQuick_item *target) {
         if (m_target == target) {
             return;
         }
-    
+
         if (m_target) {
             GlobalWheelFilter.self ().remove_item_handler_association (m_target, this);
         }
-    
+
         m_target = target;
-    
+
         GlobalWheelFilter.self ().set_item_handler_association (target, this);
-    
+
         emit target_changed ();
     }
-    
+
     #include "moc_wheelhandler.cpp"
     

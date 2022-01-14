@@ -9,7 +9,7 @@ Commercial License Usage
 Licensees holding valid commercial Qt licenses may use this file in
 accordance with the commercial license agreement provided with the
 Software or, alternatively, in accordance with the terms contained in
-a written agreement between you and Digia.  For licensing 
+a written agreement between you and Digia.  For licensing
 conditions see http://qt.digia.com/lice
 use the contact form at http://qt.digia.com/contact-us.
 
@@ -110,64 +110,70 @@ class QTokenizer {
     public using char_type = typename T.value_type;
 
     /***********************************************************
-       \class QTokenizer
-       \inmodule Qt_network
-       \brief QTokenizer tokenizes Strings on string, QByteArray,
-              std.string or std.wstring
+    \class QTokenizer
+    \inmodule Qt_network
+    \brief QTokenizer tokenizes Strings on string, QByteArray,
+            std.string or std.wstring
 
-       Example Usage:
+    Example Usage:
 
-       \code
-         string str = ...;
-         QByte_array_tokenizer tokenizer (str, "; ");
-         tokenizer.set_quote_characters ("\"'");
-         tokenizer.set_return_delimiters (true);
-         while (tokenizer.has_next ()) {
-           QByteArray token = tokenizer.next ();
-           bool is_delimiter = tokenizer.is_delimiter ();
-           ...
-         }
-       \endcode
+    \code
+        string str = ...;
+        QByte_array_tokenizer tokenizer (str, "; ");
+        tokenizer.set_quote_characters ("\"'");
+        tokenizer.set_return_delimiters (true);
+        while (tokenizer.has_next ()) {
+        QByteArray token = tokenizer.next ();
+        bool is_delimiter = tokenizer.is_delimiter ();
+        ...
+        }
+    \endcode
 
-       \param string The string to tokenize
-       \param delimiters A string containing delimiters
+    \param string The string to tokenize
+    \param delimiters A string containing delimiters
 
-       \sa QStringTokenizer, QByte_array_tokenizer, String_tokenizer, WString_tokenizer
+    \sa QStringTokenizer, QByte_array_tokenizer, String_tokenizer, WString_tokenizer
     ***********************************************************/
     public QTokenizer (T& string, T& delimiters)
-        : d (new QTokenizerPrivate<T, Const_iterator> (string, delimiters)) { }
+        : d (new QTokenizerPrivate<T, Const_iterator> (string, delimiters)) {}
 
     /***********************************************************
-       Whether or not to return delimiters as tokens
-       \see set_quote_characters
+    Whether or not to return delimiters as tokens
+    \see set_quote_characters
     ***********************************************************/
-    public void set_return_delimiters (bool enable) { d.return_delimiters = enable; }
+    public void set_return_delimiters (bool enable) {
+        d.return_delimiters = enable;
+    }
 
     /***********************************************************
-       Sets characters that are considered to start and end quotes.
+    Sets characters that are considered to start and end quotes.
 
-       When between two characters considered a quote, delimiters will
-       be ignored.
+    When between two characters considered a quote, delimiters will
+    be ignored.
 
-       When between quotes, blackslash characters will cause the QTokenizer
-       to skip the next character.
+    When between quotes, blackslash characters will cause the QTokenizer
+    to skip the next character.
 
-       \param quotes Characters that delimit quotes.
+    \param quotes Characters that delimit quotes.
     ***********************************************************/
-    public void set_quote_characters (T& quotes) { d.quotes = quotes; }
+    public void set_quote_characters (T& quotes) {
+        d.quotes = quotes;
+    }
 
     /***********************************************************
-       Whether or not to return delimiters as tokens
-       \see set_quote_characters
+    Whether or not to return delimiters as tokens
+    \see set_quote_characters
     ***********************************************************/
-    public void set_return_quote_characters (bool enable) { d.return_quotes = enable; }
+    public void set_return_quote_characters (bool enable) {
+        d.return_quotes = enable;
+    }
 
     /***********************************************************
-       Retrieve next token.
+    Retrieve next token.
 
-       Returns true if there are more tokens, false otherwise.
+    Returns true if there are more tokens, false otherwise.
 
-       \sa next ()
+    \sa next ()
     ***********************************************************/
     public bool has_next () {
         typename QTokenizerPrivate<T, Const_iterator>.State state;
@@ -191,22 +197,24 @@ class QTokenizer {
     }
 
     /***********************************************************
-       Resets the tokenizer to the starting position.
+    Resets the tokenizer to the starting position.
     ***********************************************************/
     public void reset () {
         d.token_end = d.begin;
     }
 
     /***********************************************************
-       Returns true if the current token is a delimiter,
-       if one more more delimiting characters have been set.
+    Returns true if the current token is a delimiter,
+    if one more more delimiting characters have been set.
     ***********************************************************/
-    public bool is_delimiter () { return d.is_delim; }
+    public bool is_delimiter () {
+        return d.is_delim;
+    }
 
     /***********************************************************
-       Returns the current token.
+    Returns the current token.
 
-       Use \c has_next () to fetch the next token.
+    Use \c has_next () to fetch the next token.
     ***********************************************************/
     public T next () {
         int len = std.distance (d.token_begin, d.token_end);

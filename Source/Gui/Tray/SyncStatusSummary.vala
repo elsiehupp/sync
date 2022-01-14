@@ -91,7 +91,7 @@ namespace {
 
     Occ.SyncResult.Status determine_sync_status (Occ.SyncResult &sync_result) {
         const auto status = sync_result.status ();
-    
+
         if (status == Occ.SyncResult.Success || status == Occ.SyncResult.Problem) {
             if (sync_result.has_unresolved_conflicts ()) {
                 return Occ.SyncResult.Problem;
@@ -109,14 +109,14 @@ namespace {
         connect (folder_man, &FolderMan.folder_list_changed, this, &Sync_status_summary.on_folder_list_changed);
         connect (folder_man, &FolderMan.folder_sync_state_change, this, &Sync_status_summary.on_folder_sync_state_changed);
     }
-    
+
     bool Sync_status_summary.reload_needed (AccountState *account_state) {
         if (_account_state.data () == account_state) {
             return false;
         }
         return true;
     }
-    
+
     void Sync_status_summary.load () {
         const auto current_user = User_model.instance ().current_user ();
         if (!current_user) {
@@ -127,43 +127,43 @@ namespace {
         connect_to_folders_progress (FolderMan.instance ().map ());
         init_sync_state ();
     }
-    
+
     double Sync_status_summary.sync_progress () {
         return _progress;
     }
-    
+
     QUrl Sync_status_summary.sync_icon () {
         return _sync_icon;
     }
-    
+
     bool Sync_status_summary.syncing () {
         return _is_syncing;
     }
-    
+
     void Sync_status_summary.on_folder_list_changed (Occ.Folder.Map &folder_map) {
         connect_to_folders_progress (folder_map);
     }
-    
+
     void Sync_status_summary.mark_folder_as_error (Folder *folder) {
         _folders_with_errors.insert (folder.alias ());
     }
-    
+
     void Sync_status_summary.mark_folder_as_success (Folder *folder) {
         _folders_with_errors.erase (folder.alias ());
     }
-    
+
     bool Sync_status_summary.folder_errors () {
         return _folders_with_errors.size () != 0;
     }
-    
+
     bool Sync_status_summary.folder_error (Folder *folder) {
         return _folders_with_errors.find (folder.alias ()) != _folders_with_errors.end ();
     }
-    
+
     void Sync_status_summary.clear_folder_errors () {
         _folders_with_errors.clear ();
     }
-    
+
     void Sync_status_summary.set_sync_state_for_folder (Folder *folder) {
         if (_account_state && !_account_state.is_connected ()) {
             set_syncing (false);
@@ -172,9 +172,9 @@ namespace {
             set_sync_icon (Theme.instance ().folder_offline ());
             return;
         }
-    
+
         const auto state = determine_sync_status (folder.sync_result ());
-    
+
         switch (state) {
         case SyncResult.Success:
         case SyncResult.Sync_prepare:
@@ -219,19 +219,19 @@ namespace {
             break;
         }
     }
-    
+
     void Sync_status_summary.on_folder_sync_state_changed (Folder *folder) {
         if (!folder) {
             return;
         }
-    
+
         if (!_account_state || folder.account_state () != _account_state.data ()) {
             return;
         }
-    
+
         set_sync_state_for_folder (folder);
     }
-    
+
     constexpr double calculate_overall_percent (
         int64 total_file_count, int64 completed_file, int64 total_size, int64 completed_size) {
         int overall_percent = 0;
@@ -242,20 +242,20 @@ namespace {
         overall_percent = q_bound (0, overall_percent, 100);
         return overall_percent / 100.0;
     }
-    
+
     void Sync_status_summary.on_folder_progress_info (ProgressInfo &progress) {
         const int64 completed_size = progress.completed_size ();
         const int64 current_file = progress.current_file ();
         const int64 completed_file = progress.completed_files ();
         const int64 total_size = q_max (completed_size, progress.total_size ());
         const int64 total_file_count = q_max (current_file, progress.total_files ());
-    
+
         set_sync_progress (calculate_overall_percent (total_file_count, completed_file, total_size, completed_size));
-    
+
         if (total_size > 0) {
             const auto completed_size_string = Utility.octets_to_string (completed_size);
             const auto total_size_string = Utility.octets_to_string (total_size);
-    
+
             if (progress.trust_eta ()) {
                 set_sync_status_detail_string (
                     tr ("%1 of %2 · %3 left")
@@ -265,65 +265,65 @@ namespace {
                 set_sync_status_detail_string (tr ("%1 of %2").arg (completed_size_string, total_size_string));
             }
         }
-    
+
         if (total_file_count > 0) {
             set_sync_status_string (tr ("Syncing file %1 of %2").arg (current_file).arg (total_file_count));
         }
     }
-    
+
     void Sync_status_summary.set_syncing (bool value) {
         if (value == _is_syncing) {
             return;
         }
-    
+
         _is_syncing = value;
         emit syncing_changed ();
     }
-    
+
     void Sync_status_summary.set_sync_progress (double value) {
         if (_progress == value) {
             return;
         }
-    
+
         _progress = value;
         emit sync_progress_changed ();
     }
-    
+
     void Sync_status_summary.set_sync_status_string (string &value) {
         if (_sync_status_string == value) {
             return;
         }
-    
+
         _sync_status_string = value;
         emit sync_status_string_changed ();
     }
-    
+
     string Sync_status_summary.sync_status_string () {
         return _sync_status_string;
     }
-    
+
     string Sync_status_summary.sync_status_detail_string () {
         return _sync_status_detail_string;
     }
-    
+
     void Sync_status_summary.set_sync_icon (QUrl &value) {
         if (_sync_icon == value) {
             return;
         }
-    
+
         _sync_icon = value;
         emit sync_icon_changed ();
     }
-    
+
     void Sync_status_summary.set_sync_status_detail_string (string &value) {
         if (_sync_status_detail_string == value) {
             return;
         }
-    
+
         _sync_status_detail_string = value;
         emit sync_status_detail_string_changed ();
     }
-    
+
     void Sync_status_summary.connect_to_folders_progress (Folder.Map &folder_map) {
         for (auto &folder : folder_map) {
             if (folder.account_state () == _account_state.data ()) {
@@ -334,11 +334,11 @@ namespace {
             }
         }
     }
-    
+
     void Sync_status_summary.on_is_connected_changed () {
         set_sync_state_to_connected_state ();
     }
-    
+
     void Sync_status_summary.set_sync_state_to_connected_state () {
         set_syncing (false);
         set_sync_status_detail_string ("");
@@ -350,7 +350,7 @@ namespace {
             set_sync_icon (Theme.instance ().sync_status_ok ());
         }
     }
-    
+
     void Sync_status_summary.set_account_state (AccountStatePtr account_state) {
         if (!reload_needed (account_state.data ())) {
             return;
@@ -362,14 +362,14 @@ namespace {
         _account_state = account_state;
         connect (_account_state.data (), &AccountState.is_connected_changed, this, &Sync_status_summary.on_is_connected_changed);
     }
-    
+
     void Sync_status_summary.init_sync_state () {
         auto sync_state_fallback_needed = true;
         for (auto &folder : FolderMan.instance ().map ()) {
             on_folder_sync_state_changed (folder);
             sync_state_fallback_needed = false;
         }
-    
+
         if (sync_state_fallback_needed) {
             set_sync_state_to_connected_state ();
         }

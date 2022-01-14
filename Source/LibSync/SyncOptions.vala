@@ -28,25 +28,29 @@ public:
 
     /***********************************************************
     Maximum size (in Bytes) a folder can have without asking for confirmation.
-    -1 means infinite */
+    -1 means infinite
+    ***********************************************************/
     int64 _new_big_folder_size_limit = -1;
 
     /***********************************************************
-    If a confirmation should be asked for external storages */
+    If a confirmation should be asked for external storages
+    ***********************************************************/
     bool _confirm_external_storage = false;
 
     /***********************************************************
-    If remotely deleted files are needed to move to trash */
+    If remotely deleted files are needed to move to trash
+    ***********************************************************/
     bool _move_files_to_trash = false;
 
     /***********************************************************
-    Create a virtual file for new files instead of downloading. May not be null */
+    Create a virtual file for new files instead of downloading. May not be null
+    ***********************************************************/
     QSharedPointer<Vfs> _vfs;
 
     /***********************************************************
     The initial un-adjusted chunk size in bytes for chunked uploads, both
     for old and new chunking algorithm, which classifies the item to be chunked
-    
+
     In chunking_nG, when dynamic chunk size adjustments are d
     starting value and is then gradually adjusted within the
     min_chunk_size / max_chunk_size bounds.
@@ -54,11 +58,13 @@ public:
     int64 _initial_chunk_size = 10 * 1000 * 1000; // 10MB
 
     /***********************************************************
-    The minimum chunk size in bytes for chunked uploads */
+    The minimum chunk size in bytes for chunked uploads
+    ***********************************************************/
     int64 _min_chunk_size = 1 * 1000 * 1000; // 1MB
 
     /***********************************************************
-    The maximum chunk size in bytes for chunked uploads */
+    The maximum chunk size in bytes for chunked uploads
+    ***********************************************************/
     int64 _max_chunk_size = 1000 * 1000 * 1000; // 1000MB
 
     /***********************************************************
@@ -69,7 +75,8 @@ public:
     std.chrono.milliseconds _target_chunk_upload_duration = std.chrono.minutes (1);
 
     /***********************************************************
-    The maximum number of active jobs in parallel  */
+    The maximum number of active jobs in parallel
+    ***********************************************************/
     int _parallel_network_jobs = 6;
 
     /***********************************************************

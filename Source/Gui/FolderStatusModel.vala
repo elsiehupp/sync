@@ -28,26 +28,26 @@ namespace Occ {
 @ingroup gui
 ***********************************************************/
 class FolderStatusModel : QAbstractItemModel {
-public:
-    enum {File_id_role = Qt.User_role+1};
 
-    FolderStatusModel (GLib.Object *parent = nullptr);
-    ~FolderStatusModel () override;
-    void set_account_state (AccountState *account_state);
+    public enum {File_id_role = Qt.User_role+1};
 
-    Qt.Item_flags flags (QModelIndex &) const override;
-    QVariant data (QModelIndex &index, int role) const override;
-    bool set_data (QModelIndex &index, QVariant &value, int role = Qt.Edit_role) override;
-    int column_count (QModelIndex &parent = QModelIndex ()) const override;
-    int row_count (QModelIndex &parent = QModelIndex ()) const override;
-    QModelIndex index (int row, int column = 0, QModelIndex &parent = QModelIndex ()) const override;
-    QModelIndex parent (QModelIndex &child) const override;
-    bool can_fetch_more (QModelIndex &parent) const override;
-    void fetch_more (QModelIndex &parent) override;
-    void reset_and_fetch (QModelIndex &parent);
-    bool has_children (QModelIndex &parent = QModelIndex ()) const override;
+    public FolderStatusModel (GLib.Object *parent = nullptr);
+    public ~FolderStatusModel () override;
+    public void set_account_state (AccountState *account_state);
 
-    struct SubFolderInfo {
+    public Qt.Item_flags flags (QModelIndex &) const override;
+    public QVariant data (QModelIndex &index, int role) const override;
+    public bool set_data (QModelIndex &index, QVariant &value, int role = Qt.Edit_role) override;
+    public int column_count (QModelIndex &parent = QModelIndex ()) const override;
+    public int row_count (QModelIndex &parent = QModelIndex ()) const override;
+    public QModelIndex index (int row, int column = 0, QModelIndex &parent = QModelIndex ()) const override;
+    public QModelIndex parent (QModelIndex &child) const override;
+    public bool can_fetch_more (QModelIndex &parent) const override;
+    public void fetch_more (QModelIndex &parent) override;
+    public void reset_and_fetch (QModelIndex &parent);
+    public bool has_children (QModelIndex &parent = QModelIndex ()) const override;
+
+    public struct SubFolderInfo {
         Folder *_folder = nullptr;
         string _name; // Folder name to be displayed in the UI
         string _path; // Sub-folder path that should always point to a local filesystem's folder
@@ -75,7 +75,8 @@ public:
         // Reset all subfolders and fetch status
         void reset_subs (FolderStatusModel *model, QModelIndex index);
 
-        struct Progress { {ool is_null () const
+        struct Progress {
+            bool is_null () const
             {
                 return _progress_string.is_empty () && _warning_count == 0 && _overall_sync_string.is_empty ();
             }
@@ -87,23 +88,27 @@ public:
         Progress _progress;
     };
 
-    QVector<SubFolderInfo> _folders;
+    public QVector<SubFolderInfo> _folders;
 
-    enum ItemType { RootFolder,
+    public enum ItemType {
+        RootFolder,
         SubFolder,
         AddButton,
-        Fetch_label };
-    ItemType classify (QModelIndex &index) const;
-    SubFolderInfo *info_for_index (QModelIndex &index) const;
-    bool is_any_ancestor_encrypted (QModelIndex &index) const;
+        Fetch_label
+    };
+    public ItemType classify (QModelIndex &index) const;
+    public SubFolderInfo *info_for_index (QModelIndex &index) const;
+    public bool is_any_ancestor_encrypted (QModelIndex &index) const;
     // If the selective sync check boxes were changed
-    bool is_dirty () { return _dirty; }
+    public bool is_dirty () {
+        return _dirty;
+    }
 
     /***********************************************************
     return a QModelIndex for the given path within the given folder.
     Note : this method returns an invalid index if the path was not fetched from the server before
     ***********************************************************/
-    QModelIndex index_for_path (Folder *f, string &path) const;
+    public QModelIndex index_for_path (Folder *f, string &path) const;
 
 public slots:
     void slot_update_folder_state (Folder *);
@@ -136,7 +141,7 @@ private:
 
     /***********************************************************
     Keeps track of items that are fetching data from the server.
-    
+
     See slot_show_pending_fetch_progress ()
     ***********************************************************/
     QMap<QPersistent_model_index, QElapsedTimer> _fetching_items;
@@ -903,7 +908,9 @@ void FolderStatusModel.slot_update_directories (QStringList &list) {
     }
     /* Try to remove the the undecided lists the items that are not on the server. */
     auto it = std.remove_if (selective_sync_undecided_list.begin (), selective_sync_undecided_list.end (),
-        [&] (string &s) { return selective_sync_undecided_set.count (s); });
+        [&] (string &s) {
+            return selective_sync_undecided_set.count (s);
+        });
     if (it != selective_sync_undecided_list.end ()) {
         selective_sync_undecided_list.erase (it, selective_sync_undecided_list.end ());
         parent_info._folder.journal_db ().set_selective_sync_list (

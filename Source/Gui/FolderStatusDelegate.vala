@@ -30,10 +30,10 @@ inline static QFont make_alias_font (QFont &normal_font) {
 @ingroup gui
 ***********************************************************/
 class FolderStatusDelegate : QStyled_item_delegate {
-public:
-    FolderStatusDelegate ();
 
-    enum datarole {
+    public FolderStatusDelegate ();
+
+    public enum datarole {
         FolderAliasRole = Qt.User_role + 100,
         Header_role,
         FolderPathRole, // for a SubFolder it's the complete path
@@ -57,18 +57,18 @@ public:
         Data_role_count
 
     };
-    void paint (QPainter *, QStyleOptionViewItem &, QModelIndex &) const override;
-    QSize size_hint (QStyleOptionViewItem &, QModelIndex &) const override;
-    bool editor_event (QEvent *event, QAbstractItemModel *model, QStyleOptionViewItem &option,
+    public void paint (QPainter *, QStyleOptionViewItem &, QModelIndex &) const override;
+    public QSize size_hint (QStyleOptionViewItem &, QModelIndex &) const override;
+    public bool editor_event (QEvent *event, QAbstractItemModel *model, QStyleOptionViewItem &option,
         const QModelIndex &index) override;
 
     /***********************************************************
     return the position of the option button within the item
     ***********************************************************/
-    static QRect options_button_rect (QRect within, Qt.Layout_direction direction);
-    static QRect add_button_rect (QRect within, Qt.Layout_direction direction);
-    static QRect errors_list_rect (QRect within);
-    static int root_folder_height_without_errors (QFontMetrics &fm, QFontMetrics &alias_fm);
+    public static QRect options_button_rect (QRect within, Qt.Layout_direction direction);
+    public static QRect add_button_rect (QRect within, Qt.Layout_direction direction);
+    public static QRect errors_list_rect (QRect within);
+    public static int root_folder_height_without_errors (QFontMetrics &fm, QFontMetrics &alias_fm);
 
 public slots:
     void slot_style_changed ();

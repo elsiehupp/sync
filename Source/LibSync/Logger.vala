@@ -56,26 +56,30 @@ public:
 
     void set_log_flush (bool flush);
 
-    bool log_debug () { return _log_debug; }
+    bool log_debug () {
+        return _log_debug;
+    }
     void set_log_debug (bool debug);
 
     /***********************************************************
-    Returns where the automatic logdir would be */
+    Returns where the automatic logdir would be
+    ***********************************************************/
     string temporary_folder_log_dir_path ();
 
     /***********************************************************
     Sets up default dir log setup.
 
-    logdir : a temporary folder
-    logexpire : 4 hours
-    logdebug : true
-    
+    logdir: a temporary folder
+    logexpire: 4 hours
+    logdebug: true
+
     Used in conjunction with ConfigFile.automatic_log_dir
     ***********************************************************/
     void setup_temporary_folder_log_dir ();
 
     /***********************************************************
-    For switching off via logwindow */
+    For switching off via logwindow
+    ***********************************************************/
     void disable_temporary_folder_log_dir ();
 
     void add_log_rule (QSet<string> &rules) {
@@ -156,7 +160,8 @@ bool Logger.is_logging_to_file () {
     return _logstream;
 }
 
-void Logger.do_log (Qt_msg_type type, QMessage_log_context &ctx, string &message) { {onst string msg = q_format_log_message (type, ctx, message);
+void Logger.do_log (Qt_msg_type type, QMessage_log_context &ctx, string &message) {
+    const string msg = q_format_log_message (type, ctx, message);
     {
         QMutexLocker lock (&_mutex);
         _crash_log_index = (_crash_log_index + 1) % Crash_log_size;

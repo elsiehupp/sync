@@ -94,20 +94,38 @@ public:
     int64 current_download_position ();
 
     string error_string () const override;
-    void set_error_string (string &s) { _error_string = s; }
+    void set_error_string (string &s) {
+        _error_string = s;
+    }
 
-    SyncFileItem.Status error_status () { return _error_status; }
-    void set_error_status (SyncFileItem.Status &s) { _error_status = s; }
+    SyncFileItem.Status error_status () {
+        return _error_status;
+    }
+    void set_error_status (SyncFileItem.Status &s) {
+        _error_status = s;
+    }
 
     void on_timed_out () override;
 
-    QByteArray &etag () { return _etag; }
-    int64 resume_start () { return _resume_start; }
-    time_t last_modified () { return _last_modified; }
+    QByteArray &etag () {
+        return _etag;
+    }
+    int64 resume_start () {
+        return _resume_start;
+    }
+    time_t last_modified () {
+        return _last_modified;
+    }
 
-    int64 content_length () { return _content_length; }
-    int64 expected_content_length () { return _expected_content_length; }
-    void set_expected_content_length (int64 size) { _expected_content_length = size; }
+    int64 content_length () {
+        return _content_length;
+    }
+    int64 expected_content_length () {
+        return _expected_content_length;
+    }
+    void set_expected_content_length (int64 size) {
+        _expected_content_length = size;
+    }
 
 protected:
     virtual int64 write_to_device (QByteArray &data);
@@ -196,12 +214,14 @@ public:
     int64 committed_disk_space () const override;
 
     // We think it might finish quickly because it is a small file.
-    bool is_likely_finished_quickly () override { return _item._size < propagator ().small_file_size (); }
+    bool is_likely_finished_quickly () override {
+        return _item._size < propagator ().small_file_size ();
+    }
 
     /***********************************************************
     Whether an existing folder with the same name may be deleted before
     the download.
-    
+
     If it's a non-empty folder, it'll be renamed to a confl
     to preserve any non-synced content that may be inside.
 

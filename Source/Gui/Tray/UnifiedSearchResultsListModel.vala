@@ -142,10 +142,10 @@ namespace {
         } else if (provider_id.contains (QStringLiteral ("comment"), Qt.CaseInsensitive)) {
             return QStringLiteral ("qrc:///client/theme/black/comment.svg");
         }
-    
+
         return QStringLiteral ("qrc:///client/theme/change.svg");
     }
-    
+
     string local_icon_path_from_icon_prefix (string &icon_name_with_prefix) {
         if (icon_name_with_prefix.contains (QStringLiteral ("message"), Qt.CaseInsensitive)
             || icon_name_with_prefix.contains (QStringLiteral ("talk"), Qt.CaseInsensitive)) {
@@ -161,48 +161,48 @@ namespace {
         } else if (icon_name_with_prefix.contains (QStringLiteral ("mail"), Qt.CaseInsensitive)) {
             return QStringLiteral (":/client/theme/black/email.svg");
         }
-    
+
         return QStringLiteral (":/client/theme/change.svg");
     }
-    
+
     string icon_url_for_default_icon_name (string &default_icon_name) {
         const QUrl url_for_icon{default_icon_name};
-    
+
         if (url_for_icon.is_valid () && !url_for_icon.scheme ().is_empty ()) {
             return default_icon_name;
         }
-    
+
         if (default_icon_name.starts_with (QStringLiteral ("icon-"))) {
             const auto parts = default_icon_name.split (QLatin1Char ('-'));
-    
+
             if (parts.size () > 1) {
                 const string icon_file_path = QStringLiteral (":/client/theme/") + parts[1] + QStringLiteral (".svg");
-    
+
                 if (QFile.exists (icon_file_path)) {
                     return icon_file_path;
                 }
-    
+
                 const string black_icon_file_path = QStringLiteral (":/client/theme/black/") + parts[1] + QStringLiteral (".svg");
-    
+
                 if (QFile.exists (black_icon_file_path)) {
                     return black_icon_file_path;
                 }
             }
-    
+
             const auto icon_name_from_icon_prefix = local_icon_path_from_icon_prefix (default_icon_name);
-    
+
             if (!icon_name_from_icon_prefix.is_empty ()) {
                 return icon_name_from_icon_prefix;
             }
         }
-    
+
         return QStringLiteral (":/client/theme/change.svg");
     }
-    
+
     string generate_url_for_thumbnail (string &thumbnail_url, QUrl &server_url) {
         auto server_url_copy = server_url;
         auto thumbnail_url_copy = thumbnail_url;
-    
+
         if (thumbnail_url_copy.starts_with (QLatin1Char ('/')) || thumbnail_url_copy.starts_with (QLatin1Char ('\\'))) {
             // relative image resource URL, just needs some concatenation with current server URL
             // some icons may contain parameters after (?)
@@ -216,15 +216,15 @@ namespace {
                 thumbnail_url_copy += QLatin1Char ('?') + thumbnail_url_copy_splitted[1];
             }
         }
-    
+
         return thumbnail_url_copy;
     }
-    
+
     string generate_url_for_icon (string &fallack_icon, QUrl &server_url) {
         auto server_url_copy = server_url;
-    
+
         auto fallack_icon_copy = fallack_icon;
-    
+
         if (fallack_icon_copy.starts_with (QLatin1Char ('/')) || fallack_icon_copy.starts_with (QLatin1Char ('\\'))) {
             // relative image resource URL, just needs some concatenation with current server URL
             // some icons may contain parameters after (?)
@@ -243,37 +243,37 @@ namespace {
                 fallack_icon_copy = default_icon_url;
             }
         }
-    
+
         return fallack_icon_copy;
     }
-    
+
     string icons_from_thumbnail_and_fallback_icon (string &thumbnail_url, string &fallack_icon, QUrl &server_url) {
         if (thumbnail_url.is_empty () && fallack_icon.is_empty ()) {
             return {};
         }
-    
+
         if (server_url.is_empty ()) {
             const QStringList list_images = {thumbnail_url, fallack_icon};
             return list_images.join (QLatin1Char (';'));
         }
-    
+
         const auto url_for_thumbnail = generate_url_for_thumbnail (thumbnail_url, server_url);
         const auto url_for_fallack_icon = generate_url_for_icon (fallack_icon, server_url);
-    
+
         if (url_for_thumbnail.is_empty () && !url_for_fallack_icon.is_empty ()) {
             return url_for_fallack_icon;
         }
-    
+
         if (!url_for_thumbnail.is_empty () && url_for_fallack_icon.is_empty ()) {
             return url_for_thumbnail;
         }
-    
+
         const QStringList list_images{url_for_thumbnail, url_for_fallack_icon};
         return list_images.join (QLatin1Char (';'));
     }
-    
+
     constexpr int search_term_editing_finished_search_start_delay = 800;
-    
+
     // server-side bug of returning the cursor > 0 and is_paginated == 'true', using '5' as it is done on Android client's end now
     constexpr int minimum_entres_number_to_show_load_more = 5;
 
@@ -281,10 +281,10 @@ namespace {
         : QAbstractListModel (parent)
         , _account_state (account_state) {
     }
-    
+
     QVariant Unified_search_results_list_model.data (QModelIndex &index, int role) {
         Q_ASSERT (check_index (index, QAbstractItemModel.Check_index_option.Index_is_valid));
-    
+
         switch (role) {
         case Provider_name_role:
             return _results.at (index.row ())._provider_name;
@@ -307,18 +307,18 @@ namespace {
         case Type_as_string_role:
             return Unified_search_result.type_as_string (_results.at (index.row ())._type);
         }
-    
+
         return {};
     }
-    
+
     int Unified_search_results_list_model.row_count (QModelIndex &parent) {
         if (parent.is_valid ()) {
             return 0;
         }
-    
+
         return _results.size ();
     }
-    
+
     QHash<int, QByteArray> Unified_search_results_list_model.role_names () {
         auto roles = QAbstractListModel.role_names ();
         roles[Provider_name_role] = "provider_name";
@@ -333,76 +333,76 @@ namespace {
         roles[Rounded_role] = "is_rounded";
         return roles;
     }
-    
+
     string Unified_search_results_list_model.search_term () {
         return _search_term;
     }
-    
+
     string Unified_search_results_list_model.error_string () {
         return _error_string;
     }
-    
+
     string Unified_search_results_list_model.current_fetch_more_in_progress_provider_id () {
         return _current_fetch_more_in_progress_provider_id;
     }
-    
+
     void Unified_search_results_list_model.set_search_term (string &term) {
         if (term == _search_term) {
             return;
         }
-    
+
         _search_term = term;
         emit search_term_changed ();
-    
+
         if (!_error_string.is_empty ()) {
             _error_string.clear ();
             emit error_string_changed ();
         }
-    
+
         disconnect_and_clear_search_jobs ();
-    
+
         clear_current_fetch_more_in_progress_provider_id ();
-    
+
         disconnect (&_unified_search_text_editing_finished_timer, &QTimer.timeout, this,
             &Unified_search_results_list_model.slot_search_term_editing_finished);
-    
+
         if (_unified_search_text_editing_finished_timer.is_active ()) {
             _unified_search_text_editing_finished_timer.stop ();
         }
-    
+
         if (!_search_term.is_empty ()) {
             _unified_search_text_editing_finished_timer.set_interval (search_term_editing_finished_search_start_delay);
             connect (&_unified_search_text_editing_finished_timer, &QTimer.timeout, this,
                 &Unified_search_results_list_model.slot_search_term_editing_finished);
             _unified_search_text_editing_finished_timer.start ();
         }
-    
+
         if (!_results.is_empty ()) {
             begin_reset_model ();
             _results.clear ();
             end_reset_model ();
         }
     }
-    
+
     bool Unified_search_results_list_model.is_search_in_progress () {
         return !_search_job_connections.is_empty ();
     }
-    
+
     void Unified_search_results_list_model.result_clicked (string &provider_id, QUrl &resource_url) {
         const QUrlQuery url_query{resource_url};
         const auto dir = url_query.query_item_value (QStringLiteral ("dir"), QUrl.Component_formatting_option.Fully_decoded);
         const auto file_name =
             url_query.query_item_value (QStringLiteral ("scrollto"), QUrl.Component_formatting_option.Fully_decoded);
-    
+
         if (provider_id.contains (QStringLiteral ("file"), Qt.CaseInsensitive) && !dir.is_empty () && !file_name.is_empty ()) {
             if (!_account_state || !_account_state.account ()) {
                 return;
             }
-    
+
             const string relative_path = dir + QLatin1Char ('/') + file_name;
             const auto local_files =
                 FolderMan.instance ().find_file_in_local_folders (QFileInfo (relative_path).path (), _account_state.account ());
-    
+
             if (!local_files.is_empty ()) {
                 q_c_info (lc_unified_search) << "Opening file:" << local_files.const_first ();
                 QDesktopServices.open_url (QUrl.from_local_file (local_files.const_first ()));
@@ -411,14 +411,14 @@ namespace {
         }
         Utility.open_browser (resource_url);
     }
-    
+
     void Unified_search_results_list_model.fetch_more_trigger_clicked (string &provider_id) {
         if (is_search_in_progress () || !_current_fetch_more_in_progress_provider_id.is_empty ()) {
             return;
         }
-    
+
         const auto provider_info = _providers.value (provider_id, {});
-    
+
         if (!provider_info._id.is_empty () && provider_info._id == provider_id && provider_info._is_paginated) {
             // Load more items
             _current_fetch_more_in_progress_provider_id = provider_id;
@@ -426,16 +426,16 @@ namespace {
             start_search_for_provider (provider_id, provider_info._cursor);
         }
     }
-    
+
     void Unified_search_results_list_model.slot_search_term_editing_finished () {
         disconnect (&_unified_search_text_editing_finished_timer, &QTimer.timeout, this,
             &Unified_search_results_list_model.slot_search_term_editing_finished);
-    
+
         if (!_account_state || !_account_state.account ()) {
             q_c_critical (lc_unified_search) << string ("Account state is invalid. Could not start search!");
             return;
         }
-    
+
         if (_providers.is_empty ()) {
             auto job = new JsonApiJob (_account_state.account (), QLatin1String ("ocs/v2.php/search/providers"));
             GLib.Object.connect (job, &JsonApiJob.json_received, this, &Unified_search_results_list_model.slot_fetch_providers_finished);
@@ -444,17 +444,17 @@ namespace {
             start_search ();
         }
     }
-    
+
     void Unified_search_results_list_model.slot_fetch_providers_finished (QJsonDocument &json, int status_code) {
         const auto job = qobject_cast<JsonApiJob> (sender ());
-    
+
         if (!job) {
             q_c_critical (lc_unified_search) << string ("Failed to fetch providers.").arg (_search_term);
             _error_string += tr ("Failed to fetch providers.") + QLatin1Char ('\n');
             emit error_string_changed ();
             return;
         }
-    
+
         if (status_code != 200) {
             q_c_critical (lc_unified_search) << string ("%1 : Failed to fetch search providers for '%2'. Error : %3")
                                                .arg (status_code)
@@ -468,7 +468,7 @@ namespace {
         }
         const auto provider_list =
             json.object ().value (QStringLiteral ("ocs")).to_object ().value (QStringLiteral ("data")).to_variant ().to_list ();
-    
+
         for (auto &provider : provider_list) {
             const auto provider_map = provider.to_map ();
             const auto id = provider_map[QStringLiteral ("id")].to_string ();
@@ -481,42 +481,42 @@ namespace {
                 _providers.insert (new_provider._id, new_provider);
             }
         }
-    
+
         if (!_providers.empty ()) {
             start_search ();
         }
     }
-    
+
     void Unified_search_results_list_model.slot_search_for_provider_finished (QJsonDocument &json, int status_code) {
         Q_ASSERT (_account_state && _account_state.account ());
-    
+
         const auto job = qobject_cast<JsonApiJob> (sender ());
-    
+
         if (!job) {
             q_c_critical (lc_unified_search) << string ("Search has failed for '%2'.").arg (_search_term);
             _error_string += tr ("Search has failed for '%2'.").arg (_search_term) + QLatin1Char ('\n');
             emit error_string_changed ();
             return;
         }
-    
+
         const auto provider_id = job.property ("provider_id").to_string ();
-    
+
         if (provider_id.is_empty ()) {
             return;
         }
-    
+
         if (!_search_job_connections.is_empty ()) {
             _search_job_connections.remove (provider_id);
-    
+
             if (_search_job_connections.is_empty ()) {
                 emit is_search_in_progress_changed ();
             }
         }
-    
+
         if (provider_id == _current_fetch_more_in_progress_provider_id) {
             clear_current_fetch_more_in_progress_provider_id ();
         }
-    
+
         if (status_code != 200) {
             q_c_critical (lc_unified_search) << string ("%1 : Search has failed for '%2'. Error : %3")
                                                .arg (status_code)
@@ -527,43 +527,43 @@ namespace {
             emit error_string_changed ();
             return;
         }
-    
+
         const auto data = json.object ().value (QStringLiteral ("ocs")).to_object ().value (QStringLiteral ("data")).to_object ();
         if (!data.is_empty ()) {
             parse_results_for_provider (data, provider_id, job.property ("append_results").to_bool ());
         }
     }
-    
+
     void Unified_search_results_list_model.start_search () {
         Q_ASSERT (_account_state && _account_state.account ());
-    
+
         disconnect_and_clear_search_jobs ();
-    
+
         if (!_account_state || !_account_state.account ()) {
             return;
         }
-    
+
         if (!_results.is_empty ()) {
             begin_reset_model ();
             _results.clear ();
             end_reset_model ();
         }
-    
+
         for (auto &provider : _providers) {
             start_search_for_provider (provider._id);
         }
     }
-    
+
     void Unified_search_results_list_model.start_search_for_provider (string &provider_id, int32 cursor) {
         Q_ASSERT (_account_state && _account_state.account ());
-    
+
         if (!_account_state || !_account_state.account ()) {
             return;
         }
-    
+
         auto job = new JsonApiJob (_account_state.account (),
             QLatin1String ("ocs/v2.php/search/providers/%1/search").arg (provider_id));
-    
+
         QUrlQuery params;
         params.add_query_item (QStringLiteral ("term"), _search_term);
         if (cursor > 0) {
@@ -581,47 +581,47 @@ namespace {
         }
         job.start ();
     }
-    
+
     void Unified_search_results_list_model.parse_results_for_provider (QJsonObject &data, string &provider_id, bool fetched_more) {
         const auto cursor = data.value (QStringLiteral ("cursor")).to_int ();
         const auto entries = data.value (QStringLiteral ("entries")).to_variant ().to_list ();
-    
+
         auto &provider = _providers[provider_id];
-    
+
         if (provider._id.is_empty () && fetched_more) {
             _providers.remove (provider_id);
             return;
         }
-    
+
         if (entries.is_empty ()) {
             // we may have received false pagination information from the server, such as, we expect more
             // results available via pagination, but, there are no more left, so, we need to stop paginating for
             // this provider
             provider._is_paginated = false;
-    
+
             if (fetched_more) {
                 remove_fetch_more_trigger (provider._id);
             }
-    
+
             return;
         }
-    
+
         provider._is_paginated = data.value (QStringLiteral ("is_paginated")).to_bool ();
         provider._cursor = cursor;
-    
+
         if (provider._page_size == -1) {
             provider._page_size = cursor;
         }
-    
+
         if ( (provider._page_size != -1 && entries.size () < provider._page_size)
             || entries.size () < minimum_entres_number_to_show_load_more) {
             // for some providers we are still getting a non-null cursor and is_paginated true even thought
             // there are no more results to paginate
             provider._is_paginated = false;
         }
-    
+
         QVector<Unified_search_result> new_entries;
-    
+
         const auto make_resource_url = [] (string &resource_url, QUrl &account_url) {
             QUrl final_resurce_url (resource_url);
             if (final_resurce_url.scheme ().is_empty () && account_url.scheme ().is_empty ()) {
@@ -630,7 +630,7 @@ namespace {
             }
             return final_resurce_url;
         };
-    
+
         for (auto &entry : entries) {
             const auto entry_map = entry.to_map ();
             if (entry_map.is_empty ()) {
@@ -643,24 +643,24 @@ namespace {
             result._is_rounded = entry_map.value (QStringLiteral ("rounded")).to_bool ();
             result._title = entry_map.value (QStringLiteral ("title")).to_string ();
             result._subline = entry_map.value (QStringLiteral ("subline")).to_string ();
-    
+
             const auto resource_url = entry_map.value (QStringLiteral ("resource_url")).to_string ();
             const auto account_url = (_account_state && _account_state.account ()) ? _account_state.account ().url () : QUrl ();
-    
+
             result._resource_url = make_resource_url (resource_url, account_url);
             result._icons = icons_from_thumbnail_and_fallback_icon (entry_map.value (QStringLiteral ("thumbnail_url")).to_string (),
                 entry_map.value (QStringLiteral ("icon")).to_string (), account_url);
-    
+
             new_entries.push_back (result);
         }
-    
+
         if (fetched_more) {
             append_results_to_provider (new_entries, provider);
         } else {
             append_results (new_entries, provider);
         }
     }
-    
+
     void Unified_search_results_list_model.append_results (QVector<Unified_search_result> results, Unified_search_provider &provider) {
         if (provider._cursor > 0 && provider._is_paginated) {
             Unified_search_result fetch_more_trigger;
@@ -670,14 +670,14 @@ namespace {
             fetch_more_trigger._type = Unified_search_result.Type.Fetch_more_trigger;
             results.push_back (fetch_more_trigger);
         }
-    
+
         if (_results.is_empty ()) {
             begin_insert_rows ({}, 0, results.size () - 1);
             _results = results;
             end_insert_rows ();
             return;
         }
-    
+
         // insertion is done with sorting (first . by order, then . by name)
         const auto it_to_insert_to = std.find_if (std.begin (_results), std.end (_results),
             [&provider] (Unified_search_result &current) {
@@ -689,24 +689,24 @@ namespace {
                         // insert before results of higher string value when possible
                         return current._provider_name > provider._name;
                     }
-    
+
                     return false;
                 }
             });
-    
+
         const auto first = static_cast<int> (std.distance (std.begin (_results), it_to_insert_to));
         const auto last = first + results.size () - 1;
-    
+
         begin_insert_rows ({}, first, last);
         std.copy (std.begin (results), std.end (results), std.inserter (_results, it_to_insert_to));
         end_insert_rows ();
     }
-    
+
     void Unified_search_results_list_model.append_results_to_provider (QVector<Unified_search_result> &results, Unified_search_provider &provider) {
         if (results.is_empty ()) {
             return;
         }
-    
+
         const auto provider_id = provider._id;
         /* we need to find the last result that is not a fetch-more-trigger or category-separator for the current
            provider */
@@ -714,7 +714,7 @@ namespace {
             std.find_if (std.rbegin (_results), std.rend (_results), [&provider_id] (Unified_search_result &result) {
                 return result._provider_id == provider_id && result._type == Unified_search_result.Type.Default;
             });
-    
+
         if (it_last_result_for_provider_reverse != std.rend (_results)) {
             // #1 Insert rows
             // convert reverse_iterator to iterator
@@ -724,14 +724,14 @@ namespace {
             begin_insert_rows ({}, first, last);
             std.copy (std.begin (results), std.end (results), std.inserter (_results, it_last_result_for_provider + 1));
             end_insert_rows ();
-    
+
             // #2 Remove the Fetch_more_trigger item if there are no more results to load for this provider
             if (!provider._is_paginated) {
                 remove_fetch_more_trigger (provider_id);
             }
         }
     }
-    
+
     void Unified_search_results_list_model.remove_fetch_more_trigger (string &provider_id) {
         const auto it_fetch_more_trigger_for_provider_reverse = std.find_if (
             std.rbegin (_results),
@@ -739,11 +739,11 @@ namespace {
             [provider_id] (Unified_search_result &result) {
                 return result._provider_id == provider_id && result._type == Unified_search_result.Type.Fetch_more_trigger;
             });
-    
+
         if (it_fetch_more_trigger_for_provider_reverse != std.rend (_results)) {
             // convert reverse_iterator to iterator
             const auto it_fetch_more_trigger_for_provider = (it_fetch_more_trigger_for_provider_reverse + 1).base ();
-    
+
             if (it_fetch_more_trigger_for_provider != std.end (_results)
                 && it_fetch_more_trigger_for_provider != std.begin (_results)) {
                 const auto erase_index = static_cast<int> (std.distance (std.begin (_results), it_fetch_more_trigger_for_provider));
@@ -754,26 +754,26 @@ namespace {
             }
         }
     }
-    
+
     void Unified_search_results_list_model.disconnect_and_clear_search_jobs () {
         for (auto &connection : _search_job_connections) {
             if (connection) {
                 GLib.Object.disconnect (connection);
             }
         }
-    
+
         if (!_search_job_connections.is_empty ()) {
             _search_job_connections.clear ();
             emit is_search_in_progress_changed ();
         }
     }
-    
+
     void Unified_search_results_list_model.clear_current_fetch_more_in_progress_provider_id () {
         if (!_current_fetch_more_in_progress_provider_id.is_empty ()) {
             _current_fetch_more_in_progress_provider_id.clear ();
             emit current_fetch_more_in_progress_provider_id_changed ();
         }
     }
-    
+
     }
     

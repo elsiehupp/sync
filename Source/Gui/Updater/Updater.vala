@@ -48,14 +48,14 @@ private:
 
 
     Updater *Updater._instance = nullptr;
-    
+
     Updater *Updater.instance () {
         if (!_instance) {
             _instance = create ();
         }
         return _instance;
     }
-    
+
     QUrl Updater.update_url () {
         QUrl update_base_url (string.from_local8Bit (qgetenv ("OCC_UPDATE_URL")));
         if (update_base_url.is_empty ()) {
@@ -64,14 +64,14 @@ private:
         if (!update_base_url.is_valid () || update_base_url.host () == ".") {
             return QUrl ();
         }
-    
+
         auto url_query = get_query_params ();
-    
+
         update_base_url.set_query (url_query);
-    
+
         return update_base_url;
     }
-    
+
     QUrlQuery Updater.get_query_params () {
         QUrlQuery query;
         Theme *theme = Theme.instance ();
@@ -85,7 +85,7 @@ private:
         } else if (Utility.is_mac ()) {
             platform = QStringLiteral ("macos");
         }
-    
+
         string sys_info = get_system_info ();
         if (!sys_info.is_empty ()) {
             query.add_query_item (QStringLiteral ("client"), sys_info);
@@ -98,39 +98,41 @@ private:
         query.add_query_item (QStringLiteral ("oem"), theme.app_name ());
         query.add_query_item (QStringLiteral ("build_arch"), QSysInfo.build_cpu_architecture ());
         query.add_query_item (QStringLiteral ("current_arch"), QSysInfo.current_cpu_architecture ());
-    
+
         string suffix = QStringLiteral (MIRALL_STRINGIFY (MIRALL_VERSION_SUFFIX));
         query.add_query_item (QStringLiteral ("versionsuffix"), suffix);
-    
+
         auto channel = ConfigFile ().update_channel ();
         if (channel != QLatin1String ("stable")) {
             query.add_query_item (QStringLiteral ("channel"), channel);
         }
-    
+
         // update_segment (see configfile.h)
         ConfigFile cfg;
         auto update_segment = cfg.update_segment ();
         query.add_query_item (QLatin1String ("updatesegment"), string.number (update_segment));
-    
+
         return query;
     }
-    
+
     string Updater.get_system_info () {
     #ifdef Q_OS_LINUX
         QProcess process;
-        process.start (QLatin1String ("lsb_release"), { QStringLiteral ("-a") });
+        process.start (QLatin1String ("lsb_release"), {
+            QStringLiteral ("-a")
+        });
         process.wait_for_finished ();
         QByteArray output = process.read_all_standard_output ();
         q_c_debug (lc_updater) << "Sys Info size : " << output.length ();
         if (output.length () > 1024)
             output.clear (); // don't send too much.
-    
+
         return string.from_local8Bit (output.to_base64 ());
     #else
         return string ();
     #endif
     }
-    
+
     // To test, cmake with -DAPPLICATION_UPDATE_URL="http://127.0.0.1:8080/test.rss"
     Updater *Updater.create () {
         auto url = update_url ();
@@ -142,16 +144,16 @@ private:
         // the best we can do is notify about updates
         return new Passive_update_notifier (url);
     }
-    
+
     int64 Updater.Helper.version_to_int (int64 major, int64 minor, int64 patch, int64 build) {
         return major << 56 | minor << 48 | patch << 40 | build;
     }
-    
+
     int64 Updater.Helper.current_version_to_int () {
         return version_to_int (MIRALL_VERSION_MAJOR, MIRALL_VERSION_MINOR,
             MIRALL_VERSION_PATCH, MIRALL_VERSION_BUILD);
     }
-    
+
     int64 Updater.Helper.string_version_to_int (string &version) {
         if (version.is_empty ())
             return 0;
@@ -160,10 +162,10 @@ private:
         sscanf (ba_version, "%d.%d.%d.%d", &major, &minor, &patch, &build);
         return version_to_int (major, minor, patch, build);
     }
-    
+
     string Updater.client_version () {
         return string.from_latin1 (MIRALL_STRINGIFY (MIRALL_VERSION_FULL));
     }
-    
+
     } // namespace Occ
     

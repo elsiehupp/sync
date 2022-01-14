@@ -84,7 +84,8 @@ public:
 
     void start ();
     /***********************************************************
-    Start up to nb_jobs, return the number of job started; emit finished () when done */
+    Start up to nb_jobs, return the number of job started; emit finished () when done
+    ***********************************************************/
     int process_sub_jobs (int nb_jobs);
 
     void set_inside_encrypted_tree (bool is_inside_encrypted_tree) {
@@ -108,12 +109,12 @@ private:
     /***********************************************************
     Structure representing a path during discovery. A same path may have different value locally
     or on the server in case of renames.
-    
+
     These strings never start or ends with slashes. They are all relative to the fo
     Usually they are all the same and are even shared instance of the s
-    
+
     _server and _local path
-      remote renamed A/ to 
+      remote renamed A/ to
         target :   B/Y/file
         original : A/X/file
         local :    A/Y/file
@@ -162,7 +163,7 @@ private:
 
     Can be a file or a directory.
     Usually ends up emitting item_discovered () or creating a subdirectory job.
-    
+
     This main function delegates some work to the process_file* functions.
     ***********************************************************/
     void process_file (Path_tuple, Local_info &, Remote_info &, SyncJournalFileRecord &);
@@ -205,7 +206,8 @@ private:
     void sub_job_finished ();
 
     /***********************************************************
-    An DB operation failed */
+    An DB operation failed
+    ***********************************************************/
     void db_error ();
 
     void add_virtual_file_suffix (string &str) const;
@@ -213,7 +215,8 @@ private:
     void chop_virtual_file_suffix (string &str) const;
 
     /***********************************************************
-    Convenience to detect suffix-vfs modes */
+    Convenience to detect suffix-vfs modes
+    ***********************************************************/
     bool is_vfs_with_suffix ();
 
     /***********************************************************
@@ -225,9 +228,9 @@ private:
 
     /***********************************************************
     Discover the local directory
-      *
-      * Fills _local_normal_query_entries.
-      */
+
+    Fills _local_normal_query_entries.
+    ***********************************************************/
     void start_async_local_query ();
 
     /***********************************************************
@@ -244,7 +247,7 @@ private:
     If the pin state is stored in the database (suffix vfs only right now)
     its effects won't be seen in local_entry._type. Instead the effects
     should materialize in db_entry._type.
-    
+
     This function checks whether the combination of file type and pi
     state suggests a hydration or dehydration action and changes the
     _type field accordingly.
@@ -273,7 +276,7 @@ private:
 
     These "async jobs" have nothing to do with the jobs for subdirectories
     which are being tracked by _queued_jobs and _running_jobs.
-    
+
     They are jobs that need to be completed to finish processing of direct
     entries. This variable is used to ensure this job doesn't finish while
     these jobs are still in flight.
@@ -307,11 +310,11 @@ signals:
         const std.map<string, Entries> &entries, Entries &entry) {
         const auto original_file_name = entry.local_entry.name;
         const auto new_file_name = original_file_name.trimmed ();
-    
+
         if (original_file_name == new_file_name) {
             return true;
         }
-    
+
         const auto entries_iter = entries.find (new_file_name);
         if (entries_iter != entries.end ()) {
             string error_message;
@@ -322,7 +325,7 @@ signals:
             if (new_file_name_entry.local_entry.is_valid ()) {
                 error_message = tr ("File contains trailing spaces and could not be renamed, because a file with the same name already exists locally.");
             }
-    
+
             if (!error_message.is_empty ()) {
                 auto item = SyncFileItemPtr.create ();
                 if (entry.local_entry.is_directory) {
@@ -339,21 +342,21 @@ signals:
                 return false;
             }
         }
-    
+
         entry.local_entry.rename_name = new_file_name;
-    
+
         return true;
     }
-    
+
     void Process_directory_job.start () {
         q_c_info (lc_disco) << "STARTING" << _current_folder._server << _query_server << _current_folder._local << _query_local;
-    
+
         if (_query_server == Normal_query) {
             _server_job = start_async_server_query ();
         } else {
             _server_query_done = true;
         }
-    
+
         // Check whether a normal local query is even necessary
         if (_query_local == Normal_query) {
             if (!_discovery_data._should_discover_localy (_current_folder._local)
@@ -361,21 +364,21 @@ signals:
                 _query_local = Parent_not_changed;
             }
         }
-    
+
         if (_query_local == Normal_query) {
             start_async_local_query ();
         } else {
             _local_query_done = true;
         }
-    
+
         if (_local_query_done && _server_query_done) {
             process ();
         }
     }
-    
+
     void Process_directory_job.process () {
         ASSERT (_local_query_done && _server_query_done);
-    
+
         // Build lookup tables for local, remote and db entries.
         // For suffix-virtual files, the key will normally be the base file name
         // without the suffix.
@@ -387,7 +390,7 @@ signals:
             entries[e.name].server_entry = std.move (e);
         }
         _server_normal_query_entries.clear ();
-    
+
         // fetch all the name from the DB
         auto path_u8 = _current_folder._original.to_utf8 ();
         if (!_discovery_data._statedb.list_files_in_path (path_u8, [&] (SyncJournalFileRecord &rec) {
@@ -401,7 +404,7 @@ signals:
             db_error ();
             return;
         }
-    
+
         for (auto &e : _local_normal_query_entries) {
             entries[e.name].local_entry = e;
         }
@@ -416,7 +419,7 @@ signals:
                     continue;
                 auto &suffixed_entry = entries[e.name];
                 bool has_other_data = suffixed_entry.server_entry.is_valid () || suffixed_entry.db_entry.is_valid ();
-    
+
                 auto nonvirtual_name = e.name;
                 chop_virtual_file_suffix (nonvirtual_name);
                 auto &nonvirtual_entry = entries[nonvirtual_name];
@@ -435,21 +438,21 @@ signals:
             }
         }
         _local_normal_query_entries.clear ();
-    
+
         //
         // Iterate over entries and process them
         //
         for (auto &f : entries) {
             auto &e = f.second;
-    
+
             Path_tuple path;
             path = _current_folder.add_name (e.name_override.is_empty () ? f.first : e.name_override);
-    
+
             if (is_vfs_with_suffix ()) {
                 // Without suffix vfs the paths would be good. But since the db_entry and local_entry
                 // can have different names from f.first when suffix vfs is on, make sure the
                 // corresponding _original and _local paths are right.
-    
+
                 if (e.db_entry.is_valid ()) {
                     path._original = e.db_entry._path;
                 } else if (e.local_entry.is_virtual_file) {
@@ -463,18 +466,18 @@ signals:
                     add_virtual_file_suffix (path._local);
                 }
             }
-    
+
             // On the server the path is mangled in case of E2EE
             if (!e.server_entry.e2e_mangled_name.is_empty ()) {
                 Q_ASSERT (_discovery_data._remote_folder.starts_with ('/'));
                 Q_ASSERT (_discovery_data._remote_folder.ends_with ('/'));
-    
+
                 const auto root_path = _discovery_data._remote_folder.mid (1);
                 Q_ASSERT (e.server_entry.e2e_mangled_name.starts_with (root_path));
-    
+
                 path._server = e.server_entry.e2e_mangled_name.mid (root_path.length ());
             }
-    
+
             // If the filename starts with a . we consider it a hidden file
             // For windows, the hidden state is also discovered within the vio
             // local stat function.
@@ -485,7 +488,7 @@ signals:
                     e.local_entry.is_directory || e.server_entry.is_directory, is_hidden,
                     e.local_entry.is_sym_link || is_server_entry_windows_shortcut))
                 continue;
-    
+
             if (_query_server == In_black_list || _discovery_data.is_in_selective_sync_black_list (path._original)) {
                 process_blacklisted (path, e.local_entry, e.db_entry);
                 continue;
@@ -497,10 +500,10 @@ signals:
         }
         QTimer.single_shot (0, _discovery_data, &Discovery_phase.schedule_more_jobs);
     }
-    
+
     bool Process_directory_job.handle_excluded (string &path, string &local_name, bool is_directory, bool is_hidden, bool is_symlink) {
         auto excluded = _discovery_data._excludes.traversal_pattern_match (path, is_directory ? ItemTypeDirectory : ItemTypeFile);
-    
+
         // FIXME : move to Excluded_files 's regexp ?
         bool is_invalid_pattern = false;
         if (excluded == CSYNC_NOT_EXCLUDED && !_discovery_data._invalid_filename_rx.pattern ().is_empty ()) {
@@ -517,7 +520,7 @@ signals:
             excluded = CSYNC_FILE_EXCLUDE_SERVER_BLACKLISTED;
             is_invalid_pattern = true;
         }
-    
+
         auto local_codec = QText_codec.codec_for_locale ();
         if (local_codec.mib_enum () != 106) {
             // If the locale codec is not UTF-8, we must check that the filename from the server can
@@ -531,21 +534,21 @@ signals:
                 excluded = CSYNC_FILE_EXCLUDE_CANNOT_ENCODE;
             }
         }
-    
+
         if (excluded == CSYNC_NOT_EXCLUDED && !is_symlink) {
             return false;
         } else if (excluded == CSYNC_FILE_SILENTLY_EXCLUDED || excluded == CSYNC_FILE_EXCLUDE_AND_REMOVE) {
             emit _discovery_data.silently_excluded (path);
             return true;
         }
-    
+
         auto item = SyncFileItemPtr.create ();
         item._file = path;
         item._original_file = path;
         item._instruction = CSYNC_INSTRUCTION_IGNORE;
-    
+
         if (is_symlink) {
-            /* Symbolic links are ignored. */
+            // Symbolic links are ignored.
             item._error_string = tr ("Symbolic links are not supported in syncing.");
         } else {
             switch (excluded) {
@@ -603,12 +606,12 @@ signals:
                 break;
             }
         }
-    
+
         _child_ignored = true;
         emit _discovery_data.item_discovered (item);
         return true;
     }
-    
+
     void Process_directory_job.process_file (Path_tuple path,
         const Local_info &local_entry, Remote_info &server_entry,
         const SyncJournalFileRecord &db_entry) {
@@ -626,19 +629,19 @@ signals:
                                   << " | type : " << db_entry._type << "/" << local_entry.type << "/" << (server_entry.is_directory ? ItemTypeDirectory : ItemTypeFile)
                                   << " | e2ee : " << db_entry._is_e2e_encrypted << "/" << server_entry.is_e2e_encrypted
                                   << " | e2ee_mangled_name : " << db_entry.e2e_mangled_name () << "/" << server_entry.e2e_mangled_name;
-    
+
         if (local_entry.is_valid ()
             && !server_entry.is_valid ()
             && !db_entry.is_valid ()
             && local_entry.modtime < _last_sync_timestamp) {
             q_c_warning (lc_disco) << "File" << path._original << "was modified before the last sync run and is not in the sync journal and server";
         }
-    
+
         if (_discovery_data.is_renamed (path._original)) {
             q_c_debug (lc_disco) << "Ignoring renamed";
             return; // Ignore this.
         }
-    
+
         auto item = SyncFileItem.from_sync_journal_file_record (db_entry);
         item._file = path._target;
         item._original_file = path._original;
@@ -651,11 +654,11 @@ signals:
                 item._rename_target = local_entry.rename_name;
             }
         }
-    
+
         if (db_entry._modtime == local_entry.modtime && db_entry._type == Item_type_virtual_file && local_entry.type == ItemTypeFile) {
             item._type = ItemTypeFile;
         }
-    
+
         // The item shall only have this type if the db request for the virtual download
         // was successful (like : no conflicting remote remove etc). This decision is done
         // either in process_file_analyze_remote_info () or further down here.
@@ -665,7 +668,7 @@ signals:
         // until the request is processed.
         if (item._type == ItemTypeVirtualFileDehydration)
             item._type = ItemTypeFile;
-    
+
         // VFS suffixed files on the server are ignored
         if (is_vfs_with_suffix ()) {
             if (has_virtual_file_suffix (server_entry.name)
@@ -677,12 +680,12 @@ signals:
                 return;
             }
         }
-    
+
         if (server_entry.is_valid ()) {
             process_file_analyze_remote_info (item, path, local_entry, server_entry, db_entry);
             return;
         }
-    
+
         // Downloading a virtual file is like a server action and can happen even if
         // server-side nothing has changed
         // NOTE : Normally setting the Virtual_file_download flag means that local and
@@ -697,10 +700,10 @@ signals:
             item._instruction = CSYNC_INSTRUCTION_SYNC;
             item._type = Item_type_virtual_file_download;
         }
-    
+
         process_file_analyze_local_info (item, path, local_entry, server_entry, db_entry, _query_server);
     }
-    
+
     // Compute the checksum of the given file and assign the result in item._checksum_header
     // Returns true if the checksum was successfully computed
     static bool compute_local_checksum (QByteArray &header, string &path, SyncFileItemPtr &item) {
@@ -715,7 +718,7 @@ signals:
         }
         return false;
     }
-    
+
     void Process_directory_job.process_file_analyze_remote_info (
         const SyncFileItemPtr &item, Path_tuple path, Local_info &local_entry,
         const Remote_info &server_entry, SyncJournalFileRecord &db_entry) {
@@ -731,15 +734,15 @@ signals:
             if (server_entry.e2e_mangled_name.is_empty ()) {
                 return string ();
             }
-    
+
             Q_ASSERT (_discovery_data._remote_folder.starts_with ('/'));
             Q_ASSERT (_discovery_data._remote_folder.ends_with ('/'));
-    
+
             const auto root_path = _discovery_data._remote_folder.mid (1);
             Q_ASSERT (server_entry.e2e_mangled_name.starts_with (root_path));
             return server_entry.e2e_mangled_name.mid (root_path.length ());
         } ();
-    
+
         // Check for missing server data {
             QStringList missing_data;
             if (server_entry.size == -1)
@@ -758,7 +761,7 @@ signals:
                 return;
             }
         }
-    
+
         // The file is known in the db already
         if (db_entry.is_valid ()) {
             const bool is_db_entry_an_e2Ee_placeholder = db_entry.is_virtual_file () && !db_entry.e2e_mangled_name ().is_empty ();
@@ -766,7 +769,7 @@ signals:
             const bool is_virtual_e2Ee_placeholder = is_db_entry_an_e2Ee_placeholder && server_entry.size >= Constants.e2Ee_tag_size;
             const int64 size_on_server = is_virtual_e2Ee_placeholder ? server_entry.size - Constants.e2Ee_tag_size : server_entry.size;
             const bool meta_data_size_needs_update_for_e2Ee_file_placeholder = is_virtual_e2Ee_placeholder && db_entry._file_size == server_entry.size;
-    
+
             if (server_entry.is_directory != db_entry.is_directory ()) {
                 // If the type of the entity changed, it's like NEW, but
                 // needs to delete the other entity first.
@@ -832,9 +835,9 @@ signals:
                                 local_folder_size += record._file_size;
                             }
                         };
-    
+
                         const bool list_files_succeeded = _discovery_data._statedb.list_files_in_path (db_entry.path ().to_utf8 (), list_files_callback);
-    
+
                         if (list_files_succeeded && local_folder_size != 0 && local_folder_size == server_entry.size_of_folder) {
                             q_c_info (lc_disco) << "Migration of E2EE folder " << db_entry.path () << " from older version to the one, supporting the implicit VFS hydration.";
                             return Normal_query;
@@ -842,23 +845,23 @@ signals:
                     }
                     return Parent_not_changed;
                 } ();
-    
+
                 process_file_analyze_local_info (item, path, local_entry, server_entry, db_entry, server_query_mode);
                 return;
             }
-    
+
             process_file_analyze_local_info (item, path, local_entry, server_entry, db_entry, _query_server);
             return;
         }
-    
+
         // Unknown in db : new file on the server
         Q_ASSERT (!db_entry.is_valid ());
-    
+
         item._instruction = CSYNC_INSTRUCTION_NEW;
         item._direction = SyncFileItem.Down;
         item._modtime = server_entry.modtime;
         item._size = server_entry.size;
-    
+
         auto post_process_server_new = [=] () mutable {
             if (item.is_directory ()) {
                 _pending_async_jobs++;
@@ -883,7 +886,7 @@ signals:
                 if (is_vfs_with_suffix ())
                     add_virtual_file_suffix (path._original);
             }
-    
+
             if (opts._vfs.mode () != Vfs.Off && !item._encrypted_file_name.is_empty ()) {
                 // We are syncing a file for the first time (local entry is invalid) and it is encrypted file that will be virtual once synced
                 // to avoid having error of "file has changed during sync" when trying to hydrate it excplicitly - we must remove Constants.e2Ee_tag_size bytes from the end
@@ -894,16 +897,16 @@ signals:
             }
             process_file_analyze_local_info (item, path, local_entry, server_entry, db_entry, _query_server);
         };
-    
+
         // Potential NEW/NEW conflict is handled in Analyze_local
         if (local_entry.is_valid ()) {
             post_process_server_new ();
             return;
         }
-    
+
         // Not in db or locally : either new or a rename
         Q_ASSERT (!db_entry.is_valid () && !local_entry.is_valid ());
-    
+
         // Check for renames (if there is a file with the same file id)
         bool done = false;
         bool async = false;
@@ -913,7 +916,7 @@ signals:
                 return;
             if (!base.is_valid ())
                 return;
-    
+
             // Remote rename of a virtual file we have locally scheduled for download.
             if (base._type == Item_type_virtual_file_download) {
                 // We just consider this NEW but mark it for download.
@@ -921,14 +924,14 @@ signals:
                 done = true;
                 return;
             }
-    
+
             // Remote rename targets a file that shall be locally dehydrated.
             if (base._type == ItemTypeVirtualFileDehydration) {
                 // Don't worry about the rename, just consider it DELETE + NEW (virtual)
                 done = true;
                 return;
             }
-    
+
             // Some things prohibit rename detection entirely.
             // Since we don't do the same checks again in reconcile, we can't
             // just skip the candidate, but have to give up completely.
@@ -938,31 +941,30 @@ signals:
                 return;
             }
             if (!server_entry.is_directory && base._etag != server_entry.etag) {
-                /* File with different etag, don't do a rename, but download the file again */
+                // File with different etag, don't do a rename, but download the file again
                 q_c_info (lc_disco, "file etag different, not a rename");
                 done = true;
                 return;
             }
-    
+
             // Now we know there is a sane rename candidate.
             string original_path = base.path ();
-    
+
             if (_discovery_data.is_renamed (original_path)) {
                 q_c_info (lc_disco, "folder already has a rename entry, skipping");
                 return;
             }
-    
-            /* A remote rename can also mean Encryption Mangled Name.
-             * if we find one of those in the database, we ignore it.
-             */
+
+            // A remote rename can also mean Encryption Mangled Name.
+            // if we find one of those in the database, we ignore it.
             if (!base._e2e_mangled_name.is_empty ()) {
                 q_c_warning (lc_disco, "Encrypted file can not rename");
                 done = true;
                 return;
             }
-    
+
             string original_path_adjusted = _discovery_data.adjust_renamed_path (original_path, SyncFileItem.Up);
-    
+
             if (!base.is_directory ()) {
                 csync_file_stat_t buf;
                 if (csync_vio_local_stat (_discovery_data._local_dir + original_path_adjusted, &buf)) {
@@ -981,14 +983,14 @@ signals:
                     return;
                 }
             }
-    
+
             // Renames of virtuals are possible
             if (base.is_virtual_file ()) {
                 item._type = Item_type_virtual_file;
             }
-    
+
             bool was_deleted_on_server = _discovery_data.find_and_cancel_deleted_job (original_path).first;
-    
+
             auto post_process_rename = [this, item, base, original_path] (Path_tuple &path) {
                 auto adjusted_original_path = _discovery_data.adjust_renamed_path (original_path, SyncFileItem.Up);
                 _discovery_data._renamed_items_remote.insert (original_path, path._target);
@@ -1003,7 +1005,7 @@ signals:
                 path._local = adjusted_original_path;
                 q_c_info (lc_disco) << "Rename detected (down) " << item._file << " . " << item._rename_target;
             };
-    
+
             if (was_deleted_on_server) {
                 post_process_rename (path);
                 done = true;
@@ -1021,12 +1023,12 @@ signals:
                         post_process_server_new ();
                         return;
                     }
-    
+
                     // The file do not exist, it is a rename
-    
+
                     // In case the deleted item was discovered in parallel
                     _discovery_data.find_and_cancel_deleted_job (original_path);
-    
+
                     post_process_rename (path);
                     process_file_finalize (item, path, item.is_directory (), item._instruction == CSYNC_INSTRUCTION_RENAME ? Normal_query : Parent_dont_exist, _query_server);
                 });
@@ -1042,26 +1044,26 @@ signals:
         if (async) {
             return; // We went async
         }
-    
+
         if (item._instruction == CSYNC_INSTRUCTION_NEW) {
             post_process_server_new ();
             return;
         }
         process_file_analyze_local_info (item, path, local_entry, server_entry, db_entry, _query_server);
     }
-    
+
     void Process_directory_job.process_file_analyze_local_info (
         const SyncFileItemPtr &item, Path_tuple path, Local_info &local_entry,
         const Remote_info &server_entry, SyncJournalFileRecord &db_entry, Query_mode recurse_query_server) {
         bool no_server_entry = (_query_server != Parent_not_changed && !server_entry.is_valid ())
             || (_query_server == Parent_not_changed && !db_entry.is_valid ());
-    
+
         if (no_server_entry)
             recurse_query_server = Parent_dont_exist;
-    
+
         bool server_modified = item._instruction == CSYNC_INSTRUCTION_NEW || item._instruction == CSYNC_INSTRUCTION_SYNC
             || item._instruction == CSYNC_INSTRUCTION_RENAME || item._instruction == CSYNC_INSTRUCTION_TYPE_CHANGE;
-    
+
         // Decay server modifications to UPDATE_METADATA if the local virtual exists
         bool has_local_virtual = local_entry.is_virtual_file || (_query_local == Parent_not_changed && db_entry.is_virtual_file ());
         bool virtual_file_download = item._type == Item_type_virtual_file_download;
@@ -1070,13 +1072,13 @@ signals:
             server_modified = false;
             item._type = Item_type_virtual_file;
         }
-    
+
         if (db_entry.is_virtual_file () && (!local_entry.is_valid () || local_entry.is_virtual_file) && !virtual_file_download) {
             item._type = Item_type_virtual_file;
         }
-    
+
         _child_modified |= server_modified;
-    
+
         auto finalize = [&] {
             bool recurse = item.is_directory () || local_entry.is_directory || server_entry.is_directory;
             // Even if we have a local directory : If the remote is a file that's propagated as a
@@ -1085,11 +1087,11 @@ signals:
                 recurse = false;
             if (_query_local != Normal_query && _query_server != Normal_query)
                 recurse = false;
-    
+
             auto recurse_query_local = _query_local == Parent_not_changed ? Parent_not_changed : local_entry.is_directory || item._instruction == CSYNC_INSTRUCTION_RENAME ? Normal_query : Parent_dont_exist;
             process_file_finalize (item, path, recurse, recurse_query_local, recurse_query_server);
         };
-    
+
         if (!local_entry.is_valid ()) {
             if (_query_local == Parent_not_changed && db_entry.is_valid ()) {
                 // Not modified locally (Parent_not_changed)
@@ -1125,15 +1127,15 @@ signals:
                     item._direction = SyncFileItem.Up;
                 }
             }
-    
+
             finalize ();
             return;
         }
-    
+
         Q_ASSERT (local_entry.is_valid ());
-    
+
         item._inode = local_entry.inode;
-    
+
         if (db_entry.is_valid ()) {
             bool type_change = local_entry.is_directory != db_entry.is_directory ();
             if (!type_change && local_entry.is_virtual_file) {
@@ -1224,7 +1226,7 @@ signals:
                 item._size = local_entry.size;
                 item._modtime = local_entry.modtime;
                 _child_modified = true;
-    
+
                 // Checksum comparison at this stage is only enabled for .eml files,
                 // check #4754 #4755
                 bool is_eml_file = path._original.ends_with (QLatin1String (".eml"), Qt.CaseInsensitive);
@@ -1236,13 +1238,13 @@ signals:
                     }
                 }
             }
-    
+
             finalize ();
             return;
         }
-    
+
         Q_ASSERT (!db_entry.is_valid ());
-    
+
         if (local_entry.is_virtual_file && !no_server_entry) {
             // Somehow there is a missing DB entry while the virtual file already exists.
             // The instruction should already be set correctly.
@@ -1255,7 +1257,7 @@ signals:
             finalize ();
             return;
         }
-    
+
         // New local file or rename
         item._instruction = CSYNC_INSTRUCTION_NEW;
         item._direction = SyncFileItem.Up;
@@ -1264,51 +1266,51 @@ signals:
         item._modtime = local_entry.modtime;
         item._type = local_entry.is_directory ? ItemTypeDirectory : local_entry.is_virtual_file ? Item_type_virtual_file : ItemTypeFile;
         _child_modified = true;
-    
+
         auto post_process_local_new = [item, local_entry, path, this] () {
             // TODO : We may want to execute the same logic for non-VFS mode, as, moving/renaming the same folder by 2 or more clients at the same time is not possible in Web UI.
             // Keeping it like this (for VFS files and folders only) just to fix a user issue.
-    
+
             if (! (_discovery_data && _discovery_data._sync_options._vfs && _discovery_data._sync_options._vfs.mode () != Vfs.Off)) {
                 // for VFS files and folders only
                 return;
             }
-    
+
             if (!local_entry.is_virtual_file && !local_entry.is_directory) {
                 return;
             }
-    
+
             if (local_entry.is_directory && _discovery_data._sync_options._vfs.mode () != Vfs.WindowsCfApi) {
                 // for VFS folders on Windows only
                 return;
             }
-    
+
             Q_ASSERT (item._instruction == CSYNC_INSTRUCTION_NEW);
             if (item._instruction != CSYNC_INSTRUCTION_NEW) {
                 q_c_warning (lc_disco) << "Trying to wipe a virtual item" << path._local << " with item._instruction" << item._instruction;
                 return;
             }
-    
+
             // must be a dehydrated placeholder
             const bool is_file_place_holder = !local_entry.is_directory && _discovery_data._sync_options._vfs.is_dehydrated_placeholder (_discovery_data._local_dir + path._local);
-    
+
             // either correct availability, or a result with error if the folder is new or otherwise has no availability set yet
             const auto folder_place_holder_availability = local_entry.is_directory ? _discovery_data._sync_options._vfs.availability (path._local) : Vfs.AvailabilityResult (Vfs.AvailabilityError.NoSuchItem);
-    
+
             const auto folder_pin_state = local_entry.is_directory ? _discovery_data._sync_options._vfs.pin_state (path._local) : Optional<Pin_state_enums.PinState> (PinState.Unspecified);
-    
+
             if (!is_file_place_holder && !folder_place_holder_availability.is_valid () && !folder_pin_state.is_valid ()) {
                 // not a file placeholder and not a synced folder placeholder (new local folder)
                 return;
             }
-    
+
             const auto is_folder_pin_state_online_only = (folder_pin_state.is_valid () && *folder_pin_state == PinState.OnlineOnly);
-    
+
             const auto isfolder_place_holder_availability_online_only = (folder_place_holder_availability.is_valid () && *folder_place_holder_availability == VfsItemAvailability.OnlineOnly);
-    
+
             // a folder is considered online-only if : no files are hydrated, or, if it's an empty folder
             const auto is_online_only_folder = isfolder_place_holder_availability_online_only || (!folder_place_holder_availability && is_folder_pin_state_online_only);
-    
+
             if (!is_file_place_holder && !is_online_only_folder) {
                 if (local_entry.is_directory && folder_place_holder_availability.is_valid () && !is_online_only_folder) {
                     // a VFS folder but is not online0only (has some files hydrated)
@@ -1319,10 +1321,10 @@ signals:
                 q_c_warning (lc_disco) << "Virtual file without db entry for" << path._local
                                    << "but looks odd, keeping";
                 item._instruction = CSYNC_INSTRUCTION_IGNORE;
-    
+
                 return;
             }
-    
+
             if (is_online_only_folder) {
                 // if we're wiping a folder, we will only get this function called once and will wipe a folder along with it's files and also display one error in GUI
                 q_c_info (lc_disco) << "Wiping virtual folder without db entry for" << path._local;
@@ -1342,7 +1344,7 @@ signals:
             // this flag needs to be unset, otherwise a folder would get marked as new in the process_sub_jobs
             _child_modified = false;
         };
-    
+
         // Check if it is a move
         Occ.SyncJournalFileRecord base;
         if (!_discovery_data._statedb.get_file_record_by_inode (local_entry.inode, &base)) {
@@ -1350,18 +1352,18 @@ signals:
             return;
         }
         const auto original_path = base.path ();
-    
+
         // Function to gradually check conditions for accepting a move-candidate
         auto move_check = [&] () {
             if (!base.is_valid ()) {
                 q_c_info (lc_disco) << "Not a move, no item in db with inode" << local_entry.inode;
                 return false;
             }
-    
+
             if (base._is_e2e_encrypted || is_inside_encrypted_tree ()) {
                 return false;
             }
-    
+
             if (base.is_directory () != item.is_directory ()) {
                 q_c_info (lc_disco) << "Not a move, types don't match" << base._type << item._type << local_entry.type;
                 return false;
@@ -1374,7 +1376,7 @@ signals:
                                 << "size:" << base._file_size << local_entry.size;
                 return false;
             }
-    
+
             // The old file must have been deleted.
             if (QFile.exists (_discovery_data._local_dir + original_path)
                 // Exception : If the rename changes case only (like "foo" . "Foo") the
@@ -1385,7 +1387,7 @@ signals:
                 q_c_info (lc_disco) << "Not a move, base file still exists at" << original_path;
                 return false;
             }
-    
+
             // Verify the checksum where possible
             if (!base._checksum_header.is_empty () && item._type == ItemTypeFile && base._type == ItemTypeFile) {
                 if (compute_local_checksum (base._checksum_header, _discovery_data._local_dir + path._original, item)) {
@@ -1396,15 +1398,15 @@ signals:
                     }
                 }
             }
-    
+
             if (_discovery_data.is_renamed (original_path)) {
                 q_c_info (lc_disco) << "Not a move, base path already renamed";
                 return false;
             }
-    
+
             return true;
         };
-    
+
         // If it's not a move it's just a local-NEW
         if (!move_check ()) {
             if (base._is_e2e_encrypted) {
@@ -1416,7 +1418,7 @@ signals:
             finalize ();
             return;
         }
-    
+
         // Check local permission if we are allowed to put move the file here
         // Technically we should use the permissions from the server, but we'll assume it is the same
         auto move_perms = check_move_permissions (base._remote_perm, original_path, item.is_directory ());
@@ -1425,17 +1427,17 @@ signals:
                             << "source:" << move_perms.source_ok
                             << ", target:" << move_perms.destination_ok
                             << ", target_new:" << move_perms.destination_new_ok;
-    
+
             // If we can create the destination, do that.
             // Permission errors on the destination will be handled by check_permissions later.
             post_process_local_new ();
             finalize ();
-    
+
             // If the destination upload will work, we're fine with the source deletion.
             // If the source deletion can't work, check_permissions will error.
             if (move_perms.destination_new_ok)
                 return;
-    
+
             // Here we know the new location can't be uploaded : must prevent the source delete.
             // Two cases : either the source item was already processed or not.
             auto was_deleted_on_client = _discovery_data.find_and_cancel_deleted_job (original_path);
@@ -1452,9 +1454,9 @@ signals:
             }
             return;
         }
-    
+
         auto was_deleted_on_client = _discovery_data.find_and_cancel_deleted_job (original_path);
-    
+
         auto process_rename = [item, original_path, base, this] (Path_tuple &path) {
             auto adjusted_original_path = _discovery_data.adjust_renamed_path (original_path, SyncFileItem.Down);
             _discovery_data._renamed_items_local.insert (original_path, path._target);
@@ -1471,7 +1473,7 @@ signals:
             item._remote_perm = base._remote_perm;
             item._etag = base._etag;
             item._type = base._type;
-    
+
             // Discard any download/dehydrate tags on the base file.
             // They could be preserved and honored in a follow-up sync,
             // but it complicates handling a lot and will happen rarely.
@@ -1479,7 +1481,7 @@ signals:
                 item._type = Item_type_virtual_file;
             if (item._type == ItemTypeVirtualFileDehydration)
                 item._type = ItemTypeFile;
-    
+
             q_c_info (lc_disco) << "Rename detected (up) " << item._file << " . " << item._rename_target;
         };
         if (was_deleted_on_client.first) {
@@ -1510,29 +1512,29 @@ signals:
             job.start ();
             return;
         }
-    
+
         finalize ();
     }
-    
+
     void Process_directory_job.process_file_conflict (SyncFileItemPtr &item, Process_directory_job.Path_tuple path, Local_info &local_entry, Remote_info &server_entry, SyncJournalFileRecord &db_entry) {
         item._previous_size = local_entry.size;
         item._previous_modtime = local_entry.modtime;
-    
+
         if (server_entry.is_directory && local_entry.is_directory) {
             // Folders of the same path are always considered equals
             item._instruction = CSYNC_INSTRUCTION_UPDATE_METADATA;
             return;
         }
-    
+
         // A conflict with a virtual should lead to virtual file download
         if (db_entry.is_virtual_file () || local_entry.is_virtual_file)
             item._type = Item_type_virtual_file_download;
-    
+
         // If there's no content hash, use heuristics
         if (server_entry.checksum_header.is_empty ()) {
             // If the size or mtime is different, it's definitely a conflict.
             bool is_conflict = (server_entry.size != local_entry.size) || (server_entry.modtime != local_entry.modtime);
-    
+
             // It could be a conflict even if size and mtime match!
             //
             // In older client versions we always treated these cases as a
@@ -1550,7 +1552,7 @@ signals:
             item._direction = is_conflict ? SyncFileItem.None : SyncFileItem.Down;
             return;
         }
-    
+
         // Do we have an UploadInfo for this?
         // Maybe the Upload was completed, but the connection was broken just before
         // we recieved the etag (Issue #5106)
@@ -1560,7 +1562,7 @@ signals:
             item._instruction = up._modtime == local_entry.modtime && up._size == local_entry.size
                 ? CSYNC_INSTRUCTION_NONE : CSYNC_INSTRUCTION_SYNC;
             item._direction = SyncFileItem.Up;
-    
+
             // Update the etag and other server metadata in the journal already
             // (We can't use a typical CSYNC_INSTRUCTION_UPDATE_METADATA because
             // we must not store the size/modtime from the file system)
@@ -1578,12 +1580,12 @@ signals:
             }
             return;
         }
-    
+
         // Rely on content hash comparisons to optimize away non-conflicts inside the job
         item._instruction = CSYNC_INSTRUCTION_CONFLICT;
         item._direction = SyncFileItem.None;
     }
-    
+
     void Process_directory_job.process_file_finalize (
         const SyncFileItemPtr &item, Path_tuple path, bool recurse,
         Query_mode recurse_query_local, Query_mode recurse_query_server) {
@@ -1604,7 +1606,7 @@ signals:
                 }
             }
         }
-    
+
         if (path._original != path._target && (item._instruction == CSYNC_INSTRUCTION_UPDATE_METADATA || item._instruction == CSYNC_INSTRUCTION_NONE)) {
             ASSERT (_dir_item && _dir_item._instruction == CSYNC_INSTRUCTION_RENAME);
             // This is because otherwise subitems are not updated!  (ideally renaming a directory could
@@ -1613,9 +1615,9 @@ signals:
             item._rename_target = path._target;
             item._direction = _dir_item._direction;
         }
-    
+
         q_c_info (lc_disco) << "Discovered" << item._file << item._instruction << item._direction << item._type;
-    
+
         if (item.is_directory () && item._instruction == CSYNC_INSTRUCTION_SYNC)
             item._instruction = CSYNC_INSTRUCTION_UPDATE_METADATA;
         bool removed = item._instruction == CSYNC_INSTRUCTION_REMOVE;
@@ -1645,12 +1647,12 @@ signals:
             emit _discovery_data.item_discovered (item);
         }
     }
-    
+
     void Process_directory_job.process_blacklisted (Path_tuple &path, Occ.Local_info &local_entry,
         const SyncJournalFileRecord &db_entry) {
         if (!local_entry.is_valid ())
             return;
-    
+
         auto item = SyncFileItem.from_sync_journal_file_record (db_entry);
         item._file = path._target;
         item._original_file = path._original;
@@ -1665,9 +1667,9 @@ signals:
             item._error_string = tr ("Ignored because of the \"choose what to sync\" blacklist");
             _child_ignored = true;
         }
-    
+
         q_c_info (lc_disco) << "Discovered (blacklisted) " << item._file << item._instruction << item._direction << item.is_directory ();
-    
+
         if (item.is_directory () && item._instruction != CSYNC_INSTRUCTION_IGNORE) {
             auto job = new Process_directory_job (path, item, Normal_query, In_black_list, _last_sync_timestamp, this);
             connect (job, &Process_directory_job.finished, this, &Process_directory_job.sub_job_finished);
@@ -1676,13 +1678,13 @@ signals:
             emit _discovery_data.item_discovered (item);
         }
     }
-    
+
     bool Process_directory_job.check_permissions (Occ.SyncFileItemPtr &item) {
         if (item._direction != SyncFileItem.Up) {
             // Currently we only check server-side permissions
             return true;
         }
-    
+
         switch (item._instruction) {
         case CSYNC_INSTRUCTION_TYPE_CHANGE:
         case CSYNC_INSTRUCTION_NEW : {
@@ -1758,7 +1760,7 @@ signals:
         }
         return true;
     }
-    
+
     auto Process_directory_job.check_move_permissions (RemotePermissions src_perm, string &src_path,
                                                    bool is_directory)
         . Move_permission_result {
@@ -1780,7 +1782,7 @@ signals:
             // no need to check for the destination dir permission for renames
             destination_oK = false;
         }
-    
+
         // check if we are allowed to move from the source
         bool source_oK = true;
         if (!file_perms.is_null ()
@@ -1791,23 +1793,23 @@ signals:
         }
         return Move_permission_result{source_oK, destination_oK, destination_new_oK};
     }
-    
+
     void Process_directory_job.sub_job_finished () {
         auto job = qobject_cast<Process_directory_job> (sender ());
         ASSERT (job);
-    
+
         _child_ignored |= job._child_ignored;
         _child_modified |= job._child_modified;
-    
+
         if (job._dir_item)
             emit _discovery_data.item_discovered (job._dir_item);
-    
+
         int count = _running_jobs.remove_all (job);
         ASSERT (count == 1);
         job.delete_later ();
         QTimer.single_shot (0, _discovery_data, &Discovery_phase.schedule_more_jobs);
     }
-    
+
     int Process_directory_job.process_sub_jobs (int nb_jobs) {
         if (_queued_jobs.empty () && _running_jobs.empty () && _pending_async_jobs == 0) {
             _pending_async_jobs = -1; // We're finished, we don't want to emit finished again
@@ -1832,14 +1834,14 @@ signals:
             }
             emit finished ();
         }
-    
+
         int started = 0;
         foreach (auto *rj, _running_jobs) {
             started += rj.process_sub_jobs (nb_jobs - started);
             if (started >= nb_jobs)
                 return started;
         }
-    
+
         while (started < nb_jobs && !_queued_jobs.empty ()) {
             auto f = _queued_jobs.front ();
             _queued_jobs.pop_front ();
@@ -1849,21 +1851,21 @@ signals:
         }
         return started;
     }
-    
+
     void Process_directory_job.db_error () {
         _discovery_data.fatal_error (tr ("Error while reading the database"));
     }
-    
+
     void Process_directory_job.add_virtual_file_suffix (string ==&str) {
         str.append (_discovery_data._sync_options._vfs.file_suffix ());
     }
-    
+
     bool Process_directory_job.has_virtual_file_suffix (string &str) {
         if (!is_vfs_with_suffix ())
             return false;
         return str.ends_with (_discovery_data._sync_options._vfs.file_suffix ());
     }
-    
+
     void Process_directory_job.chop_virtual_file_suffix (string &str) {
         if (!is_vfs_with_suffix ())
             return;
@@ -1872,7 +1874,7 @@ signals:
         if (has_suffix)
             str.chop (_discovery_data._sync_options._vfs.file_suffix ().size ());
     }
-    
+
     Discovery_single_directory_job *Process_directory_job.start_async_server_query () {
         auto server_job = new Discovery_single_directory_job (_discovery_data._account,
             _discovery_data._remote_folder + _current_folder._server, this);
@@ -1914,37 +1916,39 @@ signals:
             }
         });
         connect (server_job, &Discovery_single_directory_job.first_directory_permissions, this,
-            [this] (RemotePermissions &perms) { _root_permissions = perms; });
+            [this] (RemotePermissions &perms) {
+                _root_permissions = perms;
+            });
         server_job.start ();
         return server_job;
     }
-    
+
     void Process_directory_job.start_async_local_query () {
         string local_path = _discovery_data._local_dir + _current_folder._local;
         auto local_job = new Discovery_single_local_directory_job (_discovery_data._account, local_path, _discovery_data._sync_options._vfs.data ());
-    
+
         _discovery_data._currently_active_jobs++;
         _pending_async_jobs++;
-    
+
         connect (local_job, &Discovery_single_local_directory_job.item_discovered, _discovery_data, &Discovery_phase.item_discovered);
-    
+
         connect (local_job, &Discovery_single_local_directory_job.child_ignored, this, [this] (bool b) {
             _child_ignored = b;
         });
-    
+
         connect (local_job, &Discovery_single_local_directory_job.finished_fatal_error, this, [this] (string &msg) {
             _discovery_data._currently_active_jobs--;
             _pending_async_jobs--;
             if (_server_job)
                 _server_job.abort ();
-    
+
             emit _discovery_data.fatal_error (msg);
         });
-    
+
         connect (local_job, &Discovery_single_local_directory_job.finished_non_fatal_error, this, [this] (string &msg) {
             _discovery_data._currently_active_jobs--;
             _pending_async_jobs--;
-    
+
             if (_dir_item) {
                 _dir_item._instruction = CSYNC_INSTRUCTION_IGNORE;
                 _dir_item._error_string = msg;
@@ -1954,26 +1958,26 @@ signals:
                 emit _discovery_data.fatal_error (msg);
             }
         });
-    
+
         connect (local_job, &Discovery_single_local_directory_job.finished, this, [this] (auto &results) {
             _discovery_data._currently_active_jobs--;
             _pending_async_jobs--;
-    
+
             _local_normal_query_entries = results;
             _local_query_done = true;
-    
+
             if (_server_query_done)
                 this.process ();
         });
-    
+
         QThread_pool *pool = QThread_pool.global_instance ();
         pool.start (local_job); // QThread_pool takes ownership
     }
-    
+
     bool Process_directory_job.is_vfs_with_suffix () {
         return _discovery_data._sync_options._vfs.mode () == Vfs.WithSuffix;
     }
-    
+
     void Process_directory_job.compute_pin_state (PinState parent_state) {
         _pin_state = parent_state;
         if (_query_local != Parent_dont_exist) {
@@ -1981,25 +1985,25 @@ signals:
                 _pin_state = *state;
         }
     }
-    
+
     void Process_directory_job.setup_db_pin_state_actions (SyncJournalFileRecord &record) {
         // Only suffix-vfs uses the db for pin states.
         // Other plugins will set local_entry._type according to the file's pin state.
         if (!is_vfs_with_suffix ())
             return;
-    
+
         auto pin = _discovery_data._statedb.internal_pin_states ().raw_for_path (record._path);
         if (!pin || *pin == PinState.Inherited)
             pin = _pin_state;
-    
+
         // OnlineOnly hydrated files want to be dehydrated
         if (record._type == ItemTypeFile && *pin == PinState.OnlineOnly)
             record._type = ItemTypeVirtualFileDehydration;
-    
+
         // AlwaysLocal dehydrated files want to be hydrated
         if (record._type == Item_type_virtual_file && *pin == PinState.AlwaysLocal)
             record._type = Item_type_virtual_file_download;
     }
-    
+
     }
     

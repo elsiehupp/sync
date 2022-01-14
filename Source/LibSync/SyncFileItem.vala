@@ -45,11 +45,12 @@ public:
 
         Success, ///< The file was properly synced
 
-        /** Marks a conflict, old or new.
-         *
-         * With instruction:IGNORE : detected an old unresolved old conflict
-         * With instruction:CONFLICT : a new conflict this sync run
-         */
+        /***********************************************************
+        Marks a conflict, old or new.
+
+        With instruction:IGNORE : detected an old unresolved old conflict
+        With instruction:CONFLICT : a new conflict this sync run
+        ***********************************************************/
         Conflict,
 
         File_ignored, ///< The file is in the ignored list (or blacklisted with no retries left)
@@ -57,28 +58,30 @@ public:
         Restoration, ///< The file was restored because what should have been done was not allowed
 
         /***********************************************************
-         * The filename is invalid on this platform and could not created.
-         */
+        The filename is invalid on this platform and could not created.
+        ***********************************************************/
         File_name_invalid,
 
-        /** For errors that should only appear in the error view.
-         *
-         * Some errors also produce a summary message. Usually displaying that message is
-         * sufficient, but the individual errors should still appear in the issues tab.
-         *
-         * These errors do cause the sync to fail.
-         *
-         * A Normal_error that isn't as prominent.
-         */
+        /***********************************************************
+        For errors that should only appear in the error view.
+
+        Some errors also produce a summary message. Usually displaying that message is
+        sufficient, but the individual errors should still appear in the issues tab.
+
+        These errors do cause the sync to fail.
+
+        A Normal_error that isn't as prominent.
+        ***********************************************************/
         Detail_error,
 
-        /** For files whose errors were blacklisted
-         *
-         * If an file is blacklisted due to an error it isn't even reattempted. These
-         * errors should appear in the issues tab but should be silent otherwise.
-         *
-         * A Soft_error caused by blacklisting.
-         */
+        /***********************************************************
+        For files whose errors were blacklisted
+
+        If an file is blacklisted due to an error it isn't even reattempted. These
+        errors should appear in the issues tab but should be silent otherwise.
+
+        A Soft_error caused by blacklisting.
+        ***********************************************************/
         Blacklisted_error
     };
     Q_ENUM (Status)
@@ -276,14 +279,14 @@ using Sync_file_item_vector = QVector<SyncFileItemPtr>;
         SyncJournalFileRecord rec;
         rec._path = destination ().to_utf8 ();
         rec._modtime = _modtime;
-    
+
         // Some types should never be written to the database when propagation completes
         rec._type = _type;
         if (rec._type == Item_type_virtual_file_download)
             rec._type = ItemTypeFile;
         if (rec._type == ItemTypeVirtualFileDehydration)
             rec._type = Item_type_virtual_file;
-    
+
         rec._etag = _etag;
         rec._file_id = _file_id;
         rec._file_size = _size;
@@ -292,7 +295,7 @@ using Sync_file_item_vector = QVector<SyncFileItemPtr>;
         rec._checksum_header = _checksum_header;
         rec._e2e_mangled_name = _encrypted_file_name.to_utf8 ();
         rec._is_e2e_encrypted = _is_encrypted;
-    
+
         // Update the inode if possible
         rec._inode = _inode;
         if (FileSystem.get_inode (local_file_name, &rec._inode)) {
@@ -306,7 +309,7 @@ using Sync_file_item_vector = QVector<SyncFileItemPtr>;
         }
         return rec;
     }
-    
+
     SyncFileItemPtr SyncFileItem.from_sync_journal_file_record (SyncJournalFileRecord &rec) {
         auto item = SyncFileItemPtr.create ();
         item._file = rec.path ();
@@ -323,6 +326,6 @@ using Sync_file_item_vector = QVector<SyncFileItemPtr>;
         item._is_encrypted = rec._is_e2e_encrypted;
         return item;
     }
-    
+
     }
     

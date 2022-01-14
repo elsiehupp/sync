@@ -14,14 +14,14 @@ namespace Occ {
 #endif // WITH_WEBENGINE
 
 class WebFlowCredentialsDialog : Gtk.Dialog {
-public:
-    WebFlowCredentialsDialog (Account *account, bool use_flow2, Gtk.Widget *parent = nullptr);
 
-    void set_url (QUrl &url);
-    void set_info (string &msg);
-    void set_error (string &error);
+    public WebFlowCredentialsDialog (Account *account, bool use_flow2, Gtk.Widget *parent = nullptr);
 
-    bool is_using_flow2 () {
+    public void set_url (QUrl &url);
+    public void set_info (string &msg);
+    public void set_error (string &error);
+
+    public bool is_using_flow2 () {
         return _use_flow2;
     }
 

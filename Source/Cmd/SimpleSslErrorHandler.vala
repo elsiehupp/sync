@@ -19,12 +19,12 @@ class Simple_sslErrorHandler : Occ.Abstract_sslErrorHandler {
     bool Simple_sslErrorHandler.handle_errors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, Occ.AccountPtr account) {
         (void)account;
         (void)conf;
-    
+
         if (!certs) {
             q_debug () << "Certs parameter required but is NULL!";
             return false;
         }
-    
+
         for (auto &error : q_as_const (errors)) {
             certs.append (error.certificate ());
         }

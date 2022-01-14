@@ -42,38 +42,38 @@ namespace {
                 set_image_and_emit_finished ();
                 return;
             }
-    
+
             _image_paths = id.split (QLatin1Char (';'), Qt.Skip_empty_parts);
             _requested_image_size = requested_size;
-    
+
             if (_image_paths.is_empty ()) {
                 set_image_and_emit_finished ();
             } else {
                 process_next_image ();
             }
         }
-    
+
         void set_image_and_emit_finished (QImage &image = {}) {
             _image = image;
             emit finished ();
         }
-    
+
         QQuick_texture_factory *texture_factory () const override {
             return QQuick_texture_factory.texture_factory_for_image (_image);
         }
-    
+
     private:
         void process_next_image () {
             if (_index < 0 || _index >= _image_paths.size ()) {
                 set_image_and_emit_finished ();
                 return;
             }
-    
+
             if (_image_paths.at (_index).starts_with (QStringLiteral (":/client"))) {
                 set_image_and_emit_finished (QIcon (_image_paths.at (_index)).pixmap (_requested_image_size).to_image ());
                 return;
             }
-    
+
             const auto current_user = Occ.User_model.instance ().current_user ();
             if (current_user && current_user.account ()) {
                 const QUrl icon_url (_image_paths.at (_index));
@@ -85,10 +85,10 @@ namespace {
                     return;
                 }
             }
-    
+
             set_image_and_emit_finished ();
         }
-    
+
     private slots:
         void slot_process_network_reply () {
             const auto reply = qobject_cast<QNetworkReply> (sender ());
@@ -96,7 +96,7 @@ namespace {
                 set_image_and_emit_finished ();
                 return;
             }
-    
+
             const QByteArray image_data = reply.read_all ();
             // server returns "[]" for some some file previews (have no idea why), so, we use another image
             // from the list if available
@@ -121,17 +121,17 @@ namespace {
                 }
             }
         }
-    
+
         QImage _image;
         QStringList _image_paths;
         QSize _requested_image_size;
         int _index = 0;
     };
 
-    
+
     QQuick_image_response *Unified_search_result_image_provider.request_image_response (string &id, QSize &requested_size) {
         return new Async_image_response (id, requested_size);
     }
-    
+
 }
     

@@ -193,7 +193,9 @@ public:
     bool _new_mnemonic_generated = false;
 };
 
-/* Generates the Metadata for the folder */
+/***********************************************************
+Generates the Metadata for the folder
+***********************************************************/
 struct Encrypted_file {
     QByteArray encryption_key;
     QByteArray mimetype;
@@ -522,13 +524,13 @@ QByteArray encrypt_private_key (
 
     Cipher_ctx ctx;
 
-    /* Create and initialise the context */
+    // Create and initialise the context
     if (!ctx) {
         q_c_info (lc_cse ()) << "Error creating cipher";
         handle_errors ();
     }
 
-    /* Initialise the decryption operation. */
+    // Initialise the decryption operation.
     if (!EVP_Encrypt_init_ex (ctx, EVP_aes_256_gcm (), nullptr, nullptr, nullptr)) {
         q_c_info (lc_cse ()) << "Error initializing context with aes_256";
         handle_errors ();
@@ -537,13 +539,13 @@ QByteArray encrypt_private_key (
     // No padding
     EVP_CIPHER_CTX_set_padding (ctx, 0);
 
-    /* Set IV length. */
+    // Set IV length.
     if (!EVP_CIPHER_CTX_ctrl (ctx, EVP_CTRL_GCM_SET_IVLEN, iv.size (), nullptr)) {
         q_c_info (lc_cse ()) << "Error setting iv length";
         handle_errors ();
     }
 
-    /* Initialise key and IV */
+    // Initialise key and IV
     if (!EVP_Encrypt_init_ex (ctx, nullptr, nullptr, (unsigned char *)key.const_data (), (unsigned char *)iv.const_data ())) {
         q_c_info (lc_cse ()) << "Error initialising key and iv";
         handle_errors ();
@@ -564,7 +566,8 @@ QByteArray encrypt_private_key (
 
     int clen = len;
 
-    /* Finalise the encryption. Normally ciphertext bytes may be written at
+    /***********************************************************
+    Finalise the encryption. Normally ciphertext bytes may be written at
     this stage, but this does not occur in GCM mode
     ***********************************************************/
     if (1 != EVP_Encrypt_final_ex (ctx, unsigned_data (ctext) + len, &len)) {
@@ -573,7 +576,7 @@ QByteArray encrypt_private_key (
     }
     clen += len;
 
-    /* Get the e2Ee_tag */
+    // Get the e2Ee_tag
     QByteArray e2Ee_tag (Occ.Constants.e2Ee_tag_size, '\0');
     if (1 != EVP_CIPHER_CTX_ctrl (ctx, EVP_CTRL_GCM_GET_TAG, Occ.Constants.e2Ee_tag_size, unsigned_data (e2Ee_tag))) {
         q_c_info (lc_cse ()) << "Error getting the e2Ee_tag";
@@ -619,25 +622,25 @@ QByteArray decrypt_private_key (QByteArray& key, QByteArray& data) {
     // Init
     Cipher_ctx ctx;
 
-    /* Create and initialise the context */
+    // Create and initialise the context
     if (!ctx) {
         q_c_info (lc_cse ()) << "Error creating cipher";
         return QByteArray ();
     }
 
-    /* Initialise the decryption operation. */
+    // Initialise the decryption operation.
     if (!EVP_Decrypt_init_ex (ctx, EVP_aes_256_gcm (), nullptr, nullptr, nullptr)) {
         q_c_info (lc_cse ()) << "Error initialising context with aes 256";
         return QByteArray ();
     }
 
-    /* Set IV length. Not necessary if this is 12 bytes (96 bits) */
+    // Set IV length. Not necessary if this is 12 bytes (96 bits)
     if (!EVP_CIPHER_CTX_ctrl (ctx, EVP_CTRL_GCM_SET_IVLEN, iv.size (), nullptr)) {
         q_c_info (lc_cse ()) << "Error setting IV size";
         return QByteArray ();
     }
 
-    /* Initialise key and IV */
+    // Initialise key and IV
     if (!EVP_Decrypt_init_ex (ctx, nullptr, nullptr, (unsigned char *)key.const_data (), (unsigned char *)iv.const_data ())) {
         q_c_info (lc_cse ()) << "Error initialising key and iv";
         return QByteArray ();
@@ -646,7 +649,9 @@ QByteArray decrypt_private_key (QByteArray& key, QByteArray& data) {
     QByteArray ptext (cipher_t_xT.size () + Occ.Constants.e2Ee_tag_size, '\0');
     int plen = 0;
 
-    /* Provide the message to be decrypted, and obtain the plaintext output.
+
+    /***********************************************************
+    Provide the message to be decrypted, and obtain the plaintext output.
     EVP_Decrypt_update can be called multiple times if necessary
     ***********************************************************/
     if (!EVP_Decrypt_update (ctx, unsigned_data (ptext), &plen, (unsigned char *)cipher_t_xT.const_data (), cipher_t_xT.size ())) {
@@ -654,13 +659,15 @@ QByteArray decrypt_private_key (QByteArray& key, QByteArray& data) {
         return QByteArray ();
     }
 
-    /* Set expected e2Ee_tag value. Works in Open_s_sL 1.0.1d and later */
+    // Set expected e2Ee_tag value. Works in Open_s_sL 1.0.1d and later
     if (!EVP_CIPHER_CTX_ctrl (ctx, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), (unsigned char *)e2Ee_tag.const_data ())) {
         q_c_info (lc_cse ()) << "Could not set e2Ee_tag";
         return QByteArray ();
     }
 
-    /* Finalise the decryption. A positive return value indicates success,
+
+    /***********************************************************
+    Finalise the decryption. A positive return value indicates success,
     anything else is a failure - the plaintext is not trustworthy.
     ***********************************************************/
     int len = plen;
@@ -708,25 +715,25 @@ QByteArray decrypt_string_symmetric (QByteArray& key, QByteArray& data) {
     // Init
     Cipher_ctx ctx;
 
-    /* Create and initialise the context */
+    // Create and initialise the context
     if (!ctx) {
         q_c_info (lc_cse ()) << "Error creating cipher";
         return QByteArray ();
     }
 
-    /* Initialise the decryption operation. */
+    // Initialise the decryption operation.
     if (!EVP_Decrypt_init_ex (ctx, EVP_aes_128_gcm (), nullptr, nullptr, nullptr)) {
         q_c_info (lc_cse ()) << "Error initialising context with aes 128";
         return QByteArray ();
     }
 
-    /* Set IV length. Not necessary if this is 12 bytes (96 bits) */
+    // Set IV length. Not necessary if this is 12 bytes (96 bits)
     if (!EVP_CIPHER_CTX_ctrl (ctx, EVP_CTRL_GCM_SET_IVLEN, iv.size (), nullptr)) {
         q_c_info (lc_cse ()) << "Error setting IV size";
         return QByteArray ();
     }
 
-    /* Initialise key and IV */
+    // Initialise key and IV
     if (!EVP_Decrypt_init_ex (ctx, nullptr, nullptr, (unsigned char *)key.const_data (), (unsigned char *)iv.const_data ())) {
         q_c_info (lc_cse ()) << "Error initialising key and iv";
         return QByteArray ();
@@ -735,7 +742,8 @@ QByteArray decrypt_string_symmetric (QByteArray& key, QByteArray& data) {
     QByteArray ptext (cipher_t_xT.size () + Occ.Constants.e2Ee_tag_size, '\0');
     int plen = 0;
 
-    /* Provide the message to be decrypted, and obtain the plaintext output.
+    /***********************************************************
+    Provide the message to be decrypted, and obtain the plaintext output.
     EVP_Decrypt_update can be called multiple times if necessary
     ***********************************************************/
     if (!EVP_Decrypt_update (ctx, unsigned_data (ptext), &plen, (unsigned char *)cipher_t_xT.const_data (), cipher_t_xT.size ())) {
@@ -743,7 +751,7 @@ QByteArray decrypt_string_symmetric (QByteArray& key, QByteArray& data) {
         return QByteArray ();
     }
 
-    /* Set expected e2Ee_tag value. Works in Open_s_sL 1.0.1d and later */
+    // Set expected e2Ee_tag value. Works in Open_s_sL 1.0.1d and later
     if (!EVP_CIPHER_CTX_ctrl (ctx, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), (unsigned char *)e2Ee_tag.const_data ())) {
         q_c_info (lc_cse ()) << "Could not set e2Ee_tag";
         return QByteArray ();
@@ -778,14 +786,14 @@ QByteArray encrypt_string_symmetric (QByteArray& key, QByteArray& data) {
 
     Cipher_ctx ctx;
 
-    /* Create and initialise the context */
+    // Create and initialise the context
     if (!ctx) {
         q_c_info (lc_cse ()) << "Error creating cipher";
         handle_errors ();
         return {};
     }
 
-    /* Initialise the decryption operation. */
+    // Initialise the decryption operation.
     if (!EVP_Encrypt_init_ex (ctx, EVP_aes_128_gcm (), nullptr, nullptr, nullptr)) {
         q_c_info (lc_cse ()) << "Error initializing context with aes_128";
         handle_errors ();
@@ -795,14 +803,14 @@ QByteArray encrypt_string_symmetric (QByteArray& key, QByteArray& data) {
     // No padding
     EVP_CIPHER_CTX_set_padding (ctx, 0);
 
-    /* Set IV length. */
+    // Set IV length.
     if (!EVP_CIPHER_CTX_ctrl (ctx, EVP_CTRL_GCM_SET_IVLEN, iv.size (), nullptr)) {
         q_c_info (lc_cse ()) << "Error setting iv length";
         handle_errors ();
         return {};
     }
 
-    /* Initialise key and IV */
+    // Initialise key and IV
     if (!EVP_Encrypt_init_ex (ctx, nullptr, nullptr, (unsigned char *)key.const_data (), (unsigned char *)iv.const_data ())) {
         q_c_info (lc_cse ()) << "Error initialising key and iv";
         handle_errors ();
@@ -825,7 +833,8 @@ QByteArray encrypt_string_symmetric (QByteArray& key, QByteArray& data) {
 
     int clen = len;
 
-    /* Finalise the encryption. Normally ciphertext bytes may be written at
+    /***********************************************************
+    Finalise the encryption. Normally ciphertext bytes may be written at
     this stage, but this does not occur in GCM mode
     ***********************************************************/
     if (1 != EVP_Encrypt_final_ex (ctx, unsigned_data (ctext) + len, &len)) {
@@ -835,7 +844,7 @@ QByteArray encrypt_string_symmetric (QByteArray& key, QByteArray& data) {
     }
     clen += len;
 
-    /* Get the e2Ee_tag */
+    // Get the e2Ee_tag
     QByteArray e2Ee_tag (Occ.Constants.e2Ee_tag_size, '\0');
     if (1 != EVP_CIPHER_CTX_ctrl (ctx, EVP_CTRL_GCM_GET_TAG, Occ.Constants.e2Ee_tag_size, unsigned_data (e2Ee_tag))) {
         q_c_info (lc_cse ()) << "Error getting the e2Ee_tag";
@@ -1261,7 +1270,12 @@ void ClientSideEncryption.generate_c_sR (AccountPtr &account, EVP_PKEY *key_pair
     auto cn_array = account.dav_user ().to_local8Bit ();
     q_c_info (lc_cse ()) << "Getting the following array for the account Id" << cn_array;
 
-    auto cert_params = std.map<const char *, char>{ {"C", "DE"}, {"ST", "Baden-Wuerttemberg"}, {"L", "Stuttgart"}, {"O","Nextcloud"}, {"CN", cn_array.const_data ()}
+    auto cert_params = std.map<const char *, char> {
+        {"C", "DE"},
+        {"ST", "Baden-Wuerttemberg"},
+        {"L", "Stuttgart"},
+        {"O","Nextcloud"},
+        {"CN", cn_array.const_data ()}
     };
 
     int ret = 0;
@@ -1495,36 +1509,36 @@ Folder_metadata.Folder_metadata (AccountPtr account, QByteArray& metadata, int s
 }
 
 void Folder_metadata.setup_existing_metadata (QByteArray& metadata) {
-  /* This is the json response from the server, it contains two extra objects that we are *not* interested.
-  * ocs and data.
-  */
-  QJsonDocument doc = QJsonDocument.from_json (metadata);
-  q_c_info (lc_cse_metadata ()) << doc.to_json (QJsonDocument.Compact);
+/* This is the json response from the server, it contains two extra objects that we are *not* interested.
+* ocs and data.
+*/
+QJsonDocument doc = QJsonDocument.from_json (metadata);
+q_c_info (lc_cse_metadata ()) << doc.to_json (QJsonDocument.Compact);
 
-  // The metadata is being retrieved as a string stored in a json.
-  // This *seems* to be broken but the RFC doesn't explicits how it wants.
-  // I'm currently unsure if this is error on my side or in the server implementation.
-  // And because inside of the meta-data there's an object called metadata, without '-'
-  // make it really different.
+// The metadata is being retrieved as a string stored in a json.
+// This *seems* to be broken but the RFC doesn't explicits how it wants.
+// I'm currently unsure if this is error on my side or in the server implementation.
+// And because inside of the meta-data there's an object called metadata, without '-'
+// make it really different.
 
-  string meta_data_str = doc.object ()["ocs"]
-                         .to_object ()["data"]
-                         .to_object ()["meta-data"]
-                         .to_string ();
+string meta_data_str = doc.object ()["ocs"]
+                        .to_object ()["data"]
+                        .to_object ()["meta-data"]
+                        .to_string ();
 
-  QJsonDocument meta_data_doc = QJsonDocument.from_json (meta_data_str.to_local8Bit ());
-  QJsonObject metadata_obj = meta_data_doc.object ()["metadata"].to_object ();
-  QJsonObject metadata_keys = metadata_obj["metadata_keys"].to_object ();
-  QByteArray sharing = metadata_obj["sharing"].to_string ().to_local8Bit ();
-  QJsonObject files = meta_data_doc.object ()["files"].to_object ();
+QJsonDocument meta_data_doc = QJsonDocument.from_json (meta_data_str.to_local8Bit ());
+QJsonObject metadata_obj = meta_data_doc.object ()["metadata"].to_object ();
+QJsonObject metadata_keys = metadata_obj["metadata_keys"].to_object ();
+QByteArray sharing = metadata_obj["sharing"].to_string ().to_local8Bit ();
+QJsonObject files = meta_data_doc.object ()["files"].to_object ();
 
-  QJsonDocument debug_helper;
-  debug_helper.set_object (metadata_keys);
-  q_c_debug (lc_cse) << "Keys : " << debug_helper.to_json (QJsonDocument.Compact);
+QJsonDocument debug_helper;
+debug_helper.set_object (metadata_keys);
+q_c_debug (lc_cse) << "Keys : " << debug_helper.to_json (QJsonDocument.Compact);
 
-  // Iterate over the document to store the keys. I'm unsure that the keys are in order,
-  // perhaps it's better to store a map instead of a vector, perhaps this just doesn't matter.
-  for (auto it = metadata_keys.const_begin (), end = metadata_keys.const_end (); it != end; it++) {
+// Iterate over the document to store the keys. I'm unsure that the keys are in order,
+// perhaps it's better to store a map instead of a vector, perhaps this just doesn't matter.
+for (auto it = metadata_keys.const_begin (), end = metadata_keys.const_end (); it != end; it++) {
     QByteArray curr_b64Pass = it.value ().to_string ().to_local8Bit ();
     /***********************************************************
     We have to base64 decode the metadatakey here. This was a misunderstanding in the RFC
@@ -1640,14 +1654,15 @@ QByteArray Folder_metadata.encrypted_metadata () {
     QJsonObject metadata_keys;
     for (auto it = _metadata_keys.const_begin (), end = _metadata_keys.const_end (); it != end; it++) {
         /***********************************************************
-         * We have to already base64 encode the metadatakey here. This was a misunderstanding in the RFC
-         * Now we should be compatible with Android and IOS. Maybe we can fix it later.
-         */
+        We have to already base64 encode the metadatakey here. This was a misunderstanding in the RFC
+        Now we should be compatible with Android and IOS. Maybe we can fix it later.
+        ***********************************************************/
         const QByteArray encrypted_key = encrypt_metadata_key (it.value ().to_base64 ());
         metadata_keys.insert (string.number (it.key ()), string (encrypted_key));
     }
 
-    /* NO SHARING IN V1
+    /***********************************************************
+    NO SHARING IN V1
     QJsonObject recepients;
     for (auto it = _sharing.const_begin (), end = _sharing.const_end (); it != end; it++) {
         recepients.insert (it.first, it.second);
@@ -1657,8 +1672,10 @@ QByteArray Folder_metadata.encrypted_metadata () {
     string sharing_encrypted = encrypt_json_object (recepient_doc.to_json (QJsonDocument.Compact), _metadata_keys.last ());
     ***********************************************************/
 
-    QJsonObject metadata = { {"metadata_keys", metadata_keys}, {/ {"sharing", sharing_encrypted},
-      {"version", 1}
+    QJsonObject metadata = {
+        {"metadata_keys", metadata_keys},
+        {"sharing", sharing_encrypted},
+        {"version", 1}
     };
 
     QJsonObject files;
@@ -1685,7 +1702,9 @@ QByteArray Folder_metadata.encrypted_metadata () {
         files.insert (it.encrypted_filename, file);
     }
 
-    QJsonObject meta_object = { {"metadata", metadata}, {"files", files}
+    QJsonObject meta_object = {
+        {"metadata", metadata},
+        {"files", files}
     };
 
     QJsonDocument internal_metadata;
@@ -1733,13 +1752,13 @@ bool Encryption_helper.file_encryption (QByteArray &key, QByteArray &iv, QFile *
     // Init
     Cipher_ctx ctx;
 
-    /* Create and initialise the context */
+    // Create and initialise the context
     if (!ctx) {
         q_c_info (lc_cse ()) << "Could not create context";
         return false;
     }
 
-    /* Initialise the decryption operation. */
+    // Initialise the decryption operation.
     if (!EVP_Encrypt_init_ex (ctx, EVP_aes_128_gcm (), nullptr, nullptr, nullptr)) {
         q_c_info (lc_cse ()) << "Could not init cipher";
         return false;
@@ -1747,13 +1766,13 @@ bool Encryption_helper.file_encryption (QByteArray &key, QByteArray &iv, QFile *
 
     EVP_CIPHER_CTX_set_padding (ctx, 0);
 
-    /* Set IV length. */
+    // Set IV length.
     if (!EVP_CIPHER_CTX_ctrl (ctx, EVP_CTRL_GCM_SET_IVLEN, iv.size (), nullptr)) {
         q_c_info (lc_cse ()) << "Could not set iv length";
         return false;
     }
 
-    /* Initialise key and IV */
+    // Initialise key and IV
     if (!EVP_Encrypt_init_ex (ctx, nullptr, nullptr, (unsigned char *)key.const_data (), (unsigned char *)iv.const_data ())) {
         q_c_info (lc_cse ()) << "Could not set key and iv";
         return false;
@@ -1788,7 +1807,7 @@ bool Encryption_helper.file_encryption (QByteArray &key, QByteArray &iv, QFile *
     output.write (out, len);
     total_len += len;
 
-    /* Get the e2Ee_tag */
+    // Get the e2Ee_tag
     QByteArray e2Ee_tag (Occ.Constants.e2Ee_tag_size, '\0');
     if (1 != EVP_CIPHER_CTX_ctrl (ctx, EVP_CTRL_GCM_GET_TAG, Occ.Constants.e2Ee_tag_size, unsigned_data (e2Ee_tag))) {
         q_c_info (lc_cse ()) << "Could not get e2Ee_tag";
@@ -1812,13 +1831,13 @@ bool Encryption_helper.file_decryption (QByteArray &key, QByteArray& iv,
     // Init
     Cipher_ctx ctx;
 
-    /* Create and initialise the context */
+    // Create and initialise the context
     if (!ctx) {
         q_c_info (lc_cse ()) << "Could not create context";
         return false;
     }
 
-    /* Initialise the decryption operation. */
+    // Initialise the decryption operation.
     if (!EVP_Decrypt_init_ex (ctx, EVP_aes_128_gcm (), nullptr, nullptr, nullptr)) {
         q_c_info (lc_cse ()) << "Could not init cipher";
         return false;
@@ -1826,13 +1845,13 @@ bool Encryption_helper.file_decryption (QByteArray &key, QByteArray& iv,
 
     EVP_CIPHER_CTX_set_padding (ctx, 0);
 
-    /* Set IV length. */
+    // Set IV length.
     if (!EVP_CIPHER_CTX_ctrl (ctx, EVP_CTRL_GCM_SET_IVLEN,  iv.size (), nullptr)) {
         q_c_info (lc_cse ()) << "Could not set iv length";
         return false;
     }
 
-    /* Initialise key and IV */
+    // Initialise key and IV
     if (!EVP_Decrypt_init_ex (ctx, nullptr, nullptr, (unsigned char *) key.const_data (), (unsigned char *) iv.const_data ())) {
         q_c_info (lc_cse ()) << "Could not set key and iv";
         return false;
@@ -1867,7 +1886,7 @@ bool Encryption_helper.file_decryption (QByteArray &key, QByteArray& iv,
 
     const QByteArray e2Ee_tag = input.read (Occ.Constants.e2Ee_tag_size);
 
-    /* Set expected e2Ee_tag value. Works in Open_s_sL 1.0.1d and later */
+    // Set expected e2Ee_tag value. Works in Open_s_sL 1.0.1d and later
     if (!EVP_CIPHER_CTX_ctrl (ctx, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), (unsigned char *)e2Ee_tag.const_data ())) {
         q_c_info (lc_cse ()) << "Could not set expected e2Ee_tag";
         return false;
@@ -1888,7 +1907,7 @@ Encryption_helper.Streaming_decryptor.Streaming_decryptor (QByteArray &key, QByt
     if (_ctx && !key.is_empty () && !iv.is_empty () && total_size > 0) {
         _is_initialized = true;
 
-        /* Initialize the decryption operation. */
+        // Initialize the decryption operation.
         if (!EVP_Decrypt_init_ex (_ctx, EVP_aes_128_gcm (), nullptr, nullptr, nullptr)) {
             q_critical (lc_cse ()) << "Could not init cipher";
             _is_initialized = false;
@@ -1896,13 +1915,13 @@ Encryption_helper.Streaming_decryptor.Streaming_decryptor (QByteArray &key, QByt
 
         EVP_CIPHER_CTX_set_padding (_ctx, 0);
 
-        /* Set IV length. */
+        // Set IV length.
         if (!EVP_CIPHER_CTX_ctrl (_ctx, EVP_CTRL_GCM_SET_IVLEN, iv.size (), nullptr)) {
             q_critical (lc_cse ()) << "Could not set iv length";
             _is_initialized = false;
         }
 
-        /* Initialize key and IV */
+        // Initialize key and IV
         if (!EVP_Decrypt_init_ex (_ctx, nullptr, nullptr, reinterpret_cast<const unsigned char> (key.const_data ()), reinterpret_cast<const unsigned char> (iv.const_data ()))) {
             q_critical (lc_cse ()) << "Could not set key and iv";
             _is_initialized = false;
@@ -2017,7 +2036,7 @@ QByteArray Encryption_helper.Streaming_decryptor.chunk_decryption (char *input, 
 
         QByteArray e2Ee_tag = QByteArray (input + input_pos, Occ.Constants.e2Ee_tag_size);
 
-        /* Set expected e2Ee_tag value. Works in Open_s_sL 1.0.1d and later */
+        // Set expected e2Ee_tag value. Works in Open_s_sL 1.0.1d and later
         if (!EVP_CIPHER_CTX_ctrl (_ctx, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), reinterpret_cast<unsigned char> (e2Ee_tag.data ()))) {
             q_critical (lc_cse ()) << "Could not set expected e2Ee_tag";
             return QByteArray ();

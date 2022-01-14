@@ -24,7 +24,9 @@ class QtLocalPeer : GLib.Object {
     public QtLocalPeer (GLib.Object *parent = nullptr, string &app_id = string ());
     public bool is_client ();
     public bool send_message (string &message, int timeout, bool block);
-    public string application_id () { return id; }
+    public string application_id () {
+        return id;
+    }
     public static string app_session_id (string &app_id);
 
 signals:
@@ -130,7 +132,9 @@ bool QtLocalPeer.send_message (string &message, int timeout, bool block) {
         if (conn_ok || i)
             break;
         int ms = 250;
-        struct timespec ts = { ms / 1000, (ms % 1000) * 1000 * 1000 };
+        struct timespec ts = {
+            ms / 1000, (ms % 1000) * 1000 * 1000
+        };
         nanosleep (&ts, nullptr);
     }
     if (!conn_ok)

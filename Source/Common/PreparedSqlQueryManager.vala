@@ -12,7 +12,9 @@ class Prepared_sqlQuery {
 
     public ~Prepared_sqlQuery ();
 
-    public operator bool () { return _ok; }
+    public operator bool () {
+        return _ok;
+    }
 
     public SqlQuery *operator. () {
         Q_ASSERT (_ok);
@@ -122,7 +124,9 @@ const Prepared_sqlQuery PreparedSqlQueryManager.get (PreparedSqlQueryManager.Key
     auto &query = _queries[key];
     ENFORCE (query._stmt)
     Q_ASSERT (!sqlite3_stmt_busy (query._stmt));
-    return { &query };
+    return {
+        &query
+    };
 }
 
 const Prepared_sqlQuery PreparedSqlQueryManager.get (PreparedSqlQueryManager.Key key, QByteArray &sql, SqlDatabase &db) {
@@ -132,7 +136,11 @@ const Prepared_sqlQuery PreparedSqlQueryManager.get (PreparedSqlQueryManager.Key
     if (!query._stmt) {
         query._sqldb = &db;
         query._db = db.sqlite_db ();
-        return { &query, query.prepare (sql) == 0 };
+        return {
+            &query, query.prepare (sql) == 0
+        };
     }
-    return { &query };
+    return {
+        &query
+    };
 }

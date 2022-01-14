@@ -78,7 +78,9 @@ class Result {
             _result.~T ();
     }
 
-    public operator bool () { return !_is_error; }
+    public operator bool () {
+        return !_is_error;
+    }
 
     public const T &operator* () const & {
         ASSERT (!_is_error);
@@ -109,7 +111,9 @@ class Result {
         return std.move (_error);
     }
 
-    public bool is_valid () { return !_is_error; }
+    public bool is_valid () {
+        return !_is_error;
+    }
 };
 
 namespace detail {

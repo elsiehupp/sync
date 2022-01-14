@@ -77,14 +77,16 @@ private:
 ***********************************************************/
 class OCUpdater : Updater {
 public:
-    enum Download_state { Unknown = 0,
+    enum Download_state {
+        Unknown = 0,
         Checking_server,
         Up_to_date,
         Downloading,
         Download_complete,
         Download_failed,
         Download_timed_out,
-        Update_only_available_through_system };
+        Update_only_available_through_system
+    };
 
     enum Update_status_string_format {
         PlainText,
@@ -122,8 +124,12 @@ private slots:
 protected:
     virtual void version_info_arrived (Update_info &info) = 0;
     bool update_succeeded ();
-    QNetworkAccessManager *qnam () { return _access_manager; }
-    Update_info update_info () { return _update_info; }
+    QNetworkAccessManager *qnam () {
+        return _access_manager;
+    }
+    Update_info update_info () {
+        return _update_info;
+    }
 
 private:
     QUrl _update_url;
@@ -165,7 +171,9 @@ private:
 class Passive_update_notifier : OCUpdater {
 public:
     Passive_update_notifier (QUrl &url);
-    bool handle_startup () override { return false; }
+    bool handle_startup () override {
+        return false;
+    }
     void background_check_for_update () override;
 
 private:
@@ -179,51 +187,51 @@ private:
     static const char update_target_version_string_c[] = "Updater/update_target_version_string";
     static const char seen_version_c[] = "Updater/seen_version";
     static const char auto_update_attempted_c[] = "Updater/auto_update_attempted";
-    
+
     UpdaterScheduler.UpdaterScheduler (GLib.Object *parent)
         : GLib.Object (parent) {
         connect (&_update_check_timer, &QTimer.timeout,
             this, &UpdaterScheduler.slot_timer_fired);
-    
+
         // Note : the sparkle-updater is not an OCUpdater
         if (auto *updater = qobject_cast<OCUpdater> (Updater.instance ())) {
             connect (updater, &OCUpdater.new_update_available,
                 this, &UpdaterScheduler.updater_announcement);
             connect (updater, &OCUpdater.request_restart, this, &UpdaterScheduler.request_restart);
         }
-    
+
         // at startup, do a check in any case.
         QTimer.single_shot (3000, this, &UpdaterScheduler.slot_timer_fired);
-    
+
         ConfigFile cfg;
         auto check_interval = cfg.update_check_interval ();
         _update_check_timer.start (std.chrono.milliseconds (check_interval).count ());
     }
-    
+
     void UpdaterScheduler.slot_timer_fired () {
         ConfigFile cfg;
-    
+
         // re-set the check interval if it changed in the config file meanwhile
         auto check_interval = std.chrono.milliseconds (cfg.update_check_interval ()).count ();
         if (check_interval != _update_check_timer.interval ()) {
             _update_check_timer.set_interval (check_interval);
             q_c_info (lc_updater) << "Setting new update check interval " << check_interval;
         }
-    
+
         // consider the skip_update_check and !auto_update_check flags in the config.
         if (cfg.skip_update_check () || !cfg.auto_update_check ()) {
             q_c_info (lc_updater) << "Skipping update check because of config file";
             return;
         }
-    
+
         Updater *updater = Updater.instance ();
         if (updater) {
             updater.background_check_for_update ();
         }
     }
-    
+
     /* ----------------------------------------------------------------- */
-    
+
     OCUpdater.OCUpdater (QUrl &url)
         : Updater ()
         , _update_url (url)
@@ -231,11 +239,11 @@ private:
         , _access_manager (new AccessManager (this))
         , _timeout_watchdog (new QTimer (this)) {
     }
-    
+
     void OCUpdater.set_update_url (QUrl &url) {
         _update_url = url;
     }
-    
+
     bool OCUpdater.perform_update () {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
@@ -249,9 +257,9 @@ private:
                     .arg (Theme.instance ().app_name_g_u_i ()),
                 QMessageBox.Ok,
                 nullptr);
-    
+
             message_box_start_installer.set_attribute (Qt.WA_DeleteOnClose);
-    
+
             connect (message_box_start_installer, &QMessageBox.finished, this, [this] {
                 slot_start_installer ();
             });
@@ -259,10 +267,10 @@ private:
         }
         return false;
     }
-    
+
     void OCUpdater.background_check_for_update () {
         int dl_state = download_state ();
-    
+
         // do the real update check depending on the internal state of updater.
         switch (dl_state) {
         case Unknown:
@@ -280,10 +288,10 @@ private:
             break;
         }
     }
-    
+
     string OCUpdater.status_string (Update_status_string_format format) {
         string update_version = _update_info.version_string ();
-    
+
         switch (download_state ()) {
         case Downloading:
             return tr ("Downloading %1. Please wait …").arg (update_version);
@@ -313,16 +321,16 @@ private:
             return tr ("No updates available. Your installation is at the latest version.");
         }
     }
-    
+
     int OCUpdater.download_state () {
         return _state;
     }
-    
+
     void OCUpdater.set_download_state (Download_state state) {
         auto old_state = _state;
         _state = state;
         emit download_state_changed ();
-    
+
         // show the notification if the download is complete (on every check)
         // or once for system based updates.
         if (_state == OCUpdater.Download_complete || (old_state != OCUpdater.Update_only_available_through_system
@@ -330,7 +338,7 @@ private:
             emit new_update_available (tr ("Update Check"), status_string ());
         }
     }
-    
+
     void OCUpdater.slot_start_installer () {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
@@ -338,7 +346,7 @@ private:
         settings.set_value (auto_update_attempted_c, true);
         settings.sync ();
         q_c_info (lc_updater) << "Running updater" << update_file;
-    
+
         if (update_file.ends_with (".exe")) {
             QProcess.start_detached (update_file, QStringList () << "/S"
                                                               << "/launch");
@@ -350,43 +358,43 @@ private:
             // | Out-Null forces powershell to wait for msiexec to finish.
             auto prepare_path_for_powershell = [] (string path) {
                 path.replace ("'", "''");
-    
+
                 return QDir.to_native_separators (path);
             };
-    
+
             string msi_log_file = cfg.config_path () + "msi.log";
             string command = string ("&{msiexec /promptrestart /passive /i '%1' /L*V '%2'| Out-Null ; &'%3'}")
                  .arg (prepare_path_for_powershell (update_file))
                  .arg (prepare_path_for_powershell (msi_log_file))
                  .arg (prepare_path_for_powershell (QCoreApplication.application_file_path ()));
-    
+
             QProcess.start_detached ("powershell.exe", QStringList{"-Command", command});
         }
         q_app.quit ();
     }
-    
+
     void OCUpdater.check_for_update () {
         QNetworkReply *reply = _access_manager.get (QNetworkRequest (_update_url));
         connect (_timeout_watchdog, &QTimer.timeout, this, &OCUpdater.slot_timed_out);
         _timeout_watchdog.start (30 * 1000);
         connect (reply, &QNetworkReply.finished, this, &OCUpdater.slot_version_info_arrived);
-    
+
         set_download_state (Checking_server);
     }
-    
+
     void OCUpdater.slot_open_update_url () {
         QDesktopServices.open_url (_update_info.web ());
     }
-    
+
     bool OCUpdater.update_succeeded () {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
-    
+
         int64 target_version_int = Helper.string_version_to_int (settings.value (update_target_version_c).to_string ());
         int64 current_version = Helper.current_version_to_int ();
         return current_version >= target_version_int;
     }
-    
+
     void OCUpdater.slot_version_info_arrived () {
         _timeout_watchdog.stop ();
         auto *reply = qobject_cast<QNetworkReply> (sender ());
@@ -396,9 +404,9 @@ private:
             set_download_state (Download_timed_out);
             return;
         }
-    
+
         string xml = string.from_utf8 (reply.read_all ());
-    
+
         bool ok = false;
         _update_info = Update_info.parse_string (xml, &ok);
         if (ok) {
@@ -408,24 +416,24 @@ private:
             set_download_state (Download_timed_out);
         }
     }
-    
+
     void OCUpdater.slot_timed_out () {
         set_download_state (Download_timed_out);
     }
-    
+
     ////////////////////////////////////////////////////////////////////////
-    
+
     NSISUpdater.NSISUpdater (QUrl &url)
         : OCUpdater (url) {
     }
-    
+
     void NSISUpdater.slot_write_file () {
         auto *reply = qobject_cast<QNetworkReply> (sender ());
         if (_file.is_open ()) {
             _file.write (reply.read_all ());
         }
     }
-    
+
     void NSISUpdater.wipe_update_data () {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
@@ -437,7 +445,7 @@ private:
         settings.remove (update_target_version_string_c);
         settings.remove (auto_update_attempted_c);
     }
-    
+
     void NSISUpdater.slot_download_finished () {
         auto *reply = qobject_cast<QNetworkReply> (sender ());
         reply.delete_later ();
@@ -445,19 +453,19 @@ private:
             set_download_state (Download_failed);
             return;
         }
-    
+
         QUrl url (reply.url ());
         _file.close ();
-    
+
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
-    
+
         // remove previously downloaded but not used installer
         QFile old_target_file (settings.value (update_available_c).to_string ());
         if (old_target_file.exists ()) {
             old_target_file.remove ();
         }
-    
+
         QFile.copy (_file.file_name (), _target_file);
         set_download_state (Download_complete);
         q_c_info (lc_updater) << "Downloaded" << url.to_string () << "to" << _target_file;
@@ -465,7 +473,7 @@ private:
         settings.set_value (update_target_version_string_c, update_info ().version_string ());
         settings.set_value (update_available_c, _target_file);
     }
-    
+
     void NSISUpdater.version_info_arrived (Update_info &info) {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
@@ -509,24 +517,24 @@ private:
             }
         }
     }
-    
+
     void NSISUpdater.show_no_url_dialog (Update_info &info) {
         // if the version tag is set, there is a newer version.
         auto *msg_box = new Gtk.Dialog;
         msg_box.set_attribute (Qt.WA_DeleteOnClose);
         msg_box.set_window_flags (msg_box.window_flags () & ~Qt.WindowContextHelpButtonHint);
-    
+
         QIcon info_icon = msg_box.style ().standard_icon (QStyle.SP_Message_box_information);
         int icon_size = msg_box.style ().pixel_metric (QStyle.PM_Message_box_icon_size);
-    
+
         msg_box.set_window_icon (info_icon);
-    
+
         auto *layout = new QVBoxLayout (msg_box);
         auto *hlayout = new QHBox_layout;
         layout.add_layout (hlayout);
-    
+
         msg_box.set_window_title (tr ("New Version Available"));
-    
+
         auto *ico = new QLabel;
         ico.set_fixed_size (icon_size, icon_size);
         ico.set_pixmap (info_icon.pixmap (icon_size));
@@ -535,47 +543,47 @@ private:
                          "<p><b>%2</b> is available for download. The installed version is %3.</p>")
                           .arg (Utility.escape (Theme.instance ().app_name_g_u_i ()),
                               Utility.escape (info.version_string ()), Utility.escape (client_version ()));
-    
+
         lbl.set_text (txt);
         lbl.set_text_format (Qt.RichText);
         lbl.set_word_wrap (true);
-    
+
         hlayout.add_widget (ico);
         hlayout.add_widget (lbl);
-    
+
         auto *bb = new QDialogButtonBox;
         QPushButton *skip = bb.add_button (tr ("Skip this version"), QDialogButtonBox.Reset_role);
         QPushButton *reject = bb.add_button (tr ("Skip this time"), QDialogButtonBox.AcceptRole);
         QPushButton *getupdate = bb.add_button (tr ("Get update"), QDialogButtonBox.AcceptRole);
-    
+
         connect (skip, &QAbstractButton.clicked, msg_box, &Gtk.Dialog.reject);
         connect (reject, &QAbstractButton.clicked, msg_box, &Gtk.Dialog.reject);
         connect (getupdate, &QAbstractButton.clicked, msg_box, &Gtk.Dialog.accept);
-    
+
         connect (skip, &QAbstractButton.clicked, this, &NSISUpdater.slot_set_seen_version);
         connect (getupdate, &QAbstractButton.clicked, this, &NSISUpdater.slot_open_update_url);
-    
+
         layout.add_widget (bb);
-    
+
         msg_box.open ();
     }
-    
+
     void NSISUpdater.show_update_error_dialog (string &target_version) {
         auto msg_box = new Gtk.Dialog;
         msg_box.set_attribute (Qt.WA_DeleteOnClose);
         msg_box.set_window_flags (msg_box.window_flags () & ~Qt.WindowContextHelpButtonHint);
-    
+
         QIcon info_icon = msg_box.style ().standard_icon (QStyle.SP_Message_box_information);
         int icon_size = msg_box.style ().pixel_metric (QStyle.PM_Message_box_icon_size);
-    
+
         msg_box.set_window_icon (info_icon);
-    
+
         auto layout = new QVBoxLayout (msg_box);
         auto hlayout = new QHBox_layout;
         layout.add_layout (hlayout);
-    
+
         msg_box.set_window_title (tr ("Update Failed"));
-    
+
         auto ico = new QLabel;
         ico.set_fixed_size (icon_size, icon_size);
         ico.set_pixmap (info_icon.pixmap (icon_size));
@@ -584,25 +592,25 @@ private:
                          "<p><b>%2</b> has been downloaded. The installed version is %3. If you confirm restart and update, your computer may reboot to complete the installation.</p>")
                           .arg (Utility.escape (Theme.instance ().app_name_g_u_i ()),
                               Utility.escape (target_version), Utility.escape (client_version ()));
-    
+
         lbl.set_text (txt);
         lbl.set_text_format (Qt.RichText);
         lbl.set_word_wrap (true);
-    
+
         hlayout.add_widget (ico);
         hlayout.add_widget (lbl);
-    
+
         auto bb = new QDialogButtonBox;
         auto skip = bb.add_button (tr ("Skip this version"), QDialogButtonBox.Reset_role);
         auto askagain = bb.add_button (tr ("Ask again later"), QDialogButtonBox.Reset_role);
         auto retry = bb.add_button (tr ("Restart and update"), QDialogButtonBox.AcceptRole);
         auto getupdate = bb.add_button (tr ("Update manually"), QDialogButtonBox.AcceptRole);
-    
+
         connect (skip, &QAbstractButton.clicked, msg_box, &Gtk.Dialog.reject);
         connect (askagain, &QAbstractButton.clicked, msg_box, &Gtk.Dialog.reject);
         connect (retry, &QAbstractButton.clicked, msg_box, &Gtk.Dialog.accept);
         connect (getupdate, &QAbstractButton.clicked, msg_box, &Gtk.Dialog.accept);
-    
+
         connect (skip, &QAbstractButton.clicked, this, [this] () {
             wipe_update_data ();
             slot_set_seen_version ();
@@ -614,12 +622,12 @@ private:
         connect (getupdate, &QAbstractButton.clicked, this, [this] () {
             slot_open_update_url ();
         });
-    
+
         layout.add_widget (bb);
-    
+
         msg_box.open ();
     }
-    
+
     bool NSISUpdater.handle_startup () {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
@@ -649,15 +657,15 @@ private:
         }
         return false;
     }
-    
+
     void NSISUpdater.slot_set_seen_version () {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
         settings.set_value (seen_version_c, update_info ().version ());
     }
-    
+
     ////////////////////////////////////////////////////////////////////////
-    
+
     Passive_update_notifier.Passive_update_notifier (QUrl &url)
         : OCUpdater (url) {
         // remember the version of the currently running binary. On Linux it might happen that the
@@ -666,7 +674,7 @@ private:
         // running, the running app is restarted. That happens in folderman.
         _running_app_version = Utility.version_of_installed_binary ();
     }
-    
+
     void Passive_update_notifier.background_check_for_update () {
         if (Utility.is_linux ()) {
             // on linux, check if the installed binary is still the same version
@@ -676,14 +684,14 @@ private:
                 emit request_restart ();
             }
         }
-    
+
         OCUpdater.background_check_for_update ();
     }
-    
+
     void Passive_update_notifier.version_info_arrived (Update_info &info) {
         int64 current_ver = Helper.current_version_to_int ();
         int64 remote_ver = Helper.string_version_to_int (info.version ());
-    
+
         if (info.version ().is_empty () || current_ver >= remote_ver) {
             q_c_info (lc_updater) << "Client is on latest version!";
             set_download_state (Up_to_date);
@@ -691,6 +699,6 @@ private:
             set_download_state (Update_only_available_through_system);
         }
     }
-    
+
     } // ns mirall
     

@@ -50,31 +50,31 @@ inline bool operator!= (SyncFileStatus &a, SyncFileStatus &b) {
 }
 
     SyncFileStatus.SyncFileStatus () = default;
-    
+
     SyncFileStatus.SyncFileStatus (SyncFileStatusTag tag)
         : _tag (tag) {
     }
-    
+
     void SyncFileStatus.set (SyncFileStatusTag tag) {
         _tag = tag;
     }
-    
+
     SyncFileStatus.SyncFileStatusTag SyncFileStatus.tag () {
         return _tag;
     }
-    
+
     void SyncFileStatus.set_shared (bool is_shared) {
         _shared = is_shared;
     }
-    
+
     bool SyncFileStatus.shared () {
         return _shared;
     }
-    
+
     string SyncFileStatus.to_socket_api_string () {
         string status_string;
         bool can_be_shared = true;
-    
+
         switch (_tag) {
         case SyncFileStatusTag.STATUS_NONE:
             status_string = QStringLiteral ("NOP");
@@ -101,7 +101,7 @@ inline bool operator!= (SyncFileStatus &a, SyncFileStatus &b) {
         if (can_be_shared && _shared) {
             status_string += QLatin1String ("+SWM");
         }
-    
+
         return status_string;
     }
     }

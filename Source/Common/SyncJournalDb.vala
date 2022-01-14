@@ -51,7 +51,9 @@ class SyncJournalDb : GLib.Object {
     public static bool maybe_migrate_db (string &local_path, string &absolute_journal_path);
 
     // To verify that the record could be found check with SyncJournalFileRecord.is_valid ()
-    public bool get_file_record (string &filename, SyncJournalFileRecord *rec) { return get_file_record (filename.to_utf8 (), rec); }
+    public bool get_file_record (string &filename, SyncJournalFileRecord *rec) {
+        return get_file_record (filename.to_utf8 (), rec);
+    }
     public bool get_file_record (QByteArray &filename, SyncJournalFileRecord *rec);
     public bool get_file_record_by_e2e_mangled_name (string &mangled_name, SyncJournalFileRecord *rec);
     public bool get_file_record_by_inode (uint64 inode, SyncJournalFileRecord *rec);
@@ -78,7 +80,8 @@ class SyncJournalDb : GLib.Object {
     };
 
     /***********************************************************
-    Returns whether the item or any subitems are dehydrated */
+    Returns whether the item or any subitems are dehydrated
+    ***********************************************************/
     public Optional<Has_hydrated_dehydrated> has_hydrated_or_dehydrated_files (QByteArray &filename);
 
     public bool exists ();
@@ -109,11 +112,13 @@ class SyncJournalDb : GLib.Object {
         bool _valid = false;
         QByteArray _content_checksum;
         /***********************************************************
-         * Returns true if this entry refers to a chunked upload that can be continued.
-         * (As opposed to a small file transfer which is stored in the db so we can detect the case
-         * when the upload succeeded, but the connection was dropped before we got the answer)
-         */
-        bool is_chunked () { return _transferid != 0; }
+        Returns true if this entry refers to a chunked upload that can be continued.
+        (As opposed to a small file transfer which is stored in the db so we can detect the case
+        when the upload succeeded, but the connection was dropped before we got the answer)
+        ***********************************************************/
+        bool is_chunked () {
+            return _transferid != 0;
+        }
     };
 
     public struct Poll_info {
@@ -139,47 +144,61 @@ class SyncJournalDb : GLib.Object {
     /// Delete flags table entries that have no metadata correspondent
     public void delete_stale_flags_entries ();
 
-    public void avoid_renames_on_next_sync (string &path) { avoid_renames_on_next_sync (path.to_utf8 ()); }
+    public void avoid_renames_on_next_sync (string &path) {
+        avoid_renames_on_next_sync (path.to_utf8 ());
+    }
     public void avoid_renames_on_next_sync (QByteArray &path);
     public void set_poll_info (Poll_info &);
 
     public QVector<Poll_info> get_poll_infos ();
 
     public enum Selective_sync_list_type {
-        /** The black list is the list of folders that are unselected in the selective sync dialog.
-         * For the sync engine, those folders are considered as if they were not there, so the local
-         * folders will be deleted */
+        /***********************************************************
+        The black list is the list of folders that are unselected in the selective sync dialog.
+        For the sync engine, those folders are considered as if they were not there, so the local
+        folders will be deleted
+        ***********************************************************/
         SelectiveSyncBlackList = 1,
-        /** When a shared folder has a size bigger than a configured size, it is by default not sync'ed
-         * Unless it is in the white list, in which case the folder is sync'ed and all its children.
-         * If a folder is both on the black and the white list, the black list wins */
+        /***********************************************************
+        When a shared folder has a size bigger than a configured size, it is by default not sync'ed
+        Unless it is in the white list, in which case the folder is sync'ed and all its children.
+        If a folder is both on the black and the white list, the black list wins
+        ***********************************************************/
         SelectiveSyncWhiteList = 2,
-        /** List of big sync folders that have not been confirmed by the user yet and that the UI
-         * should notify about */
+        /***********************************************************
+        List of big sync folders that have not been confirmed by the user yet and that the UI
+        should notify about
+        ***********************************************************/
         SelectiveSyncUndecidedList = 3
     };
-    /* return the specified list from the database */
+    /***********************************************************
+    return the specified list from the database
+    ***********************************************************/
     public QStringList get_selective_sync_list (Selective_sync_list_type type, bool *ok);
-    /* Write the selective sync list (remove all other entries of that list */
+    /***********************************************************
+    Write the selective sync list (remove all other entries of that list
+    ***********************************************************/
     public void set_selective_sync_list (Selective_sync_list_type type, QStringList &list);
 
     /***********************************************************
     Make sure that on the next sync file_name and its parents are discovered from the server.
-    
+
     That means its metadata and, if it's a directory, its direct contents.
-    
+
     Specifically, etag
     That causes a metadata difference and a resulting discovery from the remote f
     affected folders.
-    
+
     Since folders in the selective sync list will not be rediscovered (csync_ftw,
     _csync_detect_update skip them), the _invalid_ marker will stay. And any
     child items in the db will be ignored when reading a remote tree from the database.
-    
+
     Any set_file_record () call to affected directories before the next sync run will be
     adjusted to retain the invalid etag via _etag_storage_filter.
     ***********************************************************/
-    public void schedule_path_for_remote_discovery (string &file_name) { schedule_path_for_remote_discovery (file_name.to_utf8 ()); }
+    public void schedule_path_for_remote_discovery (string &file_name) {
+        schedule_path_for_remote_discovery (file_name.to_utf8 ());
+    }
     public void schedule_path_for_remote_discovery (QByteArray &file_name);
 
     /***********************************************************
@@ -189,7 +208,7 @@ class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     Ensures full remote discovery happens on the next sync.
-    
+
     Equivalent to calling schedule_path_for_remote_discovery () for all files.
     ***********************************************************/
     public void force_remote_discovery_next_sync ();
@@ -205,17 +224,19 @@ class SyncJournalDb : GLib.Object {
 
     This usually creates some temporary files next to the db file, like
     $dbfile-shm or $dbfile-wal.
-    
+
     returns true if it could be openend or is currently opened.
     ***********************************************************/
     public bool open ();
 
     /***********************************************************
-    Returns whether the db is currently openend. */
+    Returns whether the db is currently openend.
+    ***********************************************************/
     public bool is_open ();
 
     /***********************************************************
-    Close the database */
+    Close the database
+    ***********************************************************/
     public void close ();
 
     /***********************************************************
@@ -247,7 +268,7 @@ class SyncJournalDb : GLib.Object {
     Find the base name for a conflict file name, using journal or name pattern
 
     The path must be sync-folder relative.
-    
+
     Will return an empty string if it's not even a conflict file by pattern.
     ***********************************************************/
     public QByteArray conflict_file_base_name (QByteArray &conflict_name);
@@ -262,7 +283,7 @@ class SyncJournalDb : GLib.Object {
     /***********************************************************
     Set the 'Item_type_virtual_file_download' to all the files that have the Item_type_virtual_file flag
     within the directory specified path path
-    
+
     The path "" marks everything.
     ***********************************************************/
     public void mark_virtual_file_for_download_recursively (QByteArray &path);
@@ -277,71 +298,70 @@ class SyncJournalDb : GLib.Object {
         PinStateInterface (PinStateInterface &&) = delete;
 
         /***********************************************************
-         * Gets the PinState for the path without considering parents.
-         *
-         * If a path has no explicit PinState "Inherited" is returned.
-         *
-         * The path should not have a trailing slash.
-         * It's valid to use the root path "".
-         *
-         * Returns none on db error.
-         */
+        Gets the PinState for the path without considering parents.
+
+        If a path has no explicit PinState "Inherited" is returned.
+
+        The path should not have a trailing slash.
+        It's valid to use the root path "".
+
+        Returns none on db error.
+        ***********************************************************/
         Optional<PinState> raw_for_path (QByteArray &path);
 
         /***********************************************************
-         * Gets the PinState for the path after inheriting from parents.
-         *
-         * If the exact path has no entry or has an Inherited state,
-         * the state of the closest parent path is returned.
-         *
-         * The path should not have a trailing slash.
-         * It's valid to use the root path "".
-         *
-         * Never returns PinState.Inherited. If the root is "Inherited"
-         * or there's an error, "AlwaysLocal" is returned.
-         *
-         * Returns none on db error.
-         */
+        Gets the PinState for the path after inheriting from parents.
+
+        If the exact path has no entry or has an Inherited state,
+        the state of the closest parent path is returned.
+
+        The path should not have a trailing slash.
+        It's valid to use the root path "".
+
+        Never returns PinState.Inherited. If the root is "Inherited"
+        or there's an error, "AlwaysLocal" is returned.
+
+        Returns none on db error.
+        ***********************************************************/
         Optional<PinState> effective_for_path (QByteArray &path);
 
         /***********************************************************
-         * Like effective_for_path () but also considers subitem pin states.
-         *
-         * If the path's pin state and all subitem's pin states are identical
-         * then that pin state will be returned.
-         *
-         * If some subitem's pin state is different from the path's state,
-         * PinState.Inherited will be returned. Inherited isn't returned in
-         * any other cases.
-         *
-         * It's valid to use the root path "".
-         * Returns none on db error.
-         */
+        Like effective_for_path () but also considers subitem pin states.
+
+        If the path's pin state and all subitem's pin states are identical
+        then that pin state will be returned.
+
+        If some subitem's pin state is different from the path's state,
+        PinState.Inherited will be returned. Inherited isn't returned in
+        any other cases.
+
+        It's valid to use the root path "".
+        Returns none on db error.
+        ***********************************************************/
         Optional<PinState> effective_for_path_recursive (QByteArray &path);
 
         /***********************************************************
-         * Sets a path's pin state.
-         *
-         * The path should not have a trailing slash.
-         * It's valid to use the root path "".
-         */
+        Sets a path's pin state.
+
+        The path should not have a trailing slash.
+        It's valid to use the root path "".
+        ***********************************************************/
         void set_for_path (QByteArray &path, PinState state);
 
         /***********************************************************
-         * Wipes pin states for a path and below.
-         *
-         * Used when the user asks a subtree to have a particular pin state.
-         * The path should not have a trailing slash.
-         * The path "" wipes every entry.
-         */
+        Wipes pin states for a path and below.
+
+        Used when the user asks a subtree to have a particular pin state.
+        The path should not have a trailing slash.
+        The path "" wipes every entry.
+        ***********************************************************/
         void wipe_for_path_and_below (QByteArray &path);
 
         /***********************************************************
-         * Returns list of all paths with their pin state as in the db.
-         *
-         * Returns nothing on db error.
-         * Note that this will have an entry for "".
-         */
+        Returns list of all paths with their pin state as in the db.
+        Returns nothing on db error.
+        Note that this will have an entry for "".
+        ***********************************************************/
         Optional<QVector<QPair<QByteArray, PinState>>> raw_list ();
 
         SyncJournalDb *_db;
@@ -397,7 +417,7 @@ private:
     undo that by writing the correct etag to the database instead. This filter
     will prevent this write and instead guarantee the _invalid_ etag stays in
     place.
-    
+
     The list is cleared on close () (end of sync ru
     clear_etag_storage_filter () (start of sync run).
 
@@ -710,7 +730,7 @@ bool SyncJournalDb.check_connect () {
                                                                         end - text, 0));
                                 }, nullptr, nullptr);
 
-    /* Because insert is so slow, we do everything in a transaction, and only need one call to commit */
+    // Because insert is so slow, we do everything in a transaction, and only need one call to commit
     start_transaction ();
 
     SqlQuery create_query (_db);
@@ -724,7 +744,7 @@ bool SyncJournalDb.check_connect () {
                         "mode INTEGER,"
                         "modtime INTEGER (8),"
                         "type INTEGER,"
-                        "md5 VARCHAR (32)," /* This is the etag.  Called md5 for compatibility */
+                        "md5 VARCHAR (32)," // This is the etag.  Called md5 for compatibility
                         // update_database_structure () will add
                         // fileid
                         // remote_perm
@@ -930,7 +950,7 @@ const int SQLITE_IOERR_SHMMAP            (SQLITE_IOERR | (21<<8))
     /***********************************************************
     If we are upgrading from a client version older than 1.5,
     we cannot read from the database because we need to fetch the files id and etags.
-    
+
      If 1.8.0 caused missing data in the l
      to get back the files that were gone.
      In 1.8.1 we had a fix to re-get the data, but this one here is better
@@ -2675,7 +2695,9 @@ SyncJournalDb.PinStateInterface.raw_list () {
             return {};
         if (!next.has_data)
             break;
-        result.append ({ query.ba_value (0), static_cast<PinState> (query.int_value (1)) });
+        result.append ({
+            query.ba_value (0), static_cast<PinState> (query.int_value (1))
+        });
     }
     return result;
 }

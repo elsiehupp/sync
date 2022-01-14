@@ -38,7 +38,7 @@ namespace {
     We do not want to upload files that are currently being modified.
     To avoid that, we don't upload files that have a modification time
     that is too close to the current time.
-    
+
     This interacts with the ms_between_request_and_sync delay in the fol
     manager. If that delay between file-change notification and sync
     has passed, we should accept the file for upload here.
@@ -46,12 +46,12 @@ namespace {
     inline bool file_is_still_changing (Occ.SyncFileItem &item) {
         const auto modtime = Occ.Utility.q_date_time_from_time_t (item._modtime);
         const int64 ms_since_mod = modtime.msecs_to (QDateTime.current_date_time_utc ());
-    
+
         return std.chrono.milliseconds (ms_since_mod) < Occ.SyncEngine.minimum_file_age_for_upload
             // if the mtime is too much in the future we *do* upload the file
             && ms_since_mod > -10000;
     }
-    
+
 }
 
 namespace Occ {
@@ -104,24 +104,31 @@ public:
     Q_ENUM (Job_state)
 
     enum Job_parallelism {
-
-        /** Jobs can be run in parallel to this job */
+        /***********************************************************
+        Jobs can be run in parallel to this job
+        ***********************************************************/
         Full_parallelism,
 
-        /** No other job shall be started until this one has finished.
-            So this job is guaranteed to finish before any jobs below it
-            are executed. */
+        /***********************************************************
+        No other job shall be started until this one has finished.
+        So this job is guaranteed to finish before any jobs below
+        it are executed.
+        ***********************************************************/
         Wait_for_finished,
     };
 
     Q_ENUM (Job_parallelism)
 
-    virtual Job_parallelism parallelism () { return Full_parallelism; }
+    virtual Job_parallelism parallelism () {
+        return Full_parallelism;
+    }
 
     /***********************************************************
     For "small" jobs
     ***********************************************************/
-    virtual bool is_likely_finished_quickly () { return false; }
+    virtual bool is_likely_finished_quickly () {
+        return false;
+    }
 
     /***********************************************************
     The space that the running jobs need to complete but don't actually use yet.
@@ -129,7 +136,9 @@ public:
     Note that this does *not* include the disk space that's already
     in use by running jobs for things like a download-in-progress.
     ***********************************************************/
-    virtual int64 committed_disk_space () { return 0; }
+    virtual int64 committed_disk_space () {
+        return 0;
+    }
 
     /***********************************************************
     Set the associated composite job
@@ -138,7 +147,9 @@ public:
     and from Propagate_directory to associate the sub_jobs with the first
     job.
     ***********************************************************/
-    void set_associated_composite (Propagator_composite_job *job) { _associated_composite = job; }
+    void set_associated_composite (Propagator_composite_job *job) {
+        _associated_composite = job;
+    }
 
 public slots:
     /***********************************************************
@@ -173,7 +184,7 @@ protected:
 
     For the Propagate_directory._first_job it will point to
     Propagate_directory._sub_jobs.
-    
+
     That can be useful for jobs that want to spawn follow-up jobs without
     becoming composite jobs themselves.
     ***********************************************************/
@@ -232,7 +243,9 @@ public:
         return true;
     }
 
-    Job_parallelism parallelism () override { return _parallelism; }
+    Job_parallelism parallelism () override {
+        return _parallelism;
+    }
 
     SyncFileItemPtr _item;
 
@@ -464,7 +477,8 @@ public:
     QList<Propagate_item_job> _active_job_list;
 
     /***********************************************************
-    We detected that another sync is required after this one */
+    We detected that another sync is required after this one
+    ***********************************************************/
     bool _another_sync_needed;
 
     /***********************************************************
@@ -472,7 +486,7 @@ public:
 
     This starts out empty. When an upload in a folder fails due to insufficent
     remote quota, the quota guess is updated to be attempted_size-1 at maximum.
-    
+
     Note that it will usually just an upper limit for the actual quota - but
     since the quota on the server might ch
     wrong in the other direction as well.
@@ -481,7 +495,10 @@ public:
     ***********************************************************/
     QHash<string, int64> _folder_quota;
 
-    /* the maximum number of jobs using bandwidth (uploads or downloads, in parallel) */
+    
+    /***********************************************************
+    the maximum number of jobs using bandwidth (uploads or downloads, in parallel)
+    ***********************************************************/
     int maximum_active_transfer_job ();
 
     /***********************************************************
@@ -494,7 +511,9 @@ public:
     int64 _chunk_size;
     int64 small_file_size ();
 
-    /* The maximum number of active jobs in parallel  */
+    /***********************************************************
+    The maximum number of active jobs in parallel
+    ***********************************************************/
     int hard_maximum_active_job ();
 
     /***********************************************************
@@ -509,7 +528,7 @@ public:
     It is possible to create files with filenames that differ
     only by case in NTFS, but most operations such as stat and
     open only target one of these by default.
-    
+
     When that happens, we want to avoid uploading incorrect data
     and give up on the file.
     ***********************************************************/
@@ -570,7 +589,7 @@ public:
     Handles a conflict by renaming the file 'item'.
 
     Sets up conflict records.
-    
+
     It also creates a new upload job in composite if the item
     moved away is a file and conflict uploads are requested.
 
@@ -588,7 +607,7 @@ public:
 
     Typically after a sync operation succeeded. Updates the inode from
     the filesystem.
-    
+
     Will also trigger a Vfs.convert_to_placeholder.
     ***********************************************************/
     Result<Vfs.ConvertToPlaceholderResult, string> update_metadata (SyncFileItem &item);
@@ -598,7 +617,7 @@ public:
 
     Typically after a sync operation succeeded. Updates the inode from
     the filesystem.
-    
+
     Will also trigger a Vfs.convert_to_placeholder.
     ***********************************************************/
     static Result<Vfs.ConvertToPlaceholderResult, string> static_update_metadata (SyncFileItem &item, string local_dir,
@@ -629,7 +648,8 @@ private slots:
     }
 
     /***********************************************************
-    Emit the finished signal and make sure it is only emitted once */
+    Emit the finished signal and make sure it is only emitted once
+    ***********************************************************/
     void emit_finished (SyncFileItem.Status status) {
         if (!_finished_emited)
             emit finished (status == SyncFileItem.Success);
@@ -645,7 +665,8 @@ signals:
     void finished (bool success);
 
     /***********************************************************
-    Emitted when propagation has problems with a locked file. */
+    Emitted when propagation has problems with a locked file.
+    ***********************************************************/
     void seen_locked_file (string &file_name);
 
     /***********************************************************
@@ -721,30 +742,30 @@ private slots:
 
     int64 critical_free_space_limit () {
         int64 value = 50 * 1000 * 1000LL;
-    
+
         static bool has_env = false;
         static int64 env = qgetenv ("OWNCLOUD_CRITICAL_FREE_SPACE_BYTES").to_long_long (&has_env);
         if (has_env) {
             value = env;
         }
-    
+
         return q_bound (0LL, value, free_space_limit ());
     }
-    
+
     int64 free_space_limit () {
         int64 value = 250 * 1000 * 1000LL;
-    
+
         static bool has_env = false;
         static int64 env = qgetenv ("OWNCLOUD_FREE_SPACE_BYTES").to_long_long (&has_env);
         if (has_env) {
             value = env;
         }
-    
+
         return value;
     }
-    
+
     Owncloud_propagator.~Owncloud_propagator () = default;
-    
+
     int Owncloud_propagator.maximum_active_transfer_job () {
         if (_download_limit != 0
             || _upload_limit != 0
@@ -754,14 +775,17 @@ private slots:
         }
         return q_min (3, q_ceil (_sync_options._parallel_network_jobs / 2.));
     }
-    
-    /* The maximum number of active jobs in parallel  */
+
+
+    /***********************************************************
+    The maximum number of active jobs in parallel
+    ***********************************************************/
     int Owncloud_propagator.hard_maximum_active_job () {
         if (!_sync_options._parallel_network_jobs)
             return 1;
         return _sync_options._parallel_network_jobs;
     }
-    
+
     Propagate_item_job.~Propagate_item_job () {
         if (auto p = propagator ()) {
             // Normally, every job should clean itself from the _active_job_list. So this should not be
@@ -770,22 +794,22 @@ private slots:
             p._active_job_list.remove_all (this);
         }
     }
-    
+
     static int64 get_min_blacklist_time () {
         return q_max (q_environment_variable_int_value ("OWNCLOUD_BLACKLIST_TIME_MIN"),
             25); // 25 seconds
     }
-    
+
     static int64 get_max_blacklist_time () {
         int v = q_environment_variable_int_value ("OWNCLOUD_BLACKLIST_TIME_MAX");
         if (v > 0)
             return v;
         return 24 * 60 * 60; // 1 day
     }
-    
+
     /***********************************************************
     Creates a blacklist entry, possibly taking into account an old one.
-    
+
     The old entry may be invalid, then a fresh entry is created.
     ***********************************************************/
     static SyncJournalErrorBlacklistRecord create_blacklist_entry (
@@ -799,44 +823,44 @@ private slots:
         entry._rename_target = item._rename_target;
         entry._retry_count = old._retry_count + 1;
         entry._request_id = item._request_id;
-    
+
         static int64 min_blacklist_time (get_min_blacklist_time ());
         static int64 max_blacklist_time (q_max (get_max_blacklist_time (), min_blacklist_time));
-    
+
         // The factor of 5 feels natural : 25s, 2 min, 10 min, ~1h, ~5h, ~24h
         entry._ignore_duration = old._ignore_duration * 5;
-    
+
         if (item._http_error_code == 403) {
             q_c_warning (lc_propagator) << "Probably firewall error : " << item._http_error_code << ", blacklisting up to 1h only";
             entry._ignore_duration = q_min (entry._ignore_duration, int64 (60 * 60));
-    
+
         } else if (item._http_error_code == 413 || item._http_error_code == 415) {
             q_c_warning (lc_propagator) << "Fatal Error condition" << item._http_error_code << ", maximum blacklist ignore time!";
             entry._ignore_duration = max_blacklist_time;
         }
-    
+
         entry._ignore_duration = q_bound (min_blacklist_time, entry._ignore_duration, max_blacklist_time);
-    
+
         if (item._status == SyncFileItem.Soft_error) {
             // Track these errors, but don't actively suppress them.
             entry._ignore_duration = 0;
         }
-    
+
         if (item._http_error_code == 507) {
             entry._error_category = SyncJournalErrorBlacklistRecord.Insufficient_remote_storage;
         }
-    
+
         return entry;
     }
-    
+
     /***********************************************************
     Updates, creates or removes a blacklist entry for the given item.
-    
+
     May adjust the status or item._error_string.
     ***********************************************************/
     void blacklist_update (SyncJournalDb *journal, SyncFileItem &item) {
         SyncJournalErrorBlacklistRecord old_entry = journal.error_blacklist_entry (item._file);
-    
+
         bool may_blacklist =
             item._error_may_be_blacklisted // explicitly flagged for blacklisting
             || ( (item._status == SyncFileItem.Normal_error
@@ -844,7 +868,7 @@ private slots:
                     || item._status == SyncFileItem.Detail_error)
                    && item._http_error_code != 0 // or non-local error
                    );
-    
+
         // No new entry? Possibly remove the old one, then done.
         if (!may_blacklist) {
             if (old_entry.is_valid ()) {
@@ -852,23 +876,23 @@ private slots:
             }
             return;
         }
-    
+
         auto new_entry = create_blacklist_entry (old_entry, item);
         journal.set_error_blacklist_entry (new_entry);
-    
+
         // Suppress the error if it was and continues to be blacklisted.
         // An ignore_duration of 0 mean we're tracking the error, but not actively
         // suppressing it.
         if (item._has_blacklist_entry && new_entry._ignore_duration > 0) {
             item._status = SyncFileItem.Blacklisted_error;
-    
+
             q_c_info (lc_propagator) << "blacklisting " << item._file
                                  << " for " << new_entry._ignore_duration
                                  << ", retry count " << new_entry._retry_count;
-    
+
             return;
         }
-    
+
         // Some soft errors might become louder on repeat occurrence
         if (item._status == SyncFileItem.Soft_error
             && new_entry._retry_count > 1) {
@@ -878,14 +902,14 @@ private slots:
             return;
         }
     }
-    
+
     void Propagate_item_job.done (SyncFileItem.Status status_arg, string &error_string) {
         // Duplicate calls to done () are a logic error
         ENFORCE (_state != Finished);
         _state = Finished;
-    
+
         _item._status = status_arg;
-    
+
         if (_item._is_restoration) {
             if (_item._status == SyncFileItem.Success
                 || _item._status == SyncFileItem.Conflict) {
@@ -898,13 +922,13 @@ private slots:
                 _item._error_string = error_string;
             }
         }
-    
+
         if (propagator ()._abort_requested && (_item._status == SyncFileItem.Normal_error
                                               || _item._status == SyncFileItem.Fatal_error)) {
             // an abort request is ongoing. Change the status to Soft-Error
             _item._status = SyncFileItem.Soft_error;
         }
-    
+
         // Blacklist handling
         switch (_item._status) {
         case SyncFileItem.Soft_error:
@@ -934,27 +958,27 @@ private slots:
             // nothing
             break;
         }
-    
+
         if (_item.has_error_status ())
             q_c_warning (lc_propagator) << "Could not complete propagation of" << _item.destination () << "by" << this << "with status" << _item._status << "and error:" << _item._error_string;
         else
             q_c_info (lc_propagator) << "Completed propagation of" << _item.destination () << "by" << this << "with status" << _item._status;
         emit propagator ().item_completed (_item);
         emit finished (_item._status);
-    
+
         if (_item._status == SyncFileItem.Fatal_error) {
             // Abort all remaining jobs.
             propagator ().abort ();
         }
     }
-    
+
     void Propagate_item_job.slot_restore_job_finished (SyncFileItem.Status status) {
         string msg;
         if (_restore_job) {
             msg = _restore_job.restore_job_msg ();
             _restore_job.set_restore_job_msg ();
         }
-    
+
         if (status == SyncFileItem.Success || status == SyncFileItem.Conflict
             || status == SyncFileItem.Restoration) {
             done (SyncFileItem.Soft_error, msg);
@@ -962,16 +986,16 @@ private slots:
             done (status, tr ("A file or folder was removed from a read only share, but restoring failed : %1").arg (msg));
         }
     }
-    
+
     bool Propagate_item_job.has_encrypted_ancestor () {
         if (!propagator ().account ().capabilities ().client_side_encryption_available ()) {
             return false;
         }
-    
+
         const auto path = _item._file;
         const auto slash_position = path.last_index_of ('/');
         const auto parent_path = slash_position >= 0 ? path.left (slash_position) : string ();
-    
+
         auto path_components = parent_path.split ('/');
         while (!path_components.is_empty ()) {
             SyncJournalFileRecord rec;
@@ -981,12 +1005,12 @@ private slots:
             }
             path_components.remove_last ();
         }
-    
+
         return false;
     }
-    
+
     // ================================================================================
-    
+
     Propagate_item_job *Owncloud_propagator.create_job (SyncFileItemPtr &item) {
         bool delete_existing = item._instruction == CSYNC_INSTRUCTION_TYPE_CHANGE;
         switch (item._instruction) {
@@ -1038,46 +1062,46 @@ private slots:
         }
         return nullptr;
     }
-    
+
     std.unique_ptr<Propagate_upload_file_common> Owncloud_propagator.create_upload_job (SyncFileItemPtr item, bool delete_existing) {
         auto job = std.unique_ptr<Propagate_upload_file_common>{};
-    
+
         if (item._size > sync_options ()._initial_chunk_size && account ().capabilities ().chunking_ng ()) {
             // Item is above _initial_chunk_size, thus will be classified as to be chunked
             job = std.make_unique<Propagate_upload_file_nG> (this, item);
         } else {
             job = std.make_unique<Propagate_upload_file_v1> (this, item);
         }
-    
+
         job.set_delete_existing (delete_existing);
-    
+
         remove_from_bulk_upload_black_list (item._file);
-    
+
         return job;
     }
-    
+
     void Owncloud_propagator.push_delayed_upload_task (SyncFileItemPtr item) {
         _delayed_tasks.push_back (item);
     }
-    
+
     void Owncloud_propagator.reset_delayed_upload_tasks () {
         _schedule_delayed_tasks = false;
         _delayed_tasks.clear ();
     }
-    
+
     int64 Owncloud_propagator.small_file_size () {
         const int64 small_file_size = 100 * 1024; //default to 1 MB. Not dynamic right now.
         return small_file_size;
     }
-    
+
     void Owncloud_propagator.start (Sync_file_item_vector &&items) {
         Q_ASSERT (std.is_sorted (items.begin (), items.end ()));
-    
-        /* This builds all the jobs needed for the propagation.
-         * Each directory is a Propagate_directory job, which contains the files in it.
-         * In order to do that we loop over the items. (which are sorted by destination)
-         * When we enter a directory, we can create the directory job and push it on the stack. */
-    
+
+        // This builds all the jobs needed for the propagation.
+        // Each directory is a Propagate_directory job, which contains the files in it.
+        // In order to do that we loop over the items. (which are sorted by destination)
+        // When we enter a directory, we can create the directory job and push it on the stack.
+
         const auto regex = sync_options ().file_regex ();
         if (regex.is_valid ()) {
             QSet<QStringRef> names;
@@ -1093,11 +1117,13 @@ private slots:
                 }
             }
             items.erase (std.remove_if (items.begin (), items.end (), [&names] (auto i) {
-                return !names.contains (QStringRef { &i._file });
+                return !names.contains (QStringRef {
+                    &i._file
+                });
             }),
-                items.end ());
+            items.end ());
         }
-    
+
         reset_delayed_upload_tasks ();
         _root_job.reset (new Propagate_root_directory (this));
         QStack<QPair<string /* directory name */, Propagate_directory * /* job */>> directories;
@@ -1109,17 +1135,17 @@ private slots:
             if (!removed_directory.is_empty () && item._file.starts_with (removed_directory)) {
                 // this is an item in a directory which is going to be removed.
                 auto *del_dir_job = qobject_cast<Propagate_directory> (directories_to_remove.first ());
-    
+
                 const auto is_new_directory = item.is_directory () &&
                         (item._instruction == CSYNC_INSTRUCTION_NEW || item._instruction == CSYNC_INSTRUCTION_TYPE_CHANGE);
-    
+
                 if (item._instruction == CSYNC_INSTRUCTION_REMOVE || is_new_directory) {
                     // If it is a remove it is already taken care of by the removal of the parent directory
-    
+
                     // If it is a new directory then it is inside a deleted directory... That can happen if
                     // the directory etag was not fetched properly on the previous sync because the sync was
                     // aborted while uploading this directory (which is now removed).  We can ignore it.
-    
+
                     // increase the number of subjobs that would be there.
                     if (del_dir_job) {
                         del_dir_job.increase_affected_count ();
@@ -1134,7 +1160,7 @@ private slots:
                                             << item._file << item._instruction;
                 }
             }
-    
+
             // If a CONFLICT item contains files these can't be processed because
             // the conflict handling is likely to rename the directory. This can happen
             // when there's a new local directory at the same time as a remote file.
@@ -1148,11 +1174,11 @@ private slots:
                     maybe_conflict_directory.clear ();
                 }
             }
-    
+
             while (!item.destination ().starts_with (directories.top ().first)) {
                 directories.pop ();
             }
-    
+
             if (item.is_directory ()) {
                 start_directory_propagation (item,
                                           directories,
@@ -1167,24 +1193,24 @@ private slots:
                                      maybe_conflict_directory);
             }
         }
-    
+
         foreach (Propagator_job *it, directories_to_remove) {
             _root_job._dir_deletion_jobs.append_job (it);
         }
-    
+
         connect (_root_job.data (), &Propagator_job.finished, this, &Owncloud_propagator.emit_finished);
-    
+
         _job_scheduled = false;
         schedule_next_job ();
     }
-    
+
     void Owncloud_propagator.start_directory_propagation (SyncFileItemPtr &item,
                                                        QStack<QPair<string, Propagate_directory>> &directories,
                                                        QVector<Propagator_job> &directories_to_remove,
                                                        string &removed_directory,
                                                        const Sync_file_item_vector &items) {
         auto directory_propagation_job = std.make_unique<Propagate_directory> (this, item);
-    
+
         if (item._instruction == CSYNC_INSTRUCTION_TYPE_CHANGE
             && item._direction == SyncFileItem.Up) {
             // Skip all potential uploads to the new folder.
@@ -1199,13 +1225,13 @@ private slots:
                 }
             }
         }
-    
+
         if (item._instruction == CSYNC_INSTRUCTION_REMOVE) {
             // We do the removal of directories at the end, because there might be moves from
             // these directories that will happen later.
             directories_to_remove.prepend (directory_propagation_job.get ());
             removed_directory = item._file + "/";
-    
+
             // We should not update the etag of parent directories of the removed directory
             // since it would be done before the actual remove (issue #1845)
             // NOTE : Currently this means that we don't update those etag at all in this sync,
@@ -1221,7 +1247,7 @@ private slots:
         }
         directories.push (q_make_pair (item.destination () + "/", directory_propagation_job.release ()));
     }
-    
+
     void Owncloud_propagator.start_file_propagation (SyncFileItemPtr &item,
                                                   QStack<QPair<string, Propagate_directory> > &directories,
                                                   QVector<Propagator_job> &directories_to_remove,
@@ -1237,68 +1263,70 @@ private slots:
         } else {
             directories.top ().second.append_task (item);
         }
-    
+
         if (item._instruction == CSYNC_INSTRUCTION_CONFLICT) {
             // This might be a file or a directory on the local side. If it's a
             // directory we want to skip processing items inside it.
             maybe_conflict_directory = item._file + "/";
         }
     }
-    
+
     const Sync_options &Owncloud_propagator.sync_options () {
         return _sync_options;
     }
-    
+
     void Owncloud_propagator.set_sync_options (Sync_options &sync_options) {
         _sync_options = sync_options;
         _chunk_size = sync_options._initial_chunk_size;
     }
-    
+
     bool Owncloud_propagator.local_file_name_clash (string &rel_file) {
         const string file (_local_dir + rel_file);
         Q_ASSERT (!file.is_empty ());
-    
+
         if (!file.is_empty () && Utility.fs_case_preserving ()) {
             q_c_debug (lc_propagator) << "Case_clash_check for " << file;
             // On Linux, the file system is case sensitive, but this code is useful for testing.
             // Just check that there is no other file with the same name and different casing.
             QFileInfo file_info (file);
             const string fn = file_info.file_name ();
-            const QStringList list = file_info.dir ().entry_list ({ fn });
+            const QStringList list = file_info.dir ().entry_list ({
+                fn
+            });
             if (list.count () > 1 || (list.count () == 1 && list[0] != fn)) {
                 return true;
             }
         }
         return false;
     }
-    
+
     bool Owncloud_propagator.has_case_clash_accessibility_problem (string &relfile) {
         Q_UNUSED (relfile);
         return false;
     }
-    
+
     string Owncloud_propagator.full_local_path (string &tmp_file_name) {
         return _local_dir + tmp_file_name;
     }
-    
+
     string Owncloud_propagator.local_path () {
         return _local_dir;
     }
-    
+
     void Owncloud_propagator.schedule_next_job () {
         if (_job_scheduled) return; // don't schedule more than 1
         _job_scheduled = true;
         QTimer.single_shot (3, this, &Owncloud_propagator.schedule_next_job_impl);
     }
-    
+
     void Owncloud_propagator.schedule_next_job_impl () {
         // TODO : If we see that the automatic up-scaling has a bad impact we
         // need to check how to avoid this.
         // Down-scaling on slow networks? https://github.com/owncloud/client/issues/3382
         // Making sure we do up/down at same time? https://github.com/owncloud/client/issues/1633
-    
+
         _job_scheduled = false;
-    
+
         if (_active_job_list.count () < maximum_active_transfer_job ()) {
             if (_root_job.schedule_self_or_child ()) {
                 schedule_next_job ();
@@ -1322,36 +1350,36 @@ private slots:
             }
         }
     }
-    
+
     void Owncloud_propagator.report_progress (SyncFileItem &item, int64 bytes) {
         emit progress (item, bytes);
     }
-    
+
     AccountPtr Owncloud_propagator.account () {
         return _account;
     }
-    
+
     Owncloud_propagator.Disk_space_result Owncloud_propagator.disk_space_check () {
         const int64 free_bytes = Utility.free_disk_space (_local_dir);
         if (free_bytes < 0) {
             return Disk_space_ok;
         }
-    
+
         if (free_bytes < critical_free_space_limit ()) {
             return Disk_space_critical;
         }
-    
+
         if (free_bytes - _root_job.committed_disk_space () < free_space_limit ()) {
             return Disk_space_failure;
         }
-    
+
         return Disk_space_ok;
     }
-    
+
     bool Owncloud_propagator.create_conflict (SyncFileItemPtr &item,
         Propagator_composite_job *composite, string *error) {
         string fn = full_local_path (item._file);
-    
+
         string rename_error;
         auto conflict_mod_time = FileSystem.get_mod_time (fn);
         if (conflict_mod_time <= 0) {
@@ -1364,31 +1392,31 @@ private slots:
         string conflict_file_name = Utility.make_conflict_file_name (
             item._file, Utility.q_date_time_from_time_t (conflict_mod_time), conflict_user_name);
         string conflict_file_path = full_local_path (conflict_file_name);
-    
+
         emit touched_file (fn);
         emit touched_file (conflict_file_path);
-    
+
         if (!FileSystem.rename (fn, conflict_file_path, &rename_error)) {
             // If the rename fails, don't replace it.
-    
+
             // If the file is locked, we want to retry this sync when it
             // becomes available again.
             if (FileSystem.is_file_locked (fn)) {
                 emit seen_locked_file (fn);
             }
-    
+
             if (error)
                 *error = rename_error;
             return false;
         }
         q_c_info (lc_propagator) << "Created conflict file" << fn << "." << conflict_file_name;
-    
+
         // Create a new conflict record. To get the base etag, we need to read it from the db.
         Conflict_record conflict_record;
         conflict_record.path = conflict_file_name.to_utf8 ();
         conflict_record.base_modtime = item._previous_modtime;
         conflict_record.initial_base_path = item._file.to_utf8 ();
-    
+
         SyncJournalFileRecord base_record;
         if (_journal.get_file_record (item._original_file, &base_record) && base_record.is_valid ()) {
             conflict_record.base_etag = base_record._etag;
@@ -1396,9 +1424,9 @@ private slots:
         } else {
             // We might very well end up with no fileid/etag for new/new conflicts
         }
-    
+
         _journal.set_conflict_record (conflict_record);
-    
+
         // Create a new upload job if the new conflict file should be uploaded
         if (account ().capabilities ().upload_conflict_files ()) {
             if (composite && !QFileInfo (conflict_file_path).is_dir ()) {
@@ -1413,21 +1441,21 @@ private slots:
                 composite.append_task (conflict_item);
             }
         }
-    
+
         // Need a new sync to detect the created copy of the conflicting file
         _another_sync_needed = true;
-    
+
         return true;
     }
-    
+
     string Owncloud_propagator.adjust_renamed_path (string &original) {
         return Occ.adjust_renamed_path (_renamed_directories, original);
     }
-    
+
     Result<Vfs.ConvertToPlaceholderResult, string> Owncloud_propagator.update_metadata (SyncFileItem &item) {
         return Owncloud_propagator.static_update_metadata (item, _local_dir, sync_options ()._vfs.data (), _journal);
     }
-    
+
     Result<Vfs.ConvertToPlaceholderResult, string> Owncloud_propagator.static_update_metadata (SyncFileItem &item, string local_dir,
                                                                                               Vfs *vfs, SyncJournalDb *const journal) {
         const string fs_path = local_dir + item.destination ();
@@ -1444,46 +1472,46 @@ private slots:
         }
         return Vfs.ConvertToPlaceholderResult.Ok;
     }
-    
+
     bool Owncloud_propagator.is_delayed_upload_item (SyncFileItemPtr &item) {
         return account ().capabilities ().bulk_upload () && !_schedule_delayed_tasks && !item._is_encrypted && _sync_options._min_chunk_size > item._size && !is_in_bulk_upload_black_list (item._file);
     }
-    
+
     void Owncloud_propagator.set_schedule_delayed_tasks (bool active) {
         _schedule_delayed_tasks = active;
     }
-    
+
     void Owncloud_propagator.clear_delayed_tasks () {
         _delayed_tasks.clear ();
     }
-    
+
     void Owncloud_propagator.add_to_bulk_upload_black_list (string &file) {
         q_c_debug (lc_propagator) << "black list for bulk upload" << file;
         _bulk_upload_black_list.insert (file);
     }
-    
+
     void Owncloud_propagator.remove_from_bulk_upload_black_list (string &file) {
         q_c_debug (lc_propagator) << "black list for bulk upload" << file;
         _bulk_upload_black_list.remove (file);
     }
-    
+
     bool Owncloud_propagator.is_in_bulk_upload_black_list (string &file) {
         return _bulk_upload_black_list.contains (file);
     }
-    
+
     // ================================================================================
-    
+
     Propagator_job.Propagator_job (Owncloud_propagator *propagator)
         : GLib.Object (propagator)
         , _state (Not_yet_started) {
     }
-    
+
     Owncloud_propagator *Propagator_job.propagator () {
         return qobject_cast<Owncloud_propagator> (parent ());
     }
-    
+
     // ================================================================================
-    
+
     Propagator_job.Job_parallelism Propagator_composite_job.parallelism () {
         // If any of the running sub jobs is not parallel, we have to wait
         for (int i = 0; i < _running_jobs.count (); ++i) {
@@ -1493,40 +1521,40 @@ private slots:
         }
         return Full_parallelism;
     }
-    
+
     void Propagator_composite_job.slot_sub_job_abort_finished () {
         // Count that job has been finished
         _aborts_count--;
-    
+
         // Emit abort if last job has been aborted
         if (_aborts_count == 0) {
             emit abort_finished ();
         }
     }
-    
+
     void Propagator_composite_job.append_job (Propagator_job *job) {
         job.set_associated_composite (this);
         _jobs_to_do.append (job);
     }
-    
+
     bool Propagator_composite_job.schedule_self_or_child () {
         if (_state == Finished) {
             return false;
         }
-    
+
         // Start the composite job
         if (_state == Not_yet_started) {
             _state = Running;
         }
-    
+
         // Ask all the running composite jobs if they have something new to schedule.
         for (auto running_job : q_as_const (_running_jobs)) {
             ASSERT (running_job._state == Running);
-    
+
             if (possibly_run_next_job (running_job)) {
                 return true;
             }
-    
+
             // If any of the running sub jobs is not parallel, we have to cancel the scheduling
             // of the rest of the list and wait for the blocking job to finish and schedule the next one.
             auto paral = running_job.parallelism ();
@@ -1534,7 +1562,7 @@ private slots:
                 return false;
             }
         }
-    
+
         // Now it's our turn, check if we have something left to do.
         // First, convert a task to a job if necessary
         while (_jobs_to_do.is_empty () && !_tasks_to_do.is_empty ()) {
@@ -1555,7 +1583,7 @@ private slots:
             _running_jobs.append (next_job);
             return possibly_run_next_job (next_job);
         }
-    
+
         // If neither us or our children had stuff left to do we could hang. Make sure
         // we mark this job as finished so that the propagator can schedule a new one.
         if (_jobs_to_do.is_empty () && _tasks_to_do.is_empty () && _running_jobs.is_empty ()) {
@@ -1565,17 +1593,17 @@ private slots:
         }
         return false;
     }
-    
+
     void Propagator_composite_job.slot_sub_job_finished (SyncFileItem.Status status) {
         auto *sub_job = static_cast<Propagator_job> (sender ());
         ASSERT (sub_job);
-    
+
         // Delete the job and remove it from our list of jobs.
         sub_job.delete_later ();
         int i = _running_jobs.index_of (sub_job);
         ENFORCE (i >= 0); // should only happen if this function is called more than once
         _running_jobs.remove (i);
-    
+
         // Any sub job error will cause the whole composite to fail. This is important
         // for knowing whether to update the etag in Propagate_directory, for example.
         if (status == SyncFileItem.Fatal_error
@@ -1585,24 +1613,24 @@ private slots:
             || status == SyncFileItem.Blacklisted_error) {
             _has_error = status;
         }
-    
+
         if (_jobs_to_do.is_empty () && _tasks_to_do.is_empty () && _running_jobs.is_empty ()) {
             finalize ();
         } else {
             propagator ().schedule_next_job ();
         }
     }
-    
+
     void Propagator_composite_job.finalize () {
         // The propagator will do parallel scheduling and this could be posted
         // multiple times on the event loop, ignore the duplicate calls.
         if (_state == Finished)
             return;
-    
+
         _state = Finished;
         emit finished (_has_error == SyncFileItem.No_status ? SyncFileItem.Success : _has_error);
     }
-    
+
     int64 Propagator_composite_job.committed_disk_space () {
         int64 needed = 0;
         foreach (Propagator_job *job, _running_jobs) {
@@ -1610,9 +1638,9 @@ private slots:
         }
         return needed;
     }
-    
+
     // ================================================================================
-    
+
     Propagate_directory.Propagate_directory (Owncloud_propagator *propagator, SyncFileItemPtr &item)
         : Propagator_job (propagator)
         , _item (item)
@@ -1624,7 +1652,7 @@ private slots:
         }
         connect (&_sub_jobs, &Propagator_job.finished, this, &Propagate_directory.slot_sub_jobs_finished);
     }
-    
+
     Propagator_job.Job_parallelism Propagate_directory.parallelism () {
         // If any of the non-finished sub jobs is not parallel, we have to wait
         if (_first_job && _first_job.parallelism () != Full_parallelism) {
@@ -1635,31 +1663,31 @@ private slots:
         }
         return Full_parallelism;
     }
-    
+
     bool Propagate_directory.schedule_self_or_child () {
         if (_state == Finished) {
             return false;
         }
-    
+
         if (_state == Not_yet_started) {
             _state = Running;
         }
-    
+
         if (_first_job && _first_job._state == Not_yet_started) {
             return _first_job.schedule_self_or_child ();
         }
-    
+
         if (_first_job && _first_job._state == Running) {
             // Don't schedule any more job until this is done.
             return false;
         }
-    
+
         return _sub_jobs.schedule_self_or_child ();
     }
-    
+
     void Propagate_directory.slot_first_job_finished (SyncFileItem.Status status) {
         _first_job.take ().delete_later ();
-    
+
         if (status != SyncFileItem.Success
             && status != SyncFileItem.Restoration
             && status != SyncFileItem.Conflict) {
@@ -1672,10 +1700,10 @@ private slots:
             }
             return;
         }
-    
+
         propagator ().schedule_next_job ();
     }
-    
+
     void Propagate_directory.slot_sub_jobs_finished (SyncFileItem.Status status) {
         if (!_item.is_empty () && status == SyncFileItem.Success) {
             // If a directory is renamed, recursively delete any stale items
@@ -1684,20 +1712,20 @@ private slots:
                 && _item._original_file != _item._rename_target) {
                 propagator ()._journal.delete_file_record (_item._original_file, true);
             }
-    
+
             if (_item._instruction == CSYNC_INSTRUCTION_NEW && _item._direction == SyncFileItem.Down) {
                 // special case for local MKDIR, set local directory mtime
                 // (it's not synced later at all, but can be nice to have it set initially)
-    
+
                 if (_item._modtime <= 0) {
                     status = _item._status = SyncFileItem.Normal_error;
                     _item._error_string = tr ("Error updating metadata due to invalid modified time");
                     q_c_warning (lc_directory) << "Error writing to the database for file" << _item._file;
                 }
-    
+
                 FileSystem.set_mod_time (propagator ().full_local_path (_item.destination ()), _item._modtime);
             }
-    
+
             // For new directories we always want to update the etag once
             // the directory has been propagated. Otherwise the directory
             // could appear locally without being added to the database.
@@ -1719,31 +1747,31 @@ private slots:
         q_c_info (lc_propagator) << "Propagate_directory.slot_sub_jobs_finished" << "emit finished" << status;
         emit finished (status);
     }
-    
+
     Propagate_root_directory.Propagate_root_directory (Owncloud_propagator *propagator)
         : Propagate_directory (propagator, SyncFileItemPtr (new SyncFileItem))
         , _dir_deletion_jobs (propagator) {
         connect (&_dir_deletion_jobs, &Propagator_job.finished, this, &Propagate_root_directory.slot_dir_deletion_jobs_finished);
     }
-    
+
     Propagator_job.Job_parallelism Propagate_root_directory.parallelism () {
         // the root directory parallelism isn't important
         return Wait_for_finished;
     }
-    
+
     void Propagate_root_directory.abort (Propagator_job.Abort_type abort_type) {
         if (_first_job)
             // Force first job to abort synchronously
             // even if caller allows async abort (async_abort)
             _first_job.abort (Abort_type.Synchronous);
-    
+
         if (abort_type == Abort_type.Asynchronous) {
             struct Aborts_finished {
                 bool sub_jobs_finished = false;
                 bool dir_deletion_finished = false;
             };
             auto abort_status = QSharedPointer<Aborts_finished> (new Aborts_finished);
-    
+
             connect (&_sub_jobs, &Propagator_composite_job.abort_finished, this, [this, abort_status] () {
                 abort_status.sub_jobs_finished = true;
                 if (abort_status.sub_jobs_finished && abort_status.dir_deletion_finished)
@@ -1758,42 +1786,42 @@ private slots:
         _sub_jobs.abort (abort_type);
         _dir_deletion_jobs.abort (abort_type);
     }
-    
+
     int64 Propagate_root_directory.committed_disk_space () {
         return _sub_jobs.committed_disk_space () + _dir_deletion_jobs.committed_disk_space ();
     }
-    
+
     bool Propagate_root_directory.schedule_self_or_child () {
         q_c_info (lc_root_directory ()) << "schedule_self_or_child" << _state << "pending uploads" << propagator ().delayed_tasks ().size () << "subjobs state" << _sub_jobs._state;
-    
+
         if (_state == Finished) {
             return false;
         }
-    
+
         if (Propagate_directory.schedule_self_or_child () && propagator ().delayed_tasks ().empty ()) {
             return true;
         }
-    
+
         // Important : Finish _sub_jobs before scheduling any deletes.
         if (_sub_jobs._state != Finished) {
             return false;
         }
-    
+
         if (!propagator ().delayed_tasks ().empty ()) {
             return schedule_delayed_jobs ();
         }
-    
+
         return _dir_deletion_jobs.schedule_self_or_child ();
     }
-    
+
     void Propagate_root_directory.slot_sub_jobs_finished (SyncFileItem.Status status) {
         q_c_info (lc_root_directory ()) << status << "slot_sub_jobs_finished" << _state << "pending uploads" << propagator ().delayed_tasks ().size () << "subjobs state" << _sub_jobs._state;
-    
+
         if (!propagator ().delayed_tasks ().empty ()) {
             schedule_delayed_jobs ();
             return;
         }
-    
+
         if (status != SyncFileItem.Success
             && status != SyncFileItem.Restoration
             && status != SyncFileItem.Conflict) {
@@ -1806,16 +1834,16 @@ private slots:
             }
             return;
         }
-    
+
         propagator ().schedule_next_job ();
     }
-    
+
     void Propagate_root_directory.slot_dir_deletion_jobs_finished (SyncFileItem.Status status) {
         _state = Finished;
         q_c_info (lc_propagator) << "Propagate_root_directory.slot_dir_deletion_jobs_finished" << "emit finished" << status;
         emit finished (status);
     }
-    
+
     bool Propagate_root_directory.schedule_delayed_jobs () {
         q_c_info (lc_propagator) << "Propagate_root_directory.schedule_delayed_jobs";
         propagator ().set_schedule_delayed_tasks (true);
@@ -1825,18 +1853,18 @@ private slots:
         _sub_jobs._state = Running;
         return _sub_jobs.schedule_self_or_child ();
     }
-    
+
     // ================================================================================
-    
+
     Cleanup_polls_job.~Cleanup_polls_job () = default;
-    
+
     void Cleanup_polls_job.start () {
         if (_poll_infos.empty ()) {
             emit finished ();
             delete_later ();
             return;
         }
-    
+
         auto info = _poll_infos.first ();
         _poll_infos.pop_front ();
         SyncFileItemPtr item (new SyncFileItem);
@@ -1847,7 +1875,7 @@ private slots:
         connect (job, &Poll_job.finished_signal, this, &Cleanup_polls_job.slot_poll_finished);
         job.start ();
     }
-    
+
     void Cleanup_polls_job.slot_poll_finished () {
         auto *job = qobject_cast<Poll_job> (sender ());
         ASSERT (job);
@@ -1871,16 +1899,16 @@ private slots:
         // Continue with the next entry, or finish
         start ();
     }
-    
+
     string Owncloud_propagator.full_remote_path (string &tmp_file_name) {
         // TODO : should this be part of the _item (SyncFileItemPtr)?
         return _remote_folder + tmp_file_name;
     }
-    
+
     string Owncloud_propagator.remote_path () {
         return _remote_folder;
     }
-    
+
     inline QByteArray get_etag_from_reply (QNetworkReply *reply) {
         QByteArray oc_etag = parse_etag (reply.raw_header ("OC-ETag"));
         QByteArray etag = parse_etag (reply.raw_header ("ETag"));
@@ -1893,25 +1921,25 @@ private slots:
         }
         return ret;
     }
-    
+
     /***********************************************************
     Given an error from the network, map to a SyncFileItem.Status error
     ***********************************************************/
     inline SyncFileItem.Status classify_error (QNetworkReply.NetworkError nerror,
         int http_code, bool *another_sync_needed = nullptr, QByteArray &error_body = QByteArray ()) {
         Q_ASSERT (nerror != QNetworkReply.NoError); // we should only be called when there is an error
-    
+
         if (nerror == QNetworkReply.Remote_host_closed_error) {
             // Sometimes server bugs lead to a connection close on certain files,
             // that shouldn't bring the rest of the syncing to a halt.
             return SyncFileItem.Normal_error;
         }
-    
+
         if (nerror > QNetworkReply.NoError && nerror <= QNetworkReply.Unknown_proxy_error) {
             // network error or proxy error . fatal
             return SyncFileItem.Fatal_error;
         }
-    
+
         if (http_code == 503) {
             // When the server is in maintenance mode, we want to exit the sync immediatly
             // so that we do not flood the server with many requests
@@ -1923,13 +1951,13 @@ private slots:
                     && !error_body.contains ("Storage is temporarily not available");
             return probably_maintenance ? SyncFileItem.Fatal_error : SyncFileItem.Normal_error;
         }
-    
+
         if (http_code == 412) {
             // "Precondition Failed"
             // Happens when the e-tag has changed
             return SyncFileItem.Soft_error;
         }
-    
+
         if (http_code == 423) {
             // "Locked"
             // Should be temporary.
@@ -1938,7 +1966,7 @@ private slots:
             }
             return SyncFileItem.File_locked;
         }
-    
+
         return SyncFileItem.Normal_error;
     }
     }

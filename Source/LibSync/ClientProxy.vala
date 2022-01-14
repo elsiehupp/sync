@@ -51,13 +51,13 @@ private:
     ClientProxy.ClientProxy (GLib.Object *parent)
         : GLib.Object (parent) {
     }
-    
+
     static QNetworkProxy proxy_from_config (ConfigFile &cfg) {
         QNetworkProxy proxy;
-    
+
         if (cfg.proxy_host_name ().is_empty ())
             return QNetworkProxy ();
-    
+
         proxy.set_host_name (cfg.proxy_host_name ());
         proxy.set_port (cfg.proxy_port ());
         if (cfg.proxy_needs_auth ()) {
@@ -66,18 +66,18 @@ private:
         }
         return proxy;
     }
-    
+
     bool ClientProxy.is_using_system_default () {
         Occ.ConfigFile cfg;
-    
+
         // if there is no config file, default to system proxy.
         if (cfg.exists ()) {
             return cfg.proxy_type () == QNetworkProxy.DefaultProxy;
         }
-    
+
         return true;
     }
-    
+
     const char *ClientProxy.proxy_type_to_c_str (QNetworkProxy.Proxy_type type) {
         switch (type) {
         case QNetworkProxy.NoProxy:
@@ -96,22 +96,22 @@ private:
             return "NoProxy";
         }
     }
-    
+
     string ClientProxy.print_q_network_proxy (QNetworkProxy &proxy) {
         return string ("%1://%2:%3").arg (proxy_type_to_c_str (proxy.type ())).arg (proxy.host_name ()).arg (proxy.port ());
     }
-    
+
     void ClientProxy.setup_qt_proxy_from_config () {
         Occ.ConfigFile cfg;
         int proxy_type = QNetworkProxy.DefaultProxy;
         QNetworkProxy proxy;
-    
+
         // if there is no config file, default to system proxy.
         if (cfg.exists ()) {
             proxy_type = cfg.proxy_type ();
             proxy = proxy_from_config (cfg);
         }
-    
+
         switch (proxy_type) {
             case QNetworkProxy.NoProxy:
                 q_c_info (lc_client_proxy) << "Set proxy configuration to use NO proxy";
@@ -145,23 +145,23 @@ private:
                 break;
         }
     }
-    
+
     void ClientProxy.lookup_system_proxy_async (QUrl &url, GLib.Object *dst, char *slot) {
         auto *runnable = new System_proxy_runnable (url);
         GLib.Object.connect (runnable, SIGNAL (system_proxy_looked_up (QNetworkProxy)), dst, slot);
         QThread_pool.global_instance ().start (runnable); // takes ownership and deletes
     }
-    
+
     System_proxy_runnable.System_proxy_runnable (QUrl &url)
         : GLib.Object ()
         , QRunnable ()
         , _url (url) {
     }
-    
+
     void System_proxy_runnable.run () {
         q_register_meta_type<QNetworkProxy> ("QNetworkProxy");
         QList<QNetworkProxy> proxies = QNetworkProxyFactory.system_proxy_for_query (QNetwork_proxy_query (_url));
-    
+
         if (proxies.is_empty ()) {
             emit system_proxy_looked_up (QNetworkProxy (QNetworkProxy.NoProxy));
         } else {

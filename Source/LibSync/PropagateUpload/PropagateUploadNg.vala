@@ -96,7 +96,10 @@ void Propagate_upload_file_nG.slot_propfind_iterate (string &name, QMap<string, 
     string chunk_name = name.mid (name.last_index_of ('/') + 1);
     auto chunk_id = chunk_name.to_long_long (&ok);
     if (ok) {
-        Server_chunk_info chunkinfo = { properties["getcontentlength"].to_long_long (), chunk_name };
+        Server_chunk_info chunkinfo = {
+            properties["getcontentlength"].to_long_long (),
+            chunk_name
+        };
         _server_chunks[chunk_id] = chunkinfo;
     }
 }

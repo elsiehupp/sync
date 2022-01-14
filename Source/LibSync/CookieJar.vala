@@ -45,7 +45,7 @@ private:
     namespace {
         const unsigned int JAR_VERSION = 23;
     }
-    
+
     QDataStream &operator<< (QDataStream &stream, QList<QNetwork_cookie> &list) {
         stream << JAR_VERSION;
         stream << uint32 (list.size ());
@@ -53,16 +53,16 @@ private:
             stream << cookie.to_raw_form ();
         return stream;
     }
-    
+
     QDataStream &operator>> (QDataStream &stream, QList<QNetwork_cookie> &list) {
         list.clear ();
-    
+
         uint32 version = 0;
         stream >> version;
-    
+
         if (version != JAR_VERSION)
             return stream;
-    
+
         uint32 count = 0;
         stream >> count;
         for (uint32 i = 0; i < count; ++i) {
@@ -79,38 +79,38 @@ private:
         }
         return stream;
     }
-    
+
     CookieJar.CookieJar (GLib.Object *parent)
         : QNetwork_cookie_jar (parent) {
     }
-    
+
     CookieJar.~CookieJar () = default;
-    
+
     bool CookieJar.set_cookies_from_url (QList<QNetwork_cookie> &cookie_list, QUrl &url) {
         if (QNetwork_cookie_jar.set_cookies_from_url (cookie_list, url)) {
             Q_EMIT new_cookies_for_url (cookie_list, url);
             return true;
         }
-    
+
         return false;
     }
-    
+
     QList<QNetwork_cookie> CookieJar.cookies_for_url (QUrl &url) {
         QList<QNetwork_cookie> cookies = QNetwork_cookie_jar.cookies_for_url (url);
         q_c_debug (lc_cookie_jar) << url << "requests:" << cookies;
         return cookies;
     }
-    
+
     void CookieJar.clear_session_cookies () {
         set_all_cookies (remove_expired (all_cookies ()));
     }
-    
+
     bool CookieJar.save (string &file_name) {
         const QFileInfo info (file_name);
         if (!info.dir ().exists ()) {
             info.dir ().mkpath (".");
         }
-    
+
         q_c_debug (lc_cookie_jar) << file_name;
         QFile file (file_name);
         if (!file.open (QIODevice.WriteOnly)) {
@@ -121,13 +121,13 @@ private:
         file.close ();
         return true;
     }
-    
+
     bool CookieJar.restore (string &file_name) {
         const QFileInfo info (file_name);
         if (!info.exists ()) {
             return false;
         }
-    
+
         QFile file (file_name);
         if (!file.open (QIODevice.Read_only)) {
             return false;
@@ -139,7 +139,7 @@ private:
         file.close ();
         return true;
     }
-    
+
     QList<QNetwork_cookie> CookieJar.remove_expired (QList<QNetwork_cookie> &cookies) {
         QList<QNetwork_cookie> updated_list;
         foreach (QNetwork_cookie &cookie, cookies) {
@@ -149,6 +149,6 @@ private:
         }
         return updated_list;
     }
-    
+
     } // namespace Occ
     

@@ -22,12 +22,12 @@ namespace Occ {
 @ingroup gui
 ***********************************************************/
 class SyncRunFileLog {
-public:
-    SyncRunFileLog ();
-    void start (string &folder_path);
-    void log_item (SyncFileItem &item);
-    void log_lap (string &name);
-    void finish ();
+
+    public SyncRunFileLog ();
+    public void start (string &folder_path);
+    public void log_item (SyncFileItem &item);
+    public void log_lap (string &name);
+    public void finish ();
 
 protected:
 private:
@@ -41,31 +41,31 @@ private:
 
 
     SyncRunFileLog.SyncRunFileLog () = default;
-    
+
     string SyncRunFileLog.date_time_str (QDateTime &dt) {
         return dt.to_string (Qt.ISODate);
     }
-    
+
     void SyncRunFileLog.start (string &folder_path) {
         const int64 logfile_max_size = 10 * 1024 * 1024; // 10Mi_b
-    
+
         const string logpath = QStandardPaths.writable_location (QStandardPaths.App_data_location);
         if (!QDir (logpath).exists ()) {
             QDir ().mkdir (logpath);
         }
-    
+
         int length = folder_path.split (QLatin1String ("/")).length ();
         string filename_single = folder_path.split (QLatin1String ("/")).at (length - 2);
         string filename = logpath + QLatin1String ("/") + filename_single + QLatin1String ("_sync.log");
-    
+
         int depth_index = 2;
         while (QFile.exists (filename)) {
-    
+
             QFile file (filename);
             file.open (QIODevice.Read_only| QIODevice.Text);
             QTextStream in (&file);
             string line = in.read_line ();
-    
+
             if (string.compare (folder_path,line,Qt.CaseSensitive)!=0) {
                 depth_index++;
                 if (depth_index <= length) {
@@ -80,7 +80,7 @@ private:
             }
             else break;
         }
-    
+
         // When the file is too big, just rename it to an old name.
         QFileInfo info (filename);
         bool exists = info.exists ();
@@ -91,10 +91,10 @@ private:
             QFile.rename (filename, new_filename);
         }
         _file.reset (new QFile (filename));
-    
+
         _file.open (QIODevice.WriteOnly | QIODevice.Append | QIODevice.Text);
         _out.set_device (_file.data ());
-    
+
         if (!exists) {
             _out << folder_path << endl;
             // We are creating a new file, add the note.
@@ -102,10 +102,10 @@ private:
                     "size | file_id | status | error_string | http result code | "
                     "other size | other modtime | X-Request-ID"
                  << endl;
-    
+
             FileSystem.set_file_hidden (filename, true);
         }
-    
+
         _total_duration.start ();
         _lap_duration.start ();
         _out << "#=#=#=# Syncrun started " << date_time_str (QDateTime.current_date_time_utc ()) << endl;
@@ -124,7 +124,7 @@ private:
                 ts = rx_match.captured (0);
             }
         }
-    
+
         const QChar L = QLatin1Char ('|');
         _out << ts << L;
         _out << L;
@@ -145,16 +145,16 @@ private:
         _out << string.number (item._previous_size) << L;
         _out << string.number (item._previous_modtime) << L;
         _out << item._request_id << L;
-    
+
         _out << endl;
     }
-    
+
     void SyncRunFileLog.log_lap (string &name) {
         _out << "#=#=#=#=# " << name << " " << date_time_str (QDateTime.current_date_time_utc ())
              << " (last step : " << _lap_duration.restart () << " msec"
              << ", total : " << _total_duration.elapsed () << " msec)" << endl;
     }
-    
+
     void SyncRunFileLog.finish () {
         _out << "#=#=#=# Syncrun finished " << date_time_str (QDateTime.current_date_time_utc ())
              << " (last step : " << _lap_duration.elapsed () << " msec"

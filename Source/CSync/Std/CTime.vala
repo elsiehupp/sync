@@ -116,8 +116,8 @@ int c_utimes (string &uri, struct timeval *times) {
                 errno=ENOTDIR;
                 break;
                 /*case ERROR_WRITE_PROTECT :   //Create_file sets ERROR_ACCESS_DENIED on read-only devices
-                 *                errno=EROFS;
-                 *                break;*/
+                               errno=EROFS;
+                               break;*/
                 case ERROR_ACCESS_DENIED:
                     errno=EACCES;
                     break;

@@ -25,7 +25,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 namespace Occ {
 
-static const char version_c[] = "version"; 
+static const char version_c[] = "version";
 
 class SyncRunFileLog;
 
@@ -34,55 +34,57 @@ class SyncRunFileLog;
 @ingroup gui
 ***********************************************************/
 class FolderDefinition {
-public:
+
     /// The name of the folder in the ui and internally
-    string alias;
+    public string alias;
     /// path on local machine (always trailing /)
-    string local_path;
+    public string local_path;
     /// path to the journal, usually relative to local_path
-    string journal_path;
+    public string journal_path;
     /// path on remote (usually no trailing /, exception "/")
-    string target_path;
+    public string target_path;
     /// whether the folder is paused
-    bool paused = false;
+    public bool paused = false;
     /// whether the folder syncs hidden files
-    bool ignore_hidden_files = false;
+    public bool ignore_hidden_files = false;
     /// Which virtual files setting the folder uses
-    Vfs.Mode virtual_files_mode = Vfs.Off;
+    public Vfs.Mode virtual_files_mode = Vfs.Off;
     /// The CLSID where this folder appears in registry for the Explorer navigation pane entry.
-    QUuid navigation_pane_clsid;
+    public QUuid navigation_pane_clsid;
 
     /// Whether the vfs mode shall silently be updated if possible
-    bool upgrade_vfs_mode = false;
+    public bool upgrade_vfs_mode = false;
 
     /// Saves the folder definition into the current settings group.
-    static void save (QSettings &settings, FolderDefinition &folder);
+    public static void save (QSettings &settings, FolderDefinition &folder);
 
     /// Reads a folder definition from the current settings group.
-    static bool load (QSettings &settings, string &alias,
+    public static bool load (QSettings &settings, string &alias,
         FolderDefinition *folder);
 
     /***********************************************************
     The highest version in the settings that load () can read
 
-    Version 1 : initial version (default if value absent in settings)
-    Version 2 : introduction of metadata_parent hash in 2.6.0
+    Version 1: initial version (default if value absent in settings)
+    Version 2: introduction of metadata_parent hash in 2.6.0
                (version remains readable by 2.5.1)
-    Version 3 : introduction of new windows vfs mode in 2.6.0
+    Version 3: introduction of new windows vfs mode in 2.6.0
     ***********************************************************/
-    static int max_settings_version () { return 3; }
+    public static int max_settings_version () {
+        return 3;
+    }
 
     /// Ensure / as separator and trailing /.
-    static string prepare_local_path (string &path);
+    public static string prepare_local_path (string &path);
 
     /// Remove ending /, then ensure starting '/' : so "/foo/bar" and "/".
-    static string prepare_target_path (string &path);
+    public static string prepare_target_path (string &path);
 
     /// journal_path relative to local_path.
-    string absolute_journal_path ();
+    public string absolute_journal_path ();
 
     /// Returns the relative journal path that's appropriate for this folder and account.
-    string default_journal_path (AccountPtr account);
+    public string default_journal_path (AccountPtr account);
 };
 
 /***********************************************************
@@ -91,175 +93,199 @@ public:
 ***********************************************************/
 class Folder : GLib.Object {
 
-public:
-    enum class ChangeReason {
+    public enum class ChangeReason {
         Other,
         UnLock
     };
-    Q_ENUM (ChangeReason)
 
     /***********************************************************
     Create a new Folder
     ***********************************************************/
-    Folder (FolderDefinition &definition, AccountState *account_state, std.unique_ptr<Vfs> vfs, GLib.Object *parent = nullptr);
+    public Folder (FolderDefinition &definition, AccountState *account_state, std.unique_ptr<Vfs> vfs, GLib.Object *parent = nullptr);
 
-    ~Folder () override;
+    public ~Folder () override;
 
-    using Map = QMap<string, Folder>;
-    using MapIterator = QMapIterator<string, Folder>;
+    public using Map = QMap<string, Folder>;
+    public using MapIterator = QMapIterator<string, Folder>;
 
     /***********************************************************
     The account the folder is configured on.
     ***********************************************************/
-    AccountState *account_state () { return _account_state.data (); }
+    public AccountState *account_state () {
+        return _account_state.data ();
+    }
 
     /***********************************************************
     alias or nickname
     ***********************************************************/
-    string alias ();
-    string short_gui_remote_path_or_app_name (); // since 2.0 we don't want to show aliases anymore, show the path instead
+    public string alias ();
+    public string short_gui_remote_path_or_app_name (); // since 2.0 we don't want to show aliases anymore, show the path instead
 
     /***********************************************************
     short local path to display on the GUI  (native separators)
     ***********************************************************/
-    string short_gui_local_path ();
+    public string short_gui_local_path ();
 
     /***********************************************************
     canonical local folder path, always ends with /
     ***********************************************************/
-    string path ();
+    public string path ();
 
     /***********************************************************
     cleaned canonical folder path, like path () but never ends with a /
-    
+
     Wrapper for QDir.clean_path (path ()) except for "Z:/",
     where it returns "Z:" instead of "Z:/".
     ***********************************************************/
-    string clean_path ();
+    public string clean_path ();
 
     /***********************************************************
     remote folder path, usually without trailing /, exception "/"
     ***********************************************************/
-    string remote_path ();
+    public string remote_path ();
 
     /***********************************************************
     remote folder path, always with a trailing /
     ***********************************************************/
-    string remote_path_trailing_slash ();
+    public string remote_path_trailing_slash ();
 
-    void set_navigation_pane_clsid (QUuid &clsid) { _definition.navigation_pane_clsid = clsid; }
-    QUuid navigation_pane_clsid () { return _definition.navigation_pane_clsid; }
+    public void set_navigation_pane_clsid (QUuid &clsid) {
+        _definition.navigation_pane_clsid = clsid;
+    }
+    public QUuid navigation_pane_clsid () {
+        return _definition.navigation_pane_clsid;
+    }
 
     /***********************************************************
     remote folder path with server url
     ***********************************************************/
-    QUrl remote_url ();
+    public QUrl remote_url ();
 
     /***********************************************************
     switch sync on or off
     ***********************************************************/
-    void set_sync_paused (bool);
+    public void set_sync_paused (bool);
 
-    bool sync_paused ();
+    public bool sync_paused ();
 
     /***********************************************************
     Returns true when the folder may sync.
     ***********************************************************/
-    bool can_sync ();
+    public bool can_sync ();
 
-    void prepare_to_sync ();
+    public void prepare_to_sync ();
 
     /***********************************************************
     True if the folder is busy and can't initiate
     a synchronization
     ***********************************************************/
-    virtual bool is_busy ();
+    public virtual bool is_busy ();
 
     /***********************************************************
-    True if the folder is currently synchronizing */
-    bool is_sync_running ();
+    True if the folder is currently synchronizing
+    ***********************************************************/
+    public bool is_sync_running ();
 
     /***********************************************************
     return the last sync result with error message and status
     ***********************************************************/
-    SyncResult sync_result ();
+    public SyncResult sync_result ();
 
     /***********************************************************
-      * This is called when the sync folder definition is removed. Do cleanups here.
-      *
-      * It removes the database, among other things.
-      *
-      * The folder is not in a valid state afterwards!
-      */
-    virtual void wipe_for_removal ();
+    This is called when the sync folder definition is removed. Do cleanups here.
 
-    void on_associated_account_removed ();
+    It removes the database, among other things.
 
-    void set_sync_state (SyncResult.Status state);
+    The folder is not in a valid state afterwards!
+    ***********************************************************/
+    public virtual void wipe_for_removal ();
 
-    void set_dirty_network_limits ();
+    public void on_associated_account_removed ();
+
+    public void set_sync_state (SyncResult.Status state);
+
+    public void set_dirty_network_limits ();
 
     /***********************************************************
-      * Ignore syncing of hidden files or not. This is defined in the
-      * folder definition
-      */
-    bool ignore_hidden_files ();
-    void set_ignore_hidden_files (bool ignore);
+    Ignore syncing of hidden files or not. This is defined in the
+    folder definition
+    ***********************************************************/
+    public bool ignore_hidden_files ();
+    public void set_ignore_hidden_files (bool ignore);
 
     // Used by the Socket API
-    SyncJournalDb *journal_db () { return &_journal; }
-    SyncEngine &sync_engine () { return *_engine; }
-    Vfs &vfs () { return *_vfs; }
+    public SyncJournalDb *journal_db () {
+        return &_journal;
+    }
+    public SyncEngine &sync_engine () {
+        return *_engine;
+    }
+    public Vfs &vfs () {
+        return *_vfs;
+    }
 
-    RequestEtagJob *etag_job () { return _request_etag_job; }
-    std.chrono.milliseconds msec_since_last_sync () { return std.chrono.milliseconds (_time_since_last_sync_done.elapsed ()); }
-    std.chrono.milliseconds msec_last_sync_duration () { return _last_sync_duration; }
-    int consecutive_follow_up_syncs () { return _consecutive_follow_up_syncs; }
-    int consecutive_failing_syncs () { return _consecutive_failing_syncs; }
+    public RequestEtagJob *etag_job () {
+        return _request_etag_job;
+    }
+    public std.chrono.milliseconds msec_since_last_sync () {
+        return std.chrono.milliseconds (_time_since_last_sync_done.elapsed ());
+    }
+    public std.chrono.milliseconds msec_last_sync_duration () {
+        return _last_sync_duration;
+    }
+    public int consecutive_follow_up_syncs () {
+        return _consecutive_follow_up_syncs;
+    }
+    public int consecutive_failing_syncs () {
+        return _consecutive_failing_syncs;
+    }
 
     /// Saves the folder data in the account's settings.
-    void save_to_settings ();
+    public void save_to_settings ();
     /// Removes the folder from the account's settings.
-    void remove_from_settings ();
+    public void remove_from_settings ();
 
     /***********************************************************
-      * Returns whether a file inside this folder should be excluded.
-      */
-    bool is_file_excluded_absolute (string &full_path) const;
+    Returns whether a file inside this folder should be excluded.
+    ***********************************************************/
+    public bool is_file_excluded_absolute (string &full_path) const;
 
     /***********************************************************
-      * Returns whether a file inside this folder should be excluded.
-      */
-    bool is_file_excluded_relative (string &relative_path) const;
+    Returns whether a file inside this folder should be excluded.
+    ***********************************************************/
+    public bool is_file_excluded_relative (string &relative_path) const;
 
     /***********************************************************
     Calls schedules this folder on the FolderMan after a short delay.
-      *
-      * This should be used in situations where a sync should be triggered
-      * because a local file was modified. Syncs don't upload files that were
-      * modified too recently, and this delay ensures the modification is
-      * far enough in the past.
-      *
-      * The delay doesn't reset with subsequent calls.
-      */
-    void schedule_this_folder_soon ();
+
+    This should be used in situations where a sync should be triggered
+    because a local file was modified. Syncs don't upload files that were
+    modified too recently, and this delay ensures the modification is
+    far enough in the past.
+
+    The delay doesn't reset with subsequent calls.
+    ***********************************************************/
+    public void schedule_this_folder_soon ();
 
     /***********************************************************
-      * Migration : When this flag is true, this folder will save to
-      * the backwards-compatible 'Folders' section in the config file.
-      */
-    void set_save_backwards_compatible (bool save);
+    Migration : When this flag is true, this folder will save to
+    the backwards-compatible 'Folders' section in the config file.
+    ***********************************************************/
+    public void set_save_backwards_compatible (bool save);
 
     /***********************************************************
-    Used to have placeholders : save in placeholder config section */
-    void set_save_in_folders_with_placeholders () { _save_in_folders_with_placeholders = true; }
+    Used to have placeholders : save in placeholder config section
+    ***********************************************************/
+    public void set_save_in_folders_with_placeholders () {
+        _save_in_folders_with_placeholders = true;
+    }
 
     /***********************************************************
     Sets up this folder's folder_watcher if possible.
-    
+
     May be called several times.
     ***********************************************************/
-    void register_folder_watcher ();
+    public void register_folder_watcher ();
 
     /***********************************************************
     virtual files of some kind are enabled
@@ -268,25 +294,31 @@ public:
     and never have an automatic virtual file. But when it's on, the shell context menu will allow
     users to make existing files virtual.
     ***********************************************************/
-    bool virtual_files_enabled ();
-    void set_virtual_files_enabled (bool enabled);
+    public bool virtual_files_enabled ();
+    public void set_virtual_files_enabled (bool enabled);
 
-    void set_root_pin_state (PinState state);
-
-    /***********************************************************
-    Whether user desires a switch that couldn't be executed yet, see member */
-    bool is_vfs_on_off_switch_pending () { return _vfs_on_off_pending; }
-    void set_vfs_on_off_switch_pending (bool pending) { _vfs_on_off_pending = pending; }
-
-    void switch_to_virtual_files ();
-
-    void process_switched_to_virtual_files ();
+    public void set_root_pin_state (PinState state);
 
     /***********************************************************
-    Whether this folder should show selective sync ui */
-    bool supports_selective_sync ();
+    Whether user desires a switch that couldn't be executed yet, see member
+    ***********************************************************/
+    public bool is_vfs_on_off_switch_pending () {
+        return _vfs_on_off_pending;
+    }
+    public void set_vfs_on_off_switch_pending (bool pending) {
+        _vfs_on_off_pending = pending;
+    }
 
-    string file_from_local_path (string &local_path) const;
+    public void switch_to_virtual_files ();
+
+    public void process_switched_to_virtual_files ();
+
+    /***********************************************************
+    Whether this folder should show selective sync ui
+    ***********************************************************/
+    public bool supports_selective_sync ();
+
+    public string file_from_local_path (string &local_path) const;
 
 signals:
     void sync_state_change ();
@@ -306,18 +338,18 @@ signals:
 public slots:
 
     /***********************************************************
-       * terminate the current sync run
-       */
+    terminate the current sync run
+    ***********************************************************/
     void slot_terminate_sync ();
 
     // connected to the corresponding signals in the SyncEngine
     void slot_about_to_remove_all_files (SyncFileItem.Direction, std.function<void (bool)> callback);
 
     /***********************************************************
-      * Starts a sync operation
-      *
-      * If the list of changed files is known, it is passed.
-      */
+    Starts a sync operation
+
+    If the list of changed files is known, it is passed.
+    ***********************************************************/
     void start_sync (QStringList &path_list = QStringList ());
 
     int slot_discard_download_progress ();
@@ -326,26 +358,26 @@ public slots:
     int error_black_list_entry_count ();
 
     /***********************************************************
-       * Triggered by the folder watcher when a file/dir in this folder
-       * changes. Needs to check whether this change should trigger a new
-       * sync run to be scheduled.
-       */
+    Triggered by the folder watcher when a file/dir in this folder
+    changes. Needs to check whether this change should trigger a new
+    sync run to be scheduled.
+    ***********************************************************/
     void slot_watched_path_changed (string &path, ChangeReason reason);
 
     /***********************************************************
     Mark a virtual file as being requested for download, and start a sync.
-    
+
     "implicit" here means that this download request comes from the user wan
     to access the file's data. The user did not change the file's pin state.
     If the file is currently OnlineOnly its state will change to Unspecif
-    
+
     The download re
     in the database. This is necessary since the hydration is not driven by
     the pin state.
 
     relativepath is the folder-relative path to the file (including the extension)
-    
-     * Note, passing directories is not supported. Files only.
+
+    Note, passing directories is not supported. Files only.
     ***********************************************************/
     void implicitly_hydrate_file (string &relativepath);
 
@@ -359,7 +391,8 @@ public slots:
     void schedule_path_for_local_discovery (string &relative_path);
 
     /***********************************************************
-    Ensures that the next sync performs a full local discovery. */
+    Ensures that the next sync performs a full local discovery.
+    ***********************************************************/
     void slot_next_sync_full_local_discovery ();
 
 private slots:
@@ -401,11 +434,13 @@ private slots:
     void slot_folder_conflicts (string &folder, QStringList &conflict_paths);
 
     /***********************************************************
-    Warn users if they create a file or folder that is selective-sync excluded */
+    Warn users if they create a file or folder that is selective-sync excluded
+    ***********************************************************/
     void warn_on_new_excluded_item (SyncJournalFileRecord &record, QStringRef &path);
 
     /***********************************************************
-    Warn users about an unreliable folder watcher */
+    Warn users about an unreliable folder watcher
+    ***********************************************************/
     void slot_watcher_unreliable (string &message);
 
     /***********************************************************
@@ -417,7 +452,8 @@ private slots:
     void slot_hydration_starts ();
 
     /***********************************************************
-    Unblocks normal sync operation */
+    Unblocks normal sync operation
+    ***********************************************************/
     void slot_hydration_done ();
 
 private:
@@ -512,7 +548,7 @@ private:
 
     /***********************************************************
     Watches this folder's local directory for changes.
-    
+
     Created by register_folder_watcher (), triggers slot_watched_path_changed ()
     ***********************************************************/
     QScopedPointer<Folder_watcher> _folder_watcher;
@@ -1634,7 +1670,9 @@ void Folder.register_folder_watcher () {
 
     _folder_watcher.reset (new Folder_watcher (this));
     connect (_folder_watcher.data (), &Folder_watcher.path_changed,
-        this, [this] (string &path) { slot_watched_path_changed (path, Folder.ChangeReason.Other); });
+        this, [this] (string &path) {
+            slot_watched_path_changed (path, Folder.ChangeReason.Other);
+        });
     connect (_folder_watcher.data (), &Folder_watcher.lost_changes,
         this, &Folder.slot_next_sync_full_local_discovery);
     connect (_folder_watcher.data (), &Folder_watcher.became_unreliable,

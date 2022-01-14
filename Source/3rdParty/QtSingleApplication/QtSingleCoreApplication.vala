@@ -70,28 +70,28 @@ namespace SharedTools {
         block = false;
         connect (peer, &QtLocalPeer.message_received, this, &Qt_singleCoreApplication.message_received);
     }
-    
+
     Qt_singleCoreApplication.Qt_singleCoreApplication (string &app_id, int &argc, char **argv)
         : QCoreApplication (argc, argv) {
         peer = new QtLocalPeer (this, app_id);
         connect (peer, &QtLocalPeer.message_received, this, &Qt_singleCoreApplication.message_received);
     }
-    
+
     bool Qt_singleCoreApplication.is_running () {
         return peer.is_client ();
     }
-    
+
     bool Qt_singleCoreApplication.send_message (string &message, int timeout) {
         return peer.send_message (message, timeout, block);
     }
-    
+
     string Qt_singleCoreApplication.id () {
         return peer.application_id ();
     }
-    
+
     void Qt_singleCoreApplication.set_block (bool value) {
         block = value;
     }
-    
+
     } // namespace SharedTools
     

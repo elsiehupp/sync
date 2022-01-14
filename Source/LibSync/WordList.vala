@@ -8,23 +8,23 @@ namespace Occ {
         QStringList get_random_words (int nr);
         string get_unified_string (QStringList& l);
 
-    
+
     // #include <initializer_list>
-    
+
     int get_random_number (int max) {
         unsigned char d[8];
         RAND_bytes (d, 8);
-    
+
         unsigned int num = 0;
-    
+
         for (unsigned char c : d) {
             num = num << 8;
             num += c;
         }
-    
+
         return static_cast<int> (num % max);
     }
-    
+
     QStringList get_random_words (int nr) {
         QStringList word_list = {
             "abandon",
@@ -2076,7 +2076,7 @@ namespace Occ {
             "zone",
             "zoo"
         };
-    
+
         QStringList random_words;
         while (random_words.size () != nr) {
             string curr_word = word_list.at (get_random_number (word_list.size ()));
@@ -2086,7 +2086,7 @@ namespace Occ {
         }
         return random_words;
     }
-    
+
     string get_unified_string (QStringList& w_list) {
         string ret;
         for (auto& str : w_list) {
@@ -2094,7 +2094,7 @@ namespace Occ {
         }
         return ret;
     }
-    
+
     // Namespaces
     }
     }

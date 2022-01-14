@@ -25,15 +25,17 @@ namespace Occ {
 @ingroup gui
 ***********************************************************/
 class Folder_watcher_private : GLib.Object {
-public:
-    Folder_watcher_private () = default;
-    Folder_watcher_private (Folder_watcher *p, string &path);
-    ~Folder_watcher_private () override;
 
-    int test_watch_count () { return _path_to_watch.size (); }
+    public Folder_watcher_private () = default;
+    public Folder_watcher_private (Folder_watcher *p, string &path);
+    public ~Folder_watcher_private () override;
+
+    public int test_watch_count () {
+        return _path_to_watch.size ();
+    }
 
     /// On linux the watcher is ready when the ctor finished.
-    bool _ready = true;
+    public bool _ready = true;
 
 protected slots:
     void slot_received_notification (int fd);
@@ -66,12 +68,12 @@ private:
         } else {
             q_c_warning (lc_folder_watcher) << "notify_init () failed : " << strerror (errno);
         }
-    
+
         QMetaObject.invoke_method (this, "slot_add_folder_recursive", Q_ARG (string, path));
     }
-    
+
     Folder_watcher_private.~Folder_watcher_private () = default;
-    
+
     // attention : result list passed by reference!
     bool Folder_watcher_private.find_folders_below (QDir &dir, QStringList &full_list) {
         bool ok = true;
@@ -83,7 +85,7 @@ private:
             name_filter << QLatin1String ("*");
             QDir.Filters filter = QDir.Dirs | QDir.NoDotAndDotDot | QDir.No_sym_links | QDir.Hidden;
             const QStringList pathes = dir.entry_list (name_filter, filter);
-    
+
             QStringList.Const_iterator Const_iterator;
             for (Const_iterator = pathes.const_begin (); Const_iterator != pathes.const_end ();
                  ++Const_iterator) {
@@ -92,14 +94,14 @@ private:
                 ok = find_folders_below (QDir (full_path), full_list);
             }
         }
-    
+
         return ok;
     }
-    
+
     void Folder_watcher_private.inotify_register_path (string &path) {
         if (path.is_empty ())
             return;
-    
+
         int wd = inotify_add_watch (_fd, path.to_utf8 ().const_data (),
             IN_CLOSE_WRITE | IN_ATTRIB | IN_MOVE | IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MOVE_SELF | IN_UNMOUNT | IN_ONLYDIR);
         if (wd > -1) {
@@ -116,17 +118,17 @@ private:
             }
         }
     }
-    
+
     void Folder_watcher_private.slot_add_folder_recursive (string &path) {
         if (_path_to_watch.contains (path))
             return;
-    
+
         int subdirs = 0;
         q_c_debug (lc_folder_watcher) << " (+) Watcher:" << path;
-    
+
         QDir in_path (path);
         inotify_register_path (in_path.absolute_path ());
-    
+
         QStringList all_subfolders;
         if (!find_folders_below (QDir (path), all_subfolders)) {
             q_c_warning (lc_folder_watcher) << "Could not traverse all sub folders";
@@ -146,39 +148,38 @@ private:
                 q_c_debug (lc_folder_watcher) << "    `. discarded:" << folder.path ();
             }
         }
-    
+
         if (subdirs > 0) {
             q_c_debug (lc_folder_watcher) << "    `. and" << subdirs << "subdirectories";
         }
     }
-    
+
     void Folder_watcher_private.slot_received_notification (int fd) {
         int len = 0;
         struct inotify_event *event = nullptr;
         size_t i = 0;
         int error = 0;
         QVarLengthArray<char, 2048> buffer (2048);
-    
+
         len = read (fd, buffer.data (), buffer.size ());
         error = errno;
         /***********************************************************
-          * From inotify documentation:
-          *
-          * The behavior when the buffer given to read (2) is too
-          * small to return information about the next event
-          * depends on the kernel version : in kernels  before 2.6.21,
-          * read (2) returns 0; since kernel 2.6.21, read (2) fails with
-          * the error EINVAL.
-          */
+        From inotify documentation:
+        The behavior when the buffer given to read (2) is too
+        small to return information about the next event
+        depends on the kernel version : in kernels  before 2.6.21,
+        read (2) returns 0; since kernel 2.6.21, read (2) fails with
+        the error EINVAL.
+        */
         while (len < 0 && error == EINVAL) {
             // double the buffer size
             buffer.resize (buffer.size () * 2);
-    
+
             /* and try again ... */
             len = read (fd, buffer.data (), buffer.size ());
             error = errno;
         }
-    
+
         // iterate events in buffer
         unsigned int ulen = len;
         for (i = 0; i + sizeof (inotify_event) < ulen; i += sizeof (inotify_event) + (event ? event.len : 0)) {
@@ -188,7 +189,7 @@ private:
                 q_c_debug (lc_folder_watcher) << "NULL event";
                 continue;
             }
-    
+
             // Fire event for the path that was changed.
             if (event.len == 0 || event.wd <= -1)
                 continue;
@@ -202,7 +203,7 @@ private:
             }
             const string p = _watch_to_path[event.wd] + '/' + file_name;
             _parent.change_detected (p);
-    
+
             if ( (event.mask & (IN_MOVED_TO | IN_CREATE))
                 && QFileInfo (p).is_dir ()
                 && !_parent.path_is_ignored (p)) {
@@ -213,14 +214,14 @@ private:
             }
         }
     }
-    
+
     void Folder_watcher_private.remove_folders_below (string &path) {
         auto it = _path_to_watch.find (path);
         if (it == _path_to_watch.end ())
             return;
-    
+
         string path_slash = path + '/';
-    
+
         // Remove the entry and all subentries
         while (it != _path_to_watch.end ()) {
             auto it_path = it.key ();
@@ -231,7 +232,7 @@ private:
                 ++it;
                 continue;
             }
-    
+
             auto wid = it.value ();
             inotify_rm_watch (_fd, wid);
             _watch_to_path.remove (wid);
@@ -239,6 +240,6 @@ private:
             q_c_debug (lc_folder_watcher) << "Removed watch for" << it_path;
         }
     }
-    
+
     } // ns mirall
     

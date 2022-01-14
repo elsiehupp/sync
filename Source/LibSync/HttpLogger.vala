@@ -17,7 +17,7 @@ namespace Http_logger {
     void log_request (QNetworkReply *reply, QNetworkAccessManager.Operation operation, QIODevice *device);
 
     /***********************************************************
-    * Helper to construct the HTTP verb used in the request
+    Helper to construct the HTTP verb used in the request
     ***********************************************************/
     QByteArray request_verb (QNetworkAccessManager.Operation operation, QNetworkRequest &request);
     inline QByteArray request_verb (QNetworkReply &reply) {
@@ -26,16 +26,16 @@ namespace Http_logger {
 }
 
     const int64 Peek_size = 1024 * 1024;
-    
+
     const QByteArray XRequest_id (){
         return QByteArrayLiteral ("X-Request-ID");
     }
-    
+
     bool is_text_body (string &s) {
         static const QRegularExpression regexp (QStringLiteral ("^ (text/.*| (application/ (xml|json|x-www-form-urlencoded) (;|$)))"));
         return regexp.match (s).has_match ();
     }
-    
+
     void log_http (QByteArray &verb, string &url, QByteArray &id, string &content_type, QList<QNetworkReply.Raw_header_pair> &header, QIODevice *device) {
         const auto reply = qobject_cast<QNetworkReply> (device);
         const auto content_length = device ? device.size () : 0;
@@ -83,7 +83,7 @@ namespace Http_logger {
         q_c_info (lc_network_http) << msg;
     }
 
-    
+
     void Http_logger.log_request (QNetworkReply *reply, QNetworkAccessManager.Operation operation, QIODevice *device) {
         const auto request = reply.request ();
         if (!lc_network_http ().is_info_enabled ()) {
@@ -101,7 +101,7 @@ namespace Http_logger {
             request.header (QNetworkRequest.ContentTypeHeader).to_string (),
             header,
             device);
-    
+
         GLib.Object.connect (reply, &QNetworkReply.finished, reply, [reply] {
             log_http (request_verb (*reply),
                 reply.url ().to_string (),
@@ -111,7 +111,7 @@ namespace Http_logger {
                 reply);
         });
     }
-    
+
     QByteArray Http_logger.request_verb (QNetworkAccessManager.Operation operation, QNetworkRequest &request) {
         switch (operation) {
         case QNetworkAccessManager.Head_operation:
@@ -131,6 +131,6 @@ namespace Http_logger {
         }
         Q_UNREACHABLE ();
     }
-    
+
     }
     

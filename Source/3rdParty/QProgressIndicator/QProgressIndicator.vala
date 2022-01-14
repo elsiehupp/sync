@@ -39,29 +39,33 @@ class QProgress_indicator : Gtk.Widget {
 
     public QProgress_indicator (Gtk.Widget* parent = nullptr);
 
-    /*********************************************************** Returns the delay between animation steps.
-        \return The number of milliseconds between animation steps. By default, the animation delay is set to 40 milliseconds.
-        \sa set_animation_delay
+    /***********************************************************
+    Returns the delay between animation steps.
+    \return The number of milliseconds between animation steps. By default, the animation delay is set to 40 milliseconds.
+    \sa set_animation_delay
     ***********************************************************/
     public int animation_delay () {
         return m_delay;
     }
 
-    /*********************************************************** Returns a Boolean value indicating whether the component is currently animated.
-        \return Animation state.
-        \sa start_animation stop_animation
+    /***********************************************************
+    Returns a Boolean value indicating whether the component is currently animated.
+    \return Animation state.
+    \sa start_animation stop_animation
     ***********************************************************/
     public bool is_animated ();
 
-    /*********************************************************** Returns a Boolean value indicating whether the receiver shows itself even when it is not animating.
-        \return Return true if the progress indicator shows itself even when it is not animating. By default, it returns false.
-        \sa set_displayed_when_stopped
+    /***********************************************************
+    Returns a Boolean value indicating whether the receiver shows itself even when it is not animating.
+    \return Return true if the progress indicator shows itself even when it is not animating. By default, it returns false.
+    \sa set_displayed_when_stopped
     ***********************************************************/
     public bool is_displayed_when_stopped ();
 
-    /*********************************************************** Returns the color of the component.
-        \sa set_color
-      */
+    /***********************************************************
+    Returns the color of the component.
+    \sa set_color
+    ***********************************************************/
       public const QColor & color () {
         return m_color;
     }
@@ -69,31 +73,36 @@ class QProgress_indicator : Gtk.Widget {
     public QSize size_hint () const override;
     public int height_for_width (int w) const override;
 public slots:
-    /*********************************************************** Starts the spin animation.
-        \sa stop_animation is_animated
+    /***********************************************************
+    Starts the spin animation.
+    \sa stop_animation is_animated
     ***********************************************************/
     void start_animation ();
 
-    /*********************************************************** Stops the spin animation.
-        \sa start_animation is_animated
+    /***********************************************************
+    Stops the spin animation.
+    \sa start_animation is_animated
     ***********************************************************/
     void stop_animation ();
 
-    /*********************************************************** Sets the delay between animation steps.
-        Setting the \a delay to a value larger than 40 slows the animation, while setting the \a delay to a smaller value speeds it up.
-        \param delay The delay, in milliseconds.
-        \sa animation_delay
+    /***********************************************************
+    Sets the delay between animation steps.
+    Setting the \a delay to a value larger than 40 slows the animation, while setting the \a delay to a smaller value speeds it up.
+    \param delay The delay, in milliseconds.
+    \sa animation_delay
     ***********************************************************/
     void set_animation_delay (int delay);
 
-    /*********************************************************** Sets whether the component hides itself when it is not animating.
-       \param state The animation state. Set false to hide the progress indicator when it is not animating; otherwise true.
-       \sa is_displayed_when_stopped
+    /***********************************************************
+    Sets whether the component hides itself when it is not animating.
+    \param state The animation state. Set false to hide the progress indicator when it is not animating; otherwise true.
+    \sa is_displayed_when_stopped
     ***********************************************************/
     void set_displayed_when_stopped (bool state);
 
-    /*********************************************************** Sets the color of the components to the given color.
-        \sa color
+    /***********************************************************
+    Sets the color of the components to the given color.
+    \sa color
     ***********************************************************/
     void set_color (QColor & color);
 protected:

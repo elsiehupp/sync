@@ -15,8 +15,8 @@ Copyright (C) by Camila Ayres <hello@camila.codes>
 namespace Occ {
 
 class RemoteWipe : GLib.Object {
-public:
-    RemoteWipe (AccountPtr account, GLib.Object *parent = nullptr);
+
+    public RemoteWipe (AccountPtr account, GLib.Object *parent = nullptr);
 
 signals:
     /***********************************************************
@@ -80,11 +80,11 @@ private:
         GLib.Object.connect (_account.data (), &Account.app_password_retrieved, this,
                          &RemoteWipe.start_check_job_with_app_password);
     }
-    
+
     void RemoteWipe.start_check_job_with_app_password (string pwd){
         if (pwd.is_empty ())
             return;
-    
+
         _app_password = pwd;
         QUrl request_url = Utility.concat_url_path (_account.url ().to_string (),
                                                  QLatin1String ("/index.php/core/wipe/check"));
@@ -102,13 +102,13 @@ private:
         GLib.Object.connect (_network_reply_check, &QNetworkReply.finished, this,
                          &RemoteWipe.check_job_slot);
     }
-    
+
     void RemoteWipe.check_job_slot () {
         auto json_data = _network_reply_check.read_all ();
         QJsonParseError json_parse_error;
         QJsonObject json = QJsonDocument.from_json (json_data, &json_parse_error).object ();
         bool wipe = false;
-    
+
         //check for errors
         if (_network_reply_check.error () != QNetworkReply.NoError ||
                 json_parse_error.error != QJsonParseError.NoError) {
@@ -126,43 +126,43 @@ private:
             } else {
                 q_c_warning (lc_remote_wipe) <<  string ("The reply from the server did not contain all expected fields");
             }
-    
+
         // check for wipe request
         } else if (!json.value ("wipe").is_undefined ()){
             wipe = json["wipe"].to_bool ();
         }
-    
+
         auto manager = AccountManager.instance ();
         auto account_state = manager.account (_account.display_name ()).data ();
-    
+
         if (wipe){
             /* IMPORTANT - remove later - FIXME MS@2019-12-07 -.
-             * TODO : For "Log out" & "Remove account" : Remove client CA certs and KEY!
-             *
-             *       Disabled as long as selecting another cert is not supported by the UI.
-             *
-             *       Being able to specify a new certificate is important anyway : expiry etc.
-             *
-             *       We introduce this dirty hack here, to allow deleting them upon Remote Wipe.
+            TODO : For "Log out" & "Remove account" : Remove client CA certs and KEY!
+
+                  Disabled as long as selecting another cert is not supported by the UI.
+
+                  Being able to specify a new certificate is important anyway : expiry etc.
+
+                  We introduce this dirty hack here, to allow deleting them upon Remote Wipe.
              */
             _account.set_remote_wipe_requested_HACK ();
             // <-- FIXME MS@2019-12-07
-    
+
             // delete account
             manager.delete_account (account_state);
             manager.save ();
-    
+
             // delete data
             emit authorized (account_state);
-    
+
         } else {
             // ask user for his credentials again
             account_state.handle_invalid_credentials ();
         }
-    
+
         _network_reply_check.delete_later ();
     }
-    
+
     void RemoteWipe.notify_server_success_job (AccountState *account_state, bool data_wiped){
         if (_account_removed && data_wiped && _account == account_state.account ()){
             QUrl request_url = Utility.concat_url_path (_account.url ().to_string (),
@@ -180,7 +180,7 @@ private:
                              &RemoteWipe.notify_server_success_job_slot);
         }
     }
-    
+
     void RemoteWipe.notify_server_success_job_slot () {
         auto json_data = _network_reply_success.read_all ();
         QJsonParseError json_parse_error;
@@ -202,7 +202,7 @@ private:
                 q_c_warning (lc_remote_wipe) << string ("The reply from the server did not contain all expected fields.");
             }
         }
-    
+
         _network_reply_success.delete_later ();
     }
     }

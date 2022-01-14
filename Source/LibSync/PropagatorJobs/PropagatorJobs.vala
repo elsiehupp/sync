@@ -61,8 +61,8 @@ public:
     /***********************************************************
     Whether an existing file with the same name may be deleted before
     creating the directory.
-    
-    Default : false.
+
+    Default: false.
     ***********************************************************/
     void set_delete_existing_file (bool enabled);
 
@@ -83,19 +83,21 @@ public:
         : Propagate_item_job (propagator, item) {
     }
     void start () override;
-    Job_parallelism parallelism () override { return _item.is_directory () ? Wait_for_finished : Full_parallelism; }
+    Job_parallelism parallelism () override {
+        return _item.is_directory () ? Wait_for_finished : Full_parallelism;
+    }
 };
 
     QByteArray local_file_id_from_full_id (QByteArray &id) {
         return id.left (8);
     }
-    
+
     /***********************************************************
     The code will update the database in case of error.
     If everything goes well (no error, returns true), the caller is responsible for removing the entries
     in the database.  But in case of error, we need to remove the entries from the database of the files
     that were deleted.
-    
+
     \a path is relative to propagator ()._local_dir + _item._file and should start with a slash
     ***********************************************************/
     bool Propagate_local_remove.remove_recursively (string &path) {
@@ -109,7 +111,7 @@ public:
                 deleted.prepend (q_make_pair (path, is_dir));
             },
             &errors);
-    
+
         if (!success) {
             // We need to delete the entries from the database now from the deleted vector.
             // Do it while avoiding redundant delete calls to the journal.
@@ -124,28 +126,28 @@ public:
                 }
                 propagator ()._journal.delete_file_record (it.first.mid (propagator ().local_path ().size ()), it.second);
             }
-    
+
             _error = errors.join (", ");
         }
         return success;
     }
-    
+
     void Propagate_local_remove.start () {
         q_c_info (lc_propagate_local_remove) << "Start propagate local remove job";
-    
+
         _move_to_trash = propagator ().sync_options ()._move_files_to_trash;
-    
+
         if (propagator ()._abort_requested)
             return;
-    
+
         const string filename = propagator ().full_local_path (_item._file);
         q_c_info (lc_propagate_local_remove) << "Going to delete:" << filename;
-    
+
         if (propagator ().local_file_name_clash (_item._file)) {
             done (SyncFileItem.Normal_error, tr ("Could not remove %1 because of a local file name clash").arg (QDir.to_native_separators (filename)));
             return;
         }
-    
+
         string remove_error;
         if (_move_to_trash) {
             if ( (QDir (filename).exists () || FileSystem.file_exists (filename))
@@ -172,22 +174,22 @@ public:
         propagator ()._journal.commit ("Local remove");
         done (SyncFileItem.Success);
     }
-    
+
     void Propagate_local_mkdir.start () {
         if (propagator ()._abort_requested)
             return;
-    
+
         start_local_mkdir ();
     }
-    
+
     void Propagate_local_mkdir.set_delete_existing_file (bool enabled) {
         _delete_existing_file = enabled;
     }
-    
+
     void Propagate_local_mkdir.start_local_mkdir () {
         QDir new_dir (propagator ().full_local_path (_item._file));
         string new_dir_str = QDir.to_native_separators (new_dir.path ());
-    
+
         // When turning something that used to be a file into a directory
         // we need to delete the file first.
         QFileInfo fi (new_dir_str);
@@ -208,7 +210,7 @@ public:
                 }
             }
         }
-    
+
         if (Utility.fs_case_preserving () && propagator ().local_file_name_clash (_item._file)) {
             q_c_warning (lc_propagate_local_mkdir) << "New folder to create locally already exists with different case:" << _item._file;
             done (SyncFileItem.Normal_error, tr ("Attention, possible case sensitivity clash with %1").arg (new_dir_str));
@@ -220,7 +222,7 @@ public:
             done (SyncFileItem.Normal_error, tr ("Could not create folder %1").arg (new_dir_str));
             return;
         }
-    
+
         // Insert the directory into the database. The correct etag will be set later,
         // once all contents have been propagated, because should_update_metadata is true.
         // Adding an entry with a dummy etag to the database still makes sense here
@@ -237,31 +239,31 @@ public:
             return;
         }
         propagator ()._journal.commit ("local_mkdir");
-    
+
         auto result_status = _item._instruction == CSYNC_INSTRUCTION_CONFLICT
             ? SyncFileItem.Conflict
             : SyncFileItem.Success;
         done (result_status);
     }
-    
+
     void Propagate_local_rename.start () {
         if (propagator ()._abort_requested)
             return;
-    
+
         string existing_file = propagator ().full_local_path (propagator ().adjust_renamed_path (_item._file));
         string target_file = propagator ().full_local_path (_item._rename_target);
-    
+
         // if the file is a file underneath a moved dir, the _item.file is equal
         // to _item.rename_target and the file is not moved as a result.
         if (_item._file != _item._rename_target) {
             propagator ().report_progress (*_item, 0);
             q_c_debug (lc_propagate_local_rename) << "MOVE " << existing_file << " => " << target_file;
-    
+
             if (string.compare (_item._file, _item._rename_target, Qt.CaseInsensitive) != 0
                 && propagator ().local_file_name_clash (_item._rename_target)) {
                 // Only use local_file_name_clash for the destination if we know that the source was not
                 // the one conflicting  (renaming  A.txt . a.txt is OK)
-    
+
                 // Fixme : the file that is the reason for the clash could be named here,
                 // it would have to come out the local_file_name_clash function
                 done (SyncFileItem.Normal_error,
@@ -270,7 +272,7 @@ public:
                         .arg (QDir.to_native_separators (_item._rename_target)));
                 return;
             }
-    
+
             emit propagator ().touched_file (existing_file);
             emit propagator ().touched_file (target_file);
             string rename_error;
@@ -279,19 +281,19 @@ public:
                 return;
             }
         }
-    
+
         SyncJournalFileRecord old_record;
         propagator ()._journal.get_file_record (_item._original_file, &old_record);
         propagator ()._journal.delete_file_record (_item._original_file);
-    
+
         auto &vfs = propagator ().sync_options ()._vfs;
         auto pin_state = vfs.pin_state (_item._original_file);
         if (!vfs.set_pin_state (_item._original_file, PinState.Inherited)) {
             q_c_warning (lc_propagate_local_rename) << "Could not set pin state of" << _item._original_file << "to inherited";
         }
-    
+
         const auto old_file = _item._file;
-    
+
         if (!_item.is_directory ()) { // Directories are saved at the end
             SyncFileItem new_item (*_item);
             if (old_record.is_valid ()) {
@@ -317,9 +319,9 @@ public:
             done (SyncFileItem.Normal_error, tr ("Error setting pin state"));
             return;
         }
-    
+
         propagator ()._journal.commit ("local_rename");
-    
+
         done (SyncFileItem.Success);
     }
     }

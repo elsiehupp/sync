@@ -53,18 +53,18 @@ private:
         , _path (path)
         , _file_id (file_id) {
     }
-    
+
     void EncryptFolderJob.start () {
         auto job = new Occ.Set_encryption_flag_api_job (_account, _file_id, Occ.Set_encryption_flag_api_job.Set, this);
         connect (job, &Occ.Set_encryption_flag_api_job.success, this, &EncryptFolderJob.slot_encryption_flag_success);
         connect (job, &Occ.Set_encryption_flag_api_job.error, this, &EncryptFolderJob.slot_encryption_flag_error);
         job.start ();
     }
-    
+
     string EncryptFolderJob.error_string () {
         return _error_string;
     }
-    
+
     void EncryptFolderJob.slot_encryption_flag_success (QByteArray &file_id) {
         SyncJournalFileRecord rec;
         _journal.get_file_record (_path, &rec);
@@ -72,7 +72,7 @@ private:
             rec._is_e2e_encrypted = true;
             _journal.set_file_record (rec);
         }
-    
+
         auto lock_job = new Lock_encrypt_folder_api_job (_account, file_id, this);
         connect (lock_job, &Lock_encrypt_folder_api_job.success,
                 this, &EncryptFolderJob.slot_lock_for_encryption_success);
@@ -80,15 +80,15 @@ private:
                 this, &EncryptFolderJob.slot_lock_for_encryption_error);
         lock_job.start ();
     }
-    
+
     void EncryptFolderJob.slot_encryption_flag_error (QByteArray &file_id, int http_error_code) {
         q_debug () << "Error on the encryption flag of" << file_id << "HTTP code:" << http_error_code;
         emit finished (Error);
     }
-    
+
     void EncryptFolderJob.slot_lock_for_encryption_success (QByteArray &file_id, QByteArray &token) {
         _folder_token = token;
-    
+
         Folder_metadata empty_metadata (_account);
         auto encrypted_metadata = empty_metadata.encrypted_metadata ();
         if (encrypted_metadata.is_empty ()) {
@@ -98,7 +98,7 @@ private:
             emit finished (Error);
             return;
         }
-    
+
         auto store_metadata_job = new Store_meta_data_api_job (_account, file_id, empty_metadata.encrypted_metadata (), this);
         connect (store_metadata_job, &Store_meta_data_api_job.success,
                 this, &EncryptFolderJob.slot_upload_metadata_success);
@@ -106,7 +106,7 @@ private:
                 this, &EncryptFolderJob.slot_update_metadata_error);
         store_metadata_job.start ();
     }
-    
+
     void EncryptFolderJob.slot_upload_metadata_success (QByteArray &folder_id) {
         auto unlock_job = new Unlock_encrypt_folder_api_job (_account, folder_id, _folder_token, this);
         connect (unlock_job, &Unlock_encrypt_folder_api_job.success,
@@ -115,10 +115,10 @@ private:
                         this, &EncryptFolderJob.slot_unlock_folder_error);
         unlock_job.start ();
     }
-    
+
     void EncryptFolderJob.slot_update_metadata_error (QByteArray &folder_id, int http_return_code) {
         Q_UNUSED (http_return_code);
-    
+
         auto unlock_job = new Unlock_encrypt_folder_api_job (_account, folder_id, _folder_token, this);
         connect (unlock_job, &Unlock_encrypt_folder_api_job.success,
                         this, &EncryptFolderJob.slot_unlock_folder_success);
@@ -126,12 +126,12 @@ private:
                         this, &EncryptFolderJob.slot_unlock_folder_error);
         unlock_job.start ();
     }
-    
+
     void EncryptFolderJob.slot_lock_for_encryption_error (QByteArray &file_id, int http_error_code) {
         q_c_info (lc_encrypt_folder_job ()) << "Locking error for" << file_id << "HTTP code:" << http_error_code;
         emit finished (Error);
     }
-    
+
     void EncryptFolderJob.slot_unlock_folder_error (QByteArray &file_id, int http_error_code) {
         q_c_info (lc_encrypt_folder_job ()) << "Unlocking error for" << file_id << "HTTP code:" << http_error_code;
         emit finished (Error);
@@ -140,6 +140,6 @@ private:
         q_c_info (lc_encrypt_folder_job ()) << "Unlocking success for" << file_id;
         emit finished (Success);
     }
-    
+
     }
     

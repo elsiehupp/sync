@@ -50,97 +50,103 @@ A folder is scheduled if:
    and Folder.slot_sync_finished ())
 ***********************************************************/
 class FolderMan : GLib.Object {
-public:
-    ~FolderMan () override;
-    static FolderMan *instance ();
 
-    int setup_folders ();
-    int setup_folders_migration ();
+    public ~FolderMan () override;
+    public static FolderMan *instance ();
+
+    public int setup_folders ();
+    public int setup_folders_migration ();
 
     /***********************************************************
     Returns a list of keys that can't be read because they are from
     future versions.
     ***********************************************************/
-    static void backward_migration_settings_keys (QStringList *delete_keys, QStringList *ignore_keys);
+    public static void backward_migration_settings_keys (QStringList *delete_keys, QStringList *ignore_keys);
 
-    const Folder.Map &map ();
+    public const Folder.Map &map ();
 
     /***********************************************************
     Adds a folder for an account, ensures the journal is gone and saves it in the settings.
-      */
-    Folder *add_folder (AccountState *account_state, FolderDefinition &folder_definition);
+    ***********************************************************/
+    public Folder *add_folder (AccountState *account_state, FolderDefinition &folder_definition);
 
     /***********************************************************
-    Removes a folder */
-    void remove_folder (Folder *);
+    Removes a folder
+    ***********************************************************/
+    public void remove_folder (Folder *);
 
     /***********************************************************
-    Returns the folder which the file or directory stored in path is in */
-    Folder *folder_for_path (string &path);
+    Returns the folder which the file or directory stored in path is in
+    ***********************************************************/
+    public Folder *folder_for_path (string &path);
 
     /***********************************************************
-      * returns a list of local files that exist on the local harddisk for an
-      * incoming relative server path. The method checks with all existing sync
-      * folders.
-      */
-    QStringList find_file_in_local_folders (string &rel_path, AccountPtr acc);
+    returns a list of local files that exist on the local harddisk for an
+    incoming relative server path. The method checks with all existing sync
+    folders.
+    ***********************************************************/
+    public QStringList find_file_in_local_folders (string &rel_path, AccountPtr acc);
 
     /***********************************************************
-    Returns the folder by alias or \c nullptr if no folder with the alias exists. */
-    Folder *folder (string &);
+    Returns the folder by alias or \c nullptr if no folder with the alias exists.
+    ***********************************************************/
+    public Folder *folder (string &);
 
     /***********************************************************
     Migrate accounts from owncloud < 2.0
     Creates a folder for a specific configuration, identified by alias.
     ***********************************************************/
-    Folder *setup_folder_from_old_config_file (string &, AccountState *account);
+    public Folder *setup_folder_from_old_config_file (string &, AccountState *account);
 
     /***********************************************************
     Ensures that a given directory does not contain a sync journal file.
-    
+
     @returns false if the journal could not be removed, true otherwise.
     ***********************************************************/
-    static bool ensure_journal_gone (string &journal_db_file);
+    public static bool ensure_journal_gone (string &journal_db_file);
 
     /***********************************************************
-    Creates a new and empty local directory. */
-    bool start_from_scratch (string &);
+    Creates a new and empty local directory.
+    ***********************************************************/
+    public bool start_from_scratch (string &);
 
     /// Produce text for use in the tray tooltip
-    static string tray_tooltip_status_string (SyncResult.Status sync_status, bool has_unresolved_conflicts, bool paused);
+    public static string tray_tooltip_status_string (SyncResult.Status sync_status, bool has_unresolved_conflicts, bool paused);
 
     /// Compute status summarizing multiple folders
-    static void tray_overall_status (QList<Folder> &folders,
+    public static void tray_overall_status (QList<Folder> &folders,
         SyncResult.Status *status, bool *unresolved_conflicts);
 
     // Escaping of the alias which is used in QSettings AND the file
     // system, thus need to be escaped.
-    static string escape_alias (string &);
-    static string unescape_alias (string &);
+    public static string escape_alias (string &);
+    public static string unescape_alias (string &);
 
-    SocketApi *socket_api ();
-    NavigationPaneHelper &navigation_pane_helper () { return _navigation_pane_helper; }
+    public SocketApi *socket_api ();
+    public NavigationPaneHelper &navigation_pane_helper () {
+        return _navigation_pane_helper;
+    }
 
     /***********************************************************
     Check if @a path is a valid path for a new folder considering the already sync'ed items.
     Make sure that this folder, or any subfolder is not sync'ed already.
-    
+
     Note that different accounts are allowed to sync to the same folder.
 
     @returns an empty string if it is allowed, or an error if it is not allowed
     ***********************************************************/
-    string check_path_validity_for_new_folder (string &path, QUrl &server_url = QUrl ()) const;
+    public string check_path_validity_for_new_folder (string &path, QUrl &server_url = QUrl ()) const;
 
     /***********************************************************
     Attempts to find a non-existing, acceptable path for creating a new sync folder.
-    
+
     Uses \a base_path as the baseline. It'll return this path if it's acceptable.
-    
+
     Note that this can fail. If someone syncs ~ and \a base_path is ~/own_cloud, no
     subfolder of ~ would be a good candidate. When that happens \a base_path
     is returned.
     ***********************************************************/
-    string find_good_path_for_new_sync_folder (string &base_path, QUrl &server_url) const;
+    public string find_good_path_for_new_sync_folder (string &base_path, QUrl &server_url) const;
 
     /***********************************************************
     While ignoring hidden files can theoretically be switched per folder,
@@ -148,63 +154,67 @@ public:
     at once.
     These helper functions can be removed once it's properly per-folder.
     ***********************************************************/
-    bool ignore_hidden_files ();
-    void set_ignore_hidden_files (bool ignore);
+    public bool ignore_hidden_files ();
+    public void set_ignore_hidden_files (bool ignore);
 
     /***********************************************************
     Access to the current queue of scheduled folders.
     ***********************************************************/
-    QQueue<Folder> schedule_queue ();
+    public QQueue<Folder> schedule_queue ();
 
     /***********************************************************
     Access to the currently syncing folder.
-    
+
     Note : This is only the folder that's currently syncing *as-scheduled
     may be externally-managed syncs such as from placeholder hydrations.
 
     See also is_any_sync_running ()
     ***********************************************************/
-    Folder *current_sync_folder ();
+    public Folder *current_sync_folder ();
 
     /***********************************************************
     Returns true if any folder is currently syncing.
-    
+
     This might be a FolderMan-scheduled sync, or a externally
     managed sync like a placeholder hydration.
     ***********************************************************/
-    bool is_any_sync_running ();
+    public bool is_any_sync_running ();
 
     /***********************************************************
-    Removes all folders */
-    int unload_and_delete_all_folders ();
+    Removes all folders
+    ***********************************************************/
+    public int unload_and_delete_all_folders ();
 
     /***********************************************************
     If enabled is set to false, no new folders will start to sync.
     The current one will finish.
     ***********************************************************/
-    void set_sync_enabled (bool);
+    public void set_sync_enabled (bool);
 
     /***********************************************************
-    Queues a folder for syncing. */
-    void schedule_folder (Folder *);
+    Queues a folder for syncing.
+    ***********************************************************/
+    public void schedule_folder (Folder *);
 
     /***********************************************************
-    Puts a folder in the very front of the queue. */
-    void schedule_folder_next (Folder *);
+    Puts a folder in the very front of the queue.
+    ***********************************************************/
+    public void schedule_folder_next (Folder *);
 
     /***********************************************************
-    Queues all folders for syncing. */
-    void schedule_all_folders ();
+    Queues all folders for syncing.
+    ***********************************************************/
+    public void schedule_all_folders ();
 
-    void set_dirty_proxy ();
-    void set_dirty_network_limits ();
+    public void set_dirty_proxy ();
+    public void set_dirty_network_limits ();
 
 signals:
     /***********************************************************
-      * signal to indicate a folder has changed its sync state.
-      *
-      * Attention : The folder may be zero. Do a general update of the state then.
-      */
+    signal to indicate a folder has changed its sync state.
+
+    Attention : The folder may be zero. Do a general update of the state then.
+    ***********************************************************/
     void folder_sync_state_change (Folder *);
 
     /***********************************************************
@@ -237,7 +247,7 @@ public slots:
 
     /***********************************************************
     Triggers a sync run once the lock on the given file is removed.
-    
+
     Automatically detemines the folder that's responsible for the file.
     See slot_watched_file_unlocked ().
     ***********************************************************/
@@ -247,7 +257,8 @@ public slots:
     void slot_schedule_e_tag_job (string &alias, RequestEtagJob *job);
 
     /***********************************************************
-    Wipe folder */
+    Wipe folder
+    ***********************************************************/
     void slot_wipe_folder_for_account (AccountState *account_state);
 
 private slots:
@@ -275,7 +286,7 @@ private slots:
 
     /***********************************************************
     A file whose locks were being monitored has become unlocked.
-    
+
     This schedules the folder for synchronization that contains
     the file with the given path.
     ***********************************************************/
@@ -283,7 +294,7 @@ private slots:
 
     /***********************************************************
     Schedules folders whose time to sync has come.
-    
+
     Either because a long time has passed since the last sync or
     because of previous failures.
     ***********************************************************/
@@ -297,15 +308,18 @@ private:
     /***********************************************************
     Adds a new folder, does not add it to the account settings and
      does not set an account on the new folder.
-      */
+    ***********************************************************/
     Folder *add_folder_internal (FolderDefinition folder_definition,
         AccountState *account_state, std.unique_ptr<Vfs> vfs);
 
-    /* unloads a folder object, does not delete it */
+    /***********************************************************
+    unloads a folder object, does not delete it
+    ***********************************************************/
     void unload_folder (Folder *);
 
     /***********************************************************
-    Will start a sync after a bit of delay. */
+    Will start a sync after a bit of delay.
+    ***********************************************************/
     void start_scheduled_sync_soon ();
 
     // finds all folder configuration files
@@ -908,9 +922,9 @@ void FolderMan.slot_sync_once_file_unlocks (string &path) {
 }
 
 /***********************************************************
-  * if a folder wants to be synced, it calls this slot and is added
-  * to the queue. The slot to actually start a sync is called afterwards.
-  */
+if a folder wants to be synced, it calls this slot and is added
+to the queue. The slot to actually start a sync is called afterwards.
+***********************************************************/
 void FolderMan.schedule_folder (Folder *f) {
     if (!f) {
         q_c_critical (lc_folder_man) << "slot_schedule_sync called with null folder";
@@ -973,7 +987,7 @@ void FolderMan.slot_run_one_etag_job () {
         Folder *folder = nullptr;
         for (Folder *f : q_as_const (_folder_map)) {
             if (f.etag_job ()) {
-                // Caveat : always grabs the first folder with a job, but we think this is Ok for now and avoids us having a seperate queue.
+                // Caveat: always grabs the first folder with a job, but we think this is Ok for now and avoids us having a seperate queue.
                 _current_etag_job = f.etag_job ();
                 folder = f;
                 break;
@@ -982,7 +996,7 @@ void FolderMan.slot_run_one_etag_job () {
         if (_current_etag_job.is_null ()) {
             //q_c_debug (lc_folder_man) << "No more remote ETag check jobs to schedule.";
 
-            /* now it might be a good time to check for restarting... */
+            // now it might be a good time to check for restarting...
             if (!is_any_sync_running () && _app_restart_required) {
                 restart_application ();
             }
@@ -1084,10 +1098,10 @@ void FolderMan.start_scheduled_sync_soon () {
 }
 
 /***********************************************************
-  * slot to start folder syncs.
-  * It is either called from the slot where folders enqueue themselves for
-  * syncing or after a folder sync was finished.
-  */
+slot to start folder syncs.
+It is either called from the slot where folders enqueue themselves for
+syncing or after a folder sync was finished.
+***********************************************************/
 void FolderMan.slot_start_scheduled_folder_sync () {
     if (is_any_sync_running ()) {
         for (auto f : _folder_map) {
@@ -1331,11 +1345,11 @@ void FolderMan.slot_folder_sync_started () {
 }
 
 /***********************************************************
-  * a folder indicates that its syncing is finished.
-  * Start the next sync after the system had some milliseconds to breath.
-  * This delay is particularly useful to avoid late file change notifications
-  * (that we caused ourselves by syncing) from triggering another spurious sync.
-  */
+a folder indicates that its syncing is finished.
+Start the next sync after the system had some milliseconds to breath.
+This delay is particularly useful to avoid late file change notifications
+(that we caused ourselves by syncing) from triggering another spurious sync.
+***********************************************************/
 void FolderMan.slot_folder_sync_finished (SyncResult &) {
     auto f = qobject_cast<Folder> (sender ());
     ASSERT (f);

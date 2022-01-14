@@ -43,48 +43,52 @@ through the path_changed () signal.
 ***********************************************************/
 
 class Folder_watcher : GLib.Object {
-public:
+
     // Construct, connect signals, call init ()
-    Folder_watcher (Folder *folder = nullptr);
-    ~Folder_watcher () override;
+    public Folder_watcher (Folder *folder = nullptr);
+    public ~Folder_watcher () override;
 
     /***********************************************************
     @param root Path of the root of the folder
     ***********************************************************/
-    void init (string &root);
+    public void init (string &root);
 
-    /* Check if the path is ignored. */
-    bool path_is_ignored (string &path);
+    
+    /***********************************************************
+    Check if the path is ignored.
+    ***********************************************************/
+    public bool path_is_ignored (string &path);
 
     /***********************************************************
     Returns false if the folder watcher can't be trusted to capture all
     notifications.
-    
+
     For example, this can happen on linux if the inotify user limit from
     /proc/sys/fs/inotify/max_user_watches is exceeded.
     ***********************************************************/
-    bool is_reliable ();
+    public bool is_reliable ();
 
     /***********************************************************
     Triggers a change in the path and verifies a notification arrives.
-    
+
     If no notification is seen, the folderwatcher marks itself as unreliable.
     The path must be ignored by the watcher.
     ***********************************************************/
-    void start_notificaton_test (string &path);
+    public void start_notificaton_test (string &path);
 
     /// For testing linux behavior only
-    int test_linux_watch_count ();
+    public int test_linux_watch_count ();
 
 signals:
     /***********************************************************
     Emitted when one of the watched directories or one
-     of the contained files is changed. */
+    of the contained files is changed.
+    ***********************************************************/
     void path_changed (string &path);
 
     /***********************************************************
     Emitted if some notifications were lost.
-    
+
     Would happen, for example, if the number of pending notifications
     exceeded the allocated buffer size on Windows. Note that the fold
     watcher could still be able to capture all future notifications -
@@ -119,7 +123,8 @@ private:
     void append_sub_paths (QDir dir, QStringList& sub_paths);
 
     /***********************************************************
-    Path of the expected test notification */
+    Path of the expected test notification
+    ***********************************************************/
     string _test_notification_path;
 
     friend class Folder_watcher_private;
@@ -129,20 +134,20 @@ private:
         : GLib.Object (folder)
         , _folder (folder) {
     }
-    
+
     Folder_watcher.~Folder_watcher () = default;
-    
+
     void Folder_watcher.init (string &root) {
         _d.reset (new Folder_watcher_private (this, root));
         _timer.start ();
     }
-    
+
     bool Folder_watcher.path_is_ignored (string &path) {
         if (path.is_empty ())
             return true;
         if (!_folder)
             return false;
-    
+
     #ifndef OWNCLOUD_TEST
         if (_folder.is_file_excluded_absolute (path) && !Utility.is_conflict_file (path)) {
             q_c_debug (lc_folder_watcher) << "* Ignoring file" << path;
@@ -151,11 +156,11 @@ private:
     #endif
         return false;
     }
-    
+
     bool Folder_watcher.is_reliable () {
         return _is_reliable;
     }
-    
+
     void Folder_watcher.append_sub_paths (QDir dir, QStringList& sub_paths) {
         QStringList new_sub_paths = dir.entry_list (QDir.NoDotAndDotDot | QDir.Dirs | QDir.Files);
         for (int i = 0; i < new_sub_paths.size (); i++) {
@@ -168,22 +173,22 @@ private:
             }
         }
     }
-    
+
     void Folder_watcher.start_notificaton_test (string &path) {
         Q_ASSERT (_test_notification_path.is_empty ());
         _test_notification_path = path;
-    
+
         // Don't do the local file modification immediately:
         // wait for Folder_watch_private._ready
         start_notification_test_when_ready ();
     }
-    
+
     void Folder_watcher.start_notification_test_when_ready () {
         if (!_d._ready) {
             QTimer.single_shot (1000, this, &Folder_watcher.start_notification_test_when_ready);
             return;
         }
-    
+
         auto path = _test_notification_path;
         if (QFile.exists (path)) {
             auto mtime = FileSystem.get_mod_time (path);
@@ -192,14 +197,14 @@ private:
             QFile f (path);
             f.open (QIODevice.WriteOnly | QIODevice.Append);
         }
-    
+
         QTimer.single_shot (5000, this, [this] () {
             if (!_test_notification_path.is_empty ())
                 emit became_unreliable (tr ("The watcher did not receive a test notification."));
             _test_notification_path.clear ();
         });
     }
-    
+
     int Folder_watcher.test_linux_watch_count () {
     #ifdef Q_OS_LINUX
         return _d.test_watch_count ();
@@ -207,7 +212,7 @@ private:
         return -1;
     #endif
     }
-    
+
     void Folder_watcher.change_detected (string &path) {
         QFileInfo file_info (path);
         QStringList paths (path);
@@ -217,13 +222,13 @@ private:
         }
         change_detected (paths);
     }
-    
+
     void Folder_watcher.change_detected (QStringList &paths) {
         // TODO : this shortcut doesn't look very reliable:
         //   - why is the timeout only 1 second?
         //   - what if there is more than one file being updated frequently?
         //   - why do we skip the file altogether instead of e.g. reducing the upload frequency?
-    
+
         // Check if the same path was reported within the last second.
         QSet<string> paths_set = paths.to_set ();
         if (paths_set == _last_paths && _timer.elapsed () < 1000) {
@@ -232,9 +237,9 @@ private:
         }
         _last_paths = paths_set;
         _timer.restart ();
-    
+
         QSet<string> changed_paths;
-    
+
         // ------- handle ignores:
         for (int i = 0; i < paths.size (); ++i) {
             string path = paths[i];
@@ -245,18 +250,18 @@ private:
             if (path_is_ignored (path)) {
                 continue;
             }
-    
+
             changed_paths.insert (path);
         }
         if (changed_paths.is_empty ()) {
             return;
         }
-    
+
         q_c_info (lc_folder_watcher) << "Detected changes in paths:" << changed_paths;
         foreach (string &path, changed_paths) {
             emit path_changed (path);
         }
     }
-    
+
     } // namespace Occ
     

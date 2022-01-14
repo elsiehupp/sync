@@ -42,12 +42,12 @@ struct Unified_search_result {
 
     string Unified_search_result.type_as_string (Unified_search_result.Type type) {
         string result;
-    
+
         switch (type) {
         case Default:
             result = QStringLiteral ("Default");
             break;
-    
+
         case Fetch_more_trigger:
             result = QStringLiteral ("Fetch_more_trigger");
             break;

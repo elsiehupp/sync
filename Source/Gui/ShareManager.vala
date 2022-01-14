@@ -24,12 +24,11 @@ namespace Occ {
 
 class Share : GLib.Object {
 
-public:
     /***********************************************************
     Possible share types
     Need to be in sync with Sharee.Type
     ***********************************************************/
-    enum Share_type {
+    public enum Share_type {
         Type_user = Sharee.User,
         Type_group = Sharee.Group,
         Type_link = 3,
@@ -39,12 +38,12 @@ public:
         Type_room = Sharee.Room
     };
 
-    using Permissions = Share_permissions;
+    public using Permissions = Share_permissions;
 
     /***********************************************************
     Constructor for shares
     ***********************************************************/
-    Share (AccountPtr account,
+    public Share (AccountPtr account,
         const string &id,
         const string &owner,
         const string &owner_display_name,
@@ -57,70 +56,70 @@ public:
     /***********************************************************
     The account the share is defined on.
     ***********************************************************/
-    AccountPtr account ();
+    public AccountPtr account ();
 
-    string path ();
+    public string path ();
 
     /***********************************************************
     Get the id
     ***********************************************************/
-    string get_id ();
+    public string get_id ();
 
     /***********************************************************
     Get the uid_owner
     ***********************************************************/
-    string get_uid_owner ();
+    public string get_uid_owner ();
 
     /***********************************************************
     Get the owner display name
     ***********************************************************/
-    string get_owner_display_name ();
+    public string get_owner_display_name ();
 
     /***********************************************************
     Get the share_type
     ***********************************************************/
-    Share_type get_share_type ();
+    public Share_type get_share_type ();
 
     /***********************************************************
     Get the share_with
     ***********************************************************/
-    QSharedPointer<Sharee> get_share_with ();
+    public QSharedPointer<Sharee> get_share_with ();
 
     /***********************************************************
     Get permissions
     ***********************************************************/
-    Permissions get_permissions ();
+    public Permissions get_permissions ();
 
     /***********************************************************
     Set the permissions of a share
-    
+
     On success the permissions_set signal is emitted
     In case of a server error the server_error signal is emitted.
     ***********************************************************/
-    void set_permissions (Permissions permissions);
+    public void set_permissions (Permissions permissions);
 
     /***********************************************************
     Set the password for remote share
-    
+
     On success the password_set signal is emitted
     In case of a server error the password_set_error signal is emitted.
     ***********************************************************/
-    void set_password (string &password);
+    public void set_password (string &password);
 
-    bool is_password_set ();
+    public bool is_password_set ();
 
     /***********************************************************
     Deletes a share
-    
+
     On success the share_deleted signal is emitted
     In case of a server error the server_error signal is emitted.
     ***********************************************************/
-    void delete_share ();
+    public void delete_share ();
 
-     /***********************************************************
+    /***********************************************************
     Is it a share with a user or group (local or remote)
     ***********************************************************/
-    static bool is_share_type_user_group_email_room_or_remote (Share_type type);
+    public static bool is_share_type_user_group_email_room_or_remote (Share_type type);
 
 signals:
     void permissions_set ();
@@ -156,8 +155,8 @@ There are several methods in the API that either work differently for
 link shares or are only available to link shares.
 ***********************************************************/
 class Link_share : Share {
-public:
-    Link_share (AccountPtr account,
+
+    public Link_share (AccountPtr account,
         const string &id,
         const string &uidowner,
         const string &owner_display_name,
@@ -174,78 +173,78 @@ public:
     /***********************************************************
     Get the share link
     ***********************************************************/
-    QUrl get_link ();
+    public QUrl get_link ();
 
     /***********************************************************
     The share's link for direct downloading.
     ***********************************************************/
-    QUrl get_direct_download_link ();
+    public QUrl get_direct_download_link ();
 
     /***********************************************************
     Get the public_upload status of this share
     ***********************************************************/
-    bool get_public_upload ();
+    public bool get_public_upload ();
 
     /***********************************************************
     Whether directory listings are available (READ permission)
     ***********************************************************/
-    bool get_show_file_listing ();
+    public bool get_show_file_listing ();
 
     /***********************************************************
     Returns the name of the link share. Can be empty.
     ***********************************************************/
-    string get_name ();
+    public string get_name ();
 
     /***********************************************************
     Returns the note of the link share.
     ***********************************************************/
-    string get_note ();
+    public string get_note ();
 
     /***********************************************************
     Returns the label of the link share.
     ***********************************************************/
-    string get_label ();
+    public string get_label ();
 
     /***********************************************************
     Set the name of the link share.
-    
+
     Emits either name_set () or server_error ().
     ***********************************************************/
-    void set_name (string &name);
+    public void set_name (string &name);
 
     /***********************************************************
     Set the note of the link share.
     ***********************************************************/
-    void set_note (string &note);
+    public void set_note (string &note);
 
     /***********************************************************
     Returns the token of the link share.
     ***********************************************************/
-    string get_token ();
+    public string get_token ();
 
     /***********************************************************
     Get the expiration date
     ***********************************************************/
-    QDate get_expire_date ();
+    public QDate get_expire_date ();
 
     /***********************************************************
     Set the expiration date
-    
+
     On success the expire_date_set signal is emitted
     In case of a server error the server_error signal is emitted.
     ***********************************************************/
-    void set_expire_date (QDate &expire_date);
+    public void set_expire_date (QDate &expire_date);
 
     /***********************************************************
     Set the label of the share link.
     ***********************************************************/
-    void set_label (string &label);
+    public void set_label (string &label);
 
     /***********************************************************
     Create Ocs_share_job and connect to signal/slots
     ***********************************************************/
-    template <typename Link_share_slot>
-    Ocs_share_job *create_share_job (Link_share_slot slot_function);
+    public template <typename Link_share_slot>
+    public Ocs_share_job *create_share_job (Link_share_slot slot_function);
 
 signals:
     void expire_date_set ();
@@ -269,8 +268,8 @@ private:
 };
 
 class User_group_share : Share {
-public:
-    User_group_share (AccountPtr account,
+
+    public User_group_share (AccountPtr account,
         const string &id,
         const string &owner,
         const string &owner_display_name,
@@ -282,17 +281,17 @@ public:
         const QDate &expire_date,
         const string &note);
 
-    void set_note (string &note);
+    public void set_note (string &note);
 
-    string get_note ();
+    public string get_note ();
 
-    void slot_note_set (QJsonDocument &, QVariant &note);
+    public void slot_note_set (QJsonDocument &, QVariant &note);
 
-    void set_expire_date (QDate &date);
+    public void set_expire_date (QDate &date);
 
-    QDate get_expire_date ();
+    public QDate get_expire_date ();
 
-    void slot_expire_date_set (QJsonDocument &reply, QVariant &value);
+    public void slot_expire_date_set (QJsonDocument &reply, QVariant &value);
 
 signals:
     void note_set ();
@@ -310,35 +309,35 @@ of shares. It abstracts away from the OCS Share API, all the usages
 shares should talk to this manager and not use OCS Share Job directly
 ***********************************************************/
 class Share_manager : GLib.Object {
-public:
-    Share_manager (AccountPtr _account, GLib.Object *parent = nullptr);
+
+    public Share_manager (AccountPtr _account, GLib.Object *parent = nullptr);
 
     /***********************************************************
     Tell the manager to create a link share
-    
+
     @param path The path of the linkshare relative to the u
     @param name The name of the created share, may be empty
     @param password The password of the share, may be
-    
+
     On success the signal link_share_created is emitted
     For older server the link_share_requires_password signal is emitted when it seems appropiate
     In case of a server error the server_error signal is emitted
     ***********************************************************/
-    void create_link_share (string &path,
+    public void create_link_share (string &path,
         const string &name,
         const string &password);
 
     /***********************************************************
     Tell the manager to create a new share
-    
+
     @param path The path of the share relative to the user folder on the
     @param share_type The type of share (Type_u
     @param Permissions The share permissions
-    
+
     On success the signal share_created is emitted
     In case of a server error the server_error signal is emitted
     ***********************************************************/
-    void create_share (string &path,
+    public void create_share (string &path,
         const Share.Share_type share_type,
         const string share_with,
         const Share.Permissions permissions,
@@ -346,13 +345,13 @@ public:
 
     /***********************************************************
     Fetch all the shares for path
-    
+
     @param path The path to get the shares for rel
-    
+
     On success the shares_fetched signal is emitted
     In case of a server error the server_error signal is emitted
     ***********************************************************/
-    void fetch_shares (string &path);
+    public void fetch_shares (string &path);
 
 signals:
     void share_created (QSharedPointer<Share> &share);
@@ -364,7 +363,7 @@ signals:
     Emitted when creating a link share with password fails.
 
     @param message the error message reported by the server
-    
+
     See create_link_share ().
     ***********************************************************/
     void link_share_requires_password (string &message);

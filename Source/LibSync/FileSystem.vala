@@ -40,7 +40,7 @@ namespace FileSystem {
 
     /***********************************************************
     @brief Get the mtime for a filepath
-    
+
     Use this over QFileInfo.last_modified () to avoid timezone related bugs. See
     owncloud/core#9781 for details.
     ***********************************************************/
@@ -50,7 +50,7 @@ namespace FileSystem {
 
     /***********************************************************
     @brief Get the size for a file
-    
+
     Use this over QFileInfo.size () to avoid bugs with lnk files on Windows.
     See https://bugreports.qt.io/browse/QTBUG-24831.
     ***********************************************************/
@@ -63,7 +63,7 @@ namespace FileSystem {
 
     /***********************************************************
     @brief Check if \a file_name has changed given previous size and mtime
-    
+
     Nonexisting files are covered through mtime : they have an mtime of -1.
 
     @return true if the file's mtime or size are not what is expected.
@@ -81,7 +81,7 @@ namespace FileSystem {
 
     /***********************************************************
     Removes a directory and its contents recursively
-    
+
     Returns true if all removes succeeded.
     on_deleted () is called for each deleted file or directory, including the root.
     errors are collected in errors.
@@ -101,11 +101,11 @@ namespace FileSystem {
             q_c_warning (lc_file_system) << "file_equals : Failed to open " << fn1 << "or" << fn2;
             return false;
         }
-    
+
         if (get_size (fn1) != get_size (fn2)) {
             return false;
         }
-    
+
         const int Buffer_size = 16 * 1024;
         QByteArray buffer1 (Buffer_size, 0);
         QByteArray buffer2 (Buffer_size, 0);
@@ -119,7 +119,7 @@ namespace FileSystem {
         };
         return true;
     }
-    
+
     time_t FileSystem.get_mod_time (string &filename) {
         csync_file_stat_t stat;
         int64 result = -1;
@@ -133,7 +133,7 @@ namespace FileSystem {
         }
         return result;
     }
-    
+
     bool FileSystem.set_mod_time (string &filename, time_t mod_time) {
         struct timeval times[2];
         times[0].tv_sec = times[1].tv_sec = mod_time;
@@ -146,14 +146,14 @@ namespace FileSystem {
         }
         return true;
     }
-    
+
     bool FileSystem.file_changed (string &file_name,
         int64 previous_size,
         time_t previous_mtime) {
         return get_size (file_name) != previous_size
             || get_mod_time (file_name) != previous_mtime;
     }
-    
+
     bool FileSystem.verify_file_unchanged (string &file_name,
         int64 previous_size,
         time_t previous_mtime) {
@@ -167,16 +167,16 @@ namespace FileSystem {
         }
         return true;
     }
-    
+
     int64 FileSystem.get_size (string &filename) {
         return QFileInfo (filename).size ();
     }
-    
+
     // Code inspired from Qt5's QDir.remove_recursively
     bool FileSystem.remove_recursively (string &path, std.function<void (string &path, bool is_dir)> &on_deleted, QStringList *errors) {
         bool all_removed = true;
         QDir_iterator di (path, QDir.AllEntries | QDir.Hidden | QDir.System | QDir.NoDotAndDotDot);
-    
+
         while (di.has_next ()) {
             di.next ();
             const QFileInfo &fi = di.file_info ();
@@ -218,7 +218,7 @@ namespace FileSystem {
         }
         return all_removed;
     }
-    
+
     bool FileSystem.get_inode (string &filename, uint64 *inode) {
         csync_file_stat_t fs;
         if (csync_vio_local_stat (filename, &fs) == 0) {
@@ -227,6 +227,6 @@ namespace FileSystem {
         }
         return false;
     }
-    
+
     } // namespace Occ
     

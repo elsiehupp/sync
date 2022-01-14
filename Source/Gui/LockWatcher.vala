@@ -38,8 +38,8 @@ the file is still being locked.
 ***********************************************************/
 
 class LockWatcher : GLib.Object {
-public:
-    LockWatcher (GLib.Object *parent = nullptr);
+
+    public LockWatcher (GLib.Object *parent = nullptr);
 
     /***********************************************************
     Start watching a file.
@@ -47,20 +47,23 @@ public:
     If the file is not locked later on, the file_unlocked signal will be
     emitted once.
     ***********************************************************/
-    void add_file (string &path);
+    public void add_file (string &path);
 
     /***********************************************************
-    Adjusts the default interval for checking whether the lock is still present */
-    void set_check_interval (std.chrono.milliseconds interval);
+    Adjusts the default interval for checking whether the lock is still present
+    ***********************************************************/
+    public void set_check_interval (std.chrono.milliseconds interval);
 
     /***********************************************************
-    Whether the path is being watched for lock-changes */
-    bool contains (string &path);
+    Whether the path is being watched for lock-changes
+    ***********************************************************/
+    public bool contains (string &path);
 
 signals:
     /***********************************************************
     Emitted when one of the watched files is no longer
-     being locked. */
+    being locked.
+    ***********************************************************/
     void file_unlocked (string &path);
 
 private slots:

@@ -105,8 +105,10 @@ class ConfigFile {
 public:
     ConfigFile ();
 
-    enum Scope { User_scope,
-        System_scope };
+    enum Scope {
+        User_scope,
+        System_scope
+    };
 
     string config_path ();
     string config_file ();
@@ -115,7 +117,7 @@ public:
 
     /***********************************************************
     Creates a backup of the file
-    
+
     Returns the path of the new backup.
     ***********************************************************/
     string backup ();
@@ -130,20 +132,33 @@ public:
 
     bool password_storage_allowed (string &connection = string ());
 
-    /* Server poll interval in milliseconds */
+
+    /***********************************************************
+    Server poll interval in milliseconds
+    ***********************************************************/
+
     std.chrono.milliseconds remote_poll_interval (string &connection = string ()) const;
-    /* Set poll interval. Value in milliseconds has to be larger than 5000 */
+
+    /***********************************************************
+    Set poll interval. Value in milliseconds has to be larger than 5000
+    ***********************************************************/
     void set_remote_poll_interval (std.chrono.milliseconds interval, string &connection = string ());
 
-    /* Interval to check for new notifications */
+
+    /***********************************************************
+    Interval to check for new notifications
+    ***********************************************************/
     std.chrono.milliseconds notification_refresh_interval (string &connection = string ()) const;
 
-    /* Force sync interval, in milliseconds */
+
+    /***********************************************************
+    Force sync interval, in milliseconds
+    ***********************************************************/
     std.chrono.milliseconds force_sync_interval (string &connection = string ()) const;
 
     /***********************************************************
     Interval in milliseconds within which full local discovery is required
-    
+
     Use -1 to disable regular full local discoveries.
     ***********************************************************/
     std.chrono.milliseconds full_local_discovery_interval ();
@@ -190,19 +205,22 @@ public:
     string proxy_password ();
 
     /***********************************************************
-    0 : no limit, 1 : manual, >0 : automatic */
+    0 : no limit, 1 : manual, >0 : automatic
+    ***********************************************************/
     int use_upload_limit ();
     int use_download_limit ();
     void set_use_upload_limit (int);
     void set_use_download_limit (int);
     /***********************************************************
-    in kbyte/s */
+    in kbyte/s
+    ***********************************************************/
     int upload_limit ();
     int download_limit ();
     void set_upload_limit (int kbytes);
     void set_download_limit (int kbytes);
     /***********************************************************
-    [checked, size in MB] **/
+    [checked, size in MB]
+    ***********************************************************/
     QPair<bool, int64> new_big_folder_size_limit ();
     void set_new_big_folder_size_limit (bool is_checked, int64 mbytes);
     bool use_new_big_folder_size_limit ();
@@ -210,7 +228,8 @@ public:
     void set_confirm_external_storage (bool);
 
     /***********************************************************
-    If we should move the files deleted on the server in the trash  */
+    If we should move the files deleted on the server in the trash
+    ***********************************************************/
     bool move_to_trash ();
     void set_move_to_trash (bool);
 
@@ -246,8 +265,9 @@ public:
 
     /***********************************************************
     Query-parameter 'updatesegment' for the update check, value between 0 and 99.
-        Used to throttle down desktop release rollout in order to keep the update servers alive at peak times.
-        See : https://github.com/nextcloud/client_updater_server/pull/36 */
+    Used to throttle down desktop release rollout in order to keep the update servers alive at peak times.
+    See: https://github.com/nextcloud/client_updater_server/pull/36
+    ***********************************************************/
     int update_segment ();
 
     string update_channel ();
@@ -263,13 +283,15 @@ public:
 
     /***********************************************************
     The client version that last used this settings file.
-        Updated by config_version_migration () at client startup. */
+    Updated by config_version_migration () at client startup.
+    ***********************************************************/
     string client_version_string ();
     void set_client_version_string (string &version);
 
     /***********************************************************
-     Returns a new settings pre-set in a specific group.  The Settings will be created
-         with the given parent. If no parent is specified, the caller must destroy the settings */
+    Returns a new settings pre-set in a specific group.  The Settings will be created
+    with the given parent. If no parent is specified, the caller must destroy the settings
+    ***********************************************************/
     static std.unique_ptr<QSettings> settings_with_group (string &group, GLib.Object *parent = nullptr);
 
     /// Add the system and user exclude file path to the Excluded_files instance.

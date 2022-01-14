@@ -55,27 +55,27 @@ namespace CSync_enums {
 OCSYNC_EXPORT Q_NAMESPACE
 
 enum csync_status_codes_e {
-  CSYNC_STATUS_OK         = 0,
+    CSYNC_STATUS_OK         = 0,
 
-  CSYNC_STATUS_ERROR      = 1024, /* don't use this code,
-                                     */
-  CSYNC_STATUS_UNSUCCESSFUL,       /* Unspecific problem happend */
-  CSYNC_STATUS_STATEDB_LOAD_ERROR, /* Statedb can not be loaded. */
-  CSYNC_STATUS_UPDATE_ERROR,       /* general update or discovery error */
-  CSYNC_STATUS_TIMEOUT,            /* UNUSED */
-  CSYNC_STATUS_HTTP_ERROR,         /* UNUSED */
-  CSYNC_STATUS_PERMISSION_DENIED,  /*  */
-  CSYNC_STATUS_NOT_FOUND,
-  CSYNC_STATUS_FILE_EXISTS,
-  CSYNC_STATUS_OUT_OF_SPACE,
-  CSYNC_STATUS_SERVICE_UNAVAILABLE,
-  CSYNC_STATUS_STORAGE_UNAVAILABLE,
-  CSYNC_STATUS_FILE_SIZE_ERROR,
-  CSYNC_STATUS_OPENDIR_ERROR,
-  CSYNC_STATUS_READDIR_ERROR,
-  CSYNC_STATUS_OPEN_ERROR,
-  CSYNC_STATUS_ABORTED,
-    /* Codes for file individual status : */
+    CSYNC_STATUS_ERROR      = 1024,  // don't use this code
+    CSYNC_STATUS_UNSUCCESSFUL,       // Unspecific problem happend
+    CSYNC_STATUS_STATEDB_LOAD_ERROR, // Statedb can not be loaded.
+    CSYNC_STATUS_UPDATE_ERROR,       // general update or discovery error
+    CSYNC_STATUS_TIMEOUT,            // UNUSED
+    CSYNC_STATUS_HTTP_ERROR,         // UNUSED
+    CSYNC_STATUS_PERMISSION_DENIED,  //
+    CSYNC_STATUS_NOT_FOUND,
+    CSYNC_STATUS_FILE_EXISTS,
+    CSYNC_STATUS_OUT_OF_SPACE,
+    CSYNC_STATUS_SERVICE_UNAVAILABLE,
+    CSYNC_STATUS_STORAGE_UNAVAILABLE,
+    CSYNC_STATUS_FILE_SIZE_ERROR,
+    CSYNC_STATUS_OPENDIR_ERROR,
+    CSYNC_STATUS_READDIR_ERROR,
+    CSYNC_STATUS_OPEN_ERROR,
+    CSYNC_STATUS_ABORTED,
+    
+    // Codes for file individual status:
     CSYNC_STATUS_INDIVIDUAL_IS_SYMLINK,
     CSYNC_STATUS_INDIVIDUAL_IGNORE_LIST,
     CSYNC_STATUS_INDIVIDUAL_IS_INVALID_CHARS,
@@ -92,19 +92,19 @@ enum csync_status_codes_e {
 Q_ENUM_NS (csync_status_codes_e)
 
 /***********************************************************
-  * Instruction enum. In the file traversal structure, it describes
-  * the csync state of a file.
-  */
+Instruction enum. In the file traversal structure, it describes
+the csync state of a file.
+***********************************************************/
 enum Sync_instructions {
-    CSYNC_INSTRUCTION_NONE            = 0,       /* Nothing to do (UPDATE|RECONCILE) */
-    CSYNC_INSTRUCTION_EVAL            = 1 << 0,  /* There was changed compared to the DB (UPDATE) */
-    CSYNC_INSTRUCTION_REMOVE          = 1 << 1,  /* The file need to be removed (RECONCILE) */
-    CSYNC_INSTRUCTION_RENAME          = 1 << 2,  /* The file need to be renamed (RECONCILE) */
-    CSYNC_INSTRUCTION_EVAL_RENAME     = 1 << 11, /* The file is new, it is the destination of a rename (UPDATE) */
-    CSYNC_INSTRUCTION_NEW             = 1 << 3,  /* The file is new compared to the db (UPDATE) */
-    CSYNC_INSTRUCTION_CONFLICT        = 1 << 4,  /* The file need to be downloaded because it is a conflict (RECONCILE) */
-    CSYNC_INSTRUCTION_IGNORE          = 1 << 5,  /* The file is ignored (UPDATE|RECONCILE) */
-    CSYNC_INSTRUCTION_SYNC            = 1 << 6,  /* The file need to be pushed to the other remote (RECONCILE) */
+    CSYNC_INSTRUCTION_NONE            = 0,       // Nothing to do (UPDATE|RECONCILE)
+    CSYNC_INSTRUCTION_EVAL            = 1 << 0,  // There was changed compared to the DB (UPDATE)
+    CSYNC_INSTRUCTION_REMOVE          = 1 << 1,  // The file need to be removed (RECONCILE)
+    CSYNC_INSTRUCTION_RENAME          = 1 << 2,  // The file need to be renamed (RECONCILE)
+    CSYNC_INSTRUCTION_EVAL_RENAME     = 1 << 11, // The file is new, it is the destination of a rename (UPDATE)
+    CSYNC_INSTRUCTION_NEW             = 1 << 3,  // The file is new compared to the db (UPDATE)
+    CSYNC_INSTRUCTION_CONFLICT        = 1 << 4,  // The file need to be downloaded because it is a conflict (RECONCILE)
+    CSYNC_INSTRUCTION_IGNORE          = 1 << 5,  // The file is ignored (UPDATE|RECONCILE)
+    CSYNC_INSTRUCTION_SYNC            = 1 << 6,  // The file need to be pushed to the other remote (RECONCILE)
     CSYNC_INSTRUCTION_STAT_ERROR      = 1 << 7,
     CSYNC_INSTRUCTION_ERROR           = 1 << 8,
     CSYNC_INSTRUCTION_TYPE_CHANGE     = 1 << 9,  /* Like NEW, but deletes the old entity first (RECONCILE)
@@ -116,8 +116,10 @@ enum Sync_instructions {
 
 Q_ENUM_NS (Sync_instructions)
 
-// This enum is used with BITFIELD (3) and BITFIELD (4) in several places.
-// Also, this value is stored in the database, so beware of value changes.
+/***********************************************************
+This enum is used with BITFIELD (3) and BITFIELD (4) in several places.
+Also, this value is stored in the database, so beware of value changes.
+***********************************************************/
 enum ItemType {
     ItemTypeFile = 0,
     Item_type_soft_link = 1,
@@ -125,7 +127,8 @@ enum ItemType {
     Item_type_skip = 3,
 
     /***********************************************************
-    The file is a dehydrated placeholder, meaning data isn't available locally */
+    The file is a dehydrated placeholder, meaning data isn't available locally
+    ***********************************************************/
     Item_type_virtual_file = 4,
 
     /***********************************************************
@@ -135,11 +138,11 @@ enum ItemType {
     implicit hydration (when the user wants to access file data) when using
     suffix vfs. For pin-state driven hydrations changing the database is
     not necessary.
-    
+
     For some vfs plugins the placeholder files on disk may be marked for
-    (de-)hydration (like with a 
+    (de-)hydration (like with a
     will return this item type.
-    
+
     The discovery will also use this item type to mark entries for hydration
     if an item's pin state mandates it, such as when encountering a AlwaysLocal
     file that is dehydrated.
@@ -191,20 +194,15 @@ struct OCSYNC_EXPORT csync_file_stat_s {
 
   CSYNC_STATUS error_status = CSYNC_STATUS_OK;
 
-  Sync_instructions instruction = CSYNC_INSTRUCTION_NONE; /* u32 */
+  Sync_instructions instruction = CSYNC_INSTRUCTION_NONE; // u32
 
   csync_file_stat_s ()
     : type (Item_type_skip)
     , child_modified (false)
     , has_ignored_files (false)
     , is_hidden (false)
-    , is_e2e_encrypted (false) { }
+    , is_e2e_encrypted (false) {}
 };
-
-/***********************************************************
-}@
-***********************************************************/
-/* vim : set ft=c.doxygen ts=8 sw=2 et cindent : */
 
 
 

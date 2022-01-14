@@ -43,11 +43,13 @@ namespace Utility {
     string vfs_current_availability_text (VfsItemAvailability availability);
 
     /***********************************************************
-    Translated text for "making items always available locally" */
+    Translated text for "making items always available locally"
+    ***********************************************************/
     string vfs_pin_action_text ();
 
     /***********************************************************
-    Translated text for "free up local space" (and unpinning the item) */
+    Translated text for "free up local space" (and unpinning the item)
+    ***********************************************************/
     string vfs_free_space_action_text ();
 
 } // namespace Utility
@@ -92,7 +94,16 @@ bool Utility.open_browser (QUrl &url, Gtk.Widget *error_widget_parent) {
 bool Utility.open_email_composer (string &subject, string &body, Gtk.Widget *error_widget_parent) {
     QUrl url (QLatin1String ("mailto:"));
     QUrlQuery query;
-    query.set_query_items ({ { QLatin1String ("subject"), subject }, { QLatin1String ("body"), body } });
+    query.set_query_items ({
+        {
+            QLatin1String ("subject"),
+            subject
+        },
+        {
+            QLatin1String ("body"),
+            body
+        }
+    });
     url.set_query (query);
 
     if (!QDesktopServices.open_url (url)) {

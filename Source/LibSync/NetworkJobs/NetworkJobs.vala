@@ -37,7 +37,8 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 namespace Occ {
 
 /***********************************************************
-Strips quotes and gzip annotations */
+Strips quotes and gzip annotations
+***********************************************************/
 QByteArray parse_etag (char *header);
 
 struct Http_error {
@@ -116,9 +117,9 @@ public:
 
     /***********************************************************
     Used to specify which properties shall be retrieved.
-    
+
     The properties can
-     - contain no colon : they refer to a property in the DAV : 
+     - contain no colon : they refer to a property in the DAV :
      - contain a colon : and thus specify an explicit namespace,
        e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
     ***********************************************************/
@@ -156,9 +157,9 @@ public:
 
     /***********************************************************
     Used to specify which properties shall be retrieved.
-    
+
     The properties can
-     - contain no colon : they refer to a property in the DAV : 
+     - contain no colon : they refer to a property in the DAV :
      - contain a colon : and thus specify an explicit namespace,
        e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
     ***********************************************************/
@@ -195,7 +196,8 @@ public:
     void start () override;
 
     /***********************************************************
-    The retrieved avatar images don't have the circle shape by default */
+    The retrieved avatar images don't have the circle shape by default
+    ***********************************************************/
     static QImage make_circular_avatar (QImage &base_avatar);
 
 signals:
@@ -229,9 +231,9 @@ public:
 
     /***********************************************************
     Used to specify which properties shall be set.
-    
+
     The property keys can
-     - contain no colon : they refer to a property in the DAV : 
+     - contain no colon : they refer to a property in the DAV :
      - contain a colon : and thus specify an explicit namespace,
        e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
     ***********************************************************/
@@ -328,7 +330,8 @@ private:
     QUrl _server_url;
 
     /***********************************************************
-    Keep track of how many permanent redirect were applied. */
+    Keep track of how many permanent redirect were applied.
+    ***********************************************************/
     int _permanent_redirects;
 };
 
@@ -377,7 +380,7 @@ public:
     /***********************************************************
     @brief add_query_params - add more parameters to the ocs call
     @param params : list pairs of strings containing the parameter name and the value.
-    
+
     All parameters from the passed list are appended to the query. Not
     that the format=json para
     need to be set this way.
@@ -576,7 +579,9 @@ bool RequestEtagJob.finished () {
         emit etag_retrieved (etag, QDateTime.from_string (string.from_utf8 (_response_timestamp), Qt.RFC2822Date));
         emit finished_with_result (etag);
     } else {
-        emit finished_with_result (Http_error{ http_code, error_string () });
+        emit finished_with_result (Http_error {
+            http_code, error_string ()
+        });
     }
     return true;
 }

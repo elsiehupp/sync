@@ -85,7 +85,7 @@ version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 namespace SharedTools {
 
     static const int instances_size = 1024;
-    
+
     static string instances_lock_filename (string &app_session_id) {
         const QChar slash (QLatin1Char ('/'));
         string res = QDir.temp_path ();
@@ -93,20 +93,20 @@ namespace SharedTools {
             res += slash;
         return res + app_session_id + QLatin1String ("-instances");
     }
-    
+
     QtSingleApplication.QtSingleApplication (string &app_id, int &argc, char **argv)
         : QApplication (argc, argv),
           first_peer (-1),
           pid_peer (nullptr) {
         this.app_id = app_id;
-    
+
         const string app_session_id = QtLocalPeer.app_session_id (app_id);
-    
+
         // This shared memory holds a zero-terminated array of active (or crashed) instances
         instances = new QShared_memory (app_session_id, this);
         act_win = nullptr;
         block = false;
-    
+
         // First instance creates the shared memory, later instances attach to it
         const bool created = instances.create (instances_size);
         if (!created) {
@@ -118,10 +118,10 @@ namespace SharedTools {
                 return;
             }
         }
-    
+
         // QtLockedFile is used to workaround QTBUG-10364
         QtLockedFile lockfile (instances_lock_filename (app_session_id));
-    
+
         lockfile.open (QtLockedFile.ReadWrite);
         lockfile.lock (QtLockedFile.LockMode.WRITE_LOCK);
         auto *pids = static_cast<int64> (instances.data ());
@@ -142,7 +142,7 @@ namespace SharedTools {
         pid_peer.is_client ();
         lockfile.unlock ();
     }
-    
+
     QtSingleApplication.~QtSingleApplication () {
         if (!instances)
             return;
@@ -160,7 +160,7 @@ namespace SharedTools {
         *newpids = 0;
         lockfile.unlock ();
     }
-    
+
     bool QtSingleApplication.event (QEvent *event) {
         if (event.type () == QEvent.File_open) {
             auto *foe = static_cast<QFile_open_event> (event);
@@ -169,37 +169,37 @@ namespace SharedTools {
         }
         return QApplication.event (event);
     }
-    
+
     bool QtSingleApplication.is_running (int64 pid) {
         if (pid == -1) {
             pid = first_peer;
             if (pid == -1)
                 return false;
         }
-    
+
         QtLocalPeer peer (this, app_id + QLatin1Char ('-') + string.number (pid, 10));
         return peer.is_client ();
     }
-    
+
     bool QtSingleApplication.send_message (string &message, int timeout, int64 pid) {
         if (pid == -1) {
             pid = first_peer;
             if (pid == -1)
                 return false;
         }
-    
+
         QtLocalPeer peer (this, app_id + QLatin1Char ('-') + string.number (pid, 10));
         return peer.send_message (message, timeout, block);
     }
-    
+
     string QtSingleApplication.application_id () {
         return app_id;
     }
-    
+
     void QtSingleApplication.set_block (bool value) {
         block = value;
     }
-    
+
     void QtSingleApplication.set_activation_window (Gtk.Widget *aw, bool activate_on_message) {
         act_win = aw;
         if (!pid_peer)
@@ -209,11 +209,11 @@ namespace SharedTools {
         else
             disconnect (pid_peer, &QtLocalPeer.message_received, this, &QtSingleApplication.activate_window);
     }
-    
+
     Gtk.Widget* QtSingleApplication.activation_window () {
         return act_win;
     }
-    
+
     void QtSingleApplication.activate_window () {
         if (act_win) {
             act_win.set_window_state (act_win.window_state () & ~Qt.Window_minimized);
@@ -221,6 +221,6 @@ namespace SharedTools {
             act_win.activate_window ();
         }
     }
-    
+
     } // namespace SharedTools
     

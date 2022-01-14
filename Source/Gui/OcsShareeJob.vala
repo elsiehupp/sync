@@ -16,19 +16,20 @@ namespace Occ {
 Fetching sharees from the OCS Sharee API
 ***********************************************************/
 class Ocs_sharee_job : Ocs_job {
-public:
-    Ocs_sharee_job (AccountPtr account);
+
+    public Ocs_sharee_job (AccountPtr account);
 
     /***********************************************************
     Get a list of sharees
-    
+
     @param path Path to request shares for (default all shares)
     ***********************************************************/
-    void get_sharees (string &search, string &item_type, int page = 1, int per_page = 50, bool lookup = false);
+    public void get_sharees (string &search, string &item_type, int page = 1, int per_page = 50, bool lookup = false);
+
 signals:
     /***********************************************************
     Result of the OCS request
-    
+
     @param reply The reply
     ***********************************************************/
     void sharee_job_finished (QJsonDocument &reply);
@@ -42,23 +43,23 @@ private slots:
         set_path ("ocs/v2.php/apps/files_sharing/api/v1/sharees");
         connect (this, &Ocs_job.job_finished, this, &Ocs_sharee_job.job_done);
     }
-    
+
     void Ocs_sharee_job.get_sharees (string &search,
         const string &item_type,
         int page,
         int per_page,
         bool lookup) {
         set_verb ("GET");
-    
+
         add_param (string.from_latin1 ("search"), search);
         add_param (string.from_latin1 ("item_type"), item_type);
         add_param (string.from_latin1 ("page"), string.number (page));
         add_param (string.from_latin1 ("per_page"), string.number (per_page));
         add_param (string.from_latin1 ("lookup"), QVariant (lookup).to_string ());
-    
+
         start ();
     }
-    
+
     void Ocs_sharee_job.job_done (QJsonDocument &reply) {
         emit sharee_job_finished (reply);
     }

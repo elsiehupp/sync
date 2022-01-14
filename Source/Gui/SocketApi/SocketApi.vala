@@ -70,9 +70,8 @@ Q_DECLARE_LOGGING_CATEGORY (lc_socket_api)
 ***********************************************************/
 class SocketApi : GLib.Object {
 
-public:
-    SocketApi (GLib.Object *parent = nullptr);
-    ~SocketApi () override;
+    public SocketApi (GLib.Object *parent = nullptr);
+    public ~SocketApi () override;
 
 public slots:
     void slot_update_folder_view (Folder *f);
@@ -151,7 +150,8 @@ private:
     void fetch_private_link_url_helper (string &local_file, std.function<void (string &url)> &target_fun);
 
     /***********************************************************
-    Sends translated/branded strings that may be useful to the integration */
+    Sends translated/branded strings that may be useful to the integration
+    ***********************************************************/
     Q_INVOKABLE void command_GET_STRINGS (string &argument, Socket_listener *listener);
 
     // Sends the context menu options relating to sharing to listener
@@ -711,8 +711,8 @@ void SocketApi.command_EDIT (string &local_file, Socket_listener *listener) {
 #ifndef OWNCLOUD_TEST
 
 class Get_or_create_public_link_share : GLib.Object {
-public:
-    Get_or_create_public_link_share (AccountPtr &account, string &local_file,
+
+    public Get_or_create_public_link_share (AccountPtr &account, string &local_file,
         GLib.Object *parent)
         : GLib.Object (parent)
         , _account (account)
@@ -728,7 +728,7 @@ public:
             this, &Get_or_create_public_link_share.server_error);
     }
 
-    void run () {
+    public void run () {
         q_c_debug (lc_public_link) << "Fetching shares";
         _share_manager.fetch_shares (_local_file);
     }
@@ -813,12 +813,12 @@ private:
 #else
 
 class Get_or_create_public_link_share : GLib.Object {
-public:
-    Get_or_create_public_link_share (AccountPtr &, string &,
+
+    public Get_or_create_public_link_share (AccountPtr &, string &,
         std.function<void (string &link)>, GLib.Object *) {
     }
 
-    void run () {
+    public void run () {
     }
 };
 
@@ -832,9 +832,13 @@ void SocketApi.command_COPY_PUBLIC_LINK (string &local_file, Socket_listener *) 
     AccountPtr account = file_data.folder.account_state ().account ();
     auto job = new Get_or_create_public_link_share (account, file_data.server_relative_path, this);
     connect (job, &Get_or_create_public_link_share.done, this,
-        [] (string &url) { copy_url_to_clipboard (url); });
+        [] (string &url) {
+            copy_url_to_clipboard (url);
+        });
     connect (job, &Get_or_create_public_link_share.error, this,
-        [=] () { emit share_command_received (file_data.server_relative_path, file_data.local_path, Share_dialog_start_page.Public_links); });
+        [=] () {
+            emit share_command_received (file_data.server_relative_path, file_data.local_path, Share_dialog_start_page.Public_links);
+        });
     job.run ();
 }
 
@@ -889,7 +893,9 @@ void SocketApi.command_MAKE_AVAILABLE_LOCALLY (string &files_arg, Socket_listene
     }
 }
 
-/* Go over all the files and replace them by a virtual file */
+/***********************************************************
+Go over all the files and replace them by a virtual file
+***********************************************************/
 void SocketApi.command_MAKE_ONLINE_ONLY (string &files_arg, Socket_listener *) {
     const QStringList files = split (files_arg);
 
@@ -985,9 +991,20 @@ void SocketApi.command_V2_LIST_ACCOUNTS (QSharedPointer<Socket_api_job_v2> &job)
     QJsonArray out;
     for (auto acc : AccountManager.instance ().accounts ()) {
         // TODO : Use uuid once https://github.com/owncloud/client/pull/8397 is merged
-        out << QJsonObject ({ { "name", acc.account ().display_name () }, { "id", acc.account ().id () } });
+        out << QJsonObject ({
+            {
+                "name", acc.account ().display_name ()
+            },
+            {
+                "id", acc.account ().id ()
+            }
+        });
     }
-    job.success ({ { "accounts", out } });
+    job.success ({
+        {
+            "accounts", out
+        }
+    });
 }
 
 void SocketApi.command_V2_UPLOAD_FILES_FROM (QSharedPointer<Socket_api_job_v2> &job) {
@@ -1006,8 +1023,27 @@ void Occ.SocketApi.open_private_link (string &link) {
     Utility.open_browser (link);
 }
 
-void SocketApi.command_GET_STRINGS (string &argument, Socket_listener *listener) { {c std.array<std.pair<const char *, QStrin { "SHARE_MENU_TITLE", tr ("Share options") }, { "FILE_ACTIVITY_MENU_TITLE", tr ("Activity") }, { "CONTEXT_MENU_TITLE", Theme.instance ().app_name_g_u_i () }, { "COPY_PRIVATE_LINK_MENU_TITLE", tr ("Copy private link to clipboard") } { "EMAIL_PRIVATE_LINK_MENU_TITLE", tr ("Send private link by email …") },
-        { "CONTEXT_MENU_ICON", APPLICATION_ICON_NAME },
+void SocketApi.command_GET_STRINGS (string &argument, Socket_listener *listener) {
+    {
+        c std.array<std.pair<const char *, QString
+        {
+            "SHARE_MENU_TITLE", tr ("Share options")
+        },
+        {
+            "FILE_ACTIVITY_MENU_TITLE", tr ("Activity")
+        },
+        {
+            "CONTEXT_MENU_TITLE", Theme.instance ().app_name_g_u_i ()
+        },
+        {
+            "COPY_PRIVATE_LINK_MENU_TITLE", tr ("Copy private link to clipboard")
+        },
+        {
+            "EMAIL_PRIVATE_LINK_MENU_TITLE", tr ("Send private link by email …")
+        },
+        {
+            "CONTEXT_MENU_ICON", APPLICATION_ICON_NAME
+        },
     } };
     listener.send_message (string ("GET_STRINGS:BEGIN"));
     for (auto& key_value : strings) {
@@ -1369,7 +1405,9 @@ void SocketApi.command_ASYNC_WAIT_FOR_WIDGET_SIGNAL (QSharedPointer<Socket_api_j
         return;
     }
 
-    Listener_closure *closure = new Listener_closure ([job] () { job.resolve ("signal emitted"); });
+    Listener_closure *closure = new Listener_closure ([job] () {
+        job.resolve ("signal emitted");
+    });
 
     auto signal_signature = arguments["signal_signature"].to_string ();
     signal_signature.prepend ("2");
@@ -1460,7 +1498,9 @@ void Socket_api_job.resolve (string &response) {
 }
 
 void Socket_api_job.resolve (QJsonObject &response) {
-    resolve (QJsonDocument { response }.to_json ());
+    resolve (QJsonDocument {
+        response
+    }.to_json ());
 }
 
 void Socket_api_job.reject (string &response) {
@@ -1480,11 +1520,22 @@ void Socket_api_job_v2.success (QJsonObject &response) {
 }
 
 void Socket_api_job_v2.failure (string &error) {
-    do_finish ({ { QStringLiteral ("error"), error } });
+    do_finish ({
+        {
+            QStringLiteral ("error"), error
+        }
+    });
 }
 
 void Socket_api_job_v2.do_finish (QJsonObject &obj) {
-    _socket_listener.send_message (_command + QStringLiteral ("_RESULT:") + QJsonDocument ({ { QStringLiteral ("id"), _job_id }, { QStringLiteral ("arguments"), obj } }).to_json (QJsonDocument.Compact));
+    _socket_listener.send_message (_command + QStringLiteral ("_RESULT:") + QJsonDocument ({
+        {
+            QStringLiteral ("id"), _job_id
+        },
+        {
+            QStringLiteral ("arguments"), obj
+        }
+    }).to_json (QJsonDocument.Compact));
     Q_EMIT finished ();
 }
 
@@ -1494,109 +1545,114 @@ void Socket_api_job_v2.do_finish (QJsonObject &obj) {
         // For a client navigating in less than 100 directories, this gives us a probability less than
         // (1-e^ (-2*100/1024))^2 = 0.03147872136 false positives.
         const static int Num_bits = 1024;
-    
-    public:
-        Bloom_filter ()
+
+        public Bloom_filter ()
             : hash_bits (Num_bits) {
         }
-    
-        void store_hash (uint hash) {
+
+        public void store_hash (uint hash) {
             hash_bits.set_bit ( (hash & 0x_f_f_f_f) % Num_bits); // NOLINT it's uint all the way and the modulo puts us back in the 0..1023 range
             hash_bits.set_bit ( (hash >> 16) % Num_bits); // NOLINT
         }
-        bool is_hash_maybe_stored (uint hash) {
+        public bool is_hash_maybe_stored (uint hash) {
             return hash_bits.test_bit ( (hash & 0x_f_f_f_f) % Num_bits) // NOLINT
                 && hash_bits.test_bit ( (hash >> 16) % Num_bits); // NOLINT
         }
-    
+
     private:
         QBit_array hash_bits;
     };
-    
+
     class Socket_listener {
-    public:
-        QPointer<QIODevice> socket;
-    
-        Socket_listener (QIODevice *_socket)
+
+        public QPointer<QIODevice> socket;
+
+        public Socket_listener (QIODevice *_socket)
             : socket (_socket) {
         }
-    
-        void send_message (string &message, bool do_wait = false) const;
-        void send_warning (string &message, bool do_wait = false) {
+
+        public void send_message (string &message, bool do_wait = false) const;
+        public void send_warning (string &message, bool do_wait = false) {
             send_message (QStringLiteral ("WARNING:") + message, do_wait);
         }
-        void send_error (string &message, bool do_wait = false) {
+        public void send_error (string &message, bool do_wait = false) {
             send_message (QStringLiteral ("ERROR:") + message, do_wait);
         }
-    
-        void send_message_if_directory_monitored (string &message, uint system_directory_hash) {
+
+        public void send_message_if_directory_monitored (string &message, uint system_directory_hash) {
             if (_monitored_directories_bloom_filter.is_hash_maybe_stored (system_directory_hash))
                 send_message (message, false);
         }
-    
-        void register_monitored_directory (uint system_directory_hash) {
+
+        public void register_monitored_directory (uint system_directory_hash) {
             _monitored_directories_bloom_filter.store_hash (system_directory_hash);
         }
-    
+
     private:
         Bloom_filter _monitored_directories_bloom_filter;
     };
-    
+
     class Listener_closure : GLib.Object {
-    public:
-        using Callback_function = std.function<void ()>;
-        Listener_closure (Callback_function callback)
+
+        public using Callback_function = std.function<void ()>;
+        public Listener_closure (Callback_function callback)
             : callback_ (callback) {
         }
-    
+
     public slots:
         void closure_slot () {
             callback_ ();
             delete_later ();
         }
-    
+
     private:
         Callback_function callback_;
     };
-    
+
     class Socket_api_job : GLib.Object {
-    public:
-        Socket_api_job (string &job_id, QSharedPointer<Socket_listener> &socket_listener, QJsonObject &arguments)
+
+        public Socket_api_job (string &job_id, QSharedPointer<Socket_listener> &socket_listener, QJsonObject &arguments)
             : _job_id (job_id)
             , _socket_listener (socket_listener)
             , _arguments (arguments) {
         }
-    
-        void resolve (string &response = string ());
-    
-        void resolve (QJsonObject &response);
-    
-        const QJsonObject &arguments () { return _arguments; }
-    
-        void reject (string &response);
-    
+
+        public void resolve (string &response = string ());
+
+        public void resolve (QJsonObject &response);
+
+        public const QJsonObject &arguments () {
+            return _arguments;
+        }
+
+        public void reject (string &response);
+
     protected:
         string _job_id;
         QSharedPointer<Socket_listener> _socket_listener;
         QJsonObject _arguments;
     };
-    
+
     class Socket_api_job_v2 : GLib.Object {
-    public:
-        Socket_api_job_v2 (QSharedPointer<Socket_listener> &socket_listener, QByteArray &command, QJsonObject &arguments);
-    
-        void success (QJsonObject &response) const;
-        void failure (string &error) const;
-    
-        const QJsonObject &arguments () { return _arguments; }
-        QByteArray command () { return _command; }
-    
+
+        public Socket_api_job_v2 (QSharedPointer<Socket_listener> &socket_listener, QByteArray &command, QJsonObject &arguments);
+
+        public void success (QJsonObject &response) const;
+        public void failure (string &error) const;
+
+        public const QJsonObject &arguments () {
+            return _arguments;
+        }
+        public QByteArray command () {
+            return _command;
+        }
+
     signals:
         void finished ();
-    
+
     private:
         void do_finish (QJsonObject &obj) const;
-    
+
         QSharedPointer<Socket_listener> _socket_listener;
         const QByteArray _command;
         string _job_id;

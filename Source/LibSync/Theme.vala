@@ -71,14 +71,16 @@ public:
         o_c_setup_result_top // own_cloud connect result page
     };
 
-    /* returns a singleton instance. */
+    /***********************************************************
+    returns a singleton instance.
+    ***********************************************************/
     static Theme *instance ();
 
     ~Theme () override;
 
     /***********************************************************
     @brief is_branded indicates if the current application is branded
-    
+
     By default, it is considered
     different from "Nextcloud".
 
@@ -88,32 +90,32 @@ public:
 
     /***********************************************************
     @brief app_name_g_u_i - Human readable application name.
-    
+
     Use and redefine this if
     special chars and such.
-    
+
     By default, the name is derived from the APPLICATION_NAME
     cmake variable.
-    
-     * @return string with human readable app name.
+
+    @return string with human readable app name.
     ***********************************************************/
     virtual string app_name_g_u_i ();
 
     /***********************************************************
     @brief app_name - Application name (short)
-    
+
     Use and redefine this as an application name. Keep it straight as
     it is used for config files etc. If yo
     name in the GUI, redefine app_name_g_u_i.
-    
+
     By default, the name is derived from
     cmake variable, and should be the same. This method is only
     reimplementable for legacy reasons.
-    
+
     Warning : Do not modify this value, as many things, e.g. settings
     depend on it! You most likely want to modify \ref app_name_g_u_i ().
-    
-     * @return string with app name.
+
+    @return string with app name.
     ***********************************************************/
     virtual string app_name ();
 
@@ -179,8 +181,8 @@ public:
     static bool is_hidpi (QPaint_device *dev = nullptr);
 
     /***********************************************************
-      * get an sync state icon
-      */
+    get an sync state icon
+    ***********************************************************/
     virtual QIcon sync_state_icon (SyncResult.Status, bool sys_tray = false) const;
 
     virtual QIcon folder_disabled_icon ();
@@ -203,21 +205,21 @@ public:
 
     /***********************************************************
     * URL to documentation.
-    *
+
     * This is opened in the browser when the "Help" action is selected from the tray menu.
-    *
+
     * If the function is overridden to return an empty string the action is removed from
     * the menu.
-    *
+
     * Defaults to Nextclouds client documentation website.
     ***********************************************************/
     virtual string help_url ();
 
     /***********************************************************
     The url to use for showing help on conflicts.
-    
+
     If the function is overridden to return an empty string no help link will be sh
-    
+
     Defaults to help_url () + "conflicts.html", which is a page in own_cloud's client
     documentation website. If help_url () is empty, this function will also return the
     empty string.
@@ -226,28 +228,28 @@ public:
 
     /***********************************************************
     Setting a value here will pre-define the server url.
-    
+
     The respective UI controls will be disabled only if force_override_server_url () is true
     ***********************************************************/
     virtual string override_server_url ();
 
     /***********************************************************
     Enforce a pre-defined server url.
-    
+
     When true, the respective UI controls will be disabled
     ***********************************************************/
     virtual bool force_override_server_url ();
 
     /***********************************************************
     Enable OCSP stapling for SSL handshakes
-    
+
     When true, peer will be requested for Online Certificate Status Protocol response
     ***********************************************************/
     virtual bool enable_stapling_oCSP ();
 
     /***********************************************************
     Enforce SSL validity
-    
+
     When true, trusting the untrusted certificate is not allowed
     ***********************************************************/
     virtual bool forbid_bad_s_sL ();
@@ -272,10 +274,13 @@ public:
     /***********************************************************
     Override to encforce a particular locale, i.e. "de" or "pt_BR"
     ***********************************************************/
-    virtual string enforced_locale () { return string (); }
+    virtual string enforced_locale () {
+        return string ();
+    }
 
     /***********************************************************
-    colored, white or black */
+    colored, white or black
+    ***********************************************************/
     string systray_icon_flavor (bool mono) const;
 
 #ifndef TOKEN_AUTH_ONLY
@@ -287,24 +292,27 @@ public:
     virtual QVariant custom_media (Custom_media_type type);
 
     /***********************************************************
-    @return color for the setup wizard */
+    @return color for the setup wizard
+    ***********************************************************/
     virtual QColor wizard_header_title_color ();
 
     /***********************************************************
-    @return color for the setup wizard. */
+    @return color for the setup wizard.
+    ***********************************************************/
     virtual QColor wizard_header_background_color ();
 
     virtual QPixmap wizard_application_logo ();
 
     /***********************************************************
-    @return logo for the setup wizard. */
+    @return logo for the setup wizard.
+    ***********************************************************/
     virtual QPixmap wizard_header_logo ();
 
     /***********************************************************
     The default implementation creates a
     background based on
     \ref wizard_header_title_color ().
-    
+
     @return banner for the setup wizard.
     ***********************************************************/
     virtual QPixmap wizard_header_banner ();
@@ -371,7 +379,7 @@ public:
 
     /***********************************************************
     @brief Sharing options
-    
+
     Allow link sharing and or user/group sharing
     ***********************************************************/
     virtual bool link_sharing ();
@@ -386,14 +394,16 @@ public:
 
     /***********************************************************
     @brief How to handle the user_iD
-    
+
     @value User_iDUser_name Wizard asks for user name a
     @value User_iDEmail Wizard asks for an email as ID
     @value User_iDCustom Specify string in \ref custom_user_iD
     ***********************************************************/
-    enum User_iDType { User_iDUser_name = 0,
+    enum User_iDType {
+        User_iDUser_name = 0,
         User_iDEmail,
-        User_iDCustom };
+        User_iDCustom
+    };
 
     /***********************************************************
     @brief What to display as the user_iD (e.g. in the wizards)
@@ -404,7 +414,7 @@ public:
 
     /***********************************************************
     @brief Allows to customize the type of user ID (e.g. user name, email)
-    
+
     @note This string cannot be translated, but is still useful for
           referencing brand name IDs (e.g. "ACME ID", when using ACME.)
 
@@ -415,7 +425,7 @@ public:
     /***********************************************************
     @brief Demo string to be displayed when no text has been
            entered for the user id (e.g. mylogin@company.com)
-    
+
     @return An empty string, unless reimplemented
     ***********************************************************/
     virtual string user_iDHint ();
@@ -423,21 +433,21 @@ public:
     /***********************************************************
     @brief Postfix that will be enforced in a URL. e.g.
            ".myhosting.com".
-    
+
     @return An empty string, unless reimplemented
     ***********************************************************/
     virtual string wizard_url_postfix ();
 
     /***********************************************************
     @brief String that will be shown as long as no text has been entered by the user.
-    
+
     @return An empty string, unless reimplemented
     ***********************************************************/
     virtual string wizard_url_hint ();
 
     /***********************************************************
     @brief the server folder that should be queried for the quota information
-    
+
     This can be configured to show the quota infromation for a different
     folder than the root. This is the folder on which the client will do
     PROPFIND calls to get "quota-available-bytes" and "quota-used-bytes"
@@ -455,7 +465,7 @@ public:
 
     /***********************************************************
     @brief What should be output for the --version command line switch.
-    
+
     By default, it's a combination of app_name (), version (), the GIT SHA1 and some
     important dependency versions.
     ***********************************************************/
@@ -463,7 +473,7 @@ public:
 	
 	/***********************************************************
     * @brief Request suitable QIcon resource depending on the background colour of the parent widget.
-    *
+
     * This should be replaced (TODO) by a real theming implementation for the client UI
     * (actually 2019/09/13 only systray theming).
     ***********************************************************/
@@ -471,7 +481,7 @@ public:
 
     /***********************************************************
     @brief Perform a calculation to check if a colour is dark or light and accounts for different sensitivity of the human eye.
-    
+
     @return True if the specified colour is dark.
 
     2019/12/08 : Moved here from SettingsDialog.
@@ -480,7 +490,7 @@ public:
 
     /***********************************************************
     @brief Return the colour to be used for HTML links (e.g. used in QLabel), based on the current app palette or given colour (Dark-/Light-Mode switching).
-    
+
     @return Background-aware colour for HTML links, based on the current app palette or given colour.
 
     2019/12/08 : Implemented for the Dark Mode on mac_o_s, because the app palette can not account for that (Qt 5.12.5).
@@ -489,7 +499,7 @@ public:
 
     /***********************************************************
     @brief Return the colour to be used for HTML links (e.g. used in QLabel), based on the current app palette (Dark-/Light-Mode switching).
-    
+
     @return Background-aware colour for HTML links, based on the current app palette.
 
     2019/12/08 : Implemented for the Dark Mode on mac_o_s, because the app palette can not account for that (Qt 5.12.5).
@@ -498,7 +508,7 @@ public:
 
     /***********************************************************
     @brief Appends a CSS-style colour value to all HTML link tags in a given string, based on the current app palette or given colour (Dark-/Light-Mode switching).
-    
+
     2019/12/08 : Implemented for the Dark Mode on mac_o_s, because the app palette can not account for that (Qt 5.12.5).
 
     This way we also avoid having certain strings re-translated on Transifex.
@@ -507,7 +517,7 @@ public:
 
     /***********************************************************
     @brief Appends a CSS-style colour value to all HTML link tags in a given string, based on the current app palette (Dark-/Light-Mode switching).
-    
+
     2019/12/08 : Implemented for the Dark Mode on mac_o_s, because the app palette can not account for that (Qt 5.12.5).
 
     This way we also avoid having certain strings re-translated on Transifex.
@@ -516,7 +526,7 @@ public:
 
     /***********************************************************
     @brief Appends a CSS-style colour value to all HTML link tags in a given string, as specified by new_color.
-    
+
     2019/12/19 : Implemented for the Dark Mode on mac_o_s, because the app palette can not account for that (Qt 5.12.5).
 
     This way we also avoid having certain strings re-translated on Transifex.
@@ -525,7 +535,7 @@ public:
 
     /***********************************************************
     @brief Creates a colour-aware icon based on the specified palette's base colour.
-    
+
     @return QIcon, colour-aware (inverted on dark backgrounds).
 
     2019/12/09 : Moved here from SettingsDialog.
@@ -534,7 +544,7 @@ public:
 
     /***********************************************************
     @brief Creates a colour-aware icon based on the app palette's base colour (Dark-/Light-Mode switching).
-    
+
     @return QIcon, colour-aware (inverted on dark backgrounds).
 
     2019/12/09 : Moved here from SettingsDialog.
@@ -543,7 +553,7 @@ public:
 
     /***********************************************************
     @brief Creates a colour-aware pixmap based on the specified palette's base colour.
-    
+
     @return QPixmap, colour-aware (inverted on dark backgrounds).
 
     2019/12/09 : Adapted from create_color_aware_icon.
@@ -552,7 +562,7 @@ public:
 
     /***********************************************************
     @brief Creates a colour-aware pixmap based on the app palette's base colour (Dark-/Light-Mode switching).
-    
+
     @return QPixmap, colour-aware (inverted on dark backgrounds).
 
     2019/12/09 : Adapted from create_color_aware_icon.
@@ -561,7 +571,7 @@ public:
 
     /***********************************************************
     @brief Whether to show the option to create folders using "virtual files".
-    
+
     By default, the options are not shown unless experimental options are
     manually enabled in the configuration file.
     ***********************************************************/
@@ -570,15 +580,18 @@ public:
     virtual bool enforce_virtual_files_sync_folder ();
 
     /***********************************************************
-    @return color for the Error_box text. */
+    @return color for the Error_box text.
+    ***********************************************************/
     virtual QColor error_box_text_color ();
 
     /***********************************************************
-    @return color for the Error_box background. */
+    @return color for the Error_box background.
+    ***********************************************************/
     virtual QColor error_box_background_color ();
 
     /***********************************************************
-    @return color for the Error_box border. */
+    @return color for the Error_box border.
+    ***********************************************************/
     virtual QColor error_box_border_color ();
 
     static constexpr const char *theme_prefix = ":/client/theme/";
@@ -798,8 +811,11 @@ QIcon Theme.theme_icon (string &name, bool sys_tray) {
         };
 
         const auto use_svg = should_prefer_svg ();
-        const auto sizes = use_svg ? QVector<int>{ 16, 32, 64, 128, 256 }
-                                  : QVector<int>{ 16, 22, 32, 48, 64, 128, 256, 512, 1024 };
+        const auto sizes = use_svg
+            ? QVector<int> {
+                16, 32, 64, 128, 256 }
+            : QVector<int> {
+                16, 22, 32, 48, 64, 128, 256, 512, 1024 };
         for (int size : sizes) {
             auto px = use_svg ? create_pixmap_from_svg (size) : load_pixmap (size);
             if (px.is_null ()) {
@@ -1267,7 +1283,9 @@ bool Theme.is_dark_color (QColor &color) {
 }
 
 QColor Theme.get_background_aware_link_color (QColor &background_color) {
-    return { (is_dark_color (background_color) ? QColor ("#6193dc") : QGuiApplication.palette ().color (QPalette.Link))};
+    return {
+        (is_dark_color (background_color) ? QColor ("#6193dc") : QGuiApplication.palette ().color (QPalette.Link))
+    };
 }
 
 QColor Theme.get_background_aware_link_color () {

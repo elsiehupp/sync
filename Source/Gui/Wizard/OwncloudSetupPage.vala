@@ -85,9 +85,9 @@ private:
         , _progress_indi (new QProgress_indicator (this))
         , _oc_wizard (qobject_cast<OwncloudWizard> (parent)) {
         _ui.setup_ui (this);
-    
+
         setup_server_address_description_label ();
-    
+
         Theme *theme = Theme.instance ();
         if (theme.override_server_url ().is_empty ()) {
             _ui.le_url.set_postfix (theme.wizard_url_postfix ());
@@ -95,35 +95,35 @@ private:
         } else if (Theme.instance ().force_override_server_url ()) {
             _ui.le_url.set_enabled (false);
         }
-    
+
         register_field (QLatin1String ("OCUrl*"), _ui.le_url);
-    
+
         auto size_policy = _progress_indi.size_policy ();
         size_policy.set_retain_size_when_hidden (true);
         _progress_indi.set_size_policy (size_policy);
-    
+
         _ui.progress_layout.add_widget (_progress_indi);
         stop_spinner ();
-    
+
         setup_customization ();
-    
+
         slot_url_changed (QLatin1String ("")); // don't jitter UI
         connect (_ui.le_url, &QLineEdit.text_changed, this, &Owncloud_setup_page.slot_url_changed);
         connect (_ui.le_url, &QLineEdit.editing_finished, this, &Owncloud_setup_page.slot_url_edit_finished);
-    
+
         add_cert_dial = new AddCertificateDialog (this);
         connect (add_cert_dial, &Gtk.Dialog.accepted, this, &Owncloud_setup_page.slot_certificate_accepted);
     }
-    
+
     void Owncloud_setup_page.set_logo () {
         _ui.logo_label.set_pixmap (Theme.instance ().wizard_application_logo ());
     }
-    
+
     void Owncloud_setup_page.setup_server_address_description_label () {
         const auto app_name = Theme.instance ().app_name_g_u_i ();
         _ui.server_address_description_label.set_text (tr ("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").arg (app_name));
     }
-    
+
     void Owncloud_setup_page.set_server_url (string &new_url) {
         _oc_wizard.set_registration (false);
         _o_c_url = new_url;
@@ -131,30 +131,30 @@ private:
             _ui.le_url.clear ();
             return;
         }
-    
+
         _ui.le_url.set_text (_o_c_url);
     }
-    
+
     void Owncloud_setup_page.setup_customization () {
         // set defaults for the customize labels.
         _ui.top_label.hide ();
         _ui.bottom_label.hide ();
-    
+
         Theme *theme = Theme.instance ();
         QVariant variant = theme.custom_media (Theme.o_c_setup_top);
         if (!variant.is_null ()) {
             WizardCommon.setup_custom_media (variant, _ui.top_label);
         }
-    
+
         variant = theme.custom_media (Theme.o_c_setup_bottom);
         WizardCommon.setup_custom_media (variant, _ui.bottom_label);
-    
+
         auto le_url_palette = _ui.le_url.palette ();
         le_url_palette.set_color (QPalette.Text, Qt.black);
         le_url_palette.set_color (QPalette.Base, Qt.white);
         _ui.le_url.set_palette (le_url_palette);
     }
-    
+
     // slot hit from text_changed of the url entry field.
     void Owncloud_setup_page.slot_url_changed (string &url) {
         // Need to set next button as default button here because
@@ -164,9 +164,9 @@ private:
         if (next_button) {
             next_button.set_default (true);
         }
-    
+
         _auth_type_known = false;
-    
+
         string new_url = url;
         if (url.ends_with ("index.php")) {
             new_url.chop (9);
@@ -187,7 +187,7 @@ private:
             _ui.le_url.set_text (new_url);
         }
     }
-    
+
     void Owncloud_setup_page.slot_url_edit_finished () {
         string url = _ui.le_url.full_text ();
         if (QUrl (url).is_relative () && !url.is_empty ()) {
@@ -196,27 +196,27 @@ private:
             _ui.le_url.set_full_text (url);
         }
     }
-    
+
     bool Owncloud_setup_page.is_complete () {
         return !_ui.le_url.text ().is_empty () && !_checking;
     }
-    
+
     void Owncloud_setup_page.initialize_page () {
         customize_style ();
-    
+
         WizardCommon.init_error_label (_ui.error_label);
-    
+
         _auth_type_known = false;
         _checking = false;
-    
+
         QAbstractButton *next_button = wizard ().button (QWizard.Next_button);
         auto *push_button = qobject_cast<QPushButton> (next_button);
         if (push_button) {
             push_button.set_default (true);
         }
-    
+
         _ui.le_url.set_focus ();
-    
+
         const auto is_server_url_overridden = !Theme.instance ().override_server_url ().is_empty ();
         if (is_server_url_overridden && !Theme.instance ().force_override_server_url ()) {
             // If the url is overwritten but we don't force to use that url
@@ -235,7 +235,7 @@ private:
             set_visible (false);
         }
     }
-    
+
     int Owncloud_setup_page.next_id () {
         switch (_auth_type) {
         case DetermineAuthTypeJob.Basic:
@@ -253,12 +253,12 @@ private:
         }
         Q_UNREACHABLE ();
     }
-    
+
     string Owncloud_setup_page.url () {
         string url = _ui.le_url.full_text ().simplified ();
         return url;
     }
-    
+
     bool Owncloud_setup_page.validate_page () {
         if (!_auth_type_known) {
             slot_url_edit_finished ();
@@ -268,12 +268,12 @@ private:
                 set_error_string (tr ("Server address does not seem to be valid"), false);
                 return false;
             }
-    
+
             set_error_string (string (), false);
             _checking = true;
             start_spinner ();
             emit complete_changed ();
-    
+
             emit determine_auth_type (u);
             return false;
         } else {
@@ -284,13 +284,13 @@ private:
             return true;
         }
     }
-    
+
     void Owncloud_setup_page.set_auth_type (DetermineAuthTypeJob.AuthType type) {
         _auth_type_known = true;
         _auth_type = type;
         stop_spinner ();
     }
-    
+
     void Owncloud_setup_page.set_error_string (string &err, bool retry_h_t_tPonly) {
         if (err.is_empty ()) {
             _ui.error_label.set_visible (false);
@@ -301,12 +301,12 @@ private:
                     // Ask the user how to proceed when connecting to a https:// URL fails.
                     // It is possible that the server is secured with client-side TLS certificates,
                     // but that it has no way of informing the owncloud client that this is the case.
-    
+
                     Owncloud_connection_method_dialog dialog;
                     dialog.set_url (url);
                     // FIXME : Synchronous dialogs are not so nice because of event loop recursion
                     int ret_val = dialog.exec ();
-    
+
                     switch (ret_val) {
                     case Owncloud_connection_method_dialog.No_TLS : {
                         url.set_scheme ("http");
@@ -325,7 +325,7 @@ private:
                     }
                 }
             }
-    
+
             _ui.error_label.set_visible (true);
             _ui.error_label.set_text (err);
         }
@@ -333,30 +333,30 @@ private:
         emit complete_changed ();
         stop_spinner ();
     }
-    
+
     void Owncloud_setup_page.start_spinner () {
         _ui.progress_layout.set_enabled (true);
         _progress_indi.set_visible (true);
         _progress_indi.start_animation ();
     }
-    
+
     void Owncloud_setup_page.stop_spinner () {
         _ui.progress_layout.set_enabled (false);
         _progress_indi.set_visible (false);
         _progress_indi.stop_animation ();
     }
-    
+
     string subject_info_helper (QSslCertificate &cert, QByteArray &qa) {
         return cert.subject_info (qa).join (QLatin1Char ('/'));
     }
-    
+
     //called during the validation of the client certificate.
     void Owncloud_setup_page.slot_certificate_accepted () {
         QFile cert_file (add_cert_dial.get_certificate_path ());
         cert_file.open (QFile.Read_only);
         QByteArray cert_data = cert_file.read_all ();
         QByteArray cert_password = add_cert_dial.get_certificate_passwd ().to_local8Bit ();
-    
+
         QBuffer cert_data_buffer (&cert_data);
         cert_data_buffer.open (QIODevice.Read_only);
         if (QSslCertificate.import_pkcs12 (&cert_data_buffer,
@@ -364,9 +364,9 @@ private:
                 &_oc_wizard._client_ssl_ca_certificates, cert_password)) {
             _oc_wizard._client_cert_bundle = cert_data;
             _oc_wizard._client_cert_password = cert_password;
-    
+
             add_cert_dial.reinit (); // FIXME : Why not just have this only created on use?
-    
+
             // The extracted SSL key and cert gets added to the QSslConfiguration in check_server ()
             validate_page ();
         } else {
@@ -374,16 +374,16 @@ private:
             add_cert_dial.show ();
         }
     }
-    
+
     Owncloud_setup_page.~Owncloud_setup_page () = default;
-    
+
     void Owncloud_setup_page.slot_style_changed () {
         customize_style ();
     }
-    
+
     void Owncloud_setup_page.customize_style () {
         set_logo ();
-    
+
         if (_progress_indi) {
             const auto is_dark_background = Theme.is_dark_color (palette ().window ().color ());
             if (is_dark_background) {
@@ -392,9 +392,9 @@ private:
                 _progress_indi.set_color (Qt.black);
             }
         }
-    
+
         WizardCommon.customize_hint_label (_ui.server_address_description_label);
     }
-    
+
     } // namespace Occ
     

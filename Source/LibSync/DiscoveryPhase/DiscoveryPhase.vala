@@ -41,7 +41,8 @@ Represent all the meta-data about a file in the server
 ***********************************************************/
 struct Remote_info {
     /***********************************************************
-    File_name of the entry (this does not contains any directory or path, just the plain name */
+    File_name of the entry (this does not contains any directory or path, just the plain name
+    ***********************************************************/
     string name;
     QByteArray etag;
     QByteArray file_id;
@@ -54,7 +55,9 @@ struct Remote_info {
     bool is_e2e_encrypted = false;
     string e2e_mangled_name;
 
-    bool is_valid () { return !name.is_null (); }
+    bool is_valid () {
+        return !name.is_null ();
+    }
 
     string direct_download_url;
     string direct_download_cookies;
@@ -62,7 +65,8 @@ struct Remote_info {
 
 struct Local_info {
     /***********************************************************
-    File_name of the entry (this does not contains any directory or path, just the plain name */
+    File_name of the entry (this does not contains any directory or path, just the plain name
+    ***********************************************************/
     string name;
     string rename_name;
     time_t modtime = 0;
@@ -73,7 +77,9 @@ struct Local_info {
     bool is_hidden = false;
     bool is_virtual_file = false;
     bool is_sym_link = false;
-    bool is_valid () { return !name.is_null (); }
+    bool is_valid () {
+        return !name.is_null ();
+    }
 };
 
 /***********************************************************
@@ -110,7 +116,9 @@ class Discovery_single_directory_job : GLib.Object {
 public:
     Discovery_single_directory_job (AccountPtr &account, string &path, GLib.Object *parent = nullptr);
     // Specify that this is the root and we need to check the data-fingerprint
-    void set_is_root_path () { _is_root_path = true; }
+    void set_is_root_path () {
+        _is_root_path = true;
+    }
     void start ();
     void abort ();
 
@@ -176,7 +184,7 @@ class Discovery_phase : GLib.Object {
     once the rest of the discovery has finished and we are certain
     that the folder wasn't just renamed. This avoids running the
     discovery on contents in the old location of renamed folders.
-    
+
     See find_and_cancel_deleted_job ().
     ***********************************************************/
     QMap<string, Process_directory_job> _queued_deleted_directories;
@@ -201,7 +209,9 @@ class Discovery_phase : GLib.Object {
     Useful for avoiding processing of items that have already been claimed in
     a rename (would otherwise be discovered as deletions).
     ***********************************************************/
-    bool is_renamed (string &p) { return _renamed_items_local.contains (p) || _renamed_items_remote.contains (p); }
+    bool is_renamed (string &p) {
+        return _renamed_items_local.contains (p) || _renamed_items_remote.contains (p);
+    }
 
     int _currently_active_jobs = 0;
 
@@ -232,8 +242,8 @@ class Discovery_phase : GLib.Object {
     Check if there is already a job to delete that item:
     If that's not the case, return { false, QByteArray () }.
     If there is such a job, cancel that job and return true and the old etag.
-    
-    Used when having detected a rename : The rename source 
+
+    Used when having detected a rename : The rename source
     discovered before and would have looked like a delete.
 
     See _deleted_item and _queued_deleted_directories.
@@ -272,9 +282,9 @@ signals:
 
     /***********************************************************
     For excluded items that don't show up in item_discovered ()
-      *
-      * The path is relative to the sync folder, similar to item._file
-      */
+
+    The path is relative to the sync folder, similar to item._file
+    ***********************************************************/
     void silently_excluded (string &folder_path);
 
     void add_error_to_gui (SyncFileItem.Status status, string &error_message, string &subject);
@@ -286,22 +296,22 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
     /* Given a sorted list of paths ending with '/', return whether or not the given path is within one of the paths of the list*/
     static bool find_path_in_list (QStringList &list, string &path) {
         Q_ASSERT (std.is_sorted (list.begin (), list.end ()));
-    
+
         if (list.size () == 1 && list.first () == QLatin1String ("/")) {
             // Special case for the case "/" is there, it matches everything
             return true;
         }
-    
+
         string path_slash = path + QLatin1Char ('/');
-    
+
         // Since the list is sorted, we can do a binary search.
         // If the path is a prefix of another item or right after in the lexical order.
         auto it = std.lower_bound (list.begin (), list.end (), path_slash);
-    
+
         if (it != list.end () && *it == path_slash) {
             return true;
         }
-    
+
         if (it == list.begin ()) {
             return false;
         }
@@ -309,57 +319,59 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
         Q_ASSERT (it.ends_with (QLatin1Char ('/'))); // Folder.set_selective_sync_black_list makes sure of that
         return path_slash.starts_with (*it);
     }
-    
+
     bool Discovery_phase.is_in_selective_sync_black_list (string &path) {
         if (_selective_sync_black_list.is_empty ()) {
             // If there is no black list, everything is allowed
             return false;
         }
-    
+
         // Block if it is in the black list
         if (find_path_in_list (_selective_sync_black_list, path)) {
             return true;
         }
-    
+
         return false;
     }
-    
+
     void Discovery_phase.check_selective_sync_new_folder (string &path, RemotePermissions remote_perm,
         std.function<void (bool)> callback) {
         if (_sync_options._confirm_external_storage && _sync_options._vfs.mode () == Vfs.Off
             && remote_perm.has_permission (RemotePermissions.Is_mounted)) {
             // external storage.
-    
-            /* Note : Discovery_single_directory_job.directory_listing_iterated_slot make sure that only the
-             * root of a mounted storage has 'M', all sub entries have 'm' */
-    
+
+            // Note: Discovery_single_directory_job.directory_listing_iterated_slot make sure that only the
+            // root of a mounted storage has 'M', all sub entries have 'm'
+
             // Only allow it if the white list contains exactly this path (not parents)
             // We want to ask confirmation for external storage even if the parents where selected
             if (_selective_sync_white_list.contains (path + QLatin1Char ('/'))) {
                 return callback (false);
             }
-    
+
             emit new_big_folder (path, true);
             return callback (true);
         }
-    
+
         // If this path or the parent is in the white list, then we do not block this file
         if (find_path_in_list (_selective_sync_white_list, path)) {
             return callback (false);
         }
-    
+
         auto limit = _sync_options._new_big_folder_size_limit;
         if (limit < 0 || _sync_options._vfs.mode () != Vfs.Off) {
             // no limit, everything is allowed;
             return callback (false);
         }
-    
+
         // do a PROPFIND to know the size of this folder
         auto propfind_job = new PropfindJob (_account, _remote_folder + path, this);
         propfind_job.set_properties (QList<QByteArray> () << "resourcetype"
                                                        << "http://owncloud.org/ns:size");
         GLib.Object.connect (propfind_job, &PropfindJob.finished_with_error,
-            this, [=] { return callback (false); });
+            this, [=] {
+                return callback (false);
+            });
         GLib.Object.connect (propfind_job, &PropfindJob.result, this, [=] (QVariantMap &values) {
             auto result = values.value (QLatin1String ("size")).to_long_long ();
             if (result >= limit) {
@@ -380,12 +392,14 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
         });
         propfind_job.start ();
     }
-    
-    /* Given a path on the remote, give the path as it is when the rename is done */
+
+    /***********************************************************
+    Given a path on the remote, give the path as it is when the rename is done
+    ***********************************************************/
     string Discovery_phase.adjust_renamed_path (string &original, SyncFileItem.Direction d) {
         return Occ.adjust_renamed_path (d == SyncFileItem.Down ? _renamed_items_remote : _renamed_items_local, original);
     }
-    
+
     string adjust_renamed_path (QMap<string, string> &renamed_items, string &original) {
         int slash_pos = original.size ();
         while ( (slash_pos = original.last_index_of ('/', slash_pos - 1)) > 0) {
@@ -396,7 +410,7 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
         }
         return original;
     }
-    
+
     QPair<bool, QByteArray> Discovery_phase.find_and_cancel_deleted_job (string &original_path) {
         bool result = false;
         QByteArray old_etag;
@@ -439,9 +453,11 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
             delete other_job;
             result = true;
         }
-        return { result, old_etag };
+        return {
+            result, old_etag
+        };
     }
-    
+
     void Discovery_phase.start_job (Process_directory_job *job) {
         ENFORCE (!_current_root_job);
         connect (job, &Process_directory_job.finished, this, [this, job] {
@@ -450,7 +466,7 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
             if (job._dir_item)
                 emit item_discovered (job._dir_item);
             job.delete_later ();
-    
+
             // Once the main job has finished recurse here to execute the remaining
             // jobs for queued deleted directories.
             if (!_queued_deleted_directories.is_empty ()) {
@@ -463,35 +479,35 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
         _current_root_job = job;
         job.start ();
     }
-    
+
     void Discovery_phase.set_selective_sync_black_list (QStringList &list) {
         _selective_sync_black_list = list;
         std.sort (_selective_sync_black_list.begin (), _selective_sync_black_list.end ());
     }
-    
+
     void Discovery_phase.set_selective_sync_white_list (QStringList &list) {
         _selective_sync_white_list = list;
         std.sort (_selective_sync_white_list.begin (), _selective_sync_white_list.end ());
     }
-    
+
     void Discovery_phase.schedule_more_jobs () {
         auto limit = q_max (1, _sync_options._parallel_network_jobs);
         if (_current_root_job && _currently_active_jobs < limit) {
             _current_root_job.process_sub_jobs (limit - _currently_active_jobs);
         }
     }
-    
+
     Discovery_single_local_directory_job.Discovery_single_local_directory_job (AccountPtr &account, string &local_path, Occ.Vfs *vfs, GLib.Object *parent)
      : GLib.Object (parent), QRunnable (), _local_path (local_path), _account (account), _vfs (vfs) {
         q_register_meta_type<QVector<Local_info> > ("QVector<Local_info>");
     }
-    
+
     // Use as QRunnable
     void Discovery_single_local_directory_job.run () {
         string local_path = _local_path;
         if (local_path.ends_with ('/')) // Happens if _current_folder._local.is_empty ()
             local_path.chop (1);
-    
+
         auto dh = csync_vio_local_opendir (local_path);
         if (!dh) {
             q_c_info (lc_discovery) << "Error while opening directory" << (local_path) << errno;
@@ -510,7 +526,7 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
             emit finished_fatal_error (error_string);
             return;
         }
-    
+
         QVector<Local_info> results;
         while (true) {
             errno = 0;
@@ -548,22 +564,22 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
         }
         if (errno != 0) {
             csync_vio_local_closedir (dh);
-    
+
             // Note : Windows vio converts any error into EACCES
             q_c_warning (lc_discovery) << "readdir failed for file in " << local_path << " - errno : " << errno;
             emit finished_fatal_error (tr ("Error while reading directory %1").arg (local_path));
             return;
         }
-    
+
         errno = 0;
         csync_vio_local_closedir (dh);
         if (errno != 0) {
             q_c_warning (lc_discovery) << "closedir failed for file in " << local_path << " - errno : " << errno;
         }
-    
+
         emit finished (results);
     }
-    
+
     Discovery_single_directory_job.Discovery_single_directory_job (AccountPtr &account, string &path, GLib.Object *parent)
         : GLib.Object (parent)
         , _sub_path (path)
@@ -573,11 +589,11 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
         , _is_external_storage (false)
         , _is_e2e_encrypted (false) {
     }
-    
+
     void Discovery_single_directory_job.start () {
         // Start the actual HTTP job
         auto *ls_col_job = new Ls_col_job (_account, _sub_path, this);
-    
+
         QList<QByteArray> props;
         props << "resourcetype"
               << "getlastmodified"
@@ -599,24 +615,24 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
         if (_account.capabilities ().client_side_encryption_available ()) {
             props << "http://nextcloud.org/ns:is-encrypted";
         }
-    
+
         ls_col_job.set_properties (props);
-    
+
         GLib.Object.connect (ls_col_job, &Ls_col_job.directory_listing_iterated,
             this, &Discovery_single_directory_job.directory_listing_iterated_slot);
         GLib.Object.connect (ls_col_job, &Ls_col_job.finished_with_error, this, &Discovery_single_directory_job.ls_job_finished_with_error_slot);
         GLib.Object.connect (ls_col_job, &Ls_col_job.finished_without_error, this, &Discovery_single_directory_job.ls_job_finished_without_error_slot);
         ls_col_job.start ();
-    
+
         _ls_col_job = ls_col_job;
     }
-    
+
     void Discovery_single_directory_job.abort () {
         if (_ls_col_job && _ls_col_job.reply ()) {
             _ls_col_job.reply ().abort ();
         }
     }
-    
+
     static void property_map_to_remote_info (QMap<string, string> &map, Remote_info &result) {
         for (auto it = map.const_begin (); it != map.const_end (); ++it) {
             string property = it.key ();
@@ -663,12 +679,12 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
                 result.is_e2e_encrypted = true;
             }
         }
-    
+
         if (result.is_directory && map.contains ("size")) {
             result.size_of_folder = map.value ("size").to_int ();
         }
     }
-    
+
     void Discovery_single_directory_job.directory_listing_iterated_slot (string &file, QMap<string, string> &map) {
         if (!_ignored_first) {
             // The first entry is for the folder itself, we should process it differently.
@@ -699,7 +715,7 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
                 _size = map.value ("size").to_int ();
             }
         } else {
-    
+
             Remote_info result;
             int slash = file.last_index_of ('/');
             result.name = file.mid (slash + 1);
@@ -707,17 +723,17 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
             property_map_to_remote_info (map, result);
             if (result.is_directory)
                 result.size = 0;
-    
+
             if (_is_external_storage && result.remote_perm.has_permission (RemotePermissions.Is_mounted)) {
-                /* All the entries in a external storage have 'M' in their permission. However, for all
-                   purposes in the desktop client, we only need to know about the mount points.
-                   So replace the 'M' by a 'm' for every sub entries in an external storage */
+                // All the entries in a external storage have 'M' in their permission. However, for all
+                // purposes in the desktop client, we only need to know about the mount points.
+                // So replace the 'M' by a 'm' for every sub entries in an external storage
                 result.remote_perm.unset_permission (RemotePermissions.Is_mounted);
                 result.remote_perm.set_permission (RemotePermissions.Is_mounted_sub);
             }
             _results.push_back (std.move (result));
         }
-    
+
         //This works in concerto with the RequestEtagJob and the Folder object to check if the remote folder changed.
         if (map.contains ("getetag")) {
             if (_first_etag.is_empty ()) {
@@ -725,16 +741,20 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
             }
         }
     }
-    
+
     void Discovery_single_directory_job.ls_job_finished_without_error_slot () {
         if (!_ignored_first) {
             // This is a sanity check, if we haven't _ignored_first then it means we never received any directory_listing_iterated_slot
             // which means somehow the server XML was bogus
-            emit finished (Http_error{ 0, tr ("Server error : PROPFIND reply is not XML formatted!") });
+            emit finished (Http_error {
+                0, tr ("Server error : PROPFIND reply is not XML formatted!")
+            });
             delete_later ();
             return;
         } else if (!_error.is_empty ()) {
-            emit finished (Http_error{ 0, _error });
+            emit finished (Http_error {
+                0, _error
+            });
             delete_later ();
             return;
         } else if (_is_e2e_encrypted) {
@@ -746,7 +766,7 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
         emit finished (_results);
         delete_later ();
     }
-    
+
     void Discovery_single_directory_job.ls_job_finished_with_error_slot (QNetworkReply *r) {
         string content_type = r.header (QNetworkRequest.ContentTypeHeader).to_string ();
         int http_code = r.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
@@ -756,10 +776,12 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
             && !content_type.contains ("application/xml; charset=utf-8")) {
             msg = tr ("Server error : PROPFIND reply is not XML formatted!");
         }
-        emit finished (Http_error{ http_code, msg });
+        emit finished (Http_error {
+            http_code, msg
+        });
         delete_later ();
     }
-    
+
     void Discovery_single_directory_job.fetch_e2e_metadata () {
         const auto job = new Get_metadata_api_job (_account, _local_file_id);
         connect (job, &Get_metadata_api_job.json_received,
@@ -768,14 +790,14 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
                 this, &Discovery_single_directory_job.metadata_error);
         job.start ();
     }
-    
+
     void Discovery_single_directory_job.metadata_received (QJsonDocument &json, int status_code) {
         q_c_debug (lc_discovery) << "Metadata received, applying it to the result list";
         Q_ASSERT (_sub_path.starts_with ('/'));
-    
+
         const auto metadata = Folder_metadata (_account, json.to_json (QJsonDocument.Compact), status_code);
         const auto encrypted_files = metadata.files ();
-    
+
         const auto find_encrypted_file = [=] (string &name) {
             const auto it = std.find_if (std.cbegin (encrypted_files), std.cend (encrypted_files), [=] (Encrypted_file &file) {
                 return file.encrypted_filename == name;
@@ -786,7 +808,7 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
                 return Optional<Encrypted_file> (*it);
             }
         };
-    
+
         std.transform (std.cbegin (_results), std.cend (_results), std.begin (_results), [=] (Remote_info &info) {
             auto result = info;
             const auto encrypted_file_info = find_encrypted_file (result.name);
@@ -797,11 +819,11 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
             }
             return result;
         });
-    
+
         emit finished (_results);
         delete_later ();
     }
-    
+
     void Discovery_single_directory_job.metadata_error (QByteArray &file_id, int http_return_code) {
         q_c_warning (lc_discovery) << "E2EE Metadata job error. Trying to proceed without it." << file_id << http_return_code;
         emit finished (_results);

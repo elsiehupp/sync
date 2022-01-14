@@ -43,26 +43,27 @@ Q_DECLARE_LOGGING_CATEGORY (lc_application)
 @ingroup gui
 ***********************************************************/
 class Application : SharedTools.QtSingleApplication {
-public:
-    Application (int &argc, char **argv);
-    ~Application () override;
 
-    bool give_help ();
-    void show_help ();
-    void show_hint (std.string error_hint);
-    bool debug_mode ();
-    bool background_mode ();
-    bool version_only (); // only display the version?
-    void show_version ();
+    public Application (int &argc, char **argv);
+    public ~Application () override;
 
-    void show_main_dialog ();
+    public bool give_help ();
+    public void show_help ();
+    public void show_hint (std.string error_hint);
+    public bool debug_mode ();
+    public bool background_mode ();
+    public bool version_only (); // only display the version?
+    public void show_version ();
 
-    OwncloudGui *gui ();
+    public void show_main_dialog ();
+
+    public OwncloudGui *gui ();
 
 public slots:
-    // TODO : this should not be public
+    // TODO: this should not be public
     void slotown_cloud_wizard_done (int);
     void slot_crash ();
+
     /***********************************************************
     Will download a virtual file, and open the result.
     The argument is the filename of the virtual file (including the extension)
@@ -659,7 +660,9 @@ void Application.parse_options (QStringList &options) {
             _version_only = true;
         } else if (option.ends_with (QStringLiteral (APPLICATION_DOTVIRTUALFILE_SUFFIX))) {
             // virtual file, open it after the Folder were created (if the app is not terminated)
-            QTimer.single_shot (0, this, [this, option] { open_virtual_file (option); });
+            QTimer.single_shot (0, this, [this, option] {
+                open_virtual_file (option);
+            });
         } else {
             show_hint ("Unrecognized option '" + option.to_std_string () + "'");
         }

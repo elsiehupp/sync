@@ -22,7 +22,7 @@ namespace KeychainChunk {
 
 /***********************************************************
 * Workaround for Windows:
-*
+
 * Split the keychain entry's data into chunks of 2048 bytes,
 * to allow 4k (4096 bit) keys / large certs to be saved (see limits in webflowcredentials.h)
 ***********************************************************/
@@ -89,7 +89,7 @@ public:
     /***********************************************************
     Call this method to start the job (async).
     You should connect some slot to the finished () signal first.
-    
+
     @see QKeychain.Job.start ()
     ***********************************************************/
     void start ();
@@ -97,7 +97,7 @@ public:
     /***********************************************************
     Call this method to start the job synchronously.
     Awaits completion with no need to connect some slot to the finished () signal first.
-    
+
     @return Returns true on succeess (QKeychain.NoError).
     ***********************************************************/
     bool exec ();
@@ -120,7 +120,7 @@ public:
     /***********************************************************
     Call this method to start the job (async).
     You should connect some slot to the finished () signal first.
-    
+
     @see QKeychain.Job.start ()
     ***********************************************************/
     void start ();
@@ -128,7 +128,7 @@ public:
     /***********************************************************
     Call this method to start the job synchronously.
     Awaits completion with no need to connect some slot to the finished () signal first.
-    
+
     @return Returns true on succeess (QKeychain.NoError).
     ***********************************************************/
     bool exec ();
@@ -154,7 +154,7 @@ public:
     /***********************************************************
     Call this method to start the job (async).
     You should connect some slot to the finished () signal first.
-    
+
     @see QKeychain.Job.start ()
     ***********************************************************/
     void start ();
@@ -162,7 +162,7 @@ public:
     /***********************************************************
     Call this method to start the job synchronously.
     Awaits completion with no need to connect some slot to the finished () signal first.
-    
+
     @return Returns true on succeess (QKeychain.NoError).
     ***********************************************************/
     bool exec ();

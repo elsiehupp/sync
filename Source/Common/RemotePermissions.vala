@@ -76,7 +76,9 @@ private:
         _value &= ~ (1 << static_cast<int> (p));
     }
 
-    public bool is_null () { return ! (_value & not_null_mask); }
+    public bool is_null () {
+        return ! (_value & not_null_mask);
+    }
     public friend bool operator== (RemotePermissions a, RemotePermissions b) {
         return a._value == b._value;
     }
@@ -92,7 +94,7 @@ private:
 
 
     static const char letters[] = " WDNVCKRSMm";
-    
+
     template <typename Char>
     void RemotePermissions.from_array (Char *p) {
         _value = not_null_mask;
@@ -104,7 +106,7 @@ private:
             ++p;
         }
     }
-    
+
     QByteArray RemotePermissions.to_db_value () {
         QByteArray result;
         if (is_null ())
@@ -120,11 +122,11 @@ private:
         }
         return result;
     }
-    
+
     string RemotePermissions.to_string () {
         return string.from_utf8 (to_db_value ());
     }
-    
+
     RemotePermissions RemotePermissions.from_db_value (QByteArray &value) {
         if (value.is_empty ())
             return {};
@@ -132,12 +134,12 @@ private:
         perm.from_array (value.const_data ());
         return perm;
     }
-    
+
     RemotePermissions RemotePermissions.from_server_string (string &value) {
         RemotePermissions perm;
         perm.from_array (value.utf16 ());
         return perm;
     }
-    
+
     } // namespace Occ
     

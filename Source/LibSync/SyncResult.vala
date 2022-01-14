@@ -46,29 +46,69 @@ public:
     void set_folder (string &folder);
     string folder ();
 
-    bool found_files_not_synced () { return _found_files_not_synced; }
-    bool folder_structure_was_changed () { return _folder_structure_was_changed; }
+    bool found_files_not_synced () {
+        return _found_files_not_synced;
+    }
+    bool folder_structure_was_changed () {
+        return _folder_structure_was_changed;
+    }
 
-    int num_new_items () { return _num_new_items; }
-    int num_removed_items () { return _num_removed_items; }
-    int num_updated_items () { return _num_updated_items; }
-    int num_renamed_items () { return _num_renamed_items; }
-    int num_new_conflict_items () { return _num_new_conflict_items; }
-    int num_old_conflict_items () { return _num_old_conflict_items; }
-    void set_num_old_conflict_items (int n) { _num_old_conflict_items = n; }
-    int num_error_items () { return _num_error_items; }
-    bool has_unresolved_conflicts () { return _num_new_conflict_items + _num_old_conflict_items > 0; }
+    int num_new_items () {
+        return _num_new_items;
+    }
+    int num_removed_items () {
+        return _num_removed_items;
+    }
+    int num_updated_items () {
+        return _num_updated_items;
+    }
+    int num_renamed_items () {
+        return _num_renamed_items;
+    }
+    int num_new_conflict_items () {
+        return _num_new_conflict_items;
+    }
+    int num_old_conflict_items () {
+        return _num_old_conflict_items;
+    }
+    void set_num_old_conflict_items (int n) {
+        _num_old_conflict_items = n;
+    }
+    int num_error_items () {
+        return _num_error_items;
+    }
+    bool has_unresolved_conflicts () {
+        return _num_new_conflict_items + _num_old_conflict_items > 0;
+    }
 
-    int num_locked_items () { return _num_locked_items; }
-    bool has_locked_files () { return _num_locked_items > 0; }
+    int num_locked_items () {
+        return _num_locked_items;
+    }
+    bool has_locked_files () {
+        return _num_locked_items > 0;
+    }
 
-    const SyncFileItemPtr &first_item_new () { return _first_item_new; }
-    const SyncFileItemPtr &first_item_deleted () { return _first_item_deleted; }
-    const SyncFileItemPtr &first_item_updated () { return _first_item_updated; }
-    const SyncFileItemPtr &first_item_renamed () { return _first_item_renamed; }
-    const SyncFileItemPtr &first_new_conflict_item () { return _first_new_conflict_item; }
-    const SyncFileItemPtr &first_item_error () { return _first_item_error; }
-    const SyncFileItemPtr &first_item_locked () { return _first_item_locked; }
+    const SyncFileItemPtr &first_item_new () {
+        return _first_item_new;
+    }
+    const SyncFileItemPtr &first_item_deleted () {
+        return _first_item_deleted;
+    }
+    const SyncFileItemPtr &first_item_updated () {
+        return _first_item_updated;
+    }
+    const SyncFileItemPtr &first_item_renamed () {
+        return _first_item_renamed;
+    }
+    const SyncFileItemPtr &first_new_conflict_item () {
+        return _first_new_conflict_item;
+    }
+    const SyncFileItemPtr &first_item_error () {
+        return _first_item_error;
+    }
+    const SyncFileItemPtr &first_item_locked () {
+        return _first_item_locked;
+    }
 
     void process_completed_item (SyncFileItemPtr &item);
 
@@ -104,19 +144,19 @@ private:
 };
 
     SyncResult.SyncResult () = default;
-    
+
     SyncResult.Status SyncResult.status () {
         return _status;
     }
-    
+
     void SyncResult.reset () {
         *this = SyncResult ();
     }
-    
+
     string SyncResult.status_string () {
         string re;
         Status stat = status ();
-    
+
         switch (stat) {
         case Undefined:
             re = QLatin1String ("Undefined");
@@ -151,62 +191,62 @@ private:
         }
         return re;
     }
-    
+
     void SyncResult.set_status (Status stat) {
         _status = stat;
         _sync_time = QDateTime.current_date_time_utc ();
     }
-    
+
     QDateTime SyncResult.sync_time () {
         return _sync_time;
     }
-    
+
     QStringList SyncResult.error_strings () {
         return _errors;
     }
-    
+
     void SyncResult.append_error_string (string &err) {
         _errors.append (err);
     }
-    
+
     string SyncResult.error_string () {
         if (_errors.is_empty ())
             return string ();
         return _errors.first ();
     }
-    
+
     void SyncResult.clear_errors () {
         _errors.clear ();
     }
-    
+
     void SyncResult.set_folder (string &folder) {
         _folder = folder;
     }
-    
+
     string SyncResult.folder () {
         return _folder;
     }
-    
+
     void SyncResult.process_completed_item (SyncFileItemPtr &item) {
         if (Progress.is_warning_kind (item._status)) {
             // Count any error conditions, error strings will have priority anyway.
             _found_files_not_synced = true;
         }
-    
+
         if (item.is_directory () && (item._instruction == CSYNC_INSTRUCTION_NEW
                                       || item._instruction == CSYNC_INSTRUCTION_TYPE_CHANGE
                                       || item._instruction == CSYNC_INSTRUCTION_REMOVE
                                       || item._instruction == CSYNC_INSTRUCTION_RENAME)) {
             _folder_structure_was_changed = true;
         }
-    
+
         if (item._status == SyncFileItem.File_locked){
             _num_locked_items++;
             if (!_first_item_locked) {
                 _first_item_locked = item;
             }
         }
-    
+
         // Process the item to the gui
         if (item._status == SyncFileItem.Fatal_error || item._status == SyncFileItem.Normal_error) {
             // : this displays an error string (%2) for a file %1
@@ -258,6 +298,6 @@ private:
             }
         }
     }
-    
+
     } // ns mirall
     

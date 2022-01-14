@@ -24,7 +24,7 @@ public:
 
     void Abstract_credentials_wizard_page.cleanup_page () {
         // Reset the credentials when the 'Back' button is used.
-    
+
         AccountPtr account = static_cast<OwncloudWizard> (wizard ()).account ();
         AbstractCredentials *creds = account.credentials ();
         if (creds) {

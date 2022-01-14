@@ -24,17 +24,29 @@ class SyncJournalFileRecord {
     Returns the numeric part of the full id in _file_id.
 
     On the server this is sometimes known as the internal file id.
-    
+
     It is used in the construction of private links.
     ***********************************************************/
     public QByteArray numeric_file_id ();
-    public QDateTime mod_date_time () { return Utility.q_date_time_from_time_t (_modtime); }
+    public QDateTime mod_date_time () {
+        return Utility.q_date_time_from_time_t (_modtime);
+    }
 
-    public bool is_directory () { return _type == ItemTypeDirectory; }
-    public bool is_file () { return _type == ItemTypeFile || _type == ItemTypeVirtualFileDehydration; }
-    public bool is_virtual_file () { return _type == Item_type_virtual_file || _type == Item_type_virtual_file_download; }
-    public string path () { return string.from_utf8 (_path); }
-    public string e2e_mangled_name () { return string.from_utf8 (_e2e_mangled_name); }
+    public bool is_directory () {
+        return _type == ItemTypeDirectory;
+    }
+    public bool is_file () {
+        return _type == ItemTypeFile || _type == ItemTypeVirtualFileDehydration;
+    }
+    public bool is_virtual_file () {
+        return _type == Item_type_virtual_file || _type == Item_type_virtual_file_download;
+    }
+    public string path () {
+        return string.from_utf8 (_path);
+    }
+    public string e2e_mangled_name () {
+        return string.from_utf8 (_e2e_mangled_name);
+    }
 
     public QByteArray _path;
     public uint64 _inode = 0;
@@ -125,15 +137,17 @@ class Conflict_record {
 
     /***********************************************************
     The path of the original file at the time the conflict was created
-    
-    Note that in nearly all cases one should query 
+
+    Note that in nearly all cases one should query
     thus retrieve the *current* base path instead!
 
     maybe be empty if not available
     ***********************************************************/
     public QByteArray initial_base_path;
 
-    public bool is_valid () { return !path.is_empty (); }
+    public bool is_valid () {
+        return !path.is_empty ();
+    }
 };
 
 
@@ -146,13 +160,13 @@ class Conflict_record {
         }
         return _file_id;
     }
-    
+
     bool SyncJournalErrorBlacklistRecord.is_valid () {
         return !_file.is_empty ()
             && (!_last_try_etag.is_empty () || _last_try_modtime != 0)
             && _last_try_time > 0;
     }
-    
+
     bool operator== (SyncJournalFileRecord &lhs,
         const SyncJournalFileRecord &rhs) {
         return lhs._path == rhs._path

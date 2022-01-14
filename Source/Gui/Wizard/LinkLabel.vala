@@ -34,36 +34,36 @@ private:
 };
 
     Link_label.Link_label (Gtk.Widget *parent) : QLabel (parent) {
-    
+
     }
-    
+
     void Link_label.set_url (QUrl &url) {
         this.url = url;
     }
-    
+
     void Link_label.enter_event (QEvent * /*event*/) {
         set_font_underline (true);
         set_cursor (Qt.PointingHandCursor);
     }
-    
+
     void Link_label.leave_event (QEvent * /*event*/) {
         set_font_underline (false);
         set_cursor (Qt.ArrowCursor);
     }
-    
+
     void Link_label.mouse_release_event (QMouse_event * /*event*/) {
         if (url.is_valid ()) {
             Utility.open_browser (url);
         }
-    
+
         emit clicked ();
     }
-    
+
     void Link_label.set_font_underline (bool value) {
         auto label_font = font ();
         label_font.set_underline (value);
         set_font (label_font);
     }
-    
+
     }
     

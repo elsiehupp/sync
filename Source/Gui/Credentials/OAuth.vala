@@ -37,20 +37,22 @@ Normal workfl
 
 ***********************************************************/
 class OAuth : GLib.Object {
-public:
-    OAuth (Account *account, GLib.Object *parent)
+
+    public OAuth (Account *account, GLib.Object *parent)
         : GLib.Object (parent)
         , _account (account) {
     }
-    ~OAuth () override;
+    public ~OAuth () override;
 
-    enum Result { NotSupported,
+    public enum Result {
+        NotSupported,
         LoggedIn,
-        Error };
-    Q_ENUM (Result);
-    void start ();
-    bool open_browser ();
-    QUrl authorisation_link ();
+        Error
+    };
+
+    public void start ();
+    public bool open_browser ();
+    public QUrl authorisation_link ();
 
 signals:
     /***********************************************************
@@ -63,13 +65,12 @@ private:
     Account *_account;
     QTcpServer _server;
 
-public:
-    string _expected_user;
+    public string _expected_user;
 };
 
 
     OAuth.~OAuth () = default;
-    
+
     static void http_reply_and_close (QTcpSocket *socket, char *code, char *html,
         const char *more_headers = nullptr) {
         if (!socket)
@@ -89,17 +90,17 @@ public:
         // The socket will be deleted after disconnection because disconnected is connected to delete_later
         socket.set_parent (nullptr);
     }
-    
+
     void OAuth.start () {
         // Listen on the socket to get a port which will be used in the redirect_uri
         if (!_server.listen (QHostAddress.LocalLost)) {
             emit result (NotSupported, string ());
             return;
         }
-    
+
         if (!open_browser ())
             return;
-    
+
         GLib.Object.connect (&_server, &QTcpServer.new_connection, this, [this] {
             while (QPointer<QTcpSocket> socket = _server.next_pending_connection ()) {
                 GLib.Object.connect (socket.data (), &QTcpSocket.disconnected, socket.data (), &QTcpSocket.delete_later);
@@ -113,25 +114,25 @@ public:
                         http_reply_and_close (socket, "404 Not Found", "<html><head><title>404 Not Found</title></head><body><center><h1>404 Not Found</h1></center></body></html>");
                         return;
                     }
-    
+
                     string code = rx_match.captured (1); // The 'code' is the first capture of the regexp
-    
+
                     QUrl request_token = Utility.concat_url_path (_account.url ().to_string (), QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
                     QNetworkRequest req;
                     req.set_header (QNetworkRequest.ContentTypeHeader, "application/x-www-form-urlencoded");
-    
+
                     string basic_auth = string ("%1:%2").arg (
                         Theme.instance ().oauth_client_id (), Theme.instance ().oauth_client_secret ());
                     req.set_raw_header ("Authorization", "Basic " + basic_auth.to_utf8 ().to_base64 ());
                     // We just added the Authorization header, don't let HttpCredentialsAccessManager tamper with it
                     req.set_attribute (HttpCredentials.DontAddCredentialsAttribute, true);
-    
+
                     auto request_body = new QBuffer;
                     QUrlQuery arguments (string (
                         "grant_type=authorization_code&code=%1&redirect_uri=http://localhost:%2")
                                             .arg (code, string.number (_server.server_port ())));
                     request_body.set_data (arguments.query (QUrl.FullyEncoded).to_latin1 ());
-    
+
                     auto job = _account.send_request ("POST", request_token, req, request_body);
                     job.set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
                     GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this, socket] (QNetworkReply *reply) {
@@ -142,7 +143,7 @@ public:
                         string refresh_token = json["refresh_token"].to_string ();
                         string user = json["user_id"].to_string ();
                         QUrl message_url = json["message_url"].to_string ();
-    
+
                         if (reply.error () != QNetworkReply.NoError || json_parse_error.error != QJsonParseError.NoError
                             || json_data.is_empty () || json.is_empty () || refresh_token.is_empty () || access_token.is_empty ()
                             || json["token_type"].to_string () != QLatin1String ("Bearer")) {
@@ -197,17 +198,30 @@ public:
             }
         });
     }
-    
+
     QUrl OAuth.authorisation_link () {
         Q_ASSERT (_server.is_listening ());
         QUrlQuery query;
-        query.set_query_items ({ { QLatin1String ("response_type"), QLatin1String ("code") }, { QLatin1String ("client_id"), Theme.instance ().oauth_client_id () }, { QLatin1String ("redirect_uri"), QLatin1String ("http://localhost:") + string.number (_server.server_port ()) } });
+        query.set_query_items ({
+            {
+                QLatin1String ("response_type"),
+                QLatin1String ("code")
+            },
+            {
+                QLatin1String ("client_id"),
+                Theme.instance ().oauth_client_id ()
+            },
+            {
+                QLatin1String ("redirect_uri"),
+                QLatin1String ("http://localhost:") + string.number (_server.server_port ())
+            }
+        });
         if (!_expected_user.is_null ())
             query.add_query_item ("user", _expected_user);
         QUrl url = Utility.concat_url_path (_account.url (), QLatin1String ("/index.php/apps/oauth2/authorize"), query);
         return url;
     }
-    
+
     bool OAuth.open_browser () {
         if (!Utility.open_browser (authorisation_link ())) {
             // We cannot open the browser, then we claim we don't support OAuth.
@@ -216,6 +230,6 @@ public:
         }
         return true;
     }
-    
+
     } // namespace Occ
     

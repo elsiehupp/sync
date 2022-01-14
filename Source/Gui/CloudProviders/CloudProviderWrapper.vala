@@ -38,15 +38,15 @@ using gpointer = void*;
 using namespace Occ;
 
 class CloudProviderWrapper : GLib.Object {
-public:
-    CloudProviderWrapper (GLib.Object *parent = nullptr, Folder *folder = nullptr, int folder_id = 0, CloudProvidersProviderExporter* cloudprovider = nullptr);
-    ~CloudProviderWrapper () override;
-    Cloud_providers_account_exporter* account_exporter ();
-    Folder* folder ();
-    GMenu_model* get_menu_model ();
-    GAction_group* get_action_group ();
-    void update_status_text (string status_text);
-    void update_pause_status ();
+
+    public CloudProviderWrapper (GLib.Object *parent = nullptr, Folder *folder = nullptr, int folder_id = 0, CloudProvidersProviderExporter* cloudprovider = nullptr);
+    public ~CloudProviderWrapper () override;
+    public Cloud_providers_account_exporter* account_exporter ();
+    public Folder* folder ();
+    public GMenu_model* get_menu_model ();
+    public GAction_group* get_action_group ();
+    public void update_status_text (string status_text);
+    public void update_pause_status ();
 
 public slots:
     void slot_sync_started ();
@@ -221,8 +221,8 @@ void CloudProviderWrapper.slot_sync_started () {
     cloud_providers_account_exporter_set_status (_cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_SYNCING);
 }
 
-void CloudProviderWrapper.slot_sync_finished (SyncResult &result) { {f (result.status () == result.Success || result.status () == result.Problem)
-    {
+void CloudProviderWrapper.slot_sync_finished (SyncResult &result) {
+    if (result.status () == result.Success || result.status () == result.Problem) {
         cloud_providers_account_exporter_set_status (_cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_IDLE);
         update_status_text (result.status_string ());
         return;
@@ -345,7 +345,79 @@ activate_action_pause (GSimple_action *action,
     g_variant_unref (old_state);
 }
 
-static GAction_entry actions[] = { { "openwebsite",  activate_action_open, nullptr, nullptr, nullptr, {0,0,0}}, { "quit",  activate_action_open, nullptr, nullptr, nullptr, {0,0,0}}, { "logout",  activate_action_open, nullptr, nullptr, nullptr, {0,0,0}}, { "openfolder",  activate_action_open, nullptr, nullptr, nullptr, {0,0,0}}, { "showfile",  activate_action_open, "s", nullptr, nullptr, {0,0,0}}, { "openhelp",  activate_action_open, nullptr, nullptr, nullptr, {0,0,0}}, { "opensettings",  activate_action_open, nullptr, nullptr, nullptr, {0,0,0}}, { "openrecentfile",  activate_action_openrecentfile, "s", nullptr, nullptr, {0,0,0}}, { "pause",  activate_action_pause, nullptr, "false", nullptr, {0,0,0}}
+static GAction_entry actions[] = {
+    {
+        "openwebsite",
+        activate_action_open,
+        nullptr,
+        nullptr,
+        nullptr,
+        {0,0,0}
+    },
+    {
+        "quit",
+        activate_action_open,
+        nullptr,
+        nullptr,
+        nullptr,
+        {0,0,0}
+    },
+    {
+        "logout",
+        activate_action_open,
+        nullptr,
+        nullptr,
+        nullptr,
+        {0,0,0}
+    },
+    {
+        "openfolder",
+        activate_action_open,
+        nullptr,
+        nullptr,
+        nullptr,
+        {0,0,0}
+    },
+    {
+        "showfile",
+        activate_action_open,
+        "s",
+        nullptr,
+        nullptr,
+        {0,0,0}
+    },
+    {
+        "openhelp",
+        activate_action_open,
+        nullptr,
+        nullptr,
+        nullptr,
+        {0,0,0}
+    },
+    {
+        "opensettings",
+        activate_action_open,
+        nullptr,
+        nullptr,
+        nullptr,
+        {0,0,0}
+    },
+    {
+        "openrecentfile",
+        activate_action_openrecentfile,
+        "s",
+        nullptr,
+        nullptr,
+        {0,0,0}
+    },
+    {
+        "pause",
+        activate_action_pause,
+        nullptr,
+        "false",
+        nullptr,
+        {0,0,0}
+    }
 };
 
 GAction_group* CloudProviderWrapper.get_action_group () {

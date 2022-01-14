@@ -12,15 +12,19 @@ namespace Occ {
 
 /// Label that can elide its text
 class ElidedLabel : QLabel {
-public:
-    ElidedLabel (Gtk.Widget *parent = nullptr);
-    ElidedLabel (string &text, Gtk.Widget *parent = nullptr);
 
-    void set_text (string &text);
-    const string &text () { return _text; }
+    public ElidedLabel (Gtk.Widget *parent = nullptr);
+    public ElidedLabel (string &text, Gtk.Widget *parent = nullptr);
 
-    void set_elide_mode (Qt.TextElideMode elide_mode);
-    Qt.TextElideMode elide_mode () { return _elide_mode; }
+    public void set_text (string &text);
+    public const string &text () {
+        return _text;
+    }
+
+    public void set_elide_mode (Qt.TextElideMode elide_mode);
+    public Qt.TextElideMode elide_mode () {
+        return _elide_mode;
+    }
 
 protected:
     void resize_event (QResizeEvent *event) override;
@@ -34,26 +38,26 @@ private:
     ElidedLabel.ElidedLabel (Gtk.Widget *parent)
         : QLabel (parent) {
     }
-    
+
     ElidedLabel.ElidedLabel (string &text, Gtk.Widget *parent)
         : QLabel (text, parent)
         , _text (text) {
     }
-    
+
     void ElidedLabel.set_text (string &text) {
         _text = text;
         QLabel.set_text (text);
         update ();
     }
-    
+
     void ElidedLabel.set_elide_mode (Qt.TextElideMode elide_mode) {
         _elide_mode = elide_mode;
         update ();
     }
-    
+
     void ElidedLabel.resize_event (QResizeEvent *event) {
         QLabel.resize_event (event);
-    
+
         QFontMetrics fm = font_metrics ();
         string elided = fm.elided_text (_text, _elide_mode, event.size ().width ());
         QLabel.set_text (elided);

@@ -133,7 +133,7 @@ private:
         , _web_view_page (nullptr)
     #endif // WITH_WEBENGINE {
         set_object_name ("owncloud_wizard");
-    
+
         set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         set_page (WizardCommon.Page_Welcome, _welcome_page);
         set_page (WizardCommon.Page_Server_setup, _setup_page);
@@ -144,12 +144,12 @@ private:
     #ifdef WITH_WEBENGINE
         set_page (WizardCommon.Page_Web_view, _web_view_page);
     #endif // WITH_WEBENGINE
-    
+
         connect (this, &Gtk.Dialog.finished, this, &OwncloudWizard.basic_setup_finished);
-    
+
         // note : start Id is set by the calling class depending on if the
         // welcome text is to be shown or not.
-    
+
         connect (this, &QWizard.current_id_changed, this, &OwncloudWizard.slot_current_page_changed);
         connect (_setup_page, &Owncloud_setup_page.determine_auth_type, this, &OwncloudWizard.determine_auth_type);
         connect (_http_creds_page, &Owncloud_http_creds_page.connect_to_oCUrl, this, &OwncloudWizard.connect_to_oCUrl);
@@ -161,7 +161,7 @@ private:
         connect (_advanced_setup_page, &Owncloud_advanced_setup_page.create_local_and_remote_folders,
             this, &OwncloudWizard.create_local_and_remote_folders);
         connect (this, &QWizard.custom_button_clicked, this, &OwncloudWizard.skip_folder_configuration);
-    
+
         Theme *theme = Theme.instance ();
         set_window_title (tr ("Add %1 account").arg (theme.app_name_g_u_i ()));
         set_wizard_style (QWizard.Modern_style);
@@ -169,28 +169,28 @@ private:
         set_option (QWizard.No_back_button_on_last_page);
         set_option (QWizard.No_cancel_button);
         set_button_text (QWizard.Custom_button1, tr ("Skip folders configuration"));
-    
+
         // Change the next buttons size policy since we hide it on the
         // welcome page but want it to fill it's space that we don't get
         // flickering when the page changes
         auto next_button_size_policy = button (QWizard.Next_button).size_policy ();
         next_button_size_policy.set_retain_size_when_hidden (true);
         button (QWizard.Next_button).set_size_policy (next_button_size_policy);
-    
+
         // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
         connect (this, &OwncloudWizard.style_changed, _setup_page, &Owncloud_setup_page.slot_style_changed);
         connect (this, &OwncloudWizard.style_changed, _advanced_setup_page, &Owncloud_advanced_setup_page.slot_style_changed);
         connect (this, &OwncloudWizard.style_changed, _flow2Creds_page, &Flow2Auth_creds_page.slot_style_changed);
-    
+
         customize_style ();
-    
+
         // allow Flow2 page to poll on window activation
         connect (this, &OwncloudWizard.on_activate, _flow2Creds_page, &Flow2Auth_creds_page.slot_poll_now);
-    
+
         adjust_wizard_size ();
         center_window ();
     }
-    
+
     void OwncloudWizard.center_window () {
         const auto wizard_window = window ();
         const auto screen = QGuiApplication.screen_at (wizard_window.pos ())
@@ -201,105 +201,107 @@ private:
         const auto new_window_position = screen_geometry.center () - QPoint (window_geometry.width () / 2, window_geometry.height () / 2);
         wizard_window.move (new_window_position);
     }
-    
+
     void OwncloudWizard.adjust_wizard_size () {
         const auto page_sizes = calculate_wizard_page_sizes ();
         const auto longest_side = calculate_longest_side_of_wizard_pages (page_sizes);
-    
+
         resize (QSize (longest_side, longest_side));
     }
-    
+
     QList<QSize> OwncloudWizard.calculate_wizard_page_sizes () {
         QList<QSize> page_sizes;
         const auto p_ids = page_ids ();
-    
+
         std.transform (p_ids.cbegin (), p_ids.cend (), std.back_inserter (page_sizes), [this] (int page_id) {
             auto p = page (page_id);
             p.adjust_size ();
             return p.size_hint ();
         });
-    
+
         return page_sizes;
     }
-    
+
     int OwncloudWizard.calculate_longest_side_of_wizard_pages (QList<QSize> &page_sizes) {
         return std.accumulate (std.cbegin (page_sizes), std.cend (page_sizes), 0, [] (int current, QSize &size) {
-            return std.max ({ current, size.width (), size.height () });
+            return std.max ({
+                current, size.width (), size.height ()
+            });
         });
     }
-    
+
     void OwncloudWizard.set_account (AccountPtr account) {
         _account = account;
     }
-    
+
     AccountPtr OwncloudWizard.account () {
         return _account;
     }
-    
+
     string OwncloudWizard.local_folder () {
         return (_advanced_setup_page.local_folder ());
     }
-    
+
     QStringList OwncloudWizard.selective_sync_blacklist () {
         return _advanced_setup_page.selective_sync_blacklist ();
     }
-    
+
     bool OwncloudWizard.use_virtual_file_sync () {
         return _advanced_setup_page.use_virtual_file_sync ();
     }
-    
+
     bool OwncloudWizard.is_confirm_big_folder_checked () {
         return _advanced_setup_page.is_confirm_big_folder_checked ();
     }
-    
+
     string OwncloudWizard.oc_url () {
         string url = field ("OCUrl").to_string ().simplified ();
         return url;
     }
-    
+
     bool OwncloudWizard.registration () {
         return _registration;
     }
-    
+
     void OwncloudWizard.set_registration (bool registration) {
         _registration = registration;
     }
-    
+
     void OwncloudWizard.set_remote_folder (string &remote_folder) {
         _advanced_setup_page.set_remote_folder (remote_folder);
     }
-    
+
     void OwncloudWizard.successful_step () {
         const int id (current_id ());
-    
+
         switch (id) {
         case WizardCommon.Page_Http_creds:
             _http_creds_page.set_connected ();
             break;
-    
+
         case WizardCommon.Page_OAuth_creds:
             _browser_creds_page.set_connected ();
             break;
-    
+
         case WizardCommon.Page_Flow2Auth_creds:
             _flow2Creds_page.set_connected ();
             break;
-    
+
     #ifdef WITH_WEBENGINE
         case WizardCommon.Page_Web_view:
             _web_view_page.set_connected ();
             break;
     #endif // WITH_WEBENGINE
-    
+
         case WizardCommon.Page_Advanced_setup:
             _advanced_setup_page.directories_created ();
             break;
-    
+
         case WizardCommon.Page_Server_setup:
             q_c_warning (lc_wizard, "Should not happen at this stage.");
             break;
         }
-    
+
         OwncloudGui.raise_dialog (this);
         if (next_id () == -1) {
             disconnect (this, &Gtk.Dialog.finished, this, &OwncloudWizard.basic_setup_finished);
@@ -308,10 +310,10 @@ private:
             next ();
         }
     }
-    
+
     void OwncloudWizard.set_auth_type (DetermineAuthTypeJob.AuthType type) {
         _setup_page.set_auth_type (type);
-    
+
         if (type == DetermineAuthTypeJob.OAuth) {
             _credentials_page = _browser_creds_page;
         } else if (type == DetermineAuthTypeJob.LoginFlowV2) {
@@ -325,18 +327,18 @@ private:
         }
         next ();
     }
-    
+
     // TODO : update this function
     void OwncloudWizard.slot_current_page_changed (int id) {
         q_c_debug (lc_wizard) << "Current Wizard page changed to " << id;
-    
+
         const auto set_next_button_as_default = [this] () {
             auto next_button = qobject_cast<QPushButton> (button (QWizard.Next_button));
             if (next_button) {
                 next_button.set_default (true);
             }
         };
-    
+
         if (id == WizardCommon.Page_Welcome) {
             // Set next button to just hidden so it retains it's layout
             button (QWizard.Next_button).set_hidden (true);
@@ -347,66 +349,78 @@ private:
             id == WizardCommon.Page_Web_view ||
     #endif // WITH_WEBENGINE
             id == WizardCommon.Page_Flow2Auth_creds) {
-            set_button_layout ({ QWizard.Stretch, QWizard.Back_button });
+            set_button_layout ({
+                QWizard.Stretch,
+                QWizard.Back_button
+            });
         } else if (id == WizardCommon.Page_Advanced_setup) {
-            set_button_layout ({ QWizard.Stretch, QWizard.Custom_button1, QWizard.Back_button, QWizard.Finish_button });
+            set_button_layout ({
+                QWizard.Stretch,
+                QWizard.Custom_button1,
+                QWizard.Back_button,
+                QWizard.Finish_button
+            });
             set_next_button_as_default ();
         } else {
-            set_button_layout ({ QWizard.Stretch, QWizard.Back_button, QWizard.Next_button });
+            set_button_layout ({
+                QWizard.Stretch,
+                QWizard.Back_button,
+                QWizard.Next_button
+            });
             set_next_button_as_default ();
         }
-    
+
         if (id == WizardCommon.Page_Server_setup) {
             emit clear_pending_requests ();
         }
-    
+
         if (id == WizardCommon.Page_Advanced_setup && (_credentials_page == _browser_creds_page || _credentials_page == _flow2Creds_page)) {
             // For OAuth, disable the back button in the Page_Advanced_setup because we don't want
             // to re-open the browser.
             button (QWizard.Back_button).set_enabled (false);
         }
     }
-    
+
     void OwncloudWizard.display_error (string &msg, bool retry_h_t_tPonly) {
         switch (current_id ()) {
         case WizardCommon.Page_Server_setup:
             _setup_page.set_error_string (msg, retry_h_t_tPonly);
             break;
-    
+
         case WizardCommon.Page_Http_creds:
             _http_creds_page.set_error_string (msg);
             break;
-    
+
         case WizardCommon.Page_Advanced_setup:
             _advanced_setup_page.set_error_string (msg);
             break;
         }
     }
-    
+
     void OwncloudWizard.append_to_configuration_log (string &msg, Log_type /*type*/) {
         _setup_log << msg;
         q_c_debug (lc_wizard) << "Setup-Log : " << msg;
     }
-    
+
     void OwncloudWizard.set_oCUrl (string &url) {
         _setup_page.set_server_url (url);
     }
-    
+
     AbstractCredentials *OwncloudWizard.get_credentials () {
         if (_credentials_page) {
             return _credentials_page.get_credentials ();
         }
-    
+
         return nullptr;
     }
-    
+
     void OwncloudWizard.change_event (QEvent *e) {
         switch (e.type ()) {
         case QEvent.StyleChange:
         case QEvent.PaletteChange:
         case QEvent.ThemeChange:
             customize_style ();
-    
+
             // Notify the other widgets (Dark-/Light-Mode switching)
             emit style_changed ();
             break;
@@ -417,28 +431,28 @@ private:
         default:
             break;
         }
-    
+
         QWizard.change_event (e);
     }
-    
+
     void OwncloudWizard.customize_style () {
         // HINT : Customize wizard's own style here, if necessary in the future (Dark-/Light-Mode switching)
-    
+
         // Set background colors
         auto wizard_palette = palette ();
         const auto background_color = wizard_palette.color (QPalette.Window);
         wizard_palette.set_color (QPalette.Base, background_color);
         // Set separator color
         wizard_palette.set_color (QPalette.Mid, background_color);
-    
+
         set_palette (wizard_palette);
     }
-    
+
     void OwncloudWizard.bring_to_top () {
         // bring wizard to top
         OwncloudGui.raise_dialog (this);
     }
-    
+
     void OwncloudWizard.ask_experimental_virtual_files_feature (Gtk.Widget *receiver, std.function<void (bool enable)> &callback) {
         const auto best_vfs_mode = best_available_vfs_mode ();
         QMessageBox *msg_box = nullptr;
@@ -472,13 +486,13 @@ private:
         case Vfs.Off:
             Q_UNREACHABLE ();
         }
-    
+
         connect (msg_box, &QMessageBox.accepted, receiver, [callback, msg_box, accept_button] {
             callback (msg_box.clicked_button () == accept_button);
             msg_box.delete_later ();
         });
         msg_box.open ();
     }
-    
+
     } // end namespace
     

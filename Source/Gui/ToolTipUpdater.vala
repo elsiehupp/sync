@@ -28,8 +28,8 @@ and the data_changed () slot updates the tooltip if Qt.ToolTipRole
 gets updated while a tooltip is shown.
 ***********************************************************/
 class ToolTipUpdater : GLib.Object {
-public:
-    ToolTipUpdater (QTreeView *tree_view);
+
+    public ToolTipUpdater (QTreeView *tree_view);
 
 protected:
     bool event_filter (GLib.Object *obj, QEvent *ev) override;

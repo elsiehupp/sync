@@ -339,7 +339,13 @@ Sqlite3 *SqlDatabase.sqlite_db () {
     return _db;
 }
 
-/* =========================================================================================== */
+
+
+
+
+
+
+
 
 SqlQuery.SqlQuery (SqlDatabase &db)
     : _sqldb (&db)
@@ -417,7 +423,7 @@ bool SqlQuery.exec () {
         do {
             rc = sqlite3_step (_stmt);
             if (rc == SQLITE_LOCKED) {
-                rc = sqlite3_reset (_stmt); /* This will also return SQLITE_LOCKED */
+                rc = sqlite3_reset (_stmt); // This will also return SQLITE_LOCKED
                 n++;
                 Occ.Utility.usleep (SQLITE_SLEEP_TIME_USEC);
             } else if (rc == SQLITE_BUSY) {

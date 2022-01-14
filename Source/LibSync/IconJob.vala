@@ -37,20 +37,20 @@ private slots:
         const auto reply = account.send_raw_request (QByteArrayLiteral ("GET"), url, request);
         connect (reply, &QNetworkReply.finished, this, &Icon_job.finished);
     }
-    
+
     void Icon_job.finished () {
         const auto reply = qobject_cast<QNetworkReply> (sender ());
         if (!reply) {
             return;
         }
         delete_later ();
-    
+
         const auto network_error = reply.error ();
         if (network_error != QNetworkReply.NoError) {
             emit error (network_error);
             return;
         }
-    
+
         emit job_finished (reply.read_all ());
     }
     }

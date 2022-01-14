@@ -37,35 +37,35 @@ private:
     void Update_info.set_version (string &v) {
         m_version = v;
     }
-    
+
     string Update_info.version () {
         return m_version;
     }
-    
+
     void Update_info.set_version_string (string &v) {
         m_version_string = v;
     }
-    
+
     string Update_info.version_string () {
         return m_version_string;
     }
-    
+
     void Update_info.set_web (string &v) {
         m_web = v;
     }
-    
+
     string Update_info.web () {
         return m_web;
     }
-    
+
     void Update_info.set_download_url (string &v) {
         m_download_url = v;
     }
-    
+
     string Update_info.download_url () {
         return m_download_url;
     }
-    
+
     Update_info Update_info.parse_element (QDom_element &element, bool *ok) {
         if (element.tag_name () != QLatin1String ("owncloudclient")) {
             q_c_critical (lc_updater) << "Expected 'owncloudclient', got '" << element.tag_name () << "'.";
@@ -73,9 +73,9 @@ private:
                 *ok = false;
             return Update_info ();
         }
-    
+
         Update_info result = Update_info ();
-    
+
         QDom_node n;
         for (n = element.first_child (); !n.is_null (); n = n.next_sibling ()) {
             QDom_element e = n.to_element ();
@@ -89,12 +89,12 @@ private:
                 result.set_download_url (e.text ());
             }
         }
-    
+
         if (ok)
             *ok = true;
         return result;
     }
-    
+
     Update_info Update_info.parse_string (string &xml, bool *ok) {
         string error_msg;
         int error_line = 0, error_col = 0;
@@ -108,7 +108,7 @@ private:
                 *ok = false;
             return Update_info ();
         }
-    
+
         bool document_ok = false;
         Update_info c = parse_element (doc.document_element (), &document_ok);
         if (ok) {
@@ -116,6 +116,6 @@ private:
         }
         return c;
     }
-    
+
     } // namespace Occ
     

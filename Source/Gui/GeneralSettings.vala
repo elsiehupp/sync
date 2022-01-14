@@ -34,10 +34,9 @@ namespace Ui {
 ***********************************************************/
 class General_settings : Gtk.Widget {
 
-public:
-    General_settings (Gtk.Widget *parent = nullptr);
-    ~General_settings () override;
-    QSize size_hint () const override;
+    public General_settings (Gtk.Widget *parent = nullptr);
+    public ~General_settings () override;
+    public QSize size_hint () const override;
 
 public slots:
     void slot_style_changed ();

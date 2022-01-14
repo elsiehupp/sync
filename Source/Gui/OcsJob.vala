@@ -38,7 +38,7 @@ protected:
 
     /***********************************************************
     Set the verb for the job
-    
+
     @param verb currently supported PUT POST DELETE
     ***********************************************************/
     void set_verb (QByteArray &verb);
@@ -46,7 +46,7 @@ protected:
     /***********************************************************
     Add a new parameter to the request.
     Depending on the verb this is GET or POST parameter
-    
+
     @param name The name of the parameter
     @param value The value of the parameter
     ***********************************************************/
@@ -54,7 +54,7 @@ protected:
 
     /***********************************************************
     Set the post parameters
-    
+
     @param post_params list of pairs to add (url_encoded) to the body of the
     request
     ***********************************************************/
@@ -64,7 +64,7 @@ protected:
     List of expected statuscodes for this request
     A warning will be printed to the debug log if a different status code is
     encountered
-    
+
     @param code Accepted status code
     ***********************************************************/
     void add_pass_status_code (int code);
@@ -72,28 +72,27 @@ protected:
     /***********************************************************
     The base path for an Ocs_job is always the same. But it could be the case that
     certain operations need to append something to the URL.
-    
+
     This function appends the common id. so <PATH>/<ID>
     ***********************************************************/
     void append_path (string &id);
 
-public:
     /***********************************************************
     Parse the response and return the status code and the message of the
     reply (metadata)
-    
+
     @param json The reply from OCS
     @param message The message that is set in the metadata
     @return The statuscode of the OCS response
     ***********************************************************/
-    static int get_json_return_code (QJsonDocument &json, string &message);
+    public static int get_json_return_code (QJsonDocument &json, string &message);
 
     /***********************************************************
     @brief Adds header to the request e.g. "If-None-Match"
     @param header_name a string with the header name
     @param value a string with the value
     ***********************************************************/
-    void add_raw_header (QByteArray &header_name, QByteArray &value);
+    public void add_raw_header (QByteArray &header_name, QByteArray &value);
 
 protected slots:
 
@@ -106,7 +105,7 @@ signals:
 
     /***********************************************************
     Result of the OCS request
-    
+
     @param reply the reply
     ***********************************************************/
     void job_finished (QJsonDocument reply, int status_code);
@@ -114,7 +113,7 @@ signals:
     /***********************************************************
     The status code was not one of the expected (passing)
     status code for this command
-    
+
     @param status_code The actual status code
     @param message The message provided by the server
     ***********************************************************/
@@ -145,27 +144,27 @@ private:
         _pass_status_codes.append (OCS_NOT_MODIFIED_STATUS_CODE_V2);
         set_ignore_credential_failure (true);
     }
-    
+
     void Ocs_job.set_verb (QByteArray &verb) {
         _verb = verb;
     }
-    
+
     void Ocs_job.add_param (string &name, string &value) {
         _params.append (q_make_pair (name, value));
     }
-    
+
     void Ocs_job.add_pass_status_code (int code) {
         _pass_status_codes.append (code);
     }
-    
+
     void Ocs_job.append_path (string &id) {
         set_path (path () + QLatin1Char ('/') + id);
     }
-    
+
     void Ocs_job.add_raw_header (QByteArray &header_name, QByteArray &value) {
         _request.set_raw_header (header_name, value);
     }
-    
+
     static QUrlQuery percent_encode_query_items (
         const QList<QPair<string, string>> &items) {
         QUrlQuery result;
@@ -178,13 +177,13 @@ private:
         }
         return result;
     }
-    
+
     void Ocs_job.start () {
         add_raw_header ("Ocs-APIREQUEST", "true");
         add_raw_header ("Content-Type", "application/x-www-form-urlencoded");
-    
+
         auto *buffer = new QBuffer;
-    
+
         QUrlQuery query_items;
         if (_verb == "GET") {
             query_items = percent_encode_query_items (_params);
@@ -206,15 +205,15 @@ private:
         send_request (_verb, url, _request, buffer);
         AbstractNetworkJob.start ();
     }
-    
+
     bool Ocs_job.finished () {
         const QByteArray reply_data = reply ().read_all ();
-    
+
         QJsonParseError error;
         string message;
         int status_code = 0;
         auto json = QJsonDocument.from_json (reply_data, &error);
-    
+
         // when it is null we might have a 304 so get status code from reply () and gives a warning...
         if (error.error != QJsonParseError.NoError) {
             status_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
@@ -227,7 +226,7 @@ private:
         } else {
             status_code  = get_json_return_code (json, message);
         }
-    
+
         //... then it checks for the status_code
         if (!_pass_status_codes.contains (status_code)) {
             q_c_warning (lc_ocs) << "Reply to"
@@ -236,23 +235,23 @@ private:
                              << _params
                              << "has unexpected status code:" << status_code << reply_data;
             emit ocs_error (status_code, message);
-    
+
         } else {
             // save new ETag value
             if (reply ().raw_header_list ().contains ("ETag"))
                 emit etag_response_header_received (reply ().raw_header ("ETag"), status_code);
-    
+
             emit job_finished (json, status_code);
         }
         return true;
     }
-    
+
     int Ocs_job.get_json_return_code (QJsonDocument &json, string &message) {
         //TODO proper checking
         auto meta = json.object ().value ("ocs").to_object ().value ("meta").to_object ();
         int code = meta.value ("statuscode").to_int ();
         message = meta.value ("message").to_string ();
-    
+
         return code;
     }
     }

@@ -65,15 +65,15 @@ namespace SharedTools {
 
     /***********************************************************
     \class QtLockedFile
-    
+
     \brief The QtLockedFile class extends QFile with advisory locking functions.
-    
+
     A file may be locked in read or write mode. Multiple instances of
     \e QtLockedFile, created in multiple processes running on the same
     machine, may have a file locked in read mode. Exactly one instance
     may have it locked in write mode. A read and a write lock cannot
     exist simultaneously on the same file.
-    
+
     The file locks are advisory. This means that nothing prevents
     another process from manipulating a locked file using QFile or
     file system functions offered by the OS. Serialization is only
@@ -81,102 +81,102 @@ namespace SharedTools {
     QtLockedFile. Also, while holding a lock on a file, a process
     must not open the same file again (through any API), or locks
     can be unexpectedly lost.
-    
+
     The lock provided by an instance of \e QtLockedFile is released
     whenever the program terminates. This is true even when the
     program crashes and no destructors are called.
     ***********************************************************/
-    
+
     /*********************************************************** \enum QtLockedFile.LockMode
-    
+
     This enum describes the available lock modes.
-    
+
     \value LockMode.READ_LOCK A read lock.
     \value LockMode.WRITE_LOCK A write lock.
     \value LockMode.NO_LOCK Neither a read lock nor a write lock.
     ***********************************************************/
-    
+
     /***********************************************************
         Constructs an unlocked \e QtLockedFile object. This constructor behaves in the same way
     as \e QFile.QFile ().
-    
+
     \sa QFile.QFile ()
     ***********************************************************/
     QtLockedFile.QtLockedFile ()
         : QFile () {
         m_lock_mode = LockMode.NO_LOCK;
     }
-    
+
     /***********************************************************
     Constructs an unlocked QtLockedFile object with file \a name. This constructor behaves in
     the same way as \e QFile.QFile (string&).
-    
+
     \sa QFile.QFile ()
     ***********************************************************/
     QtLockedFile.QtLockedFile (string &name)
         : QFile (name) {
         m_lock_mode = LockMode.NO_LOCK;
     }
-    
+
     /***********************************************************
     Returns \e true if this object has a in read or write lock;
     otherwise returns \e false.
-    
+
     \sa lock_mode ()
     ***********************************************************/
     bool QtLockedFile.is_locked () {
         return m_lock_mode != LockMode.NO_LOCK;
     }
-    
+
     /***********************************************************
     Returns the type of lock currently held by this object, or \e QtLockedFile.LockMode.NO_LOCK.
-    
+
     \sa is_locked ()
     ***********************************************************/
     QtLockedFile.LockMode QtLockedFile.lock_mode () {
         return m_lock_mode;
     }
-    
+
     /***********************************************************
     \fn bool QtLockedFile.lock (LockMode mode, bool block = true)
-    
+
     Obtains a lock of type \a mode.
-    
+
     If \a block is true, this
     function will block until the lock is acquired. If \a block is
     false, this function returns \e false immediately if the lock cannot
     be acquired.
-    
+
     If this object already has a lock of type \a mode, this function returns \e true immediately. If this object has a lock of a different type than \a mode, the lock
     is first released and then a new lock is obtained.
-    
+
     This function returns \e true if, after it executes, the file is locked by this object,
     and \e false otherwise.
-    
+
     \sa unlock (), is_locked (), lock_mode ()
     ***********************************************************/
-    
+
     /***********************************************************
     \fn bool QtLockedFile.unlock ()
-    
+
     Releases a lock.
-    
+
     If the object has no lock, this function returns immediately.
-    
+
     This function returns \e true if, after it executes, the file is not locked by
     this object, and \e false otherwise.
-    
+
     \sa lock (), is_locked (), lock_mode ()
     ***********************************************************/
-    
+
     /***********************************************************
     \fn QtLockedFile.~QtLockedFile ()
-    
+
     Destroys the \e QtLockedFile object. If any locks were held, they are released.
     ***********************************************************/
-    
+
     } // namespace SharedTools
-    
+
 
 
 
@@ -215,16 +215,16 @@ namespace SharedTools {
             q_warning ("QtLockedFile.lock () : file is not opened");
             return false;
         }
-    
+
         if (mode == LockMode.NO_LOCK)
             return unlock ();
-    
+
         if (mode == m_lock_mode)
             return true;
-    
+
         if (m_lock_mode != LockMode.NO_LOCK)
             unlock ();
-    
+
         struct flock fl;
         fl.l_whence = SEEK_SET;
         fl.l_start = 0;
@@ -232,47 +232,47 @@ namespace SharedTools {
         fl.l_type = (mode == LockMode.READ_LOCK) ? F_RDLCK : F_WRLCK;
         int cmd = block ? F_SETLKW : F_SETLK;
         int ret = fcntl (handle (), cmd, &fl);
-    
+
         if (ret == -1) {
             if (errno != EINTR && errno != EAGAIN)
                 q_warning ("QtLockedFile.lock () : fcntl : %s", strerror (errno));
             return false;
         }
-    
+
         m_lock_mode = mode;
         return true;
     }
-    
+
     bool QtLockedFile.unlock () {
         if (!is_open ()) {
             q_warning ("QtLockedFile.unlock () : file is not opened");
             return false;
         }
-    
+
         if (!is_locked ())
             return true;
-    
+
         struct flock fl;
         fl.l_whence = SEEK_SET;
         fl.l_start = 0;
         fl.l_len = 0;
         fl.l_type = F_UNLCK;
         int ret = fcntl (handle (), F_SETLKW, &fl);
-    
+
         if (ret == -1) {
             q_warning ("QtLockedFile.lock () : fcntl : %s", strerror (errno));
             return false;
         }
-    
+
         m_lock_mode = LockMode.NO_LOCK;
         remove ();
         return true;
     }
-    
+
     QtLockedFile.~QtLockedFile () {
         if (is_open ())
             unlock ();
     }
-    
+
     } // namespace SharedTools
     

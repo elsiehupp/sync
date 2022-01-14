@@ -38,10 +38,9 @@ fairly complicated to handle.
 ***********************************************************/
 class ProxyAuthHandler : GLib.Object {
 
-public:
-    static ProxyAuthHandler *instance ();
+    public static ProxyAuthHandler *instance ();
 
-    ~ProxyAuthHandler () override;
+    public ~ProxyAuthHandler () override;
 
 public slots:
     /// Intended for QNetworkAccessManager.proxy_authentication_required ()
