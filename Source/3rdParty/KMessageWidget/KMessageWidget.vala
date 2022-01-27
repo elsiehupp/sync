@@ -46,7 +46,7 @@ The KMessageWidget can be used as a sec
 first indicator is usually the fact the action the user expected to hap
 did not happen.
 
-Example : User fills a form, clicks "Submit".
+Example: User fills a form, clicks "Submit".
 
 @li Expected feedback : form closes
 @li First indicator of failure : form stays there

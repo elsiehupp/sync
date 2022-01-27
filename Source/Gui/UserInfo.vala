@@ -11,7 +11,6 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 // #include <QJsonDocument>
 // #include <QJsonObject>
 
-// #include <GLib.Object>
 // #include <QPointer>
 // #include <QVariant>
 // #include <QTimer>

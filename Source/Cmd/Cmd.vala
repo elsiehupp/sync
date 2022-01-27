@@ -6,7 +6,6 @@ Copyright (C) by Daniel Heule <daniel.heule@gmail.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <GLib.Object>
 // #include <iostream>
 // #include <random>
 // #include <qcoreapplication.h>

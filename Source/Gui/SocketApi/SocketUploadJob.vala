@@ -11,7 +11,6 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 using namespace Occ;
 
 // #pragma once
-// #include <GLib.Object>
 // #include <QTemporary_file>
 
 namespace Occ {

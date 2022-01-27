@@ -15,7 +15,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QPushButton>
 // #include <QApplication>
 
-// #include <GLib.Object>
 // #include <string[]>
 // #include <QUuid>
 // #include <set>
@@ -696,7 +695,7 @@ string Folder.short_gui_remote_path_or_app_name () {
         }
         return a;
     } else {
-        return Theme.instance ().app_name_g_u_i ();
+        return Theme.instance ().app_name_gui ();
     }
 }
 
@@ -978,7 +977,7 @@ void Folder.start_vfs () {
     vfs_params.remote_path = remote_path_trailing_slash ();
     vfs_params.account = _account_state.account ();
     vfs_params.journal = &_journal;
-    vfs_params.provider_name = Theme.instance ().app_name_g_u_i ();
+    vfs_params.provider_name = Theme.instance ().app_name_gui ();
     vfs_params.provider_version = Theme.instance ().version ();
     vfs_params.multiple_accounts_registered = AccountManager.instance ().accounts ().size () > 1;
 
@@ -1555,7 +1554,7 @@ void Folder.on_new_big_folder_discovered (string new_f, bool is_external) {
         message += tr ("Please go in the settings to select it if you wish to download it.");
 
         auto logger = Logger.instance ();
-        logger.post_optional_gui_log (Theme.instance ().app_name_g_u_i (), message);
+        logger.post_optional_gui_log (Theme.instance ().app_name_gui (), message);
     }
 }
 
@@ -1613,7 +1612,7 @@ void Folder.on_warn_on_new_excluded_item (SyncJournalFileRecord &record, QString
              "It will not be synchronized.")
               .arg (fi.file_path ());
 
-    Logger.instance ().post_optional_gui_log (Theme.instance ().app_name_g_u_i (), message);
+    Logger.instance ().post_optional_gui_log (Theme.instance ().app_name_gui (), message);
 }
 
 void Folder.on_watcher_unreliable (string message) {
@@ -1626,7 +1625,7 @@ void Folder.on_watcher_unreliable (string message) {
            "occasionally (every two hours by default).\n"
            "\n"
            "%1").arg (message);
-    Logger.instance ().post_gui_log (Theme.instance ().app_name_g_u_i (), full_message);
+    Logger.instance ().post_gui_log (Theme.instance ().app_name_gui (), full_message);
 }
 
 void Folder.on_hydration_starts () {

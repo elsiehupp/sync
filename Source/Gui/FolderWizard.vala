@@ -311,7 +311,7 @@ class FolderWizard : QWizard {
 
     void Folder_wizard_remote_path.on_create_remote_folder_finished () {
         q_c_debug (lc_wizard) << "webdav mkdir request on_finished";
-        show_warn (tr ("Folder was successfully created on %1.").arg (Theme.instance ().app_name_g_u_i ()));
+        show_warn (tr ("Folder was successfully created on %1.").arg (Theme.instance ().app_name_gui ()));
         on_refresh_folders ();
         _ui.folder_entry.on_set_text (static_cast<MkColJob> (sender ()).path ());
         on_ls_col_folder_entry ();
@@ -320,10 +320,10 @@ class FolderWizard : QWizard {
     void Folder_wizard_remote_path.on_handle_mkdir_network_error (QNetworkReply *reply) {
         q_c_warning (lc_wizard) << "webdav mkdir request failed:" << reply.error ();
         if (!_account.credentials ().still_valid (reply)) {
-            show_warn (tr ("Authentication failed accessing %1").arg (Theme.instance ().app_name_g_u_i ()));
+            show_warn (tr ("Authentication failed accessing %1").arg (Theme.instance ().app_name_gui ()));
         } else {
             show_warn (tr ("Failed to create the folder on %1. Please check manually.")
-                         .arg (Theme.instance ().app_name_g_u_i ()));
+                         .arg (Theme.instance ().app_name_gui ()));
         }
     }
 
@@ -414,7 +414,7 @@ class FolderWizard : QWizard {
         QTree_widget_item *root = _ui.folder_tree_widget.top_level_item (0);
         if (!root) {
             root = new QTree_widget_item (_ui.folder_tree_widget);
-            root.on_set_text (0, Theme.instance ().app_name_g_u_i ());
+            root.on_set_text (0, Theme.instance ().app_name_gui ());
             root.set_icon (0, Theme.instance ().application_icon ());
             root.set_tool_tip (0, tr ("Choose this to sync the entire account"));
             root.set_data (0, Qt.User_role, "/");

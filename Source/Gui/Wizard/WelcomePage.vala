@@ -95,7 +95,7 @@ class Welcome_page : QWizard_page {
     }
 
     void Welcome_page.setup_login_button () {
-        const auto app_name = Theme.instance ().app_name_g_u_i ();
+        const auto app_name = Theme.instance ().app_name_gui ();
 
         _ui.login_button.on_set_text (tr ("Log in to your %1").arg (app_name));
         connect (_ui.login_button, &QPushButton.clicked, this, [this] (bool /*checked*/) {

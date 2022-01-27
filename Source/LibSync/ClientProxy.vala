@@ -8,7 +8,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QUrl>
 // #include <QThreadPool>
 
-// #include <GLib.Object>
 // #include <QNetworkProxy>
 // #include <QRunnable>
 // #include <QUrl>

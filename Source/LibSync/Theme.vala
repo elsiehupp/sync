@@ -22,7 +22,6 @@ const int INCLUDE_FILE (M) QUOTEME (M)
 #endif
 
 // #include <QIcon>
-// #include <GLib.Object>
 
 class GLib.Object;
 class QPalette;
@@ -36,7 +35,7 @@ namespace Occ {
 ***********************************************************/
 class Theme : GLib.Object {
     Q_PROPERTY (bool branded READ is_branded CONSTANT)
-    Q_PROPERTY (string app_name_g_u_i READ app_name_g_u_i CONSTANT)
+    Q_PROPERTY (string app_name_gui READ app_name_gui CONSTANT)
     Q_PROPERTY (string app_name READ app_name CONSTANT)
     Q_PROPERTY (QUrl state_online_image_source READ state_online_image_source CONSTANT)
     Q_PROPERTY (QUrl state_offline_image_source READ state_offline_image_source CONSTANT)
@@ -79,7 +78,8 @@ class Theme : GLib.Object {
     ~Theme () override;
 
     /***********************************************************
-    @brief is_branded indicates if the current application is branded
+    @brief is_branded indicates if the current application is
+    branded
 
     By default, it is considered
     different from "Nextcloud".
@@ -89,7 +89,7 @@ class Theme : GLib.Object {
     public virtual bool is_branded ();
 
     /***********************************************************
-    @brief app_name_g_u_i - Human readable application name.
+    @brief app_name_gui - Human readable application name.
 
     Use and redefine this if
     special chars and such.
@@ -99,21 +99,22 @@ class Theme : GLib.Object {
 
     @return string with human readable app name.
     ***********************************************************/
-    public virtual string app_name_g_u_i ();
+    public virtual string app_name_gui ();
 
     /***********************************************************
     @brief app_name - Application name (short)
 
-    Use and redefine this as an application name. Keep it straight as
-    it is used for config files etc. If yo
-    name in the GUI, redefine app_name_g_u_i.
+    Use and redefine this as an application name. Keep it
+    straight as it is used for config files etc. If yo
+    name in the GUI, redefine app_name_gui.
 
     By default, the name is derived from
     cmake variable, and should be the same. This method is only
     reimplementable for legacy reasons.
 
-    Warning : Do not modify this value, as many things, e.g. settings
-    depend on it! You most likely want to modify \ref app_name_g_u_i ().
+    Warning: Do not modify this value, as many things, e.g.
+    settings depend on it! You most likely want to modify
+    \ref app_name_gui ().
 
     @return string with app name.
     ***********************************************************/
@@ -181,7 +182,7 @@ class Theme : GLib.Object {
     public static bool is_hidpi (QPaint_device *dev = nullptr);
 
     /***********************************************************
-    get an sync state icon
+    Get an sync state icon
     ***********************************************************/
     public virtual QIcon sync_state_icon (SyncResult.Status, bool sys_tray = false);
 
@@ -194,7 +195,7 @@ class Theme : GLib.Object {
     public virtual string version ();
 
     /***********************************************************
-    Characteristics : bool if more than one sync folder is allowed
+    Characteristics: bool if more than one sync folder is allowed
     ***********************************************************/
     public virtual bool single_sync_folder ();
 
@@ -206,10 +207,11 @@ class Theme : GLib.Object {
     /***********************************************************
     URL to documentation.
 
-    This is opened in the browser when the "Help" action is selected from the tray menu.
+    This is opened in the browser when the "Help" action is
+    selected from the tray menu.
 
-    If the function is overridden to return an empty string the action is removed from
-    * the menu.
+    If the function is overridden to return an empty string the
+    action is removed from the menu.
 
     Defaults to Nextclouds client documentation website.
     ***********************************************************/
@@ -218,18 +220,20 @@ class Theme : GLib.Object {
     /***********************************************************
     The url to use for showing help on conflicts.
 
-    If the function is overridden to return an empty string no help link will be sh
+    If the function is overridden to return an empty string no
+    help link will be sh
 
-    Defaults to help_url () + "conflicts.html", which is a page in own_cloud's client
-    documentation website. If help_url () is empty, this function will also return the
-    empty string.
+    Defaults to help_url () + "conflicts.html", which is a page
+    in ownCloud's client documentation website. If help_url ()
+    is empty, this function will also return the empty string.
     ***********************************************************/
     public virtual string conflict_help_url ();
 
     /***********************************************************
     Setting a value here will pre-define the server url.
 
-    The respective UI controls will be disabled only if force_override_server_url () is true
+    The respective UI controls will be disabled only if
+    force_override_server_url () is true
     ***********************************************************/
     public virtual string override_server_url ();
 
@@ -243,7 +247,8 @@ class Theme : GLib.Object {
     /***********************************************************
     Enable OCSP stapling for SSL handshakes
 
-    When true, peer will be requested for Online Certificate Status Protocol response
+    When true, peer will be requested for Online Certificate
+    Status Protocol response
     ***********************************************************/
     public virtual bool enable_stapling_oCSP ();
 
@@ -255,19 +260,22 @@ class Theme : GLib.Object {
     public virtual bool forbid_bad_s_sL ();
 
     /***********************************************************
-    This is only usefull when previous version had a different override_server_url
-    with a different auth type in that case You should then specify "http" or "shibboleth".
-    Normaly this should be left empty.
+    This is only usefull when previous version had a different
+    override_server_url with a different auth type in that case
+    you should then specify "http" or "shibboleth". Normally
+    this should be left empty.
     ***********************************************************/
     public virtual string force_config_auth_type ();
 
     /***********************************************************
-    The default folder name without path on the server at setup time.
+    The default folder name without path on the server at setup
+    time.
     ***********************************************************/
     public virtual string default_server_folder ();
 
     /***********************************************************
-    The default folder name without path on the client side at setup time.
+    The default folder name without path on the client side at
+    setup time.
     ***********************************************************/
     public virtual string default_client_folder ();
 
@@ -354,27 +362,28 @@ class Theme : GLib.Object {
     public virtual string update_check_url ();
 
     /***********************************************************
-    When true, the setup wizard will show the selective sync dialog by default and default
-    to nothing selected
+    When true, the setup wizard will show the selective sync
+    dialog by default and default to nothing selected
     ***********************************************************/
     public virtual bool wizard_selective_sync_default_nothing ();
 
     /***********************************************************
-    Default option for the new_big_folder_size_limit.
-    Size in MB of the maximum size of folder before we ask the confirmation.
-    Set -1 to never ask confirmation.  0 to ask confirmation for every folder.
+    Default option for the new_big_folder_size_limit. Size in MB
+    of the maximum size of folder before we ask the confirmation.
+    Set -1 to never ask confirmation. 0 to ask confirmation for
+    every folder.
     ***********************************************************/
     public virtual int64 new_big_folder_size_limit ();
 
     /***********************************************************
-    Hide the checkbox that says "Ask for confirmation before synchronizing folders larger than X MB"
-    in the account wizard
+    Hide the checkbox that says "Ask for confirmation before
+    synchronizing folders larger than X MB" in the account wizard
     ***********************************************************/
     public virtual bool wizard_hide_folder_size_limit_checkbox ();
 
     /***********************************************************
-    Hide the checkbox that says "Ask for confirmation before synchronizing external storages"
-    in the account wizard
+    Hide the checkbox that says "Ask for confirmation before
+    synchronizing external storages" in the account wizard
     ***********************************************************/
     public virtual bool wizard_hide_external_storage_confirmation_checkbox ();
 
@@ -387,8 +396,10 @@ class Theme : GLib.Object {
     public virtual bool user_group_sharing ();
 
     /***********************************************************
-    If this returns true, the user cannot configure the proxy in the network settings.
-    The proxy settings will be disabled in the configuration dialog.
+    If this returns true, the user cannot configure the proxy
+    in the network settings. The proxy settings will be disabled
+    in the configuration dialog.
+
     Default returns false.
     ***********************************************************/
     public virtual bool force_system_network_proxy ();
@@ -409,15 +420,17 @@ class Theme : GLib.Object {
     /***********************************************************
     @brief What to display as the user_iD (e.g. in the wizards)
 
-     @return User_iDType.User_iDUser_name, unless reimplemented
+    @return User_iDType.User_iDUser_name, unless reimplemented
     ***********************************************************/
     public virtual User_iDType user_iDType ();
 
     /***********************************************************
-    @brief Allows to customize the type of user ID (e.g. user name, email)
+    @brief Allows to customize the type of user ID (e.g. user
+    name, email)
 
-    @note This string cannot be translated, but is still useful for
-          referencing brand name IDs (e.g. "ACME ID", when using ACME.)
+    @note This string cannot be translated, but is still
+    useful for referencing brand name IDs (e.g. "ACME ID", when
+    using ACME.)
 
     @return An empty string, unless reimplemented
     ***********************************************************/
@@ -425,7 +438,7 @@ class Theme : GLib.Object {
 
     /***********************************************************
     @brief Demo string to be displayed when no text has been
-           entered for the user id (e.g. mylogin@company.com)
+    entered for the user id (e.g. mylogin@company.com)
 
     @return An empty string, unless reimplemented
     ***********************************************************/
@@ -440,48 +453,56 @@ class Theme : GLib.Object {
     public virtual string wizard_url_postfix ();
 
     /***********************************************************
-    @brief String that will be shown as long as no text has been entered by the user.
+    @brief String that will be shown as long as no text has
+    been entered by the user.
 
     @return An empty string, unless reimplemented
     ***********************************************************/
     public virtual string wizard_url_hint ();
 
     /***********************************************************
-    @brief the server folder that should be queried for the quota information
+    @brief the server folder that should be queried for the
+    quota information
 
-    This can be configured to show the quota infromation for a different
-    folder than the root. This is the folder on which the client will do
-    PROPFIND calls to get "quota-available-bytes" and "quota-used-bytes"
+    This can be configured to show the quota infromation for a
+    different folder than the root. This is the folder on which
+    the client will do PROPFIND calls to get
+    "quota-available-bytes" and "quota-used-bytes"
 
-    Defaults : "/"
+    Default: "/"
     ***********************************************************/
     public virtual string quota_base_folder ();
 
     /***********************************************************
     The OAuth client_id, secret pair.
-    Note that client that change these value cannot connect to un-branded owncloud servers.
+    Note that client that change these value cannot connect to
+    un-branded owncloud servers.
     ***********************************************************/
     public virtual string oauth_client_id ();
     public virtual string oauth_client_secret ();
 
     /***********************************************************
-    @brief What should be output for the --version command line switch.
+    @brief What should be output for the --version command line
+    switch.
 
-    By default, it's a combination of app_name (), version (), the GIT SHA1 and some
-    important dependency versions.
+    By default, it's a combination of app_name (), version (),
+    the GIT SHA1 and some important dependency versions.
     ***********************************************************/
     public virtual string version_switch_output ();
 	
 	/***********************************************************
-    @brief Request suitable QIcon resource depending on the background colour of the parent widget.
+    @brief Request suitable QIcon resource depending on the
+    background colour of the parent widget.
 
-    This should be replaced (TODO) by a real theming implementation for the client UI
-    * (actually 2019/09/13 only systray theming).
+    This should be replaced (TODO) by a real theming
+    implementation for the client UI
+    (actually 2019/09/13 only systray theming).
     ***********************************************************/
 	public virtual QIcon ui_theme_icon (string icon_name, bool ui_has_dark_bg);
 
     /***********************************************************
-    @brief Perform a calculation to check if a colour is dark or light and accounts for different sensitivity of the human eye.
+    @brief Perform a calculation to check if a colour is dark or
+    light and accounts for different sensitivity of the human eye.
 
     @return True if the specified colour is dark.
 
@@ -490,52 +511,72 @@ class Theme : GLib.Object {
     public static bool is_dark_color (QColor &color);
 
     /***********************************************************
-    @brief Return the colour to be used for HTML links (e.g. used in QLabel), based on the current app palette or given colour (Dark-/Light-Mode switching).
+    @brief Return the colour to be used for HTML links (e.g.
+    used in QLabel), based on the current app palette or given
+    colour (Dark-/Light-Mode switching).
 
-    @return Background-aware colour for HTML links, based on the current app palette or given colour.
+    @return Background-aware colour for HTML links, based on
+    the current app palette or given colour.
 
-    2019/12/08 : Implemented for the Dark Mode on mac_o_s, because the app palette can not account for that (Qt 5.12.5).
+    2019/12/08 : Implemented for the Dark Mode on macOS,
+    because the app palette can not account for that (Qt 5.12.5).
     ***********************************************************/
     public static QColor get_background_aware_link_color (QColor &background_color);
 
     /***********************************************************
-    @brief Return the colour to be used for HTML links (e.g. used in QLabel), based on the current app palette (Dark-/Light-Mode switching).
+    @brief Return the colour to be used for HTML links (e.g.
+    used in QLabel), based on the current app palette
+    (Dark-/Light-Mode switching).
 
-    @return Background-aware colour for HTML links, based on the current app palette.
+    @return Background-aware colour for HTML links, based on
+    the current app palette.
 
-    2019/12/08 : Implemented for the Dark Mode on mac_o_s, because the app palette can not account for that (Qt 5.12.5).
+    2019/12/08: Implemented for the Dark Mode on macOS, because
+    the app palette can not account for that (Qt 5.12.5).
     ***********************************************************/
     public static QColor get_background_aware_link_color ();
 
     /***********************************************************
-    @brief Appends a CSS-style colour value to all HTML link tags in a given string, based on the current app palette or given colour (Dark-/Light-Mode switching).
+    @brief Appends a CSS-style colour value to all HTML link
+    tags in a given string, based on the current app palette or
+    given colour (Dark-/Light-Mode switching).
 
-    2019/12/08 : Implemented for the Dark Mode on mac_o_s, because the app palette can not account for that (Qt 5.12.5).
+    2019/12/08: Implemented for the Dark Mode on macOS, because
+    the app palette can not account for that (Qt 5.12.5).
 
-    This way we also avoid having certain strings re-translated on Transifex.
+    This way we also avoid having certain strings re-translated
+    on Transifex.
     ***********************************************************/
     public static void replace_link_color_string_background_aware (string link_string, QColor &background_color);
 
     /***********************************************************
-    @brief Appends a CSS-style colour value to all HTML link tags in a given string, based on the current app palette (Dark-/Light-Mode switching).
+    @brief Appends a CSS-style colour value to all HTML link
+    tags in a given string, based on the current app palette
+    (Dark-/Light-Mode switching).
 
-    2019/12/08 : Implemented for the Dark Mode on mac_o_s, because the app palette can not account for that (Qt 5.12.5).
+    2019/12/08 : Implemented for the Dark Mode on macOS,
+    because the app palette can not account for that (Qt 5.12.5).
 
-    This way we also avoid having certain strings re-translated on Transifex.
+    This way we also avoid having certain strings re-translated
+    on Transifex.
     ***********************************************************/
     public static void replace_link_color_string_background_aware (string link_string);
 
     /***********************************************************
-    @brief Appends a CSS-style colour value to all HTML link tags in a given string, as specified by new_color.
+    @brief Appends a CSS-style colour value to all HTML link
+    tags in a given string, as specified by new_color.
 
-    2019/12/19 : Implemented for the Dark Mode on mac_o_s, because the app palette can not account for that (Qt 5.12.5).
+    2019/12/19: Implemented for the Dark Mode on macOS, because
+    the app palette can not account for that (Qt 5.12.5).
 
-    This way we also avoid having certain strings re-translated on Transifex.
+    This way we also avoid having certain strings re-translated
+    on Transifex.
     ***********************************************************/
     public static void replace_link_color_string (string link_string, QColor &new_color);
 
     /***********************************************************
-    @brief Creates a colour-aware icon based on the specified palette's base colour.
+    @brief Creates a colour-aware icon based on the specified
+    palette's base colour.
 
     @return QIcon, colour-aware (inverted on dark backgrounds).
 
@@ -544,7 +585,8 @@ class Theme : GLib.Object {
     public static QIcon create_color_aware_icon (string name, QPalette &palette);
 
     /***********************************************************
-    @brief Creates a colour-aware icon based on the app palette's base colour (Dark-/Light-Mode switching).
+    @brief Creates a colour-aware icon based on the app
+    palette's base colour (Dark-/Light-Mode switching).
 
     @return QIcon, colour-aware (inverted on dark backgrounds).
 
@@ -553,7 +595,8 @@ class Theme : GLib.Object {
     public static QIcon create_color_aware_icon (string name);
 
     /***********************************************************
-    @brief Creates a colour-aware pixmap based on the specified palette's base colour.
+    @brief Creates a colour-aware pixmap based on the specified
+    palette's base colour.
 
     @return QPixmap, colour-aware (inverted on dark backgrounds).
 
@@ -562,19 +605,21 @@ class Theme : GLib.Object {
     public static QPixmap create_color_aware_pixmap (string name, QPalette &palette);
 
     /***********************************************************
-    @brief Creates a colour-aware pixmap based on the app palette's base colour (Dark-/Light-Mode switching).
+    @brief Creates a colour-aware pixmap based on the app
+    palette's base colour (Dark-/Light-Mode switching).
 
     @return QPixmap, colour-aware (inverted on dark backgrounds).
 
-    2019/12/09 : Adapted from create_color_aware_icon.
+    2019/12/09: Adapted from create_color_aware_icon.
     ***********************************************************/
     public static QPixmap create_color_aware_pixmap (string name);
 
     /***********************************************************
-    @brief Whether to show the option to create folders using "virtual files".
+    @brief Whether to show the option to create folders using
+    "virtual files".
 
-    By default, the options are not shown unless experimental options are
-    manually enabled in the configuration file.
+    By default, the options are not shown unless experimental
+    options are manually enabled in the configuration file.
     ***********************************************************/
     public virtual bool show_virtual_files_option ();
 
@@ -605,7 +650,8 @@ class Theme : GLib.Object {
     @brief Generates image path in the resources
     @param name Name of the image file
     @param size Size in the power of two (16, 32, 64, etc.)
-    @param sys_tray Whether the image requested is for Systray or not
+    @param sys_tray Whether the image requested is for Systray
+        or not
     @return string image path in the resources
     ***********************************************************/
     protected string theme_image_path (string name, int size = -1, bool sys_tray = false);
@@ -703,10 +749,10 @@ string Theme.status_header_text (SyncResult.Status status) {
 }
 
 bool Theme.is_branded () {
-    return app_name_g_u_i () != QStringLiteral ("Nextcloud");
+    return app_name_gui () != QStringLiteral ("Nextcloud");
 }
 
-string Theme.app_name_g_u_i () {
+string Theme.app_name_gui () {
     return APPLICATION_NAME;
 }
 
@@ -1033,7 +1079,7 @@ string Theme.git_sHA1 () {
 }
 
 string Theme.about () {
-    // Shorten Qt's OS name : "mac_o_s Mojave (10.14)" . "mac_o_s"
+    // Shorten Qt's OS name : "macOS Mojave (10.14)" . "macOS"
     string[] os_string_list = Utility.platform_name ().split (QLatin1Char (' '));
     string os_name = os_string_list.at (0);
 

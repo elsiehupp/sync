@@ -179,7 +179,7 @@ signals:
                                                  "<p>You logged-in with user <em>%1</em>, but must login with user <em>%2</em>.<br>"
                                                  "Please log out of %3 in another tab, then <a href='%4'>click here</a> "
                                                  "and log in as user %2</p>")
-                                                  .arg (user, _expected_user, Theme.instance ().app_name_g_u_i (),
+                                                  .arg (user, _expected_user, Theme.instance ().app_name_gui (),
                                                       authorisation_link ().to_string (QUrl.FullyEncoded));
                             http_reply_and_close (socket, "200 OK", message.to_utf8 ().const_data ());
                             // We are still listening on the socket so we will get the new connection

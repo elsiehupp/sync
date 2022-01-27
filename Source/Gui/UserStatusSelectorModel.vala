@@ -21,7 +21,6 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 // #include <userstatusconnector.h>
 // #include <datetimeprovider.h>
 
-// #include <GLib.Object>
 // #include <QMetaType>
 // #include <Qt_numeric>
 

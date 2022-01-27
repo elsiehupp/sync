@@ -1,6 +1,5 @@
 
 
-// #include <GLib.Object>
 // #include <string>
 // #include <QMap>
 // #include <GLib.ByteArray>

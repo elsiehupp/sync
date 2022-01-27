@@ -23,7 +23,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QQuick_item>
 // #include <QQml_context>
 
-// #include <GLib.Object>
 // #include <QPointer>
 // #include <QAction>
 // #include <QMenu>

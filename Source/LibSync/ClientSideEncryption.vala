@@ -39,7 +39,6 @@ QDebug operator<< (QDebug out, std.string& str) {
 using namespace QKeychain;
 
 // #include <string>
-// #include <GLib.Object>
 // #include <QJsonDocument>
 // #include <QSslCertificate>
 // #include <QSslKey>

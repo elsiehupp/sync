@@ -16,7 +16,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
 // #pragma once
 
-// #include <GLib.Object>
 // #include <QElapsedTimer>
 // #include <string[]>
 // #include <csync.h>

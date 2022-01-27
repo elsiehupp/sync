@@ -178,7 +178,7 @@ Systray.Systray ()
     auto pause_action = context_menu.add_action (tr ("Pause sync"), this, &Systray.on_pause_all_folders);
     auto resume_action = context_menu.add_action (tr ("Resume sync"), this, &Systray.on_unpause_all_folders);
     context_menu.add_action (tr ("Settings"), this, &Systray.open_settings);
-    context_menu.add_action (tr ("Exit %1").arg (Theme.instance ().app_name_g_u_i ()), this, &Systray.shutdown);
+    context_menu.add_action (tr ("Exit %1").arg (Theme.instance ().app_name_gui ()), this, &Systray.shutdown);
     set_context_menu (context_menu);
 
     connect (context_menu, &QMenu.about_to_show, [=] {
@@ -276,7 +276,7 @@ bool Systray.is_open () {
 }
 
 string Systray.window_title () {
-    return Theme.instance ().app_name_g_u_i ();
+    return Theme.instance ().app_name_gui ();
 }
 
 bool Systray.use_normal_window () {
@@ -317,7 +317,7 @@ void Systray.show_message (string title, string message, Message_icon icon) {
 }
 
 void Systray.set_tool_tip (string tip) {
-    QSystemTrayIcon.set_tool_tip (tr ("%1 : %2").arg (Theme.instance ().app_name_g_u_i (), tip));
+    QSystemTrayIcon.set_tool_tip (tr ("%1 : %2").arg (Theme.instance ().app_name_gui (), tip));
 }
 
 bool Systray.sync_is_paused () {

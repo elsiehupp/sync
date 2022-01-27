@@ -315,7 +315,7 @@ signals:
         }
 
         string lfree_space_str = Utility.octets_to_string (available_local_space ());
-        _ui.l_free_space.on_set_text (string (tr ("%1 free space", "%1 gets replaced with the size and a matching unit. Example : 3 MB or 5 GB")).arg (lfree_space_str));
+        _ui.l_free_space.on_set_text (string (tr ("%1 free space", "%1 gets replaced with the size and a matching unit. Example: 3 MB or 5 GB")).arg (lfree_space_str));
 
         _ui.sync_mode_label.on_set_text (t);
         _ui.sync_mode_label.set_fixed_height (_ui.sync_mode_label.size_hint ().height ());

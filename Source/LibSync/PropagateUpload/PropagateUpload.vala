@@ -228,7 +228,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
     Whether an existing entity with the same name may be deleted before
     the upload.
 
-    Default : false.
+    Default: false.
     ***********************************************************/
     public void set_delete_existing (bool enabled);
 
@@ -348,9 +348,9 @@ class PropagateUploadFileV1 : PropagateUploadFileCommon {
 
     public void do_start_upload () override;
 
-    public on_ void on_abort (PropagatorJob.AbortType abort_type) override;
+    public void on_abort (PropagatorJob.AbortType abort_type) override;
 
-    private on_ void start_next_chunk ();
+    private void on_start_next_chunk ();
     private void on_put_finished ();
     private void on_upload_progress (int64, int64);
 };
@@ -392,7 +392,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
 
 
     private void start_new_upload ();
-    private void start_next_chunk ();
+    private void on_start_next_chunk ();
 
     public void on_abort (AbortType abort_type) override;
 

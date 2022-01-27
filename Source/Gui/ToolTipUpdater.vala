@@ -8,7 +8,6 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 // #include <QHelp_event>
 // #include <QToolTip>
 
-// #include <GLib.Object>
 // #include <QPoint>
 
 

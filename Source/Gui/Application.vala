@@ -66,7 +66,8 @@ class Application : SharedTools.QtSingleApplication {
 
     /***********************************************************
     Will download a virtual file, and open the result.
-    The argument is the filename of the virtual file (including the extension)
+    The argument is the filename of the virtual file (including
+    the extension)
     ***********************************************************/
     public void on_open_virtual_file (string filename);
 
@@ -267,7 +268,7 @@ Application.Application (int &argc, char **argv)
 
     if (!ConfigFile ().exists ()) {
         // Migrate from version <= 2.4
-        set_application_name (_theme.app_name_g_u_i ());
+        set_application_name (_theme.app_name_gui ());
 #ifndef QT_WARNING_DISABLE_DEPRECATED // Was added in Qt 5.9
 const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-declarations")
 #endif
@@ -276,12 +277,12 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
         // We need to use the deprecated QDesktopServices.storage_location because of its Qt4
         // behavior of adding "data" to the path
         string old_dir = QDesktopServices.storage_location (QDesktopServices.DataLocation);
-        if (old_dir.ends_with ('/')) old_dir.chop (1); // mac_o_s 10.11.x does not like trailing slash for rename/move.
+        if (old_dir.ends_with ('/')) old_dir.chop (1); // macOS 10.11.x does not like trailing slash for rename/move.
         QT_WARNING_POP
         set_application_name (_theme.app_name ());
         if (QFileInfo (old_dir).is_dir ()) {
             auto conf_dir = ConfigFile ().config_path ();
-            if (conf_dir.ends_with ('/')) conf_dir.chop (1);  // mac_o_s 10.11.x does not like trailing slash for rename/move.
+            if (conf_dir.ends_with ('/')) conf_dir.chop (1);  // macOS 10.11.x does not like trailing slash for rename/move.
             q_c_info (lc_application) << "Migrating old config from" << old_dir << "to" << conf_dir;
 
             if (!QFile.rename (old_dir, conf_dir)) {
@@ -359,7 +360,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
                 tr ("There was an error while accessing the configuration "
                    "file at %1. Please make sure the file can be accessed by your user.")
                     .arg (ConfigFile ().config_file ()),
-                tr ("Quit %1").arg (Theme.instance ().app_name_g_u_i ()));
+                tr ("Quit %1").arg (Theme.instance ().app_name_gui ()));
             QTimer.single_shot (0, q_app, SLOT (quit ()));
             return;
         }
@@ -538,7 +539,7 @@ void Application.on_owncloud_wizard_done (int res) {
         bool should_set_auto_start = false;
 #endif
         if (should_set_auto_start) {
-            Utility.set_launch_on_startup (_theme.app_name (), _theme.app_name_g_u_i (), true);
+            Utility.set_launch_on_startup (_theme.app_name (), _theme.app_name_gui (), true);
         }
 
         Systray.instance ().show_window ();

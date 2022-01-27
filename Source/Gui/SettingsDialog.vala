@@ -142,7 +142,7 @@ signals:
         set_object_name ("Settings"); // required as group for save_geometry call
 
         // : This name refers to the application name e.g Nextcloud
-        set_window_title (tr ("%1 Settings").arg (Theme.instance ().app_name_g_u_i ()));
+        set_window_title (tr ("%1 Settings").arg (Theme.instance ().app_name_gui ()));
 
         connect (AccountManager.instance (), &AccountManager.on_account_added,
             this, &SettingsDialog.on_account_added);

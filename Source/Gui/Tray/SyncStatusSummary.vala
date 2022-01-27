@@ -11,7 +11,6 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 // #include <theme.h>
 // #include <folder.h>
 
-// #include <GLib.Object>
 
 namespace Occ {
 

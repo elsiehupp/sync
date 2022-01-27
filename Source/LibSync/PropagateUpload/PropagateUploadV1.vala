@@ -55,10 +55,10 @@ void PropagateUploadFileV1.do_start_upload () {
     _current_chunk = 0;
 
     propagator ().report_progress (*_item, 0);
-    start_next_chunk ();
+    on_start_next_chunk ();
 }
 
-void PropagateUploadFileV1.start_next_chunk () {
+void PropagateUploadFileV1.on_start_next_chunk () {
     if (propagator ()._abort_requested)
         return;
 
@@ -166,7 +166,7 @@ void PropagateUploadFileV1.start_next_chunk () {
 
     if (parallel_chunk_upload && (propagator ()._active_job_list.count () < propagator ().maximum_active_transfer_job ())
         && _current_chunk < _chunk_count) {
-        start_next_chunk ();
+        on_start_next_chunk ();
     }
     if (!parallel_chunk_upload || _chunk_count - _current_chunk <= 0) {
         propagator ().schedule_next_job ();
@@ -283,7 +283,7 @@ void PropagateUploadFileV1.on_put_finished () {
         pi._size = _item._size;
         propagator ()._journal.set_upload_info (_item._file, pi);
         propagator ()._journal.commit ("Upload info");
-        start_next_chunk ();
+        on_start_next_chunk ();
         return;
     }
     // the following code only happens after all chunks were uploaded.

@@ -1183,12 +1183,12 @@ protected slots:
             }
             case AccountState.NetworkError:
                 show_connection_label (tr ("No connection to %1 at %2.")
-                                        .arg (Utility.escape (Theme.instance ().app_name_g_u_i ()), server),
+                                        .arg (Utility.escape (Theme.instance ().app_name_gui ()), server),
                     _account_state.connection_errors ());
                 break;
             case AccountState.ConfigurationError:
                 show_connection_label (tr ("Server configuration error : %1 at %2.")
-                                        .arg (Utility.escape (Theme.instance ().app_name_g_u_i ()), server),
+                                        .arg (Utility.escape (Theme.instance ().app_name_gui ()), server),
                     _account_state.connection_errors ());
                 break;
             case AccountState.Disconnected:
@@ -1199,7 +1199,7 @@ protected slots:
         } else {
             // own_cloud is not yet configured.
             show_connection_label (tr ("No %1 connection configured.")
-                                    .arg (Utility.escape (Theme.instance ().app_name_g_u_i ())));
+                                    .arg (Utility.escape (Theme.instance ().app_name_gui ())));
         }
 
         /* Allow to expand the item if the account is connected. */

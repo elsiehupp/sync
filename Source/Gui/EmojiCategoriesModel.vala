@@ -10,8 +10,6 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 // #pragma once
 
 // #include <GLib.Object>
-// #include <QSettings>
-// #include <GLib.Object>
 // #include <QQmlEngine>
 // #include <QVariant>
 // #include <QVector>

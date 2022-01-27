@@ -5,7 +5,6 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 ***********************************************************/
 // #pragma once
 
-// #include <GLib.Object>
 // #include <QScopedPointer>
 
 

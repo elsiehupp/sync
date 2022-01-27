@@ -8,7 +8,6 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 
 // #pragma once
 
-// #include <GLib.Object>
 // #include <QScopedPointer>
 
 namespace xattr {

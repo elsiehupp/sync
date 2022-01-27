@@ -3,13 +3,9 @@ Copyright (C) by Julius Härtl <jus@bitgrid.net>
 
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
-// #include <glib.h>
-// #include <gio/gio.h>
 // #include <cloudprovidersproviderexporter.h>
 
 CloudProvidersProviderExporter _provider_exporter;
-
-// #include <GLib.Object>
 
 using namespace Occ;
 

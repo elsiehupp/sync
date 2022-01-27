@@ -5,7 +5,6 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <GLib.Object>
 
 namespace Occ {
 

@@ -63,7 +63,7 @@ protected slots:
 
         WizardCommon.init_error_label (_ui.error_label);
 
-        set_title (WizardCommon.title_template ().arg (tr ("Connect to %1").arg (Theme.instance ().app_name_g_u_i ())));
+        set_title (WizardCommon.title_template ().arg (tr ("Connect to %1").arg (Theme.instance ().app_name_gui ())));
         set_sub_title (WizardCommon.sub_title_template ().arg (tr ("Login in your browser")));
 
         connect (_ui.open_link_button, &QCommand_link_button.clicked, this, &Owncloud_oauth_creds_page.on_open_browser);

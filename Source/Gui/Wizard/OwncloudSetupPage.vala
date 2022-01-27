@@ -120,7 +120,7 @@ signals:
     }
 
     void Owncloud_setup_page.setup_server_address_description_label () {
-        const auto app_name = Theme.instance ().app_name_g_u_i ();
+        const auto app_name = Theme.instance ().app_name_gui ();
         _ui.server_address_description_label.on_set_text (tr ("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").arg (app_name));
     }
 

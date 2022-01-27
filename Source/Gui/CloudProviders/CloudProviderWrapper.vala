@@ -3,10 +3,8 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 Copyright (C) by Julius Härtl <jus@bitgrid.net>
 
 <GPLv3-or-later-Boilerplate>
-***********************************************************/\
+***********************************************************/
 
-// #include <glib.h>
-// #include <gio/gio.h>
 // #include <cloudprovidersaccountexporter.h>
 // #include <cloudprovidersproviderexporter.h>
 
@@ -19,7 +17,6 @@ using namespace Occ;
 
 GSimple_action_group *action_group = nullptr;
 
-// #include <GLib.Object>
 
 /* Forward declaration required since gio header files interfere with GLib.Object headers */
 struct _Cloud_providers_provider_exporter;

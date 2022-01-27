@@ -89,7 +89,7 @@ class Capabilities {
     it to validate that data was tr
 
     Path : checksums/supported_types
-    Default : []
+    Default: []
     Possible entries : "Adler32", "MD5", "SHA1"
     ***********************************************************/
     public GLib.List<GLib.ByteArray> supported_checksum_types ();
@@ -99,7 +99,7 @@ class Capabilities {
     This is just a preference, any algorithm listed in supported_types may be used.
 
     Path : checksums/preferred_upload_type
-    Default : empty, meaning "no preference"
+    Default: empty, meaning "no preference"
     Possible values : empty or any of the supported_types
     ***********************************************************/
     public GLib.ByteArray preferred_upload_checksum_type ();
@@ -125,8 +125,8 @@ class Capabilities {
     unusual error codes such as 503.
 
     Path : dav/http_error_codes_that_reset_failing_chunked_uploads
-    Default : []
-    Example : [503, 500]
+    Default: []
+    Example: [503, 500]
     ***********************************************************/
     public GLib.List<int> http_error_codes_that_reset_failing_chunked_uploads ();
 

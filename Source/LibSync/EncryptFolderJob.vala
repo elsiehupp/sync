@@ -7,7 +7,6 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 // #include <QLoggingCategory>
 // #pragma once
 
-// #include <GLib.Object>
 
 namespace Occ {
 

@@ -8,10 +8,8 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 // #include <cerrno>
 // #include <string[]>
-// #include <GLib.Object>
 // #include <QVarLengthArray>
 
-// #include <GLib.Object>
 // #include <string>
 // #include <QSocket_notifier>
 // #include <QHash>

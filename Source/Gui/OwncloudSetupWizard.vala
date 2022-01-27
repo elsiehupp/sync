@@ -13,7 +13,6 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 // #include <QDesktopServices>
 // #include <QApplication>
 
-// #include <GLib.Object>
 // #include <Gtk.Widget>
 // #include <QProcess>
 // #include <QNetworkReply>
@@ -287,7 +286,7 @@ signals:
 
         _oc_wizard.on_append_to_configuration_log (tr ("<font color=\"green\">Successfully connected to %1 : %2 version %3 (%4)</font><br/><br/>")
                                                 .arg (Utility.escape (url.to_string ()),
-                                                    Utility.escape (Theme.instance ().app_name_g_u_i ()),
+                                                    Utility.escape (Theme.instance ().app_name_gui ()),
                                                     Utility.escape (CheckServerJob.version_string (info)),
                                                     Utility.escape (server_version)));
 
@@ -313,7 +312,7 @@ signals:
             msg = tr ("Invalid URL");
         } else {
             msg = tr ("Failed to connect to %1 at %2:<br/>%3")
-                      .arg (Utility.escape (Theme.instance ().app_name_g_u_i ()),
+                      .arg (Utility.escape (Theme.instance ().app_name_gui ()),
                           Utility.escape (_oc_wizard.account ().url ().to_string ()),
                           Utility.escape (job.error_string ()));
         }
@@ -330,7 +329,7 @@ signals:
     void OwncloudSetupWizard.on_no_server_found_timeout (QUrl url) {
         _oc_wizard.on_display_error (
             tr ("Timeout while trying to connect to %1 at %2.")
-                .arg (Utility.escape (Theme.instance ().app_name_g_u_i ()), Utility.escape (url.to_string ())),
+                .arg (Utility.escape (Theme.instance ().app_name_gui ()), Utility.escape (url.to_string ())),
                     false);
     }
 
@@ -362,7 +361,7 @@ signals:
 
             _oc_wizard.set_field (QLatin1String ("OCUrl"), url);
             _oc_wizard.on_append_to_configuration_log (tr ("Trying to connect to %1 at %2 …")
-                                                    .arg (Theme.instance ().app_name_g_u_i ())
+                                                    .arg (Theme.instance ().app_name_gui ())
                                                     .arg (url));
 
             test_owncloud_connect ();
@@ -500,7 +499,7 @@ signals:
 
                     Purpose : Don't rely on unsafe paths, be extra careful.
 
-                    Example : https://cloud.example.com/remote.php/dav//
+                    Example: https://cloud.example.com/remote.php/dav//
 
             ***********************************************************/
             q_c_info (lc_wizard) << "Sanitize got URL path:" << string (_oc_wizard.account ().url ().to_string () + '/' + _oc_wizard.account ().dav_path () + remote_folder);
@@ -620,14 +619,14 @@ signals:
             _oc_wizard.on_append_to_configuration_log (QLatin1String (" "));
             _oc_wizard.on_append_to_configuration_log (QLatin1String ("<p><font color=\"green\"><b>")
                 + tr ("Successfully connected to %1!")
-                      .arg (Theme.instance ().app_name_g_u_i ())
+                      .arg (Theme.instance ().app_name_gui ())
                 + QLatin1String ("</b></font></p>"));
             _oc_wizard.on_successful_step ();
         } else {
             // ### this is not quite true, pass in the real problem as optional parameter
             _oc_wizard.on_append_to_configuration_log (QLatin1String ("<p><font color=\"red\">")
                 + tr ("Connection to %1 could not be established. Please check again.")
-                      .arg (Theme.instance ().app_name_g_u_i ())
+                      .arg (Theme.instance ().app_name_gui ())
                 + QLatin1String ("</font></p>"));
         }
     }

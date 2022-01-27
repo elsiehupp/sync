@@ -128,7 +128,7 @@ void HttpCredentialsGui.on_show_dialog () {
                      "<br>"
                      "User : %2<br>"
                      "Account : %3<br>")
-                      .arg (Utility.escape (Theme.instance ().app_name_g_u_i ()),
+                      .arg (Utility.escape (Theme.instance ().app_name_gui ()),
                           Utility.escape (_user),
                           Utility.escape (_account.display_name ()));
 

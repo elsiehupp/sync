@@ -21,7 +21,6 @@ namespace {
 constexpr int CrashLogSize = 20;
 }
 
-// #include <GLib.Object>
 // #include <GLib.List>
 // #include <QDateTime>
 // #include <QFile>

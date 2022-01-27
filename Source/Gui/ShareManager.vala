@@ -10,7 +10,6 @@ Copyright (C) by Roeland Jago Douma <rullzer@owncloud.com>
 // #include <QJsonArray>
 
 
-// #include <GLib.Object>
 // #include <QDate>
 // #include <string>
 // #include <GLib.List>

@@ -6,7 +6,6 @@ Copyright (C) by Dominik Schmidt <dschmidt@owncloud.com>
 
 // #pragma once
 
-// #include <GLib.Object>
 
 namespace Occ {
 

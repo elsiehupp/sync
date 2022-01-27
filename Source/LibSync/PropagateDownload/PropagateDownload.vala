@@ -224,7 +224,7 @@ class PropagateDownloadFile : PropagateItemJob {
     If it's a non-empty folder, it'll be renamed to a confl
     to preserve any non-synced content that may be inside.
 
-    Default : false.
+    Default: false.
     ***********************************************************/
     public void set_delete_existing_folder (bool enabled);
 

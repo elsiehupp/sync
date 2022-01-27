@@ -7,7 +7,6 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 // #include <QFile>
 // #pragma once
 
-// #include <GLib.Object>
 // #include <QScopedPointer>
 
 namespace Occ {

@@ -9,7 +9,6 @@
 // #include <Qt_qml>
 // #include <QPoint>
 // #include <QQuick_item>
-// #include <GLib.Object>
 
 
 

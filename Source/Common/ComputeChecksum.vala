@@ -71,7 +71,6 @@ Checksum Algorithms
 
 // #pragma once
 
-// #include <GLib.Object>
 // #include <GLib.ByteArray>
 // #include <QFuture_watcher>
 
@@ -95,7 +94,7 @@ static const char check_sum_adler_c[] = "Adler32";
 Returns the highest-quality checksum in a 'checksums'
 property retrieved from the server.
 
-Example : "ADLER32:1231 SHA1:ab124124 MD5:2131affa21"
+Example: "ADLER32:1231 SHA1:ab124124 MD5:2131affa21"
       . "SHA1:ab124124"
 ***********************************************************/
 OCSYNC_EXPORT GLib.ByteArray find_best_checksum (GLib.ByteArray &checksums);

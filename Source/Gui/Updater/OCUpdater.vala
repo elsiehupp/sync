@@ -4,7 +4,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <GLib.Object>
 // #include <QtCore>
 // #include <Qt_network>
 // #include <QtGui>
@@ -12,7 +11,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 // #include <cstdio>
 
-// #include <GLib.Object>
 // #include <QUrl>
 // #include <QTemporary_file>
 // #include <QTimer>
@@ -251,10 +249,10 @@ class Passive_update_notifier : OCUpdater {
         if (!update_file.is_empty () && QFile (update_file).exists ()
             && !update_succeeded () /* Someone might have run the updater manually between restarts */) {
             const auto message_box_start_installer = new QMessageBox (QMessageBox.Information,
-                tr ("New %1 update ready").arg (Theme.instance ().app_name_g_u_i ()),
+                tr ("New %1 update ready").arg (Theme.instance ().app_name_gui ()),
                 tr ("A new update for %1 is about to be installed. The updater may ask "
                    "for additional privileges during the process. Your computer may reboot to complete the installation.")
-                    .arg (Theme.instance ().app_name_g_u_i ()),
+                    .arg (Theme.instance ().app_name_gui ()),
                 QMessageBox.Ok,
                 nullptr);
 
@@ -541,7 +539,7 @@ class Passive_update_notifier : OCUpdater {
         auto *lbl = new QLabel;
         string txt = tr ("<p>A new version of the %1 Client is available.</p>"
                          "<p><b>%2</b> is available for download. The installed version is %3.</p>")
-                          .arg (Utility.escape (Theme.instance ().app_name_g_u_i ()),
+                          .arg (Utility.escape (Theme.instance ().app_name_gui ()),
                               Utility.escape (info.version_string ()), Utility.escape (client_version ()));
 
         lbl.on_set_text (txt);
@@ -590,7 +588,7 @@ class Passive_update_notifier : OCUpdater {
         auto lbl = new QLabel;
         string txt = tr ("<p>A new version of the %1 Client is available but the updating process failed.</p>"
                          "<p><b>%2</b> has been downloaded. The installed version is %3. If you confirm restart and update, your computer may reboot to complete the installation.</p>")
-                          .arg (Utility.escape (Theme.instance ().app_name_g_u_i ()),
+                          .arg (Utility.escape (Theme.instance ().app_name_gui ()),
                               Utility.escape (target_version), Utility.escape (client_version ()));
 
         lbl.on_set_text (txt);

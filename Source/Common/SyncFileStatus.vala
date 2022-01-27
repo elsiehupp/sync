@@ -5,7 +5,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 // #include <QMetaType>
-// #include <GLib.Object>
 // #include <string>
 
 namespace Occ {

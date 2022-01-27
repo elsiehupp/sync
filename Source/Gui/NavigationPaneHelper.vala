@@ -7,7 +7,6 @@ Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
 // #include <QDir>
 // #include <QCoreApplication>
 
-// #include <GLib.Object>
 // #include <QTimer>
 
 namespace Occ {

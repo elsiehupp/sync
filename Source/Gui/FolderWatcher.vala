@@ -17,7 +17,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 // #include <GLib.List>
 // #include <QLoggingCategory>
-// #include <GLib.Object>
 // #include <string>
 // #include <string[]>
 // #include <QElapsedTimer>

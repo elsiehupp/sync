@@ -8,7 +8,6 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 // #include <QJsonDocument>
 // #include <QJsonArray>
 
-// #include <GLib.Object>
 // #include <QFlags>
 // #include <QAbstractListModel>
 // #include <QLoggingCategory>

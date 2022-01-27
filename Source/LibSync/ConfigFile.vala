@@ -358,7 +358,7 @@ bool copy_dir_recursive (string from_dir, string to_dir) {
 
 ConfigFile.ConfigFile () {
     // QDesktopServices uses the application name to create a config path
-    q_app.set_application_name (Theme.instance ().app_name_g_u_i ());
+    q_app.set_application_name (Theme.instance ().app_name_gui ());
 
     QSettings.set_default_format (QSettings.IniFormat);
 
@@ -480,14 +480,14 @@ QVariant ConfigFile.get_policy_setting (string setting, QVariant &default_value)
     if (Utility.is_windows ()) {
         // check for policies first and return immediately if a value is found.
         QSettings user_policy (string.from_latin1 (R" (HKEY_CURRENT_USER\Software\Policies\%1\%2)")
-                                 .arg (APPLICATION_VENDOR, Theme.instance ().app_name_g_u_i ()),
+                                 .arg (APPLICATION_VENDOR, Theme.instance ().app_name_gui ()),
             QSettings.NativeFormat);
         if (user_policy.contains (setting)) {
             return user_policy.value (setting);
         }
 
         QSettings machine_policy (string.from_latin1 (R" (HKEY_LOCAL_MACHINE\Software\Policies\%1\%2)")
-                                    .arg (APPLICATION_VENDOR, Theme.instance ().app_name_g_u_i ()),
+                                    .arg (APPLICATION_VENDOR, Theme.instance ().app_name_gui ()),
             QSettings.NativeFormat);
         if (machine_policy.contains (setting)) {
             return machine_policy.value (setting);
@@ -871,7 +871,7 @@ QVariant ConfigFile.get_value (string param, string group,
         system_setting = system_settings.value (param, default_value);
     } else { // Windows
         QSettings system_settings (string.from_latin1 (R" (HKEY_LOCAL_MACHINE\Software\%1\%2)")
-                                     .arg (APPLICATION_VENDOR, Theme.instance ().app_name_g_u_i ()),
+                                     .arg (APPLICATION_VENDOR, Theme.instance ().app_name_gui ()),
             QSettings.NativeFormat);
         if (!group.is_empty ()) {
             system_settings.begin_group (group);

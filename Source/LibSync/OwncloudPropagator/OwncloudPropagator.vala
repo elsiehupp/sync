@@ -15,13 +15,11 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QDir>
 // #include <QLoggingCategory>
 // #include <QTimer>
-// #include <GLib.Object>
 // #include <QTimerEvent>
 // #include <QRegularExpression>
 // #include <qmath.h>
 
 // #include <QHash>
-// #include <GLib.Object>
 // #include <QMap>
 // #include <QElapsedTimer>
 // #include <QTimer>

@@ -18,7 +18,6 @@
  ******************************************************************************/
 
 // #pragma once
-// #include <GLib.Object>
 // #include <QBasicTimer>
 // #include <QLocalSocket>
 // #include <QRegularExpression>

@@ -33,7 +33,7 @@ void warn_systray () {
                                     "If you are running XFCE, please follow "
                                     "<a href=\"http://docs.xfce.org/xfce/xfce4-panel/systray\">these instructions</a>. "
                                     "Otherwise, please install a system tray application such as \"trayer\" and try again.")
-            .arg (Theme.instance ().app_name_g_u_i ()));
+            .arg (Theme.instance ().app_name_gui ()));
 }
 
 int main (int argc, char **argv) {

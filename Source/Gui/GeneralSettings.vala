@@ -361,7 +361,7 @@ void General_settings.on_save_misc_settings () {
 
 void General_settings.on_toggle_launch_on_startup (bool enable) {
     Theme *theme = Theme.instance ();
-    Utility.set_launch_on_startup (theme.app_name (), theme.app_name_g_u_i (), enable);
+    Utility.set_launch_on_startup (theme.app_name (), theme.app_name_gui (), enable);
 }
 
 void General_settings.on_toggle_optional_server_notifications (bool enable) {

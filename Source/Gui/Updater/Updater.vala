@@ -11,7 +11,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QSysInfo>
 
 // #include <QLoggingCategory>
-// #include <GLib.Object>
 
 
 namespace Occ {

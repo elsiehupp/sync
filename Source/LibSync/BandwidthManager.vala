@@ -7,8 +7,6 @@ Copyright (C) by Markus Goetz <markus@woboq.com>
 // #include <QLoggingCategory>
 // #include <QTimer>
 // #include <GLib.Object>
-
-// #include <GLib.Object>
 // #include <QTimer>
 // #include <QIODevice>
 // #include <list>

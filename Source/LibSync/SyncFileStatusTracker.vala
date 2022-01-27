@@ -14,8 +14,9 @@ namespace Occ {
 
 
 /***********************************************************
-@brief Takes care of tracking the status of individual files as they
-       go through the SyncEngine, to be reported as overlay icons in the shell.
+@brief Takes care of tracking the status of individual
+files as they go through the SyncEngine, to be reported as
+overlay icons in the shell.
 @ingroup libsync
 ***********************************************************/
 class SyncFileStatusTracker : GLib.Object {
@@ -80,7 +81,7 @@ signals:
     }
 
     bool SyncFileStatusTracker.Path_comparator.operator () ( const string& lhs, string& rhs ) {
-        // This will make sure that the std.map is ordered and queried case-insensitively on mac_o_s and Windows.
+        // This will make sure that the std.map is ordered and queried case-insensitively on macOS and Windows.
         return path_compare (lhs, rhs) < 0;
     }
 

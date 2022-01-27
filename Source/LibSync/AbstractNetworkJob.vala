@@ -23,7 +23,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QRegularExpression>
 // #pragma once
 
-// #include <GLib.Object>
 // #include <QNetworkRequest>
 // #include <QNetworkReply>
 // #include <QPointer>
@@ -71,9 +70,9 @@ class AbstractNetworkJob : GLib.Object {
     Whether to handle redirects transparently.
 
     If true, a follow-up request is issued automatically when
-    a redirect is encountered. The on_finished () function is only
-    called if there are no more redirects (or there are problems
-    with the redirect).
+    a redirect is encountered. The on_finished () function is
+    only called if there are no more redirects (or there are
+    problems with the redirect).
 
     The transparent redirect following may be disabled for some
     requests where custom handling is necessary.
@@ -87,7 +86,8 @@ class AbstractNetworkJob : GLib.Object {
 
 
     /***********************************************************
-    Content of the X-Request-ID header. (Only set after the request is sent)
+    Content of the X-Request-ID header. (Only set after the
+    request is sent)
     ***********************************************************/
     public GLib.ByteArray request_id ();
 
@@ -105,7 +105,8 @@ class AbstractNetworkJob : GLib.Object {
 
 
     /***********************************************************
-    Like error_string, but also checking the reply body for information.
+    Like error_string, but also checking the reply body for
+    information.
 
     Specifically, sometimes xml bodies have extra error information.
     This function reads the body of the reply and parses out the
@@ -124,7 +125,9 @@ class AbstractNetworkJob : GLib.Object {
     public void retry ();
 
     /***********************************************************
-    static variable the HTTP timeout (in seconds). If set to 0, the default will be used
+    static variable the HTTP timeout (in seconds).
+    
+    If set to 0, the default will be used
     ***********************************************************/
     static int http_timeout;
 

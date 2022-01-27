@@ -18,7 +18,6 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
 
-// #include <GLib.Object>
 // #include <QSet>
 // #include <string>
 // #include <QRegularExpression>
@@ -194,7 +193,7 @@ class ExcludedFiles : GLib.Object {
     the full path every time, we check each parent path with the traversal
     function incrementally.
 
-    Example : When the sync run eventually arrives at "a/b/c it can assume
+    Example: When the sync run eventually arrives at "a/b/c it can assume
     that the traversal m
     and just needs to run the traversal matcher on "a/b/c".
 
@@ -208,7 +207,7 @@ class ExcludedFiles : GLib.Object {
     activation for it was triggered.
 
     Note : The traversal matcher will return not-excluded on some paths that
-    full matcher would exclude. Example : "b" is excluded. traversal ("b/c")
+    full matcher would exclude. Example: "b" is excluded. traversal ("b/c")
     returns not-excluded because "c" isn't a bname activation pattern.
     ***********************************************************/
     private void prepare (Base_path_string &base_path);

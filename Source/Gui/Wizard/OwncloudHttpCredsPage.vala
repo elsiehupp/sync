@@ -72,7 +72,7 @@ signals:
         }
         _ui.le_username.set_placeholder_text (theme.user_iDHint ());
 
-        set_title (WizardCommon.title_template ().arg (tr ("Connect to %1").arg (Theme.instance ().app_name_g_u_i ())));
+        set_title (WizardCommon.title_template ().arg (tr ("Connect to %1").arg (Theme.instance ().app_name_gui ())));
         set_sub_title (WizardCommon.sub_title_template ().arg (tr ("Enter user credentials")));
 
         _ui.result_layout.add_widget (_progress_indi);

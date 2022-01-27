@@ -143,7 +143,7 @@ class SyncEngine : GLib.Object {
     Returns whether the given folder-relative path should be locally discovered
     given the local discovery options.
 
-    Example : If path is 'foo/bar' and style is DatabaseAndFilesystem and dirs contains
+    Example: If path is 'foo/bar' and style is DatabaseAndFilesystem and dirs contains
         'foo/bar/touched_file', then the result will be true.
     ***********************************************************/
     public bool should_discover_locally (string path);

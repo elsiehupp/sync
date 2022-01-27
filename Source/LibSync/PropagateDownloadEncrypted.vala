@@ -1,7 +1,6 @@
 #ifndef PROPAGATEDOWNLOADENCRYPTED_H
 const int PROPAGATEDOWNLOADENCRYPTED_H
 
-// #include <GLib.Object>
 // #include <QFileInfo>
 
 

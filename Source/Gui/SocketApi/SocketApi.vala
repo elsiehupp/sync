@@ -412,8 +412,8 @@ SocketApi.~SocketApi () {
 }
 
 void SocketApi.on_new_connection () {
-    // Note that on mac_o_s this is not actually a line-based QIODevice, it's a Socket_api_socket which is our
-    // custom message based mac_o_s IPC.
+    // Note that on macOS this is not actually a line-based QIODevice, it's a Socket_api_socket which is our
+    // custom message based macOS IPC.
     QIODevice *socket = _local_server.next_pending_connection ();
 
     if (!socket) {
@@ -696,8 +696,8 @@ void SocketApi.command_VERSION (string , Socket_listener *listener) {
 }
 
 void SocketApi.command_SHARE_MENU_TITLE (string , Socket_listener *listener) {
-    //listener.on_send_message (QLatin1String ("SHARE_MENU_TITLE:") + tr ("Share with %1", "parameter is Nextcloud").arg (Theme.instance ().app_name_g_u_i ()));
-    listener.on_send_message (QLatin1String ("SHARE_MENU_TITLE:") + Theme.instance ().app_name_g_u_i ());
+    //listener.on_send_message (QLatin1String ("SHARE_MENU_TITLE:") + tr ("Share with %1", "parameter is Nextcloud").arg (Theme.instance ().app_name_gui ()));
+    listener.on_send_message (QLatin1String ("SHARE_MENU_TITLE:") + Theme.instance ().app_name_gui ());
 }
 
 void SocketApi.command_EDIT (string local_file, Socket_listener *listener) {
@@ -1060,7 +1060,7 @@ void SocketApi.command_GET_STRINGS (string argument, Socket_listener *listener) 
             "FILE_ACTIVITY_MENU_TITLE", tr ("Activity")
         },
         {
-            "CONTEXT_MENU_TITLE", Theme.instance ().app_name_g_u_i ()
+            "CONTEXT_MENU_TITLE", Theme.instance ().app_name_gui ()
         },
         {
             "COPY_PRIVATE_LINK_MENU_TITLE", tr ("Copy private link to clipboard")

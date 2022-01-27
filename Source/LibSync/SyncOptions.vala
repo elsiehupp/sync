@@ -27,7 +27,9 @@ class SyncOptions {
     ~SyncOptions ();
 
     /***********************************************************
-    Maximum size (in Bytes) a folder can have without asking for confirmation.
+    Maximum size (in Bytes) a folder can have without asking
+    for confirmation.
+
     -1 means infinite
     ***********************************************************/
     public int64 _new_big_folder_size_limit = -1;
@@ -43,13 +45,15 @@ class SyncOptions {
     public bool _move_files_to_trash = false;
 
     /***********************************************************
-    Create a virtual file for new files instead of downloading. May not be null
+    Create a virtual file for new files instead of downloading.
+    May not be null
     ***********************************************************/
     public unowned<Vfs> _vfs;
 
     /***********************************************************
-    The initial un-adjusted chunk size in bytes for chunked uploads, both
-    for old and new chunking algorithm, which classifies the item to be chunked
+    The initial un-adjusted chunk size in bytes for chunked
+    uploads, both for old and new chunking algorithm, which
+    classifies the item to be chunked
 
     In chunking_nG, when dynamic chunk size adjustments are d
     starting value and is then gradually adjusted within the
@@ -90,16 +94,17 @@ class SyncOptions {
     /***********************************************************
     Ensure min <= initial <= max
 
-    Previously min/max chunk size values didn't exist, so users might
-    have setups where the chunk size exceeds the new min/max default
-    values. To cope with this, adjust min/max to always include the
-    initial chunk size value.
+    Previously min/max chunk size values didn't exist, so users
+    might have setups where the chunk size exceeds the new
+    min/max default values. To cope with this, adjust min/max
+    to always include the initial chunk size value.
     ***********************************************************/
     public void verify_chunk_sizes ();
 
     /***********************************************************
     A regular expression to match file names
-    If no pattern is provided the default is an invalid regular expression.
+    If no pattern is provided the default is an invalid regular
+    expression.
     ***********************************************************/
     public QRegularExpression file_regex ();
 

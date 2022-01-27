@@ -1,6 +1,5 @@
 #pragma once
 
-// #include <GLib.Object>
 // #include <QPixmap>
 // #include <QUrl>
 // #include <string>

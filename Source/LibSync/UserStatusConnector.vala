@@ -6,7 +6,6 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 // #pragma once
 
-// #include <GLib.Object>
 // #include <string>
 // #include <QMetaType>
 // #include <QUrl>
@@ -24,7 +23,7 @@ enum class ClearAtType {
     Timestamp
 };
 
-// TODO : If we can use C++17 make it a std.variant
+// TODO: If we can use C++17 make it a std.variant
 struct ClearAt {
     ClearAtType _type = ClearAtType.Period;
 

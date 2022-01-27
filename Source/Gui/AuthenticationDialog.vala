@@ -16,7 +16,8 @@ Copyright (C) 2014 by Daniel Molkentin <danimo@owncloud.com>
 namespace Occ {
 
 /***********************************************************
-@brief Authenticate a user for a specific credential given his credentials
+@brief Authenticate a user for a specific credential given
+their credentials
 @ingroup gui
 ***********************************************************/
 class AuthenticationDialog : Gtk.Dialog {

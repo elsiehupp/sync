@@ -13,7 +13,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QSet>
 // #include <QNetworkProxy>
 
-// #include <GLib.Object>
 // #include <QQueue>
 // #include <GLib.List>
 
@@ -1909,7 +1908,7 @@ string FolderMan.find_good_path_for_new_sync_folder (string base_path, QUrl serv
 
     // If the parent folder is a sync folder or contained in one, we can't
     // possibly find a valid sync folder inside it.
-    // Example : Someone syncs their home directory. Then ~/foobar is not
+    // Example: Someone syncs their home directory. Then ~/foobar is not
     // going to be an acceptable sync folder path for any value of foobar.
     string parent_folder = QFileInfo (folder).dir ().canonical_path ();
     if (FolderMan.instance ().folder_for_path (parent_folder)) {

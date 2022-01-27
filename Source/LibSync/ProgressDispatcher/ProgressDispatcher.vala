@@ -4,11 +4,9 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <GLib.Object>
 // #include <QMetaType>
 // #include <QCoreApplication>
 
-// #include <GLib.Object>
 // #include <QHash>
 // #include <QTime>
 // #include <QQueue>

@@ -16,7 +16,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QFile>
 // #include <QUrl>
 // #include <QProcess>
-// #include <GLib.Object>
 // #include <QThread>
 // #include <QDateTime>
 // #include <QSysInfo>

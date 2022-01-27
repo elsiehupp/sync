@@ -30,7 +30,6 @@ const int SQLITE_DO (A)
     }
 
 // #include <QLoggingCategory>
-// #include <GLib.Object>
 // #include <QVariant>
 
 struct Sqlite3;

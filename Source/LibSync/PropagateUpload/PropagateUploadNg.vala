@@ -43,7 +43,7 @@ QUrl PropagateUploadFileNG.chunk_url (int chunk) {
           |                                                       |                      |
     +-----+<------------------------------------------------------+<---  on_delete_job_finished ()
     |
-    +---.  start_next_chunk ()  ---on_finished?  --+
+    +---.  on_start_next_chunk ()  ---on_finished?  --+
                   ^               |          |
                   +---------------+          |
                                              |
@@ -153,7 +153,7 @@ void PropagateUploadFileNG.on_propfind_finished () {
         return;
     }
 
-    start_next_chunk ();
+    on_start_next_chunk ();
 }
 
 void PropagateUploadFileNG.on_propfind_finished_with_error () {
@@ -197,7 +197,7 @@ void PropagateUploadFileNG.on_delete_job_finished () {
             // There was an error removing some files, just on_start over
             start_new_upload ();
         } else {
-            start_next_chunk ();
+            on_start_next_chunk ();
         }
     }
 }
@@ -254,10 +254,10 @@ void PropagateUploadFileNG.on_mk_col_finished () {
         abort_with_error (status, job.error_string_parsing_body ());
         return;
     }
-    start_next_chunk ();
+    on_start_next_chunk ();
 }
 
-void PropagateUploadFileNG.start_next_chunk () {
+void PropagateUploadFileNG.on_start_next_chunk () {
     if (propagator ()._abort_requested)
         return;
 
@@ -428,7 +428,7 @@ void PropagateUploadFileNG.on_put_finished () {
         propagator ()._journal.set_upload_info (_item._file, upload_info);
         propagator ()._journal.commit ("Upload info");
     }
-    start_next_chunk ();
+    on_start_next_chunk ();
 }
 
 void PropagateUploadFileNG.on_move_job_finished () {

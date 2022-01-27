@@ -7,9 +7,6 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 // #include <QFileDialog>
 // #include <QMessageBox>
 
-// #include <GLib.Object>
-
-
 namespace Occ {
 
 class ConflictSolver : GLib.Object {

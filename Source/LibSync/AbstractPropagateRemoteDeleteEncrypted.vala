@@ -6,7 +6,6 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
 // #pragma once
 
-// #include <GLib.Object>
 // #include <string>
 // #include <QNetworkReply>
 // #include <QFileInfo>
@@ -15,7 +14,8 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 namespace Occ {
 
 /***********************************************************
-@brief The AbstractPropagateRemoteDeleteEncrypted class is the base class for Propagate Remote Delete Encrypted jobs
+@brief The AbstractPropagateRemoteDeleteEncrypted class is
+the base class for Propagate Remote Delete Encrypted jobs
 @ingroup libsync
 ***********************************************************/
 class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {

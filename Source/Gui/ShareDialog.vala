@@ -154,7 +154,7 @@ signals:
             _ui.label_share_path.on_set_text (tr ("Folder : %2").arg (oc_dir));
         }
 
-        this.set_window_title (tr ("%1 Sharing").arg (Theme.instance ().app_name_g_u_i ()));
+        this.set_window_title (tr ("%1 Sharing").arg (Theme.instance ().app_name_gui ()));
 
         if (!account_state.account ().capabilities ().share_a_p_i ()) {
             return;

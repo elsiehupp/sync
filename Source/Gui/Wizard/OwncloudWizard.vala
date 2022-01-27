@@ -163,7 +163,7 @@ signals:
         connect (this, &QWizard.custom_button_clicked, this, &OwncloudWizard.skip_folder_configuration);
 
         Theme *theme = Theme.instance ();
-        set_window_title (tr ("Add %1 account").arg (theme.app_name_g_u_i ()));
+        set_window_title (tr ("Add %1 account").arg (theme.app_name_gui ()));
         set_wizard_style (QWizard.Modern_style);
         set_option (QWizard.No_back_button_on_start_page);
         set_option (QWizard.No_back_button_on_last_page);

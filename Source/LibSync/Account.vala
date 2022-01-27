@@ -74,11 +74,12 @@ class AbstractSslErrorHandler {
 };
 
 /***********************************************************
-@brief The Account class represents an account on an own_cloud Server
+@brief The Account class represents an account on an
+ownCloud Server
 @ingroup libsync
 
-The Account has a name and url. It also has information about credentials,
-SSL errors and certificates.
+The Account has a name and url. It also has information
+about credentials, SSL errors and certificates.
 ***********************************************************/
 class Account : GLib.Object {
     Q_PROPERTY (string id MEMBER _id)
@@ -140,8 +141,9 @@ class Account : GLib.Object {
     /***********************************************************
     Returns the legacy permalink url for a file.
 
-    This uses the old way of manually building the url. New code should
-    use the "privatelink" property accessible via PROPFIND.
+    This uses the old way of manually building the url. New
+    code should use the "privatelink" property accessible via
+    PROPFIND.
     ***********************************************************/
     public QUrl deprecated_private_link_url (GLib.ByteArray &numeric_file_id);
 
@@ -170,9 +172,10 @@ class Account : GLib.Object {
         const QUrl url, QNetworkRequest req, QHttpMultiPart *data);
 
     /***********************************************************
-    Create and on_start network job for a simple one-off request.
+    Create and start network job for a simple one-off request.
 
-    More complicated requests typically create their own job types.
+    More complicated requests typically create their own job
+    types.
     ***********************************************************/
     public SimpleNetworkJob *send_request (GLib.ByteArray &verb,
         const QUrl url,
@@ -227,15 +230,15 @@ class Account : GLib.Object {
     /***********************************************************
     Access the server version
 
-    For servers >= 10.0.0, this can be the empty string until capabilities
-    have been received.
+    For servers >= 10.0.0, this can be the empty string until
+    capabilities have been received.
     ***********************************************************/
     public string server_version ();
 
     /***********************************************************
     Server version for easy comparison.
 
-    Example : server_version_int () >= make_server_version (11, 2, 3)
+    Example: server_version_int () >= make_server_version (11, 2, 3)
 
     Will be 0 if the version is not available yet.
     ***********************************************************/
@@ -247,13 +250,14 @@ class Account : GLib.Object {
     /***********************************************************
     Whether the server is too old.
 
-    Not supporting server versions is a gradual process. There's a hard
-    compatibility limit (see ConnectionValidator) that forbids connecting
-    to extremely old servers. And there's a weak "untested, not
-    recommended, potentially dangerous" limit, that users might want
-    to go beyond.
+    Not supporting server versions is a gradual process. There's
+    a hard compatibility limit (see ConnectionValidator) that
+    forbids connecting to extremely old servers. And there's a
+    weak "untested, not recommended, potentially dangerous"
+    limit, that users might want to go beyond.
 
-    This function returns true if the server is beyond the weak limit.
+    This function returns true if the server is beyond the weak
+    limit.
     ***********************************************************/
     public bool server_version_unsupported ();
 
@@ -359,9 +363,10 @@ protected slots:
     /***********************************************************
     If url to use for any user-visible urls.
 
-    If the server configures overwritehost this can be different from
-    the connection url in _url. We retrieve the visible host through
-    the ocs/v1.php/config endpoint in ConnectionValidator.
+    If the server configures overwritehost this can be different
+    from the connection url in _url. We retrieve the visible
+    host through the ocs/v1.php/config endpoint in
+    ConnectionValidator.
     ***********************************************************/
     private QUrl _user_visible_url;
 
@@ -395,13 +400,17 @@ protected slots:
 
     /***********************************************************
     IMPORTANT - remove later - FIXME MS@2019-12-07 -.
-    TODO : For "Log out" & "Remove account" : Remove client CA certs and KEY!
+    TODO: For "Log out" & "Remove account":
+        Remove client CA certs and KEY!
 
-    Disabled as long as selecting another cert is not supported by the UI.
+    Disabled as long as selecting another cert is not supported
+    by the UI.
 
-    Being able to specify a new certificate is important anyway : expiry etc.
+    Being able to specify a new certificate is important anyway:
+    expiry etc.
 
-    We introduce this dirty hack here, to allow deleting them upon Remote Wipe.
+    We introduce this dirty hack here, to allow deleting them
+    upon Remote Wipe.
     ***********************************************************/
     public void set_remote_wipe_requested_HACK () {
         _is_remote_wipe_requested_HACK = true;

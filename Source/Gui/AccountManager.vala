@@ -34,8 +34,8 @@ namespace {
     }
 
 /***********************************************************
-   @brief The AccountManager class
-   @ingroup gui
+@brief The AccountManager class
+@ingroup gui
 ***********************************************************/
 class AccountManager : GLib.Object {
 
@@ -68,12 +68,14 @@ class AccountManager : GLib.Object {
 
     /***********************************************************
     Return a list of all accounts.
-    (this is a list of unowned for internal reasons, one should normally not keep a copy of them)
+    (this is a list of unowned for internal reasons, one should
+    normally not keep a copy of them)
     ***********************************************************/
     public GLib.List<AccountStatePtr> accounts ();
 
     /***********************************************************
-    Return the account state pointer for an account identified by its display name
+    Return the account state pointer for an account identified
+    by its display name
     ***********************************************************/
     public AccountStatePtr account (string name);
 

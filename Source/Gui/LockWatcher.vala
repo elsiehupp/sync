@@ -14,7 +14,6 @@ static const int check_frequency = 20 * 1000; // ms
 // #pragma once
 
 // #include <GLib.List>
-// #include <GLib.Object>
 // #include <string>
 // #include <QSet>
 // #include <QTimer>

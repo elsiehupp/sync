@@ -10,7 +10,6 @@ using namespace QKeychain;
 
 // #pragma once
 
-// #include <GLib.Object>
 // #include <qt5keychain/keychain.h>
 
 // We don't support insecure fallback

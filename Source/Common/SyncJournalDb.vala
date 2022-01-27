@@ -21,7 +21,6 @@ const int IS_PREFIX_PATH_OF (prefix, path)
 const int IS_PREFIX_PATH_OR_EQUAL (prefix, path)
 " (" path " == " prefix " OR " IS_PREFIX_PATH_OF (prefix, path) ")"
 
-// #include <GLib.Object>
 // #include <QDateTime>
 // #include <QHash>
 // #include <QMutex>

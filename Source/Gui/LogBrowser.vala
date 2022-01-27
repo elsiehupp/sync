@@ -23,7 +23,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QPlain_text_edit>
 // #include <QTextStream>
 // #include <QFile>
-// #include <GLib.Object>
 // #include <GLib.List>
 // #include <QDateTime>
 // #include <Gtk.Dialog>

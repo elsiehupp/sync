@@ -57,8 +57,8 @@ class AccountState : GLib.Object, public QSharedData {
         ServiceUnavailable,
 
         /***********************************************************
-        Similar to ServiceUnavailable, but we know the server is down
-        for maintenance
+        Similar to ServiceUnavailable, but we know the server is
+        down for maintenance
         ***********************************************************/
         MaintenanceMode,
 
@@ -70,7 +70,7 @@ class AccountState : GLib.Object, public QSharedData {
         NetworkError,
 
         /***********************************************************
-        Server configuration error. (For example : unsupported version)
+        Server configuration error. (For example: unsupported version)
         ***********************************************************/
         ConfigurationError,
 

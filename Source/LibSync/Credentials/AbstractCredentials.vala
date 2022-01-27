@@ -9,7 +9,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <string>
 // #include <QCoreApplication>
 
-// #include <GLib.Object>
 
 // #include <csync.h>
 

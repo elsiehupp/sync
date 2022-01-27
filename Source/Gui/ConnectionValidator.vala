@@ -14,7 +14,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 // #include <creds/abstractcredentials.h>
 
-// #include <GLib.Object>
 // #include <string[]>
 // #include <QVariantMap>
 // #include <QNetworkReply>
@@ -22,10 +21,12 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 namespace Occ {
 
 /***********************************************************
-This is a job-like class to check that the server is up and that we are connected.
-There are two entry points : on_check_server_and_auth and on_check_authentication
-on_check_authentication is the quick version that only does the propfind
-while on_check_server_and_auth is doing the 4 calls.
+This is a job-like class to check that the server is up and
+that we are connected. here are two entry points:
+on_check_server_and_auth and on_check_authentication.
+on_check_authentication is the quick version that only does
+the propfind while on_check_server_and_auth is doing the 4
+calls.
 
 We cannot use the capabilites call to test the l
 https://github.com/owncloud/core/issues/12930

@@ -26,11 +26,11 @@ Q_DECLARE_LOGGING_CATEGORY (lc_bulk_propagator_job)
 
 class BulkPropagatorJob : PropagatorJob {
 
-    /* This is a minified version of the SyncFileItem,
-    that holds only the specifics about the file that's
-    being uploaded.
+    /***********************************************************
+    This is a minified version of the SyncFileItem, that holds
+    only the specifics about the file that's being uploaded.
 
-    This is needed if we wanna apply changes on the file
+    This is needed if we want to apply changes on the file
     that's being uploaded while keeping the original on disk.
     ***********************************************************/
     struct UploadFileInfo {
@@ -58,7 +58,7 @@ class BulkPropagatorJob : PropagatorJob {
     public JobParallelism parallelism () override;
 
 
-    private on_ void start_upload_file (SyncFileItemPtr item, UploadFileInfo file_to_upload);
+    private void on_start_upload_file (SyncFileItemPtr item, UploadFileInfo file_to_upload);
 
     // Content checksum computed, compute the transmission checksum
     private void on_compute_transmission_checksum (SyncFileItemPtr item,
@@ -211,7 +211,7 @@ class BulkPropagatorJob : PropagatorJob {
                 file_to_upload._file = current_item._file;
                 file_to_upload._size = current_item._size;
                 file_to_upload._path = propagator ().full_local_path (file_to_upload._file);
-                start_upload_file (current_item, file_to_upload);
+                on_start_upload_file (current_item, file_to_upload);
             }); // We could be in a different thread (neon jobs)
         }
 
@@ -222,7 +222,7 @@ class BulkPropagatorJob : PropagatorJob {
         return PropagatorJob.JobParallelism.FullParallelism;
     }
 
-    void BulkPropagatorJob.start_upload_file (SyncFileItemPtr item, UploadFileInfo file_to_upload) {
+    void BulkPropagatorJob.on_start_upload_file (SyncFileItemPtr item, UploadFileInfo file_to_upload) {
         if (propagator ()._abort_requested) {
             return;
         }
