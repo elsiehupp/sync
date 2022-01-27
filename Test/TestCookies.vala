@@ -10,14 +10,13 @@ using namespace Occ;
 
 class TestCookies : GLib.Object {
 
-private slots:
-    void testCookies () {
+    private on_ void testCookies () {
         QTemporaryDir tmp;
         const string nonexistingPath = tmp.filePath ("someNonexistingDir/test.db");
         QNetworkCookie cookieA = QNetworkCookie ("foo", "bar");
         // tomorrow rounded
         cookieA.setExpirationDate (QDateTime.currentDateTimeUtc ().addDays (1).date ().startOfDay ());
-        const QList<QNetworkCookie> cookies = {cookieA, QNetworkCookie ("foo2", "bar")};
+        const GLib.List<QNetworkCookie> cookies = {cookieA, QNetworkCookie ("foo2", "bar")};
         CookieJar jar;
         jar.setAllCookies (cookies);
         QCOMPARE (cookies, jar.allCookies ());
@@ -28,7 +27,7 @@ private slots:
         CookieJar jar2;
         QVERIFY (jar2.restore (nonexistingPath));
         // here we should have  only cookieA as the second one was a session cookie
-        QCOMPARE (QList<QNetworkCookie>{cookieA}, jar2.allCookies ());
+        QCOMPARE (GLib.List<QNetworkCookie>{cookieA}, jar2.allCookies ());
 
     }
 

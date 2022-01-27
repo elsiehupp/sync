@@ -6,7 +6,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 // #include <QDir>
 // #include <QRegularExpression>
-// #include <QStringList>
+// #include <string[]>
 // #include <QtGlobal>
 // #include <QTextCodec>
 // #include <qmetaobject.h>
@@ -22,7 +22,7 @@ constexpr int CrashLogSize = 20;
 }
 
 // #include <GLib.Object>
-// #include <QList>
+// #include <GLib.List>
 // #include <QDateTime>
 // #include <QFile>
 // #include <QTextStream>
@@ -35,36 +35,36 @@ namespace Occ {
 @ingroup libsync
 ***********************************************************/
 class Logger : GLib.Object {
-public:
-    bool is_logging_to_file ();
 
-    void do_log (QtMsgType type, QMessageLogContext &ctx, string &message);
+    public bool is_logging_to_file ();
 
-    static Logger *instance ();
+    public void do_log (QtMsgType type, QMessageLogContext &ctx, string message);
 
-    void post_gui_log (string &title, string &message);
-    void post_optional_gui_log (string &title, string &message);
-    void post_gui_message (string &title, string &message);
+    public static Logger *instance ();
 
-    string log_file ();
-    void set_log_file (string &name);
+    public void post_gui_log (string title, string message);
+    public void post_optional_gui_log (string title, string message);
+    public void post_gui_message (string title, string message);
 
-    void set_log_expire (int expire);
+    public string log_file ();
+    public void set_log_file (string name);
 
-    string log_dir ();
-    void set_log_dir (string &dir);
+    public void set_log_expire (int expire);
 
-    void set_log_flush (bool flush);
+    public string log_dir ();
+    public void set_log_dir (string dir);
 
-    bool log_debug () {
+    public void set_log_flush (bool flush);
+
+    public bool log_debug () {
         return _log_debug;
     }
-    void set_log_debug (bool debug);
+    public void set_log_debug (bool debug);
 
     /***********************************************************
     Returns where the automatic logdir would be
     ***********************************************************/
-    string temporary_folder_log_dir_path ();
+    public string temporary_folder_log_dir_path ();
 
     /***********************************************************
     Sets up default dir log setup.
@@ -75,49 +75,49 @@ public:
 
     Used in conjunction with ConfigFile.automatic_log_dir
     ***********************************************************/
-    void setup_temporary_folder_log_dir ();
+    public void setup_temporary_folder_log_dir ();
 
     /***********************************************************
     For switching off via logwindow
     ***********************************************************/
-    void disable_temporary_folder_log_dir ();
+    public void disable_temporary_folder_log_dir ();
 
-    void add_log_rule (QSet<string> &rules) {
+    public void add_log_rule (QSet<string> &rules) {
         set_log_rules (_log_rules + rules);
     }
-    void remove_log_rule (QSet<string> &rules) {
+    public void remove_log_rule (QSet<string> &rules) {
         set_log_rules (_log_rules - rules);
     }
-    void set_log_rules (QSet<string> &rules);
+    public void set_log_rules (QSet<string> &rules);
 
 signals:
-    void log_window_log (string &);
+    void log_window_log (string );
 
-    void gui_log (string &, string &);
-    void gui_message (string &, string &);
-    void optional_gui_log (string &, string &);
+    void gui_log (string , string );
+    void gui_message (string , string );
+    void optional_gui_log (string , string );
 
-public slots:
-    void enter_next_log_file ();
 
-private:
-    Logger (GLib.Object *parent = nullptr);
+    public void on_enter_next_log_file ();
+
+
+    private Logger (GLib.Object *parent = nullptr);
     ~Logger () override;
 
-    void close ();
-    void dump_crash_log ();
+    private void close ();
+    private void dump_crash_log ();
 
-    QFile _log_file;
-    bool _do_file_flush = false;
-    int _log_expire = 0;
-    bool _log_debug = false;
-    QScopedPointer<QTextStream> _logstream;
-    mutable QMutex _mutex;
-    string _log_directory;
-    bool _temporary_folder_log_dir = false;
-    QSet<string> _log_rules;
-    QVector<string> _crash_log;
-    int _crash_log_index = 0;
+    private QFile _log_file;
+    private bool _do_file_flush = false;
+    private int _log_expire = 0;
+    private bool _log_debug = false;
+    private QScopedPointer<QTextStream> _logstream;
+    private mutable QMutex _mutex;
+    private string _log_directory;
+    private bool _temporary_folder_log_dir = false;
+    private QSet<string> _log_rules;
+    private QVector<string> _crash_log;
+    private int _crash_log_index = 0;
 };
 
 Logger *Logger.instance () {
@@ -131,7 +131,7 @@ Logger.Logger (GLib.Object *parent)
                                       "]%{if-debug}\t[ %{function} ]%{endif}:\t%{message}"));
     _crash_log.resize (CrashLogSize);
 #ifndef NO_MSG_HANDLER
-    q_install_message_handler ([] (QtMsgType type, QMessageLogContext &ctx, string &message) {
+    q_install_message_handler ([] (QtMsgType type, QMessageLogContext &ctx, string message) {
             Logger.instance ().do_log (type, ctx, message);
         });
 #endif
@@ -143,15 +143,15 @@ Logger.~Logger () {
 #endif
 }
 
-void Logger.post_gui_log (string &title, string &message) {
+void Logger.post_gui_log (string title, string message) {
     emit gui_log (title, message);
 }
 
-void Logger.post_optional_gui_log (string &title, string &message) {
+void Logger.post_optional_gui_log (string title, string message) {
     emit optional_gui_log (title, message);
 }
 
-void Logger.post_gui_message (string &title, string &message) {
+void Logger.post_gui_message (string title, string message) {
     emit gui_message (title, message);
 }
 
@@ -160,7 +160,7 @@ bool Logger.is_logging_to_file () {
     return _logstream;
 }
 
-void Logger.do_log (QtMsgType type, QMessageLogContext &ctx, string &message) {
+void Logger.do_log (QtMsgType type, QMessageLogContext &ctx, string message) {
     const string msg = q_format_log_message (type, ctx, message);
     {
         QMutexLocker lock (&_mutex);
@@ -183,7 +183,7 @@ void Logger.close () {
     if (_logstream) {
         _logstream.flush ();
         _log_file.close ();
-        _logstream.reset ();
+        _logstream.on_reset ();
     }
 }
 
@@ -191,10 +191,10 @@ string Logger.log_file () {
     return _log_file.file_name ();
 }
 
-void Logger.set_log_file (string &name) {
+void Logger.set_log_file (string name) {
     QMutexLocker locker (&_mutex);
     if (_logstream) {
-        _logstream.reset (nullptr);
+        _logstream.on_reset (nullptr);
         _log_file.close ();
     }
 
@@ -219,7 +219,7 @@ void Logger.set_log_file (string &name) {
         return;
     }
 
-    _logstream.reset (new QTextStream (&_log_file));
+    _logstream.on_reset (new QTextStream (&_log_file));
     _logstream.set_codec (QTextCodec.codec_for_name ("UTF-8"));
 }
 
@@ -231,7 +231,7 @@ string Logger.log_dir () {
     return _log_directory;
 }
 
-void Logger.set_log_dir (string &dir) {
+void Logger.set_log_dir (string dir) {
     _log_directory = dir;
 }
 
@@ -267,7 +267,7 @@ void Logger.disable_temporary_folder_log_dir () {
     if (!_temporary_folder_log_dir)
         return;
 
-    enter_next_log_file ();
+    on_enter_next_log_file ();
     set_log_dir (string ());
     set_log_debug (false);
     set_log_file (string ());
@@ -295,7 +295,7 @@ void Logger.dump_crash_log () {
     }
 }
 
-static bool compress_log (string &original_name, string &target_name) {
+static bool compress_log (string original_name, string target_name) {
 #ifdef ZLIB_FOUND
     QFile original (original_name);
     if (!original.open (QIODevice.ReadOnly))
@@ -320,7 +320,7 @@ static bool compress_log (string &original_name, string &target_name) {
 #endif
 }
 
-void Logger.enter_next_log_file () {
+void Logger.on_enter_next_log_file () {
     if (!_log_directory.is_empty ()) {
 
         QDir dir (_log_directory);
@@ -333,11 +333,11 @@ void Logger.enter_next_log_file () {
         string new_log_name = now.to_string ("yyyy_mMdd_HHmm") + "_owncloud.log";
 
         // Expire old log files and deal with conflicts
-        QStringList files = dir.entry_list (QStringList ("*owncloud.log.*"),
+        string[] files = dir.entry_list (string[] ("*owncloud.log.*"),
             QDir.Files, QDir.Name);
         const QRegularExpression rx (QRegularExpression.anchored_pattern (R" (.*owncloud\.log\. (\d+).*)"));
         int max_number = -1;
-        foreach (string &s, files) {
+        foreach (string s, files) {
             if (_log_expire > 0) {
                 QFileInfo file_info (dir.absolute_file_path (s));
                 if (file_info.last_modified ().add_secs (60 * 60 * _log_expire) < now) {

@@ -95,7 +95,7 @@ Example of acceptable uses:
 ***********************************************************/
 class KMessageWidget : QFrame {
 
-    Q_PROPERTY (string text READ text WRITE set_text)
+    Q_PROPERTY (string text READ text WRITE on_set_text)
     Q_PROPERTY (bool word_wrap READ word_wrap WRITE set_word_wrap)
     Q_PROPERTY (bool close_button_visible READ is_close_button_visible WRITE set_close_button_visible)
     Q_PROPERTY (Message_type message_type READ message_type WRITE set_message_type)
@@ -121,16 +121,16 @@ class KMessageWidget : QFrame {
     Constructs a KMessageWidget with the specified @p parent and
     contents @p text.
     ***********************************************************/
-    public KMessageWidget (string &text, Gtk.Widget *parent = nullptr);
+    public KMessageWidget (string text, Gtk.Widget *parent = nullptr);
 
     /***********************************************************
     Destructor.
     ***********************************************************/
-    public ~KMessageWidget () override;
+    ~KMessageWidget () override;
 
     /***********************************************************
     Get the text of this message widget.
-    @see set_text ()
+    @see on_set_text ()
     ***********************************************************/
     public string text ();
 
@@ -181,18 +181,18 @@ class KMessageWidget : QFrame {
     /***********************************************************
     Returns the preferred size of the message widget.
     ***********************************************************/
-    public QSize size_hint () const override;
+    public QSize size_hint () override;
 
     /***********************************************************
     Returns the minimum size of the message widget.
     ***********************************************************/
-    public QSize minimum_size_hint () const override;
+    public QSize minimum_size_hint () override;
 
     /***********************************************************
     Returns the required height for @p width.
     @param width the width in pixels
     ***********************************************************/
-    public int height_for_width (int width) const override;
+    public int height_for_width (int width) override;
 
     /***********************************************************
     The icon shown on the left of the text. By default, no icon is shown.
@@ -220,7 +220,6 @@ class KMessageWidget : QFrame {
     ***********************************************************/
     public bool is_show_animation_running ();
 
-public slots:
     /***********************************************************
     Set the text of the message widget to @p text.
     If the message widget is already visible, the text changes on the fly.
@@ -228,7 +227,7 @@ public slots:
     @param text the text to display, rich text is allowed
     @see text ()
     ***********************************************************/
-    void set_text (string &text);
+    public void on_set_text (string text);
 
     /***********************************************************
     Set word wrap to @p word_wrap. If word wrap is enabled, the text ()
@@ -239,7 +238,7 @@ public slots:
     @param word_wrap disable/enable word wrap
     @see word_wrap ()
     ***********************************************************/
-    void set_word_wrap (bool word_wrap);
+    public on_ void set_word_wrap (bool word_wrap);
 
     /***********************************************************
     Set the visibility of the close button. If @p visible is @e true,
@@ -247,7 +246,7 @@ public slots:
 
     @see close_button_visible (), animated_hide ()
     ***********************************************************/
-    void set_close_button_visible (bool visible);
+    public on_ void set_close_button_visible (bool visible);
 
     /***********************************************************
     Set the message type to @p type.
@@ -257,23 +256,23 @@ public slots:
 
     @see message_type (), KMessageWidget.Message_type
     ***********************************************************/
-    void set_message_type (KMessageWidget.Message_type type);
+    public on_ void set_message_type (KMessageWidget.Message_type type);
 
     /***********************************************************
     Show the widget using an animation.
     ***********************************************************/
-    void animated_show ();
+    public on_ void animated_show ();
 
     /***********************************************************
     Hide the widget using an animation.
     ***********************************************************/
-    void animated_hide ();
+    public on_ void animated_hide ();
 
     /***********************************************************
     Define an icon to be shown on the left of the text
     @since 4.11
     ***********************************************************/
-    void set_icon (QIcon &icon);
+    public on_ void set_icon (QIcon &icon);
 
 signals:
     /***********************************************************
@@ -283,7 +282,7 @@ signals:
     @see QLabel.link_activated ()
     @since 4.10
     ***********************************************************/
-    void link_activated (string &contents);
+    void link_activated (string contents);
 
     /***********************************************************
     This signal is emitted when the user hovers over a link in the text label.
@@ -292,10 +291,10 @@ signals:
     @see QLabel.link_hovered ()
     @since 4.11
     ***********************************************************/
-    void link_hovered (string &contents);
+    void link_hovered (string contents);
 
     /***********************************************************
-    This signal is emitted when the hide animation is finished, started by
+    This signal is emitted when the hide animation is on_finished, started by
     calling animated_hide (). If animations are disabled, this signal is
     emitted immediately after the message widget got hidden.
 
@@ -309,7 +308,7 @@ signals:
     void hide_animation_finished ();
 
     /***********************************************************
-    This signal is emitted when the show animation is finished, started by
+    This signal is emitted when the show animation is on_finished, started by
     calling animated_show (). If animations are disabled, this signal is
     emitted immediately after the message widget got shown.
 
@@ -322,19 +321,18 @@ signals:
     ***********************************************************/
     void show_animation_finished ();
 
-protected:
-    void paint_event (QPaint_event *event) override;
+    protected void paint_event (QPaint_event *event) override;
 
-    bool event (QEvent *event) override;
+    protected bool event (QEvent *event) override;
 
-    void resize_event (QResizeEvent *event) override;
+    protected void resize_event (QResizeEvent *event) override;
 
-private:
-    KMessageWidgetPrivate *const d;
-    friend class KMessageWidgetPrivate;
 
-    Q_PRIVATE_SLOT (d, void slot_time_line_changed (qreal))
-    Q_PRIVATE_SLOT (d, void slot_time_line_finished ())
+    private KMessageWidgetPrivate *const d;
+    private friend class KMessageWidgetPrivate;
+
+    private Q_PRIVATE_SLOT (d, void on_time_line_changed (qreal))
+    private Q_PRIVATE_SLOT (d, void on_time_line_finished ())
 };
 
 
@@ -371,7 +369,7 @@ Copyright (c) 2014 Dominik Haumann <dhaumann@kde.org>
 // KMessageWidgetPrivate
 //---------------------------------------------------------------------
 class KMessageWidgetPrivate {
-    public void init (KMessageWidget *);
+    public void on_init (KMessageWidget *);
 
     public KMessageWidget *q;
     public QFrame *content = nullptr;
@@ -384,28 +382,28 @@ class KMessageWidgetPrivate {
 
     public KMessageWidget.Message_type message_type;
     public bool word_wrap;
-    public QList<QToolButton> buttons;
+    public GLib.List<QToolButton> buttons;
     public QPixmap content_snap_shot;
 
     public void create_layout ();
     public void apply_style_sheet ();
     public void update_snap_shot ();
     public void update_layout ();
-    public void slot_time_line_changed (qreal);
-    public void slot_time_line_finished ();
+    public void on_time_line_changed (qreal);
+    public void on_time_line_finished ();
 
     public int best_content_height ();
 };
 
-    void KMessageWidgetPrivate.init (KMessageWidget *q_ptr) {
+    void KMessageWidgetPrivate.on_init (KMessageWidget *q_ptr) {
         q = q_ptr;
 
         q.set_size_policy (QSize_policy.Minimum, QSize_policy.Fixed);
 
         // Note : when changing the value 500, also update KMessage_widget_test
         time_line = new QTime_line (500, q);
-        GLib.Object.connect (time_line, SIGNAL (value_changed (qreal)), q, SLOT (slot_time_line_changed (qreal)));
-        GLib.Object.connect (time_line, SIGNAL (finished ()), q, SLOT (slot_time_line_finished ()));
+        GLib.Object.connect (time_line, SIGNAL (value_changed (qreal)), q, SLOT (on_time_line_changed (qreal)));
+        GLib.Object.connect (time_line, SIGNAL (on_finished ()), q, SLOT (on_time_line_finished ()));
 
         content = new QFrame (q);
         content.set_object_name (QStringLiteral ("content_widget"));
@@ -424,7 +422,7 @@ class KMessageWidgetPrivate {
         GLib.Object.connect (text_label, &QLabel.link_hovered, q, &KMessageWidget.link_hovered);
 
         auto *close_action = new QAction (q);
-        close_action.set_text (KMessageWidget.tr ("&Close"));
+        close_action.on_set_text (KMessageWidget.tr ("&Close"));
         close_action.set_tool_tip (KMessageWidget.tr ("Close message"));
         close_action.set_icon (QIcon (":/client/theme/close.svg")); // ivan : NC customization
 
@@ -567,22 +565,22 @@ class KMessageWidgetPrivate {
         content.render (&content_snap_shot, QPoint (), QRegion (), Gtk.Widget.Draw_children);
     }
 
-    void KMessageWidgetPrivate.slot_time_line_changed (qreal value) {
+    void KMessageWidgetPrivate.on_time_line_changed (qreal value) {
         q.set_fixed_height (q_min (q_round (value * 2.0), 1) * content.height ());
         q.update ();
     }
 
-    void KMessageWidgetPrivate.slot_time_line_finished () {
+    void KMessageWidgetPrivate.on_time_line_finished () {
         if (time_line.direction () == QTime_line.Forward) {
             // Show
             // We set the whole geometry here, because it may be wrong if a
             // KMessageWidget is shown right when the toplevel window is created.
             content.set_geometry (0, 0, q.width (), best_content_height ());
 
-            // notify about finished animation
+            // notify about on_finished animation
             emit q.show_animation_finished ();
         } else {
-            // hide and notify about finished animation
+            // hide and notify about on_finished animation
             q.hide ();
             emit q.hide_animation_finished ();
         }
@@ -602,14 +600,14 @@ class KMessageWidgetPrivate {
     KMessageWidget.KMessageWidget (Gtk.Widget *parent)
         : QFrame (parent)
         , d (new KMessageWidgetPrivate) {
-        d.init (this);
+        d.on_init (this);
     }
 
-    KMessageWidget.KMessageWidget (string &text, Gtk.Widget *parent)
+    KMessageWidget.KMessageWidget (string text, Gtk.Widget *parent)
         : QFrame (parent)
         , d (new KMessageWidgetPrivate) {
-        d.init (this);
-        set_text (text);
+        d.on_init (this);
+        on_set_text (text);
     }
 
     KMessageWidget.~KMessageWidget () {
@@ -620,8 +618,8 @@ class KMessageWidgetPrivate {
         return d.text_label.text ();
     }
 
-    void KMessageWidget.set_text (string &text) {
-        d.text_label.set_text (text);
+    void KMessageWidget.on_set_text (string text) {
+        d.text_label.on_set_text (text);
         update_geometry ();
     }
 
@@ -748,7 +746,7 @@ class KMessageWidgetPrivate {
 
         d.time_line.set_direction (QTime_line.Forward);
         if (d.time_line.state () == QTime_line.Not_running) {
-            d.time_line.start ();
+            d.time_line.on_start ();
         }
     }
 
@@ -779,7 +777,7 @@ class KMessageWidgetPrivate {
 
         d.time_line.set_direction (QTime_line.Backward);
         if (d.time_line.state () == QTime_line.Not_running) {
-            d.time_line.start ();
+            d.time_line.on_start ();
         }
     }
 

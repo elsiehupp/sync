@@ -11,10 +11,10 @@
 using namespace Occ;
 
 class FakeAsyncReply : FakeReply {
-    QByteArray _pollLocation;
+    GLib.ByteArray _pollLocation;
 
-public:
-    FakeAsyncReply (QByteArray &pollLocation, QNetworkAccessManager.Operation op, QNetworkRequest &request, GLib.Object *parent)
+
+    public FakeAsyncReply (GLib.ByteArray &pollLocation, QNetworkAccessManager.Operation op, QNetworkRequest &request, GLib.Object *parent)
         : FakeReply { parent }
         , _pollLocation (pollLocation) {
         setRequest (request);
@@ -25,22 +25,21 @@ public:
         QMetaObject.invokeMethod (this, "respond", Qt.QueuedConnection);
     }
 
-    Q_INVOKABLE void respond () {
+    //  Q_INVOKABLE
+    public void respond () {
         setAttribute (QNetworkRequest.HttpStatusCodeAttribute, 202);
         setRawHeader ("OC-JobStatus-Location", _pollLocation);
         emit metaDataChanged ();
-        emit finished ();
+        emit on_finished ();
     }
 
-    void abort () override {}
-    int64 readData (char *, int64) override { return 0; }
+    public void on_abort () override {}
+    public int64 readData (char *, int64) override { return 0; }
 };
 
 class TestAsyncOp : GLib.Object {
 
-private slots:
-
-    void asyncUploadOperations () {
+    private on_ void asyncUploadOperations () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } } });
         // Reduce max chunk size a bit so we get more chunks
@@ -98,22 +97,22 @@ private slots:
             return nullptr;
         });
 
-        // Callback to be used to finalize the transaction and return the success
+        // Callback to be used to on_finalize the transaction and return the on_success
         auto successCallback = [] (TestCase *tc, QNetworkRequest &request) {
-            tc.pollRequest = [] (TestCase *, QNetworkRequest &) . QNetworkReply * { std.abort (); }; // shall no longer be called
+            tc.pollRequest = [] (TestCase *, QNetworkRequest &) . QNetworkReply * { std.on_abort (); }; // shall no longer be called
             FileInfo *info = tc.perform ();
-            QByteArray body = R" ({ "status":"finished", "ETag":"\")" + info.etag + R" (\"", "fileId":")" + info.fileId + "\"}\n";
+            GLib.ByteArray body = R" ({ "status":"on_finished", "ETag":"\")" + info.etag + R" (\"", "fileId":")" + info.fileId + "\"}\n";
             return new FakePayloadReply (QNetworkAccessManager.GetOperation, request, body, nullptr);
         };
         // Callback that never finishes
         auto waitForeverCallback = [] (TestCase *, QNetworkRequest &request) {
-            QByteArray body = "{\"status\":\"started\"}\n";
+            GLib.ByteArray body = "{\"status\":\"started\"}\n";
             return new FakePayloadReply (QNetworkAccessManager.GetOperation, request, body, nullptr);
         };
         // Callback that simulate an error.
         auto errorCallback = [] (TestCase *tc, QNetworkRequest &request) {
-            tc.pollRequest = [] (TestCase *, QNetworkRequest &) . QNetworkReply * { std.abort (); }; // shall no longer be called;
-            QByteArray body = "{\"status\":\"error\",\"errorCode\":500,\"errorMessage\":\"TestingErrors\"}\n";
+            tc.pollRequest = [] (TestCase *, QNetworkRequest &) . QNetworkReply * { std.on_abort (); }; // shall no longer be called;
+            GLib.ByteArray body = "{\"status\":\"error\",\"errorCode\":500,\"errorMessage\":\"TestingErrors\"}\n";
             return new FakePayloadReply (QNetworkAccessManager.GetOperation, request, body, nullptr);
         };
         // This lambda takes another functor as a parameter, and returns a callback that will
@@ -122,22 +121,22 @@ private slots:
         auto waitAndChain = [] (TestCase.PollRequest_t &chain) {
             return [chain] (TestCase *tc, QNetworkRequest &request) {
                 tc.pollRequest = chain;
-                QByteArray body = "{\"status\":\"started\"}\n";
+                GLib.ByteArray body = "{\"status\":\"started\"}\n";
                 return new FakePayloadReply (QNetworkAccessManager.GetOperation, request, body, nullptr);
             };
         };
 
         // Create a testcase by creating a file of a given size locally and assigning it a callback
-        auto insertFile = [&] (string &file, int64 size, TestCase.PollRequest_t cb) {
+        auto insertFile = [&] (string file, int64 size, TestCase.PollRequest_t cb) {
             fakeFolder.localModifier ().insert (file, size);
             testCases[file] = { std.move (cb) };
         };
-        fakeFolder.localModifier ().mkdir ("success");
-        insertFile ("success/chunked_success", options._maxChunkSize * 3, successCallback);
-        insertFile ("success/single_success", 300, successCallback);
-        insertFile ("success/chunked_patience", options._maxChunkSize * 3,
+        fakeFolder.localModifier ().mkdir ("on_success");
+        insertFile ("on_success/chunked_success", options._maxChunkSize * 3, successCallback);
+        insertFile ("on_success/single_success", 300, successCallback);
+        insertFile ("on_success/chunked_patience", options._maxChunkSize * 3,
             waitAndChain (waitAndChain (successCallback)));
-        insertFile ("success/single_patience", 300,
+        insertFile ("on_success/single_patience", 300,
             waitAndChain (waitAndChain (successCallback)));
         fakeFolder.localModifier ().mkdir ("err");
         insertFile ("err/chunked_error", options._maxChunkSize * 3, errorCallback);
@@ -146,11 +145,11 @@ private slots:
         insertFile ("err/single_error2", 300, waitAndChain (errorCallback));
 
         // First sync should finish by itself.
-        // All the things in "success/" should be transfered, the things in "err/" not
+        // All the things in "on_success/" should be transfered, the things in "err/" not
         QVERIFY (!fakeFolder.syncOnce ());
         QCOMPARE (nGET, 0);
-        QCOMPARE (*fakeFolder.currentLocalState ().find ("success"),
-            *fakeFolder.currentRemoteState ().find ("success"));
+        QCOMPARE (*fakeFolder.currentLocalState ().find ("on_success"),
+            *fakeFolder.currentRemoteState ().find ("on_success"));
         testCases.clear ();
         testCases["err/chunked_error"] = { successCallback };
         testCases["err/chunked_error2"] = { successCallback };
@@ -162,7 +161,7 @@ private slots:
         insertFile ("waiting/willNotConflict", 300, waitForeverCallback);
         insertFile ("waiting/big", options._maxChunkSize * 3,
             waitAndChain (waitAndChain ([&] (TestCase *tc, QNetworkRequest &request) {
-                QTimer.singleShot (0, &fakeFolder.syncEngine (), &SyncEngine.abort);
+                QTimer.singleShot (0, &fakeFolder.syncEngine (), &SyncEngine.on_abort);
                 return waitAndChain (waitForeverCallback) (tc, request);
             })));
 

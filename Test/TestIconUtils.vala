@@ -8,17 +8,16 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
 class TestIconUtils : GLib.Object {
 
-public:
-    TestIconUtils () {
+    public TestIconUtils () {
         Q_INIT_RESOURCE (resources);
         Q_INIT_RESOURCE (theme);
     }
 
-private slots:
-    void testDrawSvgWithCustomFillColor () {
+
+    private on_ void testDrawSvgWithCustomFillColor () {
         const string blackSvgDirPath{string{Occ.Theme.themePrefix} + QStringLiteral ("black")};
         const QDir blackSvgDir (blackSvgDirPath);
-        const QStringList blackImages = blackSvgDir.entryList (QStringList ("*.svg"));
+        const string[] blackImages = blackSvgDir.entryList (string[] ("*.svg"));
 
         Q_ASSERT (!blackImages.isEmpty ());
 
@@ -28,16 +27,16 @@ private slots:
 
         const string whiteSvgDirPath{string{Occ.Theme.themePrefix} + QStringLiteral ("white")};
         const QDir whiteSvgDir (whiteSvgDirPath);
-        const QStringList whiteImages = whiteSvgDir.entryList (QStringList ("*.svg"));
+        const string[] whiteImages = whiteSvgDir.entryList (string[] ("*.svg"));
 
         Q_ASSERT (!whiteImages.isEmpty ());
 
         QVERIFY (!Occ.Ui.IconUtils.drawSvgWithCustomFillColor (whiteSvgDirPath + QStringLiteral ("/") + whiteImages.at (0), QColorConstants.Svg.blue).isNull ());
     }
 
-    void testCreateSvgPixmapWithCustomColor () {
+    private on_ void testCreateSvgPixmapWithCustomColor () {
         const QDir blackSvgDir (string (string{Occ.Theme.themePrefix}) + QStringLiteral ("black"));
-        const QStringList blackImages = blackSvgDir.entryList (QStringList ("*.svg"));
+        const string[] blackImages = blackSvgDir.entryList (string[] ("*.svg"));
 
         QVERIFY (!blackImages.isEmpty ());
 
@@ -46,19 +45,19 @@ private slots:
         QVERIFY (!Occ.Ui.IconUtils.createSvgImageWithCustomColor (blackImages.at (0), QColorConstants.Svg.green).isNull ());
 
         const QDir whiteSvgDir (string (string{Occ.Theme.themePrefix}) + QStringLiteral ("white"));
-        const QStringList whiteImages = whiteSvgDir.entryList (QStringList ("*.svg"));
+        const string[] whiteImages = whiteSvgDir.entryList (string[] ("*.svg"));
 
         QVERIFY (!whiteImages.isEmpty ());
 
         QVERIFY (!Occ.Ui.IconUtils.createSvgImageWithCustomColor (whiteImages.at (0), QColorConstants.Svg.blue).isNull ());
     }
 
-    void testPixmapForBackground () {
+    private on_ void testPixmapForBackground () {
         const QDir blackSvgDir (string (string{Occ.Theme.themePrefix}) + QStringLiteral ("black"));
-        const QStringList blackImages = blackSvgDir.entryList (QStringList ("*.svg"));
+        const string[] blackImages = blackSvgDir.entryList (string[] ("*.svg"));
 
         const QDir whiteSvgDir (string (string{Occ.Theme.themePrefix}) + QStringLiteral ("white"));
-        const QStringList whiteImages = whiteSvgDir.entryList (QStringList ("*.svg"));
+        const string[] whiteImages = whiteSvgDir.entryList (string[] ("*.svg"));
 
         QVERIFY (!blackImages.isEmpty ());
 

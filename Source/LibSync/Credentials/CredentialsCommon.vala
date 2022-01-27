@@ -5,7 +5,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QList>
+// #include <GLib.List>
 // #include <string>
 // #include <QSslCertificate>
 // #include <QSslConfiguration>

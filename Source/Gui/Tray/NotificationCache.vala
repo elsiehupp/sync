@@ -11,16 +11,16 @@ class Notification_cache {
         string message;
     };
 
-    public bool contains (Notification &notification) const;
+    public bool contains (Notification &notification);
 
     public void insert (Notification &notification);
 
     public void clear ();
 
-private:
-    uint calculate_key (Notification &notification) const;
 
-    QSet<uint> _notifications;
+    private uint calculate_key (Notification &notification);
+
+    private QSet<uint> _notifications;
 };
 
 

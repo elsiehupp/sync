@@ -24,7 +24,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QTextStream>
 // #include <QFile>
 // #include <GLib.Object>
-// #include <QList>
+// #include <GLib.List>
 // #include <QDateTime>
 // #include <Gtk.Dialog>
 // #include <QLineEdit>
@@ -40,10 +40,10 @@ namespace Occ {
 class Log_browser : Gtk.Dialog {
 
     public Log_browser (Gtk.Widget *parent = nullptr);
-    public ~Log_browser () override;
+    ~Log_browser () override;
 
-protected:
-    void close_event (QCloseEvent *) override;
+
+    protected void close_event (QCloseEvent *) override;
 
 protected slots:
     void toggle_permanent_logging (bool enabled);
@@ -62,7 +62,7 @@ protected slots:
         auto label = new QLabel (
             tr ("The client can write debug logs to a temporary folder. "
                "These logs are very helpful for diagnosing problems.\n"
-               "Since log files can get large, the client will start a new one for each sync "
+               "Since log files can get large, the client will on_start a new one for each sync "
                "run and compress older ones. It will also delete log files after a couple "
                "of hours to avoid consuming too much disk space.\n"
                "If enabled, logs will be written to %1")
@@ -74,7 +74,7 @@ protected slots:
 
         // button to permanently save logs
         auto enable_logging_button = new QCheckBox;
-        enable_logging_button.set_text (tr ("Enable logging to temporary folder"));
+        enable_logging_button.on_set_text (tr ("Enable logging to temporary folder"));
         enable_logging_button.set_checked (ConfigFile ().automatic_log_dir ());
         connect (enable_logging_button, &QCheckBox.toggled, this, &Log_browser.toggle_permanent_logging);
         main_layout.add_widget (enable_logging_button);
@@ -87,7 +87,7 @@ protected slots:
         main_layout.add_widget (label);
 
         auto open_folder_button = new QPushButton;
-        open_folder_button.set_text (tr ("Open folder"));
+        open_folder_button.on_set_text (tr ("Open folder"));
         connect (open_folder_button, &QPushButton.clicked, this, [] () {
             string path = Logger.instance ().temporary_folder_log_dir_path ();
             QDir ().mkpath (path);
@@ -129,7 +129,7 @@ protected slots:
         if (enabled) {
             if (!logger.is_logging_to_file ()) {
                 logger.setup_temporary_folder_log_dir ();
-                logger.enter_next_log_file ();
+                logger.on_enter_next_log_file ();
             }
         } else {
             logger.disable_temporary_folder_log_dir ();

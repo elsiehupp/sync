@@ -10,20 +10,19 @@ using namespace Occ;
 
 class TestSyncFileItem : GLib.Object {
 
-private slots:
-    void initTestCase () {
+    private void on_init_test_case () {
     }
 
-    void cleanupTestCase () {
+    private void on_cleanup_test_case () {
     }
 
-    SyncFileItem createItem ( const string& file ) {
+    private on_ SyncFileItem createItem ( const string& file ) {
         SyncFileItem i;
         i._file = file;
         return i;
     }
 
-    void testComparator_data () {
+    private on_ void testComparator_data () {
         QTest.addColumn<SyncFileItem> ("a");
         QTest.addColumn<SyncFileItem> ("b");
         QTest.addColumn<SyncFileItem> ("c");
@@ -42,7 +41,7 @@ private slots:
         QTest.newRow ("move3") << createItem ("abc") << movedItem1 << createItem ("ijk");
     }
 
-    void testComparator () {
+    private on_ void testComparator () {
         QFETCH ( SyncFileItem , a );
         QFETCH ( SyncFileItem , b );
         QFETCH ( SyncFileItem , c );
@@ -62,4 +61,3 @@ private slots:
 };
 
 QTEST_APPLESS_MAIN (TestSyncFileItem)
-#include "testsyncfileitem.moc"

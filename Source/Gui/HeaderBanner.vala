@@ -108,17 +108,17 @@ class HeaderBanner : Gtk.Widget {
 
     public HeaderBanner (Gtk.Widget *parent = nullptr);
 
-    public void setup (string &title, QPixmap &logo, QPixmap &banner,
-               const Qt.Text_format title_format, string &style_sheet);
+    public void setup (string title, QPixmap &logo, QPixmap &banner,
+               const Qt.Text_format title_format, string style_sheet);
 
-protected:
-    void paint_event (QPaint_event *event) override;
 
-private:
-    QLabel *title_label;
-    QLabel *logo_label;
-    QGrid_layout *layout;
-    QPixmap banner_pixmap;
+    protected void paint_event (QPaint_event *event) override;
+
+
+    private QLabel *title_label;
+    private QLabel *logo_label;
+    private QGrid_layout *layout;
+    private QPixmap banner_pixmap;
 };
 
 
@@ -149,8 +149,8 @@ private:
         layout.add_widget (logo_label, 1, 5, 5, 1);
     }
 
-    void HeaderBanner.setup (string &title, QPixmap &logo, QPixmap &banner,
-                             const Qt.Text_format title_format, string &style_sheet) {
+    void HeaderBanner.setup (string title, QPixmap &logo, QPixmap &banner,
+                             const Qt.Text_format title_format, string style_sheet) {
         QStyle *style = parent_widget ().style ();
         //const int layout_horizontal_spacing = style.pixel_metric (QStyle.PM_Layout_horizontal_spacing);
         int top_level_margin_left = style.pixel_metric (QStyle.PM_Layout_left_margin, nullptr, parent_widget ());
@@ -166,7 +166,7 @@ private:
         layout.set_column_minimum_width (0, min_column_width0);
         layout.set_column_minimum_width (1, min_column_width1);
         title_label.set_text_format (title_format);
-        title_label.set_text (title);
+        title_label.on_set_text (title);
         if (!style_sheet.is_empty ())
             title_label.set_style_sheet (style_sheet);
         logo_label.set_pixmap (logo);

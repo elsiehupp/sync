@@ -34,22 +34,22 @@ QUrl PropagateUploadFileNG.chunk_url (int chunk) {
            /                  PROPFIND
        start_new_upload () <-+        +----------------------------
           |               |        |
-         MKCOL            + slot_propfind_finished_with_error ()     slot_propfind_finished ()
+         MKCOL            + on_propfind_finished_with_error ()     on_propfind_finished ()
           |                                                       Is there stale files to remove?
-      slot_mk_col_finished ()                                         |                      |
+      on_mk_col_finished ()                                         |                      |
           |                                                       no                    yes
           |                                                       |                      |
           |                                                       |                  DeleteJob
           |                                                       |                      |
-    +-----+<------------------------------------------------------+<---  slot_delete_job_finished ()
+    +-----+<------------------------------------------------------+<---  on_delete_job_finished ()
     |
-    +---.  start_next_chunk ()  ---finished?  --+
+    +---.  start_next_chunk ()  ---on_finished?  --+
                   ^               |          |
                   +---------------+          |
                                              |
     +----------------------------------------+
     |
-    +. MOVE -----. move_job_finished () --. finalize ()
+    +. MOVE -----. move_job_finished () --. on_finalize ()
 
 ***********************************************************/
 
@@ -67,28 +67,28 @@ void PropagateUploadFileNG.do_start_upload () {
         auto url = chunk_url ();
         auto job = new LsColJob (propagator ().account (), url, this);
         _jobs.append (job);
-        job.set_properties (QList<QByteArray> () << "resourcetype"
+        job.set_properties (GLib.List<GLib.ByteArray> () << "resourcetype"
                                                << "getcontentlength");
-        connect (job, &LsColJob.finished_without_error, this, &PropagateUploadFileNG.slot_propfind_finished);
+        connect (job, &LsColJob.finished_without_error, this, &PropagateUploadFileNG.on_propfind_finished);
         connect (job, &LsColJob.finished_with_error,
-            this, &PropagateUploadFileNG.slot_propfind_finished_with_error);
-        connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.slot_job_destroyed);
+            this, &PropagateUploadFileNG.on_propfind_finished_with_error);
+        connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.on_job_destroyed);
         connect (job, &LsColJob.directory_listing_iterated,
-            this, &PropagateUploadFileNG.slot_propfind_iterate);
-        job.start ();
+            this, &PropagateUploadFileNG.on_propfind_iterate);
+        job.on_start ();
         return;
     } else if (progress_info._valid && progress_info.is_chunked ()) {
         // The upload info is stale. remove the stale chunks on the server
         _transfer_id = progress_info._transferid;
         // Fire and forget. Any error will be ignored.
-        (new DeleteJob (propagator ().account (), chunk_url (), this)).start ();
+        (new DeleteJob (propagator ().account (), chunk_url (), this)).on_start ();
         // start_new_upload will reset the _transfer_id and the UploadInfo in the db.
     }
 
     start_new_upload ();
 }
 
-void PropagateUploadFileNG.slot_propfind_iterate (string &name, QMap<string, string> &properties) {
+void PropagateUploadFileNG.on_propfind_iterate (string name, QMap<string, string> &properties) {
     if (name == chunk_url ().path ()) {
         return; // skip the info about the path itself
     }
@@ -104,9 +104,9 @@ void PropagateUploadFileNG.slot_propfind_iterate (string &name, QMap<string, str
     }
 }
 
-void PropagateUploadFileNG.slot_propfind_finished () {
+void PropagateUploadFileNG.on_propfind_finished () {
     auto job = qobject_cast<LsColJob> (sender ());
-    slot_job_destroyed (job); // remove it from the _jobs list
+    on_job_destroyed (job); // remove it from the _jobs list
     propagator ()._active_job_list.remove_one (this);
 
     _current_chunk = 0;
@@ -126,7 +126,7 @@ void PropagateUploadFileNG.slot_propfind_finished () {
 
         // Wipe the old chunking data.
         // Fire and forget. Any error will be ignored.
-        (new DeleteJob (propagator ().account (), chunk_url (), this)).start ();
+        (new DeleteJob (propagator ().account (), chunk_url (), this)).on_start ();
 
         propagator ()._active_job_list.append (this);
         start_new_upload ();
@@ -142,12 +142,12 @@ void PropagateUploadFileNG.slot_propfind_finished () {
 
         // Make sure that if there is a "hole" and then a few more chunks, on the server
         // we should remove the later chunks. Otherwise when we do dynamic chunk sizing, we may end up
-        // with corruptions if there are too many chunks, or if we abort and there are still stale chunks.
+        // with corruptions if there are too many chunks, or if we on_abort and there are still stale chunks.
         for (auto &server_chunk : q_as_const (_server_chunks)) {
             auto job = new DeleteJob (propagator ().account (), Utility.concat_url_path (chunk_url (), server_chunk.original_name), this);
-            GLib.Object.connect (job, &DeleteJob.finished_signal, this, &PropagateUploadFileNG.slot_delete_job_finished);
+            GLib.Object.connect (job, &DeleteJob.finished_signal, this, &PropagateUploadFileNG.on_delete_job_finished);
             _jobs.append (job);
-            job.start ();
+            job.on_start ();
         }
         _server_chunks.clear ();
         return;
@@ -156,9 +156,9 @@ void PropagateUploadFileNG.slot_propfind_finished () {
     start_next_chunk ();
 }
 
-void PropagateUploadFileNG.slot_propfind_finished_with_error () {
+void PropagateUploadFileNG.on_propfind_finished_with_error () {
     auto job = qobject_cast<LsColJob> (sender ());
-    slot_job_destroyed (job); // remove it from the _jobs list
+    on_job_destroyed (job); // remove it from the _jobs list
     QNetworkReply.NetworkError err = job.reply ().error ();
     auto http_error_code = job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
     auto status = classify_error (err, http_error_code, &propagator ()._another_sync_needed);
@@ -171,7 +171,7 @@ void PropagateUploadFileNG.slot_propfind_finished_with_error () {
     start_new_upload ();
 }
 
-void PropagateUploadFileNG.slot_delete_job_finished () {
+void PropagateUploadFileNG.on_delete_job_finished () {
     auto job = qobject_cast<DeleteJob> (sender ());
     ASSERT (job);
     _jobs.remove (_jobs.index_of (job));
@@ -194,7 +194,7 @@ void PropagateUploadFileNG.slot_delete_job_finished () {
     if (_jobs.is_empty ()) {
         propagator ()._active_job_list.remove_one (this);
         if (_remove_job_error) {
-            // There was an error removing some files, just start over
+            // There was an error removing some files, just on_start over
             start_new_upload ();
         } else {
             start_next_chunk ();
@@ -226,24 +226,24 @@ void PropagateUploadFileNG.start_new_upload () {
     pi._size = _item._size;
     propagator ()._journal.set_upload_info (_item._file, pi);
     propagator ()._journal.commit ("Upload info");
-    QMap<QByteArray, QByteArray> headers;
+    QMap<GLib.ByteArray, GLib.ByteArray> headers;
 
     // But we should send the temporary (or something) one.
-    headers["OC-Total-Length"] = QByteArray.number (_file_to_upload._size);
+    headers["OC-Total-Length"] = GLib.ByteArray.number (_file_to_upload._size);
     auto job = new MkColJob (propagator ().account (), chunk_url (), headers, this);
 
     connect (job, &MkColJob.finished_with_error,
-        this, &PropagateUploadFileNG.slot_mk_col_finished);
+        this, &PropagateUploadFileNG.on_mk_col_finished);
     connect (job, &MkColJob.finished_without_error,
-        this, &PropagateUploadFileNG.slot_mk_col_finished);
-    connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.slot_job_destroyed);
-    job.start ();
+        this, &PropagateUploadFileNG.on_mk_col_finished);
+    connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.on_job_destroyed);
+    job.on_start ();
 }
 
-void PropagateUploadFileNG.slot_mk_col_finished () {
+void PropagateUploadFileNG.on_mk_col_finished () {
     propagator ()._active_job_list.remove_one (this);
     auto job = qobject_cast<MkColJob> (sender ());
-    slot_job_destroyed (job); // remove it from the _jobs list
+    on_job_destroyed (job); // remove it from the _jobs list
     QNetworkReply.NetworkError err = job.reply ().error ();
     _item._http_error_code = job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
 
@@ -286,16 +286,16 @@ void PropagateUploadFileNG.start_next_chunk () {
             q_c_info (lc_propagate_upload) << destination << _transmission_checksum_header;
             headers[check_sum_header_c] = _transmission_checksum_header;
         }
-        headers[QByteArrayLiteral ("OC-Total-Length")] = QByteArray.number (file_size);
+        headers[QByteArrayLiteral ("OC-Total-Length")] = GLib.ByteArray.number (file_size);
 
         auto job = new Move_job (propagator ().account (), Utility.concat_url_path (chunk_url (), "/.file"),
             destination, headers, this);
         _jobs.append (job);
-        connect (job, &Move_job.finished_signal, this, &PropagateUploadFileNG.slot_move_job_finished);
-        connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.slot_job_destroyed);
+        connect (job, &Move_job.finished_signal, this, &PropagateUploadFileNG.on_move_job_finished);
+        connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.on_job_destroyed);
         propagator ()._active_job_list.append (this);
         adjust_last_job_timeout (job, file_size);
-        job.start ();
+        job.on_start ();
         return;
     }
 
@@ -315,8 +315,8 @@ void PropagateUploadFileNG.start_next_chunk () {
         return;
     }
 
-    QMap<QByteArray, QByteArray> headers;
-    headers["OC-Chunk-Offset"] = QByteArray.number (_sent);
+    QMap<GLib.ByteArray, GLib.ByteArray> headers;
+    headers["OC-Chunk-Offset"] = GLib.ByteArray.number (_sent);
 
     _sent += _current_chunk_size;
     QUrl url = chunk_url (_current_chunk);
@@ -325,27 +325,27 @@ void PropagateUploadFileNG.start_next_chunk () {
     auto device_ptr = device.get (); // for connections later
     auto *job = new PUTFile_job (propagator ().account (), url, std.move (device), headers, _current_chunk, this);
     _jobs.append (job);
-    connect (job, &PUTFile_job.finished_signal, this, &PropagateUploadFileNG.slot_put_finished);
+    connect (job, &PUTFile_job.finished_signal, this, &PropagateUploadFileNG.on_put_finished);
     connect (job, &PUTFile_job.upload_progress,
-        this, &PropagateUploadFileNG.slot_upload_progress);
+        this, &PropagateUploadFileNG.on_upload_progress);
     connect (job, &PUTFile_job.upload_progress,
-        device_ptr, &UploadDevice.slot_job_upload_progress);
-    connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.slot_job_destroyed);
-    job.start ();
+        device_ptr, &UploadDevice.on_job_upload_progress);
+    connect (job, &GLib.Object.destroyed, this, &PropagateUploadFileCommon.on_job_destroyed);
+    job.on_start ();
     propagator ()._active_job_list.append (this);
     _current_chunk++;
 }
 
-void PropagateUploadFileNG.slot_put_finished () {
+void PropagateUploadFileNG.on_put_finished () {
     auto *job = qobject_cast<PUTFile_job> (sender ());
     ASSERT (job);
 
-    slot_job_destroyed (job); // remove it from the _jobs list
+    on_job_destroyed (job); // remove it from the _jobs list
 
     propagator ()._active_job_list.remove_one (this);
 
     if (_finished) {
-        // We have sent the finished signal already. We don't need to handle any remaining jobs
+        // We have sent the on_finished signal already. We don't need to handle any remaining jobs
         return;
     }
 
@@ -431,10 +431,10 @@ void PropagateUploadFileNG.slot_put_finished () {
     start_next_chunk ();
 }
 
-void PropagateUploadFileNG.slot_move_job_finished () {
+void PropagateUploadFileNG.on_move_job_finished () {
     propagator ()._active_job_list.remove_one (this);
     auto job = qobject_cast<Move_job> (sender ());
-    slot_job_destroyed (job); // remove it from the _jobs list
+    on_job_destroyed (job); // remove it from the _jobs list
     QNetworkReply.NetworkError err = job.reply ().error ();
     _item._http_error_code = job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
     _item._response_time_stamp = job.response_timestamp ();
@@ -448,7 +448,7 @@ void PropagateUploadFileNG.slot_move_job_finished () {
     if (_item._http_error_code == 202) {
         string path = string.from_utf8 (job.reply ().raw_header ("OC-Job_status-Location"));
         if (path.is_empty ()) {
-            done (SyncFileItem.NormalError, tr ("Poll URL missing"));
+            on_done (SyncFileItem.NormalError, tr ("Poll URL missing"));
             return;
         }
         _finished = true;
@@ -461,7 +461,7 @@ void PropagateUploadFileNG.slot_move_job_finished () {
         return;
     }
 
-    QByteArray fid = job.reply ().raw_header ("OC-FileID");
+    GLib.ByteArray fid = job.reply ().raw_header ("OC-FileID");
     if (fid.is_empty ()) {
         q_c_warning (lc_propagate_upload_nG) << "Server did not return a OC-FileID" << _item._file;
         abort_with_error (SyncFileItem.NormalError, tr ("Missing File ID from server"));
@@ -481,10 +481,10 @@ void PropagateUploadFileNG.slot_move_job_finished () {
         abort_with_error (SyncFileItem.NormalError, tr ("Missing ETag from server"));
         return;
     }
-    finalize ();
+    on_finalize ();
 }
 
-void PropagateUploadFileNG.slot_upload_progress (int64 sent, int64 total) {
+void PropagateUploadFileNG.on_upload_progress (int64 sent, int64 total) {
     // Completion is signaled with sent=0, total=0; avoid accidentally
     // resetting progress due to the sent being zero by ignoring it.
     // finished_signal () is bound to be emitted soon anyway.
@@ -495,7 +495,7 @@ void PropagateUploadFileNG.slot_upload_progress (int64 sent, int64 total) {
     propagator ().report_progress (*_item, _sent + sent - total);
 }
 
-void PropagateUploadFileNG.abort (PropagatorJob.AbortType abort_type) {
+void PropagateUploadFileNG.on_abort (PropagatorJob.AbortType abort_type) {
     abort_network_jobs (
         abort_type,
         [abort_type] (AbstractNetworkJob *job) {

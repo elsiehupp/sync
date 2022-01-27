@@ -16,7 +16,7 @@ struct OperationCounter {
     int nMOVE = 0;
     int nDELETE = 0;
 
-    void reset () { *this = {}; }
+    void on_reset () { *this = {}; }
 
     auto functor () {
         return [&] (QNetworkAccessManager.Operation op, QNetworkRequest &req, QIODevice *) {
@@ -33,22 +33,22 @@ struct OperationCounter {
     }
 };
 
-bool itemSuccessful (ItemCompletedSpy &spy, string &path, SyncInstructions instr) {
+bool itemSuccessful (ItemCompletedSpy &spy, string path, SyncInstructions instr) {
     auto item = spy.findItem (path);
     return item._status == SyncFileItem.Success && item._instruction == instr;
 }
 
-bool itemConflict (ItemCompletedSpy &spy, string &path) {
+bool itemConflict (ItemCompletedSpy &spy, string path) {
     auto item = spy.findItem (path);
     return item._status == SyncFileItem.Conflict && item._instruction == CSYNC_INSTRUCTION_CONFLICT;
 }
 
-bool itemSuccessfulMove (ItemCompletedSpy &spy, string &path) {
+bool itemSuccessfulMove (ItemCompletedSpy &spy, string path) {
     return itemSuccessful (spy, path, CSYNC_INSTRUCTION_RENAME);
 }
 
-QStringList findConflicts (FileInfo &dir) {
-    QStringList conflicts;
+string[] findConflicts (FileInfo &dir) {
+    string[] conflicts;
     for (auto &item : dir.children) {
         if (item.name.contains (" (conflicted copy")) {
             conflicts.append (item.path ());
@@ -73,8 +73,7 @@ bool expectAndWipeConflict (FileModifier &local, FileInfo state, string path) {
 
 class TestSyncMove : GLib.Object {
 
-private slots:
-    void testMoveCustomRemoteRoot () {
+    private void on_test_move_custom_remote_root () {
         FileInfo subFolder (QStringLiteral ("AS"), { { QStringLiteral ("f1"), 4 } });
         FileInfo folder (QStringLiteral ("A"), { subFolder });
         FileInfo fileInfo ({}, { folder });
@@ -86,7 +85,7 @@ private slots:
         fakeFolder.setServerOverride (counter.functor ());
 
         // Move file and then move it back again {
-            counter.reset ();
+            counter.on_reset ();
             localModifier.rename (QStringLiteral ("AS/f1"), QStringLiteral ("f1"));
 
             ItemCompletedSpy completeSpy (fakeFolder);
@@ -103,7 +102,7 @@ private slots:
         }
     }
 
-    void testRemoteChangeInMovedFolder () {
+    private on_ void testRemoteChangeInMovedFolder () {
         // issue #5192
         FakeFolder fakeFolder{ FileInfo{ string (), { FileInfo{ QStringLiteral ("folder"), { FileInfo{ QStringLiteral ("folderA"), { { QStringLiteral ("file.txt"), 400 } } }, QStringLiteral ("folderB") } } } } };
 
@@ -124,7 +123,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), oldState);
     }
 
-    void testSelectiveSyncMovedFolder () {
+    private on_ void testSelectiveSyncMovedFolder () {
         // issue #5224
         FakeFolder fakeFolder{ FileInfo{ string (), { FileInfo{ QStringLiteral ("parentFolder"), { FileInfo{ QStringLiteral ("subFolderA"), { { QStringLiteral ("fileA.txt"), 400 } } }, FileInfo{ QStringLiteral ("subFolderB"), { { QStringLiteral ("fileB.txt"), 400 } } } } } } } };
 
@@ -180,7 +179,7 @@ private slots:
         }
     }
 
-    void testLocalMoveDetection () {
+    private on_ void testLocalMoveDetection () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
 
         int nPUT = 0;
@@ -243,7 +242,7 @@ private slots:
         QCOMPARE (nDELETE, 3);
         QVERIFY (! (fakeFolder.currentLocalState () == remoteInfo));
 
-        // cleanup, and upload a file that will have a checksum in the db
+        // on_cleanup, and upload a file that will have a checksum in the db
         fakeFolder.localModifier ().remove ("C/c1m");
         fakeFolder.localModifier ().insert ("C/c3");
         QVERIFY (fakeFolder.syncOnce ());
@@ -264,7 +263,7 @@ private slots:
         QCOMPARE (printDbData (fakeFolder.dbState ()), printDbData (remoteInfo));
     }
 
-    void testDuplicateFileId_data () {
+    private on_ void testDuplicateFileId_data () {
         QTest.addColumn<string> ("prefix");
 
         // There have been bugs related to how the original
@@ -278,7 +277,7 @@ private slots:
     // user, the target user will see duplicate file ids. We need to make
     // sure the move detection and sync still do the right thing in that
     // case.
-    void testDuplicateFileId () {
+    private on_ void testDuplicateFileId () {
         QFETCH (string, prefix);
 
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
@@ -328,7 +327,7 @@ private slots:
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         QCOMPARE (counter.nGET, 1);
-        counter.reset ();
+        counter.on_reset ();
 
         // remove localy, and remote move at the same time
         fakeFolder.localModifier ().remove ("A/Q/W/a1m");
@@ -337,10 +336,10 @@ private slots:
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         QCOMPARE (counter.nGET, 1);
-        counter.reset ();
+        counter.on_reset ();
     }
 
-    void testMovePropagation () {
+    private on_ void testMovePropagation () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         auto &local = fakeFolder.localModifier ();
         auto &remote = fakeFolder.remoteModifier ();
@@ -349,7 +348,7 @@ private slots:
         fakeFolder.setServerOverride (counter.functor ());
 
         // Move {
-            counter.reset ();
+            counter.on_reset ();
             local.rename ("A/a1", "A/a1m");
             remote.rename ("B/b1", "B/b1m");
             ItemCompletedSpy completeSpy (fakeFolder);
@@ -368,7 +367,7 @@ private slots:
         }
 
         // Touch+Move on same side
-        counter.reset ();
+        counter.on_reset ();
         local.rename ("A/a2", "A/a2m");
         local.setContents ("A/a2m", 'A');
         remote.rename ("B/b2", "B/b2m");
@@ -384,7 +383,7 @@ private slots:
         QCOMPARE (remote.find ("B/b2m").contentChar, 'A');
 
         // Touch+Move on opposite sides
-        counter.reset ();
+        counter.on_reset ();
         local.rename ("A/a1m", "A/a1m2");
         remote.setContents ("A/a1m", 'B');
         remote.rename ("B/b1m", "B/b1m2");
@@ -406,7 +405,7 @@ private slots:
         QCOMPARE (remote.find ("B/b1m2").contentChar, 'W');
 
         // Touch+create on one side, move on the other {
-            counter.reset ();
+            counter.on_reset ();
             local.appendByte ("A/a1m");
             local.insert ("A/a1mt");
             remote.rename ("A/a1m", "A/a1mt");
@@ -430,7 +429,7 @@ private slots:
         }
 
         // Create new on one side, move to new on the other {
-            counter.reset ();
+            counter.on_reset ();
             local.insert ("A/a1N", 13);
             remote.rename ("A/a1mt", "A/a1N");
             remote.insert ("B/b1N", 13);
@@ -452,7 +451,7 @@ private slots:
         }
 
         // Local move, remote move
-        counter.reset ();
+        counter.on_reset ();
         local.rename ("C/c1", "C/c1mL");
         remote.rename ("C/c1", "C/c1mR");
         QVERIFY (fakeFolder.syncOnce ());
@@ -465,7 +464,7 @@ private slots:
         QCOMPARE (counter.nDELETE, 0);
 
         // Rename/rename conflict on a folder
-        counter.reset ();
+        counter.on_reset ();
         remote.rename ("C", "CMR");
         local.rename ("C", "CML");
         QVERIFY (fakeFolder.syncOnce ());
@@ -478,7 +477,7 @@ private slots:
         QCOMPARE (counter.nDELETE, 0);
 
         // Folder move {
-            counter.reset ();
+            counter.on_reset ();
             local.rename ("A", "AM");
             remote.rename ("B", "BM");
             ItemCompletedSpy completeSpy (fakeFolder);
@@ -498,7 +497,7 @@ private slots:
         }
 
         // Folder move with contents touched on the same side {
-            counter.reset ();
+            counter.on_reset ();
             local.setContents ("AM/a2m", 'C');
             // We must change the modtime for it is likely that it did not change between sync.
             // (Previous version of the client (<=2.5) would not need this because it was always doing
@@ -523,7 +522,7 @@ private slots:
         }
 
         // Folder rename with contents touched on the other tree
-        counter.reset ();
+        counter.on_reset ();
         remote.setContents ("A2/a2m", 'D');
         // setContents alone may not produce updated mtime if the test is fast
         // and since we don't use checksums here, that matters.
@@ -543,7 +542,7 @@ private slots:
         QCOMPARE (remote.find ("B3/b2m").contentChar, 'D');
 
         // Folder rename with contents touched on both ends
-        counter.reset ();
+        counter.on_reset ();
         remote.setContents ("A3/a2m", 'R');
         remote.appendByte ("A3/a2m");
         local.setContents ("A3/a2m", 'L');
@@ -580,7 +579,7 @@ private slots:
         QCOMPARE (remote.find ("B4/b2m").contentChar, 'R');
 
         // Rename a folder and rename the contents at the same time
-        counter.reset ();
+        counter.on_reset ();
         local.rename ("A4/a2m", "A4/a2m2");
         local.rename ("A4", "A5");
         remote.rename ("B4/b2m", "B4/b2m2");
@@ -595,7 +594,7 @@ private slots:
     }
 
     // These renames can be troublesome on windows
-    void testRenameCaseOnly () {
+    private on_ void testRenameCaseOnly () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         auto &local = fakeFolder.localModifier ();
         auto &remote = fakeFolder.remoteModifier ();
@@ -616,7 +615,7 @@ private slots:
     }
 
     // Check interaction of moves with file type changes
-    void testMoveAndTypeChange () {
+    private on_ void testMoveAndTypeChange () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         auto &local = fakeFolder.localModifier ();
         auto &remote = fakeFolder.remoteModifier ();
@@ -637,7 +636,7 @@ private slots:
 
     // https://github.com/owncloud/client/issues/6629#issuecomment-402450691
     // When a file is moved and the server mtime was not in sync, the local mtime should be kept
-    void testMoveAndMTimeChange () {
+    private on_ void testMoveAndMTimeChange () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         OperationCounter counter;
         fakeFolder.setServerOverride (counter.functor ());
@@ -667,7 +666,7 @@ private slots:
     }
 
     // Test for https://github.com/owncloud/client/issues/6694
-    void testInvertFolderHierarchy () {
+    private on_ void testInvertFolderHierarchy () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         fakeFolder.remoteModifier ().mkdir ("A/Empty");
         fakeFolder.remoteModifier ().mkdir ("A/Empty/Foo");
@@ -725,13 +724,13 @@ private slots:
         QCOMPARE (counter.nPUT, 0);
     }
 
-    void testDeepHierarchy_data () {
+    private on_ void testDeepHierarchy_data () {
         QTest.addColumn<bool> ("local");
         QTest.newRow ("remote") << false;
         QTest.newRow ("local") << true;
     }
 
-    void testDeepHierarchy () {
+    private on_ void testDeepHierarchy () {
         QFETCH (bool, local);
         FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
         auto &modifier = local ? fakeFolder.localModifier () : fakeFolder.remoteModifier ();
@@ -772,7 +771,7 @@ private slots:
         QCOMPARE (counter.nPUT, local ? 5 : 0);
     }
 
-    void renameOnBothSides () {
+    private on_ void renameOnBothSides () {
         FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
         OperationCounter counter;
         fakeFolder.setServerOverride (counter.functor ());
@@ -793,7 +792,7 @@ private slots:
         QCOMPARE (counter.nGET, 0);
         QCOMPARE (counter.nPUT, 0);
         QCOMPARE (counter.nMOVE, 2);
-        counter.reset ();
+        counter.on_reset ();
 
         // 2) move alphabetically after
         fakeFolder.remoteModifier ().rename ("_A/a2", "_A/a2m");
@@ -810,7 +809,7 @@ private slots:
         QCOMPARE (counter.nMOVE, 2);
     }
 
-    void moveFileToDifferentFolderOnBothSides () {
+    private on_ void moveFileToDifferentFolderOnBothSides () {
         FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
         OperationCounter counter;
         fakeFolder.setServerOverride (counter.functor ());
@@ -833,12 +832,12 @@ private slots:
         QCOMPARE (counter.nGET, 2);
         QCOMPARE (counter.nPUT, 2);
         QCOMPARE (counter.nDELETE, 0);
-        counter.reset ();
+        counter.on_reset ();
 
     }
 
     // Test that deletes don't run before renames
-    void testRenameParallelism () {
+    private on_ void testRenameParallelism () {
         FakeFolder fakeFolder{ FileInfo{} };
         fakeFolder.remoteModifier ().mkdir ("A");
         fakeFolder.remoteModifier ().insert ("A/file");
@@ -853,16 +852,16 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void testMovedWithError_data () {
+    private on_ void testMovedWithError_data () {
         QTest.addColumn<Vfs.Mode> ("vfsMode");
 
         QTest.newRow ("Vfs.Off") << Vfs.Off;
         QTest.newRow ("Vfs.WithSuffix") << Vfs.WithSuffix;
     }
 
-    void testMovedWithError () {
+    private on_ void testMovedWithError () {
         QFETCH (Vfs.Mode, vfsMode);
-        const auto getName = [vfsMode] (string &s) { {f (vfsMode == Vfs.WithSuffix)
+        const auto getName = [vfsMode] (string s) { {f (vfsMode == Vfs.WithSuffix)
             {
                 return QStringLiteral ("%1" APPLICATION_DOTVIRTUALFILE_SUFFIX).arg (s);
             }
@@ -878,7 +877,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
         if (vfsMode != Vfs.Off) {
-            auto vfs = QSharedPointer<Vfs> (createVfsFromPlugin (vfsMode).release ());
+            auto vfs = unowned<Vfs> (createVfsFromPlugin (vfsMode).release ());
             QVERIFY (vfs);
             fakeFolder.switchToVfs (vfs);
             fakeFolder.syncJournal ().internalPinStates ().setForPath ("", PinState.OnlineOnly);
@@ -918,4 +917,3 @@ private slots:
 };
 
 QTEST_GUILESS_MAIN (TestSyncMove)
-#include "testsyncmove.moc"

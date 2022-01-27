@@ -12,7 +12,7 @@
 
 using namespace Occ;
 
-using QueryItems = QList<QPair<string, string>>;
+using QueryItems = GLib.List<QPair<string, string>>;
 
 Q_DECLARE_METATYPE (QueryItems)
 
@@ -35,8 +35,8 @@ static QueryItems make (string key1, string value1,
 }
 
 class TestConcatUrl : public GLib.Object {
-private slots:
-    void testFolder () {
+
+    private on_ void testFolder () {
         QFETCH (string, base);
         QFETCH (string, concat);
         QFETCH (QueryItems, query);
@@ -50,7 +50,7 @@ private slots:
         QCOMPARE (result, expectedFull);
     }
 
-    void testFolder_data () {
+    private on_ void testFolder_data () {
         QTest.addColumn<string> ("base");
         QTest.addColumn<string> ("concat");
         QTest.addColumn<QueryItems> ("query");

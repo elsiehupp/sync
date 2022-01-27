@@ -20,14 +20,14 @@ namespace Occ {
 
 
 struct HovercardAction {
-public:
-    HovercardAction ();
-    HovercardAction (string title, QUrl icon_url, QUrl link);
 
-    string _title;
-    QUrl _icon_url;
-    QPixmap _icon;
-    QUrl _link;
+    public HovercardAction ();
+    public HovercardAction (string title, QUrl icon_url, QUrl link);
+
+    public string _title;
+    public QUrl _icon_url;
+    public QPixmap _icon;
+    public QUrl _link;
 };
 
 struct Hovercard {
@@ -35,24 +35,24 @@ struct Hovercard {
 };
 
 class OcsProfileConnector : GLib.Object {
-public:
-    OcsProfileConnector (AccountPtr account, GLib.Object *parent = nullptr);
 
-    void fetch_hovercard (string &user_id);
-    const Hovercard &hovercard ();
+    public OcsProfileConnector (AccountPtr account, GLib.Object *parent = nullptr);
+
+    public void fetch_hovercard (string user_id);
+    public const Hovercard &hovercard ();
 
 signals:
     void error ();
     void hovercard_fetched ();
     void icon_loaded (std.size_t hovercard_action_index);
 
-private:
-    void on_hovercard_fetched (QJsonDocument &json, int status_code);
 
-    void fetch_icons ();
-    void start_fetch_icon_job (std.size_t hovercard_action_index);
-    void set_hovercard_action_icon (std.size_t index, QPixmap &pixmap);
-    void load_hovercard_action_icon (std.size_t hovercard_action_index, QByteArray &icon_data);
+    private void on_hovercard_fetched (QJsonDocument &json, int status_code);
+
+    private void fetch_icons ();
+    private void start_fetch_icon_job (std.size_t hovercard_action_index);
+    private void set_hovercard_action_icon (std.size_t index, QPixmap &pixmap);
+    private void load_hovercard_action_icon (std.size_t hovercard_action_index, GLib.ByteArray &icon_data);
 
     AccountPtr _account;
     Hovercard _current_hovercard;
@@ -86,9 +86,9 @@ private:
         return hovercard;
     }
 
-    Occ.Optional<QPixmap> create_pixmap_from_svg_data (QByteArray &icon_data) {
+    Occ.Optional<QPixmap> create_pixmap_from_svg_data (GLib.ByteArray &icon_data) {
         QSvgRenderer svg_renderer;
-        if (!svg_renderer.load (icon_data)) {
+        if (!svg_renderer.on_load (icon_data)) {
             return {};
         }
         QSize image_size{16, 16};
@@ -102,7 +102,7 @@ private:
         return QPixmap.from_image (scaled_svg);
     }
 
-    Occ.Optional<QPixmap> icon_data_to_pixmap (QByteArray icon_data) {
+    Occ.Optional<QPixmap> icon_data_to_pixmap (GLib.ByteArray icon_data) {
         if (!icon_data.starts_with ("<svg")) {
             return {};
         }
@@ -122,7 +122,7 @@ private:
         , _account (account) {
     }
 
-    void OcsProfileConnector.fetch_hovercard (string &user_id) {
+    void OcsProfileConnector.fetch_hovercard (string user_id) {
         if (_account.server_version_int () < Account.make_server_version (23, 0, 0)) {
             q_info (lc_ocs_profile_connector) << "Server version" << _account.server_version ()
                                          << "does not support profile page";
@@ -132,14 +132,14 @@ private:
         const string url = QStringLiteral ("/ocs/v2.php/hovercard/v1/%1").arg (user_id);
         const auto job = new JsonApiJob (_account, url, this);
         connect (job, &JsonApiJob.json_received, this, &OcsProfileConnector.on_hovercard_fetched);
-        job.start ();
+        job.on_start ();
     }
 
     void OcsProfileConnector.on_hovercard_fetched (QJsonDocument &json, int status_code) {
         q_c_debug (lc_ocs_profile_connector) << "Hovercard fetched:" << json;
 
         if (status_code != 200) {
-            q_c_info (lc_ocs_profile_connector) << "Fetching of hovercard finished with status code" << status_code;
+            q_c_info (lc_ocs_profile_connector) << "Fetching of hovercard on_finished with status code" << status_code;
             return;
         }
         const auto json_data = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("actions");
@@ -156,7 +156,7 @@ private:
         emit icon_loaded (index);
     }
 
-    void OcsProfileConnector.load_hovercard_action_icon (std.size_t hovercard_action_index, QByteArray &icon_data) {
+    void OcsProfileConnector.load_hovercard_action_icon (std.size_t hovercard_action_index, GLib.ByteArray &icon_data) {
         if (hovercard_action_index >= _current_hovercard._actions.size ()) {
             // Note : Probably could do more checking, like checking if the url is still the same.
             return;
@@ -173,7 +173,7 @@ private:
         const auto hovercard_action = _current_hovercard._actions[hovercard_action_index];
         const auto icon_job = new IconJob{_account, hovercard_action._icon_url, this};
         connect (icon_job, &IconJob.job_finished,
-            [this, hovercard_action_index] (QByteArray icon_data) {
+            [this, hovercard_action_index] (GLib.ByteArray icon_data) {
                 load_hovercard_action_icon (hovercard_action_index, icon_data);
             });
         connect (icon_job, &IconJob.error, this, [] (QNetworkReply.NetworkError error_type) {

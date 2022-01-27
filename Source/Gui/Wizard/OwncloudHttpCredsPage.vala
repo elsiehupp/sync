@@ -12,34 +12,34 @@ namespace Occ {
 @brief The Owncloud_http_creds_page class
 ***********************************************************/
 class Owncloud_http_creds_page : Abstract_credentials_wizard_page {
-public:
-    Owncloud_http_creds_page (Gtk.Widget *parent);
 
-    AbstractCredentials *get_credentials () const override;
+    public Owncloud_http_creds_page (Gtk.Widget *parent);
 
-    void initialize_page () override;
-    void cleanup_page () override;
-    bool validate_page () override;
-    int next_id () const override;
-    void set_connected ();
-    void set_error_string (string &err);
+    public AbstractCredentials *get_credentials () override;
+
+    public void initialize_page () override;
+    public void cleanup_page () override;
+    public bool validate_page () override;
+    public int next_id () override;
+    public void set_connected ();
+    public void on_set_error_string (string err);
 
 signals:
-    void connect_to_oCUrl (string &);
+    void connect_to_oc_url (string );
 
-public slots:
-    void slot_style_changed ();
 
-private:
-    void start_spinner ();
-    void stop_spinner ();
-    void setup_customization ();
-    void customize_style ();
+    public void on_style_changed ();
 
-    Ui_Owncloud_http_creds_page _ui;
-    bool _connected;
-    QProgress_indicator *_progress_indi;
-    OwncloudWizard *_oc_wizard;
+
+    private void on_start_spinner ();
+    private void on_stop_spinner ();
+    private void setup_customization ();
+    private void customize_style ();
+
+    private Ui_Owncloud_http_creds_page _ui;
+    private bool _connected;
+    private QProgress_indicator _progress_indi;
+    private OwncloudWizard _oc_wizard;
 };
 
     Owncloud_http_creds_page.Owncloud_http_creds_page (Gtk.Widget *parent)
@@ -62,10 +62,10 @@ private:
             // default, handled in ui file
             break;
         case Theme.User_iDEmail:
-            _ui.username_label.set_text (tr ("&Email"));
+            _ui.username_label.on_set_text (tr ("&Email"));
             break;
         case Theme.User_iDCustom:
-            _ui.username_label.set_text (theme.custom_user_iD ());
+            _ui.username_label.on_set_text (theme.custom_user_iD ());
             break;
         default:
             break;
@@ -76,7 +76,7 @@ private:
         set_sub_title (WizardCommon.sub_title_template ().arg (tr ("Enter user credentials")));
 
         _ui.result_layout.add_widget (_progress_indi);
-        stop_spinner ();
+        on_stop_spinner ();
         setup_customization ();
     }
 
@@ -104,7 +104,7 @@ private:
         if (http_creds) {
             const string user = http_creds.fetch_user ();
             if (!user.is_empty ()) {
-                _ui.le_username.set_text (user);
+                _ui.le_username.on_set_text (user);
             }
         } else {
             QUrl url = oc_wizard.account ().url ();
@@ -120,13 +120,13 @@ private:
             const string password = url.password ();
 
             if (!user.is_empty ()) {
-                _ui.le_username.set_text (user);
+                _ui.le_username.on_set_text (user);
             }
             if (!password.is_empty ()) {
-                _ui.le_password.set_text (password);
+                _ui.le_password.on_set_text (password);
             }
         }
-        _ui.token_label.set_text (HttpCredentialsGui.request_app_password_text (oc_wizard.account ().data ()));
+        _ui.token_label.on_set_text (HttpCredentialsGui.request_app_password_text (oc_wizard.account ().data ()));
         _ui.token_label.set_visible (!_ui.token_label.text ().is_empty ());
         _ui.le_username.set_focus ();
     }
@@ -143,14 +143,14 @@ private:
 
         if (!_connected) {
             _ui.error_label.set_visible (false);
-            start_spinner ();
+            on_start_spinner ();
 
             // Reset cookies to ensure the username / password is actually used
             auto *oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
             oc_wizard.account ().clear_cookie_jar ();
 
             emit complete_changed ();
-            emit connect_to_oCUrl (field ("OCUrl").to_string ().simplified ());
+            emit connect_to_oc_url (field ("OCUrl").to_string ().simplified ());
 
             return false;
         } else {
@@ -158,7 +158,7 @@ private:
             _connected = false;
 
             emit complete_changed ();
-            stop_spinner ();
+            on_stop_spinner ();
             return true;
         }
         return true;
@@ -170,43 +170,43 @@ private:
 
     void Owncloud_http_creds_page.set_connected () {
         _connected = true;
-        stop_spinner ();
+        on_stop_spinner ();
     }
 
-    void Owncloud_http_creds_page.start_spinner () {
+    void Owncloud_http_creds_page.on_start_spinner () {
         _ui.result_layout.set_enabled (true);
         _progress_indi.set_visible (true);
-        _progress_indi.start_animation ();
+        _progress_indi.on_start_animation ();
     }
 
-    void Owncloud_http_creds_page.stop_spinner () {
+    void Owncloud_http_creds_page.on_stop_spinner () {
         _ui.result_layout.set_enabled (false);
         _progress_indi.set_visible (false);
-        _progress_indi.stop_animation ();
+        _progress_indi.on_stop_animation ();
     }
 
-    void Owncloud_http_creds_page.set_error_string (string &err) {
+    void Owncloud_http_creds_page.on_set_error_string (string err) {
         if (err.is_empty ()) {
             _ui.error_label.set_visible (false);
         } else {
             _ui.error_label.set_visible (true);
-            _ui.error_label.set_text (err);
+            _ui.error_label.on_set_text (err);
         }
         emit complete_changed ();
-        stop_spinner ();
+        on_stop_spinner ();
     }
 
     AbstractCredentials *Owncloud_http_creds_page.get_credentials () {
         return new HttpCredentialsGui (_ui.le_username.text (), _ui.le_password.text (), _oc_wizard._client_cert_bundle, _oc_wizard._client_cert_password);
     }
 
-    void Owncloud_http_creds_page.slot_style_changed () {
+    void Owncloud_http_creds_page.on_style_changed () {
         customize_style ();
     }
 
     void Owncloud_http_creds_page.customize_style () {
         if (_progress_indi)
-            _progress_indi.set_color (QGuiApplication.palette ().color (QPalette.Text));
+            _progress_indi.on_set_color (QGuiApplication.palette ().color (QPalette.Text));
     }
 
     } // namespace Occ

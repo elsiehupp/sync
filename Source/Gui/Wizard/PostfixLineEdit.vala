@@ -20,37 +20,37 @@ Useful e.g. for setting a fixed domain name.
 ***********************************************************/
 
 class Postfix_line_edit : QLineEdit {
-public:
-    Postfix_line_edit (Gtk.Widget *parent);
+
+    public Postfix_line_edit (Gtk.Widget *parent);
 
     /***********************************************************
     @brief sets an optional postfix shown greyed out
     ***********************************************************/
-    set_postfix (string &postfix);
+    public set_postfix (string postfix);
 
 
     /***********************************************************
     @brief retrives the postfix
     ***********************************************************/
-    string postfix ();
+    public string postfix ();
 
 
     /***********************************************************
     @brief retrieves combined text () and postfix ()
     ***********************************************************/
-    string full_text ();
+    public string full_text ();
 
 
     /***********************************************************
     @brief sets text () from full text, discarding prefix ()
     ***********************************************************/
-    void set_full_text (string &text);
+    public void set_full_text (string text);
 
-protected:
-    void paint_event (QPaint_event *pe) override;
 
-private:
-    string _postfix;
+    protected void paint_event (QPaint_event *pe) override;
+
+
+    private string _postfix;
 };
 
     const int horizontal_margin (4);
@@ -60,7 +60,7 @@ private:
         : QLineEdit (parent) {
     }
 
-    void Postfix_line_edit.set_postfix (string &postfix) {
+    void Postfix_line_edit.set_postfix (string postfix) {
         _postfix = postfix;
         QFont_metrics_f fm (font ());
         QMargins tm = text_margins ();
@@ -76,12 +76,12 @@ private:
         return text () + _postfix;
     }
 
-    void Postfix_line_edit.set_full_text (string &text) {
+    void Postfix_line_edit.set_full_text (string text) {
         string prefix_string = text;
         if (prefix_string.ends_with (postfix ())) {
             prefix_string.chop (postfix ().length ());
         }
-        set_text (prefix_string);
+        on_set_text (prefix_string);
     }
 
     void Postfix_line_edit.paint_event (QPaint_event *pe) {
@@ -91,14 +91,14 @@ private:
         //
         p.set_pen (palette ().color (QPalette.Disabled, QPalette.Text));
         QFont_metrics_f fm (font ());
-        int start = rect ().right () - q_round (fm.width (_postfix));
+        int on_start = rect ().right () - q_round (fm.width (_postfix));
         QStyle_option_frame panel;
         init_style_option (&panel);
         QRect r = style ().sub_element_rect (QStyle.SE_Line_edit_contents, &panel, this);
         r.set_top (r.top () + horizontal_margin - 1);
         QRect postfix_rect (r);
 
-        postfix_rect.set_left (start - vertical_margin);
+        postfix_rect.set_left (on_start - vertical_margin);
         p.draw_text (postfix_rect, _postfix);
     }
 

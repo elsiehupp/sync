@@ -87,7 +87,7 @@ static constexpr char show_main_dialog_as_normal_window_c[] = "show_main_dialog_
 }
 
 // #include <memory>
-// #include <QSharedPointer>
+
 // #include <QSettings>
 // #include <string>
 // #include <QVariant>
@@ -102,221 +102,221 @@ namespace Occ {
 @ingroup libsync
 ***********************************************************/
 class ConfigFile {
-public:
-    ConfigFile ();
 
-    enum Scope {
+    public ConfigFile ();
+
+    public enum Scope {
         UserScope,
         SystemScope
     };
 
-    string config_path ();
-    string config_file ();
-    string exclude_file (Scope scope) const;
-    static string exclude_file_from_system (); // doesn't access config dir
+    public string config_path ();
+    public string config_file ();
+    public string exclude_file (Scope scope);
+    public static string exclude_file_from_system (); // doesn't access config dir
 
     /***********************************************************
     Creates a backup of the file
 
     Returns the path of the new backup.
     ***********************************************************/
-    string backup ();
+    public string backup ();
 
-    bool exists ();
+    public bool exists ();
 
-    string default_connection ();
+    public string default_connection ();
 
     // the certs do not depend on a connection.
-    QByteArray ca_certs ();
-    void set_ca_certs (QByteArray &);
+    public GLib.ByteArray ca_certs ();
+    public void set_ca_certs (GLib.ByteArray &);
 
-    bool password_storage_allowed (string &connection = string ());
+    public bool password_storage_allowed (string connection = string ());
 
 
     /***********************************************************
     Server poll interval in milliseconds
     ***********************************************************/
 
-    std.chrono.milliseconds remote_poll_interval (string &connection = string ()) const;
+    public std.chrono.milliseconds remote_poll_interval (string connection = string ());
 
     /***********************************************************
     Set poll interval. Value in milliseconds has to be larger than 5000
     ***********************************************************/
-    void set_remote_poll_interval (std.chrono.milliseconds interval, string &connection = string ());
+    public void set_remote_poll_interval (std.chrono.milliseconds interval, string connection = string ());
 
 
     /***********************************************************
     Interval to check for new notifications
     ***********************************************************/
-    std.chrono.milliseconds notification_refresh_interval (string &connection = string ()) const;
+    public std.chrono.milliseconds notification_refresh_interval (string connection = string ());
 
 
     /***********************************************************
     Force sync interval, in milliseconds
     ***********************************************************/
-    std.chrono.milliseconds force_sync_interval (string &connection = string ()) const;
+    public std.chrono.milliseconds force_sync_interval (string connection = string ());
 
     /***********************************************************
     Interval in milliseconds within which full local discovery is required
 
     Use -1 to disable regular full local discoveries.
     ***********************************************************/
-    std.chrono.milliseconds full_local_discovery_interval ();
+    public std.chrono.milliseconds full_local_discovery_interval ();
 
-    bool mono_icons ();
-    void set_mono_icons (bool);
+    public bool mono_icons ();
+    public void set_mono_icons (bool);
 
-    bool prompt_delete_files ();
-    void set_prompt_delete_files (bool prompt_delete_files);
+    public bool prompt_delete_files ();
+    public void set_prompt_delete_files (bool prompt_delete_files);
 
-    bool crash_reporter ();
-    void set_crash_reporter (bool enabled);
+    public bool crash_reporter ();
+    public void set_crash_reporter (bool enabled);
 
-    bool automatic_log_dir ();
-    void set_automatic_log_dir (bool enabled);
+    public bool automatic_log_dir ();
+    public void set_automatic_log_dir (bool enabled);
 
-    string log_dir ();
-    void set_log_dir (string &dir);
+    public string log_dir ();
+    public void set_log_dir (string dir);
 
-    bool log_debug ();
-    void set_log_debug (bool enabled);
+    public bool log_debug ();
+    public void set_log_debug (bool enabled);
 
-    int log_expire ();
-    void set_log_expire (int hours);
+    public int log_expire ();
+    public void set_log_expire (int hours);
 
-    bool log_flush ();
-    void set_log_flush (bool enabled);
+    public bool log_flush ();
+    public void set_log_flush (bool enabled);
 
     // Whether experimental UI options should be shown
-    bool show_experimental_options ();
+    public bool show_experimental_options ();
 
     // proxy settings
-    void set_proxy_type (int proxy_type,
-        const string &host = string (),
+    public void set_proxy_type (int proxy_type,
+        const string host = string (),
         int port = 0, bool needs_auth = false,
-        const string &user = string (),
-        const string &pass = string ());
+        const string user = string (),
+        const string pass = string ());
 
-    int proxy_type ();
-    string proxy_host_name ();
-    int proxy_port ();
-    bool proxy_needs_auth ();
-    string proxy_user ();
-    string proxy_password ();
+    public int proxy_type ();
+    public string proxy_host_name ();
+    public int proxy_port ();
+    public bool proxy_needs_auth ();
+    public string proxy_user ();
+    public string proxy_password ();
 
     /***********************************************************
     0 : no limit, 1 : manual, >0 : automatic
     ***********************************************************/
-    int use_upload_limit ();
-    int use_download_limit ();
-    void set_use_upload_limit (int);
-    void set_use_download_limit (int);
+    public int use_upload_limit ();
+    public int use_download_limit ();
+    public void set_use_upload_limit (int);
+    public void set_use_download_limit (int);
     /***********************************************************
     in kbyte/s
     ***********************************************************/
-    int upload_limit ();
-    int download_limit ();
-    void set_upload_limit (int kbytes);
-    void set_download_limit (int kbytes);
+    public int upload_limit ();
+    public int download_limit ();
+    public void set_upload_limit (int kbytes);
+    public void set_download_limit (int kbytes);
     /***********************************************************
     [checked, size in MB]
     ***********************************************************/
-    QPair<bool, int64> new_big_folder_size_limit ();
-    void set_new_big_folder_size_limit (bool is_checked, int64 mbytes);
-    bool use_new_big_folder_size_limit ();
-    bool confirm_external_storage ();
-    void set_confirm_external_storage (bool);
+    public QPair<bool, int64> new_big_folder_size_limit ();
+    public void set_new_big_folder_size_limit (bool is_checked, int64 mbytes);
+    public bool use_new_big_folder_size_limit ();
+    public bool confirm_external_storage ();
+    public void set_confirm_external_storage (bool);
 
     /***********************************************************
     If we should move the files deleted on the server in the trash
     ***********************************************************/
-    bool move_to_trash ();
-    void set_move_to_trash (bool);
+    public bool move_to_trash ();
+    public void set_move_to_trash (bool);
 
-    bool show_main_dialog_as_normal_window ();
+    public bool show_main_dialog_as_normal_window ();
 
-    static bool set_conf_dir (string &value);
+    public static bool set_conf_dir (string value);
 
-    bool optional_server_notifications ();
-    void set_optional_server_notifications (bool show);
+    public bool optional_server_notifications ();
+    public void set_optional_server_notifications (bool show);
 
-    bool show_in_explorer_navigation_pane ();
-    void set_show_in_explorer_navigation_pane (bool show);
+    public bool show_in_explorer_navigation_pane ();
+    public void set_show_in_explorer_navigation_pane (bool show);
 
-    int timeout ();
-    int64 chunk_size ();
-    int64 max_chunk_size ();
-    int64 min_chunk_size ();
-    std.chrono.milliseconds target_chunk_upload_duration ();
+    public int timeout ();
+    public int64 chunk_size ();
+    public int64 max_chunk_size ();
+    public int64 min_chunk_size ();
+    public std.chrono.milliseconds target_chunk_upload_duration ();
 
-    void save_geometry (Gtk.Widget *w);
-    void restore_geometry (Gtk.Widget *w);
+    public void save_geometry (Gtk.Widget *w);
+    public void restore_geometry (Gtk.Widget *w);
 
     // how often the check about new versions runs
-    std.chrono.milliseconds update_check_interval (string &connection = string ()) const;
+    public std.chrono.milliseconds update_check_interval (string connection = string ());
 
     // skip_update_check completely disables the updater and hides its UI
-    bool skip_update_check (string &connection = string ()) const;
-    void set_skip_update_check (bool, string &);
+    public bool skip_update_check (string connection = string ());
+    public void set_skip_update_check (bool, string );
 
     // auto_update_check allows the user to make the choice in the UI
-    bool auto_update_check (string &connection = string ()) const;
-    void set_auto_update_check (bool, string &);
+    public bool auto_update_check (string connection = string ());
+    public void set_auto_update_check (bool, string );
 
     /***********************************************************
     Query-parameter 'updatesegment' for the update check, value between 0 and 99.
     Used to throttle down desktop release rollout in order to keep the update servers alive at peak times.
     See: https://github.com/nextcloud/client_updater_server/pull/36
     ***********************************************************/
-    int update_segment ();
+    public int update_segment ();
 
-    string update_channel ();
-    void set_update_channel (string &channel);
+    public string update_channel ();
+    public void set_update_channel (string channel);
 
-    void save_geometry_header (QHeaderView *header);
-    void restore_geometry_header (QHeaderView *header);
+    public void save_geometry_header (QHeaderView *header);
+    public void restore_geometry_header (QHeaderView *header);
 
-    string certificate_path ();
-    void set_certificate_path (string &c_path);
-    string certificate_passwd ();
-    void set_certificate_passwd (string &c_passwd);
+    public string certificate_path ();
+    public void set_certificate_path (string c_path);
+    public string certificate_passwd ();
+    public void set_certificate_passwd (string c_passwd);
 
     /***********************************************************
     The client version that last used this settings file.
     Updated by config_version_migration () at client startup.
     ***********************************************************/
-    string client_version_string ();
-    void set_client_version_string (string &version);
+    public string client_version_string ();
+    public void set_client_version_string (string version);
 
     /***********************************************************
     Returns a new settings pre-set in a specific group.  The Settings will be created
     with the given parent. If no parent is specified, the caller must destroy the settings
     ***********************************************************/
-    static std.unique_ptr<QSettings> settings_with_group (string &group, GLib.Object *parent = nullptr);
+    public static std.unique_ptr<QSettings> settings_with_group (string group, GLib.Object *parent = nullptr);
 
     /// Add the system and user exclude file path to the ExcludedFiles instance.
-    static void setup_default_exclude_file_paths (ExcludedFiles &excluded_files);
+    public static void setup_default_exclude_file_paths (ExcludedFiles &excluded_files);
 
-protected:
-    QVariant get_policy_setting (string &policy, QVariant &default_value = QVariant ()) const;
-    void store_data (string &group, string &key, QVariant &value);
-    QVariant retrieve_data (string &group, string &key) const;
-    void remove_data (string &group, string &key);
-    bool data_exists (string &group, string &key) const;
 
-private:
-    QVariant get_value (string &param, string &group = string (),
-        const QVariant &default_value = QVariant ()) const;
-    void set_value (string &key, QVariant &value);
+    protected QVariant get_policy_setting (string policy, QVariant &default_value = QVariant ());
+    protected void store_data (string group, string key, QVariant &value);
+    protected QVariant retrieve_data (string group, string key);
+    protected void remove_data (string group, string key);
+    protected bool data_exists (string group, string key);
 
-    string keychain_proxy_password_key ();
 
-private:
-    using SharedCreds = QSharedPointer<AbstractCredentials>;
+    private QVariant get_value (string param, string group = string (),
+        const QVariant &default_value = QVariant ());
+    private void set_value (string key, QVariant &value);
 
-    static bool _asked_user;
-    static string _o_c_version;
-    static string _conf_dir;
+    private string keychain_proxy_password_key ();
+
+
+    private using SharedCreds = unowned<AbstractCredentials>;
+
+    private static bool _asked_user;
+    private static string _o_c_version;
+    private static string _conf_dir;
 };
 
 static chrono.milliseconds milliseconds_value (QSettings &setting, char *key,
@@ -368,7 +368,7 @@ ConfigFile.ConfigFile () {
     settings.begin_group (default_connection ());
 }
 
-bool ConfigFile.set_conf_dir (string &value) {
+bool ConfigFile.set_conf_dir (string value) {
     string dir_path = value;
     if (dir_path.is_empty ())
         return false;
@@ -476,7 +476,7 @@ void ConfigFile.restore_geometry_header (QHeaderView *header) {
 #endif
 }
 
-QVariant ConfigFile.get_policy_setting (string &setting, QVariant &default_value) {
+QVariant ConfigFile.get_policy_setting (string setting, QVariant &default_value) {
     if (Utility.is_windows ()) {
         // check for policies first and return immediately if a value is found.
         QSettings user_policy (string.from_latin1 (R" (HKEY_CURRENT_USER\Software\Policies\%1\%2)")
@@ -615,7 +615,7 @@ string ConfigFile.default_connection () {
     return Theme.instance ().app_name ();
 }
 
-void ConfigFile.store_data (string &group, string &key, QVariant &value) {
+void ConfigFile.store_data (string group, string key, QVariant &value) {
     const string con (group.is_empty () ? default_connection () : group);
     QSettings settings (config_file (), QSettings.IniFormat);
 
@@ -624,7 +624,7 @@ void ConfigFile.store_data (string &group, string &key, QVariant &value) {
     settings.sync ();
 }
 
-QVariant ConfigFile.retrieve_data (string &group, string &key) {
+QVariant ConfigFile.retrieve_data (string group, string key) {
     const string con (group.is_empty () ? default_connection () : group);
     QSettings settings (config_file (), QSettings.IniFormat);
 
@@ -632,7 +632,7 @@ QVariant ConfigFile.retrieve_data (string &group, string &key) {
     return settings.value (key);
 }
 
-void ConfigFile.remove_data (string &group, string &key) {
+void ConfigFile.remove_data (string group, string key) {
     const string con (group.is_empty () ? default_connection () : group);
     QSettings settings (config_file (), QSettings.IniFormat);
 
@@ -640,7 +640,7 @@ void ConfigFile.remove_data (string &group, string &key) {
     settings.remove (key);
 }
 
-bool ConfigFile.data_exists (string &group, string &key) {
+bool ConfigFile.data_exists (string group, string key) {
     const string con (group.is_empty () ? default_connection () : group);
     QSettings settings (config_file (), QSettings.IniFormat);
 
@@ -648,7 +648,7 @@ bool ConfigFile.data_exists (string &group, string &key) {
     return settings.contains (key);
 }
 
-chrono.milliseconds ConfigFile.remote_poll_interval (string &connection) {
+chrono.milliseconds ConfigFile.remote_poll_interval (string connection) {
     string con (connection);
     if (connection.is_empty ())
         con = default_connection ();
@@ -665,7 +665,7 @@ chrono.milliseconds ConfigFile.remote_poll_interval (string &connection) {
     return remote_interval;
 }
 
-void ConfigFile.set_remote_poll_interval (chrono.milliseconds interval, string &connection) {
+void ConfigFile.set_remote_poll_interval (chrono.milliseconds interval, string connection) {
     string con (connection);
     if (connection.is_empty ())
         con = default_connection ();
@@ -680,7 +680,7 @@ void ConfigFile.set_remote_poll_interval (chrono.milliseconds interval, string &
     settings.sync ();
 }
 
-chrono.milliseconds ConfigFile.force_sync_interval (string &connection) {
+chrono.milliseconds ConfigFile.force_sync_interval (string connection) {
     auto poll_interval = remote_poll_interval (connection);
 
     string con (connection);
@@ -704,7 +704,7 @@ chrono.milliseconds Occ.ConfigFile.full_local_discovery_interval () {
     return milliseconds_value (settings, full_local_discovery_interval_c, chrono.hours (1));
 }
 
-chrono.milliseconds ConfigFile.notification_refresh_interval (string &connection) {
+chrono.milliseconds ConfigFile.notification_refresh_interval (string connection) {
     string con (connection);
     if (connection.is_empty ())
         con = default_connection ();
@@ -720,7 +720,7 @@ chrono.milliseconds ConfigFile.notification_refresh_interval (string &connection
     return interval;
 }
 
-chrono.milliseconds ConfigFile.update_check_interval (string &connection) {
+chrono.milliseconds ConfigFile.update_check_interval (string connection) {
     string con (connection);
     if (connection.is_empty ())
         con = default_connection ();
@@ -738,7 +738,7 @@ chrono.milliseconds ConfigFile.update_check_interval (string &connection) {
     return interval;
 }
 
-bool ConfigFile.skip_update_check (string &connection) {
+bool ConfigFile.skip_update_check (string connection) {
     string con (connection);
     if (connection.is_empty ())
         con = default_connection ();
@@ -750,7 +750,7 @@ bool ConfigFile.skip_update_check (string &connection) {
     return value.to_bool ();
 }
 
-void ConfigFile.set_skip_update_check (bool skip, string &connection) {
+void ConfigFile.set_skip_update_check (bool skip, string connection) {
     string con (connection);
     if (connection.is_empty ())
         con = default_connection ();
@@ -762,7 +762,7 @@ void ConfigFile.set_skip_update_check (bool skip, string &connection) {
     settings.sync ();
 }
 
-bool ConfigFile.auto_update_check (string &connection) {
+bool ConfigFile.auto_update_check (string connection) {
     string con (connection);
     if (connection.is_empty ())
         con = default_connection ();
@@ -774,7 +774,7 @@ bool ConfigFile.auto_update_check (string &connection) {
     return value.to_bool ();
 }
 
-void ConfigFile.set_auto_update_check (bool auto_check, string &connection) {
+void ConfigFile.set_auto_update_check (bool auto_check, string connection) {
     string con (connection);
     if (connection.is_empty ())
         con = default_connection ();
@@ -815,16 +815,16 @@ string ConfigFile.update_channel () {
     return settings.value (QLatin1String (update_channel_c), default_update_channel).to_string ();
 }
 
-void ConfigFile.set_update_channel (string &channel) {
+void ConfigFile.set_update_channel (string channel) {
     QSettings settings (config_file (), QSettings.IniFormat);
     settings.set_value (QLatin1String (update_channel_c), channel);
 }
 
 void ConfigFile.set_proxy_type (int proxy_type,
-    const string &host,
+    const string host,
     int port, bool needs_auth,
-    const string &user,
-    const string &pass) {
+    const string user,
+    const string pass) {
     QSettings settings (config_file (), QSettings.IniFormat);
 
     settings.set_value (QLatin1String (proxy_type_c), proxy_type);
@@ -854,7 +854,7 @@ void ConfigFile.set_proxy_type (int proxy_type,
     settings.sync ();
 }
 
-QVariant ConfigFile.get_value (string &param, string &group,
+QVariant ConfigFile.get_value (string param, string group,
     const QVariant &default_value) {
     QVariant system_setting;
     if (Utility.is_mac ()) {
@@ -886,7 +886,7 @@ QVariant ConfigFile.get_value (string &param, string &group,
     return settings.value (param, system_setting);
 }
 
-void ConfigFile.set_value (string &key, QVariant &value) {
+void ConfigFile.set_value (string key, QVariant &value) {
     QSettings settings (config_file (), QSettings.IniFormat);
 
     settings.set_value (key, value);
@@ -916,8 +916,8 @@ string ConfigFile.proxy_user () {
 }
 
 string ConfigFile.proxy_password () {
-    QByteArray pass_encoded = get_value (proxy_pass_c).to_byte_array ();
-    auto pass = string.from_utf8 (QByteArray.from_base64 (pass_encoded));
+    GLib.ByteArray pass_encoded = get_value (proxy_pass_c).to_byte_array ();
+    auto pass = string.from_utf8 (GLib.ByteArray.from_base64 (pass_encoded));
     pass_encoded.clear ();
 
     const auto key = keychain_proxy_password_key ();
@@ -1064,7 +1064,7 @@ string ConfigFile.log_dir () {
     return settings.value (QLatin1String (log_dir_c), default_log_dir).to_string ();
 }
 
-void ConfigFile.set_log_dir (string &dir) {
+void ConfigFile.set_log_dir (string dir) {
     QSettings settings (config_file (), QSettings.IniFormat);
     settings.set_value (QLatin1String (log_dir_c), dir);
 }
@@ -1108,7 +1108,7 @@ string ConfigFile.certificate_path () {
     return retrieve_data (string (), QLatin1String (cert_path)).to_string ();
 }
 
-void ConfigFile.set_certificate_path (string &c_path) {
+void ConfigFile.set_certificate_path (string c_path) {
     QSettings settings (config_file (), QSettings.IniFormat);
     settings.set_value (QLatin1String (cert_path), c_path);
     settings.sync ();
@@ -1118,7 +1118,7 @@ string ConfigFile.certificate_passwd () {
     return retrieve_data (string (), QLatin1String (cert_passwd)).to_string ();
 }
 
-void ConfigFile.set_certificate_passwd (string &c_passwd) {
+void ConfigFile.set_certificate_passwd (string c_passwd) {
     QSettings settings (config_file (), QSettings.IniFormat);
     settings.set_value (QLatin1String (cert_passwd), c_passwd);
     settings.sync ();
@@ -1129,14 +1129,14 @@ string ConfigFile.client_version_string () {
     return settings.value (QLatin1String (client_version_c), string ()).to_string ();
 }
 
-void ConfigFile.set_client_version_string (string &version) {
+void ConfigFile.set_client_version_string (string version) {
     QSettings settings (config_file (), QSettings.IniFormat);
     settings.set_value (QLatin1String (client_version_c), version);
 }
 
 Q_GLOBAL_STATIC (string, g_config_file_name)
 
-std.unique_ptr<QSettings> ConfigFile.settings_with_group (string &group, GLib.Object *parent) {
+std.unique_ptr<QSettings> ConfigFile.settings_with_group (string group, GLib.Object *parent) {
     if (g_config_file_name ().is_empty ()) {
         // cache file name
         ConfigFile cfg;

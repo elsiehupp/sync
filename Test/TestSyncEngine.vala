@@ -10,33 +10,33 @@
 
 using namespace Occ;
 
-bool itemDidComplete (ItemCompletedSpy &spy, string &path) {
+bool itemDidComplete (ItemCompletedSpy &spy, string path) {
     if (auto item = spy.findItem (path)) {
         return item._instruction != CSYNC_INSTRUCTION_NONE && item._instruction != CSYNC_INSTRUCTION_UPDATE_METADATA;
     }
     return false;
 }
 
-bool itemInstruction (ItemCompletedSpy &spy, string &path, SyncInstructions instr) {
+bool itemInstruction (ItemCompletedSpy &spy, string path, SyncInstructions instr) {
     auto item = spy.findItem (path);
     return item._instruction == instr;
 }
 
-bool itemDidCompleteSuccessfully (ItemCompletedSpy &spy, string &path) {
+bool itemDidCompleteSuccessfully (ItemCompletedSpy &spy, string path) {
     if (auto item = spy.findItem (path)) {
         return item._status == SyncFileItem.Success;
     }
     return false;
 }
 
-bool itemDidCompleteSuccessfullyWithExpectedRank (ItemCompletedSpy &spy, string &path, int rank) {
+bool itemDidCompleteSuccessfullyWithExpectedRank (ItemCompletedSpy &spy, string path, int rank) {
     if (auto item = spy.findItemWithExpectedRank (path, rank)) {
         return item._status == SyncFileItem.Success;
     }
     return false;
 }
 
-int itemSuccessfullyCompletedGetRank (ItemCompletedSpy &spy, string &path) {
+int itemSuccessfullyCompletedGetRank (ItemCompletedSpy &spy, string path) {
     auto itItem = std.find_if (spy.begin (), spy.end (), [&path] (auto currentItem) {
         auto item = currentItem[0].template value<Occ.SyncFileItemPtr> ();
         return item.destination () == path;
@@ -49,8 +49,7 @@ int itemSuccessfullyCompletedGetRank (ItemCompletedSpy &spy, string &path) {
 
 class TestSyncEngine : GLib.Object {
 
-private slots:
-    void testFileDownload () {
+    private on_ void testFileDownload () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         ItemCompletedSpy completeSpy (fakeFolder);
         fakeFolder.remoteModifier ().insert ("A/a0");
@@ -59,7 +58,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void testFileUpload () {
+    private on_ void testFileUpload () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         ItemCompletedSpy completeSpy (fakeFolder);
         fakeFolder.localModifier ().insert ("A/a0");
@@ -68,7 +67,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void testDirDownload () {
+    private on_ void testDirDownload () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         ItemCompletedSpy completeSpy (fakeFolder);
         fakeFolder.remoteModifier ().mkdir ("Y");
@@ -81,7 +80,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void testDirUpload () {
+    private on_ void testDirUpload () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         ItemCompletedSpy completeSpy (fakeFolder);
         fakeFolder.localModifier ().mkdir ("Y");
@@ -94,7 +93,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void testDirUploadWithDelayedAlgorithm () {
+    private on_ void testDirUploadWithDelayedAlgorithm () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"bulkupload", "1.0"} } } });
 
@@ -125,7 +124,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void testLocalDelete () {
+    private on_ void testLocalDelete () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         ItemCompletedSpy completeSpy (fakeFolder);
         fakeFolder.remoteModifier ().remove ("A/a1");
@@ -134,7 +133,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void testRemoteDelete () {
+    private on_ void testRemoteDelete () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         ItemCompletedSpy completeSpy (fakeFolder);
         fakeFolder.localModifier ().remove ("A/a1");
@@ -143,7 +142,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void testEmlLocalChecksum () {
+    private on_ void testEmlLocalChecksum () {
         FakeFolder fakeFolder{FileInfo{}};
         fakeFolder.localModifier ().insert ("a1.eml", 64, 'A');
         fakeFolder.localModifier ().insert ("a2.eml", 64, 'A');
@@ -160,7 +159,7 @@ private slots:
         };
 
         // printf 'A%.0s' {1..64} | sha1sum -
-        QByteArray referenceChecksum ("SHA1:30b86e44e6001403827a62c58b08893e77cf121f");
+        GLib.ByteArray referenceChecksum ("SHA1:30b86e44e6001403827a62c58b08893e77cf121f");
         QCOMPARE (getDbChecksum ("a1.eml"), referenceChecksum);
         QCOMPARE (getDbChecksum ("a2.eml"), referenceChecksum);
         QCOMPARE (getDbChecksum ("a3.eml"), referenceChecksum);
@@ -176,8 +175,8 @@ private slots:
         fakeFolder.syncOnce ();
 
         QCOMPARE (getDbChecksum ("a1.eml"), referenceChecksum);
-        QCOMPARE (getDbChecksum ("a2.eml"), QByteArray ("SHA1:84951fc23a4dafd10020ac349da1f5530fa65949"));
-        QCOMPARE (getDbChecksum ("a3.eml"), QByteArray ("SHA1:826b7e7a7af8a529ae1c7443c23bf185c0ad440c"));
+        QCOMPARE (getDbChecksum ("a2.eml"), GLib.ByteArray ("SHA1:84951fc23a4dafd10020ac349da1f5530fa65949"));
+        QCOMPARE (getDbChecksum ("a3.eml"), GLib.ByteArray ("SHA1:826b7e7a7af8a529ae1c7443c23bf185c0ad440c"));
         QCOMPARE (getDbChecksum ("b3.eml"), getDbChecksum ("a3.txt"));
 
         QVERIFY (!itemDidComplete (completeSpy, "a1.eml"));
@@ -186,7 +185,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void testSelectiveSyncBug () {
+    private on_ void testSelectiveSyncBug () {
         // issue owncloud/enterprise#1965 : files from selective-sync ignored
         // folders are uploaded anyway is some circumstances.
         FakeFolder fakeFolder{FileInfo{ string (), {
@@ -210,7 +209,7 @@ private slots:
         // Remove subFolderA with selectiveSync:
         fakeFolder.syncEngine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncBlackList, {"parentFolder/subFolderA/"});
         fakeFolder.syncEngine ().journal ().schedulePathForRemoteDiscovery (QByteArrayLiteral ("parentFolder/subFolderA/"));
-        auto getEtag = [&] (QByteArray &file) {
+        auto getEtag = [&] (GLib.ByteArray &file) {
             SyncJournalFileRecord rec;
             fakeFolder.syncJournal ().getFileRecord (file, &rec);
             return rec._etag;
@@ -249,9 +248,9 @@ private slots:
         }
     }
 
-    void abortAfterFailedMkdir () {
+    private on_ void abortAfterFailedMkdir () {
         FakeFolder fakeFolder{FileInfo{}};
-        QSignalSpy finishedSpy (&fakeFolder.syncEngine (), SIGNAL (finished (bool)));
+        QSignalSpy finishedSpy (&fakeFolder.syncEngine (), SIGNAL (on_finished (bool)));
         fakeFolder.serverErrorPaths ().append ("NewFolder");
         fakeFolder.localModifier ().mkdir ("NewFolder");
         // This should be aborted and would otherwise fail in FileInfo.create.
@@ -263,9 +262,9 @@ private slots:
 
     /** Verify that an incompletely propagated directory doesn't have the server's
      * etag stored in the database yet. */
-    void testDirEtagAfterIncompleteSync () {
+    private on_ void testDirEtagAfterIncompleteSync () {
         FakeFolder fakeFolder{FileInfo{}};
-        QSignalSpy finishedSpy (&fakeFolder.syncEngine (), SIGNAL (finished (bool)));
+        QSignalSpy finishedSpy (&fakeFolder.syncEngine (), SIGNAL (on_finished (bool)));
         fakeFolder.serverErrorPaths ().append ("NewFolder/foo");
         fakeFolder.remoteModifier ().mkdir ("NewFolder");
         fakeFolder.remoteModifier ().insert ("NewFolder/foo");
@@ -278,7 +277,7 @@ private slots:
         QVERIFY (!rec._fileId.isEmpty ());
     }
 
-    void testDirDownloadWithError () {
+    private on_ void testDirDownloadWithError () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         ItemCompletedSpy completeSpy (fakeFolder);
         fakeFolder.remoteModifier ().mkdir ("Y");
@@ -299,7 +298,7 @@ private slots:
         QCoreApplication.processEvents (); // should not crash
 
         QSet<string> seen;
-        for (QList<QVariant> &args : completeSpy) {
+        for (GLib.List<QVariant> &args : completeSpy) {
             auto item = args[0].value<SyncFileItemPtr> ();
             qDebug () << item._file << item.isDirectory () << item._status;
             QVERIFY (!seen.contains (item._file)); // signal only sent once per item
@@ -314,48 +313,48 @@ private slots:
         }
     }
 
-    void testFakeConflict_data () {
+    private on_ void testFakeConflict_data () {
         QTest.addColumn<bool> ("sameMtime");
-        QTest.addColumn<QByteArray> ("checksums");
+        QTest.addColumn<GLib.ByteArray> ("checksums");
 
         QTest.addColumn<int> ("expectedGET");
 
         QTest.newRow ("Same mtime, but no server checksum . ignored in reconcile")
-            << true << QByteArray ()
+            << true << GLib.ByteArray ()
             << 0;
 
         QTest.newRow ("Same mtime, weak server checksum differ . downloaded")
-            << true << QByteArray ("Adler32:bad")
+            << true << GLib.ByteArray ("Adler32:bad")
             << 1;
 
         QTest.newRow ("Same mtime, matching weak checksum . skipped")
-            << true << QByteArray ("Adler32:2a2010d")
+            << true << GLib.ByteArray ("Adler32:2a2010d")
             << 0;
 
         QTest.newRow ("Same mtime, strong server checksum differ . downloaded")
-            << true << QByteArray ("SHA1:bad")
+            << true << GLib.ByteArray ("SHA1:bad")
             << 1;
 
         QTest.newRow ("Same mtime, matching strong checksum . skipped")
-            << true << QByteArray ("SHA1:56900fb1d337cf7237ff766276b9c1e8ce507427")
+            << true << GLib.ByteArray ("SHA1:56900fb1d337cf7237ff766276b9c1e8ce507427")
             << 0;
 
         QTest.newRow ("mtime changed, but no server checksum . download")
-            << false << QByteArray ()
+            << false << GLib.ByteArray ()
             << 1;
 
         QTest.newRow ("mtime changed, weak checksum match . download anyway")
-            << false << QByteArray ("Adler32:2a2010d")
+            << false << GLib.ByteArray ("Adler32:2a2010d")
             << 1;
 
         QTest.newRow ("mtime changed, strong checksum match . skip")
-            << false << QByteArray ("SHA1:56900fb1d337cf7237ff766276b9c1e8ce507427")
+            << false << GLib.ByteArray ("SHA1:56900fb1d337cf7237ff766276b9c1e8ce507427")
             << 0;
     }
 
-    void testFakeConflict () {
+    private on_ void testFakeConflict () {
         QFETCH (bool, sameMtime);
-        QFETCH (QByteArray, checksums);
+        QFETCH (GLib.ByteArray, checksums);
         QFETCH (int, expectedGET);
 
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
@@ -387,7 +386,7 @@ private slots:
         // check that mtime in journal and filesystem agree
         string a1path = fakeFolder.localPath () + "A/a1";
         SyncJournalFileRecord a1record;
-        fakeFolder.syncJournal ().getFileRecord (QByteArray ("A/a1"), &a1record);
+        fakeFolder.syncJournal ().getFileRecord (GLib.ByteArray ("A/a1"), &a1record);
         QCOMPARE (a1record._modtime, (int64)FileSystem.getModTime (a1path));
 
         // Extra sync reads from db, no difference
@@ -396,10 +395,10 @@ private slots:
     }
 
     /***********************************************************
-     * Checks whether SyncFileItems have the expected properties before start
+     * Checks whether SyncFileItems have the expected properties before on_start
      * of propagation.
      */
-    void testSyncFileItemProperties () {
+    private on_ void testSyncFileItemProperties () {
         auto initialMtime = QDateTime.currentDateTimeUtc ().addDays (-7);
         auto changedMtime = QDateTime.currentDateTimeUtc ().addDays (-4);
         auto changedMtime2 = QDateTime.currentDateTimeUtc ().addDays (-3);
@@ -476,7 +475,7 @@ private slots:
     /***********************************************************
      * Checks whether subsequent large uploads are skipped after a 507 error
      */
-    void testInsufficientRemoteStorage () {
+     private on_ void testInsufficientRemoteStorage () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
 
         // Disable parallel uploads
@@ -523,12 +522,12 @@ private slots:
     }
 
     // Checks whether downloads with bad checksums are accepted
-    void testChecksumValidation () {
+    private on_ void testChecksumValidation () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         GLib.Object parent;
 
-        QByteArray checksumValue;
-        QByteArray contentMd5Value;
+        GLib.ByteArray checksumValue;
+        GLib.ByteArray contentMd5Value;
 
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.GetOperation) {
@@ -556,7 +555,7 @@ private slots:
         checksumValue = "SHA1:19b1928d58a2030d08023f3d7054516dbc186f20"; // printf 'A%.0s' {1..16} | sha1sum -
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
-        checksumValue = QByteArray ();
+        checksumValue = GLib.ByteArray ();
 
         // Bad Content-MD5
         contentMd5Value = "bad";
@@ -590,7 +589,7 @@ private slots:
     }
 
     // Tests the behavior of invalid filename detection
-    void testInvalidFilenameRegex () {
+    private on_ void testInvalidFilenameRegex () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
 
         // For current servers, no characters are forbidden
@@ -618,7 +617,7 @@ private slots:
         QVERIFY (!fakeFolder.currentRemoteState ().find ("C/myfile.txt"));
     }
 
-    void testDiscoveryHiddenFile () {
+    private on_ void testDiscoveryHiddenFile () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
@@ -643,7 +642,7 @@ private slots:
         QVERIFY (fakeFolder.currentRemoteState ().find ("B/.hidden"));
     }
 
-    void testNoLocalEncoding () {
+    private on_ void testNoLocalEncoding () {
         auto utf8Locale = QTextCodec.codecForLocale ();
         if (utf8Locale.mibEnum () != 106) {
             QSKIP ("Test only works for UTF8 locale");
@@ -693,7 +692,7 @@ private slots:
     }
 
     // Aborting has had bugs when there are parallel upload jobs
-    void testUploadV1Multiabort () {
+    private on_ void testUploadV1Multiabort () {
         FakeFolder fakeFolder{ FileInfo{} };
         SyncOptions options;
         options._initialChunkSize = 10;
@@ -712,13 +711,13 @@ private slots:
         });
 
         fakeFolder.localModifier ().insert ("file", 100, 'W');
-        QTimer.singleShot (100, &fakeFolder.syncEngine (), [&] () { fakeFolder.syncEngine ().abort (); });
+        QTimer.singleShot (100, &fakeFolder.syncEngine (), [&] () { fakeFolder.syncEngine ().on_abort (); });
         QVERIFY (!fakeFolder.syncOnce ());
 
         QCOMPARE (nPUT, 3);
     }
 
-    void testPropagatePermissions () {
+    private on_ void testPropagatePermissions () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         auto perm = QFileDevice.Permission (0x7704); // user/owner : rwx, group : r, other : -
         QFile.setPermissions (fakeFolder.localPath () + "A/a1", perm);
@@ -737,7 +736,7 @@ private slots:
         QCOMPARE (QFileInfo (fakeFolder.localPath () + conflictName).permissions (), perm);
     }
 
-    void testEmptyLocalButHasRemote () {
+    private on_ void testEmptyLocalButHasRemote () {
         FakeFolder fakeFolder{ FileInfo{} };
         fakeFolder.remoteModifier ().mkdir ("foo");
 
@@ -749,7 +748,7 @@ private slots:
     }
 
     // Check that server mtime is set on directories on initial propagation
-    void testDirectoryInitialMtime () {
+    private on_ void testDirectoryInitialMtime () {
         FakeFolder fakeFolder{ FileInfo{} };
         fakeFolder.remoteModifier ().mkdir ("foo");
         fakeFolder.remoteModifier ().insert ("foo/bar");
@@ -766,7 +765,7 @@ private slots:
     /***********************************************************
      * Checks whether subsequent large uploads are skipped after a 507 error
      */
-    void testErrorsWithBulkUpload () {
+     private on_ void testErrorsWithBulkUpload () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"bulkupload", "1.0"} } } });
 
@@ -782,7 +781,7 @@ private slots:
             if (op == QNetworkAccessManager.PostOperation) {
                 ++nPOST;
                 if (contentType.startsWith (QStringLiteral ("multipart/related; boundary="))) {
-                    auto jsonReplyObject = fakeFolder.forEachReplyPart (outgoingData, contentType, [] (QMap<string, QByteArray> &allHeaders) . QJsonObject {
+                    auto jsonReplyObject = fakeFolder.forEachReplyPart (outgoingData, contentType, [] (QMap<string, GLib.ByteArray> &allHeaders) . QJsonObject {
                         auto reply = QJsonObject{};
                         const auto fileName = allHeaders[QStringLiteral ("X-File-Path")];
                         if (fileName.endsWith ("A/big2") ||
@@ -853,4 +852,3 @@ private slots:
 };
 
 QTEST_GUILESS_MAIN (TestSyncEngine)
-#include "testsyncengine.moc"

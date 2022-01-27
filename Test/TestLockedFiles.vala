@@ -13,15 +13,14 @@ using namespace Occ;
 
 class TestLockedFiles : GLib.Object {
 
-private slots:
-    void testBasicLockFileWatcher () {
+    private on_ void testBasicLockFileWatcher () {
         QTemporaryDir tmp;
         int count = 0;
         string file;
 
         LockWatcher watcher;
         watcher.setCheckInterval (std.chrono.milliseconds (50));
-        connect (&watcher, &LockWatcher.fileUnlocked, &watcher, [&] (string &f) { ++count; file = f; });
+        connect (&watcher, &LockWatcher.fileUnlocked, &watcher, [&] (string f) { ++count; file = f; });
 
         const string tmpFile = tmp.path () + string.fromUtf8 ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
                                                                "elonglonglonglong/flonglonglonglong/glonglonglonglong/hlonglonglonglong/ilonglonglonglong/"
@@ -51,4 +50,3 @@ private slots:
 };
 
 QTEST_GUILESS_MAIN (TestLockedFiles)
-#include "testlockedfiles.moc"

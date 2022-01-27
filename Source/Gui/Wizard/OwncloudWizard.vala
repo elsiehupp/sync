@@ -29,88 +29,88 @@ class Abstract_credentials_wizard_page;
 @ingroup gui
 ***********************************************************/
 class OwncloudWizard : QWizard {
-public:
-    enum Log_type {
+
+    public enum Log_type {
         Log_plain,
         Log_paragraph
     };
 
-    OwncloudWizard (Gtk.Widget *parent = nullptr);
+    public OwncloudWizard (Gtk.Widget *parent = nullptr);
 
-    void set_account (AccountPtr account);
-    AccountPtr account ();
-    void set_oCUrl (string &);
-    bool registration ();
-    void set_registration (bool registration);
+    public void set_account (AccountPtr account);
+    public AccountPtr account ();
+    public void set_oCUrl (string );
+    public bool registration ();
+    public void set_registration (bool registration);
 
-    void setup_custom_media (QVariant, QLabel *);
-    string oc_url ();
-    string local_folder ();
-    QStringList selective_sync_blacklist ();
-    bool use_virtual_file_sync ();
-    bool is_confirm_big_folder_checked ();
+    public void setup_custom_media (QVariant, QLabel *);
+    public string oc_url ();
+    public string local_folder ();
+    public string[] selective_sync_blacklist ();
+    public bool use_virtual_file_sync ();
+    public bool is_confirm_big_folder_checked ();
 
-    void display_error (string &, bool retry_h_t_tPonly);
-    AbstractCredentials *get_credentials ();
+    public void on_display_error (string , bool retry_http_only);
+    public AbstractCredentials *get_credentials ();
 
-    void bring_to_top ();
-    void center_window ();
+    public void bring_to_top ();
+    public void center_window ();
 
     /***********************************************************
     Shows a dialog explaining the virtual files mode and warning about it
     being experimental. Calles the callback with true if enabling was
     chosen.
     ***********************************************************/
-    static void ask_experimental_virtual_files_feature (Gtk.Widget *receiver, std.function<void (bool enable)> &callback);
+    public static void ask_experimental_virtual_files_feature (Gtk.Widget *receiver, std.function<void (bool enable)> &callback);
 
     // FIXME : Can those be local variables?
     // Set from the Owncloud_setup_page, later used from Owncloud_http_creds_page
-    QByteArray _client_cert_bundle; // raw, potentially encrypted pkcs12 bundle provided by the user
-    QByteArray _client_cert_password; // password for the pkcs12
-    QSslKey _client_ssl_key; // key extracted from pkcs12
-    QSslCertificate _client_ssl_certificate; // cert extracted from pkcs12
-    QList<QSslCertificate> _client_ssl_ca_certificates;
+    public GLib.ByteArray _client_cert_bundle; // raw, potentially encrypted pkcs12 bundle provided by the user
+    public GLib.ByteArray _client_cert_password; // password for the pkcs12
+    public QSslKey _client_ssl_key; // key extracted from pkcs12
+    public QSslCertificate _client_ssl_certificate; // cert extracted from pkcs12
+    public GLib.List<QSslCertificate> _client_ssl_ca_certificates;
 
-public slots:
-    void set_auth_type (DetermineAuthTypeJob.AuthType type);
-    void set_remote_folder (string &);
-    void append_to_configuration_log (string &msg, Log_type type = Log_paragraph);
-    void slot_current_page_changed (int);
-    void successful_step ();
+
+    public void on_set_auth_type (DetermineAuthTypeJob.AuthType type);
+    public void on_set_remote_folder (string );
+    public void on_append_to_configuration_log (string msg, Log_type type = Log_paragraph);
+    public void on_current_page_changed (int);
+    public void on_successful_step ();
 
 signals:
     void clear_pending_requests ();
-    void determine_auth_type (string &);
-    void connect_to_oCUrl (string &);
-    void create_local_and_remote_folders (string &, string &);
-    // make sure to connect to this, rather than finished (int)!!
+    void determine_auth_type (string );
+    void connect_to_oc_url (string );
+    void create_local_and_remote_folders (string , string );
+    // make sure to connect to this, rather than on_finished (int)!!
     void basic_setup_finished (int);
     void skip_folder_configuration ();
     void need_certificate ();
     void style_changed ();
     void on_activate ();
 
-protected:
-    void change_event (QEvent *) override;
 
-private:
-    void customize_style ();
-    void adjust_wizard_size ();
-    int calculate_longest_side_of_wizard_pages (QList<QSize> &page_sizes) const;
-    QList<QSize> calculate_wizard_page_sizes ();
+    protected void change_event (QEvent *) override;
 
-    AccountPtr _account;
-    Welcome_page *_welcome_page;
-    Owncloud_setup_page *_setup_page;
-    Owncloud_http_creds_page *_http_creds_page;
-    Owncloud_oauth_creds_page *_browser_creds_page;
-    Flow2Auth_creds_page *_flow2Creds_page;
-    Owncloud_advanced_setup_page *_advanced_setup_page;
-    Owncloud_wizard_result_page *_result_page;
-    Abstract_credentials_wizard_page *_credentials_page = nullptr;
-    Web_view_page *_web_view_page = nullptr;
 
-    QStringList _setup_log;
+    private void customize_style ();
+    private void adjust_wizard_size ();
+    private int calculate_longest_side_of_wizard_pages (GLib.List<QSize> &page_sizes);
+    private GLib.List<QSize> calculate_wizard_page_sizes ();
+
+    private AccountPtr _account;
+    private Welcome_page _welcome_page;
+    private Owncloud_setup_page _setup_page;
+    private Owncloud_http_creds_page _http_creds_page;
+    private Owncloud_oauth_creds_page _browser_creds_page;
+    private Flow2Auth_creds_page _flow2Creds_page;
+    private Owncloud_advanced_setup_page _advanced_setup_page;
+    private Owncloud_wizard_result_page _result_page;
+    private Abstract_credentials_wizard_page _credentials_page = nullptr;
+    private Web_view_page _web_view_page = nullptr;
+
+    string[] _setup_log;
 
     bool _registration = false;
 
@@ -145,18 +145,18 @@ private:
         set_page (WizardCommon.Page_Web_view, _web_view_page);
     #endif // WITH_WEBENGINE
 
-        connect (this, &Gtk.Dialog.finished, this, &OwncloudWizard.basic_setup_finished);
+        connect (this, &Gtk.Dialog.on_finished, this, &OwncloudWizard.basic_setup_finished);
 
-        // note : start Id is set by the calling class depending on if the
+        // note : on_start Id is set by the calling class depending on if the
         // welcome text is to be shown or not.
 
-        connect (this, &QWizard.current_id_changed, this, &OwncloudWizard.slot_current_page_changed);
+        connect (this, &QWizard.current_id_changed, this, &OwncloudWizard.on_current_page_changed);
         connect (_setup_page, &Owncloud_setup_page.determine_auth_type, this, &OwncloudWizard.determine_auth_type);
-        connect (_http_creds_page, &Owncloud_http_creds_page.connect_to_oCUrl, this, &OwncloudWizard.connect_to_oCUrl);
-        connect (_browser_creds_page, &Owncloud_oauth_creds_page.connect_to_oCUrl, this, &OwncloudWizard.connect_to_oCUrl);
-        connect (_flow2Creds_page, &Flow2Auth_creds_page.connect_to_oCUrl, this, &OwncloudWizard.connect_to_oCUrl);
+        connect (_http_creds_page, &Owncloud_http_creds_page.connect_to_oc_url, this, &OwncloudWizard.connect_to_oc_url);
+        connect (_browser_creds_page, &Owncloud_oauth_creds_page.connect_to_oc_url, this, &OwncloudWizard.connect_to_oc_url);
+        connect (_flow2Creds_page, &Flow2Auth_creds_page.connect_to_oc_url, this, &OwncloudWizard.connect_to_oc_url);
     #ifdef WITH_WEBENGINE
-        connect (_web_view_page, &Web_view_page.connect_to_oCUrl, this, &OwncloudWizard.connect_to_oCUrl);
+        connect (_web_view_page, &Web_view_page.connect_to_oc_url, this, &OwncloudWizard.connect_to_oc_url);
     #endif // WITH_WEBENGINE
         connect (_advanced_setup_page, &Owncloud_advanced_setup_page.create_local_and_remote_folders,
             this, &OwncloudWizard.create_local_and_remote_folders);
@@ -178,14 +178,14 @@ private:
         button (QWizard.Next_button).set_size_policy (next_button_size_policy);
 
         // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-        connect (this, &OwncloudWizard.style_changed, _setup_page, &Owncloud_setup_page.slot_style_changed);
-        connect (this, &OwncloudWizard.style_changed, _advanced_setup_page, &Owncloud_advanced_setup_page.slot_style_changed);
-        connect (this, &OwncloudWizard.style_changed, _flow2Creds_page, &Flow2Auth_creds_page.slot_style_changed);
+        connect (this, &OwncloudWizard.style_changed, _setup_page, &Owncloud_setup_page.on_style_changed);
+        connect (this, &OwncloudWizard.style_changed, _advanced_setup_page, &Owncloud_advanced_setup_page.on_style_changed);
+        connect (this, &OwncloudWizard.style_changed, _flow2Creds_page, &Flow2Auth_creds_page.on_style_changed);
 
         customize_style ();
 
         // allow Flow2 page to poll on window activation
-        connect (this, &OwncloudWizard.on_activate, _flow2Creds_page, &Flow2Auth_creds_page.slot_poll_now);
+        connect (this, &OwncloudWizard.on_activate, _flow2Creds_page, &Flow2Auth_creds_page.on_poll_now);
 
         adjust_wizard_size ();
         center_window ();
@@ -209,8 +209,8 @@ private:
         resize (QSize (longest_side, longest_side));
     }
 
-    QList<QSize> OwncloudWizard.calculate_wizard_page_sizes () {
-        QList<QSize> page_sizes;
+    GLib.List<QSize> OwncloudWizard.calculate_wizard_page_sizes () {
+        GLib.List<QSize> page_sizes;
         const auto p_ids = page_ids ();
 
         std.transform (p_ids.cbegin (), p_ids.cend (), std.back_inserter (page_sizes), [this] (int page_id) {
@@ -222,7 +222,7 @@ private:
         return page_sizes;
     }
 
-    int OwncloudWizard.calculate_longest_side_of_wizard_pages (QList<QSize> &page_sizes) {
+    int OwncloudWizard.calculate_longest_side_of_wizard_pages (GLib.List<QSize> &page_sizes) {
         return std.accumulate (std.cbegin (page_sizes), std.cend (page_sizes), 0, [] (int current, QSize &size) {
             return std.max ({
                 current, size.width (), size.height ()
@@ -242,7 +242,7 @@ private:
         return (_advanced_setup_page.local_folder ());
     }
 
-    QStringList OwncloudWizard.selective_sync_blacklist () {
+    string[] OwncloudWizard.selective_sync_blacklist () {
         return _advanced_setup_page.selective_sync_blacklist ();
     }
 
@@ -267,11 +267,11 @@ private:
         _registration = registration;
     }
 
-    void OwncloudWizard.set_remote_folder (string &remote_folder) {
-        _advanced_setup_page.set_remote_folder (remote_folder);
+    void OwncloudWizard.on_set_remote_folder (string remote_folder) {
+        _advanced_setup_page.on_set_remote_folder (remote_folder);
     }
 
-    void OwncloudWizard.successful_step () {
+    void OwncloudWizard.on_successful_step () {
         const int id (current_id ());
 
         switch (id) {
@@ -304,15 +304,15 @@ private:
 
         OwncloudGui.raise_dialog (this);
         if (next_id () == -1) {
-            disconnect (this, &Gtk.Dialog.finished, this, &OwncloudWizard.basic_setup_finished);
+            disconnect (this, &Gtk.Dialog.on_finished, this, &OwncloudWizard.basic_setup_finished);
             emit basic_setup_finished (Gtk.Dialog.Accepted);
         } else {
             next ();
         }
     }
 
-    void OwncloudWizard.set_auth_type (DetermineAuthTypeJob.AuthType type) {
-        _setup_page.set_auth_type (type);
+    void OwncloudWizard.on_set_auth_type (DetermineAuthTypeJob.AuthType type) {
+        _setup_page.on_set_auth_type (type);
 
         if (type == DetermineAuthTypeJob.OAuth) {
             _credentials_page = _browser_creds_page;
@@ -329,7 +329,7 @@ private:
     }
 
     // TODO : update this function
-    void OwncloudWizard.slot_current_page_changed (int id) {
+    void OwncloudWizard.on_current_page_changed (int id) {
         q_c_debug (lc_wizard) << "Current Wizard page changed to " << id;
 
         const auto set_next_button_as_default = [this] () {
@@ -381,28 +381,28 @@ private:
         }
     }
 
-    void OwncloudWizard.display_error (string &msg, bool retry_h_t_tPonly) {
+    void OwncloudWizard.on_display_error (string msg, bool retry_http_only) {
         switch (current_id ()) {
         case WizardCommon.Page_Server_setup:
-            _setup_page.set_error_string (msg, retry_h_t_tPonly);
+            _setup_page.on_set_error_string (msg, retry_http_only);
             break;
 
         case WizardCommon.Page_Http_creds:
-            _http_creds_page.set_error_string (msg);
+            _http_creds_page.on_set_error_string (msg);
             break;
 
         case WizardCommon.Page_Advanced_setup:
-            _advanced_setup_page.set_error_string (msg);
+            _advanced_setup_page.on_set_error_string (msg);
             break;
         }
     }
 
-    void OwncloudWizard.append_to_configuration_log (string &msg, Log_type /*type*/) {
+    void OwncloudWizard.on_append_to_configuration_log (string msg, Log_type /*type*/) {
         _setup_log << msg;
         q_c_debug (lc_wizard) << "Setup-Log : " << msg;
     }
 
-    void OwncloudWizard.set_oCUrl (string &url) {
+    void OwncloudWizard.set_oCUrl (string url) {
         _setup_page.set_server_url (url);
     }
 
@@ -441,9 +441,9 @@ private:
         // Set background colors
         auto wizard_palette = palette ();
         const auto background_color = wizard_palette.color (QPalette.Window);
-        wizard_palette.set_color (QPalette.Base, background_color);
+        wizard_palette.on_set_color (QPalette.Base, background_color);
         // Set separator color
-        wizard_palette.set_color (QPalette.Mid, background_color);
+        wizard_palette.on_set_color (QPalette.Mid, background_color);
 
         set_palette (wizard_palette);
     }
@@ -473,7 +473,7 @@ private:
                    "Currently unselected folders will be translated to online-only folders "
                    "and your selective sync settings will be reset."
                    "\n\n"
-                   "Switching to this mode will abort any currently running synchronization."
+                   "Switching to this mode will on_abort any currently running synchronization."
                    "\n\n"
                    "This is a new, experimental mode. If you decide to use it, please report any "
                    "issues that come up.")

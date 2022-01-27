@@ -13,64 +13,63 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 // #include <QSignalSpy>
 
 class FakeWebSocketServer : GLib.Object {
-public:
-    FakeWebSocketServer (uint16 port = 12345, GLib.Object *parent = nullptr);
+
+    public FakeWebSocketServer (uint16 port = 12345, GLib.Object *parent = nullptr);
 
     ~FakeWebSocketServer () override;
 
-    QWebSocket *authenticateAccount (
+    public QWebSocket *authenticateAccount (
         const Occ.AccountPtr account, std.function<void (Occ.PushNotifications *pushNotifications)> beforeAuthentication = [] (Occ.PushNotifications *) {}, std.function<void (void)> afterAuthentication = [] {});
 
-    void close ();
+    public void close ();
 
-    bool waitForTextMessages ();
+    public bool waitForTextMessages ();
 
-    uint32_t textMessagesCount ();
+    public uint32 textMessagesCount ();
 
-    string textMessage (int messageNumber) const;
+    public string textMessage (int messageNumber);
 
-    QWebSocket *socketForTextMessage (int messageNumber) const;
+    public QWebSocket *socketForTextMessage (int messageNumber);
 
-    void clearTextMessages ();
+    public void clearTextMessages ();
 
-    static Occ.AccountPtr createAccount (string &username = "user", string &password = "password");
+    public static Occ.AccountPtr createAccount (string username = "user", string password = "password");
 
 signals:
     void closed ();
-    void processTextMessage (QWebSocket *sender, string &message);
+    void processTextMessage (QWebSocket *sender, string message);
 
-private slots:
-    void processTextMessageInternal (string &message);
-    void onNewConnection ();
-    void socketDisconnected ();
 
-private:
-    QWebSocketServer *_webSocketServer;
-    QList<QWebSocket> _clients;
+    private void on_process_next_message_internal (string message);
+    private void on_new_connection ();
+    private void on_socket_disconnected ();
 
-    std.unique_ptr<QSignalSpy> _processTextMessageSpy;
+
+    private QWebSocketServer _webSocketServer;
+    private GLib.List<QWebSocket> _clients;
+
+    private std.unique_ptr<QSignalSpy> _processTextMessageSpy;
 };
 
 class CredentialsStub : Occ.AbstractCredentials {
 
-public:
-    CredentialsStub (string &user, string &password);
-    string authType () const override;
-    string user () const override;
-    string password () const override;
-    QNetworkAccessManager *createQNAM () const override;
-    bool ready () const override;
-    void fetchFromKeychain () override;
-    void askFromUser () override;
+    public CredentialsStub (string user, string password);
+    public string authType () override;
+    public string user () override;
+    public string password () override;
+    public QNetworkAccessManager *createQNAM () override;
+    public bool ready () override;
+    public void fetchFromKeychain () override;
+    public void askFromUser () override;
 
-    bool stillValid (QNetworkReply *reply) override;
-    void persist () override;
-    void invalidateToken () override;
-    void forgetSensitiveData () override;
+    public bool stillValid (QNetworkReply *reply) override;
+    public void persist () override;
+    public void invalidateToken () override;
+    public void forgetSensitiveData () override;
 
-private:
-    string _user;
-    string _password;
+
+    private string _user;
+    private string _password;
 };
 
 
@@ -95,7 +94,7 @@ FakeWebSocketServer.FakeWebSocketServer (uint16 port, GLib.Object *parent)
     if (!_webSocketServer.listen (QHostAddress.Any, port)) {
         Q_UNREACHABLE ();
     }
-    connect (_webSocketServer, &QWebSocketServer.newConnection, this, &FakeWebSocketServer.onNewConnection);
+    connect (_webSocketServer, &QWebSocketServer.newConnection, this, &FakeWebSocketServer.on_new_connection);
     connect (_webSocketServer, &QWebSocketServer.closed, this, &FakeWebSocketServer.closed);
     qCInfo (lcFakeWebSocketServer) << "Open fake websocket server on port:" << port;
     _processTextMessageSpy = std.make_unique<QSignalSpy> (this, &FakeWebSocketServer.processTextMessage);
@@ -153,23 +152,23 @@ void FakeWebSocketServer.close () {
     }
 }
 
-void FakeWebSocketServer.processTextMessageInternal (string &message) {
+void FakeWebSocketServer.on_process_next_message_internal (string message) {
     auto client = qobject_cast<QWebSocket> (sender ());
     emit processTextMessage (client, message);
 }
 
-void FakeWebSocketServer.onNewConnection () {
+void FakeWebSocketServer.on_new_connection () {
     qCInfo (lcFakeWebSocketServer) << "New connection on fake websocket server";
 
     auto socket = _webSocketServer.nextPendingConnection ();
 
-    connect (socket, &QWebSocket.textMessageReceived, this, &FakeWebSocketServer.processTextMessageInternal);
-    connect (socket, &QWebSocket.disconnected, this, &FakeWebSocketServer.socketDisconnected);
+    connect (socket, &QWebSocket.textMessageReceived, this, &FakeWebSocketServer.on_process_next_message_internal);
+    connect (socket, &QWebSocket.disconnected, this, &FakeWebSocketServer.on_socket_disconnected);
 
     _clients << socket;
 }
 
-void FakeWebSocketServer.socketDisconnected () {
+void FakeWebSocketServer.on_socket_disconnected () {
     qCInfo (lcFakeWebSocketServer) << "Socket disconnected";
 
     auto client = qobject_cast<QWebSocket> (sender ());
@@ -202,10 +201,10 @@ void FakeWebSocketServer.clearTextMessages () {
     _processTextMessageSpy.clear ();
 }
 
-Occ.AccountPtr FakeWebSocketServer.createAccount (string &username, string &password) {
+Occ.AccountPtr FakeWebSocketServer.createAccount (string username, string password) {
     auto account = Occ.Account.create ();
 
-    QStringList typeList;
+    string[] typeList;
     typeList.append ("files");
     typeList.append ("activities");
     typeList.append ("notifications");
@@ -230,7 +229,7 @@ Occ.AccountPtr FakeWebSocketServer.createAccount (string &username, string &pass
     return account;
 }
 
-CredentialsStub.CredentialsStub (string &user, string &password)
+CredentialsStub.CredentialsStub (string user, string password)
     : _user (user)
     , _password (password) {
 }

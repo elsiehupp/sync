@@ -24,22 +24,22 @@ need to make sure
 as it changes.
 
 To accomplish that, the event_filter () stores the tooltip's position
-and the data_changed () slot updates the tooltip if Qt.ToolTipRole
+and the on_data_changed () slot updates the tooltip if Qt.ToolTipRole
 gets updated while a tooltip is shown.
 ***********************************************************/
 class ToolTipUpdater : GLib.Object {
 
     public ToolTipUpdater (QTreeView *tree_view);
 
-protected:
-    bool event_filter (GLib.Object *obj, QEvent *ev) override;
 
-private slots:
-    void data_changed (QModelIndex &top_left, QModelIndex &bottom_right, QVector<int> &roles);
+    protected bool event_filter (GLib.Object *obj, QEvent *ev) override;
 
-private:
-    QTreeView *_tree_view;
-    QPoint _tool_tip_pos;
+
+    private void on_data_changed (QModelIndex &top_left, QModelIndex &bottom_right, QVector<int> &roles);
+
+
+    private QTreeView _tree_view;
+    private QPoint _tool_tip_pos;
 };
 
 } // namespace Occ
@@ -60,8 +60,8 @@ using namespace Occ;
 ToolTipUpdater.ToolTipUpdater (QTreeView *tree_view)
     : GLib.Object (tree_view)
     , _tree_view (tree_view) {
-    connect (_tree_view.model (), &QAbstractItemModel.data_changed,
-        this, &ToolTipUpdater.data_changed);
+    connect (_tree_view.model (), &QAbstractItemModel.on_data_changed,
+        this, &ToolTipUpdater.on_data_changed);
     _tree_view.viewport ().install_event_filter (this);
 }
 
@@ -73,7 +73,7 @@ bool ToolTipUpdater.event_filter (GLib.Object * /*obj*/, QEvent *ev) {
     return false;
 }
 
-void ToolTipUpdater.data_changed (QModelIndex &top_left,
+void ToolTipUpdater.on_data_changed (QModelIndex &top_left,
     const QModelIndex &bottom_right,
     const QVector<int> &roles) {
     if (!QToolTip.is_visible () || !roles.contains (Qt.ToolTipRole) || _tool_tip_pos.is_null ()) {

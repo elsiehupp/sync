@@ -12,29 +12,29 @@
 namespace Occ {
 
 class Update_info {
-public:
-    void set_version (string &v);
-    string version ();
-    void set_version_string (string &v);
-    string version_string ();
-    void set_web (string &v);
-    string web ();
-    void set_download_url (string &v);
-    string download_url ();
+
+    public void set_version (string v);
+    public string version ();
+    public void set_version_string (string v);
+    public string version_string ();
+    public void set_web (string v);
+    public string web ();
+    public void set_download_url (string v);
+    public string download_url ();
     /***********************************************************
       Parse XML object from DOM element.
     ***********************************************************/
     static Update_info parse_element (QDom_element &element, bool *ok);
-    static Update_info parse_string (string &xml, bool *ok);
+    static Update_info parse_string (string xml, bool *ok);
 
-private:
-    string m_version;
-    string m_version_string;
-    string m_web;
-    string m_download_url;
+
+    private string m_version;
+    private string m_version_string;
+    private string m_web;
+    private string m_download_url;
 };
 
-    void Update_info.set_version (string &v) {
+    void Update_info.set_version (string v) {
         m_version = v;
     }
 
@@ -42,7 +42,7 @@ private:
         return m_version;
     }
 
-    void Update_info.set_version_string (string &v) {
+    void Update_info.set_version_string (string v) {
         m_version_string = v;
     }
 
@@ -50,7 +50,7 @@ private:
         return m_version_string;
     }
 
-    void Update_info.set_web (string &v) {
+    void Update_info.set_web (string v) {
         m_web = v;
     }
 
@@ -58,7 +58,7 @@ private:
         return m_web;
     }
 
-    void Update_info.set_download_url (string &v) {
+    void Update_info.set_download_url (string v) {
         m_download_url = v;
     }
 
@@ -95,7 +95,7 @@ private:
         return result;
     }
 
-    Update_info Update_info.parse_string (string &xml, bool *ok) {
+    Update_info Update_info.parse_string (string xml, bool *ok) {
         string error_msg;
         int error_line = 0, error_col = 0;
         QDom_document doc;

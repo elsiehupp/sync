@@ -33,145 +33,145 @@ static constexpr int MaxChunks = 10;
 @brief : Abstract base class for KeychainChunk jobs.
 ***********************************************************/
 class Job : GLib.Object {
-public:
-    Job (GLib.Object *parent = nullptr);
+
+    public Job (GLib.Object *parent = nullptr);
 
     ~Job () override;
 
-    QKeychain.Error error ();
-    string error_string ();
+    public QKeychain.Error error ();
+    public string error_string ();
 
-    QByteArray binary_data ();
-    string text_data ();
+    public GLib.ByteArray binary_data ();
+    public string text_data ();
 
-    bool insecure_fallback ();
+    public bool insecure_fallback ();
 
 // If we use it but don't support insecure fallback, give us nice compilation errors ;p
 #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
-    void set_insecure_fallback (bool insecure_fallback);
+    public void set_insecure_fallback (bool insecure_fallback);
 #endif
 
     /***********************************************************
-    @return Whether this job autodeletes itself once finished () has been emitted. Default is true.
+    @return Whether this job autodeletes itself once on_finished () has been emitted. Default is true.
     @see set_auto_delete ()
     ***********************************************************/
-    bool auto_delete ();
+    public bool auto_delete ();
 
     /***********************************************************
-    Set whether this job should autodelete itself once finished () has been emitted.
+    Set whether this job should autodelete itself once on_finished () has been emitted.
     @see auto_delete ()
     ***********************************************************/
-    void set_auto_delete (bool auto_delete);
+    public void set_auto_delete (bool auto_delete);
 
-protected:
-    string _service_name;
-    Account *_account;
-    string _key;
-    bool _insecure_fallback = false;
-    bool _auto_delete = true;
-    bool _keychain_migration = false;
 
-    QKeychain.Error _error = QKeychain.NoError;
-    string _error_string;
+    protected string _service_name;
+    protected Account _account;
+    protected string _key;
+    protected bool _insecure_fallback = false;
+    protected bool _auto_delete = true;
+    protected bool _keychain_migration = false;
 
-    int _chunk_count = 0;
-    QByteArray _chunk_buffer;
+    protected QKeychain.Error _error = QKeychain.NoError;
+    protected string _error_string;
+
+    protected int _chunk_count = 0;
+    protected GLib.ByteArray _chunk_buffer;
 }; // class Job
 
 /***********************************************************
 * @brief : Simple wrapper class for QKeychain.WritePasswordJob, splits too large keychain entry's data into chunks on Windows
 ***********************************************************/
 class WriteJob : KeychainChunk.Job {
-public:
-    WriteJob (Account *account, string &key, QByteArray &data, GLib.Object *parent = nullptr);
-    WriteJob (string &key, QByteArray &data, GLib.Object *parent = nullptr);
+
+    public WriteJob (Account *account, string key, GLib.ByteArray &data, GLib.Object *parent = nullptr);
+    public WriteJob (string key, GLib.ByteArray &data, GLib.Object *parent = nullptr);
 
     /***********************************************************
-    Call this method to start the job (async).
-    You should connect some slot to the finished () signal first.
+    Call this method to on_start the job (async).
+    You should connect some slot to the on_finished () signal first.
 
-    @see QKeychain.Job.start ()
+    @see QKeychain.Job.on_start ()
     ***********************************************************/
-    void start ();
+    public void on_start ();
 
     /***********************************************************
-    Call this method to start the job synchronously.
-    Awaits completion with no need to connect some slot to the finished () signal first.
+    Call this method to on_start the job synchronously.
+    Awaits completion with no need to connect some slot to the on_finished () signal first.
 
     @return Returns true on succeess (QKeychain.NoError).
     ***********************************************************/
-    bool exec ();
+    public bool exec ();
 
 signals:
-    void finished (KeychainChunk.WriteJob *incoming_job);
+    void on_finished (KeychainChunk.WriteJob *incoming_job);
 
-private slots:
-    void slot_write_job_done (QKeychain.Job *incoming_job);
+
+    private void on_write_job_done (QKeychain.Job *incoming_job);
 }; // class WriteJob
 
 /***********************************************************
 * @brief : Simple wrapper class for QKeychain.ReadPasswordJob, splits too large keychain entry's data into chunks on Windows
 ***********************************************************/
 class ReadJob : KeychainChunk.Job {
-public:
-    ReadJob (Account *account, string &key, bool keychain_migration, GLib.Object *parent = nullptr);
-    ReadJob (string &key, GLib.Object *parent = nullptr);
+
+    public ReadJob (Account *account, string key, bool keychain_migration, GLib.Object *parent = nullptr);
+    public ReadJob (string key, GLib.Object *parent = nullptr);
 
     /***********************************************************
-    Call this method to start the job (async).
-    You should connect some slot to the finished () signal first.
+    Call this method to on_start the job (async).
+    You should connect some slot to the on_finished () signal first.
 
-    @see QKeychain.Job.start ()
+    @see QKeychain.Job.on_start ()
     ***********************************************************/
-    void start ();
+    public void on_start ();
 
     /***********************************************************
-    Call this method to start the job synchronously.
-    Awaits completion with no need to connect some slot to the finished () signal first.
+    Call this method to on_start the job synchronously.
+    Awaits completion with no need to connect some slot to the on_finished () signal first.
 
     @return Returns true on succeess (QKeychain.NoError).
     ***********************************************************/
-    bool exec ();
+    public bool exec ();
 
 signals:
-    void finished (KeychainChunk.ReadJob *incoming_job);
+    void on_finished (KeychainChunk.ReadJob *incoming_job);
 
-private slots:
-    void slot_read_job_done (QKeychain.Job *incoming_job);
 
-private:
-    bool _retry_on_key_chain_error = true; // true if we haven't done yet any reading from keychain
+    private void on_read_job_done (QKeychain.Job *incoming_job);
+
+
+    private bool _retry_on_key_chain_error = true; // true if we haven't done yet any reading from keychain
 }; // class ReadJob
 
 /***********************************************************
 * @brief : Simple wrapper class for QKeychain.DeletePasswordJob
 ***********************************************************/
 class DeleteJob : KeychainChunk.Job {
-public:
-    DeleteJob (Account *account, string &key, bool keychain_migration, GLib.Object *parent = nullptr);
-    DeleteJob (string &key, GLib.Object *parent = nullptr);
+
+    public DeleteJob (Account *account, string key, bool keychain_migration, GLib.Object *parent = nullptr);
+    public DeleteJob (string key, GLib.Object *parent = nullptr);
 
     /***********************************************************
-    Call this method to start the job (async).
-    You should connect some slot to the finished () signal first.
+    Call this method to on_start the job (async).
+    You should connect some slot to the on_finished () signal first.
 
-    @see QKeychain.Job.start ()
+    @see QKeychain.Job.on_start ()
     ***********************************************************/
-    void start ();
+    public void on_start ();
 
     /***********************************************************
-    Call this method to start the job synchronously.
-    Awaits completion with no need to connect some slot to the finished () signal first.
+    Call this method to on_start the job synchronously.
+    Awaits completion with no need to connect some slot to the on_finished () signal first.
 
     @return Returns true on succeess (QKeychain.NoError).
     ***********************************************************/
-    bool exec ();
+    public bool exec ();
 
 signals:
-    void finished (KeychainChunk.DeleteJob *incoming_job);
+    void on_finished (KeychainChunk.DeleteJob *incoming_job);
 
-private slots:
-    void slot_delete_job_done (QKeychain.Job *incoming_job);
+
+    private void on_delete_job_done (QKeychain.Job *incoming_job);
 }; // class DeleteJob
 
 
@@ -206,7 +206,7 @@ string Job.error_string () {
     return _error_string;
 }
 
-QByteArray Job.binary_data () {
+GLib.ByteArray Job.binary_data () {
     return _chunk_buffer;
 }
 
@@ -235,7 +235,7 @@ void Job.set_auto_delete (bool auto_delete) {
 /***********************************************************
 * WriteJob
 ***********************************************************/
-WriteJob.WriteJob (Account *account, string &key, QByteArray &data, GLib.Object *parent)
+WriteJob.WriteJob (Account *account, string key, GLib.ByteArray &data, GLib.Object *parent)
     : Job (parent) {
     _account = account;
     _key = key;
@@ -246,21 +246,21 @@ WriteJob.WriteJob (Account *account, string &key, QByteArray &data, GLib.Object 
     _chunk_count = 0;
 }
 
-WriteJob.WriteJob (string &key, QByteArray &data, GLib.Object *parent)
+WriteJob.WriteJob (string key, GLib.ByteArray &data, GLib.Object *parent)
     : WriteJob (nullptr, key, data, parent) {
 }
 
-void WriteJob.start () {
+void WriteJob.on_start () {
     _error = QKeychain.NoError;
 
-    slot_write_job_done (nullptr);
+    on_write_job_done (nullptr);
 }
 
 bool WriteJob.exec () {
-    start ();
+    on_start ();
 
     QEventLoop wait_loop;
-    connect (this, &WriteJob.finished, &wait_loop, &QEventLoop.quit);
+    connect (this, &WriteJob.on_finished, &wait_loop, &QEventLoop.quit);
     wait_loop.exec ();
 
     if (error () != NoError) {
@@ -271,10 +271,10 @@ bool WriteJob.exec () {
     return true;
 }
 
-void WriteJob.slot_write_job_done (QKeychain.Job *incoming_job) {
+void WriteJob.on_write_job_done (QKeychain.Job *incoming_job) {
     auto write_job = qobject_cast<QKeychain.WritePasswordJob> (incoming_job);
 
-    // Errors? (write_job can be nullptr here, see : WriteJob.start)
+    // Errors? (write_job can be nullptr here, see : WriteJob.on_start)
     if (write_job) {
         _error = write_job.error ();
         _error_string = write_job.error_string ();
@@ -302,7 +302,7 @@ void WriteJob.slot_write_job_done (QKeychain.Job *incoming_job) {
 
             _chunk_buffer.clear ();
 
-            emit finished (this);
+            emit on_finished (this);
 
             if (_auto_delete) {
                 delete_later ();
@@ -322,15 +322,15 @@ void WriteJob.slot_write_job_done (QKeychain.Job *incoming_job) {
         add_settings_to_job (_account, job);
 #endif
         job.set_insecure_fallback (_insecure_fallback);
-        connect (job, &QKeychain.Job.finished, this, &KeychainChunk.WriteJob.slot_write_job_done);
+        connect (job, &QKeychain.Job.on_finished, this, &KeychainChunk.WriteJob.on_write_job_done);
         // only add the key's (sub)"index" after the first element, to stay compatible with older versions and non-Windows
         job.set_key (kck);
         job.set_binary_data (chunk);
-        job.start ();
+        job.on_start ();
 
         chunk.clear ();
     } else {
-        emit finished (this);
+        emit on_finished (this);
 
         if (_auto_delete) {
             delete_later ();
@@ -343,7 +343,7 @@ void WriteJob.slot_write_job_done (QKeychain.Job *incoming_job) {
 /***********************************************************
 * ReadJob
 ***********************************************************/
-ReadJob.ReadJob (Account *account, string &key, bool keychain_migration, GLib.Object *parent)
+ReadJob.ReadJob (Account *account, string key, bool keychain_migration, GLib.Object *parent)
     : Job (parent) {
     _account = account;
     _key = key;
@@ -354,11 +354,11 @@ ReadJob.ReadJob (Account *account, string &key, bool keychain_migration, GLib.Ob
     _chunk_buffer.clear ();
 }
 
-ReadJob.ReadJob (string &key, GLib.Object *parent)
+ReadJob.ReadJob (string key, GLib.Object *parent)
     : ReadJob (nullptr, key, false, parent) {
 }
 
-void ReadJob.start () {
+void ReadJob.on_start () {
     _chunk_count = 0;
     _chunk_buffer.clear ();
     _error = QKeychain.NoError;
@@ -375,15 +375,15 @@ void ReadJob.start () {
 #endif
     job.set_insecure_fallback (_insecure_fallback);
     job.set_key (kck);
-    connect (job, &QKeychain.Job.finished, this, &KeychainChunk.ReadJob.slot_read_job_done);
-    job.start ();
+    connect (job, &QKeychain.Job.on_finished, this, &KeychainChunk.ReadJob.on_read_job_done);
+    job.on_start ();
 }
 
 bool ReadJob.exec () {
-    start ();
+    on_start ();
 
     QEventLoop wait_loop;
-    connect (this, &ReadJob.finished, &wait_loop, &QEventLoop.quit);
+    connect (this, &ReadJob.on_finished, &wait_loop, &QEventLoop.quit);
     wait_loop.exec ();
 
     if (error () == NoError) {
@@ -398,7 +398,7 @@ bool ReadJob.exec () {
     return false;
 }
 
-void ReadJob.slot_read_job_done (QKeychain.Job *incoming_job) {
+void ReadJob.on_read_job_done (QKeychain.Job *incoming_job) {
     // Errors or next chunk?
     auto read_job = qobject_cast<QKeychain.ReadPasswordJob> (incoming_job);
     Q_ASSERT (read_job);
@@ -414,7 +414,7 @@ void ReadJob.slot_read_job_done (QKeychain.Job *incoming_job) {
                 // (Issues #4274 and #6522)
                 // (For kwallet, the error is OtherError instead of NoBackendAvailable, maybe a bug in QtKeychain)
                 q_c_info (lc_keychain_chunk) << "Backend unavailable (yet?) Retrying in a few seconds." << read_job.error_string ();
-                QTimer.single_shot (10000, this, &ReadJob.start);
+                QTimer.single_shot (10000, this, &ReadJob.on_start);
                 _retry_on_key_chain_error = false;
                 read_job.delete_later ();
                 return;
@@ -431,7 +431,7 @@ void ReadJob.slot_read_job_done (QKeychain.Job *incoming_job) {
 
     read_job.delete_later ();
 
-    emit finished (this);
+    emit on_finished (this);
 
     if (_auto_delete) {
         delete_later ();
@@ -441,7 +441,7 @@ void ReadJob.slot_read_job_done (QKeychain.Job *incoming_job) {
 /***********************************************************
 * DeleteJob
 ***********************************************************/
-DeleteJob.DeleteJob (Account *account, string &key, bool keychain_migration, GLib.Object *parent)
+DeleteJob.DeleteJob (Account *account, string key, bool keychain_migration, GLib.Object *parent)
     : Job (parent) {
     _account = account;
     _key = key;
@@ -449,11 +449,11 @@ DeleteJob.DeleteJob (Account *account, string &key, bool keychain_migration, GLi
     _keychain_migration = keychain_migration;
 }
 
-DeleteJob.DeleteJob (string &key, GLib.Object *parent)
+DeleteJob.DeleteJob (string key, GLib.Object *parent)
     : DeleteJob (nullptr, key, false, parent) {
 }
 
-void DeleteJob.start () {
+void DeleteJob.on_start () {
     _chunk_count = 0;
     _error = QKeychain.NoError;
 
@@ -469,15 +469,15 @@ void DeleteJob.start () {
 #endif
     job.set_insecure_fallback (_insecure_fallback);
     job.set_key (kck);
-    connect (job, &QKeychain.Job.finished, this, &KeychainChunk.DeleteJob.slot_delete_job_done);
-    job.start ();
+    connect (job, &QKeychain.Job.on_finished, this, &KeychainChunk.DeleteJob.on_delete_job_done);
+    job.on_start ();
 }
 
 bool DeleteJob.exec () {
-    start ();
+    on_start ();
 
     QEventLoop wait_loop;
-    connect (this, &DeleteJob.finished, &wait_loop, &QEventLoop.quit);
+    connect (this, &DeleteJob.on_finished, &wait_loop, &QEventLoop.quit);
     wait_loop.exec ();
 
     if (error () == NoError) {
@@ -491,7 +491,7 @@ bool DeleteJob.exec () {
     return false;
 }
 
-void DeleteJob.slot_delete_job_done (QKeychain.Job *incoming_job) {
+void DeleteJob.on_delete_job_done (QKeychain.Job *incoming_job) {
     // Errors or next chunk?
     auto delete_job = qobject_cast<QKeychain.DeletePasswordJob> (incoming_job);
     Q_ASSERT (delete_job);
@@ -509,7 +509,7 @@ void DeleteJob.slot_delete_job_done (QKeychain.Job *incoming_job) {
 
     delete_job.delete_later ();
 
-    emit finished (this);
+    emit on_finished (this);
 
     if (_auto_delete) {
         delete_later ();

@@ -14,7 +14,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QNetworkRequest>
 // #include <QBuffer>
 
-// #include <QByteArray>
+// #include <GLib.ByteArray>
 // #include <QElapsedTimer>
 // #include <QPointer>
 
@@ -23,8 +23,8 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 namespace Occ {
 
-using AccountStatePtr = QExplicitlySharedDataPointer<AccountState>;
-using AccountAppList = QList<AccountApp>;
+using AccountStatePtr = unowned<AccountState>;
+using AccountAppList = GLib.List<AccountApp>;
 
 /***********************************************************
 @brief Extra info about an own_cloud server account.
@@ -89,7 +89,7 @@ class AccountState : GLib.Object, public QSharedData {
     Use the account as parent
     ***********************************************************/
     public AccountState (AccountPtr account);
-    public ~AccountState () override;
+    ~AccountState () override;
 
     /***********************************************************
     Creates an account state from settings and an Account object.
@@ -108,7 +108,7 @@ class AccountState : GLib.Object, public QSharedData {
     public AccountPtr account ();
 
     public ConnectionStatus connection_status ();
-    public QStringList connection_errors ();
+    public string[] connection_errors ();
 
     public State state ();
     public static string state_string (State state);
@@ -116,7 +116,7 @@ class AccountState : GLib.Object, public QSharedData {
     public bool is_signed_out ();
 
     public AccountAppList app_list ();
-    public AccountApp* find_app (string &app_id) const;
+    public AccountApp* find_app (string app_id);
 
     /***********************************************************
     A user-triggered sign out which disconnects, stops syncs
@@ -129,7 +129,7 @@ class AccountState : GLib.Object, public QSharedData {
 
     Does nothing for signed out accounts.
     Connected accounts will be disconnected and try anew.
-    Disconnected accounts will go to slot_check_connectivity ().
+    Disconnected accounts will go to on_check_connectivity ().
 
     Useful for when network settings (proxy) change.
     ***********************************************************/
@@ -149,7 +149,7 @@ class AccountState : GLib.Object, public QSharedData {
     /***********************************************************
     Mark the timestamp when the last successful ETag check happened for
     this account.
-    The slot_check_connectivity () method uses the timestamp to save a call to
+    The on_check_connectivity () method uses the timestamp to save a call to
     the server to validate the connection if the last successful etag job
     was not so long ago.
     ***********************************************************/
@@ -159,25 +159,25 @@ class AccountState : GLib.Object, public QSharedData {
     Saves the ETag Response header from the last Notifications api
     request with status_code 200.
     ***********************************************************/
-    public QByteArray notifications_etag_response_header ();
+    public GLib.ByteArray notifications_etag_response_header ();
 
     /***********************************************************
     Returns the ETag Response header from the last Notifications api
     request with status_code 200.
     ***********************************************************/
-    void set_notifications_etag_response_header (QByteArray &value);
+    void set_notifications_etag_response_header (GLib.ByteArray &value);
 
     /***********************************************************
     Saves the ETag Response header from the last Navigation Apps api
     request with status_code 200.
     ***********************************************************/
-    public QByteArray navigation_apps_etag_response_header ();
+    public GLib.ByteArray navigation_apps_etag_response_header ();
 
     /***********************************************************
     Returns the ETag Response header from the last Navigation Apps api
     request with status_code 200.
     ***********************************************************/
-    public void set_navigation_apps_etag_response_header (QByteArray &value);
+    public void set_navigation_apps_etag_response_header (GLib.ByteArray &value);
 
     /***********************************************************
     Asks for user credentials
@@ -199,7 +199,7 @@ class AccountState : GLib.Object, public QSharedData {
     Triggers a ping to the server to update state and
     connection status and errors.
     ***********************************************************/
-    public void slot_check_connectivity ();
+    public void on_check_connectivity ();
 
     private void set_state (State state);
     private void fetch_navigation_apps ();
@@ -211,62 +211,62 @@ class AccountState : GLib.Object, public QSharedData {
     signal void status_changed ();
     signal void desktop_notifications_allowed_changed ();
 
-    protected void slot_connection_validator_result (ConnectionValidator.Status status, QStringList &errors);
+    protected void on_connection_validator_result (ConnectionValidator.Status status, string[] &errors);
 
     /***********************************************************
     When client gets a 401 or 403 checks if server requested remote wipe
     before asking for user credentials again
     ***********************************************************/
-    protected void slot_handle_remote_wipe_check ();
+    protected void on_handle_remote_wipe_check ();
 
-    protected void slot_credentials_fetched (AbstractCredentials *creds);
-    protected void slot_credentials_asked (AbstractCredentials *creds);
+    protected void on_credentials_fetched (AbstractCredentials *creds);
+    protected void on_credentials_asked (AbstractCredentials *creds);
 
-    protected void slot_navigation_apps_fetched (QJsonDocument &reply, int status_code);
-    protected void slot_etag_response_header_received (QByteArray &value, int status_code);
-    protected void slot_ocs_error (int status_code, string &message);
+    protected void on_navigation_apps_fetched (QJsonDocument &reply, int status_code);
+    protected void on_etag_response_header_received (GLib.ByteArray &value, int status_code);
+    protected void on_ocs_error (int status_code, string message);
 
-private:
-    AccountPtr _account;
-    State _state;
-    ConnectionStatus _connection_status;
-    QStringList _connection_errors;
-    bool _waiting_for_new_credentials;
-    QDateTime _time_of_last_e_tag_check;
-    QPointer<ConnectionValidator> _connection_validator;
-    QByteArray _notifications_etag_response_header;
-    QByteArray _navigation_apps_etag_response_header;
+
+    private AccountPtr _account;
+    private State _state;
+    private ConnectionStatus _connection_status;
+    private string[] _connection_errors;
+    private bool _waiting_for_new_credentials;
+    private QDateTime _time_of_last_e_tag_check;
+    private QPointer<ConnectionValidator> _connection_validator;
+    private GLib.ByteArray _notifications_etag_response_header;
+    private GLib.ByteArray _navigation_apps_etag_response_header;
 
     /***********************************************************
     Starts counting when the server starts being back up after 503 or
     maintenance mode. The account will only become connected once this
     timer exceeds the _maintenance_to_connected_delay value.
     ***********************************************************/
-    QElapsedTimer _time_since_maintenance_over;
+    private QElapsedTimer _time_since_maintenance_over;
 
     /***********************************************************
     Milliseconds for which to delay reconnection after 503/maintenance.
     ***********************************************************/
-    int _maintenance_to_connected_delay;
+    private int _maintenance_to_connected_delay;
 
     /***********************************************************
     Connects remote wipe check with the account
     the log out triggers the check (loads app password . create request)
     ***********************************************************/
-    RemoteWipe *_remote_wipe;
+    private RemoteWipe _remote_wipe;
 
     /***********************************************************
     Holds the App names and URLs available on the server
     ***********************************************************/
-    AccountAppList _apps;
+    private AccountAppList _apps;
 
-    bool _is_desktop_notifications_allowed;
+    private bool _is_desktop_notifications_allowed;
 };
 
 class AccountApp : GLib.Object {
 
-    public AccountApp (string &name, QUrl &url,
-        const string &id, QUrl &icon_url,
+    public AccountApp (string name, QUrl url,
+        const string id, QUrl icon_url,
         GLib.Object* parent = nullptr);
 
     public string name ();
@@ -274,12 +274,12 @@ class AccountApp : GLib.Object {
     public string id ();
     public QUrl icon_url ();
 
-private:
-    string _name;
-    QUrl _url;
 
-    string _id;
-    QUrl _icon_url;
+    private string _name;
+    private QUrl _url;
+
+    private string _id;
+    private QUrl _icon_url;
 };
 
 
@@ -295,11 +295,11 @@ private:
         q_register_meta_type<AccountState> ("AccountState*");
 
         connect (account.data (), &Account.invalid_credentials,
-            this, &AccountState.slot_handle_remote_wipe_check);
+            this, &AccountState.on_handle_remote_wipe_check);
         connect (account.data (), &Account.credentials_fetched,
-            this, &AccountState.slot_credentials_fetched);
+            this, &AccountState.on_credentials_fetched);
         connect (account.data (), &Account.credentials_asked,
-            this, &AccountState.slot_credentials_asked);
+            this, &AccountState.on_credentials_asked);
 
         connect (this, &AccountState.is_connected_changed, [=]{
             // Get the Apps available on the server if we're now connected.
@@ -327,7 +327,7 @@ private:
         return _connection_status;
     }
 
-    QStringList AccountState.connection_errors () {
+    string[] AccountState.connection_errors () {
         return _connection_errors;
     }
 
@@ -348,13 +348,13 @@ private:
             } else if (old_state == SignedOut && _state == Disconnected) {
                 // If we stop being voluntarily signed-out, try to connect and
                 // auth right now!
-                slot_check_connectivity ();
+                on_check_connectivity ();
             } else if (_state == ServiceUnavailable) {
                 // Check if we are actually down for maintenance.
                 // To do this we must clear the connection validator that just
-                // produced the 503. It's finished anyway and will delete itself.
+                // produced the 503. It's on_finished anyway and will delete itself.
                 _connection_validator.clear ();
-                slot_check_connectivity ();
+                on_check_connectivity ();
             }
             if (old_state == Connected || _state == Connected) {
                 emit is_connected_changed ();
@@ -400,7 +400,7 @@ private:
     void AccountState.fresh_connection_attempt () {
         if (is_connected ())
             set_state (Disconnected);
-        slot_check_connectivity ();
+        on_check_connectivity ();
     }
 
     void AccountState.sign_in () {
@@ -418,19 +418,19 @@ private:
         _time_of_last_e_tag_check = tp;
     }
 
-    QByteArray AccountState.notifications_etag_response_header () {
+    GLib.ByteArray AccountState.notifications_etag_response_header () {
         return _notifications_etag_response_header;
     }
 
-    void AccountState.set_notifications_etag_response_header (QByteArray &value) {
+    void AccountState.set_notifications_etag_response_header (GLib.ByteArray &value) {
         _notifications_etag_response_header = value;
     }
 
-    QByteArray AccountState.navigation_apps_etag_response_header () {
+    GLib.ByteArray AccountState.navigation_apps_etag_response_header () {
         return _navigation_apps_etag_response_header;
     }
 
-    void AccountState.set_navigation_apps_etag_response_header (QByteArray &value) {
+    void AccountState.set_navigation_apps_etag_response_header (GLib.ByteArray &value) {
         _navigation_apps_etag_response_header = value;
     }
 
@@ -447,7 +447,7 @@ private:
         emit desktop_notifications_allowed_changed ();
     }
 
-    void AccountState.slot_check_connectivity () {
+    void AccountState.on_check_connectivity () {
         if (is_signed_out () || _waiting_for_new_credentials) {
             return;
         }
@@ -478,11 +478,11 @@ private:
         auto *con_validator = new ConnectionValidator (AccountStatePtr (this));
         _connection_validator = con_validator;
         connect (con_validator, &ConnectionValidator.connection_result,
-            this, &AccountState.slot_connection_validator_result);
+            this, &AccountState.on_connection_validator_result);
         if (is_connected ()) {
             // Use a small authed propfind as a minimal ping when we're
             // already connected.
-            con_validator.check_authentication ();
+            con_validator.on_check_authentication ();
         } else {
             // Check the server and then the auth.
 
@@ -499,11 +499,11 @@ private:
             // ssl config that does not have a sensible certificate chain.
             account ().set_ssl_configuration (QSslConfiguration ());
             //#endif
-            con_validator.check_server_and_auth ();
+            con_validator.on_check_server_and_auth ();
         }
     }
 
-    void AccountState.slot_connection_validator_result (ConnectionValidator.Status status, QStringList &errors) {
+    void AccountState.on_connection_validator_result (ConnectionValidator.Status status, string[] &errors) {
         if (is_signed_out ()) {
             q_c_warning (lc_account_state) << "Signed out, ignoring" << status << _account.url ().to_string ();
             return;
@@ -516,8 +516,8 @@ private:
             if (!_time_since_maintenance_over.is_valid ()) {
                 q_c_info (lc_account_state) << "AccountState reconnection : delaying for"
                                        << _maintenance_to_connected_delay << "ms";
-                _time_since_maintenance_over.start ();
-                QTimer.single_shot (_maintenance_to_connected_delay + 100, this, &AccountState.slot_check_connectivity);
+                _time_since_maintenance_over.on_start ();
+                QTimer.single_shot (_maintenance_to_connected_delay + 100, this, &AccountState.on_check_connectivity);
                 return;
             } else if (_time_since_maintenance_over.elapsed () < _maintenance_to_connected_delay) {
                 q_c_info (lc_account_state) << "AccountState reconnection : only"
@@ -580,7 +580,7 @@ private:
         }
     }
 
-    void AccountState.slot_handle_remote_wipe_check () {
+    void AccountState.on_handle_remote_wipe_check () {
         // make sure it changes account state and icons
         sign_out_by_ui ();
 
@@ -611,17 +611,17 @@ private:
         account ().credentials ().ask_from_user ();
     }
 
-    void AccountState.slot_credentials_fetched (AbstractCredentials *) {
+    void AccountState.on_credentials_fetched (AbstractCredentials *) {
         // Make a connection attempt, no matter whether the credentials are
         // ready or not - we want to check whether we can get an SSL connection
         // going before bothering the user for a password.
         q_c_info (lc_account_state) << "Fetched credentials for" << _account.url ().to_string ()
                                << "attempting to connect";
         _waiting_for_new_credentials = false;
-        slot_check_connectivity ();
+        on_check_connectivity ();
     }
 
-    void AccountState.slot_credentials_asked (AbstractCredentials *credentials) {
+    void AccountState.on_credentials_asked (AbstractCredentials *credentials) {
         q_c_info (lc_account_state) << "Credentials asked for" << _account.url ().to_string ()
                                << "are they ready?" << credentials.ready ();
 
@@ -640,7 +640,7 @@ private:
             _connection_validator = nullptr;
         }
 
-        slot_check_connectivity ();
+        on_check_connectivity ();
     }
 
     std.unique_ptr<QSettings> AccountState.settings () {
@@ -652,24 +652,24 @@ private:
     void AccountState.fetch_navigation_apps (){
         auto *job = new OcsNavigationAppsJob (_account);
         job.add_raw_header ("If-None-Match", navigation_apps_etag_response_header ());
-        connect (job, &OcsNavigationAppsJob.apps_job_finished, this, &AccountState.slot_navigation_apps_fetched);
-        connect (job, &OcsNavigationAppsJob.etag_response_header_received, this, &AccountState.slot_etag_response_header_received);
-        connect (job, &OcsNavigationAppsJob.ocs_error, this, &AccountState.slot_ocs_error);
+        connect (job, &OcsNavigationAppsJob.apps_job_finished, this, &AccountState.on_navigation_apps_fetched);
+        connect (job, &OcsNavigationAppsJob.etag_response_header_received, this, &AccountState.on_etag_response_header_received);
+        connect (job, &OcsNavigationAppsJob.ocs_error, this, &AccountState.on_ocs_error);
         job.get_navigation_apps ();
     }
 
-    void AccountState.slot_etag_response_header_received (QByteArray &value, int status_code){
+    void AccountState.on_etag_response_header_received (GLib.ByteArray &value, int status_code){
         if (status_code == 200){
             q_c_debug (lc_account_state) << "New navigation apps ETag Response Header received " << value;
             set_navigation_apps_etag_response_header (value);
         }
     }
 
-    void AccountState.slot_ocs_error (int status_code, string &message) {
+    void AccountState.on_ocs_error (int status_code, string message) {
         q_c_debug (lc_account_state) << "Error " << status_code << " while fetching new navigation apps : " << message;
     }
 
-    void AccountState.slot_navigation_apps_fetched (QJsonDocument &reply, int status_code) {
+    void AccountState.on_navigation_apps_fetched (QJsonDocument &reply, int status_code) {
         if (_account){
             if (status_code == 304) {
                 q_c_warning (lc_account_state) << "Status code " << status_code << " Not Modified - No new navigation apps.";
@@ -701,7 +701,7 @@ private:
         return _apps;
     }
 
-    AccountApp* AccountState.find_app (string &app_id) {
+    AccountApp* AccountState.find_app (string app_id) {
         if (!app_id.is_empty ()) {
             const auto apps = app_list ();
             const auto it = std.find_if (apps.cbegin (), apps.cend (), [app_id] (auto &app) {
@@ -715,8 +715,8 @@ private:
         return nullptr;
     }
 
-    AccountApp.AccountApp (string &name, QUrl &url,
-        const string &id, QUrl &icon_url,
+    AccountApp.AccountApp (string name, QUrl url,
+        const string id, QUrl icon_url,
         GLib.Object *parent)
         : GLib.Object (parent)
         , _name (name)

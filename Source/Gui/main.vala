@@ -118,17 +118,17 @@ int main (int argc, char **argv) {
     if (app.is_running ()) {
         q_c_info (lc_application) << "Already running, exiting...";
         if (app.is_session_restored ()) {
-            // This call is mirrored with the one in Application.slot_parse_message
+            // This call is mirrored with the one in Application.on_parse_message
             q_c_info (lc_application) << "Session was restored, don't notify app!";
             return -1;
         }
 
-        QStringList args = app.arguments ();
+        string[] args = app.arguments ();
         if (args.size () > 1) {
             string msg = args.join (QLatin1String ("|"));
-            if (!app.send_message (QLatin1String ("MSG_PARSEOPTIONS:") + msg))
+            if (!app.on_send_message (QLatin1String ("MSG_PARSEOPTIONS:") + msg))
                 return -1;
-        } else if (!app.background_mode () && !app.send_message (QLatin1String ("MSG_SHOWMAINDIALOG"))) {
+        } else if (!app.background_mode () && !app.on_send_message (QLatin1String ("MSG_SHOWMAINDIALOG"))) {
             return -1;
         }
         return 0;
@@ -138,7 +138,7 @@ int main (int argc, char **argv) {
     // (issue #4693)
     if (qgetenv ("QT_QPA_PLATFORMTHEME") != "appmenu-qt5") {
         if (!QSystemTrayIcon.is_system_tray_available ()) {
-            // If the systemtray is not there, we will wait one second for it to maybe start
+            // If the systemtray is not there, we will wait one second for it to maybe on_start
             // (eg boot time) then we show the settings dialog if there is still no systemtray.
             // On XFCE however, we show a message box with explainaition how to install a systemtray.
             q_c_info (lc_application) << "System tray is not available, waiting...";
@@ -162,12 +162,12 @@ int main (int argc, char **argv) {
             }
 
             if (QSystemTrayIcon.is_system_tray_available ()) {
-                app.try_tray_again ();
+                app.on_try_tray_again ();
             } else if (!app.background_mode () && !AccountManager.instance ().accounts ().is_empty ()) {
                 if (desktop_session != "ubuntu") {
                     q_c_info (lc_application) << "System tray still not available, showing window and trying again later";
                     app.show_main_dialog ();
-                    QTimer.single_shot (10000, &app, &Application.try_tray_again);
+                    QTimer.single_shot (10000, &app, &Application.on_try_tray_again);
                 } else {
                     q_c_info (lc_application) << "System tray still not available, but assuming it's fine on 'ubuntu' desktop";
                 }

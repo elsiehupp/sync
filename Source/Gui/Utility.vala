@@ -25,14 +25,14 @@ namespace Utility {
 
     If launching the browser fails, display a message.
     ***********************************************************/
-    bool open_browser (QUrl &url, Gtk.Widget *error_widget_parent = nullptr);
+    bool open_browser (QUrl url, Gtk.Widget *error_widget_parent = nullptr);
 
     /***********************************************************
     Start composing a new email message.
 
     If launching the email program fails, display a message.
     ***********************************************************/
-    bool open_email_composer (string &subject, string &body,
+    bool open_email_composer (string subject, string body,
         Gtk.Widget *error_widget_parent);
 
     /***********************************************************
@@ -63,8 +63,8 @@ namespace Utility {
 
 
 
-bool Utility.open_browser (QUrl &url, Gtk.Widget *error_widget_parent) {
-    const QStringList allowed_url_schemes = {
+bool Utility.open_browser (QUrl url, Gtk.Widget *error_widget_parent) {
+    const string[] allowed_url_schemes = {
         "http",
         "https",
         "oauthtest"
@@ -91,7 +91,7 @@ bool Utility.open_browser (QUrl &url, Gtk.Widget *error_widget_parent) {
     return true;
 }
 
-bool Utility.open_email_composer (string &subject, string &body, Gtk.Widget *error_widget_parent) {
+bool Utility.open_email_composer (string subject, string body, Gtk.Widget *error_widget_parent) {
     QUrl url (QLatin1String ("mailto:"));
     QUrlQuery query;
     query.set_query_items ({

@@ -58,13 +58,13 @@ namespace {
    ---.  fetch_from_keychain
                 |                           }
                 v                            }
-          slot_read_client_cert_pem_job_done       }     There are first 3 QtKeychain jobs to fetch
+          on_read_client_cert_pem_job_done       }     There are first 3 QtKeychain jobs to fetch
                 |                             }   the TLS client keys, if any, and the password
                 v                            }      (or refresh token
-          slot_read_client_key_pem_job_done        }
+          on_read_client_key_pem_job_done        }
                 |                           }
                 v
-            slot_read_job_done
+            on_read_job_done
                 |        |
                 |        +------. emit fetched ()   if OAuth is not used
                 |
@@ -81,75 +81,74 @@ namespace {
 class HttpCredentials : AbstractCredentials {
     friend class HttpCredentialsAccessManager;
 
-public:
     /// Don't add credentials if this is set on a QNetworkRequest
-    static constexpr QNetworkRequest.Attribute DontAddCredentialsAttribute = QNetworkRequest.User;
+    public static constexpr QNetworkRequest.Attribute DontAddCredentialsAttribute = QNetworkRequest.User;
 
-    HttpCredentials ();
-    HttpCredentials (string &user, string &password,
-            const QByteArray &client_cert_bundle = QByteArray (), QByteArray &client_cert_password = QByteArray ());
+    public HttpCredentials ();
+    public HttpCredentials (string user, string password,
+        const GLib.ByteArray &client_cert_bundle = GLib.ByteArray (), GLib.ByteArray &client_cert_password = GLib.ByteArray ());
 
-    string auth_type () const override;
-    QNetworkAccessManager *create_qNAM () const override;
-    bool ready () const override;
-    void fetch_from_keychain () override;
-    bool still_valid (QNetworkReply *reply) override;
-    void persist () override;
-    string user () const override;
+    public string auth_type () override;
+    public QNetworkAccessManager *create_qNAM () override;
+    public bool ready () override;
+    public void fetch_from_keychain () override;
+    public bool still_valid (QNetworkReply *reply) override;
+    public void persist () override;
+    public string user () override;
     // the password or token
-    string password () const override;
-    void invalidate_token () override;
-    void forget_sensitive_data () override;
-    string fetch_user ();
-    virtual bool ssl_is_trusted () {
+    public string password () override;
+    public void invalidate_token () override;
+    public void forget_sensitive_data () override;
+    public string fetch_user ();
+    public virtual bool ssl_is_trusted () {
         return false;
     }
 
     /* If we still have a valid refresh token, try to refresh it assynchronously and emit fetched ()
     otherwise return false
     ***********************************************************/
-    bool refresh_access_token ();
+    public bool refresh_access_token ();
 
     // To fetch the user name as early as possible
-    void set_account (Account *account) override;
+    public void set_account (Account *account) override;
 
     // Whether we are using OAuth
-    bool is_using_oAuth () {
+    public bool is_using_oAuth () {
         return !_refresh_token.is_null ();
     }
 
-    bool retry_if_needed (AbstractNetworkJob *) override;
+    public bool retry_if_needed (AbstractNetworkJob *) override;
 
-private slots:
-    void slot_authentication (QNetworkReply *, QAuthenticator *);
 
-    void slot_read_client_cert_password_job_done (QKeychain.Job *);
-    void slot_read_client_cert_pem_job_done (QKeychain.Job *);
-    void slot_read_client_key_pem_job_done (QKeychain.Job *);
+    private void on_authentication (QNetworkReply *, QAuthenticator *);
 
-    void slot_read_password_from_keychain ();
-    void slot_read_job_done (QKeychain.Job *);
+    private void on_read_client_cert_password_job_done (QKeychain.Job *);
+    private void on_read_client_cert_pem_job_done (QKeychain.Job *);
+    private void on_read_client_key_pem_job_done (QKeychain.Job *);
 
-    void slot_write_client_cert_password_job_done (QKeychain.Job *);
-    void slot_write_client_cert_pem_job_done (QKeychain.Job *);
-    void slot_write_client_key_pem_job_done (QKeychain.Job *);
+    private void on_read_password_from_keychain ();
+    private void on_read_job_done (QKeychain.Job *);
 
-    void slot_write_password_to_keychain ();
-    void slot_write_job_done (QKeychain.Job *);
+    private void on_write_client_cert_password_job_done (QKeychain.Job *);
+    private void on_write_client_cert_pem_job_done (QKeychain.Job *);
+    private void on_write_client_key_pem_job_done (QKeychain.Job *);
 
-protected:
+    private void on_write_password_to_keychain ();
+    private void on_write_job_done (QKeychain.Job *);
+
+
     /***********************************************************
     Reads data from keychain locations
 
     Goes through
-      slot_read_client_cert_pem_job_done to
-      slot_read_client_cert_pem_job_done to
-      slot_read_job_done
+      on_read_client_cert_pem_job_done to
+      on_read_client_cert_pem_job_done to
+      on_read_job_done
     ***********************************************************/
-    void fetch_from_keychain_helper ();
+    protected void fetch_from_keychain_helper ();
 
     /// Wipes legacy keychain locations
-    void delete_old_keychain_entries ();
+    protected void delete_old_keychain_entries ();
 
     /***********************************************************
     Whether to bow out now because a retry will happen later
@@ -160,57 +159,57 @@ protected:
     If that happens, this function will schedule another try and
     return true.
     ***********************************************************/
-    bool keychain_unavailable_retry_later (QKeychain.ReadPasswordJob *);
+    protected bool keychain_unavailable_retry_later (QKeychain.ReadPasswordJob *);
 
     /***********************************************************
     Takes client cert pkcs12 and unwraps the key/cert.
 
     Returns false on failure.
     ***********************************************************/
-    bool unpack_client_cert_bundle ();
+    protected bool unpack_client_cert_bundle ();
 
-    string _user;
-    string _password; // user's password, or access_token for OAuth
-    string _refresh_token; // OAuth _refresh_token, set if OAuth is used.
-    string _previous_password;
+    protected string _user;
+    protected string _password; // user's password, or access_token for OAuth
+    protected string _refresh_token; // OAuth _refresh_token, set if OAuth is used.
+    protected string _previous_password;
 
-    string _fetch_error_string;
-    bool _ready = false;
-    bool _is_renewing_oauth_token = false;
-    QByteArray _client_cert_bundle;
-    QByteArray _client_cert_password;
-    QSslKey _client_ssl_key;
-    QSslCertificate _client_ssl_certificate;
-    bool _keychain_migration = false;
-    bool _retry_on_key_chain_error = true; // true if we haven't done yet any reading from keychain
+    protected string _fetch_error_string;
+    protected bool _ready = false;
+    protected bool _is_renewing_oauth_token = false;
+    protected GLib.ByteArray _client_cert_bundle;
+    protected GLib.ByteArray _client_cert_password;
+    protected QSslKey _client_ssl_key;
+    protected QSslCertificate _client_ssl_certificate;
+    protected bool _keychain_migration = false;
+    protected bool _retry_on_key_chain_error = true; // true if we haven't done yet any reading from keychain
 
-    QVector<QPointer<AbstractNetworkJob>> _retry_queue; // Jobs we need to retry once the auth token is fetched
+    protected QVector<QPointer<AbstractNetworkJob>> _retry_queue; // Jobs we need to retry once the auth token is fetched
 };
 
 
 
     class HttpCredentialsAccessManager : AccessManager {
-    public:
-        HttpCredentialsAccessManager (HttpCredentials *cred, GLib.Object *parent = nullptr)
+
+        public HttpCredentialsAccessManager (HttpCredentials *cred, GLib.Object *parent = nullptr)
             : AccessManager (parent)
             , _cred (cred) {
         }
 
-    protected:
-        QNetworkReply *create_request (Operation op, QNetworkRequest &request, QIODevice *outgoing_data) override {
+
+        protected QNetworkReply *create_request (Operation op, QNetworkRequest &request, QIODevice *outgoing_data) override {
             QNetworkRequest req (request);
             if (!req.attribute (HttpCredentials.DontAddCredentialsAttribute).to_bool ()) {
                 if (_cred && !_cred.password ().is_empty ()) {
                     if (_cred.is_using_oAuth ()) {
                         req.set_raw_header ("Authorization", "Bearer " + _cred.password ().to_utf8 ());
                     } else {
-                        QByteArray cred_hash = QByteArray (_cred.user ().to_utf8 () + ":" + _cred.password ().to_utf8 ()).to_base64 ();
+                        GLib.ByteArray cred_hash = GLib.ByteArray (_cred.user ().to_utf8 () + ":" + _cred.password ().to_utf8 ()).to_base64 ();
                         req.set_raw_header ("Authorization", "Basic " + cred_hash);
                     }
                 } else if (!request.url ().password ().is_empty ()) {
                     // Typically the requests to get or refresh the OAuth access token. The client
                     // credentials are put in the URL from the code making the request.
-                    QByteArray cred_hash = request.url ().user_info ().to_utf8 ().to_base64 ();
+                    GLib.ByteArray cred_hash = request.url ().user_info ().to_utf8 ().to_base64 ();
                     req.set_raw_header ("Authorization", "Basic " + cred_hash);
                 }
             }
@@ -234,10 +233,10 @@ protected:
             return reply;
         }
 
-    private:
+
         // The credentials object dies along with the account, while the QNAM might
         // outlive both.
-        QPointer<const HttpCredentials> _cred;
+        private QPointer<const HttpCredentials> _cred;
     };
 
     static void add_settings_to_job (Account *account, QKeychain.Job *job) {
@@ -250,7 +249,7 @@ protected:
     HttpCredentials.HttpCredentials () = default;
 
     // From wizard
-    HttpCredentials.HttpCredentials (string &user, string &password, QByteArray &client_cert_bundle, QByteArray &client_cert_password)
+    HttpCredentials.HttpCredentials (string user, string password, GLib.ByteArray &client_cert_bundle, GLib.ByteArray &client_cert_password)
         : _user (user)
         , _password (password)
         , _ready (true)
@@ -285,7 +284,7 @@ protected:
         AccessManager *qnam = new HttpCredentialsAccessManager (this);
 
         connect (qnam, &QNetworkAccessManager.authentication_required,
-            this, &HttpCredentials.slot_authentication);
+            this, &HttpCredentials.on_authentication);
 
         return qnam;
     }
@@ -329,8 +328,8 @@ protected:
             add_settings_to_job (_account, job);
             job.set_insecure_fallback (false);
             job.set_key (keychain_key (_account.url ().to_string (), _user + client_cert_password_c, _account.id ()));
-            connect (job, &QKeychain.Job.finished, this, &HttpCredentials.slot_read_client_cert_password_job_done);
-            job.start ();
+            connect (job, &QKeychain.Job.on_finished, this, &HttpCredentials.on_read_client_cert_password_job_done);
+            job.on_start ();
             return;
         }
 
@@ -344,8 +343,8 @@ protected:
         add_settings_to_job (_account, job);
         job.set_insecure_fallback (false);
         job.set_key (kck);
-        connect (job, &QKeychain.Job.finished, this, &HttpCredentials.slot_read_client_cert_pem_job_done);
-        job.start ();
+        connect (job, &QKeychain.Job.on_finished, this, &HttpCredentials.on_read_client_cert_pem_job_done);
+        job.on_start ();
     }
 
     void HttpCredentials.delete_old_keychain_entries () {
@@ -354,7 +353,7 @@ protected:
             add_settings_to_job (_account, job);
             job.set_insecure_fallback (true);
             job.set_key (keychain_key (_account.url ().to_string (), user, string ()));
-            job.start ();
+            job.on_start ();
         };
 
         start_delete_job (_user);
@@ -378,7 +377,7 @@ protected:
         return false;
     }
 
-    void HttpCredentials.slot_read_client_cert_password_job_done (QKeychain.Job *job) {
+    void HttpCredentials.on_read_client_cert_password_job_done (QKeychain.Job *job) {
         auto read_job = qobject_cast<QKeychain.ReadPasswordJob> (job);
         if (keychain_unavailable_retry_later (read_job))
             return;
@@ -395,17 +394,17 @@ protected:
         _client_cert_bundle.clear ();
         _client_cert_password.clear ();
 
-        slot_read_password_from_keychain ();
+        on_read_password_from_keychain ();
     }
 
-    void HttpCredentials.slot_read_client_cert_pem_job_done (QKeychain.Job *incoming) {
+    void HttpCredentials.on_read_client_cert_pem_job_done (QKeychain.Job *incoming) {
         auto read_job = qobject_cast<QKeychain.ReadPasswordJob> (incoming);
         if (keychain_unavailable_retry_later (read_job))
             return;
 
         // Store PEM in memory
         if (read_job.error () == QKeychain.NoError && read_job.binary_data ().length () > 0) {
-            QList<QSslCertificate> ssl_certificate_list = QSslCertificate.from_data (read_job.binary_data (), QSsl.Pem);
+            GLib.List<QSslCertificate> ssl_certificate_list = QSslCertificate.from_data (read_job.binary_data (), QSsl.Pem);
             if (ssl_certificate_list.length () >= 1) {
                 _client_ssl_certificate = ssl_certificate_list.at (0);
             }
@@ -421,16 +420,16 @@ protected:
         add_settings_to_job (_account, job);
         job.set_insecure_fallback (false);
         job.set_key (kck);
-        connect (job, &QKeychain.ReadPasswordJob.finished, this, &HttpCredentials.slot_read_client_key_pem_job_done);
-        job.start ();
+        connect (job, &QKeychain.ReadPasswordJob.on_finished, this, &HttpCredentials.on_read_client_key_pem_job_done);
+        job.on_start ();
     }
 
-    void HttpCredentials.slot_read_client_key_pem_job_done (QKeychain.Job *incoming) {
+    void HttpCredentials.on_read_client_key_pem_job_done (QKeychain.Job *incoming) {
         auto read_job = qobject_cast<QKeychain.ReadPasswordJob> (incoming);
         // Store key in memory
 
         if (read_job.error () == QKeychain.NoError && read_job.binary_data ().length () > 0) {
-            QByteArray client_key_pem = read_job.binary_data ();
+            GLib.ByteArray client_key_pem = read_job.binary_data ();
             // FIXME Unfortunately Qt has a bug and we can't just use QSsl.Opaque to let it
             // load whatever we have. So we try until it works.
             _client_ssl_key = QSslKey (client_key_pem, QSsl.Rsa);
@@ -445,10 +444,10 @@ protected:
             }
         }
 
-        slot_read_password_from_keychain ();
+        on_read_password_from_keychain ();
     }
 
-    void HttpCredentials.slot_read_password_from_keychain () {
+    void HttpCredentials.on_read_password_from_keychain () {
         const string kck = keychain_key (
             _account.url ().to_string (),
             _user,
@@ -458,8 +457,8 @@ protected:
         add_settings_to_job (_account, job);
         job.set_insecure_fallback (false);
         job.set_key (kck);
-        connect (job, &QKeychain.ReadPasswordJob.finished, this, &HttpCredentials.slot_read_job_done);
-        job.start ();
+        connect (job, &QKeychain.ReadPasswordJob.on_finished, this, &HttpCredentials.on_read_job_done);
+        job.on_start ();
     }
 
     bool HttpCredentials.still_valid (QNetworkReply *reply) {
@@ -469,7 +468,7 @@ protected:
                    || !reply.property (authentication_failed_c).to_bool ()));
     }
 
-    void HttpCredentials.slot_read_job_done (QKeychain.Job *incoming) {
+    void HttpCredentials.on_read_job_done (QKeychain.Job *incoming) {
         auto *job = static_cast<QKeychain.ReadPasswordJob> (incoming);
         QKeychain.Error error = job.error ();
 
@@ -539,7 +538,7 @@ protected:
         request_body.set_data (arguments.query (QUrl.FullyEncoded).to_latin1 ());
 
         auto job = _account.send_request ("POST", request_token, req, request_body);
-        job.set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
+        job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
         GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this] (QNetworkReply *reply) {
             auto json_data = reply.read_all ();
             QJsonParseError json_parse_error;
@@ -600,14 +599,14 @@ protected:
         add_settings_to_job (_account, job);
         job.set_insecure_fallback (true);
         job.set_key (kck);
-        job.start ();
+        job.on_start ();
 
         // let QNAM forget about the password
         // This needs to be done later in the event loop because we might be called (directly or
         // indirectly) from QNetworkAccessManagerPrivate.authentication_required, which itself
         // is a called from a BlockingQueuedConnection from the Qt HTTP thread. And clearing the
         // cache needs to synchronize again with the HTTP thread.
-        QTimer.single_shot (0, _account, &Account.clear_qNAMCache);
+        QTimer.single_shot (0, _account, &Account.on_clear_qnam_cache);
     }
 
     void HttpCredentials.forget_sensitive_data () {
@@ -642,10 +641,10 @@ protected:
             auto *job = new QKeychain.WritePasswordJob (Theme.instance ().app_name ());
             add_settings_to_job (_account, job);
             job.set_insecure_fallback (false);
-            connect (job, &QKeychain.Job.finished, this, &HttpCredentials.slot_write_client_cert_password_job_done);
+            connect (job, &QKeychain.Job.on_finished, this, &HttpCredentials.on_write_client_cert_password_job_done);
             job.set_key (keychain_key (_account.url ().to_string (), _user + client_cert_password_c, _account.id ()));
             job.set_binary_data (_client_cert_password);
-            job.start ();
+            job.on_start ();
             _client_cert_bundle.clear ();
             _client_cert_password.clear ();
         } else if (_account.credential_setting (QLatin1String (client_cert_bundle_c)).is_null () && !_client_ssl_certificate.is_null ()) {
@@ -655,26 +654,26 @@ protected:
             auto *job = new QKeychain.WritePasswordJob (Theme.instance ().app_name ());
             add_settings_to_job (_account, job);
             job.set_insecure_fallback (false);
-            connect (job, &QKeychain.Job.finished, this, &HttpCredentials.slot_write_client_cert_pem_job_done);
+            connect (job, &QKeychain.Job.on_finished, this, &HttpCredentials.on_write_client_cert_pem_job_done);
             job.set_key (keychain_key (_account.url ().to_string (), _user + client_certificate_pemC, _account.id ()));
             job.set_binary_data (_client_ssl_certificate.to_pem ());
-            job.start ();
+            job.on_start ();
         } else {
             // Option 3 : no client certificate at all (or doesn't need to be written)
-            slot_write_password_to_keychain ();
+            on_write_password_to_keychain ();
         }
     }
 
-    void HttpCredentials.slot_write_client_cert_password_job_done (QKeychain.Job *finished_job) {
+    void HttpCredentials.on_write_client_cert_password_job_done (QKeychain.Job *finished_job) {
         if (finished_job && finished_job.error () != QKeychain.NoError) {
             q_c_warning (lc_http_credentials) << "Could not write client cert password to credentials"
                                          << finished_job.error () << finished_job.error_string ();
         }
 
-        slot_write_password_to_keychain ();
+        on_write_password_to_keychain ();
     }
 
-    void HttpCredentials.slot_write_client_cert_pem_job_done (QKeychain.Job *finished_job) {
+    void HttpCredentials.on_write_client_cert_pem_job_done (QKeychain.Job *finished_job) {
         if (finished_job && finished_job.error () != QKeychain.NoError) {
             q_c_warning (lc_http_credentials) << "Could not write client cert to credentials"
                                          << finished_job.error () << finished_job.error_string ();
@@ -685,42 +684,42 @@ protected:
             auto *job = new QKeychain.WritePasswordJob (Theme.instance ().app_name ());
             add_settings_to_job (_account, job);
             job.set_insecure_fallback (false);
-            connect (job, &QKeychain.Job.finished, this, &HttpCredentials.slot_write_client_key_pem_job_done);
+            connect (job, &QKeychain.Job.on_finished, this, &HttpCredentials.on_write_client_key_pem_job_done);
             job.set_key (keychain_key (_account.url ().to_string (), _user + client_key_pemC, _account.id ()));
             job.set_binary_data (_client_ssl_key.to_pem ());
-            job.start ();
+            job.on_start ();
         } else {
-            slot_write_client_key_pem_job_done (nullptr);
+            on_write_client_key_pem_job_done (nullptr);
         }
     }
 
-    void HttpCredentials.slot_write_client_key_pem_job_done (QKeychain.Job *finished_job) {
+    void HttpCredentials.on_write_client_key_pem_job_done (QKeychain.Job *finished_job) {
         if (finished_job && finished_job.error () != QKeychain.NoError) {
             q_c_warning (lc_http_credentials) << "Could not write client key to credentials"
                                          << finished_job.error () << finished_job.error_string ();
         }
 
-        slot_write_password_to_keychain ();
+        on_write_password_to_keychain ();
     }
 
-    void HttpCredentials.slot_write_password_to_keychain () {
+    void HttpCredentials.on_write_password_to_keychain () {
         auto *job = new QKeychain.WritePasswordJob (Theme.instance ().app_name ());
         add_settings_to_job (_account, job);
         job.set_insecure_fallback (false);
-        connect (job, &QKeychain.Job.finished, this, &HttpCredentials.slot_write_job_done);
+        connect (job, &QKeychain.Job.on_finished, this, &HttpCredentials.on_write_job_done);
         job.set_key (keychain_key (_account.url ().to_string (), _user, _account.id ()));
         job.set_text_data (is_using_oAuth () ? _refresh_token : _password);
-        job.start ();
+        job.on_start ();
     }
 
-    void HttpCredentials.slot_write_job_done (QKeychain.Job *job) {
+    void HttpCredentials.on_write_job_done (QKeychain.Job *job) {
         if (job && job.error () != QKeychain.NoError) {
             q_c_warning (lc_http_credentials) << "Error while writing password"
                                          << job.error () << job.error_string ();
         }
     }
 
-    void HttpCredentials.slot_authentication (QNetworkReply *reply, QAuthenticator *authenticator) {
+    void HttpCredentials.on_authentication (QNetworkReply *reply, QAuthenticator *authenticator) {
         if (!_ready)
             return;
         Q_UNUSED (authenticator)
@@ -756,7 +755,7 @@ protected:
 
         QBuffer cert_buffer (&_client_cert_bundle);
         cert_buffer.open (QIODevice.ReadOnly);
-        QList<QSslCertificate> client_ca_certificates;
+        GLib.List<QSslCertificate> client_ca_certificates;
         return QSslCertificate.import_pkcs12 (
                 &cert_buffer, &_client_ssl_key, &_client_ssl_certificate, &client_ca_certificates, _client_cert_password);
     }

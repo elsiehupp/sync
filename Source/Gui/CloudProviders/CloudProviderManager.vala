@@ -7,7 +7,7 @@ Copyright (C) by Julius Härtl <jus@bitgrid.net>
 // #include <gio/gio.h>
 // #include <cloudprovidersproviderexporter.h>
 
-CloudProvidersProviderExporter *_provider_exporter;
+CloudProvidersProviderExporter _provider_exporter;
 
 // #include <GLib.Object>
 
@@ -19,14 +19,12 @@ class CloudProviderManager : GLib.Object {
     public CloudProviderManager (GLib.Object *parent = nullptr);
     public void register_signals ();
 
-signals:
 
-public slots:
-    void slot_folder_list_changed (Folder.Map &folder_map);
+    public void on_folder_list_changed (Folder.Map &folder_map);
 
-private:
-    QMap<string, CloudProviderWrapper> _map;
-    unsigned int _folder_index;
+
+    private QMap<string, CloudProviderWrapper> _map;
+    private uint _folder_index;
 };
 
 
@@ -55,8 +53,8 @@ void on_name_lost (GDBusConnection *connection, gchar *name, gpointer user_data)
 
 void CloudProviderManager.register_signals () {
     Occ.FolderMan *folder_manager = Occ.FolderMan.instance ();
-    connect (folder_manager, SIGNAL (folder_list_changed (Folder.Map &)), SLOT (slot_folder_list_changed (Folder.Map &)));
-    slot_folder_list_changed (folder_manager.map ());
+    connect (folder_manager, SIGNAL (folder_list_changed (Folder.Map &)), SLOT (on_folder_list_changed (Folder.Map &)));
+    on_folder_list_changed (folder_manager.map ());
 }
 
 CloudProviderManager.CloudProviderManager (GLib.Object *parent) : GLib.Object (parent) {
@@ -64,7 +62,7 @@ CloudProviderManager.CloudProviderManager (GLib.Object *parent) : GLib.Object (p
     g_bus_own_name (G_BUS_TYPE_SESSION, LIBCLOUDPROVIDERS_DBUS_BUS_NAME, G_BUS_NAME_OWNER_FLAGS_NONE, nullptr, on_name_acquired, nullptr, this, nullptr);
 }
 
-void CloudProviderManager.slot_folder_list_changed (Folder.Map &folder_map) {
+void CloudProviderManager.on_folder_list_changed (Folder.Map &folder_map) {
     QMapIterator<string, CloudProviderWrapper> i (_map);
     while (i.has_next ()) {
         i.next ();

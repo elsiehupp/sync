@@ -11,7 +11,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 // #include <QDebug>
 
 // #include <QVariantMap>
-// #include <QStringList>
+// #include <string[]>
 // #include <QMimeDatabase>
 
 namespace Occ {
@@ -32,54 +32,54 @@ server
 @ingroup libsync
 ***********************************************************/
 class Capabilities {
-public:
-    Capabilities (QVariantMap &capabilities);
 
-    bool share_a_p_i ();
-    bool share_email_password_enabled ();
-    bool share_email_password_enforced ();
-    bool share_public_link ();
-    bool share_public_link_allow_upload ();
-    bool share_public_link_supports_upload_only ();
-    bool share_public_link_ask_optional_password ();
-    bool share_public_link_enforce_password ();
-    bool share_public_link_enforce_expire_date ();
-    int share_public_link_expire_date_days ();
-    bool share_internal_enforce_expire_date ();
-    int share_internal_expire_date_days ();
-    bool share_remote_enforce_expire_date ();
-    int share_remote_expire_date_days ();
-    bool share_public_link_multiple ();
-    bool share_resharing ();
-    int share_default_permissions ();
-    bool chunking_ng ();
-    bool bulk_upload ();
-    bool user_status ();
-    bool user_status_supports_emoji ();
+    public Capabilities (QVariantMap &capabilities);
+
+    public bool share_a_p_i ();
+    public bool share_email_password_enabled ();
+    public bool share_email_password_enforced ();
+    public bool share_public_link ();
+    public bool share_public_link_allow_upload ();
+    public bool share_public_link_supports_upload_only ();
+    public bool share_public_link_ask_optional_password ();
+    public bool share_public_link_enforce_password ();
+    public bool share_public_link_enforce_expire_date ();
+    public int share_public_link_expire_date_days ();
+    public bool share_internal_enforce_expire_date ();
+    public int share_internal_expire_date_days ();
+    public bool share_remote_enforce_expire_date ();
+    public int share_remote_expire_date_days ();
+    public bool share_public_link_multiple ();
+    public bool share_resharing ();
+    public int share_default_permissions ();
+    public bool chunking_ng ();
+    public bool bulk_upload ();
+    public bool user_status ();
+    public bool user_status_supports_emoji ();
 
     /// Returns which kind of push notfications are available
-    PushNotificationTypes available_push_notifications ();
+    public PushNotificationTypes available_push_notifications ();
 
     /// Websocket url for files push notifications if available
-    QUrl push_notifications_web_socket_url ();
+    public QUrl push_notifications_web_socket_url ();
 
     /// disable parallel upload in chunking
-    bool chunking_parallel_upload_disabled ();
+    public bool chunking_parallel_upload_disabled ();
 
     /// Whether the "privatelink" DAV property is available
-    bool private_link_property_available ();
+    public bool private_link_property_available ();
 
     /// returns true if the capabilities report notifications
-    bool notifications_available ();
+    public bool notifications_available ();
 
     /// returns true if the server supports client side encryption
-    bool client_side_encryption_available ();
+    public bool client_side_encryption_available ();
 
     /// returns true if the capabilities are loaded already.
-    bool is_valid ();
+    public bool is_valid ();
 
     /// return true if the activity app is enabled
-    bool has_activities ();
+    public bool has_activities ();
 
     /***********************************************************
     Returns the checksum types the server understands.
@@ -92,7 +92,7 @@ public:
     Default : []
     Possible entries : "Adler32", "MD5", "SHA1"
     ***********************************************************/
-    QList<QByteArray> supported_checksum_types ();
+    public GLib.List<GLib.ByteArray> supported_checksum_types ();
 
     /***********************************************************
     The checksum algorithm that the server recommends for file uploads.
@@ -102,14 +102,14 @@ public:
     Default : empty, meaning "no preference"
     Possible values : empty or any of the supported_types
     ***********************************************************/
-    QByteArray preferred_upload_checksum_type ();
+    public GLib.ByteArray preferred_upload_checksum_type ();
 
     /***********************************************************
     Helper that returns the preferred_upload_checksum_type () if set, or one
     of the supported_checksum_types () if it isn't. May return an empty
-    QByteArray if no checksum types are supported.
+    GLib.ByteArray if no checksum types are supported.
     ***********************************************************/
-    QByteArray upload_checksum_type ();
+    public GLib.ByteArray upload_checksum_type ();
 
     /***********************************************************
     List of HTTP error codes should be guaranteed to eventually reset
@@ -128,7 +128,7 @@ public:
     Default : []
     Example : [503, 500]
     ***********************************************************/
-    QList<int> http_error_codes_that_reset_failing_chunked_uploads ();
+    public GLib.List<int> http_error_codes_that_reset_failing_chunked_uploads ();
 
     /***********************************************************
     Regex that, if contained in a filename, will result in it not being uploaded.
@@ -139,53 +139,53 @@ public:
 
     Note that it just needs to be contained. The regex [ab] is contained in "car".
     ***********************************************************/
-    string invalid_filename_regex ();
+    public string invalid_filename_regex ();
 
     /***********************************************************
     return the list of filename that should not be uploaded
     ***********************************************************/
-    QStringList blacklisted_files ();
+    public string[] blacklisted_files ();
 
     /***********************************************************
     Whether conflict files should remain local (default) or should be uploaded.
     ***********************************************************/
-    bool upload_conflict_files ();
+    public bool upload_conflict_files ();
 
     // Direct Editing
-    void add_direct_editor (DirectEditor* direct_editor);
-    DirectEditor* get_direct_editor_for_mimetype (QMimeType &mime_type);
-    DirectEditor* get_direct_editor_for_optional_mimetype (QMimeType &mime_type);
+    public void add_direct_editor (DirectEditor* direct_editor);
+    public DirectEditor* get_direct_editor_for_mimetype (QMimeType &mime_type);
+    public DirectEditor* get_direct_editor_for_optional_mimetype (QMimeType &mime_type);
 
-private:
-    QVariantMap _capabilities;
 
-    QList<DirectEditor> _direct_editors;
+    private QVariantMap _capabilities;
+
+    private GLib.List<DirectEditor> _direct_editors;
 };
 
 /*-------------------------------------------------------------------------------------*/
 
 class DirectEditor : GLib.Object {
-public:
-    DirectEditor (string &id, string &name, GLib.Object* parent = nullptr);
 
-    void add_mimetype (QByteArray &mime_type);
-    void add_optional_mimetype (QByteArray &mime_type);
+    public DirectEditor (string id, string name, GLib.Object* parent = nullptr);
 
-    bool has_mimetype (QMimeType &mime_type);
-    bool has_optional_mimetype (QMimeType &mime_type);
+    public void add_mimetype (GLib.ByteArray &mime_type);
+    public void add_optional_mimetype (GLib.ByteArray &mime_type);
 
-    string id ();
-    string name ();
+    public bool has_mimetype (QMimeType &mime_type);
+    public bool has_optional_mimetype (QMimeType &mime_type);
 
-    QList<QByteArray> mime_types ();
-    QList<QByteArray> optional_mime_types ();
+    public string id ();
+    public string name ();
 
-private:
-    string _id;
-    string _name;
+    public GLib.List<GLib.ByteArray> mime_types ();
+    public GLib.List<GLib.ByteArray> optional_mime_types ();
 
-    QList<QByteArray> _mime_types;
-    QList<QByteArray> _optional_mime_types;
+
+    private string _id;
+    private string _name;
+
+    private GLib.List<GLib.ByteArray> _mime_types;
+    private GLib.List<GLib.ByteArray> _optional_mime_types;
 };
 
     Capabilities.Capabilities (QVariantMap &capabilities)
@@ -320,28 +320,28 @@ private:
         return _capabilities.contains ("activity");
     }
 
-    QList<QByteArray> Capabilities.supported_checksum_types () {
-        QList<QByteArray> list;
+    GLib.List<GLib.ByteArray> Capabilities.supported_checksum_types () {
+        GLib.List<GLib.ByteArray> list;
         foreach (auto &t, _capabilities["checksums"].to_map ()["supported_types"].to_list ()) {
             list.push_back (t.to_byte_array ());
         }
         return list;
     }
 
-    QByteArray Capabilities.preferred_upload_checksum_type () {
+    GLib.ByteArray Capabilities.preferred_upload_checksum_type () {
         return q_environment_variable ("OWNCLOUD_CONTENT_CHECKSUM_TYPE",
                                     _capabilities.value (QStringLiteral ("checksums")).to_map ()
                                     .value (QStringLiteral ("preferred_upload_type"), QStringLiteral ("SHA1")).to_string ()).to_utf8 ();
     }
 
-    QByteArray Capabilities.upload_checksum_type () {
-        QByteArray preferred = preferred_upload_checksum_type ();
+    GLib.ByteArray Capabilities.upload_checksum_type () {
+        GLib.ByteArray preferred = preferred_upload_checksum_type ();
         if (!preferred.is_empty ())
             return preferred;
-        QList<QByteArray> supported = supported_checksum_types ();
+        GLib.List<GLib.ByteArray> supported = supported_checksum_types ();
         if (!supported.is_empty ())
             return supported.first ();
-        return QByteArray ();
+        return GLib.ByteArray ();
     }
 
     bool Capabilities.chunking_ng () {
@@ -409,8 +409,8 @@ private:
         return _capabilities["files"].to_map ()["private_links"].to_bool ();
     }
 
-    QList<int> Capabilities.http_error_codes_that_reset_failing_chunked_uploads () {
-        QList<int> list;
+    GLib.List<int> Capabilities.http_error_codes_that_reset_failing_chunked_uploads () {
+        GLib.List<int> list;
         foreach (auto &t, _capabilities["dav"].to_map ()["http_error_codes_that_reset_failing_chunked_uploads"].to_list ()) {
             list.push_back (t.to_int ());
         }
@@ -430,7 +430,7 @@ private:
         return _capabilities[QStringLiteral ("upload_conflict_files")].to_bool ();
     }
 
-    QStringList Capabilities.blacklisted_files () {
+    string[] Capabilities.blacklisted_files () {
         return _capabilities["files"].to_map ()["blacklisted_files"].to_string_list ();
     }
 
@@ -462,7 +462,7 @@ private:
 
     /*-------------------------------------------------------------------------------------*/
 
-    DirectEditor.DirectEditor (string &id, string &name, GLib.Object* parent)
+    DirectEditor.DirectEditor (string id, string name, GLib.Object* parent)
         : GLib.Object (parent)
         , _id (id)
         , _name (name) {
@@ -476,19 +476,19 @@ private:
         return _name;
     }
 
-    void DirectEditor.add_mimetype (QByteArray &mime_type) {
+    void DirectEditor.add_mimetype (GLib.ByteArray &mime_type) {
         _mime_types.append (mime_type);
     }
 
-    void DirectEditor.add_optional_mimetype (QByteArray &mime_type) {
+    void DirectEditor.add_optional_mimetype (GLib.ByteArray &mime_type) {
         _optional_mime_types.append (mime_type);
     }
 
-    QList<QByteArray> DirectEditor.mime_types () {
+    GLib.List<GLib.ByteArray> DirectEditor.mime_types () {
         return _mime_types;
     }
 
-    QList<QByteArray> DirectEditor.optional_mime_types () {
+    GLib.List<GLib.ByteArray> DirectEditor.optional_mime_types () {
         return _optional_mime_types;
     }
 

@@ -36,7 +36,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 // #include <config_csync.h>
 // #include <functional>
 // #include <memory>
-// #include <QByteArray>
+// #include <GLib.ByteArray>
 
 namespace Occ {
 }
@@ -177,20 +177,20 @@ struct OCSYNC_EXPORT csync_file_stat_s {
   bool is_hidden BITFIELD (1); // Not saved in the DB, only used during discovery for local files.
   bool is_e2e_encrypted BITFIELD (1);
 
-  QByteArray path;
-  QByteArray rename_path;
-  QByteArray etag;
-  QByteArray file_id;
-  QByteArray direct_download_url;
-  QByteArray direct_download_cookies;
-  QByteArray original_path; // only set if locale conversion fails
+  GLib.ByteArray path;
+  GLib.ByteArray rename_path;
+  GLib.ByteArray etag;
+  GLib.ByteArray file_id;
+  GLib.ByteArray direct_download_url;
+  GLib.ByteArray direct_download_cookies;
+  GLib.ByteArray original_path; // only set if locale conversion fails
 
   // In the local tree, this can hold a checksum and its type if it is
   //   computed during discovery for some reason.
   // In the remote tree, this will have the server checksum, if available.
   // In both cases, the format is "SHA1:baff".
-  QByteArray checksum_header;
-  QByteArray e2e_mangled_name;
+  GLib.ByteArray checksum_header;
+  GLib.ByteArray e2e_mangled_name;
 
   CSYNC_STATUS error_status = CSYNC_STATUS_OK;
 

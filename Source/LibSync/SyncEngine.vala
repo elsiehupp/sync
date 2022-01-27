@@ -17,7 +17,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QLoggingCategory>
 // #include <QMutexLocker>
 // #include <QThread>
-// #include <QStringList>
+// #include <string[]>
 // #include <QTextStream>
 // #include <QTime>
 // #include <QUrl>
@@ -36,8 +36,8 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <string>
 // #include <QSet>
 // #include <QMap>
-// #include <QStringList>
-// #include <QSharedPointer>
+// #include <string[]>
+
 // #include <set>
 
 
@@ -56,60 +56,60 @@ enum Another_sync_needed {
 @ingroup libsync
 ***********************************************************/
 class SyncEngine : GLib.Object {
-public:
-    SyncEngine (AccountPtr account, string &local_path,
-        const string &remote_path, SyncJournalDb *journal);
+
+    public SyncEngine (AccountPtr account, string local_path,
+        const string remote_path, SyncJournalDb *journal);
     ~SyncEngine () override;
 
-    Q_INVOKABLE void start_sync ();
-    void set_network_limits (int upload, int download);
+    public void on_start_sync ();
+    public void set_network_limits (int upload, int download);
 
     /***********************************************************
     Abort the sync. Called from the main thread.
     ***********************************************************/
-    void abort ();
+    public void on_abort ();
 
-    bool is_sync_running () {
+    public bool is_sync_running () {
         return _sync_running;
     }
 
-    SyncOptions sync_options () {
+    public SyncOptions sync_options () {
         return _sync_options;
     }
-    void set_sync_options (SyncOptions &options) {
+    public void set_sync_options (SyncOptions &options) {
         _sync_options = options;
     }
-    bool ignore_hidden_files () {
+    public bool ignore_hidden_files () {
         return _ignore_hidden_files;
     }
-    void set_ignore_hidden_files (bool ignore) {
+    public void set_ignore_hidden_files (bool ignore) {
         _ignore_hidden_files = ignore;
     }
 
-    ExcludedFiles &excluded_files () {
-        return *_excluded_files;
+    public ExcludedFiles &excluded_files () {
+        return _excluded_files;
     }
-    Utility.StopWatch &stop_watch () {
+    public Utility.StopWatch &stop_watch () {
         return _stop_watch;
     }
-    SyncFileStatusTracker &sync_file_status_tracker () {
-        return *_sync_file_status_tracker;
+    public SyncFileStatusTracker &sync_file_status_tracker () {
+        return _sync_file_status_tracker;
     }
 
     /***********************************************************
     Returns whether another sync is needed to complete the sync
     ***********************************************************/
-    Another_sync_needed is_another_sync_needed () {
+    public Another_sync_needed is_another_sync_needed () {
         return _another_sync_needed;
     }
 
-    bool was_file_touched (string &fn) const;
+    public bool was_file_touched (string fn);
 
-    AccountPtr account ();
-    SyncJournalDb *journal () {
+    public AccountPtr account ();
+    public SyncJournalDb *journal () {
         return _journal;
     }
-    string local_path () {
+    public string local_path () {
         return _local_path;
     }
 
@@ -124,7 +124,7 @@ public:
     To avoid that, uploads of files where the distance between the mtime and the
     current time is less than this duration are skipped.
     ***********************************************************/
-    static std.chrono.milliseconds minimum_file_age_for_upload;
+    public static std.chrono.milliseconds minimum_file_age_for_upload;
 
     /***********************************************************
     Control whether local discovery should read from filesystem or db.
@@ -137,7 +137,7 @@ public:
     revert afterwards. Use _last_local_discovery_style to discover the last
     sync's style.
     ***********************************************************/
-    void set_local_discovery_options (LocalDiscoveryStyle style, std.set<string> paths = {});
+    public void set_local_discovery_options (LocalDiscoveryStyle style, std.set<string> paths = {});
 
     /***********************************************************
     Returns whether the given folder-relative path should be locally discovered
@@ -146,12 +146,12 @@ public:
     Example : If path is 'foo/bar' and style is DatabaseAndFilesystem and dirs contains
         'foo/bar/touched_file', then the result will be true.
     ***********************************************************/
-    bool should_discover_locally (string &path) const;
+    public bool should_discover_locally (string path);
 
     /***********************************************************
     Access the last sync run's local discovery style
     ***********************************************************/
-    LocalDiscoveryStyle last_local_discovery_style () {
+    public LocalDiscoveryStyle last_local_discovery_style () {
         return _last_local_discovery_style;
     }
 
@@ -164,18 +164,18 @@ public:
     Note that *hydrated* placeholder files might still be left. These will
     get cleaned up by Vfs.unregister_folder ().
     ***********************************************************/
-    static void wipe_virtual_files (string &local_path, SyncJournalDb &journal, Vfs &vfs);
+    public static void wipe_virtual_files (string local_path, SyncJournalDb &journal, Vfs &vfs);
 
-    static void switch_to_virtual_files (string &local_path, SyncJournalDb &journal, Vfs &vfs);
+    public static void switch_to_virtual_files (string local_path, SyncJournalDb &journal, Vfs &vfs);
 
     // for the test
-    auto get_propagator () {
+    public auto get_propagator () {
         return _propagator;
     }
 
 signals:
     // During update, before reconcile
-    void root_etag (QByteArray &, QDateTime &);
+    void root_etag (GLib.ByteArray &, QDateTime &);
 
     // after the above signals. with the items that actually need propagating
     void about_to_propagate (SyncFileItemVector &);
@@ -186,38 +186,38 @@ signals:
     void transmission_progress (ProgressInfo &progress);
 
     /// We've produced a new sync error of a type.
-    void sync_error (string &message, ErrorCategory category = ErrorCategory.Normal);
+    void sync_error (string message, ErrorCategory category = ErrorCategory.Normal);
 
-    void add_error_to_gui (SyncFileItem.Status status, string &error_message, string &subject);
+    void add_error_to_gui (SyncFileItem.Status status, string error_message, string subject);
 
-    void finished (bool success);
+    void on_finished (bool on_success);
     void started ();
 
     /***********************************************************
     Emited when the sync engine detects that all the files have been removed or change.
     This usually happen when the server was reset or something.
-    Set *cancel to true in a slot connected from this signal to abort the sync.
+    Set *cancel to true in a slot connected from this signal to on_abort the sync.
     ***********************************************************/
     void about_to_remove_all_files (SyncFileItem.Direction direction, std.function<void (bool)> f);
 
     // A new folder was discovered and was not synced because of the confirmation feature
-    void new_big_folder (string &folder, bool is_external);
+    void new_big_folder (string folder, bool is_external);
 
     /***********************************************************
     Emitted when propagation has problems with a locked file.
 
     Forwarded from OwncloudPropagator.seen_locked_file.
     ***********************************************************/
-    void seen_locked_file (string &file_name);
+    void seen_locked_file (string file_name);
 
-private slots:
-    void slot_folder_discovered (bool local, string &folder);
-    void slot_root_etag_received (QByteArray &, QDateTime &time);
+
+    private void on_folder_discovered (bool local, string folder);
+    private void on_root_etag_received (GLib.ByteArray &, QDateTime &time);
 
     /***********************************************************
     When the discovery phase discovers an item
     ***********************************************************/
-    void slot_item_discovered (SyncFileItemPtr &item);
+    private void on_item_discovered (SyncFileItemPtr &item);
 
     /***********************************************************
     Called when a SyncFileItem gets accepted for a sync.
@@ -226,127 +226,127 @@ private slots:
     can also be called via the propagator for items that are
     created during propagation.
     ***********************************************************/
-    void slot_new_item (SyncFileItemPtr &item);
+    private void on_new_item (SyncFileItemPtr &item);
 
-    void slot_item_completed (SyncFileItemPtr &item);
-    void slot_discovery_finished ();
-    void slot_propagation_finished (bool success);
-    void slot_progress (SyncFileItem &item, int64 curent);
-    void slot_clean_polls_job_aborted (string &error);
+    private void on_item_completed (SyncFileItemPtr &item);
+    private void on_discovery_finished ();
+    private void on_propagation_finished (bool on_success);
+    private void on_progress (SyncFileItem &item, int64 curent);
+    private void on_clean_polls_job_aborted (string error);
 
     /***********************************************************
     Records that a file was touched by a job.
     ***********************************************************/
-    void slot_add_touched_file (string &fn);
+    private void on_add_touched_file (string fn);
 
     /***********************************************************
     Wipes the _touched_files hash
     ***********************************************************/
-    void slot_clear_touched_files ();
+    private void on_clear_touched_files ();
 
     /***********************************************************
     Emit a summary error, unless it was seen before
     ***********************************************************/
-    void slot_summary_error (string &message);
+    private void on_summary_error (string message);
 
-    void slot_insufficient_local_storage ();
-    void slot_insufficient_remote_storage ();
+    private void on_insufficient_local_storage ();
+    private void on_insufficient_remote_storage ();
 
-private:
-    bool check_error_blacklisting (SyncFileItem &item);
+
+    private bool check_error_blacklisting (SyncFileItem &item);
 
     // Cleans up unnecessary downloadinfo entries in the journal as well
     // as their temporary files.
-    void delete_stale_download_infos (SyncFileItemVector &sync_items);
+    private void delete_stale_download_infos (SyncFileItemVector &sync_items);
 
     // Removes stale uploadinfos from the journal.
-    void delete_stale_upload_infos (SyncFileItemVector &sync_items);
+    private void delete_stale_upload_infos (SyncFileItemVector &sync_items);
 
     // Removes stale error blacklist entries from the journal.
-    void delete_stale_error_blacklist_entries (SyncFileItemVector &sync_items);
+    private void delete_stale_error_blacklist_entries (SyncFileItemVector &sync_items);
 
     // Removes stale and adds missing conflict records after sync
-    void conflict_record_maintenance ();
+    private void conflict_record_maintenance ();
 
-    // cleanup and emit the finished signal
-    void finalize (bool success);
+    // on_cleanup and emit the on_finished signal
+    private void on_finalize (bool on_success);
 
-    static bool s_any_sync_running; //true when one sync is running somewhere (for debugging)
+    private static bool s_any_sync_running; //true when one sync is running somewhere (for debugging)
 
     // Must only be acessed during update and reconcile
-    QVector<SyncFileItemPtr> _sync_items;
+    private QVector<SyncFileItemPtr> _sync_items;
 
-    AccountPtr _account;
-    bool _needs_update;
-    bool _sync_running;
-    string _local_path;
-    string _remote_path;
-    QByteArray _remote_root_etag;
-    SyncJournalDb *_journal;
-    QScopedPointer<DiscoveryPhase> _discovery_phase;
-    QSharedPointer<OwncloudPropagator> _propagator;
+    private AccountPtr _account;
+    private bool _needs_update;
+    private bool _sync_running;
+    private string _local_path;
+    private string _remote_path;
+    private GLib.ByteArray _remote_root_etag;
+    private SyncJournalDb _journal;
+    private QScopedPointer<DiscoveryPhase> _discovery_phase;
+    private unowned<OwncloudPropagator> _propagator;
 
-    QSet<string> _bulk_upload_black_list;
+    private QSet<string> _bulk_upload_black_list;
 
     // List of all files with conflicts
-    QSet<string> _seen_conflict_files;
+    private QSet<string> _seen_conflict_files;
 
-    QScopedPointer<ProgressInfo> _progress_info;
+    private QScopedPointer<ProgressInfo> _progress_info;
 
-    QScopedPointer<ExcludedFiles> _excluded_files;
-    QScopedPointer<SyncFileStatusTracker> _sync_file_status_tracker;
-    Utility.StopWatch _stop_watch;
+    private QScopedPointer<ExcludedFiles> _excluded_files;
+    private QScopedPointer<SyncFileStatusTracker> _sync_file_status_tracker;
+    private Utility.StopWatch _stop_watch;
 
     /***********************************************************
     check if we are allowed to propagate everything, and if we are not, adjust the instructions
     to recover
     ***********************************************************/
-    void check_for_permission (SyncFileItemVector &sync_items);
-    RemotePermissions get_permissions (string &file) const;
+    private void check_for_permission (SyncFileItemVector &sync_items);
+    private RemotePermissions get_permissions (string file);
 
     /***********************************************************
     Instead of downloading files from the server, upload the files to the server
     ***********************************************************/
-    void restore_old_files (SyncFileItemVector &sync_items);
+    private void restore_old_files (SyncFileItemVector &sync_items);
 
     // true if there is at least one file which was not changed on the server
-    bool _has_none_files;
+    private bool _has_none_files;
 
     // true if there is at leasr one file with instruction REMOVE
-    bool _has_remove_file;
+    private bool _has_remove_file;
 
     // If ignored files should be ignored
-    bool _ignore_hidden_files = false;
+    private bool _ignore_hidden_files = false;
 
-    int _upload_limit;
-    int _download_limit;
-    SyncOptions _sync_options;
+    private int _upload_limit;
+    private int _download_limit;
+    private SyncOptions _sync_options;
 
-    Another_sync_needed _another_sync_needed;
+    private Another_sync_needed _another_sync_needed;
 
     /***********************************************************
     Stores the time since a job touched a file.
     ***********************************************************/
-    QMulti_map<QElapsedTimer, string> _touched_files;
+    private QMulti_map<QElapsedTimer, string> _touched_files;
 
-    QElapsedTimer _last_update_progress_callback_call;
+    private QElapsedTimer _last_update_progress_callback_call;
 
     /***********************************************************
-    For clearing the _touched_files variable after sync finished
+    For clearing the _touched_files variable after sync on_finished
     ***********************************************************/
-    QTimer _clear_touched_files_timer;
+    private QTimer _clear_touched_files_timer;
 
     /***********************************************************
     List of unique errors that occurred in a sync run.
     ***********************************************************/
-    QSet<string> _unique_errors;
+    private QSet<string> _unique_errors;
 
     /***********************************************************
     The kind of local discovery the last sync run used
     ***********************************************************/
-    LocalDiscoveryStyle _last_local_discovery_style = LocalDiscoveryStyle.FilesystemOnly;
-    LocalDiscoveryStyle _local_discovery_style = LocalDiscoveryStyle.FilesystemOnly;
-    std.set<string> _local_discovery_paths;
+    private LocalDiscoveryStyle _last_local_discovery_style = LocalDiscoveryStyle.FilesystemOnly;
+    private LocalDiscoveryStyle _local_discovery_style = LocalDiscoveryStyle.FilesystemOnly;
+    private std.set<string> _local_discovery_paths;
 };
 
     bool SyncEngine.s_any_sync_running = false;
@@ -370,8 +370,8 @@ private:
     // doc in header
     std.chrono.milliseconds SyncEngine.minimum_file_age_for_upload (2000);
 
-    SyncEngine.SyncEngine (AccountPtr account, string &local_path,
-        const string &remote_path, Occ.SyncJournalDb *journal)
+    SyncEngine.SyncEngine (AccountPtr account, string local_path,
+        const string remote_path, Occ.SyncJournalDb *journal)
         : _account (account)
         , _needs_update (false)
         , _sync_running (false)
@@ -394,21 +394,21 @@ private:
         // Everything in the SyncEngine expects a trailing slash for the local_path.
         ASSERT (local_path.ends_with (QLatin1Char ('/')));
 
-        _excluded_files.reset (new ExcludedFiles (local_path));
+        _excluded_files.on_reset (new ExcludedFiles (local_path));
 
-        _sync_file_status_tracker.reset (new SyncFileStatusTracker (this));
+        _sync_file_status_tracker.on_reset (new SyncFileStatusTracker (this));
 
         _clear_touched_files_timer.set_single_shot (true);
         _clear_touched_files_timer.set_interval (30 * 1000);
-        connect (&_clear_touched_files_timer, &QTimer.timeout, this, &SyncEngine.slot_clear_touched_files);
-        connect (this, &SyncEngine.finished, [this] (bool /* finished */) {
+        connect (&_clear_touched_files_timer, &QTimer.timeout, this, &SyncEngine.on_clear_touched_files);
+        connect (this, &SyncEngine.on_finished, [this] (bool /* on_finished */) {
             _journal.key_value_store_set ("last_sync", QDateTime.current_secs_since_epoch ());
         });
     }
 
     SyncEngine.~SyncEngine () {
-        abort ();
-        _excluded_files.reset ();
+        on_abort ();
+        _excluded_files.on_reset ();
     }
 
     /***********************************************************
@@ -478,7 +478,7 @@ private:
         item._error_string = tr ("%1 (skipped due to earlier error, trying again in %2)").arg (entry._error_string, wait_seconds_str);
 
         if (entry._error_category == SyncJournalErrorBlacklistRecord.InsufficientRemoteStorage) {
-            slot_insufficient_remote_storage ();
+            on_insufficient_remote_storage ();
         }
 
         return true;
@@ -532,7 +532,7 @@ private:
                 if (!transfer_id)
                     continue; // Was not a chunked upload
                 QUrl url = Utility.concat_url_path (account ().url (), QLatin1String ("remote.php/dav/uploads/") + account ().dav_user () + QLatin1Char ('/') + string.number (transfer_id));
-                (new DeleteJob (account (), url, this)).start ();
+                (new DeleteJob (account (), url, this)).on_start ();
             }
         }
     }
@@ -594,7 +594,7 @@ private:
         }
     }
 
-    void Occ.SyncEngine.slot_item_discovered (Occ.SyncFileItemPtr &item) {
+    void Occ.SyncEngine.on_item_discovered (Occ.SyncFileItemPtr &item) {
         if (Utility.is_conflict_file (item._file))
             _seen_conflict_files.insert (item._file);
         if (item._instruction == CSYNC_INSTRUCTION_UPDATE_METADATA && !item.is_directory ()) {
@@ -650,7 +650,7 @@ private:
                     }
                 }
 
-                // Updating the db happens on success
+                // Updating the db happens on on_success
                 _journal.set_file_record (rec);
 
                 // This might have changed the shared flag, so we must notify SyncFileStatusTracker for example
@@ -694,23 +694,23 @@ private:
         auto it = std.lower_bound ( _sync_items.begin (), _sync_items.end (), item ); // the _sync_items is sorted
         _sync_items.insert ( it, item );
 
-        slot_new_item (item);
+        on_new_item (item);
 
         if (item.is_directory ()) {
-            slot_folder_discovered (item._etag.is_empty (), item._file);
+            on_folder_discovered (item._etag.is_empty (), item._file);
         }
     }
 
-    void SyncEngine.start_sync () {
+    void SyncEngine.on_start_sync () {
         if (_journal.exists ()) {
             QVector<SyncJournalDb.PollInfo> poll_infos = _journal.get_poll_infos ();
             if (!poll_infos.is_empty ()) {
                 q_c_info (lc_engine) << "Finish Poll jobs before starting a sync";
                 auto *job = new CleanupPollsJob (poll_infos, _account,
                     _journal, _local_path, _sync_options._vfs, this);
-                connect (job, &CleanupPollsJob.finished, this, &SyncEngine.start_sync);
-                connect (job, &CleanupPollsJob.aborted, this, &SyncEngine.slot_clean_polls_job_aborted);
-                job.start ();
+                connect (job, &CleanupPollsJob.on_finished, this, &SyncEngine.on_start_sync);
+                connect (job, &CleanupPollsJob.aborted, this, &SyncEngine.on_clean_polls_job_aborted);
+                job.on_start ();
                 return;
             }
         }
@@ -729,13 +729,13 @@ private:
         _has_remove_file = false;
         _seen_conflict_files.clear ();
 
-        _progress_info.reset ();
+        _progress_info.on_reset ();
 
         if (!QDir (_local_path).exists ()) {
             _another_sync_needed = DelayedFollowUp;
             // No _tr, it should only occur in non-mirall
             Q_EMIT sync_error (QStringLiteral ("Unable to find local sync folder."));
-            finalize (false);
+            on_finalize (false);
             return;
         }
 
@@ -747,12 +747,12 @@ private:
                 q_c_warning (lc_engine ()) << "Too little space available at" << _local_path << ". Have"
                                       << free_bytes << "bytes and require at least" << min_free << "bytes";
                 _another_sync_needed = DelayedFollowUp;
-                Q_EMIT sync_error (tr ("Only %1 are available, need at least %2 to start",
+                Q_EMIT sync_error (tr ("Only %1 are available, need at least %2 to on_start",
                     "Placeholders are postfixed with file sizes using Utility.octets_to_string ()")
                                      .arg (
                                          Utility.octets_to_string (free_bytes),
                                          Utility.octets_to_string (min_free)));
-                finalize (false);
+                on_finalize (false);
                 return;
             } else {
                 q_c_info (lc_engine) << "There are" << free_bytes << "bytes available at" << _local_path;
@@ -781,7 +781,7 @@ private:
         if (!_journal.open ()) {
             q_c_warning (lc_engine) << "No way to create a sync journal!";
             Q_EMIT sync_error (tr ("Unable to open or create the local sync database. Make sure you have write access in the sync folder."));
-            finalize (false);
+            on_finalize (false);
             return;
             // database creation error!
         }
@@ -797,7 +797,7 @@ private:
 
         if (_sync_options._vfs.mode () == Vfs.WithSuffix && _sync_options._vfs.file_suffix ().is_empty ()) {
             Q_EMIT sync_error (tr ("Using virtual files with suffix, but suffix is not set"));
-            finalize (false);
+            on_finalize (false);
             return;
         }
 
@@ -809,27 +809,27 @@ private:
         } else {
             q_c_warning (lc_engine) << "Could not retrieve selective sync list from DB";
             Q_EMIT sync_error (tr ("Unable to read the blacklist from the local database"));
-            finalize (false);
+            on_finalize (false);
             return;
         }
 
-        _stop_watch.start ();
+        _stop_watch.on_start ();
         _progress_info._status = ProgressInfo.Starting;
         emit transmission_progress (*_progress_info);
 
-        q_c_info (lc_engine) << "#### Discovery start ####################################################";
+        q_c_info (lc_engine) << "#### Discovery on_start ####################################################";
         q_c_info (lc_engine) << "Server" << account ().server_version ()
                          << (account ().is_http2Supported () ? "Using HTTP/2" : "");
         _progress_info._status = ProgressInfo.Discovery;
         emit transmission_progress (*_progress_info);
 
-        _discovery_phase.reset (new DiscoveryPhase);
+        _discovery_phase.on_reset (new DiscoveryPhase);
         _discovery_phase._account = _account;
         _discovery_phase._excludes = _excluded_files.data ();
         const string exclude_file_path = _local_path + QStringLiteral (".sync-exclude.lst");
         if (QFile.exists (exclude_file_path)) {
             _discovery_phase._excludes.add_exclude_file_path (exclude_file_path);
-            _discovery_phase._excludes.reload_exclude_files ();
+            _discovery_phase._excludes.on_reload_exclude_files ();
         }
         _discovery_phase._statedb = _journal;
         _discovery_phase._local_dir = _local_path;
@@ -839,7 +839,7 @@ private:
         if (!_discovery_phase._remote_folder.ends_with ('/'))
             _discovery_phase._remote_folder+='/';
         _discovery_phase._sync_options = _sync_options;
-        _discovery_phase._should_discover_localy = [this] (string &s) {
+        _discovery_phase._should_discover_localy = [this] (string s) {
             return should_discover_locally (s);
         };
         _discovery_phase.set_selective_sync_black_list (selective_sync_black_list);
@@ -847,7 +847,7 @@ private:
         if (!ok) {
             q_c_warning (lc_engine) << "Unable to read selective sync list, aborting.";
             Q_EMIT sync_error (tr ("Unable to read from the sync journal."));
-            finalize (false);
+            on_finalize (false);
             return;
         }
 
@@ -867,27 +867,27 @@ private:
         _discovery_phase._server_blacklisted_files = _account.capabilities ().blacklisted_files ();
         _discovery_phase._ignore_hidden_files = ignore_hidden_files ();
 
-        connect (_discovery_phase.data (), &DiscoveryPhase.item_discovered, this, &SyncEngine.slot_item_discovered);
+        connect (_discovery_phase.data (), &DiscoveryPhase.item_discovered, this, &SyncEngine.on_item_discovered);
         connect (_discovery_phase.data (), &DiscoveryPhase.new_big_folder, this, &SyncEngine.new_big_folder);
-        connect (_discovery_phase.data (), &DiscoveryPhase.fatal_error, this, [this] (string &error_string) {
+        connect (_discovery_phase.data (), &DiscoveryPhase.fatal_error, this, [this] (string error_string) {
             Q_EMIT sync_error (error_string);
-            finalize (false);
+            on_finalize (false);
         });
-        connect (_discovery_phase.data (), &DiscoveryPhase.finished, this, &SyncEngine.slot_discovery_finished);
+        connect (_discovery_phase.data (), &DiscoveryPhase.on_finished, this, &SyncEngine.on_discovery_finished);
         connect (_discovery_phase.data (), &DiscoveryPhase.silently_excluded,
-            _sync_file_status_tracker.data (), &SyncFileStatusTracker.slot_add_silently_excluded);
+            _sync_file_status_tracker.data (), &SyncFileStatusTracker.on_add_silently_excluded);
 
         auto discovery_job = new ProcessDirectoryJob (
             _discovery_phase.data (), PinState.AlwaysLocal, _journal.key_value_store_get_int ("last_sync", 0), _discovery_phase.data ());
         _discovery_phase.start_job (discovery_job);
-        connect (discovery_job, &ProcessDirectoryJob.etag, this, &SyncEngine.slot_root_etag_received);
+        connect (discovery_job, &ProcessDirectoryJob.etag, this, &SyncEngine.on_root_etag_received);
         connect (_discovery_phase.data (), &DiscoveryPhase.add_error_to_gui, this, &SyncEngine.add_error_to_gui);
     }
 
-    void SyncEngine.slot_folder_discovered (bool local, string &folder) {
+    void SyncEngine.on_folder_discovered (bool local, string folder) {
         // Don't wanna overload the UI
         if (!_last_update_progress_callback_call.is_valid () || _last_update_progress_callback_call.elapsed () >= 200) {
-            _last_update_progress_callback_call.start (); // first call or enough elapsed time
+            _last_update_progress_callback_call.on_start (); // first call or enough elapsed time
         } else {
             return;
         }
@@ -902,7 +902,7 @@ private:
         emit transmission_progress (*_progress_info);
     }
 
-    void SyncEngine.slot_root_etag_received (QByteArray &e, QDateTime &time) {
+    void SyncEngine.on_root_etag_received (GLib.ByteArray &e, QDateTime &time) {
         if (_remote_root_etag.is_empty ()) {
             q_c_debug (lc_engine) << "Root etag:" << e;
             _remote_root_etag = e;
@@ -910,11 +910,11 @@ private:
         }
     }
 
-    void SyncEngine.slot_new_item (SyncFileItemPtr &item) {
+    void SyncEngine.on_new_item (SyncFileItemPtr &item) {
         _progress_info.adjust_totals_for_file (*item);
     }
 
-    void SyncEngine.slot_discovery_finished () {
+    void SyncEngine.on_discovery_finished () {
         if (!_discovery_phase) {
             // There was an error that was already taken care of
             return;
@@ -926,7 +926,7 @@ private:
         if (!_journal.open ()) {
             q_c_warning (lc_engine) << "Bailing out, DB failure";
             Q_EMIT sync_error (tr ("Cannot open the sync journal"));
-            finalize (false);
+            on_finalize (false);
             return;
         } else {
             // Commits a possibly existing (should not though) transaction and starts a new one for the propagate phase
@@ -964,7 +964,7 @@ private:
 
             q_c_info (lc_engine) << "#### Reconcile (about_to_propagate OK) #################################################### "<< _stop_watch.add_lap_time (QStringLiteral ("Reconcile (about_to_propagate OK)")) << "ms";
 
-            // it's important to do this before ProgressInfo.start (), to announce start of new sync
+            // it's important to do this before ProgressInfo.on_start (), to announce on_start of new sync
             _progress_info._status = ProgressInfo.Propagation;
             emit transmission_progress (*_progress_info);
             _progress_info.start_estimate_updates ();
@@ -988,19 +988,19 @@ private:
             // do a database commit
             _journal.commit (QStringLiteral ("post treewalk"));
 
-            _propagator = QSharedPointer<OwncloudPropagator> (
+            _propagator = unowned<OwncloudPropagator> (
                 new OwncloudPropagator (_account, _local_path, _remote_path, _journal, _bulk_upload_black_list));
             _propagator.set_sync_options (_sync_options);
             connect (_propagator.data (), &OwncloudPropagator.item_completed,
-                this, &SyncEngine.slot_item_completed);
+                this, &SyncEngine.on_item_completed);
             connect (_propagator.data (), &OwncloudPropagator.progress,
-                this, &SyncEngine.slot_progress);
-            connect (_propagator.data (), &OwncloudPropagator.finished, this, &SyncEngine.slot_propagation_finished, Qt.QueuedConnection);
+                this, &SyncEngine.on_progress);
+            connect (_propagator.data (), &OwncloudPropagator.on_finished, this, &SyncEngine.on_propagation_finished, Qt.QueuedConnection);
             connect (_propagator.data (), &OwncloudPropagator.seen_locked_file, this, &SyncEngine.seen_locked_file);
-            connect (_propagator.data (), &OwncloudPropagator.touched_file, this, &SyncEngine.slot_add_touched_file);
-            connect (_propagator.data (), &OwncloudPropagator.insufficient_local_storage, this, &SyncEngine.slot_insufficient_local_storage);
-            connect (_propagator.data (), &OwncloudPropagator.insufficient_remote_storage, this, &SyncEngine.slot_insufficient_remote_storage);
-            connect (_propagator.data (), &OwncloudPropagator.new_item, this, &SyncEngine.slot_new_item);
+            connect (_propagator.data (), &OwncloudPropagator.touched_file, this, &SyncEngine.on_add_touched_file);
+            connect (_propagator.data (), &OwncloudPropagator.insufficient_local_storage, this, &SyncEngine.on_insufficient_local_storage);
+            connect (_propagator.data (), &OwncloudPropagator.insufficient_remote_storage, this, &SyncEngine.on_insufficient_remote_storage);
+            connect (_propagator.data (), &OwncloudPropagator.new_item, this, &SyncEngine.on_new_item);
 
             // apply the network limits to the propagator
             set_network_limits (_upload_limit, _download_limit);
@@ -1014,7 +1014,7 @@ private:
             if (_needs_update)
                 Q_EMIT started ();
 
-            _propagator.start (std.move (_sync_items));
+            _propagator.on_start (std.move (_sync_items));
 
             q_c_info (lc_engine) << "#### Post-Reconcile end #################################################### " << _stop_watch.add_lap_time (QStringLiteral ("Post-Reconcile Finished")) << "ms";
         };
@@ -1039,7 +1039,7 @@ private:
                 guard.delete_later ();
                 if (cancel) {
                     q_c_info (lc_engine) << "User aborted sync";
-                    finalize (false);
+                    on_finalize (false);
                     return;
                 } else {
                     finish ();
@@ -1051,9 +1051,9 @@ private:
         finish ();
     }
 
-    void SyncEngine.slot_clean_polls_job_aborted (string &error) {
+    void SyncEngine.on_clean_polls_job_aborted (string error) {
         sync_error (error);
-        finalize (false);
+        on_finalize (false);
     }
 
     void SyncEngine.set_network_limits (int upload, int download) {
@@ -1071,19 +1071,19 @@ private:
         }
     }
 
-    void SyncEngine.slot_item_completed (SyncFileItemPtr &item) {
+    void SyncEngine.on_item_completed (SyncFileItemPtr &item) {
         _progress_info.set_progress_complete (*item);
 
         emit transmission_progress (*_progress_info);
         emit item_completed (item);
     }
 
-    void SyncEngine.slot_propagation_finished (bool success) {
+    void SyncEngine.on_propagation_finished (bool on_success) {
         if (_propagator._another_sync_needed && _another_sync_needed == No_follow_up_sync) {
             _another_sync_needed = Immediate_follow_up;
         }
 
-        if (success && _discovery_phase) {
+        if (on_success && _discovery_phase) {
             _journal.set_data_fingerprint (_discovery_phase._data_fingerprint);
         }
 
@@ -1099,10 +1099,10 @@ private:
         _progress_info._status = ProgressInfo.Done;
         emit transmission_progress (*_progress_info);
 
-        finalize (success);
+        on_finalize (on_success);
     }
 
-    void SyncEngine.finalize (bool success) {
+    void SyncEngine.on_finalize (bool on_success) {
         q_c_info (lc_engine) << "Sync run took " << _stop_watch.add_lap_time (QLatin1String ("Sync Finished")) << "ms";
         _stop_watch.stop ();
 
@@ -1111,7 +1111,7 @@ private:
         }
         s_any_sync_running = false;
         _sync_running = false;
-        emit finished (success);
+        emit on_finished (on_success);
 
         // Delete the propagator only after emitting the signal.
         _propagator.clear ();
@@ -1120,10 +1120,10 @@ private:
         _local_discovery_paths.clear ();
         _local_discovery_style = LocalDiscoveryStyle.FilesystemOnly;
 
-        _clear_touched_files_timer.start ();
+        _clear_touched_files_timer.on_start ();
     }
 
-    void SyncEngine.slot_progress (SyncFileItem &item, int64 current) {
+    void SyncEngine.on_progress (SyncFileItem &item, int64 current) {
         _progress_info.set_progress_item (item, current);
         emit transmission_progress (*_progress_info);
     }
@@ -1164,9 +1164,9 @@ private:
         }
     }
 
-    void SyncEngine.slot_add_touched_file (string &fn) {
+    void SyncEngine.on_add_touched_file (string fn) {
         QElapsedTimer now;
-        now.start ();
+        now.on_start ();
         string file = QDir.clean_path (fn);
 
         // Iterate from the oldest and remove anything older than 15 seconds.
@@ -1189,11 +1189,11 @@ private:
         _touched_files.insert (_touched_files.const_end (), now, file);
     }
 
-    void SyncEngine.slot_clear_touched_files () {
+    void SyncEngine.on_clear_touched_files () {
         _touched_files.clear ();
     }
 
-    bool SyncEngine.was_file_touched (string &fn) {
+    bool SyncEngine.was_file_touched (string fn) {
         // Start from the end (most recent) and look for our path. Check the time just in case.
         auto begin = _touched_files.const_begin ();
         for (auto it = _touched_files.const_end (); it != begin; --it) {
@@ -1228,7 +1228,7 @@ private:
         }
     }
 
-    bool SyncEngine.should_discover_locally (string &path) {
+    bool SyncEngine.should_discover_locally (string path) {
         if (_local_discovery_style == LocalDiscoveryStyle.FilesystemOnly)
             return true;
 
@@ -1265,9 +1265,9 @@ private:
         return false;
     }
 
-    void SyncEngine.wipe_virtual_files (string &local_path, SyncJournalDb &journal, Vfs &vfs) {
+    void SyncEngine.wipe_virtual_files (string local_path, SyncJournalDb &journal, Vfs &vfs) {
         q_c_info (lc_engine) << "Wiping virtual files inside" << local_path;
-        journal.get_files_below_path (QByteArray (), [&] (SyncJournalFileRecord &rec) {
+        journal.get_files_below_path (GLib.ByteArray (), [&] (SyncJournalFileRecord &rec) {
             if (rec._type != ItemTypeVirtualFile && rec._type != ItemTypeVirtualFileDownload)
                 return;
 
@@ -1289,7 +1289,7 @@ private:
         // But hydrated placeholders may still be around.
     }
 
-    void SyncEngine.switch_to_virtual_files (string &local_path, SyncJournalDb &journal, Vfs &vfs) {
+    void SyncEngine.switch_to_virtual_files (string local_path, SyncJournalDb &journal, Vfs &vfs) {
         q_c_info (lc_engine) << "Convert to virtual files inside" << local_path;
         journal.get_files_below_path ({}, [&] (SyncJournalFileRecord &rec) {
             const auto path = rec.path ();
@@ -1306,25 +1306,25 @@ private:
         });
     }
 
-    void SyncEngine.abort () {
+    void SyncEngine.on_abort () {
         if (_propagator)
             q_c_info (lc_engine) << "Aborting sync";
 
         if (_propagator) {
             // If we're already in the propagation phase, aborting that is sufficient
-            _propagator.abort ();
+            _propagator.on_abort ();
         } else if (_discovery_phase) {
             // Delete the discovery and all child jobs after ensuring
-            // it can't finish and start the propagator
+            // it can't finish and on_start the propagator
             disconnect (_discovery_phase.data (), nullptr, this, nullptr);
             _discovery_phase.take ().delete_later ();
 
             Q_EMIT sync_error (tr ("Synchronization will resume shortly."));
-            finalize (false);
+            on_finalize (false);
         }
     }
 
-    void SyncEngine.slot_summary_error (string &message) {
+    void SyncEngine.on_summary_error (string message) {
         if (_unique_errors.contains (message))
             return;
 
@@ -1332,14 +1332,14 @@ private:
         emit sync_error (message, ErrorCategory.Normal);
     }
 
-    void SyncEngine.slot_insufficient_local_storage () {
-        slot_summary_error (
+    void SyncEngine.on_insufficient_local_storage () {
+        on_summary_error (
             tr ("Disk space is low : Downloads that would reduce free space "
                "below %1 were skipped.")
                 .arg (Utility.octets_to_string (free_space_limit ())));
     }
 
-    void SyncEngine.slot_insufficient_remote_storage () {
+    void SyncEngine.on_insufficient_remote_storage () {
         auto msg = tr ("There is insufficient space available on the server for some uploads.");
         if (_unique_errors.contains (msg))
             return;

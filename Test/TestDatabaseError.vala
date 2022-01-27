@@ -12,8 +12,7 @@ using namespace Occ;
 
 class TestDatabaseError : GLib.Object {
 
-private slots:
-    void testDatabaseError () {
+    private on_ void testDatabaseError () {
         /* This test will make many iteration, at each iteration, the iᵗʰ database access will fail.
          * The test ensure that if there is a failure, the next sync recovers. And if there was
          * no error, then everything was sync'ed properly.
@@ -48,7 +47,7 @@ private slots:
             qInfo () << "Result of iteration" << count << "was" << result;
 
             if (fakeFolder.syncJournal ().autotestFailCounter >= 0) {
-                // No error was thrown, we are finished
+                // No error was thrown, we are on_finished
                 QVERIFY (result);
                 QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
                 QCOMPARE (fakeFolder.currentRemoteState (), finalState);

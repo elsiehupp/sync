@@ -52,22 +52,22 @@ struct Emoji {
 
 class EmojiCategoriesModel : QAbstractListModel {
 
-    public QVariant data (QModelIndex &index, int role) const override;
-    public int row_count (QModelIndex &parent = QModelIndex ()) const override;
-    public QHash<int, QByteArray> role_names () const override;
+    public QVariant data (QModelIndex &index, int role) override;
+    public int row_count (QModelIndex &parent = QModelIndex ()) override;
+    public QHash<int, GLib.ByteArray> role_names () override;
 
-private:
-    enum Roles {
+
+    private enum Roles {
         EmojiRole = 0,
         LabelRole
     };
 
-    struct Category {
+    private struct Category {
         string emoji;
         string label;
     };
 
-    static const std.vector<Category> categories;
+    private static const std.vector<Category> categories;
 };
 
 class EmojiModel : GLib.Object {
@@ -91,7 +91,7 @@ class EmojiModel : GLib.Object {
     }
 
     public Q_INVOKABLE QVariantList history ();
-    public Q_INVOKABLE void set_category (string &category);
+    public Q_INVOKABLE void set_category (string category);
     public Q_INVOKABLE void emoji_used (QVariant &model_data);
 
     public QVariantList model ();
@@ -101,20 +101,20 @@ signals:
     void history_changed ();
     void model_changed ();
 
-private:
-    static const QVariantList people;
-    static const QVariantList nature;
-    static const QVariantList food;
-    static const QVariantList activity;
-    static const QVariantList travel;
-    static const QVariantList objects;
-    static const QVariantList symbols;
-    static const QVariantList flags;
 
-    QSettings _settings;
-    string _category = "history";
+    private static const QVariantList people;
+    private static const QVariantList nature;
+    private static const QVariantList food;
+    private static const QVariantList activity;
+    private static const QVariantList travel;
+    private static const QVariantList objects;
+    private static const QVariantList symbols;
+    private static const QVariantList flags;
 
-    EmojiCategoriesModel _emoji_categories_model;
+    private QSettings _settings;
+    private string _category = "history";
+
+    private EmojiCategoriesModel _emoji_categories_model;
 };
 
 
@@ -139,8 +139,8 @@ private:
         return static_cast<int> (categories.size ());
     }
 
-    QHash<int, QByteArray> EmojiCategoriesModel.role_names () {
-        QHash<int, QByteArray> roles;
+    QHash<int, GLib.ByteArray> EmojiCategoriesModel.role_names () {
+        QHash<int, GLib.ByteArray> roles;
         roles[Roles.EmojiRole] = "emoji";
         roles[Roles.LabelRole] = "label";
         return roles;
@@ -189,7 +189,7 @@ private:
         return _settings.value ("Editor/emojis", QVariantList ()).to_list ();
     }
 
-    void EmojiModel.set_category (string &category) {
+    void EmojiModel.set_category (string category) {
         if (_category == category) {
             return;
         }
@@ -1867,7 +1867,7 @@ private:
             string.from_utf8 ("\xf0\x9f\x8e\xa8"), ":art:"
         }),
         QVariant.from_value (Emoji {
-            string.from_utf8 ("\xf0\x9f\x8e\xb0"), ":slot_machine:"
+            string.from_utf8 ("\xf0\x9f\x8e\xb0"), ":on_machine:"
         }),
         QVariant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x9b\x80"), ":bath:"

@@ -7,7 +7,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <sys/inotify.h>
 
 // #include <cerrno>
-// #include <QStringList>
+// #include <string[]>
 // #include <GLib.Object>
 // #include <QVarLengthArray>
 
@@ -27,66 +27,66 @@ namespace Occ {
 class Folder_watcher_private : GLib.Object {
 
     public Folder_watcher_private () = default;
-    public Folder_watcher_private (Folder_watcher *p, string &path);
-    public ~Folder_watcher_private () override;
+    public Folder_watcher_private (Folder_watcher *p, string path);
+    ~Folder_watcher_private () override;
 
     public int test_watch_count () {
         return _path_to_watch.size ();
     }
 
-    /// On linux the watcher is ready when the ctor finished.
+    /// On linux the watcher is ready when the ctor on_finished.
     public bool _ready = true;
 
 protected slots:
-    void slot_received_notification (int fd);
-    void slot_add_folder_recursive (string &path);
+    void on_received_notification (int fd);
+    void on_add_folder_recursive (string path);
 
-protected:
-    bool find_folders_below (QDir &dir, QStringList &full_list);
-    void inotify_register_path (string &path);
-    void remove_folders_below (string &path);
 
-private:
-    Folder_watcher *_parent;
+    protected bool find_folders_below (QDir &dir, string[] &full_list);
+    protected void inotify_register_path (string path);
+    protected void remove_folders_below (string path);
 
-    string _folder;
-    QHash<int, string> _watch_to_path;
-    QMap<string, int> _path_to_watch;
-    QScopedPointer<QSocket_notifier> _socket;
-    int _fd;
+
+    private Folder_watcher _parent;
+
+    private string _folder;
+    private QHash<int, string> _watch_to_path;
+    private QMap<string, int> _path_to_watch;
+    private QScopedPointer<QSocket_notifier> _socket;
+    private int _fd;
 };
 
 
-    Folder_watcher_private.Folder_watcher_private (Folder_watcher *p, string &path)
+    Folder_watcher_private.Folder_watcher_private (Folder_watcher *p, string path)
         : GLib.Object ()
         , _parent (p)
         , _folder (path) {
         _fd = inotify_init ();
         if (_fd != -1) {
-            _socket.reset (new QSocket_notifier (_fd, QSocket_notifier.Read));
-            connect (_socket.data (), &QSocket_notifier.activated, this, &Folder_watcher_private.slot_received_notification);
+            _socket.on_reset (new QSocket_notifier (_fd, QSocket_notifier.Read));
+            connect (_socket.data (), &QSocket_notifier.activated, this, &Folder_watcher_private.on_received_notification);
         } else {
             q_c_warning (lc_folder_watcher) << "notify_init () failed : " << strerror (errno);
         }
 
-        QMetaObject.invoke_method (this, "slot_add_folder_recursive", Q_ARG (string, path));
+        QMetaObject.invoke_method (this, "on_add_folder_recursive", Q_ARG (string, path));
     }
 
     Folder_watcher_private.~Folder_watcher_private () = default;
 
     // attention : result list passed by reference!
-    bool Folder_watcher_private.find_folders_below (QDir &dir, QStringList &full_list) {
+    bool Folder_watcher_private.find_folders_below (QDir &dir, string[] &full_list) {
         bool ok = true;
         if (! (dir.exists () && dir.is_readable ())) {
             q_c_debug (lc_folder_watcher) << "Non existing path coming in : " << dir.absolute_path ();
             ok = false;
         } else {
-            QStringList name_filter;
+            string[] name_filter;
             name_filter << QLatin1String ("*");
             QDir.Filters filter = QDir.Dirs | QDir.NoDotAndDotDot | QDir.No_sym_links | QDir.Hidden;
-            const QStringList pathes = dir.entry_list (name_filter, filter);
+            const string[] pathes = dir.entry_list (name_filter, filter);
 
-            QStringList.Const_iterator Const_iterator;
+            string[].Const_iterator Const_iterator;
             for (Const_iterator = pathes.const_begin (); Const_iterator != pathes.const_end ();
                  ++Const_iterator) {
                 const string full_path (dir.path () + QLatin1String ("/") + (*Const_iterator));
@@ -98,7 +98,7 @@ private:
         return ok;
     }
 
-    void Folder_watcher_private.inotify_register_path (string &path) {
+    void Folder_watcher_private.inotify_register_path (string path) {
         if (path.is_empty ())
             return;
 
@@ -119,7 +119,7 @@ private:
         }
     }
 
-    void Folder_watcher_private.slot_add_folder_recursive (string &path) {
+    void Folder_watcher_private.on_add_folder_recursive (string path) {
         if (_path_to_watch.contains (path))
             return;
 
@@ -129,7 +129,7 @@ private:
         QDir in_path (path);
         inotify_register_path (in_path.absolute_path ());
 
-        QStringList all_subfolders;
+        string[] all_subfolders;
         if (!find_folders_below (QDir (path), all_subfolders)) {
             q_c_warning (lc_folder_watcher) << "Could not traverse all sub folders";
         }
@@ -154,7 +154,7 @@ private:
         }
     }
 
-    void Folder_watcher_private.slot_received_notification (int fd) {
+    void Folder_watcher_private.on_received_notification (int fd) {
         int len = 0;
         struct inotify_event *event = nullptr;
         size_t i = 0;
@@ -193,7 +193,7 @@ private:
             // Fire event for the path that was changed.
             if (event.len == 0 || event.wd <= -1)
                 continue;
-            QByteArray file_name (event.name);
+            GLib.ByteArray file_name (event.name);
             // Filter out journal changes - redundant with filtering in
             // Folder_watcher.path_is_ignored.
             if (file_name.starts_with ("._sync_")
@@ -207,7 +207,7 @@ private:
             if ( (event.mask & (IN_MOVED_TO | IN_CREATE))
                 && QFileInfo (p).is_dir ()
                 && !_parent.path_is_ignored (p)) {
-                slot_add_folder_recursive (p);
+                on_add_folder_recursive (p);
             }
             if (event.mask & (IN_MOVED_FROM | IN_DELETE)) {
                 remove_folders_below (p);
@@ -215,7 +215,7 @@ private:
         }
     }
 
-    void Folder_watcher_private.remove_folders_below (string &path) {
+    void Folder_watcher_private.remove_folders_below (string path) {
         auto it = _path_to_watch.find (path);
         if (it == _path_to_watch.end ())
             return;

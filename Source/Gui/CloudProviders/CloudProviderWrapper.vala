@@ -40,7 +40,7 @@ using namespace Occ;
 class CloudProviderWrapper : GLib.Object {
 
     public CloudProviderWrapper (GLib.Object *parent = nullptr, Folder *folder = nullptr, int folder_id = 0, CloudProvidersProviderExporter* cloudprovider = nullptr);
-    public ~CloudProviderWrapper () override;
+    ~CloudProviderWrapper () override;
     public Cloud_providers_account_exporter* account_exporter ();
     public Folder* folder ();
     public GMenu_model* get_menu_model ();
@@ -48,20 +48,20 @@ class CloudProviderWrapper : GLib.Object {
     public void update_status_text (string status_text);
     public void update_pause_status ();
 
-public slots:
-    void slot_sync_started ();
-    void slot_sync_finished (SyncResult &);
-    void slot_update_progress (string &folder, ProgressInfo &progress);
-    void slot_sync_paused_changed (Folder*, bool);
 
-private:
-    Folder *_folder;
-    CloudProvidersProviderExporter *_cloud_provider;
-    Cloud_providers_account_exporter *_cloud_provider_account;
-    QList<QPair<string, string>> _recently_changed;
-    bool _paused;
-    GMenu* _main_menu = nullptr;
-    GMenu* _recent_menu = nullptr;
+    public void on_sync_started ();
+    public void on_sync_finished (SyncResult &);
+    public void on_update_progress (string folder, ProgressInfo &progress);
+    public void on_sync_paused_changed (Folder*, bool);
+
+
+    private Folder _folder;
+    private CloudProvidersProviderExporter _cloud_provider;
+    private Cloud_providers_account_exporter _cloud_provider_account;
+    private GLib.List<QPair<string, string>> _recently_changed;
+    private bool _paused;
+    private GMenu* _main_menu = nullptr;
+    private GMenu* _recent_menu = nullptr;
 };
 
 
@@ -87,10 +87,10 @@ CloudProviderWrapper.CloudProviderWrapper (GLib.Object *parent, Folder *folder, 
     action_group = get_action_group ();
     cloud_providers_account_exporter_set_action_group (_cloud_provider_account, action_group);
 
-    connect (Progress_dispatcher.instance (), SIGNAL (progress_info (string, ProgressInfo)), this, SLOT (slot_update_progress (string, ProgressInfo)));
-    connect (_folder, SIGNAL (sync_started ()), this, SLOT (slot_sync_started ()));
-    connect (_folder, SIGNAL (sync_finished (SyncResult)), this, SLOT (slot_sync_finished (SyncResult)));
-    connect (_folder, SIGNAL (sync_paused_changed (Folder*,bool)), this, SLOT (slot_sync_paused_changed (Folder*, bool)));
+    connect (Progress_dispatcher.instance (), SIGNAL (progress_info (string, ProgressInfo)), this, SLOT (on_update_progress (string, ProgressInfo)));
+    connect (_folder, SIGNAL (sync_started ()), this, SLOT (on_sync_started ()));
+    connect (_folder, SIGNAL (sync_finished (SyncResult)), this, SLOT (on_sync_finished (SyncResult)));
+    connect (_folder, SIGNAL (sync_paused_changed (Folder*,bool)), this, SLOT (on_sync_paused_changed (Folder*, bool)));
 
     _paused = _folder.sync_paused ();
     update_pause_status ();
@@ -115,15 +115,15 @@ static bool should_show_in_recents_menu (SyncFileItem &item) {
             && item._instruction != CSYNC_INSTRUCTION_NONE;
 }
 
-static GMenu_item *menu_item_new (string &label, gchar *detailed_action) {
+static GMenu_item *menu_item_new (string label, gchar *detailed_action) {
     return g_menu_item_new (label.to_utf8 ().data (), detailed_action);
 }
 
-static GMenu_item *menu_item_new_submenu (string &label, GMenu_model *submenu) {
+static GMenu_item *menu_item_new_submenu (string label, GMenu_model *submenu) {
     return g_menu_item_new_submenu (label.to_utf8 ().data (), submenu);
 }
 
-void CloudProviderWrapper.slot_update_progress (string &folder, ProgressInfo &progress) {
+void CloudProviderWrapper.on_update_progress (string folder, ProgressInfo &progress) {
     // Only update progress for the current folder
     Folder *f = FolderMan.instance ().folder (folder);
     if (f != _folder)
@@ -181,7 +181,7 @@ void CloudProviderWrapper.slot_update_progress (string &folder, ProgressInfo &pr
         GMenu_item* item;
         g_menu_remove_all (G_MENU (_recent_menu));
         if (!_recently_changed.is_empty ()) {
-            QList<QPair<string, string>>.iterator i;
+            GLib.List<QPair<string, string>>.iterator i;
             for (i = _recently_changed.begin (); i != _recently_changed.end (); i++) {
                 string label = i.first;
                 string full_path = i.second;
@@ -217,11 +217,11 @@ Folder* CloudProviderWrapper.folder () {
     return _folder;
 }
 
-void CloudProviderWrapper.slot_sync_started () {
+void CloudProviderWrapper.on_sync_started () {
     cloud_providers_account_exporter_set_status (_cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_SYNCING);
 }
 
-void CloudProviderWrapper.slot_sync_finished (SyncResult &result) {
+void CloudProviderWrapper.on_sync_finished (SyncResult &result) {
     if (result.status () == result.Success || result.status () == result.Problem) {
         cloud_providers_account_exporter_set_status (_cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_IDLE);
         update_status_text (result.status_string ());
@@ -292,11 +292,11 @@ activate_action_open (GSimple_action *action, GVariant *parameter, gpointer user
     auto *gui = dynamic_cast<OwncloudGui> (self.parent ().parent ());
 
     if (g_str_equal (name, "openhelp")) {
-        gui.slot_help ();
+        gui.on_help ();
     }
 
     if (g_str_equal (name, "opensettings")) {
-        gui.slot_show_settings ();
+        gui.on_show_settings ();
     }
 
     if (g_str_equal (name, "openwebsite")) {
@@ -430,7 +430,7 @@ GAction_group* CloudProviderWrapper.get_action_group () {
     return G_ACTION_GROUP (g_object_ref (action_group));
 }
 
-void CloudProviderWrapper.slot_sync_paused_changed (Folder *folder, bool state) {
+void CloudProviderWrapper.on_sync_paused_changed (Folder *folder, bool state) {
     Q_UNUSED (folder);
     _paused = state;
     GAction *pause = g_action_map_lookup_action (G_ACTION_MAP (action_group), "pause");

@@ -31,8 +31,8 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 
 // #include <Gtk.Dialog>
 // #include <Gtk.Widget>
-// #include <QSharedPointer>
-// #include <QList>
+
+// #include <GLib.List>
 // #include <QVector>
 // #include <QTimer>
 // #include <qpushbutton.h>
@@ -60,8 +60,8 @@ signals:
     void clicked ();
     void context_menu (QPoint &global_position);
 
-protected:
-    bool event_filter (GLib.Object *obj, QEvent *event) override;
+
+    protected bool event_filter (GLib.Object *obj, QEvent *event) override;
 };
 
 /***********************************************************
@@ -71,65 +71,64 @@ protected:
 class Share_user_group_widget : Gtk.Widget {
 
     public Share_user_group_widget (AccountPtr account,
-        const string &share_path,
-        const string &local_path,
+        const string share_path,
+        const string local_path,
         Share_permissions max_sharing_permissions,
-        const string &private_link_url,
+        const string private_link_url,
         Gtk.Widget *parent = nullptr);
-    public ~Share_user_group_widget () override;
+    ~Share_user_group_widget () override;
 
 signals:
     void toggle_public_link_share (bool);
     void style_changed ();
 
-public slots:
-    void get_shares ();
-    void slot_share_created (QSharedPointer<Share> &share);
-    void slot_style_changed ();
+    public void on_get_shares ();
+    public void on_share_created (unowned<Share> &share);
+    public void on_style_changed ();
 
-private slots:
-    void slot_shares_fetched (QList<QSharedPointer<Share>> &shares);
 
-    void on_sharee_line_edit_text_changed (string &text);
-    void search_for_sharees (Sharee_model.Lookup_mode lookup_mode);
-    void slot_line_edit_text_edited (string &text);
+    private void on_shares_fetched (GLib.List<unowned<Share>> &shares);
 
-    void slot_line_edit_return ();
-    void slot_completer_activated (QModelIndex &index);
-    void slot_completer_highlighted (QModelIndex &index);
-    void slot_sharees_ready ();
-    void slot_adjust_scroll_widget_size ();
-    void slot_private_link_share ();
-    void display_error (int code, string &message);
+    private void on_sharee_line_edit_text_changed (string text);
+    private void on_search_for_sharees (Sharee_model.Lookup_mode lookup_mode);
+    private void on_line_edit_text_edited (string text);
 
-    void slot_private_link_open_browser ();
-    void slot_private_link_copy ();
-    void slot_private_link_email ();
+    private void on_line_edit_return ();
+    private void on_completer_activated (QModelIndex &index);
+    private void on_completer_highlighted (QModelIndex &index);
+    private void on_sharees_ready ();
+    private void on_adjust_scroll_widget_size ();
+    private void on_private_link_share ();
+    private void on_display_error (int code, string message);
 
-private:
-    void customize_style ();
+    private void on_private_link_open_browser ();
+    private void on_private_link_copy ();
+    private void on_private_link_email ();
 
-    void activate_sharee_line_edit ();
 
-    Ui.Share_user_group_widget *_ui;
-    QScroll_area *_parent_scroll_area;
-    AccountPtr _account;
-    string _share_path;
-    string _local_path;
-    Share_permissions _max_sharing_permissions;
-    string _private_link_url;
+    private void customize_style ();
 
-    QCompleter *_completer;
-    Sharee_model *_completer_model;
-    QTimer _completion_timer;
+    private void activate_sharee_line_edit ();
 
-    bool _is_file;
-    bool _disable_completer_activated; // in order to avoid that we share the contents twice
-    Share_manager *_manager;
+    private Ui.Share_user_group_widget _ui;
+    private QScroll_area _parent_scroll_area;
+    private AccountPtr _account;
+    private string _share_path;
+    private string _local_path;
+    private Share_permissions _max_sharing_permissions;
+    private string _private_link_url;
 
-    QProgress_indicator _pi_sharee;
+    private QCompleter _completer;
+    private Sharee_model _completer_model;
+    private QTimer _completion_timer;
 
-    string _last_created_share_id;
+    private bool _is_file;
+    private bool _disable_completer_activated; // in order to avoid that we share the contents twice
+    private Share_manager _manager;
+
+    private QProgress_indicator _pi_sharee;
+
+    private string _last_created_share_id;
 };
 
 /***********************************************************
@@ -138,92 +137,91 @@ The widget displayed for each user/group share
 class Share_user_line : Gtk.Widget {
 
     public Share_user_line (AccountPtr account,
-        QSharedPointer<User_group_share> Share,
+        unowned<User_group_share> Share,
         Share_permissions max_sharing_permissions,
         bool is_file,
         Gtk.Widget *parent = nullptr);
-    public ~Share_user_line () override;
+    ~Share_user_line () override;
 
-    public QSharedPointer<Share> share ();
+    public unowned<Share> share ();
 
 signals:
     void visual_deletion_done ();
     void resize_requested ();
 
-public slots:
-    void slot_style_changed ();
+    public void on_style_changed ();
 
-    void focus_password_line_edit ();
+    public void on_focus_password_line_edit ();
 
-private slots:
-    void on_delete_share_button_clicked ();
-    void slot_permissions_changed ();
-    void slot_edit_permissions_changed ();
-    void slot_password_checkbox_changed ();
-    void slot_delete_animation_finished ();
 
-    void refresh_password_options ();
+    private void on_delete_share_button_clicked ();
+    private void on_permissions_changed ();
+    private void on_edit_permissions_changed ();
+    private void on_password_checkbox_changed ();
+    private void on_delete_animation_finished ();
 
-    void refresh_password_line_edit_placeholder ();
+    private void on_refresh_password_options ();
 
-    void slot_password_set ();
-    void slot_password_set_error (int status_code, string &message);
+    private void on_refresh_password_line_edit_placeholder ();
 
-    void slot_share_deleted ();
-    void slot_permissions_set ();
+    private void on_password_set ();
+    private void on_password_set_error (int status_code, string message);
 
-    void slot_avatar_loaded (QImage avatar);
+    private void on_share_deleted ();
+    private void on_permissions_set ();
 
-    void set_password_confirmed ();
+    private void on_avatar_loaded (QImage avatar);
 
-    void slot_line_edit_password_return_pressed ();
+    private void on_set_password_confirmed ();
 
-    void slot_confirm_password_clicked ();
+    private void on_line_edit_password_return_pressed ();
 
-    void on_avatar_context_menu (QPoint &global_position);
+    private void on_confirm_password_clicked ();
 
-private:
-    void display_permissions ();
-    void load_avatar ();
-    void set_default_avatar (int avatar_size);
-    void customize_style ();
+    private void on_avatar_context_menu (QPoint &global_position);
 
-    QPixmap pixmap_for_sharee_type (Sharee.Type type, QColor &background_color = QColor ()) const;
-    QColor background_color_for_sharee_type (Sharee.Type type) const;
 
-  void show_note_options (bool show);
-  void toggle_note_options (bool enable);
-  void on_note_confirm_button_clicked ();
-  void set_note (string &note);
+    private void display_permissions ();
+    private void load_avatar ();
+    private void set_default_avatar (int avatar_size);
+    private void customize_style ();
 
-  void toggle_expire_date_options (bool enable);
-  void show_expire_date_options (bool show, QDate &initial_date = QDate ());
-  void set_expire_date ();
+    private QPixmap pixmap_for_sharee_type (Sharee.Type type, QColor &background_color = QColor ());
+    private QColor background_color_for_sharee_type (Sharee.Type type);
 
-  void toggle_password_set_progress_animation (bool show);
+    private void show_note_options (bool show);
+    private void toggle_note_options (bool enable);
+    private void on_note_confirm_button_clicked ();
+    private void set_note (string note);
 
-  void enable_progess_indicator_animation (bool enable);
-  void disable_progess_indicator_animation ();
+    private void toggle_expire_date_options (bool enable);
+    private void show_expire_date_options (bool show, QDate &initial_date = QDate ());
+    private void set_expire_date ();
 
-  QDate max_expiration_date_for_share (Share.Share_type type, QDate &fallback_date) const;
-  bool enforce_expiration_date_for_share (Share.Share_type type) const;
+    private void toggle_password_set_progress_animation (bool show);
 
-  Ui.Share_user_line *_ui;
-  AccountPtr _account;
-  QSharedPointer<User_group_share> _share;
-  bool _is_file;
+    private void enable_progess_indicator_animation (bool enable);
+    private void disable_progess_indicator_animation ();
 
-  Profile_page_menu _profile_page_menu;
+    private QDate max_expiration_date_for_share (Share.Share_type type, QDate &fallback_date);
+    private bool enforce_expiration_date_for_share (Share.Share_type type);
 
-  // _permission_edit is a checkbox
-  QAction *_permission_reshare;
-  QAction *_delete_share_button;
-  QAction *_permission_create;
-  QAction *_permission_change;
-  QAction *_permission_delete;
-  QAction *_note_link_action;
-  QAction *_expiration_date_link_action;
-  QAction *_password_protect_link_action;
+    private Ui.Share_user_line _ui;
+    private AccountPtr _account;
+    private unowned<User_group_share> _share;
+    private bool _is_file;
+
+    private Profile_page_menu _profile_page_menu;
+
+    // _permission_edit is a checkbox
+    private QAction _permission_reshare;
+    private QAction _delete_share_button;
+    private QAction _permission_create;
+    private QAction _permission_change;
+    private QAction _permission_delete;
+    private QAction _note_link_action;
+    private QAction _expiration_date_link_action;
+    private QAction _password_protect_link_action;
 };
 
 
@@ -244,10 +242,10 @@ private:
     }
 
     Share_user_group_widget.Share_user_group_widget (AccountPtr account,
-        const string &share_path,
-        const string &local_path,
+        const string share_path,
+        const string local_path,
         Share_permissions max_sharing_permissions,
-        const string &private_link_url,
+        const string private_link_url,
         Gtk.Widget *parent)
         : Gtk.Widget (parent)
         , _ui (new Ui.Share_user_group_widget)
@@ -269,8 +267,8 @@ private:
         _completer_model = new Sharee_model (_account,
             _is_file ? QLatin1String ("file") : QLatin1String ("folder"),
             _completer);
-        connect (_completer_model, &Sharee_model.sharees_ready, this, &Share_user_group_widget.slot_sharees_ready);
-        connect (_completer_model, &Sharee_model.display_error_message, this, &Share_user_group_widget.display_error);
+        connect (_completer_model, &Sharee_model.sharees_ready, this, &Share_user_group_widget.on_sharees_ready);
+        connect (_completer_model, &Sharee_model.display_error_message, this, &Share_user_group_widget.on_display_error);
 
         _completer.set_model (_completer_model);
         _completer.set_case_sensitivity (Qt.CaseInsensitive);
@@ -282,32 +280,32 @@ private:
         search_globally_action.set_tool_tip (tr ("Search globally"));
 
         connect (search_globally_action, &QAction.triggered, this, [this] () {
-            search_for_sharees (Sharee_model.Global_search);
+            on_search_for_sharees (Sharee_model.Global_search);
         });
 
         _ui.sharee_line_edit.add_action (search_globally_action, QLineEdit.Leading_position);
 
         _manager = new Share_manager (_account, this);
-        connect (_manager, &Share_manager.shares_fetched, this, &Share_user_group_widget.slot_shares_fetched);
-        connect (_manager, &Share_manager.share_created, this, &Share_user_group_widget.slot_share_created);
-        connect (_manager, &Share_manager.server_error, this, &Share_user_group_widget.display_error);
-        connect (_ui.sharee_line_edit, &QLineEdit.return_pressed, this, &Share_user_group_widget.slot_line_edit_return);
-        connect (_ui.confirm_share, &QAbstractButton.clicked, this, &Share_user_group_widget.slot_line_edit_return);
-        //TODO connect (_ui.private_link_text, &QLabel.link_activated, this, &Share_user_group_widget.slot_private_link_share);
+        connect (_manager, &Share_manager.on_shares_fetched, this, &Share_user_group_widget.on_shares_fetched);
+        connect (_manager, &Share_manager.share_created, this, &Share_user_group_widget.on_share_created);
+        connect (_manager, &Share_manager.on_server_error, this, &Share_user_group_widget.on_display_error);
+        connect (_ui.sharee_line_edit, &QLineEdit.return_pressed, this, &Share_user_group_widget.on_line_edit_return);
+        connect (_ui.confirm_share, &QAbstractButton.clicked, this, &Share_user_group_widget.on_line_edit_return);
+        //TODO connect (_ui.private_link_text, &QLabel.link_activated, this, &Share_user_group_widget.on_private_link_share);
 
         // By making the next two Queued_connections we can override
         // the strings the completer sets on the line edit.
-        connect (_completer, SIGNAL (activated (QModelIndex)), SLOT (slot_completer_activated (QModelIndex)),
+        connect (_completer, SIGNAL (activated (QModelIndex)), SLOT (on_completer_activated (QModelIndex)),
             Qt.QueuedConnection);
-        connect (_completer, SIGNAL (highlighted (QModelIndex)), SLOT (slot_completer_highlighted (QModelIndex)),
+        connect (_completer, SIGNAL (highlighted (QModelIndex)), SLOT (on_completer_highlighted (QModelIndex)),
             Qt.QueuedConnection);
 
         // Queued connection so this signal is recieved after text_changed
         connect (_ui.sharee_line_edit, &QLineEdit.text_edited,
-            this, &Share_user_group_widget.slot_line_edit_text_edited, Qt.QueuedConnection);
+            this, &Share_user_group_widget.on_line_edit_text_edited, Qt.QueuedConnection);
         _ui.sharee_line_edit.install_event_filter (this);
         connect (&_completion_timer, &QTimer.timeout, this, [this] () {
-            search_for_sharees (Sharee_model.Local_search);
+            on_search_for_sharees (Sharee_model.Local_search);
         });
         _completion_timer.set_single_shot (true);
         _completion_timer.set_interval (600);
@@ -327,22 +325,22 @@ private:
         delete _ui;
     }
 
-    void Share_user_group_widget.on_sharee_line_edit_text_changed (string &) {
+    void Share_user_group_widget.on_sharee_line_edit_text_changed (string ) {
         _completion_timer.stop ();
         emit toggle_public_link_share (false);
     }
 
-    void Share_user_group_widget.slot_line_edit_text_edited (string &text) {
+    void Share_user_group_widget.on_line_edit_text_edited (string text) {
         _disable_completer_activated = false;
         // First text_changed is called first and we stopped the timer when the text is changed, programatically or not
         // Then we restart the timer here if the user touched a key
         if (!text.is_empty ()) {
-            _completion_timer.start ();
+            _completion_timer.on_start ();
             emit toggle_public_link_share (true);
         }
     }
 
-    void Share_user_group_widget.slot_line_edit_return () {
+    void Share_user_group_widget.on_line_edit_return () {
         _disable_completer_activated = false;
         // did the user type in one of the options?
         const auto text = _ui.sharee_line_edit.text ();
@@ -351,7 +349,7 @@ private:
             if (sharee.format () == text
                 || sharee.display_name () == text
                 || sharee.share_with () == text) {
-                slot_completer_activated (_completer_model.index (i));
+                on_completer_activated (_completer_model.index (i));
                 // make sure we do not send the same item twice (because return is called when we press
                 // return to activate an item inthe completer)
                 _disable_completer_activated = true;
@@ -360,21 +358,21 @@ private:
         }
 
         // nothing found? try to refresh completion
-        _completion_timer.start ();
+        _completion_timer.on_start ();
     }
 
-    void Share_user_group_widget.search_for_sharees (Sharee_model.Lookup_mode lookup_mode) {
+    void Share_user_group_widget.on_search_for_sharees (Sharee_model.Lookup_mode lookup_mode) {
         if (_ui.sharee_line_edit.text ().is_empty ()) {
             return;
         }
 
         _ui.sharee_line_edit.set_enabled (false);
         _completion_timer.stop ();
-        _pi_sharee.start_animation ();
+        _pi_sharee.on_start_animation ();
         Sharee_model.Sharee_set blacklist;
 
         // Add the current user to _sharees since we can't share with ourself
-        QSharedPointer<Sharee> current_user (new Sharee (_account.credentials ().user (), "", Sharee.Type.User));
+        unowned<Sharee> current_user (new Sharee (_account.credentials ().user (), "", Sharee.Type.User));
         blacklist << current_user;
 
         foreach (auto sw, _parent_scroll_area.find_children<Share_user_line> ()) {
@@ -384,20 +382,20 @@ private:
         _completer_model.fetch (_ui.sharee_line_edit.text (), blacklist, lookup_mode);
     }
 
-    void Share_user_group_widget.get_shares () {
+    void Share_user_group_widget.on_get_shares () {
         _manager.fetch_shares (_share_path);
     }
 
-    void Share_user_group_widget.slot_share_created (QSharedPointer<Share> &share) {
+    void Share_user_group_widget.on_share_created (unowned<Share> &share) {
         if (share && _account.capabilities ().share_email_password_enabled () && !_account.capabilities ().share_email_password_enforced ()) {
             // remember this share Id so we can set it's password Line Edit to focus later
             _last_created_share_id = share.get_id ();
         }
         // fetch all shares including the one we've just created
-        get_shares ();
+        on_get_shares ();
     }
 
-    void Share_user_group_widget.slot_shares_fetched (QList<QSharedPointer<Share>> &shares) {
+    void Share_user_group_widget.on_shares_fetched (GLib.List<unowned<Share>> &shares) {
         QScroll_area *scroll_area = _parent_scroll_area;
 
         auto new_view_port = new Gtk.Widget (scroll_area);
@@ -405,7 +403,7 @@ private:
         layout.set_contents_margins (0, 0, 0, 0);
         int x = 0;
         int height = 0;
-        QList<string> link_owners ({});
+        GLib.List<string> link_owners ({});
 
         Share_user_line *just_created_share_that_needs_password = nullptr;
 
@@ -422,18 +420,18 @@ private:
             // the owner of the file that shared it first
             // leave out if it's the current user
             if (x == 0 && !share.get_uid_owner ().is_empty () && ! (share.get_uid_owner () == _account.credentials ().user ())) {
-                _ui.main_owner_label.set_text (string ("Shared with you by ").append (share.get_owner_display_name ()));
+                _ui.main_owner_label.on_set_text (string ("Shared with you by ").append (share.get_owner_display_name ()));
             }
 
             Q_ASSERT (Share.is_share_type_user_group_email_room_or_remote (share.get_share_type ()));
             auto user_group_share = q_shared_pointer_dynamic_cast<User_group_share> (share);
             auto *s = new Share_user_line (_account, user_group_share, _max_sharing_permissions, _is_file, _parent_scroll_area);
-            connect (s, &Share_user_line.resize_requested, this, &Share_user_group_widget.slot_adjust_scroll_widget_size);
-            connect (s, &Share_user_line.visual_deletion_done, this, &Share_user_group_widget.get_shares);
+            connect (s, &Share_user_line.resize_requested, this, &Share_user_group_widget.on_adjust_scroll_widget_size);
+            connect (s, &Share_user_line.visual_deletion_done, this, &Share_user_group_widget.on_get_shares);
             s.set_background_role (layout.count () % 2 == 0 ? QPalette.Base : QPalette.Alternate_base);
 
             // Connect style_changed events to our widget, so it can adapt (Dark-/Light-Mode switching)
-            connect (this, &Share_user_group_widget.style_changed, s, &Share_user_line.slot_style_changed);
+            connect (this, &Share_user_group_widget.style_changed, s, &Share_user_line.on_style_changed);
 
             layout.add_widget (s);
 
@@ -450,7 +448,7 @@ private:
             }
         }
 
-        foreach (string &owner, link_owners) {
+        foreach (string owner, link_owners) {
             auto owner_label = new QLabel (string (owner + " shared via link"));
             layout.add_widget (owner_label);
             owner_label.set_visible (true);
@@ -471,11 +469,11 @@ private:
 
         if (just_created_share_that_needs_password) {
             // always set focus to a password Line Edit when the new email share is created on a server with optional passwords enabled for email shares
-            just_created_share_that_needs_password.focus_password_line_edit ();
+            just_created_share_that_needs_password.on_focus_password_line_edit ();
         }
     }
 
-    void Share_user_group_widget.slot_adjust_scroll_widget_size () {
+    void Share_user_group_widget.on_adjust_scroll_widget_size () {
         QScroll_area *scroll_area = _parent_scroll_area;
         const auto share_user_line_childs = scroll_area.find_children<Share_user_line> ();
 
@@ -492,43 +490,43 @@ private:
         scroll_area.set_frame_shape (share_user_line_childs_count > 3 ? QFrame.Styled_panel : QFrame.No_frame);
     }
 
-    void Share_user_group_widget.slot_private_link_share () {
+    void Share_user_group_widget.on_private_link_share () {
         auto menu = new QMenu (this);
         menu.set_attribute (Qt.WA_DeleteOnClose);
 
-        // this icon is not handled by slot_style_changed () . customize_style but we can live with that
+        // this icon is not handled by on_style_changed () . customize_style but we can live with that
         menu.add_action (Theme.create_color_aware_icon (":/client/theme/copy.svg"),
                         tr ("Copy link"),
-            this, SLOT (slot_private_link_copy ()));
+            this, SLOT (on_private_link_copy ()));
 
         menu.exec (QCursor.pos ());
     }
 
-    void Share_user_group_widget.slot_sharees_ready () {
+    void Share_user_group_widget.on_sharees_ready () {
         activate_sharee_line_edit ();
 
-        _pi_sharee.stop_animation ();
+        _pi_sharee.on_stop_animation ();
         if (_completer_model.row_count () == 0) {
-            display_error (0, tr ("No results for \"%1\"").arg (_completer_model.current_search ()));
+            on_display_error (0, tr ("No results for \"%1\"").arg (_completer_model.current_search ()));
         }
 
         // if no rows are present in the model - complete () will hide the completer
         _completer.complete ();
     }
 
-    void Share_user_group_widget.slot_completer_activated (QModelIndex &index) {
+    void Share_user_group_widget.on_completer_activated (QModelIndex &index) {
         if (_disable_completer_activated)
             return;
         // The index is an index from the QCompletion model which is itelf a proxy
         // model proxying the _completer_model
-        auto sharee = qvariant_cast<QSharedPointer<Sharee>> (index.data (Qt.User_role));
+        auto sharee = qvariant_cast<unowned<Sharee>> (index.data (Qt.User_role));
         if (sharee.is_null ()) {
             return;
         }
 
     // TODO Progress Indicator where should it go?
     //    auto indicator = new QProgress_indicator (view_port);
-    //    indicator.start_animation ();
+    //    indicator.on_start_animation ();
     //    if (layout.count () == 1) {
     //        // No shares yet! Remove the label, add some stretch.
     //        delete layout.item_at (0).widget ();
@@ -572,14 +570,14 @@ private:
         _ui.sharee_line_edit.clear ();
     }
 
-    void Share_user_group_widget.slot_completer_highlighted (QModelIndex &index) {
+    void Share_user_group_widget.on_completer_highlighted (QModelIndex &index) {
         // By default the completer would set the text to Edit_role,
         // override that here.
-        _ui.sharee_line_edit.set_text (index.data (Qt.Display_role).to_string ());
+        _ui.sharee_line_edit.on_set_text (index.data (Qt.Display_role).to_string ());
     }
 
-    void Share_user_group_widget.display_error (int code, string &message) {
-        _pi_sharee.stop_animation ();
+    void Share_user_group_widget.on_display_error (int code, string message) {
+        _pi_sharee.on_stop_animation ();
 
         // Also remove the spinner in the widget list, if any
         foreach (auto pi, _parent_scroll_area.find_children<QProgress_indicator> ()) {
@@ -587,27 +585,27 @@ private:
         }
 
         q_c_warning (lc_sharing) << "Sharing error from server" << code << message;
-        _ui.error_label.set_text (message);
+        _ui.error_label.on_set_text (message);
         _ui.error_label.show ();
         activate_sharee_line_edit ();
     }
 
-    void Share_user_group_widget.slot_private_link_open_browser () {
+    void Share_user_group_widget.on_private_link_open_browser () {
         Utility.open_browser (_private_link_url, this);
     }
 
-    void Share_user_group_widget.slot_private_link_copy () {
-        QApplication.clipboard ().set_text (_private_link_url);
+    void Share_user_group_widget.on_private_link_copy () {
+        QApplication.clipboard ().on_set_text (_private_link_url);
     }
 
-    void Share_user_group_widget.slot_private_link_email () {
+    void Share_user_group_widget.on_private_link_email () {
         Utility.open_email_composer (
             tr ("I shared something with you"),
             _private_link_url,
             this);
     }
 
-    void Share_user_group_widget.slot_style_changed () {
+    void Share_user_group_widget.on_style_changed () {
         customize_style ();
 
         // Notify the other widgets (Share_user_line in this case, Dark-/Light-Mode switching)
@@ -617,10 +615,10 @@ private:
     void Share_user_group_widget.customize_style () {
         _ui.confirm_share.set_icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
 
-        _pi_sharee.set_color (QGuiApplication.palette ().color (QPalette.Text));
+        _pi_sharee.on_set_color (QGuiApplication.palette ().color (QPalette.Text));
 
         foreach (auto pi, _parent_scroll_area.find_children<QProgress_indicator> ()) {
-            pi.set_color (QGuiApplication.palette ().color (QPalette.Text));;
+            pi.on_set_color (QGuiApplication.palette ().color (QPalette.Text));;
         }
     }
 
@@ -629,7 +627,7 @@ private:
         _ui.sharee_line_edit.set_focus ();
     }
 
-    Share_user_line.Share_user_line (AccountPtr account, QSharedPointer<User_group_share> share,
+    Share_user_line.Share_user_line (AccountPtr account, unowned<User_group_share> share,
         Share_permissions max_sharing_permissions, bool is_file, Gtk.Widget *parent)
         : Gtk.Widget (parent)
         , _ui (new Ui.Share_user_line)
@@ -641,7 +639,7 @@ private:
         _ui.setup_ui (this);
 
         _ui.shared_with.set_elide_mode (Qt.Elide_right);
-        _ui.shared_with.set_text (share.get_share_with ().format ());
+        _ui.shared_with.on_set_text (share.get_share_with ().format ());
 
         // adds permissions
         // can edit permission
@@ -649,7 +647,7 @@ private:
         if (!_is_file) enabled = enabled && (max_sharing_permissions & Share_permission_create &&
                                           max_sharing_permissions & Share_permission_delete);
         _ui.permissions_edit.set_enabled (enabled);
-        connect (_ui.permissions_edit, &QAbstractButton.clicked, this, &Share_user_line.slot_edit_permissions_changed);
+        connect (_ui.permissions_edit, &QAbstractButton.clicked, this, &Share_user_line.on_edit_permissions_changed);
         connect (_ui.note_confirm_button, &QAbstractButton.clicked, this, &Share_user_line.on_note_confirm_button_clicked);
         connect (_ui.calendar, &QDate_time_edit.date_changed, this, &Share_user_line.set_expire_date);
 
@@ -657,8 +655,8 @@ private:
         connect (_share.data (), &User_group_share.note_set_error, this, &Share_user_line.disable_progess_indicator_animation);
         connect (_share.data (), &User_group_share.expire_date_set, this, &Share_user_line.disable_progess_indicator_animation);
 
-        connect (_ui.confirm_password, &QToolButton.clicked, this, &Share_user_line.slot_confirm_password_clicked);
-        connect (_ui.line_edit_password, &QLineEdit.return_pressed, this, &Share_user_line.slot_line_edit_password_return_pressed);
+        connect (_ui.confirm_password, &QToolButton.clicked, this, &Share_user_line.on_confirm_password_clicked);
+        connect (_ui.line_edit_password, &QLineEdit.return_pressed, this, &Share_user_line.on_line_edit_password_return_pressed);
 
         // create menu with checkable permissions
         auto *menu = new QMenu (this);
@@ -666,7 +664,7 @@ private:
         _permission_reshare.set_checkable (true);
         _permission_reshare.set_enabled (max_sharing_permissions & Share_permission_share);
         menu.add_action (_permission_reshare);
-        connect (_permission_reshare, &QAction.triggered, this, &Share_user_line.slot_permissions_changed);
+        connect (_permission_reshare, &QAction.triggered, this, &Share_user_line.on_permissions_changed);
 
         show_note_options (false);
 
@@ -717,19 +715,19 @@ private:
             _permission_create.set_checkable (true);
             _permission_create.set_enabled (max_sharing_permissions & Share_permission_create);
             menu.add_action (_permission_create);
-            connect (_permission_create, &QAction.triggered, this, &Share_user_line.slot_permissions_changed);
+            connect (_permission_create, &QAction.triggered, this, &Share_user_line.on_permissions_changed);
 
             _permission_change = new QAction (tr ("Can change"), this);
             _permission_change.set_checkable (true);
             _permission_change.set_enabled (max_sharing_permissions & Share_permission_update);
             menu.add_action (_permission_change);
-            connect (_permission_change, &QAction.triggered, this, &Share_user_line.slot_permissions_changed);
+            connect (_permission_change, &QAction.triggered, this, &Share_user_line.on_permissions_changed);
 
             _permission_delete = new QAction (tr ("Can delete"), this);
             _permission_delete.set_checkable (true);
             _permission_delete.set_enabled (max_sharing_permissions & Share_permission_delete);
             menu.add_action (_permission_delete);
-            connect (_permission_delete, &QAction.triggered, this, &Share_user_line.slot_permissions_changed);
+            connect (_permission_delete, &QAction.triggered, this, &Share_user_line.on_permissions_changed);
         }
 
         // Adds action to display password widget (check box)
@@ -741,15 +739,15 @@ private:
             _password_protect_link_action.set_enabled (!_share.is_password_set () || !_account.capabilities ().share_email_password_enforced ());
 
             menu.add_action (_password_protect_link_action);
-            connect (_password_protect_link_action, &QAction.triggered, this, &Share_user_line.slot_password_checkbox_changed);
+            connect (_password_protect_link_action, &QAction.triggered, this, &Share_user_line.on_password_checkbox_changed);
 
-            refresh_password_line_edit_placeholder ();
+            on_refresh_password_line_edit_placeholder ();
 
-            connect (_share.data (), &Share.password_set, this, &Share_user_line.slot_password_set);
-            connect (_share.data (), &Share.password_set_error, this, &Share_user_line.slot_password_set_error);
+            connect (_share.data (), &Share.password_set, this, &Share_user_line.on_password_set);
+            connect (_share.data (), &Share.password_set_error, this, &Share_user_line.on_password_set_error);
         }
 
-        refresh_password_options ();
+        on_refresh_password_options ();
 
         _ui.error_label.hide ();
 
@@ -772,8 +770,8 @@ private:
             _ui.permission_tool_button.set_visible (false);
         }
 
-        connect (share.data (), &Share.permissions_set, this, &Share_user_line.slot_permissions_set);
-        connect (share.data (), &Share.share_deleted, this, &Share_user_line.slot_share_deleted);
+        connect (share.data (), &Share.permissions_set, this, &Share_user_line.on_permissions_set);
+        connect (share.data (), &Share.share_deleted, this, &Share_user_line.on_share_deleted);
 
         if (!share.account ().capabilities ().share_resharing ()) {
             _permission_reshare.set_visible (false);
@@ -812,8 +810,8 @@ private:
          */
         if (_share.get_share_with ().type () == Sharee.User) {
             auto *job = new AvatarJob (_share.account (), _share.get_share_with ().share_with (), avatar_size, this);
-            connect (job, &AvatarJob.avatar_pixmap, this, &Share_user_line.slot_avatar_loaded);
-            job.start ();
+            connect (job, &AvatarJob.avatar_pixmap, this, &Share_user_line.on_avatar_loaded);
+            job.on_start ();
         }
     }
 
@@ -844,11 +842,11 @@ private:
 
             // The avatar label is the first character of the user name.
             const auto text = _share.get_share_with ().display_name ();
-            _ui.avatar.set_text (text.at (0).to_upper ());
+            _ui.avatar.on_set_text (text.at (0).to_upper ());
         }
     }
 
-    void Share_user_line.slot_avatar_loaded (QImage avatar) {
+    void Share_user_line.on_avatar_loaded (QImage avatar) {
         if (avatar.is_null ())
             return;
 
@@ -868,7 +866,7 @@ private:
         delete _ui;
     }
 
-    void Share_user_line.slot_edit_permissions_changed () {
+    void Share_user_line.on_edit_permissions_changed () {
         set_enabled (false);
 
         // Can never manually be set to "partial".
@@ -905,7 +903,7 @@ private:
         _share.set_permissions (permissions);
     }
 
-    void Share_user_line.slot_permissions_changed () {
+    void Share_user_line.on_permissions_changed () {
         set_enabled (false);
 
         Share.Permissions permissions = Share_permission_read;
@@ -928,29 +926,29 @@ private:
         _share.set_permissions (permissions);
     }
 
-    void Share_user_line.slot_password_checkbox_changed () {
+    void Share_user_line.on_password_checkbox_changed () {
         if (!_password_protect_link_action.is_checked ()) {
             _ui.error_label.hide ();
             _ui.error_label.clear ();
 
             if (!_share.is_password_set ()) {
                 _ui.line_edit_password.clear ();
-                refresh_password_options ();
+                on_refresh_password_options ();
             } else {
-                // do not call refresh_password_options here, as it will be called after the network request is complete
+                // do not call on_refresh_password_options here, as it will be called after the network request is complete
                 toggle_password_set_progress_animation (true);
                 _share.set_password (string ());
             }
         } else {
-            refresh_password_options ();
+            on_refresh_password_options ();
 
             if (_ui.line_edit_password.is_visible () && _ui.line_edit_password.is_enabled ()) {
-                focus_password_line_edit ();
+                on_focus_password_line_edit ();
             }
         }
     }
 
-    void Share_user_line.slot_delete_animation_finished () {
+    void Share_user_line.on_delete_animation_finished () {
         emit resize_requested ();
         emit visual_deletion_done ();
         delete_later ();
@@ -961,7 +959,7 @@ private:
         connect (this, SIGNAL (destroyed (GLib.Object *)), parent_widget (), SLOT (repaint ()));
     }
 
-    void Share_user_line.refresh_password_options () {
+    void Share_user_line.on_refresh_password_options () {
         const bool is_password_enabled = _share.get_share_type () == Share.Type_email && _password_protect_link_action.is_checked ();
 
         _ui.password_label.set_visible (is_password_enabled);
@@ -972,7 +970,7 @@ private:
         emit resize_requested ();
     }
 
-    void Share_user_line.refresh_password_line_edit_placeholder () {
+    void Share_user_line.on_refresh_password_line_edit_placeholder () {
         if (_share.is_password_set ()) {
             _ui.line_edit_password.set_placeholder_text (string.from_utf8 (password_is_set_placeholder));
         } else {
@@ -980,21 +978,21 @@ private:
         }
     }
 
-    void Share_user_line.slot_password_set () {
+    void Share_user_line.on_password_set () {
         toggle_password_set_progress_animation (false);
         _ui.line_edit_password.set_enabled (true);
         _ui.confirm_password.set_enabled (true);
 
-        _ui.line_edit_password.set_text ("");
+        _ui.line_edit_password.on_set_text ("");
 
         _password_protect_link_action.set_enabled (!_share.is_password_set () || !_account.capabilities ().share_email_password_enforced ());
 
-        refresh_password_line_edit_placeholder ();
+        on_refresh_password_line_edit_placeholder ();
 
-        refresh_password_options ();
+        on_refresh_password_options ();
     }
 
-    void Share_user_line.slot_password_set_error (int status_code, string &message) {
+    void Share_user_line.on_password_set_error (int status_code, string message) {
         q_c_warning (lc_sharing) << "Error from server" << status_code << message;
 
         toggle_password_set_progress_animation (false);
@@ -1002,37 +1000,37 @@ private:
         _ui.line_edit_password.set_enabled (true);
         _ui.confirm_password.set_enabled (true);
 
-        refresh_password_line_edit_placeholder ();
+        on_refresh_password_line_edit_placeholder ();
 
-        refresh_password_options ();
+        on_refresh_password_options ();
 
-        focus_password_line_edit ();
+        on_focus_password_line_edit ();
 
         _ui.error_label.show ();
-        _ui.error_label.set_text (message);
+        _ui.error_label.on_set_text (message);
 
         emit resize_requested ();
     }
 
-    void Share_user_line.slot_share_deleted () {
+    void Share_user_line.on_share_deleted () {
         auto *animation = new QPropertyAnimation (this, "maximum_height", this);
 
         animation.set_duration (500);
         animation.set_start_value (height ());
         animation.set_end_value (0);
 
-        connect (animation, &QAbstractAnimation.finished, this, &Share_user_line.slot_delete_animation_finished);
+        connect (animation, &QAbstractAnimation.on_finished, this, &Share_user_line.on_delete_animation_finished);
         connect (animation, &QVariant_animation.value_changed, this, &Share_user_line.resize_requested);
 
-        animation.start ();
+        animation.on_start ();
     }
 
-    void Share_user_line.slot_permissions_set () {
+    void Share_user_line.on_permissions_set () {
         display_permissions ();
         set_enabled (true);
     }
 
-    QSharedPointer<Share> Share_user_line.share () {
+    unowned<Share> Share_user_line.share () {
         return _share;
     }
 
@@ -1061,11 +1059,11 @@ private:
         }
     }
 
-    void Share_user_line.slot_style_changed () {
+    void Share_user_line.on_style_changed () {
         customize_style ();
     }
 
-    void Share_user_line.focus_password_line_edit () {
+    void Share_user_line.on_focus_password_line_edit () {
         _ui.line_edit_password.set_focus ();
     }
 
@@ -1076,7 +1074,7 @@ private:
         _delete_share_button.set_icon (deleteicon);
 
         _ui.note_confirm_button.set_icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
-        _ui.progress_indicator.set_color (QGuiApplication.palette ().color (QPalette.Window_text));
+        _ui.progress_indicator.on_set_color (QGuiApplication.palette ().color (QPalette.Window_text));
 
         // make sure to force Background_role to QPalette.Window_text for a lable, because it's parent always has a different role set that applies to children unless customized
         _ui.error_label.set_background_role (QPalette.Window_text);
@@ -1132,7 +1130,7 @@ private:
 
         if (show) {
             const auto note = _share.get_note ();
-            _ui.note_text_edit.set_text (note);
+            _ui.note_text_edit.on_set_text (note);
             _ui.note_text_edit.set_focus ();
         }
 
@@ -1152,7 +1150,7 @@ private:
         set_note (_ui.note_text_edit.to_plain_text ());
     }
 
-    void Share_user_line.set_note (string &note) {
+    void Share_user_line.set_note (string note) {
         enable_progess_indicator_animation (true);
         _share.set_note (note);
     }
@@ -1192,10 +1190,10 @@ private:
     void Share_user_line.enable_progess_indicator_animation (bool enable) {
         if (enable) {
             if (!_ui.progress_indicator.is_animated ()) {
-                _ui.progress_indicator.start_animation ();
+                _ui.progress_indicator.on_start_animation ();
             }
         } else {
-            _ui.progress_indicator.stop_animation ();
+            _ui.progress_indicator.on_stop_animation ();
         }
     }
 
@@ -1205,10 +1203,10 @@ private:
         _ui.password_progress_indicator.set_visible (show);
         if (show) {
             if (!_ui.password_progress_indicator.is_animated ()) {
-                _ui.password_progress_indicator.start_animation ();
+                _ui.password_progress_indicator.on_start_animation ();
             }
         } else {
-            _ui.password_progress_indicator.stop_animation ();
+            _ui.password_progress_indicator.on_stop_animation ();
         }
     }
 
@@ -1243,7 +1241,7 @@ private:
         return _account.capabilities ().share_internal_enforce_expire_date ();
     }
 
-    void Share_user_line.set_password_confirmed () {
+    void Share_user_line.on_set_password_confirmed () {
         if (_ui.line_edit_password.text ().is_empty ()) {
             return;
         }
@@ -1258,12 +1256,12 @@ private:
         _share.set_password (_ui.line_edit_password.text ());
     }
 
-    void Share_user_line.slot_line_edit_password_return_pressed () {
-        set_password_confirmed ();
+    void Share_user_line.on_line_edit_password_return_pressed () {
+        on_set_password_confirmed ();
     }
 
-    void Share_user_line.slot_confirm_password_clicked () {
-        set_password_confirmed ();
+    void Share_user_line.on_confirm_password_clicked () {
+        on_set_password_confirmed ();
     }
     }
     

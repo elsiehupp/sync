@@ -10,7 +10,7 @@ Copyright (C) by Daniel Heule <daniel.heule@gmail.com>
 // #include <iostream>
 // #include <random>
 // #include <qcoreapplication.h>
-// #include <QStringList>
+// #include <string[]>
 // #include <QUrl>
 // #include <QFile>
 // #include <QFileInfo>
@@ -39,13 +39,13 @@ class Cmd : GLib.Object {
 
     public Cmd () : GLib.Object () {
     }
-public slots:
-    void transmission_progress_slot () {
+
+    public void on_transmission_progress_slot () {
     }
 };
 
 
-static void null_message_handler (QtMsgType, QMessageLogContext &, string &) {
+static void null_message_handler (QtMsgType, QMessageLogContext &, string ) {
 }
 
 struct CmdOptions {
@@ -81,15 +81,15 @@ class EchoDisabler {
         tcsetattr (STDIN_FILENO, TCSANOW, &tios_new);
     }
 
-    public ~EchoDisabler () {
+    ~EchoDisabler () {
         tcsetattr (STDIN_FILENO, TCSANOW, &tios);
     }
 
-private:
-    termios tios;
+
+    private termios tios;
 };
 
-string query_password (string &user) {
+string query_password (string user) {
     EchoDisabler disabler;
     std.cout << "Password for user " << q_printable (user) << " : ";
     std.string s;
@@ -100,7 +100,7 @@ string query_password (string &user) {
 #ifndef TOKEN_AUTH_ONLY
 class HttpCredentialsText : HttpCredentials {
 
-    public HttpCredentialsText (string &user, string &password)
+    public HttpCredentialsText (string user, string password)
         : HttpCredentials (user, password)
         , // FIXME : not working with client certs yet (qknight)
         _ssl_trusted (false) {
@@ -121,8 +121,8 @@ class HttpCredentialsText : HttpCredentials {
         return _ssl_trusted;
     }
 
-private:
-    bool _ssl_trusted;
+
+    private bool _ssl_trusted;
 };
 #endif /* TOKEN_AUTH_ONLY */
 
@@ -163,8 +163,8 @@ void show_version () {
     exit (0);
 }
 
-void parse_options (QStringList &app_args, CmdOptions *options) {
-    QStringList args (app_args);
+void parse_options (string[] &app_args, CmdOptions *options) {
+    string[] args (app_args);
 
     int arg_count = args.count ();
 
@@ -244,7 +244,7 @@ void parse_options (QStringList &app_args, CmdOptions *options) {
 /* If the selective sync list is different from before, we need to disable the read from db
   (The normal client does it in Selective_sync_dialog.accept*)
 ***********************************************************/
-void selective_sync_fixup (Occ.SyncJournalDb *journal, QStringList &new_list) {
+void selective_sync_fixup (Occ.SyncJournalDb *journal, string[] &new_list) {
     SqlDatabase db;
     if (!db.open_or_create_read_write (journal.database_file_path ())) {
         return;
@@ -355,7 +355,7 @@ int main (int argc, char **argv) {
         int port = 0;
         bool ok = false;
 
-        QStringList p_list = options.proxy.split (':');
+        string[] p_list = options.proxy.split (':');
         if (p_list.count () == 3) {
             // http : //192.168.178.23 : 8080
             //  0            1            2
@@ -397,7 +397,7 @@ int main (int argc, char **argv) {
         account.set_server_version (caps["core"].to_object ()["status"].to_object ()["version"].to_string ());
         loop.quit ();
     });
-    job.start ();
+    job.on_start ();
     loop.exec ();
 
     if (job.reply ().error () != QNetworkReply.NoError){
@@ -412,7 +412,7 @@ int main (int argc, char **argv) {
         account.set_dav_display_name (data.value ("display-name").to_string ());
         loop.quit ();
     });
-    job.start ();
+    job.on_start ();
     loop.exec ();
 
     // much lower age than the default since this utility is usually made to be run right after a change in the tests
@@ -423,7 +423,7 @@ restart_sync:
 
     opts = &options;
 
-    QStringList selective_sync_list;
+    string[] selective_sync_list;
     if (!options.unsyncedfolders.is_empty ()) {
         QFile f (options.unsyncedfolders);
         if (!f.open (QFile.ReadOnly)) {
@@ -454,13 +454,13 @@ restart_sync:
     SyncEngine engine (account, options.source_dir, folder, &db);
     engine.set_ignore_hidden_files (options.ignore_hidden_files);
     engine.set_network_limits (options.uplimit, options.downlimit);
-    GLib.Object.connect (&engine, &SyncEngine.finished,
+    GLib.Object.connect (&engine, &SyncEngine.on_finished,
         [&app] (bool result) {
             app.exit (result ? EXIT_SUCCESS : EXIT_FAILURE);
         });
-    GLib.Object.connect (&engine, &SyncEngine.transmission_progress, &cmd, &Cmd.transmission_progress_slot);
+    GLib.Object.connect (&engine, &SyncEngine.transmission_progress, &cmd, &Cmd.on_transmission_progress_slot);
     GLib.Object.connect (&engine, &SyncEngine.sync_error,
-        [] (string &error) {
+        [] (string error) {
             q_warning () << "Sync error:" << error;
         });
 
@@ -478,13 +478,13 @@ restart_sync:
         engine.excluded_files ().add_exclude_file_path (system_exclude_file);
     }
 
-    if (!engine.excluded_files ().reload_exclude_files ()) {
+    if (!engine.excluded_files ().on_reload_exclude_files ()) {
         q_fatal ("Cannot load system exclude list or list supplied via --exclude");
         return EXIT_FAILURE;
     }
 
     // Have to be done async, else, an error before exec () does not terminate the event loop.
-    QMetaObject.invoke_method (&engine, "start_sync", Qt.QueuedConnection);
+    QMetaObject.invoke_method (&engine, "on_start_sync", Qt.QueuedConnection);
 
     int result_code = app.exec ();
 

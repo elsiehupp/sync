@@ -19,15 +19,15 @@ namespace Ui {
 class Legal_notice : Gtk.Dialog {
 
     public Legal_notice (Gtk.Dialog *parent = nullptr);
-    public ~Legal_notice () override;
+    ~Legal_notice () override;
 
-protected:
-    void change_event (QEvent *) override;
 
-private:
-    void customize_style ();
+    protected void change_event (QEvent *) override;
 
-    Ui.Legal_notice *_ui;
+
+    private void customize_style ();
+
+    private Ui.Legal_notice _ui;
 };
 
     Legal_notice.Legal_notice (Gtk.Dialog *parent)
@@ -70,7 +70,7 @@ private:
         Theme.replace_link_color_string_background_aware (notice);
 
         _ui.notice.set_text_interaction_flags (Qt.Text_selectable_by_mouse | Qt.Text_browser_interaction);
-        _ui.notice.set_text (notice);
+        _ui.notice.on_set_text (notice);
         _ui.notice.set_word_wrap (true);
         _ui.notice.set_open_external_links (true);
     }

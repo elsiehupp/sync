@@ -9,7 +9,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 // #include <QJsonObject>
 
 // #include <QVector>
-// #include <QList>
+// #include <GLib.List>
 // #include <QPair>
 // #include <QUrl>
 
@@ -33,15 +33,15 @@ All OCS jobs (e.g. sharing) should extend this class.
 ***********************************************************/
 class Ocs_job : AbstractNetworkJob {
 
-protected:
-    Ocs_job (AccountPtr account);
+
+    protected Ocs_job (AccountPtr account);
 
     /***********************************************************
     Set the verb for the job
 
     @param verb currently supported PUT POST DELETE
     ***********************************************************/
-    void set_verb (QByteArray &verb);
+    protected void set_verb (GLib.ByteArray &verb);
 
     /***********************************************************
     Add a new parameter to the request.
@@ -50,7 +50,7 @@ protected:
     @param name The name of the parameter
     @param value The value of the parameter
     ***********************************************************/
-    void add_param (string &name, string &value);
+    protected void add_param (string name, string value);
 
     /***********************************************************
     Set the post parameters
@@ -58,7 +58,7 @@ protected:
     @param post_params list of pairs to add (url_encoded) to the body of the
     request
     ***********************************************************/
-    void set_post_params (QList<QPair<string, string>> &post_params);
+    protected void set_post_params (GLib.List<QPair<string, string>> &post_params);
 
     /***********************************************************
     List of expected statuscodes for this request
@@ -67,7 +67,7 @@ protected:
 
     @param code Accepted status code
     ***********************************************************/
-    void add_pass_status_code (int code);
+    protected void add_pass_status_code (int code);
 
     /***********************************************************
     The base path for an Ocs_job is always the same. But it could be the case that
@@ -75,7 +75,7 @@ protected:
 
     This function appends the common id. so <PATH>/<ID>
     ***********************************************************/
-    void append_path (string &id);
+    protected void append_path (string id);
 
     /***********************************************************
     Parse the response and return the status code and the message of the
@@ -85,21 +85,21 @@ protected:
     @param message The message that is set in the metadata
     @return The statuscode of the OCS response
     ***********************************************************/
-    public static int get_json_return_code (QJsonDocument &json, string &message);
+    public static int get_json_return_code (QJsonDocument &json, string message);
 
     /***********************************************************
     @brief Adds header to the request e.g. "If-None-Match"
     @param header_name a string with the header name
     @param value a string with the value
     ***********************************************************/
-    public void add_raw_header (QByteArray &header_name, QByteArray &value);
+    public void add_raw_header (GLib.ByteArray &header_name, GLib.ByteArray &value);
 
 protected slots:
 
     /***********************************************************
     Start the OCS request
     ***********************************************************/
-    void start () override;
+    void on_start () override;
 
 signals:
 
@@ -117,24 +117,24 @@ signals:
     @param status_code The actual status code
     @param message The message provided by the server
     ***********************************************************/
-    void ocs_error (int status_code, string &message);
+    void ocs_error (int status_code, string message);
 
     /***********************************************************
     @brief etag_response_header_received - signal to report the ETag response header value
     from ocs api v2
     @param value - the ETag response header value
-    @param status_code - the OCS status code : 100 (!) for success
+    @param status_code - the OCS status code : 100 (!) for on_success
     ***********************************************************/
-    void etag_response_header_received (QByteArray &value, int status_code);
+    void etag_response_header_received (GLib.ByteArray &value, int status_code);
 
-private slots:
-    bool finished () override;
 
-private:
-    QByteArray _verb;
-    QList<QPair<string, string>> _params;
-    QVector<int> _pass_status_codes;
-    QNetworkRequest _request;
+    private bool on_finished () override;
+
+
+    private GLib.ByteArray _verb;
+    private GLib.List<QPair<string, string>> _params;
+    private QVector<int> _pass_status_codes;
+    private QNetworkRequest _request;
 };
 
     Ocs_job.Ocs_job (AccountPtr account)
@@ -145,11 +145,11 @@ private:
         set_ignore_credential_failure (true);
     }
 
-    void Ocs_job.set_verb (QByteArray &verb) {
+    void Ocs_job.set_verb (GLib.ByteArray &verb) {
         _verb = verb;
     }
 
-    void Ocs_job.add_param (string &name, string &value) {
+    void Ocs_job.add_param (string name, string value) {
         _params.append (q_make_pair (name, value));
     }
 
@@ -157,16 +157,16 @@ private:
         _pass_status_codes.append (code);
     }
 
-    void Ocs_job.append_path (string &id) {
+    void Ocs_job.append_path (string id) {
         set_path (path () + QLatin1Char ('/') + id);
     }
 
-    void Ocs_job.add_raw_header (QByteArray &header_name, QByteArray &value) {
+    void Ocs_job.add_raw_header (GLib.ByteArray &header_name, GLib.ByteArray &value) {
         _request.set_raw_header (header_name, value);
     }
 
     static QUrlQuery percent_encode_query_items (
-        const QList<QPair<string, string>> &items) {
+        const GLib.List<QPair<string, string>> &items) {
         QUrlQuery result;
         // Note : QUrlQuery.set_query_items () does not fully percent encode
         // the query items, see #5042
@@ -178,7 +178,7 @@ private:
         return result;
     }
 
-    void Ocs_job.start () {
+    void Ocs_job.on_start () {
         add_raw_header ("Ocs-APIREQUEST", "true");
         add_raw_header ("Content-Type", "application/x-www-form-urlencoded");
 
@@ -189,7 +189,7 @@ private:
             query_items = percent_encode_query_items (_params);
         } else if (_verb == "POST" || _verb == "PUT") {
             // Url encode the _post_params and put them in a buffer.
-            QByteArray post_data;
+            GLib.ByteArray post_data;
             Q_FOREACH (auto tmp, _params) {
                 if (!post_data.is_empty ()) {
                     post_data.append ("&");
@@ -203,11 +203,11 @@ private:
         query_items.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
         QUrl url = Utility.concat_url_path (account ().url (), path (), query_items);
         send_request (_verb, url, _request, buffer);
-        AbstractNetworkJob.start ();
+        AbstractNetworkJob.on_start ();
     }
 
-    bool Ocs_job.finished () {
-        const QByteArray reply_data = reply ().read_all ();
+    bool Ocs_job.on_finished () {
+        const GLib.ByteArray reply_data = reply ().read_all ();
 
         QJsonParseError error;
         string message;
@@ -246,7 +246,7 @@ private:
         return true;
     }
 
-    int Ocs_job.get_json_return_code (QJsonDocument &json, string &message) {
+    int Ocs_job.get_json_return_code (QJsonDocument &json, string message) {
         //TODO proper checking
         auto meta = json.object ().value ("ocs").to_object ().value ("meta").to_object ();
         int code = meta.value ("statuscode").to_int ();

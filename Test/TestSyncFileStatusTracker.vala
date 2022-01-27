@@ -11,12 +11,12 @@ using namespace Occ;
 
 class StatusPushSpy : QSignalSpy {
     SyncEngine &_syncEngine;
-public:
-    StatusPushSpy (SyncEngine &syncEngine)
+
+    public StatusPushSpy (SyncEngine &syncEngine)
         : QSignalSpy (&syncEngine.syncFileStatusTracker (), SIGNAL (fileStatusChanged (string&, SyncFileStatus)))
         , _syncEngine (syncEngine) { }
 
-    SyncFileStatus statusOf (string &relativePath) {
+    public SyncFileStatus statusOf (string relativePath) {
         QFileInfo file (_syncEngine.localPath (), relativePath);
         // Start from the end to get the latest status
         for (int i = size () - 1; i >= 0; --i) {
@@ -26,7 +26,7 @@ public:
         return {};
     }
 
-    bool statusEmittedBefore (string &firstPath, string &secondPath) {
+    public bool statusEmittedBefore (string firstPath, string secondPath) {
         QFileInfo firstFile (_syncEngine.localPath (), firstPath);
         QFileInfo secondFile (_syncEngine.localPath (), secondPath);
         // Start from the end to get the latest status
@@ -58,8 +58,7 @@ class TestSyncFileStatusTracker : GLib.Object {
         }
     }
 
-private slots:
-    void parentsGetSyncStatusUploadDownload () {
+    private on_ void parentsGetSyncStatusUploadDownload () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.localModifier ().appendByte ("B/b1");
         fakeFolder.remoteModifier ().appendByte ("C/c1");
@@ -90,7 +89,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void parentsGetSyncStatusNewFileUploadDownload () {
+    private on_ void parentsGetSyncStatusNewFileUploadDownload () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.localModifier ().insert ("B/b0");
         fakeFolder.remoteModifier ().insert ("C/c0");
@@ -121,7 +120,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void parentsGetSyncStatusNewDirDownload () {
+    private on_ void parentsGetSyncStatusNewDirDownload () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.remoteModifier ().mkdir ("D");
         fakeFolder.remoteModifier ().insert ("D/d0");
@@ -149,7 +148,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void parentsGetSyncStatusNewDirUpload () {
+    private on_ void parentsGetSyncStatusNewDirUpload () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.localModifier ().mkdir ("D");
         fakeFolder.localModifier ().insert ("D/d0");
@@ -177,7 +176,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void parentsGetSyncStatusDeleteUpDown () {
+    private on_ void parentsGetSyncStatusDeleteUpDown () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.remoteModifier ().remove ("B/b1");
         fakeFolder.localModifier ().remove ("C/c1");
@@ -205,7 +204,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void warningStatusForExcludedFile () {
+    private on_ void warningStatusForExcludedFile () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().excludedFiles ().addManualExclude ("A/a1");
         fakeFolder.syncEngine ().excludedFiles ().addManualExclude ("B");
@@ -255,7 +254,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void warningStatusForExcludedFile_CasePreserving () {
+    private on_ void warningStatusForExcludedFile_CasePreserving () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().excludedFiles ().addManualExclude ("B");
         fakeFolder.serverErrorPaths ().append ("A/a1");
@@ -273,7 +272,7 @@ private slots:
         QCOMPARE (fakeFolder.syncEngine ().syncFileStatusTracker ().fileStatus ("b"), SyncFileStatus (Utility.fsCasePreserving () ? SyncFileStatus.StatusExcluded : SyncFileStatus.StatusNone));
     }
 
-    void parentsGetWarningStatusForError () {
+    private on_ void parentsGetWarningStatusForError () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.serverErrorPaths ().append ("A/a1");
         fakeFolder.serverErrorPaths ().append ("B/b0");
@@ -301,7 +300,7 @@ private slots:
         QCOMPARE (statusSpy.statusOf ("B/b0"), SyncFileStatus (SyncFileStatus.StatusError));
         statusSpy.clear ();
 
-        // Remove the error and start a second sync, the blacklist should kick in
+        // Remove the error and on_start a second sync, the blacklist should kick in
         fakeFolder.serverErrorPaths ().clear ();
         fakeFolder.scheduleSync ();
         fakeFolder.execUntilBeforePropagation ();
@@ -373,7 +372,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void parentsGetWarningStatusForError_SibblingStartsWithPath () {
+    private on_ void parentsGetWarningStatusForError_SibblingStartsWithPath () {
         // A is a parent of A/a1, but A/a is not even if it's a substring of A/a1
         FakeFolder fakeFolder{{string{},{ {QStringLiteral ("A"), { {QStringLiteral ("a"), 4}, {QStringLiteral ("a1"), 4}
             }}}}};
@@ -400,7 +399,7 @@ private slots:
     // Even for status pushes immediately following each other, macOS
     // can sometimes have 1s delays between updates, so make sure that
     // children are marked as OK before their parents do.
-    void childOKEmittedBeforeParent () {
+    private on_ void childOKEmittedBeforeParent () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.localModifier ().appendByte ("B/b1");
         fakeFolder.remoteModifier ().appendByte ("C/c1");
@@ -419,7 +418,7 @@ private slots:
         QCOMPARE (statusSpy.statusOf ("C/c1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
     }
 
-    void sharedStatus () {
+    private on_ void sharedStatus () {
         SyncFileStatus sharedUpToDateStatus (SyncFileStatus.StatusUpToDate);
         sharedUpToDateStatus.setShared (true);
 
@@ -457,7 +456,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void renameError () {
+    private on_ void renameError () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.serverErrorPaths ().append ("A/a1");
         fakeFolder.localModifier ().rename ("A/a1", "A/a1m");
@@ -503,4 +502,3 @@ private slots:
 };
 
 QTEST_GUILESS_MAIN (TestSyncFileStatusTracker)
-#include "testsyncfilestatustracker.moc"

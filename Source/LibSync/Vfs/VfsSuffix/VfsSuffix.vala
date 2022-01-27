@@ -14,46 +14,44 @@ namespace Occ {
 
 class Vfs_suffix : Vfs {
 
-public:
-    Vfs_suffix (GLib.Object *parent = nullptr);
+    public Vfs_suffix (GLib.Object *parent = nullptr);
     ~Vfs_suffix () override;
 
-    Mode mode () const override;
-    string file_suffix () const override;
+    public Mode mode () override;
+    public string file_suffix () override;
 
-    void stop () override;
-    void unregister_folder () override;
+    public void stop () override;
+    public void unregister_folder () override;
 
-    bool socket_api_pin_state_actions_shown () const override {
+    public bool socket_api_pin_state_actions_shown () override {
         return true;
     }
-    bool is_hydrating () const override;
+    public bool is_hydrating () override;
 
-    Result<void, string> update_metadata (string &file_path, time_t modtime, int64 size, QByteArray &file_id) override;
+    public Result<void, string> update_metadata (string file_path, time_t modtime, int64 size, GLib.ByteArray &file_id) override;
 
-    Result<void, string> create_placeholder (SyncFileItem &item) override;
-    Result<void, string> dehydrate_placeholder (SyncFileItem &item) override;
-    Result<Vfs.ConvertToPlaceholderResult, string> convert_to_placeholder (string &filename, SyncFileItem &item, string &) override;
+    public Result<void, string> create_placeholder (SyncFileItem &item) override;
+    public Result<void, string> dehydrate_placeholder (SyncFileItem &item) override;
+    public Result<Vfs.ConvertToPlaceholderResult, string> convert_to_placeholder (string filename, SyncFileItem &item, string ) override;
 
-    bool needs_metadata_update (SyncFileItem &) override {
+    public bool needs_metadata_update (SyncFileItem &) override {
         return false;
     }
-    bool is_dehydrated_placeholder (string &file_path) override;
-    bool stat_type_virtual_file (csync_file_stat_t *stat, void *stat_data) override;
+    public bool is_dehydrated_placeholder (string file_path) override;
+    public bool stat_type_virtual_file (csync_file_stat_t *stat, void *stat_data) override;
 
-    bool set_pin_state (string &folder_path, PinState state) override {
+    public bool set_pin_state (string folder_path, PinState state) override {
         return set_pin_state_in_db (folder_path, state);
     }
-    Optional<PinState> pin_state (string &folder_path) override {
+    public Optional<PinState> pin_state (string folder_path) override {
         return pin_state_in_db (folder_path);
     }
-    AvailabilityResult availability (string &folder_path) override;
+    public AvailabilityResult availability (string folder_path) override;
 
-public slots:
-    void file_status_changed (string &, SyncFileStatus) override {}
 
-protected:
-    void start_impl (VfsSetupParams &params) override;
+    public void on_file_status_changed (string , SyncFileStatus) override {}
+
+    protected void start_impl (VfsSetupParams &params) override;
 };
 
 class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_suffix> {
@@ -98,7 +96,7 @@ class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_s
         return false;
     }
 
-    Result<void, string> Vfs_suffix.update_metadata (string &file_path, time_t modtime, int64, QByteArray &) {
+    Result<void, string> Vfs_suffix.update_metadata (string file_path, time_t modtime, int64, GLib.ByteArray &) {
         if (modtime <= 0) {
             return {tr ("Error updating metadata due to invalid modified time")};
         }
@@ -159,12 +157,12 @@ class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_s
         return {};
     }
 
-    Result<Vfs.ConvertToPlaceholderResult, string> Vfs_suffix.convert_to_placeholder (string &, SyncFileItem &, string &) {
+    Result<Vfs.ConvertToPlaceholderResult, string> Vfs_suffix.convert_to_placeholder (string , SyncFileItem &, string ) {
         // Nothing necessary
         return Vfs.ConvertToPlaceholderResult.Ok;
     }
 
-    bool Vfs_suffix.is_dehydrated_placeholder (string &file_path) {
+    bool Vfs_suffix.is_dehydrated_placeholder (string file_path) {
         if (!file_path.ends_with (file_suffix ()))
             return false;
         QFileInfo fi (file_path);
@@ -179,7 +177,7 @@ class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_s
         return false;
     }
 
-    Vfs.AvailabilityResult Vfs_suffix.availability (string &folder_path) {
+    Vfs.AvailabilityResult Vfs_suffix.availability (string folder_path) {
         return availability_in_db (folder_path);
     }
 

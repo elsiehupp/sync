@@ -10,7 +10,7 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 
 // #pragma once
 
-// #include <QList>
+// #include <GLib.List>
 // #include <QMap>
 // #include <QNetworkCookie>
 // #include <QUrl>
@@ -21,34 +21,34 @@ namespace Occ {
 
 
 class Flow2Auth_creds_page : Abstract_credentials_wizard_page {
-public:
-    Flow2Auth_creds_page ();
 
-    AbstractCredentials *get_credentials () const override;
+    public Flow2Auth_creds_page ();
 
-    void initialize_page () override;
-    void cleanup_page () override;
-    int next_id () const override;
-    void set_connected ();
-    bool is_complete () const override;
+    public AbstractCredentials *get_credentials () override;
 
-public slots:
-    void slot_flow_2_auth_result (Flow2Auth.Result, string &error_string, string &user, string &app_password);
-    void slot_poll_now ();
-    void slot_style_changed ();
+    public void initialize_page () override;
+    public void cleanup_page () override;
+    public int next_id () override;
+    public void set_connected ();
+    public bool is_complete () override;
+
+
+    public void on_flow_2_auth_result (Flow2Auth.Result, string error_string, string user, string app_password);
+    public void on_poll_now ();
+    public void on_style_changed ();
 
 signals:
-    void connect_to_oCUrl (string &);
+    void connect_to_oc_url (string );
     void poll_now ();
     void style_changed ();
 
-public:
-    string _user;
-    string _app_password;
 
-private:
-    Flow2AuthWidget *_flow_2_auth_widget = nullptr;
-    QVBoxLayout *_layout = nullptr;
+    public string _user;
+    public string _app_password;
+
+
+    private Flow2AuthWidget _flow_2_auth_widget = nullptr;
+    private QVBoxLayout _layout = nullptr;
 };
 
     Flow2Auth_creds_page.Flow2Auth_creds_page ()
@@ -58,13 +58,13 @@ private:
         _flow_2_auth_widget = new Flow2AuthWidget ();
         _layout.add_widget (_flow_2_auth_widget);
 
-        connect (_flow_2_auth_widget, &Flow2AuthWidget.auth_result, this, &Flow2Auth_creds_page.slot_flow_2_auth_result);
+        connect (_flow_2_auth_widget, &Flow2AuthWidget.auth_result, this, &Flow2Auth_creds_page.on_flow_2_auth_result);
 
         // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-        connect (this, &Flow2Auth_creds_page.style_changed, _flow_2_auth_widget, &Flow2AuthWidget.slot_style_changed);
+        connect (this, &Flow2Auth_creds_page.style_changed, _flow_2_auth_widget, &Flow2AuthWidget.on_style_changed);
 
         // allow Flow2 page to poll on window activation
-        connect (this, &Flow2Auth_creds_page.poll_now, _flow_2_auth_widget, &Flow2AuthWidget.slot_poll_now);
+        connect (this, &Flow2Auth_creds_page.poll_now, _flow_2_auth_widget, &Flow2AuthWidget.on_poll_now);
     }
 
     void Flow2Auth_creds_page.initialize_page () {
@@ -78,7 +78,7 @@ private:
         // Don't hide the wizard (avoid user confusion)!
         //wizard ().hide ();
 
-        _flow_2_auth_widget.slot_style_changed ();
+        _flow_2_auth_widget.on_style_changed ();
     }
 
     void Occ.Flow2Auth_creds_page.cleanup_page () {
@@ -92,7 +92,7 @@ private:
         _user.clear ();
     }
 
-    void Flow2Auth_creds_page.slot_flow_2_auth_result (Flow2Auth.Result r, string &error_string, string &user, string &app_password) {
+    void Flow2Auth_creds_page.on_flow_2_auth_result (Flow2Auth.Result r, string error_string, string user, string app_password) {
         Q_UNUSED (error_string)
         switch (r) {
         case Flow2Auth.NotSupported : {
@@ -102,7 +102,7 @@ private:
             /* Don't fallback to HTTP credentials */
             /*OwncloudWizard *oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
             oc_wizard.back ();
-            oc_wizard.set_auth_type (DetermineAuthTypeJob.Basic);*/
+            oc_wizard.on_set_auth_type (DetermineAuthTypeJob.Basic);*/
             break;
         }
         case Flow2Auth.Error:
@@ -115,7 +115,7 @@ private:
             auto *oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
             Q_ASSERT (oc_wizard);
 
-            emit connect_to_oCUrl (oc_wizard.account ().url ().to_string ());
+            emit connect_to_oc_url (oc_wizard.account ().url ().to_string ());
             break;
         }
         }
@@ -149,11 +149,11 @@ private:
         return false; /* We can never go forward manually */
     }
 
-    void Flow2Auth_creds_page.slot_poll_now () {
+    void Flow2Auth_creds_page.on_poll_now () {
         emit poll_now ();
     }
 
-    void Flow2Auth_creds_page.slot_style_changed () {
+    void Flow2Auth_creds_page.on_style_changed () {
         emit style_changed ();
     }
 

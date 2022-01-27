@@ -22,19 +22,19 @@ namespace Occ {
 @ingroup libsync
 ***********************************************************/
 class ProgressInfo : GLib.Object {
-public:
-    ProgressInfo ();
+
+    public ProgressInfo ();
 
     /***********************************************************
     Resets for a new sync run.
     ***********************************************************/
-    void reset ();
+    public void on_reset ();
 
     /***********************************************************
     Records the status of the sync run
     ***********************************************************/
-    enum Status {
-        /// Emitted once at start
+    public enum Status {
+        /// Emitted once at on_start
         Starting,
 
         /***********************************************************
@@ -52,8 +52,8 @@ public:
         /***********************************************************
         Emitted once when done
 
-        Except when SyncEngine jumps directly to finalize () without going
-        through slot_propagation_finished ().
+        Except when SyncEngine jumps directly to on_finalize () without going
+        through on_propagation_finished ().
         ***********************************************************/
         Done
     };
@@ -65,38 +65,38 @@ public:
 
     is_updating_estimates () will return true afterwards.
     ***********************************************************/
-    void start_estimate_updates ();
+    public void start_estimate_updates ();
 
     /***********************************************************
     Returns true when start_estimate_updates () was called.
 
     This is used when the SyncEngine wants to indicate a new sync
-    is about to start via the transmission_progress () signal. The
+    is about to on_start via the transmission_progress () signal. The
     first ProgressInfo will have is_updating_estimates () == false.
     ***********************************************************/
-    bool is_updating_estimates ();
+    public bool is_updating_estimates ();
 
     /***********************************************************
     Increase the file and size totals by the amount indicated in item.
     ***********************************************************/
-    void adjust_totals_for_file (SyncFileItem &item);
+    public void adjust_totals_for_file (SyncFileItem &item);
 
-    int64 total_files ();
-    int64 completed_files ();
+    public int64 total_files ();
+    public int64 completed_files ();
 
-    int64 total_size ();
-    int64 completed_size ();
+    public int64 total_size ();
+    public int64 completed_size ();
 
     /***********************************************************
     Number of a file that is currently in progress.
     ***********************************************************/
-    int64 current_file ();
+    public int64 current_file ();
 
     /***********************************************************
     Return true if the size needs to be taken in account in the
     total amount of time
     ***********************************************************/
-    static inline bool is_size_dependent (SyncFileItem &item) {
+    public static inline bool is_size_dependent (SyncFileItem &item) {
         return !item.is_directory ()
             && (item._instruction == CSYNC_INSTRUCTION_CONFLICT
                 || item._instruction == CSYNC_INSTRUCTION_SYNC
@@ -109,7 +109,7 @@ public:
     /***********************************************************
     Holds estimates about progress, returned to the user.
     ***********************************************************/
-    struct Estimates {
+    public struct Estimates {
         /// Estimated completion amount per second. (of bytes or files)
         int64 estimated_bandwidth;
 
@@ -121,7 +121,7 @@ public:
     Holds the current state of something making progress and maintains an
     estimate of the current progress per second.
     ***********************************************************/
-    struct Progress {
+    public struct Progress {
         /***********************************************************
         Returns the estimates about progress per second and eta.
         ***********************************************************/
@@ -130,31 +130,31 @@ public:
         int64 completed ();
         int64 remaining ();
 
-    private:
+
         /***********************************************************
         Update the exponential moving average estimate of _progress_per_sec.
         ***********************************************************/
-        void update ();
+        private void update ();
 
         /***********************************************************
         Changes the _completed value and does sanity checks on
         _prev_completed and _total.
         ***********************************************************/
-        void set_completed (int64 completed);
+        private void set_completed (int64 completed);
 
         // Updated by update ()
-        double _progress_per_sec = 0;
-        int64 _prev_completed = 0;
+        private double _progress_per_sec = 0;
+        private int64 _prev_completed = 0;
 
         // Used to get to a good value faster when
         // progress measurement stats. See update ().
-        double _initial_smoothing = 1.0;
+        private double _initial_smoothing = 1.0;
 
         // Set and updated by ProgressInfo
-        int64 _completed = 0;
-        int64 _total = 0;
+        private int64 _completed = 0;
+        private int64 _total = 0;
 
-        friend class ProgressInfo;
+        private friend class ProgressInfo;
     };
 
     Status _status;
@@ -199,32 +199,32 @@ public:
     /***********************************************************
     Get the current file completion estimate structure
     ***********************************************************/
-    Estimates file_progress (SyncFileItem &item) const;
+    Estimates file_progress (SyncFileItem &item);
 
-private slots:
+
     /***********************************************************
     Called every second once started, this function updates the
     estimates.
     ***********************************************************/
-    void update_estimates ();
+    private void on_update_estimates ();
 
-private:
-    // Sets the completed size by summing finished jobs with the progress
+
+    // Sets the completed size by summing on_finished jobs with the progress
     // of active ones.
-    void recompute_completed_size ();
+    private void recompute_completed_size ();
 
     // Triggers the update () slot every second once propagation started.
-    QTimer _update_estimates_timer;
+    private QTimer _update_estimates_timer;
 
-    Progress _size_progress;
-    Progress _file_progress;
+    private Progress _size_progress;
+    private Progress _file_progress;
 
     // All size from completed jobs only.
-    int64 _total_size_of_completed_jobs;
+    private int64 _total_size_of_completed_jobs;
 
     // The fastest observed rate of files per second in this sync.
-    double _max_files_per_second;
-    double _max_bytes_per_second;
+    private double _max_files_per_second;
+    private double _max_bytes_per_second;
 };
 
 namespace Progress {
@@ -259,8 +259,8 @@ or the overall sync progress.
 class Progress_dispatcher : GLib.Object {
 
     friend class Folder; // only allow Folder class to access the setting slots.
-public:
-    static Progress_dispatcher *instance ();
+
+    public static Progress_dispatcher *instance ();
     ~Progress_dispatcher () override;
 
 signals:
@@ -271,16 +271,16 @@ signals:
       @param[out]  progress   A struct with all progress info.
 
     ***********************************************************/
-    void progress_info (string &folder, ProgressInfo &progress);
+    void progress_info (string folder, ProgressInfo &progress);
     /***********************************************************
     @brief : the item was completed by a job
     ***********************************************************/
-    void item_completed (string &folder, SyncFileItemPtr &item);
+    void item_completed (string folder, SyncFileItemPtr &item);
 
     /***********************************************************
     @brief A new folder-wide sync error was seen.
     ***********************************************************/
-    void sync_error (string &folder, string &message, ErrorCategory category);
+    void sync_error (string folder, string message, ErrorCategory category);
 
     /***********************************************************
     @brief Emitted when an error needs to be added into GUI
@@ -289,21 +289,21 @@ signals:
     @param[out] full error message
     @param[out] subject (optional)
     ***********************************************************/
-    void add_error_to_gui (string &folder, SyncFileItem.Status status, string &error_message, string &subject);
+    void add_error_to_gui (string folder, SyncFileItem.Status status, string error_message, string subject);
 
     /***********************************************************
     @brief Emitted for a folder when a sync is done, listing all pending conflicts
     ***********************************************************/
-    void folder_conflicts (string &folder, QStringList &conflict_paths);
+    void folder_conflicts (string folder, string[] &conflict_paths);
 
-protected:
-    void set_progress_info (string &folder, ProgressInfo &progress);
 
-private:
-    Progress_dispatcher (GLib.Object *parent = nullptr);
+    protected void set_progress_info (string folder, ProgressInfo &progress);
 
-    QElapsedTimer _timer;
-    static Progress_dispatcher *_instance;
+
+    private Progress_dispatcher (GLib.Object *parent = nullptr);
+
+    private QElapsedTimer _timer;
+    private static Progress_dispatcher _instance;
 };
 
     Progress_dispatcher *Progress_dispatcher._instance = nullptr;
@@ -400,7 +400,7 @@ private:
 
     Progress_dispatcher.~Progress_dispatcher () = default;
 
-    void Progress_dispatcher.set_progress_info (string &folder, ProgressInfo &progress) {
+    void Progress_dispatcher.set_progress_info (string folder, ProgressInfo &progress) {
         if (folder.is_empty ())
         // The update phase now also has progress
         //            (progress._current_items.size () == 0
@@ -411,11 +411,11 @@ private:
     }
 
     ProgressInfo.ProgressInfo () {
-        connect (&_update_estimates_timer, &QTimer.timeout, this, &ProgressInfo.update_estimates);
-        reset ();
+        connect (&_update_estimates_timer, &QTimer.timeout, this, &ProgressInfo.on_update_estimates);
+        on_reset ();
     }
 
-    void ProgressInfo.reset () {
+    void ProgressInfo.on_reset () {
         _status = Starting;
 
         _current_items.clear ();
@@ -439,7 +439,7 @@ private:
     }
 
     void ProgressInfo.start_estimate_updates () {
-        _update_estimates_timer.start (1000);
+        _update_estimates_timer.on_start (1000);
     }
 
     bool ProgressInfo.is_updating_estimates () {
@@ -595,7 +595,7 @@ private:
         return _current_items[item._file]._progress.estimates ();
     }
 
-    void ProgressInfo.update_estimates () {
+    void ProgressInfo.on_update_estimates () {
         _size_progress.update ();
         _file_progress.update ();
 

@@ -39,7 +39,7 @@ class Access_manager_factory : QQml_network_access_manager_factory {
 
 #ifdef Q_OS_OSX
 bool can_os_x_send_user_notification ();
-void send_os_xUser_notification (string &title, string &message);
+void send_os_xUser_notification (string title, string message);
 void set_tray_window_level_and_visible_on_all_spaces (QWindow *window);
 #endif
 
@@ -54,7 +54,7 @@ class Systray
     Q_PROPERTY (bool use_normal_window READ use_normal_window CONSTANT)
 
     public static Systray *instance ();
-    public ~Systray () override = default;
+    ~Systray () override = default;
 
     public enum class Task_bar_position {
         Bottom,
@@ -65,8 +65,8 @@ class Systray
 
     public void set_tray_engine (QQml_application_engine *tray_engine);
     public void create ();
-    public void show_message (string &title, string &message, Message_icon icon = Information);
-    public void set_tool_tip (string &tip);
+    public void show_message (string title, string message, Message_icon icon = Information);
+    public void set_tool_tip (string tip);
     public bool is_open ();
     public string window_title ();
     public bool use_normal_window ();
@@ -75,8 +75,8 @@ class Systray
     public Q_INVOKABLE bool sync_is_paused ();
     public Q_INVOKABLE void set_opened ();
     public Q_INVOKABLE void set_closed ();
-    public Q_INVOKABLE void position_window (QQuick_window *window) const;
-    public Q_INVOKABLE void force_window_init (QQuick_window *window) const;
+    public Q_INVOKABLE void position_window (QQuick_window *window);
+    public Q_INVOKABLE void force_window_init (QQuick_window *window);
 
 signals:
     void current_user_changed ();
@@ -88,35 +88,35 @@ signals:
 
     void hide_window ();
     void show_window ();
-    void open_share_dialog (string &share_path, string &local_path);
-    void show_file_activity_dialog (string &share_path, string &local_path);
+    void open_share_dialog (string share_path, string local_path);
+    void show_file_activity_dialog (string share_path, string local_path);
 
-public slots:
-    void slot_new_user_selected ();
 
-private slots:
-    void slot_unpause_all_folders ();
-    void slot_pause_all_folders ();
+    public void on_new_user_selected ();
 
-private:
-    void set_pause_on_all_folders_helper (bool pause);
 
-    static Systray *_instance;
-    Systray ();
+    private void on_unpause_all_folders ();
+    private void on_pause_all_folders ();
 
-    QScreen *current_screen ();
-    QRect current_screen_rect ();
-    QPoint compute_window_reference_point ();
-    QPoint calc_tray_icon_center ();
-    Task_bar_position taskbar_orientation ();
-    QRect taskbar_geometry ();
-    QPoint compute_window_position (int width, int height) const;
 
-    bool _is_open = false;
-    bool _sync_is_paused = true;
-    QPointer<QQml_application_engine> _tray_engine;
+    private void set_pause_on_all_folders_helper (bool pause);
 
-    Access_manager_factory _access_manager_factory;
+    private static Systray _instance;
+    private Systray ();
+
+    private QScreen *current_screen ();
+    private QRect current_screen_rect ();
+    private QPoint compute_window_reference_point ();
+    private QPoint calc_tray_icon_center ();
+    private Task_bar_position taskbar_orientation ();
+    private QRect taskbar_geometry ();
+    private QPoint compute_window_position (int width, int height);
+
+    private bool _is_open = false;
+    private bool _sync_is_paused = true;
+    private QPointer<QQml_application_engine> _tray_engine;
+
+    private Access_manager_factory _access_manager_factory;
 };
 
 
@@ -175,8 +175,8 @@ Systray.Systray ()
         context_menu.add_action (tr ("Open main dialog"), this, &Systray.open_main_dialog);
     }
 
-    auto pause_action = context_menu.add_action (tr ("Pause sync"), this, &Systray.slot_pause_all_folders);
-    auto resume_action = context_menu.add_action (tr ("Resume sync"), this, &Systray.slot_unpause_all_folders);
+    auto pause_action = context_menu.add_action (tr ("Pause sync"), this, &Systray.on_pause_all_folders);
+    auto resume_action = context_menu.add_action (tr ("Resume sync"), this, &Systray.on_unpause_all_folders);
     context_menu.add_action (tr ("Settings"), this, &Systray.open_settings);
     context_menu.add_action (tr ("Exit %1").arg (Theme.instance ().app_name_g_u_i ()), this, &Systray.shutdown);
     set_context_menu (context_menu);
@@ -188,7 +188,7 @@ Systray.Systray ()
             return f.sync_paused ();
         });
         const auto pause_text = folders.size () > 1 ? tr ("Pause sync for all") : tr ("Pause sync");
-        pause_action.set_text (pause_text);
+        pause_action.on_set_text (pause_text);
         pause_action.set_visible (!all_paused);
         pause_action.set_enabled (!all_paused);
 
@@ -196,17 +196,17 @@ Systray.Systray ()
             return f.sync_paused ();
         });
         const auto resume_text = folders.size () > 1 ? tr ("Resume sync for all") : tr ("Resume sync");
-        resume_action.set_text (resume_text);
+        resume_action.on_set_text (resume_text);
         resume_action.set_visible (any_paused);
         resume_action.set_enabled (any_paused);
     });
 
     connect (User_model.instance (), &User_model.new_user_selected,
-        this, &Systray.slot_new_user_selected);
+        this, &Systray.on_new_user_selected);
     connect (User_model.instance (), &User_model.add_account,
             this, &Systray.open_account_wizard);
 
-    connect (AccountManager.instance (), &AccountManager.account_added,
+    connect (AccountManager.instance (), &AccountManager.on_account_added,
         this, &Systray.show_window);
 }
 
@@ -215,7 +215,7 @@ void Systray.create () {
         if (!AccountManager.instance ().accounts ().is_empty ()) {
             _tray_engine.root_context ().set_context_property ("activity_model", User_model.instance ().current_activity_model ());
         }
-        _tray_engine.load (QStringLiteral ("qrc:/qml/src/gui/tray/Window.qml"));
+        _tray_engine.on_load (QStringLiteral ("qrc:/qml/src/gui/tray/Window.qml"));
     }
     hide_window ();
     emit activated (QSystemTrayIcon.Activation_reason.Unknown);
@@ -229,7 +229,7 @@ void Systray.create () {
     }
 }
 
-void Systray.slot_new_user_selected () {
+void Systray.on_new_user_selected () {
     if (_tray_engine) {
         // Change Activity_model
         _tray_engine.root_context ().set_context_property ("activity_model", User_model.instance ().current_activity_model ());
@@ -239,11 +239,11 @@ void Systray.slot_new_user_selected () {
     User_apps_model.instance ().build_app_list ();
 }
 
-void Systray.slot_unpause_all_folders () {
+void Systray.on_unpause_all_folders () {
     set_pause_on_all_folders_helper (false);
 }
 
-void Systray.slot_pause_all_folders () {
+void Systray.on_pause_all_folders () {
     set_pause_on_all_folders_helper (true);
 }
 
@@ -253,7 +253,7 @@ void Systray.set_pause_on_all_folders_helper (bool pause) {
     // later on...
     const auto accounts = [=] {
         const auto ptr_list = AccountManager.instance ().accounts ();
-        auto result = QList<AccountState> ();
+        auto result = GLib.List<AccountState> ();
         result.reserve (ptr_list.size ());
         std.transform (std.cbegin (ptr_list), std.cend (ptr_list), std.back_inserter (result), [] (AccountStatePtr &account) {
             return account.data ();
@@ -265,7 +265,7 @@ void Systray.set_pause_on_all_folders_helper (bool pause) {
         if (accounts.contains (f.account_state ())) {
             f.set_sync_paused (pause);
             if (pause) {
-                f.slot_terminate_sync ();
+                f.on_terminate_sync ();
             }
         }
     }
@@ -296,12 +296,12 @@ Q_INVOKABLE void Systray.set_closed () {
     _is_open = false;
 }
 
-void Systray.show_message (string &title, string &message, Message_icon icon) {
+void Systray.show_message (string title, string message, Message_icon icon) {
 #ifdef USE_FDO_NOTIFICATIONS
     if (QDBus_interface (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE).is_valid ()) {
         const QVariantMap hints = {{QStringLiteral ("desktop-entry"), LINUX_APPLICATION_ID}};
-        QList<QVariant> args = QList<QVariant> () << APPLICATION_NAME << uint32 (0) << APPLICATION_ICON_NAME
-                                                 << title << message << QStringList () << hints << int32 (-1);
+        GLib.List<QVariant> args = GLib.List<QVariant> () << APPLICATION_NAME << uint32 (0) << APPLICATION_ICON_NAME
+                                                 << title << message << string[] () << hints << int32 (-1);
         QDBus_message method = QDBus_message.create_method_call (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE, "Notify");
         method.set_arguments (args);
         QDBus_connection.session_bus ().async_call (method);
@@ -316,7 +316,7 @@ void Systray.show_message (string &title, string &message, Message_icon icon) {
     }
 }
 
-void Systray.set_tool_tip (string &tip) {
+void Systray.set_tool_tip (string tip) {
     QSystemTrayIcon.set_tool_tip (tr ("%1 : %2").arg (Theme.instance ().app_name_g_u_i (), tip));
 }
 
@@ -327,10 +327,10 @@ bool Systray.sync_is_paused () {
 void Systray.pause_resume_sync () {
     if (_sync_is_paused) {
         _sync_is_paused = false;
-        slot_unpause_all_folders ();
+        on_unpause_all_folders ();
     } else {
         _sync_is_paused = true;
-        slot_pause_all_folders ();
+        on_pause_all_folders ();
     }
 }
 

@@ -27,9 +27,7 @@ we the user choose to remove all files SyncJournalDb.clearFileTable makes works 
 ***********************************************************/
 class TestAllFilesDeleted : GLib.Object {
 
-private slots:
-
-    void testAllFilesDeletedKeep_data () {
+    private on_ void testAllFilesDeletedKeep_data () {
         QTest.addColumn<bool> ("deleteOnRemote");
         QTest.newRow ("local") << false;
         QTest.newRow ("remote") << true;
@@ -40,7 +38,7 @@ private slots:
      * In this test, all files are deleted in the client, or the server, and we simulate
      * that the users press "keep"
      */
-    void testAllFilesDeletedKeep () {
+    private on_ void testAllFilesDeletedKeep () {
         QFETCH (bool, deleteOnRemote);
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         ConfigFile config;
@@ -48,7 +46,7 @@ private slots:
 
         //Just set a blacklist so we can check it is still there. This directory does not exists but
         // that does not matter for our purposes.
-        QStringList selectiveSyncBlackList = { "Q/" };
+        string[] selectiveSyncBlackList = { "Q/" };
         fakeFolder.syncEngine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncBlackList,
                                                                 selectiveSyncBlackList);
 
@@ -81,14 +79,14 @@ private slots:
                  selectiveSyncBlackList);
     }
 
-    void testAllFilesDeletedDelete_data () {
+    private on_ void testAllFilesDeletedDelete_data () {
         testAllFilesDeletedKeep_data ();
     }
 
     /***********************************************************
      * This test is like the previous one but we simulate that the user presses "delete"
      */
-    void testAllFilesDeletedDelete () {
+    private on_ void testAllFilesDeletedDelete () {
         QFETCH (bool, deleteOnRemote);
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
 
@@ -119,7 +117,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState ().children.count (), 0);
     }
 
-    void testNotDeleteMetaDataChange () {
+    private on_ void testNotDeleteMetaDataChange () {
         /***********************************************************
          * This test make sure that we don't popup a file deleted message if all the metadata have
          * been updated (for example when the server is upgraded or something)
@@ -147,7 +145,7 @@ private slots:
         QCOMPARE (fakeFolder.currentRemoteState (), expectedState);
     }
 
-    void testResetServer () {
+    private on_ void testResetServer () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
 
         int aboutToRemoveAllFilesCalled = 0;
@@ -178,13 +176,13 @@ private slots:
 
     }
 
-    void testDataFingetPrint_data () {
+    private on_ void testDataFingetPrint_data () {
         QTest.addColumn<bool> ("hasInitialFingerPrint");
         QTest.newRow ("initial finger print") << true;
         QTest.newRow ("no initial finger print") << false;
     }
 
-    void testDataFingetPrint () {
+    private on_ void testDataFingetPrint () {
         QFETCH (bool, hasInitialFingerPrint);
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         fakeFolder.remoteModifier ().setContents ("C/c1", 'N');
@@ -265,7 +263,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void testSingleFileRenamed () {
+    private on_ void testSingleFileRenamed () {
         FakeFolder fakeFolder{FileInfo{}};
 
         int aboutToRemoveAllFilesCalled = 0;
@@ -289,7 +287,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void testSelectiveSyncNoPopup () {
+    private on_ void testSelectiveSyncNoPopup () {
         // Unselecting all folder should not cause the popup to be shown
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
 
@@ -305,7 +303,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
         fakeFolder.syncEngine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncBlackList,
-            QStringList () << "A/" << "B/" << "C/" << "S/");
+            string[] () << "A/" << "B/" << "C/" << "S/");
 
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), FileInfo{}); // all files should be one localy

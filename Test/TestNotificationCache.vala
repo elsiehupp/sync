@@ -2,14 +2,13 @@
 
 class TestNotificationCache : GLib.Object {
 
-private slots:
-    void testContains_doesNotContainNotification_returnsFalse () {
+    private on_ void testContains_doesNotContainNotification_returnsFalse () {
         Occ.NotificationCache notificationCache;
 
         QVERIFY (!notificationCache.contains ({ "Title", { "Message" } }));
     }
 
-    void testContains_doesContainNotification_returnTrue () {
+    private on_ void testContains_doesContainNotification_returnTrue () {
         Occ.NotificationCache notificationCache;
         const Occ.NotificationCache.Notification notification { "Title", "message" };
 
@@ -18,7 +17,7 @@ private slots:
         QVERIFY (notificationCache.contains (notification));
     }
 
-    void testClear_doesContainNotification_clearNotifications () {
+    private on_ void testClear_doesContainNotification_clearNotifications () {
         Occ.NotificationCache notificationCache;
         const Occ.NotificationCache.Notification notification { "Title", "message" };
 
@@ -30,4 +29,3 @@ private slots:
 };
 
 QTEST_GUILESS_MAIN (TestNotificationCache)
-#include "testnotificationcache.moc"

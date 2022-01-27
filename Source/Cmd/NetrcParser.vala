@@ -24,15 +24,15 @@ class NetrcParser {
 
     public using Login_pair = QPair<string, string>;
 
-    public NetrcParser (string &file = string ());
+    public NetrcParser (string file = string ());
     public bool parse ();
-    public Login_pair find (string &machine);
+    public Login_pair find (string machine);
 
-private:
-    void try_add_entry_and_clear (string &machine, Login_pair &pair, bool &is_default);
-    QHash<string, Login_pair> _entries;
-    Login_pair _default;
-    string _netrc_location;
+
+    private void try_add_entry_and_clear (string machine, Login_pair &pair, bool &is_default);
+    private QHash<string, Login_pair> _entries;
+    private Login_pair _default;
+    private string _netrc_location;
 };
 
 
@@ -44,14 +44,14 @@ private:
         string password_keyword = QLatin1String ("password");
     }
 
-    NetrcParser.NetrcParser (string &file) {
+    NetrcParser.NetrcParser (string file) {
         _netrc_location = file;
         if (_netrc_location.is_empty ()) {
             _netrc_location = QDir.home_path () + QLatin1String ("/.netrc");
         }
     }
 
-    void NetrcParser.try_add_entry_and_clear (string &machine, Login_pair &pair, bool &is_default) {
+    void NetrcParser.try_add_entry_and_clear (string machine, Login_pair &pair, bool &is_default) {
         if (is_default) {
             _default = pair;
         } else if (!machine.is_empty () && !pair.first.is_empty ()) {
@@ -107,7 +107,7 @@ private:
         }
     }
 
-    NetrcParser.Login_pair NetrcParser.find (string &machine) {
+    NetrcParser.Login_pair NetrcParser.find (string machine) {
         QHash<string, Login_pair>.Const_iterator it = _entries.find (machine);
         if (it != _entries.end ()) {
             return *it;

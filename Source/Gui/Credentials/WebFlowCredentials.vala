@@ -41,18 +41,18 @@ class WebFlowCredentials : AbstractCredentials {
 
     public WebFlowCredentials ();
     public WebFlowCredentials (
-            const string &user,
-            const string &password,
+            const string user,
+            const string password,
             const QSslCertificate &certificate = QSslCertificate (),
             const QSslKey &key = QSslKey (),
-            const QList<QSslCertificate> &ca_certificates = QList<QSslCertificate> ());
+            const GLib.List<QSslCertificate> &ca_certificates = GLib.List<QSslCertificate> ());
 
-    public string auth_type () const override;
-    public string user () const override;
-    public string password () const override;
-    public QNetworkAccessManager *create_qNAM () const override;
+    public string auth_type () override;
+    public string user () override;
+    public string password () override;
+    public QNetworkAccessManager *create_qNAM () override;
 
-    public bool ready () const override;
+    public bool ready () override;
 
     public void fetch_from_keychain () override;
     public void ask_from_user () override;
@@ -65,32 +65,32 @@ class WebFlowCredentials : AbstractCredentials {
     // To fetch the user name as early as possible
     public void set_account (Account *account) override;
 
-private slots:
-    void slot_authentication (QNetworkReply *reply, QAuthenticator *authenticator);
-    void slot_finished (QNetworkReply *reply);
 
-    void slot_ask_from_user_credentials_provided (string &user, string &pass, string &host);
-    void slot_ask_from_user_cancelled ();
+    private void on_authentication (QNetworkReply *reply, QAuthenticator *authenticator);
+    private void on_finished (QNetworkReply *reply);
 
-    void slot_read_client_cert_pem_job_done (KeychainChunk.ReadJob *read_job);
-    void slot_read_client_key_pem_job_done (KeychainChunk.ReadJob *read_job);
-    void slot_read_client_ca_certs_pem_job_done (KeychainChunk.ReadJob *read_job);
-    void slot_read_password_job_done (QKeychain.Job *incoming_job);
+    private void on_ask_from_user_credentials_provided (string user, string pass, string host);
+    private void on_ask_from_user_cancelled ();
 
-    void slot_write_client_cert_pem_job_done (KeychainChunk.WriteJob *write_job);
-    void slot_write_client_key_pem_job_done (KeychainChunk.WriteJob *write_job);
-    void slot_write_client_ca_certs_pem_job_done (KeychainChunk.WriteJob *write_job);
-    void slot_write_job_done (QKeychain.Job *);
+    private void on_read_client_cert_pem_job_done (KeychainChunk.ReadJob *read_job);
+    private void on_read_client_key_pem_job_done (KeychainChunk.ReadJob *read_job);
+    private void on_read_client_ca_certs_pem_job_done (KeychainChunk.ReadJob *read_job);
+    private void on_read_password_job_done (QKeychain.Job *incoming_job);
 
-private:
+    private void on_write_client_cert_pem_job_done (KeychainChunk.WriteJob *write_job);
+    private void on_write_client_key_pem_job_done (KeychainChunk.WriteJob *write_job);
+    private void on_write_client_ca_certs_pem_job_done (KeychainChunk.WriteJob *write_job);
+    private void on_write_job_done (QKeychain.Job *);
+
+
     /***********************************************************
     Windows : Workaround for CredWriteW used by QtKeychain
 
              Saving all client CA's within one credential may result in:
              Error : "Credential size exceeds maximum size of 2560"
     ***********************************************************/
-    void read_single_client_ca_cert_pem ();
-    void write_single_client_ca_cert_pem ();
+    private void read_single_client_ca_cert_pem ();
+    private void write_single_client_ca_cert_pem ();
 
     /***********************************************************
     Since we're limited by Windows limits, we just create our own
@@ -98,37 +98,37 @@ private:
 
     Better than storing the count and relying on maybe-hacked values
     ***********************************************************/
-    static constexpr int _client_ssl_ca_certificates_max_count = 10;
-    QQueue<QSslCertificate> _client_ssl_ca_certificates_write_queue;
+    private static constexpr int _client_ssl_ca_certificates_max_count = 10;
+    private QQueue<QSslCertificate> _client_ssl_ca_certificates_write_queue;
 
-protected:
+
     /***********************************************************
     Reads data from keychain locations
 
     Goes through
-      slot_read_client_cert_pem_job_done to
-      slot_read_client_key_pem_job_done to
-      slot_read_client_ca_certs_pem_job_done to
-      slot_read_job_done
+      on_read_client_cert_pem_job_done to
+      on_read_client_key_pem_job_done to
+      on_read_client_ca_certs_pem_job_done to
+      on_read_job_done
     ***********************************************************/
-    void fetch_from_keychain_helper ();
+    protected void fetch_from_keychain_helper ();
 
     /// Wipes legacy keychain locations
-    void delete_keychain_entries (bool old_keychain_entries = false);
+    protected void delete_keychain_entries (bool old_keychain_entries = false);
 
-    string fetch_user ();
+    protected string fetch_user ();
 
-    string _user;
-    string _password;
-    QSslKey _client_ssl_key;
-    QSslCertificate _client_ssl_certificate;
-    QList<QSslCertificate> _client_ssl_ca_certificates;
+    protected string _user;
+    protected string _password;
+    protected QSslKey _client_ssl_key;
+    protected QSslCertificate _client_ssl_certificate;
+    protected GLib.List<QSslCertificate> _client_ssl_ca_certificates;
 
-    bool _ready = false;
-    bool _credentials_valid = false;
-    bool _keychain_migration = false;
+    protected bool _ready = false;
+    protected bool _credentials_valid = false;
+    protected bool _keychain_migration = false;
 
-    WebFlowCredentialsDialog *_ask_dialog = nullptr;
+    protected WebFlowCredentialsDialog _ask_dialog = nullptr;
 };
 
 
@@ -148,12 +148,12 @@ class WebFlowCredentialsAccessManager : AccessManager {
         , _cred (cred) {
     }
 
-protected:
-    QNetworkReply *create_request (Operation op, QNetworkRequest &request, QIODevice *outgoing_data) override {
+
+    protected QNetworkReply *create_request (Operation op, QNetworkRequest &request, QIODevice *outgoing_data) override {
         QNetworkRequest req (request);
         if (!req.attribute (WebFlowCredentials.DontAddCredentialsAttribute).to_bool ()) {
             if (_cred && !_cred.password ().is_empty ()) {
-                QByteArray cred_hash = QByteArray (_cred.user ().to_utf8 () + ":" + _cred.password ().to_utf8 ()).to_base64 ();
+                GLib.ByteArray cred_hash = GLib.ByteArray (_cred.user ().to_utf8 () + ":" + _cred.password ().to_utf8 ()).to_base64 ();
                 req.set_raw_header ("Authorization", "Basic " + cred_hash);
             }
         }
@@ -175,10 +175,10 @@ protected:
         return AccessManager.create_request (op, req, outgoing_data);
     }
 
-private:
+
     // The credentials object dies along with the account, while the QNAM might
     // outlive both.
-    QPointer<const WebFlowCredentials> _cred;
+    private QPointer<const WebFlowCredentials> _cred;
 };
 
 #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
@@ -192,7 +192,7 @@ static void add_settings_to_job (Account *account, QKeychain.Job *job) {
 
 WebFlowCredentials.WebFlowCredentials () = default;
 
-WebFlowCredentials.WebFlowCredentials (string &user, string &password, QSslCertificate &certificate, QSslKey &key, QList<QSslCertificate> &ca_certificates)
+WebFlowCredentials.WebFlowCredentials (string user, string password, QSslCertificate &certificate, QSslKey &key, GLib.List<QSslCertificate> &ca_certificates)
     : _user (user)
     , _password (password)
     , _client_ssl_key (key)
@@ -219,8 +219,8 @@ QNetworkAccessManager *WebFlowCredentials.create_qNAM () {
     q_c_info (lc_web_flow_credentials ()) << "Get QNAM";
     AccessManager *qnam = new WebFlowCredentialsAccessManager (this);
 
-    connect (qnam, &AccessManager.authentication_required, this, &WebFlowCredentials.slot_authentication);
-    connect (qnam, &AccessManager.finished, this, &WebFlowCredentials.slot_finished);
+    connect (qnam, &AccessManager.authentication_required, this, &WebFlowCredentials.on_authentication);
+    connect (qnam, &AccessManager.on_finished, this, &WebFlowCredentials.on_finished);
 
     return qnam;
 }
@@ -270,15 +270,15 @@ void WebFlowCredentials.ask_from_user () {
 
         _ask_dialog.show ();
 
-        connect (_ask_dialog, &WebFlowCredentialsDialog.url_catched, this, &WebFlowCredentials.slot_ask_from_user_credentials_provided);
-        connect (_ask_dialog, &WebFlowCredentialsDialog.on_close, this, &WebFlowCredentials.slot_ask_from_user_cancelled);
+        connect (_ask_dialog, &WebFlowCredentialsDialog.on_url_catched, this, &WebFlowCredentials.on_ask_from_user_credentials_provided);
+        connect (_ask_dialog, &WebFlowCredentialsDialog.on_close, this, &WebFlowCredentials.on_ask_from_user_cancelled);
     });
-    job.start ();
+    job.on_start ();
 
     q_c_debug (lc_web_flow_credentials ()) << "User needs to reauth!";
 }
 
-void WebFlowCredentials.slot_ask_from_user_credentials_provided (string &user, string &pass, string &host) {
+void WebFlowCredentials.on_ask_from_user_credentials_provided (string user, string pass, string host) {
     Q_UNUSED (host)
 
     // Compare the re-entered username case-insensitive and save the new value (avoid breaking the account)
@@ -315,7 +315,7 @@ void WebFlowCredentials.slot_ask_from_user_credentials_provided (string &user, s
     _ask_dialog = nullptr;
 }
 
-void WebFlowCredentials.slot_ask_from_user_cancelled () {
+void WebFlowCredentials.on_ask_from_user_cancelled () {
     q_c_debug (lc_web_flow_credentials ()) << "User cancelled reauth!";
 
     emit asked ();
@@ -347,15 +347,15 @@ void WebFlowCredentials.persist () {
                                                _user + client_certificate_pemC,
                                                _client_ssl_certificate.to_pem (),
                                                this);
-        connect (job, &KeychainChunk.WriteJob.finished, this, &WebFlowCredentials.slot_write_client_cert_pem_job_done);
-        job.start ();
+        connect (job, &KeychainChunk.WriteJob.on_finished, this, &WebFlowCredentials.on_write_client_cert_pem_job_done);
+        job.on_start ();
     } else {
         // no cert, just write credentials
-        slot_write_client_cert_pem_job_done (nullptr);
+        on_write_client_cert_pem_job_done (nullptr);
     }
 }
 
-void WebFlowCredentials.slot_write_client_cert_pem_job_done (KeychainChunk.WriteJob *write_job) {
+void WebFlowCredentials.on_write_client_cert_pem_job_done (KeychainChunk.WriteJob *write_job) {
     Q_UNUSED (write_job)
     // write ssl key if there is one
     if (!_client_ssl_key.is_null ()) {
@@ -363,11 +363,11 @@ void WebFlowCredentials.slot_write_client_cert_pem_job_done (KeychainChunk.Write
                                                _user + client_key_pemC,
                                                _client_ssl_key.to_pem (),
                                                this);
-        connect (job, &KeychainChunk.WriteJob.finished, this, &WebFlowCredentials.slot_write_client_key_pem_job_done);
-        job.start ();
+        connect (job, &KeychainChunk.WriteJob.on_finished, this, &WebFlowCredentials.on_write_client_key_pem_job_done);
+        job.on_start ();
     } else {
         // no key, just write credentials
-        slot_write_client_key_pem_job_done (nullptr);
+        on_write_client_key_pem_job_done (nullptr);
     }
 }
 
@@ -385,7 +385,7 @@ void WebFlowCredentials.write_single_client_ca_cert_pem () {
 
             _client_ssl_ca_certificates_write_queue.clear ();
 
-            slot_write_client_ca_certs_pem_job_done (nullptr);
+            on_write_client_ca_certs_pem_job_done (nullptr);
             return;
         }
 
@@ -393,14 +393,14 @@ void WebFlowCredentials.write_single_client_ca_cert_pem () {
                                                _user + client_ca_certificate_pemC + string.number (index),
                                                cert.to_pem (),
                                                this);
-        connect (job, &KeychainChunk.WriteJob.finished, this, &WebFlowCredentials.slot_write_client_ca_certs_pem_job_done);
-        job.start ();
+        connect (job, &KeychainChunk.WriteJob.on_finished, this, &WebFlowCredentials.on_write_client_ca_certs_pem_job_done);
+        job.on_start ();
     } else {
-        slot_write_client_ca_certs_pem_job_done (nullptr);
+        on_write_client_ca_certs_pem_job_done (nullptr);
     }
 }
 
-void WebFlowCredentials.slot_write_client_key_pem_job_done (KeychainChunk.WriteJob *write_job) {
+void WebFlowCredentials.on_write_client_key_pem_job_done (KeychainChunk.WriteJob *write_job) {
     Q_UNUSED (write_job)
     _client_ssl_ca_certificates_write_queue.clear ();
 
@@ -412,11 +412,11 @@ void WebFlowCredentials.slot_write_client_key_pem_job_done (KeychainChunk.WriteJ
         // first ca cert
         write_single_client_ca_cert_pem ();
     } else {
-        slot_write_client_ca_certs_pem_job_done (nullptr);
+        on_write_client_ca_certs_pem_job_done (nullptr);
     }
 }
 
-void WebFlowCredentials.slot_write_client_ca_certs_pem_job_done (KeychainChunk.WriteJob *write_job) {
+void WebFlowCredentials.on_write_client_ca_certs_pem_job_done (KeychainChunk.WriteJob *write_job) {
     // errors / next ca cert?
     if (write_job && !_client_ssl_ca_certificates.is_empty ()) {
         if (write_job.error () != NoError) {
@@ -436,13 +436,13 @@ void WebFlowCredentials.slot_write_client_ca_certs_pem_job_done (KeychainChunk.W
     add_settings_to_job (_account, job);
 #endif
     job.set_insecure_fallback (false);
-    connect (job, &Job.finished, this, &WebFlowCredentials.slot_write_job_done);
+    connect (job, &Job.on_finished, this, &WebFlowCredentials.on_write_job_done);
     job.set_key (keychain_key (_account.url ().to_string (), _user, _account.id ()));
     job.set_text_data (_password);
-    job.start ();
+    job.on_start ();
 }
 
-void WebFlowCredentials.slot_write_job_done (QKeychain.Job *job) {
+void WebFlowCredentials.on_write_job_done (QKeychain.Job *job) {
     delete job.settings ();
     switch (job.error ()) {
     case NoError:
@@ -461,7 +461,7 @@ void WebFlowCredentials.invalidate_token () {
     // indirectly) from QNetworkAccessManagerPrivate.authentication_required, which itself
     // is a called from a BlockingQueuedConnection from the Qt HTTP thread. And clearing the
     // cache needs to synchronize again with the HTTP thread.
-    QTimer.single_shot (0, _account, &Account.clear_qNAMCache);
+    QTimer.single_shot (0, _account, &Account.on_clear_qnam_cache);
 }
 
 void WebFlowCredentials.forget_sensitive_data () {
@@ -481,7 +481,7 @@ void WebFlowCredentials.forget_sensitive_data () {
     auto job = new DeletePasswordJob (Theme.instance ().app_name (), this);
     job.set_insecure_fallback (false);
     job.set_key (kck);
-    job.start ();
+    job.on_start ();
 
     invalidate_token ();
 
@@ -500,7 +500,7 @@ string WebFlowCredentials.fetch_user () {
     return _user;
 }
 
-void WebFlowCredentials.slot_authentication (QNetworkReply *reply, QAuthenticator *authenticator) {
+void WebFlowCredentials.on_authentication (QNetworkReply *reply, QAuthenticator *authenticator) {
     Q_UNUSED (reply)
 
     if (!_ready) {
@@ -518,8 +518,8 @@ void WebFlowCredentials.slot_authentication (QNetworkReply *reply, QAuthenticato
     _credentials_valid = false;
 }
 
-void WebFlowCredentials.slot_finished (QNetworkReply *reply) {
-    q_c_info (lc_web_flow_credentials ()) << "request finished";
+void WebFlowCredentials.on_finished (QNetworkReply *reply) {
+    q_c_info (lc_web_flow_credentials ()) << "request on_finished";
 
     if (reply.error () == QNetworkReply.NoError) {
         _credentials_valid = true;
@@ -535,14 +535,14 @@ void WebFlowCredentials.fetch_from_keychain_helper () {
                                           _user + client_certificate_pemC,
                                           _keychain_migration,
                                           this);
-    connect (job, &KeychainChunk.ReadJob.finished, this, &WebFlowCredentials.slot_read_client_cert_pem_job_done);
-    job.start ();
+    connect (job, &KeychainChunk.ReadJob.on_finished, this, &WebFlowCredentials.on_read_client_cert_pem_job_done);
+    job.on_start ();
 }
 
-void WebFlowCredentials.slot_read_client_cert_pem_job_done (KeychainChunk.ReadJob *read_job) {
+void WebFlowCredentials.on_read_client_cert_pem_job_done (KeychainChunk.ReadJob *read_job) {
     // Store PEM in memory
     if (read_job.error () == NoError && read_job.binary_data ().length () > 0) {
-        QList<QSslCertificate> ssl_certificate_list = QSslCertificate.from_data (read_job.binary_data (), QSsl.Pem);
+        GLib.List<QSslCertificate> ssl_certificate_list = QSslCertificate.from_data (read_job.binary_data (), QSsl.Pem);
         if (ssl_certificate_list.length () >= 1) {
             _client_ssl_certificate = ssl_certificate_list.at (0);
         }
@@ -553,14 +553,14 @@ void WebFlowCredentials.slot_read_client_cert_pem_job_done (KeychainChunk.ReadJo
                                           _user + client_key_pemC,
                                           _keychain_migration,
                                           this);
-    connect (job, &KeychainChunk.ReadJob.finished, this, &WebFlowCredentials.slot_read_client_key_pem_job_done);
-    job.start ();
+    connect (job, &KeychainChunk.ReadJob.on_finished, this, &WebFlowCredentials.on_read_client_key_pem_job_done);
+    job.on_start ();
 }
 
-void WebFlowCredentials.slot_read_client_key_pem_job_done (KeychainChunk.ReadJob *read_job) {
+void WebFlowCredentials.on_read_client_key_pem_job_done (KeychainChunk.ReadJob *read_job) {
     // Store key in memory
     if (read_job.error () == NoError && read_job.binary_data ().length () > 0) {
-        QByteArray client_key_pem = read_job.binary_data ();
+        GLib.ByteArray client_key_pem = read_job.binary_data ();
         // FIXME Unfortunately Qt has a bug and we can't just use QSsl.Opaque to let it
         // load whatever we have. So we try until it works.
         _client_ssl_key = QSslKey (client_key_pem, QSsl.Rsa);
@@ -591,20 +591,20 @@ void WebFlowCredentials.read_single_client_ca_cert_pem () {
                                               _user + client_ca_certificate_pemC + string.number (_client_ssl_ca_certificates.count ()),
                                               _keychain_migration,
                                               this);
-        connect (job, &KeychainChunk.ReadJob.finished, this, &WebFlowCredentials.slot_read_client_ca_certs_pem_job_done);
-        job.start ();
+        connect (job, &KeychainChunk.ReadJob.on_finished, this, &WebFlowCredentials.on_read_client_ca_certs_pem_job_done);
+        job.on_start ();
     } else {
         q_c_warning (lc_web_flow_credentials) << "Maximum client CA cert count exceeded while reading, ignoring after" << _client_ssl_ca_certificates_max_count;
 
-        slot_read_client_ca_certs_pem_job_done (nullptr);
+        on_read_client_ca_certs_pem_job_done (nullptr);
     }
 }
 
-void WebFlowCredentials.slot_read_client_ca_certs_pem_job_done (KeychainChunk.ReadJob *read_job) {
+void WebFlowCredentials.on_read_client_ca_certs_pem_job_done (KeychainChunk.ReadJob *read_job) {
     // Store cert in memory
     if (read_job) {
         if (read_job.error () == NoError && read_job.binary_data ().length () > 0) {
-            QList<QSslCertificate> ssl_certificate_list = QSslCertificate.from_data (read_job.binary_data (), QSsl.Pem);
+            GLib.List<QSslCertificate> ssl_certificate_list = QSslCertificate.from_data (read_job.binary_data (), QSsl.Pem);
             if (ssl_certificate_list.length () >= 1) {
                 _client_ssl_ca_certificates.append (ssl_certificate_list.at (0));
             }
@@ -632,11 +632,11 @@ void WebFlowCredentials.slot_read_client_ca_certs_pem_job_done (KeychainChunk.Re
 #endif
     job.set_insecure_fallback (false);
     job.set_key (kck);
-    connect (job, &Job.finished, this, &WebFlowCredentials.slot_read_password_job_done);
-    job.start ();
+    connect (job, &Job.on_finished, this, &WebFlowCredentials.on_read_password_job_done);
+    job.on_start ();
 }
 
-void WebFlowCredentials.slot_read_password_job_done (Job *incoming_job) {
+void WebFlowCredentials.on_read_password_job_done (Job *incoming_job) {
     auto job = qobject_cast<ReadPasswordJob> (incoming_job);
     QKeychain.Error error = job.error ();
 
@@ -672,7 +672,7 @@ void WebFlowCredentials.slot_read_password_job_done (Job *incoming_job) {
 void WebFlowCredentials.delete_keychain_entries (bool old_keychain_entries) {
     auto start_delete_job = [this, old_keychain_entries] (string key) {
         auto job = new KeychainChunk.DeleteJob (_account, key, old_keychain_entries, this);
-        job.start ();
+        job.on_start ();
     };
 
     start_delete_job (_user);

@@ -15,12 +15,11 @@ using namespace Occ;
 
 class TestClientSideEncryption : GLib.Object {
 
-    QByteArray convertToOldStorageFormat (QByteArray &data) {
+    GLib.ByteArray convertToOldStorageFormat (GLib.ByteArray &data) {
         return data.split ('|').join ("fA==");
     }
 
-private slots:
-    void shouldEncryptPrivateKeys () {
+    private on_ void shouldEncryptPrivateKeys () {
         // GIVEN
         const auto encryptionKey = QByteArrayLiteral ("foo");
         const auto privateKey = QByteArrayLiteral ("bar");
@@ -33,9 +32,9 @@ private slots:
         const auto parts = cipher.split ('|');
         QCOMPARE (parts.size (), 3);
 
-        const auto encryptedKey = QByteArray.fromBase64 (parts[0]);
-        const auto iv = QByteArray.fromBase64 (parts[1]);
-        const auto salt = QByteArray.fromBase64 (parts[2]);
+        const auto encryptedKey = GLib.ByteArray.fromBase64 (parts[0]);
+        const auto iv = GLib.ByteArray.fromBase64 (parts[1]);
+        const auto salt = GLib.ByteArray.fromBase64 (parts[2]);
 
         // We're not here to check the merits of the encryption but at least make sure it's been
         // somewhat ciphered
@@ -46,7 +45,7 @@ private slots:
         QCOMPARE (salt, originalSalt);
     }
 
-    void shouldDecryptPrivateKeys () {
+    private on_ void shouldDecryptPrivateKeys () {
         // GIVEN
         const auto encryptionKey = QByteArrayLiteral ("foo");
         const auto originalPrivateKey = QByteArrayLiteral ("bar");
@@ -62,7 +61,7 @@ private slots:
         QCOMPARE (salt, originalSalt);
     }
 
-    void shouldDecryptPrivateKeysInOldStorageFormat () {
+    private on_ void shouldDecryptPrivateKeysInOldStorageFormat () {
         // GIVEN
         const auto encryptionKey = QByteArrayLiteral ("foo");
         const auto originalPrivateKey = QByteArrayLiteral ("bar");
@@ -78,7 +77,7 @@ private slots:
         QCOMPARE (salt, originalSalt);
     }
 
-    void shouldSymmetricEncryptStrings () {
+    private on_ void shouldSymmetricEncryptStrings () {
         // GIVEN
         const auto encryptionKey = QByteArrayLiteral ("foo");
         const auto data = QByteArrayLiteral ("bar");
@@ -90,8 +89,8 @@ private slots:
         const auto parts = cipher.split ('|');
         QCOMPARE (parts.size (), 2);
 
-        const auto encryptedData = QByteArray.fromBase64 (parts[0]);
-        const auto iv = QByteArray.fromBase64 (parts[1]);
+        const auto encryptedData = GLib.ByteArray.fromBase64 (parts[0]);
+        const auto iv = GLib.ByteArray.fromBase64 (parts[1]);
 
         // We're not here to check the merits of the encryption but at least make sure it's been
         // somewhat ciphered
@@ -101,7 +100,7 @@ private slots:
         QVERIFY (!iv.isEmpty ());
     }
 
-    void shouldSymmetricDecryptStrings () {
+    private on_ void shouldSymmetricDecryptStrings () {
         // GIVEN
         const auto encryptionKey = QByteArrayLiteral ("foo");
         const auto originalData = QByteArrayLiteral ("bar");
@@ -114,7 +113,7 @@ private slots:
         QCOMPARE (data, originalData);
     }
 
-    void shouldSymmetricDecryptStringsInOldStorageFormat () {
+    private on_ void shouldSymmetricDecryptStringsInOldStorageFormat () {
         // GIVEN
         const auto encryptionKey = QByteArrayLiteral ("foo");
         const auto originalData = QByteArrayLiteral ("bar");
@@ -127,7 +126,7 @@ private slots:
         QCOMPARE (data, originalData);
     }
 
-    void testStreamingDecryptor_data () {
+    private on_ void testStreamingDecryptor_data () {
         QTest.addColumn<int> ("totalBytes");
         QTest.addColumn<int> ("bytesToRead");
 
@@ -137,7 +136,7 @@ private slots:
         QTest.newRow ("data4") << 272 << 256;
     }
 
-    void testStreamingDecryptor () {
+    private on_ void testStreamingDecryptor () {
         QFETCH (int, totalBytes);
 
         QTemporaryFile dummyInputFile;
@@ -148,13 +147,13 @@ private slots:
 
         QCOMPARE (dummyInputFile.write (dummyFileRandomContents), dummyFileRandomContents.size ());
 
-        const auto generateHash = [] (QByteArray &data) {
+        const auto generateHash = [] (GLib.ByteArray &data) {
             QCryptographicHash hash (QCryptographicHash.Sha1);
             hash.addData (data);
             return hash.result ();
         };
 
-        const QByteArray originalFileHash = generateHash (dummyFileRandomContents);
+        const GLib.ByteArray originalFileHash = generateHash (dummyFileRandomContents);
 
         QVERIFY (!originalFileHash.isEmpty ());
 
@@ -167,7 +166,7 @@ private slots:
         // test normal file encryption/decryption
         QTemporaryFile dummyEncryptionOutputFile;
 
-        QByteArray tag;
+        GLib.ByteArray tag;
 
         QVERIFY (EncryptionHelper.fileEncryption (encryptionKey, initializationVector, &dummyInputFile, &dummyEncryptionOutputFile, tag));
         dummyInputFile.close ();
@@ -192,7 +191,7 @@ private slots:
 
         QVERIFY (dummyEncryptionOutputFile.open ());
 
-        QByteArray pendingBytes;
+        GLib.ByteArray pendingBytes;
 
         QFETCH (int, bytesToRead);
 

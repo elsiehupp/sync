@@ -31,7 +31,7 @@ static const auto CSYNC_TEST_DIR = []{
 } ();
 
 namespace {
-int oc_mkdir (string &path) {
+int oc_mkdir (string path) {
     return QDir (path).mkpath (path) ? 0 : -1;
 }
 
@@ -41,8 +41,8 @@ const int WD_BUFFER_SIZE = 255
 static mbchar_t wd_buffer[WD_BUFFER_SIZE];
 
 typedef struct {
-    QByteArray result;
-    QByteArray ignored_dir;
+    GLib.ByteArray result;
+    GLib.ByteArray ignored_dir;
 } statevar;
 
 /* remove the complete test dir */
@@ -103,7 +103,7 @@ static void create_dirs ( const char *path ) {
   auto _mypath = QStringLiteral ("%1/%2").arg (CSYNC_TEST_DIR, string.fromUtf8 (path)).toUtf8 ();
   char *mypath = _mypath.data ();
 
-  char *p = mypath + CSYNC_TEST_DIR.size () + 1; /* start behind the offset */
+  char *p = mypath + CSYNC_TEST_DIR.size () + 1; /* on_start behind the offset */
   int i = 0;
 
   assert_non_null (path);
@@ -135,12 +135,12 @@ The int parameter cnt contains the number of seen files (not dirs) in the
 whole tree.
 
 ***********************************************************/
-static void traverse_dir (void **state, string &dir, int *cnt) {
+static void traverse_dir (void **state, string dir, int *cnt) {
     csync_vio_handle_t *dh = nullptr;
     std.unique_ptr<csync_file_stat_t> dirent;
     auto sv = (statevar*) *state;
-    QByteArray subdir;
-    QByteArray subdir_out;
+    GLib.ByteArray subdir;
+    GLib.ByteArray subdir_out;
     int rc = -1;
     int is_dir = 0;
 

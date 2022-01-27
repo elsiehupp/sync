@@ -5,8 +5,8 @@ void Occ.AccountManager.save (bool) { }
 Occ.AccountState *Occ.AccountManager.addAccount (AccountPtr& ac) { return new Occ.AccountState (ac); }
 void Occ.AccountManager.deleteAccount (AccountState *) { }
 void Occ.AccountManager.accountRemoved (Occ.AccountState*) { }
-QList<Occ.AccountStatePtr> Occ.AccountManager.accounts () { return QList<Occ.AccountStatePtr> (); }
-Occ.AccountStatePtr Occ.AccountManager.account (string &){ return AccountStatePtr (); }
+GLib.List<Occ.AccountStatePtr> Occ.AccountManager.accounts () { return GLib.List<Occ.AccountStatePtr> (); }
+Occ.AccountStatePtr Occ.AccountManager.account (string ){ return AccountStatePtr (); }
 const QMetaObject Occ.AccountManager.staticMetaObject = GLib.Object.staticMetaObject;
 
 Occ.FolderMan *Occ.FolderMan.instance () { return static_cast<FolderMan> (new GLib.Object); }

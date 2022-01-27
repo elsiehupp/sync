@@ -10,8 +10,8 @@
 using namespace Occ;
 
 class TestFolder : public GLib.Object {
-private slots:
-    void testFolder () {
+
+    private on_ void testFolder () {
         QFETCH (string, folder);
         QFETCH (string, expectedFolder);
         Folder *f = new Folder ("alias", folder, "http://foo.bar.net");
@@ -19,7 +19,7 @@ private slots:
         delete f;
     }
 
-    void testFolder_data () {
+    private on_ void testFolder_data () {
         QTest.addColumn<string> ("folder");
         QTest.addColumn<string> ("expectedFolder");
 

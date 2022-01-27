@@ -12,11 +12,11 @@ namespace Occ {
 ***********************************************************/
 class Simple_sslErrorHandler : Occ.AbstractSslErrorHandler {
 
-    public bool handle_errors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, Occ.AccountPtr) override;
+    public bool handle_errors (GLib.List<QSslError> errors, QSslConfiguration &conf, GLib.List<QSslCertificate> *certs, Occ.AccountPtr) override;
 };
 
 
-    bool Simple_sslErrorHandler.handle_errors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, Occ.AccountPtr account) {
+    bool Simple_sslErrorHandler.handle_errors (GLib.List<QSslError> errors, QSslConfiguration &conf, GLib.List<QSslCertificate> *certs, Occ.AccountPtr account) {
         (void)account;
         (void)conf;
 

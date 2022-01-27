@@ -23,7 +23,7 @@ Job that do the authorization grant and fetch the access token
 
 Normal workfl
 
-  -. start ()
+  -. on_start ()
       |
       +---. open_browser () open the browser to the login page, redirects to http://localhost
       |
@@ -42,7 +42,7 @@ class OAuth : GLib.Object {
         : GLib.Object (parent)
         , _account (account) {
     }
-    public ~OAuth () override;
+    ~OAuth () override;
 
     public enum Result {
         NotSupported,
@@ -50,7 +50,7 @@ class OAuth : GLib.Object {
         Error
     };
 
-    public void start ();
+    public void on_start ();
     public bool open_browser ();
     public QUrl authorisation_link ();
 
@@ -59,13 +59,13 @@ signals:
     The state has changed.
     when logged in, token has the value of the token.
     ***********************************************************/
-    void result (OAuth.Result result, string &user = string (), string &token = string (), string &refresh_token = string ());
+    void result (OAuth.Result result, string user = string (), string token = string (), string refresh_token = string ());
 
-private:
-    Account *_account;
-    QTcpServer _server;
 
-    public string _expected_user;
+    private Account _account;
+    private QTcpServer _server;
+
+    private public string _expected_user;
 };
 
 
@@ -78,7 +78,7 @@ private:
         socket.write ("HTTP/1.1 ");
         socket.write (code);
         socket.write ("\r\n_content-Type : text/html\r\n_connection : close\r\n_content-Length : ");
-        socket.write (QByteArray.number (qstrlen (html)));
+        socket.write (GLib.ByteArray.number (qstrlen (html)));
         if (more_headers) {
             socket.write ("\r\n");
             socket.write (more_headers);
@@ -91,7 +91,7 @@ private:
         socket.set_parent (nullptr);
     }
 
-    void OAuth.start () {
+    void OAuth.on_start () {
         // Listen on the socket to get a port which will be used in the redirect_uri
         if (!_server.listen (QHostAddress.LocalLost)) {
             emit result (NotSupported, string ());
@@ -105,7 +105,7 @@ private:
             while (QPointer<QTcpSocket> socket = _server.next_pending_connection ()) {
                 GLib.Object.connect (socket.data (), &QTcpSocket.disconnected, socket.data (), &QTcpSocket.delete_later);
                 GLib.Object.connect (socket.data (), &QIODevice.ready_read, this, [this, socket] {
-                    QByteArray peek = socket.peek (q_min (socket.bytes_available (), 4000LL)); //The code should always be within the first 4K
+                    GLib.ByteArray peek = socket.peek (q_min (socket.bytes_available (), 4000LL)); //The code should always be within the first 4K
                     if (peek.index_of ('\n') < 0)
                         return; // wait until we find a \n
                     const QRegularExpression rx ("^GET /\\?code= ([a-z_a-Z0-9]+)[& ]"); // Match a  /?code=...  URL
@@ -134,7 +134,7 @@ private:
                     request_body.set_data (arguments.query (QUrl.FullyEncoded).to_latin1 ());
 
                     auto job = _account.send_request ("POST", request_token, req, request_body);
-                    job.set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
+                    job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
                     GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this, socket] (QNetworkReply *reply) {
                         auto json_data = reply.read_all ();
                         QJsonParseError json_parse_error;
@@ -188,7 +188,7 @@ private:
                         const char *login_successfull_html = "<h1>Login Successful</h1><p>You can close this window.</p>";
                         if (message_url.is_valid ()) {
                             http_reply_and_close (socket, "303 See Other", login_successfull_html,
-                                QByteArray ("Location : " + message_url.to_encoded ()).const_data ());
+                                GLib.ByteArray ("Location : " + message_url.to_encoded ()).const_data ());
                         } else {
                             http_reply_and_close (socket, "200 OK", login_successfull_html);
                         }

@@ -35,7 +35,7 @@ static void check_c_jhash_trials (void **state) {
 
                     /*---- check that every output bit is affected by that input bit */
                     for (k=0; k<MAXPAIR; k+=2) {
-                        uint32_t finished=1;
+                        uint32_t on_finished=1;
                         /* keys have one bit different */
                         for (l=0; l<hlen+1; ++l) {a[l] = b[l] = (uint8_t)0;}
                         /* have a and b be two keys differing in only one bit */
@@ -53,9 +53,9 @@ static void check_c_jhash_trials (void **state) {
                             h[l] &= ~c[l];
                             x[l] &= d[l];
                             y[l] &= ~d[l];
-                            if (e[l]|f[l]|g[l]|h[l]|x[l]|y[l]) finished=0;
+                            if (e[l]|f[l]|g[l]|h[l]|x[l]|y[l]) on_finished=0;
                         }
-                        if (finished) break;
+                        if (on_finished) break;
                     }
                     if (k>z) z=k;
                     if (k==MAXPAIR) {
@@ -166,7 +166,7 @@ static void check_c_jhash64_trials (void **state) {
 
                     /*---- check that every input bit affects every output bit */
                     for (k=0; k<MAXPAIR; k+=2) {
-                        uint64_t finished=1;
+                        uint64_t on_finished=1;
                         /* keys have one bit different */
                         for (l=0; l<hlen+1; ++l) {a[l] = b[l] = (uint8_t)0;}
                         /* have a and b be two keys differing in only one bit */
@@ -184,9 +184,9 @@ static void check_c_jhash64_trials (void **state) {
                             h[l] &= ~c[l];
                             x[l] &= d[l];
                             y[l] &= ~d[l];
-                            if (e[l]|f[l]|g[l]|h[l]|x[l]|y[l]) finished=0;
+                            if (e[l]|f[l]|g[l]|h[l]|x[l]|y[l]) on_finished=0;
                         }
-                        if (finished) break;
+                        if (on_finished) break;
                     }
                     if (k>z) z=k;
                     if (k==MAXPAIR) {

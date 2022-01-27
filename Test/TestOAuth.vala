@@ -12,21 +12,23 @@ using namespace Occ;
 
 class DesktopServiceHook : GLib.Object {
 signals:
-    void hooked (QUrl &);
-public:
-    DesktopServiceHook () { QDesktopServices.setUrlHandler ("oauthtest", this, "hooked"); }
+    void hooked (QUrl );
+
+    public DesktopServiceHook () {
+        QDesktopServices.setUrlHandler ("oauthtest", this, "hooked");
+    }
 };
 
 static const QUrl sOAuthTestServer ("oauthtest://someserver/owncloud");
 
 class FakePostReply : QNetworkReply {
-public:
-    std.unique_ptr<QIODevice> payload;
-    bool aborted = false;
-    bool redirectToPolicy = false;
-    bool redirectToToken = false;
 
-    FakePostReply (QNetworkAccessManager.Operation op, QNetworkRequest &request,
+    public std.unique_ptr<QIODevice> payload;
+    public bool aborted = false;
+    public bool redirectToPolicy = false;
+    public bool redirectToToken = false;
+
+    public FakePostReply (QNetworkAccessManager.Operation op, QNetworkRequest &request,
                   std.unique_ptr<QIODevice> payload_, GLib.Object *parent)
         : QNetworkReply{parent}, payload{std.move (payload_)} {
         setRequest (request);
@@ -37,11 +39,12 @@ public:
         QMetaObject.invokeMethod (this, "respond", Qt.QueuedConnection);
     }
 
-    Q_INVOKABLE virtual void respond () {
+    //  Q_INVOKABLE
+    public virtual void respond () {
         if (aborted) {
             setError (OperationCanceledError, "Operation Canceled");
             emit metaDataChanged ();
-            emit finished ();
+            emit on_finished ();
             return;
         } else if (redirectToPolicy) {
             setHeader (QNetworkRequest.LocationHeader, "/my.policy");
@@ -49,7 +52,7 @@ public:
             setAttribute (QNetworkRequest.HttpStatusCodeAttribute, 302); // 302 might or might not lose POST data in rfc
             setHeader (QNetworkRequest.ContentLengthHeader, 0);
             emit metaDataChanged ();
-            emit finished ();
+            emit on_finished ();
             return;
         } else if (redirectToToken) {
             // Redirect to self
@@ -59,7 +62,7 @@ public:
             setAttribute (QNetworkRequest.HttpStatusCodeAttribute, 307); // 307 explicitly in rfc says to not lose POST data
             setHeader (QNetworkRequest.ContentLengthHeader, 0);
             emit metaDataChanged ();
-            emit finished ();
+            emit on_finished ();
             return;
         }
         setHeader (QNetworkRequest.ContentLengthHeader, payload.size ());
@@ -67,28 +70,28 @@ public:
         emit metaDataChanged ();
         if (bytesAvailable ())
             emit readyRead ();
-        emit finished ();
+        emit on_finished ();
     }
 
-    void abort () override {
+    public void on_abort () override {
         aborted = true;
     }
-    int64 bytesAvailable () const override {
+    public int64 bytesAvailable () override {
         if (aborted)
             return 0;
         return payload.bytesAvailable ();
     }
 
-    int64 readData (char *data, int64 maxlen) override {
+    ipublic nt64 readData (char *data, int64 maxlen) override {
         return payload.read (data, maxlen);
     }
 };
 
 // Reply with a small delay
 class SlowFakePostReply : FakePostReply {
-public:
-    using FakePostReply.FakePostReply;
-    void respond () override {
+
+    public using FakePostReply.FakePostReply;
+    public void respond () override {
         // override of FakePostReply.respond, will call the real one with a delay.
         QTimer.singleShot (100, this, [this] { this.FakePostReply.respond (); });
     }
@@ -96,22 +99,22 @@ public:
 
 class OAuthTestCase : GLib.Object {
     DesktopServiceHook desktopServiceHook;
-public:
-    enum State { StartState, BrowserOpened, TokenAsked, CustomState } state = StartState;
-    Q_ENUM (State);
-    bool replyToBrowserOk = false;
-    bool gotAuthOk = false;
-    virtual bool done () { return replyToBrowserOk && gotAuthOk; }
 
-    FakeQNAM *fakeQnam = nullptr;
-    QNetworkAccessManager realQNAM;
-    QPointer<QNetworkReply> browserReply = nullptr;
-    string code = generateEtag ();
-    Occ.AccountPtr account;
+    public enum State { StartState, BrowserOpened, TokenAsked, CustomState } state = StartState;
 
-    QScopedPointer<OAuth> oauth;
+    public bool replyToBrowserOk = false;
+    public bool gotAuthOk = false;
+    public virtual bool on_done () { return replyToBrowserOk && gotAuthOk; }
 
-    virtual void test () {
+    public FakeQNAM *fakeQnam = nullptr;
+    public QNetworkAccessManager realQNAM;
+    public QPointer<QNetworkReply> browserReply = nullptr;
+    public string code = generateEtag ();
+    public Occ.AccountPtr account;
+
+    public QScopedPointer<OAuth> oauth;
+
+    public virtual void test () {
         fakeQnam = new FakeQNAM ({});
         account = Occ.Account.create ();
         account.setUrl (sOAuthTestServer);
@@ -126,13 +129,13 @@ public:
         GLib.Object.connect (&desktopServiceHook, &DesktopServiceHook.hooked,
                          this, &OAuthTestCase.openBrowserHook);
 
-        oauth.reset (new OAuth (account.data (), nullptr));
+        oauth.on_reset (new OAuth (account.data (), nullptr));
         GLib.Object.connect (oauth.data (), &OAuth.result, this, &OAuthTestCase.oauthResult);
-        oauth.start ();
-        QTRY_VERIFY (done ());
+        oauth.on_start ();
+        QTRY_VERIFY (on_done ());
     }
 
-    virtual void openBrowserHook (QUrl &url) {
+    public virtual void openBrowserHook (QUrl url) {
         QCOMPARE (state, StartState);
         state = BrowserOpened;
         QCOMPARE (url.path (), string (sOAuthTestServer.path () + "/index.php/apps/oauth2/authorize"));
@@ -146,21 +149,21 @@ public:
         createBrowserReply (QNetworkRequest (redirectUri));
     }
 
-    virtual QNetworkReply *createBrowserReply (QNetworkRequest &request) {
+    public virtual QNetworkReply *createBrowserReply (QNetworkRequest &request) {
         browserReply = realQNAM.get (request);
-        GLib.Object.connect (browserReply, &QNetworkReply.finished, this, &OAuthTestCase.browserReplyFinished);
+        GLib.Object.connect (browserReply, &QNetworkReply.on_finished, this, &OAuthTestCase.browserReplyFinished);
         return browserReply;
     }
 
-    virtual void browserReplyFinished () {
+    public virtual void browserReplyFinished () {
         QCOMPARE (sender (), browserReply.data ());
         QCOMPARE (state, TokenAsked);
         browserReply.deleteLater ();
-        QCOMPARE (browserReply.rawHeader ("Location"), QByteArray ("owncloud://success"));
+        QCOMPARE (browserReply.rawHeader ("Location"), GLib.ByteArray ("owncloud://on_success"));
         replyToBrowserOk = true;
     };
 
-    virtual QNetworkReply *tokenReply (QNetworkAccessManager.Operation op, QNetworkRequest &req) {
+    public virtual QNetworkReply *tokenReply (QNetworkAccessManager.Operation op, QNetworkRequest &req) {
         ASSERT (state == BrowserOpened);
         state = TokenAsked;
         ASSERT (op == QNetworkAccessManager.PostOperation);
@@ -171,13 +174,13 @@ public:
         return new FakePostReply (op, req, std.move (payload), fakeQnam);
     }
 
-    virtual QByteArray tokenReplyPayload () {
-        QJsonDocument jsondata (QJsonObject{ { "access_token", "123" }, { "refresh_token" , "456" }, { "message_url",  "owncloud://success"}, { "user_id", "789" }, { "token_type", "Bearer" }
+    public virtual GLib.ByteArray tokenReplyPayload () {
+        QJsonDocument jsondata (QJsonObject{ { "access_token", "123" }, { "refresh_token" , "456" }, { "message_url",  "owncloud://on_success"}, { "user_id", "789" }, { "token_type", "Bearer" }
         });
         return jsondata.toJson ();
     }
 
-    virtual void oauthResult (OAuth.Result result, string &user, string &token , string &refreshToken) {
+    public virtual void oauthResult (OAuth.Result result, string user, string token , string refreshToken) {
         QCOMPARE (state, TokenAsked);
         QCOMPARE (result, OAuth.LoggedIn);
         QCOMPARE (user, string ("789"));
@@ -189,19 +192,18 @@ public:
 
 class TestOAuth : public GLib.Object {
 
-private slots:
-    void testBasic () {
+    private on_ void testBasic () {
         OAuthTestCase test;
         test.test ();
     }
 
     // Test for https://github.com/owncloud/client/pull/6057
-    void testCloseBrowserDontCrash () {
+    private on_ void testCloseBrowserDontCrash () {
         struct Test : OAuthTestCase {
             QNetworkReply *tokenReply (QNetworkAccessManager.Operation op, QNetworkRequest & req) override {
                 ASSERT (browserReply);
                 // simulate the fact that the browser is closing the connection
-                browserReply.abort ();
+                browserReply.on_abort ();
                 QCoreApplication.processEvents ();
 
                 ASSERT (state == BrowserOpened);
@@ -221,21 +223,21 @@ private slots:
         test.test ();
     }
 
-    void testRandomConnections () {
+    private on_ void testRandomConnections () {
         // Test that we can send random garbage to the litening socket and it does not prevent the connection
         struct Test : OAuthTestCase {
             QNetworkReply *createBrowserReply (QNetworkRequest &request) override {
                 QTimer.singleShot (0, this, [this, request] {
                     auto port = request.url ().port ();
                     state = CustomState;
-                    QVector<QByteArray> payloads = {
+                    QVector<GLib.ByteArray> payloads = {
                         "GET FOFOFO HTTP 1/1\n\n",
                         "GET /?code=invalie HTTP 1/1\n\n",
                         "GET /?code=xxxxx&bar=fff",
-                        QByteArray ("\0\0\0", 3),
-                        QByteArray ("GET \0\0\0 \n\n\n\n\n\0", 14),
-                        QByteArray ("GET /?code=éléphant\xa5 HTTP\n"),
-                        QByteArray ("\n\n\n\n"),
+                        GLib.ByteArray ("\0\0\0", 3),
+                        GLib.ByteArray ("GET \0\0\0 \n\n\n\n\n\0", 14),
+                        GLib.ByteArray ("GET /?code=éléphant\xa5 HTTP\n"),
+                        GLib.ByteArray ("\n\n\n\n"),
                     };
                     foreach (auto &x, payloads) {
                         auto socket = new QTcpSocket (this);
@@ -260,8 +262,8 @@ private slots:
                 return OAuthTestCase.tokenReply (op, req);
             }
 
-            void oauthResult (OAuth.Result result, string &user, string &token ,
-                             const string &refreshToken) override {
+            void oauthResult (OAuth.Result result, string user, string token ,
+                             const string refreshToken) override {
                 if (state != CustomState)
                     return OAuthTestCase.oauthResult (result, user, token, refreshToken);
                 QCOMPARE (result, OAuth.Error);
@@ -270,7 +272,7 @@ private slots:
         test.test ();
     }
 
-    void testTokenUrlHasRedirect () {
+    private on_ void testTokenUrlHasRedirect () {
         struct Test : OAuthTestCase {
             int redirectsDone = 0;
             QNetworkReply *tokenReply (QNetworkAccessManager.Operation op, QNetworkRequest & request) override {
@@ -303,4 +305,3 @@ private slots:
 };
 
 QTEST_GUILESS_MAIN (TestOAuth)
-#include "testoauth.moc"

@@ -14,7 +14,7 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 // #include <QLoggingCategory>
 // #include <QModelIndex>
 // #include <QVariant>
-// #include <QSharedPointer>
+
 // #include <QVector>
 
 namespace Occ {
@@ -42,10 +42,10 @@ class Sharee {
     public string display_name ();
     public Type type ();
 
-private:
-    string _share_with;
-    string _display_name;
-    Type _type;
+
+    private string _share_with;
+    private string _display_name;
+    private Type _type;
 };
 
 class Sharee_model : QAbstractListModel {
@@ -55,14 +55,14 @@ class Sharee_model : QAbstractListModel {
         Global_search = 1
     };
 
-    public Sharee_model (AccountPtr &account, string &type, GLib.Object *parent = nullptr);
+    public Sharee_model (AccountPtr &account, string type, GLib.Object *parent = nullptr);
 
-    public using Sharee_set = QVector<QSharedPointer<Sharee>>; // FIXME : make it a QSet<Sharee> when Sharee can be compared
-    public void fetch (string &search, Sharee_set &blacklist, Lookup_mode lookup_mode);
-    public int row_count (QModelIndex &parent = QModelIndex ()) const override;
-    public QVariant data (QModelIndex &index, int role) const override;
+    public using Sharee_set = QVector<unowned<Sharee>>; // FIXME : make it a QSet<Sharee> when Sharee can be compared
+    public void fetch (string search, Sharee_set &blacklist, Lookup_mode lookup_mode);
+    public int row_count (QModelIndex &parent = QModelIndex ()) override;
+    public QVariant data (QModelIndex &index, int role) override;
 
-    public QSharedPointer<Sharee> get_sharee (int at);
+    public unowned<Sharee> get_sharee (int at);
 
     public string current_search () {
         return _search;
@@ -70,21 +70,21 @@ class Sharee_model : QAbstractListModel {
 
 signals:
     void sharees_ready ();
-    void display_error_message (int code, string &);
+    void display_error_message (int code, string );
 
-private slots:
-    void sharees_fetched (QJsonDocument &reply);
 
-private:
-    QSharedPointer<Sharee> parse_sharee (QJsonObject &data);
-    void set_new_sharees (QVector<QSharedPointer<Sharee>> &new_sharees);
+    private void on_sharees_fetched (QJsonDocument &reply);
 
-    AccountPtr _account;
-    string _search;
-    string _type;
 
-    QVector<QSharedPointer<Sharee>> _sharees;
-    QVector<QSharedPointer<Sharee>> _sharee_blacklist;
+    private unowned<Sharee> parse_sharee (QJsonObject &data);
+    private void set_new_sharees (QVector<unowned<Sharee>> &new_sharees);
+
+    private AccountPtr _account;
+    private string _search;
+    private string _type;
+
+    private QVector<unowned<Sharee>> _sharees;
+    private QVector<unowned<Sharee>> _sharee_blacklist;
 };
 
     Sharee.Sharee (string share_with,
@@ -125,27 +125,27 @@ private:
         return _type;
     }
 
-    Sharee_model.Sharee_model (AccountPtr &account, string &type, GLib.Object *parent)
+    Sharee_model.Sharee_model (AccountPtr &account, string type, GLib.Object *parent)
         : QAbstractListModel (parent)
         , _account (account)
         , _type (type) {
     }
 
-    void Sharee_model.fetch (string &search, Sharee_set &blacklist, Lookup_mode lookup_mode) {
+    void Sharee_model.fetch (string search, Sharee_set &blacklist, Lookup_mode lookup_mode) {
         _search = search;
         _sharee_blacklist = blacklist;
         auto *job = new Ocs_sharee_job (_account);
-        connect (job, &Ocs_sharee_job.sharee_job_finished, this, &Sharee_model.sharees_fetched);
+        connect (job, &Ocs_sharee_job.sharee_job_finished, this, &Sharee_model.on_sharees_fetched);
         connect (job, &Ocs_job.ocs_error, this, &Sharee_model.display_error_message);
         job.get_sharees (_search, _type, 1, 50, lookup_mode == Global_search ? true : false);
     }
 
-    void Sharee_model.sharees_fetched (QJsonDocument &reply) {
-        QVector<QSharedPointer<Sharee>> new_sharees;
+    void Sharee_model.on_sharees_fetched (QJsonDocument &reply) {
+        QVector<unowned<Sharee>> new_sharees;
      {
-            const QStringList sharee_types {"users", "groups", "emails", "remotes", "circles", "rooms"};
+            const string[] sharee_types {"users", "groups", "emails", "remotes", "circles", "rooms"};
 
-            const auto append_sharees = [this, &sharee_types] (QJsonObject &data, QVector<QSharedPointer<Sharee>>& out) {
+            const auto append_sharees = [this, &sharee_types] (QJsonObject &data, QVector<unowned<Sharee>>& out) {
                 for (auto &sharee_type : sharee_types) {
                     const auto category = data.value (sharee_type).to_array ();
                     for (auto &sharee : category) {
@@ -159,7 +159,7 @@ private:
         }
 
         // Filter sharees that we have already shared with
-        QVector<QSharedPointer<Sharee>> filtered_sharees;
+        QVector<unowned<Sharee>> filtered_sharees;
         foreach (auto &sharee, new_sharees) {
             bool found = false;
             foreach (auto &blacklist_sharee, _sharee_blacklist) {
@@ -178,7 +178,7 @@ private:
         sharees_ready ();
     }
 
-    QSharedPointer<Sharee> Sharee_model.parse_sharee (QJsonObject &data) {
+    unowned<Sharee> Sharee_model.parse_sharee (QJsonObject &data) {
         string display_name = data.value ("label").to_string ();
         const string share_with = data.value ("value").to_object ().value ("share_with").to_string ();
         Sharee.Type type = (Sharee.Type)data.value ("value").to_object ().value ("share_type").to_int ();
@@ -187,17 +187,17 @@ private:
             display_name = tr ("%1 (%2)", "sharee (share_with_additional_info)").arg (display_name, additional_info);
         }
 
-        return QSharedPointer<Sharee> (new Sharee (share_with, display_name, type));
+        return unowned<Sharee> (new Sharee (share_with, display_name, type));
     }
 
     // Helper function for set_new_sharees   (could be a lambda when we can use them)
-    static QSharedPointer<Sharee> sharee_from_model_index (QModelIndex &idx) {
-        return idx.data (Qt.User_role).value<QSharedPointer<Sharee>> ();
+    static unowned<Sharee> sharee_from_model_index (QModelIndex &idx) {
+        return idx.data (Qt.User_role).value<unowned<Sharee>> ();
     }
 
     struct Find_sharee_helper {
-        const QSharedPointer<Sharee> &sharee;
-        bool operator () (QSharedPointer<Sharee> &s2) {
+        const unowned<Sharee> &sharee;
+        bool operator () (unowned<Sharee> &s2) {
             return s2.format () == sharee.format () && s2.display_name () == sharee.format ();
         }
     };
@@ -206,10 +206,10 @@ private:
 
         Do that while preserving the model index so the selection stays
     ***********************************************************/
-    void Sharee_model.set_new_sharees (QVector<QSharedPointer<Sharee>> &new_sharees) {
+    void Sharee_model.set_new_sharees (QVector<unowned<Sharee>> &new_sharees) {
         layout_about_to_be_changed ();
         const auto persistent = persistent_index_list ();
-        QVector<QSharedPointer<Sharee>> old_persistant_sharee;
+        QVector<unowned<Sharee>> old_persistant_sharee;
         old_persistant_sharee.reserve (persistent.size ());
 
         std.transform (persistent.begin (), persistent.end (), std.back_inserter (old_persistant_sharee),
@@ -219,7 +219,7 @@ private:
 
         QModel_index_list new_persistant;
         new_persistant.reserve (persistent.size ());
-        foreach (QSharedPointer<Sharee> &sharee, old_persistant_sharee) {
+        foreach (unowned<Sharee> &sharee, old_persistant_sharee) {
             Find_sharee_helper helper = {
                 sharee
             };
@@ -262,9 +262,9 @@ private:
         return QVariant ();
     }
 
-    QSharedPointer<Sharee> Sharee_model.get_sharee (int at) {
+    unowned<Sharee> Sharee_model.get_sharee (int at) {
         if (at < 0 || at > _sharees.size ()) {
-            return QSharedPointer<Sharee> (nullptr);
+            return unowned<Sharee> (nullptr);
         }
 
         return _sharees.at (at);

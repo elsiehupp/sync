@@ -33,50 +33,49 @@ class Selective_sync_widget : Gtk.Widget {
     public Selective_sync_widget (AccountPtr account, Gtk.Widget *parent = nullptr);
 
     /// Returns a list of blacklisted paths, each including the trailing /
-    public QStringList create_black_list (QTree_widget_item *root = nullptr) const;
+    public string[] create_black_list (QTree_widget_item *root = nullptr);
 
     /***********************************************************
     Returns the old_black_list passed into set_folder_info (), except that
     a "/" entry is expanded to all top-level folder names.
     ***********************************************************/
-    public QStringList old_black_list ();
+    public string[] old_black_list ();
 
     // Estimates the total size of checked items (recursively)
     public int64 estimated_size (QTree_widget_item *root = nullptr);
 
     // old_black_list is a list of excluded paths, each including a trailing /
-    public void set_folder_info (string &folder_path, string &root_name,
-        const QStringList &old_black_list = QStringList ());
+    public void set_folder_info (string folder_path, string root_name,
+        const string[] &old_black_list = string[] ());
 
-    public QSize size_hint () const override;
+    public QSize size_hint () override;
 
-private slots:
-    void slot_update_directories (QStringList);
-    void slot_item_expanded (QTree_widget_item *);
-    void slot_item_changed (QTree_widget_item *, int);
-    void slot_lscol_finished_with_error (QNetworkReply *);
-    void slot_gather_encrypted_paths (string &, QMap<string, string> &);
+    private void on_update_directories (string[]);
+    private void on_item_expanded (QTree_widget_item *);
+    private void on_item_changed (QTree_widget_item *, int);
+    private void on_lscol_finished_with_error (QNetworkReply *);
+    private void on_gather_encrypted_paths (string , QMap<string, string> &);
 
-private:
-    void refresh_folders ();
-    void recursive_insert (QTree_widget_item *parent, QStringList path_trail, string path, int64 size);
 
-    AccountPtr _account;
+    private void refresh_folders ();
+    private void recursive_insert (QTree_widget_item *parent, string[] path_trail, string path, int64 size);
 
-    string _folder_path;
-    string _root_name;
-    QStringList _old_black_list;
+    private AccountPtr _account;
 
-    bool _inserting; // set to true when we are inserting new items on the list
-    QLabel *_loading;
+    private string _folder_path;
+    private string _root_name;
+    private string[] _old_black_list;
 
-    QTree_widget *_folder_tree;
+    private bool _inserting; // set to true when we are inserting new items on the list
+    private QLabel _loading;
+
+    private QTree_widget _folder_tree;
 
     // During account setup we want to filter out excluded folders from the
     // view without having a Folder.SyncEngine.ExcludedFiles instance.
-    ExcludedFiles _excluded_files;
+    private ExcludedFiles _excluded_files;
 
-    QStringList _encrypted_paths;
+    private string[] _encrypted_paths;
 };
 
 /***********************************************************
@@ -89,23 +88,23 @@ class Selective_sync_dialog : Gtk.Dialog {
     public Selective_sync_dialog (AccountPtr account, Folder *folder, Gtk.Widget *parent = nullptr, Qt.Window_flags f = {});
 
     // Dialog for the whole account (Used from the wizard)
-    public Selective_sync_dialog (AccountPtr account, string &folder, QStringList &blacklist, Gtk.Widget *parent = nullptr, Qt.Window_flags f = {});
+    public Selective_sync_dialog (AccountPtr account, string folder, string[] &blacklist, Gtk.Widget *parent = nullptr, Qt.Window_flags f = {});
 
-    public void accept () override;
+    public void on_accept () override;
 
-    public QStringList create_black_list ();
-    public QStringList old_black_list ();
+    public string[] create_black_list ();
+    public string[] old_black_list ();
 
     // Estimate the size of the total of sync'ed files from the server
     public int64 estimated_size ();
 
-private:
-    void init (AccountPtr &account);
 
-    Selective_sync_widget *_selective_sync;
+    private void on_init (AccountPtr &account);
 
-    Folder *_folder;
-    QPushButton *_ok_button;
+    private Selective_sync_widget _selective_sync;
+
+    private Folder _folder;
+    private QPushButton _ok_button;
 };
 
 class Selective_sync_tree_view_item : QTree_widget_item {
@@ -113,7 +112,7 @@ class Selective_sync_tree_view_item : QTree_widget_item {
     public Selective_sync_tree_view_item (int type = QTree_widget_item.Type)
         : QTree_widget_item (type) {
     }
-    public Selective_sync_tree_view_item (QStringList &strings, int type = QTree_widget_item.Type)
+    public Selective_sync_tree_view_item (string[] &strings, int type = QTree_widget_item.Type)
         : QTree_widget_item (strings, type) {
     }
     public Selective_sync_tree_view_item (QTree_widget *view, int type = QTree_widget_item.Type)
@@ -123,8 +122,8 @@ class Selective_sync_tree_view_item : QTree_widget_item {
         : QTree_widget_item (parent, type) {
     }
 
-private:
-    bool operator< (QTree_widget_item &other) const override {
+
+    private bool operator< (QTree_widget_item &other) override {
         int column = tree_widget ().sort_column ();
         if (column == 1) {
             return data (1, Qt.User_role).to_long_long () < other.data (1, Qt.User_role).to_long_long ();
@@ -144,27 +143,27 @@ private:
         layout.set_contents_margins (0, 0, 0, 0);
 
         auto header = new QLabel (this);
-        header.set_text (tr ("Deselect remote folders you do not wish to synchronize."));
+        header.on_set_text (tr ("Deselect remote folders you do not wish to synchronize."));
         header.set_word_wrap (true);
         layout.add_widget (header);
 
         layout.add_widget (_folder_tree);
 
         connect (_folder_tree, &QTree_widget.item_expanded,
-            this, &Selective_sync_widget.slot_item_expanded);
+            this, &Selective_sync_widget.on_item_expanded);
         connect (_folder_tree, &QTree_widget.item_changed,
-            this, &Selective_sync_widget.slot_item_changed);
+            this, &Selective_sync_widget.on_item_changed);
         _folder_tree.set_sorting_enabled (true);
         _folder_tree.sort_by_column (0, Qt.Ascending_order);
         _folder_tree.set_column_count (2);
         _folder_tree.header ().set_section_resize_mode (0, QHeaderView.QHeaderView.Resize_to_contents);
         _folder_tree.header ().set_section_resize_mode (1, QHeaderView.QHeaderView.Resize_to_contents);
         _folder_tree.header ().set_stretch_last_section (true);
-        _folder_tree.header_item ().set_text (0, tr ("Name"));
-        _folder_tree.header_item ().set_text (1, tr ("Size"));
+        _folder_tree.header_item ().on_set_text (0, tr ("Name"));
+        _folder_tree.header_item ().on_set_text (1, tr ("Size"));
 
         ConfigFile.setup_default_exclude_file_paths (_excluded_files);
-        _excluded_files.reload_exclude_files ();
+        _excluded_files.on_reload_exclude_files ();
     }
 
     QSize Selective_sync_widget.size_hint () {
@@ -175,25 +174,25 @@ private:
         _encrypted_paths.clear ();
 
         auto *job = new LsColJob (_account, _folder_path, this);
-        auto props = QList<QByteArray> () << "resourcetype"
+        auto props = GLib.List<GLib.ByteArray> () << "resourcetype"
                                          << "http://owncloud.org/ns:size";
         if (_account.capabilities ().client_side_encryption_available ()) {
             props << "http://nextcloud.org/ns:is-encrypted";
         }
         job.set_properties (props);
         connect (job, &LsColJob.directory_listing_subfolders,
-            this, &Selective_sync_widget.slot_update_directories);
+            this, &Selective_sync_widget.on_update_directories);
         connect (job, &LsColJob.finished_with_error,
-            this, &Selective_sync_widget.slot_lscol_finished_with_error);
+            this, &Selective_sync_widget.on_lscol_finished_with_error);
         connect (job, &LsColJob.directory_listing_iterated,
-            this, &Selective_sync_widget.slot_gather_encrypted_paths);
-        job.start ();
+            this, &Selective_sync_widget.on_gather_encrypted_paths);
+        job.on_start ();
         _folder_tree.clear ();
         _loading.show ();
         _loading.move (10, _folder_tree.header ().height () + 10);
     }
 
-    void Selective_sync_widget.set_folder_info (string &folder_path, string &root_name, QStringList &old_black_list) {
+    void Selective_sync_widget.set_folder_info (string folder_path, string root_name, string[] &old_black_list) {
         _folder_path = folder_path;
         if (_folder_path.starts_with (QLatin1Char ('/'))) {
             // remove leading '/'
@@ -204,7 +203,7 @@ private:
         refresh_folders ();
     }
 
-    static QTree_widget_item *find_first_child (QTree_widget_item *parent, string &text) {
+    static QTree_widget_item *find_first_child (QTree_widget_item *parent, string text) {
         for (int i = 0; i < parent.child_count (); ++i) {
             QTree_widget_item *child = parent.child (i);
             if (child.text (0) == text) {
@@ -214,7 +213,7 @@ private:
         return nullptr;
     }
 
-    void Selective_sync_widget.recursive_insert (QTree_widget_item *parent, QStringList path_trail, string path, int64 size) {
+    void Selective_sync_widget.recursive_insert (QTree_widget_item *parent, string[] path_trail, string path, int64 size) {
         QFile_icon_provider prov;
         QIcon folder_icon = prov.icon (QFile_icon_provider.Folder);
         if (path_trail.size () == 0) {
@@ -230,7 +229,7 @@ private:
                 if (parent.check_state (0) == Qt.Checked
                     || parent.check_state (0) == Qt.Partially_checked) {
                     item.set_check_state (0, Qt.Checked);
-                    foreach (string &str, _old_black_list) {
+                    foreach (string str, _old_black_list) {
                         if (str == path || str == QLatin1String ("/")) {
                             item.set_check_state (0, Qt.Unchecked);
                             break;
@@ -242,9 +241,9 @@ private:
                     item.set_check_state (0, Qt.Unchecked);
                 }
                 item.set_icon (0, folder_icon);
-                item.set_text (0, path_trail.first ());
+                item.on_set_text (0, path_trail.first ());
                 if (size >= 0) {
-                    item.set_text (1, Utility.octets_to_string (size));
+                    item.on_set_text (1, Utility.octets_to_string (size));
                     item.set_data (1, Qt.User_role, size);
                 }
                 //            item.set_data (0, Qt.User_role, path_trail.first ());
@@ -256,7 +255,7 @@ private:
         }
     }
 
-    void Selective_sync_widget.slot_update_directories (QStringList list) {
+    void Selective_sync_widget.on_update_directories (string[] list) {
         auto job = qobject_cast<LsColJob> (sender ());
         QScoped_value_rollback<bool> is_inserting (_inserting);
         _inserting = true;
@@ -282,7 +281,7 @@ private:
 
         // Since / cannot be in the blacklist, expand it to the actual
         // list of top-level folders as soon as possible.
-        if (_old_black_list == QStringList ("/")) {
+        if (_old_black_list == string[] ("/")) {
             _old_black_list.clear ();
             foreach (string path, list) {
                 path.remove (path_to_remove);
@@ -294,7 +293,7 @@ private:
         }
 
         if (!root && list.size () <= 1) {
-            _loading.set_text (tr ("No subfolders currently on the server."));
+            _loading.on_set_text (tr ("No subfolders currently on the server."));
             _loading.resize (_loading.size_hint ()); // because it's not in a layout
             return;
         } else {
@@ -303,13 +302,13 @@ private:
 
         if (!root) {
             root = new Selective_sync_tree_view_item (_folder_tree);
-            root.set_text (0, _root_name);
+            root.on_set_text (0, _root_name);
             root.set_icon (0, Theme.instance ().application_icon ());
             root.set_data (0, Qt.User_role, string ());
             root.set_check_state (0, Qt.Checked);
             int64 size = job ? job._folder_infos[path_to_remove].size : -1;
             if (size >= 0) {
-                root.set_text (1, Utility.octets_to_string (size));
+                root.on_set_text (1, Utility.octets_to_string (size));
                 root.set_data (1, Qt.User_role, size);
             }
         }
@@ -320,14 +319,14 @@ private:
             path.remove (path_to_remove);
 
             // Don't allow to select subfolders of encrypted subfolders
-            const auto is_any_ancestor_encrypted = std.any_of (std.cbegin (_encrypted_paths), std.cend (_encrypted_paths), [=] (string &encrypted_path) {
+            const auto is_any_ancestor_encrypted = std.any_of (std.cbegin (_encrypted_paths), std.cend (_encrypted_paths), [=] (string encrypted_path) {
                 return path.size () > encrypted_path.size () && path.starts_with (encrypted_path);
             });
             if (is_any_ancestor_encrypted) {
                 continue;
             }
 
-            QStringList paths = path.split ('/');
+            string[] paths = path.split ('/');
             if (paths.last ().is_empty ())
                 paths.remove_last ();
             if (paths.is_empty ())
@@ -350,16 +349,16 @@ private:
         root.set_expanded (true);
     }
 
-    void Selective_sync_widget.slot_lscol_finished_with_error (QNetworkReply *r) {
+    void Selective_sync_widget.on_lscol_finished_with_error (QNetworkReply *r) {
         if (r.error () == QNetworkReply.ContentNotFoundError) {
-            _loading.set_text (tr ("No subfolders currently on the server."));
+            _loading.on_set_text (tr ("No subfolders currently on the server."));
         } else {
-            _loading.set_text (tr ("An error occurred while loading the list of sub folders."));
+            _loading.on_set_text (tr ("An error occurred while loading the list of sub folders."));
         }
         _loading.resize (_loading.size_hint ()); // because it's not in a layout
     }
 
-    void Selective_sync_widget.slot_gather_encrypted_paths (string &path, QMap<string, string> &properties) {
+    void Selective_sync_widget.on_gather_encrypted_paths (string path, QMap<string, string> &properties) {
         const auto it = properties.find ("is-encrypted");
         if (it == properties.cend () || *it != QStringLiteral ("1")) {
             return;
@@ -371,7 +370,7 @@ private:
         _encrypted_paths << path.mid (webdav_folder.size ()) + '/';
     }
 
-    void Selective_sync_widget.slot_item_expanded (QTree_widget_item *item) {
+    void Selective_sync_widget.on_item_expanded (QTree_widget_item *item) {
         string dir = item.data (0, Qt.User_role).to_string ();
         if (dir.is_empty ())
             return;
@@ -380,14 +379,14 @@ private:
             prefix = _folder_path + QLatin1Char ('/');
         }
         auto *job = new LsColJob (_account, prefix + dir, this);
-        job.set_properties (QList<QByteArray> () << "resourcetype"
+        job.set_properties (GLib.List<GLib.ByteArray> () << "resourcetype"
                                                << "http://owncloud.org/ns:size");
         connect (job, &LsColJob.directory_listing_subfolders,
-            this, &Selective_sync_widget.slot_update_directories);
-        job.start ();
+            this, &Selective_sync_widget.on_update_directories);
+        job.on_start ();
     }
 
-    void Selective_sync_widget.slot_item_changed (QTree_widget_item *item, int col) {
+    void Selective_sync_widget.on_item_changed (QTree_widget_item *item, int col) {
         if (col != 0 || _inserting)
             return;
 
@@ -444,23 +443,23 @@ private:
         }
     }
 
-    QStringList Selective_sync_widget.create_black_list (QTree_widget_item *root) {
+    string[] Selective_sync_widget.create_black_list (QTree_widget_item *root) {
         if (!root) {
             root = _folder_tree.top_level_item (0);
         }
         if (!root)
-            return QStringList ();
+            return string[] ();
 
         switch (root.check_state (0)) {
         case Qt.Unchecked:
-            return QStringList (root.data (0, Qt.User_role).to_string () + "/");
+            return string[] (root.data (0, Qt.User_role).to_string () + "/");
         case Qt.Checked:
-            return QStringList ();
+            return string[] ();
         case Qt.Partially_checked:
             break;
         }
 
-        QStringList result;
+        string[] result;
         if (root.child_count ()) {
             for (int i = 0; i < root.child_count (); ++i) {
                 result += create_black_list (root.child (i));
@@ -468,7 +467,7 @@ private:
         } else {
             // We did not load from the server so we re-use the one from the old black list
             string path = root.data (0, Qt.User_role).to_string ();
-            foreach (string &it, _old_black_list) {
+            foreach (string it, _old_black_list) {
                 if (it.starts_with (path))
                     result += it;
             }
@@ -476,7 +475,7 @@ private:
         return result;
     }
 
-    QStringList Selective_sync_widget.old_black_list () {
+    string[] Selective_sync_widget.old_black_list () {
         return _old_black_list;
     }
 
@@ -514,10 +513,10 @@ private:
     Selective_sync_dialog.Selective_sync_dialog (AccountPtr account, Folder *folder, Gtk.Widget *parent, Qt.Window_flags f)
         : Gtk.Dialog (parent, f)
         , _folder (folder)
-        , _ok_button (nullptr) // defined in init () {
+        , _ok_button (nullptr) // defined in on_init () {
         bool ok = false;
-        init (account);
-        QStringList selective_sync_list = _folder.journal_db ().get_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, &ok);
+        on_init (account);
+        string[] selective_sync_list = _folder.journal_db ().get_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, &ok);
         if (ok) {
             _selective_sync.set_folder_info (_folder.remote_path (), _folder.alias (), selective_sync_list);
         } else {
@@ -527,15 +526,15 @@ private:
         connect (_folder, &GLib.Object.destroyed, this, &GLib.Object.delete_later);
     }
 
-    Selective_sync_dialog.Selective_sync_dialog (AccountPtr account, string &folder,
-        const QStringList &blacklist, Gtk.Widget *parent, Qt.Window_flags f)
+    Selective_sync_dialog.Selective_sync_dialog (AccountPtr account, string folder,
+        const string[] &blacklist, Gtk.Widget *parent, Qt.Window_flags f)
         : Gtk.Dialog (parent, f)
         , _folder (nullptr) {
-        init (account);
+        on_init (account);
         _selective_sync.set_folder_info (folder, folder, blacklist);
     }
 
-    void Selective_sync_dialog.init (AccountPtr &account) {
+    void Selective_sync_dialog.on_init (AccountPtr &account) {
         set_window_title (tr ("Choose What to Sync"));
         auto *layout = new QVBoxLayout (this);
         _selective_sync = new Selective_sync_widget (account, this);
@@ -549,19 +548,19 @@ private:
         layout.add_widget (button_box);
     }
 
-    void Selective_sync_dialog.accept () {
+    void Selective_sync_dialog.on_accept () {
         if (_folder) {
             bool ok = false;
             auto old_black_list_set = _folder.journal_db ().get_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, &ok).to_set ();
             if (!ok) {
                 return;
             }
-            QStringList black_list = _selective_sync.create_black_list ();
+            string[] black_list = _selective_sync.create_black_list ();
             _folder.journal_db ().set_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, black_list);
 
             FolderMan *folder_man = FolderMan.instance ();
             if (_folder.is_busy ()) {
-                _folder.slot_terminate_sync ();
+                _folder.on_terminate_sync ();
             }
 
             //The part that changed should not be read from the DB on next sync because there might be new folders
@@ -570,19 +569,19 @@ private:
             auto changes = (old_black_list_set - black_list_set) + (black_list_set - old_black_list_set);
             foreach (auto &it, changes) {
                 _folder.journal_db ().schedule_path_for_remote_discovery (it);
-                _folder.schedule_path_for_local_discovery (it);
+                _folder.on_schedule_path_for_local_discovery (it);
             }
 
             folder_man.schedule_folder (_folder);
         }
-        Gtk.Dialog.accept ();
+        Gtk.Dialog.on_accept ();
     }
 
-    QStringList Selective_sync_dialog.create_black_list () {
+    string[] Selective_sync_dialog.create_black_list () {
         return _selective_sync.create_black_list ();
     }
 
-    QStringList Selective_sync_dialog.old_black_list () {
+    string[] Selective_sync_dialog.old_black_list () {
         return _selective_sync.old_black_list ();
     }
 

@@ -10,7 +10,7 @@ Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
 
 // #include <QLoggingCategory>
 // #include <QMap>
-// #include <QByteArray>
+// #include <GLib.ByteArray>
 // #include <QUrl>
 // #include <string>
 // #include <QElapsedTimer>
@@ -24,7 +24,7 @@ Q_DECLARE_LOGGING_CATEGORY (lc_put_multi_file_job)
 
 struct SingleUploadFileData {
     std.unique_ptr<UploadDevice> _device;
-    QMap<QByteArray, QByteArray> _headers;
+    QMap<GLib.ByteArray, GLib.ByteArray> _headers;
 };
 
 /***********************************************************
@@ -33,8 +33,7 @@ struct SingleUploadFileData {
 ***********************************************************/
 class PutMultiFileJob : AbstractNetworkJob {
 
-public:
-    PutMultiFileJob (AccountPtr account, QUrl &url,
+    public PutMultiFileJob (AccountPtr account, QUrl url,
                              std.vector<SingleUploadFileData> devices, GLib.Object *parent = nullptr)
         : AbstractNetworkJob (account, {}, parent)
         , _devices (std.move (devices))
@@ -43,21 +42,21 @@ public:
         for (auto &single_device : _devices) {
             single_device._device.set_parent (this);
             connect (this, &PutMultiFileJob.upload_progress,
-                    single_device._device.get (), &UploadDevice.slot_job_upload_progress);
+                    single_device._device.get (), &UploadDevice.on_job_upload_progress);
         }
     }
 
     ~PutMultiFileJob () override;
 
-    void start () override;
+    public void on_start () override;
 
-    bool finished () override;
+    public bool on_finished () override;
 
-    string error_string () const override {
+    public string error_string () override {
         return _error_string.is_empty () ? AbstractNetworkJob.error_string () : _error_string;
     }
 
-    std.chrono.milliseconds ms_since_start () {
+    public std.chrono.milliseconds ms_since_start () {
         return std.chrono.milliseconds (_request_timer.elapsed ());
     }
 
@@ -65,18 +64,18 @@ signals:
     void finished_signal ();
     void upload_progress (int64, int64);
 
-private:
-    QHttpMultiPart _body;
-    std.vector<SingleUploadFileData> _devices;
-    string _error_string;
-    QUrl _url;
-    QElapsedTimer _request_timer;
+
+    private QHttpMultiPart _body;
+    private std.vector<SingleUploadFileData> _devices;
+    private string _error_string;
+    private QUrl _url;
+    private QElapsedTimer _request_timer;
 };
 
 
     PutMultiFileJob.~PutMultiFileJob () = default;
 
-    void PutMultiFileJob.start () {
+    void PutMultiFileJob.on_start () {
         QNetworkRequest req;
 
         for (auto &one_device : _devices) {
@@ -84,7 +83,7 @@ private:
 
             one_part.set_body_device (one_device._device.get ());
 
-            for (QMap<QByteArray, QByteArray>.Const_iterator it = one_device._headers.begin (); it != one_device._headers.end (); ++it) {
+            for (QMap<GLib.ByteArray, GLib.ByteArray>.Const_iterator it = one_device._headers.begin (); it != one_device._headers.end (); ++it) {
                 one_part.set_raw_header (it.key (), it.value ());
             }
 
@@ -101,11 +100,11 @@ private:
 
         connect (reply (), &QNetworkReply.upload_progress, this, &PutMultiFileJob.upload_progress);
         connect (this, &AbstractNetworkJob.network_activity, account ().data (), &Account.propagator_network_activity);
-        _request_timer.start ();
-        AbstractNetworkJob.start ();
+        _request_timer.on_start ();
+        AbstractNetworkJob.on_start ();
     }
 
-    bool PutMultiFileJob.finished () {
+    bool PutMultiFileJob.on_finished () {
         for (auto &one_device : _devices) {
             one_device._device.close ();
         }

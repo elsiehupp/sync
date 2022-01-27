@@ -36,9 +36,9 @@ class SyncFileStatus {
 
     public string to_socket_api_string ();
 
-private:
-    SyncFileStatusTag _tag = SyncFileStatusTag.STATUS_NONE;
-    bool _shared = false;
+
+    private SyncFileStatusTag _tag = SyncFileStatusTag.STATUS_NONE;
+    private bool _shared = false;
 };
 
 inline bool operator== (SyncFileStatus &a, SyncFileStatus &b) {

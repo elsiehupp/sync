@@ -103,7 +103,7 @@ class KirigamiWheelEvent : GLib.Object {
 
 
     public KirigamiWheelEvent (GLib.Object *parent = nullptr);
-    public ~KirigamiWheelEvent () override;
+    ~KirigamiWheelEvent () override;
 
     public void initialize_from_event (QWheel_event *event);
 
@@ -117,36 +117,35 @@ class KirigamiWheelEvent : GLib.Object {
     public bool is_accepted ();
     public void set_accepted (bool accepted);
 
-private:
-    qreal m_x = 0;
-    qreal m_y = 0;
-    QPoint_f m_angle_delta;
-    QPoint_f m_pixel_delta;
-    Qt.Mouse_buttons m_buttons = Qt.NoButton;
-    Qt.Keyboard_modifiers m_modifiers = Qt.No_modifier;
-    bool m_inverted = false;
-    bool m_accepted = false;
+
+    private qreal m_x = 0;
+    private qreal m_y = 0;
+    private QPoint_f m_angle_delta;
+    private QPoint_f m_pixel_delta;
+    private Qt.Mouse_buttons m_buttons = Qt.NoButton;
+    private Qt.Keyboard_modifiers m_modifiers = Qt.No_modifier;
+    private bool m_inverted = false;
+    private bool m_accepted = false;
 };
 
 class GlobalWheelFilter : GLib.Object {
 
 
     public GlobalWheelFilter (GLib.Object *parent = nullptr);
-    public ~GlobalWheelFilter () override;
+    ~GlobalWheelFilter () override;
 
     public static GlobalWheelFilter *self ();
 
     public void set_item_handler_association (QQuick_item *item, WheelHandler *handler);
     public void remove_item_handler_association (QQuick_item *item, WheelHandler *handler);
 
-protected:
-    bool event_filter (GLib.Object *watched, QEvent *event) override;
 
-private:
-    void manage_wheel (QQuick_item *target, QWheel_event *wheel);
+    protected bool event_filter (GLib.Object *watched, QEvent *event) override;
 
-    QMulti_hash<QQuick_item *, WheelHandler> m_handlers_for_item;
-    KirigamiWheelEvent m_wheel_event;
+    protected private void manage_wheel (QQuick_item *target, QWheel_event *wheel);
+
+    protected private QMulti_hash<QQuick_item *, WheelHandler> m_handlers_for_item;
+    protected private KirigamiWheelEvent m_wheel_event;
 };
 
 /***********************************************************
@@ -180,7 +179,7 @@ class WheelHandler : GLib.Object {
 
 
     public WheelHandler (GLib.Object *parent = nullptr);
-    public ~WheelHandler () override;
+    ~WheelHandler () override;
 
     public QQuick_item *target ();
     public void set_target (QQuick_item *target);
@@ -191,13 +190,13 @@ signals:
     void scroll_flickable_target_changed ();
     void wheel (KirigamiWheelEvent *wheel);
 
-private:
-    QPointer<QQuick_item> m_target;
-    bool m_block_target_wheel = true;
-    bool m_scroll_flickable_target = true;
-    KirigamiWheelEvent m_wheel_event;
 
-    friend class GlobalWheelFilter;
+    private QPointer<QQuick_item> m_target;
+    private bool m_block_target_wheel = true;
+    private bool m_scroll_flickable_target = true;
+    private KirigamiWheelEvent m_wheel_event;
+
+    private friend class GlobalWheelFilter;
 };
 
 

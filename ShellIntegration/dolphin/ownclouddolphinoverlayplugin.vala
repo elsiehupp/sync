@@ -27,38 +27,35 @@
 class OwncloudDolphinPlugin : KOverlayIconPlugin {
     Q_PLUGIN_METADATA (IID "com.owncloud.ovarlayiconplugin" FILE "ownclouddolphinoverlayplugin.json")
 
-    using StatusMap = QHash<QByteArray, QByteArray>;
+    using StatusMap = QHash<GLib.ByteArray, GLib.ByteArray>;
     StatusMap m_status;
 
-public:
-
-    OwncloudDolphinPlugin () {
+    public OwncloudDolphinPlugin () {
         auto helper = OwncloudDolphinPluginHelper.instance ();
         GLib.Object.connect (helper, &OwncloudDolphinPluginHelper.commandRecieved,
                          this, &OwncloudDolphinPlugin.slotCommandRecieved);
     }
 
-    QStringList getOverlays (QUrl& url) override {
+    public string[] getOverlays (QUrl& url) override {
         auto helper = OwncloudDolphinPluginHelper.instance ();
         if (!helper.isConnected ())
-            return QStringList ();
+            return string[] ();
         if (!url.isLocalFile ())
-            return QStringList ();
+            return string[] ();
         QDir localPath (url.toLocalFile ());
-        const QByteArray localFile = localPath.canonicalPath ().toUtf8 ();
+        const GLib.ByteArray localFile = localPath.canonicalPath ().toUtf8 ();
 
-        helper.sendCommand (QByteArray ("RETRIEVE_FILE_STATUS:" + localFile + "\n"));
+        helper.sendCommand (GLib.ByteArray ("RETRIEVE_FILE_STATUS:" + localFile + "\n"));
 
         StatusMap.iterator it = m_status.find (localFile);
         if (it != m_status.constEnd ()) {
             return  overlaysForString (*it);
         }
-        return QStringList ();
+        return string[] ();
     }
 
-private:
-    QStringList overlaysForString (QByteArray &status) {
-        QStringList r;
+    private string[] overlaysForString (GLib.ByteArray &status) {
+        string[] r;
         if (status.startsWith ("NOP"))
             return r;
 
@@ -77,9 +74,9 @@ private:
         return r;
     }
 
-    void slotCommandRecieved (QByteArray &line) {
+    private void slotCommandRecieved (GLib.ByteArray &line) {
 
-        QList<QByteArray> tokens = line.split (':');
+        GLib.List<GLib.ByteArray> tokens = line.split (':');
         if (tokens.count () < 3)
             return;
         if (tokens[0] != "STATUS" && tokens[0] != "BROADCAST")
@@ -89,8 +86,8 @@ private:
 
         // We can't use tokens[2] because the filename might contain ':'
         int secondColon = line.indexOf (":", line.indexOf (":") + 1);
-        const QByteArray name = line.mid (secondColon + 1);
-        QByteArray &status = m_status[name]; // reference to the item in the hash
+        const GLib.ByteArray name = line.mid (secondColon + 1);
+        GLib.ByteArray &status = m_status[name]; // reference to the item in the hash
         if (status == tokens[1])
             return;
         status = tokens[1];
@@ -98,5 +95,3 @@ private:
         emit overlaysChanged (QUrl.fromLocalFile (string.fromUtf8 (name)), overlaysForString (status));
     }
 };
-
-#include "ownclouddolphinoverlayplugin.moc"

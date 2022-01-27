@@ -4,7 +4,7 @@ Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-// #include <QStringList>
+// #include <string[]>
 // #include <QHash>
 // #include <QDateTime>
 
@@ -16,8 +16,8 @@ namespace Occ {
 ***********************************************************/
 class SyncResult {
     Q_GADGET
-public:
-    enum Status {
+
+    public enum Status {
         Undefined,
         NotYetStarted,
         Sync_prepare,
@@ -29,118 +29,117 @@ public:
         Setup_error,
         Paused
     };
-    Q_ENUM (Status);
 
-    SyncResult ();
-    void reset ();
+    public SyncResult ();
+    public void on_reset ();
 
-    void append_error_string (string &);
-    string error_string ();
-    QStringList error_strings ();
-    void clear_errors ();
+    public void append_error_string (string );
+    public string error_string ();
+    public string[] error_strings ();
+    public void clear_errors ();
 
-    void set_status (Status);
-    Status status ();
-    string status_string ();
-    QDateTime sync_time ();
-    void set_folder (string &folder);
-    string folder ();
+    public void set_status (Status);
+    public Status status ();
+    public string status_string ();
+    public QDateTime sync_time ();
+    public void set_folder (string folder);
+    public string folder ();
 
-    bool found_files_not_synced () {
+    public bool found_files_not_synced () {
         return _found_files_not_synced;
     }
-    bool folder_structure_was_changed () {
+    public bool folder_structure_was_changed () {
         return _folder_structure_was_changed;
     }
 
-    int num_new_items () {
+    public int num_new_items () {
         return _num_new_items;
     }
-    int num_removed_items () {
+    public int num_removed_items () {
         return _num_removed_items;
     }
-    int num_updated_items () {
+    public int num_updated_items () {
         return _num_updated_items;
     }
-    int num_renamed_items () {
+    public int num_renamed_items () {
         return _num_renamed_items;
     }
-    int num_new_conflict_items () {
+    public int num_new_conflict_items () {
         return _num_new_conflict_items;
     }
-    int num_old_conflict_items () {
+    public int num_old_conflict_items () {
         return _num_old_conflict_items;
     }
-    void set_num_old_conflict_items (int n) {
+    public void set_num_old_conflict_items (int n) {
         _num_old_conflict_items = n;
     }
-    int num_error_items () {
+    public int num_error_items () {
         return _num_error_items;
     }
-    bool has_unresolved_conflicts () {
+    public bool has_unresolved_conflicts () {
         return _num_new_conflict_items + _num_old_conflict_items > 0;
     }
 
-    int num_locked_items () {
+    public int num_locked_items () {
         return _num_locked_items;
     }
-    bool has_locked_files () {
+    public bool has_locked_files () {
         return _num_locked_items > 0;
     }
 
-    const SyncFileItemPtr &first_item_new () {
+    public const SyncFileItemPtr &first_item_new () {
         return _first_item_new;
     }
-    const SyncFileItemPtr &first_item_deleted () {
+    public const SyncFileItemPtr &first_item_deleted () {
         return _first_item_deleted;
     }
-    const SyncFileItemPtr &first_item_updated () {
+    public const SyncFileItemPtr &first_item_updated () {
         return _first_item_updated;
     }
-    const SyncFileItemPtr &first_item_renamed () {
+    public const SyncFileItemPtr &first_item_renamed () {
         return _first_item_renamed;
     }
-    const SyncFileItemPtr &first_new_conflict_item () {
+    public const SyncFileItemPtr &first_new_conflict_item () {
         return _first_new_conflict_item;
     }
-    const SyncFileItemPtr &first_item_error () {
+    public const SyncFileItemPtr &first_item_error () {
         return _first_item_error;
     }
-    const SyncFileItemPtr &first_item_locked () {
+    public const SyncFileItemPtr &first_item_locked () {
         return _first_item_locked;
     }
 
-    void process_completed_item (SyncFileItemPtr &item);
+    public void process_completed_item (SyncFileItemPtr &item);
 
-private:
-    Status _status = Undefined;
-    SyncFileItemVector _sync_items;
-    QDateTime _sync_time;
-    string _folder;
+
+    private Status _status = Undefined;
+    private SyncFileItemVector _sync_items;
+    private QDateTime _sync_time;
+    private string _folder;
     /***********************************************************
     when the sync tool support this...
     ***********************************************************/
-    QStringList _errors;
-    bool _found_files_not_synced = false;
-    bool _folder_structure_was_changed = false;
+    private string[] _errors;
+    private bool _found_files_not_synced = false;
+    private bool _folder_structure_was_changed = false;
 
     // count new, removed and updated items
-    int _num_new_items = 0;
-    int _num_removed_items = 0;
-    int _num_updated_items = 0;
-    int _num_renamed_items = 0;
-    int _num_new_conflict_items = 0;
-    int _num_old_conflict_items = 0;
-    int _num_error_items = 0;
-    int _num_locked_items = 0;
+    private int _num_new_items = 0;
+    private int _num_removed_items = 0;
+    private int _num_updated_items = 0;
+    private int _num_renamed_items = 0;
+    private int _num_new_conflict_items = 0;
+    private int _num_old_conflict_items = 0;
+    private int _num_error_items = 0;
+    private int _num_locked_items = 0;
 
-    SyncFileItemPtr _first_item_new;
-    SyncFileItemPtr _first_item_deleted;
-    SyncFileItemPtr _first_item_updated;
-    SyncFileItemPtr _first_item_renamed;
-    SyncFileItemPtr _first_new_conflict_item;
-    SyncFileItemPtr _first_item_error;
-    SyncFileItemPtr _first_item_locked;
+    private SyncFileItemPtr _first_item_new;
+    private SyncFileItemPtr _first_item_deleted;
+    private SyncFileItemPtr _first_item_updated;
+    private SyncFileItemPtr _first_item_renamed;
+    private SyncFileItemPtr _first_new_conflict_item;
+    private SyncFileItemPtr _first_item_error;
+    private SyncFileItemPtr _first_item_locked;
 };
 
     SyncResult.SyncResult () = default;
@@ -149,7 +148,7 @@ private:
         return _status;
     }
 
-    void SyncResult.reset () {
+    void SyncResult.on_reset () {
         *this = SyncResult ();
     }
 
@@ -201,11 +200,11 @@ private:
         return _sync_time;
     }
 
-    QStringList SyncResult.error_strings () {
+    string[] SyncResult.error_strings () {
         return _errors;
     }
 
-    void SyncResult.append_error_string (string &err) {
+    void SyncResult.append_error_string (string err) {
         _errors.append (err);
     }
 
@@ -219,7 +218,7 @@ private:
         _errors.clear ();
     }
 
-    void SyncResult.set_folder (string &folder) {
+    void SyncResult.set_folder (string folder) {
         _folder = folder;
     }
 

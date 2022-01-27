@@ -10,11 +10,9 @@ using namespace Occ;
 
 class TestInotifyWatcher : public FolderWatcherPrivate {
 
-private:
-    string _root;
+    private string _root;
 
-private slots:
-    void initTestCase () {
+    private void on_init_test_case () {
         _root = QDir.tempPath () + "/" + "test_" + string.number (Occ.Utility.rand ());
         qDebug () << "creating test directory tree in " << _root;
         QDir rootDir (_root);
@@ -27,8 +25,8 @@ private slots:
     }
 
     // Test the recursive path listing function findFoldersBelow
-    void testDirsBelowPath () {
-        QStringList dirs;
+    private on_ void testDirsBelowPath () {
+        string[] dirs;
 
         bool ok = findFoldersBelow (QDir (_root), dirs);
         QVERIFY ( dirs.indexOf (_root + "/a1")>-1);
@@ -54,7 +52,7 @@ private slots:
         QVERIFY2 (ok, "findFoldersBelow failed.");
     }
 
-    void cleanupTestCase () {
+    private void on_cleanup_test_case () {
         if ( _root.startsWith (QDir.tempPath () )) {
            system ( string ("rm -rf %1").arg (_root).toLocal8Bit () );
         }
@@ -62,4 +60,3 @@ private slots:
 };
 
 QTEST_APPLESS_MAIN (TestInotifyWatcher)
-#include "testinotifywatcher.moc"

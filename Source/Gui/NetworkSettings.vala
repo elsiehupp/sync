@@ -6,7 +6,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 // #include <QNetworkProxy>
 // #include <string>
-// #include <QList>
+// #include <GLib.List>
 
 // #include <Gtk.Widget>
 
@@ -23,26 +23,26 @@ namespace Ui {
 class Network_settings : Gtk.Widget {
 
     public Network_settings (Gtk.Widget *parent = nullptr);
-    public ~Network_settings () override;
-    public QSize size_hint () const override;
+    ~Network_settings () override;
+    public QSize size_hint () override;
 
-private slots:
-    void save_proxy_settings ();
-    void save_bWLimit_settings ();
+
+    private void on_save_proxy_settings ();
+    private void on_save_bw_limit_settings ();
 
     /// Red marking of host field if empty and enabled
-    void check_empty_proxy_host ();
+    private void on_check_empty_proxy_host ();
 
-    void check_account_localhost ();
+    private void on_check_account_localhost ();
 
-protected:
-    void show_event (QShow_event *event) override;
 
-private:
-    void load_proxy_settings ();
-    void load_bWLimit_settings ();
+    protected void show_event (QShow_event *event) override;
 
-    Ui.Network_settings *_ui;
+
+    private void load_proxy_settings ();
+    private void load_bWLimit_settings ();
+
+    private Ui.Network_settings _ui;
 };
 
     Network_settings.Network_settings (Gtk.Widget *parent)
@@ -72,33 +72,33 @@ private:
         connect (_ui.manual_proxy_radio_button, &QAbstractButton.toggled,
             _ui.type_combo_box, &Gtk.Widget.set_enabled);
         connect (_ui.manual_proxy_radio_button, &QAbstractButton.toggled,
-            this, &Network_settings.check_account_localhost);
+            this, &Network_settings.on_check_account_localhost);
 
         load_proxy_settings ();
         load_bWLimit_settings ();
 
         // proxy
-        connect (_ui.type_combo_box, static_cast<void (QCombo_box.*) (int)> (&QCombo_box.current_index_changed), this, &Network_settings.save_proxy_settings);
-        connect (_ui.proxy_button_group, static_cast<void (QButton_group.*) (int)> (&QButton_group.button_clicked), this, &Network_settings.save_proxy_settings);
-        connect (_ui.host_line_edit, &QLineEdit.editing_finished, this, &Network_settings.save_proxy_settings);
-        connect (_ui.user_line_edit, &QLineEdit.editing_finished, this, &Network_settings.save_proxy_settings);
-        connect (_ui.password_line_edit, &QLineEdit.editing_finished, this, &Network_settings.save_proxy_settings);
-        connect (_ui.port_spin_box, &QAbstract_spin_box.editing_finished, this, &Network_settings.save_proxy_settings);
-        connect (_ui.auth_requiredcheck_box, &QAbstractButton.toggled, this, &Network_settings.save_proxy_settings);
+        connect (_ui.type_combo_box, static_cast<void (QCombo_box.*) (int)> (&QCombo_box.current_index_changed), this, &Network_settings.on_save_proxy_settings);
+        connect (_ui.proxy_button_group, static_cast<void (QButton_group.*) (int)> (&QButton_group.button_clicked), this, &Network_settings.on_save_proxy_settings);
+        connect (_ui.host_line_edit, &QLineEdit.editing_finished, this, &Network_settings.on_save_proxy_settings);
+        connect (_ui.user_line_edit, &QLineEdit.editing_finished, this, &Network_settings.on_save_proxy_settings);
+        connect (_ui.password_line_edit, &QLineEdit.editing_finished, this, &Network_settings.on_save_proxy_settings);
+        connect (_ui.port_spin_box, &QAbstract_spin_box.editing_finished, this, &Network_settings.on_save_proxy_settings);
+        connect (_ui.auth_requiredcheck_box, &QAbstractButton.toggled, this, &Network_settings.on_save_proxy_settings);
 
-        connect (_ui.upload_limit_radio_button, &QAbstractButton.clicked, this, &Network_settings.save_bWLimit_settings);
-        connect (_ui.no_upload_limit_radio_button, &QAbstractButton.clicked, this, &Network_settings.save_bWLimit_settings);
-        connect (_ui.auto_upload_limit_radio_button, &QAbstractButton.clicked, this, &Network_settings.save_bWLimit_settings);
-        connect (_ui.download_limit_radio_button, &QAbstractButton.clicked, this, &Network_settings.save_bWLimit_settings);
-        connect (_ui.no_download_limit_radio_button, &QAbstractButton.clicked, this, &Network_settings.save_bWLimit_settings);
-        connect (_ui.auto_download_limit_radio_button, &QAbstractButton.clicked, this, &Network_settings.save_bWLimit_settings);
-        connect (_ui.download_spin_box, static_cast<void (QSpin_box.*) (int)> (&QSpin_box.value_changed), this, &Network_settings.save_bWLimit_settings);
-        connect (_ui.upload_spin_box, static_cast<void (QSpin_box.*) (int)> (&QSpin_box.value_changed), this, &Network_settings.save_bWLimit_settings);
+        connect (_ui.upload_limit_radio_button, &QAbstractButton.clicked, this, &Network_settings.on_save_bw_limit_settings);
+        connect (_ui.no_upload_limit_radio_button, &QAbstractButton.clicked, this, &Network_settings.on_save_bw_limit_settings);
+        connect (_ui.auto_upload_limit_radio_button, &QAbstractButton.clicked, this, &Network_settings.on_save_bw_limit_settings);
+        connect (_ui.download_limit_radio_button, &QAbstractButton.clicked, this, &Network_settings.on_save_bw_limit_settings);
+        connect (_ui.no_download_limit_radio_button, &QAbstractButton.clicked, this, &Network_settings.on_save_bw_limit_settings);
+        connect (_ui.auto_download_limit_radio_button, &QAbstractButton.clicked, this, &Network_settings.on_save_bw_limit_settings);
+        connect (_ui.download_spin_box, static_cast<void (QSpin_box.*) (int)> (&QSpin_box.value_changed), this, &Network_settings.on_save_bw_limit_settings);
+        connect (_ui.upload_spin_box, static_cast<void (QSpin_box.*) (int)> (&QSpin_box.value_changed), this, &Network_settings.on_save_bw_limit_settings);
 
         // Warn about empty proxy host
-        connect (_ui.host_line_edit, &QLineEdit.text_changed, this, &Network_settings.check_empty_proxy_host);
-        check_empty_proxy_host ();
-        check_account_localhost ();
+        connect (_ui.host_line_edit, &QLineEdit.text_changed, this, &Network_settings.on_check_empty_proxy_host);
+        on_check_empty_proxy_host ();
+        on_check_account_localhost ();
     }
 
     Network_settings.~Network_settings () {
@@ -137,14 +137,14 @@ private:
             break;
         }
 
-        _ui.host_line_edit.set_text (cfg_file.proxy_host_name ());
+        _ui.host_line_edit.on_set_text (cfg_file.proxy_host_name ());
         int port = cfg_file.proxy_port ();
         if (port == 0)
             port = 8080;
         _ui.port_spin_box.set_value (port);
         _ui.auth_requiredcheck_box.set_checked (cfg_file.proxy_needs_auth ());
-        _ui.user_line_edit.set_text (cfg_file.proxy_user ());
-        _ui.password_line_edit.set_text (cfg_file.proxy_password ());
+        _ui.user_line_edit.on_set_text (cfg_file.proxy_user ());
+        _ui.password_line_edit.on_set_text (cfg_file.proxy_password ());
     }
 
     void Network_settings.load_bWLimit_settings () {
@@ -171,10 +171,10 @@ private:
         _ui.upload_spin_box.set_value (cfg_file.upload_limit ());
     }
 
-    void Network_settings.save_proxy_settings () {
+    void Network_settings.on_save_proxy_settings () {
         ConfigFile cfg_file;
 
-        check_empty_proxy_host ();
+        on_check_empty_proxy_host ();
         if (_ui.no_proxy_radio_button.is_checked ()) {
             cfg_file.set_proxy_type (QNetworkProxy.NoProxy);
         } else if (_ui.system_proxy_radio_button.is_checked ()) {
@@ -192,11 +192,11 @@ private:
         }
 
         ClientProxy proxy;
-        proxy.setup_qt_proxy_from_config (); // Refresh the Qt proxy settings as the
+        proxy.on_setup_qt_proxy_from_config (); // Refresh the Qt proxy settings as the
         // quota check can happen all the time.
 
         // ...and set the folders dirty, they refresh their proxy next time they
-        // start the sync.
+        // on_start the sync.
         FolderMan.instance ().set_dirty_proxy ();
 
         const auto accounts = AccountManager.instance ().accounts ();
@@ -205,7 +205,7 @@ private:
         }
     }
 
-    void Network_settings.save_bWLimit_settings () {
+    void Network_settings.on_save_bw_limit_settings () {
         ConfigFile cfg_file;
         if (_ui.download_limit_radio_button.is_checked ()) {
             cfg_file.set_use_download_limit (1);
@@ -228,7 +228,7 @@ private:
         FolderMan.instance ().set_dirty_network_limits ();
     }
 
-    void Network_settings.check_empty_proxy_host () {
+    void Network_settings.on_check_empty_proxy_host () {
         if (_ui.host_line_edit.is_enabled () && _ui.host_line_edit.text ().is_empty ()) {
             _ui.host_line_edit.set_style_sheet ("border : 1px solid red");
         } else {
@@ -241,15 +241,15 @@ private:
             && _ui.manual_proxy_radio_button.is_checked ()
             && _ui.host_line_edit.text ().is_empty ()) {
             _ui.no_proxy_radio_button.set_checked (true);
-            check_empty_proxy_host ();
-            save_proxy_settings ();
+            on_check_empty_proxy_host ();
+            on_save_proxy_settings ();
         }
-        check_account_localhost ();
+        on_check_account_localhost ();
 
         Gtk.Widget.show_event (event);
     }
 
-    void Network_settings.check_account_localhost () {
+    void Network_settings.on_check_account_localhost () {
         bool visible = false;
         if (_ui.manual_proxy_radio_button.is_checked ()) {
             // Check if at least one account is using localhost, because Qt proxy settings have no

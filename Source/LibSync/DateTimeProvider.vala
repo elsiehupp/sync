@@ -5,12 +5,12 @@
 namespace Occ {
 
 class DateTimeProvider {
-public:
+
     virtual ~DateTimeProvider ();
 
-    virtual QDateTime current_date_time ();
+    public virtual QDateTime current_date_time ();
 
-    virtual QDate current_date ();
+    public virtual QDate current_date ();
 };
 
 

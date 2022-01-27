@@ -19,43 +19,43 @@ namespace Occ {
 @ingroup libsync
 ***********************************************************/
 class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
-public:
-    AbstractPropagateRemoteDeleteEncrypted (OwncloudPropagator *propagator, SyncFileItemPtr item, GLib.Object *parent);
+
+    public AbstractPropagateRemoteDeleteEncrypted (OwncloudPropagator *propagator, SyncFileItemPtr item, GLib.Object *parent);
     ~AbstractPropagateRemoteDeleteEncrypted () override = default;
 
-    QNetworkReply.NetworkError network_error ();
-    string error_string ();
+    public QNetworkReply.NetworkError network_error ();
+    public string error_string ();
 
-    virtual void start () = 0;
+    public virtual void on_start () = 0;
 
 signals:
-    void finished (bool success);
+    void on_finished (bool on_success);
 
-protected:
-    void store_first_error (QNetworkReply.NetworkError err);
-    void store_first_error_string (string &err_string);
 
-    void start_ls_col_job (string &path);
-    void slot_folder_encrypted_id_received (QStringList &list);
-    void slot_try_lock (QByteArray &folder_id);
-    void slot_folder_locked_successfully (QByteArray &folder_id, QByteArray &token);
-    virtual void slot_folder_un_locked_successfully (QByteArray &folder_id);
-    virtual void slot_folder_encrypted_metadata_received (QJsonDocument &json, int status_code) = 0;
-    void slot_delete_remote_item_finished ();
+    protected void store_first_error (QNetworkReply.NetworkError err);
+    protected void store_first_error_string (string err_string);
 
-    void delete_remote_item (string &filename);
-    void unlock_folder ();
-    void task_failed ();
+    protected void start_ls_col_job (string path);
+    protected void on_folder_encrypted_id_received (string[] &list);
+    protected void on_try_lock (GLib.ByteArray &folder_id);
+    protected void on_folder_locked_successfully (GLib.ByteArray &folder_id, GLib.ByteArray &token);
+    protected virtual void on_folder_un_locked_successfully (GLib.ByteArray &folder_id);
+    protected virtual void on_folder_encrypted_metadata_received (QJsonDocument &json, int status_code) = 0;
+    protected void on_delete_remote_item_finished ();
 
-protected:
-    OwncloudPropagator *_propagator = nullptr;
-    SyncFileItemPtr _item;
-    QByteArray _folder_token;
-    QByteArray _folder_id;
-    bool _folder_locked = false;
-    bool _is_task_failed = false;
-    QNetworkReply.NetworkError _network_error = QNetworkReply.NoError;
-    string _error_string;
+    protected void delete_remote_item (string filename);
+    protected void unlock_folder ();
+    protected void task_failed ();
+
+
+    protected OwncloudPropagator _propagator = nullptr;
+    protected SyncFileItemPtr _item;
+    protected GLib.ByteArray _folder_token;
+    protected GLib.ByteArray _folder_id;
+    protected bool _folder_locked = false;
+    protected bool _is_task_failed = false;
+    protected QNetworkReply.NetworkError _network_error = QNetworkReply.NoError;
+    protected string _error_string;
 };
 
 }
@@ -79,55 +79,55 @@ void AbstractPropagateRemoteDeleteEncrypted.store_first_error (QNetworkReply.Net
     }
 }
 
-void AbstractPropagateRemoteDeleteEncrypted.store_first_error_string (string &err_string) {
+void AbstractPropagateRemoteDeleteEncrypted.store_first_error_string (string err_string) {
     if (_error_string.is_empty ()) {
         _error_string = err_string;
     }
 }
 
-void AbstractPropagateRemoteDeleteEncrypted.start_ls_col_job (string &path) {
+void AbstractPropagateRemoteDeleteEncrypted.start_ls_col_job (string path) {
     q_c_debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Folder is encrypted, let's get the Id from it.";
     auto job = new LsColJob (_propagator.account (), _propagator.full_remote_path (path), this);
     job.set_properties ({"resourcetype", "http://owncloud.org/ns:fileid"});
-    connect (job, &LsColJob.directory_listing_subfolders, this, &AbstractPropagateRemoteDeleteEncrypted.slot_folder_encrypted_id_received);
+    connect (job, &LsColJob.directory_listing_subfolders, this, &AbstractPropagateRemoteDeleteEncrypted.on_folder_encrypted_id_received);
     connect (job, &LsColJob.finished_with_error, this, &AbstractPropagateRemoteDeleteEncrypted.task_failed);
-    job.start ();
+    job.on_start ();
 }
 
-void AbstractPropagateRemoteDeleteEncrypted.slot_folder_encrypted_id_received (QStringList &list) {
+void AbstractPropagateRemoteDeleteEncrypted.on_folder_encrypted_id_received (string[] &list) {
     q_c_debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Received id of folder, trying to lock it so we can prepare the metadata";
     auto job = qobject_cast<LsColJob> (sender ());
     const ExtraFolderInfo folder_info = job._folder_infos.value (list.first ());
-    slot_try_lock (folder_info.file_id);
+    on_try_lock (folder_info.file_id);
 }
 
-void AbstractPropagateRemoteDeleteEncrypted.slot_try_lock (QByteArray &folder_id) {
+void AbstractPropagateRemoteDeleteEncrypted.on_try_lock (GLib.ByteArray &folder_id) {
     auto lock_job = new LockEncryptFolderApiJob (_propagator.account (), folder_id, this);
-    connect (lock_job, &LockEncryptFolderApiJob.success, this, &AbstractPropagateRemoteDeleteEncrypted.slot_folder_locked_successfully);
+    connect (lock_job, &LockEncryptFolderApiJob.on_success, this, &AbstractPropagateRemoteDeleteEncrypted.on_folder_locked_successfully);
     connect (lock_job, &LockEncryptFolderApiJob.error, this, &AbstractPropagateRemoteDeleteEncrypted.task_failed);
-    lock_job.start ();
+    lock_job.on_start ();
 }
 
-void AbstractPropagateRemoteDeleteEncrypted.slot_folder_locked_successfully (QByteArray &folder_id, QByteArray &token) {
+void AbstractPropagateRemoteDeleteEncrypted.on_folder_locked_successfully (GLib.ByteArray &folder_id, GLib.ByteArray &token) {
     q_c_debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Folder id" << folder_id << "Locked Successfully for Upload, Fetching Metadata";
     _folder_locked = true;
     _folder_token = token;
     _folder_id = folder_id;
 
     auto job = new GetMetadataApiJob (_propagator.account (), _folder_id);
-    connect (job, &GetMetadataApiJob.json_received, this, &AbstractPropagateRemoteDeleteEncrypted.slot_folder_encrypted_metadata_received);
+    connect (job, &GetMetadataApiJob.json_received, this, &AbstractPropagateRemoteDeleteEncrypted.on_folder_encrypted_metadata_received);
     connect (job, &GetMetadataApiJob.error, this, &AbstractPropagateRemoteDeleteEncrypted.task_failed);
-    job.start ();
+    job.on_start ();
 }
 
-void AbstractPropagateRemoteDeleteEncrypted.slot_folder_un_locked_successfully (QByteArray &folder_id) {
+void AbstractPropagateRemoteDeleteEncrypted.on_folder_un_locked_successfully (GLib.ByteArray &folder_id) {
     Q_UNUSED (folder_id);
     q_c_debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Folder id" << folder_id << "successfully unlocked";
     _folder_locked = false;
     _folder_token = "";
 }
 
-void AbstractPropagateRemoteDeleteEncrypted.slot_delete_remote_item_finished () {
+void AbstractPropagateRemoteDeleteEncrypted.on_delete_remote_item_finished () {
     auto *delete_job = qobject_cast<DeleteJob> (GLib.Object.sender ());
 
     Q_ASSERT (delete_job);
@@ -152,7 +152,7 @@ void AbstractPropagateRemoteDeleteEncrypted.slot_delete_remote_item_finished () 
         return;
     }
 
-    // A 404 reply is also considered a success here : We want to make sure
+    // A 404 reply is also considered a on_success here : We want to make sure
     // a file is gone from the server. It not being there in the first place
     // is ok. This will happen for files that are in the DB but not on
     // the server or the local file system.
@@ -174,28 +174,28 @@ void AbstractPropagateRemoteDeleteEncrypted.slot_delete_remote_item_finished () 
     unlock_folder ();
 }
 
-void AbstractPropagateRemoteDeleteEncrypted.delete_remote_item (string &filename) {
+void AbstractPropagateRemoteDeleteEncrypted.delete_remote_item (string filename) {
     q_c_info (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Deleting nested encrypted item" << filename;
 
     auto delete_job = new DeleteJob (_propagator.account (), _propagator.full_remote_path (filename), this);
     delete_job.set_folder_token (_folder_token);
 
-    connect (delete_job, &DeleteJob.finished_signal, this, &AbstractPropagateRemoteDeleteEncrypted.slot_delete_remote_item_finished);
+    connect (delete_job, &DeleteJob.finished_signal, this, &AbstractPropagateRemoteDeleteEncrypted.on_delete_remote_item_finished);
 
-    delete_job.start ();
+    delete_job.on_start ();
 }
 
 void AbstractPropagateRemoteDeleteEncrypted.unlock_folder () {
     if (!_folder_locked) {
-        emit finished (true);
+        emit on_finished (true);
         return;
     }
 
     q_c_debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) << "Unlocking folder" << _folder_id;
     auto unlock_job = new UnlockEncryptFolderApiJob (_propagator.account (), _folder_id, _folder_token, this);
 
-    connect (unlock_job, &UnlockEncryptFolderApiJob.success, this, &AbstractPropagateRemoteDeleteEncrypted.slot_folder_un_locked_successfully);
-    connect (unlock_job, &UnlockEncryptFolderApiJob.error, this, [this] (QByteArray& file_id, int http_return_code) {
+    connect (unlock_job, &UnlockEncryptFolderApiJob.on_success, this, &AbstractPropagateRemoteDeleteEncrypted.on_folder_un_locked_successfully);
+    connect (unlock_job, &UnlockEncryptFolderApiJob.error, this, [this] (GLib.ByteArray& file_id, int http_return_code) {
         Q_UNUSED (file_id);
         _folder_locked = false;
         _folder_token = "";
@@ -206,7 +206,7 @@ void AbstractPropagateRemoteDeleteEncrypted.unlock_folder () {
         _item._error_string =_error_string;
         task_failed ();
     });
-    unlock_job.start ();
+    unlock_job.on_start ();
 }
 
 void AbstractPropagateRemoteDeleteEncrypted.task_failed () {
@@ -215,7 +215,7 @@ void AbstractPropagateRemoteDeleteEncrypted.task_failed () {
     if (_folder_locked) {
         unlock_folder ();
     } else {
-        emit finished (false);
+        emit on_finished (false);
     }
 }
 

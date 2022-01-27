@@ -15,8 +15,7 @@ class TestFolderMan : public GLib.Object {
 
     FolderMan _fm;
 
-private slots:
-    void testCheckPathValidityForNewFolder () {
+    private on_ void testCheckPathValidityForNewFolder () {
         QTemporaryDir dir;
         ConfigFile.setConfDir (dir.path ()); // we don't want to pollute the user's config file
         QVERIFY (dir.isValid ());
@@ -50,7 +49,7 @@ private slots:
         }
 
         // those should be allowed
-        // string FolderMan.checkPathValidityForNewFolder (string& path, QUrl &serverUrl, bool forNewDirectory)
+        // string FolderMan.checkPathValidityForNewFolder (string& path, QUrl serverUrl, bool forNewDirectory)
 
         QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/sub/free"), string ());
         QCOMPARE (folderman.checkPathValidityForNewFolder (dirPath + "/free2/"), string ());
@@ -125,7 +124,7 @@ private slots:
         QVERIFY (!folderman.checkPathValidityForNewFolder (dirPath + "/ownCloud2/sub/subsub/sub").isNull ());
     }
 
-    void testFindGoodPathForNewSyncFolder () {
+    private on_ void testFindGoodPathForNewSyncFolder () {
         // SETUP
 
         QTemporaryDir dir;

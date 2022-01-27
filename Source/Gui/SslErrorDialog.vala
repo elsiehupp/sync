@@ -11,7 +11,7 @@ Copyright (C) by Klaas Freitag <freitag@kde.org>
 // #include <QtCore>
 // #include <Gtk.Dialog>
 // #include <QSslCertificate>
-// #include <QList>
+// #include <GLib.List>
 
 
 namespace Occ {
@@ -26,7 +26,7 @@ namespace Ui {
 ***********************************************************/
 class SslDialogErrorHandler : AbstractSslErrorHandler {
 
-    public bool handle_errors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, AccountPtr) override;
+    public bool handle_errors (GLib.List<QSslError> errors, QSslConfiguration &conf, GLib.List<QSslCertificate> *certs, AccountPtr) override;
 };
 
 /***********************************************************
@@ -36,33 +36,33 @@ class SslDialogErrorHandler : AbstractSslErrorHandler {
 class Ssl_error_dialog : Gtk.Dialog {
 
     public Ssl_error_dialog (AccountPtr account, Gtk.Widget *parent = nullptr);
-    public ~Ssl_error_dialog () override;
-    public bool check_failing_certs_known (QList<QSslError> &errors);
+    ~Ssl_error_dialog () override;
+    public bool check_failing_certs_known (GLib.List<QSslError> &errors);
     public bool trust_connection ();
-    public QList<QSslCertificate> unknown_certs () {
+    public GLib.List<QSslCertificate> unknown_certs () {
         return _unknown_certs;
     }
 
-private:
-    string style_sheet ();
-    bool _all_trusted;
 
-    string cert_div (QSslCertificate) const;
+    private string style_sheet ();
+    private bool _all_trusted;
 
-    QList<QSslCertificate> _unknown_certs;
-    string _custom_config_handle;
-    Ui.Ssl_error_dialog *_ui;
-    AccountPtr _account;
+    private string cert_div (QSslCertificate);
+
+    private GLib.List<QSslCertificate> _unknown_certs;
+    private string _custom_config_handle;
+    private Ui.Ssl_error_dialog _ui;
+    private AccountPtr _account;
 };
 
     namespace Utility {
-        //  Used for QSSLCertificate.subject_info which returns a QStringList in Qt5, but a string in Qt4
-        string escape (QStringList &l) {
+        //  Used for QSSLCertificate.subject_info which returns a string[] in Qt5, but a string in Qt4
+        string escape (string[] &l) {
             return escape (l.join (';'));
         }
     }
 
-    bool SslDialogErrorHandler.handle_errors (QList<QSslError> errors, QSslConfiguration &conf, QList<QSslCertificate> *certs, AccountPtr account) {
+    bool SslDialogErrorHandler.handle_errors (GLib.List<QSslError> errors, QSslConfiguration &conf, GLib.List<QSslCertificate> *certs, AccountPtr account) {
         (void)conf;
         if (!certs) {
             q_c_critical (lc_ssl_error_dialog) << "Certs parameter required but is NULL!";
@@ -127,15 +127,15 @@ private:
     }
     const int QL (x) QLatin1String (x)
 
-    bool Ssl_error_dialog.check_failing_certs_known (QList<QSslError> &errors) {
+    bool Ssl_error_dialog.check_failing_certs_known (GLib.List<QSslError> &errors) {
         // check if unknown certs caused errors.
         _unknown_certs.clear ();
 
-        QStringList error_strings;
+        string[] error_strings;
 
-        QStringList additional_error_strings;
+        string[] additional_error_strings;
 
-        QList<QSslCertificate> trusted_certs = _account.approved_certs ();
+        GLib.List<QSslCertificate> trusted_certs = _account.approved_certs ();
 
         for (int i = 0; i < errors.count (); ++i) {
             QSslError error = errors.at (i);
@@ -208,7 +208,7 @@ private:
         msg += QL ("<h3>") + tr ("with Certificate %1").arg (Utility.escape (cert.subject_info (QSslCertificate.Common_name))) + QL ("</h3>");
 
         msg += QL ("<div id=\"ccert\">");
-        QStringList li;
+        string[] li;
 
         string org = Utility.escape (cert.subject_info (QSslCertificate.Organization));
         string unit = Utility.escape (cert.subject_info (QSslCertificate.Organizational_unit_name));

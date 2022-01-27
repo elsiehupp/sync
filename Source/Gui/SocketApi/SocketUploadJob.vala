@@ -19,18 +19,18 @@ namespace Occ {
 
 class Socket_upload_job : GLib.Object {
 
-    public Socket_upload_job (QSharedPointer<Socket_api_job_v2> &job);
-    public void start ();
+    public Socket_upload_job (unowned<Socket_api_job_v2> &job);
+    public void on_start ();
 
-private:
-    QSharedPointer<Socket_api_job_v2> _api_job;
-    string _local_path;
-    string _remote_path;
-    string _pattern;
-    QTemporary_file _tmp;
-    SyncJournalDb *_db;
-    SyncEngine *_engine;
-    QStringList _synced_files;
+
+    private unowned<Socket_api_job_v2> _api_job;
+    private string _local_path;
+    private string _remote_path;
+    private string _pattern;
+    private QTemporary_file _tmp;
+    private SyncJournalDb _db;
+    private SyncEngine _engine;
+    private string[] _synced_files;
 };
 }
 
@@ -42,9 +42,9 @@ private:
 
 
 
-Socket_upload_job.Socket_upload_job (QSharedPointer<Socket_api_job_v2> &job)
+Socket_upload_job.Socket_upload_job (unowned<Socket_api_job_v2> &job)
     : _api_job (job) {
-    connect (job.data (), &Socket_api_job_v2.finished, this, &Socket_upload_job.delete_later);
+    connect (job.data (), &Socket_api_job_v2.on_finished, this, &Socket_upload_job.delete_later);
 
     _local_path = _api_job.arguments ()[QLatin1String ("local_path")].to_string ();
     _remote_path = _api_job.arguments ()[QLatin1String ("remote_path")].to_string ();
@@ -74,9 +74,9 @@ Socket_upload_job.Socket_upload_job (QSharedPointer<Socket_api_job_v2> &job)
         _synced_files.append (item._file);
     });
 
-    connect (_engine, &Occ.SyncEngine.finished, this, [this] (bool ok) {
+    connect (_engine, &Occ.SyncEngine.on_finished, this, [this] (bool ok) {
         if (ok) {
-            _api_job.success ({
+            _api_job.on_success ({
                 {
                     "local_path",
                     _local_path
@@ -88,12 +88,12 @@ Socket_upload_job.Socket_upload_job (QSharedPointer<Socket_api_job_v2> &job)
             });
         }
     });
-    connect (_engine, &Occ.SyncEngine.sync_error, this, [this] (string &error, ErrorCategory) {
+    connect (_engine, &Occ.SyncEngine.sync_error, this, [this] (string error, ErrorCategory) {
         _api_job.failure (error);
     });
 }
 
-void Socket_upload_job.start () {
+void Socket_upload_job.on_start () {
     auto opt = _engine.sync_options ();
     opt.set_file_pattern (_pattern);
     if (!opt.file_regex ().is_valid ()) {
@@ -104,7 +104,7 @@ void Socket_upload_job.start () {
 
     // create the dir, fail if it already exists
     auto mkdir = new Occ.MkColJob (_engine.account (), _remote_path);
-    connect (mkdir, &Occ.MkColJob.finished_without_error, _engine, &Occ.SyncEngine.start_sync);
+    connect (mkdir, &Occ.MkColJob.finished_without_error, _engine, &Occ.SyncEngine.on_start_sync);
     connect (mkdir, &Occ.MkColJob.finished_with_error, this, [this] (QNetworkReply *reply) {
         if (reply.error () == 202) {
             _api_job.failure (QStringLiteral ("Destination %1 already exists").arg (_remote_path));
@@ -112,5 +112,5 @@ void Socket_upload_job.start () {
             _api_job.failure (reply.error_string ());
         }
     });
-    mkdir.start ();
+    mkdir.on_start ();
 }

@@ -41,51 +41,56 @@ class UserStatus {
     Q_PROPERTY (string icon MEMBER _icon)
     Q_PROPERTY (OnlineStatus state MEMBER _state)
 
-public:
-    enum class OnlineStatus : uint8 {
+
+    public enum class OnlineStatus : uint8 {
         Online,
         DoNotDisturb,
         Away,
         Offline,
         Invisible
     };
-    Q_ENUM (OnlineStatus);
 
-    UserStatus ();
+    public UserStatus ();
 
-    UserStatus (string &id, string &message, string &icon,
+    public UserStatus (string id, string message, string icon,
         OnlineStatus state, bool message_predefined, Optional<ClearAt> &clear_at = {});
 
-    Q_REQUIRED_RESULT string id ();
-    Q_REQUIRED_RESULT string message ();
-    Q_REQUIRED_RESULT string icon ();
-    Q_REQUIRED_RESULT OnlineStatus state ();
-    Q_REQUIRED_RESULT Optional<ClearAt> clear_at ();
+    //  Q_REQUIRED_RESULT
+    public string id ();
+    //  Q_REQUIRED_RESULT
+    public string message ();
+    //  Q_REQUIRED_RESULT
+    public string icon ();
+    //  Q_REQUIRED_RESULT
+    public OnlineStatus state ();
+    //  Q_REQUIRED_RESULT
+    public Optional<ClearAt> clear_at ();
 
-    void set_id (string &id);
-    void set_message (string &message);
-    void set_state (OnlineStatus state);
-    void set_icon (string &icon);
-    void set_message_predefined (bool value);
-    void set_clear_at (Optional<ClearAt> &date_time);
+    public void set_id (string id);
+    public void set_message (string message);
+    public void set_state (OnlineStatus state);
+    public void set_icon (string icon);
+    public void set_message_predefined (bool value);
+    public void set_clear_at (Optional<ClearAt> &date_time);
 
-    Q_REQUIRED_RESULT bool message_predefined ();
+    //  Q_REQUIRED_RESULT
+    public bool message_predefined ();
 
-    Q_REQUIRED_RESULT QUrl state_icon ();
+    //  Q_REQUIRED_RESULT
+    public QUrl state_icon ();
 
-private:
-    string _id;
-    string _message;
-    string _icon;
-    OnlineStatus _state = OnlineStatus.Online;
-    bool _message_predefined;
-    Optional<ClearAt> _clear_at;
+
+    private string _id;
+    private string _message;
+    private string _icon;
+    private OnlineStatus _state = OnlineStatus.Online;
+    private bool _message_predefined;
+    private Optional<ClearAt> _clear_at;
 };
 
 class UserStatusConnector : GLib.Object {
 
-public:
-    enum class Error {
+    public enum class Error {
         CouldNotFetchUserStatus,
         CouldNotFetchPredefinedUserStatuses,
         UserStatusNotSupported,
@@ -93,21 +98,20 @@ public:
         CouldNotSetUserStatus,
         CouldNotClearMessage
     };
-    Q_ENUM (Error)
 
-    UserStatusConnector (GLib.Object *parent = nullptr);
+    public UserStatusConnector (GLib.Object *parent = nullptr);
 
     ~UserStatusConnector () override;
 
-    virtual void fetch_user_status () = 0;
+    public virtual void fetch_user_status () = 0;
 
-    virtual void fetch_predefined_statuses () = 0;
+    public virtual void fetch_predefined_statuses () = 0;
 
-    virtual void set_user_status (UserStatus &user_status) = 0;
+    public virtual void set_user_status (UserStatus &user_status) = 0;
 
-    virtual void clear_message () = 0;
+    public virtual void clear_message () = 0;
 
-    virtual UserStatus user_status () const = 0;
+    public virtual UserStatus user_status () = 0;
 
 signals:
     void user_status_fetched (UserStatus &user_status);
@@ -121,7 +125,7 @@ signals:
     UserStatus.UserStatus () = default;
 
     UserStatus.UserStatus (
-        const string &id, string &message, string &icon,
+        const string id, string message, string icon,
         OnlineStatus state, bool message_predefined, Optional<ClearAt> &clear_at)
         : _id (id)
         , _message (message)
@@ -143,7 +147,7 @@ signals:
         return _icon;
     }
 
-    auto UserStatus.state () const . OnlineStatus {
+    auto UserStatus.state () . OnlineStatus {
         return _state;
     }
 
@@ -174,11 +178,11 @@ signals:
         return _clear_at;
     }
 
-    void UserStatus.set_id (string &id) {
+    void UserStatus.set_id (string id) {
         _id = id;
     }
 
-    void UserStatus.set_message (string &message) {
+    void UserStatus.set_message (string message) {
         _message = message;
     }
 
@@ -186,7 +190,7 @@ signals:
         _state = state;
     }
 
-    void UserStatus.set_icon (string &icon) {
+    void UserStatus.set_icon (string icon) {
         _icon = icon;
     }
 

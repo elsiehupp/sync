@@ -23,14 +23,14 @@ namespace Occ {
 Class that store in a memory efficient way the remote permission
 ***********************************************************/
 class RemotePermissions {
-private:
+
     // The first bit tells if the value is set or not
     // The remaining bits correspond to know if the value is set
-    uint16 _value = 0;
-    static constexpr int not_null_mask = 0x1;
+    private uint16 _value = 0;
+    private static constexpr int not_null_mask = 0x1;
 
-    template <typename Char> // can be 'char' or 'ushort' if conversion from string
-    void from_array (Char *p);
+    private template <typename Char> // can be 'char' or 'ushort' if conversion from string
+    private void from_array (Char *p);
 
     public enum Permissions {
         Can_write = 1,             // W
@@ -55,16 +55,16 @@ private:
     public RemotePermissions () = default;
 
     /// array with one character per permission, "" is null, " " is non-null but empty
-    public QByteArray to_db_value ();
+    public GLib.ByteArray to_db_value ();
 
     /// output for display purposes, no defined format (same as to_db_value in practice)
     public string to_string ();
 
     /// read value that was written with to_db_value ()
-    public static RemotePermissions from_db_value (QByteArray &);
+    public static RemotePermissions from_db_value (GLib.ByteArray &);
 
     /// read a permissions string received from the server, never null
-    public static RemotePermissions from_server_string (string &);
+    public static RemotePermissions from_server_string (string );
 
     public bool has_permission (Permissions p) {
         return _value & (1 << static_cast<int> (p));
@@ -107,8 +107,8 @@ private:
         }
     }
 
-    QByteArray RemotePermissions.to_db_value () {
-        QByteArray result;
+    GLib.ByteArray RemotePermissions.to_db_value () {
+        GLib.ByteArray result;
         if (is_null ())
             return result;
         result.reserve (PermissionsCount);
@@ -127,7 +127,7 @@ private:
         return string.from_utf8 (to_db_value ());
     }
 
-    RemotePermissions RemotePermissions.from_db_value (QByteArray &value) {
+    RemotePermissions RemotePermissions.from_db_value (GLib.ByteArray &value) {
         if (value.is_empty ())
             return {};
         RemotePermissions perm;
@@ -135,7 +135,7 @@ private:
         return perm;
     }
 
-    RemotePermissions RemotePermissions.from_server_string (string &value) {
+    RemotePermissions RemotePermissions.from_server_string (string value) {
         RemotePermissions perm;
         perm.from_array (value.utf16 ());
         return perm;

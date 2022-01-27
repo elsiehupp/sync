@@ -15,17 +15,17 @@ static constexpr int64 stopAfter = 3'123'668;
 
 /* A FakeGetReply that sends max 'fakeSize' bytes, but whose ContentLength has the corect size */
 class BrokenFakeGetReply : FakeGetReply {
-public:
-    using FakeGetReply.FakeGetReply;
-    int fakeSize = stopAfter;
 
-    int64 bytesAvailable () const override {
+    using FakeGetReply.FakeGetReply;
+    public int fakeSize = stopAfter;
+
+    public int64 bytesAvailable () override {
         if (aborted)
             return 0;
         return std.min (size, fakeSize) + QIODevice.bytesAvailable (); // NOLINT : This is intended to simulare the brokeness
     }
 
-    int64 readData (char *data, int64 maxlen) override {
+    public int64 readData (char *data, int64 maxlen) override {
         int64 len = std.min (int64{ fakeSize }, maxlen);
         std.fill_n (data, len, payload);
         size -= len;
@@ -34,8 +34,8 @@ public:
     }
 };
 
-SyncFileItemPtr getItem (QSignalSpy &spy, string &path) {
-    for (QList<QVariant> &args : spy) {
+SyncFileItemPtr getItem (QSignalSpy &spy, string path) {
+    for (GLib.List<QVariant> &args : spy) {
         auto item = args[0].value<SyncFileItemPtr> ();
         if (item.destination () == path)
             return item;
@@ -45,9 +45,7 @@ SyncFileItemPtr getItem (QSignalSpy &spy, string &path) {
 
 class TestDownload : GLib.Object {
 
-private slots:
-
-    void testResume () {
+    private on_ void testResume () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         fakeFolder.syncEngine ().setIgnoreHiddenFiles (true);
         QSignalSpy completeSpy (&fakeFolder.syncEngine (), SIGNAL (itemCompleted (SyncFileItemPtr &)));
@@ -68,7 +66,7 @@ private slots:
         QVERIFY (fakeFolder.syncEngine ().isAnotherSyncNeeded ());
 
         // Now, we need to restart, this time, it should resume.
-        QByteArray ranges;
+        GLib.ByteArray ranges;
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.GetOperation && request.url ().path ().endsWith ("A/a0")) {
                 ranges = request.rawHeader ("Range");
@@ -76,11 +74,11 @@ private slots:
             return nullptr;
         });
         QVERIFY (fakeFolder.syncOnce ()); // now this succeeds
-        QCOMPARE (ranges, QByteArray ("bytes=" + QByteArray.number (stopAfter) + "-"));
+        QCOMPARE (ranges, GLib.ByteArray ("bytes=" + GLib.ByteArray.number (stopAfter) + "-"));
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void testErrorMessage () {
+    private on_ void testErrorMessage () {
         // This test's main goal is to test that the error string from the server is shown in the UI
 
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
@@ -89,7 +87,7 @@ private slots:
         auto size = 3'500'000;
         fakeFolder.remoteModifier ().insert ("A/broken", size);
 
-        QByteArray serverMessage = "The file was not downloaded because the tests wants so!";
+        GLib.ByteArray serverMessage = "The file was not downloaded because the tests wants so!";
 
         // First, download only the first 3 MB of the file
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
@@ -105,15 +103,15 @@ private slots:
         });
 
         bool timedOut = false;
-        QTimer.singleShot (10000, &fakeFolder.syncEngine (), [&] () { timedOut = true; fakeFolder.syncEngine ().abort (); });
+        QTimer.singleShot (10000, &fakeFolder.syncEngine (), [&] () { timedOut = true; fakeFolder.syncEngine ().on_abort (); });
         QVERIFY (!fakeFolder.syncOnce ());  // Fail because A/broken
         QVERIFY (!timedOut);
         QCOMPARE (getItem (completeSpy, "A/broken")._status, SyncFileItem.NormalError);
         QVERIFY (getItem (completeSpy, "A/broken")._errorString.contains (serverMessage));
     }
 
-    void serverMaintenence () {
-        // Server in maintenance must abort the sync.
+    private on_ void serverMaintenence () {
+        // Server in maintenance must on_abort the sync.
 
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.remoteModifier ().insert ("A/broken");
@@ -136,7 +134,7 @@ private slots:
         QVERIFY (getItem (completeSpy, "A/broken")._errorString.contains ("System in maintenance mode"));
     }
 
-    void testMoveFailsInAConflict () {
+    private on_ void testMoveFailsInAConflict () {
         // Test for https://github.com/owncloud/client/issues/7015
         // We want to test the case in which the renaming of the original to the conflict file succeeds,
         // but renaming the temporary file fails.
@@ -156,7 +154,7 @@ private slots:
             if (pi.status () != ProgressInfo.Propagation || propConnected || !propagator)
                 return;
             propConnected = true;
-            connect (propagator.data (), &OwncloudPropagator.touchedFile, [&] (string &s) {
+            connect (propagator.data (), &OwncloudPropagator.touchedFile, [&] (string s) {
                 if (s.contains ("conflicted copy")) {
                     QCOMPARE (conflictFile, string ());
                     conflictFile = s;
@@ -193,11 +191,11 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void testHttp2Resend () {
+    private on_ void testHttp2Resend () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.remoteModifier ().insert ("A/resendme", 300);
 
-        QByteArray serverMessage = "Needs to be resend on a new connection!";
+        GLib.ByteArray serverMessage = "Needs to be resend on a new connection!";
         int resendActual = 0;
         int resendExpected = 2;
 

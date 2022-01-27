@@ -20,8 +20,8 @@ namespace SharedTools {
 
 class QtSingleApplication : QApplication {
 
-    public QtSingleApplication (string &id, int &argc, char **argv);
-    public ~QtSingleApplication () override;
+    public QtSingleApplication (string id, int &argc, char **argv);
+    ~QtSingleApplication () override;
 
     public bool is_running (int64 pid = -1);
 
@@ -32,16 +32,16 @@ class QtSingleApplication : QApplication {
     public string application_id ();
     public void set_block (bool value);
 
-public slots:
-    bool send_message (string &message, int timeout = 5000, int64 pid = -1);
-    void activate_window ();
+
+    public bool on_send_message (string message, int timeout = 5000, int64 pid = -1);
+    public void on_activate_window ();
 
 signals:
-    void message_received (string &message, GLib.Object *socket);
-    void file_open_request (string &file);
+    void message_received (string message, GLib.Object *socket);
+    void file_open_request (string file);
 
-private:
-    string instances_file_name (string &app_id);
+
+    private string instances_file_name (string app_id);
 
     int64 first_peer;
     QShared_memory *instances;
@@ -86,7 +86,7 @@ namespace SharedTools {
 
     static const int instances_size = 1024;
 
-    static string instances_lock_filename (string &app_session_id) {
+    static string instances_lock_filename (string app_session_id) {
         const QChar slash (QLatin1Char ('/'));
         string res = QDir.temp_path ();
         if (!res.ends_with (slash))
@@ -94,7 +94,7 @@ namespace SharedTools {
         return res + app_session_id + QLatin1String ("-instances");
     }
 
-    QtSingleApplication.QtSingleApplication (string &app_id, int &argc, char **argv)
+    QtSingleApplication.QtSingleApplication (string app_id, int &argc, char **argv)
         : QApplication (argc, argv),
           first_peer (-1),
           pid_peer (nullptr) {
@@ -181,7 +181,7 @@ namespace SharedTools {
         return peer.is_client ();
     }
 
-    bool QtSingleApplication.send_message (string &message, int timeout, int64 pid) {
+    bool QtSingleApplication.on_send_message (string message, int timeout, int64 pid) {
         if (pid == -1) {
             pid = first_peer;
             if (pid == -1)
@@ -189,7 +189,7 @@ namespace SharedTools {
         }
 
         QtLocalPeer peer (this, app_id + QLatin1Char ('-') + string.number (pid, 10));
-        return peer.send_message (message, timeout, block);
+        return peer.on_send_message (message, timeout, block);
     }
 
     string QtSingleApplication.application_id () {
@@ -205,20 +205,20 @@ namespace SharedTools {
         if (!pid_peer)
             return;
         if (activate_on_message)
-            connect (pid_peer, &QtLocalPeer.message_received, this, &QtSingleApplication.activate_window);
+            connect (pid_peer, &QtLocalPeer.message_received, this, &QtSingleApplication.on_activate_window);
         else
-            disconnect (pid_peer, &QtLocalPeer.message_received, this, &QtSingleApplication.activate_window);
+            disconnect (pid_peer, &QtLocalPeer.message_received, this, &QtSingleApplication.on_activate_window);
     }
 
     Gtk.Widget* QtSingleApplication.activation_window () {
         return act_win;
     }
 
-    void QtSingleApplication.activate_window () {
+    void QtSingleApplication.on_activate_window () {
         if (act_win) {
             act_win.set_window_state (act_win.window_state () & ~Qt.Window_minimized);
             act_win.raise ();
-            act_win.activate_window ();
+            act_win.on_activate_window ();
         }
     }
 

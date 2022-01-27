@@ -19,8 +19,7 @@ namespace Occ {
 
 class PushNotifications : GLib.Object {
 
-public:
-    PushNotifications (Account *account, GLib.Object *parent = nullptr);
+    public PushNotifications (Account *account, GLib.Object *parent = nullptr);
 
     ~PushNotifications () override;
 
@@ -29,21 +28,21 @@ public:
 
     This method needs to be called before push notifications can be used.
     ***********************************************************/
-    void setup ();
+    public void setup ();
 
     /***********************************************************
     Set the interval for reconnection attempts
 
     @param interval Interval in milliseconds.
     ***********************************************************/
-    void set_reconnect_timer_interval (uint32_t interval);
+    public void set_reconnect_timer_interval (uint32_t interval);
 
     /***********************************************************
     Indicates if push notifications ready to use
 
     Ready to use means connected and authenticated.
     ***********************************************************/
-    bool is_ready ();
+    public bool is_ready ();
 
     /***********************************************************
     Set the interval in which the websocket will ping the server if it is still alive.
@@ -52,7 +51,7 @@ public:
 
     @param interval Interval in milliseconds.
     ***********************************************************/
-    void set_ping_interval (int interval);
+    public void set_ping_interval (int interval);
 
 signals:
     /***********************************************************
@@ -89,46 +88,46 @@ signals:
     ***********************************************************/
     void connection_lost ();
 
-private slots:
-    void on_web_socket_connected ();
-    void on_web_socket_disconnected ();
-    void on_web_socket_text_message_received (string &message);
-    void on_web_socket_error (QAbstract_socket.Socket_error error);
-    void on_web_socket_ssl_errors (QList<QSslError> &errors);
-    void on_web_socket_pong_received (uint64 elapsed_time, QByteArray &payload);
-    void on_ping_timed_out ();
 
-private:
-    void open_web_socket ();
-    void reconnect_to_web_socket ();
-    void close_web_socket ();
-    void authenticate_on_web_socket ();
-    bool try_reconnect_to_web_socket ();
-    void init_reconnect_timer ();
-    void ping_web_socket_server ();
-    void start_ping_timer ();
-    void start_ping_timed_out_timer ();
+    private void on_web_socket_connected ();
+    private void on_web_socket_disconnected ();
+    private void on_web_socket_text_message_received (string message);
+    private void on_web_socket_error (QAbstract_socket.Socket_error error);
+    private void on_web_socket_ssl_errors (GLib.List<QSslError> &errors);
+    private void on_web_socket_pong_received (uint64 elapsed_time, GLib.ByteArray &payload);
+    private void on_ping_timed_out ();
 
-    void handle_authenticated ();
-    void handle_notify_file ();
-    void handle_invalid_credentials ();
-    void handle_notify_notification ();
-    void handle_notify_activity ();
 
-    void emit_files_changed ();
-    void emit_notifications_changed ();
-    void emit_activities_changed ();
+    private void open_web_socket ();
+    private void reconnect_to_web_socket ();
+    private void close_web_socket ();
+    private void authenticate_on_web_socket ();
+    private bool try_reconnect_to_web_socket ();
+    private void init_reconnect_timer ();
+    private void ping_web_socket_server ();
+    private void start_ping_timer ();
+    private void start_ping_timed_out_timer ();
 
-    Account *_account = nullptr;
-    QWeb_socket *_web_socket;
-    uint8_t _failed_authentication_attempts_count = 0;
-    QTimer *_reconnect_timer = nullptr;
-    uint32_t _reconnect_timer_interval = 20 * 1000;
-    bool _is_ready = false;
+    private void handle_authenticated ();
+    private void handle_notify_file ();
+    private void handle_invalid_credentials ();
+    private void handle_notify_notification ();
+    private void handle_notify_activity ();
 
-    QTimer _ping_timer;
-    QTimer _ping_timed_out_timer;
-    bool _pong_received_from_web_socket_server = false;
+    private void emit_files_changed ();
+    private void emit_notifications_changed ();
+    private void emit_activities_changed ();
+
+    private Account _account = nullptr;
+    private QWeb_socket _web_socket;
+    private uint8 _failed_authentication_attempts_count = 0;
+    private QTimer _reconnect_timer = nullptr;
+    private uint32 _reconnect_timer_interval = 20 * 1000;
+    private bool _is_ready = false;
+
+    private QTimer _ping_timer;
+    private QTimer _ping_timed_out_timer;
+    private bool _pong_received_from_web_socket_server = false;
 };
 
     PushNotifications.PushNotifications (Account *account, GLib.Object *parent)
@@ -205,7 +204,7 @@ private:
         q_c_info (lc_push_notifications) << "Disconnected from websocket for account" << _account.url ();
     }
 
-    void PushNotifications.on_web_socket_text_message_received (string &message) {
+    void PushNotifications.on_web_socket_text_message_received (string message) {
         q_c_info (lc_push_notifications) << "Received push notification:" << message;
 
         if (message == "notify_file") {
@@ -250,12 +249,12 @@ private:
         connect (_reconnect_timer, &QTimer.timeout, [this] () {
             reconnect_to_web_socket ();
         });
-        _reconnect_timer.start ();
+        _reconnect_timer.on_start ();
 
         return true;
     }
 
-    void PushNotifications.on_web_socket_ssl_errors (QList<QSslError> &errors) {
+    void PushNotifications.on_web_socket_ssl_errors (GLib.List<QSslError> &errors) {
         q_c_warning (lc_push_notifications) << "Websocket ssl errors on with account" << _account.url () << errors;
         close_web_socket ();
         emit authentication_failed ();
@@ -318,7 +317,7 @@ private:
         emit_activities_changed ();
     }
 
-    void PushNotifications.on_web_socket_pong_received (uint64 /*elapsed_time*/, QByteArray & /*payload*/) {
+    void PushNotifications.on_web_socket_pong_received (uint64 /*elapsed_time*/, GLib.ByteArray & /*payload*/) {
         q_c_debug (lc_push_notifications) << "Pong received in time";
         // We are fine with every kind of pong and don't care about the
         // payload. As long as we receive pongs the server is still alive.
@@ -328,11 +327,11 @@ private:
 
     void PushNotifications.start_ping_timer () {
         _ping_timed_out_timer.stop ();
-        _ping_timer.start ();
+        _ping_timer.on_start ();
     }
 
     void PushNotifications.start_ping_timed_out_timer () {
-        _ping_timed_out_timer.start ();
+        _ping_timed_out_timer.on_start ();
     }
 
     void PushNotifications.ping_web_socket_server () {

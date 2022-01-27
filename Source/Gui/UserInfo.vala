@@ -33,7 +33,7 @@ We only request the info when the UI is visible otherwise this might slow down t
 too many requests.
 quota is not updated fast enough when changed on the server.
 
-If the fetch job is not finished within 30 seconds, it is cancelled and another
+If the fetch job is not on_finished within 30 seconds, it is cancelled and another
 
 Constructor notes:
  - allow_disconnected_account_state : set to true if you want to ignore AccountState's is_connected () state,
@@ -45,13 +45,13 @@ Constructor notes:
 Here follows the state machine
 
  \code{.unparsed}
- *--. slot_fetch_info
+ *--. on_fetch_info
          JsonApiJob (ocs/v1.php/cloud/user)
          |
-         +. slot_update_last_info
+         +. on_update_last_info
                AvatarJob (if _fetch_avatar_image is true)
                |
-               +. slot_avatar_image -.
+               +. on_avatar_image -.
    +-----------------------------------+
    |
    +. Client Side Encryption Checks --+ --report_result ()
@@ -75,32 +75,32 @@ class UserInfo : GLib.Object {
     ***********************************************************/
     public void set_active (bool active);
 
-public slots:
-    void slot_fetch_info ();
 
-private slots:
-    void slot_update_last_info (QJsonDocument &json);
-    void slot_account_state_changed ();
-    void slot_request_failed ();
-    void slot_avatar_image (QImage &img);
+    public void on_fetch_info ();
+
+
+    private void on_update_last_info (QJsonDocument &json);
+    private void on_account_state_changed ();
+    private void on_request_failed ();
+    private void on_avatar_image (QImage &img);
 
 signals:
     void quota_updated (int64 total, int64 used);
     void fetched_last_info (UserInfo *user_info);
 
-private:
-    bool can_get_info ();
 
-    QPointer<AccountState> _account_state;
-    bool _allow_disconnected_account_state;
-    bool _fetch_avatar_image;
+    private bool can_get_info ();
 
-    int64 _last_quota_total_bytes;
-    int64 _last_quota_used_bytes;
-    QTimer _job_restart_timer;
-    QDateTime _last_info_received; // the time at which the user info and quota was received last
-    bool _active; // if we should check at regular interval (when the UI is visible)
-    QPointer<JsonApiJob> _job; // the currently running job
+    private QPointer<AccountState> _account_state;
+    private bool _allow_disconnected_account_state;
+    private bool _fetch_avatar_image;
+
+    private int64 _last_quota_total_bytes;
+    private int64 _last_quota_used_bytes;
+    private QTimer _job_restart_timer;
+    private QDateTime _last_info_received; // the time at which the user info and quota was received last
+    private bool _active; // if we should check at regular interval (when the UI is visible)
+    private QPointer<JsonApiJob> _job; // the currently running job
 };
 
 
@@ -119,35 +119,35 @@ private:
         , _last_quota_used_bytes (0)
         , _active (false) {
         connect (account_state, &AccountState.state_changed,
-            this, &UserInfo.slot_account_state_changed);
-        connect (&_job_restart_timer, &QTimer.timeout, this, &UserInfo.slot_fetch_info);
+            this, &UserInfo.on_account_state_changed);
+        connect (&_job_restart_timer, &QTimer.timeout, this, &UserInfo.on_fetch_info);
         _job_restart_timer.set_single_shot (true);
     }
 
     void UserInfo.set_active (bool active) {
         _active = active;
-        slot_account_state_changed ();
+        on_account_state_changed ();
     }
 
-    void UserInfo.slot_account_state_changed () {
+    void UserInfo.on_account_state_changed () {
         if (can_get_info ()) {
             // Obviously assumes there will never be more than thousand of hours between last info
             // received and now, hence why we static_cast
             auto elapsed = static_cast<int> (_last_info_received.msecs_to (QDateTime.current_date_time ()));
             if (_last_info_received.is_null () || elapsed >= default_interval_t) {
-                slot_fetch_info ();
+                on_fetch_info ();
             } else {
-                _job_restart_timer.start (default_interval_t - elapsed);
+                _job_restart_timer.on_start (default_interval_t - elapsed);
             }
         } else {
             _job_restart_timer.stop ();
         }
     }
 
-    void UserInfo.slot_request_failed () {
+    void UserInfo.on_request_failed () {
         _last_quota_total_bytes = 0;
         _last_quota_used_bytes = 0;
-        _job_restart_timer.start (fail_interval_t);
+        _job_restart_timer.on_start (fail_interval_t);
     }
 
     bool UserInfo.can_get_info () {
@@ -160,25 +160,25 @@ private:
             && account.credentials ().ready ();
     }
 
-    void UserInfo.slot_fetch_info () {
+    void UserInfo.on_fetch_info () {
         if (!can_get_info ()) {
             return;
         }
 
         if (_job) {
-            // The previous job was not finished?  Then we cancel it!
+            // The previous job was not on_finished?  Then we cancel it!
             _job.delete_later ();
         }
 
         AccountPtr account = _account_state.account ();
         _job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/user"), this);
-        _job.set_timeout (20 * 1000);
-        connect (_job.data (), &JsonApiJob.json_received, this, &UserInfo.slot_update_last_info);
-        connect (_job.data (), &AbstractNetworkJob.network_error, this, &UserInfo.slot_request_failed);
-        _job.start ();
+        _job.on_set_timeout (20 * 1000);
+        connect (_job.data (), &JsonApiJob.json_received, this, &UserInfo.on_update_last_info);
+        connect (_job.data (), &AbstractNetworkJob.network_error, this, &UserInfo.on_request_failed);
+        _job.on_start ();
     }
 
-    void UserInfo.slot_update_last_info (QJsonDocument &json) {
+    void UserInfo.on_update_last_info (QJsonDocument &json) {
         auto obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
 
         AccountPtr account = _account_state.account ();
@@ -204,21 +204,21 @@ private:
             emit quota_updated (_last_quota_total_bytes, _last_quota_used_bytes);
         }
 
-        _job_restart_timer.start (default_interval_t);
+        _job_restart_timer.on_start (default_interval_t);
         _last_info_received = QDateTime.current_date_time ();
 
         // Avatar Image
         if (_fetch_avatar_image) {
             auto *job = new AvatarJob (account, account.dav_user (), 128, this);
-            job.set_timeout (20 * 1000);
-            GLib.Object.connect (job, &AvatarJob.avatar_pixmap, this, &UserInfo.slot_avatar_image);
-            job.start ();
+            job.on_set_timeout (20 * 1000);
+            GLib.Object.connect (job, &AvatarJob.avatar_pixmap, this, &UserInfo.on_avatar_image);
+            job.on_start ();
         }
         else
             emit fetched_last_info (this);
     }
 
-    void UserInfo.slot_avatar_image (QImage &img) {
+    void UserInfo.on_avatar_image (QImage &img) {
         _account_state.account ().set_avatar (img);
 
         emit fetched_last_info (this);

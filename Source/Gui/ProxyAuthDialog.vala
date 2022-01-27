@@ -20,18 +20,18 @@ Used by ProxyAuthHandler.
 class Proxy_auth_dialog : Gtk.Dialog {
 
     public Proxy_auth_dialog (Gtk.Widget *parent = nullptr);
-    public ~Proxy_auth_dialog () override;
+    ~Proxy_auth_dialog () override;
 
-    public void set_proxy_address (string &address);
+    public void set_proxy_address (string address);
 
     public string username ();
     public string password ();
 
     /// Resets the dialog for new credential entry.
-    public void reset ();
+    public void on_reset ();
 
-private:
-    Ui.Proxy_auth_dialog *ui;
+
+    private Ui.Proxy_auth_dialog *ui;
 };
 
     Proxy_auth_dialog.Proxy_auth_dialog (Gtk.Widget *parent)
@@ -44,8 +44,8 @@ private:
         delete ui;
     }
 
-    void Proxy_auth_dialog.set_proxy_address (string &address) {
-        ui.proxy_address.set_text (address);
+    void Proxy_auth_dialog.set_proxy_address (string address) {
+        ui.proxy_address.on_set_text (address);
     }
 
     string Proxy_auth_dialog.username () {
@@ -56,7 +56,7 @@ private:
         return ui.password_edit.text ();
     }
 
-    void Proxy_auth_dialog.reset () {
+    void Proxy_auth_dialog.on_reset () {
         ui.username_edit.set_focus ();
         ui.username_edit.clear ();
         ui.password_edit.clear ();

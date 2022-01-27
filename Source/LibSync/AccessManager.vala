@@ -26,13 +26,11 @@ namespace Occ {
 ***********************************************************/
 class AccessManager : QNetworkAccessManager {
 
-public:
-    static QByteArray generate_request_id ();
+    public static GLib.ByteArray generate_request_id ();
 
-    AccessManager (GLib.Object *parent = nullptr);
+    public AccessManager (GLib.Object *parent = nullptr);
 
-protected:
-    QNetworkReply *create_request (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *outgoing_data = nullptr) override;
+    protected QNetworkReply *create_request (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *outgoing_data = nullptr) override;
 };
 
     AccessManager.AccessManager (GLib.Object *parent)
@@ -45,7 +43,7 @@ protected:
         set_cookie_jar (new CookieJar);
     }
 
-    QByteArray AccessManager.generate_request_id () {
+    GLib.ByteArray AccessManager.generate_request_id () {
         return QUuid.create_uuid ().to_byte_array (QUuid.WithoutBraces);
     }
 
@@ -58,9 +56,9 @@ protected:
         }
 
         // Some firewalls reject requests that have a "User-Agent" but no "Accept" header
-        new_request.set_raw_header (QByteArray ("Accept"), "*/*");
+        new_request.set_raw_header (GLib.ByteArray ("Accept"), "*/*");
 
-        QByteArray verb = new_request.attribute (QNetworkRequest.CustomVerbAttribute).to_byte_array ();
+        GLib.ByteArray verb = new_request.attribute (QNetworkRequest.CustomVerbAttribute).to_byte_array ();
         // For PROPFIND (assumed to be a WebDAV op), set xml/utf8 as content type/encoding
         // This needs extension
         if (verb == "PROPFIND") {
@@ -68,7 +66,7 @@ protected:
         }
 
         // Generate a new request id
-        QByteArray request_id = generate_request_id ();
+        GLib.ByteArray request_id = generate_request_id ();
         q_info (lc_access_manager) << op << verb << new_request.url ().to_string () << "has X-Request-ID" << request_id;
         new_request.set_raw_header ("X-Request-ID", request_id);
 

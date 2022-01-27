@@ -57,10 +57,10 @@ class ActivityListModel : QAbstractListModel {
     public ActivityListModel (AccountState *account_state,
         GLib.Object *parent = nullptr);
 
-    public QVariant data (QModelIndex &index, int role) const override;
-    public int row_count (QModelIndex &parent = QModelIndex ()) const override;
+    public QVariant data (QModelIndex &index, int role) override;
+    public int row_count (QModelIndex &parent = QModelIndex ()) override;
 
-    public bool can_fetch_more (QModelIndex &) const override;
+    public bool can_fetch_more (QModelIndex &) override;
     public void fetch_more (QModelIndex &) override;
 
     public Activity_list activity_list () {
@@ -82,54 +82,53 @@ class ActivityListModel : QAbstractListModel {
 
     public AccountState *account_state ();
 
-public slots:
-    void slot_refresh_activity ();
-    void slot_remove_account ();
+
+    public void on_refresh_activity ();
+    public void on_remove_account ();
 
 signals:
     void activity_job_status_code (int status_code);
-    void send_notification_request (string &account_name, string &link, QByteArray &verb, int row);
+    void send_notification_request (string account_name, string link, GLib.ByteArray &verb, int row);
 
-protected:
-    void activities_received (QJsonDocument &json, int status_code);
-    QHash<int, QByteArray> role_names () const override;
 
-    void set_account_state (AccountState *state);
-    void set_currently_fetching (bool value);
-    bool currently_fetching ();
-    void set_done_fetching (bool value);
-    void set_hide_old_activities (bool value);
-    void set_display_actions (bool value);
+    protected void activities_received (QJsonDocument &json, int status_code);
+    protected QHash<int, GLib.ByteArray> role_names () override;
 
-    virtual void start_fetch_job ();
+    protected void set_account_state (AccountState *state);
+    protected void set_currently_fetching (bool value);
+    protected bool currently_fetching ();
+    protected void set_done_fetching (bool value);
+    protected void set_hide_old_activities (bool value);
+    protected void set_display_actions (bool value);
 
-private:
-    void combine_activity_lists ();
-    bool can_fetch_activities ();
+    protected virtual void start_fetch_job ();
 
-    Activity_list _activity_lists;
-    Activity_list _sync_file_item_lists;
-    Activity_list _notification_lists;
-    Activity_list _list_of_ignored_files;
-    Activity _notification_ignored_files;
-    Activity_list _notification_errors_lists;
-    Activity_list _final_list;
-    int _current_item = 0;
+    private void combine_activity_lists ();
+    private bool can_fetch_activities ();
 
-    bool _display_actions = true;
+    private Activity_list _activity_lists;
+    private Activity_list _sync_file_item_lists;
+    private Activity_list _notification_lists;
+    private Activity_list _list_of_ignored_files;
+    private Activity _notification_ignored_files;
+    private Activity_list _notification_errors_lists;
+    private Activity_list _final_list;
+    private int _current_item = 0;
 
-    int _total_activities_fetched = 0;
-    int _max_activities = 100;
-    int _max_activities_days = 30;
-    bool _show_more_activities_available_entry = false;
+    private bool _display_actions = true;
 
-    QPointer<ConflictDialog> _current_conflict_dialog;
-    QPointer<Invalid_filename_dialog> _current_invalid_filename_dialog;
+    private int _total_activities_fetched = 0;
+    private int _max_activities = 100;
+    private int _max_activities_days = 30;
+    private bool _show_more_activities_available_entry = false;
 
-    AccountState *_account_state = nullptr;
-    bool _currently_fetching = false;
-    bool _done_fetching = false;
-    bool _hide_old_activities = true;
+    private QPointer<ConflictDialog> _current_conflict_dialog;
+    private QPointer<Invalid_filename_dialog> _current_invalid_filename_dialog;
+
+    private AccountState _account_state = nullptr;
+    private bool _currently_fetching = false;
+    private bool _done_fetching = false;
+    private bool _hide_old_activities = true;
 };
 
     ActivityListModel.ActivityListModel (GLib.Object *parent)
@@ -142,8 +141,8 @@ private:
         , _account_state (account_state) {
     }
 
-    QHash<int, QByteArray> ActivityListModel.role_names () {
-        QHash<int, QByteArray> roles;
+    QHash<int, GLib.ByteArray> ActivityListModel.role_names () {
+        QHash<int, GLib.ByteArray> roles;
         roles[Display_path_role] = "display_path";
         roles[Path_role] = "path";
         roles[Absolute_path_role] = "absolute_path";
@@ -263,7 +262,7 @@ private:
             }
         }
         case Actions_links_role : {
-            QList<QVariant> custom_list;
+            GLib.List<QVariant> custom_list;
             foreach (Activity_link activity_link, a._links) {
                 custom_list << QVariant.from_value (activity_link);
             }
@@ -384,7 +383,7 @@ private:
 
         _currently_fetching = true;
         q_c_info (lc_activity) << "Start fetching activities for " << _account_state.account ().display_name ();
-        job.start ();
+        job.on_start ();
     }
 
     void ActivityListModel.activities_received (QJsonDocument &json, int status_code) {
@@ -549,9 +548,9 @@ private:
                 _current_conflict_dialog.close ();
             }
             _current_conflict_dialog = new ConflictDialog;
-            _current_conflict_dialog.set_base_filename (base_name);
-            _current_conflict_dialog.set_local_version_filename (conflicted_path);
-            _current_conflict_dialog.set_remote_version_filename (base_path);
+            _current_conflict_dialog.on_set_base_filename (base_name);
+            _current_conflict_dialog.on_set_local_version_filename (conflicted_path);
+            _current_conflict_dialog.on_set_remote_version_filename (base_path);
             _current_conflict_dialog.set_attribute (Qt.WA_DeleteOnClose);
             connect (_current_conflict_dialog, &ConflictDialog.accepted, folder, [folder] () {
                 folder.schedule_this_folder_soon ();
@@ -676,7 +675,7 @@ private:
         }
     }
 
-    void ActivityListModel.slot_refresh_activity () {
+    void ActivityListModel.on_refresh_activity () {
         _activity_lists.clear ();
         _done_fetching = false;
         _current_item = 0;
@@ -691,7 +690,7 @@ private:
         }
     }
 
-    void ActivityListModel.slot_remove_account () {
+    void ActivityListModel.on_remove_account () {
         _final_list.clear ();
         _activity_lists.clear ();
         _currently_fetching = false;

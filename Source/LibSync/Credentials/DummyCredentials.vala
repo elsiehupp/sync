@@ -8,20 +8,19 @@ namespace Occ {
 
 class DummyCredentials : AbstractCredentials {
 
-public:
-    string _user;
-    string _password;
-    string auth_type () const override;
-    string user () const override;
-    string password () const override;
-    QNetworkAccessManager *create_qNAM () const override;
-    bool ready () const override;
-    bool still_valid (QNetworkReply *reply) override;
-    void fetch_from_keychain () override;
-    void ask_from_user () override;
-    void persist () override;
-    void invalidate_token () override {}
-    void forget_sensitive_data () override{};
+    public string _user;
+    public string _password;
+    public string auth_type () override;
+    public string user () override;
+    public string password () override;
+    public QNetworkAccessManager *create_qNAM () override;
+    public bool ready () override;
+    public bool still_valid (QNetworkReply *reply) override;
+    public void fetch_from_keychain () override;
+    public void ask_from_user () override;
+    public void persist () override;
+    public void invalidate_token () override {}
+    public void forget_sensitive_data () override{};
 };
 
     string DummyCredentials.auth_type () {

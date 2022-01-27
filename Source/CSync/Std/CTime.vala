@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 // #include <sys/time.h>
 #endif
 
-OCSYNC_EXPORT int c_utimes (string &uri, struct timeval *times);
+OCSYNC_EXPORT int c_utimes (string uri, struct timeval *times);
 
 
 
@@ -67,7 +67,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 // #include <QFile>
 
 #ifdef HAVE_UTIMES
-int c_utimes (string &uri, struct timeval *times) {
+int c_utimes (string uri, struct timeval *times) {
     int ret = utimes (QFile.encode_name (uri).const_data (), times);
     return ret;
 }
@@ -88,7 +88,7 @@ static void Unix_timeval_to_file_time (struct timeval t, LPFILETIME pft) {
     pft.dw_high_date_time = ll >> 32;
 }
 
-int c_utimes (string &uri, struct timeval *times) {
+int c_utimes (string uri, struct timeval *times) {
     FILETIME Last_access_time;
     FILETIME Last_modification_time;
     HANDLE h_file;

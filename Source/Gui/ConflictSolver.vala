@@ -13,8 +13,8 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 namespace Occ {
 
 class ConflictSolver : GLib.Object {
-    Q_PROPERTY (string local_version_filename READ local_version_filename WRITE set_local_version_filename NOTIFY local_version_filename_changed)
-    Q_PROPERTY (string remote_version_filename READ remote_version_filename WRITE set_remote_version_filename NOTIFY remote_version_filename_changed)
+    Q_PROPERTY (string local_version_filename READ local_version_filename WRITE on_set_local_version_filename NOTIFY local_version_filename_changed)
+    Q_PROPERTY (string remote_version_filename READ remote_version_filename WRITE on_set_remote_version_filename NOTIFY remote_version_filename_changed)
 
     public enum Solution {
         KeepLocalVersion,
@@ -29,22 +29,22 @@ class ConflictSolver : GLib.Object {
 
     public bool exec (Solution solution);
 
-public slots:
-    void set_local_version_filename (string &local_version_filename);
-    void set_remote_version_filename (string &remote_version_filename);
+
+    public void on_set_local_version_filename (string local_version_filename);
+    public void on_set_remote_version_filename (string remote_version_filename);
 
 signals:
     void local_version_filename_changed ();
     void remote_version_filename_changed ();
 
-private:
-    bool delete_local_version ();
-    bool rename_local_version ();
-    bool overwrite_remote_version ();
 
-    Gtk.Widget *_parent_widget;
-    string _local_version_filename;
-    string _remote_version_filename;
+    private bool delete_local_version ();
+    private bool rename_local_version ();
+    private bool overwrite_remote_version ();
+
+    private Gtk.Widget _parent_widget;
+    private string _local_version_filename;
+    private string _remote_version_filename;
 };
 
     ConflictSolver.ConflictSolver (Gtk.Widget *parent)
@@ -73,7 +73,7 @@ private:
         return false;
     }
 
-    void ConflictSolver.set_local_version_filename (string &local_version_filename) {
+    void ConflictSolver.on_set_local_version_filename (string local_version_filename) {
         if (_local_version_filename == local_version_filename) {
             return;
         }
@@ -82,7 +82,7 @@ private:
         emit local_version_filename_changed ();
     }
 
-    void ConflictSolver.set_remote_version_filename (string &remote_version_filename) {
+    void ConflictSolver.on_set_remote_version_filename (string remote_version_filename) {
         if (_remote_version_filename == remote_version_filename) {
             return;
         }

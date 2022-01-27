@@ -13,7 +13,7 @@ static const int check_frequency = 20 * 1000; // ms
 
 // #pragma once
 
-// #include <QList>
+// #include <GLib.List>
 // #include <GLib.Object>
 // #include <string>
 // #include <QSet>
@@ -47,7 +47,7 @@ class LockWatcher : GLib.Object {
     If the file is not locked later on, the file_unlocked signal will be
     emitted once.
     ***********************************************************/
-    public void add_file (string &path);
+    public void add_file (string path);
 
     /***********************************************************
     Adjusts the default interval for checking whether the lock is still present
@@ -57,21 +57,21 @@ class LockWatcher : GLib.Object {
     /***********************************************************
     Whether the path is being watched for lock-changes
     ***********************************************************/
-    public bool contains (string &path);
+    public bool contains (string path);
 
 signals:
     /***********************************************************
     Emitted when one of the watched files is no longer
     being locked.
     ***********************************************************/
-    void file_unlocked (string &path);
+    void file_unlocked (string path);
 
-private slots:
-    void check_files ();
 
-private:
-    QSet<string> _watched_paths;
-    QTimer _timer;
+    private void on_check_files ();
+
+
+    private QSet<string> _watched_paths;
+    private QTimer _timer;
 };
 }
 
@@ -85,27 +85,27 @@ private:
 LockWatcher.LockWatcher (GLib.Object *parent)
     : GLib.Object (parent) {
     connect (&_timer, &QTimer.timeout,
-        this, &LockWatcher.check_files);
-    _timer.start (check_frequency);
+        this, &LockWatcher.on_check_files);
+    _timer.on_start (check_frequency);
 }
 
-void LockWatcher.add_file (string &path) {
+void LockWatcher.add_file (string path) {
     q_c_info (lc_lock_watcher) << "Watching for lock of" << path << "being released";
     _watched_paths.insert (path);
 }
 
 void LockWatcher.set_check_interval (std.chrono.milliseconds interval) {
-    _timer.start (interval.count ());
+    _timer.on_start (interval.count ());
 }
 
-bool LockWatcher.contains (string &path) {
+bool LockWatcher.contains (string path) {
     return _watched_paths.contains (path);
 }
 
-void LockWatcher.check_files () {
+void LockWatcher.on_check_files () {
     QSet<string> unlocked;
 
-    foreach (string &path, _watched_paths) {
+    foreach (string path, _watched_paths) {
         if (!FileSystem.is_file_locked (path)) {
             q_c_info (lc_lock_watcher) << "Lock of" << path << "was released";
             emit file_unlocked (path);

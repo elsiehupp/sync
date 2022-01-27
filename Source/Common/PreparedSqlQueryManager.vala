@@ -10,7 +10,7 @@ namespace Occ {
 
 class Prepared_sqlQuery {
 
-    public ~Prepared_sqlQuery ();
+    ~Prepared_sqlQuery ();
 
     public operator bool () {
         return _ok;
@@ -21,18 +21,18 @@ class Prepared_sqlQuery {
         return _query;
     }
 
-    public SqlQuery &operator* () const & {
+    public SqlQuery &operator* () & {
         Q_ASSERT (_ok);
-        return *_query;
+        return _query;
     }
 
-private:
-    Prepared_sqlQuery (SqlQuery *query, bool ok = true);
 
-    SqlQuery *_query;
-    bool _ok;
+    private Prepared_sqlQuery (SqlQuery *query, bool ok = true);
 
-    friend class PreparedSqlQueryManager;
+    private SqlQuery _query;
+    private bool _ok;
+
+    private friend class PreparedSqlQueryManager;
 };
 
 /***********************************************************
@@ -91,11 +91,11 @@ class PreparedSqlQueryManager {
     /***********************************************************
     Prepare the SqlQuery if it was not prepared yet.
     ***********************************************************/
-    public const Prepared_sqlQuery get (Key key, QByteArray &sql, SqlDatabase &db);
+    public const Prepared_sqlQuery get (Key key, GLib.ByteArray &sql, SqlDatabase &db);
 
-private:
-    SqlQuery _queries[Prepared_query_count];
-    Q_DISABLE_COPY (PreparedSqlQueryManager)
+
+    private SqlQuery _queries[Prepared_query_count];
+    private Q_DISABLE_COPY (PreparedSqlQueryManager)
 };
 
 }
@@ -129,7 +129,7 @@ const Prepared_sqlQuery PreparedSqlQueryManager.get (PreparedSqlQueryManager.Key
     };
 }
 
-const Prepared_sqlQuery PreparedSqlQueryManager.get (PreparedSqlQueryManager.Key key, QByteArray &sql, SqlDatabase &db) {
+const Prepared_sqlQuery PreparedSqlQueryManager.get (PreparedSqlQueryManager.Key key, GLib.ByteArray &sql, SqlDatabase &db) {
     auto &query = _queries[key];
     Q_ASSERT (!sqlite3_stmt_busy (query._stmt));
     ENFORCE (!query._sqldb || &db == query._sqldb)

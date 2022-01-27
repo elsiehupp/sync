@@ -30,23 +30,23 @@
 // #include <QtCore/QEventLoop>
 
 class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
-public:
-    OwncloudDolphinPluginAction (GLib.Object* parent, QList<QVariant>&)
+
+    public OwncloudDolphinPluginAction (GLib.Object* parent, GLib.List<QVariant>&)
         : KAbstractFileItemActionPlugin (parent) { }
 
-    QList<QAction> actions (KFileItemListProperties& fileItemInfos, Gtk.Widget* parentWidget) override {
+    public GLib.List<QAction> actions (KFileItemListProperties& fileItemInfos, Gtk.Widget* parentWidget) override {
         auto helper = OwncloudDolphinPluginHelper.instance ();
         if (!helper.isConnected () || !fileItemInfos.isLocal ())
             return {};
 
         // If any of the url is outside of a sync folder, return an empty menu.
-        const QList<QUrl> urls = fileItemInfos.urlList ();
+        const GLib.List<QUrl> urls = fileItemInfos.urlList ();
         const auto paths = helper.paths ();
-        QByteArray files;
+        GLib.ByteArray files;
         for (auto &url : urls) {
             QDir localPath (url.toLocalFile ());
             auto localFile = localPath.canonicalPath ();
-            if (!std.any_of (paths.begin (), paths.end (), [&] (string &s) {
+            if (!std.any_of (paths.begin (), paths.end (), [&] (string s) {
                     return localFile.startsWith (s);
                 }))
                 return {};
@@ -62,7 +62,7 @@ public:
 
         auto menu = new QMenu (parentWidget);
         QEventLoop loop;
-        auto con = connect (helper, &OwncloudDolphinPluginHelper.commandRecieved, this, [&] (QByteArray &cmd) {
+        auto con = connect (helper, &OwncloudDolphinPluginHelper.commandRecieved, this, [&] (GLib.ByteArray &cmd) {
             if (cmd.startsWith ("GET_MENU_ITEMS:END")) {
                 loop.quit ();
             } else if (cmd.startsWith ("MENU_ITEM:")) {
@@ -74,12 +74,12 @@ public:
                     action.setDisabled (true);
                 auto call = args.value (1).toLatin1 ();
                 connect (action, &QAction.triggered, [helper, call, files] {
-                    helper.sendCommand (QByteArray (call + ":" + files + "\n"));
+                    helper.sendCommand (GLib.ByteArray (call + ":" + files + "\n"));
                 });
             }
         });
         QTimer.singleShot (100, &loop, SLOT (quit ())); // add a timeout to be sure we don't freeze dolphin
-        helper.sendCommand (QByteArray ("GET_MENU_ITEMS:" + files + "\n"));
+        helper.sendCommand (GLib.ByteArray ("GET_MENU_ITEMS:" + files + "\n"));
         loop.exec (QEventLoop.ExcludeUserInputEvents);
         disconnect (con);
         if (menu.actions ().isEmpty ()) {
@@ -92,8 +92,8 @@ public:
         return { menu.menuAction () };
     }
 
-    QList<QAction> legacyActions (KFileItemListProperties &fileItemInfos, Gtk.Widget *parentWidget) {
-        QList<QUrl> urls = fileItemInfos.urlList ();
+    public GLib.List<QAction> legacyActions (KFileItemListProperties &fileItemInfos, Gtk.Widget *parentWidget) {
+        GLib.List<QUrl> urls = fileItemInfos.urlList ();
         if (urls.count () != 1)
             return {};
         QDir localPath (urls.first ().toLocalFile ());
@@ -106,20 +106,20 @@ public:
 
         auto shareAction = menu.addAction (helper.shareActionTitle ());
         connect (shareAction, &QAction.triggered, this, [localFile, helper] {
-            helper.sendCommand (QByteArray ("SHARE:" + localFile.toUtf8 () + "\n"));
+            helper.sendCommand (GLib.ByteArray ("SHARE:" + localFile.toUtf8 () + "\n"));
         });
 
         if (!helper.copyPrivateLinkTitle ().isEmpty ()) {
             auto copyPrivateLinkAction = menu.addAction (helper.copyPrivateLinkTitle ());
             connect (copyPrivateLinkAction, &QAction.triggered, this, [localFile, helper] {
-                helper.sendCommand (QByteArray ("COPY_PRIVATE_LINK:" + localFile.toUtf8 () + "\n"));
+                helper.sendCommand (GLib.ByteArray ("COPY_PRIVATE_LINK:" + localFile.toUtf8 () + "\n"));
             });
         }
 
         if (!helper.emailPrivateLinkTitle ().isEmpty ()) {
             auto emailPrivateLinkAction = menu.addAction (helper.emailPrivateLinkTitle ());
             connect (emailPrivateLinkAction, &QAction.triggered, this, [localFile, helper] {
-                helper.sendCommand (QByteArray ("EMAIL_PRIVATE_LINK:" + localFile.toUtf8 () + "\n"));
+                helper.sendCommand (GLib.ByteArray ("EMAIL_PRIVATE_LINK:" + localFile.toUtf8 () + "\n"));
             });
         }
         return { menuaction };

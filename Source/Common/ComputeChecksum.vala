@@ -72,7 +72,7 @@ Checksum Algorithms
 // #pragma once
 
 // #include <GLib.Object>
-// #include <QByteArray>
+// #include <GLib.ByteArray>
 // #include <QFuture_watcher>
 
 // #include <memory>
@@ -98,25 +98,25 @@ property retrieved from the server.
 Example : "ADLER32:1231 SHA1:ab124124 MD5:2131affa21"
       . "SHA1:ab124124"
 ***********************************************************/
-OCSYNC_EXPORT QByteArray find_best_checksum (QByteArray &checksums);
+OCSYNC_EXPORT GLib.ByteArray find_best_checksum (GLib.ByteArray &checksums);
 
 /// Creates a checksum header from type and value.
-OCSYNC_EXPORT QByteArray make_checksum_header (QByteArray &checksum_type, QByteArray &checksum);
+OCSYNC_EXPORT GLib.ByteArray make_checksum_header (GLib.ByteArray &checksum_type, GLib.ByteArray &checksum);
 
 /// Parses a checksum header
-OCSYNC_EXPORT bool parse_checksum_header (QByteArray &header, QByteArray *type, QByteArray *checksum);
+OCSYNC_EXPORT bool parse_checksum_header (GLib.ByteArray &header, GLib.ByteArray *type, GLib.ByteArray *checksum);
 
 /// Convenience for getting the type from a checksum header, null if none
-OCSYNC_EXPORT QByteArray parse_checksum_header_type (QByteArray &header);
+OCSYNC_EXPORT GLib.ByteArray parse_checksum_header_type (GLib.ByteArray &header);
 
 /// Checks OWNCLOUD_DISABLE_CHECKSUM_UPLOAD
 OCSYNC_EXPORT bool upload_checksum_enabled ();
 
 // Exported functions for the tests.
-QByteArray OCSYNC_EXPORT calc_md5 (QIODevice *device);
-QByteArray OCSYNC_EXPORT calc_sha1 (QIODevice *device);
+GLib.ByteArray OCSYNC_EXPORT calc_md5 (QIODevice *device);
+GLib.ByteArray OCSYNC_EXPORT calc_sha1 (QIODevice *device);
 #ifdef ZLIB_FOUND
-QByteArray OCSYNC_EXPORT calc_adler32 (QIODevice *device);
+GLib.ByteArray OCSYNC_EXPORT calc_adler32 (QIODevice *device);
 #endif
 
 /***********************************************************
@@ -126,55 +126,55 @@ Computes the checksum of a file.
 class ComputeChecksum : GLib.Object {
 
     public ComputeChecksum (GLib.Object *parent = nullptr);
-    public ~ComputeChecksum () override;
+    ~ComputeChecksum () override;
 
     /***********************************************************
     Sets the checksum type to be used. The default is empty.
     ***********************************************************/
-    public void set_checksum_type (QByteArray &type);
+    public void set_checksum_type (GLib.ByteArray &type);
 
-    public QByteArray checksum_type ();
+    public GLib.ByteArray checksum_type ();
 
     /***********************************************************
     Computes the checksum for the given file path.
 
-    done () is emitted when the calculation finishes.
+    on_done () is emitted when the calculation finishes.
     ***********************************************************/
-    public void start (string &file_path);
+    public void on_start (string file_path);
 
     /***********************************************************
     Computes the checksum for the given device.
 
-    done () is emitted when the calculation finishes.
+    on_done () is emitted when the calculation finishes.
 
     The device ownership transfers into the thread that
     will compute the checksum. It must not have a parent.
     ***********************************************************/
-    public void start (std.unique_ptr<QIODevice> device);
+    public void on_start (std.unique_ptr<QIODevice> device);
 
     /***********************************************************
     Computes the checksum synchronously.
     ***********************************************************/
-    public static QByteArray compute_now (QIODevice *device, QByteArray &checksum_type);
+    public static GLib.ByteArray compute_now (QIODevice *device, GLib.ByteArray &checksum_type);
 
     /***********************************************************
     Computes the checksum synchronously on file. Convenience wrapper for compute_now ().
     ***********************************************************/
-    public static QByteArray compute_now_on_file (string &file_path, QByteArray &checksum_type);
+    public static GLib.ByteArray compute_now_on_file (string file_path, GLib.ByteArray &checksum_type);
 
 signals:
-    void done (QByteArray &checksum_type, QByteArray &checksum);
+    void on_done (GLib.ByteArray &checksum_type, GLib.ByteArray &checksum);
 
-private slots:
-    void slot_calculation_done ();
 
-private:
-    void start_impl (std.unique_ptr<QIODevice> device);
+    private void on_calculation_done ();
 
-    QByteArray _checksum_type;
+
+    private void start_impl (std.unique_ptr<QIODevice> device);
+
+    private GLib.ByteArray _checksum_type;
 
     // watcher for the checksum calculation thread
-    QFuture_watcher<QByteArray> _watcher;
+    private QFuture_watcher<GLib.ByteArray> _watcher;
 };
 
 /***********************************************************
@@ -192,30 +192,30 @@ class Validate_checksum_header : GLib.Object {
     will be emitted. In case of any kind of error, the signal validation_failed () will
     be emitted.
     ***********************************************************/
-    public void start (string &file_path, QByteArray &checksum_header);
+    public void on_start (string file_path, GLib.ByteArray &checksum_header);
 
     /***********************************************************
     Check a device's actual checksum against the provided checksum_header
 
-    Like the other start () but works on an device.
+    Like the other on_start () but works on an device.
 
     The device ownership transfers into the thread that
     will compute the checksum. It must not have a parent.
     ***********************************************************/
-    public void start (std.unique_ptr<QIODevice> device, QByteArray &checksum_header);
+    public void on_start (std.unique_ptr<QIODevice> device, GLib.ByteArray &checksum_header);
 
 signals:
-    void validated (QByteArray &checksum_type, QByteArray &checksum);
-    void validation_failed (string &err_msg);
+    void validated (GLib.ByteArray &checksum_type, GLib.ByteArray &checksum);
+    void validation_failed (string err_msg);
 
-private slots:
-    void slot_checksum_calculated (QByteArray &checksum_type, QByteArray &checksum);
 
-private:
-    ComputeChecksum *prepare_start (QByteArray &checksum_header);
+    private void on_checksum_calculated (GLib.ByteArray &checksum_type, GLib.ByteArray &checksum);
 
-    QByteArray _expected_checksum_type;
-    QByteArray _expected_checksum;
+
+    private ComputeChecksum *prepare_start (GLib.ByteArray &checksum_header);
+
+    private GLib.ByteArray _expected_checksum_type;
+    private GLib.ByteArray _expected_checksum;
 };
 
 /***********************************************************
@@ -233,15 +233,15 @@ class CSyncChecksumHook : GLib.Object {
     to be set as userdata.
     The return value will be owned by csync.
     ***********************************************************/
-    public static QByteArray hook (QByteArray &path, QByteArray &other_checksum_header, void *this_obj);
+    public static GLib.ByteArray hook (GLib.ByteArray &path, GLib.ByteArray &other_checksum_header, void *this_obj);
 };
 
 
 
 const int BUFSIZE int64 (500 * 1024) // 500 Ki_b
 
-static QByteArray calc_crypto_hash (QIODevice *device, QCryptographicHash.Algorithm algo) {
-    QByteArray arr;
+static GLib.ByteArray calc_crypto_hash (QIODevice *device, QCryptographicHash.Algorithm algo) {
+    GLib.ByteArray arr;
     QCryptographicHash crypto ( algo );
 
     if (crypto.add_data (device)) {
@@ -250,22 +250,22 @@ static QByteArray calc_crypto_hash (QIODevice *device, QCryptographicHash.Algori
     return arr;
 }
 
-QByteArray calc_md5 (QIODevice *device) {
+GLib.ByteArray calc_md5 (QIODevice *device) {
     return calc_crypto_hash (device, QCryptographicHash.Md5);
 }
 
-QByteArray calc_sha1 (QIODevice *device) {
+GLib.ByteArray calc_sha1 (QIODevice *device) {
     return calc_crypto_hash (device, QCryptographicHash.Sha1);
 }
 
 #ifdef ZLIB_FOUND
-QByteArray calc_adler32 (QIODevice *device) {
+GLib.ByteArray calc_adler32 (QIODevice *device) {
     {
         f (device.size () == 0)
     {
-        return QByteArray ();
+        return GLib.ByteArray ();
     }
-    QByteArray buf (BUFSIZE, Qt.Uninitialized);
+    GLib.ByteArray buf (BUFSIZE, Qt.Uninitialized);
 
     unsigned int adler = adler32 (0L, Z_NULL, 0);
     int64 size = 0;
@@ -275,20 +275,20 @@ QByteArray calc_adler32 (QIODevice *device) {
             adler = adler32 (adler, (Bytef *)buf.data (), size);
     }
 
-    return QByteArray.number (adler, 16);
+    return GLib.ByteArray.number (adler, 16);
 }
 #endif
 
-QByteArray make_checksum_header (QByteArray &checksum_type, QByteArray &checksum) {
+GLib.ByteArray make_checksum_header (GLib.ByteArray &checksum_type, GLib.ByteArray &checksum) {
     if (checksum_type.is_empty () || checksum.is_empty ())
-        return QByteArray ();
-    QByteArray header = checksum_type;
+        return GLib.ByteArray ();
+    GLib.ByteArray header = checksum_type;
     header.append (':');
     header.append (checksum);
     return header;
 }
 
-QByteArray find_best_checksum (QByteArray &_checksums) {
+GLib.ByteArray find_best_checksum (GLib.ByteArray &_checksums) {
     if (_checksums.is_empty ()) {
         return {};
     }
@@ -300,7 +300,7 @@ QByteArray find_best_checksum (QByteArray &_checksums) {
         || -1 != (i = checksums.index_of (QLatin1String ("SHA1:"), 0, Qt.CaseInsensitive))
         || -1 != (i = checksums.index_of (QLatin1String ("MD5:"), 0, Qt.CaseInsensitive))
         || -1 != (i = checksums.index_of (QLatin1String ("ADLER32:"), 0, Qt.CaseInsensitive))) {
-        // Now i is the start of the best checksum
+        // Now i is the on_start of the best checksum
         // Grab it until the next space or end of xml or end of string.
         int end = _checksums.index_of (' ', i);
         // workaround for https://github.com/owncloud/core/pull/38304
@@ -313,7 +313,7 @@ QByteArray find_best_checksum (QByteArray &_checksums) {
     return {};
 }
 
-bool parse_checksum_header (QByteArray &header, QByteArray *type, QByteArray *checksum) {
+bool parse_checksum_header (GLib.ByteArray &header, GLib.ByteArray *type, GLib.ByteArray *checksum) {
     if (header.is_empty ()) {
         type.clear ();
         checksum.clear ();
@@ -330,10 +330,10 @@ bool parse_checksum_header (QByteArray &header, QByteArray *type, QByteArray *ch
     return true;
 }
 
-QByteArray parse_checksum_header_type (QByteArray &header) {
+GLib.ByteArray parse_checksum_header_type (GLib.ByteArray &header) {
     const auto idx = header.index_of (':');
     if (idx < 0) {
-        return QByteArray ();
+        return GLib.ByteArray ();
     }
     return header.left (idx);
 }
@@ -354,20 +354,20 @@ ComputeChecksum.ComputeChecksum (GLib.Object *parent)
 
 ComputeChecksum.~ComputeChecksum () = default;
 
-void ComputeChecksum.set_checksum_type (QByteArray &type) {
+void ComputeChecksum.set_checksum_type (GLib.ByteArray &type) {
     _checksum_type = type;
 }
 
-QByteArray ComputeChecksum.checksum_type () {
+GLib.ByteArray ComputeChecksum.checksum_type () {
     return _checksum_type;
 }
 
-void ComputeChecksum.start (string &file_path) {
+void ComputeChecksum.on_start (string file_path) {
     q_c_info (lc_checksums) << "Computing" << checksum_type () << "checksum of" << file_path << "in a thread";
     start_impl (std.make_unique<QFile> (file_path));
 }
 
-void ComputeChecksum.start (std.unique_ptr<QIODevice> device) {
+void ComputeChecksum.on_start (std.unique_ptr<QIODevice> device) {
     ENFORCE (device);
     q_c_info (lc_checksums) << "Computing" << checksum_type () << "checksum of device" << device.get () << "in a thread";
     ASSERT (!device.parent ());
@@ -376,13 +376,13 @@ void ComputeChecksum.start (std.unique_ptr<QIODevice> device) {
 }
 
 void ComputeChecksum.start_impl (std.unique_ptr<QIODevice> device) {
-    connect (&_watcher, &QFuture_watcher_base.finished,
-        this, &ComputeChecksum.slot_calculation_done,
+    connect (&_watcher, &QFuture_watcher_base.on_finished,
+        this, &ComputeChecksum.on_calculation_done,
         Qt.UniqueConnection);
 
     // We'd prefer to move the unique_ptr into the lambda, but that's
     // awkward with the C++ standard we're on
-    auto shared_device = QSharedPointer<QIODevice> (device.release ());
+    auto shared_device = unowned<QIODevice> (device.release ());
 
     // Bug : The thread will keep running even if ComputeChecksum is deleted.
     auto type = checksum_type ();
@@ -395,7 +395,7 @@ void ComputeChecksum.start_impl (std.unique_ptr<QIODevice> device) {
                 q_c_warning (lc_checksums) << "Could not open device" << shared_device.data ()
                         << "for reading to compute a checksum" << shared_device.error_string ();
             }
-            return QByteArray ();
+            return GLib.ByteArray ();
         }
         auto result = ComputeChecksum.compute_now (shared_device.data (), type);
         shared_device.close ();
@@ -403,20 +403,20 @@ void ComputeChecksum.start_impl (std.unique_ptr<QIODevice> device) {
     }));
 }
 
-QByteArray ComputeChecksum.compute_now_on_file (string &file_path, QByteArray &checksum_type) {
+GLib.ByteArray ComputeChecksum.compute_now_on_file (string file_path, GLib.ByteArray &checksum_type) {
     QFile file (file_path);
     if (!file.open (QIODevice.ReadOnly)) {
         q_c_warning (lc_checksums) << "Could not open file" << file_path << "for reading and computing checksum" << file.error_string ();
-        return QByteArray ();
+        return GLib.ByteArray ();
     }
 
     return compute_now (&file, checksum_type);
 }
 
-QByteArray ComputeChecksum.compute_now (QIODevice *device, QByteArray &checksum_type) {
+GLib.ByteArray ComputeChecksum.compute_now (QIODevice *device, GLib.ByteArray &checksum_type) {
     if (!checksum_computation_enabled ()) {
         q_c_warning (lc_checksums) << "Checksum computation disabled by environment variable";
-        return QByteArray ();
+        return GLib.ByteArray ();
     }
 
     if (checksum_type == check_sum_mD5C) {
@@ -440,15 +440,15 @@ QByteArray ComputeChecksum.compute_now (QIODevice *device, QByteArray &checksum_
     if (!checksum_type.is_empty ()) {
         q_c_warning (lc_checksums) << "Unknown checksum type:" << checksum_type;
     }
-    return QByteArray ();
+    return GLib.ByteArray ();
 }
 
-void ComputeChecksum.slot_calculation_done () {
-    QByteArray checksum = _watcher.future ().result ();
+void ComputeChecksum.on_calculation_done () {
+    GLib.ByteArray checksum = _watcher.future ().result ();
     if (!checksum.is_null ()) {
-        emit done (_checksum_type, checksum);
+        emit on_done (_checksum_type, checksum);
     } else {
-        emit done (QByteArray (), QByteArray ());
+        emit on_done (GLib.ByteArray (), GLib.ByteArray ());
     }
 }
 
@@ -456,10 +456,10 @@ Validate_checksum_header.Validate_checksum_header (GLib.Object *parent)
     : GLib.Object (parent) {
 }
 
-ComputeChecksum *Validate_checksum_header.prepare_start (QByteArray &checksum_header) {
+ComputeChecksum *Validate_checksum_header.prepare_start (GLib.ByteArray &checksum_header) {
     // If the incoming header is empty no validation can happen. Just continue.
     if (checksum_header.is_empty ()) {
-        emit validated (QByteArray (), QByteArray ());
+        emit validated (GLib.ByteArray (), GLib.ByteArray ());
         return nullptr;
     }
 
@@ -472,22 +472,22 @@ ComputeChecksum *Validate_checksum_header.prepare_start (QByteArray &checksum_he
     auto calculator = new ComputeChecksum (this);
     calculator.set_checksum_type (_expected_checksum_type);
     connect (calculator, &ComputeChecksum.done,
-        this, &Validate_checksum_header.slot_checksum_calculated);
+        this, &Validate_checksum_header.on_checksum_calculated);
     return calculator;
 }
 
-void Validate_checksum_header.start (string &file_path, QByteArray &checksum_header) {
+void Validate_checksum_header.on_start (string file_path, GLib.ByteArray &checksum_header) {
     if (auto calculator = prepare_start (checksum_header))
-        calculator.start (file_path);
+        calculator.on_start (file_path);
 }
 
-void Validate_checksum_header.start (std.unique_ptr<QIODevice> device, QByteArray &checksum_header) {
+void Validate_checksum_header.on_start (std.unique_ptr<QIODevice> device, GLib.ByteArray &checksum_header) {
     if (auto calculator = prepare_start (checksum_header))
-        calculator.start (std.move (device));
+        calculator.on_start (std.move (device));
 }
 
-void Validate_checksum_header.slot_checksum_calculated (QByteArray &checksum_type,
-    const QByteArray &checksum) {
+void Validate_checksum_header.on_checksum_calculated (GLib.ByteArray &checksum_type,
+    const GLib.ByteArray &checksum) {
     if (checksum_type != _expected_checksum_type) {
         emit validation_failed (tr ("The checksum header contained an unknown checksum type \"%1\"").arg (string.from_latin1 (_expected_checksum_type)));
         return;
@@ -501,13 +501,13 @@ void Validate_checksum_header.slot_checksum_calculated (QByteArray &checksum_typ
 
 CSyncChecksumHook.CSyncChecksumHook () = default;
 
-QByteArray CSyncChecksumHook.hook (QByteArray &path, QByteArray &other_checksum_header, void * /*this_obj*/) {
-    QByteArray type = parse_checksum_header_type (QByteArray (other_checksum_header));
+GLib.ByteArray CSyncChecksumHook.hook (GLib.ByteArray &path, GLib.ByteArray &other_checksum_header, void * /*this_obj*/) {
+    GLib.ByteArray type = parse_checksum_header_type (GLib.ByteArray (other_checksum_header));
     if (type.is_empty ())
         return nullptr;
 
     q_c_info (lc_checksums) << "Computing" << type << "checksum of" << path << "in the csync hook";
-    QByteArray checksum = ComputeChecksum.compute_now_on_file (string.from_utf8 (path), type);
+    GLib.ByteArray checksum = ComputeChecksum.compute_now_on_file (string.from_utf8 (path), type);
     if (checksum.is_null ()) {
         q_c_warning (lc_checksums) << "Failed to compute checksum" << type << "for" << path;
         return nullptr;

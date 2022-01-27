@@ -19,24 +19,24 @@ namespace HttpLogger {
     /***********************************************************
     Helper to construct the HTTP verb used in the request
     ***********************************************************/
-    QByteArray request_verb (QNetworkAccessManager.Operation operation, QNetworkRequest &request);
-    inline QByteArray request_verb (QNetworkReply &reply) {
+    GLib.ByteArray request_verb (QNetworkAccessManager.Operation operation, QNetworkRequest &request);
+    inline GLib.ByteArray request_verb (QNetworkReply &reply) {
         return request_verb (reply.operation (), reply.request ());
     }
 }
 
     const int64 PeekSize = 1024 * 1024;
 
-    const QByteArray XRequestId (){
+    const GLib.ByteArray XRequestId (){
         return QByteArrayLiteral ("X-Request-ID");
     }
 
-    bool is_text_body (string &s) {
+    bool is_text_body (string s) {
         static const QRegularExpression regexp (QStringLiteral ("^ (text/.*| (application/ (xml|json|x-www-form-urlencoded) (;|$)))"));
         return regexp.match (s).has_match ();
     }
 
-    void log_http (QByteArray &verb, string &url, QByteArray &id, string &content_type, QList<QNetworkReply.RawHeaderPair> &header, QIODevice *device) {
+    void log_http (GLib.ByteArray &verb, string url, GLib.ByteArray &id, string content_type, GLib.List<QNetworkReply.RawHeaderPair> &header, QIODevice *device) {
         const auto reply = qobject_cast<QNetworkReply> (device);
         const auto content_length = device ? device.size () : 0;
         string msg;
@@ -90,7 +90,7 @@ namespace HttpLogger {
             return;
         }
         const auto keys = request.raw_header_list ();
-        QList<QNetworkReply.RawHeaderPair> header;
+        GLib.List<QNetworkReply.RawHeaderPair> header;
         header.reserve (keys.size ());
         for (auto &key : keys) {
             header << q_make_pair (key, request.raw_header (key));
@@ -102,7 +102,7 @@ namespace HttpLogger {
             header,
             device);
 
-        GLib.Object.connect (reply, &QNetworkReply.finished, reply, [reply] {
+        GLib.Object.connect (reply, &QNetworkReply.on_finished, reply, [reply] {
             log_http (request_verb (*reply),
                 reply.url ().to_string (),
                 reply.request ().raw_header (XRequestId ()),
@@ -112,7 +112,7 @@ namespace HttpLogger {
         });
     }
 
-    QByteArray HttpLogger.request_verb (QNetworkAccessManager.Operation operation, QNetworkRequest &request) {
+    GLib.ByteArray HttpLogger.request_verb (QNetworkAccessManager.Operation operation, QNetworkRequest &request) {
         switch (operation) {
         case QNetworkAccessManager.HeadOperation:
             return QByteArrayLiteral ("HEAD");

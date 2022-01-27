@@ -38,7 +38,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 #include "utility_unix.cpp"
 
 // #include <string>
-// #include <QByteArray>
+// #include <GLib.ByteArray>
 // #include <QDateTime>
 // #include <QElapsedTimer>
 // #include <QLoggingCategory>
@@ -62,13 +62,13 @@ namespace Utility {
     OCSYNC_EXPORT int rand ();
     OCSYNC_EXPORT void sleep (int sec);
     OCSYNC_EXPORT void usleep (int usec);
-    OCSYNC_EXPORT string format_fingerprint (QByteArray &, bool colon_separated = true);
-    OCSYNC_EXPORT void setup_fav_link (string &folder);
-    OCSYNC_EXPORT void remove_fav_link (string &folder);
-    OCSYNC_EXPORT bool write_random_file (string &fname, int size = -1);
+    OCSYNC_EXPORT string format_fingerprint (GLib.ByteArray &, bool colon_separated = true);
+    OCSYNC_EXPORT void setup_fav_link (string folder);
+    OCSYNC_EXPORT void remove_fav_link (string folder);
+    OCSYNC_EXPORT bool write_random_file (string fname, int size = -1);
     OCSYNC_EXPORT string octets_to_string (int64 octets);
-    OCSYNC_EXPORT QByteArray user_agent_string ();
-    OCSYNC_EXPORT QByteArray friendly_user_agent_string ();
+    OCSYNC_EXPORT GLib.ByteArray user_agent_string ();
+    OCSYNC_EXPORT GLib.ByteArray friendly_user_agent_string ();
     /***********************************************************
     @brief Return whether launch on startup is enabled system wide.
 
@@ -77,9 +77,9 @@ namespace Utility {
 
     Currently only implemented on Windows.
     ***********************************************************/
-    OCSYNC_EXPORT bool has_system_launch_on_startup (string &app_name);
-    OCSYNC_EXPORT bool has_launch_on_startup (string &app_name);
-    OCSYNC_EXPORT void set_launch_on_startup (string &app_name, string &gui_name, bool launch);
+    OCSYNC_EXPORT bool has_system_launch_on_startup (string app_name);
+    OCSYNC_EXPORT bool has_launch_on_startup (string app_name);
+    OCSYNC_EXPORT void set_launch_on_startup (string app_name, string gui_name, bool launch);
     OCSYNC_EXPORT uint convert_size_to_uint (size_t &convert_var);
     OCSYNC_EXPORT int convert_size_to_int (size_t &convert_var);
 
@@ -88,7 +88,7 @@ namespace Utility {
 
     \a path must point to a directory
     ***********************************************************/
-    OCSYNC_EXPORT int64 free_disk_space (string &path);
+    OCSYNC_EXPORT int64 free_disk_space (string path);
 
     /***********************************************************
     @brief compact_format_double - formats a double value human readable.
@@ -98,10 +98,10 @@ namespace Utility {
     @param unit an optional unit that is appended if present.
     @return the formatted string.
     ***********************************************************/
-    OCSYNC_EXPORT string compact_format_double (double value, int prec, string &unit = string ());
+    OCSYNC_EXPORT string compact_format_double (double value, int prec, string unit = string ());
 
     // porting methods
-    OCSYNC_EXPORT string escape (string &);
+    OCSYNC_EXPORT string escape (string );
 
     // conversion function QDateTime <. time_t   (because the ones builtin work on only unsigned 32bit)
     OCSYNC_EXPORT QDateTime q_date_time_from_time_t (int64 t);
@@ -153,18 +153,18 @@ namespace Utility {
     // Check if two pathes that MUST exist are equal. This function
     // uses QDir.canonical_path () to judge and cares for the systems
     // case sensitivity.
-    OCSYNC_EXPORT bool file_names_equal (string &fn1, string &fn2);
+    OCSYNC_EXPORT bool file_names_equal (string fn1, string fn2);
 
     // Call the given command with the switch --version and rerun the first line
     // of the output.
     // If command is empty, the function calls the running application which, on
     // Linux, might have changed while this one is running.
     // For Mac and Windows, it returns string ()
-    OCSYNC_EXPORT QByteArray version_of_installed_binary (string &command = string ());
+    OCSYNC_EXPORT GLib.ByteArray version_of_installed_binary (string command = string ());
 
-    OCSYNC_EXPORT string file_name_for_gui_use (string &f_name);
+    OCSYNC_EXPORT string file_name_for_gui_use (string f_name);
 
-    OCSYNC_EXPORT QByteArray normalize_etag (QByteArray etag);
+    OCSYNC_EXPORT GLib.ByteArray normalize_etag (GLib.ByteArray etag);
 
     /***********************************************************
     @brief time_ago_in_words - human readable time span
@@ -177,40 +177,40 @@ namespace Utility {
     OCSYNC_EXPORT string time_ago_in_words (QDateTime &dt, QDateTime &from = QDateTime ());
 
     class StopWatch {
-    private:
-        QMap<string, uint64> _lap_times;
-        QDateTime _start_time;
-        QElapsedTimer _timer;
+
+        private QMap<string, uint64> _lap_times;
+        private QDateTime _start_time;
+        private QElapsedTimer _timer;
 
 
-        public void start ();
+        public void on_start ();
         public uint64 stop ();
-        public uint64 add_lap_time (string &lap_name);
-        public void reset ();
+        public uint64 add_lap_time (string lap_name);
+        public void on_reset ();
 
         // out helpers, return the measured times.
         public QDateTime start_time ();
-        public QDateTime time_of_lap (string &lap_name) const;
-        public uint64 duration_of_lap (string &lap_name) const;
+        public QDateTime time_of_lap (string lap_name);
+        public uint64 duration_of_lap (string lap_name);
     };
 
     /***********************************************************
-    @brief Sort a QStringList in a way that's appropriate for filenames
+    @brief Sort a string[] in a way that's appropriate for filenames
     ***********************************************************/
-    OCSYNC_EXPORT void sort_filenames (QStringList &file_names);
+    OCSYNC_EXPORT void sort_filenames (string[] &file_names);
 
     /***********************************************************
     Appends concat_path and query_items to the url
     ***********************************************************/
     OCSYNC_EXPORT QUrl concat_url_path (
-        const QUrl &url, string &concat_path,
+        const QUrl url, string concat_path,
         const QUrlQuery &query_items = {});
 
     /***********************************************************
     Returns a new settings pre-set in a specific group.  The Settings will be created
     with the given parent. If no parent is specified, the caller must destroy the settings
     ***********************************************************/
-    OCSYNC_EXPORT std.unique_ptr<QSettings> settings_with_group (string &group, GLib.Object *parent = nullptr);
+    OCSYNC_EXPORT std.unique_ptr<QSettings> settings_with_group (string group, GLib.Object *parent = nullptr);
 
     /***********************************************************
     Sanitizes a string that shall become part of a filename.
@@ -225,19 +225,19 @@ namespace Utility {
     - windows reserved filenames ('CON' etc)
     will pass unchanged.
     ***********************************************************/
-    OCSYNC_EXPORT string sanitize_for_file_name (string &name);
+    OCSYNC_EXPORT string sanitize_for_file_name (string name);
 
     /***********************************************************
     Returns a file name based on \a fn that's suitable for a conflict.
     ***********************************************************/
     OCSYNC_EXPORT string make_conflict_file_name (
-        const string &fn, QDateTime &dt, string &user);
+        const string fn, QDateTime &dt, string user);
 
     /***********************************************************
     Returns whether a file name indicates a conflict file
     ***********************************************************/
     OCSYNC_EXPORT bool is_conflict_file (char *name);
-    OCSYNC_EXPORT bool is_conflict_file (string &name);
+    OCSYNC_EXPORT bool is_conflict_file (string name);
 
     /***********************************************************
     Find the base name for a conflict file name, using name pattern only
@@ -247,12 +247,12 @@ namespace Utility {
     Prefer to use the data from the conflicts table in the journal to determine
     a conflict's base file, see SyncJournal.conflict_file_base_name ()
     ***********************************************************/
-    OCSYNC_EXPORT QByteArray conflict_file_base_name_from_pattern (QByteArray &conflict_name);
+    OCSYNC_EXPORT GLib.ByteArray conflict_file_base_name_from_pattern (GLib.ByteArray &conflict_name);
 
     /***********************************************************
     @brief Check whether the path is a root of a Windows drive partition ([c:/, d:/, e:/, etc.)
     ***********************************************************/
-    OCSYNC_EXPORT bool is_path_windows_drive_partition_root (string &path);
+    OCSYNC_EXPORT bool is_path_windows_drive_partition_root (string path);
 
     /***********************************************************
     @brief Retrieves current logged-in user name from the OS
@@ -285,7 +285,7 @@ inline bool Utility.is_b_sD () {
 
 
 
-bool Utility.write_random_file (string &fname, int size) {
+bool Utility.write_random_file (string fname, int size) {
     int max_size = 10 * 10 * 1024;
 
     if (size == -1)
@@ -308,8 +308,8 @@ bool Utility.write_random_file (string &fname, int size) {
     return false;
 }
 
-string Utility.format_fingerprint (QByteArray &fmhash, bool colon_separated) {
-    QByteArray hash;
+string Utility.format_fingerprint (GLib.ByteArray &fmhash, bool colon_separated) {
+    GLib.ByteArray hash;
     int steps = fmhash.length () / 2;
     for (int i = 0; i < steps; i++) {
         hash.append (fmhash[i * 2]);
@@ -325,11 +325,11 @@ string Utility.format_fingerprint (QByteArray &fmhash, bool colon_separated) {
     return fp;
 }
 
-void Utility.setup_fav_link (string &folder) {
+void Utility.setup_fav_link (string folder) {
     setup_fav_link_private (folder);
 }
 
-void Utility.remove_fav_link (string &folder) {
+void Utility.remove_fav_link (string folder) {
     remove_fav_link_private (folder);
 }
 
@@ -379,7 +379,7 @@ static QLatin1String platform () {
     return QSysInfo.product_type ();
 }
 
-QByteArray Utility.user_agent_string () {
+GLib.ByteArray Utility.user_agent_string () {
     return QStringLiteral ("Mozilla/5.0 (%1) mirall/%2 (%3, %4-%5 ClientArchitecture : %6 OsArchitecture : %7)")
         .arg (platform (),
             QStringLiteral (MIRALL_VERSION_STRING),
@@ -391,26 +391,26 @@ QByteArray Utility.user_agent_string () {
         .to_latin1 ();
 }
 
-QByteArray Utility.friendly_user_agent_string () {
+GLib.ByteArray Utility.friendly_user_agent_string () {
     const auto pattern = QStringLiteral ("%1 (Desktop Client - %2)");
     const auto user_agent = pattern.arg (QSysInfo.machine_host_name (), platform ());
     return user_agent.to_utf8 ();
 }
 
-bool Utility.has_system_launch_on_startup (string &app_name) {
+bool Utility.has_system_launch_on_startup (string app_name) {
     Q_UNUSED (app_name)
     return false;
 }
 
-bool Utility.has_launch_on_startup (string &app_name) {
+bool Utility.has_launch_on_startup (string app_name) {
     return has_launch_on_startup_private (app_name);
 }
 
-void Utility.set_launch_on_startup (string &app_name, string &gui_name, bool enable) {
+void Utility.set_launch_on_startup (string app_name, string gui_name, bool enable) {
     set_launch_on_startup_private (app_name, gui_name, enable);
 }
 
-int64 Utility.free_disk_space (string &path) {
+int64 Utility.free_disk_space (string path) {
 #if defined (Q_OS_UNIX)
     struct statvfs64 stat;
     if (statvfs64 (path.to_local8Bit ().data (), &stat) == 0) {
@@ -420,7 +420,7 @@ int64 Utility.free_disk_space (string &path) {
     return -1;
 }
 
-string Utility.compact_format_double (double value, int prec, string &unit) {
+string Utility.compact_format_double (double value, int prec, string unit) {
     QLocale locale = QLocale.system ();
     QChar dec_point = locale.decimal_point ();
     string str = locale.to_string (value, 'f', prec);
@@ -436,7 +436,7 @@ string Utility.compact_format_double (double value, int prec, string &unit) {
     return str;
 }
 
-string Utility.escape (string &in) {
+string Utility.escape (string in) {
     return in.to_html_escaped ();
 }
 
@@ -454,7 +454,7 @@ void Utility.usleep (int usec) {
 
 // This can be overriden from the tests
 OCSYNC_EXPORT bool fs_case_preserving_override = [] () . bool {
-    QByteArray env = qgetenv ("OWNCLOUD_TEST_CASE_PRESERVING");
+    GLib.ByteArray env = qgetenv ("OWNCLOUD_TEST_CASE_PRESERVING");
     if (!env.is_empty ())
         return env.to_int ();
     return Utility.is_windows () || Utility.is_mac ();
@@ -464,7 +464,7 @@ bool Utility.fs_case_preserving () {
     return fs_case_preserving_override;
 }
 
-bool Utility.file_names_equal (string &fn1, string &fn2) {
+bool Utility.file_names_equal (string fn1, string fn2) {
     const QDir fd1 (fn1);
     const QDir fd2 (fn2);
 
@@ -533,7 +533,7 @@ string Utility.duration_to_descriptive_string1 (uint64 msecs) {
     return periods[p].description (amount);
 }
 
-string Utility.file_name_for_gui_use (string &f_name) {
+string Utility.file_name_for_gui_use (string f_name) {
     if (is_mac ()) {
         string n (f_name);
         return n.replace (QLatin1Char (':'), QLatin1Char ('/'));
@@ -541,7 +541,7 @@ string Utility.file_name_for_gui_use (string &f_name) {
     return f_name;
 }
 
-QByteArray Utility.normalize_etag (QByteArray etag) {
+GLib.ByteArray Utility.normalize_etag (GLib.ByteArray etag) {
     // strip "XXXX-gzip"
     if (etag.starts_with ('"') && etag.ends_with ("-gzip\"")) {
         etag.chop (6);
@@ -598,17 +598,17 @@ int Utility.convert_size_to_int (size_t &convert_var) {
 //
 // This version only delivers output on linux, as Mac and Win get their
 // restarting from the installer.
-QByteArray Utility.version_of_installed_binary (string &command) {
-    QByteArray re;
+GLib.ByteArray Utility.version_of_installed_binary (string command) {
+    GLib.ByteArray re;
     if (is_linux ()) {
         string binary (command);
         if (binary.is_empty ()) {
             binary = q_app.arguments ()[0];
         }
-        QStringList params;
+        string[] params;
         params << QStringLiteral ("--version");
         QProcess process;
-        process.start (binary, params);
+        process.on_start (binary, params);
         process.wait_for_finished (); // sets current thread to sleep and waits for ping_process end
         re = process.read_all_standard_output ();
         int newline = re.index_of ('\n');
@@ -673,9 +673,9 @@ string Utility.time_ago_in_words (QDateTime &dt, QDateTime &from) {
 
 static const char STOPWATCH_END_TAG[] = "_STOPWATCH_END";
 
-void Utility.StopWatch.start () {
+void Utility.StopWatch.on_start () {
     _start_time = QDateTime.current_date_time_utc ();
-    _timer.start ();
+    _timer.on_start ();
 }
 
 uint64 Utility.StopWatch.stop () {
@@ -685,15 +685,15 @@ uint64 Utility.StopWatch.stop () {
     return duration;
 }
 
-void Utility.StopWatch.reset () {
+void Utility.StopWatch.on_reset () {
     _timer.invalidate ();
     _start_time.set_m_secs_since_epoch (0);
     _lap_times.clear ();
 }
 
-uint64 Utility.StopWatch.add_lap_time (string &lap_name) {
+uint64 Utility.StopWatch.add_lap_time (string lap_name) {
     if (!_timer.is_valid ()) {
-        start ();
+        on_start ();
     }
     uint64 re = _timer.elapsed ();
     _lap_times[lap_name] = re;
@@ -704,7 +704,7 @@ QDateTime Utility.StopWatch.start_time () {
     return _start_time;
 }
 
-QDateTime Utility.StopWatch.time_of_lap (string &lap_name) {
+QDateTime Utility.StopWatch.time_of_lap (string lap_name) {
     uint64 t = duration_of_lap (lap_name);
     if (t) {
         QDateTime re (_start_time);
@@ -714,18 +714,18 @@ QDateTime Utility.StopWatch.time_of_lap (string &lap_name) {
     return QDateTime ();
 }
 
-uint64 Utility.StopWatch.duration_of_lap (string &lap_name) {
+uint64 Utility.StopWatch.duration_of_lap (string lap_name) {
     return _lap_times.value (lap_name, 0);
 }
 
-void Utility.sort_filenames (QStringList &file_names) {
+void Utility.sort_filenames (string[] &file_names) {
     QCollator collator;
     collator.set_numeric_mode (true);
     collator.set_case_sensitivity (Qt.CaseInsensitive);
     std.sort (file_names.begin (), file_names.end (), collator);
 }
 
-QUrl Utility.concat_url_path (QUrl &url, string &concat_path,
+QUrl Utility.concat_url_path (QUrl url, string concat_path,
     const QUrlQuery &query_items) {
     string path = url.path ();
     if (!concat_path.is_empty ()) {
@@ -746,7 +746,7 @@ QUrl Utility.concat_url_path (QUrl &url, string &concat_path,
 }
 
 string Utility.make_conflict_file_name (
-    const string &fn, QDateTime &dt, string &user) {
+    const string fn, QDateTime &dt, string user) {
     string conflict_file_name (fn);
     // Add conflict tag before the extension.
     int dot_location = conflict_file_name.last_index_of (QLatin1Char ('.'));
@@ -787,7 +787,7 @@ bool Utility.is_conflict_file (char *name) {
     return false;
 }
 
-bool Utility.is_conflict_file (string &name) {
+bool Utility.is_conflict_file (string name) {
     auto bname = name.mid_ref (name.last_index_of (QLatin1Char ('/')) + 1);
 
     if (bname.contains (QStringLiteral ("_conflict-")))
@@ -799,7 +799,7 @@ bool Utility.is_conflict_file (string &name) {
     return false;
 }
 
-QByteArray Utility.conflict_file_base_name_from_pattern (QByteArray &conflict_name) {
+GLib.ByteArray Utility.conflict_file_base_name_from_pattern (GLib.ByteArray &conflict_name) {
     // This function must be able to deal with conflict files for conflict files.
     // To do this, we scan backwards, for the outermost conflict marker and
     // strip only that to generate the conflict file base name.
@@ -828,12 +828,12 @@ QByteArray Utility.conflict_file_base_name_from_pattern (QByteArray &conflict_na
     return conflict_name.left (tag_start) + conflict_name.mid (tag_end);
 }
 
-bool Utility.is_path_windows_drive_partition_root (string &path) {
+bool Utility.is_path_windows_drive_partition_root (string path) {
     Q_UNUSED (path)
     return false;
 }
 
-string Utility.sanitize_for_file_name (string &name) {
+string Utility.sanitize_for_file_name (string name) {
     const auto invalid = QStringLiteral (R" (/?<>\:*|\")");
     string result;
     result.reserve (name.size ());
@@ -849,21 +849,21 @@ string Utility.sanitize_for_file_name (string &name) {
 
 
 
-    static void setup_fav_link_private (string &folder) {
+    static void setup_fav_link_private (string folder) {
         // Nautilus : add to ~/.gtk-bookmarks
         QFile gtk_bookmarks (QDir.home_path () + QLatin1String ("/.config/gtk-3.0/bookmarks"));
-        QByteArray folder_url = "file://" + folder.to_utf8 ();
+        GLib.ByteArray folder_url = "file://" + folder.to_utf8 ();
         if (gtk_bookmarks.open (QFile.ReadWrite)) {
-            QByteArray places = gtk_bookmarks.read_all ();
+            GLib.ByteArray places = gtk_bookmarks.read_all ();
             if (!places.contains (folder_url)) {
                 places += folder_url;
-                gtk_bookmarks.reset ();
+                gtk_bookmarks.on_reset ();
                 gtk_bookmarks.write (places + '\n');
             }
         }
     }
 
-    static void remove_fav_link_private (string &folder) {
+    static void remove_fav_link_private (string folder) {
         Q_UNUSED (folder)
     }
 
@@ -875,7 +875,7 @@ string Utility.sanitize_for_file_name (string &name) {
         return config;
     }
 
-    bool has_launch_on_startup_private (string &app_name) {
+    bool has_launch_on_startup_private (string app_name) {
         Q_UNUSED (app_name)
         string desktop_file_location = get_user_autostart_dir_private ()
                                         + QLatin1String (LINUX_APPLICATION_ID)
@@ -883,7 +883,7 @@ string Utility.sanitize_for_file_name (string &name) {
         return QFile.exists (desktop_file_location);
     }
 
-    void set_launch_on_startup_private (string &app_name, string &gui_name, bool enable) {
+    void set_launch_on_startup_private (string app_name, string gui_name, bool enable) {
         Q_UNUSED (app_name)
         string user_auto_start_path = get_user_autostart_dir_private ();
         string desktop_file_location = user_auto_start_path
@@ -896,7 +896,7 @@ string Utility.sanitize_for_file_name (string &name) {
             }
             QFile ini_file (desktop_file_location);
             if (!ini_file.open (QIODevice.WriteOnly)) {
-                q_c_warning (lc_utility) << "Could not write auto start entry" << desktop_file_location;
+                q_c_warning (lc_utility) << "Could not write auto on_start entry" << desktop_file_location;
                 return;
             }
             // When running inside an AppImage, we need to set the path to the

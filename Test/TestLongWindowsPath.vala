@@ -23,9 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 class TestLongWindowsPath : GLib.Object {
 
-private slots:
-
-    void testLongPathStat_data () {
+    private on_ void testLongPathStat_data () {
         QTest.addColumn<string> ("name");
 
         QTest.newRow ("long") << QStringLiteral ("/alonglonglonglong/blonglonglonglong/clonglonglonglong/dlonglonglonglong/"
@@ -50,7 +48,7 @@ private slots:
                                                            "olonglonglonglong/自己的云.txt");
     }
 
-    void testLongPathStat () {
+    private on_ void testLongPathStat () {
         QTemporaryDir tmp;
         QFETCH (string, name);
         const QFileInfo longPath (tmp.path () + name);
@@ -74,4 +72,3 @@ private slots:
 };
 
 QTEST_GUILESS_MAIN (TestLongWindowsPath)
-#include "testlongpath.moc"

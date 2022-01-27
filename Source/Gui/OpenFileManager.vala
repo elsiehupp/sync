@@ -27,12 +27,12 @@ namespace Occ {
 @brief Open the file manager with the specified file pre-selected
 @ingroup gui
 ***********************************************************/
-void show_in_file_manager (string &local_path);
+void show_in_file_manager (string local_path);
 
 
 // according to the QStandard_dir impl from Qt5
-static QStringList xdg_data_dirs () {
-    QStringList dirs;
+static string[] xdg_data_dirs () {
+    string[] dirs;
     // http://standards.freedesktop.org/basedir-spec/latest/
     string xdg_data_dirs_env = QFile.decode_name (qgetenv ("XDG_DATA_DIRS"));
     if (xdg_data_dirs_env.is_empty ()) {
@@ -53,7 +53,7 @@ static QStringList xdg_data_dirs () {
 // Linux impl only, make sure to process %u and %U which might be returned
 static string find_default_file_manager () {
     QProcess p;
-    p.start ("xdg-mime", QStringList () << "query"
+    p.on_start ("xdg-mime", string[] () << "query"
                                       << "default"
                                       << "inode/directory",
         QFile.ReadOnly);
@@ -63,8 +63,8 @@ static string find_default_file_manager () {
         return string ();
 
     QFileInfo fi;
-    QStringList dirs = xdg_data_dirs ();
-    QStringList subdirs;
+    string[] dirs = xdg_data_dirs ();
+    string[] subdirs;
     subdirs << "/applications/"
             << "/applications/kde4/";
     foreach (string dir, dirs) {
@@ -81,15 +81,15 @@ static string find_default_file_manager () {
 // early dolphin versions did not have --select
 static bool check_dolphin_can_select () {
     QProcess p;
-    p.start ("dolphin", QStringList () << "--help", QFile.ReadOnly);
+    p.on_start ("dolphin", string[] () << "--help", QFile.ReadOnly);
     p.wait_for_finished ();
     return p.read_all ().contains ("--select");
 }
 
 // inspired by Qt Creator's show_in_graphical_shell ();
-void show_in_file_manager (string &local_path) {
+void show_in_file_manager (string local_path) {
     string app;
-    QStringList args;
+    string[] args;
 
     static string default_manager = find_default_file_manager ();
     QSettings desktop_file (default_manager, QSettings.IniFormat);
@@ -139,7 +139,7 @@ void show_in_file_manager (string &local_path) {
     std.replace (args.begin (), args.end (), string.from_latin1 ("%F"), file_to_open);
 
     // fixme : needs to append --icon, according to http://standards.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html#exec-variables
-    QStringList.iterator it = std.find (args.begin (), args.end (), string.from_latin1 ("%i"));
+    string[].iterator it = std.find (args.begin (), args.end (), string.from_latin1 ("%i"));
     if (it != args.end ()) {
         (*it) = desktop_file.value ("Desktop Entry/Icon").to_string ();
         args.insert (it, string.from_latin1 ("--icon")); // before

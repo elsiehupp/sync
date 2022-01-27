@@ -28,14 +28,14 @@ class Ssl_button : QToolButton {
     public Ssl_button (Gtk.Widget *parent = nullptr);
     public void update_account_state (AccountState *account_state);
 
-public slots:
-    void slot_update_menu ();
 
-private:
-    QMenu *build_cert_menu (QMenu *parent, QSslCertificate &cert,
-        const QList<QSslCertificate> &user_approved, int pos, QList<QSslCertificate> &system_ca_certificates);
-    QPointer<AccountState> _account_state;
-    QMenu *_menu;
+    public void on_update_menu ();
+
+
+    private QMenu *build_cert_menu (QMenu *parent, QSslCertificate &cert,
+        const GLib.List<QSslCertificate> &user_approved, int pos, GLib.List<QSslCertificate> &system_ca_certificates);
+    private QPointer<AccountState> _account_state;
+    private QMenu _menu;
 };
 
 
@@ -46,11 +46,11 @@ private:
 
         _menu = new QMenu (this);
         GLib.Object.connect (_menu, &QMenu.about_to_show,
-            this, &Ssl_button.slot_update_menu);
+            this, &Ssl_button.on_update_menu);
         set_menu (_menu);
     }
 
-    static string add_cert_details_field (string &key, string &value) {
+    static string add_cert_details_field (string key, string value) {
         if (value.is_empty ())
             return string ();
 
@@ -66,17 +66,17 @@ private:
     }
 
     QMenu *Ssl_button.build_cert_menu (QMenu *parent, QSslCertificate &cert,
-        const QList<QSslCertificate> &user_approved, int pos, QList<QSslCertificate> &system_ca_certificates) {
-        string cn = QStringList (cert.subject_info (QSslCertificate.Common_name)).join (QChar (';'));
-        string ou = QStringList (cert.subject_info (QSslCertificate.Organizational_unit_name)).join (QChar (';'));
-        string org = QStringList (cert.subject_info (QSslCertificate.Organization)).join (QChar (';'));
-        string country = QStringList (cert.subject_info (QSslCertificate.Country_name)).join (QChar (';'));
-        string state = QStringList (cert.subject_info (QSslCertificate.State_or_province_name)).join (QChar (';'));
-        string issuer = QStringList (cert.issuer_info (QSslCertificate.Common_name)).join (QChar (';'));
+        const GLib.List<QSslCertificate> &user_approved, int pos, GLib.List<QSslCertificate> &system_ca_certificates) {
+        string cn = string[] (cert.subject_info (QSslCertificate.Common_name)).join (QChar (';'));
+        string ou = string[] (cert.subject_info (QSslCertificate.Organizational_unit_name)).join (QChar (';'));
+        string org = string[] (cert.subject_info (QSslCertificate.Organization)).join (QChar (';'));
+        string country = string[] (cert.subject_info (QSslCertificate.Country_name)).join (QChar (';'));
+        string state = string[] (cert.subject_info (QSslCertificate.State_or_province_name)).join (QChar (';'));
+        string issuer = string[] (cert.issuer_info (QSslCertificate.Common_name)).join (QChar (';'));
         if (issuer.is_empty ())
-            issuer = QStringList (cert.issuer_info (QSslCertificate.Organizational_unit_name)).join (QChar (';'));
+            issuer = string[] (cert.issuer_info (QSslCertificate.Organizational_unit_name)).join (QChar (';'));
         string sha1 = Utility.format_fingerprint (cert.digest (QCryptographicHash.Sha1).to_hex (), false);
-        QByteArray sha265hash = cert.digest (QCryptographicHash.Sha256).to_hex ();
+        GLib.ByteArray sha265hash = cert.digest (QCryptographicHash.Sha256).to_hex ();
         string sha256escaped =
             Utility.escape (Utility.format_fingerprint (sha265hash.left (sha265hash.length () / 2), false))
             + QLatin1String ("<br/>")
@@ -84,7 +84,7 @@ private:
         string serial = string.from_utf8 (cert.serial_number ());
         string effective_date = cert.effective_date ().date ().to_string ();
         string expiry_date = cert.expiry_date ().date ().to_string ();
-        string sna = QStringList (cert.subject_alternative_names ().values ()).join (" ");
+        string sna = string[] (cert.subject_alternative_names ().values ()).join (" ");
 
         string details;
         QTextStream stream (&details);
@@ -150,14 +150,14 @@ private:
         auto *label = new QLabel (parent);
         label.set_style_sheet (QLatin1String ("QLabel { padding : 8px; }"));
         label.set_text_format (Qt.RichText);
-        label.set_text (details);
+        label.on_set_text (details);
 
         // plug label into widget action
         auto *action = new QWidget_action (parent);
         action.set_default_widget (label);
         // plug action into menu
         auto *menu = new QMenu (parent);
-        menu.menu_action ().set_text (txt);
+        menu.menu_action ().on_set_text (txt);
         menu.add_action (action);
 
         return menu;
@@ -183,7 +183,7 @@ private:
         }
     }
 
-    void Ssl_button.slot_update_menu () {
+    void Ssl_button.on_update_menu () {
         _menu.clear ();
 
         if (!_account_state) {
@@ -209,7 +209,7 @@ private:
                 _menu.add_action (tr ("No support for SSL session tickets/identifiers")).set_enabled (false);
             }
 
-            QList<QSslCertificate> chain = account._peer_certificate_chain;
+            GLib.List<QSslCertificate> chain = account._peer_certificate_chain;
 
             if (chain.is_empty ()) {
                 q_c_warning (lc_ssl) << "Empty certificate chain";
@@ -220,7 +220,7 @@ private:
 
             const auto system_certs = QSslConfiguration.system_ca_certificates ();
 
-            QList<QSslCertificate> tmp_chain;
+            GLib.List<QSslCertificate> tmp_chain;
             foreach (QSslCertificate cert, chain) {
                 tmp_chain << cert;
                 if (system_certs.contains (cert))

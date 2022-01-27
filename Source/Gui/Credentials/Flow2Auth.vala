@@ -39,7 +39,7 @@ class Flow2Auth : GLib.Object {
     };
 
     public Flow2Auth (Account *account, GLib.Object *parent);
-    public ~Flow2Auth () override;
+    ~Flow2Auth () override;
 
     public enum Result {
         NotSupported,
@@ -47,7 +47,7 @@ class Flow2Auth : GLib.Object {
         Error
     };
 
-    public void start ();
+    public void on_start ();
     public void open_browser ();
     public void copy_link_to_clipboard ();
     public QUrl authorisation_link ();
@@ -57,30 +57,29 @@ signals:
     The state has changed.
     when logged in, app_password has the value of the app password.
     ***********************************************************/
-    void result (Flow2Auth.Result result, string &error_string = string (),
-                const string &user = string (), string &app_password = string ());
+    void result (Flow2Auth.Result result, string error_string = string (),
+                const string user = string (), string app_password = string ());
 
     void status_changed (PollStatus status, int seconds_left);
 
-public slots:
-    void slot_poll_now ();
+    public void on_poll_now ();
 
-private slots:
-    void slot_poll_timer_timeout ();
 
-private:
-    void fetch_new_token (TokenAction action);
+    private void on_poll_timer_timeout ();
 
-    Account *_account;
-    QUrl _login_url;
-    string _poll_token;
-    string _poll_endpoint;
-    QTimer _poll_timer;
-    int64 _seconds_left;
-    int64 _seconds_interval;
-    bool _is_busy;
-    bool _has_token;
-    bool _enforce_https = false;
+
+    private void fetch_new_token (TokenAction action);
+
+    private Account _account;
+    private QUrl _login_url;
+    private string _poll_token;
+    private string _poll_endpoint;
+    private QTimer _poll_timer;
+    private int64 _seconds_left;
+    private int64 _seconds_interval;
+    private bool _is_busy;
+    private bool _has_token;
+    private bool _enforce_https = false;
 };
 
 
@@ -91,12 +90,12 @@ private:
         , _is_busy (false)
         , _has_token (false) {
         _poll_timer.set_interval (1000);
-        GLib.Object.connect (&_poll_timer, &QTimer.timeout, this, &Flow2Auth.slot_poll_timer_timeout);
+        GLib.Object.connect (&_poll_timer, &QTimer.timeout, this, &Flow2Auth.on_poll_timer_timeout);
     }
 
     Flow2Auth.~Flow2Auth () = default;
 
-    void Flow2Auth.start () {
+    void Flow2Auth.on_start () {
         // Note : All startup code is in open_browser () to allow reinitiate a new request with
         //       fresh tokens. Opening the same poll_endpoint link twice triggers an expiration
         //       message by the server (security, intended design).
@@ -134,7 +133,7 @@ private:
         req.set_header (QNetworkRequest.UserAgentHeader, Utility.friendly_user_agent_string ());
 
         auto job = _account.send_request ("POST", url, req);
-        job.set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
+        job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
 
         GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this, action] (QNetworkReply *reply) {
             auto json_data = reply.read_all ();
@@ -147,8 +146,8 @@ private:
                 poll_token = json.value ("poll").to_object ().value ("token").to_string ();
                 poll_endpoint = json.value ("poll").to_object ().value ("endpoint").to_string ();
                 if (_enforce_https && QUrl (poll_endpoint).scheme () != QStringLiteral ("https")) {
-                    q_c_warning (lc_flow2auth) << "Can not poll endpoint because the returned url" << poll_endpoint << "does not start with https";
-                    emit result (Error, tr ("The polling URL does not start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
+                    q_c_warning (lc_flow2auth) << "Can not poll endpoint because the returned url" << poll_endpoint << "does not on_start with https";
+                    emit result (Error, tr ("The polling URL does not on_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
                     return;
                 }
                 login_url = json["login"].to_string ();
@@ -200,7 +199,7 @@ private:
             emit status_changed (PollStatus.status_poll_countdown, _seconds_left);
 
             if (!_poll_timer.is_active ()) {
-                _poll_timer.start ();
+                _poll_timer.on_start ();
             }
 
             switch (action) {
@@ -213,7 +212,7 @@ private:
                 }
                 break;
             case action_copy_link_to_clipboard:
-                QApplication.clipboard ().set_text (authorisation_link ().to_string (QUrl.FullyEncoded));
+                QApplication.clipboard ().on_set_text (authorisation_link ().to_string (QUrl.FullyEncoded));
                 emit status_changed (PollStatus.status_copy_link_to_clipboard, 0);
                 break;
             }
@@ -223,7 +222,7 @@ private:
         });
     }
 
-    void Flow2Auth.slot_poll_timer_timeout () {
+    void Flow2Auth.on_poll_timer_timeout () {
         if (_is_busy || !_has_token)
             return;
 
@@ -246,7 +245,7 @@ private:
         request_body.set_data (arguments.query (QUrl.FullyEncoded).to_latin1 ());
 
         auto job = _account.send_request ("POST", _poll_endpoint, req, request_body);
-        job.set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
+        job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
 
         GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this] (QNetworkReply *reply) {
             auto json_data = reply.read_all ();
@@ -259,8 +258,8 @@ private:
                 && !json.is_empty ()) {
                 server_url = json["server"].to_string ();
                 if (_enforce_https && server_url.scheme () != QStringLiteral ("https")) {
-                    q_c_warning (lc_flow2auth) << "Returned server url" << server_url << "does not start with https";
-                    emit result (Error, tr ("The returned server URL does not start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
+                    q_c_warning (lc_flow2auth) << "Returned server url" << server_url << "does not on_start with https";
+                    emit result (Error, tr ("The returned server URL does not on_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
                     return;
                 }
                 login_name = json["login_name"].to_string ();
@@ -321,13 +320,13 @@ private:
         });
     }
 
-    void Flow2Auth.slot_poll_now () {
+    void Flow2Auth.on_poll_now () {
         // poll now if we're not already doing so
         if (_is_busy || !_has_token)
             return;
 
         _seconds_left = 1;
-        slot_poll_timer_timeout ();
+        on_poll_timer_timeout ();
     }
 
     } // namespace Occ

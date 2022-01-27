@@ -36,7 +36,7 @@ NSISUpdater starts the update if a new version of the client is available.
 On Mac_o_s_x, the sparkle framework handles the installation of the new
 version. On Linux, the update capabilit
 are relied on, and thus the Passive_upda
-if there is a new version once at every start
+if there is a new version once at every on_start
 
 Simple class diagram of the updater:
 
@@ -57,18 +57,18 @@ Simple class diagram of the updater:
 ***********************************************************/
 
 class UpdaterScheduler : GLib.Object {
-public:
-    UpdaterScheduler (GLib.Object *parent);
+
+    public UpdaterScheduler (GLib.Object *parent);
 
 signals:
-    void updater_announcement (string &title, string &msg);
+    void updater_announcement (string title, string msg);
     void request_restart ();
 
-private slots:
-    void slot_timer_fired ();
 
-private:
-    QTimer _update_check_timer; /** Timer for the regular update check. */
+    private void on_timer_fired ();
+
+
+    private QTimer _update_check_timer; /** Timer for the regular update check. */
 };
 
 /***********************************************************
@@ -76,8 +76,8 @@ private:
 @ingroup gui
 ***********************************************************/
 class OCUpdater : Updater {
-public:
-    enum Download_state {
+
+    public enum Download_state {
         Unknown = 0,
         Checking_server,
         Up_to_date,
@@ -88,55 +88,55 @@ public:
         Update_only_available_through_system
     };
 
-    enum Update_status_string_format {
+    public enum Update_status_string_format {
         PlainText,
         Html,
     };
-    OCUpdater (QUrl &url);
+    public OCUpdater (QUrl url);
 
-    void set_update_url (QUrl &url);
+    public void set_update_url (QUrl url);
 
-    bool perform_update ();
+    public bool perform_update ();
 
-    void check_for_update () override;
+    public void check_for_update () override;
 
-    string status_string (Update_status_string_format format = PlainText) const;
-    int download_state ();
-    void set_download_state (Download_state state);
+    public string status_string (Update_status_string_format format = PlainText);
+    public int download_state ();
+    public void set_download_state (Download_state state);
 
 signals:
     void download_state_changed ();
-    void new_update_available (string &header, string &message);
+    void new_update_available (string header, string message);
     void request_restart ();
 
-public slots:
+
     // FIXME Maybe this should be in the NSISUpdater which should have been called Windows_updater
-    void slot_start_installer ();
+    public void on_start_installer ();
 
 protected slots:
     void background_check_for_update () override;
-    void slot_open_update_url ();
+    void on_open_update_url ();
 
-private slots:
-    void slot_version_info_arrived ();
-    void slot_timed_out ();
 
-protected:
-    virtual void version_info_arrived (Update_info &info) = 0;
-    bool update_succeeded ();
-    QNetworkAccessManager *qnam () {
+    private void on_version_info_arrived ();
+    private void on_timed_out ();
+
+
+    protected virtual void version_info_arrived (Update_info &info) = 0;
+    protected bool update_succeeded ();
+    protected QNetworkAccessManager *qnam () {
         return _access_manager;
     }
-    Update_info update_info () {
+    protected Update_info update_info () {
         return _update_info;
     }
 
-private:
-    QUrl _update_url;
-    int _state;
-    QNetworkAccessManager *_access_manager;
-    QTimer *_timeout_watchdog; /** Timer to guard the timeout of an individual network request */
-    Update_info _update_info;
+
+    private QUrl _update_url;
+    private int _state;
+    private QNetworkAccessManager _access_manager;
+    private QTimer _timeout_watchdog; /** Timer to guard the timeout of an individual network request */
+    private Update_info _update_info;
 };
 
 /***********************************************************
@@ -144,21 +144,21 @@ private:
 @ingroup gui
 ***********************************************************/
 class NSISUpdater : OCUpdater {
-public:
-    NSISUpdater (QUrl &url);
-    bool handle_startup () override;
-private slots:
-    void slot_set_seen_version ();
-    void slot_download_finished ();
-    void slot_write_file ();
 
-private:
-    void wipe_update_data ();
-    void show_no_url_dialog (Update_info &info);
-    void show_update_error_dialog (string &target_version);
-    void version_info_arrived (Update_info &info) override;
-    QScopedPointer<QTemporary_file> _file;
-    string _target_file;
+    public NSISUpdater (QUrl url);
+    public bool handle_startup () override;
+
+    private void on_set_seen_version ();
+    private void on_download_finished ();
+    private void on_write_file ();
+
+
+    private void wipe_update_data ();
+    private void show_no_url_dialog (Update_info &info);
+    private void show_update_error_dialog (string target_version);
+    private void version_info_arrived (Update_info &info) override;
+    private QScopedPointer<QTemporary_file> _file;
+    private string _target_file;
 };
 
 /***********************************************************
@@ -169,16 +169,16 @@ private:
  @ingroup gui
 ***********************************************************/
 class Passive_update_notifier : OCUpdater {
-public:
-    Passive_update_notifier (QUrl &url);
-    bool handle_startup () override {
+
+    public Passive_update_notifier (QUrl url);
+    public bool handle_startup () override {
         return false;
     }
-    void background_check_for_update () override;
+    public void background_check_for_update () override;
 
-private:
-    void version_info_arrived (Update_info &info) override;
-    QByteArray _running_app_version;
+
+    private void version_info_arrived (Update_info &info) override;
+    private GLib.ByteArray _running_app_version;
 };
 
 
@@ -191,7 +191,7 @@ private:
     UpdaterScheduler.UpdaterScheduler (GLib.Object *parent)
         : GLib.Object (parent) {
         connect (&_update_check_timer, &QTimer.timeout,
-            this, &UpdaterScheduler.slot_timer_fired);
+            this, &UpdaterScheduler.on_timer_fired);
 
         // Note : the sparkle-updater is not an OCUpdater
         if (auto *updater = qobject_cast<OCUpdater> (Updater.instance ())) {
@@ -201,14 +201,14 @@ private:
         }
 
         // at startup, do a check in any case.
-        QTimer.single_shot (3000, this, &UpdaterScheduler.slot_timer_fired);
+        QTimer.single_shot (3000, this, &UpdaterScheduler.on_timer_fired);
 
         ConfigFile cfg;
         auto check_interval = cfg.update_check_interval ();
-        _update_check_timer.start (std.chrono.milliseconds (check_interval).count ());
+        _update_check_timer.on_start (std.chrono.milliseconds (check_interval).count ());
     }
 
-    void UpdaterScheduler.slot_timer_fired () {
+    void UpdaterScheduler.on_timer_fired () {
         ConfigFile cfg;
 
         // re-set the check interval if it changed in the config file meanwhile
@@ -232,7 +232,7 @@ private:
 
     /* ----------------------------------------------------------------- */
 
-    OCUpdater.OCUpdater (QUrl &url)
+    OCUpdater.OCUpdater (QUrl url)
         : Updater ()
         , _update_url (url)
         , _state (Unknown)
@@ -240,7 +240,7 @@ private:
         , _timeout_watchdog (new QTimer (this)) {
     }
 
-    void OCUpdater.set_update_url (QUrl &url) {
+    void OCUpdater.set_update_url (QUrl url) {
         _update_url = url;
     }
 
@@ -260,8 +260,8 @@ private:
 
             message_box_start_installer.set_attribute (Qt.WA_DeleteOnClose);
 
-            connect (message_box_start_installer, &QMessageBox.finished, this, [this] {
-                slot_start_installer ();
+            connect (message_box_start_installer, &QMessageBox.on_finished, this, [this] {
+                on_start_installer ();
             });
             message_box_start_installer.open ();
         }
@@ -296,7 +296,7 @@ private:
         case Downloading:
             return tr ("Downloading %1. Please wait …").arg (update_version);
         case Download_complete:
-            return tr ("%1 available. Restart application to start the update.").arg (update_version);
+            return tr ("%1 available. Restart application to on_start the update.").arg (update_version);
         case Download_failed : {
             if (format == Update_status_string_format.Html) {
                 return tr ("Could not download update. Please open <a href='%1'>%1</a> to download the update manually.").arg (_update_info.web ());
@@ -339,7 +339,7 @@ private:
         }
     }
 
-    void OCUpdater.slot_start_installer () {
+    void OCUpdater.on_start_installer () {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
         string update_file = settings.value (update_available_c).to_string ();
@@ -348,7 +348,7 @@ private:
         q_c_info (lc_updater) << "Running updater" << update_file;
 
         if (update_file.ends_with (".exe")) {
-            QProcess.start_detached (update_file, QStringList () << "/S"
+            QProcess.start_detached (update_file, string[] () << "/S"
                                                               << "/launch");
         } else if (update_file.ends_with (".msi")) {
             // When MSIs are installed without gui they cannot launch applications
@@ -368,21 +368,21 @@ private:
                  .arg (prepare_path_for_powershell (msi_log_file))
                  .arg (prepare_path_for_powershell (QCoreApplication.application_file_path ()));
 
-            QProcess.start_detached ("powershell.exe", QStringList{"-Command", command});
+            QProcess.start_detached ("powershell.exe", string[]{"-Command", command});
         }
         q_app.quit ();
     }
 
     void OCUpdater.check_for_update () {
         QNetworkReply *reply = _access_manager.get (QNetworkRequest (_update_url));
-        connect (_timeout_watchdog, &QTimer.timeout, this, &OCUpdater.slot_timed_out);
-        _timeout_watchdog.start (30 * 1000);
-        connect (reply, &QNetworkReply.finished, this, &OCUpdater.slot_version_info_arrived);
+        connect (_timeout_watchdog, &QTimer.timeout, this, &OCUpdater.on_timed_out);
+        _timeout_watchdog.on_start (30 * 1000);
+        connect (reply, &QNetworkReply.on_finished, this, &OCUpdater.on_version_info_arrived);
 
         set_download_state (Checking_server);
     }
 
-    void OCUpdater.slot_open_update_url () {
+    void OCUpdater.on_open_update_url () {
         QDesktopServices.open_url (_update_info.web ());
     }
 
@@ -395,7 +395,7 @@ private:
         return current_version >= target_version_int;
     }
 
-    void OCUpdater.slot_version_info_arrived () {
+    void OCUpdater.on_version_info_arrived () {
         _timeout_watchdog.stop ();
         auto *reply = qobject_cast<QNetworkReply> (sender ());
         reply.delete_later ();
@@ -417,17 +417,17 @@ private:
         }
     }
 
-    void OCUpdater.slot_timed_out () {
+    void OCUpdater.on_timed_out () {
         set_download_state (Download_timed_out);
     }
 
     ////////////////////////////////////////////////////////////////////////
 
-    NSISUpdater.NSISUpdater (QUrl &url)
+    NSISUpdater.NSISUpdater (QUrl url)
         : OCUpdater (url) {
     }
 
-    void NSISUpdater.slot_write_file () {
+    void NSISUpdater.on_write_file () {
         auto *reply = qobject_cast<QNetworkReply> (sender ());
         if (_file.is_open ()) {
             _file.write (reply.read_all ());
@@ -446,7 +446,7 @@ private:
         settings.remove (auto_update_attempted_c);
     }
 
-    void NSISUpdater.slot_download_finished () {
+    void NSISUpdater.on_download_finished () {
         auto *reply = qobject_cast<QNetworkReply> (sender ());
         reply.delete_later ();
         if (reply.error () != QNetworkReply.NoError) {
@@ -507,10 +507,10 @@ private:
                     auto request = QNetworkRequest (QUrl (url));
                     request.set_attribute (QNetworkRequest.Redirect_policy_attribute, QNetworkRequest.No_less_safe_redirect_policy);
                     QNetworkReply *reply = qnam ().get (request);
-                    connect (reply, &QIODevice.ready_read, this, &NSISUpdater.slot_write_file);
-                    connect (reply, &QNetworkReply.finished, this, &NSISUpdater.slot_download_finished);
+                    connect (reply, &QIODevice.ready_read, this, &NSISUpdater.on_write_file);
+                    connect (reply, &QNetworkReply.on_finished, this, &NSISUpdater.on_download_finished);
                     set_download_state (Downloading);
-                    _file.reset (new QTemporary_file);
+                    _file.on_reset (new QTemporary_file);
                     _file.set_auto_remove (true);
                     _file.open ();
                 }
@@ -544,7 +544,7 @@ private:
                           .arg (Utility.escape (Theme.instance ().app_name_g_u_i ()),
                               Utility.escape (info.version_string ()), Utility.escape (client_version ()));
 
-        lbl.set_text (txt);
+        lbl.on_set_text (txt);
         lbl.set_text_format (Qt.RichText);
         lbl.set_word_wrap (true);
 
@@ -560,15 +560,15 @@ private:
         connect (reject, &QAbstractButton.clicked, msg_box, &Gtk.Dialog.reject);
         connect (getupdate, &QAbstractButton.clicked, msg_box, &Gtk.Dialog.accept);
 
-        connect (skip, &QAbstractButton.clicked, this, &NSISUpdater.slot_set_seen_version);
-        connect (getupdate, &QAbstractButton.clicked, this, &NSISUpdater.slot_open_update_url);
+        connect (skip, &QAbstractButton.clicked, this, &NSISUpdater.on_set_seen_version);
+        connect (getupdate, &QAbstractButton.clicked, this, &NSISUpdater.on_open_update_url);
 
         layout.add_widget (bb);
 
         msg_box.open ();
     }
 
-    void NSISUpdater.show_update_error_dialog (string &target_version) {
+    void NSISUpdater.show_update_error_dialog (string target_version) {
         auto msg_box = new Gtk.Dialog;
         msg_box.set_attribute (Qt.WA_DeleteOnClose);
         msg_box.set_window_flags (msg_box.window_flags () & ~Qt.WindowContextHelpButtonHint);
@@ -593,7 +593,7 @@ private:
                           .arg (Utility.escape (Theme.instance ().app_name_g_u_i ()),
                               Utility.escape (target_version), Utility.escape (client_version ()));
 
-        lbl.set_text (txt);
+        lbl.on_set_text (txt);
         lbl.set_text_format (Qt.RichText);
         lbl.set_word_wrap (true);
 
@@ -613,14 +613,14 @@ private:
 
         connect (skip, &QAbstractButton.clicked, this, [this] () {
             wipe_update_data ();
-            slot_set_seen_version ();
+            on_set_seen_version ();
         });
         // askagain : do nothing
         connect (retry, &QAbstractButton.clicked, this, [this] () {
-            slot_start_installer ();
+            on_start_installer ();
         });
         connect (getupdate, &QAbstractButton.clicked, this, [this] () {
-            slot_open_update_url ();
+            on_open_update_url ();
         });
 
         layout.add_widget (bb);
@@ -638,7 +638,7 @@ private:
             // did it try to execute the update?
             if (settings.value (auto_update_attempted_c, false).to_bool ()) {
                 if (update_succeeded ()) {
-                    // success : clean up
+                    // on_success : clean up
                     q_c_info (lc_updater) << "The requested update attempt has succeeded"
                             << Helper.current_version_to_int ();
                     wipe_update_data ();
@@ -658,7 +658,7 @@ private:
         return false;
     }
 
-    void NSISUpdater.slot_set_seen_version () {
+    void NSISUpdater.on_set_seen_version () {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
         settings.set_value (seen_version_c, update_info ().version ());
@@ -666,7 +666,7 @@ private:
 
     ////////////////////////////////////////////////////////////////////////
 
-    Passive_update_notifier.Passive_update_notifier (QUrl &url)
+    Passive_update_notifier.Passive_update_notifier (QUrl url)
         : OCUpdater (url) {
         // remember the version of the currently running binary. On Linux it might happen that the
         // package management updates the package while the app is running. This is detected in the
@@ -679,7 +679,7 @@ private:
         if (Utility.is_linux ()) {
             // on linux, check if the installed binary is still the same version
             // as the one that is running. If not, restart if possible.
-            const QByteArray fs_version = Utility.version_of_installed_binary ();
+            const GLib.ByteArray fs_version = Utility.version_of_installed_binary ();
             if (! (fs_version.is_empty () || _running_app_version.is_empty ()) && fs_version != _running_app_version) {
                 emit request_restart ();
             }

@@ -12,9 +12,7 @@ using namespace Occ;
 
 class TestSyncDelete : GLib.Object {
 
-private slots:
-
-    void testDeleteDirectoryWithNewFile () {
+    private on_ void testDeleteDirectoryWithNewFile () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
 
         // Remove a directory on the server with new files on the client
@@ -38,7 +36,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void issue1329 () {
+    private on_ void issue1329 () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
 
         fakeFolder.localModifier ().remove ("B");
@@ -55,4 +53,3 @@ private slots:
 };
 
 QTEST_GUILESS_MAIN (TestSyncDelete)
-#include "testsyncdelete.moc"

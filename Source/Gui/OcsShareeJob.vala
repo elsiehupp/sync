@@ -24,7 +24,7 @@ class Ocs_sharee_job : Ocs_job {
 
     @param path Path to request shares for (default all shares)
     ***********************************************************/
-    public void get_sharees (string &search, string &item_type, int page = 1, int per_page = 50, bool lookup = false);
+    public void get_sharees (string search, string item_type, int page = 1, int per_page = 50, bool lookup = false);
 
 signals:
     /***********************************************************
@@ -34,18 +34,18 @@ signals:
     ***********************************************************/
     void sharee_job_finished (QJsonDocument &reply);
 
-private slots:
-    void job_done (QJsonDocument &reply);
+
+    private void on_job_done (QJsonDocument &reply);
 };
 
     Ocs_sharee_job.Ocs_sharee_job (AccountPtr account)
         : Ocs_job (account) {
         set_path ("ocs/v2.php/apps/files_sharing/api/v1/sharees");
-        connect (this, &Ocs_job.job_finished, this, &Ocs_sharee_job.job_done);
+        connect (this, &Ocs_job.job_finished, this, &Ocs_sharee_job.on_job_done);
     }
 
-    void Ocs_sharee_job.get_sharees (string &search,
-        const string &item_type,
+    void Ocs_sharee_job.get_sharees (string search,
+        const string item_type,
         int page,
         int per_page,
         bool lookup) {
@@ -57,10 +57,10 @@ private slots:
         add_param (string.from_latin1 ("per_page"), string.number (per_page));
         add_param (string.from_latin1 ("lookup"), QVariant (lookup).to_string ());
 
-        start ();
+        on_start ();
     }
 
-    void Ocs_sharee_job.job_done (QJsonDocument &reply) {
+    void Ocs_sharee_job.on_job_done (QJsonDocument &reply) {
         emit sharee_job_finished (reply);
     }
     }

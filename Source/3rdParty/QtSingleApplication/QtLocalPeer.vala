@@ -21,25 +21,25 @@ namespace SharedTools {
 
 class QtLocalPeer : GLib.Object {
 
-    public QtLocalPeer (GLib.Object *parent = nullptr, string &app_id = string ());
+    public QtLocalPeer (GLib.Object *parent = nullptr, string app_id = string ());
     public bool is_client ();
-    public bool send_message (string &message, int timeout, bool block);
+    public bool on_send_message (string message, int timeout, bool block);
     public string application_id () {
         return id;
     }
-    public static string app_session_id (string &app_id);
+    public static string app_session_id (string app_id);
 
 signals:
-    void message_received (string &message, GLib.Object *socket);
+    void message_received (string message, GLib.Object *socket);
 
 protected slots:
     void receive_connection ();
 
-protected:
-    string id;
-    string socket_name;
-    QLocal_server* server;
-    QtLockedFile lock_file;
+
+    protected string id;
+    protected string socket_name;
+    protected QLocal_server* server;
+    protected QtLockedFile lock_file;
 };
 
 } // namespace SharedTools
@@ -78,8 +78,8 @@ namespace SharedTools {
 
 static const char ack[] = "ack";
 
-string QtLocalPeer.app_session_id (string &app_id) {
-    QByteArray idc = app_id.to_utf8 ();
+string QtLocalPeer.app_session_id (string app_id) {
+    GLib.ByteArray idc = app_id.to_utf8 ();
     uint16 id_num = q_checksum (idc.const_data (), idc.size ());
     //### could do : two 16bit checksums over separate halves of id, for a 32bit result - improved uniqeness probability. Every-other-char split would be best.
 
@@ -89,7 +89,7 @@ string QtLocalPeer.app_session_id (string &app_id) {
     return res;
 }
 
-QtLocalPeer.QtLocalPeer (GLib.Object *parent, string &app_id)
+QtLocalPeer.QtLocalPeer (GLib.Object *parent, string app_id)
     : GLib.Object (parent), id (app_id) {
     if (id.is_empty ())
         id = QCoreApplication.application_file_path ();  //### On win, check if this returns .../argv[0] without casefolding; .\MYAPP == .\myapp on Win
@@ -111,7 +111,7 @@ bool QtLocalPeer.is_client () {
         return true;
 
     if (!QLocal_server.remove_server (socket_name))
-        q_warning ("Qt_singleCoreApplication : could not cleanup socket");
+        q_warning ("Qt_singleCoreApplication : could not on_cleanup socket");
     bool res = server.listen (socket_name);
     if (!res)
         q_warning ("Qt_singleCoreApplication : listen on local socket failed, %s", q_printable (server.error_string ()));
@@ -119,7 +119,7 @@ bool QtLocalPeer.is_client () {
     return false;
 }
 
-bool QtLocalPeer.send_message (string &message, int timeout, bool block) {
+bool QtLocalPeer.on_send_message (string message, int timeout, bool block) {
     if (!is_client ())
         return false;
 
@@ -140,7 +140,7 @@ bool QtLocalPeer.send_message (string &message, int timeout, bool block) {
     if (!conn_ok)
         return false;
 
-    QByteArray u_msg (message.to_utf8 ());
+    GLib.ByteArray u_msg (message.to_utf8 ());
     QDataStream ds (&socket);
     ds.write_bytes (u_msg.const_data (), u_msg.size ());
     bool res = socket.wait_for_bytes_written (timeout);
@@ -163,7 +163,7 @@ void QtLocalPeer.receive_connection () {
         socket.wait_for_ready_read (1000);
     }
     QDataStream ds (socket);
-    QByteArray u_msg;
+    GLib.ByteArray u_msg;
     uint32 remaining = 0;
     ds >> remaining;
     u_msg.resize (remaining);

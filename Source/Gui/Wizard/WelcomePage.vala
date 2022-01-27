@@ -17,26 +17,25 @@ namespace Ui {
 
 class Welcome_page : QWizard_page {
 
-public:
-    Welcome_page (OwncloudWizard *oc_wizard);
+    public Welcome_page (OwncloudWizard *oc_wizard);
     ~Welcome_page () override;
-    int next_id () const override;
-    void initialize_page () override;
-    void set_login_button_default ();
+    public int next_id () override;
+    public void initialize_page () override;
+    public void set_login_button_default ();
 
-private:
-    void setup_ui ();
-    void customize_style ();
-    void style_slide_show ();
-    void setup_slide_show ();
-    void setup_login_button ();
-    void setup_create_account_button ();
-    void setup_host_your_own_server_label ();
 
-    QScopedPointer<Ui.Welcome_page> _ui;
+    private void setup_ui ();
+    private void customize_style ();
+    private void style_slide_show ();
+    private void setup_slide_show ();
+    private void setup_login_button ();
+    private void setup_create_account_button ();
+    private void setup_host_your_own_server_label ();
 
-    OwncloudWizard *_oc_wizard;
-    WizardCommon.Pages _next_page = WizardCommon.Page_Server_setup;
+    private QScopedPointer<Ui.Welcome_page> _ui;
+
+    private OwncloudWizard _oc_wizard;
+    private WizardCommon.Pages _next_page = WizardCommon.Page_Server_setup;
 };
 
 
@@ -90,15 +89,15 @@ private:
     }
 
     void Welcome_page.setup_slide_show () {
-        connect (_ui.slide_show, &Slide_show.clicked, _ui.slide_show, &Slide_show.stop_show);
-        connect (_ui.slide_show_next_button, &QPushButton.clicked, _ui.slide_show, &Slide_show.next_slide);
-        connect (_ui.slide_show_previous_button, &QPushButton.clicked, _ui.slide_show, &Slide_show.prev_slide);
+        connect (_ui.slide_show, &Slide_show.clicked, _ui.slide_show, &Slide_show.on_stop_show);
+        connect (_ui.slide_show_next_button, &QPushButton.clicked, _ui.slide_show, &Slide_show.on_next_slide);
+        connect (_ui.slide_show_previous_button, &QPushButton.clicked, _ui.slide_show, &Slide_show.on_prev_slide);
     }
 
     void Welcome_page.setup_login_button () {
         const auto app_name = Theme.instance ().app_name_g_u_i ();
 
-        _ui.login_button.set_text (tr ("Log in to your %1").arg (app_name));
+        _ui.login_button.on_set_text (tr ("Log in to your %1").arg (app_name));
         connect (_ui.login_button, &QPushButton.clicked, this, [this] (bool /*checked*/) {
             _next_page = WizardCommon.Page_Server_setup;
             _oc_wizard.next ();
@@ -121,7 +120,7 @@ private:
     }
 
     void Welcome_page.setup_host_your_own_server_label () {
-        _ui.host_your_own_server_label.set_text (tr ("Host your own server"));
+        _ui.host_your_own_server_label.on_set_text (tr ("Host your own server"));
         _ui.host_your_own_server_label.set_alignment (Qt.AlignCenter);
         _ui.host_your_own_server_label.set_url (QUrl ("https://docs.nextcloud.com/server/latest/admin_manual/installation/#installation"));
     }

@@ -43,9 +43,7 @@ Q_DECLARE_METATYPE (ErrorCategory)
 
 class TestRemoteDiscovery : GLib.Object {
 
-private slots:
-
-    void testRemoteDiscoveryError_data () {
+    private on_ void testRemoteDiscoveryError_data () {
         qRegisterMetaType<ErrorCategory> ();
         QTest.addColumn<int> ("errorKind");
         QTest.addColumn<string> ("expectedErrorString");
@@ -66,7 +64,7 @@ private slots:
     }
 
     // Check what happens when there is an error.
-    void testRemoteDiscoveryError () {
+    private on_ void testRemoteDiscoveryError () {
         QFETCH (int, errorKind);
         QFETCH (string, expectedErrorString);
         QFETCH (bool, syncSucceeds);
@@ -134,7 +132,7 @@ private slots:
         QCOMPARE (errorSpy[0][0].toString (), string (fatalErrorPrefix + expectedErrorString));
     }
 
-    void testMissingData () {
+    private on_ void testMissingData () {
         FakeFolder fakeFolder{ FileInfo () };
         fakeFolder.remoteModifier ().insert ("good");
         fakeFolder.remoteModifier ().insert ("noetag");
@@ -166,4 +164,3 @@ private slots:
 };
 
 QTEST_GUILESS_MAIN (TestRemoteDiscovery)
-#include "testremotediscovery.moc"

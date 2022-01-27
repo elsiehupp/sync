@@ -14,10 +14,10 @@ namespace Occ {
 class ElidedLabel : QLabel {
 
     public ElidedLabel (Gtk.Widget *parent = nullptr);
-    public ElidedLabel (string &text, Gtk.Widget *parent = nullptr);
+    public ElidedLabel (string text, Gtk.Widget *parent = nullptr);
 
-    public void set_text (string &text);
-    public const string &text () {
+    public void on_set_text (string text);
+    public const string text () {
         return _text;
     }
 
@@ -26,12 +26,12 @@ class ElidedLabel : QLabel {
         return _elide_mode;
     }
 
-protected:
-    void resize_event (QResizeEvent *event) override;
 
-private:
-    string _text;
-    Qt.TextElideMode _elide_mode = Qt.ElideNone;
+    protected void resize_event (QResizeEvent *event) override;
+
+
+    private string _text;
+    private Qt.TextElideMode _elide_mode = Qt.ElideNone;
 };
 
 
@@ -39,14 +39,14 @@ private:
         : QLabel (parent) {
     }
 
-    ElidedLabel.ElidedLabel (string &text, Gtk.Widget *parent)
+    ElidedLabel.ElidedLabel (string text, Gtk.Widget *parent)
         : QLabel (text, parent)
         , _text (text) {
     }
 
-    void ElidedLabel.set_text (string &text) {
+    void ElidedLabel.on_set_text (string text) {
         _text = text;
-        QLabel.set_text (text);
+        QLabel.on_set_text (text);
         update ();
     }
 
@@ -60,7 +60,7 @@ private:
 
         QFontMetrics fm = font_metrics ();
         string elided = fm.elided_text (_text, _elide_mode, event.size ().width ());
-        QLabel.set_text (elided);
+        QLabel.on_set_text (elided);
     }
     }
     

@@ -17,25 +17,24 @@ namespace Occ {
 ***********************************************************/
 class PropagateRemoteDelete : PropagateItemJob {
     QPointer<DeleteJob> _job;
-    AbstractPropagateRemoteDeleteEncrypted *_delete_encrypted_helper = nullptr;
+    AbstractPropagateRemoteDeleteEncrypted _delete_encrypted_helper = nullptr;
 
-public:
-    PropagateRemoteDelete (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+    public PropagateRemoteDelete (OwncloudPropagator *propagator, SyncFileItemPtr &item)
         : PropagateItemJob (propagator, item) {
     }
-    void start () override;
-    void create_delete_job (string &filename);
-    void abort (PropagatorJob.AbortType abort_type) override;
+    public void on_start () override;
+    public void create_delete_job (string filename);
+    public void on_abort (PropagatorJob.AbortType abort_type) override;
 
-    bool is_likely_finished_quickly () override {
+    public bool is_likely_finished_quickly () override {
         return !_item.is_directory ();
     }
 
-private slots:
-    void slot_delete_job_finished ();
+
+    private void on_delete_job_finished ();
 };
 
-    void PropagateRemoteDelete.start () {
+    void PropagateRemoteDelete.on_start () {
         q_c_info (lc_propagate_remote_delete) << "Start propagate remote delete job for" << _item._file;
 
         if (propagator ()._abort_requested)
@@ -47,45 +46,45 @@ private slots:
             } else {
                 _delete_encrypted_helper = new Propagate_remote_delete_encrypted_root_folder (propagator (), _item, this);
             }
-            connect (_delete_encrypted_helper, &AbstractPropagateRemoteDeleteEncrypted.finished, this, [this] (bool success) {
-                if (!success) {
+            connect (_delete_encrypted_helper, &AbstractPropagateRemoteDeleteEncrypted.on_finished, this, [this] (bool on_success) {
+                if (!on_success) {
                     SyncFileItem.Status status = SyncFileItem.NormalError;
                     if (_delete_encrypted_helper.network_error () != QNetworkReply.NoError && _delete_encrypted_helper.network_error () != QNetworkReply.ContentNotFoundError) {
                         status = classify_error (_delete_encrypted_helper.network_error (), _item._http_error_code, &propagator ()._another_sync_needed);
                     }
-                    done (status, _delete_encrypted_helper.error_string ());
+                    on_done (status, _delete_encrypted_helper.error_string ());
                 } else {
-                    done (SyncFileItem.Success);
+                    on_done (SyncFileItem.Success);
                 }
             });
-            _delete_encrypted_helper.start ();
+            _delete_encrypted_helper.on_start ();
         } else {
             create_delete_job (_item._file);
         }
     }
 
-    void PropagateRemoteDelete.create_delete_job (string &filename) {
+    void PropagateRemoteDelete.create_delete_job (string filename) {
         q_c_info (lc_propagate_remote_delete) << "Deleting file, local" << _item._file << "remote" << filename;
 
         _job = new DeleteJob (propagator ().account (),
             propagator ().full_remote_path (filename),
             this);
 
-        connect (_job.data (), &DeleteJob.finished_signal, this, &PropagateRemoteDelete.slot_delete_job_finished);
+        connect (_job.data (), &DeleteJob.finished_signal, this, &PropagateRemoteDelete.on_delete_job_finished);
         propagator ()._active_job_list.append (this);
-        _job.start ();
+        _job.on_start ();
     }
 
-    void PropagateRemoteDelete.abort (PropagatorJob.AbortType abort_type) {
+    void PropagateRemoteDelete.on_abort (PropagatorJob.AbortType abort_type) {
         if (_job && _job.reply ())
-            _job.reply ().abort ();
+            _job.reply ().on_abort ();
 
         if (abort_type == AbortType.Asynchronous) {
             emit abort_finished ();
         }
     }
 
-    void PropagateRemoteDelete.slot_delete_job_finished () {
+    void PropagateRemoteDelete.on_delete_job_finished () {
         propagator ()._active_job_list.remove_one (this);
 
         ASSERT (_job);
@@ -99,11 +98,11 @@ private slots:
         if (err != QNetworkReply.NoError && err != QNetworkReply.ContentNotFoundError) {
             SyncFileItem.Status status = classify_error (err, _item._http_error_code,
                 &propagator ()._another_sync_needed);
-            done (status, _job.error_string ());
+            on_done (status, _job.error_string ());
             return;
         }
 
-        // A 404 reply is also considered a success here : We want to make sure
+        // A 404 reply is also considered a on_success here : We want to make sure
         // a file is gone from the server. It not being there in the first place
         // is ok. This will happen for files that are in the DB but not on
         // the server or the local file system.
@@ -111,7 +110,7 @@ private slots:
             // Normally we expect "204 No Content"
             // If it is not the case, it might be because of a proxy or gateway intercepting the request, so we must
             // throw an error.
-            done (SyncFileItem.NormalError,
+            on_done (SyncFileItem.NormalError,
                 tr ("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
                     .arg (_item._http_error_code)
                     .arg (_job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_string ()));
@@ -121,7 +120,7 @@ private slots:
         propagator ()._journal.delete_file_record (_item._original_file, _item.is_directory ());
         propagator ()._journal.commit ("Remote Remove");
 
-        done (SyncFileItem.Success);
+        on_done (SyncFileItem.Success);
     }
     }
     

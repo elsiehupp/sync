@@ -18,8 +18,7 @@ namespace Occ {
 
 class AbstractCredentials : GLib.Object {
 
-public:
-    AbstractCredentials ();
+    public AbstractCredentials ();
     // No need for virtual destructor - GLib.Object already has one.
 
     /***********************************************************
@@ -29,22 +28,22 @@ public:
     Calling Account.set_credentials () will call this function.
     Credentials only live as long as the underlying account object.
     ***********************************************************/
-    virtual void set_account (Account *account);
+    public virtual void set_account (Account *account);
 
-    virtual string auth_type () const = 0;
-    virtual string user () const = 0;
-    virtual string password () const = 0;
-    virtual QNetworkAccessManager *create_qNAM () const = 0;
+    public virtual string auth_type () = 0;
+    public virtual string user () = 0;
+    public virtual string password () = 0;
+    public virtual QNetworkAccessManager *create_qNAM () = 0;
 
     /***********************************************************
     Whether there are credentials that can be used for a connection attempt.
     ***********************************************************/
-    virtual bool ready () const = 0;
+    public virtual bool ready () = 0;
 
     /***********************************************************
     Whether fetch_from_keychain () was called before.
     ***********************************************************/
-    bool was_fetched () {
+    public bool was_fetched () {
         return _was_fetched;
     }
 
@@ -53,17 +52,17 @@ public:
 
     Should set _was_fetched = true, and later emit fetched () when done.
     ***********************************************************/
-    virtual void fetch_from_keychain () = 0;
+    public virtual void fetch_from_keychain () = 0;
 
     /***********************************************************
     Ask credentials from the user (typically async)
 
     Should emit asked () when done.
     ***********************************************************/
-    virtual void ask_from_user () = 0;
+    public virtual void ask_from_user () = 0;
 
-    virtual bool still_valid (QNetworkReply *reply) = 0;
-    virtual void persist () = 0;
+    public virtual bool still_valid (QNetworkReply *reply) = 0;
+    public virtual void persist () = 0;
 
     /***********************************************************
     Invalidates token used to authorize requests, it will no longer be used.
@@ -75,7 +74,7 @@ public:
 
     ready () must return false afterwards.
     ***********************************************************/
-    virtual void invalidate_token () = 0;
+    public virtual void invalidate_token () = 0;
 
     /***********************************************************
     Clears out all sensitive data; used for fully signing out users.
@@ -84,14 +83,14 @@ public:
 
     For http auth, this would clear the session cookie and password.
     ***********************************************************/
-    virtual void forget_sensitive_data () = 0;
+    public virtual void forget_sensitive_data () = 0;
 
-    static string keychain_key (string &url, string &user, string &account_id);
+    public static string keychain_key (string url, string user, string account_id);
 
     /***********************************************************
     If the job need to be restarted or queue, this does it and returns true.
     ***********************************************************/
-    virtual bool retry_if_needed (AbstractNetworkJob *) {
+    public virtual bool retry_if_needed (AbstractNetworkJob *) {
         return false;
     }
 
@@ -112,9 +111,9 @@ signals:
     ***********************************************************/
     void asked ();
 
-protected:
-    Account *_account = nullptr;
-    bool _was_fetched = false;
+
+    protected Account _account = nullptr;
+    protected bool _was_fetched = false;
 };
 
 
@@ -125,7 +124,7 @@ protected:
         _account = account;
     }
 
-    string AbstractCredentials.keychain_key (string &url, string &user, string &account_id) {
+    string AbstractCredentials.keychain_key (string url, string user, string account_id) {
         string u (url);
         if (u.is_empty ()) {
             q_c_warning (lc_credentials) << "Empty url in key_chain, error!";

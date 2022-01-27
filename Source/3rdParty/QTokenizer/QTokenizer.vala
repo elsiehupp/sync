@@ -38,8 +38,8 @@ $QT_END_LICENSE$
 ****************************************************************************/
 
 // #include <string>
-// #include <QByteArray>
-// #include <QSharedPointer>
+// #include <GLib.ByteArray>
+
 
 QT_BEGIN_NAMESPACE
 
@@ -112,7 +112,7 @@ class QTokenizer {
     /***********************************************************
     \class QTokenizer
     \inmodule Qt_network
-    \brief QTokenizer tokenizes Strings on string, QByteArray,
+    \brief QTokenizer tokenizes Strings on string, GLib.ByteArray,
             std.string or std.wstring
 
     Example Usage:
@@ -123,7 +123,7 @@ class QTokenizer {
         tokenizer.set_quote_characters ("\"'");
         tokenizer.set_return_delimiters (true);
         while (tokenizer.has_next ()) {
-        QByteArray token = tokenizer.next ();
+        GLib.ByteArray token = tokenizer.next ();
         bool is_delimiter = tokenizer.is_delimiter ();
         ...
         }
@@ -146,7 +146,7 @@ class QTokenizer {
     }
 
     /***********************************************************
-    Sets characters that are considered to start and end quotes.
+    Sets characters that are considered to on_start and end quotes.
 
     When between two characters considered a quote, delimiters will
     be ignored.
@@ -199,7 +199,7 @@ class QTokenizer {
     /***********************************************************
     Resets the tokenizer to the starting position.
     ***********************************************************/
-    public void reset () {
+    public void on_reset () {
         d.token_end = d.begin;
     }
 
@@ -226,14 +226,14 @@ class QTokenizer {
         return T (tmp_start, len);
     }
 
-private:
-    friend class QStringTokenizer;
-    QSharedPointer<QTokenizerPrivate<T, Const_iterator> > d;
+
+    private friend class QStringTokenizer;
+    private unowned<QTokenizerPrivate<T, Const_iterator> > d;
 };
 
 class QStringTokenizer : QTokenizer<string> {
 
-    public QStringTokenizer (string &string, string &delim) :
+    public QStringTokenizer (string string, string delim) :
         QTokenizer<string, string.Const_iterator> (string, delim) {}
     /***********************************************************
     @brief Like \see next (), but returns a lightweight string reference
@@ -251,7 +251,7 @@ class QStringTokenizer : QTokenizer<string> {
     }
 };
 
-using QByte_array_tokenizer = QTokenizer<QByteArray>;
+using QByte_array_tokenizer = QTokenizer<GLib.ByteArray>;
 using String_tokenizer = QTokenizer<std.string>;
 using WString_tokenizer = QTokenizer<std.wstring>;
 

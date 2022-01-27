@@ -32,23 +32,23 @@ signals:
     ***********************************************************/
     void apps_job_finished (QJsonDocument &reply, int status_code);
 
-private slots:
-    void job_done (QJsonDocument &reply, int status_code);
+
+    private void on_job_done (QJsonDocument &reply, int status_code);
 };
 
     OcsNavigationAppsJob.OcsNavigationAppsJob (AccountPtr account)
         : Ocs_job (account) {
         set_path ("ocs/v2.php/core/navigation/apps");
-        connect (this, &OcsNavigationAppsJob.job_finished, this, &OcsNavigationAppsJob.job_done);
+        connect (this, &OcsNavigationAppsJob.job_finished, this, &OcsNavigationAppsJob.on_job_done);
     }
 
     void OcsNavigationAppsJob.get_navigation_apps () {
         set_verb ("GET");
         add_param ("absolute", "true");
-        start ();
+        on_start ();
     }
 
-    void OcsNavigationAppsJob.job_done (QJsonDocument &reply, int status_code) {
+    void OcsNavigationAppsJob.on_job_done (QJsonDocument &reply, int status_code) {
         emit apps_job_finished (reply, status_code);
     }
     }

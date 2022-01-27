@@ -19,38 +19,37 @@ namespace Occ {
 
 class Vfs_xAttr : Vfs {
 
-public:
-    Vfs_xAttr (GLib.Object *parent = nullptr);
+    public Vfs_xAttr (GLib.Object *parent = nullptr);
     ~Vfs_xAttr () override;
 
-    Mode mode () const override;
-    string file_suffix () const override;
+    public Mode mode () override;
+    public string file_suffix () override;
 
-    void stop () override;
-    void unregister_folder () override;
+    public void stop () override;
+    public void unregister_folder () override;
 
-    bool socket_api_pin_state_actions_shown () const override;
-    bool is_hydrating () const override;
+    public bool socket_api_pin_state_actions_shown () override;
+    public bool is_hydrating () override;
 
-    Result<void, string> update_metadata (string &file_path, time_t modtime, int64 size, QByteArray &file_id) override;
+    public Result<void, string> update_metadata (string file_path, time_t modtime, int64 size, GLib.ByteArray &file_id) override;
 
-    Result<void, string> create_placeholder (SyncFileItem &item) override;
-    Result<void, string> dehydrate_placeholder (SyncFileItem &item) override;
-    Result<ConvertToPlaceholderResult, string> convert_to_placeholder (string &filename, SyncFileItem &item, string &replaces_file) override;
+    public Result<void, string> create_placeholder (SyncFileItem &item) override;
+    public Result<void, string> dehydrate_placeholder (SyncFileItem &item) override;
+    public Result<ConvertToPlaceholderResult, string> convert_to_placeholder (string filename, SyncFileItem &item, string replaces_file) override;
 
-    bool needs_metadata_update (SyncFileItem &item) override;
-    bool is_dehydrated_placeholder (string &file_path) override;
-    bool stat_type_virtual_file (csync_file_stat_t *stat, void *stat_data) override;
+    public bool needs_metadata_update (SyncFileItem &item) override;
+    public bool is_dehydrated_placeholder (string file_path) override;
+    public bool stat_type_virtual_file (csync_file_stat_t *stat, void *stat_data) override;
 
-    bool set_pin_state (string &folder_path, PinState state) override;
-    Optional<PinState> pin_state (string &folder_path) override;
-    AvailabilityResult availability (string &folder_path) override;
+    public bool set_pin_state (string folder_path, PinState state) override;
+    public Optional<PinState> pin_state (string folder_path) override;
+    public AvailabilityResult availability (string folder_path) override;
 
-public slots:
-    void file_status_changed (string &system_file_name, SyncFileStatus file_status) override;
 
-protected:
-    void start_impl (VfsSetupParams &params) override;
+    public void on_file_status_changed (string system_file_name, SyncFileStatus file_status) override;
+
+
+    protected void start_impl (VfsSetupParams &params) override;
 };
 
 class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xAttr> {
@@ -89,7 +88,7 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
         return false;
     }
 
-    Result<void, string> Vfs_xAttr.update_metadata (string &file_path, time_t modtime, int64, QByteArray &) {
+    Result<void, string> Vfs_xAttr.update_metadata (string file_path, time_t modtime, int64, GLib.ByteArray &) {
         if (modtime <= 0) {
             return {tr ("Error updating metadata due to invalid modified time")};
         }
@@ -139,7 +138,7 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
         return {};
     }
 
-    Result<Vfs.ConvertToPlaceholderResult, string> Vfs_xAttr.convert_to_placeholder (string &, SyncFileItem &, string &) {
+    Result<Vfs.ConvertToPlaceholderResult, string> Vfs_xAttr.convert_to_placeholder (string , SyncFileItem &, string ) {
         // Nothing necessary
         return {ConvertToPlaceholderResult.Ok};
     }
@@ -148,7 +147,7 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
         return false;
     }
 
-    bool Vfs_xAttr.is_dehydrated_placeholder (string &file_path) {
+    bool Vfs_xAttr.is_dehydrated_placeholder (string file_path) {
         const auto fi = QFileInfo (file_path);
         return fi.exists () &&
                 xattr.has_nextcloud_placeholder_attributes (file_path);
@@ -159,11 +158,11 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
             return false;
         }
 
-        const auto parent_path = static_cast<QByteArray> (stat_data);
+        const auto parent_path = static_cast<GLib.ByteArray> (stat_data);
         Q_ASSERT (!parent_path.ends_with ('/'));
         Q_ASSERT (!stat.path.starts_with ('/'));
 
-        const auto path = QByteArray (*parent_path + '/' + stat.path);
+        const auto path = GLib.ByteArray (*parent_path + '/' + stat.path);
         const auto pin = [=] {
             const auto absolute_path = string.from_utf8 (path);
             Q_ASSERT (absolute_path.starts_with (params ().filesystem_path.to_utf8 ()));
@@ -185,19 +184,19 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
         return false;
     }
 
-    bool Vfs_xAttr.set_pin_state (string &folder_path, PinState state) {
+    bool Vfs_xAttr.set_pin_state (string folder_path, PinState state) {
         return set_pin_state_in_db (folder_path, state);
     }
 
-    Optional<PinState> Vfs_xAttr.pin_state (string &folder_path) {
+    Optional<PinState> Vfs_xAttr.pin_state (string folder_path) {
         return pin_state_in_db (folder_path);
     }
 
-    Vfs.AvailabilityResult Vfs_xAttr.availability (string &folder_path) {
+    Vfs.AvailabilityResult Vfs_xAttr.availability (string folder_path) {
         return availability_in_db (folder_path);
     }
 
-    void Vfs_xAttr.file_status_changed (string &, SyncFileStatus) {
+    void Vfs_xAttr.on_file_status_changed (string , SyncFileStatus) {
     }
 
     } // namespace Occ

@@ -23,14 +23,13 @@ class Sync_status_summary : GLib.Object {
     Q_PROPERTY (string sync_status_string READ sync_status_string NOTIFY sync_status_string_changed)
     Q_PROPERTY (string sync_status_detail_string READ sync_status_detail_string NOTIFY sync_status_detail_string_changed)
 
-public:
-    Sync_status_summary (GLib.Object *parent = nullptr);
+    public Sync_status_summary (GLib.Object *parent = nullptr);
 
-    double sync_progress ();
-    QUrl sync_icon ();
-    bool syncing ();
-    string sync_status_string ();
-    string sync_status_detail_string ();
+    public double sync_progress ();
+    public QUrl sync_icon ();
+    public bool syncing ();
+    public string sync_status_string ();
+    public string sync_status_detail_string ();
 
 signals:
     void sync_progress_changed ();
@@ -39,42 +38,42 @@ signals:
     void sync_status_string_changed ();
     void sync_status_detail_string_changed ();
 
-public slots:
-    void load ();
 
-private:
-    void connect_to_folders_progress (Folder.Map &map);
+    public void on_load ();
 
-    void on_folder_list_changed (Occ.Folder.Map &folder_map);
-    void on_folder_progress_info (ProgressInfo &progress);
-    void on_folder_sync_state_changed (Folder *folder);
-    void on_is_connected_changed ();
 
-    void set_sync_state_for_folder (Folder *folder);
-    void mark_folder_as_error (Folder *folder);
-    void mark_folder_as_success (Folder *folder);
-    bool folder_errors ();
-    bool folder_error (Folder *folder) const;
-    void clear_folder_errors ();
-    void set_sync_state_to_connected_state ();
-    bool reload_needed (AccountState *account_state) const;
-    void init_sync_state ();
+    private void connect_to_folders_progress (Folder.Map &map);
 
-    void set_sync_progress (double value);
-    void set_syncing (bool value);
-    void set_sync_status_string (string &value);
-    void set_sync_status_detail_string (string &value);
-    void set_sync_icon (QUrl &value);
-    void set_account_state (AccountStatePtr account_state);
+    private void on_folder_list_changed (Occ.Folder.Map &folder_map);
+    private void on_folder_progress_info (ProgressInfo &progress);
+    private void on_folder_sync_state_changed (Folder *folder);
+    private void on_is_connected_changed ();
 
-    AccountStatePtr _account_state;
-    std.set<string> _folders_with_errors;
+    private void set_sync_state_for_folder (Folder *folder);
+    private void mark_folder_as_error (Folder *folder);
+    private void mark_folder_as_success (Folder *folder);
+    private bool folder_errors ();
+    private bool folder_error (Folder *folder);
+    private void clear_folder_errors ();
+    private void set_sync_state_to_connected_state ();
+    private bool reload_needed (AccountState *account_state);
+    private void init_sync_state ();
 
-    QUrl _sync_icon = Theme.instance ().sync_status_ok ();
-    double _progress = 1.0;
-    bool _is_syncing = false;
-    string _sync_status_string = tr ("All synced!");
-    string _sync_status_detail_string;
+    private void set_sync_progress (double value);
+    private void set_syncing (bool value);
+    private void set_sync_status_string (string value);
+    private void set_sync_status_detail_string (string value);
+    private void set_sync_icon (QUrl value);
+    private void set_account_state (AccountStatePtr account_state);
+
+    private AccountStatePtr _account_state;
+    private std.set<string> _folders_with_errors;
+
+    private QUrl _sync_icon = Theme.instance ().sync_status_ok ();
+    private double _progress = 1.0;
+    private bool _is_syncing = false;
+    private string _sync_status_string = tr ("All synced!");
+    private string _sync_status_detail_string;
 };
 }
 
@@ -117,7 +116,7 @@ namespace {
         return true;
     }
 
-    void Sync_status_summary.load () {
+    void Sync_status_summary.on_load () {
         const auto current_user = User_model.instance ().current_user ();
         if (!current_user) {
             return;
@@ -289,7 +288,7 @@ namespace {
         emit sync_progress_changed ();
     }
 
-    void Sync_status_summary.set_sync_status_string (string &value) {
+    void Sync_status_summary.set_sync_status_string (string value) {
         if (_sync_status_string == value) {
             return;
         }
@@ -306,7 +305,7 @@ namespace {
         return _sync_status_detail_string;
     }
 
-    void Sync_status_summary.set_sync_icon (QUrl &value) {
+    void Sync_status_summary.set_sync_icon (QUrl value) {
         if (_sync_icon == value) {
             return;
         }
@@ -315,7 +314,7 @@ namespace {
         emit sync_icon_changed ();
     }
 
-    void Sync_status_summary.set_sync_status_detail_string (string &value) {
+    void Sync_status_summary.set_sync_status_detail_string (string value) {
         if (_sync_status_detail_string == value) {
             return;
         }

@@ -7,7 +7,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <QBuffer>
 
 // #include <QVector>
-// #include <QList>
+// #include <GLib.List>
 // #include <QPair>
 // #include <QUrl>
 
@@ -30,12 +30,12 @@ class Notification_confirm_job : AbstractNetworkJob {
 
     @param verb currently supported GET PUT POST DELETE
     ***********************************************************/
-    public void set_link_and_verb (QUrl &link, QByteArray &verb);
+    public void set_link_and_verb (QUrl link, GLib.ByteArray &verb);
 
     /***********************************************************
     @brief Start the OCS request
     ***********************************************************/
-    public void start () override;
+    public void on_start () override;
 
 signals:
 
@@ -46,12 +46,12 @@ signals:
     ***********************************************************/
     void job_finished (string reply, int reply_code);
 
-private slots:
-    bool finished () override;
 
-private:
-    QByteArray _verb;
-    QUrl _link;
+    private bool on_finished () override;
+
+
+    private GLib.ByteArray _verb;
+    private QUrl _link;
 };
 
     Notification_confirm_job.Notification_confirm_job (AccountPtr account)
@@ -59,12 +59,12 @@ private:
         set_ignore_credential_failure (true);
     }
 
-    void Notification_confirm_job.set_link_and_verb (QUrl &link, QByteArray &verb) {
+    void Notification_confirm_job.set_link_and_verb (QUrl link, GLib.ByteArray &verb) {
         _link = link;
         _verb = verb;
     }
 
-    void Notification_confirm_job.start () {
+    void Notification_confirm_job.on_start () {
         if (!_link.is_valid ()) {
             q_c_warning (lc_notifications_job) << "Attempt to trigger invalid URL : " << _link.to_string ();
             return;
@@ -75,10 +75,10 @@ private:
 
         send_request (_verb, _link, req);
 
-        AbstractNetworkJob.start ();
+        AbstractNetworkJob.on_start ();
     }
 
-    bool Notification_confirm_job.finished () {
+    bool Notification_confirm_job.on_finished () {
         int reply_code = 0;
         // FIXME : check for the reply code!
         const string reply_str = reply ().read_all ();

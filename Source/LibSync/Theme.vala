@@ -63,8 +63,8 @@ class Theme : GLib.Object {
     Q_PROPERTY (QColor error_box_text_color READ error_box_text_color CONSTANT)
     Q_PROPERTY (QColor error_box_background_color READ error_box_background_color CONSTANT)
     Q_PROPERTY (QColor error_box_border_color READ error_box_border_color CONSTANT)
-public:
-    enum Custom_media_type {
+
+    public enum Custom_media_type {
         o_c_setup_top, // own_cloud connect page
         o_c_setup_side,
         o_c_setup_bottom,
@@ -74,7 +74,7 @@ public:
     /***********************************************************
     returns a singleton instance.
     ***********************************************************/
-    static Theme *instance ();
+    public static Theme *instance ();
 
     ~Theme () override;
 
@@ -86,7 +86,7 @@ public:
 
     @return true if branded, false otherwise
     ***********************************************************/
-    virtual bool is_branded ();
+    public virtual bool is_branded ();
 
     /***********************************************************
     @brief app_name_g_u_i - Human readable application name.
@@ -99,7 +99,7 @@ public:
 
     @return string with human readable app name.
     ***********************************************************/
-    virtual string app_name_g_u_i ();
+    public virtual string app_name_g_u_i ();
 
     /***********************************************************
     @brief app_name - Application name (short)
@@ -117,103 +117,103 @@ public:
 
     @return string with app name.
     ***********************************************************/
-    virtual string app_name ();
+    public virtual string app_name ();
 
     /***********************************************************
     @brief Returns full path to an online state icon
     @return QUrl full path to an icon
     ***********************************************************/
-    QUrl state_online_image_source ();
+    public QUrl state_online_image_source ();
 
     /***********************************************************
     @brief Returns full path to an offline state icon
     @return QUrl full path to an icon
     ***********************************************************/
-    QUrl state_offline_image_source ();
+    public QUrl state_offline_image_source ();
 
     /***********************************************************
     @brief Returns full path to an online user status icon
     @return QUrl full path to an icon
     ***********************************************************/
-    QUrl status_online_image_source ();
+    public QUrl status_online_image_source ();
 
     /***********************************************************
     @brief Returns full path to an do not disturb user status icon
     @return QUrl full path to an icon
     ***********************************************************/
-    QUrl status_do_not_disturb_image_source ();
+    public QUrl status_do_not_disturb_image_source ();
 
     /***********************************************************
     @brief Returns full path to an away user status icon
     @return QUrl full path to an icon
     ***********************************************************/
-    QUrl status_away_image_source ();
+    public QUrl status_away_image_source ();
 
     /***********************************************************
     @brief Returns full path to an invisible user status icon
     @return QUrl full path to an icon
     ***********************************************************/
-    QUrl status_invisible_image_source ();
+    public QUrl status_invisible_image_source ();
 
-    QUrl sync_status_ok ();
+    public QUrl sync_status_ok ();
 
-    QUrl sync_status_error ();
+    public QUrl sync_status_error ();
 
-    QUrl sync_status_running ();
+    public QUrl sync_status_running ();
 
-    QUrl sync_status_pause ();
+    public QUrl sync_status_pause ();
 
-    QUrl sync_status_warning ();
+    public QUrl sync_status_warning ();
 
-    QUrl folder_offline ();
+    public QUrl folder_offline ();
 
     /***********************************************************
     @brief config_file_name
     @return the name of the config file.
     ***********************************************************/
-    virtual string config_file_name ();
+    public virtual string config_file_name ();
 
 #ifndef TOKEN_AUTH_ONLY
-    static string hidpi_file_name (string &file_name, QPaint_device *dev = nullptr);
+    public static string hidpi_file_name (string file_name, QPaint_device *dev = nullptr);
 
-    static string hidpi_file_name (string &icon_name, QColor &background_color, QPaint_device *dev = nullptr);
+    public static string hidpi_file_name (string icon_name, QColor &background_color, QPaint_device *dev = nullptr);
 
-    static bool is_hidpi (QPaint_device *dev = nullptr);
+    public static bool is_hidpi (QPaint_device *dev = nullptr);
 
     /***********************************************************
     get an sync state icon
     ***********************************************************/
-    virtual QIcon sync_state_icon (SyncResult.Status, bool sys_tray = false) const;
+    public virtual QIcon sync_state_icon (SyncResult.Status, bool sys_tray = false);
 
-    virtual QIcon folder_disabled_icon ();
-    virtual QIcon folder_offline_icon (bool sys_tray = false) const;
-    virtual QIcon application_icon ();
+    public virtual QIcon folder_disabled_icon ();
+    public virtual QIcon folder_offline_icon (bool sys_tray = false);
+    public virtual QIcon application_icon ();
 #endif
 
-    virtual string status_header_text (SyncResult.Status) const;
-    virtual string version ();
+    public virtual string status_header_text (SyncResult.Status);
+    public virtual string version ();
 
     /***********************************************************
     Characteristics : bool if more than one sync folder is allowed
     ***********************************************************/
-    virtual bool single_sync_folder ();
+    public virtual bool single_sync_folder ();
 
     /***********************************************************
     When true, client works with multiple accounts.
     ***********************************************************/
-    virtual bool multi_account ();
+    public public virtual bool multi_account ();
 
     /***********************************************************
-    * URL to documentation.
+    URL to documentation.
 
-    * This is opened in the browser when the "Help" action is selected from the tray menu.
+    This is opened in the browser when the "Help" action is selected from the tray menu.
 
-    * If the function is overridden to return an empty string the action is removed from
+    If the function is overridden to return an empty string the action is removed from
     * the menu.
 
-    * Defaults to Nextclouds client documentation website.
+    Defaults to Nextclouds client documentation website.
     ***********************************************************/
-    virtual string help_url ();
+    public virtual string help_url ();
 
     /***********************************************************
     The url to use for showing help on conflicts.
@@ -224,64 +224,64 @@ public:
     documentation website. If help_url () is empty, this function will also return the
     empty string.
     ***********************************************************/
-    virtual string conflict_help_url ();
+    public virtual string conflict_help_url ();
 
     /***********************************************************
     Setting a value here will pre-define the server url.
 
     The respective UI controls will be disabled only if force_override_server_url () is true
     ***********************************************************/
-    virtual string override_server_url ();
+    public virtual string override_server_url ();
 
     /***********************************************************
     Enforce a pre-defined server url.
 
     When true, the respective UI controls will be disabled
     ***********************************************************/
-    virtual bool force_override_server_url ();
+    public virtual bool force_override_server_url ();
 
     /***********************************************************
     Enable OCSP stapling for SSL handshakes
 
     When true, peer will be requested for Online Certificate Status Protocol response
     ***********************************************************/
-    virtual bool enable_stapling_oCSP ();
+    public virtual bool enable_stapling_oCSP ();
 
     /***********************************************************
     Enforce SSL validity
 
     When true, trusting the untrusted certificate is not allowed
     ***********************************************************/
-    virtual bool forbid_bad_s_sL ();
+    public virtual bool forbid_bad_s_sL ();
 
     /***********************************************************
     This is only usefull when previous version had a different override_server_url
     with a different auth type in that case You should then specify "http" or "shibboleth".
     Normaly this should be left empty.
     ***********************************************************/
-    virtual string force_config_auth_type ();
+    public virtual string force_config_auth_type ();
 
     /***********************************************************
     The default folder name without path on the server at setup time.
     ***********************************************************/
-    virtual string default_server_folder ();
+    public virtual string default_server_folder ();
 
     /***********************************************************
     The default folder name without path on the client side at setup time.
     ***********************************************************/
-    virtual string default_client_folder ();
+    public virtual string default_client_folder ();
 
     /***********************************************************
     Override to encforce a particular locale, i.e. "de" or "pt_BR"
     ***********************************************************/
-    virtual string enforced_locale () {
+    public virtual string enforced_locale () {
         return string ();
     }
 
     /***********************************************************
     colored, white or black
     ***********************************************************/
-    string systray_icon_flavor (bool mono) const;
+    public string systray_icon_flavor (bool mono);
 
 #ifndef TOKEN_AUTH_ONLY
     /***********************************************************
@@ -289,24 +289,24 @@ public:
     The default implementation will try to look up
     :/client/theme/<type>.png
     ***********************************************************/
-    virtual QVariant custom_media (Custom_media_type type);
+    public virtual QVariant custom_media (Custom_media_type type);
 
     /***********************************************************
     @return color for the setup wizard
     ***********************************************************/
-    virtual QColor wizard_header_title_color ();
+    public virtual QColor wizard_header_title_color ();
 
     /***********************************************************
     @return color for the setup wizard.
     ***********************************************************/
-    virtual QColor wizard_header_background_color ();
+    public virtual QColor wizard_header_background_color ();
 
-    virtual QPixmap wizard_application_logo ();
+    public virtual QPixmap wizard_application_logo ();
 
     /***********************************************************
     @return logo for the setup wizard.
     ***********************************************************/
-    virtual QPixmap wizard_header_logo ();
+    public virtual QPixmap wizard_header_logo ();
 
     /***********************************************************
     The default implementation creates a
@@ -315,18 +315,18 @@ public:
 
     @return banner for the setup wizard.
     ***********************************************************/
-    virtual QPixmap wizard_header_banner ();
+    public virtual QPixmap wizard_header_banner ();
 #endif
 
     /***********************************************************
     The SHA sum of the released git commit
     ***********************************************************/
-    string git_sHA1 ();
+    public string git_sHA1 ();
 
     /***********************************************************
     About dialog contents
     ***********************************************************/
-    virtual string about ();
+    public virtual string about ();
 
     /***********************************************************
     Legal notice dialog version detail contents
@@ -336,61 +336,62 @@ public:
     /***********************************************************
     Define if the systray icons should be using mono design
     ***********************************************************/
-    void set_systray_use_mono_icons (bool mono);
+    public void set_systray_use_mono_icons (bool mono);
 
     /***********************************************************
     Retrieve wether to use mono icons for systray
     ***********************************************************/
-    bool systray_use_mono_icons ();
+    public bool systray_use_mono_icons ();
 
     /***********************************************************
     Check if mono icons are available
     ***********************************************************/
-    bool mono_icons_available ();
+    public bool mono_icons_available ();
 
     /***********************************************************
     @brief Where to check for new Updates.
     ***********************************************************/
-    virtual string update_check_url ();
+    public virtual string update_check_url ();
 
     /***********************************************************
     When true, the setup wizard will show the selective sync dialog by default and default
     to nothing selected
     ***********************************************************/
-    virtual bool wizard_selective_sync_default_nothing ();
+    public virtual bool wizard_selective_sync_default_nothing ();
 
     /***********************************************************
     Default option for the new_big_folder_size_limit.
     Size in MB of the maximum size of folder before we ask the confirmation.
     Set -1 to never ask confirmation.  0 to ask confirmation for every folder.
-     **/
-    virtual int64 new_big_folder_size_limit ();
+    ***********************************************************/
+    public virtual int64 new_big_folder_size_limit ();
 
     /***********************************************************
     Hide the checkbox that says "Ask for confirmation before synchronizing folders larger than X MB"
     in the account wizard
     ***********************************************************/
-    virtual bool wizard_hide_folder_size_limit_checkbox ();
+    public virtual bool wizard_hide_folder_size_limit_checkbox ();
+
     /***********************************************************
     Hide the checkbox that says "Ask for confirmation before synchronizing external storages"
     in the account wizard
     ***********************************************************/
-    virtual bool wizard_hide_external_storage_confirmation_checkbox ();
+    public virtual bool wizard_hide_external_storage_confirmation_checkbox ();
 
     /***********************************************************
     @brief Sharing options
 
     Allow link sharing and or user/group sharing
     ***********************************************************/
-    virtual bool link_sharing ();
-    virtual bool user_group_sharing ();
+    public virtual bool link_sharing ();
+    public virtual bool user_group_sharing ();
 
     /***********************************************************
     If this returns true, the user cannot configure the proxy in the network settings.
     The proxy settings will be disabled in the configuration dialog.
     Default returns false.
     ***********************************************************/
-    virtual bool force_system_network_proxy ();
+    public virtual bool force_system_network_proxy ();
 
     /***********************************************************
     @brief How to handle the user_iD
@@ -399,7 +400,7 @@ public:
     @value User_iDEmail Wizard asks for an email as ID
     @value User_iDCustom Specify string in \ref custom_user_iD
     ***********************************************************/
-    enum User_iDType {
+    public enum User_iDType {
         User_iDUser_name = 0,
         User_iDEmail,
         User_iDCustom
@@ -410,7 +411,7 @@ public:
 
      @return User_iDType.User_iDUser_name, unless reimplemented
     ***********************************************************/
-    virtual User_iDType user_iDType ();
+    public virtual User_iDType user_iDType ();
 
     /***********************************************************
     @brief Allows to customize the type of user ID (e.g. user name, email)
@@ -420,7 +421,7 @@ public:
 
     @return An empty string, unless reimplemented
     ***********************************************************/
-    virtual string custom_user_iD ();
+    public virtual string custom_user_iD ();
 
     /***********************************************************
     @brief Demo string to be displayed when no text has been
@@ -428,7 +429,7 @@ public:
 
     @return An empty string, unless reimplemented
     ***********************************************************/
-    virtual string user_iDHint ();
+    public virtual string user_iDHint ();
 
     /***********************************************************
     @brief Postfix that will be enforced in a URL. e.g.
@@ -436,14 +437,14 @@ public:
 
     @return An empty string, unless reimplemented
     ***********************************************************/
-    virtual string wizard_url_postfix ();
+    public virtual string wizard_url_postfix ();
 
     /***********************************************************
     @brief String that will be shown as long as no text has been entered by the user.
 
     @return An empty string, unless reimplemented
     ***********************************************************/
-    virtual string wizard_url_hint ();
+    public virtual string wizard_url_hint ();
 
     /***********************************************************
     @brief the server folder that should be queried for the quota information
@@ -454,14 +455,14 @@ public:
 
     Defaults : "/"
     ***********************************************************/
-    virtual string quota_base_folder ();
+    public virtual string quota_base_folder ();
 
     /***********************************************************
     The OAuth client_id, secret pair.
     Note that client that change these value cannot connect to un-branded owncloud servers.
     ***********************************************************/
-    virtual string oauth_client_id ();
-    virtual string oauth_client_secret ();
+    public virtual string oauth_client_id ();
+    public virtual string oauth_client_secret ();
 
     /***********************************************************
     @brief What should be output for the --version command line switch.
@@ -469,15 +470,15 @@ public:
     By default, it's a combination of app_name (), version (), the GIT SHA1 and some
     important dependency versions.
     ***********************************************************/
-    virtual string version_switch_output ();
+    public virtual string version_switch_output ();
 	
 	/***********************************************************
-    * @brief Request suitable QIcon resource depending on the background colour of the parent widget.
+    @brief Request suitable QIcon resource depending on the background colour of the parent widget.
 
-    * This should be replaced (TODO) by a real theming implementation for the client UI
+    This should be replaced (TODO) by a real theming implementation for the client UI
     * (actually 2019/09/13 only systray theming).
     ***********************************************************/
-	virtual QIcon ui_theme_icon (string &icon_name, bool ui_has_dark_bg) const;
+	public virtual QIcon ui_theme_icon (string icon_name, bool ui_has_dark_bg);
 
     /***********************************************************
     @brief Perform a calculation to check if a colour is dark or light and accounts for different sensitivity of the human eye.
@@ -486,7 +487,7 @@ public:
 
     2019/12/08 : Moved here from SettingsDialog.
     ***********************************************************/
-    static bool is_dark_color (QColor &color);
+    public static bool is_dark_color (QColor &color);
 
     /***********************************************************
     @brief Return the colour to be used for HTML links (e.g. used in QLabel), based on the current app palette or given colour (Dark-/Light-Mode switching).
@@ -495,7 +496,7 @@ public:
 
     2019/12/08 : Implemented for the Dark Mode on mac_o_s, because the app palette can not account for that (Qt 5.12.5).
     ***********************************************************/
-    static QColor get_background_aware_link_color (QColor &background_color);
+    public static QColor get_background_aware_link_color (QColor &background_color);
 
     /***********************************************************
     @brief Return the colour to be used for HTML links (e.g. used in QLabel), based on the current app palette (Dark-/Light-Mode switching).
@@ -504,7 +505,7 @@ public:
 
     2019/12/08 : Implemented for the Dark Mode on mac_o_s, because the app palette can not account for that (Qt 5.12.5).
     ***********************************************************/
-    static QColor get_background_aware_link_color ();
+    public static QColor get_background_aware_link_color ();
 
     /***********************************************************
     @brief Appends a CSS-style colour value to all HTML link tags in a given string, based on the current app palette or given colour (Dark-/Light-Mode switching).
@@ -513,7 +514,7 @@ public:
 
     This way we also avoid having certain strings re-translated on Transifex.
     ***********************************************************/
-    static void replace_link_color_string_background_aware (string &link_string, QColor &background_color);
+    public static void replace_link_color_string_background_aware (string link_string, QColor &background_color);
 
     /***********************************************************
     @brief Appends a CSS-style colour value to all HTML link tags in a given string, based on the current app palette (Dark-/Light-Mode switching).
@@ -522,7 +523,7 @@ public:
 
     This way we also avoid having certain strings re-translated on Transifex.
     ***********************************************************/
-    static void replace_link_color_string_background_aware (string &link_string);
+    public static void replace_link_color_string_background_aware (string link_string);
 
     /***********************************************************
     @brief Appends a CSS-style colour value to all HTML link tags in a given string, as specified by new_color.
@@ -531,7 +532,7 @@ public:
 
     This way we also avoid having certain strings re-translated on Transifex.
     ***********************************************************/
-    static void replace_link_color_string (string &link_string, QColor &new_color);
+    public static void replace_link_color_string (string link_string, QColor &new_color);
 
     /***********************************************************
     @brief Creates a colour-aware icon based on the specified palette's base colour.
@@ -540,7 +541,7 @@ public:
 
     2019/12/09 : Moved here from SettingsDialog.
     ***********************************************************/
-    static QIcon create_color_aware_icon (string &name, QPalette &palette);
+    public static QIcon create_color_aware_icon (string name, QPalette &palette);
 
     /***********************************************************
     @brief Creates a colour-aware icon based on the app palette's base colour (Dark-/Light-Mode switching).
@@ -549,7 +550,7 @@ public:
 
     2019/12/09 : Moved here from SettingsDialog.
     ***********************************************************/
-    static QIcon create_color_aware_icon (string &name);
+    public static QIcon create_color_aware_icon (string name);
 
     /***********************************************************
     @brief Creates a colour-aware pixmap based on the specified palette's base colour.
@@ -558,7 +559,7 @@ public:
 
     2019/12/09 : Adapted from create_color_aware_icon.
     ***********************************************************/
-    static QPixmap create_color_aware_pixmap (string &name, QPalette &palette);
+    public static QPixmap create_color_aware_pixmap (string name, QPalette &palette);
 
     /***********************************************************
     @brief Creates a colour-aware pixmap based on the app palette's base colour (Dark-/Light-Mode switching).
@@ -567,7 +568,7 @@ public:
 
     2019/12/09 : Adapted from create_color_aware_icon.
     ***********************************************************/
-    static QPixmap create_color_aware_pixmap (string &name);
+    public static QPixmap create_color_aware_pixmap (string name);
 
     /***********************************************************
     @brief Whether to show the option to create folders using "virtual files".
@@ -575,30 +576,30 @@ public:
     By default, the options are not shown unless experimental options are
     manually enabled in the configuration file.
     ***********************************************************/
-    virtual bool show_virtual_files_option ();
+    public virtual bool show_virtual_files_option ();
 
-    virtual bool enforce_virtual_files_sync_folder ();
+    public virtual bool enforce_virtual_files_sync_folder ();
 
     /***********************************************************
     @return color for the Error_box text.
     ***********************************************************/
-    virtual QColor error_box_text_color ();
+    public virtual QColor error_box_text_color ();
 
     /***********************************************************
     @return color for the Error_box background.
     ***********************************************************/
-    virtual QColor error_box_background_color ();
+    public virtual QColor error_box_background_color ();
 
     /***********************************************************
     @return color for the Error_box border.
     ***********************************************************/
-    virtual QColor error_box_border_color ();
+    public virtual QColor error_box_border_color ();
 
-    static constexpr const char *theme_prefix = ":/client/theme/";
+    public static constexpr const char *theme_prefix = ":/client/theme/";
 
-protected:
+
 #ifndef TOKEN_AUTH_ONLY
-    QIcon theme_icon (string &name, bool sys_tray = false) const;
+    protected QIcon theme_icon (string name, bool sys_tray = false);
 #endif
     /***********************************************************
     @brief Generates image path in the resources
@@ -606,21 +607,21 @@ protected:
     @param size Size in the power of two (16, 32, 64, etc.)
     @param sys_tray Whether the image requested is for Systray or not
     @return string image path in the resources
-     **/
-    string theme_image_path (string &name, int size = -1, bool sys_tray = false) const;
-    Theme ();
+    ***********************************************************/
+    protected string theme_image_path (string name, int size = -1, bool sys_tray = false);
+    protected Theme ();
 
 signals:
     void systray_use_mono_icons_changed (bool);
 
-private:
-    Theme (Theme const &);
-    Theme &operator= (Theme const &);
 
-    static Theme *_instance;
-    bool _mono = false;
+    private Theme (Theme const &);
+    private Theme &operator= (Theme const &);
+
+    private static Theme _instance;
+    private bool _mono = false;
 #ifndef TOKEN_AUTH_ONLY
-    mutable QHash<string, QIcon> _icon_cache;
+    private mutable QHash<string, QIcon> _icon_cache;
 #endif
 };
 }
@@ -635,7 +636,7 @@ private:
 
 namespace {
 
-QUrl image_path_to_url (string &image_path) {
+QUrl image_path_to_url (string image_path) {
     if (image_path.starts_with (':')) {
         auto url = QUrl ();
         url.set_scheme (QStringLiteral ("qrc"));
@@ -647,7 +648,7 @@ QUrl image_path_to_url (string &image_path) {
 }
 
 bool should_prefer_svg () {
-    return QByteArray (APPLICATION_ICON_SET).to_upper () == QByteArrayLiteral ("SVG");
+    return GLib.ByteArray (APPLICATION_ICON_SET).to_upper () == QByteArrayLiteral ("SVG");
 }
 
 Theme *Theme._instance = nullptr;
@@ -671,7 +672,7 @@ string Theme.status_header_text (SyncResult.Status status) {
         result_str = QCoreApplication.translate ("theme", "Status undefined");
         break;
     case SyncResult.NotYetStarted:
-        result_str = QCoreApplication.translate ("theme", "Waiting to start sync");
+        result_str = QCoreApplication.translate ("theme", "Waiting to on_start sync");
         break;
     case SyncResult.Sync_running:
         result_str = QCoreApplication.translate ("theme", "Sync is running");
@@ -779,7 +780,7 @@ QIcon Theme.application_icon () {
 helper to load a icon from either the icon theme the desktop provides or from
 the apps Qt resources.
 ***********************************************************/
-QIcon Theme.theme_icon (string &name, bool sys_tray) {
+QIcon Theme.theme_icon (string name, bool sys_tray) {
     string flavor;
     if (sys_tray) {
         flavor = systray_icon_flavor (_mono);
@@ -835,7 +836,7 @@ QIcon Theme.theme_icon (string &name, bool sys_tray) {
     return cached;
 }
 
-string Theme.theme_image_path (string &name, int size, bool sys_tray) {
+string Theme.theme_image_path (string name, int size, bool sys_tray) {
     const auto flavor = (!is_branded () && sys_tray) ? systray_icon_flavor (_mono) : QLatin1String ("colored");
     const auto use_svg = should_prefer_svg ();
 
@@ -863,13 +864,13 @@ bool Theme.is_hidpi (QPaint_device *dev) {
     return device_pixel_ratio > 1;
 }
 
-QIcon Theme.ui_theme_icon (string &icon_name, bool ui_has_dark_bg) {
+QIcon Theme.ui_theme_icon (string icon_name, bool ui_has_dark_bg) {
     string icon_path = string (Theme.theme_prefix) + (ui_has_dark_bg ? "white/" : "black/") + icon_name;
     std.string icn_path = icon_path.to_utf8 ().const_data ();
     return QIcon (QPixmap (icon_path));
 }
 
-string Theme.hidpi_file_name (string &file_name, QPaint_device *dev) {
+string Theme.hidpi_file_name (string file_name, QPaint_device *dev) {
     if (!Theme.is_hidpi (dev)) {
         return file_name;
     }
@@ -886,7 +887,7 @@ string Theme.hidpi_file_name (string &file_name, QPaint_device *dev) {
     return file_name;
 }
 
-string Theme.hidpi_file_name (string &icon_name, QColor &background_color, QPaint_device *dev) {
+string Theme.hidpi_file_name (string icon_name, QColor &background_color, QPaint_device *dev) {
     const auto is_dark_background = Theme.is_dark_color (background_color);
 
     const string icon_path = string (Theme.theme_prefix) + (is_dark_background ? "white/" : "black/") + icon_name;
@@ -1033,7 +1034,7 @@ string Theme.git_sHA1 () {
 
 string Theme.about () {
     // Shorten Qt's OS name : "mac_o_s Mojave (10.14)" . "mac_o_s"
-    QStringList os_string_list = Utility.platform_name ().split (QLatin1Char (' '));
+    string[] os_string_list = Utility.platform_name ().split (QLatin1Char (' '));
     string os_name = os_string_list.at (0);
 
     string dev_string;
@@ -1292,19 +1293,19 @@ QColor Theme.get_background_aware_link_color () {
     return get_background_aware_link_color (QGuiApplication.palette ().base ().color ());
 }
 
-void Theme.replace_link_color_string_background_aware (string &link_string, QColor &background_color) {
+void Theme.replace_link_color_string_background_aware (string link_string, QColor &background_color) {
     replace_link_color_string (link_string, get_background_aware_link_color (background_color));
 }
 
-void Theme.replace_link_color_string_background_aware (string &link_string) {
+void Theme.replace_link_color_string_background_aware (string link_string) {
     replace_link_color_string_background_aware (link_string, QGuiApplication.palette ().color (QPalette.Base));
 }
 
-void Theme.replace_link_color_string (string &link_string, QColor &new_color) {
+void Theme.replace_link_color_string (string link_string, QColor &new_color) {
     link_string.replace (QRegularExpression (" (<a href|<a style='color:# ([a-z_a-Z0-9]{6});' href)"), string.from_latin1 ("<a style='color:%1;' href").arg (new_color.name ()));
 }
 
-QIcon Theme.create_color_aware_icon (string &name, QPalette &palette) {
+QIcon Theme.create_color_aware_icon (string name, QPalette &palette) {
     QSvgRenderer renderer (name);
     QImage img (64, 64, QImage.Format_ARGB32);
     img.fill (Qt.Global_color.transparent);
@@ -1332,11 +1333,11 @@ QIcon Theme.create_color_aware_icon (string &name, QPalette &palette) {
     return icon;
 }
 
-QIcon Theme.create_color_aware_icon (string &name) {
+QIcon Theme.create_color_aware_icon (string name) {
     return create_color_aware_icon (name, QGuiApplication.palette ());
 }
 
-QPixmap Theme.create_color_aware_pixmap (string &name, QPalette &palette) {
+QPixmap Theme.create_color_aware_pixmap (string name, QPalette &palette) {
     QImage img (name);
     QImage inverted (img);
     inverted.invert_pixels (QImage.Invert_rgb);
@@ -1350,7 +1351,7 @@ QPixmap Theme.create_color_aware_pixmap (string &name, QPalette &palette) {
     return pixmap;
 }
 
-QPixmap Theme.create_color_aware_pixmap (string &name) {
+QPixmap Theme.create_color_aware_pixmap (string name) {
     return create_color_aware_pixmap (name, QGuiApplication.palette ());
 }
 

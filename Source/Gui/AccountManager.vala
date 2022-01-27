@@ -40,7 +40,7 @@ namespace {
 class AccountManager : GLib.Object {
 
     public static AccountManager *instance ();
-    public ~AccountManager () override = default;
+    ~AccountManager () override = default;
 
     /***********************************************************
     Saves the accounts to a given settings file
@@ -68,14 +68,14 @@ class AccountManager : GLib.Object {
 
     /***********************************************************
     Return a list of all accounts.
-    (this is a list of QSharedPointer for internal reasons, one should normally not keep a copy of them)
+    (this is a list of unowned for internal reasons, one should normally not keep a copy of them)
     ***********************************************************/
-    public QList<AccountStatePtr> accounts ();
+    public GLib.List<AccountStatePtr> accounts ();
 
     /***********************************************************
     Return the account state pointer for an account identified by its display name
     ***********************************************************/
-    public AccountStatePtr account (string &name);
+    public AccountStatePtr account (string name);
 
     /***********************************************************
     Delete the AccountState
@@ -92,39 +92,39 @@ class AccountManager : GLib.Object {
     Returns the list of settings keys that can't be read because
     they are from the future.
     ***********************************************************/
-    public static void backward_migration_settings_keys (QStringList *delete_keys, QStringList *ignore_keys);
+    public static void backward_migration_settings_keys (string[] *delete_keys, string[] *ignore_keys);
 
-private:
+
     // saving and loading Account to settings
-    void save_account_helper (Account *account, QSettings &settings, bool save_credentials = true);
-    AccountPtr load_account_helper (QSettings &settings);
+    private void save_account_helper (Account *account, QSettings &settings, bool save_credentials = true);
+    private AccountPtr load_account_helper (QSettings &settings);
 
-    bool restore_from_legacy_settings ();
+    private bool restore_from_legacy_settings ();
 
-    bool is_account_id_available (string &id) const;
-    string generate_free_account_id ();
+    private bool is_account_id_available (string id);
+    private string generate_free_account_id ();
 
-    // Adds an account to the tracked list, emitting account_added ()
-    void add_account_state (AccountState *account_state);
+    // Adds an account to the tracked list, emitting on_account_added ()
+    private void add_account_state (AccountState *account_state);
 
-    AccountManager () = default;
-    QList<AccountStatePtr> _accounts;
+    private AccountManager () = default;
+    private GLib.List<AccountStatePtr> _accounts;
     /// Account ids from settings that weren't read
-    QSet<string> _additional_blocked_account_ids;
+    private QSet<string> _additional_blocked_account_ids;
 
-public slots:
+
     /// Saves account data, not including the credentials
-    void save_account (Account *a);
+    public void on_save_account (Account *a);
 
     /// Saves account state data, not including the account
-    void save_account_state (AccountState *a);
+    public void on_save_account_state (AccountState *a);
 
     /// Display a Box with the mnemonic so the user can copy it to a safe place.
-    static void display_mnemonic (string& mnemonic);
+    public static void on_display_mnemonic (string& mnemonic);
 
 signals:
-    void account_added (AccountState *account);
-    void account_removed (AccountState *account);
+    void on_account_added (AccountState *account);
+    void on_account_removed (AccountState *account);
     void account_sync_connection_removed (AccountState *account);
     void remove_account_folders (AccountState *account);
 };
@@ -137,7 +137,7 @@ signals:
     }
 
     bool AccountManager.restore () {
-        QStringList skip_settings_keys;
+        string[] skip_settings_keys;
         backward_migration_settings_keys (&skip_settings_keys, &skip_settings_keys);
 
         auto settings = ConfigFile.settings_with_group (QLatin1String (accounts_c));
@@ -183,7 +183,7 @@ signals:
         return true;
     }
 
-    void AccountManager.backward_migration_settings_keys (QStringList *delete_keys, QStringList *ignore_keys) {
+    void AccountManager.backward_migration_settings_keys (string[] *delete_keys, string[] *ignore_keys) {
         auto settings = ConfigFile.settings_with_group (QLatin1String (accounts_c));
         const int accounts_version = settings.value (QLatin1String (version_c)).to_int ();
         if (accounts_version <= max_accounts_version) {
@@ -270,7 +270,7 @@ signals:
         q_c_info (lc_account_manager) << "Saved all account settings, status:" << settings.status ();
     }
 
-    void AccountManager.save_account (Account *a) {
+    void AccountManager.on_save_account (Account *a) {
         q_c_debug (lc_account_manager) << "Saving account" << a.url ().to_string ();
         auto settings = ConfigFile.settings_with_group (QLatin1String (accounts_c));
         settings.begin_group (a.id ());
@@ -281,7 +281,7 @@ signals:
         q_c_debug (lc_account_manager) << "Saved account settings, status:" << settings.status ();
     }
 
-    void AccountManager.save_account_state (AccountState *a) {
+    void AccountManager.on_save_account_state (AccountState *a) {
         q_c_debug (lc_account_manager) << "Saving account state" << a.account ().url ().to_string ();
         auto settings = ConfigFile.settings_with_group (QLatin1String (accounts_c));
         settings.begin_group (a.account ().id ());
@@ -318,7 +318,7 @@ signals:
         // Save accepted certificates.
         settings.begin_group (QLatin1String ("General"));
         q_c_info (lc_account_manager) << "Saving " << acc.approved_certs ().count () << " unknown certs.";
-        QByteArray certs;
+        GLib.ByteArray certs;
         for (auto &cert : acc.approved_certs ()) {
             certs += cert.to_pem () + '\n';
         }
@@ -377,7 +377,7 @@ signals:
             auth_type = "webflow";
             settings.set_value (QLatin1String (auth_type_c), auth_type);
 
-            for (string &key : settings.child_keys ()) {
+            for (string key : settings.child_keys ()) {
                 if (!key.starts_with ("http_"))
                     continue;
                 auto newkey = string.from_latin1 ("webflow_").append (key.mid (5));
@@ -412,7 +412,7 @@ signals:
         return acc;
     }
 
-    AccountStatePtr AccountManager.account (string &name) {
+    AccountStatePtr AccountManager.account (string name) {
         const auto it = std.find_if (_accounts.cbegin (), _accounts.cend (), [name] (auto &acc) {
             return acc.account ().display_name () == name;
         });
@@ -452,27 +452,27 @@ signals:
         account.account ().delete_app_token ();
 
         emit account_sync_connection_removed (account);
-        emit account_removed (account);
+        emit on_account_removed (account);
     }
 
     AccountPtr AccountManager.create_account () {
         AccountPtr acc = Account.create ();
         acc.set_ssl_error_handler (new SslDialogErrorHandler);
         connect (acc.data (), &Account.proxy_authentication_required,
-            ProxyAuthHandler.instance (), &ProxyAuthHandler.handle_proxy_authentication_required);
+            ProxyAuthHandler.instance (), &ProxyAuthHandler.on_handle_proxy_authentication_required);
 
         return acc;
     }
 
-    void AccountManager.display_mnemonic (string& mnemonic) {
+    void AccountManager.on_display_mnemonic (string& mnemonic) {
         auto *widget = new Gtk.Dialog;
         Ui_Dialog ui;
         ui.setup_ui (widget);
         widget.set_window_title (tr ("End to end encryption mnemonic"));
-        ui.label.set_text (tr ("To protect your Cryptographic Identity, we encrypt it with a mnemonic of 12 dictionary words. "
+        ui.label.on_set_text (tr ("To protect your Cryptographic Identity, we encrypt it with a mnemonic of 12 dictionary words. "
                              "Please note these down and keep them safe. "
                              "They will be needed to add other devices to your account (like your mobile phone or laptop)."));
-        ui.text_edit.set_text (mnemonic);
+        ui.text_edit.on_set_text (mnemonic);
         ui.text_edit.focus_widget ();
         ui.text_edit.select_all ();
         ui.text_edit.set_alignment (Qt.AlignCenter);
@@ -484,16 +484,16 @@ signals:
         const auto accounts_copy = _accounts;
         _accounts.clear ();
         for (auto &acc : accounts_copy) {
-            emit account_removed (acc.data ());
+            emit on_account_removed (acc.data ());
             emit remove_account_folders (acc.data ());
         }
     }
 
-    QList<AccountStatePtr> AccountManager.accounts () {
+    GLib.List<AccountStatePtr> AccountManager.accounts () {
          return _accounts;
     }
 
-    bool AccountManager.is_account_id_available (string &id) {
+    bool AccountManager.is_account_id_available (string id) {
         if (_additional_blocked_account_ids.contains (id))
             return false;
 
@@ -516,11 +516,11 @@ signals:
     void AccountManager.add_account_state (AccountState *account_state) {
         GLib.Object.connect (account_state.account ().data (),
             &Account.wants_account_saved,
-            this, &AccountManager.save_account);
+            this, &AccountManager.on_save_account);
 
         AccountStatePtr ptr (account_state);
         _accounts << ptr;
-        emit account_added (account_state);
+        emit on_account_added (account_state);
     }
     }
     

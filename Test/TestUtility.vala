@@ -15,17 +15,17 @@ OCSYNC_EXPORT extern bool fsCasePreserving_override;
 
 class TestUtility : GLib.Object {
 
-private slots:
-    void initTestCase () {
+    private void on_init_test_case () {
         QStandardPaths.setTestModeEnabled (true);
     }
 
-    void testFormatFingerprint () {
+    private void on_test_format_fingerprint () {
         QVERIFY2 (formatFingerprint ("68ac906495480a3404beee4874ed853a037a7a8f")
                  == "68:ac:90:64:95:48:0a:34:04:be:ee:48:74:ed:85:3a:03:7a:7a:8f",
 		"Utility.formatFingerprint () is broken");
     }
-    void testOctetsToString () {
+
+    private void on_test_octets_to_string () {
         QLocale.setDefault (QLocale ("en"));
         QCOMPARE (octetsToString (999) , string ("999 B"));
         QCOMPARE (octetsToString (1024) , string ("1 KB"));
@@ -48,10 +48,10 @@ private slots:
         QCOMPARE (octetsToString (1024LL*1024*1024), string ("1 GB"));
     }
 
-    void testLaunchOnStartup () {
+    private void on_test_launch_on_startup () {
         string postfix = string.number (Occ.Utility.rand ());
 
-        const string appName = string.fromLatin1 ("testLaunchOnStartup.%1").arg (postfix);
+        const string appName = string.fromLatin1 ("on_test_launch_on_startup.%1").arg (postfix);
         const string guiName = "LaunchOnStartup GUI Name";
 
         QVERIFY (hasLaunchOnStartup (appName) == false);
@@ -61,7 +61,7 @@ private slots:
         QVERIFY (hasLaunchOnStartup (appName) == false);
     }
 
-    void testDurationToDescriptiveString () {
+    private void on_test_duration_to_descriptive_string () {
         QLocale.setDefault (QLocale ("C"));
         //NOTE : in order for the plural to work we would need to load the english translation
 
@@ -102,7 +102,7 @@ private slots:
 
     }
 
-    void testVersionOfInstalledBinary () {
+    private void on_test_version_of_installed_binary () {
         if (isLinux ()) {
             // pass the cmd client from our build dir
             // this is a bit inaccurate as it does not test the "real thing"
@@ -119,7 +119,7 @@ private slots:
         }
     }
 
-    void testTimeAgo () {
+    private void on_test_time_ago () {
         // Both times in same timezone
         QDateTime d1 = QDateTime.fromString ("2015-01-24T09:20:30+01:00", Qt.ISODate);
         QDateTime d2 = QDateTime.fromString ("2015-01-23T09:20:30+01:00", Qt.ISODate);
@@ -143,7 +143,7 @@ private slots:
         QCOMPARE (s, QLatin1String ("Less than a minute ago"));
     }
 
-    void testFsCasePreserving () {
+    private void on_test_fs_case_preserving () {
         QVERIFY (isMac () || isWindows () ? fsCasePreserving () : ! fsCasePreserving ());
         QScopedValueRollback<bool> scope (Occ.fsCasePreserving_override);
         Occ.fsCasePreserving_override = true;
@@ -152,7 +152,7 @@ private slots:
         QVERIFY (! fsCasePreserving ());
     }
 
-    void testFileNamesEqual () {
+    private void on_test_file_names_equal () {
         QTemporaryDir dir;
         QVERIFY (dir.isValid ());
         QDir dir2 (dir.path ());
@@ -179,7 +179,7 @@ private slots:
         dir.remove ();
     }
 
-    void testSanitizeForFileName_data () {
+    private void on_test_sanitize_for_file_name_data () {
         QTest.addColumn<string> ("input");
         QTest.addColumn<string> ("output");
 
@@ -194,14 +194,14 @@ private slots:
             << "a b c d";
     }
 
-    void testSanitizeForFileName () {
+    private on_ void testSanitizeForFileName () {
         QFETCH (string, input);
         QFETCH (string, output);
         QCOMPARE (sanitizeForFileName (input), output);
     }
 
     void testNormalizeEtag () {
-        QByteArray str;
+        GLib.ByteArray str;
 
 const int CHECK_NORMALIZE_ETAG (TEST, EXPECT)
     str = Occ.Utility.normalizeEtag (TEST);
@@ -219,7 +219,7 @@ const int CHECK_NORMALIZE_ETAG (TEST, EXPECT)
         CHECK_NORMALIZE_ETAG ("\"foo-gzip\"", "foo");
     }
 
-    void testIsPathWindowsDrivePartitionRoot () {
+    private void on_test_is_path_windows_drive_partition_root () {
         // should always return false on non-Windows
         QVERIFY (!isPathWindowsDrivePartitionRoot ("c:"));
         QVERIFY (!isPathWindowsDrivePartitionRoot ("c:/"));
@@ -228,4 +228,3 @@ const int CHECK_NORMALIZE_ETAG (TEST, EXPECT)
 };
 
 QTEST_GUILESS_MAIN (TestUtility)
-#include "testutility.moc"

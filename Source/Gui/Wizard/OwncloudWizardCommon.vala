@@ -56,7 +56,7 @@ namespace WizardCommon {
         } else {
             string str = variant.to_string ();
             if (!str.is_empty ()) {
-                label.set_text (str);
+                label.on_set_text (str);
                 label.set_text_format (Qt.RichText);
                 label.set_visible (true);
                 label.set_open_external_links (true);
@@ -88,7 +88,7 @@ namespace WizardCommon {
         auto palette = label.palette ();
         QColor text_color = palette.color (QPalette.Text);
         text_color.set_alpha (128);
-        palette.set_color (QPalette.Text, text_color);
+        palette.on_set_color (QPalette.Text, text_color);
         label.set_palette (palette);
     }
 

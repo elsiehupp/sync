@@ -8,14 +8,12 @@ Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 class TestTheme : GLib.Object {
 
-public:
-    TestTheme () {
+    public TestTheme () {
         Q_INIT_RESOURCE (resources);
         Q_INIT_RESOURCE (theme);
     }
 
-private slots:
-    void testHidpiFileName_darkBackground_returnPathToWhiteIcon () {
+    private void on_test_hidpi_file_name_dark_background_return_path_to_white_icon () {
         FakePaintDevice paintDevice;
         const QColor backgroundColor ("#000000");
         const string iconName ("icon-name");
@@ -25,7 +23,7 @@ private slots:
         QCOMPARE (iconPath, ":/client/theme/white/" + iconName + ".png");
     }
 
-    void testHidpiFileName_lightBackground_returnPathToBlackIcon () {
+    private void on_test_hidpi_file_name_light_background_return_path_to_black_icon () {
         FakePaintDevice paintDevice;
         const QColor backgroundColor ("#ffffff");
         const string iconName ("icon-name");
@@ -35,7 +33,7 @@ private slots:
         QCOMPARE (iconPath, ":/client/theme/black/" + iconName + ".png");
     }
 
-    void testHidpiFileName_hidpiDevice_returnHidpiIconPath () {
+    private void on_test_hidpi_file_name_hidpi_device_return_hidpi_icon_path () {
         FakePaintDevice paintDevice;
         paintDevice.setHidpi (true);
         const QColor backgroundColor ("#000000");
@@ -46,7 +44,7 @@ private slots:
         QCOMPARE (iconPath, ":/client/theme/white/" + iconName + "@2x.png");
     }
 
-    void testIsDarkColor_nextcloudBlue_returnTrue () {
+    private void on_test_is_dark_color_nextcloud_blue_return_true () {
         const QColor color (0, 130, 201);
 
         const auto result = Occ.Theme.isDarkColor (color);
@@ -54,7 +52,7 @@ private slots:
         QCOMPARE (result, true);
     }
 
-    void testIsDarkColor_lightColor_returnFalse () {
+    private void on_test_is_dark_color_light_color_return_false () {
         const QColor color (255, 255, 255);
 
         const auto result = Occ.Theme.isDarkColor (color);
@@ -62,7 +60,7 @@ private slots:
         QCOMPARE (result, false);
     }
 
-    void testIsDarkColor_darkColor_returnTrue () {
+    private void on_test_is_dark_color_dark_color_return_true () {
         const QColor color (0, 0, 0);
 
         const auto result = Occ.Theme.isDarkColor (color);
@@ -70,7 +68,7 @@ private slots:
         QCOMPARE (result, true);
     }
 
-    void testIsHidpi_hidpi_returnTrue () {
+    private void on_test_is_hidpi_hidpi_return_true () {
         FakePaintDevice paintDevice;
         paintDevice.setHidpi (true);
 
@@ -86,4 +84,3 @@ private slots:
 };
 
 QTEST_GUILESS_MAIN (TestTheme)
-#include "testtheme.moc"

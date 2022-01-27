@@ -5,7 +5,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 ***********************************************************/
 
 // #include <QFile>
-// #include <QStringList>
+// #include <string[]>
 // #include <QDir>
 // #pragma once
 
@@ -18,15 +18,14 @@ namespace Occ {
 class Move_job : AbstractNetworkJob {
     const string _destination;
     const QUrl _url; // Only used (instead of path) when the constructor taking an URL is used
-    QMap<QByteArray, QByteArray> _extra_headers;
+    QMap<GLib.ByteArray, GLib.ByteArray> _extra_headers;
 
-public:
-    Move_job (AccountPtr account, string &path, string &destination, GLib.Object *parent = nullptr);
-    Move_job (AccountPtr account, QUrl &url, string &destination,
-        QMap<QByteArray, QByteArray> _extra_headers, GLib.Object *parent = nullptr);
+    public Move_job (AccountPtr account, string path, string destination, GLib.Object *parent = nullptr);
+    public Move_job (AccountPtr account, QUrl url, string destination,
+        QMap<GLib.ByteArray, GLib.ByteArray> _extra_headers, GLib.Object *parent = nullptr);
 
-    void start () override;
-    bool finished () override;
+    public void on_start () override;
+    public bool on_finished () override;
 
 signals:
     void finished_signal ();
@@ -39,41 +38,40 @@ signals:
 class PropagateRemoteMove : PropagateItemJob {
     QPointer<Move_job> _job;
 
-public:
-    PropagateRemoteMove (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+    public PropagateRemoteMove (OwncloudPropagator *propagator, SyncFileItemPtr &item)
         : PropagateItemJob (propagator, item) {
     }
-    void start () override;
-    void abort (PropagatorJob.AbortType abort_type) override;
-    JobParallelism parallelism () override {
+    public void on_start () override;
+    public void on_abort (PropagatorJob.AbortType abort_type) override;
+    public JobParallelism parallelism () override {
         return _item.is_directory () ? WaitForFinished : FullParallelism;
     }
 
     /***********************************************************
     Rename the directory in the selective sync list
     ***********************************************************/
-    static bool adjust_selective_sync (SyncJournalDb *journal, string &from, string &to);
+    public static bool adjust_selective_sync (SyncJournalDb *journal, string from, string to);
 
-private slots:
-    void slot_move_job_finished ();
-    void finalize ();
+
+    private void on_move_job_finished ();
+    private void on_finalize ();
 };
 
-    Move_job.Move_job (AccountPtr account, string &path,
-        const string &destination, GLib.Object *parent)
+    Move_job.Move_job (AccountPtr account, string path,
+        const string destination, GLib.Object *parent)
         : AbstractNetworkJob (account, path, parent)
         , _destination (destination) {
     }
 
-    Move_job.Move_job (AccountPtr account, QUrl &url, string &destination,
-        QMap<QByteArray, QByteArray> extra_headers, GLib.Object *parent)
+    Move_job.Move_job (AccountPtr account, QUrl url, string destination,
+        QMap<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object *parent)
         : AbstractNetworkJob (account, string (), parent)
         , _destination (destination)
         , _url (url)
         , _extra_headers (extra_headers) {
     }
 
-    void Move_job.start () {
+    void Move_job.on_start () {
         QNetworkRequest req;
         req.set_raw_header ("Destination", QUrl.to_percent_encoding (_destination, "/"));
         for (auto it = _extra_headers.const_begin (); it != _extra_headers.const_end (); ++it) {
@@ -88,10 +86,10 @@ private slots:
         if (reply ().error () != QNetworkReply.NoError) {
             q_c_warning (lc_propagate_remote_move) << " Network error : " << reply ().error_string ();
         }
-        AbstractNetworkJob.start ();
+        AbstractNetworkJob.on_start ();
     }
 
-    bool Move_job.finished () {
+    bool Move_job.on_finished () {
         q_c_info (lc_move_job) << "MOVE of" << reply ().request ().url () << "FINISHED WITH STATUS"
                           << reply_status_string ();
 
@@ -99,7 +97,7 @@ private slots:
         return true;
     }
 
-    void PropagateRemoteMove.start () {
+    void PropagateRemoteMove.on_start () {
         if (propagator ()._abort_requested)
             return;
 
@@ -124,7 +122,7 @@ private slots:
                 SyncJournalFileRecord parent_rec;
                 bool ok = propagator ()._journal.get_file_record (parent_path, &parent_rec);
                 if (!ok) {
-                    done (SyncFileItem.NormalError);
+                    on_done (SyncFileItem.NormalError);
                     return;
                 }
 
@@ -138,7 +136,7 @@ private slots:
                 }
             }
 
-            finalize ();
+            on_finalize ();
             return;
         }
 
@@ -192,7 +190,7 @@ private slots:
             if (!FileSystem.file_exists (local_target) && FileSystem.file_exists (local_target_alt)) {
                 string error;
                 if (!FileSystem.unchecked_rename_replace (local_target_alt, local_target, &error)) {
-                    done (SyncFileItem.NormalError, tr ("Could not rename %1 to %2, error : %3")
+                    on_done (SyncFileItem.NormalError, tr ("Could not rename %1 to %2, error : %3")
                          .arg (folder_target_alt, folder_target, error));
                     return;
                 }
@@ -203,21 +201,21 @@ private slots:
         q_c_debug (lc_propagate_remote_move) << remote_source << remote_destination;
 
         _job = new Move_job (propagator ().account (), remote_source, remote_destination, this);
-        connect (_job.data (), &Move_job.finished_signal, this, &PropagateRemoteMove.slot_move_job_finished);
+        connect (_job.data (), &Move_job.finished_signal, this, &PropagateRemoteMove.on_move_job_finished);
         propagator ()._active_job_list.append (this);
-        _job.start ();
+        _job.on_start ();
     }
 
-    void PropagateRemoteMove.abort (PropagatorJob.AbortType abort_type) {
+    void PropagateRemoteMove.on_abort (PropagatorJob.AbortType abort_type) {
         if (_job && _job.reply ())
-            _job.reply ().abort ();
+            _job.reply ().on_abort ();
 
         if (abort_type == AbortType.Asynchronous) {
             emit abort_finished ();
         }
     }
 
-    void PropagateRemoteMove.slot_move_job_finished () {
+    void PropagateRemoteMove.on_move_job_finished () {
         propagator ()._active_job_list.remove_one (this);
 
         ASSERT (_job);
@@ -230,7 +228,7 @@ private slots:
         if (err != QNetworkReply.NoError) {
             SyncFileItem.Status status = classify_error (err, _item._http_error_code,
                 &propagator ()._another_sync_needed);
-            done (status, _job.error_string ());
+            on_done (status, _job.error_string ());
             return;
         }
 
@@ -238,17 +236,17 @@ private slots:
             // Normally we expect "201 Created"
             // If it is not the case, it might be because of a proxy or gateway intercepting the request, so we must
             // throw an error.
-            done (SyncFileItem.NormalError,
+            on_done (SyncFileItem.NormalError,
                 tr ("Wrong HTTP code returned by server. Expected 201, but received \"%1 %2\".")
                     .arg (_item._http_error_code)
                     .arg (_job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_string ()));
             return;
         }
 
-        finalize ();
+        on_finalize ();
     }
 
-    void PropagateRemoteMove.finalize () {
+    void PropagateRemoteMove.on_finalize () {
         // Retrieve old db data.
         // if reading from db failed still continue hoping that delete_file_record
         // reopens the db successfully.
@@ -278,35 +276,35 @@ private slots:
         }
         const auto result = propagator ().update_metadata (new_item);
         if (!result) {
-            done (SyncFileItem.FatalError, tr ("Error updating metadata : %1").arg (result.error ()));
+            on_done (SyncFileItem.FatalError, tr ("Error updating metadata : %1").arg (result.error ()));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-            done (SyncFileItem.SoftError, tr ("The file %1 is currently in use").arg (new_item._file));
+            on_done (SyncFileItem.SoftError, tr ("The file %1 is currently in use").arg (new_item._file));
             return;
         }
         if (pin_state && *pin_state != PinState.Inherited
             && !vfs.set_pin_state (new_item._rename_target, *pin_state)) {
-            done (SyncFileItem.NormalError, tr ("Error setting pin state"));
+            on_done (SyncFileItem.NormalError, tr ("Error setting pin state"));
             return;
         }
 
         if (_item.is_directory ()) {
             propagator ()._renamed_directories.insert (_item._file, _item._rename_target);
             if (!adjust_selective_sync (propagator ()._journal, _item._file, _item._rename_target)) {
-                done (SyncFileItem.FatalError, tr ("Error writing metadata to the database"));
+                on_done (SyncFileItem.FatalError, tr ("Error writing metadata to the database"));
                 return;
             }
         }
 
         propagator ()._journal.commit ("Remote Rename");
-        done (SyncFileItem.Success);
+        on_done (SyncFileItem.Success);
     }
 
-    bool PropagateRemoteMove.adjust_selective_sync (SyncJournalDb *journal, string &from_, string &to_) {
+    bool PropagateRemoteMove.adjust_selective_sync (SyncJournalDb *journal, string from_, string to_) {
         bool ok = false;
         // We only care about preserving the blacklist.   The white list should anyway be empty.
         // And the undecided list will be repopulated on the next sync, if there is anything too big.
-        QStringList list = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, &ok);
+        string[] list = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, &ok);
         if (!ok)
             return false;
 

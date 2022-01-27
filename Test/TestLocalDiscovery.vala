@@ -13,14 +13,13 @@ using namespace Occ;
 
 class TestLocalDiscovery : GLib.Object {
 
-private slots:
     // Check correct behavior when local discovery is partially drawn from the db
-    void testLocalDiscoveryStyle () {
+    private on_ void testLocalDiscoveryStyle () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
 
         LocalDiscoveryTracker tracker;
         connect (&fakeFolder.syncEngine (), &SyncEngine.itemCompleted, &tracker, &LocalDiscoveryTracker.slotItemCompleted);
-        connect (&fakeFolder.syncEngine (), &SyncEngine.finished, &tracker, &LocalDiscoveryTracker.slotSyncFinished);
+        connect (&fakeFolder.syncEngine (), &SyncEngine.on_finished, &tracker, &LocalDiscoveryTracker.slotSyncFinished);
 
         // More subdirectories are useful for testing
         fakeFolder.localModifier ().mkdir ("A/X");
@@ -63,7 +62,7 @@ private slots:
         QVERIFY (tracker.localDiscoveryPaths ().empty ());
     }
 
-    void testLocalDiscoveryDecision () {
+    private on_ void testLocalDiscoveryDecision () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         auto &engine = fakeFolder.syncEngine ();
 
@@ -104,14 +103,14 @@ private slots:
         QVERIFY (!engine.shouldDiscoverLocally (""));
     }
 
-    // Check whether item success and item failure adjusts the
+    // Check whether item on_success and item failure adjusts the
     // tracker correctly.
-    void testTrackerItemCompletion () {
+    private on_ void testTrackerItemCompletion () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
 
         LocalDiscoveryTracker tracker;
         connect (&fakeFolder.syncEngine (), &SyncEngine.itemCompleted, &tracker, &LocalDiscoveryTracker.slotItemCompleted);
-        connect (&fakeFolder.syncEngine (), &SyncEngine.finished, &tracker, &LocalDiscoveryTracker.slotSyncFinished);
+        connect (&fakeFolder.syncEngine (), &SyncEngine.on_finished, &tracker, &LocalDiscoveryTracker.slotSyncFinished);
         auto trackerContains = [&] (char *path) {
             return tracker.localDiscoveryPaths ().find (path) != tracker.localDiscoveryPaths ().end ();
         };
@@ -156,7 +155,7 @@ private slots:
         QVERIFY (tracker.localDiscoveryPaths ().empty ());
     }
 
-    void testDirectoryAndSubDirectory () {
+    private on_ void testDirectoryAndSubDirectory () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
 
         fakeFolder.localModifier ().mkdir ("A/newDir");
@@ -176,7 +175,7 @@ private slots:
     }
 
     // Tests the behavior of invalid filename detection
-    void testServerBlacklist () {
+    private on_ void testServerBlacklist () {
         FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
@@ -194,7 +193,7 @@ private slots:
         QVERIFY (!fakeFolder.currentRemoteState ().find ("C/bar"));
     }
 
-    void testCreateFileWithTrailingSpaces_localAndRemoteTrimmedDoNotExist_renameAndUploadFile () {
+    private on_ void testCreateFileWithTrailingSpaces_localAndRemoteTrimmedDoNotExist_renameAndUploadFile () {
         FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         const string fileWithSpaces1 (" foo");
@@ -244,7 +243,7 @@ private slots:
         QVERIFY (!fakeFolder.currentLocalState ().find (fileWithSpaces6));
     }
 
-    void testCreateFileWithTrailingSpaces_localTrimmedDoesExist_dontRenameAndUploadFile () {
+    private on_ void testCreateFileWithTrailingSpaces_localTrimmedDoesExist_dontRenameAndUploadFile () {
         FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         const string fileWithSpaces (" foo");
@@ -261,7 +260,7 @@ private slots:
         QVERIFY (fakeFolder.currentLocalState ().find (fileTrimmed));
     }
 
-    void testCreateFileWithTrailingSpaces_localTrimmedAlsoCreated_dontRenameAndUploadFile () {
+    private on_ void testCreateFileWithTrailingSpaces_localTrimmedAlsoCreated_dontRenameAndUploadFile () {
         FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         const string fileWithSpaces (" foo");
@@ -279,4 +278,3 @@ private slots:
 };
 
 QTEST_GUILESS_MAIN (TestLocalDiscovery)
-#include "testlocaldiscovery.moc"

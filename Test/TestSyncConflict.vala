@@ -10,22 +10,22 @@
 
 using namespace Occ;
 
-bool itemSuccessful (ItemCompletedSpy &spy, string &path, SyncInstructions instr) {
+bool itemSuccessful (ItemCompletedSpy &spy, string path, SyncInstructions instr) {
     auto item = spy.findItem (path);
     return item._status == SyncFileItem.Success && item._instruction == instr;
 }
 
-bool itemConflict (ItemCompletedSpy &spy, string &path) {
+bool itemConflict (ItemCompletedSpy &spy, string path) {
     auto item = spy.findItem (path);
     return item._status == SyncFileItem.Conflict && item._instruction == CSYNC_INSTRUCTION_CONFLICT;
 }
 
-bool itemSuccessfulMove (ItemCompletedSpy &spy, string &path) {
+bool itemSuccessfulMove (ItemCompletedSpy &spy, string path) {
     return itemSuccessful (spy, path, CSYNC_INSTRUCTION_RENAME);
 }
 
-QStringList findConflicts (FileInfo &dir) {
-    QStringList conflicts;
+string[] findConflicts (FileInfo &dir) {
+    string[] conflicts;
     for (auto &item : dir.children) {
         if (item.name.contains (" (conflicted copy")) {
             conflicts.append (item.path ());
@@ -48,7 +48,7 @@ bool expectAndWipeConflict (FileModifier &local, FileInfo state, string path) {
     return false;
 }
 
-SyncJournalFileRecord dbRecord (FakeFolder &folder, string &path) {
+SyncJournalFileRecord dbRecord (FakeFolder &folder, string path) {
     SyncJournalFileRecord record;
     folder.syncJournal ().getFileRecord (path, &record);
     return record;
@@ -56,8 +56,7 @@ SyncJournalFileRecord dbRecord (FakeFolder &folder, string &path) {
 
 class TestSyncConflict : GLib.Object {
 
-private slots:
-    void testNoUpload () {
+    private on_ void testNoUpload () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
@@ -78,12 +77,12 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void testUploadAfterDownload () {
+    private on_ void testUploadAfterDownload () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "uploadConflictFiles", true } });
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        QMap<QByteArray, string> conflictMap;
+        QMap<GLib.ByteArray, string> conflictMap;
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.PutOperation) {
                 if (request.rawHeader ("OC-Conflict") == "1") {
@@ -115,7 +114,7 @@ private slots:
         QVERIFY (conflictMap.contains (a1FileId));
         QVERIFY (conflictMap.contains (a2FileId));
         QCOMPARE (conflictMap.size (), 2);
-        QCOMPARE (Utility.conflictFileBaseNameFromPattern (conflictMap[a1FileId].toUtf8 ()), QByteArray ("A/a1"));
+        QCOMPARE (Utility.conflictFileBaseNameFromPattern (conflictMap[a1FileId].toUtf8 ()), GLib.ByteArray ("A/a1"));
 
         // Check that the conflict file contains the username
         QVERIFY (conflictMap[a1FileId].contains (string (" (conflicted copy %1 ").arg (fakeFolder.syncEngine ().account ().davDisplayName ())));
@@ -127,12 +126,12 @@ private slots:
         QCOMPARE (remote.find ("A/a2").size, 6);
     }
 
-    void testSeparateUpload () {
+    private on_ void testSeparateUpload () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "uploadConflictFiles", true } });
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        QMap<QByteArray, string> conflictMap;
+        QMap<GLib.ByteArray, string> conflictMap;
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.PutOperation) {
                 if (request.rawHeader ("OC-Conflict") == "1") {
@@ -197,7 +196,7 @@ private slots:
     }
 
     // What happens if we download a conflict file? Is the metadata set up correctly?
-    void testDownloadingConflictFile () {
+    private on_ void testDownloadingConflictFile () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "uploadConflictFiles", true } });
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
@@ -209,7 +208,7 @@ private slots:
         auto conflictRecord = fakeFolder.syncJournal ().conflictRecord ("A/a1 (conflicted copy 1234)");
         QVERIFY (conflictRecord.isValid ());
         QCOMPARE (conflictRecord.baseFileId, fakeFolder.remoteModifier ().find ("A/a1").fileId);
-        QCOMPARE (conflictRecord.initialBasePath, QByteArray ("A/a1"));
+        QCOMPARE (conflictRecord.initialBasePath, GLib.ByteArray ("A/a1"));
 
         // Now with server headers
         GLib.Object parent;
@@ -233,12 +232,12 @@ private slots:
         QVERIFY (conflictRecord.isValid ());
         QCOMPARE (conflictRecord.baseFileId, a2FileId);
         QCOMPARE (conflictRecord.baseModtime, 1234);
-        QCOMPARE (conflictRecord.baseEtag, QByteArray ("etag"));
-        QCOMPARE (conflictRecord.initialBasePath, QByteArray ("A/original"));
+        QCOMPARE (conflictRecord.baseEtag, GLib.ByteArray ("etag"));
+        QCOMPARE (conflictRecord.initialBasePath, GLib.ByteArray ("A/original"));
     }
 
     // Check that conflict records are removed when the file is gone
-    void testConflictRecordRemoval1 () {
+    private on_ void testConflictRecordRemoval1 () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "uploadConflictFiles", true } });
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
@@ -265,7 +264,7 @@ private slots:
     }
 
     // Same test, but with uploadConflictFiles == false
-    void testConflictRecordRemoval2 () {
+    private on_ void testConflictRecordRemoval2 () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "uploadConflictFiles", false } });
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
@@ -280,8 +279,8 @@ private slots:
         QVERIFY (fakeFolder.syncOnce ());
 
         auto conflicts = findConflicts (fakeFolder.currentLocalState ().children["A"]);
-        QByteArray a1conflict;
-        QByteArray a2conflict;
+        GLib.ByteArray a1conflict;
+        GLib.ByteArray a2conflict;
         for (auto & conflict : conflicts) {
             if (conflict.contains ("a1"))
                 a1conflict = conflict.toUtf8 ();
@@ -301,7 +300,7 @@ private slots:
         QVERIFY (!fakeFolder.syncJournal ().conflictRecord (a2conflict).isValid ());
     }
 
-    void testConflictFileBaseName_data () {
+    private on_ void testConflictFileBaseName_data () {
         QTest.addColumn<string> ("input");
         QTest.addColumn<string> ("output");
 
@@ -373,21 +372,21 @@ private slots:
             << "a/b/foo_conflict-123.txt";
     }
 
-    void testConflictFileBaseName () {
+    private on_ void testConflictFileBaseName () {
         QFETCH (string, input);
         QFETCH (string, output);
         QCOMPARE (Utility.conflictFileBaseNameFromPattern (input.toUtf8 ()), output.toUtf8 ());
     }
 
-    void testLocalDirRemoteFileConflict () {
+    private on_ void testLocalDirRemoteFileConflict () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "uploadConflictFiles", true } });
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        auto cleanup = [&] () {
+        auto on_cleanup = [&] () {
             completeSpy.clear ();
         };
-        cleanup ();
+        on_cleanup ();
 
         // 1) a NEW/NEW conflict
         fakeFolder.localModifier ().mkdir ("Z");
@@ -444,7 +443,7 @@ private slots:
         // The contents of the conflict directories will only be uploaded after
         // another sync.
         QVERIFY (fakeFolder.syncEngine ().isAnotherSyncNeeded () == ImmediateFollowUp);
-        cleanup ();
+        on_cleanup ();
         QVERIFY (fakeFolder.syncOnce ());
 
         QVERIFY (itemSuccessful (completeSpy, conflicts[0], CSYNC_INSTRUCTION_NEW));
@@ -456,7 +455,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void testLocalFileRemoteDirConflict () {
+    private on_ void testLocalFileRemoteDirConflict () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "uploadConflictFiles", true } });
         ItemCompletedSpy completeSpy (fakeFolder);
@@ -507,7 +506,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void testTypeConflictWithMove () {
+    private on_ void testTypeConflictWithMove () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         ItemCompletedSpy completeSpy (fakeFolder);
 
@@ -539,7 +538,7 @@ private slots:
         // Currently a1 and b1 don't get moved, but redownloaded
     }
 
-    void testTypeChange () {
+    private on_ void testTypeChange () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         ItemCompletedSpy completeSpy (fakeFolder);
 
@@ -578,7 +577,7 @@ private slots:
     }
 
     // Test what happens if we remove entries both on the server, and locally
-    void testRemoveRemove () {
+    private on_ void testRemoveRemove () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         fakeFolder.remoteModifier ().remove ("A");
         fakeFolder.localModifier ().remove ("A");
@@ -602,4 +601,3 @@ private slots:
 };
 
 QTEST_GUILESS_MAIN (TestSyncConflict)
-#include "testsyncconflict.moc"

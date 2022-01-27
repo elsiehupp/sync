@@ -17,9 +17,9 @@ namespace Occ {
 @ingroup gui
 ***********************************************************/
 class Abstract_credentials_wizard_page : QWizard_page {
-public:
-    void cleanup_page () override;
-    virtual AbstractCredentials *get_credentials () const = 0;
+
+    public void cleanup_page () override;
+    public virtual AbstractCredentials *get_credentials () = 0;
 };
 
     void Abstract_credentials_wizard_page.cleanup_page () {

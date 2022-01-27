@@ -24,16 +24,16 @@ class QtLockedFile : QFile {
     };
 
     public QtLockedFile ();
-    public QtLockedFile (string &name);
-    public ~QtLockedFile () override;
+    public QtLockedFile (string name);
+    ~QtLockedFile () override;
 
     public bool lock (LockMode mode, bool block = true);
     public bool unlock ();
     public bool is_locked ();
     public LockMode lock_mode ();
 
-private:
-    LockMode m_lock_mode;
+
+    private LockMode m_lock_mode;
 };
 
 } // namespace SharedTools
@@ -113,7 +113,7 @@ namespace SharedTools {
 
     \sa QFile.QFile ()
     ***********************************************************/
-    QtLockedFile.QtLockedFile (string &name)
+    QtLockedFile.QtLockedFile (string name)
         : QFile (name) {
         m_lock_mode = LockMode.NO_LOCK;
     }

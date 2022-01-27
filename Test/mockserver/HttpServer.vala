@@ -7,15 +7,13 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 // #include <QTcpServer>
 
 class HttpServer : QTcpServer {
-     Q_OBJECT
- public:
-    HttpServer (int16 port, GLib.Object* parent = nullptr);
-    void incomingConnection (int socket);
 
- private slots:
-     void readClient ();
-     void discardClient ();
- };
+    public HttpServer (int16 port, GLib.Object* parent = nullptr);
+    public void incomingConnection (int socket);
+
+    private void on_read_client ();
+    private void on_discard_client ();
+};
 
 
 
@@ -30,7 +28,7 @@ class HttpServer : QTcpServer {
 
 
 
- /***********************************************************
+/***********************************************************
 Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 <GPLv???-or-later-Boilerplate>
@@ -41,10 +39,10 @@ HttpServer.HttpServer (uint16 port, GLib.Object* parent)
     listen (QHostAddress.Any, port);
 }
 
-void HttpServer.readClient () {
+void HttpServer.on_read_client () {
     QTcpSocket* socket = (QTcpSocket*)sender ();
     if (socket.canReadLine ()) {
-        QStringList tokens = string (socket.readLine ()).split (QRegularExpression ("[ \r\n][ \r\n]*"));
+        string[] tokens = string (socket.readLine ()).split (QRegularExpression ("[ \r\n][ \r\n]*"));
         if (tokens[0] == "GET") {
             QTextStream os (socket);
             os.setAutoDetectUnicode (true);
@@ -64,7 +62,7 @@ void HttpServer.readClient () {
         }
     }
 }
-void HttpServer.discardClient () {
+void HttpServer.on_discard_client () {
     QTcpSocket* socket = (QTcpSocket*)sender ();
     socket.deleteLater ();
 
@@ -75,7 +73,7 @@ void HttpServer.incomingConnection (int socket) {
     if (disabled)
         return;
     QTcpSocket* s = new QTcpSocket (this);
-    connect (s, SIGNAL (readyRead ()), this, SLOT (readClient ()));
-    connect (s, SIGNAL (disconnected ()), this, SLOT (discardClient ()));
+    connect (s, SIGNAL (readyRead ()), this, SLOT (on_read_client ()));
+    connect (s, SIGNAL (disconnected ()), this, SLOT (on_discard_client ()));
     s.setSocketDescriptor (socket);
 }

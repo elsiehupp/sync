@@ -31,18 +31,18 @@ const int CFVERIFY_GONE (folder, path)
 
 using namespace Occ;
 
-bool itemInstruction (ItemCompletedSpy &spy, string &path, SyncInstructions instr) {
+bool itemInstruction (ItemCompletedSpy &spy, string path, SyncInstructions instr) {
     auto item = spy.findItem (path);
     return item._instruction == instr;
 }
 
-SyncJournalFileRecord dbRecord (FakeFolder &folder, string &path) {
+SyncJournalFileRecord dbRecord (FakeFolder &folder, string path) {
     SyncJournalFileRecord record;
     folder.syncJournal ().getFileRecord (path, &record);
     return record;
 }
 
-void triggerDownload (FakeFolder &folder, QByteArray &path) {
+void triggerDownload (FakeFolder &folder, GLib.ByteArray &path) {
     auto &journal = folder.syncJournal ();
     SyncJournalFileRecord record;
     journal.getFileRecord (path, &record);
@@ -53,7 +53,7 @@ void triggerDownload (FakeFolder &folder, QByteArray &path) {
     journal.schedulePathForRemoteDiscovery (record._path);
 }
 
-void markForDehydration (FakeFolder &folder, QByteArray &path) {
+void markForDehydration (FakeFolder &folder, GLib.ByteArray &path) {
     auto &journal = folder.syncJournal ();
     SyncJournalFileRecord record;
     journal.getFileRecord (path, &record);
@@ -64,30 +64,29 @@ void markForDehydration (FakeFolder &folder, QByteArray &path) {
     journal.schedulePathForRemoteDiscovery (record._path);
 }
 
-QSharedPointer<Vfs> setupVfs (FakeFolder &folder) {
-    auto xattrVfs = QSharedPointer<Vfs> (createVfsFromPlugin (Vfs.XAttr).release ());
+unowned<Vfs> setupVfs (FakeFolder &folder) {
+    auto xattrVfs = unowned<Vfs> (createVfsFromPlugin (Vfs.XAttr).release ());
     GLib.Object.connect (&folder.syncEngine ().syncFileStatusTracker (), &SyncFileStatusTracker.fileStatusChanged,
                      xattrVfs.data (), &Vfs.fileStatusChanged);
     folder.switchToVfs (xattrVfs);
 
     // Using this directly doesn't recursively unpin everything and instead leaves
-    // the files in the hydration that that they start with
-    folder.syncJournal ().internalPinStates ().setForPath (QByteArray (), PinState.Unspecified);
+    // the files in the hydration that that they on_start with
+    folder.syncJournal ().internalPinStates ().setForPath (GLib.ByteArray (), PinState.Unspecified);
 
     return xattrVfs;
 }
 
 class TestSyncXAttr : GLib.Object {
 
-private slots:
-    void testVirtualFileLifecycle_data () {
+    private void on_test_virtual_file_lifecycle_data () {
         QTest.addColumn<bool> ("doLocalDiscovery");
 
         QTest.newRow ("full local discovery") << true;
         QTest.newRow ("skip local discovery") << false;
     }
 
-    void testVirtualFileLifecycle () {
+    private void on_test_virtual_file_lifecycle () {
         QFETCH (bool, doLocalDiscovery);
 
         FakeFolder fakeFolder{ FileInfo () };
@@ -95,12 +94,12 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        auto cleanup = [&] () {
+        auto on_cleanup = [&] () {
             completeSpy.clear ();
             if (!doLocalDiscovery)
                 fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DatabaseAndFilesystem);
         };
-        cleanup ();
+        on_cleanup ();
 
         // Create a virtual file for a new remote file
         fakeFolder.remoteModifier ().mkdir ("A");
@@ -113,7 +112,7 @@ private slots:
         QCOMPARE (QFileInfo (fakeFolder.localPath () + "A/a1").lastModified (), someDate);
         QVERIFY (fakeFolder.currentRemoteState ().find ("A/a1"));
         QVERIFY (itemInstruction (completeSpy, "A/a1", CSYNC_INSTRUCTION_NEW));
-        cleanup ();
+        on_cleanup ();
 
         // Another sync doesn't actually lead to changes
         QVERIFY (fakeFolder.syncOnce ());
@@ -122,7 +121,7 @@ private slots:
         QCOMPARE (QFileInfo (fakeFolder.localPath () + "A/a1").lastModified (), someDate);
         QVERIFY (fakeFolder.currentRemoteState ().find ("A/a1"));
         QVERIFY (completeSpy.isEmpty ());
-        cleanup ();
+        on_cleanup ();
 
         // Not even when the remote is rediscovered
         fakeFolder.syncJournal ().forceRemoteDiscoveryNextSync ();
@@ -132,7 +131,7 @@ private slots:
         QCOMPARE (QFileInfo (fakeFolder.localPath () + "A/a1").lastModified (), someDate);
         QVERIFY (fakeFolder.currentRemoteState ().find ("A/a1"));
         QVERIFY (completeSpy.isEmpty ());
-        cleanup ();
+        on_cleanup ();
 
         // Neither does a remote change
         fakeFolder.remoteModifier ().appendByte ("A/a1");
@@ -143,7 +142,7 @@ private slots:
         QVERIFY (fakeFolder.currentRemoteState ().find ("A/a1"));
         QVERIFY (itemInstruction (completeSpy, "A/a1", CSYNC_INSTRUCTION_UPDATE_METADATA));
         QCOMPARE (dbRecord (fakeFolder, "A/a1")._fileSize, 65);
-        cleanup ();
+        on_cleanup ();
 
         // If the local virtual file is removed, this will be propagated remotely
         if (!doLocalDiscovery)
@@ -154,7 +153,7 @@ private slots:
         QVERIFY (!fakeFolder.currentRemoteState ().find ("A/a1"));
         QVERIFY (itemInstruction (completeSpy, "A/a1", CSYNC_INSTRUCTION_REMOVE));
         QVERIFY (!dbRecord (fakeFolder, "A/a1").isValid ());
-        cleanup ();
+        on_cleanup ();
 
         // Recreate a1 before carrying on with the other tests
         fakeFolder.remoteModifier ().insert ("A/a1", 65);
@@ -165,7 +164,7 @@ private slots:
         QCOMPARE (QFileInfo (fakeFolder.localPath () + "A/a1").lastModified (), someDate);
         QVERIFY (fakeFolder.currentRemoteState ().find ("A/a1"));
         QVERIFY (itemInstruction (completeSpy, "A/a1", CSYNC_INSTRUCTION_NEW));
-        cleanup ();
+        on_cleanup ();
 
         // Remote rename is propagated
         fakeFolder.remoteModifier ().rename ("A/a1", "A/a1m");
@@ -181,7 +180,7 @@ private slots:
             || (itemInstruction (completeSpy, "A/a1m", CSYNC_INSTRUCTION_NEW)
                 && itemInstruction (completeSpy, "A/a1", CSYNC_INSTRUCTION_REMOVE)));
         QVERIFY (!dbRecord (fakeFolder, "A/a1").isValid ());
-        cleanup ();
+        on_cleanup ();
 
         // Remote remove is propagated
         fakeFolder.remoteModifier ().remove ("A/a1m");
@@ -191,7 +190,7 @@ private slots:
         QVERIFY (itemInstruction (completeSpy, "A/a1m", CSYNC_INSTRUCTION_REMOVE));
         QVERIFY (!dbRecord (fakeFolder, "A/a1").isValid ());
         QVERIFY (!dbRecord (fakeFolder, "A/a1m").isValid ());
-        cleanup ();
+        on_cleanup ();
 
         // Edge case : Local virtual file but no db entry for some reason
         fakeFolder.remoteModifier ().insert ("A/a2", 32);
@@ -201,7 +200,7 @@ private slots:
         QCOMPARE (dbRecord (fakeFolder, "A/a2")._fileSize, 32);
         XAVERIFY_VIRTUAL (fakeFolder, "A/a3");
         QCOMPARE (dbRecord (fakeFolder, "A/a3")._fileSize, 33);
-        cleanup ();
+        on_cleanup ();
 
         fakeFolder.syncEngine ().journal ().deleteFileRecord ("A/a2");
         fakeFolder.syncEngine ().journal ().deleteFileRecord ("A/a3");
@@ -214,19 +213,19 @@ private slots:
         QVERIFY (!QFileInfo (fakeFolder.localPath () + "A/a3").exists ());
         QVERIFY (itemInstruction (completeSpy, "A/a3", CSYNC_INSTRUCTION_REMOVE));
         QVERIFY (!dbRecord (fakeFolder, "A/a3").isValid ());
-        cleanup ();
+        on_cleanup ();
     }
 
-    void testVirtualFileConflict () {
+    private void on_test_virtual_file_conflict () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        auto cleanup = [&] () {
+        auto on_cleanup = [&] () {
             completeSpy.clear ();
         };
-        cleanup ();
+        on_cleanup ();
 
         // Create a virtual file for a new remote file
         fakeFolder.remoteModifier ().mkdir ("A");
@@ -241,7 +240,7 @@ private slots:
         QCOMPARE (dbRecord (fakeFolder, "A/a1")._fileSize, 11);
         QCOMPARE (dbRecord (fakeFolder, "A/a2")._fileSize, 12);
         QCOMPARE (dbRecord (fakeFolder, "B/b1")._fileSize, 21);
-        cleanup ();
+        on_cleanup ();
 
         // All the files are touched on the server
         fakeFolder.remoteModifier ().appendByte ("A/a1");
@@ -272,24 +271,24 @@ private slots:
         XAVERIFY_NONVIRTUAL (fakeFolder, "A/a2");
         XAVERIFY_NONVIRTUAL (fakeFolder, "B/b1");
 
-        cleanup ();
+        on_cleanup ();
     }
 
-    void testWithNormalSync () {
+    private void on_test_with_normal_sync () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        auto cleanup = [&] () {
+        auto on_cleanup = [&] () {
             completeSpy.clear ();
         };
-        cleanup ();
+        on_cleanup ();
 
         // No effect sync
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
-        cleanup ();
+        on_cleanup ();
 
         // Existing files are propagated just fine in both directions
         fakeFolder.localModifier ().appendByte ("A/a1");
@@ -297,7 +296,7 @@ private slots:
         fakeFolder.remoteModifier ().appendByte ("A/a2");
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
-        cleanup ();
+        on_cleanup ();
 
         // New files on the remote create virtual files
         fakeFolder.remoteModifier ().insert ("A/new", 42);
@@ -306,19 +305,19 @@ private slots:
         QCOMPARE (dbRecord (fakeFolder, "A/new")._fileSize, 42);
         QVERIFY (fakeFolder.currentRemoteState ().find ("A/new"));
         QVERIFY (itemInstruction (completeSpy, "A/new", CSYNC_INSTRUCTION_NEW));
-        cleanup ();
+        on_cleanup ();
     }
 
-    void testVirtualFileDownload () {
+    private void on_test_virtual_file_download () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        auto cleanup = [&] () {
+        auto on_cleanup = [&] () {
             completeSpy.clear ();
         };
-        cleanup ();
+        on_cleanup ();
 
         // Create a virtual file for remote files
         fakeFolder.remoteModifier ().mkdir ("A");
@@ -347,7 +346,7 @@ private slots:
         XAVERIFY_VIRTUAL (fakeFolder, "A/b3");
         XAVERIFY_VIRTUAL (fakeFolder, "A/b4");
 
-        cleanup ();
+        on_cleanup ();
 
         // Download by changing the db entry
         triggerDownload (fakeFolder, "A/a1");
@@ -410,24 +409,24 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void testVirtualFileDownloadResume () {
+    private void on_test_virtual_file_download_resume () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        auto cleanup = [&] () {
+        auto on_cleanup = [&] () {
             completeSpy.clear ();
             fakeFolder.syncJournal ().wipeErrorBlacklist ();
         };
-        cleanup ();
+        on_cleanup ();
 
         // Create a virtual file for remote files
         fakeFolder.remoteModifier ().mkdir ("A");
         fakeFolder.remoteModifier ().insert ("A/a1");
         QVERIFY (fakeFolder.syncOnce ());
         XAVERIFY_VIRTUAL (fakeFolder, "A/a1");
-        cleanup ();
+        on_cleanup ();
 
         // Download by changing the db entry
         triggerDownload (fakeFolder, "A/a1");
@@ -437,7 +436,7 @@ private slots:
         QVERIFY (xattr.hasNextcloudPlaceholderAttributes (fakeFolder.localPath () + "A/a1"));
         QVERIFY (QFileInfo (fakeFolder.localPath () + "A/a1").exists ());
         QCOMPARE (dbRecord (fakeFolder, "A/a1")._type, ItemTypeVirtualFileDownload);
-        cleanup ();
+        on_cleanup ();
 
         fakeFolder.serverErrorPaths ().clear ();
         QVERIFY (fakeFolder.syncOnce ());
@@ -446,7 +445,7 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void testNewFilesNotVirtual () {
+    private void on_test_new_files_not_virtual () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
@@ -456,7 +455,7 @@ private slots:
         QVERIFY (fakeFolder.syncOnce ());
         XAVERIFY_VIRTUAL (fakeFolder, "A/a1");
 
-        fakeFolder.syncJournal ().internalPinStates ().setForPath (QByteArray (), PinState.AlwaysLocal);
+        fakeFolder.syncJournal ().internalPinStates ().setForPath (GLib.ByteArray (), PinState.AlwaysLocal);
 
         // Create a new remote file, it'll not be virtual
         fakeFolder.remoteModifier ().insert ("A/a2");
@@ -465,7 +464,7 @@ private slots:
         XAVERIFY_NONVIRTUAL (fakeFolder, "A/a2");
     }
 
-    void testDownloadRecursive () {
+    private void on_test_download_recursive () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
@@ -538,16 +537,16 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    void testRenameVirtual () {
+    private void on_test_rename_virtual () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        auto cleanup = [&] () {
+        auto on_cleanup = [&] () {
             completeSpy.clear ();
         };
-        cleanup ();
+        on_cleanup ();
 
         fakeFolder.remoteModifier ().insert ("file1", 128, 'C');
         fakeFolder.remoteModifier ().insert ("file2", 256, 'C');
@@ -558,7 +557,7 @@ private slots:
         XAVERIFY_VIRTUAL (fakeFolder, "file2");
         XAVERIFY_VIRTUAL (fakeFolder, "file3");
 
-        cleanup ();
+        on_cleanup ();
 
         fakeFolder.localModifier ().rename ("file1", "renamed1");
         fakeFolder.localModifier ().rename ("file2", "renamed2");
@@ -583,17 +582,17 @@ private slots:
 
         QVERIFY (itemInstruction (completeSpy, "file3", CSYNC_INSTRUCTION_SYNC));
         XAVERIFY_NONVIRTUAL (fakeFolder, "file3");
-        cleanup ();
+        on_cleanup ();
     }
 
-    void testRenameVirtual2 () {
+    private void on_test_rename_virtual2 () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
         ItemCompletedSpy completeSpy (fakeFolder);
-        auto cleanup = [&] () {
+        auto on_cleanup = [&] () {
             completeSpy.clear ();
         };
-        cleanup ();
+        on_cleanup ();
 
         fakeFolder.remoteModifier ().insert ("case3", 128, 'C');
         fakeFolder.remoteModifier ().insert ("case4", 256, 'C');
@@ -605,7 +604,7 @@ private slots:
         XAVERIFY_VIRTUAL (fakeFolder, "case3");
         XAVERIFY_NONVIRTUAL (fakeFolder, "case4");
 
-        cleanup ();
+        on_cleanup ();
 
         // Case 1 : non-virtual, foo . bar (tested elsewhere)
         // Case 2 : virtual, foo . bar (tested elsewhere)
@@ -636,7 +635,7 @@ private slots:
     }
 
     // Dehydration via sync works
-    void testSyncDehydration () {
+    private void on_test_sync_dehydration () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         setupVfs (fakeFolder);
 
@@ -644,10 +643,10 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
         ItemCompletedSpy completeSpy (fakeFolder);
-        auto cleanup = [&] () {
+        auto on_cleanup = [&] () {
             completeSpy.clear ();
         };
-        cleanup ();
+        on_cleanup ();
 
         //
         // Mark for dehydration and check
@@ -679,11 +678,11 @@ private slots:
 
         QVERIFY (fakeFolder.syncOnce ());
 
-        auto isDehydrated = [&] (string &path) {
+        auto isDehydrated = [&] (string path) {
             return xattr.hasNextcloudPlaceholderAttributes (fakeFolder.localPath () + path)
                 && QFileInfo (fakeFolder.localPath () + path).exists ();
         };
-        auto hasDehydratedDbEntries = [&] (string &path) {
+        auto hasDehydratedDbEntries = [&] (string path) {
             SyncJournalFileRecord rec;
             fakeFolder.syncJournal ().getFileRecord (path, &rec);
             return rec.isValid () && rec._type == ItemTypeVirtualFile;
@@ -715,7 +714,7 @@ private slots:
 
         QCOMPARE (fakeFolder.currentRemoteState ().find ("C/c2").size, 26);
         QVERIFY (itemInstruction (completeSpy, "C/c2", CSYNC_INSTRUCTION_CONFLICT));
-        cleanup ();
+        on_cleanup ();
 
         auto expectedRemoteState = fakeFolder.currentRemoteState ();
         QVERIFY (fakeFolder.syncOnce ());
@@ -742,7 +741,7 @@ private slots:
         QVERIFY (!hasDehydratedDbEntries ("C/c2"));
     }
 
-    void testWipeVirtualSuffixFiles () {
+    private void on_test_wipe_virtual_suffix_files () {
         FakeFolder fakeFolder{ FileInfo{} };
         setupVfs (fakeFolder);
 
@@ -780,7 +779,7 @@ private slots:
         QVERIFY (!dbRecord (fakeFolder, "A/a3").isValid ());
         CFVERIFY_GONE (fakeFolder, "A/B/b1");
 
-        fakeFolder.switchToVfs (QSharedPointer<Vfs> (new VfsOff));
+        fakeFolder.switchToVfs (unowned<Vfs> (new VfsOff));
         ItemCompletedSpy completeSpy (fakeFolder);
         QVERIFY (fakeFolder.syncOnce ());
 
@@ -801,12 +800,12 @@ private slots:
         QCOMPARE (fakeFolder.syncJournal ().conflictRecordPaths ().size (), 1);
     }
 
-    void testNewVirtuals () {
+    private void on_test_new_virtuals () {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        auto setPin = [&] (QByteArray &path, PinState state) {
+        auto setPin = [&] (GLib.ByteArray &path, PinState state) {
             fakeFolder.syncJournal ().internalPinStates ().setForPath (path, state);
         };
 
@@ -833,7 +832,7 @@ private slots:
         XAVERIFY_VIRTUAL (fakeFolder, "unspec/file1");
 
         // Test 2 : change root to AlwaysLocal
-        setPin (QByteArray (), PinState.AlwaysLocal);
+        setPin (GLib.ByteArray (), PinState.AlwaysLocal);
 
         fakeFolder.remoteModifier ().insert ("file2");
         fakeFolder.remoteModifier ().insert ("online/file2");
@@ -855,7 +854,7 @@ private slots:
         XAVERIFY_VIRTUAL (fakeFolder, "unspec/file1");
 
         // Test 3 : change root to OnlineOnly
-        setPin (QByteArray (), PinState.OnlineOnly);
+        setPin (GLib.ByteArray (), PinState.OnlineOnly);
 
         fakeFolder.remoteModifier ().insert ("file3");
         fakeFolder.remoteModifier ().insert ("online/file3");
@@ -877,12 +876,12 @@ private slots:
         XAVERIFY_VIRTUAL (fakeFolder, "unspec/file1");
     }
 
-    void testAvailability () {
+    private void on_test_availability () {
         FakeFolder fakeFolder{ FileInfo () };
         auto vfs = setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        auto setPin = [&] (QByteArray &path, PinState state) {
+        auto setPin = [&] (GLib.ByteArray &path, PinState state) {
             fakeFolder.syncJournal ().internalPinStates ().setForPath (path, state);
         };
 
@@ -942,12 +941,12 @@ private slots:
         QCOMPARE (r.error (), Vfs.AvailabilityError.NoSuchItem);
     }
 
-    void testPinStateLocals () {
+    private void on_test_pin_state_locals () {
         FakeFolder fakeFolder{ FileInfo () };
         auto vfs = setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        auto setPin = [&] (QByteArray &path, PinState state) {
+        auto setPin = [&] (GLib.ByteArray &path, PinState state) {
             fakeFolder.syncJournal ().internalPinStates ().setForPath (path, state);
         };
 
@@ -1024,12 +1023,12 @@ private slots:
         QCOMPARE (*vfs.pinState ("onlinerenamed2/file1rename"), PinState.OnlineOnly);
     }
 
-    void testIncompatiblePins () {
+    private void on_test_incompatible_pins () {
         FakeFolder fakeFolder{ FileInfo () };
         auto vfs = setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        auto setPin = [&] (QByteArray &path, PinState state) {
+        auto setPin = [&] (GLib.ByteArray &path, PinState state) {
             fakeFolder.syncJournal ().internalPinStates ().setForPath (path, state);
         };
 
@@ -1064,4 +1063,3 @@ private slots:
 };
 
 QTEST_GUILESS_MAIN (TestSyncXAttr)
-#include "testsyncxattr.moc"

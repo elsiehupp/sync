@@ -13,23 +13,23 @@ const int success_status_code = 200;
 const int not_modified_status_code = 304;
 
 class Server_notification_handler : GLib.Object {
-public:
-    Server_notification_handler (AccountState *account_state, GLib.Object *parent = nullptr);
+
+    public Server_notification_handler (AccountState *account_state, GLib.Object *parent = nullptr);
 
 signals:
     void new_notification_list (Activity_list);
 
-public slots:
-    void slot_fetch_notifications ();
 
-private slots:
-    void slot_notifications_received (QJsonDocument &json, int status_code);
-    void slot_etag_response_header_received (QByteArray &value, int status_code);
-    void slot_allow_desktop_notifications_changed (bool is_allowed);
+    public void on_fetch_notifications ();
 
-private:
-    QPointer<JsonApiJob> _notification_job;
-    AccountState *_account_state;
+
+    private void on_notifications_received (QJsonDocument &json, int status_code);
+    private void on_etag_response_header_received (GLib.ByteArray &value, int status_code);
+    private void on_allow_desktop_notifications_changed (bool is_allowed);
+
+
+    private QPointer<JsonApiJob> _notification_job;
+    private AccountState _account_state;
 };
 
 
@@ -38,7 +38,7 @@ private:
         , _account_state (account_state) {
     }
 
-    void Server_notification_handler.slot_fetch_notifications () {
+    void Server_notification_handler.on_fetch_notifications () {
         // check connectivity and credentials
         if (! (_account_state && _account_state.is_connected () && _account_state.account () && _account_state.account ().credentials () && _account_state.account ().credentials ().ready ())) {
             delete_later ();
@@ -54,20 +54,20 @@ private:
             }
         }
 
-        // if the previous notification job has finished, start next.
+        // if the previous notification job has on_finished, on_start next.
         _notification_job = new JsonApiJob (_account_state.account (), notifications_path, this);
         GLib.Object.connect (_notification_job.data (), &JsonApiJob.json_received,
-            this, &Server_notification_handler.slot_notifications_received);
+            this, &Server_notification_handler.on_notifications_received);
         GLib.Object.connect (_notification_job.data (), &JsonApiJob.etag_response_header_received,
-            this, &Server_notification_handler.slot_etag_response_header_received);
+            this, &Server_notification_handler.on_etag_response_header_received);
         GLib.Object.connect (_notification_job.data (), &JsonApiJob.allow_desktop_notifications_changed,
-                this, &Server_notification_handler.slot_allow_desktop_notifications_changed);
+                this, &Server_notification_handler.on_allow_desktop_notifications_changed);
         _notification_job.set_property (property_account_state_c, QVariant.from_value<AccountState> (_account_state));
         _notification_job.add_raw_header ("If-None-Match", _account_state.notifications_etag_response_header ());
-        _notification_job.start ();
+        _notification_job.on_start ();
     }
 
-    void Server_notification_handler.slot_etag_response_header_received (QByteArray &value, int status_code) {
+    void Server_notification_handler.on_etag_response_header_received (GLib.ByteArray &value, int status_code) {
         if (status_code == success_status_code) {
             q_c_warning (lc_server_notification) << "New Notification ETag Response Header received " << value;
             auto *account = qvariant_cast<AccountState> (sender ().property (property_account_state_c));
@@ -75,14 +75,14 @@ private:
         }
     }
 
-    void Server_notification_handler.slot_allow_desktop_notifications_changed (bool is_allowed) {
+    void Server_notification_handler.on_allow_desktop_notifications_changed (bool is_allowed) {
         auto *account = qvariant_cast<AccountState> (sender ().property (property_account_state_c));
         if (account != nullptr) {
            account.set_desktop_notifications_allowed (is_allowed);
         }
     }
 
-    void Server_notification_handler.slot_notifications_received (QJsonDocument &json, int status_code) {
+    void Server_notification_handler.on_notifications_received (QJsonDocument &json, int status_code) {
         if (status_code != success_status_code && status_code != not_modified_status_code) {
             q_c_warning (lc_server_notification) << "Notifications failed with status code " << status_code;
             delete_later ();

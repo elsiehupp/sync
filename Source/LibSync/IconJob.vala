@@ -5,7 +5,7 @@ Copyright (C) by Camila Ayres <hello@camila.codes>
 ***********************************************************/
 
 // #include <GLib.Object>
-// #include <QByteArray>
+// #include <GLib.ByteArray>
 // #include <QNetworkAccessManager>
 // #include <QNetworkRequest>
 // #include <QNetworkReply>
@@ -17,28 +17,28 @@ namespace Occ {
 @ingroup gui
 ***********************************************************/
 class IconJob : GLib.Object {
-public:
-    IconJob (AccountPtr account, QUrl &url, GLib.Object *parent = nullptr);
+
+    public IconJob (AccountPtr account, QUrl url, GLib.Object *parent = nullptr);
 
 signals:
-    void job_finished (QByteArray icon_data);
+    void job_finished (GLib.ByteArray icon_data);
     void error (QNetworkReply.NetworkError error_type);
 
-private slots:
-    void finished ();
+
+    private void on_finished ();
 };
 
-    IconJob.IconJob (AccountPtr account, QUrl &url, GLib.Object *parent)
+    IconJob.IconJob (AccountPtr account, QUrl url, GLib.Object *parent)
         : GLib.Object (parent) {
         QNetworkRequest request (url);
     #if (QT_VERSION >= 0x050600)
         request.set_attribute (QNetworkRequest.FollowRedirectsAttribute, true);
     #endif
         const auto reply = account.send_raw_request (QByteArrayLiteral ("GET"), url, request);
-        connect (reply, &QNetworkReply.finished, this, &IconJob.finished);
+        connect (reply, &QNetworkReply.on_finished, this, &IconJob.on_finished);
     }
 
-    void IconJob.finished () {
+    void IconJob.on_finished () {
         const auto reply = qobject_cast<QNetworkReply> (sender ());
         if (!reply) {
             return;

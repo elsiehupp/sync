@@ -7,32 +7,32 @@
 
 // #include <QtTest>
 
-void touch (string &file) {
+void touch (string file) {
     string cmd;
     cmd = string ("touch %1").arg (file);
     qDebug () << "Command : " << cmd;
     system (cmd.toLocal8Bit ());
 }
 
-void mkdir (string &file) {
+void mkdir (string file) {
     string cmd = string ("mkdir %1").arg (file);
     qDebug () << "Command : " << cmd;
     system (cmd.toLocal8Bit ());
 }
 
-void rmdir (string &file) {
+void rmdir (string file) {
     string cmd = string ("rmdir %1").arg (file);
     qDebug () << "Command : " << cmd;
     system (cmd.toLocal8Bit ());
 }
 
-void rm (string &file) {
+void rm (string file) {
     string cmd = string ("rm %1").arg (file);
     qDebug () << "Command : " << cmd;
     system (cmd.toLocal8Bit ());
 }
 
-void mv (string &file1, string &file2) {
+void mv (string file1, string file2) {
     string cmd = string ("mv %1 %2").arg (file1, file2);
     qDebug () << "Command : " << cmd;
     system (cmd.toLocal8Bit ());
@@ -47,9 +47,9 @@ class TestFolderWatcher : GLib.Object {
     QScopedPointer<FolderWatcher> _watcher;
     QScopedPointer<QSignalSpy> _pathChangedSpy;
 
-    bool waitForPathChanged (string &path) {
+    bool waitForPathChanged (string path) {
         QElapsedTimer t;
-        t.start ();
+        t.on_start ();
         while (t.elapsed () < 5000) {
             // Check if it was already reported as changed by the watcher
             for (int i = 0; i < _pathChangedSpy.size (); ++i) {
@@ -69,8 +69,7 @@ const int CHECK_WATCH_COUNT (n) QCOMPARE (_watcher.testLinuxWatchCount (), (n))
 const int CHECK_WATCH_COUNT (n) do {} while (false)
 #endif
 
-public:
-    TestFolderWatcher () {
+    public TestFolderWatcher () {
         QDir rootDir (_root.path ());
         _rootPath = rootDir.canonicalPath ();
         qDebug () << "creating test directory tree in " << _rootPath;
@@ -85,29 +84,28 @@ public:
         Utility.writeRandomFile ( _rootPath+"/a2/renamefile");
         Utility.writeRandomFile ( _rootPath+"/a1/movefile");
 
-        _watcher.reset (new FolderWatcher);
-        _watcher.init (_rootPath);
-        _pathChangedSpy.reset (new QSignalSpy (_watcher.data (), SIGNAL (pathChanged (string))));
+        _watcher.on_reset (new FolderWatcher);
+        _watcher.on_init (_rootPath);
+        _pathChangedSpy.on_reset (new QSignalSpy (_watcher.data (), SIGNAL (pathChanged (string))));
     }
 
-    int countFolders (string &path) {
+    public int countFolders (string path) {
         int n = 0;
         for (auto &sub : QDir (path).entryList (QDir.Dirs | QDir.NoDotAndDotDot))
             n += 1 + countFolders (path + '/' + sub);
         return n;
     }
 
-private slots:
-    void init () {
+    private void on_init () {
         _pathChangedSpy.clear ();
         CHECK_WATCH_COUNT (countFolders (_rootPath) + 1);
     }
 
-    void cleanup () {
+    private void on_cleanup () {
         CHECK_WATCH_COUNT (countFolders (_rootPath) + 1);
     }
 
-    void testACreate () { // create a new file
+    private on_ void testACreate () { // create a new file
         string file (_rootPath + "/foo.txt");
         string cmd;
         cmd = string ("echo \"xyz\" > %1").arg (file);
@@ -117,13 +115,13 @@ private slots:
         QVERIFY (waitForPathChanged (file));
     }
 
-    void testATouch () { // touch an existing file.
+    private on_ void testATouch () { // touch an existing file.
         string file (_rootPath + "/a1/random.bin");
         touch (file);
         QVERIFY (waitForPathChanged (file));
     }
 
-    void testMove3LevelDirWithFile () {
+    private on_ void testMove3LevelDirWithFile () {
         string file (_rootPath + "/a0/b/c/empty.txt");
         mkdir (_rootPath + "/a0");
         mkdir (_rootPath + "/a0/b");
@@ -133,7 +131,7 @@ private slots:
         QVERIFY (waitForPathChanged (_rootPath + "/a/b/c/empty.txt"));
     }
 
-    void testCreateADir () {
+    private on_ void testCreateADir () {
         string file (_rootPath+"/a1/b1/new_dir");
         mkdir (file);
         QVERIFY (waitForPathChanged (file));
@@ -144,13 +142,13 @@ private slots:
         QVERIFY (waitForPathChanged (file2));
     }
 
-    void testRemoveADir () {
+    private on_ void testRemoveADir () {
         string file (_rootPath+"/a1/b3/c3");
         rmdir (file);
         QVERIFY (waitForPathChanged (file));
     }
 
-    void testRemoveAFile () {
+    private on_ void testRemoveAFile () {
         string file (_rootPath+"/a1/b2/todelete.bin");
         QVERIFY (QFile.exists (file));
         rm (file);
@@ -159,7 +157,7 @@ private slots:
         QVERIFY (waitForPathChanged (file));
     }
 
-    void testRenameAFile () {
+    private on_ void testRenameAFile () {
         string file1 (_rootPath+"/a2/renamefile");
         string file2 (_rootPath+"/a2/renamefile.renamed");
         QVERIFY (QFile.exists (file1));
@@ -170,7 +168,7 @@ private slots:
         QVERIFY (waitForPathChanged (file2));
     }
 
-    void testMoveAFile () {
+    private on_ void testMoveAFile () {
         string old_file (_rootPath+"/a1/movefile");
         string new_file (_rootPath+"/a2/movefile.renamed");
         QVERIFY (QFile.exists (old_file));
@@ -181,7 +179,7 @@ private slots:
         QVERIFY (waitForPathChanged (new_file));
     }
 
-    void testRenameDirectorySameBase () {
+    private on_ void testRenameDirectorySameBase () {
         string old_file (_rootPath+"/a1/b1");
         string new_file (_rootPath+"/a1/brename");
         QVERIFY (QFile.exists (old_file));
@@ -202,7 +200,7 @@ private slots:
         QVERIFY (waitForPathChanged (dir));
     }
 
-    void testRenameDirectoryDifferentBase () {
+    private on_ void testRenameDirectoryDifferentBase () {
         string old_file (_rootPath+"/a1/brename");
         string new_file (_rootPath+"/bren");
         QVERIFY (QFile.exists (old_file));

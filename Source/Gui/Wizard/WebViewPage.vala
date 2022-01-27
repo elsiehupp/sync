@@ -9,37 +9,37 @@ namespace Occ {
 
 
 class Web_view_page : Abstract_credentials_wizard_page {
-public:
-    Web_view_page (Gtk.Widget *parent = nullptr);
+
+    public Web_view_page (Gtk.Widget *parent = nullptr);
     ~Web_view_page () override;
 
-    void initialize_page () override;
-    void cleanup_page () override;
-    int next_id () const override;
-    bool is_complete () const override;
+    public void initialize_page () override;
+    public void cleanup_page () override;
+    public int next_id () override;
+    public bool is_complete () override;
 
-    AbstractCredentials* get_credentials () const override;
-    void set_connected ();
+    public AbstractCredentials* get_credentials () override;
+    public void set_connected ();
 
 signals:
-    void connect_to_oCUrl (string&);
+    void connect_to_oc_url (string&);
 
-private slots:
-    void url_catched (string user, string pass, string host);
 
-private:
-    void resize_wizard ();
-    bool try_to_set_wizard_size (int width, int height);
+    private void on_url_catched (string user, string pass, string host);
 
-    OwncloudWizard *_oc_wizard;
-    WebView *_web_view;
 
-    string _user;
-    string _pass;
+    private void resize_wizard ();
+    private bool try_to_set_wizard_size (int width, int height);
 
-    bool _use_system_proxy;
+    private OwncloudWizard _oc_wizard;
+    private WebView _web_view;
 
-    QSize _original_wizard_size;
+    private string _user;
+    private string _pass;
+
+    private bool _use_system_proxy;
+
+    private QSize _original_wizard_size;
 };
 
 
@@ -55,7 +55,7 @@ private:
         layout.add_widget (_web_view);
         set_layout (layout);
 
-        connect (_web_view, &WebView.url_catched, this, &Web_view_page.url_catched);
+        connect (_web_view, &WebView.on_url_catched, this, &Web_view_page.on_url_catched);
 
         //_use_system_proxy = QNetworkProxyFactory.uses_system_configuration ();
     }
@@ -133,7 +133,7 @@ private:
         q_c_info (lc_wizard_webiew_page ()) << "YAY! we are connected!";
     }
 
-    void Web_view_page.url_catched (string user, string pass, string host) {
+    void Web_view_page.on_url_catched (string user, string pass, string host) {
         q_c_info (lc_wizard_webiew_page ()) << "Got user : " << user << ", server : " << host;
 
         _user = user;
@@ -143,7 +143,7 @@ private:
         account.set_url (host);
 
         q_c_info (lc_wizard_webiew_page ()) << "URL : " << field ("OCUrl").to_string ();
-        emit connect_to_oCUrl (host);
+        emit connect_to_oc_url (host);
     }
 
     }

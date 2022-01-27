@@ -10,7 +10,7 @@
 
 using namespace Occ;
 
-SyncJournalFileRecord journalRecord (FakeFolder &folder, QByteArray &path) {
+SyncJournalFileRecord journalRecord (FakeFolder &folder, GLib.ByteArray &path) {
     SyncJournalFileRecord rec;
     folder.syncJournal ().getFileRecord (path, &rec);
     return rec;
@@ -18,14 +18,13 @@ SyncJournalFileRecord journalRecord (FakeFolder &folder, QByteArray &path) {
 
 class TestBlacklist : GLib.Object {
 
-private slots:
-    void testBlacklistBasic_data () {
+    private on_ void testBlacklistBasic_data () {
         QTest.addColumn<bool> ("remote");
         QTest.newRow ("remote") << true;
         QTest.newRow ("local") << false;
     }
 
-    void testBlacklistBasic () {
+    private on_ void testBlacklistBasic () {
         QFETCH (bool, remote);
 
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
@@ -35,8 +34,8 @@ private slots:
         auto &modifier = remote ? fakeFolder.remoteModifier () : fakeFolder.localModifier ();
 
         int counter = 0;
-        const QByteArray testFileName = QByteArrayLiteral ("A/new");
-        QByteArray reqId;
+        const GLib.ByteArray testFileName = QByteArrayLiteral ("A/new");
+        GLib.ByteArray reqId;
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &req, QIODevice *) . QNetworkReply * {
             if (req.url ().path ().endsWith (testFileName)) {
                 reqId = req.rawHeader ("X-Request-ID");
@@ -48,7 +47,7 @@ private slots:
             return nullptr;
         });
 
-        auto cleanup = [&] () {
+        auto on_cleanup = [&] () {
             completeSpy.clear ();
         };
 
@@ -75,7 +74,7 @@ private slots:
             if (remote)
                 QCOMPARE (journalRecord (fakeFolder, "A")._etag, initialEtag);
         }
-        cleanup ();
+        on_cleanup ();
 
         // Ignored during the second run - but soft errors are also errors
         QVERIFY (!fakeFolder.syncOnce ()); {
@@ -95,7 +94,7 @@ private slots:
             if (remote)
                 QCOMPARE (journalRecord (fakeFolder, "A")._etag, initialEtag);
         }
-        cleanup ();
+        on_cleanup ();
 
         // Let's expire the blacklist entry to verify it gets retried {
             auto entry = fakeFolder.syncJournal ().errorBlacklistEntry (testFileName);
@@ -120,7 +119,7 @@ private slots:
             if (remote)
                 QCOMPARE (journalRecord (fakeFolder, "A")._etag, initialEtag);
         }
-        cleanup ();
+        on_cleanup ();
 
         // When the file changes a retry happens immediately
         modifier.appendByte (testFileName);
@@ -141,7 +140,7 @@ private slots:
             if (remote)
                 QCOMPARE (journalRecord (fakeFolder, "A")._etag, initialEtag);
         }
-        cleanup ();
+        on_cleanup ();
 
         // When the error goes away and the item is retried, the sync succeeds
         fakeFolder.serverErrorPaths ().clear (); {
@@ -163,7 +162,7 @@ private slots:
             if (remote)
                 QCOMPARE (journalRecord (fakeFolder, "A")._etag, fakeFolder.currentRemoteState ().find ("A").etag);
         }
-        cleanup ();
+        on_cleanup ();
 
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }

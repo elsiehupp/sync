@@ -24,11 +24,11 @@ struct csync_vio_handle_t;
 namespace Occ {
 }
 
-csync_vio_handle_t OCSYNC_EXPORT *csync_vio_local_opendir (string &name);
+csync_vio_handle_t OCSYNC_EXPORT *csync_vio_local_opendir (string name);
 int OCSYNC_EXPORT csync_vio_local_closedir (csync_vio_handle_t *dhandle);
 std.unique_ptr<csync_file_stat_t> OCSYNC_EXPORT csync_vio_local_readdir (csync_vio_handle_t *dhandle, Occ.Vfs *vfs);
 
-int OCSYNC_EXPORT csync_vio_local_stat (string &uri, csync_file_stat_t *buf);
+int OCSYNC_EXPORT csync_vio_local_stat (string uri, csync_file_stat_t *buf);
 
 
 
@@ -85,12 +85,12 @@ directory functions
 
 struct csync_vio_handle_t {
   DIR *dh;
-  QByteArray path;
+  GLib.ByteArray path;
 };
 
 static int _csync_vio_local_stat_mb (mbchar_t *wuri, csync_file_stat_t *buf);
 
-csync_vio_handle_t *csync_vio_local_opendir (string &name) {
+csync_vio_handle_t *csync_vio_local_opendir (string name) {
     QScopedPointer<csync_vio_handle_t> handle (new csync_vio_handle_t{});
 
     auto dirname = QFile.encode_name (name);
@@ -124,7 +124,7 @@ std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t *h
 
   file_stat = std.make_unique<csync_file_stat_t> ();
   file_stat.path = QFile.decode_name (dirent.d_name).to_utf8 ();
-  QByteArray full_path = handle.path % '/' % QByteArray () % const_cast<const char> (dirent.d_name);
+  GLib.ByteArray full_path = handle.path % '/' % GLib.ByteArray () % const_cast<const char> (dirent.d_name);
   if (file_stat.path.is_null ()) {
       file_stat.original_path = full_path;
       q_c_warning (lc_c_sync_v_iOLocal) << "Invalid characters in file/directory name, please rename:" << dirent.d_name << handle.path;
@@ -170,7 +170,7 @@ std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t *h
   return file_stat;
 }
 
-int csync_vio_local_stat (string &uri, csync_file_stat_t *buf) {
+int csync_vio_local_stat (string uri, csync_file_stat_t *buf) {
     return _csync_vio_local_stat_mb (QFile.encode_name (uri).const_data (), buf);
 }
 

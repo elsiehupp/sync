@@ -13,18 +13,18 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 namespace Occ {
 namespace Ui {
 
-    class Svg_image_provider : QQuick_image_provider {
-    public:
-        Svg_image_provider ();
-        QImage request_image (string &id, QSize *size, QSize &requested_size) override;
-    };
+class Svg_image_provider : QQuick_image_provider {
+
+    public Svg_image_provider ();
+    public QImage request_image (string id, QSize *size, QSize &requested_size) override;
+};
 
 
     Svg_image_provider.Svg_image_provider ()
         : QQuick_image_provider (QQuick_image_provider.Image) {
     }
 
-    QImage Svg_image_provider.request_image (string &id, QSize *size, QSize &requested_size) {
+    QImage Svg_image_provider.request_image (string id, QSize *size, QSize &requested_size) {
         Q_ASSERT (!id.is_empty ());
 
         const auto id_split = id.split (QStringLiteral ("/"), Qt.Skip_empty_parts);

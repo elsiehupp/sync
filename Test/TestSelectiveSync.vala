@@ -12,15 +12,13 @@ using namespace Occ;
 
 class TestSelectiveSync : GLib.Object {
 
-private slots:
-
-    void testSelectiveSyncBigFolders () {
+    private on_ void testSelectiveSyncBigFolders () {
         FakeFolder fakeFolder { FileInfo.A12_B12_C12_S12 () };
         SyncOptions options;
         options._newBigFolderSizeLimit = 20000; // 20 K
         fakeFolder.syncEngine ().setSyncOptions (options);
 
-        QStringList sizeRequests;
+        string[] sizeRequests;
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation, QNetworkRequest &req, QIODevice *device)
                                          . QNetworkReply * {
             // Record what path we are querying for the size
@@ -73,7 +71,7 @@ private slots:
 
         // Simulate that we accept all files by seting a wildcard white list
         fakeFolder.syncEngine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncWhiteList,
-            QStringList () << QLatin1String ("/"));
+            string[] () << QLatin1String ("/"));
         fakeFolder.syncEngine ().journal ().schedulePathForRemoteDiscovery (string ("A/newBigDir"));
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (newBigFolder.count (), 0);
@@ -83,4 +81,3 @@ private slots:
 };
 
 QTEST_GUILESS_MAIN (TestSelectiveSync)
-#include "testselectivesync.moc"

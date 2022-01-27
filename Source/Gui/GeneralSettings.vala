@@ -35,34 +35,32 @@ namespace Ui {
 class General_settings : Gtk.Widget {
 
     public General_settings (Gtk.Widget *parent = nullptr);
-    public ~General_settings () override;
-    public QSize size_hint () const override;
+    ~General_settings () override;
+    public QSize size_hint () override;
 
-public slots:
-    void slot_style_changed ();
+    public void on_style_changed ();
 
-private slots:
-    void save_misc_settings ();
-    void slot_toggle_launch_on_startup (bool);
-    void slot_toggle_optional_server_notifications (bool);
-    void slot_show_in_explorer_navigation_pane (bool);
-    void slot_ignore_files_editor ();
-    void slot_create_debug_archive ();
-    void load_misc_settings ();
-    void slot_show_legal_notice ();
+
+    private void on_save_misc_settings ();
+    private void on_toggle_launch_on_startup (bool);
+    private void on_toggle_optional_server_notifications (bool);
+    private void on_show_in_explorer_navigation_pane (bool);
+    private void on_ignore_files_editor ();
+    private void on_create_debug_archive ();
+    private void on_load_misc_settings ();
+    private void on_show_legal_notice ();
 #if defined (BUILD_UPDATER)
-    void slot_update_info ();
-    void slot_update_channel_changed (string &channel);
-    void slot_update_check_now ();
-    void slot_toggle_auto_update_check ();
+    private void on_update_info ();
+    private void on_update_channel_changed (string channel);
+    private void on_update_check_now ();
+    private void on_toggle_auto_update_check ();
 #endif
 
-private:
-    void customize_style ();
+    private void customize_style ();
 
-    Ui.General_settings *_ui;
-    QPointer<Ignore_list_editor> _ignore_editor;
-    bool _currently_loading = false;
+    private Ui.General_settings _ui;
+    private QPointer<Ignore_list_editor> _ignore_editor;
+    private bool _currently_loading = false;
 };
 
 } // namespace Occ
@@ -126,7 +124,7 @@ QVector<Zip_entry> create_file_list () {
     return list;
 }
 
-void create_debug_archive (string &filename) {
+void create_debug_archive (string filename) {
     const auto entries = create_file_list ();
 
     QZip_writer zip (filename);
@@ -155,10 +153,10 @@ General_settings.General_settings (Gtk.Widget *parent)
     _ui.setup_ui (this);
 
     connect (_ui.server_notifications_check_box, &QAbstractButton.toggled,
-        this, &General_settings.slot_toggle_optional_server_notifications);
+        this, &General_settings.on_toggle_optional_server_notifications);
     _ui.server_notifications_check_box.set_tool_tip (tr ("Server notifications that require attention."));
 
-    connect (_ui.show_in_explorer_navigation_pane_check_box, &QAbstractButton.toggled, this, &General_settings.slot_show_in_explorer_navigation_pane);
+    connect (_ui.show_in_explorer_navigation_pane_check_box, &QAbstractButton.toggled, this, &General_settings.on_show_in_explorer_navigation_pane);
 
     // Rename 'Explorer' appropriately on non-Windows
 
@@ -169,30 +167,30 @@ General_settings.General_settings (Gtk.Widget *parent)
     } else {
         const bool has_auto_start = Utility.has_launch_on_startup (Theme.instance ().app_name ());
         // make sure the binary location is correctly set
-        slot_toggle_launch_on_startup (has_auto_start);
+        on_toggle_launch_on_startup (has_auto_start);
         _ui.autostart_check_box.set_checked (has_auto_start);
-        connect (_ui.autostart_check_box, &QAbstractButton.toggled, this, &General_settings.slot_toggle_launch_on_startup);
+        connect (_ui.autostart_check_box, &QAbstractButton.toggled, this, &General_settings.on_toggle_launch_on_startup);
     }
 
     // setup about section
     string about = Theme.instance ().about ();
     _ui.about_label.set_text_interaction_flags (Qt.Text_selectable_by_mouse | Qt.Text_browser_interaction);
-    _ui.about_label.set_text (about);
+    _ui.about_label.on_set_text (about);
     _ui.about_label.set_open_external_links (true);
 
     // About legal notice
-    connect (_ui.legal_notice_button, &QPushButton.clicked, this, &General_settings.slot_show_legal_notice);
+    connect (_ui.legal_notice_button, &QPushButton.clicked, this, &General_settings.on_show_legal_notice);
 
-    load_misc_settings ();
+    on_load_misc_settings ();
     // updater info now set in : customize_style
-    //slot_update_info ();
+    //on_update_info ();
 
     // misc
-    connect (_ui.mono_icons_check_box, &QAbstractButton.toggled, this, &General_settings.save_misc_settings);
-    connect (_ui.crashreporter_check_box, &QAbstractButton.toggled, this, &General_settings.save_misc_settings);
-    connect (_ui.new_folder_limit_check_box, &QAbstractButton.toggled, this, &General_settings.save_misc_settings);
-    connect (_ui.new_folder_limit_spin_box, static_cast<void (QSpin_box.*) (int)> (&QSpin_box.value_changed), this, &General_settings.save_misc_settings);
-    connect (_ui.new_external_storage, &QAbstractButton.toggled, this, &General_settings.save_misc_settings);
+    connect (_ui.mono_icons_check_box, &QAbstractButton.toggled, this, &General_settings.on_save_misc_settings);
+    connect (_ui.crashreporter_check_box, &QAbstractButton.toggled, this, &General_settings.on_save_misc_settings);
+    connect (_ui.new_folder_limit_check_box, &QAbstractButton.toggled, this, &General_settings.on_save_misc_settings);
+    connect (_ui.new_folder_limit_spin_box, static_cast<void (QSpin_box.*) (int)> (&QSpin_box.value_changed), this, &General_settings.on_save_misc_settings);
+    connect (_ui.new_external_storage, &QAbstractButton.toggled, this, &General_settings.on_save_misc_settings);
 
 #ifndef WITH_CRASHREPORTER
     _ui.crashreporter_check_box.set_visible (false);
@@ -215,11 +213,11 @@ General_settings.General_settings (Gtk.Widget *parent)
     // is no point in offering an option
     _ui.mono_icons_check_box.set_visible (Theme.instance ().mono_icons_available ());
 
-    connect (_ui.ignored_files_button, &QAbstractButton.clicked, this, &General_settings.slot_ignore_files_editor);
-    connect (_ui.debug_archive_button, &QAbstractButton.clicked, this, &General_settings.slot_create_debug_archive);
+    connect (_ui.ignored_files_button, &QAbstractButton.clicked, this, &General_settings.on_ignore_files_editor);
+    connect (_ui.debug_archive_button, &QAbstractButton.clicked, this, &General_settings.on_create_debug_archive);
 
-    // account_added means the wizard was finished and the wizard might change some options.
-    connect (AccountManager.instance (), &AccountManager.account_added, this, &General_settings.load_misc_settings);
+    // on_account_added means the wizard was on_finished and the wizard might change some options.
+    connect (AccountManager.instance (), &AccountManager.on_account_added, this, &General_settings.on_load_misc_settings);
 
     customize_style ();
 }
@@ -235,7 +233,7 @@ QSize General_settings.size_hint () {
     };
 }
 
-void General_settings.load_misc_settings () {
+void General_settings.on_load_misc_settings () {
     QScoped_value_rollback<bool> scope (_currently_loading, true);
     ConfigFile cfg_file;
     _ui.mono_icons_check_box.set_checked (cfg_file.mono_icons ());
@@ -250,7 +248,7 @@ void General_settings.load_misc_settings () {
 }
 
 #if defined (BUILD_UPDATER)
-void General_settings.slot_update_info () {
+void General_settings.on_update_info () {
     if (ConfigFile ().skip_update_check () || !Updater.instance ()) {
         // updater disabled on compile
         _ui.updates_group_box.set_visible (false);
@@ -260,20 +258,20 @@ void General_settings.slot_update_info () {
     // Note : the sparkle-updater is not an OCUpdater
     auto *ocupdater = qobject_cast<OCUpdater> (Updater.instance ());
     if (ocupdater) {
-        connect (ocupdater, &OCUpdater.download_state_changed, this, &General_settings.slot_update_info, Qt.UniqueConnection);
-        connect (_ui.restart_button, &QAbstractButton.clicked, ocupdater, &OCUpdater.slot_start_installer, Qt.UniqueConnection);
+        connect (ocupdater, &OCUpdater.download_state_changed, this, &General_settings.on_update_info, Qt.UniqueConnection);
+        connect (_ui.restart_button, &QAbstractButton.clicked, ocupdater, &OCUpdater.on_start_installer, Qt.UniqueConnection);
         connect (_ui.restart_button, &QAbstractButton.clicked, q_app, &QApplication.quit, Qt.UniqueConnection);
-        connect (_ui.update_button, &QAbstractButton.clicked, this, &General_settings.slot_update_check_now, Qt.UniqueConnection);
-        connect (_ui.auto_check_for_updates_check_box, &QAbstractButton.toggled, this, &General_settings.slot_toggle_auto_update_check);
+        connect (_ui.update_button, &QAbstractButton.clicked, this, &General_settings.on_update_check_now, Qt.UniqueConnection);
+        connect (_ui.auto_check_for_updates_check_box, &QAbstractButton.toggled, this, &General_settings.on_toggle_auto_update_check);
 
         string status = ocupdater.status_string (OCUpdater.Update_status_string_format.Html);
         Theme.replace_link_color_string_background_aware (status);
 
         _ui.update_state_label.set_open_external_links (false);
-        connect (_ui.update_state_label, &QLabel.link_activated, this, [] (string &link) {
+        connect (_ui.update_state_label, &QLabel.link_activated, this, [] (string link) {
             Utility.open_browser (QUrl (link));
         });
-        _ui.update_state_label.set_text (status);
+        _ui.update_state_label.on_set_text (status);
 
         _ui.restart_button.set_visible (ocupdater.download_state () == OCUpdater.Download_complete);
 
@@ -287,10 +285,10 @@ void General_settings.slot_update_info () {
     // Channel selection
     _ui.update_channel.set_current_index (ConfigFile ().update_channel () == "beta" ? 1 : 0);
     connect (_ui.update_channel, &QCombo_box.current_text_changed,
-        this, &General_settings.slot_update_channel_changed, Qt.UniqueConnection);
+        this, &General_settings.on_update_channel_changed, Qt.UniqueConnection);
 }
 
-void General_settings.slot_update_channel_changed (string &channel) {
+void General_settings.on_update_channel_changed (string channel) {
     if (channel == ConfigFile ().update_channel ())
         return;
 
@@ -312,7 +310,7 @@ void General_settings.slot_update_channel_changed (string &channel) {
         this);
     auto accept_button = msg_box.add_button (tr ("Change update channel"), QMessageBox.AcceptRole);
     msg_box.add_button (tr ("Cancel"), QMessageBox.RejectRole);
-    connect (msg_box, &QMessageBox.finished, msg_box, [this, channel, msg_box, accept_button] {
+    connect (msg_box, &QMessageBox.on_finished, msg_box, [this, channel, msg_box, accept_button] {
         msg_box.delete_later ();
         if (msg_box.clicked_button () == accept_button) {
             ConfigFile ().set_update_channel (channel);
@@ -327,7 +325,7 @@ void General_settings.slot_update_channel_changed (string &channel) {
     msg_box.open ();
 }
 
-void General_settings.slot_update_check_now () {
+void General_settings.on_update_check_now () {
     auto *updater = qobject_cast<OCUpdater> (Updater.instance ());
     if (ConfigFile ().skip_update_check ()) {
         updater = nullptr; // don't show update info if updates are disabled
@@ -340,14 +338,14 @@ void General_settings.slot_update_check_now () {
     }
 }
 
-void General_settings.slot_toggle_auto_update_check () {
+void General_settings.on_toggle_auto_update_check () {
     ConfigFile cfg_file;
     bool is_checked = _ui.auto_check_for_updates_check_box.is_checked ();
     cfg_file.set_auto_update_check (is_checked, string ());
 }
 #endif // defined (BUILD_UPDATER)
 
-void General_settings.save_misc_settings () {
+void General_settings.on_save_misc_settings () {
     if (_currently_loading)
         return;
     ConfigFile cfg_file;
@@ -361,24 +359,24 @@ void General_settings.save_misc_settings () {
     cfg_file.set_confirm_external_storage (_ui.new_external_storage.is_checked ());
 }
 
-void General_settings.slot_toggle_launch_on_startup (bool enable) {
+void General_settings.on_toggle_launch_on_startup (bool enable) {
     Theme *theme = Theme.instance ();
     Utility.set_launch_on_startup (theme.app_name (), theme.app_name_g_u_i (), enable);
 }
 
-void General_settings.slot_toggle_optional_server_notifications (bool enable) {
+void General_settings.on_toggle_optional_server_notifications (bool enable) {
     ConfigFile cfg_file;
     cfg_file.set_optional_server_notifications (enable);
 }
 
-void General_settings.slot_show_in_explorer_navigation_pane (bool checked) {
+void General_settings.on_show_in_explorer_navigation_pane (bool checked) {
     ConfigFile cfg_file;
     cfg_file.set_show_in_explorer_navigation_pane (checked);
     // Now update the registry with the change.
     FolderMan.instance ().navigation_pane_helper ().set_show_in_explorer_navigation_pane (checked);
 }
 
-void General_settings.slot_ignore_files_editor () {
+void General_settings.on_ignore_files_editor () {
     if (_ignore_editor.is_null ()) {
         ConfigFile cfg_file;
         _ignore_editor = new Ignore_list_editor (this);
@@ -389,7 +387,7 @@ void General_settings.slot_ignore_files_editor () {
     }
 }
 
-void General_settings.slot_create_debug_archive () {
+void General_settings.on_create_debug_archive () {
     const auto filename = QFileDialog.get_save_file_name (this, tr ("Create Debug Archive"), string (), tr ("Zip Archives") + " (*.zip)");
     if (filename.is_empty ()) {
         return;
@@ -399,13 +397,13 @@ void General_settings.slot_create_debug_archive () {
     QMessageBox.information (this, tr ("Debug Archive Created"), tr ("Debug archive is created at %1").arg (filename));
 }
 
-void General_settings.slot_show_legal_notice () {
+void General_settings.on_show_legal_notice () {
     auto notice = new Legal_notice ();
     notice.exec ();
     delete notice;
 }
 
-void General_settings.slot_style_changed () {
+void General_settings.on_style_changed () {
     customize_style ();
 }
 
@@ -413,11 +411,11 @@ void General_settings.customize_style () {
     // setup about section
     string about = Theme.instance ().about ();
     Theme.replace_link_color_string_background_aware (about);
-    _ui.about_label.set_text (about);
+    _ui.about_label.on_set_text (about);
 
 #if defined (BUILD_UPDATER)
     // updater info
-    slot_update_info ();
+    on_update_info ();
 #else
     _ui.updates_group_box.set_visible (false);
 #endif

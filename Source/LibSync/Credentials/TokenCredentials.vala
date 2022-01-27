@@ -21,31 +21,30 @@ namespace Occ {
 
 class TokenCredentials : AbstractCredentials {
 
-public:
-    friend class TokenCredentialsAccessManager;
-    TokenCredentials ();
-    TokenCredentials (string &user, string &password, string &token);
+    public friend class TokenCredentialsAccessManager;
+    public TokenCredentials ();
+    public TokenCredentials (string user, string password, string token);
 
-    string auth_type () const override;
-    QNetworkAccessManager *create_qNAM () const override;
-    bool ready () const override;
-    void ask_from_user () override;
-    void fetch_from_keychain () override;
-    bool still_valid (QNetworkReply *reply) override;
-    void persist () override;
-    string user () const override;
-    void invalidate_token () override;
-    void forget_sensitive_data () override;
+    public string auth_type () override;
+    public QNetworkAccessManager *create_qNAM () override;
+    public bool ready () override;
+    public void ask_from_user () override;
+    public void fetch_from_keychain () override;
+    public bool still_valid (QNetworkReply *reply) override;
+    public void persist () override;
+    public string user () override;
+    public void invalidate_token () override;
+    public void forget_sensitive_data () override;
 
     string password ();
-private slots:
-    void slot_authentication (QNetworkReply *, QAuthenticator *);
 
-private:
-    string _user;
-    string _password;
-    string _token; // the cookies
-    bool _ready;
+    private void on_authentication (QNetworkReply *, QAuthenticator *);
+
+
+    private string _user;
+    private string _password;
+    private string _token; // the cookies
+    private bool _ready;
 };
 
 
@@ -56,26 +55,26 @@ private:
     } // ns
 
     class TokenCredentialsAccessManager : AccessManager {
-    public:
-        friend class TokenCredentials;
-        TokenCredentialsAccessManager (TokenCredentials *cred, GLib.Object *parent = nullptr)
+
+        public friend class TokenCredentials;
+        public TokenCredentialsAccessManager (TokenCredentials *cred, GLib.Object *parent = nullptr)
             : AccessManager (parent)
             , _cred (cred) {
         }
 
-    protected:
-        QNetworkReply *create_request (Operation op, QNetworkRequest &request, QIODevice *outgoing_data) {
+
+        protected QNetworkReply *create_request (Operation op, QNetworkRequest &request, QIODevice *outgoing_data) {
             if (_cred.user ().is_empty () || _cred.password ().is_empty ()) {
                 q_c_warning (lc_token_credentials) << "Empty user/password provided!";
             }
 
             QNetworkRequest req (request);
 
-            QByteArray cred_hash = QByteArray (_cred.user ().to_utf8 () + ":" + _cred.password ().to_utf8 ()).to_base64 ();
-            req.set_raw_header (QByteArray ("Authorization"), QByteArray ("Basic ") + cred_hash);
+            GLib.ByteArray cred_hash = GLib.ByteArray (_cred.user ().to_utf8 () + ":" + _cred.password ().to_utf8 ()).to_base64 ();
+            req.set_raw_header (GLib.ByteArray ("Authorization"), GLib.ByteArray ("Basic ") + cred_hash);
 
             // A pre-authenticated cookie
-            QByteArray token = _cred._token.to_utf8 ();
+            GLib.ByteArray token = _cred._token.to_utf8 ();
             if (token.length () > 0) {
                 set_raw_cookie (token, request.url ());
             }
@@ -83,8 +82,8 @@ private:
             return AccessManager.create_request (op, req, outgoing_data);
         }
 
-    private:
-        const TokenCredentials *_cred;
+
+        private const TokenCredentials _cred;
     };
 
     TokenCredentials.TokenCredentials ()
@@ -93,7 +92,7 @@ private:
         , _ready (false) {
     }
 
-    TokenCredentials.TokenCredentials (string &user, string &password, string &token)
+    TokenCredentials.TokenCredentials (string user, string password, string token)
         : _user (user)
         , _password (password)
         , _token (token)
@@ -116,7 +115,7 @@ private:
         AccessManager *qnam = new TokenCredentialsAccessManager (this);
 
         connect (qnam, SIGNAL (authentication_required (QNetworkReply *, QAuthenticator *)),
-            this, SLOT (slot_authentication (QNetworkReply *, QAuthenticator *)));
+            this, SLOT (on_authentication (QNetworkReply *, QAuthenticator *)));
 
         return qnam;
     }
@@ -157,7 +156,7 @@ private:
     void TokenCredentials.persist () {
     }
 
-    void TokenCredentials.slot_authentication (QNetworkReply *reply, QAuthenticator *authenticator) {
+    void TokenCredentials.on_authentication (QNetworkReply *reply, QAuthenticator *authenticator) {
         Q_UNUSED (authenticator)
         // we cannot use QAuthenticator, because it sends username and passwords with latin1
         // instead of utf8 encoding. Instead, we send it manually. Thus, if we reach this signal,

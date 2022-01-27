@@ -19,21 +19,21 @@ namespace SharedTools {
 class Qt_singleCoreApplication : QCoreApplication {
 
     public Qt_singleCoreApplication (int &argc, char **argv);
-    public Qt_singleCoreApplication (string &id, int &argc, char **argv);
+    public Qt_singleCoreApplication (string id, int &argc, char **argv);
 
     public bool is_running ();
     public string id ();
     public void set_block (bool value);
 
-public slots:
-    bool send_message (string &message, int timeout = 5000);
+
+    public bool on_send_message (string message, int timeout = 5000);
 
 signals:
-    void message_received (string &message);
+    void message_received (string message);
 
-private:
-    QtLocalPeer* peer;
-    bool block;
+
+    private QtLocalPeer* peer;
+    private bool block;
 };
 
 } // namespace SharedTools
@@ -71,7 +71,7 @@ namespace SharedTools {
         connect (peer, &QtLocalPeer.message_received, this, &Qt_singleCoreApplication.message_received);
     }
 
-    Qt_singleCoreApplication.Qt_singleCoreApplication (string &app_id, int &argc, char **argv)
+    Qt_singleCoreApplication.Qt_singleCoreApplication (string app_id, int &argc, char **argv)
         : QCoreApplication (argc, argv) {
         peer = new QtLocalPeer (this, app_id);
         connect (peer, &QtLocalPeer.message_received, this, &Qt_singleCoreApplication.message_received);
@@ -81,8 +81,8 @@ namespace SharedTools {
         return peer.is_client ();
     }
 
-    bool Qt_singleCoreApplication.send_message (string &message, int timeout) {
-        return peer.send_message (message, timeout, block);
+    bool Qt_singleCoreApplication.on_send_message (string message, int timeout) {
+        return peer.on_send_message (message, timeout, block);
     }
 
     string Qt_singleCoreApplication.id () {

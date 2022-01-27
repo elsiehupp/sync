@@ -30,12 +30,12 @@ class Activity_link {
 
     Q_PROPERTY (string label MEMBER _label)
     Q_PROPERTY (string link MEMBER _link)
-    Q_PROPERTY (QByteArray verb MEMBER _verb)
+    Q_PROPERTY (GLib.ByteArray verb MEMBER _verb)
     Q_PROPERTY (bool primary MEMBER _primary)
 
     public string _label;
     public string _link;
-    public QByteArray _verb;
+    public GLib.ByteArray _verb;
     public bool _primary;
 };
 
@@ -109,9 +109,9 @@ bool operator< (Activity &rhs, Activity &lhs);
 @brief The Activity_list
 @ingroup gui
 
-A QList based list of Activities
+A GLib.List based list of Activities
 ***********************************************************/
-using Activity_list = QList<Activity>;
+using Activity_list = GLib.List<Activity>;
 
 
 bool operator< (Activity &rhs, Activity &lhs) {

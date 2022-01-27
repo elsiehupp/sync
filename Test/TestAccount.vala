@@ -13,8 +13,7 @@ using namespace Occ;
 
 class TestAccount : public GLib.Object {
 
-private slots:
-    void testAccountDavPath_unitialized_noCrash () {
+    private on_ void testAccountDavPath_unitialized_noCrash () {
         AccountPtr account = Account.create ();
         account.davPath ();
     }

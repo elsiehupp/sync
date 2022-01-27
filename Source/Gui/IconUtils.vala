@@ -16,7 +16,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 // #include <QPixmap>
 
 namespace {
-    string find_svg_file_path (string &file_name, QStringList &possible_colors) {
+    string find_svg_file_path (string file_name, string[] &possible_colors) {
         string result;
         result = string{Occ.Theme.theme_prefix} + file_name;
         if (QFile.exists (result)) {
@@ -40,12 +40,12 @@ namespace Occ {
 namespace Ui {
 namespace Icon_utils {
 
-QPixmap pixmap_for_background (string &file_name, QColor &background_color);
-QImage create_svg_image_with_custom_color (string &file_name, QColor &custom_color, QSize *original_size = nullptr, QSize &requested_size = {});
-QPixmap create_svg_pixmap_with_custom_color_cached (string &file_name, QColor &custom_color, QSize *original_size = nullptr, QSize &requested_size = {});
-QImage draw_svg_with_custom_fill_color (string &source_svg_path, QColor &fill_color, QSize *original_size = nullptr, QSize &requested_size = {});
+QPixmap pixmap_for_background (string file_name, QColor &background_color);
+QImage create_svg_image_with_custom_color (string file_name, QColor &custom_color, QSize *original_size = nullptr, QSize &requested_size = {});
+QPixmap create_svg_pixmap_with_custom_color_cached (string file_name, QColor &custom_color, QSize *original_size = nullptr, QSize &requested_size = {});
+QImage draw_svg_with_custom_fill_color (string source_svg_path, QColor &fill_color, QSize *original_size = nullptr, QSize &requested_size = {});
 
-    QPixmap pixmap_for_background (string &file_name, QColor &background_color) {
+    QPixmap pixmap_for_background (string file_name, QColor &background_color) {
         Q_ASSERT (!file_name.is_empty ());
 
         const auto pixmap_color = background_color.is_valid () && !Theme.is_dark_color (background_color)
@@ -55,7 +55,7 @@ QImage draw_svg_with_custom_fill_color (string &source_svg_path, QColor &fill_co
         return create_svg_pixmap_with_custom_color_cached (file_name, pixmap_color);
     }
 
-    QImage create_svg_image_with_custom_color (string &file_name, QColor &custom_color, QSize *original_size, QSize &requested_size) {
+    QImage create_svg_image_with_custom_color (string file_name, QColor &custom_color, QSize *original_size, QSize &requested_size) {
         Q_ASSERT (!file_name.is_empty ());
         Q_ASSERT (custom_color.is_valid ());
 
@@ -67,7 +67,7 @@ QImage draw_svg_with_custom_fill_color (string &source_svg_path, QColor &fill_co
         }
 
         // some icons are present in white or black only, so, we need to check both when needed
-        const auto icon_base_colors = QStringList{QStringLiteral ("black"), QStringLiteral ("white")};
+        const auto icon_base_colors = string[]{QStringLiteral ("black"), QStringLiteral ("white")};
 
         // check if there is an existing image matching the custom color {
             const auto custom_color_name = [&custom_color] () {
@@ -110,7 +110,7 @@ QImage draw_svg_with_custom_fill_color (string &source_svg_path, QColor &fill_co
         return result;
     }
 
-    QPixmap create_svg_pixmap_with_custom_color_cached (string &file_name, QColor &custom_color, QSize *original_size, QSize &requested_size) {
+    QPixmap create_svg_pixmap_with_custom_color_cached (string file_name, QColor &custom_color, QSize *original_size, QSize &requested_size) {
         QPixmap cached_pixmap;
 
         const auto custom_color_name = custom_color.name ();
@@ -135,10 +135,10 @@ QImage draw_svg_with_custom_fill_color (string &source_svg_path, QColor &fill_co
     }
 
     QImage draw_svg_with_custom_fill_color (
-        const string &source_svg_path, QColor &fill_color, QSize *original_size, QSize &requested_size) {
+        const string source_svg_path, QColor &fill_color, QSize *original_size, QSize &requested_size) {
         QSvgRenderer svg_renderer;
 
-        if (!svg_renderer.load (source_svg_path)) {
+        if (!svg_renderer.on_load (source_svg_path)) {
             q_c_warning (lc_icon_utils) << "Could no load initial SVG image";
             return {};
         }

@@ -21,19 +21,19 @@ namespace Occ {
 ***********************************************************/
 class AuthenticationDialog : Gtk.Dialog {
 
-    public AuthenticationDialog (string &realm, string &domain, Gtk.Widget *parent = nullptr);
+    public AuthenticationDialog (string realm, string domain, Gtk.Widget *parent = nullptr);
 
     public string user ();
     public string password ();
 
-private:
-    QLineEdit *_user;
-    QLineEdit *_password;
+
+    private QLineEdit _user;
+    private QLineEdit _password;
 };
 
 
 
-    AuthenticationDialog.AuthenticationDialog (string &realm, string &domain, Gtk.Widget *parent)
+    AuthenticationDialog.AuthenticationDialog (string realm, string domain, Gtk.Widget *parent)
         : Gtk.Dialog (parent)
         , _user (new QLineEdit)
         , _password (new QLineEdit) {

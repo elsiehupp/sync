@@ -40,69 +40,68 @@ class ProxyAuthHandler : GLib.Object {
 
     public static ProxyAuthHandler *instance ();
 
-    public ~ProxyAuthHandler () override;
+    ~ProxyAuthHandler () override;
 
-public slots:
     /// Intended for QNetworkAccessManager.proxy_authentication_required ()
-    void handle_proxy_authentication_required (QNetworkProxy &proxy,
+    public void on_handle_proxy_authentication_required (QNetworkProxy &proxy,
         QAuthenticator *authenticator);
 
-private slots:
-    void slot_sender_destroyed (GLib.Object *);
 
-private:
-    ProxyAuthHandler ();
+    private void on_sender_destroyed (GLib.Object *);
+
+
+    private ProxyAuthHandler ();
 
     /// Runs the Proxy_auth_dialog and returns true if new credentials were entered.
-    bool get_creds_from_dialog ();
+    private bool get_creds_from_dialog ();
 
     /// Checks the keychain for credentials of the current proxy.
-    bool get_creds_from_keychain ();
+    private bool get_creds_from_keychain ();
 
     /// Stores the current credentials in the keychain.
-    void store_creds_in_keychain ();
+    private void store_creds_in_keychain ();
 
-    template<class T, typename Pointer_to_member_function>
-    void exec_await (T *sender,
+    private template<class T, typename Pointer_to_member_function>
+    private void exec_await (T *sender,
                    Pointer_to_member_function signal,
                    int &counter,
                    const QEventLoop.Process_events_flags flags = QEventLoop.All_events);
 
-    string keychain_username_key ();
-    string keychain_password_key ();
+    private string keychain_username_key ();
+    private string keychain_password_key ();
 
     /// The hostname:port of the current proxy, used for detecting switches
     /// to a different proxy.
-    string _proxy;
+    private string _proxy;
 
-    string _username;
-    string _password;
+    private string _username;
+    private string _password;
 
     /// If the user cancels the credential dialog, blocked will be set to
     /// true and we won't bother him again.
-    bool _blocked = false;
+    private bool _blocked = false;
 
-    /// In several instances handle_proxy_authentication_required () can be called
+    /// In several instances on_handle_proxy_authentication_required () can be called
     /// while it is still running. These counters detect what we're currently
     /// waiting for.
-    int _waiting_for_dialog = 0;
-    int _waiting_for_keychain = 0;
+    private int _waiting_for_dialog = 0;
+    private int _waiting_for_keychain = 0;
 
-    QPointer<Proxy_auth_dialog> _dialog;
+    private QPointer<Proxy_auth_dialog> _dialog;
 
     /// The QSettings instance to securely store username/password in the keychain.
-    QScopedPointer<QSettings> _settings;
+    private QScopedPointer<QSettings> _settings;
 
     /// Pointer to the most-recently-run ReadPasswordJob, needed due to reentrancy.
-    QScopedPointer<QKeychain.ReadPasswordJob> _read_password_job;
+    private QScopedPointer<QKeychain.ReadPasswordJob> _read_password_job;
 
     /// For checking the proxy config settings.
-    QScopedPointer<ConfigFile> _config_file;
+    private QScopedPointer<ConfigFile> _config_file;
 
     /// To distinguish between a new QNAM asking for credentials and credentials
     /// failing for an existing QNAM, we keep track of the senders of the
     /// proxy_auth_required signal here.
-    QSet<GLib.Object> _gave_credentials_to;
+    private QSet<GLib.Object> _gave_credentials_to;
 };
 
 } // namespace Occ
@@ -121,8 +120,8 @@ ProxyAuthHandler *ProxyAuthHandler.instance () {
 ProxyAuthHandler.ProxyAuthHandler () {
     _dialog = new Proxy_auth_dialog ();
 
-    _config_file.reset (new ConfigFile);
-    _settings.reset (new QSettings (_config_file.config_file (), QSettings.IniFormat));
+    _config_file.on_reset (new ConfigFile);
+    _settings.on_reset (new QSettings (_config_file.config_file (), QSettings.IniFormat));
     _settings.begin_group (QLatin1String ("Proxy"));
     _settings.begin_group (QLatin1String ("Credentials"));
 }
@@ -131,7 +130,7 @@ ProxyAuthHandler.~ProxyAuthHandler () {
     delete _dialog;
 }
 
-void ProxyAuthHandler.handle_proxy_authentication_required (
+void ProxyAuthHandler.on_handle_proxy_authentication_required (
     const QNetworkProxy &proxy,
     QAuthenticator *authenticator) {
     if (!_dialog) {
@@ -206,18 +205,18 @@ void ProxyAuthHandler.handle_proxy_authentication_required (
     if (sending_qnam) {
         _gave_credentials_to.insert (sending_qnam);
         connect (sending_qnam, &GLib.Object.destroyed,
-            this, &ProxyAuthHandler.slot_sender_destroyed);
+            this, &ProxyAuthHandler.on_sender_destroyed);
     }
 }
 
-void ProxyAuthHandler.slot_sender_destroyed (GLib.Object *obj) {
+void ProxyAuthHandler.on_sender_destroyed (GLib.Object *obj) {
     _gave_credentials_to.remove (obj);
 }
 
 bool ProxyAuthHandler.get_creds_from_dialog () {
     // Open the credentials dialog
     if (!_waiting_for_dialog) {
-        _dialog.reset ();
+        _dialog.on_reset ();
         _dialog.set_proxy_address (_proxy);
         _dialog.open ();
     }
@@ -227,7 +226,7 @@ bool ProxyAuthHandler.get_creds_from_dialog () {
     // it's done.
     if (_dialog) {
         exec_await (_dialog.data (),
-                  &Gtk.Dialog.finished,
+                  &Gtk.Dialog.on_finished,
                   _waiting_for_dialog,
                   QEventLoop.Exclude_socket_notifiers);
     }
@@ -271,20 +270,20 @@ bool ProxyAuthHandler.get_creds_from_keychain () {
             return false;
         }
 
-        _read_password_job.reset (new ReadPasswordJob (Theme.instance ().app_name ()));
+        _read_password_job.on_reset (new ReadPasswordJob (Theme.instance ().app_name ()));
         _read_password_job.set_settings (_settings.data ());
         _read_password_job.set_insecure_fallback (false);
         _read_password_job.set_key (keychain_password_key ());
         _read_password_job.set_auto_delete (false);
-        _read_password_job.start ();
+        _read_password_job.on_start ();
     }
 
     // While we wait for the password job to be done, this code may be reentered.
     // This really needs the counter and the flag here, because otherwise we get
     // bad behavior when we reenter this code after the flag has been switched
-    // but before the while loop has finished.
+    // but before the while loop has on_finished.
     exec_await (_read_password_job.data (),
-              &QKeychain.Job.finished,
+              &QKeychain.Job.on_finished,
               _waiting_for_keychain);
 
     if (_read_password_job.error () == NoError) {
@@ -315,10 +314,10 @@ void ProxyAuthHandler.store_creds_in_keychain () {
     job.set_key (keychain_password_key ());
     job.set_text_data (_password);
     job.set_auto_delete (false);
-    job.start ();
+    job.on_start ();
 
     exec_await (job,
-              &QKeychain.Job.finished,
+              &QKeychain.Job.on_finished,
               _waiting_for_keychain);
 
     job.delete_later ();

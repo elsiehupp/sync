@@ -19,10 +19,10 @@ namespace Occ {
 @ingroup libsync
 ***********************************************************/
 class NextcloudTheme : Theme {
-public:
-    NextcloudTheme ();
 
-    string wizard_url_hint () const override;
+    public NextcloudTheme ();
+
+    public string wizard_url_hint () override;
 };
 
 NextcloudTheme.NextcloudTheme ()

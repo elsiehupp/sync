@@ -16,8 +16,8 @@ namespace Occ {
 
 namespace XAttr_wrapper {
 
-bool has_nextcloud_placeholder_attributes (string &path);
-Result<void, string> add_nextcloud_placeholder_attributes (string &path);
+bool has_nextcloud_placeholder_attributes (string path);
+Result<void, string> add_nextcloud_placeholder_attributes (string path);
 
 }
 
@@ -27,9 +27,9 @@ namespace {
 
 constexpr auto hydrate_exec_attribute_name = "user.nextcloud.hydrate_exec";
 
-Occ.Optional<QByteArray> xattr_get (QByteArray &path, QByteArray &name) {
+Occ.Optional<GLib.ByteArray> xattr_get (GLib.ByteArray &path, GLib.ByteArray &name) {
     constexpr auto buffer_size = 256;
-    QByteArray result;
+    GLib.ByteArray result;
     result.resize (buffer_size);
     const auto count = getxattr (path.const_data (), name.const_data (), result.data (), buffer_size);
     if (count >= 0) {
@@ -40,14 +40,14 @@ Occ.Optional<QByteArray> xattr_get (QByteArray &path, QByteArray &name) {
     }
 }
 
-bool xattr_set (QByteArray &path, QByteArray &name, QByteArray &value) {
+bool xattr_set (GLib.ByteArray &path, GLib.ByteArray &name, GLib.ByteArray &value) {
     const auto return_code = setxattr (path.const_data (), name.const_data (), value.const_data (), value.size () + 1, 0);
     return return_code == 0;
 }
 
 }
 
-bool Occ.XAttr_wrapper.has_nextcloud_placeholder_attributes (string &path) {
+bool Occ.XAttr_wrapper.has_nextcloud_placeholder_attributes (string path) {
     const auto value = xattr_get (path.to_utf8 (), hydrate_exec_attribute_name);
     if (value) {
         return *value == QByteArrayLiteral (APPLICATION_EXECUTABLE);
@@ -56,9 +56,9 @@ bool Occ.XAttr_wrapper.has_nextcloud_placeholder_attributes (string &path) {
     }
 }
 
-Occ.Result<void, string> Occ.XAttr_wrapper.add_nextcloud_placeholder_attributes (string &path) {
-    const auto success = xattr_set (path.to_utf8 (), hydrate_exec_attribute_name, APPLICATION_EXECUTABLE);
-    if (!success) {
+Occ.Result<void, string> Occ.XAttr_wrapper.add_nextcloud_placeholder_attributes (string path) {
+    const auto on_success = xattr_set (path.to_utf8 (), hydrate_exec_attribute_name, APPLICATION_EXECUTABLE);
+    if (!on_success) {
         return QStringLiteral ("Failed to set the extended attribute");
     } else {
         return {};

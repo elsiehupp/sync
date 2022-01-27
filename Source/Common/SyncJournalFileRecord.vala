@@ -27,7 +27,7 @@ class SyncJournalFileRecord {
 
     It is used in the construction of private links.
     ***********************************************************/
-    public QByteArray numeric_file_id ();
+    public GLib.ByteArray numeric_file_id ();
     public QDateTime mod_date_time () {
         return Utility.q_date_time_from_time_t (_modtime);
     }
@@ -48,17 +48,17 @@ class SyncJournalFileRecord {
         return string.from_utf8 (_e2e_mangled_name);
     }
 
-    public QByteArray _path;
+    public GLib.ByteArray _path;
     public uint64 _inode = 0;
     public int64 _modtime = 0;
     public ItemType _type = ItemTypeSkip;
-    public QByteArray _etag;
-    public QByteArray _file_id;
+    public GLib.ByteArray _etag;
+    public GLib.ByteArray _file_id;
     public int64 _file_size = 0;
     public RemotePermissions _remote_perm;
     public bool _server_has_ignored_files = false;
-    public QByteArray _checksum_header;
-    public QByteArray _e2e_mangled_name;
+    public GLib.ByteArray _checksum_header;
+    public GLib.ByteArray _e2e_mangled_name;
     public bool _is_e2e_encrypted = false;
 };
 
@@ -84,7 +84,7 @@ class SyncJournalErrorBlacklistRecord {
     public Category _error_category = Category.Normal;
 
     public int64 _last_try_modtime = 0;
-    public QByteArray _last_try_etag;
+    public GLib.ByteArray _last_try_etag;
 
     /// The last time the operation was attempted (in s since epoch).
     public int64 _last_try_time = 0;
@@ -96,7 +96,7 @@ class SyncJournalErrorBlacklistRecord {
     public string _rename_target;
 
     /// The last X-Request-ID of the request that failled
-    public QByteArray _request_id;
+    public GLib.ByteArray _request_id;
 
     public bool is_valid ();
 };
@@ -116,10 +116,10 @@ class ConflictRecord {
 
     The path is sync-folder relative.
     ***********************************************************/
-    public QByteArray path;
+    public GLib.ByteArray path;
 
     /// File id of the base file
-    public QByteArray base_file_id;
+    public GLib.ByteArray base_file_id;
 
     /***********************************************************
     Modtime of the base file
@@ -133,7 +133,7 @@ class ConflictRecord {
 
     may not be available and empty
     ***********************************************************/
-    public QByteArray base_etag;
+    public GLib.ByteArray base_etag;
 
     /***********************************************************
     The path of the original file at the time the conflict was created
@@ -143,7 +143,7 @@ class ConflictRecord {
 
     maybe be empty if not available
     ***********************************************************/
-    public QByteArray initial_base_path;
+    public GLib.ByteArray initial_base_path;
 
     public bool is_valid () {
         return !path.is_empty ();
@@ -151,7 +151,7 @@ class ConflictRecord {
 };
 
 
-    QByteArray SyncJournalFileRecord.numeric_file_id () {
+    GLib.ByteArray SyncJournalFileRecord.numeric_file_id () {
         // Use the id up until the first non-numeric character
         for (int i = 0; i < _file_id.size (); ++i) {
             if (_file_id[i] < '0' || _file_id[i] > '9') {

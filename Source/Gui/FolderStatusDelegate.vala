@@ -57,8 +57,8 @@ class FolderStatusDelegate : QStyled_item_delegate {
         Data_role_count
 
     };
-    public void paint (QPainter *, QStyleOptionViewItem &, QModelIndex &) const override;
-    public QSize size_hint (QStyleOptionViewItem &, QModelIndex &) const override;
+    public void paint (QPainter *, QStyleOptionViewItem &, QModelIndex &) override;
+    public QSize size_hint (QStyleOptionViewItem &, QModelIndex &) override;
     public bool editor_event (QEvent *event, QAbstractItemModel *model, QStyleOptionViewItem &option,
         const QModelIndex &index) override;
 
@@ -70,16 +70,16 @@ class FolderStatusDelegate : QStyled_item_delegate {
     public static QRect errors_list_rect (QRect within);
     public static int root_folder_height_without_errors (QFontMetrics &fm, QFontMetrics &alias_fm);
 
-public slots:
-    void slot_style_changed ();
 
-private:
-    void customize_style ();
+    public void on_style_changed ();
 
-    static string add_folder_text ();
-    QPersistent_model_index _pressed_index;
 
-    QIcon _icon_more;
+    private void customize_style ();
+
+    private static string add_folder_text ();
+    private QPersistent_model_index _pressed_index;
+
+    private QIcon _icon_more;
 };
 
 FolderStatusDelegate.FolderStatusDelegate ()
@@ -124,7 +124,7 @@ QSize FolderStatusDelegate.size_hint (QStyleOptionViewItem &option,
     // add some space for the message boxes.
     int margin = fm.height () / 4;
     for (auto role : {Folder_conflict_msg, Folder_error_msg, Folder_info_msg}) {
-        auto msgs = qvariant_cast<QStringList> (index.data (role));
+        auto msgs = qvariant_cast<string[]> (index.data (role));
         if (!msgs.is_empty ()) {
             h += margin + 2 * margin + msgs.count () * fm.height ();
         }
@@ -197,9 +197,9 @@ void FolderStatusDelegate.paint (QPainter *painter, QStyleOptionViewItem &option
     auto alias_text = qvariant_cast<string> (index.data (Header_role));
     auto path_text = qvariant_cast<string> (index.data (FolderPathRole));
     auto remote_path = qvariant_cast<string> (index.data (Folder_second_path_role));
-    auto conflict_texts = qvariant_cast<QStringList> (index.data (Folder_conflict_msg));
-    auto error_texts = qvariant_cast<QStringList> (index.data (Folder_error_msg));
-    auto info_texts = qvariant_cast<QStringList> (index.data (Folder_info_msg));
+    auto conflict_texts = qvariant_cast<string[]> (index.data (Folder_conflict_msg));
+    auto error_texts = qvariant_cast<string[]> (index.data (Folder_error_msg));
+    auto info_texts = qvariant_cast<string[]> (index.data (Folder_info_msg));
 
     auto overall_percent = qvariant_cast<int> (index.data (Sync_progress_overall_percent));
     auto overall_string = qvariant_cast<string> (index.data (Sync_progress_overall_string));
@@ -267,8 +267,8 @@ void FolderStatusDelegate.paint (QPainter *painter, QStyleOptionViewItem &option
         // Hack : Windows Vista's light blue is not contrasting enough for white
 
         // (code from QWindows_vista_style.draw_control for CE_Item_view_item)
-        palette.set_color (QPalette.All, QPalette.Highlighted_text, palette.color (QPalette.Active, QPalette.Text));
-        palette.set_color (QPalette.All, QPalette.Highlight, palette.base ().color ().darker (108));
+        palette.on_set_color (QPalette.All, QPalette.Highlighted_text, palette.color (QPalette.Active, QPalette.Text));
+        palette.on_set_color (QPalette.All, QPalette.Highlight, palette.base ().color ().darker (108));
     }
 
     QPalette.Color_group cg = option.state & QStyle.State_Enabled
@@ -303,7 +303,7 @@ void FolderStatusDelegate.paint (QPainter *painter, QStyleOptionViewItem &option
     int h = icon_rect.bottom () + margin;
 
     // paint an error overlay if there is an error string or conflict string
-    auto draw_text_box = [&] (QStringList &texts, QColor color) {
+    auto draw_text_box = [&] (string[] &texts, QColor color) {
         QRect rect = local_path_rect;
         rect.set_left (icon_rect.left ());
         rect.set_top (h);
@@ -460,7 +460,7 @@ QRect FolderStatusDelegate.errors_list_rect (QRect within) {
     return within;
 }
 
-void FolderStatusDelegate.slot_style_changed () {
+void FolderStatusDelegate.on_style_changed () {
     customize_style ();
 }
 

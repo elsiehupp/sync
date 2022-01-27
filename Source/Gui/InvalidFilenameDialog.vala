@@ -29,7 +29,7 @@ namespace {
         '\\', '/', ':', '?', '*', '\"', '<', '>', '|'
     });
 
-    QVector<QChar> get_illegal_chars_from_string (string &string) {
+    QVector<QChar> get_illegal_chars_from_string (string string) {
         QVector<QChar> result;
         for (auto &character : string) {
             if (std.find (illegal_characters.begin (), illegal_characters.end (), character)
@@ -67,26 +67,26 @@ class Invalid_filename_dialog : Gtk.Dialog {
 
     public Invalid_filename_dialog (AccountPtr account, Folder *folder, string file_path, Gtk.Widget *parent = nullptr);
 
-    public ~Invalid_filename_dialog () override;
+    ~Invalid_filename_dialog () override;
 
-    public void accept () override;
+    public void on_accept () override;
 
-private:
-    std.unique_ptr<Ui.Invalid_filename_dialog> _ui;
 
-    AccountPtr _account;
-    Folder *_folder;
-    string _file_path;
-    string _relative_file_path;
-    string _original_file_name;
-    string _new_filename;
+    private std.unique_ptr<Ui.Invalid_filename_dialog> _ui;
 
-    void on_filename_line_edit_text_changed (string &text);
-    void on_move_job_finished ();
-    void on_remote_file_already_exists (QVariantMap &values);
-    void on_remote_file_does_not_exist (QNetworkReply *reply);
-    void check_if_allowed_to_rename ();
-    void on_propfind_permission_success (QVariantMap &values);
+    private AccountPtr _account;
+    private Folder _folder;
+    private string _file_path;
+    private string _relative_file_path;
+    private string _original_file_name;
+    private string _new_filename;
+
+    private void on_filename_line_edit_text_changed (string text);
+    private void on_move_job_finished ();
+    private void on_remote_file_already_exists (QVariantMap &values);
+    private void on_remote_file_does_not_exist (QNetworkReply *reply);
+    private void check_if_allowed_to_rename ();
+    private void on_propfind_permission_success (QVariantMap &values);
 };
 
 
@@ -108,11 +108,11 @@ private:
 
         _ui.setup_ui (this);
         _ui.button_box.button (QDialogButtonBox.Ok).set_enabled (false);
-        _ui.button_box.button (QDialogButtonBox.Ok).set_text (tr ("Rename file"));
+        _ui.button_box.button (QDialogButtonBox.Ok).on_set_text (tr ("Rename file"));
 
-        _ui.description_label.set_text (tr ("The file %1 could not be synced because the name contains characters which are not allowed on this system.").arg (_original_file_name));
-        _ui.explanation_label.set_text (tr ("The following characters are not allowed on the system : * \" | & ? , ; : \\ / ~ < >"));
-        _ui.filename_line_edit.set_text (file_path_file_info.file_name ());
+        _ui.description_label.on_set_text (tr ("The file %1 could not be synced because the name contains characters which are not allowed on this system.").arg (_original_file_name));
+        _ui.explanation_label.on_set_text (tr ("The following characters are not allowed on the system : * \" | & ? , ; : \\ / ~ < >"));
+        _ui.filename_line_edit.on_set_text (file_path_file_info.file_name ());
 
         connect (_ui.button_box, &QDialogButtonBox.accepted, this, &Gtk.Dialog.accept);
         connect (_ui.button_box, &QDialogButtonBox.rejected, this, &Gtk.Dialog.reject);
@@ -131,7 +131,7 @@ private:
             "http://owncloud.org/ns:permissions"
         });
         connect (propfind_job, &PropfindJob.result, this, &Invalid_filename_dialog.on_propfind_permission_success);
-        propfind_job.start ();
+        propfind_job.on_start ();
     }
 
     void Invalid_filename_dialog.on_propfind_permission_success (QVariantMap &values) {
@@ -141,31 +141,31 @@ private:
         const auto remote_permissions = RemotePermissions.from_server_string (values["permissions"].to_string ());
         if (!remote_permissions.has_permission (remote_permissions.Can_rename)
             || !remote_permissions.has_permission (remote_permissions.Can_move)) {
-            _ui.error_label.set_text (
+            _ui.error_label.on_set_text (
                 tr ("You don't have the permission to rename this file. Please ask the author of the file to rename it."));
             _ui.button_box.button (QDialogButtonBox.Ok).set_enabled (false);
             _ui.filename_line_edit.set_enabled (false);
         }
     }
 
-    void Invalid_filename_dialog.accept () {
+    void Invalid_filename_dialog.on_accept () {
         _new_filename = _relative_file_path + _ui.filename_line_edit.text ().trimmed ();
         const auto propfind_job = new PropfindJob (_account, QDir.clean_path (_folder.remote_path () + _new_filename));
         connect (propfind_job, &PropfindJob.result, this, &Invalid_filename_dialog.on_remote_file_already_exists);
         connect (propfind_job, &PropfindJob.finished_with_error, this, &Invalid_filename_dialog.on_remote_file_does_not_exist);
-        propfind_job.start ();
+        propfind_job.on_start ();
     }
 
-    void Invalid_filename_dialog.on_filename_line_edit_text_changed (string &text) {
+    void Invalid_filename_dialog.on_filename_line_edit_text_changed (string text) {
         const auto is_new_file_name_different = text != _original_file_name;
         const auto illegal_contained_characters = get_illegal_chars_from_string (text);
         const auto contains_illegal_chars = !illegal_contained_characters.empty () || text.ends_with (QLatin1Char ('.'));
         const auto is_text_valid = is_new_file_name_different && !contains_illegal_chars;
 
         if (is_text_valid) {
-            _ui.error_label.set_text ("");
+            _ui.error_label.on_set_text ("");
         } else {
-            _ui.error_label.set_text (tr ("Filename contains illegal characters : %1")
+            _ui.error_label.on_set_text (tr ("Filename contains illegal characters : %1")
                                          .arg (illegal_character_list_to_string (illegal_contained_characters)));
         }
 
@@ -178,17 +178,17 @@ private:
         const auto error = job.reply ().error ();
 
         if (error != QNetworkReply.NoError) {
-            _ui.error_label.set_text (tr ("Could not rename file. Please make sure you are connected to the server."));
+            _ui.error_label.on_set_text (tr ("Could not rename file. Please make sure you are connected to the server."));
             return;
         }
 
-        Gtk.Dialog.accept ();
+        Gtk.Dialog.on_accept ();
     }
 
     void Invalid_filename_dialog.on_remote_file_already_exists (QVariantMap &values) {
         Q_UNUSED (values);
 
-        _ui.error_label.set_text (tr ("Cannot rename file because a file with the same name does already exist on the server. Please pick another name."));
+        _ui.error_label.on_set_text (tr ("Cannot rename file because a file with the same name does already exist on the server. Please pick another name."));
         _ui.button_box.button (QDialogButtonBox.Ok).set_enabled (false);
     }
 
@@ -200,7 +200,7 @@ private:
         const auto remote_destionation = QDir.clean_path (_account.dav_url ().path () + _folder.remote_path () + _new_filename);
         const auto move_job = new Move_job (_account, remote_source, remote_destionation, this);
         connect (move_job, &Move_job.finished_signal, this, &Invalid_filename_dialog.on_move_job_finished);
-        move_job.start ();
+        move_job.on_start ();
     }
     }
     

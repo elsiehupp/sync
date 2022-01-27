@@ -24,19 +24,17 @@ namespace Occ {
 class SyncRunFileLog {
 
     public SyncRunFileLog ();
-    public void start (string &folder_path);
+    public void on_start (string folder_path);
     public void log_item (SyncFileItem &item);
-    public void log_lap (string &name);
+    public void log_lap (string name);
     public void finish ();
 
-protected:
-private:
-    string date_time_str (QDateTime &dt);
+    private string date_time_str (QDateTime &dt);
 
-    QScopedPointer<QFile> _file;
-    QTextStream _out;
-    QElapsedTimer _total_duration;
-    QElapsedTimer _lap_duration;
+    private QScopedPointer<QFile> _file;
+    private QTextStream _out;
+    private QElapsedTimer _total_duration;
+    private QElapsedTimer _lap_duration;
 };
 
 
@@ -46,7 +44,7 @@ private:
         return dt.to_string (Qt.ISODate);
     }
 
-    void SyncRunFileLog.start (string &folder_path) {
+    void SyncRunFileLog.on_start (string folder_path) {
         const int64 logfile_max_size = 10 * 1024 * 1024; // 10Mi_b
 
         const string logpath = QStandardPaths.writable_location (QStandardPaths.AppDataLocation);
@@ -90,7 +88,7 @@ private:
             QFile.remove (new_filename);
             QFile.rename (filename, new_filename);
         }
-        _file.reset (new QFile (filename));
+        _file.on_reset (new QFile (filename));
 
         _file.open (QIODevice.WriteOnly | QIODevice.Append | QIODevice.Text);
         _out.set_device (_file.data ());
@@ -106,8 +104,8 @@ private:
             FileSystem.set_file_hidden (filename, true);
         }
 
-        _total_duration.start ();
-        _lap_duration.start ();
+        _total_duration.on_start ();
+        _lap_duration.on_start ();
         _out << "#=#=#=# Syncrun started " << date_time_str (QDateTime.current_date_time_utc ()) << endl;
     }
     void SyncRunFileLog.log_item (SyncFileItem &item) {
@@ -149,14 +147,14 @@ private:
         _out << endl;
     }
 
-    void SyncRunFileLog.log_lap (string &name) {
+    void SyncRunFileLog.log_lap (string name) {
         _out << "#=#=#=#=# " << name << " " << date_time_str (QDateTime.current_date_time_utc ())
              << " (last step : " << _lap_duration.restart () << " msec"
              << ", total : " << _total_duration.elapsed () << " msec)" << endl;
     }
 
     void SyncRunFileLog.finish () {
-        _out << "#=#=#=# Syncrun finished " << date_time_str (QDateTime.current_date_time_utc ())
+        _out << "#=#=#=# Syncrun on_finished " << date_time_str (QDateTime.current_date_time_utc ())
              << " (last step : " << _lap_duration.elapsed () << " msec"
              << ", total : " << _total_duration.elapsed () << " msec)" << endl;
         _file.close ();

@@ -12,7 +12,7 @@ using namespace Occ;
 
 /* Upload a 1/3 of a file of given size.
 fakeFolder needs to be synchronized */
-static void partialUpload (FakeFolder &fakeFolder, string &name, int64 size) {
+static void partialUpload (FakeFolder &fakeFolder, string name, int64 size) {
     QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     QCOMPARE (fakeFolder.uploadState ().children.count (), 0); // The state should be clean
 
@@ -23,7 +23,7 @@ static void partialUpload (FakeFolder &fakeFolder, string &name, int64 size) {
                                     [&] (ProgressInfo &progress) {
                 if (progress.completedSize () > (progress.totalSize () /3 )) {
                     sizeWhenAbort = progress.completedSize ();
-                    fakeFolder.syncEngine ().abort ();
+                    fakeFolder.syncEngine ().on_abort ();
                 }
     });
 
@@ -49,9 +49,7 @@ static void setChunkSize (SyncEngine &engine, int64 size) {
 
 class TestChunkingNG : GLib.Object {
 
-private slots:
-
-    void testFileUpload () {
+    private on_ void testFileUpload () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         setChunkSize (fakeFolder.syncEngine (), 1 * 1000 * 1000);
@@ -71,7 +69,7 @@ private slots:
     }
 
     // Test resuming when there's a confusing chunk added
-    void testResume1 () {
+    private on_ void testResume1 () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         const int size = 10 * 1000 * 1000; // 10 MB
@@ -107,7 +105,7 @@ private slots:
     }
 
     // Test resuming when one of the uploaded chunks got removed
-    void testResume2 () {
+    private on_ void testResume2 () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         setChunkSize (fakeFolder.syncEngine (), 1 * 1000 * 1000);
@@ -120,7 +118,7 @@ private slots:
         QVERIFY (uploadedSize > 2 * 1000 * 1000); // at least 50 MB
         QVERIFY (chunkMap.size () >= 3); // at least three chunks
 
-        QStringList chunksToDelete;
+        string[] chunksToDelete;
 
         // Remove the second chunk, so all further chunks will be deleted and resent
         auto firstChunk = chunkMap.first ();
@@ -130,7 +128,7 @@ private slots:
         }
         fakeFolder.uploadState ().children.first ().remove (secondChunk.name);
 
-        QStringList deletedPaths;
+        string[] deletedPaths;
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.PutOperation) {
                 // Test that we properly resuming, not resending the first chunk
@@ -162,7 +160,7 @@ private slots:
     }
 
     // Test resuming when all chunks are already present
-    void testResume3 () {
+    private on_ void testResume3 () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         const int size = 30 * 1000 * 1000; // 30 MB
@@ -207,7 +205,7 @@ private slots:
 
     // Test resuming (or rather not resuming!) for the error case of the sum of
     // chunk sizes being larger than the file size
-    void testResume4 () {
+    private on_ void testResume4 () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         const int size = 30 * 1000 * 1000; // 30 MB
@@ -233,22 +231,22 @@ private slots:
         QVERIFY (fakeFolder.uploadState ().children.first ().name != chunkingId);
     }
 
-    // Check what happens when we abort during the final MOVE and the
-    // the final MOVE takes longer than the abort-delay
-    void testLateAbortHard () {
+    // Check what happens when we on_abort during the final MOVE and the
+    // the final MOVE takes longer than the on_abort-delay
+    private on_ void testLateAbortHard () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
-        fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", QStringList () << "SHA1" } } } });
+        fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", string[] () << "SHA1" } } } });
         const int size = 15 * 1000 * 1000; // 15 MB
         setChunkSize (fakeFolder.syncEngine (), 1 * 1000 * 1000);
 
-        // Make the MOVE never reply, but trigger a client-abort and apply the change remotely
+        // Make the MOVE never reply, but trigger a client-on_abort and apply the change remotely
         GLib.Object parent;
-        QByteArray moveChecksumHeader;
+        GLib.ByteArray moveChecksumHeader;
         int nGET = 0;
-        int responseDelay = 100000; // bigger than abort-wait timeout
+        int responseDelay = 100000; // bigger than on_abort-wait timeout
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
             if (request.attribute (QNetworkRequest.CustomVerbAttribute) == "MOVE") {
-                QTimer.singleShot (50, &parent, [&] () { fakeFolder.syncEngine ().abort (); });
+                QTimer.singleShot (50, &parent, [&] () { fakeFolder.syncEngine ().on_abort (); });
                 moveChecksumHeader = request.rawHeader ("OC-Checksum");
                 return new DelayedReply<FakeChunkMoveReply> (responseDelay, fakeFolder.uploadState (), fakeFolder.remoteModifier (), op, request, &parent);
             } else if (op == QNetworkAccessManager.GetOperation) {
@@ -259,7 +257,7 @@ private slots:
 
         // Test 1 : NEW file aborted
         fakeFolder.localModifier ().insert ("A/a0", size);
-        QVERIFY (!fakeFolder.syncOnce ()); // error : abort!
+        QVERIFY (!fakeFolder.syncOnce ()); // error : on_abort!
 
         // Now the next sync gets a NEW/NEW conflict and since there's no checksum
         // it just becomes a UPDATE_METADATA
@@ -267,7 +265,7 @@ private slots:
             QCOMPARE (items.size (), 1);
             QCOMPARE (items[0]._file, QLatin1String ("A"));
             SyncJournalFileRecord record;
-            QVERIFY (fakeFolder.syncJournal ().getFileRecord (QByteArray ("A/a0"), &record));
+            QVERIFY (fakeFolder.syncJournal ().getFileRecord (GLib.ByteArray ("A/a0"), &record));
             QCOMPARE (record._etag, fakeFolder.remoteModifier ().find ("A/a0").etag);
         };
         auto connection = connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToPropagate, checkEtagUpdated);
@@ -278,7 +276,7 @@ private slots:
 
         // Test 2 : modified file upload aborted
         fakeFolder.localModifier ().appendByte ("A/a0");
-        QVERIFY (!fakeFolder.syncOnce ()); // error : abort!
+        QVERIFY (!fakeFolder.syncOnce ()); // error : on_abort!
 
         // An EVAL/EVAL conflict is also UPDATE_METADATA when there's no checksums
         connection = connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToPropagate, checkEtagUpdated);
@@ -289,7 +287,7 @@ private slots:
 
         // Test 3 : modified file upload aborted, with good checksums
         fakeFolder.localModifier ().appendByte ("A/a0");
-        QVERIFY (!fakeFolder.syncOnce ()); // error : abort!
+        QVERIFY (!fakeFolder.syncOnce ()); // error : on_abort!
 
         // Set the remote checksum -- the test setup doesn't do it automatically
         QVERIFY (!moveChecksumHeader.isEmpty ());
@@ -302,7 +300,7 @@ private slots:
 
         // Test 4 : New file, that gets deleted locally before the next sync
         fakeFolder.localModifier ().insert ("A/a3", size);
-        QVERIFY (!fakeFolder.syncOnce ()); // error : abort!
+        QVERIFY (!fakeFolder.syncOnce ()); // error : on_abort!
         fakeFolder.localModifier ().remove ("A/a3");
 
         // bug : in this case we must expect a re-download of A/A3
@@ -312,20 +310,20 @@ private slots:
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    // Check what happens when we abort during the final MOVE and the
-    // the final MOVE is short enough for the abort-delay to help
-    void testLateAbortRecoverable () {
+    // Check what happens when we on_abort during the final MOVE and the
+    // the final MOVE is short enough for the on_abort-delay to help
+    private on_ void testLateAbortRecoverable () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
-        fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", QStringList () << "SHA1" } } } });
+        fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", string[] () << "SHA1" } } } });
         const int size = 15 * 1000 * 1000; // 15 MB
         setChunkSize (fakeFolder.syncEngine (), 1 * 1000 * 1000);
 
-        // Make the MOVE never reply, but trigger a client-abort and apply the change remotely
+        // Make the MOVE never reply, but trigger a client-on_abort and apply the change remotely
         GLib.Object parent;
-        int responseDelay = 200; // smaller than abort-wait timeout
+        int responseDelay = 200; // smaller than on_abort-wait timeout
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
             if (request.attribute (QNetworkRequest.CustomVerbAttribute) == "MOVE") {
-                QTimer.singleShot (50, &parent, [&] () { fakeFolder.syncEngine ().abort (); });
+                QTimer.singleShot (50, &parent, [&] () { fakeFolder.syncEngine ().on_abort (); });
                 return new DelayedReply<FakeChunkMoveReply> (responseDelay, fakeFolder.uploadState (), fakeFolder.remoteModifier (), op, request, &parent);
             }
             return nullptr;
@@ -343,7 +341,7 @@ private slots:
     }
 
     // We modify the file locally after it has been partially uploaded
-    void testRemoveStale1 () {
+    private on_ void testRemoveStale1 () {
 
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
@@ -367,7 +365,7 @@ private slots:
     }
 
     // We remove the file locally after it has been partially uploaded
-    void testRemoveStale2 () {
+    private on_ void testRemoveStale2 () {
 
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
@@ -383,7 +381,7 @@ private slots:
         QCOMPARE (fakeFolder.uploadState ().children.count (), 0);
     }
 
-    void testCreateConflictWhileSyncing () {
+    private on_ void testCreateConflictWhileSyncing () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         const int size = 10 * 1000 * 1000; // 10 MB
@@ -394,7 +392,7 @@ private slots:
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        // Modify the file localy and start the upload
+        // Modify the file localy and on_start the upload
         fakeFolder.localModifier ().setContents ("A/a0", 'B');
         fakeFolder.localModifier ().appendByte ("A/a0");
 
@@ -438,7 +436,7 @@ private slots:
         QCOMPARE (fakeFolder.uploadState ().children.count (), 0); // The last sync cleaned the chunks
     }
 
-    void testModifyLocalFileWhileUploading () {
+    private on_ void testModifyLocalFileWhileUploading () {
 
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
@@ -476,7 +474,7 @@ private slots:
         QVERIFY (fakeFolder.uploadState ().children.first ().name != chunkingId);
     }
 
-    void testResumeServerDeletedChunks () {
+    private on_ void testResumeServerDeletedChunks () {
 
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
@@ -500,20 +498,21 @@ private slots:
 
     // Check what happens when the connection is dropped on the PUT (non-chunking) or MOVE (chunking)
     // for on the issue #5106
-    void connectionDroppedBeforeEtagRecieved_data () {
+    private on_ void connectionDroppedBeforeEtagRecieved_data () {
         QTest.addColumn<bool> ("chunking");
         QTest.newRow ("big file") << true;
         QTest.newRow ("small file") << false;
     }
-    void connectionDroppedBeforeEtagRecieved () {
+
+    private on_ void connectionDroppedBeforeEtagRecieved () {
         QFETCH (bool, chunking);
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
-        fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", QStringList () << "SHA1" } } } });
+        fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", string[] () << "SHA1" } } } });
         const int size = chunking ? 1 * 1000 * 1000 : 300;
         setChunkSize (fakeFolder.syncEngine (), 300 * 1000);
 
-        // Make the MOVE never reply, but trigger a client-abort and apply the change remotely
-        QByteArray checksumHeader;
+        // Make the MOVE never reply, but trigger a client-on_abort and apply the change remotely
+        GLib.ByteArray checksumHeader;
         int nGET = 0;
         QScopedValueRollback<int> setHttpTimeout (AbstractNetworkJob.httpTimeout, 1);
         int responseDelay = AbstractNetworkJob.httpTimeout * 1000 * 1000; // much bigger than http timeout (so a timeout will occur)
@@ -560,7 +559,7 @@ private slots:
         QCOMPARE (nGET, 0);
     }
 
-    void testPercentEncoding () {
+    private on_ void testPercentEncoding () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         const int size = 5 * 1000 * 1000;
@@ -577,7 +576,7 @@ private slots:
     }
 
     // Test uploading large files (2.5GiB)
-    void testVeryBigFiles () {
+    private on_ void testVeryBigFiles () {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "dav", QVariantMap{ {"chunking", "1.0"} } } });
         const int64 size = 2.5 * 1024 * 1024 * 1024; // 2.5 GiB

@@ -24,12 +24,12 @@ class NavigationPaneHelper : GLib.Object {
 
     public void schedule_update_cloud_storage_registry ();
 
-private:
-    void update_cloud_storage_registry ();
 
-    FolderMan *_folder_man;
-    bool _show_in_explorer_navigation_pane;
-    QTimer _update_cloud_storage_registry_timer;
+    private void update_cloud_storage_registry ();
+
+    private FolderMan _folder_man;
+    private bool _show_in_explorer_navigation_pane;
+    private QTimer _update_cloud_storage_registry_timer;
 };
 
     NavigationPaneHelper.NavigationPaneHelper (FolderMan *folder_man)
@@ -62,7 +62,7 @@ private:
     void NavigationPaneHelper.schedule_update_cloud_storage_registry () {
         // Schedule the update to happen a bit later to avoid doing the update multiple times in a row.
         if (!_update_cloud_storage_registry_timer.is_active ())
-            _update_cloud_storage_registry_timer.start (500);
+            _update_cloud_storage_registry_timer.on_start (500);
     }
 
     void NavigationPaneHelper.update_cloud_storage_registry () {

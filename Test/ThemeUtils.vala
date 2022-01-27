@@ -10,18 +10,16 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 // #include <QTest>
 
 class FakePaintDevice : QPaintDevice {
-public:
-    FakePaintDevice ();
 
-    QPaintEngine *paintEngine () const override;
+    public FakePaintDevice ();
 
-    void setHidpi (bool value);
+    public QPaintEngine *paintEngine () override;
 
-protected:
-    int metric (QPaintDevice.PaintDeviceMetric metric) const override;
+    public void setHidpi (bool value);
 
-private:
-    bool _hidpi = false;
+    protected int metric (QPaintDevice.PaintDeviceMetric metric) override;
+
+    private bool _hidpi = false;
 };
 
 

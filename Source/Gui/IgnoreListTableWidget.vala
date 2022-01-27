@@ -16,24 +16,23 @@ namespace Ui {
 class IgnoreListTableWidget : Gtk.Widget {
 
     public IgnoreListTableWidget (Gtk.Widget *parent = nullptr);
-    public ~IgnoreListTableWidget () override;
+    ~IgnoreListTableWidget () override;
 
-    public void read_ignore_file (string &file, bool read_only = false);
-    public int add_pattern (string &pattern, bool deletable, bool read_only);
+    public void read_ignore_file (string file, bool read_only = false);
+    public int add_pattern (string pattern, bool deletable, bool read_only);
 
-public slots:
-    void slot_remove_all_items ();
-    void slot_write_ignore_file (string & file);
+    public void on_remove_all_items ();
+    public void on_write_ignore_file (string  file);
 
-private slots:
-    void slot_item_selection_changed ();
-    void slot_remove_current_item ();
-    void slot_add_pattern ();
 
-private:
-    void setup_table_read_only_items ();
-    string read_only_tooltip;
-    Ui.IgnoreListTableWidget *ui;
+    private void on_item_selection_changed ();
+    private void on_remove_current_item ();
+    private void on_add_pattern ();
+
+
+    private void setup_table_read_only_items ();
+    private string read_only_tooltip;
+    private Ui.IgnoreListTableWidget *ui;
 };
 
 
@@ -47,20 +46,20 @@ private:
         set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         ui.setup_ui (this);
 
-        ui.description_label.set_text (tr ("Files or folders matching a pattern will not be synchronized.\n\n"
+        ui.description_label.on_set_text (tr ("Files or folders matching a pattern will not be synchronized.\n\n"
                                          "Items where deletion is allowed will be deleted if they prevent a "
                                          "directory from being removed. "
                                          "This is useful for meta data."));
 
         ui.remove_push_button.set_enabled (false);
         connect (ui.table_widget,         &QTable_widget.item_selection_changed,
-                this, &IgnoreListTableWidget.slot_item_selection_changed);
+                this, &IgnoreListTableWidget.on_item_selection_changed);
         connect (ui.remove_push_button,    &QAbstractButton.clicked,
-                this, &IgnoreListTableWidget.slot_remove_current_item);
+                this, &IgnoreListTableWidget.on_remove_current_item);
         connect (ui.add_push_button,       &QAbstractButton.clicked,
-                this, &IgnoreListTableWidget.slot_add_pattern);
+                this, &IgnoreListTableWidget.on_add_pattern);
         connect (ui.remove_all_push_button, &QAbstractButton.clicked,
-                this, &IgnoreListTableWidget.slot_remove_all_items);
+                this, &IgnoreListTableWidget.on_remove_all_items);
 
         ui.table_widget.resize_columns_to_contents ();
         ui.table_widget.horizontal_header ().set_section_resize_mode (pattern_col, QHeaderView.Stretch);
@@ -71,7 +70,7 @@ private:
         delete ui;
     }
 
-    void IgnoreListTableWidget.slot_item_selection_changed () {
+    void IgnoreListTableWidget.on_item_selection_changed () {
         QTable_widget_item *item = ui.table_widget.current_item ();
         if (!item) {
             ui.remove_push_button.set_enabled (false);
@@ -82,17 +81,17 @@ private:
         ui.remove_push_button.set_enabled (enable);
     }
 
-    void IgnoreListTableWidget.slot_remove_current_item () {
+    void IgnoreListTableWidget.on_remove_current_item () {
         ui.table_widget.remove_row (ui.table_widget.current_row ());
         if (ui.table_widget.row_count () == read_only_rows)
             ui.remove_all_push_button.set_enabled (false);
     }
 
-    void IgnoreListTableWidget.slot_remove_all_items () {
+    void IgnoreListTableWidget.on_remove_all_items () {
         ui.table_widget.set_row_count (0);
     }
 
-    void IgnoreListTableWidget.slot_write_ignore_file (string & file) {
+    void IgnoreListTableWidget.on_write_ignore_file (string  file) {
         QFile ignores (file);
         if (ignores.open (QIODevice.WriteOnly)) {
             // rewrites the whole file since now the user can also remove system patterns
@@ -101,7 +100,7 @@ private:
                 QTable_widget_item *pattern_item = ui.table_widget.item (row, pattern_col);
                 QTable_widget_item *deletable_item = ui.table_widget.item (row, deletable_col);
                 if (pattern_item.flags () & Qt.ItemIsEnabled) {
-                    QByteArray prepend;
+                    GLib.ByteArray prepend;
                     if (deletable_item.check_state () == Qt.Checked) {
                         prepend = "]";
                     } else if (pattern_item.text ().starts_with ('#')) {
@@ -127,7 +126,7 @@ private:
         }
     }
 
-    void IgnoreListTableWidget.slot_add_pattern () {
+    void IgnoreListTableWidget.on_add_pattern () {
         bool ok_clicked = false;
         string pattern = QInputDialog.get_text (this, tr ("Add Ignore Pattern"),
             tr ("Add a new ignore pattern:"),
@@ -140,7 +139,7 @@ private:
         ui.table_widget.scroll_to_bottom ();
     }
 
-    void IgnoreListTableWidget.read_ignore_file (string &file, bool read_only) {
+    void IgnoreListTableWidget.read_ignore_file (string file, bool read_only) {
         QFile ignores (file);
         if (ignores.open (QIODevice.ReadOnly)) {
             while (!ignores.at_end ()) {
@@ -158,12 +157,12 @@ private:
         }
     }
 
-    int IgnoreListTableWidget.add_pattern (string &pattern, bool deletable, bool read_only) {
+    int IgnoreListTableWidget.add_pattern (string pattern, bool deletable, bool read_only) {
         int new_row = ui.table_widget.row_count ();
         ui.table_widget.set_row_count (new_row + 1);
 
         auto *pattern_item = new QTable_widget_item;
-        pattern_item.set_text (pattern);
+        pattern_item.on_set_text (pattern);
         ui.table_widget.set_item (new_row, pattern_col, pattern_item);
 
         auto *deletable_item = new QTable_widget_item;

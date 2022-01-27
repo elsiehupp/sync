@@ -27,7 +27,7 @@ int main (int argc, char *argv[]) {
     reporter.set_logo (QPixmap (CRASHREPORTER_ICON));
 #endif
     reporter.set_window_title (CRASHREPORTER_PRODUCT_NAME);
-    reporter.set_text ("<html><head/><body><p><span style=\" font-weight:600;\">Sorry!</span> " CRASHREPORTER_PRODUCT_NAME " crashed. Please tell us about it! " CRASHREPORTER_PRODUCT_NAME " has created an error report for you that can help improve the stability in the future. You can now send this report directly to the " CRASHREPORTER_PRODUCT_NAME " developers.</p></body></html>");
+    reporter.on_set_text ("<html><head/><body><p><span style=\" font-weight:600;\">Sorry!</span> " CRASHREPORTER_PRODUCT_NAME " crashed. Please tell us about it! " CRASHREPORTER_PRODUCT_NAME " has created an error report for you that can help improve the stability in the future. You can now send this report directly to the " CRASHREPORTER_PRODUCT_NAME " developers.</p></body></html>");
 
     const QFileInfo crash_log (QDir.temp_path () + QStringLiteral ("/" CRASHREPORTER_PRODUCT_NAME "-crash.log"));
     if (crash_log.exists ()) {
@@ -42,7 +42,7 @@ int main (int argc, char *argv[]) {
     reporter.set_report_data ("Version", CRASHREPORTER_VERSION_STRING);
     reporter.set_report_data ("Release_channel", CRASHREPORTER_RELEASE_CHANNEL);
 
-    //reporter.set_report_data ( "timestamp", QByteArray.number ( QDateTime.current_date_time ().to_time_t () ) );
+    //reporter.set_report_data ( "timestamp", GLib.ByteArray.number ( QDateTime.current_date_time ().to_time_t () ) );
 
     // add parameters
 

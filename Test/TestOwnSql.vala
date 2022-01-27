@@ -11,10 +11,10 @@
 using namespace Occ;
 
 class TestOwnSql : GLib.Object {
+
     QTemporaryDir _tempDir;
 
-private slots:
-    void testOpenDb () {
+    private on_ void testOpenDb () {
         QFileInfo fi ( _tempDir.path () + "/testdb.sqlite" );
         QVERIFY ( !fi.exists () ); // must not exist
         _db.openOrCreateReadWrite (fi.filePath ());
@@ -22,7 +22,7 @@ private slots:
         QVERIFY (fi.exists ());
     }
 
-    void testCreate () {
+    private on_ void testCreate () {
         const char *sql = "CREATE TABLE addresses ( id INTEGER, name VARCHAR (4096), "
                 "address VARCHAR (4096), entered INTEGER (8), PRIMARY KEY (id));";
 
@@ -31,7 +31,7 @@ private slots:
         QVERIFY (q.exec ());
     }
 
-    void testIsSelect () {
+    private on_ void testIsSelect () {
         SqlQuery q (_db);
         q.prepare ("SELECT id FROM addresses;");
         QVERIFY ( q.isSelect () );
@@ -40,7 +40,7 @@ private slots:
         QVERIFY ( !q.isSelect ());
     }
 
-    void testInsert () {
+    private on_ void testInsert () {
         const char *sql = "INSERT INTO addresses (id, name, address, entered) VALUES "
                 " (1, 'Gonzo Alberto', 'Moriabata 24, Palermo', 1403100844);";
         SqlQuery q (_db);
@@ -48,7 +48,7 @@ private slots:
         QVERIFY (q.exec ());
     }
 
-    void testInsert2 () {
+    private on_ void testInsert2 () {
         const char *sql = "INSERT INTO addresses (id, name, address, entered) VALUES "
                 " (?1, ?2, ?3, ?4);";
         SqlQuery q (_db);
@@ -60,7 +60,7 @@ private slots:
         QVERIFY (q.exec ());
     }
 
-    void testSelect () {
+    private on_ void testSelect () {
         const char *sql = "SELECT * FROM addresses;";
 
         SqlQuery q (_db);
@@ -73,7 +73,7 @@ private slots:
         }
     }
 
-    void testSelect2 () {
+    private on_ void testSelect2 () {
         const char *sql = "SELECT * FROM addresses WHERE id=?1";
         SqlQuery q (_db);
         q.prepare (sql);
@@ -85,7 +85,7 @@ private slots:
         }
     }
 
-    void testPragma () {
+    private on_ void testPragma () {
         const char *sql = "PRAGMA table_info (addresses)";
 
         SqlQuery q (_db);
@@ -97,7 +97,7 @@ private slots:
         }
     }
 
-    void testUnicode () {
+    private on_ void testUnicode () {
         const char *sql = "INSERT INTO addresses (id, name, address, entered) VALUES "
                 " (?1, ?2, ?3, ?4);";
         SqlQuery q (_db);
@@ -109,7 +109,7 @@ private slots:
         QVERIFY (q.exec ());
     }
 
-    void testReadUnicode () {
+    private on_ void testReadUnicode () {
         const char *sql = "SELECT * FROM addresses WHERE id=3;";
         SqlQuery q (_db);
         q.prepare (sql);
@@ -122,7 +122,7 @@ private slots:
         }
     }
 
-    void testDestructor () {
+    private on_ void testDestructor () {
         // This test make sure that the destructor of SqlQuery works even if the SqlDatabase
         // is destroyed before
         QScopedPointer<SqlDatabase> db (new SqlDatabase ());
@@ -131,12 +131,11 @@ private slots:
         q2.prepare ("SELECT * FROM addresses");
         SqlQuery q3 ("SELECT * FROM addresses", _db);
         SqlQuery q4;
-        db.reset ();
+        db.on_reset ();
     }
 
-private:
-    SqlDatabase _db;
+
+    private SqlDatabase _db;
 };
 
 QTEST_APPLESS_MAIN (TestOwnSql)
-#include "testownsql.moc"

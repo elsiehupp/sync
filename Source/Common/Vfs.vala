@@ -7,7 +7,7 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 
 // #include <GLib.Object>
 // #include <QScopedPointer>
-// #include <QSharedPointer>
+
 
 // #include <memory>
 
@@ -15,7 +15,7 @@ using csync_file_stat_t = struct csync_file_stat_s;
 
 namespace Occ {
 
-using AccountPtr = QSharedPointer<Account>;
+using AccountPtr = unowned<Account>;
 
 /***********************************************************
 Collection of parameters for initializing a Vfs instance.
@@ -96,9 +96,9 @@ class Vfs : GLib.Object {
     };
 
     public static string mode_to_string (Mode mode);
-    public static Optional<Mode> mode_from_string (string &str);
+    public static Optional<Mode> mode_from_string (string str);
 
-    public static Result<bool, string> check_availability (string &path);
+    public static Result<bool, string> check_availability (string path);
 
     public enum class AvailabilityError {
         // Availability can't be retrieved due to db error
@@ -110,14 +110,14 @@ class Vfs : GLib.Object {
 
 
     public Vfs (GLib.Object* parent = nullptr);
-    public ~Vfs () override;
+    ~Vfs () override;
 
-    public virtual Mode mode () const = 0;
+    public virtual Mode mode () = 0;
 
     /// For WithSuffix modes : the suffix (including the dot)
-    public virtual string file_suffix () const = 0;
+    public virtual string file_suffix () = 0;
 
-    /// Access to the parameters the instance was start ()ed with.
+    /// Access to the parameters the instance was on_start ()ed with.
     public const VfsSetupParams &params () {
         return _setup_params;
     }
@@ -127,7 +127,7 @@ class Vfs : GLib.Object {
 
     The plugin-specific work is done in start_impl ().
     ***********************************************************/
-    public void start (VfsSetupParams &params);
+    public void on_start (VfsSetupParams &params);
 
     /// Stop interaction with VFS provider. Like when the client application quits.
     public virtual void stop () = 0;
@@ -141,14 +141,14 @@ class Vfs : GLib.Object {
     Some plugins might provide alternate shell integration, making the normal
     context menu actions redundant.
     ***********************************************************/
-    public virtual bool socket_api_pin_state_actions_shown () const = 0;
+    public virtual bool socket_api_pin_state_actions_shown () = 0;
 
     /***********************************************************
     Return true when download of a file's data is currently ongoing.
 
     See also the begin_hydrating () and done_hydrating () signals.
     ***********************************************************/
-    public virtual bool is_hydrating () const = 0;
+    public virtual bool is_hydrating () = 0;
 
     /***********************************************************
     Update placeholder metadata during discovery.
@@ -156,7 +156,7 @@ class Vfs : GLib.Object {
     If the remote metadata changes, the local placeholder's metadata should possibly
     change as well.
     ***********************************************************/
-    public virtual Q_REQUIRED_RESULT Result<void, string> update_metadata (string &file_path, time_t modtime, int64 size, QByteArray &file_id) = 0;
+    public virtual Q_REQUIRED_RESULT Result<void, string> update_metadata (string file_path, time_t modtime, int64 size, GLib.ByteArray &file_id) = 0;
 
     /// Create a new dehydrated placeholder. Called from PropagateDownload.
     public virtual Q_REQUIRED_RESULT Result<void, string> create_placeholder (SyncFileItem &item) = 0;
@@ -192,12 +192,12 @@ class Vfs : GLib.Object {
     for example.
     ***********************************************************/
     public virtual Q_REQUIRED_RESULT Result<Vfs.ConvertToPlaceholderResult, string> convert_to_placeholder (
-        const string &filename,
+        const string filename,
         const SyncFileItem &item,
-        const string &replaces_file = string ()) = 0;
+        const string replaces_file = string ()) = 0;
 
     /// Determine whether the file at the given absolute path is a dehydrated placeholder.
-    public virtual Q_REQUIRED_RESULT bool is_dehydrated_placeholder (string &file_path) = 0;
+    public virtual Q_REQUIRED_RESULT bool is_dehydrated_placeholder (string file_path) = 0;
 
     /***********************************************************
     Similar to is_dehydrated_placeholder () but used from sync discovery.
@@ -219,7 +219,7 @@ class Vfs : GLib.Object {
 
     folder_path is relative to the sync folder. Can be "" for root folder.
     ***********************************************************/
-    public virtual Q_REQUIRED_RESULT bool set_pin_state (string &folder_path, PinState state) = 0;
+    public virtual Q_REQUIRED_RESULT bool set_pin_state (string folder_path, PinState state) = 0;
 
     /***********************************************************
     Returns the pin state of an item at a path.
@@ -231,7 +231,7 @@ class Vfs : GLib.Object {
 
     Returns none on retrieval error.
     ***********************************************************/
-    public virtual Q_REQUIRED_RESULT Optional<PinState> pin_state (string &folder_path) = 0;
+    public virtual Q_REQUIRED_RESULT Optional<PinState> pin_state (string folder_path) = 0;
 
     /***********************************************************
     Returns availability status of an item at a path.
@@ -241,9 +241,9 @@ class Vfs : GLib.Object {
 
     folder_path is relative to the sync folder. Can be "" for root folder.
     ***********************************************************/
-    public virtual Q_REQUIRED_RESULT AvailabilityResult availability (string &folder_path) = 0;
+    public virtual Q_REQUIRED_RESULT AvailabilityResult availability (string folder_path) = 0;
 
-public slots:
+
     /***********************************************************
     Update in-sync state based on SyncFileStatusTracker signal.
 
@@ -251,7 +251,7 @@ public slots:
     via the vfs plugin. The connection to SyncFileStatusTracker allows both to be based
     on the same data.
     ***********************************************************/
-    virtual void file_status_changed (string &system_file_name, SyncFileStatus file_status) = 0;
+    public virtual void on_file_status_changed (string system_file_name, SyncFileStatus file_status) = 0;
 
 signals:
     /// Emitted when a user-initiated hydration starts
@@ -259,53 +259,53 @@ signals:
     /// Emitted when the hydration ends
     void done_hydrating ();
 
-protected:
+
     /***********************************************************
     Setup the plugin for the folder.
 
-    For example, the VFS provider might monitor files to be able to start a file
+    For example, the VFS provider might monitor files to be able to on_start a file
     hydration (download of a file's remote contents) when the user wants to open
     it.
 
     Usually some registration needs to be done with the backend. This function
     should take care of it if necessary.
     ***********************************************************/
-    virtual void start_impl (VfsSetupParams &params) = 0;
+    protected virtual void start_impl (VfsSetupParams &params) = 0;
 
     // Db-backed pin state handling. Derived classes may use it to implement pin states.
-    bool set_pin_state_in_db (string &folder_path, PinState state);
-    Optional<PinState> pin_state_in_db (string &folder_path);
-    AvailabilityResult availability_in_db (string &folder_path);
+    protected bool set_pin_state_in_db (string folder_path, PinState state);
+    protected Optional<PinState> pin_state_in_db (string folder_path);
+    protected AvailabilityResult availability_in_db (string folder_path);
 
-    // the parameters passed to start ()
-    VfsSetupParams _setup_params;
+    // the parameters passed to on_start ()
+    protected VfsSetupParams _setup_params;
 };
 
 /// Implementation of Vfs for Vfs.Off mode - does nothing
 class VfsOff : Vfs {
 
     public VfsOff (GLib.Object* parent = nullptr);
-    public ~VfsOff () override;
+    ~VfsOff () override;
 
-    public Mode mode () const override {
+    public Mode mode () override {
         return Vfs.Off;
     }
 
-    public string file_suffix () const override {
+    public string file_suffix () override {
         return string ();
     }
 
     public void stop () override {}
     public void unregister_folder () override {}
 
-    public bool socket_api_pin_state_actions_shown () const override {
+    public bool socket_api_pin_state_actions_shown () override {
         return false;
     }
-    public bool is_hydrating () const override {
+    public bool is_hydrating () override {
         return false;
     }
 
-    public Result<void, string> update_metadata (string &, time_t, int64, QByteArray &) override {
+    public Result<void, string> update_metadata (string , time_t, int64, GLib.ByteArray &) override {
         return {};
     }
     public Result<void, string> create_placeholder (SyncFileItem &) override {
@@ -314,35 +314,35 @@ class VfsOff : Vfs {
     public Result<void, string> dehydrate_placeholder (SyncFileItem &) override {
         return {};
     }
-    public Result<ConvertToPlaceholderResult, string> convert_to_placeholder (string &, SyncFileItem &, string &) override {
+    public Result<ConvertToPlaceholderResult, string> convert_to_placeholder (string , SyncFileItem &, string ) override {
         return ConvertToPlaceholderResult.Ok;
     }
 
     public bool needs_metadata_update (SyncFileItem &) override {
         return false;
     }
-    public bool is_dehydrated_placeholder (string &) override {
+    public bool is_dehydrated_placeholder (string ) override {
         return false;
     }
     public bool stat_type_virtual_file (csync_file_stat_t *, void *) override {
         return false;
     }
 
-    public bool set_pin_state (string &, PinState) override {
+    public bool set_pin_state (string , PinState) override {
         return true;
     }
-    public Optional<PinState> pin_state (string &) override {
+    public Optional<PinState> pin_state (string ) override {
         return PinState.AlwaysLocal;
     }
-    public AvailabilityResult availability (string &) override {
+    public AvailabilityResult availability (string ) override {
         return VfsItemAvailability.AlwaysLocal;
     }
 
-public slots:
-    void file_status_changed (string &, SyncFileStatus) override {}
 
-protected:
-    void start_impl (VfsSetupParams &) override {}
+    public void on_file_status_changed (string , SyncFileStatus) override {}
+
+
+    protected void start_impl (VfsSetupParams &) override {}
 };
 
 /// Check whether the plugin for the mode is available.
@@ -407,7 +407,7 @@ string Vfs.mode_to_string (Mode mode) {
     return QStringLiteral ("off");
 }
 
-Optional<Vfs.Mode> Vfs.mode_from_string (string &str) {
+Optional<Vfs.Mode> Vfs.mode_from_string (string str) {
     // Note : Strings are used for config and must be stable
     if (str == QLatin1String ("off")) {
         return Off;
@@ -419,19 +419,19 @@ Optional<Vfs.Mode> Vfs.mode_from_string (string &str) {
     return {};
 }
 
-Result<bool, string> Vfs.check_availability (string &path) {
+Result<bool, string> Vfs.check_availability (string path) {
     const auto mode = best_available_vfs_mode ();
     Q_UNUSED (mode)
     Q_UNUSED (path)
     return true;
 }
 
-void Vfs.start (VfsSetupParams &params) {
+void Vfs.on_start (VfsSetupParams &params) {
     _setup_params = params;
     start_impl (params);
 }
 
-bool Vfs.set_pin_state_in_db (string &folder_path, PinState state) {
+bool Vfs.set_pin_state_in_db (string folder_path, PinState state) {
     auto path = folder_path.to_utf8 ();
     _setup_params.journal.internal_pin_states ().wipe_for_path_and_below (path);
     if (state != PinState.Inherited)
@@ -439,12 +439,12 @@ bool Vfs.set_pin_state_in_db (string &folder_path, PinState state) {
     return true;
 }
 
-Optional<PinState> Vfs.pin_state_in_db (string &folder_path) {
+Optional<PinState> Vfs.pin_state_in_db (string folder_path) {
     auto pin = _setup_params.journal.internal_pin_states ().effective_for_path (folder_path.to_utf8 ());
     return pin;
 }
 
-Vfs.AvailabilityResult Vfs.availability_in_db (string &folder_path) {
+Vfs.AvailabilityResult Vfs.availability_in_db (string folder_path) {
     auto path = folder_path.to_utf8 ();
     auto pin = _setup_params.journal.internal_pin_states ().effective_for_path_recursive (path);
     // not being able to retrieve the pin state isn't too bad
@@ -520,7 +520,7 @@ bool Occ.is_vfs_plugin_available (Vfs.Mode mode) {
 
     // Attempting to load the plugin is essential as it could have dependencies that
     // can't be resolved and thus not be available after all.
-    if (!loader.load ()) {
+    if (!loader.on_load ()) {
         q_c_warning (lc_plugin) << "Plugin failed to load:" << loader.error_string ();
         return false;
     }

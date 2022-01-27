@@ -23,28 +23,28 @@ namespace Occ {
 @ingroup libsync
 ***********************************************************/
 class ClientProxy : GLib.Object {
-public:
-    ClientProxy (GLib.Object *parent = nullptr);
 
-    static bool is_using_system_default ();
-    static void lookup_system_proxy_async (QUrl &url, GLib.Object *dst, char *slot);
+    public ClientProxy (GLib.Object *parent = nullptr);
 
-    static string print_q_network_proxy (QNetworkProxy &proxy);
-    static const char *proxy_type_to_c_str (QNetworkProxy.ProxyType type);
+    public static bool is_using_system_default ();
+    public static void lookup_system_proxy_async (QUrl url, GLib.Object *dst, char *slot);
 
-public slots:
-    void setup_qt_proxy_from_config ();
+    public static string print_q_network_proxy (QNetworkProxy &proxy);
+    public static const char *proxy_type_to_c_str (QNetworkProxy.ProxyType type);
+
+
+    public void on_setup_qt_proxy_from_config ();
 };
 
 class SystemProxyRunnable : GLib.Object, public QRunnable {
-public:
-    SystemProxyRunnable (QUrl &url);
-    void run () override;
+
+    public SystemProxyRunnable (QUrl url);
+    public void run () override;
 signals:
     void system_proxy_looked_up (QNetworkProxy &url);
 
-private:
-    QUrl _url;
+
+    private QUrl _url;
 };
 
 
@@ -101,7 +101,7 @@ private:
         return string ("%1://%2:%3").arg (proxy_type_to_c_str (proxy.type ())).arg (proxy.host_name ()).arg (proxy.port ());
     }
 
-    void ClientProxy.setup_qt_proxy_from_config () {
+    void ClientProxy.on_setup_qt_proxy_from_config () {
         Occ.ConfigFile cfg;
         int proxy_type = QNetworkProxy.DefaultProxy;
         QNetworkProxy proxy;
@@ -146,13 +146,13 @@ private:
         }
     }
 
-    void ClientProxy.lookup_system_proxy_async (QUrl &url, GLib.Object *dst, char *slot) {
+    void ClientProxy.lookup_system_proxy_async (QUrl url, GLib.Object *dst, char *slot) {
         auto *runnable = new SystemProxyRunnable (url);
         GLib.Object.connect (runnable, SIGNAL (system_proxy_looked_up (QNetworkProxy)), dst, slot);
-        QThreadPool.global_instance ().start (runnable); // takes ownership and deletes
+        QThreadPool.global_instance ().on_start (runnable); // takes ownership and deletes
     }
 
-    SystemProxyRunnable.SystemProxyRunnable (QUrl &url)
+    SystemProxyRunnable.SystemProxyRunnable (QUrl url)
         : GLib.Object ()
         , QRunnable ()
         , _url (url) {
@@ -160,7 +160,7 @@ private:
 
     void SystemProxyRunnable.run () {
         q_register_meta_type<QNetworkProxy> ("QNetworkProxy");
-        QList<QNetworkProxy> proxies = QNetworkProxyFactory.system_proxy_for_query (QNetworkProxyQuery (_url));
+        GLib.List<QNetworkProxy> proxies = QNetworkProxyFactory.system_proxy_for_query (QNetworkProxyQuery (_url));
 
         if (proxies.is_empty ()) {
             emit system_proxy_looked_up (QNetworkProxy (QNetworkProxy.NoProxy));

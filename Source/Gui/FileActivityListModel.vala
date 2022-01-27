@@ -12,21 +12,21 @@ class FileActivityListModel : ActivityListModel {
 
     public FileActivityListModel (GLib.Object *parent = nullptr);
 
-public slots:
-    void load (AccountState *account_state, string &file_id);
 
-protected:
-    void start_fetch_job () override;
+    public void on_load (AccountState *account_state, string file_id);
 
-private:
-    string _file_id;
+
+    protected void start_fetch_job () override;
+
+
+    private string _file_id;
 };
     FileActivityListModel.FileActivityListModel (GLib.Object *parent)
         : ActivityListModel (nullptr, parent) {
         set_display_actions (false);
     }
 
-    void FileActivityListModel.load (AccountState *account_state, string &local_path) {
+    void FileActivityListModel.on_load (AccountState *account_state, string local_path) {
         Q_ASSERT (account_state);
         if (!account_state || currently_fetching ()) {
             return;
@@ -45,7 +45,7 @@ private:
         }
 
         _file_id = file_record._file_id;
-        slot_refresh_activity ();
+        on_refresh_activity ();
     }
 
     void FileActivityListModel.start_fetch_job () {
@@ -66,7 +66,7 @@ private:
         job.add_query_params (params);
         set_done_fetching (true);
         set_hide_old_activities (true);
-        job.start ();
+        job.on_start ();
     }
     }
     

@@ -27,17 +27,17 @@ namespace Ui {
 class Ignore_list_editor : Gtk.Dialog {
 
     public Ignore_list_editor (Gtk.Widget *parent = nullptr);
-    public ~Ignore_list_editor () override;
+    ~Ignore_list_editor () override;
 
     public bool ignore_hidden_files ();
 
-private slots:
-    void slot_restore_defaults (QAbstractButton *button);
 
-private:
-    void setup_table_read_only_items ();
-    string read_only_tooltip;
-    Ui.Ignore_list_editor *ui;
+    private void on_restore_defaults (QAbstractButton *button);
+
+
+    private void setup_table_read_only_items ();
+    private string read_only_tooltip;
+    private Ui.Ignore_list_editor *ui;
 };
 
 
@@ -58,7 +58,7 @@ private:
         ui.ignore_table_widget.read_ignore_file (user_config);
 
         connect (this, &Gtk.Dialog.accepted, [=] () {
-            ui.ignore_table_widget.slot_write_ignore_file (user_config);
+            ui.ignore_table_widget.on_write_ignore_file (user_config);
             /* handle the hidden file checkbox */
 
             /* the ignore_hidden_files flag is a folder specific setting, but for now, it is
@@ -69,7 +69,7 @@ private:
             FolderMan.instance ().set_ignore_hidden_files (ignore_hidden_files ());
         });
         connect (ui.button_box, &QDialogButtonBox.clicked,
-                this, &Ignore_list_editor.slot_restore_defaults);
+                this, &Ignore_list_editor.on_restore_defaults);
 
         ui.sync_hidden_files_check_box.set_checked (!FolderMan.instance ().ignore_hidden_files ());
     }
@@ -88,11 +88,11 @@ private:
         return !ui.sync_hidden_files_check_box.is_checked ();
     }
 
-    void Ignore_list_editor.slot_restore_defaults (QAbstractButton *button) {
+    void Ignore_list_editor.on_restore_defaults (QAbstractButton *button) {
         if (ui.button_box.button_role (button) != QDialogButtonBox.Reset_role)
             return;
 
-        ui.ignore_table_widget.slot_remove_all_items ();
+        ui.ignore_table_widget.on_remove_all_items ();
 
         ConfigFile cfg_file;
         setup_table_read_only_items ();

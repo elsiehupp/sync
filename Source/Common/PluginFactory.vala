@@ -27,13 +27,13 @@ class DefaultPluginFactory : PluginFactory {
 };
 
 /// Return the expected name of a plugin, for use with QPluginLoader
-string plugin_file_name (string &type, string &name);
+string plugin_file_name (string type, string name);
 
 
 
 PluginFactory.~PluginFactory () = default;
 
-string plugin_file_name (string &type, string &name) {
+string plugin_file_name (string type, string name) {
     return QStringLiteral ("%1sync_%2_%3")
         .arg (QStringLiteral (APPLICATION_EXECUTABLE), type, name);
 }

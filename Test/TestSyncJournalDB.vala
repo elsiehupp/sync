@@ -14,27 +14,25 @@ class TestSyncJournalDB : GLib.Object {
 
     QTemporaryDir _tempDir;
 
-public:
-    TestSyncJournalDB ()
+
+    public TestSyncJournalDB ()
         : _db ( (_tempDir.path () + "/sync.db")) {
         QVERIFY (_tempDir.isValid ());
     }
 
-    int64 dropMsecs (QDateTime time) {
+    public int64 dropMsecs (QDateTime time) {
         return Utility.qDateTimeToTime_t (time);
     }
 
-private slots:
-
-    void initTestCase () {
+    private void on_init_test_case () {
     }
 
-    void cleanupTestCase () {
+    private void on_cleanup_test_case () {
         const string file = _db.databaseFilePath ();
         QFile.remove (file);
     }
 
-    void testFileRecord () {
+    private on_ void testFileRecord () {
         SyncJournalFileRecord record;
         QVERIFY (_db.getFileRecord (QByteArrayLiteral ("nonexistant"), &record));
         QVERIFY (!record.isValid ());
@@ -80,7 +78,7 @@ private slots:
         QVERIFY (!record.isValid ());
     }
 
-    void testFileRecordChecksum () { {/ Try with and without a checksum
+    private on_ void testFileRecordChecksum () { {// Try with and without a checksum
         {
             SyncJournalFileRecord record;
             record._path = "foo-checksum";
@@ -115,7 +113,7 @@ private slots:
         }
     }
 
-    void testDownloadInfo () {
+    private on_ void testDownloadInfo () {
         using Info = SyncJournalDb.DownloadInfo;
         Info record = _db.getDownloadInfo ("nonexistant");
         QVERIFY (!record._valid);
@@ -134,7 +132,7 @@ private slots:
         QVERIFY (!wipedRecord._valid);
     }
 
-    void testUploadInfo () {
+    private on_ void testUploadInfo () {
         using Info = SyncJournalDb.UploadInfo;
         Info record = _db.getUploadInfo ("nonexistant");
         QVERIFY (!record._valid);
@@ -155,19 +153,19 @@ private slots:
         QVERIFY (!wipedRecord._valid);
     }
 
-    void testNumericId () {
+    private on_ void testNumericId () {
         SyncJournalFileRecord record;
 
         // Typical 8-digit padded id
         record._fileId = "00000001abcd";
-        QCOMPARE (record.numericFileId (), QByteArray ("00000001"));
+        QCOMPARE (record.numericFileId (), GLib.ByteArray ("00000001"));
 
         // When the numeric id overflows the 8-digit boundary
         record._fileId = "123456789ocidblaabcd";
-        QCOMPARE (record.numericFileId (), QByteArray ("123456789"));
+        QCOMPARE (record.numericFileId (), GLib.ByteArray ("123456789"));
     }
 
-    void testConflictRecord () {
+    private on_ void testConflictRecord () {
         ConflictRecord record;
         record.path = "abc";
         record.baseFileId = "def";
@@ -188,10 +186,10 @@ private slots:
         QVERIFY (!_db.conflictRecord (record.path).isValid ());
     }
 
-    void testAvoidReadFromDbOnNextSync () {
-        auto invalidEtag = QByteArray ("_invalid_");
-        auto initialEtag = QByteArray ("etag");
-        auto makeEntry = [&] (QByteArray &path, ItemType type) {
+    private on_ void testAvoidReadFromDbOnNextSync () {
+        auto invalidEtag = GLib.ByteArray ("_invalid_");
+        auto initialEtag = GLib.ByteArray ("etag");
+        auto makeEntry = [&] (GLib.ByteArray &path, ItemType type) {
             SyncJournalFileRecord record;
             record._path = path;
             record._type = type;
@@ -199,7 +197,7 @@ private slots:
             record._remotePerm = RemotePermissions.fromDbValue ("RW");
             _db.setFileRecord (record);
         };
-        auto getEtag = [&] (QByteArray &path) {
+        auto getEtag = [&] (GLib.ByteArray &path) {
             SyncJournalFileRecord record;
             _db.getFileRecord (path, &record);
             return record._etag;
@@ -219,7 +217,7 @@ private slots:
         makeEntry ("foodir/subdir/subsubdir/file", ItemTypeFile);
         makeEntry ("foodir/subdir/otherdir", ItemTypeDirectory);
 
-        _db.schedulePathForRemoteDiscovery (QByteArray ("foodir/subdir"));
+        _db.schedulePathForRemoteDiscovery (GLib.ByteArray ("foodir/subdir"));
 
         // Direct effects of parent directories being set to _invalid_
         QCOMPARE (getEtag ("foodir"), invalidEtag);
@@ -253,8 +251,8 @@ private slots:
         QCOMPARE (getEtag ("foodir/sub"), initialEtag);
     }
 
-    void testRecursiveDelete () {
-        auto makeEntry = [&] (QByteArray &path) {
+    private on_ void testRecursiveDelete () {
+        auto makeEntry = [&] (GLib.ByteArray &path) {
             SyncJournalFileRecord record;
             record._path = path;
             record._remotePerm = RemotePermissions.fromDbValue ("RW");
@@ -303,14 +301,14 @@ private slots:
         QVERIFY (checkElements ());
     }
 
-    void testPinState () {
-        auto make = [&] (QByteArray &path, PinState state) {
+    private on_ void testPinState () {
+        auto make = [&] (GLib.ByteArray &path, PinState state) {
             _db.internalPinStates ().setForPath (path, state);
             auto pinState = _db.internalPinStates ().rawForPath (path);
             QVERIFY (pinState);
             QCOMPARE (*pinState, state);
         };
-        auto get = [&] (QByteArray &path) . PinState {
+        auto get = [&] (GLib.ByteArray &path) . PinState {
             auto state = _db.internalPinStates ().effectiveForPath (path);
             if (!state) {
                 QTest.qFail ("couldn't read pin state", __FILE__, __LINE__);
@@ -318,7 +316,7 @@ private slots:
             }
             return *state;
         };
-        auto getRecursive = [&] (QByteArray &path) . PinState {
+        auto getRecursive = [&] (GLib.ByteArray &path) . PinState {
             auto state = _db.internalPinStates ().effectiveForPathRecursive (path);
             if (!state) {
                 QTest.qFail ("couldn't read pin state", __FILE__, __LINE__);
@@ -326,7 +324,7 @@ private slots:
             }
             return *state;
         };
-        auto getRaw = [&] (QByteArray &path) . PinState {
+        auto getRaw = [&] (GLib.ByteArray &path) . PinState {
             auto state = _db.internalPinStates ().rawForPath (path);
             if (!state) {
                 QTest.qFail ("couldn't read pin state", __FILE__, __LINE__);
@@ -345,14 +343,14 @@ private slots:
         make ("online", PinState.OnlineOnly);
         make ("inherit", PinState.Inherited);
         for (auto base : {"local/", "online/", "inherit/"}) {
-            make (QByteArray (base) + "inherit", PinState.Inherited);
-            make (QByteArray (base) + "local", PinState.AlwaysLocal);
-            make (QByteArray (base) + "online", PinState.OnlineOnly);
+            make (GLib.ByteArray (base) + "inherit", PinState.Inherited);
+            make (GLib.ByteArray (base) + "local", PinState.AlwaysLocal);
+            make (GLib.ByteArray (base) + "online", PinState.OnlineOnly);
 
             for (auto base2 : {"local/", "online/", "inherit/"}) {
-                make (QByteArray (base) + base2 + "inherit", PinState.Inherited);
-                make (QByteArray (base) + base2 + "local", PinState.AlwaysLocal);
-                make (QByteArray (base) + base2 + "online", PinState.OnlineOnly);
+                make (GLib.ByteArray (base) + base2 + "inherit", PinState.Inherited);
+                make (GLib.ByteArray (base) + base2 + "local", PinState.AlwaysLocal);
+                make (GLib.ByteArray (base) + base2 + "online", PinState.OnlineOnly);
             }
         }
 
@@ -435,9 +433,8 @@ private slots:
         QCOMPARE (list.size (), 0);
     }
 
-private:
-    SyncJournalDb _db;
+
+    private SyncJournalDb _db;
 };
 
 QTEST_APPLESS_MAIN (TestSyncJournalDB)
-#include "testsyncjournaldb.moc"

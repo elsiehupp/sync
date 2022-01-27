@@ -37,7 +37,7 @@ class User_status_selector_model : GLib.Object {
     Q_PROPERTY (string user_status_emoji READ user_status_emoji WRITE set_user_status_emoji NOTIFY user_status_changed)
     Q_PROPERTY (Occ.UserStatus.OnlineStatus online_status READ online_status WRITE set_online_status NOTIFY online_status_changed)
     Q_PROPERTY (int predefined_statuses_count READ predefined_statuses_count NOTIFY predefined_statuses_changed)
-    Q_PROPERTY (QStringList clear_at_values READ clear_at_values CONSTANT)
+    Q_PROPERTY (string[] clear_at_values READ clear_at_values CONSTANT)
     Q_PROPERTY (string clear_at READ clear_at NOTIFY clear_at_changed)
     Q_PROPERTY (string error_message READ error_message NOTIFY error_message_changed)
     Q_PROPERTY (QUrl online_icon READ online_icon CONSTANT)
@@ -61,7 +61,7 @@ class User_status_selector_model : GLib.Object {
     public User_status_selector_model (UserStatus &user_status,
         GLib.Object *parent = nullptr);
 
-    public Q_INVOKABLE void load (int id);
+    public Q_INVOKABLE void on_load (int id);
 
     public Q_REQUIRED_RESULT UserStatus.OnlineStatus online_status ();
     public Q_INVOKABLE void set_online_status (Occ.UserStatus.OnlineStatus status);
@@ -72,19 +72,19 @@ class User_status_selector_model : GLib.Object {
     public Q_REQUIRED_RESULT QUrl invisible_icon ();
 
     public Q_REQUIRED_RESULT string user_status_message ();
-    public Q_INVOKABLE void set_user_status_message (string &message);
-    public void set_user_status_emoji (string &emoji);
+    public Q_INVOKABLE void set_user_status_message (string message);
+    public void set_user_status_emoji (string emoji);
     public Q_REQUIRED_RESULT string user_status_emoji ();
 
     public Q_INVOKABLE void set_user_status ();
     public Q_INVOKABLE void clear_user_status ();
 
     public Q_REQUIRED_RESULT int predefined_statuses_count ();
-    public Q_INVOKABLE UserStatus predefined_status (int index) const;
-    public Q_INVOKABLE string predefined_status_clear_at (int index) const;
+    public Q_INVOKABLE UserStatus predefined_status (int index);
+    public Q_INVOKABLE string predefined_status_clear_at (int index);
     public Q_INVOKABLE void set_predefined_status (int index);
 
-    public Q_REQUIRED_RESULT QStringList clear_at_values ();
+    public Q_REQUIRED_RESULT string[] clear_at_values ();
     public Q_REQUIRED_RESULT string clear_at ();
     public Q_INVOKABLE void set_clear_at (int index);
 
@@ -96,10 +96,10 @@ signals:
     void online_status_changed ();
     void clear_at_changed ();
     void predefined_statuses_changed ();
-    void finished ();
+    void on_finished ();
 
-private:
-    enum class Clear_stage_type {
+
+    private enum class Clear_stage_type {
         Dont_clear,
         Half_hour,
         One_hour,
@@ -108,29 +108,33 @@ private:
         Week
     };
 
-    void init ();
-    void reset ();
-    void on_user_status_fetched (UserStatus &user_status);
-    void on_predefined_statuses_fetched (std.vector<UserStatus> &statuses);
-    void on_user_status_set ();
-    void on_message_cleared ();
-    void on_error (UserStatusConnector.Error error);
+    private void on_init ();
+    private void on_reset ();
+    private void on_user_status_fetched (UserStatus &user_status);
+    private void on_predefined_statuses_fetched (std.vector<UserStatus> &statuses);
+    private void on_user_status_set ();
+    private void on_message_cleared ();
+    private void on_error (UserStatusConnector.Error error);
 
-    Q_REQUIRED_RESULT string clear_at_stage_to_string (Clear_stage_type stage) const;
-    Q_REQUIRED_RESULT string clear_at_readable (Optional<ClearAt> &clear_at) const;
-    Q_REQUIRED_RESULT string time_difference_to_string (int difference_secs) const;
-    Q_REQUIRED_RESULT Optional<ClearAt> clear_stage_type_to_date_time (Clear_stage_type type) const;
-    void set_error (string &reason);
-    void clear_error ();
+    //  Q_REQUIRED_RESULT
+    private string clear_at_stage_to_string (Clear_stage_type stage);
+    //  Q_REQUIRED_RESULT
+    private string clear_at_readable (Optional<ClearAt> &clear_at);
+    //  Q_REQUIRED_RESULT
+    private string time_difference_to_string (int difference_secs);
+    //  Q_REQUIRED_RESULT
+    private Optional<ClearAt> clear_stage_type_to_date_time (Clear_stage_type type);
+    private void set_error (string reason);
+    private void clear_error ();
 
-    std.shared_ptr<UserStatusConnector> _user_status_connector {};
-    std.vector<UserStatus> _predefined_statuses;
-    UserStatus _user_status;
-    std.unique_ptr<DateTimeProvider> _date_time_provider;
+    private std.shared_ptr<UserStatusConnector> _user_status_connector {};
+    private std.vector<UserStatus> _predefined_statuses;
+    private UserStatus _user_status;
+    private std.unique_ptr<DateTimeProvider> _date_time_provider;
 
-    string _error_message;
+    private string _error_message;
 
-    std.vector<Clear_stage_type> _clear_stages = {
+    private std.vector<Clear_stage_type> _clear_stages = {
         Clear_stage_type.Dont_clear,
         Clear_stage_type.Half_hour,
         Clear_stage_type.One_hour,
@@ -152,7 +156,7 @@ private:
         , _user_status ("no-id", "", "😀", UserStatus.OnlineStatus.Online, false, {})
         , _date_time_provider (new DateTimeProvider) {
         _user_status.set_icon ("😀");
-        init ();
+        on_init ();
     }
 
     User_status_selector_model.User_status_selector_model (std.shared_ptr<UserStatusConnector> user_status_connector,
@@ -162,7 +166,7 @@ private:
         , _user_status_connector (user_status_connector)
         , _date_time_provider (std.move (date_time_provider)) {
         _user_status.set_icon ("😀");
-        init ();
+        on_init ();
     }
 
     User_status_selector_model.User_status_selector_model (UserStatus &user_status,
@@ -180,13 +184,13 @@ private:
         _user_status.set_icon ("😀");
     }
 
-    void User_status_selector_model.load (int id) {
-        reset ();
+    void User_status_selector_model.on_load (int id) {
+        on_reset ();
         _user_status_connector = User_model.instance ().user_status_connector (id);
-        init ();
+        on_init ();
     }
 
-    void User_status_selector_model.reset () {
+    void User_status_selector_model.on_reset () {
         if (_user_status_connector) {
             disconnect (_user_status_connector.get (), &UserStatusConnector.user_status_fetched, this,
                 &User_status_selector_model.on_user_status_fetched);
@@ -202,7 +206,7 @@ private:
         _user_status_connector = nullptr;
     }
 
-    void User_status_selector_model.init () {
+    void User_status_selector_model.on_init () {
         if (!_user_status_connector) {
             return;
         }
@@ -223,11 +227,11 @@ private:
     }
 
     void User_status_selector_model.on_user_status_set () {
-        emit finished ();
+        emit on_finished ();
     }
 
     void User_status_selector_model.on_message_cleared () {
-        emit finished ();
+        emit on_finished ();
     }
 
     void User_status_selector_model.on_error (UserStatusConnector.Error error) {
@@ -262,7 +266,7 @@ private:
         Q_UNREACHABLE ();
     }
 
-    void User_status_selector_model.set_error (string &reason) {
+    void User_status_selector_model.set_error (string reason) {
         _error_message = reason;
         emit error_message_changed ();
     }
@@ -302,13 +306,13 @@ private:
         return _user_status.message ();
     }
 
-    void User_status_selector_model.set_user_status_message (string &message) {
+    void User_status_selector_model.set_user_status_message (string message) {
         _user_status.set_message (message);
         _user_status.set_message_predefined (false);
         emit user_status_changed ();
     }
 
-    void User_status_selector_model.set_user_status_emoji (string &emoji) {
+    void User_status_selector_model.set_user_status_emoji (string emoji) {
         _user_status.set_icon (emoji);
         _user_status.set_message_predefined (false);
         emit user_status_changed ();
@@ -454,8 +458,8 @@ private:
         }
     }
 
-    QStringList User_status_selector_model.clear_at_values () {
-        QStringList clear_at_stages;
+    string[] User_status_selector_model.clear_at_values () {
+        string[] clear_at_stages;
         std.transform (_clear_stages.begin (), _clear_stages.end (),
             std.back_inserter (clear_at_stages),
             [this] (Clear_stage_type &stage) {

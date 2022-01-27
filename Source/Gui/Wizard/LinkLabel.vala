@@ -12,32 +12,32 @@ Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
 namespace Occ {
 
 class Link_label : QLabel {
-public:
-    Link_label (Gtk.Widget *parent = nullptr);
 
-    void set_url (QUrl &url);
+    public Link_label (Gtk.Widget *parent = nullptr);
+
+    public void set_url (QUrl url);
 
 signals:
     void clicked ();
 
-protected:
-    void enter_event (QEvent *event) override;
 
-    void leave_event (QEvent *event) override;
+    protected void enter_event (QEvent *event) override;
 
-    void mouse_release_event (QMouse_event *event) override;
+    protected void leave_event (QEvent *event) override;
 
-private:
-    void set_font_underline (bool value);
+    protected void mouse_release_event (QMouse_event *event) override;
 
-    QUrl url;
+
+    private void set_font_underline (bool value);
+
+    private QUrl url;
 };
 
     Link_label.Link_label (Gtk.Widget *parent) : QLabel (parent) {
 
     }
 
-    void Link_label.set_url (QUrl &url) {
+    void Link_label.set_url (QUrl url) {
         this.url = url;
     }
 

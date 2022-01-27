@@ -10,8 +10,7 @@ using namespace Occ;
 
 class TestUpdater : GLib.Object {
 
-private slots:
-    void testVersionToInt () {
+    private void on_test_version_to_int () {
         int64 lowVersion = Updater.Helper.versionToInt (1,2,80,3000);
         QCOMPARE (Updater.Helper.stringVersionToInt ("1.2.80.3000"), lowVersion);
 
@@ -25,4 +24,3 @@ private slots:
 };
 
 QTEST_APPLESS_MAIN (TestUpdater)
-#include "testupdater.moc"

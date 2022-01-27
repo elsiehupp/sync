@@ -35,32 +35,31 @@ This includes:
 
 This job is tightly coupled with the DiscoveryPhase class.
 
-After being start ()'ed
+After being on_start ()'ed
 
 Internally, this job will call DiscoveryPhase.schedule_more_jobs when one of its sub-jobs is
-finished. DiscoveryPhase.schedule_more_jobs will call process_sub_jobs () to continue work until
-the job is finished.
+on_finished. DiscoveryPhase.schedule_more_jobs will call process_sub_jobs () to continue work until
+the job is on_finished.
 
 Results are fed outwards via the DiscoveryPhase.item_discovered () signal.
 ***********************************************************/
 class ProcessDirectoryJob : GLib.Object {
 
     struct PathTuple;
-public:
-    enum Query_mode {
+
+    public enum Query_mode {
         Normal_query,
         Parent_dont_exist, // Do not query this folder because it does not exist
         Parent_not_changed, // No need to query this folder because it has not changed from what is in the DB
         In_black_list // Do not query this folder because it is in the blacklist (remote entries only)
     };
-    Q_ENUM (Query_mode)
 
     /***********************************************************
     For creating the root job
 
     The base pin state is used if the root dir's pin state can't be retrieved.
     ***********************************************************/
-    ProcessDirectoryJob (DiscoveryPhase *data, PinState base_pin_state,
+    public ProcessDirectoryJob (DiscoveryPhase *data, PinState base_pin_state,
         int64 last_sync_timestamp, GLib.Object *parent)
         : GLib.Object (parent)
         , _last_sync_timestamp (last_sync_timestamp)
@@ -69,7 +68,7 @@ public:
     }
 
     /// For creating subjobs
-    ProcessDirectoryJob (PathTuple &path, SyncFileItemPtr &dir_item,
+    public ProcessDirectoryJob (PathTuple &path, SyncFileItemPtr &dir_item,
         Query_mode query_local, Query_mode query_server, int64 last_sync_timestamp,
         ProcessDirectoryJob *parent)
         : GLib.Object (parent)
@@ -82,24 +81,24 @@ public:
         compute_pin_state (parent._pin_state);
     }
 
-    void start ();
+    public void on_start ();
     /***********************************************************
-    Start up to nb_jobs, return the number of job started; emit finished () when done
+    Start up to nb_jobs, return the number of job started; emit on_finished () when done
     ***********************************************************/
-    int process_sub_jobs (int nb_jobs);
+    public int process_sub_jobs (int nb_jobs);
 
-    void set_inside_encrypted_tree (bool is_inside_encrypted_tree) {
+    public void set_inside_encrypted_tree (bool is_inside_encrypted_tree) {
         _is_inside_encrypted_tree = is_inside_encrypted_tree;
     }
 
-    bool is_inside_encrypted_tree () {
+    public bool is_inside_encrypted_tree () {
         return _is_inside_encrypted_tree;
     }
 
-    SyncFileItemPtr _dir_item;
+    public SyncFileItemPtr _dir_item;
 
-private:
-    struct Entries {
+
+    private struct Entries {
         string name_override;
         SyncJournalFileRecord db_entry;
         RemoteInfo server_entry;
@@ -110,7 +109,7 @@ private:
     Structure representing a path during discovery. A same path may have different value locally
     or on the server in case of renames.
 
-    These strings never start or ends with slashes. They are all relative to the fo
+    These strings never on_start or ends with slashes. They are all relative to the fo
     Usually they are all the same and are even shared instance of the s
 
     _server and _local path
@@ -120,18 +119,18 @@ private:
         local :    A/Y/file
         server :   B/X/file
     ***********************************************************/
-    struct PathTuple {
+    private struct PathTuple {
         string _original; // Path as in the DB (before the sync)
         string _target; // Path that will be the result after the sync (and will be in the DB)
         string _server; // Path on the server (before the sync)
         string _local; // Path locally (before the sync)
-        static string path_append (string &base, string &name) {
+        static string path_append (string base, string name) {
             return base.is_empty () ? name : base + QLatin1Char ('/') + name;
         }
-        PathTuple add_name (string &name) {
+        PathTuple add_name (string name) {
             PathTuple result;
             result._original = path_append (_original, name);
-            auto build_string = [&] (string &other) {
+            auto build_string = [&] (string other) {
                 // Optimize by trying to keep all string implicitly shared if they are the same (common case)
                 return other == _original ? result._original : path_append (other, name);
             };
@@ -142,20 +141,20 @@ private:
         }
     };
 
-    bool check_for_invalid_file_name (PathTuple &path, std.map<string, Entries> &entries, Entries &entry);
+    private bool check_for_invalid_file_name (PathTuple &path, std.map<string, Entries> &entries, Entries &entry);
 
     /***********************************************************
     Iterate over entries inside the directory (non-recursively).
 
     Called once _server_entries and _local_entries are filled
     Calls process_file () for each non-excluded one.
-    Will start scheduling subdir jobs when done.
+    Will on_start scheduling subdir jobs when done.
     ***********************************************************/
-    void process ();
+    private void process ();
 
     // return true if the file is excluded.
     // path is the full relative path of the file. local_name is the base name of the local entry.
-    bool handle_excluded (string &path, string &local_name, bool is_directory,
+    private bool handle_excluded (string path, string local_name, bool is_directory,
         bool is_hidden, bool is_symlink);
 
     /***********************************************************
@@ -166,28 +165,28 @@ private:
 
     This main function delegates some work to the process_file* functions.
     ***********************************************************/
-    void process_file (PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &);
+    private void process_file (PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &);
 
     /// process_file helper for when remote information is available, typically flows into Analyze_local_info when done
-    void process_file_analyze_remote_info (SyncFileItemPtr &item, PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &);
+    private void process_file_analyze_remote_info (SyncFileItemPtr &item, PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &);
 
     /// process_file helper for reconciling local changes
-    void process_file_analyze_local_info (SyncFileItemPtr &item, PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &, Query_mode recurse_query_server);
+    private void process_file_analyze_local_info (SyncFileItemPtr &item, PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &, Query_mode recurse_query_server);
 
     /// process_file helper for local/remote conflicts
-    void process_file_conflict (SyncFileItemPtr &item, PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &);
+    private void process_file_conflict (SyncFileItemPtr &item, PathTuple, LocalInfo &, RemoteInfo &, SyncJournalFileRecord &);
 
     /// process_file helper for common final processing
-    void process_file_finalize (SyncFileItemPtr &item, PathTuple, bool recurse, Query_mode recurse_query_local, Query_mode recurse_query_server);
+    private void process_file_finalize (SyncFileItemPtr &item, PathTuple, bool recurse, Query_mode recurse_query_local, Query_mode recurse_query_server);
 
     /***********************************************************
     Checks the permission for this item, if needed, change the item to a restoration item.
     @return false indicate that this is an error and if it is a directory, one should not recurse
     inside it.
     ***********************************************************/
-    bool check_permissions (SyncFileItemPtr &item);
+    private bool check_permissions (SyncFileItemPtr &item);
 
-    struct Move_permission_result {
+    private struct Move_permission_result {
         // whether moving/renaming the source is ok
         bool source_ok = false;
         // whether the destination accepts (always true for renames)
@@ -200,38 +199,38 @@ private:
     Check if the move is of a specified file within this directory is allowed.
     Return true if it is allowed, false otherwise
     ***********************************************************/
-    Move_permission_result check_move_permissions (RemotePermissions src_perm, string &src_path, bool is_directory);
+    private Move_permission_result check_move_permissions (RemotePermissions src_perm, string src_path, bool is_directory);
 
     void process_blacklisted (PathTuple &, LocalInfo &, SyncJournalFileRecord &db_entry);
-    void sub_job_finished ();
+    private void sub_job_finished ();
 
     /***********************************************************
     An DB operation failed
     ***********************************************************/
-    void db_error ();
+    private void db_error ();
 
-    void add_virtual_file_suffix (string &str) const;
-    bool has_virtual_file_suffix (string &str) const;
-    void chop_virtual_file_suffix (string &str) const;
+    private void add_virtual_file_suffix (string str);
+    private bool has_virtual_file_suffix (string str);
+    private void chop_virtual_file_suffix (string str);
 
     /***********************************************************
     Convenience to detect suffix-vfs modes
     ***********************************************************/
-    bool is_vfs_with_suffix ();
+    private bool is_vfs_with_suffix ();
 
     /***********************************************************
     Start a remote discovery network job
 
     It fills _server_normal_query_entries and sets _server_query_done when done.
     ***********************************************************/
-    DiscoverySingleDirectoryJob *start_async_server_query ();
+    private DiscoverySingleDirectoryJob *start_async_server_query ();
 
     /***********************************************************
     Discover the local directory
 
     Fills _local_normal_query_entries.
     ***********************************************************/
-    void start_async_local_query ();
+    private void start_async_local_query ();
 
     /***********************************************************
     Sets _pin_state, the directory's pin state
@@ -239,7 +238,7 @@ private:
     If the folder exists locally its state is retrieved, otherwise the
     parent's pin state is inherited.
     ***********************************************************/
-    void compute_pin_state (PinState parent_state);
+    private void compute_pin_state (PinState parent_state);
 
     /***********************************************************
     Adjust record._type if the db pin state suggests it.
@@ -252,24 +251,24 @@ private:
     state suggests a hydration or dehydration action and changes the
     _type field accordingly.
     ***********************************************************/
-    void setup_db_pin_state_actions (SyncJournalFileRecord &record);
+    private void setup_db_pin_state_actions (SyncJournalFileRecord &record);
 
-    int64 _last_sync_timestamp = 0;
+    private int64 _last_sync_timestamp = 0;
 
-    Query_mode _query_server = Query_mode.Normal_query;
-    Query_mode _query_local = Query_mode.Normal_query;
+    private Query_mode _query_server = Query_mode.Normal_query;
+    private Query_mode _query_local = Query_mode.Normal_query;
 
     // Holds entries that resulted from a Normal_query
-    QVector<RemoteInfo> _server_normal_query_entries;
-    QVector<LocalInfo> _local_normal_query_entries;
+    private QVector<RemoteInfo> _server_normal_query_entries;
+    private QVector<LocalInfo> _local_normal_query_entries;
 
     // Whether the local/remote directory item queries are done. Will be set
     // even even for do-nothing (!= Normal_query) queries.
-    bool _server_query_done = false;
-    bool _local_query_done = false;
+    private bool _server_query_done = false;
+    private bool _local_query_done = false;
 
-    RemotePermissions _root_permissions;
-    QPointer<DiscoverySingleDirectoryJob> _server_job;
+    private RemotePermissions _root_permissions;
+    private QPointer<DiscoverySingleDirectoryJob> _server_job;
 
     /***********************************************************
     Number of currently running async jobs.
@@ -281,7 +280,7 @@ private:
     entries. This variable is used to ensure this job doesn't finish while
     these jobs are still in flight.
     ***********************************************************/
-    int _pending_async_jobs = 0;
+    private int _pending_async_jobs = 0;
 
     /***********************************************************
     The queued and running jobs for subdirectories.
@@ -289,21 +288,21 @@ private:
     The jobs are enqueued while processind directory entries and
     then gradually run via calls to process_sub_jobs ().
     ***********************************************************/
-    std.deque<ProcessDirectoryJob> _queued_jobs;
-    QVector<ProcessDirectoryJob> _running_jobs;
+    private std.deque<ProcessDirectoryJob> _queued_jobs;
+    private QVector<ProcessDirectoryJob> _running_jobs;
 
-    DiscoveryPhase *_discovery_data;
+    private DiscoveryPhase _discovery_data;
 
-    PathTuple _current_folder;
-    bool _child_modified = false; // the directory contains modified item what would prevent deletion
-    bool _child_ignored = false; // The directory contains ignored item that would prevent deletion
-    PinState _pin_state = PinState.Unspecified; // The directory's pin-state, see compute_pin_state ()
-    bool _is_inside_encrypted_tree = false; // this directory is encrypted or is within the tree of directories with root directory encrypted
+    private PathTuple _current_folder;
+    private bool _child_modified = false; // the directory contains modified item what would prevent deletion
+    private bool _child_ignored = false; // The directory contains ignored item that would prevent deletion
+    private PinState _pin_state = PinState.Unspecified; // The directory's pin-state, see compute_pin_state ()
+    private bool _is_inside_encrypted_tree = false; // this directory is encrypted or is within the tree of directories with root directory encrypted
 
 signals:
-    void finished ();
+    void on_finished ();
     // The root etag of this directory was fetched
-    void etag (QByteArray &, QDateTime &time);
+    void etag (GLib.ByteArray &, QDateTime &time);
 };
 
     bool ProcessDirectoryJob.check_for_invalid_file_name (PathTuple &path,
@@ -348,7 +347,7 @@ signals:
         return true;
     }
 
-    void ProcessDirectoryJob.start () {
+    void ProcessDirectoryJob.on_start () {
         q_c_info (lc_disco) << "STARTING" << _current_folder._server << _query_server << _current_folder._local << _query_local;
 
         if (_query_server == Normal_query) {
@@ -501,7 +500,7 @@ signals:
         QTimer.single_shot (0, _discovery_data, &DiscoveryPhase.schedule_more_jobs);
     }
 
-    bool ProcessDirectoryJob.handle_excluded (string &path, string &local_name, bool is_directory, bool is_hidden, bool is_symlink) {
+    bool ProcessDirectoryJob.handle_excluded (string path, string local_name, bool is_directory, bool is_hidden, bool is_symlink) {
         auto excluded = _discovery_data._excludes.traversal_pattern_match (path, is_directory ? ItemTypeDirectory : ItemTypeFile);
 
         // FIXME : move to ExcludedFiles 's regexp ?
@@ -564,7 +563,7 @@ signals:
                     item._error_string = tr ("File names ending with a period are not supported on this file system.");
                 } else {
                     char invalid = '\0';
-                    foreach (char x, QByteArray ("\\:?*\"<>|")) {
+                    foreach (char x, GLib.ByteArray ("\\:?*\"<>|")) {
                         if (item._file.contains (x)) {
                             invalid = x;
                             break;
@@ -706,11 +705,11 @@ signals:
 
     // Compute the checksum of the given file and assign the result in item._checksum_header
     // Returns true if the checksum was successfully computed
-    static bool compute_local_checksum (QByteArray &header, string &path, SyncFileItemPtr &item) {
+    static bool compute_local_checksum (GLib.ByteArray &header, string path, SyncFileItemPtr &item) {
         auto type = parse_checksum_header_type (header);
         if (!type.is_empty ()) {
             // TODO : compute async?
-            QByteArray checksum = ComputeChecksum.compute_now_on_file (path, type);
+            GLib.ByteArray checksum = ComputeChecksum.compute_now_on_file (path, type);
             if (!checksum.is_empty ()) {
                 item._checksum_header = make_checksum_header (type, checksum);
                 return true;
@@ -744,7 +743,7 @@ signals:
         } ();
 
         // Check for missing server data {
-            QStringList missing_data;
+            string[] missing_data;
             if (server_entry.size == -1)
                 missing_data.append (tr ("size"));
             if (server_entry.remote_perm.is_null ())
@@ -1013,7 +1012,7 @@ signals:
                 // we need to make a request to the server to know that the original file is deleted on the server
                 _pending_async_jobs++;
                 auto job = new RequestEtagJob (_discovery_data._account, _discovery_data._remote_folder + original_path, this);
-                connect (job, &RequestEtagJob.finished_with_result, this, [=] (HttpResult<QByteArray> &etag) mutable {
+                connect (job, &RequestEtagJob.finished_with_result, this, [=] (HttpResult<GLib.ByteArray> &etag) mutable {
                     _pending_async_jobs--;
                     QTimer.single_shot (0, _discovery_data, &DiscoveryPhase.schedule_more_jobs);
                     if (etag || etag.error ().code != 404 ||
@@ -1032,7 +1031,7 @@ signals:
                     post_process_rename (path);
                     process_file_finalize (item, path, item.is_directory (), item._instruction == CSYNC_INSTRUCTION_RENAME ? Normal_query : Parent_dont_exist, _query_server);
                 });
-                job.start ();
+                job.on_start ();
                 done = true; // Ideally, if the origin still exist on the server, we should continue searching...  but that'd be difficult
                 async = true;
             }
@@ -1079,7 +1078,7 @@ signals:
 
         _child_modified |= server_modified;
 
-        auto finalize = [&] {
+        auto on_finalize = [&] {
             bool recurse = item.is_directory () || local_entry.is_directory || server_entry.is_directory;
             // Even if we have a local directory : If the remote is a file that's propagated as a
             // conflict we don't need to recurse into it. (local c1.owncloud, c1/ ; remote : c1)
@@ -1128,7 +1127,7 @@ signals:
                 }
             }
 
-            finalize ();
+            on_finalize ();
             return;
         }
 
@@ -1239,7 +1238,7 @@ signals:
                 }
             }
 
-            finalize ();
+            on_finalize ();
             return;
         }
 
@@ -1250,11 +1249,11 @@ signals:
             // The instruction should already be set correctly.
             ASSERT (item._instruction == CSYNC_INSTRUCTION_UPDATE_METADATA);
             ASSERT (item._type == ItemTypeVirtualFile);
-            finalize ();
+            on_finalize ();
             return;
         } else if (server_modified) {
             process_file_conflict (item, path, local_entry, server_entry, db_entry);
-            finalize ();
+            on_finalize ();
             return;
         }
 
@@ -1415,7 +1414,7 @@ signals:
                 item._is_encrypted = true;
             }
             post_process_local_new ();
-            finalize ();
+            on_finalize ();
             return;
         }
 
@@ -1431,7 +1430,7 @@ signals:
             // If we can create the destination, do that.
             // Permission errors on the destination will be handled by check_permissions later.
             post_process_local_new ();
-            finalize ();
+            on_finalize ();
 
             // If the destination upload will work, we're fine with the source deletion.
             // If the source deletion can't work, check_permissions will error.
@@ -1494,7 +1493,7 @@ signals:
             if (base.is_virtual_file () && is_vfs_with_suffix ())
                 chop_virtual_file_suffix (server_original_path);
             auto job = new RequestEtagJob (_discovery_data._account, server_original_path, this);
-            connect (job, &RequestEtagJob.finished_with_result, this, [=] (HttpResult<QByteArray> &etag) mutable {
+            connect (job, &RequestEtagJob.finished_with_result, this, [=] (HttpResult<GLib.ByteArray> &etag) mutable {
                 if (!etag || (etag.get () != base._etag && !item.is_directory ()) || _discovery_data.is_renamed (original_path)) {
                     q_c_info (lc_disco) << "Can't rename because the etag has changed or the directory is gone" << original_path;
                     // Can't be a rename, leave it as a new.
@@ -1509,11 +1508,11 @@ signals:
                 _pending_async_jobs--;
                 QTimer.single_shot (0, _discovery_data, &DiscoveryPhase.schedule_more_jobs);
             });
-            job.start ();
+            job.on_start ();
             return;
         }
 
-        finalize ();
+        on_finalize ();
     }
 
     void ProcessDirectoryJob.process_file_conflict (SyncFileItemPtr &item, ProcessDirectoryJob.PathTuple path, LocalInfo &local_entry, RemoteInfo &server_entry, SyncJournalFileRecord &db_entry) {
@@ -1610,7 +1609,7 @@ signals:
         if (path._original != path._target && (item._instruction == CSYNC_INSTRUCTION_UPDATE_METADATA || item._instruction == CSYNC_INSTRUCTION_NONE)) {
             ASSERT (_dir_item && _dir_item._instruction == CSYNC_INSTRUCTION_RENAME);
             // This is because otherwise subitems are not updated!  (ideally renaming a directory could
-            // update the database for all items!  See PropagateDirectory.slot_sub_jobs_finished)
+            // update the database for all items!  See PropagateDirectory.on_sub_jobs_finished)
             item._instruction = CSYNC_INSTRUCTION_RENAME;
             item._rename_target = path._target;
             item._direction = _dir_item._direction;
@@ -1635,7 +1634,7 @@ signals:
                 job.set_parent (_discovery_data);
                 _discovery_data._queued_deleted_directories[path._original] = job;
             } else {
-                connect (job, &ProcessDirectoryJob.finished, this, &ProcessDirectoryJob.sub_job_finished);
+                connect (job, &ProcessDirectoryJob.on_finished, this, &ProcessDirectoryJob.sub_job_finished);
                 _queued_jobs.push_back (job);
             }
         } else {
@@ -1672,7 +1671,7 @@ signals:
 
         if (item.is_directory () && item._instruction != CSYNC_INSTRUCTION_IGNORE) {
             auto job = new ProcessDirectoryJob (path, item, Normal_query, In_black_list, _last_sync_timestamp, this);
-            connect (job, &ProcessDirectoryJob.finished, this, &ProcessDirectoryJob.sub_job_finished);
+            connect (job, &ProcessDirectoryJob.on_finished, this, &ProcessDirectoryJob.sub_job_finished);
             _queued_jobs.push_back (job);
         } else {
             emit _discovery_data.item_discovered (item);
@@ -1761,7 +1760,7 @@ signals:
         return true;
     }
 
-    auto ProcessDirectoryJob.check_move_permissions (RemotePermissions src_perm, string &src_path,
+    auto ProcessDirectoryJob.check_move_permissions (RemotePermissions src_perm, string src_path,
                                                    bool is_directory)
         . Move_permission_result {
         auto dest_perms = !_root_permissions.is_null () ? _root_permissions
@@ -1812,7 +1811,7 @@ signals:
 
     int ProcessDirectoryJob.process_sub_jobs (int nb_jobs) {
         if (_queued_jobs.empty () && _running_jobs.empty () && _pending_async_jobs == 0) {
-            _pending_async_jobs = -1; // We're finished, we don't want to emit finished again
+            _pending_async_jobs = -1; // We're on_finished, we don't want to emit on_finished again
             if (_dir_item) {
                 if (_child_modified && _dir_item._instruction == CSYNC_INSTRUCTION_REMOVE) {
                     // re-create directory that has modified contents
@@ -1832,7 +1831,7 @@ signals:
                     _dir_item._instruction = CSYNC_INSTRUCTION_NONE;
                 }
             }
-            emit finished ();
+            emit on_finished ();
         }
 
         int started = 0;
@@ -1846,7 +1845,7 @@ signals:
             auto f = _queued_jobs.front ();
             _queued_jobs.pop_front ();
             _running_jobs.push_back (f);
-            f.start ();
+            f.on_start ();
             started++;
         }
         return started;
@@ -1860,13 +1859,13 @@ signals:
         str.append (_discovery_data._sync_options._vfs.file_suffix ());
     }
 
-    bool ProcessDirectoryJob.has_virtual_file_suffix (string &str) {
+    bool ProcessDirectoryJob.has_virtual_file_suffix (string str) {
         if (!is_vfs_with_suffix ())
             return false;
         return str.ends_with (_discovery_data._sync_options._vfs.file_suffix ());
     }
 
-    void ProcessDirectoryJob.chop_virtual_file_suffix (string &str) {
+    void ProcessDirectoryJob.chop_virtual_file_suffix (string str) {
         if (!is_vfs_with_suffix ())
             return;
         bool has_suffix = has_virtual_file_suffix (str);
@@ -1883,7 +1882,7 @@ signals:
         connect (server_job, &DiscoverySingleDirectoryJob.etag, this, &ProcessDirectoryJob.etag);
         _discovery_data._currently_active_jobs++;
         _pending_async_jobs++;
-        connect (server_job, &DiscoverySingleDirectoryJob.finished, this, [this, server_job] (auto &results) {
+        connect (server_job, &DiscoverySingleDirectoryJob.on_finished, this, [this, server_job] (auto &results) {
             _discovery_data._currently_active_jobs--;
             _pending_async_jobs--;
             if (results) {
@@ -1907,7 +1906,7 @@ signals:
                     // Similarly, the server might also return 404 or 50x in case of bugs. #7199 #7586
                     _dir_item._instruction = CSYNC_INSTRUCTION_IGNORE;
                     _dir_item._error_string = results.error ().message;
-                    emit this.finished ();
+                    emit this.on_finished ();
                 } else {
                     // Fatal for the root job since it has no SyncFileItem, or for the network errors
                     emit _discovery_data.fatal_error (tr ("Server replied with an error while reading directory \"%1\" : %2")
@@ -1919,7 +1918,7 @@ signals:
             [this] (RemotePermissions &perms) {
                 _root_permissions = perms;
             });
-        server_job.start ();
+        server_job.on_start ();
         return server_job;
     }
 
@@ -1936,30 +1935,30 @@ signals:
             _child_ignored = b;
         });
 
-        connect (local_job, &DiscoverySingleLocalDirectoryJob.finished_fatal_error, this, [this] (string &msg) {
+        connect (local_job, &DiscoverySingleLocalDirectoryJob.finished_fatal_error, this, [this] (string msg) {
             _discovery_data._currently_active_jobs--;
             _pending_async_jobs--;
             if (_server_job)
-                _server_job.abort ();
+                _server_job.on_abort ();
 
             emit _discovery_data.fatal_error (msg);
         });
 
-        connect (local_job, &DiscoverySingleLocalDirectoryJob.finished_non_fatal_error, this, [this] (string &msg) {
+        connect (local_job, &DiscoverySingleLocalDirectoryJob.finished_non_fatal_error, this, [this] (string msg) {
             _discovery_data._currently_active_jobs--;
             _pending_async_jobs--;
 
             if (_dir_item) {
                 _dir_item._instruction = CSYNC_INSTRUCTION_IGNORE;
                 _dir_item._error_string = msg;
-                emit this.finished ();
+                emit this.on_finished ();
             } else {
                 // Fatal for the root job since it has no SyncFileItem
                 emit _discovery_data.fatal_error (msg);
             }
         });
 
-        connect (local_job, &DiscoverySingleLocalDirectoryJob.finished, this, [this] (auto &results) {
+        connect (local_job, &DiscoverySingleLocalDirectoryJob.on_finished, this, [this] (auto &results) {
             _discovery_data._currently_active_jobs--;
             _pending_async_jobs--;
 
@@ -1971,7 +1970,7 @@ signals:
         });
 
         QThreadPool *pool = QThreadPool.global_instance ();
-        pool.start (local_job); // QThreadPool takes ownership
+        pool.on_start (local_job); // QThreadPool takes ownership
     }
 
     bool ProcessDirectoryJob.is_vfs_with_suffix () {

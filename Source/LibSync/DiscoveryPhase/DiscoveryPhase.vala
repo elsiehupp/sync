@@ -18,7 +18,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
 // #include <GLib.Object>
 // #include <QElapsedTimer>
-// #include <QStringList>
+// #include <string[]>
 // #include <csync.h>
 // #include <QMap>
 // #include <QSet>
@@ -44,9 +44,9 @@ struct RemoteInfo {
     FileName of the entry (this does not contains any directory or path, just the plain name
     ***********************************************************/
     string name;
-    QByteArray etag;
-    QByteArray file_id;
-    QByteArray checksum_header;
+    GLib.ByteArray etag;
+    GLib.ByteArray file_id;
+    GLib.ByteArray checksum_header;
     Occ.RemotePermissions remote_perm;
     time_t modtime = 0;
     int64_t size = 0;
@@ -88,23 +88,22 @@ struct LocalInfo {
 @ingroup libsync
 ***********************************************************/
 class DiscoverySingleLocalDirectoryJob : GLib.Object, public QRunnable {
-public:
-    DiscoverySingleLocalDirectoryJob (AccountPtr &account, string &local_path, Occ.Vfs *vfs, GLib.Object *parent = nullptr);
 
-    void run () override;
+    public DiscoverySingleLocalDirectoryJob (AccountPtr &account, string local_path, Occ.Vfs *vfs, GLib.Object *parent = nullptr);
+
+    public void run () override;
 signals:
-    void finished (QVector<LocalInfo> result);
+    void on_finished (QVector<LocalInfo> result);
     void finished_fatal_error (string error_string);
     void finished_non_fatal_error (string error_string);
 
     void item_discovered (SyncFileItemPtr item);
     void child_ignored (bool b);
-private slots:
-private:
-    string _local_path;
-    AccountPtr _account;
-    Occ.Vfs* _vfs;
-public:
+
+    private string _local_path;
+    private AccountPtr _account;
+    private Occ.Vfs* _vfs;
+
 };
 
 /***********************************************************
@@ -113,52 +112,52 @@ public:
 @ingroup libsync
 ***********************************************************/
 class DiscoverySingleDirectoryJob : GLib.Object {
-public:
-    DiscoverySingleDirectoryJob (AccountPtr &account, string &path, GLib.Object *parent = nullptr);
+
+    public DiscoverySingleDirectoryJob (AccountPtr &account, string path, GLib.Object *parent = nullptr);
     // Specify that this is the root and we need to check the data-fingerprint
-    void set_is_root_path () {
+    public void set_is_root_path () {
         _is_root_path = true;
     }
-    void start ();
-    void abort ();
+    public void on_start ();
+    public void on_abort ();
 
     // This is not actually a network job, it is just a job
 signals:
     void first_directory_permissions (RemotePermissions);
-    void etag (QByteArray &, QDateTime &time);
+    void etag (GLib.ByteArray &, QDateTime &time);
     void finished (HttpResult<QVector<RemoteInfo>> &result);
 
-private slots:
-    void directory_listing_iterated_slot (string &, QMap<string, string> &);
-    void ls_job_finished_without_error_slot ();
-    void ls_job_finished_with_error_slot (QNetworkReply *);
-    void fetch_e2e_metadata ();
-    void metadata_received (QJsonDocument &json, int status_code);
-    void metadata_error (QByteArray& file_id, int http_return_code);
 
-private:
-    QVector<RemoteInfo> _results;
-    string _sub_path;
-    QByteArray _first_etag;
-    QByteArray _file_id;
-    QByteArray _local_file_id;
-    AccountPtr _account;
+    private void on_directory_listing_iterated_slot (string , QMap<string, string> &);
+    private void on_ls_job_finished_without_error_slot ();
+    private void on_ls_job_finished_with_error_slot (QNetworkReply *);
+    private void on_fetch_e2e_metadata ();
+    private void on_metadata_received (QJsonDocument &json, int status_code);
+    private void on_metadata_error (GLib.ByteArray& file_id, int http_return_code);
+
+
+    private QVector<RemoteInfo> _results;
+    private string _sub_path;
+    private GLib.ByteArray _first_etag;
+    private GLib.ByteArray _file_id;
+    private GLib.ByteArray _local_file_id;
+    private AccountPtr _account;
     // The first result is for the directory itself and need to be ignored.
     // This flag is true if it was already ignored.
-    bool _ignored_first;
+    private bool _ignored_first;
     // Set to true if this is the root path and we need to check the data-fingerprint
-    bool _is_root_path;
+    private bool _is_root_path;
     // If this directory is an external storage (The first item has 'M' in its permission)
-    bool _is_external_storage;
+    private bool _is_external_storage;
     // If this directory is e2ee
-    bool _is_e2e_encrypted;
+    private bool _is_e2e_encrypted;
     // If set, the discovery will finish with an error
-    int64_t _size = 0;
-    string _error;
-    QPointer<LsColJob> _ls_col_job;
+    private int64_t _size = 0;
+    private string _error;
+    private QPointer<LsColJob> _ls_col_job;
 
-public:
-    QByteArray _data_fingerprint;
+
+    private public GLib.ByteArray _data_fingerprint;
 };
 
 class DiscoveryPhase : GLib.Object {
@@ -181,7 +180,7 @@ class DiscoveryPhase : GLib.Object {
 
     If a folder is deleted and must be recursed into, its job isn't
     executed immediately. Instead it's queued here and only run
-    once the rest of the discovery has finished and we are certain
+    once the rest of the discovery has on_finished and we are certain
     that the folder wasn't just renamed. This avoids running the
     discovery on contents in the old location of renamed folders.
 
@@ -209,23 +208,23 @@ class DiscoveryPhase : GLib.Object {
     Useful for avoiding processing of items that have already been claimed in
     a rename (would otherwise be discovered as deletions).
     ***********************************************************/
-    bool is_renamed (string &p) {
+    bool is_renamed (string p) {
         return _renamed_items_local.contains (p) || _renamed_items_remote.contains (p);
     }
 
     int _currently_active_jobs = 0;
 
     // both must contain a sorted list
-    QStringList _selective_sync_black_list;
-    QStringList _selective_sync_white_list;
+    string[] _selective_sync_black_list;
+    string[] _selective_sync_white_list;
 
     void schedule_more_jobs ();
 
-    bool is_in_selective_sync_black_list (string &path) const;
+    bool is_in_selective_sync_black_list (string path);
 
     // Check if the new folder should be deselected or not.
     // May be async. "Return" via the callback, true if the item is blacklisted
-    void check_selective_sync_new_folder (string &path, RemotePermissions rp,
+    void check_selective_sync_new_folder (string path, RemotePermissions rp,
         std.function<void (bool)> callback);
 
     /***********************************************************
@@ -234,13 +233,13 @@ class DiscoveryPhase : GLib.Object {
     Note that it only considers parent directory renames. So if A/B got renamed to C/D,
     checking A/B/file would yield C/D/file, but checking A/B would yield A/B.
     ***********************************************************/
-    string adjust_renamed_path (string &original, SyncFileItem.Direction) const;
+    string adjust_renamed_path (string original, SyncFileItem.Direction);
 
     /***********************************************************
-    If the db-path is scheduled for deletion, abort it.
+    If the db-path is scheduled for deletion, on_abort it.
 
     Check if there is already a job to delete that item:
-    If that's not the case, return { false, QByteArray () }.
+    If that's not the case, return { false, GLib.ByteArray () }.
     If there is such a job, cancel that job and return true and the old etag.
 
     Used when having detected a rename : The rename source
@@ -248,53 +247,52 @@ class DiscoveryPhase : GLib.Object {
 
     See _deleted_item and _queued_deleted_directories.
     ***********************************************************/
-    QPair<bool, QByteArray> find_and_cancel_deleted_job (string &original_path);
+    QPair<bool, GLib.ByteArray> find_and_cancel_deleted_job (string original_path);
 
-public:
     // input
-    string _local_dir; // absolute path to the local directory. ends with '/'
-    string _remote_folder; // remote folder, ends with '/'
-    SyncJournalDb *_statedb;
-    AccountPtr _account;
-    SyncOptions _sync_options;
-    ExcludedFiles *_excludes;
-    QRegularExpression _invalid_filename_rx; // FIXME : maybe move in ExcludedFiles
-    QStringList _server_blacklisted_files; // The blacklist from the capabilities
-    bool _ignore_hidden_files = false;
-    std.function<bool (string &)> _should_discover_localy;
+    public string _local_dir; // absolute path to the local directory. ends with '/'
+    public string _remote_folder; // remote folder, ends with '/'
+    public SyncJournalDb _statedb;
+    public AccountPtr _account;
+    public SyncOptions _sync_options;
+    public ExcludedFiles _excludes;
+    public QRegularExpression _invalid_filename_rx; // FIXME : maybe move in ExcludedFiles
+    public string[] _server_blacklisted_files; // The blacklist from the capabilities
+    public bool _ignore_hidden_files = false;
+    public std.function<bool (string )> _should_discover_localy;
 
-    void start_job (ProcessDirectoryJob *);
+    public void start_job (ProcessDirectoryJob *);
 
-    void set_selective_sync_black_list (QStringList &list);
-    void set_selective_sync_white_list (QStringList &list);
+    public void set_selective_sync_black_list (string[] &list);
+    public void set_selective_sync_white_list (string[] &list);
 
     // output
-    QByteArray _data_fingerprint;
-    bool _another_sync_needed = false;
+    public GLib.ByteArray _data_fingerprint;
+    public bool _another_sync_needed = false;
 
 signals:
-    void fatal_error (string &error_string);
+    void fatal_error (string error_string);
     void item_discovered (SyncFileItemPtr &item);
-    void finished ();
+    void on_finished ();
 
     // A new folder was discovered and was not synced because of the confirmation feature
-    void new_big_folder (string &folder, bool is_external);
+    void new_big_folder (string folder, bool is_external);
 
     /***********************************************************
     For excluded items that don't show up in item_discovered ()
 
     The path is relative to the sync folder, similar to item._file
     ***********************************************************/
-    void silently_excluded (string &folder_path);
+    void silently_excluded (string folder_path);
 
-    void add_error_to_gui (SyncFileItem.Status status, string &error_message, string &subject);
+    void add_error_to_gui (SyncFileItem.Status status, string error_message, string subject);
 };
 
 /// Implementation of DiscoveryPhase.adjust_renamed_path
-string adjust_renamed_path (QMap<string, string> &renamed_items, string &original);
+string adjust_renamed_path (QMap<string, string> &renamed_items, string original);
 
     /* Given a sorted list of paths ending with '/', return whether or not the given path is within one of the paths of the list*/
-    static bool find_path_in_list (QStringList &list, string &path) {
+    static bool find_path_in_list (string[] &list, string path) {
         Q_ASSERT (std.is_sorted (list.begin (), list.end ()));
 
         if (list.size () == 1 && list.first () == QLatin1String ("/")) {
@@ -320,7 +318,7 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
         return path_slash.starts_with (*it);
     }
 
-    bool DiscoveryPhase.is_in_selective_sync_black_list (string &path) {
+    bool DiscoveryPhase.is_in_selective_sync_black_list (string path) {
         if (_selective_sync_black_list.is_empty ()) {
             // If there is no black list, everything is allowed
             return false;
@@ -334,13 +332,13 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
         return false;
     }
 
-    void DiscoveryPhase.check_selective_sync_new_folder (string &path, RemotePermissions remote_perm,
+    void DiscoveryPhase.check_selective_sync_new_folder (string path, RemotePermissions remote_perm,
         std.function<void (bool)> callback) {
         if (_sync_options._confirm_external_storage && _sync_options._vfs.mode () == Vfs.Off
             && remote_perm.has_permission (RemotePermissions.IsMounted)) {
             // external storage.
 
-            // Note: DiscoverySingleDirectoryJob.directory_listing_iterated_slot make sure that only the
+            // Note: DiscoverySingleDirectoryJob.on_directory_listing_iterated_slot make sure that only the
             // root of a mounted storage has 'M', all sub entries have 'm'
 
             // Only allow it if the white list contains exactly this path (not parents)
@@ -366,7 +364,7 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
 
         // do a PROPFIND to know the size of this folder
         auto propfind_job = new PropfindJob (_account, _remote_folder + path, this);
-        propfind_job.set_properties (QList<QByteArray> () << "resourcetype"
+        propfind_job.set_properties (GLib.List<GLib.ByteArray> () << "resourcetype"
                                                        << "http://owncloud.org/ns:size");
         GLib.Object.connect (propfind_job, &PropfindJob.finished_with_error,
             this, [=] {
@@ -390,17 +388,17 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
                 return callback (false);
             }
         });
-        propfind_job.start ();
+        propfind_job.on_start ();
     }
 
     /***********************************************************
     Given a path on the remote, give the path as it is when the rename is done
     ***********************************************************/
-    string DiscoveryPhase.adjust_renamed_path (string &original, SyncFileItem.Direction d) {
+    string DiscoveryPhase.adjust_renamed_path (string original, SyncFileItem.Direction d) {
         return Occ.adjust_renamed_path (d == SyncFileItem.Down ? _renamed_items_remote : _renamed_items_local, original);
     }
 
-    string adjust_renamed_path (QMap<string, string> &renamed_items, string &original) {
+    string adjust_renamed_path (QMap<string, string> &renamed_items, string original) {
         int slash_pos = original.size ();
         while ( (slash_pos = original.last_index_of ('/', slash_pos - 1)) > 0) {
             auto it = renamed_items.const_find (original.left (slash_pos));
@@ -411,9 +409,9 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
         return original;
     }
 
-    QPair<bool, QByteArray> DiscoveryPhase.find_and_cancel_deleted_job (string &original_path) {
+    QPair<bool, GLib.ByteArray> DiscoveryPhase.find_and_cancel_deleted_job (string original_path) {
         bool result = false;
-        QByteArray old_etag;
+        GLib.ByteArray old_etag;
         auto it = _deleted_item.find (original_path);
         if (it != _deleted_item.end ()) {
             const SyncInstructions instruction = (*it)._instruction;
@@ -460,32 +458,32 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
 
     void DiscoveryPhase.start_job (ProcessDirectoryJob *job) {
         ENFORCE (!_current_root_job);
-        connect (job, &ProcessDirectoryJob.finished, this, [this, job] {
+        connect (job, &ProcessDirectoryJob.on_finished, this, [this, job] {
             ENFORCE (_current_root_job == sender ());
             _current_root_job = nullptr;
             if (job._dir_item)
                 emit item_discovered (job._dir_item);
             job.delete_later ();
 
-            // Once the main job has finished recurse here to execute the remaining
+            // Once the main job has on_finished recurse here to execute the remaining
             // jobs for queued deleted directories.
             if (!_queued_deleted_directories.is_empty ()) {
                 auto next_job = _queued_deleted_directories.take (_queued_deleted_directories.first_key ());
                 start_job (next_job);
             } else {
-                emit finished ();
+                emit on_finished ();
             }
         });
         _current_root_job = job;
-        job.start ();
+        job.on_start ();
     }
 
-    void DiscoveryPhase.set_selective_sync_black_list (QStringList &list) {
+    void DiscoveryPhase.set_selective_sync_black_list (string[] &list) {
         _selective_sync_black_list = list;
         std.sort (_selective_sync_black_list.begin (), _selective_sync_black_list.end ());
     }
 
-    void DiscoveryPhase.set_selective_sync_white_list (QStringList &list) {
+    void DiscoveryPhase.set_selective_sync_white_list (string[] &list) {
         _selective_sync_white_list = list;
         std.sort (_selective_sync_white_list.begin (), _selective_sync_white_list.end ());
     }
@@ -497,7 +495,7 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
         }
     }
 
-    DiscoverySingleLocalDirectoryJob.DiscoverySingleLocalDirectoryJob (AccountPtr &account, string &local_path, Occ.Vfs *vfs, GLib.Object *parent)
+    DiscoverySingleLocalDirectoryJob.DiscoverySingleLocalDirectoryJob (AccountPtr &account, string local_path, Occ.Vfs *vfs, GLib.Object *parent)
      : GLib.Object (parent), QRunnable (), _local_path (local_path), _account (account), _vfs (vfs) {
         q_register_meta_type<QVector<LocalInfo> > ("QVector<LocalInfo>");
     }
@@ -577,10 +575,10 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
             q_c_warning (lc_discovery) << "closedir failed for file in " << local_path << " - errno : " << errno;
         }
 
-        emit finished (results);
+        emit on_finished (results);
     }
 
-    DiscoverySingleDirectoryJob.DiscoverySingleDirectoryJob (AccountPtr &account, string &path, GLib.Object *parent)
+    DiscoverySingleDirectoryJob.DiscoverySingleDirectoryJob (AccountPtr &account, string path, GLib.Object *parent)
         : GLib.Object (parent)
         , _sub_path (path)
         , _account (account)
@@ -590,11 +588,11 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
         , _is_e2e_encrypted (false) {
     }
 
-    void DiscoverySingleDirectoryJob.start () {
+    void DiscoverySingleDirectoryJob.on_start () {
         // Start the actual HTTP job
         auto *ls_col_job = new LsColJob (_account, _sub_path, this);
 
-        QList<QByteArray> props;
+        GLib.List<GLib.ByteArray> props;
         props << "resourcetype"
               << "getlastmodified"
               << "getcontentlength"
@@ -619,17 +617,17 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
         ls_col_job.set_properties (props);
 
         GLib.Object.connect (ls_col_job, &LsColJob.directory_listing_iterated,
-            this, &DiscoverySingleDirectoryJob.directory_listing_iterated_slot);
-        GLib.Object.connect (ls_col_job, &LsColJob.finished_with_error, this, &DiscoverySingleDirectoryJob.ls_job_finished_with_error_slot);
-        GLib.Object.connect (ls_col_job, &LsColJob.finished_without_error, this, &DiscoverySingleDirectoryJob.ls_job_finished_without_error_slot);
-        ls_col_job.start ();
+            this, &DiscoverySingleDirectoryJob.on_directory_listing_iterated_slot);
+        GLib.Object.connect (ls_col_job, &LsColJob.finished_with_error, this, &DiscoverySingleDirectoryJob.on_ls_job_finished_with_error_slot);
+        GLib.Object.connect (ls_col_job, &LsColJob.finished_without_error, this, &DiscoverySingleDirectoryJob.on_ls_job_finished_without_error_slot);
+        ls_col_job.on_start ();
 
         _ls_col_job = ls_col_job;
     }
 
-    void DiscoverySingleDirectoryJob.abort () {
+    void DiscoverySingleDirectoryJob.on_abort () {
         if (_ls_col_job && _ls_col_job.reply ()) {
-            _ls_col_job.reply ().abort ();
+            _ls_col_job.reply ().on_abort ();
         }
     }
 
@@ -685,7 +683,7 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
         }
     }
 
-    void DiscoverySingleDirectoryJob.directory_listing_iterated_slot (string &file, QMap<string, string> &map) {
+    void DiscoverySingleDirectoryJob.on_directory_listing_iterated_slot (string file, QMap<string, string> &map) {
         if (!_ignored_first) {
             // The first entry is for the folder itself, we should process it differently.
             _ignored_first = true;
@@ -742,32 +740,32 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
         }
     }
 
-    void DiscoverySingleDirectoryJob.ls_job_finished_without_error_slot () {
+    void DiscoverySingleDirectoryJob.on_ls_job_finished_without_error_slot () {
         if (!_ignored_first) {
-            // This is a sanity check, if we haven't _ignored_first then it means we never received any directory_listing_iterated_slot
+            // This is a sanity check, if we haven't _ignored_first then it means we never received any on_directory_listing_iterated_slot
             // which means somehow the server XML was bogus
-            emit finished (HttpError {
+            emit on_finished (HttpError {
                 0, tr ("Server error : PROPFIND reply is not XML formatted!")
             });
             delete_later ();
             return;
         } else if (!_error.is_empty ()) {
-            emit finished (HttpError {
+            emit on_finished (HttpError {
                 0, _error
             });
             delete_later ();
             return;
         } else if (_is_e2e_encrypted) {
             emit etag (_first_etag, QDateTime.from_string (string.from_utf8 (_ls_col_job.response_timestamp ()), Qt.RFC2822Date));
-            fetch_e2e_metadata ();
+            on_fetch_e2e_metadata ();
             return;
         }
         emit etag (_first_etag, QDateTime.from_string (string.from_utf8 (_ls_col_job.response_timestamp ()), Qt.RFC2822Date));
-        emit finished (_results);
+        emit on_finished (_results);
         delete_later ();
     }
 
-    void DiscoverySingleDirectoryJob.ls_job_finished_with_error_slot (QNetworkReply *r) {
+    void DiscoverySingleDirectoryJob.on_ls_job_finished_with_error_slot (QNetworkReply *r) {
         string content_type = r.header (QNetworkRequest.ContentTypeHeader).to_string ();
         int http_code = r.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
         string msg = r.error_string ();
@@ -776,29 +774,29 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
             && !content_type.contains ("application/xml; charset=utf-8")) {
             msg = tr ("Server error : PROPFIND reply is not XML formatted!");
         }
-        emit finished (HttpError {
+        emit on_finished (HttpError {
             http_code, msg
         });
         delete_later ();
     }
 
-    void DiscoverySingleDirectoryJob.fetch_e2e_metadata () {
+    void DiscoverySingleDirectoryJob.on_fetch_e2e_metadata () {
         const auto job = new GetMetadataApiJob (_account, _local_file_id);
         connect (job, &GetMetadataApiJob.json_received,
-                this, &DiscoverySingleDirectoryJob.metadata_received);
+                this, &DiscoverySingleDirectoryJob.on_metadata_received);
         connect (job, &GetMetadataApiJob.error,
-                this, &DiscoverySingleDirectoryJob.metadata_error);
-        job.start ();
+                this, &DiscoverySingleDirectoryJob.on_metadata_error);
+        job.on_start ();
     }
 
-    void DiscoverySingleDirectoryJob.metadata_received (QJsonDocument &json, int status_code) {
+    void DiscoverySingleDirectoryJob.on_metadata_received (QJsonDocument &json, int status_code) {
         q_c_debug (lc_discovery) << "Metadata received, applying it to the result list";
         Q_ASSERT (_sub_path.starts_with ('/'));
 
         const auto metadata = FolderMetadata (_account, json.to_json (QJsonDocument.Compact), status_code);
         const auto encrypted_files = metadata.files ();
 
-        const auto find_encrypted_file = [=] (string &name) {
+        const auto find_encrypted_file = [=] (string name) {
             const auto it = std.find_if (std.cbegin (encrypted_files), std.cend (encrypted_files), [=] (EncryptedFile &file) {
                 return file.encrypted_filename == name;
             });
@@ -820,13 +818,13 @@ string adjust_renamed_path (QMap<string, string> &renamed_items, string &origina
             return result;
         });
 
-        emit finished (_results);
+        emit on_finished (_results);
         delete_later ();
     }
 
-    void DiscoverySingleDirectoryJob.metadata_error (QByteArray &file_id, int http_return_code) {
+    void DiscoverySingleDirectoryJob.on_metadata_error (GLib.ByteArray &file_id, int http_return_code) {
         q_c_warning (lc_discovery) << "E2EE Metadata job error. Trying to proceed without it." << file_id << http_return_code;
-        emit finished (_results);
+        emit on_finished (_results);
         delete_later ();
     }
     }

@@ -48,34 +48,34 @@ class SqlDatabase {
     Q_DISABLE_COPY (SqlDatabase)
 
     public SqlDatabase ();
-    public ~SqlDatabase ();
+    ~SqlDatabase ();
 
     public bool is_open ();
-    public bool open_or_create_read_write (string &filename);
-    public bool open_read_only (string &filename);
+    public bool open_or_create_read_write (string filename);
+    public bool open_read_only (string filename);
     public bool transaction ();
     public bool commit ();
     public void close ();
     public string error ();
     public Sqlite3 *sqlite_db ();
 
-private:
-    enum class CheckDbResult {
+
+    private enum class CheckDbResult {
         Ok,
         Cant_prepare,
         Cant_exec,
         Not_ok,
     };
 
-    bool open_helper (string &filename, int sqlite_flags);
-    CheckDbResult check_db ();
+    private bool open_helper (string filename, int sqlite_flags);
+    private CheckDbResult check_db ();
 
-    Sqlite3 *_db = nullptr;
-    string _error; // last error string
-    int _err_id = 0;
+    private Sqlite3 _db = nullptr;
+    private string _error; // last error string
+    private int _err_id = 0;
 
-    friend class SqlQuery;
-    QSet<SqlQuery> _queries;
+    private friend class SqlQuery;
+    private QSet<SqlQuery> _queries;
 };
 
 /***********************************************************
@@ -107,15 +107,15 @@ class SqlQuery {
 
     public SqlQuery () = default;
     public SqlQuery (SqlDatabase &db);
-    public SqlQuery (QByteArray &sql, SqlDatabase &db);
+    public SqlQuery (GLib.ByteArray &sql, SqlDatabase &db);
     /***********************************************************
     Prepare the SqlQuery.
     If the query was already prepared, this will first call finish (), and re-prepare it.
     This function must only be used if the constructor was setting a SqlDatabase
     ***********************************************************/
-    public int prepare (QByteArray &sql, bool allow_failure = false);
+    public int prepare (GLib.ByteArray &sql, bool allow_failure = false);
 
-    public ~SqlQuery ();
+    ~SqlQuery ();
     public string error ();
     public int error_id ();
 
@@ -125,7 +125,7 @@ class SqlQuery {
     public string string_value (int index);
     public int int_value (int index);
     public uint64 int64Value (int index);
-    public QByteArray ba_value (int index);
+    public GLib.ByteArray ba_value (int index);
     public bool is_select ();
     public bool is_pragma ();
     public bool exec ();
@@ -148,28 +148,28 @@ class SqlQuery {
         bind_value_internal (pos, value);
     }
 
-    public void bind_value (int pos, QByteArray &value) {
+    public void bind_value (int pos, GLib.ByteArray &value) {
         q_c_debug (lc_sql) << "SQL bind" << pos << string.from_utf8 (value);
         bind_value_internal (pos, value);
     }
 
-    public const QByteArray &last_query ();
+    public const GLib.ByteArray &last_query ();
     public int num_rows_affected ();
     public void reset_and_clear_bindings ();
 
-private:
-    void bind_value_internal (int pos, QVariant &value);
-    void finish ();
 
-    SqlDatabase *_sqldb = nullptr;
-    Sqlite3 *_db = nullptr;
-    sqlite3_stmt *_stmt = nullptr;
-    string _error;
-    int _err_id;
-    QByteArray _sql;
+    private void bind_value_internal (int pos, QVariant &value);
+    private void finish ();
 
-    friend class SqlDatabase;
-    friend class PreparedSqlQueryManager;
+    private SqlDatabase _sqldb = nullptr;
+    private Sqlite3 _db = nullptr;
+    private sqlite3_stmt _stmt = nullptr;
+    private string _error;
+    private int _err_id;
+    private GLib.ByteArray _sql;
+
+    private friend class SqlDatabase;
+    private friend class PreparedSqlQueryManager;
 };
 
 
@@ -185,7 +185,7 @@ bool SqlDatabase.is_open () {
     return _db != nullptr;
 }
 
-bool SqlDatabase.open_helper (string &filename, int sqlite_flags) {
+bool SqlDatabase.open_helper (string filename, int sqlite_flags) {
     if (is_open ()) {
         return true;
     }
@@ -243,7 +243,7 @@ SqlDatabase.CheckDbResult SqlDatabase.check_db () {
     return CheckDbResult.Ok;
 }
 
-bool SqlDatabase.open_or_create_read_write (string &filename) {
+bool SqlDatabase.open_or_create_read_write (string filename) {
     if (is_open ()) {
         return true;
     }
@@ -283,7 +283,7 @@ bool SqlDatabase.open_or_create_read_write (string &filename) {
     return true;
 }
 
-bool SqlDatabase.open_read_only (string &filename) {
+bool SqlDatabase.open_read_only (string filename) {
     if (is_open ()) {
         return true;
     }
@@ -358,13 +358,13 @@ SqlQuery.~SqlQuery () {
     }
 }
 
-SqlQuery.SqlQuery (QByteArray &sql, SqlDatabase &db)
+SqlQuery.SqlQuery (GLib.ByteArray &sql, SqlDatabase &db)
     : _sqldb (&db)
     , _db (db.sqlite_db ()) {
     prepare (sql);
 }
 
-int SqlQuery.prepare (QByteArray &sql, bool allow_failure) {
+int SqlQuery.prepare (GLib.ByteArray &sql, bool allow_failure) {
     _sql = sql.trimmed ();
     if (_stmt) {
         finish ();
@@ -394,10 +394,10 @@ int SqlQuery.prepare (QByteArray &sql, bool allow_failure) {
 }
 
 /***********************************************************
-There is no overloads to QByteArray.start_with that takes Qt.CaseInsensitive.
+There is no overloads to GLib.ByteArray.start_with that takes Qt.CaseInsensitive.
 Returns true if 'a' starts with 'b' in a case insensitive way
 ***********************************************************/
-static bool starts_with_insensitive (QByteArray &a, QByteArray &b) {
+static bool starts_with_insensitive (GLib.ByteArray &a, GLib.ByteArray &b) {
     return a.size () >= b.size () && qstrnicmp (a.const_data (), b.const_data (), static_cast<uint> (b.size ())) == 0;
 }
 
@@ -557,8 +557,8 @@ uint64 SqlQuery.int64Value (int index) {
     return sqlite3_column_int64 (_stmt, index);
 }
 
-QByteArray SqlQuery.ba_value (int index) {
-    return QByteArray (static_cast<const char> (sqlite3_column_blob (_stmt, index)),
+GLib.ByteArray SqlQuery.ba_value (int index) {
+    return GLib.ByteArray (static_cast<const char> (sqlite3_column_blob (_stmt, index)),
         sqlite3_column_bytes (_stmt, index));
 }
 
@@ -570,7 +570,7 @@ int SqlQuery.error_id () {
     return _err_id;
 }
 
-const QByteArray &SqlQuery.last_query () {
+const GLib.ByteArray &SqlQuery.last_query () {
     return _sql;
 }
 

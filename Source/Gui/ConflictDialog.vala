@@ -24,26 +24,26 @@ namespace Ui {
 class ConflictDialog : Gtk.Dialog {
 
     public ConflictDialog (Gtk.Widget *parent = nullptr);
-    public ~ConflictDialog () override;
+    ~ConflictDialog () override;
 
     public string base_filename ();
     public string local_version_filename ();
     public string remote_version_filename ();
 
-public slots:
-    void set_base_filename (string &base_filename);
-    void set_local_version_filename (string &local_version_filename);
-    void set_remote_version_filename (string &remote_version_filename);
 
-    void accept () override;
+    public void on_set_base_filename (string base_filename);
+    public void on_set_local_version_filename (string local_version_filename);
+    public void on_set_remote_version_filename (string remote_version_filename);
 
-private:
-    void update_widgets ();
-    void update_button_states ();
+    void on_accept () override;
 
-    string _base_filename;
-    QScopedPointer<Ui.ConflictDialog> _ui;
-    ConflictSolver *_solver;
+
+    private void update_widgets ();
+    private void update_button_states ();
+
+    private string _base_filename;
+    private QScopedPointer<Ui.ConflictDialog> _ui;
+    private ConflictSolver _solver;
 };
 
 } // namespace Occ
@@ -71,7 +71,7 @@ namespace {
         _ui.setup_ui (this);
         force_header_font (_ui.conflict_message);
         _ui.button_box.button (QDialogButtonBox.Ok).set_enabled (false);
-        _ui.button_box.button (QDialogButtonBox.Ok).set_text (tr ("Keep selected version"));
+        _ui.button_box.button (QDialogButtonBox.Ok).on_set_text (tr ("Keep selected version"));
 
         connect (_ui.local_version_radio, &QCheckBox.toggled, this, &ConflictDialog.update_button_states);
         connect (_ui.local_version_button, &QToolButton.clicked, this, [=] {
@@ -101,24 +101,24 @@ namespace {
         return _solver.remote_version_filename ();
     }
 
-    void ConflictDialog.set_base_filename (string &base_filename) {
+    void ConflictDialog.on_set_base_filename (string base_filename) {
         if (_base_filename == base_filename) {
             return;
         }
 
         _base_filename = base_filename;
-        _ui.conflict_message.set_text (tr ("Conflicting versions of %1.").arg (_base_filename));
+        _ui.conflict_message.on_set_text (tr ("Conflicting versions of %1.").arg (_base_filename));
     }
 
-    void ConflictDialog.set_local_version_filename (string &local_version_filename) {
-        _solver.set_local_version_filename (local_version_filename);
+    void ConflictDialog.on_set_local_version_filename (string local_version_filename) {
+        _solver.on_set_local_version_filename (local_version_filename);
     }
 
-    void ConflictDialog.set_remote_version_filename (string &remote_version_filename) {
-        _solver.set_remote_version_filename (remote_version_filename);
+    void ConflictDialog.on_set_remote_version_filename (string remote_version_filename) {
+        _solver.on_set_remote_version_filename (remote_version_filename);
     }
 
-    void ConflictDialog.accept () {
+    void ConflictDialog.on_accept () {
         const auto is_local_picked = _ui.local_version_radio.is_checked ();
         const auto is_remote_picked = _ui.remote_version_radio.is_checked ();
 
@@ -131,20 +131,20 @@ namespace {
                             : is_local_picked ? ConflictSolver.KeepLocalVersion
                             : ConflictSolver.KeepRemoteVersion;
         if (_solver.exec (solution)) {
-            Gtk.Dialog.accept ();
+            Gtk.Dialog.on_accept ();
         }
     }
 
     void ConflictDialog.update_widgets () {
         QMimeDatabase mime_db;
 
-        const auto update_group = [this, &mime_db] (string &filename, QLabel *link_label, string &link_text, QLabel *mtime_label, QLabel *size_label, QToolButton *button) {
+        const auto update_group = [this, &mime_db] (string filename, QLabel *link_label, string link_text, QLabel *mtime_label, QLabel *size_label, QToolButton *button) {
             const auto file_url = QUrl.from_local_file (filename).to_string ();
-            link_label.set_text (QStringLiteral ("<a href='%1'>%2</a>").arg (file_url).arg (link_text));
+            link_label.on_set_text (QStringLiteral ("<a href='%1'>%2</a>").arg (file_url).arg (link_text));
 
             const auto info = QFileInfo (filename);
-            mtime_label.set_text (info.last_modified ().to_string ());
-            size_label.set_text (locale ().formatted_data_size (info.size ()));
+            mtime_label.on_set_text (info.last_modified ().to_string ());
+            size_label.on_set_text (locale ().formatted_data_size (info.size ()));
 
             const auto mime = mime_db.mime_type_for_file (filename);
             if (QIcon.has_theme_icon (mime.icon_name ())) {
@@ -186,7 +186,7 @@ namespace {
                         : is_local_picked ? tr ("Keep local version")
                         : is_remote_picked ? tr ("Keep server version")
                         : tr ("Keep selected version");
-        _ui.button_box.button (QDialogButtonBox.Ok).set_text (text);
+        _ui.button_box.button (QDialogButtonBox.Ok).on_set_text (text);
     }
 
     } // namespace Occ

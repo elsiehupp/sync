@@ -71,7 +71,7 @@ class Result {
         return *this;
     }
 
-    public ~Result () {
+    ~Result () {
         if (_is_error)
             _error.~Error ();
         else
@@ -82,7 +82,7 @@ class Result {
         return !_is_error;
     }
 
-    public const T &operator* () const & {
+    public const T &operator* () & {
         ASSERT (!_is_error);
         return _result;
     }
@@ -102,7 +102,7 @@ class Result {
         return _result;
     }
 
-    public const Error &error () const & {
+    public const Error &error () & {
         ASSERT (_is_error);
         return _error;
     }

@@ -19,31 +19,31 @@ namespace Occ {
 Q_DECLARE_LOGGING_CATEGORY (lc_updater)
 
 class Updater : GLib.Object {
-public:
-    struct Helper {
-        static int64 string_version_to_int (string &version);
+
+    public struct Helper {
+        static int64 string_version_to_int (string version);
         static int64 current_version_to_int ();
         static int64 version_to_int (int64 major, int64 minor, int64 patch, int64 build);
     };
 
-    static Updater *instance ();
-    static QUrl update_url ();
+    public static Updater *instance ();
+    public static QUrl update_url ();
 
-    virtual void check_for_update () = 0;
-    virtual void background_check_for_update () = 0;
-    virtual bool handle_startup () = 0;
+    public virtual void check_for_update () = 0;
+    public virtual void background_check_for_update () = 0;
+    public virtual bool handle_startup () = 0;
 
-protected:
-    static string client_version ();
-    Updater ()
+
+    protected static string client_version ();
+    protected Updater ()
         : GLib.Object (nullptr) {
     }
 
-private:
-    static string get_system_info ();
-    static QUrlQuery get_query_params ();
-    static Updater *create ();
-    static Updater *_instance;
+
+    private static string get_system_info ();
+    private static QUrlQuery get_query_params ();
+    private static Updater *create ();
+    private static Updater _instance;
 };
 
 
@@ -118,11 +118,11 @@ private:
     string Updater.get_system_info () {
     #ifdef Q_OS_LINUX
         QProcess process;
-        process.start (QLatin1String ("lsb_release"), {
+        process.on_start (QLatin1String ("lsb_release"), {
             QStringLiteral ("-a")
         });
         process.wait_for_finished ();
-        QByteArray output = process.read_all_standard_output ();
+        GLib.ByteArray output = process.read_all_standard_output ();
         q_c_debug (lc_updater) << "Sys Info size : " << output.length ();
         if (output.length () > 1024)
             output.clear (); // don't send too much.
@@ -154,10 +154,10 @@ private:
             MIRALL_VERSION_PATCH, MIRALL_VERSION_BUILD);
     }
 
-    int64 Updater.Helper.string_version_to_int (string &version) {
+    int64 Updater.Helper.string_version_to_int (string version) {
         if (version.is_empty ())
             return 0;
-        QByteArray ba_version = version.to_latin1 ();
+        GLib.ByteArray ba_version = version.to_latin1 ();
         int major = 0, minor = 0, patch = 0, build = 0;
         sscanf (ba_version, "%d.%d.%d.%d", &major, &minor, &patch, &build);
         return version_to_int (major, minor, patch, build);

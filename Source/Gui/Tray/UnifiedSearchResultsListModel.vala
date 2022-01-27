@@ -29,7 +29,7 @@ class Unified_search_results_list_model : QAbstractListModel {
     Q_PROPERTY (string current_fetch_more_in_progress_provider_id READ current_fetch_more_in_progress_provider_id NOTIFY
             current_fetch_more_in_progress_provider_id_changed)
     Q_PROPERTY (string error_string READ error_string NOTIFY error_string_changed)
-    Q_PROPERTY (string search_term READ search_term WRITE set_search_term NOTIFY search_term_changed)
+    Q_PROPERTY (string search_term READ search_term WRITE on_set_search_term NOTIFY search_term_changed)
 
     struct Unified_search_provider {
         string _id;
@@ -40,8 +40,8 @@ class Unified_search_results_list_model : QAbstractListModel {
         int32 _order = std.numeric_limits<int32>.max (); // sorting order (smaller number has bigger priority)
     };
 
-public:
-    enum Data_role {
+
+    public enum Data_role {
         Provider_name_role = Qt.User_role + 1,
         Provider_id_role,
         Image_placeholder_role,
@@ -54,39 +54,39 @@ public:
         Type_as_string_role,
     };
 
-    Unified_search_results_list_model (AccountState *account_state, GLib.Object *parent = nullptr);
+    public Unified_search_results_list_model (AccountState *account_state, GLib.Object *parent = nullptr);
 
-    QVariant data (QModelIndex &index, int role) const override;
-    int row_count (QModelIndex &parent = QModelIndex ()) const override;
+    public QVariant data (QModelIndex &index, int role) override;
+    public int row_count (QModelIndex &parent = QModelIndex ()) override;
 
-    bool is_search_in_progress ();
+    public bool is_search_in_progress ();
 
-    string current_fetch_more_in_progress_provider_id ();
-    string search_term ();
-    string error_string ();
+    public string current_fetch_more_in_progress_provider_id ();
+    public string search_term ();
+    public string error_string ();
 
-    Q_INVOKABLE void result_clicked (string &provider_id, QUrl &resource_url) const;
-    Q_INVOKABLE void fetch_more_trigger_clicked (string &provider_id);
+    public void result_clicked (string provider_id, QUrl resource_url);
+    public void fetch_more_trigger_clicked (string provider_id);
 
-    QHash<int, QByteArray> role_names () const override;
+    public QHash<int, GLib.ByteArray> role_names () override;
 
-private:
-    void start_search ();
-    void start_search_for_provider (string &provider_id, int32 cursor = -1);
 
-    void parse_results_for_provider (QJsonObject &data, string &provider_id, bool fetched_more = false);
+    private void start_search ();
+    private void start_search_for_provider (string provider_id, int32 cursor = -1);
+
+    private void parse_results_for_provider (QJsonObject &data, string provider_id, bool fetched_more = false);
 
     // append initial search results to the list
-    void append_results (QVector<Unified_search_result> results, Unified_search_provider &provider);
+    private void append_results (QVector<Unified_search_result> results, Unified_search_provider &provider);
 
     // append pagination results to existing results from the initial search
-    void append_results_to_provider (QVector<Unified_search_result> &results, Unified_search_provider &provider);
+    private void append_results_to_provider (QVector<Unified_search_result> &results, Unified_search_provider &provider);
 
-    void remove_fetch_more_trigger (string &provider_id);
+    private void remove_fetch_more_trigger (string provider_id);
 
-    void disconnect_and_clear_search_jobs ();
+    private void disconnect_and_clear_search_jobs ();
 
-    void clear_current_fetch_more_in_progress_provider_id ();
+    private void clear_current_fetch_more_in_progress_provider_id ();
 
 signals:
     void current_fetch_more_in_progress_provider_id_changed ();
@@ -94,28 +94,28 @@ signals:
     void error_string_changed ();
     void search_term_changed ();
 
-public slots:
-    void set_search_term (string &term);
 
-private slots:
-    void slot_search_term_editing_finished ();
-    void slot_fetch_providers_finished (QJsonDocument &json, int status_code);
-    void slot_search_for_provider_finished (QJsonDocument &json, int status_code);
+    public void on_set_search_term (string term);
 
-private:
-    QMap<string, Unified_search_provider> _providers;
-    QVector<Unified_search_result> _results;
 
-    string _search_term;
-    string _error_string;
+    private void on_search_term_editing_finished ();
+    private void on_fetch_providers_finished (QJsonDocument &json, int status_code);
+    private void on_search_for_provider_finished (QJsonDocument &json, int status_code);
 
-    string _current_fetch_more_in_progress_provider_id;
 
-    QMap<string, QMetaObject.Connection> _search_job_connections;
+    private QMap<string, Unified_search_provider> _providers;
+    private QVector<Unified_search_result> _results;
 
-    QTimer _unified_search_text_editing_finished_timer;
+    private string _search_term;
+    private string _error_string;
 
-    AccountState *_account_state = nullptr;
+    private string _current_fetch_more_in_progress_provider_id;
+
+    private QMap<string, QMetaObject.Connection> _search_job_connections;
+
+    private QTimer _unified_search_text_editing_finished_timer;
+
+    private AccountState _account_state = nullptr;
 };
 }
 
@@ -127,7 +127,7 @@ private:
 
 
 namespace {
-    string image_placeholder_url_for_provider_id (string &provider_id) {
+    string image_placeholder_url_for_provider_id (string provider_id) {
         if (provider_id.contains (QStringLiteral ("message"), Qt.CaseInsensitive)
             || provider_id.contains (QStringLiteral ("talk"), Qt.CaseInsensitive)) {
             return QStringLiteral ("qrc:///client/theme/black/wizard-talk.svg");
@@ -146,7 +146,7 @@ namespace {
         return QStringLiteral ("qrc:///client/theme/change.svg");
     }
 
-    string local_icon_path_from_icon_prefix (string &icon_name_with_prefix) {
+    string local_icon_path_from_icon_prefix (string icon_name_with_prefix) {
         if (icon_name_with_prefix.contains (QStringLiteral ("message"), Qt.CaseInsensitive)
             || icon_name_with_prefix.contains (QStringLiteral ("talk"), Qt.CaseInsensitive)) {
             return QStringLiteral (":/client/theme/black/wizard-talk.svg");
@@ -165,7 +165,7 @@ namespace {
         return QStringLiteral (":/client/theme/change.svg");
     }
 
-    string icon_url_for_default_icon_name (string &default_icon_name) {
+    string icon_url_for_default_icon_name (string default_icon_name) {
         const QUrl url_for_icon{default_icon_name};
 
         if (url_for_icon.is_valid () && !url_for_icon.scheme ().is_empty ()) {
@@ -199,16 +199,16 @@ namespace {
         return QStringLiteral (":/client/theme/change.svg");
     }
 
-    string generate_url_for_thumbnail (string &thumbnail_url, QUrl &server_url) {
+    string generate_url_for_thumbnail (string thumbnail_url, QUrl server_url) {
         auto server_url_copy = server_url;
         auto thumbnail_url_copy = thumbnail_url;
 
         if (thumbnail_url_copy.starts_with (QLatin1Char ('/')) || thumbnail_url_copy.starts_with (QLatin1Char ('\\'))) {
             // relative image resource URL, just needs some concatenation with current server URL
             // some icons may contain parameters after (?)
-            const QStringList thumbnail_url_copy_splitted = thumbnail_url_copy.contains (QLatin1Char ('?'))
+            const string[] thumbnail_url_copy_splitted = thumbnail_url_copy.contains (QLatin1Char ('?'))
                 ? thumbnail_url_copy.split (QLatin1Char ('?'), Qt.Skip_empty_parts)
-                : QStringList{thumbnail_url_copy};
+                : string[]{thumbnail_url_copy};
             Q_ASSERT (!thumbnail_url_copy_splitted.is_empty ());
             server_url_copy.set_path (thumbnail_url_copy_splitted[0]);
             thumbnail_url_copy = server_url_copy.to_string ();
@@ -220,7 +220,7 @@ namespace {
         return thumbnail_url_copy;
     }
 
-    string generate_url_for_icon (string &fallack_icon, QUrl &server_url) {
+    string generate_url_for_icon (string fallack_icon, QUrl server_url) {
         auto server_url_copy = server_url;
 
         auto fallack_icon_copy = fallack_icon;
@@ -228,8 +228,8 @@ namespace {
         if (fallack_icon_copy.starts_with (QLatin1Char ('/')) || fallack_icon_copy.starts_with (QLatin1Char ('\\'))) {
             // relative image resource URL, just needs some concatenation with current server URL
             // some icons may contain parameters after (?)
-            const QStringList fallack_icon_path_splitted =
-                fallack_icon_copy.contains (QLatin1Char ('?')) ? fallack_icon_copy.split (QLatin1Char ('?')) : QStringList{fallack_icon_copy};
+            const string[] fallack_icon_path_splitted =
+                fallack_icon_copy.contains (QLatin1Char ('?')) ? fallack_icon_copy.split (QLatin1Char ('?')) : string[]{fallack_icon_copy};
             Q_ASSERT (!fallack_icon_path_splitted.is_empty ());
             server_url_copy.set_path (fallack_icon_path_splitted[0]);
             fallack_icon_copy = server_url_copy.to_string ();
@@ -247,13 +247,13 @@ namespace {
         return fallack_icon_copy;
     }
 
-    string icons_from_thumbnail_and_fallback_icon (string &thumbnail_url, string &fallack_icon, QUrl &server_url) {
+    string icons_from_thumbnail_and_fallback_icon (string thumbnail_url, string fallack_icon, QUrl server_url) {
         if (thumbnail_url.is_empty () && fallack_icon.is_empty ()) {
             return {};
         }
 
         if (server_url.is_empty ()) {
-            const QStringList list_images = {thumbnail_url, fallack_icon};
+            const string[] list_images = {thumbnail_url, fallack_icon};
             return list_images.join (QLatin1Char (';'));
         }
 
@@ -268,7 +268,7 @@ namespace {
             return url_for_thumbnail;
         }
 
-        const QStringList list_images{url_for_thumbnail, url_for_fallack_icon};
+        const string[] list_images{url_for_thumbnail, url_for_fallack_icon};
         return list_images.join (QLatin1Char (';'));
     }
 
@@ -319,7 +319,7 @@ namespace {
         return _results.size ();
     }
 
-    QHash<int, QByteArray> Unified_search_results_list_model.role_names () {
+    QHash<int, GLib.ByteArray> Unified_search_results_list_model.role_names () {
         auto roles = QAbstractListModel.role_names ();
         roles[Provider_name_role] = "provider_name";
         roles[Provider_id_role] = "provider_id";
@@ -346,7 +346,7 @@ namespace {
         return _current_fetch_more_in_progress_provider_id;
     }
 
-    void Unified_search_results_list_model.set_search_term (string &term) {
+    void Unified_search_results_list_model.on_set_search_term (string term) {
         if (term == _search_term) {
             return;
         }
@@ -364,7 +364,7 @@ namespace {
         clear_current_fetch_more_in_progress_provider_id ();
 
         disconnect (&_unified_search_text_editing_finished_timer, &QTimer.timeout, this,
-            &Unified_search_results_list_model.slot_search_term_editing_finished);
+            &Unified_search_results_list_model.on_search_term_editing_finished);
 
         if (_unified_search_text_editing_finished_timer.is_active ()) {
             _unified_search_text_editing_finished_timer.stop ();
@@ -373,8 +373,8 @@ namespace {
         if (!_search_term.is_empty ()) {
             _unified_search_text_editing_finished_timer.set_interval (search_term_editing_finished_search_start_delay);
             connect (&_unified_search_text_editing_finished_timer, &QTimer.timeout, this,
-                &Unified_search_results_list_model.slot_search_term_editing_finished);
-            _unified_search_text_editing_finished_timer.start ();
+                &Unified_search_results_list_model.on_search_term_editing_finished);
+            _unified_search_text_editing_finished_timer.on_start ();
         }
 
         if (!_results.is_empty ()) {
@@ -388,7 +388,7 @@ namespace {
         return !_search_job_connections.is_empty ();
     }
 
-    void Unified_search_results_list_model.result_clicked (string &provider_id, QUrl &resource_url) {
+    void Unified_search_results_list_model.result_clicked (string provider_id, QUrl resource_url) {
         const QUrlQuery url_query{resource_url};
         const auto dir = url_query.query_item_value (QStringLiteral ("dir"), QUrl.Component_formatting_option.Fully_decoded);
         const auto file_name =
@@ -412,7 +412,7 @@ namespace {
         Utility.open_browser (resource_url);
     }
 
-    void Unified_search_results_list_model.fetch_more_trigger_clicked (string &provider_id) {
+    void Unified_search_results_list_model.fetch_more_trigger_clicked (string provider_id) {
         if (is_search_in_progress () || !_current_fetch_more_in_progress_provider_id.is_empty ()) {
             return;
         }
@@ -427,25 +427,25 @@ namespace {
         }
     }
 
-    void Unified_search_results_list_model.slot_search_term_editing_finished () {
+    void Unified_search_results_list_model.on_search_term_editing_finished () {
         disconnect (&_unified_search_text_editing_finished_timer, &QTimer.timeout, this,
-            &Unified_search_results_list_model.slot_search_term_editing_finished);
+            &Unified_search_results_list_model.on_search_term_editing_finished);
 
         if (!_account_state || !_account_state.account ()) {
-            q_c_critical (lc_unified_search) << string ("Account state is invalid. Could not start search!");
+            q_c_critical (lc_unified_search) << string ("Account state is invalid. Could not on_start search!");
             return;
         }
 
         if (_providers.is_empty ()) {
             auto job = new JsonApiJob (_account_state.account (), QLatin1String ("ocs/v2.php/search/providers"));
-            GLib.Object.connect (job, &JsonApiJob.json_received, this, &Unified_search_results_list_model.slot_fetch_providers_finished);
-            job.start ();
+            GLib.Object.connect (job, &JsonApiJob.json_received, this, &Unified_search_results_list_model.on_fetch_providers_finished);
+            job.on_start ();
         } else {
             start_search ();
         }
     }
 
-    void Unified_search_results_list_model.slot_fetch_providers_finished (QJsonDocument &json, int status_code) {
+    void Unified_search_results_list_model.on_fetch_providers_finished (QJsonDocument &json, int status_code) {
         const auto job = qobject_cast<JsonApiJob> (sender ());
 
         if (!job) {
@@ -487,7 +487,7 @@ namespace {
         }
     }
 
-    void Unified_search_results_list_model.slot_search_for_provider_finished (QJsonDocument &json, int status_code) {
+    void Unified_search_results_list_model.on_search_for_provider_finished (QJsonDocument &json, int status_code) {
         Q_ASSERT (_account_state && _account_state.account ());
 
         const auto job = qobject_cast<JsonApiJob> (sender ());
@@ -554,7 +554,7 @@ namespace {
         }
     }
 
-    void Unified_search_results_list_model.start_search_for_provider (string &provider_id, int32 cursor) {
+    void Unified_search_results_list_model.start_search_for_provider (string provider_id, int32 cursor) {
         Q_ASSERT (_account_state && _account_state.account ());
 
         if (!_account_state || !_account_state.account ()) {
@@ -575,14 +575,14 @@ namespace {
         const auto was_search_in_progress = is_search_in_progress ();
         _search_job_connections.insert (provider_id,
             GLib.Object.connect (
-                job, &JsonApiJob.json_received, this, &Unified_search_results_list_model.slot_search_for_provider_finished));
+                job, &JsonApiJob.json_received, this, &Unified_search_results_list_model.on_search_for_provider_finished));
         if (is_search_in_progress () && !was_search_in_progress) {
             emit is_search_in_progress_changed ();
         }
-        job.start ();
+        job.on_start ();
     }
 
-    void Unified_search_results_list_model.parse_results_for_provider (QJsonObject &data, string &provider_id, bool fetched_more) {
+    void Unified_search_results_list_model.parse_results_for_provider (QJsonObject &data, string provider_id, bool fetched_more) {
         const auto cursor = data.value (QStringLiteral ("cursor")).to_int ();
         const auto entries = data.value (QStringLiteral ("entries")).to_variant ().to_list ();
 
@@ -622,7 +622,7 @@ namespace {
 
         QVector<Unified_search_result> new_entries;
 
-        const auto make_resource_url = [] (string &resource_url, QUrl &account_url) {
+        const auto make_resource_url = [] (string resource_url, QUrl account_url) {
             QUrl final_resurce_url (resource_url);
             if (final_resurce_url.scheme ().is_empty () && account_url.scheme ().is_empty ()) {
                 final_resurce_url = account_url;
@@ -732,7 +732,7 @@ namespace {
         }
     }
 
-    void Unified_search_results_list_model.remove_fetch_more_trigger (string &provider_id) {
+    void Unified_search_results_list_model.remove_fetch_more_trigger (string provider_id) {
         const auto it_fetch_more_trigger_for_provider_reverse = std.find_if (
             std.rbegin (_results),
             std.rend (_results),
