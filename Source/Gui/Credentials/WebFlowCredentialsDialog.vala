@@ -15,10 +15,14 @@ namespace Occ {
 
 class WebFlowCredentialsDialog : Gtk.Dialog {
 
-    public WebFlowCredentialsDialog (Account *account, bool use_flow2, Gtk.Widget *parent = nullptr);
+    public WebFlowCredentialsDialog (Account account, bool use_flow2, Gtk.Widget parent = nullptr);
 
     public void set_url (QUrl url);
+
+
     public void set_info (string msg);
+
+
     public void set_error (string error);
 
     public bool is_using_flow2 () {
@@ -31,6 +35,8 @@ class WebFlowCredentialsDialog : Gtk.Dialog {
 
 
     public void on_flow_2_auth_result (Flow2Auth.Result, string error_string, string user, string app_password);
+
+
     public void on_show_settings_dialog ();
 
 signals:
@@ -56,7 +62,7 @@ signals:
     private HeaderBanner _header_banner;
 };
 
-WebFlowCredentialsDialog.WebFlowCredentialsDialog (Account *account, bool use_flow2, Gtk.Widget *parent)
+WebFlowCredentialsDialog.WebFlowCredentialsDialog (Account account, bool use_flow2, Gtk.Widget parent)
     : Gtk.Dialog (parent)
     , _use_flow2 (use_flow2)
     , _flow_2_auth_widget (nullptr)
@@ -101,7 +107,7 @@ WebFlowCredentialsDialog.WebFlowCredentialsDialog (Account *account, bool use_fl
 #endif // WITH_WEBENGINE
     }
 
-    auto app = static_cast<Application> (q_app);
+    var app = static_cast<Application> (q_app);
     connect (app, &Application.is_showing_settings_dialog, this, &WebFlowCredentialsDialog.on_show_settings_dialog);
 
     _error_label = new QLabel ();
@@ -134,7 +140,7 @@ void WebFlowCredentialsDialog.close_event (QCloseEvent* e) {
         _flow_2_auth_widget = nullptr;
     }
 
-    emit on_close ();
+    emit close ();
 }
 
 void WebFlowCredentialsDialog.set_url (QUrl url) {
@@ -167,7 +173,7 @@ void WebFlowCredentialsDialog.set_error (string error) {
     }
 }
 
-void WebFlowCredentialsDialog.change_event (QEvent *e) {
+void WebFlowCredentialsDialog.change_event (QEvent e) {
     switch (e.type ()) {
     case QEvent.StyleChange:
     case QEvent.PaletteChange:
@@ -179,7 +185,7 @@ void WebFlowCredentialsDialog.change_event (QEvent *e) {
         break;
     case QEvent.ActivationChange:
         if (is_active_window ())
-            emit on_activate ();
+            emit activate ();
         break;
     default:
         break;
@@ -202,7 +208,7 @@ void WebFlowCredentialsDialog.on_show_settings_dialog () {
 void WebFlowCredentialsDialog.on_flow_2_auth_result (Flow2Auth.Result r, string error_string, string user, string app_password) {
     Q_UNUSED (error_string)
     if (r == Flow2Auth.LoggedIn) {
-        emit on_url_catched (user, app_password, string ());
+        emit url_catched (user, app_password, string ());
     } else {
         // bring window to top
         on_show_settings_dialog ();

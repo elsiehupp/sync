@@ -38,7 +38,7 @@ namespace Occ {
 ***********************************************************/
 class Log_browser : Gtk.Dialog {
 
-    public Log_browser (Gtk.Widget *parent = nullptr);
+    public Log_browser (Gtk.Widget parent = nullptr);
     ~Log_browser () override;
 
 
@@ -49,16 +49,16 @@ protected slots:
 };
 
 
-    Log_browser.Log_browser (Gtk.Widget *parent)
+    Log_browser.Log_browser (Gtk.Widget parent)
         : Gtk.Dialog (parent) {
         set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         set_object_name ("Log_browser"); // for save/restore_geometry ()
         set_window_title (tr ("Log Output"));
         set_minimum_width (600);
 
-        auto main_layout = new QVBoxLayout;
+        var main_layout = new QVBoxLayout;
 
-        auto label = new QLabel (
+        var label = new QLabel (
             tr ("The client can write debug logs to a temporary folder. "
                "These logs are very helpful for diagnosing problems.\n"
                "Since log files can get large, the client will on_start a new one for each sync "
@@ -72,7 +72,7 @@ protected slots:
         main_layout.add_widget (label);
 
         // button to permanently save logs
-        auto enable_logging_button = new QCheckBox;
+        var enable_logging_button = new QCheckBox;
         enable_logging_button.on_set_text (tr ("Enable logging to temporary folder"));
         enable_logging_button.set_checked (ConfigFile ().automatic_log_dir ());
         connect (enable_logging_button, &QCheckBox.toggled, this, &Log_browser.toggle_permanent_logging);
@@ -85,7 +85,7 @@ protected slots:
         label.set_size_policy (QSize_policy.Expanding, QSize_policy.Minimum_expanding);
         main_layout.add_widget (label);
 
-        auto open_folder_button = new QPushButton;
+        var open_folder_button = new QPushButton;
         open_folder_button.on_set_text (tr ("Open folder"));
         connect (open_folder_button, &QPushButton.clicked, this, [] () {
             string path = Logger.instance ().temporary_folder_log_dir_path ();
@@ -94,8 +94,8 @@ protected slots:
         });
         main_layout.add_widget (open_folder_button);
 
-        auto *btnbox = new QDialogButtonBox;
-        QPushButton *close_btn = btnbox.add_button (QDialogButtonBox.Close);
+        var btnbox = new QDialogButtonBox;
+        QPushButton close_btn = btnbox.add_button (QDialogButtonBox.Close);
         connect (close_btn, &QAbstractButton.clicked, this, &Gtk.Widget.close);
 
         main_layout.add_stretch ();
@@ -105,7 +105,7 @@ protected slots:
 
         set_modal (false);
 
-        auto show_log_window = new QAction (this);
+        var show_log_window = new QAction (this);
         show_log_window.set_shortcut (QKeySequence ("F12"));
         connect (show_log_window, &QAction.triggered, this, &Gtk.Widget.close);
         add_action (show_log_window);
@@ -124,7 +124,7 @@ protected slots:
     void Log_browser.toggle_permanent_logging (bool enabled) {
         ConfigFile ().set_automatic_log_dir (enabled);
 
-        auto logger = Logger.instance ();
+        var logger = Logger.instance ();
         if (enabled) {
             if (!logger.is_logging_to_file ()) {
                 logger.setup_temporary_folder_log_dir ();

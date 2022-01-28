@@ -25,12 +25,14 @@ class Notification_confirm_job : AbstractNetworkJob {
 
     public Notification_confirm_job (AccountPtr account);
 
+
     /***********************************************************
     @brief Set the verb and link for the job
 
     @param verb currently supported GET PUT POST DELETE
     ***********************************************************/
-    public void set_link_and_verb (QUrl link, GLib.ByteArray &verb);
+    public void set_link_and_verb (QUrl link, GLib.ByteArray verb);
+
 
     /***********************************************************
     @brief Start the OCS request
@@ -59,7 +61,7 @@ signals:
         set_ignore_credential_failure (true);
     }
 
-    void Notification_confirm_job.set_link_and_verb (QUrl link, GLib.ByteArray &verb) {
+    void Notification_confirm_job.set_link_and_verb (QUrl link, GLib.ByteArray verb) {
         _link = link;
         _verb = verb;
     }
@@ -85,7 +87,7 @@ signals:
 
         if (reply_str.contains ("<?xml version=\"1.0\"?>")) {
             const QRegularExpression rex ("<statuscode> (\\d+)</statuscode>");
-            const auto rex_match = rex.match (reply_str);
+            const var rex_match = rex.match (reply_str);
             if (rex_match.has_match ()) {
                 // this is a error message coming back from ocs.
                 reply_code = rex_match.captured (1).to_int ();

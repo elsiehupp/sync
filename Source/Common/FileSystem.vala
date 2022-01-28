@@ -39,150 +39,25 @@ namespace FileSystem {
 
     /***********************************************************
     @brief Mark the file as hidden  (only has effects on windows)
+
+    OCSYNC_EXPORT
     ***********************************************************/
-    void OCSYNC_EXPORT set_file_hidden (string filename, bool hidden);
-
-    /***********************************************************
-    @brief Marks the file as read-only.
-
-    On linux this either revokes all 'w' permissions or restores permissions
-    according to the umask.
-    ***********************************************************/
-    void OCSYNC_EXPORT set_file_read_only (string filename, bool readonly);
-
-    /***********************************************************
-    @brief Marks the file as read-only.
-
-    It's like set_file_read_only (), but weaker : if readonly is false and t
-    already has write permissions, no change to the permissions is made.
-
-    This means that it will preserve explicitly set rw-r--r-- permissions even
-    when the umask is 0002. (set_file_read_only () would adjust to rw-rw-r--)
-    ***********************************************************/
-    void OCSYNC_EXPORT set_file_read_only_weak (string filename, bool readonly);
-
-    /***********************************************************
-    @brief Try to set permissions so that other users on the local machine can not
-    go into the folder.
-    ***********************************************************/
-    void OCSYNC_EXPORT set_folder_minimum_permissions (string filename);
-
-    /***********************************************************
-    convert a "normal" windows path into a path that can be 32k chars long.
-    ***********************************************************/
-    string OCSYNC_EXPORT long_win_path (string inpath);
-
-    /***********************************************************
-    @brief Checks whether a file exists.
-
-    Use this over QFileInfo.exists () and QFile.exists () to avoid bugs with lnk
-    files, see above.
-    ***********************************************************/
-    bool OCSYNC_EXPORT file_exists (string filename, QFileInfo & = QFileInfo ());
-
-    /***********************************************************
-    @brief Rename the file \a origin_file_name to \a destination_file_name.
-
-    It behaves as QFile.rename () but handles .lnk files correctly on Windows.
-    ***********************************************************/
-    bool OCSYNC_EXPORT rename (string origin_file_name,
-        const string destination_file_name,
-        string *error_string = nullptr);
-
-    /***********************************************************
-    Rename the file \a origin_file_name to \a destination_file_name, and
-    overwrite the destination if it already exists - without extra checks.
-    ***********************************************************/
-    bool OCSYNC_EXPORT unchecked_rename_replace (string origin_file_name,
-        const string destination_file_name,
-        string *error_string);
-
-    /***********************************************************
-    Removes a file.
-
-    Equivalent to QFile.remove (), except on Windows, where it will also
-    successfully remove read-only files.
-    ***********************************************************/
-    bool OCSYNC_EXPORT remove (string file_name, string *error_string = nullptr);
-
-    /***********************************************************
-    Move the specified file or folder to the trash. (Only implemented on linux)
-    ***********************************************************/
-    bool OCSYNC_EXPORT move_to_trash (string filename, string *error_string);
-
-    /***********************************************************
-    Replacement for QFile.open (ReadOnly) followed by a seek ().
-    This version sets a more permissive sharing mode on Windows.
-
-    Warning : The resulting file may have an empty file_name and be unsuitable for use
-    with QFileInfo! Calling seek () on the QFile with >32bit signed values will fail!
-    ***********************************************************/
-    bool OCSYNC_EXPORT open_and_seek_file_shared_read (QFile *file, string *error, int64 seek);
-
-    /***********************************************************
-    Returns true when a file is locked. (Windows only)
-    ***********************************************************/
-    bool OCSYNC_EXPORT is_file_locked (string file_name);
-
-    /***********************************************************
-    Returns whether the file is a shortcut file (ends with .lnk)
-    ***********************************************************/
-    bool OCSYNC_EXPORT is_lnk_file (string filename);
-
-    /***********************************************************
-    Returns whether the file is an exclude file (contains patterns to exclude from sync)
-    ***********************************************************/
-    bool OCSYNC_EXPORT is_exclude_file (string filename);
-
-    /***********************************************************
-    Returns whether the file is a junction (windows only)
-    ***********************************************************/
-    bool OCSYNC_EXPORT is_junction (string filename);
-}
-
-
-
-
-
-    string FileSystem.long_win_path (string inpath) {
-        return inpath;
-    }
-
-    void FileSystem.set_file_hidden (string filename, bool hidden) {
-    #ifdef _WIN32
-        string f_name = long_win_path (filename);
-        DWORD dw_attrs;
-
-        dw_attrs = Get_file_attributes_w ( (wchar_t *)f_name.utf16 ());
-
-        if (dw_attrs != INVALID_FILE_ATTRIBUTES) {
-            if (hidden && ! (dw_attrs & FILE_ATTRIBUTE_HIDDEN)) {
-                Set_file_attributes_w ( (wchar_t *)f_name.utf16 (), dw_attrs | FILE_ATTRIBUTE_HIDDEN);
-            } else if (!hidden && (dw_attrs & FILE_ATTRIBUTE_HIDDEN)) {
-                Set_file_attributes_w ( (wchar_t *)f_name.utf16 (), dw_attrs & ~FILE_ATTRIBUTE_HIDDEN);
-            }
-        }
-    #else
+    void set_file_hidden (string filename, bool hidden) {
         Q_UNUSED (filename);
         Q_UNUSED (hidden);
-    #endif
     }
 
-    static QFile.Permissions get_default_write_permissions () {
-        QFile.Permissions result = QFile.Write_user;
-        mode_t mask = umask (0);
-        umask (mask);
-        if (! (mask & S_IWGRP)) {
-            result |= QFile.Write_group;
-        }
-        if (! (mask & S_IWOTH)) {
-            result |= QFile.Write_other;
-        }
-        return result;
-    }
 
-    void FileSystem.set_file_read_only (string filename, bool readonly) {
-        QFile file (filename);
+    /***********************************************************
+    @brief Marks the file as read-only.
+
+    On linux this either revokes all 'w' permissions or
+    restores permissions according to the umask.
+
+    OCSYNC_EXPORT
+    ***********************************************************/
+    void set_file_read_only (string filename, bool read_only) {
+        QFile file = new QFile (filename);
         QFile.Permissions permissions = file.permissions ();
 
         QFile.Permissions all_write_permissions =
@@ -190,30 +65,90 @@ namespace FileSystem {
         static QFile.Permissions default_write_permissions = get_default_write_permissions ();
 
         permissions &= ~all_write_permissions;
-        if (!readonly) {
+        if (!read_only) {
             permissions |= default_write_permissions;
         }
         file.set_permissions (permissions);
     }
 
-    void FileSystem.set_folder_minimum_permissions (string filename) {
-        Q_UNUSED (filename);
-    }
 
-    void FileSystem.set_file_read_only_weak (string filename, bool readonly) {
-        QFile file (filename);
+    /***********************************************************
+    @brief Marks the file as read-only.
+
+    It's like set_file_read_only (), but weaker : if read_only is false and t
+    already has write permissions, no change to the permissions is made.
+
+    This means that it will preserve explicitly set rw-r--r-- permissions even
+    when the umask is 0002. (set_file_read_only () would adjust to rw-rw-r--)
+
+    OCSYNC_EXPORT
+    ***********************************************************/
+    void set_file_read_only_weak (string filename, bool read_only) {
+        QFile file = new QFile (filename);
         QFile.Permissions permissions = file.permissions ();
 
-        if (!readonly && (permissions & QFile.Write_owner)) {
+        if (!read_only && (permissions & QFile.Write_owner)) {
             return; // already writable enough
         }
 
-        set_file_read_only (filename, readonly);
+        set_file_read_only (filename, read_only);
     }
 
-    bool FileSystem.rename (string origin_file_name,
+
+    /***********************************************************
+    @brief Try to set permissions so that other users on the
+    local machine can not go into the folder.
+
+    OCSYNC_EXPORT
+    ***********************************************************/
+    void set_folder_minimum_permissions (string filename) {
+        Q_UNUSED (filename);
+    }
+
+
+    /***********************************************************
+    convert a "normal" windows path into a path that can be 32k chars long.
+
+    OCSYNC_EXPORT
+    ***********************************************************/
+    string long_win_path (string inpath) {
+        return inpath;
+    }
+
+
+    /***********************************************************
+    @brief Checks whether a file exists.
+
+    Use this over QFileInfo.exists () and QFile.exists () to avoid bugs with lnk
+    files, see above.
+
+    OCSYNC_EXPORT
+    ***********************************************************/
+    bool file_exists (string filename, QFileInfo file_info = new QFileInfo ()) {
+        bool re = file_info.exists ();
+        // if the filename is different from the filename in file_info, the file_info is
+        // not valid. There needs to be one initialised here. Otherwise the incoming
+        // file_info is re-used.
+        if (file_info.file_path () != filename) {
+            QFileInfo my_f_i (filename);
+            re = my_f_i.exists ();
+        }
+        return re;
+    }
+
+
+    /***********************************************************
+    @brief Rename the file \a origin_file_name to
+    \a destination_file_name.
+
+    It behaves as QFile.rename () but handles .lnk files
+    correctly on Windows.
+
+    OCSYNC_EXPORT
+    ***********************************************************/
+    bool rename (string origin_file_name,
         const string destination_file_name,
-        string *error_string) {
+        string error_string = "") {
         bool on_success = false;
         string error;
 
@@ -234,9 +169,17 @@ namespace FileSystem {
         return on_success;
     }
 
-    bool FileSystem.unchecked_rename_replace (string origin_file_name,
+
+    /***********************************************************
+    Rename the file \a origin_file_name to
+    \a destination_file_name, and overwrite the destination if
+    it already exists, without extra checks.
+
+    OCSYNC_EXPORT
+    ***********************************************************/
+    bool unchecked_rename_replace (string origin_file_name,
         const string destination_file_name,
-        string *error_string) {
+        string error_string) {
 
         bool on_success = false;
         QFile orig (origin_file_name);
@@ -262,36 +205,16 @@ namespace FileSystem {
         return true;
     }
 
-    bool FileSystem.open_and_seek_file_shared_read (QFile *file, string *error_or_null, int64 seek) {
-        string error_dummy;
-        // avoid many if (error_or_null) later.
-        string error = error_or_null ? *error_or_null : error_dummy;
-        error.clear ();
 
-        if (!file.open (QFile.ReadOnly)) {
-            error = file.error_string ();
-            return false;
-        }
-        if (!file.seek (seek)) {
-            error = file.error_string ();
-            return false;
-        }
-        return true;
-    }
+    /***********************************************************
+    Removes a file.
 
-    bool FileSystem.file_exists (string filename, QFileInfo &file_info) {
-        bool re = file_info.exists ();
-        // if the filename is different from the filename in file_info, the file_info is
-        // not valid. There needs to be one initialised here. Otherwise the incoming
-        // file_info is re-used.
-        if (file_info.file_path () != filename) {
-            QFileInfo my_f_i (filename);
-            re = my_f_i.exists ();
-        }
-        return re;
-    }
+    Equivalent to QFile.remove (), except on Windows, where it will also
+    successfully remove read-only files.
 
-    bool FileSystem.remove (string file_name, string *error_string) {
+    OCSYNC_EXPORT
+    ***********************************************************/
+    bool remove (string file_name, string error_string = "") {
         QFile f (file_name);
         if (!f.remove ()) {
             if (error_string) {
@@ -302,7 +225,14 @@ namespace FileSystem {
         return true;
     }
 
-    bool FileSystem.move_to_trash (string file_name, string *error_string) {
+
+    /***********************************************************
+    Move the specified file or folder to the trash.
+    (Only implemented on linux)
+
+    OCSYNC_EXPORT
+    ***********************************************************/
+    bool move_to_trash (string filename, string error_string) {
         // TODO : Qt 5.15 bool QFile.move_to_trash ()
         string trash_path, trash_file_path, trash_info_path;
         string xdg_data_home = QFile.decode_name (qgetenv ("XDG_DATA_HOME"));
@@ -370,26 +300,92 @@ namespace FileSystem {
         return true;
     }
 
-    bool FileSystem.is_file_locked (string file_name) {
+
+    /***********************************************************
+    Replacement for QFile.open (ReadOnly) followed by a seek ().
+    This version sets a more permissive sharing mode on Windows.
+
+    Warning : The resulting file may have an empty file_name and be unsuitable for use
+    with QFileInfo! Calling seek () on the QFile with >32bit signed values will fail!
+
+    OCSYNC_EXPORT
+    ***********************************************************/
+    bool open_and_seek_file_shared_read (QFile file, string error_or_null, int64 seek) {
+        string error_dummy;
+        // avoid many if (error_or_null) later.
+        string error = error_or_null ? *error_or_null : error_dummy;
+        error.clear ();
+
+        if (!file.open (QFile.ReadOnly)) {
+            error = file.error_string ();
+            return false;
+        }
+        if (!file.seek (seek)) {
+            error = file.error_string ();
+            return false;
+        }
+        return true;
+    }
+
+
+    /***********************************************************
+    Returns true when a file is locked. (Windows only)
+
+    OCSYNC_EXPORT
+    ***********************************************************/
+    bool is_file_locked (string file_name) {
         Q_UNUSED (file_name);
         return false;
     }
 
-    bool FileSystem.is_lnk_file (string filename) {
+
+    /***********************************************************
+    Returns whether the file is a shortcut file (ends with .lnk)
+
+    OCSYNC_EXPORT
+    ***********************************************************/
+    bool is_lnk_file (string filename) {
         return filename.ends_with (QLatin1String (".lnk"));
     }
 
-    bool FileSystem.is_exclude_file (string filename) {
+
+    /***********************************************************
+    Returns whether the file is an exclude file (contains patterns to exclude from sync)
+
+    OCSYNC_EXPORT
+    ***********************************************************/
+    bool is_exclude_file (string filename) {
         return filename.compare (QStringLiteral (".sync-exclude.lst"), Qt.CaseInsensitive) == 0
             || filename.compare (QStringLiteral ("exclude.lst"), Qt.CaseInsensitive) == 0
             || filename.ends_with (QStringLiteral ("/.sync-exclude.lst"), Qt.CaseInsensitive)
             || filename.ends_with (QStringLiteral ("/exclude.lst"), Qt.CaseInsensitive);
     }
 
-    bool FileSystem.is_junction (string filename) {
+
+    /***********************************************************
+    Returns whether the file is a junction (windows only)
+
+    OCSYNC_EXPORT
+    ***********************************************************/
+    bool is_junction (string filename) {
         Q_UNUSED (filename);
         return false;
     }
 
-    } // namespace Occ
+
+    private static QFile.Permissions get_default_write_permissions () {
+        QFile.Permissions result = QFile.Write_user;
+        mode_t mask = umask (0);
+        umask (mask);
+        if (! (mask & S_IWGRP)) {
+            result |= QFile.Write_group;
+        }
+        if (! (mask & S_IWOTH)) {
+            result |= QFile.Write_other;
+        }
+        return result;
+    }
+}
+
+} // namespace Occ
     

@@ -85,7 +85,7 @@ int main (int argc, char **argv) {
     }
 #endif
 
-    auto surface_format = QSurface_format.default_format ();
+    var surface_format = QSurface_format.default_format ();
     surface_format.set_option (QSurface_format.Reset_notification);
     QSurface_format.set_default_format (surface_format);
 
@@ -108,7 +108,7 @@ int main (int argc, char **argv) {
     // if handle_startup returns true, main ()
     // needs to terminate here, e.g. because
     // the updater is triggered
-    Updater *updater = Updater.instance ();
+    Updater updater = Updater.instance ();
     if (updater && updater.handle_startup ()) {
         return 1;
     }
@@ -144,7 +144,7 @@ int main (int argc, char **argv) {
             q_c_info (lc_application) << "System tray is not available, waiting...";
             Utility.sleep (1);
 
-            auto desktop_session = qgetenv ("XDG_CURRENT_DESKTOP").to_lower ();
+            var desktop_session = qgetenv ("XDG_CURRENT_DESKTOP").to_lower ();
             if (desktop_session.is_empty ()) {
                 desktop_session = qgetenv ("DESKTOP_SESSION").to_lower ();
             }

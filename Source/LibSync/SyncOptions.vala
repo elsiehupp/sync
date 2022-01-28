@@ -26,6 +26,7 @@ class SyncOptions {
     public SyncOptions ();
     ~SyncOptions ();
 
+
     /***********************************************************
     Maximum size (in Bytes) a folder can have without asking
     for confirmation.
@@ -34,21 +35,25 @@ class SyncOptions {
     ***********************************************************/
     public int64 _new_big_folder_size_limit = -1;
 
+
     /***********************************************************
     If a confirmation should be asked for external storages
     ***********************************************************/
     public bool _confirm_external_storage = false;
+
 
     /***********************************************************
     If remotely deleted files are needed to move to trash
     ***********************************************************/
     public bool _move_files_to_trash = false;
 
+
     /***********************************************************
     Create a virtual file for new files instead of downloading.
     May not be null
     ***********************************************************/
     public unowned<Vfs> _vfs;
+
 
     /***********************************************************
     The initial un-adjusted chunk size in bytes for chunked
@@ -78,10 +83,12 @@ class SyncOptions {
     ***********************************************************/
     public std.chrono.milliseconds _target_chunk_upload_duration = std.chrono.minutes (1);
 
+
     /***********************************************************
     The maximum number of active jobs in parallel
     ***********************************************************/
     public int _parallel_network_jobs = 6;
+
 
     /***********************************************************
     Reads settings from env vars where available.
@@ -90,6 +97,7 @@ class SyncOptions {
     _target_chunk_upload_duration, _parallel_network_jobs.
     ***********************************************************/
     public void fill_from_environment_variables ();
+
 
     /***********************************************************
     Ensure min <= initial <= max
@@ -101,6 +109,7 @@ class SyncOptions {
     ***********************************************************/
     public void verify_chunk_sizes ();
 
+
     /***********************************************************
     A regular expression to match file names
     If no pattern is provided the default is an invalid regular
@@ -108,10 +117,12 @@ class SyncOptions {
     ***********************************************************/
     public QRegularExpression file_regex ();
 
+
     /***********************************************************
     A pattern like *.txt, matching only file names
     ***********************************************************/
     public void set_file_pattern (string pattern);
+
 
     /***********************************************************
     A pattern like /own.*\/.*txt matching the full path

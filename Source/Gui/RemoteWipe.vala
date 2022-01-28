@@ -16,7 +16,7 @@ namespace Occ {
 
 class RemoteWipe : GLib.Object {
 
-    public RemoteWipe (AccountPtr account, GLib.Object *parent = nullptr);
+    public RemoteWipe (AccountPtr account, GLib.Object parent = nullptr);
 
 signals:
     /***********************************************************
@@ -24,10 +24,12 @@ signals:
     ***********************************************************/
     void authorized (AccountState*);
 
+
     /***********************************************************
     Notify if user only needs to login again
     ***********************************************************/
     void ask_user_credentials ();
+
 
     /***********************************************************
     Once receives a 401 or 403 status response it will do a fetch to
@@ -35,17 +37,19 @@ signals:
     ***********************************************************/
     public void on_start_check_job_with_app_password (string);
 
+
     /***********************************************************
     If wipe is requested, delete account and data, if not continue by asking
     the user to login again
     ***********************************************************/
     private void on_check_job_slot ();
 
+
     /***********************************************************
     Once the client has wiped all the required data a POST to
     <server>/index.php/core/wipe/on_success
     ***********************************************************/
-    private void on_notify_server_success_job (AccountState *account_state, bool);
+    private void on_notify_server_success_job (AccountState account_state, bool);
     private void on_notify_server_success_job_slot ();
 
 
@@ -59,7 +63,7 @@ signals:
     private friend class .Test_remote_wipe;
 };
 
-    RemoteWipe.RemoteWipe (AccountPtr account, GLib.Object *parent)
+    RemoteWipe.RemoteWipe (AccountPtr account, GLib.Object parent)
         : GLib.Object (parent),
           _account (account),
           _app_password (string ()),
@@ -91,7 +95,7 @@ signals:
                           "application/x-www-form-urlencoded");
         request.set_url (request_url);
         request.set_ssl_configuration (_account.get_or_create_ssl_config ());
-        auto request_body = new QBuffer;
+        var request_body = new QBuffer;
         QUrlQuery arguments (string ("token=%1").arg (_app_password));
         request_body.set_data (arguments.query (QUrl.FullyEncoded).to_latin1 ());
         _network_reply_check = _network_manager.post (request, request_body);
@@ -102,7 +106,7 @@ signals:
     }
 
     void RemoteWipe.on_check_job_slot () {
-        auto json_data = _network_reply_check.read_all ();
+        var json_data = _network_reply_check.read_all ();
         QJsonParseError json_parse_error;
         QJsonObject json = QJsonDocument.from_json (json_data, &json_parse_error).object ();
         bool wipe = false;
@@ -130,8 +134,8 @@ signals:
             wipe = json["wipe"].to_bool ();
         }
 
-        auto manager = AccountManager.instance ();
-        auto account_state = manager.account (_account.display_name ()).data ();
+        var manager = AccountManager.instance ();
+        var account_state = manager.account (_account.display_name ()).data ();
 
         if (wipe){
             /* IMPORTANT - remove later - FIXME MS@2019-12-07 -.
@@ -161,7 +165,7 @@ signals:
         _network_reply_check.delete_later ();
     }
 
-    void RemoteWipe.on_notify_server_success_job (AccountState *account_state, bool data_wiped){
+    void RemoteWipe.on_notify_server_success_job (AccountState account_state, bool data_wiped){
         if (_account_removed && data_wiped && _account == account_state.account ()){
             QUrl request_url = Utility.concat_url_path (_account.url ().to_string (),
                                                      QLatin1String ("/index.php/core/wipe/on_success"));
@@ -170,7 +174,7 @@ signals:
                               "application/x-www-form-urlencoded");
             request.set_url (request_url);
             request.set_ssl_configuration (_account.get_or_create_ssl_config ());
-            auto request_body = new QBuffer;
+            var request_body = new QBuffer;
             QUrlQuery arguments (string ("token=%1").arg (_app_password));
             request_body.set_data (arguments.query (QUrl.FullyEncoded).to_latin1 ());
             _network_reply_success = _network_manager.post (request, request_body);
@@ -180,7 +184,7 @@ signals:
     }
 
     void RemoteWipe.on_notify_server_success_job_slot () {
-        auto json_data = _network_reply_success.read_all ();
+        var json_data = _network_reply_success.read_all ();
         QJsonParseError json_parse_error;
         QJsonObject json = QJsonDocument.from_json (json_data, &json_parse_error).object ();
         if (_network_reply_success.error () != QNetworkReply.NoError ||

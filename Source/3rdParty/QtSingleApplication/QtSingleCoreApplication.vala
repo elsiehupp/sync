@@ -19,10 +19,16 @@ namespace SharedTools {
 class Qt_singleCoreApplication : QCoreApplication {
 
     public Qt_singleCoreApplication (int &argc, char **argv);
+
+
     public Qt_singleCoreApplication (string id, int &argc, char **argv);
 
     public bool is_running ();
+
+
     public string id ();
+
+
     public void set_block (bool value);
 
 

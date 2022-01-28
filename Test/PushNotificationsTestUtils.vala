@@ -14,12 +14,12 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 class FakeWebSocketServer : GLib.Object {
 
-    public FakeWebSocketServer (uint16 port = 12345, GLib.Object *parent = nullptr);
+    public FakeWebSocketServer (uint16 port = 12345, GLib.Object parent = nullptr);
 
     ~FakeWebSocketServer () override;
 
-    public QWebSocket *authenticateAccount (
-        const Occ.AccountPtr account, std.function<void (Occ.PushNotifications *pushNotifications)> beforeAuthentication = [] (Occ.PushNotifications *) {}, std.function<void (void)> afterAuthentication = [] {});
+    public QWebSocket authenticateAccount (
+        const Occ.AccountPtr account, std.function<void (Occ.PushNotifications pushNotifications)> beforeAuthentication = [] (Occ.PushNotifications *) {}, std.function<void (void)> afterAuthentication = [] {});
 
     public void close ();
 
@@ -29,7 +29,7 @@ class FakeWebSocketServer : GLib.Object {
 
     public string textMessage (int messageNumber);
 
-    public QWebSocket *socketForTextMessage (int messageNumber);
+    public QWebSocket socketForTextMessage (int messageNumber);
 
     public void clearTextMessages ();
 
@@ -37,7 +37,7 @@ class FakeWebSocketServer : GLib.Object {
 
 signals:
     void closed ();
-    void processTextMessage (QWebSocket *sender, string message);
+    void processTextMessage (QWebSocket sender, string message);
 
 
     private void on_process_next_message_internal (string message);
@@ -54,15 +54,17 @@ signals:
 class CredentialsStub : Occ.AbstractCredentials {
 
     public CredentialsStub (string user, string password);
+
+
     public string authType () override;
     public string user () override;
     public string password () override;
-    public QNetworkAccessManager *createQNAM () override;
+    public QNetworkAccessManager createQNAM () override;
     public bool ready () override;
     public void fetchFromKeychain () override;
     public void askFromUser () override;
 
-    public bool stillValid (QNetworkReply *reply) override;
+    public bool stillValid (QNetworkReply reply) override;
     public void persist () override;
     public void invalidateToken () override;
     public void forgetSensitiveData () override;
@@ -88,7 +90,7 @@ class CredentialsStub : Occ.AbstractCredentials {
 
 Q_LOGGING_CATEGORY (lcFakeWebSocketServer, "nextcloud.test.fakewebserver", QtInfoMsg)
 
-FakeWebSocketServer.FakeWebSocketServer (uint16 port, GLib.Object *parent)
+FakeWebSocketServer.FakeWebSocketServer (uint16 port, GLib.Object parent)
     : GLib.Object (parent)
     , _webSocketServer (new QWebSocketServer (QStringLiteral ("Fake Server"), QWebSocketServer.NonSecureMode, this)) {
     if (!_webSocketServer.listen (QHostAddress.Any, port)) {
@@ -104,8 +106,8 @@ FakeWebSocketServer.~FakeWebSocketServer () {
     close ();
 }
 
-QWebSocket *FakeWebSocketServer.authenticateAccount (Occ.AccountPtr account, std.function<void (Occ.PushNotifications *pushNotifications)> beforeAuthentication, std.function<void (void)> afterAuthentication) {
-    const auto pushNotifications = account.pushNotifications ();
+QWebSocket *FakeWebSocketServer.authenticateAccount (Occ.AccountPtr account, std.function<void (Occ.PushNotifications pushNotifications)> beforeAuthentication, std.function<void (void)> afterAuthentication) {
+    const var pushNotifications = account.pushNotifications ();
     Q_ASSERT (pushNotifications);
     QSignalSpy readySpy (pushNotifications, &Occ.PushNotifications.ready);
 
@@ -121,9 +123,9 @@ QWebSocket *FakeWebSocketServer.authenticateAccount (Occ.AccountPtr account, std
         return nullptr;
     }
 
-    const auto socket = socketForTextMessage (0);
-    const auto userSent = textMessage (0);
-    const auto passwordSent = textMessage (1);
+    const var socket = socketForTextMessage (0);
+    const var userSent = textMessage (0);
+    const var passwordSent = textMessage (1);
 
     if (userSent != account.credentials ().user () || passwordSent != account.credentials ().password ()) {
         return nullptr;
@@ -153,14 +155,14 @@ void FakeWebSocketServer.close () {
 }
 
 void FakeWebSocketServer.on_process_next_message_internal (string message) {
-    auto client = qobject_cast<QWebSocket> (sender ());
+    var client = qobject_cast<QWebSocket> (sender ());
     emit processTextMessage (client, message);
 }
 
 void FakeWebSocketServer.on_new_connection () {
     qCInfo (lcFakeWebSocketServer) << "New connection on fake websocket server";
 
-    auto socket = _webSocketServer.nextPendingConnection ();
+    var socket = _webSocketServer.nextPendingConnection ();
 
     connect (socket, &QWebSocket.textMessageReceived, this, &FakeWebSocketServer.on_process_next_message_internal);
     connect (socket, &QWebSocket.disconnected, this, &FakeWebSocketServer.on_socket_disconnected);
@@ -171,7 +173,7 @@ void FakeWebSocketServer.on_new_connection () {
 void FakeWebSocketServer.on_socket_disconnected () {
     qCInfo (lcFakeWebSocketServer) << "Socket disconnected";
 
-    auto client = qobject_cast<QWebSocket> (sender ());
+    var client = qobject_cast<QWebSocket> (sender ());
 
     if (client) {
         _clients.removeAll (client);
@@ -202,7 +204,7 @@ void FakeWebSocketServer.clearTextMessages () {
 }
 
 Occ.AccountPtr FakeWebSocketServer.createAccount (string username, string password) {
-    auto account = Occ.Account.create ();
+    var account = Occ.Account.create ();
 
     string[] typeList;
     typeList.append ("files");
@@ -223,7 +225,7 @@ Occ.AccountPtr FakeWebSocketServer.createAccount (string username, string passwo
 
     account.setCapabilities (capabilitiesMap);
 
-    auto credentials = new CredentialsStub (username, password);
+    var credentials = new CredentialsStub (username, password);
     account.setCredentials (credentials);
 
     return account;

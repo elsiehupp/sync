@@ -8,16 +8,28 @@ namespace Occ {
 
 class Propagate_download_encrypted : GLib.Object {
 
-    public Propagate_download_encrypted (OwncloudPropagator *propagator, string local_parent_path, SyncFileItemPtr item, GLib.Object *parent = nullptr);
+    public Propagate_download_encrypted (OwncloudPropagator propagator, string local_parent_path, SyncFileItemPtr item, GLib.Object parent = nullptr);
+
+
     public void on_start ();
+
+
     public bool decrypt_file (QFile& tmp_file);
+
+
     public string error_string ();
 
 
     public void on_check_folder_id (string[] &list);
+
+
     public void on_check_folder_encrypted_metadata (QJsonDocument &json);
+
+
     public void on_folder_id_error ();
-    public void on_folder_encrypted_metadata_error (GLib.ByteArray &file_id, int http_return_code);
+
+
+    public void on_folder_encrypted_metadata_error (GLib.ByteArray file_id, int http_return_code);
 
 signals:
     void file_metadata_found ();
@@ -36,7 +48,7 @@ signals:
 
 
 
-Propagate_download_encrypted.Propagate_download_encrypted (OwncloudPropagator *propagator, string local_parent_path, SyncFileItemPtr item, GLib.Object *parent)
+Propagate_download_encrypted.Propagate_download_encrypted (OwncloudPropagator propagator, string local_parent_path, SyncFileItemPtr item, GLib.Object parent)
         : GLib.Object (parent)
         , _propagator (propagator)
         , _local_parent_path (local_parent_path)
@@ -45,20 +57,20 @@ Propagate_download_encrypted.Propagate_download_encrypted (OwncloudPropagator *p
 }
 
 void Propagate_download_encrypted.on_start () {
-        const auto root_path = [=] () {
-                const auto result = _propagator.remote_path ();
+        const var root_path = [=] () {
+                const var result = _propagator.remote_path ();
                 if (result.starts_with ('/')) {
                         return result.mid (1);
                 } else {
                         return result;
                 }
         } ();
-        const auto remote_filename = _item._encrypted_file_name.is_empty () ? _item._file : _item._encrypted_file_name;
-        const auto remote_path = string (root_path + remote_filename);
-        const auto remote_parent_path = remote_path.left (remote_path.last_index_of ('/'));
+        const var remote_filename = _item._encrypted_file_name.is_empty () ? _item._file : _item._encrypted_file_name;
+        const var remote_path = string (root_path + remote_filename);
+        const var remote_parent_path = remote_path.left (remote_path.last_index_of ('/'));
 
         // Is encrypted Now we need the folder-id
-        auto job = new LsColJob (_propagator.account (), remote_parent_path, this);
+        var job = new LsColJob (_propagator.account (), remote_parent_path, this);
         job.set_properties ({"resourcetype", "http://owncloud.org/ns:fileid"});
         connect (job, &LsColJob.directory_listing_subfolders,
                         this, &Propagate_download_encrypted.on_check_folder_id);
@@ -72,14 +84,14 @@ void Propagate_download_encrypted.on_folder_id_error () {
 }
 
 void Propagate_download_encrypted.on_check_folder_id (string[] &list) {
-    auto job = qobject_cast<LsColJob> (sender ());
+    var job = qobject_cast<LsColJob> (sender ());
     const string folder_id = list.first ();
     q_c_debug (lc_propagate_download_encrypted) << "Received id of folder" << folder_id;
 
     const ExtraFolderInfo &folder_info = job._folder_infos.value (folder_id);
 
     // Now that we have the folder-id we need it's JSON metadata
-    auto metadata_job = new GetMetadataApiJob (_propagator.account (), folder_info.file_id);
+    var metadata_job = new GetMetadataApiJob (_propagator.account (), folder_info.file_id);
     connect (metadata_job, &GetMetadataApiJob.json_received,
                     this, &Propagate_download_encrypted.on_check_folder_encrypted_metadata);
     connect (metadata_job, &GetMetadataApiJob.error,
@@ -88,7 +100,7 @@ void Propagate_download_encrypted.on_check_folder_id (string[] &list) {
     metadata_job.on_start ();
 }
 
-void Propagate_download_encrypted.on_folder_encrypted_metadata_error (GLib.ByteArray & /*file_id*/, int /*http_return_code*/) {
+void Propagate_download_encrypted.on_folder_encrypted_metadata_error (GLib.ByteArray  /*file_id*/, int /*http_return_code*/) {
         q_c_critical (lc_propagate_download_encrypted) << "Failed to find encrypted metadata information of remote file" << _info.file_name ();
         emit failed ();
 }
@@ -97,7 +109,7 @@ void Propagate_download_encrypted.on_check_folder_encrypted_metadata (QJsonDocum
     q_c_debug (lc_propagate_download_encrypted) << "Metadata Received reading"
                                                                                 << _item._instruction << _item._file << _item._encrypted_file_name;
     const string filename = _info.file_name ();
-    auto meta = new FolderMetadata (_propagator.account (), json.to_json (QJsonDocument.Compact));
+    var meta = new FolderMetadata (_propagator.account (), json.to_json (QJsonDocument.Compact));
     const QVector<EncryptedFile> files = meta.files ();
 
     const string encrypted_filename = _item._encrypted_file_name.section (QLatin1Char ('/'), -1);

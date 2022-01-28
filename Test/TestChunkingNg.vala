@@ -19,7 +19,7 @@ static void partialUpload (FakeFolder &fakeFolder, string name, int64 size) {
     fakeFolder.localModifier ().insert (name, size);
     // Abort when the upload is at 1/3
     int64 sizeWhenAbort = -1;
-    auto con = GLib.Object.connect (&fakeFolder.syncEngine (),  &SyncEngine.transmissionProgress,
+    var con = GLib.Object.connect (&fakeFolder.syncEngine (),  &SyncEngine.transmissionProgress,
                                     [&] (ProgressInfo &progress) {
                 if (progress.completedSize () > (progress.totalSize () /3 )) {
                     sizeWhenAbort = progress.completedSize ();
@@ -33,7 +33,7 @@ static void partialUpload (FakeFolder &fakeFolder, string name, int64 size) {
     QVERIFY (sizeWhenAbort < size);
 
     QCOMPARE (fakeFolder.uploadState ().children.count (), 1); // the transfer was done with chunking
-    auto upStateChildren = fakeFolder.uploadState ().children.first ().children;
+    var upStateChildren = fakeFolder.uploadState ().children.first ().children;
     QCOMPARE (sizeWhenAbort, std.accumulate (upStateChildren.cbegin (), upStateChildren.cend (), 0,
                                             [] (int s, FileInfo &i) { return s + i.size; }));
 }
@@ -77,8 +77,8 @@ class TestChunkingNG : GLib.Object {
 
         partialUpload (fakeFolder, "A/a0", size);
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
-        auto chunkingId = fakeFolder.uploadState ().children.first ().name;
-        const auto &chunkMap = fakeFolder.uploadState ().children.first ().children;
+        var chunkingId = fakeFolder.uploadState ().children.first ().name;
+        const var &chunkMap = fakeFolder.uploadState ().children.first ().children;
         int64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (int64 s, FileInfo &f) { return s + f.size; });
         QVERIFY (uploadedSize > 2 * 1000 * 1000); // at least 2 MB
 
@@ -112,8 +112,8 @@ class TestChunkingNG : GLib.Object {
         const int size = 30 * 1000 * 1000; // 30 MB
         partialUpload (fakeFolder, "A/a0", size);
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
-        auto chunkingId = fakeFolder.uploadState ().children.first ().name;
-        const auto &chunkMap = fakeFolder.uploadState ().children.first ().children;
+        var chunkingId = fakeFolder.uploadState ().children.first ().name;
+        const var &chunkMap = fakeFolder.uploadState ().children.first ().children;
         int64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (int64 s, FileInfo &f) { return s + f.size; });
         QVERIFY (uploadedSize > 2 * 1000 * 1000); // at least 50 MB
         QVERIFY (chunkMap.size () >= 3); // at least three chunks
@@ -121,9 +121,9 @@ class TestChunkingNG : GLib.Object {
         string[] chunksToDelete;
 
         // Remove the second chunk, so all further chunks will be deleted and resent
-        auto firstChunk = chunkMap.first ();
-        auto secondChunk = * (chunkMap.begin () + 1);
-        for (auto& name : chunkMap.keys ().mid (2)) {
+        var firstChunk = chunkMap.first ();
+        var secondChunk = * (chunkMap.begin () + 1);
+        for (var& name : chunkMap.keys ().mid (2)) {
             chunksToDelete.append (name);
         }
         fakeFolder.uploadState ().children.first ().remove (secondChunk.name);
@@ -141,9 +141,9 @@ class TestChunkingNG : GLib.Object {
 
         QVERIFY (fakeFolder.syncOnce ());
 
-        for (auto& toDelete : chunksToDelete) {
+        for (var& toDelete : chunksToDelete) {
             bool wasDeleted = false;
-            for (auto& deleted : deletedPaths) {
+            for (var& deleted : deletedPaths) {
                 if (deleted.mid (deleted.lastIndexOf ('/') + 1) == toDelete) {
                     wasDeleted = true;
                     break;
@@ -168,8 +168,8 @@ class TestChunkingNG : GLib.Object {
 
         partialUpload (fakeFolder, "A/a0", size);
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
-        auto chunkingId = fakeFolder.uploadState ().children.first ().name;
-        const auto &chunkMap = fakeFolder.uploadState ().children.first ().children;
+        var chunkingId = fakeFolder.uploadState ().children.first ().name;
+        const var &chunkMap = fakeFolder.uploadState ().children.first ().children;
         int64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (int64 s, FileInfo &f) { return s + f.size; });
         QVERIFY (uploadedSize > 5 * 1000 * 1000); // at least 5 MB
 
@@ -213,8 +213,8 @@ class TestChunkingNG : GLib.Object {
 
         partialUpload (fakeFolder, "A/a0", size);
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
-        auto chunkingId = fakeFolder.uploadState ().children.first ().name;
-        const auto &chunkMap = fakeFolder.uploadState ().children.first ().children;
+        var chunkingId = fakeFolder.uploadState ().children.first ().name;
+        const var &chunkMap = fakeFolder.uploadState ().children.first ().children;
         int64 uploadedSize = std.accumulate (chunkMap.begin (), chunkMap.end (), 0LL, [] (int64 s, FileInfo &f) { return s + f.size; });
         QVERIFY (uploadedSize > 5 * 1000 * 1000); // at least 5 MB
 
@@ -261,14 +261,14 @@ class TestChunkingNG : GLib.Object {
 
         // Now the next sync gets a NEW/NEW conflict and since there's no checksum
         // it just becomes a UPDATE_METADATA
-        auto checkEtagUpdated = [&] (SyncFileItemVector &items) {
+        var checkEtagUpdated = [&] (SyncFileItemVector &items) {
             QCOMPARE (items.size (), 1);
             QCOMPARE (items[0]._file, QLatin1String ("A"));
             SyncJournalFileRecord record;
             QVERIFY (fakeFolder.syncJournal ().getFileRecord (GLib.ByteArray ("A/a0"), &record));
             QCOMPARE (record._etag, fakeFolder.remoteModifier ().find ("A/a0").etag);
         };
-        auto connection = connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToPropagate, checkEtagUpdated);
+        var connection = connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToPropagate, checkEtagUpdated);
         QVERIFY (fakeFolder.syncOnce ());
         disconnect (connection);
         QCOMPARE (nGET, 0);
@@ -350,7 +350,7 @@ class TestChunkingNG : GLib.Object {
 
         partialUpload (fakeFolder, "A/a0", size);
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
-        auto chunkingId = fakeFolder.uploadState ().children.first ().name;
+        var chunkingId = fakeFolder.uploadState ().children.first ().name;
 
         fakeFolder.localModifier ().setContents ("A/a0", 'B');
         fakeFolder.localModifier ().appendByte ("A/a0");
@@ -413,15 +413,15 @@ class TestChunkingNG : GLib.Object {
 
         // Now we will download the server file and create a conflict
         QVERIFY (fakeFolder.syncOnce ());
-        auto localState = fakeFolder.currentLocalState ();
+        var localState = fakeFolder.currentLocalState ();
 
         // A0 is the one from the server
         QCOMPARE (localState.find ("A/a0").size, size);
         QCOMPARE (localState.find ("A/a0").contentChar, 'C');
 
         // There is a conflict file with our version
-        auto &stateAChildren = localState.find ("A").children;
-        auto it = std.find_if (stateAChildren.cbegin (), stateAChildren.cend (), [&] (FileInfo &fi) {
+        var &stateAChildren = localState.find ("A").children;
+        var it = std.find_if (stateAChildren.cbegin (), stateAChildren.cend (), [&] (FileInfo &fi) {
             return fi.name.startsWith ("a0 (conflicted copy");
         });
         QVERIFY (it != stateAChildren.cend ());
@@ -461,7 +461,7 @@ class TestChunkingNG : GLib.Object {
         QCOMPARE (fakeFolder.syncEngine ().isAnotherSyncNeeded (), ImmediateFollowUp);
 
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1); // We did not clean the chunks at this point
-        auto chunkingId = fakeFolder.uploadState ().children.first ().name;
+        var chunkingId = fakeFolder.uploadState ().children.first ().name;
 
         // Now we make a new sync which should upload the file for good.
         QVERIFY (fakeFolder.syncOnce ());
@@ -482,7 +482,7 @@ class TestChunkingNG : GLib.Object {
         setChunkSize (fakeFolder.syncEngine (), 1 * 1000 * 1000);
         partialUpload (fakeFolder, "A/a0", size);
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
-        auto chunkingId = fakeFolder.uploadState ().children.first ().name;
+        var chunkingId = fakeFolder.uploadState ().children.first ().name;
 
         // Delete the chunks on the server
         fakeFolder.uploadState ().children.clear ();
@@ -517,7 +517,7 @@ class TestChunkingNG : GLib.Object {
         QScopedValueRollback<int> setHttpTimeout (AbstractNetworkJob.httpTimeout, 1);
         int responseDelay = AbstractNetworkJob.httpTimeout * 1000 * 1000; // much bigger than http timeout (so a timeout will occur)
         // This will perform the operation on the server, but the reply will not come to the client
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *outgoingData) . QNetworkReply * {
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice outgoingData) . QNetworkReply * {
             if (!chunking) {
                 Q_ASSERT (!request.url ().path ().contains ("/uploads/")
                     && "Should not touch uploads endpoint when not chunking");
@@ -584,7 +584,7 @@ class TestChunkingNG : GLib.Object {
         // Partial upload of big files
         partialUpload (fakeFolder, "A/a0", size);
         QCOMPARE (fakeFolder.uploadState ().children.count (), 1);
-        auto chunkingId = fakeFolder.uploadState ().children.first ().name;
+        var chunkingId = fakeFolder.uploadState ().children.first ().name;
 
         // Now resume
         QVERIFY (fakeFolder.syncOnce ());

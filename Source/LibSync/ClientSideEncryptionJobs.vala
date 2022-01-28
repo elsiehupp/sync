@@ -33,7 +33,8 @@ _job.on_start
 ***********************************************************/
 class SignPublicKeyApiJob : AbstractNetworkJob {
 
-    public SignPublicKeyApiJob (AccountPtr &account, string path, GLib.Object *parent = nullptr);
+    public SignPublicKeyApiJob (AccountPtr &account, string path, GLib.Object parent = nullptr);
+
 
     /***********************************************************
     @brief set_csr - the CSR with the public key.
@@ -73,7 +74,8 @@ _job.on_start
 ***********************************************************/
 class StorePrivateKeyApiJob : AbstractNetworkJob {
 
-    public StorePrivateKeyApiJob (AccountPtr &account, string path, GLib.Object *parent = nullptr);
+    public StorePrivateKeyApiJob (AccountPtr &account, string path, GLib.Object parent = nullptr);
+
 
     /***********************************************************
     @brief set_csr - the CSR with the public key.
@@ -117,7 +119,7 @@ class SetEncryptionFlagApiJob : AbstractNetworkJob {
         Set = 1
     };
 
-    public SetEncryptionFlagApiJob (AccountPtr &account, GLib.ByteArray &file_id, FlagAction flag_action = Set, GLib.Object *parent = nullptr);
+    public SetEncryptionFlagApiJob (AccountPtr &account, GLib.ByteArray file_id, FlagAction flag_action = Set, GLib.Object parent = nullptr);
 
 
     public on_ void on_start () override;
@@ -125,8 +127,8 @@ class SetEncryptionFlagApiJob : AbstractNetworkJob {
     protected bool on_finished () override;
 
 signals:
-    void on_success (GLib.ByteArray &file_id);
-    void error (GLib.ByteArray &file_id, int http_return_code);
+    void on_success (GLib.ByteArray file_id);
+    void error (GLib.ByteArray file_id, int http_return_code);
 
 
     private GLib.ByteArray _file_id;
@@ -135,7 +137,7 @@ signals:
 
 class LockEncryptFolderApiJob : AbstractNetworkJob {
 
-    public LockEncryptFolderApiJob (AccountPtr &account, GLib.ByteArray& file_id, GLib.Object *parent = nullptr);
+    public LockEncryptFolderApiJob (AccountPtr &account, GLib.ByteArray& file_id, GLib.Object parent = nullptr);
 
 
     public on_ void on_start () override;
@@ -156,7 +158,7 @@ class UnlockEncryptFolderApiJob : AbstractNetworkJob {
         const AccountPtr &account,
         const GLib.ByteArray& file_id,
         const GLib.ByteArray& token,
-        GLib.Object *parent = nullptr);
+        GLib.Object parent = nullptr);
 
 
     public on_ void on_start () override;
@@ -179,7 +181,7 @@ class StoreMetaDataApiJob : AbstractNetworkJob {
         const AccountPtr &account,
         const GLib.ByteArray& file_id,
         const GLib.ByteArray& b64Metadata,
-        GLib.Object *parent = nullptr);
+        GLib.Object parent = nullptr);
 
 
     public on_ void on_start () override;
@@ -202,7 +204,7 @@ class UpdateMetadataApiJob : AbstractNetworkJob {
         const GLib.ByteArray& file_id,
         const GLib.ByteArray& b64Metadata,
         const GLib.ByteArray& locked_token,
-        GLib.Object *parent = nullptr);
+        GLib.Object parent = nullptr);
 
 
     public on_ void on_start () override;
@@ -224,7 +226,7 @@ class GetMetadataApiJob : AbstractNetworkJob {
     public GetMetadataApiJob (
         const AccountPtr &account,
         const GLib.ByteArray& file_id,
-        GLib.Object *parent = nullptr);
+        GLib.Object parent = nullptr);
 
 
     public on_ void on_start () override;
@@ -244,7 +246,7 @@ class DeleteMetadataApiJob : AbstractNetworkJob {
     public DeleteMetadataApiJob (
         const AccountPtr &account,
         const GLib.ByteArray& file_id,
-        GLib.Object *parent = nullptr);
+        GLib.Object parent = nullptr);
 
 
     public on_ void on_start () override;
@@ -288,7 +290,7 @@ bool GetMetadataApiJob.on_finished () {
         return true;
     }
     QJsonParseError error;
-    auto json = QJsonDocument.from_json (reply ().read_all (), &error);
+    var json = QJsonDocument.from_json (reply ().read_all (), &error);
     emit json_received (json, reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ());
     return true;
 }
@@ -310,7 +312,7 @@ void StoreMetaDataApiJob.on_start () {
     url.set_query (query);
 
     GLib.ByteArray data = GLib.ByteArray ("meta_data=") + QUrl.to_percent_encoding (_b64Metadata);
-    auto buffer = new QBuffer (this);
+    var buffer = new QBuffer (this);
     buffer.set_data (data);
 
     q_c_info (lc_cse_job ()) << "sending the metadata for the file_id" << _file_id << "as encrypted";
@@ -326,7 +328,7 @@ bool StoreMetaDataApiJob.on_finished () {
 		}
 
 		q_c_info (lc_cse_job ()) << "Metadata submited to the server successfully";
-		emit on_success (_file_id);
+		emit success (_file_id);
     return true;
 }
 
@@ -358,7 +360,7 @@ void UpdateMetadataApiJob.on_start () {
     params.add_query_item ("e2e-token", _token);
 
     GLib.ByteArray data = params.query ().to_local8Bit ();
-    auto buffer = new QBuffer (this);
+    var buffer = new QBuffer (this);
     buffer.set_data (data);
 
     q_c_info (lc_cse_job ()) << "updating the metadata for the file_id" << _file_id << "as encrypted";
@@ -374,7 +376,7 @@ bool UpdateMetadataApiJob.on_finished () {
 		}
 
 		q_c_info (lc_cse_job ()) << "Metadata submited to the server successfully";
-		emit on_success (_file_id);
+		emit success (_file_id);
     return true;
 }
 
@@ -405,7 +407,7 @@ bool UnlockEncryptFolderApiJob.on_finished () {
         emit error (_file_id, ret_code);
         return true;
     }
-    emit on_success (_file_id);
+    emit success (_file_id);
     return true;
 }
 
@@ -434,7 +436,7 @@ bool DeleteMetadataApiJob.on_finished () {
         emit error (_file_id, ret_code);
         return true;
     }
-    emit on_success (_file_id);
+    emit success (_file_id);
     return true;
 }
 
@@ -464,13 +466,13 @@ bool LockEncryptFolderApiJob.on_finished () {
     }
 
     QJsonParseError error;
-    auto json = QJsonDocument.from_json (reply ().read_all (), &error);
-    auto obj = json.object ().to_variant_map ();
-    auto token = obj["ocs"].to_map ()["data"].to_map ()["e2e-token"].to_byte_array ();
+    var json = QJsonDocument.from_json (reply ().read_all (), &error);
+    var obj = json.object ().to_variant_map ();
+    var token = obj["ocs"].to_map ()["data"].to_map ()["e2e-token"].to_byte_array ();
     q_c_info (lc_cse_job ()) << "got json:" << token;
 
     //TODO : Parse the token and submit.
-    emit on_success (_file_id, token);
+    emit success (_file_id, token);
     return true;
 }
 
@@ -494,7 +496,7 @@ bool SetEncryptionFlagApiJob.on_finished () {
     int ret_code = reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
     q_c_info (lc_cse_job ()) << "Encryption Flag Return" << reply ().read_all ();
     if (ret_code == 200) {
-        emit on_success (_file_id);
+        emit success (_file_id);
     } else {
         q_c_info (lc_cse_job ()) << "Setting the encrypted flag failed with" << path () << error_string () << ret_code;
         emit error (_file_id, ret_code);
@@ -531,7 +533,7 @@ bool StorePrivateKeyApiJob.on_finished () {
         q_c_info (lc_store_private_key_api_job ()) << "Sending private key ended with"  << path () << error_string () << ret_code;
 
     QJsonParseError error;
-    auto json = QJsonDocument.from_json (reply ().read_all (), &error);
+    var json = QJsonDocument.from_json (reply ().read_all (), &error);
     emit json_received (json, reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ());
     return true;
 }
@@ -564,7 +566,7 @@ bool SignPublicKeyApiJob.on_finished () {
     q_c_info (lc_store_private_key_api_job ()) << "Sending CSR ended with"  << path () << error_string () << reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute);
 
     QJsonParseError error;
-    auto json = QJsonDocument.from_json (reply ().read_all (), &error);
+    var json = QJsonDocument.from_json (reply ().read_all (), &error);
     emit json_received (json, reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ());
     return true;
 }

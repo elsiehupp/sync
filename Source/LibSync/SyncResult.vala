@@ -31,18 +31,36 @@ class SyncResult {
     };
 
     public SyncResult ();
+
+
     public void on_reset ();
 
     public void append_error_string (string );
+
+
     public string error_string ();
+
+
     public string[] error_strings ();
+
+
     public void clear_errors ();
 
     public void set_status (Status);
+
+
     public Status status ();
+
+
     public string status_string ();
+
+
     public QDateTime sync_time ();
+
+
     public void set_folder (string folder);
+
+
     public string folder ();
 
     public bool found_files_not_synced () {
@@ -51,6 +69,7 @@ class SyncResult {
     public bool folder_structure_was_changed () {
         return _folder_structure_was_changed;
     }
+
 
     public int num_new_items () {
         return _num_new_items;
@@ -80,12 +99,14 @@ class SyncResult {
         return _num_new_conflict_items + _num_old_conflict_items > 0;
     }
 
+
     public int num_locked_items () {
         return _num_locked_items;
     }
     public bool has_locked_files () {
         return _num_locked_items > 0;
     }
+
 
     public const SyncFileItemPtr &first_item_new () {
         return _first_item_new;
@@ -108,6 +129,7 @@ class SyncResult {
     public const SyncFileItemPtr &first_item_locked () {
         return _first_item_locked;
     }
+
 
     public void process_completed_item (SyncFileItemPtr &item);
 

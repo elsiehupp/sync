@@ -70,12 +70,18 @@ Q_DECLARE_LOGGING_CATEGORY (lc_socket_api)
 ***********************************************************/
 class SocketApi : GLib.Object {
 
-    public SocketApi (GLib.Object *parent = nullptr);
+    public SocketApi (GLib.Object parent = nullptr);
     ~SocketApi () override;
 
-    public void on_update_folder_view (Folder *f);
+    public void on_update_folder_view (Folder f);
+
+
     public void on_unregister_path (string alias);
+
+
     public void on_register_path (string alias);
+
+
     public void on_broadcast_status_push_message (string system_path, SyncFileStatus file_status);
 
 signals:
@@ -85,7 +91,7 @@ signals:
 
     private void on_new_connection ();
     private void on_lost_connection ();
-    private void on_socket_destroyed (GLib.Object *obj);
+    private void on_socket_destroyed (GLib.Object obj);
     private void on_read_socket ();
 
     static void copy_url_to_clipboard (string link);
@@ -105,7 +111,7 @@ signals:
         // Relative path of the file locally, without any vfs suffix
         string folder_relative_path_no_vfs_suffix ();
 
-        Folder *folder;
+        Folder folder;
         // Absolute path of the file locally. (May be a virtual file)
         string local_path;
         // Relative path of the file locally, as in the DB. (May be a virtual file)
@@ -117,45 +123,45 @@ signals:
     private void broadcast_message (string msg, bool do_wait = false);
 
     // opens share dialog, sends reply
-    private void process_share_request (string local_file, Socket_listener *listener, Share_dialog_start_page start_page);
+    private void process_share_request (string local_file, Socket_listener listener, Share_dialog_start_page start_page);
     private void process_file_activity_request (string local_file);
 
     //  Q_INVOKABLE
-    private void command_RETRIEVE_FOLDER_STATUS (string argument, Socket_listener *listener);
+    private void command_RETRIEVE_FOLDER_STATUS (string argument, Socket_listener listener);
     //  Q_INVOKABLE
-    private void command_RETRIEVE_FILE_STATUS (string argument, Socket_listener *listener);
+    private void command_RETRIEVE_FILE_STATUS (string argument, Socket_listener listener);
 
     //  Q_INVOKABLE
-    private void command_VERSION (string argument, Socket_listener *listener);
+    private void command_VERSION (string argument, Socket_listener listener);
 
     //  Q_INVOKABLE
-    private void command_SHARE_MENU_TITLE (string argument, Socket_listener *listener);
+    private void command_SHARE_MENU_TITLE (string argument, Socket_listener listener);
 
     // The context menu actions
     //  Q_INVOKABLE
-    private void command_ACTIVITY (string local_file, Socket_listener *listener);
+    private void command_ACTIVITY (string local_file, Socket_listener listener);
     //  Q_INVOKABLE
-    private void command_SHARE (string local_file, Socket_listener *listener);
+    private void command_SHARE (string local_file, Socket_listener listener);
     //  Q_INVOKABLE
-    private void command_MANAGE_PUBLIC_LINKS (string local_file, Socket_listener *listener);
+    private void command_MANAGE_PUBLIC_LINKS (string local_file, Socket_listener listener);
     //  Q_INVOKABLE
-    private void command_COPY_PUBLIC_LINK (string local_file, Socket_listener *listener);
+    private void command_COPY_PUBLIC_LINK (string local_file, Socket_listener listener);
     //  Q_INVOKABLE
-    private void command_COPY_PRIVATE_LINK (string local_file, Socket_listener *listener);
+    private void command_COPY_PRIVATE_LINK (string local_file, Socket_listener listener);
     //  Q_INVOKABLE
-    private void command_EMAIL_PRIVATE_LINK (string local_file, Socket_listener *listener);
+    private void command_EMAIL_PRIVATE_LINK (string local_file, Socket_listener listener);
     //  Q_INVOKABLE
-    private void command_OPEN_PRIVATE_LINK (string local_file, Socket_listener *listener);
+    private void command_OPEN_PRIVATE_LINK (string local_file, Socket_listener listener);
     //  Q_INVOKABLE
-    private void command_MAKE_AVAILABLE_LOCALLY (string files_arg, Socket_listener *listener);
+    private void command_MAKE_AVAILABLE_LOCALLY (string files_arg, Socket_listener listener);
     //  Q_INVOKABLE
-    private void command_MAKE_ONLINE_ONLY (string files_arg, Socket_listener *listener);
+    private void command_MAKE_ONLINE_ONLY (string files_arg, Socket_listener listener);
     //  Q_INVOKABLE
-    private void command_RESOLVE_CONFLICT (string local_file, Socket_listener *listener);
+    private void command_RESOLVE_CONFLICT (string local_file, Socket_listener listener);
     //  Q_INVOKABLE
-    private void command_DELETE_ITEM (string local_file, Socket_listener *listener);
+    private void command_DELETE_ITEM (string local_file, Socket_listener listener);
     //  Q_INVOKABLE
-    private void command_MOVE_ITEM (string local_file, Socket_listener *listener);
+    private void command_MOVE_ITEM (string local_file, Socket_listener listener);
 
     // External sync
     //  Q_INVOKABLE
@@ -166,14 +172,16 @@ signals:
     // Fetch the private link and call target_fun
     private void fetch_private_link_url_helper (string local_file, std.function<void (string url)> &target_fun);
 
+
     /***********************************************************
     Sends translated/branded strings that may be useful to the integration
     ***********************************************************/
     //  Q_INVOKABLE
-    private void command_GET_STRINGS (string argument, Socket_listener *listener);
+    private void command_GET_STRINGS (string argument, Socket_listener listener);
 
     // Sends the context menu options relating to sharing to listener
-    private void send_sharing_context_menu_options (File_data &file_data, Socket_listener *listener, bool enabled);
+    private void send_sharing_context_menu_options (File_data &file_data, Socket_listener listener, bool enabled);
+
 
     /***********************************************************
     Send the list of menu item. (added in version 1.1)
@@ -184,11 +192,11 @@ signals:
     and ends with GET_MENU_ITEMS:END
     ***********************************************************/
     //  Q_INVOKABLE
-    private void command_GET_MENU_ITEMS (string argument, Socket_listener *listener);
+    private void command_GET_MENU_ITEMS (string argument, Socket_listener listener);
 
     /// Direct Editing
     //  Q_INVOKABLE
-    private void command_EDIT (string local_file, Socket_listener *listener);
+    private void command_EDIT (string local_file, Socket_listener listener);
     DirectEditor* get_direct_editor_for_local_file (string local_file);
 
 #if GUI_TESTING
@@ -252,43 +260,43 @@ GLib.List<GLib.Object> all_objects (GLib.List<Gtk.Widget> &widgets) {
     return objects;
 }
 
-GLib.Object *find_widget (string query_string, GLib.List<Gtk.Widget> &widgets = QApplication.all_widgets ()) {
-    auto objects = all_objects (widgets);
+GLib.Object find_widget (string query_string, GLib.List<Gtk.Widget> &widgets = QApplication.all_widgets ()) {
+    var objects = all_objects (widgets);
 
     GLib.List<GLib.Object>.Const_iterator found_widget;
 
     if (query_string.contains ('>')) {
         q_c_debug (lc_socket_api) << "query_string contains >";
 
-        auto sub_queries = query_string.split ('>', string.Skip_empty_parts);
+        var sub_queries = query_string.split ('>', string.Skip_empty_parts);
         Q_ASSERT (sub_queries.count () == 2);
 
-        auto parent_query_string = sub_queries[0].trimmed ();
+        var parent_query_string = sub_queries[0].trimmed ();
         q_c_debug (lc_socket_api) << "Find parent : " << parent_query_string;
-        auto parent = find_widget (parent_query_string);
+        var parent = find_widget (parent_query_string);
 
         if (!parent) {
             return nullptr;
         }
 
-        auto child_query_string = sub_queries[1].trimmed ();
-        auto child = find_widget (child_query_string, parent.find_children<Gtk.Widget> ());
+        var child_query_string = sub_queries[1].trimmed ();
+        var child = find_widget (child_query_string, parent.find_children<Gtk.Widget> ());
         q_c_debug (lc_socket_api) << "found child : " << !!child;
         return child;
 
     } else if (query_string.starts_with ('#')) {
-        auto object_name = query_string.mid (1);
+        var object_name = query_string.mid (1);
         q_c_debug (lc_socket_api) << "find object_name : " << object_name;
-        found_widget = std.find_if (objects.const_begin (), objects.const_end (), [&] (GLib.Object *widget) {
+        found_widget = std.find_if (objects.const_begin (), objects.const_end (), [&] (GLib.Object widget) {
             return widget.object_name () == object_name;
         });
     } else {
         GLib.List<GLib.Object> matches;
-        std.copy_if (objects.const_begin (), objects.const_end (), std.back_inserter (matches), [&] (GLib.Object *widget) {
+        std.copy_if (objects.const_begin (), objects.const_end (), std.back_inserter (matches), [&] (GLib.Object widget) {
             return widget.inherits (query_string.to_latin1 ());
         });
 
-        std.for_each (matches.const_begin (), matches.const_end (), [] (GLib.Object *w) {
+        std.for_each (matches.const_begin (), matches.const_end (), [] (GLib.Object w) {
             if (!w)
                 return;
             q_c_debug (lc_socket_api) << "WIDGET : " << w.object_name () << w.meta_object ().class_name ();
@@ -304,7 +312,7 @@ GLib.Object *find_widget (string query_string, GLib.List<Gtk.Widget> &widgets = 
         return nullptr;
     }
 
-    return *found_widget;
+    return found_widget;
 }
 #endif
 
@@ -351,7 +359,7 @@ void Socket_listener.on_send_message (string message, bool do_wait) {
     }
 }
 
-SocketApi.SocketApi (GLib.Object *parent)
+SocketApi.SocketApi (GLib.Object parent)
     : GLib.Object (parent) {
     string socket_path;
 
@@ -414,7 +422,7 @@ SocketApi.~SocketApi () {
 void SocketApi.on_new_connection () {
     // Note that on macOS this is not actually a line-based QIODevice, it's a Socket_api_socket which is our
     // custom message based macOS IPC.
-    QIODevice *socket = _local_server.next_pending_connection ();
+    QIODevice socket = _local_server.next_pending_connection ();
 
     if (!socket) {
         return;
@@ -425,9 +433,9 @@ void SocketApi.on_new_connection () {
     connect (socket, &GLib.Object.destroyed, this, &SocketApi.on_socket_destroyed);
     ASSERT (socket.read_all ().is_empty ());
 
-    auto listener = unowned<Socket_listener>.create (socket);
+    var listener = unowned<Socket_listener>.create (socket);
     _listeners.insert (socket, listener);
-    for (Folder *f : FolderMan.instance ().map ()) {
+    for (Folder f : FolderMan.instance ().map ()) {
         if (f.can_sync ()) {
             string message = build_register_path_message (remove_trailing_slash (f.path ()));
             q_c_info (lc_socket_api) << "Trying to send SocketApi Register Path Message -." << message << "to" << listener.socket;
@@ -440,18 +448,18 @@ void SocketApi.on_lost_connection () {
     q_c_info (lc_socket_api) << "Lost connection " << sender ();
     sender ().delete_later ();
 
-    auto socket = qobject_cast<QIODevice> (sender ());
+    var socket = qobject_cast<QIODevice> (sender ());
     ASSERT (socket);
     _listeners.remove (socket);
 }
 
-void SocketApi.on_socket_destroyed (GLib.Object *obj) {
-    auto *socket = static_cast<QIODevice> (obj);
+void SocketApi.on_socket_destroyed (GLib.Object obj) {
+    var socket = static_cast<QIODevice> (obj);
     _listeners.remove (socket);
 }
 
 void SocketApi.on_read_socket () {
-    auto *socket = qobject_cast<QIODevice> (sender ());
+    var socket = qobject_cast<QIODevice> (sender ());
     ASSERT (socket);
 
     // Find the Socket_listener
@@ -460,8 +468,8 @@ void SocketApi.on_read_socket () {
     // the ready_read () signals are received - in that case there won't be a
     // valid listener. We execute the handler anyway, but it will work with
     // a Socket_listener that doesn't send any messages.
-    static auto invalid_listener = unowned<Socket_listener>.create (nullptr);
-    const auto listener = _listeners.value (socket, invalid_listener);
+    static var invalid_listener = unowned<Socket_listener>.create (nullptr);
+    const var listener = _listeners.value (socket, invalid_listener);
     while (socket.can_read_line ()) {
         // Make sure to normalize the input from the socket to
         // make sure that the path will match, especially on OS X.
@@ -479,7 +487,7 @@ void SocketApi.on_read_socket () {
                 function_with_arguments += command + QByteArrayLiteral (" (string,Socket_listener*)");
             }
             Q_ASSERT (static_qt_meta_object.normalized_signature (function_with_arguments) == function_with_arguments);
-            const auto out = static_meta_object.index_of_method (function_with_arguments);
+            const var out = static_meta_object.index_of_method (function_with_arguments);
             if (out == -1) {
                 listener.send_error (QStringLiteral ("Function %1 not found").arg (string.from_utf8 (function_with_arguments)));
             }
@@ -487,19 +495,19 @@ void SocketApi.on_read_socket () {
             return out;
         } ();
 
-        const auto argument = arg_pos != -1 ? line.mid_ref (arg_pos + 1) : QStringRef ();
+        const var argument = arg_pos != -1 ? line.mid_ref (arg_pos + 1) : QStringRef ();
         if (command.starts_with ("ASYNC_")) {
-            auto arguments = argument.split ('|');
+            var arguments = argument.split ('|');
             if (arguments.size () != 2) {
                 listener.send_error (QStringLiteral ("argument count is wrong"));
                 return;
             }
 
-            auto json = QJsonDocument.from_json (arguments[1].to_utf8 ()).object ();
+            var json = QJsonDocument.from_json (arguments[1].to_utf8 ()).object ();
 
-            auto job_id = arguments[0];
+            var job_id = arguments[0];
 
-            auto socket_api_job = unowned<Socket_api_job> (
+            var socket_api_job = unowned<Socket_api_job> (
                 new Socket_api_job (job_id.to_string (), listener, json), &GLib.Object.delete_later);
             if (index_of_method != -1) {
                 static_meta_object.method (index_of_method)
@@ -512,13 +520,13 @@ void SocketApi.on_read_socket () {
             }
         } else if (command.starts_with ("V2/")) {
             QJsonParseError error;
-            const auto json = QJsonDocument.from_json (argument.to_utf8 (), &error).object ();
+            const var json = QJsonDocument.from_json (argument.to_utf8 (), &error).object ();
             if (error.error != QJsonParseError.NoError) {
                 q_c_warning (lc_socket_api ()) << "Invalid json" << argument.to_string () << error.error_string ();
                 listener.send_error (error.error_string ());
                 return;
             }
-            auto socket_api_job = unowned<Socket_api_job_v2>.create (listener, command, json);
+            var socket_api_job = unowned<Socket_api_job_v2>.create (listener, command, json);
             if (index_of_method != -1) {
                 static_meta_object.method (index_of_method)
                     .invoke (this, Qt.QueuedConnection,
@@ -545,10 +553,10 @@ void SocketApi.on_register_path (string alias) {
     if (_registered_aliases.contains (alias))
         return;
 
-    Folder *f = FolderMan.instance ().folder (alias);
+    Folder f = FolderMan.instance ().folder (alias);
     if (f) {
         const string message = build_register_path_message (remove_trailing_slash (f.path ()));
-        for (auto &listener : q_as_const (_listeners)) {
+        for (var &listener : q_as_const (_listeners)) {
             q_c_info (lc_socket_api) << "Trying to send SocketApi Register Path Message -." << message << "to" << listener.socket;
             listener.on_send_message (message);
         }
@@ -561,14 +569,14 @@ void SocketApi.on_unregister_path (string alias) {
     if (!_registered_aliases.contains (alias))
         return;
 
-    Folder *f = FolderMan.instance ().folder (alias);
+    Folder f = FolderMan.instance ().folder (alias);
     if (f)
         broadcast_message (build_message (QLatin1String ("UNREGISTER_PATH"), remove_trailing_slash (f.path ()), string ()), true);
 
     _registered_aliases.remove (alias);
 }
 
-void SocketApi.on_update_folder_view (Folder *f) {
+void SocketApi.on_update_folder_view (Folder f) {
     if (_listeners.is_empty ()) {
         return;
     }
@@ -592,21 +600,21 @@ void SocketApi.on_update_folder_view (Folder *f) {
 }
 
 void SocketApi.broadcast_message (string msg, bool do_wait) {
-    for (auto &listener : q_as_const (_listeners)) {
+    for (var &listener : q_as_const (_listeners)) {
         listener.on_send_message (msg, do_wait);
     }
 }
 
 void SocketApi.process_file_activity_request (string local_file) {
-    const auto file_data = File_data.get (local_file);
+    const var file_data = File_data.get (local_file);
     emit file_activity_command_received (file_data.server_relative_path, file_data.local_path);
 }
 
-void SocketApi.process_share_request (string local_file, Socket_listener *listener, Share_dialog_start_page start_page) {
-    auto theme = Theme.instance ();
+void SocketApi.process_share_request (string local_file, Socket_listener listener, Share_dialog_start_page start_page) {
+    var theme = Theme.instance ();
 
-    auto file_data = File_data.get (local_file);
-    auto share_folder = file_data.folder;
+    var file_data = File_data.get (local_file);
+    var share_folder = file_data.folder;
     if (!share_folder) {
         const string message = QLatin1String ("SHARE:NOP:") + QDir.to_native_separators (local_file);
         // files that are not within a sync folder are not synced.
@@ -626,7 +634,7 @@ void SocketApi.process_share_request (string local_file, Socket_listener *listen
             return;
         }
 
-        auto &remote_path = file_data.server_relative_path;
+        var &remote_path = file_data.server_relative_path;
 
         // Can't share root folder
         if (remote_path == "/") {
@@ -645,21 +653,21 @@ void SocketApi.process_share_request (string local_file, Socket_listener *listen
 void SocketApi.on_broadcast_status_push_message (string system_path, SyncFileStatus file_status) {
     string msg = build_message (QLatin1String ("STATUS"), system_path, file_status.to_socket_api_string ());
     Q_ASSERT (!system_path.ends_with ('/'));
-    uint directory_hash = q_hash (system_path.left (system_path.last_index_of ('/')));
-    for (auto &listener : q_as_const (_listeners)) {
+    uint32 directory_hash = q_hash (system_path.left (system_path.last_index_of ('/')));
+    for (var &listener : q_as_const (_listeners)) {
         listener.send_message_if_directory_monitored (msg, directory_hash);
     }
 }
 
-void SocketApi.command_RETRIEVE_FOLDER_STATUS (string argument, Socket_listener *listener) {
+void SocketApi.command_RETRIEVE_FOLDER_STATUS (string argument, Socket_listener listener) {
     // This command is the same as RETRIEVE_FILE_STATUS
     command_RETRIEVE_FILE_STATUS (argument, listener);
 }
 
-void SocketApi.command_RETRIEVE_FILE_STATUS (string argument, Socket_listener *listener) {
+void SocketApi.command_RETRIEVE_FILE_STATUS (string argument, Socket_listener listener) {
     string status_string;
 
-    auto file_data = File_data.get (argument);
+    var file_data = File_data.get (argument);
     if (!file_data.folder) {
         // this can happen in offline mode e.g. : nothing to worry about
         status_string = QLatin1String ("NOP");
@@ -677,38 +685,38 @@ void SocketApi.command_RETRIEVE_FILE_STATUS (string argument, Socket_listener *l
     listener.on_send_message (message);
 }
 
-void SocketApi.command_SHARE (string local_file, Socket_listener *listener) {
+void SocketApi.command_SHARE (string local_file, Socket_listener listener) {
     process_share_request (local_file, listener, Share_dialog_start_page.Users_and_groups);
 }
 
-void SocketApi.command_ACTIVITY (string local_file, Socket_listener *listener) {
+void SocketApi.command_ACTIVITY (string local_file, Socket_listener listener) {
     Q_UNUSED (listener);
 
     process_file_activity_request (local_file);
 }
 
-void SocketApi.command_MANAGE_PUBLIC_LINKS (string local_file, Socket_listener *listener) {
+void SocketApi.command_MANAGE_PUBLIC_LINKS (string local_file, Socket_listener listener) {
     process_share_request (local_file, listener, Share_dialog_start_page.Public_links);
 }
 
-void SocketApi.command_VERSION (string , Socket_listener *listener) {
+void SocketApi.command_VERSION (string , Socket_listener listener) {
     listener.on_send_message (QLatin1String ("VERSION:" MIRALL_VERSION_STRING ":" MIRALL_SOCKET_API_VERSION));
 }
 
-void SocketApi.command_SHARE_MENU_TITLE (string , Socket_listener *listener) {
+void SocketApi.command_SHARE_MENU_TITLE (string , Socket_listener listener) {
     //listener.on_send_message (QLatin1String ("SHARE_MENU_TITLE:") + tr ("Share with %1", "parameter is Nextcloud").arg (Theme.instance ().app_name_gui ()));
     listener.on_send_message (QLatin1String ("SHARE_MENU_TITLE:") + Theme.instance ().app_name_gui ());
 }
 
-void SocketApi.command_EDIT (string local_file, Socket_listener *listener) {
+void SocketApi.command_EDIT (string local_file, Socket_listener listener) {
     Q_UNUSED (listener)
-    auto file_data = File_data.get (local_file);
+    var file_data = File_data.get (local_file);
     if (!file_data.folder) {
         q_c_warning (lc_socket_api) << "Unknown path" << local_file;
         return;
     }
 
-    auto record = file_data.journal_record ();
+    var record = file_data.journal_record ();
     if (!record.is_valid ())
         return;
 
@@ -716,7 +724,7 @@ void SocketApi.command_EDIT (string local_file, Socket_listener *listener) {
     if (!editor)
         return;
 
-    auto *job = new JsonApiJob (file_data.folder.account_state ().account (), QLatin1String ("ocs/v2.php/apps/files/api/v1/direct_editing/open"), this);
+    var job = new JsonApiJob (file_data.folder.account_state ().account (), QLatin1String ("ocs/v2.php/apps/files/api/v1/direct_editing/open"), this);
 
     QUrlQuery params;
     params.add_query_item ("path", file_data.server_relative_path);
@@ -725,8 +733,8 @@ void SocketApi.command_EDIT (string local_file, Socket_listener *listener) {
     job.set_verb (JsonApiJob.Verb.Post);
 
     GLib.Object.connect (job, &JsonApiJob.json_received, [] (QJsonDocument &json){
-        auto data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
-        auto url = QUrl (data.value ("url").to_string ());
+        var data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
+        var url = QUrl (data.value ("url").to_string ());
 
         if (!url.is_empty ())
             Utility.open_browser (url);
@@ -740,7 +748,7 @@ void SocketApi.command_EDIT (string local_file, Socket_listener *listener) {
 class Get_or_create_public_link_share : GLib.Object {
 
     public Get_or_create_public_link_share (AccountPtr &account, string local_file,
-        GLib.Object *parent)
+        GLib.Object parent)
         : GLib.Object (parent)
         , _account (account)
         , _share_manager (account)
@@ -755,6 +763,7 @@ class Get_or_create_public_link_share : GLib.Object {
             this, &Get_or_create_public_link_share.on_server_error);
     }
 
+
     public void run () {
         q_c_debug (lc_public_link) << "Fetching shares";
         _share_manager.fetch_shares (_local_file);
@@ -762,11 +771,11 @@ class Get_or_create_public_link_share : GLib.Object {
 
 
     private void on_shares_fetched (GLib.List<unowned<Share>> &shares) {
-        auto share_name = SocketApi.tr ("Context menu share");
+        var share_name = SocketApi.tr ("Context menu share");
 
         // If there already is a context menu share, reuse it
-        for (auto &share : shares) {
-            const auto link_share = q_shared_pointer_dynamic_cast<Link_share> (share);
+        for (var &share : shares) {
+            const var link_share = q_shared_pointer_dynamic_cast<Link_share> (share);
             if (!link_share)
                 continue;
 
@@ -828,7 +837,7 @@ signals:
 
 
     private void on_success (string link) {
-        emit on_done (link);
+        emit done (link);
         delete_later ();
     }
 
@@ -845,6 +854,7 @@ class Get_or_create_public_link_share : GLib.Object {
         std.function<void (string link)>, GLib.Object *) {
     }
 
+
     public void run () {
     }
 };
@@ -852,12 +862,12 @@ class Get_or_create_public_link_share : GLib.Object {
 #endif
 
 void SocketApi.command_COPY_PUBLIC_LINK (string local_file, Socket_listener *) {
-    auto file_data = File_data.get (local_file);
+    var file_data = File_data.get (local_file);
     if (!file_data.folder)
         return;
 
     AccountPtr account = file_data.folder.account_state ().account ();
-    auto job = new Get_or_create_public_link_share (account, file_data.server_relative_path, this);
+    var job = new Get_or_create_public_link_share (account, file_data.server_relative_path, this);
     connect (job, &Get_or_create_public_link_share.done, this,
         [] (string url) {
             copy_url_to_clipboard (url);
@@ -871,13 +881,13 @@ void SocketApi.command_COPY_PUBLIC_LINK (string local_file, Socket_listener *) {
 
 // Fetches the private link url asynchronously and then calls the target slot
 void SocketApi.fetch_private_link_url_helper (string local_file, std.function<void (string url)> &target_fun) {
-    auto file_data = File_data.get (local_file);
+    var file_data = File_data.get (local_file);
     if (!file_data.folder) {
         q_c_warning (lc_socket_api) << "Unknown path" << local_file;
         return;
     }
 
-    auto record = file_data.journal_record ();
+    var record = file_data.journal_record ();
     if (!record.is_valid ())
         return;
 
@@ -904,13 +914,13 @@ void SocketApi.command_OPEN_PRIVATE_LINK (string local_file, Socket_listener *) 
 void SocketApi.command_MAKE_AVAILABLE_LOCALLY (string files_arg, Socket_listener *) {
     const string[] files = split (files_arg);
 
-    for (auto &file : files) {
-        auto data = File_data.get (file);
+    for (var &file : files) {
+        var data = File_data.get (file);
         if (!data.folder)
             continue;
 
         // Update the pin state on all items
-        if (!data.folder.vfs ().set_pin_state (data.folder_relative_path, PinState.AlwaysLocal)) {
+        if (!data.folder.vfs ().set_pin_state (data.folder_relative_path, PinState.PinState.ALWAYS_LOCAL)) {
             q_c_warning (lc_socket_api) << "Could not set pin state of" << data.folder_relative_path << "to always local";
         }
 
@@ -926,13 +936,13 @@ Go over all the files and replace them by a virtual file
 void SocketApi.command_MAKE_ONLINE_ONLY (string files_arg, Socket_listener *) {
     const string[] files = split (files_arg);
 
-    for (auto &file : files) {
-        auto data = File_data.get (file);
+    for (var &file : files) {
+        var data = File_data.get (file);
         if (!data.folder)
             continue;
 
         // Update the pin state on all items
-        if (!data.folder.vfs ().set_pin_state (data.folder_relative_path, PinState.OnlineOnly)) {
+        if (!data.folder.vfs ().set_pin_state (data.folder_relative_path, PinState.VfsItemAvailability.ONLINE_ONLY)) {
             q_c_warning (lc_socket_api) << "Could not set pin state of" << data.folder_relative_path << "to online only";
         }
 
@@ -947,18 +957,18 @@ void SocketApi.copy_url_to_clipboard (string link) {
 }
 
 void SocketApi.command_RESOLVE_CONFLICT (string local_file, Socket_listener *) {
-    const auto file_data = File_data.get (local_file);
+    const var file_data = File_data.get (local_file);
     if (!file_data.folder || !Utility.is_conflict_file (file_data.folder_relative_path))
         return; // should not have shown menu item
 
-    const auto conflicted_relative_path = file_data.folder_relative_path;
-    const auto base_relative_path = file_data.folder.journal_db ().conflict_file_base_name (file_data.folder_relative_path.to_utf8 ());
+    const var conflicted_relative_path = file_data.folder_relative_path;
+    const var base_relative_path = file_data.folder.journal_database ().conflict_file_base_name (file_data.folder_relative_path.to_utf8 ());
 
-    const auto dir = QDir (file_data.folder.path ());
-    const auto conflicted_path = dir.file_path (conflicted_relative_path);
-    const auto base_path = dir.file_path (base_relative_path);
+    const var dir = QDir (file_data.folder.path ());
+    const var conflicted_path = dir.file_path (conflicted_relative_path);
+    const var base_path = dir.file_path (base_relative_path);
 
-    const auto base_name = QFileInfo (base_path).file_name ();
+    const var base_name = QFileInfo (base_path).file_name ();
 
 #ifndef OWNCLOUD_TEST
     ConflictDialog dialog;
@@ -978,8 +988,8 @@ void SocketApi.command_DELETE_ITEM (string local_file, Socket_listener *) {
 }
 
 void SocketApi.command_MOVE_ITEM (string local_file, Socket_listener *) {
-    const auto file_data = File_data.get (local_file);
-    const auto parent_dir = file_data.parent_folder ();
+    const var file_data = File_data.get (local_file);
+    const var parent_dir = file_data.parent_folder ();
     if (!file_data.folder)
         return; // should not have shown menu item
 
@@ -987,12 +997,12 @@ void SocketApi.command_MOVE_ITEM (string local_file, Socket_listener *) {
 
     // If it's a conflict, we want to save it under the base name by default
     if (Utility.is_conflict_file (default_dir_and_name)) {
-        default_dir_and_name = file_data.folder.journal_db ().conflict_file_base_name (file_data.folder_relative_path.to_utf8 ());
+        default_dir_and_name = file_data.folder.journal_database ().conflict_file_base_name (file_data.folder_relative_path.to_utf8 ());
     }
 
     // If the parent doesn't accept new files, go to the root of the sync folder
     QFileInfo file_info (local_file);
-    const auto parent_record = parent_dir.journal_record ();
+    const var parent_record = parent_dir.journal_record ();
     if ( (file_info.is_file () && !parent_record._remote_perm.has_permission (RemotePermissions.Can_add_file))
         || (file_info.is_dir () && !parent_record._remote_perm.has_permission (RemotePermissions.Can_add_sub_directories))) {
         default_dir_and_name = QFileInfo (default_dir_and_name).file_name ();
@@ -1001,7 +1011,7 @@ void SocketApi.command_MOVE_ITEM (string local_file, Socket_listener *) {
     // Add back the folder path
     default_dir_and_name = QDir (file_data.folder.path ()).file_path (default_dir_and_name);
 
-    const auto target = QFileDialog.get_save_file_name (
+    const var target = QFileDialog.get_save_file_name (
         nullptr,
         tr ("Select new location …"),
         default_dir_and_name,
@@ -1016,7 +1026,7 @@ void SocketApi.command_MOVE_ITEM (string local_file, Socket_listener *) {
 
 void SocketApi.command_V2_LIST_ACCOUNTS (unowned<Socket_api_job_v2> &job) {
     QJsonArray out;
-    for (auto acc : AccountManager.instance ().accounts ()) {
+    for (var acc : AccountManager.instance ().accounts ()) {
         // TODO : Use uuid once https://github.com/owncloud/client/pull/8397 is merged
         out << QJsonObject ({
             {
@@ -1035,7 +1045,7 @@ void SocketApi.command_V2_LIST_ACCOUNTS (unowned<Socket_api_job_v2> &job) {
 }
 
 void SocketApi.command_V2_UPLOAD_FILES_FROM (unowned<Socket_api_job_v2> &job) {
-    auto upload_job = new Socket_upload_job (job);
+    var upload_job = new Socket_upload_job (job);
     upload_job.on_start ();
 }
 
@@ -1050,7 +1060,7 @@ void Occ.SocketApi.open_private_link (string link) {
     Utility.open_browser (link);
 }
 
-void SocketApi.command_GET_STRINGS (string argument, Socket_listener *listener) {
+void SocketApi.command_GET_STRINGS (string argument, Socket_listener listener) {
     {
         c std.array<std.pair<const char *, QString
         {
@@ -1073,7 +1083,7 @@ void SocketApi.command_GET_STRINGS (string argument, Socket_listener *listener) 
         },
     } };
     listener.on_send_message (string ("GET_STRINGS:BEGIN"));
-    for (auto& key_value : strings) {
+    for (var& key_value : strings) {
         if (argument.is_empty () || argument == QLatin1String (key_value.first)) {
             listener.on_send_message (string ("STRING:%1:%2").arg (key_value.first, key_value.second));
         }
@@ -1081,13 +1091,13 @@ void SocketApi.command_GET_STRINGS (string argument, Socket_listener *listener) 
     listener.on_send_message (string ("GET_STRINGS:END"));
 }
 
-void SocketApi.send_sharing_context_menu_options (File_data &file_data, Socket_listener *listener, bool enabled) {
-    auto record = file_data.journal_record ();
+void SocketApi.send_sharing_context_menu_options (File_data &file_data, Socket_listener listener, bool enabled) {
+    var record = file_data.journal_record ();
     bool is_on_the_server = record.is_valid ();
-    auto flag_string = is_on_the_server && enabled ? QLatin1String (".") : QLatin1String (":d:");
+    var flag_string = is_on_the_server && enabled ? QLatin1String (".") : QLatin1String (":d:");
 
-    auto capabilities = file_data.folder.account_state ().account ().capabilities ();
-    auto theme = Theme.instance ();
+    var capabilities = file_data.folder.account_state ().account ().capabilities ();
+    var theme = Theme.instance ();
     if (!capabilities.share_a_p_i () || ! (theme.user_group_sharing () || (theme.link_sharing () && capabilities.share_public_link ())))
         return;
 
@@ -1142,7 +1152,7 @@ SocketApi.File_data SocketApi.File_data.get (string local_file) {
 }
 
 string SocketApi.File_data.folder_relative_path_no_vfs_suffix () {
-    auto result = folder_relative_path;
+    var result = folder_relative_path;
     string virtual_file_ext = QStringLiteral (APPLICATION_DOTVIRTUALFILE_SUFFIX);
     if (result.ends_with (virtual_file_ext)) {
         result.chop (virtual_file_ext.size ());
@@ -1160,7 +1170,7 @@ SyncJournalFileRecord SocketApi.File_data.journal_record () {
     SyncJournalFileRecord record;
     if (!folder)
         return record;
-    folder.journal_db ().get_file_record (folder_relative_path, &record);
+    folder.journal_database ().get_file_record (folder_relative_path, &record);
     return record;
 }
 
@@ -1168,15 +1178,15 @@ SocketApi.File_data SocketApi.File_data.parent_folder () {
     return File_data.get (QFileInfo (local_path).dir ().path ().to_utf8 ());
 }
 
-void SocketApi.command_GET_MENU_ITEMS (string argument, Occ.Socket_listener *listener) {
+void SocketApi.command_GET_MENU_ITEMS (string argument, Occ.Socket_listener listener) {
     listener.on_send_message (string ("GET_MENU_ITEMS:BEGIN"));
     const string[] files = split (argument);
 
     // Find the common sync folder.
     // sync_folder will be null if files are in different folders.
-    Folder *sync_folder = nullptr;
-    for (auto &file : files) {
-        auto folder = FolderMan.instance ().folder_for_path (file);
+    Folder sync_folder = nullptr;
+    for (var &file : files) {
+        var folder = FolderMan.instance ().folder_for_path (file);
         if (folder != sync_folder) {
             if (!sync_folder) {
                 sync_folder = folder;
@@ -1195,10 +1205,10 @@ void SocketApi.command_GET_MENU_ITEMS (string argument, Occ.Socket_listener *lis
         }
 
         File_data file_data = File_data.get (argument);
-        const auto record = file_data.journal_record ();
+        const var record = file_data.journal_record ();
         const bool is_on_the_server = record.is_valid ();
-        const auto is_e2e_encrypted_path = file_data.journal_record ()._is_e2e_encrypted || !file_data.journal_record ()._e2e_mangled_name.is_empty ();
-        auto flag_string = is_on_the_server && !is_e2e_encrypted_path ? QLatin1String (".") : QLatin1String (":d:");
+        const var is_e2e_encrypted_path = file_data.journal_record ()._is_e2e_encrypted || !file_data.journal_record ()._e2e_mangled_name.is_empty ();
+        var flag_string = is_on_the_server && !is_e2e_encrypted_path ? QLatin1String (".") : QLatin1String (":d:");
 
         const QFileInfo file_info (file_data.local_path);
         if (!file_info.is_dir ()) {
@@ -1219,8 +1229,8 @@ void SocketApi.command_GET_MENU_ITEMS (string argument, Occ.Socket_listener *lis
         bool is_conflict = Utility.is_conflict_file (file_data.folder_relative_path);
         if (is_conflict || !is_on_the_server) {
             // Check whether this new file is in a read-only directory
-            const auto parent_dir = file_data.parent_folder ();
-            const auto parent_record = parent_dir.journal_record ();
+            const var parent_dir = file_data.parent_folder ();
+            const var parent_record = parent_dir.journal_record ();
             const bool can_add_to_dir =
                 !parent_record.is_valid () // We're likely at the root of the sync folder, got to assume we can add there
                 || (file_info.is_file () && parent_record._remote_perm.has_permission (RemotePermissions.Can_add_file))
@@ -1261,24 +1271,24 @@ void SocketApi.command_GET_MENU_ITEMS (string argument, Occ.Socket_listener *lis
         ENFORCE (!files.is_empty ());
 
         // Determine the combined availability status of the files
-        auto combined = Optional<VfsItemAvailability> ();
-        auto merge = [] (VfsItemAvailability lhs, VfsItemAvailability rhs) {
+        var combined = Optional<VfsItemAvailability> ();
+        var merge = [] (VfsItemAvailability lhs, VfsItemAvailability rhs) {
             if (lhs == rhs)
                 return lhs;
             if (int (lhs) > int (rhs))
                 std.swap (lhs, rhs); // reduce cases ensuring lhs < rhs
-            if (lhs == VfsItemAvailability.AlwaysLocal && rhs == VfsItemAvailability.AllHydrated)
-                return VfsItemAvailability.AllHydrated;
-            if (lhs == VfsItemAvailability.AllDehydrated && rhs == VfsItemAvailability.OnlineOnly)
-                return VfsItemAvailability.AllDehydrated;
-            return VfsItemAvailability.Mixed;
+            if (lhs == VfsItemAvailability.PinState.ALWAYS_LOCAL && rhs == VfsItemAvailability.VfsItemAvailability.ALL_HYDRATED)
+                return VfsItemAvailability.VfsItemAvailability.ALL_HYDRATED;
+            if (lhs == VfsItemAvailability.VfsItemAvailability.ALL_DEHYDRATED && rhs == VfsItemAvailability.VfsItemAvailability.ONLINE_ONLY)
+                return VfsItemAvailability.VfsItemAvailability.ALL_DEHYDRATED;
+            return VfsItemAvailability.VfsItemAvailability.MIXED;
         };
-        for (auto &file : files) {
-            auto file_data = File_data.get (file);
-            auto availability = sync_folder.vfs ().availability (file_data.folder_relative_path);
+        for (var &file : files) {
+            var file_data = File_data.get (file);
+            var availability = sync_folder.vfs ().availability (file_data.folder_relative_path);
             if (!availability) {
                 if (availability.error () == Vfs.AvailabilityError.DbError)
-                    availability = VfsItemAvailability.Mixed;
+                    availability = VfsItemAvailability.VfsItemAvailability.MIXED;
                 if (availability.error () == Vfs.AvailabilityError.NoSuchItem)
                     continue;
             }
@@ -1290,7 +1300,7 @@ void SocketApi.command_GET_MENU_ITEMS (string argument, Occ.Socket_listener *lis
         }
 
         // TODO : Should be a submenu, should use icons
-        auto make_pin_context_menu = [&] (bool make_available_locally, bool free_space) {
+        var make_pin_context_menu = [&] (bool make_available_locally, bool free_space) {
             listener.on_send_message (QLatin1String ("MENU_ITEM:CURRENT_PIN:d:")
                 + Utility.vfs_current_availability_text (*combined));
             if (!Theme.instance ().enforce_virtual_files_sync_folder ()) {
@@ -1305,15 +1315,15 @@ void SocketApi.command_GET_MENU_ITEMS (string argument, Occ.Socket_listener *lis
 
         if (combined) {
             switch (*combined) {
-            case VfsItemAvailability.AlwaysLocal:
+            case VfsItemAvailability.PinState.ALWAYS_LOCAL:
                 make_pin_context_menu (false, true);
                 break;
-            case VfsItemAvailability.AllHydrated:
-            case VfsItemAvailability.Mixed:
+            case VfsItemAvailability.VfsItemAvailability.ALL_HYDRATED:
+            case VfsItemAvailability.VfsItemAvailability.MIXED:
                 make_pin_context_menu (true, true);
                 break;
-            case VfsItemAvailability.AllDehydrated:
-            case VfsItemAvailability.OnlineOnly:
+            case VfsItemAvailability.VfsItemAvailability.ALL_DEHYDRATED:
+            case VfsItemAvailability.VfsItemAvailability.ONLINE_ONLY:
                 make_pin_context_menu (true, false);
                 break;
             }
@@ -1325,14 +1335,14 @@ void SocketApi.command_GET_MENU_ITEMS (string argument, Occ.Socket_listener *lis
 
 DirectEditor* SocketApi.get_direct_editor_for_local_file (string local_file) {
     File_data file_data = File_data.get (local_file);
-    auto capabilities = file_data.folder.account_state ().account ().capabilities ();
+    var capabilities = file_data.folder.account_state ().account ().capabilities ();
 
     if (file_data.folder && file_data.folder.account_state ().is_connected ()) {
-        const auto record = file_data.journal_record ();
-        const auto mime_match_mode = record.is_virtual_file () ? QMimeDatabase.Match_extension : QMimeDatabase.Match_default;
+        const var record = file_data.journal_record ();
+        const var mime_match_mode = record.is_virtual_file () ? QMimeDatabase.Match_extension : QMimeDatabase.Match_default;
 
-        QMimeDatabase db;
-        QMimeType type = db.mime_type_for_file (local_file, mime_match_mode);
+        QMimeDatabase database;
+        QMimeType type = database.mime_type_for_file (local_file, mime_match_mode);
 
         DirectEditor* editor = capabilities.get_direct_editor_for_mimetype (type);
         if (!editor) {
@@ -1347,8 +1357,8 @@ DirectEditor* SocketApi.get_direct_editor_for_local_file (string local_file) {
 #if GUI_TESTING
 void SocketApi.command_ASYNC_LIST_WIDGETS (unowned<Socket_api_job> &job) {
     string response;
-    for (auto &widget : all_objects (QApplication.all_widgets ())) {
-        auto object_name = widget.object_name ();
+    for (var &widget : all_objects (QApplication.all_widgets ())) {
+        var object_name = widget.object_name ();
         if (!object_name.is_empty ()) {
             response += object_name + ":" + widget.property ("text").to_string () + ", ";
         }
@@ -1357,9 +1367,9 @@ void SocketApi.command_ASYNC_LIST_WIDGETS (unowned<Socket_api_job> &job) {
 }
 
 void SocketApi.command_ASYNC_INVOKE_WIDGET_METHOD (unowned<Socket_api_job> &job) {
-    auto &arguments = job.arguments ();
+    var &arguments = job.arguments ();
 
-    auto widget = find_widget (arguments["object_name"].to_string ());
+    var widget = find_widget (arguments["object_name"].to_string ());
     if (!widget) {
         job.reject (QLatin1String ("widget not found"));
         return;
@@ -1371,22 +1381,22 @@ void SocketApi.command_ASYNC_INVOKE_WIDGET_METHOD (unowned<Socket_api_job> &job)
 
 void SocketApi.command_ASYNC_GET_WIDGET_PROPERTY (unowned<Socket_api_job> &job) {
     string widget_name = job.arguments ()[QLatin1String ("object_name")].to_string ();
-    auto widget = find_widget (widget_name);
+    var widget = find_widget (widget_name);
     if (!widget) {
         string message = string (QLatin1String ("Widget not found : 2 : %1")).arg (widget_name);
         job.reject (message);
         return;
     }
 
-    auto property_name = job.arguments ()[QLatin1String ("property")].to_string ();
+    var property_name = job.arguments ()[QLatin1String ("property")].to_string ();
 
-    auto segments = property_name.split ('.');
+    var segments = property_name.split ('.');
 
-    GLib.Object *current_object = widget;
+    GLib.Object current_object = widget;
     string value;
     for (int i = 0; i < segments.count (); i++) {
-        auto segment = segments.at (i);
-        auto var = current_object.property (segment.to_utf8 ().const_data ());
+        var segment = segments.at (i);
+        var var = current_object.property (segment.to_utf8 ().const_data ());
 
         if (var.can_convert<string> ()) {
             var.convert (QMetaType.string);
@@ -1394,7 +1404,7 @@ void SocketApi.command_ASYNC_GET_WIDGET_PROPERTY (unowned<Socket_api_job> &job) 
             break;
         }
 
-        auto tmp_object = var.value<GLib.Object> ();
+        var tmp_object = var.value<GLib.Object> ();
         if (tmp_object) {
             current_object = tmp_object;
         } else {
@@ -1408,9 +1418,9 @@ void SocketApi.command_ASYNC_GET_WIDGET_PROPERTY (unowned<Socket_api_job> &job) 
 }
 
 void SocketApi.command_ASYNC_SET_WIDGET_PROPERTY (unowned<Socket_api_job> &job) {
-    auto &arguments = job.arguments ();
+    var &arguments = job.arguments ();
     string widget_name = arguments["object_name"].to_string ();
-    auto widget = find_widget (widget_name);
+    var widget = find_widget (widget_name);
     if (!widget) {
         string message = string (QLatin1String ("Widget not found : 4 : %1")).arg (widget_name);
         job.reject (message);
@@ -1423,42 +1433,42 @@ void SocketApi.command_ASYNC_SET_WIDGET_PROPERTY (unowned<Socket_api_job> &job) 
 }
 
 void SocketApi.command_ASYNC_WAIT_FOR_WIDGET_SIGNAL (unowned<Socket_api_job> &job) {
-    auto &arguments = job.arguments ();
+    var &arguments = job.arguments ();
     string widget_name = arguments["object_name"].to_string ();
-    auto widget = find_widget (arguments["object_name"].to_string ());
+    var widget = find_widget (arguments["object_name"].to_string ());
     if (!widget) {
         string message = string (QLatin1String ("Widget not found : 5 : %1")).arg (widget_name);
         job.reject (message);
         return;
     }
 
-    Listener_closure *closure = new Listener_closure ([job] () {
+    Listener_closure closure = new Listener_closure ([job] () {
         job.resolve ("signal emitted");
     });
 
-    auto signal_signature = arguments["signal_signature"].to_string ();
+    var signal_signature = arguments["signal_signature"].to_string ();
     signal_signature.prepend ("2");
-    auto utf8 = signal_signature.to_utf8 ();
-    auto signal_signature_final = utf8.const_data ();
+    var utf8 = signal_signature.to_utf8 ();
+    var signal_signature_final = utf8.const_data ();
     connect (widget, signal_signature_final, closure, SLOT (closure_slot ()), Qt.QueuedConnection);
 }
 
 void SocketApi.command_ASYNC_TRIGGER_MENU_ACTION (unowned<Socket_api_job> &job) {
-    auto &arguments = job.arguments ();
+    var &arguments = job.arguments ();
 
-    auto object_name = arguments["object_name"].to_string ();
-    auto widget = find_widget (object_name);
+    var object_name = arguments["object_name"].to_string ();
+    var widget = find_widget (object_name);
     if (!widget) {
         string message = string (QLatin1String ("Object not found : 1 : %1")).arg (object_name);
         job.reject (message);
         return;
     }
 
-    auto children = widget.find_children<Gtk.Widget> ();
-    for (auto child_widget : children) {
+    var children = widget.find_children<Gtk.Widget> ();
+    for (var child_widget : children) {
         // foo is the popupwidget!
-        auto actions = child_widget.actions ();
-        for (auto action : actions) {
+        var actions = child_widget.actions ();
+        for (var action : actions) {
             if (action.object_name () == arguments["action_name"].to_string ()) {
                 action.trigger ();
 
@@ -1473,22 +1483,22 @@ void SocketApi.command_ASYNC_TRIGGER_MENU_ACTION (unowned<Socket_api_job> &job) 
 }
 
 void SocketApi.command_ASYNC_ASSERT_ICON_IS_EQUAL (unowned<Socket_api_job> &job) {
-    auto widget = find_widget (job.arguments ()[QLatin1String ("query_string")].to_string ());
+    var widget = find_widget (job.arguments ()[QLatin1String ("query_string")].to_string ());
     if (!widget) {
         string message = string (QLatin1String ("Object not found : 6 : %1")).arg (job.arguments ()["query_string"].to_string ());
         job.reject (message);
         return;
     }
 
-    auto property_name = job.arguments ()[QLatin1String ("property_path")].to_string ();
+    var property_name = job.arguments ()[QLatin1String ("property_path")].to_string ();
 
-    auto segments = property_name.split ('.');
+    var segments = property_name.split ('.');
 
-    GLib.Object *current_object = widget;
+    GLib.Object current_object = widget;
     QIcon value;
     for (int i = 0; i < segments.count (); i++) {
-        auto segment = segments.at (i);
-        auto var = current_object.property (segment.to_utf8 ().const_data ());
+        var segment = segments.at (i);
+        var var = current_object.property (segment.to_utf8 ().const_data ());
 
         if (var.can_convert<QIcon> ()) {
             var.convert (QMetaType.QIcon);
@@ -1496,7 +1506,7 @@ void SocketApi.command_ASYNC_ASSERT_ICON_IS_EQUAL (unowned<Socket_api_job> &job)
             break;
         }
 
-        auto tmp_object = var.value<GLib.Object> ();
+        var tmp_object = var.value<GLib.Object> ();
         if (tmp_object) {
             current_object = tmp_object;
         } else {
@@ -1504,7 +1514,7 @@ void SocketApi.command_ASYNC_ASSERT_ICON_IS_EQUAL (unowned<Socket_api_job> &job)
         }
     }
 
-    auto icon_name = job.arguments ()[QLatin1String ("icon_name")].to_string ();
+    var icon_name = job.arguments ()[QLatin1String ("icon_name")].to_string ();
     if (value.name () == icon_name) {
         job.resolve ();
     } else {
@@ -1534,7 +1544,7 @@ void Socket_api_job.reject (string response) {
     _socket_listener.on_send_message (QStringLiteral ("REJECT|") + _job_id + QLatin1Char ('|') + response);
 }
 
-Socket_api_job_v2.Socket_api_job_v2 (unowned<Socket_listener> &socket_listener, GLib.ByteArray &command, QJsonObject &arguments)
+Socket_api_job_v2.Socket_api_job_v2 (unowned<Socket_listener> &socket_listener, GLib.ByteArray command, QJsonObject &arguments)
     : _socket_listener (socket_listener)
     , _command (command)
     , _job_id (arguments[QStringLiteral ("id")].to_string ())
@@ -1577,11 +1587,11 @@ void Socket_api_job_v2.do_finish (QJsonObject &obj) {
             : hash_bits (Num_bits) {
         }
 
-        public void store_hash (uint hash) {
-            hash_bits.set_bit ( (hash & 0x_f_f_f_f) % Num_bits); // NOLINT it's uint all the way and the modulo puts us back in the 0..1023 range
+        public void store_hash (uint32 hash) {
+            hash_bits.set_bit ( (hash & 0x_f_f_f_f) % Num_bits); // NOLINT it's uint32 all the way and the modulo puts us back in the 0..1023 range
             hash_bits.set_bit ( (hash >> 16) % Num_bits); // NOLINT
         }
-        public bool is_hash_maybe_stored (uint hash) {
+        public bool is_hash_maybe_stored (uint32 hash) {
             return hash_bits.test_bit ( (hash & 0x_f_f_f_f) % Num_bits) // NOLINT
                 && hash_bits.test_bit ( (hash >> 16) % Num_bits); // NOLINT
         }
@@ -1606,12 +1616,12 @@ void Socket_api_job_v2.do_finish (QJsonObject &obj) {
             on_send_message (QStringLiteral ("ERROR:") + message, do_wait);
         }
 
-        public void send_message_if_directory_monitored (string message, uint system_directory_hash) {
+        public void send_message_if_directory_monitored (string message, uint32 system_directory_hash) {
             if (_monitored_directories_bloom_filter.is_hash_maybe_stored (system_directory_hash))
                 on_send_message (message, false);
         }
 
-        public void register_monitored_directory (uint system_directory_hash) {
+        public void register_monitored_directory (uint32 system_directory_hash) {
             _monitored_directories_bloom_filter.store_hash (system_directory_hash);
         }
 
@@ -1624,6 +1634,7 @@ void Socket_api_job_v2.do_finish (QJsonObject &obj) {
         public Listener_closure (Callback_function callback)
             : callback_ (callback) {
         }
+
 
     public slots:
         void closure_slot () {
@@ -1660,7 +1671,7 @@ void Socket_api_job_v2.do_finish (QJsonObject &obj) {
 
     class Socket_api_job_v2 : GLib.Object {
 
-        public Socket_api_job_v2 (unowned<Socket_listener> &socket_listener, GLib.ByteArray &command, QJsonObject &arguments);
+        public Socket_api_job_v2 (unowned<Socket_listener> &socket_listener, GLib.ByteArray command, QJsonObject &arguments);
 
         public void on_success (QJsonObject &response);
         public void failure (string error);

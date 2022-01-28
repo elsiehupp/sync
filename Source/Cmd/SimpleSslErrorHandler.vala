@@ -25,7 +25,7 @@ class Simple_sslErrorHandler : Occ.AbstractSslErrorHandler {
             return false;
         }
 
-        for (auto &error : q_as_const (errors)) {
+        for (var &error : q_as_const (errors)) {
             certs.append (error.certificate ());
         }
         return true;

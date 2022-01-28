@@ -24,7 +24,7 @@ namespace Occ {
 
 class WebView : Gtk.Widget {
 
-    public WebView (Gtk.Widget *parent = nullptr);
+    public WebView (Gtk.Widget parent = nullptr);
     ~WebView () override;
     public void set_url (QUrl url);
 
@@ -45,14 +45,18 @@ signals:
 
 class Web_view_page_url_request_interceptor : QWeb_engine_url_request_interceptor {
 
-    public Web_view_page_url_request_interceptor (GLib.Object *parent = nullptr);
+    public Web_view_page_url_request_interceptor (GLib.Object parent = nullptr);
+
+
     public void intercept_request (QWeb_engine_url_request_info &info) override;
 };
 
 class Web_view_page_url_scheme_handler : QWeb_engine_url_scheme_handler {
 
-    public Web_view_page_url_scheme_handler (GLib.Object *parent = nullptr);
-    public void request_started (QWeb_engine_url_request_job *request) override;
+    public Web_view_page_url_scheme_handler (GLib.Object parent = nullptr);
+
+
+    public void request_started (QWeb_engine_url_request_job request) override;
 
 signals:
     void on_url_catched (string user, string pass, string host);
@@ -60,7 +64,9 @@ signals:
 
 class Web_engine_page : QWeb_engine_page {
 
-    public Web_engine_page (QWeb_engine_profile *profile, GLib.Object* parent = nullptr);
+    public Web_engine_page (QWeb_engine_profile profile, GLib.Object* parent = nullptr);
+
+
     public QWeb_engine_page * create_window (QWeb_engine_page.Web_window_type type) override;
     public void set_url (QUrl url);
 
@@ -77,11 +83,13 @@ class Web_engine_page : QWeb_engine_page {
 // this leads to a strage segfault somewhere deep inside of the QWeb_engine code
 class External_web_engine_page : QWeb_engine_page {
 
-    public External_web_engine_page (QWeb_engine_profile *profile, GLib.Object* parent = nullptr);
+    public External_web_engine_page (QWeb_engine_profile profile, GLib.Object* parent = nullptr);
+
+
     public bool accept_navigation_request (QUrl url, QWeb_engine_page.Navigation_type type, bool is_main_frame) override;
 };
 
-WebView.WebView (Gtk.Widget *parent)
+WebView.WebView (Gtk.Widget parent)
     : Gtk.Widget (parent),
       _ui () {
     _ui.setup_ui (this);
@@ -101,9 +109,10 @@ WebView.WebView (Gtk.Widget *parent)
     _profile.set_request_interceptor (_interceptor);
     _profile.install_url_scheme_handler ("nc", _scheme_handler);
 
+
     /***********************************************************
     Set a proper accept langauge to the language of the client
-    code from : http://code.qt.io/cgit/qt/qtbase.git/tree/src/network/access/qhttpnetworkconnection.cpp
+    code from : http://code.qt.io/cgit/qt/qtbase.git/tree/src/network/access/qhttpnetworkconnection
     ***********************************************************/ {
         string system_locale = QLocale.system ().name ().replace (QChar.from_latin1 ('_'),QChar.from_latin1 ('-'));
         string accept_language;
@@ -141,7 +150,7 @@ WebView.~WebView () {
     delete _page;
 }
 
-Web_view_page_url_request_interceptor.Web_view_page_url_request_interceptor (GLib.Object *parent)
+Web_view_page_url_request_interceptor.Web_view_page_url_request_interceptor (GLib.Object parent)
     : QWeb_engine_url_request_interceptor (parent) {
 
 }
@@ -150,12 +159,12 @@ void Web_view_page_url_request_interceptor.intercept_request (QWeb_engine_url_re
     info.set_http_header ("OCS-APIREQUEST", "true");
 }
 
-Web_view_page_url_scheme_handler.Web_view_page_url_scheme_handler (GLib.Object *parent)
+Web_view_page_url_scheme_handler.Web_view_page_url_scheme_handler (GLib.Object parent)
     : QWeb_engine_url_scheme_handler (parent) {
 
 }
 
-void Web_view_page_url_scheme_handler.request_started (QWeb_engine_url_request_job *request) {
+void Web_view_page_url_scheme_handler.request_started (QWeb_engine_url_request_job request) {
     QUrl url = request.request_url ();
 
     string path = url.path ().mid (1); // get undecoded path
@@ -188,16 +197,16 @@ void Web_view_page_url_scheme_handler.request_started (QWeb_engine_url_request_j
     }
     q_c_info (lc_wizard_webiew ()) << "Got user : " << user << ", server : " << server;
 
-    emit on_url_catched (user, password, server);
+    emit url_catched (user, password, server);
 }
 
-Web_engine_page.Web_engine_page (QWeb_engine_profile *profile, GLib.Object* parent) : QWeb_engine_page (profile, parent) {
+Web_engine_page.Web_engine_page (QWeb_engine_profile profile, GLib.Object* parent) : QWeb_engine_page (profile, parent) {
 
 }
 
 QWeb_engine_page * Web_engine_page.create_window (QWeb_engine_page.Web_window_type type) {
     Q_UNUSED (type);
-    auto *view = new External_web_engine_page (this.profile ());
+    var view = new External_web_engine_page (this.profile ());
     return view;
 }
 
@@ -237,7 +246,7 @@ bool Web_engine_page.accept_navigation_request (QUrl url, QWeb_engine_page.Navig
     return true;
 }
 
-External_web_engine_page.External_web_engine_page (QWeb_engine_profile *profile, GLib.Object* parent) : QWeb_engine_page (profile, parent) {
+External_web_engine_page.External_web_engine_page (QWeb_engine_profile profile, GLib.Object* parent) : QWeb_engine_page (profile, parent) {
 
 }
 

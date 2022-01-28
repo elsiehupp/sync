@@ -14,13 +14,13 @@ namespace Occ {
 ***********************************************************/
 class Folder_status_view : QTreeView {
 
-    public Folder_status_view (Gtk.Widget *parent = nullptr);
+    public Folder_status_view (Gtk.Widget parent = nullptr);
 
     public QModelIndex index_at (QPoint &point) override;
     public QRect visual_rect (QModelIndex &index) override;
 };
 
-    Folder_status_view.Folder_status_view (Gtk.Widget *parent) : QTreeView (parent) {
+    Folder_status_view.Folder_status_view (Gtk.Widget parent) : QTreeView (parent) {
     }
 
     QModelIndex Folder_status_view.index_at (QPoint &point) {

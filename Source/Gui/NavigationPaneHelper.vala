@@ -14,7 +14,7 @@ namespace Occ {
 
 class NavigationPaneHelper : GLib.Object {
 
-    public NavigationPaneHelper (FolderMan *folder_man);
+    public NavigationPaneHelper (FolderMan folder_man);
 
     public bool show_in_explorer_navigation_pane () {
         return _show_in_explorer_navigation_pane;
@@ -31,7 +31,7 @@ class NavigationPaneHelper : GLib.Object {
     private QTimer _update_cloud_storage_registry_timer;
 };
 
-    NavigationPaneHelper.NavigationPaneHelper (FolderMan *folder_man)
+    NavigationPaneHelper.NavigationPaneHelper (FolderMan folder_man)
         : _folder_man (folder_man) {
         ConfigFile cfg;
         _show_in_explorer_navigation_pane = cfg.show_in_explorer_navigation_pane ();
@@ -52,7 +52,7 @@ class NavigationPaneHelper : GLib.Object {
         _show_in_explorer_navigation_pane = show;
         // Re-generate a new CLSID when enabling, possibly throwing away the old one.
         // update_cloud_storage_registry will take care of removing any unknown CLSID our application owns from the registry.
-        foreach (Folder *folder, _folder_man.map ())
+        foreach (Folder folder, _folder_man.map ())
             folder.set_navigation_pane_clsid (show ? QUuid.create_uuid () : QUuid ());
 
         schedule_update_cloud_storage_registry ();
@@ -74,7 +74,7 @@ class NavigationPaneHelper : GLib.Object {
             // Then re-save every folder that has a valid navigation_pane_clsid to the registry.
             // We currently don't distinguish between new and existing CLSIDs, if it's there we just
             // save over it. We at least need to update the tile in case we are suddently using multiple accounts.
-            foreach (Folder *folder, _folder_man.map ()) {
+            foreach (Folder folder, _folder_man.map ()) {
                 if (!folder.navigation_pane_clsid ().is_null ()) {
                     // If it already exists, unmark it for removal, this is a valid sync root.
                     entries_to_remove.remove_one (folder.navigation_pane_clsid ());
@@ -103,7 +103,7 @@ class NavigationPaneHelper : GLib.Object {
         }
 
         // Then remove anything that isn't in our folder list anymore.
-        foreach (auto &clsid, entries_to_remove) {
+        foreach (var &clsid, entries_to_remove) {
             string clsid_str = clsid.to_string ();
             string clsid_path = string () % R" (Software\Classes\CLSID\)" % clsid_str;
             string clsid_path_wow64 = string () % R" (Software\Classes\Wow6432Node\CLSID\)" % clsid_str;

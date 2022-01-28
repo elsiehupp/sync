@@ -25,7 +25,8 @@ namespace Utility {
 
     If launching the browser fails, display a message.
     ***********************************************************/
-    bool open_browser (QUrl url, Gtk.Widget *error_widget_parent = nullptr);
+    bool open_browser (QUrl url, Gtk.Widget error_widget_parent = nullptr);
+
 
     /***********************************************************
     Start composing a new email message.
@@ -33,7 +34,8 @@ namespace Utility {
     If launching the email program fails, display a message.
     ***********************************************************/
     bool open_email_composer (string subject, string body,
-        Gtk.Widget *error_widget_parent);
+        Gtk.Widget error_widget_parent);
+
 
     /***********************************************************
     Returns a translated string indicating the current availability.
@@ -42,10 +44,12 @@ namespace Utility {
     ***********************************************************/
     string vfs_current_availability_text (VfsItemAvailability availability);
 
+
     /***********************************************************
     Translated text for "making items always available locally"
     ***********************************************************/
     string vfs_pin_action_text ();
+
 
     /***********************************************************
     Translated text for "free up local space" (and unpinning the item)
@@ -63,7 +67,7 @@ namespace Utility {
 
 
 
-bool Utility.open_browser (QUrl url, Gtk.Widget *error_widget_parent) {
+bool Utility.open_browser (QUrl url, Gtk.Widget error_widget_parent) {
     const string[] allowed_url_schemes = {
         "http",
         "https",
@@ -91,7 +95,7 @@ bool Utility.open_browser (QUrl url, Gtk.Widget *error_widget_parent) {
     return true;
 }
 
-bool Utility.open_email_composer (string subject, string body, Gtk.Widget *error_widget_parent) {
+bool Utility.open_email_composer (string subject, string body, Gtk.Widget error_widget_parent) {
     QUrl url (QLatin1String ("mailto:"));
     QUrlQuery query;
     query.set_query_items ({
@@ -124,14 +128,14 @@ bool Utility.open_email_composer (string subject, string body, Gtk.Widget *error
 
 string Utility.vfs_current_availability_text (VfsItemAvailability availability) {
     switch (availability) {
-    case VfsItemAvailability.AlwaysLocal:
+    case VfsItemAvailability.PinState.ALWAYS_LOCAL:
         return QCoreApplication.translate ("utility", "Always available locally");
-    case VfsItemAvailability.AllHydrated:
+    case VfsItemAvailability.VfsItemAvailability.ALL_HYDRATED:
         return QCoreApplication.translate ("utility", "Currently available locally");
-    case VfsItemAvailability.Mixed:
+    case VfsItemAvailability.VfsItemAvailability.MIXED:
         return QCoreApplication.translate ("utility", "Some available online only");
-    case VfsItemAvailability.AllDehydrated:
-    case VfsItemAvailability.OnlineOnly:
+    case VfsItemAvailability.VfsItemAvailability.ALL_DEHYDRATED:
+    case VfsItemAvailability.VfsItemAvailability.ONLINE_ONLY:
         return QCoreApplication.translate ("utility", "Available online only");
     }
     Q_UNREACHABLE ();

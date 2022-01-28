@@ -16,6 +16,7 @@ class StatusPushSpy : QSignalSpy {
         : QSignalSpy (&syncEngine.syncFileStatusTracker (), SIGNAL (fileStatusChanged (string&, SyncFileStatus)))
         , _syncEngine (syncEngine) { }
 
+
     public SyncFileStatus statusOf (string relativePath) {
         QFileInfo file (_syncEngine.localPath (), relativePath);
         // Start from the end to get the latest status
@@ -25,6 +26,7 @@ class StatusPushSpy : QSignalSpy {
         }
         return {};
     }
+
 
     public bool statusEmittedBefore (string firstPath, string secondPath) {
         QFileInfo firstFile (_syncEngine.localPath (), firstPath);

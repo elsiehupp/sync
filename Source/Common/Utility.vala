@@ -37,7 +37,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 #include "utility_unix.cpp"
 
 // #include <string>
-// #include <GLib.ByteArray>
 // #include <QDateTime>
 // #include <QElapsedTimer>
 // #include <QLoggingCategory>
@@ -58,15 +57,25 @@ Q_DECLARE_LOGGING_CATEGORY (lc_utility)
  @{
 ***********************************************************/
 namespace Utility {
+
     OCSYNC_EXPORT int rand ();
+
     OCSYNC_EXPORT void sleep (int sec);
+
     OCSYNC_EXPORT void usleep (int usec);
-    OCSYNC_EXPORT string format_fingerprint (GLib.ByteArray &, bool colon_separated = true);
+
+    OCSYNC_EXPORT string format_fingerprint (GLib.ByteArray , bool colon_separated = true);
+
     OCSYNC_EXPORT void setup_fav_link (string folder);
+
     OCSYNC_EXPORT void remove_fav_link (string folder);
+
     OCSYNC_EXPORT bool write_random_file (string fname, int size = -1);
+
     OCSYNC_EXPORT string octets_to_string (int64 octets);
+
     OCSYNC_EXPORT GLib.ByteArray user_agent_string ();
+
     OCSYNC_EXPORT GLib.ByteArray friendly_user_agent_string ();
     /***********************************************************
     @brief Return whether launch on startup is enabled system wide.
@@ -76,18 +85,26 @@ namespace Utility {
 
     Currently only implemented on Windows.
     ***********************************************************/
+
     OCSYNC_EXPORT bool has_system_launch_on_startup (string app_name);
+
     OCSYNC_EXPORT bool has_launch_on_startup (string app_name);
+
     OCSYNC_EXPORT void set_launch_on_startup (string app_name, string gui_name, bool launch);
-    OCSYNC_EXPORT uint convert_size_to_uint (size_t &convert_var);
+
+    OCSYNC_EXPORT uint32 convert_size_to_uint (size_t &convert_var);
+
     OCSYNC_EXPORT int convert_size_to_int (size_t &convert_var);
+
 
     /***********************************************************
     Return the amount of free space available.
 
     \a path must point to a directory
     ***********************************************************/
+
     OCSYNC_EXPORT int64 free_disk_space (string path);
+
 
     /***********************************************************
     @brief compact_format_double - formats a double value human readable.
@@ -97,14 +114,19 @@ namespace Utility {
     @param unit an optional unit that is appended if present.
     @return the formatted string.
     ***********************************************************/
+
     OCSYNC_EXPORT string compact_format_double (double value, int prec, string unit = string ());
 
     // porting methods
+
     OCSYNC_EXPORT string escape (string );
 
     // conversion function QDateTime <. time_t   (because the ones builtin work on only unsigned 32bit)
+
     OCSYNC_EXPORT QDateTime q_date_time_from_time_t (int64 t);
+
     OCSYNC_EXPORT int64 q_date_time_to_time_t (QDateTime &t);
+
 
     /***********************************************************
     @brief Convert milliseconds duration to human readable string.
@@ -117,8 +139,11 @@ namespace Utility {
     duration_to_descriptive_string2 uses two units where possible, so
     "5 minutes 43 seconds" or "1 month 3 days".
     ***********************************************************/
+
     OCSYNC_EXPORT string duration_to_descriptive_string1 (uint64 msecs);
+
     OCSYNC_EXPORT string duration_to_descriptive_string2 (uint64 msecs);
+
 
     /***********************************************************
     @brief has_dark_systray - determines whether the systray is dark or light.
@@ -130,6 +155,7 @@ namespace Utility {
 
     @return bool which is true for systems with dark systray.
     ***********************************************************/
+
     OCSYNC_EXPORT bool has_dark_systray ();
 
     // convenience OS detection methods
@@ -140,18 +166,21 @@ namespace Utility {
     inline bool is_b_sD (); // use with care, does not match OS X
 
     OCSYNC_EXPORT string platform_name ();
-    // crash helper for --debug
+
+    OCSYNC_EXPORTer for --debug
     OCSYNC_EXPORT void crash ();
 
     // Case preserving file system underneath?
     // if this function returns true, the file system is case preserving,
     // that means "test" means the same as "TEST" for filenames.
     // if false, the two cases are two different files.
+
     OCSYNC_EXPORT bool fs_case_preserving ();
 
     // Check if two pathes that MUST exist are equal. This function
     // uses QDir.canonical_path () to judge and cares for the systems
     // case sensitivity.
+
     OCSYNC_EXPORT bool file_names_equal (string fn1, string fn2);
 
     // Call the given command with the switch --version and rerun the first line
@@ -159,11 +188,15 @@ namespace Utility {
     // If command is empty, the function calls the running application which, on
     // Linux, might have changed while this one is running.
     // For Mac and Windows, it returns string ()
+
     OCSYNC_EXPORT GLib.ByteArray version_of_installed_binary (string command = string ());
+
+    OCSYNC_EXPORT
 
     OCSYNC_EXPORT string file_name_for_gui_use (string f_name);
 
     OCSYNC_EXPORT GLib.ByteArray normalize_etag (GLib.ByteArray etag);
+
 
     /***********************************************************
     @brief time_ago_in_words - human readable time span
@@ -173,6 +206,7 @@ namespace Utility {
 
     If the second parameter is ommitted, the current time is used.
     ***********************************************************/
+
     OCSYNC_EXPORT string time_ago_in_words (QDateTime &dt, QDateTime &from = QDateTime ());
 
     class StopWatch {
@@ -193,23 +227,30 @@ namespace Utility {
         public uint64 duration_of_lap (string lap_name);
     };
 
+
     /***********************************************************
     @brief Sort a string[] in a way that's appropriate for filenames
     ***********************************************************/
+
     OCSYNC_EXPORT void sort_filenames (string[] &file_names);
+
 
     /***********************************************************
     Appends concat_path and query_items to the url
     ***********************************************************/
+
     OCSYNC_EXPORT QUrl concat_url_path (
         const QUrl url, string concat_path,
         const QUrlQuery &query_items = {});
+
 
     /***********************************************************
     Returns a new settings pre-set in a specific group.  The Settings will be created
     with the given parent. If no parent is specified, the caller must destroy the settings
     ***********************************************************/
-    OCSYNC_EXPORT std.unique_ptr<QSettings> settings_with_group (string group, GLib.Object *parent = nullptr);
+
+    OCSYNC_EXPORT std.unique_ptr<QSettings> settings_with_group (string group, GLib.Object parent = nullptr);
+
 
     /***********************************************************
     Sanitizes a string that shall become part of a filename.
@@ -224,19 +265,26 @@ namespace Utility {
     - windows reserved filenames ('CON' etc)
     will pass unchanged.
     ***********************************************************/
+
     OCSYNC_EXPORT string sanitize_for_file_name (string name);
+
 
     /***********************************************************
     Returns a file name based on \a fn that's suitable for a conflict.
     ***********************************************************/
+
     OCSYNC_EXPORT string make_conflict_file_name (
         const string fn, QDateTime &dt, string user);
+
 
     /***********************************************************
     Returns whether a file name indicates a conflict file
     ***********************************************************/
-    OCSYNC_EXPORT bool is_conflict_file (char *name);
+
+    OCSYNC_EXPORT bool is_conflict_file (char name);
+
     OCSYNC_EXPORT bool is_conflict_file (string name);
+
 
     /***********************************************************
     Find the base name for a conflict file name, using name pattern only
@@ -246,16 +294,21 @@ namespace Utility {
     Prefer to use the data from the conflicts table in the journal to determine
     a conflict's base file, see SyncJournal.conflict_file_base_name ()
     ***********************************************************/
-    OCSYNC_EXPORT GLib.ByteArray conflict_file_base_name_from_pattern (GLib.ByteArray &conflict_name);
+
+    OCSYNC_EXPORT GLib.ByteArray conflict_file_base_name_from_pattern (GLib.ByteArray conflict_name);
+
 
     /***********************************************************
     @brief Check whether the path is a root of a Windows drive partition ([c:/, d:/, e:/, etc.)
     ***********************************************************/
+
     OCSYNC_EXPORT bool is_path_windows_drive_partition_root (string path);
+
 
     /***********************************************************
     @brief Retrieves current logged-in user name from the OS
     ***********************************************************/
+
     OCSYNC_EXPORT string get_current_user_name ();
 }
 
@@ -296,7 +349,7 @@ bool Utility.write_random_file (string fname, int size) {
         rand_string.append (QChar (r));
     }
 
-    QFile file (fname);
+    QFile file = new QFile (fname);
     if (file.open (QIODevice.WriteOnly | QIODevice.Text)) {
         QTextStream out (&file);
         out << rand_string;
@@ -307,7 +360,7 @@ bool Utility.write_random_file (string fname, int size) {
     return false;
 }
 
-string Utility.format_fingerprint (GLib.ByteArray &fmhash, bool colon_separated) {
+string Utility.format_fingerprint (GLib.ByteArray fmhash, bool colon_separated) {
     GLib.ByteArray hash;
     int steps = fmhash.length () / 2;
     for (int i = 0; i < steps; i++) {
@@ -391,8 +444,8 @@ GLib.ByteArray Utility.user_agent_string () {
 }
 
 GLib.ByteArray Utility.friendly_user_agent_string () {
-    const auto pattern = QStringLiteral ("%1 (Desktop Client - %2)");
-    const auto user_agent = pattern.arg (QSysInfo.machine_host_name (), platform ());
+    const var pattern = QStringLiteral ("%1 (Desktop Client - %2)");
+    const var user_agent = pattern.arg (QSysInfo.machine_host_name (), platform ());
     return user_agent.to_utf8 ();
 }
 
@@ -485,7 +538,7 @@ int64 Utility.q_date_time_to_time_t (QDateTime &t) {
 
 namespace {
     struct Period {
-        const char *name;
+        const char name;
         uint64 msec;
 
         string description (uint64 value) {
@@ -507,7 +560,7 @@ string Utility.duration_to_descriptive_string2 (uint64 msecs) {
         p++;
     }
 
-    auto first_part = periods[p].description (int (msecs / periods[p].msec));
+    var first_part = periods[p].description (int (msecs / periods[p].msec));
 
     if (!periods[p + 1].name) {
         return first_part;
@@ -568,18 +621,18 @@ string Utility.platform_name () {
 }
 
 void Utility.crash () {
-    volatile int *a = (int *)nullptr;
+    volatile int a = (int *)nullptr;
     *a = 1;
 }
 
-// Use this functions to retrieve uint/int (often required by Qt and WIN32) from size_t
+// Use this functions to retrieve uint32/int (often required by Qt and WIN32) from size_t
 // without compiler warnings about possible truncation
-uint Utility.convert_size_to_uint (size_t &convert_var) {
+uint32 Utility.convert_size_to_uint (size_t &convert_var) {
     if (convert_var > UINT_MAX) {
         //throw std.bad_cast ();
         convert_var = UINT_MAX; // intentionally default to wrong value here to not crash : exception handling TBD
     }
-    return static_cast<uint> (convert_var);
+    return static_cast<uint32> (convert_var);
 }
 
 int Utility.convert_size_to_int (size_t &convert_var) {
@@ -758,7 +811,7 @@ string Utility.make_conflict_file_name (
     if (!user.is_empty ()) {
         // Don't allow parens in the user name, to ensure
         // we can find the beginning and end of the conflict tag.
-        const auto user_name = sanitize_for_file_name (user).replace (QLatin1Char (' ('), QLatin1Char ('_')).replace (QLatin1Char (')'), QLatin1Char ('_'));;
+        const var user_name = sanitize_for_file_name (user).replace (QLatin1Char (' ('), QLatin1Char ('_')).replace (QLatin1Char (')'), QLatin1Char ('_'));;
         conflict_marker += user_name + QLatin1Char (' ');
     }
     conflict_marker += dt.to_string (QStringLiteral ("yyyy-MM-dd hhmmss")) + QLatin1Char (')');
@@ -767,8 +820,8 @@ string Utility.make_conflict_file_name (
     return conflict_file_name;
 }
 
-bool Utility.is_conflict_file (char *name) {
-    const char *bname = std.strrchr (name, '/');
+bool Utility.is_conflict_file (char name) {
+    const char bname = std.strrchr (name, '/');
     if (bname) {
         bname += 1;
     } else {
@@ -787,7 +840,7 @@ bool Utility.is_conflict_file (char *name) {
 }
 
 bool Utility.is_conflict_file (string name) {
-    auto bname = name.mid_ref (name.last_index_of (QLatin1Char ('/')) + 1);
+    var bname = name.mid_ref (name.last_index_of (QLatin1Char ('/')) + 1);
 
     if (bname.contains (QStringLiteral ("_conflict-")))
         return true;
@@ -798,29 +851,29 @@ bool Utility.is_conflict_file (string name) {
     return false;
 }
 
-GLib.ByteArray Utility.conflict_file_base_name_from_pattern (GLib.ByteArray &conflict_name) {
+GLib.ByteArray Utility.conflict_file_base_name_from_pattern (GLib.ByteArray conflict_name) {
     // This function must be able to deal with conflict files for conflict files.
     // To do this, we scan backwards, for the outermost conflict marker and
     // strip only that to generate the conflict file base name.
-    auto start_old = conflict_name.last_index_of ("_conflict-");
+    var start_old = conflict_name.last_index_of ("_conflict-");
 
     // A single space before " (conflicted copy" is considered part of the tag
-    auto start_new = conflict_name.last_index_of (" (conflicted copy");
+    var start_new = conflict_name.last_index_of (" (conflicted copy");
     if (start_new > 0 && conflict_name[start_new - 1] == ' ')
         start_new -= 1;
 
     // The rightmost tag is relevant
-    auto tag_start = q_max (start_old, start_new);
+    var tag_start = q_max (start_old, start_new);
     if (tag_start == -1)
         return "";
 
     // Find the end of the tag
-    auto tag_end = conflict_name.size ();
-    auto dot = conflict_name.last_index_of ('.'); // dot could be part of user name for new tag!
+    var tag_end = conflict_name.size ();
+    var dot = conflict_name.last_index_of ('.'); // dot could be part of user name for new tag!
     if (dot > tag_start)
         tag_end = dot;
     if (tag_start == start_new) {
-        auto paren = conflict_name.index_of (')', tag_start);
+        var paren = conflict_name.index_of (')', tag_start);
         if (paren != -1)
             tag_end = paren + 1;
     }
@@ -833,10 +886,10 @@ bool Utility.is_path_windows_drive_partition_root (string path) {
 }
 
 string Utility.sanitize_for_file_name (string name) {
-    const auto invalid = QStringLiteral (R" (/?<>\:*|\")");
+    const var invalid = QStringLiteral (R" (/?<>\:*|\")");
     string result;
     result.reserve (name.size ());
-    for (auto c : name) {
+    for (var c : name) {
         if (!invalid.contains (c)
             && c.category () != QChar.Other_Control
             && c.category () != QChar.Other_Format) {
@@ -895,7 +948,7 @@ string Utility.sanitize_for_file_name (string name) {
             }
             QFile ini_file (desktop_file_location);
             if (!ini_file.open (QIODevice.WriteOnly)) {
-                q_c_warning (lc_utility) << "Could not write auto on_start entry" << desktop_file_location;
+                q_c_warning (lc_utility) << "Could not write var on_start entry" << desktop_file_location;
                 return;
             }
             // When running inside an AppImage, we need to set the path to the

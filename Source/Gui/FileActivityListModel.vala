@@ -10,10 +10,10 @@ namespace Occ {
 
 class FileActivityListModel : ActivityListModel {
 
-    public FileActivityListModel (GLib.Object *parent = nullptr);
+    public FileActivityListModel (GLib.Object parent = nullptr);
 
 
-    public void on_load (AccountState *account_state, string file_id);
+    public void on_load (AccountState account_state, string file_id);
 
 
     protected void start_fetch_job () override;
@@ -21,26 +21,26 @@ class FileActivityListModel : ActivityListModel {
 
     private string _file_id;
 };
-    FileActivityListModel.FileActivityListModel (GLib.Object *parent)
+    FileActivityListModel.FileActivityListModel (GLib.Object parent)
         : ActivityListModel (nullptr, parent) {
         set_display_actions (false);
     }
 
-    void FileActivityListModel.on_load (AccountState *account_state, string local_path) {
+    void FileActivityListModel.on_load (AccountState account_state, string local_path) {
         Q_ASSERT (account_state);
         if (!account_state || currently_fetching ()) {
             return;
         }
         set_account_state (account_state);
 
-        const auto folder = FolderMan.instance ().folder_for_path (local_path);
+        const var folder = FolderMan.instance ().folder_for_path (local_path);
         if (!folder) {
             return;
         }
 
-        const auto file = folder.file_from_local_path (local_path);
+        const var file = folder.file_from_local_path (local_path);
         SyncJournalFileRecord file_record;
-        if (!folder.journal_db ().get_file_record (file, &file_record) || !file_record.is_valid ()) {
+        if (!folder.journal_database ().get_file_record (file, &file_record) || !file_record.is_valid ()) {
             return;
         }
 
@@ -55,7 +55,7 @@ class FileActivityListModel : ActivityListModel {
         set_currently_fetching (true);
 
         const string url (QStringLiteral ("ocs/v2.php/apps/activity/api/v2/activity/filter"));
-        auto job = new JsonApiJob (account_state ().account (), url, this);
+        var job = new JsonApiJob (account_state ().account (), url, this);
         GLib.Object.connect (job, &JsonApiJob.json_received,
             this, &FileActivityListModel.activities_received);
 

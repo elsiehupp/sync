@@ -13,15 +13,17 @@ namespace Occ {
 ***********************************************************/
 class Owncloud_http_creds_page : Abstract_credentials_wizard_page {
 
-    public Owncloud_http_creds_page (Gtk.Widget *parent);
+    public Owncloud_http_creds_page (Gtk.Widget parent);
 
-    public AbstractCredentials *get_credentials () override;
+    public AbstractCredentials get_credentials () override;
 
     public void initialize_page () override;
     public void cleanup_page () override;
     public bool validate_page () override;
     public int next_id () override;
     public void set_connected ();
+
+
     public void on_set_error_string (string err);
 
 signals:
@@ -42,7 +44,7 @@ signals:
     private OwncloudWizard _oc_wizard;
 };
 
-    Owncloud_http_creds_page.Owncloud_http_creds_page (Gtk.Widget *parent)
+    Owncloud_http_creds_page.Owncloud_http_creds_page (Gtk.Widget parent)
         : Abstract_credentials_wizard_page ()
         , _ui ()
         , _connected (false)
@@ -56,7 +58,7 @@ signals:
         register_field (QLatin1String ("OCUser*"), _ui.le_username);
         register_field (QLatin1String ("OCPasswd*"), _ui.le_password);
 
-        Theme *theme = Theme.instance ();
+        Theme theme = Theme.instance ();
         switch (theme.user_iDType ()) {
         case Theme.User_iDUser_name:
             // default, handled in ui file
@@ -85,7 +87,7 @@ signals:
         _ui.top_label.hide ();
         _ui.bottom_label.hide ();
 
-        Theme *theme = Theme.instance ();
+        Theme theme = Theme.instance ();
         QVariant variant = theme.custom_media (Theme.o_c_setup_top);
         if (!variant.is_null ()) {
             WizardCommon.setup_custom_media (variant, _ui.top_label);
@@ -98,9 +100,9 @@ signals:
     void Owncloud_http_creds_page.initialize_page () {
         WizardCommon.init_error_label (_ui.error_label);
 
-        auto *oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
-        AbstractCredentials *cred = oc_wizard.account ().credentials ();
-        auto *http_creds = qobject_cast<HttpCredentials> (cred);
+        var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+        AbstractCredentials cred = oc_wizard.account ().credentials ();
+        var http_creds = qobject_cast<HttpCredentials> (cred);
         if (http_creds) {
             const string user = http_creds.fetch_user ();
             if (!user.is_empty ()) {
@@ -146,7 +148,7 @@ signals:
             on_start_spinner ();
 
             // Reset cookies to ensure the username / password is actually used
-            auto *oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+            var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
             oc_wizard.account ().clear_cookie_jar ();
 
             emit complete_changed ();

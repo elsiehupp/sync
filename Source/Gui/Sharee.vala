@@ -37,8 +37,14 @@ class Sharee {
         const Type type);
 
     public string format ();
+
+
     public string share_with ();
+
+
     public string display_name ();
+
+
     public Type type ();
 
 
@@ -54,10 +60,12 @@ class Sharee_model : QAbstractListModel {
         Global_search = 1
     };
 
-    public Sharee_model (AccountPtr &account, string type, GLib.Object *parent = nullptr);
+    public Sharee_model (AccountPtr &account, string type, GLib.Object parent = nullptr);
 
     public using Sharee_set = QVector<unowned<Sharee>>; // FIXME : make it a QSet<Sharee> when Sharee can be compared
     public void fetch (string search, Sharee_set &blacklist, Lookup_mode lookup_mode);
+
+
     public int row_count (QModelIndex &parent = QModelIndex ()) override;
     public QVariant data (QModelIndex &index, int role) override;
 
@@ -124,7 +132,7 @@ signals:
         return _type;
     }
 
-    Sharee_model.Sharee_model (AccountPtr &account, string type, GLib.Object *parent)
+    Sharee_model.Sharee_model (AccountPtr &account, string type, GLib.Object parent)
         : QAbstractListModel (parent)
         , _account (account)
         , _type (type) {
@@ -133,7 +141,7 @@ signals:
     void Sharee_model.fetch (string search, Sharee_set &blacklist, Lookup_mode lookup_mode) {
         _search = search;
         _sharee_blacklist = blacklist;
-        auto *job = new Ocs_sharee_job (_account);
+        var job = new Ocs_sharee_job (_account);
         connect (job, &Ocs_sharee_job.sharee_job_finished, this, &Sharee_model.on_sharees_fetched);
         connect (job, &Ocs_job.ocs_error, this, &Sharee_model.display_error_message);
         job.get_sharees (_search, _type, 1, 50, lookup_mode == Global_search ? true : false);
@@ -144,10 +152,10 @@ signals:
      {
             const string[] sharee_types {"users", "groups", "emails", "remotes", "circles", "rooms"};
 
-            const auto append_sharees = [this, &sharee_types] (QJsonObject &data, QVector<unowned<Sharee>>& out) {
-                for (auto &sharee_type : sharee_types) {
-                    const auto category = data.value (sharee_type).to_array ();
-                    for (auto &sharee : category) {
+            const var append_sharees = [this, &sharee_types] (QJsonObject &data, QVector<unowned<Sharee>>& out) {
+                for (var &sharee_type : sharee_types) {
+                    const var category = data.value (sharee_type).to_array ();
+                    for (var &sharee : category) {
                         out.append (parse_sharee (sharee.to_object ()));
                     }
                 }
@@ -159,9 +167,9 @@ signals:
 
         // Filter sharees that we have already shared with
         QVector<unowned<Sharee>> filtered_sharees;
-        foreach (auto &sharee, new_sharees) {
+        foreach (var &sharee, new_sharees) {
             bool found = false;
-            foreach (auto &blacklist_sharee, _sharee_blacklist) {
+            foreach (var &blacklist_sharee, _sharee_blacklist) {
                 if (sharee.type () == blacklist_sharee.type () && sharee.share_with () == blacklist_sharee.share_with ()) {
                     found = true;
                     break;
@@ -207,7 +215,7 @@ signals:
     ***********************************************************/
     void Sharee_model.set_new_sharees (QVector<unowned<Sharee>> &new_sharees) {
         layout_about_to_be_changed ();
-        const auto persistent = persistent_index_list ();
+        const var persistent = persistent_index_list ();
         QVector<unowned<Sharee>> old_persistant_sharee;
         old_persistant_sharee.reserve (persistent.size ());
 
@@ -222,7 +230,7 @@ signals:
             Find_sharee_helper helper = {
                 sharee
             };
-            auto it = std.find_if (_sharees.const_begin (), _sharees.const_end (), helper);
+            var it = std.find_if (_sharees.const_begin (), _sharees.const_end (), helper);
             if (it == _sharees.const_end ()) {
                 new_persistant << QModelIndex ();
             } else {
@@ -243,7 +251,7 @@ signals:
             return QVariant ();
         }
 
-        const auto &sharee = _sharees.at (index.row ());
+        const var &sharee = _sharees.at (index.row ());
         if (role == Qt.Display_role) {
             return sharee.format ();
 

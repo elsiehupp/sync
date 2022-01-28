@@ -38,7 +38,7 @@ Normal workfl
 ***********************************************************/
 class OAuth : GLib.Object {
 
-    public OAuth (Account *account, GLib.Object *parent)
+    public OAuth (Account account, GLib.Object parent)
         : GLib.Object (parent)
         , _account (account) {
     }
@@ -51,7 +51,11 @@ class OAuth : GLib.Object {
     };
 
     public void on_start ();
+
+
     public bool open_browser ();
+
+
     public QUrl authorisation_link ();
 
 signals:
@@ -71,8 +75,8 @@ signals:
 
     OAuth.~OAuth () = default;
 
-    static void http_reply_and_close (QTcpSocket *socket, char *code, char *html,
-        const char *more_headers = nullptr) {
+    static void http_reply_and_close (QTcpSocket socket, char code, char html,
+        const char more_headers = nullptr) {
         if (!socket)
             return; // socket can have been deleted if the browser was closed
         socket.write ("HTTP/1.1 ");
@@ -109,7 +113,7 @@ signals:
                     if (peek.index_of ('\n') < 0)
                         return; // wait until we find a \n
                     const QRegularExpression rx ("^GET /\\?code= ([a-z_a-Z0-9]+)[& ]"); // Match a  /?code=...  URL
-                    const auto rx_match = rx.match (peek);
+                    const var rx_match = rx.match (peek);
                     if (!rx_match.has_match ()) {
                         http_reply_and_close (socket, "404 Not Found", "<html><head><title>404 Not Found</title></head><body><center><h1>404 Not Found</h1></center></body></html>");
                         return;
@@ -127,16 +131,16 @@ signals:
                     // We just added the Authorization header, don't let HttpCredentialsAccessManager tamper with it
                     req.set_attribute (HttpCredentials.DontAddCredentialsAttribute, true);
 
-                    auto request_body = new QBuffer;
+                    var request_body = new QBuffer;
                     QUrlQuery arguments (string (
                         "grant_type=authorization_code&code=%1&redirect_uri=http://localhost:%2")
                                             .arg (code, string.number (_server.server_port ())));
                     request_body.set_data (arguments.query (QUrl.FullyEncoded).to_latin1 ());
 
-                    auto job = _account.send_request ("POST", request_token, req, request_body);
+                    var job = _account.send_request ("POST", request_token, req, request_body);
                     job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
-                    GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this, socket] (QNetworkReply *reply) {
-                        auto json_data = reply.read_all ();
+                    GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this, socket] (QNetworkReply reply) {
+                        var json_data = reply.read_all ();
                         QJsonParseError json_parse_error;
                         QJsonObject json = QJsonDocument.from_json (json_data, &json_parse_error).object ();
                         string access_token = json["access_token"].to_string ();
@@ -185,7 +189,7 @@ signals:
                             // We are still listening on the socket so we will get the new connection
                             return;
                         }
-                        const char *login_successfull_html = "<h1>Login Successful</h1><p>You can close this window.</p>";
+                        const char login_successfull_html = "<h1>Login Successful</h1><p>You can close this window.</p>";
                         if (message_url.is_valid ()) {
                             http_reply_and_close (socket, "303 See Other", login_successfull_html,
                                 GLib.ByteArray ("Location : " + message_url.to_encoded ()).const_data ());

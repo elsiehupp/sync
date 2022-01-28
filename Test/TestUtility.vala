@@ -63,7 +63,7 @@ class TestUtility : GLib.Object {
 
     private void on_test_duration_to_descriptive_string () {
         QLocale.setDefault (QLocale ("C"));
-        //NOTE : in order for the plural to work we would need to load the english translation
+        //Note: in order for the plural to work we would need to load the english translation
 
         uint64 sec = 1000;
         uint64 hour = 3600 * sec;

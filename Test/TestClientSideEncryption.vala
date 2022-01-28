@@ -15,26 +15,26 @@ using namespace Occ;
 
 class TestClientSideEncryption : GLib.Object {
 
-    GLib.ByteArray convertToOldStorageFormat (GLib.ByteArray &data) {
+    GLib.ByteArray convertToOldStorageFormat (GLib.ByteArray data) {
         return data.split ('|').join ("fA==");
     }
 
     private on_ void shouldEncryptPrivateKeys () {
         // GIVEN
-        const auto encryptionKey = QByteArrayLiteral ("foo");
-        const auto privateKey = QByteArrayLiteral ("bar");
-        const auto originalSalt = QByteArrayLiteral ("baz");
+        const var encryptionKey = QByteArrayLiteral ("foo");
+        const var privateKey = QByteArrayLiteral ("bar");
+        const var originalSalt = QByteArrayLiteral ("baz");
 
         // WHEN
-        const auto cipher = EncryptionHelper.encryptPrivateKey (encryptionKey, privateKey, originalSalt);
+        const var cipher = EncryptionHelper.encryptPrivateKey (encryptionKey, privateKey, originalSalt);
 
         // THEN
-        const auto parts = cipher.split ('|');
+        const var parts = cipher.split ('|');
         QCOMPARE (parts.size (), 3);
 
-        const auto encryptedKey = GLib.ByteArray.fromBase64 (parts[0]);
-        const auto iv = GLib.ByteArray.fromBase64 (parts[1]);
-        const auto salt = GLib.ByteArray.fromBase64 (parts[2]);
+        const var encryptedKey = GLib.ByteArray.fromBase64 (parts[0]);
+        const var iv = GLib.ByteArray.fromBase64 (parts[1]);
+        const var salt = GLib.ByteArray.fromBase64 (parts[2]);
 
         // We're not here to check the merits of the encryption but at least make sure it's been
         // somewhat ciphered
@@ -47,14 +47,14 @@ class TestClientSideEncryption : GLib.Object {
 
     private on_ void shouldDecryptPrivateKeys () {
         // GIVEN
-        const auto encryptionKey = QByteArrayLiteral ("foo");
-        const auto originalPrivateKey = QByteArrayLiteral ("bar");
-        const auto originalSalt = QByteArrayLiteral ("baz");
-        const auto cipher = EncryptionHelper.encryptPrivateKey (encryptionKey, originalPrivateKey, originalSalt);
+        const var encryptionKey = QByteArrayLiteral ("foo");
+        const var originalPrivateKey = QByteArrayLiteral ("bar");
+        const var originalSalt = QByteArrayLiteral ("baz");
+        const var cipher = EncryptionHelper.encryptPrivateKey (encryptionKey, originalPrivateKey, originalSalt);
 
         // WHEN
-        const auto privateKey = EncryptionHelper.decryptPrivateKey (encryptionKey, cipher);
-        const auto salt = EncryptionHelper.extractPrivateKeySalt (cipher);
+        const var privateKey = EncryptionHelper.decryptPrivateKey (encryptionKey, cipher);
+        const var salt = EncryptionHelper.extractPrivateKeySalt (cipher);
 
         // THEN
         QCOMPARE (privateKey, originalPrivateKey);
@@ -63,14 +63,14 @@ class TestClientSideEncryption : GLib.Object {
 
     private on_ void shouldDecryptPrivateKeysInOldStorageFormat () {
         // GIVEN
-        const auto encryptionKey = QByteArrayLiteral ("foo");
-        const auto originalPrivateKey = QByteArrayLiteral ("bar");
-        const auto originalSalt = QByteArrayLiteral ("baz");
-        const auto cipher = convertToOldStorageFormat (EncryptionHelper.encryptPrivateKey (encryptionKey, originalPrivateKey, originalSalt));
+        const var encryptionKey = QByteArrayLiteral ("foo");
+        const var originalPrivateKey = QByteArrayLiteral ("bar");
+        const var originalSalt = QByteArrayLiteral ("baz");
+        const var cipher = convertToOldStorageFormat (EncryptionHelper.encryptPrivateKey (encryptionKey, originalPrivateKey, originalSalt));
 
         // WHEN
-        const auto privateKey = EncryptionHelper.decryptPrivateKey (encryptionKey, cipher);
-        const auto salt = EncryptionHelper.extractPrivateKeySalt (cipher);
+        const var privateKey = EncryptionHelper.decryptPrivateKey (encryptionKey, cipher);
+        const var salt = EncryptionHelper.extractPrivateKeySalt (cipher);
 
         // THEN
         QCOMPARE (privateKey, originalPrivateKey);
@@ -79,18 +79,18 @@ class TestClientSideEncryption : GLib.Object {
 
     private on_ void shouldSymmetricEncryptStrings () {
         // GIVEN
-        const auto encryptionKey = QByteArrayLiteral ("foo");
-        const auto data = QByteArrayLiteral ("bar");
+        const var encryptionKey = QByteArrayLiteral ("foo");
+        const var data = QByteArrayLiteral ("bar");
 
         // WHEN
-        const auto cipher = EncryptionHelper.encryptStringSymmetric (encryptionKey, data);
+        const var cipher = EncryptionHelper.encryptStringSymmetric (encryptionKey, data);
 
         // THEN
-        const auto parts = cipher.split ('|');
+        const var parts = cipher.split ('|');
         QCOMPARE (parts.size (), 2);
 
-        const auto encryptedData = GLib.ByteArray.fromBase64 (parts[0]);
-        const auto iv = GLib.ByteArray.fromBase64 (parts[1]);
+        const var encryptedData = GLib.ByteArray.fromBase64 (parts[0]);
+        const var iv = GLib.ByteArray.fromBase64 (parts[1]);
 
         // We're not here to check the merits of the encryption but at least make sure it's been
         // somewhat ciphered
@@ -102,12 +102,12 @@ class TestClientSideEncryption : GLib.Object {
 
     private on_ void shouldSymmetricDecryptStrings () {
         // GIVEN
-        const auto encryptionKey = QByteArrayLiteral ("foo");
-        const auto originalData = QByteArrayLiteral ("bar");
-        const auto cipher = EncryptionHelper.encryptStringSymmetric (encryptionKey, originalData);
+        const var encryptionKey = QByteArrayLiteral ("foo");
+        const var originalData = QByteArrayLiteral ("bar");
+        const var cipher = EncryptionHelper.encryptStringSymmetric (encryptionKey, originalData);
 
         // WHEN
-        const auto data = EncryptionHelper.decryptStringSymmetric (encryptionKey, cipher);
+        const var data = EncryptionHelper.decryptStringSymmetric (encryptionKey, cipher);
 
         // THEN
         QCOMPARE (data, originalData);
@@ -115,12 +115,12 @@ class TestClientSideEncryption : GLib.Object {
 
     private on_ void shouldSymmetricDecryptStringsInOldStorageFormat () {
         // GIVEN
-        const auto encryptionKey = QByteArrayLiteral ("foo");
-        const auto originalData = QByteArrayLiteral ("bar");
-        const auto cipher = convertToOldStorageFormat (EncryptionHelper.encryptStringSymmetric (encryptionKey, originalData));
+        const var encryptionKey = QByteArrayLiteral ("foo");
+        const var originalData = QByteArrayLiteral ("bar");
+        const var cipher = convertToOldStorageFormat (EncryptionHelper.encryptStringSymmetric (encryptionKey, originalData));
 
         // WHEN
-        const auto data = EncryptionHelper.decryptStringSymmetric (encryptionKey, cipher);
+        const var data = EncryptionHelper.decryptStringSymmetric (encryptionKey, cipher);
 
         // THEN
         QCOMPARE (data, originalData);
@@ -143,11 +143,11 @@ class TestClientSideEncryption : GLib.Object {
 
         QVERIFY (dummyInputFile.open ());
 
-        const auto dummyFileRandomContents = EncryptionHelper.generateRandom (totalBytes);
+        const var dummyFileRandomContents = EncryptionHelper.generateRandom (totalBytes);
 
         QCOMPARE (dummyInputFile.write (dummyFileRandomContents), dummyFileRandomContents.size ());
 
-        const auto generateHash = [] (GLib.ByteArray &data) {
+        const var generateHash = [] (GLib.ByteArray data) {
             QCryptographicHash hash (QCryptographicHash.Sha1);
             hash.addData (data);
             return hash.result ();
@@ -160,8 +160,8 @@ class TestClientSideEncryption : GLib.Object {
         dummyInputFile.close ();
         QVERIFY (!dummyInputFile.isOpen ());
 
-        const auto encryptionKey = EncryptionHelper.generateRandom (16);
-        const auto initializationVector = EncryptionHelper.generateRandom (16);
+        const var encryptionKey = EncryptionHelper.generateRandom (16);
+        const var initializationVector = EncryptionHelper.generateRandom (16);
 
         // test normal file encryption/decryption
         QTemporaryFile dummyEncryptionOutputFile;
@@ -179,7 +179,7 @@ class TestClientSideEncryption : GLib.Object {
 
         QVERIFY (EncryptionHelper.fileDecryption (encryptionKey, initializationVector, &dummyEncryptionOutputFile, &dummyDecryptionOutputFile));
         QVERIFY (dummyDecryptionOutputFile.open ());
-        const auto dummyDecryptionOutputFileHash = generateHash (dummyDecryptionOutputFile.readAll ());
+        const var dummyDecryptionOutputFileHash = generateHash (dummyDecryptionOutputFile.readAll ());
         QCOMPARE (dummyDecryptionOutputFileHash, originalFileHash);
 
         // test streaming decryptor
@@ -196,8 +196,8 @@ class TestClientSideEncryption : GLib.Object {
         QFETCH (int, bytesToRead);
 
         while (dummyEncryptionOutputFile.pos () < dummyEncryptionOutputFile.size ()) {
-            const auto bytesRemaining = dummyEncryptionOutputFile.size () - dummyEncryptionOutputFile.pos ();
-            auto toRead = bytesRemaining > bytesToRead ? bytesToRead : bytesRemaining;
+            const var bytesRemaining = dummyEncryptionOutputFile.size () - dummyEncryptionOutputFile.pos ();
+            var toRead = bytesRemaining > bytesToRead ? bytesToRead : bytesRemaining;
 
             if (dummyEncryptionOutputFile.pos () + toRead > dummyEncryptionOutputFile.size ()) {
                 toRead = dummyEncryptionOutputFile.size () - dummyEncryptionOutputFile.pos ();
@@ -212,7 +212,7 @@ class TestClientSideEncryption : GLib.Object {
                 continue;
             }
 
-            const auto decryptedChunk = streamingDecryptor.chunkDecryption (dummyEncryptionOutputFile.read (toRead).constData (), toRead);
+            const var decryptedChunk = streamingDecryptor.chunkDecryption (dummyEncryptionOutputFile.read (toRead).constData (), toRead);
 
             QVERIFY (decryptedChunk.size () == toRead || streamingDecryptor.isFinished () || !pendingBytes.isEmpty ());
 
@@ -220,7 +220,7 @@ class TestClientSideEncryption : GLib.Object {
         }
 
         if (!pendingBytes.isEmpty ()) {
-            const auto decryptedChunk = streamingDecryptor.chunkDecryption (pendingBytes.constData (), pendingBytes.size ());
+            const var decryptedChunk = streamingDecryptor.chunkDecryption (pendingBytes.constData (), pendingBytes.size ());
 
             QVERIFY (decryptedChunk.size () == pendingBytes.size () || streamingDecryptor.isFinished ());
 

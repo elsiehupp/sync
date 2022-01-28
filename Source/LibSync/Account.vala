@@ -29,7 +29,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 using namespace QKeychain;
 
-// #include <GLib.ByteArray>
 // #include <QUrl>
 // #include <QNetworkCookie>
 // #include <QNetworkRequest>
@@ -88,9 +87,12 @@ class Account : GLib.Object {
     Q_PROPERTY (QUrl url MEMBER _url)
 
     public static AccountPtr create ();
+
+
     public ~Account () override;
 
     public AccountPtr shared_from_this ();
+
 
     /***********************************************************
     The user that can be used in dav url.
@@ -99,13 +101,19 @@ class Account : GLib.Object {
     stored in credentials ().user ().
     ***********************************************************/
     public string dav_user ();
+
+
     public void set_dav_user (string new_dav_user);
 
     public string dav_display_name ();
+
+
     public void set_dav_display_name (string new_display_name);
 
 #ifndef TOKEN_AUTH_ONLY
     public QImage avatar ();
+
+
     public void set_avatar (QImage &img);
 #endif
 
@@ -115,16 +123,20 @@ class Account : GLib.Object {
     /// The internal id of the account.
     public string id ();
 
+
     /***********************************************************
     Server url of the account
     ***********************************************************/
     public void set_url (QUrl url);
+
+
     public QUrl url () {
         return _url;
     }
 
     /// Adjusts _user_visible_url once the host to use is discovered.
     public void set_user_visible_host (string host);
+
 
     /***********************************************************
     @brief The possibly themed dav path for the account. It has
@@ -133,10 +145,12 @@ class Account : GLib.Object {
     ***********************************************************/
     public string dav_path ();
 
+
     /***********************************************************
     Returns webdav entry URL, based on url ()
     ***********************************************************/
     public QUrl dav_url ();
+
 
     /***********************************************************
     Returns the legacy permalink url for a file.
@@ -145,13 +159,17 @@ class Account : GLib.Object {
     code should use the "privatelink" property accessible via
     PROPFIND.
     ***********************************************************/
-    public QUrl deprecated_private_link_url (GLib.ByteArray &numeric_file_id);
+    public QUrl deprecated_private_link_url (GLib.ByteArray numeric_file_id);
+
 
     /***********************************************************
     Holds the accounts credentials
     ***********************************************************/
-    public AbstractCredentials *credentials ();
-    public void set_credentials (AbstractCredentials *cred);
+    public AbstractCredentials credentials ();
+
+
+    public void set_credentials (AbstractCredentials cred);
+
 
     /***********************************************************
     Create a network request on the account's QNAM.
@@ -160,16 +178,17 @@ class Account : GLib.Object {
     this function. Other places should prefer to use jobs or
     send_request ().
     ***********************************************************/
-    public QNetworkReply *send_raw_request (GLib.ByteArray &verb,
+    public QNetworkReply send_raw_request (GLib.ByteArray verb,
         const QUrl url,
         QNetworkRequest req = QNetworkRequest (),
-        QIODevice *data = nullptr);
+        QIODevice data = nullptr);
 
-    public QNetworkReply *send_raw_request (GLib.ByteArray &verb,
-        const QUrl url, QNetworkRequest req, GLib.ByteArray &data);
+    public QNetworkReply send_raw_request (GLib.ByteArray verb,
+        const QUrl url, QNetworkRequest req, GLib.ByteArray data);
 
-    public QNetworkReply *send_raw_request (GLib.ByteArray &verb,
-        const QUrl url, QNetworkRequest req, QHttpMultiPart *data);
+    public QNetworkReply send_raw_request (GLib.ByteArray verb,
+        const QUrl url, QNetworkRequest req, QHttpMultiPart data);
+
 
     /***********************************************************
     Create and start network job for a simple one-off request.
@@ -177,15 +196,18 @@ class Account : GLib.Object {
     More complicated requests typically create their own job
     types.
     ***********************************************************/
-    public SimpleNetworkJob *send_request (GLib.ByteArray &verb,
+    public SimpleNetworkJob send_request (GLib.ByteArray verb,
         const QUrl url,
         QNetworkRequest req = QNetworkRequest (),
-        QIODevice *data = nullptr);
+        QIODevice data = nullptr);
+
 
     /***********************************************************
     The ssl configuration during the first connection
     ***********************************************************/
     public QSslConfiguration get_or_create_ssl_config ();
+
+
     public QSslConfiguration ssl_configuration () {
         return _ssl_configuration;
     }
@@ -195,6 +217,7 @@ class Account : GLib.Object {
     public GLib.ByteArray _session_ticket;
     public GLib.List<QSslCertificate> _peer_certificate_chain;
 
+
     /***********************************************************
     The certificates of the account
     ***********************************************************/
@@ -202,6 +225,8 @@ class Account : GLib.Object {
         return _approved_certs;
     }
     public void set_approved_certs (GLib.List<QSslCertificate> certs);
+
+
     public void add_approved_certs (GLib.List<QSslCertificate> certs);
 
     // Usually when a user explicitly rejects a certificate we don't
@@ -210,22 +235,29 @@ class Account : GLib.Object {
     public void reset_rejected_certificates ();
 
     // pluggable handler
-    public void set_ssl_error_handler (AbstractSslErrorHandler *handler);
+    public void set_ssl_error_handler (AbstractSslErrorHandler handler);
 
     // To be called by credentials only, for storing username and the like
     public QVariant credential_setting (string key);
+
+
     public void set_credential_setting (string key, QVariant &value);
+
 
     /***********************************************************
     Assign a client certificate
     ***********************************************************/
     public void set_certificate (GLib.ByteArray certficate = GLib.ByteArray (), string private_key = string ());
 
+
     /***********************************************************
     Access the server capabilities
     ***********************************************************/
     public const Capabilities &capabilities ();
+
+
     public void set_capabilities (QVariantMap &caps);
+
 
     /***********************************************************
     Access the server version
@@ -234,6 +266,7 @@ class Account : GLib.Object {
     capabilities have been received.
     ***********************************************************/
     public string server_version ();
+
 
     /***********************************************************
     Server version for easy comparison.
@@ -245,7 +278,10 @@ class Account : GLib.Object {
     public int server_version_int ();
 
     public static int make_server_version (int major_version, int minor_version, int patch_version);
+
+
     public void set_server_version (string version);
+
 
     /***********************************************************
     Whether the server is too old.
@@ -263,6 +299,7 @@ class Account : GLib.Object {
 
     public bool is_username_prefill_supported ();
 
+
     /***********************************************************
     True when the server connection is using HTTP2
     ***********************************************************/
@@ -273,12 +310,21 @@ class Account : GLib.Object {
         _http2Supported = value;
     }
 
+
     public void clear_cookie_jar ();
-    public void lend_cookie_jar_to (QNetworkAccessManager *guest);
+
+
+    public void lend_cookie_jar_to (QNetworkAccessManager guest);
+
+
     public string cookie_jar_path ();
 
     public void reset_network_access_manager ();
-    public QNetworkAccessManager *network_access_manager ();
+
+
+    public QNetworkAccessManager network_access_manager ();
+
+
     public unowned<QNetworkAccessManager> shared_network_access_manager ();
 
     /// Called by network jobs on credential errors, emits invalid_credentials ()
@@ -288,7 +334,11 @@ class Account : GLib.Object {
 
     /// Used in RemoteWipe
     public void retrieve_app_password ();
+
+
     public void write_app_password_once (string app_password);
+
+
     public void delete_app_password ();
 
     public void delete_app_token ();
@@ -298,8 +348,14 @@ class Account : GLib.Object {
     public void fetch_direct_editors (QUrl direct_editing_uRL, string direct_editing_e_tag);
 
     public void setup_user_status_connector ();
+
+
     public void try_setup_push_notifications ();
-    public PushNotifications *push_notifications ();
+
+
+    public PushNotifications push_notifications ();
+
+
     public void set_push_notifications_reconnect_interval (int interval);
 
     public std.shared_ptr<UserStatusConnector> user_status_connector ();
@@ -307,6 +363,8 @@ class Account : GLib.Object {
 
     /// Used when forgetting credentials
     public void on_clear_qnam_cache ();
+
+
     public void on_handle_ssl_errors (QNetworkReply *, GLib.List<QSslError>);
 
 signals:
@@ -316,16 +374,16 @@ signals:
     /// Triggered by handle_invalid_credentials ()
     void invalid_credentials ();
 
-    void credentials_fetched (AbstractCredentials *credentials);
-    void credentials_asked (AbstractCredentials *credentials);
+    void credentials_fetched (AbstractCredentials credentials);
+    void credentials_asked (AbstractCredentials credentials);
 
     /// Forwards from QNetworkAccessManager.proxy_authentication_required ().
     void proxy_authentication_required (QNetworkProxy &, QAuthenticator *);
 
     // e.g. when the approved SSL certificates changed
-    void wants_account_saved (Account *acc);
+    void wants_account_saved (Account acc);
 
-    void server_version_changed (Account *account, string new_version, string old_version);
+    void server_version_changed (Account account, string new_version, string old_version);
 
     void account_changed_avatar ();
     void account_changed_display_name ();
@@ -333,8 +391,8 @@ signals:
     /// Used in RemoteWipe
     void app_password_retrieved (string);
 
-    void push_notifications_ready (Account *account);
-    void push_notifications_disabled (Account *account);
+    void push_notifications_ready (Account account);
+    void push_notifications_disabled (Account account);
 
     void user_status_changed ();
 
@@ -344,7 +402,7 @@ protected slots:
     void on_direct_editing_recieved (QJsonDocument &json);
 
 
-    private Account (GLib.Object *parent = nullptr);
+    private Account (GLib.Object parent = nullptr);
     private void set_shared_this (AccountPtr shared_this);
 
     private static string dav_path_base ();
@@ -359,6 +417,7 @@ protected slots:
 #endif
     private QMap<string, QVariant> _settings_map;
     private QUrl _url;
+
 
     /***********************************************************
     If url to use for any user-visible urls.
@@ -398,6 +457,7 @@ protected slots:
 
     private std.shared_ptr<UserStatusConnector> _user_status_connector;
 
+
     /***********************************************************
     IMPORTANT - remove later - FIXME MS@2019-12-07 -.
     TODO: For "Log out" & "Remove account":
@@ -423,7 +483,7 @@ protected slots:
     // <-- FIXME MS@2019-12-07
 };
 
-Account.Account (GLib.Object *parent)
+Account.Account (GLib.Object parent)
     : GLib.Object (parent)
     , _capabilities (QVariantMap ()) {
     q_register_meta_type<AccountPtr> ("AccountPtr");
@@ -511,9 +571,9 @@ AbstractCredentials *Account.credentials () {
     return _credentials.data ();
 }
 
-void Account.set_credentials (AbstractCredentials *cred) {
+void Account.set_credentials (AbstractCredentials cred) {
     // set active credential manager
-    QNetworkCookieJar *jar = nullptr;
+    QNetworkCookieJar jar = nullptr;
     QNetworkProxy proxy;
 
     if (_am) {
@@ -531,7 +591,7 @@ void Account.set_credentials (AbstractCredentials *cred) {
     _credentials.on_reset (cred);
     cred.set_account (this);
 
-    // Note : This way the QNAM can outlive the Account and Credentials.
+    // Note: This way the QNAM can outlive the Account and Credentials.
     // This is necessary to avoid issues with the QNAM being deleted while
     // processing on_handle_ssl_errors ().
     _am = unowned<QNetworkAccessManager> (_credentials.create_qNAM (), &GLib.Object.delete_later);
@@ -573,7 +633,7 @@ void Account.try_setup_push_notifications () {
                 emit push_notifications_ready (this);
             });
 
-            const auto disable_push_notifications = [this] () {
+            const var disable_push_notifications = [this] () {
                 q_c_info (lc_account) << "Disable push notifications object because authentication failed or connection lost";
                 if (!_push_notifications) {
                     return;
@@ -598,7 +658,7 @@ QUrl Account.dav_url () {
     return Utility.concat_url_path (url (), dav_path ());
 }
 
-QUrl Account.deprecated_private_link_url (GLib.ByteArray &numeric_file_id) {
+QUrl Account.deprecated_private_link_url (GLib.ByteArray numeric_file_id) {
     return Utility.concat_url_path (_user_visible_url,
         QLatin1String ("/index.php/f/") + QUrl.to_percent_encoding (string.from_latin1 (numeric_file_id)));
 }
@@ -607,7 +667,7 @@ QUrl Account.deprecated_private_link_url (GLib.ByteArray &numeric_file_id) {
 clear all cookies. (Session cookies or not)
 ***********************************************************/
 void Account.clear_cookie_jar () {
-    auto jar = qobject_cast<CookieJar> (_am.cookie_jar ());
+    var jar = qobject_cast<CookieJar> (_am.cookie_jar ());
     ASSERT (jar);
     jar.set_all_cookies (GLib.List<QNetworkCookie> ());
     emit wants_account_saved (this);
@@ -618,9 +678,9 @@ This shares our official cookie jar (containing all the tasty
 authentication cookies) with another QNAM while making sure
 of not losing its ownership.
 ***********************************************************/
-void Account.lend_cookie_jar_to (QNetworkAccessManager *guest) {
-    auto jar = _am.cookie_jar ();
-    auto old_parent = jar.parent ();
+void Account.lend_cookie_jar_to (QNetworkAccessManager guest) {
+    var jar = _am.cookie_jar ();
+    var old_parent = jar.parent ();
     guest.set_cookie_jar (jar); // takes ownership of our precious cookie jar
     jar.set_parent (old_parent); // takes it back
 }
@@ -635,7 +695,7 @@ void Account.reset_network_access_manager () {
     }
 
     q_c_debug (lc_account) << "Resetting QNAM";
-    QNetworkCookieJar *jar = _am.cookie_jar ();
+    QNetworkCookieJar jar = _am.cookie_jar ();
     QNetworkProxy proxy = _am.proxy ();
 
     // Use a unowned to allow locking the life of the QNAM on the stack.
@@ -659,7 +719,7 @@ unowned<QNetworkAccessManager> Account.shared_network_access_manager () {
     return _am;
 }
 
-QNetworkReply *Account.send_raw_request (GLib.ByteArray &verb, QUrl url, QNetworkRequest req, QIODevice *data) {
+QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, QUrl url, QNetworkRequest req, QIODevice data) {
     req.set_url (url);
     req.set_ssl_configuration (this.get_or_create_ssl_config ());
     if (verb == "HEAD" && !data) {
@@ -676,7 +736,7 @@ QNetworkReply *Account.send_raw_request (GLib.ByteArray &verb, QUrl url, QNetwor
     return _am.send_custom_request (req, verb, data);
 }
 
-QNetworkReply *Account.send_raw_request (GLib.ByteArray &verb, QUrl url, QNetworkRequest req, GLib.ByteArray &data) {
+QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, QUrl url, QNetworkRequest req, GLib.ByteArray data) {
     req.set_url (url);
     req.set_ssl_configuration (this.get_or_create_ssl_config ());
     if (verb == "HEAD" && data.is_empty ()) {
@@ -693,7 +753,7 @@ QNetworkReply *Account.send_raw_request (GLib.ByteArray &verb, QUrl url, QNetwor
     return _am.send_custom_request (req, verb, data);
 }
 
-QNetworkReply *Account.send_raw_request (GLib.ByteArray &verb, QUrl url, QNetworkRequest req, QHttpMultiPart *data) {
+QNetworkReply *Account.send_raw_request (GLib.ByteArray verb, QUrl url, QNetworkRequest req, QHttpMultiPart data) {
     req.set_url (url);
     req.set_ssl_configuration (this.get_or_create_ssl_config ());
     if (verb == "PUT") {
@@ -704,8 +764,8 @@ QNetworkReply *Account.send_raw_request (GLib.ByteArray &verb, QUrl url, QNetwor
     return _am.send_custom_request (req, verb, data);
 }
 
-SimpleNetworkJob *Account.send_request (GLib.ByteArray &verb, QUrl url, QNetworkRequest req, QIODevice *data) {
-    auto job = new SimpleNetworkJob (shared_from_this ());
+SimpleNetworkJob *Account.send_request (GLib.ByteArray verb, QUrl url, QNetworkRequest req, QIODevice data) {
+    var job = new SimpleNetworkJob (shared_from_this ());
     job.start_request (verb, url, req, data);
     return job;
 }
@@ -748,7 +808,7 @@ void Account.reset_rejected_certificates () {
     _rejected_certificates.clear ();
 }
 
-void Account.set_ssl_error_handler (AbstractSslErrorHandler *handler) {
+void Account.set_ssl_error_handler (AbstractSslErrorHandler handler) {
     _ssl_error_handler.on_reset (handler);
 }
 
@@ -780,7 +840,7 @@ void Account.set_credential_setting (string key, QVariant &value) {
     }
 }
 
-void Account.on_handle_ssl_errors (QNetworkReply *reply, GLib.List<QSslError> errors) {
+void Account.on_handle_ssl_errors (QNetworkReply reply, GLib.List<QSslError> errors) {
     NetworkJobTimeoutPauser pauser (reply);
     string out;
     QDebug (&out) << "SSL-Errors happened for url " << reply.url ().to_string ();
@@ -832,7 +892,7 @@ void Account.on_handle_ssl_errors (QNetworkReply *reply, GLib.List<QSslError> er
             q_c_info (lc_account) << out << "Certs are known and trusted! This is not an actual error.";
         }
 
-        // Warning : Do *not* use ignore_ssl_errors () (without args) here:
+        // Warning : Do not* use ignore_ssl_errors () (without args) here:
         // it permanently ignores all SSL errors for this host, even
         // certificate changes.
         reply.ignore_ssl_errors (errors);
@@ -855,7 +915,7 @@ void Account.on_handle_ssl_errors (QNetworkReply *reply, GLib.List<QSslError> er
 void Account.on_credentials_fetched () {
     if (_dav_user.is_empty ()) {
         q_c_debug (lc_account) << "User id not set. Fetch it.";
-        const auto fetch_user_name_job = new JsonApiJob (shared_from_this (), QStringLiteral ("/ocs/v1.php/cloud/user"));
+        const var fetch_user_name_job = new JsonApiJob (shared_from_this (), QStringLiteral ("/ocs/v1.php/cloud/user"));
         connect (fetch_user_name_job, &JsonApiJob.json_received, this, [this, fetch_user_name_job] (QJsonDocument &json, int status_code) {
             fetch_user_name_job.delete_later ();
             if (status_code != 100) {
@@ -864,8 +924,8 @@ void Account.on_credentials_fetched () {
                 return;
             }
 
-            const auto obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
-            const auto user_id = obj_data.value ("id").to_string ("");
+            const var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
+            const var user_id = obj_data.value ("id").to_string ("");
             set_dav_user (user_id);
             emit credentials_fetched (_credentials.data ());
         });
@@ -918,7 +978,7 @@ string Account.server_version () {
 
 int Account.server_version_int () {
     // FIXME : Use Qt 5.5 QVersionNumber
-    auto components = server_version ().split ('.');
+    var components = server_version ().split ('.');
     return make_server_version (components.value (0).to_int (),
         components.value (1).to_int (),
         components.value (2).to_int ());
@@ -946,7 +1006,7 @@ void Account.set_server_version (string version) {
         return;
     }
 
-    auto old_server_version = _server_version;
+    var old_server_version = _server_version;
     _server_version = version;
     emit server_version_changed (this, old_server_version, version);
 }
@@ -969,12 +1029,12 @@ void Account.write_app_password_once (string app_password){
                 id ()
     );
 
-    auto *job = new WritePasswordJob (Theme.instance ().app_name ());
+    var job = new WritePasswordJob (Theme.instance ().app_name ());
     job.set_insecure_fallback (false);
     job.set_key (kck);
     job.set_binary_data (app_password.to_latin1 ());
-    connect (job, &WritePasswordJob.on_finished, [this] (Job *incoming) {
-        auto *write_job = static_cast<WritePasswordJob> (incoming);
+    connect (job, &WritePasswordJob.on_finished, [this] (Job incoming) {
+        var write_job = static_cast<WritePasswordJob> (incoming);
         if (write_job.error () == NoError)
             q_c_info (lc_account) << "app_password stored in keychain";
         else
@@ -993,11 +1053,11 @@ void Account.retrieve_app_password (){
                 id ()
     );
 
-    auto *job = new ReadPasswordJob (Theme.instance ().app_name ());
+    var job = new ReadPasswordJob (Theme.instance ().app_name ());
     job.set_insecure_fallback (false);
     job.set_key (kck);
-    connect (job, &ReadPasswordJob.on_finished, [this] (Job *incoming) {
-        auto *read_job = static_cast<ReadPasswordJob> (incoming);
+    connect (job, &ReadPasswordJob.on_finished, [this] (Job incoming) {
+        var read_job = static_cast<ReadPasswordJob> (incoming);
         string pwd ("");
         // Error or no valid public key error out
         if (read_job.error () == NoError &&
@@ -1022,11 +1082,11 @@ void Account.delete_app_password () {
         return;
     }
 
-    auto *job = new DeletePasswordJob (Theme.instance ().app_name ());
+    var job = new DeletePasswordJob (Theme.instance ().app_name ());
     job.set_insecure_fallback (false);
     job.set_key (kck);
-    connect (job, &DeletePasswordJob.on_finished, [this] (Job *incoming) {
-        auto *delete_job = static_cast<DeletePasswordJob> (incoming);
+    connect (job, &DeletePasswordJob.on_finished, [this] (Job incoming) {
+        var delete_job = static_cast<DeletePasswordJob> (incoming);
         if (delete_job.error () == NoError)
             q_c_info (lc_account) << "app_password deleted from keychain";
         else
@@ -1039,10 +1099,10 @@ void Account.delete_app_password () {
 }
 
 void Account.delete_app_token () {
-    const auto delete_app_token_job = new DeleteJob (shared_from_this (), QStringLiteral ("/ocs/v2.php/core/apppassword"));
+    const var delete_app_token_job = new DeleteJob (shared_from_this (), QStringLiteral ("/ocs/v2.php/core/apppassword"));
     connect (delete_app_token_job, &DeleteJob.finished_signal, this, [this] () {
-        if (auto delete_job = qobject_cast<DeleteJob> (GLib.Object.sender ())) {
-            const auto http_code = delete_job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
+        if (var delete_job = qobject_cast<DeleteJob> (GLib.Object.sender ())) {
+            const var http_code = delete_job.reply ().attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
             if (http_code != 200) {
                 q_c_warning (lc_account) << "AppToken remove failed for user : " << display_name () << " with code : " << http_code;
             } else {
@@ -1064,33 +1124,33 @@ void Account.fetch_direct_editors (QUrl direct_editing_uRL, string direct_editin
     if (!direct_editing_uRL.is_empty () &&
         (direct_editing_e_tag.is_empty () || direct_editing_e_tag != _last_direct_editing_e_tag)) {
             // Fetch the available editors and their mime types
-            auto *job = new JsonApiJob (shared_from_this (), QLatin1String ("ocs/v2.php/apps/files/api/v1/direct_editing"));
+            var job = new JsonApiJob (shared_from_this (), QLatin1String ("ocs/v2.php/apps/files/api/v1/direct_editing"));
             GLib.Object.connect (job, &JsonApiJob.json_received, this, &Account.on_direct_editing_recieved);
             job.on_start ();
     }
 }
 
 void Account.on_direct_editing_recieved (QJsonDocument &json) {
-    auto data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
-    auto editors = data.value ("editors").to_object ();
+    var data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
+    var editors = data.value ("editors").to_object ();
 
-    foreach (auto editor_key, editors.keys ()) {
-        auto editor = editors.value (editor_key).to_object ();
+    foreach (var editor_key, editors.keys ()) {
+        var editor = editors.value (editor_key).to_object ();
 
         const string id = editor.value ("id").to_string ();
         const string name = editor.value ("name").to_string ();
 
         if (!id.is_empty () && !name.is_empty ()) {
-            auto mime_types = editor.value ("mimetypes").to_array ();
-            auto optional_mime_types = editor.value ("optional_mimetypes").to_array ();
+            var mime_types = editor.value ("mimetypes").to_array ();
+            var optional_mime_types = editor.value ("optional_mimetypes").to_array ();
 
-            auto *direct_editor = new DirectEditor (id, name);
+            var direct_editor = new DirectEditor (id, name);
 
-            foreach (auto mime_type, mime_types) {
+            foreach (var mime_type, mime_types) {
                 direct_editor.add_mimetype (mime_type.to_string ().to_latin1 ());
             }
 
-            foreach (auto optional_mime_type, optional_mime_types) {
+            foreach (var optional_mime_type, optional_mime_types) {
                 direct_editor.add_optional_mimetype (optional_mime_type.to_string ().to_latin1 ());
             }
 

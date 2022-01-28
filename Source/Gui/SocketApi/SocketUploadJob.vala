@@ -19,6 +19,8 @@ namespace Occ {
 class Socket_upload_job : GLib.Object {
 
     public Socket_upload_job (unowned<Socket_api_job_v2> &job);
+
+
     public void on_start ();
 
 
@@ -27,7 +29,7 @@ class Socket_upload_job : GLib.Object {
     private string _remote_path;
     private string _pattern;
     private QTemporary_file _tmp;
-    private SyncJournalDb _db;
+    private SyncJournalDb _database;
     private SyncEngine _engine;
     private string[] _synced_files;
 };
@@ -53,8 +55,8 @@ Socket_upload_job.Socket_upload_job (unowned<Socket_api_job_v2> &job)
 
     _pattern = job.arguments ()[QLatin1String ("pattern")].to_string ();
     // TODO : use uuid
-    const auto accname = job.arguments ()[QLatin1String ("account")][QLatin1String ("name")].to_string ();
-    auto account = AccountManager.instance ().account (accname);
+    const var accname = job.arguments ()[QLatin1String ("account")][QLatin1String ("name")].to_string ();
+    var account = AccountManager.instance ().account (accname);
 
     if (!QFileInfo (_local_path).is_absolute ()) {
         job.failure (QStringLiteral ("Local path must be a an absolute path"));
@@ -65,9 +67,9 @@ Socket_upload_job.Socket_upload_job (unowned<Socket_api_job_v2> &job)
         return;
     }
 
-    _db = new SyncJournalDb (_tmp.file_name (), this);
-    _engine = new SyncEngine (account.account (), _local_path.ends_with (QLatin1Char ('/')) ? _local_path : _local_path + QLatin1Char ('/'), _remote_path, _db);
-    _engine.set_parent (_db);
+    _database = new SyncJournalDb (_tmp.file_name (), this);
+    _engine = new SyncEngine (account.account (), _local_path.ends_with (QLatin1Char ('/')) ? _local_path : _local_path + QLatin1Char ('/'), _remote_path, _database);
+    _engine.set_parent (_database);
 
     connect (_engine, &Occ.SyncEngine.item_completed, this, [this] (Occ.SyncFileItemPtr item) {
         _synced_files.append (item._file);
@@ -93,7 +95,7 @@ Socket_upload_job.Socket_upload_job (unowned<Socket_api_job_v2> &job)
 }
 
 void Socket_upload_job.on_start () {
-    auto opt = _engine.sync_options ();
+    var opt = _engine.sync_options ();
     opt.set_file_pattern (_pattern);
     if (!opt.file_regex ().is_valid ()) {
         _api_job.failure (opt.file_regex ().error_string ());
@@ -102,9 +104,9 @@ void Socket_upload_job.on_start () {
     _engine.set_sync_options (opt);
 
     // create the dir, fail if it already exists
-    auto mkdir = new Occ.MkColJob (_engine.account (), _remote_path);
+    var mkdir = new Occ.MkColJob (_engine.account (), _remote_path);
     connect (mkdir, &Occ.MkColJob.finished_without_error, _engine, &Occ.SyncEngine.on_start_sync);
-    connect (mkdir, &Occ.MkColJob.finished_with_error, this, [this] (QNetworkReply *reply) {
+    connect (mkdir, &Occ.MkColJob.finished_with_error, this, [this] (QNetworkReply reply) {
         if (reply.error () == 202) {
             _api_job.failure (QStringLiteral ("Destination %1 already exists").arg (_remote_path));
         } else {

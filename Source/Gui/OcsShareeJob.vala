@@ -19,6 +19,7 @@ class Ocs_sharee_job : Ocs_job {
 
     public Ocs_sharee_job (AccountPtr account);
 
+
     /***********************************************************
     Get a list of sharees
 

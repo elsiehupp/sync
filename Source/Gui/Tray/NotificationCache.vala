@@ -18,9 +18,9 @@ class Notification_cache {
     public void clear ();
 
 
-    private uint calculate_key (Notification &notification);
+    private uint32 calculate_key (Notification &notification);
 
-    private QSet<uint> _notifications;
+    private QSet<uint32> _notifications;
 };
 
 
@@ -36,7 +36,7 @@ class Notification_cache {
         _notifications.clear ();
     }
 
-    uint Notification_cache.calculate_key (Notification &notification) {
+    uint32 Notification_cache.calculate_key (Notification &notification) {
         return q_hash (notification.title + notification.message);
     }
     }

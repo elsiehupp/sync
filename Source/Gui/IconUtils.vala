@@ -22,7 +22,7 @@ namespace {
         if (QFile.exists (result)) {
             return result;
         } else {
-            for (auto &color : possible_colors) {
+            for (var &color : possible_colors) {
                 result = string{Occ.Theme.theme_prefix} + color + QStringLiteral ("/") + file_name;
 
                 if (QFile.exists (result)) {
@@ -41,21 +41,21 @@ namespace Ui {
 namespace Icon_utils {
 
 QPixmap pixmap_for_background (string file_name, QColor &background_color);
-QImage create_svg_image_with_custom_color (string file_name, QColor &custom_color, QSize *original_size = nullptr, QSize &requested_size = {});
-QPixmap create_svg_pixmap_with_custom_color_cached (string file_name, QColor &custom_color, QSize *original_size = nullptr, QSize &requested_size = {});
-QImage draw_svg_with_custom_fill_color (string source_svg_path, QColor &fill_color, QSize *original_size = nullptr, QSize &requested_size = {});
+QImage create_svg_image_with_custom_color (string file_name, QColor &custom_color, QSize original_size = nullptr, QSize &requested_size = {});
+QPixmap create_svg_pixmap_with_custom_color_cached (string file_name, QColor &custom_color, QSize original_size = nullptr, QSize &requested_size = {});
+QImage draw_svg_with_custom_fill_color (string source_svg_path, QColor &fill_color, QSize original_size = nullptr, QSize &requested_size = {});
 
     QPixmap pixmap_for_background (string file_name, QColor &background_color) {
         Q_ASSERT (!file_name.is_empty ());
 
-        const auto pixmap_color = background_color.is_valid () && !Theme.is_dark_color (background_color)
+        const var pixmap_color = background_color.is_valid () && !Theme.is_dark_color (background_color)
             ? QColor_constants.Svg.black
             : QColor_constants.Svg.white;
         ;
         return create_svg_pixmap_with_custom_color_cached (file_name, pixmap_color);
     }
 
-    QImage create_svg_image_with_custom_color (string file_name, QColor &custom_color, QSize *original_size, QSize &requested_size) {
+    QImage create_svg_image_with_custom_color (string file_name, QColor &custom_color, QSize original_size, QSize &requested_size) {
         Q_ASSERT (!file_name.is_empty ());
         Q_ASSERT (custom_color.is_valid ());
 
@@ -67,11 +67,11 @@ QImage draw_svg_with_custom_fill_color (string source_svg_path, QColor &fill_col
         }
 
         // some icons are present in white or black only, so, we need to check both when needed
-        const auto icon_base_colors = string[]{QStringLiteral ("black"), QStringLiteral ("white")};
+        const var icon_base_colors = string[]{QStringLiteral ("black"), QStringLiteral ("white")};
 
         // check if there is an existing image matching the custom color {
-            const auto custom_color_name = [&custom_color] () {
-                auto result = custom_color.name ();
+            const var custom_color_name = [&custom_color] () {
+                var result = custom_color.name ();
                 if (result.starts_with (QStringLiteral ("#"))) {
                     if (result == QStringLiteral ("#000000")) {
                         result = QStringLiteral ("black");
@@ -92,7 +92,7 @@ QImage draw_svg_with_custom_fill_color (string source_svg_path, QColor &fill_col
         }
 
         // find the first matching svg file
-        const auto source_svg = find_svg_file_path (file_name, icon_base_colors);
+        const var source_svg = find_svg_file_path (file_name, icon_base_colors);
 
         Q_ASSERT (!source_svg.is_empty ());
         if (source_svg.is_empty ()) {
@@ -110,10 +110,10 @@ QImage draw_svg_with_custom_fill_color (string source_svg_path, QColor &fill_col
         return result;
     }
 
-    QPixmap create_svg_pixmap_with_custom_color_cached (string file_name, QColor &custom_color, QSize *original_size, QSize &requested_size) {
+    QPixmap create_svg_pixmap_with_custom_color_cached (string file_name, QColor &custom_color, QSize original_size, QSize &requested_size) {
         QPixmap cached_pixmap;
 
-        const auto custom_color_name = custom_color.name ();
+        const var custom_color_name = custom_color.name ();
 
         const string cache_key = file_name + QStringLiteral (",") + custom_color_name;
 
@@ -135,7 +135,7 @@ QImage draw_svg_with_custom_fill_color (string source_svg_path, QColor &fill_col
     }
 
     QImage draw_svg_with_custom_fill_color (
-        const string source_svg_path, QColor &fill_color, QSize *original_size, QSize &requested_size) {
+        const string source_svg_path, QColor &fill_color, QSize original_size, QSize &requested_size) {
         QSvgRenderer svg_renderer;
 
         if (!svg_renderer.on_load (source_svg_path)) {
@@ -143,7 +143,7 @@ QImage draw_svg_with_custom_fill_color (string source_svg_path, QColor &fill_col
             return {};
         }
 
-        const auto req_size = requested_size.is_valid () ? requested_size : svg_renderer.default_size ();
+        const var req_size = requested_size.is_valid () ? requested_size : svg_renderer.default_size ();
 
         if (original_size) {
             *original_size = svg_renderer.default_size ();

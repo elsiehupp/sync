@@ -24,17 +24,23 @@ class Flow2Auth_creds_page : Abstract_credentials_wizard_page {
 
     public Flow2Auth_creds_page ();
 
-    public AbstractCredentials *get_credentials () override;
+    public AbstractCredentials get_credentials () override;
 
     public void initialize_page () override;
     public void cleanup_page () override;
     public int next_id () override;
     public void set_connected ();
+
+
     public bool is_complete () override;
 
 
     public void on_flow_2_auth_result (Flow2Auth.Result, string error_string, string user, string app_password);
+
+
     public void on_poll_now ();
+
+
     public void on_style_changed ();
 
 signals:
@@ -68,7 +74,7 @@ signals:
     }
 
     void Flow2Auth_creds_page.initialize_page () {
-        auto *oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+        var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
         Q_ASSERT (oc_wizard);
         oc_wizard.account ().set_credentials (CredentialsFactory.create ("http"));
 
@@ -95,12 +101,12 @@ signals:
     void Flow2Auth_creds_page.on_flow_2_auth_result (Flow2Auth.Result r, string error_string, string user, string app_password) {
         Q_UNUSED (error_string)
         switch (r) {
-        case Flow2Auth.NotSupported : {
+        case Flow2Auth.NotSupported: {
             /* Flow2Auth not supported (can't open browser) */
             wizard ().show ();
 
             /* Don't fallback to HTTP credentials */
-            /*OwncloudWizard *oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+            /*OwncloudWizard oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
             oc_wizard.back ();
             oc_wizard.on_set_auth_type (DetermineAuthTypeJob.Basic);*/
             break;
@@ -109,10 +115,10 @@ signals:
             /* Error while getting the access token.  (Timeout, or the server did not accept our client credentials */
             wizard ().show ();
             break;
-        case Flow2Auth.LoggedIn : {
+        case Flow2Auth.LoggedIn: {
             _user = user;
             _app_password = app_password;
-            auto *oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+            var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
             Q_ASSERT (oc_wizard);
 
             emit connect_to_oc_url (oc_wizard.account ().url ().to_string ());
@@ -126,7 +132,7 @@ signals:
     }
 
     void Flow2Auth_creds_page.set_connected () {
-        auto *oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+        var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
         Q_ASSERT (oc_wizard);
 
         // bring wizard to top
@@ -134,7 +140,7 @@ signals:
     }
 
     AbstractCredentials *Flow2Auth_creds_page.get_credentials () {
-        auto *oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+        var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
         Q_ASSERT (oc_wizard);
         return new WebFlowCredentials (
                     _user,

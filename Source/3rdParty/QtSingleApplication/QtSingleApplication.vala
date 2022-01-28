@@ -26,27 +26,35 @@ class QtSingleApplication : QApplication {
     public bool is_running (int64 pid = -1);
 
     public void set_activation_window (Gtk.Widget* aw, bool activate_on_message = true);
+
+
     public Gtk.Widget* activation_window ();
-    public bool event (QEvent *event) override;
+
+
+    public bool event (QEvent event) override;
 
     public string application_id ();
+
+
     public void set_block (bool value);
 
 
     public bool on_send_message (string message, int timeout = 5000, int64 pid = -1);
+
+
     public void on_activate_window ();
 
 signals:
-    void message_received (string message, GLib.Object *socket);
+    void message_received (string message, GLib.Object socket);
     void file_open_request (string file);
 
 
     private string instances_file_name (string app_id);
 
     int64 first_peer;
-    QShared_memory *instances;
-    QtLocalPeer *pid_peer;
-    Gtk.Widget *act_win;
+    QShared_memory instances;
+    QtLocalPeer pid_peer;
+    Gtk.Widget act_win;
     string app_id;
     bool block;
 };
@@ -124,7 +132,7 @@ namespace SharedTools {
 
         lockfile.open (QtLockedFile.ReadWrite);
         lockfile.lock (QtLockedFile.LockMode.WRITE_LOCK);
-        auto *pids = static_cast<int64> (instances.data ());
+        var pids = static_cast<int64> (instances.data ());
         if (!created) {
             // Find the first instance that it still running
             // The whole list needs to be iterated in order to append to it
@@ -151,8 +159,8 @@ namespace SharedTools {
         lockfile.open (QtLockedFile.ReadWrite);
         lockfile.lock (QtLockedFile.LockMode.WRITE_LOCK);
         // Rewrite array, removing current pid and previously crashed ones
-        auto *pids = static_cast<int64> (instances.data ());
-        int64 *newpids = pids;
+        var pids = static_cast<int64> (instances.data ());
+        int64 newpids = pids;
         for (; *pids; ++pids) {
             if (*pids != app_pid && is_running (*pids))
                 *newpids++ = *pids;
@@ -161,9 +169,9 @@ namespace SharedTools {
         lockfile.unlock ();
     }
 
-    bool QtSingleApplication.event (QEvent *event) {
+    bool QtSingleApplication.event (QEvent event) {
         if (event.type () == QEvent.File_open) {
-            auto *foe = static_cast<QFile_open_event> (event);
+            var foe = static_cast<QFile_open_event> (event);
             emit file_open_request (foe.file ());
             return true;
         }
@@ -200,7 +208,7 @@ namespace SharedTools {
         block = value;
     }
 
-    void QtSingleApplication.set_activation_window (Gtk.Widget *aw, bool activate_on_message) {
+    void QtSingleApplication.set_activation_window (Gtk.Widget aw, bool activate_on_message) {
         act_win = aw;
         if (!pid_peer)
             return;

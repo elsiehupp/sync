@@ -12,7 +12,7 @@ using namespace Occ;
 
 static void applyPermissionsFromName (FileInfo &info) {
     static QRegularExpression rx ("_PERM_ ([^_]*)_[^/]*$");
-    auto m = rx.match (info.name);
+    var m = rx.match (info.name);
     if (m.hasMatch ()) {
         info.permissions = RemotePermissions.fromServerString (m.captured (1));
     }
@@ -27,16 +27,16 @@ static void assertCsyncJournalOk (SyncJournalDb &journal) {
     // The DB is openend in locked mode : close to allow us to access.
     journal.close ();
 
-    SqlDatabase db;
-    QVERIFY (db.openReadOnly (journal.databaseFilePath ()));
-    SqlQuery q ("SELECT count (*) from metadata where length (fileId) == 0", db);
+    SqlDatabase database;
+    QVERIFY (database.openReadOnly (journal.databaseFilePath ()));
+    SqlQuery q ("SELECT count (*) from metadata where length (fileId) == 0", database);
     QVERIFY (q.exec ());
     QVERIFY (q.next ().hasData);
     QCOMPARE (q.intValue (0), 0);
 }
 
 SyncFileItemPtr findDiscoveryItem (SyncFileItemVector &spy, string path) {
-    for (auto &item : spy) {
+    for (var &item : spy) {
         if (item.destination () == path)
             return item;
     }
@@ -44,12 +44,12 @@ SyncFileItemPtr findDiscoveryItem (SyncFileItemVector &spy, string path) {
 }
 
 bool itemInstruction (ItemCompletedSpy &spy, string path, SyncInstructions instr) {
-    auto item = spy.findItem (path);
+    var item = spy.findItem (path);
     return item._instruction == instr;
 }
 
 bool discoveryInstruction (SyncFileItemVector &spy, string path, SyncInstructions instr) {
-    auto item = findDiscoveryItem (spy, path);
+    var item = findDiscoveryItem (spy, path);
     return item._instruction == instr;
 }
 
@@ -62,7 +62,7 @@ class TestPermissions : GLib.Object {
         // Some of this test depends on the order of discovery. With threading
         // that order becomes effectively random, but we want to make sure to test
         // all cases and thus disable threading.
-        auto syncOpts = fakeFolder.syncEngine ().syncOptions ();
+        var syncOpts = fakeFolder.syncEngine ().syncOptions ();
         syncOpts._parallelNetworkJobs = 1;
         fakeFolder.syncEngine ().setSyncOptions (syncOpts);
 
@@ -70,7 +70,7 @@ class TestPermissions : GLib.Object {
         const int canBeModifiedSize = 144;
 
         //create some files
-        auto insertIn = [&] (string dir) {
+        var insertIn = [&] (string dir) {
             fakeFolder.remoteModifier ().insert (dir + "normalFile_PERM_WVND_.data", 100 );
             fakeFolder.remoteModifier ().insert (dir + "cannotBeRemoved_PERM_WVN_.data", 101 );
             fakeFolder.remoteModifier ().insert (dir + "canBeRemoved_PERM_D_.data", 102 );
@@ -100,7 +100,7 @@ class TestPermissions : GLib.Object {
 
         //2. remove the file that can be removed
         //  (they should properly be gone)
-        auto removeReadOnly = [&] (string file)  {
+        var removeReadOnly = [&] (string file)  {
             QVERIFY (!QFileInfo (fakeFolder.localPath () + file).permission (QFile.WriteOwner));
             QFile (fakeFolder.localPath () + file).setPermissions (QFile.WriteOwner | QFile.ReadOwner);
             fakeFolder.localModifier ().remove (file);
@@ -110,7 +110,7 @@ class TestPermissions : GLib.Object {
 
         //3. Edit the files that cannot be modified
         //  (they should be recovered, and a conflict shall be created)
-        auto editReadOnly = [&] (string file)  {
+        var editReadOnly = [&] (string file)  {
             QVERIFY (!QFileInfo (fakeFolder.localPath () + file).permission (QFile.WriteOwner));
             QFile (fakeFolder.localPath () + file).setPermissions (QFile.WriteOwner | QFile.ReadOwner);
             fakeFolder.localModifier ().appendByte (file);
@@ -131,7 +131,7 @@ class TestPermissions : GLib.Object {
         //do the sync
         QVERIFY (fakeFolder.syncOnce ());
         assertCsyncJournalOk (fakeFolder.syncJournal ());
-        auto currentLocalState = fakeFolder.currentLocalState ();
+        var currentLocalState = fakeFolder.currentLocalState ();
 
         //1.
         // File should be recovered
@@ -148,10 +148,10 @@ class TestPermissions : GLib.Object {
         QCOMPARE (currentLocalState.find ("normalDirectory_PERM_CKDNV_/cannotBeModified_PERM_DVN_.data").size, cannotBeModifiedSize);
         QCOMPARE (currentLocalState.find ("readonlyDirectory_PERM_M_/cannotBeModified_PERM_DVN_.data").size, cannotBeModifiedSize);
         // and conflict created
-        auto c1 = findConflict (currentLocalState, "normalDirectory_PERM_CKDNV_/cannotBeModified_PERM_DVN_.data");
+        var c1 = findConflict (currentLocalState, "normalDirectory_PERM_CKDNV_/cannotBeModified_PERM_DVN_.data");
         QVERIFY (c1);
         QCOMPARE (c1.size, cannotBeModifiedSize + 1);
-        auto c2 = findConflict (currentLocalState, "readonlyDirectory_PERM_M_/cannotBeModified_PERM_DVN_.data");
+        var c2 = findConflict (currentLocalState, "readonlyDirectory_PERM_M_/cannotBeModified_PERM_DVN_.data");
         QVERIFY (c2);
         QCOMPARE (c2.size, cannotBeModifiedSize + 1);
         // remove the conflicts for the next state comparison
@@ -176,7 +176,7 @@ class TestPermissions : GLib.Object {
         fakeFolder.localModifier ().insert ("readonlyDirectory_PERM_M_/newFile_PERM_WDNV_.data", 105 );
 
         applyPermissionsFromName (fakeFolder.remoteModifier ());
-        // error : can't upload to readonly
+        // error : can't upload to read_only
         QVERIFY (!fakeFolder.syncOnce ());
 
         assertCsyncJournalOk (fakeFolder.syncJournal ());
@@ -258,7 +258,7 @@ class TestPermissions : GLib.Object {
         //2. move a directory from read to read only  (move the directory from previous step)
         fakeFolder.localModifier ().rename ("normalDirectory_PERM_CKDNV_/subdir_PERM_CKDNV_", "readonlyDirectory_PERM_M_/moved_PERM_CK_" );
 
-        // error : can't upload to readonly!
+        // error : can't upload to read_only!
         QVERIFY (!fakeFolder.syncOnce ());
         currentLocalState = fakeFolder.currentLocalState ();
 
@@ -311,7 +311,7 @@ class TestPermissions : GLib.Object {
         // there should be two conflict files
         currentLocalState = fakeFolder.currentLocalState ();
         int count = 0;
-        while (auto i = findConflict (currentLocalState, "readonlyDirectory_PERM_M_/cannotBeModified_PERM_DVN_.data")) {
+        while (var i = findConflict (currentLocalState, "readonlyDirectory_PERM_M_/cannotBeModified_PERM_DVN_.data")) {
             QVERIFY ( (i.contentChar == 's') || (i.contentChar == 'd'));
             fakeFolder.localModifier ().remove (i.path ());
             currentLocalState = fakeFolder.currentLocalState ();
@@ -321,9 +321,9 @@ class TestPermissions : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
     }
 
-    private on_ static void setAllPerm (FileInfo *fi, RemotePermissions perm) {
+    private on_ static void setAllPerm (FileInfo fi, RemotePermissions perm) {
         fi.permissions = perm;
-        for (auto &subFi : fi.children)
+        for (var &subFi : fi.children)
             setAllPerm (&subFi, perm);
     }
 
@@ -334,12 +334,12 @@ class TestPermissions : GLib.Object {
         // Some of this test depends on the order of discovery. With threading
         // that order becomes effectively random, but we want to make sure to test
         // all cases and thus disable threading.
-        auto syncOpts = fakeFolder.syncEngine ().syncOptions ();
+        var syncOpts = fakeFolder.syncEngine ().syncOptions ();
         syncOpts._parallelNetworkJobs = 1;
         fakeFolder.syncEngine ().setSyncOptions (syncOpts);
 
-        auto &lm = fakeFolder.localModifier ();
-        auto &rm = fakeFolder.remoteModifier ();
+        var &lm = fakeFolder.localModifier ();
+        var &rm = fakeFolder.remoteModifier ();
         rm.mkdir ("allowed");
         rm.mkdir ("norename");
         rm.mkdir ("nomove");
@@ -387,7 +387,7 @@ class TestPermissions : GLib.Object {
 
         // also hook into discovery!!
         SyncFileItemVector discovery;
-        connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToPropagate, this, [&discovery] (auto v) { discovery = v; });
+        connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToPropagate, this, [&discovery] (var v) { discovery = v; });
         ItemCompletedSpy completeSpy (fakeFolder);
         QVERIFY (!fakeFolder.syncOnce ());
 
@@ -438,7 +438,7 @@ class TestPermissions : GLib.Object {
         QVERIFY (itemInstruction (completeSpy, "allowed/sub2", CSYNC_INSTRUCTION_NEW));
         QVERIFY (itemInstruction (completeSpy, "allowed/sub2/file", CSYNC_INSTRUCTION_NEW));
 
-        auto cls = fakeFolder.currentLocalState ();
+        var cls = fakeFolder.currentLocalState ();
         QVERIFY (cls.find ("allowed/file"));
         QVERIFY (cls.find ("allowed/sub2"));
         QVERIFY (cls.find ("zallowed/file"));
@@ -453,12 +453,12 @@ class TestPermissions : GLib.Object {
         // Some of this test depends on the order of discovery. With threading
         // that order becomes effectively random, but we want to make sure to test
         // all cases and thus disable threading.
-        auto syncOpts = fakeFolder.syncEngine ().syncOptions ();
+        var syncOpts = fakeFolder.syncEngine ().syncOptions ();
         syncOpts._parallelNetworkJobs = 1;
         fakeFolder.syncEngine ().setSyncOptions (syncOpts);
 
-        auto &lm = fakeFolder.localModifier ();
-        auto &rm = fakeFolder.remoteModifier ();
+        var &lm = fakeFolder.localModifier ();
+        var &rm = fakeFolder.remoteModifier ();
         rm.mkdir ("changeonly");
         rm.mkdir ("changeonly/sub1");
         rm.insert ("changeonly/sub1/file1");
@@ -482,7 +482,7 @@ class TestPermissions : GLib.Object {
         lm.rename ("changeonly/sub1", "changeonly/aaa");
         lm.rename ("changeonly/sub2", "changeonly/zzz");
 
-        auto expectedState = fakeFolder.currentLocalState ();
+        var expectedState = fakeFolder.currentLocalState ();
 
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), expectedState);

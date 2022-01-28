@@ -18,7 +18,7 @@ namespace Occ {
 
 class Vfs_xAttr : Vfs {
 
-    public Vfs_xAttr (GLib.Object *parent = nullptr);
+    public Vfs_xAttr (GLib.Object parent = nullptr);
     ~Vfs_xAttr () override;
 
     public Mode mode () override;
@@ -30,7 +30,7 @@ class Vfs_xAttr : Vfs {
     public bool socket_api_pin_state_actions_shown () override;
     public bool is_hydrating () override;
 
-    public Result<void, string> update_metadata (string file_path, time_t modtime, int64 size, GLib.ByteArray &file_id) override;
+    public Result<void, string> update_metadata (string file_path, time_t modtime, int64 size, GLib.ByteArray file_id) override;
 
     public Result<void, string> create_placeholder (SyncFileItem &item) override;
     public Result<void, string> dehydrate_placeholder (SyncFileItem &item) override;
@@ -38,7 +38,7 @@ class Vfs_xAttr : Vfs {
 
     public bool needs_metadata_update (SyncFileItem &item) override;
     public bool is_dehydrated_placeholder (string file_path) override;
-    public bool stat_type_virtual_file (csync_file_stat_t *stat, void *stat_data) override;
+    public bool stat_type_virtual_file (csync_file_stat_t stat, void stat_data) override;
 
     public bool set_pin_state (string folder_path, PinState state) override;
     public Optional<PinState> pin_state (string folder_path) override;
@@ -56,7 +56,7 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
     Q_INTERFACES (Occ.PluginFactory)
 };
 
-    Vfs_xAttr.Vfs_xAttr (GLib.Object *parent)
+    Vfs_xAttr.Vfs_xAttr (GLib.Object parent)
         : Vfs (parent) {
     }
 
@@ -87,7 +87,7 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
         return false;
     }
 
-    Result<void, string> Vfs_xAttr.update_metadata (string file_path, time_t modtime, int64, GLib.ByteArray &) {
+    Result<void, string> Vfs_xAttr.update_metadata (string file_path, time_t modtime, int64, GLib.ByteArray ) {
         if (modtime <= 0) {
             return {tr ("Error updating metadata due to invalid modified time")};
         }
@@ -101,8 +101,8 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
             return {tr ("Error updating metadata due to invalid modified time")};
         }
 
-        const auto path = string (_setup_params.filesystem_path + item._file);
-        QFile file (path);
+        const var path = string (_setup_params.filesystem_path + item._file);
+        QFile file = new QFile (path);
         if (file.exists () && file.size () > 1
             && !FileSystem.verify_file_unchanged (path, item._size, item._modtime)) {
             return QStringLiteral ("Cannot create a placeholder because a file with the placeholder name already exist");
@@ -119,20 +119,20 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
     }
 
     Result<void, string> Vfs_xAttr.dehydrate_placeholder (SyncFileItem &item) {
-        const auto path = string (_setup_params.filesystem_path + item._file);
-        QFile file (path);
+        const var path = string (_setup_params.filesystem_path + item._file);
+        QFile file = new QFile (path);
         if (!file.remove ()) {
             return QStringLiteral ("Couldn't remove the original file to dehydrate");
         }
-        auto r = create_placeholder (item);
+        var r = create_placeholder (item);
         if (!r) {
             return r;
         }
 
         // Ensure the pin state isn't contradictory
-        const auto pin = pin_state (item._file);
-        if (pin && *pin == PinState.AlwaysLocal) {
-            set_pin_state (item._rename_target, PinState.Unspecified);
+        const var pin = pin_state (item._file);
+        if (pin && *pin == PinState.PinState.ALWAYS_LOCAL) {
+            set_pin_state (item._rename_target, PinState.PinState.UNSPECIFIED);
         }
         return {};
     }
@@ -147,34 +147,34 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
     }
 
     bool Vfs_xAttr.is_dehydrated_placeholder (string file_path) {
-        const auto fi = QFileInfo (file_path);
+        const var fi = QFileInfo (file_path);
         return fi.exists () &&
                 xattr.has_nextcloud_placeholder_attributes (file_path);
     }
 
-    bool Vfs_xAttr.stat_type_virtual_file (csync_file_stat_t *stat, void *stat_data) {
+    bool Vfs_xAttr.stat_type_virtual_file (csync_file_stat_t stat, void stat_data) {
         if (stat.type == ItemTypeDirectory) {
             return false;
         }
 
-        const auto parent_path = static_cast<GLib.ByteArray> (stat_data);
+        const var parent_path = static_cast<GLib.ByteArray> (stat_data);
         Q_ASSERT (!parent_path.ends_with ('/'));
         Q_ASSERT (!stat.path.starts_with ('/'));
 
-        const auto path = GLib.ByteArray (*parent_path + '/' + stat.path);
-        const auto pin = [=] {
-            const auto absolute_path = string.from_utf8 (path);
+        const var path = GLib.ByteArray (*parent_path + '/' + stat.path);
+        const var pin = [=] {
+            const var absolute_path = string.from_utf8 (path);
             Q_ASSERT (absolute_path.starts_with (params ().filesystem_path.to_utf8 ()));
-            const auto folder_path = absolute_path.mid (params ().filesystem_path.length ());
+            const var folder_path = absolute_path.mid (params ().filesystem_path.length ());
             return pin_state (folder_path);
         } ();
 
         if (xattr.has_nextcloud_placeholder_attributes (path)) {
-            const auto should_download = pin && (*pin == PinState.AlwaysLocal);
+            const var should_download = pin && (*pin == PinState.PinState.ALWAYS_LOCAL);
             stat.type = should_download ? ItemTypeVirtualFileDownload : ItemTypeVirtualFile;
             return true;
         } else {
-            const auto should_dehydrate = pin && (*pin == PinState.OnlineOnly);
+            const var should_dehydrate = pin && (*pin == PinState.VfsItemAvailability.ONLINE_ONLY);
             if (should_dehydrate) {
                 stat.type = ItemTypeVirtualFileDehydration;
                 return true;
@@ -184,15 +184,15 @@ class Xattr_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_xA
     }
 
     bool Vfs_xAttr.set_pin_state (string folder_path, PinState state) {
-        return set_pin_state_in_db (folder_path, state);
+        return set_pin_state_in_database (folder_path, state);
     }
 
     Optional<PinState> Vfs_xAttr.pin_state (string folder_path) {
-        return pin_state_in_db (folder_path);
+        return pin_state_in_database (folder_path);
     }
 
     Vfs.AvailabilityResult Vfs_xAttr.availability (string folder_path) {
-        return availability_in_db (folder_path);
+        return availability_in_database (folder_path);
     }
 
     void Vfs_xAttr.on_file_status_changed (string , SyncFileStatus) {

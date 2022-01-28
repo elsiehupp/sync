@@ -23,11 +23,14 @@ class Result {
         : _result (std.move (value))
         , _is_error (false) {
     }
+
+
     // TODO : This doesn't work if T and Error are too similar
     public Result (Error error)
         : _error (std.move (error))
         , _is_error (true) {
     }
+
 
     public Result (Result &&other)
         : _is_error (other._is_error) {
@@ -38,6 +41,7 @@ class Result {
         }
     }
 
+
     public Result (Result &other)
         : _is_error (other._is_error) {
         if (_is_error) {
@@ -46,6 +50,7 @@ class Result {
             new (&_result) T (other._result);
         }
     }
+
 
     public Result &operator= (Result &&other) {
         if (&other != this) {
@@ -56,8 +61,9 @@ class Result {
                 new (&_result) T (std.move (other._result));
             }
         }
-        return *this;
+        return this;
     }
+
 
     public Result &operator= (Result &other) {
         if (&other != this) {
@@ -68,8 +74,9 @@ class Result {
                 new (&_result) T (other._result);
             }
         }
-        return *this;
+        return this;
     }
+
 
     ~Result () {
         if (_is_error)
@@ -78,29 +85,35 @@ class Result {
             _result.~T ();
     }
 
-    public operator bool () {
+
+    public to_bool () {
         return !_is_error;
     }
+
 
     public const T &operator* () & {
         ASSERT (!_is_error);
         return _result;
     }
 
+
     public T operator* () && {
         ASSERT (!_is_error);
         return std.move (_result);
     }
+
 
     public const T *operator. () {
         ASSERT (!_is_error);
         return &_result;
     }
 
+
     public const T &get () {
         ASSERT (!_is_error)
         return _result;
     }
+
 
     public const Error &error () & {
         ASSERT (_is_error);
@@ -110,6 +123,7 @@ class Result {
         ASSERT (_is_error);
         return std.move (_error);
     }
+
 
     public bool is_valid () {
         return !_is_error;

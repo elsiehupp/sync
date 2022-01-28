@@ -34,13 +34,13 @@ class Access_manager_factory : QQml_network_access_manager_factory {
 
     public Access_manager_factory ();
 
-    public QNetworkAccessManager* create (GLib.Object *parent) override;
+    public QNetworkAccessManager* create (GLib.Object parent) override;
 };
 
 #ifdef Q_OS_OSX
 bool can_os_x_send_user_notification ();
 void send_os_xUser_notification (string title, string message);
-void set_tray_window_level_and_visible_on_all_spaces (QWindow *window);
+void set_tray_window_level_and_visible_on_all_spaces (QWindow window);
 #endif
 
 /***********************************************************
@@ -53,7 +53,7 @@ class Systray
     Q_PROPERTY (string window_title READ window_title CONSTANT)
     Q_PROPERTY (bool use_normal_window READ use_normal_window CONSTANT)
 
-    public static Systray *instance ();
+    public static Systray instance ();
     ~Systray () override = default;
 
     public enum class Task_bar_position {
@@ -63,20 +63,42 @@ class Systray
         Right
     };
 
-    public void set_tray_engine (QQml_application_engine *tray_engine);
+    public void set_tray_engine (QQml_application_engine tray_engine);
+
+
     public void create ();
+
+
     public void show_message (string title, string message, Message_icon icon = Information);
+
+
     public void set_tool_tip (string tip);
+
+
     public bool is_open ();
+
+
     public string window_title ();
+
+
     public bool use_normal_window ();
 
     public Q_INVOKABLE void pause_resume_sync ();
+
+
     public Q_INVOKABLE bool sync_is_paused ();
+
+
     public Q_INVOKABLE void set_opened ();
+
+
     public Q_INVOKABLE void set_closed ();
-    public Q_INVOKABLE void position_window (QQuick_window *window);
-    public Q_INVOKABLE void force_window_init (QQuick_window *window);
+
+
+    public Q_INVOKABLE void position_window (QQuick_window window);
+
+
+    public Q_INVOKABLE void force_window_init (QQuick_window window);
 
 signals:
     void current_user_changed ();
@@ -104,7 +126,7 @@ signals:
     private static Systray _instance;
     private Systray ();
 
-    private QScreen *current_screen ();
+    private QScreen current_screen ();
     private QRect current_screen_rect ();
     private QPoint compute_window_reference_point ();
     private QPoint calc_tray_icon_center ();
@@ -129,7 +151,7 @@ Systray *Systray.instance () {
     return _instance;
 }
 
-void Systray.set_tray_engine (QQml_application_engine *tray_engine) {
+void Systray.set_tray_engine (QQml_application_engine tray_engine) {
     _tray_engine = tray_engine;
 
     _tray_engine.set_network_access_manager_factory (&_access_manager_factory);
@@ -168,34 +190,34 @@ Systray.Systray ()
 
     qml_register_type<WheelHandler> ("com.nextcloud.desktopclient", 1, 0, "WheelHandler");
 
-    auto context_menu = new QMenu ();
+    var context_menu = new QMenu ();
     if (AccountManager.instance ().accounts ().is_empty ()) {
         context_menu.add_action (tr ("Add account"), this, &Systray.open_account_wizard);
     } else {
         context_menu.add_action (tr ("Open main dialog"), this, &Systray.open_main_dialog);
     }
 
-    auto pause_action = context_menu.add_action (tr ("Pause sync"), this, &Systray.on_pause_all_folders);
-    auto resume_action = context_menu.add_action (tr ("Resume sync"), this, &Systray.on_unpause_all_folders);
+    var pause_action = context_menu.add_action (tr ("Pause sync"), this, &Systray.on_pause_all_folders);
+    var resume_action = context_menu.add_action (tr ("Resume sync"), this, &Systray.on_unpause_all_folders);
     context_menu.add_action (tr ("Settings"), this, &Systray.open_settings);
     context_menu.add_action (tr ("Exit %1").arg (Theme.instance ().app_name_gui ()), this, &Systray.shutdown);
     set_context_menu (context_menu);
 
     connect (context_menu, &QMenu.about_to_show, [=] {
-        const auto folders = FolderMan.instance ().map ();
+        const var folders = FolderMan.instance ().map ();
 
-        const auto all_paused = std.all_of (std.cbegin (folders), std.cend (folders), [] (Folder *f) {
+        const var all_paused = std.all_of (std.cbegin (folders), std.cend (folders), [] (Folder f) {
             return f.sync_paused ();
         });
-        const auto pause_text = folders.size () > 1 ? tr ("Pause sync for all") : tr ("Pause sync");
+        const var pause_text = folders.size () > 1 ? tr ("Pause sync for all") : tr ("Pause sync");
         pause_action.on_set_text (pause_text);
         pause_action.set_visible (!all_paused);
         pause_action.set_enabled (!all_paused);
 
-        const auto any_paused = std.any_of (std.cbegin (folders), std.cend (folders), [] (Folder *f) {
+        const var any_paused = std.any_of (std.cbegin (folders), std.cend (folders), [] (Folder f) {
             return f.sync_paused ();
         });
-        const auto resume_text = folders.size () > 1 ? tr ("Resume sync for all") : tr ("Resume sync");
+        const var resume_text = folders.size () > 1 ? tr ("Resume sync for all") : tr ("Resume sync");
         resume_action.on_set_text (resume_text);
         resume_action.set_visible (any_paused);
         resume_action.set_enabled (any_paused);
@@ -220,8 +242,8 @@ void Systray.create () {
     hide_window ();
     emit activated (QSystemTrayIcon.Activation_reason.Unknown);
 
-    const auto folder_map = FolderMan.instance ().map ();
-    for (auto *folder : folder_map) {
+    const var folder_map = FolderMan.instance ().map ();
+    for (var folder : folder_map) {
         if (!folder.sync_paused ()) {
             _sync_is_paused = false;
             break;
@@ -251,17 +273,17 @@ void Systray.set_pause_on_all_folders_helper (bool pause) {
     // For some reason we get the raw pointer from Folder.account_state ()
     // that's why we need a list of raw pointers for the call to contains
     // later on...
-    const auto accounts = [=] {
-        const auto ptr_list = AccountManager.instance ().accounts ();
-        auto result = GLib.List<AccountState> ();
+    const var accounts = [=] {
+        const var ptr_list = AccountManager.instance ().accounts ();
+        var result = GLib.List<AccountState> ();
         result.reserve (ptr_list.size ());
         std.transform (std.cbegin (ptr_list), std.cend (ptr_list), std.back_inserter (result), [] (AccountStatePtr &account) {
             return account.data ();
         });
         return result;
     } ();
-    const auto folders = FolderMan.instance ().map ();
-    for (auto f : folders) {
+    const var folders = FolderMan.instance ().map ();
+    for (var f : folders) {
         if (accounts.contains (f.account_state ())) {
             f.set_sync_paused (pause);
             if (pause) {
@@ -338,15 +360,15 @@ void Systray.pause_resume_sync () {
 /* Helper functions for cross-platform tray icon position and taskbar orientation detection */
 /***************************************************************************/
 
-void Systray.position_window (QQuick_window *window) {
+void Systray.position_window (QQuick_window window) {
     if (!use_normal_window ()) {
         window.set_screen (current_screen ());
-        const auto position = compute_window_position (window.width (), window.height ());
+        const var position = compute_window_position (window.width (), window.height ());
         window.set_position (position);
     }
 }
 
-void Systray.force_window_init (QQuick_window *window) {
+void Systray.force_window_init (QQuick_window window) {
     // HACK : At least on Windows, if the systray window is not shown at least once
     // it can prevent session handling to carry on properly, so we show/hide it here
     // this shouldn't flicker
@@ -355,10 +377,10 @@ void Systray.force_window_init (QQuick_window *window) {
 }
 
 QScreen *Systray.current_screen () {
-    const auto screens = QGuiApplication.screens ();
-    const auto cursor_pos = QCursor.pos ();
+    const var screens = QGuiApplication.screens ();
+    const var cursor_pos = QCursor.pos ();
 
-    for (auto screen : screens) {
+    for (var screen : screens) {
         if (screen.geometry ().contains (cursor_pos)) {
             return screen;
         }
@@ -370,15 +392,15 @@ QScreen *Systray.current_screen () {
 }
 
 Systray.Task_bar_position Systray.taskbar_orientation () {
-    const auto screen_rect = current_screen_rect ();
-    const auto tray_icon_center = calc_tray_icon_center ();
+    const var screen_rect = current_screen_rect ();
+    const var tray_icon_center = calc_tray_icon_center ();
 
-    const auto dist_bottom = screen_rect.bottom () - tray_icon_center.y ();
-    const auto dist_right = screen_rect.right () - tray_icon_center.x ();
-    const auto dist_left = tray_icon_center.x () - screen_rect.left ();
-    const auto dist_top = tray_icon_center.y () - screen_rect.top ();
+    const var dist_bottom = screen_rect.bottom () - tray_icon_center.y ();
+    const var dist_right = screen_rect.right () - tray_icon_center.x ();
+    const var dist_left = tray_icon_center.x () - screen_rect.left ();
+    const var dist_top = tray_icon_center.y () - screen_rect.top ();
 
-    const auto min_dist = std.min ({dist_right, dist_top, dist_bottom});
+    const var min_dist = std.min ({dist_right, dist_top, dist_bottom});
 
     if (min_dist == dist_bottom) {
         return Task_bar_position.Bottom;
@@ -394,26 +416,26 @@ Systray.Task_bar_position Systray.taskbar_orientation () {
 // TODO : Get real taskbar dimensions Linux as well
 QRect Systray.taskbar_geometry () {
     if (taskbar_orientation () == Task_bar_position.Bottom || taskbar_orientation () == Task_bar_position.Top) {
-        auto screen_width = current_screen_rect ().width ();
+        var screen_width = current_screen_rect ().width ();
         return {0, 0, screen_width, 32};
     } else {
-        auto screen_height = current_screen_rect ().height ();
+        var screen_height = current_screen_rect ().height ();
         return {0, 0, 32, screen_height};
     }
 }
 
 QRect Systray.current_screen_rect () {
-    const auto screen = current_screen ();
+    const var screen = current_screen ();
     Q_ASSERT (screen);
     return screen.geometry ();
 }
 
 QPoint Systray.compute_window_reference_point () {
-    constexpr auto spacing = 4;
-    const auto tray_icon_center = calc_tray_icon_center ();
-    const auto taskbar_rect = taskbar_geometry ();
-    const auto taskbar_screen_edge = taskbar_orientation ();
-    const auto screen_rect = current_screen_rect ();
+    constexpr var spacing = 4;
+    const var tray_icon_center = calc_tray_icon_center ();
+    const var taskbar_rect = taskbar_geometry ();
+    const var taskbar_screen_edge = taskbar_orientation ();
+    const var screen_rect = current_screen_rect ();
 
     q_c_debug (lc_systray) << "screen_rect:" << screen_rect;
     q_c_debug (lc_systray) << "taskbar_rect:" << taskbar_rect;
@@ -446,12 +468,12 @@ QPoint Systray.compute_window_reference_point () {
 }
 
 QPoint Systray.compute_window_position (int width, int height) {
-    const auto reference_point = compute_window_reference_point ();
+    const var reference_point = compute_window_reference_point ();
 
-    const auto taskbar_screen_edge = taskbar_orientation ();
-    const auto screen_rect = current_screen_rect ();
+    const var taskbar_screen_edge = taskbar_orientation ();
+    const var screen_rect = current_screen_rect ();
 
-    const auto top_left = [=] () {
+    const var top_left = [=] () {
         switch (taskbar_screen_edge) {
         case Task_bar_position.Bottom:
             return reference_point - QPoint (width / 2, height);
@@ -464,10 +486,10 @@ QPoint Systray.compute_window_position (int width, int height) {
         }
         Q_UNREACHABLE ();
     } ();
-    const auto bottom_right = top_left + QPoint (width, height);
-    const auto window_rect = [=] () {
-        const auto rect = QRect (top_left, bottom_right);
-        auto offset = QPoint ();
+    const var bottom_right = top_left + QPoint (width, height);
+    const var window_rect = [=] () {
+        const var rect = QRect (top_left, bottom_right);
+        var offset = QPoint ();
 
         if (rect.left () < screen_rect.left ()) {
             offset.set_x (screen_rect.left () - rect.left () + 4);
@@ -501,7 +523,7 @@ Access_manager_factory.Access_manager_factory ()
     : QQml_network_access_manager_factory () {
 }
 
-QNetworkAccessManager* Access_manager_factory.create (GLib.Object *parent) {
+QNetworkAccessManager* Access_manager_factory.create (GLib.Object parent) {
     return new AccessManager (parent);
 }
 

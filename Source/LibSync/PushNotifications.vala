@@ -19,9 +19,10 @@ namespace Occ {
 
 class PushNotifications : GLib.Object {
 
-    public PushNotifications (Account *account, GLib.Object *parent = nullptr);
+    public PushNotifications (Account account, GLib.Object parent = nullptr);
 
     ~PushNotifications () override;
+
 
     /***********************************************************
     Setup push notifications
@@ -30,6 +31,7 @@ class PushNotifications : GLib.Object {
     ***********************************************************/
     public void setup ();
 
+
     /***********************************************************
     Set the interval for reconnection attempts
 
@@ -37,12 +39,14 @@ class PushNotifications : GLib.Object {
     ***********************************************************/
     public void set_reconnect_timer_interval (uint32_t interval);
 
+
     /***********************************************************
     Indicates if push notifications ready to use
 
     Ready to use means connected and authenticated.
     ***********************************************************/
     public bool is_ready ();
+
 
     /***********************************************************
     Set the interval in which the websocket will ping the server if it is still alive.
@@ -59,20 +63,24 @@ signals:
     ***********************************************************/
     void ready ();
 
+
     /***********************************************************
     Will be emitted if files on the server changed
     ***********************************************************/
-    void files_changed (Account *account);
+    void files_changed (Account account);
+
 
     /***********************************************************
     Will be emitted if activities have been changed on the server
     ***********************************************************/
-    void activities_changed (Account *account);
+    void activities_changed (Account account);
+
 
     /***********************************************************
     Will be emitted if notifications have been changed on the server
     ***********************************************************/
-    void notifications_changed (Account *account);
+    void notifications_changed (Account account);
+
 
     /***********************************************************
     Will be emitted if push notifications are unable to authenticate
@@ -80,6 +88,7 @@ signals:
     It's save to call #PushNotifications.setup () after this signal has been emitted.
     ***********************************************************/
     void authentication_failed ();
+
 
     /***********************************************************
     Will be emitted if push notifications are unable to connect or the connection timed out
@@ -94,7 +103,7 @@ signals:
     private void on_web_socket_text_message_received (string message);
     private void on_web_socket_error (QAbstract_socket.Socket_error error);
     private void on_web_socket_ssl_errors (GLib.List<QSslError> &errors);
-    private void on_web_socket_pong_received (uint64 elapsed_time, GLib.ByteArray &payload);
+    private void on_web_socket_pong_received (uint64 elapsed_time, GLib.ByteArray payload);
     private void on_ping_timed_out ();
 
 
@@ -130,7 +139,7 @@ signals:
     private bool _pong_received_from_web_socket_server = false;
 };
 
-    PushNotifications.PushNotifications (Account *account, GLib.Object *parent)
+    PushNotifications.PushNotifications (Account account, GLib.Object parent)
         : GLib.Object (parent)
         , _account (account)
         , _web_socket (new QWeb_socket (string (), QWeb_socket_protocol.Version_latest, this)) {
@@ -191,9 +200,9 @@ signals:
     }
 
     void PushNotifications.authenticate_on_web_socket () {
-        const auto credentials = _account.credentials ();
-        const auto username = credentials.user ();
-        const auto password = credentials.password ();
+        const var credentials = _account.credentials ();
+        const var username = credentials.user ();
+        const var password = credentials.password ();
 
         // Authenticate
         _web_socket.send_text_message (username);
@@ -262,8 +271,8 @@ signals:
 
     void PushNotifications.open_web_socket () {
         // Open websocket
-        const auto capabilities = _account.capabilities ();
-        const auto web_socket_url = capabilities.push_notifications_web_socket_url ();
+        const var capabilities = _account.capabilities ();
+        const var web_socket_url = capabilities.push_notifications_web_socket_url ();
 
         q_c_info (lc_push_notifications) << "Open connection to websocket on" << web_socket_url << "for account" << _account.url ();
         connect (_web_socket, QOverload<QAbstract_socket.Socket_error>.of (&QWeb_socket.error), this, &PushNotifications.on_web_socket_error);
@@ -317,7 +326,7 @@ signals:
         emit_activities_changed ();
     }
 
-    void PushNotifications.on_web_socket_pong_received (uint64 /*elapsed_time*/, GLib.ByteArray & /*payload*/) {
+    void PushNotifications.on_web_socket_pong_received (uint64 /*elapsed_time*/, GLib.ByteArray  /*payload*/) {
         q_c_debug (lc_push_notifications) << "Pong received in time";
         // We are fine with every kind of pong and don't care about the
         // payload. As long as we receive pongs the server is still alive.

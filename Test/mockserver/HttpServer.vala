@@ -9,6 +9,8 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 class HttpServer : QTcpServer {
 
     public HttpServer (int16 port, GLib.Object* parent = nullptr);
+
+
     public void incomingConnection (int socket);
 
     private void on_read_client ();

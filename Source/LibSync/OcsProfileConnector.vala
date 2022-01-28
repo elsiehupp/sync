@@ -21,6 +21,8 @@ namespace Occ {
 struct HovercardAction {
 
     public HovercardAction ();
+
+
     public HovercardAction (string title, QUrl icon_url, QUrl link);
 
     public string _title;
@@ -35,9 +37,11 @@ struct Hovercard {
 
 class OcsProfileConnector : GLib.Object {
 
-    public OcsProfileConnector (AccountPtr account, GLib.Object *parent = nullptr);
+    public OcsProfileConnector (AccountPtr account, GLib.Object parent = nullptr);
 
     public void fetch_hovercard (string user_id);
+
+
     public const Hovercard &hovercard ();
 
 signals:
@@ -51,7 +55,7 @@ signals:
     private void fetch_icons ();
     private void start_fetch_icon_job (std.size_t hovercard_action_index);
     private void set_hovercard_action_icon (std.size_t index, QPixmap &pixmap);
-    private void load_hovercard_action_icon (std.size_t hovercard_action_index, GLib.ByteArray &icon_data);
+    private void load_hovercard_action_icon (std.size_t hovercard_action_index, GLib.ByteArray icon_data);
 
     AccountPtr _account;
     Hovercard _current_hovercard;
@@ -61,7 +65,7 @@ signals:
 
 
     Occ.HovercardAction json_to_action (QJsonObject &json_action_object) {
-        const auto icon_url = json_action_object.value (QStringLiteral ("icon")).to_string (QStringLiteral ("no-icon"));
+        const var icon_url = json_action_object.value (QStringLiteral ("icon")).to_string (QStringLiteral ("no-icon"));
         QPixmap icon_pixmap;
         Occ.HovercardAction hovercard_action{
             json_action_object.value (QStringLiteral ("title")).to_string (QStringLiteral ("No title")), icon_url,
@@ -75,7 +79,7 @@ signals:
     Occ.Hovercard json_to_hovercard (QJsonArray &json_data_array) {
         Occ.Hovercard hovercard;
         hovercard._actions.reserve (json_data_array.size ());
-        for (auto &json_entry : json_data_array) {
+        for (var &json_entry : json_data_array) {
             Q_ASSERT (json_entry.is_object ());
             if (!json_entry.is_object ()) {
                 continue;
@@ -85,7 +89,7 @@ signals:
         return hovercard;
     }
 
-    Occ.Optional<QPixmap> create_pixmap_from_svg_data (GLib.ByteArray &icon_data) {
+    Occ.Optional<QPixmap> create_pixmap_from_svg_data (GLib.ByteArray icon_data) {
         QSvgRenderer svg_renderer;
         if (!svg_renderer.on_load (icon_data)) {
             return {};
@@ -116,7 +120,7 @@ signals:
         , _link (std.move (link)) {
     }
 
-    OcsProfileConnector.OcsProfileConnector (AccountPtr account, GLib.Object *parent)
+    OcsProfileConnector.OcsProfileConnector (AccountPtr account, GLib.Object parent)
         : GLib.Object (parent)
         , _account (account) {
     }
@@ -129,7 +133,7 @@ signals:
             return;
         }
         const string url = QStringLiteral ("/ocs/v2.php/hovercard/v1/%1").arg (user_id);
-        const auto job = new JsonApiJob (_account, url, this);
+        const var job = new JsonApiJob (_account, url, this);
         connect (job, &JsonApiJob.json_received, this, &OcsProfileConnector.on_hovercard_fetched);
         job.on_start ();
     }
@@ -141,7 +145,7 @@ signals:
             q_c_info (lc_ocs_profile_connector) << "Fetching of hovercard on_finished with status code" << status_code;
             return;
         }
-        const auto json_data = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("actions");
+        const var json_data = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("actions");
         Q_ASSERT (json_data.is_array ());
         _current_hovercard = json_to_hovercard (json_data.to_array ());
         fetch_icons ();
@@ -149,18 +153,18 @@ signals:
     }
 
     void OcsProfileConnector.set_hovercard_action_icon (std.size_t index, QPixmap &pixmap) {
-        auto &hovercard_action = _current_hovercard._actions[index];
+        var &hovercard_action = _current_hovercard._actions[index];
         QPixmapCache.insert (hovercard_action._icon_url.to_string (), pixmap);
         hovercard_action._icon = pixmap;
         emit icon_loaded (index);
     }
 
-    void OcsProfileConnector.load_hovercard_action_icon (std.size_t hovercard_action_index, GLib.ByteArray &icon_data) {
+    void OcsProfileConnector.load_hovercard_action_icon (std.size_t hovercard_action_index, GLib.ByteArray icon_data) {
         if (hovercard_action_index >= _current_hovercard._actions.size ()) {
-            // Note : Probably could do more checking, like checking if the url is still the same.
+            // Note: Probably could do more checking, like checking if the url is still the same.
             return;
         }
-        const auto icon = icon_data_to_pixmap (icon_data);
+        const var icon = icon_data_to_pixmap (icon_data);
         if (icon.is_valid ()) {
             set_hovercard_action_icon (hovercard_action_index, icon.get ());
             return;
@@ -169,8 +173,8 @@ signals:
     }
 
     void OcsProfileConnector.start_fetch_icon_job (std.size_t hovercard_action_index) {
-        const auto hovercard_action = _current_hovercard._actions[hovercard_action_index];
-        const auto icon_job = new IconJob{_account, hovercard_action._icon_url, this};
+        const var hovercard_action = _current_hovercard._actions[hovercard_action_index];
+        const var icon_job = new IconJob{_account, hovercard_action._icon_url, this};
         connect (icon_job, &IconJob.job_finished,
             [this, hovercard_action_index] (GLib.ByteArray icon_data) {
                 load_hovercard_action_icon (hovercard_action_index, icon_data);
@@ -181,7 +185,7 @@ signals:
     }
 
     void OcsProfileConnector.fetch_icons () {
-        for (auto hovercard_action_index = 0u; hovercard_action_index < _current_hovercard._actions.size ();
+        for (var hovercard_action_index = 0u; hovercard_action_index < _current_hovercard._actions.size ();
              ++hovercard_action_index) {
             start_fetch_icon_job (hovercard_action_index);
         }

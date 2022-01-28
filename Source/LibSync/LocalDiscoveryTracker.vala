@@ -11,7 +11,6 @@ using namespace Occ;
 
 
 // #include <set>
-// #include <GLib.ByteArray>
 
 
 namespace Occ {
@@ -42,6 +41,7 @@ class LocalDiscoveryTracker : GLib.Object {
 
     public LocalDiscoveryTracker ();
 
+
     /***********************************************************
     Adds a path that must be locally rediscovered later.
 
@@ -50,26 +50,31 @@ class LocalDiscoveryTracker : GLib.Object {
     ***********************************************************/
     public void add_touched_path (string relative_path);
 
+
     /***********************************************************
     Call when a sync run starts that rediscovers all local files
     ***********************************************************/
     public void start_sync_full_discovery ();
+
 
     /***********************************************************
     Call when a sync using local_discovery_paths () starts
     ***********************************************************/
     public void start_sync_partial_discovery ();
 
+
     /***********************************************************
     Access list of files that shall be locally rediscovered.
     ***********************************************************/
     public const std.set<string> &local_discovery_paths ();
+
 
     /***********************************************************
     Success and failure of sync items adjust what the next sync is
     supposed to do.
     ***********************************************************/
     public void on_item_completed (SyncFileItemPtr &item);
+
 
     /***********************************************************
     When a sync finishes, the lists must be updated
@@ -84,6 +89,7 @@ class LocalDiscoveryTracker : GLib.Object {
     Also includes files that have had errors in the last sync run.
     ***********************************************************/
     private std.set<string> _local_discovery_paths;
+
 
     /***********************************************************
     The paths that the current sync run used for local discovery.
@@ -122,7 +128,7 @@ void LocalDiscoveryTracker.start_sync_full_discovery () {
 void LocalDiscoveryTracker.start_sync_partial_discovery () {
     if (lc_local_discovery_tracker ().is_debug_enabled ()) {
         string[] paths;
-        for (auto &path : _local_discovery_paths)
+        for (var &path : _local_discovery_paths)
             paths.append (path);
         q_c_debug (lc_local_discovery_tracker) << "partial discovery with paths : " << paths;
     }

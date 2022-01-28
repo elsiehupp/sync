@@ -12,7 +12,9 @@ using namespace Occ;
 
 class CloudProviderManager : GLib.Object {
 
-    public CloudProviderManager (GLib.Object *parent = nullptr);
+    public CloudProviderManager (GLib.Object parent = nullptr);
+
+
     public void register_signals ();
 
 
@@ -20,7 +22,7 @@ class CloudProviderManager : GLib.Object {
 
 
     private QMap<string, CloudProviderWrapper> _map;
-    private uint _folder_index;
+    private uint32 _folder_index;
 };
 
 
@@ -31,16 +33,16 @@ class CloudProviderManager : GLib.Object {
 
 
 
-void on_name_acquired (GDBusConnection *connection, gchar *name, gpointer user_data) {
+void on_name_acquired (GDBusConnection connection, gchar name, gpointer user_data) {
     Q_UNUSED (name);
-    CloudProviderManager *self;
+    CloudProviderManager self;
     self = static_cast<CloudProviderManager> (user_data);
     _provider_exporter = cloud_providers_provider_exporter_new (connection, LIBCLOUDPROVIDERS_DBUS_BUS_NAME, LIBCLOUDPROVIDERS_DBUS_OBJECT_PATH);
     cloud_providers_provider_exporter_set_name (_provider_exporter, APPLICATION_NAME);
     self.register_signals ();
 }
 
-void on_name_lost (GDBusConnection *connection, gchar *name, gpointer user_data) {
+void on_name_lost (GDBusConnection connection, gchar name, gpointer user_data) {
     Q_UNUSED (connection);
     Q_UNUSED (name);
     Q_UNUSED (user_data);
@@ -48,12 +50,12 @@ void on_name_lost (GDBusConnection *connection, gchar *name, gpointer user_data)
 }
 
 void CloudProviderManager.register_signals () {
-    Occ.FolderMan *folder_manager = Occ.FolderMan.instance ();
+    Occ.FolderMan folder_manager = Occ.FolderMan.instance ();
     connect (folder_manager, SIGNAL (folder_list_changed (Folder.Map &)), SLOT (on_folder_list_changed (Folder.Map &)));
     on_folder_list_changed (folder_manager.map ());
 }
 
-CloudProviderManager.CloudProviderManager (GLib.Object *parent) : GLib.Object (parent) {
+CloudProviderManager.CloudProviderManager (GLib.Object parent) : GLib.Object (parent) {
     _folder_index = 0;
     g_bus_own_name (G_BUS_TYPE_SESSION, LIBCLOUDPROVIDERS_DBUS_BUS_NAME, G_BUS_NAME_OWNER_FLAGS_NONE, nullptr, on_name_acquired, nullptr, this, nullptr);
 }
@@ -73,7 +75,7 @@ void CloudProviderManager.on_folder_list_changed (Folder.Map &folder_map) {
     while (j.has_next ()) {
         j.next ();
         if (!_map.contains (j.key ())) {
-            auto *cpo = new CloudProviderWrapper (this, j.value (), _folder_index++, _provider_exporter);
+            var cpo = new CloudProviderWrapper (this, j.value (), _folder_index++, _provider_exporter);
             _map.insert (j.key (), cpo);
         }
     }

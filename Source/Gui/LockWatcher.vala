@@ -38,7 +38,8 @@ the file is still being locked.
 
 class LockWatcher : GLib.Object {
 
-    public LockWatcher (GLib.Object *parent = nullptr);
+    public LockWatcher (GLib.Object parent = nullptr);
+
 
     /***********************************************************
     Start watching a file.
@@ -48,10 +49,12 @@ class LockWatcher : GLib.Object {
     ***********************************************************/
     public void add_file (string path);
 
+
     /***********************************************************
     Adjusts the default interval for checking whether the lock is still present
     ***********************************************************/
     public void set_check_interval (std.chrono.milliseconds interval);
+
 
     /***********************************************************
     Whether the path is being watched for lock-changes
@@ -81,7 +84,7 @@ signals:
 
 
 
-LockWatcher.LockWatcher (GLib.Object *parent)
+LockWatcher.LockWatcher (GLib.Object parent)
     : GLib.Object (parent) {
     connect (&_timer, &QTimer.timeout,
         this, &LockWatcher.on_check_files);

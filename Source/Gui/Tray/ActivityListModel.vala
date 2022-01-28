@@ -29,7 +29,7 @@ Simple list model to provide the list view with data.
 
 class ActivityListModel : QAbstractListModel {
 
-    Q_PROPERTY (AccountState *account_state READ account_state CONSTANT)
+    Q_PROPERTY (AccountState account_state READ account_state CONSTANT)
 
     public enum Data_role {
         Action_icon_role = Qt.User_role + 1,
@@ -52,10 +52,10 @@ class ActivityListModel : QAbstractListModel {
         Shareable_role,
     };
 
-    public ActivityListModel (GLib.Object *parent = nullptr);
+    public ActivityListModel (GLib.Object parent = nullptr);
 
-    public ActivityListModel (AccountState *account_state,
-        GLib.Object *parent = nullptr);
+    public ActivityListModel (AccountState account_state,
+        GLib.Object parent = nullptr);
 
     public QVariant data (QModelIndex &index, int role) override;
     public int row_count (QModelIndex &parent = QModelIndex ()) override;
@@ -70,31 +70,47 @@ class ActivityListModel : QAbstractListModel {
         return _notification_errors_lists;
     }
     public void add_notification_to_activity_list (Activity activity);
+
+
     public void clear_notifications ();
+
+
     public void add_error_to_activity_list (Activity activity);
+
+
     public void add_ignored_file_to_list (Activity new_activity);
+
+
     public void add_sync_file_item_to_activity_list (Activity activity);
+
+
     public void remove_activity_from_activity_list (int row);
+
+
     public void remove_activity_from_activity_list (Activity activity);
 
     public Q_INVOKABLE void trigger_default_action (int activity_index);
+
+
     public Q_INVOKABLE void trigger_action (int activity_index, int action_index);
 
-    public AccountState *account_state ();
+    public AccountState account_state ();
 
 
     public void on_refresh_activity ();
+
+
     public void on_remove_account ();
 
 signals:
     void activity_job_status_code (int status_code);
-    void send_notification_request (string account_name, string link, GLib.ByteArray &verb, int row);
+    void send_notification_request (string account_name, string link, GLib.ByteArray verb, int row);
 
 
     protected void activities_received (QJsonDocument &json, int status_code);
     protected QHash<int, GLib.ByteArray> role_names () override;
 
-    protected void set_account_state (AccountState *state);
+    protected void set_account_state (AccountState state);
     protected void set_currently_fetching (bool value);
     protected bool currently_fetching ();
     protected void set_done_fetching (bool value);
@@ -131,12 +147,12 @@ signals:
     private bool _hide_old_activities = true;
 };
 
-    ActivityListModel.ActivityListModel (GLib.Object *parent)
+    ActivityListModel.ActivityListModel (GLib.Object parent)
         : QAbstractListModel (parent) {
     }
 
-    ActivityListModel.ActivityListModel (AccountState *account_state,
-        GLib.Object *parent)
+    ActivityListModel.ActivityListModel (AccountState account_state,
+        GLib.Object parent)
         : QAbstractListModel (parent)
         , _account_state (account_state) {
     }
@@ -160,7 +176,7 @@ signals:
         return roles;
     }
 
-    void ActivityListModel.set_account_state (AccountState *state) {
+    void ActivityListModel.set_account_state (AccountState state) {
         _account_state = state;
     }
 
@@ -198,12 +214,12 @@ signals:
         switch (role) {
         case Display_path_role:
             if (!a._file.is_empty ()) {
-                auto folder = FolderMan.instance ().folder (a._folder);
+                var folder = FolderMan.instance ().folder (a._folder);
                 string rel_path (a._file);
                 if (folder) {
                     rel_path.prepend (folder.remote_path ());
                 }
-                const auto local_files = FolderMan.instance ().find_file_in_local_folders (rel_path, ast.account ());
+                const var local_files = FolderMan.instance ().find_file_in_local_folders (rel_path, ast.account ());
                 if (local_files.count () > 0) {
                     if (rel_path.starts_with ('/') || rel_path.starts_with ('\\')) {
                         return rel_path.remove (0, 1);
@@ -215,7 +231,7 @@ signals:
             return string ();
         case Path_role:
             if (!a._file.is_empty ()) {
-                const auto folder = FolderMan.instance ().folder (a._folder);
+                const var folder = FolderMan.instance ().folder (a._folder);
 
                 string rel_path (a._file);
                 if (folder) {
@@ -223,7 +239,7 @@ signals:
                 }
 
                 // get relative path to the file so we can open it in the file manager
-                const auto local_files = FolderMan.instance ().find_file_in_local_folders (QFileInfo (rel_path).path (), ast.account ());
+                const var local_files = FolderMan.instance ().find_file_in_local_folders (QFileInfo (rel_path).path (), ast.account ());
 
                 if (local_files.is_empty ()) {
                     return string ();
@@ -233,7 +249,7 @@ signals:
                 // hiding the share button which is what we want
                 if (folder) {
                     SyncJournalFileRecord rec;
-                    folder.journal_db ().get_file_record (a._file.mid (1), &rec);
+                    folder.journal_database ().get_file_record (a._file.mid (1), &rec);
                     if (rec.is_valid () && (rec._is_e2e_encrypted || !rec._e2e_mangled_name.is_empty ())) {
                         return string ();
                     }
@@ -242,14 +258,14 @@ signals:
                 return QUrl.from_local_file (local_files.const_first ());
             }
             return string ();
-        case Absolute_path_role : {
-            const auto folder = FolderMan.instance ().folder (a._folder);
+        case Absolute_path_role: {
+            const var folder = FolderMan.instance ().folder (a._folder);
             string rel_path (a._file);
             if (!a._file.is_empty ()) {
                 if (folder) {
                     rel_path.prepend (folder.remote_path ());
                 }
-                const auto local_files = FolderMan.instance ().find_file_in_local_folders (rel_path, ast.account ());
+                const var local_files = FolderMan.instance ().find_file_in_local_folders (rel_path, ast.account ());
                 if (!local_files.empty ()) {
                     return local_files.const_first ();
                 } else {
@@ -261,14 +277,14 @@ signals:
                 return string ();
             }
         }
-        case Actions_links_role : {
+        case Actions_links_role: {
             GLib.List<QVariant> custom_list;
             foreach (Activity_link activity_link, a._links) {
                 custom_list << QVariant.from_value (activity_link);
             }
             return custom_list;
         }
-        case Action_icon_role : {
+        case Action_icon_role: {
             if (a._type == Activity.Notification_type) {
                 return "qrc:///client/theme/black/bell.svg";
             } else if (a._type == Activity.Sync_result_type) {
@@ -308,7 +324,7 @@ signals:
         }
         case Object_type_role:
             return a._object_type;
-        case Action_role : {
+        case Action_role: {
             switch (a._type) {
             case Activity.Activity_type:
                 return "Activity";
@@ -328,7 +344,7 @@ signals:
             return a._id == -1 ? QLatin1String ("#808080") : QLatin1String ("#222");   // FIXME : This is a temporary workaround for _show_more_activities_available_entry
         case Message_role:
             return a._message;
-        case Link_role : {
+        case Link_role: {
             if (a._link.is_empty ()) {
                 return "";
             } else {
@@ -372,7 +388,7 @@ signals:
         if (!_account_state.is_connected ()) {
             return;
         }
-        auto *job = new JsonApiJob (_account_state.account (), QLatin1String ("ocs/v2.php/apps/activity/api/v2/activity"), this);
+        var job = new JsonApiJob (_account_state.account (), QLatin1String ("ocs/v2.php/apps/activity/api/v2/activity"), this);
         GLib.Object.connect (job, &JsonApiJob.json_received,
             this, &ActivityListModel.activities_received);
 
@@ -387,10 +403,10 @@ signals:
     }
 
     void ActivityListModel.activities_received (QJsonDocument &json, int status_code) {
-        auto activities = json.object ().value ("ocs").to_object ().value ("data").to_array ();
+        var activities = json.object ().value ("ocs").to_object ().value ("data").to_array ();
 
         Activity_list list;
-        auto ast = _account_state;
+        var ast = _account_state;
         if (!ast) {
             return;
         }
@@ -404,8 +420,8 @@ signals:
         QDateTime oldest_date = QDateTime.current_date_time ();
         oldest_date = oldest_date.add_days (_max_activities_days * -1);
 
-        foreach (auto activ, activities) {
-            auto json = activ.to_object ();
+        foreach (var activ, activities) {
+            var json = activ.to_object ();
 
             Activity a;
             a._type = Activity.Activity_type;
@@ -524,25 +540,25 @@ signals:
             return;
         }
 
-        const auto model_index = index (activity_index);
-        const auto path = data (model_index, Path_role).to_url ();
+        const var model_index = index (activity_index);
+        const var path = data (model_index, Path_role).to_url ();
 
-        const auto activity = _final_list.at (activity_index);
+        const var activity = _final_list.at (activity_index);
         if (activity._status == SyncFileItem.Conflict) {
             Q_ASSERT (!activity._file.is_empty ());
             Q_ASSERT (!activity._folder.is_empty ());
             Q_ASSERT (Utility.is_conflict_file (activity._file));
 
-            const auto folder = FolderMan.instance ().folder (activity._folder);
+            const var folder = FolderMan.instance ().folder (activity._folder);
 
-            const auto conflicted_relative_path = activity._file;
-            const auto base_relative_path = folder.journal_db ().conflict_file_base_name (conflicted_relative_path.to_utf8 ());
+            const var conflicted_relative_path = activity._file;
+            const var base_relative_path = folder.journal_database ().conflict_file_base_name (conflicted_relative_path.to_utf8 ());
 
-            const auto dir = QDir (folder.path ());
-            const auto conflicted_path = dir.file_path (conflicted_relative_path);
-            const auto base_path = dir.file_path (base_relative_path);
+            const var dir = QDir (folder.path ());
+            const var conflicted_path = dir.file_path (conflicted_relative_path);
+            const var base_path = dir.file_path (base_relative_path);
 
-            const auto base_name = QFileInfo (base_path).file_name ();
+            const var base_name = QFileInfo (base_path).file_name ();
 
             if (!_current_conflict_dialog.is_null ()) {
                 _current_conflict_dialog.close ();
@@ -563,8 +579,8 @@ signals:
                 _current_invalid_filename_dialog.close ();
             }
 
-            auto folder = FolderMan.instance ().folder (activity._folder);
-            const auto folder_dir = QDir (folder.path ());
+            var folder = FolderMan.instance ().folder (activity._folder);
+            const var folder_dir = QDir (folder.path ());
             _current_invalid_filename_dialog = new Invalid_filename_dialog (_account_state.account (), folder,
                 folder_dir.file_path (activity._file));
             connect (_current_invalid_filename_dialog, &Invalid_filename_dialog.accepted, folder, [folder] () {
@@ -578,7 +594,7 @@ signals:
         if (path.is_valid ()) {
             QDesktopServices.open_url (path);
         } else {
-            const auto link = data (model_index, Link_role).to_url ();
+            const var link = data (model_index, Link_role).to_url ();
             Utility.open_browser (link);
         }
     }
@@ -589,14 +605,14 @@ signals:
             return;
         }
 
-        const auto activity = _final_list[activity_index];
+        const var activity = _final_list[activity_index];
 
         if (action_index < 0 || action_index >= activity._links.size ()) {
             q_c_warning (lc_activity) << "Couldn't trigger action at index" << action_index << "/ actions list size:" << activity._links.size ();
             return;
         }
 
-        const auto action = activity._links[action_index];
+        const var action = activity._links[action_index];
 
         if (action._verb == "WEB") {
             Utility.open_browser (QUrl (action._link));
@@ -642,7 +658,7 @@ signals:
                 a._subject = tr ("For more activities please open the Activity app.");
                 a._date_time = QDateTime.current_date_time ();
 
-                AccountApp *app = _account_state.find_app (QLatin1String ("activity"));
+                AccountApp app = _account_state.find_app (QLatin1String ("activity"));
                 if (app) {
                     a._link = app.url ();
                 }

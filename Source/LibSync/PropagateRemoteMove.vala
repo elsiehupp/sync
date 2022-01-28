@@ -20,9 +20,11 @@ class Move_job : AbstractNetworkJob {
     const QUrl _url; // Only used (instead of path) when the constructor taking an URL is used
     QMap<GLib.ByteArray, GLib.ByteArray> _extra_headers;
 
-    public Move_job (AccountPtr account, string path, string destination, GLib.Object *parent = nullptr);
+    public Move_job (AccountPtr account, string path, string destination, GLib.Object parent = nullptr);
+
+
     public Move_job (AccountPtr account, QUrl url, string destination,
-        QMap<GLib.ByteArray, GLib.ByteArray> _extra_headers, GLib.Object *parent = nullptr);
+        QMap<GLib.ByteArray, GLib.ByteArray> _extra_headers, GLib.Object parent = nullptr);
 
     public void on_start () override;
     public bool on_finished () override;
@@ -38,7 +40,7 @@ signals:
 class PropagateRemoteMove : PropagateItemJob {
     QPointer<Move_job> _job;
 
-    public PropagateRemoteMove (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+    public PropagateRemoteMove (OwncloudPropagator propagator, SyncFileItemPtr &item)
         : PropagateItemJob (propagator, item) {
     }
     public void on_start () override;
@@ -47,10 +49,11 @@ class PropagateRemoteMove : PropagateItemJob {
         return _item.is_directory () ? WaitForFinished : FullParallelism;
     }
 
+
     /***********************************************************
     Rename the directory in the selective sync list
     ***********************************************************/
-    public static bool adjust_selective_sync (SyncJournalDb *journal, string from, string to);
+    public static bool adjust_selective_sync (SyncJournalDb journal, string from, string to);
 
 
     private void on_move_job_finished ();
@@ -58,13 +61,13 @@ class PropagateRemoteMove : PropagateItemJob {
 };
 
     Move_job.Move_job (AccountPtr account, string path,
-        const string destination, GLib.Object *parent)
+        const string destination, GLib.Object parent)
         : AbstractNetworkJob (account, path, parent)
         , _destination (destination) {
     }
 
     Move_job.Move_job (AccountPtr account, QUrl url, string destination,
-        QMap<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object *parent)
+        QMap<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object parent)
         : AbstractNetworkJob (account, string (), parent)
         , _destination (destination)
         , _url (url)
@@ -74,7 +77,7 @@ class PropagateRemoteMove : PropagateItemJob {
     void Move_job.on_start () {
         QNetworkRequest req;
         req.set_raw_header ("Destination", QUrl.to_percent_encoding (_destination, "/"));
-        for (auto it = _extra_headers.const_begin (); it != _extra_headers.const_end (); ++it) {
+        for (var it = _extra_headers.const_begin (); it != _extra_headers.const_end (); ++it) {
             req.set_raw_header (it.key (), it.value ());
         }
         if (_url.is_valid ()) {
@@ -115,9 +118,9 @@ class PropagateRemoteMove : PropagateItemJob {
                 // we are fixing it by modifying the "_encrypted_file_name" in such a way so it will have a renamed root path at the beginning of it as expected
                 // corrected "_encrypted_file_name" is later used in propagator ().update_metadata () call that will update the record in the Sync journal DB
 
-                const auto path = _item._file;
-                const auto slash_position = path.last_index_of ('/');
-                const auto parent_path = slash_position >= 0 ? path.left (slash_position) : string ();
+                const var path = _item._file;
+                const var slash_position = path.last_index_of ('/');
+                const var parent_path = slash_position >= 0 ? path.left (slash_position) : string ();
 
                 SyncJournalFileRecord parent_rec;
                 bool ok = propagator ()._journal.get_file_record (parent_path, &parent_rec);
@@ -126,10 +129,10 @@ class PropagateRemoteMove : PropagateItemJob {
                     return;
                 }
 
-                const auto remote_parent_path = parent_rec._e2e_mangled_name.is_empty () ? parent_path : parent_rec._e2e_mangled_name;
+                const var remote_parent_path = parent_rec._e2e_mangled_name.is_empty () ? parent_path : parent_rec._e2e_mangled_name;
 
-                const auto last_slash_position = _item._encrypted_file_name.last_index_of ('/');
-                const auto encrypted_name = last_slash_position >= 0 ? _item._encrypted_file_name.mid (last_slash_position + 1) : string ();
+                const var last_slash_position = _item._encrypted_file_name.last_index_of ('/');
+                const var encrypted_name = last_slash_position >= 0 ? _item._encrypted_file_name.mid (last_slash_position + 1) : string ();
 
                 if (!encrypted_name.is_empty ()) {
                     _item._encrypted_file_name = remote_parent_path + "/" + encrypted_name;
@@ -143,11 +146,11 @@ class PropagateRemoteMove : PropagateItemJob {
         string remote_source = propagator ().full_remote_path (origin);
         string remote_destination = QDir.clean_path (propagator ().account ().dav_url ().path () + propagator ().full_remote_path (_item._rename_target));
 
-        auto &vfs = propagator ().sync_options ()._vfs;
-        auto itype = _item._type;
+        var &vfs = propagator ().sync_options ()._vfs;
+        var itype = _item._type;
         ASSERT (itype != ItemTypeVirtualFileDownload && itype != ItemTypeVirtualFileDehydration);
         if (vfs.mode () == Vfs.WithSuffix && itype != ItemTypeDirectory) {
-            const auto suffix = vfs.file_suffix ();
+            const var suffix = vfs.file_suffix ();
             bool source_had_suffix = remote_source.ends_with (suffix);
             bool destination_had_suffix = remote_destination.ends_with (suffix);
 
@@ -159,7 +162,7 @@ class PropagateRemoteMove : PropagateItemJob {
 
             string folder_target = _item._rename_target;
 
-            // Users can rename the file *and at the same time* add or remove the vfs
+            // Users can rename the file and at the same time* add or remove the vfs
             // suffix. That's a complicated case where a remote rename plus a local hydration
             // change is requested. We don't currently deal with that. Instead, the rename
             // is propagated and the local vfs suffix change is reverted.
@@ -247,19 +250,19 @@ class PropagateRemoteMove : PropagateItemJob {
     }
 
     void PropagateRemoteMove.on_finalize () {
-        // Retrieve old db data.
-        // if reading from db failed still continue hoping that delete_file_record
-        // reopens the db successfully.
-        // The db is only queried to transfer the content checksum from the old
+        // Retrieve old database data.
+        // if reading from database failed still continue hoping that delete_file_record
+        // reopens the database successfully.
+        // The database is only queried to transfer the content checksum from the old
         // to the new record. It is not a problem to skip it here.
         SyncJournalFileRecord old_record;
         propagator ()._journal.get_file_record (_item._original_file, &old_record);
-        auto &vfs = propagator ().sync_options ()._vfs;
-        auto pin_state = vfs.pin_state (_item._original_file);
+        var &vfs = propagator ().sync_options ()._vfs;
+        var pin_state = vfs.pin_state (_item._original_file);
 
-        // Delete old db data.
+        // Delete old database data.
         propagator ()._journal.delete_file_record (_item._original_file);
-        if (!vfs.set_pin_state (_item._original_file, PinState.Inherited)) {
+        if (!vfs.set_pin_state (_item._original_file, PinState.PinState.INHERITED)) {
             q_c_warning (lc_propagate_remote_move) << "Could not set pin state of" << _item._original_file << "to inherited";
         }
 
@@ -274,7 +277,7 @@ class PropagateRemoteMove : PropagateItemJob {
                 new_item._size = old_record._file_size;
             }
         }
-        const auto result = propagator ().update_metadata (new_item);
+        const var result = propagator ().update_metadata (new_item);
         if (!result) {
             on_done (SyncFileItem.FatalError, tr ("Error updating metadata : %1").arg (result.error ()));
             return;
@@ -282,7 +285,7 @@ class PropagateRemoteMove : PropagateItemJob {
             on_done (SyncFileItem.SoftError, tr ("The file %1 is currently in use").arg (new_item._file));
             return;
         }
-        if (pin_state && *pin_state != PinState.Inherited
+        if (pin_state && *pin_state != PinState.PinState.INHERITED
             && !vfs.set_pin_state (new_item._rename_target, *pin_state)) {
             on_done (SyncFileItem.NormalError, tr ("Error setting pin state"));
             return;
@@ -300,7 +303,7 @@ class PropagateRemoteMove : PropagateItemJob {
         on_done (SyncFileItem.Success);
     }
 
-    bool PropagateRemoteMove.adjust_selective_sync (SyncJournalDb *journal, string from_, string to_) {
+    bool PropagateRemoteMove.adjust_selective_sync (SyncJournalDb journal, string from_, string to_) {
         bool ok = false;
         // We only care about preserving the blacklist.   The white list should anyway be empty.
         // And the undecided list will be repopulated on the next sync, if there is anything too big.
@@ -314,7 +317,7 @@ class PropagateRemoteMove : PropagateItemJob {
         string from = from_ + QLatin1String ("/");
         string to = to_ + QLatin1String ("/");
 
-        for (auto &s : list) {
+        for (var &s : list) {
             if (s.starts_with (from)) {
                 s = s.replace (0, from.size (), to);
                 changed = true;

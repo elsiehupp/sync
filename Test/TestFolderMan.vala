@@ -32,19 +32,19 @@ class TestFolderMan : public GLib.Object {
 
         AccountPtr account = Account.create ();
         QUrl url ("http://example.de");
-        auto *cred = new HttpCredentialsTest ("testuser", "secret");
+        var cred = new HttpCredentialsTest ("testuser", "secret");
         account.setCredentials (cred);
         account.setUrl ( url );
 
         AccountStatePtr newAccountState (new AccountState (account));
-        FolderMan *folderman = FolderMan.instance ();
+        FolderMan folderman = FolderMan.instance ();
         QCOMPARE (folderman, &_fm);
         QVERIFY (folderman.addFolder (newAccountState.data (), folderDefinition (dirPath + "/sub/ownCloud1")));
         QVERIFY (folderman.addFolder (newAccountState.data (), folderDefinition (dirPath + "/ownCloud2")));
 
-        const auto folderList = folderman.map ();
+        const var folderList = folderman.map ();
 
-        for (auto &folder : folderList) {
+        for (var &folder : folderList) {
             QVERIFY (!folder.isSyncRunning ());
         }
 
@@ -141,13 +141,13 @@ class TestFolderMan : public GLib.Object {
 
         AccountPtr account = Account.create ();
         QUrl url ("http://example.de");
-        auto *cred = new HttpCredentialsTest ("testuser", "secret");
+        var cred = new HttpCredentialsTest ("testuser", "secret");
         account.setCredentials (cred);
         account.setUrl ( url );
         url.setUserName (cred.user ());
 
         AccountStatePtr newAccountState (new AccountState (account));
-        FolderMan *folderman = FolderMan.instance ();
+        FolderMan folderman = FolderMan.instance ();
         QCOMPARE (folderman, &_fm);
         QVERIFY (folderman.addFolder (newAccountState.data (), folderDefinition (dirPath + "/sub/ownCloud/")));
         QVERIFY (folderman.addFolder (newAccountState.data (), folderDefinition (dirPath + "/ownCloud2/")));

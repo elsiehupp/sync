@@ -11,7 +11,7 @@ Copyright (C) by Dominik Schmidt <domme@tomahawk-player.org>
 // #include <QDebug>
 // #include <QFileInfo>
 
-int main (int argc, char *argv[]) {
+int main (int argc, char argv[]) {
     QCoreApplication.set_attribute (Qt.AA_Use_high_dpi_pixmaps, true);
     QApplication app (argc, argv);
 

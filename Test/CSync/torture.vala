@@ -30,11 +30,11 @@ extern "C" {
 
 /* Used by main to communicate with parse_opt. */
 struct argument_s {
-  char *args[2];
+  char args[2];
   int verbose;
 };
 
-void torture_cmdline_parse (int argc, char **argv, struct argument_s *arguments);
+void torture_cmdline_parse (int argc, char **argv, struct argument_s arguments);
 
 int torture_csync_verbosity (void);
 

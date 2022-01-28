@@ -34,18 +34,30 @@ class Slide_show : Gtk.Widget {
     public bool is_active ();
 
     public int interval ();
+
+
     public void set_interval (int interval);
 
     public int current_slide ();
+
+
     public void set_current_slide (int index);
 
     public QSize size_hint () override;
 
 
     public void on_start_show (int interval = 0);
+
+
     public void on_stop_show ();
+
+
     public void on_next_slide ();
+
+
     public void on_prev_slide ();
+
+
     public void on_reset ();
 
 signals:
@@ -53,14 +65,14 @@ signals:
     void current_slide_changed (int index);
 
 
-    protected void mouse_press_event (QMouse_event *event) override;
-    protected void mouse_release_event (QMouse_event *event) override;
-    protected void paint_event (QPaint_event *event) override;
-    protected void timer_event (QTimerEvent *event) override;
+    protected void mouse_press_event (QMouse_event event) override;
+    protected void mouse_release_event (QMouse_event event) override;
+    protected void paint_event (QPaint_event event) override;
+    protected void timer_event (QTimerEvent event) override;
 
 
     private void maybe_restart_timer ();
-    private void draw_slide (QPainter *painter, int index);
+    private void draw_slide (QPainter painter, int index);
 
     private bool _reverse = false;
     private int _interval = 3500;
@@ -76,7 +88,7 @@ static const int Spacing = 6;
 static const int Slide_duration = 1000;
 static const int Slide_distance = 400;
 
-Slide_show.Slide_show (Gtk.Widget *parent) : Gtk.Widget (parent) {
+Slide_show.Slide_show (Gtk.Widget parent) : Gtk.Widget (parent) {
     set_size_policy (QSize_policy.Minimum, QSize_policy.Minimum);
 }
 
@@ -176,11 +188,11 @@ void Slide_show.on_reset () {
     update ();
 }
 
-void Slide_show.mouse_press_event (QMouse_event *event) {
+void Slide_show.mouse_press_event (QMouse_event event) {
     _press_point = event.pos ();
 }
 
-void Slide_show.mouse_release_event (QMouse_event *event) {
+void Slide_show.mouse_release_event (QMouse_event event) {
     if (!_animation && QLine_f (_press_point, event.pos ()).length () < QGuiApplication.style_hints ().start_drag_distance ())
         emit clicked ();
 }
@@ -207,7 +219,7 @@ void Slide_show.paint_event (QPaint_event *) {
     }
 }
 
-void Slide_show.timer_event (QTimerEvent *event) {
+void Slide_show.timer_event (QTimerEvent event) {
     if (event.timer_id () == _timer.timer_id ())
         on_next_slide ();
 }
@@ -219,7 +231,7 @@ void Slide_show.maybe_restart_timer () {
     on_start_show ();
 }
 
-void Slide_show.draw_slide (QPainter *painter, int index) {
+void Slide_show.draw_slide (QPainter painter, int index) {
     string label = _labels.value (index);
     QRect label_rect = style ().item_text_rect (font_metrics (), rect (), Qt.Align_bottom | Qt.Align_hCenter, is_enabled (), label);
     style ().draw_item_text (painter, label_rect, Qt.AlignCenter, palette (), is_enabled (), label, QPalette.Window_text);

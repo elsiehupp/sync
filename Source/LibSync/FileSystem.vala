@@ -38,6 +38,7 @@ namespace FileSystem {
     ***********************************************************/
     bool file_equals (string fn1, string fn2);
 
+
     /***********************************************************
     @brief Get the mtime for a filepath
 
@@ -48,6 +49,7 @@ namespace FileSystem {
 
     bool set_mod_time (string filename, time_t mod_time);
 
+
     /***********************************************************
     @brief Get the size for a file
 
@@ -56,10 +58,12 @@ namespace FileSystem {
     ***********************************************************/
     int64 get_size (string filename);
 
+
     /***********************************************************
     @brief Retrieve a file inode with csync
     ***********************************************************/
-    bool get_inode (string filename, uint64 *inode);
+    bool get_inode (string filename, uint64 inode);
+
 
     /***********************************************************
     @brief Check if \a file_name has changed given previous size and mtime
@@ -72,12 +76,14 @@ namespace FileSystem {
         int64 previous_size,
         time_t previous_mtime);
 
+
     /***********************************************************
-    @brief Like !file_changed () but with verbose logging if the file *did* change.
+    @brief Like !file_changed () but with verbose logging if the file did* change.
     ***********************************************************/
     bool verify_file_unchanged (string file_name,
         int64 previous_size,
         time_t previous_mtime);
+
 
     /***********************************************************
     Removes a directory and its contents recursively
@@ -219,7 +225,7 @@ namespace FileSystem {
         return all_removed;
     }
 
-    bool FileSystem.get_inode (string filename, uint64 *inode) {
+    bool FileSystem.get_inode (string filename, uint64 inode) {
         csync_file_stat_t fs;
         if (csync_vio_local_stat (filename, &fs) == 0) {
             *inode = fs.inode;

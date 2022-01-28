@@ -19,7 +19,7 @@ class TestSelectiveSync : GLib.Object {
         fakeFolder.syncEngine ().setSyncOptions (options);
 
         string[] sizeRequests;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation, QNetworkRequest &req, QIODevice *device)
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation, QNetworkRequest &req, QIODevice device)
                                          . QNetworkReply * {
             // Record what path we are querying for the size
             if (req.attribute (QNetworkRequest.CustomVerbAttribute) == "PROPFIND") {
@@ -59,7 +59,7 @@ class TestSelectiveSync : GLib.Object {
         QCOMPARE (sizeRequests.filter ("/subDir").count (), 0); // at no point we should request the size of the subdirs
         sizeRequests.clear ();
 
-        auto oldSync = fakeFolder.currentLocalState ();
+        var oldSync = fakeFolder.currentLocalState ();
         // syncing again should do the same
         fakeFolder.syncEngine ().journal ().schedulePathForRemoteDiscovery (string ("A/newBigDir"));
         QVERIFY (fakeFolder.syncOnce ());

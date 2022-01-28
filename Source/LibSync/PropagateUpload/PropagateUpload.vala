@@ -33,14 +33,14 @@ Q_DECLARE_LOGGING_CATEGORY (lc_propagate_upload_nG)
 ***********************************************************/
 class UploadDevice : QIODevice {
 
-    public UploadDevice (string file_name, int64 on_start, int64 size, BandwidthManager *bwm);
+    public UploadDevice (string file_name, int64 on_start, int64 size, BandwidthManager bwm);
     ~UploadDevice () override;
 
     public bool open (QIODevice.Open_mode mode) override;
     public void close () override;
 
     public int64 write_data (char *, int64) override;
-    public int64 read_data (char *data, int64 maxlen) override;
+    public int64 read_data (char data, int64 maxlen) override;
     public bool at_end () override;
     public int64 size () override;
     public int64 bytes_available () override;
@@ -48,10 +48,14 @@ class UploadDevice : QIODevice {
     public bool seek (int64 pos) override;
 
     public void set_bandwidth_limited (bool);
+
+
     public bool is_bandwidth_limited () {
         return _bandwidth_limited;
     }
     public void set_choked (bool);
+
+
     public bool is_choked () {
         return _choked;
     }
@@ -94,7 +98,7 @@ class PUTFile_job : AbstractNetworkJob {
 
     // Takes ownership of the device
     public PUTFile_job (AccountPtr account, string path, std.unique_ptr<QIODevice> device,
-        const QMap<GLib.ByteArray, GLib.ByteArray> &headers, int chunk, GLib.Object *parent = nullptr)
+        const QMap<GLib.ByteArray, GLib.ByteArray> &headers, int chunk, GLib.Object parent = nullptr)
         : AbstractNetworkJob (account, path, parent)
         , _device (device.release ())
         , _headers (headers)
@@ -102,7 +106,7 @@ class PUTFile_job : AbstractNetworkJob {
         _device.set_parent (this);
     }
     public PUTFile_job (AccountPtr account, QUrl url, std.unique_ptr<QIODevice> device,
-        const QMap<GLib.ByteArray, GLib.ByteArray> &headers, int chunk, GLib.Object *parent = nullptr)
+        const QMap<GLib.ByteArray, GLib.ByteArray> &headers, int chunk, GLib.Object parent = nullptr)
         : AbstractNetworkJob (account, string (), parent)
         , _device (device.release ())
         , _headers (headers)
@@ -118,13 +122,15 @@ class PUTFile_job : AbstractNetworkJob {
 
     public bool on_finished () override;
 
-    public QIODevice *device () {
+    public QIODevice device () {
         return _device;
     }
+
 
     public string error_string () override {
         return _error_string.is_empty () ? AbstractNetworkJob.error_string () : _error_string;
     }
+
 
     public std.chrono.milliseconds ms_since_start () {
         return std.chrono.milliseconds (_request_timer.elapsed ());
@@ -151,12 +157,13 @@ class PollJob : AbstractNetworkJob {
     public SyncFileItemPtr _item;
     // Takes ownership of the device
     public PollJob (AccountPtr account, string path, SyncFileItemPtr &item,
-        SyncJournalDb *journal, string local_path, GLib.Object *parent)
+        SyncJournalDb journal, string local_path, GLib.Object parent)
         : AbstractNetworkJob (account, path, parent)
         , _journal (journal)
         , _local_path (local_path)
         , _item (item) {
     }
+
 
     public void on_start () override;
     public bool on_finished () override;
@@ -198,6 +205,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
     protected bool _finished BITFIELD (1); /// Tells that all the jobs have been on_finished
     protected bool _delete_existing BITFIELD (1);
 
+
     /***********************************************************
     Whether an on_abort is currently ongoing.
 
@@ -222,7 +230,8 @@ class PropagateUploadFileCommon : PropagateItemJob {
     protected GLib.ByteArray _transmission_checksum_header;
 
 
-    public PropagateUploadFileCommon (OwncloudPropagator *propagator, SyncFileItemPtr &item);
+    public PropagateUploadFileCommon (OwncloudPropagator propagator, SyncFileItemPtr &item);
+
 
     /***********************************************************
     Whether an existing entity with the same name may be deleted before
@@ -232,25 +241,34 @@ class PropagateUploadFileCommon : PropagateItemJob {
     ***********************************************************/
     public void set_delete_existing (bool enabled);
 
+
     /***********************************************************
     on_start should setup the file, path and size that will be send to the server
     ***********************************************************/
     public void on_start () override;
     public void setup_encrypted_file (string& path, string& filename, uint64 size);
+
+
     public void setup_unencrypted_file ();
+
+
     public void start_upload_file ();
+
+
     public void call_unlock_folder ();
+
+
     public bool is_likely_finished_quickly () override {
         return _item._size < propagator ().small_file_size ();
     }
 
     private void on_compute_content_checksum ();
     // Content checksum computed, compute the transmission checksum
-    private void on_compute_transmission_checksum (GLib.ByteArray &content_checksum_type, GLib.ByteArray &content_checksum);
+    private void on_compute_transmission_checksum (GLib.ByteArray content_checksum_type, GLib.ByteArray content_checksum);
     // transmission checksum computed, prepare the upload
-    private void on_start_upload (GLib.ByteArray &transmission_checksum_type, GLib.ByteArray &transmission_checksum);
+    private void on_start_upload (GLib.ByteArray transmission_checksum_type, GLib.ByteArray transmission_checksum);
     // invoked when encrypted folder lock has been released
-    private void on_folder_unlocked (GLib.ByteArray &folder_id, int http_return_code);
+    private void on_folder_unlocked (GLib.ByteArray folder_id, int http_return_code);
     // invoked on internal error to unlock a folder and faile
     private void on_on_error_start_folder_unlock (SyncFileItem.Status status, string error_string);
 
@@ -258,11 +276,15 @@ class PropagateUploadFileCommon : PropagateItemJob {
     public virtual void do_start_upload () = 0;
 
     public void start_poll_job (string path);
+
+
     public void on_finalize ();
+
+
     public void abort_with_error (SyncFileItem.Status status, string error);
 
 
-    public void on_job_destroyed (GLib.Object *job);
+    public void on_job_destroyed (GLib.Object job);
 
 
     private void on_poll_finished ();
@@ -270,13 +292,15 @@ class PropagateUploadFileCommon : PropagateItemJob {
 
     protected void on_done (SyncFileItem.Status status, string error_string = string ()) override;
 
+
     /***********************************************************
     Aborts all running network jobs, except for the ones that may_abort_job
     returns false on and, for async aborts, emits abort_finished when done.
     ***********************************************************/
     protected void abort_network_jobs (
         AbortType abort_type,
-        const std.function<bool (AbstractNetworkJob *job)> &may_abort_job);
+        const std.function<bool (AbstractNetworkJob job)> &may_abort_job);
+
 
     /***********************************************************
     Checks whether the current error is one that should reset the whole
@@ -285,10 +309,12 @@ class PropagateUploadFileCommon : PropagateItemJob {
     ***********************************************************/
     protected void check_resetting_errors ();
 
+
     /***********************************************************
     Error handling functionality that is shared between jobs.
     ***********************************************************/
-    protected void common_error_handling (AbstractNetworkJob *job);
+    protected void common_error_handling (AbstractNetworkJob job);
+
 
     /***********************************************************
     Increases the timeout for the final MOVE/PUT for large files.
@@ -299,7 +325,8 @@ class PropagateUploadFileCommon : PropagateItemJob {
 
     See #6527, enterprise#2480
     ***********************************************************/
-    protected static void adjust_last_job_timeout (AbstractNetworkJob *job, int64 file_size);
+    protected static void adjust_last_job_timeout (AbstractNetworkJob job, int64 file_size);
+
 
     /***********************************************************
     Bases headers that need to be sent on the PUT, or in the MOVE for chunking-ng
@@ -333,7 +360,7 @@ class PropagateUploadFileV1 : PropagateUploadFileCommon {
     ***********************************************************/
     private int _current_chunk = 0;
     private int _chunk_count = 0; /// Total number of chunks for this file
-    private uint _transfer_id = 0; /// transfer id (part of the url)
+    private uint32 _transfer_id = 0; /// transfer id (part of the url)
 
     private int64 chunk_size () {
         // Old chunking does not use dynamic chunking algorithm, and does not adjusts the chunk size respectively,
@@ -342,9 +369,10 @@ class PropagateUploadFileV1 : PropagateUploadFileCommon {
     }
 
 
-    public PropagateUploadFileV1 (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+    public PropagateUploadFileV1 (OwncloudPropagator propagator, SyncFileItemPtr &item)
         : PropagateUploadFileCommon (propagator, item) {
     }
+
 
     public void do_start_upload () override;
 
@@ -364,7 +392,7 @@ Propagation job, impementing the new chunking agorithm
 class PropagateUploadFileNG : PropagateUploadFileCommon {
 
     private int64 _sent = 0; /// amount of data (bytes) that was already sent
-    private uint _transfer_id = 0; /// transfer id (part of the url)
+    private uint32 _transfer_id = 0; /// transfer id (part of the url)
     private int _current_chunk = 0; /// Id of the next chunk that will be sent
     private int64 _current_chunk_size = 0; /// current chunk size
     private bool _remove_job_error = false; /// If not null, there was an error removing the job
@@ -377,6 +405,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
     };
     private QMap<int64, Server_chunk_info> _server_chunks;
 
+
     /***********************************************************
     Return the URL of a chunk.
     If chunk == -1, returns the URL of the parent folder containing the chunks
@@ -384,9 +413,10 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
     private QUrl chunk_url (int chunk = -1);
 
 
-    public PropagateUploadFileNG (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+    public PropagateUploadFileNG (OwncloudPropagator propagator, SyncFileItemPtr &item)
         : PropagateUploadFileCommon (propagator, item) {
     }
+
 
     public void do_start_upload () override;
 
@@ -492,7 +522,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
             return true;
         }
 
-        auto status = json["status"].to_string ();
+        var status = json["status"].to_string ();
         if (status == QLatin1String ("on_init") || status == QLatin1String ("started")) {
             QTimer.single_shot (5 * 1000, this, &PollJob.on_start);
             return false;
@@ -520,16 +550,16 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         return true;
     }
 
-    PropagateUploadFileCommon.PropagateUploadFileCommon (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+    PropagateUploadFileCommon.PropagateUploadFileCommon (OwncloudPropagator propagator, SyncFileItemPtr &item)
         : PropagateItemJob (propagator, item)
         , _finished (false)
         , _delete_existing (false)
         , _aborting (false)
         , _upload_encrypted_helper (nullptr)
         , _uploading_encrypted (false) {
-        const auto path = _item._file;
-        const auto slash_position = path.last_index_of ('/');
-        const auto parent_path = slash_position >= 0 ? path.left (slash_position) : string ();
+        const var path = _item._file;
+        const var slash_position = path.last_index_of ('/');
+        const var parent_path = slash_position >= 0 ? path.left (slash_position) : string ();
 
         SyncJournalFileRecord parent_rec;
         bool ok = propagator._journal.get_file_record (parent_path, &parent_rec);
@@ -543,15 +573,15 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
     }
 
     void PropagateUploadFileCommon.on_start () {
-        const auto path = _item._file;
-        const auto slash_position = path.last_index_of ('/');
-        const auto parent_path = slash_position >= 0 ? path.left (slash_position) : string ();
+        const var path = _item._file;
+        const var slash_position = path.last_index_of ('/');
+        const var parent_path = slash_position >= 0 ? path.left (slash_position) : string ();
 
         if (!_item._rename_target.is_empty () && _item._file != _item._rename_target) {
             // Try to rename the file
-            const auto original_file_path_absolute = propagator ().full_local_path (_item._file);
-            const auto new_file_path_absolute = propagator ().full_local_path (_item._rename_target);
-            const auto rename_success = QFile.rename (original_file_path_absolute, new_file_path_absolute);
+            const var original_file_path_absolute = propagator ().full_local_path (_item._file);
+            const var new_file_path_absolute = propagator ().full_local_path (_item._rename_target);
+            const var rename_success = QFile.rename (original_file_path_absolute, new_file_path_absolute);
             if (!rename_success) {
                 on_done (SyncFileItem.NormalError, "File contains trailing spaces and couldn't be renamed");
                 return;
@@ -573,7 +603,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
             return;
         }
 
-        const auto account = propagator ().account ();
+        const var account = propagator ().account ();
 
         if (!account.capabilities ().client_side_encryption_available () ||
             !parent_rec.is_valid () ||
@@ -582,7 +612,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
             return;
         }
 
-        const auto remote_parent_path = parent_rec._e2e_mangled_name.is_empty () ? parent_path : parent_rec._e2e_mangled_name;
+        const var remote_parent_path = parent_rec._e2e_mangled_name.is_empty () ? parent_path : parent_rec._e2e_mangled_name;
         _upload_encrypted_helper = new Propagate_upload_encrypted (propagator (), remote_parent_path, _item, this);
         connect (_upload_encrypted_helper, &Propagate_upload_encrypted.finalized,
                 this, &PropagateUploadFileCommon.setup_encrypted_file);
@@ -640,7 +670,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         }
 
         q_debug () << "Deleting the current";
-        auto job = new DeleteJob (propagator ().account (),
+        var job = new DeleteJob (propagator ().account (),
             propagator ().full_remote_path (_file_to_upload._file),
             this);
         _jobs.append (job);
@@ -682,7 +712,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         }
 
         // Compute the content checksum.
-        auto compute_checksum = new ComputeChecksum (this);
+        var compute_checksum = new ComputeChecksum (this);
         compute_checksum.set_checksum_type (checksum_type);
 
         connect (compute_checksum, &ComputeChecksum.done,
@@ -692,11 +722,11 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         compute_checksum.on_start (_file_to_upload._path);
     }
 
-    void PropagateUploadFileCommon.on_compute_transmission_checksum (GLib.ByteArray &content_checksum_type, GLib.ByteArray &content_checksum) {
+    void PropagateUploadFileCommon.on_compute_transmission_checksum (GLib.ByteArray content_checksum_type, GLib.ByteArray content_checksum) {
         _item._checksum_header = make_checksum_header (content_checksum_type, content_checksum);
 
         // Reuse the content checksum as the transmission checksum if possible
-        const auto supported_transmission_checksums =
+        const var supported_transmission_checksums =
             propagator ().account ().capabilities ().supported_checksum_types ();
         if (supported_transmission_checksums.contains (content_checksum_type)) {
             on_start_upload (content_checksum_type, content_checksum);
@@ -704,7 +734,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         }
 
         // Compute the transmission checksum.
-        auto compute_checksum = new ComputeChecksum (this);
+        var compute_checksum = new ComputeChecksum (this);
         if (upload_checksum_enabled ()) {
             compute_checksum.set_checksum_type (propagator ().account ().capabilities ().upload_checksum_type ());
         } else {
@@ -718,7 +748,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         compute_checksum.on_start (_file_to_upload._path);
     }
 
-    void PropagateUploadFileCommon.on_start_upload (GLib.ByteArray &transmission_checksum_type, GLib.ByteArray &transmission_checksum) {
+    void PropagateUploadFileCommon.on_start_upload (GLib.ByteArray transmission_checksum_type, GLib.ByteArray transmission_checksum) {
         // Remove ourselfs from the list of active job, before any posible call to on_done ()
         // When we on_start chunks, we will add it again, once for every chunks.
         propagator ()._active_job_list.remove_one (this);
@@ -777,7 +807,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         do_start_upload ();
     }
 
-    void PropagateUploadFileCommon.on_folder_unlocked (GLib.ByteArray &folder_id, int http_return_code) {
+    void PropagateUploadFileCommon.on_folder_unlocked (GLib.ByteArray folder_id, int http_return_code) {
         q_debug () << "Failed to unlock encrypted folder" << folder_id;
         if (_upload_status.status == SyncFileItem.NoStatus && http_return_code != 200) {
             on_done (SyncFileItem.FatalError, tr ("Failed to unlock encrypted folder."));
@@ -798,7 +828,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         }
     }
 
-    UploadDevice.UploadDevice (string file_name, int64 on_start, int64 size, BandwidthManager *bwm)
+    UploadDevice.UploadDevice (string file_name, int64 on_start, int64 size, BandwidthManager bwm)
         : _file (file_name)
         , _start (on_start)
         , _size (size)
@@ -818,7 +848,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
 
         // Get the file size now : _file.file_name () is no longer reliable
         // on all platforms after open_and_seek_file_shared_read ().
-        auto file_disk_size = FileSystem.get_size (_file.file_name ());
+        var file_disk_size = FileSystem.get_size (_file.file_name ());
 
         string open_error;
         if (!FileSystem.open_and_seek_file_shared_read (&_file, &open_error, _start)) {
@@ -842,7 +872,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         return 0;
     }
 
-    int64 UploadDevice.read_data (char *data, int64 maxlen) {
+    int64 UploadDevice.read_data (char data, int64 maxlen) {
         if (_size - _read <= 0) {
             // at end
             if (_bandwidth_manager) {
@@ -865,7 +895,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
             _bandwidth_quota -= maxlen;
         }
 
-        auto c = _file.read (data, maxlen);
+        var c = _file.read (data, maxlen);
         if (c < 0) {
             on_set_error_string (_file.error_string ());
             return -1;
@@ -930,7 +960,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
     }
 
     void PropagateUploadFileCommon.start_poll_job (string path) {
-        auto *job = new PollJob (propagator ().account (), path, _item,
+        var job = new PollJob (propagator ().account (), path, _item,
             propagator ()._journal, propagator ().local_path (), this);
         connect (job, &PollJob.finished_signal, this, &PropagateUploadFileCommon.on_poll_finished);
         SyncJournalDb.PollInfo info;
@@ -949,7 +979,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
     }
 
     void PropagateUploadFileCommon.on_poll_finished () {
-        auto *job = qobject_cast<PollJob> (sender ());
+        var job = qobject_cast<PollJob> (sender ());
         ASSERT (job);
 
         propagator ()._active_job_list.remove_one (this);
@@ -970,7 +1000,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
     void PropagateUploadFileCommon.check_resetting_errors () {
         if (_item._http_error_code == 412
             || propagator ().account ().capabilities ().http_error_codes_that_reset_failing_chunked_uploads ().contains (_item._http_error_code)) {
-            auto upload_info = propagator ()._journal.get_upload_info (_item._file);
+            var upload_info = propagator ()._journal.get_upload_info (_item._file);
             upload_info._error_count += 1;
             if (upload_info._error_count > 3) {
                 q_c_info (lc_propagate_upload) << "Reset transfer of" << _item._file
@@ -986,7 +1016,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         }
     }
 
-    void PropagateUploadFileCommon.common_error_handling (AbstractNetworkJob *job) {
+    void PropagateUploadFileCommon.common_error_handling (AbstractNetworkJob job) {
         GLib.ByteArray reply_content;
         string error_string = job.error_string_parsing_body (&reply_content);
         q_c_debug (lc_propagate_upload) << reply_content; // display the XML error in the debug
@@ -1012,8 +1042,8 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
             // store the quota for the real local file using the information
             // on the file to upload, that could have been modified by
             // filters or something.
-            const auto path = QFileInfo (_item._file).path ();
-            auto quota_it = propagator ()._folder_quota.find (path);
+            const var path = QFileInfo (_item._file).path ();
+            var quota_it = propagator ()._folder_quota.find (path);
             if (quota_it != propagator ()._folder_quota.end ()) {
                 quota_it.value () = q_min (quota_it.value (), _file_to_upload._size - 1);
             } else {
@@ -1029,7 +1059,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         abort_with_error (status, error_string);
     }
 
-    void PropagateUploadFileCommon.adjust_last_job_timeout (AbstractNetworkJob *job, int64 file_size) {
+    void PropagateUploadFileCommon.adjust_last_job_timeout (AbstractNetworkJob job, int64 file_size) {
         constexpr double three_minutes = 3.0 * 60 * 1000;
 
         job.on_set_timeout (q_bound (
@@ -1040,7 +1070,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
             static_cast<int64> (30 * 60 * 1000)));
     }
 
-    void PropagateUploadFileCommon.on_job_destroyed (GLib.Object *job) {
+    void PropagateUploadFileCommon.on_job_destroyed (GLib.Object job) {
         _jobs.erase (std.remove (_jobs.begin (), _jobs.end (), job), _jobs.end ());
     }
 
@@ -1064,7 +1094,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
             headers[QByteArrayLiteral ("OC-LazyOps")] = QByteArrayLiteral ("true");
 
         if (_item._file.contains (QLatin1String (".sys.admin#recall#"))) {
-            // This is a file recall triggered by the admin.  Note : the
+            // This is a file recall triggered by the admin.  Note: the
             // recall list file created by the admin and downloaded by the
             // client (.sys.admin#recall#) also falls into this category
             // (albeit users are not supposed to mess up with it)
@@ -1084,7 +1114,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         }
 
         // Set up a conflict file header pointing to the original file
-        auto conflict_record = propagator ()._journal.conflict_record (_item._file.to_utf8 ());
+        var conflict_record = propagator ()._journal.conflict_record (_item._file.to_utf8 ());
         if (conflict_record.is_valid ()) {
             headers[QByteArrayLiteral ("OC-Conflict")] = "1";
             if (!conflict_record.initial_base_path.is_empty ())
@@ -1106,12 +1136,12 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
 
     void PropagateUploadFileCommon.on_finalize () {
         // Update the quota, if known
-        auto quota_it = propagator ()._folder_quota.find (QFileInfo (_item._file).path ());
+        var quota_it = propagator ()._folder_quota.find (QFileInfo (_item._file).path ());
         if (quota_it != propagator ()._folder_quota.end ())
             quota_it.value () -= _file_to_upload._size;
 
         // Update the database entry
-        const auto result = propagator ().update_metadata (*_item);
+        const var result = propagator ().update_metadata (*_item);
         if (!result) {
             on_done (SyncFileItem.FatalError, tr ("Error updating metadata : %1").arg (result.error ()));
             return;
@@ -1124,10 +1154,10 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         // even if their parent folder is online-only.
         if (_item._instruction == CSYNC_INSTRUCTION_NEW
             || _item._instruction == CSYNC_INSTRUCTION_TYPE_CHANGE) {
-            auto &vfs = propagator ().sync_options ()._vfs;
-            const auto pin = vfs.pin_state (_item._file);
-            if (pin && *pin == PinState.OnlineOnly) {
-                if (!vfs.set_pin_state (_item._file, PinState.Unspecified)) {
+            var &vfs = propagator ().sync_options ()._vfs;
+            const var pin = vfs.pin_state (_item._file);
+            if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY) {
+                if (!vfs.set_pin_state (_item._file, PinState.PinState.UNSPECIFIED)) {
                     q_c_warning (lc_propagate_upload) << "Could not set pin state of" << _item._file << "to unspecified";
                 }
             }
@@ -1158,7 +1188,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         // Count the number of jobs that need aborting, and emit the overall
         // on_abort signal when they're all done.
         unowned<int> running_count (new int (0));
-        auto one_abort_finished = [this, running_count] () {
+        var one_abort_finished = [this, running_count] () {
             (*running_count)--;
             if (*running_count == 0) {
                 emit this.abort_finished ();
@@ -1166,8 +1196,8 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
         };
 
         // Abort all running jobs, except for explicitly excluded ones
-        foreach (AbstractNetworkJob *job, _jobs) {
-            auto reply = job.reply ();
+        foreach (AbstractNetworkJob job, _jobs) {
+            var reply = job.reply ();
             if (!reply || !reply.is_running ())
                 continue;
 

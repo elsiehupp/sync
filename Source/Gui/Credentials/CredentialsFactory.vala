@@ -16,7 +16,7 @@ namespace Occ {
 ***********************************************************/
 namespace CredentialsFactory {
 
-    AbstractCredentials *create (string type) {
+    AbstractCredentials create (string type) {
         // empty string might happen for old version of configuration
         if (type == "http" || type == "") {
             return new HttpCredentialsGui;

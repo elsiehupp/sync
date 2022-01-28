@@ -35,33 +35,56 @@ class OwncloudWizard : QWizard {
         Log_paragraph
     };
 
-    public OwncloudWizard (Gtk.Widget *parent = nullptr);
+    public OwncloudWizard (Gtk.Widget parent = nullptr);
 
     public void set_account (AccountPtr account);
+
+
     public AccountPtr account ();
+
+
     public void set_oCUrl (string );
+
+
     public bool registration ();
+
+
     public void set_registration (bool registration);
 
     public void setup_custom_media (QVariant, QLabel *);
+
+
     public string oc_url ();
+
+
     public string local_folder ();
+
+
     public string[] selective_sync_blacklist ();
+
+
     public bool use_virtual_file_sync ();
+
+
     public bool is_confirm_big_folder_checked ();
 
     public void on_display_error (string , bool retry_http_only);
-    public AbstractCredentials *get_credentials ();
+
+
+    public AbstractCredentials get_credentials ();
 
     public void bring_to_top ();
+
+
     public void center_window ();
+
 
     /***********************************************************
     Shows a dialog explaining the virtual files mode and warning about it
     being experimental. Calles the callback with true if enabling was
     chosen.
     ***********************************************************/
-    public static void ask_experimental_virtual_files_feature (Gtk.Widget *receiver, std.function<void (bool enable)> &callback);
+    public static void ask_experimental_virtual_files_feature (Gtk.Widget receiver, std.function<void (bool enable)> &callback);
 
     // FIXME : Can those be local variables?
     // Set from the Owncloud_setup_page, later used from Owncloud_http_creds_page
@@ -73,9 +96,17 @@ class OwncloudWizard : QWizard {
 
 
     public void on_set_auth_type (DetermineAuthTypeJob.AuthType type);
+
+
     public void on_set_remote_folder (string );
+
+
     public void on_append_to_configuration_log (string msg, Log_type type = Log_paragraph);
+
+
     public void on_current_page_changed (int);
+
+
     public void on_successful_step ();
 
 signals:
@@ -118,7 +149,7 @@ signals:
 };
 
 
-    OwncloudWizard.OwncloudWizard (Gtk.Widget *parent)
+    OwncloudWizard.OwncloudWizard (Gtk.Widget parent)
         : QWizard (parent)
         , _account (nullptr)
         , _welcome_page (new Welcome_page (this))
@@ -162,7 +193,7 @@ signals:
             this, &OwncloudWizard.create_local_and_remote_folders);
         connect (this, &QWizard.custom_button_clicked, this, &OwncloudWizard.skip_folder_configuration);
 
-        Theme *theme = Theme.instance ();
+        Theme theme = Theme.instance ();
         set_window_title (tr ("Add %1 account").arg (theme.app_name_gui ()));
         set_wizard_style (QWizard.Modern_style);
         set_option (QWizard.No_back_button_on_start_page);
@@ -173,7 +204,7 @@ signals:
         // Change the next buttons size policy since we hide it on the
         // welcome page but want it to fill it's space that we don't get
         // flickering when the page changes
-        auto next_button_size_policy = button (QWizard.Next_button).size_policy ();
+        var next_button_size_policy = button (QWizard.Next_button).size_policy ();
         next_button_size_policy.set_retain_size_when_hidden (true);
         button (QWizard.Next_button).set_size_policy (next_button_size_policy);
 
@@ -192,29 +223,29 @@ signals:
     }
 
     void OwncloudWizard.center_window () {
-        const auto wizard_window = window ();
-        const auto screen = QGuiApplication.screen_at (wizard_window.pos ())
+        const var wizard_window = window ();
+        const var screen = QGuiApplication.screen_at (wizard_window.pos ())
             ? QGuiApplication.screen_at (wizard_window.pos ())
             : QGuiApplication.primary_screen ();
-        const auto screen_geometry = screen.geometry ();
-        const auto window_geometry = wizard_window.geometry ();
-        const auto new_window_position = screen_geometry.center () - QPoint (window_geometry.width () / 2, window_geometry.height () / 2);
+        const var screen_geometry = screen.geometry ();
+        const var window_geometry = wizard_window.geometry ();
+        const var new_window_position = screen_geometry.center () - QPoint (window_geometry.width () / 2, window_geometry.height () / 2);
         wizard_window.move (new_window_position);
     }
 
     void OwncloudWizard.adjust_wizard_size () {
-        const auto page_sizes = calculate_wizard_page_sizes ();
-        const auto longest_side = calculate_longest_side_of_wizard_pages (page_sizes);
+        const var page_sizes = calculate_wizard_page_sizes ();
+        const var longest_side = calculate_longest_side_of_wizard_pages (page_sizes);
 
         resize (QSize (longest_side, longest_side));
     }
 
     GLib.List<QSize> OwncloudWizard.calculate_wizard_page_sizes () {
         GLib.List<QSize> page_sizes;
-        const auto p_ids = page_ids ();
+        const var p_ids = page_ids ();
 
         std.transform (p_ids.cbegin (), p_ids.cend (), std.back_inserter (page_sizes), [this] (int page_id) {
-            auto p = page (page_id);
+            var p = page (page_id);
             p.adjust_size ();
             return p.size_hint ();
         });
@@ -332,8 +363,8 @@ signals:
     void OwncloudWizard.on_current_page_changed (int id) {
         q_c_debug (lc_wizard) << "Current Wizard page changed to " << id;
 
-        const auto set_next_button_as_default = [this] () {
-            auto next_button = qobject_cast<QPushButton> (button (QWizard.Next_button));
+        const var set_next_button_as_default = [this] () {
+            var next_button = qobject_cast<QPushButton> (button (QWizard.Next_button));
             if (next_button) {
                 next_button.set_default (true);
             }
@@ -414,7 +445,7 @@ signals:
         return nullptr;
     }
 
-    void OwncloudWizard.change_event (QEvent *e) {
+    void OwncloudWizard.change_event (QEvent e) {
         switch (e.type ()) {
         case QEvent.StyleChange:
         case QEvent.PaletteChange:
@@ -426,7 +457,7 @@ signals:
             break;
         case QEvent.ActivationChange:
             if (is_active_window ())
-                emit on_activate ();
+                emit activate ();
             break;
         default:
             break;
@@ -439,8 +470,8 @@ signals:
         // HINT : Customize wizard's own style here, if necessary in the future (Dark-/Light-Mode switching)
 
         // Set background colors
-        auto wizard_palette = palette ();
-        const auto background_color = wizard_palette.color (QPalette.Window);
+        var wizard_palette = palette ();
+        const var background_color = wizard_palette.color (QPalette.Window);
         wizard_palette.on_set_color (QPalette.Base, background_color);
         // Set separator color
         wizard_palette.on_set_color (QPalette.Mid, background_color);
@@ -453,10 +484,10 @@ signals:
         OwncloudGui.raise_dialog (this);
     }
 
-    void OwncloudWizard.ask_experimental_virtual_files_feature (Gtk.Widget *receiver, std.function<void (bool enable)> &callback) {
-        const auto best_vfs_mode = best_available_vfs_mode ();
-        QMessageBox *msg_box = nullptr;
-        QPushButton *accept_button = nullptr;
+    void OwncloudWizard.ask_experimental_virtual_files_feature (Gtk.Widget receiver, std.function<void (bool enable)> &callback) {
+        const var best_vfs_mode = best_available_vfs_mode ();
+        QMessageBox msg_box = nullptr;
+        QPushButton accept_button = nullptr;
         switch (best_vfs_mode) {
         case Vfs.WindowsCfApi:
             callback (true);

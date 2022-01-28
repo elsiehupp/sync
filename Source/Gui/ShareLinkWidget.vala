@@ -28,7 +28,7 @@ Copyright (C) 2015 by Klaas Freitag <freitag@owncloud.com>
 namespace Occ {
 
 namespace {
-    const char *password_is_set_placeholder = "●●●●●●●●";
+    const char password_is_set_placeholder = "●●●●●●●●";
 }
 
 namespace Ui {
@@ -47,21 +47,33 @@ class Share_link_widget : Gtk.Widget {
         const string share_path,
         const string local_path,
         Share_permissions max_sharing_permissions,
-        Gtk.Widget *parent = nullptr);
+        Gtk.Widget parent = nullptr);
     ~Share_link_widget () override;
 
     public void toggle_button (bool show);
+
+
     public void setup_ui_options ();
 
     public void set_link_share (unowned<Link_share> link_share);
+
+
     public unowned<Link_share> get_link_share ();
 
     public void on_focus_password_line_edit ();
 
     public void on_delete_share_fetched ();
+
+
     public void on_toggle_share_link_animation (bool on_start);
+
+
     public void on_server_error (int code, string message);
+
+
     public void on_create_share_requires_password (string message);
+
+
     public void on_style_changed ();
 
 
@@ -79,7 +91,7 @@ class Share_link_widget : Gtk.Widget {
     private void on_expire_date_set ();
 
     private void on_context_menu_button_clicked ();
-    private void on_link_context_menu_action_triggered (QAction *action);
+    private void on_link_context_menu_action_triggered (QAction action);
 
     private void on_delete_animation_finished ();
     private void on_animation_finished ();
@@ -96,17 +108,19 @@ signals:
     void create_password_processed ();
 
 
-    private void on_display_error (string err_msg);
+    private void on_display_error (string error_message);
 
     private void toggle_password_options (bool enable = true);
     private void toggle_note_options (bool enable = true);
     private void toggle_expire_date_options (bool enable = true);
-    private void toggle_button_animation (QToolButton *button, QProgress_indicator *progress_indicator, QAction *checked_action);
+    private void toggle_button_animation (QToolButton button, QProgress_indicator progress_indicator, QAction checked_action);
+
 
     /***********************************************************
     Confirm with the user and then delete the share
     ***********************************************************/
     void confirm_and_delete_share ();
+
 
     /***********************************************************
     Retrieve a share's name, accounting for _names_supported
@@ -158,7 +172,7 @@ Share_link_widget.Share_link_widget (AccountPtr account,
     const string share_path,
     const string local_path,
     Share_permissions max_sharing_permissions,
-    Gtk.Widget *parent)
+    Gtk.Widget parent)
     : Gtk.Widget (parent)
     , _ui (new Ui.Share_link_widget)
     , _account (account)
@@ -194,7 +208,7 @@ Share_link_widget.Share_link_widget (AccountPtr account,
 
     _ui.error_label.hide ();
 
-    auto sharing_possible = true;
+    var sharing_possible = true;
     if (!_account.capabilities ().share_public_link ()) {
         q_c_warning (lc_share_link) << "Link shares have been disabled";
         sharing_possible = false;
@@ -243,9 +257,9 @@ void Share_link_widget.on_toggle_share_link_animation (bool on_start) {
     }
 }
 
-void Share_link_widget.toggle_button_animation (QToolButton *button, QProgress_indicator *progress_indicator, QAction *checked_action) {
-    auto on_start_animation = false;
-    const auto action_is_checked = checked_action.is_checked ();
+void Share_link_widget.toggle_button_animation (QToolButton button, QProgress_indicator progress_indicator, QAction checked_action) {
+    var on_start_animation = false;
+    const var action_is_checked = checked_action.is_checked ();
     if (!progress_indicator.is_animated () && action_is_checked) {
         progress_indicator.on_start_animation ();
         on_start_animation = true;
@@ -278,8 +292,8 @@ void Share_link_widget.setup_ui_options () {
     // Prepare permissions check and create group action
     const QDate expire_date = _link_share.data ().get_expire_date ().is_valid () ? _link_share.data ().get_expire_date () : QDate ();
     const Share_permissions perm = _link_share.data ().get_permissions ();
-    auto checked = false;
-    auto *permissions_group = new QAction_group (this);
+    var checked = false;
+    var permissions_group = new QAction_group (this);
 
     // Prepare sharing menu
     _link_context_menu = new QMenu (this);
@@ -432,7 +446,7 @@ void Share_link_widget.setup_ui_options () {
 }
 
 void Share_link_widget.on_create_note () {
-    const auto note = _ui.text_edit_note.to_plain_text ();
+    const var note = _ui.text_edit_note.to_plain_text ();
     if (!_link_share || _link_share.get_note () == note || note.is_empty ()) {
         return;
     }
@@ -507,7 +521,7 @@ void Share_link_widget.on_password_set_error (int code, string message) {
 }
 
 void Share_link_widget.on_start_animation (int on_start, int end) {
-    auto *animation = new QPropertyAnimation (this, "maximum_height", this);
+    var animation = new QPropertyAnimation (this, "maximum_height", this);
 
     animation.set_duration (500);
     animation.set_start_value (on_start);
@@ -548,7 +562,7 @@ void Share_link_widget.on_animation_finished () {
 }
 
 void Share_link_widget.on_create_label () {
-    const auto label_text = _share_link_edit.text ();
+    const var label_text = _share_link_edit.text ();
     if (!_link_share || _link_share.get_label () == label_text || label_text.is_empty ()) {
         return;
     }
@@ -599,7 +613,7 @@ void Share_link_widget.toggle_expire_date_options (bool enable) {
     _ui.calendar.set_visible (enable);
     _ui.confirm_expiration_date.set_visible (enable);
 
-    const auto date = enable ? _link_share.get_expire_date () : QDate.current_date ().add_days (1);
+    const var date = enable ? _link_share.get_expire_date () : QDate.current_date ().add_days (1);
     _ui.calendar.set_date (date);
     _ui.calendar.set_minimum_date (QDate.current_date ().add_days (1));
     _ui.calendar.set_maximum_date (
@@ -612,15 +626,15 @@ void Share_link_widget.toggle_expire_date_options (bool enable) {
 }
 
 void Share_link_widget.confirm_and_delete_share () {
-    auto message_box = new QMessageBox (
+    var message_box = new QMessageBox (
         QMessageBox.Question,
         tr ("Confirm Link Share Deletion"),
         tr ("<p>Do you really want to delete the public link share <i>%1</i>?</p>"
-           "<p>Note : This action cannot be undone.</p>")
+           "<p>Note: This action cannot be undone.</p>")
             .arg (share_name ()),
         QMessageBox.NoButton,
         this);
-    QPushButton *yes_button =
+    QPushButton yes_button =
         message_box.add_button (tr ("Delete"), QMessageBox.YesRole);
     message_box.add_button (tr ("Cancel"), QMessageBox.NoRole);
 
@@ -647,8 +661,8 @@ void Share_link_widget.on_context_menu_button_clicked () {
     _link_context_menu.exec (QCursor.pos ());
 }
 
-void Share_link_widget.on_link_context_menu_action_triggered (QAction *action) {
-    const auto state = action.is_checked ();
+void Share_link_widget.on_link_context_menu_action_triggered (QAction action) {
+    const var state = action.is_checked ();
     Share_permissions perm = Share_permission_read;
 
     if (action == _add_another_link_action) {
@@ -690,8 +704,8 @@ void Share_link_widget.on_server_error (int code, string message) {
     on_display_error (message);
 }
 
-void Share_link_widget.on_display_error (string err_msg) {
-    _ui.error_label.on_set_text (err_msg);
+void Share_link_widget.on_display_error (string error_message) {
+    _ui.error_label.on_set_text (error_message);
     _ui.error_label.show ();
 }
 

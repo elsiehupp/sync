@@ -30,7 +30,7 @@ void addBunchOfFiles (int depth, string path, FileModifier &fi) {
     }
 }
 
-int main (int argc, char *argv[]) {
+int main (int argc, char argv[]) {
     QCoreApplication app (argc, argv);
     FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
     addBunchOfFiles<10, 8, 4> (0, "", fakeFolder.localModifier ());

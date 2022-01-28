@@ -33,14 +33,18 @@ static constexpr int MaxChunks = 10;
 ***********************************************************/
 class Job : GLib.Object {
 
-    public Job (GLib.Object *parent = nullptr);
+    public Job (GLib.Object parent = nullptr);
 
     ~Job () override;
 
     public QKeychain.Error error ();
+
+
     public string error_string ();
 
     public GLib.ByteArray binary_data ();
+
+
     public string text_data ();
 
     public bool insecure_fallback ();
@@ -55,6 +59,7 @@ class Job : GLib.Object {
     @see set_auto_delete ()
     ***********************************************************/
     public bool auto_delete ();
+
 
     /***********************************************************
     Set whether this job should autodelete itself once on_finished () has been emitted.
@@ -82,8 +87,11 @@ class Job : GLib.Object {
 ***********************************************************/
 class WriteJob : KeychainChunk.Job {
 
-    public WriteJob (Account *account, string key, GLib.ByteArray &data, GLib.Object *parent = nullptr);
-    public WriteJob (string key, GLib.ByteArray &data, GLib.Object *parent = nullptr);
+    public WriteJob (Account account, string key, GLib.ByteArray data, GLib.Object parent = nullptr);
+
+
+    public WriteJob (string key, GLib.ByteArray data, GLib.Object parent = nullptr);
+
 
     /***********************************************************
     Call this method to on_start the job (async).
@@ -92,6 +100,7 @@ class WriteJob : KeychainChunk.Job {
     @see QKeychain.Job.on_start ()
     ***********************************************************/
     public void on_start ();
+
 
     /***********************************************************
     Call this method to on_start the job synchronously.
@@ -102,10 +111,10 @@ class WriteJob : KeychainChunk.Job {
     public bool exec ();
 
 signals:
-    void on_finished (KeychainChunk.WriteJob *incoming_job);
+    void on_finished (KeychainChunk.WriteJob incoming_job);
 
 
-    private void on_write_job_done (QKeychain.Job *incoming_job);
+    private void on_write_job_done (QKeychain.Job incoming_job);
 }; // class WriteJob
 
 /***********************************************************
@@ -113,8 +122,11 @@ signals:
 ***********************************************************/
 class ReadJob : KeychainChunk.Job {
 
-    public ReadJob (Account *account, string key, bool keychain_migration, GLib.Object *parent = nullptr);
-    public ReadJob (string key, GLib.Object *parent = nullptr);
+    public ReadJob (Account account, string key, bool keychain_migration, GLib.Object parent = nullptr);
+
+
+    public ReadJob (string key, GLib.Object parent = nullptr);
+
 
     /***********************************************************
     Call this method to on_start the job (async).
@@ -123,6 +135,7 @@ class ReadJob : KeychainChunk.Job {
     @see QKeychain.Job.on_start ()
     ***********************************************************/
     public void on_start ();
+
 
     /***********************************************************
     Call this method to on_start the job synchronously.
@@ -133,10 +146,10 @@ class ReadJob : KeychainChunk.Job {
     public bool exec ();
 
 signals:
-    void on_finished (KeychainChunk.ReadJob *incoming_job);
+    void on_finished (KeychainChunk.ReadJob incoming_job);
 
 
-    private void on_read_job_done (QKeychain.Job *incoming_job);
+    private void on_read_job_done (QKeychain.Job incoming_job);
 
 
     private bool _retry_on_key_chain_error = true; // true if we haven't done yet any reading from keychain
@@ -147,8 +160,11 @@ signals:
 ***********************************************************/
 class DeleteJob : KeychainChunk.Job {
 
-    public DeleteJob (Account *account, string key, bool keychain_migration, GLib.Object *parent = nullptr);
-    public DeleteJob (string key, GLib.Object *parent = nullptr);
+    public DeleteJob (Account account, string key, bool keychain_migration, GLib.Object parent = nullptr);
+
+
+    public DeleteJob (string key, GLib.Object parent = nullptr);
+
 
     /***********************************************************
     Call this method to on_start the job (async).
@@ -157,6 +173,7 @@ class DeleteJob : KeychainChunk.Job {
     @see QKeychain.Job.on_start ()
     ***********************************************************/
     public void on_start ();
+
 
     /***********************************************************
     Call this method to on_start the job synchronously.
@@ -167,18 +184,18 @@ class DeleteJob : KeychainChunk.Job {
     public bool exec ();
 
 signals:
-    void on_finished (KeychainChunk.DeleteJob *incoming_job);
+    void on_finished (KeychainChunk.DeleteJob incoming_job);
 
 
-    private void on_delete_job_done (QKeychain.Job *incoming_job);
+    private void on_delete_job_done (QKeychain.Job incoming_job);
 }; // class DeleteJob
 
 
 
 #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
-static void add_settings_to_job (Account *account, QKeychain.Job *job) {
+static void add_settings_to_job (Account account, QKeychain.Job job) {
     Q_UNUSED (account)
-    auto settings = ConfigFile.settings_with_group (Theme.instance ().app_name ());
+    var settings = ConfigFile.settings_with_group (Theme.instance ().app_name ());
     settings.set_parent (job); // make the job parent to make setting deleted properly
     job.set_settings (settings.release ());
 }
@@ -187,7 +204,7 @@ static void add_settings_to_job (Account *account, QKeychain.Job *job) {
 /***********************************************************
 Job
 ***********************************************************/
-Job.Job (GLib.Object *parent)
+Job.Job (GLib.Object parent)
     : GLib.Object (parent) {
     _service_name = Theme.instance ().app_name ();
 }
@@ -234,7 +251,7 @@ void Job.set_auto_delete (bool auto_delete) {
 /***********************************************************
 * WriteJob
 ***********************************************************/
-WriteJob.WriteJob (Account *account, string key, GLib.ByteArray &data, GLib.Object *parent)
+WriteJob.WriteJob (Account account, string key, GLib.ByteArray data, GLib.Object parent)
     : Job (parent) {
     _account = account;
     _key = key;
@@ -245,7 +262,7 @@ WriteJob.WriteJob (Account *account, string key, GLib.ByteArray &data, GLib.Obje
     _chunk_count = 0;
 }
 
-WriteJob.WriteJob (string key, GLib.ByteArray &data, GLib.Object *parent)
+WriteJob.WriteJob (string key, GLib.ByteArray data, GLib.Object parent)
     : WriteJob (nullptr, key, data, parent) {
 }
 
@@ -270,8 +287,8 @@ bool WriteJob.exec () {
     return true;
 }
 
-void WriteJob.on_write_job_done (QKeychain.Job *incoming_job) {
-    auto write_job = qobject_cast<QKeychain.WritePasswordJob> (incoming_job);
+void WriteJob.on_write_job_done (QKeychain.Job incoming_job) {
+    var write_job = qobject_cast<QKeychain.WritePasswordJob> (incoming_job);
 
     // Errors? (write_job can be nullptr here, see : WriteJob.on_start)
     if (write_job) {
@@ -287,11 +304,11 @@ void WriteJob.on_write_job_done (QKeychain.Job *incoming_job) {
     // write a chunk if there is any in the buffer
     if (!_chunk_buffer.is_empty ()) {
         // write full data in one chunk on non-Windows, as usual
-        auto chunk = _chunk_buffer;
+        var chunk = _chunk_buffer;
 
         _chunk_buffer.clear ();
 
-        auto index = (_chunk_count++);
+        var index = (_chunk_count++);
 
         // keep the limit
         if (_chunk_count > KeychainChunk.MaxChunks) {
@@ -301,7 +318,7 @@ void WriteJob.on_write_job_done (QKeychain.Job *incoming_job) {
 
             _chunk_buffer.clear ();
 
-            emit on_finished (this);
+            emit finished (this);
 
             if (_auto_delete) {
                 delete_later ();
@@ -316,7 +333,7 @@ void WriteJob.on_write_job_done (QKeychain.Job *incoming_job) {
                 _account.id ()
             ) : key_with_index;
 
-        auto job = new QKeychain.WritePasswordJob (_service_name, this);
+        var job = new QKeychain.WritePasswordJob (_service_name, this);
 #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
         add_settings_to_job (_account, job);
 #endif
@@ -329,7 +346,7 @@ void WriteJob.on_write_job_done (QKeychain.Job *incoming_job) {
 
         chunk.clear ();
     } else {
-        emit on_finished (this);
+        emit finished (this);
 
         if (_auto_delete) {
             delete_later ();
@@ -342,7 +359,7 @@ void WriteJob.on_write_job_done (QKeychain.Job *incoming_job) {
 /***********************************************************
 * ReadJob
 ***********************************************************/
-ReadJob.ReadJob (Account *account, string key, bool keychain_migration, GLib.Object *parent)
+ReadJob.ReadJob (Account account, string key, bool keychain_migration, GLib.Object parent)
     : Job (parent) {
     _account = account;
     _key = key;
@@ -353,7 +370,7 @@ ReadJob.ReadJob (Account *account, string key, bool keychain_migration, GLib.Obj
     _chunk_buffer.clear ();
 }
 
-ReadJob.ReadJob (string key, GLib.Object *parent)
+ReadJob.ReadJob (string key, GLib.Object parent)
     : ReadJob (nullptr, key, false, parent) {
 }
 
@@ -368,7 +385,7 @@ void ReadJob.on_start () {
             _keychain_migration ? string () : _account.id ()
         ) : _key;
 
-    auto job = new QKeychain.ReadPasswordJob (_service_name, this);
+    var job = new QKeychain.ReadPasswordJob (_service_name, this);
 #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
     add_settings_to_job (_account, job);
 #endif
@@ -397,9 +414,9 @@ bool ReadJob.exec () {
     return false;
 }
 
-void ReadJob.on_read_job_done (QKeychain.Job *incoming_job) {
+void ReadJob.on_read_job_done (QKeychain.Job incoming_job) {
     // Errors or next chunk?
-    auto read_job = qobject_cast<QKeychain.ReadPasswordJob> (incoming_job);
+    var read_job = qobject_cast<QKeychain.ReadPasswordJob> (incoming_job);
     Q_ASSERT (read_job);
 
     if (read_job.error () == NoError && !read_job.binary_data ().is_empty ()) {
@@ -430,7 +447,7 @@ void ReadJob.on_read_job_done (QKeychain.Job *incoming_job) {
 
     read_job.delete_later ();
 
-    emit on_finished (this);
+    emit finished (this);
 
     if (_auto_delete) {
         delete_later ();
@@ -440,7 +457,7 @@ void ReadJob.on_read_job_done (QKeychain.Job *incoming_job) {
 /***********************************************************
 * DeleteJob
 ***********************************************************/
-DeleteJob.DeleteJob (Account *account, string key, bool keychain_migration, GLib.Object *parent)
+DeleteJob.DeleteJob (Account account, string key, bool keychain_migration, GLib.Object parent)
     : Job (parent) {
     _account = account;
     _key = key;
@@ -448,7 +465,7 @@ DeleteJob.DeleteJob (Account *account, string key, bool keychain_migration, GLib
     _keychain_migration = keychain_migration;
 }
 
-DeleteJob.DeleteJob (string key, GLib.Object *parent)
+DeleteJob.DeleteJob (string key, GLib.Object parent)
     : DeleteJob (nullptr, key, false, parent) {
 }
 
@@ -462,7 +479,7 @@ void DeleteJob.on_start () {
             _keychain_migration ? string () : _account.id ()
         ) : _key;
 
-    auto job = new QKeychain.DeletePasswordJob (_service_name, this);
+    var job = new QKeychain.DeletePasswordJob (_service_name, this);
 #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
     add_settings_to_job (_account, job);
 #endif
@@ -490,9 +507,9 @@ bool DeleteJob.exec () {
     return false;
 }
 
-void DeleteJob.on_delete_job_done (QKeychain.Job *incoming_job) {
+void DeleteJob.on_delete_job_done (QKeychain.Job incoming_job) {
     // Errors or next chunk?
-    auto delete_job = qobject_cast<QKeychain.DeletePasswordJob> (incoming_job);
+    var delete_job = qobject_cast<QKeychain.DeletePasswordJob> (incoming_job);
     Q_ASSERT (delete_job);
 
     if (delete_job.error () == NoError) {
@@ -508,7 +525,7 @@ void DeleteJob.on_delete_job_done (QKeychain.Job *incoming_job) {
 
     delete_job.delete_later ();
 
-    emit on_finished (this);
+    emit finished (this);
 
     if (_auto_delete) {
         delete_later ();

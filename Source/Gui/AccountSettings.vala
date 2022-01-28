@@ -31,8 +31,8 @@ class QLabel;
 namespace Occ {
 
 namespace {
-    constexpr auto property_folder = "folder";
-    constexpr auto property_path = "path";
+    constexpr var property_folder = "folder";
+    constexpr var property_path = "path";
     }
 
 namespace Ui {
@@ -48,7 +48,7 @@ namespace Ui {
 class AccountSettings : Gtk.Widget {
     Q_PROPERTY (AccountState* account_state MEMBER _account_state)
 
-    public AccountSettings (AccountState *account_state, Gtk.Widget *parent = nullptr);
+    public AccountSettings (AccountState account_state, Gtk.Widget parent = nullptr);
     ~AccountSettings () override;
     public QSize size_hint () override {
         return OwncloudGui.settings_dialog_size ();
@@ -58,16 +58,24 @@ class AccountSettings : Gtk.Widget {
 signals:
     void folder_changed ();
     void open_folder_alias (string );
-    void show_issues_list (AccountState *account);
+    void show_issues_list (AccountState account);
     void request_mnemonic ();
-    void remove_account_folders (AccountState *account);
+    void remove_account_folders (AccountState account);
     void style_changed ();
 
 
     public void on_open_oC ();
+
+
     public void on_update_quota (int64 total, int64 used);
+
+
     public void on_account_state_changed ();
+
+
     public void on_style_changed ();
+
+
     public AccountState on_accounts_state () {
         return _account_state;
     }
@@ -88,13 +96,13 @@ protected slots:
     void on_enable_vfs_current_folder ();
     void on_disable_vfs_current_folder ();
     void on_set_current_folder_availability (PinState state);
-    void on_set_sub_folder_availability (Folder *folder, string path, PinState state);
+    void on_set_sub_folder_availability (Folder folder, string path, PinState state);
     void on_folder_wizard_accepted ();
     void on_folder_wizard_rejected ();
     void on_delete_account ();
     void on_toggle_sign_in_state ();
     void refresh_selective_sync_status ();
-    void on_mark_subfolder_encrypted (FolderStatusModel.SubFolderInfo *folder_info);
+    void on_mark_subfolder_encrypted (FolderStatusModel.SubFolderInfo folder_info);
     void on_subfolder_context_menu_requested (QModelIndex& idx, QPoint& point);
     void on_custom_context_menu_requested (QPoint &);
     void on_folder_list_clicked (QModelIndex &indx);
@@ -148,7 +156,7 @@ protected slots:
         "}";
 
     void show_enable_e2ee_with_virtual_files_warning_dialog (std.function<void (void)> on_accept) {
-        const auto message_box = new QMessageBox;
+        const var message_box = new QMessageBox;
         message_box.set_attribute (Qt.WA_DeleteOnClose);
         message_box.on_set_text (AccountSettings.tr ("End-to-End Encryption with Virtual Files"));
         message_box.set_informative_text (AccountSettings.tr ("You seem to have the Virtual Files feature enabled on this folder. "
@@ -157,16 +165,17 @@ protected slots:
                                                            "End-to-End Encryption, make sure the encrypted folder is marked with "
                                                            "\"Make always available locally\"."));
         message_box.set_icon (QMessageBox.Warning);
-        const auto dont_encrypt_button = message_box.add_button (QMessageBox.StandardButton.Cancel);
+        const var dont_encrypt_button = message_box.add_button (QMessageBox.StandardButton.Cancel);
         Q_ASSERT (dont_encrypt_button);
         dont_encrypt_button.on_set_text (AccountSettings.tr ("Don't encrypt folder"));
-        const auto encrypt_button = message_box.add_button (QMessageBox.StandardButton.Ok);
+        const var encrypt_button = message_box.add_button (QMessageBox.StandardButton.Ok);
         Q_ASSERT (encrypt_button);
         encrypt_button.on_set_text (AccountSettings.tr ("Encrypt folder"));
         GLib.Object.connect (message_box, &QMessageBox.accepted, on_accept);
 
         message_box.open ();
     }
+
 
     /***********************************************************
     Adjusts the mouse cursor based on the region it is on over the folder tree view.
@@ -176,19 +185,19 @@ protected slots:
     ***********************************************************/
     class MouseCursorChanger : GLib.Object {
 
-        public MouseCursorChanger (GLib.Object *parent)
+        public MouseCursorChanger (GLib.Object parent)
             : GLib.Object (parent) {
         }
 
-        public QTreeView *folder_list;
-        public FolderStatusModel *model;
+        public QTreeView folder_list;
+        public FolderStatusModel model;
 
 
-        protected bool event_filter (GLib.Object *watched, QEvent *event) override {
+        protected bool event_filter (GLib.Object watched, QEvent event) override {
             if (event.type () == QEvent.HoverMove) {
                 Qt.CursorShape shape = Qt.ArrowCursor;
-                auto pos = folder_list.map_from_global (QCursor.pos ());
-                auto index = folder_list.index_at (pos);
+                var pos = folder_list.map_from_global (QCursor.pos ());
+                var index = folder_list.index_at (pos);
                 if (model.classify (index) == FolderStatusModel.RootFolder
                     && (FolderStatusDelegate.errors_list_rect (folder_list.visual_rect (index)).contains (pos)
                         || FolderStatusDelegate.options_button_rect (folder_list.visual_rect (index),folder_list.layout_direction ()).contains (pos))) {
@@ -200,7 +209,7 @@ protected slots:
         }
     };
 
-    AccountSettings.AccountSettings (AccountState *account_state, Gtk.Widget *parent)
+    AccountSettings.AccountSettings (AccountState account_state, Gtk.Widget parent)
         : Gtk.Widget (parent)
         , _ui (new Ui.AccountSettings)
         , _was_disabled_before (false)
@@ -212,7 +221,7 @@ protected slots:
         _model = new FolderStatusModel;
         _model.set_account_state (_account_state);
         _model.set_parent (this);
-        auto *delegate = new FolderStatusDelegate;
+        var delegate = new FolderStatusDelegate;
         delegate.set_parent (this);
 
         // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
@@ -224,7 +233,7 @@ protected slots:
         _ui._folder_list.set_minimum_width (300);
         new ToolTipUpdater (_ui._folder_list);
 
-        auto mouse_cursor_changer = new MouseCursorChanger (this);
+        var mouse_cursor_changer = new MouseCursorChanger (this);
         mouse_cursor_changer.folder_list = _ui._folder_list;
         mouse_cursor_changer.model = _model;
         _ui._folder_list.set_mouse_tracking (true);
@@ -247,12 +256,12 @@ protected slots:
         connect (_model, &QAbstractItemModel.rows_inserted,
             this, &AccountSettings.refresh_selective_sync_status);
 
-        auto *sync_now_action = new QAction (this);
+        var sync_now_action = new QAction (this);
         sync_now_action.set_shortcut (QKeySequence (Qt.Key_F6));
         connect (sync_now_action, &QAction.triggered, this, &AccountSettings.on_schedule_current_folder);
         add_action (sync_now_action);
 
-        auto *sync_now_with_remote_discovery = new QAction (this);
+        var sync_now_with_remote_discovery = new QAction (this);
         sync_now_with_remote_discovery.set_shortcut (QKeySequence (Qt.CTRL + Qt.Key_F6));
         connect (sync_now_with_remote_discovery, &QAction.triggered, this, &AccountSettings.on_schedule_current_folder_force_remote_discovery);
         add_action (sync_now_with_remote_discovery);
@@ -286,7 +295,7 @@ protected slots:
         } else {
             _ui.encryption_message.on_set_text (tr ("This account supports end-to-end encryption"));
 
-            auto *mnemonic = new QAction (tr ("Display mnemonic"), this);
+            var mnemonic = new QAction (tr ("Display mnemonic"), this);
             connect (mnemonic, &QAction.triggered, this, &AccountSettings.request_mnemonic);
             _ui.encryption_message.add_action (mnemonic);
             _ui.encryption_message.hide ();
@@ -306,7 +315,7 @@ protected slots:
     void AccountSettings.on_new_mnemonic_generated () {
         _ui.encryption_message.on_set_text (tr ("This account supports end-to-end encryption"));
 
-        auto *mnemonic = new QAction (tr ("Enable encryption"), this);
+        var mnemonic = new QAction (tr ("Enable encryption"), this);
         connect (mnemonic, &QAction.triggered, this, &AccountSettings.request_mnemonic);
         connect (mnemonic, &QAction.triggered, _ui.encryption_message, &KMessageWidget.hide);
 
@@ -316,16 +325,16 @@ protected slots:
 
     void AccountSettings.on_encrypt_folder_finished (int status) {
         q_c_info (lc_account_settings) << "Current folder encryption status code:" << status;
-        auto job = qobject_cast<EncryptFolderJob> (sender ());
+        var job = qobject_cast<EncryptFolderJob> (sender ());
         Q_ASSERT (job);
         if (!job.error_string ().is_empty ()) {
             QMessageBox.warning (nullptr, tr ("Warning"), job.error_string ());
         }
 
-        const auto folder = job.property (property_folder).value<Folder> ();
+        const var folder = job.property (property_folder).value<Folder> ();
         Q_ASSERT (folder);
-        const auto path = job.property (property_path).value<string> ();
-        const auto index = _model.index_for_path (folder, path);
+        const var path = job.property (property_path).value<string> ();
+        const var index = _model.index_for_path (folder, path);
         Q_ASSERT (index.is_valid ());
         _model.reset_and_fetch (index.parent ());
 
@@ -351,7 +360,7 @@ protected slots:
     void AccountSettings.do_expand () {
         // Make sure at least the root items are expanded
         for (int i = 0; i < _model.row_count (); ++i) {
-            auto idx = _model.index (i);
+            var idx = _model.index (i);
             if (!_ui._folder_list.is_expanded (idx))
                 _ui._folder_list.set_expanded (idx, true);
         }
@@ -388,14 +397,14 @@ protected slots:
             return;
         }
 
-        const auto folder = folder_info._folder;
+        const var folder = folder_info._folder;
         Q_ASSERT (folder);
 
-        const auto folder_alias = folder.alias ();
-        const auto path = folder_info._path;
-        const auto file_id = folder_info._file_id;
-        const auto encrypt_folder = [this, file_id, path, folder_alias] {
-            const auto folder = FolderMan.instance ().folder (folder_alias);
+        const var folder_alias = folder.alias ();
+        const var path = folder_info._path;
+        const var file_id = folder_info._file_id;
+        const var encrypt_folder = [this, file_id, path, folder_alias] {
+            const var folder = FolderMan.instance ().folder (folder_alias);
             if (!folder) {
                 q_c_warning (lc_account_settings) << "Could not encrypt folder because folder" << folder_alias << "does not exist anymore";
                 QMessageBox.warning (nullptr, tr ("Encryption failed"), tr ("Could not encrypt folder because the folder does not exist anymore"));
@@ -405,8 +414,8 @@ protected slots:
             // Folder info have directory paths in Foo/Bar/ convention...
             Q_ASSERT (!path.starts_with ('/') && path.ends_with ('/'));
             // But EncryptFolderJob expects directory path Foo/Bar convention
-            const auto chopped_path = path.chopped (1);
-            auto job = new Occ.EncryptFolderJob (on_accounts_state ().account (), folder.journal_db (), chopped_path, file_id, this);
+            const var chopped_path = path.chopped (1);
+            var job = new Occ.EncryptFolderJob (on_accounts_state ().account (), folder.journal_database (), chopped_path, file_id, this);
             job.set_property (property_folder, QVariant.from_value (folder));
             job.set_property (property_path, QVariant.from_value (path));
             connect (job, &Occ.EncryptFolderJob.on_finished, this, &AccountSettings.on_encrypt_folder_finished);
@@ -422,21 +431,21 @@ protected slots:
     }
 
     void AccountSettings.on_edit_current_ignored_files () {
-        Folder *f = FolderMan.instance ().folder (selected_folder_alias ());
+        Folder f = FolderMan.instance ().folder (selected_folder_alias ());
         if (!f)
             return;
         open_ignored_files_dialog (f.path ());
     }
 
     void AccountSettings.on_open_make_folder_dialog () {
-        const auto &selected = _ui._folder_list.selection_model ().current_index ();
+        const var &selected = _ui._folder_list.selection_model ().current_index ();
 
         if (!selected.is_valid ()) {
             q_c_warning (lc_account_settings) << "Selection model current folder index is not valid.";
             return;
         }
 
-        const auto &classification = _model.classify (selected);
+        const var &classification = _model.classify (selected);
 
         if (classification != FolderStatusModel.SubFolder && classification != FolderStatusModel.RootFolder) {
             return;
@@ -445,8 +454,8 @@ protected slots:
         const string file_name = [this, &selected, &classification] {
             string result;
             if (classification == FolderStatusModel.RootFolder) {
-                const auto alias = _model.data (selected, FolderStatusDelegate.FolderAliasRole).to_string ();
-                if (auto folder = FolderMan.instance ().folder (alias)) {
+                const var alias = _model.data (selected, FolderStatusDelegate.FolderAliasRole).to_string ();
+                if (var folder = FolderMan.instance ().folder (alias)) {
                     result = folder.path ();
                 }
             } else {
@@ -461,7 +470,7 @@ protected slots:
         } ();
 
         if (!file_name.is_empty ()) {
-            const auto folder_creation_dialog = new FolderCreationDialog (file_name, this);
+            const var folder_creation_dialog = new FolderCreationDialog (file_name, this);
             folder_creation_dialog.set_attribute (Qt.WA_DeleteOnClose);
             folder_creation_dialog.open ();
         }
@@ -479,15 +488,15 @@ protected slots:
         Q_ASSERT (QFileInfo (abs_folder_path).is_absolute ());
 
         const string ignore_file = abs_folder_path + ".sync-exclude.lst";
-        auto layout = new QVBoxLayout ();
-        auto ignore_list_widget = new IgnoreListTableWidget (this);
+        var layout = new QVBoxLayout ();
+        var ignore_list_widget = new IgnoreListTableWidget (this);
         ignore_list_widget.read_ignore_file (ignore_file);
         layout.add_widget (ignore_list_widget);
 
-        auto button_box = new QDialogButtonBox (QDialogButtonBox.Ok | QDialogButtonBox.Cancel);
+        var button_box = new QDialogButtonBox (QDialogButtonBox.Ok | QDialogButtonBox.Cancel);
         layout.add_widget (button_box);
 
-        auto dialog = new Gtk.Dialog ();
+        var dialog = new Gtk.Dialog ();
         dialog.set_layout (layout);
 
         connect (button_box, &QDialogButtonBox.clicked, [=] (QAbstractButton * button) {
@@ -505,15 +514,15 @@ protected slots:
         Q_UNUSED (pos);
 
         QMenu menu;
-        auto ac = menu.add_action (tr ("Open folder"));
+        var ac = menu.add_action (tr ("Open folder"));
         connect (ac, &QAction.triggered, this, &AccountSettings.on_open_current_local_sub_folder);
 
-        auto file_name = _model.data (index, FolderStatusDelegate.FolderPathRole).to_string ();
+        var file_name = _model.data (index, FolderStatusDelegate.FolderPathRole).to_string ();
         if (!QFile.exists (file_name)) {
             ac.set_enabled (false);
         }
-        auto info   = _model.info_for_index (index);
-        auto acc = _account_state.account ();
+        var info   = _model.info_for_index (index);
+        var acc = _account_state.account ();
 
         if (acc.capabilities ().client_side_encryption_available ()) {
             // Verify if the folder is empty before attempting to encrypt.
@@ -541,30 +550,30 @@ protected slots:
         connect (ac, &QAction.triggered, this, &AccountSettings.on_open_make_folder_dialog);
         ac.set_enabled (QFile.exists (file_name));
 
-        const auto folder = info._folder;
+        const var folder = info._folder;
         if (folder && folder.virtual_files_enabled ()) {
-            auto availability_menu = menu.add_menu (tr ("Availability"));
+            var availability_menu = menu.add_menu (tr ("Availability"));
 
             // Has '/' suffix convention for paths here but VFS and
             // sync engine expects no such suffix
             Q_ASSERT (info._path.ends_with ('/'));
-            const auto remote_path = info._path.chopped (1);
+            const var remote_path = info._path.chopped (1);
 
             // It might be an E2EE mangled path, so let's try to demangle it
-            const auto journal = folder.journal_db ();
+            const var journal = folder.journal_database ();
             SyncJournalFileRecord rec;
             journal.get_file_record_by_e2e_mangled_name (remote_path, &rec);
 
-            const auto path = rec.is_valid () ? rec._path : remote_path;
+            const var path = rec.is_valid () ? rec._path : remote_path;
 
             ac = availability_menu.add_action (Utility.vfs_pin_action_text ());
             connect (ac, &QAction.triggered, this, [this, folder, path] {
-                on_set_sub_folder_availability (folder, path, PinState.AlwaysLocal);
+                on_set_sub_folder_availability (folder, path, PinState.PinState.ALWAYS_LOCAL);
             });
 
             ac = availability_menu.add_action (Utility.vfs_free_space_action_text ());
             connect (ac, &QAction.triggered, this, [this, folder, path] {
-                on_set_sub_folder_availability (folder, path, PinState.OnlineOnly);
+                on_set_sub_folder_availability (folder, path, PinState.VfsItemAvailability.ONLINE_ONLY);
             });
         }
 
@@ -572,7 +581,7 @@ protected slots:
     }
 
     void AccountSettings.on_custom_context_menu_requested (QPoint &pos) {
-        QTreeView *tv = _ui._folder_list;
+        QTreeView tv = _ui._folder_list;
         QModelIndex index = tv.index_at (pos);
         if (!index.is_valid ()) {
             return;
@@ -591,16 +600,16 @@ protected slots:
         string alias = _model.data (index, FolderStatusDelegate.FolderAliasRole).to_string ();
         bool folder_paused = _model.data (index, FolderStatusDelegate.FolderSyncPaused).to_bool ();
         bool folder_connected = _model.data (index, FolderStatusDelegate.FolderAccountConnected).to_bool ();
-        auto folder_man = FolderMan.instance ();
+        var folder_man = FolderMan.instance ();
         QPointer<Folder> folder = folder_man.folder (alias);
         if (!folder)
             return;
 
-        auto *menu = new QMenu (tv);
+        var menu = new QMenu (tv);
 
         menu.set_attribute (Qt.WA_DeleteOnClose);
 
-        QAction *ac = menu.add_action (tr ("Open folder"));
+        QAction ac = menu.add_action (tr ("Open folder"));
         connect (ac, &QAction.triggered, this, &AccountSettings.on_open_current_folder);
 
         ac = menu.add_action (tr ("Edit Ignored Files"));
@@ -632,17 +641,17 @@ protected slots:
         connect (ac, &QAction.triggered, this, &AccountSettings.on_remove_current_folder);
 
         if (folder.virtual_files_enabled ()) {
-            auto availability_menu = menu.add_menu (tr ("Availability"));
+            var availability_menu = menu.add_menu (tr ("Availability"));
 
             ac = availability_menu.add_action (Utility.vfs_pin_action_text ());
             connect (ac, &QAction.triggered, this, [this] () {
-                on_set_current_folder_availability (PinState.AlwaysLocal);
+                on_set_current_folder_availability (PinState.PinState.ALWAYS_LOCAL);
             });
             ac.set_disabled (Theme.instance ().enforce_virtual_files_sync_folder ());
 
             ac = availability_menu.add_action (Utility.vfs_free_space_action_text ());
             connect (ac, &QAction.triggered, this, [this] () {
-                on_set_current_folder_availability (PinState.OnlineOnly);
+                on_set_current_folder_availability (PinState.VfsItemAvailability.ONLINE_ONLY);
             });
 
             ac = menu.add_action (tr ("Disable virtual file support …"));
@@ -652,7 +661,7 @@ protected slots:
 
         if (Theme.instance ().show_virtual_files_option ()
             && !folder.virtual_files_enabled () && Vfs.check_availability (folder.path ())) {
-            const auto mode = best_available_vfs_mode ();
+            const var mode = best_available_vfs_mode ();
             if (mode == Vfs.WindowsCfApi || ConfigFile ().show_experimental_options ()) {
                 ac = menu.add_action (tr ("Enable virtual file support %1 …").arg (mode == Vfs.WindowsCfApi ? string () : tr (" (experimental)")));
                 // TODO : remove when UX decision is made
@@ -668,13 +677,13 @@ protected slots:
     void AccountSettings.on_folder_list_clicked (QModelIndex &indx) {
         if (indx.data (FolderStatusDelegate.AddButton).to_bool ()) {
             // "Add Folder Sync Connection"
-            QTreeView *tv = _ui._folder_list;
-            auto pos = tv.map_from_global (QCursor.pos ());
+            QTreeView tv = _ui._folder_list;
+            var pos = tv.map_from_global (QCursor.pos ());
             QStyleOptionViewItem opt;
             opt.init_from (tv);
-            auto btn_rect = tv.visual_rect (indx);
-            auto btn_size = tv.item_delegate (indx).size_hint (opt, indx);
-            auto actual = QStyle.visual_rect (opt.direction, btn_rect, QRect (btn_rect.top_left (), btn_size));
+            var btn_rect = tv.visual_rect (indx);
+            var btn_size = tv.item_delegate (indx).size_hint (opt, indx);
+            var actual = QStyle.visual_rect (opt.direction, btn_rect, QRect (btn_rect.top_left (), btn_size));
             if (!actual.contains (pos))
                 return;
 
@@ -690,8 +699,8 @@ protected slots:
         }
         if (_model.classify (indx) == FolderStatusModel.RootFolder) {
             // tries to find if we clicked on the '...' button.
-            QTreeView *tv = _ui._folder_list;
-            auto pos = tv.map_from_global (QCursor.pos ());
+            QTreeView tv = _ui._folder_list;
+            var pos = tv.map_from_global (QCursor.pos ());
             if (FolderStatusDelegate.options_button_rect (tv.visual_rect (indx), layout_direction ()).contains (pos)) {
                 on_custom_context_menu_requested (pos);
                 return;
@@ -710,10 +719,10 @@ protected slots:
     }
 
     void AccountSettings.on_add_folder () {
-        FolderMan *folder_man = FolderMan.instance ();
+        FolderMan folder_man = FolderMan.instance ();
         folder_man.set_sync_enabled (false); // do not on_start more syncs.
 
-        auto *folder_wizard = new FolderWizard (_account_state.account (), this);
+        var folder_wizard = new FolderWizard (_account_state.account (), this);
         folder_wizard.set_attribute (Qt.WA_DeleteOnClose);
 
         connect (folder_wizard, &Gtk.Dialog.accepted, this, &AccountSettings.on_folder_wizard_accepted);
@@ -722,8 +731,8 @@ protected slots:
     }
 
     void AccountSettings.on_folder_wizard_accepted () {
-        auto *folder_wizard = qobject_cast<FolderWizard> (sender ());
-        FolderMan *folder_man = FolderMan.instance ();
+        var folder_wizard = qobject_cast<FolderWizard> (sender ());
+        FolderMan folder_man = FolderMan.instance ();
 
         q_c_info (lc_account_settings) << "Folder wizard completed";
 
@@ -761,19 +770,19 @@ protected slots:
         if (folder_man.navigation_pane_helper ().show_in_explorer_navigation_pane ())
             definition.navigation_pane_clsid = QUuid.create_uuid ();
 
-        auto selective_sync_black_list = folder_wizard.property ("selective_sync_black_list").to_string_list ();
+        var selective_sync_black_list = folder_wizard.property ("selective_sync_black_list").to_string_list ();
 
         folder_man.set_sync_enabled (true);
 
-        Folder *f = folder_man.add_folder (_account_state, definition);
+        Folder f = folder_man.add_folder (_account_state, definition);
         if (f) {
             if (definition.virtual_files_mode != Vfs.Off && folder_wizard.property ("use_virtual_files").to_bool ())
-                f.set_root_pin_state (PinState.OnlineOnly);
+                f.set_root_pin_state (PinState.VfsItemAvailability.ONLINE_ONLY);
 
-            f.journal_db ().set_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, selective_sync_black_list);
+            f.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, selective_sync_black_list);
 
             // The user already accepted the selective sync dialog. everything is in the white list
-            f.journal_db ().set_selective_sync_list (SyncJournalDb.SelectiveSyncWhiteList,
+            f.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncWhiteList,
                 string[] () << QLatin1String ("/"));
             folder_man.schedule_all_folders ();
             emit folder_changed ();
@@ -782,12 +791,12 @@ protected slots:
 
     void AccountSettings.on_folder_wizard_rejected () {
         q_c_info (lc_account_settings) << "Folder wizard cancelled";
-        FolderMan *folder_man = FolderMan.instance ();
+        FolderMan folder_man = FolderMan.instance ();
         folder_man.set_sync_enabled (true);
     }
 
     void AccountSettings.on_remove_current_folder () {
-        auto folder = FolderMan.instance ().folder (selected_folder_alias ());
+        var folder = FolderMan.instance ().folder (selected_folder_alias ());
         QModelIndex selected = _ui._folder_list.selection_model ().current_index ();
         if (selected.is_valid () && folder) {
             int row = selected.row ();
@@ -795,7 +804,7 @@ protected slots:
             q_c_info (lc_account_settings) << "Remove Folder alias " << folder.alias ();
             string short_gui_local_path = folder.short_gui_local_path ();
 
-            auto message_box = new QMessageBox (QMessageBox.Question,
+            var message_box = new QMessageBox (QMessageBox.Question,
                 tr ("Confirm Folder Sync Connection Removal"),
                 tr ("<p>Do you really want to stop syncing the folder <i>%1</i>?</p>"
                    "<p><b>Note:</b> This will <b>not</b> delete any files.</p>")
@@ -803,7 +812,7 @@ protected slots:
                 QMessageBox.NoButton,
                 this);
             message_box.set_attribute (Qt.WA_DeleteOnClose);
-            QPushButton *yes_button =
+            QPushButton yes_button =
                 message_box.add_button (tr ("Remove Folder Sync Connection"), QMessageBox.YesRole);
             message_box.add_button (tr ("Cancel"), QMessageBox.NoRole);
             connect (message_box, &QMessageBox.on_finished, this, [message_box, yes_button, folder, row, this]{
@@ -821,7 +830,7 @@ protected slots:
     }
 
     void AccountSettings.on_open_current_folder () {
-        auto alias = selected_folder_alias ();
+        var alias = selected_folder_alias ();
         if (!alias.is_empty ()) {
             emit open_folder_alias (alias);
         }
@@ -837,7 +846,7 @@ protected slots:
     }
 
     void AccountSettings.on_enable_vfs_current_folder () {
-        FolderMan *folder_man = FolderMan.instance ();
+        FolderMan folder_man = FolderMan.instance ();
         QPointer<Folder> folder = folder_man.folder (selected_folder_alias ());
         QModelIndex selected = _ui._folder_list.selection_model ().current_index ();
         if (!selected.is_valid () || !folder)
@@ -851,8 +860,8 @@ protected slots:
             FolderMan.instance ().navigation_pane_helper ().schedule_update_cloud_storage_registry ();
 
             // It is unsafe to switch on vfs while a sync is running - wait if necessary.
-            auto connection = std.make_shared<QMetaObject.Connection> ();
-            auto switch_vfs_on = [folder, connection, this] () {
+            var connection = std.make_shared<QMetaObject.Connection> ();
+            var switch_vfs_on = [folder, connection, this] () {
                 if (*connection)
                     GLib.Object.disconnect (*connection);
 
@@ -860,19 +869,19 @@ protected slots:
 
                 // Wipe selective sync blacklist
                 bool ok = false;
-                const auto old_blacklist = folder.journal_db ().get_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, &ok);
-                folder.journal_db ().set_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, {});
+                const var old_blacklist = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, &ok);
+                folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, {});
 
                 // Change the folder vfs mode and load the plugin
                 folder.set_virtual_files_enabled (true);
                 folder.set_vfs_on_off_switch_pending (false);
 
-                // Setting to Unspecified retains existing data.
-                // Selective sync excluded folders become OnlineOnly.
-                folder.set_root_pin_state (PinState.Unspecified);
-                for (auto &entry : old_blacklist) {
-                    folder.journal_db ().schedule_path_for_remote_discovery (entry);
-                    if (!folder.vfs ().set_pin_state (entry, PinState.OnlineOnly)) {
+                // Setting to PinState.UNSPECIFIED retains existing data.
+                // Selective sync excluded folders become VfsItemAvailability.ONLINE_ONLY.
+                folder.set_root_pin_state (PinState.PinState.UNSPECIFIED);
+                for (var &entry : old_blacklist) {
+                    folder.journal_database ().schedule_path_for_remote_discovery (entry);
+                    if (!folder.vfs ().set_pin_state (entry, PinState.VfsItemAvailability.ONLINE_ONLY)) {
                         q_c_warning (lc_account_settings) << "Could not set pin state of" << entry << "to online only";
                     }
                 }
@@ -896,13 +905,13 @@ protected slots:
     }
 
     void AccountSettings.on_disable_vfs_current_folder () {
-        FolderMan *folder_man = FolderMan.instance ();
+        FolderMan folder_man = FolderMan.instance ();
         QPointer<Folder> folder = folder_man.folder (selected_folder_alias ());
         QModelIndex selected = _ui._folder_list.selection_model ().current_index ();
         if (!selected.is_valid () || !folder)
             return;
 
-        auto msg_box = new QMessageBox (
+        var msg_box = new QMessageBox (
             QMessageBox.Question,
             tr ("Disable virtual file support?"),
             tr ("This action will disable virtual file support. As a consequence contents of folders that "
@@ -912,7 +921,7 @@ protected slots:
                "will become available again."
                "\n\n"
                "This action will on_abort any currently running synchronization."));
-        auto accept_button = msg_box.add_button (tr ("Disable support"), QMessageBox.AcceptRole);
+        var accept_button = msg_box.add_button (tr ("Disable support"), QMessageBox.AcceptRole);
         msg_box.add_button (tr ("Cancel"), QMessageBox.RejectRole);
         connect (msg_box, &QMessageBox.on_finished, msg_box, [this, msg_box, folder, accept_button] {
             msg_box.delete_later ();
@@ -923,8 +932,8 @@ protected slots:
             FolderMan.instance ().navigation_pane_helper ().schedule_update_cloud_storage_registry ();
 
             // It is unsafe to switch off vfs while a sync is running - wait if necessary.
-            auto connection = std.make_shared<QMetaObject.Connection> ();
-            auto switch_vfs_off = [folder, connection, this] () {
+            var connection = std.make_shared<QMetaObject.Connection> ();
+            var switch_vfs_off = [folder, connection, this] () {
                 if (*connection)
                     GLib.Object.disconnect (*connection);
 
@@ -934,9 +943,9 @@ protected slots:
                 folder.set_virtual_files_enabled (false);
                 folder.set_vfs_on_off_switch_pending (false);
 
-                // Wipe pin states and selective sync db
-                folder.set_root_pin_state (PinState.AlwaysLocal);
-                folder.journal_db ().set_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, {});
+                // Wipe pin states and selective sync database
+                folder.set_root_pin_state (PinState.PinState.ALWAYS_LOCAL);
+                folder.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, {});
 
                 // Prevent issues with missing local files
                 folder.on_next_sync_full_local_discovery ();
@@ -959,9 +968,9 @@ protected slots:
     }
 
     void AccountSettings.on_set_current_folder_availability (PinState state) {
-        ASSERT (state == PinState.OnlineOnly || state == PinState.AlwaysLocal);
+        ASSERT (state == PinState.VfsItemAvailability.ONLINE_ONLY || state == PinState.PinState.ALWAYS_LOCAL);
 
-        FolderMan *folder_man = FolderMan.instance ();
+        FolderMan folder_man = FolderMan.instance ();
         QPointer<Folder> folder = folder_man.folder (selected_folder_alias ());
         QModelIndex selected = _ui._folder_list.selection_model ().current_index ();
         if (!selected.is_valid () || !folder)
@@ -972,7 +981,7 @@ protected slots:
         folder.schedule_this_folder_soon ();
     }
 
-    void AccountSettings.on_set_sub_folder_availability (Folder *folder, string path, PinState state) {
+    void AccountSettings.on_set_sub_folder_availability (Folder folder, string path, PinState state) {
         Q_ASSERT (folder && folder.virtual_files_enabled ());
         Q_ASSERT (!path.ends_with ('/'));
 
@@ -1009,16 +1018,16 @@ protected slots:
     }
 
     void AccountSettings.on_enable_current_folder (bool terminate) {
-        auto alias = selected_folder_alias ();
+        var alias = selected_folder_alias ();
 
         if (!alias.is_empty ()) {
-            FolderMan *folder_man = FolderMan.instance ();
+            FolderMan folder_man = FolderMan.instance ();
 
             q_c_info (lc_account_settings) << "Application : enable folder with alias " << alias;
             bool currently_paused = false;
 
             // this sets the folder status to disabled but does not interrupt it.
-            Folder *f = folder_man.folder (alias);
+            Folder f = folder_man.folder (alias);
             if (!f) {
                 return;
             }
@@ -1026,7 +1035,7 @@ protected slots:
             if (!currently_paused && !terminate) {
                 // check if a sync is still running and if so, ask if we should terminate.
                 if (f.is_busy ()) { // its still running
-                    auto msgbox = new QMessageBox (QMessageBox.Question, tr ("Sync Running"),
+                    var msgbox = new QMessageBox (QMessageBox.Question, tr ("Sync Running"),
                         tr ("The syncing operation is running.<br/>Do you want to terminate it?"),
                         QMessageBox.Yes | QMessageBox.No, this);
                     msgbox.set_attribute (Qt.WA_DeleteOnClose);
@@ -1055,26 +1064,26 @@ protected slots:
     }
 
     void AccountSettings.on_schedule_current_folder () {
-        FolderMan *folder_man = FolderMan.instance ();
-        if (auto folder = folder_man.folder (selected_folder_alias ())) {
+        FolderMan folder_man = FolderMan.instance ();
+        if (var folder = folder_man.folder (selected_folder_alias ())) {
             folder_man.schedule_folder (folder);
         }
     }
 
     void AccountSettings.on_schedule_current_folder_force_remote_discovery () {
-        FolderMan *folder_man = FolderMan.instance ();
-        if (auto folder = folder_man.folder (selected_folder_alias ())) {
+        FolderMan folder_man = FolderMan.instance ();
+        if (var folder = folder_man.folder (selected_folder_alias ())) {
             folder.on_wipe_error_blacklist ();
-            folder.journal_db ().force_remote_discovery_next_sync ();
+            folder.journal_database ().force_remote_discovery_next_sync ();
             folder_man.schedule_folder (folder);
         }
     }
 
     void AccountSettings.on_force_sync_current_folder () {
-        FolderMan *folder_man = FolderMan.instance ();
-        if (auto selected_folder = folder_man.folder (selected_folder_alias ())) {
+        FolderMan folder_man = FolderMan.instance ();
+        if (var selected_folder = folder_man.folder (selected_folder_alias ())) {
             // Terminate and reschedule any running sync
-            for (auto f : folder_man.map ()) {
+            for (var f : folder_man.map ()) {
                 if (f.is_sync_running ()) {
                     f.on_terminate_sync ();
                     folder_man.schedule_folder (f);
@@ -1130,8 +1139,8 @@ protected slots:
             AccountPtr account = _account_state.account ();
             QUrl safe_url (account.url ());
             safe_url.set_password (string ()); // Remove the password from the URL to avoid showing it in the UI
-            const auto folders = FolderMan.instance ().map ().values ();
-            for (Folder *folder : folders) {
+            const var folders = FolderMan.instance ().map ().values ();
+            for (Folder folder : folders) {
                 _model.on_update_folder_state (folder);
             }
 
@@ -1139,7 +1148,7 @@ protected slots:
                                        .arg (Utility.escape (account.url ().to_string ()),
                                            Utility.escape (safe_url.to_string ()));
             string server_with_user = server;
-            if (AbstractCredentials *cred = account.credentials ()) {
+            if (AbstractCredentials cred = account.credentials ()) {
                 string user = account.dav_display_name ();
                 if (user.is_empty ()) {
                     user = cred.user ();
@@ -1148,7 +1157,7 @@ protected slots:
             }
 
             switch (state) {
-            case AccountState.Connected : {
+            case AccountState.Connected: {
                 string[] errors;
                 if (account.server_version_unsupported ()) {
                     errors << tr ("The server version %1 is unsupported! Proceed at your own risk.").arg (account.server_version ());
@@ -1165,9 +1174,9 @@ protected slots:
             case AccountState.SignedOut:
                 show_connection_label (tr ("Signed out from %1.").arg (server_with_user));
                 break;
-            case AccountState.AskingCredentials : {
+            case AccountState.AskingCredentials: {
                 QUrl url;
-                if (auto cred = qobject_cast<HttpCredentialsGui> (account.credentials ())) {
+                if (var cred = qobject_cast<HttpCredentialsGui> (account.credentials ())) {
                     connect (cred, &HttpCredentialsGui.authorisation_link_changed,
                         this, &AccountSettings.on_account_state_changed, Qt.UniqueConnection);
                     url = cred.authorisation_link ();
@@ -1246,7 +1255,7 @@ protected slots:
                 my_folder.chop (1);
 
             // Make sure the folder itself is expanded
-            Folder *f = FolderMan.instance ().folder (alias);
+            Folder f = FolderMan.instance ().folder (alias);
             QModelIndex folder_indx = _model.index_for_path (f, string ());
             if (!_ui._folder_list.is_expanded (folder_indx)) {
                 _ui._folder_list.set_expanded (folder_indx, true);
@@ -1255,7 +1264,7 @@ protected slots:
             QModelIndex indx = _model.index_for_path (f, my_folder);
             if (indx.is_valid ()) {
                 // make sure all the parents are expanded
-                for (auto i = indx.parent (); i.is_valid (); i = i.parent ()) {
+                for (var i = indx.parent (); i.is_valid (); i = i.parent ()) {
                     if (!_ui._folder_list.is_expanded (i)) {
                         _ui._folder_list.set_expanded (i, true);
                     }
@@ -1288,7 +1297,7 @@ protected slots:
             return;
         }
 
-        const auto info = _model.info_for_index (top_left);
+        const var info = _model.info_for_index (top_left);
         if (!info) {
             return;
         }
@@ -1312,13 +1321,13 @@ protected slots:
         _ui.selective_sync_buttons.set_visible (true);
 
         if (should_be_visible != was_visible) {
-            const auto hint = _ui.selective_sync_status.size_hint ();
+            const var hint = _ui.selective_sync_status.size_hint ();
 
             if (should_be_visible) {
                 _ui.selective_sync_status.set_maximum_height (0);
             }
 
-            const auto anim = new QPropertyAnimation (_ui.selective_sync_status, "maximum_height", _ui.selective_sync_status);
+            const var anim = new QPropertyAnimation (_ui.selective_sync_status, "maximum_height", _ui.selective_sync_status);
             anim.set_end_value (_model.is_dirty () ? hint.height () : 0);
             anim.on_start (QAbstractAnimation.DeleteWhenStopped);
             connect (anim, &QPropertyAnimation.on_finished, [this, should_be_visible] () {
@@ -1333,16 +1342,16 @@ protected slots:
     void AccountSettings.refresh_selective_sync_status () {
         string msg;
         int cnt = 0;
-        const auto folders = FolderMan.instance ().map ().values ();
+        const var folders = FolderMan.instance ().map ().values ();
         _ui.big_folder_ui.set_visible (false);
-        for (Folder *folder : folders) {
+        for (Folder folder : folders) {
             if (folder.account_state () != _account_state) {
                 continue;
             }
 
             bool ok = false;
-            const auto undecided_list = folder.journal_db ().get_selective_sync_list (SyncJournalDb.SelectiveSyncUndecidedList, &ok);
-            for (auto &it : undecided_list) {
+            const var undecided_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncUndecidedList, &ok);
+            for (var &it : undecided_list) {
                 // FIXME : add the folder alias in a hoover hint.
                 // folder.alias () + QLatin1String ("/")
                 if (cnt++) {
@@ -1378,14 +1387,14 @@ protected slots:
     void AccountSettings.on_delete_account () {
         // Deleting the account potentially deletes 'this', so
         // the QMessageBox should be destroyed before that happens.
-        auto message_box = new QMessageBox (QMessageBox.Question,
+        var message_box = new QMessageBox (QMessageBox.Question,
             tr ("Confirm Account Removal"),
             tr ("<p>Do you really want to remove the connection to the account <i>%1</i>?</p>"
                "<p><b>Note:</b> This will <b>not</b> delete any files.</p>")
                 .arg (_account_state.account ().display_name ()),
             QMessageBox.NoButton,
             this);
-        auto yes_button = message_box.add_button (tr ("Remove connection"), QMessageBox.YesRole);
+        var yes_button = message_box.add_button (tr ("Remove connection"), QMessageBox.YesRole);
         message_box.add_button (tr ("Cancel"), QMessageBox.NoRole);
         message_box.set_attribute (Qt.WA_DeleteOnClose);
         connect (message_box, &QMessageBox.on_finished, this, [this, message_box, yes_button]{
@@ -1393,7 +1402,7 @@ protected slots:
                 // Else it might access during destruction. This should be better handled by it having a unowned
                 _model.set_account_state (nullptr);
 
-                auto manager = AccountManager.instance ();
+                var manager = AccountManager.instance ();
                 manager.delete_account (_account_state);
                 manager.save ();
             }
@@ -1401,7 +1410,7 @@ protected slots:
         message_box.open ();
     }
 
-    bool AccountSettings.event (QEvent *e) {
+    bool AccountSettings.event (QEvent e) {
         if (e.type () == QEvent.Hide || e.type () == QEvent.Show) {
             _user_info.set_active (is_visible ());
         }

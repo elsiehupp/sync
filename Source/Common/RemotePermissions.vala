@@ -29,8 +29,20 @@ class RemotePermissions {
     private uint16 _value = 0;
     private static constexpr int not_null_mask = 0x1;
 
+    static const char letters[] = " WDNVCKRSMm";
+
     private template <typename Char> // can be 'char' or 'ushort' if conversion from string
-    private void from_array (Char *p);
+    private void from_array (Char remote_permissions) {
+        _value = not_null_mask;
+        if (!remote_permissions)
+            return;
+        while (*remote_permissions) {
+            if (var res = std.strchr (letters, static_cast<char> (*remote_permissions)))
+                _value |= (1 << (res - letters));
+            ++remote_permissions;
+        }
+    }
+
 
     public enum Permissions {
         Can_write = 1,             // W
@@ -40,13 +52,13 @@ class RemotePermissions {
         Can_add_file = 5,           // C
         Can_add_sub_directories = 6, // K
         Can_reshare = 7,           // R
-        // Note : on the server, this means Shared_with_me, but in discoveryphase.cpp we also set
+        // Note: on the server, this means Shared_with_me, but in discoveryphase.cpp we also set
         // this permission when the server reports the any "share-types"
         IsShared = 8,             // S
         IsMounted = 9,            // M
         IsMountedSub = 10,        // m (internal : set if the parent dir has IsMounted)
 
-        // Note : when adding support for more permissions, we need to invalid the cache in the database.
+        // Note: when adding support for more permissions, we need to invalid the cache in the database.
         // (by setting force_remote_discovery in SyncJournalDb.check_connect)
         PermissionsCount = IsMountedSub
     };
@@ -55,64 +67,12 @@ class RemotePermissions {
     public RemotePermissions () = default;
 
     /// array with one character per permission, "" is null, " " is non-null but empty
-    public GLib.ByteArray to_db_value ();
-
-    /// output for display purposes, no defined format (same as to_db_value in practice)
-    public string to_string ();
-
-    /// read value that was written with to_db_value ()
-    public static RemotePermissions from_db_value (GLib.ByteArray &);
-
-    /// read a permissions string received from the server, never null
-    public static RemotePermissions from_server_string (string );
-
-    public bool has_permission (Permissions p) {
-        return _value & (1 << static_cast<int> (p));
-    }
-    public void set_permission (Permissions p) {
-        _value |= (1 << static_cast<int> (p)) | not_null_mask;
-    }
-    public void unset_permission (Permissions p) {
-        _value &= ~ (1 << static_cast<int> (p));
-    }
-
-    public bool is_null () {
-        return ! (_value & not_null_mask);
-    }
-    public friend bool operator== (RemotePermissions a, RemotePermissions b) {
-        return a._value == b._value;
-    }
-    public friend bool operator!= (RemotePermissions a, RemotePermissions b) {
-        return ! (a == b);
-    }
-
-    public friend QDebug operator<< (QDebug &dbg, RemotePermissions p) {
-        return dbg << p.to_string ();
-    }
-};
-
-
-
-    static const char letters[] = " WDNVCKRSMm";
-
-    template <typename Char>
-    void RemotePermissions.from_array (Char *p) {
-        _value = not_null_mask;
-        if (!p)
-            return;
-        while (*p) {
-            if (auto res = std.strchr (letters, static_cast<char> (*p)))
-                _value |= (1 << (res - letters));
-            ++p;
-        }
-    }
-
-    GLib.ByteArray RemotePermissions.to_db_value () {
+    public GLib.ByteArray to_database_value () {
         GLib.ByteArray result;
         if (is_null ())
             return result;
         result.reserve (PermissionsCount);
-        for (uint i = 1; i <= PermissionsCount; ++i) {
+        for (uint32 i = 1; i <= PermissionsCount; ++i) {
             if (_value & (1 << i))
                 result.append (letters[i]);
         }
@@ -123,11 +83,13 @@ class RemotePermissions {
         return result;
     }
 
-    string RemotePermissions.to_string () {
-        return string.from_utf8 (to_db_value ());
+    /// output for display purposes, no defined format (same as to_database_value in practice)
+    public string to_string () {
+        return string.from_utf8 (to_database_value ());
     }
 
-    RemotePermissions RemotePermissions.from_db_value (GLib.ByteArray &value) {
+    /// read value that was written with to_database_value ()
+    public static RemotePermissions from_database_value (GLib.ByteArray value) {
         if (value.is_empty ())
             return {};
         RemotePermissions perm;
@@ -135,11 +97,46 @@ class RemotePermissions {
         return perm;
     }
 
-    RemotePermissions RemotePermissions.from_server_string (string value) {
+    /// read a permissions string received from the server, never null
+    public static RemotePermissions from_server_string (string ) {
         RemotePermissions perm;
         perm.from_array (value.utf16 ());
         return perm;
     }
 
-    } // namespace Occ
+
+    public bool has_permission (Permissions permissions) {
+        return _value & (1 << static_cast<int> (permissions));
+    }
+    public void set_permission (Permissions permissions) {
+        _value |= (1 << static_cast<int> (permissions)) | not_null_mask;
+    }
+
+
+    public void unset_permission (Permissions permissions) {
+        _value &= ~ (1 << static_cast<int> (permissions));
+    }
+
+
+    public bool is_null () {
+        return ! (_value & not_null_mask);
+    }
+
+
+    public friend bool operator== (RemotePermissions a, RemotePermissions b) {
+        return a._value == b._value;
+    }
+
+
+    public friend bool operator!= (RemotePermissions a, RemotePermissions b) {
+        return ! (a == b);
+    }
+
+
+    public friend QDebug operator<< (QDebug &dbg, RemotePermissions remote_permissions) {
+        return dbg << remote_permissions.to_string ();
+    }
+}
+
+} // namespace Occ
     

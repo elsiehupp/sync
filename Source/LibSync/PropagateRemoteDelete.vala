@@ -19,11 +19,13 @@ class PropagateRemoteDelete : PropagateItemJob {
     QPointer<DeleteJob> _job;
     AbstractPropagateRemoteDeleteEncrypted _delete_encrypted_helper = nullptr;
 
-    public PropagateRemoteDelete (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+    public PropagateRemoteDelete (OwncloudPropagator propagator, SyncFileItemPtr &item)
         : PropagateItemJob (propagator, item) {
     }
     public void on_start () override;
     public void create_delete_job (string filename);
+
+
     public void on_abort (PropagatorJob.AbortType abort_type) override;
 
     public bool is_likely_finished_quickly () override {

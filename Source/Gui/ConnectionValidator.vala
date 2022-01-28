@@ -73,7 +73,7 @@ Here follows the state machine
 
 class ConnectionValidator : GLib.Object {
 
-    public ConnectionValidator (AccountStatePtr account_state, GLib.Object *parent = nullptr);
+    public ConnectionValidator (AccountStatePtr account_state, GLib.Object parent = nullptr);
 
     public enum Status {
         Undefined,
@@ -97,6 +97,8 @@ class ConnectionValidator : GLib.Object {
 
     /// Checks the server and the authentication.
     public void on_check_server_and_auth ();
+
+
     public void on_system_proxy_lookup_done (QNetworkProxy &proxy);
 
     /// Checks authentication only.
@@ -109,14 +111,14 @@ protected slots:
     void on_check_server_and_auth ();
 
     void on_status_found (QUrl url, QJsonObject &info);
-    void on_no_status_found (QNetworkReply *reply);
+    void on_no_status_found (QNetworkReply reply);
     void on_job_timeout (QUrl url);
 
-    void on_auth_failed (QNetworkReply *reply);
+    void on_auth_failed (QNetworkReply reply);
     void on_auth_success ();
 
     void on_capabilities_recieved (QJsonDocument &);
-    void on_user_fetched (UserInfo *user_info);
+    void on_user_fetched (UserInfo user_info);
 
 
 #ifndef TOKEN_AUTH_ONLY
@@ -125,6 +127,7 @@ protected slots:
     private void report_result (Status status);
     private void check_server_capabilities ();
     private void fetch_user ();
+
 
     /***********************************************************
     Sets the account's server version
@@ -143,7 +146,7 @@ protected slots:
     // This makes sure we get tried often enough without "ConnectionValidator already running"
     static int64 timeout_to_use_msec = q_max (1000, ConnectionValidator.DefaultCallingIntervalMsec - 5 * 1000);
 
-    ConnectionValidator.ConnectionValidator (AccountStatePtr account_state, GLib.Object *parent)
+    ConnectionValidator.ConnectionValidator (AccountStatePtr account_state, GLib.Object parent)
         : GLib.Object (parent)
         , _account_state (account_state)
         , _account (account_state.account ())
@@ -191,7 +194,7 @@ protected slots:
 
     // The actual check
     void ConnectionValidator.on_check_server_and_auth () {
-        auto *check_job = new CheckServerJob (_account, this);
+        var check_job = new CheckServerJob (_account, this);
         check_job.on_set_timeout (timeout_to_use_msec);
         check_job.set_ignore_credential_failure (true);
         connect (check_job, &CheckServerJob.instance_found, this, &ConnectionValidator.on_status_found);
@@ -235,8 +238,8 @@ protected slots:
     }
 
     // status.php could not be loaded (network or server issue!).
-    void ConnectionValidator.on_no_status_found (QNetworkReply *reply) {
-        auto job = qobject_cast<CheckServerJob> (sender ());
+    void ConnectionValidator.on_no_status_found (QNetworkReply reply) {
+        var job = qobject_cast<CheckServerJob> (sender ());
         q_c_warning (lc_connection_validator) << reply.error () << job.error_string () << reply.peek (1024);
         if (reply.error () == QNetworkReply.SslHandshakeFailedError) {
             report_result (SslError);
@@ -244,7 +247,7 @@ protected slots:
         }
 
         if (!_account.credentials ().still_valid (reply)) {
-            // Note : Why would this happen on a status.php request?
+            // Note: Why would this happen on a status.php request?
             _errors.append (tr ("Authentication error : Either username or password are wrong."));
         } else {
             //_errors.append (tr ("Unable to connect to %1").arg (_account.url ().to_string ()));
@@ -261,7 +264,7 @@ protected slots:
     }
 
     void ConnectionValidator.on_check_authentication () {
-        AbstractCredentials *creds = _account.credentials ();
+        AbstractCredentials creds = _account.credentials ();
 
         if (!creds.ready ()) {
             report_result (CredentialsNotReady);
@@ -271,7 +274,7 @@ protected slots:
         // simply GET the webdav root, will fail if credentials are wrong.
         // continue in on_auth_check here :-)
         q_c_debug (lc_connection_validator) << "# Check whether authenticated propfind works.";
-        auto *job = new PropfindJob (_account, "/", this);
+        var job = new PropfindJob (_account, "/", this);
         job.on_set_timeout (timeout_to_use_msec);
         job.set_properties (GLib.List<GLib.ByteArray> () << "getlastmodified");
         connect (job, &PropfindJob.result, this, &ConnectionValidator.on_auth_success);
@@ -279,8 +282,8 @@ protected slots:
         job.on_start ();
     }
 
-    void ConnectionValidator.on_auth_failed (QNetworkReply *reply) {
-        auto job = qobject_cast<PropfindJob> (sender ());
+    void ConnectionValidator.on_auth_failed (QNetworkReply reply) {
+        var job = qobject_cast<PropfindJob> (sender ());
         Status stat = Timeout;
 
         if (reply.error () == QNetworkReply.SslHandshakeFailedError) {
@@ -318,14 +321,14 @@ protected slots:
 
     void ConnectionValidator.check_server_capabilities () {
         // The main flow now needs the capabilities
-        auto *job = new JsonApiJob (_account, QLatin1String ("ocs/v1.php/cloud/capabilities"), this);
+        var job = new JsonApiJob (_account, QLatin1String ("ocs/v1.php/cloud/capabilities"), this);
         job.on_set_timeout (timeout_to_use_msec);
         GLib.Object.connect (job, &JsonApiJob.json_received, this, &ConnectionValidator.on_capabilities_recieved);
         job.on_start ();
     }
 
     void ConnectionValidator.on_capabilities_recieved (QJsonDocument &json) {
-        auto caps = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
+        var caps = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
         q_c_info (lc_connection_validator) << "Server capabilities" << caps;
         _account.set_capabilities (caps.to_variant_map ());
 
@@ -344,7 +347,7 @@ protected slots:
     }
 
     void ConnectionValidator.fetch_user () {
-        auto *user_info = new UserInfo (_account_state.data (), true, true, this);
+        var user_info = new UserInfo (_account_state.data (), true, true, this);
         GLib.Object.connect (user_info, &UserInfo.fetched_last_info, this, &ConnectionValidator.on_user_fetched);
         user_info.set_active (true);
     }
@@ -367,8 +370,8 @@ protected slots:
     #if QT_VERSION >= QT_VERSION_CHECK (5, 9, 0)
         // Record that the server supports HTTP/2
         // Actual decision if we should use HTTP/2 is done in AccessManager.create_request
-        if (auto job = qobject_cast<AbstractNetworkJob> (sender ())) {
-            if (auto reply = job.reply ()) {
+        if (var job = qobject_cast<AbstractNetworkJob> (sender ())) {
+            if (var reply = job.reply ()) {
                 _account.set_http2Supported (
                     reply.attribute (QNetworkRequest.HTTP2WasUsedAttribute).to_bool ());
             }
@@ -377,7 +380,7 @@ protected slots:
         return true;
     }
 
-    void ConnectionValidator.on_user_fetched (UserInfo *user_info) {
+    void ConnectionValidator.on_user_fetched (UserInfo user_info) {
         if (user_info) {
             user_info.set_active (false);
             user_info.delete_later ();

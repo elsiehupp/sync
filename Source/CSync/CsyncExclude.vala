@@ -60,6 +60,7 @@ class ExcludedFiles : GLib.Object {
     public ExcludedFiles (string local_path = QStringLiteral ("/"));
     ~ExcludedFiles () override;
 
+
     /***********************************************************
     Adds a new path to a file containing exclude patterns.
 
@@ -67,12 +68,14 @@ class ExcludedFiles : GLib.Object {
     ***********************************************************/
     public void add_exclude_file_path (string path);
 
+
     /***********************************************************
     Whether conflict files shall be excluded.
 
     Defaults to true.
     ***********************************************************/
     public void set_exclude_conflict_files (bool onoff);
+
 
     /***********************************************************
     Checks whether a file or directory should be excluded.
@@ -85,6 +88,7 @@ class ExcludedFiles : GLib.Object {
         const string base_path,
         bool exclude_hidden);
 
+
     /***********************************************************
     Adds an exclude pattern anchored to base path
 
@@ -92,7 +96,10 @@ class ExcludedFiles : GLib.Object {
     on_reload_exclude_files () is called.
     ***********************************************************/
     public void add_manual_exclude (string expr);
+
+
     public void add_manual_exclude (string expr, string base_path);
+
 
     /***********************************************************
     Removes all manually added exclude patterns.
@@ -101,15 +108,18 @@ class ExcludedFiles : GLib.Object {
     ***********************************************************/
     public void clear_manual_excludes ();
 
+
     /***********************************************************
     Adjusts behavior of wildcards. Only used for testing.
     ***********************************************************/
     public void set_wildcards_match_slash (bool onoff);
 
+
     /***********************************************************
     Sets the client version, only used for testing.
     ***********************************************************/
     public void set_client_version (Version version);
+
 
     /***********************************************************
     @brief Check if the given path should be excluded in a traversal situation.
@@ -156,7 +166,8 @@ class ExcludedFiles : GLib.Object {
 
     Would enable the "myexclude" pattern only for versions before 2.5.0.
     ***********************************************************/
-    private bool version_directive_keep_next_line (GLib.ByteArray &directive);
+    private bool version_directive_keep_next_line (GLib.ByteArray directive);
+
 
     /***********************************************************
     @brief Match the exclude pattern against the full path.
@@ -180,6 +191,7 @@ class ExcludedFiles : GLib.Object {
             Q_ASSERT (ends_with (QLatin1Char ('/')));
         }
     };
+
 
     /***********************************************************
     Generate optimized regular expressions for the exclude patterns anchored to base_path.
@@ -206,7 +218,7 @@ class ExcludedFiles : GLib.Object {
     and only runs a simplified _full_traversal_regex on the whole path if bname
     activation for it was triggered.
 
-    Note : The traversal matcher will return not-excluded on some paths that
+    Note: The traversal matcher will return not-excluded on some paths that
     full matcher would exclude. Example: "b" is excluded. traversal ("b/c")
     returns not-excluded because "c" isn't a bname activation pattern.
     ***********************************************************/
@@ -238,6 +250,7 @@ class ExcludedFiles : GLib.Object {
 
     private bool _exclude_conflict_files = true;
 
+
     /***********************************************************
     Whether * and ? in patterns can match a /
 
@@ -245,6 +258,7 @@ class ExcludedFiles : GLib.Object {
     it continues to be enabled there.
     ***********************************************************/
     private bool _wildcards_match_slash = false;
+
 
     /***********************************************************
     The client version. Used to evaluate version-dependent excludes,
@@ -300,10 +314,10 @@ const int _GNU_SOURCE
 /***********************************************************
 Expands C-like escape sequences (in place)
 ***********************************************************/
-OCSYNC_EXPORT void csync_exclude_expand_escapes (GLib.ByteArray &input) {
+OCSYNC_EXPORT void csync_exclude_expand_escapes (GLib.ByteArray input) {
     size_t o = 0;
-    char *line = input.data ();
-    auto len = input.size ();
+    char line = input.data ();
+    var len = input.size ();
     for (int i = 0; i < len; ++i) {
         if (line[i] == '\\') {
             // at worst input[i+1] is \0
@@ -338,13 +352,13 @@ OCSYNC_EXPORT void csync_exclude_expand_escapes (GLib.ByteArray &input) {
 // See http://support.microsoft.com/kb/74496 and
 // https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247 (v=vs.85).aspx
 // Additionally, we ignore '$Recycle.Bin', see https://github.com/owncloud/client/issues/2955
-static const char *win_reserved_words_3[] = {
+static const char win_reserved_words_3[] = {
     "CON",
     "PRN",
     "AUX",
     "NUL"
 };
-static const char *win_reserved_words_4[] = {
+static const char win_reserved_words_4[] = {
     "COM1",
     "COM2",
     "COM3",
@@ -364,7 +378,7 @@ static const char *win_reserved_words_4[] = {
     "LPT8",
     "LPT9"
 };
-static const char *win_reserved_words_n[] = {
+static const char win_reserved_words_n[] = {
     "CLOCK$",
     "$Recycle.Bin"
 };
@@ -388,7 +402,7 @@ OCSYNC_EXPORT bool csync_is_windows_reserved_word (QStringRef &filename) {
     }
 
     if (len_filename == 3 || (len_filename > 3 && filename.at (3) == QLatin1Char ('.'))) {
-        for (char *word : win_reserved_words_3) {
+        for (char word : win_reserved_words_3) {
             if (filename.left (3).compare (QLatin1String (word), Qt.CaseInsensitive) == 0) {
                 return true;
             }
@@ -396,14 +410,14 @@ OCSYNC_EXPORT bool csync_is_windows_reserved_word (QStringRef &filename) {
     }
 
     if (len_filename == 4 || (len_filename > 4 && filename.at (4) == QLatin1Char ('.'))) {
-        for (char *word : win_reserved_words_4) {
+        for (char word : win_reserved_words_4) {
             if (filename.left (4).compare (QLatin1String (word), Qt.CaseInsensitive) == 0) {
                 return true;
             }
         }
     }
 
-    for (char *word : win_reserved_words_n) {
+    for (char word : win_reserved_words_n) {
         if (filename.compare (QLatin1String (word), Qt.CaseInsensitive) == 0) {
             return true;
         }
@@ -459,7 +473,7 @@ static CSYNC_EXCLUDE_TYPE _csync_excluded_common (string path, bool exclude_conf
     }
 
     // Filter out characters not allowed in a filename on windows
-    for (auto p : path) {
+    for (var p : path) {
         const ushort c = p.unicode ();
         if (c < 32) {
             return CSYNC_FILE_EXCLUDE_INVALID_CHAR;
@@ -481,7 +495,7 @@ static CSYNC_EXCLUDE_TYPE _csync_excluded_common (string path, bool exclude_conf
 #endif
 
     /* Do not sync desktop.ini files anywhere in the tree. */
-    const auto desktop_ini_file = QStringLiteral ("desktop.ini");
+    const var desktop_ini_file = QStringLiteral ("desktop.ini");
     if (blen == static_cast<qsizetype> (desktop_ini_file.length ()) && bname.compare (desktop_ini_file, Qt.CaseInsensitive) == 0) {
         return CSYNC_FILE_SILENTLY_EXCLUDED;
     }
@@ -503,7 +517,7 @@ ExcludedFiles.ExcludedFiles (string local_path)
     : _local_path (local_path)
     , _client_version (MIRALL_VERSION_MAJOR, MIRALL_VERSION_MINOR, MIRALL_VERSION_PATCH) {
     Q_ASSERT (_local_path.ends_with (QStringLiteral ("/")));
-    // Windows used to use Path_match_spec which allows *foo to match abc/deffoo.
+    // Windows used to use Path_match_spec which allows foo to match abc/deffoo.
     _wildcards_match_slash = Utility.is_windows ();
 
     // We're in a detached exclude probably coming from a partial sync or test
@@ -515,11 +529,11 @@ ExcludedFiles.~ExcludedFiles () = default;
 
 void ExcludedFiles.add_exclude_file_path (string path) {
     const QFileInfo exclude_file_info (path);
-    const auto file_name = exclude_file_info.file_name ();
-    const auto base_path = file_name.compare (QStringLiteral ("sync-exclude.lst"), Qt.CaseInsensitive) == 0
+    const var file_name = exclude_file_info.file_name ();
+    const var base_path = file_name.compare (QStringLiteral ("sync-exclude.lst"), Qt.CaseInsensitive) == 0
                                                                     ? _local_path
                                                                     : left_include_last (path, QLatin1Char ('/'));
-    auto &exclude_files_local_path = _exclude_files[base_path];
+    var &exclude_files_local_path = _exclude_files[base_path];
     if (std.find (exclude_files_local_path.cbegin (), exclude_files_local_path.cend (), path) == exclude_files_local_path.cend ()) {
         exclude_files_local_path.append (path);
     }
@@ -536,7 +550,7 @@ void ExcludedFiles.add_manual_exclude (string expr) {
 void ExcludedFiles.add_manual_exclude (string expr, string base_path) {
     Q_ASSERT (base_path.ends_with (QLatin1Char ('/')));
 
-    auto key = base_path;
+    var key = base_path;
     _manual_excludes[key].append (expr);
     _all_excludes[key].append (expr);
     prepare (key);
@@ -588,10 +602,10 @@ bool ExcludedFiles.on_reload_exclude_files () {
     _full_regex_dir.clear ();
 
     bool on_success = true;
-    const auto keys = _exclude_files.keys ();
-    for (auto& base_path : keys) {
-        for (auto &exclude_file : _exclude_files.value (base_path)) {
-            QFile file (exclude_file);
+    const var keys = _exclude_files.keys ();
+    for (var& base_path : keys) {
+        for (var &exclude_file : _exclude_files.value (base_path)) {
+            QFile file = new QFile (exclude_file);
             if (file.exists () && file.open (QIODevice.ReadOnly)) {
                 on_load_exclude_file_patterns (base_path, file);
             } else {
@@ -601,8 +615,8 @@ bool ExcludedFiles.on_reload_exclude_files () {
         }
     }
 
-    auto end_manual = _manual_excludes.cend ();
-    for (auto kv = _manual_excludes.cbegin (); kv != end_manual; ++kv) {
+    var end_manual = _manual_excludes.cend ();
+    for (var kv = _manual_excludes.cbegin (); kv != end_manual; ++kv) {
         _all_excludes[kv.key ()].append (kv.value ());
         prepare (kv.key ());
     }
@@ -610,7 +624,7 @@ bool ExcludedFiles.on_reload_exclude_files () {
     return on_success;
 }
 
-bool ExcludedFiles.version_directive_keep_next_line (GLib.ByteArray &directive) {
+bool ExcludedFiles.version_directive_keep_next_line (GLib.ByteArray directive) {
     if (!directive.starts_with ("#!version"))
         return true;
     QByte_array_list args = directive.split (' ');
@@ -621,7 +635,7 @@ bool ExcludedFiles.version_directive_keep_next_line (GLib.ByteArray &directive) 
     if (arg_versions.size () != 3)
         return true;
 
-    auto arg_version = std.make_tuple (arg_versions[0].to_int (), arg_versions[1].to_int (), arg_versions[2].to_int ());
+    var arg_version = std.make_tuple (arg_versions[0].to_int (), arg_versions[1].to_int (), arg_versions[2].to_int ());
     if (op == "<=")
         return _client_version <= arg_version;
     if (op == "<")
@@ -647,7 +661,7 @@ bool ExcludedFiles.is_excluded (
     //TODO this seems a waste, hidden files are ignored before hitting this function it seems
     if (exclude_hidden) {
         string path = file_path;
-        // Check all path subcomponents, but to *not* check the base path:
+        // Check all path subcomponents, but to not* check the base path:
         // We do want to be able to sync with a hidden folder as the target.
         while (path.size () > base_path.size ()) {
             QFileInfo fi (path);
@@ -676,7 +690,7 @@ bool ExcludedFiles.is_excluded (
 }
 
 CSYNC_EXCLUDE_TYPE ExcludedFiles.traversal_pattern_match (string path, ItemType filetype) {
-    auto match = _csync_excluded_common (path, _exclude_conflict_files);
+    var match = _csync_excluded_common (path, _exclude_conflict_files);
     if (match != CSYNC_NOT_EXCLUDED)
         return match;
     if (_all_excludes.is_empty ())
@@ -684,7 +698,7 @@ CSYNC_EXCLUDE_TYPE ExcludedFiles.traversal_pattern_match (string path, ItemType 
 
     // Directories are guaranteed to be visited before their files
     if (filetype == ItemTypeDirectory) {
-        const auto base_path = string (_local_path + path + QLatin1Char ('/'));
+        const var base_path = string (_local_path + path + QLatin1Char ('/'));
         const string absolute_path = base_path + QStringLiteral (".sync-exclude.lst");
         QFileInfo exclude_file_info (absolute_path);
 
@@ -754,7 +768,7 @@ CSYNC_EXCLUDE_TYPE ExcludedFiles.traversal_pattern_match (string path, ItemType 
 }
 
 CSYNC_EXCLUDE_TYPE ExcludedFiles.full_pattern_match (string p, ItemType filetype) {
-    auto match = _csync_excluded_common (p, _exclude_conflict_files);
+    var match = _csync_excluded_common (p, _exclude_conflict_files);
     if (match != CSYNC_NOT_EXCLUDED)
         return match;
     if (_all_excludes.is_empty ())
@@ -811,11 +825,11 @@ string ExcludedFiles.convert_to_regexp_syntax (string exclude, bool wildcards_ma
     string regex;
     int i = 0;
     int chars_to_escape = 0;
-    auto flush = [&] () {
+    var flush = [&] () {
         regex.append (QRegularExpression.escape (exclude.mid (i - chars_to_escape, chars_to_escape)));
         chars_to_escape = 0;
     };
-    auto len = exclude.size ();
+    var len = exclude.size ();
     for (; i < len; ++i) {
         switch (exclude[i].unicode ()) {
         case '*':
@@ -834,10 +848,10 @@ string ExcludedFiles.convert_to_regexp_syntax (string exclude, bool wildcards_ma
                 regex.append (QStringLiteral ("[^/]"));
             }
             break;
-        case '[' : {
+        case '[': {
             flush ();
             // Find the end of the bracket expression
-            auto j = i + 1;
+            var j = i + 1;
             for (; j < len; ++j) {
                 if (exclude[j] == QLatin1Char (']'))
                     break;
@@ -900,7 +914,7 @@ string ExcludedFiles.extract_bname_trigger (string exclude, bool wildcards_match
     // - "foo*bar*" can match "foo_x/Xbar_x", pattern is "*bar*"
     // - "foo?bar" can match "foo/bar" but also "foo_xbar", pattern is "*bar"
 
-    auto is_wildcard = [] (QChar c) {
+    var is_wildcard = [] (QChar c) {
         return c == QLatin1Char ('*') || c == QLatin1Char ('?');
     };
 
@@ -932,8 +946,8 @@ void ExcludedFiles.prepare () {
     _full_regex_file.clear ();
     _full_regex_dir.clear ();
 
-    const auto keys = _all_excludes.keys ();
-    for (auto const & base_path : keys)
+    const var keys = _all_excludes.keys ();
+    for (var const & base_path : keys)
         prepare (base_path);
 }
 
@@ -974,14 +988,14 @@ void ExcludedFiles.prepare (Base_path_string & base_path) {
     string bname_trigger_file_dir;
     string bname_trigger_dir;
 
-    auto regex_append = [] (string file_dir_pattern, string dir_pattern, string append_me, bool dir_only) {
+    var regex_append = [] (string file_dir_pattern, string dir_pattern, string append_me, bool dir_only) {
         string pattern = dir_only ? dir_pattern : file_dir_pattern;
         if (!pattern.is_empty ())
             pattern.append (QLatin1Char ('|'));
         pattern.append (append_me);
     };
 
-    for (auto exclude : _all_excludes.value (base_path)) {
+    for (var exclude : _all_excludes.value (base_path)) {
         if (exclude[0] == QLatin1Char ('\n'))
             continue; // empty line
         if (exclude[0] == QLatin1Char ('\r'))
@@ -998,21 +1012,21 @@ void ExcludedFiles.prepare (Base_path_string & base_path) {
         bool full_path = exclude.contains (QLatin1Char ('/'));
 
         /* Use QRegularExpression, append to the right pattern */
-        auto &bname_file_dir = remove_excluded ? bname_file_dir_remove : bname_file_dir_keep;
-        auto &bname_dir = remove_excluded ? bname_dir_remove : bname_dir_keep;
-        auto &full_file_dir = remove_excluded ? full_file_dir_remove : full_file_dir_keep;
-        auto &full_dir = remove_excluded ? full_dir_remove : full_dir_keep;
+        var &bname_file_dir = remove_excluded ? bname_file_dir_remove : bname_file_dir_keep;
+        var &bname_dir = remove_excluded ? bname_dir_remove : bname_dir_keep;
+        var &full_file_dir = remove_excluded ? full_file_dir_remove : full_file_dir_keep;
+        var &full_dir = remove_excluded ? full_dir_remove : full_dir_keep;
 
         if (full_path) {
             // The full pattern is matched against a path relative to _local_path, however exclude is
             // relative to base_path at this point.
             // We know for sure that both _local_path and base_path are absolute and that base_path is
             // contained in _local_path. So we can simply remove it from the begining.
-            auto rel_path = base_path.mid (_local_path.size ());
+            var rel_path = base_path.mid (_local_path.size ());
             // Make exclude relative to _local_path
             exclude.prepend (rel_path);
         }
-        auto regex_exclude = convert_to_regexp_syntax (exclude, _wildcards_match_slash);
+        var regex_exclude = convert_to_regexp_syntax (exclude, _wildcards_match_slash);
         if (!full_path) {
             regex_append (bname_file_dir, bname_dir, regex_exclude, match_dir_only);
         } else {
@@ -1020,13 +1034,13 @@ void ExcludedFiles.prepare (Base_path_string & base_path) {
 
             // For activation, trigger on the 'bname' part of the full pattern.
             string bname_exclude = extract_bname_trigger (exclude, _wildcards_match_slash);
-            auto regex_bname = convert_to_regexp_syntax (bname_exclude, true);
+            var regex_bname = convert_to_regexp_syntax (bname_exclude, true);
             regex_append (bname_trigger_file_dir, bname_trigger_dir, regex_bname, match_dir_only);
         }
     }
 
     // The empty pattern would match everything - change it to match-nothing
-    auto empty_match_nothing = [] (string pattern) {
+    var empty_match_nothing = [] (string pattern) {
         if (pattern.is_empty ())
             pattern = QStringLiteral ("a^");
     };

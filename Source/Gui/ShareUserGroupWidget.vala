@@ -39,7 +39,7 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 // #include <qscrollarea.h>
 
 namespace {
-    const char *password_is_set_placeholder = "●●●●●●●●";
+    const char password_is_set_placeholder = "●●●●●●●●";
 
 }
 
@@ -54,14 +54,14 @@ class Share_manager;
 
 class Avatar_event_filter : GLib.Object {
 
-    public Avatar_event_filter (GLib.Object *parent = nullptr);
+    public Avatar_event_filter (GLib.Object parent = nullptr);
 
 signals:
     void clicked ();
     void context_menu (QPoint &global_position);
 
 
-    protected bool event_filter (GLib.Object *obj, QEvent *event) override;
+    protected bool event_filter (GLib.Object obj, QEvent event) override;
 };
 
 /***********************************************************
@@ -75,7 +75,7 @@ class Share_user_group_widget : Gtk.Widget {
         const string local_path,
         Share_permissions max_sharing_permissions,
         const string private_link_url,
-        Gtk.Widget *parent = nullptr);
+        Gtk.Widget parent = nullptr);
     ~Share_user_group_widget () override;
 
 signals:
@@ -83,7 +83,11 @@ signals:
     void style_changed ();
 
     public void on_get_shares ();
+
+
     public void on_share_created (unowned<Share> &share);
+
+
     public void on_style_changed ();
 
 
@@ -140,7 +144,7 @@ class Share_user_line : Gtk.Widget {
         unowned<User_group_share> Share,
         Share_permissions max_sharing_permissions,
         bool is_file,
-        Gtk.Widget *parent = nullptr);
+        Gtk.Widget parent = nullptr);
     ~Share_user_line () override;
 
     public unowned<Share> share ();
@@ -225,13 +229,13 @@ signals:
 };
 
 
-    Avatar_event_filter.Avatar_event_filter (GLib.Object *parent)
-        : GLib.Object (parent) {
+    Avatar_event_filter.Avatar_event_filter (GLib.Object parent) {
+        base (parent);
     }
 
-    bool Avatar_event_filter.event_filter (GLib.Object *obj, QEvent *event) {
+    bool Avatar_event_filter.event_filter (GLib.Object obj, QEvent event) {
         if (event.type () == QEvent.Context_menu) {
-            const auto context_menu_event = dynamic_cast<QContext_menu_event> (event);
+            const var context_menu_event = dynamic_cast<QContext_menu_event> (event);
             if (!context_menu_event) {
                 return false;
             }
@@ -246,7 +250,7 @@ signals:
         const string local_path,
         Share_permissions max_sharing_permissions,
         const string private_link_url,
-        Gtk.Widget *parent)
+        Gtk.Widget parent)
         : Gtk.Widget (parent)
         , _ui (new Ui.Share_user_group_widget)
         , _account (account)
@@ -275,7 +279,7 @@ signals:
         _completer.set_completion_mode (QCompleter.Unfiltered_popup_completion);
         _ui.sharee_line_edit.set_completer (_completer);
 
-        auto search_globally_action = new QAction (_ui.sharee_line_edit);
+        var search_globally_action = new QAction (_ui.sharee_line_edit);
         search_globally_action.set_icon (QIcon (":/client/theme/magnifying-glass.svg"));
         search_globally_action.set_tool_tip (tr ("Search globally"));
 
@@ -343,9 +347,9 @@ signals:
     void Share_user_group_widget.on_line_edit_return () {
         _disable_completer_activated = false;
         // did the user type in one of the options?
-        const auto text = _ui.sharee_line_edit.text ();
+        const var text = _ui.sharee_line_edit.text ();
         for (int i = 0; i < _completer_model.row_count (); ++i) {
-            const auto sharee = _completer_model.get_sharee (i);
+            const var sharee = _completer_model.get_sharee (i);
             if (sharee.format () == text
                 || sharee.display_name () == text
                 || sharee.share_with () == text) {
@@ -375,7 +379,7 @@ signals:
         unowned<Sharee> current_user (new Sharee (_account.credentials ().user (), "", Sharee.Type.User));
         blacklist << current_user;
 
-        foreach (auto sw, _parent_scroll_area.find_children<Share_user_line> ()) {
+        foreach (var sw, _parent_scroll_area.find_children<Share_user_line> ()) {
             blacklist << sw.share ().get_share_with ();
         }
         _ui.error_label.hide ();
@@ -396,18 +400,18 @@ signals:
     }
 
     void Share_user_group_widget.on_shares_fetched (GLib.List<unowned<Share>> &shares) {
-        QScroll_area *scroll_area = _parent_scroll_area;
+        QScroll_area scroll_area = _parent_scroll_area;
 
-        auto new_view_port = new Gtk.Widget (scroll_area);
-        auto layout = new QVBoxLayout (new_view_port);
+        var new_view_port = new Gtk.Widget (scroll_area);
+        var layout = new QVBoxLayout (new_view_port);
         layout.set_contents_margins (0, 0, 0, 0);
         int x = 0;
         int height = 0;
         GLib.List<string> link_owners ({});
 
-        Share_user_line *just_created_share_that_needs_password = nullptr;
+        Share_user_line just_created_share_that_needs_password = nullptr;
 
-        foreach (auto &share, shares) {
+        foreach (var &share, shares) {
             // We don't handle link shares, only Type_user or Type_group
             if (share.get_share_type () == Share.Type_link) {
                 if (!share.get_uid_owner ().is_empty () &&
@@ -424,8 +428,8 @@ signals:
             }
 
             Q_ASSERT (Share.is_share_type_user_group_email_room_or_remote (share.get_share_type ()));
-            auto user_group_share = q_shared_pointer_dynamic_cast<User_group_share> (share);
-            auto *s = new Share_user_line (_account, user_group_share, _max_sharing_permissions, _is_file, _parent_scroll_area);
+            var user_group_share = q_shared_pointer_dynamic_cast<User_group_share> (share);
+            var s = new Share_user_line (_account, user_group_share, _max_sharing_permissions, _is_file, _parent_scroll_area);
             connect (s, &Share_user_line.resize_requested, this, &Share_user_group_widget.on_adjust_scroll_widget_size);
             connect (s, &Share_user_line.visual_deletion_done, this, &Share_user_group_widget.on_get_shares);
             s.set_background_role (layout.count () % 2 == 0 ? QPalette.Base : QPalette.Alternate_base);
@@ -449,7 +453,7 @@ signals:
         }
 
         foreach (string owner, link_owners) {
-            auto owner_label = new QLabel (string (owner + " shared via link"));
+            var owner_label = new QLabel (string (owner + " shared via link"));
             layout.add_widget (owner_label);
             owner_label.set_visible (true);
 
@@ -474,15 +478,15 @@ signals:
     }
 
     void Share_user_group_widget.on_adjust_scroll_widget_size () {
-        QScroll_area *scroll_area = _parent_scroll_area;
-        const auto share_user_line_childs = scroll_area.find_children<Share_user_line> ();
+        QScroll_area scroll_area = _parent_scroll_area;
+        const var share_user_line_childs = scroll_area.find_children<Share_user_line> ();
 
         // Ask the child widgets to calculate their size
-        for (auto share_user_line_child : share_user_line_childs) {
+        for (var share_user_line_child : share_user_line_childs) {
             share_user_line_child.adjust_size ();
         }
 
-        const auto share_user_line_childs_count = share_user_line_childs.count ();
+        const var share_user_line_childs_count = share_user_line_childs.count ();
         scroll_area.set_visible (share_user_line_childs_count > 0);
         if (share_user_line_childs_count > 0 && share_user_line_childs_count <= 3) {
             scroll_area.set_fixed_height (scroll_area.widget ().size_hint ().height ());
@@ -491,7 +495,7 @@ signals:
     }
 
     void Share_user_group_widget.on_private_link_share () {
-        auto menu = new QMenu (this);
+        var menu = new QMenu (this);
         menu.set_attribute (Qt.WA_DeleteOnClose);
 
         // this icon is not handled by on_style_changed () . customize_style but we can live with that
@@ -519,13 +523,13 @@ signals:
             return;
         // The index is an index from the QCompletion model which is itelf a proxy
         // model proxying the _completer_model
-        auto sharee = qvariant_cast<unowned<Sharee>> (index.data (Qt.User_role));
+        var sharee = qvariant_cast<unowned<Sharee>> (index.data (Qt.User_role));
         if (sharee.is_null ()) {
             return;
         }
 
     // TODO Progress Indicator where should it go?
-    //    auto indicator = new QProgress_indicator (view_port);
+    //    var indicator = new QProgress_indicator (view_port);
     //    indicator.on_start_animation ();
     //    if (layout.count () == 1) {
     //        // No shares yet! Remove the label, add some stretch.
@@ -580,7 +584,7 @@ signals:
         _pi_sharee.on_stop_animation ();
 
         // Also remove the spinner in the widget list, if any
-        foreach (auto pi, _parent_scroll_area.find_children<QProgress_indicator> ()) {
+        foreach (var pi, _parent_scroll_area.find_children<QProgress_indicator> ()) {
             delete pi;
         }
 
@@ -617,7 +621,7 @@ signals:
 
         _pi_sharee.on_set_color (QGuiApplication.palette ().color (QPalette.Text));
 
-        foreach (auto pi, _parent_scroll_area.find_children<QProgress_indicator> ()) {
+        foreach (var pi, _parent_scroll_area.find_children<QProgress_indicator> ()) {
             pi.on_set_color (QGuiApplication.palette ().color (QPalette.Text));;
         }
     }
@@ -628,7 +632,7 @@ signals:
     }
 
     Share_user_line.Share_user_line (AccountPtr account, unowned<User_group_share> share,
-        Share_permissions max_sharing_permissions, bool is_file, Gtk.Widget *parent)
+        Share_permissions max_sharing_permissions, bool is_file, Gtk.Widget parent)
         : Gtk.Widget (parent)
         , _ui (new Ui.Share_user_line)
         , _account (account)
@@ -659,7 +663,7 @@ signals:
         connect (_ui.line_edit_password, &QLineEdit.return_pressed, this, &Share_user_line.on_line_edit_password_return_pressed);
 
         // create menu with checkable permissions
-        auto *menu = new QMenu (this);
+        var menu = new QMenu (this);
         _permission_reshare= new QAction (tr ("Can reshare"), this);
         _permission_reshare.set_checkable (true);
         _permission_reshare.set_enabled (max_sharing_permissions & Share_permission_share);
@@ -691,7 +695,7 @@ signals:
             _expiration_date_link_action.set_checkable (true);
             menu.add_action (_expiration_date_link_action);
             connect (_expiration_date_link_action, &QAction.triggered, this, &Share_user_line.toggle_expire_date_options);
-            const auto expire_date = _share.get_expire_date ().is_valid () ? share.data ().get_expire_date () : QDate ();
+            const var expire_date = _share.get_expire_date ().is_valid () ? share.data ().get_expire_date () : QDate ();
             if (!expire_date.is_null ()) {
                 _expiration_date_link_action.set_checked (true);
                 show_expire_date_options (true, expire_date);
@@ -777,7 +781,7 @@ signals:
             _permission_reshare.set_visible (false);
         }
 
-        const auto avatar_event_filter = new Avatar_event_filter (_ui.avatar);
+        const var avatar_event_filter = new Avatar_event_filter (_ui.avatar);
         connect (avatar_event_filter, &Avatar_event_filter.context_menu, this, &Share_user_line.on_avatar_context_menu);
         _ui.avatar.install_event_filter (avatar_event_filter);
 
@@ -809,7 +813,7 @@ signals:
         Currently only regular users can have avatars.
          */
         if (_share.get_share_with ().type () == Sharee.User) {
-            auto *job = new AvatarJob (_share.account (), _share.get_share_with ().share_with (), avatar_size, this);
+            var job = new AvatarJob (_share.account (), _share.get_share_with ().share_with (), avatar_size, this);
             connect (job, &AvatarJob.avatar_pixmap, this, &Share_user_line.on_avatar_loaded);
             job.on_start ();
         }
@@ -822,7 +826,7 @@ signals:
          */
 
         // See core/js/placeholder.js for details on colors and styling
-        const auto background_color = background_color_for_sharee_type (_share.get_share_with ().type ());
+        const var background_color = background_color_for_sharee_type (_share.get_share_with ().type ());
         const string style = string (R" (* {
             color : #fff;
             background-color : %1;
@@ -833,7 +837,7 @@ signals:
         })").arg (background_color.name (), string.number (avatar_size / 2));
         _ui.avatar.set_style_sheet (style);
 
-        const auto pixmap = pixmap_for_sharee_type (_share.get_share_with ().type (), background_color);
+        const var pixmap = pixmap_for_sharee_type (_share.get_share_with ().type (), background_color);
 
         if (!pixmap.is_null ()) {
             _ui.avatar.set_pixmap (pixmap);
@@ -841,7 +845,7 @@ signals:
             q_c_debug (lc_sharing) << "pixmap is null for share type : " << _share.get_share_with ().type ();
 
             // The avatar label is the first character of the user name.
-            const auto text = _share.get_share_with ().display_name ();
+            const var text = _share.get_share_with ().display_name ();
             _ui.avatar.on_set_text (text.at (0).to_upper ());
         }
     }
@@ -1013,7 +1017,7 @@ signals:
     }
 
     void Share_user_line.on_share_deleted () {
-        auto *animation = new QPropertyAnimation (this, "maximum_height", this);
+        var animation = new QPropertyAnimation (this, "maximum_height", this);
 
         animation.set_duration (500);
         animation.set_start_value (height ());
@@ -1035,7 +1039,7 @@ signals:
     }
 
     void Share_user_line.display_permissions () {
-        auto perm = _share.get_permissions ();
+        var perm = _share.get_permissions ();
 
     //  folders edit = CREATE, READ, UPDATE, DELETE
     //  files edit = READ + UPDATE
@@ -1109,8 +1113,8 @@ signals:
             break;
         }
 
-        const auto calculate_background_based_on_text = [this] () {
-            const auto hash = QCryptographicHash.hash (_ui.shared_with.text ().to_utf8 (), QCryptographicHash.Md5);
+        const var calculate_background_based_on_text = [this] () {
+            const var hash = QCryptographicHash.hash (_ui.shared_with.text ().to_utf8 (), QCryptographicHash.Md5);
             Q_ASSERT (hash.size () > 0);
             if (hash.size () == 0) {
                 q_c_warning (lc_sharing) << "Failed to calculate hash color for share:" << _share.path ();
@@ -1129,7 +1133,7 @@ signals:
         _ui.note_confirm_button.set_visible (show);
 
         if (show) {
-            const auto note = _share.get_note ();
+            const var note = _share.get_note ();
             _ui.note_text_edit.on_set_text (note);
             _ui.note_text_edit.set_focus ();
         }
@@ -1215,7 +1219,7 @@ signals:
     }
 
     QDate Share_user_line.max_expiration_date_for_share (Share.Share_type type, QDate &fallback_date) {
-        auto days_to_expire = 0;
+        var days_to_expire = 0;
         if (type == Share.Share_type.Type_remote) {
             days_to_expire = _account.capabilities ().share_remote_expire_date_days ();
         } else if (type == Share.Share_type.Type_email) {

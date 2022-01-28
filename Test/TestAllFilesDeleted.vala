@@ -16,7 +16,7 @@ static void changeAllFileId (FileInfo &info) {
     if (!info.isDir)
         return;
     info.etag = generateEtag ();
-    for (auto &child : info.children) {
+    for (var &child : info.children) {
         changeAllFileId (child);
     }
 }
@@ -34,6 +34,7 @@ class TestAllFilesDeleted : GLib.Object {
 
     }
 
+
     /***********************************************************
      * In this test, all files are deleted in the client, or the server, and we simulate
      * that the users press "keep"
@@ -50,7 +51,7 @@ class TestAllFilesDeleted : GLib.Object {
         fakeFolder.syncEngine ().journal ().setSelectiveSyncList (SyncJournalDb.SelectiveSyncBlackList,
                                                                 selectiveSyncBlackList);
 
-        auto initialState = fakeFolder.currentLocalState ();
+        var initialState = fakeFolder.currentLocalState ();
         int aboutToRemoveAllFilesCalled = 0;
         GLib.Object.connect (&fakeFolder.syncEngine (), &SyncEngine.aboutToRemoveAllFiles,
             [&] (SyncFileItem.Direction dir, std.function<void (bool)> callback) {
@@ -61,8 +62,8 @@ class TestAllFilesDeleted : GLib.Object {
                 fakeFolder.syncEngine ().journal ().clearFileTable (); // That's what Folder is doing
             });
 
-        auto &modifier = deleteOnRemote ? fakeFolder.remoteModifier () : fakeFolder.localModifier ();
-        for (auto &s : fakeFolder.currentRemoteState ().children.keys ())
+        var &modifier = deleteOnRemote ? fakeFolder.remoteModifier () : fakeFolder.localModifier ();
+        for (var &s : fakeFolder.currentRemoteState ().children.keys ())
             modifier.remove (s);
 
         QVERIFY (!fakeFolder.syncOnce ()); // Should fail because we cancel the sync
@@ -83,6 +84,7 @@ class TestAllFilesDeleted : GLib.Object {
         testAllFilesDeletedKeep_data ();
     }
 
+
     /***********************************************************
      * This test is like the previous one but we simulate that the user presses "delete"
      */
@@ -99,8 +101,8 @@ class TestAllFilesDeleted : GLib.Object {
                 callback (false);
             });
 
-        auto &modifier = deleteOnRemote ? fakeFolder.remoteModifier () : fakeFolder.localModifier ();
-        for (auto &s : fakeFolder.currentRemoteState ().children.keys ())
+        var &modifier = deleteOnRemote ? fakeFolder.remoteModifier () : fakeFolder.localModifier ();
+        for (var &s : fakeFolder.currentRemoteState ().children.keys ())
             modifier.remove (s);
 
         QVERIFY (fakeFolder.syncOnce ()); // Should succeed, and all files must then be deleted
@@ -129,10 +131,10 @@ class TestAllFilesDeleted : GLib.Object {
             [&] { QVERIFY (false); });
         QVERIFY (fakeFolder.syncOnce ());
 
-        for (auto &s : fakeFolder.currentRemoteState ().children.keys ())
+        for (var &s : fakeFolder.currentRemoteState ().children.keys ())
             fakeFolder.syncJournal ().avoidRenamesOnNextSync (s); // clears all the fileid and inodes.
         fakeFolder.localModifier ().remove ("A/a1");
-        auto expectedState = fakeFolder.currentLocalState ();
+        var expectedState = fakeFolder.currentLocalState ();
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), expectedState);
         QCOMPARE (fakeFolder.currentRemoteState (), expectedState);
@@ -196,10 +198,10 @@ class TestAllFilesDeleted : GLib.Object {
         }
 
         int fingerprintRequests = 0;
-        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation, QNetworkRequest &request, QIODevice *stream) . QNetworkReply * {
-            auto verb = request.attribute (QNetworkRequest.CustomVerbAttribute);
+        fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation, QNetworkRequest &request, QIODevice stream) . QNetworkReply * {
+            var verb = request.attribute (QNetworkRequest.CustomVerbAttribute);
             if (verb == "PROPFIND") {
-                auto data = stream.readAll ();
+                var data = stream.readAll ();
                 if (data.contains ("data-fingerprint")) {
                     if (request.url ().path ().endsWith ("dav/files/admin/")) {
                         ++fingerprintRequests;
@@ -239,10 +241,10 @@ class TestAllFilesDeleted : GLib.Object {
 
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fingerprintRequests, 2);
-        auto currentState = fakeFolder.currentLocalState ();
+        var currentState = fakeFolder.currentLocalState ();
         // Altough the local file is kept as a conflict, the server file is downloaded
         QCOMPARE (currentState.find ("A/a1").contentChar, 'O');
-        auto conflict = findConflict (currentState, "A/a1");
+        var conflict = findConflict (currentState, "A/a1");
         QVERIFY (conflict);
         QCOMPARE (conflict.contentChar, 'W');
         fakeFolder.localModifier ().remove (conflict.path ());

@@ -31,7 +31,9 @@ class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     Run the wizard
     ***********************************************************/
-    public static void run_wizard (GLib.Object *obj, char *amember, Gtk.Widget *parent = nullptr);
+    public static void run_wizard (GLib.Object obj, char amember, Gtk.Widget parent = nullptr);
+
+
     public static bool bring_wizard_to_front_if_visible ();
 signals:
     // overall dialog close signal.
@@ -44,7 +46,7 @@ signals:
     private void on_find_server ();
     private void on_find_server_behind_redirect ();
     private void on_found_server (QUrl , QJsonObject &);
-    private void on_no_server_found (QNetworkReply *reply);
+    private void on_no_server_found (QNetworkReply reply);
     private void on_no_server_found_timeout (QUrl url);
 
     private void on_determine_auth_type ();
@@ -54,20 +56,20 @@ signals:
 
     private void on_create_local_and_remote_folders (string , string );
     private void on_remote_folder_exists (QNetworkReply *);
-    private void on_create_remote_folder_finished (QNetworkReply *reply);
+    private void on_create_remote_folder_finished (QNetworkReply reply);
     private void on_assistant_finished (int);
     private void on_skip_folder_configuration ();
 
 
-    private OwncloudSetupWizard (GLib.Object *parent = nullptr);
+    private OwncloudSetupWizard (GLib.Object parent = nullptr);
     ~OwncloudSetupWizard () override;
     private void start_wizard ();
     private void test_owncloud_connect ();
     private void create_remote_folder ();
     private void finalize_setup (bool);
     private bool ensure_start_from_scratch (string local_folder);
-    private AccountState *apply_account_changes ();
-    private bool check_downgrade_advised (QNetworkReply *reply);
+    private AccountState apply_account_changes ();
+    private bool check_downgrade_advised (QNetworkReply reply);
 
     private OwncloudWizard _oc_wizard;
     private string _init_local_folder;
@@ -75,7 +77,7 @@ signals:
 };
 
 
-    OwncloudSetupWizard.OwncloudSetupWizard (GLib.Object *parent)
+    OwncloudSetupWizard.OwncloudSetupWizard (GLib.Object parent)
         : GLib.Object (parent)
         , _oc_wizard (new OwncloudWizard)
         , _remote_folder () {
@@ -100,7 +102,7 @@ signals:
 
     static QPointer<OwncloudSetupWizard> wiz = nullptr;
 
-    void OwncloudSetupWizard.run_wizard (GLib.Object *obj, char *amember, Gtk.Widget *parent) {
+    void OwncloudSetupWizard.run_wizard (GLib.Object obj, char amember, Gtk.Widget parent) {
         if (!wiz.is_null ()) {
             bring_wizard_to_front_if_visible ();
             return;
@@ -151,9 +153,9 @@ signals:
         _oc_wizard.on_set_remote_folder (_remote_folder);
 
     #ifdef WITH_PROVIDERS
-        const auto start_page = WizardCommon.Page_Welcome;
+        const var start_page = WizardCommon.Page_Welcome;
     #else // WITH_PROVIDERS
-        const auto start_page = WizardCommon.Page_Server_setup;
+        const var start_page = WizardCommon.Page_Server_setup;
     #endif // WITH_PROVIDERS
         _oc_wizard.set_start_id (start_page);
 
@@ -181,13 +183,13 @@ signals:
         // And also reset the QSslConfiguration, for the same reason (#6832)
         // Here the client certificate is added, if any. Later it'll be in HttpCredentials
         account.set_ssl_configuration (QSslConfiguration ());
-        auto ssl_configuration = account.get_or_create_ssl_config (); // let Account set defaults
+        var ssl_configuration = account.get_or_create_ssl_config (); // let Account set defaults
         if (!_oc_wizard._client_ssl_certificate.is_null ()) {
             ssl_configuration.set_local_certificate (_oc_wizard._client_ssl_certificate);
             ssl_configuration.set_private_key (_oc_wizard._client_ssl_key);
         }
         // Be sure to merge the CAs
-        auto ca = ssl_configuration.system_ca_certificates ();
+        var ca = ssl_configuration.system_ca_certificates ();
         ca.append (_oc_wizard._client_ssl_ca_certificates);
         ssl_configuration.set_ca_certificates (ca);
         account.set_ssl_configuration (ssl_configuration);
@@ -234,7 +236,7 @@ signals:
         // 3. Check redirected-url/status.php with CheckServerJob
 
         // Step 1 : Check url/status.php
-        auto *job = new CheckServerJob (account, this);
+        var job = new CheckServerJob (account, this);
         job.set_ignore_credential_failure (true);
         connect (job, &CheckServerJob.instance_found, this, &OwncloudSetupWizard.on_found_server);
         connect (job, &CheckServerJob.instance_not_found, this, &OwncloudSetupWizard.on_find_server_behind_redirect);
@@ -249,7 +251,7 @@ signals:
         AccountPtr account = _oc_wizard.account ();
 
         // Step 2 : Resolve any permanent redirect chains on the base url
-        auto redirect_check_job = account.send_request ("GET", account.url ());
+        var redirect_check_job = account.send_request ("GET", account.url ());
 
         // Use a significantly reduced timeout for this redirect check:
         // the 5-minute default is inappropriate.
@@ -257,9 +259,9 @@ signals:
 
         // Grab the chain of permanent redirects and adjust the account url
         // accordingly
-        auto permanent_redirects = std.make_shared<int> (0);
+        var permanent_redirects = std.make_shared<int> (0);
         connect (redirect_check_job, &AbstractNetworkJob.redirected, this,
-            [permanent_redirects, account] (QNetworkReply *reply, QUrl target_url, int count) {
+            [permanent_redirects, account] (QNetworkReply reply, QUrl target_url, int count) {
                 int http_code = reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
                 if (count == *permanent_redirects && (http_code == 301 || http_code == 308)) {
                     q_c_info (lc_wizard) << account.url () << " was redirected to" << target_url;
@@ -271,7 +273,7 @@ signals:
         // Step 3 : When done, on_start checking status.php.
         connect (redirect_check_job, &SimpleNetworkJob.finished_signal, this,
             [this, account] () {
-                auto *job = new CheckServerJob (account, this);
+                var job = new CheckServerJob (account, this);
                 job.set_ignore_credential_failure (true);
                 connect (job, &CheckServerJob.instance_found, this, &OwncloudSetupWizard.on_found_server);
                 connect (job, &CheckServerJob.instance_not_found, this, &OwncloudSetupWizard.on_no_server_found);
@@ -282,7 +284,7 @@ signals:
     }
 
     void OwncloudSetupWizard.on_found_server (QUrl url, QJsonObject &info) {
-        auto server_version = CheckServerJob.version (info);
+        var server_version = CheckServerJob.version (info);
 
         _oc_wizard.on_append_to_configuration_log (tr ("<font color=\"green\">Successfully connected to %1 : %2 version %3 (%4)</font><br/><br/>")
                                                 .arg (Utility.escape (url.to_string ()),
@@ -303,8 +305,8 @@ signals:
         on_determine_auth_type ();
     }
 
-    void OwncloudSetupWizard.on_no_server_found (QNetworkReply *reply) {
-        auto job = qobject_cast<CheckServerJob> (sender ());
+    void OwncloudSetupWizard.on_no_server_found (QNetworkReply reply) {
+        var job = qobject_cast<CheckServerJob> (sender ());
 
         // Do this early because reply might be deleted in message box event loop
         string msg;
@@ -334,7 +336,7 @@ signals:
     }
 
     void OwncloudSetupWizard.on_determine_auth_type () {
-        auto *job = new DetermineAuthTypeJob (_oc_wizard.account (), this);
+        var job = new DetermineAuthTypeJob (_oc_wizard.account (), this);
         connect (job, &DetermineAuthTypeJob.auth_type,
             _oc_wizard, &OwncloudWizard.on_set_auth_type);
         job.on_start ();
@@ -342,10 +344,10 @@ signals:
 
     void OwncloudSetupWizard.on_connect_to_oCUrl (string url) {
         q_c_info (lc_wizard) << "Connect to url : " << url;
-        AbstractCredentials *creds = _oc_wizard.get_credentials ();
+        AbstractCredentials creds = _oc_wizard.get_credentials ();
         _oc_wizard.account ().set_credentials (creds);
 
-        const auto fetch_user_name_job = new JsonApiJob (_oc_wizard.account ().shared_from_this (), QStringLiteral ("/ocs/v1.php/cloud/user"));
+        const var fetch_user_name_job = new JsonApiJob (_oc_wizard.account ().shared_from_this (), QStringLiteral ("/ocs/v1.php/cloud/user"));
         connect (fetch_user_name_job, &JsonApiJob.json_received, this, [this, url] (QJsonDocument &json, int status_code) {
             if (status_code != 100) {
                 q_c_warning (lc_wizard) << "Could not fetch username.";
@@ -353,9 +355,9 @@ signals:
 
             sender ().delete_later ();
 
-            const auto obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
-            const auto user_id = obj_data.value ("id").to_string ("");
-            const auto display_name = obj_data.value ("display-name").to_string ("");
+            const var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
+            const var user_id = obj_data.value ("id").to_string ("");
+            const var display_name = obj_data.value ("display-name").to_string ("");
             _oc_wizard.account ().set_dav_user (user_id);
             _oc_wizard.account ().set_dav_display_name (display_name);
 
@@ -372,7 +374,7 @@ signals:
     void OwncloudSetupWizard.test_owncloud_connect () {
         AccountPtr account = _oc_wizard.account ();
 
-        auto *job = new PropfindJob (account, "/", this);
+        var job = new PropfindJob (account, "/", this);
         job.set_ignore_credential_failure (true);
         // There is custom redirect handling in the error handler,
         // so don't automatically follow redirects.
@@ -386,14 +388,14 @@ signals:
     void OwncloudSetupWizard.on_auth_error () {
         string error_msg;
 
-        auto *job = qobject_cast<PropfindJob> (sender ());
+        var job = qobject_cast<PropfindJob> (sender ());
         if (!job) {
             q_c_warning (lc_wizard) << "Cannot check for authed redirects. This slot should be invoked from PropfindJob!";
             return;
         }
-        QNetworkReply *reply = job.reply ();
+        QNetworkReply reply = job.reply ();
 
-        // If there were redirects on the *authed* requests, also store
+        // If there were redirects on the authed* requests, also store
         // the updated server URL, similar to redirects on status.php.
         QUrl redirect_url = reply.attribute (QNetworkRequest.RedirectionTargetAttribute).to_url ();
         if (!redirect_url.is_empty ()) {
@@ -444,7 +446,7 @@ signals:
         _oc_wizard.on_display_error (error_msg, _oc_wizard.current_id () == WizardCommon.Page_Server_setup && check_downgrade_advised (reply));
     }
 
-    bool OwncloudSetupWizard.check_downgrade_advised (QNetworkReply *reply) {
+    bool OwncloudSetupWizard.check_downgrade_advised (QNetworkReply reply) {
         if (reply.url ().scheme () != QLatin1String ("https")) {
             return false;
         }
@@ -528,7 +530,7 @@ signals:
             END - Sanitize URL paths to eliminate double-slashes
             ***********************************************************/
 
-            auto *job = new EntityExistsJob (_oc_wizard.account (), new_url_path, this);
+            var job = new EntityExistsJob (_oc_wizard.account (), new_url_path, this);
             connect (job, &EntityExistsJob.exists, this, &OwncloudSetupWizard.on_remote_folder_exists);
             job.on_start ();
         } else {
@@ -537,8 +539,8 @@ signals:
     }
 
     // ### TODO move into EntityExistsJob once we decide if/how to return gui strings from jobs
-    void OwncloudSetupWizard.on_remote_folder_exists (QNetworkReply *reply) {
-        auto job = qobject_cast<EntityExistsJob> (sender ());
+    void OwncloudSetupWizard.on_remote_folder_exists (QNetworkReply reply) {
+        var job = qobject_cast<EntityExistsJob> (sender ());
         bool ok = true;
         string error;
         QNetworkReply.NetworkError err_id = reply.error ();
@@ -567,7 +569,7 @@ signals:
     void OwncloudSetupWizard.create_remote_folder () {
         _oc_wizard.on_append_to_configuration_log (tr ("creating folder on Nextcloud : %1").arg (_remote_folder));
 
-        auto *job = new MkColJob (_oc_wizard.account (), _remote_folder, this);
+        var job = new MkColJob (_oc_wizard.account (), _remote_folder, this);
         connect (job, &MkColJob.finished_with_error, this, &OwncloudSetupWizard.on_create_remote_folder_finished);
         connect (job, &MkColJob.finished_without_error, this, [this] {
             _oc_wizard.on_append_to_configuration_log (tr ("Remote folder %1 created successfully.").arg (_remote_folder));
@@ -576,8 +578,8 @@ signals:
         job.on_start ();
     }
 
-    void OwncloudSetupWizard.on_create_remote_folder_finished (QNetworkReply *reply) {
-        auto error = reply.error ();
+    void OwncloudSetupWizard.on_create_remote_folder_finished (QNetworkReply reply) {
+        var error = reply.error ();
         q_c_debug (lc_wizard) << "** webdav mkdir request on_finished " << error;
         //    disconnect (own_cloud_info.instance (), SIGNAL (webdav_col_created (QNetworkReply.NetworkError)),
         //               this, SLOT (on_create_remote_folder_finished (QNetworkReply.NetworkError)));
@@ -651,7 +653,7 @@ signals:
 
     // Method executed when the user end has on_finished the basic setup.
     void OwncloudSetupWizard.on_assistant_finished (int result) {
-        FolderMan *folder_man = FolderMan.instance ();
+        FolderMan folder_man = FolderMan.instance ();
 
         if (result == Gtk.Dialog.Rejected) {
             q_c_info (lc_wizard) << "Rejected the new config, use the old!";
@@ -660,7 +662,7 @@ signals:
             // This may or may not wipe all folder definitions, depending
             // on whether a new account is activated or the existing one
             // is changed.
-            auto account = apply_account_changes ();
+            var account = apply_account_changes ();
 
             string local_folder = FolderDefinition.prepare_local_path (_oc_wizard.local_folder ());
 
@@ -677,16 +679,16 @@ signals:
                 if (folder_man.navigation_pane_helper ().show_in_explorer_navigation_pane ())
                     folder_definition.navigation_pane_clsid = QUuid.create_uuid ();
 
-                auto f = folder_man.add_folder (account, folder_definition);
+                var f = folder_man.add_folder (account, folder_definition);
                 if (f) {
                     if (folder_definition.virtual_files_mode != Vfs.Off && _oc_wizard.use_virtual_file_sync ())
-                        f.set_root_pin_state (PinState.OnlineOnly);
+                        f.set_root_pin_state (PinState.VfsItemAvailability.ONLINE_ONLY);
 
-                    f.journal_db ().set_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList,
+                    f.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList,
                         _oc_wizard.selective_sync_blacklist ());
                     if (!_oc_wizard.is_confirm_big_folder_checked ()) {
                         // The user already accepted the selective sync dialog. everything is in the white list
-                        f.journal_db ().set_selective_sync_list (SyncJournalDb.SelectiveSyncWhiteList,
+                        f.journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncWhiteList,
                             string[] () << QLatin1String ("/"));
                     }
                 }
@@ -717,9 +719,9 @@ signals:
         // Abstract_credentials_wizard_page.cleanup_page ())
         _oc_wizard.set_account (AccountManager.create_account ());
 
-        auto manager = AccountManager.instance ();
+        var manager = AccountManager.instance ();
 
-        auto new_state = manager.add_account (new_account);
+        var new_state = manager.add_account (new_account);
         manager.save ();
         return new_state;
     }

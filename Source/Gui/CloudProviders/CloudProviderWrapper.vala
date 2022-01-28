@@ -15,7 +15,7 @@ Copyright (C) by Julius Härtl <jus@bitgrid.net>
 
 using namespace Occ;
 
-GSimple_action_group *action_group = nullptr;
+GSimple_action_group action_group = nullptr;
 
 
 /* Forward declaration required since gio header files interfere with GLib.Object headers */
@@ -36,19 +36,35 @@ using namespace Occ;
 
 class CloudProviderWrapper : GLib.Object {
 
-    public CloudProviderWrapper (GLib.Object *parent = nullptr, Folder *folder = nullptr, int folder_id = 0, CloudProvidersProviderExporter* cloudprovider = nullptr);
+    public CloudProviderWrapper (GLib.Object parent = nullptr, Folder folder = nullptr, int folder_id = 0, CloudProvidersProviderExporter* cloudprovider = nullptr);
     ~CloudProviderWrapper () override;
     public Cloud_providers_account_exporter* account_exporter ();
+
+
     public Folder* folder ();
+
+
     public GMenu_model* get_menu_model ();
+
+
     public GAction_group* get_action_group ();
+
+
     public void update_status_text (string status_text);
+
+
     public void update_pause_status ();
 
 
     public void on_sync_started ();
+
+
     public void on_sync_finished (SyncResult &);
+
+
     public void on_update_progress (string folder, ProgressInfo &progress);
+
+
     public void on_sync_paused_changed (Folder*, bool);
 
 
@@ -66,10 +82,10 @@ class CloudProviderWrapper : GLib.Object {
 
 
 
-CloudProviderWrapper.CloudProviderWrapper (GLib.Object *parent, Folder *folder, int folder_id, CloudProvidersProviderExporter* cloudprovider) : GLib.Object (parent)
+CloudProviderWrapper.CloudProviderWrapper (GLib.Object parent, Folder folder, int folder_id, CloudProvidersProviderExporter* cloudprovider) : GLib.Object (parent)
   , _folder (folder) {
-    GMenu_model *model;
-    GAction_group *action_group;
+    GMenu_model model;
+    GAction_group action_group;
     string account_name = string ("Folder/%1").arg (folder_id);
 
     _cloud_provider = CLOUD_PROVIDERS_PROVIDER_EXPORTER (cloudprovider);
@@ -112,17 +128,17 @@ static bool should_show_in_recents_menu (SyncFileItem &item) {
             && item._instruction != CSYNC_INSTRUCTION_NONE;
 }
 
-static GMenu_item *menu_item_new (string label, gchar *detailed_action) {
+static GMenu_item menu_item_new (string label, gchar detailed_action) {
     return g_menu_item_new (label.to_utf8 ().data (), detailed_action);
 }
 
-static GMenu_item *menu_item_new_submenu (string label, GMenu_model *submenu) {
+static GMenu_item menu_item_new_submenu (string label, GMenu_model submenu) {
     return g_menu_item_new_submenu (label.to_utf8 ().data (), submenu);
 }
 
 void CloudProviderWrapper.on_update_progress (string folder, ProgressInfo &progress) {
     // Only update progress for the current folder
-    Folder *f = FolderMan.instance ().folder (folder);
+    Folder f = FolderMan.instance ().folder (folder);
     if (f != _folder)
         return;
 
@@ -282,11 +298,11 @@ GMenu_model* CloudProviderWrapper.get_menu_model () {
 }
 
 static void
-activate_action_open (GSimple_action *action, GVariant *parameter, gpointer user_data) {
+activate_action_open (GSimple_action action, GVariant parameter, gpointer user_data) {
     Q_UNUSED (parameter);
-    const gchar *name = g_action_get_name (G_ACTION (action));
-    auto *self = static_cast<CloudProviderWrapper> (user_data);
-    auto *gui = dynamic_cast<OwncloudGui> (self.parent ().parent ());
+    const gchar name = g_action_get_name (G_ACTION (action));
+    var self = static_cast<CloudProviderWrapper> (user_data);
+    var gui = dynamic_cast<OwncloudGui> (self.parent ().parent ());
 
     if (g_str_equal (name, "openhelp")) {
         gui.on_help ();
@@ -305,7 +321,7 @@ activate_action_open (GSimple_action *action, GVariant *parameter, gpointer user
     }
 
     if (g_str_equal (name, "showfile")) {
-        const gchar *path = g_variant_get_string (parameter, nullptr);
+        const gchar path = g_variant_get_string (parameter, nullptr);
         g_print ("showfile => %s\n", path);
         show_in_file_manager (string (path));
     }
@@ -320,20 +336,20 @@ activate_action_open (GSimple_action *action, GVariant *parameter, gpointer user
 }
 
 static void
-activate_action_openrecentfile (GSimple_action *action, GVariant *parameter, gpointer user_data) {
+activate_action_openrecentfile (GSimple_action action, GVariant parameter, gpointer user_data) {
     Q_UNUSED (action);
     Q_UNUSED (parameter);
-    auto *self = static_cast<CloudProviderWrapper> (user_data);
+    var self = static_cast<CloudProviderWrapper> (user_data);
     QDesktopServices.open_url (self.folder ().account_state ().account ().url ());
 }
 
 static void
-activate_action_pause (GSimple_action *action,
+activate_action_pause (GSimple_action action,
                        GVariant      *parameter,
                        gpointer       user_data) {
     Q_UNUSED (parameter);
-    auto *self = static_cast<CloudProviderWrapper> (user_data);
-    GVariant *old_state, *new_state;
+    var self = static_cast<CloudProviderWrapper> (user_data);
+    GVariant old_state, *new_state;
 
     old_state = g_action_get_state (G_ACTION (action));
     new_state = g_variant_new_boolean (! (bool)g_variant_get_boolean (old_state));
@@ -422,15 +438,15 @@ GAction_group* CloudProviderWrapper.get_action_group () {
     action_group = g_simple_action_group_new ();
     g_action_map_add_action_entries (G_ACTION_MAP (action_group), actions, G_N_ELEMENTS (actions), this);
     bool state = _folder.sync_paused ();
-    GAction *pause = g_action_map_lookup_action (G_ACTION_MAP (action_group), "pause");
+    GAction pause = g_action_map_lookup_action (G_ACTION_MAP (action_group), "pause");
     g_simple_action_set_state (G_SIMPLE_ACTION (pause), g_variant_new_boolean (state));
     return G_ACTION_GROUP (g_object_ref (action_group));
 }
 
-void CloudProviderWrapper.on_sync_paused_changed (Folder *folder, bool state) {
+void CloudProviderWrapper.on_sync_paused_changed (Folder folder, bool state) {
     Q_UNUSED (folder);
     _paused = state;
-    GAction *pause = g_action_map_lookup_action (G_ACTION_MAP (action_group), "pause");
+    GAction pause = g_action_map_lookup_action (G_ACTION_MAP (action_group), "pause");
     g_simple_action_set_state (G_SIMPLE_ACTION (pause), g_variant_new_boolean (state));
     update_pause_status ();
 }

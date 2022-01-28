@@ -25,7 +25,11 @@ class NetrcParser {
     public using Login_pair = QPair<string, string>;
 
     public NetrcParser (string file = string ());
+
+
     public bool parse ();
+
+
     public Login_pair find (string machine);
 
 
@@ -110,7 +114,7 @@ class NetrcParser {
     NetrcParser.Login_pair NetrcParser.find (string machine) {
         QHash<string, Login_pair>.Const_iterator it = _entries.find (machine);
         if (it != _entries.end ()) {
-            return *it;
+            return it;
         } else {
             return _default;
         }

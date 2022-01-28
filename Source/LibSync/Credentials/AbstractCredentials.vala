@@ -27,17 +27,19 @@ class AbstractCredentials : GLib.Object {
     Calling Account.set_credentials () will call this function.
     Credentials only live as long as the underlying account object.
     ***********************************************************/
-    public virtual void set_account (Account *account);
+    public virtual void set_account (Account account);
 
     public virtual string auth_type () = 0;
     public virtual string user () = 0;
     public virtual string password () = 0;
-    public virtual QNetworkAccessManager *create_qNAM () = 0;
+    public virtual QNetworkAccessManager create_qNAM () = 0;
+
 
     /***********************************************************
     Whether there are credentials that can be used for a connection attempt.
     ***********************************************************/
     public virtual bool ready () = 0;
+
 
     /***********************************************************
     Whether fetch_from_keychain () was called before.
@@ -46,12 +48,14 @@ class AbstractCredentials : GLib.Object {
         return _was_fetched;
     }
 
+
     /***********************************************************
     Trigger (async) fetching of credential information
 
     Should set _was_fetched = true, and later emit fetched () when done.
     ***********************************************************/
     public virtual void fetch_from_keychain () = 0;
+
 
     /***********************************************************
     Ask credentials from the user (typically async)
@@ -60,8 +64,9 @@ class AbstractCredentials : GLib.Object {
     ***********************************************************/
     public virtual void ask_from_user () = 0;
 
-    public virtual bool still_valid (QNetworkReply *reply) = 0;
+    public virtual bool still_valid (QNetworkReply reply) = 0;
     public virtual void persist () = 0;
+
 
     /***********************************************************
     Invalidates token used to authorize requests, it will no longer be used.
@@ -75,6 +80,7 @@ class AbstractCredentials : GLib.Object {
     ***********************************************************/
     public virtual void invalidate_token () = 0;
 
+
     /***********************************************************
     Clears out all sensitive data; used for fully signing out users.
 
@@ -85,6 +91,7 @@ class AbstractCredentials : GLib.Object {
     public virtual void forget_sensitive_data () = 0;
 
     public static string keychain_key (string url, string user, string account_id);
+
 
     /***********************************************************
     If the job need to be restarted or queue, this does it and returns true.
@@ -102,6 +109,7 @@ signals:
     ***********************************************************/
     void fetched ();
 
+
     /***********************************************************
     Emitted when ask_from_user () is done.
 
@@ -118,7 +126,7 @@ signals:
 
     AbstractCredentials.AbstractCredentials () = default;
 
-    void AbstractCredentials.set_account (Account *account) {
+    void AbstractCredentials.set_account (Account account) {
         ENFORCE (!_account, "should only set_account once");
         _account = account;
     }

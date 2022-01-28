@@ -15,13 +15,17 @@ namespace Ui {
 
 class IgnoreListTableWidget : Gtk.Widget {
 
-    public IgnoreListTableWidget (Gtk.Widget *parent = nullptr);
+    public IgnoreListTableWidget (Gtk.Widget parent = nullptr);
     ~IgnoreListTableWidget () override;
 
     public void read_ignore_file (string file, bool read_only = false);
+
+
     public int add_pattern (string pattern, bool deletable, bool read_only);
 
     public void on_remove_all_items ();
+
+
     public void on_write_ignore_file (string  file);
 
 
@@ -32,7 +36,7 @@ class IgnoreListTableWidget : Gtk.Widget {
 
     private void setup_table_read_only_items ();
     private string read_only_tooltip;
-    private Ui.IgnoreListTableWidget *ui;
+    private Ui.IgnoreListTableWidget ui;
 };
 
 
@@ -40,7 +44,7 @@ class IgnoreListTableWidget : Gtk.Widget {
     static constexpr int deletable_col = 1;
     static constexpr int read_only_rows = 3;
 
-    IgnoreListTableWidget.IgnoreListTableWidget (Gtk.Widget *parent)
+    IgnoreListTableWidget.IgnoreListTableWidget (Gtk.Widget parent)
         : Gtk.Widget (parent)
         , ui (new Ui.IgnoreListTableWidget) {
         set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
@@ -71,7 +75,7 @@ class IgnoreListTableWidget : Gtk.Widget {
     }
 
     void IgnoreListTableWidget.on_item_selection_changed () {
-        QTable_widget_item *item = ui.table_widget.current_item ();
+        QTable_widget_item item = ui.table_widget.current_item ();
         if (!item) {
             ui.remove_push_button.set_enabled (false);
             return;
@@ -97,8 +101,8 @@ class IgnoreListTableWidget : Gtk.Widget {
             // rewrites the whole file since now the user can also remove system patterns
             QFile.resize (file, 0);
             for (int row = 0; row < ui.table_widget.row_count (); ++row) {
-                QTable_widget_item *pattern_item = ui.table_widget.item (row, pattern_col);
-                QTable_widget_item *deletable_item = ui.table_widget.item (row, deletable_col);
+                QTable_widget_item pattern_item = ui.table_widget.item (row, pattern_col);
+                QTable_widget_item deletable_item = ui.table_widget.item (row, deletable_col);
                 if (pattern_item.flags () & Qt.ItemIsEnabled) {
                     GLib.ByteArray prepend;
                     if (deletable_item.check_state () == Qt.Checked) {
@@ -115,13 +119,13 @@ class IgnoreListTableWidget : Gtk.Widget {
         }
         ignores.close (); //close the file before reloading stuff.
 
-        FolderMan *folder_man = FolderMan.instance ();
+        FolderMan folder_man = FolderMan.instance ();
 
         // We need to force a remote discovery after a change of the ignore list.
         // Otherwise we would not download the files/directories that are no longer
         // ignored (because the remote etag did not change)   (issue #3172)
-        foreach (Folder *folder, folder_man.map ()) {
-            folder.journal_db ().force_remote_discovery_next_sync ();
+        foreach (Folder folder, folder_man.map ()) {
+            folder.journal_database ().force_remote_discovery_next_sync ();
             folder_man.schedule_folder (folder);
         }
     }
@@ -161,11 +165,11 @@ class IgnoreListTableWidget : Gtk.Widget {
         int new_row = ui.table_widget.row_count ();
         ui.table_widget.set_row_count (new_row + 1);
 
-        auto *pattern_item = new QTable_widget_item;
+        var pattern_item = new QTable_widget_item;
         pattern_item.on_set_text (pattern);
         ui.table_widget.set_item (new_row, pattern_col, pattern_item);
 
-        auto *deletable_item = new QTable_widget_item;
+        var deletable_item = new QTable_widget_item;
         deletable_item.set_flags (Qt.Item_is_user_checkable | Qt.ItemIsEnabled);
         deletable_item.set_check_state (deletable ? Qt.Checked : Qt.Unchecked);
         ui.table_widget.set_item (new_row, deletable_col, deletable_item);

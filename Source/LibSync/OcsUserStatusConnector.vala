@@ -28,7 +28,7 @@ namespace Occ {
 
 class OcsUserStatusConnector : UserStatusConnector {
 
-    public OcsUserStatusConnector (AccountPtr account, GLib.Object *parent = nullptr);
+    public OcsUserStatusConnector (AccountPtr account, GLib.Object parent = nullptr);
 
     public void fetch_user_status () override;
 
@@ -122,7 +122,7 @@ class OcsUserStatusConnector : UserStatusConnector {
     }
 
     Occ.UserStatus json_extract_user_status (QJsonObject json) {
-        const auto clear_at = json_extract_clear_at (json);
+        const var clear_at = json_extract_clear_at (json);
 
         const Occ.UserStatus user_status (json.value ("message_id").to_string (),
             json.value ("message").to_string ().trimmed (),
@@ -151,7 +151,7 @@ class OcsUserStatusConnector : UserStatusConnector {
                 "status_is_user_defined", "false"
             }
         };
-        const auto retrieved_data = json.object ().value ("ocs").to_object ().value ("data").to_object (default_values);
+        const var retrieved_data = json.object ().value ("ocs").to_object ().value ("data").to_object (default_values);
         return json_extract_user_status (retrieved_data);
     }
 
@@ -161,7 +161,7 @@ class OcsUserStatusConnector : UserStatusConnector {
         if (clear_at._endof == "day") {
             return QDate.current_date ().add_days (1).start_of_day ().to_time_t ();
         } else if (clear_at._endof == "week") {
-            const auto days = Qt.Sunday - QDate.current_date ().day_of_week ();
+            const var days = Qt.Sunday - QDate.current_date ().day_of_week ();
             return QDate.current_date ().add_days (days + 1).start_of_day ().to_time_t ();
         }
         q_c_warning (lc_ocs_user_status_connector) << "Can not handle clear at endof day type" << clear_at._endof;
@@ -174,15 +174,15 @@ class OcsUserStatusConnector : UserStatusConnector {
 
     uint64 clear_at_to_timestamp (Occ.ClearAt &clear_at) {
         switch (clear_at._type) {
-        case Occ.ClearAtType.Period : {
+        case Occ.ClearAtType.Period: {
             return clear_at_period_to_timestamp (clear_at);
         }
 
-        case Occ.ClearAtType.EndOf : {
+        case Occ.ClearAtType.EndOf: {
             return clear_at_end_of_to_timestamp (clear_at);
         }
 
-        case Occ.ClearAtType.Timestamp : {
+        case Occ.ClearAtType.Timestamp: {
             return clear_at._timestamp;
         }
         }
@@ -202,14 +202,14 @@ class OcsUserStatusConnector : UserStatusConnector {
 
         if (json_object.value ("clear_at").is_object () && !json_object.value ("clear_at").is_null ()) {
             Occ.ClearAt clear_at_value;
-            const auto clear_at_object = json_object.value ("clear_at").to_object ();
-            const auto type_value = clear_at_object.value ("type").to_string ("period");
+            const var clear_at_object = json_object.value ("clear_at").to_object ();
+            const var type_value = clear_at_object.value ("type").to_string ("period");
             if (type_value == "period") {
-                const auto time_value = clear_at_object.value ("time").to_int (0);
+                const var time_value = clear_at_object.value ("time").to_int (0);
                 clear_at_value._type = Occ.ClearAtType.Period;
                 clear_at_value._period = time_value;
             } else if (type_value == "end-of") {
-                const auto time_value = clear_at_object.value ("time").to_string ("day");
+                const var time_value = clear_at_object.value ("time").to_string ("day");
                 clear_at_value._type = Occ.ClearAtType.EndOf;
                 clear_at_value._endof = time_value;
             } else {
@@ -222,7 +222,7 @@ class OcsUserStatusConnector : UserStatusConnector {
     }
 
     Occ.UserStatus json_to_user_status (QJsonObject json_object) {
-        const auto clear_at = json_to_clear_at (json_object);
+        const var clear_at = json_to_clear_at (json_object);
 
         Occ.UserStatus user_status (
             json_object.value ("id").to_string ("no-id"),
@@ -237,7 +237,7 @@ class OcsUserStatusConnector : UserStatusConnector {
 
     std.vector<Occ.UserStatus> json_to_predefined_statuses (QJsonArray json_data_array) {
         std.vector<Occ.UserStatus> statuses;
-        for (auto &json_entry : json_data_array) {
+        for (var &json_entry : json_data_array) {
             Q_ASSERT (json_entry.is_object ());
             if (!json_entry.is_object ()) {
                 continue;
@@ -251,7 +251,7 @@ class OcsUserStatusConnector : UserStatusConnector {
     const string base_url ("/ocs/v2.php/apps/user_status/api/v1");
     const string user_status_base_url = base_url + QStringLiteral ("/user_status");
 
-    OcsUserStatusConnector.OcsUserStatusConnector (AccountPtr account, GLib.Object *parent)
+    OcsUserStatusConnector.OcsUserStatusConnector (AccountPtr account, GLib.Object parent)
         : UserStatusConnector (parent)
         , _account (account) {
         Q_ASSERT (_account);
@@ -324,12 +324,12 @@ class OcsUserStatusConnector : UserStatusConnector {
             emit error (Error.CouldNotFetchPredefinedUserStatuses);
             return;
         }
-        const auto json_data = json.object ().value ("ocs").to_object ().value ("data");
+        const var json_data = json.object ().value ("ocs").to_object ().value ("data");
         Q_ASSERT (json_data.is_array ());
         if (!json_data.is_array ()) {
             return;
         }
-        const auto statuses = json_to_predefined_statuses (json_data.to_array ());
+        const var statuses = json_to_predefined_statuses (json_data.to_array ());
         emit predefined_statuses_fetched (statuses);
     }
 
@@ -390,7 +390,7 @@ class OcsUserStatusConnector : UserStatusConnector {
         QJsonObject data_object;
         data_object.insert ("status_icon", user_status.icon ());
         data_object.insert ("message", user_status.message ());
-        const auto clear_at = user_status.clear_at ();
+        const var clear_at = user_status.clear_at ();
         if (clear_at) {
             data_object.insert ("clear_at", static_cast<int> (clear_at_to_timestamp (*clear_at)));
         } else {

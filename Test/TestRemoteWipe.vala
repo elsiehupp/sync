@@ -27,19 +27,19 @@ class TestRemoteWipe : public GLib.Object {
 //        AccountPtr account = Account.create ();
 //        QVERIFY (account);
 
-//        auto manager = AccountManager.instance ();
+//        var manager = AccountManager.instance ();
 //        QVERIFY (manager);
 
-//        AccountState *newAccountState = manager.addAccount (account);
+//        AccountState newAccountState = manager.addAccount (account);
 //        manager.save ();
 //        QVERIFY (newAccountState);
 
 //        QUrl url ("http://example.de");
-//        HttpCredentialsTest *cred = new HttpCredentialsTest ("testuser", "secret");
+//        HttpCredentialsTest cred = new HttpCredentialsTest ("testuser", "secret");
 //        account.setCredentials (cred);
 //        account.setUrl ( url );
 
-//        FolderMan *folderman = FolderMan.instance ();
+//        FolderMan folderman = FolderMan.instance ();
 //        folderman.addFolder (newAccountState, folderDefinition (dirPath + "/sub/nextcloud/"));
 
 //        // check if account exists

@@ -24,12 +24,20 @@ class QtLockedFile : QFile {
     };
 
     public QtLockedFile ();
+
+
     public QtLockedFile (string name);
     ~QtLockedFile () override;
 
     public bool lock (LockMode mode, bool block = true);
+
+
     public bool unlock ();
+
+
     public bool is_locked ();
+
+
     public LockMode lock_mode ();
 
 
@@ -107,6 +115,7 @@ namespace SharedTools {
         m_lock_mode = LockMode.NO_LOCK;
     }
 
+
     /***********************************************************
     Constructs an unlocked QtLockedFile object with file \a name. This constructor behaves in
     the same way as \e QFile.QFile (string&).
@@ -118,6 +127,7 @@ namespace SharedTools {
         m_lock_mode = LockMode.NO_LOCK;
     }
 
+
     /***********************************************************
     Returns \e true if this object has a in read or write lock;
     otherwise returns \e false.
@@ -128,6 +138,7 @@ namespace SharedTools {
         return m_lock_mode != LockMode.NO_LOCK;
     }
 
+
     /***********************************************************
     Returns the type of lock currently held by this object, or \e QtLockedFile.LockMode.NO_LOCK.
 
@@ -136,6 +147,7 @@ namespace SharedTools {
     QtLockedFile.LockMode QtLockedFile.lock_mode () {
         return m_lock_mode;
     }
+
 
     /***********************************************************
     \fn bool QtLockedFile.lock (LockMode mode, bool block = true)

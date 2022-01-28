@@ -20,6 +20,7 @@ class SyncJournalFileRecord {
         return !_path.is_empty ();
     }
 
+
     /***********************************************************
     Returns the numeric part of the full id in _file_id.
 
@@ -28,9 +29,12 @@ class SyncJournalFileRecord {
     It is used in the construction of private links.
     ***********************************************************/
     public GLib.ByteArray numeric_file_id ();
+
+
     public QDateTime mod_date_time () {
         return Utility.q_date_time_from_time_t (_modtime);
     }
+
 
     public bool is_directory () {
         return _type == ItemTypeDirectory;
@@ -47,6 +51,7 @@ class SyncJournalFileRecord {
     public string e2e_mangled_name () {
         return string.from_utf8 (_e2e_mangled_name);
     }
+
 
     public GLib.ByteArray _path;
     public uint64 _inode = 0;
@@ -121,12 +126,14 @@ class ConflictRecord {
     /// File id of the base file
     public GLib.ByteArray base_file_id;
 
+
     /***********************************************************
     Modtime of the base file
 
     may not be available and be -1
     ***********************************************************/
     public int64 base_modtime = -1;
+
 
     /***********************************************************
     Etag of the base file
@@ -135,11 +142,12 @@ class ConflictRecord {
     ***********************************************************/
     public GLib.ByteArray base_etag;
 
+
     /***********************************************************
     The path of the original file at the time the conflict was created
 
     Note that in nearly all cases one should query
-    thus retrieve the *current* base path instead!
+    thus retrieve the current* base path instead!
 
     maybe be empty if not available
     ***********************************************************/

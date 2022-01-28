@@ -25,21 +25,23 @@ namespace Occ {
 ***********************************************************/
 class Ssl_button : QToolButton {
 
-    public Ssl_button (Gtk.Widget *parent = nullptr);
-    public void update_account_state (AccountState *account_state);
+    public Ssl_button (Gtk.Widget parent = nullptr);
+
+
+    public void update_account_state (AccountState account_state);
 
 
     public void on_update_menu ();
 
 
-    private QMenu *build_cert_menu (QMenu *parent, QSslCertificate &cert,
+    private QMenu build_cert_menu (QMenu parent, QSslCertificate &cert,
         const GLib.List<QSslCertificate> &user_approved, int pos, GLib.List<QSslCertificate> &system_ca_certificates);
     private QPointer<AccountState> _account_state;
     private QMenu _menu;
 };
 
 
-    Ssl_button.Ssl_button (Gtk.Widget *parent)
+    Ssl_button.Ssl_button (Gtk.Widget parent)
         : QToolButton (parent) {
         set_popup_mode (QToolButton.Instant_popup);
         set_auto_raise (true);
@@ -65,7 +67,7 @@ class Ssl_button : QToolButton {
             && certificate.issuer_info (QSslCertificate.Organizational_unit_name) == certificate.subject_info (QSslCertificate.Organizational_unit_name);
     }
 
-    QMenu *Ssl_button.build_cert_menu (QMenu *parent, QSslCertificate &cert,
+    QMenu *Ssl_button.build_cert_menu (QMenu parent, QSslCertificate &cert,
         const GLib.List<QSslCertificate> &user_approved, int pos, GLib.List<QSslCertificate> &system_ca_certificates) {
         string cn = string[] (cert.subject_info (QSslCertificate.Common_name)).join (QChar (';'));
         string ou = string[] (cert.subject_info (QSslCertificate.Organizational_unit_name)).join (QChar (';'));
@@ -147,23 +149,23 @@ class Ssl_button : QToolButton {
         }
 
         // create label first
-        auto *label = new QLabel (parent);
+        var label = new QLabel (parent);
         label.set_style_sheet (QLatin1String ("QLabel { padding : 8px; }"));
         label.set_text_format (Qt.RichText);
         label.on_set_text (details);
 
         // plug label into widget action
-        auto *action = new QWidget_action (parent);
+        var action = new QWidget_action (parent);
         action.set_default_widget (label);
         // plug action into menu
-        auto *menu = new QMenu (parent);
+        var menu = new QMenu (parent);
         menu.menu_action ().on_set_text (txt);
         menu.add_action (action);
 
         return menu;
     }
 
-    void Ssl_button.update_account_state (AccountState *account_state) {
+    void Ssl_button.update_account_state (AccountState account_state) {
         if (!account_state || !account_state.is_connected ()) {
             set_visible (false);
             return;
@@ -218,7 +220,7 @@ class Ssl_button : QToolButton {
 
             _menu.add_action (tr ("Certificate information:")).set_enabled (false);
 
-            const auto system_certs = QSslConfiguration.system_ca_certificates ();
+            const var system_certs = QSslConfiguration.system_ca_certificates ();
 
             GLib.List<QSslCertificate> tmp_chain;
             foreach (QSslCertificate cert, chain) {

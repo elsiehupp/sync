@@ -9,33 +9,31 @@ Copyright (C) by Dominik Schmidt <dschmidt@owncloud.com>
 
 namespace Occ {
 
-Q_DECLARE_INTERFACE (Occ.PluginFactory, "org.owncloud.PluginFactory")
+// Q_DECLARE_INTERFACE (Occ.PluginFactory, "org.owncloud.PluginFactory")
 
 class PluginFactory {
 
-    public virtual ~PluginFactory ();
+    public virtual ~PluginFactory () = default;
     public virtual GLib.Object* create (GLib.Object* parent) = 0;
 };
 
 template<class PluginClass>
 class DefaultPluginFactory : PluginFactory {
 
-    public GLib.Object* create (GLib.Object *parent) override {
+    public GLib.Object* create (GLib.Object parent) override {
         return new PluginClass (parent);
     }
 };
 
 /// Return the expected name of a plugin, for use with QPluginLoader
-string plugin_file_name (string type, string name);
-
-
-
-PluginFactory.~PluginFactory () = default;
-
 string plugin_file_name (string type, string name) {
     return QStringLiteral ("%1sync_%2_%3")
         .arg (QStringLiteral (APPLICATION_EXECUTABLE), type, name);
 }
+
+
+
+
 
 }
     

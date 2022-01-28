@@ -36,12 +36,14 @@ class Ocs_job : AbstractNetworkJob {
 
     protected Ocs_job (AccountPtr account);
 
+
     /***********************************************************
     Set the verb for the job
 
     @param verb currently supported PUT POST DELETE
     ***********************************************************/
-    protected void set_verb (GLib.ByteArray &verb);
+    protected void set_verb (GLib.ByteArray verb);
+
 
     /***********************************************************
     Add a new parameter to the request.
@@ -52,6 +54,7 @@ class Ocs_job : AbstractNetworkJob {
     ***********************************************************/
     protected void add_param (string name, string value);
 
+
     /***********************************************************
     Set the post parameters
 
@@ -59,6 +62,7 @@ class Ocs_job : AbstractNetworkJob {
     request
     ***********************************************************/
     protected void set_post_params (GLib.List<QPair<string, string>> &post_params);
+
 
     /***********************************************************
     List of expected statuscodes for this request
@@ -69,6 +73,7 @@ class Ocs_job : AbstractNetworkJob {
     ***********************************************************/
     protected void add_pass_status_code (int code);
 
+
     /***********************************************************
     The base path for an Ocs_job is always the same. But it could be the case that
     certain operations need to append something to the URL.
@@ -76,6 +81,7 @@ class Ocs_job : AbstractNetworkJob {
     This function appends the common id. so <PATH>/<ID>
     ***********************************************************/
     protected void append_path (string id);
+
 
     /***********************************************************
     Parse the response and return the status code and the message of the
@@ -87,12 +93,13 @@ class Ocs_job : AbstractNetworkJob {
     ***********************************************************/
     public static int get_json_return_code (QJsonDocument &json, string message);
 
+
     /***********************************************************
     @brief Adds header to the request e.g. "If-None-Match"
     @param header_name a string with the header name
     @param value a string with the value
     ***********************************************************/
-    public void add_raw_header (GLib.ByteArray &header_name, GLib.ByteArray &value);
+    public void add_raw_header (GLib.ByteArray header_name, GLib.ByteArray value);
 
 protected slots:
 
@@ -110,6 +117,7 @@ signals:
     ***********************************************************/
     void job_finished (QJsonDocument reply, int status_code);
 
+
     /***********************************************************
     The status code was not one of the expected (passing)
     status code for this command
@@ -119,13 +127,14 @@ signals:
     ***********************************************************/
     void ocs_error (int status_code, string message);
 
+
     /***********************************************************
     @brief etag_response_header_received - signal to report the ETag response header value
     from ocs api v2
     @param value - the ETag response header value
     @param status_code - the OCS status code : 100 (!) for on_success
     ***********************************************************/
-    void etag_response_header_received (GLib.ByteArray &value, int status_code);
+    void etag_response_header_received (GLib.ByteArray value, int status_code);
 
 
     private bool on_finished () override;
@@ -145,7 +154,7 @@ signals:
         set_ignore_credential_failure (true);
     }
 
-    void Ocs_job.set_verb (GLib.ByteArray &verb) {
+    void Ocs_job.set_verb (GLib.ByteArray verb) {
         _verb = verb;
     }
 
@@ -161,16 +170,16 @@ signals:
         set_path (path () + QLatin1Char ('/') + id);
     }
 
-    void Ocs_job.add_raw_header (GLib.ByteArray &header_name, GLib.ByteArray &value) {
+    void Ocs_job.add_raw_header (GLib.ByteArray header_name, GLib.ByteArray value) {
         _request.set_raw_header (header_name, value);
     }
 
     static QUrlQuery percent_encode_query_items (
         const GLib.List<QPair<string, string>> &items) {
         QUrlQuery result;
-        // Note : QUrlQuery.set_query_items () does not fully percent encode
+        // Note: QUrlQuery.set_query_items () does not fully percent encode
         // the query items, see #5042
-        foreach (auto &item, items) {
+        foreach (var &item, items) {
             result.add_query_item (
                 QUrl.to_percent_encoding (item.first),
                 QUrl.to_percent_encoding (item.second));
@@ -182,7 +191,7 @@ signals:
         add_raw_header ("Ocs-APIREQUEST", "true");
         add_raw_header ("Content-Type", "application/x-www-form-urlencoded");
 
-        auto *buffer = new QBuffer;
+        var buffer = new QBuffer;
 
         QUrlQuery query_items;
         if (_verb == "GET") {
@@ -190,7 +199,7 @@ signals:
         } else if (_verb == "POST" || _verb == "PUT") {
             // Url encode the _post_params and put them in a buffer.
             GLib.ByteArray post_data;
-            Q_FOREACH (auto tmp, _params) {
+            Q_FOREACH (var tmp, _params) {
                 if (!post_data.is_empty ()) {
                     post_data.append ("&");
                 }
@@ -212,7 +221,7 @@ signals:
         QJsonParseError error;
         string message;
         int status_code = 0;
-        auto json = QJsonDocument.from_json (reply_data, &error);
+        var json = QJsonDocument.from_json (reply_data, &error);
 
         // when it is null we might have a 304 so get status code from reply () and gives a warning...
         if (error.error != QJsonParseError.NoError) {
@@ -248,7 +257,7 @@ signals:
 
     int Ocs_job.get_json_return_code (QJsonDocument &json, string message) {
         //TODO proper checking
-        auto meta = json.object ().value ("ocs").to_object ().value ("meta").to_object ();
+        var meta = json.object ().value ("ocs").to_object ().value ("meta").to_object ();
         int code = meta.value ("statuscode").to_int ();
         message = meta.value ("message").to_string ();
 

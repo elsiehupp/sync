@@ -39,6 +39,7 @@ class Cmd : GLib.Object {
     public Cmd () : GLib.Object () {
     }
 
+
     public void on_transmission_progress_slot () {
     }
 };
@@ -69,7 +70,7 @@ struct CmdOptions {
 
 // we can't use csync_set_userdata because the SyncEngine sets it already.
 // So we have to use a global variable
-CmdOptions *opts = nullptr;
+CmdOptions opts = nullptr;
 
 class EchoDisabler {
 
@@ -105,6 +106,7 @@ class HttpCredentialsText : HttpCredentials {
         _ssl_trusted (false) {
     }
 
+
     public void ask_from_user () override {
         _password = .query_password (user ());
         _ready = true;
@@ -112,9 +114,11 @@ class HttpCredentialsText : HttpCredentials {
         emit asked ();
     }
 
+
     public void set_s_sLTrusted (bool is_trusted) {
         _ssl_trusted = is_trusted;
     }
+
 
     public bool ssl_is_trusted () override {
         return _ssl_trusted;
@@ -126,7 +130,7 @@ class HttpCredentialsText : HttpCredentials {
 #endif /* TOKEN_AUTH_ONLY */
 
 void help () {
-    const char *binary_name = APPLICATION_EXECUTABLE "cmd";
+    const char binary_name = APPLICATION_EXECUTABLE "cmd";
 
     std.cout << binary_name << " - command line " APPLICATION_NAME " client tool" << std.endl;
     std.cout << "" << std.endl;
@@ -162,7 +166,7 @@ void show_version () {
     exit (0);
 }
 
-void parse_options (string[] &app_args, CmdOptions *options) {
+void parse_options (string[] &app_args, CmdOptions options) {
     string[] args (app_args);
 
     int arg_count = args.count ();
@@ -240,23 +244,23 @@ void parse_options (string[] &app_args, CmdOptions *options) {
     }
 }
 
-/* If the selective sync list is different from before, we need to disable the read from db
+/* If the selective sync list is different from before, we need to disable the read from database
   (The normal client does it in Selective_sync_dialog.accept*)
 ***********************************************************/
-void selective_sync_fixup (Occ.SyncJournalDb *journal, string[] &new_list) {
-    SqlDatabase db;
-    if (!db.open_or_create_read_write (journal.database_file_path ())) {
+void selective_sync_fixup (Occ.SyncJournalDb journal, string[] &new_list) {
+    SqlDatabase database;
+    if (!database.open_or_create_read_write (journal.database_file_path ())) {
         return;
     }
 
     bool ok = false;
 
-    const auto selective_sync_list = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, &ok);
+    const var selective_sync_list = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, &ok);
     const QSet<string> old_black_list_set (selective_sync_list.begin (), selective_sync_list.end ());
     if (ok) {
         const QSet<string> black_list_set (new_list.begin (), new_list.end ());
-        const auto changes = (old_black_list_set - black_list_set) + (black_list_set - old_black_list_set);
-        for (auto &it : changes) {
+        const var changes = (old_black_list_set - black_list_set) + (black_list_set - old_black_list_set);
+        for (var &it : changes) {
             journal.schedule_path_for_remote_discovery (it);
         }
 
@@ -371,13 +375,13 @@ int main (int argc, char **argv) {
         }
     }
 
-    auto *ssl_error_handler = new Simple_sslErrorHandler;
+    var ssl_error_handler = new Simple_sslErrorHandler;
 
 #ifdef TOKEN_AUTH_ONLY
-    auto *cred = new TokenCredentials (user, password, "");
+    var cred = new TokenCredentials (user, password, "");
     account.set_credentials (cred);
 #else
-    auto *cred = new HttpCredentialsText (user, password);
+    var cred = new HttpCredentialsText (user, password);
     account.set_credentials (cred);
     if (options.trust_s_sL) {
         cred.set_s_sLTrusted (true);
@@ -388,9 +392,9 @@ int main (int argc, char **argv) {
     account.set_ssl_error_handler (ssl_error_handler);
 
     QEventLoop loop;
-    auto *job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/capabilities"));
+    var job = new JsonApiJob (account, QLatin1String ("ocs/v1.php/cloud/capabilities"));
     GLib.Object.connect (job, &JsonApiJob.json_received, [&] (QJsonDocument &json) {
-        auto caps = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
+        var caps = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
         q_debug () << "Server capabilities" << caps;
         account.set_capabilities (caps.to_variant_map ());
         account.set_server_version (caps["core"].to_object ()["status"].to_object ()["version"].to_string ());
@@ -440,17 +444,17 @@ restart_sync:
     }
 
     Cmd cmd;
-    string db_path = options.source_dir + SyncJournalDb.make_db_name (options.source_dir, credential_free_url, folder, user);
-    SyncJournalDb db (db_path);
+    string db_path = options.source_dir + SyncJournalDb.make_database_name (options.source_dir, credential_free_url, folder, user);
+    SyncJournalDb database (db_path);
 
     if (!selective_sync_list.empty ()) {
-        selective_sync_fixup (&db, selective_sync_list);
+        selective_sync_fixup (&database, selective_sync_list);
     }
 
     SyncOptions opt;
     opt.fill_from_environment_variables ();
     opt.verify_chunk_sizes ();
-    SyncEngine engine (account, options.source_dir, folder, &db);
+    SyncEngine engine (account, options.source_dir, folder, &database);
     engine.set_ignore_hidden_files (options.ignore_hidden_files);
     engine.set_network_limits (options.uplimit, options.downlimit);
     GLib.Object.connect (&engine, &SyncEngine.on_finished,

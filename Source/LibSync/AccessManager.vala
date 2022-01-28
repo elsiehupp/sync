@@ -28,12 +28,12 @@ class AccessManager : QNetworkAccessManager {
 
     public static GLib.ByteArray generate_request_id ();
 
-    public AccessManager (GLib.Object *parent = nullptr);
+    public AccessManager (GLib.Object parent = nullptr);
 
-    protected QNetworkReply *create_request (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *outgoing_data = nullptr) override;
+    protected QNetworkReply create_request (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice outgoing_data = nullptr) override;
 };
 
-    AccessManager.AccessManager (GLib.Object *parent)
+    AccessManager.AccessManager (GLib.Object parent)
         : QNetworkAccessManager (parent) {
 
     #ifndef Q_OS_LINUX
@@ -47,7 +47,7 @@ class AccessManager : QNetworkAccessManager {
         return QUuid.create_uuid ().to_byte_array (QUuid.WithoutBraces);
     }
 
-    QNetworkReply *AccessManager.create_request (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *outgoing_data) {
+    QNetworkReply *AccessManager.create_request (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice outgoing_data) {
         QNetworkRequest new_request (request);
 
         // Respect request specific user agent if any
@@ -80,7 +80,7 @@ class AccessManager : QNetworkAccessManager {
         }
     #endif
 
-        const auto reply = QNetworkAccessManager.create_request (op, new_request, outgoing_data);
+        const var reply = QNetworkAccessManager.create_request (op, new_request, outgoing_data);
         HttpLogger.log_request (reply, op, outgoing_data);
         return reply;
     }

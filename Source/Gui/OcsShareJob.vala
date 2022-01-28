@@ -28,6 +28,7 @@ class Ocs_share_job : Ocs_job {
     ***********************************************************/
     public Ocs_share_job (AccountPtr account);
 
+
     /***********************************************************
     Get all the shares
 
@@ -35,10 +36,12 @@ class Ocs_share_job : Ocs_job {
     ***********************************************************/
     public void on_get_shares (string path = "");
 
+
     /***********************************************************
     Delete the current Share
     ***********************************************************/
     public void delete_share (string share_id);
+
 
     /***********************************************************
     Set the expiration date of a share
@@ -56,6 +59,7 @@ class Ocs_share_job : Ocs_job {
     ***********************************************************/
     public void set_note (string share_id, string note);
 
+
     /***********************************************************
     Set the password of a share
 
@@ -64,6 +68,7 @@ class Ocs_share_job : Ocs_job {
     ***********************************************************/
     public void set_password (string share_id, string password);
 
+
     /***********************************************************
     Set the share to be public upload
 
@@ -71,10 +76,12 @@ class Ocs_share_job : Ocs_job {
     ***********************************************************/
     public void set_public_upload (string share_id, bool public_upload);
 
+
     /***********************************************************
     Change the name of a share
     ***********************************************************/
     public void set_name (string share_id, string name);
+
 
     /***********************************************************
     Set the permissions
@@ -84,10 +91,12 @@ class Ocs_share_job : Ocs_job {
     public void set_permissions (string share_id,
         const Share.Permissions permissions);
 
+
     /***********************************************************
     Set share link label
     ***********************************************************/
     public void set_label (string share_id, string label);
+
 
     /***********************************************************
     Create a new link share
@@ -97,6 +106,7 @@ class Ocs_share_job : Ocs_job {
     ***********************************************************/
     public void create_link_share (string path, string name,
         const string password);
+
 
     /***********************************************************
     Create a new share
@@ -112,6 +122,7 @@ class Ocs_share_job : Ocs_job {
         const string share_with = "",
         const Share.Permissions permissions = Share_permission_read,
         const string password = "");
+
 
     /***********************************************************
     Returns information on the items shared with the current user.

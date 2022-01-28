@@ -25,7 +25,7 @@ namespace Occ {
 class Folder_watcher_private : GLib.Object {
 
     public Folder_watcher_private () = default;
-    public Folder_watcher_private (Folder_watcher *p, string path);
+    public Folder_watcher_private (Folder_watcher p, string path);
     ~Folder_watcher_private () override;
 
     public int test_watch_count () {
@@ -55,7 +55,7 @@ protected slots:
 };
 
 
-    Folder_watcher_private.Folder_watcher_private (Folder_watcher *p, string path)
+    Folder_watcher_private.Folder_watcher_private (Folder_watcher p, string path)
         : GLib.Object ()
         , _parent (p)
         , _folder (path) {
@@ -154,7 +154,7 @@ protected slots:
 
     void Folder_watcher_private.on_received_notification (int fd) {
         int len = 0;
-        struct inotify_event *event = nullptr;
+        struct inotify_event event = nullptr;
         size_t i = 0;
         int error = 0;
         QVarLengthArray<char, 2048> buffer (2048);
@@ -179,7 +179,7 @@ protected slots:
         }
 
         // iterate events in buffer
-        unsigned int ulen = len;
+        uint32 ulen = len;
         for (i = 0; i + sizeof (inotify_event) < ulen; i += sizeof (inotify_event) + (event ? event.len : 0)) {
             // cast an inotify_event
             event = (struct inotify_event *)&buffer[i];
@@ -214,7 +214,7 @@ protected slots:
     }
 
     void Folder_watcher_private.remove_folders_below (string path) {
-        auto it = _path_to_watch.find (path);
+        var it = _path_to_watch.find (path);
         if (it == _path_to_watch.end ())
             return;
 
@@ -222,7 +222,7 @@ protected slots:
 
         // Remove the entry and all subentries
         while (it != _path_to_watch.end ()) {
-            auto it_path = it.key ();
+            var it_path = it.key ();
             if (!it_path.starts_with (path))
                 break;
             if (it_path != path && !it_path.starts_with (path_slash)) {
@@ -231,7 +231,7 @@ protected slots:
                 continue;
             }
 
-            auto wid = it.value ();
+            var wid = it.value ();
             inotify_rm_watch (_fd, wid);
             _watch_to_path.remove (wid);
             it = _path_to_watch.erase (it);

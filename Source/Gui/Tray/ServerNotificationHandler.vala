@@ -14,7 +14,7 @@ const int not_modified_status_code = 304;
 
 class Server_notification_handler : GLib.Object {
 
-    public Server_notification_handler (AccountState *account_state, GLib.Object *parent = nullptr);
+    public Server_notification_handler (AccountState account_state, GLib.Object parent = nullptr);
 
 signals:
     void new_notification_list (Activity_list);
@@ -24,7 +24,7 @@ signals:
 
 
     private void on_notifications_received (QJsonDocument &json, int status_code);
-    private void on_etag_response_header_received (GLib.ByteArray &value, int status_code);
+    private void on_etag_response_header_received (GLib.ByteArray value, int status_code);
     private void on_allow_desktop_notifications_changed (bool is_allowed);
 
 
@@ -33,7 +33,7 @@ signals:
 };
 
 
-    Server_notification_handler.Server_notification_handler (AccountState *account_state, GLib.Object *parent)
+    Server_notification_handler.Server_notification_handler (AccountState account_state, GLib.Object parent)
         : GLib.Object (parent)
         , _account_state (account_state) {
     }
@@ -67,16 +67,16 @@ signals:
         _notification_job.on_start ();
     }
 
-    void Server_notification_handler.on_etag_response_header_received (GLib.ByteArray &value, int status_code) {
+    void Server_notification_handler.on_etag_response_header_received (GLib.ByteArray value, int status_code) {
         if (status_code == success_status_code) {
             q_c_warning (lc_server_notification) << "New Notification ETag Response Header received " << value;
-            auto *account = qvariant_cast<AccountState> (sender ().property (property_account_state_c));
+            var account = qvariant_cast<AccountState> (sender ().property (property_account_state_c));
             account.set_notifications_etag_response_header (value);
         }
     }
 
     void Server_notification_handler.on_allow_desktop_notifications_changed (bool is_allowed) {
-        auto *account = qvariant_cast<AccountState> (sender ().property (property_account_state_c));
+        var account = qvariant_cast<AccountState> (sender ().property (property_account_state_c));
         if (account != nullptr) {
            account.set_desktop_notifications_allowed (is_allowed);
         }
@@ -95,15 +95,15 @@ signals:
             return;
         }
 
-        auto notifies = json.object ().value ("ocs").to_object ().value ("data").to_array ();
+        var notifies = json.object ().value ("ocs").to_object ().value ("data").to_array ();
 
-        auto *ai = qvariant_cast<AccountState> (sender ().property (property_account_state_c));
+        var ai = qvariant_cast<AccountState> (sender ().property (property_account_state_c));
 
         Activity_list list;
 
-        foreach (auto element, notifies) {
+        foreach (var element, notifies) {
             Activity a;
-            auto json = element.to_object ();
+            var json = element.to_object ();
             a._type = Activity.Notification_type;
             a._acc_name = ai.account ().display_name ();
             a._id = json.value ("notification_id").to_int ();
@@ -129,9 +129,9 @@ signals:
             a._link = link;
             a._date_time = QDateTime.from_string (json.value ("datetime").to_string (), Qt.ISODate);
 
-            auto actions = json.value ("actions").to_array ();
-            foreach (auto action, actions) {
-                auto action_json = action.to_object ();
+            var actions = json.value ("actions").to_array ();
+            foreach (var action, actions) {
+                var action_json = action.to_object ();
                 Activity_link al;
                 al._label = QUrl.from_percent_encoding (action_json.value ("label").to_string ().to_utf8 ());
                 al._link = action_json.value ("link").to_string ();

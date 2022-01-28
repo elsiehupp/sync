@@ -16,14 +16,18 @@ namespace Occ {
 ***********************************************************/
 class DeleteJob : AbstractNetworkJob {
 
-    public DeleteJob (AccountPtr account, string path, GLib.Object *parent = nullptr);
-    public DeleteJob (AccountPtr account, QUrl url, GLib.Object *parent = nullptr);
+    public DeleteJob (AccountPtr account, string path, GLib.Object parent = nullptr);
+
+
+    public DeleteJob (AccountPtr account, QUrl url, GLib.Object parent = nullptr);
 
     public void on_start () override;
     public bool on_finished () override;
 
     public GLib.ByteArray folder_token ();
-    public void set_folder_token (GLib.ByteArray &folder_token);
+
+
+    public void set_folder_token (GLib.ByteArray folder_token);
 
 signals:
     void finished_signal ();
@@ -33,11 +37,11 @@ signals:
     private GLib.ByteArray _folder_token;
 };
 
-    DeleteJob.DeleteJob (AccountPtr account, string path, GLib.Object *parent)
+    DeleteJob.DeleteJob (AccountPtr account, string path, GLib.Object parent)
         : AbstractNetworkJob (account, path, parent) {
     }
 
-    DeleteJob.DeleteJob (AccountPtr account, QUrl url, GLib.Object *parent)
+    DeleteJob.DeleteJob (AccountPtr account, QUrl url, GLib.Object parent)
         : AbstractNetworkJob (account, string (), parent)
         , _url (url) {
     }
@@ -72,7 +76,7 @@ signals:
         return _folder_token;
     }
 
-    void DeleteJob.set_folder_token (GLib.ByteArray &folder_token) {
+    void DeleteJob.set_folder_token (GLib.ByteArray folder_token) {
         _folder_token = folder_token;
     }
 

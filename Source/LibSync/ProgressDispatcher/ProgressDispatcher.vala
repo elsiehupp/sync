@@ -23,10 +23,12 @@ class ProgressInfo : GLib.Object {
 
     public ProgressInfo ();
 
+
     /***********************************************************
     Resets for a new sync run.
     ***********************************************************/
     public void on_reset ();
+
 
     /***********************************************************
     Records the status of the sync run
@@ -58,12 +60,14 @@ class ProgressInfo : GLib.Object {
 
     Status status ();
 
+
     /***********************************************************
     Called when propagation starts.
 
     is_updating_estimates () will return true afterwards.
     ***********************************************************/
     public void start_estimate_updates ();
+
 
     /***********************************************************
     Returns true when start_estimate_updates () was called.
@@ -74,21 +78,28 @@ class ProgressInfo : GLib.Object {
     ***********************************************************/
     public bool is_updating_estimates ();
 
+
     /***********************************************************
     Increase the file and size totals by the amount indicated in item.
     ***********************************************************/
     public void adjust_totals_for_file (SyncFileItem &item);
 
     public int64 total_files ();
+
+
     public int64 completed_files ();
 
     public int64 total_size ();
+
+
     public int64 completed_size ();
+
 
     /***********************************************************
     Number of a file that is currently in progress.
     ***********************************************************/
     public int64 current_file ();
+
 
     /***********************************************************
     Return true if the size needs to be taken in account in the
@@ -104,6 +115,7 @@ class ProgressInfo : GLib.Object {
                  || item._type == ItemTypeVirtualFileDehydration);
     }
 
+
     /***********************************************************
     Holds estimates about progress, returned to the user.
     ***********************************************************/
@@ -114,6 +126,7 @@ class ProgressInfo : GLib.Object {
         /// Estimated time remaining in milliseconds.
         uint64 estimated_eta;
     };
+
 
     /***********************************************************
     Holds the current state of something making progress and maintains an
@@ -173,10 +186,12 @@ class ProgressInfo : GLib.Object {
 
     void set_progress_item (SyncFileItem &item, int64 completed);
 
+
     /***********************************************************
     Get the total completion estimate
     ***********************************************************/
     Estimates total_progress ();
+
 
     /***********************************************************
     Get the optimistic eta.
@@ -186,6 +201,7 @@ class ProgressInfo : GLib.Object {
     ***********************************************************/
     uint64 optimistic_eta ();
 
+
     /***********************************************************
     Whether the remaining-time estimate is trusted.
 
@@ -193,6 +209,7 @@ class ProgressInfo : GLib.Object {
     See #5046.
     ***********************************************************/
     bool trust_eta ();
+
 
     /***********************************************************
     Get the current file completion estimate structure
@@ -258,7 +275,7 @@ class Progress_dispatcher : GLib.Object {
 
     friend class Folder; // only allow Folder class to access the setting slots.
 
-    public static Progress_dispatcher *instance ();
+    public static Progress_dispatcher instance ();
     ~Progress_dispatcher () override;
 
 signals:
@@ -275,10 +292,12 @@ signals:
     ***********************************************************/
     void item_completed (string folder, SyncFileItemPtr &item);
 
+
     /***********************************************************
     @brief A new folder-wide sync error was seen.
     ***********************************************************/
     void sync_error (string folder, string message, ErrorCategory category);
+
 
     /***********************************************************
     @brief Emitted when an error needs to be added into GUI
@@ -289,6 +308,7 @@ signals:
     ***********************************************************/
     void add_error_to_gui (string folder, SyncFileItem.Status status, string error_message, string subject);
 
+
     /***********************************************************
     @brief Emitted for a folder when a sync is done, listing all pending conflicts
     ***********************************************************/
@@ -298,7 +318,7 @@ signals:
     protected void set_progress_info (string folder, ProgressInfo &progress);
 
 
-    private Progress_dispatcher (GLib.Object *parent = nullptr);
+    private Progress_dispatcher (GLib.Object parent = nullptr);
 
     private QElapsedTimer _timer;
     private static Progress_dispatcher _instance;
@@ -392,8 +412,8 @@ signals:
         return _instance;
     }
 
-    Progress_dispatcher.Progress_dispatcher (GLib.Object *parent)
-        : GLib.Object (parent) {
+    Progress_dispatcher.Progress_dispatcher (GLib.Object parent) {
+        base (parent);
     }
 
     Progress_dispatcher.~Progress_dispatcher () = default;
@@ -445,7 +465,7 @@ signals:
     }
 
     static bool should_count_progress (SyncFileItem &item) {
-        const auto instruction = item._instruction;
+        const var instruction = item._instruction;
 
         // Skip any ignored, error or non-propagated files and directories.
         if (instruction == CSYNC_INSTRUCTION_NONE
@@ -541,7 +561,7 @@ signals:
         // on the upload speed. That's particularly relevant for large file
         // up/downloads, where files per second will be close to 0.
         //
-        // However, when many *small* files are transfered, the estimate
+        // However, when many small* files are transfered, the estimate
         // can become very pessimistic as the transfered amount per second
         // drops significantly.
         //

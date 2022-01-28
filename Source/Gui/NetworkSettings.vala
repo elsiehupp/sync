@@ -22,7 +22,7 @@ namespace Ui {
 ***********************************************************/
 class Network_settings : Gtk.Widget {
 
-    public Network_settings (Gtk.Widget *parent = nullptr);
+    public Network_settings (Gtk.Widget parent = nullptr);
     ~Network_settings () override;
     public QSize size_hint () override;
 
@@ -36,7 +36,7 @@ class Network_settings : Gtk.Widget {
     private void on_check_account_localhost ();
 
 
-    protected void show_event (QShow_event *event) override;
+    protected void show_event (QShow_event event) override;
 
 
     private void load_proxy_settings ();
@@ -45,7 +45,7 @@ class Network_settings : Gtk.Widget {
     private Ui.Network_settings _ui;
 };
 
-    Network_settings.Network_settings (Gtk.Widget *parent)
+    Network_settings.Network_settings (Gtk.Widget parent)
         : Gtk.Widget (parent)
         , _ui (new Ui.Network_settings) {
         _ui.setup_ui (this);
@@ -199,8 +199,8 @@ class Network_settings : Gtk.Widget {
         // on_start the sync.
         FolderMan.instance ().set_dirty_proxy ();
 
-        const auto accounts = AccountManager.instance ().accounts ();
-        for (auto account : accounts) {
+        const var accounts = AccountManager.instance ().accounts ();
+        for (var account : accounts) {
             account.fresh_connection_attempt ();
         }
     }
@@ -236,7 +236,7 @@ class Network_settings : Gtk.Widget {
         }
     }
 
-    void Network_settings.show_event (QShow_event *event) {
+    void Network_settings.show_event (QShow_event event) {
         if (!event.spontaneous ()
             && _ui.manual_proxy_radio_button.is_checked ()
             && _ui.host_line_edit.text ().is_empty ()) {
@@ -254,8 +254,8 @@ class Network_settings : Gtk.Widget {
         if (_ui.manual_proxy_radio_button.is_checked ()) {
             // Check if at least one account is using localhost, because Qt proxy settings have no
             // effect for localhost (#7169)
-            for (auto &account : AccountManager.instance ().accounts ()) {
-                const auto host = account.account ().url ().host ();
+            for (var &account : AccountManager.instance ().accounts ()) {
+                const var host = account.account ().url ().host ();
                 // Some typical url for localhost
                 if (host == "localhost" || host.starts_with ("127.") || host == "[.1]")
                     visible = true;

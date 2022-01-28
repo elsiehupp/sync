@@ -19,22 +19,24 @@ Used by ProxyAuthHandler.
 ***********************************************************/
 class Proxy_auth_dialog : Gtk.Dialog {
 
-    public Proxy_auth_dialog (Gtk.Widget *parent = nullptr);
+    public Proxy_auth_dialog (Gtk.Widget parent = nullptr);
     ~Proxy_auth_dialog () override;
 
     public void set_proxy_address (string address);
 
     public string username ();
+
+
     public string password ();
 
     /// Resets the dialog for new credential entry.
     public void on_reset ();
 
 
-    private Ui.Proxy_auth_dialog *ui;
+    private Ui.Proxy_auth_dialog ui;
 };
 
-    Proxy_auth_dialog.Proxy_auth_dialog (Gtk.Widget *parent)
+    Proxy_auth_dialog.Proxy_auth_dialog (Gtk.Widget parent)
         : Gtk.Dialog (parent)
         , ui (new Ui.Proxy_auth_dialog) {
         ui.setup_ui (this);

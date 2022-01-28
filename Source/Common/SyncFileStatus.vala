@@ -25,12 +25,18 @@ class SyncFileStatus {
     };
 
     public SyncFileStatus ();
+
+
     public SyncFileStatus (SyncFileStatusTag);
 
     public void set (SyncFileStatusTag tag);
+
+
     public SyncFileStatusTag tag ();
 
     public void set_shared (bool is_shared);
+
+
     public bool shared ();
 
     public string to_socket_api_string ();

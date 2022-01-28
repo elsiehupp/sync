@@ -36,25 +36,65 @@ class Capabilities {
     public Capabilities (QVariantMap &capabilities);
 
     public bool share_a_p_i ();
+
+
     public bool share_email_password_enabled ();
+
+
     public bool share_email_password_enforced ();
+
+
     public bool share_public_link ();
+
+
     public bool share_public_link_allow_upload ();
+
+
     public bool share_public_link_supports_upload_only ();
+
+
     public bool share_public_link_ask_optional_password ();
+
+
     public bool share_public_link_enforce_password ();
+
+
     public bool share_public_link_enforce_expire_date ();
+
+
     public int share_public_link_expire_date_days ();
+
+
     public bool share_internal_enforce_expire_date ();
+
+
     public int share_internal_expire_date_days ();
+
+
     public bool share_remote_enforce_expire_date ();
+
+
     public int share_remote_expire_date_days ();
+
+
     public bool share_public_link_multiple ();
+
+
     public bool share_resharing ();
+
+
     public int share_default_permissions ();
+
+
     public bool chunking_ng ();
+
+
     public bool bulk_upload ();
+
+
     public bool user_status ();
+
+
     public bool user_status_supports_emoji ();
 
     /// Returns which kind of push notfications are available
@@ -81,6 +121,7 @@ class Capabilities {
     /// return true if the activity app is enabled
     public bool has_activities ();
 
+
     /***********************************************************
     Returns the checksum types the server understands.
 
@@ -94,6 +135,7 @@ class Capabilities {
     ***********************************************************/
     public GLib.List<GLib.ByteArray> supported_checksum_types ();
 
+
     /***********************************************************
     The checksum algorithm that the server recommends for file uploads.
     This is just a preference, any algorithm listed in supported_types may be used.
@@ -104,12 +146,14 @@ class Capabilities {
     ***********************************************************/
     public GLib.ByteArray preferred_upload_checksum_type ();
 
+
     /***********************************************************
     Helper that returns the preferred_upload_checksum_type () if set, or one
     of the supported_checksum_types () if it isn't. May return an empty
     GLib.ByteArray if no checksum types are supported.
     ***********************************************************/
     public GLib.ByteArray upload_checksum_type ();
+
 
     /***********************************************************
     List of HTTP error codes should be guaranteed to eventually reset
@@ -130,6 +174,7 @@ class Capabilities {
     ***********************************************************/
     public GLib.List<int> http_error_codes_that_reset_failing_chunked_uploads ();
 
+
     /***********************************************************
     Regex that, if contained in a filename, will result in it not being uploaded.
 
@@ -141,10 +186,12 @@ class Capabilities {
     ***********************************************************/
     public string invalid_filename_regex ();
 
+
     /***********************************************************
     return the list of filename that should not be uploaded
     ***********************************************************/
     public string[] blacklisted_files ();
+
 
     /***********************************************************
     Whether conflict files should remain local (default) or should be uploaded.
@@ -153,7 +200,11 @@ class Capabilities {
 
     // Direct Editing
     public void add_direct_editor (DirectEditor* direct_editor);
+
+
     public DirectEditor* get_direct_editor_for_mimetype (QMimeType &mime_type);
+
+
     public DirectEditor* get_direct_editor_for_optional_mimetype (QMimeType &mime_type);
 
 
@@ -168,16 +219,24 @@ class DirectEditor : GLib.Object {
 
     public DirectEditor (string id, string name, GLib.Object* parent = nullptr);
 
-    public void add_mimetype (GLib.ByteArray &mime_type);
-    public void add_optional_mimetype (GLib.ByteArray &mime_type);
+    public void add_mimetype (GLib.ByteArray mime_type);
+
+
+    public void add_optional_mimetype (GLib.ByteArray mime_type);
 
     public bool has_mimetype (QMimeType &mime_type);
+
+
     public bool has_optional_mimetype (QMimeType &mime_type);
 
     public string id ();
+
+
     public string name ();
 
     public GLib.List<GLib.ByteArray> mime_types ();
+
+
     public GLib.List<GLib.ByteArray> optional_mime_types ();
 
 
@@ -275,30 +334,30 @@ class DirectEditor : GLib.Object {
     }
 
     bool Capabilities.client_side_encryption_available () {
-        auto it = _capabilities.const_find (QStringLiteral ("end-to-end-encryption"));
+        var it = _capabilities.const_find (QStringLiteral ("end-to-end-encryption"));
         if (it == _capabilities.const_end ()) {
             return false;
         }
 
-        const auto properties = (*it).to_map ();
-        const auto enabled = properties.value (QStringLiteral ("enabled"), false).to_bool ();
+        const var properties = (*it).to_map ();
+        const var enabled = properties.value (QStringLiteral ("enabled"), false).to_bool ();
         if (!enabled) {
             return false;
         }
 
-        const auto version = properties.value (QStringLiteral ("api-version"), "1.0").to_byte_array ();
+        const var version = properties.value (QStringLiteral ("api-version"), "1.0").to_byte_array ();
         q_c_info (lc_server_capabilities) << "E2EE API version:" << version;
-        const auto splitted_version = version.split ('.');
+        const var splitted_version = version.split ('.');
 
         bool ok = false;
-        const auto major = !splitted_version.is_empty () ? splitted_version.at (0).to_int (&ok) : 0;
+        const var major = !splitted_version.is_empty () ? splitted_version.at (0).to_int (&ok) : 0;
         if (!ok) {
             q_c_warning (lc_server_capabilities) << "Didn't understand version scheme (major), E2EE disabled";
             return false;
         }
 
         ok = false;
-        const auto minor = splitted_version.size () > 1 ? splitted_version.at (1).to_int (&ok) : 0;
+        const var minor = splitted_version.size () > 1 ? splitted_version.at (1).to_int (&ok) : 0;
         if (!ok) {
             q_c_warning (lc_server_capabilities) << "Didn't understand version scheme (minor), E2EE disabled";
             return false;
@@ -322,7 +381,7 @@ class DirectEditor : GLib.Object {
 
     GLib.List<GLib.ByteArray> Capabilities.supported_checksum_types () {
         GLib.List<GLib.ByteArray> list;
-        foreach (auto &t, _capabilities["checksums"].to_map ()["supported_types"].to_list ()) {
+        foreach (var &t, _capabilities["checksums"].to_map ()["supported_types"].to_list ()) {
             list.push_back (t.to_byte_array ());
         }
         return list;
@@ -345,7 +404,7 @@ class DirectEditor : GLib.Object {
     }
 
     bool Capabilities.chunking_ng () {
-        static const auto chunkng = qgetenv ("OWNCLOUD_CHUNKING_NG");
+        static const var chunkng = qgetenv ("OWNCLOUD_CHUNKING_NG");
         if (chunkng == "0")
             return false;
         if (chunkng == "1")
@@ -361,7 +420,7 @@ class DirectEditor : GLib.Object {
         if (!_capabilities.contains ("user_status")) {
             return false;
         }
-        const auto user_status_map = _capabilities["user_status"].to_map ();
+        const var user_status_map = _capabilities["user_status"].to_map ();
         return user_status_map.value ("enabled", false).to_bool ();
     }
 
@@ -369,7 +428,7 @@ class DirectEditor : GLib.Object {
         if (!user_status ()) {
             return false;
         }
-        const auto user_status_map = _capabilities["user_status"].to_map ();
+        const var user_status_map = _capabilities["user_status"].to_map ();
         return user_status_map.value ("supports_emoji", false).to_bool ();
     }
 
@@ -378,7 +437,7 @@ class DirectEditor : GLib.Object {
             return PushNotificationType.None;
         }
 
-        const auto types = _capabilities["notify_push"].to_map ()["type"].to_string_list ();
+        const var types = _capabilities["notify_push"].to_map ()["type"].to_string_list ();
         PushNotificationTypes push_notification_types;
 
         if (types.contains ("files")) {
@@ -397,7 +456,7 @@ class DirectEditor : GLib.Object {
     }
 
     QUrl Capabilities.push_notifications_web_socket_url () {
-        const auto websocket = _capabilities["notify_push"].to_map ()["endpoints"].to_map ()["websocket"].to_string ();
+        const var websocket = _capabilities["notify_push"].to_map ()["endpoints"].to_map ()["websocket"].to_string ();
         return QUrl (websocket);
     }
 
@@ -411,7 +470,7 @@ class DirectEditor : GLib.Object {
 
     GLib.List<int> Capabilities.http_error_codes_that_reset_failing_chunked_uploads () {
         GLib.List<int> list;
-        foreach (auto &t, _capabilities["dav"].to_map ()["http_error_codes_that_reset_failing_chunked_uploads"].to_list ()) {
+        foreach (var &t, _capabilities["dav"].to_map ()["http_error_codes_that_reset_failing_chunked_uploads"].to_list ()) {
             list.push_back (t.to_int ());
         }
         return list;
@@ -422,7 +481,7 @@ class DirectEditor : GLib.Object {
     }
 
     bool Capabilities.upload_conflict_files () {
-        static auto env_is_set = !q_environment_variable_is_empty ("OWNCLOUD_UPLOAD_CONFLICT_FILES");
+        static var env_is_set = !q_environment_variable_is_empty ("OWNCLOUD_UPLOAD_CONFLICT_FILES");
         static int env_value = q_environment_variable_int_value ("OWNCLOUD_UPLOAD_CONFLICT_FILES");
         if (env_is_set)
             return env_value != 0;
@@ -476,11 +535,11 @@ class DirectEditor : GLib.Object {
         return _name;
     }
 
-    void DirectEditor.add_mimetype (GLib.ByteArray &mime_type) {
+    void DirectEditor.add_mimetype (GLib.ByteArray mime_type) {
         _mime_types.append (mime_type);
     }
 
-    void DirectEditor.add_optional_mimetype (GLib.ByteArray &mime_type) {
+    void DirectEditor.add_optional_mimetype (GLib.ByteArray mime_type) {
         _optional_mime_types.append (mime_type);
     }
 

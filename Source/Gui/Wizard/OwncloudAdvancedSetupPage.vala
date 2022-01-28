@@ -27,18 +27,30 @@ namespace Occ {
 ***********************************************************/
 class Owncloud_advanced_setup_page : QWizard_page {
 
-    public Owncloud_advanced_setup_page (OwncloudWizard *wizard);
+    public Owncloud_advanced_setup_page (OwncloudWizard wizard);
 
     public bool is_complete () override;
     public void initialize_page () override;
     public int next_id () override;
     public bool validate_page () override;
     public string local_folder ();
+
+
     public string[] selective_sync_blacklist ();
+
+
     public bool use_virtual_file_sync ();
+
+
     public bool is_confirm_big_folder_checked ();
+
+
     public void on_set_remote_folder (string remote_folder);
+
+
     public void set_multiple_folders_exist (bool exist);
+
+
     public void directories_created ();
 
 signals:
@@ -46,6 +58,8 @@ signals:
 
 
     public void on_set_error_string (string );
+
+
     public void on_style_changed ();
 
 
@@ -56,7 +70,7 @@ signals:
     private void on_quota_retrieved (QVariantMap &result);
 
 
-    private void set_radio_checked (QRadio_button *radio);
+    private void set_radio_checked (QRadio_button radio);
 
     private void setup_customization ();
     private void update_status ();
@@ -91,7 +105,7 @@ signals:
     private OwncloudWizard _oc_wizard;
 };
 
-    Owncloud_advanced_setup_page.Owncloud_advanced_setup_page (OwncloudWizard *wizard)
+    Owncloud_advanced_setup_page.Owncloud_advanced_setup_page (OwncloudWizard wizard)
         : QWizard_page ()
         , _progress_indi (new QProgress_indicator (this))
         , _oc_wizard (wizard) {
@@ -101,7 +115,7 @@ signals:
 
         register_field (QLatin1String ("OCSync_from_scratch"), _ui.cb_sync_from_scratch);
 
-        auto size_policy = _progress_indi.size_policy ();
+        var size_policy = _progress_indi.size_policy ();
         size_policy.set_retain_size_when_hidden (true);
         _progress_indi.set_size_policy (size_policy);
 
@@ -129,9 +143,9 @@ signals:
         });
         connect (_ui.b_selective_sync, &QAbstractButton.clicked, this, &Owncloud_advanced_setup_page.on_selective_sync_clicked);
 
-        const auto theme = Theme.instance ();
-        const auto app_icon = theme.application_icon ();
-        const auto app_icon_size = Theme.is_hidpi () ? 128 : 64;
+        const var theme = Theme.instance ();
+        const var app_icon = theme.application_icon ();
+        const var app_icon_size = Theme.is_hidpi () ? 128 : 64;
 
         _ui.l_server_icon.set_pixmap (app_icon.pixmap (app_icon_size));
 
@@ -152,7 +166,7 @@ signals:
         _ui.top_label.hide ();
         _ui.bottom_label.hide ();
 
-        Theme *theme = Theme.instance ();
+        Theme theme = Theme.instance ();
         QVariant variant = theme.custom_media (Theme.o_c_setup_top);
         if (!variant.is_null ()) {
             WizardCommon.setup_custom_media (variant, _ui.top_label);
@@ -175,7 +189,7 @@ signals:
         WizardCommon.init_error_label (_ui.error_label);
 
         if (!Theme.instance ().show_virtual_files_option () || best_available_vfs_mode () == Vfs.Off) {
-            // If the layout were wrapped in a widget, the auto-grouping of the
+            // If the layout were wrapped in a widget, the var-grouping of the
             // radio buttons no longer works and there are surprising margins.
             // Just manually hide the button and remove the layout.
             _ui.r_virtual_file_sync.hide ();
@@ -196,8 +210,8 @@ signals:
         // ensure "next" gets the focus, not ob_select_local_folder
         QTimer.single_shot (0, wizard ().button (QWizard.Finish_button), q_overload<> (&Gtk.Widget.set_focus));
 
-        auto acc = static_cast<OwncloudWizard> (wizard ()).account ();
-        auto quota_job = new PropfindJob (acc, _remote_folder, this);
+        var acc = static_cast<OwncloudWizard> (wizard ()).account ();
+        var quota_job = new PropfindJob (acc, _remote_folder, this);
         quota_job.set_properties (GLib.List<GLib.ByteArray> () << "http://owncloud.org/ns:size");
 
         connect (quota_job, &PropfindJob.result, this, &Owncloud_advanced_setup_page.on_quota_retrieved);
@@ -210,7 +224,7 @@ signals:
         }
 
         ConfigFile cfg_file;
-        auto new_folder_limit = cfg_file.new_big_folder_size_limit ();
+        var new_folder_limit = cfg_file.new_big_folder_size_limit ();
         _ui.conf_check_box_size.set_checked (new_folder_limit.first);
         _ui.conf_spin_box.set_value (new_folder_limit.second);
         _ui.conf_check_box_external.set_checked (cfg_file.confirm_external_storage ());
@@ -220,7 +234,7 @@ signals:
 
         customize_style ();
 
-        auto next_button = qobject_cast<QPushButton> (_oc_wizard.button (QWizard.Next_button));
+        var next_button = qobject_cast<QPushButton> (_oc_wizard.button (QWizard.Next_button));
         if (next_button) {
             next_button.set_default (true);
         }
@@ -228,31 +242,31 @@ signals:
 
     void Owncloud_advanced_setup_page.fetch_user_avatar () {
         // Reset user avatar
-        const auto app_icon = Theme.instance ().application_icon ();
+        const var app_icon = Theme.instance ().application_icon ();
         _ui.l_server_icon.set_pixmap (app_icon.pixmap (48));
         // Fetch user avatar
-        const auto account = _oc_wizard.account ();
-        auto avatar_size = 64;
+        const var account = _oc_wizard.account ();
+        var avatar_size = 64;
         if (Theme.is_hidpi ()) {
             avatar_size *= 2;
         }
-        const auto avatar_job = new AvatarJob (account, account.dav_user (), avatar_size, this);
+        const var avatar_job = new AvatarJob (account, account.dav_user (), avatar_size, this);
         avatar_job.on_set_timeout (20 * 1000);
         GLib.Object.connect (avatar_job, &AvatarJob.avatar_pixmap, this, [this] (QImage &avatar_image) {
             if (avatar_image.is_null ()) {
                 return;
             }
-            const auto avatar_pixmap = QPixmap.from_image (AvatarJob.make_circular_avatar (avatar_image));
+            const var avatar_pixmap = QPixmap.from_image (AvatarJob.make_circular_avatar (avatar_image));
             _ui.l_server_icon.set_pixmap (avatar_pixmap);
         });
         avatar_job.on_start ();
     }
 
     void Owncloud_advanced_setup_page.set_user_information () {
-        const auto account = _oc_wizard.account ();
-        const auto server_url = account.url ().to_string ();
+        const var account = _oc_wizard.account ();
+        const var server_url = account.url ().to_string ();
         set_server_address_label_url (server_url);
-        const auto user_name = account.dav_display_name ();
+        const var user_name = account.dav_display_name ();
         _ui.user_name_label.on_set_text (user_name);
     }
 
@@ -278,7 +292,7 @@ signals:
             return;
         }
 
-        const auto pretty_url = url.to_string ().mid (url.scheme ().size () + 3); // + 3 because we need to remove ://
+        const var pretty_url = url.to_string ().mid (url.scheme ().size () + 3); // + 3 because we need to remove ://
         _ui.server_address_label.on_set_text (pretty_url);
     }
 
@@ -387,9 +401,9 @@ signals:
 
     bool Owncloud_advanced_setup_page.validate_page () {
         if (use_virtual_file_sync ()) {
-            const auto availability = Vfs.check_availability (local_folder ());
+            const var availability = Vfs.check_availability (local_folder ());
             if (!availability) {
-                auto msg = new QMessageBox (QMessageBox.Warning, tr ("Virtual files are not available for the selected folder"), availability.error (), QMessageBox.Ok, this);
+                var msg = new QMessageBox (QMessageBox.Warning, tr ("Virtual files are not available for the selected folder"), availability.error (), QMessageBox.Ok, this);
                 msg.set_attribute (Qt.WA_DeleteOnClose);
                 msg.open ();
                 return false;
@@ -461,14 +475,14 @@ signals:
     }
 
     void Owncloud_advanced_setup_page.set_local_folder_push_button_path (string path) {
-        const auto home_dir = QDir.home_path ().ends_with ('/') ? QDir.home_path () : QDir.home_path () + QLatin1Char ('/');
+        const var home_dir = QDir.home_path ().ends_with ('/') ? QDir.home_path () : QDir.home_path () + QLatin1Char ('/');
 
         if (!path.starts_with (home_dir)) {
             _ui.pb_select_local_folder.on_set_text (QDir.to_native_separators (path));
             return;
         }
 
-        auto pretty_path = path;
+        var pretty_path = path;
         pretty_path.remove (0, home_dir.size ());
 
         _ui.pb_select_local_folder.on_set_text (QDir.to_native_separators (pretty_path));
@@ -476,7 +490,7 @@ signals:
 
     void Owncloud_advanced_setup_page.on_selective_sync_clicked () {
         AccountPtr acc = static_cast<OwncloudWizard> (wizard ()).account ();
-        auto *dlg = new Selective_sync_dialog (acc, _remote_folder, _selective_sync_blacklist, this);
+        var dlg = new Selective_sync_dialog (acc, _remote_folder, _selective_sync_blacklist, this);
         dlg.set_attribute (Qt.WA_DeleteOnClose);
 
         connect (dlg, &Selective_sync_dialog.on_finished, this, [this, dlg]{
@@ -500,7 +514,7 @@ signals:
                     _ui.r_selective_sync.block_signals (true);
                     set_radio_checked (_ui.r_selective_sync);
                     _ui.r_selective_sync.block_signals (false);
-                    auto s = dlg.estimated_size ();
+                    var s = dlg.estimated_size ();
                     if (s > 0) {
                         _ui.l_selective_sync_size_label.on_set_text (tr (" (%1)").arg (Utility.octets_to_string (s)));
                     } else {
@@ -564,7 +578,7 @@ signals:
 
     void Owncloud_advanced_setup_page.customize_style () {
         if (_progress_indi) {
-            const auto is_dark_background = Theme.is_dark_color (palette ().window ().color ());
+            const var is_dark_background = Theme.is_dark_color (palette ().window ().color ());
             if (is_dark_background) {
                 _progress_indi.on_set_color (Qt.white);
             } else {
@@ -577,13 +591,13 @@ signals:
     }
 
     void Owncloud_advanced_setup_page.style_local_folder_label () {
-        const auto background_color = palette ().window ().color ();
-        const auto folder_icon_file_name = Theme.instance ().is_branded () ? Theme.hidpi_file_name ("folder.png", background_color)
+        const var background_color = palette ().window ().color ();
+        const var folder_icon_file_name = Theme.instance ().is_branded () ? Theme.hidpi_file_name ("folder.png", background_color)
                                                                        : Theme.hidpi_file_name (":/client/theme/colored/folder.png");
         _ui.l_local.set_pixmap (folder_icon_file_name);
     }
 
-    void Owncloud_advanced_setup_page.set_radio_checked (QRadio_button *radio) {
+    void Owncloud_advanced_setup_page.set_radio_checked (QRadio_button radio) {
         // We don't want clicking the radio buttons to immediately adjust the checked state
         // for selective sync and virtual file sync, so we keep them uncheckable until
         // they should be checked.
@@ -597,18 +611,18 @@ signals:
     }
 
     void Owncloud_advanced_setup_page.style_sync_logo () {
-        const auto sync_arrow_icon = Theme.create_color_aware_icon (QLatin1String (":/client/theme/sync-arrow.svg"), palette ());
+        const var sync_arrow_icon = Theme.create_color_aware_icon (QLatin1String (":/client/theme/sync-arrow.svg"), palette ());
         _ui.sync_logo_label.set_pixmap (sync_arrow_icon.pixmap (QSize (50, 50)));
     }
 
     void Owncloud_advanced_setup_page.setup_resoultion_widget () {
         for (int i = 0; i < _ui.resolution_widget_layout.count (); ++i) {
-            auto widget = _ui.resolution_widget_layout.item_at (i).widget ();
+            var widget = _ui.resolution_widget_layout.item_at (i).widget ();
             if (!widget) {
                 continue;
             }
 
-            auto size_policy = widget.size_policy ();
+            var size_policy = widget.size_policy ();
             size_policy.set_retain_size_when_hidden (true);
             widget.set_size_policy (size_policy);
         }

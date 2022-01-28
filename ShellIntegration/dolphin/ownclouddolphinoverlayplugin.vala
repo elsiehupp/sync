@@ -31,13 +31,14 @@ class OwncloudDolphinPlugin : KOverlayIconPlugin {
     StatusMap m_status;
 
     public OwncloudDolphinPlugin () {
-        auto helper = OwncloudDolphinPluginHelper.instance ();
+        var helper = OwncloudDolphinPluginHelper.instance ();
         GLib.Object.connect (helper, &OwncloudDolphinPluginHelper.commandRecieved,
                          this, &OwncloudDolphinPlugin.slotCommandRecieved);
     }
 
+
     public string[] getOverlays (QUrl& url) override {
-        auto helper = OwncloudDolphinPluginHelper.instance ();
+        var helper = OwncloudDolphinPluginHelper.instance ();
         if (!helper.isConnected ())
             return string[] ();
         if (!url.isLocalFile ())
@@ -54,7 +55,7 @@ class OwncloudDolphinPlugin : KOverlayIconPlugin {
         return string[] ();
     }
 
-    private string[] overlaysForString (GLib.ByteArray &status) {
+    private string[] overlaysForString (GLib.ByteArray status) {
         string[] r;
         if (status.startsWith ("NOP"))
             return r;
@@ -74,7 +75,7 @@ class OwncloudDolphinPlugin : KOverlayIconPlugin {
         return r;
     }
 
-    private void slotCommandRecieved (GLib.ByteArray &line) {
+    private void slotCommandRecieved (GLib.ByteArray line) {
 
         GLib.List<GLib.ByteArray> tokens = line.split (':');
         if (tokens.count () < 3)
@@ -87,7 +88,7 @@ class OwncloudDolphinPlugin : KOverlayIconPlugin {
         // We can't use tokens[2] because the filename might contain ':'
         int secondColon = line.indexOf (":", line.indexOf (":") + 1);
         const GLib.ByteArray name = line.mid (secondColon + 1);
-        GLib.ByteArray &status = m_status[name]; // reference to the item in the hash
+        GLib.ByteArray status = m_status[name]; // reference to the item in the hash
         if (status == tokens[1])
             return;
         status = tokens[1];

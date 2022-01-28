@@ -16,12 +16,12 @@ namespace Occ {
 
 class Propagate_remote_delete_encrypted : AbstractPropagateRemoteDeleteEncrypted {
 
-    public Propagate_remote_delete_encrypted (OwncloudPropagator *propagator, SyncFileItemPtr item, GLib.Object *parent);
+    public Propagate_remote_delete_encrypted (OwncloudPropagator propagator, SyncFileItemPtr item, GLib.Object parent);
 
     public void on_start () override;
 
 
-    private void on_folder_un_locked_successfully (GLib.ByteArray &folder_id) override;
+    private void on_folder_un_locked_successfully (GLib.ByteArray folder_id) override;
     private void on_folder_encrypted_metadata_received (QJsonDocument &json, int status_code) override;
 };
 
@@ -33,7 +33,7 @@ class Propagate_remote_delete_encrypted : AbstractPropagateRemoteDeleteEncrypted
 
 
 
-Propagate_remote_delete_encrypted.Propagate_remote_delete_encrypted (OwncloudPropagator *propagator, SyncFileItemPtr item, GLib.Object *parent)
+Propagate_remote_delete_encrypted.Propagate_remote_delete_encrypted (OwncloudPropagator propagator, SyncFileItemPtr item, GLib.Object parent)
     : AbstractPropagateRemoteDeleteEncrypted (propagator, item, parent) {
 
 }
@@ -45,9 +45,9 @@ void Propagate_remote_delete_encrypted.on_start () {
     start_ls_col_job (info.path ());
 }
 
-void Propagate_remote_delete_encrypted.on_folder_un_locked_successfully (GLib.ByteArray &folder_id) {
+void Propagate_remote_delete_encrypted.on_folder_un_locked_successfully (GLib.ByteArray folder_id) {
     AbstractPropagateRemoteDeleteEncrypted.on_folder_un_locked_successfully (folder_id);
-    emit on_finished (!_is_task_failed);
+    emit finished (!_is_task_failed);
 }
 
 void Propagate_remote_delete_encrypted.on_folder_encrypted_metadata_received (QJsonDocument &json, int status_code) {
@@ -83,7 +83,7 @@ void Propagate_remote_delete_encrypted.on_folder_encrypted_metadata_received (QJ
 
     q_c_debug (PROPAGATE_REMOVE_ENCRYPTED) << "Metadata updated, sending to the server.";
 
-    auto job = new UpdateMetadataApiJob (_propagator.account (), _folder_id, metadata.encrypted_metadata (), _folder_token);
+    var job = new UpdateMetadataApiJob (_propagator.account (), _folder_id, metadata.encrypted_metadata (), _folder_token);
     connect (job, &UpdateMetadataApiJob.on_success, this, [this] (GLib.ByteArray& file_id) {
         Q_UNUSED (file_id);
         delete_remote_item (_item._encrypted_file_name);

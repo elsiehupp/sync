@@ -21,7 +21,9 @@ overlay icons in the shell.
 ***********************************************************/
 class SyncFileStatusTracker : GLib.Object {
 
-    public SyncFileStatusTracker (SyncEngine *sync_engine);
+    public SyncFileStatusTracker (SyncEngine sync_engine);
+
+
     public SyncFileStatus file_status (string relative_path);
 
 
@@ -86,8 +88,8 @@ signals:
     }
 
     SyncFileStatus.SyncFileStatusTag SyncFileStatusTracker.lookup_problem (string path_to_match, SyncFileStatusTracker.Problems_map &problem_map) {
-        auto lower = problem_map.lower_bound (path_to_match);
-        for (auto it = lower; it != problem_map.cend (); ++it) {
+        var lower = problem_map.lower_bound (path_to_match);
+        for (var it = lower; it != problem_map.cend (); ++it) {
             const string problem_path = it.first;
             SyncFileStatus.SyncFileStatusTag severity = it.second;
 
@@ -110,6 +112,7 @@ signals:
         return SyncFileStatus.SyncFileStatusTag.STATUS_NONE;
     }
 
+
     /***********************************************************
     Whether this item should get an ERROR icon through the Socket API.
 
@@ -119,7 +122,7 @@ signals:
     automatically.
     ***********************************************************/
     static inline bool has_error_status (SyncFileItem &item) {
-        const auto status = item._status;
+        const var status = item._status;
         return item._instruction == CSYNC_INSTRUCTION_ERROR
             || status == SyncFileItem.NormalError
             || status == SyncFileItem.FatalError
@@ -129,7 +132,7 @@ signals:
     }
 
     static inline bool has_excluded_status (SyncFileItem &item) {
-        const auto status = item._status;
+        const var status = item._status;
         return item._instruction == CSYNC_INSTRUCTION_IGNORE
             || status == SyncFileItem.FileIgnored
             || status == SyncFileItem.Conflict
@@ -137,7 +140,7 @@ signals:
             || status == SyncFileItem.FileLocked;
     }
 
-    SyncFileStatusTracker.SyncFileStatusTracker (SyncEngine *sync_engine)
+    SyncFileStatusTracker.SyncFileStatusTracker (SyncEngine sync_engine)
         : _sync_engine (sync_engine) {
         connect (sync_engine, &SyncEngine.about_to_propagate,
             this, &SyncFileStatusTracker.on_about_to_propagate);
@@ -190,12 +193,12 @@ signals:
         string local_path = file_name.mid (folder_path.size ());
         _dirty_paths.insert (local_path);
 
-        emit on_file_status_changed (file_name, SyncFileStatus.SyncFileStatusTag.STATUS_SYNC);
+        emit file_status_changed (file_name, SyncFileStatus.SyncFileStatusTag.STATUS_SYNC);
     }
 
     void SyncFileStatusTracker.on_add_silently_excluded (string folder_path) {
         _sync_problems[folder_path] = SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
-        emit on_file_status_changed (get_system_destination (folder_path), resolve_sync_and_error_status (folder_path, Not_shared));
+        emit file_status_changed (get_system_destination (folder_path), resolve_sync_and_error_status (folder_path, Not_shared));
     }
 
     void SyncFileStatusTracker.inc_sync_count_and_emit_status_changed (string relative_path, Shared_flag shared_flag) {
@@ -205,7 +208,7 @@ signals:
             SyncFileStatus status = shared_flag == Unknown_shared
                 ? file_status (relative_path)
                 : resolve_sync_and_error_status (relative_path, shared_flag);
-            emit on_file_status_changed (get_system_destination (relative_path), status);
+            emit file_status_changed (get_system_destination (relative_path), status);
 
             // We passed from OK to SYNC, increment the parent to keep it marked as
             // SYNC while we propagate ourselves and our own children.
@@ -227,7 +230,7 @@ signals:
             SyncFileStatus status = shared_flag == Unknown_shared
                 ? file_status (relative_path)
                 : resolve_sync_and_error_status (relative_path, shared_flag);
-            emit on_file_status_changed (get_system_destination (relative_path), status);
+            emit file_status_changed (get_system_destination (relative_path), status);
 
             // We passed from SYNC to OK, decrement our parent.
             ASSERT (!relative_path.ends_with ('/'));
@@ -264,7 +267,7 @@ signals:
                 // Mark this path as syncing for instructions that will result in propagation.
                 inc_sync_count_and_emit_status_changed (item.destination (), shared_flag);
             } else {
-                emit on_file_status_changed (get_system_destination (item.destination ()), resolve_sync_and_error_status (item.destination (), shared_flag));
+                emit file_status_changed (get_system_destination (item.destination ()), resolve_sync_and_error_status (item.destination (), shared_flag));
             }
         }
 
@@ -273,19 +276,19 @@ signals:
         // Swap into a copy since file_status () reads _dirty_paths to determine the status
         QSet<string> old_dirty_paths;
         std.swap (_dirty_paths, old_dirty_paths);
-        for (auto &old_dirty_path : q_as_const (old_dirty_paths))
-            emit on_file_status_changed (get_system_destination (old_dirty_path), file_status (old_dirty_path));
+        for (var &old_dirty_path : q_as_const (old_dirty_paths))
+            emit file_status_changed (get_system_destination (old_dirty_path), file_status (old_dirty_path));
 
         // Make sure to push any status that might have been resolved indirectly since the last sync
         // (like an error file being deleted from disk)
-        for (auto &sync_problem : _sync_problems)
+        for (var &sync_problem : _sync_problems)
             old_problems.erase (sync_problem.first);
-        for (auto &old_problem : old_problems) {
+        for (var &old_problem : old_problems) {
             const string path = old_problem.first;
             SyncFileStatus.SyncFileStatusTag severity = old_problem.second;
             if (severity == SyncFileStatus.SyncFileStatusTag.STATUS_ERROR)
                 invalidate_parent_paths (path);
-            emit on_file_status_changed (get_system_destination (path), file_status (path));
+            emit file_status_changed (get_system_destination (path), file_status (path));
         }
     }
 
@@ -306,10 +309,10 @@ signals:
             && item._instruction != CSYNC_INSTRUCTION_UPDATE_METADATA
             && item._instruction != CSYNC_INSTRUCTION_IGNORE
             && item._instruction != CSYNC_INSTRUCTION_ERROR) {
-            // dec_sync_count calls *must* be symetric with inc_sync_count calls in on_about_to_propagate
+            // dec_sync_count calls must* be symetric with inc_sync_count calls in on_about_to_propagate
             dec_sync_count_and_emit_status_changed (item.destination (), shared_flag);
         } else {
-            emit on_file_status_changed (get_system_destination (item.destination ()), resolve_sync_and_error_status (item.destination (), shared_flag));
+            emit file_status_changed (get_system_destination (item.destination ()), resolve_sync_and_error_status (item.destination (), shared_flag));
         }
     }
 
@@ -317,18 +320,18 @@ signals:
         // Clear the sync counts to reduce the impact of unsymetrical inc/dec calls (e.g. when directory job on_abort)
         QHash<string, int> old_sync_count;
         std.swap (_sync_count, old_sync_count);
-        for (auto it = old_sync_count.begin (); it != old_sync_count.end (); ++it) {
+        for (var it = old_sync_count.begin (); it != old_sync_count.end (); ++it) {
             // Don't announce folders, file_status expect only paths without '/', otherwise it asserts
             if (it.key ().ends_with ('/')) {
                 continue;
             }
 
-            emit on_file_status_changed (get_system_destination (it.key ()), file_status (it.key ()));
+            emit file_status_changed (get_system_destination (it.key ()), file_status (it.key ()));
         }
     }
 
     void SyncFileStatusTracker.on_sync_engine_running_changed () {
-        emit on_file_status_changed (get_system_destination (string ()), resolve_sync_and_error_status (string (), Not_shared));
+        emit file_status_changed (get_system_destination (string ()), resolve_sync_and_error_status (string (), Not_shared));
     }
 
     SyncFileStatus SyncFileStatusTracker.resolve_sync_and_error_status (string relative_path, Shared_flag shared_flag, Path_known_flag is_path_known) {
@@ -357,7 +360,7 @@ signals:
         string[] split_path = path.split ('/', Qt.Skip_empty_parts);
         for (int i = 0; i < split_path.size (); ++i) {
             string parent_path = string[] (split_path.mid (0, i)).join (QLatin1String ("/"));
-            emit on_file_status_changed (get_system_destination (parent_path), file_status (parent_path));
+            emit file_status_changed (get_system_destination (parent_path), file_status (parent_path));
         }
     }
 

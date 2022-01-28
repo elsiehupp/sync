@@ -26,22 +26,22 @@ namespace Ui {
 ***********************************************************/
 class Ignore_list_editor : Gtk.Dialog {
 
-    public Ignore_list_editor (Gtk.Widget *parent = nullptr);
+    public Ignore_list_editor (Gtk.Widget parent = nullptr);
     ~Ignore_list_editor () override;
 
     public bool ignore_hidden_files ();
 
 
-    private void on_restore_defaults (QAbstractButton *button);
+    private void on_restore_defaults (QAbstractButton button);
 
 
     private void setup_table_read_only_items ();
     private string read_only_tooltip;
-    private Ui.Ignore_list_editor *ui;
+    private Ui.Ignore_list_editor ui;
 };
 
 
-    Ignore_list_editor.Ignore_list_editor (Gtk.Widget *parent)
+    Ignore_list_editor.Ignore_list_editor (Gtk.Widget parent)
         : Gtk.Dialog (parent)
         , ui (new Ui.Ignore_list_editor) {
         set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
@@ -54,7 +54,7 @@ class Ignore_list_editor : Gtk.Dialog {
                               .arg (QDir.to_native_separators (cfg_file.exclude_file (ConfigFile.SystemScope)));
 
         setup_table_read_only_items ();
-        const auto user_config = cfg_file.exclude_file (ConfigFile.Scope.UserScope);
+        const var user_config = cfg_file.exclude_file (ConfigFile.Scope.UserScope);
         ui.ignore_table_widget.read_ignore_file (user_config);
 
         connect (this, &Gtk.Dialog.accepted, [=] () {
@@ -79,16 +79,16 @@ class Ignore_list_editor : Gtk.Dialog {
     }
 
     void Ignore_list_editor.setup_table_read_only_items () {
-        ui.ignore_table_widget.add_pattern (".csync_journal.db*", /*deletable=*/false, /*readonly=*/true);
-        ui.ignore_table_widget.add_pattern ("._sync_*.db*", /*deletable=*/false, /*readonly=*/true);
-        ui.ignore_table_widget.add_pattern (".sync_*.db*", /*deletable=*/false, /*readonly=*/true);
+        ui.ignore_table_widget.add_pattern (".csync_journal.db*", /*deletable=*/false, /*read_only=*/true);
+        ui.ignore_table_widget.add_pattern ("._sync_*.db*", /*deletable=*/false, /*read_only=*/true);
+        ui.ignore_table_widget.add_pattern (".sync_*.db*", /*deletable=*/false, /*read_only=*/true);
     }
 
     bool Ignore_list_editor.ignore_hidden_files () {
         return !ui.sync_hidden_files_check_box.is_checked ();
     }
 
-    void Ignore_list_editor.on_restore_defaults (QAbstractButton *button) {
+    void Ignore_list_editor.on_restore_defaults (QAbstractButton button) {
         if (ui.button_box.button_role (button) != QDialogButtonBox.Reset_role)
             return;
 

@@ -56,7 +56,7 @@ Simple class diagram of the updater:
 
 class UpdaterScheduler : GLib.Object {
 
-    public UpdaterScheduler (GLib.Object *parent);
+    public UpdaterScheduler (GLib.Object parent);
 
 signals:
     void updater_announcement (string title, string msg);
@@ -99,7 +99,11 @@ class OCUpdater : Updater {
     public void check_for_update () override;
 
     public string status_string (Update_status_string_format format = PlainText);
+
+
     public int download_state ();
+
+
     public void set_download_state (Download_state state);
 
 signals:
@@ -122,7 +126,7 @@ protected slots:
 
     protected virtual void version_info_arrived (Update_info &info) = 0;
     protected bool update_succeeded ();
-    protected QNetworkAccessManager *qnam () {
+    protected QNetworkAccessManager qnam () {
         return _access_manager;
     }
     protected Update_info update_info () {
@@ -144,6 +148,8 @@ protected slots:
 class NSISUpdater : OCUpdater {
 
     public NSISUpdater (QUrl url);
+
+
     public bool handle_startup () override;
 
     private void on_set_seen_version ();
@@ -169,6 +175,8 @@ class NSISUpdater : OCUpdater {
 class Passive_update_notifier : OCUpdater {
 
     public Passive_update_notifier (QUrl url);
+
+
     public bool handle_startup () override {
         return false;
     }
@@ -186,13 +194,13 @@ class Passive_update_notifier : OCUpdater {
     static const char seen_version_c[] = "Updater/seen_version";
     static const char auto_update_attempted_c[] = "Updater/auto_update_attempted";
 
-    UpdaterScheduler.UpdaterScheduler (GLib.Object *parent)
-        : GLib.Object (parent) {
+    UpdaterScheduler.UpdaterScheduler (GLib.Object parent) {
+        base (parent);
         connect (&_update_check_timer, &QTimer.timeout,
             this, &UpdaterScheduler.on_timer_fired);
 
-        // Note : the sparkle-updater is not an OCUpdater
-        if (auto *updater = qobject_cast<OCUpdater> (Updater.instance ())) {
+        // Note: the sparkle-updater is not an OCUpdater
+        if (var updater = qobject_cast<OCUpdater> (Updater.instance ())) {
             connect (updater, &OCUpdater.new_update_available,
                 this, &UpdaterScheduler.updater_announcement);
             connect (updater, &OCUpdater.request_restart, this, &UpdaterScheduler.request_restart);
@@ -202,7 +210,7 @@ class Passive_update_notifier : OCUpdater {
         QTimer.single_shot (3000, this, &UpdaterScheduler.on_timer_fired);
 
         ConfigFile cfg;
-        auto check_interval = cfg.update_check_interval ();
+        var check_interval = cfg.update_check_interval ();
         _update_check_timer.on_start (std.chrono.milliseconds (check_interval).count ());
     }
 
@@ -210,7 +218,7 @@ class Passive_update_notifier : OCUpdater {
         ConfigFile cfg;
 
         // re-set the check interval if it changed in the config file meanwhile
-        auto check_interval = std.chrono.milliseconds (cfg.update_check_interval ()).count ();
+        var check_interval = std.chrono.milliseconds (cfg.update_check_interval ()).count ();
         if (check_interval != _update_check_timer.interval ()) {
             _update_check_timer.set_interval (check_interval);
             q_c_info (lc_updater) << "Setting new update check interval " << check_interval;
@@ -222,7 +230,7 @@ class Passive_update_notifier : OCUpdater {
             return;
         }
 
-        Updater *updater = Updater.instance ();
+        Updater updater = Updater.instance ();
         if (updater) {
             updater.background_check_for_update ();
         }
@@ -248,7 +256,7 @@ class Passive_update_notifier : OCUpdater {
         string update_file = settings.value (update_available_c).to_string ();
         if (!update_file.is_empty () && QFile (update_file).exists ()
             && !update_succeeded () /* Someone might have run the updater manually between restarts */) {
-            const auto message_box_start_installer = new QMessageBox (QMessageBox.Information,
+            const var message_box_start_installer = new QMessageBox (QMessageBox.Information,
                 tr ("New %1 update ready").arg (Theme.instance ().app_name_gui ()),
                 tr ("A new update for %1 is about to be installed. The updater may ask "
                    "for additional privileges during the process. Your computer may reboot to complete the installation.")
@@ -295,7 +303,7 @@ class Passive_update_notifier : OCUpdater {
             return tr ("Downloading %1. Please wait …").arg (update_version);
         case Download_complete:
             return tr ("%1 available. Restart application to on_start the update.").arg (update_version);
-        case Download_failed : {
+        case Download_failed: {
             if (format == Update_status_string_format.Html) {
                 return tr ("Could not download update. Please open <a href='%1'>%1</a> to download the update manually.").arg (_update_info.web ());
             }
@@ -303,7 +311,7 @@ class Passive_update_notifier : OCUpdater {
         }
         case Download_timed_out:
             return tr ("Could not check for new updates.");
-        case Update_only_available_through_system : {
+        case Update_only_available_through_system: {
             if (format == Update_status_string_format.Html) {
                 return tr ("New %1 is available. Please open <a href='%2'>%2</a> to download the update.").arg (update_version, _update_info.web ());
             }
@@ -325,7 +333,7 @@ class Passive_update_notifier : OCUpdater {
     }
 
     void OCUpdater.set_download_state (Download_state state) {
-        auto old_state = _state;
+        var old_state = _state;
         _state = state;
         emit download_state_changed ();
 
@@ -354,7 +362,7 @@ class Passive_update_notifier : OCUpdater {
             // manually here. We wrap the msiexec and client invocation in a powershell
             // script because owncloud.exe will be shut down for installation.
             // | Out-Null forces powershell to wait for msiexec to finish.
-            auto prepare_path_for_powershell = [] (string path) {
+            var prepare_path_for_powershell = [] (string path) {
                 path.replace ("'", "''");
 
                 return QDir.to_native_separators (path);
@@ -372,7 +380,7 @@ class Passive_update_notifier : OCUpdater {
     }
 
     void OCUpdater.check_for_update () {
-        QNetworkReply *reply = _access_manager.get (QNetworkRequest (_update_url));
+        QNetworkReply reply = _access_manager.get (QNetworkRequest (_update_url));
         connect (_timeout_watchdog, &QTimer.timeout, this, &OCUpdater.on_timed_out);
         _timeout_watchdog.on_start (30 * 1000);
         connect (reply, &QNetworkReply.on_finished, this, &OCUpdater.on_version_info_arrived);
@@ -395,7 +403,7 @@ class Passive_update_notifier : OCUpdater {
 
     void OCUpdater.on_version_info_arrived () {
         _timeout_watchdog.stop ();
-        auto *reply = qobject_cast<QNetworkReply> (sender ());
+        var reply = qobject_cast<QNetworkReply> (sender ());
         reply.delete_later ();
         if (reply.error () != QNetworkReply.NoError) {
             q_c_warning (lc_updater) << "Failed to reach version check url : " << reply.error_string ();
@@ -426,7 +434,7 @@ class Passive_update_notifier : OCUpdater {
     }
 
     void NSISUpdater.on_write_file () {
-        auto *reply = qobject_cast<QNetworkReply> (sender ());
+        var reply = qobject_cast<QNetworkReply> (sender ());
         if (_file.is_open ()) {
             _file.write (reply.read_all ());
         }
@@ -445,7 +453,7 @@ class Passive_update_notifier : OCUpdater {
     }
 
     void NSISUpdater.on_download_finished () {
-        auto *reply = qobject_cast<QNetworkReply> (sender ());
+        var reply = qobject_cast<QNetworkReply> (sender ());
         reply.delete_later ();
         if (reply.error () != QNetworkReply.NoError) {
             set_download_state (Download_failed);
@@ -476,7 +484,7 @@ class Passive_update_notifier : OCUpdater {
         ConfigFile cfg;
         QSettings settings (cfg.config_file (), QSettings.IniFormat);
         int64 info_version = Helper.string_version_to_int (info.version ());
-        auto seen_string = settings.value (seen_version_c).to_string ();
+        var seen_string = settings.value (seen_version_c).to_string ();
         int64 seen_version = Helper.string_version_to_int (seen_string);
         int64 curr_version = Helper.current_version_to_int ();
         q_c_info (lc_updater) << "Version info arrived:"
@@ -502,9 +510,9 @@ class Passive_update_notifier : OCUpdater {
                 if (QFile (_target_file).exists ()) {
                     set_download_state (Download_complete);
                 } else {
-                    auto request = QNetworkRequest (QUrl (url));
+                    var request = QNetworkRequest (QUrl (url));
                     request.set_attribute (QNetworkRequest.Redirect_policy_attribute, QNetworkRequest.No_less_safe_redirect_policy);
-                    QNetworkReply *reply = qnam ().get (request);
+                    QNetworkReply reply = qnam ().get (request);
                     connect (reply, &QIODevice.ready_read, this, &NSISUpdater.on_write_file);
                     connect (reply, &QNetworkReply.on_finished, this, &NSISUpdater.on_download_finished);
                     set_download_state (Downloading);
@@ -518,7 +526,7 @@ class Passive_update_notifier : OCUpdater {
 
     void NSISUpdater.show_no_url_dialog (Update_info &info) {
         // if the version tag is set, there is a newer version.
-        auto *msg_box = new Gtk.Dialog;
+        var msg_box = new Gtk.Dialog;
         msg_box.set_attribute (Qt.WA_DeleteOnClose);
         msg_box.set_window_flags (msg_box.window_flags () & ~Qt.WindowContextHelpButtonHint);
 
@@ -527,16 +535,16 @@ class Passive_update_notifier : OCUpdater {
 
         msg_box.set_window_icon (info_icon);
 
-        auto *layout = new QVBoxLayout (msg_box);
-        auto *hlayout = new QHBox_layout;
+        var layout = new QVBoxLayout (msg_box);
+        var hlayout = new QHBox_layout;
         layout.add_layout (hlayout);
 
         msg_box.set_window_title (tr ("New Version Available"));
 
-        auto *ico = new QLabel;
+        var ico = new QLabel;
         ico.set_fixed_size (icon_size, icon_size);
         ico.set_pixmap (info_icon.pixmap (icon_size));
-        auto *lbl = new QLabel;
+        var lbl = new QLabel;
         string txt = tr ("<p>A new version of the %1 Client is available.</p>"
                          "<p><b>%2</b> is available for download. The installed version is %3.</p>")
                           .arg (Utility.escape (Theme.instance ().app_name_gui ()),
@@ -549,10 +557,10 @@ class Passive_update_notifier : OCUpdater {
         hlayout.add_widget (ico);
         hlayout.add_widget (lbl);
 
-        auto *bb = new QDialogButtonBox;
-        QPushButton *skip = bb.add_button (tr ("Skip this version"), QDialogButtonBox.Reset_role);
-        QPushButton *reject = bb.add_button (tr ("Skip this time"), QDialogButtonBox.AcceptRole);
-        QPushButton *getupdate = bb.add_button (tr ("Get update"), QDialogButtonBox.AcceptRole);
+        var bb = new QDialogButtonBox;
+        QPushButton skip = bb.add_button (tr ("Skip this version"), QDialogButtonBox.Reset_role);
+        QPushButton reject = bb.add_button (tr ("Skip this time"), QDialogButtonBox.AcceptRole);
+        QPushButton getupdate = bb.add_button (tr ("Get update"), QDialogButtonBox.AcceptRole);
 
         connect (skip, &QAbstractButton.clicked, msg_box, &Gtk.Dialog.reject);
         connect (reject, &QAbstractButton.clicked, msg_box, &Gtk.Dialog.reject);
@@ -567,7 +575,7 @@ class Passive_update_notifier : OCUpdater {
     }
 
     void NSISUpdater.show_update_error_dialog (string target_version) {
-        auto msg_box = new Gtk.Dialog;
+        var msg_box = new Gtk.Dialog;
         msg_box.set_attribute (Qt.WA_DeleteOnClose);
         msg_box.set_window_flags (msg_box.window_flags () & ~Qt.WindowContextHelpButtonHint);
 
@@ -576,16 +584,16 @@ class Passive_update_notifier : OCUpdater {
 
         msg_box.set_window_icon (info_icon);
 
-        auto layout = new QVBoxLayout (msg_box);
-        auto hlayout = new QHBox_layout;
+        var layout = new QVBoxLayout (msg_box);
+        var hlayout = new QHBox_layout;
         layout.add_layout (hlayout);
 
         msg_box.set_window_title (tr ("Update Failed"));
 
-        auto ico = new QLabel;
+        var ico = new QLabel;
         ico.set_fixed_size (icon_size, icon_size);
         ico.set_pixmap (info_icon.pixmap (icon_size));
-        auto lbl = new QLabel;
+        var lbl = new QLabel;
         string txt = tr ("<p>A new version of the %1 Client is available but the updating process failed.</p>"
                          "<p><b>%2</b> has been downloaded. The installed version is %3. If you confirm restart and update, your computer may reboot to complete the installation.</p>")
                           .arg (Utility.escape (Theme.instance ().app_name_gui ()),
@@ -598,11 +606,11 @@ class Passive_update_notifier : OCUpdater {
         hlayout.add_widget (ico);
         hlayout.add_widget (lbl);
 
-        auto bb = new QDialogButtonBox;
-        auto skip = bb.add_button (tr ("Skip this version"), QDialogButtonBox.Reset_role);
-        auto askagain = bb.add_button (tr ("Ask again later"), QDialogButtonBox.Reset_role);
-        auto retry = bb.add_button (tr ("Restart and update"), QDialogButtonBox.AcceptRole);
-        auto getupdate = bb.add_button (tr ("Update manually"), QDialogButtonBox.AcceptRole);
+        var bb = new QDialogButtonBox;
+        var skip = bb.add_button (tr ("Skip this version"), QDialogButtonBox.Reset_role);
+        var askagain = bb.add_button (tr ("Ask again later"), QDialogButtonBox.Reset_role);
+        var retry = bb.add_button (tr ("Restart and update"), QDialogButtonBox.AcceptRole);
+        var getupdate = bb.add_button (tr ("Update manually"), QDialogButtonBox.AcceptRole);
 
         connect (skip, &QAbstractButton.clicked, msg_box, &Gtk.Dialog.reject);
         connect (askagain, &QAbstractButton.clicked, msg_box, &Gtk.Dialog.reject);
@@ -642,7 +650,7 @@ class Passive_update_notifier : OCUpdater {
                     wipe_update_data ();
                     return false;
                 } else {
-                    // auto update failed. Ask user what to do
+                    // var update failed. Ask user what to do
                     q_c_info (lc_updater) << "The requested update attempt has failed"
                             << settings.value (update_target_version_c).to_string ();
                     show_update_error_dialog (settings.value (update_target_version_string_c).to_string ());

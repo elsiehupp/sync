@@ -13,7 +13,7 @@ namespace Occ {
 
 class Vfs_suffix : Vfs {
 
-    public Vfs_suffix (GLib.Object *parent = nullptr);
+    public Vfs_suffix (GLib.Object parent = nullptr);
     ~Vfs_suffix () override;
 
     public Mode mode () override;
@@ -27,7 +27,7 @@ class Vfs_suffix : Vfs {
     }
     public bool is_hydrating () override;
 
-    public Result<void, string> update_metadata (string file_path, time_t modtime, int64 size, GLib.ByteArray &file_id) override;
+    public Result<void, string> update_metadata (string file_path, time_t modtime, int64 size, GLib.ByteArray file_id) override;
 
     public Result<void, string> create_placeholder (SyncFileItem &item) override;
     public Result<void, string> dehydrate_placeholder (SyncFileItem &item) override;
@@ -37,13 +37,13 @@ class Vfs_suffix : Vfs {
         return false;
     }
     public bool is_dehydrated_placeholder (string file_path) override;
-    public bool stat_type_virtual_file (csync_file_stat_t *stat, void *stat_data) override;
+    public bool stat_type_virtual_file (csync_file_stat_t stat, void stat_data) override;
 
     public bool set_pin_state (string folder_path, PinState state) override {
-        return set_pin_state_in_db (folder_path, state);
+        return set_pin_state_in_database (folder_path, state);
     }
     public Optional<PinState> pin_state (string folder_path) override {
-        return pin_state_in_db (folder_path);
+        return pin_state_in_database (folder_path);
     }
     public AvailabilityResult availability (string folder_path) override;
 
@@ -58,7 +58,7 @@ class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_s
     Q_INTERFACES (Occ.PluginFactory)
 };
 
-    Vfs_suffix.Vfs_suffix (GLib.Object *parent)
+    Vfs_suffix.Vfs_suffix (GLib.Object parent)
         : Vfs (parent) {
     }
 
@@ -81,7 +81,7 @@ class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_s
             if (!rec.is_virtual_file () && rec._path.ends_with (APPLICATION_DOTVIRTUALFILE_SUFFIX))
                 to_wipe.append (rec._path);
         });
-        for (auto &path : to_wipe)
+        for (var &path : to_wipe)
             params.journal.delete_file_record (path);
     }
 
@@ -95,7 +95,7 @@ class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_s
         return false;
     }
 
-    Result<void, string> Vfs_suffix.update_metadata (string file_path, time_t modtime, int64, GLib.ByteArray &) {
+    Result<void, string> Vfs_suffix.update_metadata (string file_path, time_t modtime, int64, GLib.ByteArray ) {
         if (modtime <= 0) {
             return {tr ("Error updating metadata due to invalid modified time")};
         }
@@ -116,7 +116,7 @@ class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_s
             return string ("vfs file isn't ending with suffix");
         }
 
-        QFile file (fn);
+        QFile file = new QFile (fn);
         if (file.exists () && file.size () > 1
             && !FileSystem.verify_file_unchanged (fn, item._size, item._modtime)) {
             return string ("Cannot create a placeholder because a file with the placeholder name already exist");
@@ -134,7 +134,7 @@ class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_s
     Result<void, string> Vfs_suffix.dehydrate_placeholder (SyncFileItem &item) {
         SyncFileItem virtual_item (item);
         virtual_item._file = item._rename_target;
-        auto r = create_placeholder (virtual_item);
+        var r = create_placeholder (virtual_item);
         if (!r)
             return r;
 
@@ -143,16 +143,16 @@ class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_s
         }
 
         // Move the item's pin state
-        auto pin = _setup_params.journal.internal_pin_states ().raw_for_path (item._file.to_utf8 ());
-        if (pin && *pin != PinState.Inherited) {
+        var pin = _setup_params.journal.internal_pin_states ().raw_for_path (item._file.to_utf8 ());
+        if (pin && *pin != PinState.PinState.INHERITED) {
             set_pin_state (item._rename_target, *pin);
-            set_pin_state (item._file, PinState.Inherited);
+            set_pin_state (item._file, PinState.PinState.INHERITED);
         }
 
         // Ensure the pin state isn't contradictory
         pin = pin_state (item._rename_target);
-        if (pin && *pin == PinState.AlwaysLocal)
-            set_pin_state (item._rename_target, PinState.Unspecified);
+        if (pin && *pin == PinState.PinState.ALWAYS_LOCAL)
+            set_pin_state (item._rename_target, PinState.PinState.UNSPECIFIED);
         return {};
     }
 
@@ -168,7 +168,7 @@ class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_s
         return fi.exists () && fi.size () == 1;
     }
 
-    bool Vfs_suffix.stat_type_virtual_file (csync_file_stat_t *stat, void *) {
+    bool Vfs_suffix.stat_type_virtual_file (csync_file_stat_t stat, void *) {
         if (stat.path.ends_with (file_suffix ().to_utf8 ())) {
             stat.type = ItemTypeVirtualFile;
             return true;
@@ -177,7 +177,7 @@ class Suffix_vfs_plugin_factory : GLib.Object, public DefaultPluginFactory<Vfs_s
     }
 
     Vfs.AvailabilityResult Vfs_suffix.availability (string folder_path) {
-        return availability_in_db (folder_path);
+        return availability_in_database (folder_path);
     }
 
     } // namespace Occ

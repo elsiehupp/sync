@@ -63,7 +63,7 @@ class TestNextcloudPropagator : GLib.Object {
         tests.append (Test ("\"fii\"-gzip", "fii"));
         tests.append (Test ("W/\"foo\"", "foo"));
 
-        foreach (auto& test, tests) {
+        foreach (var& test, tests) {
             QCOMPARE (parseEtag (test.first), GLib.ByteArray (test.second));
         }
     }

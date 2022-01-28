@@ -38,19 +38,19 @@ static void setup_init () {
 
 class TestExcludedFiles : public GLib.Object {
 
-static auto check_file_full (char *path) {
+static var check_file_full (char path) {
     return excludedFiles.fullPatternMatch (path, ItemTypeFile);
 }
 
-static auto check_dir_full (char *path) {
+static var check_dir_full (char path) {
     return excludedFiles.fullPatternMatch (path, ItemTypeDirectory);
 }
 
-static auto check_file_traversal (char *path) {
+static var check_file_traversal (char path) {
     return excludedFiles.traversalPatternMatch (path, ItemTypeFile);
 }
 
-static auto check_dir_traversal (char *path) {
+static var check_dir_traversal (char path) {
     return excludedFiles.traversalPatternMatch (path, ItemTypeDirectory);
 }
 
@@ -120,6 +120,7 @@ private on_ void check_csync_excluded () {
     QCOMPARE (check_file_full (".kde/share/config/kwin.eventsrc"), CSYNC_NOT_EXCLUDED);
     QCOMPARE (check_file_full (".directory/cache-maximegalon/cache1.txt"), CSYNC_FILE_EXCLUDE_LIST);
     QCOMPARE (check_dir_full ("mozilla/.directory"), CSYNC_FILE_EXCLUDE_LIST);
+
 
     /***********************************************************
     * Test for patterns in subdirs. '.beagle' is defined as a pattern and has
@@ -216,7 +217,7 @@ private on_ void check_csync_excluded () {
 }
 
 private on_ void check_csync_excluded_per_dir () {
-    const auto tempDir = QStandardPaths.writableLocation (QStandardPaths.TempLocation);
+    const var tempDir = QStandardPaths.writableLocation (QStandardPaths.TempLocation);
     excludedFiles.on_reset (new ExcludedFiles (tempDir + "/"));
     excludedFiles.setWildcardsMatchSlash (false);
     excludedFiles.addManualExclude ("A");
@@ -238,10 +239,10 @@ private on_ void check_csync_excluded_per_dir () {
     QCOMPARE (check_file_full ("A"), CSYNC_NOT_EXCLUDED);
     QCOMPARE (check_file_full ("B/A/a1"), CSYNC_FILE_EXCLUDE_LIST);
 
-    const auto fooDir = QStringLiteral ("check_csync1/foo");
+    const var fooDir = QStringLiteral ("check_csync1/foo");
     QVERIFY (QDir (tempDir).mkpath (fooDir));
 
-    const auto fooExcludeList = string (tempDir + '/' + fooDir + "/.sync-exclude.lst");
+    const var fooExcludeList = string (tempDir + '/' + fooDir + "/.sync-exclude.lst");
     QFile excludeList (fooExcludeList);
     QVERIFY (excludeList.open (QFile.WriteOnly));
     QCOMPARE (excludeList.write ("bar"), 3);
@@ -273,6 +274,7 @@ private on_ void check_csync_excluded_traversal () {
     QCOMPARE (check_file_traversal ("krawel_krawel"), CSYNC_NOT_EXCLUDED);
     QCOMPARE (check_file_traversal (".kde/share/config/kwin.eventsrc"), CSYNC_NOT_EXCLUDED);
     QCOMPARE (check_dir_traversal ("mozilla/.directory"), CSYNC_FILE_EXCLUDE_LIST);
+
 
     /***********************************************************
     * Test for patterns in subdirs. '.beagle' is defined as a pattern and has
@@ -510,7 +512,7 @@ private on_ void check_csync_wildcards () {
 private on_ void check_csync_regex_translation () {
     setup ();
     GLib.ByteArray storage;
-    auto translate = [&storage] (char *pattern) {
+    var translate = [&storage] (char pattern) {
         storage = ExcludedFiles.convertToRegexpSyntax (pattern, false).toUtf8 ();
         return storage.constData ();
     };
@@ -531,7 +533,7 @@ private on_ void check_csync_bname_trigger () {
     setup ();
     bool wildcardsMatchSlash = false;
     GLib.ByteArray storage;
-    auto translate = [&storage, &wildcardsMatchSlash] (char *pattern) {
+    var translate = [&storage, &wildcardsMatchSlash] (char pattern) {
         storage = ExcludedFiles.extractBnameTrigger (pattern, wildcardsMatchSlash).toUtf8 ();
         return storage.constData ();
     };
@@ -559,7 +561,7 @@ private on_ void check_csync_bname_trigger () {
 }
 
 private on_ void check_csync_is_windows_reserved_word () {
-    auto csync_is_windows_reserved_word = [] (char *fn) {
+    var csync_is_windows_reserved_word = [] (char fn) {
         string s = string.fromLatin1 (fn);
         extern bool csync_is_windows_reserved_word (QStringRef &filename);
         return csync_is_windows_reserved_word (&s);
@@ -628,7 +630,7 @@ private on_ void check_csync_is_windows_reserved_word () {
     }
 
     private on_ void check_csync_exclude_expand_escapes () {
-        extern void csync_exclude_expand_escapes (GLib.ByteArray &input);
+        extern void csync_exclude_expand_escapes (GLib.ByteArray input);
 
         GLib.ByteArray line = R" (keep \' \" \? \\ \a \b \f \n \r \t \v \z \#)";
         csync_exclude_expand_escapes (line);
@@ -649,14 +651,14 @@ private on_ void check_csync_is_windows_reserved_word () {
 
         std.vector<std.pair<const char *, bool>> tests = { { "#!version == 2.5.0", true }, { "#!version == 2.6.0", false }, { "#!version < 2.6.0", true }, { "#!version <= 2.6.0", true }, { "#!version > 2.6.0", false }, { "#!version >= 2.6.0", false }, { "#!version < 2.4.0", false }, { "#!version <= 2.4.0", false }, { "#!version > 2.4.0", true }, { "#!version >= 2.4.0", true }, { "#!version < 2.5.0", false }, { "#!version <= 2.5.0", true }, { "#!version > 2.5.0", false }, { "#!version >= 2.5.0", true },
         };
-        for (auto test : tests) {
+        for (var test : tests) {
             QVERIFY (excludes.versionDirectiveKeepNextLine (test.first) == test.second);
         }
     }
 
     private on_ void testAddExcludeFilePath_addSameFilePath_listSizeDoesNotIncrease () {
         excludedFiles.on_reset (new ExcludedFiles ());
-        const auto filePath = string ("exclude/.sync-exclude.lst");
+        const var filePath = string ("exclude/.sync-exclude.lst");
 
         excludedFiles.addExcludeFilePath (filePath);
         excludedFiles.addExcludeFilePath (filePath);
@@ -667,8 +669,8 @@ private on_ void check_csync_is_windows_reserved_word () {
     private on_ void testAddExcludeFilePath_addDifferentFilePaths_listSizeIncrease () {
         excludedFiles.on_reset (new ExcludedFiles ());
 
-        const auto filePath1 = string ("exclude1/.sync-exclude.lst");
-        const auto filePath2 = string ("exclude2/.sync-exclude.lst");
+        const var filePath1 = string ("exclude1/.sync-exclude.lst");
+        const var filePath2 = string ("exclude2/.sync-exclude.lst");
 
         excludedFiles.addExcludeFilePath (filePath1);
         excludedFiles.addExcludeFilePath (filePath2);
@@ -705,13 +707,13 @@ private on_ void check_csync_is_windows_reserved_word () {
     }
 
     private on_ void testReloadExcludeFiles_fileExists_returnTrue () {
-        const auto tempDir = QStandardPaths.writableLocation (QStandardPaths.TempLocation);
+        const var tempDir = QStandardPaths.writableLocation (QStandardPaths.TempLocation);
         excludedFiles.on_reset (new ExcludedFiles (tempDir + "/"));
 
-        const auto subTempDir = QStringLiteral ("exclude");
+        const var subTempDir = QStringLiteral ("exclude");
         QVERIFY (QDir (tempDir).mkpath (subTempDir));
 
-        const auto existingFilePath = string (tempDir + '/' + subTempDir + "/.sync-exclude.lst");
+        const var existingFilePath = string (tempDir + '/' + subTempDir + "/.sync-exclude.lst");
         QFile excludeList (existingFilePath);
         QVERIFY (excludeList.open (QFile.WriteOnly));
         excludeList.close ();

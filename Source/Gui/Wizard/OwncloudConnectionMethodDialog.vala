@@ -20,7 +20,7 @@ namespace Ui {
 ***********************************************************/
 class Owncloud_connection_method_dialog : Gtk.Dialog {
 
-    public Owncloud_connection_method_dialog (Gtk.Widget *parent = nullptr);
+    public Owncloud_connection_method_dialog (Gtk.Widget parent = nullptr);
     ~Owncloud_connection_method_dialog () override;
     public enum {
         Closed = 0,
@@ -34,14 +34,18 @@ class Owncloud_connection_method_dialog : Gtk.Dialog {
 
 
     public void on_return_no_tls ();
+
+
     public void on_return_client_side_tls ();
+
+
     public void return_back ();
 
 
-    private Ui.Owncloud_connection_method_dialog *ui;
+    private Ui.Owncloud_connection_method_dialog ui;
 };
 
-    Owncloud_connection_method_dialog.Owncloud_connection_method_dialog (Gtk.Widget *parent)
+    Owncloud_connection_method_dialog.Owncloud_connection_method_dialog (Gtk.Widget parent)
         : Gtk.Dialog (parent, Qt.Customize_window_hint | Qt.Window_title_hint | Qt.Window_close_button_hint | Qt.MSWindows_fixed_size_dialog_hint)
         , ui (new Ui.Owncloud_connection_method_dialog) {
         ui.setup_ui (this);

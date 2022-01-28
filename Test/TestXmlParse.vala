@@ -20,10 +20,12 @@ class TestXmlParse : GLib.Object {
         _subdirs.append (list);
     }
 
+
     public void on_directory_listing_iterated (string& item, QMap<string,string>& ) {
         qDebug () << "     item : " << item;
         _items.append (item);
     }
+
 
     public void on_finished_successfully () {
         _success = true;

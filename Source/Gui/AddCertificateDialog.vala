@@ -23,22 +23,28 @@ namespace Ui {
 ***********************************************************/
 class AddCertificateDialog : Gtk.Dialog {
 
-    public AddCertificateDialog (Gtk.Widget *parent = nullptr);
+    public AddCertificateDialog (Gtk.Widget parent = nullptr);
     ~AddCertificateDialog () override;
     public string get_certificate_path ();
+
+
     public string get_certificate_passwd ();
+
+
     public void show_error_message (string message);
+
+
     public void reinit ();
 
 
     private void on_push_button_browse_certificate_clicked ();
 
 
-    private Ui.AddCertificateDialog *ui;
+    private Ui.AddCertificateDialog ui;
 };
 
 
-    AddCertificateDialog.AddCertificateDialog (Gtk.Widget *parent)
+    AddCertificateDialog.AddCertificateDialog (Gtk.Widget parent)
         : Gtk.Dialog (parent)
         , ui (new Ui.AddCertificateDialog) {
         ui.setup_ui (this);

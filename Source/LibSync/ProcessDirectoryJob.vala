@@ -53,13 +53,14 @@ class ProcessDirectoryJob : GLib.Object {
         In_black_list // Do not query this folder because it is in the blacklist (remote entries only)
     };
 
+
     /***********************************************************
     For creating the root job
 
     The base pin state is used if the root dir's pin state can't be retrieved.
     ***********************************************************/
-    public ProcessDirectoryJob (DiscoveryPhase *data, PinState base_pin_state,
-        int64 last_sync_timestamp, GLib.Object *parent)
+    public ProcessDirectoryJob (DiscoveryPhase data, PinState base_pin_state,
+        int64 last_sync_timestamp, GLib.Object parent)
         : GLib.Object (parent)
         , _last_sync_timestamp (last_sync_timestamp)
         , _discovery_data (data) {
@@ -69,7 +70,7 @@ class ProcessDirectoryJob : GLib.Object {
     /// For creating subjobs
     public ProcessDirectoryJob (PathTuple &path, SyncFileItemPtr &dir_item,
         Query_mode query_local, Query_mode query_server, int64 last_sync_timestamp,
-        ProcessDirectoryJob *parent)
+        ProcessDirectoryJob parent)
         : GLib.Object (parent)
         , _dir_item (dir_item)
         , _last_sync_timestamp (last_sync_timestamp)
@@ -80,9 +81,10 @@ class ProcessDirectoryJob : GLib.Object {
         compute_pin_state (parent._pin_state);
     }
 
+
     public void on_start ();
     /***********************************************************
-    Start up to nb_jobs, return the number of job started; emit on_finished () when done
+    Start up to nb_jobs, return the number of job started; emit finished () when done
     ***********************************************************/
     public int process_sub_jobs (int nb_jobs);
 
@@ -90,9 +92,11 @@ class ProcessDirectoryJob : GLib.Object {
         _is_inside_encrypted_tree = is_inside_encrypted_tree;
     }
 
+
     public bool is_inside_encrypted_tree () {
         return _is_inside_encrypted_tree;
     }
+
 
     public SyncFileItemPtr _dir_item;
 
@@ -103,6 +107,7 @@ class ProcessDirectoryJob : GLib.Object {
         RemoteInfo server_entry;
         LocalInfo local_entry;
     };
+
 
     /***********************************************************
     Structure representing a path during discovery. A same path may have different value locally
@@ -129,7 +134,7 @@ class ProcessDirectoryJob : GLib.Object {
         PathTuple add_name (string name) {
             PathTuple result;
             result._original = path_append (_original, name);
-            auto build_string = [&] (string other) {
+            var build_string = [&] (string other) {
                 // Optimize by trying to keep all string implicitly shared if they are the same (common case)
                 return other == _original ? result._original : path_append (other, name);
             };
@@ -141,6 +146,7 @@ class ProcessDirectoryJob : GLib.Object {
     };
 
     private bool check_for_invalid_file_name (PathTuple &path, std.map<string, Entries> &entries, Entries &entry);
+
 
     /***********************************************************
     Iterate over entries inside the directory (non-recursively).
@@ -156,8 +162,9 @@ class ProcessDirectoryJob : GLib.Object {
     private bool handle_excluded (string path, string local_name, bool is_directory,
         bool is_hidden, bool is_symlink);
 
+
     /***********************************************************
-    Reconcile local/remote/db information for a single item.
+    Reconcile local/remote/database information for a single item.
 
     Can be a file or a directory.
     Usually ends up emitting item_discovered () or creating a subdirectory job.
@@ -178,6 +185,7 @@ class ProcessDirectoryJob : GLib.Object {
     /// process_file helper for common final processing
     private void process_file_finalize (SyncFileItemPtr &item, PathTuple, bool recurse, Query_mode recurse_query_local, Query_mode recurse_query_server);
 
+
     /***********************************************************
     Checks the permission for this item, if needed, change the item to a restoration item.
     @return false indicate that this is an error and if it is a directory, one should not recurse
@@ -194,6 +202,7 @@ class ProcessDirectoryJob : GLib.Object {
         bool destination_new_ok = false;
     };
 
+
     /***********************************************************
     Check if the move is of a specified file within this directory is allowed.
     Return true if it is allowed, false otherwise
@@ -202,6 +211,7 @@ class ProcessDirectoryJob : GLib.Object {
 
     void process_blacklisted (PathTuple &, LocalInfo &, SyncJournalFileRecord &db_entry);
     private void sub_job_finished ();
+
 
     /***********************************************************
     An DB operation failed
@@ -212,17 +222,20 @@ class ProcessDirectoryJob : GLib.Object {
     private bool has_virtual_file_suffix (string str);
     private void chop_virtual_file_suffix (string str);
 
+
     /***********************************************************
     Convenience to detect suffix-vfs modes
     ***********************************************************/
     private bool is_vfs_with_suffix ();
+
 
     /***********************************************************
     Start a remote discovery network job
 
     It fills _server_normal_query_entries and sets _server_query_done when done.
     ***********************************************************/
-    private DiscoverySingleDirectoryJob *start_async_server_query ();
+    private DiscoverySingleDirectoryJob start_async_server_query ();
+
 
     /***********************************************************
     Discover the local directory
@@ -230,6 +243,7 @@ class ProcessDirectoryJob : GLib.Object {
     Fills _local_normal_query_entries.
     ***********************************************************/
     private void start_async_local_query ();
+
 
     /***********************************************************
     Sets _pin_state, the directory's pin state
@@ -239,8 +253,9 @@ class ProcessDirectoryJob : GLib.Object {
     ***********************************************************/
     private void compute_pin_state (PinState parent_state);
 
+
     /***********************************************************
-    Adjust record._type if the db pin state suggests it.
+    Adjust record._type if the database pin state suggests it.
 
     If the pin state is stored in the database (suffix vfs only right now)
     its effects won't be seen in local_entry._type. Instead the effects
@@ -250,7 +265,7 @@ class ProcessDirectoryJob : GLib.Object {
     state suggests a hydration or dehydration action and changes the
     _type field accordingly.
     ***********************************************************/
-    private void setup_db_pin_state_actions (SyncJournalFileRecord &record);
+    private void setup_database_pin_state_actions (SyncJournalFileRecord &record);
 
     private int64 _last_sync_timestamp = 0;
 
@@ -269,6 +284,7 @@ class ProcessDirectoryJob : GLib.Object {
     private RemotePermissions _root_permissions;
     private QPointer<DiscoverySingleDirectoryJob> _server_job;
 
+
     /***********************************************************
     Number of currently running async jobs.
 
@@ -280,6 +296,7 @@ class ProcessDirectoryJob : GLib.Object {
     these jobs are still in flight.
     ***********************************************************/
     private int _pending_async_jobs = 0;
+
 
     /***********************************************************
     The queued and running jobs for subdirectories.
@@ -295,28 +312,28 @@ class ProcessDirectoryJob : GLib.Object {
     private PathTuple _current_folder;
     private bool _child_modified = false; // the directory contains modified item what would prevent deletion
     private bool _child_ignored = false; // The directory contains ignored item that would prevent deletion
-    private PinState _pin_state = PinState.Unspecified; // The directory's pin-state, see compute_pin_state ()
+    private PinState _pin_state = PinState.PinState.UNSPECIFIED; // The directory's pin-state, see compute_pin_state ()
     private bool _is_inside_encrypted_tree = false; // this directory is encrypted or is within the tree of directories with root directory encrypted
 
 signals:
     void on_finished ();
     // The root etag of this directory was fetched
-    void etag (GLib.ByteArray &, QDateTime &time);
+    void etag (GLib.ByteArray , QDateTime &time);
 };
 
     bool ProcessDirectoryJob.check_for_invalid_file_name (PathTuple &path,
         const std.map<string, Entries> &entries, Entries &entry) {
-        const auto original_file_name = entry.local_entry.name;
-        const auto new_file_name = original_file_name.trimmed ();
+        const var original_file_name = entry.local_entry.name;
+        const var new_file_name = original_file_name.trimmed ();
 
         if (original_file_name == new_file_name) {
             return true;
         }
 
-        const auto entries_iter = entries.find (new_file_name);
+        const var entries_iter = entries.find (new_file_name);
         if (entries_iter != entries.end ()) {
             string error_message;
-            const auto new_file_name_entry = entries_iter.second;
+            const var new_file_name_entry = entries_iter.second;
             if (new_file_name_entry.server_entry.is_valid ()) {
                 error_message = tr ("File contains trailing spaces and could not be renamed, because a file with the same name already exists on the server.");
             }
@@ -325,7 +342,7 @@ signals:
             }
 
             if (!error_message.is_empty ()) {
-                auto item = SyncFileItemPtr.create ();
+                var item = SyncFileItemPtr.create ();
                 if (entry.local_entry.is_directory) {
                     item._type = CSync_enums.ItemTypeDirectory;
                 } else {
@@ -377,33 +394,33 @@ signals:
     void ProcessDirectoryJob.process () {
         ASSERT (_local_query_done && _server_query_done);
 
-        // Build lookup tables for local, remote and db entries.
+        // Build lookup tables for local, remote and database entries.
         // For suffix-virtual files, the key will normally be the base file name
         // without the suffix.
         // However, if foo and foo.owncloud exists locally, there'll be "foo"
-        // with local, db, server entries and "foo.owncloud" with only a local
+        // with local, database, server entries and "foo.owncloud" with only a local
         // entry.
         std.map<string, Entries> entries;
-        for (auto &e : _server_normal_query_entries) {
+        for (var &e : _server_normal_query_entries) {
             entries[e.name].server_entry = std.move (e);
         }
         _server_normal_query_entries.clear ();
 
         // fetch all the name from the DB
-        auto path_u8 = _current_folder._original.to_utf8 ();
-        if (!_discovery_data._statedb.list_files_in_path (path_u8, [&] (SyncJournalFileRecord &rec) {
-                auto name = path_u8.is_empty () ? rec._path : string.from_utf8 (rec._path.const_data () + (path_u8.size () + 1));
+        var path_u8 = _current_folder._original.to_utf8 ();
+        if (!_discovery_data._statedatabase.list_files_in_path (path_u8, [&] (SyncJournalFileRecord &rec) {
+                var name = path_u8.is_empty () ? rec._path : string.from_utf8 (rec._path.const_data () + (path_u8.size () + 1));
                 if (rec.is_virtual_file () && is_vfs_with_suffix ())
                     chop_virtual_file_suffix (name);
-                auto &db_entry = entries[name].db_entry;
+                var &db_entry = entries[name].db_entry;
                 db_entry = rec;
-                setup_db_pin_state_actions (db_entry);
+                setup_database_pin_state_actions (db_entry);
             })) {
             db_error ();
             return;
         }
 
-        for (auto &e : _local_normal_query_entries) {
+        for (var &e : _local_normal_query_entries) {
             entries[e.name].local_entry = e;
         }
         if (is_vfs_with_suffix ()) {
@@ -412,15 +429,15 @@ signals:
             // other data about the suffixed file.
             // This is done in a second path in order to not depend on the order of
             // _local_normal_query_entries.
-            for (auto &e : _local_normal_query_entries) {
+            for (var &e : _local_normal_query_entries) {
                 if (!e.is_virtual_file)
                     continue;
-                auto &suffixed_entry = entries[e.name];
+                var &suffixed_entry = entries[e.name];
                 bool has_other_data = suffixed_entry.server_entry.is_valid () || suffixed_entry.db_entry.is_valid ();
 
-                auto nonvirtual_name = e.name;
+                var nonvirtual_name = e.name;
                 chop_virtual_file_suffix (nonvirtual_name);
-                auto &nonvirtual_entry = entries[nonvirtual_name];
+                var &nonvirtual_entry = entries[nonvirtual_name];
                 // If the non-suffixed entry has no data, move it
                 if (!nonvirtual_entry.local_entry.is_valid ()) {
                     std.swap (nonvirtual_entry.local_entry, suffixed_entry.local_entry);
@@ -440,8 +457,8 @@ signals:
         //
         // Iterate over entries and process them
         //
-        for (auto &f : entries) {
-            auto &e = f.second;
+        for (var &f : entries) {
+            var &e = f.second;
 
             PathTuple path;
             path = _current_folder.add_name (e.name_override.is_empty () ? f.first : e.name_override);
@@ -454,7 +471,7 @@ signals:
                 if (e.db_entry.is_valid ()) {
                     path._original = e.db_entry._path;
                 } else if (e.local_entry.is_virtual_file) {
-                    // We don't have a db entry - but it should be at this path
+                    // We don't have a database entry - but it should be at this path
                     path._original = PathTuple.path_append (_current_folder._original,  e.local_entry.name);
                 }
                 if (e.local_entry.is_valid ()) {
@@ -470,7 +487,7 @@ signals:
                 Q_ASSERT (_discovery_data._remote_folder.starts_with ('/'));
                 Q_ASSERT (_discovery_data._remote_folder.ends_with ('/'));
 
-                const auto root_path = _discovery_data._remote_folder.mid (1);
+                const var root_path = _discovery_data._remote_folder.mid (1);
                 Q_ASSERT (e.server_entry.e2e_mangled_name.starts_with (root_path));
 
                 path._server = e.server_entry.e2e_mangled_name.mid (root_path.length ());
@@ -500,7 +517,7 @@ signals:
     }
 
     bool ProcessDirectoryJob.handle_excluded (string path, string local_name, bool is_directory, bool is_hidden, bool is_symlink) {
-        auto excluded = _discovery_data._excludes.traversal_pattern_match (path, is_directory ? ItemTypeDirectory : ItemTypeFile);
+        var excluded = _discovery_data._excludes.traversal_pattern_match (path, is_directory ? ItemTypeDirectory : ItemTypeFile);
 
         // FIXME : move to ExcludedFiles 's regexp ?
         bool is_invalid_pattern = false;
@@ -519,7 +536,7 @@ signals:
             is_invalid_pattern = true;
         }
 
-        auto local_codec = QTextCodec.codec_for_locale ();
+        var local_codec = QTextCodec.codec_for_locale ();
         if (local_codec.mib_enum () != 106) {
             // If the locale codec is not UTF-8, we must check that the filename from the server can
             // be encoded in the local file system.
@@ -540,7 +557,7 @@ signals:
             return true;
         }
 
-        auto item = SyncFileItemPtr.create ();
+        var item = SyncFileItemPtr.create ();
         item._file = path;
         item._original_file = path;
         item._instruction = CSYNC_INSTRUCTION_IGNORE;
@@ -613,8 +630,8 @@ signals:
     void ProcessDirectoryJob.process_file (PathTuple path,
         const LocalInfo &local_entry, RemoteInfo &server_entry,
         const SyncJournalFileRecord &db_entry) {
-        const char *has_server = server_entry.is_valid () ? "true" : _query_server == Parent_not_changed ? "db" : "false";
-        const char *has_local = local_entry.is_valid () ? "true" : _query_local == Parent_not_changed ? "db" : "false";
+        const char has_server = server_entry.is_valid () ? "true" : _query_server == Parent_not_changed ? "database" : "false";
+        const char has_local = local_entry.is_valid () ? "true" : _query_local == Parent_not_changed ? "database" : "false";
         q_c_info (lc_disco).nospace () << "Processing " << path._original
                                   << " | valid : " << db_entry.is_valid () << "/" << has_local << "/" << has_server
                                   << " | mtime : " << db_entry._modtime << "/" << local_entry.modtime << "/" << server_entry.modtime
@@ -640,7 +657,7 @@ signals:
             return; // Ignore this.
         }
 
-        auto item = SyncFileItem.from_sync_journal_file_record (db_entry);
+        var item = SyncFileItem.from_sync_journal_file_record (db_entry);
         item._file = path._target;
         item._original_file = path._original;
         item._previous_size = db_entry._file_size;
@@ -657,12 +674,12 @@ signals:
             item._type = ItemTypeFile;
         }
 
-        // The item shall only have this type if the db request for the virtual download
+        // The item shall only have this type if the database request for the virtual download
         // was successful (like : no conflicting remote remove etc). This decision is done
         // either in process_file_analyze_remote_info () or further down here.
         if (item._type == ItemTypeVirtualFileDownload)
             item._type = ItemTypeVirtualFile;
-        // Similarly db entries with a dehydration request denote a regular file
+        // Similarly database entries with a dehydration request denote a regular file
         // until the request is processed.
         if (item._type == ItemTypeVirtualFileDehydration)
             item._type = ItemTypeFile;
@@ -686,7 +703,7 @@ signals:
 
         // Downloading a virtual file is like a server action and can happen even if
         // server-side nothing has changed
-        // NOTE : Normally setting the Virtual_file_download flag means that local and
+        // Note: Normally setting the Virtual_file_download flag means that local and
         // remote will be rediscovered. This is just a fallback for a similar check
         // in process_file_analyze_remote_info ().
         if (_query_server == Parent_not_changed
@@ -704,8 +721,8 @@ signals:
 
     // Compute the checksum of the given file and assign the result in item._checksum_header
     // Returns true if the checksum was successfully computed
-    static bool compute_local_checksum (GLib.ByteArray &header, string path, SyncFileItemPtr &item) {
-        auto type = parse_checksum_header_type (header);
+    static bool compute_local_checksum (GLib.ByteArray header, string path, SyncFileItemPtr &item) {
+        var type = parse_checksum_header_type (header);
         if (!type.is_empty ()) {
             // TODO : compute async?
             GLib.ByteArray checksum = ComputeChecksum.compute_now_on_file (path, type);
@@ -736,7 +753,7 @@ signals:
             Q_ASSERT (_discovery_data._remote_folder.starts_with ('/'));
             Q_ASSERT (_discovery_data._remote_folder.ends_with ('/'));
 
-            const auto root_path = _discovery_data._remote_folder.mid (1);
+            const var root_path = _discovery_data._remote_folder.mid (1);
             Q_ASSERT (server_entry.e2e_mangled_name.starts_with (root_path));
             return server_entry.e2e_mangled_name.mid (root_path.length ());
         } ();
@@ -760,12 +777,12 @@ signals:
             }
         }
 
-        // The file is known in the db already
+        // The file is known in the database already
         if (db_entry.is_valid ()) {
-            const bool is_db_entry_an_e2Ee_placeholder = db_entry.is_virtual_file () && !db_entry.e2e_mangled_name ().is_empty ();
-            Q_ASSERT (!is_db_entry_an_e2Ee_placeholder || server_entry.size >= Constants.e2Ee_tag_size);
-            const bool is_virtual_e2Ee_placeholder = is_db_entry_an_e2Ee_placeholder && server_entry.size >= Constants.e2Ee_tag_size;
-            const int64 size_on_server = is_virtual_e2Ee_placeholder ? server_entry.size - Constants.e2Ee_tag_size : server_entry.size;
+            const bool is_database_entry_an_e2Ee_placeholder = db_entry.is_virtual_file () && !db_entry.e2e_mangled_name ().is_empty ();
+            Q_ASSERT (!is_database_entry_an_e2Ee_placeholder || server_entry.size >= Constants.E2EE_TAG_SIZE);
+            const bool is_virtual_e2Ee_placeholder = is_database_entry_an_e2Ee_placeholder && server_entry.size >= Constants.E2EE_TAG_SIZE;
+            const int64 size_on_server = is_virtual_e2Ee_placeholder ? server_entry.size - Constants.E2EE_TAG_SIZE : server_entry.size;
             const bool meta_data_size_needs_update_for_e2Ee_file_placeholder = is_virtual_e2Ee_placeholder && db_entry._file_size == server_entry.size;
 
             if (server_entry.is_directory != db_entry.is_directory ()) {
@@ -778,7 +795,7 @@ signals:
             } else if ( (db_entry._type == ItemTypeVirtualFileDownload || local_entry.type == ItemTypeVirtualFileDownload)
                 && (local_entry.is_valid () || _query_local == Parent_not_changed)) {
                 // The above check for the local_entry existing is important. Otherwise it breaks
-                // the case where a file is moved and simultaneously tagged for download in the db.
+                // the case where a file is moved and simultaneously tagged for download in the database.
                 item._direction = SyncFileItem.Down;
                 item._instruction = CSYNC_INSTRUCTION_SYNC;
                 item._type = ItemTypeVirtualFileDownload;
@@ -824,17 +841,17 @@ signals:
                     const bool is_vfs_mode_on = _discovery_data && _discovery_data._sync_options._vfs && _discovery_data._sync_options._vfs.mode () != Vfs.Off;
                     if (is_vfs_mode_on && db_entry.is_directory () && db_entry._is_e2e_encrypted) {
                         int64 local_folder_size = 0;
-                        const auto list_files_callback = [&local_folder_size] (Occ.SyncJournalFileRecord &record) {
+                        const var list_files_callback = [&local_folder_size] (Occ.SyncJournalFileRecord &record) {
                             if (record.is_file ()) {
-                                // add Constants.e2Ee_tag_size so we will know the size of E2EE file on the server
-                                local_folder_size += record._file_size + Constants.e2Ee_tag_size;
+                                // add Constants.E2EE_TAG_SIZE so we will know the size of E2EE file on the server
+                                local_folder_size += record._file_size + Constants.E2EE_TAG_SIZE;
                             } else if (record.is_virtual_file ()) {
-                                // just a virtual file, so, the size must contain Constants.e2Ee_tag_size if it was not corrected already
+                                // just a virtual file, so, the size must contain Constants.E2EE_TAG_SIZE if it was not corrected already
                                 local_folder_size += record._file_size;
                             }
                         };
 
-                        const bool list_files_succeeded = _discovery_data._statedb.list_files_in_path (db_entry.path ().to_utf8 (), list_files_callback);
+                        const bool list_files_succeeded = _discovery_data._statedatabase.list_files_in_path (db_entry.path ().to_utf8 (), list_files_callback);
 
                         if (list_files_succeeded && local_folder_size != 0 && local_folder_size == server_entry.size_of_folder) {
                             q_c_info (lc_disco) << "Migration of E2EE folder " << db_entry.path () << " from older version to the one, supporting the implicit VFS hydration.";
@@ -852,7 +869,7 @@ signals:
             return;
         }
 
-        // Unknown in db : new file on the server
+        // Unknown in database : new file on the server
         Q_ASSERT (!db_entry.is_valid ());
 
         item._instruction = CSYNC_INSTRUCTION_NEW;
@@ -860,7 +877,7 @@ signals:
         item._modtime = server_entry.modtime;
         item._size = server_entry.size;
 
-        auto post_process_server_new = [=] () mutable {
+        var post_process_server_new = [=] () mutable {
             if (item.is_directory ()) {
                 _pending_async_jobs++;
                 _discovery_data.check_selective_sync_new_folder (path._server, server_entry.remote_perm,
@@ -874,11 +891,11 @@ signals:
                 return;
             }
             // Turn new remote files into virtual files if the option is enabled.
-            auto &opts = _discovery_data._sync_options;
+            var &opts = _discovery_data._sync_options;
             if (!local_entry.is_valid ()
                 && item._type == ItemTypeFile
                 && opts._vfs.mode () != Vfs.Off
-                && _pin_state != PinState.AlwaysLocal
+                && _pin_state != PinState.PinState.ALWAYS_LOCAL
                 && !FileSystem.is_exclude_file (item._file)) {
                 item._type = ItemTypeVirtualFile;
                 if (is_vfs_with_suffix ())
@@ -887,11 +904,11 @@ signals:
 
             if (opts._vfs.mode () != Vfs.Off && !item._encrypted_file_name.is_empty ()) {
                 // We are syncing a file for the first time (local entry is invalid) and it is encrypted file that will be virtual once synced
-                // to avoid having error of "file has changed during sync" when trying to hydrate it excplicitly - we must remove Constants.e2Ee_tag_size bytes from the end
+                // to avoid having error of "file has changed during sync" when trying to hydrate it excplicitly - we must remove Constants.E2EE_TAG_SIZE bytes from the end
                 // as explicit hydration does not care if these bytes are present in the placeholder or not, but, the size must not change in the middle of the sync
-                // this way it works for both implicit and explicit hydration by making a placeholder size that does not includes encryption tag Constants.e2Ee_tag_size bytes
+                // this way it works for both implicit and explicit hydration by making a placeholder size that does not includes encryption tag Constants.E2EE_TAG_SIZE bytes
                 // another scenario - we are syncing a file which is on disk but not in the database (database was removed or file was not written there yet)
-                item._size = server_entry.size - Constants.e2Ee_tag_size;
+                item._size = server_entry.size - Constants.E2EE_TAG_SIZE;
             }
             process_file_analyze_local_info (item, path, local_entry, server_entry, db_entry, _query_server);
         };
@@ -902,14 +919,14 @@ signals:
             return;
         }
 
-        // Not in db or locally : either new or a rename
+        // Not in database or locally : either new or a rename
         Q_ASSERT (!db_entry.is_valid () && !local_entry.is_valid ());
 
         // Check for renames (if there is a file with the same file id)
         bool done = false;
         bool async = false;
         // This function will be executed for every candidate
-        auto rename_candidate_processing = [&] (Occ.SyncJournalFileRecord &base) {
+        var rename_candidate_processing = [&] (Occ.SyncJournalFileRecord &base) {
             if (done)
                 return;
             if (!base.is_valid ())
@@ -969,8 +986,8 @@ signals:
                     q_c_info (lc_disco) << "Local file does not exist anymore." << original_path_adjusted;
                     return;
                 }
-                // NOTE : This prohibits some VFS renames from being detected since
-                // suffix-file size is different from the db size. That's ok, they'll DELETE+NEW.
+                // Note: This prohibits some VFS renames from being detected since
+                // suffix-file size is different from the database size. That's ok, they'll DELETE+NEW.
                 if (buf.modtime != base._modtime || buf.size != base._file_size || buf.type == ItemTypeDirectory) {
                     q_c_info (lc_disco) << "File has changed locally, not a rename." << original_path;
                     return;
@@ -989,8 +1006,8 @@ signals:
 
             bool was_deleted_on_server = _discovery_data.find_and_cancel_deleted_job (original_path).first;
 
-            auto post_process_rename = [this, item, base, original_path] (PathTuple &path) {
-                auto adjusted_original_path = _discovery_data.adjust_renamed_path (original_path, SyncFileItem.Up);
+            var post_process_rename = [this, item, base, original_path] (PathTuple &path) {
+                var adjusted_original_path = _discovery_data.adjust_renamed_path (original_path, SyncFileItem.Up);
                 _discovery_data._renamed_items_remote.insert (original_path, path._target);
                 item._modtime = base._modtime;
                 item._inode = base._inode;
@@ -1010,7 +1027,7 @@ signals:
             } else {
                 // we need to make a request to the server to know that the original file is deleted on the server
                 _pending_async_jobs++;
-                auto job = new RequestEtagJob (_discovery_data._account, _discovery_data._remote_folder + original_path, this);
+                var job = new RequestEtagJob (_discovery_data._account, _discovery_data._remote_folder + original_path, this);
                 connect (job, &RequestEtagJob.finished_with_result, this, [=] (HttpResult<GLib.ByteArray> &etag) mutable {
                     _pending_async_jobs--;
                     QTimer.single_shot (0, _discovery_data, &DiscoveryPhase.schedule_more_jobs);
@@ -1035,7 +1052,7 @@ signals:
                 async = true;
             }
         };
-        if (!_discovery_data._statedb.get_file_records_by_file_id (server_entry.file_id, rename_candidate_processing)) {
+        if (!_discovery_data._statedatabase.get_file_records_by_file_id (server_entry.file_id, rename_candidate_processing)) {
             db_error ();
             return;
         }
@@ -1077,7 +1094,7 @@ signals:
 
         _child_modified |= server_modified;
 
-        auto on_finalize = [&] {
+        var on_finalize = [&] {
             bool recurse = item.is_directory () || local_entry.is_directory || server_entry.is_directory;
             // Even if we have a local directory : If the remote is a file that's propagated as a
             // conflict we don't need to recurse into it. (local c1.owncloud, c1/ ; remote : c1)
@@ -1086,7 +1103,7 @@ signals:
             if (_query_local != Normal_query && _query_server != Normal_query)
                 recurse = false;
 
-            auto recurse_query_local = _query_local == Parent_not_changed ? Parent_not_changed : local_entry.is_directory || item._instruction == CSYNC_INSTRUCTION_RENAME ? Normal_query : Parent_dont_exist;
+            var recurse_query_local = _query_local == Parent_not_changed ? Parent_not_changed : local_entry.is_directory || item._instruction == CSYNC_INSTRUCTION_RENAME ? Normal_query : Parent_dont_exist;
             process_file_finalize (item, path, recurse, recurse_query_local, recurse_query_server);
         };
 
@@ -1107,7 +1124,7 @@ signals:
             } else if (no_server_entry) {
                 // Not locally, not on the server. The entry is stale!
                 q_c_info (lc_disco) << "Stale DB entry";
-                _discovery_data._statedb.delete_file_record (path._original, true);
+                _discovery_data._statedatabase.delete_file_record (path._original, true);
                 return;
             } else if (db_entry._type == ItemTypeVirtualFile && is_vfs_with_suffix ()) {
                 // If the virtual file is removed, recreate it.
@@ -1152,7 +1169,7 @@ signals:
                         add_virtual_file_suffix (item._file);
                         item._rename_target = item._file;
                     } else {
-                        q_c_info (lc_disco) << "Virtual file with non-virtual db entry, ignoring:" << item._file;
+                        q_c_info (lc_disco) << "Virtual file with non-virtual database entry, ignoring:" << item._file;
                         item._instruction = CSYNC_INSTRUCTION_IGNORE;
                     }
                 }
@@ -1191,7 +1208,7 @@ signals:
             } else if (server_modified
                 || (is_vfs_with_suffix () && db_entry.is_virtual_file ())) {
                 // There's a local change and a server change : Conflict!
-                // Alternatively, this might be a suffix-file that's virtual in the db but
+                // Alternatively, this might be a suffix-file that's virtual in the database but
                 // not locally. These also become conflicts. For in-place placeholders that's
                 // not necessary : they could be replaced by real files and should then trigger
                 // a regular SYNC upwards when there's no server change.
@@ -1231,7 +1248,7 @@ signals:
                 if (is_eml_file && db_entry._file_size == local_entry.size && !db_entry._checksum_header.is_empty ()) {
                     if (compute_local_checksum (db_entry._checksum_header, _discovery_data._local_dir + path._local, item)
                             && item._checksum_header == db_entry._checksum_header) {
-                        q_c_info (lc_disco) << "NOTE : Checksums are identical, file did not actually change : " << path._local;
+                        q_c_info (lc_disco) << "Note: Checksums are identical, file did not actually change : " << path._local;
                         item._instruction = CSYNC_INSTRUCTION_UPDATE_METADATA;
                     }
                 }
@@ -1265,7 +1282,7 @@ signals:
         item._type = local_entry.is_directory ? ItemTypeDirectory : local_entry.is_virtual_file ? ItemTypeVirtualFile : ItemTypeFile;
         _child_modified = true;
 
-        auto post_process_local_new = [item, local_entry, path, this] () {
+        var post_process_local_new = [item, local_entry, path, this] () {
             // TODO : We may want to execute the same logic for non-VFS mode, as, moving/renaming the same folder by 2 or more clients at the same time is not possible in Web UI.
             // Keeping it like this (for VFS files and folders only) just to fix a user issue.
 
@@ -1293,30 +1310,30 @@ signals:
             const bool is_file_place_holder = !local_entry.is_directory && _discovery_data._sync_options._vfs.is_dehydrated_placeholder (_discovery_data._local_dir + path._local);
 
             // either correct availability, or a result with error if the folder is new or otherwise has no availability set yet
-            const auto folder_place_holder_availability = local_entry.is_directory ? _discovery_data._sync_options._vfs.availability (path._local) : Vfs.AvailabilityResult (Vfs.AvailabilityError.NoSuchItem);
+            const var folder_place_holder_availability = local_entry.is_directory ? _discovery_data._sync_options._vfs.availability (path._local) : Vfs.AvailabilityResult (Vfs.AvailabilityError.NoSuchItem);
 
-            const auto folder_pin_state = local_entry.is_directory ? _discovery_data._sync_options._vfs.pin_state (path._local) : Optional<Pin_state_enums.PinState> (PinState.Unspecified);
+            const var folder_pin_state = local_entry.is_directory ? _discovery_data._sync_options._vfs.pin_state (path._local) : Optional<PinStateEnums.PinState> (PinState.PinState.UNSPECIFIED);
 
             if (!is_file_place_holder && !folder_place_holder_availability.is_valid () && !folder_pin_state.is_valid ()) {
                 // not a file placeholder and not a synced folder placeholder (new local folder)
                 return;
             }
 
-            const auto is_folder_pin_state_online_only = (folder_pin_state.is_valid () && *folder_pin_state == PinState.OnlineOnly);
+            const var is_folder_pin_state_online_only = (folder_pin_state.is_valid () && *folder_pin_state == PinState.VfsItemAvailability.ONLINE_ONLY);
 
-            const auto isfolder_place_holder_availability_online_only = (folder_place_holder_availability.is_valid () && *folder_place_holder_availability == VfsItemAvailability.OnlineOnly);
+            const var isfolder_place_holder_availability_online_only = (folder_place_holder_availability.is_valid () && *folder_place_holder_availability == VfsItemAvailability.VfsItemAvailability.ONLINE_ONLY);
 
             // a folder is considered online-only if : no files are hydrated, or, if it's an empty folder
-            const auto is_online_only_folder = isfolder_place_holder_availability_online_only || (!folder_place_holder_availability && is_folder_pin_state_online_only);
+            const var is_online_only_folder = isfolder_place_holder_availability_online_only || (!folder_place_holder_availability && is_folder_pin_state_online_only);
 
             if (!is_file_place_holder && !is_online_only_folder) {
                 if (local_entry.is_directory && folder_place_holder_availability.is_valid () && !is_online_only_folder) {
                     // a VFS folder but is not online0only (has some files hydrated)
-                    q_c_info (lc_disco) << "Virtual directory without db entry for" << path._local << "but it contains hydrated file (s), so let's keep it and reupload.";
+                    q_c_info (lc_disco) << "Virtual directory without database entry for" << path._local << "but it contains hydrated file (s), so let's keep it and reupload.";
                     emit _discovery_data.add_error_to_gui (SyncFileItem.SoftError, tr ("Conflict when uploading some files to a folder. Those, conflicted, are going to get cleared!"), path._local);
                     return;
                 }
-                q_c_warning (lc_disco) << "Virtual file without db entry for" << path._local
+                q_c_warning (lc_disco) << "Virtual file without database entry for" << path._local
                                    << "but looks odd, keeping";
                 item._instruction = CSYNC_INSTRUCTION_IGNORE;
 
@@ -1325,7 +1342,7 @@ signals:
 
             if (is_online_only_folder) {
                 // if we're wiping a folder, we will only get this function called once and will wipe a folder along with it's files and also display one error in GUI
-                q_c_info (lc_disco) << "Wiping virtual folder without db entry for" << path._local;
+                q_c_info (lc_disco) << "Wiping virtual folder without database entry for" << path._local;
                 if (isfolder_place_holder_availability_online_only && folder_place_holder_availability.is_valid ()) {
                     q_c_info (lc_disco) << "*folder_place_holder_availability:" << *folder_place_holder_availability;
                 }
@@ -1334,7 +1351,7 @@ signals:
                 }
                 emit _discovery_data.add_error_to_gui (SyncFileItem.SoftError, tr ("Conflict when uploading a folder. It's going to get cleared!"), path._local);
             } else {
-                q_c_info (lc_disco) << "Wiping virtual file without db entry for" << path._local;
+                q_c_info (lc_disco) << "Wiping virtual file without database entry for" << path._local;
                 emit _discovery_data.add_error_to_gui (SyncFileItem.SoftError, tr ("Conflict when uploading a file. It's going to get removed!"), path._local);
             }
             item._instruction = CSYNC_INSTRUCTION_REMOVE;
@@ -1345,16 +1362,16 @@ signals:
 
         // Check if it is a move
         Occ.SyncJournalFileRecord base;
-        if (!_discovery_data._statedb.get_file_record_by_inode (local_entry.inode, &base)) {
+        if (!_discovery_data._statedatabase.get_file_record_by_inode (local_entry.inode, &base)) {
             db_error ();
             return;
         }
-        const auto original_path = base.path ();
+        const var original_path = base.path ();
 
         // Function to gradually check conditions for accepting a move-candidate
-        auto move_check = [&] () {
+        var move_check = [&] () {
             if (!base.is_valid ()) {
-                q_c_info (lc_disco) << "Not a move, no item in db with inode" << local_entry.inode;
+                q_c_info (lc_disco) << "Not a move, no item in database with inode" << local_entry.inode;
                 return false;
             }
 
@@ -1419,7 +1436,7 @@ signals:
 
         // Check local permission if we are allowed to put move the file here
         // Technically we should use the permissions from the server, but we'll assume it is the same
-        auto move_perms = check_move_permissions (base._remote_perm, original_path, item.is_directory ());
+        var move_perms = check_move_permissions (base._remote_perm, original_path, item.is_directory ());
         if (!move_perms.source_ok || !move_perms.destination_ok) {
             q_c_info (lc_disco) << "Move without permission to rename base file, "
                             << "source:" << move_perms.source_ok
@@ -1438,12 +1455,12 @@ signals:
 
             // Here we know the new location can't be uploaded : must prevent the source delete.
             // Two cases : either the source item was already processed or not.
-            auto was_deleted_on_client = _discovery_data.find_and_cancel_deleted_job (original_path);
+            var was_deleted_on_client = _discovery_data.find_and_cancel_deleted_job (original_path);
             if (was_deleted_on_client.first) {
                 // More complicated. The REMOVE is canceled. Restore will happen next sync.
                 q_c_info (lc_disco) << "Undid remove instruction on source" << original_path;
-                _discovery_data._statedb.delete_file_record (original_path, true);
-                _discovery_data._statedb.schedule_path_for_remote_discovery (original_path);
+                _discovery_data._statedatabase.delete_file_record (original_path, true);
+                _discovery_data._statedatabase.schedule_path_for_remote_discovery (original_path);
                 _discovery_data._another_sync_needed = true;
             } else {
                 // Signal to future check_permissions () to forbid the REMOVE and set to restore instead
@@ -1453,10 +1470,10 @@ signals:
             return;
         }
 
-        auto was_deleted_on_client = _discovery_data.find_and_cancel_deleted_job (original_path);
+        var was_deleted_on_client = _discovery_data.find_and_cancel_deleted_job (original_path);
 
-        auto process_rename = [item, original_path, base, this] (PathTuple &path) {
-            auto adjusted_original_path = _discovery_data.adjust_renamed_path (original_path, SyncFileItem.Down);
+        var process_rename = [item, original_path, base, this] (PathTuple &path) {
+            var adjusted_original_path = _discovery_data.adjust_renamed_path (original_path, SyncFileItem.Down);
             _discovery_data._renamed_items_local.insert (original_path, path._target);
             item._rename_target = path._target;
             path._server = adjusted_original_path;
@@ -1491,7 +1508,7 @@ signals:
             string server_original_path = _discovery_data._remote_folder + _discovery_data.adjust_renamed_path (original_path, SyncFileItem.Down);
             if (base.is_virtual_file () && is_vfs_with_suffix ())
                 chop_virtual_file_suffix (server_original_path);
-            auto job = new RequestEtagJob (_discovery_data._account, server_original_path, this);
+            var job = new RequestEtagJob (_discovery_data._account, server_original_path, this);
             connect (job, &RequestEtagJob.finished_with_result, this, [=] (HttpResult<GLib.ByteArray> &etag) mutable {
                 if (!etag || (etag.get () != base._etag && !item.is_directory ()) || _discovery_data.is_renamed (original_path)) {
                     q_c_info (lc_disco) << "Can't rename because the etag has changed or the directory is gone" << original_path;
@@ -1554,7 +1571,7 @@ signals:
         // Do we have an UploadInfo for this?
         // Maybe the Upload was completed, but the connection was broken just before
         // we recieved the etag (Issue #5106)
-        auto up = _discovery_data._statedb.get_upload_info (path._original);
+        var up = _discovery_data._statedatabase.get_upload_info (path._original);
         if (up._valid && up._content_checksum == server_entry.checksum_header) {
             // Solve the conflict into an upload, or nothing
             item._instruction = up._modtime == local_entry.modtime && up._size == local_entry.size
@@ -1565,7 +1582,7 @@ signals:
             // (We can't use a typical CSYNC_INSTRUCTION_UPDATE_METADATA because
             // we must not store the size/modtime from the file system)
             Occ.SyncJournalFileRecord rec;
-            if (_discovery_data._statedb.get_file_record (path._original, &rec)) {
+            if (_discovery_data._statedatabase.get_file_record (path._original, &rec)) {
                 rec._path = path._original.to_utf8 ();
                 rec._etag = server_entry.etag;
                 rec._file_id = server_entry.file_id;
@@ -1574,7 +1591,7 @@ signals:
                 rec._file_size = server_entry.size;
                 rec._remote_perm = server_entry.remote_perm;
                 rec._checksum_header = server_entry.checksum_header;
-                _discovery_data._statedb.set_file_record (rec);
+                _discovery_data._statedatabase.set_file_record (rec);
             }
             return;
         }
@@ -1626,7 +1643,7 @@ signals:
             recurse = false;
         }
         if (recurse) {
-            auto job = new ProcessDirectoryJob (path, item, recurse_query_local, recurse_query_server,
+            var job = new ProcessDirectoryJob (path, item, recurse_query_local, recurse_query_server,
                 _last_sync_timestamp, this);
             job.set_inside_encrypted_tree (is_inside_encrypted_tree () || item._is_encrypted);
             if (removed) {
@@ -1651,7 +1668,7 @@ signals:
         if (!local_entry.is_valid ())
             return;
 
-        auto item = SyncFileItem.from_sync_journal_file_record (db_entry);
+        var item = SyncFileItem.from_sync_journal_file_record (db_entry);
         item._file = path._target;
         item._original_file = path._original;
         item._inode = local_entry.inode;
@@ -1669,7 +1686,7 @@ signals:
         q_c_info (lc_disco) << "Discovered (blacklisted) " << item._file << item._instruction << item._direction << item.is_directory ();
 
         if (item.is_directory () && item._instruction != CSYNC_INSTRUCTION_IGNORE) {
-            auto job = new ProcessDirectoryJob (path, item, Normal_query, In_black_list, _last_sync_timestamp, this);
+            var job = new ProcessDirectoryJob (path, item, Normal_query, In_black_list, _last_sync_timestamp, this);
             connect (job, &ProcessDirectoryJob.on_finished, this, &ProcessDirectoryJob.sub_job_finished);
             _queued_jobs.push_back (job);
         } else {
@@ -1685,8 +1702,8 @@ signals:
 
         switch (item._instruction) {
         case CSYNC_INSTRUCTION_TYPE_CHANGE:
-        case CSYNC_INSTRUCTION_NEW : {
-            const auto perms = !_root_permissions.is_null () ? _root_permissions
+        case CSYNC_INSTRUCTION_NEW: {
+            const var perms = !_root_permissions.is_null () ? _root_permissions
                                                           : _dir_item ? _dir_item._remote_perm : _root_permissions;
             if (perms.is_null ()) {
                 // No permissions set
@@ -1704,8 +1721,8 @@ signals:
             }
             break;
         }
-        case CSYNC_INSTRUCTION_SYNC : {
-            const auto perms = item._remote_perm;
+        case CSYNC_INSTRUCTION_SYNC: {
+            const var perms = item._remote_perm;
             if (perms.is_null ()) {
                 // No permissions set
                 return true;
@@ -1716,7 +1733,7 @@ signals:
                 item._direction = SyncFileItem.Down;
                 item._is_restoration = true;
                 q_c_warning (lc_disco) << "check_for_permission : RESTORING" << item._file << item._error_string;
-                // Take the things to write to the db from the "other" node (i.e : info from server).
+                // Take the things to write to the database from the "other" node (i.e : info from server).
                 // Do a lookup into the csync remote tree to get the metadata we need to restore.
                 q_swap (item._size, item._previous_size);
                 q_swap (item._modtime, item._previous_modtime);
@@ -1724,9 +1741,9 @@ signals:
             }
             break;
         }
-        case CSYNC_INSTRUCTION_REMOVE : {
+        case CSYNC_INSTRUCTION_REMOVE: {
             string file_slash = item._file + '/';
-            auto forbidden_it = _discovery_data._forbidden_deletes.upper_bound (file_slash);
+            var forbidden_it = _discovery_data._forbidden_deletes.upper_bound (file_slash);
             if (forbidden_it != _discovery_data._forbidden_deletes.begin ())
                 forbidden_it -= 1;
             if (forbidden_it != _discovery_data._forbidden_deletes.end ()
@@ -1738,7 +1755,7 @@ signals:
                 q_c_warning (lc_disco) << "check_for_permission : RESTORING" << item._file << item._error_string;
                 return true; // restore sub items
             }
-            const auto perms = item._remote_perm;
+            const var perms = item._remote_perm;
             if (perms.is_null ()) {
                 // No permissions set
                 return true;
@@ -1759,12 +1776,12 @@ signals:
         return true;
     }
 
-    auto ProcessDirectoryJob.check_move_permissions (RemotePermissions src_perm, string src_path,
+    var ProcessDirectoryJob.check_move_permissions (RemotePermissions src_perm, string src_path,
                                                    bool is_directory)
         . Move_permission_result {
-        auto dest_perms = !_root_permissions.is_null () ? _root_permissions
+        var dest_perms = !_root_permissions.is_null () ? _root_permissions
                                                     : _dir_item ? _dir_item._remote_perm : _root_permissions;
-        auto file_perms = src_perm;
+        var file_perms = src_perm;
         //true when it is just a rename in the same directory. (not a move)
         bool is_rename = src_path.starts_with (_current_folder._original)
             && src_path.last_index_of ('/') == _current_folder._original.size ();
@@ -1793,7 +1810,7 @@ signals:
     }
 
     void ProcessDirectoryJob.sub_job_finished () {
-        auto job = qobject_cast<ProcessDirectoryJob> (sender ());
+        var job = qobject_cast<ProcessDirectoryJob> (sender ());
         ASSERT (job);
 
         _child_ignored |= job._child_ignored;
@@ -1810,7 +1827,7 @@ signals:
 
     int ProcessDirectoryJob.process_sub_jobs (int nb_jobs) {
         if (_queued_jobs.empty () && _running_jobs.empty () && _pending_async_jobs == 0) {
-            _pending_async_jobs = -1; // We're on_finished, we don't want to emit on_finished again
+            _pending_async_jobs = -1; // We're on_finished, we don't want to emit finished again
             if (_dir_item) {
                 if (_child_modified && _dir_item._instruction == CSYNC_INSTRUCTION_REMOVE) {
                     // re-create directory that has modified contents
@@ -1830,18 +1847,18 @@ signals:
                     _dir_item._instruction = CSYNC_INSTRUCTION_NONE;
                 }
             }
-            emit on_finished ();
+            emit finished ();
         }
 
         int started = 0;
-        foreach (auto *rj, _running_jobs) {
+        foreach (var rj, _running_jobs) {
             started += rj.process_sub_jobs (nb_jobs - started);
             if (started >= nb_jobs)
                 return started;
         }
 
         while (started < nb_jobs && !_queued_jobs.empty ()) {
-            auto f = _queued_jobs.front ();
+            var f = _queued_jobs.front ();
             _queued_jobs.pop_front ();
             _running_jobs.push_back (f);
             f.on_start ();
@@ -1874,14 +1891,14 @@ signals:
     }
 
     DiscoverySingleDirectoryJob *ProcessDirectoryJob.start_async_server_query () {
-        auto server_job = new DiscoverySingleDirectoryJob (_discovery_data._account,
+        var server_job = new DiscoverySingleDirectoryJob (_discovery_data._account,
             _discovery_data._remote_folder + _current_folder._server, this);
         if (!_dir_item)
             server_job.set_is_root_path (); // query the fingerprint on the root
         connect (server_job, &DiscoverySingleDirectoryJob.etag, this, &ProcessDirectoryJob.etag);
         _discovery_data._currently_active_jobs++;
         _pending_async_jobs++;
-        connect (server_job, &DiscoverySingleDirectoryJob.on_finished, this, [this, server_job] (auto &results) {
+        connect (server_job, &DiscoverySingleDirectoryJob.on_finished, this, [this, server_job] (var &results) {
             _discovery_data._currently_active_jobs--;
             _pending_async_jobs--;
             if (results) {
@@ -1892,7 +1909,7 @@ signals:
                 if (_local_query_done)
                     this.process ();
             } else {
-                auto code = results.error ().code;
+                var code = results.error ().code;
                 q_c_warning (lc_disco) << "Server error in directory" << _current_folder._server << code;
                 if (_dir_item && code >= 403) {
                     // In case of an HTTP error, we ignore that directory
@@ -1923,7 +1940,7 @@ signals:
 
     void ProcessDirectoryJob.start_async_local_query () {
         string local_path = _discovery_data._local_dir + _current_folder._local;
-        auto local_job = new DiscoverySingleLocalDirectoryJob (_discovery_data._account, local_path, _discovery_data._sync_options._vfs.data ());
+        var local_job = new DiscoverySingleLocalDirectoryJob (_discovery_data._account, local_path, _discovery_data._sync_options._vfs.data ());
 
         _discovery_data._currently_active_jobs++;
         _pending_async_jobs++;
@@ -1957,7 +1974,7 @@ signals:
             }
         });
 
-        connect (local_job, &DiscoverySingleLocalDirectoryJob.on_finished, this, [this] (auto &results) {
+        connect (local_job, &DiscoverySingleLocalDirectoryJob.on_finished, this, [this] (var &results) {
             _discovery_data._currently_active_jobs--;
             _pending_async_jobs--;
 
@@ -1968,7 +1985,7 @@ signals:
                 this.process ();
         });
 
-        QThreadPool *pool = QThreadPool.global_instance ();
+        QThreadPool pool = QThreadPool.global_instance ();
         pool.on_start (local_job); // QThreadPool takes ownership
     }
 
@@ -1979,27 +1996,27 @@ signals:
     void ProcessDirectoryJob.compute_pin_state (PinState parent_state) {
         _pin_state = parent_state;
         if (_query_local != Parent_dont_exist) {
-            if (auto state = _discovery_data._sync_options._vfs.pin_state (_current_folder._local)) // ouch! pin local or original?
+            if (var state = _discovery_data._sync_options._vfs.pin_state (_current_folder._local)) // ouch! pin local or original?
                 _pin_state = *state;
         }
     }
 
-    void ProcessDirectoryJob.setup_db_pin_state_actions (SyncJournalFileRecord &record) {
-        // Only suffix-vfs uses the db for pin states.
+    void ProcessDirectoryJob.setup_database_pin_state_actions (SyncJournalFileRecord &record) {
+        // Only suffix-vfs uses the database for pin states.
         // Other plugins will set local_entry._type according to the file's pin state.
         if (!is_vfs_with_suffix ())
             return;
 
-        auto pin = _discovery_data._statedb.internal_pin_states ().raw_for_path (record._path);
-        if (!pin || *pin == PinState.Inherited)
+        var pin = _discovery_data._statedatabase.internal_pin_states ().raw_for_path (record._path);
+        if (!pin || *pin == PinState.PinState.INHERITED)
             pin = _pin_state;
 
-        // OnlineOnly hydrated files want to be dehydrated
-        if (record._type == ItemTypeFile && *pin == PinState.OnlineOnly)
+        // VfsItemAvailability.ONLINE_ONLY hydrated files want to be dehydrated
+        if (record._type == ItemTypeFile && *pin == PinState.VfsItemAvailability.ONLINE_ONLY)
             record._type = ItemTypeVirtualFileDehydration;
 
-        // AlwaysLocal dehydrated files want to be hydrated
-        if (record._type == ItemTypeVirtualFile && *pin == PinState.AlwaysLocal)
+        // PinState.ALWAYS_LOCAL dehydrated files want to be hydrated
+        if (record._type == ItemTypeVirtualFile && *pin == PinState.PinState.ALWAYS_LOCAL)
             record._type = ItemTypeVirtualFileDownload;
     }
 

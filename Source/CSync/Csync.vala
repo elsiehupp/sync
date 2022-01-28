@@ -36,7 +36,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 // #include <config_csync.h>
 // #include <functional>
 // #include <memory>
-// #include <GLib.ByteArray>
 
 namespace Occ {
 }
@@ -59,7 +58,7 @@ enum csync_status_codes_e {
 
     CSYNC_STATUS_ERROR      = 1024,  // don't use this code
     CSYNC_STATUS_UNSUCCESSFUL,       // Unspecific problem happend
-    CSYNC_STATUS_STATEDB_LOAD_ERROR, // Statedb can not be loaded.
+    CSYNC_STATUS_STATEDB_LOAD_ERROR, // Statedatabase can not be loaded.
     CSYNC_STATUS_UPDATE_ERROR,       // general update or discovery error
     CSYNC_STATUS_TIMEOUT,            // UNUSED
     CSYNC_STATUS_HTTP_ERROR,         // UNUSED
@@ -101,7 +100,7 @@ enum SyncInstructions {
     CSYNC_INSTRUCTION_REMOVE          = 1 << 1,  // The file need to be removed (RECONCILE)
     CSYNC_INSTRUCTION_RENAME          = 1 << 2,  // The file need to be renamed (RECONCILE)
     CSYNC_INSTRUCTION_EVAL_RENAME     = 1 << 11, // The file is new, it is the destination of a rename (UPDATE)
-    CSYNC_INSTRUCTION_NEW             = 1 << 3,  // The file is new compared to the db (UPDATE)
+    CSYNC_INSTRUCTION_NEW             = 1 << 3,  // The file is new compared to the database (UPDATE)
     CSYNC_INSTRUCTION_CONFLICT        = 1 << 4,  // The file need to be downloaded because it is a conflict (RECONCILE)
     CSYNC_INSTRUCTION_IGNORE          = 1 << 5,  // The file is ignored (UPDATE|RECONCILE)
     CSYNC_INSTRUCTION_SYNC            = 1 << 6,  // The file need to be pushed to the other remote (RECONCILE)
@@ -110,7 +109,7 @@ enum SyncInstructions {
     CSYNC_INSTRUCTION_TYPE_CHANGE     = 1 << 9,  /* Like NEW, but deletes the old entity first (RECONCILE)
                                                     Used when the type of something changes from directory to file
                                                     or back. */
-    CSYNC_INSTRUCTION_UPDATE_METADATA = 1 << 10, /* If the etag has been updated and need to be writen to the db,
+    CSYNC_INSTRUCTION_UPDATE_METADATA = 1 << 10, /* If the etag has been updated and need to be writen to the database,
                                                     but without any propagation (UPDATE|RECONCILE) */
 };
 
@@ -134,7 +133,7 @@ enum ItemType {
     /***********************************************************
     A ItemTypeVirtualFile that wants to be hydrated.
 
-    Actions may put this in the db as a request to a future sync, such as
+    Actions may put this in the database as a request to a future sync, such as
     implicit hydration (when the user wants to access file data) when using
     suffix vfs. For pin-state driven hydrations changing the database is
     not necessary.
@@ -144,7 +143,7 @@ enum ItemType {
     will return this item type.
 
     The discovery will also use this item type to mark entries for hydration
-    if an item's pin state mandates it, such as when encountering a AlwaysLocal
+    if an item's pin state mandates it, such as when encountering a PinState.ALWAYS_LOCAL
     file that is dehydrated.
     ***********************************************************/
     ItemTypeVirtualFileDownload = 5,

@@ -35,10 +35,14 @@ class SslDialogErrorHandler : AbstractSslErrorHandler {
 ***********************************************************/
 class Ssl_error_dialog : Gtk.Dialog {
 
-    public Ssl_error_dialog (AccountPtr account, Gtk.Widget *parent = nullptr);
+    public Ssl_error_dialog (AccountPtr account, Gtk.Widget parent = nullptr);
     ~Ssl_error_dialog () override;
     public bool check_failing_certs_known (GLib.List<QSslError> &errors);
+
+
     public bool trust_connection ();
+
+
     public GLib.List<QSslCertificate> unknown_certs () {
         return _unknown_certs;
     }
@@ -85,7 +89,7 @@ class Ssl_error_dialog : Gtk.Dialog {
         return false;
     }
 
-    Ssl_error_dialog.Ssl_error_dialog (AccountPtr account, Gtk.Widget *parent)
+    Ssl_error_dialog.Ssl_error_dialog (AccountPtr account, Gtk.Widget parent)
         : Gtk.Dialog (parent)
         , _all_trusted (false)
         , _ui (new Ui.Ssl_error_dialog)
@@ -93,9 +97,9 @@ class Ssl_error_dialog : Gtk.Dialog {
         set_window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         _ui.setup_ui (this);
         set_window_title (tr ("Untrusted Certificate"));
-        QPushButton *ok_button =
+        QPushButton ok_button =
             _ui._dialog_button_box.button (QDialogButtonBox.Ok);
-        QPushButton *cancel_button =
+        QPushButton cancel_button =
             _ui._dialog_button_box.button (QDialogButtonBox.Cancel);
         ok_button.set_enabled (false);
 
@@ -160,7 +164,7 @@ class Ssl_error_dialog : Gtk.Dialog {
         msg += QL ("<link rel='stylesheet' type='text/css' href='format.css'>");
         msg += QL ("</head><body>");
 
-        auto host = _account.url ().host ();
+        var host = _account.url ().host ();
         msg += QL ("<h3>") + tr ("Cannot connect securely to <i>%1</i>:").arg (host) + QL ("</h3>");
         // loop over the unknown certs and line up their errors.
         msg += QL ("<div id=\"ca_errors\">");
@@ -182,7 +186,7 @@ class Ssl_error_dialog : Gtk.Dialog {
         if (!additional_error_strings.is_empty ()) {
             msg += QL ("<h4>") + tr ("Additional errors:") + QL ("</h4>");
 
-            for (auto &error_string : additional_error_strings) {
+            for (var &error_string : additional_error_strings) {
                 msg += QL ("<div id=\"ca_error\">");
                 msg += QL ("<p>") + error_string + QL ("</p>");
                 msg += QL ("</div>");
@@ -191,7 +195,7 @@ class Ssl_error_dialog : Gtk.Dialog {
 
         msg += QL ("</div></body></html>");
 
-        auto *doc = new QText_document (nullptr);
+        var doc = new QText_document (nullptr);
         string style = style_sheet ();
         doc.add_resource (QText_document.Style_sheet_resource, QUrl (QL ("format.css")), style);
         doc.set_html (msg);

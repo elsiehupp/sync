@@ -15,17 +15,27 @@ namespace Occ {
 
 class Flow2AuthWidget : Gtk.Widget {
 
-    public Flow2AuthWidget (Gtk.Widget *parent = nullptr);
+    public Flow2AuthWidget (Gtk.Widget parent = nullptr);
     ~Flow2AuthWidget () override;
 
-    public void start_auth (Account *account);
-    public void reset_auth (Account *account = nullptr);
+    public void start_auth (Account account);
+
+
+    public void reset_auth (Account account = nullptr);
+
+
     public void set_error (string error);
 
 
     public void on_auth_result (Flow2Auth.Result, string error_string, string user, string app_password);
+
+
     public void on_poll_now ();
+
+
     public void on_status_changed (Flow2Auth.PollStatus status, int seconds_left);
+
+
     public void on_style_changed ();
 
 signals:

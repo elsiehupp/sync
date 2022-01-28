@@ -17,7 +17,7 @@ namespace Ui {
 
 class Welcome_page : QWizard_page {
 
-    public Welcome_page (OwncloudWizard *oc_wizard);
+    public Welcome_page (OwncloudWizard oc_wizard);
     ~Welcome_page () override;
     public int next_id () override;
     public void initialize_page () override;
@@ -39,7 +39,7 @@ class Welcome_page : QWizard_page {
 };
 
 
-    Welcome_page.Welcome_page (OwncloudWizard *oc_wizard)
+    Welcome_page.Welcome_page (OwncloudWizard oc_wizard)
         : QWizard_page ()
         , _ui (new Ui.Welcome_page)
         , _oc_wizard (oc_wizard) {
@@ -66,16 +66,16 @@ class Welcome_page : QWizard_page {
     }
 
     void Welcome_page.style_slide_show () {
-        const auto theme = Theme.instance ();
-        const auto background_color = palette ().window ().color ();
+        const var theme = Theme.instance ();
+        const var background_color = palette ().window ().color ();
 
-        const auto wizard_nextcloud_icon_file_name = theme.is_branded () ? Theme.hidpi_file_name ("wizard-nextcloud.png", background_color)
+        const var wizard_nextcloud_icon_file_name = theme.is_branded () ? Theme.hidpi_file_name ("wizard-nextcloud.png", background_color)
                                                                     : Theme.hidpi_file_name (":/client/theme/colored/wizard-nextcloud.png");
-        const auto wizard_files_icon_file_name = theme.is_branded () ? Theme.hidpi_file_name ("wizard-files.png", background_color)
+        const var wizard_files_icon_file_name = theme.is_branded () ? Theme.hidpi_file_name ("wizard-files.png", background_color)
                                                                 : Theme.hidpi_file_name (":/client/theme/colored/wizard-files.png");
-        const auto wizard_groupware_icon_file_name = theme.is_branded () ? Theme.hidpi_file_name ("wizard-groupware.png", background_color)
+        const var wizard_groupware_icon_file_name = theme.is_branded () ? Theme.hidpi_file_name ("wizard-groupware.png", background_color)
                                                                     : Theme.hidpi_file_name (":/client/theme/colored/wizard-groupware.png");
-        const auto wizard_talk_icon_file_name = theme.is_branded () ? Theme.hidpi_file_name ("wizard-talk.png", background_color)
+        const var wizard_talk_icon_file_name = theme.is_branded () ? Theme.hidpi_file_name ("wizard-talk.png", background_color)
                                                                : Theme.hidpi_file_name (":/client/theme/colored/wizard-talk.png");
 
         _ui.slide_show.add_slide (wizard_nextcloud_icon_file_name, tr ("Keep your data secure and under your control"));
@@ -83,7 +83,7 @@ class Welcome_page : QWizard_page {
         _ui.slide_show.add_slide (wizard_groupware_icon_file_name, tr ("Easy-to-use web mail, calendaring & contacts"));
         _ui.slide_show.add_slide (wizard_talk_icon_file_name, tr ("Screensharing, online meetings & web conferences"));
 
-        const auto is_dark_background = Theme.is_dark_color (background_color);
+        const var is_dark_background = Theme.is_dark_color (background_color);
         _ui.slide_show_next_button.set_icon (theme.ui_theme_icon (string ("control-next.svg"), is_dark_background));
         _ui.slide_show_previous_button.set_icon (theme.ui_theme_icon (string ("control-prev.svg"), is_dark_background));
     }
@@ -95,7 +95,7 @@ class Welcome_page : QWizard_page {
     }
 
     void Welcome_page.setup_login_button () {
-        const auto app_name = Theme.instance ().app_name_gui ();
+        const var app_name = Theme.instance ().app_name_gui ();
 
         _ui.login_button.on_set_text (tr ("Log in to your %1").arg (app_name));
         connect (_ui.login_button, &QPushButton.clicked, this, [this] (bool /*checked*/) {

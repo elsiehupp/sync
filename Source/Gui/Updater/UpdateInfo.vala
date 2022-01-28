@@ -14,18 +14,32 @@ namespace Occ {
 class Update_info {
 
     public void set_version (string v);
+
+
     public string version ();
+
+
     public void set_version_string (string v);
+
+
     public string version_string ();
+
+
     public void set_web (string v);
+
+
     public string web ();
+
+
     public void set_download_url (string v);
+
+
     public string download_url ();
     /***********************************************************
       Parse XML object from DOM element.
     ***********************************************************/
-    static Update_info parse_element (QDom_element &element, bool *ok);
-    static Update_info parse_string (string xml, bool *ok);
+    static Update_info parse_element (QDom_element &element, bool ok);
+    static Update_info parse_string (string xml, bool ok);
 
 
     private string m_version;
@@ -66,7 +80,7 @@ class Update_info {
         return m_download_url;
     }
 
-    Update_info Update_info.parse_element (QDom_element &element, bool *ok) {
+    Update_info Update_info.parse_element (QDom_element &element, bool ok) {
         if (element.tag_name () != QLatin1String ("owncloudclient")) {
             q_c_critical (lc_updater) << "Expected 'owncloudclient', got '" << element.tag_name () << "'.";
             if (ok)
@@ -95,7 +109,7 @@ class Update_info {
         return result;
     }
 
-    Update_info Update_info.parse_string (string xml, bool *ok) {
+    Update_info Update_info.parse_string (string xml, bool ok) {
         string error_msg;
         int error_line = 0, error_col = 0;
         QDom_document doc;

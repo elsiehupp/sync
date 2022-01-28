@@ -80,7 +80,7 @@ static void check_c_jhash_trials (void **state) {
 static void check_c_jhash_alignment_problems (void **state) {
     uint32_t test = 0;
     uint8_t buf[MAXLEN+20];
-    uint8_t *b = NULL;
+    uint8_t b = NULL;
     uint32_t len = 0;
     uint8_t q[] = "This is the time for all good men to come to the aid of their country";
     uint8_t qq[] = "xThis is the time for all good men to come to the aid of their country";
@@ -135,7 +135,7 @@ static void check_c_jhash_null_strings (void **state) {
 
 static void check_c_jhash64_trials (void **state) {
     uint8_t qa[MAXLEN + 1], qb[MAXLEN + 2];
-    uint8_t *a = NULL, *b = NULL;
+    uint8_t a = NULL, *b = NULL;
     uint64_t c[HASHSTATE];
     uint64_t d[HASHSTATE];
     uint64_t i = 0;
@@ -193,12 +193,12 @@ static void check_c_jhash64_trials (void **state) {
 #if 0
                          print_error ("Some bit didn't change : ");
                          print_error ("%.8llx %.8llx %.8llx %.8llx %.8llx %.8llx    ",
-                                                 (long long unsigned int) e[0],
-                                                 (long long unsigned int) f[0],
-                                                 (long long unsigned int) g[0],
-                                                 (long long unsigned int) h[0],
-                                                 (long long unsigned int) x[0],
-                                                 (long long unsigned int) y[0]);
+                                                 (long long uint32) e[0],
+                                                 (long long uint32) f[0],
+                                                 (long long uint32) g[0],
+                                                 (long long uint32) h[0],
+                                                 (long long uint32) x[0],
+                                                 (long long uint32) y[0]);
                          print_error ("i %d j %d m %d len %d\n",
                                                  (uint32_t)i, (uint32_t)j, (uint32_t)m, (uint32_t)hlen);
 #endif
@@ -220,7 +220,7 @@ static void check_c_jhash64_trials (void **state) {
 
 static void check_c_jhash64_alignment_problems (void **state) {
     uint8_t buf[MAXLEN+20];
-    uint8_t *b = NULL;
+    uint8_t b = NULL;
     uint64_t len = 0;
     uint8_t q[] = "This is the time for all good men to come to the aid of their country";
     uint8_t qq[] = "xThis is the time for all good men to come to the aid of their country";

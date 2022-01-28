@@ -14,7 +14,8 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 
 namespace Occ {
 namespace HttpLogger {
-    void log_request (QNetworkReply *reply, QNetworkAccessManager.Operation operation, QIODevice *device);
+    void log_request (QNetworkReply reply, QNetworkAccessManager.Operation operation, QIODevice device);
+
 
     /***********************************************************
     Helper to construct the HTTP verb used in the request
@@ -36,9 +37,9 @@ namespace HttpLogger {
         return regexp.match (s).has_match ();
     }
 
-    void log_http (GLib.ByteArray &verb, string url, GLib.ByteArray &id, string content_type, GLib.List<QNetworkReply.RawHeaderPair> &header, QIODevice *device) {
-        const auto reply = qobject_cast<QNetworkReply> (device);
-        const auto content_length = device ? device.size () : 0;
+    void log_http (GLib.ByteArray verb, string url, GLib.ByteArray id, string content_type, GLib.List<QNetworkReply.RawHeaderPair> &header, QIODevice device) {
+        const var reply = qobject_cast<QNetworkReply> (device);
+        const var content_length = device ? device.size () : 0;
         string msg;
         QTextStream stream (&msg);
         stream << id << " : ";
@@ -51,8 +52,8 @@ namespace HttpLogger {
         if (reply) {
             stream << " " << reply.attribute (QNetworkRequest.HttpStatusCodeAttribute).to_int ();
         }
-        stream << " " << url << " Header : { ";
-        for (auto &it : header) {
+        stream << " " << url << " Header: { ";
+        for (var &it : header) {
             stream << it.first << " : ";
             if (it.first == "Authorization") {
                 stream << (it.second.starts_with ("Bearer ") ? "Bearer" : "Basic");
@@ -84,15 +85,15 @@ namespace HttpLogger {
     }
 
 
-    void HttpLogger.log_request (QNetworkReply *reply, QNetworkAccessManager.Operation operation, QIODevice *device) {
-        const auto request = reply.request ();
+    void HttpLogger.log_request (QNetworkReply reply, QNetworkAccessManager.Operation operation, QIODevice device) {
+        const var request = reply.request ();
         if (!lc_network_http ().is_info_enabled ()) {
             return;
         }
-        const auto keys = request.raw_header_list ();
+        const var keys = request.raw_header_list ();
         GLib.List<QNetworkReply.RawHeaderPair> header;
         header.reserve (keys.size ());
-        for (auto &key : keys) {
+        for (var &key : keys) {
             header << q_make_pair (key, request.raw_header (key));
         }
         log_http (request_verb (operation, request),

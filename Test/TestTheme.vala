@@ -18,7 +18,7 @@ class TestTheme : GLib.Object {
         const QColor backgroundColor ("#000000");
         const string iconName ("icon-name");
 
-        const auto iconPath = Occ.Theme.hidpiFileName (iconName + ".png", backgroundColor, &paintDevice);
+        const var iconPath = Occ.Theme.hidpiFileName (iconName + ".png", backgroundColor, &paintDevice);
 
         QCOMPARE (iconPath, ":/client/theme/white/" + iconName + ".png");
     }
@@ -28,7 +28,7 @@ class TestTheme : GLib.Object {
         const QColor backgroundColor ("#ffffff");
         const string iconName ("icon-name");
 
-        const auto iconPath = Occ.Theme.hidpiFileName (iconName + ".png", backgroundColor, &paintDevice);
+        const var iconPath = Occ.Theme.hidpiFileName (iconName + ".png", backgroundColor, &paintDevice);
 
         QCOMPARE (iconPath, ":/client/theme/black/" + iconName + ".png");
     }
@@ -39,7 +39,7 @@ class TestTheme : GLib.Object {
         const QColor backgroundColor ("#000000");
         const string iconName ("wizard-files");
 
-        const auto iconPath = Occ.Theme.hidpiFileName (iconName + ".png", backgroundColor, &paintDevice);
+        const var iconPath = Occ.Theme.hidpiFileName (iconName + ".png", backgroundColor, &paintDevice);
 
         QCOMPARE (iconPath, ":/client/theme/white/" + iconName + "@2x.png");
     }
@@ -47,7 +47,7 @@ class TestTheme : GLib.Object {
     private void on_test_is_dark_color_nextcloud_blue_return_true () {
         const QColor color (0, 130, 201);
 
-        const auto result = Occ.Theme.isDarkColor (color);
+        const var result = Occ.Theme.isDarkColor (color);
 
         QCOMPARE (result, true);
     }
@@ -55,7 +55,7 @@ class TestTheme : GLib.Object {
     private void on_test_is_dark_color_light_color_return_false () {
         const QColor color (255, 255, 255);
 
-        const auto result = Occ.Theme.isDarkColor (color);
+        const var result = Occ.Theme.isDarkColor (color);
 
         QCOMPARE (result, false);
     }
@@ -63,7 +63,7 @@ class TestTheme : GLib.Object {
     private void on_test_is_dark_color_dark_color_return_true () {
         const QColor color (0, 0, 0);
 
-        const auto result = Occ.Theme.isDarkColor (color);
+        const var result = Occ.Theme.isDarkColor (color);
 
         QCOMPARE (result, true);
     }

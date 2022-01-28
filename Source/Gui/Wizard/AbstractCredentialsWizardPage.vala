@@ -19,14 +19,14 @@ namespace Occ {
 class Abstract_credentials_wizard_page : QWizard_page {
 
     public void cleanup_page () override;
-    public virtual AbstractCredentials *get_credentials () = 0;
+    public virtual AbstractCredentials get_credentials () = 0;
 };
 
     void Abstract_credentials_wizard_page.cleanup_page () {
         // Reset the credentials when the 'Back' button is used.
 
         AccountPtr account = static_cast<OwncloudWizard> (wizard ()).account ();
-        AbstractCredentials *creds = account.credentials ();
+        AbstractCredentials creds = account.credentials ();
         if (creds) {
             if (!creds.inherits ("DummyCredentials")) {
                 account.set_credentials (CredentialsFactory.create ("dummy"));

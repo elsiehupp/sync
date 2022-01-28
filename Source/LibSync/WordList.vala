@@ -15,7 +15,7 @@ namespace Occ {
         unsigned char d[8];
         RAND_bytes (d, 8);
 
-        unsigned int num = 0;
+        uint32 num = 0;
 
         for (unsigned char c : d) {
             num = num << 8;
@@ -151,7 +151,7 @@ namespace Occ {
             "august",
             "aunt",
             "author",
-            "auto",
+            "var",
             "autumn",
             "average",
             "avocado",
@@ -2089,7 +2089,7 @@ namespace Occ {
 
     string get_unified_string (string[]& w_list) {
         string ret;
-        for (auto& str : w_list) {
+        for (var& str : w_list) {
             ret += str;
         }
         return ret;

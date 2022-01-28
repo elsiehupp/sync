@@ -44,8 +44,9 @@ through the path_changed () signal.
 class Folder_watcher : GLib.Object {
 
     // Construct, connect signals, call on_init ()
-    public Folder_watcher (Folder *folder = nullptr);
+    public Folder_watcher (Folder folder = nullptr);
     ~Folder_watcher () override;
+
 
     /***********************************************************
     @param root Path of the root of the folder
@@ -58,6 +59,7 @@ class Folder_watcher : GLib.Object {
     ***********************************************************/
     public bool path_is_ignored (string path);
 
+
     /***********************************************************
     Returns false if the folder watcher can't be trusted to capture all
     notifications.
@@ -66,6 +68,7 @@ class Folder_watcher : GLib.Object {
     /proc/sys/fs/inotify/max_user_watches is exceeded.
     ***********************************************************/
     public bool is_reliable ();
+
 
     /***********************************************************
     Triggers a change in the path and verifies a notification arrives.
@@ -85,6 +88,7 @@ signals:
     ***********************************************************/
     void path_changed (string path);
 
+
     /***********************************************************
     Emitted if some notifications were lost.
 
@@ -94,6 +98,7 @@ signals:
     i.e. is_reliable () is orthogonal to losing changes occasionally.
     ***********************************************************/
     void lost_changes ();
+
 
     /***********************************************************
     Signals when the watcher became unreliable. The string is a translated
@@ -121,6 +126,7 @@ protected slots:
 
     private void append_sub_paths (QDir dir, string[]& sub_paths);
 
+
     /***********************************************************
     Path of the expected test notification
     ***********************************************************/
@@ -129,7 +135,7 @@ protected slots:
     private friend class Folder_watcher_private;
 };
 
-    Folder_watcher.Folder_watcher (Folder *folder)
+    Folder_watcher.Folder_watcher (Folder folder)
         : GLib.Object (folder)
         , _folder (folder) {
     }
@@ -188,9 +194,9 @@ protected slots:
             return;
         }
 
-        auto path = _test_notification_path;
+        var path = _test_notification_path;
         if (QFile.exists (path)) {
-            auto mtime = FileSystem.get_mod_time (path);
+            var mtime = FileSystem.get_mod_time (path);
             FileSystem.set_mod_time (path, mtime + 1);
         } else {
             QFile f (path);

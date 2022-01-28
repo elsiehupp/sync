@@ -66,10 +66,20 @@ class UserStatus {
     public Optional<ClearAt> clear_at ();
 
     public void set_id (string id);
+
+
     public void set_message (string message);
+
+
     public void set_state (OnlineStatus state);
+
+
     public void set_icon (string icon);
+
+
     public void set_message_predefined (bool value);
+
+
     public void set_clear_at (Optional<ClearAt> &date_time);
 
     //  Q_REQUIRED_RESULT
@@ -98,7 +108,7 @@ class UserStatusConnector : GLib.Object {
         CouldNotClearMessage
     };
 
-    public UserStatusConnector (GLib.Object *parent = nullptr);
+    public UserStatusConnector (GLib.Object parent = nullptr);
 
     ~UserStatusConnector () override;
 
@@ -146,7 +156,7 @@ signals:
         return _icon;
     }
 
-    auto UserStatus.state () . OnlineStatus {
+    var UserStatus.state () . OnlineStatus {
         return _state;
     }
 
@@ -201,8 +211,8 @@ signals:
         _clear_at = date_time;
     }
 
-    UserStatusConnector.UserStatusConnector (GLib.Object *parent)
-        : GLib.Object (parent) {
+    UserStatusConnector.UserStatusConnector (GLib.Object parent) {
+        base (parent);
     }
 
     UserStatusConnector.~UserStatusConnector () = default;

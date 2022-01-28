@@ -32,7 +32,7 @@ const int CFVERIFY_GONE (folder, path)
 using namespace Occ;
 
 bool itemInstruction (ItemCompletedSpy &spy, string path, SyncInstructions instr) {
-    auto item = spy.findItem (path);
+    var item = spy.findItem (path);
     return item._instruction == instr;
 }
 
@@ -42,8 +42,8 @@ SyncJournalFileRecord dbRecord (FakeFolder &folder, string path) {
     return record;
 }
 
-void triggerDownload (FakeFolder &folder, GLib.ByteArray &path) {
-    auto &journal = folder.syncJournal ();
+void triggerDownload (FakeFolder &folder, GLib.ByteArray path) {
+    var &journal = folder.syncJournal ();
     SyncJournalFileRecord record;
     journal.getFileRecord (path, &record);
     if (!record.isValid ())
@@ -53,8 +53,8 @@ void triggerDownload (FakeFolder &folder, GLib.ByteArray &path) {
     journal.schedulePathForRemoteDiscovery (record._path);
 }
 
-void markForDehydration (FakeFolder &folder, GLib.ByteArray &path) {
-    auto &journal = folder.syncJournal ();
+void markForDehydration (FakeFolder &folder, GLib.ByteArray path) {
+    var &journal = folder.syncJournal ();
     SyncJournalFileRecord record;
     journal.getFileRecord (path, &record);
     if (!record.isValid ())
@@ -65,14 +65,14 @@ void markForDehydration (FakeFolder &folder, GLib.ByteArray &path) {
 }
 
 unowned<Vfs> setupVfs (FakeFolder &folder) {
-    auto xattrVfs = unowned<Vfs> (createVfsFromPlugin (Vfs.XAttr).release ());
+    var xattrVfs = unowned<Vfs> (createVfsFromPlugin (Vfs.XAttr).release ());
     GLib.Object.connect (&folder.syncEngine ().syncFileStatusTracker (), &SyncFileStatusTracker.fileStatusChanged,
                      xattrVfs.data (), &Vfs.fileStatusChanged);
     folder.switchToVfs (xattrVfs);
 
     // Using this directly doesn't recursively unpin everything and instead leaves
     // the files in the hydration that that they on_start with
-    folder.syncJournal ().internalPinStates ().setForPath (GLib.ByteArray (), PinState.Unspecified);
+    folder.syncJournal ().internalPinStates ().setForPath (GLib.ByteArray (), PinState.PinState.UNSPECIFIED);
 
     return xattrVfs;
 }
@@ -94,7 +94,7 @@ class TestSyncXAttr : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        auto on_cleanup = [&] () {
+        var on_cleanup = [&] () {
             completeSpy.clear ();
             if (!doLocalDiscovery)
                 fakeFolder.syncEngine ().setLocalDiscoveryOptions (LocalDiscoveryStyle.DatabaseAndFilesystem);
@@ -104,7 +104,7 @@ class TestSyncXAttr : GLib.Object {
         // Create a virtual file for a new remote file
         fakeFolder.remoteModifier ().mkdir ("A");
         fakeFolder.remoteModifier ().insert ("A/a1", 64);
-        auto someDate = QDateTime (QDate (1984, 07, 30), QTime (1,3,2));
+        var someDate = QDateTime (QDate (1984, 07, 30), QTime (1,3,2));
         fakeFolder.remoteModifier ().setModTime ("A/a1", someDate);
         QVERIFY (fakeFolder.syncOnce ());
         XAVERIFY_VIRTUAL (fakeFolder, "A/a1");
@@ -192,7 +192,7 @@ class TestSyncXAttr : GLib.Object {
         QVERIFY (!dbRecord (fakeFolder, "A/a1m").isValid ());
         on_cleanup ();
 
-        // Edge case : Local virtual file but no db entry for some reason
+        // Edge case : Local virtual file but no database entry for some reason
         fakeFolder.remoteModifier ().insert ("A/a2", 32);
         fakeFolder.remoteModifier ().insert ("A/a3", 33);
         QVERIFY (fakeFolder.syncOnce ());
@@ -222,7 +222,7 @@ class TestSyncXAttr : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        auto on_cleanup = [&] () {
+        var on_cleanup = [&] () {
             completeSpy.clear ();
         };
         on_cleanup ();
@@ -248,7 +248,7 @@ class TestSyncXAttr : GLib.Object {
         fakeFolder.remoteModifier ().appendByte ("B/b1");
 
         // A : the correct file and a conflicting file are added
-        // B : user adds a *directory* locally
+        // B : user adds a directory* locally
         fakeFolder.localModifier ().remove ("A/a1");
         fakeFolder.localModifier ().insert ("A/a1", 12);
         fakeFolder.localModifier ().remove ("A/a2");
@@ -280,7 +280,7 @@ class TestSyncXAttr : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        auto on_cleanup = [&] () {
+        var on_cleanup = [&] () {
             completeSpy.clear ();
         };
         on_cleanup ();
@@ -314,7 +314,7 @@ class TestSyncXAttr : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        auto on_cleanup = [&] () {
+        var on_cleanup = [&] () {
             completeSpy.clear ();
         };
         on_cleanup ();
@@ -348,7 +348,7 @@ class TestSyncXAttr : GLib.Object {
 
         on_cleanup ();
 
-        // Download by changing the db entry
+        // Download by changing the database entry
         triggerDownload (fakeFolder, "A/a1");
         triggerDownload (fakeFolder, "A/a2");
         triggerDownload (fakeFolder, "A/a3");
@@ -415,7 +415,7 @@ class TestSyncXAttr : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        auto on_cleanup = [&] () {
+        var on_cleanup = [&] () {
             completeSpy.clear ();
             fakeFolder.syncJournal ().wipeErrorBlacklist ();
         };
@@ -428,7 +428,7 @@ class TestSyncXAttr : GLib.Object {
         XAVERIFY_VIRTUAL (fakeFolder, "A/a1");
         on_cleanup ();
 
-        // Download by changing the db entry
+        // Download by changing the database entry
         triggerDownload (fakeFolder, "A/a1");
         fakeFolder.serverErrorPaths ().append ("A/a1", 500);
         QVERIFY (!fakeFolder.syncOnce ());
@@ -455,7 +455,7 @@ class TestSyncXAttr : GLib.Object {
         QVERIFY (fakeFolder.syncOnce ());
         XAVERIFY_VIRTUAL (fakeFolder, "A/a1");
 
-        fakeFolder.syncJournal ().internalPinStates ().setForPath (GLib.ByteArray (), PinState.AlwaysLocal);
+        fakeFolder.syncJournal ().internalPinStates ().setForPath (GLib.ByteArray (), PinState.PinState.ALWAYS_LOCAL);
 
         // Create a new remote file, it'll not be virtual
         fakeFolder.remoteModifier ().insert ("A/a2");
@@ -543,7 +543,7 @@ class TestSyncXAttr : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        auto on_cleanup = [&] () {
+        var on_cleanup = [&] () {
             completeSpy.clear ();
         };
         on_cleanup ();
@@ -589,7 +589,7 @@ class TestSyncXAttr : GLib.Object {
         FakeFolder fakeFolder{ FileInfo () };
         setupVfs (fakeFolder);
         ItemCompletedSpy completeSpy (fakeFolder);
-        auto on_cleanup = [&] () {
+        var on_cleanup = [&] () {
             completeSpy.clear ();
         };
         on_cleanup ();
@@ -609,11 +609,11 @@ class TestSyncXAttr : GLib.Object {
         // Case 1 : non-virtual, foo . bar (tested elsewhere)
         // Case 2 : virtual, foo . bar (tested elsewhere)
 
-        // Case 3 : virtual, foo.oc . bar.oc (db hydrate)
+        // Case 3 : virtual, foo.oc . bar.oc (database hydrate)
         fakeFolder.localModifier ().rename ("case3", "case3-rename");
         triggerDownload (fakeFolder, "case3");
 
-        // Case 4 : non-virtual foo . bar (db dehydrate)
+        // Case 4 : non-virtual foo . bar (database dehydrate)
         fakeFolder.localModifier ().rename ("case4", "case4-rename");
         markForDehydration (fakeFolder, "case4");
 
@@ -643,7 +643,7 @@ class TestSyncXAttr : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
         ItemCompletedSpy completeSpy (fakeFolder);
-        auto on_cleanup = [&] () {
+        var on_cleanup = [&] () {
             completeSpy.clear ();
         };
         on_cleanup ();
@@ -678,11 +678,11 @@ class TestSyncXAttr : GLib.Object {
 
         QVERIFY (fakeFolder.syncOnce ());
 
-        auto isDehydrated = [&] (string path) {
+        var isDehydrated = [&] (string path) {
             return xattr.hasNextcloudPlaceholderAttributes (fakeFolder.localPath () + path)
                 && QFileInfo (fakeFolder.localPath () + path).exists ();
         };
-        auto hasDehydratedDbEntries = [&] (string path) {
+        var hasDehydratedDbEntries = [&] (string path) {
             SyncJournalFileRecord rec;
             fakeFolder.syncJournal ().getFileRecord (path, &rec);
             return rec.isValid () && rec._type == ItemTypeVirtualFile;
@@ -716,7 +716,7 @@ class TestSyncXAttr : GLib.Object {
         QVERIFY (itemInstruction (completeSpy, "C/c2", CSYNC_INSTRUCTION_CONFLICT));
         on_cleanup ();
 
-        auto expectedRemoteState = fakeFolder.currentRemoteState ();
+        var expectedRemoteState = fakeFolder.currentRemoteState ();
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentRemoteState (), expectedRemoteState);
 
@@ -805,7 +805,7 @@ class TestSyncXAttr : GLib.Object {
         setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        auto setPin = [&] (GLib.ByteArray &path, PinState state) {
+        var setPin = [&] (GLib.ByteArray path, PinState state) {
             fakeFolder.syncJournal ().internalPinStates ().setForPath (path, state);
         };
 
@@ -815,11 +815,11 @@ class TestSyncXAttr : GLib.Object {
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        setPin ("local", PinState.AlwaysLocal);
-        setPin ("online", PinState.OnlineOnly);
-        setPin ("unspec", PinState.Unspecified);
+        setPin ("local", PinState.PinState.ALWAYS_LOCAL);
+        setPin ("online", PinState.VfsItemAvailability.ONLINE_ONLY);
+        setPin ("unspec", PinState.PinState.UNSPECIFIED);
 
-        // Test 1 : root is Unspecified
+        // Test 1 : root is PinState.UNSPECIFIED
         fakeFolder.remoteModifier ().insert ("file1");
         fakeFolder.remoteModifier ().insert ("online/file1");
         fakeFolder.remoteModifier ().insert ("local/file1");
@@ -831,8 +831,8 @@ class TestSyncXAttr : GLib.Object {
         XAVERIFY_NONVIRTUAL (fakeFolder, "local/file1");
         XAVERIFY_VIRTUAL (fakeFolder, "unspec/file1");
 
-        // Test 2 : change root to AlwaysLocal
-        setPin (GLib.ByteArray (), PinState.AlwaysLocal);
+        // Test 2 : change root to PinState.ALWAYS_LOCAL
+        setPin (GLib.ByteArray (), PinState.PinState.ALWAYS_LOCAL);
 
         fakeFolder.remoteModifier ().insert ("file2");
         fakeFolder.remoteModifier ().insert ("online/file2");
@@ -853,8 +853,8 @@ class TestSyncXAttr : GLib.Object {
         XAVERIFY_NONVIRTUAL (fakeFolder, "local/file1");
         XAVERIFY_VIRTUAL (fakeFolder, "unspec/file1");
 
-        // Test 3 : change root to OnlineOnly
-        setPin (GLib.ByteArray (), PinState.OnlineOnly);
+        // Test 3 : change root to VfsItemAvailability.ONLINE_ONLY
+        setPin (GLib.ByteArray (), PinState.VfsItemAvailability.ONLINE_ONLY);
 
         fakeFolder.remoteModifier ().insert ("file3");
         fakeFolder.remoteModifier ().insert ("online/file3");
@@ -878,10 +878,10 @@ class TestSyncXAttr : GLib.Object {
 
     private void on_test_availability () {
         FakeFolder fakeFolder{ FileInfo () };
-        auto vfs = setupVfs (fakeFolder);
+        var vfs = setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        auto setPin = [&] (GLib.ByteArray &path, PinState state) {
+        var setPin = [&] (GLib.ByteArray path, PinState state) {
             fakeFolder.syncJournal ().internalPinStates ().setForPath (path, state);
         };
 
@@ -893,9 +893,9 @@ class TestSyncXAttr : GLib.Object {
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        setPin ("local", PinState.AlwaysLocal);
-        setPin ("online", PinState.OnlineOnly);
-        setPin ("unspec", PinState.Unspecified);
+        setPin ("local", PinState.PinState.ALWAYS_LOCAL);
+        setPin ("online", PinState.VfsItemAvailability.ONLINE_ONLY);
+        setPin ("unspec", PinState.PinState.UNSPECIFIED);
 
         fakeFolder.remoteModifier ().insert ("file1");
         fakeFolder.remoteModifier ().insert ("online/file1");
@@ -906,47 +906,47 @@ class TestSyncXAttr : GLib.Object {
         QVERIFY (fakeFolder.syncOnce ());
 
         // root is unspecified
-        QCOMPARE (*vfs.availability ("file1"), VfsItemAvailability.AllDehydrated);
-        QCOMPARE (*vfs.availability ("local"), VfsItemAvailability.AlwaysLocal);
-        QCOMPARE (*vfs.availability ("local/file1"), VfsItemAvailability.AlwaysLocal);
-        QCOMPARE (*vfs.availability ("online"), VfsItemAvailability.OnlineOnly);
-        QCOMPARE (*vfs.availability ("online/file1"), VfsItemAvailability.OnlineOnly);
-        QCOMPARE (*vfs.availability ("unspec"), VfsItemAvailability.AllDehydrated);
-        QCOMPARE (*vfs.availability ("unspec/file1"), VfsItemAvailability.AllDehydrated);
+        QCOMPARE (*vfs.availability ("file1"), VfsItemAvailability.VfsItemAvailability.ALL_DEHYDRATED);
+        QCOMPARE (*vfs.availability ("local"), VfsItemAvailability.PinState.ALWAYS_LOCAL);
+        QCOMPARE (*vfs.availability ("local/file1"), VfsItemAvailability.PinState.ALWAYS_LOCAL);
+        QCOMPARE (*vfs.availability ("online"), VfsItemAvailability.VfsItemAvailability.ONLINE_ONLY);
+        QCOMPARE (*vfs.availability ("online/file1"), VfsItemAvailability.VfsItemAvailability.ONLINE_ONLY);
+        QCOMPARE (*vfs.availability ("unspec"), VfsItemAvailability.VfsItemAvailability.ALL_DEHYDRATED);
+        QCOMPARE (*vfs.availability ("unspec/file1"), VfsItemAvailability.VfsItemAvailability.ALL_DEHYDRATED);
 
         // Subitem pin states can ruin "pure" availabilities
-        setPin ("local/sub", PinState.OnlineOnly);
-        QCOMPARE (*vfs.availability ("local"), VfsItemAvailability.AllHydrated);
-        setPin ("online/sub", PinState.Unspecified);
-        QCOMPARE (*vfs.availability ("online"), VfsItemAvailability.AllDehydrated);
+        setPin ("local/sub", PinState.VfsItemAvailability.ONLINE_ONLY);
+        QCOMPARE (*vfs.availability ("local"), VfsItemAvailability.VfsItemAvailability.ALL_HYDRATED);
+        setPin ("online/sub", PinState.PinState.UNSPECIFIED);
+        QCOMPARE (*vfs.availability ("online"), VfsItemAvailability.VfsItemAvailability.ALL_DEHYDRATED);
 
         triggerDownload (fakeFolder, "unspec/file1");
-        setPin ("local/file2", PinState.OnlineOnly);
-        setPin ("online/file2", PinState.AlwaysLocal);
+        setPin ("local/file2", PinState.VfsItemAvailability.ONLINE_ONLY);
+        setPin ("online/file2", PinState.PinState.ALWAYS_LOCAL);
         QVERIFY (fakeFolder.syncOnce ());
 
-        QCOMPARE (*vfs.availability ("unspec"), VfsItemAvailability.AllHydrated);
-        QCOMPARE (*vfs.availability ("local"), VfsItemAvailability.Mixed);
-        QCOMPARE (*vfs.availability ("online"), VfsItemAvailability.Mixed);
+        QCOMPARE (*vfs.availability ("unspec"), VfsItemAvailability.VfsItemAvailability.ALL_HYDRATED);
+        QCOMPARE (*vfs.availability ("local"), VfsItemAvailability.VfsItemAvailability.MIXED);
+        QCOMPARE (*vfs.availability ("online"), VfsItemAvailability.VfsItemAvailability.MIXED);
 
-        QVERIFY (vfs.setPinState ("local", PinState.AlwaysLocal));
-        QVERIFY (vfs.setPinState ("online", PinState.OnlineOnly));
+        QVERIFY (vfs.setPinState ("local", PinState.PinState.ALWAYS_LOCAL));
+        QVERIFY (vfs.setPinState ("online", PinState.VfsItemAvailability.ONLINE_ONLY));
         QVERIFY (fakeFolder.syncOnce ());
 
-        QCOMPARE (*vfs.availability ("online"), VfsItemAvailability.OnlineOnly);
-        QCOMPARE (*vfs.availability ("local"), VfsItemAvailability.AlwaysLocal);
+        QCOMPARE (*vfs.availability ("online"), VfsItemAvailability.VfsItemAvailability.ONLINE_ONLY);
+        QCOMPARE (*vfs.availability ("local"), VfsItemAvailability.PinState.ALWAYS_LOCAL);
 
-        auto r = vfs.availability ("nonexistant");
+        var r = vfs.availability ("nonexistant");
         QVERIFY (!r);
         QCOMPARE (r.error (), Vfs.AvailabilityError.NoSuchItem);
     }
 
     private void on_test_pin_state_locals () {
         FakeFolder fakeFolder{ FileInfo () };
-        auto vfs = setupVfs (fakeFolder);
+        var vfs = setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        auto setPin = [&] (GLib.ByteArray &path, PinState state) {
+        var setPin = [&] (GLib.ByteArray path, PinState state) {
             fakeFolder.syncJournal ().internalPinStates ().setForPath (path, state);
         };
 
@@ -956,9 +956,9 @@ class TestSyncXAttr : GLib.Object {
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        setPin ("local", PinState.AlwaysLocal);
-        setPin ("online", PinState.OnlineOnly);
-        setPin ("unspec", PinState.Unspecified);
+        setPin ("local", PinState.PinState.ALWAYS_LOCAL);
+        setPin ("online", PinState.VfsItemAvailability.ONLINE_ONLY);
+        setPin ("unspec", PinState.PinState.UNSPECIFIED);
 
         fakeFolder.localModifier ().insert ("file1");
         fakeFolder.localModifier ().insert ("online/file1");
@@ -969,10 +969,10 @@ class TestSyncXAttr : GLib.Object {
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
         // root is unspecified
-        QCOMPARE (*vfs.pinState ("file1"), PinState.Unspecified);
-        QCOMPARE (*vfs.pinState ("local/file1"), PinState.AlwaysLocal);
-        QCOMPARE (*vfs.pinState ("online/file1"), PinState.Unspecified);
-        QCOMPARE (*vfs.pinState ("unspec/file1"), PinState.Unspecified);
+        QCOMPARE (*vfs.pinState ("file1"), PinState.PinState.UNSPECIFIED);
+        QCOMPARE (*vfs.pinState ("local/file1"), PinState.PinState.ALWAYS_LOCAL);
+        QCOMPARE (*vfs.pinState ("online/file1"), PinState.PinState.UNSPECIFIED);
+        QCOMPARE (*vfs.pinState ("unspec/file1"), PinState.PinState.UNSPECIFIED);
 
         // Sync again : bad pin states of new local files usually take effect on second sync
         QVERIFY (fakeFolder.syncOnce ());
@@ -982,53 +982,53 @@ class TestSyncXAttr : GLib.Object {
         fakeFolder.localModifier ().rename ("online/file1", "online/file1rename");
         fakeFolder.remoteModifier ().rename ("online/file2", "online/file2rename");
         QVERIFY (fakeFolder.syncOnce ());
-        QCOMPARE (*vfs.pinState ("online/file1rename"), PinState.Unspecified);
-        QCOMPARE (*vfs.pinState ("online/file2rename"), PinState.Unspecified);
+        QCOMPARE (*vfs.pinState ("online/file1rename"), PinState.PinState.UNSPECIFIED);
+        QCOMPARE (*vfs.pinState ("online/file2rename"), PinState.PinState.UNSPECIFIED);
 
         // When a folder is renamed, the pin states inside should be retained
         fakeFolder.localModifier ().rename ("online", "onlinerenamed1");
         QVERIFY (fakeFolder.syncOnce ());
-        QCOMPARE (*vfs.pinState ("onlinerenamed1"), PinState.OnlineOnly);
-        QCOMPARE (*vfs.pinState ("onlinerenamed1/file1rename"), PinState.Unspecified);
+        QCOMPARE (*vfs.pinState ("onlinerenamed1"), PinState.VfsItemAvailability.ONLINE_ONLY);
+        QCOMPARE (*vfs.pinState ("onlinerenamed1/file1rename"), PinState.PinState.UNSPECIFIED);
 
         fakeFolder.remoteModifier ().rename ("onlinerenamed1", "onlinerenamed2");
         QVERIFY (fakeFolder.syncOnce ());
-        QCOMPARE (*vfs.pinState ("onlinerenamed2"), PinState.OnlineOnly);
-        QCOMPARE (*vfs.pinState ("onlinerenamed2/file1rename"), PinState.Unspecified);
+        QCOMPARE (*vfs.pinState ("onlinerenamed2"), PinState.VfsItemAvailability.ONLINE_ONLY);
+        QCOMPARE (*vfs.pinState ("onlinerenamed2/file1rename"), PinState.PinState.UNSPECIFIED);
 
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
         // When a file is deleted and later a new file has the same name, the old pin
         // state isn't preserved.
-        QCOMPARE (*vfs.pinState ("onlinerenamed2/file1rename"), PinState.Unspecified);
+        QCOMPARE (*vfs.pinState ("onlinerenamed2/file1rename"), PinState.PinState.UNSPECIFIED);
         fakeFolder.remoteModifier ().remove ("onlinerenamed2/file1rename");
         QVERIFY (fakeFolder.syncOnce ());
-        QCOMPARE (*vfs.pinState ("onlinerenamed2/file1rename"), PinState.OnlineOnly);
+        QCOMPARE (*vfs.pinState ("onlinerenamed2/file1rename"), PinState.VfsItemAvailability.ONLINE_ONLY);
         fakeFolder.remoteModifier ().insert ("onlinerenamed2/file1rename");
         QVERIFY (fakeFolder.syncOnce ());
-        QCOMPARE (*vfs.pinState ("onlinerenamed2/file1rename"), PinState.OnlineOnly);
+        QCOMPARE (*vfs.pinState ("onlinerenamed2/file1rename"), PinState.VfsItemAvailability.ONLINE_ONLY);
 
         // When a file is hydrated or dehydrated due to pin state it retains its pin state
-        QVERIFY (vfs.setPinState ("onlinerenamed2/file1rename", PinState.AlwaysLocal));
+        QVERIFY (vfs.setPinState ("onlinerenamed2/file1rename", PinState.PinState.ALWAYS_LOCAL));
         QVERIFY (fakeFolder.syncOnce ());
         QVERIFY (fakeFolder.currentLocalState ().find ("onlinerenamed2/file1rename"));
-        QCOMPARE (*vfs.pinState ("onlinerenamed2/file1rename"), PinState.AlwaysLocal);
+        QCOMPARE (*vfs.pinState ("onlinerenamed2/file1rename"), PinState.PinState.ALWAYS_LOCAL);
 
-        QVERIFY (vfs.setPinState ("onlinerenamed2", PinState.Unspecified));
-        QVERIFY (vfs.setPinState ("onlinerenamed2/file1rename", PinState.OnlineOnly));
+        QVERIFY (vfs.setPinState ("onlinerenamed2", PinState.PinState.UNSPECIFIED));
+        QVERIFY (vfs.setPinState ("onlinerenamed2/file1rename", PinState.VfsItemAvailability.ONLINE_ONLY));
         QVERIFY (fakeFolder.syncOnce ());
 
         XAVERIFY_VIRTUAL (fakeFolder, "onlinerenamed2/file1rename");
 
-        QCOMPARE (*vfs.pinState ("onlinerenamed2/file1rename"), PinState.OnlineOnly);
+        QCOMPARE (*vfs.pinState ("onlinerenamed2/file1rename"), PinState.VfsItemAvailability.ONLINE_ONLY);
     }
 
     private void on_test_incompatible_pins () {
         FakeFolder fakeFolder{ FileInfo () };
-        auto vfs = setupVfs (fakeFolder);
+        var vfs = setupVfs (fakeFolder);
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        auto setPin = [&] (GLib.ByteArray &path, PinState state) {
+        var setPin = [&] (GLib.ByteArray path, PinState state) {
             fakeFolder.syncJournal ().internalPinStates ().setForPath (path, state);
         };
 
@@ -1037,8 +1037,8 @@ class TestSyncXAttr : GLib.Object {
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
-        setPin ("local", PinState.AlwaysLocal);
-        setPin ("online", PinState.OnlineOnly);
+        setPin ("local", PinState.PinState.ALWAYS_LOCAL);
+        setPin ("online", PinState.VfsItemAvailability.ONLINE_ONLY);
 
         fakeFolder.localModifier ().insert ("local/file1");
         fakeFolder.localModifier ().insert ("online/file1");
@@ -1052,8 +1052,8 @@ class TestSyncXAttr : GLib.Object {
 
         XAVERIFY_NONVIRTUAL (fakeFolder, "online/file1");
         XAVERIFY_VIRTUAL (fakeFolder, "local/file1");
-        QCOMPARE (*vfs.pinState ("online/file1"), PinState.Unspecified);
-        QCOMPARE (*vfs.pinState ("local/file1"), PinState.Unspecified);
+        QCOMPARE (*vfs.pinState ("online/file1"), PinState.PinState.UNSPECIFIED);
+        QCOMPARE (*vfs.pinState ("local/file1"), PinState.PinState.UNSPECIFIED);
 
         // no change on another sync
         QVERIFY (fakeFolder.syncOnce ());

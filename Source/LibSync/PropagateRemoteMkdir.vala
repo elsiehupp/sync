@@ -21,7 +21,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
     Propagate_upload_encrypted _upload_encrypted_helper;
     friend class PropagateDirectory; // So it can access the _item;
 
-    public PropagateRemoteMkdir (OwncloudPropagator *propagator, SyncFileItemPtr &item);
+    public PropagateRemoteMkdir (OwncloudPropagator propagator, SyncFileItemPtr &item);
 
     public void on_start () override;
     public void on_abort (PropagatorJob.AbortType abort_type) override;
@@ -30,6 +30,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
     public bool is_likely_finished_quickly () override {
         return true;
     }
+
 
     /***********************************************************
     Whether an existing entity with the same name may be deleted before
@@ -51,13 +52,13 @@ class PropagateRemoteMkdir : PropagateItemJob {
     private void finalize_mk_col_job (QNetworkReply.NetworkError err, string job_http_reason_phrase_string, string job_path);
 };
 
-    PropagateRemoteMkdir.PropagateRemoteMkdir (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+    PropagateRemoteMkdir.PropagateRemoteMkdir (OwncloudPropagator propagator, SyncFileItemPtr &item)
         : PropagateItemJob (propagator, item)
         , _delete_existing (false)
         , _upload_encrypted_helper (nullptr) {
-        const auto path = _item._file;
-        const auto slash_position = path.last_index_of ('/');
-        const auto parent_path = slash_position >= 0 ? path.left (slash_position) : string ();
+        const var path = _item._file;
+        const var slash_position = path.last_index_of ('/');
+        const var parent_path = slash_position >= 0 ? path.left (slash_position) : string ();
 
         SyncJournalFileRecord parent_rec;
         bool ok = propagator._journal.get_file_record (parent_path, &parent_rec);
@@ -110,7 +111,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
         q_debug () << filename;
         q_c_debug (lc_propagate_remote_mkdir) << filename;
 
-        auto job = new MkColJob (propagator ().account (),
+        var job = new MkColJob (propagator ().account (),
                                 propagator ().full_remote_path (filename), {{"e2e-token", _upload_encrypted_helper.folder_token () }},
                                 this);
         connect (job, &MkColJob.finished_with_error, this, &PropagateRemoteMkdir.on_mkcol_job_finished);
@@ -153,7 +154,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
         }
 
         propagator ()._active_job_list.append (this);
-        auto propfind_job = new PropfindJob (propagator ().account (), job_path, this);
+        var propfind_job = new PropfindJob (propagator ().account (), job_path, this);
         propfind_job.set_properties ({"http://owncloud.org/ns:permissions"});
         connect (propfind_job, &PropfindJob.result, this, [this, job_path] (QVariantMap &result){
             propagator ()._active_job_list.remove_one (this);
@@ -169,7 +170,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
                 // We're expecting directory path in /Foo/Bar convention...
                 Q_ASSERT (job_path.starts_with ('/') && !job_path.ends_with ('/'));
                 // But encryption job expect it in Foo/Bar/ convention
-                auto job = new Occ.EncryptFolderJob (propagator ().account (), propagator ()._journal, job_path.mid (1), _item._file_id, this);
+                var job = new Occ.EncryptFolderJob (propagator ().account (), propagator ()._journal, job_path.mid (1), _item._file_id, this);
                 connect (job, &Occ.EncryptFolderJob.on_finished, this, &PropagateRemoteMkdir.on_encrypt_folder_finished);
                 job.on_start ();
             }
@@ -183,9 +184,9 @@ class PropagateRemoteMkdir : PropagateItemJob {
     }
 
     void PropagateRemoteMkdir.on_mkdir () {
-        const auto path = _item._file;
-        const auto slash_position = path.last_index_of ('/');
-        const auto parent_path = slash_position >= 0 ? path.left (slash_position) : string ();
+        const var path = _item._file;
+        const var slash_position = path.last_index_of ('/');
+        const var parent_path = slash_position >= 0 ? path.left (slash_position) : string ();
 
         SyncJournalFileRecord parent_rec;
         bool ok = propagator ()._journal.get_file_record (parent_path, &parent_rec);
@@ -200,7 +201,7 @@ class PropagateRemoteMkdir : PropagateItemJob {
         }
 
         // We should be encrypted as well since our parent is
-        const auto remote_parent_path = parent_rec._e2e_mangled_name.is_empty () ? parent_path : parent_rec._e2e_mangled_name;
+        const var remote_parent_path = parent_rec._e2e_mangled_name.is_empty () ? parent_path : parent_rec._e2e_mangled_name;
         _upload_encrypted_helper = new Propagate_upload_encrypted (propagator (), remote_parent_path, _item, this);
         connect (_upload_encrypted_helper, &Propagate_upload_encrypted.finalized,
             this, &PropagateRemoteMkdir.on_start_encrypted_mkcol_job);
@@ -225,9 +226,9 @@ class PropagateRemoteMkdir : PropagateItemJob {
 
         _item._error_string = _job.error_string ();
 
-        const auto job_http_reason_phrase_string = _job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_string ();
+        const var job_http_reason_phrase_string = _job.reply ().attribute (QNetworkRequest.HttpReasonPhraseAttribute).to_string ();
 
-        const auto job_path = _job.path ();
+        const var job_path = _job.path ();
 
         if (_upload_encrypted_helper && _upload_encrypted_helper.is_folder_locked () && !_upload_encrypted_helper.is_unlock_running ()) {
             // since we are done, we need to unlock a folder in case it was locked
@@ -250,11 +251,11 @@ class PropagateRemoteMkdir : PropagateItemJob {
     void PropagateRemoteMkdir.on_success () {
         // Never save the etag on first mkdir.
         // Only fully propagated directories should have the etag set.
-        auto item_copy = _item;
+        var item_copy = _item;
         item_copy._etag.clear ();
 
         // save the file id already so we can detect rename or remove
-        const auto result = propagator ().update_metadata (item_copy);
+        const var result = propagator ().update_metadata (item_copy);
         if (!result) {
             on_done (SyncFileItem.FatalError, tr ("Error writing metadata to the database : %1").arg (result.error ()));
             return;

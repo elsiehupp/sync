@@ -104,13 +104,13 @@ using namespace Occ.Utility;
 #ifndef ZLIB_FOUND
         QSKIP ("ZLIB not found.", SkipSingle);
 #else
-        auto *vali = new ComputeChecksum (this);
+        var vali = new ComputeChecksum (this);
         _expectedType = "Adler32";
         vali.setChecksumType (_expectedType);
 
         connect (vali, SIGNAL (on_done (GLib.ByteArray,GLib.ByteArray)), SLOT (slotUpValidated (GLib.ByteArray,GLib.ByteArray)));
 
-        auto file = new QFile (_testfile, vali);
+        var file = new QFile (_testfile, vali);
         file.open (QIODevice.ReadOnly);
         _expected = calcAdler32 (file);
         qDebug () << "XX Expected Checksum : " << _expected;
@@ -126,12 +126,12 @@ using namespace Occ.Utility;
 
     void testUploadChecksummingMd5 () {
 
-        auto *vali = new ComputeChecksum (this);
+        var vali = new ComputeChecksum (this);
         _expectedType = Occ.checkSumMD5C;
         vali.setChecksumType (_expectedType);
         connect (vali, SIGNAL (on_done (GLib.ByteArray,GLib.ByteArray)), this, SLOT (slotUpValidated (GLib.ByteArray,GLib.ByteArray)));
 
-        auto file = new QFile (_testfile, vali);
+        var file = new QFile (_testfile, vali);
         file.open (QIODevice.ReadOnly);
         _expected = calcMd5 (file);
         vali.on_start (_testfile);
@@ -145,12 +145,12 @@ using namespace Occ.Utility;
 
     void testUploadChecksummingSha1 () {
 
-        auto *vali = new ComputeChecksum (this);
+        var vali = new ComputeChecksum (this);
         _expectedType = Occ.checkSumSHA1C;
         vali.setChecksumType (_expectedType);
         connect (vali, SIGNAL (on_done (GLib.ByteArray,GLib.ByteArray)), this, SLOT (slotUpValidated (GLib.ByteArray,GLib.ByteArray)));
 
-        auto file = new QFile (_testfile, vali);
+        var file = new QFile (_testfile, vali);
         file.open (QIODevice.ReadOnly);
         _expected = calcSha1 (file);
 
@@ -167,11 +167,11 @@ using namespace Occ.Utility;
 #ifndef ZLIB_FOUND
         QSKIP ("ZLIB not found.", SkipSingle);
 #else
-        auto *vali = new ValidateChecksumHeader (this);
+        var vali = new ValidateChecksumHeader (this);
         connect (vali, &ValidateChecksumHeader.validated, this, &TestChecksumValidator.slotDownValidated);
         connect (vali, &ValidateChecksumHeader.validationFailed, this, &TestChecksumValidator.slotDownError);
 
-        auto file = new QFile (_testfile, vali);
+        var file = new QFile (_testfile, vali);
         file.open (QIODevice.ReadOnly);
         _expected = calcAdler32 (file);
 

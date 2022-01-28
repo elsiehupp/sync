@@ -25,7 +25,9 @@ class Updater : GLib.Object {
         static int64 version_to_int (int64 major, int64 minor, int64 patch, int64 build);
     };
 
-    public static Updater *instance ();
+    public static Updater instance ();
+
+
     public static QUrl update_url ();
 
     public virtual void check_for_update () = 0;
@@ -41,7 +43,7 @@ class Updater : GLib.Object {
 
     private static string get_system_info ();
     private static QUrlQuery get_query_params ();
-    private static Updater *create ();
+    private static Updater create ();
     private static Updater _instance;
 };
 
@@ -64,7 +66,7 @@ class Updater : GLib.Object {
             return QUrl ();
         }
 
-        auto url_query = get_query_params ();
+        var url_query = get_query_params ();
 
         update_base_url.set_query (url_query);
 
@@ -73,7 +75,7 @@ class Updater : GLib.Object {
 
     QUrlQuery Updater.get_query_params () {
         QUrlQuery query;
-        Theme *theme = Theme.instance ();
+        Theme theme = Theme.instance ();
         string platform = QStringLiteral ("stranger");
         if (Utility.is_linux ()) {
             platform = QStringLiteral ("linux");
@@ -101,14 +103,14 @@ class Updater : GLib.Object {
         string suffix = QStringLiteral (MIRALL_STRINGIFY (MIRALL_VERSION_SUFFIX));
         query.add_query_item (QStringLiteral ("versionsuffix"), suffix);
 
-        auto channel = ConfigFile ().update_channel ();
+        var channel = ConfigFile ().update_channel ();
         if (channel != QLatin1String ("stable")) {
             query.add_query_item (QStringLiteral ("channel"), channel);
         }
 
         // update_segment (see configfile.h)
         ConfigFile cfg;
-        auto update_segment = cfg.update_segment ();
+        var update_segment = cfg.update_segment ();
         query.add_query_item (QLatin1String ("updatesegment"), string.number (update_segment));
 
         return query;
@@ -134,7 +136,7 @@ class Updater : GLib.Object {
 
     // To test, cmake with -DAPPLICATION_UPDATE_URL="http://127.0.0.1:8080/test.rss"
     Updater *Updater.create () {
-        auto url = update_url ();
+        var url = update_url ();
         q_c_debug (lc_updater) << url;
         if (url.is_empty ()) {
             q_c_warning (lc_updater) << "Not a valid updater URL, will not do update check";

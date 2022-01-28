@@ -4,39 +4,46 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
 
+// #include <Sqlite3.h>
 // #pragma once
 
 namespace Occ {
 
-class Prepared_sqlQuery {
-
-    ~Prepared_sqlQuery ();
-
-    public operator bool () {
-        return _ok;
-    }
-
-    public SqlQuery *operator. () {
-        Q_ASSERT (_ok);
-        return _query;
-    }
-
-    public SqlQuery &operator* () & {
-        Q_ASSERT (_ok);
-        return _query;
-    }
-
-
-    private Prepared_sqlQuery (SqlQuery *query, bool ok = true);
+class PreparedSqlQuery {
 
     private SqlQuery _query;
     private bool _ok;
 
     private friend class PreparedSqlQueryManager;
+
+
+    private PreparedSqlQuery (SqlQuery query, bool ok = true) {
+        _query = query;
+        _ok = ok;
+    }
+
+    ~PreparedSqlQuery () {
+        _query.reset_and_clear_bindings ();
+    }
+
+
+    public to_bool () {
+        return _ok;
+    }
+
+    //  public SqlQuery operator. () {
+    //      Q_ASSERT (_ok);
+    //      return _query;
+    //  }
+
+    //  public SqlQuery &operator* () & {
+    //      Q_ASSERT (_ok);
+    //      return _query;
+    //  }
 };
 
 /***********************************************************
-@brief Manage Prepared_sqlQuery
+@brief Manage PreparedSqlQuery
 ***********************************************************/
 class PreparedSqlQueryManager {
 
@@ -45,20 +52,20 @@ class PreparedSqlQueryManager {
         Key.GET_FILE_RECORD_QUERY_BY_MANGLED_NAME,
         Key.GET_FILE_RECORD_QUERY_BY_INODE,
         Key.GET_FILE_RECORD_QUERY_BY_FILE_ID,
-        GetFilesBelowPathQuery,
-        GetAllFilesQuery,
-        List_files_in_path_query,
-        SetFileRecordQuery,
-        Set_file_record_checksum_query,
-        Set_file_record_local_metadata_query,
-        Get_download_info_query,
-        Set_download_info_query,
-        DeleteDownloadInfoQuery,
-        Get_upload_info_query,
-        Set_upload_info_query,
-        DeleteUploadInfoQuery,
-        DeleteFileRecordPhash,
-        DeleteFileRecordRecursively,
+        Key.GET_FILES_BELOW_PATH_QUERY,
+        Key.GET_ALL_FILES_QUERY,
+        Key.LIST_FILES_IN_PATH_QUERY,
+        Key.SET_FILE_RECORD_QUERY,
+        Key.SET_FILE_RECORD_CHECKSUM_QUERY,
+        Key.SET_FILE_LOCAL_METADATA_QUERY,
+        Key.GET_DOWNLOAD_INFO_QUERY,
+        Key.SET_DOWNLOAD_INFO_QUERY,
+        Key.DELETE_DOWNLOAD_INFO_QUERY,
+        Key.GET_UPLOAD_INFO_QUERY,
+        Key.SET_UPLOAD_INFO_QUERY,
+        Key.DELETE_UPLOAD_INFO_QUERY,
+        Key.DELETE_FILE_RECORD_PHASH,
+        Key.DELETE_FILE_RECORD_RECURSIVELY,
         GetErrorBlacklistQuery,
         Set_error_blacklist_query,
         Get_selective_sync_list_query,
@@ -83,64 +90,46 @@ class PreparedSqlQueryManager {
 
         Prepared_query_count
     };
+
+
     public PreparedSqlQueryManager () = default;
+
+
     /***********************************************************
     The queries are reset in the destructor to prevent wal locks
     ***********************************************************/
-    public const Prepared_sqlQuery get (Key key);
+    public const PreparedSqlQuery get (Key key) {
+        var &query = _queries[key];
+        ENFORCE (query._stmt)
+        Q_ASSERT (!Sqlite3Stmt_busy (query._stmt));
+        return {
+            &query
+        };
+    }
+
+
     /***********************************************************
     Prepare the SqlQuery if it was not prepared yet.
     ***********************************************************/
-    public const Prepared_sqlQuery get (Key key, GLib.ByteArray &sql, SqlDatabase &db);
+    public const PreparedSqlQuery get (Key key, GLib.ByteArray sql, SqlDatabase database) {
+        var &query = _queries[key];
+        Q_ASSERT (!Sqlite3Stmt_busy (query._stmt));
+        ENFORCE (!query._sqldb || &database == query._sqldb)
+        if (!query._stmt) {
+            query._sqldb = &database;
+            query._db = database.sqlite_db ();
+            return {
+                &query, query.prepare (sql) == 0
+            };
+        }
+        return {
+            &query
+        };
+    }
 
 
     private SqlQuery _queries[Prepared_query_count];
     private Q_DISABLE_COPY (PreparedSqlQueryManager)
 };
 
-}
-
-
-/***********************************************************
-Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
-
-<LGPLv2.1-or-later-Boilerplate>
-***********************************************************/
-
-// #include <Sqlite3.h>
-
-using namespace Occ;
-
-Prepared_sqlQuery.Prepared_sqlQuery (SqlQuery *query, bool ok)
-    : _query (query)
-    , _ok (ok) {
-}
-
-Prepared_sqlQuery.~Prepared_sqlQuery () {
-    _query.reset_and_clear_bindings ();
-}
-
-const Prepared_sqlQuery PreparedSqlQueryManager.get (PreparedSqlQueryManager.Key key) {
-    auto &query = _queries[key];
-    ENFORCE (query._stmt)
-    Q_ASSERT (!sqlite3_stmt_busy (query._stmt));
-    return {
-        &query
-    };
-}
-
-const Prepared_sqlQuery PreparedSqlQueryManager.get (PreparedSqlQueryManager.Key key, GLib.ByteArray &sql, SqlDatabase &db) {
-    auto &query = _queries[key];
-    Q_ASSERT (!sqlite3_stmt_busy (query._stmt));
-    ENFORCE (!query._sqldb || &db == query._sqldb)
-    if (!query._stmt) {
-        query._sqldb = &db;
-        query._db = db.sqlite_db ();
-        return {
-            &query, query.prepare (sql) == 0
-        };
-    }
-    return {
-        &query
-    };
 }

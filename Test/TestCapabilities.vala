@@ -12,8 +12,8 @@ class TestCapabilities : GLib.Object {
         QVariantMap capabilitiesMap;
         capabilitiesMap["notify_push"] = notifyPushMap;
 
-        const auto &capabilities = Occ.Capabilities (capabilitiesMap);
-        const auto activitiesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Activities);
+        const var &capabilities = Occ.Capabilities (capabilitiesMap);
+        const var activitiesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Activities);
 
         QCOMPARE (activitiesPushNotificationsAvailable, true);
     }
@@ -28,8 +28,8 @@ class TestCapabilities : GLib.Object {
         QVariantMap capabilitiesMap;
         capabilitiesMap["notify_push"] = notifyPushMap;
 
-        const auto &capabilities = Occ.Capabilities (capabilitiesMap);
-        const auto activitiesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Activities);
+        const var &capabilities = Occ.Capabilities (capabilitiesMap);
+        const var activitiesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Activities);
 
         QCOMPARE (activitiesPushNotificationsAvailable, false);
     }
@@ -44,8 +44,8 @@ class TestCapabilities : GLib.Object {
         QVariantMap capabilitiesMap;
         capabilitiesMap["notify_push"] = notifyPushMap;
 
-        const auto &capabilities = Occ.Capabilities (capabilitiesMap);
-        const auto filesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Files);
+        const var &capabilities = Occ.Capabilities (capabilitiesMap);
+        const var filesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Files);
 
         QCOMPARE (filesPushNotificationsAvailable, true);
     }
@@ -60,8 +60,8 @@ class TestCapabilities : GLib.Object {
         QVariantMap capabilitiesMap;
         capabilitiesMap["notify_push"] = notifyPushMap;
 
-        const auto &capabilities = Occ.Capabilities (capabilitiesMap);
-        const auto filesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Files);
+        const var &capabilities = Occ.Capabilities (capabilitiesMap);
+        const var filesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Files);
 
         QCOMPARE (filesPushNotificationsAvailable, false);
     }
@@ -76,8 +76,8 @@ class TestCapabilities : GLib.Object {
         QVariantMap capabilitiesMap;
         capabilitiesMap["notify_push"] = notifyPushMap;
 
-        const auto &capabilities = Occ.Capabilities (capabilitiesMap);
-        const auto notificationsPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Notifications);
+        const var &capabilities = Occ.Capabilities (capabilitiesMap);
+        const var notificationsPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Notifications);
 
         QCOMPARE (notificationsPushNotificationsAvailable, true);
     }
@@ -92,17 +92,17 @@ class TestCapabilities : GLib.Object {
         QVariantMap capabilitiesMap;
         capabilitiesMap["notify_push"] = notifyPushMap;
 
-        const auto &capabilities = Occ.Capabilities (capabilitiesMap);
-        const auto notificationsPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Notifications);
+        const var &capabilities = Occ.Capabilities (capabilitiesMap);
+        const var notificationsPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Notifications);
 
         QCOMPARE (notificationsPushNotificationsAvailable, false);
     }
 
     private on_ void testPushNotificationsAvailable_pushNotificationsNotAvailable_returnFalse () {
-        const auto &capabilities = Occ.Capabilities (QVariantMap ());
-        const auto activitiesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Activities);
-        const auto filesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Files);
-        const auto notificationsPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Notifications);
+        const var &capabilities = Occ.Capabilities (QVariantMap ());
+        const var activitiesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Activities);
+        const var filesPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Files);
+        const var notificationsPushNotificationsAvailable = capabilities.availablePushNotifications ().testFlag (Occ.PushNotificationType.Notifications);
 
         QCOMPARE (activitiesPushNotificationsAvailable, false);
         QCOMPARE (filesPushNotificationsAvailable, false);
@@ -121,7 +121,7 @@ class TestCapabilities : GLib.Object {
         QVariantMap capabilitiesMap;
         capabilitiesMap["notify_push"] = notifyPushMap;
 
-        const auto &capabilities = Occ.Capabilities (capabilitiesMap);
+        const var &capabilities = Occ.Capabilities (capabilitiesMap);
 
         QCOMPARE (capabilities.pushNotificationsWebSocketUrl (), websocketUrl);
     }
@@ -204,7 +204,7 @@ class TestCapabilities : GLib.Object {
         capabilitiesMap["files_sharing"] = filesSharingMap;
 
         const Occ.Capabilities capabilities (capabilitiesMap);
-        const auto defaultSharePermissionsNotInCapabilities = capabilities.shareDefaultPermissions ();
+        const var defaultSharePermissionsNotInCapabilities = capabilities.shareDefaultPermissions ();
 
         QCOMPARE (defaultSharePermissionsNotInCapabilities, {});
     }
@@ -218,7 +218,7 @@ class TestCapabilities : GLib.Object {
         capabilitiesMap["files_sharing"] = filesSharingMap;
 
         const Occ.Capabilities capabilities (capabilitiesMap);
-        const auto defaultSharePermissionsAvailable = capabilities.shareDefaultPermissions ();
+        const var defaultSharePermissionsAvailable = capabilities.shareDefaultPermissions ();
 
         QCOMPARE (defaultSharePermissionsAvailable, 31);
     }
@@ -230,8 +230,8 @@ class TestCapabilities : GLib.Object {
         QVariantMap capabilitiesMap;
         capabilitiesMap["dav"] = bulkuploadMap;
 
-        const auto &capabilities = Occ.Capabilities (capabilitiesMap);
-        const auto bulkuploadAvailable = capabilities.bulkUpload ();
+        const var &capabilities = Occ.Capabilities (capabilitiesMap);
+        const var bulkuploadAvailable = capabilities.bulkUpload ();
 
         QCOMPARE (bulkuploadAvailable, true);
     }

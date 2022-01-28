@@ -38,7 +38,6 @@ $QT_END_LICENSE$
 ****************************************************************************/
 
 // #include <string>
-// #include <GLib.ByteArray>
 
 
 QT_BEGIN_NAMESPACE
@@ -109,6 +108,7 @@ class QTokenizer {
 
     public using char_type = typename T.value_type;
 
+
     /***********************************************************
     \class QTokenizer
     \inmodule Qt_network
@@ -137,6 +137,7 @@ class QTokenizer {
     public QTokenizer (T& string, T& delimiters)
         : d (new QTokenizerPrivate<T, Const_iterator> (string, delimiters)) {}
 
+
     /***********************************************************
     Whether or not to return delimiters as tokens
     \see set_quote_characters
@@ -144,6 +145,7 @@ class QTokenizer {
     public void set_return_delimiters (bool enable) {
         d.return_delimiters = enable;
     }
+
 
     /***********************************************************
     Sets characters that are considered to on_start and end quotes.
@@ -160,6 +162,7 @@ class QTokenizer {
         d.quotes = quotes;
     }
 
+
     /***********************************************************
     Whether or not to return delimiters as tokens
     \see set_quote_characters
@@ -167,6 +170,7 @@ class QTokenizer {
     public void set_return_quote_characters (bool enable) {
         d.return_quotes = enable;
     }
+
 
     /***********************************************************
     Retrieve next token.
@@ -196,12 +200,14 @@ class QTokenizer {
         return true;
     }
 
+
     /***********************************************************
     Resets the tokenizer to the starting position.
     ***********************************************************/
     public void on_reset () {
         d.token_end = d.begin;
     }
+
 
     /***********************************************************
     Returns true if the current token is a delimiter,
@@ -210,6 +216,7 @@ class QTokenizer {
     public bool is_delimiter () {
         return d.is_delim;
     }
+
 
     /***********************************************************
     Returns the current token.

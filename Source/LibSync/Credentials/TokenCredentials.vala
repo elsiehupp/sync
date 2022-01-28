@@ -23,14 +23,16 @@ class TokenCredentials : AbstractCredentials {
 
     public friend class TokenCredentialsAccessManager;
     public TokenCredentials ();
+
+
     public TokenCredentials (string user, string password, string token);
 
     public string auth_type () override;
-    public QNetworkAccessManager *create_qNAM () override;
+    public QNetworkAccessManager create_qNAM () override;
     public bool ready () override;
     public void ask_from_user () override;
     public void fetch_from_keychain () override;
-    public bool still_valid (QNetworkReply *reply) override;
+    public bool still_valid (QNetworkReply reply) override;
     public void persist () override;
     public string user () override;
     public void invalidate_token () override;
@@ -57,13 +59,13 @@ class TokenCredentials : AbstractCredentials {
     class TokenCredentialsAccessManager : AccessManager {
 
         public friend class TokenCredentials;
-        public TokenCredentialsAccessManager (TokenCredentials *cred, GLib.Object *parent = nullptr)
+        public TokenCredentialsAccessManager (TokenCredentials cred, GLib.Object parent = nullptr)
             : AccessManager (parent)
             , _cred (cred) {
         }
 
 
-        protected QNetworkReply *create_request (Operation op, QNetworkRequest &request, QIODevice *outgoing_data) {
+        protected QNetworkReply create_request (Operation op, QNetworkRequest &request, QIODevice outgoing_data) {
             if (_cred.user ().is_empty () || _cred.password ().is_empty ()) {
                 q_c_warning (lc_token_credentials) << "Empty user/password provided!";
             }
@@ -112,7 +114,7 @@ class TokenCredentials : AbstractCredentials {
     }
 
     QNetworkAccessManager *TokenCredentials.create_qNAM () {
-        AccessManager *qnam = new TokenCredentialsAccessManager (this);
+        AccessManager qnam = new TokenCredentialsAccessManager (this);
 
         connect (qnam, SIGNAL (authentication_required (QNetworkReply *, QAuthenticator *)),
             this, SLOT (on_authentication (QNetworkReply *, QAuthenticator *)));
@@ -133,7 +135,7 @@ class TokenCredentials : AbstractCredentials {
         emit asked ();
     }
 
-    bool TokenCredentials.still_valid (QNetworkReply *reply) {
+    bool TokenCredentials.still_valid (QNetworkReply reply) {
         return ( (reply.error () != QNetworkReply.AuthenticationRequiredError)
             // returned if user/password or token are incorrect
             && (reply.error () != QNetworkReply.OperationCanceledError
@@ -156,7 +158,7 @@ class TokenCredentials : AbstractCredentials {
     void TokenCredentials.persist () {
     }
 
-    void TokenCredentials.on_authentication (QNetworkReply *reply, QAuthenticator *authenticator) {
+    void TokenCredentials.on_authentication (QNetworkReply reply, QAuthenticator authenticator) {
         Q_UNUSED (authenticator)
         // we cannot use QAuthenticator, because it sends username and passwords with latin1
         // instead of utf8 encoding. Instead, we send it manually. Thus, if we reach this signal,

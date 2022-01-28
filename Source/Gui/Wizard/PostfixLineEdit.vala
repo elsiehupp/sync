@@ -21,7 +21,8 @@ Useful e.g. for setting a fixed domain name.
 
 class Postfix_line_edit : QLineEdit {
 
-    public Postfix_line_edit (Gtk.Widget *parent);
+    public Postfix_line_edit (Gtk.Widget parent);
+
 
     /***********************************************************
     @brief sets an optional postfix shown greyed out
@@ -47,7 +48,7 @@ class Postfix_line_edit : QLineEdit {
     public void set_full_text (string text);
 
 
-    protected void paint_event (QPaint_event *pe) override;
+    protected void paint_event (QPaint_event pe) override;
 
 
     private string _postfix;
@@ -56,7 +57,7 @@ class Postfix_line_edit : QLineEdit {
     const int horizontal_margin (4);
     const int vertical_margin (4);
 
-    Postfix_line_edit.Postfix_line_edit (Gtk.Widget *parent)
+    Postfix_line_edit.Postfix_line_edit (Gtk.Widget parent)
         : QLineEdit (parent) {
     }
 
@@ -84,7 +85,7 @@ class Postfix_line_edit : QLineEdit {
         on_set_text (prefix_string);
     }
 
-    void Postfix_line_edit.paint_event (QPaint_event *pe) {
+    void Postfix_line_edit.paint_event (QPaint_event pe) {
         QLineEdit.paint_event (pe);
         QPainter p (this);
 

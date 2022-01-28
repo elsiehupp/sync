@@ -13,7 +13,7 @@ using namespace Occ;
 
 class TestLocalDiscovery : GLib.Object {
 
-    // Check correct behavior when local discovery is partially drawn from the db
+    // Check correct behavior when local discovery is partially drawn from the database
     private on_ void testLocalDiscoveryStyle () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
 
@@ -64,7 +64,7 @@ class TestLocalDiscovery : GLib.Object {
 
     private on_ void testLocalDiscoveryDecision () {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
-        auto &engine = fakeFolder.syncEngine ();
+        var &engine = fakeFolder.syncEngine ();
 
         QVERIFY (engine.shouldDiscoverLocally (""));
         QVERIFY (engine.shouldDiscoverLocally ("A"));
@@ -111,7 +111,7 @@ class TestLocalDiscovery : GLib.Object {
         LocalDiscoveryTracker tracker;
         connect (&fakeFolder.syncEngine (), &SyncEngine.itemCompleted, &tracker, &LocalDiscoveryTracker.slotItemCompleted);
         connect (&fakeFolder.syncEngine (), &SyncEngine.on_finished, &tracker, &LocalDiscoveryTracker.slotSyncFinished);
-        auto trackerContains = [&] (char *path) {
+        var trackerContains = [&] (char path) {
             return tracker.localDiscoveryPaths ().find (path) != tracker.localDiscoveryPaths ().end ();
         };
 
@@ -162,7 +162,7 @@ class TestLocalDiscovery : GLib.Object {
         fakeFolder.localModifier ().mkdir ("A/newDir/subDir");
         fakeFolder.localModifier ().insert ("A/newDir/subDir/file", 10);
 
-        auto expectedState = fakeFolder.currentLocalState ();
+        var expectedState = fakeFolder.currentLocalState ();
 
         // Only "A" was modified according to the file system tracker
         fakeFolder.syncEngine ().setLocalDiscoveryOptions (

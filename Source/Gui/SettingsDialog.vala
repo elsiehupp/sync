@@ -39,7 +39,7 @@ namespace {
     display name with two lines that is displayed in the settings
     If width is bigger than 0, the string will be ellided so it does not exceed that width
     ***********************************************************/
-    string short_display_name_for_settings (Occ.Account *account, int width) {
+    string short_display_name_for_settings (Occ.Account account, int width) {
         string user = account.dav_display_name ();
         if (user.is_empty ()) {
             user = account.credentials ().user ();
@@ -75,15 +75,23 @@ class OwncloudGui;
 class SettingsDialog : Gtk.Dialog {
     Q_PROPERTY (Gtk.Widget* current_page READ current_page)
 
-    public SettingsDialog (OwncloudGui *gui, Gtk.Widget *parent = nullptr);
+    public SettingsDialog (OwncloudGui gui, Gtk.Widget parent = nullptr);
     ~SettingsDialog () override;
 
     public Gtk.Widget* current_page ();
 
     public on_ void show_first_page ();
-    public on_ void show_issues_list (AccountState *account);
-    public void on_switch_page (QAction *action);
+
+
+    public on_ void show_issues_list (AccountState account);
+
+
+    public void on_switch_page (QAction action);
+
+
     public void on_account_avatar_changed ();
+
+
     public void on_account_display_name_changed ();
 
 signals:
@@ -102,10 +110,10 @@ signals:
 
     private void customize_style ();
 
-    private QAction *create_color_aware_action (string icon_name, string file_name);
-    private QAction *create_action_with_icon (QIcon &icon, string text, string icon_path = string ());
+    private QAction create_color_aware_action (string icon_name, string file_name);
+    private QAction create_action_with_icon (QIcon &icon, string text, string icon_path = string ());
 
-    private Ui.SettingsDialog *const _ui;
+    private Ui.SettingsDialog const _ui;
 
     private QAction_group _action_group;
     // Maps the actions from the action group to the corresponding widgets
@@ -121,7 +129,7 @@ signals:
 };
 
 
-    SettingsDialog.SettingsDialog (OwncloudGui *gui, Gtk.Widget *parent)
+    SettingsDialog.SettingsDialog (OwncloudGui gui, Gtk.Widget parent)
         : Gtk.Dialog (parent)
         , _ui (new Ui.SettingsDialog)
         , _gui (gui) {
@@ -134,7 +142,7 @@ signals:
         layout ().set_menu_bar (_tool_bar);
 
         // People perceive this as a Window, so also make Ctrl+W work
-        auto *close_window_action = new QAction (this);
+        var close_window_action = new QAction (this);
         close_window_action.set_shortcut (QKeySequence ("Ctrl+W"));
         connect (close_window_action, &QAction.triggered, this, &SettingsDialog.accept);
         add_action (close_window_action);
@@ -154,41 +162,41 @@ signals:
         connect (_action_group, &QAction_group.triggered, this, &SettingsDialog.on_switch_page);
 
         // Adds space between users + activities and general + network actions
-        auto *spacer = new Gtk.Widget ();
+        var spacer = new Gtk.Widget ();
         spacer.set_minimum_width (10);
         spacer.set_size_policy (QSize_policy.Minimum_expanding, QSize_policy.Minimum);
         _tool_bar.add_widget (spacer);
 
-        QAction *general_action = create_color_aware_action (QLatin1String (":/client/theme/settings.svg"), tr ("General"));
+        QAction general_action = create_color_aware_action (QLatin1String (":/client/theme/settings.svg"), tr ("General"));
         _action_group.add_action (general_action);
         _tool_bar.add_action (general_action);
-        auto *general_settings = new General_settings;
+        var general_settings = new General_settings;
         _ui.stack.add_widget (general_settings);
 
         // Connect style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
         connect (this, &SettingsDialog.style_changed, general_settings, &General_settings.on_style_changed);
 
-        QAction *network_action = create_color_aware_action (QLatin1String (":/client/theme/network.svg"), tr ("Network"));
+        QAction network_action = create_color_aware_action (QLatin1String (":/client/theme/network.svg"), tr ("Network"));
         _action_group.add_action (network_action);
         _tool_bar.add_action (network_action);
-        auto *network_settings = new Network_settings;
+        var network_settings = new Network_settings;
         _ui.stack.add_widget (network_settings);
 
         _action_group_widgets.insert (general_action, general_settings);
         _action_group_widgets.insert (network_action, network_settings);
 
-        foreach (auto ai, AccountManager.instance ().accounts ()) {
+        foreach (var ai, AccountManager.instance ().accounts ()) {
             on_account_added (ai.data ());
         }
 
         QTimer.single_shot (1, this, &SettingsDialog.show_first_page);
 
-        auto *show_log_window = new QAction (this);
+        var show_log_window = new QAction (this);
         show_log_window.set_shortcut (QKeySequence ("F12"));
         connect (show_log_window, &QAction.triggered, gui, &OwncloudGui.on_toggle_log_browser);
         add_action (show_log_window);
 
-        auto *show_log_window2 = new QAction (this);
+        var show_log_window2 = new QAction (this);
         show_log_window2.set_shortcut (QKeySequence (Qt.CTRL + Qt.Key_L));
         connect (show_log_window2, &QAction.triggered, gui, &OwncloudGui.on_toggle_log_browser);
         add_action (show_log_window2);
@@ -222,7 +230,7 @@ signals:
         Gtk.Dialog.on_accept ();
     }
 
-    void SettingsDialog.change_event (QEvent *e) {
+    void SettingsDialog.change_event (QEvent e) {
         switch (e.type ()) {
         case QEvent.StyleChange:
         case QEvent.PaletteChange:
@@ -234,7 +242,7 @@ signals:
             break;
         case QEvent.ActivationChange:
             if (is_active_window ())
-                emit on_activate ();
+                emit activate ();
             break;
         default:
             break;
@@ -243,7 +251,7 @@ signals:
         Gtk.Dialog.change_event (e);
     }
 
-    void SettingsDialog.on_switch_page (QAction *action) {
+    void SettingsDialog.on_switch_page (QAction action) {
         _ui.stack.set_current_widget (_action_group_widgets.value (action));
     }
 
@@ -254,18 +262,18 @@ signals:
         }
     }
 
-    void SettingsDialog.show_issues_list (AccountState *account) {
-        const auto user_model = User_model.instance ();
-        const auto id = user_model.find_user_id_for_account (account);
+    void SettingsDialog.show_issues_list (AccountState account) {
+        const var user_model = User_model.instance ();
+        const var id = user_model.find_user_id_for_account (account);
         User_model.instance ().switch_current_user (id);
         emit Systray.instance ().show_window ();
     }
 
-    void SettingsDialog.on_account_added (AccountState *s) {
-        auto height = _tool_bar.size_hint ().height ();
+    void SettingsDialog.on_account_added (AccountState s) {
+        var height = _tool_bar.size_hint ().height ();
         bool branding_single_account = !Theme.instance ().multi_account ();
 
-        QAction *account_action = nullptr;
+        QAction account_action = nullptr;
         QImage avatar = s.account ().avatar ();
         const string action_text = branding_single_account ? tr ("Account") : s.account ().display_name ();
         if (avatar.is_null ()) {
@@ -282,7 +290,7 @@ signals:
         }
 
         _tool_bar.insert_action (_tool_bar.actions ().at (0), account_action);
-        auto account_settings = new AccountSettings (s, this);
+        var account_settings = new AccountSettings (s, this);
         string object_name = QLatin1String ("account_settings_");
         object_name += s.account ().display_name ();
         account_settings.set_object_name (object_name);
@@ -305,9 +313,9 @@ signals:
     }
 
     void SettingsDialog.on_account_avatar_changed () {
-        auto *account = static_cast<Account> (sender ());
+        var account = static_cast<Account> (sender ());
         if (account && _action_for_account.contains (account)) {
-            QAction *action = _action_for_account[account];
+            QAction action = _action_for_account[account];
             if (action) {
                 QImage pix = account.avatar ();
                 if (!pix.is_null ()) {
@@ -318,21 +326,21 @@ signals:
     }
 
     void SettingsDialog.on_account_display_name_changed () {
-        auto *account = static_cast<Account> (sender ());
+        var account = static_cast<Account> (sender ());
         if (account && _action_for_account.contains (account)) {
-            QAction *action = _action_for_account[account];
+            QAction action = _action_for_account[account];
             if (action) {
                 string display_name = account.display_name ();
                 action.on_set_text (display_name);
-                auto height = _tool_bar.size_hint ().height ();
+                var height = _tool_bar.size_hint ().height ();
                 action.set_icon_text (short_display_name_for_settings (account, static_cast<int> (height * button_size_ratio)));
             }
         }
     }
 
-    void SettingsDialog.on_account_removed (AccountState *s) {
-        for (auto it = _action_group_widgets.begin (); it != _action_group_widgets.end (); ++it) {
-            auto as = qobject_cast<AccountSettings> (*it);
+    void SettingsDialog.on_account_removed (AccountState s) {
+        for (var it = _action_group_widgets.begin (); it != _action_group_widgets.end (); ++it) {
+            var as = qobject_cast<AccountSettings> (*it);
             if (!as) {
                 continue;
             }
@@ -369,10 +377,10 @@ signals:
         string background (palette ().base ().color ().name ());
         _tool_bar.set_style_sheet (TOOLBAR_CSS ().arg (background, dark, highlight_color, highlight_text_color));
 
-        Q_FOREACH (QAction *a, _action_group.actions ()) {
+        Q_FOREACH (QAction a, _action_group.actions ()) {
             QIcon icon = Theme.create_color_aware_icon (a.property ("icon_path").to_string (), palette ());
             a.set_icon (icon);
-            auto *btn = qobject_cast<QToolButton> (_tool_bar.widget_for_action (a));
+            var btn = qobject_cast<QToolButton> (_tool_bar.widget_for_action (a));
             if (btn)
                 btn.set_icon (icon);
         }
@@ -380,20 +388,21 @@ signals:
 
 class Tool_button_action : QWidget_action {
 
-    public Tool_button_action (QIcon &icon, string text, GLib.Object *parent)
+    public Tool_button_action (QIcon &icon, string text, GLib.Object parent)
         : QWidget_action (parent) {
         on_set_text (text);
         set_icon (icon);
     }
 
-    public Gtk.Widget *create_widget (Gtk.Widget *parent) override {
-        auto toolbar = qobject_cast<QTool_bar> (parent);
+
+    public Gtk.Widget create_widget (Gtk.Widget parent) override {
+        var toolbar = qobject_cast<QTool_bar> (parent);
         if (!toolbar) {
             // this means we are in the extention menu, no special action here
             return nullptr;
         }
 
-        auto *btn = new QToolButton (parent);
+        var btn = new QToolButton (parent);
         string object_name = QLatin1String ("settingsdialog_toolbutton_");
         object_name += text ();
         btn.set_object_name (object_name);
@@ -406,7 +415,7 @@ class Tool_button_action : QWidget_action {
 };
 
     QAction *SettingsDialog.create_action_with_icon (QIcon &icon, string text, string icon_path) {
-        QAction *action = new Tool_button_action (icon, text, this);
+        QAction action = new Tool_button_action (icon, text, this);
         action.set_checkable (true);
         if (!icon_path.is_empty ()) {
             action.set_property ("icon_path", icon_path);

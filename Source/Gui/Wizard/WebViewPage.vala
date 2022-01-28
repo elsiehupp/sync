@@ -10,7 +10,7 @@ namespace Occ {
 
 class Web_view_page : Abstract_credentials_wizard_page {
 
-    public Web_view_page (Gtk.Widget *parent = nullptr);
+    public Web_view_page (Gtk.Widget parent = nullptr);
     ~Web_view_page () override;
 
     public void initialize_page () override;
@@ -43,14 +43,14 @@ signals:
 };
 
 
-    Web_view_page.Web_view_page (Gtk.Widget *parent)
+    Web_view_page.Web_view_page (Gtk.Widget parent)
         : Abstract_credentials_wizard_page () {
         _oc_wizard = qobject_cast<OwncloudWizard> (parent);
 
         q_c_info (lc_wizard_webiew_page ()) << "Time for a webview!";
         _web_view = new WebView (this);
 
-        auto *layout = new QVBoxLayout (this);
+        var layout = new QVBoxLayout (this);
         layout.set_margin (0);
         layout.add_widget (_web_view);
         set_layout (layout);
@@ -87,7 +87,7 @@ signals:
 
     void Web_view_page.resize_wizard () {
         // The webview needs a little bit more space
-        auto wizard_size_changed = try_to_set_wizard_size (_original_wizard_size.width () * 2, _original_wizard_size.height () * 2);
+        var wizard_size_changed = try_to_set_wizard_size (_original_wizard_size.width () * 2, _original_wizard_size.height () * 2);
 
         if (!wizard_size_changed) {
             wizard_size_changed = try_to_set_wizard_size (static_cast<int> (_original_wizard_size.width () * 1.5), static_cast<int> (_original_wizard_size.height () * 1.5));
@@ -99,10 +99,10 @@ signals:
     }
 
     bool Web_view_page.try_to_set_wizard_size (int width, int height) {
-        const auto window = _oc_wizard.window ();
-        const auto screen_geometry = QGuiApplication.screen_at (window.pos ()).geometry ();
-        const auto window_width = screen_geometry.width ();
-        const auto window_height = screen_geometry.height ();
+        const var window = _oc_wizard.window ();
+        const var screen_geometry = QGuiApplication.screen_at (window.pos ()).geometry ();
+        const var window_width = screen_geometry.width ();
+        const var window_height = screen_geometry.height ();
 
         if (width < window_width && height < window_height) {
             _oc_wizard.resize (width, height);

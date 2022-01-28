@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 // #include <QDir>
 
-static const auto CSYNC_TEST_DIR = []{
+static const var CSYNC_TEST_DIR = []{
     return QStringLiteral ("%1/csync_test").arg (QDir.tempPath ());
 } ();
 
@@ -60,7 +60,7 @@ static int setup_testenv (void **state) {
     rc = wipe_testdir ();
     assert_int_equal (rc, 0);
 
-    auto dir = CSYNC_TEST_DIR;
+    var dir = CSYNC_TEST_DIR;
     rc = oc_mkdir (dir);
     assert_int_equal (rc, 0);
 
@@ -71,12 +71,12 @@ static int setup_testenv (void **state) {
     assert_int_equal (rc, 0);
 
     /* --- initialize csync */
-    auto mystate = new statevar;
+    var mystate = new statevar;
     *state = mystate;
     return 0;
 }
 
-static void output ( const char *text ) {
+static void output ( const char text ) {
     printf ("%s\n", text);
 }
 
@@ -98,12 +98,12 @@ static int teardown (void **state) {
 /* This function takes a relative path, prepends it with the CSYNC_TEST_DIR
 and creates each sub directory.
 ***********************************************************/
-static void create_dirs ( const char *path ) {
+static void create_dirs ( const char path ) {
   int rc = -1;
-  auto _mypath = QStringLiteral ("%1/%2").arg (CSYNC_TEST_DIR, string.fromUtf8 (path)).toUtf8 ();
-  char *mypath = _mypath.data ();
+  var _mypath = QStringLiteral ("%1/%2").arg (CSYNC_TEST_DIR, string.fromUtf8 (path)).toUtf8 ();
+  char mypath = _mypath.data ();
 
-  char *p = mypath + CSYNC_TEST_DIR.size () + 1; /* on_start behind the offset */
+  char p = mypath + CSYNC_TEST_DIR.size () + 1; /* on_start behind the offset */
   int i = 0;
 
   assert_non_null (path);
@@ -112,7 +112,7 @@ static void create_dirs ( const char *path ) {
     if ( * (p+i) == '/' ) {
       p[i] = '\0';
 
-      auto mb_dir = string.fromUtf8 (mypath);
+      var mb_dir = string.fromUtf8 (mypath);
       rc = oc_mkdir (mb_dir);
       if (rc) {
           rc = errno;
@@ -128,17 +128,17 @@ static void create_dirs ( const char *path ) {
 This function uses the vio_opendir, vio_readdir and vio_closedir functions
 to traverse a file tree that was created before by the create_dir function.
 
-It appends a listing to the result member of the incoming struct in *state
+It appends a listing to the result member of the incoming struct in state
 that can be compared later to what was expected in the calling functions.
 
 The int parameter cnt contains the number of seen files (not dirs) in the
 whole tree.
 
 ***********************************************************/
-static void traverse_dir (void **state, string dir, int *cnt) {
-    csync_vio_handle_t *dh = nullptr;
+static void traverse_dir (void **state, string dir, int cnt) {
+    csync_vio_handle_t dh = nullptr;
     std.unique_ptr<csync_file_stat_t> dirent;
-    auto sv = (statevar*) *state;
+    var sv = (statevar*) *state;
     GLib.ByteArray subdir;
     GLib.ByteArray subdir_out;
     int rc = -1;
@@ -147,7 +147,7 @@ static void traverse_dir (void **state, string dir, int *cnt) {
     dh = csync_vio_local_opendir (dir);
     assert_non_null (dh);
 
-    Occ.Vfs *vfs = nullptr;
+    Occ.Vfs vfs = nullptr;
     while ( (dirent = csync_vio_local_readdir (dh, vfs)) ) {
         assert_non_null (dirent.get ());
         if (!dirent.original_path.isEmpty ()) {
@@ -186,16 +186,16 @@ static void traverse_dir (void **state, string dir, int *cnt) {
 
 }
 
-static void create_file ( const char *path, char *name, char *content) {
-    QFile file (QStringLiteral ("%1/%2%3").arg (CSYNC_TEST_DIR, string.fromUtf8 (path), string.fromUtf8 (name)));
+static void create_file ( const char path, char name, char content) {
+    QFile file = new QFile (QStringLiteral ("%1/%2%3").arg (CSYNC_TEST_DIR, string.fromUtf8 (path), string.fromUtf8 (name)));
     assert_int_equal (1, file.open (QIODevice.WriteOnly | QIODevice.NewOnly));
     file.write (content);
 }
 
 static void check_readdir_shorttree (void **state) {
-    auto sv = (statevar*) *state;
+    var sv = (statevar*) *state;
 
-    const char *t1 = "alibaba/und/die/vierzig/räuber/";
+    const char t1 = "alibaba/und/die/vierzig/räuber/";
     create_dirs ( t1 );
     int files_cnt = 0;
 
@@ -214,10 +214,10 @@ static void check_readdir_shorttree (void **state) {
 }
 
 static void check_readdir_with_content (void **state) {
-    auto sv = (statevar*) *state;
+    var sv = (statevar*) *state;
     int files_cnt = 0;
 
-    const char *t1 = "warum/nur/40/Räuber/";
+    const char t1 = "warum/nur/40/Räuber/";
     create_dirs ( t1 );
 
     create_file ( t1, "Räuber Max.txt", "Der Max ist ein schlimmer finger");
@@ -239,17 +239,17 @@ static void check_readdir_with_content (void **state) {
 }
 
 static void check_readdir_longtree (void **state) {
-    auto sv = (statevar*) *state;
+    var sv = (statevar*) *state;
 
     /* Strange things here : Compilers only support strings with length of 4k max.
      * The expected result string is longer, so it needs to be split up in r1, r2 and r3
      */
 
     /* create the test tree */
-    const char *t1 = "vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND/NE/BOTTLE/VOLL/RUM/undnochmalallezusammen/VierZig/MannaufDesTotenManns/KISTE/ooooooooooooooooooooooooooohhhhhh/und/BESSER/ZWEI/Butteln/VOLL RUM/";
+    const char t1 = "vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND/NE/BOTTLE/VOLL/RUM/undnochmalallezusammen/VierZig/MannaufDesTotenManns/KISTE/ooooooooooooooooooooooooooohhhhhh/und/BESSER/ZWEI/Butteln/VOLL RUM/";
     create_dirs ( t1 );
 
-    const auto r1 = string.fromUtf8 (
+    const var r1 = string.fromUtf8 (
 "<DIR> %1/vierzig"
 "<DIR> %1/vierzig/mann"
 "<DIR> %1/vierzig/mann/auf"
@@ -264,7 +264,7 @@ static void check_readdir_longtree (void **state) {
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll"
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum").arg (CSYNC_TEST_DIR);
 
-    const auto r2 = string.fromUtf8 (
+    const var r2 = string.fromUtf8 (
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und"
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so"
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen"
@@ -278,7 +278,7 @@ static void check_readdir_longtree (void **state) {
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE"
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH").arg (CSYNC_TEST_DIR);
 
-    const auto r3 = string.fromUtf8 (
+    const var r3 = string.fromUtf8 (
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND"
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND/NE"
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND/NE/BOTTLE"
@@ -296,7 +296,7 @@ static void check_readdir_longtree (void **state) {
 "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND/NE/BOTTLE/VOLL/RUM/undnochmalallezusammen/VierZig/MannaufDesTotenManns/KISTE/ooooooooooooooooooooooooooohhhhhh/und/BESSER/ZWEI/Butteln/VOLL RUM").arg (CSYNC_TEST_DIR);
 
     /* assemble the result string ... */
-    const auto result = (r1 + r2 + r3).toUtf8 ();
+    const var result = (r1 + r2 + r3).toUtf8 ();
     int files_cnt = 0;
     traverse_dir (state, CSYNC_TEST_DIR, &files_cnt);
     assert_int_equal (files_cnt, 0);
@@ -306,7 +306,7 @@ static void check_readdir_longtree (void **state) {
 
 // https://github.com/owncloud/client/issues/3128 https://github.com/owncloud/client/issues/2777
 static void check_readdir_bigunicode (void **state) {
-    auto sv = (statevar*) *state;
+    var sv = (statevar*) *state;
 //    1 : ? ASCII : 239 - EF
 //    2 : ? ASCII : 187 - BB
 //    3 : ? ASCII : 191 - BF
@@ -324,7 +324,7 @@ static void check_readdir_bigunicode (void **state) {
 
     int files_cnt = 0;
     traverse_dir (state, CSYNC_TEST_DIR, &files_cnt);
-    const auto expected_result = QStringLiteral ("<DIR> %1/goodone"
+    const var expected_result = QStringLiteral ("<DIR> %1/goodone"
                                                 "<DIR> %1/goodone/ugly\xEF\xBB\xBF\x32.txt")
                                      .arg (CSYNC_TEST_DIR);
     assert_string_equal (sv.result.constData (), expected_result.toUtf8 ().constData ());

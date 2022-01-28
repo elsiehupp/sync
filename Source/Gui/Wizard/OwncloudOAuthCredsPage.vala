@@ -22,12 +22,14 @@ class Owncloud_oauth_creds_page : Abstract_credentials_wizard_page {
 
     public Owncloud_oauth_creds_page ();
 
-    public AbstractCredentials *get_credentials () override;
+    public AbstractCredentials get_credentials () override;
 
     public void initialize_page () override;
     public void cleanup_page () override;
     public int next_id () override;
     public void set_connected ();
+
+
     public bool is_complete () override;
 
 
@@ -53,7 +55,7 @@ protected slots:
         : Abstract_credentials_wizard_page () {
         _ui.setup_ui (this);
 
-        Theme *theme = Theme.instance ();
+        Theme theme = Theme.instance ();
         _ui.top_label.hide ();
         _ui.bottom_label.hide ();
         QVariant variant = theme.custom_media (Theme.o_c_setup_top);
@@ -71,7 +73,7 @@ protected slots:
     }
 
     void Owncloud_oauth_creds_page.initialize_page () {
-        auto *oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+        var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
         Q_ASSERT (oc_wizard);
         oc_wizard.account ().set_credentials (CredentialsFactory.create ("http"));
         _async_auth.on_reset (new OAuth (oc_wizard.account ().data (), this));
@@ -91,9 +93,9 @@ protected slots:
     void Owncloud_oauth_creds_page.on_async_auth_result (OAuth.Result r, string user,
         const string token, string refresh_token) {
         switch (r) {
-        case OAuth.NotSupported : {
+        case OAuth.NotSupported: {
             /* OAuth not supported (can't open browser), fallback to HTTP credentials */
-            auto *oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+            var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
             oc_wizard.back ();
             oc_wizard.on_set_auth_type (DetermineAuthTypeJob.Basic);
             break;
@@ -103,11 +105,11 @@ protected slots:
             _ui.error_label.show ();
             wizard ().show ();
             break;
-        case OAuth.LoggedIn : {
+        case OAuth.LoggedIn: {
             _token = token;
             _user = user;
             _refresh_token = refresh_token;
-            auto *oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+            var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
             Q_ASSERT (oc_wizard);
             emit connect_to_oc_url (oc_wizard.account ().url ().to_string ());
             break;
@@ -124,7 +126,7 @@ protected slots:
     }
 
     AbstractCredentials *Owncloud_oauth_creds_page.get_credentials () {
-        auto *oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+        var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
         Q_ASSERT (oc_wizard);
         return new HttpCredentialsGui (_user, _token, _refresh_token,
             oc_wizard._client_cert_bundle, oc_wizard._client_cert_password);

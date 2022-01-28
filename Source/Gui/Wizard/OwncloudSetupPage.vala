@@ -31,26 +31,46 @@ namespace Occ {
 ***********************************************************/
 class Owncloud_setup_page : QWizard_page {
 
-    public Owncloud_setup_page (Gtk.Widget *parent = nullptr);
+    public Owncloud_setup_page (Gtk.Widget parent = nullptr);
     ~Owncloud_setup_page () override;
 
     public bool is_complete () override;
     public void initialize_page () override;
     public int next_id () override;
     public void set_server_url (string );
+
+
     public void set_allow_password_storage (bool);
-    public bool validate_page () override;
-    public string url ();
-    public string local_folder ();
-    public void on_set_remote_folder (string remote_folder);
+
+
+    public bool validate_page () override;);
+
+
+    public string url (););
+
+
+    public string local_folder (););
+
+
+    public void on_set_remote_folder (string remote_fo);
+
+
     public void set_multiple_folders_exist (bool exist);
     public void on_set_auth_type (DetermineAuthTypeJob.AuthType type);
 
 
     public void on_set_error_string (string , bool retry_http_only);
+
+
     public void on_start_spinner ();
+
+
     public void on_stop_spinner ();
+
+
     public void on_certificate_accepted ();
+
+
     public void on_style_changed ();
 
 protected slots:
@@ -77,10 +97,10 @@ signals:
 
     private QProgress_indicator _progress_indi;
     private OwncloudWizard _oc_wizard;
-    private AddCertificateDialog *add_cert_dial = nullptr;
+    private AddCertificateDialog add_cert_dial = nullptr;
 };
 
-    Owncloud_setup_page.Owncloud_setup_page (Gtk.Widget *parent)
+    Owncloud_setup_page.Owncloud_setup_page (Gtk.Widget parent)
         : QWizard_page ()
         , _progress_indi (new QProgress_indicator (this))
         , _oc_wizard (qobject_cast<OwncloudWizard> (parent)) {
@@ -88,7 +108,7 @@ signals:
 
         setup_server_address_description_label ();
 
-        Theme *theme = Theme.instance ();
+        Theme theme = Theme.instance ();
         if (theme.override_server_url ().is_empty ()) {
             _ui.le_url.set_postfix (theme.wizard_url_postfix ());
             _ui.le_url.set_placeholder_text (theme.wizard_url_hint ());
@@ -98,7 +118,7 @@ signals:
 
         register_field (QLatin1String ("OCUrl*"), _ui.le_url);
 
-        auto size_policy = _progress_indi.size_policy ();
+        var size_policy = _progress_indi.size_policy ();
         size_policy.set_retain_size_when_hidden (true);
         _progress_indi.set_size_policy (size_policy);
 
@@ -120,7 +140,7 @@ signals:
     }
 
     void Owncloud_setup_page.setup_server_address_description_label () {
-        const auto app_name = Theme.instance ().app_name_gui ();
+        const var app_name = Theme.instance ().app_name_gui ();
         _ui.server_address_description_label.on_set_text (tr ("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").arg (app_name));
     }
 
@@ -140,7 +160,7 @@ signals:
         _ui.top_label.hide ();
         _ui.bottom_label.hide ();
 
-        Theme *theme = Theme.instance ();
+        Theme theme = Theme.instance ();
         QVariant variant = theme.custom_media (Theme.o_c_setup_top);
         if (!variant.is_null ()) {
             WizardCommon.setup_custom_media (variant, _ui.top_label);
@@ -149,7 +169,7 @@ signals:
         variant = theme.custom_media (Theme.o_c_setup_bottom);
         WizardCommon.setup_custom_media (variant, _ui.bottom_label);
 
-        auto le_url_palette = _ui.le_url.palette ();
+        var le_url_palette = _ui.le_url.palette ();
         le_url_palette.on_set_color (QPalette.Text, Qt.black);
         le_url_palette.on_set_color (QPalette.Base, Qt.white);
         _ui.le_url.set_palette (le_url_palette);
@@ -160,7 +180,7 @@ signals:
         // Need to set next button as default button here because
         // otherwise the on OSX the next button does not stay the default
         // button
-        auto next_button = qobject_cast<QPushButton> (_oc_wizard.button (QWizard.Next_button));
+        var next_button = qobject_cast<QPushButton> (_oc_wizard.button (QWizard.Next_button));
         if (next_button) {
             next_button.set_default (true);
         }
@@ -209,15 +229,15 @@ signals:
         _auth_type_known = false;
         _checking = false;
 
-        QAbstractButton *next_button = wizard ().button (QWizard.Next_button);
-        auto *push_button = qobject_cast<QPushButton> (next_button);
+        QAbstractButton next_button = wizard ().button (QWizard.Next_button);
+        var push_button = qobject_cast<QPushButton> (next_button);
         if (push_button) {
             push_button.set_default (true);
         }
 
         _ui.le_url.set_focus ();
 
-        const auto is_server_url_overridden = !Theme.instance ().override_server_url ().is_empty ();
+        const var is_server_url_overridden = !Theme.instance ().override_server_url ().is_empty ();
         if (is_server_url_overridden && !Theme.instance ().force_override_server_url ()) {
             // If the url is overwritten but we don't force to use that url
             // Just focus the next button to let the user navigate quicker
@@ -308,7 +328,7 @@ signals:
                     int ret_val = dialog.exec ();
 
                     switch (ret_val) {
-                    case Owncloud_connection_method_dialog.No_TLS : {
+                    case Owncloud_connection_method_dialog.No_TLS: {
                         url.set_scheme ("http");
                         _ui.le_url.set_full_text (url.to_string ());
                         // skip ahead to next page, since the user would expect us to retry automatically
@@ -346,7 +366,7 @@ signals:
         _progress_indi.on_stop_animation ();
     }
 
-    string subject_info_helper (QSslCertificate &cert, GLib.ByteArray &qa) {
+    string subject_info_helper (QSslCertificate &cert, GLib.ByteArray qa) {
         return cert.subject_info (qa).join (QLatin1Char ('/'));
     }
 
@@ -385,7 +405,7 @@ signals:
         set_logo ();
 
         if (_progress_indi) {
-            const auto is_dark_background = Theme.is_dark_color (palette ().window ().color ());
+            const var is_dark_background = Theme.is_dark_color (palette ().window ().color ());
             if (is_dark_background) {
                 _progress_indi.on_set_color (Qt.white);
             } else {

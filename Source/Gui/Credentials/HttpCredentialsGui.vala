@@ -31,14 +31,15 @@ class HttpCredentialsGui : HttpCredentials {
         : HttpCredentials () {
     }
     public HttpCredentialsGui (string user, string password,
-            const GLib.ByteArray &client_cert_bundle, GLib.ByteArray &client_cert_password)
+            const GLib.ByteArray client_cert_bundle, GLib.ByteArray client_cert_password)
         : HttpCredentials (user, password, client_cert_bundle, client_cert_password) {
     }
     public HttpCredentialsGui (string user, string password, string refresh_token,
-            const GLib.ByteArray &client_cert_bundle, GLib.ByteArray &client_cert_password)
+            const GLib.ByteArray client_cert_bundle, GLib.ByteArray client_cert_password)
         : HttpCredentials (user, password, client_cert_bundle, client_cert_password) {
         _refresh_token = refresh_token;
     }
+
 
     /***********************************************************
     This will query the server and either uses OAuth via _async_auth.on_start ()
@@ -53,7 +54,7 @@ class HttpCredentialsGui : HttpCredentials {
         return _async_auth ? _async_auth.authorisation_link () : QUrl ();
     }
 
-    static string request_app_password_text (Account *account);
+    static string request_app_password_text (Account account);
 
     private void on_async_auth_result (OAuth.Result, string user, string access_token, string refresh_token);
     private void on_show_dialog ();
@@ -76,7 +77,7 @@ void HttpCredentialsGui.ask_from_user () {
 
 void HttpCredentialsGui.on_ask_from_user_async () {
     // First, we will check what kind of auth we need.
-    auto job = new DetermineAuthTypeJob (_account.shared_from_this (), this);
+    var job = new DetermineAuthTypeJob (_account.shared_from_this (), this);
     GLib.Object.connect (job, &DetermineAuthTypeJob.auth_type, this, [this] (DetermineAuthTypeJob.AuthType type) {
         if (type == DetermineAuthTypeJob.OAuth) {
             _async_auth.on_reset (new OAuth (_account, this));
@@ -143,13 +144,13 @@ void HttpCredentialsGui.on_show_dialog () {
             + QLatin1String ("<br>");
     }
 
-    auto *dialog = new QInputDialog ();
+    var dialog = new QInputDialog ();
     dialog.set_attribute (Qt.WA_DeleteOnClose, true);
     dialog.set_window_title (tr ("Enter Password"));
     dialog.set_label_text (msg);
     dialog.set_text_value (_previous_password);
     dialog.set_text_echo_mode (QLineEdit.Password);
-    if (auto *dialog_label = dialog.find_child<QLabel> ()) {
+    if (var dialog_label = dialog.find_child<QLabel> ()) {
         dialog_label.set_open_external_links (true);
         dialog_label.set_text_format (Qt.RichText);
     }
@@ -166,9 +167,9 @@ void HttpCredentialsGui.on_show_dialog () {
     });
 }
 
-string HttpCredentialsGui.request_app_password_text (Account *account) {
+string HttpCredentialsGui.request_app_password_text (Account account) {
     int version = account.server_version_int ();
-    auto url = account.url ().to_string ();
+    var url = account.url ().to_string ();
     if (url.ends_with ('/'))
         url.chop (1);
 

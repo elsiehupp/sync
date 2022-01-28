@@ -85,14 +85,16 @@ class HttpCredentials : AbstractCredentials {
     public static constexpr QNetworkRequest.Attribute DontAddCredentialsAttribute = QNetworkRequest.User;
 
     public HttpCredentials ();
+
+
     public HttpCredentials (string user, string password,
-        const GLib.ByteArray &client_cert_bundle = GLib.ByteArray (), GLib.ByteArray &client_cert_password = GLib.ByteArray ());
+        const GLib.ByteArray client_cert_bundle = GLib.ByteArray (), GLib.ByteArray client_cert_password = GLib.ByteArray ());
 
     public string auth_type () override;
-    public QNetworkAccessManager *create_qNAM () override;
+    public QNetworkAccessManager create_qNAM () override;
     public bool ready () override;
     public void fetch_from_keychain () override;
-    public bool still_valid (QNetworkReply *reply) override;
+    public bool still_valid (QNetworkReply reply) override;
     public void persist () override;
     public string user () override;
     // the password or token
@@ -100,6 +102,8 @@ class HttpCredentials : AbstractCredentials {
     public void invalidate_token () override;
     public void forget_sensitive_data () override;
     public string fetch_user ();
+
+
     public virtual bool ssl_is_trusted () {
         return false;
     }
@@ -110,12 +114,13 @@ class HttpCredentials : AbstractCredentials {
     public bool refresh_access_token ();
 
     // To fetch the user name as early as possible
-    public void set_account (Account *account) override;
+    public void set_account (Account account) override;
 
     // Whether we are using OAuth
     public bool is_using_oAuth () {
         return !_refresh_token.is_null ();
     }
+
 
     public bool retry_if_needed (AbstractNetworkJob *) override;
 
@@ -150,6 +155,7 @@ class HttpCredentials : AbstractCredentials {
     /// Wipes legacy keychain locations
     protected void delete_old_keychain_entries ();
 
+
     /***********************************************************
     Whether to bow out now because a retry will happen later
 
@@ -160,6 +166,7 @@ class HttpCredentials : AbstractCredentials {
     return true.
     ***********************************************************/
     protected bool keychain_unavailable_retry_later (QKeychain.ReadPasswordJob *);
+
 
     /***********************************************************
     Takes client cert pkcs12 and unwraps the key/cert.
@@ -190,13 +197,13 @@ class HttpCredentials : AbstractCredentials {
 
     class HttpCredentialsAccessManager : AccessManager {
 
-        public HttpCredentialsAccessManager (HttpCredentials *cred, GLib.Object *parent = nullptr)
+        public HttpCredentialsAccessManager (HttpCredentials cred, GLib.Object parent = nullptr)
             : AccessManager (parent)
             , _cred (cred) {
         }
 
 
-        protected QNetworkReply *create_request (Operation op, QNetworkRequest &request, QIODevice *outgoing_data) override {
+        protected QNetworkReply create_request (Operation op, QNetworkRequest &request, QIODevice outgoing_data) override {
             QNetworkRequest req (request);
             if (!req.attribute (HttpCredentials.DontAddCredentialsAttribute).to_bool ()) {
                 if (_cred && !_cred.password ().is_empty ()) {
@@ -222,7 +229,7 @@ class HttpCredentials : AbstractCredentials {
                 req.set_ssl_configuration (ssl_configuration);
             }
 
-            auto *reply = AccessManager.create_request (op, req, outgoing_data);
+            var reply = AccessManager.create_request (op, req, outgoing_data);
 
             if (_cred._is_renewing_oauth_token) {
                 // We know this is going to fail, but we have no way to queue it there, so we will
@@ -239,9 +246,9 @@ class HttpCredentials : AbstractCredentials {
         private QPointer<const HttpCredentials> _cred;
     };
 
-    static void add_settings_to_job (Account *account, QKeychain.Job *job) {
+    static void add_settings_to_job (Account account, QKeychain.Job job) {
         Q_UNUSED (account);
-        auto settings = ConfigFile.settings_with_group (Theme.instance ().app_name ());
+        var settings = ConfigFile.settings_with_group (Theme.instance ().app_name ());
         settings.set_parent (job); // make the job parent to make setting deleted properly
         job.set_settings (settings.release ());
     }
@@ -249,7 +256,7 @@ class HttpCredentials : AbstractCredentials {
     HttpCredentials.HttpCredentials () = default;
 
     // From wizard
-    HttpCredentials.HttpCredentials (string user, string password, GLib.ByteArray &client_cert_bundle, GLib.ByteArray &client_cert_password)
+    HttpCredentials.HttpCredentials (string user, string password, GLib.ByteArray client_cert_bundle, GLib.ByteArray client_cert_password)
         : _user (user)
         , _password (password)
         , _ready (true)
@@ -273,7 +280,7 @@ class HttpCredentials : AbstractCredentials {
         return _password;
     }
 
-    void HttpCredentials.set_account (Account *account) {
+    void HttpCredentials.set_account (Account account) {
         AbstractCredentials.set_account (account);
         if (_user.is_empty ()) {
             fetch_user ();
@@ -281,7 +288,7 @@ class HttpCredentials : AbstractCredentials {
     }
 
     QNetworkAccessManager *HttpCredentials.create_qNAM () {
-        AccessManager *qnam = new HttpCredentialsAccessManager (this);
+        AccessManager qnam = new HttpCredentialsAccessManager (this);
 
         connect (qnam, &QNetworkAccessManager.authentication_required,
             this, &HttpCredentials.on_authentication);
@@ -324,7 +331,7 @@ class HttpCredentials : AbstractCredentials {
         if (!_client_cert_bundle.is_empty ()) {
             // New case (>=2.6) : We have a bundle in the settings and read the password from
             // the keychain
-            auto job = new QKeychain.ReadPasswordJob (Theme.instance ().app_name ());
+            var job = new QKeychain.ReadPasswordJob (Theme.instance ().app_name ());
             add_settings_to_job (_account, job);
             job.set_insecure_fallback (false);
             job.set_key (keychain_key (_account.url ().to_string (), _user + client_cert_password_c, _account.id ()));
@@ -339,7 +346,7 @@ class HttpCredentials : AbstractCredentials {
             _user + client_certificate_pemC,
             _keychain_migration ? string () : _account.id ());
 
-        auto *job = new QKeychain.ReadPasswordJob (Theme.instance ().app_name ());
+        var job = new QKeychain.ReadPasswordJob (Theme.instance ().app_name ());
         add_settings_to_job (_account, job);
         job.set_insecure_fallback (false);
         job.set_key (kck);
@@ -348,8 +355,8 @@ class HttpCredentials : AbstractCredentials {
     }
 
     void HttpCredentials.delete_old_keychain_entries () {
-        auto start_delete_job = [this] (string user) {
-            auto *job = new QKeychain.DeletePasswordJob (Theme.instance ().app_name ());
+        var start_delete_job = [this] (string user) {
+            var job = new QKeychain.DeletePasswordJob (Theme.instance ().app_name ());
             add_settings_to_job (_account, job);
             job.set_insecure_fallback (true);
             job.set_key (keychain_key (_account.url ().to_string (), user, string ()));
@@ -361,7 +368,7 @@ class HttpCredentials : AbstractCredentials {
         start_delete_job (_user + client_certificate_pemC);
     }
 
-    bool HttpCredentials.keychain_unavailable_retry_later (QKeychain.ReadPasswordJob *incoming) {
+    bool HttpCredentials.keychain_unavailable_retry_later (QKeychain.ReadPasswordJob incoming) {
         Q_ASSERT (!incoming.insecure_fallback ()); // If insecure_fallback is set, the next test would be pointless
         if (_retry_on_key_chain_error && (incoming.error () == QKeychain.NoBackendAvailable
                 || incoming.error () == QKeychain.OtherError)) {
@@ -377,8 +384,8 @@ class HttpCredentials : AbstractCredentials {
         return false;
     }
 
-    void HttpCredentials.on_read_client_cert_password_job_done (QKeychain.Job *job) {
-        auto read_job = qobject_cast<QKeychain.ReadPasswordJob> (job);
+    void HttpCredentials.on_read_client_cert_password_job_done (QKeychain.Job job) {
+        var read_job = qobject_cast<QKeychain.ReadPasswordJob> (job);
         if (keychain_unavailable_retry_later (read_job))
             return;
 
@@ -397,8 +404,8 @@ class HttpCredentials : AbstractCredentials {
         on_read_password_from_keychain ();
     }
 
-    void HttpCredentials.on_read_client_cert_pem_job_done (QKeychain.Job *incoming) {
-        auto read_job = qobject_cast<QKeychain.ReadPasswordJob> (incoming);
+    void HttpCredentials.on_read_client_cert_pem_job_done (QKeychain.Job incoming) {
+        var read_job = qobject_cast<QKeychain.ReadPasswordJob> (incoming);
         if (keychain_unavailable_retry_later (read_job))
             return;
 
@@ -416,7 +423,7 @@ class HttpCredentials : AbstractCredentials {
             _user + client_key_pemC,
             _keychain_migration ? string () : _account.id ());
 
-        auto *job = new QKeychain.ReadPasswordJob (Theme.instance ().app_name ());
+        var job = new QKeychain.ReadPasswordJob (Theme.instance ().app_name ());
         add_settings_to_job (_account, job);
         job.set_insecure_fallback (false);
         job.set_key (kck);
@@ -424,8 +431,8 @@ class HttpCredentials : AbstractCredentials {
         job.on_start ();
     }
 
-    void HttpCredentials.on_read_client_key_pem_job_done (QKeychain.Job *incoming) {
-        auto read_job = qobject_cast<QKeychain.ReadPasswordJob> (incoming);
+    void HttpCredentials.on_read_client_key_pem_job_done (QKeychain.Job incoming) {
+        var read_job = qobject_cast<QKeychain.ReadPasswordJob> (incoming);
         // Store key in memory
 
         if (read_job.error () == QKeychain.NoError && read_job.binary_data ().length () > 0) {
@@ -453,7 +460,7 @@ class HttpCredentials : AbstractCredentials {
             _user,
             _keychain_migration ? string () : _account.id ());
 
-        auto *job = new QKeychain.ReadPasswordJob (Theme.instance ().app_name ());
+        var job = new QKeychain.ReadPasswordJob (Theme.instance ().app_name ());
         add_settings_to_job (_account, job);
         job.set_insecure_fallback (false);
         job.set_key (kck);
@@ -461,15 +468,15 @@ class HttpCredentials : AbstractCredentials {
         job.on_start ();
     }
 
-    bool HttpCredentials.still_valid (QNetworkReply *reply) {
+    bool HttpCredentials.still_valid (QNetworkReply reply) {
         return ( (reply.error () != QNetworkReply.AuthenticationRequiredError)
             // returned if user or password is incorrect
             && (reply.error () != QNetworkReply.OperationCanceledError
                    || !reply.property (authentication_failed_c).to_bool ()));
     }
 
-    void HttpCredentials.on_read_job_done (QKeychain.Job *incoming) {
-        auto *job = static_cast<QKeychain.ReadPasswordJob> (incoming);
+    void HttpCredentials.on_read_job_done (QKeychain.Job incoming) {
+        var job = static_cast<QKeychain.ReadPasswordJob> (incoming);
         QKeychain.Error error = job.error ();
 
         // If we can't find the credentials at the keys that include the account id,
@@ -533,14 +540,14 @@ class HttpCredentials : AbstractCredentials {
         req.set_raw_header ("Authorization", "Basic " + basic_auth.to_utf8 ().to_base64 ());
         req.set_attribute (HttpCredentials.DontAddCredentialsAttribute, true);
 
-        auto request_body = new QBuffer;
+        var request_body = new QBuffer;
         QUrlQuery arguments (string ("grant_type=refresh_token&refresh_token=%1").arg (_refresh_token));
         request_body.set_data (arguments.query (QUrl.FullyEncoded).to_latin1 ());
 
-        auto job = _account.send_request ("POST", request_token, req, request_body);
+        var job = _account.send_request ("POST", request_token, req, request_body);
         job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
-        GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this] (QNetworkReply *reply) {
-            auto json_data = reply.read_all ();
+        GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this] (QNetworkReply reply) {
+            var json_data = reply.read_all ();
             QJsonParseError json_parse_error;
             QJsonObject json = QJsonDocument.from_json (json_data, &json_parse_error).object ();
             string access_token = json["access_token"].to_string ();
@@ -559,7 +566,7 @@ class HttpCredentials : AbstractCredentials {
                 persist ();
             }
             _is_renewing_oauth_token = false;
-            for (auto &job : _retry_queue) {
+            for (var &job : _retry_queue) {
                 if (job)
                     job.retry ();
             }
@@ -595,7 +602,7 @@ class HttpCredentials : AbstractCredentials {
             return;
         }
 
-        auto *job = new QKeychain.DeletePasswordJob (Theme.instance ().app_name ());
+        var job = new QKeychain.DeletePasswordJob (Theme.instance ().app_name ());
         add_settings_to_job (_account, job);
         job.set_insecure_fallback (true);
         job.set_key (kck);
@@ -638,7 +645,7 @@ class HttpCredentials : AbstractCredentials {
             // and we'll just store the bundle password in the keychain. That's prefered
             // since the keychain on older Windows platforms can only store a limited number
             // of bytes per entry and key/cert may exceed that.
-            auto *job = new QKeychain.WritePasswordJob (Theme.instance ().app_name ());
+            var job = new QKeychain.WritePasswordJob (Theme.instance ().app_name ());
             add_settings_to_job (_account, job);
             job.set_insecure_fallback (false);
             connect (job, &QKeychain.Job.on_finished, this, &HttpCredentials.on_write_client_cert_password_job_done);
@@ -651,7 +658,7 @@ class HttpCredentials : AbstractCredentials {
             // Option 2, pre 2.6 configs : We used to store the raw cert/key in the keychain and
             // still do so if no bundle is available. We can't currently migrate to Option 1
             // because we have no functions for creating an encrypted pkcs12 bundle.
-            auto *job = new QKeychain.WritePasswordJob (Theme.instance ().app_name ());
+            var job = new QKeychain.WritePasswordJob (Theme.instance ().app_name ());
             add_settings_to_job (_account, job);
             job.set_insecure_fallback (false);
             connect (job, &QKeychain.Job.on_finished, this, &HttpCredentials.on_write_client_cert_pem_job_done);
@@ -664,7 +671,7 @@ class HttpCredentials : AbstractCredentials {
         }
     }
 
-    void HttpCredentials.on_write_client_cert_password_job_done (QKeychain.Job *finished_job) {
+    void HttpCredentials.on_write_client_cert_password_job_done (QKeychain.Job finished_job) {
         if (finished_job && finished_job.error () != QKeychain.NoError) {
             q_c_warning (lc_http_credentials) << "Could not write client cert password to credentials"
                                          << finished_job.error () << finished_job.error_string ();
@@ -673,7 +680,7 @@ class HttpCredentials : AbstractCredentials {
         on_write_password_to_keychain ();
     }
 
-    void HttpCredentials.on_write_client_cert_pem_job_done (QKeychain.Job *finished_job) {
+    void HttpCredentials.on_write_client_cert_pem_job_done (QKeychain.Job finished_job) {
         if (finished_job && finished_job.error () != QKeychain.NoError) {
             q_c_warning (lc_http_credentials) << "Could not write client cert to credentials"
                                          << finished_job.error () << finished_job.error_string ();
@@ -681,7 +688,7 @@ class HttpCredentials : AbstractCredentials {
 
         // write ssl key if there is one
         if (!_client_ssl_key.is_null ()) {
-            auto *job = new QKeychain.WritePasswordJob (Theme.instance ().app_name ());
+            var job = new QKeychain.WritePasswordJob (Theme.instance ().app_name ());
             add_settings_to_job (_account, job);
             job.set_insecure_fallback (false);
             connect (job, &QKeychain.Job.on_finished, this, &HttpCredentials.on_write_client_key_pem_job_done);
@@ -693,7 +700,7 @@ class HttpCredentials : AbstractCredentials {
         }
     }
 
-    void HttpCredentials.on_write_client_key_pem_job_done (QKeychain.Job *finished_job) {
+    void HttpCredentials.on_write_client_key_pem_job_done (QKeychain.Job finished_job) {
         if (finished_job && finished_job.error () != QKeychain.NoError) {
             q_c_warning (lc_http_credentials) << "Could not write client key to credentials"
                                          << finished_job.error () << finished_job.error_string ();
@@ -703,7 +710,7 @@ class HttpCredentials : AbstractCredentials {
     }
 
     void HttpCredentials.on_write_password_to_keychain () {
-        auto *job = new QKeychain.WritePasswordJob (Theme.instance ().app_name ());
+        var job = new QKeychain.WritePasswordJob (Theme.instance ().app_name ());
         add_settings_to_job (_account, job);
         job.set_insecure_fallback (false);
         connect (job, &QKeychain.Job.on_finished, this, &HttpCredentials.on_write_job_done);
@@ -712,14 +719,14 @@ class HttpCredentials : AbstractCredentials {
         job.on_start ();
     }
 
-    void HttpCredentials.on_write_job_done (QKeychain.Job *job) {
+    void HttpCredentials.on_write_job_done (QKeychain.Job job) {
         if (job && job.error () != QKeychain.NoError) {
             q_c_warning (lc_http_credentials) << "Error while writing password"
                                          << job.error () << job.error_string ();
         }
     }
 
-    void HttpCredentials.on_authentication (QNetworkReply *reply, QAuthenticator *authenticator) {
+    void HttpCredentials.on_authentication (QNetworkReply reply, QAuthenticator authenticator) {
         if (!_ready)
             return;
         Q_UNUSED (authenticator)
@@ -737,8 +744,8 @@ class HttpCredentials : AbstractCredentials {
         }
     }
 
-    bool HttpCredentials.retry_if_needed (AbstractNetworkJob *job) {
-        auto *reply = job.reply ();
+    bool HttpCredentials.retry_if_needed (AbstractNetworkJob job) {
+        var reply = job.reply ();
         if (!reply || !reply.property (need_retry_c).to_bool ())
             return false;
         if (_is_renewing_oauth_token) {

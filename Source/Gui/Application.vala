@@ -48,21 +48,34 @@ class Application : SharedTools.QtSingleApplication {
     ~Application () override;
 
     public bool give_help ();
+
+
     public void show_help ();
+
+
     public void show_hint (std.string error_hint);
+
+
     public bool debug_mode ();
+
+
     public bool background_mode ();
+
+
     public bool version_only (); // only display the version?
     public void show_version ();
 
     public void show_main_dialog ();
 
-    public OwncloudGui *gui ();
+    public OwncloudGui gui ();
 
 
     // TODO: this should not be public
     public void on_owncloud_wizard_done (int);
+
+
     public void on_crash ();
+
 
     /***********************************************************
     Will download a virtual file, and open the result.
@@ -78,7 +91,7 @@ class Application : SharedTools.QtSingleApplication {
     protected void parse_options (string[] &);
     protected void setup_translations ();
     protected void setup_logging ();
-    protected bool event (QEvent *event) override;
+    protected bool event (QEvent event) override;
 
 signals:
     void folder_removed ();
@@ -90,13 +103,14 @@ protected slots:
     void on_check_connection ();
     void on_use_mono_icons_changed (bool);
     void on_cleanup ();
-    void on_account_state_added (AccountState *account_state);
-    void on_account_state_removed (AccountState *account_state);
+    void on_account_state_added (AccountState account_state);
+    void on_account_state_removed (AccountState account_state);
     void on_system_online_configuration_changed (QNetworkConfiguration);
     void on_gui_is_showing_settings ();
 
 
     private void set_help ();
+
 
     /***********************************************************
     Maybe a newer version of the client was used with this config file:
@@ -189,7 +203,7 @@ bool Application.config_version_migration () {
     if (!version_changed && !warning_message)
         return true;
 
-    const auto backup_file = config_file.backup ();
+    const var backup_file = config_file.backup ();
 
     if (warning_message) {
         string bold_message;
@@ -210,7 +224,7 @@ bool Application.config_version_migration () {
                "The current configuration file was already backed up to <i>%2</i>.")
                 .arg (bold_message, backup_file));
         box.add_button (tr ("Quit"), QMessageBox.AcceptRole);
-        auto continue_btn = box.add_button (tr ("Continue"), QMessageBox.DestructiveRole);
+        var continue_btn = box.add_button (tr ("Continue"), QMessageBox.DestructiveRole);
 
         box.exec ();
         if (box.clicked_button () != continue_btn) {
@@ -218,11 +232,11 @@ bool Application.config_version_migration () {
             return false;
         }
 
-        auto settings = ConfigFile.settings_with_group ("foo");
+        var settings = ConfigFile.settings_with_group ("foo");
         settings.end_group ();
 
         // Wipe confusing keys from the future, ignore the others
-        for (auto &bad_key : delete_keys)
+        for (var &bad_key : delete_keys)
             settings.remove (bad_key);
     }
 
@@ -281,7 +295,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
         QT_WARNING_POP
         set_application_name (_theme.app_name ());
         if (QFileInfo (old_dir).is_dir ()) {
-            auto conf_dir = ConfigFile ().config_path ();
+            var conf_dir = ConfigFile ().config_path ();
             if (conf_dir.ends_with ('/')) conf_dir.chop (1);  // macOS 10.11.x does not like trailing slash for rename/move.
             q_c_info (lc_application) << "Migrating old config from" << old_dir << "to" << conf_dir;
 
@@ -292,7 +306,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
                 if (QFileInfo (conf_dir).is_dir () || QDir ().mkdir (conf_dir)) {
                     const string[] files_list = QDir (old_dir).entry_list (QDir.Files);
                     q_c_info (lc_application) << "Will move the individual files" << files_list;
-                    for (auto &name : files_list) {
+                    for (var &name : files_list) {
                         if (!QFile.rename (old_dir + "/" + name,  conf_dir + "/" + name)) {
                             q_c_warning (lc_application) << "Fallback move of " << name << "also failed";
                         }
@@ -317,7 +331,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
 
 #if defined (WITH_CRASHREPORTER)
     if (ConfigFile ().crash_reporter ()) {
-        auto reporter = QStringLiteral (CRASHREPORTER_EXECUTABLE);
+        var reporter = QStringLiteral (CRASHREPORTER_EXECUTABLE);
         _crash_handler.on_reset (new CrashReporter.Handler (QDir.temp_path (), true, reporter));
     }
 #endif
@@ -390,7 +404,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
         this, &Application.on_account_state_added);
     connect (AccountManager.instance (), &AccountManager.on_account_removed,
         this, &Application.on_account_state_removed);
-    for (auto &ai : AccountManager.instance ().accounts ()) {
+    for (var &ai : AccountManager.instance ().accounts ()) {
         on_account_state_added (ai.data ());
     }
 
@@ -413,7 +427,7 @@ const int QT_WARNING_DISABLE_DEPRECATED QT_WARNING_DISABLE_GCC ("-Wdeprecated-de
 
 #if defined (BUILD_UPDATER)
     // Update checks
-    auto *updater_scheduler = new UpdaterScheduler (this);
+    var updater_scheduler = new UpdaterScheduler (this);
     connect (updater_scheduler, &UpdaterScheduler.updater_announcement,
         _gui.data (), &OwncloudGui.on_show_tray_message);
     connect (updater_scheduler, &UpdaterScheduler.request_restart,
@@ -442,7 +456,7 @@ Application.~Application () {
     AccountManager.instance ().shutdown ();
 }
 
-void Application.on_account_state_removed (AccountState *account_state) {
+void Application.on_account_state_removed (AccountState account_state) {
     if (_gui) {
         disconnect (account_state, &AccountState.state_changed,
             _gui.data (), &OwncloudGui.on_account_state_changed);
@@ -464,7 +478,7 @@ void Application.on_account_state_removed (AccountState *account_state) {
     }
 }
 
-void Application.on_account_state_added (AccountState *account_state) {
+void Application.on_account_state_added (AccountState account_state) {
     connect (account_state, &AccountState.state_changed,
         _gui.data (), &OwncloudGui.on_account_state_changed);
     connect (account_state.account ().data (), &Account.server_version_changed,
@@ -495,14 +509,14 @@ void Application.on_system_online_configuration_changed (QNetworkConfiguration c
 }
 
 void Application.on_check_connection () {
-    const auto list = AccountManager.instance ().accounts ();
-    for (auto &account_state : list) {
+    const var list = AccountManager.instance ().accounts ();
+    for (var &account_state : list) {
         AccountState.State state = account_state.state ();
 
         // Don't check if we're manually signed out or
         // when the error is permanent.
-        const auto push_notifications = account_state.account ().push_notifications ();
-        const auto push_notifications_available = (push_notifications && push_notifications.is_ready ());
+        const var push_notifications = account_state.account ().push_notifications ();
+        const var push_notifications_available = (push_notifications && push_notifications.is_ready ());
         if (state != AccountState.SignedOut && state != AccountState.ConfigurationError
             && state != AccountState.AskingCredentials && !push_notifications_available) {
             account_state.on_check_connectivity ();
@@ -522,7 +536,7 @@ void Application.on_crash () {
 }
 
 void Application.on_owncloud_wizard_done (int res) {
-    FolderMan *folder_man = FolderMan.instance ();
+    FolderMan folder_man = FolderMan.instance ();
 
     // During the wizard, scheduling of new syncs is disabled
     folder_man.set_sync_enabled (true);
@@ -548,7 +562,7 @@ void Application.on_owncloud_wizard_done (int res) {
 
 void Application.setup_logging () {
     // might be called from second instance
-    auto logger = Logger.instance ();
+    var logger = Logger.instance ();
     logger.set_log_file (_log_file);
     if (_log_file.is_empty ()) {
         logger.set_log_dir (_log_dir.is_empty () ? ConfigFile ().log_dir () : _log_dir);
@@ -592,7 +606,7 @@ void Application.on_parse_message (string msg, GLib.Object *) {
         q_c_info (lc_application) << "Running for" << _started_at.elapsed () / 1000.0 << "sec";
         if (_started_at.elapsed () < 10 * 1000) {
             // This call is mirrored with the one in int main ()
-            q_c_warning (lc_application) << "Ignoring MSG_SHOWMAINDIALOG, possibly double-invocation of client via session restore and auto on_start";
+            q_c_warning (lc_application) << "Ignoring MSG_SHOWMAINDIALOG, possibly double-invocation of client via session restore and var on_start";
             return;
         }
 
@@ -741,9 +755,9 @@ void Application.setup_translations () {
     if (!enforced_locale.is_empty ())
         ui_languages.prepend (enforced_locale);
 
-    auto *translator = new QTranslator (this);
-    auto *qt_translator = new QTranslator (this);
-    auto *qtkeychain_translator = new QTranslator (this);
+    var translator = new QTranslator (this);
+    var qt_translator = new QTranslator (this);
+    var qtkeychain_translator = new QTranslator (this);
 
     for (string lang : q_as_const (ui_languages)) {
         lang.replace (QLatin1Char ('-'), QLatin1Char ('_')); // work around QTBUG-25973
@@ -807,7 +821,7 @@ void Application.on_open_virtual_file (string filename) {
         q_warning (lc_application) << "Can only handle file ending in .owncloud. Unable to open" << filename;
         return;
     }
-    auto folder = FolderMan.instance ().folder_for_path (filename);
+    var folder = FolderMan.instance ().folder_for_path (filename);
     if (!folder) {
         q_warning (lc_application) << "Can't find sync folder for" << filename;
         // TODO : show a QMessageBox for errors
@@ -816,7 +830,7 @@ void Application.on_open_virtual_file (string filename) {
     string relative_path = QDir.clean_path (filename).mid (folder.clean_path ().length () + 1);
     folder.on_implicitly_hydrate_file (relative_path);
     string normal_name = filename.left (filename.size () - virtual_file_ext.size ());
-    auto con = unowned<QMetaObject.Connection>.create ();
+    var con = unowned<QMetaObject.Connection>.create ();
     *con = connect (folder, &Folder.sync_finished, folder, [folder, con, normal_name] {
         folder.disconnect (*con);
         if (QFile.exists (normal_name)) {
@@ -830,7 +844,7 @@ void Application.on_try_tray_again () {
     _gui.hide_and_show_tray ();
 }
 
-bool Application.event (QEvent *event) {
+bool Application.event (QEvent event) {
     return SharedTools.QtSingleApplication.event (event);
 }
 

@@ -59,15 +59,22 @@ class FolderStatusDelegate : QStyled_item_delegate {
     };
     public void paint (QPainter *, QStyleOptionViewItem &, QModelIndex &) override;
     public QSize size_hint (QStyleOptionViewItem &, QModelIndex &) override;
-    public bool editor_event (QEvent *event, QAbstractItemModel *model, QStyleOptionViewItem &option,
+    public bool editor_event (QEvent event, QAbstractItemModel model, QStyleOptionViewItem &option,
         const QModelIndex &index) override;
+
 
     /***********************************************************
     return the position of the option button within the item
     ***********************************************************/
     public static QRect options_button_rect (QRect within, Qt.Layout_direction direction);
+
+
     public static QRect add_button_rect (QRect within, Qt.Layout_direction direction);
+
+
     public static QRect errors_list_rect (QRect within);
+
+
     public static int root_folder_height_without_errors (QFontMetrics &fm, QFontMetrics &alias_fm);
 
 
@@ -100,7 +107,7 @@ QSize FolderStatusDelegate.size_hint (QStyleOptionViewItem &option,
     QFontMetrics fm (font);
     QFontMetrics alias_fm (alias_font);
 
-    auto classif = static_cast<const FolderStatusModel> (index.model ()).classify (index);
+    var classif = static_cast<const FolderStatusModel> (index.model ()).classify (index);
     if (classif == FolderStatusModel.AddButton) {
         const int margins = alias_fm.height (); // same as 2*alias_margin of paint
         QFontMetrics fm (q_app.font ("QPushButton"));
@@ -123,8 +130,8 @@ QSize FolderStatusDelegate.size_hint (QStyleOptionViewItem &option,
 
     // add some space for the message boxes.
     int margin = fm.height () / 4;
-    for (auto role : {Folder_conflict_msg, Folder_error_msg, Folder_info_msg}) {
-        auto msgs = qvariant_cast<string[]> (index.data (role));
+    for (var role: {Folder_conflict_msg, Folder_error_msg, Folder_info_msg}) {
+        var msgs = qvariant_cast<string[]> (index.data (role));
         if (!msgs.is_empty ()) {
             h += margin + 2 * margin + msgs.count () * fm.height ();
         }
@@ -147,7 +154,7 @@ int FolderStatusDelegate.root_folder_height_without_errors (QFontMetrics &fm, QF
     return h;
 }
 
-void FolderStatusDelegate.paint (QPainter *painter, QStyleOptionViewItem &option,
+void FolderStatusDelegate.paint (QPainter painter, QStyleOptionViewItem &option,
     const QModelIndex &index) {
     if (index.data (AddButton).to_bool ()) {
         const_cast<QStyleOptionViewItem &> (option).show_decoration_selected = false;
@@ -155,7 +162,7 @@ void FolderStatusDelegate.paint (QPainter *painter, QStyleOptionViewItem &option
 
     QStyled_item_delegate.paint (painter, option, index);
 
-    auto text_align = Qt.Align_left;
+    var text_align = Qt.Align_left;
 
     QFont alias_font = make_alias_font (option.font);
     QFont sub_font = option.font;
@@ -193,24 +200,24 @@ void FolderStatusDelegate.paint (QPainter *painter, QStyleOptionViewItem &option
     }
     painter.save ();
 
-    auto status_icon = qvariant_cast<QIcon> (index.data (Folder_status_icon_role));
-    auto alias_text = qvariant_cast<string> (index.data (Header_role));
-    auto path_text = qvariant_cast<string> (index.data (FolderPathRole));
-    auto remote_path = qvariant_cast<string> (index.data (Folder_second_path_role));
-    auto conflict_texts = qvariant_cast<string[]> (index.data (Folder_conflict_msg));
-    auto error_texts = qvariant_cast<string[]> (index.data (Folder_error_msg));
-    auto info_texts = qvariant_cast<string[]> (index.data (Folder_info_msg));
+    var status_icon = qvariant_cast<QIcon> (index.data (Folder_status_icon_role));
+    var alias_text = qvariant_cast<string> (index.data (Header_role));
+    var path_text = qvariant_cast<string> (index.data (FolderPathRole));
+    var remote_path = qvariant_cast<string> (index.data (Folder_second_path_role));
+    var conflict_texts = qvariant_cast<string[]> (index.data (Folder_conflict_msg));
+    var error_texts = qvariant_cast<string[]> (index.data (Folder_error_msg));
+    var info_texts = qvariant_cast<string[]> (index.data (Folder_info_msg));
 
-    auto overall_percent = qvariant_cast<int> (index.data (Sync_progress_overall_percent));
-    auto overall_string = qvariant_cast<string> (index.data (Sync_progress_overall_string));
-    auto item_string = qvariant_cast<string> (index.data (Sync_progress_item_string));
-    auto warning_count = qvariant_cast<int> (index.data (Warning_count));
-    auto sync_ongoing = qvariant_cast<bool> (index.data (Sync_running));
-    auto sync_enabled = qvariant_cast<bool> (index.data (FolderAccountConnected));
-    auto sync_text = qvariant_cast<string> (index.data (Folder_sync_text));
+    var overall_percent = qvariant_cast<int> (index.data (Sync_progress_overall_percent));
+    var overall_string = qvariant_cast<string> (index.data (Sync_progress_overall_string));
+    var item_string = qvariant_cast<string> (index.data (Sync_progress_item_string));
+    var warning_count = qvariant_cast<int> (index.data (Warning_count));
+    var sync_ongoing = qvariant_cast<bool> (index.data (Sync_running));
+    var sync_enabled = qvariant_cast<bool> (index.data (FolderAccountConnected));
+    var sync_text = qvariant_cast<string> (index.data (Folder_sync_text));
 
-    auto icon_rect = option.rect;
-    auto alias_rect = option.rect;
+    var icon_rect = option.rect;
+    var alias_rect = option.rect;
 
     icon_rect.set_left (option.rect.left () + alias_margin);
     icon_rect.set_top (icon_rect.top () + alias_margin); // (icon_rect.height ()-iconsize.height ())/2);
@@ -221,12 +228,12 @@ void FolderStatusDelegate.paint (QPainter *painter, QStyleOptionViewItem &option
     alias_rect.set_right (alias_rect.right () - alias_margin);
 
     // remote directory box
-    auto remote_path_rect = alias_rect;
+    var remote_path_rect = alias_rect;
     remote_path_rect.set_top (alias_rect.bottom () + margin);
     remote_path_rect.set_bottom (remote_path_rect.top () + sub_fm.height ());
 
     // local directory box
-    auto local_path_rect = remote_path_rect;
+    var local_path_rect = remote_path_rect;
     local_path_rect.set_top (remote_path_rect.bottom () + margin);
     local_path_rect.set_bottom (local_path_rect.top () + sub_fm.height ());
 
@@ -240,7 +247,7 @@ void FolderStatusDelegate.paint (QPainter *painter, QStyleOptionViewItem &option
 
     int icon_size = icon_rect.width ();
 
-    auto options_button_visual_rect = options_button_rect (option.rect, option.direction);
+    var options_button_visual_rect = options_button_rect (option.rect, option.direction);
 
     QPixmap pm = status_icon.pixmap (icon_size, icon_size, sync_enabled ? QIcon.Normal : QIcon.Disabled);
     painter.draw_pixmap (QStyle.visual_rect (option.direction, option.rect, icon_rect).left (),
@@ -261,7 +268,7 @@ void FolderStatusDelegate.paint (QPainter *painter, QStyleOptionViewItem &option
         painter.draw_pixmap (QPoint (warn_rect.left (), warn_rect.top ()), pm);
     }
 
-    auto palette = option.palette;
+    var palette = option.palette;
 
     if (q_app.style ().inherits ("QWindows_vista_style")) {
         // Hack : Windows Vista's light blue is not contrasting enough for white
@@ -303,7 +310,7 @@ void FolderStatusDelegate.paint (QPainter *painter, QStyleOptionViewItem &option
     int h = icon_rect.bottom () + margin;
 
     // paint an error overlay if there is an error string or conflict string
-    auto draw_text_box = [&] (string[] &texts, QColor color) {
+    var draw_text_box = [&] (string[] &texts, QColor color) {
         QRect rect = local_path_rect;
         rect.set_left (icon_rect.left ());
         rect.set_top (h);
@@ -397,13 +404,13 @@ void FolderStatusDelegate.paint (QPainter *painter, QStyleOptionViewItem &option
     }
 }
 
-bool FolderStatusDelegate.editor_event (QEvent *event, QAbstractItemModel *model,
+bool FolderStatusDelegate.editor_event (QEvent event, QAbstractItemModel model,
     const QStyleOptionViewItem &option, QModelIndex &index) {
     switch (event.type ()) {
     case QEvent.Mouse_button_press:
     case QEvent.Mouse_move:
-        if (auto *view = qobject_cast<const QAbstractItemView> (option.widget)) {
-            auto *me = static_cast<QMouse_event> (event);
+        if (var view = qobject_cast<const QAbstractItemView> (option.widget)) {
+            var me = static_cast<QMouse_event> (event);
             QModelIndex index;
             if (me.buttons ()) {
                 index = view.index_at (me.pos ());

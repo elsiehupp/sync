@@ -39,7 +39,7 @@ class Flow2Auth : GLib.Object {
         status_copy_link_to_clipboard
     };
 
-    public Flow2Auth (Account *account, GLib.Object *parent);
+    public Flow2Auth (Account account, GLib.Object parent);
     ~Flow2Auth () override;
 
     public enum Result {
@@ -49,8 +49,14 @@ class Flow2Auth : GLib.Object {
     };
 
     public void on_start ();
+
+
     public void open_browser ();
+
+
     public void copy_link_to_clipboard ();
+
+
     public QUrl authorisation_link ();
 
 signals:
@@ -85,7 +91,7 @@ signals:
 
 
 
-    Flow2Auth.Flow2Auth (Account *account, GLib.Object *parent)
+    Flow2Auth.Flow2Auth (Account account, GLib.Object parent)
         : GLib.Object (parent)
         , _account (account)
         , _is_busy (false)
@@ -97,7 +103,7 @@ signals:
     Flow2Auth.~Flow2Auth () = default;
 
     void Flow2Auth.on_start () {
-        // Note : All startup code is in open_browser () to allow reinitiate a new request with
+        // Note: All startup code is in open_browser () to allow reinitiate a new request with
         //       fresh tokens. Opening the same poll_endpoint link twice triggers an expiration
         //       message by the server (security, intended design).
         open_browser ();
@@ -133,11 +139,11 @@ signals:
         req.set_header (QNetworkRequest.ContentLengthHeader, "0");
         req.set_header (QNetworkRequest.UserAgentHeader, Utility.friendly_user_agent_string ());
 
-        auto job = _account.send_request ("POST", url, req);
+        var job = _account.send_request ("POST", url, req);
         job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
 
-        GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this, action] (QNetworkReply *reply) {
-            auto json_data = reply.read_all ();
+        GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this, action] (QNetworkReply reply) {
+            var json_data = reply.read_all ();
             QJsonParseError json_parse_error;
             QJsonObject json = QJsonDocument.from_json (json_data, &json_parse_error).object ();
             string poll_token, poll_endpoint, login_url;
@@ -180,9 +186,9 @@ signals:
             _login_url = login_url;
 
             if (_account.is_username_prefill_supported ()) {
-                const auto user_name = Utility.get_current_user_name ();
+                const var user_name = Utility.get_current_user_name ();
                 if (!user_name.is_empty ()) {
-                    auto query = QUrlQuery (_login_url);
+                    var query = QUrlQuery (_login_url);
                     query.add_query_item (QStringLiteral ("user"), user_name);
                     _login_url.set_query (query);
                 }
@@ -241,15 +247,15 @@ signals:
         QNetworkRequest req;
         req.set_header (QNetworkRequest.ContentTypeHeader, "application/x-www-form-urlencoded");
 
-        auto request_body = new QBuffer;
+        var request_body = new QBuffer;
         QUrlQuery arguments (string ("token=%1").arg (_poll_token));
         request_body.set_data (arguments.query (QUrl.FullyEncoded).to_latin1 ());
 
-        auto job = _account.send_request ("POST", _poll_endpoint, req, request_body);
+        var job = _account.send_request ("POST", _poll_endpoint, req, request_body);
         job.on_set_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
 
-        GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this] (QNetworkReply *reply) {
-            auto json_data = reply.read_all ();
+        GLib.Object.connect (job, &SimpleNetworkJob.finished_signal, this, [this] (QNetworkReply reply) {
+            var json_data = reply.read_all ();
             QJsonParseError json_parse_error;
             QJsonObject json = QJsonDocument.from_json (json_data, &json_parse_error).object ();
             QUrl server_url;

@@ -6,7 +6,7 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 
 /***********************************************************
 Based on Qt sourcecode:
-  qt5/qtbase/src/widgets/dialogs/qwizard.cpp
+  qt5/qtbase/src/widgets/dialogs/qwizard
 
 https://code.qt.io/c
 
@@ -51,7 +51,7 @@ https://www.gnu.org/licenses/gpl-3.0.html.
 
 /***********************************************************
 Based on Qt sourcecode:
-  qt5/qtbase/src/widgets/dialogs/qwizard.cpp
+  qt5/qtbase/src/widgets/dialogs/qwizard
 
 https://code.qt.io/c
 
@@ -106,18 +106,18 @@ namespace Occ {
 
 class HeaderBanner : Gtk.Widget {
 
-    public HeaderBanner (Gtk.Widget *parent = nullptr);
+    public HeaderBanner (Gtk.Widget parent = nullptr);
 
     public void setup (string title, QPixmap &logo, QPixmap &banner,
                const Qt.Text_format title_format, string style_sheet);
 
 
-    protected void paint_event (QPaint_event *event) override;
+    protected void paint_event (QPaint_event event) override;
 
 
-    private QLabel *title_label;
-    private QLabel *logo_label;
-    private QGrid_layout *layout;
+    private QLabel title_label;
+    private QLabel logo_label;
+    private QGrid_layout layout;
     private QPixmap banner_pixmap;
 };
 
@@ -127,7 +127,7 @@ class HeaderBanner : Gtk.Widget {
     const int Gap_between_logo_and_right_edge = 5;
     const int Modern_header_top_margin = 2;
 
-    HeaderBanner.HeaderBanner (Gtk.Widget *parent)
+    HeaderBanner.HeaderBanner (Gtk.Widget parent)
         : Gtk.Widget (parent) {
         set_size_policy (QSize_policy.Expanding, QSize_policy.Fixed);
         set_background_role (QPalette.Base);
@@ -151,7 +151,7 @@ class HeaderBanner : Gtk.Widget {
 
     void HeaderBanner.setup (string title, QPixmap &logo, QPixmap &banner,
                              const Qt.Text_format title_format, string style_sheet) {
-        QStyle *style = parent_widget ().style ();
+        QStyle style = parent_widget ().style ();
         //const int layout_horizontal_spacing = style.pixel_metric (QStyle.PM_Layout_horizontal_spacing);
         int top_level_margin_left = style.pixel_metric (QStyle.PM_Layout_left_margin, nullptr, parent_widget ());
         int top_level_margin_right = style.pixel_metric (QStyle.PM_Layout_right_margin, nullptr, parent_widget ());

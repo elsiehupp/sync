@@ -19,15 +19,19 @@ class ConflictSolver : GLib.Object {
         KeepBothVersions
     };
 
-    public ConflictSolver (Gtk.Widget *parent = nullptr);
+    public ConflictSolver (Gtk.Widget parent = nullptr);
 
     public string local_version_filename ();
+
+
     public string remote_version_filename ();
 
     public bool exec (Solution solution);
 
 
     public void on_set_local_version_filename (string local_version_filename);
+
+
     public void on_set_remote_version_filename (string remote_version_filename);
 
 signals:
@@ -44,7 +48,7 @@ signals:
     private string _remote_version_filename;
 };
 
-    ConflictSolver.ConflictSolver (Gtk.Widget *parent)
+    ConflictSolver.ConflictSolver (Gtk.Widget parent)
         : GLib.Object (parent)
         , _parent_widget (parent) {
     }
@@ -98,9 +102,9 @@ signals:
             return false;
         }
 
-        const auto message = info.is_dir () ? tr ("Do you want to delete the directory <i>%1</i> and all its contents permanently?").arg (info.dir ().dir_name ())
+        const var message = info.is_dir () ? tr ("Do you want to delete the directory <i>%1</i> and all its contents permanently?").arg (info.dir ().dir_name ())
                                           : tr ("Do you want to delete the file <i>%1</i> permanently?").arg (info.file_name ());
-        const auto result = QMessageBox.question (_parent_widget, tr ("Confirm deletion"), message, QMessageBox.Yes, QMessageBox.No);
+        const var result = QMessageBox.question (_parent_widget, tr ("Confirm deletion"), message, QMessageBox.Yes, QMessageBox.No);
         if (result != QMessageBox.Yes)
             return false;
 
@@ -121,15 +125,15 @@ signals:
             return false;
         }
 
-        const auto rename_pattern = [=] {
-            auto result = string.from_utf8 (Occ.Utility.conflict_file_base_name_from_pattern (_local_version_filename.to_utf8 ()));
-            const auto dot_index = result.last_index_of ('.');
+        const var rename_pattern = [=] {
+            var result = string.from_utf8 (Occ.Utility.conflict_file_base_name_from_pattern (_local_version_filename.to_utf8 ()));
+            const var dot_index = result.last_index_of ('.');
             return string (result.left (dot_index) + "_%1" + result.mid (dot_index));
         } ();
 
-        const auto target_filename = [=] {
-            uint i = 1;
-            auto result = rename_pattern.arg (i);
+        const var target_filename = [=] {
+            uint32 i = 1;
+            var result = rename_pattern.arg (i);
             while (QFileInfo.exists (result)) {
                 Q_ASSERT (i > 0);
                 i++;

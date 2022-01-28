@@ -21,16 +21,22 @@ namespace SharedTools {
 
 class QtLocalPeer : GLib.Object {
 
-    public QtLocalPeer (GLib.Object *parent = nullptr, string app_id = string ());
+    public QtLocalPeer (GLib.Object parent = nullptr, string app_id = string ());
+
+
     public bool is_client ();
+
+
     public bool on_send_message (string message, int timeout, bool block);
+
+
     public string application_id () {
         return id;
     }
     public static string app_session_id (string app_id);
 
 signals:
-    void message_received (string message, GLib.Object *socket);
+    void message_received (string message, GLib.Object socket);
 
 protected slots:
     void receive_connection ();
@@ -89,7 +95,7 @@ string QtLocalPeer.app_session_id (string app_id) {
     return res;
 }
 
-QtLocalPeer.QtLocalPeer (GLib.Object *parent, string app_id)
+QtLocalPeer.QtLocalPeer (GLib.Object parent, string app_id)
     : GLib.Object (parent), id (app_id) {
     if (id.is_empty ())
         id = QCoreApplication.application_file_path ();  //### On win, check if this returns .../argv[0] without casefolding; .\MYAPP == .\myapp on Win

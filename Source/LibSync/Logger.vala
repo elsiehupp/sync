@@ -14,7 +14,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 // #include <iostream>
 
 #ifdef ZLIB_FOUND
-// #include <zlib.h>
+using ZLib
 #endif
 
 namespace {
@@ -39,18 +39,26 @@ class Logger : GLib.Object {
 
     public void do_log (QtMsgType type, QMessageLogContext &ctx, string message);
 
-    public static Logger *instance ();
+    public static Logger instance ();
 
     public void post_gui_log (string title, string message);
+
+
     public void post_optional_gui_log (string title, string message);
+
+
     public void post_gui_message (string title, string message);
 
     public string log_file ();
+
+
     public void set_log_file (string name);
 
     public void set_log_expire (int expire);
 
     public string log_dir ();
+
+
     public void set_log_dir (string dir);
 
     public void set_log_flush (bool flush);
@@ -60,10 +68,12 @@ class Logger : GLib.Object {
     }
     public void set_log_debug (bool debug);
 
+
     /***********************************************************
     Returns where the automatic logdir would be
     ***********************************************************/
     public string temporary_folder_log_dir_path ();
+
 
     /***********************************************************
     Sets up default dir log setup.
@@ -75,6 +85,7 @@ class Logger : GLib.Object {
     Used in conjunction with ConfigFile.automatic_log_dir
     ***********************************************************/
     public void setup_temporary_folder_log_dir ();
+
 
     /***********************************************************
     For switching off via logwindow
@@ -100,7 +111,7 @@ signals:
     public void on_enter_next_log_file ();
 
 
-    private Logger (GLib.Object *parent = nullptr);
+    private Logger (GLib.Object parent = nullptr);
     ~Logger () override;
 
     private void close ();
@@ -124,7 +135,7 @@ Logger *Logger.instance () {
     return &log;
 }
 
-Logger.Logger (GLib.Object *parent)
+Logger.Logger (GLib.Object parent)
     : GLib.Object (parent) {
     q_set_message_pattern (QStringLiteral ("%{time yyyy-MM-dd hh:mm:ss:zzz} [ %{type} %{category} %{file}:%{line} "
                                       "]%{if-debug}\t[ %{function} ]%{endif}:\t%{message}"));
@@ -253,7 +264,7 @@ string Logger.temporary_folder_log_dir_path () {
 }
 
 void Logger.setup_temporary_folder_log_dir () {
-    auto dir = temporary_folder_log_dir_path ();
+    var dir = temporary_folder_log_dir_path ();
     if (!QDir ().mkpath (dir))
         return;
     set_log_debug (true);
@@ -277,7 +288,7 @@ void Logger.set_log_rules (QSet<string> &rules) {
     _log_rules = rules;
     string tmp;
     QTextStream out (&tmp);
-    for (auto &p : rules) {
+    for (var &p : rules) {
         out << p << QLatin1Char ('\n');
     }
     q_debug () << tmp;
@@ -299,14 +310,14 @@ static bool compress_log (string original_name, string target_name) {
     QFile original (original_name);
     if (!original.open (QIODevice.ReadOnly))
         return false;
-    auto compressed = gzopen (target_name.to_utf8 (), "wb");
+    var compressed = gzopen (target_name.to_utf8 (), "wb");
     if (!compressed) {
         return false;
     }
 
     while (!original.at_end ()) {
-        auto data = original.read (1024 * 1024);
-        auto written = gzwrite (compressed, data.data (), data.size ());
+        var data = original.read (1024 * 1024);
+        var written = gzwrite (compressed, data.data (), data.size ());
         if (written != data.size ()) {
             gzclose (compressed);
             return false;
@@ -343,19 +354,19 @@ void Logger.on_enter_next_log_file () {
                     dir.remove (s);
                 }
             }
-            const auto rx_match = rx.match (s);
+            const var rx_match = rx.match (s);
             if (s.starts_with (new_log_name) && rx_match.has_match ()) {
                 max_number = q_max (max_number, rx_match.captured (1).to_int ());
             }
         }
         new_log_name.append ("." + string.number (max_number + 1));
 
-        auto previous_log = _log_file.file_name ();
+        var previous_log = _log_file.file_name ();
         set_log_file (dir.file_path (new_log_name));
 
         // Compress the previous log file. On a restart this can be the most recent
         // log file.
-        auto log_to_compress = previous_log;
+        var log_to_compress = previous_log;
         if (log_to_compress.is_empty () && files.size () > 0 && !files.last ().ends_with (".gz"))
             log_to_compress = dir.absolute_file_path (files.last ());
         if (!log_to_compress.is_empty ()) {

@@ -13,7 +13,7 @@ class FakePaintDevice : QPaintDevice {
 
     public FakePaintDevice ();
 
-    public QPaintEngine *paintEngine () override;
+    public QPaintEngine paintEngine () override;
 
     public void setHidpi (bool value);
 

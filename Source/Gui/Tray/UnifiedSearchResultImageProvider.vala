@@ -23,7 +23,7 @@ Allows to fetch Unified Search result icon from the server or used a local resou
 
 class Unified_search_result_image_provider : QQuick_async_image_provider {
 
-    public QQuick_image_response *request_image_response (string id, QSize &requested_size) override;
+    public QQuick_image_response request_image_response (string id, QSize &requested_size) override;
 };
 }
 
@@ -55,10 +55,10 @@ namespace {
 
         public void set_image_and_emit_finished (QImage &image = {}) {
             _image = image;
-            emit on_finished ();
+            emit finished ();
         }
 
-        public QQuick_texture_factory *texture_factory () override {
+        public QQuick_texture_factory texture_factory () override {
             return QQuick_texture_factory.texture_factory_for_image (_image);
         }
 
@@ -74,12 +74,12 @@ namespace {
                 return;
             }
 
-            const auto current_user = Occ.User_model.instance ().current_user ();
+            const var current_user = Occ.User_model.instance ().current_user ();
             if (current_user && current_user.account ()) {
                 const QUrl icon_url (_image_paths.at (_index));
                 if (icon_url.is_valid () && !icon_url.scheme ().is_empty ()) {
                     // fetch the remote resource
-                    const auto reply = current_user.account ().send_raw_request (QByteArrayLiteral ("GET"), icon_url);
+                    const var reply = current_user.account ().send_raw_request (QByteArrayLiteral ("GET"), icon_url);
                     connect (reply, &QNetworkReply.on_finished, this, &Async_image_response.on_process_network_reply);
                     ++_index;
                     return;
@@ -91,7 +91,7 @@ namespace {
 
     private slots:
         void on_process_network_reply () {
-            const auto reply = qobject_cast<QNetworkReply> (sender ());
+            const var reply = qobject_cast<QNetworkReply> (sender ());
             if (!reply) {
                 set_image_and_emit_finished ();
                 return;

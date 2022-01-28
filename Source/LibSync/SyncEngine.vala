@@ -58,11 +58,14 @@ enum Another_sync_needed {
 class SyncEngine : GLib.Object {
 
     public SyncEngine (AccountPtr account, string local_path,
-        const string remote_path, SyncJournalDb *journal);
+        const string remote_path, SyncJournalDb journal);
     ~SyncEngine () override;
 
     public void on_start_sync ();
+
+
     public void set_network_limits (int upload, int download);
+
 
     /***********************************************************
     Abort the sync. Called from the main thread.
@@ -72,6 +75,7 @@ class SyncEngine : GLib.Object {
     public bool is_sync_running () {
         return _sync_running;
     }
+
 
     public SyncOptions sync_options () {
         return _sync_options;
@@ -86,6 +90,7 @@ class SyncEngine : GLib.Object {
         _ignore_hidden_files = ignore;
     }
 
+
     public ExcludedFiles &excluded_files () {
         return _excluded_files;
     }
@@ -96,6 +101,7 @@ class SyncEngine : GLib.Object {
         return _sync_file_status_tracker;
     }
 
+
     /***********************************************************
     Returns whether another sync is needed to complete the sync
     ***********************************************************/
@@ -103,15 +109,19 @@ class SyncEngine : GLib.Object {
         return _another_sync_needed;
     }
 
+
     public bool was_file_touched (string fn);
 
     public AccountPtr account ();
-    public SyncJournalDb *journal () {
+
+
+    public SyncJournalDb journal () {
         return _journal;
     }
     public string local_path () {
         return _local_path;
     }
+
 
     /***********************************************************
     Duration in ms that uploads should be delayed after a file change
@@ -126,18 +136,20 @@ class SyncEngine : GLib.Object {
     ***********************************************************/
     public static std.chrono.milliseconds minimum_file_age_for_upload;
 
+
     /***********************************************************
-    Control whether local discovery should read from filesystem or db.
+    Control whether local discovery should read from filesystem or database.
 
     If style is DatabaseAndFilesystem, paths a set of file paths relative
     the synced folder. All the parent directories of th
-    be read from the db and scanned on the filesystem.
+    be read from the database and scanned on the filesystem.
 
     Note, the style and paths are only retained for the next sync and
     revert afterwards. Use _last_local_discovery_style to discover the last
     sync's style.
     ***********************************************************/
     public void set_local_discovery_options (LocalDiscoveryStyle style, std.set<string> paths = {});
+
 
     /***********************************************************
     Returns whether the given folder-relative path should be locally discovered
@@ -148,6 +160,7 @@ class SyncEngine : GLib.Object {
     ***********************************************************/
     public bool should_discover_locally (string path);
 
+
     /***********************************************************
     Access the last sync run's local discovery style
     ***********************************************************/
@@ -155,13 +168,14 @@ class SyncEngine : GLib.Object {
         return _last_local_discovery_style;
     }
 
+
     /***********************************************************
-    Removes all virtual file db entries and dehydrated local placeholders.
+    Removes all virtual file database entries and dehydrated local placeholders.
 
     Particularly useful when switching off vfs mode or switching to a
     different kind of vfs.
 
-    Note that *hydrated* placeholder files might still be left. These will
+    Note that hydrated* placeholder files might still be left. These will
     get cleaned up by Vfs.unregister_folder ().
     ***********************************************************/
     public static void wipe_virtual_files (string local_path, SyncJournalDb &journal, Vfs &vfs);
@@ -169,13 +183,13 @@ class SyncEngine : GLib.Object {
     public static void switch_to_virtual_files (string local_path, SyncJournalDb &journal, Vfs &vfs);
 
     // for the test
-    public auto get_propagator () {
+    public var get_propagator () {
         return _propagator;
     }
 
 signals:
     // During update, before reconcile
-    void root_etag (GLib.ByteArray &, QDateTime &);
+    void root_etag (GLib.ByteArray , QDateTime &);
 
     // after the above signals. with the items that actually need propagating
     void about_to_propagate (SyncFileItemVector &);
@@ -193,15 +207,17 @@ signals:
     void on_finished (bool on_success);
     void started ();
 
+
     /***********************************************************
     Emited when the sync engine detects that all the files have been removed or change.
     This usually happen when the server was reset or something.
-    Set *cancel to true in a slot connected from this signal to on_abort the sync.
+    Set cancel to true in a slot connected from this signal to on_abort the sync.
     ***********************************************************/
     void about_to_remove_all_files (SyncFileItem.Direction direction, std.function<void (bool)> f);
 
     // A new folder was discovered and was not synced because of the confirmation feature
     void new_big_folder (string folder, bool is_external);
+
 
     /***********************************************************
     Emitted when propagation has problems with a locked file.
@@ -212,12 +228,14 @@ signals:
 
 
     private void on_folder_discovered (bool local, string folder);
-    private void on_root_etag_received (GLib.ByteArray &, QDateTime &time);
+    private void on_root_etag_received (GLib.ByteArray , QDateTime &time);
+
 
     /***********************************************************
     When the discovery phase discovers an item
     ***********************************************************/
     private void on_item_discovered (SyncFileItemPtr &item);
+
 
     /***********************************************************
     Called when a SyncFileItem gets accepted for a sync.
@@ -234,15 +252,18 @@ signals:
     private void on_progress (SyncFileItem &item, int64 curent);
     private void on_clean_polls_job_aborted (string error);
 
+
     /***********************************************************
     Records that a file was touched by a job.
     ***********************************************************/
     private void on_add_touched_file (string fn);
 
+
     /***********************************************************
     Wipes the _touched_files hash
     ***********************************************************/
     private void on_clear_touched_files ();
+
 
     /***********************************************************
     Emit a summary error, unless it was seen before
@@ -297,12 +318,14 @@ signals:
     private QScopedPointer<SyncFileStatusTracker> _sync_file_status_tracker;
     private Utility.StopWatch _stop_watch;
 
+
     /***********************************************************
     check if we are allowed to propagate everything, and if we are not, adjust the instructions
     to recover
     ***********************************************************/
     private void check_for_permission (SyncFileItemVector &sync_items);
     private RemotePermissions get_permissions (string file);
+
 
     /***********************************************************
     Instead of downloading files from the server, upload the files to the server
@@ -324,6 +347,7 @@ signals:
 
     private Another_sync_needed _another_sync_needed;
 
+
     /***********************************************************
     Stores the time since a job touched a file.
     ***********************************************************/
@@ -331,15 +355,18 @@ signals:
 
     private QElapsedTimer _last_update_progress_callback_call;
 
+
     /***********************************************************
     For clearing the _touched_files variable after sync on_finished
     ***********************************************************/
     private QTimer _clear_touched_files_timer;
 
+
     /***********************************************************
     List of unique errors that occurred in a sync run.
     ***********************************************************/
     private QSet<string> _unique_errors;
+
 
     /***********************************************************
     The kind of local discovery the last sync run used
@@ -350,6 +377,7 @@ signals:
 };
 
     bool SyncEngine.s_any_sync_running = false;
+
 
     /***********************************************************
     When the client touches a file, block change notifications for this duration (ms)
@@ -371,7 +399,7 @@ signals:
     std.chrono.milliseconds SyncEngine.minimum_file_age_for_upload (2000);
 
     SyncEngine.SyncEngine (AccountPtr account, string local_path,
-        const string remote_path, Occ.SyncJournalDb *journal)
+        const string remote_path, Occ.SyncJournalDb journal)
         : _account (account)
         , _needs_update (false)
         , _sync_running (false)
@@ -410,6 +438,7 @@ signals:
         on_abort ();
         _excluded_files.on_reset ();
     }
+
 
     /***********************************************************
     Check if the item is in the blacklist.
@@ -474,7 +503,7 @@ signals:
         item._instruction = CSYNC_INSTRUCTION_IGNORE;
         item._status = SyncFileItem.BlacklistedError;
 
-        auto wait_seconds_str = Utility.duration_to_descriptive_string1 (1000 * wait_seconds);
+        var wait_seconds_str = Utility.duration_to_descriptive_string1 (1000 * wait_seconds);
         item._error_string = tr ("%1 (skipped due to earlier error, trying again in %2)").arg (entry._error_string, wait_seconds_str);
 
         if (entry._error_category == SyncJournalErrorBlacklistRecord.InsufficientRemoteStorage) {
@@ -524,11 +553,11 @@ signals:
         }
 
         // Delete from journal.
-        auto ids = _journal.delete_stale_upload_infos (upload_file_paths);
+        var ids = _journal.delete_stale_upload_infos (upload_file_paths);
 
         // Delete the stales chunk on the server.
         if (account ().capabilities ().chunking_ng ()) {
-            foreach (uint transfer_id, ids) {
+            foreach (uint32 transfer_id, ids) {
                 if (!transfer_id)
                     continue; // Was not a chunked upload
                 QUrl url = Utility.concat_url_path (account ().url (), QLatin1String ("remote.php/dav/uploads/") + account ().dav_user () + QLatin1Char ('/') + string.number (transfer_id));
@@ -560,9 +589,9 @@ signals:
         // Remove stale conflict entries from the database
         // by checking which files still exist and removing the
         // missing ones.
-        const auto conflict_record_paths = _journal.conflict_record_paths ();
-        for (auto &path : conflict_record_paths) {
-            auto fs_path = _propagator.full_local_path (string.from_utf8 (path));
+        const var conflict_record_paths = _journal.conflict_record_paths ();
+        for (var &path : conflict_record_paths) {
+            var fs_path = _propagator.full_local_path (string.from_utf8 (path));
             if (!QFileInfo (fs_path).exists ()) {
                 _journal.delete_conflict_record (path);
             }
@@ -573,14 +602,14 @@ signals:
         //
         // This happens when the conflicts table is new or when conflict files
         // are downlaoded but the server doesn't send conflict headers.
-        for (auto &path : q_as_const (_seen_conflict_files)) {
+        for (var &path : q_as_const (_seen_conflict_files)) {
             ASSERT (Utility.is_conflict_file (path));
 
-            auto bapath = path.to_utf8 ();
+            var bapath = path.to_utf8 ();
             if (!conflict_record_paths.contains (bapath)) {
                 ConflictRecord record;
                 record.path = bapath;
-                auto base_path = Utility.conflict_file_base_name_from_pattern (bapath);
+                var base_path = Utility.conflict_file_base_name_from_pattern (bapath);
                 record.initial_base_path = base_path;
 
                 // Determine fileid of target file
@@ -610,7 +639,7 @@ signals:
             // database is removed. Nothing will be done for those files, but we still need
             // to update the database.
 
-            // This metadata update *could* be a propagation job of its own, but since it's
+            // This metadata update could* be a propagation job of its own, but since it's
             // quick to do and we don't want to create a potentially large number of
             // mini-jobs later on, we just update metadata right now.
 
@@ -625,14 +654,14 @@ signals:
                     const bool is_read_only = !item._remote_perm.is_null () && !item._remote_perm.has_permission (RemotePermissions.Can_write);
                     FileSystem.set_file_read_only_weak (file_path, is_read_only);
                 }
-                auto rec = item.to_sync_journal_file_record_with_inode (file_path);
+                var rec = item.to_sync_journal_file_record_with_inode (file_path);
                 if (rec._checksum_header.is_empty ())
                     rec._checksum_header = prev._checksum_header;
                 rec._server_has_ignored_files |= prev._server_has_ignored_files;
 
                 // Ensure it's a placeholder file on disk
                 if (item._type == ItemTypeFile) {
-                    const auto result = _sync_options._vfs.convert_to_placeholder (file_path, *item);
+                    const var result = _sync_options._vfs.convert_to_placeholder (file_path, *item);
                     if (!result) {
                         item._instruction = CSYNC_INSTRUCTION_ERROR;
                         item._error_string = tr ("Could not update file : %1").arg (result.error ());
@@ -642,7 +671,7 @@ signals:
 
                 // Update on-disk virtual file metadata
                 if (item._type == ItemTypeVirtualFile) {
-                    auto r = _sync_options._vfs.update_metadata (file_path, item._modtime, item._size, item._file_id);
+                    var r = _sync_options._vfs.update_metadata (file_path, item._modtime, item._size, item._file_id);
                     if (!r) {
                         item._instruction = CSYNC_INSTRUCTION_ERROR;
                         item._error_string = tr ("Could not update virtual file metadata : %1").arg (r.error ());
@@ -650,7 +679,7 @@ signals:
                     }
                 }
 
-                // Updating the db happens on on_success
+                // Updating the database happens on on_success
                 _journal.set_file_record (rec);
 
                 // This might have changed the shared flag, so we must notify SyncFileStatusTracker for example
@@ -691,7 +720,7 @@ signals:
         _needs_update = true;
 
         // Insert sorted
-        auto it = std.lower_bound ( _sync_items.begin (), _sync_items.end (), item ); // the _sync_items is sorted
+        var it = std.lower_bound ( _sync_items.begin (), _sync_items.end (), item ); // the _sync_items is sorted
         _sync_items.insert ( it, item );
 
         on_new_item (item);
@@ -706,7 +735,7 @@ signals:
             QVector<SyncJournalDb.PollInfo> poll_infos = _journal.get_poll_infos ();
             if (!poll_infos.is_empty ()) {
                 q_c_info (lc_engine) << "Finish Poll jobs before starting a sync";
-                auto *job = new CleanupPollsJob (poll_infos, _account,
+                var job = new CleanupPollsJob (poll_infos, _account,
                     _journal, _local_path, _sync_options._vfs, this);
                 connect (job, &CleanupPollsJob.on_finished, this, &SyncEngine.on_start_sync);
                 connect (job, &CleanupPollsJob.aborted, this, &SyncEngine.on_clean_polls_job_aborted);
@@ -787,7 +816,7 @@ signals:
         }
 
         // Functionality like selective sync might have set up etag storage
-        // filtering via schedule_path_for_remote_discovery (). This *is* the next sync, so
+        // filtering via schedule_path_for_remote_discovery (). This is* the next sync, so
         // undo the filter to allow this sync to retrieve and store the correct etags.
         _journal.clear_etag_storage_filter ();
 
@@ -802,7 +831,7 @@ signals:
         }
 
         bool ok = false;
-        auto selective_sync_black_list = _journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, &ok);
+        var selective_sync_black_list = _journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, &ok);
         if (ok) {
             bool using_selective_sync = (!selective_sync_black_list.is_empty ());
             q_c_info (lc_engine) << (using_selective_sync ? "Using Selective Sync" : "NOT Using Selective Sync");
@@ -831,7 +860,7 @@ signals:
             _discovery_phase._excludes.add_exclude_file_path (exclude_file_path);
             _discovery_phase._excludes.on_reload_exclude_files ();
         }
-        _discovery_phase._statedb = _journal;
+        _discovery_phase._statedatabase = _journal;
         _discovery_phase._local_dir = _local_path;
         if (!_discovery_phase._local_dir.ends_with ('/'))
             _discovery_phase._local_dir+='/';
@@ -877,8 +906,8 @@ signals:
         connect (_discovery_phase.data (), &DiscoveryPhase.silently_excluded,
             _sync_file_status_tracker.data (), &SyncFileStatusTracker.on_add_silently_excluded);
 
-        auto discovery_job = new ProcessDirectoryJob (
-            _discovery_phase.data (), PinState.AlwaysLocal, _journal.key_value_store_get_int ("last_sync", 0), _discovery_phase.data ());
+        var discovery_job = new ProcessDirectoryJob (
+            _discovery_phase.data (), PinState.PinState.ALWAYS_LOCAL, _journal.key_value_store_get_int ("last_sync", 0), _discovery_phase.data ());
         _discovery_phase.start_job (discovery_job);
         connect (discovery_job, &ProcessDirectoryJob.etag, this, &SyncEngine.on_root_etag_received);
         connect (_discovery_phase.data (), &DiscoveryPhase.add_error_to_gui, this, &SyncEngine.add_error_to_gui);
@@ -902,7 +931,7 @@ signals:
         emit transmission_progress (*_progress_info);
     }
 
-    void SyncEngine.on_root_etag_received (GLib.ByteArray &e, QDateTime &time) {
+    void SyncEngine.on_root_etag_received (GLib.ByteArray e, QDateTime &time) {
         if (_remote_root_etag.is_empty ()) {
             q_c_debug (lc_engine) << "Root etag:" << e;
             _remote_root_etag = e;
@@ -939,8 +968,8 @@ signals:
         emit transmission_progress (*_progress_info);
 
         //    q_c_info (lc_engine) << "Permissions of the root folder : " << _csync_ctx.remote.root_perms.to_string ();
-        auto finish = [this]{
-            auto database_fingerprint = _journal.data_fingerprint ();
+        var finish = [this]{
+            var database_fingerprint = _journal.data_fingerprint ();
             // If database_fingerprint is empty, this means that there was no information in the database
             // (for example, upgrading from a previous version, or first sync, or server not supporting fingerprint)
             if (!database_fingerprint.is_empty () && _discovery_phase
@@ -975,9 +1004,9 @@ signals:
                 const string script = q_environment_variable ("OWNCLOUD_POST_UPDATE_SCRIPT");
 
                 q_c_debug (lc_engine) << "Post Update Script : " << script;
-                auto script_args = script.split (QRegularExpression ("\\s+"), Qt.Skip_empty_parts);
+                var script_args = script.split (QRegularExpression ("\\s+"), Qt.Skip_empty_parts);
                 if (script_args.size () > 0) {
-                    const auto script_executable = script_args.take_first ();
+                    const var script_executable = script_args.take_first ();
                     QProcess.execute (script_executable, script_args);
                 }
     #else
@@ -1022,7 +1051,7 @@ signals:
         if (!_has_none_files && _has_remove_file) {
             q_c_info (lc_engine) << "All the files are going to be changed, asking the user";
             int side = 0; // > 0 means more deleted on the server.  < 0 means more deleted on the client
-            foreach (auto &it, _sync_items) {
+            foreach (var &it, _sync_items) {
                 if (it._instruction == CSYNC_INSTRUCTION_REMOVE) {
                     side += it._direction == SyncFileItem.Down ? 1 : -1;
                 }
@@ -1030,7 +1059,7 @@ signals:
 
             QPointer<GLib.Object> guard = new GLib.Object ();
             QPointer<GLib.Object> self = this;
-            auto callback = [this, self, finish, guard] (bool cancel) . void {
+            var callback = [this, self, finish, guard] (bool cancel) . void {
                 // use a guard to ensure its only called once...
                 // qpointer to self to ensure we still exist
                 if (!guard || !self) {
@@ -1111,7 +1140,7 @@ signals:
         }
         s_any_sync_running = false;
         _sync_running = false;
-        emit on_finished (on_success);
+        emit finished (on_success);
 
         // Delete the propagator only after emitting the signal.
         _propagator.clear ();
@@ -1140,7 +1169,7 @@ signals:
     ***********************************************************/
     void SyncEngine.restore_old_files (SyncFileItemVector &sync_items) {
 
-        for (auto &sync_item : q_as_const (sync_items)) {
+        for (var &sync_item : q_as_const (sync_items)) {
             if (sync_item._direction != SyncFileItem.Down)
                 continue;
 
@@ -1171,12 +1200,12 @@ signals:
 
         // Iterate from the oldest and remove anything older than 15 seconds.
         while (true) {
-            auto first = _touched_files.begin ();
+            var first = _touched_files.begin ();
             if (first == _touched_files.end ())
                 break;
             // Compare to our new QElapsedTimer instead of using elapsed ().
             // This avoids querying the current time from the OS for every loop.
-            auto elapsed = std.chrono.milliseconds (now.msecs_since_reference () - first.key ().msecs_since_reference ());
+            var elapsed = std.chrono.milliseconds (now.msecs_since_reference () - first.key ().msecs_since_reference ());
             if (elapsed <= s_touched_files_max_age_ms) {
                 // We found the first path younger than the maximum age, keep the rest.
                 break;
@@ -1195,8 +1224,8 @@ signals:
 
     bool SyncEngine.was_file_touched (string fn) {
         // Start from the end (most recent) and look for our path. Check the time just in case.
-        auto begin = _touched_files.const_begin ();
-        for (auto it = _touched_files.const_end (); it != begin; --it) {
+        var begin = _touched_files.const_begin ();
+        for (var it = _touched_files.const_end (); it != begin; --it) {
             if ( (it-1).value () == fn)
                 return std.chrono.milliseconds ( (it-1).key ().elapsed ()) <= s_touched_files_max_age_ms;
         }
@@ -1212,12 +1241,12 @@ signals:
         _local_discovery_paths = std.move (paths);
 
         // Normalize to make sure that no path is a contained in another.
-        // Note : for simplicity, this code consider anything less than '/' as a path separator, so for
+        // Note: for simplicity, this code consider anything less than '/' as a path separator, so for
         // example, this will remove "foo.bar" if "foo" is in the list. This will mean we might have
         // some false positive, but that's Ok.
         // This invariant is used in SyncEngine.should_discover_locally
         string prev;
-        auto it = _local_discovery_paths.begin ();
+        var it = _local_discovery_paths.begin ();
         while (it != _local_discovery_paths.end ()) {
             if (!prev.is_null () && it.starts_with (prev) && (prev.ends_with ('/') || *it == prev || it.at (prev.size ()) <= '/')) {
                 it = _local_discovery_paths.erase (it);
@@ -1240,7 +1269,7 @@ signals:
         //   discovered in full)
         // Check out Test_local_discovery.test_local_discovery_decision ()
 
-        auto it = _local_discovery_paths.lower_bound (path);
+        var it = _local_discovery_paths.lower_bound (path);
         if (it == _local_discovery_paths.end () || !it.starts_with (path)) {
             // Maybe a subfolder of something in the list?
             if (it != _local_discovery_paths.begin () && path.starts_with (* (--it))) {
@@ -1271,7 +1300,7 @@ signals:
             if (rec._type != ItemTypeVirtualFile && rec._type != ItemTypeVirtualFileDownload)
                 return;
 
-            q_c_debug (lc_engine) << "Removing db record for" << rec.path ();
+            q_c_debug (lc_engine) << "Removing database record for" << rec.path ();
             journal.delete_file_record (rec._path);
 
             // If the local file is a dehydrated placeholder, wipe it too.
@@ -1285,21 +1314,21 @@ signals:
 
         journal.force_remote_discovery_next_sync ();
 
-        // Postcondition : No ItemTypeVirtualFile / ItemTypeVirtualFileDownload left in the db.
+        // Postcondition : No ItemTypeVirtualFile / ItemTypeVirtualFileDownload left in the database.
         // But hydrated placeholders may still be around.
     }
 
     void SyncEngine.switch_to_virtual_files (string local_path, SyncJournalDb &journal, Vfs &vfs) {
         q_c_info (lc_engine) << "Convert to virtual files inside" << local_path;
         journal.get_files_below_path ({}, [&] (SyncJournalFileRecord &rec) {
-            const auto path = rec.path ();
-            const auto file_name = QFileInfo (path).file_name ();
+            const var path = rec.path ();
+            const var file_name = QFileInfo (path).file_name ();
             if (FileSystem.is_exclude_file (file_name)) {
                 return;
             }
             SyncFileItem item;
             string local_file = local_path + path;
-            const auto result = vfs.convert_to_placeholder (local_file, item, local_file);
+            const var result = vfs.convert_to_placeholder (local_file, item, local_file);
             if (!result.is_valid ()) {
                 q_c_warning (lc_engine) << "Could not convert file to placeholder" << result.error ();
             }
@@ -1340,7 +1369,7 @@ signals:
     }
 
     void SyncEngine.on_insufficient_remote_storage () {
-        auto msg = tr ("There is insufficient space available on the server for some uploads.");
+        var msg = tr ("There is insufficient space available on the server for some uploads.");
         if (_unique_errors.contains (msg))
             return;
 

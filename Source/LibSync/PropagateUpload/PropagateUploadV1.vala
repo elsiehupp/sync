@@ -19,7 +19,7 @@ void PropagateUploadFileV1.do_start_upload () {
     if (_item._modtime <= 0) {
         q_c_warning (lc_propagate_upload ()) << "invalid modified time" << _item._file << _item._modtime;
     }
-    _transfer_id = uint (Utility.rand ()) ^ uint (_item._modtime) ^ (uint (_file_to_upload._size) << 16);
+    _transfer_id = uint32 (Utility.rand ()) ^ uint32 (_item._modtime) ^ (uint32 (_file_to_upload._size) << 16);
 
     const SyncJournalDb.UploadInfo progress_info = propagator ()._journal.get_upload_info (_item._file);
 
@@ -66,12 +66,12 @@ void PropagateUploadFileV1.on_start_next_chunk () {
         // Don't do parallel upload of chunk if this might be the last chunk because the server cannot handle that
         // https://github.com/owncloud/core/issues/11106
         // We return now and when the _jobs are on_finished we will proceed with the last chunk
-        // NOTE : Some other parts of the code such as on_upload_progress also assume that the last chunk
+        // Note: Some other parts of the code such as on_upload_progress also assume that the last chunk
         // is sent last.
         return;
     }
     int64 file_size = _file_to_upload._size;
-    auto headers = PropagateUploadFileCommon.headers ();
+    var headers = PropagateUploadFileCommon.headers ();
     headers[QByteArrayLiteral ("OC-Total-Length")] = GLib.ByteArray.number (file_size);
     headers[QByteArrayLiteral ("OC-Chunk-Size")] = GLib.ByteArray.number (chunk_size ());
 
@@ -83,7 +83,7 @@ void PropagateUploadFileV1.on_start_next_chunk () {
     if (_chunk_count > 1) {
         int sending_chunk = (_current_chunk + _start_chunk) % _chunk_count;
         // XOR with chunk size to make sure everything goes well if chunk size changes between runs
-        uint transid = _transfer_id ^ uint (chunk_size ());
+        uint32 transid = _transfer_id ^ uint32 (chunk_size ());
         q_c_info (lc_propagate_upload_v1) << "Upload chunk" << sending_chunk << "of" << _chunk_count << "transferid (remote)=" << transid;
         path += string ("-chunking-%1-%2-%3").arg (transid).arg (_chunk_count).arg (sending_chunk);
 
@@ -110,7 +110,7 @@ void PropagateUploadFileV1.on_start_next_chunk () {
     }
 
     const string file_name = _file_to_upload._path;
-    auto device = std.make_unique<UploadDevice> (
+    var device = std.make_unique<UploadDevice> (
             file_name, chunk_start, current_chunk_size, &propagator ()._bandwidth_manager);
     if (!device.open (QIODevice.ReadOnly)) {
         q_c_warning (lc_propagate_upload_v1) << "Could not prepare upload device : " << device.error_string ();
@@ -126,8 +126,8 @@ void PropagateUploadFileV1.on_start_next_chunk () {
     }
 
     // job takes ownership of device via a QScopedPointer. Job deletes itself when finishing
-    auto device_ptr = device.get (); // for connections later
-    auto *job = new PUTFile_job (propagator ().account (), propagator ().full_remote_path (path), std.move (device), headers, _current_chunk, this);
+    var device_ptr = device.get (); // for connections later
+    var job = new PUTFile_job (propagator ().account (), propagator ().full_remote_path (path), std.move (device), headers, _current_chunk, this);
     _jobs.append (job);
     connect (job, &PUTFile_job.finished_signal, this, &PropagateUploadFileV1.on_put_finished);
     connect (job, &PUTFile_job.upload_progress, this, &PropagateUploadFileV1.on_upload_progress);
@@ -174,7 +174,7 @@ void PropagateUploadFileV1.on_start_next_chunk () {
 }
 
 void PropagateUploadFileV1.on_put_finished () {
-    auto *job = qobject_cast<PUTFile_job> (sender ());
+    var job = qobject_cast<PUTFile_job> (sender ());
     ASSERT (job);
 
     on_job_destroyed (job); // remove it from the _jobs list
@@ -264,10 +264,10 @@ void PropagateUploadFileV1.on_put_finished () {
 
         SyncJournalDb.UploadInfo pi;
         pi._valid = true;
-        auto current_chunk = job._chunk;
-        foreach (auto *job, _jobs) {
+        var current_chunk = job._chunk;
+        foreach (var job, _jobs) {
             // Take the minimum on_finished one
-            if (auto put_job = qobject_cast<PUTFile_job> (job)) {
+            if (var put_job = qobject_cast<PUTFile_job> (job)) {
                 current_chunk = q_min (current_chunk, put_job._chunk - 1);
             }
         }
@@ -331,7 +331,7 @@ void PropagateUploadFileV1.on_upload_progress (int64 sent, int64 total) {
     sender ().set_property ("byte_written", sent);
     if (_jobs.count () > 1) {
         amount -= (_jobs.count () - 1) * chunk_size ();
-        foreach (GLib.Object *j, _jobs) {
+        foreach (GLib.Object j, _jobs) {
             amount += j.property ("byte_written").to_uLong_long ();
         }
     } else {
@@ -344,8 +344,8 @@ void PropagateUploadFileV1.on_upload_progress (int64 sent, int64 total) {
 void PropagateUploadFileV1.on_abort (PropagatorJob.AbortType abort_type) {
     abort_network_jobs (
         abort_type,
-        [this, abort_type] (AbstractNetworkJob *job) {
-            if (auto *put_job = qobject_cast<PUTFile_job> (job)){
+        [this, abort_type] (AbstractNetworkJob job) {
+            if (var put_job = qobject_cast<PUTFile_job> (job)){
                 if (abort_type == AbortType.Asynchronous
                     && _chunk_count > 0
                     && ( ( (_current_chunk + _start_chunk) % _chunk_count) == 0)

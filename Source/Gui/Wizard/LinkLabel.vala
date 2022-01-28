@@ -13,7 +13,7 @@ namespace Occ {
 
 class Link_label : QLabel {
 
-    public Link_label (Gtk.Widget *parent = nullptr);
+    public Link_label (Gtk.Widget parent = nullptr);
 
     public void set_url (QUrl url);
 
@@ -21,11 +21,11 @@ signals:
     void clicked ();
 
 
-    protected void enter_event (QEvent *event) override;
+    protected void enter_event (QEvent event) override;
 
-    protected void leave_event (QEvent *event) override;
+    protected void leave_event (QEvent event) override;
 
-    protected void mouse_release_event (QMouse_event *event) override;
+    protected void mouse_release_event (QMouse_event event) override;
 
 
     private void set_font_underline (bool value);
@@ -33,7 +33,7 @@ signals:
     private QUrl url;
 };
 
-    Link_label.Link_label (Gtk.Widget *parent) : QLabel (parent) {
+    Link_label.Link_label (Gtk.Widget parent) : QLabel (parent) {
 
     }
 
@@ -60,7 +60,7 @@ signals:
     }
 
     void Link_label.set_font_underline (bool value) {
-        auto label_font = font ();
+        var label_font = font ();
         label_font.set_underline (value);
         set_font (label_font);
     }

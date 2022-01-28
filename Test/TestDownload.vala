@@ -25,7 +25,8 @@ class BrokenFakeGetReply : FakeGetReply {
         return std.min (size, fakeSize) + QIODevice.bytesAvailable (); // NOLINT : This is intended to simulare the brokeness
     }
 
-    public int64 readData (char *data, int64 maxlen) override {
+
+    public int64 readData (char data, int64 maxlen) override {
         int64 len = std.min (int64{ fakeSize }, maxlen);
         std.fill_n (data, len, payload);
         size -= len;
@@ -36,7 +37,7 @@ class BrokenFakeGetReply : FakeGetReply {
 
 SyncFileItemPtr getItem (QSignalSpy &spy, string path) {
     for (GLib.List<QVariant> &args : spy) {
-        auto item = args[0].value<SyncFileItemPtr> ();
+        var item = args[0].value<SyncFileItemPtr> ();
         if (item.destination () == path)
             return item;
     }
@@ -49,7 +50,7 @@ class TestDownload : GLib.Object {
         FakeFolder fakeFolder{ FileInfo.A12_B12_C12_S12 () };
         fakeFolder.syncEngine ().setIgnoreHiddenFiles (true);
         QSignalSpy completeSpy (&fakeFolder.syncEngine (), SIGNAL (itemCompleted (SyncFileItemPtr &)));
-        auto size = 30 * 1000 * 1000;
+        var size = 30 * 1000 * 1000;
         fakeFolder.remoteModifier ().insert ("A/a0", size);
 
         // First, download only the first 3 MB of the file
@@ -84,7 +85,7 @@ class TestDownload : GLib.Object {
         FakeFolder fakeFolder{FileInfo.A12_B12_C12_S12 ()};
         fakeFolder.syncEngine ().setIgnoreHiddenFiles (true);
         QSignalSpy completeSpy (&fakeFolder.syncEngine (), SIGNAL (itemCompleted (SyncFileItemPtr &)));
-        auto size = 3'500'000;
+        var size = 3'500'000;
         fakeFolder.remoteModifier ().insert ("A/broken", size);
 
         GLib.ByteArray serverMessage = "The file was not downloaded because the tests wants so!";
@@ -148,9 +149,9 @@ class TestDownload : GLib.Object {
 
         bool propConnected = false;
         string conflictFile;
-        auto transProgress = connect (&fakeFolder.syncEngine (), &SyncEngine.transmissionProgress,
+        var transProgress = connect (&fakeFolder.syncEngine (), &SyncEngine.transmissionProgress,
                                      [&] (ProgressInfo &pi) {
-            auto propagator = fakeFolder.syncEngine ().getPropagator ();
+            var propagator = fakeFolder.syncEngine ().getPropagator ();
             if (pi.status () != ProgressInfo.Propagation || propConnected || !propagator)
                 return;
             propConnected = true;
@@ -202,7 +203,7 @@ class TestDownload : GLib.Object {
         // First, download only the first 3 MB of the file
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.GetOperation && request.url ().path ().endsWith ("A/resendme") && resendActual < resendExpected) {
-                auto errorReply = new FakeErrorReply (op, request, this, 400, "ignore this body");
+                var errorReply = new FakeErrorReply (op, request, this, 400, "ignore this body");
                 errorReply.setError (QNetworkReply.ContentReSendError, serverMessage);
                 errorReply.setAttribute (QNetworkRequest.HTTP2WasUsedAttribute, true);
                 errorReply.setAttribute (QNetworkRequest.HttpStatusCodeAttribute, QVariant ());

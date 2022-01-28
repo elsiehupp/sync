@@ -21,8 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #ifdef HAVE_ARGP_H
 // #include <argp.h>
 
-const char *argp_program_version = "csync test 0.2";
-const char *argp_program_bug_address = "<csync-devel@csync.org>";
+const char argp_program_version = "csync test 0.2";
+const char argp_program_bug_address = "<csync-devel@csync.org>";
 
 static char **cmdline;
 
@@ -41,11 +41,11 @@ static struct argp_option options[] = { {
 };
 
 /* Parse a single option. */
-static error_t parse_opt (int key, char *arg, struct argp_state *state) {
+static error_t parse_opt (int key, char arg, struct argp_state state) {
   /* Get the input argument from argp_parse, which we
    * know is a pointer to our arguments structure.
    */
-  struct argument_s *arguments = state.input;
+  struct argument_s arguments = state.input;
 
   /* arg is currently not used */
   (void) arg;
@@ -71,7 +71,7 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 static struct argp argp = {options, parse_opt, NULL, doc, NULL, NULL, NULL};
 #endif /* HAVE_ARGP_H */
 
-void torture_cmdline_parse (int argc, char **argv, struct argument_s *arguments) {
+void torture_cmdline_parse (int argc, char **argv, struct argument_s arguments) {
   /***********************************************************
    * Parse our arguments; every option seen by parse_opt will
    * be reflected in arguments.

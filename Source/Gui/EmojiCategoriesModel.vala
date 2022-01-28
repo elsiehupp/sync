@@ -71,7 +71,7 @@ class EmojiCategoriesModel : QAbstractListModel {
 class EmojiModel : GLib.Object {
 
     Q_PROPERTY (QVariantList model READ model NOTIFY model_changed)
-    Q_PROPERTY (QAbstractListModel *emoji_categories_model READ emoji_categories_model CONSTANT)
+    Q_PROPERTY (QAbstractListModel emoji_categories_model READ emoji_categories_model CONSTANT)
 
     Q_PROPERTY (QVariantList history READ history NOTIFY history_changed)
 
@@ -84,16 +84,23 @@ class EmojiModel : GLib.Object {
     Q_PROPERTY (QVariantList symbols MEMBER symbols CONSTANT)
     Q_PROPERTY (QVariantList flags MEMBER flags CONSTANT)
 
-    public EmojiModel (GLib.Object *parent = nullptr)
+    public EmojiModel (GLib.Object parent = nullptr)
         : GLib.Object (parent) {
     }
 
+
     public Q_INVOKABLE QVariantList history ();
+
+
     public Q_INVOKABLE void set_category (string category);
+
+
     public Q_INVOKABLE void emoji_used (QVariant &model_data);
 
     public QVariantList model ();
-    public QAbstractListModel *emoji_categories_model ();
+
+
+    public QAbstractListModel emoji_categories_model ();
 
 signals:
     void history_changed ();
@@ -223,9 +230,9 @@ signals:
     }
 
     void EmojiModel.emoji_used (QVariant &model_data) {
-        auto history_emojis = history ();
+        var history_emojis = history ();
 
-        auto history_emojis_iter = history_emojis.begin ();
+        var history_emojis_iter = history_emojis.begin ();
         while (history_emojis_iter != history_emojis.end ()) {
             if ( (*history_emojis_iter).value<Emoji> ().unicode == model_data.value<Emoji> ().unicode) {
                 history_emojis_iter = history_emojis.erase (history_emojis_iter);

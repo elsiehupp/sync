@@ -19,7 +19,7 @@ namespace Ui {
 
 class FolderCreationDialog : Gtk.Dialog {
 
-    public FolderCreationDialog (string destination, Gtk.Widget *parent = nullptr);
+    public FolderCreationDialog (string destination, Gtk.Widget parent = nullptr);
     ~FolderCreationDialog () override;
 
 
@@ -28,13 +28,13 @@ class FolderCreationDialog : Gtk.Dialog {
     private void on_new_folder_name_edit_text_edited ();
 
 
-    private Ui.FolderCreationDialog *ui;
+    private Ui.FolderCreationDialog ui;
 
     private string _destination;
 };
 
 
-    FolderCreationDialog.FolderCreationDialog (string destination, Gtk.Widget *parent)
+    FolderCreationDialog.FolderCreationDialog (string destination, Gtk.Widget parent)
         : Gtk.Dialog (parent)
         , ui (new Ui.FolderCreationDialog)
         , _destination (destination) {
@@ -52,7 +52,7 @@ class FolderCreationDialog : Gtk.Dialog {
         if (!QDir (new_folder_full_path).exists ()) {
             ui.new_folder_name_edit.on_set_text (suggested_folder_name_prefix);
         } else {
-            for (unsigned int i = 2; i < std.numeric_limits<unsigned int>.max (); ++i) {
+            for (uint32 i = 2; i < std.numeric_limits<uint32>.max (); ++i) {
                 const string suggested_postfix = string (" (%1)").arg (i);
 
                 if (!QDir (new_folder_full_path + suggested_postfix).exists ()) {

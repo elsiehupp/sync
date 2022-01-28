@@ -44,47 +44,73 @@ class User_status_selector_model : GLib.Object {
     Q_PROPERTY (QUrl dnd_icon READ dnd_icon CONSTANT)
     Q_PROPERTY (QUrl invisible_icon READ invisible_icon CONSTANT)
 
-    public User_status_selector_model (GLib.Object *parent = nullptr);
+    public User_status_selector_model (GLib.Object parent = nullptr);
 
     public User_status_selector_model (std.shared_ptr<UserStatusConnector> user_status_connector,
-        GLib.Object *parent = nullptr);
+        GLib.Object parent = nullptr);
 
     public User_status_selector_model (std.shared_ptr<UserStatusConnector> user_status_connector,
         std.unique_ptr<DateTimeProvider> date_time_provider,
-        GLib.Object *parent = nullptr);
+        GLib.Object parent = nullptr);
 
     public User_status_selector_model (UserStatus &user_status,
         std.unique_ptr<DateTimeProvider> date_time_provider,
-        GLib.Object *parent = nullptr);
+        GLib.Object parent = nullptr);
 
     public User_status_selector_model (UserStatus &user_status,
-        GLib.Object *parent = nullptr);
+        GLib.Object parent = nullptr);
 
     public Q_INVOKABLE void on_load (int id);
 
     public Q_REQUIRED_RESULT UserStatus.OnlineStatus online_status ();
+
+
     public Q_INVOKABLE void set_online_status (Occ.UserStatus.OnlineStatus status);
 
     public Q_REQUIRED_RESULT QUrl online_icon ();
+
+
     public Q_REQUIRED_RESULT QUrl away_icon ();
+
+
     public Q_REQUIRED_RESULT QUrl dnd_icon ();
+
+
     public Q_REQUIRED_RESULT QUrl invisible_icon ();
 
     public Q_REQUIRED_RESULT string user_status_message ();
+
+
     public Q_INVOKABLE void set_user_status_message (string message);
+
+
     public void set_user_status_emoji (string emoji);
+
+
     public Q_REQUIRED_RESULT string user_status_emoji ();
 
     public Q_INVOKABLE void set_user_status ();
+
+
     public Q_INVOKABLE void clear_user_status ();
 
     public Q_REQUIRED_RESULT int predefined_statuses_count ();
+
+
     public Q_INVOKABLE UserStatus predefined_status (int index);
+
+
     public Q_INVOKABLE string predefined_status_clear_at (int index);
+
+
     public Q_INVOKABLE void set_predefined_status (int index);
 
     public Q_REQUIRED_RESULT string[] clear_at_values ();
+
+
     public Q_REQUIRED_RESULT string clear_at ();
+
+
     public Q_INVOKABLE void set_clear_at (int index);
 
     public Q_REQUIRED_RESULT string error_message ();
@@ -143,13 +169,13 @@ signals:
     };
 };
 
-    User_status_selector_model.User_status_selector_model (GLib.Object *parent)
+    User_status_selector_model.User_status_selector_model (GLib.Object parent)
         : GLib.Object (parent)
         , _date_time_provider (new DateTimeProvider) {
         _user_status.set_icon ("😀");
     }
 
-    User_status_selector_model.User_status_selector_model (std.shared_ptr<UserStatusConnector> user_status_connector, GLib.Object *parent)
+    User_status_selector_model.User_status_selector_model (std.shared_ptr<UserStatusConnector> user_status_connector, GLib.Object parent)
         : GLib.Object (parent)
         , _user_status_connector (user_status_connector)
         , _user_status ("no-id", "", "😀", UserStatus.OnlineStatus.Online, false, {})
@@ -160,7 +186,7 @@ signals:
 
     User_status_selector_model.User_status_selector_model (std.shared_ptr<UserStatusConnector> user_status_connector,
         std.unique_ptr<DateTimeProvider> date_time_provider,
-        GLib.Object *parent)
+        GLib.Object parent)
         : GLib.Object (parent)
         , _user_status_connector (user_status_connector)
         , _date_time_provider (std.move (date_time_provider)) {
@@ -169,7 +195,7 @@ signals:
     }
 
     User_status_selector_model.User_status_selector_model (UserStatus &user_status,
-        std.unique_ptr<DateTimeProvider> date_time_provider, GLib.Object *parent)
+        std.unique_ptr<DateTimeProvider> date_time_provider, GLib.Object parent)
         : GLib.Object (parent)
         , _user_status (user_status)
         , _date_time_provider (std.move (date_time_provider)) {
@@ -177,7 +203,7 @@ signals:
     }
 
     User_status_selector_model.User_status_selector_model (UserStatus &user_status,
-        GLib.Object *parent)
+        GLib.Object parent)
         : GLib.Object (parent)
         , _user_status (user_status) {
         _user_status.set_icon ("😀");
@@ -226,11 +252,11 @@ signals:
     }
 
     void User_status_selector_model.on_user_status_set () {
-        emit on_finished ();
+        emit finished ();
     }
 
     void User_status_selector_model.on_message_cleared () {
-        emit on_finished ();
+        emit finished ();
     }
 
     void User_status_selector_model.on_error (UserStatusConnector.Error error) {
@@ -344,35 +370,35 @@ signals:
         case Clear_stage_type.Dont_clear:
             return {};
 
-        case Clear_stage_type.Half_hour : {
+        case Clear_stage_type.Half_hour: {
             ClearAt clear_at;
             clear_at._type = ClearAtType.Period;
             clear_at._period = 60 * 30;
             return clear_at;
         }
 
-        case Clear_stage_type.One_hour : {
+        case Clear_stage_type.One_hour: {
             ClearAt clear_at;
             clear_at._type = ClearAtType.Period;
             clear_at._period = 60 * 60;
             return clear_at;
         }
 
-        case Clear_stage_type.Four_hour : {
+        case Clear_stage_type.Four_hour: {
             ClearAt clear_at;
             clear_at._type = ClearAtType.Period;
             clear_at._period = 60 * 60 * 4;
             return clear_at;
         }
 
-        case Clear_stage_type.Today : {
+        case Clear_stage_type.Today: {
             ClearAt clear_at;
             clear_at._type = ClearAtType.EndOf;
             clear_at._endof = "day";
             return clear_at;
         }
 
-        case Clear_stage_type.Week : {
+        case Clear_stage_type.Week: {
             ClearAt clear_at;
             clear_at._type = ClearAtType.EndOf;
             clear_at._endof = "week";
@@ -422,7 +448,7 @@ signals:
         Q_ASSERT (0 <= index && index < static_cast<int> (_predefined_statuses.size ()));
 
         _user_status.set_message_predefined (true);
-        const auto predefined_status = _predefined_statuses[index];
+        const var predefined_status = _predefined_statuses[index];
         _user_status.set_id (predefined_status.id ());
         _user_status.set_message (predefined_status.message ());
         _user_status.set_icon (predefined_status.icon ());
@@ -482,21 +508,21 @@ signals:
         if (difference_secs < 60) {
             return tr ("Less than a minute");
         } else if (difference_secs < 60 * 60) {
-            const auto minutes_left = std.ceil (difference_secs / 60.0);
+            const var minutes_left = std.ceil (difference_secs / 60.0);
             if (minutes_left == 1) {
                 return tr ("1 minute");
             } else {
                 return tr ("%1 minutes").arg (minutes_left);
             }
         } else if (difference_secs < 60 * 60 * 24) {
-            const auto hours_left = std.ceil (difference_secs / 60.0 / 60.0);
+            const var hours_left = std.ceil (difference_secs / 60.0 / 60.0);
             if (hours_left == 1) {
                 return tr ("1 hour");
             } else {
                 return tr ("%1 hours").arg (hours_left);
             }
         } else {
-            const auto days_left = std.ceil (difference_secs / 60.0 / 60.0 / 24.0);
+            const var days_left = std.ceil (difference_secs / 60.0 / 60.0 / 24.0);
             if (days_left == 1) {
                 return tr ("1 day");
             } else {
@@ -508,16 +534,16 @@ signals:
     string User_status_selector_model.clear_at_readable (Optional<ClearAt> &clear_at) {
         if (clear_at) {
             switch (clear_at._type) {
-            case ClearAtType.Period : {
+            case ClearAtType.Period: {
                 return time_difference_to_string (clear_at._period);
             }
 
-            case ClearAtType.Timestamp : {
+            case ClearAtType.Timestamp: {
                 const int difference = static_cast<int> (clear_at._timestamp - _date_time_provider.current_date_time ().to_time_t ());
                 return time_difference_to_string (difference);
             }
 
-            case ClearAtType.EndOf : {
+            case ClearAtType.EndOf: {
                 if (clear_at._endof == "day") {
                     return tr ("Today");
                 } else if (clear_at._endof == "week") {

@@ -39,6 +39,7 @@ class Share : GLib.Object {
 
     public using Permissions = Share_permissions;
 
+
     /***********************************************************
     Constructor for shares
     ***********************************************************/
@@ -52,6 +53,7 @@ class Share : GLib.Object {
         const Permissions permissions = Share_permission_default,
         const unowned<Sharee> share_with = unowned<Sharee> (nullptr));
 
+
     /***********************************************************
     The account the share is defined on.
     ***********************************************************/
@@ -59,35 +61,42 @@ class Share : GLib.Object {
 
     public string path ();
 
+
     /***********************************************************
     Get the id
     ***********************************************************/
     public string get_id ();
+
 
     /***********************************************************
     Get the uid_owner
     ***********************************************************/
     public string get_uid_owner ();
 
+
     /***********************************************************
     Get the owner display name
     ***********************************************************/
     public string get_owner_display_name ();
+
 
     /***********************************************************
     Get the share_type
     ***********************************************************/
     public Share_type get_share_type ();
 
+
     /***********************************************************
     Get the share_with
     ***********************************************************/
     public unowned<Sharee> get_share_with ();
 
+
     /***********************************************************
     Get permissions
     ***********************************************************/
     public Permissions get_permissions ();
+
 
     /***********************************************************
     Set the permissions of a share
@@ -96,6 +105,7 @@ class Share : GLib.Object {
     In case of a server error the on_server_error signal is emitted.
     ***********************************************************/
     public void set_permissions (Permissions permissions);
+
 
     /***********************************************************
     Set the password for remote share
@@ -107,6 +117,7 @@ class Share : GLib.Object {
 
     public bool is_password_set ();
 
+
     /***********************************************************
     Deletes a share
 
@@ -114,6 +125,7 @@ class Share : GLib.Object {
     In case of a server error the on_server_error signal is emitted.
     ***********************************************************/
     public void delete_share ();
+
 
     /***********************************************************
     Is it a share with a user or group (local or remote)
@@ -169,40 +181,48 @@ class Link_share : Share {
         const string note,
         const string label);
 
+
     /***********************************************************
     Get the share link
     ***********************************************************/
     public QUrl get_link ();
+
 
     /***********************************************************
     The share's link for direct downloading.
     ***********************************************************/
     public QUrl get_direct_download_link ();
 
+
     /***********************************************************
     Get the public_upload status of this share
     ***********************************************************/
     public bool get_public_upload ();
+
 
     /***********************************************************
     Whether directory listings are available (READ permission)
     ***********************************************************/
     public bool get_show_file_listing ();
 
+
     /***********************************************************
     Returns the name of the link share. Can be empty.
     ***********************************************************/
     public string get_name ();
+
 
     /***********************************************************
     Returns the note of the link share.
     ***********************************************************/
     public string get_note ();
 
+
     /***********************************************************
     Returns the label of the link share.
     ***********************************************************/
     public string get_label ();
+
 
     /***********************************************************
     Set the name of the link share.
@@ -211,20 +231,24 @@ class Link_share : Share {
     ***********************************************************/
     public void set_name (string name);
 
+
     /***********************************************************
     Set the note of the link share.
     ***********************************************************/
     public void set_note (string note);
+
 
     /***********************************************************
     Returns the token of the link share.
     ***********************************************************/
     public string get_token ();
 
+
     /***********************************************************
     Get the expiration date
     ***********************************************************/
     public QDate get_expire_date ();
+
 
     /***********************************************************
     Set the expiration date
@@ -234,16 +258,18 @@ class Link_share : Share {
     ***********************************************************/
     public void set_expire_date (QDate &expire_date);
 
+
     /***********************************************************
     Set the label of the share link.
     ***********************************************************/
     public void set_label (string label);
 
+
     /***********************************************************
     Create Ocs_share_job and connect to signal/slots
     ***********************************************************/
     public template <typename Link_share_slot>
-    public Ocs_share_job *create_share_job (Link_share_slot on_function);
+    public Ocs_share_job create_share_job (Link_share_slot on_function);
 
 signals:
     void expire_date_set ();
@@ -309,7 +335,8 @@ shares should talk to this manager and not use OCS Share Job directly
 ***********************************************************/
 class Share_manager : GLib.Object {
 
-    public Share_manager (AccountPtr _account, GLib.Object *parent = nullptr);
+    public Share_manager (AccountPtr _account, GLib.Object parent = nullptr);
+
 
     /***********************************************************
     Tell the manager to create a link share
@@ -325,6 +352,7 @@ class Share_manager : GLib.Object {
     public void create_link_share (string path,
         const string name,
         const string password);
+
 
     /***********************************************************
     Tell the manager to create a new share
@@ -342,6 +370,7 @@ class Share_manager : GLib.Object {
         const Share.Permissions permissions,
         const string password = "");
 
+
     /***********************************************************
     Fetch all the shares for path
 
@@ -357,6 +386,7 @@ signals:
     void on_link_share_created (unowned<Link_share> &share);
     void on_shares_fetched (GLib.List<unowned<Share>> &shares);
     void on_server_error (int code, string message);
+
 
     /***********************************************************
     Emitted when creating a link share with password fails.
@@ -385,15 +415,15 @@ signals:
 When a share is modified, we need to tell the folders so they can adjust overlay icons
 ***********************************************************/
 static void update_folder (AccountPtr &account, string path) {
-    foreach (Folder *f, FolderMan.instance ().map ()) {
+    foreach (Folder f, FolderMan.instance ().map ()) {
         if (f.account_state ().account () != account)
             continue;
-        auto folder_path = f.remote_path ();
+        var folder_path = f.remote_path ();
         if (path.starts_with (folder_path) && (path == folder_path || folder_path.ends_with ('/') || path[folder_path.size ()] == '/')) {
             // Workaround the fact that the server does not invalidate the etags of parent directories
             // when something is shared.
-            auto relative = path.mid_ref (f.remote_path_trailing_slash ().length ());
-            f.journal_db ().schedule_path_for_remote_discovery (relative.to_string ());
+            var relative = path.mid_ref (f.remote_path_trailing_slash ().length ());
+            f.journal_database ().schedule_path_for_remote_discovery (relative.to_string ());
 
             // Schedule a sync so it can update the remote permission flag and let the socket API
             // know about the shared icon.
@@ -451,7 +481,7 @@ unowned<Sharee> Share.get_share_with () {
 }
 
 void Share.set_password (string password) {
-    auto * const job = new Ocs_share_job (_account);
+    var * const job = new Ocs_share_job (_account);
     connect (job, &Ocs_share_job.share_job_finished, this, &Share.on_password_set);
     connect (job, &Ocs_job.ocs_error, this, &Share.on_set_password_error);
     job.set_password (get_id (), password);
@@ -462,7 +492,7 @@ bool Share.is_password_set () {
 }
 
 void Share.set_permissions (Permissions permissions) {
-    auto *job = new Ocs_share_job (_account);
+    var job = new Ocs_share_job (_account);
     connect (job, &Ocs_share_job.share_job_finished, this, &Share.on_permissions_set);
     connect (job, &Ocs_job.ocs_error, this, &Share.on_ocs_error);
     job.set_permissions (get_id (), permissions);
@@ -478,7 +508,7 @@ Share.Permissions Share.get_permissions () {
 }
 
 void Share.delete_share () {
-    auto *job = new Ocs_share_job (_account);
+    var job = new Ocs_share_job (_account);
     connect (job, &Ocs_share_job.share_job_finished, this, &Share.on_deleted);
     connect (job, &Ocs_job.ocs_error, this, &Share.on_ocs_error);
     job.delete_share (get_id ());
@@ -495,7 +525,7 @@ void Share.on_deleted () {
 }
 
 void Share.on_ocs_error (int status_code, string message) {
-    emit on_server_error (status_code, message);
+    emit server_error (status_code, message);
 }
 
 void Share.on_password_set (QJsonDocument &, QVariant &value) {
@@ -590,14 +620,15 @@ void Link_share.set_label (string label) {
 
 template <typename Link_share_slot>
 Ocs_share_job *Link_share.create_share_job (Link_share_slot on_function) {
-    auto *job = new Ocs_share_job (_account);
+    var job = new Ocs_share_job (_account);
     connect (job, &Ocs_share_job.share_job_finished, this, on_function);
     connect (job, &Ocs_job.ocs_error, this, &Link_share.on_ocs_error);
     return job;
 }
 
 void Link_share.on_expire_date_set (QJsonDocument &reply, QVariant &value) {
-    auto data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
+    var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
+
 
     /***********************************************************
     If the reply provides a data back (more REST style)
@@ -642,7 +673,7 @@ User_group_share.User_group_share (AccountPtr account,
 }
 
 void User_group_share.set_note (string note) {
-    auto *job = new Ocs_share_job (_account);
+    var job = new Ocs_share_job (_account);
     connect (job, &Ocs_share_job.share_job_finished, this, &User_group_share.on_note_set);
     connect (job, &Ocs_job.ocs_error, this, &User_group_share.note_set_error);
     job.set_note (get_id (), note);
@@ -667,14 +698,15 @@ void User_group_share.set_expire_date (QDate &date) {
         return;
     }
 
-    auto *job = new Ocs_share_job (_account);
+    var job = new Ocs_share_job (_account);
     connect (job, &Ocs_share_job.share_job_finished, this, &User_group_share.on_expire_date_set);
     connect (job, &Ocs_job.ocs_error, this, &User_group_share.on_ocs_error);
     job.set_expire_date (get_id (), date);
 }
 
 void User_group_share.on_expire_date_set (QJsonDocument &reply, QVariant &value) {
-    auto data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
+    var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
+
 
     /***********************************************************
     If the reply provides a data back (more REST style)
@@ -688,7 +720,7 @@ void User_group_share.on_expire_date_set (QJsonDocument &reply, QVariant &value)
     emit expire_date_set ();
 }
 
-Share_manager.Share_manager (AccountPtr account, GLib.Object *parent)
+Share_manager.Share_manager (AccountPtr account, GLib.Object parent)
     : GLib.Object (parent)
     , _account (account) {
 }
@@ -696,7 +728,7 @@ Share_manager.Share_manager (AccountPtr account, GLib.Object *parent)
 void Share_manager.create_link_share (string path,
     const string name,
     const string password) {
-    auto *job = new Ocs_share_job (_account);
+    var job = new Ocs_share_job (_account);
     connect (job, &Ocs_share_job.share_job_finished, this, &Share_manager.on_link_share_created);
     connect (job, &Ocs_job.ocs_error, this, &Share_manager.on_ocs_error);
     job.create_link_share (path, name, password);
@@ -706,20 +738,21 @@ void Share_manager.on_link_share_created (QJsonDocument &reply) {
     string message;
     int code = Ocs_share_job.get_json_return_code (reply, message);
 
+
     /***********************************************************
     Before we had decent sharing capabilities on the server a 403 "generally"
     meant that a share was password protected
     ***********************************************************/
     if (code == 403) {
-        emit on_link_share_requires_password (message);
+        emit link_share_requires_password (message);
         return;
     }
 
     //Parse share
-    auto data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
+    var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
     unowned<Link_share> share (parse_link_share (data));
 
-    emit on_link_share_created (share);
+    emit link_share_created (share);
 
     update_folder (_account, share.path ());
 }
@@ -729,21 +762,21 @@ void Share_manager.create_share (string path,
     const string share_with,
     const Share.Permissions desired_permissions,
     const string password) {
-    auto job = new Ocs_share_job (_account);
+    var job = new Ocs_share_job (_account);
     connect (job, &Ocs_job.ocs_error, this, &Share_manager.on_ocs_error);
     connect (job, &Ocs_share_job.share_job_finished, this,
         [=] (QJsonDocument &reply) {
             // Find existing share permissions (if this was shared with us)
             Share.Permissions existing_permissions = Share_permission_default;
             foreach (QJsonValue &element, reply.object ()["ocs"].to_object ()["data"].to_array ()) {
-                auto map = element.to_object ();
+                var map = element.to_object ();
                 if (map["file_target"] == path)
                     existing_permissions = Share.Permissions (map["permissions"].to_int ());
             }
 
             // Limit the permissions we request for a share to the ones the item
             // was shared with initially.
-            auto valid_permissions = desired_permissions;
+            var valid_permissions = desired_permissions;
             if (valid_permissions == Share_permission_default) {
                 valid_permissions = existing_permissions;
             }
@@ -751,7 +784,7 @@ void Share_manager.create_share (string path,
                 valid_permissions &= existing_permissions;
             }
 
-            auto *job = new Ocs_share_job (_account);
+            var job = new Ocs_share_job (_account);
             connect (job, &Ocs_share_job.share_job_finished, this, &Share_manager.on_share_created);
             connect (job, &Ocs_job.ocs_error, this, &Share_manager.on_ocs_error);
             job.create_share (path, share_type, share_with, valid_permissions, password);
@@ -761,7 +794,7 @@ void Share_manager.create_share (string path,
 
 void Share_manager.on_share_created (QJsonDocument &reply) {
     //Parse share
-    auto data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
+    var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
     unowned<Share> share (parse_share (data));
 
     emit share_created (share);
@@ -770,23 +803,23 @@ void Share_manager.on_share_created (QJsonDocument &reply) {
 }
 
 void Share_manager.fetch_shares (string path) {
-    auto *job = new Ocs_share_job (_account);
+    var job = new Ocs_share_job (_account);
     connect (job, &Ocs_share_job.share_job_finished, this, &Share_manager.on_shares_fetched);
     connect (job, &Ocs_job.ocs_error, this, &Share_manager.on_ocs_error);
     job.on_get_shares (path);
 }
 
 void Share_manager.on_shares_fetched (QJsonDocument &reply) {
-    auto tmp_shares = reply.object ().value ("ocs").to_object ().value ("data").to_array ();
+    var tmp_shares = reply.object ().value ("ocs").to_object ().value ("data").to_array ();
     const string version_string = _account.server_version ();
     q_c_debug (lc_sharing) << version_string << "Fetched" << tmp_shares.count () << "shares";
 
     GLib.List<unowned<Share>> shares;
 
-    foreach (auto &share, tmp_shares) {
-        auto data = share.to_object ();
+    foreach (var &share, tmp_shares) {
+        var data = share.to_object ();
 
-        auto share_type = data.value ("share_type").to_int ();
+        var share_type = data.value ("share_type").to_int ();
 
         unowned<Share> new_share;
 
@@ -802,7 +835,7 @@ void Share_manager.on_shares_fetched (QJsonDocument &reply) {
     }
 
     q_c_debug (lc_sharing) << "Sending " << shares.count () << "shares";
-    emit on_shares_fetched (shares);
+    emit shares_fetched (shares);
 }
 
 unowned<User_group_share> Share_manager.parse_user_group_share (QJsonObject &data) {
@@ -891,6 +924,6 @@ unowned<Share> Share_manager.parse_share (QJsonObject &data) {
 }
 
 void Share_manager.on_ocs_error (int status_code, string message) {
-    emit on_server_error (status_code, message);
+    emit server_error (status_code, message);
 }
 }

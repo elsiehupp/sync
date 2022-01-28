@@ -39,6 +39,7 @@ class QProgress_indicator : Gtk.Widget {
 
     public QProgress_indicator (Gtk.Widget* parent = nullptr);
 
+
     /***********************************************************
     Returns the delay between animation steps.
     \return The number of milliseconds between animation steps. By default, the animation delay is set to 40 milliseconds.
@@ -48,6 +49,7 @@ class QProgress_indicator : Gtk.Widget {
         return m_delay;
     }
 
+
     /***********************************************************
     Returns a Boolean value indicating whether the component is currently animated.
     \return Animation state.
@@ -55,12 +57,14 @@ class QProgress_indicator : Gtk.Widget {
     ***********************************************************/
     public bool is_animated ();
 
+
     /***********************************************************
     Returns a Boolean value indicating whether the receiver shows itself even when it is not animating.
     \return Return true if the progress indicator shows itself even when it is not animating. By default, it returns false.
     \sa on_set_displayed_when_stopped
     ***********************************************************/
     public bool is_displayed_when_stopped ();
+
 
     /***********************************************************
     Returns the color of the component.
@@ -70,8 +74,10 @@ class QProgress_indicator : Gtk.Widget {
         return m_color;
     }
 
+
     public QSize size_hint () override;
     public int height_for_width (int w) override;
+
 
     /***********************************************************
     Starts the spin animation.
@@ -79,11 +85,13 @@ class QProgress_indicator : Gtk.Widget {
     ***********************************************************/
     public void on_start_animation ();
 
+
     /***********************************************************
     Stops the spin animation.
     \sa on_start_animation is_animated
     ***********************************************************/
     public void on_stop_animation ();
+
 
     /***********************************************************
     Sets the delay between animation steps.
@@ -93,12 +101,14 @@ class QProgress_indicator : Gtk.Widget {
     ***********************************************************/
     public void on_set_animation_delay (int delay);
 
+
     /***********************************************************
     Sets whether the component hides itself when it is not animating.
     \param state The animation state. Set false to hide the progress indicator when it is not animating; otherwise true.
     \sa is_displayed_when_stopped
     ***********************************************************/
     public void on_set_displayed_when_stopped (bool state);
+
 
     /***********************************************************
     Sets the color of the components to the given color.

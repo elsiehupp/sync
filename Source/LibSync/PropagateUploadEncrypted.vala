@@ -2,7 +2,6 @@
 
 // #include <string>
 // #include <QMap>
-// #include <GLib.ByteArray>
 // #include <QJsonDocument>
 // #include <QNetworkReply>
 // #include <QFile>
@@ -19,7 +18,7 @@ namespace Occ {
 
 /*
 This class is used if the server supports end to end encryption.
-It will fire for *any* folder, encrypted or not, because when the
+It will fire for any* folder, encrypted or not, because when the
 client starts the upload request we don't know if the folder is
 encrypted on the server.
 
@@ -31,7 +30,7 @@ folder_not_encrypted () if the file is within a folder that's not encrypted.
 
 class Propagate_upload_encrypted : GLib.Object {
 
-    public Propagate_upload_encrypted (OwncloudPropagator *propagator, string remote_parent_path, SyncFileItemPtr item, GLib.Object *parent = nullptr);
+    public Propagate_upload_encrypted (OwncloudPropagator propagator, string remote_parent_path, SyncFileItemPtr item, GLib.Object parent = nullptr);
     ~Propagate_upload_encrypted () override = default;
 
     public void on_start ();
@@ -50,7 +49,7 @@ class Propagate_upload_encrypted : GLib.Object {
 
 
     private void on_folder_encrypted_id_received (string[] &list);
-    private void on_folder_encrypted_id_error (QNetworkReply *r);
+    private void on_folder_encrypted_id_error (QNetworkReply r);
     private void on_folder_locked_successfully (GLib.ByteArray& file_id, GLib.ByteArray& token);
     private void on_folder_locked_error (GLib.ByteArray& file_id, int http_error_code);
     private void on_try_lock (GLib.ByteArray& file_id);
@@ -63,7 +62,7 @@ signals:
     // Emmited after the file is encrypted and everythign is setup.
     void finalized (string& path, string& filename, uint64 size);
     void error ();
-    void folder_unlocked (GLib.ByteArray &folder_id, int http_status);
+    void folder_unlocked (GLib.ByteArray folder_id, int http_status);
 
 
     private OwncloudPropagator _propagator;
@@ -87,7 +86,7 @@ signals:
 };
 
 
-  Propagate_upload_encrypted.Propagate_upload_encrypted (OwncloudPropagator *propagator, string remote_parent_path, SyncFileItemPtr item, GLib.Object *parent)
+  Propagate_upload_encrypted.Propagate_upload_encrypted (OwncloudPropagator propagator, string remote_parent_path, SyncFileItemPtr item, GLib.Object parent)
       : GLib.Object (parent)
       , _propagator (propagator)
       , _remote_parent_path (remote_parent_path)
@@ -96,16 +95,16 @@ signals:
   }
 
   void Propagate_upload_encrypted.on_start () {
-      const auto root_path = [=] () {
-          const auto result = _propagator.remote_path ();
+      const var root_path = [=] () {
+          const var result = _propagator.remote_path ();
           if (result.starts_with ('/')) {
               return result.mid (1);
           } else {
               return result;
           }
       } ();
-      const auto absolute_remote_parent_path = [=]{
-          auto path = string (root_path + _remote_parent_path);
+      const var absolute_remote_parent_path = [=]{
+          var path = string (root_path + _remote_parent_path);
           if (path.ends_with ('/')) {
               path.chop (1);
           }
@@ -123,7 +122,7 @@ signals:
       unlock the folder.
        */
       q_c_debug (lc_propagate_upload_encrypted) << "Folder is encrypted, let's get the Id from it.";
-      auto job = new LsColJob (_propagator.account (), absolute_remote_parent_path, this);
+      var job = new LsColJob (_propagator.account (), absolute_remote_parent_path, this);
       job.set_properties ({"resourcetype", "http://owncloud.org/ns:fileid"});
       connect (job, &LsColJob.directory_listing_subfolders, this, &Propagate_upload_encrypted.on_folder_encrypted_id_received);
       connect (job, &LsColJob.finished_with_error, this, &Propagate_upload_encrypted.on_folder_encrypted_id_error);
@@ -141,14 +140,14 @@ signals:
 
   void Propagate_upload_encrypted.on_folder_encrypted_id_received (string[] &list) {
     q_c_debug (lc_propagate_upload_encrypted) << "Received id of folder, trying to lock it so we can prepare the metadata";
-    auto job = qobject_cast<LsColJob> (sender ());
-    const auto& folder_info = job._folder_infos.value (list.first ());
+    var job = qobject_cast<LsColJob> (sender ());
+    const var& folder_info = job._folder_infos.value (list.first ());
     _folder_lock_first_try.on_start ();
     on_try_lock (folder_info.file_id);
   }
 
   void Propagate_upload_encrypted.on_try_lock (GLib.ByteArray& file_id) {
-    auto *lock_job = new LockEncryptFolderApiJob (_propagator.account (), file_id, this);
+    var lock_job = new LockEncryptFolderApiJob (_propagator.account (), file_id, this);
     connect (lock_job, &LockEncryptFolderApiJob.on_success, this, &Propagate_upload_encrypted.on_folder_locked_successfully);
     connect (lock_job, &LockEncryptFolderApiJob.error, this, &Propagate_upload_encrypted.on_folder_locked_error);
     lock_job.on_start ();
@@ -162,7 +161,7 @@ signals:
     _folder_id = file_id;
     _is_folder_locked = true;
 
-    auto job = new GetMetadataApiJob (_propagator.account (), _folder_id);
+    var job = new GetMetadataApiJob (_propagator.account (), _folder_id);
     connect (job, &GetMetadataApiJob.json_received,
             this, &Propagate_upload_encrypted.on_folder_encrypted_metadata_received);
     connect (job, &GetMetadataApiJob.error,
@@ -177,7 +176,7 @@ signals:
       q_c_debug (lc_propagate_upload_encrypted ()) << "Error Getting the encrypted metadata. Pretend we got empty metadata.";
       FolderMetadata empty_metadata (_propagator.account ());
       empty_metadata.encrypted_metadata ();
-      auto json = QJsonDocument.from_json (empty_metadata.encrypted_metadata ());
+      var json = QJsonDocument.from_json (empty_metadata.encrypted_metadata ());
       on_folder_encrypted_metadata_received (json, http_return_code);
   }
 
@@ -211,8 +210,8 @@ signals:
         encrypted_file.metadata_key = 1;
         encrypted_file.original_filename = file_name;
 
-        QMimeDatabase mdb;
-        encrypted_file.mimetype = mdb.mime_type_for_file (info).name ().to_local8Bit ();
+        QMimeDatabase mdatabase;
+        encrypted_file.mimetype = mdatabase.mime_type_for_file (info).name ().to_local8Bit ();
 
         // Other clients expect "httpd/unix-directory" instead of "inode/directory"
         // Doesn't matter much for us since we don't do much about that mimetype anyway
@@ -257,14 +256,14 @@ signals:
     q_c_debug (lc_propagate_upload_encrypted) << "Metadata created, sending to the server.";
 
     if (status_code == 404) {
-      auto job = new StoreMetaDataApiJob (_propagator.account (),
+      var job = new StoreMetaDataApiJob (_propagator.account (),
                                          _folder_id,
                                          _metadata.encrypted_metadata ());
       connect (job, &StoreMetaDataApiJob.on_success, this, &Propagate_upload_encrypted.on_update_metadata_success);
       connect (job, &StoreMetaDataApiJob.error, this, &Propagate_upload_encrypted.on_update_metadata_error);
       job.on_start ();
     } else {
-      auto job = new UpdateMetadataApiJob (_propagator.account (),
+      var job = new UpdateMetadataApiJob (_propagator.account (),
                                         _folder_id,
                                         _metadata.encrypted_metadata (),
                                         _folder_token);
@@ -317,7 +316,7 @@ signals:
       q_c_debug (lc_propagate_upload_encrypted) << "Folder" << file_id << "Coundn't be locked.";
   }
 
-  void Propagate_upload_encrypted.on_folder_encrypted_id_error (QNetworkReply *r) {
+  void Propagate_upload_encrypted.on_folder_encrypted_id_error (QNetworkReply r) {
       Q_UNUSED (r);
       q_c_debug (lc_propagate_upload_encrypted) << "Error retrieving the Id of the encrypted folder.";
   }
@@ -333,10 +332,10 @@ signals:
       _is_unlock_running = true;
 
       q_debug () << "Calling Unlock";
-      auto *unlock_job = new UnlockEncryptFolderApiJob (_propagator.account (),
+      var unlock_job = new UnlockEncryptFolderApiJob (_propagator.account (),
           _folder_id, _folder_token, this);
 
-      connect (unlock_job, &UnlockEncryptFolderApiJob.on_success, [this] (GLib.ByteArray &folder_id) {
+      connect (unlock_job, &UnlockEncryptFolderApiJob.on_success, [this] (GLib.ByteArray folder_id) {
           q_debug () << "Successfully Unlocked";
           _folder_token = "";
           _folder_id = "";
@@ -345,7 +344,7 @@ signals:
           emit folder_unlocked (folder_id, 200);
           _is_unlock_running = false;
       });
-      connect (unlock_job, &UnlockEncryptFolderApiJob.error, [this] (GLib.ByteArray &folder_id, int http_status) {
+      connect (unlock_job, &UnlockEncryptFolderApiJob.error, [this] (GLib.ByteArray folder_id, int http_status) {
           q_debug () << "Unlock Error";
 
           emit folder_unlocked (folder_id, http_status);

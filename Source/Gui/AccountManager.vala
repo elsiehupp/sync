@@ -39,13 +39,15 @@ namespace {
 ***********************************************************/
 class AccountManager : GLib.Object {
 
-    public static AccountManager *instance ();
+    public static AccountManager instance ();
     ~AccountManager () override = default;
+
 
     /***********************************************************
     Saves the accounts to a given settings file
     ***********************************************************/
     public void save (bool save_credentials = true);
+
 
     /***********************************************************
     Creates account objects from a given settings file.
@@ -55,16 +57,19 @@ class AccountManager : GLib.Object {
     ***********************************************************/
     public bool restore ();
 
+
     /***********************************************************
     Add this account in the list of saved accounts.
     Typically called from the wizard
     ***********************************************************/
-    public AccountState *add_account (AccountPtr &new_account);
+    public AccountState add_account (AccountPtr &new_account);
+
 
     /***********************************************************
     remove all accounts
     ***********************************************************/
     public void shutdown ();
+
 
     /***********************************************************
     Return a list of all accounts.
@@ -73,22 +78,26 @@ class AccountManager : GLib.Object {
     ***********************************************************/
     public GLib.List<AccountStatePtr> accounts ();
 
+
     /***********************************************************
     Return the account state pointer for an account identified
     by its display name
     ***********************************************************/
     public AccountStatePtr account (string name);
 
+
     /***********************************************************
     Delete the AccountState
     ***********************************************************/
-    public void delete_account (AccountState *account);
+    public void delete_account (AccountState account);
+
 
     /***********************************************************
     Creates an account and sets up some basic handlers.
-    Does *not* add the account to the account manager just yet.
+    Does not* add the account to the account manager just yet.
     ***********************************************************/
     public static AccountPtr create_account ();
+
 
     /***********************************************************
     Returns the list of settings keys that can't be read because
@@ -98,7 +107,7 @@ class AccountManager : GLib.Object {
 
 
     // saving and loading Account to settings
-    private void save_account_helper (Account *account, QSettings &settings, bool save_credentials = true);
+    private void save_account_helper (Account account, QSettings &settings, bool save_credentials = true);
     private AccountPtr load_account_helper (QSettings &settings);
 
     private bool restore_from_legacy_settings ();
@@ -107,7 +116,7 @@ class AccountManager : GLib.Object {
     private string generate_free_account_id ();
 
     // Adds an account to the tracked list, emitting on_account_added ()
-    private void add_account_state (AccountState *account_state);
+    private void add_account_state (AccountState account_state);
 
     private AccountManager () = default;
     private GLib.List<AccountStatePtr> _accounts;
@@ -116,19 +125,19 @@ class AccountManager : GLib.Object {
 
 
     /// Saves account data, not including the credentials
-    public void on_save_account (Account *a);
+    public void on_save_account (Account a);
 
     /// Saves account state data, not including the account
-    public void on_save_account_state (AccountState *a);
+    public void on_save_account_state (AccountState a);
 
     /// Display a Box with the mnemonic so the user can copy it to a safe place.
     public static void on_display_mnemonic (string& mnemonic);
 
 signals:
-    void on_account_added (AccountState *account);
-    void on_account_removed (AccountState *account);
-    void account_sync_connection_removed (AccountState *account);
-    void remove_account_folders (AccountState *account);
+    void on_account_added (AccountState account);
+    void on_account_removed (AccountState account);
+    void account_sync_connection_removed (AccountState account);
+    void remove_account_folders (AccountState account);
 };
 
 
@@ -142,7 +151,7 @@ signals:
         string[] skip_settings_keys;
         backward_migration_settings_keys (&skip_settings_keys, &skip_settings_keys);
 
-        auto settings = ConfigFile.settings_with_group (QLatin1String (accounts_c));
+        var settings = ConfigFile.settings_with_group (QLatin1String (accounts_c));
         if (settings.status () != QSettings.NoError || !settings.is_writable ()) {
             q_c_warning (lc_account_manager) << "Could not read settings from" << settings.file_name ()
                                         << settings.status ();
@@ -162,13 +171,13 @@ signals:
             return true;
         }
 
-        for (auto &account_id : settings.child_groups ()) {
+        for (var &account_id : settings.child_groups ()) {
             settings.begin_group (account_id);
             if (!skip_settings_keys.contains (settings.group ())) {
-                if (auto acc = load_account_helper (*settings)) {
+                if (var acc = load_account_helper (*settings)) {
                     acc._id = account_id;
-                    if (auto acc_state = AccountState.load_from_settings (acc, *settings)) {
-                        auto jar = qobject_cast<CookieJar> (acc._am.cookie_jar ());
+                    if (var acc_state = AccountState.load_from_settings (acc, *settings)) {
+                        var jar = qobject_cast<CookieJar> (acc._am.cookie_jar ());
                         ASSERT (jar);
                         if (jar)
                             jar.restore (acc.cookie_jar_path ());
@@ -186,10 +195,10 @@ signals:
     }
 
     void AccountManager.backward_migration_settings_keys (string[] *delete_keys, string[] *ignore_keys) {
-        auto settings = ConfigFile.settings_with_group (QLatin1String (accounts_c));
+        var settings = ConfigFile.settings_with_group (QLatin1String (accounts_c));
         const int accounts_version = settings.value (QLatin1String (version_c)).to_int ();
         if (accounts_version <= max_accounts_version) {
-            foreach (auto &account_id, settings.child_groups ()) {
+            foreach (var &account_id, settings.child_groups ()) {
                 settings.begin_group (account_id);
                 const int account_version = settings.value (QLatin1String (version_c), 1).to_int ();
                 if (account_version > max_account_version) {
@@ -207,7 +216,7 @@ signals:
                                  << Theme.instance ().app_name ();
 
         // try to open the correctly themed settings
-        auto settings = ConfigFile.settings_with_group (Theme.instance ().app_name ());
+        var settings = ConfigFile.settings_with_group (Theme.instance ().app_name ());
 
         // if the settings file could not be opened, the child_keys list is empty
         // then try to load settings from a very old place
@@ -250,7 +259,7 @@ signals:
 
         // Try to load the single account.
         if (!settings.child_keys ().is_empty ()) {
-            if (auto acc = load_account_helper (*settings)) {
+            if (var acc = load_account_helper (*settings)) {
                 add_account (acc);
                 return true;
             }
@@ -259,9 +268,9 @@ signals:
     }
 
     void AccountManager.save (bool save_credentials) {
-        auto settings = ConfigFile.settings_with_group (QLatin1String (accounts_c));
+        var settings = ConfigFile.settings_with_group (QLatin1String (accounts_c));
         settings.set_value (QLatin1String (version_c), max_accounts_version);
-        for (auto &acc : q_as_const (_accounts)) {
+        for (var &acc : q_as_const (_accounts)) {
             settings.begin_group (acc.account ().id ());
             save_account_helper (acc.account ().data (), *settings, save_credentials);
             acc.write_to_settings (*settings);
@@ -272,9 +281,9 @@ signals:
         q_c_info (lc_account_manager) << "Saved all account settings, status:" << settings.status ();
     }
 
-    void AccountManager.on_save_account (Account *a) {
+    void AccountManager.on_save_account (Account a) {
         q_c_debug (lc_account_manager) << "Saving account" << a.url ().to_string ();
-        auto settings = ConfigFile.settings_with_group (QLatin1String (accounts_c));
+        var settings = ConfigFile.settings_with_group (QLatin1String (accounts_c));
         settings.begin_group (a.id ());
         save_account_helper (a, *settings, false); // don't save credentials they might not have been loaded yet
         settings.end_group ();
@@ -283,9 +292,9 @@ signals:
         q_c_debug (lc_account_manager) << "Saved account settings, status:" << settings.status ();
     }
 
-    void AccountManager.on_save_account_state (AccountState *a) {
+    void AccountManager.on_save_account_state (AccountState a) {
         q_c_debug (lc_account_manager) << "Saving account state" << a.account ().url ().to_string ();
-        auto settings = ConfigFile.settings_with_group (QLatin1String (accounts_c));
+        var settings = ConfigFile.settings_with_group (QLatin1String (accounts_c));
         settings.begin_group (a.account ().id ());
         a.write_to_settings (*settings);
         settings.end_group ();
@@ -294,7 +303,7 @@ signals:
         q_c_debug (lc_account_manager) << "Saved account state settings, status:" << settings.status ();
     }
 
-    void AccountManager.save_account_helper (Account *acc, QSettings &settings, bool save_credentials) {
+    void AccountManager.save_account_helper (Account acc, QSettings &settings, bool save_credentials) {
         settings.set_value (QLatin1String (version_c), max_account_version);
         settings.set_value (QLatin1String (url_c), acc._url.to_string ());
         settings.set_value (QLatin1String (dav_user_c), acc._dav_user);
@@ -307,7 +316,7 @@ signals:
                 // re-persisting them)
                 acc._credentials.persist ();
             }
-            for (auto &key : acc._settings_map.keys ()) {
+            for (var &key : acc._settings_map.keys ()) {
                 settings.set_value (key, acc._settings_map.value (key));
             }
             settings.set_value (QLatin1String (auth_type_c), acc._credentials.auth_type ());
@@ -321,7 +330,7 @@ signals:
         settings.begin_group (QLatin1String ("General"));
         q_c_info (lc_account_manager) << "Saving " << acc.approved_certs ().count () << " unknown certs.";
         GLib.ByteArray certs;
-        for (auto &cert : acc.approved_certs ()) {
+        for (var &cert : acc.approved_certs ()) {
             certs += cert.to_pem () + '\n';
         }
         if (!certs.is_empty ()) {
@@ -331,7 +340,7 @@ signals:
 
         // Save cookies.
         if (acc._am) {
-            auto *jar = qobject_cast<CookieJar> (acc._am.cookie_jar ());
+            var jar = qobject_cast<CookieJar> (acc._am.cookie_jar ());
             if (jar) {
                 q_c_info (lc_account_manager) << "Saving cookies." << acc.cookie_jar_path ();
                 if (!jar.save (acc.cookie_jar_path ())) {
@@ -342,14 +351,14 @@ signals:
     }
 
     AccountPtr AccountManager.load_account_helper (QSettings &settings) {
-        auto url_config = settings.value (QLatin1String (url_c));
+        var url_config = settings.value (QLatin1String (url_c));
         if (!url_config.is_valid ()) {
             // No URL probably means a corrupted entry in the account settings
             q_c_warning (lc_account_manager) << "No URL for account " << settings.group ();
             return AccountPtr ();
         }
 
-        auto acc = create_account ();
+        var acc = create_account ();
 
         string auth_type = settings.value (QLatin1String (auth_type_c)).to_string ();
 
@@ -382,7 +391,7 @@ signals:
             for (string key : settings.child_keys ()) {
                 if (!key.starts_with ("http_"))
                     continue;
-                auto newkey = string.from_latin1 ("webflow_").append (key.mid (5));
+                var newkey = string.from_latin1 ("webflow_").append (key.mid (5));
                 settings.set_value (newkey, settings.value ( (key)));
                 settings.remove (key);
             }
@@ -396,7 +405,7 @@ signals:
         // We want to only restore settings for that auth type and the user value
         acc._settings_map.insert (QLatin1String (user_c), settings.value (user_c));
         string auth_type_prefix = auth_type + "_";
-        for (auto &key : settings.child_keys ()) {
+        for (var &key : settings.child_keys ()) {
             if (!key.starts_with (auth_type_prefix))
                 continue;
             acc._settings_map.insert (key, settings.value (key));
@@ -406,7 +415,7 @@ signals:
 
         // now the server cert, it is in the general group
         settings.begin_group (QLatin1String ("General"));
-        const auto certs = QSslCertificate.from_data (settings.value (ca_certs_key_c).to_byte_array ());
+        const var certs = QSslCertificate.from_data (settings.value (ca_certs_key_c).to_byte_array ());
         q_c_info (lc_account_manager) << "Restored : " << certs.count () << " unknown certs.";
         acc.set_approved_certs (certs);
         settings.end_group ();
@@ -415,37 +424,37 @@ signals:
     }
 
     AccountStatePtr AccountManager.account (string name) {
-        const auto it = std.find_if (_accounts.cbegin (), _accounts.cend (), [name] (auto &acc) {
+        const var it = std.find_if (_accounts.cbegin (), _accounts.cend (), [name] (var &acc) {
             return acc.account ().display_name () == name;
         });
         return it != _accounts.cend () ? *it : AccountStatePtr ();
     }
 
     AccountState *AccountManager.add_account (AccountPtr &new_account) {
-        auto id = new_account.id ();
+        var id = new_account.id ();
         if (id.is_empty () || !is_account_id_available (id)) {
             id = generate_free_account_id ();
         }
         new_account._id = id;
 
-        auto new_account_state = new AccountState (new_account);
+        var new_account_state = new AccountState (new_account);
         add_account_state (new_account_state);
         return new_account_state;
     }
 
-    void AccountManager.delete_account (AccountState *account) {
-        auto it = std.find (_accounts.begin (), _accounts.end (), account);
+    void AccountManager.delete_account (AccountState account) {
+        var it = std.find (_accounts.begin (), _accounts.end (), account);
         if (it == _accounts.end ()) {
             return;
         }
-        auto copy = *it; // keep a reference to the shared pointer so it does not delete it just yet
+        var copy = *it; // keep a reference to the shared pointer so it does not delete it just yet
         _accounts.erase (it);
 
         // Forget account credentials, cookies
         account.account ().credentials ().forget_sensitive_data ();
         QFile.remove (account.account ().cookie_jar_path ());
 
-        auto settings = ConfigFile.settings_with_group (QLatin1String (accounts_c));
+        var settings = ConfigFile.settings_with_group (QLatin1String (accounts_c));
         settings.remove (account.account ().id ());
 
         // Forget E2E keys
@@ -454,7 +463,7 @@ signals:
         account.account ().delete_app_token ();
 
         emit account_sync_connection_removed (account);
-        emit on_account_removed (account);
+        emit account_removed (account);
     }
 
     AccountPtr AccountManager.create_account () {
@@ -467,7 +476,7 @@ signals:
     }
 
     void AccountManager.on_display_mnemonic (string& mnemonic) {
-        auto *widget = new Gtk.Dialog;
+        var widget = new Gtk.Dialog;
         Ui_Dialog ui;
         ui.setup_ui (widget);
         widget.set_window_title (tr ("End to end encryption mnemonic"));
@@ -483,10 +492,10 @@ signals:
     }
 
     void AccountManager.shutdown () {
-        const auto accounts_copy = _accounts;
+        const var accounts_copy = _accounts;
         _accounts.clear ();
-        for (auto &acc : accounts_copy) {
-            emit on_account_removed (acc.data ());
+        for (var &acc : accounts_copy) {
+            emit account_removed (acc.data ());
             emit remove_account_folders (acc.data ());
         }
     }
@@ -499,7 +508,7 @@ signals:
         if (_additional_blocked_account_ids.contains (id))
             return false;
 
-        return std.none_of (_accounts.cbegin (), _accounts.cend (), [id] (auto &acc) {
+        return std.none_of (_accounts.cbegin (), _accounts.cend (), [id] (var &acc) {
             return acc.account ().id () == id;
         });
     }
@@ -515,14 +524,14 @@ signals:
         }
     }
 
-    void AccountManager.add_account_state (AccountState *account_state) {
+    void AccountManager.add_account_state (AccountState account_state) {
         GLib.Object.connect (account_state.account ().data (),
             &Account.wants_account_saved,
             this, &AccountManager.on_save_account);
 
         AccountStatePtr ptr (account_state);
         _accounts << ptr;
-        emit on_account_added (account_state);
+        emit account_added (account_state);
     }
     }
     

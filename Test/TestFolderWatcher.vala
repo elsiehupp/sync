@@ -53,7 +53,7 @@ class TestFolderWatcher : GLib.Object {
         while (t.elapsed () < 5000) {
             // Check if it was already reported as changed by the watcher
             for (int i = 0; i < _pathChangedSpy.size (); ++i) {
-                const auto &args = _pathChangedSpy.at (i);
+                const var &args = _pathChangedSpy.at (i);
                 if (args.first ().toString () == path)
                     return true;
             }
@@ -89,9 +89,10 @@ const int CHECK_WATCH_COUNT (n) do {} while (false)
         _pathChangedSpy.on_reset (new QSignalSpy (_watcher.data (), SIGNAL (pathChanged (string))));
     }
 
+
     public int countFolders (string path) {
         int n = 0;
-        for (auto &sub : QDir (path).entryList (QDir.Dirs | QDir.NoDotAndDotDot))
+        for (var &sub : QDir (path).entryList (QDir.Dirs | QDir.NoDotAndDotDot))
             n += 1 + countFolders (path + '/' + sub);
         return n;
     }

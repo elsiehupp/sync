@@ -24,11 +24,16 @@
 
 class OWNCLOUDDOLPHINPLUGINHELPER_EXPORT OwncloudDolphinPluginHelper : GLib.Object {
 
-    public static OwncloudDolphinPluginHelper *instance ();
+    public static OwncloudDolphinPluginHelper instance ();
 
     public bool isConnected ();
-    public void sendCommand (char *data);
+
+
+    public void sendCommand (char data);
+
+
     public QVector<string> paths () { return _paths; }
+
 
     public string contextMenuTitle () {
         return _strings.value ("CONTEXT_MENU_TITLE", APPLICATION_NAME);
@@ -40,13 +45,15 @@ class OWNCLOUDDOLPHINPLUGINHELPER_EXPORT OwncloudDolphinPluginHelper : GLib.Obje
         return _strings.value ("CONTEXT_MENU_ICON", APPLICATION_ICON_NAME);
     }
 
-    public string copyPrivateLinkTitle () { return _strings["COPY_PRIVATE_LINK_MENU_TITLE"]; }
-    public string emailPrivateLinkTitle () { return _strings["EMAIL_PRIVATE_LINK_MENU_TITLE"]; }
 
+    public string copyPrivateLinkTitle () { return _strings["COPY_PRIVATE_LINK_MENU_TITLE"]; }}
+
+
+    public
     public GLib.ByteArray version () { return _version; }
 
 signals:
-    void commandRecieved (GLib.ByteArray &cmd);
+    void commandRecieved (GLib.ByteArray cmd);
 
     protected void timerEvent (QTimerEvent*) override;
 
@@ -110,7 +117,7 @@ OwncloudDolphinPluginHelper.OwncloudDolphinPluginHelper () {
     tryConnect ();
 }
 
-void OwncloudDolphinPluginHelper.timerEvent (QTimerEvent *e) {
+void OwncloudDolphinPluginHelper.timerEvent (QTimerEvent e) {
     if (e.timerId () == _connectTimer.timerId ()) {
         tryConnect ();
         return;
@@ -158,19 +165,19 @@ void OwncloudDolphinPluginHelper.slotReadyRead () {
             continue;
 
         if (line.startsWith ("REGISTER_PATH:")) {
-            auto col = line.indexOf (':');
+            var col = line.indexOf (':');
             string file = string.fromUtf8 (line.constData () + col + 1, line.size () - col - 1);
             _paths.append (file);
             continue;
         } else if (line.startsWith ("STRING:")) {
-            auto args = string.fromUtf8 (line).split (QLatin1Char (':'));
+            var args = string.fromUtf8 (line).split (QLatin1Char (':'));
             if (args.size () >= 3) {
                 _strings[args[1]] = args.mid (2).join (QLatin1Char (':'));
             }
             continue;
         } else if (line.startsWith ("VERSION:")) {
-            auto args = line.split (':');
-            auto version = args.value (2);
+            var args = line.split (':');
+            var version = args.value (2);
             _version = version;
             if (!version.startsWith ("1.")) {
                 // Incompatible version, disconnect forever

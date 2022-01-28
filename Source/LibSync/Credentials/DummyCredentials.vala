@@ -13,9 +13,9 @@ class DummyCredentials : AbstractCredentials {
     public string auth_type () override;
     public string user () override;
     public string password () override;
-    public QNetworkAccessManager *create_qNAM () override;
+    public QNetworkAccessManager create_qNAM () override;
     public bool ready () override;
-    public bool still_valid (QNetworkReply *reply) override;
+    public bool still_valid (QNetworkReply reply) override;
     public void fetch_from_keychain () override;
     public void ask_from_user () override;
     public void persist () override;
@@ -44,7 +44,7 @@ class DummyCredentials : AbstractCredentials {
         return true;
     }
 
-    bool DummyCredentials.still_valid (QNetworkReply *reply) {
+    bool DummyCredentials.still_valid (QNetworkReply reply) {
         Q_UNUSED (reply)
         return true;
     }

@@ -58,7 +58,7 @@ Here follows the state machine
 ***********************************************************/
 class UserInfo : GLib.Object {
 
-    public UserInfo (Occ.AccountState *account_state, bool allow_disconnected_account_state, bool fetch_avatar_image, GLib.Object *parent = nullptr);
+    public UserInfo (Occ.AccountState account_state, bool allow_disconnected_account_state, bool fetch_avatar_image, GLib.Object parent = nullptr);
 
     public int64 last_quota_total_bytes () {
         return _last_quota_total_bytes;
@@ -66,6 +66,7 @@ class UserInfo : GLib.Object {
     public int64 last_quota_used_bytes () {
         return _last_quota_used_bytes;
     }
+
 
     /***********************************************************
     When the quotainfo is active, it requests the quota at regular interval.
@@ -85,7 +86,7 @@ class UserInfo : GLib.Object {
 
 signals:
     void quota_updated (int64 total, int64 used);
-    void fetched_last_info (UserInfo *user_info);
+    void fetched_last_info (UserInfo user_info);
 
 
     private bool can_get_info ();
@@ -109,7 +110,7 @@ signals:
         static const int fail_interval_t = 5 * 1000;
     }
 
-    UserInfo.UserInfo (AccountState *account_state, bool allow_disconnected_account_state, bool fetch_avatar_image, GLib.Object *parent)
+    UserInfo.UserInfo (AccountState account_state, bool allow_disconnected_account_state, bool fetch_avatar_image, GLib.Object parent)
         : GLib.Object (parent)
         , _account_state (account_state)
         , _allow_disconnected_account_state (allow_disconnected_account_state)
@@ -132,7 +133,7 @@ signals:
         if (can_get_info ()) {
             // Obviously assumes there will never be more than thousand of hours between last info
             // received and now, hence why we static_cast
-            auto elapsed = static_cast<int> (_last_info_received.msecs_to (QDateTime.current_date_time ()));
+            var elapsed = static_cast<int> (_last_info_received.msecs_to (QDateTime.current_date_time ()));
             if (_last_info_received.is_null () || elapsed >= default_interval_t) {
                 on_fetch_info ();
             } else {
@@ -178,7 +179,7 @@ signals:
     }
 
     void UserInfo.on_update_last_info (QJsonDocument &json) {
-        auto obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
+        var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
 
         AccountPtr account = _account_state.account ();
 
@@ -193,7 +194,7 @@ signals:
         }
 
         // Quota
-        auto obj_quota = obj_data.value ("quota").to_object ();
+        var obj_quota = obj_data.value ("quota").to_object ();
         int64 used = obj_quota.value ("used").to_double ();
         int64 total = obj_quota.value ("quota").to_double ();
 
@@ -208,7 +209,7 @@ signals:
 
         // Avatar Image
         if (_fetch_avatar_image) {
-            auto *job = new AvatarJob (account, account.dav_user (), 128, this);
+            var job = new AvatarJob (account, account.dav_user (), 128, this);
             job.on_set_timeout (20 * 1000);
             GLib.Object.connect (job, &AvatarJob.avatar_pixmap, this, &UserInfo.on_avatar_image);
             job.on_start ();

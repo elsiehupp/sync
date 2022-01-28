@@ -19,9 +19,9 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 
 namespace {
     string create_random_password () {
-        const auto words = Occ.Word_list.get_random_words (10);
+        const var words = Occ.Word_list.get_random_words (10);
 
-        const auto add_first_letter = [] (string current, string next) . string {
+        const var add_first_letter = [] (string current, string next) . string {
             return current + next.at (0);
         };
 
@@ -43,16 +43,16 @@ class Share_dialog : Gtk.Dialog {
         const string share_path,
         const string local_path,
         Share_permissions max_sharing_permissions,
-        const GLib.ByteArray &numeric_file_id,
+        const GLib.ByteArray numeric_file_id,
         Share_dialog_start_page start_page,
-        Gtk.Widget *parent = nullptr);
+        Gtk.Widget parent = nullptr);
     ~Share_dialog () override;
 
 
     private void on_done (int r) override;
     private void on_propfind_received (QVariantMap &result);
     private void on_propfind_error ();
-    private void on_thumbnail_fetched (int &status_code, GLib.ByteArray &reply);
+    private void on_thumbnail_fetched (int &status_code, GLib.ByteArray reply);
     private void on_account_state_changed (int state);
 
     private void on_shares_fetched (GLib.List<unowned<Share>> &shares);
@@ -73,7 +73,7 @@ signals:
 
 
     private void show_sharing_ui ();
-    private Share_link_widget *add_link_share_widget (unowned<Link_share> &link_share);
+    private Share_link_widget add_link_share_widget (unowned<Link_share> &link_share);
     private void init_link_share_widget ();
 
     private Ui.Share_dialog _ui;
@@ -99,9 +99,9 @@ signals:
         const string share_path,
         const string local_path,
         Share_permissions max_sharing_permissions,
-        const GLib.ByteArray &numeric_file_id,
+        const GLib.ByteArray numeric_file_id,
         Share_dialog_start_page start_page,
-        Gtk.Widget *parent)
+        Gtk.Widget parent)
         : Gtk.Dialog (parent)
         , _ui (new Ui.Share_dialog)
         , _account_state (account_state)
@@ -123,7 +123,7 @@ signals:
         QFileInfo f_info (_local_path);
         QFile_icon_provider icon_provider;
         QIcon icon = icon_provider.icon (f_info);
-        auto pixmap = icon.pixmap (thumbnail_size, thumbnail_size);
+        var pixmap = icon.pixmap (thumbnail_size, thumbnail_size);
         if (pixmap.width () > 0) {
             _ui.label_icon.set_pixmap (pixmap);
         }
@@ -161,12 +161,12 @@ signals:
         }
 
         if (QFileInfo (_local_path).is_file ()) {
-            auto *job = new Thumbnail_job (_share_path, _account_state.account (), this);
+            var job = new Thumbnail_job (_share_path, _account_state.account (), this);
             connect (job, &Thumbnail_job.job_finished, this, &Share_dialog.on_thumbnail_fetched);
             job.on_start ();
         }
 
-        auto job = new PropfindJob (account_state.account (), _share_path);
+        var job = new PropfindJob (account_state.account (), _share_path);
         job.set_properties (
             GLib.List<GLib.ByteArray> ()
             << "http://open-collaboration-services.org/ns:share-permissions"
@@ -197,7 +197,7 @@ signals:
     Share_link_widget *Share_dialog.add_link_share_widget (unowned<Link_share> &link_share) {
         _link_widget_list.append (new Share_link_widget (_account_state.account (), _share_path, _local_path, _max_sharing_permissions, this));
 
-        const auto link_share_widget = _link_widget_list.at (_link_widget_list.size () - 1);
+        const var link_share_widget = _link_widget_list.at (_link_widget_list.size () - 1);
         link_share_widget.set_link_share (link_share);
 
         connect (link_share.data (), &Share.on_server_error, link_share_widget, &Share_link_widget.on_server_error);
@@ -247,7 +247,7 @@ signals:
 
     void Share_dialog.on_add_link_share_widget (unowned<Link_share> &link_share) {
         emit toggle_share_link_animation (true);
-        const auto added_link_share_widget = add_link_share_widget (link_share);
+        const var added_link_share_widget = add_link_share_widget (link_share);
         init_link_share_widget ();
         if (link_share.is_password_set ()) {
             added_link_share_widget.on_focus_password_line_edit ();
@@ -260,7 +260,7 @@ signals:
 
         const string version_string = _account_state.account ().server_version ();
         q_c_info (lc_sharing) << version_string << "Fetched" << shares.count () << "shares";
-        foreach (auto share, shares) {
+        foreach (var share, shares) {
             if (share.get_share_type () != Share.Type_link || share.get_uid_owner () != share.account ().dav_user ()) {
                 continue;
             }
@@ -299,8 +299,8 @@ signals:
             _max_sharing_permissions = static_cast<Share_permissions> (received_permissions.to_int ());
             q_c_info (lc_sharing) << "Received sharing permissions for" << _share_path << _max_sharing_permissions;
         }
-        auto private_link_url = result["privatelink"].to_string ();
-        auto numeric_file_id = result["fileid"].to_byte_array ();
+        var private_link_url = result["privatelink"].to_string ();
+        var numeric_file_id = result["fileid"].to_byte_array ();
         if (!private_link_url.is_empty ()) {
             q_c_info (lc_sharing) << "Received private link url for" << _share_path << private_link_url;
             _private_link_url = private_link_url;
@@ -321,14 +321,14 @@ signals:
     }
 
     void Share_dialog.show_sharing_ui () {
-        auto theme = Theme.instance ();
+        var theme = Theme.instance ();
 
         // There's no difference between being unable to reshare and
         // being unable to reshare with reshare permission.
         bool can_reshare = _max_sharing_permissions & Share_permission_share;
 
         if (!can_reshare) {
-            auto label = new QLabel (this);
+            var label = new QLabel (this);
             label.on_set_text (tr ("The file cannot be shared because it does not have sharing permission."));
             label.set_word_wrap (true);
             _ui.vertical_layout.insert_widget (1, label);
@@ -359,14 +359,14 @@ signals:
 
     void Share_dialog.on_create_link_share () {
         if (_manager) {
-            const auto ask_optional_password = _account_state.account ().capabilities ().share_public_link_ask_optional_password ();
-            const auto password = ask_optional_password ? create_random_password () : string ();
+            const var ask_optional_password = _account_state.account ().capabilities ().share_public_link_ask_optional_password ();
+            const var password = ask_optional_password ? create_random_password () : string ();
             _manager.create_link_share (_share_path, string (), password);
         }
     }
 
     void Share_dialog.on_create_password_for_link_share (string password) {
-        const auto share_link_widget = qobject_cast<Share_link_widget> (sender ());
+        const var share_link_widget = qobject_cast<Share_link_widget> (sender ());
         Q_ASSERT (share_link_widget);
         if (share_link_widget) {
             connect (_manager, &Share_manager.on_link_share_requires_password, share_link_widget, &Share_link_widget.on_create_share_requires_password);
@@ -378,7 +378,7 @@ signals:
     }
 
     void Share_dialog.on_create_password_for_link_share_processed () {
-        const auto share_link_widget = qobject_cast<Share_link_widget> (sender ());
+        const var share_link_widget = qobject_cast<Share_link_widget> (sender ());
         Q_ASSERT (share_link_widget);
         if (share_link_widget) {
             disconnect (_manager, &Share_manager.on_link_share_requires_password, share_link_widget, &Share_link_widget.on_create_share_requires_password);
@@ -410,14 +410,14 @@ signals:
     }
 
     void Share_dialog.on_delete_share () {
-        auto sharelink_widget = dynamic_cast<Share_link_widget> (sender ());
+        var sharelink_widget = dynamic_cast<Share_link_widget> (sender ());
         sharelink_widget.hide ();
         _ui.vertical_layout.remove_widget (sharelink_widget);
         _link_widget_list.remove_all (sharelink_widget);
         init_link_share_widget ();
     }
 
-    void Share_dialog.on_thumbnail_fetched (int &status_code, GLib.ByteArray &reply) {
+    void Share_dialog.on_thumbnail_fetched (int &status_code, GLib.ByteArray reply) {
         if (status_code != 200) {
             q_c_warning (lc_sharing) << "Thumbnail status code : " << status_code;
             return;
@@ -439,13 +439,13 @@ signals:
         }
 
         if (_link_widget_list.size () > 0){
-            foreach (Share_link_widget *widget, _link_widget_list){
+            foreach (Share_link_widget widget, _link_widget_list){
                 widget.set_enabled (state);
             }
         }
     }
 
-    void Share_dialog.change_event (QEvent *e) {
+    void Share_dialog.change_event (QEvent e) {
         switch (e.type ()) {
         case QEvent.StyleChange:
         case QEvent.PaletteChange:

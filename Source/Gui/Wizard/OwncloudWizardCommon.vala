@@ -21,11 +21,11 @@ namespace Occ {
 
 namespace WizardCommon {
 
-    void setup_custom_media (QVariant &variant, QLabel *label);
+    void setup_custom_media (QVariant &variant, QLabel label);
     string title_template ();
     string sub_title_template ();
-    void init_error_label (QLabel *error_label);
-    void customize_hint_label (QLabel *label);
+    void init_error_label (QLabel error_label);
+    void customize_hint_label (QLabel label);
 
     enum Sync_mode {
         Selective_mode,
@@ -44,7 +44,7 @@ namespace WizardCommon {
         Page_Advanced_setup,
     };
 
-    void setup_custom_media (QVariant &variant, QLabel *label) {
+    void setup_custom_media (QVariant &variant, QLabel label) {
         if (!label)
             return;
 
@@ -72,20 +72,20 @@ namespace WizardCommon {
         return string.from_latin1 ("<font color=\"%1\">").arg (Theme.instance ().wizard_header_title_color ().name ()) + string.from_latin1 ("%1</font>");
     }
 
-    void init_error_label (QLabel *error_label) {
+    void init_error_label (QLabel error_label) {
         string style = QLatin1String ("border : 1px solid #eed3d7; border-radius : 5px; padding : 3px;"
                                         "background-color : #f2dede; color : #b94a48;");
 
         error_label.set_style_sheet (style);
         error_label.set_word_wrap (true);
-        auto size_policy = error_label.size_policy ();
+        var size_policy = error_label.size_policy ();
         size_policy.set_retain_size_when_hidden (true);
         error_label.set_size_policy (size_policy);
         error_label.set_visible (false);
     }
 
-    void customize_hint_label (QLabel *label) {
-        auto palette = label.palette ();
+    void customize_hint_label (QLabel label) {
+        var palette = label.palette ();
         QColor text_color = palette.color (QPalette.Text);
         text_color.set_alpha (128);
         palette.on_set_color (QPalette.Text, text_color);

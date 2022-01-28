@@ -13,7 +13,7 @@ using namespace Occ;
 
 struct FakeBrokenXmlPropfindReply : FakePropfindReply {
     FakeBrokenXmlPropfindReply (FileInfo &remoteRootFileInfo, QNetworkAccessManager.Operation op,
-                               const QNetworkRequest &request, GLib.Object *parent)
+                               const QNetworkRequest &request, GLib.Object parent)
         : FakePropfindReply (remoteRootFileInfo, op, request, parent) {
         QVERIFY (payload.size () > 50);
         // turncate the XML
@@ -23,11 +23,11 @@ struct FakeBrokenXmlPropfindReply : FakePropfindReply {
 
 struct MissingPermissionsPropfindReply : FakePropfindReply {
     MissingPermissionsPropfindReply (FileInfo &remoteRootFileInfo, QNetworkAccessManager.Operation op,
-                               const QNetworkRequest &request, GLib.Object *parent)
+                               const QNetworkRequest &request, GLib.Object parent)
         : FakePropfindReply (remoteRootFileInfo, op, request, parent) {
         // If the propfind contains a single file without permissions, this is a server error
         const char toRemove[] = "<oc:permissions>RDNVCKW</oc:permissions>";
-        auto pos = payload.indexOf (toRemove, payload.size ()/2);
+        var pos = payload.indexOf (toRemove, payload.size ()/2);
         QVERIFY (pos > 0);
         payload.remove (pos, sizeof (toRemove) - 1);
     }
@@ -79,8 +79,8 @@ class TestRemoteDiscovery : GLib.Object {
         fakeFolder.remoteModifier ().insert ("B/z2");
         fakeFolder.remoteModifier ().insert ("C/z2");
 
-        auto oldLocalState = fakeFolder.currentLocalState ();
-        auto oldRemoteState = fakeFolder.currentRemoteState ();
+        var oldLocalState = fakeFolder.currentLocalState ();
+        var oldRemoteState = fakeFolder.currentRemoteState ();
 
         string errorFolder = "dav/files/admin/B";
         string fatalErrorPrefix = "Server replied with an error while reading directory \"B\" : ";

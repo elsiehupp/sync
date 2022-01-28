@@ -22,12 +22,20 @@ class Sync_status_summary : GLib.Object {
     Q_PROPERTY (string sync_status_string READ sync_status_string NOTIFY sync_status_string_changed)
     Q_PROPERTY (string sync_status_detail_string READ sync_status_detail_string NOTIFY sync_status_detail_string_changed)
 
-    public Sync_status_summary (GLib.Object *parent = nullptr);
+    public Sync_status_summary (GLib.Object parent = nullptr);
 
     public double sync_progress ();
+
+
     public QUrl sync_icon ();
+
+
     public bool syncing ();
+
+
     public string sync_status_string ();
+
+
     public string sync_status_detail_string ();
 
 signals:
@@ -45,17 +53,17 @@ signals:
 
     private void on_folder_list_changed (Occ.Folder.Map &folder_map);
     private void on_folder_progress_info (ProgressInfo &progress);
-    private void on_folder_sync_state_changed (Folder *folder);
+    private void on_folder_sync_state_changed (Folder folder);
     private void on_is_connected_changed ();
 
-    private void set_sync_state_for_folder (Folder *folder);
-    private void mark_folder_as_error (Folder *folder);
-    private void mark_folder_as_success (Folder *folder);
+    private void set_sync_state_for_folder (Folder folder);
+    private void mark_folder_as_error (Folder folder);
+    private void mark_folder_as_success (Folder folder);
     private bool folder_errors ();
-    private bool folder_error (Folder *folder);
+    private bool folder_error (Folder folder);
     private void clear_folder_errors ();
     private void set_sync_state_to_connected_state ();
-    private bool reload_needed (AccountState *account_state);
+    private bool reload_needed (AccountState account_state);
     private void init_sync_state ();
 
     private void set_sync_progress (double value);
@@ -88,7 +96,7 @@ signals:
 namespace {
 
     Occ.SyncResult.Status determine_sync_status (Occ.SyncResult &sync_result) {
-        const auto status = sync_result.status ();
+        const var status = sync_result.status ();
 
         if (status == Occ.SyncResult.Success || status == Occ.SyncResult.Problem) {
             if (sync_result.has_unresolved_conflicts ()) {
@@ -101,14 +109,14 @@ namespace {
         return status;
     }
 
-    Sync_status_summary.Sync_status_summary (GLib.Object *parent)
-        : GLib.Object (parent) {
-        const auto folder_man = FolderMan.instance ();
+    Sync_status_summary.Sync_status_summary (GLib.Object parent) {
+        base (parent);
+        const var folder_man = FolderMan.instance ();
         connect (folder_man, &FolderMan.folder_list_changed, this, &Sync_status_summary.on_folder_list_changed);
         connect (folder_man, &FolderMan.folder_sync_state_change, this, &Sync_status_summary.on_folder_sync_state_changed);
     }
 
-    bool Sync_status_summary.reload_needed (AccountState *account_state) {
+    bool Sync_status_summary.reload_needed (AccountState account_state) {
         if (_account_state.data () == account_state) {
             return false;
         }
@@ -116,7 +124,7 @@ namespace {
     }
 
     void Sync_status_summary.on_load () {
-        const auto current_user = User_model.instance ().current_user ();
+        const var current_user = User_model.instance ().current_user ();
         if (!current_user) {
             return;
         }
@@ -142,11 +150,11 @@ namespace {
         connect_to_folders_progress (folder_map);
     }
 
-    void Sync_status_summary.mark_folder_as_error (Folder *folder) {
+    void Sync_status_summary.mark_folder_as_error (Folder folder) {
         _folders_with_errors.insert (folder.alias ());
     }
 
-    void Sync_status_summary.mark_folder_as_success (Folder *folder) {
+    void Sync_status_summary.mark_folder_as_success (Folder folder) {
         _folders_with_errors.erase (folder.alias ());
     }
 
@@ -154,7 +162,7 @@ namespace {
         return _folders_with_errors.size () != 0;
     }
 
-    bool Sync_status_summary.folder_error (Folder *folder) {
+    bool Sync_status_summary.folder_error (Folder folder) {
         return _folders_with_errors.find (folder.alias ()) != _folders_with_errors.end ();
     }
 
@@ -162,7 +170,7 @@ namespace {
         _folders_with_errors.clear ();
     }
 
-    void Sync_status_summary.set_sync_state_for_folder (Folder *folder) {
+    void Sync_status_summary.set_sync_state_for_folder (Folder folder) {
         if (_account_state && !_account_state.is_connected ()) {
             set_syncing (false);
             set_sync_status_string (tr ("Offline"));
@@ -171,7 +179,7 @@ namespace {
             return;
         }
 
-        const auto state = determine_sync_status (folder.sync_result ());
+        const var state = determine_sync_status (folder.sync_result ());
 
         switch (state) {
         case SyncResult.Success:
@@ -218,7 +226,7 @@ namespace {
         }
     }
 
-    void Sync_status_summary.on_folder_sync_state_changed (Folder *folder) {
+    void Sync_status_summary.on_folder_sync_state_changed (Folder folder) {
         if (!folder) {
             return;
         }
@@ -251,8 +259,8 @@ namespace {
         set_sync_progress (calculate_overall_percent (total_file_count, completed_file, total_size, completed_size));
 
         if (total_size > 0) {
-            const auto completed_size_string = Utility.octets_to_string (completed_size);
-            const auto total_size_string = Utility.octets_to_string (total_size);
+            const var completed_size_string = Utility.octets_to_string (completed_size);
+            const var total_size_string = Utility.octets_to_string (total_size);
 
             if (progress.trust_eta ()) {
                 set_sync_status_detail_string (
@@ -323,7 +331,7 @@ namespace {
     }
 
     void Sync_status_summary.connect_to_folders_progress (Folder.Map &folder_map) {
-        for (auto &folder : folder_map) {
+        for (var &folder : folder_map) {
             if (folder.account_state () == _account_state.data ()) {
                 connect (
                     folder, &Folder.progress_info, this, &Sync_status_summary.on_folder_progress_info, Qt.UniqueConnection);
@@ -362,8 +370,8 @@ namespace {
     }
 
     void Sync_status_summary.init_sync_state () {
-        auto sync_state_fallback_needed = true;
-        for (auto &folder : FolderMan.instance ().map ()) {
+        var sync_state_fallback_needed = true;
+        for (var &folder : FolderMan.instance ().map ()) {
             on_folder_sync_state_changed (folder);
             sync_state_fallback_needed = false;
         }

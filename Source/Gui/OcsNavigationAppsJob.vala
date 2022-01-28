@@ -17,6 +17,7 @@ class OcsNavigationAppsJob : Ocs_job {
 
     public OcsNavigationAppsJob (AccountPtr account);
 
+
     /***********************************************************
     Get a list of enabled apps and external sites
     visible in the Navigation menu

@@ -86,6 +86,7 @@ class SyncFileItem {
 
     public SyncJournalFileRecord to_sync_journal_file_record_with_inode (string local_file_name);
 
+
     /***********************************************************
     Creates a basic SyncFileItem from a DB record
 
@@ -106,26 +107,28 @@ class SyncFileItem {
         , _is_encrypted (false) {
     }
 
+
     public friend bool operator== (SyncFileItem &item1, SyncFileItem &item2) {
         return item1._original_file == item2._original_file;
     }
 
+
     public friend bool operator< (SyncFileItem &item1, SyncFileItem &item2) {
         // Sort by destination
-        auto d1 = item1.destination ();
-        auto d2 = item2.destination ();
+        var d1 = item1.destination ();
+        var d2 = item2.destination ();
 
         // But this we need to order it so the slash come first. It should be this order:
         //  "foo", "foo/bar", "foo-bar"
         // This is important since we assume that the contents of a folder directly follows
         // its contents
 
-        auto data1 = d1.const_data ();
-        auto data2 = d2.const_data ();
+        var data1 = d1.const_data ();
+        var data2 = d2.const_data ();
 
         // Find the length of the largest prefix
         int prefix_l = 0;
-        auto min_size = std.min (d1.size (), d2.size ());
+        var min_size = std.min (d1.size (), d2.size ());
         while (prefix_l < min_size && data1[prefix_l] == data2[prefix_l]) {
             prefix_l++;
         }
@@ -143,6 +146,7 @@ class SyncFileItem {
         return data1[prefix_l] < data2[prefix_l];
     }
 
+
     public string destination () {
         if (!_rename_target.is_empty ()) {
             return _rename_target;
@@ -150,13 +154,16 @@ class SyncFileItem {
         return _file;
     }
 
+
     public bool is_empty () {
         return _file.is_empty ();
     }
 
+
     public bool is_directory () {
         return _type == ItemTypeDirectory;
     }
+
 
     /***********************************************************
     True if the item had any kind of error.
@@ -168,12 +175,14 @@ class SyncFileItem {
             || !_error_string.is_empty ();
     }
 
+
     /***********************************************************
     Whether this item should appear on the issues tab.
     ***********************************************************/
     public bool show_in_issues_tab () {
         return has_error_status () || _status == SyncFileItem.Conflict;
     }
+
 
     /***********************************************************
     Whether this item should appear on the protocol tab.
@@ -193,6 +202,7 @@ class SyncFileItem {
     ***********************************************************/
     public string _file;
 
+
     /***********************************************************
     for renames : the name _file should be renamed to
     for dehydrations : the name _file should become after dehydration (like adding a suffix)
@@ -200,8 +210,9 @@ class SyncFileItem {
     ***********************************************************/
     public string _rename_target;
 
+
     /***********************************************************
-    The db-path of this item.
+    The database-path of this item.
 
     This can easily differ from _file and _rename_target if parts of the path were renamed.
     ***********************************************************/
@@ -213,13 +224,18 @@ class SyncFileItem {
     public string _encrypted_file_name;
 
     public ItemType _type BITFIELD (3);
+
+
     public Direction _direction BITFIELD (3);
+
+
     public bool _server_has_ignored_files BITFIELD (1);
 
     /// Whether there's an entry in the blacklist table.
-    /// Note : that entry may have retries left, so this can be true
+    /// Note: that entry may have retries left, so this can be true
     /// without the status being FileIgnored.
     public bool _has_blacklist_entry BITFIELD (1);
+
 
     /***********************************************************
     If true and NormalError, this error may be blacklisted
@@ -231,6 +247,8 @@ class SyncFileItem {
 
     // Variables useful to report to the user
     public Status _status BITFIELD (4);
+
+
     public bool _is_restoration BITFIELD (1); // The original operation was forbidden, and this is a restoration
     public bool _is_selective_sync BITFIELD (1); // The file is removed or ignored because it is in the selective sync list
     public bool _is_encrypted BITFIELD (1); // The file is E2EE or the content of the directory should be E2EE
@@ -267,7 +285,7 @@ class SyncFileItem {
 };
 
 inline bool operator< (SyncFileItemPtr &item1, SyncFileItemPtr &item2) {
-    return *item1 < *item2;
+    return item1 < *item2;
 }
 
 using SyncFileItemVector = QVector<SyncFileItemPtr>;
@@ -309,7 +327,7 @@ using SyncFileItemVector = QVector<SyncFileItemPtr>;
     }
 
     SyncFileItemPtr SyncFileItem.from_sync_journal_file_record (SyncJournalFileRecord &rec) {
-        auto item = SyncFileItemPtr.create ();
+        var item = SyncFileItemPtr.create ();
         item._file = rec.path ();
         item._inode = rec._inode;
         item._modtime = rec._modtime;

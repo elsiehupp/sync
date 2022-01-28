@@ -35,7 +35,7 @@ static const char content_md5Header_c[] = "Content-MD5";
 ***********************************************************/
 class PropagateLocalRemove : PropagateItemJob {
 
-    public PropagateLocalRemove (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+    public PropagateLocalRemove (OwncloudPropagator propagator, SyncFileItemPtr &item)
         : PropagateItemJob (propagator, item) {
     }
     public void on_start () override;
@@ -52,11 +52,12 @@ class PropagateLocalRemove : PropagateItemJob {
 ***********************************************************/
 class PropagateLocalMkdir : PropagateItemJob {
 
-    public PropagateLocalMkdir (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+    public PropagateLocalMkdir (OwncloudPropagator propagator, SyncFileItemPtr &item)
         : PropagateItemJob (propagator, item)
         , _delete_existing_file (false) {
     }
     public void on_start () override;
+
 
     /***********************************************************
     Whether an existing file with the same name may be deleted before
@@ -79,7 +80,7 @@ class PropagateLocalMkdir : PropagateItemJob {
 ***********************************************************/
 class PropagateLocalRename : PropagateItemJob {
 
-    public PropagateLocalRename (OwncloudPropagator *propagator, SyncFileItemPtr &item)
+    public PropagateLocalRename (OwncloudPropagator propagator, SyncFileItemPtr &item)
         : PropagateItemJob (propagator, item) {
     }
     public void on_start () override;
@@ -88,9 +89,10 @@ class PropagateLocalRename : PropagateItemJob {
     }
 };
 
-    GLib.ByteArray local_file_id_from_full_id (GLib.ByteArray &id) {
+    GLib.ByteArray local_file_id_from_full_id (GLib.ByteArray id) {
         return id.left (8);
     }
+
 
     /***********************************************************
     The code will update the database in case of error.
@@ -116,7 +118,7 @@ class PropagateLocalRename : PropagateItemJob {
             // We need to delete the entries from the database now from the deleted vector.
             // Do it while avoiding redundant delete calls to the journal.
             string deleted_dir;
-            foreach (auto &it, deleted) {
+            foreach (var &it, deleted) {
                 if (!it.first.starts_with (propagator ().local_path ()))
                     continue;
                 if (!deleted_dir.is_empty () && it.first.starts_with (deleted_dir))
@@ -230,7 +232,7 @@ class PropagateLocalRename : PropagateItemJob {
         // before the correct etag is stored.
         SyncFileItem new_item (*_item);
         new_item._etag = "_invalid_";
-        const auto result = propagator ().update_metadata (new_item);
+        const var result = propagator ().update_metadata (new_item);
         if (!result) {
             on_done (SyncFileItem.FatalError, tr ("Error updating metadata : %1").arg (result.error ()));
             return;
@@ -240,7 +242,7 @@ class PropagateLocalRename : PropagateItemJob {
         }
         propagator ()._journal.commit ("local_mkdir");
 
-        auto result_status = _item._instruction == CSYNC_INSTRUCTION_CONFLICT
+        var result_status = _item._instruction == CSYNC_INSTRUCTION_CONFLICT
             ? SyncFileItem.Conflict
             : SyncFileItem.Success;
         on_done (result_status);
@@ -286,20 +288,20 @@ class PropagateLocalRename : PropagateItemJob {
         propagator ()._journal.get_file_record (_item._original_file, &old_record);
         propagator ()._journal.delete_file_record (_item._original_file);
 
-        auto &vfs = propagator ().sync_options ()._vfs;
-        auto pin_state = vfs.pin_state (_item._original_file);
-        if (!vfs.set_pin_state (_item._original_file, PinState.Inherited)) {
+        var &vfs = propagator ().sync_options ()._vfs;
+        var pin_state = vfs.pin_state (_item._original_file);
+        if (!vfs.set_pin_state (_item._original_file, PinState.PinState.INHERITED)) {
             q_c_warning (lc_propagate_local_rename) << "Could not set pin state of" << _item._original_file << "to inherited";
         }
 
-        const auto old_file = _item._file;
+        const var old_file = _item._file;
 
         if (!_item.is_directory ()) { // Directories are saved at the end
             SyncFileItem new_item (*_item);
             if (old_record.is_valid ()) {
                 new_item._checksum_header = old_record._checksum_header;
             }
-            const auto result = propagator ().update_metadata (new_item);
+            const var result = propagator ().update_metadata (new_item);
             if (!result) {
                 on_done (SyncFileItem.FatalError, tr ("Error updating metadata : %1").arg (result.error ()));
                 return;
@@ -314,7 +316,7 @@ class PropagateLocalRename : PropagateItemJob {
                 return;
             }
         }
-        if (pin_state && *pin_state != PinState.Inherited
+        if (pin_state && *pin_state != PinState.PinState.INHERITED
             && !vfs.set_pin_state (_item._rename_target, *pin_state)) {
             on_done (SyncFileItem.NormalError, tr ("Error setting pin state"));
             return;

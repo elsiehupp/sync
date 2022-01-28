@@ -20,7 +20,7 @@ namespace Occ {
 ***********************************************************/
 class BandwidthManager : GLib.Object {
 
-    public BandwidthManager (OwncloudPropagator *p);
+    public BandwidthManager (OwncloudPropagator p);
     ~BandwidthManager () override;
 
     public bool using_absolute_upload_limit () {
@@ -38,18 +38,28 @@ class BandwidthManager : GLib.Object {
 
 
     public void on_register_upload_device (UploadDevice *);
+
+
     public void on_unregister_upload_device (GLib.Object *);
 
     public void on_register_download_job (GETFileJob *);
+
+
     public void on_unregister_download_job (GLib.Object *);
 
     public void on_absolute_limit_timer_expired ();
+
+
     public void on_switching_timer_expired ();
 
     public void on_relative_upload_measuring_timer_expired ();
+
+
     public void on_relative_upload_delay_timer_expired ();
 
     public void on_relative_download_measuring_timer_expired ();
+
+
     public void on_relative_download_delay_timer_expired ();
 
 
@@ -107,7 +117,7 @@ class BandwidthManager : GLib.Object {
     //  * For relative limiting, do less measuring and more delaying+giving quota
     //  * For relative limiting, smoothen measurements
 
-    BandwidthManager.BandwidthManager (OwncloudPropagator *p)
+    BandwidthManager.BandwidthManager (OwncloudPropagator p)
         : GLib.Object ()
         , _propagator (p)
         , _relative_limit_current_measured_device (nullptr)
@@ -151,7 +161,7 @@ class BandwidthManager : GLib.Object {
 
     BandwidthManager.~BandwidthManager () = default;
 
-    void BandwidthManager.on_register_upload_device (UploadDevice *p) {
+    void BandwidthManager.on_register_upload_device (UploadDevice p) {
         _absolute_upload_device_list.push_back (p);
         _relative_upload_device_list.push_back (p);
         GLib.Object.connect (p, &GLib.Object.destroyed, this, &BandwidthManager.on_unregister_upload_device);
@@ -168,8 +178,8 @@ class BandwidthManager : GLib.Object {
         }
     }
 
-    void BandwidthManager.on_unregister_upload_device (GLib.Object *o) {
-        auto p = reinterpret_cast<UploadDevice> (o); // note, we might already be in the ~GLib.Object
+    void BandwidthManager.on_unregister_upload_device (GLib.Object o) {
+        var p = reinterpret_cast<UploadDevice> (o); // note, we might already be in the ~GLib.Object
         _absolute_upload_device_list.remove (p);
         _relative_upload_device_list.remove (p);
         if (p == _relative_limit_current_measured_device) {
@@ -178,7 +188,7 @@ class BandwidthManager : GLib.Object {
         }
     }
 
-    void BandwidthManager.on_register_download_job (GETFileJob *j) {
+    void BandwidthManager.on_register_download_job (GETFileJob j) {
         _download_job_list.push_back (j);
         GLib.Object.connect (j, &GLib.Object.destroyed, this, &BandwidthManager.on_unregister_download_job);
 
@@ -194,8 +204,8 @@ class BandwidthManager : GLib.Object {
         }
     }
 
-    void BandwidthManager.on_unregister_download_job (GLib.Object *o) {
-        auto *j = reinterpret_cast<GETFileJob> (o); // note, we might already be in the ~GLib.Object
+    void BandwidthManager.on_unregister_download_job (GLib.Object o) {
+        var j = reinterpret_cast<GETFileJob> (o); // note, we might already be in the ~GLib.Object
         _download_job_list.remove (j);
         if (_relative_limit_current_measured_job == j) {
             _relative_limit_current_measured_job = nullptr;
@@ -248,9 +258,9 @@ class BandwidthManager : GLib.Object {
         _relative_upload_delay_timer.set_interval (real_wait_time_msec);
         _relative_upload_delay_timer.on_start ();
 
-        auto device_count = _relative_upload_device_list.size ();
+        var device_count = _relative_upload_device_list.size ();
         int64 quota_per_device = relative_limit_progress_difference * (upload_limit_percent / 100.0) / device_count + 1.0;
-        Q_FOREACH (UploadDevice *ud, _relative_upload_device_list) {
+        Q_FOREACH (UploadDevice ud, _relative_upload_device_list) {
             ud.set_bandwidth_limited (true);
             ud.set_choked (false);
             ud.give_bandwidth_quota (quota_per_device);
@@ -285,7 +295,7 @@ class BandwidthManager : GLib.Object {
         _relative_limit_current_measured_device.set_choked (false);
 
         // choke all other UploadDevice s
-        Q_FOREACH (UploadDevice *ud, _relative_upload_device_list) {
+        Q_FOREACH (UploadDevice ud, _relative_upload_device_list) {
             if (ud != _relative_limit_current_measured_device) {
                 ud.set_bandwidth_limited (true);
                 ud.set_choked (true);
@@ -336,14 +346,14 @@ class BandwidthManager : GLib.Object {
         _relative_download_delay_timer.set_interval (real_wait_time_msec);
         _relative_download_delay_timer.on_start ();
 
-        auto job_count = _download_job_list.size ();
+        var job_count = _download_job_list.size ();
         int64 quota = relative_limit_progress_difference * (download_limit_percent / 100.0);
         if (quota > 20 * 1024) {
             q_c_info (lc_bandwidth_manager) << "ADJUSTING QUOTA FROM " << quota << " TO " << quota - 20 * 1024;
             quota -= 20 * 1024;
         }
         int64 quota_per_job = quota / job_count + 1;
-        Q_FOREACH (GETFileJob *gfj, _download_job_list) {
+        Q_FOREACH (GETFileJob gfj, _download_job_list) {
             gfj.set_bandwidth_limited (true);
             gfj.set_choked (false);
             gfj.give_bandwidth_quota (quota_per_job);
@@ -377,7 +387,7 @@ class BandwidthManager : GLib.Object {
         _relative_limit_current_measured_job.set_choked (false);
 
         // choke all other download jobs
-        Q_FOREACH (GETFileJob *gfj, _download_job_list) {
+        Q_FOREACH (GETFileJob gfj, _download_job_list) {
             if (gfj != _relative_limit_current_measured_job) {
                 gfj.set_bandwidth_limited (true);
                 gfj.set_choked (true);
@@ -394,7 +404,7 @@ class BandwidthManager : GLib.Object {
         if (new_upload_limit != _current_upload_limit) {
             q_c_info (lc_bandwidth_manager) << "Upload Bandwidth limit changed" << _current_upload_limit << new_upload_limit;
             _current_upload_limit = new_upload_limit;
-            Q_FOREACH (UploadDevice *ud, _relative_upload_device_list) {
+            Q_FOREACH (UploadDevice ud, _relative_upload_device_list) {
                 if (new_upload_limit == 0) {
                     ud.set_bandwidth_limited (false);
                     ud.set_choked (false);
@@ -411,7 +421,7 @@ class BandwidthManager : GLib.Object {
         if (new_download_limit != _current_download_limit) {
             q_c_info (lc_bandwidth_manager) << "Download Bandwidth limit changed" << _current_download_limit << new_download_limit;
             _current_download_limit = new_download_limit;
-            Q_FOREACH (GETFileJob *j, _download_job_list) {
+            Q_FOREACH (GETFileJob j, _download_job_list) {
                 if (using_absolute_download_limit ()) {
                     j.set_bandwidth_limited (true);
                     j.set_choked (false);
@@ -430,7 +440,7 @@ class BandwidthManager : GLib.Object {
         if (using_absolute_upload_limit () && !_absolute_upload_device_list.empty ()) {
             int64 quota_per_device = _current_upload_limit / q_max ( (GLib.List<UploadDevice>.size_type)1, _absolute_upload_device_list.size ());
             q_c_debug (lc_bandwidth_manager) << quota_per_device << _absolute_upload_device_list.size () << _current_upload_limit;
-            Q_FOREACH (UploadDevice *device, _absolute_upload_device_list) {
+            Q_FOREACH (UploadDevice device, _absolute_upload_device_list) {
                 device.give_bandwidth_quota (quota_per_device);
                 q_c_debug (lc_bandwidth_manager) << "Gave " << quota_per_device / 1024.0 << " k_b to" << device;
             }
@@ -438,7 +448,7 @@ class BandwidthManager : GLib.Object {
         if (using_absolute_download_limit () && !_download_job_list.empty ()) {
             int64 quota_per_job = _current_download_limit / q_max ( (GLib.List<GETFileJob>.size_type)1, _download_job_list.size ());
             q_c_debug (lc_bandwidth_manager) << quota_per_job << _download_job_list.size () << _current_download_limit;
-            Q_FOREACH (GETFileJob *j, _download_job_list) {
+            Q_FOREACH (GETFileJob j, _download_job_list) {
                 j.give_bandwidth_quota (quota_per_job);
                 q_c_debug (lc_bandwidth_manager) << "Gave " << quota_per_job / 1024.0 << " k_b to" << j;
             }

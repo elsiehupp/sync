@@ -24,9 +24,17 @@ namespace Occ {
 class SyncRunFileLog {
 
     public SyncRunFileLog ();
+
+
     public void on_start (string folder_path);
+
+
     public void log_item (SyncFileItem &item);
+
+
     public void log_lap (string name);
+
+
     public void finish ();
 
     private string date_time_str (QDateTime &dt);
@@ -59,7 +67,7 @@ class SyncRunFileLog {
         int depth_index = 2;
         while (QFile.exists (filename)) {
 
-            QFile file (filename);
+            QFile file = new QFile (filename);
             file.open (QIODevice.ReadOnly| QIODevice.Text);
             QTextStream in (&file);
             string line = in.read_line ();
@@ -117,7 +125,7 @@ class SyncRunFileLog {
         string ts = string.from_latin1 (item._response_time_stamp);
         if (ts.length () > 6) {
             const QRegularExpression rx (R" ( (\d\d:\d\d:\d\d))");
-            const auto rx_match = rx.match (ts);
+            const var rx_match = rx.match (ts);
             if (rx_match.has_match ()) {
                 ts = rx_match.captured (0);
             }

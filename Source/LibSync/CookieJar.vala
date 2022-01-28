@@ -21,7 +21,7 @@ namespace Occ {
 ***********************************************************/
 class CookieJar : QNetworkCookieJar {
 
-    public CookieJar (GLib.Object *parent = nullptr);
+    public CookieJar (GLib.Object parent = nullptr);
     ~CookieJar () override;
     public bool set_cookies_from_url (GLib.List<QNetworkCookie> &cookie_list, QUrl url) override;
     public GLib.List<QNetworkCookie> cookies_for_url (QUrl url) override;
@@ -32,6 +32,8 @@ class CookieJar : QNetworkCookieJar {
     using QNetworkCookieJar.all_cookies;
 
     public bool save (string file_name);
+
+
     public bool restore (string file_name);
 
 signals:
@@ -43,13 +45,13 @@ signals:
 
 
     namespace {
-        const unsigned int JAR_VERSION = 23;
+        const uint32 JAR_VERSION = 23;
     }
 
     QDataStream &operator<< (QDataStream &stream, GLib.List<QNetworkCookie> &list) {
         stream << JAR_VERSION;
         stream << uint32 (list.size ());
-        for (auto &cookie : list)
+        for (var &cookie : list)
             stream << cookie.to_raw_form ();
         return stream;
     }
@@ -80,7 +82,7 @@ signals:
         return stream;
     }
 
-    CookieJar.CookieJar (GLib.Object *parent)
+    CookieJar.CookieJar (GLib.Object parent)
         : QNetworkCookieJar (parent) {
     }
 
@@ -112,7 +114,7 @@ signals:
         }
 
         q_c_debug (lc_cookie_jar) << file_name;
-        QFile file (file_name);
+        QFile file = new QFile (file_name);
         if (!file.open (QIODevice.WriteOnly)) {
             return false;
         }
@@ -128,7 +130,7 @@ signals:
             return false;
         }
 
-        QFile file (file_name);
+        QFile file = new QFile (file_name);
         if (!file.open (QIODevice.ReadOnly)) {
             return false;
         }

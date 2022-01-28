@@ -18,7 +18,7 @@ namespace Ui {
 ***********************************************************/
 class Legal_notice : Gtk.Dialog {
 
-    public Legal_notice (Gtk.Dialog *parent = nullptr);
+    public Legal_notice (Gtk.Dialog parent = nullptr);
     ~Legal_notice () override;
 
 
@@ -30,7 +30,7 @@ class Legal_notice : Gtk.Dialog {
     private Ui.Legal_notice _ui;
 };
 
-    Legal_notice.Legal_notice (Gtk.Dialog *parent)
+    Legal_notice.Legal_notice (Gtk.Dialog parent)
         : Gtk.Dialog (parent)
         , _ui (new Ui.Legal_notice) {
         _ui.setup_ui (this);
@@ -44,7 +44,7 @@ class Legal_notice : Gtk.Dialog {
         delete _ui;
     }
 
-    void Legal_notice.change_event (QEvent *e) {
+    void Legal_notice.change_event (QEvent e) {
         switch (e.type ()) {
         case QEvent.StyleChange:
         case QEvent.PaletteChange:

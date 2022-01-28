@@ -48,17 +48,21 @@ enum class Share_dialog_start_page {
 ***********************************************************/
 class OwncloudGui : GLib.Object {
 
-    public OwncloudGui (Application *parent = nullptr);
+    public OwncloudGui (Application parent = nullptr);
 
     public bool check_account_exists (bool open_settings);
 
-    public static void raise_dialog (Gtk.Widget *raise_widget);
+    public static void raise_dialog (Gtk.Widget raise_widget);
+
+
     public static QSize settings_dialog_size () {
         return {800, 500};
     }
     public void setup_overlay_icons ();
 #ifdef WITH_LIBCLOUDPROVIDERS
     public void setup_cloud_providers ();
+
+
     public bool cloud_provider_api_available ();
 #endif
     public void create_tray ();
@@ -72,26 +76,67 @@ signals:
 
 
     public void on_compute_overall_sync_status ();
+
+
     public void on_show_tray_message (string title, string msg);
+
+
     public void on_show_optional_tray_message (string title, string msg);
+
+
     public void on_folder_open_action (string alias);
+
+
     public void on_update_progress (string folder, ProgressInfo &progress);
+
+
     public void on_show_gui_message (string title, string message);
+
+
     public void on_folders_changed ();
+
+
     public void on_show_settings ();
+
+
     public void on_show_sync_protocol ();
+
+
     public void on_shutdown ();
+
+
     public void on_sync_state_change (Folder *);
+
+
     public void on_tray_clicked (QSystemTrayIcon.Activation_reason reason);
+
+
     public void on_toggle_log_browser ();
+
+
     public void on_open_owncloud ();
+
+
     public void on_open_settings_dialog ();
+
+
     public void on_open_main_dialog ();
+
+
     public void on_settings_dialog_activated ();
+
+
     public void on_help ();
+
+
     public void on_open_path (string path);
+
+
     public void on_account_state_changed ();
-    public void on_tray_message_if_server_unsupported (Account *account);
+
+
+    public void on_tray_message_if_server_unsupported (Account account);
+
 
     /***********************************************************
     Open a share dialog for a file or folder.
@@ -133,7 +178,7 @@ signals:
 
 const char property_account_c[] = "oc_account";
 
-OwncloudGui.OwncloudGui (Application *parent)
+OwncloudGui.OwncloudGui (Application parent)
     : GLib.Object (parent)
     , _tray (nullptr)
     , _settings_dialog (nullptr)
@@ -172,11 +217,11 @@ OwncloudGui.OwncloudGui (Application *parent)
                 on_show_share_dialog (share_path, local_path, Share_dialog_start_page.Users_and_groups);
             });
 
-    Progress_dispatcher *pd = Progress_dispatcher.instance ();
+    Progress_dispatcher pd = Progress_dispatcher.instance ();
     connect (pd, &Progress_dispatcher.progress_info, this,
         &OwncloudGui.on_update_progress);
 
-    FolderMan *folder_man = FolderMan.instance ();
+    FolderMan folder_man = FolderMan.instance ();
     connect (folder_man, &FolderMan.folder_sync_state_change,
         this, &OwncloudGui.on_sync_state_change);
 
@@ -254,18 +299,18 @@ void OwncloudGui.on_tray_clicked (QSystemTrayIcon.Activation_reason reason) {
 
         }
     }
-    // FIXME : Also make sure that any auto updater dialogue https://github.com/owncloud/client/issues/5613
+    // FIXME : Also make sure that any var updater dialogue https://github.com/owncloud/client/issues/5613
     // or SSL error dialog also comes to front.
 }
 
-void OwncloudGui.on_sync_state_change (Folder *folder) {
+void OwncloudGui.on_sync_state_change (Folder folder) {
     on_compute_overall_sync_status ();
 
     if (!folder) {
         return; // Valid, just a general GUI redraw was needed.
     }
 
-    auto result = folder.sync_result ();
+    var result = folder.sync_result ();
 
     q_c_info (lc_application) << "Sync state changed for folder " << folder.remote_url ().to_string () << " : " << result.status_string ();
 
@@ -289,7 +334,7 @@ void OwncloudGui.on_account_state_changed () {
     on_compute_overall_sync_status ();
 }
 
-void OwncloudGui.on_tray_message_if_server_unsupported (Account *account) {
+void OwncloudGui.on_tray_message_if_server_unsupported (Account account) {
     if (account.server_version_unsupported ()) {
         on_show_tray_message (
             tr ("Unsupported Server Version"),
@@ -305,7 +350,7 @@ void OwncloudGui.on_compute_overall_sync_status () {
     bool all_paused = true;
     bool all_disconnected = true;
     QVector<AccountStatePtr> problem_accounts;
-    auto set_status_text = [&] (string text) {
+    var set_status_text = [&] (string text) {
         // FIXME : So this doesn't do anything? Needs to be revisited
         Q_UNUSED (text)
         // Don't overwrite the status if we're currently syncing
@@ -314,7 +359,7 @@ void OwncloudGui.on_compute_overall_sync_status () {
         //_action_status.on_set_text (text);
     };
 
-    foreach (auto a, AccountManager.instance ().accounts ()) {
+    foreach (var a, AccountManager.instance ().accounts ()) {
         if (!a.is_signed_out ()) {
             all_signed_out = false;
         }
@@ -324,7 +369,7 @@ void OwncloudGui.on_compute_overall_sync_status () {
             all_disconnected = false;
         }
     }
-    foreach (Folder *f, FolderMan.instance ().map ()) {
+    foreach (Folder f, FolderMan.instance ().map ()) {
         if (!f.sync_paused ()) {
             all_paused = false;
         }
@@ -366,7 +411,7 @@ void OwncloudGui.on_compute_overall_sync_status () {
 
     // display the info of the least successful sync (eg. do not just display the result of the latest sync)
     string tray_message;
-    FolderMan *folder_man = FolderMan.instance ();
+    FolderMan folder_man = FolderMan.instance ();
     Folder.Map map = folder_man.map ();
 
     SyncResult.Status overall_status = SyncResult.Undefined;
@@ -375,7 +420,7 @@ void OwncloudGui.on_compute_overall_sync_status () {
 
     // If the sync succeeded but there are unresolved conflicts,
     // show the problem icon!
-    auto icon_status = overall_status;
+    var icon_status = overall_status;
     if (icon_status == SyncResult.Success && has_unresolved_conflicts) {
         icon_status = SyncResult.Problem;
     }
@@ -391,7 +436,7 @@ void OwncloudGui.on_compute_overall_sync_status () {
     // create the tray blob message, check if we have an defined state
     if (map.count () > 0) {
         string[] all_status_strings;
-        foreach (Folder *folder, map.values ()) {
+        foreach (Folder folder, map.values ()) {
             string folder_message = FolderMan.tray_tooltip_status_string (
                 folder.sync_result ().status (),
                 folder.sync_result ().has_unresolved_conflicts (),
@@ -439,7 +484,7 @@ void OwncloudGui.on_show_optional_tray_message (string title, string msg) {
 open the folder with the given Alias
 ***********************************************************/
 void OwncloudGui.on_folder_open_action (string alias) {
-    Folder *f = FolderMan.instance ().folder (alias);
+    Folder f = FolderMan.instance ().folder (alias);
     if (f) {
         q_c_info (lc_application) << "opening local url " << f.path ();
         QUrl url = QUrl.from_local_file (f.path ());
@@ -501,8 +546,8 @@ void OwncloudGui.on_update_progress (string folder, ProgressInfo &progress) {
         string kind_str = Progress.as_result_string (progress._last_completed_item);
         string time_str = QTime.current_time ().to_string ("hh:mm");
         string action_text = tr ("%1 (%2, %3)").arg (progress._last_completed_item._file, kind_str, time_str);
-        auto *action = new QAction (action_text, this);
-        Folder *f = FolderMan.instance ().folder (folder);
+        var action = new QAction (action_text, this);
+        Folder f = FolderMan.instance ().folder (folder);
         if (f) {
             string full_path = f.path () + '/' + progress._last_completed_item._file;
             if (QFile (full_path).exists ()) {
@@ -521,25 +566,25 @@ void OwncloudGui.on_update_progress (string folder, ProgressInfo &progress) {
 }
 
 void OwncloudGui.on_login () {
-    if (auto account = qvariant_cast<AccountStatePtr> (sender ().property (property_account_c))) {
+    if (var account = qvariant_cast<AccountStatePtr> (sender ().property (property_account_c))) {
         account.account ().reset_rejected_certificates ();
         account.sign_in ();
     } else {
-        auto list = AccountManager.instance ().accounts ();
-        foreach (auto &a, list) {
+        var list = AccountManager.instance ().accounts ();
+        foreach (var &a, list) {
             a.sign_in ();
         }
     }
 }
 
 void OwncloudGui.on_logout () {
-    auto list = AccountManager.instance ().accounts ();
-    if (auto account = qvariant_cast<AccountStatePtr> (sender ().property (property_account_c))) {
+    var list = AccountManager.instance ().accounts ();
+    if (var account = qvariant_cast<AccountStatePtr> (sender ().property (property_account_c))) {
         list.clear ();
         list.append (account);
     }
 
-    foreach (auto &ai, list) {
+    foreach (var &ai, list) {
         ai.sign_out_by_ui ();
     }
 }
@@ -549,7 +594,7 @@ void OwncloudGui.on_new_account_wizard () {
 }
 
 void OwncloudGui.on_show_gui_message (string title, string message) {
-    auto *msg_box = new QMessageBox;
+    var msg_box = new QMessageBox;
     msg_box.set_window_flags (msg_box.window_flags () | Qt.Window_stays_on_top_hint);
     msg_box.set_attribute (Qt.WA_DeleteOnClose);
     msg_box.on_set_text (message);
@@ -603,7 +648,7 @@ void OwncloudGui.on_toggle_log_browser () {
 }
 
 void OwncloudGui.on_open_owncloud () {
-    if (auto account = qvariant_cast<AccountPtr> (sender ().property (property_account_c))) {
+    if (var account = qvariant_cast<AccountPtr> (sender ().property (property_account_c))) {
         Utility.open_browser (account.url ());
     }
 }
@@ -612,7 +657,7 @@ void OwncloudGui.on_help () {
     QDesktopServices.open_url (QUrl (Theme.instance ().help_url ()));
 }
 
-void OwncloudGui.raise_dialog (Gtk.Widget *raise_widget) {
+void OwncloudGui.raise_dialog (Gtk.Widget raise_widget) {
     if (raise_widget && !raise_widget.parent_widget ()) {
         // Qt has a bug which causes parent-less dialogs to pop-under.
         raise_widget.show_normal ();
@@ -622,28 +667,28 @@ void OwncloudGui.raise_dialog (Gtk.Widget *raise_widget) {
 }
 
 void OwncloudGui.on_show_share_dialog (string share_path, string local_path, Share_dialog_start_page start_page) {
-    const auto folder = FolderMan.instance ().folder_for_path (local_path);
+    const var folder = FolderMan.instance ().folder_for_path (local_path);
     if (!folder) {
         q_c_warning (lc_application) << "Could not open share dialog for" << local_path << "no responsible folder found";
         return;
     }
 
-    const auto account_state = folder.account_state ();
+    const var account_state = folder.account_state ();
 
     const string file = local_path.mid (folder.clean_path ().length () + 1);
     SyncJournalFileRecord file_record;
 
     bool resharing_allowed = true; // lets assume the good
-    if (folder.journal_db ().get_file_record (file, &file_record) && file_record.is_valid ()) {
+    if (folder.journal_database ().get_file_record (file, &file_record) && file_record.is_valid ()) {
         // check the permission : Is resharing allowed?
         if (!file_record._remote_perm.is_null () && !file_record._remote_perm.has_permission (RemotePermissions.Can_reshare)) {
             resharing_allowed = false;
         }
     }
 
-    auto max_sharing_permissions = resharing_allowed? Share_permissions (account_state.account ().capabilities ().share_default_permissions ()) : Share_permissions ({});
+    var max_sharing_permissions = resharing_allowed? Share_permissions (account_state.account ().capabilities ().share_default_permissions ()) : Share_permissions ({});
 
-    Share_dialog *w = nullptr;
+    Share_dialog w = nullptr;
     if (_share_dialogs.contains (local_path) && _share_dialogs[local_path]) {
         q_c_info (lc_application) << "Raising share dialog" << share_path << local_path;
         w = _share_dialogs[local_path];

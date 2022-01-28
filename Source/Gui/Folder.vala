@@ -59,7 +59,8 @@ class FolderDefinition {
 
     /// Reads a folder definition from the current settings group.
     public static bool on_load (QSettings &settings, string alias,
-        FolderDefinition *folder);
+        FolderDefinition folder);
+
 
     /***********************************************************
     The highest version in the settings that on_load () can read
@@ -97,27 +98,32 @@ class Folder : GLib.Object {
         UnLock
     };
 
+
     /***********************************************************
     Create a new Folder
     ***********************************************************/
-    public Folder (FolderDefinition &definition, AccountState *account_state, std.unique_ptr<Vfs> vfs, GLib.Object *parent = nullptr);
+    public Folder (FolderDefinition &definition, AccountState account_state, std.unique_ptr<Vfs> vfs, GLib.Object parent = nullptr);
 
     ~Folder () override;
 
     public using Map = QMap<string, Folder>;
     public using MapIterator = QMapIterator<string, Folder>;
 
+
     /***********************************************************
     The account the folder is configured on.
     ***********************************************************/
-    public AccountState *account_state () {
+    public AccountState account_state () {
         return _account_state.data ();
     }
+
 
     /***********************************************************
     alias or nickname
     ***********************************************************/
     public string alias ();
+
+
     public string short_gui_remote_path_or_app_name (); // since 2.0 we don't want to show aliases anymore, show the path instead
 
     /***********************************************************
@@ -125,10 +131,12 @@ class Folder : GLib.Object {
     ***********************************************************/
     public string short_gui_local_path ();
 
+
     /***********************************************************
     canonical local folder path, always ends with /
     ***********************************************************/
     public string path ();
+
 
     /***********************************************************
     cleaned canonical folder path, like path () but never ends with a /
@@ -138,10 +146,12 @@ class Folder : GLib.Object {
     ***********************************************************/
     public string clean_path ();
 
+
     /***********************************************************
     remote folder path, usually without trailing /, exception "/"
     ***********************************************************/
     public string remote_path ();
+
 
     /***********************************************************
     remote folder path, always with a trailing /
@@ -155,10 +165,12 @@ class Folder : GLib.Object {
         return _definition.navigation_pane_clsid;
     }
 
+
     /***********************************************************
     remote folder path with server url
     ***********************************************************/
     public QUrl remote_url ();
+
 
     /***********************************************************
     switch sync on or off
@@ -167,6 +179,7 @@ class Folder : GLib.Object {
 
     public bool sync_paused ();
 
+
     /***********************************************************
     Returns true when the folder may sync.
     ***********************************************************/
@@ -174,21 +187,25 @@ class Folder : GLib.Object {
 
     public void prepare_to_sync ();
 
+
     /***********************************************************
     True if the folder is busy and can't initiate
     a synchronization
     ***********************************************************/
     public virtual bool is_busy ();
 
+
     /***********************************************************
     True if the folder is currently synchronizing
     ***********************************************************/
     public bool is_sync_running ();
 
+
     /***********************************************************
     return the last sync result with error message and status
     ***********************************************************/
     public SyncResult sync_result ();
+
 
     /***********************************************************
     This is called when the sync folder definition is removed. Do cleanups here.
@@ -205,15 +222,18 @@ class Folder : GLib.Object {
 
     public void set_dirty_network_limits ();
 
+
     /***********************************************************
     Ignore syncing of hidden files or not. This is defined in the
     folder definition
     ***********************************************************/
     public bool ignore_hidden_files ();
+
+
     public void set_ignore_hidden_files (bool ignore);
 
     // Used by the Socket API
-    public SyncJournalDb *journal_db () {
+    public SyncJournalDb journal_database () {
         return &_journal;
     }
     public SyncEngine &sync_engine () {
@@ -223,7 +243,8 @@ class Folder : GLib.Object {
         return _vfs;
     }
 
-    public RequestEtagJob *etag_job () {
+
+    public RequestEtagJob etag_job () {
         return _request_etag_job;
     }
     public std.chrono.milliseconds msec_since_last_sync () {
@@ -244,15 +265,18 @@ class Folder : GLib.Object {
     /// Removes the folder from the account's settings.
     public void remove_from_settings ();
 
+
     /***********************************************************
     Returns whether a file inside this folder should be excluded.
     ***********************************************************/
     public bool is_file_excluded_absolute (string full_path);
 
+
     /***********************************************************
     Returns whether a file inside this folder should be excluded.
     ***********************************************************/
     public bool is_file_excluded_relative (string relative_path);
+
 
     /***********************************************************
     Calls schedules this folder on the FolderMan after a short delay.
@@ -266,11 +290,13 @@ class Folder : GLib.Object {
     ***********************************************************/
     public void schedule_this_folder_soon ();
 
+
     /***********************************************************
     Migration : When this flag is true, this folder will save to
     the backwards-compatible 'Folders' section in the config file.
     ***********************************************************/
     public void set_save_backwards_compatible (bool save);
+
 
     /***********************************************************
     Used to have placeholders : save in placeholder config section
@@ -279,12 +305,14 @@ class Folder : GLib.Object {
         _save_in_folders_with_placeholders = true;
     }
 
+
     /***********************************************************
     Sets up this folder's folder_watcher if possible.
 
     May be called several times.
     ***********************************************************/
     public void register_folder_watcher ();
+
 
     /***********************************************************
     virtual files of some kind are enabled
@@ -294,9 +322,12 @@ class Folder : GLib.Object {
     users to make existing files virtual.
     ***********************************************************/
     public bool virtual_files_enabled ();
+
+
     public void set_virtual_files_enabled (bool enabled);
 
     public void set_root_pin_state (PinState state);
+
 
     /***********************************************************
     Whether user desires a switch that couldn't be executed yet, see member
@@ -308,9 +339,11 @@ class Folder : GLib.Object {
         _vfs_on_off_pending = pending;
     }
 
+
     public void switch_to_virtual_files ();
 
     public void process_switched_to_virtual_files ();
+
 
     /***********************************************************
     Whether this folder should show selective sync ui
@@ -328,6 +361,7 @@ signals:
     void sync_paused_changed (Folder *, bool paused);
     void can_sync_changed ();
 
+
     /***********************************************************
     Fires for each change inside this folder that wasn't caused
     by sync activity.
@@ -343,6 +377,7 @@ signals:
     // connected to the corresponding signals in the SyncEngine
     public void on_about_to_remove_all_files (SyncFileItem.Direction, std.function<void (bool)> callback);
 
+
     /***********************************************************
     Starts a sync operation
 
@@ -351,9 +386,16 @@ signals:
     public void on_start_sync (string[] &path_list = string[] ());
 
     public int on_discard_download_progress ();
+
+
     public int on_download_info_count ();
+
+
     public int on_wipe_error_blacklist ();
+
+
     public int on_error_black_list_entry_count ();
+
 
     /***********************************************************
     Triggered by the folder watcher when a file/dir in this folder
@@ -362,12 +404,13 @@ signals:
     ***********************************************************/
     public void on_watched_path_changed (string path, ChangeReason reason);
 
+
     /***********************************************************
     Mark a virtual file as being requested for download, and on_start a sync.
 
     "implicit" here means that this download request comes from the user wan
     to access the file's data. The user did not change the file's pin state.
-    If the file is currently OnlineOnly its state will change to Unspecif
+    If the file is currently VfsItemAvailability.ONLINE_ONLY its state will change to Unspecif
 
     The download re
     in the database. This is necessary since the hydration is not driven by
@@ -379,6 +422,7 @@ signals:
     ***********************************************************/
     public void on_implicitly_hydrate_file (string relativepath);
 
+
     /***********************************************************
     Adds the path to the local discovery list
 
@@ -388,6 +432,7 @@ signals:
     ***********************************************************/
     public void on_schedule_path_for_local_discovery (string relative_path);
 
+
     /***********************************************************
     Ensures that the next sync performs a full local discovery.
     ***********************************************************/
@@ -396,6 +441,7 @@ signals:
 
     private void on_sync_started ();
     private void on_sync_finished (bool);
+
 
     /***********************************************************
     Adds a error message that's not tied to a specific item.
@@ -408,8 +454,8 @@ signals:
     private void on_item_completed (SyncFileItemPtr &);
 
     private void on_run_etag_job ();
-    private void on_etag_retrieved (GLib.ByteArray &, QDateTime &tp);
-    private void on_etag_retrieved_from_sync_engine (GLib.ByteArray &, QDateTime &time);
+    private void on_etag_retrieved (GLib.ByteArray , QDateTime &tp);
+    private void on_etag_retrieved_from_sync_engine (GLib.ByteArray , QDateTime &time);
 
     private void on_emit_finished_delayed ();
 
@@ -417,11 +463,13 @@ signals:
 
     private void on_log_propagation_start ();
 
+
     /***********************************************************
     Adds this folder to the list of scheduled folders in the
     FolderMan.
     ***********************************************************/
     private void on_schedule_this_folder ();
+
 
     /***********************************************************
     Adjust sync result based on conflict data from IssuesWidget.
@@ -431,15 +479,18 @@ signals:
     ***********************************************************/
     private void on_folder_conflicts (string folder, string[] &conflict_paths);
 
+
     /***********************************************************
     Warn users if they create a file or folder that is selective-sync excluded
     ***********************************************************/
     private void on_warn_on_new_excluded_item (SyncJournalFileRecord &record, QStringRef &path);
 
+
     /***********************************************************
     Warn users about an unreliable folder watcher
     ***********************************************************/
     private void on_watcher_unreliable (string message);
+
 
     /***********************************************************
     Aborts any running sync and blocks it until hydration is on_finished.
@@ -448,6 +499,7 @@ signals:
     at the same time.
     ***********************************************************/
     private void on_hydration_starts ();
+
 
     /***********************************************************
     Unblocks normal sync operation
@@ -510,25 +562,28 @@ signals:
 
     private QTimer _schedule_self_timer;
 
+
     /***********************************************************
     When the same local path is synced to multiple accounts, only one
     of them can be stored in the settings in a way that's compatible
     with old clients that don't support it. This flag marks folders
     that shall be written in a backwards-compatible way, by being set
-    on the *first* Folder instance that was configured for each local
+    on the first* Folder instance that was configured for each local
     path.
     ***********************************************************/
     private bool _save_backwards_compatible = false;
+
 
     /***********************************************************
     Whether the folder should be saved in that settings group
 
     If it was read from there it had virtual files enabled at some
-    point and might still have db entries or suffix-virtual files even
+    point and might still have database entries or suffix-virtual files even
     if they are disabled right now. This flag ensures folders that
     were in that group once never go back.
     ***********************************************************/
     private bool _save_in_folders_with_placeholders = false;
+
 
     /***********************************************************
     Whether a vfs mode switch is pending
@@ -539,10 +594,12 @@ signals:
     ***********************************************************/
     private bool _vfs_on_off_pending = false;
 
+
     /***********************************************************
     Whether this folder has just switched to VFS or not
     ***********************************************************/
     private bool _has_switched_to_vfs = false;
+
 
     /***********************************************************
     Watches this folder's local directory for changes.
@@ -551,10 +608,12 @@ signals:
     ***********************************************************/
     private QScopedPointer<Folder_watcher> _folder_watcher;
 
+
     /***********************************************************
     Keeps track of locally dirty files so we can skip local discovery sometimes.
     ***********************************************************/
     private QScopedPointer<LocalDiscoveryTracker> _local_discovery_tracker;
+
 
     /***********************************************************
     The vfs mode instance (created by plugin) to use. Never null.
@@ -563,8 +622,8 @@ signals:
 };
 
 Folder.Folder (FolderDefinition &definition,
-    AccountState *account_state, std.unique_ptr<Vfs> vfs,
-    GLib.Object *parent)
+    AccountState account_state, std.unique_ptr<Vfs> vfs,
+    GLib.Object parent)
     : GLib.Object (parent)
     , _account_state (account_state)
     , _definition (definition)
@@ -635,7 +694,7 @@ Folder.Folder (FolderDefinition &definition,
     if (_definition.virtual_files_mode == Vfs.WithSuffix
         && _definition.upgrade_vfs_mode) {
         if (is_vfs_plugin_available (Vfs.WindowsCfApi)) {
-            if (auto winvfs = create_vfs_from_plugin (Vfs.WindowsCfApi)) {
+            if (var winvfs = create_vfs_from_plugin (Vfs.WindowsCfApi)) {
                 // Wipe the existing suffix files from fs and journal
                 SyncEngine.wipe_virtual_files (path (), _journal, _vfs);
 
@@ -832,10 +891,10 @@ void Folder.on_run_etag_job () {
     // check if the etag is different when retrieved
     GLib.Object.connect (_request_etag_job.data (), &RequestEtagJob.on_etag_retrieved, this, &Folder.on_etag_retrieved);
     FolderMan.instance ().on_schedule_e_tag_job (alias (), _request_etag_job);
-    // The _request_etag_job is auto deleting itself on finish. Our guard pointer _request_etag_job will then be null.
+    // The _request_etag_job is var deleting itself on finish. Our guard pointer _request_etag_job will then be null.
 }
 
-void Folder.on_etag_retrieved (GLib.ByteArray &etag, QDateTime &tp) {
+void Folder.on_etag_retrieved (GLib.ByteArray etag, QDateTime &tp) {
     // re-enable sync if it was disabled because network was down
     FolderMan.instance ().set_sync_enabled (true);
 
@@ -848,7 +907,7 @@ void Folder.on_etag_retrieved (GLib.ByteArray &etag, QDateTime &tp) {
     _account_state.tag_last_successfull_e_tag_request (tp);
 }
 
-void Folder.on_etag_retrieved_from_sync_engine (GLib.ByteArray &etag, QDateTime &time) {
+void Folder.on_etag_retrieved_from_sync_engine (GLib.ByteArray etag, QDateTime &time) {
     q_c_info (lc_folder) << "Root etag from during sync:" << etag;
     account_state ().tag_last_successfull_e_tag_request (time);
     _last_etag = etag;
@@ -894,7 +953,7 @@ void Folder.show_sync_result_popup () {
 void Folder.create_gui_log (string filename, LogStatus status, int count,
     const string rename_target) {
     if (count > 0) {
-        Logger *logger = Logger.instance ();
+        Logger logger = Logger.instance ();
 
         string file = QDir.to_native_separators (filename);
         string text;
@@ -990,11 +1049,11 @@ void Folder.start_vfs () {
     _vfs.on_start (vfs_params);
 
     // Immediately mark the sqlite temporaries as excluded. They get recreated
-    // on db-open and need to get marked again every time.
-    string state_db_file = _journal.database_file_path ();
+    // on database-open and need to get marked again every time.
+    string state_database_file = _journal.database_file_path ();
     _journal.open ();
-    _vfs.on_file_status_changed (state_db_file + "-wal", SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED);
-    _vfs.on_file_status_changed (state_db_file + "-shm", SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED);
+    _vfs.on_file_status_changed (state_database_file + "-wal", SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED);
+    _vfs.on_file_status_changed (state_database_file + "-shm", SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED);
 }
 
 int Folder.on_discard_download_progress () {
@@ -1003,7 +1062,7 @@ int Folder.on_discard_download_progress () {
     QSet<string> keep_nothing;
     const QVector<SyncJournalDb.DownloadInfo> deleted_infos =
         _journal.get_and_delete_stale_download_infos (keep_nothing);
-    for (auto &deleted_info : deleted_infos) {
+    for (var &deleted_info : deleted_infos) {
         const string tmppath = folderpath.file_path (deleted_info._tmpfile);
         q_c_info (lc_folder) << "Deleting temporary file : " << tmppath;
         FileSystem.remove (tmppath);
@@ -1029,13 +1088,13 @@ void Folder.on_watched_path_changed (string path, ChangeReason reason) {
         return;
     }
 
-    auto relative_path = path.mid_ref (this.path ().size ());
+    var relative_path = path.mid_ref (this.path ().size ());
 
     // Add to list of locally modified paths
     //
     // We do this before checking for our own sync-related changes to make
     // extra sure to not miss relevant changes.
-    auto relative_path_bytes = relative_path.to_utf8 ();
+    var relative_path_bytes = relative_path.to_utf8 ();
     _local_discovery_tracker.add_touched_path (relative_path_bytes);
 
     // The folder watcher fires a lot of bogus notifications during
@@ -1060,10 +1119,10 @@ void Folder.on_watched_path_changed (string path, ChangeReason reason) {
             && !FileSystem.file_changed (path, record._file_size, record._modtime)) {
             spurious = true;
 
-            if (auto pin_state = _vfs.pin_state (relative_path.to_string ())) {
-                if (*pin_state == PinState.AlwaysLocal && record.is_virtual_file ())
+            if (var pin_state = _vfs.pin_state (relative_path.to_string ())) {
+                if (*pin_state == PinState.PinState.ALWAYS_LOCAL && record.is_virtual_file ())
                     spurious = false;
-                if (*pin_state == PinState.OnlineOnly && record.is_file ())
+                if (*pin_state == PinState.VfsItemAvailability.ONLINE_ONLY && record.is_file ())
                     spurious = false;
             }
         }
@@ -1088,7 +1147,7 @@ void Folder.on_implicitly_hydrate_file (string relativepath) {
     SyncJournalFileRecord record;
     _journal.get_file_record (relativepath.to_utf8 (), &record);
     if (!record.is_valid ()) {
-        q_c_info (lc_folder) << "Did not find file in db";
+        q_c_info (lc_folder) << "Did not find file in database";
         return;
     }
     if (!record.is_virtual_file ()) {
@@ -1100,9 +1159,9 @@ void Folder.on_implicitly_hydrate_file (string relativepath) {
 
     // Change the file's pin state if it's contradictory to being hydrated
     // (suffix-virtual file's pin state is stored at the hydrated path)
-    const auto pin = _vfs.pin_state (relativepath);
-    if (pin && *pin == PinState.OnlineOnly) {
-        if (!_vfs.set_pin_state (relativepath, PinState.Unspecified)) {
+    const var pin = _vfs.pin_state (relativepath);
+    if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY) {
+        if (!_vfs.set_pin_state (relativepath, PinState.PinState.UNSPECIFIED)) {
             q_c_warning (lc_folder) << "Could not set pin state of" << relativepath << "to unspecified";
         }
     }
@@ -1172,12 +1231,12 @@ void Folder.save_to_settings () {
     // Remove first to make sure we don't get duplicates
     remove_from_settings ();
 
-    auto settings = _account_state.settings ();
+    var settings = _account_state.settings ();
     string settings_group = QStringLiteral ("Multifolders");
 
     // True if the folder path appears in only one account
-    const auto folder_map = FolderMan.instance ().map ();
-    const auto one_account_only = std.none_of (folder_map.cbegin (), folder_map.cend (), [this] (auto *other) {
+    const var folder_map = FolderMan.instance ().map ();
+    const var one_account_only = std.none_of (folder_map.cbegin (), folder_map.cend (), [this] (var other) {
         return other != this && other.clean_path () == this.clean_path ();
     });
 
@@ -1198,7 +1257,7 @@ void Folder.save_to_settings () {
     }
 
     settings.begin_group (settings_group);
-    // Note : Each of these groups might have a "version" tag, but that's
+    // Note: Each of these groups might have a "version" tag, but that's
     //       currently unused.
     settings.begin_group (FolderMan.escape_alias (_definition.alias));
     FolderDefinition.save (*settings, _definition);
@@ -1208,7 +1267,7 @@ void Folder.save_to_settings () {
 }
 
 void Folder.remove_from_settings () {
-    auto settings = _account_state.settings ();
+    var settings = _account_state.settings ();
     settings.begin_group (QLatin1String ("Folders"));
     settings.remove (FolderMan.escape_alias (_definition.alias));
     settings.end_group ();
@@ -1245,25 +1304,25 @@ void Folder.wipe_for_removal () {
     FolderMan.instance ().socket_api ().on_unregister_path (alias ());
     _journal.close (); // close the sync journal
 
-    // Remove db and temporaries
-    string state_db_file = _engine.journal ().database_file_path ();
+    // Remove database and temporaries
+    string state_database_file = _engine.journal ().database_file_path ();
 
-    QFile file (state_db_file);
+    QFile file = new QFile (state_database_file);
     if (file.exists ()) {
         if (!file.remove ()) {
-            q_c_warning (lc_folder) << "Failed to remove existing csync State_d_b " << state_db_file;
+            q_c_warning (lc_folder) << "Failed to remove existing csync State_d_b " << state_database_file;
         } else {
-            q_c_info (lc_folder) << "wipe : Removed csync State_d_b " << state_db_file;
+            q_c_info (lc_folder) << "wipe : Removed csync State_d_b " << state_database_file;
         }
     } else {
-        q_c_warning (lc_folder) << "statedb is empty, can not remove.";
+        q_c_warning (lc_folder) << "statedatabase is empty, can not remove.";
     }
 
-    // Also remove other db related files
-    QFile.remove (state_db_file + ".ctmp");
-    QFile.remove (state_db_file + "-shm");
-    QFile.remove (state_db_file + "-wal");
-    QFile.remove (state_db_file + "-journal");
+    // Also remove other database related files
+    QFile.remove (state_database_file + ".ctmp");
+    QFile.remove (state_database_file + "-shm");
+    QFile.remove (state_database_file + "-wal");
+    QFile.remove (state_database_file + "-journal");
 
     _vfs.stop ();
     _vfs.unregister_folder ();
@@ -1301,7 +1360,7 @@ void Folder.on_start_sync (string[] &path_list) {
     set_sync_options ();
 
     static std.chrono.milliseconds full_local_discovery_interval = [] () {
-        auto interval = ConfigFile ().full_local_discovery_interval ();
+        var interval = ConfigFile ().full_local_discovery_interval ();
         GLib.ByteArray env = qgetenv ("OWNCLOUD_FULL_LOCAL_DISCOVERY_INTERVAL");
         if (!env.is_empty ()) {
             interval = std.chrono.milliseconds (env.to_long_long ());
@@ -1339,8 +1398,8 @@ void Folder.correct_placeholder_files () {
     if (_definition.virtual_files_mode == Vfs.Off) {
         return;
     }
-    static const auto placeholders_corrected_key = QStringLiteral ("placeholders_corrected");
-    const auto placeholders_corrected = _journal.key_value_store_get_int (placeholders_corrected_key, 0);
+    static const var placeholders_corrected_key = QStringLiteral ("placeholders_corrected");
+    const var placeholders_corrected = _journal.key_value_store_get_int (placeholders_corrected_key, 0);
     if (!placeholders_corrected) {
         q_c_debug (lc_folder) << "Make sure all virtual files are placeholder files";
         switch_to_virtual_files ();
@@ -1352,7 +1411,7 @@ void Folder.set_sync_options () {
     SyncOptions opt;
     ConfigFile cfg_file;
 
-    auto new_folder_limit = cfg_file.new_big_folder_size_limit ();
+    var new_folder_limit = cfg_file.new_big_folder_size_limit ();
     opt._new_big_folder_size_limit = new_folder_limit.first ? new_folder_limit.second * 1000LL * 1000LL : -1; // convert from MB to B
     opt._confirm_external_storage = cfg_file.confirm_external_storage ();
     opt._move_files_to_trash = cfg_file.move_to_trash ();
@@ -1421,7 +1480,7 @@ void Folder.on_sync_finished (bool on_success) {
     _file_log.finish ();
     show_sync_result_popup ();
 
-    auto another_sync_needed = _engine.is_another_sync_needed ();
+    var another_sync_needed = _engine.is_another_sync_needed ();
 
     if (sync_error) {
         _sync_result.set_status (SyncResult.Error);
@@ -1445,7 +1504,7 @@ void Folder.on_sync_finished (bool on_success) {
 
     if (_sync_result.status () == SyncResult.Success && on_success) {
         // Clear the white list as all the folders that should be on that list are sync-ed
-        journal_db ().set_selective_sync_list (SyncJournalDb.SelectiveSyncWhiteList, string[] ());
+        journal_database ().set_selective_sync_list (SyncJournalDb.SelectiveSyncWhiteList, string[] ());
     }
 
     if ( (_sync_result.status () == SyncResult.Success
@@ -1523,24 +1582,24 @@ void Folder.on_item_completed (SyncFileItemPtr &item) {
 }
 
 void Folder.on_new_big_folder_discovered (string new_f, bool is_external) {
-    auto new_folder = new_f;
+    var new_folder = new_f;
     if (!new_folder.ends_with (QLatin1Char ('/'))) {
         new_folder += QLatin1Char ('/');
     }
-    auto journal = journal_db ();
+    var journal = journal_database ();
 
     // Add the entry to the blacklist if it is neither in the blacklist or whitelist already
     bool ok1 = false;
     bool ok2 = false;
-    auto blacklist = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, &ok1);
-    auto whitelist = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncWhiteList, &ok2);
+    var blacklist = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, &ok1);
+    var whitelist = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncWhiteList, &ok2);
     if (ok1 && ok2 && !blacklist.contains (new_folder) && !whitelist.contains (new_folder)) {
         blacklist.append (new_folder);
         journal.set_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, blacklist);
     }
 
     // And add the entry to the undecided list and signal the UI
-    auto undecided_list = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncUndecidedList, &ok1);
+    var undecided_list = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncUndecidedList, &ok1);
     if (ok1) {
         if (!undecided_list.contains (new_folder)) {
             undecided_list.append (new_folder);
@@ -1553,7 +1612,7 @@ void Folder.on_new_big_folder_discovered (string new_f, bool is_external) {
                                       : (tr ("A folder from an external storage has been added.\n"));
         message += tr ("Please go in the settings to select it if you wish to download it.");
 
-        auto logger = Logger.instance ();
+        var logger = Logger.instance ();
         logger.post_optional_gui_log (Theme.instance ().app_name_gui (), message);
     }
 }
@@ -1577,7 +1636,7 @@ void Folder.on_schedule_path_for_local_discovery (string relative_path) {
 void Folder.on_folder_conflicts (string folder, string[] &conflict_paths) {
     if (folder != _definition.alias)
         return;
-    auto &r = _sync_result;
+    var &r = _sync_result;
 
     // If the number of conflicts is too low, adjust it upwards
     if (conflict_paths.size () > r.num_new_conflict_items () + r.num_old_conflict_items ())
@@ -1590,7 +1649,7 @@ void Folder.on_warn_on_new_excluded_item (SyncJournalFileRecord &record, QString
         return;
 
     // Don't warn for items that no longer exist.
-    // Note : This assumes we're getting file watcher notifications
+    // Note: This assumes we're getting file watcher notifications
     // for folders only on creation and deletion - if we got a notification
     // on content change that would create spurious warnings.
     QFileInfo fi (_canonical_local_path + path);
@@ -1598,13 +1657,13 @@ void Folder.on_warn_on_new_excluded_item (SyncJournalFileRecord &record, QString
         return;
 
     bool ok = false;
-    auto blacklist = _journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, &ok);
+    var blacklist = _journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncBlackList, &ok);
     if (!ok)
         return;
     if (!blacklist.contains (path + "/"))
         return;
 
-    const auto message = fi.is_dir ()
+    const var message = fi.is_dir ()
         ? tr ("The folder %1 was created but was excluded from synchronization previously. "
              "Data inside it will not be synchronized.")
               .arg (fi.file_path ())
@@ -1617,7 +1676,7 @@ void Folder.on_warn_on_new_excluded_item (SyncJournalFileRecord &record, QString
 
 void Folder.on_watcher_unreliable (string message) {
     q_c_warning (lc_folder) << "Folder watcher for" << path () << "became unreliable:" << message;
-    auto full_message =
+    var full_message =
         tr ("Changes in synchronized folders could not be tracked reliably.\n"
            "\n"
            "This means that the synchronization client might not upload local changes "
@@ -1699,12 +1758,12 @@ void Folder.on_about_to_remove_all_files (SyncFileItem.Direction dir, std.functi
                                                  "synchronized with your server, making such files unavailable unless restored.\n"
                                                  "Are you sure you want to sync those actions with the server?\n"
                                                  "If this was an accident and you decide to keep your files, they will be re-synced from the server.");
-    auto msg_box = new QMessageBox (QMessageBox.Warning, tr ("Remove All Files?"),
+    var msg_box = new QMessageBox (QMessageBox.Warning, tr ("Remove All Files?"),
         msg.arg (short_gui_local_path ()), QMessageBox.NoButton);
     msg_box.set_attribute (Qt.WA_DeleteOnClose);
     msg_box.set_window_flags (msg_box.window_flags () | Qt.Window_stays_on_top_hint);
     msg_box.add_button (tr ("Remove all files"), QMessageBox.DestructiveRole);
-    QPushButton *keep_btn = msg_box.add_button (tr ("Keep files"), QMessageBox.AcceptRole);
+    QPushButton keep_btn = msg_box.add_button (tr ("Keep files"), QMessageBox.AcceptRole);
     bool old_paused = sync_paused ();
     set_sync_paused (true);
     connect (msg_box, &QMessageBox.on_finished, this, [msg_box, keep_btn, callback, old_paused, this] {
@@ -1712,7 +1771,7 @@ void Folder.on_about_to_remove_all_files (SyncFileItem.Direction dir, std.functi
         callback (cancel);
         if (cancel) {
             FileSystem.set_folder_minimum_permissions (path ());
-            journal_db ().clear_file_table ();
+            journal_database ().clear_file_table ();
             _last_etag.clear ();
             on_schedule_this_folder ();
         }
@@ -1750,7 +1809,7 @@ void FolderDefinition.save (QSettings &settings, FolderDefinition &folder) {
 }
 
 bool FolderDefinition.on_load (QSettings &settings, string alias,
-    FolderDefinition *folder) {
+    FolderDefinition folder) {
     folder.alias = FolderMan.unescape_alias (alias);
     folder.local_path = settings.value (QLatin1String ("local_path")).to_string ();
     folder.journal_path = settings.value (QLatin1String ("journal_path")).to_string ();
@@ -1762,7 +1821,7 @@ bool FolderDefinition.on_load (QSettings &settings, string alias,
     folder.virtual_files_mode = Vfs.Off;
     string vfs_mode_string = settings.value (QStringLiteral ("virtual_files_mode")).to_string ();
     if (!vfs_mode_string.is_empty ()) {
-        if (auto mode = Vfs.mode_from_string (vfs_mode_string)) {
+        if (var mode = Vfs.mode_from_string (vfs_mode_string)) {
             folder.virtual_files_mode = *mode;
         } else {
             q_c_warning (lc_folder) << "Unknown virtual_files_mode:" << vfs_mode_string << "assuming 'off'";
@@ -1810,7 +1869,7 @@ string FolderDefinition.absolute_journal_path () {
 }
 
 string FolderDefinition.default_journal_path (AccountPtr account) {
-    return SyncJournalDb.make_db_name (local_path, account.url (), target_path, account.credentials ().user ());
+    return SyncJournalDb.make_database_name (local_path, account.url (), target_path, account.credentials ().user ());
 }
 
 } // namespace Occ

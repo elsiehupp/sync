@@ -11,12 +11,12 @@
 using namespace Occ;
 
 bool itemSuccessful (ItemCompletedSpy &spy, string path, SyncInstructions instr) {
-    auto item = spy.findItem (path);
+    var item = spy.findItem (path);
     return item._status == SyncFileItem.Success && item._instruction == instr;
 }
 
 bool itemConflict (ItemCompletedSpy &spy, string path) {
-    auto item = spy.findItem (path);
+    var item = spy.findItem (path);
     return item._status == SyncFileItem.Conflict && item._instruction == CSYNC_INSTRUCTION_CONFLICT;
 }
 
@@ -26,7 +26,7 @@ bool itemSuccessfulMove (ItemCompletedSpy &spy, string path) {
 
 string[] findConflicts (FileInfo &dir) {
     string[] conflicts;
-    for (auto &item : dir.children) {
+    for (var &item : dir.children) {
         if (item.name.contains (" (conflicted copy")) {
             conflicts.append (item.path ());
         }
@@ -36,10 +36,10 @@ string[] findConflicts (FileInfo &dir) {
 
 bool expectAndWipeConflict (FileModifier &local, FileInfo state, string path) {
     PathComponents pathComponents (path);
-    auto base = state.find (pathComponents.parentDirComponents ());
+    var base = state.find (pathComponents.parentDirComponents ());
     if (!base)
         return false;
-    for (auto &item : base.children) {
+    for (var &item : base.children) {
         if (item.name.startsWith (pathComponents.fileName ()) && item.name.contains (" (conflicted copy")) {
             local.remove (item.path ());
             return true;
@@ -68,7 +68,7 @@ class TestSyncConflict : GLib.Object {
         QVERIFY (fakeFolder.syncOnce ());
 
         // Verify that the conflict names don't have the user name
-        for (auto &name : findConflicts (fakeFolder.currentLocalState ().children["A"])) {
+        for (var &name : findConflicts (fakeFolder.currentLocalState ().children["A"])) {
             QVERIFY (!name.contains (fakeFolder.syncEngine ().account ().davDisplayName ()));
         }
 
@@ -86,8 +86,8 @@ class TestSyncConflict : GLib.Object {
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.PutOperation) {
                 if (request.rawHeader ("OC-Conflict") == "1") {
-                    auto baseFileId = request.rawHeader ("OC-ConflictBaseFileId");
-                    auto components = request.url ().toString ().split ('/');
+                    var baseFileId = request.rawHeader ("OC-ConflictBaseFileId");
+                    var components = request.url ().toString ().split ('/');
                     string conflictFile = components.mid (components.size () - 2).join ('/');
                     conflictMap[baseFileId] = conflictFile;
                     [&] {
@@ -105,12 +105,12 @@ class TestSyncConflict : GLib.Object {
         fakeFolder.remoteModifier ().appendByte ("A/a2");
         fakeFolder.remoteModifier ().appendByte ("A/a2");
         QVERIFY (fakeFolder.syncOnce ());
-        auto local = fakeFolder.currentLocalState ();
-        auto remote = fakeFolder.currentRemoteState ();
+        var local = fakeFolder.currentLocalState ();
+        var remote = fakeFolder.currentRemoteState ();
         QCOMPARE (local, remote);
 
-        auto a1FileId = fakeFolder.remoteModifier ().find ("A/a1").fileId;
-        auto a2FileId = fakeFolder.remoteModifier ().find ("A/a2").fileId;
+        var a1FileId = fakeFolder.remoteModifier ().find ("A/a1").fileId;
+        var a2FileId = fakeFolder.remoteModifier ().find ("A/a2").fileId;
         QVERIFY (conflictMap.contains (a1FileId));
         QVERIFY (conflictMap.contains (a2FileId));
         QCOMPARE (conflictMap.size (), 2);
@@ -135,8 +135,8 @@ class TestSyncConflict : GLib.Object {
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.PutOperation) {
                 if (request.rawHeader ("OC-Conflict") == "1") {
-                    auto baseFileId = request.rawHeader ("OC-ConflictBaseFileId");
-                    auto components = request.url ().toString ().split ('/');
+                    var baseFileId = request.rawHeader ("OC-ConflictBaseFileId");
+                    var components = request.url ().toString ().split ('/');
                     string conflictFile = components.mid (components.size () - 2).join ('/');
                     conflictMap[baseFileId] = conflictFile;
                     [&] {
@@ -151,7 +151,7 @@ class TestSyncConflict : GLib.Object {
         // Explicitly add a conflict file to simulate the case where the upload of the
         // file didn't finish in the same sync run that the conflict was created.
         // To do that we need to create a mock conflict record.
-        auto a1FileId = fakeFolder.remoteModifier ().find ("A/a1").fileId;
+        var a1FileId = fakeFolder.remoteModifier ().find ("A/a1").fileId;
         string conflictName = QLatin1String ("A/a1 (conflicted copy me 1234)");
         fakeFolder.localModifier ().insert (conflictName, 64, 'L');
         ConflictRecord conflictRecord;
@@ -182,7 +182,7 @@ class TestSyncConflict : GLib.Object {
         QVERIFY (conflictMap.isEmpty ());
 
         // Conflict files for conflict files!
-        auto a1ConflictFileId = fakeFolder.remoteModifier ().find (conflictName).fileId;
+        var a1ConflictFileId = fakeFolder.remoteModifier ().find (conflictName).fileId;
         fakeFolder.remoteModifier ().appendByte (conflictName);
         fakeFolder.remoteModifier ().appendByte (conflictName);
         fakeFolder.localModifier ().appendByte (conflictName);
@@ -205,17 +205,17 @@ class TestSyncConflict : GLib.Object {
         fakeFolder.remoteModifier ().insert ("A/a1 (conflicted copy 1234)");
         QVERIFY (fakeFolder.syncOnce ());
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
-        auto conflictRecord = fakeFolder.syncJournal ().conflictRecord ("A/a1 (conflicted copy 1234)");
+        var conflictRecord = fakeFolder.syncJournal ().conflictRecord ("A/a1 (conflicted copy 1234)");
         QVERIFY (conflictRecord.isValid ());
         QCOMPARE (conflictRecord.baseFileId, fakeFolder.remoteModifier ().find ("A/a1").fileId);
         QCOMPARE (conflictRecord.initialBasePath, GLib.ByteArray ("A/a1"));
 
         // Now with server headers
         GLib.Object parent;
-        auto a2FileId = fakeFolder.remoteModifier ().find ("A/a2").fileId;
+        var a2FileId = fakeFolder.remoteModifier ().find ("A/a2").fileId;
         fakeFolder.setServerOverride ([&] (QNetworkAccessManager.Operation op, QNetworkRequest &request, QIODevice *) . QNetworkReply * {
             if (op == QNetworkAccessManager.GetOperation) {
-                auto reply = new FakeGetReply (fakeFolder.remoteModifier (), op, request, &parent);
+                var reply = new FakeGetReply (fakeFolder.remoteModifier (), op, request, &parent);
                 reply.setRawHeader ("OC-Conflict", "1");
                 reply.setRawHeader ("OC-ConflictBaseFileId", a2FileId);
                 reply.setRawHeader ("OC-ConflictBaseMtime", "1234");
@@ -278,10 +278,10 @@ class TestSyncConflict : GLib.Object {
         fakeFolder.remoteModifier ().appendByte ("A/a2");
         QVERIFY (fakeFolder.syncOnce ());
 
-        auto conflicts = findConflicts (fakeFolder.currentLocalState ().children["A"]);
+        var conflicts = findConflicts (fakeFolder.currentLocalState ().children["A"]);
         GLib.ByteArray a1conflict;
         GLib.ByteArray a2conflict;
-        for (auto & conflict : conflicts) {
+        for (var & conflict : conflicts) {
             if (conflict.contains ("a1"))
                 a1conflict = conflict.toUtf8 ();
             if (conflict.contains ("a2"))
@@ -383,7 +383,7 @@ class TestSyncConflict : GLib.Object {
         fakeFolder.syncEngine ().account ().setCapabilities ({ { "uploadConflictFiles", true } });
         ItemCompletedSpy completeSpy (fakeFolder);
 
-        auto on_cleanup = [&] () {
+        var on_cleanup = [&] () {
             completeSpy.clear ();
         };
         on_cleanup ();
@@ -407,12 +407,12 @@ class TestSyncConflict : GLib.Object {
 
         QVERIFY (fakeFolder.syncOnce ());
 
-        auto conflicts = findConflicts (fakeFolder.currentLocalState ());
+        var conflicts = findConflicts (fakeFolder.currentLocalState ());
         conflicts += findConflicts (fakeFolder.currentLocalState ().children["A"]);
         QCOMPARE (conflicts.size (), 3);
         std.sort (conflicts.begin (), conflicts.end ());
 
-        auto conflictRecords = fakeFolder.syncJournal ().conflictRecordPaths ();
+        var conflictRecords = fakeFolder.syncJournal ().conflictRecordPaths ();
         QCOMPARE (conflictRecords.size (), 3);
         std.sort (conflictRecords.begin (), conflictRecords.end ());
 
@@ -478,12 +478,12 @@ class TestSyncConflict : GLib.Object {
         fakeFolder.remoteModifier ().insert ("B/b1/zzz");
 
         QVERIFY (fakeFolder.syncOnce ());
-        auto conflicts = findConflicts (fakeFolder.currentLocalState ());
+        var conflicts = findConflicts (fakeFolder.currentLocalState ());
         conflicts += findConflicts (fakeFolder.currentLocalState ().children["B"]);
         QCOMPARE (conflicts.size (), 3);
         std.sort (conflicts.begin (), conflicts.end ());
 
-        auto conflictRecords = fakeFolder.syncJournal ().conflictRecordPaths ();
+        var conflictRecords = fakeFolder.syncJournal ().conflictRecordPaths ();
         QCOMPARE (conflictRecords.size (), 3);
         std.sort (conflictRecords.begin (), conflictRecords.end ());
 
@@ -526,12 +526,12 @@ class TestSyncConflict : GLib.Object {
         QVERIFY (itemSuccessful (completeSpy, "A", CSYNC_INSTRUCTION_TYPE_CHANGE));
         QVERIFY (itemConflict (completeSpy, "B"));
 
-        auto conflicts = findConflicts (fakeFolder.currentLocalState ());
+        var conflicts = findConflicts (fakeFolder.currentLocalState ());
         std.sort (conflicts.begin (), conflicts.end ());
         QVERIFY (conflicts.size () == 2);
         QVERIFY (conflicts[0].contains ("A (conflicted copy"));
         QVERIFY (conflicts[1].contains ("B (conflicted copy"));
-        for (auto& conflict : conflicts)
+        for (var& conflict : conflicts)
             QDir (fakeFolder.localPath () + conflict).removeRecursively ();
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
 
@@ -565,10 +565,10 @@ class TestSyncConflict : GLib.Object {
 
         // A becomes a conflict because we don't delete folders with files
         // inside of them!
-        auto conflicts = findConflicts (fakeFolder.currentLocalState ());
+        var conflicts = findConflicts (fakeFolder.currentLocalState ());
         QVERIFY (conflicts.size () == 1);
         QVERIFY (conflicts[0].contains ("A (conflicted copy"));
-        for (auto& conflict : conflicts)
+        for (var& conflict : conflicts)
             QDir (fakeFolder.localPath () + conflict).removeRecursively ();
 
         QVERIFY (fakeFolder.syncEngine ().isAnotherSyncNeeded () == ImmediateFollowUp);
@@ -585,7 +585,7 @@ class TestSyncConflict : GLib.Object {
         fakeFolder.localModifier ().remove ("B/b1");
 
         QCOMPARE (fakeFolder.currentLocalState (), fakeFolder.currentRemoteState ());
-        auto expectedState = fakeFolder.currentLocalState ();
+        var expectedState = fakeFolder.currentLocalState ();
 
         QVERIFY (fakeFolder.syncOnce ());
 

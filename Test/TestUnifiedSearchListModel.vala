@@ -16,7 +16,7 @@ overrides QDesktopServices.openUrl
  **/
 class FakeDesktopServicesUrlHandler : GLib.Object {
 
-    public FakeDesktopServicesUrlHandler (GLib.Object *parent = nullptr)
+    public FakeDesktopServicesUrlHandler (GLib.Object parent = nullptr)
         : GLib.Object (parent) {}
 
 signals:
@@ -32,6 +32,8 @@ class FakeProvider {
     public string _id;
     public string _name;
     public int32 _order = std.numeric_limits<int32>.max ();
+
+
     public uint32 _numItemsToInsert = 5; // how many fake resuls to insert
 };
 
@@ -74,7 +76,7 @@ class FakeSearchResultsStorage { {lass Provider {
     FakeSearchResultsStorage () = default;
 
 
-    public static FakeSearchResultsStorage *instance () {
+    public static FakeSearchResultsStorage instance () {
         if (!_instance) {
             _instance = new FakeSearchResultsStorage ();
             _instance.on_init ();
@@ -90,6 +92,7 @@ class FakeSearchResultsStorage { {lass Provider {
 
         _instance = nullptr;
     }
+
 
     public void on_init () {
         if (!_searchResultsData.isEmpty ()) {
@@ -107,7 +110,7 @@ class FakeSearchResultsStorage { {lass Provider {
     public void initProvidersResponse () {
         GLib.List<QVariant> providersList;
 
-        for (auto &fakeProviderInitInfo : fakeProvidersInitInfo) {
+        for (var &fakeProviderInitInfo : fakeProvidersInitInfo) {
             providersList.push_back (QVariantMap{ {QStringLiteral ("id"), fakeProviderInitInfo._id}, {QStringLiteral ("name"), fakeProviderInitInfo._name}, {QStringLiteral ("order"), fakeProviderInitInfo._order},
             });
         }
@@ -121,8 +124,8 @@ class FakeSearchResultsStorage { {lass Provider {
 
     // on_init the map of fake search results for each provider
     public void initSearchResultsData () {
-        for (auto &fakeProvider : fakeProvidersInitInfo) {
-            auto &providerData = _searchResultsData[fakeProvider._id];
+        for (var &fakeProvider : fakeProvidersInitInfo) {
+            var &providerData = _searchResultsData[fakeProvider._id];
             providerData._id = fakeProvider._id;
             providerData._name = fakeProvider._name;
             providerData._order = fakeProvider._order;
@@ -138,16 +141,17 @@ class FakeSearchResultsStorage { {lass Provider {
         }
     }
 
+
     public const GLib.List<QVariant> resultsForProvider (string providerId, int cursor) {
         GLib.List<QVariant> list;
 
-        const auto results = resultsForProviderAsVector (providerId, cursor);
+        const var results = resultsForProviderAsVector (providerId, cursor);
 
         if (results.isEmpty ()) {
             return list;
         }
 
-        for (auto &result : results) {
+        for (var &result : results) {
             list.push_back (QVariantMap{ {"thumbnailUrl", result._thumbnailUrl}, {"title", result._title}, {"subline", result._subline}, {"resourceUrl", result._resourceUrl}, {"icon", result._icon}, {"rounded", result._rounded}
             });
         }
@@ -155,10 +159,11 @@ class FakeSearchResultsStorage { {lass Provider {
         return list;
     }
 
+
     public const QVector<Provider.SearchResult> resultsForProviderAsVector (string providerId, int cursor) {
         QVector<Provider.SearchResult> results;
 
-        const auto provider = _searchResultsData.value (providerId, Provider ());
+        const var provider = _searchResultsData.value (providerId, Provider ());
 
         if (provider._id.isEmpty () || cursor > provider._results.size ()) {
             return results;
@@ -174,6 +179,7 @@ class FakeSearchResultsStorage { {lass Provider {
 
         return results;
     }
+
 
     public const GLib.ByteArray queryProvider (string providerId, string searchTerm, int cursor) {
         if (!_searchResultsData.contains (providerId)) {
@@ -193,9 +199,9 @@ class FakeSearchResultsStorage { {lass Provider {
                 .toJson (QJsonDocument.Compact);
         }
 
-        const auto provider = _searchResultsData.value (providerId, Provider ());
+        const var provider = _searchResultsData.value (providerId, Provider ());
 
-        const auto nextCursor = cursor + pageSize;
+        const var nextCursor = cursor + pageSize;
 
         const QVariantMap dataMap = {{QStringLiteral ("name"), _searchResultsData[providerId]._name}, {QStringLiteral ("isPaginated"), _searchResultsData[providerId]._isPaginated}, {QStringLiteral ("cursor"), nextCursor}, {QStringLiteral ("entries"), resultsForProvider (providerId, cursor)}};
 
@@ -204,7 +210,8 @@ class FakeSearchResultsStorage { {lass Provider {
         return QJsonDocument.fromVariant (QVariantMap{{QStringLiteral ("ocs"), ocsMap}}).toJson (QJsonDocument.Compact);
     }
 
-    public const GLib.ByteArray &fakeProvidersResponseJson () { return _providersResponse; }
+
+    public const GLib.ByteArray fakeProvidersResponseJson () { return _providersResponse; }
 
     private static FakeSearchResultsStorage _instance;
 
@@ -243,15 +250,15 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
         accountState.on_reset (new Occ.AccountState (account));
 
-        fakeQnam.setOverride ([this] (QNetworkAccessManager.Operation op, QNetworkRequest &req, QIODevice *device) {
+        fakeQnam.setOverride ([this] (QNetworkAccessManager.Operation op, QNetworkRequest &req, QIODevice device) {
             Q_UNUSED (device);
-            QNetworkReply *reply = nullptr;
+            QNetworkReply reply = nullptr;
 
-            const auto urlQuery = QUrlQuery (req.url ());
-            const auto format = urlQuery.queryItemValue (QStringLiteral ("format"));
-            const auto cursor = urlQuery.queryItemValue (QStringLiteral ("cursor")).toInt ();
-            const auto searchTerm = urlQuery.queryItemValue (QStringLiteral ("term"));
-            const auto path = req.url ().path ();
+            const var urlQuery = QUrlQuery (req.url ());
+            const var format = urlQuery.queryItemValue (QStringLiteral ("format"));
+            const var cursor = urlQuery.queryItemValue (QStringLiteral ("cursor")).toInt ();
+            const var searchTerm = urlQuery.queryItemValue (QStringLiteral ("term"));
+            const var path = req.url ().path ();
 
             if (!req.url ().toString ().startsWith (accountState.account ().url ().toString ())) {
                 reply = new FakeErrorReply (op, req, this, 404, fake404Response);
@@ -266,7 +273,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
                     FakeSearchResultsStorage.instance ().fakeProvidersResponseJson (), fakeQnam.data ());
             // handle search for provider
             } else if (path.startsWith (QStringLiteral ("/ocs/v2.php/search/providers")) && !searchTerm.isEmpty ()) {
-                const auto pathSplit = path.mid (string (QStringLiteral ("/ocs/v2.php/search/providers")).size ())
+                const var pathSplit = path.mid (string (QStringLiteral ("/ocs/v2.php/search/providers")).size ())
                                            .split (QLatin1Char ('/'), Qt.SkipEmptyParts);
 
                 if (!pathSplit.isEmpty () && path.contains (pathSplit.first ())) {
@@ -393,17 +400,17 @@ class TestUnifiedSearchListmodel : GLib.Object {
         // make sure search has on_finished
         QVERIFY (!model.isSearchInProgress ());
 
-        const auto numRowsInModelPrev = model.rowCount ();
+        const var numRowsInModelPrev = model.rowCount ();
 
         // test fetch more results
         QSignalSpy currentFetchMoreInProgressProviderIdChanged (
             model.data (), &Occ.UnifiedSearchResultsListModel.currentFetchMoreInProgressProviderIdChanged);
         QSignalSpy rowsInserted (model.data (), &Occ.UnifiedSearchResultsListModel.rowsInserted);
         for (int i = 0; i < model.rowCount (); ++i) {
-            const auto type = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.TypeRole);
+            const var type = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.TypeRole);
 
             if (type == Occ.UnifiedSearchResult.Type.FetchMoreTrigger) {
-                const auto providerId =
+                const var providerId =
                     model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
                         .toString ();
                 model.fetchMoreTriggerClicked (providerId);
@@ -414,7 +421,7 @@ class TestUnifiedSearchListmodel : GLib.Object {
         // make sure the currentFetchMoreInProgressProviderId was set back and forth and correct number fows has been inserted
         QCOMPARE (currentFetchMoreInProgressProviderIdChanged.count (), 1);
 
-        const auto providerIdFetchMoreTriggered = model.currentFetchMoreInProgressProviderId ();
+        const var providerIdFetchMoreTriggered = model.currentFetchMoreInProgressProviderId ();
 
         QVERIFY (!providerIdFetchMoreTriggered.isEmpty ());
 
@@ -424,12 +431,12 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
         QCOMPARE (rowsInserted.count (), 1);
 
-        const auto arguments = rowsInserted.takeFirst ();
+        const var arguments = rowsInserted.takeFirst ();
 
         QVERIFY (arguments.size () > 0);
 
-        const auto first = arguments.at (0).toInt ();
-        const auto last = arguments.at (1).toInt ();
+        const var first = arguments.at (0).toInt ();
+        const var last = arguments.at (1).toInt ();
 
         const int numInsertedExpected = last - first;
 
@@ -457,8 +464,8 @@ class TestUnifiedSearchListmodel : GLib.Object {
             bool isFetchMoreTriggerFound = false;
 
             for (int i = 0; i < model.rowCount (); ++i) {
-                const auto type = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.TypeRole);
-                const auto providerId =  model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
+                const var type = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.TypeRole);
+                const var providerId =  model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
                             .toString ();
                 if (type == Occ.UnifiedSearchResult.Type.FetchMoreTrigger
                     && providerId == providerIdFetchMoreTriggered) {
@@ -504,10 +511,10 @@ class TestUnifiedSearchListmodel : GLib.Object {
         string urlForClickedResult;
 
         for (int i = 0; i < model.rowCount (); ++i) {
-            const auto type = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.TypeRole);
+            const var type = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.TypeRole);
 
             if (type == Occ.UnifiedSearchResult.Type.Default) {
-                const auto providerId =
+                const var providerId =
                     model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
                         .toString ();
                 urlForClickedResult = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ResourceUrlRole).toString ();
@@ -521,9 +528,9 @@ class TestUnifiedSearchListmodel : GLib.Object {
 
         QCOMPARE (resultClicked.count (), 1);
 
-        const auto arguments = resultClicked.takeFirst ();
+        const var arguments = resultClicked.takeFirst ();
 
-        const auto urlOpenTriggeredViaDesktopServices = arguments.at (0).toString ();
+        const var urlOpenTriggeredViaDesktopServices = arguments.at (0).toString ();
 
         QCOMPARE (urlOpenTriggeredViaDesktopServices, urlForClickedResult);
     }

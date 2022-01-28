@@ -70,12 +70,14 @@ class Theme : GLib.Object {
         o_c_setup_result_top // own_cloud connect result page
     };
 
+
     /***********************************************************
     returns a singleton instance.
     ***********************************************************/
-    public static Theme *instance ();
+    public static Theme instance ();
 
     ~Theme () override;
+
 
     /***********************************************************
     @brief is_branded indicates if the current application is
@@ -87,6 +89,7 @@ class Theme : GLib.Object {
     @return true if branded, false otherwise
     ***********************************************************/
     public virtual bool is_branded ();
+
 
     /***********************************************************
     @brief app_name_gui - Human readable application name.
@@ -100,6 +103,7 @@ class Theme : GLib.Object {
     @return string with human readable app name.
     ***********************************************************/
     public virtual string app_name_gui ();
+
 
     /***********************************************************
     @brief app_name - Application name (short)
@@ -120,11 +124,13 @@ class Theme : GLib.Object {
     ***********************************************************/
     public virtual string app_name ();
 
+
     /***********************************************************
     @brief Returns full path to an online state icon
     @return QUrl full path to an icon
     ***********************************************************/
     public QUrl state_online_image_source ();
+
 
     /***********************************************************
     @brief Returns full path to an offline state icon
@@ -132,11 +138,13 @@ class Theme : GLib.Object {
     ***********************************************************/
     public QUrl state_offline_image_source ();
 
+
     /***********************************************************
     @brief Returns full path to an online user status icon
     @return QUrl full path to an icon
     ***********************************************************/
     public QUrl status_online_image_source ();
+
 
     /***********************************************************
     @brief Returns full path to an do not disturb user status icon
@@ -144,11 +152,13 @@ class Theme : GLib.Object {
     ***********************************************************/
     public QUrl status_do_not_disturb_image_source ();
 
+
     /***********************************************************
     @brief Returns full path to an away user status icon
     @return QUrl full path to an icon
     ***********************************************************/
     public QUrl status_away_image_source ();
+
 
     /***********************************************************
     @brief Returns full path to an invisible user status icon
@@ -168,6 +178,7 @@ class Theme : GLib.Object {
 
     public QUrl folder_offline ();
 
+
     /***********************************************************
     @brief config_file_name
     @return the name of the config file.
@@ -175,11 +186,12 @@ class Theme : GLib.Object {
     public virtual string config_file_name ();
 
 #ifndef TOKEN_AUTH_ONLY
-    public static string hidpi_file_name (string file_name, QPaint_device *dev = nullptr);
+    public static string hidpi_file_name (string file_name, QPaint_device dev = nullptr);
 
-    public static string hidpi_file_name (string icon_name, QColor &background_color, QPaint_device *dev = nullptr);
+    public static string hidpi_file_name (string icon_name, QColor &background_color, QPaint_device dev = nullptr);
 
-    public static bool is_hidpi (QPaint_device *dev = nullptr);
+    public static bool is_hidpi (QPaint_device dev = nullptr);
+
 
     /***********************************************************
     Get an sync state icon
@@ -187,22 +199,31 @@ class Theme : GLib.Object {
     public virtual QIcon sync_state_icon (SyncResult.Status, bool sys_tray = false);
 
     public virtual QIcon folder_disabled_icon ();
+
+
     public virtual QIcon folder_offline_icon (bool sys_tray = false);
+
+
     public virtual QIcon application_icon ();
 #endif
 
     public virtual string status_header_text (SyncResult.Status);
+
+
     public virtual string version ();
+
 
     /***********************************************************
     Characteristics: bool if more than one sync folder is allowed
     ***********************************************************/
     public virtual bool single_sync_folder ();
 
+
     /***********************************************************
     When true, client works with multiple accounts.
     ***********************************************************/
     public public virtual bool multi_account ();
+
 
     /***********************************************************
     URL to documentation.
@@ -217,6 +238,7 @@ class Theme : GLib.Object {
     ***********************************************************/
     public virtual string help_url ();
 
+
     /***********************************************************
     The url to use for showing help on conflicts.
 
@@ -229,6 +251,7 @@ class Theme : GLib.Object {
     ***********************************************************/
     public virtual string conflict_help_url ();
 
+
     /***********************************************************
     Setting a value here will pre-define the server url.
 
@@ -237,12 +260,14 @@ class Theme : GLib.Object {
     ***********************************************************/
     public virtual string override_server_url ();
 
+
     /***********************************************************
     Enforce a pre-defined server url.
 
     When true, the respective UI controls will be disabled
     ***********************************************************/
     public virtual bool force_override_server_url ();
+
 
     /***********************************************************
     Enable OCSP stapling for SSL handshakes
@@ -252,12 +277,14 @@ class Theme : GLib.Object {
     ***********************************************************/
     public virtual bool enable_stapling_oCSP ();
 
+
     /***********************************************************
     Enforce SSL validity
 
     When true, trusting the untrusted certificate is not allowed
     ***********************************************************/
     public virtual bool forbid_bad_s_sL ();
+
 
     /***********************************************************
     This is only usefull when previous version had a different
@@ -267,11 +294,13 @@ class Theme : GLib.Object {
     ***********************************************************/
     public virtual string force_config_auth_type ();
 
+
     /***********************************************************
     The default folder name without path on the server at setup
     time.
     ***********************************************************/
     public virtual string default_server_folder ();
+
 
     /***********************************************************
     The default folder name without path on the client side at
@@ -279,12 +308,14 @@ class Theme : GLib.Object {
     ***********************************************************/
     public virtual string default_client_folder ();
 
+
     /***********************************************************
     Override to encforce a particular locale, i.e. "de" or "pt_BR"
     ***********************************************************/
     public virtual string enforced_locale () {
         return string ();
     }
+
 
     /***********************************************************
     colored, white or black
@@ -299,10 +330,12 @@ class Theme : GLib.Object {
     ***********************************************************/
     public virtual QVariant custom_media (Custom_media_type type);
 
+
     /***********************************************************
     @return color for the setup wizard
     ***********************************************************/
     public virtual QColor wizard_header_title_color ();
+
 
     /***********************************************************
     @return color for the setup wizard.
@@ -311,10 +344,12 @@ class Theme : GLib.Object {
 
     public virtual QPixmap wizard_application_logo ();
 
+
     /***********************************************************
     @return logo for the setup wizard.
     ***********************************************************/
     public virtual QPixmap wizard_header_logo ();
+
 
     /***********************************************************
     The default implementation creates a
@@ -331,41 +366,49 @@ class Theme : GLib.Object {
     ***********************************************************/
     public string git_sHA1 ();
 
+
     /***********************************************************
     About dialog contents
     ***********************************************************/
     public virtual string about ();
+
 
     /***********************************************************
     Legal notice dialog version detail contents
     ***********************************************************/
     virtual string about_details ();
 
+
     /***********************************************************
     Define if the systray icons should be using mono design
     ***********************************************************/
     public void set_systray_use_mono_icons (bool mono);
+
 
     /***********************************************************
     Retrieve wether to use mono icons for systray
     ***********************************************************/
     public bool systray_use_mono_icons ();
 
+
     /***********************************************************
     Check if mono icons are available
     ***********************************************************/
     public bool mono_icons_available ();
+
 
     /***********************************************************
     @brief Where to check for new Updates.
     ***********************************************************/
     public virtual string update_check_url ();
 
+
     /***********************************************************
     When true, the setup wizard will show the selective sync
     dialog by default and default to nothing selected
     ***********************************************************/
     public virtual bool wizard_selective_sync_default_nothing ();
+
 
     /***********************************************************
     Default option for the new_big_folder_size_limit. Size in MB
@@ -375,11 +418,13 @@ class Theme : GLib.Object {
     ***********************************************************/
     public virtual int64 new_big_folder_size_limit ();
 
+
     /***********************************************************
     Hide the checkbox that says "Ask for confirmation before
     synchronizing folders larger than X MB" in the account wizard
     ***********************************************************/
     public virtual bool wizard_hide_folder_size_limit_checkbox ();
+
 
     /***********************************************************
     Hide the checkbox that says "Ask for confirmation before
@@ -387,13 +432,17 @@ class Theme : GLib.Object {
     ***********************************************************/
     public virtual bool wizard_hide_external_storage_confirmation_checkbox ();
 
+
     /***********************************************************
     @brief Sharing options
 
     Allow link sharing and or user/group sharing
     ***********************************************************/
     public virtual bool link_sharing ();
+
+
     public virtual bool user_group_sharing ();
+
 
     /***********************************************************
     If this returns true, the user cannot configure the proxy
@@ -403,6 +452,7 @@ class Theme : GLib.Object {
     Default returns false.
     ***********************************************************/
     public virtual bool force_system_network_proxy ();
+
 
     /***********************************************************
     @brief How to handle the user_iD
@@ -417,12 +467,14 @@ class Theme : GLib.Object {
         User_iDCustom
     };
 
+
     /***********************************************************
     @brief What to display as the user_iD (e.g. in the wizards)
 
     @return User_iDType.User_iDUser_name, unless reimplemented
     ***********************************************************/
     public virtual User_iDType user_iDType ();
+
 
     /***********************************************************
     @brief Allows to customize the type of user ID (e.g. user
@@ -436,6 +488,7 @@ class Theme : GLib.Object {
     ***********************************************************/
     public virtual string custom_user_iD ();
 
+
     /***********************************************************
     @brief Demo string to be displayed when no text has been
     entered for the user id (e.g. mylogin@company.com)
@@ -443,6 +496,7 @@ class Theme : GLib.Object {
     @return An empty string, unless reimplemented
     ***********************************************************/
     public virtual string user_iDHint ();
+
 
     /***********************************************************
     @brief Postfix that will be enforced in a URL. e.g.
@@ -452,6 +506,7 @@ class Theme : GLib.Object {
     ***********************************************************/
     public virtual string wizard_url_postfix ();
 
+
     /***********************************************************
     @brief String that will be shown as long as no text has
     been entered by the user.
@@ -459,6 +514,7 @@ class Theme : GLib.Object {
     @return An empty string, unless reimplemented
     ***********************************************************/
     public virtual string wizard_url_hint ();
+
 
     /***********************************************************
     @brief the server folder that should be queried for the
@@ -473,13 +529,17 @@ class Theme : GLib.Object {
     ***********************************************************/
     public virtual string quota_base_folder ();
 
+
     /***********************************************************
     The OAuth client_id, secret pair.
     Note that client that change these value cannot connect to
     un-branded owncloud servers.
     ***********************************************************/
     public virtual string oauth_client_id ();
+
+
     public virtual string oauth_client_secret ();
+
 
     /***********************************************************
     @brief What should be output for the --version command line
@@ -500,6 +560,7 @@ class Theme : GLib.Object {
     ***********************************************************/
 	public virtual QIcon ui_theme_icon (string icon_name, bool ui_has_dark_bg);
 
+
     /***********************************************************
     @brief Perform a calculation to check if a colour is dark or
     light and accounts for different sensitivity of the human eye.
@@ -509,6 +570,7 @@ class Theme : GLib.Object {
     2019/12/08 : Moved here from SettingsDialog.
     ***********************************************************/
     public static bool is_dark_color (QColor &color);
+
 
     /***********************************************************
     @brief Return the colour to be used for HTML links (e.g.
@@ -523,6 +585,7 @@ class Theme : GLib.Object {
     ***********************************************************/
     public static QColor get_background_aware_link_color (QColor &background_color);
 
+
     /***********************************************************
     @brief Return the colour to be used for HTML links (e.g.
     used in QLabel), based on the current app palette
@@ -535,6 +598,7 @@ class Theme : GLib.Object {
     the app palette can not account for that (Qt 5.12.5).
     ***********************************************************/
     public static QColor get_background_aware_link_color ();
+
 
     /***********************************************************
     @brief Appends a CSS-style colour value to all HTML link
@@ -549,6 +613,7 @@ class Theme : GLib.Object {
     ***********************************************************/
     public static void replace_link_color_string_background_aware (string link_string, QColor &background_color);
 
+
     /***********************************************************
     @brief Appends a CSS-style colour value to all HTML link
     tags in a given string, based on the current app palette
@@ -562,6 +627,7 @@ class Theme : GLib.Object {
     ***********************************************************/
     public static void replace_link_color_string_background_aware (string link_string);
 
+
     /***********************************************************
     @brief Appends a CSS-style colour value to all HTML link
     tags in a given string, as specified by new_color.
@@ -574,6 +640,7 @@ class Theme : GLib.Object {
     ***********************************************************/
     public static void replace_link_color_string (string link_string, QColor &new_color);
 
+
     /***********************************************************
     @brief Creates a colour-aware icon based on the specified
     palette's base colour.
@@ -583,6 +650,7 @@ class Theme : GLib.Object {
     2019/12/09 : Moved here from SettingsDialog.
     ***********************************************************/
     public static QIcon create_color_aware_icon (string name, QPalette &palette);
+
 
     /***********************************************************
     @brief Creates a colour-aware icon based on the app
@@ -594,6 +662,7 @@ class Theme : GLib.Object {
     ***********************************************************/
     public static QIcon create_color_aware_icon (string name);
 
+
     /***********************************************************
     @brief Creates a colour-aware pixmap based on the specified
     palette's base colour.
@@ -604,6 +673,7 @@ class Theme : GLib.Object {
     ***********************************************************/
     public static QPixmap create_color_aware_pixmap (string name, QPalette &palette);
 
+
     /***********************************************************
     @brief Creates a colour-aware pixmap based on the app
     palette's base colour (Dark-/Light-Mode switching).
@@ -613,6 +683,7 @@ class Theme : GLib.Object {
     2019/12/09: Adapted from create_color_aware_icon.
     ***********************************************************/
     public static QPixmap create_color_aware_pixmap (string name);
+
 
     /***********************************************************
     @brief Whether to show the option to create folders using
@@ -625,22 +696,25 @@ class Theme : GLib.Object {
 
     public virtual bool enforce_virtual_files_sync_folder ();
 
+
     /***********************************************************
     @return color for the Error_box text.
     ***********************************************************/
     public virtual QColor error_box_text_color ();
+
 
     /***********************************************************
     @return color for the Error_box background.
     ***********************************************************/
     public virtual QColor error_box_background_color ();
 
+
     /***********************************************************
     @return color for the Error_box border.
     ***********************************************************/
     public virtual QColor error_box_border_color ();
 
-    public static constexpr const char *theme_prefix = ":/client/theme/";
+    public static constexpr const char theme_prefix = ":/client/theme/";
 
 
 #ifndef TOKEN_AUTH_ONLY
@@ -684,7 +758,7 @@ namespace {
 
 QUrl image_path_to_url (string image_path) {
     if (image_path.starts_with (':')) {
-        auto url = QUrl ();
+        var url = QUrl ();
         url.set_scheme (QStringLiteral ("qrc"));
         url.set_path (image_path.mid (1));
         return url;
@@ -844,7 +918,7 @@ QIcon Theme.theme_icon (string name, bool sys_tray) {
 
         const string svg_name = string (Theme.theme_prefix) + string.from_latin1 ("%1/%2.svg").arg (flavor).arg (name);
         QSvgRenderer renderer (svg_name);
-        const auto create_pixmap_from_svg = [&renderer] (int size) {
+        const var create_pixmap_from_svg = [&renderer] (int size) {
             QImage img (size, size, QImage.Format_ARGB32);
             img.fill (Qt.Global_color.transparent);
             QPainter img_painter (&img);
@@ -852,19 +926,19 @@ QIcon Theme.theme_icon (string name, bool sys_tray) {
             return QPixmap.from_image (img);
         };
 
-        const auto load_pixmap = [flavor, name] (int size) {
+        const var load_pixmap = [flavor, name] (int size) {
             const string pixmap_name = string (Theme.theme_prefix) + string.from_latin1 ("%1/%2-%3.png").arg (flavor).arg (name).arg (size);
             return QPixmap (pixmap_name);
         };
 
-        const auto use_svg = should_prefer_svg ();
-        const auto sizes = use_svg
+        const var use_svg = should_prefer_svg ();
+        const var sizes = use_svg
             ? QVector<int> {
                 16, 32, 64, 128, 256 }
             : QVector<int> {
                 16, 22, 32, 48, 64, 128, 256, 512, 1024 };
         for (int size : sizes) {
-            auto px = use_svg ? create_pixmap_from_svg (size) : load_pixmap (size);
+            var px = use_svg ? create_pixmap_from_svg (size) : load_pixmap (size);
             if (px.is_null ()) {
                 continue;
             }
@@ -883,8 +957,8 @@ QIcon Theme.theme_icon (string name, bool sys_tray) {
 }
 
 string Theme.theme_image_path (string name, int size, bool sys_tray) {
-    const auto flavor = (!is_branded () && sys_tray) ? systray_icon_flavor (_mono) : QLatin1String ("colored");
-    const auto use_svg = should_prefer_svg ();
+    const var flavor = (!is_branded () && sys_tray) ? systray_icon_flavor (_mono) : QLatin1String ("colored");
+    const var use_svg = should_prefer_svg ();
 
     // branded client may have several sizes of the same icon
     const string file_path = (use_svg || size <= 0)
@@ -905,8 +979,8 @@ string Theme.theme_image_path (string name, int size, bool sys_tray) {
     }
 }
 
-bool Theme.is_hidpi (QPaint_device *dev) {
-    const auto device_pixel_ratio = dev ? dev.device_pixel_ratio () : q_app.primary_screen ().device_pixel_ratio ();
+bool Theme.is_hidpi (QPaint_device dev) {
+    const var device_pixel_ratio = dev ? dev.device_pixel_ratio () : q_app.primary_screen ().device_pixel_ratio ();
     return device_pixel_ratio > 1;
 }
 
@@ -916,7 +990,7 @@ QIcon Theme.ui_theme_icon (string icon_name, bool ui_has_dark_bg) {
     return QIcon (QPixmap (icon_path));
 }
 
-string Theme.hidpi_file_name (string file_name, QPaint_device *dev) {
+string Theme.hidpi_file_name (string file_name, QPaint_device dev) {
     if (!Theme.is_hidpi (dev)) {
         return file_name;
     }
@@ -933,8 +1007,8 @@ string Theme.hidpi_file_name (string file_name, QPaint_device *dev) {
     return file_name;
 }
 
-string Theme.hidpi_file_name (string icon_name, QColor &background_color, QPaint_device *dev) {
-    const auto is_dark_background = Theme.is_dark_color (background_color);
+string Theme.hidpi_file_name (string icon_name, QColor &background_color, QPaint_device dev) {
+    const var is_dark_background = Theme.is_dark_color (background_color);
 
     const string icon_path = string (Theme.theme_prefix) + (is_dark_background ? "white/" : "black/") + icon_name;
 
@@ -970,7 +1044,7 @@ string Theme.help_url () {
 }
 
 string Theme.conflict_help_url () {
-    auto base_url = help_url ();
+    var base_url = help_url ();
     if (base_url.is_empty ())
         return string ();
     if (!base_url.ends_with ('/'))
@@ -1202,32 +1276,32 @@ QPixmap Theme.wizard_application_logo () {
         return QPixmap (Theme.hidpi_file_name (string (Theme.theme_prefix) + "colored/wizard-nextcloud.png"));
     }
 #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
-    const auto use_svg = should_prefer_svg ();
+    const var use_svg = should_prefer_svg ();
     const string logo_base_path = string (Theme.theme_prefix) + QStringLiteral ("colored/wizard_logo");
     if (use_svg) {
-        const auto max_height = Theme.is_hidpi () ? 200 : 100;
-        const auto max_width = 2 * max_height;
-        const auto icon = QIcon (logo_base_path + ".svg");
-        const auto size = icon.actual_size (QSize (max_width, max_height));
+        const var max_height = Theme.is_hidpi () ? 200 : 100;
+        const var max_width = 2 * max_height;
+        const var icon = QIcon (logo_base_path + ".svg");
+        const var size = icon.actual_size (QSize (max_width, max_height));
         return icon.pixmap (size);
     } else {
         return QPixmap (hidpi_file_name (logo_base_path + ".png"));
     }
 #else
-    const auto size = Theme.is_hidpi () ? : 200 : 100;
+    const var size = Theme.is_hidpi () ? : 200 : 100;
     return application_icon ().pixmap (size);
 #endif
 }
 
 QPixmap Theme.wizard_header_logo () {
 #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
-    const auto use_svg = should_prefer_svg ();
+    const var use_svg = should_prefer_svg ();
     const string logo_base_path = string (Theme.theme_prefix) + QStringLiteral ("colored/wizard_logo");
     if (use_svg) {
-        const auto max_height = 64;
-        const auto max_width = 2 * max_height;
-        const auto icon = QIcon (logo_base_path + ".svg");
-        const auto size = icon.actual_size (QSize (max_width, max_height));
+        const var max_height = 64;
+        const var max_width = 2 * max_height;
+        const var icon = QIcon (logo_base_path + ".svg");
+        const var size = icon.actual_size (QSize (max_width, max_height));
         return icon.pixmap (size);
     } else {
         return QPixmap (hidpi_file_name (logo_base_path + ".png"));
@@ -1243,10 +1317,10 @@ QPixmap Theme.wizard_header_banner () {
         return QPixmap ();
 
     QSize size (750, 78);
-    if (auto screen = q_app.primary_screen ()) {
+    if (var screen = q_app.primary_screen ()) {
         // Adjust the the size if there is a different DPI. (Issue #6156)
         // Indeed, this size need to be big enough to for the banner height, and the wizard's width
-        auto ratio = screen.logical_dots_per_inch () / 96.;
+        var ratio = screen.logical_dots_per_inch () / 96.;
         if (ratio > 1.)
             size *= ratio;
     }
@@ -1402,12 +1476,12 @@ QPixmap Theme.create_color_aware_pixmap (string name) {
 }
 
 bool Theme.show_virtual_files_option () {
-    const auto vfs_mode = best_available_vfs_mode ();
+    const var vfs_mode = best_available_vfs_mode ();
     return ConfigFile ().show_experimental_options () || vfs_mode == Vfs.WindowsCfApi;
 }
 
 bool Theme.enforce_virtual_files_sync_folder () {
-    const auto vfs_mode = best_available_vfs_mode ();
+    const var vfs_mode = best_available_vfs_mode ();
     return ENFORCE_VIRTUAL_FILES_SYNC_FOLDER && vfs_mode != Occ.Vfs.Off;
 }
 

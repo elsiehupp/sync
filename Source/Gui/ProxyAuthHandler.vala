@@ -37,13 +37,13 @@ fairly complicated to handle.
 ***********************************************************/
 class ProxyAuthHandler : GLib.Object {
 
-    public static ProxyAuthHandler *instance ();
+    public static ProxyAuthHandler instance ();
 
     ~ProxyAuthHandler () override;
 
     /// Intended for QNetworkAccessManager.proxy_authentication_required ()
     public void on_handle_proxy_authentication_required (QNetworkProxy &proxy,
-        QAuthenticator *authenticator);
+        QAuthenticator authenticator);
 
 
     private void on_sender_destroyed (GLib.Object *);
@@ -131,7 +131,7 @@ ProxyAuthHandler.~ProxyAuthHandler () {
 
 void ProxyAuthHandler.on_handle_proxy_authentication_required (
     const QNetworkProxy &proxy,
-    QAuthenticator *authenticator) {
+    QAuthenticator authenticator) {
     if (!_dialog) {
         return;
     }
@@ -160,7 +160,7 @@ void ProxyAuthHandler.on_handle_proxy_authentication_required (
 
     // Find the responsible QNAM if possible.
     QPointer<QNetworkAccessManager> sending_qnam = nullptr;
-    if (auto account = qobject_cast<Account> (sender ())) {
+    if (var account = qobject_cast<Account> (sender ())) {
         // Since we go into an event loop, it's possible for the account's qnam
         // to be destroyed before we get back. We can use this to check for its
         // liveness.
@@ -208,7 +208,7 @@ void ProxyAuthHandler.on_handle_proxy_authentication_required (
     }
 }
 
-void ProxyAuthHandler.on_sender_destroyed (GLib.Object *obj) {
+void ProxyAuthHandler.on_sender_destroyed (GLib.Object obj) {
     _gave_credentials_to.remove (obj);
 }
 
@@ -307,7 +307,7 @@ void ProxyAuthHandler.store_creds_in_keychain () {
 
     _settings.set_value (keychain_username_key (), _username);
 
-    auto job = new WritePasswordJob (Theme.instance ().app_name (), this);
+    var job = new WritePasswordJob (Theme.instance ().app_name (), this);
     job.set_settings (_settings.data ());
     job.set_insecure_fallback (false);
     job.set_key (keychain_password_key ());

@@ -25,10 +25,10 @@ namespace Occ {
 }
 
 csync_vio_handle_t OCSYNC_EXPORT *csync_vio_local_opendir (string name);
-int OCSYNC_EXPORT csync_vio_local_closedir (csync_vio_handle_t *dhandle);
-std.unique_ptr<csync_file_stat_t> OCSYNC_EXPORT csync_vio_local_readdir (csync_vio_handle_t *dhandle, Occ.Vfs *vfs);
+int OCSYNC_EXPORT csync_vio_local_closedir (csync_vio_handle_t dhandle);
+std.unique_ptr<csync_file_stat_t> OCSYNC_EXPORT csync_vio_local_readdir (csync_vio_handle_t dhandle, Occ.Vfs vfs);
 
-int OCSYNC_EXPORT csync_vio_local_stat (string uri, csync_file_stat_t *buf);
+int OCSYNC_EXPORT csync_vio_local_stat (string uri, csync_file_stat_t buf);
 
 
 
@@ -88,12 +88,12 @@ struct csync_vio_handle_t {
   GLib.ByteArray path;
 };
 
-static int _csync_vio_local_stat_mb (mbchar_t *wuri, csync_file_stat_t *buf);
+static int _csync_vio_local_stat_mb (mbchar_t wuri, csync_file_stat_t buf);
 
-csync_vio_handle_t *csync_vio_local_opendir (string name) {
+csync_vio_handle_t csync_vio_local_opendir (string name) {
     QScopedPointer<csync_vio_handle_t> handle (new csync_vio_handle_t{});
 
-    auto dirname = QFile.encode_name (name);
+    var dirname = QFile.encode_name (name);
 
     handle.dh = _topendir (dirname.const_data ());
     if (!handle.dh) {
@@ -104,16 +104,16 @@ csync_vio_handle_t *csync_vio_local_opendir (string name) {
     return handle.take ();
 }
 
-int csync_vio_local_closedir (csync_vio_handle_t *dhandle) {
+int csync_vio_local_closedir (csync_vio_handle_t dhandle) {
     Q_ASSERT (dhandle);
-    auto rc = _tclosedir (dhandle.dh);
+    var rc = _tclosedir (dhandle.dh);
     delete dhandle;
     return rc;
 }
 
-std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t *handle, Occ.Vfs *vfs) {
+std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t handle, Occ.Vfs vfs) {
 
-  struct _tdirent *dirent = nullptr;
+  struct _tdirent dirent = nullptr;
   std.unique_ptr<csync_file_stat_t> file_stat;
 
   do {
@@ -163,18 +163,18 @@ std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t *h
   if (vfs) {
       // Directly modifies file_stat.type.
       // We can ignore the return value since we're done here anyway.
-      const auto result = vfs.stat_type_virtual_file (file_stat.get (), &handle.path);
+      const var result = vfs.stat_type_virtual_file (file_stat.get (), &handle.path);
       Q_UNUSED (result)
   }
 
   return file_stat;
 }
 
-int csync_vio_local_stat (string uri, csync_file_stat_t *buf) {
+int csync_vio_local_stat (string uri, csync_file_stat_t buf) {
     return _csync_vio_local_stat_mb (QFile.encode_name (uri).const_data (), buf);
 }
 
-static int _csync_vio_local_stat_mb (mbchar_t *wuri, csync_file_stat_t *buf) {
+static int _csync_vio_local_stat_mb (mbchar_t wuri, csync_file_stat_t buf) {
     csync_stat_t sb;
 
     if (_tstat (wuri, &sb) < 0) {
